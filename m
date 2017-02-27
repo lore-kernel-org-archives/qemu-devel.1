@@ -1,35 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46794)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ciUHq-0000e8-TX
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:01:02 -0500
+	(envelope-from <groug@kaod.org>) id 1ciUHj-0000Vo-5K
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:00:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ciUHn-00044R-Ko
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:00:58 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32898
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <groug@kaod.org>) id 1ciUHf-0003tA-Tk
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:00:51 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54807)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ciUHn-00043o-E5
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:00:55 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1RMragC076845
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 18:00:54 -0500
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28vqj0q6hd-1
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ciUHf-0003mS-Jj
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:00:47 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1RMra7f055653
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 18:00:39 -0500
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28vq9ag8y7-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 18:00:54 -0500
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 18:00:39 -0500
 Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Mon, 27 Feb 2017 23:00:52 -0000
+	Mon, 27 Feb 2017 23:00:37 -0000
 From: Greg Kurz <groug@kaod.org>
-Date: Mon, 27 Feb 2017 23:59:59 +0100
+Date: Mon, 27 Feb 2017 23:59:51 +0100
 In-Reply-To: <1488236421-30983-1-git-send-email-groug@kaod.org>
 References: <1488236421-30983-1-git-send-email-groug@kaod.org>
-Message-Id: <1488236421-30983-10-git-send-email-groug@kaod.org>
-Subject: [Qemu-devel] [PULL 09/31] 9pfs: local: open/opendir: don't follow
- symlinks
+Message-Id: <1488236421-30983-2-git-send-email-groug@kaod.org>
+Subject: [Qemu-devel] [PULL 01/31] 9pfs: fix v9fs_lock error case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,127 +37,65 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-The local_open() and local_opendir() callbacks are vulnerable to symlink
-attacks because they call:
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-(1) open(O_NOFOLLOW) which follows symbolic links in all path elements but
-    the rightmost one
-(2) opendir() which follows symbolic links in all path elements
+In this case, we are marshaling an error status instead of the errno value.
+Reorganize the out and out_nofid labels to look like all the other cases.
+Coverity reports this because the "err = -ENOENT" and "err = -EINVAL"
+assignments above are dead, overwritten by the call to pdu_marshal.
 
-This patch converts both callbacks to use new helpers based on
-openat_nofollow() to only open files and directories if they are
-below the virtfs shared folder
+(Coverity issues CID1348512 and CID1348513)
 
-This partly fixes CVE-2016-9602.
-
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+(also open-coded the success path since locking is a nop for us, Greg Kurz)
 Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- hw/9pfs/9p-local.c | 37 +++++++++++++++++++++++++++----------
- hw/9pfs/9p-local.h | 20 ++++++++++++++++++++
- 2 files changed, 47 insertions(+), 10 deletions(-)
- create mode 100644 hw/9pfs/9p-local.h
+ hw/9pfs/9p.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index b58d0bc65439..af5f430e6c8e 100644
---- a/hw/9pfs/9p-local.c
-+++ b/hw/9pfs/9p-local.c
-@@ -13,6 +13,7 @@
- 
- #include "qemu/osdep.h"
- #include "9p.h"
-+#include "9p-local.h"
- #include "9p-xattr.h"
- #include "9p-util.h"
- #include "fsdev/qemu-fsdev.h"   /* local_ops */
-@@ -48,6 +49,24 @@ typedef struct {
-     int mountfd;
- } LocalData;
- 
-+int local_open_nofollow(FsContext *fs_ctx, const char *path, int flags,
-+                        mode_t mode)
-+{
-+    LocalData *data = fs_ctx->private;
-+
-+    /* All paths are relative to the path data->mountfd points to */
-+    while (*path == '/') {
-+        path++;
-+    }
-+
-+    return relative_openat_nofollow(data->mountfd, path, flags, mode);
-+}
-+
-+int local_opendir_nofollow(FsContext *fs_ctx, const char *path)
-+{
-+    return local_open_nofollow(fs_ctx, path, O_DIRECTORY | O_RDONLY, 0);
-+}
-+
- #define VIRTFS_META_DIR ".virtfs_metadata"
- 
- static char *local_mapped_attr_path(FsContext *ctx, const char *path)
-@@ -359,13 +378,9 @@ static int local_closedir(FsContext *ctx, V9fsFidOpenState *fs)
- static int local_open(FsContext *ctx, V9fsPath *fs_path,
-                       int flags, V9fsFidOpenState *fs)
+diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+index 3af1c93dc87d..d99abc46025e 100644
+--- a/hw/9pfs/9p.c
++++ b/hw/9pfs/9p.c
+@@ -3010,7 +3010,6 @@ out_nofid:
+  */
+ static void coroutine_fn v9fs_lock(void *opaque)
  {
--    char *buffer;
--    char *path = fs_path->data;
-     int fd;
+-    int8_t status;
+     V9fsFlock flock;
+     size_t offset = 7;
+     struct stat stbuf;
+@@ -3018,7 +3017,6 @@ static void coroutine_fn v9fs_lock(void *opaque)
+     int32_t fid, err = 0;
+     V9fsPDU *pdu = opaque;
  
--    buffer = rpath(ctx, path);
--    fd = open(buffer, flags | O_NOFOLLOW);
--    g_free(buffer);
-+    fd = local_open_nofollow(ctx, fs_path->data, flags, 0);
-     if (fd == -1) {
-         return -1;
+-    status = P9_LOCK_ERROR;
+     v9fs_string_init(&flock.client_id);
+     err = pdu_unmarshal(pdu, offset, "dbdqqds", &fid, &flock.type,
+                         &flock.flags, &flock.start, &flock.length,
+@@ -3044,15 +3042,15 @@ static void coroutine_fn v9fs_lock(void *opaque)
+     if (err < 0) {
+         goto out;
      }
-@@ -376,13 +391,15 @@ static int local_open(FsContext *ctx, V9fsPath *fs_path,
- static int local_opendir(FsContext *ctx,
-                          V9fsPath *fs_path, V9fsFidOpenState *fs)
- {
--    char *buffer;
--    char *path = fs_path->data;
-+    int dirfd;
-     DIR *stream;
- 
--    buffer = rpath(ctx, path);
--    stream = opendir(buffer);
--    g_free(buffer);
-+    dirfd = local_opendir_nofollow(ctx, fs_path->data);
-+    if (dirfd == -1) {
-+        return -1;
+-    status = P9_LOCK_SUCCESS;
++    err = pdu_marshal(pdu, offset, "b", P9_LOCK_SUCCESS);
++    if (err < 0) {
++        goto out;
 +    }
-+
-+    stream = fdopendir(dirfd);
-     if (!stream) {
-         return -1;
-     }
-diff --git a/hw/9pfs/9p-local.h b/hw/9pfs/9p-local.h
-new file mode 100644
-index 000000000000..32c72749d9df
---- /dev/null
-+++ b/hw/9pfs/9p-local.h
-@@ -0,0 +1,20 @@
-+/*
-+ * 9p local backend utilities
-+ *
-+ * Copyright IBM, Corp. 2017
-+ *
-+ * Authors:
-+ *  Greg Kurz <groug@kaod.org>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef QEMU_9P_LOCAL_H
-+#define QEMU_9P_LOCAL_H
-+
-+int local_open_nofollow(FsContext *fs_ctx, const char *path, int flags,
-+                        mode_t mode);
-+int local_opendir_nofollow(FsContext *fs_ctx, const char *path);
-+
-+#endif
++    err += offset;
++    trace_v9fs_lock_return(pdu->tag, pdu->id, P9_LOCK_SUCCESS);
+ out:
+     put_fid(pdu, fidp);
+ out_nofid:
+-    err = pdu_marshal(pdu, offset, "b", status);
+-    if (err > 0) {
+-        err += offset;
+-    }
+-    trace_v9fs_lock_return(pdu->tag, pdu->id, status);
+     pdu_complete(pdu, err);
+     v9fs_string_free(&flock.client_id);
+ }
 -- 
 2.7.4
