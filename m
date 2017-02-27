@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shah.suramya@gmail.com>) id 1ciNoX-0000Jy-ID
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:06:18 -0500
+	(envelope-from <bounces@canonical.com>) id 1ciNt1-0004B9-Da
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:10:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shah.suramya@gmail.com>) id 1ciNoT-0006Ys-Ka
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:06:17 -0500
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:36633)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shah.suramya@gmail.com>)
-	id 1ciNoT-0006Yf-Ek
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:06:13 -0500
-Received: by mail-pg0-x241.google.com with SMTP id 25so1490462pgy.3
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 08:06:13 -0800 (PST)
-From: Suramya Shah <shah.suramya@gmail.com>
-Date: Mon, 27 Feb 2017 21:31:18 +0530
-Message-Id: <20170227160118.3557-1-shah.suramya@gmail.com>
-Subject: [Qemu-devel] [[PATCH-2]] Removed support for DEPTH!=32 in sm501.c
+	(envelope-from <bounces@canonical.com>) id 1ciNsx-0007zZ-VJ
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:10:55 -0500
+Received: from indium.canonical.com ([91.189.90.7]:49660)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ciNsx-0007yt-OD
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:10:51 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1ciNsv-00016R-L7
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 16:10:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 98ADC2E80C6
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 16:10:49 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 27 Feb 2017 15:58:11 -0000
+From: Nehal J Wani <nehaljw.kkd1@gmail.com>
+Reply-To: Bug 1668273 <1668273@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170227140328.20639.14786.malonedeb@soybean.canonical.com>
+Message-Id: <20170227155811.5587.81925.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1668273] Re: DoS possible on - a QEMU process
+ using userspace SLIRP?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,40 +38,108 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: shah.suramya@gmail.com, peter.maydell@linaro.org, kraxel@redhat.com
 
-Signed-off-by: Suramya Shah <shah.suramya@gmail.com>
----
- hw/display/sm501.c | 17 -----------------
- 1 file changed, 17 deletions(-)
+But lsof shows that all connections are stuck at FIN_WAIT2 for an
+indefinite amount of time. Is that expected?
 
-diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index 040a0b9..faca906 100644
---- a/hw/display/sm501.c
-+++ b/hw/display/sm501.c
-@@ -1173,23 +1173,6 @@ typedef void draw_line_func(uint8_t *d, const uint8_t *s,
- typedef void draw_hwc_line_func(SM501State * s, int crt, uint8_t * palette,
-                                 int c_y, uint8_t *d, int width);
- 
--#define DEPTH 8
--#include "sm501_template.h"
--
--#define DEPTH 15
--#include "sm501_template.h"
--
--#define BGR_FORMAT
--#define DEPTH 15
--#include "sm501_template.h"
--
--#define DEPTH 16
--#include "sm501_template.h"
--
--#define BGR_FORMAT
--#define DEPTH 16
--#include "sm501_template.h"
--
- #define DEPTH 32
- #include "sm501_template.h"
- 
--- 
-2.9.3
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1668273
+
+Title:
+  DoS possible on - a QEMU process using userspace SLIRP?
+
+Status in QEMU:
+  New
+
+Bug description:
+  Steps to reproduce:
+
+  - Launch a VM using QEMU (2.8.0):
+
+  $ qemu-system-x86_64 \
+  =C2=A0=C2=A0=C2=A0=C2=A0-machine accel=3Dkvm \
+  =C2=A0=C2=A0=C2=A0=C2=A0-hda Fedora-Cloud-Base-25-1.3.x86_64.qcow2 \
+  =C2=A0=C2=A0=C2=A0=C2=A0-m 2G \
+  =C2=A0=C2=A0=C2=A0=C2=A0-smp 2 \
+  =C2=A0=C2=A0=C2=A0=C2=A0-vnc :8 \
+  =C2=A0=C2=A0=C2=A0=C2=A0-boot dc \
+  =C2=A0=C2=A0=C2=A0=C2=A0-vga std \
+  =C2=A0=C2=A0=C2=A0=C2=A0-cpu host \
+  =C2=A0=C2=A0=C2=A0=C2=A0-net nic,vlan=3D0 \
+  =C2=A0=C2=A0=C2=A0=C2=A0-net user,vlan=3D0,hostfwd=3Dtcp::10024-:22,hostf=
+wd=3Dtcp::8082-:80
+
+  - SSH into the VM, install httpd, start httpd
+
+  $ ssh -p 10024 root@localhost 'dnf install -y httpd && systemctl start
+  httpd'
+
+  - Compile and run the following Java program (on the host):
+
+  $ cat <<EOF > URLConnectionReader.java
+  import java.net.*;
+  import java.io.*;
+
+  public class URLConnectionReader {
+  =C2=A0=C2=A0=C2=A0=C2=A0public static void main(String[] args) throws Exc=
+eption {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int i =3D 0;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0while (i < 1024) {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0U=
+RL this_is_404 =3D new URL("http://localhost:8082/blah");
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0U=
+RLConnection yc =3D this_is_404.openConnection();
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0t=
+ry {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0BufferedReader in =3D new BufferedReader(new InputS=
+treamReader(
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0yc.getInputStream()));
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0String inputLine;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0while ((inputLine =3D in.readLine()) !=3D null)
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0System.out.println(inputLin=
+e);
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0in.close();
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}=
+ catch (Exception e) {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0//HttpURLConnection urlConnection =3D (HttpURLConne=
+ction) yc;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0//urlConnection.disconnect();
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0i=
+++;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Thread.sleep(1000000000);
+  =C2=A0=C2=A0=C2=A0=C2=A0}
+  }
+
+  $ javac URLConnectionReader.java
+
+  $ java URLConnectionReader &
+
+  The java program tries to open a lot of HTTP connections, but never
+  calls disconnect() on any.
+
+  - Take a look at the list of open FDs of the qemu process:
+
+  $ ls -tl /proc/${qemu-pid}/fd
+
+  $ lsof -p ${qemu-pid}
+  All of the TCP connections will be stuck at FIN_WAIT2
+
+  The VM becomes unresponsive. Neither SSH or VNC works after this; even
+  after tcp_fin_timeout expires.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1668273/+subscriptions
