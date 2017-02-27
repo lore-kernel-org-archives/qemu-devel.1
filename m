@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43754)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ciJJ7-0004fm-Er
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:17:34 -0500
+	(envelope-from <armbru@redhat.com>) id 1ciJMU-00063q-5c
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:21:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1ciJJ2-0000Eb-MF
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:17:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46872)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ciJJ2-0000EN-G1
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:17:28 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 55C633A76A4
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 11:17:28 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 27 Feb 2017 12:17:26 +0100
-Message-Id: <20170227111726.9237-1-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] tests-aio-multithread: use atomic_read properly
+	(envelope-from <armbru@redhat.com>) id 1ciJMS-0000zk-8b
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:21:02 -0500
+From: Markus Armbruster <armbru@redhat.com>
+Date: Mon, 27 Feb 2017 12:20:36 +0100
+Message-Id: <1488194450-28056-11-git-send-email-armbru@redhat.com>
+In-Reply-To: <1488194450-28056-1-git-send-email-armbru@redhat.com>
+References: <1488194450-28056-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH 10/24] qjson: Abort earlier on
+ qobject_from_jsonf() misuse
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +21,29 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: stefanha@redhat.com
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com, eblake@redhat.com, "mdroth@linux.vnet.ibm.commdroth"@linux.vnet.ibm.com
 
-nodes[id].next is written by other threads.  If atomic_read is not used
-(matching atomic_set in mcs_mutex_lock!) the compiler can optimize the
-whole "if" away!
+Ignoring errors first, then asserting success is suboptimal.  Pass
+&error_abort instead, so we abort earlier, and hopefully get more
+useful clues on what's wrong.
 
-Reported-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/test-aio-multithread.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ qobject/qjson.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/test-aio-multithread.c b/tests/test-aio-multithread.c
-index f11e990..8b0b40e 100644
---- a/tests/test-aio-multithread.c
-+++ b/tests/test-aio-multithread.c
-@@ -309,7 +309,7 @@ static void mcs_mutex_lock(void)
- static void mcs_mutex_unlock(void)
- {
-     int next;
--    if (nodes[id].next =3D=3D -1) {
-+    if (atomic_read(&nodes[id].next) =3D=3D -1) {
-         if (atomic_read(&mutex_head) =3D=3D id &&
-             atomic_cmpxchg(&mutex_head, id, -1) =3D=3D id) {
-             /* Last item in the list, exit.  */
-@@ -323,7 +323,7 @@ static void mcs_mutex_unlock(void)
-     }
-=20
-     /* Wake up the next in line.  */
--    next =3D nodes[id].next;
-+    next =3D atomic_read(&nodes[id].next);
-     nodes[next].locked =3D 0;
-     qemu_futex_wake(&nodes[next].locked, 1);
- }
---=20
-2.9.3
+diff --git a/qobject/qjson.c b/qobject/qjson.c
+index 339c9f7..c98d6a7 100644
+--- a/qobject/qjson.c
++++ b/qobject/qjson.c
+@@ -65,7 +65,7 @@ QObject *qobject_from_jsonf(const char *string, ...)
+     va_list ap;
+ 
+     va_start(ap, string);
+-    obj = qobject_from_jsonv(string, &ap, NULL);
++    obj = qobject_from_jsonv(string, &ap, &error_abort);
+     va_end(ap);
+ 
+     assert(obj != NULL);
+-- 
+2.7.4
