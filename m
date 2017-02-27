@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ciSYZ-00016J-FU
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 16:10:08 -0500
+	(envelope-from <eblake@redhat.com>) id 1ciSir-0000LK-7s
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 16:20:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ciSYX-0003G9-L4
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 16:10:06 -0500
-References: <1488193394-28453-1-git-send-email-pl@kamp.de>
+	(envelope-from <eblake@redhat.com>) id 1ciSio-0006nk-2Z
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 16:20:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39784)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ciSin-0006nZ-Pr
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 16:20:41 -0500
+References: <20170227201456.31814-1-berrange@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <07ef9e24-a17b-536b-8ef3-9a105cfe6bc6@redhat.com>
-Date: Mon, 27 Feb 2017 15:09:57 -0600
+Message-ID: <739c3a03-fffe-46d0-0ba6-a328a9a18eb2@redhat.com>
+Date: Mon, 27 Feb 2017 15:20:37 -0600
 MIME-Version: 1.0
-In-Reply-To: <1488193394-28453-1-git-send-email-pl@kamp.de>
+In-Reply-To: <20170227201456.31814-1-berrange@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="Q4hkm1wfmdBWvHiVviUCs8ttrqUJmeqt2"
-Subject: Re: [Qemu-devel] [PATCH V2] qemu-img: make convert async
+	boundary="vG58eojSLPw6eddk8MDmIpqDKRC4knr9f"
+Subject: Re: [Qemu-devel] [PATCH] io: ignore case when matching websockets
+ HTTP headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,104 +28,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, stefanha@gmail.com, ct@flyingcircus.io, mreitz@redhat.com, famz@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: "Denis V. Lunev" <den@openvz.org>, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Q4hkm1wfmdBWvHiVviUCs8ttrqUJmeqt2
+--vG58eojSLPw6eddk8MDmIpqDKRC4knr9f
 From: Eric Blake <eblake@redhat.com>
-To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, stefanha@gmail.com,
- ct@flyingcircus.io, mreitz@redhat.com, famz@redhat.com
-Message-ID: <07ef9e24-a17b-536b-8ef3-9a105cfe6bc6@redhat.com>
-Subject: Re: [PATCH V2] qemu-img: make convert async
-References: <1488193394-28453-1-git-send-email-pl@kamp.de>
-In-Reply-To: <1488193394-28453-1-git-send-email-pl@kamp.de>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: "Denis V. Lunev" <den@openvz.org>,
+ Anton Nefedov <anton.nefedov@virtuozzo.com>
+Message-ID: <739c3a03-fffe-46d0-0ba6-a328a9a18eb2@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] io: ignore case when matching websockets
+ HTTP headers
+References: <20170227201456.31814-1-berrange@redhat.com>
+In-Reply-To: <20170227201456.31814-1-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 02/27/2017 05:03 AM, Peter Lieven wrote:
-> the convert process is currently completely implemented with sync opera=
-tions.
-> That means it reads one buffer and then writes it. No parallelism and e=
-ach sync
-> request takes as long as it takes until it is completed.
->=20
+On 02/27/2017 02:14 PM, Daniel P. Berrange wrote:
+> According to RFC7230 Section 3.2, header field name is case-insensitive=
+=2E
+> Convert the header data into all lowercase before doing string matching=
 
+> on the headers.
 >=20
-> This patches introduces 2 new cmdline parameters. The -m parameter to s=
-pecify
-> the number of coroutines running in parallel (defaults to 8). And the -=
-W paremeter to
-
-s/paremeter/parameter/
-
-> allow qemu-img to write to the target out of order rather than sequenti=
-al. This improves
-> performance as the writes do not have to wait for each other to complet=
-e.
->=20
-> Signed-off-by: Peter Lieven <pl@kamp.de>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 > ---
+>  io/channel-websock.c | 14 +++++++++-----
+>  1 file changed, 9 insertions(+), 5 deletions(-)
+>=20
 
-> @@ -1798,7 +1908,7 @@ static int img_convert(int argc, char **argv)
->              {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
->              {0, 0, 0, 0}
->          };
-> -        c =3D getopt_long(argc, argv, "hf:O:B:ce6o:s:l:S:pt:T:qn",
-> +        c =3D getopt_long(argc, argv, "hf:O:B:ce6o:s:l:S:pt:T:qnm:W",
->                          long_options, NULL);
->          if (c =3D=3D -1) {
->              break;
-> @@ -1890,6 +2000,18 @@ static int img_convert(int argc, char **argv)
->          case 'n':
->              skip_create =3D 1;
->              break;
-> +        case 'm':
-> +            num_coroutines =3D atoi(optarg);
+> @@ -223,7 +223,7 @@ static int qio_channel_websock_handshake_process(QI=
+OChannelWebsock *ioc,
+>  static int qio_channel_websock_handshake_read(QIOChannelWebsock *ioc,
+>                                                Error **errp)
+>  {
+> -    char *handshake_end;
+> +    char *handshake_end, *tmp;
+>      ssize_t ret;
+>      /* Typical HTTP headers from novnc are 512 bytes, so limiting
+>       * total header size to 4096 is easily enough. */
 
-atoi() should be avoided. It has no error checking, so it treats '-m 1'
-and '-m 1k' identically.  You are a bit justified in that '-m junk' gets
-treated like '-m 0' and rejected, but it's still a poor error message in
-that case.
+Drive-by grammar nit: s/easily/easy/
 
-> +            if (num_coroutines < 1 || num_coroutines > MAX_COROUTINES)=
- {
-> +                error_report("Allowed number of coroutines is between =
-1 and %d",
-> +                             MAX_COROUTINES);
-
-> +++ b/qemu-img.texi
-> @@ -137,6 +137,12 @@ Parameters to convert subcommand:
+> @@ -249,9 +249,13 @@ static int qio_channel_websock_handshake_read(QIOC=
+hannelWebsock *ioc,
+>          }
+>      }
 > =20
->  @item -n
->  Skip the creation of the target volume
-> +@item -m
-> +Number of parallel coroutines for the convert process
-> +@item -W
-> +Allow to write out of order to the destination. This is option improve=
-s performance,
+> +    for (tmp =3D (char *)ioc->encinput.buffer; tmp < handshake_end; tm=
+p++) {
+> +        *tmp =3D g_ascii_tolower(*tmp);
+> +    }
+> +
+>      if (qio_channel_websock_handshake_process(ioc,
+>                                                (char *)ioc->encinput.bu=
+ffer,
+> -                                              ioc->encinput.offset,
+> +                                              handshake_end - (char *)=
+ioc->encinput.buffer,
 
-Grammar suggestion:
-
-Allow out-of-order writes to the destination.  This option ...
-
-> +but is only recommened for preallocated devices like host devices or o=
-ther
-
-s/recommened/recommended/
-
-> +raw block devices.
->  @end table
-> =20
-
+I'm not sure why this change is here; nothing else in the patch changed
+ioc->encinput.offset.
 
 --=20
 Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---Q4hkm1wfmdBWvHiVviUCs8ttrqUJmeqt2
+--vG58eojSLPw6eddk8MDmIpqDKRC4knr9f
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -130,13 +106,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYtJWlAAoJEKeha0olJ0Nq+ZIH/RTee8W/bLr76IX16icFq9vA
-uhkz2dx1C0vUZr9oUprRbttKo70tg0w7j3AxEFMSiXX+bvsUAsdc+iB4T6pgZ0V9
-93FqTzvXTOjDORd7eabEO61ZK8NKvW5t9LAMRySCJl9ar59PB4gbezDx3CWJ8Iwt
-4hP5joSKcDsGKM5bigJVRIAIOe97k8leYBCqGCESfrfsctHYm11wus0uEGMTcKEq
-0rqN6fDrapa90+wpr/gV4+IZUEdppuLjZMxZYWdkVmBY6eWXGQ740U0hiW2Yh2VH
-cnQpsdnzO18Wo1TFcpw6pPIKojgKKWGsBuB/L+86Nw+JTle/7p25mKXrQ4n6oFI=
-=OoOt
+iQEcBAEBCAAGBQJYtJglAAoJEKeha0olJ0Nqd0oH/Rx+9spfWyr2KvfF49F+LALk
+hCjI4mxMnT9weg5txjkwQVJ33kx9RNhU9e+O6nqHIbcag1nmqTvq1vKQ0D3P4LDl
+SzHdy4p4WlxfTcFopEPB8sn/rEwCW5Bt4hr3n2qrxcIMkkiXsXnUyyoabidtYzUV
+6tsBdWmlRQHxvsYSdv73zzhtfvphgiOtuYUfWcMMgVRGFIHqFpVQ+B/kLbtT2TPi
+ah1mudVmrHdlr5dg0jtuE76lj23lHEuxNRNCbAUyQP/AZx+7dMAACazELADdQIYF
+NJ646cRK0ABypbIpRWcMAE5U4/QLJgmxx6Sm1g7b/BwTCrkg8PXPhuwV9BAD9r8=
+=+R/k
 -----END PGP SIGNATURE-----
 
---Q4hkm1wfmdBWvHiVviUCs8ttrqUJmeqt2--
+--vG58eojSLPw6eddk8MDmIpqDKRC4knr9f--
