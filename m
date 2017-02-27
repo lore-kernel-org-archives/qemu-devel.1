@@ -1,24 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33103)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aarcange@redhat.com>) id 1ciNcD-0006Ky-2i
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:53:34 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1ciNfM-0000qN-BD
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:56:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aarcange@redhat.com>) id 1ciNc8-0001hM-97
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:53:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54292)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aarcange@redhat.com>) id 1ciNc8-0001h6-0D
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:53:28 -0500
-Date: Mon, 27 Feb 2017 16:53:24 +0100
-From: Andrea Arcangeli <aarcange@redhat.com>
-Message-ID: <20170227155324.GC5816@redhat.com>
-References: <20170224172714.26026-1-berrange@redhat.com>
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1ciNfI-0002v3-EL
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:56:48 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43236)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1ciNfI-0002uk-4k
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:56:44 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1RFtTfP020328
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 10:56:42 -0500
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28vpwe8vf9-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 10:56:42 -0500
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Mon, 27 Feb 2017 15:56:40 -0000
+Date: Mon, 27 Feb 2017 16:56:34 +0100
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <20170223122025.10420-2-cornelia.huck@de.ibm.com>
+References: <20170223122025.10420-1-cornelia.huck@de.ibm.com>
+	<20170223122025.10420-2-cornelia.huck@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170224172714.26026-1-berrange@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] os: don't corrupt pre-existing
- memory-backend data with prealloc
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20170227165634.0c1a9eb6.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/5] elf-loader: Allow late loading of
+ elf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,66 +42,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Jitendra Kolhe <jitendra.kolhe@hpe.com>, Michal Privoznik <mprivozn@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, Farhan Ali <alifm@linux.vnet.ibm.com>, Peter Maydell <peter.maydell@linaro.org>
 
-Hello,
+On Thu, 23 Feb 2017 13:20:21 +0100
+Cornelia Huck <cornelia.huck@de.ibm.com> wrote:
 
-On Fri, Feb 24, 2017 at 05:27:14PM +0000, Daniel P. Berrange wrote:
-> diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-> index 35012b9..2a5bb93 100644
-> --- a/util/oslib-posix.c
-> +++ b/util/oslib-posix.c
-> @@ -355,7 +355,20 @@ void os_mem_prealloc(int fd, char *area, size_t memory, Error **errp)
->  
->          /* MAP_POPULATE silently ignores failures */
->          for (i = 0; i < numpages; i++) {
-> -            memset(area + (hpagesize * i), 0, 1);
-> +            /*
-> +             * Read & write back the same value, so we don't
-> +             * corrupt existinng user/app data that might be
-> +             * stored.
-> +             *
-> +             * 'volatile' to stop compiler optimizing this away
-> +             * to a no-op
-> +             *
-> +             * TODO: get a better solution from kernel so we
-> +             * don't need to write at all so we don't cause
-> +             * wear on the storage backing the region...
-> +             */
+> From: Farhan Ali <alifm@linux.vnet.ibm.com>
+> 
+> The current QEMU ROM infrastructure rejects late loading of ROMs.
+> And ELFs are currently loaded as ROM, this prevents delayed loading
+> of ELFs. So when loading ELF, allow the user to specify if ELF should
+> be loaded as ROM or not.
+> 
+> If an ELF is not loaded as ROM, then they are not restored on a
+> guest reboot/reset and so its upto the user to handle the reloading.
+> 
+> Signed-off-by: Farhan Ali <alifm@linux.vnet.ibm.com>
+> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+> ---
+>  hw/core/loader.c     | 17 +++++++++++++++--
+>  include/hw/elf_ops.h | 13 +++++++++----
+>  include/hw/loader.h  | 13 ++++++++++++-
+>  3 files changed, 36 insertions(+), 7 deletions(-)
+> 
 
-It would be better that if MAP_POPULATE failed like mlock does, at
-least for those get_user_pages errors like -ENOMEM that are already a
-retval for mmap it sounds weird that it's not being forwarded. It'd be
-enough to call do_munmap to rollback all mmap work before returning
--ENOMEM from mmap instead of succees.
+Any further acks for this?
 
--EFAULT or other get_user_pages errors are more troublesome, as mmap
-wouldn't otherwise return -EFAULT, but those would generally be qemu
-bugs or hardware errors and MAP_POPULATE I doubt is meant to be a
-debug/robustness aid.  All we care about here is memory resource
-management and not to risk -ENOMEM at runtime and immediate peak
-performance. So perhaps a kernel patch that forwards -ENOMEM from
-__mm_populate to mmap retval would be enough to make it usable?
+Or, put differently, any objections to me sending this in a pullreq for
+2.9?
 
-> +            volatile char val = *(area + (hpagesize * i));
-> +            *(area + (hpagesize * i)) = val;
-
-It's not "var" that should be volatile, nor the pointer, but only the
-memory area you write to, because the write to the memory are is the
-only thing we care about.
-
-If "val" is volatile gcc could read the memory area and cache the
-value of the memory area, write it into the volatile var, then read
-the volatile var again, compare it with the cached value and skip the
-write to the memory if it's equal. In practice it's likely not doing
-that, and making var volatile has the same effect, so it's probably
-only a theoretical issue of course.
-
-I would suggest this to correct it (untested):
-
-	char *tmparea = area + (hpagesize * i);
-	*(volatile char *)tmparea = *tmparea;
-
-Thanks,
-Andrea
+> diff --git a/hw/core/loader.c b/hw/core/loader.c
+> index ee5abd6eb7..9d1af1f6f3 100644
+> --- a/hw/core/loader.c
+> +++ b/hw/core/loader.c
+> @@ -435,6 +435,19 @@ int load_elf_as(const char *filename,
+>                  uint64_t *highaddr, int big_endian, int elf_machine,
+>                  int clear_lsb, int data_swab, AddressSpace *as)
+>  {
+> +    return load_elf_ram(filename, translate_fn, translate_opaque,
+> +                        pentry, lowaddr, highaddr, big_endian, elf_machine,
+> +                        clear_lsb, data_swab, as, true);
+> +}
+> +
+> +/* return < 0 if error, otherwise the number of bytes loaded in memory */
+> +int load_elf_ram(const char *filename,
+> +                 uint64_t (*translate_fn)(void *, uint64_t),
+> +                 void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
+> +                 uint64_t *highaddr, int big_endian, int elf_machine,
+> +                 int clear_lsb, int data_swab, AddressSpace *as,
+> +                 bool load_rom)
+> +{
+>      int fd, data_order, target_data_order, must_swab, ret = ELF_LOAD_FAILED;
+>      uint8_t e_ident[EI_NIDENT];
+> 
+> @@ -473,11 +486,11 @@ int load_elf_as(const char *filename,
+>      if (e_ident[EI_CLASS] == ELFCLASS64) {
+>          ret = load_elf64(filename, fd, translate_fn, translate_opaque, must_swab,
+>                           pentry, lowaddr, highaddr, elf_machine, clear_lsb,
+> -                         data_swab, as);
+> +                         data_swab, as, load_rom);
+>      } else {
+>          ret = load_elf32(filename, fd, translate_fn, translate_opaque, must_swab,
+>                           pentry, lowaddr, highaddr, elf_machine, clear_lsb,
+> -                         data_swab, as);
+> +                         data_swab, as, load_rom);
+>      }
+> 
+>   fail:
+> diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
+> index 25659b93be..a172a6068a 100644
+> --- a/include/hw/elf_ops.h
+> +++ b/include/hw/elf_ops.h
+> @@ -264,7 +264,7 @@ static int glue(load_elf, SZ)(const char *name, int fd,
+>                                int must_swab, uint64_t *pentry,
+>                                uint64_t *lowaddr, uint64_t *highaddr,
+>                                int elf_machine, int clear_lsb, int data_swab,
+> -                              AddressSpace *as)
+> +                              AddressSpace *as, bool load_rom)
+>  {
+>      struct elfhdr ehdr;
+>      struct elf_phdr *phdr = NULL, *ph;
+> @@ -403,10 +403,15 @@ static int glue(load_elf, SZ)(const char *name, int fd,
+>                  *pentry = ehdr.e_entry - ph->p_vaddr + ph->p_paddr;
+>              }
+> 
+> -            snprintf(label, sizeof(label), "phdr #%d: %s", i, name);
+> +            if (load_rom) {
+> +                snprintf(label, sizeof(label), "phdr #%d: %s", i, name);
+> 
+> -            /* rom_add_elf_program() seize the ownership of 'data' */
+> -            rom_add_elf_program(label, data, file_size, mem_size, addr, as);
+> +                /* rom_add_elf_program() seize the ownership of 'data' */
+> +                rom_add_elf_program(label, data, file_size, mem_size, addr, as);
+> +            } else {
+> +                cpu_physical_memory_write(addr, data, file_size);
+> +                g_free(data);
+> +            }
+> 
+>              total_size += mem_size;
+>              if (addr < low)
+> diff --git a/include/hw/loader.h b/include/hw/loader.h
+> index 0dbd8d6bf3..3df4d73398 100644
+> --- a/include/hw/loader.h
+> +++ b/include/hw/loader.h
+> @@ -65,7 +65,7 @@ int load_image_gzipped(const char *filename, hwaddr addr, uint64_t max_sz);
+>  #define ELF_LOAD_WRONG_ENDIAN -4
+>  const char *load_elf_strerror(int error);
+> 
+> -/** load_elf_as:
+> +/** load_elf_ram:
+>   * @filename: Path of ELF file
+>   * @translate_fn: optional function to translate load addresses
+>   * @translate_opaque: opaque data passed to @translate_fn
+> @@ -81,6 +81,7 @@ const char *load_elf_strerror(int error);
+>   *             words and 3 for within doublewords.
+>   * @as: The AddressSpace to load the ELF to. The value of address_space_memory
+>   *      is used if nothing is supplied here.
+> + * @load_rom : Load ELF binary as ROM
+>   *
+>   * Load an ELF file's contents to the emulated system's address space.
+>   * Clients may optionally specify a callback to perform address
+> @@ -93,6 +94,16 @@ const char *load_elf_strerror(int error);
+>   * If @elf_machine is EM_NONE then the machine type will be read from the
+>   * ELF header and no checks will be carried out against the machine type.
+>   */
+> +int load_elf_ram(const char *filename,
+> +                 uint64_t (*translate_fn)(void *, uint64_t),
+> +                 void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
+> +                 uint64_t *highaddr, int big_endian, int elf_machine,
+> +                 int clear_lsb, int data_swab, AddressSpace *as,
+> +                 bool load_rom);
+> +
+> +/** load_elf_as:
+> + * Same as load_elf_ram(), but always loads the elf as ROM
+> + */
+>  int load_elf_as(const char *filename,
+>                  uint64_t (*translate_fn)(void *, uint64_t),
+>                  void *translate_opaque, uint64_t *pentry, uint64_t *lowaddr,
