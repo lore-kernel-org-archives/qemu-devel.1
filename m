@@ -1,37 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1ciJcW-0004Sf-9z
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:37:37 -0500
+	(envelope-from <thuth@redhat.com>) id 1ciJiF-0001ed-BO
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:43:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1ciJcS-0005Ys-9Z
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:37:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35266)
+	(envelope-from <thuth@redhat.com>) id 1ciJiC-0007Tk-7n
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:43:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57788)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1ciJcS-0005Xl-3p
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:37:32 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7B4A07AEAA
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 11:37:31 +0000 (UTC)
-Received: from ovpn-204-136.brq.redhat.com (ovpn-204-136.brq.redhat.com
-	[10.40.204.136])
-	by int-mx13.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v1RBbTGe019451
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=NO)
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 06:37:30 -0500
-Message-ID: <1488195448.4244.24.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Mon, 27 Feb 2017 12:37:28 +0100
-In-Reply-To: <1487326479-8664-1-git-send-email-abologna@redhat.com>
-References: <1487326479-8664-1-git-send-email-abologna@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 0/2] docs: Improve sample configuration
- files
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ciJiC-0007T7-1U
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:43:28 -0500
+References: <1485333658-23035-1-git-send-email-thuth@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <0eca8185-8e94-46f8-6b7a-36c4a21bc28d@redhat.com>
+Date: Mon, 27 Feb 2017 12:43:23 +0100
+MIME-Version: 1.0
+In-Reply-To: <1485333658-23035-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] null-machine: Add support for the
+ "-kernel" parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,38 +27,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: Max Filippov <jcmvbkbc@gmail.com>, Laurent Vivier <laurent@vivier.eu>, Alistair Francis <alistair.francis@xilinx.com>
 
-On Fri, 2017-02-17 at 11:14 +0100, Andrea Bolognani wrote:
-[...]
-> Andrea Bolognani (2):
->=C2=A0=C2=A0=C2=A0q35: Improve sample configuration files
->=C2=A0=C2=A0=C2=A0mach-virt: Provide sample configuration files
->=C2=A0
->=C2=A0=C2=A0docs/mach-virt-graphical.cfg=C2=A0=C2=A0| 281 ++++++++++++++=
-+++++++++++++++++++++++++++
->=C2=A0=C2=A0docs/mach-virt-serial.cfg=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0| 243=
- +++++++++++++++++++++++++++++++++++
->=C2=A0=C2=A0docs/q35-chipset.cfg=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0| 152 ----------------------
->=C2=A0=C2=A0docs/q35-emulated.cfg=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0| 288 ++++++++++++++++++++++++++++++++++++++++++
->=C2=A0=C2=A0docs/q35-virtio-graphical.cfg | 248 ++++++++++++++++++++++++=
-++++++++++++
->=C2=A0=C2=A0docs/q35-virtio-serial.cfg=C2=A0=C2=A0=C2=A0=C2=A0| 193 ++++=
-++++++++++++++++++++++++
->=C2=A0=C2=A06 files changed, 1253 insertions(+), 152 deletions(-)
->=C2=A0=C2=A0create mode 100644 docs/mach-virt-graphical.cfg
->=C2=A0=C2=A0create mode 100644 docs/mach-virt-serial.cfg
->=C2=A0=C2=A0delete mode 100644 docs/q35-chipset.cfg
->=C2=A0=C2=A0create mode 100644 docs/q35-emulated.cfg
->=C2=A0=C2=A0create mode 100644 docs/q35-virtio-graphical.cfg
->=C2=A0=C2=A0create mode 100644 docs/q35-virtio-serial.cfg
+On 25.01.2017 09:40, Thomas Huth wrote:
+> We can have basic support for the "-kernel" parameter quite easily
+> by using the generic loader device. This should be enough for most
+> boards which do not need special machine-specific magic for loading
+> a kernel (and for those that need special magic, the generic "none"
+> machine is likely not suitable for using it as an instruction set
+> simulator board anyway).
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  PS: If we can't agree on using the generic loader here, I can also
+>      prepare a patch instead that simply prints out an error message
+>      if the user tried to use the "-kernel" parameter.
+> 
+>  hw/core/null-machine.c | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+> 
+> diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
+> index 27c8369..866e699 100644
+> --- a/hw/core/null-machine.c
+> +++ b/hw/core/null-machine.c
+> @@ -5,6 +5,7 @@
+>   *
+>   * Authors:
+>   *  Anthony Liguori   <aliguori@us.ibm.com>
+> + *  Thomas Huth       <thuth@redhat.com>
+>   *
+>   * This work is licensed under the terms of the GNU GPL, version 2 or later.
+>   * See the COPYING file in the top-level directory.
+> @@ -16,6 +17,7 @@
+>  #include "qemu/error-report.h"
+>  #include "hw/hw.h"
+>  #include "hw/boards.h"
+> +#include "hw/core/generic-loader.h"
+>  #include "sysemu/sysemu.h"
+>  #include "exec/address-spaces.h"
+>  #include "cpu.h"
+> @@ -40,6 +42,18 @@ static void machine_none_init(MachineState *mch)
+>          memory_region_allocate_system_memory(ram, NULL, "ram", mch->ram_size);
+>          memory_region_add_subregion(get_system_memory(), 0, ram);
+>      }
+> +
+> +    /* Load kernel */
+> +    if (mch->kernel_filename) {
+> +        DeviceState *loader;
+> +
+> +        loader = qdev_create(sysbus_get_default(), TYPE_GENERIC_LOADER);
+> +        qdev_prop_set_string(loader, "file", mch->kernel_filename);
+> +        if (cpu) {
+> +            qdev_prop_set_uint32(loader, "cpu-num", cpu->cpu_index);
+> +        }
+> +        qdev_init_nofail(loader);
+> +    }
+>  }
+>  
+>  static void machine_none_machine_init(MachineClass *mc)
 
-Ping?
+*ping*
 
-The series is fully ACKed as of two weeks ago, and it would
-be great if someone could pick it up.
+Apparently the discussion has ceased ... can we get a consensus whether
+we want to support the "-kernel" parameter for the "none" machine or not?
 
---=C2=A0
-Andrea Bolognani / Red Hat / Virtualization
+ Thomas
