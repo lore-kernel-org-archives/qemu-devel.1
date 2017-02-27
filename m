@@ -1,26 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53328)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ciFlL-0006T4-P8
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:30:28 -0500
+	(envelope-from <jcody@redhat.com>) id 1ciFlj-0006ha-Is
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:30:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ciFlG-0006g8-Td
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:30:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55276)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ciFlG-0006fl-NT
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:30:22 -0500
-References: <20170225231653.14942-1-mmarek@suse.com>
-	<20170225233845.25828-1-mmarek@suse.com>
-	<41cc9d11-2e28-5b5e-4772-81a118d79111@redhat.com>
-	<f0b31c30-6b3e-fe9e-5f60-7a117456b595@suse.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <ae4dba44-c634-062c-d412-201d1f10be32@redhat.com>
-Date: Mon, 27 Feb 2017 08:30:16 +0100
-MIME-Version: 1.0
-In-Reply-To: <f0b31c30-6b3e-fe9e-5f60-7a117456b595@suse.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] target-s390x: Implement stfl and stfle
+	(envelope-from <jcody@redhat.com>) id 1ciFli-0006vk-Mm
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:30:51 -0500
+From: Jeff Cody <jcody@redhat.com>
+Date: Mon, 27 Feb 2017 02:30:39 -0500
+Message-Id: <6f1d60bdbbb4e82991c699d4aa6666c4317a1c5d.1488180142.git.jcody@redhat.com>
+In-Reply-To: <cover.1488180142.git.jcody@redhat.com>
+References: <cover.1488180142.git.jcody@redhat.com>
+In-Reply-To: <cover.1488180142.git.jcody@redhat.com>
+References: <cover.1488180142.git.jcody@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/4] block/rbd: code movement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +21,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michal Marek <mmarek@suse.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
-Cc: Eric Bischoff <ebischoff@suse.com>, Miroslav Benes <mbenes@suse.cz>, qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, armbru@redhat.com, berrange@redhat.com, eblake@redhat.com
 
-On 26.02.2017 19:57, Michal Marek wrote:
-> Dne 26.2.2017 v 12:22 Thomas Huth napsal(a):
->> On 26.02.2017 00:38, Michal Marek wrote:
->>> The implementation is partially cargo cult based, but it works for the
->>> linux kernel use case.
->>>
->>> Signed-off-by: Michal Marek <mmarek@suse.com>
->>> ---
->>> v3:
->>>  - Initialize the buffer in do_stfle()
->>> v2:
->>>  - STFLE is not a privileged instruction, go through the MMU to store the
->>>    result
->>>  - annotate the stfl helper with TCG_CALL_NO_RWG
->>>  - Use a large enough buffer to hold the feature bitmap
->>>  - Fix coding style of the stfle helper
->>> ---
->>>  target/s390x/cpu_features.c |  6 ++++--
->>>  target/s390x/cpu_features.h |  2 +-
->>>  target/s390x/helper.h       |  2 ++
->>>  target/s390x/insn-data.def  |  2 ++
->>>  target/s390x/misc_helper.c  | 36 ++++++++++++++++++++++++++++++++++++
->>>  target/s390x/translate.c    | 17 +++++++++--------
->>>  6 files changed, 54 insertions(+), 11 deletions(-)
-[...]
->>> +uint64_t HELPER(stfle)(CPUS390XState *env, uint64_t a0, uint64_t r0)
->>> +{
->>> +    int need, len = r0 & 0xff;
->>
->> According to the POP spec, the address "must be designated on a
->> doubleword boundary; otherwise, a specification exception is recognized."
->> Could you please add this check here (or in translate.c)?
-> 
-> Dumb question, but how do I signal a specification exception?
-> s390_cpu_do_interrupt() does not seem to be prepared for it.
+Signed-off-by: Jeff Cody <jcody@redhat.com>
+---
+ block/rbd.c | 64 +++++++++++++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 45 insertions(+), 19 deletions(-)
 
-Not sure, but I think something like
-
- program_interrupt(env, PGM_SPECIFICATION, 4);
-
-should do the job here.
-
- Thomas
+diff --git a/block/rbd.c b/block/rbd.c
+index 3f1a9de..c8d4eb1 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -357,6 +357,51 @@ static void qemu_rbd_memset(RADOSCB *rcb, int64_t offs)
+     }
+ }
+ 
++static QemuOptsList runtime_opts = {
++    .name = "rbd",
++    .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
++    .desc = {
++        {
++            .name = "filename",
++            .type = QEMU_OPT_STRING,
++            .help = "Specification of the rbd image",
++        },
++        {
++            .name = "password-secret",
++            .type = QEMU_OPT_STRING,
++            .help = "ID of secret providing the password",
++        },
++        {
++            .name = "conf",
++            .type = QEMU_OPT_STRING,
++        },
++        {
++            .name = "pool",
++            .type = QEMU_OPT_STRING,
++        },
++        {
++            .name = "image",
++            .type = QEMU_OPT_STRING,
++        },
++        {
++            .name = "snapshot",
++            .type = QEMU_OPT_STRING,
++        },
++        {
++            /* you might be tempted to call this 'id' to match
++             * the ceph documentation, but then it'll get gobbled
++             * up in the block layer before it gets to the image driver */
++            .name = "rbd-id",
++            .type = QEMU_OPT_STRING,
++        },
++        {
++            .name = "keyvalue-pairs",
++            .type = QEMU_OPT_STRING,
++        },
++        { /* end of list */ }
++    },
++};
++
+ static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
+ {
+     Error *local_err = NULL;
+@@ -500,25 +545,6 @@ static void qemu_rbd_complete_aio(RADOSCB *rcb)
+     qemu_aio_unref(acb);
+ }
+ 
+-/* TODO Convert to fine grained options */
+-static QemuOptsList runtime_opts = {
+-    .name = "rbd",
+-    .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
+-    .desc = {
+-        {
+-            .name = "filename",
+-            .type = QEMU_OPT_STRING,
+-            .help = "Specification of the rbd image",
+-        },
+-        {
+-            .name = "password-secret",
+-            .type = QEMU_OPT_STRING,
+-            .help = "ID of secret providing the password",
+-        },
+-        { /* end of list */ }
+-    },
+-};
+-
+ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+                          Error **errp)
+ {
+-- 
+2.9.3
