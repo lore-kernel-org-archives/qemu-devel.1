@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ciLCI-0006nY-Us
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:18:39 -0500
+	(envelope-from <jcody@redhat.com>) id 1ciLCn-0007Br-4x
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:19:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ciLCE-0002Ov-1s
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:18:38 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36674)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ciLCD-0002Or-RH
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:18:33 -0500
-Received: by mail-wm0-x242.google.com with SMTP id r18so13417327wmd.3
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 05:18:33 -0800 (PST)
-Date: Mon, 27 Feb 2017 13:18:30 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170227131830.GP28403@stefanha-x1.localdomain>
-References: <148814889214.28146.16915712763478774662.stgit@bahia>
-	<148814910969.28146.2398026356734732533.stgit@bahia>
+	(envelope-from <jcody@redhat.com>) id 1ciLCm-0002Sv-3A
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:19:09 -0500
+Date: Mon, 27 Feb 2017 08:18:59 -0500
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170227131859.GD25637@localhost.localdomain>
+References: <cover.1488180142.git.jcody@redhat.com>
+	<08786526aec147544588ab3e885a984e7d0d1c69.1488180142.git.jcody@redhat.com>
+	<20170227073613.GB25637@localhost.localdomain>
+	<20170227093121.GD18219@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="R3SAtXwgGp429mN7"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <148814910969.28146.2398026356734732533.stgit@bahia>
-Subject: Re: [Qemu-devel] [PATCH v2 27/28] 9pfs: local: open2: don't follow
- symlinks
+In-Reply-To: <20170227093121.GD18219@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 4/4] block/rbd: Add blockdev-add support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,65 +25,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Jann Horn <jannh@google.com>, Prasad J Pandit <prasad@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, eblake@redhat.com
+
+On Mon, Feb 27, 2017 at 09:31:21AM +0000, Daniel P. Berrange wrote:
+> On Mon, Feb 27, 2017 at 02:36:13AM -0500, Jeff Cody wrote:
+> > On Mon, Feb 27, 2017 at 02:30:41AM -0500, Jeff Cody wrote:
+> > > Signed-off-by: Jeff Cody <jcody@redhat.com>
+> > > ---
+> > >  qapi/block-core.json | 47 ++++++++++++++++++++++++++++++++++++++++++++---
+> > >  1 file changed, 44 insertions(+), 3 deletions(-)
+> > > 
+> > > diff --git a/qapi/block-core.json b/qapi/block-core.json
+> > > index 5f82d35..08a1419 100644
+> > > --- a/qapi/block-core.json
+> > > +++ b/qapi/block-core.json
+> > > @@ -2111,6 +2111,7 @@
+> > >  # @replication: Since 2.8
+> > >  # @ssh: Since 2.8
+> > >  # @iscsi: Since 2.9
+> > > +# @rbd: Since 2.9
+> > >  #
+> > >  # Since: 2.0
+> > >  ##
+> > > @@ -2120,7 +2121,7 @@
+> > >              'host_device', 'http', 'https', 'iscsi', 'luks', 'nbd', 'nfs',
+> > >              'null-aio', 'null-co', 'parallels', 'qcow', 'qcow2', 'qed',
+> > >              'quorum', 'raw', 'replication', 'ssh', 'vdi', 'vhdx', 'vmdk',
+> > > -            'vpc', 'vvfat' ] }
+> > > +            'vpc', 'vvfat', 'rbd' ] }
+> > >  
+> > >  ##
+> > >  # @BlockdevOptionsFile:
+> > > @@ -2376,7 +2377,6 @@
+> > >              'path': 'str',
+> > >              '*user': 'str' } }
+> > >  
+> > > -
+> > >  ##
+> > >  # @BlkdebugEvent:
+> > >  #
+> > > @@ -2666,6 +2666,47 @@
+> > >              '*timeout': 'int' } }
+> > >  
+> > >  ##
+> > > +# @BlockdevOptionsRbd:
+> > > +#
+> > > +# @pool:               Ceph pool name
+> > > +#
+> > > +# @image:              Image name in the Ceph pool
+> > > +#
+> > > +# @conf:               # optional path to Ceph configuration file.  Values
+> > > +#                      in the configuration file will be overridden by
+> > > +#                      options specified via QAPI.
+> > > +#
+> > > +# @snapshot:           #optional Ceph snapshot name
+> > > +#
+> > > +# @rbd-id:             #optional Ceph id name
+> > > +#
+> > > +# @password-secret:    #optional The ID of a QCryptoSecret object providing
+> > > +#                       the password for the login.
+> > > +#
+> > > +# @keyvalue-pairs:     #optional  string containing key/value pairs for
+> > > +#                      additional Ceph configuration, not including "id" or "conf"
+> > > +#                      options. This can be used to specify any of the options
+> > > +#                      that Ceph supports.  The format is of the form:
+> > > +#                           key1=value1:key2=value2:[...]
+> > > +#
+> > > +#                      Special characters such as ":" and "=" can be escaped
+> > > +#                      with a '\' character, which means the QAPI needs an
+> > > +#                      extra '\' character to pass the needed escape character.
+> > > +#                      For example:
+> > > +#                            "keyvalue-pairs": "mon_host=127.0.0.1\\:6321"
+> > > +#
+> > 
+> > This is the key / value pair issue mentioned in the cover letter.  Encoding
+> > all the options as a string like this is ugly.  What is the preference on
+> > how to handle these via QAPI, when the actual key and value pairs could be
+> > anything?   Talking with Markus on IRC, one option he mentioned was an array
+> > of a generic struct of 'key' and 'value' pairs.
+> > 
+> > Do the libvirt folks have any interface preferences here?
+> 
+> IMHO, we should formally model each option that we need to be able to provide
+> and *not* provide any generic passthrough feature in QAPI.
+> 
+> Particularly for the server hostname/port, we should have the same QAPI
+> modelling approach that we did for other network protocols.
+> 
+>
+
+That is a sane position to take, but the problem is I really have no idea
+all the options to include or not include here.
+
+However, maybe it doesn't matter, at least for 2.9 - for the QAPI command,
+we could drop the extra arguments completely (i.e., just drop the
+keyvalue-pairs argument, above).  The extra options could still be set via a
+config file passed in via 'conf', and in release > 2.9 we can gradually (or
+not-so-gradually) add in additional options directly supported via QAPI.
+
+The filename parsing would remain the same, for backwards compatibility, of
+course.
+
+Does this sound reasonable to you?
 
 
---R3SAtXwgGp429mN7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Sun, Feb 26, 2017 at 11:45:09PM +0100, Greg Kurz wrote:
-> The local_open2() callback is vulnerable to symlink attacks because it
-> calls:
->=20
-> (1) open() which follows symbolic links for all path elements but the
->     rightmost one
-> (2) local_set_xattr()->setxattr() which follows symbolic links for all
->     path elements
-> (3) local_set_mapped_file_attr() which calls in turn local_fopen() and
->     mkdir(), both functions following symbolic links for all path
->     elements but the rightmost one
-> (4) local_post_create_passthrough() which calls in turn lchown() and
->     chmod(), both functions also following symbolic links
->=20
-> This patch converts local_open2() to rely on opendir_nofollow() and
-> mkdirat() to fix (1), as well as local_set_xattrat(),
-> local_set_mapped_file_attrat() and local_set_cred_passthrough() to
-> fix (2), (3) and (4) respectively. Since local_open2() already opens
-> a descriptor to the target file, local_set_cred_passthrough() is
-> modified to reuse it instead of opening a new one.
->=20
-> The mapped and mapped-file security modes are supposed to be identical,
-> except for the place where credentials and file modes are stored. While
-> here, we also make that explicit by sharing the call to openat().
->=20
-> This partly fixes CVE-2016-9602.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
-> v2: - use openat_file()
->     - pass dirfd and name to local_set_cred_passthrough()
-> ---
->  hw/9pfs/9p-local.c |   56 ++++++++++++++++++----------------------------=
-------
->  1 file changed, 19 insertions(+), 37 deletions(-)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---R3SAtXwgGp429mN7
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYtCcmAAoJEJykq7OBq3PIS+QH/jxr75pz2en/HuqYq5OwOsIp
-rT7vK31XTwY1BaNO6M7+8DPGpU559cCrmEK5Txuuidlo8B/ZCLnxKztOrfSl04Nm
-ZJ72tD/N5VLJh6CyOzQzqEPnyKovmkzWw0OS6xFT/8oa1d53nfucKXBQUA0YkKdn
-Q8CdXytA82+XDxBjQBaGUTjGkORKt5md7H4GPPn5ihFx5kU9fG0b+JuMQIV71bNN
-un9narIwxqqY34fT5Vb1b0T2+eA/PUE3uTyBnU2SK6lT/4U2k/aEK+pslmzEQ6x+
-6kLCiRwHx+e4sq1bYrEbJpmST2apW7ajbtIMchi90rvx7gPwUbwHEI2nKg+HE3I=
-=PcJC
------END PGP SIGNATURE-----
-
---R3SAtXwgGp429mN7--
+-Jeff
