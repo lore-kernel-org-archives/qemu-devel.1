@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ciNyw-00014G-0U
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:17:06 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ciNze-0001cO-QW
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:17:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1ciNys-0001jM-Og
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:17:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59126)
+	(envelope-from <pbonzini@redhat.com>) id 1ciNzb-00023r-Jp
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:17:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50664)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ciNys-0001j1-G6
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:16:58 -0500
-Date: Mon, 27 Feb 2017 18:16:57 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170227175749-mutt-send-email-mst@kernel.org>
-References: <1488180523-18137-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ciNzb-00023k-Cq
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:17:43 -0500
+References: <20170224112109.3147-1-alex.bennee@linaro.org>
+	<05abc81a-febc-11e6-601f-8d9ee30922eb@redhat.com>
+	<87varv8wjh.fsf@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5907368e-1945-2109-93c3-a587654e430c@redhat.com>
+Date: Mon, 27 Feb 2017 17:17:40 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1488180523-18137-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-Subject: Re: [Qemu-devel] [PATCH] vfio pci: kernel support of error recovery
- only for non fatal error
+In-Reply-To: <87varv8wjh.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/24] MTTCG Base enabling patches with ARM
+ enablement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,232 +29,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cao jin <caoj.fnst@cn.fujitsu.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, alex.williamson@redhat.com, izumi.taku@jp.fujitsu.com
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-On Mon, Feb 27, 2017 at 03:28:43PM +0800, Cao jin wrote:
-> Subject: Re: [PATCH] vfio pci: kernel support of error recovery only for non
-> fatal error
 
-Don't make the subject so long. This is why I had
-	[PATCH v3] vfio error recovery: kernel support
-you also want to add versioning as you inherited my v3,
-you should make this v4 etc.
 
-> 0. What happens now (PCIE AER only)
->    Fatal errors cause a link reset.
->    Non fatal errors don't.
->    All errors stop the VM eventually, but not immediately
->    because it's detected and reported asynchronously.
->    Interrupts are forwarded as usual.
->    Correctable errors are not reported to guest at all.
->    Note: PPC EEH is different. This focuses on AER.
-> 
-> 1. Correctable errors
->    There is no need to report these to guest. So let's not.
-> 
-> 2. Fatal errors
->    It's not easy to handle them gracefully since link reset
->    is needed. As a first step, let's use the existing mechanism
->    in that case.
-> 
-> 2. Non-fatal errors
->    Here we could make progress by reporting them to guest
->    and have guest handle them.
-> 
->    Issues:
->    a. this behaviour should only be enabled with new userspace,
->       old userspace should work without changes.
-> 
->       Suggestion: One way to address this would be to add a new eventfd
->       non_fatal_err_trigger. If not set, invoke err_trigger.
-> 
->    b. drivers are supposed to stop MMIO when error is reported,
->       if vm keeps going, we will keep doing MMIO/config.
-> 
->       Suggestion 1: ignore this. vm stop happens much later when
->       userspace runs anyway, so we are not making things much worse.
-> 
->       Suggestion 2: try to stop MMIO/config, resume on resume call
-> 
->       Patch below implements Suggestion 1.
-> 
->       Note that although this is really against the documentation, which
->       states error_detected() is the point at which the driver should quiesce
->       the device and not touch it further (until diagnostic poking at
->       mmio_enabled or full access at resume callback).
-> 
->       Fixing this won't be easy. However, this is not a regression.
-> 
->       Also note this does nothing about interrupts, documentation
->       suggests returning IRQ_NONE until reset.
->       Again, not a regression.
-> 
->    c. PF driver might detect that function is completely broken,
->       if vm keeps going, we will keep doing MMIO/config.
-> 
->       Suggestion 1: ignore this. vm stop happens much later when
->       userspace runs anyway, so we are not making things much worse.
-> 
->       Suggestion 2: detect this and invoke err_trigger to stop VM.
-> 
->       Patch below implements Suggestion 2.
-> 
-> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+On 27/02/2017 16:48, Alex Benn=C3=A9e wrote:
+> Currently the code does:
+>=20
+>   static bool default_mttcg_enabled(void)
+>   {
+>       QemuOpts *icount_opts =3D qemu_find_opts_singleton("icount");
+>       const char *rr =3D qemu_opt_get(icount_opts, "rr");
+>=20
+>       if (rr || TCG_OVERSIZED_GUEST) {
+>           return false;
+>=20
+> I suspect I should just fail if any icount options are set.
 
-It's more than this, you are really reusing parts of my patch,
-so you should say so and include my signature.
+Yes.
 
-If you only added a line or two you can keep
-the original author. To do this you add
-	From: Michael S. Tsirkin <mst@redhat.com>
-before commit text.
+> However
+> qemu_find_opts_singleton always returns the structure. How do I test
+> for any icount options?
 
-> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
-> ---
+use_icount !=3D 0 if configure_icount has been called already.
 
-Changelog from my v3?
+>> 2) "-icount auto -accel tcg,thread=3Dsingle" hangs fairly early, print=
+ing
+>> this on the serial console.  It's okay if it hangs at
+>>
+>> [Bds]=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3DEnd Load Options Dumping=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>> [Bds]BdsWait ...Zzzzzzzzzzzz...
+>> [Bds]BdsWait(3)..Zzzz...
+>>
+>> (pressing Enter a few times then seems to unhang it), but it now hangs
+>> much earlier than that.
+>=20
+> Hmm I can see a hang on linux booting like that. It looks like a vCPU
+> get stuck in waitio and never schedules the others.
 
->  drivers/vfio/pci/vfio_pci.c         | 38 +++++++++++++++++++++++++++++++++++--
->  drivers/vfio/pci/vfio_pci_intrs.c   | 19 +++++++++++++++++++
->  drivers/vfio/pci/vfio_pci_private.h |  1 +
->  include/uapi/linux/vfio.h           |  1 +
->  4 files changed, 57 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> index 324c52e..3551cc9 100644
-> --- a/drivers/vfio/pci/vfio_pci.c
-> +++ b/drivers/vfio/pci/vfio_pci.c
-> @@ -441,7 +441,8 @@ static int vfio_pci_get_irq_count(struct vfio_pci_device *vdev, int irq_type)
->  
->  			return (flags & PCI_MSIX_FLAGS_QSIZE) + 1;
->  		}
-> -	} else if (irq_type == VFIO_PCI_ERR_IRQ_INDEX) {
-> +	} else if (irq_type == VFIO_PCI_ERR_IRQ_INDEX ||
-> +		   irq_type == VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX) {
->  		if (pci_is_pcie(vdev->pdev))
->  			return 1;
->  	} else if (irq_type == VFIO_PCI_REQ_IRQ_INDEX) {
-> @@ -796,6 +797,7 @@ static long vfio_pci_ioctl(void *device_data,
->  		case VFIO_PCI_REQ_IRQ_INDEX:
->  			break;
->  		case VFIO_PCI_ERR_IRQ_INDEX:
-> +		case VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX:
->  			if (pci_is_pcie(vdev->pdev))
->  				break;
->  		/* pass thru to return error */
-> @@ -1282,7 +1284,9 @@ static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
->  
->  	mutex_lock(&vdev->igate);
->  
-> -	if (vdev->err_trigger)
-> +	if (state == pci_channel_io_normal && vdev->non_fatal_err_trigger)
-> +		eventfd_signal(vdev->non_fatal_err_trigger, 1);
-> +	else if (vdev->err_trigger)
->  		eventfd_signal(vdev->err_trigger, 1);
->  
->  	mutex_unlock(&vdev->igate);
-> @@ -1292,8 +1296,38 @@ static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
->  	return PCI_ERS_RESULT_CAN_RECOVER;
->  }
->  
-> +static pci_ers_result_t vfio_pci_aer_slot_reset(struct pci_dev *pdev)
-> +{
-> +	struct vfio_pci_device *vdev;
-> +	struct vfio_device *device;
-> +	static pci_ers_result_t err = PCI_ERS_RESULT_NONE;
-> +
-> +	device = vfio_device_get_from_dev(&pdev->dev);
-> +	if (!device)
-> +		goto err_dev;
-> +
-> +	vdev = vfio_device_data(device);
-> +	if (!vdev)
-> +		goto err_data;
-> +
-> +	mutex_lock(&vdev->igate);
-> +
-> +	if (vdev->err_trigger)
-> +		eventfd_signal(vdev->err_trigger, 1);
-> +
-> +	mutex_unlock(&vdev->igate);
-> +
-> +	err = PCI_ERS_RESULT_RECOVERED;
-> +
-> +err_data:
-> +	vfio_device_put(device);
-> +err_dev:
-> +	return err;
-> +}
-> +
->  static const struct pci_error_handlers vfio_err_handlers = {
->  	.error_detected = vfio_pci_aer_err_detected,
-> +	.slot_reset = vfio_pci_aer_slot_reset,
->  };
->  
->  static struct pci_driver vfio_pci_driver = {
-> diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-> index 1c46045..270d568 100644
-> --- a/drivers/vfio/pci/vfio_pci_intrs.c
-> +++ b/drivers/vfio/pci/vfio_pci_intrs.c
-> @@ -611,6 +611,17 @@ static int vfio_pci_set_err_trigger(struct vfio_pci_device *vdev,
->  					       count, flags, data);
->  }
->  
-> +static int vfio_pci_set_non_fatal_err_trigger(struct vfio_pci_device *vdev,
-> +				    unsigned index, unsigned start,
-> +				    unsigned count, uint32_t flags, void *data)
-> +{
-> +	if (index != VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX || start != 0 || count > 1)
-> +		return -EINVAL;
-> +
-> +	return vfio_pci_set_ctx_trigger_single(&vdev->non_fatal_err_trigger,
-> +					       count, flags, data);
-> +}
-> +
->  static int vfio_pci_set_req_trigger(struct vfio_pci_device *vdev,
->  				    unsigned index, unsigned start,
->  				    unsigned count, uint32_t flags, void *data)
-> @@ -664,6 +675,14 @@ int vfio_pci_set_irqs_ioctl(struct vfio_pci_device *vdev, uint32_t flags,
->  			break;
->  		}
->  		break;
-> +	case VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX:
-> +		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
-> +		case VFIO_IRQ_SET_ACTION_TRIGGER:
-> +			if (pci_is_pcie(vdev->pdev))
-> +				func = vfio_pci_set_non_fatal_err_trigger;
-> +			break;
-> +		}
-> +		break;
->  	case VFIO_PCI_REQ_IRQ_INDEX:
->  		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
->  		case VFIO_IRQ_SET_ACTION_TRIGGER:
-> diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
-> index f561ac1..d30f8a3 100644
-> --- a/drivers/vfio/pci/vfio_pci_private.h
-> +++ b/drivers/vfio/pci/vfio_pci_private.h
-> @@ -93,6 +93,7 @@ struct vfio_pci_device {
->  	struct pci_saved_state	*pci_saved_state;
->  	int			refcnt;
->  	struct eventfd_ctx	*err_trigger;
-> +	struct eventfd_ctx	*non_fatal_err_trigger;
->  	struct eventfd_ctx	*req_trigger;
->  	struct list_head	dummy_resources_list;
->  };
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 519eff3..affa973 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -443,6 +443,7 @@ enum {
->  	VFIO_PCI_MSIX_IRQ_INDEX,
->  	VFIO_PCI_ERR_IRQ_INDEX,
->  	VFIO_PCI_REQ_IRQ_INDEX,
-> +	VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX,
->  	VFIO_PCI_NUM_IRQS
->  };
->  
-> -- 
-> 1.8.3.1
-> 
-> 
+I don't know if it's the same. For OVMF it fails in many different ways
+and it complains about unexpected expensions too.
+
+>> Also, x86 "-accel tcg,thread=3Dmulti" prints the scary message on memo=
+ry
+>> ordering.
+>
+> That is expected until x86 is properly tested and we submit the default
+> enabling patch for x86 on x86. To be honest we could submit the MO patc=
+h
+> now to make that warning go away.
+
+Yeah, this is just the message being unnecessarily specific.
+
+Paolo
