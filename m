@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51960)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ciPfd-0002Kw-TS
+	(envelope-from <pm215@archaic.org.uk>) id 1ciPff-0002M8-CA
 	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ciPfc-0001rr-9V
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:13 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48677)
+	(envelope-from <pm215@archaic.org.uk>) id 1ciPfd-0001tO-R8
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:15 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48679)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ciPfc-0001lG-2s
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:12 -0500
+	id 1ciPfd-0001rj-JJ
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:13 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1ciPfb-0002Pw-02
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:05:11 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1ciPfc-0002Qv-I4
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:05:12 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 27 Feb 2017 18:04:50 +0000
-Message-Id: <1488218699-31035-22-git-send-email-peter.maydell@linaro.org>
+Date: Mon, 27 Feb 2017 18:04:53 +0000
+Message-Id: <1488218699-31035-25-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1488218699-31035-1-git-send-email-peter.maydell@linaro.org>
 References: <1488218699-31035-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 21/30] armv7m: Extract "exception taken" code
- into functions
+Subject: [Qemu-devel] [PULL 24/30] armv7m: Allow SHCSR writes to change
+ pending and active bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,173 +33,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Extract the code from the tail end of arm_v7m_do_interrupt() which
-enters the exception handler into a pair of utility functions
-v7m_exception_taken() and v7m_push_stack(), which correspond roughly
-to the pseudocode PushStack() and ExceptionTaken().
-
-This also requires us to move the arm_v7m_load_vector() utility
-routine up so we can call it.
-
-Handling illegal exception returns has some cases where we want to
-take a UsageFault either on an existing stack frame or with a new
-stack frame but with a specific LR value, so we want to be able to
-call these without having to go via arm_v7m_cpu_do_interrupt().
+Implement the NVIC SHCSR write behaviour which allows pending and
+active status of some exceptions to be changed.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- target/arm/helper.c | 118 ++++++++++++++++++++++++++++++----------------------
- 1 file changed, 68 insertions(+), 50 deletions(-)
+ hw/intc/armv7m_nvic.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 664f030..be731dc 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -6002,6 +6002,72 @@ static void switch_v7m_sp(CPUARMState *env, bool new_spsel)
-     }
- }
- 
-+static uint32_t arm_v7m_load_vector(ARMCPU *cpu)
-+{
-+    CPUState *cs = CPU(cpu);
-+    CPUARMState *env = &cpu->env;
-+    MemTxResult result;
-+    hwaddr vec = env->v7m.vecbase + env->v7m.exception * 4;
-+    uint32_t addr;
-+
-+    addr = address_space_ldl(cs->as, vec,
-+                             MEMTXATTRS_UNSPECIFIED, &result);
-+    if (result != MEMTX_OK) {
-+        /* Architecturally this should cause a HardFault setting HSFR.VECTTBL,
-+         * which would then be immediately followed by our failing to load
-+         * the entry vector for that HardFault, which is a Lockup case.
-+         * Since we don't model Lockup, we just report this guest error
-+         * via cpu_abort().
-+         */
-+        cpu_abort(cs, "Failed to read from exception vector table "
-+                  "entry %08x\n", (unsigned)vec);
-+    }
-+    return addr;
-+}
-+
-+static void v7m_exception_taken(ARMCPU *cpu, uint32_t lr)
-+{
-+    /* Do the "take the exception" parts of exception entry,
-+     * but not the pushing of state to the stack. This is
-+     * similar to the pseudocode ExceptionTaken() function.
-+     */
-+    CPUARMState *env = &cpu->env;
-+    uint32_t addr;
-+
-+    armv7m_nvic_acknowledge_irq(env->nvic);
-+    switch_v7m_sp(env, 0);
-+    /* Clear IT bits */
-+    env->condexec_bits = 0;
-+    env->regs[14] = lr;
-+    addr = arm_v7m_load_vector(cpu);
-+    env->regs[15] = addr & 0xfffffffe;
-+    env->thumb = addr & 1;
-+}
-+
-+static void v7m_push_stack(ARMCPU *cpu)
-+{
-+    /* Do the "set up stack frame" part of exception entry,
-+     * similar to pseudocode PushStack().
-+     */
-+    CPUARMState *env = &cpu->env;
-+    uint32_t xpsr = xpsr_read(env);
-+
-+    /* Align stack pointer if the guest wants that */
-+    if ((env->regs[13] & 4) && (env->v7m.ccr & R_V7M_CCR_STKALIGN_MASK)) {
-+        env->regs[13] -= 4;
-+        xpsr |= 0x200;
-+    }
-+    /* Switch to the handler mode.  */
-+    v7m_push(env, xpsr);
-+    v7m_push(env, env->regs[15]);
-+    v7m_push(env, env->regs[14]);
-+    v7m_push(env, env->regs[12]);
-+    v7m_push(env, env->regs[3]);
-+    v7m_push(env, env->regs[2]);
-+    v7m_push(env, env->regs[1]);
-+    v7m_push(env, env->regs[0]);
-+}
-+
- static void do_v7m_exception_exit(CPUARMState *env)
- {
-     uint32_t type;
-@@ -6063,37 +6129,11 @@ static void arm_log_exception(int idx)
-     }
- }
- 
--static uint32_t arm_v7m_load_vector(ARMCPU *cpu)
--
--{
--    CPUState *cs = CPU(cpu);
--    CPUARMState *env = &cpu->env;
--    MemTxResult result;
--    hwaddr vec = env->v7m.vecbase + env->v7m.exception * 4;
--    uint32_t addr;
--
--    addr = address_space_ldl(cs->as, vec,
--                             MEMTXATTRS_UNSPECIFIED, &result);
--    if (result != MEMTX_OK) {
--        /* Architecturally this should cause a HardFault setting HSFR.VECTTBL,
--         * which would then be immediately followed by our failing to load
--         * the entry vector for that HardFault, which is a Lockup case.
--         * Since we don't model Lockup, we just report this guest error
--         * via cpu_abort().
--         */
--        cpu_abort(cs, "Failed to read from exception vector table "
--                  "entry %08x\n", (unsigned)vec);
--    }
--    return addr;
--}
--
- void arm_v7m_cpu_do_interrupt(CPUState *cs)
- {
-     ARMCPU *cpu = ARM_CPU(cs);
-     CPUARMState *env = &cpu->env;
--    uint32_t xpsr = xpsr_read(env);
-     uint32_t lr;
--    uint32_t addr;
- 
-     arm_log_exception(cs->exception_index);
- 
-@@ -6151,31 +6191,9 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
-         return; /* Never happens.  Keep compiler happy.  */
-     }
- 
--    armv7m_nvic_acknowledge_irq(env->nvic);
--
-+    v7m_push_stack(cpu);
-+    v7m_exception_taken(cpu, lr);
-     qemu_log_mask(CPU_LOG_INT, "... as %d\n", env->v7m.exception);
--
--    /* Align stack pointer if the guest wants that */
--    if ((env->regs[13] & 4) && (env->v7m.ccr & R_V7M_CCR_STKALIGN_MASK)) {
--        env->regs[13] -= 4;
--        xpsr |= 0x200;
--    }
--    /* Switch to the handler mode.  */
--    v7m_push(env, xpsr);
--    v7m_push(env, env->regs[15]);
--    v7m_push(env, env->regs[14]);
--    v7m_push(env, env->regs[12]);
--    v7m_push(env, env->regs[3]);
--    v7m_push(env, env->regs[2]);
--    v7m_push(env, env->regs[1]);
--    v7m_push(env, env->regs[0]);
--    switch_v7m_sp(env, 0);
--    /* Clear IT bits */
--    env->condexec_bits = 0;
--    env->regs[14] = lr;
--    addr = arm_v7m_load_vector(cpu);
--    env->regs[15] = addr & 0xfffffffe;
--    env->thumb = addr & 1;
- }
- 
- /* Function used to synchronize QEMU's AArch64 register set with AArch32
+diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+index 718b1a1..76097b4 100644
+--- a/hw/intc/armv7m_nvic.c
++++ b/hw/intc/armv7m_nvic.c
+@@ -755,8 +755,17 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value)
+         cpu->env.v7m.ccr = value;
+         break;
+     case 0xd24: /* System Handler Control.  */
+-        /* TODO: Real hardware allows you to set/clear the active bits
+-           under some circumstances.  We don't implement this.  */
++        s->vectors[ARMV7M_EXCP_MEM].active = (value & (1 << 0)) != 0;
++        s->vectors[ARMV7M_EXCP_BUS].active = (value & (1 << 1)) != 0;
++        s->vectors[ARMV7M_EXCP_USAGE].active = (value & (1 << 3)) != 0;
++        s->vectors[ARMV7M_EXCP_SVC].active = (value & (1 << 7)) != 0;
++        s->vectors[ARMV7M_EXCP_DEBUG].active = (value & (1 << 8)) != 0;
++        s->vectors[ARMV7M_EXCP_PENDSV].active = (value & (1 << 10)) != 0;
++        s->vectors[ARMV7M_EXCP_SYSTICK].active = (value & (1 << 11)) != 0;
++        s->vectors[ARMV7M_EXCP_USAGE].pending = (value & (1 << 12)) != 0;
++        s->vectors[ARMV7M_EXCP_MEM].pending = (value & (1 << 13)) != 0;
++        s->vectors[ARMV7M_EXCP_BUS].pending = (value & (1 << 14)) != 0;
++        s->vectors[ARMV7M_EXCP_SVC].pending = (value & (1 << 15)) != 0;
+         s->vectors[ARMV7M_EXCP_MEM].enabled = (value & (1 << 16)) != 0;
+         s->vectors[ARMV7M_EXCP_BUS].enabled = (value & (1 << 17)) != 0;
+         s->vectors[ARMV7M_EXCP_USAGE].enabled = (value & (1 << 18)) != 0;
 -- 
 2.7.4
