@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57078)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ciILe-0002oV-BK
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:16:07 -0500
+	(envelope-from <mlureau@redhat.com>) id 1ciIMU-0003Ry-Nt
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:17:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ciILd-0004wq-62
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:16:06 -0500
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:36906)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ciILc-0004w9-SC
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:16:05 -0500
-Received: by mail-wm0-x230.google.com with SMTP id v77so58457453wmv.0
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 02:16:04 -0800 (PST)
+	(envelope-from <mlureau@redhat.com>) id 1ciIMP-0005RW-M1
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:16:58 -0500
+Received: from mx4-phx2.redhat.com ([209.132.183.25]:47615)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1ciIMP-0005Qy-DX
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:16:53 -0500
+Date: Mon, 27 Feb 2017 05:16:51 -0500 (EST)
+From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>
+Message-ID: <1800937540.12350937.1488190611084.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20170227101013.GB2350@work-vm>
+References: <20170224202345.13311-1-marcandre.lureau@redhat.com>
+	<20170227101013.GB2350@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <87d1e4p59c.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-References: <1486976352-549-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<1486976352-549-2-git-send-email-nikunj@linux.vnet.ibm.com>
-	<CAFEAcA8X873FLQxF_n_KZ-jc0hrKcqAj_tjNm6SO0hpPxbF75w@mail.gmail.com>
-	<87d1e4p59c.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 27 Feb 2017 10:15:43 +0000
-Message-ID: <CAFEAcA8x8G7Xjx+W8Y2nbX2NA3YCLJyj_c0pZgm3xtEHYtQQ3Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 2/2] risu_ppc64le: distinguish real illegal
- instruction
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] vhost-user: delay vhost_user_stop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,47 +27,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, "bharata@linux.vnet.ibm.com" <bharata@linux.vnet.ibm.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-On 27 February 2017 at 05:33, Nikunj A Dadhania
-<nikunj@linux.vnet.ibm.com> wrote:
-> Peter Maydell <peter.maydell@linaro.org> writes:
->
->> On 13 February 2017 at 08:59, Nikunj A Dadhania
->> <nikunj@linux.vnet.ibm.com> wrote:
->>> While executing qemu_ppc64le, found an issue that the real illegal
->>> instructions are handled as risu_op which results in wrong info at the
->>> master end. Even the master needs to distinguish real illegal
->>> instructions versus risu_op.
->>>
->>> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
->>
->> No, this is deliberate. Otherwise you can't test illegal
->> instructions. What should happen is that both master and
->> apprentice ends end up in the default case, which does
->> a register info compare and continues having stepped the
->> PC past the illegal insn.
->
-> One of the issue that I had was some of the instruction are implemented
-> in the master and not in apprentice. I think we could then disable them
-> in the ppc64.risu. And enable them only when we have that implemented it
-> in qemu tcg.
+Hi
 
-Yes; if you haven't yet implemented an instruction the best
-approach is just to not try to test it.
+----- Original Message -----
+> * Marc-Andr=C3=A9 Lureau (marcandre.lureau@redhat.com) wrote:
+> > Since commit b0a335e351103bf92f3f9d0bd5759311be8156ac, a socket write
+> > may trigger a disconnect events, calling vhost_user_stop() and clearing
+> > all the vhost_dev strutures holding data that vhost.c functions expect
+> > to remain valid. Delay the cleanup to keep the vhost_dev structure
+> > valid during the vhost.c functions.
+> >=20
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>=20
+> This does get me through a 'make check' succesfully.
+>=20
 
->> (If only one end thinks the insn is illegal then there will
->> be a register mismatch on the PC.)
->
-> Yeah, the issue here was it does not come out obviously that there was a
-> real illegal instruction. Maybe a error print at both the ends would
-> help in debugging.
+Yes, it's not optimal, but there is so much cleanup to deal with otherwise,=
+ than I am inclined to go with this approach for now, and keep the FIXME fo=
+r 2.10
 
-It should print "faulting insn mismatch" if the instructions which
-fault aren't the same thing. This is what the arm and aarch64
-implementations of reginfo_dump_mismatch() do, anyway. It looks
-like the ppc and m68k versions don't do that, though.
+I'll update the patch to avoid the race on reconnect.
 
-thanks
--- PMM
+> Dave
+>=20
+> > ---
+> >  net/vhost-user.c | 49 +++++++++++++++++++++++++++++++++++++++++++-----=
+-
+> >  1 file changed, 43 insertions(+), 6 deletions(-)
+> >=20
+> > diff --git a/net/vhost-user.c b/net/vhost-user.c
+> > index 77b8110f8c..00573c8ac8 100644
+> > --- a/net/vhost-user.c
+> > +++ b/net/vhost-user.c
+> > @@ -25,6 +25,7 @@ typedef struct VhostUserState {
+> >      guint watch;
+> >      uint64_t acked_features;
+> >      bool started;
+> > +    QEMUBH *chr_closed_bh;
+> >  } VhostUserState;
+> > =20
+> >  VHostNetState *vhost_user_get_vhost_net(NetClientState *nc)
+> > @@ -190,9 +191,40 @@ static gboolean net_vhost_user_watch(GIOChannel *c=
+han,
+> > GIOCondition cond,
+> > =20
+> >      qemu_chr_fe_disconnect(&s->chr);
+> > =20
+> > +    s->watch =3D 0;
+> >      return FALSE;
+> >  }
+> > =20
+> > +static void chr_closed_bh(void *opaque)
+> > +{
+> > +    const char *name =3D opaque;
+> > +    NetClientState *ncs[MAX_QUEUE_NUM];
+> > +    VhostUserState *s;
+> > +    Error *err =3D NULL;
+> > +    int queues;
+> > +
+> > +    queues =3D qemu_find_net_clients_except(name, ncs,
+> > +                                          NET_CLIENT_DRIVER_NIC,
+> > +                                          MAX_QUEUE_NUM);
+> > +    assert(queues < MAX_QUEUE_NUM);
+> > +
+> > +    s =3D DO_UPCAST(VhostUserState, nc, ncs[0]);
+> > +
+> > +    qmp_set_link(name, false, &err);
+> > +    vhost_user_stop(queues, ncs);
+> > +    if (s->watch) {
+> > +        g_source_remove(s->watch);
+> > +    }
+> > +    s->watch =3D 0;
+> > +
+> > +    qemu_bh_delete(s->chr_closed_bh);
+> > +    s->chr_closed_bh =3D NULL;
+> > +
+> > +    if (err) {
+> > +        error_report_err(err);
+> > +    }
+> > +}
+> > +
+> >  static void net_vhost_user_event(void *opaque, int event)
+> >  {
+> >      const char *name =3D opaque;
+> > @@ -212,20 +244,25 @@ static void net_vhost_user_event(void *opaque, in=
+t
+> > event)
+> >      trace_vhost_user_event(chr->label, event);
+> >      switch (event) {
+> >      case CHR_EVENT_OPENED:
+> > -        s->watch =3D qemu_chr_fe_add_watch(&s->chr, G_IO_HUP,
+> > -                                         net_vhost_user_watch, s);
+> >          if (vhost_user_start(queues, ncs, &s->chr) < 0) {
+> >              qemu_chr_fe_disconnect(&s->chr);
+> >              return;
+> >          }
+> > +        s->watch =3D qemu_chr_fe_add_watch(&s->chr, G_IO_HUP,
+> > +                                         net_vhost_user_watch, s);
+> >          qmp_set_link(name, true, &err);
+> > +        s->chr_closed_bh =3D qemu_bh_new(chr_closed_bh, opaque);
+> >          s->started =3D true;
+> >          break;
+> >      case CHR_EVENT_CLOSED:
+> > -        qmp_set_link(name, false, &err);
+> > -        vhost_user_stop(queues, ncs);
+> > -        g_source_remove(s->watch);
+> > -        s->watch =3D 0;
+> > +        /* a close event may happen during a read/write, but vhost
+> > +         * code assumes the vhost_dev remains setup, so delay the
+> > +         * stop & clear to idle.
+> > +         * FIXME: better handle failure in vhost code, remove bh
+> > +         */
+> > +        if (s->chr_closed_bh) {
+> > +            qemu_bh_schedule(s->chr_closed_bh);
+> > +        }
+> >          break;
+> >      }
+> > =20
+> > --
+> > 2.12.0.rc2.3.gc93709801
+> >=20
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>=20
