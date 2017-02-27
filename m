@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ciKVk-0005RN-8M
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:34:41 -0500
+	(envelope-from <imammedo@redhat.com>) id 1ciKYP-0007dO-S7
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:37:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ciKVj-0005p3-3B
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:34:40 -0500
-References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
-	<1487689130-30373-19-git-send-email-kwolf@redhat.com>
-	<3a201ea1-81fe-e4f3-7474-364b7cc8f091@redhat.com>
-	<20170227123302.GD6356@noname.redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <b735ce93-e4a3-5f25-f641-108d8f9cccc7@redhat.com>
-Date: Mon, 27 Feb 2017 13:34:30 +0100
+	(envelope-from <imammedo@redhat.com>) id 1ciKYM-0006qC-FV
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:37:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54610)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ciKYM-0006pv-76
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:37:22 -0500
+Date: Mon, 27 Feb 2017 13:37:13 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170227133713.3ae9d820@nial.brq.redhat.com>
+In-Reply-To: <20170226164815.26799-1-marex@denx.de>
+References: <20170226164815.26799-1-marex@denx.de>
 MIME-Version: 1.0
-In-Reply-To: <20170227123302.GD6356@noname.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="nDSc39P1rPTTjB9ti09npsNull6UCw2jr"
-Subject: Re: [Qemu-devel] [PATCH 18/54] block: Default .bdrv_child_perm()
- for format drivers
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] nios2: iic: Convert CPU prop to qom link
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,133 +26,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+To: Marek Vasut <marex@denx.de>
+Cc: qemu-devel@nongnu.org, Jeff Da Silva <jdasilva@altera.com>, Chris Wulff <crwulff@gmail.com>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, Sandra Loosemore <sandra@codesourcery.com>, Yves Vandervennet <yvanderv@altera.com>, Ley Foon Tan <lftan@altera.com>, Richard Henderson <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nDSc39P1rPTTjB9ti09npsNull6UCw2jr
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, jcody@redhat.com, famz@redhat.com,
- qemu-devel@nongnu.org
-Message-ID: <b735ce93-e4a3-5f25-f641-108d8f9cccc7@redhat.com>
-Subject: Re: [PATCH 18/54] block: Default .bdrv_child_perm() for format
- drivers
-References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
- <1487689130-30373-19-git-send-email-kwolf@redhat.com>
- <3a201ea1-81fe-e4f3-7474-364b7cc8f091@redhat.com>
- <20170227123302.GD6356@noname.redhat.com>
-In-Reply-To: <20170227123302.GD6356@noname.redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+On Sun, 26 Feb 2017 17:48:15 +0100
+Marek Vasut <marex@denx.de> wrote:
 
-On 27.02.2017 13:33, Kevin Wolf wrote:
-> Am 25.02.2017 um 12:57 hat Max Reitz geschrieben:
->> On 21.02.2017 15:58, Kevin Wolf wrote:
->>> Almost all format drivers have the same characteristics as far as
->>> permissions are concerned: They have one or more children for storing=
+> Add a const qom link between the CPU and the IIC instead
+> of passing the CPU link through a qom property.
+> 
+> Signed-off-by: Marek Vasut <marex@denx.de>
+> Cc: Alexander Graf <agraf@suse.de>
+> Cc: Chris Wulff <crwulff@gmail.com>
+> Cc: Jeff Da Silva <jdasilva@altera.com>
+> Cc: Ley Foon Tan <lftan@altera.com>
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Sandra Loosemore <sandra@codesourcery.com>
+> Cc: Yves Vandervennet <yvanderv@altera.com>
+> ---
+>  hw/intc/nios2_iic.c       | 13 ++++---------
+>  hw/nios2/10m50_devboard.c |  3 ++-
+>  2 files changed, 6 insertions(+), 10 deletions(-)
+> 
+> diff --git a/hw/intc/nios2_iic.c b/hw/intc/nios2_iic.c
+> index 818ab1b315..70550ef8c1 100644
+> --- a/hw/intc/nios2_iic.c
+> +++ b/hw/intc/nios2_iic.c
+> @@ -62,17 +62,15 @@ static void altera_iic_init(Object *obj)
+>      sysbus_init_irq(SYS_BUS_DEVICE(obj), &pv->parent_irq);
+>  }
+>  
+> -static Property altera_iic_properties[] = {
+> -    DEFINE_PROP_PTR("cpu", AlteraIIC, cpu),
+> -    DEFINE_PROP_END_OF_LIST(),
+> -};
+> -
+>  static void altera_iic_realize(DeviceState *dev, Error **errp)
+>  {
+>      struct AlteraIIC *pv = ALTERA_IIC(dev);
+> +    Error *err = NULL;
+>  
+> +    pv->cpu = object_property_get_link(OBJECT(dev), "cpu", &err);
+>      if (!pv->cpu) {
+> -        error_setg(errp, "altera,iic: CPU not connected");
+> +        error_setg(errp, "altera,iic: CPU link not found: %s",
+> +                   error_get_pretty(err));
+>          return;
+>      }
+>  }
+> @@ -81,9 +79,6 @@ static void altera_iic_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+>  
+> -    dc->props = altera_iic_properties;
+> -    /* Reason: pointer property "cpu" */
 
->>> their own data and, more importantly, metadata (can be written to and=
+> -    dc->cannot_instantiate_with_device_add_yet = true;
+this device is still not device_add creatable
+since object_property_add_const_link() is basically the same
+as DEFINE_PROP_PTR("cpu", AlteraIIC, cpu), so drop this hunk.
 
->>> grow even without external write requests, must be protected against
->>> other writers and present consistent data) and optionally a backing f=
-ile
->>> (this is just data, so like for a filter, it only depends on what the=
+otherwise patch is still improvement as it removes an instance
+of obsoleted DEFINE_PROP_PTR
 
->>> parent nodes need).
->>>
->>> This provides a default implementation that can be shared by most of
->>> our format drivers.
->>>
->>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->>> ---
->>>  block.c                   | 42 +++++++++++++++++++++++++++++++++++++=
-+++++
->>>  include/block/block_int.h |  8 ++++++++
->>>  2 files changed, 50 insertions(+)
->>>
->>> diff --git a/block.c b/block.c
->>> index 523cbd3..f2e7178 100644
->>> --- a/block.c
->>> +++ b/block.c
->>> @@ -1554,6 +1554,48 @@ void bdrv_filter_default_perms(BlockDriverStat=
-e *bs, BdrvChild *c,
->>>                 (c->shared_perm & DEFAULT_PERM_UNCHANGED);
->>>  }
->>> =20
->>> +void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
->>> +                               const BdrvChildRole *role,
->>> +                               uint64_t perm, uint64_t shared,
->>> +                               uint64_t *nperm, uint64_t *nshared)
->>> +{
->>> +    bool backing =3D (role =3D=3D &child_backing);
->>> +    assert(role =3D=3D &child_backing || role =3D=3D &child_file);
->>> +
->>> +    if (!backing) {
->>> +        /* Apart from the modifications below, the same permissions =
-are
->>> +         * forwarded and left alone as for filters */
->>> +        bdrv_filter_default_perms(bs, c, role, perm, shared, &perm, =
-&shared);
->>> +
->>> +        /* Format drivers may touch metadata even if the guest doesn=
-'t write */
->>> +        if (!bdrv_is_read_only(bs)) {
->>> +            perm |=3D BLK_PERM_WRITE | BLK_PERM_RESIZE;
->>> +        }
->>> +
->>> +        /* bs->file always needs to be consistent because of the met=
-adata. We
->>> +         * can never allow other users to resize or write to it. */
->>> +        perm |=3D BLK_PERM_CONSISTENT_READ;
->>> +        shared &=3D ~(BLK_PERM_WRITE | BLK_PERM_RESIZE);
->>> +    } else {
->>> +        /* We want consistent read from backing files if the parent =
-needs it.
->>> +         * No other operations are performed on backing files. */
->>> +        perm &=3D BLK_PERM_CONSISTENT_READ;
->>> +
->>> +        /* If the parent can deal with changing data, we're okay wit=
-h a
->>> +         * writable and resizable backing file. */
->>> +        if (shared & BLK_PERM_WRITE) {
->>> +            shared =3D BLK_PERM_WRITE | BLK_PERM_RESIZE;
->>
->> Wouldn't this break CONSISTENT_READ?
->=20
-> WRITE (even for multiple users) and CONSISTENT_READ aren't mutually
-> exclusive. I was afraid that I didn't define CONSISTENT_READ right, but=
-
-> it appears that the definition is fine:
->=20
->  * A user that has the "permission" of consistent reads is guaranteed t=
-hat
->  * their view of the contents of the block device is complete and
->  * self-consistent, representing the contents of a disk at a specific
->  * point.
-
-Right, but writes to the backing file at least to me appear to be a
-different matter. If those don't break CONSISTENT_READ, then I don't see
-how commit breaks CONSISTENT_READ for the intermediate nodes.
-
-Max
-
-
---nDSc39P1rPTTjB9ti09npsNull6UCw2jr
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAli0HNYSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9Ab7sH/2l5/QUDakhgfRWooVKWqQV1v+tQXewQ
-QzW3vRTGCQwNU8L+AfYsvvKeXqtYqGpFTYdzpxwJkksNwDLUO66caXvqd4tfI7by
-csCySdC4DUDcxYzllcWVQcUwL7MYFrm10rBAr3ceH4lRLeitGxv3a2PmgSmGNuv9
-CNkq3vEcc0vhbD5vc4loYmRzxAZeNbxbLj7GSHTH9PVLmHYeziJDDuCY6kcwcvnL
-mYJmx3GdD2Aa/iji5mYDoL79V0sIx3q4Wir/ILePjAvf8TCPR5TYIvPX7lrmU17v
-MUaCXbNVCIFQciQaVRAMAsSRKEKilVTpwwSkpI8SmKQuwbR1K/JVtwk=
-=5EeU
------END PGP SIGNATURE-----
-
---nDSc39P1rPTTjB9ti09npsNull6UCw2jr--
+>      dc->realize = altera_iic_realize;
+>  }
+>  
+> diff --git a/hw/nios2/10m50_devboard.c b/hw/nios2/10m50_devboard.c
+> index 0d8b9aa58f..c18e0b2a17 100644
+> --- a/hw/nios2/10m50_devboard.c
+> +++ b/hw/nios2/10m50_devboard.c
+> @@ -83,7 +83,8 @@ static void nios2_10m50_ghrd_init(MachineState *machine)
+>  
+>      /* Register: Internal Interrupt Controller (IIC) */
+>      dev = qdev_create(NULL, "altera,iic");
+> -    qdev_prop_set_ptr(dev, "cpu", cpu);
+> +    object_property_add_const_link(OBJECT(dev), "cpu", OBJECT(cpu),
+> +                                   &error_abort);
+>      qdev_init_nofail(dev);
+>      sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, cpu_irq[0]);
+>      for (i = 0; i < 32; i++) {
