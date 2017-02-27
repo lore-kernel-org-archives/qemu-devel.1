@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1ciRuA-0007Lr-8k
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:28:23 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ciS3R-0006uU-6W
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:37:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1ciRu5-0008WJ-CK
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:28:22 -0500
-Received: from mail-db5eur01on0111.outbound.protection.outlook.com
-	([104.47.2.111]:50176
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1ciRu4-0008Vi-JV
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:28:17 -0500
-References: <1485782396-22341-1-git-send-email-den@openvz.org>
-	<20170227201119.GA25346@redhat.com>
-From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <92089767-84c6-1e74-c1dd-10f904e2ad48@openvz.org>
-Date: Mon, 27 Feb 2017 23:13:27 +0300
+	(envelope-from <kwolf@redhat.com>) id 1ciS3Q-0002wR-Cg
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:37:57 -0500
+Date: Mon, 27 Feb 2017 21:37:44 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170227203744.GI6356@noname.redhat.com>
+References: <1488193394-28453-1-git-send-email-pl@kamp.de>
 MIME-Version: 1.0
-In-Reply-To: <20170227201119.GA25346@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] io: ignore case in WebSocket HTTP
- header #PSBM-57554
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1488193394-28453-1-git-send-email-pl@kamp.de>
+Subject: Re: [Qemu-devel] [PATCH V2] qemu-img: make convert async
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +22,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Anton Nefedov <anton.nefedov@virtuozzo.com>
+To: Peter Lieven <pl@kamp.de>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, stefanha@gmail.com, ct@flyingcircus.io, mreitz@redhat.com, famz@redhat.com, eblake@redhat.com
 
-On 02/27/2017 11:11 PM, Daniel P. Berrange wrote:
-> On Mon, Jan 30, 2017 at 04:19:56PM +0300, Denis V. Lunev wrote:
->> From: Anton Nefedov <anton.nefedov@virtuozzo.com>
->>
->> According to RFC7230 Section 3.2, header field name is case-insensitive.
->>
->> The haystack string length is limited by 4096 bytes by
->> qio_channel_websock_handshake_read().
->>
->> Further, handshake_process() dups and NULL-terminates the string
->> so it is safe to call non length-limited functions like strcasestr().
->>
->> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
->> Signed-off-by: Denis V. Lunev <den@openvz.org>
->> CC: Daniel P. Berrange <berrange@redhat.com>
->> ---
->>  io/channel-websock.c | 25 ++++++++++++++-----------
->>  1 file changed, 14 insertions(+), 11 deletions(-)
->>
->> diff --git a/io/channel-websock.c b/io/channel-websock.c
->> index d5a4ed3..991925a 100644
->> --- a/io/channel-websock.c
->> +++ b/io/channel-websock.c
->> @@ -108,18 +108,16 @@ enum {
->>  };
->>  
->>  static char *qio_channel_websock_handshake_entry(const char *handshake,
->> -                                                 size_t handshake_len,
->>                                                   const char *name)
->>  {
->>      char *begin, *end, *ret = NULL;
->>      char *line = g_strdup_printf("%s%s: ",
->>                                   QIO_CHANNEL_WEBSOCK_HANDSHAKE_DELIM,
->>                                   name);
->> -    begin = g_strstr_len(handshake, handshake_len, line);
->> +    begin = strcasestr(handshake, line);
-> So this turns out to break Windows builds since there's no strcasestr
-> on Mingw. There's no alternative that I know of in glib and I don't
-> fancy implementing a custom strcasestr() function. So I'm going to
-> drop this patch entirely, and copy you on an alternative fix that
-> simply converts the input data to lowercase before comparison. Would
-> appreciate if you can test my alternate patch with whatever client
-> you had problems with.
->
-> Regards,
-> Daniel
-Sure!
+Am 27.02.2017 um 12:03 hat Peter Lieven geschrieben:
+> the convert process is currently completely implemented with sync operations.
+> That means it reads one buffer and then writes it. No parallelism and each sync
+> request takes as long as it takes until it is completed.
+> 
+> This can be a big performance hit when the convert process reads and writes
+> to devices which do not benefit from kernel readahead or pagecache.
+> In our environment we heavily have the following two use cases when using
+> qemu-img convert.
+> 
+> a) reading from NFS and writing to iSCSI for deploying templates
+> b) reading from iSCSI and writing to NFS for backups
+> 
+> In both processes we use libiscsi and libnfs so we have no kernel cache.
+> 
+> This patch changes the convert process to work with parallel running coroutines
+> which can significantly improve performance for network storage devices:
+> 
+> qemu-img (master)
+>  nfs -> iscsi 22.8 secs
+>  nfs -> ram   11.7 secs
+>  ram -> iscsi 12.3 secs
+> 
+> qemu-img-async (8 coroutines, in-order write disabled)
+>  nfs -> iscsi 11.0 secs
+>  nfs -> ram   10.4 secs
+>  ram -> iscsi  9.0 secs
+> 
+> This patches introduces 2 new cmdline parameters. The -m parameter to specify
+> the number of coroutines running in parallel (defaults to 8). And the -W paremeter to
+> allow qemu-img to write to the target out of order rather than sequential. This improves
+> performance as the writes do not have to wait for each other to complete.
+> 
+> Signed-off-by: Peter Lieven <pl@kamp.de>
+
+Thanks, applied to the block branch.
+
+Kevin
