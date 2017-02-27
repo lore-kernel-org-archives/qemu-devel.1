@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ciR4V-0007ga-QO
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:35:00 -0500
+	(envelope-from <thuth@redhat.com>) id 1ciR6W-0000H4-A4
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:37:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ciR4U-0000d4-TC
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:34:59 -0500
-References: <1488200143-2140-1-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8e3d659d-1619-ce23-e427-7e8b15a9c447@redhat.com>
-Date: Mon, 27 Feb 2017 13:34:49 -0600
+	(envelope-from <thuth@redhat.com>) id 1ciR6R-0001Zn-De
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:37:04 -0500
+References: <1485377117-18105-1-git-send-email-thuth@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <f524e29d-6e8c-19b0-e170-2a6876cbfe69@redhat.com>
+Date: Mon, 27 Feb 2017 20:36:56 +0100
 MIME-Version: 1.0
-In-Reply-To: <1488200143-2140-1-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="lrIf9jA0Ia7XWskfr46ahiVf8mqa78qsX"
-Subject: Re: [Qemu-devel] [PATCH] option: Tweak invalid size error message
- and unbreak iotest 049
+In-Reply-To: <1485377117-18105-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/core/generic-loader: Fix crash when
+ running without CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +23,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, thuth@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>
+Cc: Laurent Vivier <laurent@vivier.eu>, QEMU Trivial <qemu-trivial@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lrIf9jA0Ia7XWskfr46ahiVf8mqa78qsX
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, thuth@redhat.com, qemu-block@nongnu.org,
- mreitz@redhat.com
-Message-ID: <8e3d659d-1619-ce23-e427-7e8b15a9c447@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] option: Tweak invalid size error message and
- unbreak iotest 049
-References: <1488200143-2140-1-git-send-email-armbru@redhat.com>
-In-Reply-To: <1488200143-2140-1-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 02/27/2017 06:55 AM, Markus Armbruster wrote:
-> Commit 75cdcd1 neglected to update tests/qemu-iotests/049.out, and
-> made the error message for negative size worse.  Fix that.
->=20
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+On 25.01.2017 21:45, Thomas Huth wrote:
+> When running QEMU with "-M none -device loader,file=kernel.elf", it
+> currently crashes with a segmentation fault, because the "none"-machine
+> does not have any CPU by default and the generic loader code tries
+> to dereference s->cpu. Fix it by adding an appropriate check for a
+> NULL pointer.
+> 
+> Reported-by: Laurent Vivier <laurent@vivier.eu>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  tests/qemu-iotests/049.out | 14 +++++++++-----
->  util/qemu-option.c         |  2 +-
+>  hw/core/generic-loader.c | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/core/generic-loader.c b/hw/core/generic-loader.c
+> index 58f1f02..4601267 100644
+> --- a/hw/core/generic-loader.c
+> +++ b/hw/core/generic-loader.c
+> @@ -137,20 +137,21 @@ static void generic_loader_realize(DeviceState *dev, Error **errp)
+>  #endif
+>  
+>      if (s->file) {
+> +        AddressSpace *as = s->cpu ? s->cpu->as :  NULL;
+> +
+>          if (!s->force_raw) {
+>              size = load_elf_as(s->file, NULL, NULL, &entry, NULL, NULL,
+> -                               big_endian, 0, 0, 0, s->cpu->as);
+> +                               big_endian, 0, 0, 0, as);
+>  
+>              if (size < 0) {
+>                  size = load_uimage_as(s->file, &entry, NULL, NULL, NULL, NULL,
+> -                                      s->cpu->as);
+> +                                      as);
+>              }
+>          }
+>  
+>          if (size < 0 || s->force_raw) {
+>              /* Default to the maximum size being the machine's ram size */
+> -            size = load_image_targphys_as(s->file, s->addr, ram_size,
+> -                                          s->cpu->as);
+> +            size = load_image_targphys_as(s->file, s->addr, ram_size, as);
+>          } else {
+>              s->addr = entry;
+>          }
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Ping?
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---lrIf9jA0Ia7XWskfr46ahiVf8mqa78qsX
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYtH9ZAAoJEKeha0olJ0NqCCEIAJpZbEIBDT+RN2eS/AOtlNWB
-YcboL9pD/sePCYuRYDEikUzY45yRwzzZR8OZ4V0N6qeMQkR8yOLtdZ0od1StZPOp
-cn/Qss5hB+J0aUFpiiOMYKRz9gp4uAnak51P49kx6C4LuA0mxcixHfWLREE9hgf1
-9dy3R5rQT1HptAa8q9KV3W1Y9B080wDLrLBASPVkmvzYkkt6qZWP55AgVdalQQKr
-Ew9jZFOBH0EUwHYDmXNMl10GjKyYoXeiwVuUym8Hg3gXA5wIhvnYJpie5/HaP43o
-FkYmpIpUFlduzW+r0LfmmjR49YRG4TQUZfX+ql+0c1M6Z6mOy/kN5xeU3frYdiI=
-=0wpS
------END PGP SIGNATURE-----
-
---lrIf9jA0Ia7XWskfr46ahiVf8mqa78qsX--
+ Thomas
