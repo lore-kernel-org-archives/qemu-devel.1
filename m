@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52046)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ciPfg-0002N7-BB
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:19 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1ciPfc-0002I9-IY
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ciPfd-0001sy-Cv
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:16 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48678)
+	(envelope-from <pm215@archaic.org.uk>) id 1ciPfZ-0001qJ-WC
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:11 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48677)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ciPfd-0001qs-3y
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:13 -0500
+	id 1ciPfZ-0001lG-Mf
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:09 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1ciPfY-0002O7-Bv
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:05:08 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1ciPfQ-0002IT-Ux
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:05:00 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 27 Feb 2017 18:04:45 +0000
-Message-Id: <1488218699-31035-17-git-send-email-peter.maydell@linaro.org>
+Date: Mon, 27 Feb 2017 18:04:30 +0000
+Message-Id: <1488218699-31035-2-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1488218699-31035-1-git-send-email-peter.maydell@linaro.org>
 References: <1488218699-31035-1-git-send-email-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 16/30] arm: gic: Remove references to NVIC
+Subject: [Qemu-devel] [PULL 01/30] target-arm: Implement BCM2835 hardware RNG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,205 +29,264 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Michael Davidsaver <mdavidsaver@gmail.com>
+From: Marcin Chojnacki <marcinch7@gmail.com>
 
-Now that the NVIC is its own separate implementation, we can
-clean up the GIC code by removing REV_NVIC and conditionals
-which use it.
+Recent vanilla Raspberry Pi kernels started to make use of
+the hardware random number generator in BCM2835 SoC. As a
+result, those kernels wouldn't work anymore under QEMU
+but rather just freeze during the boot process.
 
-Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+This patch implements a trivial BCM2835 compatible RNG,
+and adds it as a peripheral to BCM2835 platform, which
+allows to boot a vanilla Raspberry Pi kernel under Qemu.
+
+Changes since v1:
+ * Prevented guest from writing [31..20] bits in rng_status
+ * Removed redundant minimum_version_id_old
+ * Added field entries for the state
+ * Changed realize function to reset
+
+Signed-off-by: Marcin Chojnacki <marcinch7@gmail.com>
+Message-id: 20170210210857.47893-1-marcinch7@gmail.com
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- hw/intc/gic_internal.h   |  7 ++-----
- hw/intc/arm_gic.c        | 31 +++++--------------------------
- hw/intc/arm_gic_common.c | 23 ++++++++---------------
- 3 files changed, 15 insertions(+), 46 deletions(-)
+ hw/misc/Makefile.objs                |   1 +
+ include/hw/arm/bcm2835_peripherals.h |   2 +
+ include/hw/misc/bcm2835_rng.h        |  27 ++++++++
+ hw/arm/bcm2835_peripherals.c         |  15 +++++
+ hw/misc/bcm2835_rng.c                | 124 +++++++++++++++++++++++++++++++++++
+ 5 files changed, 169 insertions(+)
+ create mode 100644 include/hw/misc/bcm2835_rng.h
+ create mode 100644 hw/misc/bcm2835_rng.c
 
-diff --git a/hw/intc/gic_internal.h b/hw/intc/gic_internal.h
-index 3f31174..7fe87b1 100644
---- a/hw/intc/gic_internal.h
-+++ b/hw/intc/gic_internal.h
-@@ -25,9 +25,7 @@
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index 898e4cc..57a4406 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -42,6 +42,7 @@ obj-$(CONFIG_OMAP) += omap_sdrc.o
+ obj-$(CONFIG_OMAP) += omap_tap.o
+ obj-$(CONFIG_RASPI) += bcm2835_mbox.o
+ obj-$(CONFIG_RASPI) += bcm2835_property.o
++obj-$(CONFIG_RASPI) += bcm2835_rng.o
+ obj-$(CONFIG_SLAVIO) += slavio_misc.o
+ obj-$(CONFIG_ZYNQ) += zynq_slcr.o
+ obj-$(CONFIG_ZYNQ) += zynq-xadc.o
+diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm2835_peripherals.h
+index e12ae37..31241c7 100644
+--- a/include/hw/arm/bcm2835_peripherals.h
++++ b/include/hw/arm/bcm2835_peripherals.h
+@@ -19,6 +19,7 @@
+ #include "hw/dma/bcm2835_dma.h"
+ #include "hw/intc/bcm2835_ic.h"
+ #include "hw/misc/bcm2835_property.h"
++#include "hw/misc/bcm2835_rng.h"
+ #include "hw/misc/bcm2835_mbox.h"
+ #include "hw/sd/sdhci.h"
  
- #define ALL_CPU_MASK ((unsigned)(((1 << GIC_NCPU) - 1)))
+@@ -41,6 +42,7 @@ typedef struct BCM2835PeripheralState {
+     BCM2835DMAState dma;
+     BCM2835ICState ic;
+     BCM2835PropertyState property;
++    BCM2835RngState rng;
+     BCM2835MboxState mboxes;
+     SDHCIState sdhci;
+ } BCM2835PeripheralState;
+diff --git a/include/hw/misc/bcm2835_rng.h b/include/hw/misc/bcm2835_rng.h
+new file mode 100644
+index 0000000..41a531b
+--- /dev/null
++++ b/include/hw/misc/bcm2835_rng.h
+@@ -0,0 +1,27 @@
++/*
++ * BCM2835 Random Number Generator emulation
++ *
++ * Copyright (C) 2017 Marcin Chojnacki <marcinch7@gmail.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef BCM2835_RNG_H
++#define BCM2835_RNG_H
++
++#include "hw/sysbus.h"
++
++#define TYPE_BCM2835_RNG "bcm2835-rng"
++#define BCM2835_RNG(obj) \
++        OBJECT_CHECK(BCM2835RngState, (obj), TYPE_BCM2835_RNG)
++
++typedef struct {
++    SysBusDevice busdev;
++    MemoryRegion iomem;
++
++    uint32_t rng_ctrl;
++    uint32_t rng_status;
++} BCM2835RngState;
++
++#endif
+diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
+index 2e641a3..9ed22d5 100644
+--- a/hw/arm/bcm2835_peripherals.c
++++ b/hw/arm/bcm2835_peripherals.c
+@@ -86,6 +86,11 @@ static void bcm2835_peripherals_init(Object *obj)
+     object_property_add_const_link(OBJECT(&s->property), "dma-mr",
+                                    OBJECT(&s->gpu_bus_mr), &error_abort);
  
--/* The NVIC has 16 internal vectors.  However these are not exposed
--   through the normal GIC interface.  */
--#define GIC_BASE_IRQ ((s->revision == REV_NVIC) ? 32 : 0)
-+#define GIC_BASE_IRQ 0
++    /* Random Number Generator */
++    object_initialize(&s->rng, sizeof(s->rng), TYPE_BCM2835_RNG);
++    object_property_add_child(obj, "rng", OBJECT(&s->rng), NULL);
++    qdev_set_parent_bus(DEVICE(&s->rng), sysbus_get_default());
++
+     /* Extended Mass Media Controller */
+     object_initialize(&s->sdhci, sizeof(s->sdhci), TYPE_SYSBUS_SDHCI);
+     object_property_add_child(obj, "sdhci", OBJECT(&s->sdhci), NULL);
+@@ -226,6 +231,16 @@ static void bcm2835_peripherals_realize(DeviceState *dev, Error **errp)
+     sysbus_connect_irq(SYS_BUS_DEVICE(&s->property), 0,
+                       qdev_get_gpio_in(DEVICE(&s->mboxes), MBOX_CHAN_PROPERTY));
  
- #define GIC_SET_ENABLED(irq, cm) s->irq_state[irq].enabled |= (cm)
- #define GIC_CLEAR_ENABLED(irq, cm) s->irq_state[irq].enabled &= ~(cm)
-@@ -75,7 +73,6 @@
- 
- /* The special cases for the revision property: */
- #define REV_11MPCORE 0
--#define REV_NVIC 0xffffffff
- 
- void gic_set_pending_private(GICState *s, int cpu, int irq);
- uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs);
-@@ -87,7 +84,7 @@ void gic_set_priority(GICState *s, int cpu, int irq, uint8_t val,
- 
- static inline bool gic_test_pending(GICState *s, int irq, int cm)
- {
--    if (s->revision == REV_NVIC || s->revision == REV_11MPCORE) {
-+    if (s->revision == REV_11MPCORE) {
-         return s->irq_state[irq].pending & cm;
-     } else {
-         /* Edge-triggered interrupts are marked pending on a rising edge, but
-diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
-index 521aac3..8e5a9d8 100644
---- a/hw/intc/arm_gic.c
-+++ b/hw/intc/arm_gic.c
-@@ -156,17 +156,6 @@ static void gic_set_irq_11mpcore(GICState *s, int irq, int level,
-     }
- }
- 
--static void gic_set_irq_nvic(GICState *s, int irq, int level,
--                                 int cm, int target)
--{
--    if (level) {
--        GIC_SET_LEVEL(irq, cm);
--        GIC_SET_PENDING(irq, target);
--    } else {
--        GIC_CLEAR_LEVEL(irq, cm);
--    }
--}
--
- static void gic_set_irq_generic(GICState *s, int irq, int level,
-                                 int cm, int target)
- {
-@@ -214,8 +203,6 @@ static void gic_set_irq(void *opaque, int irq, int level)
- 
-     if (s->revision == REV_11MPCORE) {
-         gic_set_irq_11mpcore(s, irq, level, cm, target);
--    } else if (s->revision == REV_NVIC) {
--        gic_set_irq_nvic(s, irq, level, cm, target);
-     } else {
-         gic_set_irq_generic(s, irq, level, cm, target);
-     }
-@@ -367,7 +354,7 @@ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs)
-         return 1023;
-     }
- 
--    if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
-+    if (s->revision == REV_11MPCORE) {
-         /* Clear pending flags for both level and edge triggered interrupts.
-          * Level triggered IRQs will be reasserted once they become inactive.
-          */
-@@ -589,11 +576,6 @@ void gic_complete_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs)
-             DPRINTF("Set %d pending mask %x\n", irq, cm);
-             GIC_SET_PENDING(irq, cm);
-         }
--    } else if (s->revision == REV_NVIC) {
--        if (GIC_TEST_LEVEL(irq, cm)) {
--            DPRINTF("Set nvic %d pending mask %x\n", irq, cm);
--            GIC_SET_PENDING(irq, cm);
--        }
-     }
- 
-     group = gic_has_groups(s) && GIC_TEST_GROUP(irq, cm);
-@@ -768,7 +750,7 @@ static uint32_t gic_dist_readb(void *opaque, hwaddr offset, MemTxAttrs attrs)
-     } else if (offset < 0xf10) {
-         goto bad_reg;
-     } else if (offset < 0xf30) {
--        if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
-+        if (s->revision == REV_11MPCORE) {
-             goto bad_reg;
-         }
- 
-@@ -802,9 +784,6 @@ static uint32_t gic_dist_readb(void *opaque, hwaddr offset, MemTxAttrs attrs)
-             case 2:
-                 res = gic_id_gicv2[(offset - 0xfd0) >> 2];
-                 break;
--            case REV_NVIC:
--                /* Shouldn't be able to get here */
--                abort();
-             default:
-                 res = 0;
-             }
-@@ -1028,7 +1007,7 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
-                 continue; /* Ignore Non-secure access of Group0 IRQ */
-             }
- 
--            if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
-+            if (s->revision == REV_11MPCORE) {
-                 if (value & (1 << (i * 2))) {
-                     GIC_SET_MODEL(irq + i);
-                 } else {
-@@ -1046,7 +1025,7 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
-         goto bad_reg;
-     } else if (offset < 0xf20) {
-         /* GICD_CPENDSGIRn */
--        if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
-+        if (s->revision == REV_11MPCORE) {
-             goto bad_reg;
-         }
-         irq = (offset - 0xf10);
-@@ -1060,7 +1039,7 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
-         }
-     } else if (offset < 0xf30) {
-         /* GICD_SPENDSGIRn */
--        if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
-+        if (s->revision == REV_11MPCORE) {
-             goto bad_reg;
-         }
-         irq = (offset - 0xf20);
-diff --git a/hw/intc/arm_gic_common.c b/hw/intc/arm_gic_common.c
-index 4a8df44..70f1134 100644
---- a/hw/intc/arm_gic_common.c
-+++ b/hw/intc/arm_gic_common.c
-@@ -99,9 +99,7 @@ void gic_init_irqs_and_mmio(GICState *s, qemu_irq_handler handler,
-      *  [N+32..N+63] PPIs for CPU 1
-      *   ...
-      */
--    if (s->revision != REV_NVIC) {
--        i += (GIC_INTERNAL * s->num_cpu);
--    }
-+    i += (GIC_INTERNAL * s->num_cpu);
-     qdev_init_gpio_in(DEVICE(s), handler, i);
- 
-     for (i = 0; i < s->num_cpu; i++) {
-@@ -121,16 +119,12 @@ void gic_init_irqs_and_mmio(GICState *s, qemu_irq_handler handler,
-     memory_region_init_io(&s->iomem, OBJECT(s), ops, s, "gic_dist", 0x1000);
-     sysbus_init_mmio(sbd, &s->iomem);
- 
--    if (s->revision != REV_NVIC) {
--        /* This is the main CPU interface "for this core". It is always
--         * present because it is required by both software emulation and KVM.
--         * NVIC is not handled here because its CPU interface is different,
--         * neither it can use KVM.
--         */
--        memory_region_init_io(&s->cpuiomem[0], OBJECT(s), ops ? &ops[1] : NULL,
--                              s, "gic_cpu", s->revision == 2 ? 0x2000 : 0x100);
--        sysbus_init_mmio(sbd, &s->cpuiomem[0]);
--    }
-+    /* This is the main CPU interface "for this core". It is always
-+     * present because it is required by both software emulation and KVM.
-+     */
-+    memory_region_init_io(&s->cpuiomem[0], OBJECT(s), ops ? &ops[1] : NULL,
-+                          s, "gic_cpu", s->revision == 2 ? 0x2000 : 0x100);
-+    sysbus_init_mmio(sbd, &s->cpuiomem[0]);
- }
- 
- static void arm_gic_common_realize(DeviceState *dev, Error **errp)
-@@ -162,7 +156,7 @@ static void arm_gic_common_realize(DeviceState *dev, Error **errp)
-     }
- 
-     if (s->security_extn &&
--        (s->revision == REV_11MPCORE || s->revision == REV_NVIC)) {
-+        (s->revision == REV_11MPCORE)) {
-         error_setg(errp, "this GIC revision does not implement "
-                    "the security extensions");
-         return;
-@@ -255,7 +249,6 @@ static Property arm_gic_common_properties[] = {
-     DEFINE_PROP_UINT32("num-irq", GICState, num_irq, 32),
-     /* Revision can be 1 or 2 for GIC architecture specification
-      * versions 1 or 2, or 0 to indicate the legacy 11MPCore GIC.
--     * (Internally, 0xffffffff also indicates "not a GIC but an NVIC".)
-      */
-     DEFINE_PROP_UINT32("revision", GICState, revision, 1),
-     /* True if the GIC should implement the security extensions */
++    /* Random Number Generator */
++    object_property_set_bool(OBJECT(&s->rng), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++
++    memory_region_add_subregion(&s->peri_mr, RNG_OFFSET,
++                sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->rng), 0));
++
+     /* Extended Mass Media Controller */
+     object_property_set_int(OBJECT(&s->sdhci), BCM2835_SDHC_CAPAREG, "capareg",
+                             &err);
+diff --git a/hw/misc/bcm2835_rng.c b/hw/misc/bcm2835_rng.c
+new file mode 100644
+index 0000000..2242bc5
+--- /dev/null
++++ b/hw/misc/bcm2835_rng.c
+@@ -0,0 +1,124 @@
++/*
++ * BCM2835 Random Number Generator emulation
++ *
++ * Copyright (C) 2017 Marcin Chojnacki <marcinch7@gmail.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "hw/misc/bcm2835_rng.h"
++
++static uint64_t bcm2835_rng_read(void *opaque, hwaddr offset,
++                                 unsigned size)
++{
++    BCM2835RngState *s = (BCM2835RngState *)opaque;
++    uint32_t res = 0;
++
++    assert(size == 4);
++
++    switch (offset) {
++    case 0x0:    /* rng_ctrl */
++        res = s->rng_ctrl;
++        break;
++    case 0x4:    /* rng_status */
++        res = s->rng_status | (1 << 24);
++        break;
++    case 0x8:    /* rng_data */
++        res = rand();
++        break;
++
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "bcm2835_rng_read: Bad offset %x\n",
++                      (int)offset);
++        res = 0;
++        break;
++    }
++
++    return res;
++}
++
++static void bcm2835_rng_write(void *opaque, hwaddr offset,
++                              uint64_t value, unsigned size)
++{
++    BCM2835RngState *s = (BCM2835RngState *)opaque;
++
++    assert(size == 4);
++
++    switch (offset) {
++    case 0x0:    /* rng_ctrl */
++        s->rng_ctrl = value;
++        break;
++    case 0x4:    /* rng_status */
++        /* we shouldn't let the guest write to bits [31..20] */
++        s->rng_status &= ~0xFFFFF;        /* clear 20 lower bits */
++        s->rng_status |= value & 0xFFFFF; /* set them to new value */
++        break;
++
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "bcm2835_rng_write: Bad offset %x\n",
++                      (int)offset);
++        break;
++    }
++}
++
++static const MemoryRegionOps bcm2835_rng_ops = {
++    .read = bcm2835_rng_read,
++    .write = bcm2835_rng_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++};
++
++static const VMStateDescription vmstate_bcm2835_rng = {
++    .name = TYPE_BCM2835_RNG,
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32(rng_ctrl, BCM2835RngState),
++        VMSTATE_UINT32(rng_status, BCM2835RngState),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void bcm2835_rng_init(Object *obj)
++{
++    BCM2835RngState *s = BCM2835_RNG(obj);
++
++    memory_region_init_io(&s->iomem, obj, &bcm2835_rng_ops, s,
++                          TYPE_BCM2835_RNG, 0x10);
++    sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->iomem);
++}
++
++static void bcm2835_rng_reset(DeviceState *dev)
++{
++    BCM2835RngState *s = BCM2835_RNG(dev);
++
++    s->rng_ctrl = 0;
++    s->rng_status = 0;
++}
++
++static void bcm2835_rng_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->reset = bcm2835_rng_reset;
++    dc->vmsd = &vmstate_bcm2835_rng;
++}
++
++static TypeInfo bcm2835_rng_info = {
++    .name          = TYPE_BCM2835_RNG,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(BCM2835RngState),
++    .class_init    = bcm2835_rng_class_init,
++    .instance_init = bcm2835_rng_init,
++};
++
++static void bcm2835_rng_register_types(void)
++{
++    type_register_static(&bcm2835_rng_info);
++}
++
++type_init(bcm2835_rng_register_types)
 -- 
 2.7.4
