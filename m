@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37998)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ciMJt-00012d-5S
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:30:34 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ciMJw-000156-3h
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:30:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ciMJp-0007WC-6n
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:30:33 -0500
-Received: from 5.mo6.mail-out.ovh.net ([46.105.54.31]:41776)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ciMJp-0007VY-1E
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:30:29 -0500
-Received: from player761.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 0764FB3ABE
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 15:30:24 +0100 (CET)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Mon, 27 Feb 2017 15:29:14 +0100
-Message-Id: <1488205773-30436-8-git-send-email-clg@kaod.org>
-In-Reply-To: <1488205773-30436-1-git-send-email-clg@kaod.org>
-References: <1488205773-30436-1-git-send-email-clg@kaod.org>
+	(envelope-from <alex.bennee@linaro.org>) id 1ciMJs-0007Zi-5Q
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:30:36 -0500
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:35457)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1ciMJr-0007Yd-Uw
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:30:32 -0500
+Received: by mail-wr0-x232.google.com with SMTP id g10so53383021wrg.2
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 06:30:31 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Mon, 27 Feb 2017 14:30:27 +0000
+Message-Id: <20170227143028.16428-2-alex.bennee@linaro.org>
+In-Reply-To: <20170227143028.16428-1-alex.bennee@linaro.org>
+References: <20170227143028.16428-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 07/26] ppc/xics: introduce a XICSFabric QOM
- interface to handle ICSs
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v1 1/2] new: dockerfiles/debian-s390-cross
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,77 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: famz@redhat.com
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-This interface provides two simple handlers. One is to get an ICS
-(Interrupt Source Controller) object from an irq number and a second
-to resend the irqs when needed.
+This adds an s390 cross build target to our library of docker setups.
+There is an issue with the xfslibs-dev:s390x package having a clash so
+we do a || apt-get -f install to fixup the rest of the dependencies.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+This doesn't build on the debian.docker file as we are using the
+multilib compiler which is only available in stretch (the current
+testing repo).
+
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+CC: Christian Borntraeger <borntraeger@de.ibm.com>
 ---
- Changes since v2:
+ tests/docker/dockerfiles/debian-s390x-cross.docker | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+ create mode 100644 tests/docker/dockerfiles/debian-s390x-cross.docker
 
- - renamed QOM Interface to XICSFabric
-
- hw/intc/xics.c        |  7 +++++++
- include/hw/ppc/xics.h | 18 ++++++++++++++++++
- 2 files changed, 25 insertions(+)
-
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index c7c9bd600790..433869a696c4 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -745,6 +745,12 @@ static const TypeInfo ics_base_info =3D {
-     .class_size =3D sizeof(ICSStateClass),
- };
-=20
-+static const TypeInfo xics_fabric_info =3D {
-+    .name =3D TYPE_XICS_FABRIC,
-+    .parent =3D TYPE_INTERFACE,
-+    .class_size =3D sizeof(XICSFabricClass),
-+};
+diff --git a/tests/docker/dockerfiles/debian-s390x-cross.docker b/tests/docker/dockerfiles/debian-s390x-cross.docker
+new file mode 100644
+index 0000000000..bbb21ed088
+--- /dev/null
++++ b/tests/docker/dockerfiles/debian-s390x-cross.docker
+@@ -0,0 +1,22 @@
++#
++# Docker s390 cross-compiler target
++#
++# This docker target is based on stretch (testing) as the stable build
++# doesn't have the cross compiler available.
++#
++FROM debian:testing-slim
 +
- /*
-  * Exported functions
-  */
-@@ -785,6 +791,7 @@ static void xics_register_types(void)
-     type_register_static(&ics_simple_info);
-     type_register_static(&ics_base_info);
-     type_register_static(&icp_info);
-+    type_register_static(&xics_fabric_info);
- }
-=20
- type_init(xics_register_types)
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index 37d4d9ce3f81..1c43305a0456 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -178,6 +178,24 @@ struct ICSIRQState {
-     uint8_t flags;
- };
-=20
-+typedef struct XICSFabric {
-+    Object parent;
-+} XICSFabric;
++# Duplicate deb line as deb-src
++RUN cat /etc/apt/sources.list | sed "s/deb/deb-src/" >> /etc/apt/sources.list
 +
-+#define TYPE_XICS_FABRIC "xics-fabric"
-+#define XICS_FABRIC(obj)                                     \
-+    OBJECT_CHECK(XICSFabric, (obj), TYPE_XICS_FABRIC)
-+#define XICS_FABRIC_CLASS(klass)                                     \
-+    OBJECT_CLASS_CHECK(XICSFabricClass, (klass), TYPE_XICS_FABRIC)
-+#define XICS_FABRIC_GET_CLASS(obj)                                   \
-+    OBJECT_GET_CLASS(XICSFabricClass, (obj), TYPE_XICS_FABRIC)
++# Add the s390x architecture
++RUN dpkg --add-architecture s390x
 +
-+typedef struct XICSFabricClass {
-+    InterfaceClass parent;
-+    ICSState *(*ics_get)(XICSFabric *xi, int irq);
-+    void (*ics_resend)(XICSFabric *xi);
-+} XICSFabricClass;
++# Grab the updated list of packages
++RUN apt update
++RUN apt dist-upgrade -yy
++RUN apt-get build-dep -yy -a s390x qemu || apt-get -f install
++RUN apt install -yy gcc-multilib-s390x-linux-gnu binutils-multiarch
 +
- #define XICS_IRQS_SPAPR               1024
-=20
- qemu_irq xics_get_qirq(XICSState *icp, int irq);
---=20
-2.7.4
++# Specify the cross prefix for this image (see tests/docker/common.rc)
++ENV QEMU_CONFIGURE_OPTS --cross-prefix=s390x-linux-gnu-
+-- 
+2.11.0
