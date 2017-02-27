@@ -1,27 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58113)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ciLrR-0000uW-0t
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:01:09 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1ciLsi-0001xu-2H
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:02:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ciLrN-00072K-4j
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:01:09 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35262)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ciLrM-00072D-R1
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:01:05 -0500
-Received: by mail-wm0-x241.google.com with SMTP id u63so13568982wmu.2
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 06:01:04 -0800 (PST)
-Date: Mon, 27 Feb 2017 14:01:01 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170227140101.GU28403@stefanha-x1.localdomain>
-References: <20170227111726.9237-1-pbonzini@redhat.com>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1ciLse-0007Sb-VC
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:02:28 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53668)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1ciLse-0007SS-LS
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:02:24 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1RDxLgG005658
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 09:02:22 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28u641byqe-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 09:02:22 -0500
+Received: from localhost
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Mon, 27 Feb 2017 14:02:20 -0000
+References: <20170222160119.52771-1-pasic@linux.vnet.ibm.com>
+	<20170222160119.52771-4-pasic@linux.vnet.ibm.com>
+	<20170224122954.GA8830@work-vm>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Mon, 27 Feb 2017 15:02:17 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="aQ0PHH3iiKbaMI5N"
-Content-Disposition: inline
-In-Reply-To: <20170227111726.9237-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] tests-aio-multithread: use atomic_read
- properly
+In-Reply-To: <20170224122954.GA8830@work-vm>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Message-Id: <fb8ac151-a375-9c2b-a241-fbff879c3492@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] migration/vmstate: fix array of ptr
+ with nullptrs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +43,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
 
---aQ0PHH3iiKbaMI5N
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 27, 2017 at 12:17:26PM +0100, Paolo Bonzini wrote:
-> nodes[id].next is written by other threads.  If atomic_read is not used
-> (matching atomic_set in mcs_mutex_lock!) the compiler can optimize the
-> whole "if" away!
->=20
-> Reported-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  tests/test-aio-multithread.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+On 02/24/2017 01:29 PM, Dr. David Alan Gilbert wrote:
+> * Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
+>> Make VMS_ARRAY_OF_POINTER cope with null pointers. Previously the
+>> reward for trying to migrate an array with some null pointers in it was
+>> an illegal memory access, that is a swift and painless death of the
+>> process.  Let's make vmstate cope with this scenario.
+>>
+>> The general approach is, when we encounter a null pointer (element),
+>> instead of following the pointer to save/load the data behind it, we
+>> save/load a placeholder. This way we can detect if we expected a null
+>> pointer at the load side but not null data was saved instead.
+>>
+>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>> Reviewed-by: Guenther Hutzl <hutzl@linux.vnet.ibm.com>
+> 
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> 
 
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
+Thanks! Seems there are no further objections. Is the series going in
+via your tree (softfreeze starting 28.02, me worried)?
 
-Stefan
-
---aQ0PHH3iiKbaMI5N
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYtDEdAAoJEJykq7OBq3PIyIkH/RrLkcZNMXuUqndTf1XeMZBR
-RR8JWlCs2rbb/LZO7qaPKZlE7wYCKD6HXEx7XvbyuJ5FU23LQzpAzQ9nH4XdNnsS
-DGfLsusLXu6gLbpOpbkNaMBIop2aCy1iQTUr3KeOssFLjd+J3Cl20KgRvNS51uT5
-xczQZpDLaiTg9K/0rC8jHjbJFWFBFUmM9C24yRu7CTivXEzk4G0N19QYaf4VOVPp
-GrMldAStGgE01qCbsdM3xmUB60Auu/sTs01vLNFvFSG6CQPxasTDCFlBxK2bjGSG
-M9wa3WJNcwFr+amAXaP6kQOAO0/fzofo7V4F45GcpWDNTQePropALMjeOVTlNJI=
-=tX6i
------END PGP SIGNATURE-----
-
---aQ0PHH3iiKbaMI5N--
+Regards,
+Halil
