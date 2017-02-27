@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ciRd0-0008CW-IW
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:10:40 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ciRd2-0008Ej-MR
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:10:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ciRcx-0003Lg-Pk
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:10:38 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ciRd1-0003Pt-Ov
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:10:40 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 27 Feb 2017 21:09:16 +0100
-Message-Id: <1488226184-9044-16-git-send-email-kwolf@redhat.com>
+Date: Mon, 27 Feb 2017 21:09:17 +0100
+Message-Id: <1488226184-9044-17-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1488226184-9044-1-git-send-email-kwolf@redhat.com>
 References: <1488226184-9044-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 15/43] block: Add BDRV_O_RESIZE for
+Subject: [Qemu-devel] [PATCH v2 16/43] block: Request real permissions in
  blk_new_open()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,206 +23,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-blk_new_open() is a convenience function that processes flags rather
-than QDict options as a simple way to just open an image file.
-
-In order to keep it convenient in the future, it must automatically
-request the necessary permissions. This can easily be inferred from the
-flags for read and write, but we need another flag that tells us whether
-to get the resize permission.
-
-We can't just always request it because that means that no block jobs
-can run on the resulting BlockBackend (which is something that e.g.
-qemu-img commit wants to do), but we also can't request it never because
-most of the .bdrv_create() implementations call blk_truncate().
-
-The solution is to introduce another flag that is passed by all users
-that want to resize the image.
+We can figure out the necessary permissions from the flags that the
+caller passed.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/parallels.c     | 3 ++-
- block/qcow.c          | 3 ++-
- block/qcow2.c         | 6 ++++--
- block/qed.c           | 3 ++-
- block/sheepdog.c      | 2 +-
- block/vdi.c           | 3 ++-
- block/vhdx.c          | 3 ++-
- block/vmdk.c          | 6 ++++--
- block/vpc.c           | 3 ++-
- include/block/block.h | 1 +
- qemu-img.c            | 2 +-
- 11 files changed, 23 insertions(+), 12 deletions(-)
+ block/block-backend.c | 22 +++++++++++++++++++---
+ 1 file changed, 19 insertions(+), 3 deletions(-)
 
-diff --git a/block/parallels.c b/block/parallels.c
-index 6b0c0a9..19935e2 100644
---- a/block/parallels.c
-+++ b/block/parallels.c
-@@ -488,7 +488,8 @@ static int parallels_create(const char *filename, QemuOpts *opts, Error **errp)
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 299948f..03d5495 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -166,17 +166,33 @@ BlockBackend *blk_new_open(const char *filename, const char *reference,
+ {
+     BlockBackend *blk;
+     BlockDriverState *bs;
++    uint64_t perm;
++
++    /* blk_new_open() is mainly used in .bdrv_create implementations and the
++     * tools where sharing isn't a concern because the BDS stays private, so we
++     * just request permission according to the flags.
++     *
++     * The exceptions are xen_disk and blockdev_init(); in these cases, the
++     * caller of blk_new_open() doesn't make use of the permissions, but they
++     * shouldn't hurt either. We can still share everything here because the
++     * guest devices will add their own blockers if they can't share. */
++    perm = BLK_PERM_CONSISTENT_READ;
++    if (flags & BDRV_O_RDWR) {
++        perm |= BLK_PERM_WRITE;
++    }
++    if (flags & BDRV_O_RESIZE) {
++        perm |= BLK_PERM_RESIZE;
++    }
+ 
+-    blk = blk_new(0, BLK_PERM_ALL);
++    blk = blk_new(perm, BLK_PERM_ALL);
+     bs = bdrv_open(filename, reference, options, flags, errp);
+     if (!bs) {
+         blk_unref(blk);
+         return NULL;
      }
  
-     file = blk_new_open(filename, NULL, NULL,
--                        BDRV_O_RDWR | BDRV_O_PROTOCOL, &local_err);
-+                        BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
-+                        &local_err);
-     if (file == NULL) {
-         error_propagate(errp, local_err);
-         return -EIO;
-diff --git a/block/qcow.c b/block/qcow.c
-index eb5d54c..9d6ac83 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -823,7 +823,8 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
-     }
+-    /* FIXME Use real permissions */
+     blk->root = bdrv_root_attach_child(bs, "root", &child_root,
+-                                       0, BLK_PERM_ALL, blk, &error_abort);
++                                       perm, BLK_PERM_ALL, blk, &error_abort);
  
-     qcow_blk = blk_new_open(filename, NULL, NULL,
--                            BDRV_O_RDWR | BDRV_O_PROTOCOL, &local_err);
-+                            BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
-+                            &local_err);
-     if (qcow_blk == NULL) {
-         error_propagate(errp, local_err);
-         ret = -EIO;
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 6f79df8..6a92d2e 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2202,7 +2202,8 @@ static int qcow2_create2(const char *filename, int64_t total_size,
-     }
- 
-     blk = blk_new_open(filename, NULL, NULL,
--                       BDRV_O_RDWR | BDRV_O_PROTOCOL, &local_err);
-+                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
-+                       &local_err);
-     if (blk == NULL) {
-         error_propagate(errp, local_err);
-         return -EIO;
-@@ -2266,7 +2267,8 @@ static int qcow2_create2(const char *filename, int64_t total_size,
-     options = qdict_new();
-     qdict_put(options, "driver", qstring_from_str("qcow2"));
-     blk = blk_new_open(filename, NULL, options,
--                       BDRV_O_RDWR | BDRV_O_NO_FLUSH, &local_err);
-+                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_NO_FLUSH,
-+                       &local_err);
-     if (blk == NULL) {
-         error_propagate(errp, local_err);
-         ret = -EIO;
-diff --git a/block/qed.c b/block/qed.c
-index d8f947a..5ec7fd8 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -625,7 +625,8 @@ static int qed_create(const char *filename, uint32_t cluster_size,
-     }
- 
-     blk = blk_new_open(filename, NULL, NULL,
--                       BDRV_O_RDWR | BDRV_O_PROTOCOL, &local_err);
-+                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
-+                       &local_err);
-     if (blk == NULL) {
-         error_propagate(errp, local_err);
-         return -EIO;
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index 860ba61..7434710 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -1609,7 +1609,7 @@ static int sd_prealloc(const char *filename, Error **errp)
-     int ret;
- 
-     blk = blk_new_open(filename, NULL, NULL,
--                       BDRV_O_RDWR | BDRV_O_PROTOCOL, errp);
-+                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL, errp);
-     if (blk == NULL) {
-         ret = -EIO;
-         goto out_with_err_set;
-diff --git a/block/vdi.c b/block/vdi.c
-index fd6e26d..9b4f70e 100644
---- a/block/vdi.c
-+++ b/block/vdi.c
-@@ -763,7 +763,8 @@ static int vdi_create(const char *filename, QemuOpts *opts, Error **errp)
-     }
- 
-     blk = blk_new_open(filename, NULL, NULL,
--                       BDRV_O_RDWR | BDRV_O_PROTOCOL, &local_err);
-+                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
-+                       &local_err);
-     if (blk == NULL) {
-         error_propagate(errp, local_err);
-         ret = -EIO;
-diff --git a/block/vhdx.c b/block/vhdx.c
-index ab747f6..052a753 100644
---- a/block/vhdx.c
-+++ b/block/vhdx.c
-@@ -1859,7 +1859,8 @@ static int vhdx_create(const char *filename, QemuOpts *opts, Error **errp)
-     }
- 
-     blk = blk_new_open(filename, NULL, NULL,
--                       BDRV_O_RDWR | BDRV_O_PROTOCOL, &local_err);
-+                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
-+                       &local_err);
-     if (blk == NULL) {
-         error_propagate(errp, local_err);
-         ret = -EIO;
-diff --git a/block/vmdk.c b/block/vmdk.c
-index f5e2fb5..a9bd22b 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -1703,7 +1703,8 @@ static int vmdk_create_extent(const char *filename, int64_t filesize,
-     }
- 
-     blk = blk_new_open(filename, NULL, NULL,
--                       BDRV_O_RDWR | BDRV_O_PROTOCOL, &local_err);
-+                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
-+                       &local_err);
-     if (blk == NULL) {
-         error_propagate(errp, local_err);
-         ret = -EIO;
-@@ -2071,7 +2072,8 @@ static int vmdk_create(const char *filename, QemuOpts *opts, Error **errp)
-     }
- 
-     new_blk = blk_new_open(filename, NULL, NULL,
--                           BDRV_O_RDWR | BDRV_O_PROTOCOL, &local_err);
-+                           BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
-+                           &local_err);
-     if (new_blk == NULL) {
-         error_propagate(errp, local_err);
-         ret = -EIO;
-diff --git a/block/vpc.c b/block/vpc.c
-index b9c9832..f591d4b 100644
---- a/block/vpc.c
-+++ b/block/vpc.c
-@@ -915,7 +915,8 @@ static int vpc_create(const char *filename, QemuOpts *opts, Error **errp)
-     }
- 
-     blk = blk_new_open(filename, NULL, NULL,
--                       BDRV_O_RDWR | BDRV_O_PROTOCOL, &local_err);
-+                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
-+                       &local_err);
-     if (blk == NULL) {
-         error_propagate(errp, local_err);
-         ret = -EIO;
-diff --git a/include/block/block.h b/include/block/block.h
-index ff951ea..07f7561 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -82,6 +82,7 @@ typedef struct HDGeometry {
- } HDGeometry;
- 
- #define BDRV_O_RDWR        0x0002
-+#define BDRV_O_RESIZE      0x0004 /* request permission for resizing the node */
- #define BDRV_O_SNAPSHOT    0x0008 /* open the file read only and save writes in a snapshot */
- #define BDRV_O_TEMPORARY   0x0010 /* delete the file after use */
- #define BDRV_O_NOCACHE     0x0020 /* do not use the host page cache */
-diff --git a/qemu-img.c b/qemu-img.c
-index df3aefd..6fc6bc3 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -3289,7 +3289,7 @@ static int img_resize(int argc, char **argv)
-     qemu_opts_del(param);
- 
-     blk = img_open(image_opts, filename, fmt,
--                   BDRV_O_RDWR, false, quiet);
-+                   BDRV_O_RDWR | BDRV_O_RESIZE, false, quiet);
-     if (!blk) {
-         ret = -1;
-         goto out;
+     return blk;
+ }
 -- 
 1.8.3.1
