@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ciNXG-0002Ab-7a
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:48:27 -0500
+	(envelope-from <bounces@canonical.com>) id 1ciNZp-0004L1-HY
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:51:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ciNXB-0007QL-O1
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:48:26 -0500
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:35461)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ciNXB-0007Q5-EH
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:48:21 -0500
-Received: by mail-wm0-x22f.google.com with SMTP id v186so64526812wmd.0
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 07:48:21 -0800 (PST)
-References: <20170224112109.3147-1-alex.bennee@linaro.org>
-	<05abc81a-febc-11e6-601f-8d9ee30922eb@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <05abc81a-febc-11e6-601f-8d9ee30922eb@redhat.com>
-Date: Mon, 27 Feb 2017 15:48:18 +0000
-Message-ID: <87varv8wjh.fsf@linaro.org>
+	(envelope-from <bounces@canonical.com>) id 1ciNZk-0000Bd-MT
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:51:05 -0500
+Received: from indium.canonical.com ([91.189.90.7]:60515)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ciNZk-00009x-DS
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 10:51:00 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1ciNZh-0004PA-Io
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 15:50:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 3EDFF2E80DA
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 15:50:52 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 00/24] MTTCG Base enabling patches with ARM
- enablement
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 27 Feb 2017 15:42:08 -0000
+From: Daniel Berrange <1668273@bugs.launchpad.net>
+Reply-To: Bug 1668273 <1668273@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170227140328.20639.14786.malonedeb@soybean.canonical.com>
+Message-Id: <20170227154208.6113.19323.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1668273] Re: DoS possible on - a QEMU process
+ using userspace SLIRP?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,152 +37,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
+Unless I'm mis-understanding what you're saying you have an app which
+opens 100's of TCP conenctions in the guest, and this causes QEMU to
+have 100's of file descriptors open in the host.
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+If so, this is normal behaviour of SLIRP - it opens a socket for every
+connection it has to proxy across from the guest, so the number of file
+descriptors it will use is essentially unbounded. If this is a concern,
+then the best answer is to not use SLIRP.
 
-> On 24/02/2017 12:20, Alex Bennée wrote:
->> The following changes since commit 2d896b454a0e19ec4c1ddbb0e0b65b7e54fcedf3:
->>
->>   Revert "hw/mips: MIPS Boston board support" (2017-02-23 18:04:45 +0000)
->>
->> are available in the git repository at:
->>
->>   https://github.com/stsquad/qemu.git tags/pull-mttcg-240217-1
->>
->> for you to fetch changes up to ca759f9e387db87e1719911f019bc60c74be9ed8:
->>
->>   tcg: enable MTTCG by default for ARM on x86 hosts (2017-02-24 10:32:46 +0000)
->>
->> ----------------------------------------------------------------
->> This is the MTTCG pull-request as posted yesterday.
->
-> This breaks "-icount auto" on qemu-system-aarch64 with "-M virt" and
-> AAVMF firmware, in two ways:
->
-> 1) "-icount auto" doesn't work;
+-- =
 
-Currently the code does:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1668273
 
-  static bool default_mttcg_enabled(void)
-  {
-      QemuOpts *icount_opts = qemu_find_opts_singleton("icount");
-      const char *rr = qemu_opt_get(icount_opts, "rr");
+Title:
+  DoS possible on - a QEMU process using userspace SLIRP?
 
-      if (rr || TCG_OVERSIZED_GUEST) {
-          return false;
+Status in QEMU:
+  New
 
-I suspect I should just fail if any icount options are set. However
-qemu_find_opts_singleton always returns the structure. How do I test
-for any icount options?
+Bug description:
+  Steps to reproduce:
 
->
-> 2) "-icount auto -accel tcg,thread=single" hangs fairly early, printing
-> this on the serial console.  It's okay if it hangs at
->
-> [Bds]=============End Load Options Dumping=============
-> [Bds]BdsWait ...Zzzzzzzzzzzz...
-> [Bds]BdsWait(3)..Zzzz...
->
-> (pressing Enter a few times then seems to unhang it), but it now hangs
-> much earlier than that.
+  - Launch a VM using QEMU (2.8.0):
 
-Hmm I can see a hang on linux booting like that. It looks like a vCPU
-get stuck in waitio and never schedules the others.
+  $ qemu-system-x86_64 \
+  =C2=A0=C2=A0=C2=A0=C2=A0-machine accel=3Dkvm \
+  =C2=A0=C2=A0=C2=A0=C2=A0-hda Fedora-Cloud-Base-25-1.3.x86_64.qcow2 \
+  =C2=A0=C2=A0=C2=A0=C2=A0-m 2G \
+  =C2=A0=C2=A0=C2=A0=C2=A0-smp 2 \
+  =C2=A0=C2=A0=C2=A0=C2=A0-vnc :8 \
+  =C2=A0=C2=A0=C2=A0=C2=A0-boot dc \
+  =C2=A0=C2=A0=C2=A0=C2=A0-vga std \
+  =C2=A0=C2=A0=C2=A0=C2=A0-cpu host \
+  =C2=A0=C2=A0=C2=A0=C2=A0-net nic,vlan=3D0 \
+  =C2=A0=C2=A0=C2=A0=C2=A0-net user,vlan=3D0,hostfwd=3Dtcp::10024-:22,hostf=
+wd=3Dtcp::8082-:80
 
->
->
-> Also, x86 "-accel tcg,thread=multi" prints the scary message on memory
-> ordering.
+  - SSH into the VM, install httpd, start httpd
 
-That is expected until x86 is properly tested and we submit the default
-enabling patch for x86 on x86. To be honest we could submit the MO patch
-now to make that warning go away.
+  $ ssh -p 10024 root@localhost 'dnf install -y httpd && systemctl start
+  httpd'
 
->
-> Paolo
->
->> ----------------------------------------------------------------
->> Alex Bennée (18):
->>       docs: new design document multi-thread-tcg.txt
->>       tcg: move TCG_MO/BAR types into own file
->>       tcg: add kick timer for single-threaded vCPU emulation
->>       tcg: rename tcg_current_cpu to tcg_current_rr_cpu
->>       tcg: remove global exit_request
->>       tcg: enable tb_lock() for SoftMMU
->>       tcg: enable thread-per-vCPU
->>       cputlb: add assert_cpu_is_self checks
->>       cputlb: tweak qemu_ram_addr_from_host_nofail reporting
->>       cputlb and arm/sparc targets: convert mmuidx flushes from varg to bitmap
->>       cputlb: add tlb_flush_by_mmuidx async routines
->>       cputlb: atomically update tlb fields used by tlb_reset_dirty
->>       cputlb: introduce tlb_flush_*_all_cpus[_synced]
->>       target-arm/powerctl: defer cpu reset work to CPU context
->>       target-arm: don't generate WFE/YIELD calls for MTTCG
->>       target-arm: ensure all cross vCPUs TLB flushes complete
->>       hw/misc/imx6_src: defer clearing of SRC_SCR reset bits
->>       tcg: enable MTTCG by default for ARM on x86 hosts
->>
->> Jan Kiszka (1):
->>       tcg: drop global lock during TCG code execution
->>
->> KONRAD Frederic (2):
->>       tcg: add options for enabling MTTCG
->>       cputlb: introduce tlb_flush_* async work.
->>
->> Pranith Kumar (3):
->>       mttcg: translate-all: Enable locking debug in a debug build
->>       mttcg: Add missing tb_lock/unlock() in cpu_exec_step()
->>       tcg: handle EXCP_ATOMIC exception for system emulation
->>
->>  configure                  |   6 +
->>  cpu-exec-common.c          |   3 -
->>  cpu-exec.c                 |  89 ++++++---
->>  cpus.c                     | 345 ++++++++++++++++++++++++++-------
->>  cputlb.c                   | 463 +++++++++++++++++++++++++++++++++++++--------
->>  docs/multi-thread-tcg.txt  | 350 ++++++++++++++++++++++++++++++++++
->>  exec.c                     |  12 +-
->>  hw/core/irq.c              |   1 +
->>  hw/i386/kvmvapic.c         |   4 +-
->>  hw/intc/arm_gicv3_cpuif.c  |   3 +
->>  hw/misc/imx6_src.c         |  58 +++++-
->>  hw/ppc/ppc.c               |  16 +-
->>  hw/ppc/spapr.c             |   3 +
->>  include/exec/cputlb.h      |   2 -
->>  include/exec/exec-all.h    | 132 +++++++++++--
->>  include/qom/cpu.h          |  16 ++
->>  include/sysemu/cpus.h      |   2 +
->>  memory.c                   |   2 +
->>  qemu-options.hx            |  20 ++
->>  qom/cpu.c                  |  10 +
->>  target/arm/arm-powerctl.c  | 202 +++++++++++++-------
->>  target/arm/arm-powerctl.h  |   2 +
->>  target/arm/cpu.c           |   4 +-
->>  target/arm/cpu.h           |  18 +-
->>  target/arm/helper.c        | 219 ++++++++++-----------
->>  target/arm/kvm.c           |   7 +-
->>  target/arm/machine.c       |  41 +++-
->>  target/arm/op_helper.c     |  50 ++++-
->>  target/arm/psci.c          |   4 +-
->>  target/arm/translate-a64.c |   8 +-
->>  target/arm/translate.c     |  20 +-
->>  target/i386/smm_helper.c   |   7 +
->>  target/s390x/misc_helper.c |   5 +-
->>  target/sparc/ldst_helper.c |   8 +-
->>  tcg/i386/tcg-target.h      |  11 ++
->>  tcg/tcg-mo.h               |  48 +++++
->>  tcg/tcg.h                  |  27 +--
->>  translate-all.c            |  66 ++-----
->>  translate-common.c         |  21 +-
->>  vl.c                       |  49 ++++-
->>  40 files changed, 1878 insertions(+), 476 deletions(-)
->>  create mode 100644 docs/multi-thread-tcg.txt
->>  create mode 100644 tcg/tcg-mo.h
->>
->>
+  - Compile and run the following Java program (on the host):
 
+  $ cat <<EOF > URLConnectionReader.java
+  import java.net.*;
+  import java.io.*;
 
---
-Alex Bennée
+  public class URLConnectionReader {
+  =C2=A0=C2=A0=C2=A0=C2=A0public static void main(String[] args) throws Exc=
+eption {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int i =3D 0;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0while (i < 1024) {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0U=
+RL this_is_404 =3D new URL("http://localhost:8082/blah");
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0U=
+RLConnection yc =3D this_is_404.openConnection();
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0t=
+ry {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0BufferedReader in =3D new BufferedReader(new InputS=
+treamReader(
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0yc.getInputStream()));
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0String inputLine;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0while ((inputLine =3D in.readLine()) !=3D null)
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0System.out.println(inputLin=
+e);
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0in.close();
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}=
+ catch (Exception e) {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0//HttpURLConnection urlConnection =3D (HttpURLConne=
+ction) yc;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0//urlConnection.disconnect();
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0i=
+++;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Thread.sleep(1000000000);
+  =C2=A0=C2=A0=C2=A0=C2=A0}
+  }
+
+  $ javac URLConnectionReader.java
+
+  $ java URLConnectionReader &
+
+  The java program tries to open a lot of HTTP connections, but never
+  calls disconnect() on any.
+
+  - Take a look at the list of open FDs of the qemu process:
+
+  $ ls -tl /proc/${qemu-pid}/fd
+
+  $ lsof -p ${qemu-pid}
+  All of the TCP connections will be stuck at FIN_WAIT2
+
+  The VM becomes unresponsive. Neither SSH or VNC works after this; even
+  after tcp_fin_timeout expires.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1668273/+subscriptions
