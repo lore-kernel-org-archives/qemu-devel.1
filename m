@@ -1,37 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60311)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ciLzi-0008Ew-6C
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:09:43 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ciM0R-0000TC-V0
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:10:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1ciLzd-0000LR-50
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:09:42 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60851
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1ciLzc-0000LI-V1
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:09:37 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1RDx5LE080087
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 09:09:36 -0500
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28vm1vn61m-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 09:09:36 -0500
-Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 27 Feb 2017 07:09:34 -0700
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 27 Feb 2017 15:09:30 +0100
+	(envelope-from <kwolf@redhat.com>) id 1ciM0Q-0000Xf-Vg
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:10:27 -0500
+Date: Mon, 27 Feb 2017 15:10:17 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170227141017.GF6356@noname.redhat.com>
+References: <1487689130-30373-1-git-send-email-kwolf@redhat.com>
+	<1487689130-30373-23-git-send-email-kwolf@redhat.com>
+	<a6bf4bc1-c673-17fa-336d-f9d45686cba5@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: base64
-Message-Id: <baa954b4-53fc-2b4e-b79c-917ba9171a60@de.ibm.com>
-Subject: [Qemu-devel] segfault use VRingMemoryRegionCaches for avail and
- used ring vs num-queues
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="NtwzykIc2mflq5ck"
+Content-Disposition: inline
+In-Reply-To: <a6bf4bc1-c673-17fa-336d-f9d45686cba5@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 22/54] block: Request real permissions in
+ bdrv_attach_child()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,102 +26,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cornelia.huck@de.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-UGFvbG8sDQoNCmNvbW1pdCA5N2NkOTY1YzA3MDE1MmJjNjI2Yzc1MDdkZjlmYjM1NmJiZTFj
-ZDgxDQoidmlydGlvOiB1c2UgVlJpbmdNZW1vcnlSZWdpb25DYWNoZXMgZm9yIGF2YWlsIGFu
-ZCB1c2VkIHJpbmdzIg0KZG9lcyBjYXVzZSBhIHNlZ2ZhdWx0IG9uIG15IHMzOTAgc3lzdGVt
-IHdoZW4gSSB1c2UgbnVtLXF1ZXVlcy4NCg0KZ2RiIC0tYXJncyBxZW11LXN5c3RlbS1zMzkw
-eCAtbm9ncmFwaGljIC1lbmFibGUta3ZtIC1tIDFHIC1kcml2ZSBmaWxlPS92YXIvbGliL2xp
-YnZpcnQvcWVtdS9pbWFnZS56aHlwMTM3LGlmPW5vbmUsaWQ9ZDEgLWRldmljZSB2aXJ0aW8t
-YmxrLWNjdyxkcml2ZT1kMSxpb3RocmVhZD1pbzEsbnVtLXF1ZXVlcz0yIC1vYmplY3QgaW90
-aHJlYWQsaWQ9aW8xDQoNCg0KVGhyZWFkIDMgInFlbXUtc3lzdGVtLXMzOSIgcmVjZWl2ZWQg
-c2lnbmFsIFNJR1NFR1YsIFNlZ21lbnRhdGlvbiBmYXVsdC4NCltTd2l0Y2hpbmcgdG8gVGhy
-ZWFkIDB4M2ZmZTU4N2Y5MTAgKExXUCA0MDYzMCldDQoweDAwMDAwMDAwMDEwMjRhMjYgaW4g
-YWRkcmVzc19zcGFjZV90cmFuc2xhdGVfY2FjaGVkIChjYWNoZT0weDM4LCBhZGRyPTIsIHhs
-YXQ9MHgzZmZlNTg3YmZmOCwgcGxlbj0weDNmZmU1ODdiZmYwLCBpc193cml0ZT1mYWxzZSkg
-YXQgL2hvbWUvY2Jvcm50cmEvUkVQT1MvcWVtdS9leGVjLmM6MzE4Nw0KMzE4NwkgICAgYXNz
-ZXJ0KGFkZHIgPCBjYWNoZS0+bGVuICYmICpwbGVuIDw9IGNhY2hlLT5sZW4gLSBhZGRyKTsN
-Ck1pc3Npbmcgc2VwYXJhdGUgZGVidWdpbmZvcywgdXNlOiBkbmYgZGVidWdpbmZvLWluc3Rh
-bGwgYXRrLTIuMjAuMC0xLmZjMjQuczM5MHggYm9vc3QtaW9zdHJlYW1zLTEuNjAuMC03LmZj
-MjQuczM5MHggYm9vc3QtcmFuZG9tLTEuNjAuMC03LmZjMjQuczM5MHggYm9vc3Qtc3lzdGVt
-LTEuNjAuMC03LmZjMjQuczM5MHggYm9vc3QtdGhyZWFkLTEuNjAuMC03LmZjMjQuczM5MHgg
-YnppcDItbGlicy0xLjAuNi0yMC5mYzI0LnMzOTB4IGNhaXJvLTEuMTQuNi0xLmZjMjQuczM5
-MHggY3lydXMtc2FzbC1saWItMi4xLjI2LTI2LjIuZmMyNC5zMzkweCBleHBhdC0yLjEuMS0y
-LmZjMjQuczM5MHggZm9udGNvbmZpZy0yLjExLjk0LTYuZmMyNC5zMzkweCBmcmVldHlwZS0y
-LjYuMy0yLmZjMjQuczM5MHggZ2RrLXBpeGJ1ZjItMi4zNC4wLTEuZmMyNC5zMzkweCBnbGli
-Mi0yLjQ4LjEtMS5mYzI0LnMzOTB4IGdsdXN0ZXJmcy1hcGktMy44LjEtMS5mYzI0LnMzOTB4
-IGdsdXN0ZXJmcy1saWJzLTMuOC4xLTEuZmMyNC5zMzkweCBnbXAtNi4xLjEtMS5mYzI0LnMz
-OTB4IGdudXRscy0zLjQuMTQtMS5mYzI0LnMzOTB4IGdyYXBoaXRlMi0xLjMuNi0xLmZjMjQu
-czM5MHggZ3RrMi0yLjI0LjMwLTEuZmMyNC5zMzkweCBoYXJmYnV6ei0xLjIuNy0xLmZjMjQu
-czM5MHgga2V5dXRpbHMtbGlicy0xLjUuOS04LmZjMjQuczM5MHgga3JiNS1saWJzLTEuMTQu
-MS04LmZjMjQuczM5MHggbGliWDExLTEuNi4zLTMuZmMyNC5zMzkweCBsaWJYYXUtMS4wLjgt
-Ni5mYzI0LnMzOTB4IGxpYlhjb21wb3NpdGUtMC40LjQtOC5mYzI0LnMzOTB4IGxpYlhjdXJz
-b3ItMS4xLjE0LTYuZmMyNC5zMzkweCBsaWJYZGFtYWdlLTEuMS40LTguZmMyNC5zMzkweCBs
-aWJYZXh0LTEuMy4zLTQuZmMyNC5zMzkweCBsaWJYZml4ZXMtNS4wLjItMi5mYzI0LnMzOTB4
-IGxpYlhpLTEuNy42LTIuZmMyNC5zMzkweCBsaWJYaW5lcmFtYS0xLjEuMy02LmZjMjQuczM5
-MHggbGliWHJhbmRyLTEuNS4wLTMuZmMyNC5zMzkweCBsaWJYcmVuZGVyLTAuOS45LTMuZmMy
-NC5zMzkweCBsaWJYeGY4NnZtLTEuMS40LTMuZmMyNC5zMzkweCBsaWJhY2wtMi4yLjUyLTEx
-LmZjMjQuczM5MHggbGliYWlvLTAuMy4xMTAtNi5mYzI0LnMzOTB4IGxpYmF0b21pY19vcHMt
-Ny40LjItOS5mYzI0LnMzOTB4IGxpYmF0dHItMi40LjQ3LTE2LmZjMjQuczM5MHggbGliYmxr
-aWQtMi4yOC0zLmZjMjQuczM5MHggbGliY29tX2Vyci0xLjQyLjEzLTQuZmMyNC5zMzkweCBs
-aWJjdXJsLTcuNDcuMS01LmZjMjQuczM5MHggbGliZGF0cmllLTAuMi45LTMuZmMyNC5zMzkw
-eCBsaWJkcm0tMi40LjcwLTEuZmMyNC5zMzkweCBsaWJmZmktMy4xLTkuZmMyNC5zMzkweCBs
-aWJnY2MtNi4yLjEtMi4wLmlibS5mYzI0LnMzOTB4IGxpYmlkbi0xLjMzLTEuZmMyNC5zMzkw
-eCBsaWJuZ2h0dHAyLTEuNy4xLTEuZmMyNC5zMzkweCBsaWJwbmctMS42LjIzLTEuZmMyNC5z
-MzkweCBsaWJwc2wtMC4xMy4wLTEuZmMyNC5zMzkweCBsaWJyYWRvczItMTAuMi4yLTIuZmMy
-NC5zMzkweCBsaWJyYmQxLTEwLjIuMi0yLmZjMjQuczM5MHggbGlic2VsaW51eC0yLjUtOS5m
-YzI0LnMzOTB4IGxpYnNzaDItMS43LjAtNS5mYzI0LnMzOTB4IGxpYnN0ZGMrKy02LjIuMS0y
-LjAuaWJtLmZjMjQuczM5MHggbGlidGFzbjEtNC44LTIuZmMyNC5zMzkweCBsaWJ0aGFpLTAu
-MS4yNC0xLmZjMjQuczM5MHggbGlidW5pc3RyaW5nLTAuOS40LTMuZmMyNC5zMzkweCBsaWJ1
-dWlkLTIuMjgtMy5mYzI0LnMzOTB4IGxpYndheWxhbmQtY2xpZW50LTEuMTAuMC0xLmZjMjQu
-czM5MHggbGlid2F5bGFuZC1zZXJ2ZXItMS4xMC4wLTEuZmMyNC5zMzkweCBsaWJ4Y2ItMS4x
-MS4xLTIuZmMyNC5zMzkweCBsaWJ4c2htZmVuY2UtMS4yLTMuZmMyNC5zMzkweCBsdHRuZy11
-c3QtMi42LjItMy5mYzI0LnMzOTB4IG1lc2EtbGliRUdMLTEzLjAuMC0zLmZjMjQuczM5MHgg
-bWVzYS1saWJHTC0xMy4wLjAtMy5mYzI0LnMzOTB4IG1lc2EtbGliZ2JtLTEzLjAuMC0zLmZj
-MjQuczM5MHggbWVzYS1saWJnbGFwaS0xMy4wLjAtMy5mYzI0LnMzOTB4IG5jdXJzZXMtbGli
-cy02LjAtNi4yMDE2MDcwOS5mYzI0LnMzOTB4IG5ldHRsZS0zLjItMy5mYzI0LnMzOTB4IG5z
-cHItNC4xMy4wLTEuZmMyNC5zMzkweCBuc3MtMy4yNy4wLTEuMS5mYzI0LnMzOTB4IG5zcy1z
-b2Z0b2tuLWZyZWVibC0zLjI3LjAtMS4wLmZjMjQuczM5MHggbnNzLXV0aWwtMy4yNy4wLTEu
-MC5mYzI0LnMzOTB4IG9wZW5sZGFwLTIuNC40NC0xLmZjMjQuczM5MHggb3BlbnNzbC1saWJz
-LTEuMC4yai0xLmZjMjQuczM5MHggcDExLWtpdC0wLjIzLjItMi5mYzI0LnMzOTB4IHBhbmdv
-LTEuNDAuMS0xLmZjMjQuczM5MHggcGNyZS04LjM5LTIuZmMyNC5zMzkweCBwaXhtYW4tMC4z
-NC4wLTIuZmMyNC5zMzkweCB1c2Vyc3BhY2UtcmN1LTAuOC42LTIuZmMyNC5zMzkweCB6bGli
-LTEuMi44LTEwLmZjMjQuczM5MHgNCihnZGIpIGJ0DQojMCAgMHgwMDAwMDAwMDAxMDI0YTI2
-IGluIGFkZHJlc3Nfc3BhY2VfdHJhbnNsYXRlX2NhY2hlZCAoY2FjaGU9MHgzOCwgYWRkcj0y
-LCB4bGF0PTB4M2ZmZTU4N2JmZjgsIHBsZW49MHgzZmZlNTg3YmZmMCwgaXNfd3JpdGU9ZmFs
-c2UpIGF0IC9ob21lL2Nib3JudHJhL1JFUE9TL3FlbXUvZXhlYy5jOjMxODcNCiMxICAweDAw
-MDAwMDAwMDEwMjU1OTYgaW4gYWRkcmVzc19zcGFjZV9sZHV3X2ludGVybmFsX2NhY2hlZCAo
-Y2FjaGU9MHgzOCwgYWRkcj0yLCBhdHRycz0uLi4sIHJlc3VsdD0weDAsIGVuZGlhbj1ERVZJ
-Q0VfQklHX0VORElBTikgYXQgL2hvbWUvY2Jvcm50cmEvUkVQT1MvcWVtdS9tZW1vcnlfbGRz
-dC5pbmMuYzoyNjQNCiMyICAweDAwMDAwMDAwMDEwMjU4NDYgaW4gYWRkcmVzc19zcGFjZV9s
-ZHV3X2JlX2NhY2hlZCAoY2FjaGU9MHgzOCwgYWRkcj0yLCBhdHRycz0uLi4sIHJlc3VsdD0w
-eDApIGF0IC9ob21lL2Nib3JudHJhL1JFUE9TL3FlbXUvbWVtb3J5X2xkc3QuaW5jLmM6MzIy
-DQojMyAgMHgwMDAwMDAwMDAxMDI1OTdlIGluIGxkdXdfYmVfcGh5c19jYWNoZWQgKGNhY2hl
-PTB4MzgsIGFkZHI9MikgYXQgL2hvbWUvY2Jvcm50cmEvUkVQT1MvcWVtdS9tZW1vcnlfbGRz
-dC5pbmMuYzozNDANCiM0ICAweDAwMDAwMDAwMDExMTQ4NTYgaW4gdmlydGlvX2xkdXdfcGh5
-c19jYWNoZWQgKHZkZXY9MHgxYzU3Y2QwLCBjYWNoZT0weDM4LCBwYT0yKSBhdCAvaG9tZS9j
-Ym9ybnRyYS9SRVBPUy9xZW11L2luY2x1ZGUvaHcvdmlydGlvL3ZpcnRpby1hY2Nlc3MuaDox
-NjQNCiM1ICAweDAwMDAwMDAwMDExMTUyM2MgaW4gdnJpbmdfYXZhaWxfaWR4ICh2cT0weDNm
-ZmZkZTFlMDkwKSBhdCAvaG9tZS9jYm9ybnRyYS9SRVBPUy9xZW11L2h3L3ZpcnRpby92aXJ0
-aW8uYzoyMDENCiM2ICAweDAwMDAwMDAwMDExMTViYmEgaW4gdmlydGlvX3F1ZXVlX2VtcHR5
-ICh2cT0weDNmZmZkZTFlMDkwKSBhdCAvaG9tZS9jYm9ybnRyYS9SRVBPUy9xZW11L2h3L3Zp
-cnRpby92aXJ0aW8uYzozMzINCiM3ICAweDAwMDAwMDAwMDExMWMzMTIgaW4gdmlydGlvX3F1
-ZXVlX2hvc3Rfbm90aWZpZXJfYWlvX3BvbGwgKG9wYXF1ZT0weDNmZmZkZTFlMGY4KSBhdCAv
-aG9tZS9jYm9ybnRyYS9SRVBPUy9xZW11L2h3L3ZpcnRpby92aXJ0aW8uYzoyMjk0DQojOCAg
-MHgwMDAwMDAwMDAxNDdhMDM2IGluIHJ1bl9wb2xsX2hhbmRsZXJzX29uY2UgKGN0eD0weDFi
-YjhiYjApIGF0IC9ob21lL2Nib3JudHJhL1JFUE9TL3FlbXUvdXRpbC9haW8tcG9zaXguYzo0
-OTANCiM5ICAweDAwMDAwMDAwMDE0N2EyZmUgaW4gdHJ5X3BvbGxfbW9kZSAoY3R4PTB4MWJi
-OGJiMCwgYmxvY2tpbmc9dHJ1ZSkgYXQgL2hvbWUvY2Jvcm50cmEvUkVQT1MvcWVtdS91dGls
-L2Fpby1wb3NpeC5jOjU2Ng0KIzEwIDB4MDAwMDAwMDAwMTQ3YTNjYSBpbiBhaW9fcG9sbCAo
-Y3R4PTB4MWJiOGJiMCwgYmxvY2tpbmc9dHJ1ZSkgYXQgL2hvbWUvY2Jvcm50cmEvUkVQT1Mv
-cWVtdS91dGlsL2Fpby1wb3NpeC5jOjU5NQ0KIzExIDB4MDAwMDAwMDAwMTFhMDE3NiBpbiBp
-b3RocmVhZF9ydW4gKG9wYXF1ZT0weDFiYjg2YzApIGF0IC9ob21lL2Nib3JudHJhL1JFUE9T
-L3FlbXUvaW90aHJlYWQuYzo1OQ0KIzEyIDB4MDAwMDAzZmZlOTA4N2JjNCBpbiBzdGFydF90
-aHJlYWQgKCkgYXQgL2xpYjY0L2xpYnB0aHJlYWQuc28uMA0KIzEzIDB4MDAwMDAzZmZlOGY4
-YTlmMiBpbiB0aHJlYWRfc3RhcnQgKCkgYXQgL2xpYjY0L2xpYmMuc28uNg0KDQpJdCBzZWVt
-cyB0byBtYWtlIGEgZGlmZmVyZW5jZSBpZiBpdHMgdGhlIGJvb3QgZGlzayBvciBub3QuIE1h
-eWJlIHRoZSByZXNldCBvZiB0aGUNCmRldmljZXMgdGhhdCB0aGUgYm9vdGxvYWRlciBkb2Vz
-IGJlZm9yZSBoYW5kbGluZyBvdmVyIGNvbnRyb2wgdG8gTGludXggY3JlYXRlcw0Kc29tZSB0
-cm91YmxlIGhlcmUuDQoNCg0KDQo=
+
+--NtwzykIc2mflq5ck
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Am 22.02.2017 um 15:31 hat Max Reitz geschrieben:
+> On 21.02.2017 15:58, Kevin Wolf wrote:
+> > Now that all block drivers with children tell us what permissions they
+> > need from each of their children, bdrv_attach_child() can use this
+> > information and make the right requirements while trying to attach new
+> > children.
+> >=20
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >  block.c | 8 ++++++--
+> >  1 file changed, 6 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/block.c b/block.c
+> > index 1c5f211..054e6f0 100644
+> > --- a/block.c
+> > +++ b/block.c
+> > @@ -1659,10 +1659,14 @@ BdrvChild *bdrv_attach_child(BlockDriverState *=
+parent_bs,
+> >                               Error **errp)
+> >  {
+> >      BdrvChild *child;
+> > +    uint64_t perm, shared_perm;
+> > +
+> > +    assert(parent_bs->drv);
+> > +    parent_bs->drv->bdrv_child_perm(parent_bs, NULL, child_role,
+> > +                                    0, BLK_PERM_ALL, &perm, &shared_pe=
+rm);
+>=20
+> Another Second Thought=E2=84=A2: Why do we request no permissions for the=
+ new
+> child here? Seems weird to me. Shouldn't the caller specify the
+> necessary permissions and what can be shared?
+
+Actually not the caller, but we should calculate the cumulative
+permissions of parent_bs, like in bdrv_update_perm().
+
+Kevin
+
+--NtwzykIc2mflq5ck
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBAgAGBQJYtDNJAAoJEH8JsnLIjy/WRlYP/RfFUcrOsbM0sn/sHv07oUuI
+HHaN4u8vAM9io+Un+p5WkwDvM90FgdWaLBe9JnP8tJ9ocKb6Tqwo8NpuEeBf5qRG
+ropFfWJ/lxFItt+tYVh69LfnOFKni6currhblkP+iZJj7++9LHZYZFZHj9iOm1EK
+e9mzXyFYKavWAzeK+2f4GMkE+kOF6RUGLCf3gAh/0dlf8jyPm0xMHCO2PvgKWYGV
+v4f5+ceIIUUxoN7y69G4r5qtPOR8SEdijFM+sJNNFLdRvlCMfxEywIxy5RjB/uSU
+wVaFqhStnIyjKZ20Mcmfgq19PPm+DlVFplQXWu5Na1trvzTepS1utFIJ0Jmwr9Ha
+zDzH6uEKZKghxboAIcGAHhGzdiksWHl/NQEoKAjx7lMimM4IdtL+FbzwuB6rqLKY
+uwe7r/xZ6mMce0qvT1Y5U+EvogykDV8kL2P9LoCHDevirX8Ky6EXgmp8C8M0ZYAP
+9QLFFD/9xTzInH29v/FAawQbFXDk4w4g7YHgs0D3lEj1wzw8R2YWcktKZnX65iL6
+X1KK/NMDlJA3YHtrcQMM1zO1FjyLLWpqoC1vuGH5vLuQIGQD1Rx2IwDX46OS/+Gr
+SWDVq3eXWEDmiXTyCjYE5OGZcZman32QG+8HoEEibbufOhOru8luwznDu0aSfOZg
+f6tMlqtWkK0RmYQnKQto
+=SRcG
+-----END PGP SIGNATURE-----
+
+--NtwzykIc2mflq5ck--
