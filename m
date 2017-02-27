@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45882)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ciOGC-0007ly-Vd
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:34:53 -0500
+	(envelope-from <stefanha@redhat.com>) id 1ciOGK-0007rg-7f
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:35:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1ciOGB-0008P0-S8
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:34:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52516)
+	(envelope-from <stefanha@redhat.com>) id 1ciOGH-0008Q8-PN
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:35:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58056)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ciOGB-0008Op-KK
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:34:51 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ciOGH-0008Q1-Jk
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:34:57 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon, 27 Feb 2017 16:34:44 +0000
-Message-Id: <20170227163447.20428-2-stefanha@redhat.com>
+Date: Mon, 27 Feb 2017 16:34:47 +0000
+Message-Id: <20170227163447.20428-5-stefanha@redhat.com>
 In-Reply-To: <20170227163447.20428-1-stefanha@redhat.com>
 References: <20170227163447.20428-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 1/4] curl: do not use aio_context_acquire/release
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 4/4] tests-aio-multithread: use atomic_read
+ properly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,134 +32,40 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com
 
 From: Paolo Bonzini <pbonzini@redhat.com>
 
-Now that all bottom halves and callbacks take care of taking the
-AioContext lock, we can migrate some users away from it and to a
-specific QemuMutex or CoMutex.
+nodes[id].next is written by other threads.  If atomic_read is not used
+(matching atomic_set in mcs_mutex_lock!) the compiler can optimize the
+whole "if" away!
 
-Protect BDRVCURLState access with a QemuMutex.
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reported-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-id: 20170222180725.28611-2-pbonzini@redhat.com
+Tested-by: Greg Kurz <groug@kaod.org>
+Message-id: 20170227111726.9237-1-pbonzini@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/curl.c | 24 +++++++++++++++---------
- 1 file changed, 15 insertions(+), 9 deletions(-)
+ tests/test-aio-multithread.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/curl.c b/block/curl.c
-index 2939cc7..e83dcd8 100644
---- a/block/curl.c
-+++ b/block/curl.c
-@@ -135,6 +135,7 @@ typedef struct BDRVCURLState {
-     char *cookie;
-     bool accept_range;
-     AioContext *aio_context;
-+    QemuMutex mutex;
-     char *username;
-     char *password;
-     char *proxyusername;
-@@ -333,6 +334,7 @@ static int curl_find_buf(BDRVCURLState *s, size_t start, size_t len,
-     return FIND_RET_NONE;
- }
- 
-+/* Called with s->mutex held.  */
- static void curl_multi_check_completion(BDRVCURLState *s)
+diff --git a/tests/test-aio-multithread.c b/tests/test-aio-multithread.c
+index f11e990..8b0b40e 100644
+--- a/tests/test-aio-multithread.c
++++ b/tests/test-aio-multithread.c
+@@ -309,7 +309,7 @@ static void mcs_mutex_lock(void)
+ static void mcs_mutex_unlock(void)
  {
-     int msgs_in_queue;
-@@ -374,7 +376,9 @@ static void curl_multi_check_completion(BDRVCURLState *s)
-                         continue;
-                     }
- 
-+                    qemu_mutex_unlock(&s->mutex);
-                     acb->common.cb(acb->common.opaque, -EPROTO);
-+                    qemu_mutex_lock(&s->mutex);
-                     qemu_aio_unref(acb);
-                     state->acb[i] = NULL;
-                 }
-@@ -386,6 +390,7 @@ static void curl_multi_check_completion(BDRVCURLState *s)
+     int next;
+-    if (nodes[id].next =3D=3D -1) {
++    if (atomic_read(&nodes[id].next) =3D=3D -1) {
+         if (atomic_read(&mutex_head) =3D=3D id &&
+             atomic_cmpxchg(&mutex_head, id, -1) =3D=3D id) {
+             /* Last item in the list, exit.  */
+@@ -323,7 +323,7 @@ static void mcs_mutex_unlock(void)
      }
+=20
+     /* Wake up the next in line.  */
+-    next =3D nodes[id].next;
++    next =3D atomic_read(&nodes[id].next);
+     nodes[next].locked =3D 0;
+     qemu_futex_wake(&nodes[next].locked, 1);
  }
- 
-+/* Called with s->mutex held.  */
- static void curl_multi_do_locked(CURLState *s)
- {
-     CURLSocket *socket, *next_socket;
-@@ -409,19 +414,19 @@ static void curl_multi_do(void *arg)
- {
-     CURLState *s = (CURLState *)arg;
- 
--    aio_context_acquire(s->s->aio_context);
-+    qemu_mutex_lock(&s->s->mutex);
-     curl_multi_do_locked(s);
--    aio_context_release(s->s->aio_context);
-+    qemu_mutex_unlock(&s->s->mutex);
- }
- 
- static void curl_multi_read(void *arg)
- {
-     CURLState *s = (CURLState *)arg;
- 
--    aio_context_acquire(s->s->aio_context);
-+    qemu_mutex_lock(&s->s->mutex);
-     curl_multi_do_locked(s);
-     curl_multi_check_completion(s->s);
--    aio_context_release(s->s->aio_context);
-+    qemu_mutex_unlock(&s->s->mutex);
- }
- 
- static void curl_multi_timeout_do(void *arg)
-@@ -434,11 +439,11 @@ static void curl_multi_timeout_do(void *arg)
-         return;
-     }
- 
--    aio_context_acquire(s->aio_context);
-+    qemu_mutex_lock(&s->mutex);
-     curl_multi_socket_action(s->multi, CURL_SOCKET_TIMEOUT, 0, &running);
- 
-     curl_multi_check_completion(s);
--    aio_context_release(s->aio_context);
-+    qemu_mutex_unlock(&s->mutex);
- #else
-     abort();
- #endif
-@@ -771,6 +776,7 @@ static int curl_open(BlockDriverState *bs, QDict *options, int flags,
-     curl_easy_cleanup(state->curl);
-     state->curl = NULL;
- 
-+    qemu_mutex_init(&s->mutex);
-     curl_attach_aio_context(bs, bdrv_get_aio_context(bs));
- 
-     qemu_opts_del(opts);
-@@ -801,12 +807,11 @@ static void curl_readv_bh_cb(void *p)
-     CURLAIOCB *acb = p;
-     BlockDriverState *bs = acb->common.bs;
-     BDRVCURLState *s = bs->opaque;
--    AioContext *ctx = bdrv_get_aio_context(bs);
- 
-     size_t start = acb->sector_num * BDRV_SECTOR_SIZE;
-     size_t end;
- 
--    aio_context_acquire(ctx);
-+    qemu_mutex_lock(&s->mutex);
- 
-     // In case we have the requested data already (e.g. read-ahead),
-     // we can just call the callback and be done.
-@@ -854,7 +859,7 @@ static void curl_readv_bh_cb(void *p)
-     curl_multi_socket_action(s->multi, CURL_SOCKET_TIMEOUT, 0, &running);
- 
- out:
--    aio_context_release(ctx);
-+    qemu_mutex_unlock(&s->mutex);
-     if (ret != -EINPROGRESS) {
-         acb->common.cb(acb->common.opaque, ret);
-         qemu_aio_unref(acb);
-@@ -883,6 +888,7 @@ static void curl_close(BlockDriverState *bs)
- 
-     DPRINTF("CURL: Close\n");
-     curl_detach_aio_context(bs);
-+    qemu_mutex_destroy(&s->mutex);
- 
-     g_free(s->cookie);
-     g_free(s->url);
--- 
+--=20
 2.9.3
