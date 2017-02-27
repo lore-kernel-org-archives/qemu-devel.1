@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ciRcm-0007yp-Qr
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:10:25 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ciRcs-00084k-CA
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:10:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ciRcm-00035Q-0Y
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:10:24 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ciRcr-0003CX-EX
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:10:30 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 27 Feb 2017 21:09:12 +0100
-Message-Id: <1488226184-9044-12-git-send-email-kwolf@redhat.com>
+Date: Mon, 27 Feb 2017 21:09:13 +0100
+Message-Id: <1488226184-9044-13-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1488226184-9044-1-git-send-email-kwolf@redhat.com>
 References: <1488226184-9044-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 11/43] block: Request real permissions in
- bdrv_attach_child()
+Subject: [Qemu-devel] [PATCH v2 12/43] block: Add permissions to BlockBackend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,64 +22,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-Now that all block drivers with children tell us what permissions they
-need from each of their children, bdrv_attach_child() can use this
-information and make the right requirements while trying to attach new
-children.
+The BlockBackend can now store the permissions that its user requires.
+This is necessary because nodes can be ejected from or inserted into a
+BlockBackend and all of these operations must make sure that the user
+still gets what it requested initially.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c | 22 +++++++++++++++++++---
- 1 file changed, 19 insertions(+), 3 deletions(-)
+ block/block-backend.c          | 27 +++++++++++++++++++++++++++
+ include/sysemu/block-backend.h |  2 ++
+ 2 files changed, 29 insertions(+)
 
-diff --git a/block.c b/block.c
-index d2c8126..08476bb 100644
---- a/block.c
-+++ b/block.c
-@@ -1438,7 +1438,8 @@ static void bdrv_set_perm(BlockDriverState *bs, uint64_t cumulative_perms,
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 9bb4528..1ed75c6 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -59,6 +59,9 @@ struct BlockBackend {
+     bool iostatus_enabled;
+     BlockDeviceIoStatus iostatus;
+ 
++    uint64_t perm;
++    uint64_t shared_perm;
++
+     bool allow_write_beyond_eof;
+ 
+     NotifierList remove_bs_notifiers, insert_bs_notifiers;
+@@ -126,6 +129,8 @@ BlockBackend *blk_new(void)
+ 
+     blk = g_new0(BlockBackend, 1);
+     blk->refcnt = 1;
++    blk->perm = 0;
++    blk->shared_perm = BLK_PERM_ALL;
+     blk_set_enable_write_cache(blk, true);
+ 
+     qemu_co_queue_init(&blk->public.throttled_reqs[0]);
+@@ -511,6 +516,27 @@ void blk_insert_bs(BlockBackend *blk, BlockDriverState *bs)
      }
  }
  
--static void bdrv_update_perm(BlockDriverState *bs)
-+static void bdrv_get_cumulative_perm(BlockDriverState *bs, uint64_t *perm,
-+                                     uint64_t *shared_perm)
- {
-     BdrvChild *c;
-     uint64_t cumulative_perms = 0;
-@@ -1449,6 +1450,15 @@ static void bdrv_update_perm(BlockDriverState *bs)
-         cumulative_shared_perms &= c->shared_perm;
-     }
- 
-+    *perm = cumulative_perms;
-+    *shared_perm = cumulative_shared_perms;
++/*
++ * Sets the permission bitmasks that the user of the BlockBackend needs.
++ */
++int blk_set_perm(BlockBackend *blk, uint64_t perm, uint64_t shared_perm,
++                 Error **errp)
++{
++    int ret;
++
++    if (blk->root) {
++        ret = bdrv_child_try_set_perm(blk->root, perm, shared_perm, errp);
++        if (ret < 0) {
++            return ret;
++        }
++    }
++
++    blk->perm = perm;
++    blk->shared_perm = shared_perm;
++
++    return 0;
 +}
 +
-+static void bdrv_update_perm(BlockDriverState *bs)
-+{
-+    uint64_t cumulative_perms, cumulative_shared_perms;
-+
-+    bdrv_get_cumulative_perm(bs, &cumulative_perms, &cumulative_shared_perms);
-     bdrv_set_perm(bs, cumulative_perms, cumulative_shared_perms);
+ static int blk_do_attach_dev(BlockBackend *blk, void *dev)
+ {
+     if (blk->dev) {
+@@ -557,6 +583,7 @@ void blk_detach_dev(BlockBackend *blk, void *dev)
+     blk->dev_ops = NULL;
+     blk->dev_opaque = NULL;
+     blk->guest_block_size = 512;
++    blk_set_perm(blk, 0, BLK_PERM_ALL, &error_abort);
+     blk_unref(blk);
  }
  
-@@ -1661,10 +1671,16 @@ BdrvChild *bdrv_attach_child(BlockDriverState *parent_bs,
-                              Error **errp)
- {
-     BdrvChild *child;
-+    uint64_t perm, shared_perm;
-+
-+    bdrv_get_cumulative_perm(parent_bs, &perm, &shared_perm);
-+
-+    assert(parent_bs->drv);
-+    parent_bs->drv->bdrv_child_perm(parent_bs, NULL, child_role,
-+                                    perm, shared_perm, &perm, &shared_perm);
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
+index f365a51..4a18e86 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -105,6 +105,8 @@ void blk_remove_bs(BlockBackend *blk);
+ void blk_insert_bs(BlockBackend *blk, BlockDriverState *bs);
+ bool bdrv_has_blk(BlockDriverState *bs);
+ bool bdrv_is_root_node(BlockDriverState *bs);
++int blk_set_perm(BlockBackend *blk, uint64_t perm, uint64_t shared_perm,
++                 Error **errp);
  
--    /* FIXME Use real permissions */
-     child = bdrv_root_attach_child(child_bs, child_name, child_role,
--                                   0, BLK_PERM_ALL, parent_bs, errp);
-+                                   perm, shared_perm, parent_bs, errp);
-     if (child == NULL) {
-         return NULL;
-     }
+ void blk_set_allow_write_beyond_eof(BlockBackend *blk, bool allow);
+ void blk_iostatus_enable(BlockBackend *blk);
 -- 
 1.8.3.1
