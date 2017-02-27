@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ciSoZ-0003fG-5c
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 16:26:40 -0500
+	(envelope-from <no-reply@patchew.org>) id 1ciSrq-00052R-3g
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 16:30:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ciSoY-00007N-21
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 16:26:39 -0500
-References: <cover.1488220970.git.jcody@redhat.com>
-	<963f4d61ffcef289b8030bed4be9b9849e2056fe.1488220970.git.jcody@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8cd7a865-83fb-e89b-10e5-b0dc1e6ad66a@redhat.com>
-Date: Mon, 27 Feb 2017 15:26:24 -0600
+	(envelope-from <no-reply@patchew.org>) id 1ciSrl-0000vP-IH
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 16:30:02 -0500
+Resent-Message-Id: <E1ciSrl-0000vP-IH@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21384)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1ciSrl-0000v9-Aw
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 16:29:57 -0500
+In-Reply-To: <20170227201456.31814-1-berrange@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148823093151.186.12396350889629389667@0e2666bad730>
 MIME-Version: 1.0
-In-Reply-To: <963f4d61ffcef289b8030bed4be9b9849e2056fe.1488220970.git.jcody@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="N6O5PX256Kiwq4C3x5KWBEjswKr6XVPI0"
-Subject: Re: [Qemu-devel] [PATCH v2 1/5] block/rbd: don't copy strings in
- qemu_rbd_next_tok()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 27 Feb 2017 13:28:52 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] io: ignore case when matching websockets
+ HTTP headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,67 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, armbru@redhat.com, berrange@redhat.com
+To: berrange@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, den@openvz.org, anton.nefedov@virtuozzo.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---N6O5PX256Kiwq4C3x5KWBEjswKr6XVPI0
-From: Eric Blake <eblake@redhat.com>
-To: Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, armbru@redhat.com, berrange@redhat.com
-Message-ID: <8cd7a865-83fb-e89b-10e5-b0dc1e6ad66a@redhat.com>
-Subject: Re: [PATCH v2 1/5] block/rbd: don't copy strings in
- qemu_rbd_next_tok()
-References: <cover.1488220970.git.jcody@redhat.com>
- <963f4d61ffcef289b8030bed4be9b9849e2056fe.1488220970.git.jcody@redhat.com>
-In-Reply-To: <963f4d61ffcef289b8030bed4be9b9849e2056fe.1488220970.git.jcody@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 02/27/2017 12:58 PM, Jeff Cody wrote:
-> This patch is prep work for parsing options for .bdrv_parse_filename,
-> and using QDict options.
->=20
-> The function qemu_rbd_next_tok() searched for various key/value pairs,
-> and copied them into buffers.  This will soon be an unnecessary extra
-> step, so we will now return found strings by reference only, and
-> offload the responsibility for safely handling/coping these strings to
-> the caller.
->=20
-> This also cleans up error handling some, as the callers now rely on
-> the Error object to determine if there is a parse error.
->=20
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
-> ---
->  block/rbd.c | 99 +++++++++++++++++++++++++++++++++++++++--------------=
---------
->  1 file changed, 64 insertions(+), 35 deletions(-)
->=20
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---N6O5PX256Kiwq4C3x5KWBEjswKr6XVPI0
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYtJmAAAoJEKeha0olJ0NqNIEH/ic32VNav7+K59A5dGeg4rc/
-fD4B1HCHrxZS5h5/VgwlIe5sfWIQOR1KhZF2nkyksmPaAiafKuA1UdIXGUaD3qK0
-CR5VIhAsDxeG+rMBQIj4Dd+o2tpdazCmBqB+izBFuEgEzOLKpLT4+xmBu/7imdeb
-dEZayiJEbY2I+m+J5Cf1VoIfHhIPPBpbh8pWwKRP3zR8iW+xIzMvlWVt6aS7isFY
-SGPsVvs5zTC0xdVebc55ffhEg0kRWN1EnjkiTdjVCKlqyVHJ+YnMxQPv3yW3lFnY
-0xdroaY+SRE8lCNlUNUfQh1NcPSpXlm3+PARYbyJBTGv0I+ldVr5h+oi2TevoeE=
-=IvMu
------END PGP SIGNATURE-----
-
---N6O5PX256Kiwq4C3x5KWBEjswKr6XVPI0--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzAyMjcyMDE0NTYuMzE4MTQtMS1iZXJyYW5nZUByZWRoYXQuY29tClR5cGU6IHNlcmllcwpTdWJq
+ZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBpbzogaWdub3JlIGNhc2Ugd2hlbiBtYXRjaGluZyB3
+ZWJzb2NrZXRzIEhUVFAgaGVhZGVycwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
+YmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3
+YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpj
+b21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBp
+biAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQg
+bG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1h
+dD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAg
+ICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhp
+dCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
+ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNo
+ZXctcHJvamVjdC9xZW11CiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvY292ZXIuMTQ4ODIy
+MDk3MC5naXQuamNvZHlAcmVkaGF0LmNvbSAtPiBwYXRjaGV3L2NvdmVyLjE0ODgyMjA5NzAuZ2l0
+Lmpjb2R5QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpiOTQxMTcz
+IGlvOiBpZ25vcmUgY2FzZSB3aGVuIG1hdGNoaW5nIHdlYnNvY2tldHMgSFRUUCBoZWFkZXJzCgo9
+PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IGlvOiBpZ25vcmUgY2FzZSB3
+aGVuIG1hdGNoaW5nIHdlYnNvY2tldHMgSFRUUCBoZWFkZXJzLi4uCkVSUk9SOiBsaW5lIG92ZXIg
+OTAgY2hhcmFjdGVycwojNTA6IEZJTEU6IGlvL2NoYW5uZWwtd2Vic29jay5jOjI1ODoKKyAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBoYW5kc2hha2VfZW5kIC0g
+KGNoYXIgKilpb2MtPmVuY2lucHV0LmJ1ZmZlciwKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5n
+cywgMzQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
+ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
+b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
+LgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoK
+Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0
+Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZy
+ZWVsaXN0cy5vcmc=
