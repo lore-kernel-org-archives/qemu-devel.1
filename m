@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53928)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ciJxB-000702-6M
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:58:58 -0500
+	(envelope-from <thuth@redhat.com>) id 1ciJxx-0007bE-65
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:59:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ciJxA-0003sr-F5
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:58:57 -0500
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:38784)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ciJxA-0003sg-85
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:58:56 -0500
-Received: by mail-wm0-x235.google.com with SMTP id u199so16756449wmd.1
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 03:58:56 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1ciJxs-00041V-9O
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:59:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48528)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ciJxs-00040m-47
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:59:40 -0500
+References: <20170223122025.10420-1-cornelia.huck@de.ibm.com>
+	<20170223122025.10420-4-cornelia.huck@de.ibm.com>
+	<4fe97bb7-d6f0-7b58-916f-94dc0ae81616@redhat.com>
+	<20170227125138.18c3f43c.cornelia.huck@de.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <c0652d8e-399a-411f-b338-e80674ae27c4@redhat.com>
+Date: Mon, 27 Feb 2017 12:59:36 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170224164021.9066-1-clement.deschamps@antfield.fr>
-References: <20170224164021.9066-1-clement.deschamps@antfield.fr>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 27 Feb 2017 11:58:34 +0000
-Message-ID: <CAFEAcA9RSPFQJ2EE0jcTbkymj=CSWt1NajXu8ojX0rhkw5QyWg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] bcm2835: add sdhost and gpio
- controllers
+In-Reply-To: <20170227125138.18c3f43c.cornelia.huck@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] s390x/ipl: Load network boot image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +29,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Clement Deschamps <clement.deschamps@antfield.fr>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrew Baumann <andrew.baumann@microsoft.com>
+To: Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, jfrei@linux.vnet.ibm.com, Farhan Ali <alifm@linux.vnet.ibm.com>, agraf@suse.de
 
-On 24 February 2017 at 16:40, Clement Deschamps
-<clement.deschamps@antfield.fr> wrote:
-> This patches add the Arasan SDHost controller and the GPIO controller to the BCM2835/36 platforms.
->
-> This patches have been tested with raspbian 2015-09-24 (which uses the SDHCI controller),
-> and raspbian 2017-01-11 (which dynamically switches to the SDHost controller).
+On 27.02.2017 12:51, Cornelia Huck wrote:
+> On Sat, 25 Feb 2017 07:18:29 +0100
+> Thomas Huth <thuth@redhat.com> wrote:
+> 
+>> On 23.02.2017 13:20, Cornelia Huck wrote:
+>>> From: Farhan Ali <alifm@linux.vnet.ibm.com>
+>>>
+>>> Load the network boot image into guest RAM when the boot
+>>> device selected is a network device. Use some of the reserved
+>>> space in IplBlockCcw to store the start address of the netboot
+>>> image.
+>>>
+>>> A user could also use 'chreipl'(diag 308/5) to change the boot device.
+>>> So every time we update the IPLB, we need to verify if the selected
+>>> boot device is a network device so we can appropriately load the
+>>> network boot image.
+>>>
+>>> Signed-off-by: Farhan Ali <alifm@linux.vnet.ibm.com>
+>>> Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+>>> ---
+>>>  hw/s390x/ipl.c | 89 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>>  hw/s390x/ipl.h |  4 ++-
+>>>  2 files changed, 92 insertions(+), 1 deletion(-)
+[...]
+>>> +    if (ipl->netboot) {
+>>> +        if (load_netboot_image(&err) < 0) {
+>>> +            error_report_err(err);
+>>> +            vm_stop(RUN_STATE_INTERNAL_ERROR);
+>>> +        }
+>>> +        ipl->iplb.ccw.netboot_start_addr = ipl->start_addr;
+>>
+>> Not sure whether it matters, but in case of early errors during
+>> load_netboot_image(), ipl->start_addr could be used uninitialized here.
+>> Maybe you should move the "ipl->start_addr = KERN_IMAGE_START;" there at
+>> the beginning of the function, to make it also the default value for the
+>> other error cases?
+> 
+> ipl->start_addr has already been set to some value in the realize
+> function (either the kernel entry address, or the bios address).
+> 
+> But that should not matter with the vm_stop() on error anyway, no?
 
-Thanks; applied to target-arm.next; I'll put out a pullreq either today
-or tomorrow with these in.
+Likely not. It's just a little bit strange to see that the program flow
+continues after the error in this function here ... maybe it would have
+been clearer to put a "return" right after the "vm_stop()"? Anyway, it
+likely does not really matter here, so never mind.
 
-> I spotted an issue with the raspi2 platform, but it is not related to this patch.
-> The CP15 timer frequency is set to 19.20MHz in the raspbian kernel DTB.
-> There is a constant (GTIMER_SCALE) in target/arm/internals.h which seems to tell that the timer is at 62.5MHz.
-> This causes problems:
-> - The sleep command entered in guest lasts around 1/3 of the time it is supposed to last.
-> - The cursor is blinking faster that it should
-> - The systemd timeouts expire too early.
-> - ...
->
-> Did you already have this issue on another platform ?
-> Should the frequency in the DTB be dynamically replaced depending on the GTIMER_SCALE value ?
-> Or should the constant GTIMER_SCALE be platform dependent ?
-
-We haven't noticed that on other platforms -- I think typically the kernel
-trusts the value in the cp15 "what frequency are the timers" register,
-at least on the "virt" board which gets the most usage.
-
-We probably should have a mechanism for allowing the SoC or
-board to set the clock frequency for the timer registers, though.
-Ideally this would be done with the clocktree patchset that
-Fred Konrad has been working on, which provides a generic
-mechanism for wiring up "clocks" to devices which tell them how
-fast things should tick.
-
-thanks
--- PMM
+ Thomas
