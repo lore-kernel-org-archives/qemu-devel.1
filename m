@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ciMLn-0002u9-QR
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:32:33 -0500
+	(envelope-from <clg@kaod.org>) id 1ciMLt-0002xd-56
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:32:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ciMLj-0008Dr-Le
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:32:31 -0500
-Received: from 16.mo6.mail-out.ovh.net ([87.98.139.208]:35897)
+	(envelope-from <clg@kaod.org>) id 1ciMLp-0008GZ-5p
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:32:37 -0500
+Received: from 1.mo6.mail-out.ovh.net ([46.105.56.136]:35072)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ciMLj-0008D6-GQ
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:32:27 -0500
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ciMLo-0008GP-W7
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 09:32:33 -0500
 Received: from player761.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 1C79EB34AD
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 15:32:26 +0100 (CET)
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id D3313B34FD
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 15:32:31 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Mon, 27 Feb 2017 15:29:26 +0100
-Message-Id: <1488205773-30436-20-git-send-email-clg@kaod.org>
+Date: Mon, 27 Feb 2017 15:29:28 +0100
+Message-Id: <1488205773-30436-22-git-send-email-clg@kaod.org>
 In-Reply-To: <1488205773-30436-1-git-send-email-clg@kaod.org>
 References: <1488205773-30436-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 19/26] ppc/xics: simplify spapr_dt_xics()
- interface
+Subject: [Qemu-devel] [PATCH v4 21/26] ppc/xics: move the ICP array under
+ the sPAPR machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,61 +33,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-spapr_dt_xics() only needs the number of servers to build the device
-tree nodes. Let's change the routine interface to reflect that.
+This is the last step to remove the XICSState abstraction and have the
+machine hold all the objects related to interrupts : ICSs and ICPs.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/intc/xics_spapr.c  | 4 ++--
- hw/ppc/spapr.c        | 2 +-
- include/hw/ppc/xics.h | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ hw/ppc/spapr.c         | 17 ++++++++---------
+ include/hw/ppc/spapr.h |  3 +++
+ include/hw/ppc/xics.h  |  2 --
+ 3 files changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-index bc62b0ccc254..35045a20b860 100644
---- a/hw/intc/xics_spapr.c
-+++ b/hw/intc/xics_spapr.c
-@@ -387,10 +387,10 @@ void spapr_ics_free(ICSState *ics, int irq, int num=
-)
-     }
- }
-=20
--void spapr_dt_xics(XICSState *xics, void *fdt, uint32_t phandle)
-+void spapr_dt_xics(int nr_servers, void *fdt, uint32_t phandle)
- {
-     uint32_t interrupt_server_ranges_prop[] =3D {
--        0, cpu_to_be32(xics->nr_servers),
-+        0, cpu_to_be32(nr_servers),
-     };
-     int node;
-=20
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 309b9ff91563..aa62292c8c90 100644
+index 88539557abd3..358bdec7d2ad 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -966,7 +966,7 @@ static void *spapr_build_fdt(sPAPRMachineState *spapr=
+@@ -124,15 +124,15 @@ static XICSState *try_create_xics(sPAPRMachineState=
+ *spapr,
+         goto error;
+     }
+=20
+-    xics->ss =3D g_malloc0(nr_servers * sizeof(ICPState));
+-    xics->nr_servers =3D nr_servers;
++    spapr->icps =3D g_malloc0(nr_servers * sizeof(ICPState));
++    spapr->nr_servers =3D nr_servers;
+=20
+     for (i =3D 0; i < nr_servers; i++) {
+-        ICPState *icp =3D &xics->ss[i];
++        ICPState *icp =3D &spapr->icps[i];
+=20
+         object_initialize(icp, sizeof(*icp), type_icp);
+         qdev_set_parent_bus(DEVICE(icp), sysbus_get_default());
+-        object_property_add_child(OBJECT(xics), "icp[*]", OBJECT(icp), N=
+ULL);
++        object_property_add_child(OBJECT(spapr), "icp[*]", OBJECT(icp), =
+NULL);
+         object_property_add_const_link(OBJECT(icp), "xics", OBJECT(xi), =
+NULL);
+         object_property_set_bool(OBJECT(icp), true, "realized", &err);
+         if (err) {
+@@ -967,7 +967,7 @@ static void *spapr_build_fdt(sPAPRMachineState *spapr=
 ,
      _FDT(fdt_setprop_cell(fdt, 0, "#size-cells", 2));
 =20
      /* /interrupt controller */
--    spapr_dt_xics(spapr->xics, fdt, PHANDLE_XICP);
-+    spapr_dt_xics(spapr->xics->nr_servers, fdt, PHANDLE_XICP);
+-    spapr_dt_xics(spapr->xics->nr_servers, fdt, PHANDLE_XICP);
++    spapr_dt_xics(spapr->nr_servers, fdt, PHANDLE_XICP);
 =20
      ret =3D spapr_populate_memory(spapr, fdt);
      if (ret < 0) {
+@@ -2933,8 +2933,7 @@ static ICPState *spapr_icp_get(XICSFabric *xi, int =
+server)
+ {
+     sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+=20
+-    return (server < spapr->xics->nr_servers) ? &spapr->xics->ss[server]=
+ :
+-        NULL;
++    return (server < spapr->nr_servers) ? &spapr->icps[server] : NULL;
+ }
+=20
+ static void spapr_icp_resend(XICSFabric *xi)
+@@ -2942,8 +2941,8 @@ static void spapr_icp_resend(XICSFabric *xi)
+     sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
+     int i;
+=20
+-    for (i =3D 0; i < spapr->xics->nr_servers; i++) {
+-        icp_resend(&spapr->xics->ss[i]);
++    for (i =3D 0; i < spapr->nr_servers; i++) {
++        icp_resend(&spapr->icps[i]);
+     }
+ }
+=20
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 21e506b13cfa..f5bbb040f941 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -95,6 +95,9 @@ struct sPAPRMachineState {
+     /*< public >*/
+     char *kvm_type;
+     MemoryHotplugState hotplug_memory;
++
++    uint32_t nr_servers;
++    ICPState *icps;
+ };
+=20
+ #define H_SUCCESS         0
 diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index c57e80e4187b..f618848009cf 100644
+index f618848009cf..50a5933df535 100644
 --- a/include/hw/ppc/xics.h
 +++ b/include/hw/ppc/xics.h
-@@ -202,7 +202,7 @@ int spapr_ics_alloc(ICSState *ics, int irq_hint, bool=
- lsi, Error **errp);
- int spapr_ics_alloc_block(ICSState *ics, int num, bool lsi, bool align,
-                            Error **errp);
- void spapr_ics_free(ICSState *ics, int irq, int num);
--void spapr_dt_xics(XICSState *xics, void *fdt, uint32_t phandle);
-+void spapr_dt_xics(int nr_servers, void *fdt, uint32_t phandle);
+@@ -79,8 +79,6 @@ struct XICSState {
+     /*< private >*/
+     DeviceState parent_obj;
+     /*< public >*/
+-    uint32_t nr_servers;
+-    ICPState *ss;
+ };
 =20
- qemu_irq xics_get_qirq(XICSFabric *xi, int irq);
- ICPState *xics_icp_get(XICSFabric *xi, int server);
+ #define TYPE_ICP "icp"
 --=20
 2.7.4
