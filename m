@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41589)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ciO0i-0002RW-Ou
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:18:53 -0500
+	(envelope-from <kraxel@redhat.com>) id 1ciO0i-0002RA-6Y
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:18:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ciO0h-0002n6-KE
+	(envelope-from <kraxel@redhat.com>) id 1ciO0g-0002mD-Db
 	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:18:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56614)
+Received: from mx1.redhat.com ([209.132.183.28]:48274)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ciO0h-0002mR-BY
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:18:51 -0500
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ciO0g-0002lf-4o
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:18:50 -0500
 Received: from int-mx11.intmail.prod.int.phx2.redhat.com
 	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 82DE37FB62
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 16:18:51 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6277164A53
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 16:18:50 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 27 Feb 2017 17:18:41 +0100
-Message-Id: <1488212323-26882-8-git-send-email-kraxel@redhat.com>
+Date: Mon, 27 Feb 2017 17:18:35 +0100
+Message-Id: <1488212323-26882-2-git-send-email-kraxel@redhat.com>
 In-Reply-To: <1488212323-26882-1-git-send-email-kraxel@redhat.com>
 References: <1488212323-26882-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 7/9] ui: Use XkbGetMap and XkbGetNames instead
- of XkbGetKeyboard
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 1/9] console: rename dpy_gl_scanout to
+ dpy_gl_scanout_texture
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,77 +34,359 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-From: "Daniel P. Berrange" <berrange@redhat.com>
+We'll add a variant which accepts dmabufs soon.  Change
+the name so we can easily disturgish the two variants.
 
-XkbGetKeyboard does not work in XWayland and even on non-Wayland
-X11 servers its use is discouraged:
-
-  https://bugs.freedesktop.org/show_bug.cgi?id=89240
-
-This resolves a problem whereby QEMU prints
-
-  "could not lookup keycode name"
-
-on startup when running under XWayland. Keymap handling is
-however still broken after this commit, since Xwayland is
-reporting a keymap we can't handle
-
-  "unknown keycodes `(unnamed)', please report to qemu-devel@nongnu.org"
-
-NB, native Wayland support (which is the default under GTK3) is
-not affected - only XWayland (which can be requested with GDK_BACKEND
-on GTK3, and is the only option for GTK2).
-
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Message-id: 20170227132343.30824-1-berrange@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-id: 1487669841-13668-2-git-send-email-kraxel@redhat.com
 ---
- ui/gtk.c |  7 ++++---
- ui/sdl.c | 10 ++++++----
- 2 files changed, 10 insertions(+), 7 deletions(-)
+ hw/display/virtio-gpu-3d.c | 14 +++++++-------
+ include/ui/console.h       | 19 +++++++++++--------
+ include/ui/gtk.h           | 24 ++++++++++++++----------
+ include/ui/sdl2.h          | 12 +++++++-----
+ ui/console.c               | 19 +++++++++++--------
+ ui/gtk-egl.c               | 10 +++++-----
+ ui/gtk-gl-area.c           | 12 +++++++-----
+ ui/gtk.c                   |  4 ++--
+ ui/sdl2-gl.c               | 12 +++++++-----
+ ui/sdl2.c                  |  2 +-
+ ui/spice-display.c         | 16 ++++++++--------
+ 11 files changed, 80 insertions(+), 64 deletions(-)
 
+diff --git a/hw/display/virtio-gpu-3d.c b/hw/display/virtio-gpu-3d.c
+index ecb09d1..b526b3f 100644
+--- a/hw/display/virtio-gpu-3d.c
++++ b/hw/display/virtio-gpu-3d.c
+@@ -177,16 +177,16 @@ static void virgl_cmd_set_scanout(VirtIOGPU *g,
+         qemu_console_resize(g->scanout[ss.scanout_id].con,
+                             ss.r.width, ss.r.height);
+         virgl_renderer_force_ctx_0();
+-        dpy_gl_scanout(g->scanout[ss.scanout_id].con, info.tex_id,
+-                       info.flags & 1 /* FIXME: Y_0_TOP */,
+-                       info.width, info.height,
+-                       ss.r.x, ss.r.y, ss.r.width, ss.r.height);
++        dpy_gl_scanout_texture(g->scanout[ss.scanout_id].con, info.tex_i=
+d,
++                               info.flags & 1 /* FIXME: Y_0_TOP */,
++                               info.width, info.height,
++                               ss.r.x, ss.r.y, ss.r.width, ss.r.height);
+     } else {
+         if (ss.scanout_id !=3D 0) {
+             dpy_gfx_replace_surface(g->scanout[ss.scanout_id].con, NULL)=
+;
+         }
+-        dpy_gl_scanout(g->scanout[ss.scanout_id].con, 0, false,
+-                       0, 0, 0, 0, 0, 0);
++        dpy_gl_scanout_texture(g->scanout[ss.scanout_id].con, 0, false,
++                               0, 0, 0, 0, 0, 0);
+     }
+     g->scanout[ss.scanout_id].resource_id =3D ss.resource_id;
+ }
+@@ -597,7 +597,7 @@ void virtio_gpu_virgl_reset(VirtIOGPU *g)
+         if (i !=3D 0) {
+             dpy_gfx_replace_surface(g->scanout[i].con, NULL);
+         }
+-        dpy_gl_scanout(g->scanout[i].con, 0, false, 0, 0, 0, 0, 0, 0);
++        dpy_gl_scanout_texture(g->scanout[i].con, 0, false, 0, 0, 0, 0, =
+0, 0);
+     }
+ }
+=20
+diff --git a/include/ui/console.h b/include/ui/console.h
+index af6350e..e6ae637 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -215,10 +215,13 @@ typedef struct DisplayChangeListenerOps {
+                                    QEMUGLContext ctx);
+     QEMUGLContext (*dpy_gl_ctx_get_current)(DisplayChangeListener *dcl);
+=20
+-    void (*dpy_gl_scanout)(DisplayChangeListener *dcl,
+-                           uint32_t backing_id, bool backing_y_0_top,
+-                           uint32_t backing_width, uint32_t backing_heig=
+ht,
+-                           uint32_t x, uint32_t y, uint32_t w, uint32_t =
+h);
++    void (*dpy_gl_scanout_texture)(DisplayChangeListener *dcl,
++                                   uint32_t backing_id,
++                                   bool backing_y_0_top,
++                                   uint32_t backing_width,
++                                   uint32_t backing_height,
++                                   uint32_t x, uint32_t y,
++                                   uint32_t w, uint32_t h);
+     void (*dpy_gl_update)(DisplayChangeListener *dcl,
+                           uint32_t x, uint32_t y, uint32_t w, uint32_t h=
+);
+=20
+@@ -284,10 +287,10 @@ bool dpy_cursor_define_supported(QemuConsole *con);
+ bool dpy_gfx_check_format(QemuConsole *con,
+                           pixman_format_code_t format);
+=20
+-void dpy_gl_scanout(QemuConsole *con,
+-                    uint32_t backing_id, bool backing_y_0_top,
+-                    uint32_t backing_width, uint32_t backing_height,
+-                    uint32_t x, uint32_t y, uint32_t w, uint32_t h);
++void dpy_gl_scanout_texture(QemuConsole *con,
++                            uint32_t backing_id, bool backing_y_0_top,
++                            uint32_t backing_width, uint32_t backing_hei=
+ght,
++                            uint32_t x, uint32_t y, uint32_t w, uint32_t=
+ h);
+ void dpy_gl_update(QemuConsole *con,
+                    uint32_t x, uint32_t y, uint32_t w, uint32_t h);
+=20
+diff --git a/include/ui/gtk.h b/include/ui/gtk.h
+index 47ffddb..408e21b 100644
+--- a/include/ui/gtk.h
++++ b/include/ui/gtk.h
+@@ -103,11 +103,13 @@ void gd_egl_switch(DisplayChangeListener *dcl,
+                    DisplaySurface *surface);
+ QEMUGLContext gd_egl_create_context(DisplayChangeListener *dcl,
+                                     QEMUGLParams *params);
+-void gd_egl_scanout(DisplayChangeListener *dcl,
+-                    uint32_t backing_id, bool backing_y_0_top,
+-                    uint32_t backing_width, uint32_t backing_height,
+-                    uint32_t x, uint32_t y,
+-                    uint32_t w, uint32_t h);
++void gd_egl_scanout_texture(DisplayChangeListener *dcl,
++                            uint32_t backing_id,
++                            bool backing_y_0_top,
++                            uint32_t backing_width,
++                            uint32_t backing_height,
++                            uint32_t x, uint32_t y,
++                            uint32_t w, uint32_t h);
+ void gd_egl_scanout_flush(DisplayChangeListener *dcl,
+                           uint32_t x, uint32_t y, uint32_t w, uint32_t h=
+);
+ void gtk_egl_init(void);
+@@ -126,11 +128,13 @@ QEMUGLContext gd_gl_area_create_context(DisplayChan=
+geListener *dcl,
+                                         QEMUGLParams *params);
+ void gd_gl_area_destroy_context(DisplayChangeListener *dcl,
+                                 QEMUGLContext ctx);
+-void gd_gl_area_scanout(DisplayChangeListener *dcl,
+-                        uint32_t backing_id, bool backing_y_0_top,
+-                        uint32_t backing_width, uint32_t backing_height,
+-                        uint32_t x, uint32_t y,
+-                        uint32_t w, uint32_t h);
++void gd_gl_area_scanout_texture(DisplayChangeListener *dcl,
++                                uint32_t backing_id,
++                                bool backing_y_0_top,
++                                uint32_t backing_width,
++                                uint32_t backing_height,
++                                uint32_t x, uint32_t y,
++                                uint32_t w, uint32_t h);
+ void gd_gl_area_scanout_flush(DisplayChangeListener *dcl,
+                               uint32_t x, uint32_t y, uint32_t w, uint32=
+_t h);
+ void gtk_gl_area_init(void);
+diff --git a/include/ui/sdl2.h b/include/ui/sdl2.h
+index 683bb6a..2de792f 100644
+--- a/include/ui/sdl2.h
++++ b/include/ui/sdl2.h
+@@ -62,11 +62,13 @@ int sdl2_gl_make_context_current(DisplayChangeListene=
+r *dcl,
+                                  QEMUGLContext ctx);
+ QEMUGLContext sdl2_gl_get_current_context(DisplayChangeListener *dcl);
+=20
+-void sdl2_gl_scanout(DisplayChangeListener *dcl,
+-                     uint32_t backing_id, bool backing_y_0_top,
+-                     uint32_t backing_width, uint32_t backing_height,
+-                     uint32_t x, uint32_t y,
+-                     uint32_t w, uint32_t h);
++void sdl2_gl_scanout_texture(DisplayChangeListener *dcl,
++                             uint32_t backing_id,
++                             bool backing_y_0_top,
++                             uint32_t backing_width,
++                             uint32_t backing_height,
++                             uint32_t x, uint32_t y,
++                             uint32_t w, uint32_t h);
+ void sdl2_gl_scanout_flush(DisplayChangeListener *dcl,
+                            uint32_t x, uint32_t y, uint32_t w, uint32_t =
+h);
+=20
+diff --git a/ui/console.c b/ui/console.c
+index 49d0740..22c3c7d 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -1735,16 +1735,19 @@ QEMUGLContext dpy_gl_ctx_get_current(QemuConsole =
+*con)
+     return con->gl->ops->dpy_gl_ctx_get_current(con->gl);
+ }
+=20
+-void dpy_gl_scanout(QemuConsole *con,
+-                    uint32_t backing_id, bool backing_y_0_top,
+-                    uint32_t backing_width, uint32_t backing_height,
+-                    uint32_t x, uint32_t y, uint32_t width, uint32_t hei=
+ght)
++void dpy_gl_scanout_texture(QemuConsole *con,
++                            uint32_t backing_id,
++                            bool backing_y_0_top,
++                            uint32_t backing_width,
++                            uint32_t backing_height,
++                            uint32_t x, uint32_t y,
++                            uint32_t width, uint32_t height)
+ {
+     assert(con->gl);
+-    con->gl->ops->dpy_gl_scanout(con->gl, backing_id,
+-                                 backing_y_0_top,
+-                                 backing_width, backing_height,
+-                                 x, y, width, height);
++    con->gl->ops->dpy_gl_scanout_texture(con->gl, backing_id,
++                                         backing_y_0_top,
++                                         backing_width, backing_height,
++                                         x, y, width, height);
+ }
+=20
+ void dpy_gl_update(QemuConsole *con,
+diff --git a/ui/gtk-egl.c b/ui/gtk-egl.c
+index 3f5d328..d5541c3 100644
+--- a/ui/gtk-egl.c
++++ b/ui/gtk-egl.c
+@@ -170,11 +170,11 @@ QEMUGLContext gd_egl_create_context(DisplayChangeLi=
+stener *dcl,
+     return qemu_egl_create_context(dcl, params);
+ }
+=20
+-void gd_egl_scanout(DisplayChangeListener *dcl,
+-                    uint32_t backing_id, bool backing_y_0_top,
+-                    uint32_t backing_width, uint32_t backing_height,
+-                    uint32_t x, uint32_t y,
+-                    uint32_t w, uint32_t h)
++void gd_egl_scanout_texture(DisplayChangeListener *dcl,
++                            uint32_t backing_id, bool backing_y_0_top,
++                            uint32_t backing_width, uint32_t backing_hei=
+ght,
++                            uint32_t x, uint32_t y,
++                            uint32_t w, uint32_t h)
+ {
+     VirtualConsole *vc =3D container_of(dcl, VirtualConsole, gfx.dcl);
+=20
+diff --git a/ui/gtk-gl-area.c b/ui/gtk-gl-area.c
+index 0df5a36..b05c665 100644
+--- a/ui/gtk-gl-area.c
++++ b/ui/gtk-gl-area.c
+@@ -167,11 +167,13 @@ void gd_gl_area_destroy_context(DisplayChangeListen=
+er *dcl, QEMUGLContext ctx)
+     /* FIXME */
+ }
+=20
+-void gd_gl_area_scanout(DisplayChangeListener *dcl,
+-                        uint32_t backing_id, bool backing_y_0_top,
+-                        uint32_t backing_width, uint32_t backing_height,
+-                        uint32_t x, uint32_t y,
+-                        uint32_t w, uint32_t h)
++void gd_gl_area_scanout_texture(DisplayChangeListener *dcl,
++                                uint32_t backing_id,
++                                bool backing_y_0_top,
++                                uint32_t backing_width,
++                                uint32_t backing_height,
++                                uint32_t x, uint32_t y,
++                                uint32_t w, uint32_t h)
+ {
+     VirtualConsole *vc =3D container_of(dcl, VirtualConsole, gfx.dcl);
+=20
 diff --git a/ui/gtk.c b/ui/gtk.c
-index 640ff84..a86848f 100644
+index f21e9e7..1dd0b53 100644
 --- a/ui/gtk.c
 +++ b/ui/gtk.c
-@@ -2201,11 +2201,12 @@ static void gd_set_keycode_type(GtkDisplayState *s)
-     GdkDisplay *display = gtk_widget_get_display(s->window);
-     if (GDK_IS_X11_DISPLAY(display)) {
-         Display *x11_display = gdk_x11_display_get_xdisplay(display);
--        XkbDescPtr desc = XkbGetKeyboard(x11_display, XkbGBN_AllComponentsMask,
--                                         XkbUseCoreKbd);
-+        XkbDescPtr desc = XkbGetMap(x11_display, XkbGBN_AllComponentsMask,
-+                                    XkbUseCoreKbd);
-         char *keycodes = NULL;
- 
--        if (desc && desc->names) {
-+        if (desc &&
-+            (XkbGetNames(x11_display, XkbKeycodesNameMask, desc) == Success)) {
-             keycodes = XGetAtomName(x11_display, desc->names->keycodes);
-         }
-         if (keycodes == NULL) {
-diff --git a/ui/sdl.c b/ui/sdl.c
-index 19e8a84..37c21a0 100644
---- a/ui/sdl.c
-+++ b/ui/sdl.c
-@@ -233,10 +233,12 @@ static int check_for_evdev(void)
-     if (!SDL_GetWMInfo(&info)) {
-         return 0;
-     }
--    desc = XkbGetKeyboard(info.info.x11.display,
--                          XkbGBN_AllComponentsMask,
--                          XkbUseCoreKbd);
--    if (desc && desc->names) {
-+    desc = XkbGetMap(info.info.x11.display,
-+                     XkbGBN_AllComponentsMask,
-+                     XkbUseCoreKbd);
-+    if (desc &&
-+        (XkbGetNames(info.info.x11.display,
-+                     XkbKeycodesNameMask, desc) == Success)) {
-         keycodes = XGetAtomName(info.info.x11.display, desc->names->keycodes);
-         if (keycodes == NULL) {
-             fprintf(stderr, "could not lookup keycode name\n");
--- 
+@@ -669,7 +669,7 @@ static const DisplayChangeListenerOps dcl_gl_area_ops=
+ =3D {
+     .dpy_gl_ctx_destroy      =3D gd_gl_area_destroy_context,
+     .dpy_gl_ctx_make_current =3D gd_gl_area_make_current,
+     .dpy_gl_ctx_get_current  =3D gd_gl_area_get_current_context,
+-    .dpy_gl_scanout          =3D gd_gl_area_scanout,
++    .dpy_gl_scanout_texture  =3D gd_gl_area_scanout_texture,
+     .dpy_gl_update           =3D gd_gl_area_scanout_flush,
+ };
+=20
+@@ -688,7 +688,7 @@ static const DisplayChangeListenerOps dcl_egl_ops =3D=
+ {
+     .dpy_gl_ctx_destroy      =3D qemu_egl_destroy_context,
+     .dpy_gl_ctx_make_current =3D gd_egl_make_current,
+     .dpy_gl_ctx_get_current  =3D qemu_egl_get_current_context,
+-    .dpy_gl_scanout          =3D gd_egl_scanout,
++    .dpy_gl_scanout_texture  =3D gd_egl_scanout_texture,
+     .dpy_gl_update           =3D gd_egl_scanout_flush,
+ };
+=20
+diff --git a/ui/sdl2-gl.c b/ui/sdl2-gl.c
+index 039645d..e25aa3b 100644
+--- a/ui/sdl2-gl.c
++++ b/ui/sdl2-gl.c
+@@ -184,11 +184,13 @@ QEMUGLContext sdl2_gl_get_current_context(DisplayCh=
+angeListener *dcl)
+     return (QEMUGLContext)sdlctx;
+ }
+=20
+-void sdl2_gl_scanout(DisplayChangeListener *dcl,
+-                     uint32_t backing_id, bool backing_y_0_top,
+-                     uint32_t backing_width, uint32_t backing_height,
+-                     uint32_t x, uint32_t y,
+-                     uint32_t w, uint32_t h)
++void sdl2_gl_scanout_texture(DisplayChangeListener *dcl,
++                             uint32_t backing_id,
++                             bool backing_y_0_top,
++                             uint32_t backing_width,
++                             uint32_t backing_height,
++                             uint32_t x, uint32_t y,
++                             uint32_t w, uint32_t h)
+ {
+     struct sdl2_console *scon =3D container_of(dcl, struct sdl2_console,=
+ dcl);
+=20
+diff --git a/ui/sdl2.c b/ui/sdl2.c
+index 91fb111..febda80 100644
+--- a/ui/sdl2.c
++++ b/ui/sdl2.c
+@@ -733,7 +733,7 @@ static const DisplayChangeListenerOps dcl_gl_ops =3D =
+{
+     .dpy_gl_ctx_destroy      =3D sdl2_gl_destroy_context,
+     .dpy_gl_ctx_make_current =3D sdl2_gl_make_context_current,
+     .dpy_gl_ctx_get_current  =3D sdl2_gl_get_current_context,
+-    .dpy_gl_scanout          =3D sdl2_gl_scanout,
++    .dpy_gl_scanout_texture  =3D sdl2_gl_scanout_texture,
+     .dpy_gl_update           =3D sdl2_gl_scanout_flush,
+ };
+ #endif
+diff --git a/ui/spice-display.c b/ui/spice-display.c
+index 64e472e..b80a9f3 100644
+--- a/ui/spice-display.c
++++ b/ui/spice-display.c
+@@ -928,13 +928,13 @@ static QEMUGLContext qemu_spice_gl_create_context(D=
+isplayChangeListener *dcl,
+     return qemu_egl_create_context(dcl, params);
+ }
+=20
+-static void qemu_spice_gl_scanout(DisplayChangeListener *dcl,
+-                                  uint32_t tex_id,
+-                                  bool y_0_top,
+-                                  uint32_t backing_width,
+-                                  uint32_t backing_height,
+-                                  uint32_t x, uint32_t y,
+-                                  uint32_t w, uint32_t h)
++static void qemu_spice_gl_scanout_texture(DisplayChangeListener *dcl,
++                                          uint32_t tex_id,
++                                          bool y_0_top,
++                                          uint32_t backing_width,
++                                          uint32_t backing_height,
++                                          uint32_t x, uint32_t y,
++                                          uint32_t w, uint32_t h)
+ {
+     SimpleSpiceDisplay *ssd =3D container_of(dcl, SimpleSpiceDisplay, dc=
+l);
+     EGLint stride =3D 0, fourcc =3D 0;
+@@ -993,7 +993,7 @@ static const DisplayChangeListenerOps display_listene=
+r_gl_ops =3D {
+     .dpy_gl_ctx_make_current =3D qemu_egl_make_context_current,
+     .dpy_gl_ctx_get_current  =3D qemu_egl_get_current_context,
+=20
+-    .dpy_gl_scanout          =3D qemu_spice_gl_scanout,
++    .dpy_gl_scanout_texture  =3D qemu_spice_gl_scanout_texture,
+     .dpy_gl_update           =3D qemu_spice_gl_update,
+ };
+=20
+--=20
 1.8.3.1
