@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1ciIMU-0003Ry-Nt
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:17:00 -0500
+	(envelope-from <bounces@canonical.com>) id 1ciILk-0002rC-IL
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:16:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1ciIMP-0005RW-M1
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:16:58 -0500
-Received: from mx4-phx2.redhat.com ([209.132.183.25]:47615)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1ciIMP-0005Qy-DX
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:16:53 -0500
-Date: Mon, 27 Feb 2017 05:16:51 -0500 (EST)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>
-Message-ID: <1800937540.12350937.1488190611084.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20170227101013.GB2350@work-vm>
-References: <20170224202345.13311-1-marcandre.lureau@redhat.com>
-	<20170227101013.GB2350@work-vm>
+	(envelope-from <bounces@canonical.com>) id 1ciILf-0004xQ-GD
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:16:12 -0500
+Received: from indium.canonical.com ([91.189.90.7]:52144)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ciILf-0004xC-9w
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:16:07 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1ciILe-0004Kt-4g
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 10:16:06 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9E8EA2E80C6
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 10:16:05 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] vhost-user: delay vhost_user_stop
+Date: Mon, 27 Feb 2017 10:01:36 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1668103 <1668103@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170226205013.23267.77116.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170227100136.20287.14613.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1668103] Re: Possible off-by-one error in
+ priority handling of hw/PL190.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,129 +37,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: qemu-devel@nongnu.org
 
-Hi
+For a one-off one-liner bugfix patch it's easier for me to grab it from
+the bug tracker than require the submitter to resend, though... I'll
+have a look at it later today.
 
------ Original Message -----
-> * Marc-Andr=C3=A9 Lureau (marcandre.lureau@redhat.com) wrote:
-> > Since commit b0a335e351103bf92f3f9d0bd5759311be8156ac, a socket write
-> > may trigger a disconnect events, calling vhost_user_stop() and clearing
-> > all the vhost_dev strutures holding data that vhost.c functions expect
-> > to remain valid. Delay the cleanup to keep the vhost_dev structure
-> > valid during the vhost.c functions.
-> >=20
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->=20
-> This does get me through a 'make check' succesfully.
->=20
+-- =
 
-Yes, it's not optimal, but there is so much cleanup to deal with otherwise,=
- than I am inclined to go with this approach for now, and keep the FIXME fo=
-r 2.10
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1668103
 
-I'll update the patch to avoid the race on reconnect.
+Title:
+  Possible off-by-one error in priority handling of hw/PL190.c
 
-> Dave
->=20
-> > ---
-> >  net/vhost-user.c | 49 +++++++++++++++++++++++++++++++++++++++++++-----=
--
-> >  1 file changed, 43 insertions(+), 6 deletions(-)
-> >=20
-> > diff --git a/net/vhost-user.c b/net/vhost-user.c
-> > index 77b8110f8c..00573c8ac8 100644
-> > --- a/net/vhost-user.c
-> > +++ b/net/vhost-user.c
-> > @@ -25,6 +25,7 @@ typedef struct VhostUserState {
-> >      guint watch;
-> >      uint64_t acked_features;
-> >      bool started;
-> > +    QEMUBH *chr_closed_bh;
-> >  } VhostUserState;
-> > =20
-> >  VHostNetState *vhost_user_get_vhost_net(NetClientState *nc)
-> > @@ -190,9 +191,40 @@ static gboolean net_vhost_user_watch(GIOChannel *c=
-han,
-> > GIOCondition cond,
-> > =20
-> >      qemu_chr_fe_disconnect(&s->chr);
-> > =20
-> > +    s->watch =3D 0;
-> >      return FALSE;
-> >  }
-> > =20
-> > +static void chr_closed_bh(void *opaque)
-> > +{
-> > +    const char *name =3D opaque;
-> > +    NetClientState *ncs[MAX_QUEUE_NUM];
-> > +    VhostUserState *s;
-> > +    Error *err =3D NULL;
-> > +    int queues;
-> > +
-> > +    queues =3D qemu_find_net_clients_except(name, ncs,
-> > +                                          NET_CLIENT_DRIVER_NIC,
-> > +                                          MAX_QUEUE_NUM);
-> > +    assert(queues < MAX_QUEUE_NUM);
-> > +
-> > +    s =3D DO_UPCAST(VhostUserState, nc, ncs[0]);
-> > +
-> > +    qmp_set_link(name, false, &err);
-> > +    vhost_user_stop(queues, ncs);
-> > +    if (s->watch) {
-> > +        g_source_remove(s->watch);
-> > +    }
-> > +    s->watch =3D 0;
-> > +
-> > +    qemu_bh_delete(s->chr_closed_bh);
-> > +    s->chr_closed_bh =3D NULL;
-> > +
-> > +    if (err) {
-> > +        error_report_err(err);
-> > +    }
-> > +}
-> > +
-> >  static void net_vhost_user_event(void *opaque, int event)
-> >  {
-> >      const char *name =3D opaque;
-> > @@ -212,20 +244,25 @@ static void net_vhost_user_event(void *opaque, in=
-t
-> > event)
-> >      trace_vhost_user_event(chr->label, event);
-> >      switch (event) {
-> >      case CHR_EVENT_OPENED:
-> > -        s->watch =3D qemu_chr_fe_add_watch(&s->chr, G_IO_HUP,
-> > -                                         net_vhost_user_watch, s);
-> >          if (vhost_user_start(queues, ncs, &s->chr) < 0) {
-> >              qemu_chr_fe_disconnect(&s->chr);
-> >              return;
-> >          }
-> > +        s->watch =3D qemu_chr_fe_add_watch(&s->chr, G_IO_HUP,
-> > +                                         net_vhost_user_watch, s);
-> >          qmp_set_link(name, true, &err);
-> > +        s->chr_closed_bh =3D qemu_bh_new(chr_closed_bh, opaque);
-> >          s->started =3D true;
-> >          break;
-> >      case CHR_EVENT_CLOSED:
-> > -        qmp_set_link(name, false, &err);
-> > -        vhost_user_stop(queues, ncs);
-> > -        g_source_remove(s->watch);
-> > -        s->watch =3D 0;
-> > +        /* a close event may happen during a read/write, but vhost
-> > +         * code assumes the vhost_dev remains setup, so delay the
-> > +         * stop & clear to idle.
-> > +         * FIXME: better handle failure in vhost code, remove bh
-> > +         */
-> > +        if (s->chr_closed_bh) {
-> > +            qemu_bh_schedule(s->chr_closed_bh);
-> > +        }
-> >          break;
-> >      }
-> > =20
-> > --
-> > 2.12.0.rc2.3.gc93709801
-> >=20
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->=20
+Status in QEMU:
+  In Progress
+
+Bug description:
+  I have a problem when reading back VECTADDR in my proprietary OS's
+  interrupt handler.
+
+  Example client code:
+
+   1) Write INTENCLEAR to clear all interrupt enable bits
+   2) Set all 16 vector control registers to zero
+   3) Set vector address #2 to value 2
+   4) Set vector control #2 to 0x21 (vector_interrupt_enable(0x20) | vector=
+_interrupt_source(0x1) )
+   5) Enable interrupt 1 by writing 0x2 to INTENABLE
+   6) In interrupt handler: read VECTADDR [should read 0x2 (active IRQs vec=
+tor address as set in step 3), reads 0x0 (active vector address index 3 ins=
+tead of index 2)]
+
+  Problem:
+
+  So, for me, the block commented with /* Read vector address at the
+  start of an ISR...  */ in hw/pl190.c has an off by-one error and does
+  not return the vector address of the pending interrupt, but of the
+  next one in the list of priorities (i.e. vector address 3).
+
+  Solution:
+
+  In pl190_update_vectors(), also set the priority bit for the current
+  priority (1<<i) interrupt (if enabled) in s->prio_mask[i] in addition
+  to those of higher priority enabled interrupts. This will cause the
+  loop in the read handling of VECTADDR to terminate an iteration
+  earlier and will deliver the correct interrupt priority as iteration
+  variable i subsequently used for addressing.
+
+  I'll try to provide a patch for this.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1668103/+subscriptions
