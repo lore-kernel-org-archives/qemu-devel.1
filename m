@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52057)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ciPfg-0002NG-JM
+	(envelope-from <pm215@archaic.org.uk>) id 1ciPfg-0002N7-BB
 	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1ciPfe-0001ub-UQ
+	(envelope-from <pm215@archaic.org.uk>) id 1ciPfd-0001sy-Cv
 	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:16 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48679)
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48678)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1ciPfe-0001rj-L7
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:14 -0500
+	id 1ciPfd-0001qs-3y
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 13:05:13 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1ciPfd-0002Rk-Hb
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:05:13 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1ciPfY-0002O7-Bv
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 18:05:08 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 27 Feb 2017 18:04:55 +0000
-Message-Id: <1488218699-31035-27-git-send-email-peter.maydell@linaro.org>
+Date: Mon, 27 Feb 2017 18:04:45 +0000
+Message-Id: <1488218699-31035-17-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1488218699-31035-1-git-send-email-peter.maydell@linaro.org>
 References: <1488218699-31035-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 26/30] hw/sd: add card-reparenting function
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 16/30] arm: gic: Remove references to NVIC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,86 +32,205 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Clement Deschamps <clement.deschamps@antfield.fr>
+From: Michael Davidsaver <mdavidsaver@gmail.com>
 
-Provide a new function sdbus_reparent_card() in sd core for reparenting
-a card from a SDBus to another one.
+Now that the NVIC is its own separate implementation, we can
+clean up the GIC code by removing REV_NVIC and conditionals
+which use it.
 
-This function is required by the raspi platform, where the two SD
-controllers can be dynamically switched.
-
-Signed-off-by: Clement Deschamps <clement.deschamps@antfield.fr>
-Message-id: 20170224164021.9066-3-clement.deschamps@antfield.fr
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-[PMM: added a doc comment to the header file]
+Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- include/hw/sd/sd.h | 11 +++++++++++
- hw/sd/core.c       | 30 ++++++++++++++++++++++++++++++
- 2 files changed, 41 insertions(+)
+ hw/intc/gic_internal.h   |  7 ++-----
+ hw/intc/arm_gic.c        | 31 +++++--------------------------
+ hw/intc/arm_gic_common.c | 23 ++++++++---------------
+ 3 files changed, 15 insertions(+), 46 deletions(-)
 
-diff --git a/include/hw/sd/sd.h b/include/hw/sd/sd.h
-index 79909b2..96caefe 100644
---- a/include/hw/sd/sd.h
-+++ b/include/hw/sd/sd.h
-@@ -140,6 +140,17 @@ uint8_t sdbus_read_data(SDBus *sd);
- bool sdbus_data_ready(SDBus *sd);
- bool sdbus_get_inserted(SDBus *sd);
- bool sdbus_get_readonly(SDBus *sd);
-+/**
-+ * sdbus_reparent_card: Reparent an SD card from one controller to another
-+ * @from: controller bus to remove card from
-+ * @to: controller bus to move card to
-+ *
-+ * Reparent an SD card, effectively unplugging it from one controller
-+ * and inserting it into another. This is useful for SoCs like the
-+ * bcm2835 which have two SD controllers and connect a single SD card
-+ * to them, selected by the guest reprogramming GPIO line routing.
-+ */
-+void sdbus_reparent_card(SDBus *from, SDBus *to);
+diff --git a/hw/intc/gic_internal.h b/hw/intc/gic_internal.h
+index 3f31174..7fe87b1 100644
+--- a/hw/intc/gic_internal.h
++++ b/hw/intc/gic_internal.h
+@@ -25,9 +25,7 @@
  
- /* Functions to be used by SD devices to report back to qdevified controllers */
- void sdbus_set_inserted(SDBus *sd, bool inserted);
-diff --git a/hw/sd/core.c b/hw/sd/core.c
-index 14c2bdf..a8f24f5 100644
---- a/hw/sd/core.c
-+++ b/hw/sd/core.c
-@@ -131,6 +131,36 @@ void sdbus_set_readonly(SDBus *sdbus, bool readonly)
+ #define ALL_CPU_MASK ((unsigned)(((1 << GIC_NCPU) - 1)))
+ 
+-/* The NVIC has 16 internal vectors.  However these are not exposed
+-   through the normal GIC interface.  */
+-#define GIC_BASE_IRQ ((s->revision == REV_NVIC) ? 32 : 0)
++#define GIC_BASE_IRQ 0
+ 
+ #define GIC_SET_ENABLED(irq, cm) s->irq_state[irq].enabled |= (cm)
+ #define GIC_CLEAR_ENABLED(irq, cm) s->irq_state[irq].enabled &= ~(cm)
+@@ -75,7 +73,6 @@
+ 
+ /* The special cases for the revision property: */
+ #define REV_11MPCORE 0
+-#define REV_NVIC 0xffffffff
+ 
+ void gic_set_pending_private(GICState *s, int cpu, int irq);
+ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs);
+@@ -87,7 +84,7 @@ void gic_set_priority(GICState *s, int cpu, int irq, uint8_t val,
+ 
+ static inline bool gic_test_pending(GICState *s, int irq, int cm)
+ {
+-    if (s->revision == REV_NVIC || s->revision == REV_11MPCORE) {
++    if (s->revision == REV_11MPCORE) {
+         return s->irq_state[irq].pending & cm;
+     } else {
+         /* Edge-triggered interrupts are marked pending on a rising edge, but
+diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
+index 521aac3..8e5a9d8 100644
+--- a/hw/intc/arm_gic.c
++++ b/hw/intc/arm_gic.c
+@@ -156,17 +156,6 @@ static void gic_set_irq_11mpcore(GICState *s, int irq, int level,
      }
  }
  
-+void sdbus_reparent_card(SDBus *from, SDBus *to)
-+{
-+    BusChild *kid = QTAILQ_FIRST(&from->qbus.children);
-+    SDState *card;
-+    SDCardClass *sc;
-+    bool readonly;
-+
-+    /* We directly reparent the card object rather than implementing this
-+     * as a hotpluggable connection because we don't want to expose SD cards
-+     * to users as being hotpluggable, and we can get away with it in this
-+     * limited use case. This could perhaps be implemented more cleanly in
-+     * future by adding support to the hotplug infrastructure for "device
-+     * can be hotplugged only via code, not by user".
+-static void gic_set_irq_nvic(GICState *s, int irq, int level,
+-                                 int cm, int target)
+-{
+-    if (level) {
+-        GIC_SET_LEVEL(irq, cm);
+-        GIC_SET_PENDING(irq, target);
+-    } else {
+-        GIC_CLEAR_LEVEL(irq, cm);
+-    }
+-}
+-
+ static void gic_set_irq_generic(GICState *s, int irq, int level,
+                                 int cm, int target)
+ {
+@@ -214,8 +203,6 @@ static void gic_set_irq(void *opaque, int irq, int level)
+ 
+     if (s->revision == REV_11MPCORE) {
+         gic_set_irq_11mpcore(s, irq, level, cm, target);
+-    } else if (s->revision == REV_NVIC) {
+-        gic_set_irq_nvic(s, irq, level, cm, target);
+     } else {
+         gic_set_irq_generic(s, irq, level, cm, target);
+     }
+@@ -367,7 +354,7 @@ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs)
+         return 1023;
+     }
+ 
+-    if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
++    if (s->revision == REV_11MPCORE) {
+         /* Clear pending flags for both level and edge triggered interrupts.
+          * Level triggered IRQs will be reasserted once they become inactive.
+          */
+@@ -589,11 +576,6 @@ void gic_complete_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs)
+             DPRINTF("Set %d pending mask %x\n", irq, cm);
+             GIC_SET_PENDING(irq, cm);
+         }
+-    } else if (s->revision == REV_NVIC) {
+-        if (GIC_TEST_LEVEL(irq, cm)) {
+-            DPRINTF("Set nvic %d pending mask %x\n", irq, cm);
+-            GIC_SET_PENDING(irq, cm);
+-        }
+     }
+ 
+     group = gic_has_groups(s) && GIC_TEST_GROUP(irq, cm);
+@@ -768,7 +750,7 @@ static uint32_t gic_dist_readb(void *opaque, hwaddr offset, MemTxAttrs attrs)
+     } else if (offset < 0xf10) {
+         goto bad_reg;
+     } else if (offset < 0xf30) {
+-        if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
++        if (s->revision == REV_11MPCORE) {
+             goto bad_reg;
+         }
+ 
+@@ -802,9 +784,6 @@ static uint32_t gic_dist_readb(void *opaque, hwaddr offset, MemTxAttrs attrs)
+             case 2:
+                 res = gic_id_gicv2[(offset - 0xfd0) >> 2];
+                 break;
+-            case REV_NVIC:
+-                /* Shouldn't be able to get here */
+-                abort();
+             default:
+                 res = 0;
+             }
+@@ -1028,7 +1007,7 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
+                 continue; /* Ignore Non-secure access of Group0 IRQ */
+             }
+ 
+-            if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
++            if (s->revision == REV_11MPCORE) {
+                 if (value & (1 << (i * 2))) {
+                     GIC_SET_MODEL(irq + i);
+                 } else {
+@@ -1046,7 +1025,7 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
+         goto bad_reg;
+     } else if (offset < 0xf20) {
+         /* GICD_CPENDSGIRn */
+-        if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
++        if (s->revision == REV_11MPCORE) {
+             goto bad_reg;
+         }
+         irq = (offset - 0xf10);
+@@ -1060,7 +1039,7 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
+         }
+     } else if (offset < 0xf30) {
+         /* GICD_SPENDSGIRn */
+-        if (s->revision == REV_11MPCORE || s->revision == REV_NVIC) {
++        if (s->revision == REV_11MPCORE) {
+             goto bad_reg;
+         }
+         irq = (offset - 0xf20);
+diff --git a/hw/intc/arm_gic_common.c b/hw/intc/arm_gic_common.c
+index 4a8df44..70f1134 100644
+--- a/hw/intc/arm_gic_common.c
++++ b/hw/intc/arm_gic_common.c
+@@ -99,9 +99,7 @@ void gic_init_irqs_and_mmio(GICState *s, qemu_irq_handler handler,
+      *  [N+32..N+63] PPIs for CPU 1
+      *   ...
+      */
+-    if (s->revision != REV_NVIC) {
+-        i += (GIC_INTERNAL * s->num_cpu);
+-    }
++    i += (GIC_INTERNAL * s->num_cpu);
+     qdev_init_gpio_in(DEVICE(s), handler, i);
+ 
+     for (i = 0; i < s->num_cpu; i++) {
+@@ -121,16 +119,12 @@ void gic_init_irqs_and_mmio(GICState *s, qemu_irq_handler handler,
+     memory_region_init_io(&s->iomem, OBJECT(s), ops, s, "gic_dist", 0x1000);
+     sysbus_init_mmio(sbd, &s->iomem);
+ 
+-    if (s->revision != REV_NVIC) {
+-        /* This is the main CPU interface "for this core". It is always
+-         * present because it is required by both software emulation and KVM.
+-         * NVIC is not handled here because its CPU interface is different,
+-         * neither it can use KVM.
+-         */
+-        memory_region_init_io(&s->cpuiomem[0], OBJECT(s), ops ? &ops[1] : NULL,
+-                              s, "gic_cpu", s->revision == 2 ? 0x2000 : 0x100);
+-        sysbus_init_mmio(sbd, &s->cpuiomem[0]);
+-    }
++    /* This is the main CPU interface "for this core". It is always
++     * present because it is required by both software emulation and KVM.
 +     */
-+
-+    if (!kid) {
-+        return;
-+    }
-+
-+    card = SD_CARD(kid->child);
-+    sc = SD_CARD_GET_CLASS(card);
-+    readonly = sc->get_readonly(card);
-+
-+    sdbus_set_inserted(from, false);
-+    object_unparent(OBJECT(kid));
-+    qdev_set_parent_bus(DEVICE(card), &to->qbus);
-+    sdbus_set_inserted(to, true);
-+    sdbus_set_readonly(to, readonly);
-+}
-+
- static const TypeInfo sd_bus_info = {
-     .name = TYPE_SD_BUS,
-     .parent = TYPE_BUS,
++    memory_region_init_io(&s->cpuiomem[0], OBJECT(s), ops ? &ops[1] : NULL,
++                          s, "gic_cpu", s->revision == 2 ? 0x2000 : 0x100);
++    sysbus_init_mmio(sbd, &s->cpuiomem[0]);
+ }
+ 
+ static void arm_gic_common_realize(DeviceState *dev, Error **errp)
+@@ -162,7 +156,7 @@ static void arm_gic_common_realize(DeviceState *dev, Error **errp)
+     }
+ 
+     if (s->security_extn &&
+-        (s->revision == REV_11MPCORE || s->revision == REV_NVIC)) {
++        (s->revision == REV_11MPCORE)) {
+         error_setg(errp, "this GIC revision does not implement "
+                    "the security extensions");
+         return;
+@@ -255,7 +249,6 @@ static Property arm_gic_common_properties[] = {
+     DEFINE_PROP_UINT32("num-irq", GICState, num_irq, 32),
+     /* Revision can be 1 or 2 for GIC architecture specification
+      * versions 1 or 2, or 0 to indicate the legacy 11MPCore GIC.
+-     * (Internally, 0xffffffff also indicates "not a GIC but an NVIC".)
+      */
+     DEFINE_PROP_UINT32("revision", GICState, revision, 1),
+     /* True if the GIC should implement the security extensions */
 -- 
 2.7.4
