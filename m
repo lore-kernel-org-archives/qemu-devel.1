@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ciKjk-0007Ip-Sm
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:49:09 -0500
+	(envelope-from <xzhou@redhat.com>) id 1ciKki-00087z-Ia
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:50:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ciKjh-0001Or-K3
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:49:08 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33696)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ciKjh-0001Ol-C4
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:49:05 -0500
-Received: by mail-wm0-x241.google.com with SMTP id v77so13283569wmv.0
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 04:49:05 -0800 (PST)
-Date: Mon, 27 Feb 2017 12:49:01 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170227124901.GH28403@stefanha-x1.localdomain>
-References: <148814889214.28146.16915712763478774662.stgit@bahia>
-	<148814893846.28146.10539730675852394601.stgit@bahia>
+	(envelope-from <xzhou@redhat.com>) id 1ciKkf-0001dJ-FX
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:50:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48914)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <xzhou@redhat.com>) id 1ciKkf-0001cl-9H
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 07:50:05 -0500
+Date: Mon, 27 Feb 2017 20:50:03 +0800
+From: Xiong Zhou <xzhou@redhat.com>
+Message-ID: <20170227125003.fegyd7gbrfdvrwjv@XZHOUW.usersys.redhat.com>
+References: <20170227094050.ia6nrkvtvzmg7b2q@XZHOUW.usersys.redhat.com>
+	<20170227101104.GB28403@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ik0NlRzMGhMnxrMX"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <148814893846.28146.10539730675852394601.stgit@bahia>
-Subject: Re: [Qemu-devel] [PATCH v2 06/28] 9pfs: local: open/opendir: don't
- follow symlinks
+In-Reply-To: <20170227101104.GB28403@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] Fail to start 2nd guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,56 +27,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Jann Horn <jannh@google.com>, Prasad J Pandit <prasad@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Xiong Zhou <xzhou@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org
+
+On Mon, Feb 27, 2017 at 10:11:04AM +0000, Stefan Hajnoczi wrote:
+> On Mon, Feb 27, 2017 at 05:40:50PM +0800, Xiong Zhou wrote:
+> > It worked fine on Linus tree commit:
+> >   7bb0338 Merge tag 'rodata-v4.11-rc1' of git://git.kernel.org/pub/scm/..
+> > 
+> > failed to start 2nd domain on this commit:
+> > 37c8596 Merge tag 'tty-4.11-rc1' of git://git.kernel.org/pub/scm/..
+> > (this commit probably is not the first bad, i didn't do the bisecting)
+> > 
+> > 
+> > sh-4.2# uname -r
+> > 4.10.0-master-37c8596+
+> > sh-4.2# rpm -qv qemu
+> > qemu-2.0.0-1.el7.6.x86_64
+> > sh-4.2# ps ajxf | grep qemu
+> > ...
+> > sh-4.2# virsh list
+> >  Id    Name                           State
+> > ----------------------------------------------------
+> >  1     73h                            running
+> > 
+> > sh-4.2# virsh start 73us
+> > error: Failed to start domain 73us
+> > error: internal error: qemu unexpectedly closed the monitor: ((null):11497): Spice-Warning **: reds.c:2499:reds_init_socket: listen: Address already in use
+> > 2017-02-27T09:33:42.335708Z qemu-kvm: failed to initialize spice server
+> 
+> The error message says that the spice remote desktop cannot listen on
+> -spice port=5900,addr=127.0.0.1.
+> 
+> Did you hardcode port 5900 in the domain XML?  That could explain why
+No.
+> the second guest fails to launch - you need to use unique port numbers
+> or let libvirt automatically assign them.  Check the domain XML:
+> 
+>   <graphics type='spice' port='-1' tlsPort='-1' autoport='yes'>
+
+It looks like:
+
+    <graphics type='spice' autoport='yes'>
+      <listen type='address'/>
+      <image compression='off'/>
+    </graphics>
 
 
---ik0NlRzMGhMnxrMX
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Sun, Feb 26, 2017 at 11:42:18PM +0100, Greg Kurz wrote:
-> @@ -48,6 +49,24 @@ typedef struct {
->      int mountfd;
->  } LocalData;
-> =20
-> +int local_open_nofollow(FsContext *fs_ctx, const char *path, int flags,
-> +                        mode_t mode)
-> +{
-> +    LocalData *data =3D fs_ctx->private;
-> +
-> +    /* All paths are relative to the path data->mountfd points to */
-> +    while (*path =3D=3D '/') {
-> +        path++;
-> +    }
-> +
-> +    return openat_nofollow(data->mountfd, path, flags, mode);
-
-What about all the other openat_nofollow() users?  They don't explicitly
-strip leading slashes.  Perhaps this should be part of a renamed
-relative_openat_nofollow() function.
-
-> +}
-> +
-> +int local_opendir_nofollow(FsContext *fs_ctx, const char *path)
-> +{
-> +    return local_open_nofollow(fs_ctx, path, O_DIRECTORY | O_RDONLY, 0);
-
-Why not strip slashes here?
-
---ik0NlRzMGhMnxrMX
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYtCA9AAoJEJykq7OBq3PIDbEH/ApuJrKUcV0xPFNw82c+fHfX
-OD8s18OIBY3UA/YDpJgVuBFCxFw6onlns6bi3ple0ZIAdl5azB8SSpix5wDCVIAC
-jF8gMzx19sDNPSR1AC7IybLA8mYpX8SzCV3cm1Dlue6AOfLjQAJDZ2HkYAhBVQr5
-D4OKQQpuffbtxP/Qk0mHm0kuTbJU3dW/5uku9/4qaFFdZEWglUtqADeiw9aZJaYr
-agXw0prVUkFQmC9hW54SJU6sv+pvLFAOjc4hFReVFeiNBICRixcR7h+S5ZjEXAfG
-9Uo2gfbO0sMbPzW5/Zyb+uEn5A23asDvcSqoFOpe7GVK/Emqmia3w2hF9+80Qis=
-=wATj
------END PGP SIGNATURE-----
-
---ik0NlRzMGhMnxrMX--
+> 
+> Another possibility is that a process running on the host is already
+> using port 5900.  Perhaps a guest or VNC server that was launched
+> outside of libvirt?  You can check this with:
+> 
+>   netstat -alpn | grep 5900
+# netstat -alpn | grep 5900
+tcp        0      0 127.0.0.1:5900          0.0.0.0:*               LISTEN      11065/qemu-kvm      
+> 
+> Stefan
