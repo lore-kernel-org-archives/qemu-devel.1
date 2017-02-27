@@ -1,18 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41287)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mbenes@suse.cz>) id 1ciH4D-000834-Ng
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 03:54:02 -0500
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1ciHDN-0001dc-50
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 04:03:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mbenes@suse.cz>) id 1ciH4A-0001Xd-Mf
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 03:54:01 -0500
-Received: from mx2.suse.de ([195.135.220.15]:57338)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mbenes@suse.cz>) id 1ciH4A-0001XP-Gm
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 03:53:58 -0500
-From: Miroslav Benes <mbenes@suse.cz>
-Date: Mon, 27 Feb 2017 09:53:53 +0100
-Message-Id: <20170227085353.20787-1-mbenes@suse.cz>
-Subject: [Qemu-devel] [PATCH v2] target-s390x: Implement lpp instruction
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1ciHDK-0004Uz-19
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 04:03:29 -0500
+Received: from [59.151.112.132] (port=42260 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1ciHDJ-0004UD-1N
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 04:03:25 -0500
+References: <1487993530-30875-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1487993530-30875-4-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<58B12B02.2000202@huawei.com>
+	<31f0e89c-13c0-247a-1026-9fc28ee2d6f4@cn.fujitsu.com>
+	<58B3D525.6080104@huawei.com>
+	<a675b8e4-99ca-492a-921c-7e510a23b94c@cn.fujitsu.com>
+	<58B3E69B.2050905@huawei.com>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <a0052a82-4dbe-4a81-77e6-2f035df3a3f3@cn.fujitsu.com>
+Date: Mon, 27 Feb 2017 17:02:33 +0800
+MIME-Version: 1.0
+In-Reply-To: <58B3E69B.2050905@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 2/3] COLO-compare: Optimize
+ colo_packet_compare_common
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,61 +33,198 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: rth@twiddle.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org, mmarek@suse.com, ebischoff@suse.com, thuth@redhat.com, Miroslav Benes <mbenes@suse.cz>
+To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>, qemu-devel@nongnu.org
+Cc: zhangchen.fnst@cn.fujitsu.com, xuquan8@huawei.com
 
-Linux arch/s390/kernel/head(64).S uses lpp instruction if it is
-available in facilities list provided by stfl/stfle instruction. This is
-the case of newer z/System generations and their qemu definition.
 
-Signed-off-by: Miroslav Benes <mbenes@suse.cz>
----
-v2
-- remove potential_page_fault()
 
- target/s390x/insn-data.def | 2 ++
- target/s390x/translate.c   | 9 +++++++++
- 2 files changed, 11 insertions(+)
+On 02/27/2017 04:43 PM, Hailiang Zhang wrote:
+> On 2017/2/27 15:34, Zhang Chen wrote:
+>>
+>>
+>> On 02/27/2017 03:28 PM, Hailiang Zhang wrote:
+>>> On 2017/2/27 15:03, Zhang Chen wrote:
+>>>>
+>>>>
+>>>> On 02/25/2017 02:58 PM, Hailiang Zhang wrote:
+>>>>> On 2017/2/25 11:32, Zhang Chen wrote:
+>>>>>> Add offset args for colo_packet_compare_common, optimize
+>>>>>> colo_packet_compare_icmp() and colo_packet_compare_udp()
+>>>>>> just compare the IP payload.
+>>>>>>
+>>>>>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+>>>>>> ---
+>>>>>>     net/colo-compare.c | 28 +++++++++++++++++++++-------
+>>>>>>     1 file changed, 21 insertions(+), 7 deletions(-)
+>>>>>>
+>>>>>> diff --git a/net/colo-compare.c b/net/colo-compare.c
+>>>>>> index e75f0ae..9853232 100644
+>>>>>> --- a/net/colo-compare.c
+>>>>>> +++ b/net/colo-compare.c
+>>>>>> @@ -180,7 +180,7 @@ static int packet_enqueue(CompareState *s, int
+>>>>>> mode)
+>>>>>>      * return:    0  means packet same
+>>>>>>      *            > 0 || < 0 means packet different
+>>>>>>      */
+>>>>>> -static int colo_packet_compare_common(Packet *ppkt, Packet *spkt)
+>>>>>> +static int colo_packet_compare_common(Packet *ppkt, Packet *spkt,
+>>>>>> int offset)
+>>>>>>     {
+>>>>>>         trace_colo_compare_ip_info(ppkt->size,
+>>>>>> inet_ntoa(ppkt->ip->ip_src),
+>>>>>> inet_ntoa(ppkt->ip->ip_dst), spkt->size,
+>>>>>> @@ -188,7 +188,8 @@ static int colo_packet_compare_common(Packet
+>>>>>> *ppkt, Packet *spkt)
+>>>>>> inet_ntoa(spkt->ip->ip_dst));
+>>>>>>
+>>>>>>         if (ppkt->size == spkt->size) {
+>>>>>> -        return memcmp(ppkt->data, spkt->data, spkt->size);
+>>>>>> +        return memcmp(ppkt->data + offset, spkt->data + offset,
+>>>>>> +                      spkt->size - offset);
+>>>>>>         } else {
+>>>>>>             trace_colo_compare_main("Net packet size are not the
+>>>>>> same");
+>>>>>>             return -1;
+>>>>>> @@ -237,8 +238,7 @@ static int colo_packet_compare_tcp(Packet *spkt,
+>>>>>> Packet *ppkt)
+>>>>>>             spkt->ip->ip_sum = ppkt->ip->ip_sum;
+>>>>>>         }
+>>>>>>
+>>>>>> -    res = memcmp(ppkt->data + ETH_HLEN, spkt->data + ETH_HLEN,
+>>>>>> -                (spkt->size - ETH_HLEN));
+>>>>>> +    res = colo_packet_compare_common(ppkt, spkt, ETH_HLEN);
+>>>>>>
+>>>>>
+>>>>> For tcp packets check, why not ignore the ip headers, just like udp
+>>>>> packets check ?
+>>>>> Besides, here, can we compare the checksum stored in headers of tcp
+>>>>> and udp
+>>>>> before call colo_packet_compare_common(), which i think will improve
+>>>>> the comparing
+>>>>> performance.
+>>>>
+>>>> That's another way to compare the packet suggested by Dr. David Alan
+>>>> Gilbert,
+>>>> It makes two packets IP header be same firstly, then compare all IP
+>>>> packet.
+>>>> This way can tell people why we ignore IP header explicitly in other
+>>>> packets check like udp.
+>>>> For performance, If we ignore the IP header that will reduce at 
+>>>> least 20
+>>>> byte not to be compared.
+>>>> So, ignore ip header have better comparing performance.
+>>>>
+>>>
+>>> OK, here, i think we can re-use the checksum value stored in headers
+>>> of tcp
+>>> or udp, comparing it first before comparing the complete payload of
+>>> tcp or udp
+>>> packets is another way to improve the performance, it is only 2 bytes.
+>>
+>> No, The IP header's checksum are always different, Because the IP
+>> header's ID field
+>> are always different.
+>>
+>
+> Not checksum in ip header， i mean checksum in tcp header or udp header.
 
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 075ff597c3de..880b0403cb5e 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -843,6 +843,8 @@
- /* LOAD CONTROL */
-     C(0xb700, LCTL,    RS_a,  Z,   0, a2, 0, 0, lctl, 0)
-     C(0xeb2f, LCTLG,   RSY_a, Z,   0, a2, 0, 0, lctlg, 0)
-+/* LOAD PROGRAM PARAMETER */
-+    C(0xb280, LPP,     S,   LPP,   0, m2_64, 0, 0, lpp, 0)
- /* LOAD PSW */
-     C(0x8200, LPSW,    S,     Z,   0, a2, 0, 0, lpsw, 0)
- /* LOAD PSW EXTENDED */
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 01c62176bf70..3032d495dcf8 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -1194,6 +1194,7 @@ typedef enum DisasFacility {
-     FAC_SCF,                /* store clock fast */
-     FAC_SFLE,               /* store facility list extended */
-     FAC_ILA,                /* interlocked access facility 1 */
-+    FAC_LPP,                /* load-program-parameter */
- } DisasFacility;
- 
- struct DisasInsn {
-@@ -2567,6 +2568,14 @@ static ExitStatus op_lra(DisasContext *s, DisasOps *o)
-     return NO_EXIT;
- }
- 
-+static ExitStatus op_lpp(DisasContext *s, DisasOps *o)
-+{
-+    check_privileged(s);
-+
-+    tcg_gen_st_i64(o->in2, cpu_env, offsetof(CPUS390XState, pp));
-+    return NO_EXIT;
-+}
-+
- static ExitStatus op_lpsw(DisasContext *s, DisasOps *o)
- {
-     TCGv_i64 t1, t2;
+TCP header can do it, but UDP header's checksum is optional.
+
+Thanks
+Zhang Chen
+
+>
+>
+>> Thanks
+>> Zhang Chen
+>>
+>>>
+>>> Thanks.
+>>>
+>>>> Thanks
+>>>> Zhang Chen
+>>>>
+>>>>
+>>>>>
+>>>>> Thanks.
+>>>>> Hailiang
+>>>>>
+>>>>>>         if (res != 0 &&
+>>>>>> trace_event_get_state(TRACE_COLO_COMPARE_MISCOMPARE)) {
+>>>>>> trace_colo_compare_pkt_info_src(inet_ntoa(ppkt->ip->ip_src),
+>>>>>> @@ -277,7 +277,14 @@ static int colo_packet_compare_udp(Packet 
+>>>>>> *spkt,
+>>>>>> Packet *ppkt)
+>>>>>>             return -1;
+>>>>>>         }
+>>>>>>
+>>>>>> -    ret = colo_packet_compare_common(ppkt, spkt);
+>>>>>> +    /*
+>>>>>> +     * Because of ppkt and spkt are both in the same connection,
+>>>>>> +     * The ppkt's src ip, dst ip, src port, dst port, ip_proto all
+>>>>>> are
+>>>>>> +     * same with spkt. In addition, IP header's Identification is a
+>>>>>> random
+>>>>>> +     * field, we can handle it in IP fragmentation function later.
+>>>>>> +     * So we just compare the ip payload here.
+>>>>>> +     */
+>>>>>> +    ret = colo_packet_compare_common(ppkt, spkt, network_length +
+>>>>>> ETH_HLEN);
+>>>>>>
+>>>>>>         if (ret) {
+>>>>>>             trace_colo_compare_udp_miscompare("primary pkt size",
+>>>>>> ppkt->size);
+>>>>>> @@ -304,7 +311,14 @@ static int colo_packet_compare_icmp(Packet
+>>>>>> *spkt, Packet *ppkt)
+>>>>>>             return -1;
+>>>>>>         }
+>>>>>>
+>>>>>> -    if (colo_packet_compare_common(ppkt, spkt)) {
+>>>>>> +    /*
+>>>>>> +     * Because of ppkt and spkt are both in the same connection,
+>>>>>> +     * The ppkt's src ip, dst ip, src port, dst port, ip_proto all
+>>>>>> are
+>>>>>> +     * same with spkt. In addition, IP header's Identification is a
+>>>>>> random
+>>>>>> +     * field, we can handle it in IP fragmentation function later.
+>>>>>> +     * So we just compare the ip payload here.
+>>>>>> +     */
+>>>>>> +    if (colo_packet_compare_common(ppkt, spkt, network_length +
+>>>>>> ETH_HLEN)) {
+>>>>>>             trace_colo_compare_icmp_miscompare("primary pkt size",
+>>>>>> ppkt->size);
+>>>>>>             qemu_hexdump((char *)ppkt->data, stderr, "colo-compare",
+>>>>>> @@ -330,7 +344,7 @@ static int colo_packet_compare_other(Packet
+>>>>>> *spkt, Packet *ppkt)
+>>>>>> inet_ntoa(ppkt->ip->ip_dst), spkt->size,
+>>>>>> inet_ntoa(spkt->ip->ip_src),
+>>>>>> inet_ntoa(spkt->ip->ip_dst));
+>>>>>> -    return colo_packet_compare_common(ppkt, spkt);
+>>>>>> +    return colo_packet_compare_common(ppkt, spkt, 0);
+>>>>>>     }
+>>>>>>
+>>>>>>     static int colo_old_packet_check_one(Packet *pkt, int64_t
+>>>>>> *check_time)
+>>>>>>
+>>>>>
+>>>>>
+>>>>>
+>>>>>
+>>>>> .
+>>>>>
+>>>>
+>>>
+>>>
+>>>
+>>> .
+>>>
+>>
+>
+>
+>
+> .
+>
+
 -- 
-2.11.0
+Thanks
+Zhang Chen
