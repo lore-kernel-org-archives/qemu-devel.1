@@ -1,23 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ciPCw-0000XI-8e
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:35:35 -0500
+	(envelope-from <drjones@redhat.com>) id 1ciPEa-0001Rw-Ab
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:37:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ciPCv-0008Qf-FM
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:35:34 -0500
-Date: Mon, 27 Feb 2017 18:35:25 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170227173525.GG6356@noname.redhat.com>
-References: <20170131115728.5244.21690.stgit@PASHA-ISP>
-	<20170131115734.5244.64846.stgit@PASHA-ISP>
-	<20170222100543.GC4112@noname.str.redhat.com>
-	<002701d290f2$1541b9c0$3fc52d40$@ru>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <002701d290f2$1541b9c0$3fc52d40$@ru>
-Subject: Re: [Qemu-devel] [PATCH 1/3] block: implement bdrv_snapshot_goto
- for blkreplay
+	(envelope-from <drjones@redhat.com>) id 1ciPEZ-0000d7-I4
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:37:16 -0500
+From: Andrew Jones <drjones@redhat.com>
+Date: Mon, 27 Feb 2017 18:37:04 +0100
+Message-Id: <20170227173706.15210-1-drjones@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/2] Enable QEMU to control MPIDR values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,36 +17,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org, pbonzini@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, imammedo@redhat.com
 
-Am 27.02.2017 um 13:07 hat Pavel Dovgalyuk geschrieben:
-> > From: Kevin Wolf [mailto:kwolf@redhat.com]
-> > Am 31.01.2017 um 12:57 hat Pavel Dovgalyuk geschrieben:
-> > > This patch enables making snapshots with blkreplay used in
-> > > block devices.
-> > >
-> > > Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-> > 
-> > Specifically, I think it avoids the blkreplay_open/close sequence. Is
-> > this what is needed to make it work?
-> 
-> Then I'll need to implement bdrv_open, because there is only bdrv_file_open
-> for blkreplay now.
-> 
-> Which way is better?
+Igor needs to know/select vcpu MPIDR values early in order to map vcpus
+to vnodes. Waiting until after vcpu init, when KVM sets them, is too
+late. With this patch, and its KVM counterpart, QEMU can control the
+values, allowing it to know/select them whenever it likes.
 
-I was just checking whether I understood the reason for this correctly.
+Andrew Jones (2):
+  HACK: update linux/kvm header
+  arm: kvm: set MPIDR when we can
 
-If I did, then I think your solution is fine and we should just make the
-commit message a bit more explicit.
+ linux-headers/linux/kvm.h |  1 +
+ target/arm/cpu.c          |  3 +--
+ target/arm/kvm32.c        | 22 ++++++++++++++--------
+ target/arm/kvm64.c        | 22 ++++++++++++++--------
+ 4 files changed, 30 insertions(+), 18 deletions(-)
 
-Kevin
-
-> > We should probably mention in the commit message the exact reason why
-> > implementing .bdrv_snapshot_goto, but not the other snapshot related
-> > callbacks, fixes things. If you confirm my assumption, I can add that
-> > while applying.
-> 
-> Pavel Dovgalyuk
-> 
+-- 
+2.9.3
