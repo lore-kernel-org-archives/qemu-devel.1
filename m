@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53469)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ciFll-0006jg-Fv
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:30:55 -0500
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1ciFpx-0001lC-NJ
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:35:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ciFlj-0006wS-FL
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:30:53 -0500
-From: Jeff Cody <jcody@redhat.com>
-Date: Mon, 27 Feb 2017 02:30:40 -0500
-Message-Id: <2b61d5edaab9b15472b72689089f73613cc44fc9.1488180142.git.jcody@redhat.com>
-In-Reply-To: <cover.1488180142.git.jcody@redhat.com>
-References: <cover.1488180142.git.jcody@redhat.com>
-In-Reply-To: <cover.1488180142.git.jcody@redhat.com>
-References: <cover.1488180142.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/4] block/rbd: parse all options via
- bdrv_parse_filename
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1ciFpt-0000FA-1y
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:35:13 -0500
+Received: from [59.151.112.132] (port=50895 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1ciFps-0000D8-4l
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:35:08 -0500
+References: <1487993530-30875-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1487993530-30875-4-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<58B12B02.2000202@huawei.com>
+	<31f0e89c-13c0-247a-1026-9fc28ee2d6f4@cn.fujitsu.com>
+	<58B3D525.6080104@huawei.com>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <a675b8e4-99ca-492a-921c-7e510a23b94c@cn.fujitsu.com>
+Date: Mon, 27 Feb 2017 15:34:41 +0800
+MIME-Version: 1.0
+In-Reply-To: <58B3D525.6080104@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/3] COLO-compare: Optimize
+ colo_packet_compare_common
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,501 +31,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, armbru@redhat.com, berrange@redhat.com, eblake@redhat.com
+To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>, qemu-devel@nongnu.org
+Cc: zhangchen.fnst@cn.fujitsu.com, xuquan8@huawei.com
 
-Get rid of qemu_rbd_parsename in favor of bdrv_parse_filename.
-This simplifies a lot of the parsing as well, as we can treat everything
-a bit simpler since nonexistent options are simply NULL pointers instead
-of empy strings.
 
-An important item to note:
 
-Ceph has many extra option values that can be specified as key/value
-pairs.  This was handled previously in the driver by extracting the
-values that the QEMU driver cared about, and then blindly passing all
-extra options to rbd after splitting them into key/value pairs, and
-cleaning up any special character escaping.
+On 02/27/2017 03:28 PM, Hailiang Zhang wrote:
+> On 2017/2/27 15:03, Zhang Chen wrote:
+>>
+>>
+>> On 02/25/2017 02:58 PM, Hailiang Zhang wrote:
+>>> On 2017/2/25 11:32, Zhang Chen wrote:
+>>>> Add offset args for colo_packet_compare_common, optimize
+>>>> colo_packet_compare_icmp() and colo_packet_compare_udp()
+>>>> just compare the IP payload.
+>>>>
+>>>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+>>>> ---
+>>>>    net/colo-compare.c | 28 +++++++++++++++++++++-------
+>>>>    1 file changed, 21 insertions(+), 7 deletions(-)
+>>>>
+>>>> diff --git a/net/colo-compare.c b/net/colo-compare.c
+>>>> index e75f0ae..9853232 100644
+>>>> --- a/net/colo-compare.c
+>>>> +++ b/net/colo-compare.c
+>>>> @@ -180,7 +180,7 @@ static int packet_enqueue(CompareState *s, int 
+>>>> mode)
+>>>>     * return:    0  means packet same
+>>>>     *            > 0 || < 0 means packet different
+>>>>     */
+>>>> -static int colo_packet_compare_common(Packet *ppkt, Packet *spkt)
+>>>> +static int colo_packet_compare_common(Packet *ppkt, Packet *spkt,
+>>>> int offset)
+>>>>    {
+>>>>        trace_colo_compare_ip_info(ppkt->size,
+>>>> inet_ntoa(ppkt->ip->ip_src),
+>>>> inet_ntoa(ppkt->ip->ip_dst), spkt->size,
+>>>> @@ -188,7 +188,8 @@ static int colo_packet_compare_common(Packet
+>>>> *ppkt, Packet *spkt)
+>>>> inet_ntoa(spkt->ip->ip_dst));
+>>>>
+>>>>        if (ppkt->size == spkt->size) {
+>>>> -        return memcmp(ppkt->data, spkt->data, spkt->size);
+>>>> +        return memcmp(ppkt->data + offset, spkt->data + offset,
+>>>> +                      spkt->size - offset);
+>>>>        } else {
+>>>>            trace_colo_compare_main("Net packet size are not the 
+>>>> same");
+>>>>            return -1;
+>>>> @@ -237,8 +238,7 @@ static int colo_packet_compare_tcp(Packet *spkt,
+>>>> Packet *ppkt)
+>>>>            spkt->ip->ip_sum = ppkt->ip->ip_sum;
+>>>>        }
+>>>>
+>>>> -    res = memcmp(ppkt->data + ETH_HLEN, spkt->data + ETH_HLEN,
+>>>> -                (spkt->size - ETH_HLEN));
+>>>> +    res = colo_packet_compare_common(ppkt, spkt, ETH_HLEN);
+>>>>
+>>>
+>>> For tcp packets check, why not ignore the ip headers, just like udp
+>>> packets check ?
+>>> Besides, here, can we compare the checksum stored in headers of tcp
+>>> and udp
+>>> before call colo_packet_compare_common(), which i think will improve
+>>> the comparing
+>>> performance.
+>>
+>> That's another way to compare the packet suggested by Dr. David Alan
+>> Gilbert,
+>> It makes two packets IP header be same firstly, then compare all IP 
+>> packet.
+>> This way can tell people why we ignore IP header explicitly in other
+>> packets check like udp.
+>> For performance, If we ignore the IP header that will reduce at least 20
+>> byte not to be compared.
+>> So, ignore ip header have better comparing performance.
+>>
+>
+> OK, here, i think we can re-use the checksum value stored in headers 
+> of tcp
+> or udp, comparing it first before comparing the complete payload of 
+> tcp or udp
+> packets is another way to improve the performance, it is only 2 bytes.
 
-The practice is continued in this patch; there is an option
-"keyvalue-pairs" that is populated with all the key/value pairs that the
-QEMU driver does not care about.  These key/value pairs will override
-any settings in the 'conf' configuration file, just as they did before.
+No, The IP header's checksum are always different, Because the IP 
+header's ID field
+are always different.
 
-Signed-off-by: Jeff Cody <jcody@redhat.com>
----
- block/rbd.c | 296 ++++++++++++++++++++++++++++++------------------------------
- 1 file changed, 148 insertions(+), 148 deletions(-)
+Thanks
+Zhang Chen
 
-diff --git a/block/rbd.c b/block/rbd.c
-index c8d4eb1..2eee502 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -18,6 +18,7 @@
- #include "block/block_int.h"
- #include "crypto/secret.h"
- #include "qemu/cutils.h"
-+#include "qapi/qmp/qstring.h"
- 
- #include <rbd/librbd.h>
- 
-@@ -151,113 +152,129 @@ static void qemu_rbd_unescape(char *src)
-     *p = '\0';
- }
- 
--static int qemu_rbd_parsename(const char *filename,
--                              char *pool, int pool_len,
--                              char *snap, int snap_len,
--                              char *name, int name_len,
--                              char *conf, int conf_len,
--                              Error **errp)
-+static void qemu_rbd_parse_filename(const char *filename, QDict *options,
-+                                    Error **errp)
- {
-     const char *start;
--    char *p, *buf;
--    int ret = 0;
-+    char *p, *buf, *keypairs;
-     char *found_str;
-+    size_t max_keypair_size;
-     Error *local_err = NULL;
- 
-     if (!strstart(filename, "rbd:", &start)) {
-         error_setg(errp, "File name must start with 'rbd:'");
--        return -EINVAL;
-+        return;
-     }
- 
-+    max_keypair_size = strlen(start) + 1;
-     buf = g_strdup(start);
-+    keypairs = g_malloc0(max_keypair_size);
-     p = buf;
--    *snap = '\0';
--    *conf = '\0';
- 
--    found_str = qemu_rbd_next_tok(pool_len, p,
-+    found_str = qemu_rbd_next_tok(RBD_MAX_POOL_NAME_SIZE, p,
-                                  '/', "pool name", &p, &local_err);
-     if (local_err) {
-         goto done;
-     }
-     if (!p) {
--        ret = -EINVAL;
-         error_setg(errp, "Pool name is required");
-         goto done;
-     }
-     qemu_rbd_unescape(found_str);
--    g_strlcpy(pool, found_str, pool_len);
-+    qdict_put(options, "pool", qstring_from_str(found_str));
- 
-     if (strchr(p, '@')) {
--        found_str = qemu_rbd_next_tok(name_len, p,
-+        found_str = qemu_rbd_next_tok(RBD_MAX_IMAGE_NAME_SIZE, p,
-                                      '@', "object name", &p, &local_err);
-         if (local_err) {
-             goto done;
-         }
-         qemu_rbd_unescape(found_str);
--        g_strlcpy(name, found_str, name_len);
-+        qdict_put(options, "image", qstring_from_str(found_str));
- 
--        found_str = qemu_rbd_next_tok(snap_len, p,
-+        found_str = qemu_rbd_next_tok(RBD_MAX_SNAP_NAME_SIZE, p,
-                                       ':', "snap name", &p, &local_err);
-         if (local_err) {
-             goto done;
-         }
-         qemu_rbd_unescape(found_str);
--        g_strlcpy(snap, found_str, snap_len);
-+        qdict_put(options, "snapshot", qstring_from_str(found_str));
-     } else {
--        found_str = qemu_rbd_next_tok(name_len, p,
-+        found_str = qemu_rbd_next_tok(RBD_MAX_IMAGE_NAME_SIZE, p,
-                                      ':', "object name", &p, &local_err);
-         if (local_err) {
-             goto done;
-         }
-         qemu_rbd_unescape(found_str);
--        g_strlcpy(name, found_str, name_len);
-+        qdict_put(options, "image", qstring_from_str(found_str));
-     }
-     if (!p) {
-         goto done;
-     }
- 
--    found_str = qemu_rbd_next_tok(conf_len, p,
-+    found_str = qemu_rbd_next_tok(RBD_MAX_CONF_NAME_SIZE, p,
-                                  '\0', "configuration", &p, &local_err);
-     if (local_err) {
-         goto done;
-     }
--    g_strlcpy(conf, found_str, conf_len);
-+
-+    p = found_str;
-+
-+    /* The following are essentially all key/value pairs, and we treat
-+     * 'id' and 'conf' a bit special.  Key/value pairs may be in any order. */
-+    while (p) {
-+        char *name, *value;
-+        name = qemu_rbd_next_tok(RBD_MAX_CONF_NAME_SIZE, p,
-+                                 '=', "conf option name", &p, &local_err);
-+        if (local_err) {
-+            break;
-+        }
-+
-+        if (!p) {
-+            error_setg(errp, "conf option %s has no value", name);
-+            break;
-+        }
-+
-+        qemu_rbd_unescape(name);
-+
-+        value = qemu_rbd_next_tok(RBD_MAX_CONF_VAL_SIZE, p,
-+                                  ':', "conf option value", &p, &local_err);
-+        if (local_err) {
-+            break;
-+        }
-+        qemu_rbd_unescape(value);
-+
-+        if (!strcmp(name, "conf")) {
-+            qdict_put(options, "conf", qstring_from_str(value));
-+        } else if (!strcmp(name, "id")) {
-+            qdict_put(options, "rbd-id" , qstring_from_str(value));
-+        } else {
-+            char *tmp = g_malloc0(max_keypair_size);
-+            /* only use a delimiter if it is not the first keypair found */
-+            /* These are sets of unknown key/value pairs we'll pass along
-+             * to ceph */
-+            if (keypairs[0]) {
-+                snprintf(tmp, max_keypair_size, ":%s=%s", name, value);
-+                pstrcat(keypairs, max_keypair_size, tmp);
-+            } else {
-+                snprintf(keypairs, max_keypair_size, "%s=%s", name, value);
-+            }
-+            g_free(tmp);
-+        }
-+    }
-+
-+    if (keypairs[0]) {
-+        qdict_put(options, "keyvalue-pairs", qstring_from_str(keypairs));
-+    }
-+
- 
- done:
-     if (local_err) {
--        ret = -EINVAL;
-         error_propagate(errp, local_err);
-     }
-     g_free(buf);
--    return ret;
--}
--
--static char *qemu_rbd_parse_clientname(const char *conf, char *clientname)
--{
--    const char *p = conf;
--
--    while (*p) {
--        int len;
--        const char *end = strchr(p, ':');
--
--        if (end) {
--            len = end - p;
--        } else {
--            len = strlen(p);
--        }
--
--        if (strncmp(p, "id=", 3) == 0) {
--            len -= 3;
--            strncpy(clientname, p + 3, len);
--            clientname[len] = '\0';
--            return clientname;
--        }
--        if (end == NULL) {
--            break;
--        }
--        p = end + 1;
--    }
--    return NULL;
-+    g_free(keypairs);
-+    return;
- }
- 
- 
-@@ -280,10 +297,8 @@ static int qemu_rbd_set_auth(rados_t cluster, const char *secretid,
-     return 0;
- }
- 
--
--static int qemu_rbd_set_conf(rados_t cluster, const char *conf,
--                             bool only_read_conf_file,
--                             Error **errp)
-+static int qemu_rbd_set_keypairs(rados_t cluster, const char *keypairs,
-+                                 Error **errp)
- {
-     char *p, *buf;
-     char *name;
-@@ -291,7 +306,7 @@ static int qemu_rbd_set_conf(rados_t cluster, const char *conf,
-     Error *local_err = NULL;
-     int ret = 0;
- 
--    buf = g_strdup(conf);
-+    buf = g_strdup(keypairs);
-     p = buf;
- 
-     while (p) {
-@@ -315,26 +330,11 @@ static int qemu_rbd_set_conf(rados_t cluster, const char *conf,
-         }
-         qemu_rbd_unescape(value);
- 
--        if (strcmp(name, "conf") == 0) {
--            /* read the conf file alone, so it doesn't override more
--               specific settings for a particular device */
--            if (only_read_conf_file) {
--                ret = rados_conf_read_file(cluster, value);
--                if (ret < 0) {
--                    error_setg_errno(errp, -ret, "error reading conf file %s",
--                                     value);
--                    break;
--                }
--            }
--        } else if (strcmp(name, "id") == 0) {
--            /* ignore, this is parsed by qemu_rbd_parse_clientname() */
--        } else if (!only_read_conf_file) {
--            ret = rados_conf_set(cluster, name, value);
--            if (ret < 0) {
--                error_setg_errno(errp, -ret, "invalid conf option %s", name);
--                ret = -EINVAL;
--                break;
--            }
-+        ret = rados_conf_set(cluster, name, value);
-+        if (ret < 0) {
-+            error_setg_errno(errp, -ret, "invalid conf option %s", name);
-+            ret = -EINVAL;
-+            break;
-         }
-     }
- 
-@@ -408,27 +408,16 @@ static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
-     int64_t bytes = 0;
-     int64_t objsize;
-     int obj_order = 0;
--    char pool[RBD_MAX_POOL_NAME_SIZE];
--    char name[RBD_MAX_IMAGE_NAME_SIZE];
--    char snap_buf[RBD_MAX_SNAP_NAME_SIZE];
--    char conf[RBD_MAX_CONF_SIZE];
--    char clientname_buf[RBD_MAX_CONF_SIZE];
--    char *clientname;
-+    const char *pool, *name, *conf, *clientname, *keypairs;
-     const char *secretid;
-     rados_t cluster;
-     rados_ioctx_t io_ctx;
--    int ret;
-+    QDict *options = NULL;
-+    QemuOpts *rbd_opts = NULL;
-+    int ret = 0;
- 
-     secretid = qemu_opt_get(opts, "password-secret");
- 
--    if (qemu_rbd_parsename(filename, pool, sizeof(pool),
--                           snap_buf, sizeof(snap_buf),
--                           name, sizeof(name),
--                           conf, sizeof(conf), &local_err) < 0) {
--        error_propagate(errp, local_err);
--        return -EINVAL;
--    }
--
-     /* Read out options */
-     bytes = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
-                      BDRV_SECTOR_SIZE);
-@@ -436,35 +425,55 @@ static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
-     if (objsize) {
-         if ((objsize - 1) & objsize) {    /* not a power of 2? */
-             error_setg(errp, "obj size needs to be power of 2");
--            return -EINVAL;
-+            ret = -EINVAL;
-+            goto exit;
-         }
-         if (objsize < 4096) {
-             error_setg(errp, "obj size too small");
--            return -EINVAL;
-+            ret = -EINVAL;
-+            goto exit;
-         }
-         obj_order = ctz32(objsize);
-     }
- 
--    clientname = qemu_rbd_parse_clientname(conf, clientname_buf);
-+    options = qdict_new();
-+    qemu_rbd_parse_filename(filename, options, &local_err);
-+    if (local_err) {
-+        ret = -EINVAL;
-+        error_propagate(errp, local_err);
-+        goto exit;
-+    }
-+
-+    rbd_opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
-+    qemu_opts_absorb_qdict(rbd_opts, options, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        ret = -EINVAL;
-+        goto exit;
-+    }
-+
-+    pool       = qemu_opt_get(rbd_opts, "pool");
-+    conf       = qemu_opt_get(rbd_opts, "conf");
-+    clientname = qemu_opt_get(rbd_opts, "rbd-id");
-+    name       = qemu_opt_get(rbd_opts, "image");
-+    keypairs   = qemu_opt_get(rbd_opts, "keyvalue-pairs");
-+
-     ret = rados_create(&cluster, clientname);
-     if (ret < 0) {
-         error_setg_errno(errp, -ret, "error initializing");
--        return ret;
-+        goto exit;
-     }
- 
--    if (strstr(conf, "conf=") == NULL) {
--        /* try default location, but ignore failure */
--        rados_conf_read_file(cluster, NULL);
--    } else if (conf[0] != '\0' &&
--               qemu_rbd_set_conf(cluster, conf, true, &local_err) < 0) {
--        error_propagate(errp, local_err);
-+    /* try default location when conf=NULL, but ignore failure */
-+    ret = rados_conf_read_file(cluster, conf);
-+    if (conf && ret < 0) {
-+        error_setg_errno(errp, -ret, "error reading conf file %s", conf);
-         ret = -EIO;
-         goto shutdown;
-     }
- 
--    if (conf[0] != '\0' &&
--        qemu_rbd_set_conf(cluster, conf, false, &local_err) < 0) {
--        error_propagate(errp, local_err);
-+    ret = qemu_rbd_set_keypairs(cluster, keypairs, errp);
-+    if (ret < 0) {
-         ret = -EIO;
-         goto shutdown;
-     }
-@@ -495,6 +504,10 @@ static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
- 
- shutdown:
-     rados_shutdown(cluster);
-+
-+exit:
-+    QDECREF(options);
-+    qemu_opts_del(rbd_opts);
-     return ret;
- }
- 
-@@ -549,15 +562,10 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-                          Error **errp)
- {
-     BDRVRBDState *s = bs->opaque;
--    char pool[RBD_MAX_POOL_NAME_SIZE];
--    char snap_buf[RBD_MAX_SNAP_NAME_SIZE];
--    char conf[RBD_MAX_CONF_SIZE];
--    char clientname_buf[RBD_MAX_CONF_SIZE];
--    char *clientname;
-+    const char *pool, *snap, *conf, *clientname, *name, *keypairs;
-     const char *secretid;
-     QemuOpts *opts;
-     Error *local_err = NULL;
--    const char *filename;
-     int r;
- 
-     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
-@@ -568,44 +576,36 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-         return -EINVAL;
-     }
- 
--    filename = qemu_opt_get(opts, "filename");
-     secretid = qemu_opt_get(opts, "password-secret");
- 
--    if (qemu_rbd_parsename(filename, pool, sizeof(pool),
--                           snap_buf, sizeof(snap_buf),
--                           s->name, sizeof(s->name),
--                           conf, sizeof(conf), errp) < 0) {
--        r = -EINVAL;
--        goto failed_opts;
--    }
-+    pool       = qemu_opt_get(opts, "pool");
-+    conf       = qemu_opt_get(opts, "conf");
-+    snap       = qemu_opt_get(opts, "snapshot");
-+    clientname = qemu_opt_get(opts, "rbd-id");
-+    name       = qemu_opt_get(opts, "image");
-+    keypairs   = qemu_opt_get(opts, "keyvalue-pairs");
- 
--    clientname = qemu_rbd_parse_clientname(conf, clientname_buf);
-     r = rados_create(&s->cluster, clientname);
-     if (r < 0) {
-         error_setg_errno(errp, -r, "error initializing");
-         goto failed_opts;
-     }
- 
--    s->snap = NULL;
--    if (snap_buf[0] != '\0') {
--        s->snap = g_strdup(snap_buf);
-+    s->snap = g_strdup(snap);
-+    if (name) {
-+        pstrcpy(s->name, RBD_MAX_IMAGE_NAME_SIZE, name);
-     }
- 
--    if (strstr(conf, "conf=") == NULL) {
--        /* try default location, but ignore failure */
--        rados_conf_read_file(s->cluster, NULL);
--    } else if (conf[0] != '\0') {
--        r = qemu_rbd_set_conf(s->cluster, conf, true, errp);
--        if (r < 0) {
--            goto failed_shutdown;
--        }
-+    /* try default location when conf=NULL, but ignore failure */
-+    r = rados_conf_read_file(s->cluster, conf);
-+    if (conf && r < 0) {
-+        error_setg_errno(errp, -r, "error reading conf file %s", conf);
-+        goto failed_shutdown;
-     }
- 
--    if (conf[0] != '\0') {
--        r = qemu_rbd_set_conf(s->cluster, conf, false, errp);
--        if (r < 0) {
--            goto failed_shutdown;
--        }
-+    r = qemu_rbd_set_keypairs(s->cluster, keypairs, errp);
-+    if (r < 0) {
-+        goto failed_shutdown;
-     }
- 
-     if (qemu_rbd_set_auth(s->cluster, secretid, errp) < 0) {
-@@ -1059,18 +1059,18 @@ static QemuOptsList qemu_rbd_create_opts = {
- };
- 
- static BlockDriver bdrv_rbd = {
--    .format_name        = "rbd",
--    .instance_size      = sizeof(BDRVRBDState),
--    .bdrv_needs_filename = true,
--    .bdrv_file_open     = qemu_rbd_open,
--    .bdrv_close         = qemu_rbd_close,
--    .bdrv_create        = qemu_rbd_create,
--    .bdrv_has_zero_init = bdrv_has_zero_init_1,
--    .bdrv_get_info      = qemu_rbd_getinfo,
--    .create_opts        = &qemu_rbd_create_opts,
--    .bdrv_getlength     = qemu_rbd_getlength,
--    .bdrv_truncate      = qemu_rbd_truncate,
--    .protocol_name      = "rbd",
-+    .format_name            = "rbd",
-+    .instance_size          = sizeof(BDRVRBDState),
-+    .bdrv_parse_filename    = qemu_rbd_parse_filename,
-+    .bdrv_file_open         = qemu_rbd_open,
-+    .bdrv_close             = qemu_rbd_close,
-+    .bdrv_create            = qemu_rbd_create,
-+    .bdrv_has_zero_init     = bdrv_has_zero_init_1,
-+    .bdrv_get_info          = qemu_rbd_getinfo,
-+    .create_opts            = &qemu_rbd_create_opts,
-+    .bdrv_getlength         = qemu_rbd_getlength,
-+    .bdrv_truncate          = qemu_rbd_truncate,
-+    .protocol_name          = "rbd",
- 
-     .bdrv_aio_readv         = qemu_rbd_aio_readv,
-     .bdrv_aio_writev        = qemu_rbd_aio_writev,
+>
+> Thanks.
+>
+>> Thanks
+>> Zhang Chen
+>>
+>>
+>>>
+>>> Thanks.
+>>> Hailiang
+>>>
+>>>>        if (res != 0 &&
+>>>> trace_event_get_state(TRACE_COLO_COMPARE_MISCOMPARE)) {
+>>>> trace_colo_compare_pkt_info_src(inet_ntoa(ppkt->ip->ip_src),
+>>>> @@ -277,7 +277,14 @@ static int colo_packet_compare_udp(Packet *spkt,
+>>>> Packet *ppkt)
+>>>>            return -1;
+>>>>        }
+>>>>
+>>>> -    ret = colo_packet_compare_common(ppkt, spkt);
+>>>> +    /*
+>>>> +     * Because of ppkt and spkt are both in the same connection,
+>>>> +     * The ppkt's src ip, dst ip, src port, dst port, ip_proto all 
+>>>> are
+>>>> +     * same with spkt. In addition, IP header's Identification is a
+>>>> random
+>>>> +     * field, we can handle it in IP fragmentation function later.
+>>>> +     * So we just compare the ip payload here.
+>>>> +     */
+>>>> +    ret = colo_packet_compare_common(ppkt, spkt, network_length +
+>>>> ETH_HLEN);
+>>>>
+>>>>        if (ret) {
+>>>>            trace_colo_compare_udp_miscompare("primary pkt size",
+>>>> ppkt->size);
+>>>> @@ -304,7 +311,14 @@ static int colo_packet_compare_icmp(Packet
+>>>> *spkt, Packet *ppkt)
+>>>>            return -1;
+>>>>        }
+>>>>
+>>>> -    if (colo_packet_compare_common(ppkt, spkt)) {
+>>>> +    /*
+>>>> +     * Because of ppkt and spkt are both in the same connection,
+>>>> +     * The ppkt's src ip, dst ip, src port, dst port, ip_proto all 
+>>>> are
+>>>> +     * same with spkt. In addition, IP header's Identification is a
+>>>> random
+>>>> +     * field, we can handle it in IP fragmentation function later.
+>>>> +     * So we just compare the ip payload here.
+>>>> +     */
+>>>> +    if (colo_packet_compare_common(ppkt, spkt, network_length +
+>>>> ETH_HLEN)) {
+>>>>            trace_colo_compare_icmp_miscompare("primary pkt size",
+>>>> ppkt->size);
+>>>>            qemu_hexdump((char *)ppkt->data, stderr, "colo-compare",
+>>>> @@ -330,7 +344,7 @@ static int colo_packet_compare_other(Packet
+>>>> *spkt, Packet *ppkt)
+>>>> inet_ntoa(ppkt->ip->ip_dst), spkt->size,
+>>>> inet_ntoa(spkt->ip->ip_src),
+>>>> inet_ntoa(spkt->ip->ip_dst));
+>>>> -    return colo_packet_compare_common(ppkt, spkt);
+>>>> +    return colo_packet_compare_common(ppkt, spkt, 0);
+>>>>    }
+>>>>
+>>>>    static int colo_old_packet_check_one(Packet *pkt, int64_t 
+>>>> *check_time)
+>>>>
+>>>
+>>>
+>>>
+>>>
+>>> .
+>>>
+>>
+>
+>
+>
+> .
+>
+
 -- 
-2.9.3
+Thanks
+Zhang Chen
