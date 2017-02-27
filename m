@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45130)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ciOCp-00054s-IZ
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:31:24 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1ciOFP-00077m-4c
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:34:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ciOCk-0007aq-Gu
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:31:23 -0500
-Received: from indium.canonical.com ([91.189.90.7]:34165)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ciOCk-0007aS-BM
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:31:18 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ciOCj-0005kx-29
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 16:31:17 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C475B2E80CE
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 16:31:16 +0000 (UTC)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1ciOFK-0008DC-5b
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 11:34:03 -0500
+Date: Mon, 27 Feb 2017 17:33:12 +0100
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20170227163312.jzszc2ajn3tslrdf@var.youpi.perso.aquilenet.fr>
+References: <20170227004545.hzpr266jzturlxdh@var.youpi.perso.aquilenet.fr>
+	<4bbc4d50-3c87-bd83-b74d-6aa8b020f2c1@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 27 Feb 2017 16:21:36 -0000
-From: Daniel Berrange <1668273@bugs.launchpad.net>
-Reply-To: Bug 1668273 <1668273@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170227140328.20639.14786.malonedeb@soybean.canonical.com>
-Message-Id: <20170227162136.21253.41417.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1668273] Re: DoS possible on - a QEMU process
- using userspace SLIRP?
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <4bbc4d50-3c87-bd83-b74d-6aa8b020f2c1@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] blk: Add discard=sparse mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,111 +24,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-IIUC, a socket staying around in FIN_WAIT2 state means that a socket has
-been closed in one direction, but not the other direction. Assuming
-SLIRP is just mirroring what the guest OS has done with the socket
-shutdown process, this would be expected.
+Hello,
 
--- =
+Max Reitz, on lun. 27 févr. 2017 17:12:47 +0100, wrote:
+> >  #ifdef CONFIG_FALLOCATE_PUNCH_HOLE
+> > -    if (s->has_discard && s->has_fallocate) {
+> > +    if (s->has_discard && (s->has_fallocate || open_flags & BDRV_O_SPARSE)) {
+> 
+> s->has_fallocate has a meaning. I wouldn't try to call do_fallocate() if
+> s->has_fallocate is false.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1668273
+Ah, sorry, I didn't realize that that test wasn't only to check that
+we'll be able to call fallocate(0) further down.
 
-Title:
-  DoS possible on - a QEMU process using userspace SLIRP?
+> Therefore, I consider this to effectively be a no-op.
 
-Status in QEMU:
-  New
+Yes.
 
-Bug description:
-  Steps to reproduce:
+> > @@ -1098,7 +1102,8 @@ static ssize_t handle_aiocb_write_zeroes(RawPosixAIOData *aiocb)
+> >  #endif
+> >  
+> >  #ifdef CONFIG_FALLOCATE
+> > -    if (s->has_fallocate && aiocb->aio_offset >= bdrv_getlength(aiocb->bs)) {
+> > +    if (s->has_fallocate && !(open_flags & BDRV_O_SPARSE)
+> > +            && aiocb->aio_offset >= bdrv_getlength(aiocb->bs)) {
+> 
+> First, this part is only invoked if everything before it has failed.
 
-  - Launch a VM using QEMU (2.8.0):
+I misread the code indeed.
 
-  $ qemu-system-x86_64 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-machine accel=3Dkvm \
-  =C2=A0=C2=A0=C2=A0=C2=A0-hda Fedora-Cloud-Base-25-1.3.x86_64.qcow2 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-m 2G \
-  =C2=A0=C2=A0=C2=A0=C2=A0-smp 2 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-vnc :8 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-boot dc \
-  =C2=A0=C2=A0=C2=A0=C2=A0-vga std \
-  =C2=A0=C2=A0=C2=A0=C2=A0-cpu host \
-  =C2=A0=C2=A0=C2=A0=C2=A0-net nic,vlan=3D0 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-net user,vlan=3D0,hostfwd=3Dtcp::10024-:22,hostf=
-wd=3Dtcp::8082-:80
+> Unless I'm mistaken, unmap/trim requests from the guest should result in
+> a discard request in the block layer. This should always trigger
+> handle_aiocb_discard() here and that should do what you want it to.
 
-  - SSH into the VM, install httpd, start httpd
+Mmm, indeed.  I guess I got lost in the hairy block code.
 
-  $ ssh -p 10024 root@localhost 'dnf install -y httpd && systemctl start
-  httpd'
+> Could you maybe give me the configuration that results in the issue
+> you're describing in the commit message?
 
-  - Compile and run the following Java program (on the host):
+Actually I can't reproduce the issue any more.  I'm now wondering how I
+ended up there.
 
-  $ cat <<EOF > URLConnectionReader.java
-  import java.net.*;
-  import java.io.*;
+Anyway, I'm really sorry for the noise, and thanks for the good work :)
 
-  public class URLConnectionReader {
-  =C2=A0=C2=A0=C2=A0=C2=A0public static void main(String[] args) throws Exc=
-eption {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int i =3D 0;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0while (i < 1024) {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0U=
-RL this_is_404 =3D new URL("http://localhost:8082/blah");
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0U=
-RLConnection yc =3D this_is_404.openConnection();
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0t=
-ry {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0BufferedReader in =3D new BufferedReader(new InputS=
-treamReader(
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0yc.getInputStream()));
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0String inputLine;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0while ((inputLine =3D in.readLine()) !=3D null)
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0System.out.println(inputLin=
-e);
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0in.close();
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}=
- catch (Exception e) {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0//HttpURLConnection urlConnection =3D (HttpURLConne=
-ction) yc;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0//urlConnection.disconnect();
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0i=
-++;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Thread.sleep(1000000000);
-  =C2=A0=C2=A0=C2=A0=C2=A0}
-  }
-
-  $ javac URLConnectionReader.java
-
-  $ java URLConnectionReader &
-
-  The java program tries to open a lot of HTTP connections, but never
-  calls disconnect() on any.
-
-  - Take a look at the list of open FDs of the qemu process:
-
-  $ ls -tl /proc/${qemu-pid}/fd
-
-  $ lsof -p ${qemu-pid}
-  All of the TCP connections will be stuck at FIN_WAIT2
-
-  The VM becomes unresponsive. Neither SSH or VNC works after this; even
-  after tcp_fin_timeout expires.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1668273/+subscriptions
+Samuel
