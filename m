@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47130)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ciHV5-0008Cx-Go
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 04:21:48 -0500
+	(envelope-from <berrange@redhat.com>) id 1ciHVf-0000As-Cv
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 04:22:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1ciHV2-0003pK-9T
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 04:21:47 -0500
-Received: from 5.mo6.mail-out.ovh.net ([46.105.54.31]:60332)
+	(envelope-from <berrange@redhat.com>) id 1ciHVc-00043q-86
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 04:22:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58710)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ciHV2-0003oY-36
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 04:21:44 -0500
-Received: from player761.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 59F31ADF52
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 10:21:42 +0100 (CET)
-References: <1487252865-12064-1-git-send-email-clg@kaod.org>
-	<1487252865-12064-17-git-send-email-clg@kaod.org>
-	<20170223024238.GB12577@umbus.fritz.box>
-	<6eb9d5d8-ea57-dc2b-afd7-7796b7e3295b@kaod.org>
-	<20170227010024.GL17615@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <6c547a12-5c49-7fbe-14f6-5337889786a3@kaod.org>
-Date: Mon, 27 Feb 2017 10:21:32 +0100
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ciHVb-00043Z-Vb
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 04:22:20 -0500
+Date: Mon, 27 Feb 2017 09:22:07 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170227092207.GA18219@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170220110235.GD21255@stefanha-x1.localdomain>
+	<CAAo6VWNwHbsQRxU18dNCjWaNfNrZNAV9FfOKW8=JeZCND2vHnQ@mail.gmail.com>
+	<20170221105918.GA22731@stefanha-x1.localdomain>
+	<20170221113353.GC17041@redhat.com>
+	<20170222140920.GA10201@stefanha-x1.localdomain>
+	<20170222142230.GR28937@redhat.com>
+	<20170222144407.GS19045@localhost.localdomain>
+	<CAAo6VWPWjRTE3t9myt7Q6gTnZcvP72ypTE03PCFfJkvb2UWLTA@mail.gmail.com>
+	<20170224091916.GD3702@redhat.com>
+	<CAAo6VWPyQrjSp2qjvxqXRPS8=5N85i0-DJdkWhiGaXmND_8+qA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170227010024.GL17615@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 16/22] ppc/xics: register the
- reset handler of ICP objects
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAAo6VWPyQrjSp2qjvxqXRPS8=5N85i0-DJdkWhiGaXmND_8+qA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
+ block device type called "vxhs"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,122 +37,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: ashish mittal <ashmit602@gmail.com>
+Cc: Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
 
-[ adding Peter for some insights ]=20
+On Fri, Feb 24, 2017 at 03:30:21PM -0800, ashish mittal wrote:
+> Thanks!
+> 
+> I hope the following is in line with what you suggested -
 
-On 02/27/2017 02:00 AM, David Gibson wrote:
-> On Fri, Feb 24, 2017 at 12:27:35PM +0100, C=E9dric Le Goater wrote:
->> On 02/23/2017 03:42 AM, David Gibson wrote:
->>> On Thu, Feb 16, 2017 at 02:47:39PM +0100, C=E9dric Le Goater wrote:
->>>> The reset of the ICP objects is currently handled by XICS but this c=
-an
->>>> be done for each individual ICP.
->>>>
->>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->>>
->>> Hrm.  I think whether device_reset() gets called automatically depend=
-s
->>> on how the device is wired into the composition tree, and I'm not sur=
-e
->>> the icps are in the right place for it to work.
->>
->> reset gets called only if it under sysbus or if you have registered=20
->> a reset_handler. previously, XICS was a sysbus object so=20
->> xics_common_reset() was getting called automatically.
->=20
-> Right.  Hmm.  So I think artificially placing the ics under the sysbus
-> is not the right way to get the reset called - I think explicitly
-> registering a reset handler is better.
->=20
-> The only thing that concerns me about that is that the MMIO ICS
-> variants we'll want for powernv really _do_ have a bus presence,
-> either on sysbus or some descendent, so that will get its reset called
-> automatically.  I'm not sure what the best way to ensure the reset
-> gets called exactly once in all cases.
+Yes, that looks suitable for password auth
 
-Well, I am not sure either. I have reproduced this pattern as it is=20
-frequently used under ARM which has quite a few QOM'ified machines.
+> 
+> We will error out in case either of username, secret-id, or password
+> are missing.
+> 
+> Good case, passing password via a file -
+> $ ./qemu-io --trace enable=vxhs* --object
+> secret,id=xvxhspasswd,file=/tmp/some/file/path  -c 'read 66000 128k'
+> 'json:{"server.host": "127.0.0.1", "server.port": "9999", "vdisk-id":
+> "/test.raw", "driver": "vxhs", "user": "ashish",  "password-secret":
+> "xvxhspasswd"}'
+> 1132@1487977829.151064:vxhs_open_vdiskid Opening vdisk-id /test.raw
+> 
+> 1132@1487977829.151141:vxhs_get_creds User ashish, SecretID
+> xvxhspasswd, Password Str0ngP@ssw0rd   <=== ****  NOTE WILL NOT PRINT
+> PASSWORD IN FINAL CODE ****
+> 
+> 1132@1487977829.151168:vxhs_open_hostinfo Adding host 127.0.0.1:9999
+> to BDRVVXHSState
+> 1132@1487977829.173062:vxhs_get_vdisk_stat vDisk /test.raw stat ioctl
+> returned size 196616
+> read 131072/131072 bytes at offset 66000
+> 128 KiB, 1 ops; 0.0012 sec (99.049 MiB/sec and 792.3930 ops/sec)
+> 1132@1487977829.175141:vxhs_close Closing vdisk /test.raw
+> 
+> 
+> Bad case, missing user -
+> $ ./qemu-io --trace enable=vxhs* --object
+> secret,id=xvxhspasswd,data=/tmp/some/file/path  -c 'read 66000 128k'
+> 'json:{"server.host": "127.0.0.1", "server.port": "9999", "vdisk-id":
+> "/test.raw", "driver": "vxhs"}'
+> 1310@1487978547.771234:vxhs_open_vdiskid Opening vdisk-id /test.raw
+> can't open device json:{"server.host": "127.0.0.1", "server.port":
+> "9999", "vdisk-id": "/test.raw", "driver": "vxhs"}: please specify the
+> user for authenticating to target
+> 
+> diff --git a/block/vxhs.c b/block/vxhs.c
+> index 4f0633e..9b60ddf 100644
+> --- a/block/vxhs.c
+> +++ b/block/vxhs.c
+> @@ -17,12 +17,16 @@
+>  #include "qemu/uri.h"
+>  #include "qapi/error.h"
+>  #include "qemu/uuid.h"
+> +#include "crypto/secret.h"
+> 
+>  #define VXHS_OPT_FILENAME           "filename"
+>  #define VXHS_OPT_VDISK_ID           "vdisk-id"
+>  #define VXHS_OPT_SERVER             "server"
+>  #define VXHS_OPT_HOST               "host"
+>  #define VXHS_OPT_PORT               "port"
+> +#define VXHS_OPT_USER               "user"
+> +#define VXHS_OPT_PASSWORD           "password"
+> +#define VXHS_OPT_SECRETID           "password-secret"
+>  #define VXHS_UUID_DEF "12345678-1234-1234-1234-123456789012"
+> 
+>  QemuUUID qemu_uuid __attribute__ ((weak));
+> @@ -136,6 +140,22 @@ static QemuOptsList runtime_opts = {
+>              .type = QEMU_OPT_STRING,
+>              .help = "UUID of the VxHS vdisk",
+>          },
+> +        {
+> +            .name = VXHS_OPT_USER,
+> +            .type = QEMU_OPT_STRING,
+> +            .help = "username for authentication to target",
+> +        },
+> +        {
+> +            .name = VXHS_OPT_PASSWORD,
+> +            .type = QEMU_OPT_STRING,
+> +            .help = "password for authentication to target",
+> +        },
+> +        {
+> +            .name = VXHS_OPT_SECRETID,
+> +            .type = QEMU_OPT_STRING,
+> +            .help = "ID of the secret providing password for"
+> +                    "authentication to target",
+> +        },
+>          { /* end of list */ }
+>      },
+>  };
+> @@ -257,6 +277,9 @@ static int vxhs_open(BlockDriverState *bs, QDict *options,
+>      const char *server_host_opt;
+>      char *str = NULL;
+>      int ret = 0;
+> +    const char *user = NULL;
+> +    const char *secretid = NULL;
+> +    const char *password = NULL;
+> 
+>      ret = vxhs_init_and_ref();
+>      if (ret < 0) {
+> @@ -320,6 +343,35 @@ static int vxhs_open(BlockDriverState *bs, QDict *options,
+>          goto out;
+>      }
+> 
+> +    /* check if we got username and secretid via the options */
+> +    user = qemu_opt_get(opts, VXHS_OPT_USER);
+> +    if (!user) {
+> +        error_setg(&local_err, "please specify the user for authenticating to "
+> +                   "target");
+> +        qdict_del(backing_options, str);
 
-Thanks,
+Not sure why you're deleting this ? Likewise the 2 cases below too
 
-C.=20
+> +        ret = -EINVAL;
+> +        goto out;
+> +    }
+> +
+> +    secretid = qemu_opt_get(opts, VXHS_OPT_SECRETID);
+> +    if (!secretid) {
+> +        error_setg(&local_err, "please specify the ID of the secret to be "
+> +                   "used for authenticating to target");
+> +        qdict_del(backing_options, str);
+> +        ret = -EINVAL;
+> +        goto out;
+> +    }
+> +
+> +    /* check if we got password via the --object argument */
+> +    password = qcrypto_secret_lookup_as_utf8(secretid, &local_err);
+> +    if (local_err != NULL) {
+> +        trace_vxhs_get_creds(user, secretid, password);
+> +        qdict_del(backing_options, str);
+> +        ret = -EINVAL;
+> +        goto out;
+> +    }
+> +    trace_vxhs_get_creds(user, secretid, password);
+> +
+>      s->vdisk_hostinfo.host = g_strdup(server_host_opt);
+> 
+>      s->vdisk_hostinfo.port = g_ascii_strtoll(qemu_opt_get(tcp_opts,
 
->>> This doesn't replace the code in xics_common_reset() so if it does
->>> work it means we must have previously been resetting the ICPs twice.
->>> Is that right?
->>
->> no. but there has been some confusion with the recent changes
->> on XICS.
->>
->> What replace the code in xics_common_reset() is :
->>
->> 	qdev_set_parent_bus(DEVICE(icp), sysbus_get_default());
->>
->> That's how the reset handlers get called from QOM objects.
->=20
-> Right, I saw that later on.
->=20
->>
->> C.
->>
->>>> ---
->>>>  hw/intc/xics.c | 18 ------------------
->>>>  hw/ppc/spapr.c |  1 +
->>>>  2 files changed, 1 insertion(+), 18 deletions(-)
->>>>
->>>> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
->>>> index dd41340d41a5..3ad7e8cf8ec4 100644
->>>> --- a/hw/intc/xics.c
->>>> +++ b/hw/intc/xics.c
->>>> @@ -137,29 +137,11 @@ static void ics_simple_pic_print_info(Interrup=
-tStatsProvider *obj,
->>>>  /*
->>>>   * XICS Common class - parent for emulated XICS and KVM-XICS
->>>>   */
->>>> -static void xics_common_reset(DeviceState *d)
->>>> -{
->>>> -    XICSState *xics =3D XICS_COMMON(d);
->>>> -    int i;
->>>> -
->>>> -    for (i =3D 0; i < xics->nr_servers; i++) {
->>>> -        device_reset(DEVICE(&xics->ss[i]));
->>>> -    }
->>>> -}
->>>> -
->>>> -static void xics_common_class_init(ObjectClass *oc, void *data)
->>>> -{
->>>> -    DeviceClass *dc =3D DEVICE_CLASS(oc);
->>>> -
->>>> -    dc->reset =3D xics_common_reset;
->>>> -}
->>>> -
->>>>  static const TypeInfo xics_common_info =3D {
->>>>      .name          =3D TYPE_XICS_COMMON,
->>>>      .parent        =3D TYPE_DEVICE,
->>>>      .instance_size =3D sizeof(XICSState),
->>>>      .class_size    =3D sizeof(XICSStateClass),
->>>> -    .class_init    =3D xics_common_class_init,
->>>>  };
->>>> =20
->>>>  /*
->>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->>>> index 9c1772f93155..445d9a6ddad4 100644
->>>> --- a/hw/ppc/spapr.c
->>>> +++ b/hw/ppc/spapr.c
->>>> @@ -130,6 +130,7 @@ static XICSState *try_create_xics(sPAPRMachineSt=
-ate *spapr,
->>>>          ICPState *icp =3D &xics->ss[i];
->>>> =20
->>>>          object_initialize(icp, sizeof(*icp), type_icp);
->>>> +        qdev_set_parent_bus(DEVICE(icp), sysbus_get_default());
->>>>          object_property_add_child(OBJECT(xics), "icp[*]", OBJECT(ic=
-p), NULL);
->>>>          object_property_add_const_link(OBJECT(icp), "xics", OBJECT(=
-xics), NULL);
->>>>          object_property_set_bool(OBJECT(icp), true, "realized", &er=
-r);
->>>
->>
->=20
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
