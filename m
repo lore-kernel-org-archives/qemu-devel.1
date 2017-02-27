@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ciOkT-0001T8-Er
+	(envelope-from <bounces@canonical.com>) id 1ciOkT-0001TA-Fw
 	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:06:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ciOkO-0004Fs-D5
+	(envelope-from <bounces@canonical.com>) id 1ciOkO-0004Fv-DD
 	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:06:09 -0500
-Received: from indium.canonical.com ([91.189.90.7]:36430)
+Received: from indium.canonical.com ([91.189.90.7]:36428)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ciOkO-0004Fa-70
+	id 1ciOkO-0004FZ-6e
 	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 12:06:04 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ciOkL-0003sV-Ig
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 17:06:01 +0000
+	id 1ciOkM-0003sg-7G
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 17:06:02 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A09DC2E80D1
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 17:06:00 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id ECD7E2E80D7
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 17:06:01 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 27 Feb 2017 16:53:26 -0000
-From: Greg Kurz <groug@kaod.org>
-Reply-To: Bug 1668273 <1668273@bugs.launchpad.net>
+Date: Mon, 27 Feb 2017 16:58:51 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1668103 <1668103@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20170227140328.20639.14786.malonedeb@soybean.canonical.com>
-Message-Id: <20170227165326.22198.47876.malone@gac.canonical.com>
+References: <20170226205013.23267.77116.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170227165851.21024.56537.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1668273] Re: DoS possible on - a QEMU process
- using userspace SLIRP?
+Subject: [Qemu-devel] [Bug 1668103] Re: Possible off-by-one error in
+ priority handling of hw/PL190.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,117 +39,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Responding to comment #1:
+This turns out to be because Marc had a very out-of-date copy of pl190.c wh=
+ich was missing the fix for this bug in commit 14c126baf1c38607c5b. (Furthe=
+r discussion in list thread =
 
-Nehal's scenario seems to be the other way round. An external
-application hammers on QEMU with bogus http requests, httpd within the
-guest closes the socket, but the external application doesn't and QEMU
-stays with tons of dangling sockets, and "The VM becomes unresponsive.
-Neither SSH or VNC works after this; even after tcp_fin_timeout
-expires."
+https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg06580.html).
 
-This being said maybe the answer is don't ever use SLIRP if you don't
-trust both ends of network connections (which sounds a bit like don't
-ever use SLIRP to me).
+
+** Changed in: qemu
+       Status: In Progress =3D> Invalid
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1668273
+https://bugs.launchpad.net/bugs/1668103
 
 Title:
-  DoS possible on - a QEMU process using userspace SLIRP?
+  Possible off-by-one error in priority handling of hw/PL190.c
 
 Status in QEMU:
-  New
+  Invalid
 
 Bug description:
-  Steps to reproduce:
+  I have a problem when reading back VECTADDR in my proprietary OS's
+  interrupt handler.
 
-  - Launch a VM using QEMU (2.8.0):
+  Example client code:
 
-  $ qemu-system-x86_64 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-machine accel=3Dkvm \
-  =C2=A0=C2=A0=C2=A0=C2=A0-hda Fedora-Cloud-Base-25-1.3.x86_64.qcow2 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-m 2G \
-  =C2=A0=C2=A0=C2=A0=C2=A0-smp 2 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-vnc :8 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-boot dc \
-  =C2=A0=C2=A0=C2=A0=C2=A0-vga std \
-  =C2=A0=C2=A0=C2=A0=C2=A0-cpu host \
-  =C2=A0=C2=A0=C2=A0=C2=A0-net nic,vlan=3D0 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-net user,vlan=3D0,hostfwd=3Dtcp::10024-:22,hostf=
-wd=3Dtcp::8082-:80
+   1) Write INTENCLEAR to clear all interrupt enable bits
+   2) Set all 16 vector control registers to zero
+   3) Set vector address #2 to value 2
+   4) Set vector control #2 to 0x21 (vector_interrupt_enable(0x20) | vector=
+_interrupt_source(0x1) )
+   5) Enable interrupt 1 by writing 0x2 to INTENABLE
+   6) In interrupt handler: read VECTADDR [should read 0x2 (active IRQs vec=
+tor address as set in step 3), reads 0x0 (active vector address index 3 ins=
+tead of index 2)]
 
-  - SSH into the VM, install httpd, start httpd
+  Problem:
 
-  $ ssh -p 10024 root@localhost 'dnf install -y httpd && systemctl start
-  httpd'
+  So, for me, the block commented with /* Read vector address at the
+  start of an ISR...  */ in hw/pl190.c has an off by-one error and does
+  not return the vector address of the pending interrupt, but of the
+  next one in the list of priorities (i.e. vector address 3).
 
-  - Compile and run the following Java program (on the host):
+  Solution:
 
-  $ cat <<EOF > URLConnectionReader.java
-  import java.net.*;
-  import java.io.*;
+  In pl190_update_vectors(), also set the priority bit for the current
+  priority (1<<i) interrupt (if enabled) in s->prio_mask[i] in addition
+  to those of higher priority enabled interrupts. This will cause the
+  loop in the read handling of VECTADDR to terminate an iteration
+  earlier and will deliver the correct interrupt priority as iteration
+  variable i subsequently used for addressing.
 
-  public class URLConnectionReader {
-  =C2=A0=C2=A0=C2=A0=C2=A0public static void main(String[] args) throws Exc=
-eption {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int i =3D 0;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0while (i < 1024) {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0U=
-RL this_is_404 =3D new URL("http://localhost:8082/blah");
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0U=
-RLConnection yc =3D this_is_404.openConnection();
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0t=
-ry {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0BufferedReader in =3D new BufferedReader(new InputS=
-treamReader(
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0yc.getInputStream()));
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0String inputLine;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0while ((inputLine =3D in.readLine()) !=3D null)
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0System.out.println(inputLin=
-e);
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0in.close();
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}=
- catch (Exception e) {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0//HttpURLConnection urlConnection =3D (HttpURLConne=
-ction) yc;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0//urlConnection.disconnect();
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0i=
-++;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Thread.sleep(1000000000);
-  =C2=A0=C2=A0=C2=A0=C2=A0}
-  }
-
-  $ javac URLConnectionReader.java
-
-  $ java URLConnectionReader &
-
-  The java program tries to open a lot of HTTP connections, but never
-  calls disconnect() on any.
-
-  - Take a look at the list of open FDs of the qemu process:
-
-  $ ls -tl /proc/${qemu-pid}/fd
-
-  $ lsof -p ${qemu-pid}
-  All of the TCP connections will be stuck at FIN_WAIT2
-
-  The VM becomes unresponsive. Neither SSH or VNC works after this; even
-  after tcp_fin_timeout expires.
+  I'll try to provide a patch for this.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1668273/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1668103/+subscriptions
