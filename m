@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57414)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ciRdT-0000FT-Rr
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:11:08 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ciRdV-0000Gl-5Z
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:11:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ciRdS-0003cE-T1
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:11:07 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ciRdT-0003dW-U6
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 15:11:09 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 27 Feb 2017 21:09:27 +0100
-Message-Id: <1488226184-9044-27-git-send-email-kwolf@redhat.com>
+Date: Mon, 27 Feb 2017 21:09:28 +0100
+Message-Id: <1488226184-9044-28-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1488226184-9044-1-git-send-email-kwolf@redhat.com>
 References: <1488226184-9044-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 26/43] commit: Use real permissions for HMP
- 'commit'
+Subject: [Qemu-devel] [PATCH v2 27/43] backup: Use real permissions in
+ backup block job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,85 +23,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-This is a little simpler than the commit block job because it's
-synchronous and only commits into the immediate backing file, but
-otherwise doing more or less the same.
+The backup block job doesn't have very complicated requirements: It
+needs to read from the source and write to the target, but it's fine
+with either side being changed. The only restriction is that we can't
+resize the image because the job uses a cached value.
+
+qemu-iotests 055 needs to be changed because it used a target which was
+already attached to a virtio-blk device. The permission system correctly
+forbids this (virtio-blk can't accept another writer with its default
+share-rw=off).
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/commit.c | 33 +++++++++++++++++++++++++++------
- 1 file changed, 27 insertions(+), 6 deletions(-)
+ block/backup.c         | 15 ++++++++++-----
+ tests/qemu-iotests/055 | 11 +++++++----
+ 2 files changed, 17 insertions(+), 9 deletions(-)
 
-diff --git a/block/commit.c b/block/commit.c
-index 8de4473..f18026b 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -401,11 +401,14 @@ fail:
- int bdrv_commit(BlockDriverState *bs)
- {
-     BlockBackend *src, *backing;
-+    BlockDriverState *backing_file_bs = NULL;
-+    BlockDriverState *commit_top_bs = NULL;
-     BlockDriver *drv = bs->drv;
-     int64_t sector, total_sectors, length, backing_length;
-     int n, ro, open_flags;
-     int ret = 0;
-     uint8_t *buf = NULL;
-+    Error *local_err = NULL;
- 
-     if (!drv)
-         return -ENOMEDIUM;
-@@ -428,17 +431,31 @@ int bdrv_commit(BlockDriverState *bs)
-         }
+diff --git a/block/backup.c b/block/backup.c
+index 405f271..d1ab617 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -618,15 +618,20 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
+         goto error;
      }
  
 -    /* FIXME Use real permissions */
--    src = blk_new(0, BLK_PERM_ALL);
--    backing = blk_new(0, BLK_PERM_ALL);
-+    src = blk_new(BLK_PERM_CONSISTENT_READ, BLK_PERM_ALL);
-+    backing = blk_new(BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
- 
--    ret = blk_insert_bs(src, bs, NULL);
-+    ret = blk_insert_bs(src, bs, &local_err);
-     if (ret < 0) {
-+        error_report_err(local_err);
-+        goto ro_cleanup;
-+    }
-+
-+    /* Insert commit_top block node above backing, so we can write to it */
-+    backing_file_bs = backing_bs(bs);
-+
-+    commit_top_bs = bdrv_new_open_driver(&bdrv_commit_top, NULL, BDRV_O_RDWR,
-+                                         &local_err);
-+    if (commit_top_bs == NULL) {
-+        error_report_err(local_err);
-         goto ro_cleanup;
+-    job = block_job_create(job_id, &backup_job_driver, bs, 0, BLK_PERM_ALL,
++    /* job->common.len is fixed, so we can't allow resize */
++    job = block_job_create(job_id, &backup_job_driver, bs,
++                           BLK_PERM_CONSISTENT_READ,
++                           BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE |
++                           BLK_PERM_WRITE_UNCHANGED | BLK_PERM_GRAPH_MOD,
+                            speed, creation_flags, cb, opaque, errp);
+     if (!job) {
+         goto error;
      }
  
--    ret = blk_insert_bs(backing, bs->backing->bs, NULL);
-+    bdrv_set_backing_hd(commit_top_bs, backing_file_bs);
-+    bdrv_set_backing_hd(bs, commit_top_bs);
-+
-+    ret = blk_insert_bs(backing, backing_file_bs, &local_err);
+-    /* FIXME Use real permissions */
+-    job->target = blk_new(0, BLK_PERM_ALL);
++    /* The target must match the source in size, so no resize here either */
++    job->target = blk_new(BLK_PERM_WRITE,
++                          BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE |
++                          BLK_PERM_WRITE_UNCHANGED | BLK_PERM_GRAPH_MOD);
+     ret = blk_insert_bs(job->target, target, errp);
      if (ret < 0) {
-+        error_report_err(local_err);
-         goto ro_cleanup;
+         goto error;
+@@ -657,7 +662,7 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
+         job->cluster_size = MAX(BACKUP_CLUSTER_SIZE_DEFAULT, bdi.cluster_size);
      }
  
-@@ -512,8 +529,12 @@ int bdrv_commit(BlockDriverState *bs)
- ro_cleanup:
-     qemu_vfree(buf);
+-    /* FIXME Use real permissions */
++    /* Required permissions are already taken with target's blk_new() */
+     block_job_add_bdrv(&job->common, "target", target, 0, BLK_PERM_ALL,
+                        &error_abort);
+     job->common.len = len;
+diff --git a/tests/qemu-iotests/055 b/tests/qemu-iotests/055
+index 1d3fd04..aafcd24 100755
+--- a/tests/qemu-iotests/055
++++ b/tests/qemu-iotests/055
+@@ -48,7 +48,8 @@ class TestSingleDrive(iotests.QMPTestCase):
+     def setUp(self):
+         qemu_img('create', '-f', iotests.imgfmt, blockdev_target_img, str(image_len))
  
--    blk_unref(src);
-     blk_unref(backing);
-+    if (backing_file_bs) {
-+        bdrv_set_backing_hd(bs, backing_file_bs);
-+    }
-+    bdrv_unref(commit_top_bs);
-+    blk_unref(src);
+-        self.vm = iotests.VM().add_drive(test_img).add_drive(blockdev_target_img)
++        self.vm = iotests.VM().add_drive(test_img)
++        self.vm.add_drive(blockdev_target_img, interface="none")
+         if iotests.qemu_default_machine == 'pc':
+             self.vm.add_drive(None, 'media=cdrom', 'ide')
+         self.vm.launch()
+@@ -164,7 +165,8 @@ class TestSetSpeed(iotests.QMPTestCase):
+     def setUp(self):
+         qemu_img('create', '-f', iotests.imgfmt, blockdev_target_img, str(image_len))
  
-     if (ro) {
-         /* ignoring error return here */
+-        self.vm = iotests.VM().add_drive(test_img).add_drive(blockdev_target_img)
++        self.vm = iotests.VM().add_drive(test_img)
++        self.vm.add_drive(blockdev_target_img, interface="none")
+         self.vm.launch()
+ 
+     def tearDown(self):
+@@ -247,7 +249,8 @@ class TestSingleTransaction(iotests.QMPTestCase):
+     def setUp(self):
+         qemu_img('create', '-f', iotests.imgfmt, blockdev_target_img, str(image_len))
+ 
+-        self.vm = iotests.VM().add_drive(test_img).add_drive(blockdev_target_img)
++        self.vm = iotests.VM().add_drive(test_img)
++        self.vm.add_drive(blockdev_target_img, interface="none")
+         if iotests.qemu_default_machine == 'pc':
+             self.vm.add_drive(None, 'media=cdrom', 'ide')
+         self.vm.launch()
+@@ -460,7 +463,7 @@ class TestDriveCompression(iotests.QMPTestCase):
+ 
+         qemu_img('create', '-f', fmt, blockdev_target_img,
+                  str(TestDriveCompression.image_len), *args)
+-        self.vm.add_drive(blockdev_target_img, format=fmt)
++        self.vm.add_drive(blockdev_target_img, format=fmt, interface="none")
+ 
+         self.vm.launch()
+ 
 -- 
 1.8.3.1
