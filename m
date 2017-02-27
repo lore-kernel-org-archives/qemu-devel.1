@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ciLCn-0007Br-4x
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:19:10 -0500
+	(envelope-from <berrange@redhat.com>) id 1ciLHL-0002pk-Vs
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:23:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ciLCm-0002Sv-3A
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:19:09 -0500
-Date: Mon, 27 Feb 2017 08:18:59 -0500
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170227131859.GD25637@localhost.localdomain>
-References: <cover.1488180142.git.jcody@redhat.com>
-	<08786526aec147544588ab3e885a984e7d0d1c69.1488180142.git.jcody@redhat.com>
-	<20170227073613.GB25637@localhost.localdomain>
-	<20170227093121.GD18219@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170227093121.GD18219@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 4/4] block/rbd: Add blockdev-add support
+	(envelope-from <berrange@redhat.com>) id 1ciLHI-0003hf-1y
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:23:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40620)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ciLHH-0003hT-SI
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:23:47 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E756D81127
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 13:23:47 +0000 (UTC)
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Mon, 27 Feb 2017 13:23:43 +0000
+Message-Id: <20170227132343.30824-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH] ui: Use XkbGetMap and XkbGetNames instead of
+ XkbGetKeyboard
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,109 +28,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, eblake@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On Mon, Feb 27, 2017 at 09:31:21AM +0000, Daniel P. Berrange wrote:
-> On Mon, Feb 27, 2017 at 02:36:13AM -0500, Jeff Cody wrote:
-> > On Mon, Feb 27, 2017 at 02:30:41AM -0500, Jeff Cody wrote:
-> > > Signed-off-by: Jeff Cody <jcody@redhat.com>
-> > > ---
-> > >  qapi/block-core.json | 47 ++++++++++++++++++++++++++++++++++++++++++++---
-> > >  1 file changed, 44 insertions(+), 3 deletions(-)
-> > > 
-> > > diff --git a/qapi/block-core.json b/qapi/block-core.json
-> > > index 5f82d35..08a1419 100644
-> > > --- a/qapi/block-core.json
-> > > +++ b/qapi/block-core.json
-> > > @@ -2111,6 +2111,7 @@
-> > >  # @replication: Since 2.8
-> > >  # @ssh: Since 2.8
-> > >  # @iscsi: Since 2.9
-> > > +# @rbd: Since 2.9
-> > >  #
-> > >  # Since: 2.0
-> > >  ##
-> > > @@ -2120,7 +2121,7 @@
-> > >              'host_device', 'http', 'https', 'iscsi', 'luks', 'nbd', 'nfs',
-> > >              'null-aio', 'null-co', 'parallels', 'qcow', 'qcow2', 'qed',
-> > >              'quorum', 'raw', 'replication', 'ssh', 'vdi', 'vhdx', 'vmdk',
-> > > -            'vpc', 'vvfat' ] }
-> > > +            'vpc', 'vvfat', 'rbd' ] }
-> > >  
-> > >  ##
-> > >  # @BlockdevOptionsFile:
-> > > @@ -2376,7 +2377,6 @@
-> > >              'path': 'str',
-> > >              '*user': 'str' } }
-> > >  
-> > > -
-> > >  ##
-> > >  # @BlkdebugEvent:
-> > >  #
-> > > @@ -2666,6 +2666,47 @@
-> > >              '*timeout': 'int' } }
-> > >  
-> > >  ##
-> > > +# @BlockdevOptionsRbd:
-> > > +#
-> > > +# @pool:               Ceph pool name
-> > > +#
-> > > +# @image:              Image name in the Ceph pool
-> > > +#
-> > > +# @conf:               # optional path to Ceph configuration file.  Values
-> > > +#                      in the configuration file will be overridden by
-> > > +#                      options specified via QAPI.
-> > > +#
-> > > +# @snapshot:           #optional Ceph snapshot name
-> > > +#
-> > > +# @rbd-id:             #optional Ceph id name
-> > > +#
-> > > +# @password-secret:    #optional The ID of a QCryptoSecret object providing
-> > > +#                       the password for the login.
-> > > +#
-> > > +# @keyvalue-pairs:     #optional  string containing key/value pairs for
-> > > +#                      additional Ceph configuration, not including "id" or "conf"
-> > > +#                      options. This can be used to specify any of the options
-> > > +#                      that Ceph supports.  The format is of the form:
-> > > +#                           key1=value1:key2=value2:[...]
-> > > +#
-> > > +#                      Special characters such as ":" and "=" can be escaped
-> > > +#                      with a '\' character, which means the QAPI needs an
-> > > +#                      extra '\' character to pass the needed escape character.
-> > > +#                      For example:
-> > > +#                            "keyvalue-pairs": "mon_host=127.0.0.1\\:6321"
-> > > +#
-> > 
-> > This is the key / value pair issue mentioned in the cover letter.  Encoding
-> > all the options as a string like this is ugly.  What is the preference on
-> > how to handle these via QAPI, when the actual key and value pairs could be
-> > anything?   Talking with Markus on IRC, one option he mentioned was an array
-> > of a generic struct of 'key' and 'value' pairs.
-> > 
-> > Do the libvirt folks have any interface preferences here?
-> 
-> IMHO, we should formally model each option that we need to be able to provide
-> and *not* provide any generic passthrough feature in QAPI.
-> 
-> Particularly for the server hostname/port, we should have the same QAPI
-> modelling approach that we did for other network protocols.
-> 
->
+XkbGetKeyboard does not work in XWayland and even on non-Wayland
+X11 servers its use is discouraged:
 
-That is a sane position to take, but the problem is I really have no idea
-all the options to include or not include here.
+  https://bugs.freedesktop.org/show_bug.cgi?id=89240
 
-However, maybe it doesn't matter, at least for 2.9 - for the QAPI command,
-we could drop the extra arguments completely (i.e., just drop the
-keyvalue-pairs argument, above).  The extra options could still be set via a
-config file passed in via 'conf', and in release > 2.9 we can gradually (or
-not-so-gradually) add in additional options directly supported via QAPI.
+This resolves a problem whereby QEMU prints
 
-The filename parsing would remain the same, for backwards compatibility, of
-course.
+  "could not lookup keycode name"
 
-Does this sound reasonable to you?
+on startup when running under XWayland. Keymap handling is
+however still broken after this commit, since Xwayland is
+reporting a keymap we can't handle
 
+  "unknown keycodes `(unnamed)', please report to qemu-devel@nongnu.org"
 
--Jeff
+NB, native Wayland support (which is the default under GTK3) is
+not affected - only XWayland (which can be requested with GDK_BACKEND
+on GTK3, and is the only option for GTK2).
+
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ ui/gtk.c |  7 ++++---
+ ui/sdl.c | 10 ++++++----
+ 2 files changed, 10 insertions(+), 7 deletions(-)
+
+diff --git a/ui/gtk.c b/ui/gtk.c
+index f21e9e7..6eb56e9 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -2200,11 +2200,12 @@ static void gd_set_keycode_type(GtkDisplayState *s)
+     GdkDisplay *display = gtk_widget_get_display(s->window);
+     if (GDK_IS_X11_DISPLAY(display)) {
+         Display *x11_display = gdk_x11_display_get_xdisplay(display);
+-        XkbDescPtr desc = XkbGetKeyboard(x11_display, XkbGBN_AllComponentsMask,
+-                                         XkbUseCoreKbd);
++        XkbDescPtr desc = XkbGetMap(x11_display, XkbGBN_AllComponentsMask,
++                                    XkbUseCoreKbd);
+         char *keycodes = NULL;
+ 
+-        if (desc && desc->names) {
++        if (desc &&
++            (XkbGetNames(x11_display, XkbKeycodesNameMask, desc) == Success)) {
+             keycodes = XGetAtomName(x11_display, desc->names->keycodes);
+         }
+         if (keycodes == NULL) {
+diff --git a/ui/sdl.c b/ui/sdl.c
+index 19e8a84..37c21a0 100644
+--- a/ui/sdl.c
++++ b/ui/sdl.c
+@@ -233,10 +233,12 @@ static int check_for_evdev(void)
+     if (!SDL_GetWMInfo(&info)) {
+         return 0;
+     }
+-    desc = XkbGetKeyboard(info.info.x11.display,
+-                          XkbGBN_AllComponentsMask,
+-                          XkbUseCoreKbd);
+-    if (desc && desc->names) {
++    desc = XkbGetMap(info.info.x11.display,
++                     XkbGBN_AllComponentsMask,
++                     XkbUseCoreKbd);
++    if (desc &&
++        (XkbGetNames(info.info.x11.display,
++                     XkbKeycodesNameMask, desc) == Success)) {
+         keycodes = XGetAtomName(info.info.x11.display, desc->names->keycodes);
+         if (keycodes == NULL) {
+             fprintf(stderr, "could not lookup keycode name\n");
+-- 
+2.9.3
