@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ciJsw-00039v-TW
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:54:35 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ciJxB-000702-6M
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:58:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ciJss-0002KU-0H
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:54:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37304)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ciJsr-0002Jp-Qa
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:54:29 -0500
-Message-ID: <1488196464.25015.20.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 27 Feb 2017 12:54:24 +0100
-In-Reply-To: <CAFEAcA9nZCfVyDUzbavnu0HYtfHp1WTK=euATBB9FHkvnC7hTQ@mail.gmail.com>
-References: <20170227081456.7131-1-shah.suramya@gmail.com>
-	<CAFEAcA9nZCfVyDUzbavnu0HYtfHp1WTK=euATBB9FHkvnC7hTQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] Removed support for depth!=32
+	(envelope-from <peter.maydell@linaro.org>) id 1ciJxA-0003sr-F5
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:58:57 -0500
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:38784)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ciJxA-0003sg-85
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 06:58:56 -0500
+Received: by mail-wm0-x235.google.com with SMTP id u199so16756449wmd.1
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 03:58:56 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20170224164021.9066-1-clement.deschamps@antfield.fr>
+References: <20170224164021.9066-1-clement.deschamps@antfield.fr>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 27 Feb 2017 11:58:34 +0000
+Message-ID: <CAFEAcA9RSPFQJ2EE0jcTbkymj=CSWt1NajXu8ojX0rhkw5QyWg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] bcm2835: add sdhost and gpio
+ controllers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Suramya Shah <shah.suramya@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Clement Deschamps <clement.deschamps@antfield.fr>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrew Baumann <andrew.baumann@microsoft.com>
 
-  Hi,
+On 24 February 2017 at 16:40, Clement Deschamps
+<clement.deschamps@antfield.fr> wrote:
+> This patches add the Arasan SDHost controller and the GPIO controller to the BCM2835/36 platforms.
+>
+> This patches have been tested with raspbian 2015-09-24 (which uses the SDHCI controller),
+> and raspbian 2017-01-11 (which dynamically switches to the SDHost controller).
 
-> (Gerd: can you remind me of the reason why we can assume that
-> depth is always 32 here? IIRC it's because the UI layer always
-> uses 32 bit depth now but I couldn't convince myself of that
-> with a quick look through the ui code...)
+Thanks; applied to target-arm.next; I'll put out a pullreq either today
+or tomorrow with these in.
 
-qemu-allocated display surfaces (backed by host memory) are always
-32bpp.  Display emulation will get such surfaces in case it uses
-qemu_create_displaysurface() or qemu_console_resize().  So the display
-emulation only needs to be able to generate 32bpp output
-(PIXMAN_x8r8g8b8 to be exact) from whatever the guest creates.
+> I spotted an issue with the raspi2 platform, but it is not related to this patch.
+> The CP15 timer frequency is set to 19.20MHz in the raspbian kernel DTB.
+> There is a constant (GTIMER_SCALE) in target/arm/internals.h which seems to tell that the timer is at 62.5MHz.
+> This causes problems:
+> - The sleep command entered in guest lasts around 1/3 of the time it is supposed to last.
+> - The cursor is blinking faster that it should
+> - The systemd timeouts expire too early.
+> - ...
+>
+> Did you already have this issue on another platform ?
+> Should the frequency in the DTB be dynamically replaced depending on the GTIMER_SCALE value ?
+> Or should the constant GTIMER_SCALE be platform dependent ?
 
-There is also the option to create display surfaces which are backed by
-guest ram or vga device memory, using qemu_create_displaysurface_from(),
-those can have a different format (any pixman supported format is
-allowed here, because the ui code will use pixman to convert those
-surfaces if needed).
+We haven't noticed that on other platforms -- I think typically the kernel
+trusts the value in the cp15 "what frequency are the timers" register,
+at least on the "virt" board which gets the most usage.
 
-sm501 uses qemu_console_resize (see line 1320), so yes, the code will
-never see a display surface with a depth !=3D 32 and a whole bunch of code
-can be dropped.  The need for the include template goes away too.
+We probably should have a mechanism for allowing the SoC or
+board to set the clock frequency for the timer registers, though.
+Ideally this would be done with the clocktree patchset that
+Fred Konrad has been working on, which provides a generic
+mechanism for wiring up "clocks" to devices which tell them how
+fast things should tick.
 
-cheers,
-  Gerd
+thanks
+-- PMM
