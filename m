@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1ciFeC-0001VF-UZ
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:23:08 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ciFjf-0005SK-Az
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:28:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1ciFe8-0004ER-CC
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:23:04 -0500
-Received: from [59.151.112.132] (port=42321 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1ciFe7-0004E1-42
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:23:00 -0500
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Date: Mon, 27 Feb 2017 15:30:27 +0800
-Message-ID: <1488180627-18258-4-git-send-email-caoj.fnst@cn.fujitsu.com>
-In-Reply-To: <1488180627-18258-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-References: <1488180627-18258-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ciFja-0006BT-HK
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:28:43 -0500
+Received: from [45.249.212.187] (port=2992 helo=dggrg01-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ciFjZ-00069F-Jh
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 02:28:38 -0500
+References: <1487993530-30875-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1487993530-30875-4-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<58B12B02.2000202@huawei.com>
+	<31f0e89c-13c0-247a-1026-9fc28ee2d6f4@cn.fujitsu.com>
+From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Message-ID: <58B3D525.6080104@huawei.com>
+Date: Mon, 27 Feb 2017 15:28:37 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 3/3] vfio-pci: process non fatal error of AER
+In-Reply-To: <31f0e89c-13c0-247a-1026-9fc28ee2d6f4@cn.fujitsu.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/3] COLO-compare: Optimize
+ colo_packet_compare_common
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,227 +30,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, alex.williamson@redhat.com, izumi.taku@jp.fujitsu.com, Dou Liyang <douly.fnst@cn.fujitsu.com>
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
+Cc: xuquan8@huawei.com
 
-Make use of the non fatal error eventfd that the kernel module provide
-to process the AER non fatal error. Fatal error still goes into the
-legacy way which results in VM stop.
+On 2017/2/27 15:03, Zhang Chen wrote:
+>
+>
+> On 02/25/2017 02:58 PM, Hailiang Zhang wrote:
+>> On 2017/2/25 11:32, Zhang Chen wrote:
+>>> Add offset args for colo_packet_compare_common, optimize
+>>> colo_packet_compare_icmp() and colo_packet_compare_udp()
+>>> just compare the IP payload.
+>>>
+>>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+>>> ---
+>>>    net/colo-compare.c | 28 +++++++++++++++++++++-------
+>>>    1 file changed, 21 insertions(+), 7 deletions(-)
+>>>
+>>> diff --git a/net/colo-compare.c b/net/colo-compare.c
+>>> index e75f0ae..9853232 100644
+>>> --- a/net/colo-compare.c
+>>> +++ b/net/colo-compare.c
+>>> @@ -180,7 +180,7 @@ static int packet_enqueue(CompareState *s, int mode)
+>>>     * return:    0  means packet same
+>>>     *            > 0 || < 0 means packet different
+>>>     */
+>>> -static int colo_packet_compare_common(Packet *ppkt, Packet *spkt)
+>>> +static int colo_packet_compare_common(Packet *ppkt, Packet *spkt,
+>>> int offset)
+>>>    {
+>>>        trace_colo_compare_ip_info(ppkt->size,
+>>> inet_ntoa(ppkt->ip->ip_src),
+>>> inet_ntoa(ppkt->ip->ip_dst), spkt->size,
+>>> @@ -188,7 +188,8 @@ static int colo_packet_compare_common(Packet
+>>> *ppkt, Packet *spkt)
+>>> inet_ntoa(spkt->ip->ip_dst));
+>>>
+>>>        if (ppkt->size == spkt->size) {
+>>> -        return memcmp(ppkt->data, spkt->data, spkt->size);
+>>> +        return memcmp(ppkt->data + offset, spkt->data + offset,
+>>> +                      spkt->size - offset);
+>>>        } else {
+>>>            trace_colo_compare_main("Net packet size are not the same");
+>>>            return -1;
+>>> @@ -237,8 +238,7 @@ static int colo_packet_compare_tcp(Packet *spkt,
+>>> Packet *ppkt)
+>>>            spkt->ip->ip_sum = ppkt->ip->ip_sum;
+>>>        }
+>>>
+>>> -    res = memcmp(ppkt->data + ETH_HLEN, spkt->data + ETH_HLEN,
+>>> -                (spkt->size - ETH_HLEN));
+>>> +    res = colo_packet_compare_common(ppkt, spkt, ETH_HLEN);
+>>>
+>>
+>> For tcp packets check, why not ignore the ip headers, just like udp
+>> packets check ?
+>> Besides, here, can we compare the checksum stored in headers of tcp
+>> and udp
+>> before call colo_packet_compare_common(), which i think will improve
+>> the comparing
+>> performance.
+>
+> That's another way to compare the packet suggested by Dr. David Alan
+> Gilbert,
+> It makes two packets IP header be same firstly, then compare all IP packet.
+> This way can tell people why we ignore IP header explicitly in other
+> packets check like udp.
+> For performance, If we ignore the IP header that will reduce at least 20
+> byte not to be compared.
+> So, ignore ip header have better comparing performance.
+>
 
-Register the handler, wait for notification. Construct aer message and
-pass it to root port on notification. Root port will trigger an interrupt
-to signal guest, then, the guest driver will do the recovery.
+OK, here, i think we can re-use the checksum value stored in headers of tcp
+or udp, comparing it first before comparing the complete payload of tcp or udp
+packets is another way to improve the performance, it is only 2 bytes.
 
-Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
----
- hw/vfio/pci.c              | 139 +++++++++++++++++++++++++++++++++++++++++++++
- hw/vfio/pci.h              |   2 +
- linux-headers/linux/vfio.h |   1 +
- 3 files changed, 142 insertions(+)
+Thanks.
 
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 3d0d005..55c6e05 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -2422,6 +2422,21 @@ static void vfio_populate_device(VFIOPCIDevice *vdev, Error **errp)
-                      "Could not enable error recovery for the device",
-                      vbasedev->name);
-     }
-+
-+    irq_info.index = VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX;
-+    irq_info.count = 0; /* clear */
-+    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_GET_IRQ_INFO, &irq_info);
-+    if (ret) {
-+        /* This can fail for an old kernel or legacy PCI dev */
-+        trace_vfio_populate_device_get_irq_info_failure();
-+    } else if (irq_info.count == 1) {
-+        vdev->pci_aer_non_fatal = true;
-+    } else {
-+        error_report(WARN_PREFIX
-+                     "Couldn't enable non fatal error recovery for the device",
-+                     vbasedev->name);
-+    }
-+
- }
- 
- static void vfio_put_device(VFIOPCIDevice *vdev)
-@@ -2432,6 +2447,128 @@ static void vfio_put_device(VFIOPCIDevice *vdev)
-     vfio_put_base_device(&vdev->vbasedev);
- }
- 
-+static void vfio_non_fatal_err_notifier_handler(void *opaque)
-+{
-+    VFIOPCIDevice *vdev = opaque;
-+    PCIDevice *dev = &vdev->pdev;
-+    PCIEAERMsg msg = {
-+        .severity = PCI_ERR_ROOT_CMD_NONFATAL_EN,
-+        .source_id = (pci_bus_num(dev->bus) << 8) | dev->devfn,
-+    };
-+
-+    if (!event_notifier_test_and_clear(&vdev->non_fatal_err_notifier)) {
-+        return;
-+    }
-+
-+    /* Populate the aer msg and send it to root port */
-+    if (dev->exp.aer_cap) {
-+        uint8_t *aer_cap = dev->config + dev->exp.aer_cap;
-+        uint32_t uncor_status;
-+        bool isfatal;
-+
-+        uncor_status = vfio_pci_read_config(dev,
-+                            dev->exp.aer_cap + PCI_ERR_UNCOR_STATUS, 4);
-+        if (!uncor_status) {
-+            return;
-+        }
-+
-+        isfatal = uncor_status & pci_get_long(aer_cap + PCI_ERR_UNCOR_SEVER);
-+        if (isfatal) {
-+            goto stop;
-+        }
-+
-+        error_report("%s sending non fatal event to root port. uncor status = "
-+                     "0x%"PRIx32, vdev->vbasedev.name, uncor_status);
-+        pcie_aer_msg(dev, &msg);
-+        return;
-+    }
-+
-+stop:
-+    /* Terminate the guest in case of fatal error */
-+    error_report("%s(%s) fatal error detected. Please collect any data"
-+            " possible and then kill the guest", __func__, vdev->vbasedev.name);
-+    vm_stop(RUN_STATE_INTERNAL_ERROR);
-+}
-+
-+/*
-+ * Register non fatal error notifier for devices supporting error recovery.
-+ * If we encounter a failure in this function, we report an error
-+ * and continue after disabling error recovery support for the device.
-+ */
-+static void vfio_register_non_fatal_err_notifier(VFIOPCIDevice *vdev)
-+{
-+    int ret;
-+    int argsz;
-+    struct vfio_irq_set *irq_set;
-+    int32_t *pfd;
-+
-+    if (!vdev->pci_aer_non_fatal) {
-+        return;
-+    }
-+
-+    if (event_notifier_init(&vdev->non_fatal_err_notifier, 0)) {
-+        error_report("vfio: Unable to init event notifier for non-fatal error detection");
-+        vdev->pci_aer_non_fatal = false;
-+        return;
-+    }
-+
-+    argsz = sizeof(*irq_set) + sizeof(*pfd);
-+
-+    irq_set = g_malloc0(argsz);
-+    irq_set->argsz = argsz;
-+    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
-+                     VFIO_IRQ_SET_ACTION_TRIGGER;
-+    irq_set->index = VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX;
-+    irq_set->start = 0;
-+    irq_set->count = 1;
-+    pfd = (int32_t *)&irq_set->data;
-+
-+    *pfd = event_notifier_get_fd(&vdev->non_fatal_err_notifier);
-+    qemu_set_fd_handler(*pfd, vfio_non_fatal_err_notifier_handler, NULL, vdev);
-+
-+    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
-+    if (ret) {
-+        error_report("vfio: Failed to set up non-fatal error notification");
-+        qemu_set_fd_handler(*pfd, NULL, NULL, vdev);
-+        event_notifier_cleanup(&vdev->non_fatal_err_notifier);
-+        vdev->pci_aer_non_fatal = false;
-+    }
-+    g_free(irq_set);
-+}
-+
-+static void vfio_unregister_non_fatal_err_notifier(VFIOPCIDevice *vdev)
-+{
-+    int argsz;
-+    struct vfio_irq_set *irq_set;
-+    int32_t *pfd;
-+    int ret;
-+
-+    if (!vdev->pci_aer_non_fatal) {
-+        return;
-+    }
-+
-+    argsz = sizeof(*irq_set) + sizeof(*pfd);
-+
-+    irq_set = g_malloc0(argsz);
-+    irq_set->argsz = argsz;
-+    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
-+                     VFIO_IRQ_SET_ACTION_TRIGGER;
-+    irq_set->index = VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX;
-+    irq_set->start = 0;
-+    irq_set->count = 1;
-+    pfd = (int32_t *)&irq_set->data;
-+    *pfd = -1;
-+
-+    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
-+    if (ret) {
-+        error_report("vfio: Failed to de-assign error fd: %m");
-+    }
-+    g_free(irq_set);
-+    qemu_set_fd_handler(event_notifier_get_fd(&vdev->non_fatal_err_notifier),
-+                        NULL, NULL, vdev);
-+    event_notifier_cleanup(&vdev->non_fatal_err_notifier);
-+}
-+
- static void vfio_err_notifier_handler(void *opaque)
- {
-     VFIOPCIDevice *vdev = opaque;
-@@ -2860,6 +2997,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
-         }
-     }
- 
-+    vfio_register_non_fatal_err_notifier(vdev);
-     vfio_register_err_notifier(vdev);
-     vfio_register_req_notifier(vdev);
-     vfio_setup_resetfn_quirk(vdev);
-@@ -2900,6 +3038,7 @@ static void vfio_exitfn(PCIDevice *pdev)
- 
-     vfio_unregister_req_notifier(vdev);
-     vfio_unregister_err_notifier(vdev);
-+    vfio_unregister_non_fatal_err_notifier(vdev);
-     pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
-     vfio_disable_interrupts(vdev);
-     if (vdev->intx.mmap_timer) {
-diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-index 34e8b04..9d83349 100644
---- a/hw/vfio/pci.h
-+++ b/hw/vfio/pci.h
-@@ -119,6 +119,7 @@ typedef struct VFIOPCIDevice {
-     void *igd_opregion;
-     PCIHostDeviceAddress host;
-     EventNotifier err_notifier;
-+    EventNotifier non_fatal_err_notifier;
-     EventNotifier req_notifier;
-     int (*resetfn)(struct VFIOPCIDevice *);
-     uint32_t vendor_id;
-@@ -137,6 +138,7 @@ typedef struct VFIOPCIDevice {
-     uint32_t igd_gms;
-     uint8_t pm_cap;
-     bool pci_aer;
-+    bool pci_aer_non_fatal;
-     bool req_enabled;
-     bool has_flr;
-     bool has_pm_reset;
-diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-index 759b850..c8f699c 100644
---- a/linux-headers/linux/vfio.h
-+++ b/linux-headers/linux/vfio.h
-@@ -433,6 +433,7 @@ enum {
- 	VFIO_PCI_MSIX_IRQ_INDEX,
- 	VFIO_PCI_ERR_IRQ_INDEX,
- 	VFIO_PCI_REQ_IRQ_INDEX,
-+	VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX,
- 	VFIO_PCI_NUM_IRQS
- };
- 
--- 
-1.8.3.1
+> Thanks
+> Zhang Chen
+>
+>
+>>
+>> Thanks.
+>> Hailiang
+>>
+>>>        if (res != 0 &&
+>>> trace_event_get_state(TRACE_COLO_COMPARE_MISCOMPARE)) {
+>>> trace_colo_compare_pkt_info_src(inet_ntoa(ppkt->ip->ip_src),
+>>> @@ -277,7 +277,14 @@ static int colo_packet_compare_udp(Packet *spkt,
+>>> Packet *ppkt)
+>>>            return -1;
+>>>        }
+>>>
+>>> -    ret = colo_packet_compare_common(ppkt, spkt);
+>>> +    /*
+>>> +     * Because of ppkt and spkt are both in the same connection,
+>>> +     * The ppkt's src ip, dst ip, src port, dst port, ip_proto all are
+>>> +     * same with spkt. In addition, IP header's Identification is a
+>>> random
+>>> +     * field, we can handle it in IP fragmentation function later.
+>>> +     * So we just compare the ip payload here.
+>>> +     */
+>>> +    ret = colo_packet_compare_common(ppkt, spkt, network_length +
+>>> ETH_HLEN);
+>>>
+>>>        if (ret) {
+>>>            trace_colo_compare_udp_miscompare("primary pkt size",
+>>> ppkt->size);
+>>> @@ -304,7 +311,14 @@ static int colo_packet_compare_icmp(Packet
+>>> *spkt, Packet *ppkt)
+>>>            return -1;
+>>>        }
+>>>
+>>> -    if (colo_packet_compare_common(ppkt, spkt)) {
+>>> +    /*
+>>> +     * Because of ppkt and spkt are both in the same connection,
+>>> +     * The ppkt's src ip, dst ip, src port, dst port, ip_proto all are
+>>> +     * same with spkt. In addition, IP header's Identification is a
+>>> random
+>>> +     * field, we can handle it in IP fragmentation function later.
+>>> +     * So we just compare the ip payload here.
+>>> +     */
+>>> +    if (colo_packet_compare_common(ppkt, spkt, network_length +
+>>> ETH_HLEN)) {
+>>>            trace_colo_compare_icmp_miscompare("primary pkt size",
+>>>                                               ppkt->size);
+>>>            qemu_hexdump((char *)ppkt->data, stderr, "colo-compare",
+>>> @@ -330,7 +344,7 @@ static int colo_packet_compare_other(Packet
+>>> *spkt, Packet *ppkt)
+>>> inet_ntoa(ppkt->ip->ip_dst), spkt->size,
+>>> inet_ntoa(spkt->ip->ip_src),
+>>> inet_ntoa(spkt->ip->ip_dst));
+>>> -    return colo_packet_compare_common(ppkt, spkt);
+>>> +    return colo_packet_compare_common(ppkt, spkt, 0);
+>>>    }
+>>>
+>>>    static int colo_old_packet_check_one(Packet *pkt, int64_t *check_time)
+>>>
+>>
+>>
+>>
+>>
+>> .
+>>
+>
