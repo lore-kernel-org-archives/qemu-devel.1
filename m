@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ciIg9-0004yn-Gs
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:37:18 -0500
+	(envelope-from <groug@kaod.org>) id 1ciIgs-0005JO-2Z
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:38:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ciIg8-0005Kf-NJ
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:37:17 -0500
-Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:35248)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ciIg8-0005KN-Ew
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:37:16 -0500
-Received: by mail-wr0-x22f.google.com with SMTP id g10so49102045wrg.2
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 02:37:16 -0800 (PST)
+	(envelope-from <groug@kaod.org>) id 1ciIgo-0005Pj-3I
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:38:02 -0500
+Received: from 7.mo6.mail-out.ovh.net ([46.105.59.196]:51425)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ciIgn-0005PE-S9
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 05:37:58 -0500
+Received: from player761.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 6F997B3869
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 11:37:56 +0100 (CET)
+Date: Mon, 27 Feb 2017 11:37:43 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170227113743.0920003b@bahia.lan>
+In-Reply-To: <20170227102058.GC28403@stefanha-x1.localdomain>
+References: <148760155821.31154.13876757160410915057.stgit@bahia.lan>
+	<148760159100.31154.15503472827834963062.stgit@bahia.lan>
+	<20170223111644.GD30636@stefanha-x1.localdomain>
+	<20170223125621.1d03281c@bahia.lan>
+	<20170224171730.GE27402@stefanha-x1.localdomain>
+	<20170224231744.0f629a65@bahia.lan>
+	<20170227102058.GC28403@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20170227081456.7131-1-shah.suramya@gmail.com>
-References: <20170227081456.7131-1-shah.suramya@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 27 Feb 2017 10:36:54 +0000
-Message-ID: <CAFEAcA9nZCfVyDUzbavnu0HYtfHp1WTK=euATBB9FHkvnC7hTQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] Removed support for depth!=32
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/0fe7PAYG97I2IbPA47/pd.U";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH 04/29] 9pfs: introduce openat_nofollow()
+ helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +37,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suramya Shah <shah.suramya@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Prasad J Pandit <prasad@redhat.com>, qemu-devel@nongnu.org, Jann Horn <jannh@google.com>
 
-On 27 February 2017 at 08:14, Suramya Shah <shah.suramya@gmail.com> wrote:
-> Signed-off-by: Suramya Shah <shah.suramya@gmail.com>
-> ---
->  hw/display/sm501_template.h | 8 +-------
->  1 file changed, 1 insertion(+), 7 deletions(-)
->
-> diff --git a/hw/display/sm501_template.h b/hw/display/sm501_template.h
-> index f33e499..4e5801e 100644
-> --- a/hw/display/sm501_template.h
-> +++ b/hw/display/sm501_template.h
-> @@ -22,13 +22,7 @@
->   * THE SOFTWARE.
->   */
->
-> -#if DEPTH == 8
-> -#define BPP 1
-> -#define PIXEL_TYPE uint8_t
-> -#elif DEPTH == 15 || DEPTH == 16
-> -#define BPP 2
-> -#define PIXEL_TYPE uint16_t
-> -#elif DEPTH == 32
-> +#if DEPTH == 32
->  #define BPP 4
->  #define PIXEL_TYPE uint32_t
->  #else
+--Sig_/0fe7PAYG97I2IbPA47/pd.U
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Hi there; thanks for this patch. How did you test it? It doesn't
-compile for me:
+On Mon, 27 Feb 2017 10:20:58 +0000
+Stefan Hajnoczi <stefanha@gmail.com> wrote:
 
-In file included from
-/home/petmay01/linaro/qemu-from-laptop/qemu/hw/display/sm501.c:1177:0:
-/home/petmay01/linaro/qemu-from-laptop/qemu/hw/display/sm501_template.h:29:2:
-error: #error unsupport depth
- #error unsupport depth
-  ^
+> On Fri, Feb 24, 2017 at 11:17:44PM +0100, Greg Kurz wrote:
+> > On Fri, 24 Feb 2017 17:17:30 +0000
+> > Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> > [...] =20
+> > > > > This function doesn't handle absolute paths?  It ignores leading =
+'/' and
+> > > > > therefore treats all paths as relative paths.
+> > > > >    =20
+> > > >=20
+> > > > Yes because any path coming from the client is supposed (*) to be r=
+elative to the
+> > > > shared directory and openat(2) says:   =20
+> > >=20
+> > > Please change the function name since this isn't openat with nofollow
+> > > behavior, it's a subset of openat that only takes relative paths with
+> > > nofollow behavior. =20
+> >=20
+> > In the v2, this function is only called by local_open_nofollow() actual=
+ly.
+> > Maybe I should move the stripping of leading '/' characters there ? =20
+>=20
+> As long as the function name is clear then I'm happy.  If it has
+> different semantics from openat() then it should have a different name
+> (e.g. relative_openat_nofollow()).
+>=20
 
-This is because you've removed the code from this #ifdef
-but you haven't also removed the code in sm501.c which is
-currently trying to use it. (You also can expand out the
-uses of PIXEL_NAME and PIXEL_TYPE used later in sm501_template.h
-since they are now only ever defined to one thing, but not
-doing that doesn't cause compilation failure.)
+I've moved the stripping to the caller. This makes the code simpler.
+
+> Stefan
 
 
-(Gerd: can you remind me of the reason why we can assume that
-depth is always 32 here? IIRC it's because the UI layer always
-uses 32 bit depth now but I couldn't convince myself of that
-with a quick look through the ui code...)
+--Sig_/0fe7PAYG97I2IbPA47/pd.U
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-thanks
--- PMM
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAli0AXcACgkQAvw66wEB28JoxQCfXcRBP/2b1EFWw7UwsIltH7Ep
+HZ8An2h6rhXWI0KkZABKw8tZpSDaHHwU
+=1eba
+-----END PGP SIGNATURE-----
+
+--Sig_/0fe7PAYG97I2IbPA47/pd.U--
