@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ciRNB-0006B8-QR
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:54:19 -0500
+	(envelope-from <groug@kaod.org>) id 1ciRQr-0000YH-QD
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:58:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ciRNA-00070C-ID
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:54:17 -0500
-Date: Mon, 27 Feb 2017 19:54:03 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170227195403.GA23045@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <cover.1488220970.git.jcody@redhat.com>
-	<12a16b28300f871052a49897ec7875a082fc63e3.1488220970.git.jcody@redhat.com>
+	(envelope-from <groug@kaod.org>) id 1ciRQo-0008Cu-Lt
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:58:05 -0500
+Received: from 2.mo6.mail-out.ovh.net ([46.105.76.65]:56061)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ciRQo-0008CR-F0
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 14:58:02 -0500
+Received: from player761.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 03047B37B5
+	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 20:58:00 +0100 (CET)
+Date: Mon, 27 Feb 2017 20:57:53 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170227205753.60b8a225@bahia.lan>
+In-Reply-To: <20170227194134.GH2778@thinpad.lan.raisama.net>
+References: <20170227162501.29280-1-ehabkost@redhat.com>
+	<CAFEAcA8b_tdQAP6YVDRaZKzHLed5xKbfABtJUV0U43HpkTiBdg@mail.gmail.com>
+	<20170227194134.GH2778@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <12a16b28300f871052a49897ec7875a082fc63e3.1488220970.git.jcody@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 5/5] block/rbd: add support for
- 'mon_host', 'auth_supported' via QAPI
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/B4EHs+vVyRVf7.lk_I5POe3";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] travis-ci 'make check' timeouts (was Re: [PULL
+ 00/11] x86 queue, 2017-02-27)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,129 +33,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, eblake@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-On Mon, Feb 27, 2017 at 01:58:48PM -0500, Jeff Cody wrote:
-> This adds support for two additional options that may be specified
-> by QAPI in blockdev-add:
-> 
->     mon_host: servername and port
->     auth_supported: either 'cephx' or 'none'
-> 
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
-> ---
->  block/rbd.c          | 39 +++++++++++++++++++++++++++++++++++++++
->  qapi/block-core.json |  8 ++++++++
->  2 files changed, 47 insertions(+)
-> 
-> diff --git a/block/rbd.c b/block/rbd.c
-> index e04a5e1..51e971e 100644
-> --- a/block/rbd.c
-> +++ b/block/rbd.c
-> @@ -394,6 +394,18 @@ static QemuOptsList runtime_opts = {
->              .name = "keyvalue-pairs",
->              .type = QEMU_OPT_STRING,
->          },
-> +        {
-> +            .name = "server.host",
-> +            .type = QEMU_OPT_STRING,
-> +        },
-> +        {
-> +            .name = "server.port",
-> +            .type = QEMU_OPT_STRING,
-> +        },
-> +        {
-> +            .name = "auth_supported",
-> +            .type = QEMU_OPT_STRING,
-> +        },
->          { /* end of list */ }
->      },
->  };
-> @@ -559,6 +571,7 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
->  {
->      BDRVRBDState *s = bs->opaque;
->      const char *pool, *snap, *conf, *clientname, *name, *keypairs;
-> +    const char *host, *port, *auth_supported;
->      const char *secretid;
->      QemuOpts *opts;
->      Error *local_err = NULL;
-> @@ -580,6 +593,9 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
->      clientname     = qemu_opt_get(opts, "user");
->      name           = qemu_opt_get(opts, "image");
->      keypairs       = qemu_opt_get(opts, "keyvalue-pairs");
-> +    host           = qemu_opt_get(opts, "server.host");
-> +    port           = qemu_opt_get(opts, "server.port");
-> +    auth_supported = qemu_opt_get(opts, "auth_supported");
->  
->      r = rados_create(&s->cluster, clientname);
->      if (r < 0) {
-> @@ -604,6 +620,29 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
->          goto failed_shutdown;
->      }
->  
-> +    /* if mon_host was specified */
-> +    if (host) {
-> +        const char *hostname = host;
-> +        char *mon_host = NULL;
-> +
-> +        if (port) {
-> +            mon_host = g_strdup_printf("%s:%s", host, port);
-> +            hostname = mon_host;
-> +        }
-> +        r = rados_conf_set(s->cluster, "mon_host", hostname);
-> +        g_free(mon_host);
-> +        if (r < 0) {
-> +            goto failed_shutdown;
-> +        }
-> +    }
-> +
-> +    if (auth_supported) {
-> +        r = rados_conf_set(s->cluster, "auth_supported", auth_supported);
-> +        if (r < 0) {
-> +            goto failed_shutdown;
-> +        }
-> +    }
-> +
->      if (qemu_rbd_set_auth(s->cluster, secretid, errp) < 0) {
->          r = -EIO;
->          goto failed_shutdown;
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 5b311ff..376512c 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -2680,6 +2680,12 @@
->  #
->  # @user:               #optional Ceph id name.
->  #
-> +# @server:             #optional Monitor host address and port.  This maps
-> +#                      to the "mon_host" Ceph option.
-> +#
-> +# @auth_supported:     #optional Authentication supported.
-> +#                      Either "cephx" or"none".
-> +#
->  # @password-secret:    #optional The ID of a QCryptoSecret object providing
->  #                       the password for the login.
->  #
-> @@ -2691,6 +2697,8 @@
->              '*conf': 'str',
->              '*snapshot': 'str',
->              '*user': 'str',
-> +            '*server': 'InetSocketAddress',
+--Sig_/B4EHs+vVyRVf7.lk_I5POe3
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-This needs to be an array
+On Mon, 27 Feb 2017 16:41:34 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-> +            '*auth_supported': 'str',
+> On Mon, Feb 27, 2017 at 07:16:03PM +0000, Peter Maydell wrote:
+> [...]
+> > This seemed to hang in 'make check' on x86. I didn't have time to
+> > investigate, so I'll have another go with it later. =20
+>=20
+> I have been seeing lots of travis-ci failures recently because of
+> 'make check' taking too long. The jobs seem to timeout while
+> running tests/test-aio-multithread.
+>=20
+> I see similar failures on recent qemu.git master jobs, too:
+> https://travis-ci.org/qemu/qemu/builds
+>=20
+> Are they similar to the hang you have seen?
+>=20
 
-IIUC, you're allowed to list multiple auth options too
+The problem with tests/test-aio-multithread got fixed today with the
+following commit:
 
->              '*password-secret': 'str' } }
->  
+http://git.qemu-project.org/?p=3Dqemu.git;a=3Dcommit;h=3D3b1d8169844fafee18=
+4366b0e0d7080534758b4d
 
+--Sig_/B4EHs+vVyRVf7.lk_I5POe3
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAli0hMEACgkQAvw66wEB28JTIgCfUImnu5w42BW6NXn514oLbPGz
+caUAn0u9h6pkdB1qtdFe0UU/cec/3RL7
+=efdr
+-----END PGP SIGNATURE-----
+
+--Sig_/B4EHs+vVyRVf7.lk_I5POe3--
