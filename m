@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pkrempa@redhat.com>) id 1ciLUJ-00054I-Rl
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:37:16 -0500
+	(envelope-from <mreitz@redhat.com>) id 1ciLVW-00064T-Bl
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:38:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pkrempa@redhat.com>) id 1ciLUF-0008BJ-UJ
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:37:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:30293)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pkrempa@redhat.com>) id 1ciLUF-0008Av-Lr
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:37:11 -0500
-Date: Mon, 27 Feb 2017 14:38:05 +0100
-From: Peter Krempa <pkrempa@redhat.com>
-Message-ID: <20170227133805.GG3900@andariel.pipo.sk>
-References: <20170227094050.ia6nrkvtvzmg7b2q@XZHOUW.usersys.redhat.com>
-	<20170227101104.GB28403@stefanha-x1.localdomain>
-	<20170227125003.fegyd7gbrfdvrwjv@XZHOUW.usersys.redhat.com>
-	<20170227133130.GS28403@stefanha-x1.localdomain>
+	(envelope-from <mreitz@redhat.com>) id 1ciLVV-00008Z-Fo
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:38:30 -0500
+References: <20170225170758.427066-1-vsementsov@virtuozzo.com>
+	<20170225170758.427066-12-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <3e19d516-0763-1e41-effa-d14d05f417b9@redhat.com>
+Date: Mon, 27 Feb 2017 14:38:18 +0100
 MIME-Version: 1.0
+In-Reply-To: <20170225170758.427066-12-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="/i8j2F0k9BYX4qLc"
-Content-Disposition: inline
-In-Reply-To: <20170227133130.GS28403@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [libvirt] Fail to start 2nd guest
+	protocol="application/pgp-signature";
+	boundary="OEHD90IqpDuOJjbqEBQmWs3aNoB1wJvI3"
+Subject: Re: [Qemu-devel] [PATCH v16 11/22] block: introduce persistent
+ dirty bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,87 +25,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Xiong Zhou <xzhou@redhat.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
-
---/i8j2F0k9BYX4qLc
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--OEHD90IqpDuOJjbqEBQmWs3aNoB1wJvI3
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
+ famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+Message-ID: <3e19d516-0763-1e41-effa-d14d05f417b9@redhat.com>
+Subject: Re: [PATCH v16 11/22] block: introduce persistent dirty bitmaps
+References: <20170225170758.427066-1-vsementsov@virtuozzo.com>
+ <20170225170758.427066-12-vsementsov@virtuozzo.com>
+In-Reply-To: <20170225170758.427066-12-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=iso-8859-15
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 27, 2017 at 13:31:30 +0000, Stefan Hajnoczi wrote:
-> On Mon, Feb 27, 2017 at 08:50:03PM +0800, Xiong Zhou wrote:
-> > On Mon, Feb 27, 2017 at 10:11:04AM +0000, Stefan Hajnoczi wrote:
-> > > On Mon, Feb 27, 2017 at 05:40:50PM +0800, Xiong Zhou wrote:
+On 25.02.2017 18:07, Vladimir Sementsov-Ogievskiy wrote:
+> New field BdrvDirtyBitmap.persistent means, that bitmap should be saved=
 
-[...]
+> on bdrv_close, using format driver.
 
-> > > > sh-4.2# virsh start 73us
-> > > > error: Failed to start domain 73us
-> > > > error: internal error: qemu unexpectedly closed the monitor: ((null=
-):11497): Spice-Warning **: reds.c:2499:reds_init_socket: listen: Address a=
-lready in use
-> > > > 2017-02-27T09:33:42.335708Z qemu-kvm: failed to initialize spice se=
-rver
-> > >=20
-> > > The error message says that the spice remote desktop cannot listen on
-> > > -spice port=3D5900,addr=3D127.0.0.1.
-> > >=20
-> > > Did you hardcode port 5900 in the domain XML?  That could explain why
-> > No.
-> > > the second guest fails to launch - you need to use unique port numbers
-> > > or let libvirt automatically assign them.  Check the domain XML:
-> > >=20
-> > >   <graphics type=3D'spice' port=3D'-1' tlsPort=3D'-1' autoport=3D'yes=
-'>
-> >=20
-> > It looks like:
-> >=20
-> >     <graphics type=3D'spice' autoport=3D'yes'>
-> >       <listen type=3D'address'/>
-> >       <image compression=3D'off'/>
-> >     </graphics>
-> >=20
-> >=20
-> > >=20
-> > > Another possibility is that a process running on the host is already
-> > > using port 5900.  Perhaps a guest or VNC server that was launched
-> > > outside of libvirt?  You can check this with:
-> > >=20
-> > >   netstat -alpn | grep 5900
-> > # netstat -alpn | grep 5900
-> > tcp        0      0 127.0.0.1:5900          0.0.0.0:*               LIS=
-TEN      11065/qemu-kvm     =20
+Somehow this sentence stays valid, but it has a much different meaning
+now. bdrv_close() no longer directly takes care of saving bitmaps but
+its completely up to the format driver. In any case, this patch has no
+longer anything to do with that, so I think this statement should be
+changed.
+
+Max
+
+>                                     Format driver should maintain bitma=
+p
+> storing.
 >=20
-> Please check that 11065/qemu-kvm was launched by the same libvirtd and
-> its domain XML also uses autoport=3D'yes'.
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/dirty-bitmap.c         | 26 ++++++++++++++++++++++++++
+>  block/qcow2-bitmap.c         |  1 +
+>  include/block/dirty-bitmap.h |  6 ++++++
+>  3 files changed, 33 insertions(+)
 >=20
-> I have CCed the libvirt mailing list because they may be able to explain
-> why there is a collision on TCP port 5900.
+> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+> index a9dfce8d00..d2fbf55964 100644
+> --- a/block/dirty-bitmap.c
+> +++ b/block/dirty-bitmap.c
+> @@ -44,6 +44,7 @@ struct BdrvDirtyBitmap {
+>      int64_t size;               /* Size of the bitmap (Number of secto=
+rs) */
+>      bool disabled;              /* Bitmap is read-only */
+>      int active_iterators;       /* How many iterators are active */
+> +    bool persistent;            /* bitmap must be saved to owner disk =
+image */
+>      bool autoload;              /* For persistent bitmaps: bitmap must=
+ be
+>                                     autoloaded on image opening */
+>      QLIST_ENTRY(BdrvDirtyBitmap) list;
+> @@ -72,6 +73,7 @@ void bdrv_dirty_bitmap_make_anon(BdrvDirtyBitmap *bit=
+map)
+>      assert(!bdrv_dirty_bitmap_frozen(bitmap));
+>      g_free(bitmap->name);
+>      bitmap->name =3D NULL;
+> +    bitmap->persistent =3D false;
+>      bitmap->autoload =3D false;
+>  }
+> =20
+> @@ -241,6 +243,8 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDr=
+iverState *bs,
+>      bitmap->name =3D NULL;
+>      successor->name =3D name;
+>      bitmap->successor =3D NULL;
+> +    successor->persistent =3D bitmap->persistent;
+> +    bitmap->persistent =3D false;
+>      successor->autoload =3D bitmap->autoload;
+>      bitmap->autoload =3D false;
+>      bdrv_release_dirty_bitmap(bs, bitmap);
+> @@ -555,3 +559,25 @@ bool bdrv_dirty_bitmap_get_autoload(const BdrvDirt=
+yBitmap *bitmap)
+>  {
+>      return bitmap->autoload;
+>  }
+> +
+> +void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap, bool p=
+ersistent)
+> +{
+> +    bitmap->persistent =3D persistent;
+> +}
+> +
+> +bool bdrv_dirty_bitmap_get_persistance(BdrvDirtyBitmap *bitmap)
+> +{
+> +    return bitmap->persistent;
+> +}
+> +
+> +bool bdrv_has_persistent_bitmaps(BlockDriverState *bs)
+> +{
+> +    BdrvDirtyBitmap *bm;
+> +    QLIST_FOREACH(bm, &bs->dirty_bitmaps, list) {
+> +        if (bm->persistent) {
+> +            return true;
+> +        }
+> +    }
+> +
+> +    return false;
+> +}
+> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+> index 6b1a2c9c67..ba72b7d2ac 100644
+> --- a/block/qcow2-bitmap.c
+> +++ b/block/qcow2-bitmap.c
+> @@ -780,6 +780,7 @@ void qcow2_load_autoloading_dirty_bitmaps(BlockDriv=
+erState *bs, Error **errp)
+>                  goto fail;
+>              }
+> =20
+> +            bdrv_dirty_bitmap_set_persistance(bitmap, true);
+>              bdrv_dirty_bitmap_set_autoload(bitmap, true);
+>              bm->flags |=3D BME_FLAG_IN_USE;
+>              created_dirty_bitmaps =3D
+> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.=
+h
+> index 45a389a20a..8dbd16b040 100644
+> --- a/include/block/dirty-bitmap.h
+> +++ b/include/block/dirty-bitmap.h
+> @@ -77,4 +77,10 @@ void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyB=
+itmap *bitmap);
+> =20
+>  void bdrv_dirty_bitmap_set_autoload(BdrvDirtyBitmap *bitmap, bool auto=
+load);
+>  bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap);
+> +void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap,
+> +                                                bool persistent);
+> +bool bdrv_dirty_bitmap_get_persistance(BdrvDirtyBitmap *bitmap);
+> +
+> +bool bdrv_has_persistent_bitmaps(BlockDriverState *bs);
+> +
+>  #endif
+>=20
 
-There was a bug in the code. There could be a race between startup of
-two VMs:
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1397440
 
---/i8j2F0k9BYX4qLc
+
+--OEHD90IqpDuOJjbqEBQmWs3aNoB1wJvI3
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAli0K7cACgkQHGwCByjY
-1GrShQ/+IVU0T60hWOGQ/dCMZDn/rZiGn8dVuvZcwBNC+NG514bjWyGaLb+Y4MXe
-w9Io2ThOcjGXUWnOvxAhegwbFCkNh2BraxUii8ZdHZCaVDyZsP0i8EtHYfyAJkMp
-Y5US6+zH/JXGsvgENO20cK+atnAHhuwIIVlx3Z5sSth+QTozR1UGT0TgUqvUG/W8
-QLx1r4ZAcyPXqgQ0Bss8Fd+GPEcm6IBwLhuQC6s8NSvumW9d3ReCXrocPsaN5G9q
-88vsTupVJAGU2UYCJFEu688KjzC/UCfQhKthZo471qYjM/D4tNpS68WUi/00SB9H
-9Vds40PZCbDFWCuBH2HHWGBpKUJz0zhu5/aobevigc9V2Dph+JVa0099/E/bIE0e
-fSW6rl6vmr7ccWyJk/ye3JQLkY9ZCLjvkBpN2M4rgNn1h6zcITKVveIrMuZh4cfn
-3VwFECv6r8VBMsoie0F06pfhyF/UYV78bOosEmN2rrnb67bcn8lYiNvOUT0mV8sS
-mg8kkjCssiAt+lH5BZFfkVFzlBg3BulPu7z2LTzGqswD/em6LP2cQOaO2qvIGcvg
-ZpCCBsMMf9wNqZrp0EwJNkOMjgSzTRlr3x24Mrq4HFDPPMzQ4DHIJcvR4H5RwiER
-vrmTdb199vBh1hBWog3eXFxg5VrNKrp69z+wr3IycL4vQRw6y4s=
-=LMCn
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAli0K8oSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A+4AIAI7yCPaOIBvCVYOKC0qRCpNSGjXPIGgR
+TTQ/yDmmq17/TP8+gUe8oGt1TZ1C0AXVVIWa+czmqdhlbHBGibqoDCvfHE4wtyvI
+NzSTiyNTpLpJQFGfGDmvwVnCAMUnapA3XXAbqJIUsR2zOlat9C98K3BBtxJ1lRCq
+FE8E/CwjTWGmURY/rT326Mml6Rutlbk1kmBhvOiFh/OKntXgoTu3Q5199SYxVFVz
+1npI8QUm+Z9qdO57z6hurvKoepulbz0UI/tk1u7O7OxYD/zP3CU5IrrlH6pggoxz
+ABWWSkXn2oXwnzScVYikK8hrWuML2h56f3EBY7u8Op5nOnxibzix6mg=
+=o6kL
 -----END PGP SIGNATURE-----
 
---/i8j2F0k9BYX4qLc--
+--OEHD90IqpDuOJjbqEBQmWs3aNoB1wJvI3--
