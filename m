@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ciL8B-0003b4-18
+	(envelope-from <jcody@redhat.com>) id 1ciL8B-0003b5-1J
 	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:14:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1ciL89-0000tz-Sk
+	(envelope-from <jcody@redhat.com>) id 1ciL89-0000tu-S0
 	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:14:23 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:36179)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ciL89-0000tn-Mm
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:14:21 -0500
-Received: by mail-wm0-x244.google.com with SMTP id r18so13399457wmd.3
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 05:14:21 -0800 (PST)
-Date: Mon, 27 Feb 2017 13:14:17 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170227131417.GM28403@stefanha-x1.localdomain>
-References: <148814889214.28146.16915712763478774662.stgit@bahia>
-	<148814898026.28146.12256183919348399642.stgit@bahia>
+Date: Mon, 27 Feb 2017 08:14:14 -0500
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170227131414.GC25637@localhost.localdomain>
+References: <cover.1488180142.git.jcody@redhat.com>
+	<6f1d60bdbbb4e82991c699d4aa6666c4317a1c5d.1488180142.git.jcody@redhat.com>
+	<20170227092856.GC18219@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="yaap9KN+GmBP785v"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <148814898026.28146.12256183919348399642.stgit@bahia>
-Subject: Re: [Qemu-devel] [PATCH v2 11/28] 9pfs: local: unlinkat: don't
- follow symlinks
+In-Reply-To: <20170227092856.GC18219@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/4] block/rbd: code movement
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,52 +24,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Jann Horn <jannh@google.com>, Prasad J Pandit <prasad@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, eblake@redhat.com
 
+On Mon, Feb 27, 2017 at 09:28:56AM +0000, Daniel P. Berrange wrote:
+> 
+> Describing this as "code movement" when the added & removed chunks are not
+> identical is a bit misleading.
+> 
+> Can you expand the commit message to explain why the extra options are
+> being added
 
---yaap9KN+GmBP785v
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Ah, sorry - yes.  The lack of a commit message was a mistake when squashing
+patches.
 
-On Sun, Feb 26, 2017 at 11:43:00PM +0100, Greg Kurz wrote:
-> The local_unlinkat() callback is vulnerable to symlink attacks because it
-> calls remove() which follows symbolic links in all path elements but the
-> rightmost one.
->=20
-> This patch converts local_unlinkat() to rely on opendir_nofollow() and
-> unlinkat() instead.
->=20
-> Most of the code is moved to a separate local_unlinkat_common() helper
-> which will be reused in a subsequent patch to fix the same issue in
-> local_remove().
->=20
-> This partly fixes CVE-2016-9602.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
-> v2: - use openat_dir()
-> ---
->  hw/9pfs/9p-local.c |   99 +++++++++++++++++++++++++++++-----------------=
-------
->  1 file changed, 56 insertions(+), 43 deletions(-)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---yaap9KN+GmBP785v
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYtCYpAAoJEJykq7OBq3PIdEkH/Ryws50/fxUHn1dkdLr8S2E4
-rVToCs9UuZm9hNpOMzSCSEAJxR/+cOPzL0CuFDaoVcrv26YErsDa6D3iBCDtc+zv
-lC86D5i+w18uOTT5j4FsdWZvWJFWuSAlDthBz6IYdm4PZYC26UuD2a+tri5LwshV
-Z5+9rh5YS0Lxne+H9wPkEyi9FYEGiK91EcJ3wLHKeierMBH/yVBrXDZMQ5ECAYA2
-NEWQDM3IM0Eh5QWnEP5Uh4A+eRE8FyfAC7/PDG6O4VBkHQgNqYQrsQ7FQ2n7w98A
-Yk2Y4xrO+pySTkc8YN8tAqh0Akb23wdmtJGLeVakiz/M4FYfEur6Et9tD7bKX0Y=
-=tVSt
------END PGP SIGNATURE-----
-
---yaap9KN+GmBP785v--
+> 
+> On Mon, Feb 27, 2017 at 02:30:39AM -0500, Jeff Cody wrote:
+> > Signed-off-by: Jeff Cody <jcody@redhat.com>
+> > ---
+> >  block/rbd.c | 64 +++++++++++++++++++++++++++++++++++++++++++------------------
+> >  1 file changed, 45 insertions(+), 19 deletions(-)
+> > 
+> > diff --git a/block/rbd.c b/block/rbd.c
+> > index 3f1a9de..c8d4eb1 100644
+> > --- a/block/rbd.c
+> > +++ b/block/rbd.c
+> > @@ -357,6 +357,51 @@ static void qemu_rbd_memset(RADOSCB *rcb, int64_t offs)
+> >      }
+> >  }
+> >  
+> > +static QemuOptsList runtime_opts = {
+> > +    .name = "rbd",
+> > +    .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
+> > +    .desc = {
+> > +        {
+> > +            .name = "filename",
+> > +            .type = QEMU_OPT_STRING,
+> > +            .help = "Specification of the rbd image",
+> > +        },
+> > +        {
+> > +            .name = "password-secret",
+> > +            .type = QEMU_OPT_STRING,
+> > +            .help = "ID of secret providing the password",
+> > +        },
+> > +        {
+> > +            .name = "conf",
+> > +            .type = QEMU_OPT_STRING,
+> > +        },
+> > +        {
+> > +            .name = "pool",
+> > +            .type = QEMU_OPT_STRING,
+> > +        },
+> > +        {
+> > +            .name = "image",
+> > +            .type = QEMU_OPT_STRING,
+> > +        },
+> > +        {
+> > +            .name = "snapshot",
+> > +            .type = QEMU_OPT_STRING,
+> > +        },
+> > +        {
+> > +            /* you might be tempted to call this 'id' to match
+> > +             * the ceph documentation, but then it'll get gobbled
+> > +             * up in the block layer before it gets to the image driver */
+> > +            .name = "rbd-id",
+> > +            .type = QEMU_OPT_STRING,
+> > +        },
+> > +        {
+> > +            .name = "keyvalue-pairs",
+> > +            .type = QEMU_OPT_STRING,
+> > +        },
+> > +        { /* end of list */ }
+> > +    },
+> > +};
+> > +
+> >  static int qemu_rbd_create(const char *filename, QemuOpts *opts, Error **errp)
+> >  {
+> >      Error *local_err = NULL;
+> > @@ -500,25 +545,6 @@ static void qemu_rbd_complete_aio(RADOSCB *rcb)
+> >      qemu_aio_unref(acb);
+> >  }
+> >  
+> > -/* TODO Convert to fine grained options */
+> > -static QemuOptsList runtime_opts = {
+> > -    .name = "rbd",
+> > -    .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
+> > -    .desc = {
+> > -        {
+> > -            .name = "filename",
+> > -            .type = QEMU_OPT_STRING,
+> > -            .help = "Specification of the rbd image",
+> > -        },
+> > -        {
+> > -            .name = "password-secret",
+> > -            .type = QEMU_OPT_STRING,
+> > -            .help = "ID of secret providing the password",
+> > -        },
+> > -        { /* end of list */ }
+> > -    },
+> > -};
+> > -
+> >  static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+> >                           Error **errp)
+> >  {
+> > -- 
+> > 2.9.3
+> > 
+> 
+> Regards,
+> Daniel
+> -- 
+> |: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+> |: http://libvirt.org              -o-             http://virt-manager.org :|
+> |: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
