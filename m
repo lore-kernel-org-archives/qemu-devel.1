@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ciBjb-0001RJ-4S
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 22:12:24 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1ciBwA-0003eC-UZ
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 22:25:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ciBjX-0002D5-U4
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 22:12:23 -0500
-Received: from [45.249.212.189] (port=2412 helo=dggrg03-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1ciBjW-0002BY-JM
-	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 22:12:19 -0500
-References: <1487735198-127300-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1487735198-127300-3-git-send-email-zhang.zhanghailiang@huawei.com>
-	<b0b04c02-7c97-ea04-1e38-99fd9344edae@redhat.com>
-	<58AD4F8F.5030703@huawei.com> <58AD5125.4010306@huawei.com>
-	<b792c68e-d67a-ac24-26ea-aaf24f1f9437@redhat.com>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <58B398F8.1020205@huawei.com>
-Date: Mon, 27 Feb 2017 11:11:52 +0800
+	(envelope-from <aik@ozlabs.ru>) id 1ciBw7-0005rL-Kt
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 22:25:22 -0500
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:35736)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ciBw7-0005r6-A4
+	for qemu-devel@nongnu.org; Sun, 26 Feb 2017 22:25:19 -0500
+Received: by mail-pf0-x241.google.com with SMTP id y23so1042093pfk.2
+	for <qemu-devel@nongnu.org>; Sun, 26 Feb 2017 19:25:17 -0800 (PST)
+References: <1487659615-15820-1-git-send-email-xyjxie@linux.vnet.ibm.com>
+	<5edff645-12e8-d3e0-1849-302b6986c232@ozlabs.ru>
+	<148816231660.24134.11740535448495534378@loki>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <4d32c104-25e8-3a90-37c9-544ca9ed6775@ozlabs.ru>
+Date: Mon, 27 Feb 2017 14:25:11 +1100
 MIME-Version: 1.0
-In-Reply-To: <b792c68e-d67a-ac24-26ea-aaf24f1f9437@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] filter-rewriter: fix memory leak
- for connection in connection_track_table
+In-Reply-To: <148816231660.24134.11740535448495534378@loki>
+Content-Type: text/plain; charset=koi8-r
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] memory: make ram device read/write endian
+ sensitive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,339 +31,299 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com
-Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, pss.wulizhen@huawei.com
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, Yongji Xie <xyjxie@linux.vnet.ibm.com>, pbonzini@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, zhong@linux.vnet.ibm.com, qemu-devel@nongnu.org, alex.williamson@redhat.com, Paul Mackerras <paulus@samba.org>, David Gibson <david@gibson.dropbear.id.au>
 
-On 2017/2/23 12:16, Jason Wang wrote:
->
->
-> On 2017年02月22日 16:51, Hailiang Zhang wrote:
->> On 2017/2/22 16:45, Hailiang Zhang wrote:
->>> On 2017/2/22 16:07, Jason Wang wrote:
->>>>
->>>>
->>>> On 2017年02月22日 11:46, zhanghailiang wrote:
->>>>> After a net connection is closed, we didn't clear its releated
->>>>> resources
->>>>> in connection_track_table, which will lead to memory leak.
->>>>
->>>> Not a real leak but would lead reset of hash table if too many closed
->>>> connections.
->>>>
+On 27/02/17 13:25, Michael Roth wrote:
+> Quoting Alexey Kardashevskiy (2017-02-22 22:20:25)
+>> On 21/02/17 17:46, Yongji Xie wrote:
+>>> At the moment ram device's memory regions are NATIVE_ENDIAN. This does
+>>> not work on PPC64 because VFIO PCI device is little endian but PPC64
+>>> always defines static macro TARGET_WORDS_BIGENDIAN.
 >>>
->>> Yes, you are right, there will be lots of stale connection data in
->>> hash table
->>> if we don't remove it while it is been closed. Which
->
->
-> Ok, so let's come up with a better title of the patch.
->
-
-OK.
-
+>>> This fixes endianness for ram device the same way as it is done
+>>> for VFIO region in commit 6758008e2c4e79fb6bd04fe8e7a41665fa583965.
 >>>
->>>>>
->>>>> Let't track the state of net connection, if it is closed, its related
->>>>> resources will be cleared up.
->>>>
->>>> The issue is the state were tracked partially, do we need a full state
->>>> machine here?
->>>>
+>>> Signed-off-by: Yongji Xie <xyjxie@linux.vnet.ibm.com>
+>>> ---
+>>>  memory.c |   14 +++++++-------
+>>>  1 files changed, 7 insertions(+), 7 deletions(-)
 >>>
->>> Not, IMHO, we only care about the last state of it, because, we will
->>> do nothing
->>> even if we track the intermedial states.
->
-> Well, you care at least syn state too. Without a complete state machine,
-> it's very hard to track even partial state I believe. And you will fail
-> to track some state transition for sure which makes the code fragile.
->
-
-Agree, but here things are a little different. There are some extreme cases
-that we may can't track the complete process of closing connection.
-For example (I have explained that in the bellow, it seems that you didn't
-got it ;) ).
-If VM is running before we want to make it goes into COLO FT state,
-there maybe some connections exist already, in extreme case, VM is going into
-COLO state while some connections are in half closing state, we can only track
-the bellow half closing state in filter-rewriter and colo compare object.
-
+>>> diff --git a/memory.c b/memory.c
+>>> index 6c58373..1ccb99f 100644
+>>> --- a/memory.c
+>>> +++ b/memory.c
+>>> @@ -1139,13 +1139,13 @@ static uint64_t memory_region_ram_device_read(void *opaque,
+>>>          data = *(uint8_t *)(mr->ram_block->host + addr);
+>>>          break;
+>>>      case 2:
+>>> -        data = *(uint16_t *)(mr->ram_block->host + addr);
+>>> +        data = le16_to_cpu(*(uint16_t *)(mr->ram_block->host + addr));
+>>>          break;
+>>>      case 4:
+>>> -        data = *(uint32_t *)(mr->ram_block->host + addr);
+>>> +        data = le32_to_cpu(*(uint32_t *)(mr->ram_block->host + addr));
+>>>          break;
+>>>      case 8:
+>>> -        data = *(uint64_t *)(mr->ram_block->host + addr);
+>>> +        data = le64_to_cpu(*(uint64_t *)(mr->ram_block->host + addr));
+>>>          break;
+>>>      }
+>>>  
+>>> @@ -1166,13 +1166,13 @@ static void memory_region_ram_device_write(void *opaque, hwaddr addr,
+>>>          *(uint8_t *)(mr->ram_block->host + addr) = (uint8_t)data;
+>>>          break;
+>>>      case 2:
+>>> -        *(uint16_t *)(mr->ram_block->host + addr) = (uint16_t)data;
+>>> +        *(uint16_t *)(mr->ram_block->host + addr) = cpu_to_le16((uint16_t)data);
+>>>          break;
+>>>      case 4:
+>>> -        *(uint32_t *)(mr->ram_block->host + addr) = (uint32_t)data;
+>>> +        *(uint32_t *)(mr->ram_block->host + addr) = cpu_to_le32((uint32_t)data);
+>>>          break;
+>>>      case 8:
+>>> -        *(uint64_t *)(mr->ram_block->host + addr) = data;
+>>> +        *(uint64_t *)(mr->ram_block->host + addr) = cpu_to_le64(data);
+>>>          break;
+>>>      }
+>>>  }
+>>> @@ -1180,7 +1180,7 @@ static void memory_region_ram_device_write(void *opaque, hwaddr addr,
+>>>  static const MemoryRegionOps ram_device_mem_ops = {
+>>>      .read = memory_region_ram_device_read,
+>>>      .write = memory_region_ram_device_write,
+>>> -    .endianness = DEVICE_NATIVE_ENDIAN,
+>>> +    .endianness = DEVICE_LITTLE_ENDIAN,
+>>>      .valid = {
+>>>          .min_access_size = 1,
+>>>          .max_access_size = 8,
 >>>
->>>>>
->>>>> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
->>>>> ---
->>>>>      net/colo.h            |  4 +++
->>>>>      net/filter-rewriter.c | 70
->>>>> +++++++++++++++++++++++++++++++++++++++++++++------
->>>>>      2 files changed, 67 insertions(+), 7 deletions(-)
->>>>>
->>>>> diff --git a/net/colo.h b/net/colo.h
->>>>> index 7c524f3..cd9027f 100644
->>>>> --- a/net/colo.h
->>>>> +++ b/net/colo.h
->>>>> @@ -18,6 +18,7 @@
->>>>>      #include "slirp/slirp.h"
->>>>>      #include "qemu/jhash.h"
->>>>>      #include "qemu/timer.h"
->>>>> +#include "slirp/tcp.h"
->>>>>
->>>>>      #define HASHTABLE_MAX_SIZE 16384
->>>>>
->>>>> @@ -69,6 +70,9 @@ typedef struct Connection {
->>>>>           * run once in independent tcp connection
->>>>>           */
->>>>>          int syn_flag;
->>>>> +
->>>>> +    int tcp_state; /* TCP FSM state */
->>>>> +    tcp_seq fin_ack_seq; /* the seq of 'fin=1,ack=1' */
->>>>>      } Connection;
->>>>>
->>>>>      uint32_t connection_key_hash(const void *opaque);
->>>>> diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
->>>>> index c4ab91c..7e7ec35 100644
->>>>> --- a/net/filter-rewriter.c
->>>>> +++ b/net/filter-rewriter.c
->>>>> @@ -60,9 +60,9 @@ static int is_tcp_packet(Packet *pkt)
->>>>>      }
->>>>>
->>>>>      /* handle tcp packet from primary guest */
->>>>> -static int handle_primary_tcp_pkt(NetFilterState *nf,
->>>>> +static int handle_primary_tcp_pkt(RewriterState *rf,
->>>>>                                        Connection *conn,
->>>>> -                                  Packet *pkt)
->>>>> +                                  Packet *pkt, ConnectionKey *key)
->>>>>      {
->>>>>          struct tcphdr *tcp_pkt;
->>>>>
->>>>> @@ -97,15 +97,45 @@ static int
->>>>> handle_primary_tcp_pkt(NetFilterState *nf,
->>>>>              tcp_pkt->th_ack = htonl(ntohl(tcp_pkt->th_ack) +
->>>>> conn->offset);
->>>>>
->>>>>              net_checksum_calculate((uint8_t *)pkt->data, pkt->size);
->>>>> +        /*
->>>>> +         * Case 1:
->>>>> +         * The *server* side of this connect is VM, *client* tries
->>>>> to close
->>>>> +         * the connection.
->>>>> +         *
->>>>> +         * We got 'ack=1' packets from client side, it acks
->>>>> 'fin=1, ack=1'
->>>>> +         * packet from server side. From this point, we can ensure
->>>>> that there
->>>>> +         * will be no packets in the connection, except that, some
->>>>> errors
->>>>> +         * happen between the path of 'filter object' and vNIC, if
->>>>> this rare
->>>>> +         * case really happen, we can still create a new connection,
->>>>> +         * So it is safe to remove the connection from
->>>>> connection_track_table.
->>>>> +         *
->>>>> +         */
->>>>> +        if ((conn->tcp_state == TCPS_LAST_ACK) &&
->>>>> +            (ntohl(tcp_pkt->th_ack) == (conn->fin_ack_seq + 1))) {
->>>>> +            fprintf(stderr, "Remove conn "
->>>>
->>>> Can this even compile?
->>>>
->>>
->>> Oops, i forgot to remove it, will remove it in next version.
->>>
->>>>> + g_hash_table_remove(rf->connection_track_table, key);
->>>>> +        }
->>>>> +    }
->>>>> +    /*
->>>>> +     * Case 2:
->>>>> +     * The *server* side of this connect is VM, *server* tries to
->>>>> close
->>>>> +     * the connection.
->>>>> +     *
->>>>> +     * We got 'fin=1, ack=1' packet from client side, we need to
->>>>> +     * record the seq of 'fin=1, ack=1' packet.
->>>>> +     */
->>>>> +    if ((tcp_pkt->th_flags & (TH_ACK | TH_FIN)) == (TH_ACK |
->>>>> TH_FIN)) {
->>>>> +        conn->fin_ack_seq = htonl(tcp_pkt->th_seq);
->>>>> +        conn->tcp_state = TCPS_LAST_ACK;
->>>>>          }
->>>>>
->>>>>          return 0;
->>>>>      }
->>>>>
->>>>>      /* handle tcp packet from secondary guest */
->>>>> -static int handle_secondary_tcp_pkt(NetFilterState *nf,
->>>>> +static int handle_secondary_tcp_pkt(RewriterState *rf,
->>>>>                                          Connection *conn,
->>>>> -                                    Packet *pkt)
->>>>> +                                    Packet *pkt, ConnectionKey *key)
->>>>>      {
->>>>>          struct tcphdr *tcp_pkt;
->>>>>
->>>>> @@ -133,8 +163,34 @@ static int
->>>>> handle_secondary_tcp_pkt(NetFilterState *nf,
->>>>>              tcp_pkt->th_seq = htonl(ntohl(tcp_pkt->th_seq) -
->>>>> conn->offset);
->>>>>
->>>>>              net_checksum_calculate((uint8_t *)pkt->data, pkt->size);
->>>>> +        /*
->>>>> +         * Case 2:
->>>>> +         * The *server* side of this connect is VM, *server* tries
->>>>> to close
->>>>> +         * the connection.
->>>>> +         *
->>>>> +         * We got 'ack=1' packets from server side, it acks
->>>>> 'fin=1, ack=1'
->>>>> +         * packet from client side. Like Case 1, there should be
->>>>> no packets
->>>>> +         * in the connection from now know, But the difference
->>>>> here is
->>>>> +         * if the packet is lost, We will get the resent
->>>>> 'fin=1,ack=1' packet.
->>>>> +         * TODO: Fix above case.
->>>>> +         */
->>>>> +        if ((conn->tcp_state == TCPS_LAST_ACK) &&
->>>>> +            (ntohl(tcp_pkt->th_ack) == (conn->fin_ack_seq + 1))) {
->>>>> + g_hash_table_remove(rf->connection_track_table, key);
->>>>> +        }
->>>>> +    }
->>>>> +    /*
->>>>> +     * Case 1:
->>>>> +     * The *server* side of this connect is VM, *client* tries to
->>>>> close
->>>>> +     * the connection.
->>>>> +     *
->>>>> +     * We got 'fin=1, ack=1' packet from server side, we need to
->>>>> +     * record the seq of 'fin=1, ack=1' packet.
->>>>> +     */
->>>>> +    if ((tcp_pkt->th_flags & (TH_ACK | TH_FIN)) == (TH_ACK |
->>>>> TH_FIN)) {
->>>>> +        conn->fin_ack_seq = ntohl(tcp_pkt->th_seq);
->>>>> +        conn->tcp_state = TCPS_LAST_ACK;
->>>>
->>>> I thought the tcp_state should store the state of TCP from the view of
->>>> secondary VM? So TCPS_LAST_ACK is wrong and bring lots of confusion.
->>>> And
->>>> the handle of active close needs more states here. E.g if connection is
->>>> in FIN_WAIT_2, the connection is only half closed, remote peer can
->>>> still
->>>> send packet to us unless we receive a FIN.
->>>>
->>>
->>> Yes, i know what you mean, actually, here, we try to only track the last
->>> two steps for closing a connection, that is 'fin=1,ack=1,seq=2,ack=u+1'
->>                                               ^
->> 'FIN=1,ACK=1,seq=w,ack=u+1'
+>>         
 >>
->>> and 'ack=1,seq=u+1,ack=w+1', because if we get a 'fin=1,ack=1', we can
->>       ^ 'ACK=1,seq=u+1,ack=w+1'                     ^ 'FIN=1，ACK=1'
+>> I did some debugging today.
 >>
->>> ensure that the 'fin=1,seq=u' packet has been posted.
->>>
->>                    ^ 'FIN=1,seq=u'
->
-> That's just the case I'm saying, the transition above is in fact:
->
-> secondary(ESTABLISHED)
-> secondary(FIN_WAIT_1): ->  FIN,seq=w,ack=u+1   -> :remote
-> secondary(FIN_WAIT_2): <-  seq=u+1,ack=w+1     <- :remote
->
-> So we are in fact in FIN_WAIT_2, which means the connection is only half
-> closed, but your patch will treat this as fully closed connection and
-> will remove the connection from the hashtable.
->
-
-Er, here we track the last two states 'FIN=1, ACK=1' and  'ACK=1' ( which asks
-the 'FIN=1,ACK=1' packet, We will remove the connection while got the 'ACK=1'
-packet, so  is it enough ?
-
-> What's more I don't think we can decide passive or active close by:
->
->
-> +    if ((tcp_pkt->th_flags & (TH_ACK | TH_FIN)) == (TH_ACK | TH_FIN)) {
->
-> Since both cases will send FIN,ACK for sure.
->
-
-I didn't quite understand, here we have tracked the closing request no matter
-it is from the server side (passive close ?) or client side ( active close ?).
-You can refer to the comment in codes, 'Case 1' and 'Case 2' comments.
-
-Here, it seems that we can't track one case which both sides send the closing
-requests at the same time, in that case, there are only 'FIN=1' and 'ACK=1'
-packets.
-
-
-Thanks.
-Hailiang
-
->>
->>> Another reason is we may can't track the 'fin=1,seq=u' packet while
->>> we start COLO while one connection is closing, which the
->>> 'fin=1,seq=u' packet
->>> has been posted.
->>>
->>> Actually, here, if we start COLO while one connection is closing,
->>> which the
->>> 'fin=1,ack=1' has been posted, we can only track 'ack=1' packet. In this
->>
->>   ^ 'FIN=1,ACK=1'
->>
->> Sorry for the typo. :)
->>
->>> case, the connection will be left in hash table for ever though it is
->>> harmless.
->>> Any ideas for this case ?
->
-> Sorry I don't follow the question.
->
->>>
->>> For the above codes question, i'd like to change tcp_state to
->>> tap_closing_wait,
->>> is it OK ?
->
-> You mean "tcp_closing_wait". I think we need first figure out if we can
-> track the state correctly first.
->
-> Thanks
->
->>>
->>> Thanks.
->>> Hailiang
->>>
->>>> Thanks
->>>>
->>>>>          }
->>>>> -
->>>>>          return 0;
->>>>>      }
->>>>>
->>>>> @@ -178,7 +234,7 @@ static ssize_t
->>>>> colo_rewriter_receive_iov(NetFilterState *nf,
->>>>>
->>>>>              if (sender == nf->netdev) {
->>>>>                  /* NET_FILTER_DIRECTION_TX */
->>>>> -            if (!handle_primary_tcp_pkt(nf, conn, pkt)) {
->>>>> +            if (!handle_primary_tcp_pkt(s, conn, pkt, &key)) {
->>>>> qemu_net_queue_send(s->incoming_queue, sender, 0,
->>>>>                      (const uint8_t *)pkt->data, pkt->size, NULL);
->>>>>                      packet_destroy(pkt, NULL);
->>>>> @@ -191,7 +247,7 @@ static ssize_t
->>>>> colo_rewriter_receive_iov(NetFilterState *nf,
->>>>>                  }
->>>>>              } else {
->>>>>                  /* NET_FILTER_DIRECTION_RX */
->>>>> -            if (!handle_secondary_tcp_pkt(nf, conn, pkt)) {
->>>>> +            if (!handle_secondary_tcp_pkt(s, conn, pkt, &key)) {
->>>>> qemu_net_queue_send(s->incoming_queue, sender, 0,
->>>>>                      (const uint8_t *)pkt->data, pkt->size, NULL);
->>>>>                      packet_destroy(pkt, NULL);
->>>>
->>>>
->>>> .
->>>>
+>> First, Paolo is right and ram_device_mem_ops::endianness should be
+>> host-endian which happens to be little in our test case (ppc64le) so
+>> changes to .read/.write are actually no-op (I believe so, have not checked).
 >>
 >>
->
->
-> .
->
+>> But I was wondering why this gets executed at all.
+>>
+>> The test case is:
+>>
+>> qemu-system-ppc64 ...
+>> -device "vfio-pci,id=vfio0001_03_00_0,host=0001:03:00.0
+>> -drive id=DRIVE0,if=none,file=./test.qcow2,format=qcow2
+>> -device virtio-blk-pci,id=vblk0,drive=DRIVE0
+>>
+>> The host kernel is v4.10, ppc64le (little endian), 64K system page size,
+>> QEMU is v2.8.0.
+>>
+>> When this boots, lspci shows:
+>>
+>> 00:00.0 Ethernet controller: Chelsio Communications Inc T310 10GbE Single
+>> Port Adapter
+>>         Subsystem: IBM Device 038c
+>>         Flags: bus master, fast devsel, latency 0, IRQ 18
+>>         Memory at 210000004000 (64-bit, non-prefetchable) [size=4K]
+>>         Memory at 210000800000 (64-bit, non-prefetchable) [size=8M]
+>>         Memory at 210001000000 (64-bit, non-prefetchable) [size=4K]
+>>         Expansion ROM at 2000c0080000 [disabled] [size=512K]
+>>         Capabilities: [40] Power Management version 3
+>>         Capabilities: [48] MSI: Enable- Count=1/32 Maskable- 64bit+
+>>         Capabilities: [58] Express Endpoint, MSI 00
+>>         Capabilities: [94] Vital Product Data
+>>         Capabilities: [9c] MSI-X: Enable+ Count=32 Masked-
+>>         Kernel driver in use: cxgb3
+>>
+>> 00:01.0 SCSI storage controller: Red Hat, Inc Virtio block device
+>>         Subsystem: Red Hat, Inc Device 0002
+>>         Physical Slot: C16
+>>         Flags: bus master, fast devsel, latency 0, IRQ 17
+>>         I/O ports at 0040 [size=64]
+>>         Memory at 2000c0000000 (32-bit, non-prefetchable) [size=4K]
+>>         Memory at 210000000000 (64-bit, prefetchable) [size=16K]
+>>         Capabilities: [98] MSI-X: Enable+ Count=2 Masked-
+>>         Capabilities: [84] Vendor Specific Information: Len=14 <?>
+>>         Capabilities: [70] Vendor Specific Information: Len=14 <?>
+>>         Capabilities: [60] Vendor Specific Information: Len=10 <?>
+>>         Capabilities: [50] Vendor Specific Information: Len=10 <?>
+>>         Capabilities: [40] Vendor Specific Information: Len=10 <?>
+>>         Kernel driver in use: virtio-pci
+>>
+>>
+>> As we can see, BAR0 of Chelsio is 210000004000 - not aligned (it should
+>> have been aligned but it is not - this is another bug, in QEMU). Normally
+> 
+> I think SLOF is the culprit in this case. The patch below enforces
+> 64k alignment for mmio/mem regions at boot-time. I'm not sure if this
+> should be done for all devices, or limited specifically to VFIO though
+> (controlled perhaps via a per-device property? or at the machine-level
+> at least?):
+
+
+I was sure we have this in SLOF and now I see that we don't. Hm :)
+
+
+
+> https://github.com/mdroth/SLOF/commit/6ff6827740aba39d8db9bebcc3ae069bdf934d06
+> 
+> I've only sniff-tested it with virtio so far. Does this fix things
+> for Chelsio?
+> 
+> aligned (enabled):
+>   Bus  0, device   2, function 0:
+>     Ethernet controller: PCI device 1af4:1000
+>       IRQ 0.
+>       BAR0: I/O at 0x0040 [0x005f].
+>       BAR1: 32 bit memory at 0xc0080000 [0xc0080fff].
+>       BAR4: 64 bit prefetchable memory at 0x210000010000 [0x210000013fff].
+>       BAR6: 32 bit memory at 0xffffffffffffffff [0x0003fffe].
+>       id ""
+>   Bus  0, device   3, function 0:
+>     Ethernet controller: PCI device 1af4:1000
+>       IRQ 0.
+>       BAR0: I/O at 0x0020 [0x003f].
+>       BAR1: 32 bit memory at 0xc0000000 [0xc0000fff].
+>       BAR4: 64 bit prefetchable memory at 0x210000000000 [0x210000003fff].
+>       BAR6: 32 bit memory at 0xffffffffffffffff [0x0003fffe].
+>       id ""
+> 
+> aligned (disabled):
+>   Bus  0, device   2, function 0:
+>     Ethernet controller: PCI device 1af4:1000
+>       IRQ 0.
+>       BAR0: I/O at 0x0040 [0x005f].
+>       BAR1: 32 bit memory at 0xc0080000 [0xc0080fff].
+>       BAR4: 64 bit prefetchable memory at 0x210000004000 [0x210000007fff].
+>       BAR6: 32 bit memory at 0xffffffffffffffff [0x0003fffe].
+>       id ""
+>   Bus  0, device   3, function 0:
+>     Ethernet controller: PCI device 1af4:1000
+>       IRQ 0.
+>       BAR0: I/O at 0x0020 [0x003f].
+>       BAR1: 32 bit memory at 0xc0000000 [0xc0000fff].
+>       BAR4: 64 bit prefetchable memory at 0x210000000000 [0x210000003fff].
+>       BAR6: 32 bit memory at 0xffffffffffffffff [0x0003fffe].
+>       id ""
+> 
+> upstream:
+>   Bus  0, device   2, function 0:
+>     Ethernet controller: PCI device 1af4:1000
+>       IRQ 0.
+>       BAR0: I/O at 0x0040 [0x005f].
+>       BAR1: 32 bit memory at 0xc0080000 [0xc0080fff].
+>       BAR4: 64 bit prefetchable memory at 0x210000004000 [0x210000007fff].
+>       BAR6: 32 bit memory at 0xffffffffffffffff [0x0003fffe].
+>       id ""
+>   Bus  0, device   3, function 0:
+>     Ethernet controller: PCI device 1af4:1000
+>       IRQ 0.
+>       BAR0: I/O at 0x0020 [0x003f].
+>       BAR1: 32 bit memory at 0xc0000000 [0xc0000fff].
+>       BAR4: 64 bit prefetchable memory at 0x210000000000 [0x210000003fff].
+>       BAR6: 32 bit memory at 0xffffffffffffffff [0x0003fffe].
+>       id ""
+> 
+> 
+>> such a BAR would be emulated by VFIO. However, since 95251725e335 "vfio:
+>> Add support for mmapping sub-page MMIO BARs" we mmap such BARs to QEMU in a
+>> hope they will be registered later via KVM_SET_USER_MEMORY_REGION - and
+>> this fails as the guest address is not host page size aligned.
+>>
+>> So we end up having the following memory tree:
+>>
+>> memory-region: pci@800000020000000.mmio
+>>   0000000000000000-ffffffffffffffff (prio 0, RW): pci@800000020000000.mmio
+>>     00000000c0000000-00000000c0000fff (prio 1, RW): virtio-blk-pci-msix
+>>       00000000c0000000-00000000c000001f (prio 0, RW): msix-table
+>>       00000000c0000800-00000000c0000807 (prio 0, RW): msix-pba
+>>     0000210000000000-0000210000003fff (prio 1, RW): virtio-pci
+>>       0000210000000000-0000210000000fff (prio 0, RW): virtio-pci-common
+>>       0000210000001000-0000210000001fff (prio 0, RW): virtio-pci-isr
+>>       0000210000002000-0000210000002fff (prio 0, RW): virtio-pci-device
+>>       0000210000003000-0000210000003fff (prio 0, RW): virtio-pci-notify
+>>     0000210000004000-0000210000004fff (prio 1, RW): 0001:03:00.0 BAR 0
+>>       0000210000004000-0000210000004fff (prio 0, RW): 0001:03:00.0 BAR 0
+>> mmaps[0]
+>>     0000210000800000-0000210000ffffff (prio 1, RW): 0001:03:00.0 BAR 2
+>>       0000210000800000-0000210000ffffff (prio 0, RW): 0001:03:00.0 BAR 2
+>> mmaps[0]
+>>     0000210001000000-0000210001000fff (prio 1, RW): 0001:03:00.0 BAR 4
+>>       0000210001000000-00002100010001ff (prio 0, RW): msix-table
+>>       0000210001000800-0000210001000807 (prio 0, RW): msix-pba [disabled]
+>>
+>> The problem region which this patch is fixing is "0001:03:00.0 BAR 0
+>> mmaps[0]". It is mmaped to QEMU and not registered in KVM. So when the
+>> guest accesses this BAR, we trap into KVM, KVM passes it to QEMU and QEMU
+>> read/writes this memory region.
+>>
+>> A simple hack like below fixes it - it basically removes mmap'd memory
+>> region from the tree and MMIO starts being handled by the parent MR -
+>> "0001:03:00.0 BAR 0" (which is "little endian" - vfio_region_ops).
+>>
+>>
+>> I am wondering now what would be a correct approach here?
+>>
+>> Add/remove mmap'd MRs once we detect aligned/unaligned BARs?
+>>
+>> Keep things where they are in the VFIO department and just fix
+>> ram_device_mem_ops::endianness?
+> 
+> VFIO tries to report similar scenarios in realize():
+> 
+>   vfio_bar_setup:
+>     if (vfio_region_mmap(&bar->region)) {
+>       error_report("Failed to mmap %s BAR %d. Performance may be slow",
+>                    vdev->vbasedev.name, nr);
+>     }
+> 
+> maybe we should at least be reporting it in this case as well? In our
+> case we'll see it every reset/hotplug though, so maybe a trace makes
+> more sense.
+
+
+Tracepoint should be enough imho.
+
+
+> Even with the patch for SLOF this would continue to be an
+> issue for hotplug until BAR assignment is moved to QEMU for pseries,
+> so would be good to have a simple way to check for it. Can send a patch
+> if that makes sense.
+
+Can BAR allocation be done by QEMU when hotplugging?
+
+
+> 
+>>
+>> Thanks.
+>>
+>>
+>>
+>> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+>> index d7dbe0e3e0..0657a27623 100644
+>> --- a/hw/vfio/pci.c
+>> +++ b/hw/vfio/pci.c
+>> @@ -1109,7 +1109,10 @@ static void
+>> vfio_sub_page_bar_update_mapping(PCIDevice *pdev, int bar)
+>>      memory_region_transaction_begin();
+>>
+>>      memory_region_set_size(mr, size);
+>> -    memory_region_set_size(mmap_mr, size);
+>> +    if (bar_addr & qemu_real_host_page_mask)
+>> +          memory_region_del_subregion(mr, mmap_mr);
+>> +    else
+>> +        memory_region_set_size(mmap_mr, size);
+>>      if (size != region->size && memory_region_is_mapped(mr)) {
+>>          memory_region_del_subregion(r->address_space, mr);
+>>          memory_region_add_subregion_overlap(r->address_space,
+>>
+>>
+>>
+>> -- 
+>> Alexey
+>>
+> 
+
+
+-- 
+Alexey
