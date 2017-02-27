@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54457)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ciLcm-0004cm-65
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:46:01 -0500
+	(envelope-from <riel@redhat.com>) id 1ciLdB-0004xI-14
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:46:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ciLck-0002WI-Ti
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:46:00 -0500
-Date: Mon, 27 Feb 2017 13:45:47 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170227134547.GM18219@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <cover.1488180142.git.jcody@redhat.com>
-	<08786526aec147544588ab3e885a984e7d0d1c69.1488180142.git.jcody@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <08786526aec147544588ab3e885a984e7d0d1c69.1488180142.git.jcody@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 4/4] block/rbd: Add blockdev-add support
+	(envelope-from <riel@redhat.com>) id 1ciLd7-0002a4-UJ
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:46:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51976)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <riel@redhat.com>) id 1ciLd7-0002Zt-Lw
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 08:46:21 -0500
+Message-ID: <1488203170.4736.24.camel@redhat.com>
+From: Rik van Riel <riel@redhat.com>
+Date: Mon, 27 Feb 2017 08:46:10 -0500
+In-Reply-To: <20170227111047.GF28403@stefanha-x1.localdomain>
+References: <20170223105922.22989-1-berrange@redhat.com>
+	<20170227111047.GF28403@stefanha-x1.localdomain>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] os: don't corrupt pre-existing
+ memory-backend data with prealloc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,84 +28,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, eblake@redhat.com
+To: Stefan Hajnoczi <stefanha@gmail.com>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Jitendra Kolhe <jitendra.kolhe@hpe.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Michal Privoznik <mprivozn@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-On Mon, Feb 27, 2017 at 02:30:41AM -0500, Jeff Cody wrote:
-> Signed-off-by: Jeff Cody <jcody@redhat.com>
-> ---
->  qapi/block-core.json | 47 ++++++++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 44 insertions(+), 3 deletions(-)
-> 
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 5f82d35..08a1419 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -2111,6 +2111,7 @@
->  # @replication: Since 2.8
->  # @ssh: Since 2.8
->  # @iscsi: Since 2.9
-> +# @rbd: Since 2.9
->  #
->  # Since: 2.0
->  ##
-> @@ -2120,7 +2121,7 @@
->              'host_device', 'http', 'https', 'iscsi', 'luks', 'nbd', 'nfs',
->              'null-aio', 'null-co', 'parallels', 'qcow', 'qcow2', 'qed',
->              'quorum', 'raw', 'replication', 'ssh', 'vdi', 'vhdx', 'vmdk',
-> -            'vpc', 'vvfat' ] }
-> +            'vpc', 'vvfat', 'rbd' ] }
->  
->  ##
->  # @BlockdevOptionsFile:
-> @@ -2376,7 +2377,6 @@
->              'path': 'str',
->              '*user': 'str' } }
->  
-> -
->  ##
->  # @BlkdebugEvent:
->  #
-> @@ -2666,6 +2666,47 @@
->              '*timeout': 'int' } }
->  
->  ##
-> +# @BlockdevOptionsRbd:
-> +#
-> +# @pool:               Ceph pool name
-> +#
-> +# @image:              Image name in the Ceph pool
-> +#
-> +# @conf:               # optional path to Ceph configuration file.  Values
-> +#                      in the configuration file will be overridden by
-> +#                      options specified via QAPI.
-> +#
-> +# @snapshot:           #optional Ceph snapshot name
-> +#
-> +# @rbd-id:             #optional Ceph id name
+On Mon, 2017-02-27 at 11:10 +0000, Stefan Hajnoczi wrote:
+> On Thu, Feb 23, 2017 at 10:59:22AM +0000, Daniel P. Berrange wrote:
+> > When using a memory-backend object with prealloc turned on, QEMU
+> > will memset() the first byte in every memory page to zero. While
+> > this might have been acceptable for memory backends associated
+> > with RAM, this corrupts application data for NVDIMMs.
+> >=20
+> > Instead of setting every page to zero, read the current byte
+> > value and then just write that same value back, so we are not
+> > corrupting the original data.
+> >=20
+> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> > ---
+> >=20
+> > I'm unclear if this is actually still safe in practice ? Is the
+> > compiler permitted to optimize away the read+write since it doesn't
+> > change the memory value. I'd hope not, but I've been surprised
+> > before...
+> >=20
+> > IMHO this is another factor in favour of requesting an API from
+> > the kernel to provide the prealloc behaviour we want.
+> >=20
+> > =C2=A0util/oslib-posix.c | 3 ++-
+> > =C2=A01 file changed, 2 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+> > index 35012b9..8f5b656 100644
+> > --- a/util/oslib-posix.c
+> > +++ b/util/oslib-posix.c
+> > @@ -355,7 +355,8 @@ void os_mem_prealloc(int fd, char *area, size_t
+> > memory, Error **errp)
+> > =C2=A0
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* MAP_POPULATE=
+ silently ignores failures */
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0for (i =3D 0; i=
+ < numpages; i++) {
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0memset(area + (hpagesize * i), 0, 1);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0char val =3D *(area + (hpagesize * i));
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0memset(area + (hpagesize * i), 0, val);
+>=20
+> Please include a comment in the final patch explaining why we want to
+> preserve memory contents.
+>=20
+> In the case of NVDIMM I'm not sure if the memset is needed at
+> all.=C2=A0=C2=A0The
+> memory already exists - no new pages need to be allocated by the
+> kernel.
+> We just want the page table entries to be populated for the NVDIMM
+> when
+> -mem-prealloc is used.
+>=20
+> Perhaps Andrea or Rik have ideas on improving the kernel interface
+> and
+> whether mmap(MAP_POPULATE) should be used with NVDIMM instead of this
+> userspace "touch every page" workaround?
 
-BTW, I think I'd suggest 'user' or 'username' for this, since that is the more
-common terminology we seem to use for other block drivers
+Why do we need the page table entries to be populated
+in advance at all?
 
-> +#
-> +# @password-secret:    #optional The ID of a QCryptoSecret object providing
-> +#                       the password for the login.
-> +#
-> +# @keyvalue-pairs:     #optional  string containing key/value pairs for
-> +#                      additional Ceph configuration, not including "id" or "conf"
-> +#                      options. This can be used to specify any of the options
-> +#                      that Ceph supports.  The format is of the form:
-> +#                           key1=value1:key2=value2:[...]
-> +#
-> +#                      Special characters such as ":" and "=" can be escaped
-> +#                      with a '\' character, which means the QAPI needs an
-> +#                      extra '\' character to pass the needed escape character.
-> +#                      For example:
-> +#                            "keyvalue-pairs": "mon_host=127.0.0.1\\:6321"
+The high cost of the page fault for regular memory
+is zeroing out the memory pages before we give them
+to userspace.
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+Simply faulting in the NVDIMM memory as it is touched
+may make more sense than treating it like DRAM,
+especially given that with DAX, NVDIMM areas may be
+orders of magnitude larger than RAM, and we really
+do not want to set up all the page tables for every
+part of the guest DAX "disk".
