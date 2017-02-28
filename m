@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciVmZ-00058H-0I
+	(envelope-from <dgibson@ozlabs.org>) id 1ciVmZ-00058J-0f
 	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 19:36:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciVmU-00058b-Sr
+	(envelope-from <dgibson@ozlabs.org>) id 1ciVmU-00058Q-SP
 	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 19:36:47 -0500
-Date: Tue, 28 Feb 2017 11:36:31 +1100
+Date: Tue, 28 Feb 2017 11:29:14 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170228003631.GF17615@umbus.fritz.box>
+Message-ID: <20170228002914.GE17615@umbus.fritz.box>
 References: <cover.1487829585.git.sam.bobroff@au1.ibm.com>
-	<e2f52ac4317e8caff0cc4ed696e550d6843013ad.1487829585.git.sam.bobroff@au1.ibm.com>
+	<ac9e5c1e3b571f0286a2ebcd955abfd7be5d7ac7.1487829585.git.sam.bobroff@au1.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="11Z8SZcIENILcoZn"
+	protocol="application/pgp-signature"; boundary="B6Zh/hwRPruM9rlZ"
 Content-Disposition: inline
-In-Reply-To: <e2f52ac4317e8caff0cc4ed696e550d6843013ad.1487829585.git.sam.bobroff@au1.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 12/12] spapr: Workaround for broken
- radix guests
+In-Reply-To: <ac9e5c1e3b571f0286a2ebcd955abfd7be5d7ac7.1487829585.git.sam.bobroff@au1.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 10/12] spapr: move
+ spapr_populate_pa_features()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,164 +29,143 @@ To: Sam Bobroff <sam.bobroff@au1.ibm.com>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, sjitindarsingh@gmail.com
 
 
---11Z8SZcIENILcoZn
+--B6Zh/hwRPruM9rlZ
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 23, 2017 at 05:00:05PM +1100, Sam Bobroff wrote:
-> For a little while around 4.9, Linux kernels that saw the radix bit in
-> ibm,pa-features would attempt to set up the MMU as if they were a
-> hypervisor, even if they were a guest, which would cause them to
-> crash.
->=20
-> Work around this by detecting pre-ISA 3.0 guests by their lack of that
-> bit in option vector 1, and then removing the radix bit from
-> ibm,pa-features. Note: This now requires regeneration of that node
-> after CAS negotiation.
+On Thu, Feb 23, 2017 at 05:00:03PM +1100, Sam Bobroff wrote:
+> In the next patch, spapr_fixup_cpu_dt() will need to call
+> spapr_populate_pa_features() so move it's definition up without making
+> any other changes.
+
+s/it's/its/
+
 >=20
 > Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
-
-A bit ugly, but not any more so than it needs to given what we're
-dealing with AFAICT.
-
-I'll save more detailed review until the rebase in conjuction with the
-TCG bits.
-
 > ---
->  hw/ppc/spapr.c              | 15 +++++++++++++--
->  hw/ppc/spapr_hcall.c        |  5 +++--
->  include/hw/ppc/spapr.h      |  1 +
->  include/hw/ppc/spapr_ovec.h |  3 +++
->  4 files changed, 20 insertions(+), 4 deletions(-)
+>  hw/ppc/spapr.c | 86 +++++++++++++++++++++++++++++-----------------------=
+------
+>  1 file changed, 43 insertions(+), 43 deletions(-)
 >=20
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index e83468a8d3..c47600b8ee 100644
+> index dfee0f685f..0c0782b558 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -195,7 +195,8 @@ static int spapr_fixup_cpu_numa_dt(void *fdt, int off=
-set, CPUState *cs)
->  }
-> =20
->  /* Populate the "ibm,pa-features" property */
-> -static void spapr_populate_pa_features(CPUPPCState *env, void *fdt, int =
-offset)
-> +static void spapr_populate_pa_features(CPUPPCState *env, void *fdt, int =
-offset,
-> +                                      bool legacy_guest)
->  {
->      uint8_t pa_features_206[] =3D { 6, 0,
->          0xf6, 0x1f, 0xc7, 0x00, 0x80, 0xc0 };
-> @@ -251,6 +252,12 @@ static void spapr_populate_pa_features(CPUPPCState *=
-env, void *fdt, int offset)
->      if (kvmppc_has_cap_htm() && pa_size > 24) {
->          pa_features[24] |=3D 0x80;    /* Transactional memory support */
->      }
-> +    if (legacy_guest && pa_size > 40) {
-> +        /* Workaround for broken kernels that attempt (guest) radix
-> +         * mode when they can't handle it, if they see the radix bit set
-> +         * in pa-features. So hide it from them. */
-> +        pa_features[40 + 2] &=3D ~0x80; /* Radix MMU */
-> +    }
-> =20
->      _FDT((fdt_setprop(fdt, offset, "ibm,pa-features", pa_features, pa_si=
-ze)));
->  }
-> @@ -265,6 +272,7 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachine=
-State *spapr)
-> =20
->      CPU_FOREACH(cs) {
->          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> +        CPUPPCState *env =3D &cpu->env;
->          DeviceClass *dc =3D DEVICE_GET_CLASS(cs);
->          int index =3D ppc_get_vcpu_dt_id(cpu);
->          int compat_smt =3D MIN(smp_threads, ppc_compat_max_threads(cpu));
-> @@ -306,6 +314,9 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachine=
-State *spapr)
->          if (ret < 0) {
->              return ret;
->          }
-> +
-> +        spapr_populate_pa_features(env, fdt, offset,
-> +                                         spapr->cas_legacy_guest_workaro=
-und);
->      }
+> @@ -194,6 +194,49 @@ static int spapr_fixup_cpu_numa_dt(void *fdt, int of=
+fset, CPUState *cs)
 >      return ret;
 >  }
-> @@ -503,7 +514,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void =
-*fdt, int offset,
->                            page_sizes_prop, page_sizes_prop_size)));
->      }
 > =20
-> -    spapr_populate_pa_features(env, fdt, offset);
-> +    spapr_populate_pa_features(env, fdt, offset, false);
-> =20
->      _FDT((fdt_setprop_cell(fdt, offset, "ibm,chip-id",
->                             cs->cpu_index / vcpus_per_socket)));
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index efaa1a1b19..7660cd7d64 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -933,7 +933,7 @@ static target_ulong h_client_architecture_support(Pow=
-erPCCPU *cpu,
->      uint32_t max_compat =3D cpu->max_compat;
->      uint32_t best_compat =3D 0;
->      int i;
-> -    sPAPROptionVector *ov5_guest, *ov5_cas_old, *ov5_updates;
-> +    sPAPROptionVector *ov1_guest, *ov5_guest, *ov5_cas_old, *ov5_updates;
->      bool guest_radix;
-> =20
->      /*
-> @@ -985,6 +985,7 @@ static target_ulong h_client_architecture_support(Pow=
-erPCCPU *cpu,
->      /* For the future use: here @ov_table points to the first option vec=
-tor */
->      ov_table =3D list;
-> =20
-> +    ov1_guest =3D spapr_ovec_parse_vector(ov_table, 1);
->      ov5_guest =3D spapr_ovec_parse_vector(ov_table, 5);
->      if (spapr_ovec_test(ov5_guest, OV5_MMU_BOTH)) {
->          error_report("qemu: guest requested hash and radix MMU, which is=
- invalid.");
-> @@ -1025,7 +1026,7 @@ static target_ulong h_client_architecture_support(P=
-owerPCCPU *cpu,
->              exit(EXIT_FAILURE);
->          }
->      }
-> -
-> +    spapr->cas_legacy_guest_workaround =3D !spapr_ovec_test(ov1_guest, O=
-V1_PPC_3_00);
->      if (!spapr->cas_reboot) {
->          spapr->cas_reboot =3D
->              (spapr_h_cas_compose_response(spapr, args[1], args[2],
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index d523db3b4a..1e64e3ada8 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -77,6 +77,7 @@ struct sPAPRMachineState {
->      sPAPROptionVector *ov5;         /* QEMU-supported option vectors */
->      sPAPROptionVector *ov5_cas;     /* negotiated (via CAS) option vecto=
-rs */
->      bool cas_reboot;
-> +    bool cas_legacy_guest_workaround;
-> =20
->      Notifier epow_notifier;
->      QTAILQ_HEAD(, sPAPREventLogEntry) pending_events;
-> diff --git a/include/hw/ppc/spapr_ovec.h b/include/hw/ppc/spapr_ovec.h
-> index e2dfbac558..8807c753e0 100644
-> --- a/include/hw/ppc/spapr_ovec.h
-> +++ b/include/hw/ppc/spapr_ovec.h
-> @@ -43,6 +43,9 @@ typedef struct sPAPROptionVector sPAPROptionVector;
-> =20
->  #define OV_BIT(byte, bit) ((byte - 1) * BITS_PER_BYTE + bit)
-> =20
-> +/* option vector 1 */
-> +#define OV1_PPC_3_00            OV_BIT(3, 0) /* set if we support PowerP=
-C 3.00 */
+> +/* Populate the "ibm,pa-features" property */
+> +static void spapr_populate_pa_features(CPUPPCState *env, void *fdt, int =
+offset)
+> +{
+> +    uint8_t pa_features_206[] =3D { 6, 0,
+> +        0xf6, 0x1f, 0xc7, 0x00, 0x80, 0xc0 };
+> +    uint8_t pa_features_207[] =3D { 24, 0,
+> +        0xf6, 0x1f, 0xc7, 0xc0, 0x80, 0xf0,
+> +        0x80, 0x00, 0x00, 0x00, 0x00, 0x00,
+> +        0x00, 0x00, 0x00, 0x00, 0x80, 0x00,
+> +        0x80, 0x00, 0x80, 0x00, 0x00, 0x00 };
+> +    uint8_t *pa_features;
+> +    size_t pa_size;
 > +
->  /* option vector 5 */
->  #define OV5_DRCONF_MEMORY       OV_BIT(2, 2)
->  #define OV5_FORM1_AFFINITY      OV_BIT(5, 0)
+> +    switch (POWERPC_MMU_VER(env->mmu_model)) {
+> +    case POWERPC_MMU_VER_2_06:
+> +        pa_features =3D pa_features_206;
+> +        pa_size =3D sizeof(pa_features_206);
+> +        break;
+> +    case POWERPC_MMU_VER_2_07:
+> +        pa_features =3D pa_features_207;
+> +        pa_size =3D sizeof(pa_features_207);
+> +        break;
+> +    default:
+> +        return;
+> +    }
+> +
+> +    if (env->ci_large_pages) {
+> +        /*
+> +         * Note: we keep CI large pages off by default because a 64K cap=
+able
+> +         * guest provisioned with large pages might otherwise try to map=
+ a qemu
+> +         * framebuffer (or other kind of memory mapped PCI BAR) using 64=
+K pages
+> +         * even if that qemu runs on a 4k host.
+> +         * We dd this bit back here if we are confident this is not an i=
+ssue
+> +         */
+> +        pa_features[3] |=3D 0x20;
+> +    }
+> +    if (kvmppc_has_cap_htm() && pa_size > 24) {
+> +        pa_features[24] |=3D 0x80;    /* Transactional memory support */
+> +    }
+> +
+> +    _FDT((fdt_setprop(fdt, offset, "ibm,pa-features", pa_features, pa_si=
+ze)));
+> +}
+> +
+>  static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
+>  {
+>      int ret =3D 0, offset, cpus_offset;
+> @@ -346,49 +389,6 @@ static int spapr_populate_memory(sPAPRMachineState *=
+spapr, void *fdt)
+>      return 0;
+>  }
+> =20
+> -/* Populate the "ibm,pa-features" property */
+> -static void spapr_populate_pa_features(CPUPPCState *env, void *fdt, int =
+offset)
+> -{
+> -    uint8_t pa_features_206[] =3D { 6, 0,
+> -        0xf6, 0x1f, 0xc7, 0x00, 0x80, 0xc0 };
+> -    uint8_t pa_features_207[] =3D { 24, 0,
+> -        0xf6, 0x1f, 0xc7, 0xc0, 0x80, 0xf0,
+> -        0x80, 0x00, 0x00, 0x00, 0x00, 0x00,
+> -        0x00, 0x00, 0x00, 0x00, 0x80, 0x00,
+> -        0x80, 0x00, 0x80, 0x00, 0x00, 0x00 };
+> -    uint8_t *pa_features;
+> -    size_t pa_size;
+> -
+> -    switch (POWERPC_MMU_VER(env->mmu_model)) {
+> -    case POWERPC_MMU_VER_2_06:
+> -        pa_features =3D pa_features_206;
+> -        pa_size =3D sizeof(pa_features_206);
+> -        break;
+> -    case POWERPC_MMU_VER_2_07:
+> -        pa_features =3D pa_features_207;
+> -        pa_size =3D sizeof(pa_features_207);
+> -        break;
+> -    default:
+> -        return;
+> -    }
+> -
+> -    if (env->ci_large_pages) {
+> -        /*
+> -         * Note: we keep CI large pages off by default because a 64K cap=
+able
+> -         * guest provisioned with large pages might otherwise try to map=
+ a qemu
+> -         * framebuffer (or other kind of memory mapped PCI BAR) using 64=
+K pages
+> -         * even if that qemu runs on a 4k host.
+> -         * We dd this bit back here if we are confident this is not an i=
+ssue
+> -         */
+> -        pa_features[3] |=3D 0x20;
+> -    }
+> -    if (kvmppc_has_cap_htm() && pa_size > 24) {
+> -        pa_features[24] |=3D 0x80;    /* Transactional memory support */
+> -    }
+> -
+> -    _FDT((fdt_setprop(fdt, offset, "ibm,pa-features", pa_features, pa_si=
+ze)));
+> -}
+> -
+>  static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
+>                                    sPAPRMachineState *spapr)
+>  {
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -194,25 +173,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---11Z8SZcIENILcoZn
+--B6Zh/hwRPruM9rlZ
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYtMYPAAoJEGw4ysog2bOSCroP/0xvOxnXzeo5XMhnHCtbCHzq
-0B8I3J2beB4QzDeu5OhQ8jU4ph/8bca6k7m1HHxRWwUNlQMHcOiGwqDPuh//G7h1
-5kWY5nHRq8RQK5kVuK1z+Ie90weFnQ4ThUXPvkxh2MYiOf1RZC1Ux3F9C9S78j1P
-RJt3GM9BQtpSqjeYW5kFjAB6yzKRnpKvjwZIwQKlMDgXupCvVTspqxStSMhMkmAu
-XLR3QcNWihguez1WPFgF6/8yqFCh+R5z06YPyXR7pvV3Dy+r8DWLNy13RfuMufNl
-q729CkD0i9EBe0SJ9KdIXAI+M+m4euAMec/nEXzgJ3hHf20Pcw7w6cvsiLmqQpzp
-OW8h0D6ce57cQM0lpUryQ9sVuKI40SoLFlG/peWC1HdhAQNnH/60Cj/4C080N3u3
-0YvJiOO3j7hxJNOAKK/zh9P2hA3TFr0sDw90kW2thcrd4vzSFBCMzcCR4t0Wv+jK
-azYURpselL23EHsTt6Ire5udDAkCralbqjv9rfCLNKIYOyEVsvU4dO2G8b3LNefC
-/VA5qsqE8OQhmP6aff+c6EOihsAhRmi0vTUd4gNDx3RdYTY2Q7LaMwUXMH9gOKtN
-nb+SaXPm/kY+vv885vV6Z5+uxzFN4CQK6DYO4wvz1m+yitdMy8Q9yXIGPqv5Ng3a
-mS2WBzauOzTIUIsOeaxJ
-=egn0
+iQIcBAEBCAAGBQJYtMRaAAoJEGw4ysog2bOSYk4P/0IpZggqSoLBHka4t9MwHu+E
+wZ93QAVotbZA8wWxoiUmy8z3YwbJNjjwJO7tBn4W5uhIOa9e6cfnrab/GrU3LHPC
+XOuauw/dkVHScToBjsrBuyzxVy8CXEkobXRDWwWhm7f9zFoD06oe+HmSCcLcwGkY
+RVWWZYU7pQ7OaUDDtFV/TqFFxim1scFETK7sNl0l+LPJ7cQ5EglQucsYRA2/+0ts
+e6dhiAlK7rN5vTi8FyIubmBZydX4UIK/W85mHMjVtCM7GGDyHGh+L0FN9mgR+W5q
+jF5yGZcoj6xHupdHIKeq6120xCMTvLJogtAZbrW06o96DiSVDFUo+9YjdjM8H132
+a1OO0G9FpetlV6SY4mhOO6AsIMoMUMWXs6zQAK20ROB/J476ZF6HEEKOErC0+bLw
+Yq7XfGqHfzFpEY1WcEqkTS87HQzBsqEdiX2RXsJTgPbAFYiLwXlPkmo5s2bVN+21
+xOQgoO7urza76f3Ke6hAKX35aGuWHMiVxBuqXyCiJMTsnOspvuguGBZP7NNlavck
+Z5ZKXAwXxuaQH4Py/wyRVm6WJBH7WNUJZwujAJVzFpM/2Ni2w9v3U9gHUqf/gHMY
+4JDh+OmmdlzpZuwHqTYVUk/KsGP/Ewu6Ux1lcNtTo/6DxSl9qR/z0UDE9TD2yuwp
+YAOja7lWWuUnztq29BE3
+=2VD+
 -----END PGP SIGNATURE-----
 
---11Z8SZcIENILcoZn--
+--B6Zh/hwRPruM9rlZ--
