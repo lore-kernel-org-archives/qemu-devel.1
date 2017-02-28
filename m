@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cinv8-0003pG-8e
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:58:52 -0500
+	(envelope-from <eblake@redhat.com>) id 1cio2Y-0005nO-It
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:06:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cinv6-00027F-LN
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:58:50 -0500
-From: Markus Armbruster <armbru@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1cio2X-0005Du-B0
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:06:30 -0500
 References: <1488194450-28056-1-git-send-email-armbru@redhat.com>
 	<1488194450-28056-25-git-send-email-armbru@redhat.com>
 	<20170228192543.GZ4090@noname.redhat.com>
-Date: Tue, 28 Feb 2017 20:58:36 +0100
-In-Reply-To: <20170228192543.GZ4090@noname.redhat.com> (Kevin Wolf's message
-	of "Tue, 28 Feb 2017 20:25:43 +0100")
-Message-ID: <87tw7edr4j.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c1efb07d-e5ab-b627-8cf7-1a0c364e7c86@redhat.com>
+Date: Tue, 28 Feb 2017 14:06:20 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20170228192543.GZ4090@noname.redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="rRBqMcsn4NxXioPCenxAHGaSkbFF6NaSX"
 Subject: Re: [Qemu-devel] [PATCH 24/24] keyval: Support lists
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -24,146 +25,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: pkrempa@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, pkrempa@redhat.com
 
-Kevin Wolf <kwolf@redhat.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--rRBqMcsn4NxXioPCenxAHGaSkbFF6NaSX
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, pkrempa@redhat.com
+Message-ID: <c1efb07d-e5ab-b627-8cf7-1a0c364e7c86@redhat.com>
+Subject: Re: [PATCH 24/24] keyval: Support lists
+References: <1488194450-28056-1-git-send-email-armbru@redhat.com>
+ <1488194450-28056-25-git-send-email-armbru@redhat.com>
+ <20170228192543.GZ4090@noname.redhat.com>
+In-Reply-To: <20170228192543.GZ4090@noname.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+On 02/28/2017 01:25 PM, Kevin Wolf wrote:
 > Am 27.02.2017 um 12:20 hat Markus Armbruster geschrieben:
 >> Additionally permit non-negative integers as key components.  A
 >> dictionary's keys must either be all integers or none.  If all keys
 >> are integers, convert the dictionary to a list.  The set of keys must
 >> be [0,N].
->> 
->> Examples:
->> 
->> * list.1=goner,list.0=null,list.1=eins,list.2=zwei
->>   is equivalent to JSON [ "null", "eins", "zwei" ]
->> 
->> * a.b.c=1,a.b.0=2
->>   is inconsistent: a.b.c clashes with a.b.0
->> 
->> * list.0=null,list.2=eins,list.2=zwei
->>   has a hole: list.1 is missing
->> 
->> Similar design flaw as for objects: there is now way to denote an
->
-> s/now/no/
+>>
 
-Fixing...
-
->> empty list.  While interpreting "key absent" as empty list seems
->> natural (removing a list member from the input string works when there
->> are multiple ones, so why not when there's just one), it doesn't work:
->> "key absent" already means "optional list absent", which isn't the
->> same as "empty list present".
->> 
->> Update the keyval object visitor to use this a.0 syntax in error
->> messages rather than the usual a[0].
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->
-> valgrind finds a quite a few leaks while running tests/test-keyval. Not
-> sure if I caught all of them, maybe you want to just run it yourself.
-
-Will do.
-
->>  qapi/qobject-input-visitor.c |   5 +-
->>  tests/test-keyval.c          | 117 ++++++++++++++++++++++++++++
->>  util/keyval.c                | 177 ++++++++++++++++++++++++++++++++++++++++---
->>  3 files changed, 286 insertions(+), 13 deletions(-)
->> 
->> diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
->> index 1d7b420..4c159e0 100644
->> --- a/qapi/qobject-input-visitor.c
->> +++ b/qapi/qobject-input-visitor.c
->> @@ -41,6 +41,7 @@ struct QObjectInputVisitor {
->>  
->>      /* Root of visit at visitor creation. */
->>      QObject *root;
->> +    bool keyval;                /* Assume @root made with keyval_parse() */
->
-> Who sets this? I can't seem to find it in this patch, and it's the final
-> patch of the series.
-
-I either forgot or lost its initialization in
-qobject_input_visitor_new_keyval().  Fixing...
-
->>      /* Stack of objects being visited (all entries will be either
->>       * QDict or QList). */
->> @@ -73,7 +74,9 @@ static const char *full_name_nth(QObjectInputVisitor *qiv, const char *name,
->>              g_string_prepend(qiv->errname, name ?: "<anonymous>");
->>              g_string_prepend_c(qiv->errname, '.');
->>          } else {
->> -            snprintf(buf, sizeof(buf), "[%u]", so->index);
->> +            snprintf(buf, sizeof(buf),
->> +                     qiv->keyval ? ".%u" : "[%u]",
->> +                     so->index);
->>              g_string_prepend(qiv->errname, buf);
->>          }
->>          name = so->name;
->
->> diff --git a/util/keyval.c b/util/keyval.c
->> index 1170dad..3621f28 100644
->> --- a/util/keyval.c
->> +++ b/util/keyval.c
->> @@ -21,10 +21,12 @@
->>   *
->>   * Semantics defined by reduction to JSON:
->>   *
->> - *   key-vals defines a tree of objects rooted at R
->> + *   key-vals is a tree of objects and arrays rooted at object R
->>   *   where for each key-val = key-fragment . ... = val in key-vals
->>   *       R op key-fragment op ... = val'
->> - *       where (left-associative) op is member reference L.key-fragment
->> + *       where (left-associative) op is
->> + *                 array subscript L[key-fragment] for numeric key-fragment
->> + *                 member reference L.key-fragment otherwise
->>   *             val' is val with ',,' replaced by ','
->>   *   and only R may be empty.
->>   *
 >> @@ -34,16 +36,16 @@
->>   *   doesn't have one, because R.a must be an object to satisfy a.b=1
->>   *   and a string to satisfy a=2.
+>>   *   doesn't have one, because R.a must be an object to satisfy a.b=3D=
+1
+>>   *   and a string to satisfy a=3D2.
 >>   *
 >> - * Key-fragments must be valid QAPI names.
 >> + * Key-fragments must be valid QAPI names or consist only of digits.
->>   *
->>   * The length of any key-fragment must be between 1 and 127.
->>   *
->> - * Design flaw: there is no way to denote an empty non-root object.
->> - * While interpreting "key absent" as empty object seems natural
->> + * Design flaw: there is no way to denote an empty array or non-root
->> + * object.  While interpreting "key absent" as empty seems natural
->>   * (removing a key-val from the input string removes the member when
->>   * there are more, so why not when it's the last), it doesn't work:
->> - * "key absent" already means "optional object absent", which isn't
->> - * the same as "empty object present".
->> + * "key absent" already means "optional object/array absent", which
->> + * isn't the same as "empty object/array present".
->>   *
->>   * Additional syntax for use with an implied key:
->>   *
->> @@ -51,17 +53,43 @@
->>   *   val-no-key   = / [^,]* /
->>   *
->>   * where no-key is syntactic sugar for implied-key=val-no-key.
->> - *
->> - * TODO support lists
->>   */
->>  
->>  #include "qemu/osdep.h"
->>  #include "qapi/error.h"
->>  #include "qapi/qmp/qstring.h"
->>  #include "qapi/util.h"
->> +#include "qemu/cutils.h"
->>  #include "qemu/option.h"
->>  
+
 >>  /*
 >> + * Convert @key to a list index.
 >> + * Convert all leading digits to a (non-negative) number, capped at
 >> + * INT_MAX.
->> + * If @end is non-null, assign a pointer to the first character after
+>> + * If @end is non-null, assign a pointer to the first character after=
+
 >> + * the number to *@end.
 >> + * Else, fail if any characters follow.
 >> + * On success, return the converted number.
@@ -179,202 +79,100 @@ qobject_input_visitor_new_keyval().  Fixing...
 >> +    if (*key < '0' || *key > '9') {
 >> +        return -EINVAL;
 >> +    }
->> +    ret = qemu_strtoul(key, end, 10, &index);
->> +    if (ret) {
->> +        return ret == -ERANGE ? INT_MAX : ret;
->> +    }
->> +    return index <= INT_MAX ? index : INT_MAX;
->> +}
->> +
->> +/*
->>   * Ensure @cur maps @key_in_cur the right way.
->>   * If @value is null, it needs to map to a QDict, else to this
->>   * QString.
->> @@ -113,7 +141,7 @@ static const char *keyval_parse_one(QDict *qdict, const char *params,
->>                                      const char *implied_key,
->>                                      Error **errp)
->>  {
->> -    const char *key, *key_end, *s;
->> +    const char *key, *key_end, *s, *end;
->>      size_t len;
->>      char key_in_cur[128];
->>      QDict *cur;
->> @@ -137,8 +165,13 @@ static const char *keyval_parse_one(QDict *qdict, const char *params,
->>      cur = qdict;
->>      s = key;
+
+So no leading whitespace, '+', or '-', even if strtoul would have
+allowed it.  Such names are also invalid as member id names.  (There's
+still the question if we want to allow arbitrary whitespace after
+between-key-value ',', and maybe even after between-key-segment '.'
+after this series, to make it easier to write strategically line-wrapped
+command lines - but that's an independent thing to be done on top).
+
+>> @@ -137,8 +165,13 @@ static const char *keyval_parse_one(QDict *qdict,=
+ const char *params,
+>>      cur =3D qdict;
+>>      s =3D key;
 >>      for (;;) {
->> -        ret = parse_qapi_name(s, false);
->> -        len = ret < 0 ? 0 : ret;
+>> -        ret =3D parse_qapi_name(s, false);
+>> -        len =3D ret < 0 ? 0 : ret;
 >> +        /* Want a key index (unless it's first) or a QAPI name */
->> +        if (s != key && key_to_index(s, &end) >= 0) {
->> +            len = end - s;
+>> +        if (s !=3D key && key_to_index(s, &end) >=3D 0) {
+>> +            len =3D end - s;
 >> +        } else {
->> +            ret = parse_qapi_name(s, false);
->> +            len = ret < 0 ? 0 : ret;
+>> +            ret =3D parse_qapi_name(s, false);
+>> +            len =3D ret < 0 ? 0 : ret;
 >> +        }
->>          assert(s + len <= key_end);
->>          if (!len || (s + len < key_end && s[len] != '.')) {
->>              assert(key != implied_key);
->> @@ -205,6 +238,119 @@ static const char *keyval_parse_one(QDict *qdict, const char *params,
+
+Does this mishandle keyval_parse(string, "0", err) - where we want to
+assert that the caller always passes only a valid id name for an
+implicit key?
+
+>>          assert(s + len <=3D key_end);
+>>          if (!len || (s + len < key_end && s[len] !=3D '.')) {
+>>              assert(key !=3D implied_key);
+>> @@ -205,6 +238,119 @@ static const char *keyval_parse_one(QDict *qdict=
+, const char *params,
 >>      return s;
 >>  }
->>  
+>> =20
 >> +static char *reassemble_key(GSList *key)
 >> +{
->> +    GString *s = g_string_new("");
+>> +    GString *s =3D g_string_new("");
 >> +    GSList *p;
 >> +
->> +    for (p = key; p; p = p->next) {
+>> +    for (p =3D key; p; p =3D p->next) {
 >> +        g_string_prepend_c(s, '.');
 >> +        g_string_prepend(s, (char *)p->data);
->> +    }
->> +
->> +    return g_string_free(s, FALSE);
->> +}
->> +
->> +/*
->> + * Listify @cur recursively.
->> + * Replace QDicts whose keys are all valid list indexes by QLists.
->> + * @key_of_cur is the list of key fragments leading up to @cur.
->> + * On success, return either @cur or its replacement.
->> + * On failure, store an error through @errp and return NULL.
->> + */
->> +static QObject *keyval_listify(QDict *cur, GSList *key_of_cur, Error **errp)
->> +{
->> +    GSList key_node;
->> +    bool has_index, has_member;
->> +    const QDictEntry *ent;
->> +    QDict *qdict;
->> +    QObject *val;
->> +    char *key;
->> +    size_t nelt;
->> +    QObject **elt;
->> +    int index, i;
->> +    QList *list;
->> +
->> +    key_node.next = key_of_cur;
->> +
->> +    /*
->> +     * Recursively listify @cur's members, and figure out whether @cur
->> +     * itself is to be listified.
->> +     */
->> +    has_index = false;
->> +    has_member = false;
->> +    for (ent = qdict_first(cur); ent; ent = qdict_next(cur, ent)) {
->> +        if (key_to_index(ent->key, NULL) >= 0) {
->> +            has_index = true;
->> +        } else {
->> +            has_member = true;
->> +        }
->> +
->> +        qdict = qobject_to_qdict(ent->value);
->> +        if (!qdict) {
->> +            continue;
->> +        }
->> +
->> +        key_node.data = ent->key;
->> +        val = keyval_listify(qdict, &key_node, errp);
->> +        if (!val) {
->> +            return NULL;
->> +        }
->> +        if (val != ent->value) {
->> +            qdict_put_obj(cur, ent->key, val);
->> +        }
->> +    }
->> +
->> +    if (has_index && has_member) {
->> +        key = reassemble_key(key_of_cur);
->> +        error_setg(errp, "Parameters '%s*' used inconsistently", key);
->> +        g_free(key);
->> +        return NULL;
->> +    }
->> +    if (!has_index) {
->> +        return QOBJECT(cur);
->> +    }
->> +
+
+Should this use the canonical form of an index, even if the user spelled
+it with extra bytes like leading zero?
+
+
 >> +    /* Copy @cur's values to @elt[] */
->> +    nelt = qdict_size(cur);
->> +    elt = g_new0(QObject *, nelt);
->
+>> +    nelt =3D qdict_size(cur);
+>> +    elt =3D g_new0(QObject *, nelt);
+>=20
 > This doesn't seem to be freed.
-
-Yup.  Fixing...
-
->> +    for (ent = qdict_first(cur); ent; ent = qdict_next(cur, ent)) {
->> +        index = key_to_index(ent->key, NULL);
->> +        assert(index >= 0);
+>=20
+>> +    for (ent =3D qdict_first(cur); ent; ent =3D qdict_next(cur, ent))=
+ {
+>> +        index =3D key_to_index(ent->key, NULL);
+>> +        assert(index >=3D 0);
 >> +        /*
 >> +         * We iterate @nelt times.  Because the dictionary keys are
 >> +         * distinct, the indexes are also distinct (key_to_index()
 >> +         * ensures it).
->
+>=20
 > Really? What about leading zeros?
 
-Bummer.
+key_to_index() should be used to convert "01" and "1" into the same key
+when first computing the QDict during the initial parse; this post-pass
+should thus only see a single "1" key (last-one-wins semantics,
+regardless of the difference in spelling of the same index repeated on
+the command line).
 
-You know, my first version of this code didn't rely on distinct indexes,
-but I found it a bit complicated, so I "simplified" it.  I'll dig it out
-of git.
 
->> +                        If we get one exceeding @nelt here, we will
->> +         * leave a hole in @elt[], triggering the error in the next
->> +         * loop.
->> +         *
->> +         * Well, I lied.  key_to_index() can return INT_MAX multiple
->> +         * times, but INT_MAX surely exceeds @nelt.
->> +         */
->> +        if ((size_t)index >= nelt) {
->> +            continue;
->> +        }
->> +        assert(!elt[index]);
->> +        elt[index] = ent->value;
->> +        qobject_incref(elt[index]);
->
-> We forget to decref this in error cases. Maybe it would be better to
-> only incref immediately before qlist_append_obj().
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-Will fix one way or another.
 
->> +    }
->> +
->> +    /* Make a list from @elt[] */
->> +    list = qlist_new();
->> +    for (i = 0; i < nelt; i++) {
->> +        if (!elt[i]) {
->> +            key = reassemble_key(key_of_cur);
->> +            error_setg(errp, "Parameter '%s%d' missing", key, i);
->> +            g_free(key);
->> +            QDECREF(list);
->> +            return NULL;
->> +        }
->> +        qlist_append_obj(list, elt[i]);
->> +    }
->> +
->> +    return QOBJECT(list);
->> +}
->> +
->>  /*
->>   * Parse @params in QEMU's traditional KEY=VALUE,... syntax.
->>   * If @implied_key, the first KEY= can be omitted.  @implied_key is
->> @@ -216,6 +362,7 @@ QDict *keyval_parse(const char *params, const char *implied_key,
->>                      Error **errp)
->>  {
->>      QDict *qdict = qdict_new();
->> +    QObject *listified;
->>      const char *s;
->>  
->>      s = params;
->> @@ -228,5 +375,11 @@ QDict *keyval_parse(const char *params, const char *implied_key,
->>          implied_key = NULL;
->>      }
->>  
->> +    listified = keyval_listify(qdict, NULL, errp);
->> +    if (!listified) {
->> +        QDECREF(qdict);
->> +        return NULL;
->> +    }
->> +    assert(listified == QOBJECT(qdict));
->>      return qdict;
->>  }
->
-> Kevin
+--rRBqMcsn4NxXioPCenxAHGaSkbFF6NaSX
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYtdg8AAoJEKeha0olJ0Nq330IAJ0VUaEDhVbNLkzeH03lvG4B
+BY29ShGv8k1yDUhI8v7UzzThq4CDllrN3d2ijddMMYouywIYNxzdF3JB/7acE3Gr
+OlC5AWfOy71oTRES4SW1WCn8uKpH+SN1PA26Yv7UqcWnkT4+Ea8hEWdcbsPZdZ3i
+Tfy8tIMjBicW6b/dr1aAgkcoG7MeYqstbqw6r4zLwhy7CcV5jZbNztaQh3e0aohZ
+GYKFwb9dQTtFLPmblAapn6+dd53eL1f59dwkS9DujpQPQgtrcUU893mxb10pEpeo
+renDaXkhz0AQZ6bJ6HkuoqbTk6vk+lq8OLw3vKAhm2FyvnPOOV/Ryk6VJKJ8KqY=
+=3KLi
+-----END PGP SIGNATURE-----
+
+--rRBqMcsn4NxXioPCenxAHGaSkbFF6NaSX--
