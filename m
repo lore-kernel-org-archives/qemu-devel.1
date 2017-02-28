@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cigjB-0000hm-5F
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:18:01 -0500
+	(envelope-from <berrange@redhat.com>) id 1cigtz-0002TV-QQ
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:29:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cigj7-0001Kb-Vd
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:18:01 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20170228111935.10826-3-stefanha@redhat.com>
-References: <20170228111935.10826-1-stefanha@redhat.com>
-	<20170228111935.10826-3-stefanha@redhat.com>
-Date: Tue, 28 Feb 2017 13:17:55 +0100
-Message-ID: <w51innu5x1o.fsf@maestria.local.igalia.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] throttle: make
- throttle_config(throttle_get_config()) symmetric
+	(envelope-from <berrange@redhat.com>) id 1cigtw-0004R9-NN
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:29:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42874)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cigtw-0004Qn-HP
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:29:08 -0500
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Tue, 28 Feb 2017 12:28:59 +0000
+Message-Id: <20170228122901.24520-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/2] Fix stale 'trace-events-all' file in build
+ dir
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,23 +22,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Nini Gu <ngu@redhat.com>, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On Tue 28 Feb 2017 12:19:35 PM CET, Stefan Hajnoczi wrote:
-> +/* undo internal bucket parameter changes (see throttle_fix_bucket()) */
-> +static void throttle_unfix_bucket(LeakyBucket *bkt)
-> +{
-> +    double min = bkt->avg / 10;
-> +
-> +    if (bkt->max == min) {
-> +        bkt->max = 0;
-> +    }
-> +}
+If systemtap support was disabled, the trace-events-all file was
+only getting regenerated at time of 'make instal'. This is bad
+because it leaves stale files in the build dir for developers.
 
-I guess you could do the more general if (bkt->max < bkt->avg), but your
-solution is also fine with me.
+Daniel P. Berrange (2):
+  makefile: merge GENERATED_HEADERS & GENERATED_SOURCES variables
+  makefile: generate trace-events-all upfront
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+ Makefile                   | 39 +++++++++++++++++++--------------------
+ Makefile.target            |  6 +++---
+ target/s390x/Makefile.objs |  2 +-
+ tests/Makefile.include     |  2 +-
+ 4 files changed, 24 insertions(+), 25 deletions(-)
 
-Berto
+-- 
+2.9.3
