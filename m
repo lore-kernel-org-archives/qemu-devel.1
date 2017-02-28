@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cioX0-0006QA-0i
+	(envelope-from <kwolf@redhat.com>) id 1cioX0-0006Qs-I0
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:37:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cioWy-00080L-JT
+	(envelope-from <kwolf@redhat.com>) id 1cioWz-00081I-JN
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:37:58 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 28 Feb 2017 21:36:30 +0100
-Message-Id: <1488314205-16264-32-git-send-email-kwolf@redhat.com>
+Date: Tue, 28 Feb 2017 21:36:32 +0100
+Message-Id: <1488314205-16264-34-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1488314205-16264-1-git-send-email-kwolf@redhat.com>
 References: <1488314205-16264-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 31/46] block: BdrvChildRole.attach/detach()
- callbacks
+Subject: [Qemu-devel] [PULL 33/46] blockjob: Factor out
+ block_job_remove_all_bdrv()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,183 +23,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-Backing files are somewhat special compared to other kinds of children
-because they are attached and detached using bdrv_set_backing_hd()
-rather than the normal set of functions, which does a few more things
-like setting backing blockers, toggling the BDRV_O_NO_BACKING flag,
-setting parent_bs->backing_file, etc.
+In some cases, we want to remove op blockers on intermediate nodes
+before the whole block job transaction has completed (because they block
+restoring the final graph state during completion). Provide a function
+for this.
 
-These special features are a reason why change_parent_backing_link()
-can't handle backing files yet. With abstracting the additional features
-into .attach/.detach callbacks, we get a step closer to a function that
-can actually deal with this.
+The whole block job lifecycle is a bit messed up and it's hard to
+actually do all things in the right order, but I'll leave simplifying
+this for another day.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 Acked-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c                   | 95 ++++++++++++++++++++++++++++++-----------------
- include/block/block_int.h |  3 ++
- 2 files changed, 63 insertions(+), 35 deletions(-)
+ blockjob.c               | 20 +++++++++++++-------
+ include/block/blockjob.h |  9 +++++++++
+ 2 files changed, 22 insertions(+), 7 deletions(-)
 
-diff --git a/block.c b/block.c
-index 5189c7c..698a5c7 100644
---- a/block.c
-+++ b/block.c
-@@ -807,6 +807,57 @@ const BdrvChildRole child_format = {
-     .drained_end     = bdrv_child_cb_drained_end,
- };
- 
-+static void bdrv_backing_attach(BdrvChild *c)
-+{
-+    BlockDriverState *parent = c->opaque;
-+    BlockDriverState *backing_hd = c->bs;
-+
-+    assert(!parent->backing_blocker);
-+    error_setg(&parent->backing_blocker,
-+               "node is used as backing hd of '%s'",
-+               bdrv_get_device_or_node_name(parent));
-+
-+    parent->open_flags &= ~BDRV_O_NO_BACKING;
-+    pstrcpy(parent->backing_file, sizeof(parent->backing_file),
-+            backing_hd->filename);
-+    pstrcpy(parent->backing_format, sizeof(parent->backing_format),
-+            backing_hd->drv ? backing_hd->drv->format_name : "");
-+
-+    bdrv_op_block_all(backing_hd, parent->backing_blocker);
-+    /* Otherwise we won't be able to commit or stream */
-+    bdrv_op_unblock(backing_hd, BLOCK_OP_TYPE_COMMIT_TARGET,
-+                    parent->backing_blocker);
-+    bdrv_op_unblock(backing_hd, BLOCK_OP_TYPE_STREAM,
-+                    parent->backing_blocker);
-+    /*
-+     * We do backup in 3 ways:
-+     * 1. drive backup
-+     *    The target bs is new opened, and the source is top BDS
-+     * 2. blockdev backup
-+     *    Both the source and the target are top BDSes.
-+     * 3. internal backup(used for block replication)
-+     *    Both the source and the target are backing file
-+     *
-+     * In case 1 and 2, neither the source nor the target is the backing file.
-+     * In case 3, we will block the top BDS, so there is only one block job
-+     * for the top BDS and its backing chain.
-+     */
-+    bdrv_op_unblock(backing_hd, BLOCK_OP_TYPE_BACKUP_SOURCE,
-+                    parent->backing_blocker);
-+    bdrv_op_unblock(backing_hd, BLOCK_OP_TYPE_BACKUP_TARGET,
-+                    parent->backing_blocker);
-+}
-+
-+static void bdrv_backing_detach(BdrvChild *c)
-+{
-+    BlockDriverState *parent = c->opaque;
-+
-+    assert(parent->backing_blocker);
-+    bdrv_op_unblock_all(c->bs, parent->backing_blocker);
-+    error_free(parent->backing_blocker);
-+    parent->backing_blocker = NULL;
-+}
-+
- /*
-  * Returns the options and flags that bs->backing should get, based on the
-  * given options and flags for the parent BDS
-@@ -833,6 +884,8 @@ static void bdrv_backing_options(int *child_flags, QDict *child_options,
- 
- const BdrvChildRole child_backing = {
-     .get_parent_desc = bdrv_child_get_parent_desc,
-+    .attach          = bdrv_backing_attach,
-+    .detach          = bdrv_backing_detach,
-     .inherit_options = bdrv_backing_options,
-     .drained_begin   = bdrv_child_cb_drained_begin,
-     .drained_end     = bdrv_child_cb_drained_end,
-@@ -1670,6 +1723,9 @@ static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs,
-         if (old_bs->quiesce_counter && child->role->drained_end) {
-             child->role->drained_end(child);
-         }
-+        if (child->role->detach) {
-+            child->role->detach(child);
-+        }
-         QLIST_REMOVE(child, next_parent);
- 
-         /* Update permissions for old node. This is guaranteed to succeed
-@@ -1693,6 +1749,10 @@ static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs,
-             bdrv_check_perm(new_bs, perm, shared_perm, &error_abort);
-         }
-         bdrv_set_perm(new_bs, perm, shared_perm);
-+
-+        if (child->role->attach) {
-+            child->role->attach(child);
-+        }
-     }
+diff --git a/blockjob.c b/blockjob.c
+index 4216cde..69126af 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -128,6 +128,18 @@ static void block_job_detach_aio_context(void *opaque)
+     block_job_unref(job);
  }
  
-@@ -1830,52 +1890,17 @@ void bdrv_set_backing_hd(BlockDriverState *bs, BlockDriverState *backing_hd)
-     }
- 
-     if (bs->backing) {
--        assert(bs->backing_blocker);
--        bdrv_op_unblock_all(bs->backing->bs, bs->backing_blocker);
-         bdrv_unref_child(bs, bs->backing);
--    } else if (backing_hd) {
--        error_setg(&bs->backing_blocker,
--                   "node is used as backing hd of '%s'",
--                   bdrv_get_device_or_node_name(bs));
-     }
- 
-     if (!backing_hd) {
--        error_free(bs->backing_blocker);
--        bs->backing_blocker = NULL;
-         bs->backing = NULL;
-         goto out;
-     }
-     /* FIXME Error handling */
-     bs->backing = bdrv_attach_child(bs, backing_hd, "backing", &child_backing,
-                                     &error_abort);
--    bs->open_flags &= ~BDRV_O_NO_BACKING;
--    pstrcpy(bs->backing_file, sizeof(bs->backing_file), backing_hd->filename);
--    pstrcpy(bs->backing_format, sizeof(bs->backing_format),
--            backing_hd->drv ? backing_hd->drv->format_name : "");
- 
--    bdrv_op_block_all(backing_hd, bs->backing_blocker);
--    /* Otherwise we won't be able to commit or stream */
--    bdrv_op_unblock(backing_hd, BLOCK_OP_TYPE_COMMIT_TARGET,
--                    bs->backing_blocker);
--    bdrv_op_unblock(backing_hd, BLOCK_OP_TYPE_STREAM,
--                    bs->backing_blocker);
--    /*
--     * We do backup in 3 ways:
--     * 1. drive backup
--     *    The target bs is new opened, and the source is top BDS
--     * 2. blockdev backup
--     *    Both the source and the target are top BDSes.
--     * 3. internal backup(used for block replication)
--     *    Both the source and the target are backing file
--     *
--     * In case 1 and 2, neither the source nor the target is the backing file.
--     * In case 3, we will block the top BDS, so there is only one block job
--     * for the top BDS and its backing chain.
--     */
--    bdrv_op_unblock(backing_hd, BLOCK_OP_TYPE_BACKUP_SOURCE,
--                    bs->backing_blocker);
--    bdrv_op_unblock(backing_hd, BLOCK_OP_TYPE_BACKUP_TARGET,
--                    bs->backing_blocker);
- out:
-     bdrv_refresh_limits(bs, NULL);
- }
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index a0d9328..a5c704b 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -472,6 +472,9 @@ struct BdrvChildRole {
-      */
-     void (*drained_begin)(BdrvChild *child);
-     void (*drained_end)(BdrvChild *child);
++void block_job_remove_all_bdrv(BlockJob *job)
++{
++    GSList *l;
++    for (l = job->nodes; l; l = l->next) {
++        BdrvChild *c = l->data;
++        bdrv_op_unblock_all(c->bs, job->blocker);
++        bdrv_root_unref_child(c);
++    }
++    g_slist_free(job->nodes);
++    job->nodes = NULL;
++}
 +
-+    void (*attach)(BdrvChild *child);
-+    void (*detach)(BdrvChild *child);
- };
+ int block_job_add_bdrv(BlockJob *job, const char *name, BlockDriverState *bs,
+                        uint64_t perm, uint64_t shared_perm, Error **errp)
+ {
+@@ -258,15 +270,9 @@ void block_job_ref(BlockJob *job)
+ void block_job_unref(BlockJob *job)
+ {
+     if (--job->refcnt == 0) {
+-        GSList *l;
+         BlockDriverState *bs = blk_bs(job->blk);
+         bs->job = NULL;
+-        for (l = job->nodes; l; l = l->next) {
+-            BdrvChild *c = l->data;
+-            bdrv_op_unblock_all(c->bs, job->blocker);
+-            bdrv_root_unref_child(c);
+-        }
+-        g_slist_free(job->nodes);
++        block_job_remove_all_bdrv(job);
+         blk_remove_aio_context_notifier(job->blk,
+                                         block_job_attached_aio_context,
+                                         block_job_detach_aio_context, job);
+diff --git a/include/block/blockjob.h b/include/block/blockjob.h
+index 9d65ef8..9e906f7 100644
+--- a/include/block/blockjob.h
++++ b/include/block/blockjob.h
+@@ -181,6 +181,15 @@ int block_job_add_bdrv(BlockJob *job, const char *name, BlockDriverState *bs,
+                        uint64_t perm, uint64_t shared_perm, Error **errp);
  
- extern const BdrvChildRole child_file;
+ /**
++ * block_job_remove_all_bdrv:
++ * @job: The block job
++ *
++ * Remove all BlockDriverStates from the list of nodes that are involved in the
++ * job. This removes the blockers added with block_job_add_bdrv().
++ */
++void block_job_remove_all_bdrv(BlockJob *job);
++
++/**
+  * block_job_set_speed:
+  * @job: The job to set the speed for.
+  * @speed: The new value
 -- 
 1.8.3.1
