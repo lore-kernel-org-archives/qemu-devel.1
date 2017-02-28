@@ -1,19 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51077)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1cipmo-00052g-EH
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1cipmo-00052Y-9E
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 16:58:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Andrew.Baumann@microsoft.com>) id 1cipmj-0005dG-Sx
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1cipmj-0005d3-Jl
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 16:58:22 -0500
 From: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Date: Tue, 28 Feb 2017 13:58:00 -0800
-Message-ID: <20170228215801.10472-2-Andrew.Baumann@microsoft.com>
-In-Reply-To: <20170228215801.10472-1-Andrew.Baumann@microsoft.com>
-References: <20170228215801.10472-1-Andrew.Baumann@microsoft.com>
+Date: Tue, 28 Feb 2017 13:57:59 -0800
+Message-ID: <20170228215801.10472-1-Andrew.Baumann@microsoft.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 1/2] target/arm: implement armv8 PMUSERENR
- (user-mode enable bits)
+Subject: [Qemu-devel] [PATCH 0/2] misc aarch64 fixes for Windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,148 +22,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Baumann <Andrew.Baumann@microsoft.com>
 
-In armv8, this register implements more than a single bit, with
-fine-grained enables for read access to event counters, cycles
-counters, and write access to the software increment. This change
-implements those checks using custom access functions for the relevant
-registers.
+Hi all,
 
-Signed-off-by: Andrew Baumann <Andrew.Baumann@microsoft.com>
----
- target/arm/helper.c | 79 +++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 71 insertions(+), 8 deletions(-)
+I've been experimenting with running arm64 Windows on qemu's aarch64
+virt target. There were a couple of fixes needed in the core ISA
+emulation to enable this -- I'd appreciate feedback on whether this is
+(a) the best way to implement these and (b) suitable for inclusion in
+mainline. (I realise this is too late for 2.9, but would be happy to
+have any feedback nevertheless.)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 3f4211b..760092a 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -885,7 +885,7 @@ static CPAccessResult pmreg_access(CPUARMState *env, const ARMCPRegInfo *ri,
-      */
-     int el = arm_current_el(env);
- 
--    if (el == 0 && !env->cp15.c9_pmuserenr) {
-+    if (el == 0 && !(env->cp15.c9_pmuserenr & 1)) {
-         return CP_ACCESS_TRAP;
-     }
-     if (el < 2 && (env->cp15.mdcr_el2 & MDCR_TPM)
-@@ -899,6 +899,65 @@ static CPAccessResult pmreg_access(CPUARMState *env, const ARMCPRegInfo *ri,
-     return CP_ACCESS_OK;
- }
- 
-+static CPAccessResult pmreg_access_xevcntr(CPUARMState *env,
-+                                           const ARMCPRegInfo *ri,
-+                                           bool isread)
-+{
-+    /* ER: event counter read trap control */
-+    if (arm_feature(env, ARM_FEATURE_V8)
-+        && arm_current_el(env) == 0
-+        && (env->cp15.c9_pmuserenr & (1 << 3)) != 0
-+        && isread) {
-+        return CP_ACCESS_OK;
-+    }
-+
-+    return pmreg_access(env, ri, isread);
-+}
-+
-+static CPAccessResult pmreg_access_selr(CPUARMState *env,
-+                                        const ARMCPRegInfo *ri,
-+                                        bool isread)
-+{
-+    /* ER: event counter read trap control */
-+    if (arm_feature(env, ARM_FEATURE_V8)
-+        && arm_current_el(env) == 0
-+        && (env->cp15.c9_pmuserenr & (1 << 3)) != 0) {
-+        return CP_ACCESS_OK;
-+    }
-+
-+    return pmreg_access(env, ri, isread);
-+}
-+
-+static CPAccessResult pmreg_access_ccntr(CPUARMState *env,
-+                                         const ARMCPRegInfo *ri,
-+                                         bool isread)
-+{
-+    /* CR: cycle counter read trap control */
-+    if (arm_feature(env, ARM_FEATURE_V8)
-+        && arm_current_el(env) == 0
-+        && (env->cp15.c9_pmuserenr & (1 << 2)) != 0
-+        && isread) {
-+        return CP_ACCESS_OK;
-+    }
-+
-+    return pmreg_access(env, ri, isread);
-+}
-+
-+static CPAccessResult pmreg_access_swinc(CPUARMState *env,
-+                                         const ARMCPRegInfo *ri,
-+                                         bool isread)
-+{
-+    /* SW: software increment write trap control */
-+    if (arm_feature(env, ARM_FEATURE_V8)
-+        && arm_current_el(env) == 0
-+        && (env->cp15.c9_pmuserenr & (1 << 1)) != 0
-+        && !isread) {
-+        return CP_ACCESS_OK;
-+    }
-+
-+    return pmreg_access(env, ri, isread);
-+}
-+
- #ifndef CONFIG_USER_ONLY
- 
- static inline bool arm_ccnt_enabled(CPUARMState *env)
-@@ -1068,7 +1127,11 @@ static uint64_t pmxevtyper_read(CPUARMState *env, const ARMCPRegInfo *ri)
- static void pmuserenr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                             uint64_t value)
- {
--    env->cp15.c9_pmuserenr = value & 1;
-+    if (arm_feature(env, ARM_FEATURE_V8)) {
-+        env->cp15.c9_pmuserenr = value & 0xf;
-+    } else {
-+        env->cp15.c9_pmuserenr = value & 1;
-+    }
- }
- 
- static void pmintenset_write(CPUARMState *env, const ARMCPRegInfo *ri,
-@@ -1212,25 +1275,25 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
-       .raw_writefn = raw_write },
-     /* Unimplemented so WI. */
-     { .name = "PMSWINC", .cp = 15, .crn = 9, .crm = 12, .opc1 = 0, .opc2 = 4,
--      .access = PL0_W, .accessfn = pmreg_access, .type = ARM_CP_NOP },
-+      .access = PL0_W, .accessfn = pmreg_access_swinc, .type = ARM_CP_NOP },
- #ifndef CONFIG_USER_ONLY
-     { .name = "PMSELR", .cp = 15, .crn = 9, .crm = 12, .opc1 = 0, .opc2 = 5,
-       .access = PL0_RW, .type = ARM_CP_ALIAS,
-       .fieldoffset = offsetoflow32(CPUARMState, cp15.c9_pmselr),
--      .accessfn = pmreg_access, .writefn = pmselr_write,
-+      .accessfn = pmreg_access_selr, .writefn = pmselr_write,
-       .raw_writefn = raw_write},
-     { .name = "PMSELR_EL0", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 3, .crn = 9, .crm = 12, .opc2 = 5,
--      .access = PL0_RW, .accessfn = pmreg_access,
-+      .access = PL0_RW, .accessfn = pmreg_access_selr,
-       .fieldoffset = offsetof(CPUARMState, cp15.c9_pmselr),
-       .writefn = pmselr_write, .raw_writefn = raw_write, },
-     { .name = "PMCCNTR", .cp = 15, .crn = 9, .crm = 13, .opc1 = 0, .opc2 = 0,
-       .access = PL0_RW, .resetvalue = 0, .type = ARM_CP_IO,
-       .readfn = pmccntr_read, .writefn = pmccntr_write32,
--      .accessfn = pmreg_access },
-+      .accessfn = pmreg_access_ccntr },
-     { .name = "PMCCNTR_EL0", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 3, .crn = 9, .crm = 13, .opc2 = 0,
--      .access = PL0_RW, .accessfn = pmreg_access,
-+      .access = PL0_RW, .accessfn = pmreg_access_ccntr,
-       .type = ARM_CP_IO,
-       .readfn = pmccntr_read, .writefn = pmccntr_write, },
- #endif
-@@ -1251,7 +1314,7 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
-     /* Unimplemented, RAZ/WI. */
-     { .name = "PMXEVCNTR", .cp = 15, .crn = 9, .crm = 13, .opc1 = 0, .opc2 = 2,
-       .access = PL0_RW, .type = ARM_CP_CONST, .resetvalue = 0,
--      .accessfn = pmreg_access },
-+      .accessfn = pmreg_access_xevcntr },
-     { .name = "PMUSERENR", .cp = 15, .crn = 9, .crm = 14, .opc1 = 0, .opc2 = 0,
-       .access = PL0_R | PL1_RW, .accessfn = access_tpm,
-       .fieldoffset = offsetof(CPUARMState, cp15.c9_pmuserenr),
+I've smoke-tested that these don't break Linux by following:
+https://www.bennee.com/~alex/blog/2014/05/09/running-linux-in-qemus-aarch64-system-emulation-mode/
+... however, that is fairly old; I'd also be happy to try a more
+recent kernel if someone could point me to a bootable image.
+
+Cheers,
+Andrew
+
+Andrew Baumann (2):
+  target/arm: implement armv8 PMUSERENR (user-mode enable bits)
+  target/arm: lie more convincingly about memory attributes in PAR_EL1
+
+ target/arm/helper.c | 87 +++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 78 insertions(+), 9 deletions(-)
+
 -- 
 2.8.3
