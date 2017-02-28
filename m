@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ciqDy-0005B2-QQ
+	(envelope-from <armbru@redhat.com>) id 1ciqDy-0005B9-U1
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:26:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ciqDu-0000c7-7i
+	(envelope-from <armbru@redhat.com>) id 1ciqDu-0000cD-74
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:26:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54592)
+Received: from mx1.redhat.com ([209.132.183.28]:46878)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ciqDt-0000Zq-NN
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:26:21 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ciqDt-0000aF-T5
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:26:22 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D835E7FB68
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 22:26:21 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1736715561
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 22:26:22 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
 	[10.36.116.55])
-	by int-mx13.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v1SMQKKC011105
+	by int-mx09.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v1SMQKq0017538
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
 	verify=NO)
 	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 17:26:21 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 28 Feb 2017 23:26:08 +0100
-Message-Id: <1488320775-9849-18-git-send-email-armbru@redhat.com>
+Date: Tue, 28 Feb 2017 23:26:14 +0100
+Message-Id: <1488320775-9849-24-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488320775-9849-1-git-send-email-armbru@redhat.com>
 References: <1488320775-9849-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 17/24] test-qapi-util: New,
- covering qapi/qapi-util.c
+Subject: [Qemu-devel] [PULL 23/24] docs/qapi-code-gen.txt: Clarify naming
+ rules
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,103 +41,94 @@ To: qemu-devel@nongnu.org
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-Message-Id: <1488317230-26248-18-git-send-email-armbru@redhat.com>
+Message-Id: <1488317230-26248-24-git-send-email-armbru@redhat.com>
 ---
- tests/.gitignore       |  1 +
- tests/Makefile.include |  3 +++
- tests/test-qapi-util.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 55 insertions(+)
- create mode 100644 tests/test-qapi-util.c
+ docs/qapi-code-gen.txt | 61 ++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 39 insertions(+), 22 deletions(-)
 
-diff --git a/tests/.gitignore b/tests/.gitignore
-index 30b7740..a966740 100644
---- a/tests/.gitignore
-+++ b/tests/.gitignore
-@@ -53,6 +53,7 @@ test-mul64
- test-opts-visitor
- test-qapi-event.[ch]
- test-qapi-types.[ch]
-+test-qapi-util
- test-qapi-visit.[ch]
- test-qdev-global-props
- test-qemu-opts
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index e3b4f27..4b09fcd 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -128,6 +128,8 @@ gcov-files-check-bufferiszero-y = util/bufferiszero.c
- check-unit-y += tests/test-uuid$(EXESUF)
- check-unit-y += tests/ptimer-test$(EXESUF)
- gcov-files-ptimer-test-y = hw/core/ptimer.c
-+check-unit-y += tests/test-qapi-util$(EXESUF)
-+gcov-files-test-qapi-util-y = qapi/qapi-util.c
+diff --git a/docs/qapi-code-gen.txt b/docs/qapi-code-gen.txt
+index 6746c10..9514d93 100644
+--- a/docs/qapi-code-gen.txt
++++ b/docs/qapi-code-gen.txt
+@@ -216,33 +216,38 @@ single-dimension array of that type; multi-dimension arrays are not
+ directly supported (although an array of a complex struct that
+ contains an array member is possible).
  
- check-block-$(CONFIG_POSIX) += tests/qemu-iotests-quick.sh
++All names must begin with a letter, and contain only ASCII letters,
++digits, hyphen, and underscore.  There are two exceptions: enum values
++may start with a digit, and names that are downstream extensions (see
++section Downstream extensions) start with underscore.
++
++Names beginning with 'q_' are reserved for the generator, which uses
++them for munging QMP names that resemble C keywords or other
++problematic strings.  For example, a member named "default" in qapi
++becomes "q_default" in the generated C code.
++
+ Types, commands, and events share a common namespace.  Therefore,
+ generally speaking, type definitions should always use CamelCase for
+-user-defined type names, while built-in types are lowercase. Type
+-definitions should not end in 'Kind', as this namespace is used for
+-creating implicit C enums for visiting union types, or in 'List', as
+-this namespace is used for creating array types.  Command names,
+-and member names within a type, should be all lower case with words
+-separated by a hyphen.  However, some existing older commands and
+-complex types use underscore; when extending such expressions,
+-consistency is preferred over blindly avoiding underscore.  Event
+-names should be ALL_CAPS with words separated by underscore.  Member
+-names cannot start with 'has-' or 'has_', as this is reserved for
+-tracking optional members.
++user-defined type names, while built-in types are lowercase.
++
++Type names ending with 'Kind' or 'List' are reserved for the
++generator, which uses them for implicit union enums and array types,
++respectively.
++
++Command names, and member names within a type, should be all lower
++case with words separated by a hyphen.  However, some existing older
++commands and complex types use underscore; when extending such
++expressions, consistency is preferred over blindly avoiding
++underscore.
++
++Event names should be ALL_CAPS with words separated by underscore.
++
++Member names starting with 'has-' or 'has_' are reserved for the
++generator, which uses them for tracking optional members.
  
-@@ -732,6 +734,7 @@ tests/ivshmem-test$(EXESUF): tests/ivshmem-test.o contrib/ivshmem-server/ivshmem
- tests/vhost-user-bridge$(EXESUF): tests/vhost-user-bridge.o contrib/libvhost-user/libvhost-user.o $(test-util-obj-y)
- tests/test-uuid$(EXESUF): tests/test-uuid.o $(test-util-obj-y)
- tests/test-arm-mptimer$(EXESUF): tests/test-arm-mptimer.o
-+tests/test-qapi-util$(EXESUF): tests/test-qapi-util.o $(test-util-obj-y)
+ Any name (command, event, type, member, or enum value) beginning with
+ "x-" is marked experimental, and may be withdrawn or changed
+-incompatibly in a future release.  All names must begin with a letter,
+-and contain only ASCII letters, digits, dash, and underscore.  There
+-are two exceptions: enum values may start with a digit, and any
+-extensions added by downstream vendors should start with a prefix
+-matching "__RFQDN_" (for the reverse-fully-qualified-domain-name of
+-the vendor), even if the rest of the name uses dash (example:
+-__com.redhat_drive-mirror).  Names beginning with 'q_' are reserved
+-for the generator: QMP names that resemble C keywords or other
+-problematic strings will be munged in C to use this prefix.  For
+-example, a member named "default" in qapi becomes "q_default" in the
+-generated C code.
++incompatibly in a future release.
  
- tests/migration/stress$(EXESUF): tests/migration/stress.o
- 	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $< ,"LINK","$(TARGET_DIR)$@")
-diff --git a/tests/test-qapi-util.c b/tests/test-qapi-util.c
-new file mode 100644
-index 0000000..39db8bf
---- /dev/null
-+++ b/tests/test-qapi-util.c
-@@ -0,0 +1,51 @@
-+/*
-+ * Unit tests for QAPI utility functions
-+ *
-+ * Copyright (C) 2017 Red Hat Inc.
-+ *
-+ * Authors:
-+ *  Markus Armbruster <armbru@redhat.com>,
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
+ In the rest of this document, usage lines are given for each
+ expression type, with literal strings written in lower case and
+@@ -643,6 +648,18 @@ any non-empty complex type (struct, union, or alternate), and a
+ pointer to that QAPI type is passed as a single argument.
+ 
+ 
++=== Downstream extensions ===
 +
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qapi/util.h"
-+#include "test-qapi-types.h"
++QAPI schema names that are externally visible, say in the Client JSON
++Protocol, need to be managed with care.  Names starting with a
++downstream prefix of the form __RFQDN_ are reserved for the downstream
++who controls the valid, reverse fully qualified domain name RFQDN.
++RFQDN may only contain ASCII letters, digits, hyphen and period.
 +
-+static void test_qapi_enum_parse(void)
-+{
-+    Error *err = NULL;
-+    int ret;
++Example: Red Hat, Inc. controls redhat.com, and may therefore add a
++downstream command __com.redhat_drive-mirror.
 +
-+    ret = qapi_enum_parse(QType_lookup, NULL, QTYPE__MAX, QTYPE_NONE,
-+                          &error_abort);
-+    g_assert_cmpint(ret, ==, QTYPE_NONE);
 +
-+    ret = qapi_enum_parse(QType_lookup, "junk", QTYPE__MAX, -1,
-+                          NULL);
-+    g_assert_cmpint(ret, ==, -1);
-+
-+    ret = qapi_enum_parse(QType_lookup, "junk", QTYPE__MAX, -1,
-+                          &err);
-+    error_free_or_abort(&err);
-+
-+    ret = qapi_enum_parse(QType_lookup, "none", QTYPE__MAX, -1,
-+                          &error_abort);
-+    g_assert_cmpint(ret, ==, QTYPE_NONE);
-+
-+    ret = qapi_enum_parse(QType_lookup, QType_lookup[QTYPE__MAX - 1],
-+                          QTYPE__MAX, QTYPE__MAX - 1,
-+                          &error_abort);
-+    g_assert_cmpint(ret, ==, QTYPE__MAX - 1);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+    g_test_init(&argc, &argv, NULL);
-+    g_test_add_func("/qapi/util/qapi_enum_parse", test_qapi_enum_parse);
-+    g_test_run();
-+    return 0;
-+}
+ == Client JSON Protocol introspection ==
+ 
+ Clients of a Client JSON Protocol commonly need to figure out what
 -- 
 2.7.4
