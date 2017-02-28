@@ -1,28 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1cifjE-0003gq-SR
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 06:14:02 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cifom-0007ji-K6
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 06:19:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1cifjB-0004Gk-Lu
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 06:14:00 -0500
-Received: from mail-db5eur01on0108.outbound.protection.outlook.com
-	([104.47.2.108]:61467
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1cifjB-0004Df-0y
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 06:13:57 -0500
-References: <20170227201456.31814-1-berrange@redhat.com>
-	<20170228104828.GA2720@redhat.com>
-	<0bb8488e-ee11-9401-7c40-a0ab1eb275c0@openvz.org>
-From: "Denis V. Lunev" <den@virtuozzo.com>
-Message-ID: <ace8fc68-dd8c-81f6-872f-17798cce3609@virtuozzo.com>
-Date: Tue, 28 Feb 2017 13:58:38 +0300
-MIME-Version: 1.0
-In-Reply-To: <0bb8488e-ee11-9401-7c40-a0ab1eb275c0@openvz.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] io: ignore case when matching websockets
- HTTP headers
+	(envelope-from <stefanha@redhat.com>) id 1cifol-0006Hi-HO
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 06:19:44 -0500
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Tue, 28 Feb 2017 11:19:33 +0000
+Message-Id: <20170228111935.10826-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/2] throttle: improve command-line
+ parameter documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +18,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Cc: Nini Gu <ngu@redhat.com>, qemu-block@nongnu.org, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 02/28/2017 01:54 PM, Denis V. Lunev wrote:
-> On 02/28/2017 01:48 PM, Daniel P. Berrange wrote:
->> On Mon, Feb 27, 2017 at 08:14:56PM +0000, Daniel P. Berrange wrote:
->>> According to RFC7230 Section 3.2, header field name is case-insensitive.
->>> Convert the header data into all lowercase before doing string matching
->>> on the headers.
->>>
->>> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
->>> ---
->>>  io/channel-websock.c | 14 +++++++++-----
->>>  1 file changed, 9 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/io/channel-websock.c b/io/channel-websock.c
->>> index a06a4a8..32b7f37 100644
->>> --- a/io/channel-websock.c
->>> +++ b/io/channel-websock.c
->>> @@ -33,9 +33,9 @@
->>>  #define QIO_CHANNEL_WEBSOCK_GUID "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
->>>  #define QIO_CHANNEL_WEBSOCK_GUID_LEN strlen(QIO_CHANNEL_WEBSOCK_GUID)
->>>  
->>> -#define QIO_CHANNEL_WEBSOCK_HEADER_PROTOCOL "Sec-WebSocket-Protocol"
->>> -#define QIO_CHANNEL_WEBSOCK_HEADER_VERSION "Sec-WebSocket-Version"
->>> -#define QIO_CHANNEL_WEBSOCK_HEADER_KEY "Sec-WebSocket-Key"
->>> +#define QIO_CHANNEL_WEBSOCK_HEADER_PROTOCOL "sec-websocket-protocol"
->>> +#define QIO_CHANNEL_WEBSOCK_HEADER_VERSION "sec-websocket-version"
->>> +#define QIO_CHANNEL_WEBSOCK_HEADER_KEY "sec-websocket-key"
->>>  
->>>  #define QIO_CHANNEL_WEBSOCK_PROTOCOL_BINARY "binary"
->>>  
->>> @@ -223,7 +223,7 @@ static int qio_channel_websock_handshake_process(QIOChannelWebsock *ioc,
->>>  static int qio_channel_websock_handshake_read(QIOChannelWebsock *ioc,
->>>                                                Error **errp)
->>>  {
->>> -    char *handshake_end;
->>> +    char *handshake_end, *tmp;
->>>      ssize_t ret;
->>>      /* Typical HTTP headers from novnc are 512 bytes, so limiting
->>>       * total header size to 4096 is easily enough. */
->>> @@ -249,9 +249,13 @@ static int qio_channel_websock_handshake_read(QIOChannelWebsock *ioc,
->>>          }
->>>      }
->>>  
->>> +    for (tmp = (char *)ioc->encinput.buffer; tmp < handshake_end; tmp++) {
->>> +        *tmp = g_ascii_tolower(*tmp);
->>> +    }
->>> +
->> self-nack - this does not in fact work - while it is fine to lowercase
->> the header keys, we must not touch the header values as some data is
->> case-sensitive
->>
->> Regards,
->> Daniel
-> g-ascii-tolower() will help
->
-> Den
-ah, sorry, wrong copy/paste. I meant 'g_ascii_strdown ()'
+v2:
+ * Fixed s/bps/iops/ copy-paste error in Patch 1 [Berto]
+ * Rephrased warning about guest hangs and errors [Berto]
+ * Added Patch 2 to hide the internal .max value from the monitor
 
-Den
+Patch 1 fleshes out the documentation for I/O throttling command-line
+parameters.
+
+Patch 2 hides an internal value that was being exposed to users via the
+monitor and caused confusion.
+
+I ended up not adding QMP-style throttling.* names to the command-line
+documentation because the names are very long and unlikely to be used.  I
+couldn't see a nice way of adding them while still keeping the documentation
+readable.
+
+Stefan Hajnoczi (2):
+  qemu-options: explain disk I/O throttling options
+  throttle: make throttle_config(throttle_get_config()) symmetric
+
+ tests/test-throttle.c |  8 ++++----
+ util/throttle.c       | 16 ++++++++++++++++
+ qemu-options.hx       | 24 ++++++++++++++++++++++++
+ 3 files changed, 44 insertions(+), 4 deletions(-)
+
+-- 
+2.9.3
