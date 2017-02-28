@@ -1,21 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54543)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cikhw-0002lY-UN
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:33:01 -0500
+	(envelope-from <jcody@redhat.com>) id 1cikja-0004LC-FN
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:34:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cikhw-0001Sg-17
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:33:00 -0500
-Date: Tue, 28 Feb 2017 17:32:52 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170228163252.GJ4090@noname.redhat.com>
-References: <1488194450-28056-1-git-send-email-armbru@redhat.com>
-	<1488194450-28056-9-git-send-email-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1488194450-28056-9-git-send-email-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 08/24] qobject: Propagate parse errors
- through qobject_from_jsonv()
+	(envelope-from <jcody@redhat.com>) id 1cikjZ-0001sO-K5
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:34:42 -0500
+From: Jeff Cody <jcody@redhat.com>
+Date: Tue, 28 Feb 2017 11:34:31 -0500
+Message-Id: <20170228163436.31357-1-jcody@redhat.com>
+Subject: [Qemu-devel] [PULL v2 0/5] Block patches for 2.9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,116 +17,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, pkrempa@redhat.com, eblake@redhat.com
+To: qemu-block@nongnu.org
+Cc: peter.maydell@linaro.org, jcody@redhat.com, qemu-devel@nongnu.org
 
-Am 27.02.2017 um 12:20 hat Markus Armbruster geschrieben:
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  include/qapi/qmp/qjson.h           |  3 ++-
->  qobject/qjson.c                    | 12 ++++++++----
->  tests/libqtest.c                   |  2 +-
->  tests/test-qobject-input-visitor.c |  2 +-
->  4 files changed, 12 insertions(+), 7 deletions(-)
-> 
-> diff --git a/include/qapi/qmp/qjson.h b/include/qapi/qmp/qjson.h
-> index 02b1f2c..6fe42d0 100644
-> --- a/include/qapi/qmp/qjson.h
-> +++ b/include/qapi/qmp/qjson.h
-> @@ -19,7 +19,8 @@
->  
->  QObject *qobject_from_json(const char *string);
->  QObject *qobject_from_jsonf(const char *string, ...) GCC_FMT_ATTR(1, 2);
-> -QObject *qobject_from_jsonv(const char *string, va_list *ap) GCC_FMT_ATTR(1, 0);
-> +QObject *qobject_from_jsonv(const char *string, va_list *ap, Error **errp)
-> +    GCC_FMT_ATTR(1, 0);
->  
->  QString *qobject_to_json(const QObject *obj);
->  QString *qobject_to_json_pretty(const QObject *obj);
-> diff --git a/qobject/qjson.c b/qobject/qjson.c
-> index 9a0de89..339c9f7 100644
-> --- a/qobject/qjson.c
-> +++ b/qobject/qjson.c
-> @@ -12,6 +12,7 @@
->   */
->  
->  #include "qemu/osdep.h"
-> +#include "qapi/error.h"
->  #include "qapi/qmp/json-lexer.h"
->  #include "qapi/qmp/json-parser.h"
->  #include "qapi/qmp/json-streamer.h"
-> @@ -24,15 +25,17 @@ typedef struct JSONParsingState
->      JSONMessageParser parser;
->      va_list *ap;
->      QObject *result;
-> +    Error *err;
->  } JSONParsingState;
->  
->  static void parse_json(JSONMessageParser *parser, GQueue *tokens)
->  {
->      JSONParsingState *s = container_of(parser, JSONParsingState, parser);
-> -    s->result = json_parser_parse(tokens, s->ap);
-> +
-> +    s->result = json_parser_parse_err(tokens, s->ap, &s->err);
->  }
->  
-> -QObject *qobject_from_jsonv(const char *string, va_list *ap)
-> +QObject *qobject_from_jsonv(const char *string, va_list *ap, Error **errp)
->  {
->      JSONParsingState state = {};
->  
-> @@ -43,12 +46,13 @@ QObject *qobject_from_jsonv(const char *string, va_list *ap)
->      json_message_parser_flush(&state.parser);
->      json_message_parser_destroy(&state.parser);
->  
-> +    error_propagate(errp, state.err);
->      return state.result;
->  }
->  
->  QObject *qobject_from_json(const char *string)
->  {
-> -    return qobject_from_jsonv(string, NULL);
-> +    return qobject_from_jsonv(string, NULL, NULL);
->  }
->  
->  /*
-> @@ -61,7 +65,7 @@ QObject *qobject_from_jsonf(const char *string, ...)
->      va_list ap;
->  
->      va_start(ap, string);
-> -    obj = qobject_from_jsonv(string, &ap);
-> +    obj = qobject_from_jsonv(string, &ap, NULL);
->      va_end(ap);
->  
->      assert(obj != NULL);
-> diff --git a/tests/libqtest.c b/tests/libqtest.c
-> index cf27afc..683d5e3 100644
-> --- a/tests/libqtest.c
-> +++ b/tests/libqtest.c
-> @@ -442,7 +442,7 @@ void qmp_fd_sendv(int fd, const char *fmt, va_list ap)
->       * is an array type.
->       */
->      va_copy(ap_copy, ap);
-> -    qobj = qobject_from_jsonv(fmt, &ap_copy);
-> +    qobj = qobject_from_jsonv(fmt, &ap_copy, NULL);
->      va_end(ap_copy);
+The following changes since commit c8c0a1a784cdf70ecea50e93213137c6c89337a7:
 
-&error_abort might be appropriate here.
+  Merge remote-tracking branch 'remotes/cody/tags/block-pull-request' into staging (2017-02-28 13:41:03 +0000)
 
->      /* No need to send anything for an empty QObject.  */
-> diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-input-visitor.c
-> index 650637e..44885ee 100644
-> --- a/tests/test-qobject-input-visitor.c
-> +++ b/tests/test-qobject-input-visitor.c
-> @@ -51,7 +51,7 @@ static Visitor *visitor_input_test_init_internal(TestInputVisitorData *data,
->  {
->      visitor_input_teardown(data, NULL);
->  
-> -    data->obj = qobject_from_jsonv(json_string, ap);
-> +    data->obj = qobject_from_jsonv(json_string, ap, NULL);
->      g_assert(data->obj);
+are available in the git repository at:
 
-And here, too.
+  git@github.com:codyprime/qemu-kvm-jtc.git tags/block-pull-request
 
-Changed or unchanged:
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+for you to fetch changes up to 7a4bdbdd818fba3fb6c79d23baa3c7cb928be661:
+
+  block/rbd: add support for 'mon_host', 'auth_supported' via QAPI (2017-02-28 11:32:46 -0500)
+
+----------------------------------------------------------------
+Block patches for 2.9 - rbd blockdev-add.  Added s-o-b's.
+----------------------------------------------------------------
+
+Jeff Cody (5):
+  block/rbd: don't copy strings in qemu_rbd_next_tok()
+  block/rbd: add all the currently supported runtime_opts
+  block/rbd: parse all options via bdrv_parse_filename
+  block/rbd: add blockdev-add support
+  block/rbd: add support for 'mon_host', 'auth_supported' via QAPI
+
+ block/rbd.c          | 568 ++++++++++++++++++++++++++++++++++-----------------
+ qapi/block-core.json |  62 +++++-
+ 2 files changed, 442 insertions(+), 188 deletions(-)
+
+-- 
+2.9.3
