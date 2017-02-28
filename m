@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41009)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ciVnH-0005uP-8i
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 19:37:32 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ciVqr-0000bE-K1
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 19:41:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ciVnC-0005Kk-CO
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 19:37:31 -0500
-Received: from mo6.mail-out.ovh.net ([178.32.228.6]:37543)
+	(envelope-from <dgibson@ozlabs.org>) id 1ciVqq-0006La-FU
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 19:41:13 -0500
+Received: from ozlabs.org ([2401:3900:2:1::2]:40597)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ciVnC-0005Ke-5c
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 19:37:26 -0500
-Received: from player761.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id B0BCBB34DA
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 01:37:24 +0100 (CET)
-Date: Tue, 28 Feb 2017 01:37:21 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170228013721.242076f0@bahia.lan>
-In-Reply-To: <1488236421-30983-1-git-send-email-groug@kaod.org>
-References: <1488236421-30983-1-git-send-email-groug@kaod.org>
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1ciVqq-0006HR-1h
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 19:41:12 -0500
+Date: Tue, 28 Feb 2017 11:41:01 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170228004101.GG17615@umbus.fritz.box>
+References: <1488171164-28319-1-git-send-email-xyjxie@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/QuwUzRJF/DkHgMbWZ0yA36=";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PULL 00/31] 9p patches 2017-02-27 for 2.9 soft
- freeze
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="3LkAFa4R1oQZ/xxz"
+Content-Disposition: inline
+In-Reply-To: <1488171164-28319-1-git-send-email-xyjxie@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2] memory: Introduce DEVICE_HOST_ENDIAN
+ for ram device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,121 +28,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
+To: Yongji Xie <xyjxie@linux.vnet.ibm.com>
+Cc: pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, qemu-devel@nongnu.org, alex.williamson@redhat.com, aik@ozlabs.ru, peter.maydell@linaro.org, paulus@samba.org, mdroth@linux.vnet.ibm.com, zhong@linux.vnet.ibm.com
 
---Sig_/QuwUzRJF/DkHgMbWZ0yA36=
-Content-Type: text/plain; charset=US-ASCII
+
+--3LkAFa4R1oQZ/xxz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-Peter,
+On Mon, Feb 27, 2017 at 12:52:44PM +0800, Yongji Xie wrote:
+> At the moment ram device's memory regions are DEVICE_NATIVE_ENDIAN. It's
+> incorrect. This memory region is backed by a MMIO area in host, so the
+> uint64_t data that MemoryRegionOps read from/write to this area should be
+> host-endian rather than target-endian. Hence, current code does not work
+> when target and host endianness are different which is the most common ca=
+se
+> on PPC64. To fix it, this introduces DEVICE_HOST_ENDIAN for the ram devic=
+e.
+>=20
+> This has been tested on PPC64 BE/LE host/guest in all possible combinatio=
+ns
+> including TCG.
+>=20
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Yongji Xie <xyjxie@linux.vnet.ibm.com>
 
-I have some issues with this pull request. Please don't apply it, I'll resp=
-in a
-new one.
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
-Thanks.
+The effect of the patch is certainly correct.  I remain a little
+concerned that the name "host endian" might cause more confusion than
+it resolves, but a better term isn't immediately obvious to me.
 
-On Mon, 27 Feb 2017 23:59:50 +0100
-Greg Kurz <groug@kaod.org> wrote:
+> ---
+>  include/exec/cpu-common.h |    6 ++++++
+>  memory.c                  |    2 +-
+>  2 files changed, 7 insertions(+), 1 deletions(-)
+>=20
+> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+> index bd15853..eef74df 100644
+> --- a/include/exec/cpu-common.h
+> +++ b/include/exec/cpu-common.h
+> @@ -36,6 +36,12 @@ enum device_endian {
+>      DEVICE_LITTLE_ENDIAN,
+>  };
+> =20
+> +#if defined(HOST_WORDS_BIGENDIAN)
+> +#define DEVICE_HOST_ENDIAN DEVICE_BIG_ENDIAN
+> +#else
+> +#define DEVICE_HOST_ENDIAN DEVICE_LITTLE_ENDIAN
+> +#endif
+> +
+>  /* address in the RAM (different from a physical address) */
+>  #if defined(CONFIG_XEN_BACKEND)
+>  typedef uint64_t ram_addr_t;
+> diff --git a/memory.c b/memory.c
+> index ed8b5aa..17cfada 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -1180,7 +1180,7 @@ static void memory_region_ram_device_write(void *op=
+aque, hwaddr addr,
+>  static const MemoryRegionOps ram_device_mem_ops =3D {
+>      .read =3D memory_region_ram_device_read,
+>      .write =3D memory_region_ram_device_write,
+> -    .endianness =3D DEVICE_NATIVE_ENDIAN,
+> +    .endianness =3D DEVICE_HOST_ENDIAN,
+>      .valid =3D {
+>          .min_access_size =3D 1,
+>          .max_access_size =3D 8,
 
-> The following changes since commit 8f2d7c341184a95d05476ea3c45dbae2b9ddbe=
-51:
->=20
->   Merge remote-tracking branch 'remotes/berrange/tags/pull-qcrypto-2017-0=
-2-27-1' into staging (2017-02-27 15:33:21 +0000)
->=20
-> are available in the git repository at:
->=20
->   https://github.com/gkurz/qemu.git tags/for-upstream
->=20
-> for you to fetch changes up to a07ef65e3aeac852188331708716792930d819ef:
->=20
->   9pfs: local: drop unused code (2017-02-27 22:45:17 +0100)
->=20
-> ----------------------------------------------------------------
-> This pull request brings:
-> - a fix to a minor bug reported by Coverity
-> - throttling support in the local backend (command line only)
-> - a huge fix for CVE-2016-9602 (symlink attack vulnerability)
->=20
-> ----------------------------------------------------------------
-> Greg Kurz (29):
->       fsdev: add IO throttle support to fsdev devices
->       9pfs: local: move xattr security ops to 9p-xattr.c
->       9pfs: remove side-effects in local_init()
->       9pfs: remove side-effects in local_open() and local_opendir()
->       9pfs: introduce relative_openat_nofollow() helper
->       9pfs: local: keep a file descriptor on the shared folder
->       9pfs: local: open/opendir: don't follow symlinks
->       9pfs: local: lgetxattr: don't follow symlinks
->       9pfs: local: llistxattr: don't follow symlinks
->       9pfs: local: lsetxattr: don't follow symlinks
->       9pfs: local: lremovexattr: don't follow symlinks
->       9pfs: local: unlinkat: don't follow symlinks
->       9pfs: local: remove: don't follow symlinks
->       9pfs: local: utimensat: don't follow symlinks
->       9pfs: local: statfs: don't follow symlinks
->       9pfs: local: truncate: don't follow symlinks
->       9pfs: local: readlink: don't follow symlinks
->       9pfs: local: lstat: don't follow symlinks
->       9pfs: local: renameat: don't follow symlinks
->       9pfs: local: rename: use renameat
->       9pfs: local: improve error handling in link op
->       9pfs: local: link: don't follow symlinks
->       9pfs: local: chmod: don't follow symlinks
->       9pfs: local: chown: don't follow symlinks
->       9pfs: local: symlink: don't follow symlinks
->       9pfs: local: mknod: don't follow symlinks
->       9pfs: local: mkdir: don't follow symlinks
->       9pfs: local: open2: don't follow symlinks
->       9pfs: local: drop unused code
->=20
-> Paolo Bonzini (1):
->       9pfs: fix v9fs_lock error case
->=20
-> Pradeep (1):
->       throttle: factor out duplicate code
->=20
->  blockdev.c                      |   83 +---
->  fsdev/Makefile.objs             |    2 +-
->  fsdev/file-op-9p.h              |    3 +
->  fsdev/qemu-fsdev-opts.c         |    3 +
->  fsdev/qemu-fsdev-throttle.c     |  118 +++++
->  fsdev/qemu-fsdev-throttle.h     |   39 ++
->  hw/9pfs/9p-local.c              | 1031 +++++++++++++++++++++------------=
-------
->  hw/9pfs/9p-local.h              |   20 +
->  hw/9pfs/9p-posix-acl.c          |   44 +-
->  hw/9pfs/9p-util.c               |   68 +++
->  hw/9pfs/9p-util.h               |   53 ++
->  hw/9pfs/9p-xattr-user.c         |   24 +-
->  hw/9pfs/9p-xattr.c              |  166 ++++++-
->  hw/9pfs/9p-xattr.h              |   87 +---
->  hw/9pfs/9p.c                    |   19 +-
->  hw/9pfs/Makefile.objs           |    2 +-
->  hw/9pfs/cofile.c                |    2 +
->  include/qemu/throttle-options.h |   92 ++++
->  qemu-options.hx                 |    7 +-
->  19 files changed, 1180 insertions(+), 683 deletions(-)
->  create mode 100644 fsdev/qemu-fsdev-throttle.c
->  create mode 100644 fsdev/qemu-fsdev-throttle.h
->  create mode 100644 hw/9pfs/9p-local.h
->  create mode 100644 hw/9pfs/9p-util.c
->  create mode 100644 hw/9pfs/9p-util.h
->  create mode 100644 include/qemu/throttle-options.h
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-
---Sig_/QuwUzRJF/DkHgMbWZ0yA36=
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+--3LkAFa4R1oQZ/xxz
+Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iEYEARECAAYFAli0xkEACgkQAvw66wEB28IMOQCgl3/XeX16h9KuYcGj0bIRRBcb
-N7MAnRfMYKx1xABLXf04fZccoVFaTRO9
-=yi2e
+iQIcBAEBCAAGBQJYtMcdAAoJEGw4ysog2bOSCQsP/3UX1GVZUxARAmL9d6fZ0xnp
+Xa2yGxw8r5irHK9gtOAtXaUV644Tg5gLx2GYzErP3QYiSC53LAmhg/Ns+LNfqcEC
+mAsatihUiAbCoTGOeFSiVJ9Ql/s+DGLr90SObTXvl0u1PcI52MIY3T45DgZjjQ+9
+Bf28wGcj/02xELWWyrEI6AxuaYVH4IUsOrm2oNmOp7qcrrpVM0KlLlz1x/mj0ibr
+aVz21TniQIh0ji4sY+Nzxbqvc6FvjyfgeCCDSP6DX6T72EvDFpmCSF5qMZkIRyHB
+bBVi2iNAIYq+mb3JWk8fF6x89wYkP7kLk0ZJfXCSVzmO+kvjh1WzOVQLAEtUKHqb
+yYItD1svosgMLIjAjA4Dgil21PUPed1FAksVzgyZptG5MPC/sUNJnp7phq2E7F3f
+9jCJZTevBu8klGkv2txE7I62svItqZu8k/3ocGvGtznDhBrZt2aDyeujSBprFVI1
+jvWGUfix3WS7pR9faJLxSTpGyzH1y6+sM7xATn+lpgVdnI23SQpmJ9AKD6TO64SD
+zMoy3Pp/DayQpws6zDQICRweixsLWtKCzYZhV/hCYfsm8E7eHns7lVyDJdkDlNKE
+vEYEvNpmICi+x5ahvKoNoMVFuIYA2bDyGBghHP56y3Z8ZkGiHkkVElz/sSmtelF4
+LrYJaRxuUKwKga2QyGr+
+=7anB
 -----END PGP SIGNATURE-----
 
---Sig_/QuwUzRJF/DkHgMbWZ0yA36=--
+--3LkAFa4R1oQZ/xxz--
