@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cihK1-0005GG-JK
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:56:07 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cihPc-0001kM-P9
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 08:01:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cihK0-0004eO-Dm
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:56:05 -0500
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 28 Feb 2017 13:54:29 +0100
-Message-Id: <1488286469-9381-45-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
-References: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 44/44] block: Add Error parameter to
- bdrv_append()
+	(envelope-from <peter.maydell@linaro.org>) id 1cihPb-0006FU-OE
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 08:01:52 -0500
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:35833)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cihPb-0006FO-Ix
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 08:01:51 -0500
+Received: by mail-wm0-x22f.google.com with SMTP id v186so84879118wmd.0
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 05:01:51 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20170227223337.17434-1-laurent@vivier.eu>
+References: <20170227223337.17434-1-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 28 Feb 2017 13:01:29 +0000
+Message-ID: <CAFEAcA_Dje0ibNsqQFp+OC=UT6+WkY-K-_f_yb=w+vER3P2gFQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 0/6] Linux user for upstream patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,189 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
 
-Aborting on error in bdrv_append() isn't correct. This patch fixes it
-and lets the callers handle failures.
+On 27 February 2017 at 22:33, Laurent Vivier <laurent@vivier.eu> wrote:
+> The following changes since commit 8f2d7c341184a95d05476ea3c45dbae2b9ddbe51:
+>
+>   Merge remote-tracking branch 'remotes/berrange/tags/pull-qcrypto-2017-02-27-1' into staging (2017-02-27 15:33:21 +0000)
+>
+> are available in the git repository at:
+>
+>   git://github.com/vivier/qemu.git tags/linux-user-for-upstream-pull-request
+>
+> for you to fetch changes up to 98a3331a552f6e033da10bd07b14ccdd81d05e61:
+>
+>   syscall: fixed mincore(2) not failing with ENOMEM (2017-02-27 23:10:02 +0100)
+>
+> ----------------------------------------------------------------
+> Tested with ltp-full-20170116, target ppc, host x86_64,
+> debian version 8.7
+>
+> Total Tests: 1111
+> Total Skipped Tests: 174
+> Total Failures: 67
+> Kernel Version: 4.9.10-200.fc25.x86_64
+> Machine Architecture: ppc
+>
+> Changes since last pull request:
+> -mincore01                      FAIL       1
+> +mincore01                      PASS       0
+>
+> [tested on top of 2f16960, as 3725794 is broken]
+> ----------------------------------------------------------------
+>
 
-Test case 085 needs a reference output update. This is caused by the
-reversed order of bdrv_set_backing_hd() and change_parent_backing_link()
-in bdrv_append(): When the backing file of the new node is set, the
-parent nodes are still pointing to the old top, so the backing blocker
-is now initialised with the node name rather than the BlockBackend name.
+Applied, thanks.
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block.c                    | 23 +++++++++++++++++------
- block/mirror.c             |  9 ++++++++-
- blockdev.c                 | 18 +++++++++++++++---
- include/block/block.h      |  3 ++-
- tests/qemu-iotests/085.out |  2 +-
- 5 files changed, 43 insertions(+), 12 deletions(-)
-
-diff --git a/block.c b/block.c
-index 6440b61..f293ccb 100644
---- a/block.c
-+++ b/block.c
-@@ -2087,6 +2087,7 @@ static BlockDriverState *bdrv_append_temp_snapshot(BlockDriverState *bs,
-     int64_t total_size;
-     QemuOpts *opts = NULL;
-     BlockDriverState *bs_snapshot;
-+    Error *local_err = NULL;
-     int ret;
- 
-     /* if snapshot, we create a temporary backing file and open it
-@@ -2136,7 +2137,12 @@ static BlockDriverState *bdrv_append_temp_snapshot(BlockDriverState *bs,
-      * call bdrv_unref() on it), so in order to be able to return one, we have
-      * to increase bs_snapshot's refcount here */
-     bdrv_ref(bs_snapshot);
--    bdrv_append(bs_snapshot, bs);
-+    bdrv_append(bs_snapshot, bs, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        ret = -EINVAL;
-+        goto out;
-+    }
- 
-     g_free(tmp_filename);
-     return bs_snapshot;
-@@ -2927,20 +2933,25 @@ static void change_parent_backing_link(BlockDriverState *from,
-  * parents of bs_top after bdrv_append() returns. If the caller needs to keep a
-  * reference of its own, it must call bdrv_ref().
-  */
--void bdrv_append(BlockDriverState *bs_new, BlockDriverState *bs_top)
-+void bdrv_append(BlockDriverState *bs_new, BlockDriverState *bs_top,
-+                 Error **errp)
- {
-+    Error *local_err = NULL;
-+
-     assert(!atomic_read(&bs_top->in_flight));
-     assert(!atomic_read(&bs_new->in_flight));
- 
--    bdrv_ref(bs_top);
-+    bdrv_set_backing_hd(bs_new, bs_top, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        goto out;
-+    }
- 
-     change_parent_backing_link(bs_top, bs_new);
--    /* FIXME Error handling */
--    bdrv_set_backing_hd(bs_new, bs_top, &error_abort);
--    bdrv_unref(bs_top);
- 
-     /* bs_new is now referenced by its new parents, we don't need the
-      * additional reference any more. */
-+out:
-     bdrv_unref(bs_new);
- }
- 
-diff --git a/block/mirror.c b/block/mirror.c
-index e0475b4..41a64ac 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1099,6 +1099,7 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
-     BlockDriverState *mirror_top_bs;
-     bool target_graph_mod;
-     bool target_is_backing;
-+    Error *local_err = NULL;
-     int ret;
- 
-     if (granularity == 0) {
-@@ -1130,9 +1131,15 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
-      * it alive until block_job_create() even if bs has no parent. */
-     bdrv_ref(mirror_top_bs);
-     bdrv_drained_begin(bs);
--    bdrv_append(mirror_top_bs, bs);
-+    bdrv_append(mirror_top_bs, bs, &local_err);
-     bdrv_drained_end(bs);
- 
-+    if (local_err) {
-+        bdrv_unref(mirror_top_bs);
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-     /* Make sure that the source is not resized while the job is running */
-     s = block_job_create(job_id, driver, mirror_top_bs,
-                          BLK_PERM_CONSISTENT_READ,
-diff --git a/blockdev.c b/blockdev.c
-index 34b522b..97fbc7e 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -1767,6 +1767,17 @@ static void external_snapshot_prepare(BlkActionState *common,
- 
-     if (!state->new_bs->drv->supports_backing) {
-         error_setg(errp, "The snapshot does not support backing images");
-+        return;
-+    }
-+
-+    /* This removes our old bs and adds the new bs. This is an operation that
-+     * can fail, so we need to do it in .prepare; undoing it for abort is
-+     * always possible. */
-+    bdrv_ref(state->new_bs);
-+    bdrv_append(state->new_bs, state->old_bs, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-     }
- }
- 
-@@ -1777,8 +1788,6 @@ static void external_snapshot_commit(BlkActionState *common)
- 
-     bdrv_set_aio_context(state->new_bs, state->aio_context);
- 
--    /* This removes our old bs and adds the new bs */
--    bdrv_append(state->new_bs, state->old_bs);
-     /* We don't need (or want) to use the transactional
-      * bdrv_reopen_multiple() across all the entries at once, because we
-      * don't want to abort all of them if one of them fails the reopen */
-@@ -1793,7 +1802,9 @@ static void external_snapshot_abort(BlkActionState *common)
-     ExternalSnapshotState *state =
-                              DO_UPCAST(ExternalSnapshotState, common, common);
-     if (state->new_bs) {
--        bdrv_unref(state->new_bs);
-+        if (state->new_bs->backing) {
-+            bdrv_replace_in_backing_chain(state->new_bs, state->old_bs);
-+        }
-     }
- }
- 
-@@ -1804,6 +1815,7 @@ static void external_snapshot_clean(BlkActionState *common)
-     if (state->aio_context) {
-         bdrv_drained_end(state->old_bs);
-         aio_context_release(state->aio_context);
-+        bdrv_unref(state->new_bs);
-     }
- }
- 
-diff --git a/include/block/block.h b/include/block/block.h
-index eac2861..c7c4a3a 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -236,7 +236,8 @@ int bdrv_create(BlockDriver *drv, const char* filename,
-                 QemuOpts *opts, Error **errp);
- int bdrv_create_file(const char *filename, QemuOpts *opts, Error **errp);
- BlockDriverState *bdrv_new(void);
--void bdrv_append(BlockDriverState *bs_new, BlockDriverState *bs_top);
-+void bdrv_append(BlockDriverState *bs_new, BlockDriverState *bs_top,
-+                 Error **errp);
- void bdrv_replace_in_backing_chain(BlockDriverState *old,
-                                    BlockDriverState *new);
- 
-diff --git a/tests/qemu-iotests/085.out b/tests/qemu-iotests/085.out
-index 08e4bb7..182acb4 100644
---- a/tests/qemu-iotests/085.out
-+++ b/tests/qemu-iotests/085.out
-@@ -74,7 +74,7 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/
- 
- === Invalid command - snapshot node used as backing hd ===
- 
--{"error": {"class": "GenericError", "desc": "Node 'snap_11' is busy: node is used as backing hd of 'virtio0'"}}
-+{"error": {"class": "GenericError", "desc": "Node 'snap_11' is busy: node is used as backing hd of 'snap_12'"}}
- 
- === Invalid command - snapshot node has a backing image ===
- 
--- 
-1.8.3.1
+-- PMM
