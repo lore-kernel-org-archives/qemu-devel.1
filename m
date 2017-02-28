@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aarcange@redhat.com>) id 1cikPh-00037m-0x
+	(envelope-from <pbonzini@redhat.com>) id 1cikPg-00037M-I9
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:14:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aarcange@redhat.com>) id 1cikPg-0000tc-5y
+	(envelope-from <pbonzini@redhat.com>) id 1cikPe-0000sr-HV
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:14:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49550)
+Received: from mx1.redhat.com ([209.132.183.28]:55124)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aarcange@redhat.com>) id 1cikPg-0000sz-0d
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:14:08 -0500
-Date: Tue, 28 Feb 2017 17:14:04 +0100
-From: Andrea Arcangeli <aarcange@redhat.com>
-Message-ID: <20170228161404.GL5816@redhat.com>
-References: <1452169208-840-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<CAN9JPjHxb1RgtG=3f9+HWz80gwARymEKgX0N+OLGTi5Svgy6qw@mail.gmail.com>
-	<577B1238.7040605@huawei.com>
-	<CAN9JPjH_AQjHGbMMdSZofRp8nxcfgtkzpK6LZsd7bWyfGhJkCQ@mail.gmail.com>
-	<577B8BA7.6010001@huawei.com>
-	<20160818155636.l46t4ha65eybnnhe@redhat.com>
-	<57B7F948.9040701@huawei.com>
-	<cc27b58b-8751-f720-1370-d30c20c8d76a@virtualopensystems.com>
-	<58B4D6EA.5050804@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <58B4D6EA.5050804@huawei.com>
-Subject: Re: [Qemu-devel] [RFC 00/13] Live memory snapshot based on
- userfaultfd
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cikPe-0000sT-B5
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:14:06 -0500
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 28 Feb 2017 17:14:01 +0100
+Message-Id: <20170228161402.25122-3-pbonzini@redhat.com>
+In-Reply-To: <20170228161402.25122-1-pbonzini@redhat.com>
+References: <20170228161402.25122-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 18/19] memory: Introduce DEVICE_HOST_ENDIAN for
+ ram device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,23 +24,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Cc: Christian Pinto <c.pinto@virtualopensystems.com>, Juan Quintela <quintela@redhat.com>, dgilbert@redhat.com, xuquan8@huawei.com, peter.huangpeng@huawei.com, Baptiste Reynal <b.reynal@virtualopensystems.com>, qemu list <qemu-devel@nongnu.org>, "Huangweidong (C)" <weidong.huang@huawei.com>, colo-ft@hotmail.com
+To: qemu-devel@nongnu.org
+Cc: Yongji Xie <xyjxie@linux.vnet.ibm.com>
 
-Hello,
+From: Yongji Xie <xyjxie@linux.vnet.ibm.com>
 
-On Tue, Feb 28, 2017 at 09:48:26AM +0800, Hailiang Zhang wrote:
-> Yes, for current implementing of live snapshot, it supports tcg,
-> but does not support kvm mode, the reason i have mentioned above,
-> if you try to implement it, i think you need to start from userfaultfd
-> supporting KVM. There is scenario for it, But I'm blocked by other things
-> these days. I'm glad to discuss with you if you planed to do it.
+At the moment ram device's memory regions are DEVICE_NATIVE_ENDIAN. It's
+incorrect. This memory region is backed by a MMIO area in host, so the
+uint64_t data that MemoryRegionOps read from/write to this area should be
+host-endian rather than target-endian. Hence, current code does not work
+when target and host endianness are different which is the most common case
+on PPC64. To fix it, this introduces DEVICE_HOST_ENDIAN for the ram device.
 
-Yes, there were other urgent userfaultfd features needed by QEMU and
-CRIU queued for merging (hugetlbfs/shmem/non-cooperative support) and
-they're all included upstream now. Now that such work is finished,
-fixing the WP support to work with KVM and to provide full accuracy
-will be the next thing to do.
+This has been tested on PPC64 BE/LE host/guest in all possible combinations
+including TCG.
 
-Thanks,
-Andrea
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Yongji Xie <xyjxie@linux.vnet.ibm.com>
+Message-Id: <1488171164-28319-1-git-send-email-xyjxie@linux.vnet.ibm.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ include/exec/cpu-common.h | 6 ++++++
+ memory.c                  | 2 +-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+index bd15853..eef74df 100644
+--- a/include/exec/cpu-common.h
++++ b/include/exec/cpu-common.h
+@@ -36,6 +36,12 @@ enum device_endian {
+     DEVICE_LITTLE_ENDIAN,
+ };
+ 
++#if defined(HOST_WORDS_BIGENDIAN)
++#define DEVICE_HOST_ENDIAN DEVICE_BIG_ENDIAN
++#else
++#define DEVICE_HOST_ENDIAN DEVICE_LITTLE_ENDIAN
++#endif
++
+ /* address in the RAM (different from a physical address) */
+ #if defined(CONFIG_XEN_BACKEND)
+ typedef uint64_t ram_addr_t;
+diff --git a/memory.c b/memory.c
+index d61caee..573fa6e 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1182,7 +1182,7 @@ static void memory_region_ram_device_write(void *opaque, hwaddr addr,
+ static const MemoryRegionOps ram_device_mem_ops = {
+     .read = memory_region_ram_device_read,
+     .write = memory_region_ram_device_write,
+-    .endianness = DEVICE_NATIVE_ENDIAN,
++    .endianness = DEVICE_HOST_ENDIAN,
+     .valid = {
+         .min_access_size = 1,
+         .max_access_size = 8,
+-- 
+2.9.3
