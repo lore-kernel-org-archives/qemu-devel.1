@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47525)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cibpX-0006ES-Pf
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 02:04:16 -0500
+	(envelope-from <mjt@tls.msk.ru>) id 1cic8w-0003tR-LV
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 02:24:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cibpU-0000Ow-Nw
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 02:04:15 -0500
+	(envelope-from <mjt@tls.msk.ru>) id 1cic8s-0005ID-7u
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 02:24:18 -0500
 From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Tue, 28 Feb 2017 09:44:55 +0300
-Message-Id: <3d74ee7dcae57b93a64737b954d76cf96236a367.1488264243.git.mjt@msgid.tls.msk.ru>
+Date: Tue, 28 Feb 2017 09:44:46 +0300
+Message-Id: <a70716eb2c766d80f605abd42115b923fedaa1f7.1488264243.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1488264243.git.mjt@msgid.tls.msk.ru>
 References: <cover.1488264243.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1488264243.git.mjt@msgid.tls.msk.ru>
 References: <cover.1488264243.git.mjt@msgid.tls.msk.ru>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 12/14] lm32: milkymist-tmu2: fix a third integer
- overflow
+Subject: [Qemu-devel] [PULL 03/14] hw/core/or-irq: Mark the device with
+ cannot_instantiate_with_device_add_yet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,37 +23,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
 
-Don't truncate the multiplication and do a 64 bit one instead
-because the result is stored in a 64 bit variable.
+The "or-irq" device needs to be wired up in source code, there is no
+way the user can make any real use of this device with the "-device"
+parameter or the "device_add" monitor command yet.
 
-This fixes a similar coverity warning to commits 237a8650d640 and
-4382fa655498, in a similar way, and is the final third of the fix for
-coverity CID 1167561 (hopefully!).
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Acked-by: Michael Walle <michael@walle.cc>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
 ---
- hw/display/milkymist-tmu2.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/core/or-irq.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/hw/display/milkymist-tmu2.c b/hw/display/milkymist-tmu2.c
-index 7528665..59120dd 100644
---- a/hw/display/milkymist-tmu2.c
-+++ b/hw/display/milkymist-tmu2.c
-@@ -293,7 +293,7 @@ static void tmu2_start(MilkymistTMU2State *s)
-     cpu_physical_memory_unmap(mesh, mesh_len, 0, mesh_len);
-=20
-     /* Write back the OpenGL framebuffer to the QEMU framebuffer */
--    fb_len =3D 2 * s->regs[R_DSTHRES] * s->regs[R_DSTVRES];
-+    fb_len =3D 2ULL * s->regs[R_DSTHRES] * s->regs[R_DSTVRES];
-     fb =3D cpu_physical_memory_map(s->regs[R_DSTFBUF], &fb_len, 1);
-     if (fb =3D=3D NULL) {
-         glDeleteTextures(1, &texture);
---=20
+diff --git a/hw/core/or-irq.c b/hw/core/or-irq.c
+index 1ac090d..1485d5b 100644
+--- a/hw/core/or-irq.c
++++ b/hw/core/or-irq.c
+@@ -89,6 +89,9 @@ static void or_irq_class_init(ObjectClass *klass, void *data)
+     dc->props = or_irq_properties;
+     dc->realize = or_irq_realize;
+     dc->vmsd = &vmstate_or_irq;
++
++    /* Reason: Needs to be wired up to work, e.g. see stm32f205_soc.c */
++    dc->cannot_instantiate_with_device_add_yet = true;
+ }
+ 
+ static const TypeInfo or_irq_type_info = {
+-- 
 2.1.4
