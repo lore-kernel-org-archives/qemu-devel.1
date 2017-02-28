@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cilNu-0001fM-Uz
+	(envelope-from <pm215@archaic.org.uk>) id 1cilNw-0001fw-3y
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cilNt-00030B-9o
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:22 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48710)
+	(envelope-from <pm215@archaic.org.uk>) id 1cilNv-00032q-0g
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:24 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48713)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cilNt-0002wj-2O
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:21 -0500
+	id 1cilNu-00031p-R9
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:22 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1cilNq-0003PL-NG
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:16:18 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1cilNt-0003RY-UV
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:16:21 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Feb 2017 17:15:57 +0000
-Message-Id: <1488302176-19463-3-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 28 Feb 2017 17:16:03 +0000
+Message-Id: <1488302176-19463-9-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1488302176-19463-1-git-send-email-peter.maydell@linaro.org>
 References: <1488302176-19463-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 02/21] armv7m: Move NVICState struct definition
- into header
+Subject: [Qemu-devel] [PULL 08/21] armv7m: Don't put core v7M devices under
+ CONFIG_STELLARIS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,164 +33,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Move the NVICState struct definition into a header, so we can
-embed it into other QOM objects like SoCs.
+The NVIC is a core v7M device that exists for all v7M CPUs;
+put it under a CONFIG_ARM_V7M rather than hiding it under
+CONFIG_STELLARIS.
+
+(We'll use CONFIG_ARM_V7M for the SysTick device too
+when we split it out of the NVIC.)
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Message-id: 1487604965-23220-3-git-send-email-peter.maydell@linaro.org
+Message-id: 1487604965-23220-9-git-send-email-peter.maydell@linaro.org
 ---
- include/hw/arm/armv7m_nvic.h | 66 ++++++++++++++++++++++++++++++++++++++++++++
- hw/intc/armv7m_nvic.c        | 49 +-------------------------------
- 2 files changed, 67 insertions(+), 48 deletions(-)
- create mode 100644 include/hw/arm/armv7m_nvic.h
+ hw/intc/Makefile.objs           | 2 +-
+ default-configs/arm-softmmu.mak | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/arm/armv7m_nvic.h b/include/hw/arm/armv7m_nvic.h
-new file mode 100644
-index 0000000..39b94ee
---- /dev/null
-+++ b/include/hw/arm/armv7m_nvic.h
-@@ -0,0 +1,66 @@
-+/*
-+ * ARMv7M NVIC object
-+ *
-+ * Copyright (c) 2017 Linaro Ltd
-+ * Written by Peter Maydell <peter.maydell@linaro.org>
-+ *
-+ * This code is licensed under the GPL version 2 or later.
-+ */
-+
-+#ifndef HW_ARM_ARMV7M_NVIC_H
-+#define HW_ARM_ARMV7M_NVIC_H
-+
-+#include "target/arm/cpu.h"
-+#include "hw/sysbus.h"
-+
-+#define TYPE_NVIC "armv7m_nvic"
-+
-+#define NVIC(obj) \
-+    OBJECT_CHECK(NVICState, (obj), TYPE_NVIC)
-+
-+/* Highest permitted number of exceptions (architectural limit) */
-+#define NVIC_MAX_VECTORS 512
-+
-+typedef struct VecInfo {
-+    /* Exception priorities can range from -3 to 255; only the unmodifiable
-+     * priority values for RESET, NMI and HardFault can be negative.
-+     */
-+    int16_t prio;
-+    uint8_t enabled;
-+    uint8_t pending;
-+    uint8_t active;
-+    uint8_t level; /* exceptions <=15 never set level */
-+} VecInfo;
-+
-+typedef struct NVICState {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+    /*< public >*/
-+
-+    ARMCPU *cpu;
-+
-+    VecInfo vectors[NVIC_MAX_VECTORS];
-+    uint32_t prigroup;
-+
-+    /* vectpending and exception_prio are both cached state that can
-+     * be recalculated from the vectors[] array and the prigroup field.
-+     */
-+    unsigned int vectpending; /* highest prio pending enabled exception */
-+    int exception_prio; /* group prio of the highest prio active exception */
-+
-+    struct {
-+        uint32_t control;
-+        uint32_t reload;
-+        int64_t tick;
-+        QEMUTimer *timer;
-+    } systick;
-+
-+    MemoryRegion sysregmem;
-+    MemoryRegion container;
-+
-+    uint32_t num_irq;
-+    qemu_irq excpout;
-+    qemu_irq sysresetreq;
-+} NVICState;
-+
-+#endif
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index 76097b4..f2ada39 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -17,6 +17,7 @@
- #include "hw/sysbus.h"
- #include "qemu/timer.h"
- #include "hw/arm/arm.h"
-+#include "hw/arm/armv7m_nvic.h"
- #include "target/arm/cpu.h"
- #include "exec/address-spaces.h"
- #include "qemu/log.h"
-@@ -47,7 +48,6 @@
-  * "exception" more or less interchangeably.
-  */
- #define NVIC_FIRST_IRQ 16
--#define NVIC_MAX_VECTORS 512
- #define NVIC_MAX_IRQ (NVIC_MAX_VECTORS - NVIC_FIRST_IRQ)
+diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
+index 8948106..adedd0d 100644
+--- a/hw/intc/Makefile.objs
++++ b/hw/intc/Makefile.objs
+@@ -24,7 +24,7 @@ obj-$(CONFIG_APIC) += apic.o apic_common.o
+ obj-$(CONFIG_ARM_GIC_KVM) += arm_gic_kvm.o
+ obj-$(call land,$(CONFIG_ARM_GIC_KVM),$(TARGET_AARCH64)) += arm_gicv3_kvm.o
+ obj-$(call land,$(CONFIG_ARM_GIC_KVM),$(TARGET_AARCH64)) += arm_gicv3_its_kvm.o
+-obj-$(CONFIG_STELLARIS) += armv7m_nvic.o
++obj-$(CONFIG_ARM_V7M) += armv7m_nvic.o
+ obj-$(CONFIG_EXYNOS4) += exynos4210_gic.o exynos4210_combiner.o
+ obj-$(CONFIG_GRLIB) += grlib_irqmp.o
+ obj-$(CONFIG_IOAPIC) += ioapic.o
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index fdf4089..1e3bd2b 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -42,6 +42,8 @@ CONFIG_ARM11MPCORE=y
+ CONFIG_A9MPCORE=y
+ CONFIG_A15MPCORE=y
  
- /* Effective running priority of the CPU when no exception is active
-@@ -55,53 +55,6 @@
-  */
- #define NVIC_NOEXC_PRIO 0x100
- 
--typedef struct VecInfo {
--    /* Exception priorities can range from -3 to 255; only the unmodifiable
--     * priority values for RESET, NMI and HardFault can be negative.
--     */
--    int16_t prio;
--    uint8_t enabled;
--    uint8_t pending;
--    uint8_t active;
--    uint8_t level; /* exceptions <=15 never set level */
--} VecInfo;
--
--typedef struct NVICState {
--    /*< private >*/
--    SysBusDevice parent_obj;
--    /*< public >*/
--
--    ARMCPU *cpu;
--
--    VecInfo vectors[NVIC_MAX_VECTORS];
--    uint32_t prigroup;
--
--    /* vectpending and exception_prio are both cached state that can
--     * be recalculated from the vectors[] array and the prigroup field.
--     */
--    unsigned int vectpending; /* highest prio pending enabled exception */
--    int exception_prio; /* group prio of the highest prio active exception */
--
--    struct {
--        uint32_t control;
--        uint32_t reload;
--        int64_t tick;
--        QEMUTimer *timer;
--    } systick;
--
--    MemoryRegion sysregmem;
--    MemoryRegion container;
--
--    uint32_t num_irq;
--    qemu_irq excpout;
--    qemu_irq sysresetreq;
--} NVICState;
--
--#define TYPE_NVIC "armv7m_nvic"
--
--#define NVIC(obj) \
--    OBJECT_CHECK(NVICState, (obj), TYPE_NVIC)
--
- static const uint8_t nvic_id[] = {
-     0x00, 0xb0, 0x1b, 0x00, 0x0d, 0xe0, 0x05, 0xb1
- };
++CONFIG_ARM_V7M=y
++
+ CONFIG_ARM_GIC=y
+ CONFIG_ARM_GIC_KVM=$(CONFIG_KVM)
+ CONFIG_ARM_TIMER=y
 -- 
 2.7.4
