@@ -1,18 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cibX1-0001o9-Lc
+	(envelope-from <mjt@tls.msk.ru>) id 1cibX1-0001oC-Lc
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 01:45:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cibWy-0003EA-Ka
+	(envelope-from <mjt@tls.msk.ru>) id 1cibWy-0003Dy-Ke
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 01:45:07 -0500
 From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Tue, 28 Feb 2017 09:44:44 +0300
-Message-Id: <8dc52350f97ec7e2ce5d16c65021b5283f71b184.1488264243.git.mjt@msgid.tls.msk.ru>
-In-Reply-To: <cover.1488264243.git.mjt@msgid.tls.msk.ru>
-References: <cover.1488264243.git.mjt@msgid.tls.msk.ru>
-In-Reply-To: <cover.1488264243.git.mjt@msgid.tls.msk.ru>
-References: <cover.1488264243.git.mjt@msgid.tls.msk.ru>
-Subject: [Qemu-devel] [PULL 01/14] target/s390x: Fix typo
+Date: Tue, 28 Feb 2017 09:44:43 +0300
+Message-Id: <cover.1488264243.git.mjt@msgid.tls.msk.ru>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/14] Trivial patches for 2017-02-28
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,28 +21,79 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefan Weil <sw@weilnetz.de>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
+Cc: Michael Tokarev <mjt@tls.msk.ru>, qemu-trivial@nongnu.org
 
-From: Stefan Weil <sw@weilnetz.de>
+This is yet another trivial patches pull request.
+Please consider applying/pulling.
 
-Signed-off-by: Stefan Weil <sw@weilnetz.de>
-Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
----
- target/s390x/cpu_models.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The following changes since commit 8f2d7c341184a95d05476ea3c45dbae2b9ddbe=
+51:
 
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 5b66d33..2a894ee 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -671,7 +671,7 @@ static S390CPUModel *get_max_cpu_model(Error **errp)
-     if (kvm_enabled()) {
-         kvm_s390_get_host_cpu_model(&max_model, errp);
-     } else {
--        /* TCG enulates a z900 */
-+        /* TCG emulates a z900 */
-         max_model.def = &s390_cpu_defs[0];
-         bitmap_copy(max_model.features, max_model.def->default_feat,
-                     S390_FEAT_MAX);
--- 
-2.1.4
+  Merge remote-tracking branch 'remotes/berrange/tags/pull-qcrypto-2017-0=
+2-27-1' into staging (2017-02-27 15:33:21 +0000)
+
+are available in the git repository at:
+
+  git://git.corpit.ru/qemu.git tags/trivial-patches-fetch
+
+for you to fetch changes up to f5507e0448bd34473af72509297617a783049024:
+
+  syscall: fixed mincore(2) not failing with ENOMEM (2017-02-28 09:03:39 =
++0300)
+
+----------------------------------------------------------------
+trivial patches for 2017-02-28
+
+----------------------------------------------------------------
+Fam Zheng (1):
+      cadence_gem: Remove unused parameter debug message
+
+Franklin \"Snaipe\" Mathieu (1):
+      syscall: fixed mincore(2) not failing with ENOMEM
+
+Igor Pavlikevich (1):
+      hw/acpi/tco.c: fix tco timer stop
+
+John Snow (1):
+      ide: remove undefined behavior in ide-test
+
+Marc-Andr=C3=A9 Lureau (1):
+      Update copyright year
+
+Peter Maydell (3):
+      softfloat: Use correct type in float64_to_uint64_round_to_zero()
+      CODING_STYLE: Mention preferred comment form
+      lm32: milkymist-tmu2: fix a third integer overflow
+
+Philippe Mathieu-Daud=C3=A9 (1):
+      register: fix incorrect read mask
+
+Stefan Weil (1):
+      target/s390x: Fix typo
+
+Thomas Huth (3):
+      hw/core/or-irq: Mark the device with cannot_instantiate_with_device=
+_add_yet
+      hw/core/register: Mark the device with cannot_instantiate_with_devi=
+ce_add_yet
+      tests/prom-env: Enable the test for the sun4u machine, too
+
+Vincenzo Maffione (1):
+      qemu-options.hx: add missing id=3Dchr0 chardev argument in vhost-us=
+er example
+
+ CODING_STYLE                |  7 +++++++
+ fpu/softfloat.c             |  2 +-
+ hw/acpi/tco.c               |  1 +
+ hw/core/or-irq.c            |  3 +++
+ hw/core/register.c          | 30 ++++++++++++++++++++++++------
+ hw/display/milkymist-tmu2.c |  2 +-
+ hw/net/cadence_gem.c        |  2 +-
+ include/qemu-common.h       |  2 +-
+ linux-user/syscall.c        | 11 ++++++++---
+ qemu-options.hx             |  2 +-
+ target/s390x/cpu_models.c   |  2 +-
+ tests/Makefile.include      |  3 +--
+ tests/ide-test.c            |  1 +
+ tests/prom-env-test.c       |  2 +-
+ 14 files changed, 52 insertions(+), 18 deletions(-)
