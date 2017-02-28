@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45427)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cin6j-0001Yx-3s
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:06:48 -0500
+	(envelope-from <armbru@redhat.com>) id 1cin6l-0001Zn-Si
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:06:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cin6f-0006ta-A2
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:06:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41894)
+	(envelope-from <armbru@redhat.com>) id 1cin6g-0006v9-OK
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:06:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42230)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cin6f-0006sV-2d
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:06:41 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cin6g-0006uB-F2
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:06:42 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4C5653D944
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 19:06:41 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A985361BBC
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 19:06:42 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
 	[10.36.116.55])
-	by int-mx10.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v1SJ6djf031363
+	by int-mx11.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v1SJ6fee028188
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
 	verify=NO)
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 14:06:40 -0500
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 14:06:42 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 28 Feb 2017 20:06:24 +0100
-Message-Id: <1488308796-28832-15-git-send-email-armbru@redhat.com>
+Date: Tue, 28 Feb 2017 20:06:27 +0100
+Message-Id: <1488308796-28832-18-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488308796-28832-1-git-send-email-armbru@redhat.com>
 References: <1488308796-28832-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 14/26] qapi: Make string input and opts visitor
- require non-null input
+Subject: [Qemu-devel] [PULL 17/26] qapi: Drop unused non-strict qobject
+ input visitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,139 +39,302 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The string input visitor tries to cope with null input.  Null input
-isn't used anywhere, and isn't covered by tests.  Unsurprisingly, it
-doesn't fully work: start_list() crashes because it passes the input
-via parse_str() to strtoll() unchecked.
-
-Make string_input_visitor_new() assert its argument isn't null, and
-drop the code trying to deal with null input.
-
-The opts visitor crashes when you try to actually visit something with
-null input.  Make opts_visitor_new() assert its argument isn't null,
-mostly for clarity.
-
-qobject_input_visitor_new() already asserts its argument isn't null.
+The split between tests/test-qobject-input-visitor.c and
+tests/test-qobject-input-strict.c now makes less sense than ever.  The
+next commit will take care of that.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <1488303560-18803-15-git-send-email-armbru@redhat.com>
+Message-Id: <1488303560-18803-18-git-send-email-armbru@redhat.com>
 ---
- qapi/opts-visitor.c         |  1 +
- qapi/string-input-visitor.c | 54 ++++++++++++++-------------------------------
- 2 files changed, 18 insertions(+), 37 deletions(-)
+ block/nbd.c                          |  2 +-
+ block/nfs.c                          |  2 +-
+ block/ssh.c                          |  2 +-
+ docs/qapi-code-gen.txt               |  2 +-
+ include/qapi/qobject-input-visitor.h |  5 +----
+ qapi/qobject-input-visitor.c         | 28 ++++++++++------------------
+ qmp.c                                |  2 +-
+ qom/qom-qobject.c                    |  2 +-
+ scripts/qapi-commands.py             |  2 +-
+ target/s390x/cpu_models.c            |  2 +-
+ tests/check-qnull.c                  |  2 +-
+ tests/qmp-test.c                     |  2 +-
+ tests/test-qmp-commands.c            |  2 +-
+ tests/test-qobject-input-strict.c    |  2 +-
+ tests/test-qobject-input-visitor.c   |  2 +-
+ tests/test-visitor-serialization.c   |  2 +-
+ 16 files changed, 25 insertions(+), 36 deletions(-)
 
-diff --git a/qapi/opts-visitor.c b/qapi/opts-visitor.c
-index a0a7c0e..c50dc4b 100644
---- a/qapi/opts-visitor.c
-+++ b/qapi/opts-visitor.c
-@@ -528,6 +528,7 @@ opts_visitor_new(const QemuOpts *opts)
- {
-     OptsVisitor *ov;
+diff --git a/block/nbd.c b/block/nbd.c
+index a7f9108..f478f80 100644
+--- a/block/nbd.c
++++ b/block/nbd.c
+@@ -278,7 +278,7 @@ static SocketAddress *nbd_config(BDRVNBDState *s, QDict *options, Error **errp)
+         goto done;
+     }
  
-+    assert(opts);
-     ov = g_malloc0(sizeof *ov);
+-    iv = qobject_input_visitor_new(crumpled_addr, true);
++    iv = qobject_input_visitor_new(crumpled_addr);
+     visit_type_SocketAddress(iv, NULL, &saddr, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+diff --git a/block/nfs.c b/block/nfs.c
+index 890d5d4..3f43f6e 100644
+--- a/block/nfs.c
++++ b/block/nfs.c
+@@ -474,7 +474,7 @@ static NFSServer *nfs_config(QDict *options, Error **errp)
+         goto out;
+     }
  
-     ov->visitor.type = VISITOR_INPUT;
-diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.c
-index 1a855c5..f126cd9 100644
---- a/qapi/string-input-visitor.c
-+++ b/qapi/string-input-visitor.c
-@@ -182,12 +182,6 @@ static void parse_type_int64(Visitor *v, const char *name, int64_t *obj,
- {
-     StringInputVisitor *siv = to_siv(v);
+-    iv = qobject_input_visitor_new(crumpled_addr, true);
++    iv = qobject_input_visitor_new(crumpled_addr);
+     visit_type_NFSServer(iv, NULL, &server, &local_error);
+     if (local_error) {
+         error_propagate(errp, local_error);
+diff --git a/block/ssh.c b/block/ssh.c
+index 835932e..278e66f 100644
+--- a/block/ssh.c
++++ b/block/ssh.c
+@@ -601,7 +601,7 @@ static InetSocketAddress *ssh_config(QDict *options, Error **errp)
+         goto out;
+     }
  
--    if (!siv->string) {
--        error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
--                   "integer");
--        return;
--    }
+-    iv = qobject_input_visitor_new(crumpled_addr, true);
++    iv = qobject_input_visitor_new(crumpled_addr);
+     visit_type_InetSocketAddress(iv, NULL, &inet, &local_error);
+     if (local_error) {
+         error_propagate(errp, local_error);
+diff --git a/docs/qapi-code-gen.txt b/docs/qapi-code-gen.txt
+index 7eb7be1..6746c10 100644
+--- a/docs/qapi-code-gen.txt
++++ b/docs/qapi-code-gen.txt
+@@ -1138,7 +1138,7 @@ Example:
+         Visitor *v;
+         UserDefOneList *arg1 = NULL;
+ 
+-        v = qobject_input_visitor_new(QOBJECT(args), true);
++        v = qobject_input_visitor_new(QOBJECT(args));
+         visit_start_struct(v, NULL, NULL, 0, &err);
+         if (err) {
+             goto out;
+diff --git a/include/qapi/qobject-input-visitor.h b/include/qapi/qobject-input-visitor.h
+index cde328d..21db9c4 100644
+--- a/include/qapi/qobject-input-visitor.h
++++ b/include/qapi/qobject-input-visitor.h
+@@ -21,10 +21,7 @@ typedef struct QObjectInputVisitor QObjectInputVisitor;
+ 
+ /*
+  * Return a new input visitor that converts a QObject to a QAPI object.
+- *
+- * Set @strict to reject a parse that doesn't consume all keys of a
+- * dictionary; otherwise excess input is ignored.
+  */
+-Visitor *qobject_input_visitor_new(QObject *obj, bool strict);
++Visitor *qobject_input_visitor_new(QObject *obj);
+ 
+ #endif
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index 8015a98..eafcdf4 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -43,9 +43,6 @@ struct QObjectInputVisitor {
+      * QDict or QList). */
+     QSLIST_HEAD(, StackObject) stack;
+ 
+-    /* True to reject parse in visit_end_struct() if unvisited keys remain. */
+-    bool strict;
 -
-     if (parse_str(siv, name, errp) < 0) {
-         return;
+     GString *errname;           /* Accumulator for full_name() */
+ };
+ 
+@@ -157,11 +154,12 @@ static const QListEntry *qobject_input_push(QObjectInputVisitor *qiv,
+     tos->obj = obj;
+     tos->qapi = qapi;
+ 
+-    if (qiv->strict && qobject_type(obj) == QTYPE_QDICT) {
++    if (qobject_type(obj) == QTYPE_QDICT) {
+         h = g_hash_table_new(g_str_hash, g_str_equal);
+         qdict_iter(qobject_to_qdict(obj), qdict_add_key, h);
+         tos->h = h;
+-    } else if (qobject_type(obj) == QTYPE_QLIST) {
++    } else {
++        assert(qobject_type(obj) == QTYPE_QLIST);
+         tos->entry = qlist_first(qobject_to_qlist(obj));
+         tos->index = -1;
      }
-@@ -242,13 +236,7 @@ static void parse_type_size(Visitor *v, const char *name, uint64_t *obj,
-     Error *err = NULL;
-     uint64_t val;
- 
--    if (siv->string) {
--        parse_option_size(name, siv->string, &val, &err);
--    } else {
--        error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
--                   "size");
--        return;
--    }
-+    parse_option_size(name, siv->string, &val, &err);
-     if (err) {
-         error_propagate(errp, err);
-         return;
-@@ -262,19 +250,17 @@ static void parse_type_bool(Visitor *v, const char *name, bool *obj,
+@@ -175,20 +173,15 @@ static void qobject_input_check_struct(Visitor *v, Error **errp)
  {
-     StringInputVisitor *siv = to_siv(v);
+     QObjectInputVisitor *qiv = to_qiv(v);
+     StackObject *tos = QSLIST_FIRST(&qiv->stack);
++    GHashTableIter iter;
++    const char *key;
  
--    if (siv->string) {
--        if (!strcasecmp(siv->string, "on") ||
--            !strcasecmp(siv->string, "yes") ||
--            !strcasecmp(siv->string, "true")) {
--            *obj = true;
--            return;
+     assert(tos && !tos->entry);
+-    if (qiv->strict) {
+-        GHashTable *const top_ht = tos->h;
+-        if (top_ht) {
+-            GHashTableIter iter;
+-            const char *key;
+ 
+-            g_hash_table_iter_init(&iter, top_ht);
+-            if (g_hash_table_iter_next(&iter, (void **)&key, NULL)) {
+-                error_setg(errp, "Parameter '%s' is unexpected",
+-                           full_name(qiv, key));
+-            }
 -        }
--        if (!strcasecmp(siv->string, "off") ||
--            !strcasecmp(siv->string, "no") ||
--            !strcasecmp(siv->string, "false")) {
--            *obj = false;
--            return;
--        }
-+    if (!strcasecmp(siv->string, "on") ||
-+        !strcasecmp(siv->string, "yes") ||
-+        !strcasecmp(siv->string, "true")) {
-+        *obj = true;
-+        return;
-+    }
-+    if (!strcasecmp(siv->string, "off") ||
-+        !strcasecmp(siv->string, "no") ||
-+        !strcasecmp(siv->string, "false")) {
-+        *obj = false;
-+        return;
++    g_hash_table_iter_init(&iter, tos->h);
++    if (g_hash_table_iter_next(&iter, (void **)&key, NULL)) {
++        error_setg(errp, "Parameter '%s' is unexpected",
++                   full_name(qiv, key));
      }
- 
-     error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
-@@ -285,13 +271,8 @@ static void parse_type_str(Visitor *v, const char *name, char **obj,
-                            Error **errp)
- {
-     StringInputVisitor *siv = to_siv(v);
--    if (siv->string) {
--        *obj = g_strdup(siv->string);
--    } else {
--        *obj = NULL;
--        error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
--                   "string");
--    }
-+
-+    *obj = g_strdup(siv->string);
  }
  
- static void parse_type_number(Visitor *v, const char *name, double *obj,
-@@ -302,10 +283,8 @@ static void parse_type_number(Visitor *v, const char *name, double *obj,
-     double val;
+@@ -465,7 +458,7 @@ static void qobject_input_free(Visitor *v)
+     g_free(qiv);
+ }
  
-     errno = 0;
--    if (siv->string) {
--        val = strtod(siv->string, &endp);
--    }
--    if (!siv->string || errno || endp == siv->string || *endp) {
-+    val = strtod(siv->string, &endp);
-+    if (errno || endp == siv->string || *endp) {
-         error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
-                    "number");
-         return;
-@@ -327,6 +306,7 @@ Visitor *string_input_visitor_new(const char *str)
+-Visitor *qobject_input_visitor_new(QObject *obj, bool strict)
++Visitor *qobject_input_visitor_new(QObject *obj)
  {
-     StringInputVisitor *v;
+     QObjectInputVisitor *v;
  
-+    assert(str);
-     v = g_malloc0(sizeof(*v));
+@@ -489,7 +482,6 @@ Visitor *qobject_input_visitor_new(QObject *obj, bool strict)
+     v->visitor.type_null = qobject_input_type_null;
+     v->visitor.optional = qobject_input_optional;
+     v->visitor.free = qobject_input_free;
+-    v->strict = strict;
  
-     v->visitor.type = VISITOR_INPUT;
+     v->root = obj;
+     qobject_incref(obj);
+diff --git a/qmp.c b/qmp.c
+index dfaabac..fa82b59 100644
+--- a/qmp.c
++++ b/qmp.c
+@@ -675,7 +675,7 @@ void qmp_object_add(const char *type, const char *id,
+         pdict = qdict_new();
+     }
+ 
+-    v = qobject_input_visitor_new(QOBJECT(pdict), true);
++    v = qobject_input_visitor_new(QOBJECT(pdict));
+     obj = user_creatable_add_type(type, id, pdict, v, errp);
+     visit_free(v);
+     if (obj) {
+diff --git a/qom/qom-qobject.c b/qom/qom-qobject.c
+index bbdedda..4aec20d 100644
+--- a/qom/qom-qobject.c
++++ b/qom/qom-qobject.c
+@@ -23,7 +23,7 @@ void object_property_set_qobject(Object *obj, QObject *value,
+ {
+     Visitor *v;
+ 
+-    v = qobject_input_visitor_new(value, true);
++    v = qobject_input_visitor_new(value);
+     object_property_set(obj, v, name, errp);
+     visit_free(v);
+ }
+diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
+index a75946f..befac8f 100644
+--- a/scripts/qapi-commands.py
++++ b/scripts/qapi-commands.py
+@@ -130,7 +130,7 @@ def gen_marshal(name, arg_type, boxed, ret_type):
+         push_indent()
+ 
+     ret += mcgen('''
+-    v = qobject_input_visitor_new(QOBJECT(args), true);
++    v = qobject_input_visitor_new(QOBJECT(args));
+     visit_start_struct(v, NULL, NULL, 0, &err);
+     if (err) {
+         goto out;
+diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+index 2a894ee..4ea3a2d 100644
+--- a/target/s390x/cpu_models.c
++++ b/target/s390x/cpu_models.c
+@@ -346,7 +346,7 @@ static void cpu_model_from_info(S390CPUModel *model, const CpuModelInfo *info,
+     }
+ 
+     if (qdict) {
+-        visitor = qobject_input_visitor_new(info->props, true);
++        visitor = qobject_input_visitor_new(info->props);
+         visit_start_struct(visitor, NULL, NULL, 0, errp);
+         if (*errp) {
+             object_unref(obj);
+diff --git a/tests/check-qnull.c b/tests/check-qnull.c
+index b50bb8a..8dd1c96 100644
+--- a/tests/check-qnull.c
++++ b/tests/check-qnull.c
+@@ -47,7 +47,7 @@ static void qnull_visit_test(void)
+ 
+     g_assert(qnull_.refcnt == 1);
+     obj = qnull();
+-    v = qobject_input_visitor_new(obj, true);
++    v = qobject_input_visitor_new(obj);
+     qobject_decref(obj);
+     visit_type_null(v, NULL, &error_abort);
+     visit_free(v);
+diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+index 405e49e..5d0260b 100644
+--- a/tests/qmp-test.c
++++ b/tests/qmp-test.c
+@@ -34,7 +34,7 @@ static void test_version(QObject *version)
+     VersionInfo *vinfo;
+ 
+     g_assert(version);
+-    v = qobject_input_visitor_new(version, true);
++    v = qobject_input_visitor_new(version);
+     visit_type_VersionInfo(v, "version", &vinfo, &error_abort);
+     qapi_free_VersionInfo(vinfo);
+     visit_free(v);
+diff --git a/tests/test-qmp-commands.c b/tests/test-qmp-commands.c
+index c4e20d1..a815056 100644
+--- a/tests/test-qmp-commands.c
++++ b/tests/test-qmp-commands.c
+@@ -244,7 +244,7 @@ static void test_dealloc_partial(void)
+         ud2_dict = qdict_new();
+         qdict_put_obj(ud2_dict, "string0", QOBJECT(qstring_from_str(text)));
+ 
+-        v = qobject_input_visitor_new(QOBJECT(ud2_dict), true);
++        v = qobject_input_visitor_new(QOBJECT(ud2_dict));
+         visit_type_UserDefTwo(v, NULL, &ud2, &err);
+         visit_free(v);
+         QDECREF(ud2_dict);
+diff --git a/tests/test-qobject-input-strict.c b/tests/test-qobject-input-strict.c
+index 4087ea3..7d26113 100644
+--- a/tests/test-qobject-input-strict.c
++++ b/tests/test-qobject-input-strict.c
+@@ -53,7 +53,7 @@ static Visitor *validate_test_init_internal(TestInputVisitorData *data,
+     data->obj = qobject_from_jsonv(json_string, ap);
+     g_assert(data->obj);
+ 
+-    data->qiv = qobject_input_visitor_new(data->obj, true);
++    data->qiv = qobject_input_visitor_new(data->obj);
+     g_assert(data->qiv);
+     return data->qiv;
+ }
+diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-input-visitor.c
+index 125e34c..658fa2c 100644
+--- a/tests/test-qobject-input-visitor.c
++++ b/tests/test-qobject-input-visitor.c
+@@ -49,7 +49,7 @@ static Visitor *visitor_input_test_init_internal(TestInputVisitorData *data,
+     data->obj = qobject_from_jsonv(json_string, ap);
+     g_assert(data->obj);
+ 
+-    data->qiv = qobject_input_visitor_new(data->obj, true);
++    data->qiv = qobject_input_visitor_new(data->obj);
+     g_assert(data->qiv);
+     return data->qiv;
+ }
+diff --git a/tests/test-visitor-serialization.c b/tests/test-visitor-serialization.c
+index 66b2b1c..c7e64f0 100644
+--- a/tests/test-visitor-serialization.c
++++ b/tests/test-visitor-serialization.c
+@@ -1040,7 +1040,7 @@ static void qmp_deserialize(void **native_out, void *datap,
+     obj = qobject_from_json(qstring_get_str(output_json));
+ 
+     QDECREF(output_json);
+-    d->qiv = qobject_input_visitor_new(obj, true);
++    d->qiv = qobject_input_visitor_new(obj);
+     qobject_decref(obj_orig);
+     qobject_decref(obj);
+     visit(d->qiv, native_out, errp);
 -- 
 2.7.4
