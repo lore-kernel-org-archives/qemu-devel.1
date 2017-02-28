@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40332)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cih6I-0000LC-4c
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:55 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cih6J-0000Mq-TX
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cih6H-0000bp-DF
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57906)
+	(envelope-from <dgilbert@redhat.com>) id 1cih6J-0000dI-8g
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59598)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cih6H-0000bY-79
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:53 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cih6J-0000cT-3t
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:55 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue, 28 Feb 2017 12:40:55 +0000
-Message-Id: <20170228124056.5074-27-dgilbert@redhat.com>
+Date: Tue, 28 Feb 2017 12:40:56 +0000
+Message-Id: <20170228124056.5074-28-dgilbert@redhat.com>
 In-Reply-To: <20170228124056.5074-1-dgilbert@redhat.com>
 References: <20170228124056.5074-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 26/27] postcopy: Add doc about hugepages and
- postcopy
+Subject: [Qemu-devel] [PULL 27/27] postcopy: Add extra check for COPY
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +29,32 @@ Cc: quintela@redhat.com, lvivier@redhat.com, marcandre.lureau@redhat.com, vsemen
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
+As an extra sanity check, make sure the region we're registering
+can perform UFFDIO_COPY;  the COPY will fail later but this
+gives a cleaner failure.
+
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-Message-Id: <20170224182844.32452-16-dgilbert@redhat.com>
+Message-Id: <20170224182844.32452-17-dgilbert@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- docs/migration.txt | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ migration/postcopy-ram.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/docs/migration.txt b/docs/migration.txt
-index c8b0304..1b940a8 100644
---- a/docs/migration.txt
-+++ b/docs/migration.txt
-@@ -540,3 +540,16 @@ request for a page that has already been sent is ignored.  Duplicate requests
- such as this can happen as a page is sent at about the same time the
- destination accesses it.
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index 102fb61..effbeb6 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -378,6 +378,10 @@ static int ram_block_enable_notify(const char *block_name, void *host_addr,
+         error_report("%s userfault register: %s", __func__, strerror(errno));
+         return -1;
+     }
++    if (!(reg_struct.ioctls & ((__u64)1 << _UFFDIO_COPY))) {
++        error_report("%s userfault: Region doesn't support COPY", __func__);
++        return -1;
++    }
  
-+=== Postcopy with hugepages ===
-+
-+Postcopy now works with hugetlbfs backed memory:
-+  a) The linux kernel on the destination must support userfault on hugepages.
-+  b) The huge-page configuration on the source and destination VMs must be
-+     identical; i.e. RAMBlocks on both sides must use the same page size.
-+  c) Note that -mem-path /dev/hugepages  will fall back to allocating normal
-+     RAM if it doesn't have enough hugepages, triggering (b) to fail.
-+     Using -mem-prealloc enforces the allocation using hugepages.
-+  d) Care should be taken with the size of hugepage used; postcopy with 2MB
-+     hugepages works well, however 1GB hugepages are likely to be problematic
-+     since it takes ~1 second to transfer a 1GB hugepage across a 10Gbps link,
-+     and until the full page is transferred the destination thread is blocked.
+     return 0;
+ }
 -- 
 2.9.3
