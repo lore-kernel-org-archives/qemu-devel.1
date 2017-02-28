@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cilB1-0002XQ-VM
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:03:04 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cilE7-0005Gl-Nz
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:06:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cilAy-0006zb-2k
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:03:04 -0500
-Received: from mail3-relais-sop.national.inria.fr ([192.134.164.104]:51824)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1cilAx-0006yB-N9
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:03:00 -0500
-Date: Tue, 28 Feb 2017 18:02:35 +0100
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20170228170235.4xtrld37c6ymj5ko@var.youpi.perso.aquilenet.fr>
-References: <20170220185020.774-1-dgilbert@redhat.com>
-	<20170220185020.774-5-dgilbert@redhat.com>
-	<8760k3od2r.fsf@emacs.mitica> <20170223105155.GA2383@work-vm>
-	<20170223110433.GL10047@redhat.com> <20170223114045.GB2383@work-vm>
-	<20170226203427.6xjmuvt6okc356e5@var.youpi.perso.aquilenet.fr>
-	<20170228165445.GG2773@work-vm>
-	<20170228165730.ovdh4k6psrd3qv33@var.youpi.perso.aquilenet.fr>
-	<20170228170017.GH2773@work-vm>
+	(envelope-from <kwolf@redhat.com>) id 1cilE7-00080o-12
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:06:15 -0500
+Date: Tue, 28 Feb 2017 18:06:06 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170228170606.GP4090@noname.redhat.com>
+References: <1488194450-28056-1-git-send-email-armbru@redhat.com>
+	<1488194450-28056-15-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20170228170017.GH2773@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v4 4/5] slirp: VMStatify socket level
+In-Reply-To: <1488194450-28056-15-git-send-email-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 14/24] check-qjson: Test errors from
+ qobject_from_json()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,22 +24,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, jan.kiszka@siemens.com, maethor@subiron.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, pkrempa@redhat.com, eblake@redhat.com
 
-Dr. David Alan Gilbert, on mar. 28 févr. 2017 17:00:17 +0000, wrote:
-> * Samuel Thibault (samuel.thibault@gnu.org) wrote:
-> > Dr. David Alan Gilbert, on mar. 28 févr. 2017 16:54:46 +0000, wrote:
-> > > I'm thinking one way to do it without changing the version would
-> > > be to use the existing value for IPv4, and on reading allow any other
-> > > value for IPv6 (or just the ones we know about); that would make
-> > > it inwards migration compatible.
-> > 
-> > Right. I don't know if that's enough for QEMU requirements.
+Am 27.02.2017 um 12:20 hat Markus Armbruster geschrieben:
+> Pass &error_abort with known-good input.  Else pass &err and check
+> what comes back.  This demonstrates that the parser fails silently for
+> many errors.
 > 
-> If you change the version number you break backwards migration anyway;
-> but doing what I suggested would keep backwards working in most cases.
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Sure, but in some cases we're breaking upward compatibility *silently*.
-
-Samuel
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
