@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43335)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cilNx-0001gd-0P
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:26 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cilO0-0001j5-7i
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cilNv-000342-TV
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:25 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48713)
+	(envelope-from <pm215@archaic.org.uk>) id 1cilNz-00036k-8S
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:28 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48715)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cilNv-00031p-Mw
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:23 -0500
+	id 1cilNz-00034e-1v
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:27 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1cilNu-0003SY-TF
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:16:22 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1cilNx-0003UA-Ew
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:16:25 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Feb 2017 17:16:05 +0000
-Message-Id: <1488302176-19463-11-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 28 Feb 2017 17:16:09 +0000
+Message-Id: <1488302176-19463-15-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1488302176-19463-1-git-send-email-peter.maydell@linaro.org>
 References: <1488302176-19463-1-git-send-email-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 10/21] stm32f205: Create armv7m object without
- using armv7m_init()
+Subject: [Qemu-devel] [PULL 14/21] hw/intc/arm_gicv3_kvm: Add ICC_SRE_EL1
+ register to vmstate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,116 +30,88 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Switch the stm32f205 SoC to create the armv7m object directly
-rather than via the armv7m_init() wrapper. This fits better
-with the SoC model's very QOMified design.
+From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 
-In particular this means we can push loading the guest image
-out to the top level board code where it belongs, rather
-than the SoC object having a QOM property for the filename
-to load.
+To Save and Restore ICC_SRE_EL1 register introduce vmstate
+subsection and load only if non-zero.
+Also initialize icc_sre_el1 with to 0x7 in pre_load
+function.
 
+Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Message-id: 1487850673-26455-3-git-send-email-vijay.kilari@gmail.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Message-id: 1487604965-23220-11-git-send-email-peter.maydell@linaro.org
 ---
- include/hw/arm/stm32f205_soc.h |  4 +++-
- hw/arm/netduino2.c             |  7 ++++---
- hw/arm/stm32f205_soc.c         | 16 +++++++++++++---
- 3 files changed, 20 insertions(+), 7 deletions(-)
+ include/hw/intc/arm_gicv3_common.h |  1 +
+ hw/intc/arm_gicv3_common.c         | 36 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 37 insertions(+)
 
-diff --git a/include/hw/arm/stm32f205_soc.h b/include/hw/arm/stm32f205_soc.h
-index 1332141..e2dce11 100644
---- a/include/hw/arm/stm32f205_soc.h
-+++ b/include/hw/arm/stm32f205_soc.h
-@@ -31,6 +31,7 @@
- #include "hw/adc/stm32f2xx_adc.h"
- #include "hw/or-irq.h"
- #include "hw/ssi/stm32f2xx_spi.h"
-+#include "hw/arm/armv7m.h"
+diff --git a/include/hw/intc/arm_gicv3_common.h b/include/hw/intc/arm_gicv3_common.h
+index 4156051..bccdfe1 100644
+--- a/include/hw/intc/arm_gicv3_common.h
++++ b/include/hw/intc/arm_gicv3_common.h
+@@ -172,6 +172,7 @@ struct GICv3CPUState {
+     uint8_t gicr_ipriorityr[GIC_INTERNAL];
  
- #define TYPE_STM32F205_SOC "stm32f205-soc"
- #define STM32F205_SOC(obj) \
-@@ -51,9 +52,10 @@ typedef struct STM32F205State {
-     SysBusDevice parent_obj;
-     /*< public >*/
- 
--    char *kernel_filename;
-     char *cpu_model;
- 
-+    ARMv7MState armv7m;
-+
-     STM32F2XXSyscfgState syscfg;
-     STM32F2XXUsartState usart[STM_NUM_USARTS];
-     STM32F2XXTimerState timer[STM_NUM_TIMERS];
-diff --git a/hw/arm/netduino2.c b/hw/arm/netduino2.c
-index 23d7928..3cfe332 100644
---- a/hw/arm/netduino2.c
-+++ b/hw/arm/netduino2.c
-@@ -27,17 +27,18 @@
- #include "hw/boards.h"
- #include "qemu/error-report.h"
- #include "hw/arm/stm32f205_soc.h"
-+#include "hw/arm/arm.h"
- 
- static void netduino2_init(MachineState *machine)
- {
-     DeviceState *dev;
- 
-     dev = qdev_create(NULL, TYPE_STM32F205_SOC);
--    if (machine->kernel_filename) {
--        qdev_prop_set_string(dev, "kernel-filename", machine->kernel_filename);
--    }
-     qdev_prop_set_string(dev, "cpu-model", "cortex-m3");
-     object_property_set_bool(OBJECT(dev), true, "realized", &error_fatal);
-+
-+    armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
-+                       FLASH_SIZE);
- }
- 
- static void netduino2_machine_init(MachineClass *mc)
-diff --git a/hw/arm/stm32f205_soc.c b/hw/arm/stm32f205_soc.c
-index 38425bd..e6bd73a 100644
---- a/hw/arm/stm32f205_soc.c
-+++ b/hw/arm/stm32f205_soc.c
-@@ -49,6 +49,9 @@ static void stm32f205_soc_initfn(Object *obj)
-     STM32F205State *s = STM32F205_SOC(obj);
-     int i;
- 
-+    object_initialize(&s->armv7m, sizeof(s->armv7m), TYPE_ARMV7M);
-+    qdev_set_parent_bus(DEVICE(&s->armv7m), sysbus_get_default());
-+
-     object_initialize(&s->syscfg, sizeof(s->syscfg), TYPE_STM32F2XX_SYSCFG);
-     qdev_set_parent_bus(DEVICE(&s->syscfg), sysbus_get_default());
- 
-@@ -110,8 +113,16 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
-     vmstate_register_ram_global(sram);
-     memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, sram);
- 
--    nvic = armv7m_init(get_system_memory(), FLASH_SIZE, 96,
--                       s->kernel_filename, s->cpu_model);
-+    nvic = DEVICE(&s->armv7m);
-+    qdev_prop_set_uint32(nvic, "num-irq", 96);
-+    qdev_prop_set_string(nvic, "cpu-model", s->cpu_model);
-+    object_property_set_link(OBJECT(&s->armv7m), OBJECT(get_system_memory()),
-+                                     "memory", &error_abort);
-+    object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
-+    if (err != NULL) {
-+        error_propagate(errp, err);
-+        return;
-+    }
- 
-     /* System configuration controller */
-     dev = DEVICE(&s->syscfg);
-@@ -192,7 +203,6 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
- }
- 
- static Property stm32f205_soc_properties[] = {
--    DEFINE_PROP_STRING("kernel-filename", STM32F205State, kernel_filename),
-     DEFINE_PROP_STRING("cpu-model", STM32F205State, cpu_model),
-     DEFINE_PROP_END_OF_LIST(),
+     /* CPU interface */
++    uint64_t icc_sre_el1;
+     uint64_t icc_ctlr_el1[2];
+     uint64_t icc_pmr_el1;
+     uint64_t icc_bpr[3];
+diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
+index 16b9b0f..5b0e456 100644
+--- a/hw/intc/arm_gicv3_common.c
++++ b/hw/intc/arm_gicv3_common.c
+@@ -70,6 +70,38 @@ static const VMStateDescription vmstate_gicv3_cpu_virt = {
+     }
  };
+ 
++static int icc_sre_el1_reg_pre_load(void *opaque)
++{
++    GICv3CPUState *cs = opaque;
++
++   /*
++    * If the sre_el1 subsection is not transferred this
++    * means SRE_EL1 is 0x7 (which might not be the same as
++    * our reset value).
++    */
++    cs->icc_sre_el1 = 0x7;
++    return 0;
++}
++
++static bool icc_sre_el1_reg_needed(void *opaque)
++{
++    GICv3CPUState *cs = opaque;
++
++    return cs->icc_sre_el1 != 7;
++}
++
++const VMStateDescription vmstate_gicv3_cpu_sre_el1 = {
++    .name = "arm_gicv3_cpu/sre_el1",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .pre_load = icc_sre_el1_reg_pre_load,
++    .needed = icc_sre_el1_reg_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT64(icc_sre_el1, GICv3CPUState),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static const VMStateDescription vmstate_gicv3_cpu = {
+     .name = "arm_gicv3_cpu",
+     .version_id = 1,
+@@ -100,6 +132,10 @@ static const VMStateDescription vmstate_gicv3_cpu = {
+     .subsections = (const VMStateDescription * []) {
+         &vmstate_gicv3_cpu_virt,
+         NULL
++    },
++    .subsections = (const VMStateDescription * []) {
++        &vmstate_gicv3_cpu_sre_el1,
++        NULL
+     }
+ };
+ 
 -- 
 2.7.4
