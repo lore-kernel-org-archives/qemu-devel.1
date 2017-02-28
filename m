@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45593)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cij6c-0005qi-Vk
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:50:24 -0500
+	(envelope-from <thuth@redhat.com>) id 1cij7K-0006Mi-L3
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:51:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cij6b-0003lk-Mm
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:50:23 -0500
-Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:34936)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cij6b-0003kS-Fy
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:50:21 -0500
-Received: by mail-wr0-x235.google.com with SMTP id g10so10443200wrg.2
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 06:50:21 -0800 (PST)
+	(envelope-from <thuth@redhat.com>) id 1cij7F-00042G-Kz
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:51:06 -0500
+References: <1487715299-21102-1-git-send-email-kraxel@redhat.com>
+	<1487715299-21102-2-git-send-email-kraxel@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <7ba0b043-f299-1d35-a699-b41740248287@redhat.com>
+Date: Tue, 28 Feb 2017 15:50:55 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170228043707.23121-1-jcody@redhat.com>
-References: <20170228043707.23121-1-jcody@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Feb 2017 14:49:59 +0000
-Message-ID: <CAFEAcA84Zn3GennD7qsmXbJvwMb1r9QN2J_Rg+SoO074E0KiBA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 0/2] Block patches
+In-Reply-To: <1487715299-21102-2-git-send-email-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/9] sysemu: add defines for sparc & ppc
+ graphics_*
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +24,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
 
-On 28 February 2017 at 04:37, Jeff Cody <jcody@redhat.com> wrote:
-> The following changes since commit 8f2d7c341184a95d05476ea3c45dbae2b9ddbe51:
->
->   Merge remote-tracking branch 'remotes/berrange/tags/pull-qcrypto-2017-02-27-1' into staging (2017-02-27 15:33:21 +0000)
->
-> are available in the git repository at:
->
->   https://github.com/codyprime/qemu-kvm-jtc.git tags/block-pull-request
->
-> for you to fetch changes up to 51654aa52a94612edfaf76dcb51c0a0b7821c90d:
->
->   iscsi: add missing colons to the qapi docs (2017-02-27 23:33:41 -0500)
->
-> ----------------------------------------------------------------
-> Block patches for 2.9
-> ----------------------------------------------------------------
+On 21.02.2017 23:14, Gerd Hoffmann wrote:
+> Add defines for the sparc and ppc arch specific graphics defaults.
+> They return the graphic_* values these variables are non-zero, and
+> the default values otherwise.
+> 
+> After switching over ppc and sparc to use these we don't need the
+> arch-specific initialization for the graphic_* variables any more.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  include/sysemu/sysemu.h | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> index 576c7ce..9450788 100644
+> --- a/include/sysemu/sysemu.h
+> +++ b/include/sysemu/sysemu.h
+> @@ -142,9 +142,16 @@ typedef enum {
+>  extern int vga_interface_type;
+>  #define xenfb_enabled (vga_interface_type == VGA_XENFB)
+>  
+> +#define sparc_graphic_width  (graphic_width  ? graphic_width  : 1024)
+> +#define sparc_graphic_height (graphic_height ? graphic_height :  768)
+> +#define sparc_graphic_depth  (graphic_depth  ? graphic_depth  :    8)
+> +#define ppc_graphic_width    (graphic_width  ? graphic_width  :  800)
+> +#define ppc_graphic_height   (graphic_height ? graphic_height :  600)
+> +#define ppc_graphic_depth    (graphic_depth  ? graphic_depth  :   32)
 
-Applied, thanks.
+I have to say that I really dislike the idea to hide this logic in such
+macros. Could we please do it without such macros, i.e. by just adding
+some code a la
+	if (!graphic_width) {
+		graphic_width = 800;
+	}
+to the right machine_init() functions instead?
 
--- PMM
+ Thomas
