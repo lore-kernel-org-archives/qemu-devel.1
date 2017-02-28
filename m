@@ -1,17 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cifon-0007jn-6p
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 06:19:46 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cig0i-0007ut-TY
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 06:32:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cifol-0006Ht-Qe
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 06:19:45 -0500
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Tue, 28 Feb 2017 11:19:34 +0000
-Message-Id: <20170228111935.10826-2-stefanha@redhat.com>
-In-Reply-To: <20170228111935.10826-1-stefanha@redhat.com>
-References: <20170228111935.10826-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/2] qemu-options: explain disk I/O
- throttling options
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cig0f-0002ZM-Qt
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 06:32:04 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57477
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cig0f-0002Z4-LK
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 06:32:01 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1SBNnSj119775
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 06:32:00 -0500
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28w79x3012-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 06:32:00 -0500
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Tue, 28 Feb 2017 11:31:58 -0000
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+Date: Tue, 28 Feb 2017 12:31:48 +0100
+Message-Id: <20170228113153.23867-1-cornelia.huck@de.ibm.com>
+Subject: [Qemu-devel] [PULL for-2.9 0/5] s390x: network boot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,53 +36,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Nini Gu <ngu@redhat.com>, qemu-block@nongnu.org, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: peter.maydell@linaro.org
+Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, qemu-devel@nongnu.org, Cornelia Huck <cornelia.huck@de.ibm.com>
 
-The disk I/O throttling options have been listed for a long time but
-never explained on the QEMU man page.
+The following changes since commit 6181478f6395cdd9d6ffd99623d0c9f39ea53606:
 
-Suggested-by: Nini Gu <ngu@redhat.com>
-Cc: Alberto Garcia <berto@igalia.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- qemu-options.hx | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2017-02-28 08:46:03 +0000)
 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 5633d39..c609b05 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -587,6 +587,30 @@ file sectors into the image file.
- conversion of plain zero writes by the OS to driver specific optimized
- zero write commands. You may even choose "unmap" if @var{discard} is set
- to "unmap" to allow a zero write to be converted to an UNMAP operation.
-+@item bps=@var{b},bps_rd=@var{r},bps_wr=@var{w}
-+Specify bandwidth throttling limits in bytes per second, either for all request
-+types or for reads or writes only.  Small values can lead to timeouts or hangs
-+inside the guest.  A safe minimum for disks is 2 MB/s.
-+@item bps_max=@var{bm},bps_rd_max=@var{rm},bps_wr_max=@var{wm}
-+Specify bursts in bytes per second, either for all request types or for reads
-+or writes only.  Bursts allow the guest I/O to spike above the limit
-+temporarily.
-+@item iops=@var{i},iops_rd=@var{r},iops_wr=@var{w}
-+Specify request rate limits in requests per second, either for all request
-+types or for reads or writes only.
-+@item iops_max=@var{bm},iops_rd_max=@var{rm},iops_wr_max=@var{wm}
-+Specify bursts in requests per second, either for all request types or for reads
-+or writes only.  Bursts allow the guest I/O to spike above the limit
-+temporarily.
-+@item iops_size=@var{is}
-+Let every @var{is} bytes of a request count as a new request for iops
-+throttling purposes.  Use this option to prevent guests from circumventing iops
-+limits by sending fewer but larger requests.
-+@item group=@var{g}
-+Join a throttling quota group with given name @var{g}.  All drives that are
-+members of the same group are accounted for together.  Use this option to
-+prevent guests from circumventing throttling limits by using many small disks
-+instead of a single larger disk.
- @end table
- 
- By default, the @option{cache=writeback} mode is used. It will report data
+are available in the git repository at:
+
+  git://github.com/cohuck/qemu tags/s390x-20170228
+
+for you to fetch changes up to e8ebf60f6d12aca2a4d6bb1059bbcda94ea0bbeb:
+
+  pc-bios/s390-ccw.img: rebuild image (2017-02-28 12:04:48 +0100)
+
+----------------------------------------------------------------
+Network boot for s390x. More information (and instructions
+for building a s390-netboot.img) can be found at
+http://wiki.qemu-project.org/Features/S390xNetworkBoot
+
+----------------------------------------------------------------
+
+Cornelia Huck (1):
+  pc-bios/s390-ccw.img: rebuild image
+
+Farhan Ali (4):
+  elf-loader: Allow late loading of elf
+  s390x/ipl: Extend S390IPLState to support network boot
+  s390x/ipl: Load network boot image
+  pc-bios/s390-ccw: Use the ccw bios to start the network boot
+
+ hw/core/loader.c           |  17 ++++++++-
+ hw/s390x/ipl.c             |  90 +++++++++++++++++++++++++++++++++++++++++++++
+ hw/s390x/ipl.h             |   5 ++-
+ hw/s390x/s390-virtio-ccw.c |   3 +-
+ hw/s390x/s390-virtio.c     |   2 +
+ hw/s390x/s390-virtio.h     |   1 +
+ include/hw/elf_ops.h       |  13 +++++--
+ include/hw/loader.h        |  13 ++++++-
+ pc-bios/s390-ccw.img       | Bin 26392 -> 26456 bytes
+ pc-bios/s390-ccw/bootmap.c |   8 +++-
+ pc-bios/s390-ccw/iplb.h    |   3 +-
+ pc-bios/s390-ccw/main.c    |  20 +++++++---
+ pc-bios/s390-ccw/virtio.c  |   1 +
+ pc-bios/s390-ccw/virtio.h  |   1 +
+ 14 files changed, 160 insertions(+), 17 deletions(-)
+
 -- 
-2.9.3
+2.11.0
