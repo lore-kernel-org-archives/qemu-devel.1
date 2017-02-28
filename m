@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57516)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cim9f-0000zD-RQ
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 13:05:44 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cimAv-0001vx-Ud
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 13:07:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cim9e-0001gU-AC
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 13:05:43 -0500
-From: Markus Armbruster <armbru@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1cimAv-0002dG-5q
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 13:07:01 -0500
+Date: Tue, 28 Feb 2017 19:06:56 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170228180656.GY4090@noname.redhat.com>
 References: <1488194450-28056-1-git-send-email-armbru@redhat.com>
-	<1488194450-28056-10-git-send-email-armbru@redhat.com>
-	<20170228165117.GK4090@noname.redhat.com>
-Date: Tue, 28 Feb 2017 19:05:37 +0100
-In-Reply-To: <20170228165117.GK4090@noname.redhat.com> (Kevin Wolf's message
-	of "Tue, 28 Feb 2017 17:51:17 +0100")
-Message-ID: <874lzep4we.fsf@dusky.pond.sub.org>
+	<1488194450-28056-24-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 09/24] libqtest: Fix qmp() & friends to
- abort on JSON parse errors
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1488194450-28056-24-git-send-email-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 23/24] keyval: Restrict key components to
+ valid QAPI names
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,18 +24,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: pkrempa@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, pkrempa@redhat.com, eblake@redhat.com
 
-Kevin Wolf <kwolf@redhat.com> writes:
+Am 27.02.2017 um 12:20 hat Markus Armbruster geschrieben:
+> Restricting the key components to something sane leaves us room for
+> evolving key syntax.  Since they will be commonly used as QAPI member
+> names by the QObject input visitor, we can just as well borrow the
+> QAPI naming rules here.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-> Am 27.02.2017 um 12:20 hat Markus Armbruster geschrieben:
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->
-> Aha, I was just too quick! :-)
-
-I'll add something to the previous commit's message.
-
-> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-
-Thanks!
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
