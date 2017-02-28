@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ciewB-0004xu-AL
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:23:20 -0500
+	(envelope-from <berrange@redhat.com>) id 1cif1f-0008KS-G3
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:29:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1ciewA-0005WB-Ah
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:23:19 -0500
-References: <1485900317-3256-1-git-send-email-joserz@linux.vnet.ibm.com>
-	<23319194-73e8-8edd-32e5-a8543b91fca9@vivier.eu>
-	<20170228010905.GM17615@umbus.fritz.box>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <227638f2-d9fc-c56d-78d1-09d6ee21a600@vivier.eu>
-Date: Tue, 28 Feb 2017 11:22:54 +0100
+	(envelope-from <berrange@redhat.com>) id 1cif1e-0007Nm-HD
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:28:59 -0500
+Date: Tue, 28 Feb 2017 10:28:49 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170228102849.GF2762@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <cover.1488220970.git.jcody@redhat.com>
+	<12a16b28300f871052a49897ec7875a082fc63e3.1488220970.git.jcody@redhat.com>
+	<c5869fe5-fa51-3f2f-26d6-26a733c15493@redhat.com>
+	<20170228035744.GO25637@localhost.localdomain>
+	<20170228101651.GE2762@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170228010905.GM17615@umbus.fritz.box>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="4R2WblvN6OdBNtIF5hVjvDLqc01RM03av"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] linux-user: fill target
- sigcontext struct accordingly
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170228101651.GE2762@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] block/rbd: add support for
+ 'mon_host', 'auth_supported' via QAPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,116 +28,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, qemu-devel@nongnu.org, riku.voipio@iki.fi, qemu-ppc@nongnu.org
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---4R2WblvN6OdBNtIF5hVjvDLqc01RM03av
-From: Laurent Vivier <laurent@vivier.eu>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
- riku.voipio@iki.fi, qemu-ppc@nongnu.org
-Message-ID: <227638f2-d9fc-c56d-78d1-09d6ee21a600@vivier.eu>
-Subject: Re: [Qemu-ppc] [Qemu-devel] [PATCH] linux-user: fill target
- sigcontext struct accordingly
-References: <1485900317-3256-1-git-send-email-joserz@linux.vnet.ibm.com>
- <23319194-73e8-8edd-32e5-a8543b91fca9@vivier.eu>
- <20170228010905.GM17615@umbus.fritz.box>
-In-Reply-To: <20170228010905.GM17615@umbus.fritz.box>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Feb 28, 2017 at 10:16:51AM +0000, Daniel P. Berrange wrote:
+> On Mon, Feb 27, 2017 at 10:57:44PM -0500, Jeff Cody wrote:
+> > On Mon, Feb 27, 2017 at 04:47:54PM -0600, Eric Blake wrote:
+> > > On 02/27/2017 12:58 PM, Jeff Cody wrote:
+> > > > @@ -604,6 +620,29 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+> > > >          goto failed_shutdown;
+> > > >      }
+> > > >  
+> > > > +    /* if mon_host was specified */
+> > > > +    if (host) {
+> > > > +        const char *hostname = host;
+> > > > +        char *mon_host = NULL;
+> > > > +
+> > > > +        if (port) {
+> > > > +            mon_host = g_strdup_printf("%s:%s", host, port);
+> > > 
+> > > Does Ceph care about IPv6 (in which case you may need [host]:port when
+> > > host itself includes ':')?
+> > >
+> > 
+> > Some quick sanity testing seems to show that it does not need [] for ipv6
+> > addresses, which is nice.
+> 
+> Hmm, that is very odd to me, as that means parsing is ambiguous. The
+> ceph 'mon_host' option allows the port to be omitted, so given a
+> string  2001:242:24:23   there's no way of knowing whether it is
+> a IPv6 addr 2001:242:24:23, with no port, or an addr 2001:242:24 with
+> port of 23
 
-Le 28/02/2017 =C3=A0 02:09, David Gibson a =C3=A9crit :
-> On Wed, Feb 01, 2017 at 09:43:57PM +0100, Laurent Vivier wrote:
->> Le 31/01/2017 =C3=A0 23:05, Jose Ricardo Ziviani a =C3=A9crit :
->>> A segfault is noticed when an emulated program uses any of ucontext
->>> regs fields. Risu detected this issue in the following operation when=
+Looking at the source code to ceph it appears that if you omit the
+use of [], then it will treat the entire string as being the address
+without port. It does look to support use of [], so we should use
+that IIUC.
 
->>> handling a signal:
->>>   ucontext_t *uc =3D (ucontext_t*)uc;
->>>   uc->uc_mcontext.regs->nip +=3D 4;
->>>
->>> but this works fine:
->>>   uc->uc_mcontext.gp_regs[PT_NIP] +=3D 4;
->>>
->>> This patch set regs to a valid location as well as other sigcontext
->>> fields.
->>>
->>> Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
->>> ---
->>>  linux-user/signal.c | 5 +++++
->>>  1 file changed, 5 insertions(+)
->>>
->>> diff --git a/linux-user/signal.c b/linux-user/signal.c
->>> index 5064de0..8209539 100644
->>> --- a/linux-user/signal.c
->>> +++ b/linux-user/signal.c
->>> @@ -5155,6 +5155,7 @@ static void setup_rt_frame(int sig, struct targ=
-et_sigaction *ka,
->>>      target_ulong rt_sf_addr, newsp =3D 0;
->>>      int i, err =3D 0;
->>>  #if defined(TARGET_PPC64)
->>> +    struct target_sigcontext *sc =3D 0;
->>>      struct image_info *image =3D ((TaskState *)thread_cpu->opaque)->=
-info;
->>>  #endif
->>> =20
->>> @@ -5183,6 +5184,10 @@ static void setup_rt_frame(int sig, struct tar=
-get_sigaction *ka,
->>>  #if defined(TARGET_PPC64)
->>>      mctx =3D &rt_sf->uc.tuc_sigcontext.mcontext;
->>>      trampptr =3D &rt_sf->trampoline[0];
->>> +
->>> +    sc =3D &rt_sf->uc.tuc_sigcontext;
->>> +    __put_user(h2g(mctx), &sc->regs);
->>> +    __put_user(sig, &sc->signal);
->>>  #else
->>>      mctx =3D &rt_sf->uc.tuc_mcontext;
->>>      trampptr =3D (uint32_t *)&rt_sf->uc.tuc_mcontext.tramp;
->>>
->>
->> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
->>
->> This is correct, but QEMU and kernel implementation are really
->> different.
->=20
+https://blog.widodh.nl/2014/11/ceph-with-a-cluster-and-public-network-on-ipv6/
 
-Hi David,
+See also entity_addr_t::parse in $CEPH/src/msg/msg_types.cc which is
+what I think parses the mon addr. NB, I've not tested this yet, so
+if you have a live ceph cluster with ipv6, it'd be good to verify that
+using [] is correct.
 
-> Laurent, I'm a bit clear on what the upshot is here.
->=20
-> Should I merge the patch above?
-
-I've already included this patch in a linux-user pull request a couple
-of weeks ago, and it is now in the master.
-
-So you have nothing to do :)
-
-Thanks,
-Laurent
-
-
---4R2WblvN6OdBNtIF5hVjvDLqc01RM03av
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJYtU9+AAoJEPMMOL0/L748rlYQAJKoFPpSizZN6ZfniWciAKIe
-bIBbLHfH2jmOkMTQ3oaXWwGvs52a+4vI6Nr5+eTmxFrptPSfnNcRdmIU8X0qWm4/
-4z3dXNN5Y5CTKW74Rmhvik4pOZYOqQpiBtzybnGGo0PoEH/t2yZRLpbby/C+upJV
-nKR0rLX6HCrdJTEOSyC4mwK10MLOaIwMceLZ/keu8TCvol2IUxaL4a60hix2SeDP
-/Xn0GznuDsx14kdJ3ZYCeW9+7gLiJ+eR8zssGlrle1iuVEMkuWMtwz6peaBCLGLA
-LaZVIT5ll+3UqSOeLYRlnMuvgc8MhMuek93RMcDIRCUrRegefxXqBpxx1xO8mEXh
-lqox3ccuScJPzzUWEa9L4ktH1DHZowbv99Kqpo8zh6pD4CRfA17vpTP8bl44LRgv
-d5OjQq8waQPHSHDacN267y2mWow4BVr2vTNlSUzU6yiNgW5QwAoEmaBb/+mjVYVk
-xZ5ZVFyZF6x/3PG/Zx/rxNFz0Yj/OBAm7Cy4NB0oDLa9XfooP1pqGzhC6loSuSLu
-7200+eXrGjJ5KIque351Y0AsbtC0ADczU9a67DTpp+timmEpx68oIkarxdLL6tQB
-pLlQYImTMeEw8xfO5nP4Y9T4wCVm3ARJztlh99o3YVe5O8vCuBWn988Q+5uhDsUl
-Ck3LzUMjHSL6LxsaRsfs
-=XZXe
------END PGP SIGNATURE-----
-
---4R2WblvN6OdBNtIF5hVjvDLqc01RM03av--
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
