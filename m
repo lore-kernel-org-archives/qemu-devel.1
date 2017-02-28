@@ -1,39 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34335)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xyjxie@linux.vnet.ibm.com>) id 1ciemQ-0006pt-LZ
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:13:15 -0500
+	(envelope-from <berrange@redhat.com>) id 1cieqA-0001Ge-7I
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:17:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xyjxie@linux.vnet.ibm.com>) id 1ciemL-0000Zz-MQ
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:13:14 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41569)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <xyjxie@linux.vnet.ibm.com>)
-	id 1ciemL-0000ZN-DN
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:13:09 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1SA95AB000793
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 05:13:07 -0500
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28w3d4j7ps-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 05:13:07 -0500
-Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <xyjxie@linux.vnet.ibm.com>;
-	Tue, 28 Feb 2017 03:13:06 -0700
-References: <1488171164-28319-1-git-send-email-xyjxie@linux.vnet.ibm.com>
-	<20170228004101.GG17615@umbus.fritz.box>
-From: Yongji Xie <xyjxie@linux.vnet.ibm.com>
-Date: Tue, 28 Feb 2017 18:12:56 +0800
+	(envelope-from <berrange@redhat.com>) id 1cieq6-0002Zm-7c
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:17:06 -0500
+Date: Tue, 28 Feb 2017 10:16:51 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170228101651.GE2762@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <cover.1488220970.git.jcody@redhat.com>
+	<12a16b28300f871052a49897ec7875a082fc63e3.1488220970.git.jcody@redhat.com>
+	<c5869fe5-fa51-3f2f-26d6-26a733c15493@redhat.com>
+	<20170228035744.GO25637@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20170228004101.GG17615@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Message-Id: <ba290b8f-5967-eb50-3ba5-514a28bd0dda@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2] memory: Introduce DEVICE_HOST_ENDIAN
- for ram device
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170228035744.GO25637@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] block/rbd: add support for
+ 'mon_host', 'auth_supported' via QAPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,54 +27,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, qemu-devel@nongnu.org, alex.williamson@redhat.com, aik@ozlabs.ru, peter.maydell@linaro.org, paulus@samba.org, mdroth@linux.vnet.ibm.com, zhong@linux.vnet.ibm.com
+To: Jeff Cody <jcody@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com
 
-on 2017/2/28 8:41, David Gibson wrote:
+On Mon, Feb 27, 2017 at 10:57:44PM -0500, Jeff Cody wrote:
+> On Mon, Feb 27, 2017 at 04:47:54PM -0600, Eric Blake wrote:
+> > On 02/27/2017 12:58 PM, Jeff Cody wrote:
+> > > @@ -604,6 +620,29 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+> > >          goto failed_shutdown;
+> > >      }
+> > >  
+> > > +    /* if mon_host was specified */
+> > > +    if (host) {
+> > > +        const char *hostname = host;
+> > > +        char *mon_host = NULL;
+> > > +
+> > > +        if (port) {
+> > > +            mon_host = g_strdup_printf("%s:%s", host, port);
+> > 
+> > Does Ceph care about IPv6 (in which case you may need [host]:port when
+> > host itself includes ':')?
+> >
+> 
+> Some quick sanity testing seems to show that it does not need [] for ipv6
+> addresses, which is nice.
 
-> On Mon, Feb 27, 2017 at 12:52:44PM +0800, Yongji Xie wrote:
->> At the moment ram device's memory regions are DEVICE_NATIVE_ENDIAN. It's
->> incorrect. This memory region is backed by a MMIO area in host, so the
->> uint64_t data that MemoryRegionOps read from/write to this area should be
->> host-endian rather than target-endian. Hence, current code does not work
->> when target and host endianness are different which is the most common case
->> on PPC64. To fix it, this introduces DEVICE_HOST_ENDIAN for the ram device.
->>
->> This has been tested on PPC64 BE/LE host/guest in all possible combinations
->> including TCG.
->>
->> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
->> Signed-off-by: Yongji Xie <xyjxie@linux.vnet.ibm.com>
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
->
-> The effect of the patch is certainly correct.  I remain a little
-> concerned that the name "host endian" might cause more confusion than
-> it resolves, but a better term isn't immediately obvious to me.
+Hmm, that is very odd to me, as that means parsing is ambiguous. The
+ceph 'mon_host' option allows the port to be omitted, so given a
+string  2001:242:24:23   there's no way of knowing whether it is
+a IPv6 addr 2001:242:24:23, with no port, or an addr 2001:242:24 with
+port of 23
 
-If the memory region's endianness indicates the endianness of multi-byte 
-value that
-MemoryRegionOps read from/write to this memory region, should "host endian"
-be reasonable?
 
-For a mmio store, QEMU just get a bunch of bytes in the memory at the 
-beginning.
-Then we use ldX_p to load a target-endian multi-byte value from the 
-memory.  Then
-adjust_endianness() change the endianness of the multi-byte value from 
-target-endian
-to memory region's endianness.
-
-For the mmap MMIO area, we should use host-endian multi-byte value to 
-access it.
-
-*(uint32_t *)(mr->ram_block->host + addr) = (uint32_t)data;
-
-Here it is the same as stl_he_p().
-
-The "host-endian" means we load a bunch of bytes as a host-endian value, 
-and write the
-value to the mmap MMIO area. That's my understanding. Not sure if it's 
-correct.
-
-Thanks,
-Yongji
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
