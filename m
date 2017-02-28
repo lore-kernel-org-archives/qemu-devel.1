@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40196)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cih66-00005x-By
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:43 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cih65-0000Sv-6l
+	(envelope-from <dgilbert@redhat.com>) id 1cih65-0008WL-6o
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:42 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48688)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cih64-0000Rx-WA
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgilbert@redhat.com>) id 1cih64-0000So-9k
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:41 -0500
-Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1cih63-0003Ch-88
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:41:39 +0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Feb 2017 12:41:38 +0000
-Message-Id: <1488285698-21781-1-git-send-email-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 00/27] target-arm queue
+Received: from mx1.redhat.com ([209.132.183.28]:54972)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cih64-0000RV-1L
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:40 -0500
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Tue, 28 Feb 2017 12:40:49 +0000
+Message-Id: <20170228124056.5074-21-dgilbert@redhat.com>
+In-Reply-To: <20170228124056.5074-1-dgilbert@redhat.com>
+References: <20170228124056.5074-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PULL 20/27] postcopy: Load huge pages in one go
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,115 +24,70 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: quintela@redhat.com, lvivier@redhat.com, marcandre.lureau@redhat.com, vsementsov@virtuozzo.com, danielhb@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, ashijeetacharya@gmail.com
 
-v1->v2 changes: drop the sd card-reparenting patch
-and the 2 raspi2 patches that depend on it.
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
--- PMM
+The existing postcopy RAM load loop already ensures that it
+glues together whole host-pages from the target page size chunks sent
+over the wire.  Modify the definition of host page that it uses
+to be the RAM block page size and thus be huge pages where appropriate.
 
-The following changes since commit 6181478f6395cdd9d6ffd99623d0c9f39ea53606:
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Message-Id: <20170224182844.32452-10-dgilbert@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ migration/ram.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2017-02-28 08:46:03 +0000)
-
-are available in the git repository at:
-
-  git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20170228
-
-for you to fetch changes up to f3a6339a5bbc160d327299c67bb68c6d07fa4a61:
-
-  hw/arm/exynos: Fix proper mapping of CPUs by providing real cluster ID (2017-02-28 12:08:20 +0000)
-
-----------------------------------------------------------------
-target-arm queue:
- * raspi2: implement RNG module
- * raspi2: implement new SD card controller (but don't wire it up)
- * sdhci: bugfixes for block transfers
- * virt: fix cpu object reference leak
- * Add missing fp_access_check() to aarch64 crypto instructions
- * cputlb: Don't assume do_unassigned_access() never returns
- * virt: Add a user option to disallow ITS instantiation
- * i.MX timers: fix reset handling
- * ARMv7M NVIC: rewrite to fix broken priority handling and masking
- * exynos: Fix proper mapping of CPUs by providing real cluster ID
- * exynos: Fix Linux kernel division by zero for PLLs
-
-----------------------------------------------------------------
-Clement Deschamps (1):
-      bcm2835_sdhost: add bcm2835 sdhost controller
-
-Eric Auger (1):
-      hw/arm/virt: Add a user option to disallow ITS instantiation
-
-Igor Mammedov (1):
-      hw/arm/virt: fix cpu object reference leak
-
-Krzysztof Kozlowski (2):
-      hw/arm/exynos: Fix Linux kernel division by zero for PLLs
-      hw/arm/exynos: Fix proper mapping of CPUs by providing real cluster ID
-
-Kurban Mallachiev (1):
-      ARM i.MX timers: fix reset handling
-
-Marcin Chojnacki (1):
-      target-arm: Implement BCM2835 hardware RNG
-
-Michael Davidsaver (5):
-      armv7m: Rewrite NVIC to not use any GIC code
-      arm: gic: Remove references to NVIC
-      armv7m: Escalate exceptions to HardFault if necessary
-      armv7m: Simpler and faster exception start
-      armv7m: VECTCLRACTIVE and VECTRESET are UNPREDICTABLE
-
-Nick Reilly (1):
-      Add missing fp_access_check() to aarch64 crypto instructions
-
-Peter Maydell (10):
-      bcm2835_rng: Use qcrypto_random_bytes() rather than rand()
-      cputlb: Don't assume do_unassigned_access() never returns
-      armv7m: Rename nvic_state to NVICState
-      armv7m: Implement reading and writing of PRIGROUP
-      armv7m: Fix condition check for taking exceptions
-      armv7m: Remove unused armv7m_nvic_acknowledge_irq() return value
-      armv7m: Extract "exception taken" code into functions
-      armv7m: Check exception return consistency
-      armv7m: Raise correct kind of UsageFault for attempts to execute ARM code
-      armv7m: Allow SHCSR writes to change pending and active bits
-
-Prasad J Pandit (4):
-      sd: sdhci: mask transfer mode register value
-      sd: sdhci: check transfer mode register in multi block transfer
-      sd: sdhci: conditionally invoke multi block transfer
-      sd: sdhci: Remove block count enable check in single block transfers
-
- hw/misc/Makefile.objs                |   3 +-
- hw/sd/Makefile.objs                  |   1 +
- hw/intc/gic_internal.h               |   7 +-
- include/hw/arm/bcm2835_peripherals.h |   2 +
- include/hw/arm/virt.h                |   1 +
- include/hw/misc/bcm2835_rng.h        |  27 ++
- include/hw/sd/bcm2835_sdhost.h       |  48 ++
- target/arm/cpu.h                     |  23 +-
- cputlb.c                             |  15 +-
- hw/arm/bcm2835_peripherals.c         |  15 +
- hw/arm/exynos4210.c                  |  18 +
- hw/arm/virt.c                        |  32 +-
- hw/intc/arm_gic.c                    |  31 +-
- hw/intc/arm_gic_common.c             |  23 +-
- hw/intc/armv7m_nvic.c                | 885 ++++++++++++++++++++++++++++-------
- hw/misc/bcm2835_rng.c                | 149 ++++++
- hw/misc/exynos4210_clk.c             | 164 +++++++
- hw/sd/bcm2835_sdhost.c               | 429 +++++++++++++++++
- hw/sd/sdhci.c                        |  25 +-
- hw/timer/imx_gpt.c                   |  33 +-
- linux-user/main.c                    |   1 +
- target/arm/cpu.c                     |  16 +-
- target/arm/helper.c                  | 245 +++++++---
- target/arm/translate-a64.c           |  12 +
- target/arm/translate.c               |   8 +-
- hw/intc/trace-events                 |  15 +
- 26 files changed, 1897 insertions(+), 331 deletions(-)
- create mode 100644 include/hw/misc/bcm2835_rng.h
- create mode 100644 include/hw/sd/bcm2835_sdhost.h
- create mode 100644 hw/misc/bcm2835_rng.c
- create mode 100644 hw/misc/exynos4210_clk.c
- create mode 100644 hw/sd/bcm2835_sdhost.c
+diff --git a/migration/ram.c b/migration/ram.c
+index ff86664..9f28da2 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -2390,7 +2390,7 @@ static int ram_load_postcopy(QEMUFile *f)
+ {
+     int flags = 0, ret = 0;
+     bool place_needed = false;
+-    bool matching_page_sizes = qemu_host_page_size == TARGET_PAGE_SIZE;
++    bool matching_page_sizes = false;
+     MigrationIncomingState *mis = migration_incoming_get_current();
+     /* Temporary page that is later 'placed' */
+     void *postcopy_host_page = postcopy_get_tmp_page(mis);
+@@ -2420,8 +2420,11 @@ static int ram_load_postcopy(QEMUFile *f)
+                 ret = -EINVAL;
+                 break;
+             }
++            matching_page_sizes = block->page_size == TARGET_PAGE_SIZE;
+             /*
+-             * Postcopy requires that we place whole host pages atomically.
++             * Postcopy requires that we place whole host pages atomically;
++             * these may be huge pages for RAMBlocks that are backed by
++             * hugetlbfs.
+              * To make it atomic, the data is read into a temporary page
+              * that's moved into place later.
+              * The migration protocol uses,  possibly smaller, target-pages
+@@ -2429,9 +2432,9 @@ static int ram_load_postcopy(QEMUFile *f)
+              * of a host page in order.
+              */
+             page_buffer = postcopy_host_page +
+-                          ((uintptr_t)host & ~qemu_host_page_mask);
++                          ((uintptr_t)host & (block->page_size - 1));
+             /* If all TP are zero then we can optimise the place */
+-            if (!((uintptr_t)host & ~qemu_host_page_mask)) {
++            if (!((uintptr_t)host & (block->page_size - 1))) {
+                 all_zero = true;
+             } else {
+                 /* not the 1st TP within the HP */
+@@ -2449,7 +2452,7 @@ static int ram_load_postcopy(QEMUFile *f)
+              * page
+              */
+             place_needed = (((uintptr_t)host + TARGET_PAGE_SIZE) &
+-                                     ~qemu_host_page_mask) == 0;
++                                     (block->page_size - 1)) == 0;
+             place_source = postcopy_host_page;
+         }
+         last_host = host;
+-- 
+2.9.3
