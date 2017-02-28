@@ -1,51 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1ciimV-0005ZA-J9
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:29:36 -0500
+	(envelope-from <armbru@redhat.com>) id 1ciir4-00017p-MC
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:34:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1ciimS-00046l-Dj
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:29:35 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50834)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
-	id 1ciimS-00046c-4e
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:29:32 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1SETBGK078960
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 09:29:30 -0500
-Received: from e24smtp02.br.ibm.com (e24smtp02.br.ibm.com [32.104.18.86])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28w2hcr086-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 09:29:30 -0500
-Received: from localhost
-	by e24smtp02.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
-	Tue, 28 Feb 2017 11:29:27 -0300
-Received: from d24relay04.br.ibm.com (d24relay04.br.ibm.com [9.18.232.146])
-	by d24dlp02.br.ibm.com (Postfix) with ESMTP id 0C20C1DC0071
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 09:29:26 -0500 (EST)
-Received: from d24av03.br.ibm.com (d24av03.br.ibm.com [9.8.31.95])
-	by d24relay04.br.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	v1SETOcd26083442
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 11:29:24 -0300
-Received: from d24av03.br.ibm.com (localhost [127.0.0.1])
-	by d24av03.br.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
-	v1SETON8016676
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 11:29:24 -0300
-Date: Tue, 28 Feb 2017 11:29:18 -0300
-From: joserz@linux.vnet.ibm.com
-References: <1488224492-20316-1-git-send-email-joserz@linux.vnet.ibm.com>
-	<1488224492-20316-3-git-send-email-joserz@linux.vnet.ibm.com>
-	<CAFEAcA_DD1KmSR+U-4jSVbycO+QwZ9ebc_k4RJ2+TqZD2jiB5w@mail.gmail.com>
+	(envelope-from <armbru@redhat.com>) id 1ciir3-0005pB-Py
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:34:18 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <cover.1488254329.git.jcody@redhat.com>
+	<cover.1488254329.git.jcody@redhat.com>
+	<64a3308bbe51f78ccd2a53b30e8ba576e979ac4f.1488254329.git.jcody@redhat.com>
+Date: Tue, 28 Feb 2017 15:34:10 +0100
+In-Reply-To: <64a3308bbe51f78ccd2a53b30e8ba576e979ac4f.1488254329.git.jcody@redhat.com>
+	(Jeff Cody's message of "Mon, 27 Feb 2017 23:12:28 -0500")
+Message-ID: <87shmyxu3h.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_DD1KmSR+U-4jSVbycO+QwZ9ebc_k4RJ2+TqZD2jiB5w@mail.gmail.com>
-Message-Id: <20170228142918.GA7745@pacoca>
-Subject: Re: [Qemu-devel] [PATCH Risu 2/5] risu_reginfo_ppc64le: Remove
- unused code from PPC64 register comparison
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 5/5] block/rbd: add support for
+ 'mon_host', 'auth_supported' via QAPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -54,49 +25,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, qemu-block@nongnu.org
 
-On Tue, Feb 28, 2017 at 01:43:22PM +0000, Peter Maydell wrote:
-> On 27 February 2017 at 19:41, Jose Ricardo Ziviani
-> <joserz@linux.vnet.ibm.com> wrote:
-> > Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-> > ---
-> >  risu_reginfo_ppc64le.c | 8 --------
-> >  1 file changed, 8 deletions(-)
-> >
-> > diff --git a/risu_reginfo_ppc64le.c b/risu_reginfo_ppc64le.c
-> > index e6bc0e0..a76f296 100644
-> > --- a/risu_reginfo_ppc64le.c
-> > +++ b/risu_reginfo_ppc64le.c
-> > @@ -86,14 +86,6 @@ int reginfo_is_eq(struct reginfo *m, struct reginfo *a, ucontext_t *uc)
-> >                  m->vrregs.vrregs[i][1] != a->vrregs.vrregs[i][1] ||
-> >                  m->vrregs.vrregs[i][2] != a->vrregs.vrregs[i][2] ||
-> >                  m->vrregs.vrregs[i][3] != a->vrregs.vrregs[i][3]) {
-> > -
-> > -            if (uc != NULL && (m->gregs[CCR] & 0x10)) {
-> > -                uc->uc_mcontext.v_regs->vrregs[i][0] = a->vrregs.vrregs[i][0];
-> > -                uc->uc_mcontext.v_regs->vrregs[i][1] = a->vrregs.vrregs[i][1];
-> > -                uc->uc_mcontext.v_regs->vrregs[i][2] = a->vrregs.vrregs[i][2];
-> > -                uc->uc_mcontext.v_regs->vrregs[i][3] = a->vrregs.vrregs[i][3];
-> > -                return 1;
-> > -            }
-> >              return 0;
-> >          }
-> >      }
-> > --
-> 
-> I have a variation on this patch already in my set of refactoring
-> patches that I posted last week:
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg06152.html
+Starting with just the QAPI schema.
 
-Sorry, I missed that commit. I'll send a v2 with the fix suggested by
-Nikunj and without this one.
+Jeff Cody <jcody@redhat.com> writes:
 
-Thanks Peter
+> This adds support for three additional options that may be specified
+> by QAPI in blockdev-add:
+>
+>     server: host, port
+>     auth method: either 'cephx' or 'none'
+>
+> The "server" and "auth-supported" QAPI parameters are arrays.  To conform
+> with the rados API, the array items are join as a single string with a ';'
+> character as a delimiter when setting the configuration values.
+>
+> Signed-off-by: Jeff Cody <jcody@redhat.com>
+> ---
+[...]
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index f152953..5f74f92 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -2666,6 +2666,28 @@
+>              '*header-digest': 'IscsiHeaderDigest',
+>              '*timeout': 'int' } }
+>  
+> +
+> +##
+> +# @RbdAuthSupport:
+> +#
+> +# An enumeration of RBD auth support
+> +#
+> +# Since: 2.9
+> +##
+> +{ 'enum': 'RbdAuthSupport',
+> +  'data': [ 'cephx', 'none' ] }
+> +
+> +
+> +##
+> +# @RbdAuthMethod:
+> +#
+> +# An enumeration of rados auth_supported types
+> +#
+> +# Since: 2.9
+> +##
+> +{ 'struct': 'RbdAuthMethod',
+> +  'data': { 'auth': 'RbdAuthSupport' } }
+> +
 
-> 
-> thanks
-> -- PMM
-> 
+Any particular reason for wrapping the enum in a struct?  Do you
+envisage adding members to the struct?
+
+>  ##
+>  # @BlockdevOptionsRbd:
+>  #
+> @@ -2681,6 +2703,11 @@
+>  #
+>  # @user:               #optional Ceph id name.
+>  #
+> +# @server:             #optional Monitor host address and port.  This maps
+> +#                      to the "mon_host" Ceph option.
+
+Suggest something like "Monitor addresses", for consistency with how we
+document *SocketAddress members elsewhere, and plural to hint at it
+being a list, not just one.
+
+> +#
+> +# @auth-supported:     #optional Authentication supported.
+> +#
+>  # @password-secret:    #optional The ID of a QCryptoSecret object providing
+>  #                      the password for the login.
+>  #
+> @@ -2692,6 +2719,8 @@
+>              '*conf': 'str',
+>              '*snapshot': 'str',
+>              '*user': 'str',
+> +            '*server': ['InetSocketAddress'],
+> +            '*auth-supported': ['RbdAuthMethod'],
+>              '*password-secret': 'str' } }
+>  
+>  ##
