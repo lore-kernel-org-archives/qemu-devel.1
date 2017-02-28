@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56218)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cieTu-0001gW-33
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 04:54:07 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57832)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1cieZH-0004LN-H3
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 04:59:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cieTp-0000Vq-Pg
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 04:54:06 -0500
-Resent-Message-Id: <E1cieTp-0000Vq-Pg@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21475)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cieTp-0000VT-IY
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 04:54:01 -0500
-In-Reply-To: <1488275176-16613-1-git-send-email-groug@kaod.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148827559687.186.7183496453942617823@0e2666bad730>
+	(envelope-from <pl@kamp.de>) id 1cieZE-0002GU-HN
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 04:59:39 -0500
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:54821 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1cieZE-0002Fh-8H
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 04:59:36 -0500
+References: <1488193394-28453-1-git-send-email-pl@kamp.de>
+	<07ef9e24-a17b-536b-8ef3-9a105cfe6bc6@redhat.com>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <11860d28-91e1-3858-e5f6-4176e9f72816@kamp.de>
+Date: Tue, 28 Feb 2017 10:59:31 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 28 Feb 2017 01:53:17 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 0/3] 9p patches 2018-02-27 for 2.9 soft
- freeze
+In-Reply-To: <07ef9e24-a17b-536b-8ef3-9a105cfe6bc6@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V2] qemu-img: make convert async
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,96 +27,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: groug@kaod.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, aneesh.kumar@linux.vnet.ibm.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, stefanha@gmail.com, ct@flyingcircus.io, mreitz@redhat.com, famz@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ4
-ODI3NTE3Ni0xNjYxMy0xLWdpdC1zZW5kLWVtYWlsLWdyb3VnQGthb2Qub3JnClR5cGU6IHNlcmll
-cwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMC8zXSA5cCBwYXRjaGVzIDIwMTgtMDItMjcg
-Zm9yIDIuOSBzb2Z0IGZyZWV6ZQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFz
-aAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAt
-bCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
-LnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21t
-aXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAk
-Y29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9n
-IC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1l
-bWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAg
-IGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAk
-ZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4
-MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXct
-cHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTQ4ODI3NTE3Ni0xNjYx
-My0xLWdpdC1zZW5kLWVtYWlsLWdyb3VnQGthb2Qub3JnIC0+IHBhdGNoZXcvMTQ4ODI3NTE3Ni0x
-NjYxMy0xLWdpdC1zZW5kLWVtYWlsLWdyb3VnQGthb2Qub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJy
-YW5jaCAndGVzdCcKODAxMDQ4YyB0aHJvdHRsZTogZmFjdG9yIG91dCBkdXBsaWNhdGUgY29kZQph
-MTJkZWUzIGZzZGV2OiBhZGQgSU8gdGhyb3R0bGUgc3VwcG9ydCB0byBmc2RldiBkZXZpY2VzCjZl
-MWNjNGMgOXBmczogZml4IHY5ZnNfbG9jayBlcnJvciBjYXNlCgo9PT0gT1VUUFVUIEJFR0lOID09
-PQpDaGVja2luZyBQQVRDSCAxLzM6IDlwZnM6IGZpeCB2OWZzX2xvY2sgZXJyb3IgY2FzZS4uLgpD
-aGVja2luZyBQQVRDSCAyLzM6IGZzZGV2OiBhZGQgSU8gdGhyb3R0bGUgc3VwcG9ydCB0byBmc2Rl
-diBkZXZpY2VzLi4uCkNoZWNraW5nIFBBVENIIDMvMzogdGhyb3R0bGU6IGZhY3RvciBvdXQgZHVw
-bGljYXRlIGNvZGUuLi4KRVJST1I6IE1hY3JvcyB3aXRoIG11bHRpcGxlIHN0YXRlbWVudHMgc2hv
-dWxkIGJlIGVuY2xvc2VkIGluIGEgZG8gLSB3aGlsZSBsb29wCiMyMzU6IEZJTEU6IGluY2x1ZGUv
-cWVtdS90aHJvdHRsZS1vcHRpb25zLmg6MTM6CisjZGVmaW5lIFRIUk9UVExFX09QVFMgXAorICAg
-ICAgICAgIHsgXAorICAgICAgICAgICAgLm5hbWUgPSAidGhyb3R0bGluZy5pb3BzLXRvdGFsIixc
-CisgICAgICAgICAgICAudHlwZSA9IFFFTVVfT1BUX05VTUJFUixcCisgICAgICAgICAgICAuaGVs
-cCA9ICJsaW1pdCB0b3RhbCBJL08gb3BlcmF0aW9ucyBwZXIgc2Vjb25kIixcCisgICAgICAgIH0s
-eyBcCisgICAgICAgICAgICAubmFtZSA9ICJ0aHJvdHRsaW5nLmlvcHMtcmVhZCIsXAorICAgICAg
-ICAgICAgLnR5cGUgPSBRRU1VX09QVF9OVU1CRVIsXAorICAgICAgICAgICAgLmhlbHAgPSAibGlt
-aXQgcmVhZCBvcGVyYXRpb25zIHBlciBzZWNvbmQiLFwKKyAgICAgICAgfSx7IFwKKyAgICAgICAg
-ICAgIC5uYW1lID0gInRocm90dGxpbmcuaW9wcy13cml0ZSIsXAorICAgICAgICAgICAgLnR5cGUg
-PSBRRU1VX09QVF9OVU1CRVIsXAorICAgICAgICAgICAgLmhlbHAgPSAibGltaXQgd3JpdGUgb3Bl
-cmF0aW9ucyBwZXIgc2Vjb25kIixcCisgICAgICAgIH0seyBcCisgICAgICAgICAgICAubmFtZSA9
-ICJ0aHJvdHRsaW5nLmJwcy10b3RhbCIsXAorICAgICAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9O
-VU1CRVIsXAorICAgICAgICAgICAgLmhlbHAgPSAibGltaXQgdG90YWwgYnl0ZXMgcGVyIHNlY29u
-ZCIsXAorICAgICAgICB9LHsgXAorICAgICAgICAgICAgLm5hbWUgPSAidGhyb3R0bGluZy5icHMt
-cmVhZCIsXAorICAgICAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9OVU1CRVIsXAorICAgICAgICAg
-ICAgLmhlbHAgPSAibGltaXQgcmVhZCBieXRlcyBwZXIgc2Vjb25kIixcCisgICAgICAgIH0seyBc
-CisgICAgICAgICAgICAubmFtZSA9ICJ0aHJvdHRsaW5nLmJwcy13cml0ZSIsXAorICAgICAgICAg
-ICAgLnR5cGUgPSBRRU1VX09QVF9OVU1CRVIsXAorICAgICAgICAgICAgLmhlbHAgPSAibGltaXQg
-d3JpdGUgYnl0ZXMgcGVyIHNlY29uZCIsXAorICAgICAgICB9LHsgXAorICAgICAgICAgICAgLm5h
-bWUgPSAidGhyb3R0bGluZy5pb3BzLXRvdGFsLW1heCIsXAorICAgICAgICAgICAgLnR5cGUgPSBR
-RU1VX09QVF9OVU1CRVIsXAorICAgICAgICAgICAgLmhlbHAgPSAiSS9PIG9wZXJhdGlvbnMgYnVy
-c3QiLFwKKyAgICAgICAgfSx7IFwKKyAgICAgICAgICAgIC5uYW1lID0gInRocm90dGxpbmcuaW9w
-cy1yZWFkLW1heCIsXAorICAgICAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9OVU1CRVIsXAorICAg
-ICAgICAgICAgLmhlbHAgPSAiSS9PIG9wZXJhdGlvbnMgcmVhZCBidXJzdCIsXAorICAgICAgICB9
-LHsgXAorICAgICAgICAgICAgLm5hbWUgPSAidGhyb3R0bGluZy5pb3BzLXdyaXRlLW1heCIsXAor
-ICAgICAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9OVU1CRVIsXAorICAgICAgICAgICAgLmhlbHAg
-PSAiSS9PIG9wZXJhdGlvbnMgd3JpdGUgYnVyc3QiLFwKKyAgICAgICAgfSx7IFwKKyAgICAgICAg
-ICAgIC5uYW1lID0gInRocm90dGxpbmcuYnBzLXRvdGFsLW1heCIsXAorICAgICAgICAgICAgLnR5
-cGUgPSBRRU1VX09QVF9OVU1CRVIsXAorICAgICAgICAgICAgLmhlbHAgPSAidG90YWwgYnl0ZXMg
-YnVyc3QiLFwKKyAgICAgICAgfSx7IFwKKyAgICAgICAgICAgIC5uYW1lID0gInRocm90dGxpbmcu
-YnBzLXJlYWQtbWF4IixcCisgICAgICAgICAgICAudHlwZSA9IFFFTVVfT1BUX05VTUJFUixcCisg
-ICAgICAgICAgICAuaGVscCA9ICJ0b3RhbCBieXRlcyByZWFkIGJ1cnN0IixcCisgICAgICAgIH0s
-eyBcCisgICAgICAgICAgICAubmFtZSA9ICJ0aHJvdHRsaW5nLmJwcy13cml0ZS1tYXgiLFwKKyAg
-ICAgICAgICAgIC50eXBlID0gUUVNVV9PUFRfTlVNQkVSLFwKKyAgICAgICAgICAgIC5oZWxwID0g
-InRvdGFsIGJ5dGVzIHdyaXRlIGJ1cnN0IixcCisgICAgICAgIH0seyBcCisgICAgICAgICAgICAu
-bmFtZSA9ICJ0aHJvdHRsaW5nLmlvcHMtdG90YWwtbWF4LWxlbmd0aCIsXAorICAgICAgICAgICAg
-LnR5cGUgPSBRRU1VX09QVF9OVU1CRVIsXAorICAgICAgICAgICAgLmhlbHAgPSAibGVuZ3RoIG9m
-IHRoZSBpb3BzLXRvdGFsLW1heCBidXJzdCBwZXJpb2QsIGluIHNlY29uZHMiLFwKKyAgICAgICAg
-fSx7IFwKKyAgICAgICAgICAgIC5uYW1lID0gInRocm90dGxpbmcuaW9wcy1yZWFkLW1heC1sZW5n
-dGgiLFwKKyAgICAgICAgICAgIC50eXBlID0gUUVNVV9PUFRfTlVNQkVSLFwKKyAgICAgICAgICAg
-IC5oZWxwID0gImxlbmd0aCBvZiB0aGUgaW9wcy1yZWFkLW1heCBidXJzdCBwZXJpb2QsIGluIHNl
-Y29uZHMiLFwKKyAgICAgICAgfSx7IFwKKyAgICAgICAgICAgIC5uYW1lID0gInRocm90dGxpbmcu
-aW9wcy13cml0ZS1tYXgtbGVuZ3RoIixcCisgICAgICAgICAgICAudHlwZSA9IFFFTVVfT1BUX05V
-TUJFUixcCisgICAgICAgICAgICAuaGVscCA9ICJsZW5ndGggb2YgdGhlIGlvcHMtd3JpdGUtbWF4
-IGJ1cnN0IHBlcmlvZCwgaW4gc2Vjb25kcyIsXAorICAgICAgICB9LHsgXAorICAgICAgICAgICAg
-Lm5hbWUgPSAidGhyb3R0bGluZy5icHMtdG90YWwtbWF4LWxlbmd0aCIsXAorICAgICAgICAgICAg
-LnR5cGUgPSBRRU1VX09QVF9OVU1CRVIsXAorICAgICAgICAgICAgLmhlbHAgPSAibGVuZ3RoIG9m
-IHRoZSBicHMtdG90YWwtbWF4IGJ1cnN0IHBlcmlvZCwgaW4gc2Vjb25kcyIsXAorICAgICAgICB9
-LHsgXAorICAgICAgICAgICAgLm5hbWUgPSAidGhyb3R0bGluZy5icHMtcmVhZC1tYXgtbGVuZ3Ro
-IixcCisgICAgICAgICAgICAudHlwZSA9IFFFTVVfT1BUX05VTUJFUixcCisgICAgICAgICAgICAu
-aGVscCA9ICJsZW5ndGggb2YgdGhlIGJwcy1yZWFkLW1heCBidXJzdCBwZXJpb2QsIGluIHNlY29u
-ZHMiLFwKKyAgICAgICAgfSx7IFwKKyAgICAgICAgICAgIC5uYW1lID0gInRocm90dGxpbmcuYnBz
-LXdyaXRlLW1heC1sZW5ndGgiLFwKKyAgICAgICAgICAgIC50eXBlID0gUUVNVV9PUFRfTlVNQkVS
-LFwKKyAgICAgICAgICAgIC5oZWxwID0gImxlbmd0aCBvZiB0aGUgYnBzLXdyaXRlLW1heCBidXJz
-dCBwZXJpb2QsIGluIHNlY29uZHMiLFwKKyAgICAgICAgfSx7IFwKKyAgICAgICAgICAgIC5uYW1l
-ID0gInRocm90dGxpbmcuaW9wcy1zaXplIixcCisgICAgICAgICAgICAudHlwZSA9IFFFTVVfT1BU
-X05VTUJFUixcCisgICAgICAgICAgICAuaGVscCA9ICJ3aGVuIGxpbWl0aW5nIGJ5IGlvcHMgbWF4
-IHNpemUgb2YgYW4gSS9PIGluIGJ5dGVzIixcCisgICAgICAgIH0KCnRvdGFsOiAxIGVycm9ycywg
-MCB3YXJuaW5ncywgMjgwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
-ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
-aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
-QUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRo
-IGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBb
-aHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
-dy1kZXZlbEBmcmVlbGlzdHMub3Jn
+Am 27.02.2017 um 22:09 schrieb Eric Blake:
+> On 02/27/2017 05:03 AM, Peter Lieven wrote:
+>> the convert process is currently completely implemented with sync operations.
+>> That means it reads one buffer and then writes it. No parallelism and each sync
+>> request takes as long as it takes until it is completed.
+>>
+>> This patches introduces 2 new cmdline parameters. The -m parameter to specify
+>> the number of coroutines running in parallel (defaults to 8). And the -W paremeter to
+> s/paremeter/parameter/
+>
+>> allow qemu-img to write to the target out of order rather than sequential. This improves
+>> performance as the writes do not have to wait for each other to complete.
+>>
+>> Signed-off-by: Peter Lieven <pl@kamp.de>
+>> ---
+>> @@ -1798,7 +1908,7 @@ static int img_convert(int argc, char **argv)
+>>               {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
+>>               {0, 0, 0, 0}
+>>           };
+>> -        c = getopt_long(argc, argv, "hf:O:B:ce6o:s:l:S:pt:T:qn",
+>> +        c = getopt_long(argc, argv, "hf:O:B:ce6o:s:l:S:pt:T:qnm:W",
+>>                           long_options, NULL);
+>>           if (c == -1) {
+>>               break;
+>> @@ -1890,6 +2000,18 @@ static int img_convert(int argc, char **argv)
+>>           case 'n':
+>>               skip_create = 1;
+>>               break;
+>> +        case 'm':
+>> +            num_coroutines = atoi(optarg);
+> atoi() should be avoided. It has no error checking, so it treats '-m 1'
+> and '-m 1k' identically.  You are a bit justified in that '-m junk' gets
+> treated like '-m 0' and rejected, but it's still a poor error message in
+> that case.
+
+would you use qemu_strtoul or parse_uint instead?
+
+Kevin, shall I send a V3?
+
+Peter
