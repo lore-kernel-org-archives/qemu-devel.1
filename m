@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cikK1-0005wu-5e
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:08:18 -0500
+	(envelope-from <bobby.prani@gmail.com>) id 1cikLQ-0007FR-2F
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:09:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cikJw-0007km-7M
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:08:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43624)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cikJw-0007kb-1K
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:08:12 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4C1147E9D1
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 16:08:12 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <1488145424-14974-1-git-send-email-armbru@redhat.com>
-	<1488145424-14974-20-git-send-email-armbru@redhat.com>
-	<c4df7917-1081-9fce-7bec-28a1467e88e1@redhat.com>
-Date: Tue, 28 Feb 2017 17:08:09 +0100
-In-Reply-To: <c4df7917-1081-9fce-7bec-28a1467e88e1@redhat.com> (Eric Blake's
-	message of "Tue, 28 Feb 2017 09:44:55 -0600")
-Message-ID: <87y3wqnvrq.fsf@dusky.pond.sub.org>
+	(envelope-from <bobby.prani@gmail.com>) id 1cikLO-00083Z-VR
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:09:44 -0500
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:35672)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1cikLO-00083U-OQ
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:09:42 -0500
+Received: by mail-oi0-x242.google.com with SMTP id z13so1168945oig.2
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 08:09:42 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 19/26] test-string-input-visitor: Tear
- down existing test automatically
+Sender: bobby.prani@gmail.com
+In-Reply-To: <4e9eeab8-faca-b6ba-d53e-a8fbf5848c0f@msgid.tls.msk.ru>
+References: <1488277840-18608-1-git-send-email-groug@kaod.org>
+	<2a8da4e5-d66d-502c-322b-ec942f250f40@msgid.tls.msk.ru>
+	<20170228152240.6efc1fbc@bahia.lan>
+	<4e9eeab8-faca-b6ba-d53e-a8fbf5848c0f@msgid.tls.msk.ru>
+From: Pranith Kumar <bobby.prani+qemu@gmail.com>
+Date: Tue, 28 Feb 2017 11:09:11 -0500
+Message-ID: <CAJhHMCAWFy4o4br265CXq65rUPafKgxqX_dX+mBTErvqfA0pNA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 00/28] 9p CVE-2016-9602 fixes 2017-02-28 for
+ 2.9 soft freeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,31 +33,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Michael Tokarev <mjt@tls.msk.ru>
+Cc: Greg Kurz <groug@kaod.org>, qemu-devel <qemu-devel@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
-
-> On 02/26/2017 03:43 PM, Markus Armbruster wrote:
->> Call visitor_input_teardown() from visitor_input_test_init(), so you
->> don't have to call it from the actial tests.
+On Tue, Feb 28, 2017 at 9:55 AM, Michael Tokarev <mjt@tls.msk.ru> wrote:
+>>
+>> https://github.com/gkurz/qemu/commits/cve-2016-9602-for-upstream
+>> https://github.com/gkurz/qemu/commit/c23d5f1d5bc0e23aeb845b1af8f996f16783ce98
 >
-> s/actial/actual/
-
-Will fix!
-
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  tests/test-string-input-visitor.c | 19 ++-----------------
->>  1 file changed, 2 insertions(+), 17 deletions(-)
->> 
+> Interesting. Perhaps I've never worked with github before.
+> It works when referring to particular commit like this.
+> but the tag isn't visible in github UI, and neither the
+> tag nor this commit ID is visible when cloning github
+> repository locally. I wonder where's that.
 >
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+> $ git remote -v | grep gkurz
+> gkurz   git://github.com/gkurz/qemu.git (fetch)
+> gkurz   git://github.com/gkurz/qemu.git (push)
+> $ git remote update gkurz
+> Fetching gkurz
+> $ git show c23d5f1d5bc0e23aeb845b1af8f996f16783ce98
+> fatal: bad object c23d5f1d5bc0e23aeb845b1af8f996f16783ce98
+> $ git show cve-2016-9602-for-upstream --
+> fatal: bad revision 'cve-2016-9602-for-upstream'
 >
-> I tested this one under valgrind to ensure no weird memory issues
-> cropped up, so you can also add:
+> that's now.  I'll dig into that later, there's apparently
+> nothing wrong on your side, I'm sorry for the noise.
 >
-> Tested-by: Eric Blake <eblake@redhat.com>
 
-Thanks!
+I think the answer is given here:
+https://eddiemoya.com/2013/02/21/better-git-git-fetch-not-getting-tags/
+
+You have to explicitly fetch the tags using 'git fetch -t gkurz' to
+get the tags which are not direct references to a commit.
+
+$ git remote update gkurz
+Fetching gkurz
+>From https://github.com/gkurz/qemu
+ * [new branch]            9p-attr-fixes         -> gkurz/9p-attr-fixes
+ * [new branch]            9p-cleanup            -> gkurz/9p-cleanup
+ * [new branch]            9p-fix                -> gkurz/9p-fix
+ * [new branch]            9p-next               -> gkurz/9p-next
+ * [new branch]            9p-proxy              -> gkurz/9p-proxy
+ * [new branch]            9p-security           -> gkurz/9p-security
+ * [new branch]            9p-symlink            -> gkurz/9p-symlink
+ * [new branch]            9p-tests              -> gkurz/9p-tests
+ * [new branch]            ppc-vcpu-dt-id-rework -> gkurz/ppc-vcpu-dt-id-rework
+
+$ git fetch -t gkurz
+remote: Counting objects: 155, done.
+remote: Compressing objects: 100% (145/145), done.
+remote: Total 155 (delta 126), reused 8 (delta 8), pack-reused 2
+Receiving objects: 100% (155/155), 41.89 KiB | 0 bytes/s, done.
+Resolving deltas: 100% (126/126), completed with 6 local objects.
+>From https://github.com/gkurz/qemu
+ * [new tag]               cve-2016-9602-for-upstream ->
+cve-2016-9602-for-upstream
+ t [tag update]            for-upstream               -> for-upstream
+ t [tag update]            for_anthony                -> for_anthony
+
+
+Thanks,
+--
+Pranith
