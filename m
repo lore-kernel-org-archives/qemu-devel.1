@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cihJK-0004WT-TH
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:55:25 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cihJP-0004bU-HD
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:55:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cihJJ-0004Gp-HF
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:55:23 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cihJO-0004M1-P6
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:55:27 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 28 Feb 2017 13:54:05 +0100
-Message-Id: <1488286469-9381-21-git-send-email-kwolf@redhat.com>
+Date: Tue, 28 Feb 2017 13:54:11 +0100
+Message-Id: <1488286469-9381-27-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
 References: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 20/44] blockjob: Add permissions to
- block_job_create()
+Subject: [Qemu-devel] [PATCH v3 26/44] commit: Use real permissions for HMP
+ 'commit'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,164 +23,85 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-This functions creates a BlockBackend internally, so the block jobs need
-to tell it what they want to do with the BB.
+This is a little simpler than the commit block job because it's
+synchronous and only commits into the immediate backing file, but
+otherwise doing more or less the same.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/backup.c               | 5 +++--
- block/commit.c               | 5 +++--
- block/mirror.c               | 5 +++--
- block/stream.c               | 5 +++--
- blockjob.c                   | 6 +++---
- include/block/blockjob_int.h | 4 +++-
- tests/test-blockjob-txn.c    | 6 +++---
- tests/test-blockjob.c        | 5 +++--
- 8 files changed, 24 insertions(+), 17 deletions(-)
+ block/commit.c | 33 +++++++++++++++++++++++++++------
+ 1 file changed, 27 insertions(+), 6 deletions(-)
 
-diff --git a/block/backup.c b/block/backup.c
-index f38d1d0..c759684 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -618,8 +618,9 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-         goto error;
-     }
- 
--    job = block_job_create(job_id, &backup_job_driver, bs, speed,
--                           creation_flags, cb, opaque, errp);
-+    /* FIXME Use real permissions */
-+    job = block_job_create(job_id, &backup_job_driver, bs, 0, BLK_PERM_ALL,
-+                           speed, creation_flags, cb, opaque, errp);
-     if (!job) {
-         goto error;
-     }
 diff --git a/block/commit.c b/block/commit.c
-index 2ad8138..60d29a9 100644
+index 8de4473..f18026b 100644
 --- a/block/commit.c
 +++ b/block/commit.c
-@@ -235,8 +235,9 @@ void commit_start(const char *job_id, BlockDriverState *bs,
-         return;
-     }
- 
--    s = block_job_create(job_id, &commit_job_driver, bs, speed,
--                         BLOCK_JOB_DEFAULT, NULL, NULL, errp);
-+    /* FIXME Use real permissions */
-+    s = block_job_create(job_id, &commit_job_driver, bs, 0, BLK_PERM_ALL,
-+                         speed, BLOCK_JOB_DEFAULT, NULL, NULL, errp);
-     if (!s) {
-         return;
-     }
-diff --git a/block/mirror.c b/block/mirror.c
-index 7eeeb97..cd4e7db 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1015,8 +1015,9 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
-         buf_size = DEFAULT_MIRROR_BUF_SIZE;
-     }
- 
--    s = block_job_create(job_id, driver, bs, speed, creation_flags,
--                         cb, opaque, errp);
-+    /* FIXME Use real permissions */
-+    s = block_job_create(job_id, driver, bs, 0, BLK_PERM_ALL, speed,
-+                         creation_flags, cb, opaque, errp);
-     if (!s) {
-         return;
-     }
-diff --git a/block/stream.c b/block/stream.c
-index 1523ba7..7f49279 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -229,8 +229,9 @@ void stream_start(const char *job_id, BlockDriverState *bs,
-     BlockDriverState *iter;
-     int orig_bs_flags;
- 
--    s = block_job_create(job_id, &stream_job_driver, bs, speed,
--                         BLOCK_JOB_DEFAULT, NULL, NULL, errp);
-+    /* FIXME Use real permissions */
-+    s = block_job_create(job_id, &stream_job_driver, bs, 0, BLK_PERM_ALL,
-+                         speed, BLOCK_JOB_DEFAULT, NULL, NULL, errp);
-     if (!s) {
-         return;
-     }
-diff --git a/blockjob.c b/blockjob.c
-index 72b7d4c..27833c7 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -123,7 +123,8 @@ void block_job_add_bdrv(BlockJob *job, BlockDriverState *bs)
- }
- 
- void *block_job_create(const char *job_id, const BlockJobDriver *driver,
--                       BlockDriverState *bs, int64_t speed, int flags,
-+                       BlockDriverState *bs, uint64_t perm,
-+                       uint64_t shared_perm, int64_t speed, int flags,
-                        BlockCompletionFunc *cb, void *opaque, Error **errp)
+@@ -401,11 +401,14 @@ fail:
+ int bdrv_commit(BlockDriverState *bs)
  {
-     BlockBackend *blk;
-@@ -160,8 +161,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+     BlockBackend *src, *backing;
++    BlockDriverState *backing_file_bs = NULL;
++    BlockDriverState *commit_top_bs = NULL;
+     BlockDriver *drv = bs->drv;
+     int64_t sector, total_sectors, length, backing_length;
+     int n, ro, open_flags;
+     int ret = 0;
+     uint8_t *buf = NULL;
++    Error *local_err = NULL;
+ 
+     if (!drv)
+         return -ENOMEDIUM;
+@@ -428,17 +431,31 @@ int bdrv_commit(BlockDriverState *bs)
          }
      }
  
 -    /* FIXME Use real permissions */
--    blk = blk_new(0, BLK_PERM_ALL);
-+    blk = blk_new(perm, shared_perm);
-     ret = blk_insert_bs(blk, bs, errp);
+-    src = blk_new(0, BLK_PERM_ALL);
+-    backing = blk_new(0, BLK_PERM_ALL);
++    src = blk_new(BLK_PERM_CONSISTENT_READ, BLK_PERM_ALL);
++    backing = blk_new(BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
+ 
+-    ret = blk_insert_bs(src, bs, NULL);
++    ret = blk_insert_bs(src, bs, &local_err);
      if (ret < 0) {
-         blk_unref(blk);
-diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-index 8223822..3f86cc5 100644
---- a/include/block/blockjob_int.h
-+++ b/include/block/blockjob_int.h
-@@ -119,6 +119,7 @@ struct BlockJobDriver {
-  * generated automatically.
-  * @job_type: The class object for the newly-created job.
-  * @bs: The block
-+ * @perm, @shared_perm: Permissions to request for @bs
-  * @speed: The maximum speed, in bytes per second, or 0 for unlimited.
-  * @cb: Completion function for the job.
-  * @opaque: Opaque pointer value passed to @cb.
-@@ -134,7 +135,8 @@ struct BlockJobDriver {
-  * called from a wrapper that is specific to the job type.
-  */
- void *block_job_create(const char *job_id, const BlockJobDriver *driver,
--                       BlockDriverState *bs, int64_t speed, int flags,
-+                       BlockDriverState *bs, uint64_t perm,
-+                       uint64_t shared_perm, int64_t speed, int flags,
-                        BlockCompletionFunc *cb, void *opaque, Error **errp);
++        error_report_err(local_err);
++        goto ro_cleanup;
++    }
++
++    /* Insert commit_top block node above backing, so we can write to it */
++    backing_file_bs = backing_bs(bs);
++
++    commit_top_bs = bdrv_new_open_driver(&bdrv_commit_top, NULL, BDRV_O_RDWR,
++                                         &local_err);
++    if (commit_top_bs == NULL) {
++        error_report_err(local_err);
+         goto ro_cleanup;
+     }
  
- /**
-diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
-index f6dfd08..4ccbda1 100644
---- a/tests/test-blockjob-txn.c
-+++ b/tests/test-blockjob-txn.c
-@@ -101,9 +101,9 @@ static BlockJob *test_block_job_start(unsigned int iterations,
-     g_assert_nonnull(bs);
+-    ret = blk_insert_bs(backing, bs->backing->bs, NULL);
++    bdrv_set_backing_hd(commit_top_bs, backing_file_bs);
++    bdrv_set_backing_hd(bs, commit_top_bs);
++
++    ret = blk_insert_bs(backing, backing_file_bs, &local_err);
+     if (ret < 0) {
++        error_report_err(local_err);
+         goto ro_cleanup;
+     }
  
-     snprintf(job_id, sizeof(job_id), "job%u", counter++);
--    s = block_job_create(job_id, &test_block_job_driver, bs, 0,
--                         BLOCK_JOB_DEFAULT, test_block_job_cb,
--                         data, &error_abort);
-+    s = block_job_create(job_id, &test_block_job_driver, bs,
-+                         0, BLK_PERM_ALL, 0, BLOCK_JOB_DEFAULT,
-+                         test_block_job_cb, data, &error_abort);
-     s->iterations = iterations;
-     s->use_timer = use_timer;
-     s->rc = rc;
-diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
-index 143ce96..1afe17b 100644
---- a/tests/test-blockjob.c
-+++ b/tests/test-blockjob.c
-@@ -30,8 +30,9 @@ static BlockJob *do_test_id(BlockBackend *blk, const char *id,
-     BlockJob *job;
-     Error *errp = NULL;
+@@ -512,8 +529,12 @@ int bdrv_commit(BlockDriverState *bs)
+ ro_cleanup:
+     qemu_vfree(buf);
  
--    job = block_job_create(id, &test_block_job_driver, blk_bs(blk), 0,
--                           BLOCK_JOB_DEFAULT, block_job_cb, NULL, &errp);
-+    job = block_job_create(id, &test_block_job_driver, blk_bs(blk),
-+                           0, BLK_PERM_ALL, 0, BLOCK_JOB_DEFAULT, block_job_cb,
-+                           NULL, &errp);
-     if (should_succeed) {
-         g_assert_null(errp);
-         g_assert_nonnull(job);
+-    blk_unref(src);
+     blk_unref(backing);
++    if (backing_file_bs) {
++        bdrv_set_backing_hd(bs, backing_file_bs);
++    }
++    bdrv_unref(commit_top_bs);
++    blk_unref(src);
+ 
+     if (ro) {
+         /* ignoring error return here */
 -- 
 1.8.3.1
