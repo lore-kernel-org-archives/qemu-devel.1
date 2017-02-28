@@ -1,19 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38806)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cik3d-0008MS-4Y
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:51:22 -0500
+	(envelope-from <eblake@redhat.com>) id 1cik7U-0003Zd-NK
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:55:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cik3b-0001f5-TS
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:51:21 -0500
-From: Jeff Cody <jcody@redhat.com>
-Date: Tue, 28 Feb 2017 10:51:07 -0500
-Message-Id: <7f62442524e9b3e5c129d1d10fe01c41a0e0d4ff.1488296634.git.jcody@redhat.com>
-In-Reply-To: <cover.1488296634.git.jcody@redhat.com>
-References: <cover.1488296634.git.jcody@redhat.com>
-In-Reply-To: <cover.1488296634.git.jcody@redhat.com>
-References: <cover.1488296634.git.jcody@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 5/5] block/rbd: add support for 'mon_host',
- 'auth_supported' via QAPI
+	(envelope-from <eblake@redhat.com>) id 1cik7O-00031x-FX
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:55:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56712)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cik7O-00031q-7W
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:55:14 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 43BB091C3E
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 15:55:14 +0000 (UTC)
+References: <1488145424-14974-1-git-send-email-armbru@redhat.com>
+	<1488145424-14974-22-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <aa12f2f1-7ff3-d58f-011d-25be93722d0e@redhat.com>
+Date: Tue, 28 Feb 2017 09:55:11 -0600
+MIME-Version: 1.0
+In-Reply-To: <1488145424-14974-22-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="dkXnX3heOk2gGRibLF958Du1iTwJ1Kr1q"
+Subject: Re: [Qemu-devel] [PATCH v2 21/26] tests: Cover partial input visit
+ of list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,258 +35,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, stefanha@redhat.com, armbru@redhat.com, berrange@redhat.com, eblake@redhat.com
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
-This adds support for three additional options that may be specified
-by QAPI in blockdev-add:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--dkXnX3heOk2gGRibLF958Du1iTwJ1Kr1q
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <aa12f2f1-7ff3-d58f-011d-25be93722d0e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 21/26] tests: Cover partial input visit of
+ list
+References: <1488145424-14974-1-git-send-email-armbru@redhat.com>
+ <1488145424-14974-22-git-send-email-armbru@redhat.com>
+In-Reply-To: <1488145424-14974-22-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-    server: host, port
-    auth method: either 'cephx' or 'none'
+On 02/26/2017 03:43 PM, Markus Armbruster wrote:
+> Demonstrates a design flaw: there is no way to for input visitors to
+> report that a list visit didn't visit the complete input list.  The
+> generated list visits always do, but manual visits needn't.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  tests/test-opts-visitor.c          | 41 ++++++++++++++++++++++++++++++=
++++++
+>  tests/test-qobject-input-visitor.c | 44 ++++++++++++++++++++++++++++++=
+++++++++
+>  tests/test-string-input-visitor.c  | 22 +++++++++++++++++++
+>  3 files changed, 107 insertions(+)
+>=20
 
-The "server" and "auth-supported" QAPI parameters are arrays.  To conform
-with the rados API, the array items are join as a single string with a ';'
-character as a delimiter when setting the configuration values.
+> =20
+> +static void
+> +test_opts_range_unvisited(void)
+> +{
+> +    intList *list =3D NULL;
+> +    intList *tail;
+> +    QemuOpts *opts;
+> +    Visitor *v;
+> +
+> +    opts =3D qemu_opts_parse(qemu_find_opts("userdef"), "ilist=3D0-2",=
+ false,
+> +                           &error_abort);
+> +
+> +    v =3D opts_visitor_new(opts);
+> +
+> +    visit_start_struct(v, NULL, NULL, 0, &error_abort);
+> +
+> +    /* Would be simpler if the visitor genuinely supported virtual wal=
+ks */
+> +    visit_start_list(v, "ilist", (GenericList **)&list, sizeof(*list),=
 
-Signed-off-by: Jeff Cody <jcody@redhat.com>
----
- block/rbd.c          | 134 +++++++++++++++++++++++++++++++++++++++++++++++++++
- qapi/block-core.json |  29 +++++++++++
- 2 files changed, 163 insertions(+)
+> +                     &error_abort);
 
-diff --git a/block/rbd.c b/block/rbd.c
-index cc43f42..8b039fa 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -405,6 +405,19 @@ static QemuOptsList runtime_opts = {
-             .type = QEMU_OPT_STRING,
-             .help = "Legacy rados key/value option parameters",
-         },
-+        {
-+            .name = "host",
-+            .type = QEMU_OPT_STRING,
-+        },
-+        {
-+            .name = "port",
-+            .type = QEMU_OPT_STRING,
-+        },
-+        {
-+            .name = "auth",
-+            .type = QEMU_OPT_STRING,
-+            .help = "Supported authentication method, either cephx or none",
-+        },
-         { /* end of list */ }
-     },
- };
-@@ -565,6 +578,93 @@ static void qemu_rbd_complete_aio(RADOSCB *rcb)
-     qemu_aio_unref(acb);
- }
- 
-+#define RBD_MON_HOST          0
-+#define RBD_AUTH_SUPPORTED    1
-+
-+static char *qemu_rbd_array_opts(QDict *options, const char *prefix, int type,
-+                                 Error **errp)
-+{
-+    int num_entries;
-+    QemuOpts *opts = NULL;
-+    QDict *sub_options;
-+    const char *host;
-+    const char *port;
-+    char *str;
-+    char *rados_str = NULL;
-+    Error *local_err = NULL;
-+
-+    assert(type == RBD_MON_HOST || type == RBD_AUTH_SUPPORTED);
-+
-+    num_entries = qdict_array_entries(options, prefix);
-+
-+    if (num_entries < 0) {
-+        error_setg(errp, "Parse error on RBD QDict array");
-+        return NULL;
-+    }
-+
-+    for (int i = 0; i < num_entries; i++) {
-+        char *strbuf = NULL;
-+        const char *value;
-+        char *rados_str_tmp;
-+
-+        str = g_strdup_printf("%s%d.", prefix, i);
-+        qdict_extract_subqdict(options, &sub_options, str);
-+        g_free(str);
-+
-+        opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
-+        qemu_opts_absorb_qdict(opts, sub_options, &local_err);
-+        QDECREF(sub_options);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            g_free(rados_str);
-+            rados_str = NULL;
-+            goto exit;
-+        }
-+
-+        if (type == RBD_MON_HOST) {
-+            host = qemu_opt_get(opts, "host");
-+            port = qemu_opt_get(opts, "port");
-+
-+            value = host;
-+            if (port) {
-+                /* check for ipv6 */
-+                if (strchr(host, ':')) {
-+                    strbuf = g_strdup_printf("[%s]:%s", host, port);
-+                } else {
-+                    strbuf = g_strdup_printf("%s:%s", host, port);
-+                }
-+                value = strbuf;
-+            } else if (strchr(host, ':')) {
-+                strbuf = g_strdup_printf("[%s]", host);
-+                value = strbuf;
-+            }
-+        } else {
-+            value = qemu_opt_get(opts, "auth");
-+        }
-+
-+
-+        /* each iteration in the for loop will build upon the string, and if
-+         * rados_str is NULL then it is our first pass */
-+        if (rados_str) {
-+            /* separate options with ';', as that  is what rados_conf_set()
-+             * requires */
-+            rados_str_tmp = rados_str;
-+            rados_str = g_strdup_printf("%s;%s", rados_str_tmp, value);
-+            g_free(rados_str_tmp);
-+        } else {
-+            rados_str = g_strdup(value);
-+        }
-+
-+        g_free(strbuf);
-+        qemu_opts_del(opts);
-+        opts = NULL;
-+    }
-+
-+exit:
-+    qemu_opts_del(opts);
-+    return rados_str;
-+}
-+
- static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-                          Error **errp)
- {
-@@ -573,6 +673,8 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-     const char *secretid;
-     QemuOpts *opts;
-     Error *local_err = NULL;
-+    char *mon_host = NULL;
-+    char *auth_supported = NULL;
-     int r;
- 
-     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
-@@ -583,6 +685,22 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-         return -EINVAL;
-     }
- 
-+    auth_supported = qemu_rbd_array_opts(options, "auth-supported.",
-+                                         RBD_AUTH_SUPPORTED, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        r = -EINVAL;
-+        goto failed_opts;
-+    }
-+
-+    mon_host = qemu_rbd_array_opts(options, "server.",
-+                                   RBD_MON_HOST, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        r = -EINVAL;
-+        goto failed_opts;
-+    }
-+
-     secretid = qemu_opt_get(opts, "password-secret");
- 
-     pool           = qemu_opt_get(opts, "pool");
-@@ -615,6 +733,20 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-         goto failed_shutdown;
-     }
- 
-+    if (mon_host) {
-+        r = rados_conf_set(s->cluster, "mon_host", mon_host);
-+        if (r < 0) {
-+            goto failed_shutdown;
-+        }
-+    }
-+
-+    if (auth_supported) {
-+        r = rados_conf_set(s->cluster, "auth_supported", auth_supported);
-+        if (r < 0) {
-+            goto failed_shutdown;
-+        }
-+    }
-+
-     if (qemu_rbd_set_auth(s->cluster, secretid, errp) < 0) {
-         r = -EIO;
-         goto failed_shutdown;
-@@ -663,6 +795,8 @@ failed_shutdown:
-     g_free(s->snap);
- failed_opts:
-     qemu_opts_del(opts);
-+    g_free(mon_host);
-+    g_free(auth_supported);
-     return r;
- }
- 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 803edc3..2e01a95 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2666,6 +2666,28 @@
-             '*header-digest': 'IscsiHeaderDigest',
-             '*timeout': 'int' } }
- 
-+
-+##
-+# @RbdAuthSupport:
-+#
-+# An enumeration of RBD auth support
-+#
-+# Since: 2.9
-+##
-+{ 'enum': 'RbdAuthSupport',
-+  'data': [ 'cephx', 'none' ] }
-+
-+
-+##
-+# @RbdAuthMethod:
-+#
-+# An enumeration of rados auth_supported types
-+#
-+# Since: 2.9
-+##
-+{ 'struct': 'RbdAuthMethod',
-+  'data': { 'auth': 'RbdAuthSupport' } }
-+
- ##
- # @BlockdevOptionsRbd:
- #
-@@ -2681,6 +2703,11 @@
- #
- # @user:               #optional Ceph id name.
- #
-+# @server:             #optional Monitor host address and port.  This maps
-+#                      to the "mon_host" Ceph option.
-+#
-+# @auth-supported:     #optional Authentication supported.
-+#
- # @password-secret:    #optional The ID of a QCryptoSecret object providing
- #                      the password for the login.
- #
-@@ -2692,6 +2719,8 @@
-             '*conf': 'str',
-             '*snapshot': 'str',
-             '*user': 'str',
-+            '*server': ['InetSocketAddress'],
-+            '*auth-supported': ['RbdAuthMethod'],
-             '*password-secret': 'str' } }
- 
- ##
--- 
-2.9.3
+Although the complexity of adding virtual walks to the string visitor
+may not be worth the effort.
+
+> +++ b/tests/test-qobject-input-visitor.c
+> @@ -923,6 +923,46 @@ static void test_visitor_in_fail_struct_missing(Te=
+stInputVisitorData *data,
+>      visit_end_struct(v, NULL);
+>  }
+> =20
+> +static void test_visitor_in_fail_list(TestInputVisitorData *data,
+> +                                      const void *unused)
+> +{
+> +    int64_t i64 =3D -1;
+> +    Visitor *v;
+> +
+> +    /* Unvisited list tail */
+> +
+> +    v =3D visitor_input_test_init(data, "[ 1, 2, 3 ]");
+> +
+> +    visit_start_list(v, NULL, NULL, 0, &error_abort);
+> +    visit_type_int(v, NULL, &i64, &error_abort);
+> +    g_assert_cmpint(i64, =3D=3D, 1);
+> +    visit_type_int(v, NULL, &i64, &error_abort);
+> +    g_assert_cmpint(i64, =3D=3D, 2);
+> +    visit_end_list(v, NULL);
+> +    /* BUG: unvisited tail not reported; actually not reportable by de=
+sign */
+
+Indeed - the virtual walk is easier. At any rate, good testsuite
+addition, and sets the stage for why the next patches fix the design flaw=
+=2E
+
+> +}
+> +
+> +static void test_visitor_in_fail_list_nested(TestInputVisitorData *dat=
+a,
+> +                                             const void *unused)
+> +{
+> +    int64_t i64 =3D -1;
+> +    Visitor *v;
+> +
+> +    /* Unvisited nested list tail */
+> +
+> +    v =3D visitor_input_test_init(data, "[ 0, [ 1, 2, 3 ] ]");
+
+In fact, QAPI does not (currently) allow the creation of one list nested
+inside another (at least, not without an intervening struct), so this
+particular input can only be walked virtually.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--dkXnX3heOk2gGRibLF958Du1iTwJ1Kr1q
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYtZ1fAAoJEKeha0olJ0NqwRcH/iESw1MQAj0/EAvtjJ7+wwLK
+QjlzCOPbOf4a6JVfNC7srl11y5t7wABOTr9SJrDtQadQZ00pMR02YuiBAwGzIvYJ
+sW61WSPZUgOWLIL239lT0cqwUfhq5QxiLEjdWBn93cO8ASG9BwpK6FNNYknzkqMW
+S/e+2z89OveauIfRde2WQO0KP0Zpns8n6vb2V4kf+kfXu1WkNX6q343NueM01PzO
+U3QuopoPaJWnR4MUXTjyBpoXPGkQo6qZIMitmeCBRFJd+h8Ux3p2RLsV0jgahvTZ
+ZzxC/blasS/W011Nys8sgJRF63m9ka+NMMOVjSX5RYgj8pUw4QjAjmfVRlZ6j3w=
+=rOct
+-----END PGP SIGNATURE-----
+
+--dkXnX3heOk2gGRibLF958Du1iTwJ1Kr1q--
