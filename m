@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40092)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cih5r-0008FS-No
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:28 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cih5v-0008It-Gi
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cih5q-0000K3-CH
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57726)
+	(envelope-from <dgilbert@redhat.com>) id 1cih5s-0000KN-E6
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42020)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cih5q-0000Jv-6N
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:26 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cih5s-0000KE-7f
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:28 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue, 28 Feb 2017 12:40:42 +0000
-Message-Id: <20170228124056.5074-14-dgilbert@redhat.com>
+Date: Tue, 28 Feb 2017 12:40:43 +0000
+Message-Id: <20170228124056.5074-15-dgilbert@redhat.com>
 In-Reply-To: <20170228124056.5074-1-dgilbert@redhat.com>
 References: <20170228124056.5074-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 13/27] postcopy: Transmit and compare individual
- page sizes
+Subject: [Qemu-devel] [PULL 14/27] postcopy: Chunk discards for hugepages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,64 +28,72 @@ Cc: quintela@redhat.com, lvivier@redhat.com, marcandre.lureau@redhat.com, vsemen
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-When using postcopy with hugepages, we require the source
-and destination page sizes for any RAMBlock to match; note
-that different RAMBlocks in the same VM can have different
-page sizes.
-
-Transmit them as part of the RAM information header and
-fail if there's a difference.
+At the start of the postcopy phase, partially sent huge pages
+must be discarded.  The code for dealing with host page sizes larger
+than the target page size can be reused for this case.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
-Message-Id: <20170224182844.32452-3-dgilbert@redhat.com>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Message-Id: <20170224182844.32452-4-dgilbert@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/ram.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ migration/ram.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
 
 diff --git a/migration/ram.c b/migration/ram.c
-index 1f6397a..fbd987a 100644
+index fbd987a..7c5cdf9 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -2027,6 +2027,9 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
-         qemu_put_byte(f, strlen(block->idstr));
-         qemu_put_buffer(f, (uint8_t *)block->idstr, strlen(block->idstr));
-         qemu_put_be64(f, block->used_length);
-+        if (migrate_postcopy_ram() && block->page_size != qemu_host_page_size) {
-+            qemu_put_be64(f, block->page_size);
-+        }
+@@ -1672,12 +1672,17 @@ static void postcopy_chunk_hostpages_pass(MigrationState *ms, bool unsent_pass,
+ {
+     unsigned long *bitmap;
+     unsigned long *unsentmap;
+-    unsigned int host_ratio = qemu_host_page_size / TARGET_PAGE_SIZE;
++    unsigned int host_ratio = block->page_size / TARGET_PAGE_SIZE;
+     unsigned long first = block->offset >> TARGET_PAGE_BITS;
+     unsigned long len = block->used_length >> TARGET_PAGE_BITS;
+     unsigned long last = first + (len - 1);
+     unsigned long run_start;
+ 
++    if (block->page_size == TARGET_PAGE_SIZE) {
++        /* Easy case - TPS==HPS for a non-huge page RAMBlock */
++        return;
++    }
++
+     bitmap = atomic_rcu_read(&migration_bitmap_rcu)->bmap;
+     unsentmap = atomic_rcu_read(&migration_bitmap_rcu)->unsentmap;
+ 
+@@ -1781,7 +1786,8 @@ static void postcopy_chunk_hostpages_pass(MigrationState *ms, bool unsent_pass,
+  * Utility for the outgoing postcopy code.
+  *
+  * Discard any partially sent host-page size chunks, mark any partially
+- * dirty host-page size chunks as all dirty.
++ * dirty host-page size chunks as all dirty.  In this case the host-page
++ * is the host-page for the particular RAMBlock, i.e. it might be a huge page
+  *
+  * Returns: 0 on success
+  */
+@@ -1789,11 +1795,6 @@ static int postcopy_chunk_hostpages(MigrationState *ms)
+ {
+     struct RAMBlock *block;
+ 
+-    if (qemu_host_page_size == TARGET_PAGE_SIZE) {
+-        /* Easy case - TPS==HPS - nothing to be done */
+-        return 0;
+-    }
+-
+     /* Easiest way to make sure we don't resume in the middle of a host-page */
+     last_seen_block = NULL;
+     last_sent_block = NULL;
+@@ -1849,7 +1850,7 @@ int ram_postcopy_send_discard_bitmap(MigrationState *ms)
+         return -EINVAL;
      }
  
-     rcu_read_unlock();
-@@ -2528,6 +2531,8 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-      * be atomic
-      */
-     bool postcopy_running = postcopy_state_get() >= POSTCOPY_INCOMING_LISTENING;
-+    /* ADVISE is earlier, it shows the source has the postcopy capability on */
-+    bool postcopy_advised = postcopy_state_get() >= POSTCOPY_INCOMING_ADVISE;
- 
-     seq_iter++;
- 
-@@ -2592,6 +2597,18 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-                             error_report_err(local_err);
-                         }
-                     }
-+                    /* For postcopy we need to check hugepage sizes match */
-+                    if (postcopy_advised &&
-+                        block->page_size != qemu_host_page_size) {
-+                        uint64_t remote_page_size = qemu_get_be64(f);
-+                        if (remote_page_size != block->page_size) {
-+                            error_report("Mismatched RAM page size %s "
-+                                         "(local) %zd != %" PRId64,
-+                                         id, block->page_size,
-+                                         remote_page_size);
-+                            ret = -EINVAL;
-+                        }
-+                    }
-                     ram_control_load_hook(f, RAM_CONTROL_BLOCK_REG,
-                                           block->idstr);
-                 } else {
+-    /* Deal with TPS != HPS */
++    /* Deal with TPS != HPS and huge pages */
+     ret = postcopy_chunk_hostpages(ms);
+     if (ret) {
+         rcu_read_unlock();
 -- 
 2.9.3
