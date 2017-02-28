@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cih5Z-0007zV-Jl
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:13 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cih5d-00082Z-48
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cih5Y-0000DK-G1
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54790)
+	(envelope-from <dgilbert@redhat.com>) id 1cih5a-0000EW-GE
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47662)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cih5Y-0000Cr-7z
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:08 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cih5a-0000EG-7h
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:10 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue, 28 Feb 2017 12:40:33 +0000
-Message-Id: <20170228124056.5074-5-dgilbert@redhat.com>
+Date: Tue, 28 Feb 2017 12:40:34 +0000
+Message-Id: <20170228124056.5074-6-dgilbert@redhat.com>
 In-Reply-To: <20170228124056.5074-1-dgilbert@redhat.com>
 References: <20170228124056.5074-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 04/27] migration/vmstate: fix array of ptr with
- nullptrs
+Subject: [Qemu-devel] [PULL 05/27] tests/test-vmstate.c: test array of ptr
+ with null
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,105 +29,135 @@ Cc: quintela@redhat.com, lvivier@redhat.com, marcandre.lureau@redhat.com, vsemen
 
 From: Halil Pasic <pasic@linux.vnet.ibm.com>
 
-Make VMS_ARRAY_OF_POINTER cope with null pointers. Previously the
-reward for trying to migrate an array with some null pointers in it was
-an illegal memory access, that is a swift and painless death of the
-process.  Let's make vmstate cope with this scenario.
-
-The general approach is, when we encounter a null pointer (element),
-instead of following the pointer to save/load the data behind it, we
-save/load a placeholder. This way we can detect if we expected a null
-pointer at the load side but not null data was saved instead.
+Add test for VMSTATE_ARRAY_OF_POINTER_TO_STRUCT with an array
+containing some null pointer.
 
 Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-Reviewed-by: Guenther Hutzl <hutzl@linux.vnet.ibm.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Message-Id: <20170222160119.52771-4-pasic@linux.vnet.ibm.com>
+Message-Id: <20170222160119.52771-5-pasic@linux.vnet.ibm.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+   Fixed type case in assert to uintptr_t rather than uint64_t
 ---
- include/migration/vmstate.h |  4 ++++
- migration/vmstate.c         | 40 ++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 42 insertions(+), 2 deletions(-)
+ tests/test-vmstate.c | 74 ++++++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 57 insertions(+), 17 deletions(-)
 
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index 63e7b02..f2dbf84 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -253,6 +253,10 @@ extern const VMStateInfo vmstate_info_uint16;
- extern const VMStateInfo vmstate_info_uint32;
- extern const VMStateInfo vmstate_info_uint64;
- 
-+/** Put this in the stream when migrating a null pointer.*/
-+#define VMS_NULLPTR_MARKER (0x30U) /* '0' */
-+extern const VMStateInfo vmstate_info_nullptr;
-+
- extern const VMStateInfo vmstate_info_float64;
- extern const VMStateInfo vmstate_info_cpudouble;
- 
-diff --git a/migration/vmstate.c b/migration/vmstate.c
-index 836a7a4..78b3cd4 100644
---- a/migration/vmstate.c
-+++ b/migration/vmstate.c
-@@ -117,7 +117,11 @@ int vmstate_load_state(QEMUFile *f, const VMStateDescription *vmsd,
-                 if (field->flags & VMS_ARRAY_OF_POINTER) {
-                     curr_elem = *(void **)curr_elem;
-                 }
--                if (field->flags & VMS_STRUCT) {
-+                if (!curr_elem) {
-+                    /* if null pointer check placeholder and do not follow */
-+                    assert(field->flags & VMS_ARRAY_OF_POINTER);
-+                    ret = vmstate_info_nullptr.get(f, curr_elem, size, NULL);
-+                } else if (field->flags & VMS_STRUCT) {
-                     ret = vmstate_load_state(f, field->vmsd, curr_elem,
-                                              field->vmsd->version_id);
-                 } else {
-@@ -332,7 +336,11 @@ void vmstate_save_state(QEMUFile *f, const VMStateDescription *vmsd,
-                     assert(curr_elem);
-                     curr_elem = *(void **)curr_elem;
-                 }
--                if (field->flags & VMS_STRUCT) {
-+                if (!curr_elem) {
-+                    /* if null pointer write placeholder and do not follow */
-+                    assert(field->flags & VMS_ARRAY_OF_POINTER);
-+                    vmstate_info_nullptr.put(f, curr_elem, size, NULL, NULL);
-+                } else if (field->flags & VMS_STRUCT) {
-                     vmstate_save_state(f, field->vmsd, curr_elem, vmdesc_loop);
-                 } else {
-                     field->info->put(f, curr_elem, size, field, vmdesc_loop);
-@@ -747,6 +755,34 @@ const VMStateInfo vmstate_info_uint64 = {
-     .put  = put_uint64,
+diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
+index 39f338a..2e20756 100644
+--- a/tests/test-vmstate.c
++++ b/tests/test-vmstate.c
+@@ -476,6 +476,8 @@ const VMStateDescription vmsd_tst = {
+     }
  };
  
-+static int get_nullptr(QEMUFile *f, void *pv, size_t size, VMStateField *field)
++/* test array migration */
 +
-+{
-+    if (qemu_get_byte(f) == VMS_NULLPTR_MARKER) {
-+        return  0;
-+    }
-+    error_report("vmstate: get_nullptr expected VMS_NULLPTR_MARKER");
-+    return -EINVAL;
-+}
+ #define AR_SIZE 4
+ 
+ typedef struct {
+@@ -492,20 +494,22 @@ const VMStateDescription vmsd_arps = {
+         VMSTATE_END_OF_LIST()
+     }
+ };
 +
-+static int put_nullptr(QEMUFile *f, void *pv, size_t size,
-+                        VMStateField *field, QJSON *vmdesc)
-+
-+{
-+    if (pv == NULL) {
-+        qemu_put_byte(f, VMS_NULLPTR_MARKER);
-+        return 0;
-+    }
-+    error_report("vmstate: put_nullptr must be called with pv == NULL");
-+    return -EINVAL;
-+}
-+
-+const VMStateInfo vmstate_info_nullptr = {
-+    .name = "uint64",
-+    .get  = get_nullptr,
-+    .put  = put_nullptr,
++static uint8_t wire_arr_ptr_no0[] = {
++    0x00, 0x00, 0x00, 0x00,
++    0x00, 0x00, 0x00, 0x01,
++    0x00, 0x00, 0x00, 0x02,
++    0x00, 0x00, 0x00, 0x03,
++    QEMU_VM_EOF
 +};
 +
- /* 64 bit unsigned int. See that the received value is the same than the one
-    in the field */
+ static void test_arr_ptr_str_no0_save(void)
+ {
+     TestStructTriv ar[AR_SIZE] = {{.i = 0}, {.i = 1}, {.i = 2}, {.i = 3} };
+     TestArrayOfPtrToStuct sample = {.ar = {&ar[0], &ar[1], &ar[2], &ar[3]} };
+-    uint8_t wire_sample[] = {
+-        0x00, 0x00, 0x00, 0x00,
+-        0x00, 0x00, 0x00, 0x01,
+-        0x00, 0x00, 0x00, 0x02,
+-        0x00, 0x00, 0x00, 0x03,
+-        QEMU_VM_EOF
+-    };
  
+     save_vmstate(&vmsd_arps, &sample);
+-    compare_vmstate(wire_sample, sizeof(wire_sample));
++    compare_vmstate(wire_arr_ptr_no0, sizeof(wire_arr_ptr_no0));
+ }
+ 
+ static void test_arr_ptr_str_no0_load(void)
+@@ -514,21 +518,54 @@ static void test_arr_ptr_str_no0_load(void)
+     TestStructTriv ar[AR_SIZE] = {};
+     TestArrayOfPtrToStuct obj = {.ar = {&ar[0], &ar[1], &ar[2], &ar[3]} };
+     int idx;
+-    uint8_t wire_sample[] = {
+-        0x00, 0x00, 0x00, 0x00,
+-        0x00, 0x00, 0x00, 0x01,
+-        0x00, 0x00, 0x00, 0x02,
+-        0x00, 0x00, 0x00, 0x03,
+-        QEMU_VM_EOF
+-    };
+ 
+-    save_buffer(wire_sample, sizeof(wire_sample));
++    save_buffer(wire_arr_ptr_no0, sizeof(wire_arr_ptr_no0));
++    SUCCESS(load_vmstate_one(&vmsd_arps, &obj, 1,
++                          wire_arr_ptr_no0, sizeof(wire_arr_ptr_no0)));
++    for (idx = 0; idx < AR_SIZE; ++idx) {
++        /* compare the target array ar with the ground truth array ar_gt */
++        g_assert_cmpint(ar_gt[idx].i, ==, ar[idx].i);
++    }
++}
++
++static uint8_t wire_arr_ptr_0[] = {
++    0x00, 0x00, 0x00, 0x00,
++    VMS_NULLPTR_MARKER,
++    0x00, 0x00, 0x00, 0x02,
++    0x00, 0x00, 0x00, 0x03,
++    QEMU_VM_EOF
++};
++
++static void test_arr_ptr_str_0_save(void)
++{
++    TestStructTriv ar[AR_SIZE] = {{.i = 0}, {.i = 1}, {.i = 2}, {.i = 3} };
++    TestArrayOfPtrToStuct sample = {.ar = {&ar[0], NULL, &ar[2], &ar[3]} };
++
++    save_vmstate(&vmsd_arps, &sample);
++    compare_vmstate(wire_arr_ptr_0, sizeof(wire_arr_ptr_0));
++}
++
++static void test_arr_ptr_str_0_load(void)
++{
++    TestStructTriv ar_gt[AR_SIZE] = {{.i = 0}, {.i = 0}, {.i = 2}, {.i = 3} };
++    TestStructTriv ar[AR_SIZE] = {};
++    TestArrayOfPtrToStuct obj = {.ar = {&ar[0], NULL, &ar[2], &ar[3]} };
++    int idx;
++
++    save_buffer(wire_arr_ptr_0, sizeof(wire_arr_ptr_0));
+     SUCCESS(load_vmstate_one(&vmsd_arps, &obj, 1,
+-                          wire_sample, sizeof(wire_sample)));
++                          wire_arr_ptr_0, sizeof(wire_arr_ptr_0)));
+     for (idx = 0; idx < AR_SIZE; ++idx) {
+         /* compare the target array ar with the ground truth array ar_gt */
+         g_assert_cmpint(ar_gt[idx].i, ==, ar[idx].i);
+     }
++    for (idx = 0; idx < AR_SIZE; ++idx) {
++        if (idx == 1) {
++            g_assert_cmpint((uintptr_t)(obj.ar[idx]), ==, 0);
++        } else {
++            g_assert_cmpint((uintptr_t)(obj.ar[idx]), !=, 0);
++        }
++    }
+ }
+ 
+ /* test QTAILQ migration */
+@@ -781,6 +818,9 @@ int main(int argc, char **argv)
+                     test_arr_ptr_str_no0_save);
+     g_test_add_func("/vmstate/array/ptr/str/no0/load",
+                     test_arr_ptr_str_no0_load);
++    g_test_add_func("/vmstate/array/ptr/str/0/save", test_arr_ptr_str_0_save);
++    g_test_add_func("/vmstate/array/ptr/str/0/load",
++                    test_arr_ptr_str_0_load);
+     g_test_add_func("/vmstate/qtailq/save/saveq", test_save_q);
+     g_test_add_func("/vmstate/qtailq/load/loadq", test_load_q);
+     g_test_add_func("/vmstate/tmp_struct", test_tmp_struct);
 -- 
 2.9.3
