@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cim5p-000655-2J
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 13:01:46 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cim78-0007Vk-2r
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 13:03:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cim5n-0007xD-Vs
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 13:01:45 -0500
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:35992)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cim5n-0007wV-Pd
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 13:01:43 -0500
-Received: by mail-wr0-x22b.google.com with SMTP id u108so14206124wrb.3
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 10:01:42 -0800 (PST)
+	(envelope-from <kwolf@redhat.com>) id 1cim77-0008Sf-5Q
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 13:03:06 -0500
+Date: Tue, 28 Feb 2017 19:02:56 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170228180256.GX4090@noname.redhat.com>
+References: <1488194450-28056-1-git-send-email-armbru@redhat.com>
+	<1488194450-28056-23-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170228142918.GA7745@pacoca>
-References: <1488224492-20316-1-git-send-email-joserz@linux.vnet.ibm.com>
-	<1488224492-20316-3-git-send-email-joserz@linux.vnet.ibm.com>
-	<CAFEAcA_DD1KmSR+U-4jSVbycO+QwZ9ebc_k4RJ2+TqZD2jiB5w@mail.gmail.com>
-	<20170228142918.GA7745@pacoca>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Feb 2017 18:01:20 +0000
-Message-ID: <CAFEAcA8=WFvjU1tON50ve8DLFm-4uh+APbBPoZCdR2vurGHLuA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH Risu 2/5] risu_reginfo_ppc64le: Remove
- unused code from PPC64 register comparison
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1488194450-28056-23-git-send-email-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 22/24] qapi: New parse_qapi_name()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,22 +23,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, pkrempa@redhat.com, eblake@redhat.com
 
-On 28 February 2017 at 14:29,  <joserz@linux.vnet.ibm.com> wrote:
-> On Tue, Feb 28, 2017 at 01:43:22PM +0000, Peter Maydell wrote:
->> I have a variation on this patch already in my set of refactoring
->> patches that I posted last week:
->>
->> https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg06152.html
->
-> Sorry, I missed that commit. I'll send a v2 with the fix suggested by
-> Nikunj and without this one.
+Am 27.02.2017 um 12:20 hat Markus Armbruster geschrieben:
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  include/qapi/util.h    |  2 ++
+>  qapi/qapi-util.c       | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+>  tests/test-qapi-util.c | 34 ++++++++++++++++++++++++++++++++++
+>  3 files changed, 83 insertions(+)
+> 
+> diff --git a/include/qapi/util.h b/include/qapi/util.h
+> index 7ad26c0..7436ed8 100644
+> --- a/include/qapi/util.h
+> +++ b/include/qapi/util.h
+> @@ -14,4 +14,6 @@
+>  int qapi_enum_parse(const char * const lookup[], const char *buf,
+>                      int max, int def, Error **errp);
+>  
+> +int parse_qapi_name(const char *name, bool complete);
+> +
+>  #endif
+> diff --git a/qapi/qapi-util.c b/qapi/qapi-util.c
+> index 818730a..53b27e2 100644
+> --- a/qapi/qapi-util.c
+> +++ b/qapi/qapi-util.c
+> @@ -33,3 +33,50 @@ int qapi_enum_parse(const char * const lookup[], const char *buf,
+>      error_setg(errp, "invalid parameter value: %s", buf);
+>      return def;
+>  }
+> +
+> +/*
+> + * Parse a valid QAPI name from @str.
+> + * A valid name consists of letters, digits, hyphen and underscore.
+> + * It may be prefixed by __RFQDN_ (downstream extension), where RFQDN
+> + * may contain only letters, digits and hyphen.
 
-No problem. I've just pushed that refactoring series to risu master
-so you probably want to rebase on that. I've also grabbed patch 5
-of this series because it was an obvious change.
+And '.' according to the code below.
 
-thanks
--- PMM
+> + * The special exception for enumeration names is not implemented.
+> + * See docs/qapi-code-gen.txt for more on QAPI naming rules.
+> + * Keep this consistent with scripts/qapi.py!
+> + * If @complete, the parse fails unless it consumes @str completely.
+> + * Return its length on success, -1 on failure.
+> + */
+
+Kevin
