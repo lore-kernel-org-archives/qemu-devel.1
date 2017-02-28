@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cih6G-0000JU-5g
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:53 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cih6I-0000LC-4c
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cih6F-0000bK-Ev
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43148)
+	(envelope-from <dgilbert@redhat.com>) id 1cih6H-0000bp-DF
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57906)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cih6F-0000b7-8d
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:51 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cih6H-0000bY-79
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:53 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue, 28 Feb 2017 12:40:54 +0000
-Message-Id: <20170228124056.5074-26-dgilbert@redhat.com>
+Date: Tue, 28 Feb 2017 12:40:55 +0000
+Message-Id: <20170228124056.5074-27-dgilbert@redhat.com>
 In-Reply-To: <20170228124056.5074-1-dgilbert@redhat.com>
 References: <20170228124056.5074-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 25/27] postcopy: Check for userfault+hugepage
- feature
+Subject: [Qemu-devel] [PULL 26/27] postcopy: Add doc about hugepages and
+ postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,47 +29,35 @@ Cc: quintela@redhat.com, lvivier@redhat.com, marcandre.lureau@redhat.com, vsemen
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-We need extra Linux kernel support (~4.11) to support userfaults
-on hugetlbfs; check for them.
-
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-Message-Id: <20170224182844.32452-15-dgilbert@redhat.com>
+Message-Id: <20170224182844.32452-16-dgilbert@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/postcopy-ram.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ docs/migration.txt | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index 6b30b43..102fb61 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -81,6 +81,17 @@ static bool ufd_version_check(int ufd)
-         return false;
-     }
+diff --git a/docs/migration.txt b/docs/migration.txt
+index c8b0304..1b940a8 100644
+--- a/docs/migration.txt
++++ b/docs/migration.txt
+@@ -540,3 +540,16 @@ request for a page that has already been sent is ignored.  Duplicate requests
+ such as this can happen as a page is sent at about the same time the
+ destination accesses it.
  
-+    if (getpagesize() != ram_pagesize_summary()) {
-+        bool have_hp = false;
-+        /* We've got a huge page */
-+#ifdef UFFD_FEATURE_MISSING_HUGETLBFS
-+        have_hp = api_struct.features & UFFD_FEATURE_MISSING_HUGETLBFS;
-+#endif
-+        if (!have_hp) {
-+            error_report("Userfault on this host does not support huge pages");
-+            return false;
-+        }
-+    }
-     return true;
- }
- 
-@@ -115,7 +126,6 @@ bool postcopy_ram_supported_by_host(void)
-     if (!ufd_version_check(ufd)) {
-         goto out;
-     }
--    /* TODO: Only allow huge pages if the kernel supports it */
- 
-     /*
-      * userfault and mlock don't go together; we'll put it back later if
++=== Postcopy with hugepages ===
++
++Postcopy now works with hugetlbfs backed memory:
++  a) The linux kernel on the destination must support userfault on hugepages.
++  b) The huge-page configuration on the source and destination VMs must be
++     identical; i.e. RAMBlocks on both sides must use the same page size.
++  c) Note that -mem-path /dev/hugepages  will fall back to allocating normal
++     RAM if it doesn't have enough hugepages, triggering (b) to fail.
++     Using -mem-prealloc enforces the allocation using hugepages.
++  d) Care should be taken with the size of hugepage used; postcopy with 2MB
++     hugepages works well, however 1GB hugepages are likely to be problematic
++     since it takes ~1 second to transfer a 1GB hugepage across a 10Gbps link,
++     and until the full page is transferred the destination thread is blocked.
 -- 
 2.9.3
