@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cin6j-0001Yp-3X
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:06:49 -0500
+	(envelope-from <armbru@redhat.com>) id 1cin6j-0001Yv-3n
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:06:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cin6g-0006ul-Fa
+	(envelope-from <armbru@redhat.com>) id 1cin6g-0006v4-Ml
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:06:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33078)
+Received: from mx1.redhat.com ([209.132.183.28]:41552)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cin6g-0006u5-8i
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cin6g-0006uC-Et
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:06:42 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7E5CC81F01
+	by mx1.redhat.com (Postfix) with ESMTPS id ACEA864A6D
 	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 19:06:42 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
 	[10.36.116.55])
-	by int-mx11.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v1SJ6fkS028186
+	by int-mx10.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v1SJ6f13031380
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
 	verify=NO)
 	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 14:06:42 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 28 Feb 2017 20:06:25 +0100
-Message-Id: <1488308796-28832-16-git-send-email-armbru@redhat.com>
+Date: Tue, 28 Feb 2017 20:06:30 +0100
+Message-Id: <1488308796-28832-21-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488308796-28832-1-git-send-email-armbru@redhat.com>
 References: <1488308796-28832-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 15/26] qom: Make object_property_set_qobject()'s
- input visitor strict
+Subject: [Qemu-devel] [PULL 20/26] test-string-input-visitor: Improve list
+ coverage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,54 +39,123 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Commit 240f64b made all qobject input visitors created outside tests
-strict, except for the one in object_property_set_qobject().  That one
-was left behind only because Eric couldn't spare the time to figure
-out whether making it strict would break anything, with a TODO
-comment.  Time to resolve it.
-
-Strict makes a difference only for otherwise successful visits of QAPI
-structs or unions.  Let's examine what the callers of
-object_property_set_qobject() visit:
-
-* object_property_set_str(), object_property_set_bool(),
-  object_property_set_int() visit a QString, QBool, QInt,
-  respectively.  Strictness can't matter.
-
-* qmp_qom_set visits its @value argument.  Comes straight from QMP and
-  can be anything ('any' in the QAPI schema).  Strictness matters when
-  the property's set() method visits a struct or union QAPI type.
-
-  No such methods exist, thus switching to strict can't break
-  anything.
-
-  If we acquire such methods in the future, we'll *want* the visitor
-  to be strict, so that unexpected members get rejected as they should
-  be.
-
-Switch to strict.
+Lists with elements above INT64_MAX don't work (known bug).  Empty
+lists don't work (weird).
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <1488303560-18803-16-git-send-email-armbru@redhat.com>
+Message-Id: <1488303560-18803-21-git-send-email-armbru@redhat.com>
 ---
- qom/qom-qobject.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tests/test-string-input-visitor.c | 85 +++++++++++++++++++++++++++++++++------
+ 1 file changed, 72 insertions(+), 13 deletions(-)
 
-diff --git a/qom/qom-qobject.c b/qom/qom-qobject.c
-index 447e4a0..bbdedda 100644
---- a/qom/qom-qobject.c
-+++ b/qom/qom-qobject.c
-@@ -22,8 +22,8 @@ void object_property_set_qobject(Object *obj, QObject *value,
-                                  const char *name, Error **errp)
- {
-     Visitor *v;
--    /* TODO: Should we reject, rather than ignore, excess input? */
--    v = qobject_input_visitor_new(value, false);
+diff --git a/tests/test-string-input-visitor.c b/tests/test-string-input-visitor.c
+index a32828c..72f8732 100644
+--- a/tests/test-string-input-visitor.c
++++ b/tests/test-string-input-visitor.c
+@@ -65,31 +65,90 @@ static void test_visitor_in_int(TestInputVisitorData *data,
+     error_free_or_abort(&err);
+ }
+ 
++static void check_ilist(Visitor *v, int64_t *expected, size_t n)
++{
++    int64List *res = NULL;
++    int64List *tail;
++    int i;
 +
-+    v = qobject_input_visitor_new(value, true);
-     object_property_set(obj, v, name, errp);
-     visit_free(v);
++    visit_type_int64List(v, NULL, &res, &error_abort);
++    tail = res;
++    for (i = 0; i < n; i++) {
++        g_assert(tail);
++        g_assert_cmpint(tail->value, ==, expected[i]);
++        tail = tail->next;
++    }
++    g_assert(!tail);
++
++    qapi_free_int64List(res);
++}
++
++static void check_ulist(Visitor *v, uint64_t *expected, size_t n)
++{
++    uint64List *res = NULL;
++    uint64List *tail;
++    int i;
++
++    /* BUG: unsigned numbers above INT64_MAX don't work */
++    for (i = 0; i < n; i++) {
++        if (expected[i] > INT64_MAX) {
++            Error *err = NULL;
++            visit_type_uint64List(v, NULL, &res, &err);
++            error_free_or_abort(&err);
++            return;
++        }
++    }
++
++    visit_type_uint64List(v, NULL, &res, &error_abort);
++    tail = res;
++    for (i = 0; i < n; i++) {
++        g_assert(tail);
++        g_assert_cmpuint(tail->value, ==, expected[i]);
++        tail = tail->next;
++    }
++    g_assert(!tail);
++
++    qapi_free_uint64List(res);
++}
++
+ static void test_visitor_in_intList(TestInputVisitorData *data,
+                                     const void *unused)
+ {
+-    int64_t value[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 20};
+-    int16List *res = NULL, *tmp;
++    /* Note: the visitor *sorts* ranges *unsigned* */
++    int64_t expect1[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 20 };
++    int64_t expect2[] = { 32767, -32768, -32767 };
++    int64_t expect3[] = { INT64_MAX, INT64_MIN };
++    uint64_t expect4[] = { UINT64_MAX };
+     Error *err = NULL;
++    int64List *res = NULL;
+     Visitor *v;
+-    int i = 0;
++
++    /* Valid lists */
+ 
+     v = visitor_input_test_init(data, "1,2,0,2-4,20,5-9,1-8");
++    check_ilist(v, expect1, ARRAY_SIZE(expect1));
+ 
+-    visit_type_int16List(v, NULL, &res, &error_abort);
+-    tmp = res;
+-    while (i < sizeof(value) / sizeof(value[0])) {
+-        g_assert(tmp);
+-        g_assert_cmpint(tmp->value, ==, value[i++]);
+-        tmp = tmp->next;
+-    }
+-    g_assert(!tmp);
++    v = visitor_input_test_init(data, "32767,-32768--32767");
++    check_ilist(v, expect2, ARRAY_SIZE(expect2));
+ 
+-    qapi_free_int16List(res);
++    v = visitor_input_test_init(data,
++                                "-9223372036854775808,9223372036854775807");
++    check_ilist(v, expect3, ARRAY_SIZE(expect3));
++
++    v = visitor_input_test_init(data, "18446744073709551615");
++    check_ulist(v, expect4, ARRAY_SIZE(expect4));
++
++    /* Empty list is invalid (weird) */
++
++    v = visitor_input_test_init(data, "");
++    visit_type_int64List(v, NULL, &res, &err);
++    error_free_or_abort(&err);
++
++    /* Not a list */
+ 
+     v = visitor_input_test_init(data, "not an int list");
+ 
+-    visit_type_int16List(v, NULL, &res, &err);
++    visit_type_int64List(v, NULL, &res, &err);
+     error_free_or_abort(&err);
+     g_assert(!res);
  }
 -- 
 2.7.4
