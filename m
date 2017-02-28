@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cikIo-0004uD-Vn
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:07:03 -0500
+	(envelope-from <armbru@redhat.com>) id 1cikJ6-00058Y-I3
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:07:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cikIo-0007U1-CA
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:07:02 -0500
-References: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
-	<1488286469-9381-42-git-send-email-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <bd05f3c2-a8e2-1e18-9ef7-4ec2f69ec593@redhat.com>
-Date: Tue, 28 Feb 2017 17:06:55 +0100
+	(envelope-from <armbru@redhat.com>) id 1cikJ5-0007W7-CI
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:07:20 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <cover.1488296634.git.jcody@redhat.com>
+	<cover.1488296634.git.jcody@redhat.com>
+	<7f62442524e9b3e5c129d1d10fe01c41a0e0d4ff.1488296634.git.jcody@redhat.com>
+Date: Tue, 28 Feb 2017 17:07:09 +0100
+In-Reply-To: <7f62442524e9b3e5c129d1d10fe01c41a0e0d4ff.1488296634.git.jcody@redhat.com>
+	(Jeff Cody's message of "Tue, 28 Feb 2017 10:51:07 -0500")
+Message-ID: <8737eypadu.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1488286469-9381-42-git-send-email-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="QDSHNUHah9lg0NI4pTWk74djd0msBwvE6"
-Subject: Re: [Qemu-devel] [PATCH v3 41/44] block: Assertions for write
- permissions
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 5/5] block/rbd: add support for
+ 'mon_host', 'auth_supported' via QAPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,49 +25,266 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, qemu-block@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---QDSHNUHah9lg0NI4pTWk74djd0msBwvE6
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
-Message-ID: <bd05f3c2-a8e2-1e18-9ef7-4ec2f69ec593@redhat.com>
-Subject: Re: [PATCH v3 41/44] block: Assertions for write permissions
-References: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
- <1488286469-9381-42-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1488286469-9381-42-git-send-email-kwolf@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
+Jeff Cody <jcody@redhat.com> writes:
 
-On 28.02.2017 13:54, Kevin Wolf wrote:
-> This adds assertions that ensure that the necessary write permissions
-> have been granted before someone attempts to write to a node.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> This adds support for three additional options that may be specified
+> by QAPI in blockdev-add:
+>
+>     server: host, port
+>     auth method: either 'cephx' or 'none'
+>
+> The "server" and "auth-supported" QAPI parameters are arrays.  To conform
+> with the rados API, the array items are join as a single string with a ';'
+> character as a delimiter when setting the configuration values.
+>
+> Signed-off-by: Jeff Cody <jcody@redhat.com>
 > ---
->  block/io.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  block/rbd.c          | 134 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  qapi/block-core.json |  29 +++++++++++
+>  2 files changed, 163 insertions(+)
+>
+> diff --git a/block/rbd.c b/block/rbd.c
+> index cc43f42..8b039fa 100644
+> --- a/block/rbd.c
+> +++ b/block/rbd.c
+> @@ -405,6 +405,19 @@ static QemuOptsList runtime_opts = {
+>              .type = QEMU_OPT_STRING,
+>              .help = "Legacy rados key/value option parameters",
+>          },
+> +        {
+> +            .name = "host",
+> +            .type = QEMU_OPT_STRING,
+> +        },
+> +        {
+> +            .name = "port",
+> +            .type = QEMU_OPT_STRING,
+> +        },
+> +        {
+> +            .name = "auth",
+> +            .type = QEMU_OPT_STRING,
+> +            .help = "Supported authentication method, either cephx or none",
+> +        },
+>          { /* end of list */ }
+>      },
+>  };
+> @@ -565,6 +578,93 @@ static void qemu_rbd_complete_aio(RADOSCB *rcb)
+>      qemu_aio_unref(acb);
+>  }
+>  
+> +#define RBD_MON_HOST          0
+> +#define RBD_AUTH_SUPPORTED    1
+> +
+> +static char *qemu_rbd_array_opts(QDict *options, const char *prefix, int type,
+> +                                 Error **errp)
+> +{
+> +    int num_entries;
+> +    QemuOpts *opts = NULL;
+> +    QDict *sub_options;
+> +    const char *host;
+> +    const char *port;
+> +    char *str;
+> +    char *rados_str = NULL;
+> +    Error *local_err = NULL;
+> +
+> +    assert(type == RBD_MON_HOST || type == RBD_AUTH_SUPPORTED);
+> +
+> +    num_entries = qdict_array_entries(options, prefix);
+> +
+> +    if (num_entries < 0) {
+> +        error_setg(errp, "Parse error on RBD QDict array");
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+This error message isn't nice, but we can fix that on top.
 
+> +        return NULL;
+> +    }
+> +
+> +    for (int i = 0; i < num_entries; i++) {
+> +        char *strbuf = NULL;
+> +        const char *value;
+> +        char *rados_str_tmp;
+> +
+> +        str = g_strdup_printf("%s%d.", prefix, i);
+> +        qdict_extract_subqdict(options, &sub_options, str);
+> +        g_free(str);
+> +
+> +        opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+> +        qemu_opts_absorb_qdict(opts, sub_options, &local_err);
+> +        QDECREF(sub_options);
+> +        if (local_err) {
+> +            error_propagate(errp, local_err);
+> +            g_free(rados_str);
+> +            rados_str = NULL;
+> +            goto exit;
+> +        }
+> +
+> +        if (type == RBD_MON_HOST) {
+> +            host = qemu_opt_get(opts, "host");
+> +            port = qemu_opt_get(opts, "port");
+> +
+> +            value = host;
+> +            if (port) {
+> +                /* check for ipv6 */
+> +                if (strchr(host, ':')) {
+> +                    strbuf = g_strdup_printf("[%s]:%s", host, port);
+> +                } else {
+> +                    strbuf = g_strdup_printf("%s:%s", host, port);
+> +                }
 
---QDSHNUHah9lg0NI4pTWk74djd0msBwvE6
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Good enough.
 
------BEGIN PGP SIGNATURE-----
+> +                value = strbuf;
+> +            } else if (strchr(host, ':')) {
+> +                strbuf = g_strdup_printf("[%s]", host);
+> +                value = strbuf;
+> +            }
+> +        } else {
+> +            value = qemu_opt_get(opts, "auth");
+> +        }
+> +
+> +
+> +        /* each iteration in the for loop will build upon the string, and if
+> +         * rados_str is NULL then it is our first pass */
+> +        if (rados_str) {
+> +            /* separate options with ';', as that  is what rados_conf_set()
+> +             * requires */
+> +            rados_str_tmp = rados_str;
+> +            rados_str = g_strdup_printf("%s;%s", rados_str_tmp, value);
+> +            g_free(rados_str_tmp);
+> +        } else {
+> +            rados_str = g_strdup(value);
+> +        }
+> +
+> +        g_free(strbuf);
+> +        qemu_opts_del(opts);
+> +        opts = NULL;
+> +    }
+> +
+> +exit:
+> +    qemu_opts_del(opts);
+> +    return rados_str;
+> +}
+> +
+>  static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+>                           Error **errp)
+>  {
+> @@ -573,6 +673,8 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+>      const char *secretid;
+>      QemuOpts *opts;
+>      Error *local_err = NULL;
+> +    char *mon_host = NULL;
+> +    char *auth_supported = NULL;
+>      int r;
+>  
+>      opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+> @@ -583,6 +685,22 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+>          return -EINVAL;
+>      }
+>  
+> +    auth_supported = qemu_rbd_array_opts(options, "auth-supported.",
+> +                                         RBD_AUTH_SUPPORTED, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        r = -EINVAL;
+> +        goto failed_opts;
+> +    }
+> +
+> +    mon_host = qemu_rbd_array_opts(options, "server.",
+> +                                   RBD_MON_HOST, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        r = -EINVAL;
+> +        goto failed_opts;
+> +    }
+> +
+>      secretid = qemu_opt_get(opts, "password-secret");
+>  
+>      pool           = qemu_opt_get(opts, "pool");
+> @@ -615,6 +733,20 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+>          goto failed_shutdown;
+>      }
+>  
+> +    if (mon_host) {
+> +        r = rados_conf_set(s->cluster, "mon_host", mon_host);
+> +        if (r < 0) {
+> +            goto failed_shutdown;
+> +        }
+> +    }
+> +
+> +    if (auth_supported) {
+> +        r = rados_conf_set(s->cluster, "auth_supported", auth_supported);
+> +        if (r < 0) {
+> +            goto failed_shutdown;
+> +        }
+> +    }
+> +
+>      if (qemu_rbd_set_auth(s->cluster, secretid, errp) < 0) {
+>          r = -EIO;
+>          goto failed_shutdown;
+> @@ -663,6 +795,8 @@ failed_shutdown:
+>      g_free(s->snap);
+>  failed_opts:
+>      qemu_opts_del(opts);
+> +    g_free(mon_host);
+> +    g_free(auth_supported);
+>      return r;
+>  }
+>  
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 803edc3..2e01a95 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -2666,6 +2666,28 @@
+>              '*header-digest': 'IscsiHeaderDigest',
+>              '*timeout': 'int' } }
+>  
+> +
+> +##
+> +# @RbdAuthSupport:
+> +#
+> +# An enumeration of RBD auth support
+> +#
+> +# Since: 2.9
+> +##
+> +{ 'enum': 'RbdAuthSupport',
+> +  'data': [ 'cephx', 'none' ] }
+> +
+> +
+> +##
+> +# @RbdAuthMethod:
+> +#
+> +# An enumeration of rados auth_supported types
+> +#
+> +# Since: 2.9
+> +##
+> +{ 'struct': 'RbdAuthMethod',
+> +  'data': { 'auth': 'RbdAuthSupport' } }
+> +
+>  ##
+>  # @BlockdevOptionsRbd:
+>  #
+> @@ -2681,6 +2703,11 @@
+>  #
+>  # @user:               #optional Ceph id name.
+>  #
+> +# @server:             #optional Monitor host address and port.  This maps
+> +#                      to the "mon_host" Ceph option.
+> +#
+> +# @auth-supported:     #optional Authentication supported.
+> +#
+>  # @password-secret:    #optional The ID of a QCryptoSecret object providing
+>  #                      the password for the login.
+>  #
+> @@ -2692,6 +2719,8 @@
+>              '*conf': 'str',
+>              '*snapshot': 'str',
+>              '*user': 'str',
+> +            '*server': ['InetSocketAddress'],
+> +            '*auth-supported': ['RbdAuthMethod'],
+>              '*password-secret': 'str' } }
+>  
+>  ##
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAli1oB8SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AGT8IAJ6U2e7ZZseGmUerAIlyXq+HfcrRcg0g
-pl4KNSFdFU7CbBZ2MJOcVVJiaJblIq8h+3Xj8YX+QnlYHF220bdwZy9aJLN3WFbh
-L44j8HIiz7uQ8kYxvDeam55WJ7VZF2d17tDLSxFzIVxb2PZtYx3oFSqQ9qsndoJe
-m1eWRZBjrFsIOiGOi8q3RqEx5f/Ujzq3LptowCBYwIg1+V+ay3RW8ruXXY530PLy
-6I6T9Kn2JUOU1bew6tOKFdpMNWHPWYSzBXYl7Vo6KRHVp59mzmIit+Rl+eq9AcsU
-roJQdnXkHPzo8J9f+XyyFp4oHRk6rKexzio3nigrd9ZUdITftpLPM/M=
-=DKIi
------END PGP SIGNATURE-----
-
---QDSHNUHah9lg0NI4pTWk74djd0msBwvE6--
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
