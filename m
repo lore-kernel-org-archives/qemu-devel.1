@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58870)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1ciXTm-0004WG-GE
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 21:25:31 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1ciXVs-0006Js-7S
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 21:27:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1ciXTl-0005fp-92
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 21:25:30 -0500
-Message-ID: <1488248717.2323.11.camel@gmail.com>
+	(envelope-from <sjitindarsingh@gmail.com>) id 1ciXVr-0006R8-2L
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 21:27:40 -0500
+Message-ID: <1488248845.2323.13.camel@gmail.com>
 From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Tue, 28 Feb 2017 13:25:17 +1100
-In-Reply-To: <20170228002810.GD17615@umbus.fritz.box>
+Date: Tue, 28 Feb 2017 13:27:25 +1100
+In-Reply-To: <20170228001221.GB17615@umbus.fritz.box>
 References: <cover.1487829585.git.sam.bobroff@au1.ibm.com>
-	<034945c1bbc8d4a97e5f568d4d463af2c9a24080.1487829585.git.sam.bobroff@au1.ibm.com>
-	<20170228002810.GD17615@umbus.fritz.box>
+	<ca5b4ee7d0dc010a545e5ace603dcf019d8d0c02.1487829585.git.sam.bobroff@au1.ibm.com>
+	<20170228001221.GB17615@umbus.fritz.box>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH v2 08/12] spapr: Only setup HTP if
- necessary.
+Subject: Re: [Qemu-devel] [RFC PATCH v2 06/12] spapr: Add ibm,
+ processor-radix-AP-encodings to the device tree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,161 +28,178 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>, Sam Bobroff <sam.bobroff@au1.ibm.com>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Tue, 2017-02-28 at 11:28 +1100, David Gibson wrote:
-> s/HTP/HPT/ in subject line.
-> 
-> 
-> On Thu, Feb 23, 2017 at 05:00:01PM +1100, Sam Bobroff wrote:
+On Tue, 2017-02-28 at 11:12 +1100, David Gibson wrote:
+> On Thu, Feb 23, 2017 at 04:59:59PM +1100, Sam Bobroff wrote:
 > > 
-> > If QEMU is using KVM, and KVM is capable of running in radix mode,
-> > guests can be run in real-mode without allocating a HPT (because
-> > KVM
-> > will use a minimal RPT). So in this case, we avoid creating the HPT
-> > at reset time and later (during CAS) create it if it is necessary.
+> > Use the new ioctl, KVM_PPC_GET_RMMU_INFO, to fetch radix MMU
+> > information from KVM and present the page encodings in the device
+> > tree
+> > under ibm,processor-radix-AP-encodings. This provides page size
+> > information to the guest which is necessary for it to use radix
+> > mode.
 > > 
 > > Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
-> So, IIRC, we discussed previously that the logical way to do things
-> was to, by default, delay HPT allocation until CAS time, and just do
-> it at reset time for the case that needs it: hash host with KVM.
-> 
-> Did you hit a problem with that approach, or is there still work to
-> be
-> done here?
-
-So what we're doing is assuming radix. Allocate hpt if hash host,
-otherwise delay til CAS time and allocate only if guest chose hash.
-
-> 
-> > 
 > > ---
 > > v2:
 > > 
-> > * This patch has been mostly rewritten to move the late HPT
-> > allocation to CAS.
-> > This allows a guest to start in radix mode (when it's in real mode)
-> > and then
-> > change to hash, even if it is a legacy guest and will not call
-> > h_register_process_table().
-> > * Added an exported function to spapr.c to perform HPT allocation
-> > and adjust
-> > the vrma if necessary. This makes it possible to allocate the HPT
-> > from
-> > h_client_architecture_support() in spapr_hcall.c.
-> > 
-> >  hw/ppc/spapr.c         | 24 +++++++++++++++---------
-> >  hw/ppc/spapr_hcall.c   | 10 ++++++++++
-> >  include/hw/ppc/spapr.h |  1 +
-> >  3 files changed, 26 insertions(+), 9 deletions(-)
-> > 
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index ca3812555f..dfee0f685f 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -1123,6 +1123,17 @@ static void
-> > spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
-> >      }
-> >  }
-> >  
-> > +void spapr_setup_hpt_and_vrma(sPAPRMachineState *spapr)
-> > +{
-> > +    spapr_reallocate_hpt(spapr,
-> > +                     spapr_hpt_shift_for_ramsize(MACHINE(qdev_get_
-> > machine())->maxram_size),
-> > +                     &error_fatal);
-> > +    if (spapr->vrma_adjust) {
-> > +        spapr->rma_size = kvmppc_rma_size(spapr_node0_size(),
-> > +                                          spapr->htab_shift);
-> > +    }
-> > +}
-> > +
-> >  static void find_unknown_sysbus_device(SysBusDevice *sbdev, void
-> > *opaque)
-> >  {
-> >      bool matched = false;
-> > @@ -1151,15 +1162,10 @@ static void ppc_spapr_reset(void)
-> >      /* Check for unknown sysbus devices */
-> >      foreach_dynamic_sysbus_device(find_unknown_sysbus_device,
-> > NULL);
-> >  
-> > -    /* Allocate and/or reset the hash page table */
-> > -    spapr_reallocate_hpt(spapr,
-> > -                         spapr_hpt_shift_for_ramsize(machine-
-> > >maxram_size),
-> > -                         &error_fatal);
-> > -
-> > -    /* Update the RMA size if necessary */
-> > -    if (spapr->vrma_adjust) {
-> > -        spapr->rma_size = kvmppc_rma_size(spapr_node0_size(),
-> > -                                          spapr->htab_shift);
-> > +    /* If using KVM with radix mode available, VCPUs can be
-> > started
-> > +     * without a HPT because KVM will start them in radix mode. */
-> > +    if (!(kvm_enabled() && kvmppc_has_cap_mmu_radix())) {
-> > +        spapr_setup_hpt_and_vrma(spapr);
-> >      }
-> >  
-> >      qemu_devices_reset();
-> > diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> > index 42d20e0b92..cea34073aa 100644
-> > --- a/hw/ppc/spapr_hcall.c
-> > +++ b/hw/ppc/spapr_hcall.c
-> > @@ -1002,6 +1002,16 @@ static target_ulong
-> > h_client_architecture_support(PowerPCCPU *cpu,
-> >      ov5_updates = spapr_ovec_new();
-> >      spapr->cas_reboot = spapr_ovec_diff(ov5_updates,
-> >                                          ov5_cas_old, spapr-
-> > >ov5_cas);
-> > +    if (kvm_enabled()) {
-> > +        if (kvmppc_has_cap_mmu_radix()) {
-> > +            /* If the HPT hasn't yet been set up (see
-> > +             * ppc_spapr_reset()), and it's needed, do it now: */
-> I think it's a bit fragile to have here it explicitly mirror the
-> logic
-> which determines whether the HPT is allocated early.  I'd prefer to
-> explicitly test here whether we have allocated an HPT - adding a
-> flag,
-> if we have to.
+> > * ppc_radix_page_info now kept in native format, conversion to BE
+> > done when adding to the device tree.
+> > * radix_page_info moved into the CPU class, cleaning up some code.
+> Looks pretty good, although I imaginge it will need a little rework
+> to
+> rebase on top of the TCG radix stuff.  Also one comment below..
 
-We can use the MSB of patb_entry as that flag.
-
-patb_entry & GUEST_RADIX == GUEST_RADIX -> radix, so assume a hpt
-hasn't been allocated.
-
-When we do allocate a hpt we know we're not radix, so set
-patb_entry &= ~GUEST_RADIX;
-
-Where GUEST_RADIX is the msb in patb_entry which indicates that a guest
-is radix.
-
-Essentially patb_entry & GUEST_RADIX cleared mean hash with hpt
-allocated, patb_entry & GUEST_RADIX set means radix so assume an hpt
-hasn't been allocated. On the hpt allocation path we clear GUEST_RADIX
-in patb_entry and when we set GUEST_RADIX we free the hpt.
+I've reworked a bit so my TCG stuff applies cleanly on top.
 
 > 
 > > 
-> > +            if (!spapr_ovec_test(ov5_updates, OV5_MMU_RADIX)) {
-> > +                /* legacy hash or new hash: */
-> > +                spapr_setup_hpt_and_vrma(spapr);
-> > +            }
+> > 
+> >  hw/ppc/spapr.c       | 12 ++++++++++++
+> >  include/sysemu/kvm.h |  1 +
+> >  target/ppc/cpu-qom.h |  1 +
+> >  target/ppc/cpu.h     |  4 ++++
+> >  target/ppc/kvm.c     | 27 +++++++++++++++++++++++++++
+> >  5 files changed, 45 insertions(+)
+> > 
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index cceb35f083..ca3812555f 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -409,6 +409,8 @@ static void spapr_populate_cpu_dt(CPUState *cs,
+> > void *fdt, int offset,
+> >      sPAPRDRConnector *drc;
+> >      sPAPRDRConnectorClass *drck;
+> >      int drc_index;
+> > +    uint32_t radix_AP_encodings[PPC_PAGE_SIZES_MAX_SZ];
+> > +    int i;
+> >  
+> >      drc = spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_CPU,
+> > index);
+> >      if (drc) {
+> > @@ -494,6 +496,16 @@ static void spapr_populate_cpu_dt(CPUState
+> > *cs, void *fdt, int offset,
+> >      _FDT(spapr_fixup_cpu_numa_dt(fdt, offset, cs));
+> >  
+> >      _FDT(spapr_fixup_cpu_smt_dt(fdt, offset, cpu, compat_smt));
+> > +
+> > +    if (pcc->radix_page_info) {
+> > +        for (i = 0; i < pcc->radix_page_info->count; i++) {
+> > +            radix_AP_encodings[i] = cpu_to_be32(pcc-
+> > >radix_page_info->entries[i]);
+> > +        }
+> > +        _FDT((fdt_setprop(fdt, offset, "ibm,processor-radix-AP-
+> > encodings",
+> > +                          radix_AP_encodings,
+> > +                          pcc->radix_page_info->count *
+> > +                          sizeof(radix_AP_encodings[0]))));
+> > +    }
+> >  }
+> >  
+> >  static void spapr_populate_cpus_dt_node(void *fdt,
+> > sPAPRMachineState *spapr)
+> > diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+> > index 3045ee7678..01a8db1180 100644
+> > --- a/include/sysemu/kvm.h
+> > +++ b/include/sysemu/kvm.h
+> > @@ -526,5 +526,6 @@ int kvm_set_one_reg(CPUState *cs, uint64_t id,
+> > void *source);
+> >   * Returns: 0 on success, or a negative errno on failure.
+> >   */
+> >  int kvm_get_one_reg(CPUState *cs, uint64_t id, void *target);
+> > +struct ppc_radix_page_info *kvm_get_radix_page_info(void);
+> >  int kvm_get_max_memslots(void);
+> >  #endif
+> > diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+> > index 4807f4d86c..0efb543912 100644
+> > --- a/target/ppc/cpu-qom.h
+> > +++ b/target/ppc/cpu-qom.h
+> > @@ -195,6 +195,7 @@ typedef struct PowerPCCPUClass {
+> >      int bfd_mach;
+> >      uint32_t l1_dcache_size, l1_icache_size;
+> >      const struct ppc_segment_page_sizes *sps;
+> > +    struct ppc_radix_page_info *radix_page_info;
+> >      void (*init_proc)(CPUPPCState *env);
+> >      int  (*check_pow)(CPUPPCState *env);
+> >      int (*handle_mmu_fault)(PowerPCCPU *cpu, vaddr eaddr, int rwx,
+> > int mmu_idx);
+> > diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> > index b559b67073..a6c8c5ff4c 100644
+> > --- a/target/ppc/cpu.h
+> > +++ b/target/ppc/cpu.h
+> > @@ -934,6 +934,10 @@ struct ppc_segment_page_sizes {
+> >      struct ppc_one_seg_page_size sps[PPC_PAGE_SIZES_MAX_SZ];
+> >  };
+> >  
+> > +struct ppc_radix_page_info {
+> > +    uint32_t count;
+> > +    uint32_t entries[PPC_PAGE_SIZES_MAX_SZ];
+> > +};
+> >  
+> >  /*****************************************************************
+> > ************/
+> >  /* The whole PowerPC CPU context */
+> > diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> > index d53ede8b4a..cf62a42c1f 100644
+> > --- a/target/ppc/kvm.c
+> > +++ b/target/ppc/kvm.c
+> > @@ -48,6 +48,7 @@
+> >  #if defined(TARGET_PPC64)
+> >  #include "hw/ppc/spapr_cpu_core.h"
+> >  #endif
+> > +#include "sysemu/kvm_int.h"
+> >  
+> >  //#define DEBUG_KVM
+> >  
+> > @@ -329,6 +330,30 @@ static void kvm_get_smmu_info(PowerPCCPU *cpu,
+> > struct kvm_ppc_smmu_info *info)
+> >      kvm_get_fallback_smmu_info(cpu, info);
+> >  }
+> >  
+> > +struct ppc_radix_page_info *kvm_get_radix_page_info(void)
+> > +{
+> > +    KVMState *s = KVM_STATE(current_machine->accelerator);
+> > +    struct ppc_radix_page_info *radix_page_info;
+> > +    struct kvm_ppc_rmmu_info rmmu_info;
+> > +    int i;
+> > +
+> > +    if (!kvm_check_extension(s, KVM_CAP_PPC_MMU_RADIX)) {
+> > +        return NULL;
+> > +    }
+> > +    if (kvm_vm_ioctl(s, KVM_PPC_GET_RMMU_INFO, &rmmu_info)) {
+> > +        return NULL;
+> > +    }
+> > +    radix_page_info = g_malloc0(sizeof(*radix_page_info));
+> > +    radix_page_info->count = 0;
+> > +    for (i = 0; i < PPC_PAGE_SIZES_MAX_SZ; i++) {
+> > +        if (rmmu_info.ap_encodings[i]) {
+> > +            radix_page_info->entries[i] =
+> > rmmu_info.ap_encodings[i];
+> > +            radix_page_info->count++;
 > > +        }
 > > +    }
+> > +    return radix_page_info;
+> > +}
+> > +
+> >  static long gethugepagesize(const char *mem_path)
+> >  {
+> >      struct statfs fs;
+> > @@ -2379,6 +2404,8 @@ static void
+> > kvmppc_host_cpu_class_init(ObjectClass *oc, void *data)
+> >          pcc->l1_icache_size = icache_size;
+> >      }
 > >  
-> >      if (!spapr->cas_reboot) {
-> >          spapr->cas_reboot =
-> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > index f9b17d860a..a30cbc485c 100644
-> > --- a/include/hw/ppc/spapr.h
-> > +++ b/include/hw/ppc/spapr.h
-> > @@ -590,6 +590,7 @@ void spapr_dt_events(sPAPRMachineState *sm,
-> > void *fdt);
-> >  int spapr_h_cas_compose_response(sPAPRMachineState *sm,
-> >                                   target_ulong addr, target_ulong
-> > size,
-> >                                   sPAPROptionVector *ov5_updates);
-> > +void spapr_setup_hpt_and_vrma(sPAPRMachineState *spapr);
-> >  sPAPRTCETable *spapr_tce_new_table(DeviceState *owner, uint32_t
-> > liobn);
-> >  void spapr_tce_table_enable(sPAPRTCETable *tcet,
-> >                              uint32_t page_shift, uint64_t
-> > bus_offset,
+> > +    pcc->radix_page_info = kvm_enabled() ?
+> > kvm_get_radix_page_info() : NULL;
+> This whole function is only called in the kvm case: no need to check
+> kvm_enabled() here.
+
+I've reworked this, so this is irrelevant. I've added a generic
+function in mmu-radix64.h which calls kvm_get_radix_page_info if radix
+enabled, otherwise returns the default for TCG case.
+
+> 
+> > 
+> >      /* Reason: kvmppc_host_cpu_initfn() dies when !kvm_enabled()
+> > */
+> >      dc->cannot_destroy_with_object_finalize_yet = true;
+> >  }
