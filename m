@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43335)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cilO0-0001j5-7i
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:29 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cilO0-0001jo-Tq
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cilNz-00036k-8S
+	(envelope-from <pm215@archaic.org.uk>) id 1cilNz-00036v-SW
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:28 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48715)
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48716)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cilNz-00034e-1v
+	id 1cilNz-00036d-Ll
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:27 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1cilNx-0003UA-Ew
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:16:25 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1cilNy-0003V9-Sk
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:16:26 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Feb 2017 17:16:09 +0000
-Message-Id: <1488302176-19463-15-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 28 Feb 2017 17:16:11 +0000
+Message-Id: <1488302176-19463-17-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1488302176-19463-1-git-send-email-peter.maydell@linaro.org>
 References: <1488302176-19463-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 14/21] hw/intc/arm_gicv3_kvm: Add ICC_SRE_EL1
- register to vmstate
+Subject: [Qemu-devel] [PULL 16/21] target-arm: Add GICv3CPUState in
+ CPUARMState struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,86 +32,80 @@ To: qemu-devel@nongnu.org
 
 From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 
-To Save and Restore ICC_SRE_EL1 register introduce vmstate
-subsection and load only if non-zero.
-Also initialize icc_sre_el1 with to 0x7 in pre_load
-function.
+Add gicv3state void pointer to CPUARMState struct
+to store GICv3CPUState.
+
+In case of usecase like CPU reset, we need to reset
+GICv3CPUState of the CPU. In such scenario, this pointer
+becomes handy.
 
 Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Message-id: 1487850673-26455-3-git-send-email-vijay.kilari@gmail.com
+Message-id: 1487850673-26455-5-git-send-email-vijay.kilari@gmail.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/intc/arm_gicv3_common.h |  1 +
- hw/intc/arm_gicv3_common.c         | 36 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 37 insertions(+)
+ hw/intc/gicv3_internal.h   | 2 ++
+ target/arm/cpu.h           | 2 ++
+ hw/intc/arm_gicv3_common.c | 2 ++
+ hw/intc/arm_gicv3_cpuif.c  | 8 ++++++++
+ 4 files changed, 14 insertions(+)
 
-diff --git a/include/hw/intc/arm_gicv3_common.h b/include/hw/intc/arm_gicv3_common.h
-index 4156051..bccdfe1 100644
---- a/include/hw/intc/arm_gicv3_common.h
-+++ b/include/hw/intc/arm_gicv3_common.h
-@@ -172,6 +172,7 @@ struct GICv3CPUState {
-     uint8_t gicr_ipriorityr[GIC_INTERNAL];
+diff --git a/hw/intc/gicv3_internal.h b/hw/intc/gicv3_internal.h
+index 457118e..05303a5 100644
+--- a/hw/intc/gicv3_internal.h
++++ b/hw/intc/gicv3_internal.h
+@@ -408,4 +408,6 @@ static inline void gicv3_cache_all_target_cpustates(GICv3State *s)
+     }
+ }
  
-     /* CPU interface */
-+    uint64_t icc_sre_el1;
-     uint64_t icc_ctlr_el1[2];
-     uint64_t icc_pmr_el1;
-     uint64_t icc_bpr[3];
++void gicv3_set_gicv3state(CPUState *cpu, GICv3CPUState *s);
++
+ #endif /* QEMU_ARM_GICV3_INTERNAL_H */
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 9e7b2df..25ceaab 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -521,6 +521,8 @@ typedef struct CPUARMState {
+ 
+     void *nvic;
+     const struct arm_boot_info *boot_info;
++    /* Store GICv3CPUState to access from this struct */
++    void *gicv3state;
+ } CPUARMState;
+ 
+ /**
 diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
-index 16b9b0f..5b0e456 100644
+index 5b0e456..c6493d6 100644
 --- a/hw/intc/arm_gicv3_common.c
 +++ b/hw/intc/arm_gicv3_common.c
-@@ -70,6 +70,38 @@ static const VMStateDescription vmstate_gicv3_cpu_virt = {
-     }
- };
+@@ -252,6 +252,8 @@ static void arm_gicv3_common_realize(DeviceState *dev, Error **errp)
  
-+static int icc_sre_el1_reg_pre_load(void *opaque)
+         s->cpu[i].cpu = cpu;
+         s->cpu[i].gic = s;
++        /* Store GICv3CPUState in CPUARMState gicv3state pointer */
++        gicv3_set_gicv3state(cpu, &s->cpu[i]);
+ 
+         /* Pre-construct the GICR_TYPER:
+          * For our implementation:
+diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
+index f775aba..0b20856 100644
+--- a/hw/intc/arm_gicv3_cpuif.c
++++ b/hw/intc/arm_gicv3_cpuif.c
+@@ -19,6 +19,14 @@
+ #include "gicv3_internal.h"
+ #include "cpu.h"
+ 
++void gicv3_set_gicv3state(CPUState *cpu, GICv3CPUState *s)
 +{
-+    GICv3CPUState *cs = opaque;
++    ARMCPU *arm_cpu = ARM_CPU(cpu);
++    CPUARMState *env = &arm_cpu->env;
 +
-+   /*
-+    * If the sre_el1 subsection is not transferred this
-+    * means SRE_EL1 is 0x7 (which might not be the same as
-+    * our reset value).
-+    */
-+    cs->icc_sre_el1 = 0x7;
-+    return 0;
-+}
-+
-+static bool icc_sre_el1_reg_needed(void *opaque)
-+{
-+    GICv3CPUState *cs = opaque;
-+
-+    return cs->icc_sre_el1 != 7;
-+}
-+
-+const VMStateDescription vmstate_gicv3_cpu_sre_el1 = {
-+    .name = "arm_gicv3_cpu/sre_el1",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .pre_load = icc_sre_el1_reg_pre_load,
-+    .needed = icc_sre_el1_reg_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(icc_sre_el1, GICv3CPUState),
-+        VMSTATE_END_OF_LIST()
-+    }
++    env->gicv3state = (void *)s;
 +};
 +
- static const VMStateDescription vmstate_gicv3_cpu = {
-     .name = "arm_gicv3_cpu",
-     .version_id = 1,
-@@ -100,6 +132,10 @@ static const VMStateDescription vmstate_gicv3_cpu = {
-     .subsections = (const VMStateDescription * []) {
-         &vmstate_gicv3_cpu_virt,
-         NULL
-+    },
-+    .subsections = (const VMStateDescription * []) {
-+        &vmstate_gicv3_cpu_sre_el1,
-+        NULL
-     }
- };
- 
+ static GICv3CPUState *icc_cs_from_env(CPUARMState *env)
+ {
+     /* Given the CPU, find the right GICv3CPUState struct.
 -- 
 2.7.4
