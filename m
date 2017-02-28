@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cied5-0006oH-Uo
+	(envelope-from <fred.konrad@greensocs.com>) id 1cied6-0006oW-CA
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cied2-00047u-SD
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:35 -0500
-Received: from greensocs.com ([193.104.36.180]:38360)
+	(envelope-from <fred.konrad@greensocs.com>) id 1cied4-00048t-WF
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:36 -0500
+Received: from greensocs.com ([193.104.36.180]:38421)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cied2-000472-GR
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:32 -0500
+	(envelope-from <fred.konrad@greensocs.com>) id 1cied4-00048g-Iq
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:34 -0500
 From: fred.konrad@greensocs.com
-Date: Tue, 28 Feb 2017 11:02:57 +0100
-Message-Id: <1488276185-31168-3-git-send-email-fred.konrad@greensocs.com>
+Date: Tue, 28 Feb 2017 11:03:01 +0100
+Message-Id: <1488276185-31168-7-git-send-email-fred.konrad@greensocs.com>
 In-Reply-To: <1488276185-31168-1-git-send-email-fred.konrad@greensocs.com>
 References: <1488276185-31168-1-git-send-email-fred.konrad@greensocs.com>
-Subject: [Qemu-devel] [PATCH v3 02/10] qemu-clk: allow to add a clock to a
- device
+Subject: [Qemu-devel] [PATCH v3 06/10] docs: add qemu-clock documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,97 +28,300 @@ Cc: peter.maydell@linaro.org, edgar.iglesias@xilinx.com, alistair.francis@xilinx
 
 From: KONRAD Frederic <fred.konrad@greensocs.com>
 
-This allows to add a clock to a DeviceState.
-Contrary to gpios, the clock pins are not contained in the DeviceState but
-with the child property so they can appears in the qom-tree.
+This adds the qemu-clock documentation.
 
 Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
 
-V2 -> V3:
-  * s/qemu_clk/QEMUClock/g
 V1 -> V2:
-  * Rename the function use 'add' instead of 'attach'
+  * Fixed in accordance with the changes in the previous patches.
 ---
- include/qemu/qemu-clock.h | 24 +++++++++++++++++++++++-
- qemu-clock.c              | 23 +++++++++++++++++++++++
- 2 files changed, 46 insertions(+), 1 deletion(-)
+ docs/clock.txt | 278 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 278 insertions(+)
+ create mode 100644 docs/clock.txt
 
-diff --git a/include/qemu/qemu-clock.h b/include/qemu/qemu-clock.h
-index 446a490..ffe743d 100644
---- a/include/qemu/qemu-clock.h
-+++ b/include/qemu/qemu-clock.h
-@@ -33,8 +33,30 @@
- typedef struct QEMUClock {
-     /*< private >*/
-     Object parent_obj;
-+    char *name;            /* name of this clock in the device. */
- } QEMUClock;
- 
--#endif /* QEMU_CLOCK_H */
-+/**
-+ * qemu_clk_device_add_clock:
-+ * @dev: the device on which the clock needs to be added.
-+ * @clk: the clock which needs to be added.
-+ * @name: the name of the clock can't be NULL.
-+ *
-+ * Add @clk to device @dev as a clock named @name.
-+ *
-+ */
-+void qemu_clk_device_add_clock(DeviceState *dev, QEMUClock *clk,
-+                               const char *name);
- 
-+/**
-+ * qemu_clk_device_get_clock:
-+ * @dev: the device which contains the clock.
-+ * @name: the name of the clock.
-+ *
-+ * Get the clock named @name contained in the device @dev, or NULL if not found.
-+ *
-+ * Returns the clock named @name contained in @dev.
-+ */
-+QEMUClock *qemu_clk_device_get_clock(DeviceState *dev, const char *name);
- 
-+#endif /* QEMU_CLOCK_H */
-diff --git a/qemu-clock.c b/qemu-clock.c
-index 3bef144..6eeecf3 100644
---- a/qemu-clock.c
-+++ b/qemu-clock.c
-@@ -25,6 +25,7 @@
- #include "qemu/qemu-clock.h"
- #include "hw/hw.h"
- #include "qemu/log.h"
-+#include "qapi/error.h"
- 
- #ifndef DEBUG_QEMU_CLOCK
- #define DEBUG_QEMU_CLOCK 0
-@@ -36,6 +37,28 @@
-     }                                                                        \
- } while (0);
- 
-+void qemu_clk_device_add_clock(DeviceState *dev, QEMUClock *clk,
-+                               const char *name)
+diff --git a/docs/clock.txt b/docs/clock.txt
+new file mode 100644
+index 0000000..010ae50
+--- /dev/null
++++ b/docs/clock.txt
+@@ -0,0 +1,278 @@
++
++What is a QEMU_CLOCK
++====================
++
++A QEMU_CLOCK is a QOM Object developed for the purpose of modeling a clock tree
++with QEMU.
++
++It only simulates the clock by keeping a copy of the current frequency and
++doesn't model the signal itself such as pin toggle or duty cycle.
++
++It allows to model the impact of badly configured PLL, clock source selection
++or disabled clock on the models.
++
++Binding the clock together to create a tree
++===========================================
++
++In order to create a clock tree with QEMU_CLOCK two or more clock must be bound
++together. Let's say there are two clocks clk_a and clk_b:
++Using qemu_clk_bind(clk_a, clk_b) will bind clk_a and clk_b.
++
++Binding two qemu-clk together creates a unidirectional link which means that
++changing the rate of clk_a will propagate to clk_b and not the opposite.
++The binding process automatically refreshes clk_b rate.
++
++Clock can be bound and unbound during execution for modeling eg: a clock
++selector.
++
++A clock can drive more than one other clock. eg with this code:
++qemu_clk_bind(clk_a, clk_b);
++qemu_clk_bind(clk_a, clk_c);
++
++A clock rate change one clk_a will propagate to clk_b and clk_c.
++
++Implementing a callback on a rate change
++========================================
++
++The function prototype is the following:
++typedef uint64_t QEMUClkRateUpdateCallback(void *opaque, uint64_t rate);
++
++It's main goal is to modify the rate before it's passed to the next clocks in
++the tree.
++
++eg: for a 4x PLL the function will be:
++uint64_t qemu_clk_rate_change_cb(void *opaque, uint64_t rate)
 +{
-+    assert(name);
-+    assert(!clk->name);
-+    object_property_add_child(OBJECT(dev), name, OBJECT(clk), &error_abort);
-+    clk->name = g_strdup(name);
++    return 4 * rate;
 +}
 +
-+QEMUClock *qemu_clk_device_get_clock(DeviceState *dev, const char *name)
-+{
-+    gchar *path = NULL;
-+    Object *clk;
-+    bool ambiguous;
++To set the callback for the clock:
++void qemu_clk_set_callback(qemu_clk clk, QEMUClkRateUpdateCallback *cb,
++                           void *opaque);
++can be called.
 +
-+    path = g_strdup_printf("%s/%s", object_get_canonical_path(OBJECT(dev)),
-+                           name);
-+    clk = object_resolve_path(path, &ambiguous);
-+    g_free(path);
-+    return QEMU_CLOCK(clk);
++The rate update process
++=======================
++
++The rate update happen in this way:
++When a model wants to update a clock frequency (eg: based on a register change
++or something similar) it will call qemu_clk_update_rate(..) on the clock:
++  * The callback associated to the clock is called with the new rate.
++  * qemu_clk_update_rate(..) is then called on all bound clocks with the value
++    returned by the callback.
++
++NOTE: When no callback is attached, the clock qemu_clk_update_rate(..) is called
++on the next clock in the tree with the rate unmodified.
++
++Adding a QEMU_CLOCK to a DeviceState
++====================================
++
++Adding a qemu-clk to a DeviceState is required to be able to get the clock
++outside the model through qemu_clk_device_get_clock(..).
++
++It is also required to be able to print the clock and its rate with info qtree.
++For example:
++
++  type System
++  dev: xlnx.zynqmp_crf, id ""
++    gpio-out "sysbus-irq" 1
++    gpio-out "RST_A9" 4
++    qemu-clk "dbg_trace" 0
++    qemu-clk "vpll_to_lpd" 625000000
++    qemu-clk "dp_stc_ref" 0
++    qemu-clk "dpll_to_lpd" 12500000
++    qemu-clk "acpu_clk" 0
++    qemu-clk "pcie_ref" 0
++    qemu-clk "topsw_main" 0
++    qemu-clk "topsw_lsbus" 0
++    qemu-clk "dp_audio_ref" 0
++    qemu-clk "sata_ref" 0
++    qemu-clk "dp_video_ref" 71428568
++    qemu-clk "vpll_clk" 2500000000
++    qemu-clk "apll_to_lpd" 12500000
++    qemu-clk "dpll_clk" 50000000
++    qemu-clk "gpu_ref" 0
++    qemu-clk "aux_refclk" 0
++    qemu-clk "video_clk" 27000000
++    qemu-clk "gdma_ref" 0
++    qemu-clk "gt_crx_ref_clk" 0
++    qemu-clk "dbg_fdp" 0
++    qemu-clk "apll_clk" 50000000
++    qemu-clk "pss_alt_ref_clk" 0
++    qemu-clk "ddr" 0
++    qemu-clk "pss_ref_clk" 50000000
++    qemu-clk "dpdma_ref" 0
++    qemu-clk "dbg_tstmp" 0
++    mmio 00000000fd1a0000/000000000000010c
++
++This way a DeviceState can have multiple clock input or output.
++
++Examples
++========
++
++Those are the different way of using the QEMUClock object.
++
++Modelling a fixed clock generator
++=================================
++
++Here is a brief example of a device acting as a clock source:
++
++typedef struct {
++    DeviceState parent_obj;
++
++    uint32_t rate;
++    QEMUClock out;
++} FixedClock;
++
++During the initialization the device must initialize its clock object:
++
++static void fixed_clock_instance_init(Object *obj)
++{
++    FixedClock *s = FIXED_CLOCK(obj);
++
++    object_initialize(&s->out, sizeof(s->out), TYPE_CLOCK);
++    qemu_clk_device_add_clock(DEVICE(obj), &s->out, "clk_out");
 +}
 +
- static const TypeInfo qemu_clk_info = {
-     .name          = TYPE_CLOCK,
-     .parent        = TYPE_OBJECT,
++As the device acts as a clock source it must refresh the clock tree during the
++realize phase:
++
++static void fixed_clock_realizefn(DeviceState *dev, Error **errp)
++{
++    FixedClock *s = FIXED_CLOCK(dev);
++
++    qemu_clk_update_rate(&s->out, s->rate);
++}
++
++This means that the clock tree must be finished before realize is called on the
++fixed clock.
++
++Modelling a clock user device
++=============================
++
++Here is a brief example of a clock user:
++
++typedef struct {
++    DeviceState parent_obj;
++
++    QEMUClock in;
++} ClockUser;
++
++As before the clock must be initialized through the device initialize function:
++
++static void clock_user_instance_init(Object *obj)
++{
++    ClockUser *s = CLOCK_USER(obj);
++
++    object_initialize(&s->in, sizeof(s->in), TYPE_CLOCK);
++    qemu_clk_device_add_clock(DEVICE(obj), &s->in, "clk_in");
++    /*
++     * Call on_rate_change_cb when something change on clk_in.
++     */
++    qemu_clk_set_callback(s->in, on_rate_change_cb, obj);
++}
++
++The callback is in this case used as a notifier when the clock tree which
++sources the device change:
++
++static uint64_t on_rate_change_cb(void *opaque, uint64_t input_rate)
++{
++    printf("the new rate is %ld\n", input_rate);
++
++    /* The return is ignored if nothing is bound to clk_in. */
++    return input_rate;
++}
++
++Modelling a clock multiplier
++============================
++
++Here is a brief example of a device acting as a clock modifier:
++
++typedef struct {
++    DeviceState parent_obj;
++
++    uint32_t rate;
++    QEMUClock out;
++    QEMUClock in;
++} ClockMultiplier;
++
++As before the clocks must be initialized through the device initialize function
++but they must be bound together so a change on the input will propagate on the
++output:
++
++static void clock_multiplier_instance_init(Object *obj)
++{
++    ClockMultiplier *s = CLOCK_MULTIPLIER(obj);
++
++    object_initialize(&s->out, sizeof(s->out), TYPE_CLOCK);
++    object_initialize(&s->in, sizeof(s->in), TYPE_CLOCK);
++
++    qemu_clk_device_add_clock(DEVICE(obj), &s->in, "clk_in");
++    qemu_clk_device_add_clock(DEVICE(obj), &s->out, "clk_out");
++    /*
++     * Propagate the change from in to out, this can be done dynamically during
++     * the simulation but we need to do the initial binding here to get the
++     * initial refresh happening when the realize function is called on the
++     * fixed clock.
++     */
++    qemu_clk_bind(s->in, s->out);
++    /*
++     * But before propagating the rate modify it with multiplier_cb.
++     */
++    qemu_clk_set_callback(s->out, multiplier_cb, obj);
++}
++
++In this example when clk_in changes it will trigger a change on clk_out and this
++callback can modify the rate of clk_out (the return value of this callback)
++accordingly to clk_in rate (input_rate).
++
++static uint64_t multiplier_cb(void *opaque, uint64_t input_rate)
++{
++    return input_rate * 4;
++}
++
++This device doesn't refresh the clock tree as it will be done by the clock tree
++source.
++
++Modelling a clock selector
++==========================
++
++Here is a brief example of a device acting as a device which alter the clock
++topology such as a clock selector:
++
++typedef struct {
++    DeviceState parent_obj;
++
++    QEMUClock out;
++    QEMUClock in_a;
++    QEMUClock in_b;
++} ClockSelector;
++
++The clocks must be initialized through the device initialize function but they
++must be bound together like they will be when the device is reset so a change on
++the input during the realize of the fixed clock will propagate to the output:
++
++static void clock_selector_instance_init(Object *obj)
++{
++    ClockSelector *s = CLOCK_SELECTOR(obj);
++
++    object_initialize(&s->out, sizeof(s->out), TYPE_CLOCK);
++    object_initialize(&s->in_a, sizeof(s->in_a), TYPE_CLOCK);
++    object_initialize(&s->in_b, sizeof(s->in_b), TYPE_CLOCK);
++
++    qemu_clk_device_add_clock(DEVICE(obj), &s->in_a, "clk_in_a");
++    qemu_clk_device_add_clock(DEVICE(obj), &s->in_b, "clk_in_b");
++    qemu_clk_device_add_clock(DEVICE(obj), &s->out, "clk_out");
++
++    /* Assuming at the reset that the input_a is connected to output. */
++    qemu_clk_bind(s->in_a, s->out);
++}
++
++/* This is called for example by a register change or something like that */
++void update_topology(ClockSelector *s)
++{
++    /* Unbind the old clock */
++    qemu_clk_unbind(s->in_a, s->out);
++    /* Bind the new one, the rate is automatically refreshed. */
++    qemu_clk_bind(s->in_b, s->out);
++}
 -- 
 1.8.3.1
