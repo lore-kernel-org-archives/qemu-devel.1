@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56209)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ciklo-0006QA-LI
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:37:02 -0500
+	(envelope-from <clg@kaod.org>) id 1ciksw-0004T6-SM
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:44:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cikln-0002uN-4y
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:37:00 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1488194450-28056-1-git-send-email-armbru@redhat.com>
-	<1488194450-28056-4-git-send-email-armbru@redhat.com>
-	<20170228154836.GF4090@noname.redhat.com>
-Date: Tue, 28 Feb 2017 17:36:50 +0100
-In-Reply-To: <20170228154836.GF4090@noname.redhat.com> (Kevin Wolf's message
-	of "Tue, 28 Feb 2017 16:48:36 +0100")
-Message-ID: <87innunufx.fsf@dusky.pond.sub.org>
+	(envelope-from <clg@kaod.org>) id 1cikss-0006Ou-6y
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:44:22 -0500
+Received: from 1.mo179.mail-out.ovh.net ([178.33.111.220]:57074)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1ciksr-0006OK-To
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:44:18 -0500
+Received: from player690.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id BFF7E238E1
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 17:44:13 +0100 (CET)
+References: <1484757581-13124-1-git-send-email-clg@kaod.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <72225e13-b889-a4cb-c026-d66ea16a9117@kaod.org>
+Date: Tue, 28 Feb 2017 17:44:10 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 03/24] keyval: New keyval_parse()
+In-Reply-To: <1484757581-13124-1-git-send-email-clg@kaod.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] hw/misc: add a TMP42{1, 2,
+ 3} device model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,318 +30,484 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: pkrempa@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, Andrew Jeffery <andrew@aj.id.au>
 
-Kevin Wolf <kwolf@redhat.com> writes:
+On 01/18/2017 05:39 PM, C=C3=A9dric Le Goater wrote:
+> Largely inspired by the TMP105 temperature sensor, here is a model for
+> the TMP42{1,2,3} temperature sensors.
+>=20
+> Specs can be found here :
+>=20
+> 	http://www.ti.com/lit/gpn/tmp421
+>=20
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> Reviewed-by: Joel Stanley <joel@jms.id.au>
 
-> Am 27.02.2017 um 12:20 hat Markus Armbruster geschrieben:
->> keyval_parse() parses KEY=VALUE,... into a QDict.  Works like
->> qemu_opts_parse(), except:
->> 
->> * Returns a QDict instead of a QemuOpts (d'oh).
->> 
->> * Supports nesting, unlike QemuOpts: a KEY is split into key
->>   fragments at '.' (dotted key convention; the block layer does
->>   something similar on top of QemuOpts).  The key fragments are QDict
->>   keys, and the last one's value is updated to VALUE.
->> 
->> * Each key fragment may be up to 127 bytes long.  qemu_opts_parse()
->>   limits the entire key to 127 bytes.
->> 
->> * Overlong key fragments are rejected.  qemu_opts_parse() silently
->>   truncates them.
->> 
->> * Empty key fragments are rejected.  qemu_opts_parse() happily
->>   accepts empty keys.
->> 
->> * It does not store the returned value.  qemu_opts_parse() stores it
->>   in the QemuOptsList.
->> 
->> * It does not treat parameter "id" specially.  qemu_opts_parse()
->>   ignores all but the first "id", and fails when its value isn't
->>   id_wellformed(), or duplicate (a QemuOpts with the same ID is
->>   already stored).  It also screws up when a value contains ",id=".
->
-> This is important to keep in mind, callers need to explicitly check
-> validity of the "id" key themselves.
+So, do you think this model is worth to take for 2.9 ?=20
 
-Good point.  Come to think of it, I'm not sure I did %-}
+Thanks,
 
->> * Implied value is not supported.  qemu_opts_parse() desugars "foo" to
->>   "foo=on", and "nofoo" to "foo=off".
->> 
->> * An implied key's value can't be empty, and can't contain ','.
->> 
->> I intend to grow this into a saner replacement for QemuOpts.  It'll
->> take time, though.
->> 
->> Note: keyval_parse() provides no way to do lists, and its key syntax
->> is incompatible with the __RFQDN_ prefix convention for downstream
->> extensions, because it blindly splits at '.', even in __RFQDN_.  Both
->> issues will be addressed later in the series.
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->
->> diff --git a/util/keyval.c b/util/keyval.c
->> new file mode 100644
->> index 0000000..3904c39
->> --- /dev/null
->> +++ b/util/keyval.c
->> @@ -0,0 +1,228 @@
->> +/*
->> + * Parsing KEY=VALUE,... strings
->> + *
->> + * Copyright (C) 2017 Red Hat Inc.
->> + *
->> + * Authors:
->> + *  Markus Armbruster <armbru@redhat.com>,
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
->> + * See the COPYING file in the top-level directory.
->> + */
->> +
->> +/*
->> + * KEY=VALUE,... syntax:
->> + *
->> + *   key-vals     = [ key-val { ',' key-vals } ]
->> + *   key-val      = key '=' val
->> + *   key          = key-fragment { '.' key-fragment }
->> + *   key-fragment = / [^=,.]* /
->> + *   val          = { / [^,]* / | ',,' }
->> + *
->> + * Semantics defined by reduction to JSON:
->> + *
->> + *   key-vals defines a tree of objects rooted at R
->> + *   where for each key-val = key-fragment . ... = val in key-vals
->> + *       R op key-fragment op ... = val'
->> + *       where (left-associative) op is member reference L.key-fragment
->
-> Maybe it's just me, but I can't say that I fully understand what these
-> last two lines are supposed to tell me.
+C.
 
-Okay, I'll try to clarify.
-
-Last patch amends this part for lists.
-
->> + *             val' is val with ',,' replaced by ','
->> + *   and only R may be empty.
->> + *
->> + *   Duplicate keys are permitted; all but the last one are ignored.
->> + *
->> + *   The equations must have a solution.  Counter-example: a.b=1,a=2
->> + *   doesn't have one, because R.a must be an object to satisfy a.b=1
->> + *   and a string to satisfy a=2.
->> + *
->> + * The length of any key-fragment must be between 1 and 127.
->> + *
->> + * Design flaw: there is no way to denote an empty non-root object.
->> + * While interpreting "key absent" as empty object seems natural
->> + * (removing a key-val from the input string removes the member when
->> + * there are more, so why not when it's the last), it doesn't work:
->> + * "key absent" already means "optional object absent", which isn't
->> + * the same as "empty object present".
->> + *
->> + * Additional syntax for use with an implied key:
->> + *
->> + *   key-vals-ik  = val-no-key [ ',' key-vals ]
->> + *   val-no-key   = / [^,]* /
->> + *
->> + * where no-key is syntactic sugar for implied-key=val-no-key.
->
-> s/no-key/val-no-key/ ?
-
-Yes.
-
->> + *
->> + * TODO support lists
->> + * TODO support key-fragment with __RFQDN_ prefix (downstream extensions)
->
-> Worth another TODO comment for implied values that contain a comma? The
-> current restriction feels a bit artificial.
-
-My reasons for the restriction are perhaps best explained with an
-example.  Consider params = "a,,,b".
-
-qemu_opts_parse(opt_list, params, true) splits into comma-separated
-parts like this:
-
-    #   part    key       value
-    0   "a,,"   implied   "a,"
-    1   "b"     "b"       "on"
-
-qemu_opts_parse(list, params, false) like this:
-
-    #   part    key       value
-    0   "a"     "a"       "on"
-    1   ""      ""        "on"
-    2   ""      ""        "on"
-    3   "b"     "b"       "on"
-
-The split of depends on the permit_abbrev argument!  I consider that
-tasteless design.  Or rather I would if I could bring myself to believe
-in the existence of a design here.
-
-The big hammer to make *syntactic* analysis invariant of whether we have
-an implied key is to outlaw ',' val-no-key.  That way, the leftmost part
-of param can be isolated the same with and without implied key: it ends
-at the first '=' or ','.
-
-Perhaps a smaller hammer can be found, but right now I'm in no mood for
-checking grammars for ambiguity :)
-
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "qapi/error.h"
->> +#include "qapi/qmp/qstring.h"
->> +#include "qemu/option.h"
->> +
->> +/*
->> + * Ensure @cur maps @key_in_cur the right way.
->> + * If @value is null, it needs to map to a QDict, else to this
->> + * QString.
->> + * If @cur doesn't have @key_in_cur, put an empty QDict or @value,
->> + * respectively.
->> + * Else, if it needs to map to a QDict, and already does, do nothing.
->> + * Else, if it needs to map to this QString, and already maps to a
->> + * QString, replace it by @value.
->> + * Else, fail because we have conflicting needs on how to map
->> + * @key_in_cur.
->> + * Use @key up to @key_cursor to identify the key in error messages.
->> + * On success, return the mapped value.
->> + * On failure, store an error through @errp and return NULL.
->> + */
->> +static QObject *keyval_parse_put(QDict *cur,
->> +                                 const char *key_in_cur, QString *value,
->> +                                 const char *key, const char *key_cursor,
->> +                                 Error **errp)
->> +{
->> +    QObject *old, *new;
->> +
->> +    old = qdict_get(cur, key_in_cur);
->> +    if (old) {
->> +        if (qobject_type(old) != (value ? QTYPE_QSTRING : QTYPE_QDICT)) {
->> +            error_setg(errp, "Parameters '%.*s.*' used inconsistently",
->> +                       (int)(key_cursor - key), key);
->> +            return NULL;
->> +        }
->> +        if (!value) {
->> +            return old;         /* already QDict, do nothing */
->> +        }
->> +        new = QOBJECT(value);   /* replacement */
->> +    } else {
->> +        new = QOBJECT(value) ?: QOBJECT(qdict_new());
->> +    }
->> +    qdict_put_obj(cur, key_in_cur, new);
->> +    return new;
->> +}
->> +
->> +/*
->> + * Parse one KEY=VALUE from @params, store result in @qdict.
->> + * The first fragment of KEY applies to @qdict.  Subsequent fragments
->> + * apply to nested QDicts, which are created on demand.  @implied_key
->> + * is as in keyval_parse().
->> + * On success, return a pointer to the next KEY=VALUE, or else to '\0'.
->> + * On failure, return NULL.
->> + */
->> +static const char *keyval_parse_one(QDict *qdict, const char *params,
->> +                                    const char *implied_key,
->> +                                    Error **errp)
->> +{
->> +    const char *key, *key_end, *s;
->> +    size_t len;
->> +    char key_in_cur[128];
->> +    QDict *cur;
->> +    QObject *next;
->> +    QString *val;
->> +
->> +    key = params;
->> +    len = strcspn(params, "=,");
->> +    if (implied_key && len && key[len] != '=') {
->> +        /* Desugar implied key */
->> +        key = implied_key;
->> +        len = strlen(implied_key);
->> +    }
->> +    key_end = key + len;
->> +
->> +    /*
->> +     * Loop over key fragments: @s points to current fragment, it
->> +     * applies to @cur.  @key_in_cur[] holds the previous fragment.
->> +     */
->> +    cur = qdict;
->> +    s = key;
->> +    for (;;) {
->> +        for (len = 0; s + len < key_end && s[len] != '.'; len++) {
->> +        }
->> +        if (!len) {
->> +            assert(key != implied_key);
->> +            error_setg(errp, "Invalid parameter '%.*s'",
->> +                       (int)(key_end - key), key);
->> +            return NULL;
->> +        }
->> +        if (len >= sizeof(key_in_cur)) {
->> +            assert(key != implied_key);
->> +            error_setg(errp, "Parameter%s '%.*s' is too long",
->> +                       s != key || s + len != key_end ? " fragment" : "",
->> +                       (int)len, s);
->> +            return NULL;
->> +        }
->> +
->> +        if (s != key) {
->> +            next = keyval_parse_put(cur, key_in_cur, NULL,
->> +                                    key, s - 1, errp);
->> +            if (!next) {
->> +                return NULL;
->> +            }
->> +            cur = qobject_to_qdict(next);
->> +            assert(cur);
->> +        }
->> +
->> +        memcpy(key_in_cur, s, len);
->> +        key_in_cur[len] = 0;
->> +        s += len;
->> +
->> +        if (*s != '.') {
->> +            break;
->> +        }
->> +        s++;
->> +    }
->> +
->> +    if (key == implied_key) {
->> +        assert(!*s);
->> +        s = params;
->> +    } else {
->> +        if (*s != '=') {
->> +            error_setg(errp, "Expected '=' after parameter '%.*s'",
->> +                       (int)(s - key), key);
->> +            return NULL;
->> +        }
->> +        s++;
->> +    }
->> +
->> +    val = qstring_new();
->> +    for (;;) {
->> +        if (!*s) {
->> +            break;
->> +        } else if (*s == ',') {
->> +            s++;
->> +            if (*s != ',') {
->> +                break;
->> +            }
->> +        }
->> +        qstring_append_chr(val, *s++);
->> +    }
->> +
->> +    if (!keyval_parse_put(cur, key_in_cur, val, key, key_end, errp)) {
->> +        return NULL;
->
-> This leaks val.
-
-Will fix, thanks!
-
->> +    }
->> +    return s;
->> +}
->
-> Kevin
+> ---
+>  Changes since v1:
+>=20
+>  - simplified tmp421_tx() as tmp421 does not need to support 2 bytes
+>    writes.  =20
+>  - extended tmp421_read() to support 2 bytes reads
+> =20
+>  default-configs/arm-softmmu.mak |   1 +
+>  hw/misc/Makefile.objs           |   1 +
+>  hw/misc/tmp421.c                | 401 ++++++++++++++++++++++++++++++++=
+++++++++
+>  3 files changed, 403 insertions(+)
+>  create mode 100644 hw/misc/tmp421.c
+>=20
+> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-soft=
+mmu.mak
+> index 612f6e69f255..81def25bfd54 100644
+> --- a/default-configs/arm-softmmu.mak
+> +++ b/default-configs/arm-softmmu.mak
+> @@ -14,6 +14,7 @@ CONFIG_TWL92230=3Dy
+>  CONFIG_TSC2005=3Dy
+>  CONFIG_LM832X=3Dy
+>  CONFIG_TMP105=3Dy
+> +CONFIG_TMP421=3Dy
+>  CONFIG_STELLARIS=3Dy
+>  CONFIG_STELLARIS_INPUT=3Dy
+>  CONFIG_STELLARIS_ENET=3Dy
+> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+> index 1a89615a6270..69610caa325d 100644
+> --- a/hw/misc/Makefile.objs
+> +++ b/hw/misc/Makefile.objs
+> @@ -1,6 +1,7 @@
+>  common-obj-$(CONFIG_APPLESMC) +=3D applesmc.o
+>  common-obj-$(CONFIG_MAX111X) +=3D max111x.o
+>  common-obj-$(CONFIG_TMP105) +=3D tmp105.o
+> +common-obj-$(CONFIG_TMP421) +=3D tmp421.o
+>  common-obj-$(CONFIG_ISA_DEBUG) +=3D debugexit.o
+>  common-obj-$(CONFIG_SGA) +=3D sga.o
+>  common-obj-$(CONFIG_ISA_TESTDEV) +=3D pc-testdev.o
+> diff --git a/hw/misc/tmp421.c b/hw/misc/tmp421.c
+> new file mode 100644
+> index 000000000000..a57cf93f1658
+> --- /dev/null
+> +++ b/hw/misc/tmp421.c
+> @@ -0,0 +1,401 @@
+> +/*
+> + * Texas Instruments TMP421 temperature sensor.
+> + *
+> + * Copyright (c) 2016 IBM Corporation.
+> + *
+> + * Largely inspired by :
+> + *
+> + * Texas Instruments TMP105 temperature sensor.
+> + *
+> + * Copyright (C) 2008 Nokia Corporation
+> + * Written by Andrzej Zaborowski <andrew@openedhand.com>
+> + *
+> + * This program is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU General Public License as
+> + * published by the Free Software Foundation; either version 2 or
+> + * (at your option) version 3 of the License.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License a=
+long
+> + * with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "hw/hw.h"
+> +#include "hw/i2c/i2c.h"
+> +#include "qapi/error.h"
+> +#include "qapi/visitor.h"
+> +
+> +/* Manufacturer / Device ID's */
+> +#define TMP421_MANUFACTURER_ID          0x55
+> +#define TMP421_DEVICE_ID                0x21
+> +#define TMP422_DEVICE_ID                0x22
+> +#define TMP423_DEVICE_ID                0x23
+> +
+> +typedef struct DeviceInfo {
+> +    int model;
+> +    const char *name;
+> +} DeviceInfo;
+> +
+> +static const DeviceInfo devices[] =3D {
+> +    { TMP421_DEVICE_ID, "tmp421" },
+> +    { TMP422_DEVICE_ID, "tmp422" },
+> +    { TMP423_DEVICE_ID, "tmp423" },
+> +};
+> +
+> +typedef struct TMP421State {
+> +    /*< private >*/
+> +    I2CSlave i2c;
+> +    /*< public >*/
+> +
+> +    int16_t temperature[4];
+> +
+> +    uint8_t status;
+> +    uint8_t config[2];
+> +    uint8_t rate;
+> +
+> +    uint8_t len;
+> +    uint8_t buf[2];
+> +    uint8_t pointer;
+> +
+> +} TMP421State;
+> +
+> +typedef struct TMP421Class {
+> +    I2CSlaveClass parent_class;
+> +    DeviceInfo *dev;
+> +} TMP421Class;
+> +
+> +#define TYPE_TMP421 "tmp421-generic"
+> +#define TMP421(obj) OBJECT_CHECK(TMP421State, (obj), TYPE_TMP421)
+> +
+> +#define TMP421_CLASS(klass) \
+> +     OBJECT_CLASS_CHECK(TMP421Class, (klass), TYPE_TMP421)
+> +#define TMP421_GET_CLASS(obj) \
+> +     OBJECT_GET_CLASS(TMP421Class, (obj), TYPE_TMP421)
+> +
+> +/* the TMP421 registers */
+> +#define TMP421_STATUS_REG               0x08
+> +#define    TMP421_STATUS_BUSY             (1 << 7)
+> +#define TMP421_CONFIG_REG_1             0x09
+> +#define    TMP421_CONFIG_RANGE            (1 << 2)
+> +#define    TMP421_CONFIG_SHUTDOWN         (1 << 6)
+> +#define TMP421_CONFIG_REG_2             0x0A
+> +#define    TMP421_CONFIG_RC               (1 << 2)
+> +#define    TMP421_CONFIG_LEN              (1 << 3)
+> +#define    TMP421_CONFIG_REN              (1 << 4)
+> +#define    TMP421_CONFIG_REN2             (1 << 5)
+> +#define    TMP421_CONFIG_REN3             (1 << 6)
+> +
+> +#define TMP421_CONVERSION_RATE_REG      0x0B
+> +#define TMP421_ONE_SHOT                 0x0F
+> +
+> +#define TMP421_RESET                    0xFC
+> +#define TMP421_MANUFACTURER_ID_REG      0xFE
+> +#define TMP421_DEVICE_ID_REG            0xFF
+> +
+> +#define TMP421_TEMP_MSB0                0x00
+> +#define TMP421_TEMP_MSB1                0x01
+> +#define TMP421_TEMP_MSB2                0x02
+> +#define TMP421_TEMP_MSB3                0x03
+> +#define TMP421_TEMP_LSB0                0x10
+> +#define TMP421_TEMP_LSB1                0x11
+> +#define TMP421_TEMP_LSB2                0x12
+> +#define TMP421_TEMP_LSB3                0x13
+> +
+> +static const int32_t mins[2] =3D { -40000, -55000 };
+> +static const int32_t maxs[2] =3D { 127000, 150000 };
+> +
+> +static void tmp421_get_temperature(Object *obj, Visitor *v, const char=
+ *name,
+> +                                   void *opaque, Error **errp)
+> +{
+> +    TMP421State *s =3D TMP421(obj);
+> +    bool ext_range =3D (s->config[0] & TMP421_CONFIG_RANGE);
+> +    int offset =3D ext_range * 64 * 256;
+> +    int64_t value;
+> +    int tempid;
+> +
+> +    if (sscanf(name, "temperature%d", &tempid) !=3D 1) {
+> +        error_setg(errp, "error reading %s: %m", name);
+> +        return;
+> +    }
+> +
+> +    if (tempid >=3D 4 || tempid < 0) {
+> +        error_setg(errp, "error reading %s", name);
+> +        return;
+> +    }
+> +
+> +    value =3D ((s->temperature[tempid] - offset) * 1000 + 128) / 256;
+> +
+> +    visit_type_int(v, name, &value, errp);
+> +}
+> +
+> +/* Units are 0.001 centigrades relative to 0 C.  s->temperature is 8.8
+> + * fixed point, so units are 1/256 centigrades.  A simple ratio will d=
+o.
+> + */
+> +static void tmp421_set_temperature(Object *obj, Visitor *v, const char=
+ *name,
+> +                                   void *opaque, Error **errp)
+> +{
+> +    TMP421State *s =3D TMP421(obj);
+> +    Error *local_err =3D NULL;
+> +    int64_t temp;
+> +    bool ext_range =3D (s->config[0] & TMP421_CONFIG_RANGE);
+> +    int offset =3D ext_range * 64 * 256;
+> +    int tempid;
+> +
+> +    visit_type_int(v, name, &temp, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +
+> +    if (temp >=3D maxs[ext_range] || temp < mins[ext_range]) {
+> +        error_setg(errp, "value %" PRId64 ".%03" PRIu64 " =C2=B0C is o=
+ut of range",
+> +                   temp / 1000, temp % 1000);
+> +        return;
+> +    }
+> +
+> +    if (sscanf(name, "temperature%d", &tempid) !=3D 1) {
+> +        error_setg(errp, "error reading %s: %m", name);
+> +        return;
+> +    }
+> +
+> +    if (tempid >=3D 4 || tempid < 0) {
+> +        error_setg(errp, "error reading %s", name);
+> +        return;
+> +    }
+> +
+> +    s->temperature[tempid] =3D (int16_t) ((temp * 256 - 128) / 1000) +=
+ offset;
+> +}
+> +
+> +static void tmp421_read(TMP421State *s)
+> +{
+> +    TMP421Class *sc =3D TMP421_GET_CLASS(s);
+> +
+> +    s->len =3D 0;
+> +
+> +    switch (s->pointer) {
+> +    case TMP421_MANUFACTURER_ID_REG:
+> +        s->buf[s->len++] =3D TMP421_MANUFACTURER_ID;
+> +        break;
+> +    case TMP421_DEVICE_ID_REG:
+> +        s->buf[s->len++] =3D sc->dev->model;
+> +        break;
+> +    case TMP421_CONFIG_REG_1:
+> +        s->buf[s->len++] =3D s->config[0];
+> +        break;
+> +    case TMP421_CONFIG_REG_2:
+> +        s->buf[s->len++] =3D s->config[1];
+> +        break;
+> +    case TMP421_CONVERSION_RATE_REG:
+> +        s->buf[s->len++] =3D s->rate;
+> +        break;
+> +    case TMP421_STATUS_REG:
+> +        s->buf[s->len++] =3D s->status;
+> +        break;
+> +
+> +        /* FIXME: check for channel enablement in config registers */
+> +    case TMP421_TEMP_MSB0:
+> +        s->buf[s->len++] =3D (((uint16_t) s->temperature[0]) >> 8);
+> +        s->buf[s->len++] =3D (((uint16_t) s->temperature[0]) >> 0) & 0=
+xf0;
+> +        break;
+> +    case TMP421_TEMP_MSB1:
+> +        s->buf[s->len++] =3D (((uint16_t) s->temperature[1]) >> 8);
+> +        s->buf[s->len++] =3D (((uint16_t) s->temperature[1]) >> 0) & 0=
+xf0;
+> +        break;
+> +    case TMP421_TEMP_MSB2:
+> +        s->buf[s->len++] =3D (((uint16_t) s->temperature[2]) >> 8);
+> +        s->buf[s->len++] =3D (((uint16_t) s->temperature[2]) >> 0) & 0=
+xf0;
+> +        break;
+> +    case TMP421_TEMP_MSB3:
+> +        s->buf[s->len++] =3D (((uint16_t) s->temperature[3]) >> 8);
+> +        s->buf[s->len++] =3D (((uint16_t) s->temperature[3]) >> 0) & 0=
+xf0;
+> +        break;
+> +    case TMP421_TEMP_LSB0:
+> +        s->buf[s->len++] =3D (((uint16_t) s->temperature[0]) >> 0) & 0=
+xf0;
+> +        break;
+> +    case TMP421_TEMP_LSB1:
+> +        s->buf[s->len++] =3D (((uint16_t) s->temperature[1]) >> 0) & 0=
+xf0;
+> +        break;
+> +    case TMP421_TEMP_LSB2:
+> +        s->buf[s->len++] =3D (((uint16_t) s->temperature[2]) >> 0) & 0=
+xf0;
+> +        break;
+> +    case TMP421_TEMP_LSB3:
+> +        s->buf[s->len++] =3D (((uint16_t) s->temperature[3]) >> 0) & 0=
+xf0;
+> +        break;
+> +    }
+> +}
+> +
+> +static void tmp421_reset(I2CSlave *i2c);
+> +
+> +static void tmp421_write(TMP421State *s)
+> +{
+> +    switch (s->pointer) {
+> +    case TMP421_CONVERSION_RATE_REG:
+> +        s->rate =3D s->buf[0];
+> +        break;
+> +    case TMP421_CONFIG_REG_1:
+> +        s->config[0] =3D s->buf[0];
+> +        break;
+> +    case TMP421_CONFIG_REG_2:
+> +        s->config[1] =3D s->buf[0];
+> +        break;
+> +    case TMP421_RESET:
+> +        tmp421_reset(I2C_SLAVE(s));
+> +        break;
+> +    }
+> +}
+> +
+> +static int tmp421_rx(I2CSlave *i2c)
+> +{
+> +    TMP421State *s =3D TMP421(i2c);
+> +
+> +    if (s->len < 2) {
+> +        return s->buf[s->len++];
+> +    } else {
+> +        return 0xff;
+> +    }
+> +}
+> +
+> +static int tmp421_tx(I2CSlave *i2c, uint8_t data)
+> +{
+> +    TMP421State *s =3D TMP421(i2c);
+> +
+> +    if (s->len =3D=3D 0) {
+> +        /* first byte is the register pointer for a read or write
+> +         * operation */
+> +        s->pointer =3D data;
+> +        s->len++;
+> +    } else if (s->len =3D=3D 1) {
+> +        /* second byte is the data to write. The device only supports
+> +         * one byte writes */
+> +        s->buf[0] =3D data;
+> +        tmp421_write(s);
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +static int tmp421_event(I2CSlave *i2c, enum i2c_event event)
+> +{
+> +    TMP421State *s =3D TMP421(i2c);
+> +
+> +    if (event =3D=3D I2C_START_RECV) {
+> +        tmp421_read(s);
+> +    }
+> +
+> +    s->len =3D 0;
+> +    return 0;
+> +}
+> +
+> +static const VMStateDescription vmstate_tmp421 =3D {
+> +    .name =3D "TMP421",
+> +    .version_id =3D 0,
+> +    .minimum_version_id =3D 0,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_UINT8(len, TMP421State),
+> +        VMSTATE_UINT8_ARRAY(buf, TMP421State, 2),
+> +        VMSTATE_UINT8(pointer, TMP421State),
+> +        VMSTATE_UINT8_ARRAY(config, TMP421State, 2),
+> +        VMSTATE_UINT8(status, TMP421State),
+> +        VMSTATE_UINT8(rate, TMP421State),
+> +        VMSTATE_INT16_ARRAY(temperature, TMP421State, 4),
+> +        VMSTATE_I2C_SLAVE(i2c, TMP421State),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +static void tmp421_reset(I2CSlave *i2c)
+> +{
+> +    TMP421State *s =3D TMP421(i2c);
+> +    TMP421Class *sc =3D TMP421_GET_CLASS(s);
+> +
+> +    memset(s->temperature, 0, sizeof(s->temperature));
+> +    s->pointer =3D 0;
+> +
+> +    s->config[0] =3D 0; /* TMP421_CONFIG_RANGE */
+> +
+> +     /* resistance correction and channel enablement */
+> +    switch (sc->dev->model) {
+> +    case TMP421_DEVICE_ID:
+> +        s->config[1] =3D 0x1c;
+> +        break;
+> +    case TMP422_DEVICE_ID:
+> +        s->config[1] =3D 0x3c;
+> +        break;
+> +    case TMP423_DEVICE_ID:
+> +        s->config[1] =3D 0x7c;
+> +        break;
+> +    }
+> +
+> +    s->rate =3D 0x7;       /* 8Hz */
+> +    s->status =3D 0;
+> +}
+> +
+> +static int tmp421_init(I2CSlave *i2c)
+> +{
+> +    TMP421State *s =3D TMP421(i2c);
+> +
+> +    tmp421_reset(&s->i2c);
+> +
+> +    return 0;
+> +}
+> +
+> +static void tmp421_initfn(Object *obj)
+> +{
+> +    object_property_add(obj, "temperature0", "int",
+> +                        tmp421_get_temperature,
+> +                        tmp421_set_temperature, NULL, NULL, NULL);
+> +    object_property_add(obj, "temperature1", "int",
+> +                        tmp421_get_temperature,
+> +                        tmp421_set_temperature, NULL, NULL, NULL);
+> +    object_property_add(obj, "temperature2", "int",
+> +                        tmp421_get_temperature,
+> +                        tmp421_set_temperature, NULL, NULL, NULL);
+> +    object_property_add(obj, "temperature3", "int",
+> +                        tmp421_get_temperature,
+> +                        tmp421_set_temperature, NULL, NULL, NULL);
+> +}
+> +
+> +static void tmp421_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> +    I2CSlaveClass *k =3D I2C_SLAVE_CLASS(klass);
+> +    TMP421Class *sc =3D TMP421_CLASS(klass);
+> +
+> +    k->init =3D tmp421_init;
+> +    k->event =3D tmp421_event;
+> +    k->recv =3D tmp421_rx;
+> +    k->send =3D tmp421_tx;
+> +    dc->vmsd =3D &vmstate_tmp421;
+> +    sc->dev =3D (DeviceInfo *) data;
+> +}
+> +
+> +static const TypeInfo tmp421_info =3D {
+> +    .name          =3D TYPE_TMP421,
+> +    .parent        =3D TYPE_I2C_SLAVE,
+> +    .instance_size =3D sizeof(TMP421State),
+> +    .instance_init =3D tmp421_initfn,
+> +    .class_init    =3D tmp421_class_init,
+> +};
+> +
+> +static void tmp421_register_types(void)
+> +{
+> +    int i;
+> +
+> +    type_register_static(&tmp421_info);
+> +    for (i =3D 0; i < ARRAY_SIZE(devices); ++i) {
+> +        TypeInfo ti =3D {
+> +            .name       =3D devices[i].name,
+> +            .parent     =3D TYPE_TMP421,
+> +            .class_init =3D tmp421_class_init,
+> +            .class_data =3D (void *) &devices[i],
+> +        };
+> +        type_register(&ti);
+> +    }
+> +}
+> +
+> +type_init(tmp421_register_types)
+>=20
