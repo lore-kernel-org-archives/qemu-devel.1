@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45745)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cioXG-0006jK-HS
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:38:15 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cioXI-0006lf-Ss
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:38:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cioXF-000899-NU
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:38:14 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cioXH-0008A3-Df
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:38:16 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 28 Feb 2017 21:36:40 +0100
-Message-Id: <1488314205-16264-42-git-send-email-kwolf@redhat.com>
+Date: Tue, 28 Feb 2017 21:36:41 +0100
+Message-Id: <1488314205-16264-43-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1488314205-16264-1-git-send-email-kwolf@redhat.com>
 References: <1488314205-16264-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 41/46] tests: Remove FIXME comments
+Subject: [Qemu-devel] [PULL 42/46] block: Pass BdrvChild to
+ bdrv_aligned_preadv/pwritev and copy-on-read
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,43 +23,174 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-Not requesting any permissions is actually correct for these test cases
-because no actual I/O or other operation covered by the permission
-system is performed.
+This is where we want to check the permissions, so we need to have the
+BdrvChild around where they are stored.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 Acked-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/test-blockjob.c | 2 +-
- tests/test-throttle.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ block/io.c | 37 +++++++++++++++++++++----------------
+ 1 file changed, 21 insertions(+), 16 deletions(-)
 
-diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
-index 1afe17b..740e740 100644
---- a/tests/test-blockjob.c
-+++ b/tests/test-blockjob.c
-@@ -54,7 +54,7 @@ static BlockJob *do_test_id(BlockBackend *blk, const char *id,
-  * BlockDriverState inserted. */
- static BlockBackend *create_blk(const char *name)
+diff --git a/block/io.c b/block/io.c
+index d5c4544..2592ca1 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -925,9 +925,11 @@ bdrv_driver_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
+     return drv->bdrv_co_pwritev_compressed(bs, offset, bytes, qiov);
+ }
+ 
+-static int coroutine_fn bdrv_co_do_copy_on_readv(BlockDriverState *bs,
++static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
+         int64_t offset, unsigned int bytes, QEMUIOVector *qiov)
  {
--    /* FIXME Use real permissions */
-+    /* No I/O is performed on this device */
-     BlockBackend *blk = blk_new(0, BLK_PERM_ALL);
-     BlockDriverState *bs;
++    BlockDriverState *bs = child->bs;
++
+     /* Perform I/O through a temporary buffer so that users who scribble over
+      * their read buffer while the operation is in progress do not end up
+      * modifying the image file.  This is critical for zero-copy guest I/O
+@@ -1001,10 +1003,11 @@ err:
+  * handles copy on read, zeroing after EOF, and fragmentation of large
+  * reads; any other features must be implemented by the caller.
+  */
+-static int coroutine_fn bdrv_aligned_preadv(BlockDriverState *bs,
++static int coroutine_fn bdrv_aligned_preadv(BdrvChild *child,
+     BdrvTrackedRequest *req, int64_t offset, unsigned int bytes,
+     int64_t align, QEMUIOVector *qiov, int flags)
+ {
++    BlockDriverState *bs = child->bs;
+     int64_t total_bytes, max_bytes;
+     int ret = 0;
+     uint64_t bytes_remaining = bytes;
+@@ -1050,7 +1053,7 @@ static int coroutine_fn bdrv_aligned_preadv(BlockDriverState *bs,
+         }
  
-diff --git a/tests/test-throttle.c b/tests/test-throttle.c
-index 5846433..bd7c501 100644
---- a/tests/test-throttle.c
-+++ b/tests/test-throttle.c
-@@ -593,7 +593,7 @@ static void test_groups(void)
-     BlockBackend *blk1, *blk2, *blk3;
-     BlockBackendPublic *blkp1, *blkp2, *blkp3;
+         if (!ret || pnum != nb_sectors) {
+-            ret = bdrv_co_do_copy_on_readv(bs, offset, bytes, qiov);
++            ret = bdrv_co_do_copy_on_readv(child, offset, bytes, qiov);
+             goto out;
+         }
+     }
+@@ -1158,7 +1161,7 @@ int coroutine_fn bdrv_co_preadv(BdrvChild *child,
+     }
  
--    /* FIXME Use real permissions */
-+    /* No actual I/O is performed on these devices */
-     blk1 = blk_new(0, BLK_PERM_ALL);
-     blk2 = blk_new(0, BLK_PERM_ALL);
-     blk3 = blk_new(0, BLK_PERM_ALL);
+     tracked_request_begin(&req, bs, offset, bytes, BDRV_TRACKED_READ);
+-    ret = bdrv_aligned_preadv(bs, &req, offset, bytes, align,
++    ret = bdrv_aligned_preadv(child, &req, offset, bytes, align,
+                               use_local_qiov ? &local_qiov : qiov,
+                               flags);
+     tracked_request_end(&req);
+@@ -1306,10 +1309,11 @@ fail:
+  * Forwards an already correctly aligned write request to the BlockDriver,
+  * after possibly fragmenting it.
+  */
+-static int coroutine_fn bdrv_aligned_pwritev(BlockDriverState *bs,
++static int coroutine_fn bdrv_aligned_pwritev(BdrvChild *child,
+     BdrvTrackedRequest *req, int64_t offset, unsigned int bytes,
+     int64_t align, QEMUIOVector *qiov, int flags)
+ {
++    BlockDriverState *bs = child->bs;
+     BlockDriver *drv = bs->drv;
+     bool waited;
+     int ret;
+@@ -1397,12 +1401,13 @@ static int coroutine_fn bdrv_aligned_pwritev(BlockDriverState *bs,
+     return ret;
+ }
+ 
+-static int coroutine_fn bdrv_co_do_zero_pwritev(BlockDriverState *bs,
++static int coroutine_fn bdrv_co_do_zero_pwritev(BdrvChild *child,
+                                                 int64_t offset,
+                                                 unsigned int bytes,
+                                                 BdrvRequestFlags flags,
+                                                 BdrvTrackedRequest *req)
+ {
++    BlockDriverState *bs = child->bs;
+     uint8_t *buf = NULL;
+     QEMUIOVector local_qiov;
+     struct iovec iov;
+@@ -1430,7 +1435,7 @@ static int coroutine_fn bdrv_co_do_zero_pwritev(BlockDriverState *bs,
+         mark_request_serialising(req, align);
+         wait_serialising_requests(req);
+         bdrv_debug_event(bs, BLKDBG_PWRITEV_RMW_HEAD);
+-        ret = bdrv_aligned_preadv(bs, req, offset & ~(align - 1), align,
++        ret = bdrv_aligned_preadv(child, req, offset & ~(align - 1), align,
+                                   align, &local_qiov, 0);
+         if (ret < 0) {
+             goto fail;
+@@ -1438,7 +1443,7 @@ static int coroutine_fn bdrv_co_do_zero_pwritev(BlockDriverState *bs,
+         bdrv_debug_event(bs, BLKDBG_PWRITEV_RMW_AFTER_HEAD);
+ 
+         memset(buf + head_padding_bytes, 0, zero_bytes);
+-        ret = bdrv_aligned_pwritev(bs, req, offset & ~(align - 1), align,
++        ret = bdrv_aligned_pwritev(child, req, offset & ~(align - 1), align,
+                                    align, &local_qiov,
+                                    flags & ~BDRV_REQ_ZERO_WRITE);
+         if (ret < 0) {
+@@ -1452,7 +1457,7 @@ static int coroutine_fn bdrv_co_do_zero_pwritev(BlockDriverState *bs,
+     if (bytes >= align) {
+         /* Write the aligned part in the middle. */
+         uint64_t aligned_bytes = bytes & ~(align - 1);
+-        ret = bdrv_aligned_pwritev(bs, req, offset, aligned_bytes, align,
++        ret = bdrv_aligned_pwritev(child, req, offset, aligned_bytes, align,
+                                    NULL, flags);
+         if (ret < 0) {
+             goto fail;
+@@ -1468,7 +1473,7 @@ static int coroutine_fn bdrv_co_do_zero_pwritev(BlockDriverState *bs,
+         mark_request_serialising(req, align);
+         wait_serialising_requests(req);
+         bdrv_debug_event(bs, BLKDBG_PWRITEV_RMW_TAIL);
+-        ret = bdrv_aligned_preadv(bs, req, offset, align,
++        ret = bdrv_aligned_preadv(child, req, offset, align,
+                                   align, &local_qiov, 0);
+         if (ret < 0) {
+             goto fail;
+@@ -1476,7 +1481,7 @@ static int coroutine_fn bdrv_co_do_zero_pwritev(BlockDriverState *bs,
+         bdrv_debug_event(bs, BLKDBG_PWRITEV_RMW_AFTER_TAIL);
+ 
+         memset(buf, 0, bytes);
+-        ret = bdrv_aligned_pwritev(bs, req, offset, align, align,
++        ret = bdrv_aligned_pwritev(child, req, offset, align, align,
+                                    &local_qiov, flags & ~BDRV_REQ_ZERO_WRITE);
+     }
+ fail:
+@@ -1523,7 +1528,7 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
+     tracked_request_begin(&req, bs, offset, bytes, BDRV_TRACKED_WRITE);
+ 
+     if (!qiov) {
+-        ret = bdrv_co_do_zero_pwritev(bs, offset, bytes, flags, &req);
++        ret = bdrv_co_do_zero_pwritev(child, offset, bytes, flags, &req);
+         goto out;
+     }
+ 
+@@ -1542,7 +1547,7 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
+         qemu_iovec_init_external(&head_qiov, &head_iov, 1);
+ 
+         bdrv_debug_event(bs, BLKDBG_PWRITEV_RMW_HEAD);
+-        ret = bdrv_aligned_preadv(bs, &req, offset & ~(align - 1), align,
++        ret = bdrv_aligned_preadv(child, &req, offset & ~(align - 1), align,
+                                   align, &head_qiov, 0);
+         if (ret < 0) {
+             goto fail;
+@@ -1584,8 +1589,8 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
+         qemu_iovec_init_external(&tail_qiov, &tail_iov, 1);
+ 
+         bdrv_debug_event(bs, BLKDBG_PWRITEV_RMW_TAIL);
+-        ret = bdrv_aligned_preadv(bs, &req, (offset + bytes) & ~(align - 1), align,
+-                                  align, &tail_qiov, 0);
++        ret = bdrv_aligned_preadv(child, &req, (offset + bytes) & ~(align - 1),
++                                  align, align, &tail_qiov, 0);
+         if (ret < 0) {
+             goto fail;
+         }
+@@ -1603,7 +1608,7 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
+         bytes = ROUND_UP(bytes, align);
+     }
+ 
+-    ret = bdrv_aligned_pwritev(bs, &req, offset, bytes, align,
++    ret = bdrv_aligned_pwritev(child, &req, offset, bytes, align,
+                                use_local_qiov ? &local_qiov : qiov,
+                                flags);
+ 
 -- 
 1.8.3.1
