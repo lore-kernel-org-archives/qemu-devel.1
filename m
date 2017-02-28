@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38355)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ciiht-0001Ss-Sv
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:24:51 -0500
+	(envelope-from <den@virtuozzo.com>) id 1ciilF-0004XU-1A
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:28:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1ciiht-0002Tn-3N
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:24:49 -0500
-Date: Tue, 28 Feb 2017 22:24:40 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170228142440.GA2344@lemon.lan>
-References: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
+	(envelope-from <den@virtuozzo.com>) id 1ciilB-0003rt-Rj
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:28:17 -0500
+Received: from mail-he1eur01on0109.outbound.protection.outlook.com
+	([104.47.0.109]:63360
+	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1ciilB-0003qu-5i
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:28:13 -0500
+References: <20170227201456.31814-1-berrange@redhat.com>
+	<20170228104828.GA2720@redhat.com>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <0bb8488e-ee11-9401-7c40-a0ab1eb275c0@openvz.org>
+Date: Tue, 28 Feb 2017 13:54:45 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 00/44] New op blocker system, part 1
+In-Reply-To: <20170228104828.GA2720@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] io: ignore case when matching websockets
+ HTTP headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,24 +30,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-On Tue, 02/28 13:53, Kevin Wolf wrote:
-> This series is the first part of implementing the new op blocker system
-> whose design was agreed on quite a while ago, but proved a bit tricky to
-> implement in places. There is more work to do to fully replace the old op
-> blocker system, but realistically we don't have that much time until the 2.9
-> freeze. So let's merge this series to complement the traditional op blockers
-> and plan with a second part for the 2.10 timeframe.
+On 02/28/2017 01:48 PM, Daniel P. Berrange wrote:
+> On Mon, Feb 27, 2017 at 08:14:56PM +0000, Daniel P. Berrange wrote:
+>> According to RFC7230 Section 3.2, header field name is case-insensitive.
+>> Convert the header data into all lowercase before doing string matching
+>> on the headers.
+>>
+>> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+>> ---
+>>  io/channel-websock.c | 14 +++++++++-----
+>>  1 file changed, 9 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/io/channel-websock.c b/io/channel-websock.c
+>> index a06a4a8..32b7f37 100644
+>> --- a/io/channel-websock.c
+>> +++ b/io/channel-websock.c
+>> @@ -33,9 +33,9 @@
+>>  #define QIO_CHANNEL_WEBSOCK_GUID "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
+>>  #define QIO_CHANNEL_WEBSOCK_GUID_LEN strlen(QIO_CHANNEL_WEBSOCK_GUID)
+>>  
+>> -#define QIO_CHANNEL_WEBSOCK_HEADER_PROTOCOL "Sec-WebSocket-Protocol"
+>> -#define QIO_CHANNEL_WEBSOCK_HEADER_VERSION "Sec-WebSocket-Version"
+>> -#define QIO_CHANNEL_WEBSOCK_HEADER_KEY "Sec-WebSocket-Key"
+>> +#define QIO_CHANNEL_WEBSOCK_HEADER_PROTOCOL "sec-websocket-protocol"
+>> +#define QIO_CHANNEL_WEBSOCK_HEADER_VERSION "sec-websocket-version"
+>> +#define QIO_CHANNEL_WEBSOCK_HEADER_KEY "sec-websocket-key"
+>>  
+>>  #define QIO_CHANNEL_WEBSOCK_PROTOCOL_BINARY "binary"
+>>  
+>> @@ -223,7 +223,7 @@ static int qio_channel_websock_handshake_process(QIOChannelWebsock *ioc,
+>>  static int qio_channel_websock_handshake_read(QIOChannelWebsock *ioc,
+>>                                                Error **errp)
+>>  {
+>> -    char *handshake_end;
+>> +    char *handshake_end, *tmp;
+>>      ssize_t ret;
+>>      /* Typical HTTP headers from novnc are 512 bytes, so limiting
+>>       * total header size to 4096 is easily enough. */
+>> @@ -249,9 +249,13 @@ static int qio_channel_websock_handshake_read(QIOChannelWebsock *ioc,
+>>          }
+>>      }
+>>  
+>> +    for (tmp = (char *)ioc->encinput.buffer; tmp < handshake_end; tmp++) {
+>> +        *tmp = g_ascii_tolower(*tmp);
+>> +    }
+>> +
+> self-nack - this does not in fact work - while it is fine to lowercase
+> the header keys, we must not touch the header values as some data is
+> case-sensitive
+>
+> Regards,
+> Daniel
+g-ascii-tolower() will help
 
-If we don't merge this, what should we do during the lengthy winter^Wfreeze? ;-)
-
-Seriously, the series looks pretty good to me. I didn't leave my rev-by patch by
-patch when reviewing previous versions, because I focused on my overall
-happiness on the API (frankly, I was a bit skeptical about the apparent
-complexity of this at the first sight). Now that I think I am happy, and also as
-I don't have time for a blanket review on the whole series today that upholds a
-full rev-by, I'm going to give:
-
-Acked-by: Fam Zheng <famz@redhat.com>
+Den
