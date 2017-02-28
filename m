@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cimm6-0002BS-8C
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 13:45:27 -0500
+	(envelope-from <armbru@redhat.com>) id 1cimpf-0003SR-Ol
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 13:49:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cimm5-0004vj-Dq
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 13:45:26 -0500
+	(envelope-from <armbru@redhat.com>) id 1cimpe-0006tm-Q1
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 13:49:07 -0500
 From: Markus Armbruster <armbru@redhat.com>
 References: <1488194450-28056-1-git-send-email-armbru@redhat.com>
 	<1488194450-28056-18-git-send-email-armbru@redhat.com>
-	<20170228173332.GT4090@noname.redhat.com>
-Date: Tue, 28 Feb 2017 19:45:17 +0100
-In-Reply-To: <20170228173332.GT4090@noname.redhat.com> (Kevin Wolf's message
-	of "Tue, 28 Feb 2017 18:33:32 +0100")
-Message-ID: <87poi2jgsi.fsf@dusky.pond.sub.org>
+	<20170228171823.GS4090@noname.redhat.com>
+Date: Tue, 28 Feb 2017 19:48:58 +0100
+In-Reply-To: <20170228171823.GS4090@noname.redhat.com> (Kevin Wolf's message
+	of "Tue, 28 Feb 2017 18:18:23 +0100")
+Message-ID: <87h93ejgmd.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 Subject: Re: [Qemu-devel] [PATCH 17/24] qapi: New
@@ -84,6 +84,15 @@ Kevin Wolf <kwolf@redhat.com> writes:
 >> +                                       Error **errp)
 >> +{
 >> +    bool is_json = str[0] == '{';
+>
+> Should the keyval_parse() grammar just forbid { in key names then (and
+> ideally employ assertions to enforce this) to avoid any ambiguity here?
+> therwise the behaviour might depend on the order of options in a
+> key/value string, which could be somewhat confusing.
+
+You're absolutely right.  Fortunately, PATCH 23 does.  I guess the
+easiest fix is to move it before this one.
+
 >> +    QObject *obj;
 >> +    QDict *args;
 >> +    Visitor *v;
@@ -103,18 +112,13 @@ Kevin Wolf <kwolf@redhat.com> writes:
 >> +        v = qobject_input_visitor_new(QOBJECT(args));
 >> +    } else {
 >> +        args = keyval_parse(optarg, implied_key, errp);
->
-> No, you don't mean optarg.
->
-> Makes all attempts to use -blockdev segfault for me.
-
-Okay, I guess I get to stay after class and write "Late night last
-minute changes are a bad idea" one hundred times.
-
-Including the kitchen sink can hide stupid bugs...
-
->
 >> +        v = qobject_input_visitor_new_keyval(QOBJECT(args));
+>
+> If keyval_parse() fails and returns args == NULL, won't we run into the
+> assertion in qobject_input_visitor_base_new() now?
+
+Lacks error checking, will fix.
+
 >> +    }
 >> +    QDECREF(args);
 >> +
@@ -122,3 +126,5 @@ Including the kitchen sink can hide stupid bugs...
 >> +}
 >
 > Kevin
+
+Thanks!
