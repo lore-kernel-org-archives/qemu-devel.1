@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cipIt-0007Z5-2U
+	(envelope-from <armbru@redhat.com>) id 1cipIv-0007bx-5G
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 16:27:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cipIo-0000xR-VL
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 16:27:27 -0500
+	(envelope-from <armbru@redhat.com>) id 1cipIq-0000ya-QQ
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 16:27:29 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 28 Feb 2017 22:26:50 +0100
-Message-Id: <1488317230-26248-5-git-send-email-armbru@redhat.com>
+Date: Tue, 28 Feb 2017 22:27:00 +0100
+Message-Id: <1488317230-26248-15-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488317230-26248-1-git-send-email-armbru@redhat.com>
 References: <1488317230-26248-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 04/24] qapi: qobject input visitor variant
- for use with keyval_parse()
+Subject: [Qemu-devel] [PATCH v2 14/24] check-qjson: Test errors from
+ qobject_from_json()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,557 +21,309 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com, eblake@redhat.com, mdroth@linux.vnet.ibm.com, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com, eblake@redhat.com, mdroth@linux.vnet.ibm.com
 
-From: "Daniel P. Berrange" <berrange@redhat.com>
-
-Currently the QObjectInputVisitor assumes that all scalar values are
-directly represented as the final types declared by the thing being
-visited. i.e. it assumes an 'int' is using QInt, and a 'bool' is using
-QBool, etc.  This is good when QObjectInputVisitor is fed a QObject
-that came from a JSON document on the QMP monitor, as it will strictly
-validate correctness.
-
-To allow QObjectInputVisitor to be reused for visiting a QObject
-originating from keyval_parse(), an alternative mode is needed where
-all the scalars types are represented as QString and converted on the
-fly to the final desired type.
-
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Message-Id: <1475246744-29302-8-git-send-email-berrange@redhat.com>
-
-Rebased, conflicts resolved, commit message updated to refer to
-keyval_parse().  autocast replaced by keyval in identifiers,
-noautocast replaced by fail in tests.
-
-Fix qobject_input_type_uint64_keyval() not to reject '-', for QemuOpts
-compatibility: replace parse_uint_full() by open-coded
-parse_option_number().  The next commit will add suitable tests.
-Leave out the fancy ERANGE error reporting for now, but add a TODO
-comment.  Add it qobject_input_type_int64_keyval() and
-qobject_input_type_number_keyval(), too.
-
-Open code parse_option_bool() and parse_option_size() so we have to
-call qobject_input_get_name() only when actually needed.  Again, leave
-out ERANGE error reporting for now.
-
-QAPI/QMP downstream extension prefixes __RFQDN_ don't work, because
-keyval_parse() splits them at '.'.  Add a TODO comment there.
-
-qobject_input_type_int64_keyval(), qobject_input_type_uint64_keyval(),
-qobject_input_type_number_keyval() tweaked for style.
+Pass &error_abort with known-good input.  Else pass &err and check
+what comes back.  This demonstrates that the parser fails silently for
+many errors.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/qapi/qobject-input-visitor.h |   9 ++
- qapi/qobject-input-visitor.c         | 166 ++++++++++++++++++++++++++++++-
- tests/test-qobject-input-visitor.c   | 188 ++++++++++++++++++++++++++++++++++-
- 3 files changed, 358 insertions(+), 5 deletions(-)
+ tests/check-qjson.c | 88 ++++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 56 insertions(+), 32 deletions(-)
 
-diff --git a/include/qapi/qobject-input-visitor.h b/include/qapi/qobject-input-visitor.h
-index 0b7633a..282f9d2 100644
---- a/include/qapi/qobject-input-visitor.h
-+++ b/include/qapi/qobject-input-visitor.h
-@@ -59,4 +59,13 @@ typedef struct QObjectInputVisitor QObjectInputVisitor;
+diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+index aa63758..963dd46 100644
+--- a/tests/check-qjson.c
++++ b/tests/check-qjson.c
+@@ -10,8 +10,10 @@
+  * See the COPYING.LIB file in the top-level directory.
+  *
   */
- Visitor *qobject_input_visitor_new(QObject *obj);
- 
-+/*
-+ * Create a QObject input visitor for @obj for use with keyval_parse()
-+ *
-+ * This is like qobject_input_visitor_new(), except scalars are all
-+ * QString, and error messages refer to parts of @obj in the syntax
-+ * keyval_parse() uses for KEYs.
-+ */
-+Visitor *qobject_input_visitor_new_keyval(QObject *obj);
 +
- #endif
-diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
-index d192727..e2e3e70 100644
---- a/qapi/qobject-input-visitor.c
-+++ b/qapi/qobject-input-visitor.c
-@@ -1,7 +1,7 @@
- /*
-  * Input Visitor
-  *
-- * Copyright (C) 2012-2016 Red Hat, Inc.
-+ * Copyright (C) 2012-2017 Red Hat, Inc.
-  * Copyright IBM, Corp. 2011
-  *
-  * Authors:
-@@ -20,6 +20,7 @@
- #include "qemu-common.h"
+ #include "qemu/osdep.h"
+ 
++#include "qapi/error.h"
  #include "qapi/qmp/types.h"
- #include "qapi/qmp/qerror.h"
-+#include "qemu/cutils.h"
+ #include "qapi/qmp/qjson.h"
+ #include "qemu-common.h"
+@@ -53,7 +55,7 @@ static void escaped_string(void)
+         QObject *obj;
+         QString *str;
  
- typedef struct StackObject {
-     const char *name;            /* Name of @obj in its parent, if any */
-@@ -337,6 +338,31 @@ static void qobject_input_type_int64(Visitor *v, const char *name, int64_t *obj,
-     *obj = qint_get_int(qint);
- }
+-        obj = qobject_from_json(test_cases[i].encoded, NULL);
++        obj = qobject_from_json(test_cases[i].encoded, &error_abort);
+         str = qobject_to_qstring(obj);
+         g_assert(str);
+         g_assert_cmpstr(qstring_get_str(str), ==, test_cases[i].decoded);
+@@ -85,7 +87,7 @@ static void simple_string(void)
+         QObject *obj;
+         QString *str;
  
-+
-+static void qobject_input_type_int64_keyval(Visitor *v, const char *name,
-+                                            int64_t *obj, Error **errp)
-+{
-+    QObjectInputVisitor *qiv = to_qiv(v);
-+    QObject *qobj = qobject_input_get_object(qiv, name, true, errp);
-+    QString *qstr;
-+
-+    if (!qobj) {
-+        return;
-+    }
-+    qstr = qobject_to_qstring(qobj);
-+    if (!qstr) {
-+        error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
-+                   full_name(qiv, name), "string");
-+        return;
-+    }
-+
-+    if (qemu_strtoi64(qstring_get_str(qstr), NULL, 0, obj) < 0) {
-+        /* TODO report -ERANGE more nicely */
-+        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-+                   full_name(qiv, name), "integer");
-+    }
-+}
-+
- static void qobject_input_type_uint64(Visitor *v, const char *name,
-                                       uint64_t *obj, Error **errp)
+-        obj = qobject_from_json(test_cases[i].encoded, NULL);
++        obj = qobject_from_json(test_cases[i].encoded, &error_abort);
+         str = qobject_to_qstring(obj);
+         g_assert(str);
+         g_assert(strcmp(qstring_get_str(str), test_cases[i].decoded) == 0);
+@@ -116,7 +118,7 @@ static void single_quote_string(void)
+         QObject *obj;
+         QString *str;
+ 
+-        obj = qobject_from_json(test_cases[i].encoded, NULL);
++        obj = qobject_from_json(test_cases[i].encoded, &error_abort);
+         str = qobject_to_qstring(obj);
+         g_assert(str);
+         g_assert(strcmp(qstring_get_str(str), test_cases[i].decoded) == 0);
+@@ -809,7 +811,7 @@ static void utf8_string(void)
+         utf8_in = test_cases[i].utf8_in ?: test_cases[i].utf8_out;
+         json_out = test_cases[i].json_out ?: test_cases[i].json_in;
+ 
+-        obj = qobject_from_json(json_in, NULL);
++        obj = qobject_from_json(json_in, utf8_out ? &error_abort : NULL);
+         if (utf8_out) {
+             str = qobject_to_qstring(obj);
+             g_assert(str);
+@@ -836,7 +838,7 @@ static void utf8_string(void)
+          * FIXME Enable once these bugs have been fixed.
+          */
+         if (0 && json_out != json_in) {
+-            obj = qobject_from_json(json_out, NULL);
++            obj = qobject_from_json(json_out, &error_abort);
+             str = qobject_to_qstring(obj);
+             g_assert(str);
+             g_assert_cmpstr(qstring_get_str(str), ==, utf8_out);
+@@ -886,7 +888,8 @@ static void simple_number(void)
+     for (i = 0; test_cases[i].encoded; i++) {
+         QInt *qint;
+ 
+-        qint = qobject_to_qint(qobject_from_json(test_cases[i].encoded, NULL));
++        qint = qobject_to_qint(qobject_from_json(test_cases[i].encoded,
++                                                 &error_abort));
+         g_assert(qint);
+         g_assert(qint_get_int(qint) == test_cases[i].decoded);
+         if (test_cases[i].skip == 0) {
+@@ -920,7 +923,7 @@ static void float_number(void)
+         QObject *obj;
+         QFloat *qfloat;
+ 
+-        obj = qobject_from_json(test_cases[i].encoded, NULL);
++        obj = qobject_from_json(test_cases[i].encoded, &error_abort);
+         qfloat = qobject_to_qfloat(obj);
+         g_assert(qfloat);
+         g_assert(qfloat_get_double(qfloat) == test_cases[i].decoded);
+@@ -965,7 +968,7 @@ static void keyword_literal(void)
+     QObject *null;
+     QString *str;
+ 
+-    obj = qobject_from_json("true", NULL);
++    obj = qobject_from_json("true", &error_abort);
+     qbool = qobject_to_qbool(obj);
+     g_assert(qbool);
+     g_assert(qbool_get_bool(qbool) == true);
+@@ -976,7 +979,7 @@ static void keyword_literal(void)
+ 
+     QDECREF(qbool);
+ 
+-    obj = qobject_from_json("false", NULL);
++    obj = qobject_from_json("false", &error_abort);
+     qbool = qobject_to_qbool(obj);
+     g_assert(qbool);
+     g_assert(qbool_get_bool(qbool) == false);
+@@ -998,7 +1001,7 @@ static void keyword_literal(void)
+     g_assert(qbool_get_bool(qbool) == true);
+     QDECREF(qbool);
+ 
+-    obj = qobject_from_json("null", NULL);
++    obj = qobject_from_json("null", &error_abort);
+     g_assert(obj != NULL);
+     g_assert(qobject_type(obj) == QTYPE_QNULL);
+ 
+@@ -1134,13 +1137,13 @@ static void simple_dict(void)
+         QObject *obj;
+         QString *str;
+ 
+-        obj = qobject_from_json(test_cases[i].encoded, NULL);
++        obj = qobject_from_json(test_cases[i].encoded, &error_abort);
+         g_assert(compare_litqobj_to_qobj(&test_cases[i].decoded, obj) == 1);
+ 
+         str = qobject_to_json(obj);
+         qobject_decref(obj);
+ 
+-        obj = qobject_from_json(qstring_get_str(str), NULL);
++        obj = qobject_from_json(qstring_get_str(str), &error_abort);
+         g_assert(compare_litqobj_to_qobj(&test_cases[i].decoded, obj) == 1);
+         qobject_decref(obj);
+         QDECREF(str);
+@@ -1192,7 +1195,7 @@ static void large_dict(void)
+     QObject *obj;
+ 
+     gen_test_json(gstr, 10, 100);
+-    obj = qobject_from_json(gstr->str, NULL);
++    obj = qobject_from_json(gstr->str, &error_abort);
+     g_assert(obj != NULL);
+ 
+     qobject_decref(obj);
+@@ -1243,13 +1246,13 @@ static void simple_list(void)
+         QObject *obj;
+         QString *str;
+ 
+-        obj = qobject_from_json(test_cases[i].encoded, NULL);
++        obj = qobject_from_json(test_cases[i].encoded, &error_abort);
+         g_assert(compare_litqobj_to_qobj(&test_cases[i].decoded, obj) == 1);
+ 
+         str = qobject_to_json(obj);
+         qobject_decref(obj);
+ 
+-        obj = qobject_from_json(qstring_get_str(str), NULL);
++        obj = qobject_from_json(qstring_get_str(str), &error_abort);
+         g_assert(compare_litqobj_to_qobj(&test_cases[i].decoded, obj) == 1);
+         qobject_decref(obj);
+         QDECREF(str);
+@@ -1305,13 +1308,13 @@ static void simple_whitespace(void)
+         QObject *obj;
+         QString *str;
+ 
+-        obj = qobject_from_json(test_cases[i].encoded, NULL);
++        obj = qobject_from_json(test_cases[i].encoded, &error_abort);
+         g_assert(compare_litqobj_to_qobj(&test_cases[i].decoded, obj) == 1);
+ 
+         str = qobject_to_json(obj);
+         qobject_decref(obj);
+ 
+-        obj = qobject_from_json(qstring_get_str(str), NULL);
++        obj = qobject_from_json(qstring_get_str(str), &error_abort);
+         g_assert(compare_litqobj_to_qobj(&test_cases[i].decoded, obj) == 1);
+ 
+         qobject_decref(obj);
+@@ -1332,7 +1335,7 @@ static void simple_varargs(void)
+                         {}})),
+             {}}));
+ 
+-    embedded_obj = qobject_from_json("[32, 42]", NULL);
++    embedded_obj = qobject_from_json("[32, 42]", &error_abort);
+     g_assert(embedded_obj != NULL);
+ 
+     obj = qobject_from_jsonf("[%d, 2, %p]", 1, embedded_obj);
+@@ -1344,68 +1347,87 @@ static void simple_varargs(void)
+ static void empty_input(void)
  {
-@@ -358,6 +384,30 @@ static void qobject_input_type_uint64(Visitor *v, const char *name,
-     *obj = qint_get_int(qint);
+     const char *empty = "";
+-
+-    QObject *obj = qobject_from_json(empty, NULL);
++    QObject *obj = qobject_from_json(empty, &error_abort);
+     g_assert(obj == NULL);
  }
  
-+static void qobject_input_type_uint64_keyval(Visitor *v, const char *name,
-+                                             uint64_t *obj, Error **errp)
-+{
-+    QObjectInputVisitor *qiv = to_qiv(v);
-+    QObject *qobj = qobject_input_get_object(qiv, name, true, errp);
-+    QString *qstr;
-+
-+    if (!qobj) {
-+        return;
-+    }
-+    qstr = qobject_to_qstring(qobj);
-+    if (!qstr) {
-+        error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
-+                   full_name(qiv, name), "string");
-+        return;
-+    }
-+
-+    if (qemu_strtou64(qstring_get_str(qstr), NULL, 0, obj) < 0) {
-+        /* TODO report -ERANGE more nicely */
-+        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-+                   full_name(qiv, name), "integer");
-+    }
-+}
-+
- static void qobject_input_type_bool(Visitor *v, const char *name, bool *obj,
-                                     Error **errp)
+ static void unterminated_string(void)
  {
-@@ -378,6 +428,35 @@ static void qobject_input_type_bool(Visitor *v, const char *name, bool *obj,
-     *obj = qbool_get_bool(qbool);
- }
- 
-+static void qobject_input_type_bool_keyval(Visitor *v, const char *name,
-+                                           bool *obj, Error **errp)
-+{
-+    QObjectInputVisitor *qiv = to_qiv(v);
-+    QObject *qobj = qobject_input_get_object(qiv, name, true, errp);
-+    QString *qstr;
-+    const char *str;
-+
-+    if (!qobj) {
-+        return;
-+    }
-+    qstr = qobject_to_qstring(qobj);
-+    if (!qstr) {
-+        error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
-+                   full_name(qiv, name), "string");
-+        return;
-+    }
-+
-+    str = qstring_get_str(qstr);
-+    if (!strcmp(str, "on")) {
-+        *obj = true;
-+    } else if (!strcmp(str, "off")) {
-+        *obj = false;
-+    } else {
-+        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-+                   full_name(qiv, name), "'on' or 'off'");
-+    }
-+}
-+
- static void qobject_input_type_str(Visitor *v, const char *name, char **obj,
-                                    Error **errp)
- {
-@@ -426,6 +505,35 @@ static void qobject_input_type_number(Visitor *v, const char *name, double *obj,
-                full_name(qiv, name), "number");
- }
- 
-+static void qobject_input_type_number_keyval(Visitor *v, const char *name,
-+                                             double *obj, Error **errp)
-+{
-+    QObjectInputVisitor *qiv = to_qiv(v);
-+    QObject *qobj = qobject_input_get_object(qiv, name, true, errp);
-+    QString *qstr;
-+    const char *str;
-+    char *endp;
-+
-+    if (!qobj) {
-+        return;
-+    }
-+    qstr = qobject_to_qstring(qobj);
-+    if (!qstr) {
-+        error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
-+                   full_name(qiv, name), "string");
-+        return;
-+    }
-+
-+    str = qstring_get_str(qstr);
-+    errno = 0;
-+    *obj = strtod(str, &endp);
-+    if (errno || endp == str || *endp) {
-+        /* TODO report -ERANGE more nicely */
-+        error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
-+                   full_name(qiv, name), "number");
-+    }
-+}
-+
- static void qobject_input_type_any(Visitor *v, const char *name, QObject **obj,
-                                    Error **errp)
- {
-@@ -456,6 +564,30 @@ static void qobject_input_type_null(Visitor *v, const char *name, Error **errp)
-     }
- }
- 
-+static void qobject_input_type_size_keyval(Visitor *v, const char *name,
-+                                           uint64_t *obj, Error **errp)
-+{
-+    QObjectInputVisitor *qiv = to_qiv(v);
-+    QObject *qobj = qobject_input_get_object(qiv, name, true, errp);
-+    QString *qstr;
-+
-+    if (!qobj) {
-+        return;
-+    }
-+    qstr = qobject_to_qstring(qobj);
-+    if (!qstr) {
-+        error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
-+                   full_name(qiv, name), "string");
-+        return;
-+    }
-+
-+    if (qemu_strtosz(qstring_get_str(qstr), NULL, obj) < 0) {
-+        /* TODO report -ERANGE more nicely */
-+        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-+                   full_name(qiv, name), "size");
-+    }
-+}
-+
- static void qobject_input_optional(Visitor *v, const char *name, bool *present)
- {
-     QObjectInputVisitor *qiv = to_qiv(v);
-@@ -518,3 +650,35 @@ Visitor *qobject_input_visitor_new(QObject *obj)
- 
-     return &v->visitor;
- }
-+
-+Visitor *qobject_input_visitor_new_keyval(QObject *obj)
-+{
-+    QObjectInputVisitor *v;
-+
-+    v = g_malloc0(sizeof(*v));
-+
-+    v->visitor.type = VISITOR_INPUT;
-+    v->visitor.start_struct = qobject_input_start_struct;
-+    v->visitor.check_struct = qobject_input_check_struct;
-+    v->visitor.end_struct = qobject_input_pop;
-+    v->visitor.start_list = qobject_input_start_list;
-+    v->visitor.next_list = qobject_input_next_list;
-+    v->visitor.check_list = qobject_input_check_list;
-+    v->visitor.end_list = qobject_input_pop;
-+    v->visitor.start_alternate = qobject_input_start_alternate;
-+    v->visitor.type_int64 = qobject_input_type_int64_keyval;
-+    v->visitor.type_uint64 = qobject_input_type_uint64_keyval;
-+    v->visitor.type_bool = qobject_input_type_bool_keyval;
-+    v->visitor.type_str = qobject_input_type_str;
-+    v->visitor.type_number = qobject_input_type_number_keyval;
-+    v->visitor.type_any = qobject_input_type_any;
-+    v->visitor.type_null = qobject_input_type_null;
-+    v->visitor.type_size = qobject_input_type_size_keyval;
-+    v->visitor.optional = qobject_input_optional;
-+    v->visitor.free = qobject_input_free;
-+
-+    v->root = obj;
-+    qobject_incref(obj);
-+
-+    return &v->visitor;
-+}
-diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-input-visitor.c
-index 94305f5..32ba492 100644
---- a/tests/test-qobject-input-visitor.c
-+++ b/tests/test-qobject-input-visitor.c
-@@ -45,6 +45,7 @@ static void visitor_input_teardown(TestInputVisitorData *data,
-    function so that the JSON string used by the tests are kept in the test
-    functions (and not in main()). */
- static Visitor *visitor_input_test_init_internal(TestInputVisitorData *data,
-+                                                 bool keyval,
-                                                  const char *json_string,
-                                                  va_list *ap)
- {
-@@ -53,11 +54,29 @@ static Visitor *visitor_input_test_init_internal(TestInputVisitorData *data,
-     data->obj = qobject_from_jsonv(json_string, ap);
-     g_assert(data->obj);
- 
--    data->qiv = qobject_input_visitor_new(data->obj);
-+    if (keyval) {
-+        data->qiv = qobject_input_visitor_new_keyval(data->obj);
-+    } else {
-+        data->qiv = qobject_input_visitor_new(data->obj);
-+    }
-     g_assert(data->qiv);
-     return data->qiv;
- }
- 
-+static GCC_FMT_ATTR(3, 4)
-+Visitor *visitor_input_test_init_full(TestInputVisitorData *data,
-+                                      bool keyval,
-+                                      const char *json_string, ...)
-+{
-+    Visitor *v;
-+    va_list ap;
-+
-+    va_start(ap, json_string);
-+    v = visitor_input_test_init_internal(data, keyval, json_string, &ap);
-+    va_end(ap);
-+    return v;
-+}
-+
- static GCC_FMT_ATTR(2, 3)
- Visitor *visitor_input_test_init(TestInputVisitorData *data,
-                                  const char *json_string, ...)
-@@ -66,7 +85,7 @@ Visitor *visitor_input_test_init(TestInputVisitorData *data,
-     va_list ap;
- 
-     va_start(ap, json_string);
--    v = visitor_input_test_init_internal(data, json_string, &ap);
-+    v = visitor_input_test_init_internal(data, false, json_string, &ap);
-     va_end(ap);
-     return v;
- }
-@@ -81,7 +100,7 @@ Visitor *visitor_input_test_init(TestInputVisitorData *data,
- static Visitor *visitor_input_test_init_raw(TestInputVisitorData *data,
-                                             const char *json_string)
- {
--    return visitor_input_test_init_internal(data, json_string, NULL);
-+    return visitor_input_test_init_internal(data, false, json_string, NULL);
- }
- 
- static void test_visitor_in_int(TestInputVisitorData *data,
-@@ -114,6 +133,43 @@ static void test_visitor_in_int_overflow(TestInputVisitorData *data,
-     error_free_or_abort(&err);
- }
- 
-+static void test_visitor_in_int_keyval(TestInputVisitorData *data,
-+                                       const void *unused)
-+{
-+    int64_t res = 0, value = -42;
+-    QObject *obj = qobject_from_json("\"abc", NULL);
 +    Error *err = NULL;
-+    Visitor *v;
-+
-+    v = visitor_input_test_init_full(data, true, "%" PRId64, value);
-+    visit_type_int(v, NULL, &res, &err);
-+    error_free_or_abort(&err);
-+}
-+
-+static void test_visitor_in_int_str_keyval(TestInputVisitorData *data,
-+                                           const void *unused)
-+{
-+    int64_t res = 0, value = -42;
-+    Visitor *v;
-+
-+    v = visitor_input_test_init_full(data, true, "\"-42\"");
-+
-+    visit_type_int(v, NULL, &res, &error_abort);
-+    g_assert_cmpint(res, ==, value);
-+}
-+
-+static void test_visitor_in_int_str_fail(TestInputVisitorData *data,
-+                                         const void *unused)
-+{
-+    int64_t res = 0;
-+    Visitor *v;
-+    Error *err = NULL;
-+
-+    v = visitor_input_test_init(data, "\"-42\"");
-+
-+    visit_type_int(v, NULL, &res, &err);
-+    error_free_or_abort(&err);
-+}
-+
- static void test_visitor_in_bool(TestInputVisitorData *data,
-                                  const void *unused)
- {
-@@ -126,6 +182,44 @@ static void test_visitor_in_bool(TestInputVisitorData *data,
-     g_assert_cmpint(res, ==, true);
++    QObject *obj = qobject_from_json("\"abc", &err);
++    g_assert(!err);             /* BUG */
+     g_assert(obj == NULL);
  }
  
-+static void test_visitor_in_bool_keyval(TestInputVisitorData *data,
-+                                        const void *unused)
-+{
-+    bool res = false;
-+    Error *err = NULL;
-+    Visitor *v;
-+
-+    v = visitor_input_test_init_full(data, true, "true");
-+
-+    visit_type_bool(v, NULL, &res, &err);
-+    error_free_or_abort(&err);
-+}
-+
-+static void test_visitor_in_bool_str_keyval(TestInputVisitorData *data,
-+                                            const void *unused)
-+{
-+    bool res = false;
-+    Visitor *v;
-+
-+    v = visitor_input_test_init_full(data, true, "\"on\"");
-+
-+    visit_type_bool(v, NULL, &res, &error_abort);
-+    g_assert_cmpint(res, ==, true);
-+}
-+
-+static void test_visitor_in_bool_str_fail(TestInputVisitorData *data,
-+                                          const void *unused)
-+{
-+    bool res = false;
-+    Visitor *v;
-+    Error *err = NULL;
-+
-+    v = visitor_input_test_init(data, "\"true\"");
-+
-+    visit_type_bool(v, NULL, &res, &err);
-+    error_free_or_abort(&err);
-+}
-+
- static void test_visitor_in_number(TestInputVisitorData *data,
-                                    const void *unused)
+ static void unterminated_sq_string(void)
  {
-@@ -138,6 +232,69 @@ static void test_visitor_in_number(TestInputVisitorData *data,
-     g_assert_cmpfloat(res, ==, value);
+-    QObject *obj = qobject_from_json("'abc", NULL);
++    Error *err = NULL;
++    QObject *obj = qobject_from_json("'abc", &err);
++    g_assert(!err);             /* BUG */
+     g_assert(obj == NULL);
  }
  
-+static void test_visitor_in_number_keyval(TestInputVisitorData *data,
-+                                          const void *unused)
-+{
-+    double res = 0, value = 3.14;
-+    Error *err = NULL;
-+    Visitor *v;
-+
-+    v = visitor_input_test_init_full(data, true, "%f", value);
-+
-+    visit_type_number(v, NULL, &res, &err);
-+    error_free_or_abort(&err);
-+}
-+
-+static void test_visitor_in_number_str_keyval(TestInputVisitorData *data,
-+                                              const void *unused)
-+{
-+    double res = 0, value = 3.14;
-+    Visitor *v;
-+
-+    v = visitor_input_test_init_full(data, true, "\"3.14\"");
-+
-+    visit_type_number(v, NULL, &res, &error_abort);
-+    g_assert_cmpfloat(res, ==, value);
-+}
-+
-+static void test_visitor_in_number_str_fail(TestInputVisitorData *data,
-+                                            const void *unused)
-+{
-+    double res = 0;
-+    Visitor *v;
-+    Error *err = NULL;
-+
-+    v = visitor_input_test_init(data, "\"3.14\"");
-+
-+    visit_type_number(v, NULL, &res, &err);
-+    error_free_or_abort(&err);
-+}
-+
-+static void test_visitor_in_size_str_keyval(TestInputVisitorData *data,
-+                                            const void *unused)
-+{
-+    uint64_t res, value = 500 * 1024 * 1024;
-+    Visitor *v;
-+
-+    v = visitor_input_test_init_full(data, true, "\"500M\"");
-+
-+    visit_type_size(v, NULL, &res, &error_abort);
-+    g_assert_cmpfloat(res, ==, value);
-+}
-+
-+static void test_visitor_in_size_str_fail(TestInputVisitorData *data,
-+                                          const void *unused)
-+{
-+    uint64_t res = 0;
-+    Visitor *v;
-+    Error *err = NULL;
-+
-+    v = visitor_input_test_init(data, "\"500M\"");
-+
-+    visit_type_size(v, NULL, &res, &err);
-+    error_free_or_abort(&err);
-+}
-+
- static void test_visitor_in_string(TestInputVisitorData *data,
-                                    const void *unused)
+ static void unterminated_escape(void)
  {
-@@ -294,7 +451,8 @@ static void test_visitor_in_null(TestInputVisitorData *data,
-      * when input is not null.
-      */
+-    QObject *obj = qobject_from_json("\"abc\\\"", NULL);
++    Error *err = NULL;
++    QObject *obj = qobject_from_json("\"abc\\\"", &err);
++    g_assert(!err);             /* BUG */
+     g_assert(obj == NULL);
+ }
  
--    v = visitor_input_test_init(data, "{ 'a': null, 'b': '', 'c': null }");
-+    v = visitor_input_test_init_full(data, false,
-+                                     "{ 'a': null, 'b': '' }");
-     visit_start_struct(v, NULL, NULL, 0, &error_abort);
-     visit_type_null(v, "a", &error_abort);
-     visit_type_null(v, "b", &err);
-@@ -1069,10 +1227,32 @@ int main(int argc, char **argv)
-                            NULL, test_visitor_in_int);
-     input_visitor_test_add("/visitor/input/int_overflow",
-                            NULL, test_visitor_in_int_overflow);
-+    input_visitor_test_add("/visitor/input/int_keyval",
-+                           NULL, test_visitor_in_int_keyval);
-+    input_visitor_test_add("/visitor/input/int_str_keyval",
-+                           NULL, test_visitor_in_int_str_keyval);
-+    input_visitor_test_add("/visitor/input/int_str_fail",
-+                           NULL, test_visitor_in_int_str_fail);
-     input_visitor_test_add("/visitor/input/bool",
-                            NULL, test_visitor_in_bool);
-+    input_visitor_test_add("/visitor/input/bool_keyval",
-+                           NULL, test_visitor_in_bool_keyval);
-+    input_visitor_test_add("/visitor/input/bool_str_keyval",
-+                           NULL, test_visitor_in_bool_str_keyval);
-+    input_visitor_test_add("/visitor/input/bool_str_fail",
-+                           NULL, test_visitor_in_bool_str_fail);
-     input_visitor_test_add("/visitor/input/number",
-                            NULL, test_visitor_in_number);
-+    input_visitor_test_add("/visitor/input/number_keyval",
-+                           NULL, test_visitor_in_number_keyval);
-+    input_visitor_test_add("/visitor/input/number_str_keyval",
-+                           NULL, test_visitor_in_number_str_keyval);
-+    input_visitor_test_add("/visitor/input/number_str_fail",
-+                           NULL, test_visitor_in_number_str_fail);
-+    input_visitor_test_add("/visitor/input/size_str_keyval",
-+                           NULL, test_visitor_in_size_str_keyval);
-+    input_visitor_test_add("/visitor/input/size_str_fail",
-+                           NULL, test_visitor_in_size_str_fail);
-     input_visitor_test_add("/visitor/input/string",
-                            NULL, test_visitor_in_string);
-     input_visitor_test_add("/visitor/input/enum",
+ static void unterminated_array(void)
+ {
+-    QObject *obj = qobject_from_json("[32", NULL);
++    Error *err = NULL;
++    QObject *obj = qobject_from_json("[32", &err);
++    g_assert(!err);             /* BUG */
+     g_assert(obj == NULL);
+ }
+ 
+ static void unterminated_array_comma(void)
+ {
+-    QObject *obj = qobject_from_json("[32,", NULL);
++    Error *err = NULL;
++    QObject *obj = qobject_from_json("[32,", &err);
++    g_assert(!err);             /* BUG */
+     g_assert(obj == NULL);
+ }
+ 
+ static void invalid_array_comma(void)
+ {
+-    QObject *obj = qobject_from_json("[32,}", NULL);
++    Error *err = NULL;
++    QObject *obj = qobject_from_json("[32,}", &err);
++    error_free_or_abort(&err);
+     g_assert(obj == NULL);
+ }
+ 
+ static void unterminated_dict(void)
+ {
+-    QObject *obj = qobject_from_json("{'abc':32", NULL);
++    Error *err = NULL;
++    QObject *obj = qobject_from_json("{'abc':32", &err);
++    g_assert(!err);             /* BUG */
+     g_assert(obj == NULL);
+ }
+ 
+ static void unterminated_dict_comma(void)
+ {
+-    QObject *obj = qobject_from_json("{'abc':32,", NULL);
++    Error *err = NULL;
++    QObject *obj = qobject_from_json("{'abc':32,", &err);
++    g_assert(!err);             /* BUG */
+     g_assert(obj == NULL);
+ }
+ 
+ static void invalid_dict_comma(void)
+ {
+-    QObject *obj = qobject_from_json("{'abc':32,}", NULL);
++    Error *err = NULL;
++    QObject *obj = qobject_from_json("{'abc':32,}", &err);
++    error_free_or_abort(&err);
+     g_assert(obj == NULL);
+ }
+ 
+ static void unterminated_literal(void)
+ {
+-    QObject *obj = qobject_from_json("nul", NULL);
++    Error *err = NULL;
++    QObject *obj = qobject_from_json("nul", &err);
++    error_free_or_abort(&err);
+     g_assert(obj == NULL);
+ }
+ 
+@@ -1421,15 +1443,17 @@ static char *make_nest(char *buf, size_t cnt)
+ 
+ static void limits_nesting(void)
+ {
++    Error *err = NULL;
+     enum { max_nesting = 1024 }; /* see qobject/json-streamer.c */
+     char buf[2 * (max_nesting + 1) + 1];
+     QObject *obj;
+ 
+-    obj = qobject_from_json(make_nest(buf, max_nesting), NULL);
++    obj = qobject_from_json(make_nest(buf, max_nesting), &error_abort);
+     g_assert(obj != NULL);
+     qobject_decref(obj);
+ 
+-    obj = qobject_from_json(make_nest(buf, max_nesting + 1), NULL);
++    obj = qobject_from_json(make_nest(buf, max_nesting + 1), &err);
++    error_free_or_abort(&err);
+     g_assert(obj == NULL);
+ }
+ 
 -- 
 2.7.4
