@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cieDQ-0007P5-IN
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 04:37:05 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cieHV-0002Or-OV
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 04:41:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cieDN-0002rF-Dh
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 04:37:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37700)
+	(envelope-from <dgilbert@redhat.com>) id 1cieHS-0003tv-JB
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 04:41:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54386)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cieDN-0002rB-7q
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 04:37:01 -0500
-Date: Tue, 28 Feb 2017 09:36:56 +0000
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cieHS-0003sx-9k
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 04:41:14 -0500
+Date: Tue, 28 Feb 2017 09:41:09 +0000
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170228093656.GB2773@work-vm>
-References: <20170222160119.52771-1-pasic@linux.vnet.ibm.com>
+Message-ID: <20170228094108.GC2773@work-vm>
+References: <1487009088-23891-1-git-send-email-ashijeetacharya@gmail.com>
+	<20170223152709.GD2383@work-vm>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170222160119.52771-1-pasic@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] vmstate: handle arrays with null
- ptrs
+In-Reply-To: <20170223152709.GD2383@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v4] migrate: Introduce a 'dc->vmsd' check
+ to avoid segfault for --only-migratable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,46 +28,227 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Cc: quintela@redhat.com, peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org
 
-* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
-> The objective is supporting migration of arrays of pointers 
-> holdig a mix of null and not null pointers.
+* Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
+> * Ashijeet Acharya (ashijeetacharya@gmail.com) wrote:
+> > Commit a3a3d8c7 introduced a segfault bug while checking for
+> > 'dc->vmsd->unmigratable' which caused QEMU to crash when trying to add
+> > devices which do no set their 'dc->vmsd' yet while initialization.
+> > Place a 'dc->vmsd' check prior to it so that we do not segfault for
+> > such devices.
+> > 
+> > NOTE: This doesn't compromise the functioning of --only-migratable
+> > option as all the unmigratable devices do set their 'dc->vmsd'.
+> > 
+> > Introduce a new function check_migratable() and move the
+> > only_migratable check inside it, also use stubs to avoid user-mode qemu
+> > build failures.
+> > 
+> > Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+> 
+> Yep, I think that should work.
+> 
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
 Queued.
 
-> v1 -> v2:
-> * do not ignore return value (Dave)
-> * change some asserts to report_error+rc (Dave)
-> * factor out and reuse wire_sample in patches 4 and 5 (Dave)
-> * minor reword of patch 2
-> * add r-b's
 > 
-> 
-> RFC v2 -> v1:
-> * rebase
-> * changed marker as suggested by Dave (incl. simplifications)
-> * fixed issues pointed out by Dave
-> * reworded some commit messages
-> * added a test for array of ptr to primitive
-> 
-> 
-> Halil Pasic (5):
->   migration/vmstate: renames in (load|save)_state
->   migration/vmstate: split up vmstate_base_addr
->   migration/vmstate: fix array of ptr with nullptrs
->   tests/test-vmstate.c: test array of ptr with null
->   tests/test-vmstate.c: test array of ptr to primitive
-> 
->  include/migration/vmstate.h |   4 ++
->  migration/vmstate.c         |  97 +++++++++++++++++++++++------------
->  tests/test-vmstate.c        | 122 ++++++++++++++++++++++++++++++++++++++------
->  3 files changed, 173 insertions(+), 50 deletions(-)
-> 
-> -- 
-> 2.8.4
-> 
+> > ---
+> > Changes in v4:
+> > - introduce new check_migratable() function and use stubs
+> > Changes is v3:
+> > - move only_migratable check inside device_set_realized() to avoid code
+> > - duplication
+> > - I have dropped Juan's R-b tag for this one
+> > Changes in v2:
+> > - place dc->vmsd check in hw/usb/bus.c as well
+> > ---
+> >  hw/core/qdev.c                |  7 +++++++
+> >  hw/usb/bus.c                  | 19 -------------------
+> >  include/migration/migration.h |  3 +++
+> >  migration/migration.c         | 15 +++++++++++++++
+> >  qdev-monitor.c                |  9 ---------
+> >  stubs/vmstate.c               |  6 ++++++
+> >  6 files changed, 31 insertions(+), 28 deletions(-)
+> > 
+> > diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> > index 5783442..4f49cfe 100644
+> > --- a/hw/core/qdev.c
+> > +++ b/hw/core/qdev.c
+> > @@ -37,6 +37,7 @@
+> >  #include "hw/boards.h"
+> >  #include "hw/sysbus.h"
+> >  #include "qapi-event.h"
+> > +#include "migration/migration.h"
+> >  
+> >  int qdev_hotplug = 0;
+> >  static bool qdev_hot_added = false;
+> > @@ -889,6 +890,7 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+> >      Error *local_err = NULL;
+> >      bool unattached_parent = false;
+> >      static int unattached_count;
+> > +    int ret;
+> >  
+> >      if (dev->hotplugged && !dc->hotpluggable) {
+> >          error_setg(errp, QERR_DEVICE_NO_HOTPLUG, object_get_typename(obj));
+> > @@ -896,6 +898,11 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+> >      }
+> >  
+> >      if (value && !dev->realized) {
+> > +        ret = check_migratable(obj, &local_err);
+> > +        if (ret < 0) {
+> > +            goto fail;
+> > +        }
+> > +
+> >          if (!obj->parent) {
+> >              gchar *name = g_strdup_printf("device[%d]", unattached_count++);
+> >  
+> > diff --git a/hw/usb/bus.c b/hw/usb/bus.c
+> > index 1dcc35c..25913ad 100644
+> > --- a/hw/usb/bus.c
+> > +++ b/hw/usb/bus.c
+> > @@ -8,7 +8,6 @@
+> >  #include "monitor/monitor.h"
+> >  #include "trace.h"
+> >  #include "qemu/cutils.h"
+> > -#include "migration/migration.h"
+> >  
+> >  static void usb_bus_dev_print(Monitor *mon, DeviceState *qdev, int indent);
+> >  
+> > @@ -687,8 +686,6 @@ USBDevice *usbdevice_create(const char *cmdline)
+> >      const char *params;
+> >      int len;
+> >      USBDevice *dev;
+> > -    ObjectClass *klass;
+> > -    DeviceClass *dc;
+> >  
+> >      params = strchr(cmdline,':');
+> >      if (params) {
+> > @@ -723,22 +720,6 @@ USBDevice *usbdevice_create(const char *cmdline)
+> >          return NULL;
+> >      }
+> >  
+> > -    klass = object_class_by_name(f->name);
+> > -    if (klass == NULL) {
+> > -        error_report("Device '%s' not found", f->name);
+> > -        return NULL;
+> > -    }
+> > -
+> > -    dc = DEVICE_CLASS(klass);
+> > -
+> > -    if (only_migratable) {
+> > -        if (dc->vmsd->unmigratable) {
+> > -            error_report("Device %s is not migratable, but --only-migratable "
+> > -                         "was specified", f->name);
+> > -            return NULL;
+> > -        }
+> > -    }
+> > -
+> >      if (f->usbdevice_init) {
+> >          dev = f->usbdevice_init(bus, params);
+> >      } else {
+> > diff --git a/include/migration/migration.h b/include/migration/migration.h
+> > index af9135f..a6868cd 100644
+> > --- a/include/migration/migration.h
+> > +++ b/include/migration/migration.h
+> > @@ -22,6 +22,7 @@
+> >  #include "qapi-types.h"
+> >  #include "exec/cpu-common.h"
+> >  #include "qemu/coroutine_int.h"
+> > +#include "qom/object.h"
+> >  
+> >  #define QEMU_VM_FILE_MAGIC           0x5145564d
+> >  #define QEMU_VM_FILE_VERSION_COMPAT  0x00000002
+> > @@ -305,6 +306,8 @@ int migrate_add_blocker(Error *reason, Error **errp);
+> >   */
+> >  void migrate_del_blocker(Error *reason);
+> >  
+> > +int check_migratable(Object *obj, Error **err);
+> > +
+> >  bool migrate_postcopy_ram(void);
+> >  bool migrate_zero_blocks(void);
+> >  
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index 2766d2f..00b33f3 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -1146,6 +1146,21 @@ void migrate_del_blocker(Error *reason)
+> >      migration_blockers = g_slist_remove(migration_blockers, reason);
+> >  }
+> >  
+> > +int check_migratable(Object *obj, Error **err)
+> > +{
+> > +    DeviceClass *dc = DEVICE_GET_CLASS(obj);
+> > +    if (only_migratable && dc->vmsd) {
+> > +        if (dc->vmsd->unmigratable) {
+> > +            error_setg(err, "Device %s is not migratable, but "
+> > +                       "--only-migratable was specified",
+> > +                       object_get_typename(obj));
+> > +            return -1;
+> > +        }
+> > +    }
+> > +
+> > +    return 0;
+> > +}
+> > +
+> >  void qmp_migrate_incoming(const char *uri, Error **errp)
+> >  {
+> >      Error *local_err = NULL;
+> > diff --git a/qdev-monitor.c b/qdev-monitor.c
+> > index 549f45f..5f2fcdf 100644
+> > --- a/qdev-monitor.c
+> > +++ b/qdev-monitor.c
+> > @@ -29,7 +29,6 @@
+> >  #include "qemu/error-report.h"
+> >  #include "qemu/help_option.h"
+> >  #include "sysemu/block-backend.h"
+> > -#include "migration/migration.h"
+> >  
+> >  /*
+> >   * Aliases were a bad idea from the start.  Let's keep them
+> > @@ -579,14 +578,6 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
+> >          return NULL;
+> >      }
+> >  
+> > -    if (only_migratable) {
+> > -        if (dc->vmsd->unmigratable) {
+> > -            error_setg(errp, "Device %s is not migratable, but "
+> > -                       "--only-migratable was specified", driver);
+> > -            return NULL;
+> > -        }
+> > -    }
+> > -
+> >      /* find bus */
+> >      path = qemu_opt_get(opts, "bus");
+> >      if (path != NULL) {
+> > diff --git a/stubs/vmstate.c b/stubs/vmstate.c
+> > index 6590627..5a71770 100644
+> > --- a/stubs/vmstate.c
+> > +++ b/stubs/vmstate.c
+> > @@ -1,6 +1,7 @@
+> >  #include "qemu/osdep.h"
+> >  #include "qemu-common.h"
+> >  #include "migration/vmstate.h"
+> > +#include "migration/migration.h"
+> >  
+> >  const VMStateDescription vmstate_dummy = {};
+> >  
+> > @@ -18,3 +19,8 @@ void vmstate_unregister(DeviceState *dev,
+> >                          void *opaque)
+> >  {
+> >  }
+> > +
+> > +int check_migratable(Object *obj, Error **err)
+> > +{
+> > +    return 0;
+> > +}
+> > -- 
+> > 2.6.2
+> > 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 > 
 --
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
