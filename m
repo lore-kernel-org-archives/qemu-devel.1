@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cijMN-0002qn-Dl
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:06:40 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cijMy-0003e8-1t
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:07:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cijMJ-0002M5-B8
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:06:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33954)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cijMJ-0002LO-6E
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:06:35 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 98A4A7AEBB
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 15:06:34 +0000 (UTC)
-Date: Tue, 28 Feb 2017 16:06:24 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170228160629.4794f504@Igors-MacBook-Pro.local>
-In-Reply-To: <1488291209-29430-2-git-send-email-marcel@redhat.com>
-References: <1488291209-29430-1-git-send-email-marcel@redhat.com>
-	<1488291209-29430-2-git-send-email-marcel@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1cijMu-0002m0-0p
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:07:16 -0500
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:32981)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cijMt-0002lJ-QZ
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:07:11 -0500
+Received: by mail-wm0-x22f.google.com with SMTP id i17so3363396wmf.0
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 07:07:11 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Tue, 28 Feb 2017 15:07:06 +0000
+Message-Id: <20170228150709.27453-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V4 1/2] acpi: simplify _OSC
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v1 0/3] MTTCG start-up tweaks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,52 +27,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com
+To: rth@twiddle.net
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On Tue, 28 Feb 2017 16:13:28 +0200
-Marcel Apfelbaum <marcel@redhat.com> wrote:
+Hi,
 
-> From: "Michael S. Tsirkin" <mst@redhat.com>
-> 
-> Our _OSC method has a bunch of unused code loading data
-> into external CTRL and SUPP fields which are then never
-> used. Drop this in favor of a single local variable.
-> 
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+These are a couple of quick tweaks to command line handling for MTTCG.
+The first patch moves the paring of --accel tcg to after icount and
+simplifies the logic to disable mttcg when icount is enabled. There is
+still a regression to icount to be fixed (caused by 8d04fb5).
 
-> ---
->  hw/i386/acpi-build.c | 5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
-> 
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 1c928ab..1da6d9f 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -1803,7 +1803,7 @@ static Aml *build_q35_osc_method(void)
->      Aml *else_ctx;
->      Aml *method;
->      Aml *a_cwd1 = aml_name("CDW1");
-> -    Aml *a_ctrl = aml_name("CTRL");
-> +    Aml *a_ctrl = aml_local(0);
->  
->      method = aml_method("_OSC", 4, AML_NOTSERIALIZED);
->      aml_append(method, aml_create_dword_field(aml_arg(3), aml_int(0), "CDW1"));
-> @@ -1813,7 +1813,6 @@ static Aml *build_q35_osc_method(void)
->      aml_append(if_ctx, aml_create_dword_field(aml_arg(3), aml_int(4), "CDW2"));
->      aml_append(if_ctx, aml_create_dword_field(aml_arg(3), aml_int(8), "CDW3"));
->  
-> -    aml_append(if_ctx, aml_store(aml_name("CDW2"), aml_name("SUPP")));
->      aml_append(if_ctx, aml_store(aml_name("CDW3"), a_ctrl));
->  
->      /*
-> @@ -1898,8 +1897,6 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
->          aml_append(dev, aml_name_decl("_CID", aml_eisaid("PNP0A03")));
->          aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
->          aml_append(dev, aml_name_decl("_UID", aml_int(1)));
-> -        aml_append(dev, aml_name_decl("SUPP", aml_int(0)));
-> -        aml_append(dev, aml_name_decl("CTRL", aml_int(0)));
->          aml_append(dev, build_q35_osc_method());
->          aml_append(sb_scope, dev);
->          aml_append(dsdt, sb_scope);
+Finally there is a patch to declare the TCG_GUEST_DEFAULT_MO for x86
+guests to avoid the bogus warning about memory order when forcing
+mttcg on. A new warning has been added specifically for guests that
+haven't declared TARGET_SUPPORT_MTTCG which means the front-end has
+had atomics/barrier/helpers converted for a MTTCG world.
+
+Alex Bennée (3):
+  vl/cpus: be smarter with icount and MTTCG
+  target/i386/cpu.h: declare TCG_GUEST_DEFAULT_MO
+  cpus.c: add additional error_report when !TARGET_SUPPORT_MTTCG
+
+ cpus.c            | 11 +++++++----
+ target/i386/cpu.h |  3 +++
+ vl.c              |  7 ++-----
+ 3 files changed, 12 insertions(+), 9 deletions(-)
+
+-- 
+2.11.0
