@@ -1,27 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34450)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1ciiX4-0000Fj-CP
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:13:39 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1ciiYt-000248-5y
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:15:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1ciiX3-0005H1-Gu
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:13:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53064)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1ciiX3-0005Ge-BO
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:13:37 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 84D3CC04BD3A
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 14:13:37 +0000 (UTC)
-From: Marcel Apfelbaum <marcel@redhat.com>
-Date: Tue, 28 Feb 2017 16:13:29 +0200
-Message-Id: <1488291209-29430-3-git-send-email-marcel@redhat.com>
-In-Reply-To: <1488291209-29430-1-git-send-email-marcel@redhat.com>
-References: <1488291209-29430-1-git-send-email-marcel@redhat.com>
-Subject: [Qemu-devel] [PATCH V4 2/2] hw/pxb-pcie: fix PCI Express hotplug
- support
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1ciiYp-00065k-2i
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:15:31 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51436
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1ciiYo-00065U-SM
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:15:27 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1SEF1lw007582
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 09:15:25 -0500
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28w2v0q561-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 09:15:25 -0500
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Tue, 28 Feb 2017 14:15:23 -0000
+Date: Tue, 28 Feb 2017 15:15:03 +0100
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <6b9508d3-98d4-bce4-8f50-f6f3b09178a9@redhat.com>
+References: <baa954b4-53fc-2b4e-b79c-917ba9171a60@de.ibm.com>
+	<20170227160609.0d49a87d.cornelia.huck@de.ibm.com>
+	<20170227163708.796ab27f.cornelia.huck@de.ibm.com>
+	<a5ada7c2-4166-1cdf-a4e0-7c49a68374f9@redhat.com>
+	<20170228134854.141a10e6.cornelia.huck@de.ibm.com>
+	<6b9508d3-98d4-bce4-8f50-f6f3b09178a9@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20170228151503.299f81e0.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] segfault use VRingMemoryRegionCaches for avail and
+ used ring vs num-queues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +47,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, imammedo@redhat.com, marcel@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>
 
-Add the missing osc method for pxb-pcie devices as APCI spec recommends,
-see 6.2.9.1 OSC Implementation Example for PCI Host Bridge Devices, ACPI 3.0a:
+On Tue, 28 Feb 2017 14:46:10 +0100
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-    It is recommended that a machine with multiple host bridge devices
-    should report the same capabilities for all host bridges, and also
-    negotiate control of the features described in the Control Field in
-    the same way for all host bridges.
+> On 28/02/2017 13:48, Cornelia Huck wrote:
+> > On Mon, 27 Feb 2017 16:41:09 +0100
+> > Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > 
+> >> On 27/02/2017 16:37, Cornelia Huck wrote:
+> >>> With the following applied (probably whitespace damaged), my guest
+> >>> starts:
+> >>>
+> >>> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> >>> index e487e36..28906e5 100644
+> >>> --- a/hw/virtio/virtio.c
+> >>> +++ b/hw/virtio/virtio.c
+> >>> @@ -287,6 +287,9 @@ static inline void vring_set_avail_event(VirtQueue *vq, uint16_t val)
+> >>>  void virtio_queue_set_notification(VirtQueue *vq, int enable)
+> >>>  {
+> >>>      vq->notification = enable;
+> >>> +    if (!vq->vring.desc) {
+> >>> +        return;
+> >>> +    }
+> >>>  
+> >>>      rcu_read_lock();
+> >>>      if (virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX)) {
+> >>>
+> >>> Maybe introduction of caches just exposed bugs that were already there
+> >>> (trying to muck with vring state for queues that have not been setup?)
+> >>
+> >> Yes, it did.  I had caught a few while writing the patches, but it does
+> >> feel like whack-a-mole...
+> >>
+> >> Paolo
+> >>
+> >>> Should we stick some asserts into the respective functions to help
+> >>> flush out the remaining bugs?
+> > 
+> > I've been staring at the code some more and I'm not really sure how to
+> > fix this properly.
+> > 
+> > The dataplane code tries to switch handlers for all virtqueues,
+> > regardless whether they are configured or not. My hack above leaves the
+> > notification in a bit of an ambiguous state, as it cannot
+> > enable/disable notifications on the real queues.
+> 
+> What if virtio_queue_set_addr called virtio_queue_set_notification(vq,
+> vq->notification)?  In fact the RCU-protected part of
+> virtio_queue_set_notification could become its own function, something
+> like virtio_queue_update_notification or perhaps a better name.
+> 
+> virtio_queue_set_addr is only called by the virtio transports, not e.g.
+> on migration, so it seems to be the right spot.
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
----
- dtc                  | 2 +-
- hw/i386/acpi-build.c | 3 +++
- 2 files changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/dtc b/dtc
-index ec02b34..65cc4d2 160000
---- a/dtc
-+++ b/dtc
-@@ -1 +1 @@
--Subproject commit ec02b34c05be04f249ffaaca4b666f5246877dea
-+Subproject commit 65cc4d2748a2c2e6f27f1cf39e07a5dbabd80ebf
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 1da6d9f..04029f6 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -1961,6 +1961,9 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-             aml_append(dev, aml_name_decl("_UID", aml_int(bus_num)));
-             aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A03")));
-             aml_append(dev, aml_name_decl("_BBN", aml_int(bus_num)));
-+            if (pci_bus_is_express(bus)) {
-+                aml_append(dev, build_q35_osc_method());
-+            }
- 
-             if (numa_node != NUMA_NODE_UNASSIGNED) {
-                 aml_append(dev, aml_name_decl("_PXM", aml_int(numa_node)));
--- 
-2.5.5
+And virtio_queue_set_rings() for virtio-1. This sounds like a plan;
+I'll play with it a bit.
