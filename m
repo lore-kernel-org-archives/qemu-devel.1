@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cimhI-0008IV-HA
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 13:40:29 -0500
+	(envelope-from <eblake@redhat.com>) id 1cimiL-0000LC-ST
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 13:41:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cimhF-0002MP-E4
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 13:40:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53778)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cimhF-0002M8-4e
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 13:40:25 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 31B95C037F6B
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 18:40:25 +0000 (UTC)
-References: <148830500441.258.8927797894103383324@0e2666bad730>
+	(envelope-from <eblake@redhat.com>) id 1cimiI-0002dt-Px
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 13:41:33 -0500
+References: <1488303601-23741-1-git-send-email-thuth@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <9bccf145-9481-2eee-dabb-33001071a841@redhat.com>
-Date: Tue, 28 Feb 2017 12:40:22 -0600
+Message-ID: <01709a2f-9230-8c1e-ca6f-396f9ecc4e10@redhat.com>
+Date: Tue, 28 Feb 2017 12:41:27 -0600
 MIME-Version: 1.0
-In-Reply-To: <148830500441.258.8927797894103383324@0e2666bad730>
+In-Reply-To: <1488303601-23741-1-git-send-email-thuth@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="FHImn5M6BVoGS2qJhUnx7FbrMAbrIiOUm"
-Subject: Re: [Qemu-devel] [PATCH v3 00/26] qapi: QMP dispatch and input
- visitor work
+	boundary="dGrebtlFex2ntpdv3GvNGIt2iAxrLAO5I"
+Subject: Re: [Qemu-devel] [PATCH] docs: Add a note about mixing bootindex
+ with "-boot order"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,54 +24,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, armbru@redhat.com
-Cc: famz@redhat.com
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-trivial@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, Laszlo Ersek <lersek@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---FHImn5M6BVoGS2qJhUnx7FbrMAbrIiOUm
+--dGrebtlFex2ntpdv3GvNGIt2iAxrLAO5I
 From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org, armbru@redhat.com
-Cc: famz@redhat.com
-Message-ID: <9bccf145-9481-2eee-dabb-33001071a841@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 00/26] qapi: QMP dispatch and input
- visitor work
-References: <148830500441.258.8927797894103383324@0e2666bad730>
-In-Reply-To: <148830500441.258.8927797894103383324@0e2666bad730>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-trivial@nongnu.org,
+ Alexey Kardashevskiy <aik@ozlabs.ru>, Laszlo Ersek <lersek@redhat.com>
+Message-ID: <01709a2f-9230-8c1e-ca6f-396f9ecc4e10@redhat.com>
+Subject: Re: [PATCH] docs: Add a note about mixing bootindex with "-boot
+ order"
+References: <1488303601-23741-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <1488303601-23741-1-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 02/28/2017 12:03 PM, no-reply@patchew.org wrote:
-> Hi,
+On 02/28/2017 11:40 AM, Thomas Huth wrote:
+> Occasionally the users try to mix the bootindex properties with the
+> "-boot order" parameter - and this likely does not give the expected
+> results. So let's add a proper statement that these two concepts
+> should not be used together.
 >=20
-> This series seems to have some coding style problems. See output below =
-for
-> more information:
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  docs/bootindex.txt | 9 +++++++++
+>  qemu-options.hx    | 5 ++++-
+>  2 files changed, 13 insertions(+), 1 deletion(-)
 >=20
 
-> Checking PATCH 18/26: tests-qobject-input-strict: Merge into test-qobje=
-ct-input-visitor...
-> ERROR: line over 90 characters
-> #486: FILE: tests/test-qobject-input-visitor.c:847:
-> +    v =3D visitor_input_test_init(data, "{ 'integer': -42, 'boolean': =
-true, 'string': 'foo', 'extra': 42 }");
-
-Code motion, can be ignored (we may want to clean it up later, but
-doesn't affect this series).
-
-
-> Checking PATCH 24/26: tests: Cover input visit beyond end of list...
-> ERROR: if this code is redundant consider removing it
-> #85: FILE: tests/test-qobject-input-visitor.c:956:
-> +#if 0 /* FIXME crash */
-
-Fixed later in the series, so doesn't impact the overall submission.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
 Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---FHImn5M6BVoGS2qJhUnx7FbrMAbrIiOUm
+--dGrebtlFex2ntpdv3GvNGIt2iAxrLAO5I
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -91,13 +71,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYtcQWAAoJEKeha0olJ0Nqq1kIAKdFPsALxyhoZTunIgP5p+q9
-g3P3f2gLu9hFq8yP3MLu94REWM74UpyDcrPonngE3iUtVOxPsdiXx5RS0LAIaF2n
-HE6x5nhb4SdUo2fS+QHi6P3gdAHgS17FUKbNSL+PhkE2MY6wv887FROZPAfSSRWA
-qoPuWa6bu9nWXyj2h5oe3XECAEApZkhdfsLPO4dSZiNC075azg5Q4l7kB4bl2LM2
-Mef2enLgDMzSShqnqoUmMcvkVLk357ozMFL3+FWuelFgbDjaf6K0BPLQQfmrAuLH
-VFAeyzDZ3AuPCR4OelHKeGrIb9Z3l8wKaXAWTEwtfbP3a78cU0iOWU1kMuQ5uCg=
-=asRt
+iQEcBAEBCAAGBQJYtcRXAAoJEKeha0olJ0NqyAEH/jyj2I4DJdTDXAmiMBbtjp66
+ZyDnffpRRORSEl70dq6CymE5h5eLr76rnyiFxJeeSG9p+fAO3Yc701rU5LPI2BmR
+Vs1KJuGS+kwoVyijORTi5l8ofjRyOd+fdyeMZaOGswGcMQz21VZ/eLh2+bcdqnDD
+evqBWYq66rRClPmAcREi2UJ4cPfOVUEAJtHQjXdwAw/ZIsbpUrqV6Q2kthDs51O2
+k41x+Lbwih4c9gx3+WZRF8Is1+d7UOwHllEkGplvoIzaJO1d4pXurRkVBxyBDO3C
+B1LXY5tCEXCI2ZjXP3edE/XVflwishRHBqabFNou42xr8dWQQCxcqQyEVMsowBw=
+=A2+E
 -----END PGP SIGNATURE-----
 
---FHImn5M6BVoGS2qJhUnx7FbrMAbrIiOUm--
+--dGrebtlFex2ntpdv3GvNGIt2iAxrLAO5I--
