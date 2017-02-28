@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cihJK-0004Vb-3V
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:55:25 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cihJI-0004UE-QK
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:55:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cihJJ-0004Gg-CN
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:55:22 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cihJH-0004FF-Gq
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:55:20 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 28 Feb 2017 13:54:08 +0100
-Message-Id: <1488286469-9381-24-git-send-email-kwolf@redhat.com>
+Date: Tue, 28 Feb 2017 13:54:07 +0100
+Message-Id: <1488286469-9381-23-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
 References: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 23/44] block: Add BdrvChildRole.stay_at_node
+Subject: [Qemu-devel] [PATCH v3 22/44] block: Include details on permission
+ errors in message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,47 +23,99 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-When the parents' child links are updated in bdrv_append() or
-bdrv_replace_in_backing_chain(), this should affect all child links of
-BlockBackends or other nodes, but not on child links held for other
-purposes (like for setting permissions). This patch allows to control
-the behaviour per BdrvChildRole.
+Instead of just telling that there was some conflict, we can be specific
+and tell which permissions were in conflict and which way the conflict
+is.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c                   | 3 +++
- include/block/block_int.h | 4 ++++
- 2 files changed, 7 insertions(+)
+ block.c | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 56 insertions(+), 11 deletions(-)
 
 diff --git a/block.c b/block.c
-index f72a67f..9e538a5 100644
+index e03cc5d..f72a67f 100644
 --- a/block.c
 +++ b/block.c
-@@ -2853,6 +2853,9 @@ static void change_parent_backing_link(BlockDriverState *from,
-     BdrvChild *c, *next, *to_c;
+@@ -1462,6 +1462,43 @@ static void bdrv_get_cumulative_perm(BlockDriverState *bs, uint64_t *perm,
+     *shared_perm = cumulative_shared_perms;
+ }
  
-     QLIST_FOREACH_SAFE(c, &from->parents, next_parent, next) {
-+        if (c->role->stay_at_node) {
-+            continue;
-+        }
-         if (c->role == &child_backing) {
-             /* @from is generally not allowed to be a backing file, except for
-              * when @to is the overlay. In that case, @from may not be replaced
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 3177b9f..a0d9328 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -441,6 +441,10 @@ typedef struct BdrvAioNotifier {
- } BdrvAioNotifier;
- 
- struct BdrvChildRole {
-+    /* If true, bdrv_replace_in_backing_chain() doesn't change the node this
-+     * BdrvChild points to. */
-+    bool stay_at_node;
++static char *bdrv_child_user_desc(BdrvChild *c)
++{
++    if (c->role->get_parent_desc) {
++        return c->role->get_parent_desc(c);
++    }
 +
-     void (*inherit_options)(int *child_flags, QDict *child_options,
-                             int parent_flags, QDict *parent_options);
++    return g_strdup("another user");
++}
++
++static char *bdrv_perm_names(uint64_t perm)
++{
++    struct perm_name {
++        uint64_t perm;
++        const char *name;
++    } permissions[] = {
++        { BLK_PERM_CONSISTENT_READ, "consistent read" },
++        { BLK_PERM_WRITE,           "write" },
++        { BLK_PERM_WRITE_UNCHANGED, "write unchanged" },
++        { BLK_PERM_RESIZE,          "resize" },
++        { BLK_PERM_GRAPH_MOD,       "change children" },
++        { 0, NULL }
++    };
++
++    char *result = g_strdup("");
++    struct perm_name *p;
++
++    for (p = permissions; p->name; p++) {
++        if (perm & p->perm) {
++            char *old = result;
++            result = g_strdup_printf("%s%s%s", old, *old ? ", " : "", p->name);
++            g_free(old);
++        }
++    }
++
++    return result;
++}
++
+ /*
+  * Checks whether a new reference to @bs can be added if the new user requires
+  * @new_used_perm/@new_shared_perm as its permissions. If @ignore_child is set,
+@@ -1486,17 +1523,25 @@ static int bdrv_check_update_perm(BlockDriverState *bs, uint64_t new_used_perm,
+             continue;
+         }
+ 
+-        if ((new_used_perm & c->shared_perm) != new_used_perm ||
+-            (c->perm & new_shared_perm) != c->perm)
+-        {
+-            const char *user = NULL;
+-            if (c->role->get_name) {
+-                user = c->role->get_name(c);
+-                if (user && !*user) {
+-                    user = NULL;
+-                }
+-            }
+-            error_setg(errp, "Conflicts with %s", user ?: "another operation");
++        if ((new_used_perm & c->shared_perm) != new_used_perm) {
++            char *user = bdrv_child_user_desc(c);
++            char *perm_names = bdrv_perm_names(new_used_perm & ~c->shared_perm);
++            error_setg(errp, "Conflicts with use by %s as '%s', which does not "
++                             "allow '%s' on %s",
++                       user, c->name, perm_names, bdrv_get_node_name(c->bs));
++            g_free(user);
++            g_free(perm_names);
++            return -EPERM;
++        }
++
++        if ((c->perm & new_shared_perm) != c->perm) {
++            char *user = bdrv_child_user_desc(c);
++            char *perm_names = bdrv_perm_names(c->perm & ~new_shared_perm);
++            error_setg(errp, "Conflicts with use by %s as '%s', which uses "
++                             "'%s' on %s",
++                       user, c->name, perm_names, bdrv_get_node_name(c->bs));
++            g_free(user);
++            g_free(perm_names);
+             return -EPERM;
+         }
  
 -- 
 1.8.3.1
