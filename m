@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56025)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1cinhf-0007Fe-2O
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:44:56 -0500
+	(envelope-from <eblake@redhat.com>) id 1cinl4-0008P4-3Z
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:48:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@virtuozzo.com>) id 1cinha-0006BL-3f
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:44:55 -0500
-Received: from mail-ve1eur01on0122.outbound.protection.outlook.com
-	([104.47.1.122]:43517
-	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1cinhZ-0006Ar-EC
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:44:50 -0500
-References: <20170227201456.31814-1-berrange@redhat.com>
-	<739c3a03-fffe-46d0-0ba6-a328a9a18eb2@redhat.com>
-	<20170228100907.GD2762@redhat.com>
-From: "Denis V. Lunev" <den@openvz.org>
-Message-ID: <a0920e25-3bb6-c917-f9ec-fde74ad02fe6@openvz.org>
-Date: Tue, 28 Feb 2017 13:12:47 +0300
+	(envelope-from <eblake@redhat.com>) id 1cinl3-0007cQ-8x
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:48:26 -0500
+References: <1488194450-28056-1-git-send-email-armbru@redhat.com>
+	<1488194450-28056-23-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <61ac43dd-25fb-0a83-75d5-ade76641444f@redhat.com>
+Date: Tue, 28 Feb 2017 13:48:15 -0600
 MIME-Version: 1.0
-In-Reply-To: <20170228100907.GD2762@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] io: ignore case when matching websockets
- HTTP headers
+In-Reply-To: <1488194450-28056-23-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="caVb8DPcRAe4r18BFJHcCr0gInflKqPOm"
+Subject: Re: [Qemu-devel] [PATCH 22/24] qapi: New parse_qapi_name()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,57 +24,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Anton Nefedov <anton.nefedov@virtuozzo.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com, "mdroth@linux.vnet.ibm.commdroth"@linux.vnet.ibm.com
 
-On 02/28/2017 01:09 PM, Daniel P. Berrange wrote:
-> On Mon, Feb 27, 2017 at 03:20:37PM -0600, Eric Blake wrote:
->> On 02/27/2017 02:14 PM, Daniel P. Berrange wrote:
->>> According to RFC7230 Section 3.2, header field name is case-insensitive.
->>> Convert the header data into all lowercase before doing string matching
->>> on the headers.
->>>
->>> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
->>> ---
->>>  io/channel-websock.c | 14 +++++++++-----
->>>  1 file changed, 9 insertions(+), 5 deletions(-)
->>>
->>> @@ -223,7 +223,7 @@ static int qio_channel_websock_handshake_process(QIOChannelWebsock *ioc,
->>>  static int qio_channel_websock_handshake_read(QIOChannelWebsock *ioc,
->>>                                                Error **errp)
->>>  {
->>> -    char *handshake_end;
->>> +    char *handshake_end, *tmp;
->>>      ssize_t ret;
->>>      /* Typical HTTP headers from novnc are 512 bytes, so limiting
->>>       * total header size to 4096 is easily enough. */
->> Drive-by grammar nit: s/easily/easy/
->>
->>> @@ -249,9 +249,13 @@ static int qio_channel_websock_handshake_read(QIOChannelWebsock *ioc,
->>>          }
->>>      }
->>>  
->>> +    for (tmp = (char *)ioc->encinput.buffer; tmp < handshake_end; tmp++) {
->>> +        *tmp = g_ascii_tolower(*tmp);
->>> +    }
->>> +
->>>      if (qio_channel_websock_handshake_process(ioc,
->>>                                                (char *)ioc->encinput.buffer,
->>> -                                              ioc->encinput.offset,
->>> +                                              handshake_end - (char *)ioc->encinput.buffer,
->> I'm not sure why this change is here; nothing else in the patch changed
->> ioc->encinput.offset.
-> It is a related bug. The ioc->encinput buffer contains upto 4096
-> bytes, but that data may cover both the header & payload. The
-> handshake_end pointer refers to the end of the header region.
-> So if we just pass encinput.offset, then handshake_process()
-> will be searching part of the payload as well as the header.
-> This might cause it do match the wrong data. I guess I should
-> have made that clear in the commit, or even tput it in a
-> separate commit
->
-> Regards,
-> Daniel
-with this comment this is obviously correct :)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--caVb8DPcRAe4r18BFJHcCr0gInflKqPOm
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com,
+ "mdroth@linux.vnet.ibm.commdroth"@linux.vnet.ibm.com
+Message-ID: <61ac43dd-25fb-0a83-75d5-ade76641444f@redhat.com>
+Subject: Re: [PATCH 22/24] qapi: New parse_qapi_name()
+References: <1488194450-28056-1-git-send-email-armbru@redhat.com>
+ <1488194450-28056-23-git-send-email-armbru@redhat.com>
+In-Reply-To: <1488194450-28056-23-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Denis V. Lunev <den@openvz.org>
+On 02/27/2017 05:20 AM, Markus Armbruster wrote:
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  include/qapi/util.h    |  2 ++
+>  qapi/qapi-util.c       | 47 ++++++++++++++++++++++++++++++++++++++++++=
++++++
+>  tests/test-qapi-util.c | 34 ++++++++++++++++++++++++++++++++++
+>  3 files changed, 83 insertions(+)
+>=20
+
+> +/*
+> + * Parse a valid QAPI name from @str.
+> + * A valid name consists of letters, digits, hyphen and underscore.
+> + * It may be prefixed by __RFQDN_ (downstream extension), where RFQDN
+> + * may contain only letters, digits and hyphen.
+
+With the doc fix you discussed with Kevin,
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--caVb8DPcRAe4r18BFJHcCr0gInflKqPOm
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYtdP/AAoJEKeha0olJ0NqQngIAJfQuIhphkSocfhPW+1BfrXK
+E2LupDk8zxdDc4/FCGOEbw6dD5zoWcST4OIyRPdDZeQDn3ctbP4CTDy+2MlSBlLy
+cQ4Nl21WlAKg6qPll0q0xDdfhtN/yYCthQlND4YOWAjtBvuZj0Y9cnC97eZnq+Ei
+pDr/KDnGI4/dQ8TE57qyzF0S3jvXzY+pGfafHMCWYEgIf0W4Nsxm/+xsor8gyjJr
+n4LCdb7dD2RH+EW+sjoJxclkq9Ij9x8nFXRw/OCTsF6XXWHn770DrYwI54YW+pi2
+BG9tstSsSAG3Ph62Yfkx7I53w+o/787xJIbzvXDsnxXYS9PdwymXB+LyYlaLaRg=
+=PCy+
+-----END PGP SIGNATURE-----
+
+--caVb8DPcRAe4r18BFJHcCr0gInflKqPOm--
