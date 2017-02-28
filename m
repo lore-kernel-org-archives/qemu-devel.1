@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50028)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cilkH-0003fR-RH
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:39:31 -0500
+	(envelope-from <armbru@redhat.com>) id 1cilkJ-0003gu-2i
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:39:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cilkF-0005Sv-5j
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:39:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50530)
+	(envelope-from <armbru@redhat.com>) id 1cilkF-0005Tb-GT
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:39:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41304)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cilkE-0005Rb-Sd
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cilkF-0005Rj-3R
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:39:27 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0BD5C3D941
+	by mx1.redhat.com (Postfix) with ESMTPS id 35E1581F01
 	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 17:39:27 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 28 Feb 2017 18:39:13 +0100
-Message-Id: <1488303560-18803-20-git-send-email-armbru@redhat.com>
+Date: Tue, 28 Feb 2017 18:39:14 +0100
+Message-Id: <1488303560-18803-21-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488303560-18803-1-git-send-email-armbru@redhat.com>
 References: <1488303560-18803-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 19/26] test-string-input-visitor: Tear down
- existing test automatically
+Subject: [Qemu-devel] [PATCH v3 20/26] test-string-input-visitor: Improve
+ list coverage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,121 +32,122 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Call visitor_input_teardown() from visitor_input_test_init(), so you
-don't have to call it from the actual tests.
+Lists with elements above INT64_MAX don't work (known bug).  Empty
+lists don't work (weird).
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/test-string-input-visitor.c | 19 ++-----------------
- 1 file changed, 2 insertions(+), 17 deletions(-)
+ tests/test-string-input-visitor.c | 85 +++++++++++++++++++++++++++++++++------
+ 1 file changed, 72 insertions(+), 13 deletions(-)
 
 diff --git a/tests/test-string-input-visitor.c b/tests/test-string-input-visitor.c
-index 7f10e25..a32828c 100644
+index a32828c..72f8732 100644
 --- a/tests/test-string-input-visitor.c
 +++ b/tests/test-string-input-visitor.c
-@@ -39,6 +39,8 @@ static
- Visitor *visitor_input_test_init(TestInputVisitorData *data,
-                                  const char *string)
- {
-+    visitor_input_teardown(data, NULL);
+@@ -65,31 +65,90 @@ static void test_visitor_in_int(TestInputVisitorData *data,
+     error_free_or_abort(&err);
+ }
+ 
++static void check_ilist(Visitor *v, int64_t *expected, size_t n)
++{
++    int64List *res = NULL;
++    int64List *tail;
++    int i;
 +
-     data->v = string_input_visitor_new(string);
-     g_assert(data->v);
-     return data->v;
-@@ -57,8 +59,6 @@ static void test_visitor_in_int(TestInputVisitorData *data,
-     g_assert(!err);
-     g_assert_cmpint(res, ==, value);
++    visit_type_int64List(v, NULL, &res, &error_abort);
++    tail = res;
++    for (i = 0; i < n; i++) {
++        g_assert(tail);
++        g_assert_cmpint(tail->value, ==, expected[i]);
++        tail = tail->next;
++    }
++    g_assert(!tail);
++
++    qapi_free_int64List(res);
++}
++
++static void check_ulist(Visitor *v, uint64_t *expected, size_t n)
++{
++    uint64List *res = NULL;
++    uint64List *tail;
++    int i;
++
++    /* BUG: unsigned numbers above INT64_MAX don't work */
++    for (i = 0; i < n; i++) {
++        if (expected[i] > INT64_MAX) {
++            Error *err = NULL;
++            visit_type_uint64List(v, NULL, &res, &err);
++            error_free_or_abort(&err);
++            return;
++        }
++    }
++
++    visit_type_uint64List(v, NULL, &res, &error_abort);
++    tail = res;
++    for (i = 0; i < n; i++) {
++        g_assert(tail);
++        g_assert_cmpuint(tail->value, ==, expected[i]);
++        tail = tail->next;
++    }
++    g_assert(!tail);
++
++    qapi_free_uint64List(res);
++}
++
+ static void test_visitor_in_intList(TestInputVisitorData *data,
+                                     const void *unused)
+ {
+-    int64_t value[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 20};
+-    int16List *res = NULL, *tmp;
++    /* Note: the visitor *sorts* ranges *unsigned* */
++    int64_t expect1[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 20 };
++    int64_t expect2[] = { 32767, -32768, -32767 };
++    int64_t expect3[] = { INT64_MAX, INT64_MIN };
++    uint64_t expect4[] = { UINT64_MAX };
+     Error *err = NULL;
++    int64List *res = NULL;
+     Visitor *v;
+-    int i = 0;
++
++    /* Valid lists */
  
--    visitor_input_teardown(data, unused);
--
-     v = visitor_input_test_init(data, "not an int");
+     v = visitor_input_test_init(data, "1,2,0,2-4,20,5-9,1-8");
++    check_ilist(v, expect1, ARRAY_SIZE(expect1));
  
-     visit_type_int(v, NULL, &res, &err);
-@@ -87,8 +87,6 @@ static void test_visitor_in_intList(TestInputVisitorData *data,
+-    visit_type_int16List(v, NULL, &res, &error_abort);
+-    tmp = res;
+-    while (i < sizeof(value) / sizeof(value[0])) {
+-        g_assert(tmp);
+-        g_assert_cmpint(tmp->value, ==, value[i++]);
+-        tmp = tmp->next;
+-    }
+-    g_assert(!tmp);
++    v = visitor_input_test_init(data, "32767,-32768--32767");
++    check_ilist(v, expect2, ARRAY_SIZE(expect2));
  
-     qapi_free_int16List(res);
+-    qapi_free_int16List(res);
++    v = visitor_input_test_init(data,
++                                "-9223372036854775808,9223372036854775807");
++    check_ilist(v, expect3, ARRAY_SIZE(expect3));
++
++    v = visitor_input_test_init(data, "18446744073709551615");
++    check_ulist(v, expect4, ARRAY_SIZE(expect4));
++
++    /* Empty list is invalid (weird) */
++
++    v = visitor_input_test_init(data, "");
++    visit_type_int64List(v, NULL, &res, &err);
++    error_free_or_abort(&err);
++
++    /* Not a list */
  
--    visitor_input_teardown(data, unused);
--
      v = visitor_input_test_init(data, "not an int list");
  
-     visit_type_int16List(v, NULL, &res, &err);
-@@ -108,35 +106,30 @@ static void test_visitor_in_bool(TestInputVisitorData *data,
-     visit_type_bool(v, NULL, &res, &err);
-     g_assert(!err);
-     g_assert_cmpint(res, ==, true);
--    visitor_input_teardown(data, unused);
- 
-     v = visitor_input_test_init(data, "yes");
- 
-     visit_type_bool(v, NULL, &res, &err);
-     g_assert(!err);
-     g_assert_cmpint(res, ==, true);
--    visitor_input_teardown(data, unused);
- 
-     v = visitor_input_test_init(data, "on");
- 
-     visit_type_bool(v, NULL, &res, &err);
-     g_assert(!err);
-     g_assert_cmpint(res, ==, true);
--    visitor_input_teardown(data, unused);
- 
-     v = visitor_input_test_init(data, "false");
- 
-     visit_type_bool(v, NULL, &res, &err);
-     g_assert(!err);
-     g_assert_cmpint(res, ==, false);
--    visitor_input_teardown(data, unused);
- 
-     v = visitor_input_test_init(data, "no");
- 
-     visit_type_bool(v, NULL, &res, &err);
-     g_assert(!err);
-     g_assert_cmpint(res, ==, false);
--    visitor_input_teardown(data, unused);
- 
-     v = visitor_input_test_init(data, "off");
- 
-@@ -190,8 +183,6 @@ static void test_visitor_in_enum(TestInputVisitorData *data,
-         visit_type_EnumOne(v, NULL, &res, &err);
-         g_assert(!err);
-         g_assert_cmpint(i, ==, res);
--
--        visitor_input_teardown(data, NULL);
-     }
+-    visit_type_int16List(v, NULL, &res, &err);
++    visit_type_int64List(v, NULL, &res, &err);
+     error_free_or_abort(&err);
+     g_assert(!res);
  }
- 
-@@ -224,30 +215,24 @@ static void test_visitor_in_fuzz(TestInputVisitorData *data,
- 
-         v = visitor_input_test_init(data, buf);
-         visit_type_int(v, NULL, &ires, NULL);
--        visitor_input_teardown(data, NULL);
- 
-         v = visitor_input_test_init(data, buf);
-         visit_type_intList(v, NULL, &ilres, NULL);
-         qapi_free_intList(ilres);
--        visitor_input_teardown(data, NULL);
- 
-         v = visitor_input_test_init(data, buf);
-         visit_type_bool(v, NULL, &bres, NULL);
--        visitor_input_teardown(data, NULL);
- 
-         v = visitor_input_test_init(data, buf);
-         visit_type_number(v, NULL, &nres, NULL);
--        visitor_input_teardown(data, NULL);
- 
-         v = visitor_input_test_init(data, buf);
-         sres = NULL;
-         visit_type_str(v, NULL, &sres, NULL);
-         g_free(sres);
--        visitor_input_teardown(data, NULL);
- 
-         v = visitor_input_test_init(data, buf);
-         visit_type_EnumOne(v, NULL, &eres, NULL);
--        visitor_input_teardown(data, NULL);
-     }
- }
- 
 -- 
 2.7.4
