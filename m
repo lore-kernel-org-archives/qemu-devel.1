@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ciVmJ-0004pk-B7
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 19:36:37 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ciVmW-00052m-FU
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 19:36:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ciVmD-00055S-93
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 19:36:31 -0500
-Received: from 4.mo6.mail-out.ovh.net ([87.98.184.159]:35208)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ciVmC-00055O-NU
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 19:36:25 -0500
-Received: from player761.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 345A7B033D
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 01:36:23 +0100 (CET)
-Date: Tue, 28 Feb 2017 01:36:16 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170228013616.5146663c@bahia.lan>
-In-Reply-To: <148824002502.186.17034924792706896386@0e2666bad730>
-References: <1488236421-30983-1-git-send-email-groug@kaod.org>
-	<148824002502.186.17034924792706896386@0e2666bad730>
+	(envelope-from <dgibson@ozlabs.org>) id 1ciVmV-00058k-8t
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 19:36:44 -0500
+Date: Tue, 28 Feb 2017 11:28:10 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170228002810.GD17615@umbus.fritz.box>
+References: <cover.1487829585.git.sam.bobroff@au1.ibm.com>
+	<034945c1bbc8d4a97e5f568d4d463af2c9a24080.1487829585.git.sam.bobroff@au1.ibm.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/aB7HySC9QSWj/qq.pbGQo/5";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PULL 00/31] 9p patches 2017-02-27 for 2.9 soft
- freeze
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="01b0+GAtiOmVD9T6"
+Content-Disposition: inline
+In-Reply-To: <034945c1bbc8d4a97e5f568d4d463af2c9a24080.1487829585.git.sam.bobroff@au1.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 08/12] spapr: Only setup HTP if
+ necessary.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,1325 +25,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: no-reply@patchew.org
-Cc: qemu-devel@nongnu.org, famz@redhat.com, peter.maydell@linaro.org, aneesh.kumar@linux.vnet.ibm.com
+To: Sam Bobroff <sam.bobroff@au1.ibm.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, sjitindarsingh@gmail.com
 
---Sig_/aB7HySC9QSWj/qq.pbGQo/5
-Content-Type: text/plain; charset=US-ASCII
+
+--01b0+GAtiOmVD9T6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 27 Feb 2017 16:00:25 -0800 (PST)
-no-reply@patchew.org wrote:
+s/HTP/HPT/ in subject line.
 
-> Hi,
->=20
-> This series failed build test on s390x host. Please find the details belo=
-w.
->=20
 
-Hmm... I don't understand how this is related to this pull request... :-\
+On Thu, Feb 23, 2017 at 05:00:01PM +1100, Sam Bobroff wrote:
+> If QEMU is using KVM, and KVM is capable of running in radix mode,
+> guests can be run in real-mode without allocating a HPT (because KVM
+> will use a minimal RPT). So in this case, we avoid creating the HPT
+> at reset time and later (during CAS) create it if it is necessary.
+>=20
+> Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
 
-> Type: series
-> Subject: [Qemu-devel] [PULL 00/31] 9p patches 2017-02-27 for 2.9 soft fre=
-eze
-> Message-id: 1488236421-30983-1-git-send-email-groug@kaod.org
->=20
-> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
-> #!/bin/bash
-> # Testing script will be invoked under the git checkout with
-> # HEAD pointing to a commit that has the patches applied on top of "base"
-> # branch
-> set -e
-> echo "=3D=3D=3D ENV =3D=3D=3D"
-> env
-> echo "=3D=3D=3D PACKAGES =3D=3D=3D"
-> rpm -qa
-> echo "=3D=3D=3D TEST BEGIN =3D=3D=3D"
-> CC=3D$HOME/bin/cc
-> INSTALL=3D$PWD/install
-> BUILD=3D/var/tmp/patchew-qemu-build
-> echo -n "Using CC: "
-> realpath $CC
-> test -e $BUILD && rm -rf $BUILD
-> mkdir -p $BUILD $INSTALL
-> SRC=3D$PWD
-> cd $BUILD
-> $SRC/configure --cc=3D$CC --prefix=3D$INSTALL
-> make -j4
-> make check -j4
-> make install
-> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
->=20
-> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> From https://github.com/patchew-project/qemu
->  - [tag update]      patchew/1488236421-30983-1-git-send-email-groug@kaod=
-.org -> patchew/1488236421-30983-1-git-send-email-groug@kaod.org
-> Switched to a new branch 'test'
-> 07c3d33 9pfs: local: drop unused code
-> 5ce7d8c 9pfs: local: open2: don't follow symlinks
-> aa37460 9pfs: local: mkdir: don't follow symlinks
-> a0173b8 9pfs: local: mknod: don't follow symlinks
-> 69b7736 9pfs: local: symlink: don't follow symlinks
-> 3e4489d 9pfs: local: chown: don't follow symlinks
-> c485ffa 9pfs: local: chmod: don't follow symlinks
-> 86eeb62 9pfs: local: link: don't follow symlinks
-> 85f4b20 9pfs: local: improve error handling in link op
-> b464899 9pfs: local: rename: use renameat
-> 6b56008 9pfs: local: renameat: don't follow symlinks
-> 08500f7 9pfs: local: lstat: don't follow symlinks
-> 939b750 9pfs: local: readlink: don't follow symlinks
-> def2b5c 9pfs: local: truncate: don't follow symlinks
-> 3590fd1 9pfs: local: statfs: don't follow symlinks
-> 16cd7bf 9pfs: local: utimensat: don't follow symlinks
-> 88b8a10 9pfs: local: remove: don't follow symlinks
-> 0f81ee9 9pfs: local: unlinkat: don't follow symlinks
-> 6dc3122 9pfs: local: lremovexattr: don't follow symlinks
-> ae5edcc 9pfs: local: lsetxattr: don't follow symlinks
-> 2d68506 9pfs: local: llistxattr: don't follow symlinks
-> 6ac09e6 9pfs: local: lgetxattr: don't follow symlinks
-> 4e29bb4 9pfs: local: open/opendir: don't follow symlinks
-> f377113 9pfs: local: keep a file descriptor on the shared folder
-> 5b8c8e3 9pfs: introduce relative_openat_nofollow() helper
-> 11557d4 9pfs: remove side-effects in local_open() and local_opendir()
-> 3cf5912 9pfs: remove side-effects in local_init()
-> 9835545 9pfs: local: move xattr security ops to 9p-xattr.c
-> d462443 throttle: factor out duplicate code
-> 8273ae8 fsdev: add IO throttle support to fsdev devices
-> 48bdc6e 9pfs: fix v9fs_lock error case
->=20
-> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
-> =3D=3D=3D ENV =3D=3D=3D
-> XDG_SESSION_ID=3D40003
-> SHELL=3D/bin/sh
-> USER=3Dfam
-> PATCHEW=3D/home/fam/patchew/patchew-cli -s http://patchew.org --nodebug
-> PATH=3D/usr/bin:/bin
-> PWD=3D/var/tmp/patchew-tester-tmp-g8vh4imz/src
-> LANG=3Den_US.UTF-8
-> HOME=3D/home/fam
-> SHLVL=3D2
-> LOGNAME=3Dfam
-> DBUS_SESSION_BUS_ADDRESS=3Dunix:path=3D/run/user/1012/bus
-> XDG_RUNTIME_DIR=3D/run/user/1012
-> _=3D/usr/bin/env
-> =3D=3D=3D PACKAGES =3D=3D=3D
-> gpg-pubkey-873529b8-54e386ff
-> xz-libs-5.2.2-2.fc24.s390x
-> libacl-2.2.52-11.fc24.s390x
-> libxshmfence-1.2-3.fc24.s390x
-> cdparanoia-libs-10.2-21.fc24.s390x
-> ustr-1.0.4-21.fc24.s390x
-> giflib-4.1.6-15.fc24.s390x
-> libusb-0.1.5-7.fc24.s390x
-> trousers-lib-0.3.13-6.fc24.s390x
-> readline-devel-6.3-8.fc24.s390x
-> python-srpm-macros-3-10.fc25.noarch
-> ncurses-base-6.0-6.20160709.fc25.noarch
-> gmp-6.1.1-1.fc25.s390x
-> chkconfig-1.8-1.fc25.s390x
-> libidn-1.33-1.fc25.s390x
-> file-5.28-4.fc25.s390x
-> slang-2.3.0-7.fc25.s390x
-> avahi-libs-0.6.32-4.fc25.s390x
-> libsemanage-2.5-8.fc25.s390x
-> perl-Unicode-Normalize-1.25-365.fc25.s390x
-> perl-libnet-3.10-1.fc25.noarch
-> perl-Thread-Queue-3.11-1.fc25.noarch
-> perl-podlators-4.09-1.fc25.noarch
-> jasper-libs-1.900.13-1.fc25.s390x
-> graphite2-1.3.6-1.fc25.s390x
-> libblkid-2.28.2-1.fc25.s390x
-> pkgconfig-0.29.1-1.fc25.s390x
-> dbus-python-1.2.4-2.fc25.s390x
-> alsa-lib-1.1.1-2.fc25.s390x
-> libgnome-keyring-3.12.0-7.fc25.s390x
-> yum-metadata-parser-1.1.4-17.fc25.s390x
-> python3-3.5.2-4.fc25.s390x
-> python3-slip-dbus-0.6.4-4.fc25.noarch
-> python2-cssselect-0.9.2-1.fc25.noarch
-> python-backports-1.0-8.fc25.s390x
-> python-magic-5.28-4.fc25.noarch
-> python-pycparser-2.14-7.fc25.noarch
-> python-fedora-0.8.0-2.fc25.noarch
-> createrepo_c-libs-0.10.0-6.fc25.s390x
-> initscripts-9.69-1.fc25.s390x
-> plymouth-scripts-0.9.3-0.6.20160620git0e65b86c.fc25.s390x
-> cronie-1.5.1-2.fc25.s390x
-> python2-librepo-1.7.18-3.fc25.s390x
-> wget-1.18-2.fc25.s390x
-> python3-dnf-plugins-core-0.1.21-4.fc25.noarch
-> at-spi2-core-2.22.0-1.fc25.s390x
-> libXv-1.0.11-1.fc25.s390x
-> dhcp-client-4.3.5-1.fc25.s390x
-> python2-dnf-plugins-core-0.1.21-4.fc25.noarch
-> parted-3.2-21.fc25.s390x
-> python2-ndg_httpsclient-0.4.0-4.fc25.noarch
-> bash-completion-2.4-1.fc25.noarch
-> btrfs-progs-4.6.1-1.fc25.s390x
-> texinfo-6.1-3.fc25.s390x
-> perl-Filter-1.55-366.fc25.s390x
-> flex-2.6.0-3.fc25.s390x
-> libgcc-6.3.1-1.fc25.s390x
-> glib2-2.50.2-1.fc25.s390x
-> dbus-libs-1.11.8-1.fc25.s390x
-> libgomp-6.3.1-1.fc25.s390x
-> colord-libs-1.3.4-1.fc25.s390x
-> perl-Encode-2.88-5.fc25.s390x
-> gstreamer1-1.10.2-1.fc25.s390x
-> cracklib-2.9.6-4.fc25.s390x
-> rpm-build-libs-4.13.0-6.fc25.s390x
-> libobjc-6.3.1-1.fc25.s390x
-> pcre-devel-8.40-1.fc25.s390x
-> mariadb-config-10.1.20-1.fc25.s390x
-> gcc-6.3.1-1.fc25.s390x
-> mesa-libGL-13.0.3-1.fc25.s390x
-> python3-dnf-plugin-system-upgrade-0.7.1-4.fc25.noarch
-> bind-libs-9.10.4-4.P5.fc25.s390x
-> python-osbs-client-0.33-3.fc25.noarch
-> NetworkManager-1.4.4-3.fc25.s390x
-> audit-2.7.1-1.fc25.s390x
-> glibc-static-2.24-4.fc25.s390x
-> perl-Pod-Simple-3.35-1.fc25.noarch
-> gdb-7.12-36.fc25.s390x
-> python2-simplejson-3.10.0-1.fc25.s390x
-> python3-sssdconfig-1.14.2-2.fc25.noarch
-> texlive-lib-2016-30.20160520.fc25.s390x
-> boost-random-1.60.0-10.fc25.s390x
-> brltty-5.4-2.fc25.s390x
-> libref_array-0.1.5-29.fc25.s390x
-> librados2-10.2.4-2.fc25.s390x
-> gnutls-dane-3.5.8-1.fc25.s390x
-> systemtap-client-3.1-0.20160725git91bfb36.fc25.s390x
-> libXrender-devel-0.9.10-1.fc25.s390x
-> libXi-devel-1.7.8-2.fc25.s390x
-> texlive-pdftex-doc-svn41149-30.fc25.noarch
-> tcp_wrappers-7.6-83.fc25.s390x
-> javapackages-tools-4.7.0-6.1.fc25.noarch
-> texlive-kpathsea-bin-svn40473-30.20160520.fc25.s390x
-> texlive-url-svn32528.3.4-30.fc25.noarch
-> texlive-latex-fonts-svn28888.0-30.fc25.noarch
-> texlive-mptopdf-bin-svn18674.0-30.20160520.fc25.noarch
-> texlive-underscore-svn18261.0-30.fc25.noarch
-> texlive-subfig-svn15878.1.3-30.fc25.noarch
-> texlive-dvipdfmx-def-svn40328-30.fc25.noarch
-> texlive-plain-svn40274-30.fc25.noarch
-> texlive-texlive-scripts-svn41433-30.fc25.noarch
-> texlive-fancyref-svn15878.0.9c-30.fc25.noarch
-> texlive-csquotes-svn39538-30.fc25.noarch
-> texlive-pxfonts-svn15878.0-30.fc25.noarch
-> texlive-cite-svn36428.5.5-30.fc25.noarch
-> texlive-section-svn20180.0-30.fc25.noarch
-> texlive-pslatex-svn16416.0-30.fc25.noarch
-> texlive-tex-gyre-math-svn41264-30.fc25.noarch
-> texlive-knuth-local-svn38627-30.fc25.noarch
-> texlive-type1cm-svn21820.0-30.fc25.noarch
-> texlive-finstrut-svn21719.0.5-30.fc25.noarch
-> texlive-ucharcat-svn38907-30.fc25.noarch
-> texlive-environ-svn33821.0.3-30.fc25.noarch
-> texlive-eso-pic-svn37925.2.0g-30.fc25.noarch
-> texlive-filehook-svn24280.0.5d-30.fc25.noarch
-> texlive-luatexbase-svn38550-30.fc25.noarch
-> texlive-pst-text-svn15878.1.00-30.fc25.noarch
-> texlive-pst-tree-svn24142.1.12-30.fc25.noarch
-> texlive-latex-bin-bin-svn14050.0-30.20160520.fc25.noarch
-> texlive-metalogo-svn18611.0.12-30.fc25.noarch
-> texlive-cm-super-svn15878.0-30.fc25.noarch
-> texlive-xetex-svn41438-30.fc25.noarch
-> keyutils-1.5.9-8.fc24.s390x
-> libcephfs_jni1-10.2.4-2.fc25.s390x
-> libcom_err-devel-1.43.3-1.fc25.s390x
-> mesa-libGLES-devel-13.0.3-1.fc25.s390x
-> graphite2-devel-1.3.6-1.fc25.s390x
-> nettle-devel-3.3-1.fc25.s390x
-> lzo-minilzo-2.08-8.fc24.s390x
-> bzip2-devel-1.0.6-21.fc25.s390x
-> libusbx-devel-1.0.21-1.fc25.s390x
-> SDL2-devel-2.0.5-2.fc25.s390x
-> virglrenderer-devel-0.5.0-1.20160411git61846f92f.fc25.s390x
-> glib2-static-2.50.2-1.fc25.s390x
-> mesa-libgbm-devel-13.0.3-1.fc25.s390x
-> acpica-tools-20160831-1.fc25.s390x
-> gdk-pixbuf2-2.36.4-1.fc25.s390x
-> nss-softokn-3.28.1-1.0.fc25.s390x
-> python3-dnf-1.1.10-5.fc25.noarch
-> python-gluster-3.9.1-1.fc25.noarch
-> perl-IO-1.36-382.fc25.s390x
-> glusterfs-devel-3.9.1-1.fc25.s390x
-> gtk3-3.22.7-1.fc25.s390x
-> vim-enhanced-8.0.206-1.fc25.s390x
-> nss-tools-3.28.1-1.3.fc25.s390x
-> libmicrohttpd-0.9.52-1.fc25.s390x
-> gpg-pubkey-a29cb19c-53bcbba6
-> libaio-0.3.110-6.fc24.s390x
-> m4-1.4.17-9.fc24.s390x
-> libfontenc-1.1.3-3.fc24.s390x
-> lzo-2.08-8.fc24.s390x
-> isl-0.14-5.fc24.s390x
-> libXau-1.0.8-6.fc24.s390x
-> liblockfile-1.09-4.fc24.s390x
-> linux-atm-libs-2.5.1-14.fc24.s390x
-> sg3_utils-1.41-3.fc24.s390x
-> libXext-1.3.3-4.fc24.s390x
-> libXinerama-1.1.3-6.fc24.s390x
-> libXxf86vm-1.1.4-3.fc24.s390x
-> libXft-2.3.2-4.fc24.s390x
-> ykpers-1.17.3-2.fc24.s390x
-> bison-3.0.4-4.fc24.s390x
-> perl-srpm-macros-1-20.fc25.noarch
-> gawk-4.1.3-8.fc25.s390x
-> tcp_wrappers-libs-7.6-83.fc25.s390x
-> libwayland-client-1.12.0-1.fc25.s390x
-> iptables-1.6.0-2.fc25.s390x
-> perl-Exporter-5.72-366.fc25.noarch
-> perl-Text-Tabs+Wrap-2013.0523-365.fc25.noarch
-> perl-Error-0.17024-7.fc25.noarch
-> perl-Term-Cap-1.17-365.fc25.noarch
-> perl-version-0.99.17-1.fc25.s390x
-> perl-Pod-Usage-1.69-1.fc25.noarch
-> fftw-libs-double-3.3.5-3.fc25.s390x
-> device-mapper-persistent-data-0.6.3-1.fc25.s390x
-> krb5-libs-1.14.4-4.fc25.s390x
-> system-python-libs-3.5.2-4.fc25.s390x
-> net-snmp-libs-5.7.3-13.fc25.s390x
-> libssh2-1.8.0-1.fc25.s390x
-> libgusb-0.2.9-1.fc25.s390x
-> ModemManager-glib-1.6.4-1.fc25.s390x
-> python3-six-1.10.0-3.fc25.noarch
-> newt-python3-0.52.19-2.fc25.s390x
-> python3-pysocks-1.5.6-5.fc25.noarch
-> python-chardet-2.3.0-1.fc25.noarch
-> python-munch-2.0.4-3.fc25.noarch
-> python2-cffi-1.7.0-2.fc25.s390x
-> python-bugzilla-1.2.2-4.fc25.noarch
-> openldap-2.4.44-2.fc25.s390x
-> libedit-3.1-16.20160618cvs.fc25.s390x
-> gc-devel-7.4.4-1.fc25.s390x
-> python-pycurl-7.43.0-4.fc25.s390x
-> createrepo_c-0.10.0-6.fc25.s390x
-> plymouth-0.9.3-0.6.20160620git0e65b86c.fc25.s390x
-> device-mapper-multipath-libs-0.4.9-83.fc25.s390x
-> ebtables-2.0.10-21.fc25.s390x
-> python3-librepo-1.7.18-3.fc25.s390x
-> libwmf-lite-0.2.8.4-49.fc25.s390x
-> net-snmp-5.7.3-13.fc25.s390x
-> yum-3.4.3-510.fc25.noarch
-> dnf-plugins-core-0.1.21-4.fc25.noarch
-> at-spi2-atk-2.22.0-1.fc25.s390x
-> ImageMagick-libs-6.9.3.0-3.fc25.s390x
-> dhcp-common-4.3.5-1.fc25.noarch
-> kernel-modules-4.8.8-300.fc25.s390x
-> dracut-config-rescue-044-78.fc25.s390x
-> sendmail-8.15.2-7.fc25.s390x
-> avahi-autoipd-0.6.32-4.fc25.s390x
-> teamd-1.26-1.fc25.s390x
-> kernel-devel-4.8.8-300.fc25.s390x
-> mozjs17-17.0.0-16.fc25.s390x
-> libselinux-2.5-13.fc25.s390x
-> libcrypt-nss-2.24-4.fc25.s390x
-> systemd-libs-231-12.fc25.s390x
-> libgo-6.3.1-1.fc25.s390x
-> libgo-devel-6.3.1-1.fc25.s390x
-> NetworkManager-libnm-1.4.4-3.fc25.s390x
-> cpp-6.3.1-1.fc25.s390x
-> rpm-plugin-selinux-4.13.0-6.fc25.s390x
-> pcre-utf32-8.40-1.fc25.s390x
-> packagedb-cli-2.14-1.fc25.noarch
-> python2-pyparsing-2.1.10-1.fc25.noarch
-> glibc-devel-2.24-4.fc25.s390x
-> libdrm-2.4.74-1.fc25.s390x
-> kernel-modules-4.9.3-200.fc25.s390x
-> cairo-gobject-1.14.8-1.fc25.s390x
-> bind99-license-9.9.9-4.P5.fc25.noarch
-> pyrpkg-1.47-5.fc25.noarch
-> emacs-25.1-3.fc25.s390x
-> firewalld-0.4.4.2-2.fc25.noarch
-> pyparsing-2.1.10-1.fc25.noarch
-> kernel-devel-4.9.3-200.fc25.s390x
-> libproxy-0.4.14-1.fc25.s390x
-> ethtool-4.8-1.fc25.s390x
-> python3-pyparsing-2.1.10-1.fc25.noarch
-> xorg-x11-proto-devel-7.7-20.fc25.noarch
-> brlapi-0.6.5-2.fc25.s390x
-> libcollection-0.7.0-29.fc25.s390x
-> librados-devel-10.2.4-2.fc25.s390x
-> libcephfs-devel-10.2.4-2.fc25.s390x
-> libXdamage-devel-1.1.4-8.fc24.s390x
-> libXinerama-devel-1.1.3-6.fc24.s390x
-> quota-4.03-7.fc25.s390x
-> texlive-texlive-common-doc-svn40682-30.fc25.noarch
-> texlive-metafont-bin-svn40987-30.20160520.fc25.s390x
-> texlive-ifluatex-svn41346-30.fc25.noarch
-> texlive-dvips-bin-svn40987-30.20160520.fc25.s390x
-> texlive-marvosym-svn29349.2.2a-30.fc25.noarch
-> texlive-graphics-cfg-svn40269-30.fc25.noarch
-> texlive-carlisle-svn18258.0-30.fc25.noarch
-> texlive-glyphlist-svn28576.0-30.fc25.noarch
-> texlive-tex-bin-svn40987-30.20160520.fc25.s390x
-> texlive-texlive-scripts-bin-svn29741.0-30.20160520.fc25.noarch
-> texlive-mathtools-svn38833-30.fc25.noarch
-> texlive-euro-svn22191.1.1-30.fc25.noarch
-> texlive-palatino-svn31835.0-30.fc25.noarch
-> texlive-anysize-svn15878.0-30.fc25.noarch
-> texlive-sansmath-svn17997.1.1-30.fc25.noarch
-> texlive-mfnfss-svn19410.0-30.fc25.noarch
-> texlive-mathpazo-svn15878.1.003-30.fc25.noarch
-> texlive-knuth-lib-svn35820.0-30.fc25.noarch
-> texlive-updmap-map-svn41159-30.fc25.noarch
-> texlive-beton-svn15878.0-30.fc25.noarch
-> texlive-xetexconfig-svn41133-30.fc25.noarch
-> texlive-trimspaces-svn15878.1.1-30.fc25.noarch
-> texlive-memoir-svn41203-30.fc25.noarch
-> texlive-latex-svn40218-30.fc25.noarch
-> texlive-lualatex-math-svn40621-30.fc25.noarch
-> texlive-pst-grad-svn15878.1.06-30.fc25.noarch
-> texlive-pst-tools-svn34067.0.05-30.fc25.noarch
-> texlive-amscls-svn36804.0-30.fc25.noarch
-> texlive-tex-gyre-svn18651.2.004-30.fc25.noarch
-> texlive-ltxmisc-svn21927.0-30.fc25.noarch
-> texlive-xetex-bin-svn41091-30.20160520.fc25.s390x
-> lua-posix-33.3.1-3.fc25.s390x
-> gssproxy-0.5.1-3.fc25.s390x
-> java-1.8.0-openjdk-1.8.0.111-5.b16.fc25.s390x
-> libverto-devel-0.2.6-6.fc24.s390x
-> mesa-libGLES-13.0.3-1.fc25.s390x
-> p11-kit-devel-0.23.2-2.fc24.s390x
-> snappy-1.1.3-2.fc24.s390x
-> gnutls-devel-3.5.8-1.fc25.s390x
-> cairo-gobject-devel-1.14.8-1.fc25.s390x
-> usbredir-devel-0.7.1-2.fc24.s390x
-> systemtap-3.1-0.20160725git91bfb36.fc25.s390x
-> bluez-libs-devel-5.43-1.fc25.s390x
-> libcurl-devel-7.51.0-4.fc25.s390x
-> cyrus-sasl-devel-2.1.26-26.2.fc24.s390x
-> python-libs-2.7.13-1.fc25.s390x
-> nss-sysinit-3.28.1-1.3.fc25.s390x
-> dnf-1.1.10-5.fc25.noarch
-> glusterfs-extra-xlators-3.9.1-1.fc25.s390x
-> perl-5.24.1-382.fc25.s390x
-> linux-firmware-20161205-69.git91ddce49.fc25.noarch
-> libX11-devel-1.6.4-4.fc25.s390x
-> kernel-devel-4.9.5-200.fc25.s390x
-> python-devel-2.7.13-1.fc25.s390x
-> kernel-headers-4.9.5-200.fc25.s390x
-> gpg-pubkey-efe550f5-5220ba41
-> python-async-0.6.1-9.fc22.s390x
-> gpg-pubkey-81b46521-55b3ca9a
-> dejavu-sans-mono-fonts-2.35-3.fc24.noarch
-> filesystem-3.2-37.fc24.s390x
-> popt-1.16-7.fc24.s390x
-> libffi-3.1-9.fc24.s390x
-> cyrus-sasl-lib-2.1.26-26.2.fc24.s390x
-> xz-5.2.2-2.fc24.s390x
-> keyutils-libs-1.5.9-8.fc24.s390x
-> libnfnetlink-1.0.1-8.fc24.s390x
-> libnetfilter_conntrack-1.0.4-6.fc24.s390x
-> libtheora-1.1.1-14.fc24.s390x
-> xml-common-0.6.3-44.fc24.noarch
-> autoconf-2.69-22.fc24.noarch
-> libpipeline-1.4.1-2.fc24.s390x
-> libXt-1.1.5-3.fc24.s390x
-> kbd-legacy-2.0.3-3.fc24.noarch
-> ghostscript-fonts-5.50-35.fc24.noarch
-> libcroco-0.6.11-2.fc24.s390x
-> pinentry-0.9.7-2.fc24.s390x
-> libXevie-1.0.3-11.fc24.s390x
-> pth-2.0.7-27.fc24.s390x
-> python2-rpm-macros-3-10.fc25.noarch
-> libsepol-2.5-10.fc25.s390x
-> libcap-2.25-2.fc25.s390x
-> sqlite-libs-3.14.2-1.fc25.s390x
-> mpfr-3.1.5-1.fc25.s390x
-> libxcb-1.12-1.fc25.s390x
-> libicu-57.1-4.fc25.s390x
-> perl-Carp-1.40-365.fc25.noarch
-> perl-IO-Socket-IP-0.38-1.fc25.noarch
-> libmnl-1.0.4-1.fc25.s390x
-> perl-Unicode-EastAsianWidth-1.33-8.fc25.noarch
-> perl-Getopt-Long-2.49.1-1.fc25.noarch
-> libwayland-cursor-1.12.0-1.fc25.s390x
-> coreutils-common-8.25-15.fc25.s390x
-> libmount-2.28.2-1.fc25.s390x
-> python2-decorator-4.0.10-3.fc25.noarch
-> avahi-glib-0.6.32-4.fc25.s390x
-> python3-pip-8.1.2-2.fc25.noarch
-> python3-libcomps-0.1.7-5.fc25.s390x
-> python-slip-0.6.4-4.fc25.noarch
-> python-krbV-1.0.90-12.fc25.s390x
-> python2-libcomps-0.1.7-5.fc25.s390x
-> python2-urllib3-1.15.1-3.fc25.noarch
-> fipscheck-1.4.1-11.fc25.s390x
-> gc-7.4.4-1.fc25.s390x
-> libndp-1.6-1.fc25.s390x
-> libsolv-0.6.24-1.fc25.s390x
-> gnupg2-2.1.13-2.fc25.s390x
-> geoclue2-2.4.4-1.fc25.s390x
-> s390utils-cmsfs-1.36.0-1.fc25.s390x
-> libXfixes-5.0.3-1.fc25.s390x
-> libXi-1.7.8-2.fc25.s390x
-> adwaita-icon-theme-3.22.0-1.fc25.noarch
-> dconf-0.26.0-1.fc25.s390x
-> ncurses-devel-6.0-6.20160709.fc25.s390x
-> newt-python-0.52.19-2.fc25.s390x
-> perl-Test-Harness-3.36-367.fc25.noarch
-> valgrind-3.12.0-1.fc25.s390x
-> dejagnu-1.6-1.fc25.noarch
-> audit-libs-2.7.1-1.fc25.s390x
-> libstdc++-devel-6.3.1-1.fc25.s390x
-> emacs-filesystem-25.1-3.fc25.noarch
-> libdb-utils-5.3.28-16.fc25.s390x
-> libidn2-0.11-1.fc25.s390x
-> python3-rpm-4.13.0-6.fc25.s390x
-> gnutls-3.5.8-1.fc25.s390x
-> python-beautifulsoup4-4.5.3-1.fc25.noarch
-> qt5-srpm-macros-5.7.1-1.fc25.noarch
-> elfutils-default-yama-scope-0.168-1.fc25.noarch
-> device-mapper-1.02.136-3.fc25.s390x
-> device-mapper-event-1.02.136-3.fc25.s390x
-> systemd-container-231-12.fc25.s390x
-> python3-distro-1.0.1-2.fc25.noarch
-> fedpkg-1.26-4.fc25.noarch
-> gstreamer1-plugins-base-1.10.2-1.fc25.s390x
-> subversion-1.9.5-1.fc25.s390x
-> perl-Module-CoreList-5.20170115-1.fc25.noarch
-> perl-Class-Inspector-1.31-2.fc25.noarch
-> libtool-ltdl-2.4.6-13.fc25.s390x
-> python2-sssdconfig-1.14.2-2.fc25.noarch
-> glib2-devel-2.50.2-1.fc25.s390x
-> poppler-0.45.0-2.fc25.s390x
-> libbasicobjects-0.1.1-29.fc25.s390x
-> libevent-2.0.22-1.fc25.s390x
-> libradosstriper1-10.2.4-2.fc25.s390x
-> atk-devel-2.22.0-1.fc25.s390x
-> libXxf86vm-devel-1.1.4-3.fc24.s390x
-> libev-4.24-1.fc25.s390x
-> gsm-1.0.16-1.fc25.s390x
-> libnfsidmap-0.27-0.fc25.s390x
-> zziplib-0.13.62-7.fc24.s390x
-> texlive-metafont-svn40793-30.fc25.noarch
-> texlive-booktabs-svn40846-30.fc25.noarch
-> texlive-dvips-svn41149-30.fc25.noarch
-> texlive-zapfding-svn31835.0-30.fc25.noarch
-> texlive-graphics-svn41015-30.fc25.noarch
-> texlive-latexconfig-svn40274-30.fc25.noarch
-> texlive-gsftopk-bin-svn40473-30.20160520.fc25.s390x
-> texlive-tex-svn40793-30.fc25.noarch
-> texlive-xdvi-bin-svn40750-30.20160520.fc25.s390x
-> texlive-qstest-svn15878.0-30.fc25.noarch
-> texlive-avantgar-svn31835.0-30.fc25.noarch
-> texlive-ncntrsbk-svn31835.0-30.fc25.noarch
-> texlive-cm-svn32865.0-30.fc25.noarch
-> texlive-rcs-svn15878.0-30.fc25.noarch
-> texlive-fix2col-svn38770-30.fc25.noarch
-> texlive-lm-math-svn36915.1.959-30.fc25.noarch
-> texlive-hyphen-base-svn41138-30.fc25.noarch
-> texlive-unicode-data-svn39808-30.fc25.noarch
-> texlive-luatex-svn40963-30.fc25.noarch
-> texlive-xetex-def-svn40327-30.fc25.noarch
-> texlive-varwidth-svn24104.0.92-30.fc25.noarch
-> texlive-l3kernel-svn41246-30.fc25.noarch
-> texlive-hyperref-svn41396-30.fc25.noarch
-> texlive-unicode-math-svn38462-30.fc25.noarch
-> texlive-fancyvrb-svn18492.2.8-30.fc25.noarch
-> texlive-pst-plot-svn41242-30.fc25.noarch
-> texlive-rotating-svn16832.2.16b-30.fc25.noarch
-> texlive-pdfpages-svn40638-30.fc25.noarch
-> texlive-ae-svn15878.1.4-30.fc25.noarch
-> libpaper-1.1.24-12.fc24.s390x
-> texlive-collection-latexrecommended-svn35765.0-30.20160520.fc25.noarch
-> libini_config-1.3.0-29.fc25.s390x
-> xorg-x11-fonts-Type1-7.5-16.fc24.noarch
-> pcre2-devel-10.22-8.fc25.s390x
-> gnutls-c++-3.5.8-1.fc25.s390x
-> systemtap-devel-3.1-0.20160725git91bfb36.fc25.s390x
-> libtasn1-devel-4.10-1.fc25.s390x
-> pango-devel-1.40.3-1.fc25.s390x
-> vte291-devel-0.46.1-1.fc25.s390x
-> snappy-devel-1.1.3-2.fc24.s390x
-> brlapi-devel-0.6.5-2.fc25.s390x
-> man-pages-4.06-3.fc25.noarch
-> libcap-ng-devel-0.7.8-1.fc25.s390x
-> glusterfs-3.9.1-1.fc25.s390x
-> nss-util-devel-3.28.1-1.0.fc25.s390x
-> dnf-conf-1.1.10-5.fc25.noarch
-> libxkbcommon-devel-0.7.1-1.fc25.s390x
-> perl-macros-5.24.1-382.fc25.s390x
-> rpcbind-0.2.4-2.fc25.s390x
-> pulseaudio-libs-10.0-2.fc25.s390x
-> kernel-4.9.5-200.fc25.s390x
-> libnl3-cli-3.2.29-2.fc25.s390x
-> tzdata-2016j-2.fc25.noarch
-> gpg-pubkey-34ec9cba-54e38751
-> gpg-pubkey-030d5aed-55b577f0
-> basesystem-11-2.fc24.noarch
-> libattr-2.4.47-16.fc24.s390x
-> libmpc-1.0.2-5.fc24.s390x
-> apr-util-1.5.4-3.fc24.s390x
-> rsync-3.1.2-2.fc24.s390x
-> libunistring-0.9.4-3.fc24.s390x
-> jbigkit-libs-2.1-5.fc24.s390x
-> pixman-0.34.0-2.fc24.s390x
-> acl-2.2.52-11.fc24.s390x
-> dwz-0.12-2.fc24.s390x
-> expect-5.45-22.fc24.s390x
-> libmodman-2.0.1-12.fc24.s390x
-> libsigsegv-2.10-10.fc24.s390x
-> libvisual-0.4.0-20.fc24.s390x
-> fakeroot-libs-1.20.2-4.fc24.s390x
-> m17n-lib-1.7.0-5.fc24.s390x
-> libpcap-1.7.4-2.fc24.s390x
-> libverto-0.2.6-6.fc24.s390x
-> lsscsi-0.28-3.fc24.s390x
-> setup-2.10.4-1.fc25.noarch
-> rpmconf-base-1.0.18-2.fc25.noarch
-> bash-4.3.43-4.fc25.s390x
-> expat-2.2.0-1.fc25.s390x
-> libxml2-2.9.3-4.fc25.s390x
-> libgpg-error-1.24-1.fc25.s390x
-> nspr-4.13.1-1.fc25.s390x
-> libgcrypt-1.6.6-1.fc25.s390x
-> file-libs-5.28-4.fc25.s390x
-> findutils-4.6.0-8.fc25.s390x
-> libjpeg-turbo-1.5.1-0.fc25.s390x
-> kmod-23-1.fc25.s390x
-> libassuan-2.4.3-1.fc25.s390x
-> libusbx-1.0.21-1.fc25.s390x
-> newt-0.52.19-2.fc25.s390x
-> libxslt-1.1.28-13.fc25.s390x
-> libmetalink-0.1.3-1.fc25.s390x
-> perl-Socket-2.024-1.fc25.s390x
-> perl-File-Path-2.12-365.fc25.noarch
-> perl-MIME-Base64-3.15-365.fc25.s390x
-> perl-HTTP-Tiny-0.070-1.fc25.noarch
-> ncurses-6.0-6.20160709.fc25.s390x
-> libwayland-server-1.12.0-1.fc25.s390x
-> ipset-6.29-1.fc25.s390x
-> perl-Text-Unidecode-1.27-3.fc25.noarch
-> perl-Fedora-VSP-0.001-4.fc25.noarch
-> perl-libintl-perl-1.26-1.fc25.s390x
-> plymouth-core-libs-0.9.3-0.6.20160620git0e65b86c.fc25.s390x
-> hunspell-1.4.1-1.fc25.s390x
-> which-2.21-1.fc25.s390x
-> coreutils-8.25-15.fc25.s390x
-> python2-setuptools-25.1.1-1.fc25.noarch
-> shadow-utils-4.2.1-11.fc25.s390x
-> atk-2.22.0-1.fc25.s390x
-> system-python-3.5.2-4.fc25.s390x
-> pam-1.3.0-1.fc25.s390x
-> python2-pyasn1-0.1.9-7.fc25.1.noarch
-> harfbuzz-icu-1.3.2-1.fc25.s390x
-> gsettings-desktop-schemas-3.22.0-1.fc25.s390x
-> libsecret-0.18.5-2.fc25.s390x
-> s390utils-iucvterm-1.36.0-1.fc25.s390x
-> python3-setuptools-25.1.1-1.fc25.noarch
-> python3-decorator-4.0.10-3.fc25.noarch
-> python3-slip-0.6.4-4.fc25.noarch
-> python3-magic-5.28-4.fc25.noarch
-> python3-requests-2.10.0-4.fc25.noarch
-> python3-systemd-232-1.fc25.s390x
-> pyusb-1.0.0-2.fc25.noarch
-> python-slip-dbus-0.6.4-4.fc25.noarch
-> python-enum34-1.0.4-6.fc25.noarch
-> python-lockfile-0.11.0-4.fc25.noarch
-> python2-ply-3.8-2.fc25.noarch
-> pyOpenSSL-16.0.0-2.fc25.noarch
-> python2-requests-2.10.0-4.fc25.noarch
-> pyxattr-0.5.3-8.fc25.s390x
-> libarchive-3.2.2-1.fc25.s390x
-> libkadm5-1.14.4-4.fc25.s390x
-> dtc-1.4.2-1.fc25.s390x
-> libbabeltrace-1.4.0-3.fc25.s390x
-> guile-2.0.13-1.fc25.s390x
-> libthai-0.1.25-1.fc25.s390x
-> libnghttp2-1.13.0-2.fc25.s390x
-> deltarpm-3.6-17.fc25.s390x
-> python-urlgrabber-3.10.1-9.fc25.noarch
-> iputils-20161105-1.fc25.s390x
-> s390utils-mon_statd-1.36.0-1.fc25.s390x
-> cryptsetup-libs-1.7.2-3.fc25.s390x
-> device-mapper-multipath-0.4.9-83.fc25.s390x
-> cronie-anacron-1.5.1-2.fc25.s390x
-> ghostscript-core-9.20-5.fc25.s390x
-> python3-pygpgme-0.3-18.fc25.s390x
-> rest-0.8.0-1.fc25.s390x
-> libreport-filesystem-2.8.0-1.fc25.s390x
-> libXtst-1.2.3-1.fc25.s390x
-> iso-codes-3.70-1.fc25.noarch
-> ghc-srpm-macros-1.4.2-4.fc25.noarch
-> adwaita-cursor-theme-3.22.0-1.fc25.noarch
-> rpmdevtools-8.9-1.fc25.noarch
-> kernel-4.8.8-300.fc25.s390x
-> python-dnf-plugins-extras-migrate-0.0.12-4.fc25.noarch
-> s390utils-1.36.0-1.fc25.s390x
-> authconfig-6.2.10-14.fc25.s390x
-> fedora-cert-0.6.0.1-1.fc25.noarch
-> glibc-2.24-4.fc25.s390x
-> elfutils-libelf-0.168-1.fc25.s390x
-> libstdc++-6.3.1-1.fc25.s390x
-> perl-Scalar-List-Utils-1.47-1.fc25.s390x
-> gdb-headless-7.12-36.fc25.s390x
-> bzip2-1.0.6-21.fc25.s390x
-> bind-license-9.10.4-4.P5.fc25.noarch
-> pcre-cpp-8.40-1.fc25.s390x
-> perl-threads-2.12-1.fc25.s390x
-> subversion-libs-1.9.5-1.fc25.s390x
-> libss-1.43.3-1.fc25.s390x
-> shared-mime-info-1.8-1.fc25.s390x
-> libselinux-utils-2.5-13.fc25.s390x
-> libgfortran-6.3.1-1.fc25.s390x
-> rpm-4.13.0-6.fc25.s390x
-> python2-rpm-4.13.0-6.fc25.s390x
-> policycoreutils-2.5-19.fc25.s390x
-> libtasn1-4.10-1.fc25.s390x
-> mesa-libwayland-egl-13.0.3-1.fc25.s390x
-> pigz-2.3.4-1.fc25.s390x
-> koji-1.11.0-1.fc25.noarch
-> python3-enchant-1.6.8-1.fc25.noarch
-> mariadb-common-10.1.20-1.fc25.s390x
-> firewalld-filesystem-0.4.4.2-2.fc25.noarch
-> systemd-231-12.fc25.s390x
-> device-mapper-libs-1.02.136-3.fc25.s390x
-> systemd-udev-231-12.fc25.s390x
-> dnf-plugin-system-upgrade-0.7.1-4.fc25.noarch
-> mesa-libEGL-13.0.3-1.fc25.s390x
-> dnsmasq-2.76-2.fc25.s390x
-> distribution-gpg-keys-1.9-1.fc25.noarch
-> bind-libs-lite-9.10.4-4.P5.fc25.s390x
-> mock-1.3.3-1.fc25.noarch
-> python2-dockerfile-parse-0.0.5-7.fc25.noarch
-> fedora-packager-0.6.0.1-1.fc25.noarch
-> openssl-1.0.2j-3.fc25.s390x
-> lvm2-2.02.167-3.fc25.s390x
-> systemd-bootchart-231-2.fc25.s390x
-> gcc-c++-6.3.1-1.fc25.s390x
-> texlive-base-2016-30.20160520.fc25.noarch
-> boost-system-1.60.0-10.fc25.s390x
-> pcre2-10.22-8.fc25.s390x
-> libpng-devel-1.6.27-1.fc25.s390x
-> perl-XML-Parser-2.44-5.fc25.s390x
-> libtirpc-1.0.1-3.rc3.fc25.s390x
-> lttng-ust-2.8.1-2.fc25.s390x
-> libasyncns-0.8-10.fc24.s390x
-> unbound-libs-1.5.10-1.fc25.s390x
-> libradosstriper-devel-10.2.4-2.fc25.s390x
-> systemtap-runtime-3.1-0.20160725git91bfb36.fc25.s390x
-> libXau-devel-1.0.8-6.fc24.s390x
-> libXfixes-devel-5.0.3-1.fc25.s390x
-> mesa-libEGL-devel-13.0.3-1.fc25.s390x
-> libXcomposite-devel-0.4.4-8.fc24.s390x
-> libverto-libev-0.2.6-6.fc24.s390x
-> texlive-kpathsea-doc-svn41139-30.fc25.noarch
-> flac-libs-1.3.2-1.fc25.s390x
-> quota-nls-4.03-7.fc25.noarch
-> python3-html5lib-0.999-9.fc25.noarch
-> python3-javapackages-4.7.0-6.1.fc25.noarch
-> perl-Digest-1.17-366.fc25.noarch
-> texlive-texlive.infra-svn41280-30.fc25.noarch
-> texlive-tetex-svn41059-30.fc25.noarch
-> texlive-amsfonts-svn29208.3.04-30.fc25.noarch
-> texlive-etex-pkg-svn39355-30.fc25.noarch
-> texlive-lm-svn28119.2.004-30.fc25.noarch
-> texlive-fp-svn15878.0-30.fc25.noarch
-> texlive-mptopdf-svn41282-30.fc25.noarch
-> texlive-euler-svn17261.2.5-30.fc25.noarch
-> texlive-setspace-svn24881.6.7a-30.fc25.noarch
-> texlive-tools-svn40934-30.fc25.noarch
-> texlive-colortbl-svn29803.v1.0a-30.fc25.noarch
-> texlive-natbib-svn20668.8.31b-30.fc25.noarch
-> texlive-bibtex-svn40768-30.fc25.noarch
-> texlive-gsftopk-svn40768-30.fc25.noarch
-> texlive-mfware-svn40768-30.fc25.noarch
-> texlive-tex-ini-files-svn40533-30.fc25.noarch
-> texlive-texconfig-bin-svn29741.0-30.20160520.fc25.noarch
-> libXmu-1.1.2-4.fc24.s390x
-> libXcursor-1.1.14-6.fc24.s390x
-> kbd-misc-2.0.3-3.fc24.noarch
-> libutempter-1.1.6-8.fc24.s390x
-> python-kitchen-1.2.4-2.fc24.noarch
-> polkit-libs-0.113-5.fc24.s390x
-> libgudev-230-3.fc24.s390x
-> popt-devel-1.16-7.fc24.s390x
-> make-4.1-5.fc24.s390x
-> fakeroot-1.20.2-4.fc24.s390x
-> blktrace-1.1.0-3.fc24.s390x
-> hicolor-icon-theme-0.15-3.fc24.noarch
-> usermode-1.111-8.fc24.s390x
-> kbd-2.0.3-3.fc24.s390x
-> libaio-devel-0.3.110-6.fc24.s390x
-> web-assets-filesystem-5-4.fc24.noarch
-> perl-IO-Socket-SSL-2.038-1.fc25.noarch
-> python-backports-ssl_match_hostname-3.5.0.1-3.fc25.noarch
-> mc-4.8.18-2.fc25.s390x
-> expat-devel-2.2.0-1.fc25.s390x
-> automake-1.15-7.fc25.noarch
-> perl-File-ShareDir-1.102-7.fc25.noarch
-> lua-5.3.3-3.fc25.s390x
-> tcl-8.6.6-1.fc25.s390x
-> gcc-objc-6.3.1-1.fc25.s390x
-> libselinux-devel-2.5-13.fc25.s390x
-> e2fsprogs-1.43.3-1.fc25.s390x
-> perl-Storable-2.56-367.fc25.s390x
-> libstdc++-static-6.3.1-1.fc25.s390x
-> perl-Time-Local-1.250-1.fc25.noarch
-> libwebp-0.5.2-1.fc25.s390x
-> xkeyboard-config-2.19-1.1.fc25.noarch
-> python-firewall-0.4.4.2-2.fc25.noarch
-> texlive-xdvi-svn40768-30.fc25.noarch
-> texlive-wasy2-ps-svn35830.0-30.fc25.noarch
-> texlive-ltabptch-svn17533.1.74d-30.fc25.noarch
-> texlive-sauerj-svn15878.0-30.fc25.noarch
-> texlive-bookman-svn31835.0-30.fc25.noarch
-> texlive-courier-svn35058.0-30.fc25.noarch
-> texlive-mflogo-font-svn36898.1.002-30.fc25.noarch
-> texlive-rsfs-svn15878.0-30.fc25.noarch
-> texlive-zapfchan-svn31835.0-30.fc25.noarch
-> texlive-cmap-svn41168-30.fc25.noarch
-> texlive-parskip-svn19963.2.0-30.fc25.noarch
-> texlive-sepnum-svn20186.2.0-30.fc25.noarch
-> texlive-fancyhdr-svn15878.3.1-30.fc25.noarch
-> texlive-pspicture-svn15878.0-30.fc25.noarch
-> texlive-fpl-svn15878.1.002-30.fc25.noarch
-> texlive-utopia-svn15878.0-30.fc25.noarch
-> texlive-hyph-utf8-svn41189-30.fc25.noarch
-> texlive-lua-alt-getopt-svn29349.0.7.0-30.fc25.noarch
-> texlive-texlive-msg-translations-svn41431-30.fc25.noarch
-> texlive-parallel-svn15878.0-30.fc25.noarch
-> texlive-luatex-bin-svn41091-30.20160520.fc25.s390x
-> texlive-lineno-svn21442.4.41-30.fc25.noarch
-> texlive-kastrup-svn15878.0-30.fc25.noarch
-> texlive-chngcntr-svn17157.1.0a-30.fc25.noarch
-> texlive-lualibs-svn40370-30.fc25.noarch
-> texlive-xunicode-svn30466.0.981-30.fc25.noarch
-> texlive-l3packages-svn41246-30.fc25.noarch
-> texlive-pgf-svn40966-30.fc25.noarch
-> texlive-koma-script-svn41508-30.fc25.noarch
-> texlive-currfile-svn40725-30.fc25.noarch
-> texlive-luaotfload-svn40902-30.fc25.noarch
-> texlive-ifplatform-svn21156.0.4-30.fc25.noarch
-> texlive-showexpl-svn32737.v0.3l-30.fc25.noarch
-> texlive-pst-3d-svn17257.1.10-30.fc25.noarch
-> texlive-pst-node-svn40743-30.fc25.noarch
-> texlive-pstricks-add-svn40744-30.fc25.noarch
-> texlive-pst-pdf-svn31660.1.1v-30.fc25.noarch
-> texlive-latex-bin-svn41438-30.fc25.noarch
-> texlive-powerdot-svn38984-30.fc25.noarch
-> texlive-sansmathaccent-svn30187.0-30.fc25.noarch
-> texlive-typehtml-svn17134.0-30.fc25.noarch
-> texlive-ucs-svn35853.2.2-30.fc25.noarch
-> teckit-2.5.1-15.fc24.s390x
-> texlive-dvipdfmx-svn41149-30.fc25.noarch
-> texlive-collection-latex-svn41011-30.20160520.fc25.noarch
-> netpbm-10.76.00-2.fc25.s390x
-> libpath_utils-0.2.1-29.fc25.s390x
-> nfs-utils-1.3.4-1.rc3.fc25.s390x
-> ttmkfdir-3.0.9-48.fc24.s390x
-> libcephfs_jni-devel-10.2.4-2.fc25.s390x
-> pcre2-utf16-10.22-8.fc25.s390x
-> keyutils-libs-devel-1.5.9-8.fc24.s390x
-> libicu-devel-57.1-4.fc25.s390x
-> attr-2.4.47-16.fc24.s390x
-> harfbuzz-devel-1.3.2-1.fc25.s390x
-> libidn-devel-1.33-1.fc25.s390x
-> usbredir-0.7.1-2.fc24.s390x
-> libnfs-1.9.8-2.fc24.s390x
-> SDL2-2.0.5-2.fc25.s390x
-> freetype-devel-2.6.5-1.fc25.s390x
-> cairo-devel-1.14.8-1.fc25.s390x
-> libepoxy-devel-1.3.1-3.fc25.s390x
-> libcacard-devel-2.5.2-2.fc24.s390x
-> lzo-devel-2.08-8.fc24.s390x
-> libssh2-devel-1.8.0-1.fc25.s390x
-> pcre-static-8.40-1.fc25.s390x
-> qemu-sanity-check-nodeps-1.1.5-5.fc24.s390x
-> libcap-devel-2.25-2.fc25.s390x
-> alsa-lib-devel-1.1.1-2.fc25.s390x
-> nss-util-3.28.1-1.0.fc25.s390x
-> glusterfs-client-xlators-3.9.1-1.fc25.s390x
-> nss-softokn-freebl-3.28.1-1.0.fc25.s390x
-> libnl3-3.2.29-2.fc25.s390x
-> python3-hawkey-0.6.3-6.1.fc25.s390x
-> git-core-doc-2.9.3-2.fc25.s390x
-> glusterfs-fuse-3.9.1-1.fc25.s390x
-> gdk-pixbuf2-devel-2.36.4-1.fc25.s390x
-> perl-Errno-1.25-382.fc25.s390x
-> git-2.9.3-2.fc25.s390x
-> glusterfs-server-3.9.1-1.fc25.s390x
-> kernel-modules-4.9.5-200.fc25.s390x
-> pulseaudio-libs-glib2-10.0-2.fc25.s390x
-> libpsl-0.17.0-1.fc25.s390x
-> glusterfs-api-devel-3.9.1-1.fc25.s390x
-> nss-devel-3.28.1-1.3.fc25.s390x
-> wpa_supplicant-2.6-1.fc25.s390x
-> xemacs-filesystem-21.5.34-19.20170114hgd0e8ec0fe015.fc25.noarch
-> opus-1.1.3-2.fc25.s390x
-> copy-jdk-configs-2.0-1.fc25.noarch
-> gpg-pubkey-a0a7badb-52844296
-> fontpackages-filesystem-1.44-17.fc24.noarch
-> readline-6.3-8.fc24.s390x
-> cpio-2.12-3.fc24.s390x
-> groff-base-1.22.3-8.fc24.s390x
-> ilmbase-2.2.0-5.fc24.s390x
-> p11-kit-trust-0.23.2-2.fc24.s390x
-> OpenEXR-libs-2.2.0-5.fc24.s390x
-> hesiod-3.2.1-6.fc24.s390x
-> sysfsutils-2.1.0-19.fc24.s390x
-> qrencode-libs-3.4.2-6.fc24.s390x
-> GeoIP-1.6.9-2.fc24.s390x
-> ocaml-srpm-macros-2-4.fc24.noarch
-> libXcomposite-0.4.4-8.fc24.s390x
-> procps-ng-3.3.10-11.fc24.s390x
-> GConf2-3.2.6-16.fc24.s390x
-> mailx-12.5-19.fc24.s390x
-> xz-devel-5.2.2-2.fc24.s390x
-> fedora-logos-22.0.0-3.fc24.s390x
-> telnet-0.17-65.fc24.s390x
-> gpg-pubkey-e372e838-56fd7943
-> fedora-repos-25-1.noarch
-> ncurses-libs-6.0-6.20160709.fc25.s390x
-> lua-libs-5.3.3-3.fc25.s390x
-> kmod-libs-23-1.fc25.s390x
-> libseccomp-2.3.1-1.fc25.s390x
-> perl-parent-0.236-1.fc25.noarch
-> libICE-1.0.9-5.fc25.s390x
-> ipset-libs-6.29-1.fc25.s390x
-> perl-TermReadKey-2.37-1.fc25.s390x
-> dhcp-libs-4.3.5-1.fc25.s390x
-> gmp-devel-6.1.1-1.fc25.s390x
-> ncurses-c++-libs-6.0-6.20160709.fc25.s390x
-> python-pip-8.1.2-2.fc25.noarch
-> gzip-1.8-1.fc25.s390x
-> harfbuzz-1.3.2-1.fc25.s390x
-> python2-iniparse-0.4-20.fc25.noarch
-> libfdisk-2.28.2-1.fc25.s390x
-> python3-iniparse-0.4-20.fc25.noarch
-> python3-gobject-base-3.22.0-1.fc25.s390x
-> python3-kickstart-2.32-1.fc25.noarch
-> python2-yubico-1.3.2-3.fc25.noarch
-> python-idna-2.0-4.fc25.noarch
-> nss-pem-1.0.2-2.fc25.s390x
-> perl-Net-SSLeay-1.78-1.fc25.s390x
-> krb5-workstation-1.14.4-4.fc25.s390x
-> libepoxy-1.3.1-3.fc25.s390x
-> drpm-0.3.0-3.fc25.s390x
-> libsmartcols-2.28.2-1.fc25.s390x
-> s390utils-ziomon-1.36.0-1.fc25.s390x
-> librepo-1.7.18-3.fc25.s390x
-> glib-networking-2.50.0-1.fc25.s390x
-> librsvg2-2.40.16-2.fc25.s390x
-> gnat-srpm-macros-4-1.fc25.noarch
-> webkitgtk3-2.4.11-3.fc25.s390x
-> libXaw-1.0.13-4.fc25.s390x
-> sudo-1.8.18p1-1.fc25.s390x
-> systemtap-sdt-devel-3.1-0.20160725git91bfb36.fc25.s390x
-> xorg-x11-font-utils-7.5-32.fc25.s390x
-> python-decoratortools-1.8-12.fc25.noarch
-> m17n-db-1.7.0-7.fc25.noarch
-> hardlink-1.1-1.fc25.s390x
-> glibc-common-2.24-4.fc25.s390x
-> libcom_err-1.43.3-1.fc25.s390x
-> grep-2.27-1.fc25.s390x
-> iproute-4.6.0-6.fc25.s390x
-> e2fsprogs-libs-1.43.3-1.fc25.s390x
-> curl-7.51.0-4.fc25.s390x
-> libvorbis-1.3.5-1.fc25.s390x
-> python2-dateutil-2.6.0-1.fc25.noarch
-> python3-firewall-0.4.4.2-2.fc25.noarch
-> libXpm-3.5.12-1.fc25.s390x
-> systemd-pam-231-12.fc25.s390x
-> mesa-libgbm-13.0.3-1.fc25.s390x
-> rpm-build-4.13.0-6.fc25.s390x
-> openssl-libs-1.0.2j-3.fc25.s390x
-> python2-smmap-2.0.1-1.fc25.noarch
-> bind99-libs-9.9.9-4.P5.fc25.s390x
-> kernel-4.9.3-200.fc25.s390x
-> gcc-gdb-plugin-6.3.1-1.fc25.s390x
-> selinux-policy-targeted-3.13.1-225.6.fc25.noarch
-> perl-Time-HiRes-1.9741-1.fc25.s390x
-> npth-1.3-1.fc25.s390x
-> poppler-data-0.4.7-6.fc25.noarch
-> nspr-devel-4.13.1-1.fc25.s390x
-> libcephfs1-10.2.4-2.fc25.s390x
-> wayland-devel-1.12.0-1.fc25.s390x
-> librbd1-10.2.4-2.fc25.s390x
-> libxcb-devel-1.12-1.fc25.s390x
-> mesa-libGL-devel-13.0.3-1.fc25.s390x
-> perl-encoding-2.19-5.fc25.s390x
-> libsndfile-1.0.27-1.fc25.s390x
-> python3-cssselect-0.9.2-1.fc25.noarch
-> perl-Digest-MD5-2.55-2.fc25.s390x
-> texlive-tetex-bin-svn36770.0-30.20160520.fc25.noarch
-> texlive-etoolbox-svn38031.2.2a-30.fc25.noarch
-> texlive-babel-svn40706-30.fc25.noarch
-> texlive-fancybox-svn18304.1.4-30.fc25.noarch
-> texlive-xkeyval-svn35741.2.7a-30.fc25.noarch
-> texlive-pdftex-def-svn22653.0.06d-30.fc25.noarch
-> texlive-makeindex-bin-svn40473-30.20160520.fc25.s390x
-> texlive-pdftex-bin-svn40987-30.20160520.fc25.s390x
-> texlive-pst-ovl-svn40873-30.fc25.noarch
-> texlive-crop-svn15878.1.5-30.fc25.noarch
-> texlive-manfnt-font-svn35799.0-30.fc25.noarch
-> texlive-txfonts-svn15878.0-30.fc25.noarch
-> texlive-ntgclass-svn15878.2.1a-30.fc25.noarch
-> texlive-dvisvgm-def-svn41011-30.fc25.noarch
-> texlive-ec-svn25033.1.0-30.fc25.noarch
-> texlive-etex-svn37057.0-30.fc25.noarch
-> texlive-texlive-en-svn41185-30.fc25.noarch
-> texlive-graphics-def-svn41879-30.fc25.noarch
-> texlive-iftex-svn29654.0.2-30.fc25.noarch
-> texlive-pst-math-svn34786.0.63-30.fc25.noarch
-> texlive-bera-svn20031.0-30.fc25.noarch
-> texlive-ms-svn29849.0-30.fc25.noarch
-> texlive-luaotfload-bin-svn34647.0-30.20160520.fc25.noarch
-> texlive-listings-svn37534.1.6-30.fc25.noarch
-> texlive-pst-fill-svn15878.1.01-30.fc25.noarch
-> texlive-pst-pdf-bin-svn7838.0-30.20160520.fc25.noarch
-> texlive-pst-slpe-svn24391.1.31-30.fc25.noarch
-> texlive-seminar-svn34011.1.62-30.fc25.noarch
-> texlive-l3experimental-svn41163-30.fc25.noarch
-> texlive-collection-fontsrecommended-svn35830.0-30.20160520.fc25.noarch
-> gettext-libs-0.19.8.1-3.fc25.s390x
-> java-1.8.0-openjdk-headless-1.8.0.111-5.b16.fc25.s390x
-> pcre2-utf32-10.22-8.fc25.s390x
-> at-spi2-atk-devel-2.22.0-1.fc25.s390x
-> wayland-protocols-devel-1.7-1.fc25.noarch
-> virglrenderer-0.5.0-1.20160411git61846f92f.fc25.s390x
-> libcacard-2.5.2-2.fc24.s390x
-> pixman-devel-0.34.0-2.fc24.s390x
-> libacl-devel-2.2.52-11.fc24.s390x
-> libnfs-devel-1.9.8-2.fc24.s390x
-> texi2html-5.0-4.fc24.noarch
-> libseccomp-devel-2.3.1-1.fc25.s390x
-> perl-libs-5.24.1-382.fc25.s390x
-> libxkbcommon-0.7.1-1.fc25.s390x
-> git-core-2.9.3-2.fc25.s390x
-> nss-softokn-freebl-devel-3.28.1-1.0.fc25.s390x
-> gtk-update-icon-cache-3.22.7-1.fc25.s390x
-> vim-filesystem-8.0.206-1.fc25.s390x
-> libX11-common-1.6.4-4.fc25.noarch
-> gtk3-devel-3.22.7-1.fc25.s390x
-> python2-dnf-1.1.10-5.fc25.noarch
-> vim-minimal-8.0.206-1.fc25.s390x
-> GeoIP-GeoLite-data-2017.01-1.fc25.noarch
-> gpg-pubkey-95a43f54-5284415a
-> dejavu-fonts-common-2.35-3.fc24.noarch
-> libSM-1.2.2-4.fc24.s390x
-> diffutils-3.3-13.fc24.s390x
-> libogg-1.3.2-5.fc24.s390x
-> hunspell-en-US-0.20140811.1-5.fc24.noarch
-> libdaemon-0.14-10.fc24.s390x
-> patch-2.7.5-3.fc24.s390x
-> libsysfs-2.1.0-19.fc24.s390x
-> procmail-3.22-39.fc24.s390x
-> libXdamage-1.1.4-8.fc24.s390x
-> libotf-0.9.13-7.fc24.s390x
-> urw-fonts-2.4-22.fc24.noarch
-> crontabs-1.11-12.20150630git.fc24.noarch
-> ppp-2.4.7-9.fc24.s390x
-> polkit-0.113-5.fc24.s390x
-> cyrus-sasl-2.1.26-26.2.fc24.s390x
-> zlib-devel-1.2.8-10.fc24.s390x
-> time-1.7-49.fc24.s390x
-> gpg-pubkey-fdb19c98-56fd6333
-> fedora-release-25-1.noarch
-> freetype-2.6.5-1.fc25.s390x
-> libcap-ng-0.7.8-1.fc25.s390x
-> gdbm-1.12-1.fc25.s390x
-> binutils-2.26.1-1.fc25.s390x
-> lcms2-2.8-2.fc25.s390x
-> libcomps-0.1.7-5.fc25.s390x
-> less-481-6.fc25.s390x
-> apr-1.5.2-4.fc25.s390x
-> perl-constant-1.33-367.fc25.noarch
-> perl-Data-Dumper-2.161-1.fc25.s390x
-> ipcalc-0.1.8-1.fc25.s390x
-> perl-Pod-Perldoc-3.27-1.fc25.noarch
-> libteam-1.26-1.fc25.s390x
-> gmp-c++-6.1.1-1.fc25.s390x
-> fontconfig-2.12.1-1.fc25.s390x
-> enchant-1.6.0-14.fc25.s390x
-> json-glib-1.2.2-1.fc25.s390x
-> pyliblzma-0.5.3-16.fc25.s390x
-> libsepol-devel-2.5-10.fc25.s390x
-> python3-libs-3.5.2-4.fc25.s390x
-> python3-ordered-set-2.0.0-4.fc25.noarch
-> python3-rpmconf-1.0.18-2.fc25.noarch
-> python-ipaddress-1.0.16-3.fc25.noarch
-> python2-kerberos-1.2.5-1.fc25.s390x
-> python2-pysocks-1.5.6-5.fc25.noarch
-> fipscheck-lib-1.4.1-11.fc25.s390x
-> libatomic_ops-7.4.4-1.fc25.s390x
-> net-snmp-agent-libs-5.7.3-13.fc25.s390x
-> util-linux-2.28.2-1.fc25.s390x
-> dracut-044-78.fc25.s390x
-> python2-pygpgme-0.3-18.fc25.s390x
-> libsoup-2.56.0-2.fc25.s390x
-> orc-0.4.26-1.fc25.s390x
-> yum-utils-1.1.31-511.fc25.noarch
-> libXrender-0.9.10-1.fc25.s390x
-> libXrandr-1.5.1-1.fc25.s390x
-> go-srpm-macros-2-7.fc25.noarch
-> gnupg2-smime-2.1.13-2.fc25.s390x
-> guile-devel-2.0.13-1.fc25.s390x
-> uboot-tools-2016.09.01-2.fc25.s390x
-> pykickstart-2.32-1.fc25.noarch
-> python-bunch-1.0.1-9.fc25.noarch
-> perl-generators-1.10-1.fc25.noarch
-> perl-Mozilla-CA-20160104-3.fc25.noarch
-> glibc-all-langpacks-2.24-4.fc25.s390x
-> bzip2-libs-1.0.6-21.fc25.s390x
-> libpng-1.6.27-1.fc25.s390x
-> libtiff-4.0.7-1.fc25.s390x
-> desktop-file-utils-0.23-2.fc25.s390x
-> python2-cccolutils-1.4-1.fc25.s390x
-> libcurl-7.51.0-4.fc25.s390x
-> rpm-plugin-systemd-inhibit-4.13.0-6.fc25.s390x
-> cups-libs-2.2.0-5.fc25.s390x
-> python2-lxml-3.7.2-1.fc25.s390x
-> redhat-rpm-config-45-1.fc25.noarch
-> elfutils-libs-0.168-1.fc25.s390x
-> device-mapper-event-libs-1.02.136-3.fc25.s390x
-> lvm2-libs-2.02.167-3.fc25.s390x
-> elfutils-0.168-1.fc25.s390x
-> openssh-7.4p1-1.fc25.s390x
-> python2-gitdb-2.0.0-1.fc25.noarch
-> openssh-server-7.4p1-1.fc25.s390x
-> gcc-gfortran-6.3.1-1.fc25.s390x
-> rpm-devel-4.13.0-6.fc25.s390x
-> libselinux-python-2.5-13.fc25.s390x
-> openjpeg2-2.1.2-3.fc25.s390x
-> js-jquery-2.2.4-1.fc25.noarch
-> boost-thread-1.60.0-10.fc25.s390x
-> json-c-0.12-7.fc24.s390x
-> ghostscript-x11-9.20-5.fc25.s390x
-> libdrm-devel-2.4.74-1.fc25.s390x
-> libuuid-devel-2.28.2-1.fc25.s390x
-> librbd-devel-10.2.4-2.fc25.s390x
-> libXcursor-devel-1.1.14-6.fc24.s390x
-> python3-beautifulsoup4-4.5.3-1.fc25.noarch
-> texlive-kpathsea-svn41139-30.fc25.noarch
-> texlive-amsmath-svn41561-30.fc25.noarch
-> texlive-thumbpdf-svn34621.3.16-30.fc25.noarch
-> texlive-multido-svn18302.1.42-30.fc25.noarch
-> texlive-float-svn15878.1.3d-30.fc25.noarch
-> texlive-psnfss-svn33946.9.2a-30.fc25.noarch
-> texlive-wasy-svn35831.0-30.fc25.noarch
-> texlive-makeindex-svn40768-30.fc25.noarch
-> texlive-pdftex-svn41149-30.fc25.noarch
-> texlive-enumitem-svn24146.3.5.2-30.fc25.noarch
-> texlive-microtype-svn41127-30.fc25.noarch
-> texlive-helvetic-svn31835.0-30.fc25.noarch
-> texlive-times-svn35058.0-30.fc25.noarch
-> texlive-mdwtools-svn15878.1.05.4-30.fc25.noarch
-> texlive-babel-english-svn30264.3.3p-30.fc25.noarch
-> texlive-cmextra-svn32831.0-30.fc25.noarch
-> texlive-enctex-svn34957.0-30.fc25.noarch
-> texlive-texlive-docindex-svn41430-30.fc25.noarch
-> texlive-ifetex-svn24853.1.2-30.fc25.noarch
-> texlive-mparhack-svn15878.1.4-30.fc25.noarch
-> texlive-paralist-svn39247-30.fc25.noarch
-> texlive-algorithms-svn38085.0.1-30.fc25.noarch
-> texlive-geometry-svn19716.5.6-30.fc25.noarch
-> texlive-fontspec-svn41262-30.fc25.noarch
-> texlive-oberdiek-svn41346-30.fc25.noarch
-> texlive-pst-eps-svn15878.1.0-30.fc25.noarch
-> texlive-pstricks-svn41321-30.fc25.noarch
-> texlive-pst-blur-svn15878.2.0-30.fc25.noarch
-> texlive-jknapltx-svn19440.0-30.fc25.noarch
-> texlive-breqn-svn38099.0.98d-30.fc25.noarch
-> texlive-collection-basic-svn41149-30.20160520.fc25.noarch
-> latex2html-2012-7.fc24.noarch
-> lksctp-tools-1.0.16-5.fc24.s390x
-> vte291-0.46.1-1.fc25.s390x
-> openssl-devel-1.0.2j-3.fc25.s390x
-> at-spi2-core-devel-2.22.0-1.fc25.s390x
-> libfdt-1.4.2-1.fc25.s390x
-> libXft-devel-2.3.2-4.fc24.s390x
-> libattr-devel-2.4.47-16.fc24.s390x
-> libiscsi-devel-1.15.0-2.fc24.s390x
-> gettext-0.19.8.1-3.fc25.s390x
-> libjpeg-turbo-devel-1.5.1-0.fc25.s390x
-> glusterfs-libs-3.9.1-1.fc25.s390x
-> glusterfs-api-3.9.1-1.fc25.s390x
-> hawkey-0.6.3-6.1.fc25.s390x
-> nss-softokn-devel-3.28.1-1.0.fc25.s390x
-> glusterfs-cli-3.9.1-1.fc25.s390x
-> vim-common-8.0.206-1.fc25.s390x
-> libX11-1.6.4-4.fc25.s390x
-> pulseaudio-libs-devel-10.0-2.fc25.s390x
-> dnf-yum-1.1.10-5.fc25.noarch
-> tzdata-java-2016j-2.fc25.noarch
-> ccache-3.3.3-1.fc25.s390x
-> gpg-pubkey-8e1431d5-53bcbac7
-> zlib-1.2.8-10.fc24.s390x
-> sed-4.2.2-15.fc24.s390x
-> p11-kit-0.23.2-2.fc24.s390x
-> psmisc-22.21-8.fc24.s390x
-> gpm-libs-1.20.7-9.fc24.s390x
-> zip-3.0-16.fc24.s390x
-> hostname-3.15-7.fc24.s390x
-> libyubikey-1.13-2.fc24.s390x
-> sg3_utils-libs-1.41-3.fc24.s390x
-> polkit-pkla-compat-0.1-7.fc24.s390x
-> passwd-0.79-8.fc24.s390x
-> trousers-0.3.13-6.fc24.s390x
-> grubby-8.40-3.fc24.s390x
-> rootfiles-8.1-19.fc24.noarch
-> python-rpm-macros-3-10.fc25.noarch
-> info-6.1-3.fc25.s390x
-> libuuid-2.28.2-1.fc25.s390x
-> iptables-libs-1.6.0-2.fc25.s390x
-> nettle-3.3-1.fc25.s390x
-> jansson-2.9-1.fc25.s390x
-> libksba-1.3.5-1.fc25.s390x
-> perl-Text-ParseWords-3.30-365.fc25.noarch
-> perl-PathTools-3.63-366.fc25.s390x
-> perl-File-Temp-0.23.04-365.fc25.noarch
-> fuse-libs-2.9.7-1.fc25.s390x
-> perl-Pod-Escapes-1.07-365.fc25.noarch
-> perl-Term-ANSIColor-4.05-2.fc25.noarch
-> perl-URI-1.71-5.fc25.noarch
-> libXfont-1.5.2-1.fc25.s390x
-> crypto-policies-20160921-2.git75b9b04.fc25.noarch
-> python-six-1.10.0-3.fc25.noarch
-> dbus-glib-0.108-1.fc25.s390x
-> gobject-introspection-1.50.0-1.fc25.s390x
-> libpwquality-1.3.0-6.fc25.s390x
-> python-gobject-base-3.22.0-1.fc25.s390x
-> python-html5lib-0.999-9.fc25.noarch
-> python3-dbus-1.2.4-2.fc25.s390x
-> python3-chardet-2.3.0-1.fc25.noarch
-> python3-urllib3-1.15.1-3.fc25.noarch
-> python-offtrac-0.1.0-7.fc25.noarch
-> python2-cryptography-1.5.3-3.fc25.s390x
-> python2-requests-kerberos-0.10.0-2.fc25.noarch
-> libserf-1.3.9-1.fc25.s390x
-> libdatrie-0.2.9-3.fc25.s390x
-> s390utils-base-1.36.0-1.fc25.s390x
-> kpartx-0.4.9-83.fc25.s390x
-> s390utils-cpuplugd-1.36.0-1.fc25.s390x
-> rpmconf-1.0.18-2.fc25.noarch
-> s390utils-osasnmpd-1.36.0-1.fc25.s390x
-> python-dnf-plugins-extras-common-0.0.12-4.fc25.noarch
-> pango-1.40.3-1.fc25.s390x
-> fpc-srpm-macros-1.0-1.fc25.noarch
-> kernel-core-4.8.8-300.fc25.s390x
-> fedora-upgrade-25.2-1.fc25.noarch
-> net-tools-2.0-0.38.20160329git.fc25.s390x
-> libuser-0.62-4.fc25.s390x
-> screen-4.4.0-4.fc25.s390x
-> man-db-2.7.5-3.fc25.s390x
-> sqlite-3.14.2-1.fc25.s390x
-> python-systemd-doc-232-1.fc25.s390x
-> pcre-8.40-1.fc25.s390x
-> libdb-5.3.28-16.fc25.s390x
-> lz4-1.7.5-1.fc25.s390x
-> tar-1.29-3.fc25.s390x
-> emacs-common-25.1-3.fc25.s390x
-> perl-threads-shared-1.54-1.fc25.s390x
-> unzip-6.0-31.fc25.s390x
-> mesa-libglapi-13.0.3-1.fc25.s390x
-> rpm-libs-4.13.0-6.fc25.s390x
-> selinux-policy-3.13.1-225.6.fc25.noarch
-> pcre-utf16-8.40-1.fc25.s390x
-> bodhi-client-0.9.12.2-6.fc25.noarch
-> rpmlint-1.9-5.fc25.noarch
-> glibc-headers-2.24-4.fc25.s390x
-> dbus-1.11.8-1.fc25.s390x
-> kernel-core-4.9.3-200.fc25.s390x
-> cairo-1.14.8-1.fc25.s390x
-> ca-certificates-2017.2.11-1.0.fc25.noarch
-> openssh-clients-7.4p1-1.fc25.s390x
-> python2-GitPython-2.1.1-2.fc25.noarch
-> mariadb-libs-10.1.20-1.fc25.s390x
-> NetworkManager-glib-1.4.4-3.fc25.s390x
-> gcc-go-6.3.1-1.fc25.s390x
-> cracklib-dicts-2.9.6-4.fc25.s390x
-> iproute-tc-4.6.0-6.fc25.s390x
-> libselinux-python3-2.5-13.fc25.s390x
-> strace-4.15-1.fc25.s390x
-> python2-enchant-1.6.8-1.fc25.noarch
-> boost-iostreams-1.60.0-10.fc25.s390x
-> bluez-libs-5.43-1.fc25.s390x
-> ghostscript-9.20-5.fc25.s390x
-> userspace-rcu-0.9.2-2.fc25.s390x
-> mesa-libwayland-egl-devel-13.0.3-1.fc25.s390x
-> libXext-devel-1.3.3-4.fc24.s390x
-> libXrandr-devel-1.5.1-1.fc25.s390x
-> perl-XML-XPath-1.39-1.fc25.noarch
-> python3-lxml-3.7.2-1.fc25.s390x
-> texlive-texlive.infra-bin-svn40312-30.20160520.fc25.s390x
-> texlive-ifxetex-svn19685.0.5-30.fc25.noarch
-> texlive-thumbpdf-bin-svn6898.0-30.20160520.fc25.noarch
-> texlive-babelbib-svn25245.1.31-30.fc25.noarch
-> texlive-index-svn24099.4.1beta-30.fc25.noarch
-> texlive-caption-svn41409-30.fc25.noarch
-> texlive-bibtex-bin-svn40473-30.20160520.fc25.s390x
-> texlive-mfware-bin-svn40473-30.20160520.fc25.s390x
-> texlive-texconfig-svn40768-30.fc25.noarch
-> texlive-footmisc-svn23330.5.5b-30.fc25.noarch
-> texlive-psfrag-svn15878.3.04-30.fc25.noarch
-> texlive-eurosym-svn17265.1.4_subrfix-30.fc25.noarch
-> texlive-symbol-svn31835.0-30.fc25.noarch
-> texlive-euenc-svn19795.0.1h-30.fc25.noarch
-> texlive-textcase-svn15878.0-30.fc25.noarch
-> texlive-charter-svn15878.0-30.fc25.noarch
-> texlive-wasysym-svn15878.2.0-30.fc25.noarch
-> texlive-mflogo-svn38628-30.fc25.noarch
-> texlive-soul-svn15878.2.4-30.fc25.noarch
-> texlive-marginnote-svn41382-30.fc25.noarch
-> texlive-filecontents-svn24250.1.3-30.fc25.noarch
-> texlive-tipa-svn29349.1.3-30.fc25.noarch
-> texlive-xcolor-svn41044-30.fc25.noarch
-> texlive-breakurl-svn29901.1.40-30.fc25.noarch
-> texlive-attachfile-svn38830-30.fc25.noarch
-> texlive-pst-coil-svn37377.1.07-30.fc25.noarch
-> texlive-auto-pst-pdf-svn23723.0.6-30.fc25.noarch
-> texlive-ctable-svn38672-30.fc25.noarch
-> texlive-extsizes-svn17263.1.4a-30.fc25.noarch
-> texlive-beamer-svn36461.3.36-30.fc25.noarch
-> texlive-dvipdfmx-bin-svn40273-30.20160520.fc25.s390x
-> netpbm-progs-10.76.00-2.fc25.s390x
-> vte-profile-0.46.1-1.fc25.s390x
-> krb5-devel-1.14.4-4.fc25.s390x
-> dbus-devel-1.11.8-1.fc25.s390x
-> sqlite-devel-3.14.2-1.fc25.s390x
-> libiscsi-1.15.0-2.fc24.s390x
-> fontconfig-devel-2.12.1-1.fc25.s390x
-> libfdt-devel-1.4.2-1.fc25.s390x
-> ceph-devel-compat-10.2.4-2.fc25.s390x
-> zlib-static-1.2.8-10.fc24.s390x
-> chrpath-0.16-3.fc24.s390x
-> python-2.7.13-1.fc25.s390x
-> nss-3.28.1-1.3.fc25.s390x
-> python2-hawkey-0.6.3-6.1.fc25.s390x
-> gdk-pixbuf2-modules-2.36.4-1.fc25.s390x
-> perl-Git-2.9.3-2.fc25.noarch
-> kernel-core-4.9.5-200.fc25.s390x
-> publicsuffix-list-dafsa-20170116-1.fc25.noarch
-> perl-SelfLoader-1.23-382.fc25.noarch
-> perl-open-1.10-382.fc25.noarch
-> gpgme-1.8.0-8.fc25.s390x
-> =3D=3D=3D TEST BEGIN =3D=3D=3D
-> Using CC: /home/fam/bin/cc
-> rm: cannot remove '/var/tmp/patchew-qemu-build': Directory not empty
-> =3D=3D=3D OUTPUT END =3D=3D=3D
->=20
-> Test command exited with code: 1
->=20
->=20
+So, IIRC, we discussed previously that the logical way to do things
+was to, by default, delay HPT allocation until CAS time, and just do
+it at reset time for the case that needs it: hash host with KVM.
+
+Did you hit a problem with that approach, or is there still work to be
+done here?
+
 > ---
-> Email generated automatically by Patchew [http://patchew.org/].
-> Please send your feedback to patchew-devel@freelists.org
+> v2:
+>=20
+> * This patch has been mostly rewritten to move the late HPT allocation to=
+ CAS.
+> This allows a guest to start in radix mode (when it's in real mode) and t=
+hen
+> change to hash, even if it is a legacy guest and will not call
+> h_register_process_table().
+> * Added an exported function to spapr.c to perform HPT allocation and adj=
+ust
+> the vrma if necessary. This makes it possible to allocate the HPT from
+> h_client_architecture_support() in spapr_hcall.c.
+>=20
+>  hw/ppc/spapr.c         | 24 +++++++++++++++---------
+>  hw/ppc/spapr_hcall.c   | 10 ++++++++++
+>  include/hw/ppc/spapr.h |  1 +
+>  3 files changed, 26 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index ca3812555f..dfee0f685f 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1123,6 +1123,17 @@ static void spapr_reallocate_hpt(sPAPRMachineState=
+ *spapr, int shift,
+>      }
+>  }
+> =20
+> +void spapr_setup_hpt_and_vrma(sPAPRMachineState *spapr)
+> +{
+> +    spapr_reallocate_hpt(spapr,
+> +                     spapr_hpt_shift_for_ramsize(MACHINE(qdev_get_machin=
+e())->maxram_size),
+> +                     &error_fatal);
+> +    if (spapr->vrma_adjust) {
+> +        spapr->rma_size =3D kvmppc_rma_size(spapr_node0_size(),
+> +                                          spapr->htab_shift);
+> +    }
+> +}
+> +
+>  static void find_unknown_sysbus_device(SysBusDevice *sbdev, void *opaque)
+>  {
+>      bool matched =3D false;
+> @@ -1151,15 +1162,10 @@ static void ppc_spapr_reset(void)
+>      /* Check for unknown sysbus devices */
+>      foreach_dynamic_sysbus_device(find_unknown_sysbus_device, NULL);
+> =20
+> -    /* Allocate and/or reset the hash page table */
+> -    spapr_reallocate_hpt(spapr,
+> -                         spapr_hpt_shift_for_ramsize(machine->maxram_siz=
+e),
+> -                         &error_fatal);
+> -
+> -    /* Update the RMA size if necessary */
+> -    if (spapr->vrma_adjust) {
+> -        spapr->rma_size =3D kvmppc_rma_size(spapr_node0_size(),
+> -                                          spapr->htab_shift);
+> +    /* If using KVM with radix mode available, VCPUs can be started
+> +     * without a HPT because KVM will start them in radix mode. */
+> +    if (!(kvm_enabled() && kvmppc_has_cap_mmu_radix())) {
+> +        spapr_setup_hpt_and_vrma(spapr);
+>      }
+> =20
+>      qemu_devices_reset();
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 42d20e0b92..cea34073aa 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1002,6 +1002,16 @@ static target_ulong h_client_architecture_support(=
+PowerPCCPU *cpu,
+>      ov5_updates =3D spapr_ovec_new();
+>      spapr->cas_reboot =3D spapr_ovec_diff(ov5_updates,
+>                                          ov5_cas_old, spapr->ov5_cas);
+> +    if (kvm_enabled()) {
+> +        if (kvmppc_has_cap_mmu_radix()) {
+> +            /* If the HPT hasn't yet been set up (see
+> +             * ppc_spapr_reset()), and it's needed, do it now: */
 
---Sig_/aB7HySC9QSWj/qq.pbGQo/5
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+I think it's a bit fragile to have here it explicitly mirror the logic
+which determines whether the HPT is allocated early.  I'd prefer to
+explicitly test here whether we have allocated an HPT - adding a flag,
+if we have to.
+
+> +            if (!spapr_ovec_test(ov5_updates, OV5_MMU_RADIX)) {
+> +                /* legacy hash or new hash: */
+> +                spapr_setup_hpt_and_vrma(spapr);
+> +            }
+> +        }
+> +    }
+> =20
+>      if (!spapr->cas_reboot) {
+>          spapr->cas_reboot =3D
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index f9b17d860a..a30cbc485c 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -590,6 +590,7 @@ void spapr_dt_events(sPAPRMachineState *sm, void *fdt=
+);
+>  int spapr_h_cas_compose_response(sPAPRMachineState *sm,
+>                                   target_ulong addr, target_ulong size,
+>                                   sPAPROptionVector *ov5_updates);
+> +void spapr_setup_hpt_and_vrma(sPAPRMachineState *spapr);
+>  sPAPRTCETable *spapr_tce_new_table(DeviceState *owner, uint32_t liobn);
+>  void spapr_tce_table_enable(sPAPRTCETable *tcet,
+>                              uint32_t page_shift, uint64_t bus_offset,
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--01b0+GAtiOmVD9T6
+Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iEYEARECAAYFAli0xgAACgkQAvw66wEB28JXSgCfTrv9DlvPPY7vAXYeZpnUHSXm
-wqoAoJewdO80ar1cC3rvzC40253n5X4G
-=21yD
+iQIcBAEBCAAGBQJYtMQYAAoJEGw4ysog2bOSoOAP/2WGAgeCj0h1naK3julA0uLd
+AqcG4cFEg+Bx1Gg58UFrO4EDWdTjtdNbp9HPXzinyoGC5t97zOosOXK4jjtMZTsp
+Qh635CHMSQSipYwQZhrm12T3X614I0hs7CkqBmTlFQ1h7qenI6jKg9N7Ql9JRr3G
+8iQDdmU9sWcIC/KnKmUCo1S484XYJrR1vNvp8HE4JG1wlztWk4PIBe5THWI7iu44
+3x/twRo9nisZVPT5O9hf3PlT5jE/WikAjzjPW/d1LQXo/9C9OTo3SnESVLDygVxU
+1K62Eqpb8hGOUgFo9mmZV6Al7fNcBPIr2kaII5GTNKZXoIMYyhHJzHrot9pMV5Kx
+N8WOZHt3HO119I2PLyLpXXsXIaV1o2fCV0eh1xknfEYTxk9g8qKmFupTjcZCX0jy
+0uvMIsfyp2W+0mV4z7pQ7pJoTvCTczQssWVsk+lvW+GpsIJSQjvR6cSFUvdz4y87
+2EvcbOXai50QyIEUDAE711Z3eBDuC8hQD/d4BsIaU0tjgmK2eO6iTfprKgDTXiOi
+p9shkJQn0GpX5EtVakSsXLVvVfAzt7GCG2XPQ4SnXBYfv6gqSqCKi7aUzjgpgwFu
+jv+yAUA0ubUfVwdTewidiwMa5BTl7xf4U57IXRCmKLEsjweE1mMpeaEXN88SuPSs
+Uc5YDX2u5LX0uDxW/w6g
+=tWLd
 -----END PGP SIGNATURE-----
 
---Sig_/aB7HySC9QSWj/qq.pbGQo/5--
+--01b0+GAtiOmVD9T6--
