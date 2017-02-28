@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58970)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cied7-0006pN-PL
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:38 -0500
+	(envelope-from <fred.konrad@greensocs.com>) id 1cied8-0006pa-3S
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cied6-00049u-Uy
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:37 -0500
-Received: from greensocs.com ([193.104.36.180]:38450)
+	(envelope-from <fred.konrad@greensocs.com>) id 1cied2-00047l-QD
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:38 -0500
+Received: from greensocs.com ([193.104.36.180]:38345)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cied6-00049e-KO
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:36 -0500
+	(envelope-from <fred.konrad@greensocs.com>) id 1cied2-00046s-B3
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:32 -0500
 From: fred.konrad@greensocs.com
-Date: Tue, 28 Feb 2017 11:03:04 +0100
-Message-Id: <1488276185-31168-10-git-send-email-fred.konrad@greensocs.com>
+Date: Tue, 28 Feb 2017 11:02:56 +0100
+Message-Id: <1488276185-31168-2-git-send-email-fred.konrad@greensocs.com>
 In-Reply-To: <1488276185-31168-1-git-send-email-fred.konrad@greensocs.com>
 References: <1488276185-31168-1-git-send-email-fred.konrad@greensocs.com>
-Subject: [Qemu-devel] [PATCH v3 09/10] zynqmp: add the zynqmp_crf to the
- platform
+Subject: [Qemu-devel] [PATCH v3 01/10] qemu-clk: introduce qemu-clk qom
+ object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +29,133 @@ Cc: peter.maydell@linaro.org, edgar.iglesias@xilinx.com, alistair.francis@xilinx
 
 From: KONRAD Frederic <fred.konrad@greensocs.com>
 
-This adds the zynqmp_crf to the zynqmp platform.
+This introduces qemu-clk qom object.
 
 Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
----
- hw/arm/xlnx-zynqmp.c         | 7 +++++++
- include/hw/arm/xlnx-zynqmp.h | 2 ++
- 2 files changed, 9 insertions(+)
 
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index bc4e66b..27dccdb 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -177,6 +177,11 @@ static void xlnx_zynqmp_init(Object *obj)
+V2 -> V3:
+  * s/qemu_clk/QEMUClock/g
+---
+ Makefile.objs             |  1 +
+ include/qemu/qemu-clock.h | 40 +++++++++++++++++++++++++++++++++++++
+ qemu-clock.c              | 50 +++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 91 insertions(+)
+ create mode 100644 include/qemu/qemu-clock.h
+ create mode 100644 qemu-clock.c
+
+diff --git a/Makefile.objs b/Makefile.objs
+index e740500..0b8b8ff 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -75,6 +75,7 @@ common-obj-y += backends/
+ common-obj-$(CONFIG_SECCOMP) += qemu-seccomp.o
  
-     object_initialize(&s->dpdma, sizeof(s->dpdma), TYPE_XLNX_DPDMA);
-     qdev_set_parent_bus(DEVICE(&s->dpdma), sysbus_get_default());
+ common-obj-$(CONFIG_FDT) += device_tree.o
++common-obj-y += qemu-clock.o
+ 
+ ######################################################################
+ # qapi
+diff --git a/include/qemu/qemu-clock.h b/include/qemu/qemu-clock.h
+new file mode 100644
+index 0000000..446a490
+--- /dev/null
++++ b/include/qemu/qemu-clock.h
+@@ -0,0 +1,40 @@
++/*
++ * QEMU Clock
++ *
++ *  Copyright (C) 2016 : GreenSocs Ltd
++ *      http://www.greensocs.com/ , email: info@greensocs.com
++ *
++ *  Frederic Konrad <fred.konrad@greensocs.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation, either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ *
++ */
 +
-+    s->crf = object_new("xlnx.zynqmp_crf");
-+    qdev_set_parent_bus(DEVICE(s->crf), sysbus_get_default());
-+    object_property_add_child(obj, "xlnx.zynqmp_crf", OBJECT(s->crf),
-+                              &error_abort);
- }
- 
- static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-@@ -424,6 +429,8 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-                              &error_abort);
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->dpdma), 0, DPDMA_ADDR);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->dpdma), 0, gic_spi[DPDMA_IRQ]);
++#ifndef QEMU_CLOCK_H
++#define QEMU_CLOCK_H
 +
-+    sysbus_mmio_map(SYS_BUS_DEVICE(s->crf), 0, 0xFD1A0000);
- }
- 
- static Property xlnx_zynqmp_props[] = {
-diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
-index c2931bf..379a17a 100644
---- a/include/hw/arm/xlnx-zynqmp.h
-+++ b/include/hw/arm/xlnx-zynqmp.h
-@@ -86,6 +86,8 @@ typedef struct XlnxZynqMPState {
-     XlnxDPState dp;
-     XlnxDPDMAState dpdma;
- 
-+    Object *crf;
++#include "qemu/osdep.h"
++#include "qom/object.h"
 +
-     char *boot_cpu;
-     ARMCPU *boot_cpu_ptr;
- 
++#define TYPE_CLOCK "qemu-clk"
++#define QEMU_CLOCK(obj) OBJECT_CHECK(QEMUClock, (obj), TYPE_CLOCK)
++
++typedef struct QEMUClock {
++    /*< private >*/
++    Object parent_obj;
++} QEMUClock;
++
++#endif /* QEMU_CLOCK_H */
++
++
+diff --git a/qemu-clock.c b/qemu-clock.c
+new file mode 100644
+index 0000000..3bef144
+--- /dev/null
++++ b/qemu-clock.c
+@@ -0,0 +1,50 @@
++/*
++ * QEMU Clock
++ *
++ *  Copyright (C) 2016 : GreenSocs Ltd
++ *      http://www.greensocs.com/ , email: info@greensocs.com
++ *
++ *  Frederic Konrad <fred.konrad@greensocs.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation, either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/qemu-clock.h"
++#include "hw/hw.h"
++#include "qemu/log.h"
++
++#ifndef DEBUG_QEMU_CLOCK
++#define DEBUG_QEMU_CLOCK 0
++#endif
++
++#define DPRINTF(fmt, args...) do {                                           \
++    if (DEBUG_QEMU_CLOCK) {                                                  \
++        qemu_log("%s: " fmt, __func__, ## args);                             \
++    }                                                                        \
++} while (0);
++
++static const TypeInfo qemu_clk_info = {
++    .name          = TYPE_CLOCK,
++    .parent        = TYPE_OBJECT,
++    .instance_size = sizeof(QEMUClock),
++};
++
++static void qemu_clk_register_types(void)
++{
++    type_register_static(&qemu_clk_info);
++}
++
++type_init(qemu_clk_register_types);
 -- 
 1.8.3.1
