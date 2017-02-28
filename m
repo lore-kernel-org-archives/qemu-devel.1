@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <konrad.wilk@oracle.com>) id 1cipvf-0002yo-PO
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:07:33 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cipwC-0003N0-GB
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:08:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <konrad.wilk@oracle.com>) id 1cipvc-0000RT-LV
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:07:31 -0500
-Received: from aserp1040.oracle.com ([141.146.126.69]:48952)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <konrad.wilk@oracle.com>)
-	id 1cipvc-0000QJ-DF
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:07:28 -0500
-Date: Tue, 28 Feb 2017 17:07:19 -0500
-From: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Message-ID: <20170228220719.GD2352@char.us.ORACLE.com>
-References: <A2975661238FB949B60364EF0F2C257436DE3165@shsmsx102.ccr.corp.intel.com>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cipw9-0000aV-9c
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:08:04 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:43619
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1cipw9-0000aC-2I
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:08:01 -0500
+References: <CAFEAcA_KVG19uhPuBUNx4ySmebnL1Hit6=HUX9ug0FkBFMwasg@mail.gmail.com>
+	<4b5d1228-fb99-6b8f-6f8b-bab42b84e7ce@redhat.com>
+	<61a443e9-2e69-149c-1c2f-7c0cd53ba6a2@redhat.com>
+	<bc547cf1-a5b1-c60e-51b9-8e559e37195e@ilande.co.uk>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <6bcc6880-b33c-581d-fa2d-f4835c326320@ilande.co.uk>
+Date: Tue, 28 Feb 2017 22:07:41 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <A2975661238FB949B60364EF0F2C257436DE3165@shsmsx102.ccr.corp.intel.com>
-Subject: Re: [Qemu-devel] [RFC Design Doc v3] Enable Shared Virtual Memory
- feature in pass-through scenarios
+In-Reply-To: <bc547cf1-a5b1-c60e-51b9-8e559e37195e@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] intermittent make check failure:
+ "tcg_handle_interrupt: assertion failed: (qemu_mutex_iothread_locked())"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +32,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@intel.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Lan, Tianyu" <tianyu.lan@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, "Peng, Chao P" <chao.p.peng@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Hao, Xudong" <xudong.hao@intel.com>, "Sun, Yi Y" <yi.y.sun@intel.com>, 'Peter Xu' <peterx@redhat.com>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "Pan, Jacob jun" <jacob.jun.pan@intel.com>
+To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-On Wed, Nov 30, 2016 at 08:49:24AM +0000, Liu, Yi L wrote:
-> What's changed from v2:
-> a) Detailed feature description
-> b) refine description in "Address translation in virtual SVM"
-> b) "Terms" is added
+On 28/02/17 21:35, Mark Cave-Ayland wrote:
+> On 28/02/17 21:28, Thomas Huth wrote:
 > 
-> Content
-> ===============================================
-> 1. Feature description
-> 2. Why use it?
-> 3. How to enable it
-> 4. How to test
-> 5. Terms
+>>> Maybe worth mentioning that the prom-env test for sparc64 has just been
+>>> enabled a couple of commits ago (6b591ad613010f13). There was an issue
+>>> with that test for the sparc64 target last year, but IIRC it only
+>>> affected 32-bit hosts and has been fixed, so I think/hope this is a
+>>> different issue now...
+>>
+>> OK, I think this is definitively not related to the prom-env test, but
+>> to MTTCG (or something else in TCG): I can reproduce this problem
+>> reliably when I run QEMU in s390 mode with the Moon Buggy disk image
+>> from the QEMU advent calendar
+>> (http://www.qemu-advent-calendar.org/2014/download/s390-moon-buggy.tar.xz):
+>>
+>> qemu-system-s390x -nographic -kernel s390-bb.kernel \
+>>                   -initrd s390-moon-buggy.initrd
+>>
+>> ... starts the kernel, but aborts very soon with:
+>>
+>> ERROR:qemu/translate-common.c:34:tcg_handle_interrupt: assertion failed:
+>> (qemu_mutex_iothread_locked())
+>> Aborted (core dumped)
 > 
-> Details
-> ===============================================
-> 1. Feature description
-> Shared virtual memory(SVM) is to let application program share its virtual
-> address with SVM capable devices. 
-> 
-> Shared virtual memory details:
-> a) SVM feature requires ATS/PRQ/PASID support on both device side and
-> IOMMU side.
-> b) SVM capable devices could send DMA requests with PASID, the address
-> in the request would be a virtual address within a program's virtual address
-> space.
-> c) IOMMU would use first level page table to translate the address in the
-> request.
-> d) First level page table is a HVA->HPA mapping on bare metal.
-> 
-> Shared Virtual Memory feature in pass-through scenarios is actually SVM
-> virtualization. It is to let application programs(running in guest)share their
-> virtual address with assigned device(e.g. graphics processors or accelerators).
+> FWIW I've spent some time running the "make check" regression tests
+> locally this evening and I can't seem to reproduce the failure here on
+> my normal qemu-system-ppc/qemu-system-sparc/qemu-system-sparc64 setup.
 
-I think I am missing something obvious, but the current way that DRM
-works is that the kernel sets up its VA addresses for the GPU and it uses
-that for its ring. It also setups an user level mapping for the GPU if the
-application (Xorg) really wants it - but most of the time the kernel is
-in charge of poking at the ring, and the memory that is shared with the
-Xorg is normal RAM allocated via alloc_pages (see drivers/gpu/drm/ttm/ttm_page_alloc_dma.c
-and drivers/gpu/drm/ttm/ttm_page_alloc.c).
+However I can reproduce it consistently booting my OpenBIOS test images
+under qemu-system-sparc:
 
-So are talking about the guest applications having access to the 
-ring of the GPU?
+$ ./qemu-system-sparc -cdrom debian-40r4a-sparc-netinst.iso -boot d
+qemu-system-sparc: -cdrom
+/home/build/src/qemu/image/sparc32/debian-40r4a-sparc-netinst.iso:
+warning: bus=0,unit=2 is deprecated with this machine type
+**
+ERROR:/home/build/src/qemu/git/qemu/translate-common.c:34:tcg_handle_interrupt:
+assertion failed: (qemu_mutex_iothread_locked())
+Aborted
+
+
+ATB,
+
+Mark.
