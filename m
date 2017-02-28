@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cieCS-0006hb-7d
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 04:36:05 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cieDQ-0007P5-IN
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 04:37:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cieCO-0002ke-IU
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 04:36:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34668)
+	(envelope-from <dgilbert@redhat.com>) id 1cieDN-0002rF-Dh
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 04:37:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37700)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cieCO-0002jL-6p
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 04:36:00 -0500
-Date: Tue, 28 Feb 2017 09:35:53 +0000
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cieDN-0002rB-7q
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 04:37:01 -0500
+Date: Tue, 28 Feb 2017 09:36:56 +0000
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170228093553.GA2773@work-vm>
-References: <20170214133331.28997-1-lvivier@redhat.com>
+Message-ID: <20170228093656.GB2773@work-vm>
+References: <20170222160119.52771-1-pasic@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170214133331.28997-1-lvivier@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] vmstate-static-checker: update white list
- with spapr_pci
+In-Reply-To: <20170222160119.52771-1-pasic@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] vmstate: handle arrays with null
+ ptrs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,59 +27,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, Greg Kurz <groug@kaod.org>, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
-* Laurent Vivier (lvivier@redhat.com) wrote:
-> To fix migration between 2.7 and 2.8, some fields have
-> been renamed and managed with the help of a PHB property
-> (pre_2_8_migration):
-> 
->     5c4537b spapr: Fix 2.7<->2.8 migration of PCI host bridge
-> 
-> So we need to add them to the white list:
-> 
->     dma_liobn[0],
->     mem_win_addr, mem_win_size,
->     io_win_addr, io_win_size
-> 
-> become
-> 
->     mig_liobn,
->     mig_mem_win_addr, mig_mem_win_size,
->     mig_io_win_addr, mig_io_win_size
-> 
-> CC: David Gibson <david@gibson.dropbear.id.au>
-> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> CC: Thomas Huth <thuth@redhat.com>
-> CC: Greg Kurz <groug@kaod.org>
-> CC: Alexey Kardashevskiy <aik@ozlabs.ru>
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
+> The objective is supporting migration of arrays of pointers 
+> holdig a mix of null and not null pointers.
 
 Queued.
 
-> ---
->  scripts/vmstate-static-checker.py | 5 +++++
->  1 file changed, 5 insertions(+)
+> v1 -> v2:
+> * do not ignore return value (Dave)
+> * change some asserts to report_error+rc (Dave)
+> * factor out and reuse wire_sample in patches 4 and 5 (Dave)
+> * minor reword of patch 2
+> * add r-b's
 > 
-> diff --git a/scripts/vmstate-static-checker.py b/scripts/vmstate-static-checker.py
-> index 14a27e7..bcef7ee 100755
-> --- a/scripts/vmstate-static-checker.py
-> +++ b/scripts/vmstate-static-checker.py
-> @@ -85,6 +85,11 @@ def check_fields_match(name, s_field, d_field):
->          'xio3130-express-upstream-port': ['br.dev', 'parent_obj.parent_obj',
->                                            'br.dev.exp.aer_log',
->                                            'parent_obj.parent_obj.exp.aer_log'],
-> +        'spapr_pci': ['dma_liobn[0]', 'mig_liobn',
-> +                      'mem_win_addr', 'mig_mem_win_addr',
-> +                      'mem_win_size', 'mig_mem_win_size',
-> +                      'io_win_addr', 'mig_io_win_addr',
-> +                      'io_win_size', 'mig_io_win_size'],
->      }
->  
->      if not name in changed_names:
+> 
+> RFC v2 -> v1:
+> * rebase
+> * changed marker as suggested by Dave (incl. simplifications)
+> * fixed issues pointed out by Dave
+> * reworded some commit messages
+> * added a test for array of ptr to primitive
+> 
+> 
+> Halil Pasic (5):
+>   migration/vmstate: renames in (load|save)_state
+>   migration/vmstate: split up vmstate_base_addr
+>   migration/vmstate: fix array of ptr with nullptrs
+>   tests/test-vmstate.c: test array of ptr with null
+>   tests/test-vmstate.c: test array of ptr to primitive
+> 
+>  include/migration/vmstate.h |   4 ++
+>  migration/vmstate.c         |  97 +++++++++++++++++++++++------------
+>  tests/test-vmstate.c        | 122 ++++++++++++++++++++++++++++++++++++++------
+>  3 files changed, 173 insertions(+), 50 deletions(-)
+> 
 > -- 
-> 2.9.3
+> 2.8.4
 > 
 > 
 --
