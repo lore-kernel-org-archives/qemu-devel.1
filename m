@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ciqdA-0007HN-Nn
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:52:29 -0500
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1ciqff-0008S1-5r
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:55:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ciqd9-0002IT-OX
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:52:28 -0500
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:36185)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ciqd9-0002IB-GL
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:52:27 -0500
-Received: by mail-wm0-x234.google.com with SMTP id v77so96515882wmv.1
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 14:52:27 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20170228215801.10472-3-Andrew.Baumann@microsoft.com>
+	(envelope-from <Andrew.Baumann@microsoft.com>) id 1ciqfc-0002px-4T
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:55:03 -0500
+From: Andrew Baumann <Andrew.Baumann@microsoft.com>
+Date: Tue, 28 Feb 2017 22:22:16 +0000
+Message-ID: <DM5PR03MB28272ACE93520F5462B9EAB19E560@DM5PR03MB2827.namprd03.prod.outlook.com>
 References: <20170228215801.10472-1-Andrew.Baumann@microsoft.com>
-	<20170228215801.10472-3-Andrew.Baumann@microsoft.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Feb 2017 22:52:05 +0000
-Message-ID: <CAFEAcA_hNXrQ4rihj4-ha+m25pkaf7GqMEa=WL93hF+27hPE1A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 2/2] target/arm: lie more convincingly
- about memory attributes in PAR_EL1
+	<148832000677.258.3665878022537430417@0e2666bad730>
+In-Reply-To: <148832000677.258.3665878022537430417@0e2666bad730>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH 0/2] misc aarch64 fixes for Windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,32 +24,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Baumann <Andrew.Baumann@microsoft.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "famz@redhat.com" <famz@redhat.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>
 
-On 28 February 2017 at 21:58, Andrew Baumann
-<Andrew.Baumann@microsoft.com> wrote:
-> On a successful long-descriptor translation, PAR_EL1 bits 56:63 are
-> expected to report the memory attributes of the page. However, the
-> page table walker (get_phys_addr()) does not currently retrieve these
-> attributes. Rather than leaving these bits clear (which implies
-> uncacheable device memory), this change sets them to 0xff, which
-> corresponds to write-back cached normal memory.
->
-> Signed-off-by: Andrew Baumann <Andrew.Baumann@microsoft.com>
-> ---
-> In my (biased!) opinion, this is a better lie to tell for an emulated
-> environment. It also happens to un-break the Windows boot process, and
-> enable an NT kernel optimisation (DC ZVA for page zeroing).
-
-It's not clear to me that misreporting Device memory as
-Normal is any better than misreporting Normal memory as
-Device -- at least, it seems like it might break currently
-working guests.
-
-I think it would be safer to implement the PAR as "honour the
-attribute index bits in page table descriptors and return
-the corresponding bits from the MAIR registers".
-
-thanks
--- PMM
+PiBGcm9tOiBuby1yZXBseUBwYXRjaGV3Lm9yZyBbbWFpbHRvOm5vLXJlcGx5QHBhdGNoZXcub3Jn
+XQ0KPiBTZW50OiBUdWVzZGF5LCAyOCBGZWJydWFyeSAyMDE3IDE0OjEzDQo+IA0KPiBIaSwNCj4g
+DQo+IFRoaXMgc2VyaWVzIGZhaWxlZCBidWlsZCB0ZXN0IG9uIHMzOTB4IGhvc3QuIFBsZWFzZSBm
+aW5kIHRoZSBkZXRhaWxzIGJlbG93Lg0KWy4uXQ0KPiAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10
+bXAtNjRhZG5qanIvc3JjL3RhcmdldC9hcm0vaGVscGVyLmM6OTMxOjIzOg0KPiBlcnJvcjog4oCY
+cG1yZWdfYWNjZXNzX2NjbnRy4oCZIGRlZmluZWQgYnV0IG5vdCB1c2VkIFstV2Vycm9yPXVudXNl
+ZC0NCj4gZnVuY3Rpb25dDQo+ICBzdGF0aWMgQ1BBY2Nlc3NSZXN1bHQgcG1yZWdfYWNjZXNzX2Nj
+bnRyKENQVUFSTVN0YXRlICplbnYsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+
+fn5+fn5+fn5+DQo+IC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC02NGFkbmpqci9zcmMvdGFy
+Z2V0L2FybS9oZWxwZXIuYzo5MTc6MjM6DQo+IGVycm9yOiDigJhwbXJlZ19hY2Nlc3Nfc2VscuKA
+mSBkZWZpbmVkIGJ1dCBub3QgdXNlZCBbLVdlcnJvcj11bnVzZWQtZnVuY3Rpb25dDQo+ICBzdGF0
+aWMgQ1BBY2Nlc3NSZXN1bHQgcG1yZWdfYWNjZXNzX3NlbHIoQ1BVQVJNU3RhdGUgKmVudiwNCj4g
+ICAgICAgICAgICAgICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fg0KDQpPb3BzLCB0aGVzZSBu
+ZWVkIHRvIGJlIHByb3RlY3RlZCB3aXRoICNpZm5kZWYgQ09ORklHX1VTRVJfT05MWS4uLiB3aWxs
+IGJlIGZpeGVkIGluIHYyLCBidXQgSSdsbCB3YWl0IGZvciBhbnkgb3RoZXIgZmVlZGJhY2suDQoN
+CkFuZHJldw0K
