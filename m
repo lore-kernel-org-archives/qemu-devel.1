@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50015)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cikWU-0000vp-AE
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:21:11 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cikYA-0002Gs-1C
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:22:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cikWT-0005D4-ED
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:21:10 -0500
-Date: Tue, 28 Feb 2017 17:21:01 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170228162101.GH4090@noname.redhat.com>
-References: <1488194450-28056-1-git-send-email-armbru@redhat.com>
-	<1488194450-28056-6-git-send-email-armbru@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1cikY9-00063i-8K
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:22:54 -0500
+References: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
+	<1488286469-9381-45-git-send-email-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <d0b58368-5a80-8f34-f7c3-7b73029af671@redhat.com>
+Date: Tue, 28 Feb 2017 17:22:46 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1488194450-28056-6-git-send-email-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 05/24] test-keyval: Cover use with qobject
- input visitor
+In-Reply-To: <1488286469-9381-45-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Ph3WX4hlGKAh3U5vwVKcPXPREwcddlSex"
+Subject: Re: [Qemu-devel] [PATCH v3 44/44] block: Add Error parameter to
+ bdrv_append()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,37 +25,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, pkrempa@redhat.com, eblake@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-Am 27.02.2017 um 12:20 hat Markus Armbruster geschrieben:
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Ph3WX4hlGKAh3U5vwVKcPXPREwcddlSex
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+Message-ID: <d0b58368-5a80-8f34-f7c3-7b73029af671@redhat.com>
+Subject: Re: [PATCH v3 44/44] block: Add Error parameter to bdrv_append()
+References: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
+ <1488286469-9381-45-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1488286469-9381-45-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-> +static void test_keyval_visit_size(void)
-> +{
-> +    Error *err = NULL;
-> +    Visitor *v;
-> +    QDict *qdict;
-> +    uint64_t sz;
-> +
-> +    /* Lower limit zero */
-> +    qdict = keyval_parse("sz1=0", NULL, &error_abort);
-> +    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-> +    QDECREF(qdict);
-> +    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-> +    visit_type_size(v, "sz1", &sz, &error_abort);
-> +    g_assert_cmpuint(sz, ==, 0);
-> +    visit_check_struct(v, &error_abort);
-> +    visit_end_struct(v, NULL);
-> +    visit_free(v);
-> +
-> +    /* Note: precision is 53 bits since we're parsing with strtod() */
-> +
-> +    /* Around limit of precision: 2^53-1, 2^53, 2^54 */
-> +    qdict = keyval_parse("sz1=9007199254740991,"
-> +                         "sz2=9007199254740992,"
-> +                         "sz3=9007199254740993",
+On 28.02.2017 13:54, Kevin Wolf wrote:
+> Aborting on error in bdrv_append() isn't correct. This patch fixes it
+> and lets the callers handle failures.
+>=20
+> Test case 085 needs a reference output update. This is caused by the
+> reversed order of bdrv_set_backing_hd() and change_parent_backing_link(=
+)
+> in bdrv_append(): When the backing file of the new node is set, the
+> parent nodes are still pointing to the old top, so the backing blocker
+> is now initialised with the node name rather than the BlockBackend name=
+=2E
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block.c                    | 23 +++++++++++++++++------
+>  block/mirror.c             |  9 ++++++++-
+>  blockdev.c                 | 18 +++++++++++++++---
+>  include/block/block.h      |  3 ++-
+>  tests/qemu-iotests/085.out |  2 +-
+>  5 files changed, 43 insertions(+), 12 deletions(-)
 
-That's 2^53+1, not 2^54. With the comment fixed:
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Thanks for leaving me the opportunity to write a patch which removes the
+bdrv_unref() from bdrv_append(). :-)
+
+Max
+
+
+--Ph3WX4hlGKAh3U5vwVKcPXPREwcddlSex
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAli1o9cSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9Abi0IAL7D4e6T+Ndby3QmJQ2PVIch5f9uEOxk
+FYycxKmJD3Q1qVWVI245Xldmm3a+KMkZDh2xLCXeg7/XmkCuAbjzpria+sacSiTe
+7Pko90NGfnLTn9wFp4FxTdmi2BR4Uf83qlbfymRoB2YU47o54/sie8XpD+/ejvqy
+1Jz1gv/d/FAoMXOq/uhlsiv7pipQXwNhqlUk/+jQm2BbOCQtNdoM+xoy4NMXuAcQ
+dmGKQNgmj/d2Jw1LmzSMZ8CgPHPTFi5qmL5eXsyPhEZkKg8dOFq13DoClPlqHVUt
+czb6+HGqNp/Sd6WW+d0HpX4koYq+HsnQx59KCjp/vHBDqnnQ92RZXDg=
+=JbQo
+-----END PGP SIGNATURE-----
+
+--Ph3WX4hlGKAh3U5vwVKcPXPREwcddlSex--
