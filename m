@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43301)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cilNy-0001hQ-JV
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:27 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cilO1-0001kj-Ny
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cilNs-0002zG-S3
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:26 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48711)
+	(envelope-from <pm215@archaic.org.uk>) id 1cilO1-00037w-28
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:29 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48715)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cilNs-0002xz-Lt
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:20 -0500
+	id 1cilO0-00034e-Rs
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:28 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1cilNr-0003QA-RB
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:16:19 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1cilNz-0003Vm-Qi
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:16:27 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Feb 2017 17:15:59 +0000
-Message-Id: <1488302176-19463-5-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 28 Feb 2017 17:16:13 +0000
+Message-Id: <1488302176-19463-19-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1488302176-19463-1-git-send-email-peter.maydell@linaro.org>
 References: <1488302176-19463-1-git-send-email-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 04/21] armv7m: Use QOMified armv7m object in
- armv7m_init()
+Subject: [Qemu-devel] [PULL 18/21] qdev: Have qdev_set_parent_bus() handle
+ devices already on a bus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,94 +30,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Make the legacy armv7m_init() function use the newly QOMified
-armv7m object rather than doing everything by hand.
-
-We can return the armv7m object rather than the NVIC from
-armv7m_init() because its interface to the rest of the
-board (GPIOs, etc) is identical.
+Instead of qdev_set_parent_bus() silently doing the wrong
+thing if it's handed a device that's already on a bus,
+have it remove the device from the old bus and add it to
+the new one. This is useful for the raspi2 sdcard.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Message-id: 1487604965-23220-5-git-send-email-peter.maydell@linaro.org
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Message-id: 1488293711-14195-2-git-send-email-peter.maydell@linaro.org
 ---
- hw/arm/armv7m.c | 49 ++++++++++++-------------------------------------
- 1 file changed, 12 insertions(+), 37 deletions(-)
+ hw/core/qdev.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-index fca85b2..d9baa8c 100644
---- a/hw/arm/armv7m.c
-+++ b/hw/arm/armv7m.c
-@@ -131,21 +131,6 @@ static void bitband_init(Object *obj)
-     sysbus_init_mmio(dev, &s->iomem);
- }
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 06ba02e..923e626 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -102,9 +102,23 @@ static void bus_add_child(BusState *bus, DeviceState *child)
  
--static void armv7m_bitband_init(void)
--{
--    DeviceState *dev;
--
--    dev = qdev_create(NULL, TYPE_BITBAND);
--    qdev_prop_set_uint32(dev, "base", 0x20000000);
--    qdev_init_nofail(dev);
--    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0x22000000);
--
--    dev = qdev_create(NULL, TYPE_BITBAND);
--    qdev_prop_set_uint32(dev, "base", 0x40000000);
--    qdev_init_nofail(dev);
--    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0x42000000);
--}
--
- /* Board init.  */
- 
- static const hwaddr bitband_input_addr[ARMV7M_NUM_BITBANDS] = {
-@@ -282,35 +267,25 @@ static void armv7m_reset(void *opaque)
- 
- /* Init CPU and memory for a v7-M based board.
-    mem_size is in bytes.
--   Returns the NVIC array.  */
-+   Returns the ARMv7M device.  */
- 
- DeviceState *armv7m_init(MemoryRegion *system_memory, int mem_size, int num_irq,
-                       const char *kernel_filename, const char *cpu_model)
+ void qdev_set_parent_bus(DeviceState *dev, BusState *bus)
  {
--    ARMCPU *cpu;
--    CPUARMState *env;
--    DeviceState *nvic;
-+    DeviceState *armv7m;
- 
-     if (cpu_model == NULL) {
--	cpu_model = "cortex-m3";
-+        cpu_model = "cortex-m3";
-     }
--    cpu = cpu_arm_init(cpu_model);
--    if (cpu == NULL) {
--        fprintf(stderr, "Unable to find CPU definition\n");
--        exit(1);
--    }
--    env = &cpu->env;
--
--    armv7m_bitband_init();
--
--    nvic = qdev_create(NULL, "armv7m_nvic");
--    qdev_prop_set_uint32(nvic, "num-irq", num_irq);
--    env->nvic = nvic;
--    qdev_init_nofail(nvic);
--    sysbus_connect_irq(SYS_BUS_DEVICE(nvic), 0,
--                       qdev_get_gpio_in(DEVICE(cpu), ARM_CPU_IRQ));
--    armv7m_load_kernel(cpu, kernel_filename, mem_size);
--    return nvic;
++    bool replugging = dev->parent_bus != NULL;
 +
-+    armv7m = qdev_create(NULL, "armv7m");
-+    qdev_prop_set_uint32(armv7m, "num-irq", num_irq);
-+    qdev_prop_set_string(armv7m, "cpu-model", cpu_model);
-+    /* This will exit with an error if the user passed us a bad cpu_model */
-+    qdev_init_nofail(armv7m);
-+
-+    armv7m_load_kernel(ARM_CPU(first_cpu), kernel_filename, mem_size);
-+    return armv7m;
++    if (replugging) {
++        /* Keep a reference to the device while it's not plugged into
++         * any bus, to avoid it potentially evaporating when it is
++         * dereffed in bus_remove_child().
++         */
++        object_ref(OBJECT(dev));
++        bus_remove_child(dev->parent_bus, dev);
++        object_unref(OBJECT(dev->parent_bus));
++    }
+     dev->parent_bus = bus;
+     object_ref(OBJECT(bus));
+     bus_add_child(bus, dev);
++    if (replugging) {
++        object_unref(OBJECT(dev));
++    }
  }
  
- void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem_size)
+ /* Create a new device.  This only initializes the device state
 -- 
 2.7.4
