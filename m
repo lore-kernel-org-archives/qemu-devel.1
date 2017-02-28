@@ -1,21 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cif3U-00013Y-1o
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:30:53 -0500
+	(envelope-from <groug@kaod.org>) id 1cif3b-00018J-27
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:31:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cif3T-0007qn-6I
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:30:52 -0500
-Date: Tue, 28 Feb 2017 11:30:42 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170228103042.GA4090@noname.redhat.com>
-References: <1488193394-28453-1-git-send-email-pl@kamp.de>
-	<07ef9e24-a17b-536b-8ef3-9a105cfe6bc6@redhat.com>
-	<11860d28-91e1-3858-e5f6-4176e9f72816@kamp.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <11860d28-91e1-3858-e5f6-4176e9f72816@kamp.de>
-Subject: Re: [Qemu-devel] [PATCH V2] qemu-img: make convert async
+	(envelope-from <groug@kaod.org>) id 1cif3X-0007uU-V3
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:30:59 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56095
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cif3X-0007u5-PT
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:30:55 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1SAT0BL089371
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 05:30:55 -0500
+Received: from e06smtp09.uk.ibm.com (e06smtp09.uk.ibm.com [195.75.94.105])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28vyqf3e9b-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 05:30:54 -0500
+Received: from localhost
+	by e06smtp09.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Tue, 28 Feb 2017 10:30:53 -0000
+From: Greg Kurz <groug@kaod.org>
+Date: Tue, 28 Feb 2017 11:30:15 +0100
+In-Reply-To: <1488277840-18608-1-git-send-email-groug@kaod.org>
+References: <1488277840-18608-1-git-send-email-groug@kaod.org>
+Message-Id: <1488277840-18608-4-git-send-email-groug@kaod.org>
+Subject: [Qemu-devel] [PULL 03/28] 9pfs: remove side-effects in local_open()
+ and local_opendir()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,50 +38,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, stefanha@gmail.com, ct@flyingcircus.io, mreitz@redhat.com, famz@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
 
-Am 28.02.2017 um 10:59 hat Peter Lieven geschrieben:
-> Am 27.02.2017 um 22:09 schrieb Eric Blake:
-> >On 02/27/2017 05:03 AM, Peter Lieven wrote:
-> >>the convert process is currently completely implemented with sync operations.
-> >>That means it reads one buffer and then writes it. No parallelism and each sync
-> >>request takes as long as it takes until it is completed.
-> >>
-> >>This patches introduces 2 new cmdline parameters. The -m parameter to specify
-> >>the number of coroutines running in parallel (defaults to 8). And the -W paremeter to
-> >s/paremeter/parameter/
-> >
-> >>allow qemu-img to write to the target out of order rather than sequential. This improves
-> >>performance as the writes do not have to wait for each other to complete.
-> >>
-> >>Signed-off-by: Peter Lieven <pl@kamp.de>
-> >>---
-> >>@@ -1798,7 +1908,7 @@ static int img_convert(int argc, char **argv)
-> >>              {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-> >>              {0, 0, 0, 0}
-> >>          };
-> >>-        c = getopt_long(argc, argv, "hf:O:B:ce6o:s:l:S:pt:T:qn",
-> >>+        c = getopt_long(argc, argv, "hf:O:B:ce6o:s:l:S:pt:T:qnm:W",
-> >>                          long_options, NULL);
-> >>          if (c == -1) {
-> >>              break;
-> >>@@ -1890,6 +2000,18 @@ static int img_convert(int argc, char **argv)
-> >>          case 'n':
-> >>              skip_create = 1;
-> >>              break;
-> >>+        case 'm':
-> >>+            num_coroutines = atoi(optarg);
-> >atoi() should be avoided. It has no error checking, so it treats '-m 1'
-> >and '-m 1k' identically.  You are a bit justified in that '-m junk' gets
-> >treated like '-m 0' and rejected, but it's still a poor error message in
-> >that case.
-> 
-> would you use qemu_strtoul or parse_uint instead?
-> 
-> Kevin, shall I send a V3?
+If these functions fail, they should not change *fs. Let's use local
+variables to fix this.
 
-If you can send a v3 today, I'll replace the patch in my queue with it.
-Otherwise we'll fix it on top during the freeze.
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ hw/9pfs/9p-local.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-Kevin
+diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+index 4a8e628117ae..607cd2aeceea 100644
+--- a/hw/9pfs/9p-local.c
++++ b/hw/9pfs/9p-local.c
+@@ -356,10 +356,15 @@ static int local_open(FsContext *ctx, V9fsPath *fs_path,
+ {
+     char *buffer;
+     char *path = fs_path->data;
++    int fd;
+ 
+     buffer = rpath(ctx, path);
+-    fs->fd = open(buffer, flags | O_NOFOLLOW);
++    fd = open(buffer, flags | O_NOFOLLOW);
+     g_free(buffer);
++    if (fd == -1) {
++        return -1;
++    }
++    fs->fd = fd;
+     return fs->fd;
+ }
+ 
+@@ -368,13 +373,15 @@ static int local_opendir(FsContext *ctx,
+ {
+     char *buffer;
+     char *path = fs_path->data;
++    DIR *stream;
+ 
+     buffer = rpath(ctx, path);
+-    fs->dir.stream = opendir(buffer);
++    stream = opendir(buffer);
+     g_free(buffer);
+-    if (!fs->dir.stream) {
++    if (!stream) {
+         return -1;
+     }
++    fs->dir.stream = stream;
+     return 0;
+ }
+ 
+-- 
+2.7.4
