@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cinU1-0005a5-5m
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:30:50 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cinWy-00081L-FY
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:33:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cinTy-0007QP-Uz
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:30:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60460)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cinWv-0000Bm-AJ
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:33:52 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:23137 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cinTy-0007QH-Ox
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:30:46 -0500
-References: <CAFEAcA_KVG19uhPuBUNx4ySmebnL1Hit6=HUX9ug0FkBFMwasg@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <4b5d1228-fb99-6b8f-6f8b-bab42b84e7ce@redhat.com>
-Date: Tue, 28 Feb 2017 20:30:41 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_KVG19uhPuBUNx4ySmebnL1Hit6=HUX9ug0FkBFMwasg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] intermittent make check failure:
- "tcg_handle_interrupt: assertion failed: (qemu_mutex_iothread_locked())"
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1cinWu-00008l-VE
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:33:49 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Tue, 28 Feb 2017 22:33:40 +0300
+Message-Id: <20170228193340.63980-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v4] backup: allow target without .bdrv_get_info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,36 +22,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: Richard Henderson <rth@twiddle.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, jcody@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, vsementsov@virtuozzo.com, stefanha@redhat.com
 
-On 28.02.2017 20:10, Peter Maydell wrote:
-> I got a make check failure on aarch64 host running a sparc64 test:
-> 
-> TEST: tests/prom-env-test... (pid=13573)
->   /sparc64/prom-env/sun4u:                                             **
-> ERROR:/home/pm215/qemu/translate-common.c:34:tcg_handle_interrupt:
-> assertion failed: (qemu_mutex_iothread_locked())
-> Broken pipe
-> FAIL
-> GTester: last random seed: R02Sa5fa983185fe5e65cfb5b7fcb39ed3d1
-> (pid=13579)
-> FAIL: tests/prom-env-test
-> 
-> This is with commit 9514f2648ca05b3.
-> 
-> It didn't reproduce on a rerun of 'make check' and it didn't
-> look like the merge in question was particularly relevant to
-> the failure, so I went ahead and pushed it to master.
-> 
-> I'm (perhaps unfairly) assuming that this is fallout from MTTCG
-> landing. (prom-env-test is one of the handful of tests in
-> 'make check' that actually runs TCG code.)
+Currently backup to nbd target is broken, as nbd doesn't have
+.bdrv_get_info realization.
 
-Maybe worth mentioning that the prom-env test for sparc64 has just been
-enabled a couple of commits ago (6b591ad613010f13). There was an issue
-with that test for the sparc64 target last year, but IIRC it only
-affected 32-bit hosts and has been fixed, so I think/hope this is a
-different issue now...
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
 
- Thomas
+v4: use error_report()
+    add article
+
+v3: fix compilation (I feel like an idiot)
+    adjust wording (Fam)
+    
+v2: add WARNING
+
+===
+
+Since commit
+
+commit 4c9bca7e39a6e07ad02c1dcde3478363344ec60b
+Author: John Snow <jsnow@redhat.com>
+Date:   Thu Feb 25 15:58:30 2016 -0500
+
+    block/backup: avoid copying less than full target clusters
+
+backup to nbd target is broken, we have "Couldn't determine the cluster size of
+the target image".
+
+Proposed NBD protocol extension - NBD_OPT_INFO should finally solve this problem.
+But until it is not realized, we need allow backup to nbd target due to backward
+compatibility.
+
+Furthermore, is it entirely ok to disallow backup if bds lacks .bdrv_get_info?
+Which behavior should be default: to fail backup or to use default cluster size?
+
+ block/backup.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/block/backup.c b/block/backup.c
+index ea38733849..ea160e9e82 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -24,6 +24,7 @@
+ #include "qemu/cutils.h"
+ #include "sysemu/block-backend.h"
+ #include "qemu/bitmap.h"
++#include "qemu/error-report.h"
+ 
+ #define BACKUP_CLUSTER_SIZE_DEFAULT (1 << 16)
+ #define SLICE_TIME 100000000ULL /* ns */
+@@ -638,7 +639,16 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
+      * backup cluster size is smaller than the target cluster size. Even for
+      * targets with a backing file, try to avoid COW if possible. */
+     ret = bdrv_get_info(target, &bdi);
+-    if (ret < 0 && !target->backing) {
++    if (ret == -ENOTSUP) {
++        /* Cluster size is not defined */
++        error_report("WARNING: The target block device doesn't provide "
++                     "information about the block size and it doesn't have a "
++                     "backing file. The default block size of %u bytes is "
++                     "used. If the actual block size of the target exceeds "
++                     "this default, the backup may be unusable",
++                     BACKUP_CLUSTER_SIZE_DEFAULT);
++        job->cluster_size = BACKUP_CLUSTER_SIZE_DEFAULT;
++    } else if (ret < 0 && !target->backing) {
+         error_setg_errno(errp, -ret,
+             "Couldn't determine the cluster size of the target image, "
+             "which has no backing file");
+-- 
+2.11.1
