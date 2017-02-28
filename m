@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48138)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49136)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciWSM-0008O6-C2
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 20:19:59 -0500
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1ciWVv-0002H3-Fv
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 20:23:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciWSK-0003VR-S9
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 20:19:58 -0500
-Date: Tue, 28 Feb 2017 11:51:32 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170228005132.GI17615@umbus.fritz.box>
-References: <148776029578.5865.5785337570950575739.stgit@bahia>
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1ciWVs-0004de-9N
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 20:23:39 -0500
+Received: from [59.151.112.132] (port=53801 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1ciWVr-0004dD-5P
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 20:23:36 -0500
+References: <1488180523-18137-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+	<20170227175749-mutt-send-email-mst@kernel.org>
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Message-ID: <58B4D2D9.5090900@cn.fujitsu.com>
+Date: Tue, 28 Feb 2017 09:31:05 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="e6pBmKo+I8wpp27t"
-Content-Disposition: inline
-In-Reply-To: <148776029578.5865.5785337570950575739.stgit@bahia>
-Subject: Re: [Qemu-devel] [PATCH] spapr/pci: populate PCI DT in reverse order
+In-Reply-To: <20170227175749-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] vfio pci: kernel support of error recovery
+ only for non fatal error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,219 +28,249 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, alex.williamson@redhat.com, izumi.taku@jp.fujitsu.com
 
 
---e6pBmKo+I8wpp27t
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 22, 2017 at 11:56:53AM +0100, Greg Kurz wrote:
-> From: Greg Kurz <gkurz@linux.vnet.ibm.com>
->=20
-> Since commit 1d2d974244c6 "spapr_pci: enumerate and add PCI device tree",=
- QEMU
-> populates the PCI device tree in the opposite order compared to SLOF.
->=20
-> Before 1d2d974244c6:
->=20
-> Populating /pci@800000020000000
->                      00 0000 (D) : 1af4 1000    virtio [ net ]
->                      00 0800 (D) : 1af4 1001    virtio [ block ]
->                      00 1000 (D) : 1af4 1009    virtio [ network ]
-> Populating /pci@800000020000000/unknown-legacy-device@2
->=20
-> 7e5294b8 :  /pci@800000020000000
-> 7e52b998 :  |-- ethernet@0
-> 7e52c0c8 :  |-- scsi@1
-> 7e52c7e8 :  +-- unknown-legacy-device@2 ok
->=20
-> Since 1d2d974244c6:
->=20
-> Populating /pci@800000020000000
->                      00 1000 (D) : 1af4 1009    virtio [ network ]
-> Populating /pci@800000020000000/unknown-legacy-device@2
->                      00 0800 (D) : 1af4 1001    virtio [ block ]
->                      00 0000 (D) : 1af4 1000    virtio [ net ]
->=20
-> 7e5e8118 :  /pci@800000020000000
-> 7e5ea6a0 :  |-- unknown-legacy-device@2
-> 7e5eadb8 :  |-- scsi@1
-> 7e5eb4d8 :  +-- ethernet@0 ok
->=20
-> This behaviour change is not actually a bug since no assumptions should be
-> made on DT ordering. But it has no real justification either, other than
-> being the consequence of the way fdt_add_subnode() inserts new elements
-> to the front of the FDT rather than adding them to the tail.
->=20
-> This patch reverts to the historical SLOF ordering by walking PCI devices
-> in reverse order. This reconciles pseries with x86 machine types behavior.
-> It is expected to make things easier when porting existing applications to
-> power.
->=20
-> Signed-off-by: Greg Kurz <gkurz@linux.vnet.ibm.com>
-> Tested-by: Thomas Huth <thuth@redhat.com>
-> Reviewed-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-> (slight update to the changelog)
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  hw/pci/pci.c         |   28 ++++++++++++++++++++++++++++
->  hw/ppc/spapr_pci.c   |   12 ++++++------
->  include/hw/pci/pci.h |    4 ++++
->  3 files changed, 38 insertions(+), 6 deletions(-)
->=20
-> David,
->=20
-> This patch was posted and already discussed during 2.5 development:
->=20
-> http://patchwork.ozlabs.org/patch/549925/
->=20
-> The "consensus" at the time was that guests should not rely on device
-> ordering (i.e. use persistent naming instead).
->=20
-> I got recently contacted by OpenStack people who had several complaints
-> about the reverse ordering of PCI devices in pseries: different behavior
-> between ppc64 and x86, lots of time spent in debugging when porting
-> applications from x86 to ppc64 before realizing that it is caused by the
-> reverse ordering, necessity to carry hacky workarounds...
->=20
-> One strong argument against handling this properly with persistent naming
-> is that it requires systemd/udev. This option is considered as painful
-> with CirrOS, which aims at remaining as minimal as possible and is widely
-> used in the OpenStack ecosystem.
->=20
-> Would you re-consider your position and apply this patch ?
+On 02/28/2017 12:16 AM, Michael S. Tsirkin wrote:
+> On Mon, Feb 27, 2017 at 03:28:43PM +0800, Cao jin wrote:
+>> Subject: Re: [PATCH] vfio pci: kernel support of error recovery only for non
+>> fatal error
+> 
+> Don't make the subject so long. This is why I had
+> 	[PATCH v3] vfio error recovery: kernel support
+> you also want to add versioning as you inherited my v3,
+> you should make this v4 etc.
+> 
 
-As it happens, I'd thought about this from time to time already, and
-concluded that (re-)reversing the DT order was probably the least bad
-approach.
+Ok. I didn' see [PATCH v3], I guess I am not CCed.
 
-So, applied to ppc-for-2.9.
+>> 0. What happens now (PCIE AER only)
+>>    Fatal errors cause a link reset.
+>>    Non fatal errors don't.
+>>    All errors stop the VM eventually, but not immediately
+>>    because it's detected and reported asynchronously.
+>>    Interrupts are forwarded as usual.
+>>    Correctable errors are not reported to guest at all.
+>>    Note: PPC EEH is different. This focuses on AER.
+>>
+>> 1. Correctable errors
+>>    There is no need to report these to guest. So let's not.
+>>
+>> 2. Fatal errors
+>>    It's not easy to handle them gracefully since link reset
+>>    is needed. As a first step, let's use the existing mechanism
+>>    in that case.
+>>
+>> 2. Non-fatal errors
+>>    Here we could make progress by reporting them to guest
+>>    and have guest handle them.
+>>
+>>    Issues:
+>>    a. this behaviour should only be enabled with new userspace,
+>>       old userspace should work without changes.
+>>
+>>       Suggestion: One way to address this would be to add a new eventfd
+>>       non_fatal_err_trigger. If not set, invoke err_trigger.
+>>
+>>    b. drivers are supposed to stop MMIO when error is reported,
+>>       if vm keeps going, we will keep doing MMIO/config.
+>>
+>>       Suggestion 1: ignore this. vm stop happens much later when
+>>       userspace runs anyway, so we are not making things much worse.
+>>
+>>       Suggestion 2: try to stop MMIO/config, resume on resume call
+>>
+>>       Patch below implements Suggestion 1.
+>>
+>>       Note that although this is really against the documentation, which
+>>       states error_detected() is the point at which the driver should quiesce
+>>       the device and not touch it further (until diagnostic poking at
+>>       mmio_enabled or full access at resume callback).
+>>
+>>       Fixing this won't be easy. However, this is not a regression.
+>>
+>>       Also note this does nothing about interrupts, documentation
+>>       suggests returning IRQ_NONE until reset.
+>>       Again, not a regression.
+>>
+>>    c. PF driver might detect that function is completely broken,
+>>       if vm keeps going, we will keep doing MMIO/config.
+>>
+>>       Suggestion 1: ignore this. vm stop happens much later when
+>>       userspace runs anyway, so we are not making things much worse.
+>>
+>>       Suggestion 2: detect this and invoke err_trigger to stop VM.
+>>
+>>       Patch below implements Suggestion 2.
+>>
+>> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> It's more than this, you are really reusing parts of my patch,
+> so you should say so and include my signature.
+> 
+> If you only added a line or two you can keep
+> the original author. To do this you add
+> 	From: Michael S. Tsirkin <mst@redhat.com>
+> before commit text.
 
->=20
-> Cheers.
->=20
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index a563555e7da7..273f1e46025a 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -1530,6 +1530,34 @@ static const pci_class_desc pci_class_descriptions=
-[] =3D
->      { 0, NULL}
->  };
-> =20
-> +static void pci_for_each_device_under_bus_reverse(PCIBus *bus,
-> +                                                  void (*fn)(PCIBus *b,
-> +                                                             PCIDevice *=
-d,
-> +                                                             void *opaqu=
-e),
-> +                                                  void *opaque)
-> +{
-> +    PCIDevice *d;
-> +    int devfn;
-> +
-> +    for (devfn =3D 0; devfn < ARRAY_SIZE(bus->devices); devfn++) {
-> +        d =3D bus->devices[ARRAY_SIZE(bus->devices) - 1 - devfn];
-> +        if (d) {
-> +            fn(bus, d, opaque);
-> +        }
-> +    }
-> +}
-> +
-> +void pci_for_each_device_reverse(PCIBus *bus, int bus_num,
-> +                         void (*fn)(PCIBus *b, PCIDevice *d, void *opaqu=
-e),
-> +                         void *opaque)
-> +{
-> +    bus =3D pci_find_bus_nr(bus, bus_num);
-> +
-> +    if (bus) {
-> +        pci_for_each_device_under_bus_reverse(bus, fn, opaque);
-> +    }
-> +}
-> +
->  static void pci_for_each_device_under_bus(PCIBus *bus,
->                                            void (*fn)(PCIBus *b, PCIDevic=
-e *d,
->                                                       void *opaque),
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index fd6fc1d95344..2a20c2a140fc 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -1782,9 +1782,9 @@ static void spapr_populate_pci_devices_dt(PCIBus *b=
-us, PCIDevice *pdev,
->      s_fdt.fdt =3D p->fdt;
->      s_fdt.node_off =3D offset;
->      s_fdt.sphb =3D p->sphb;
-> -    pci_for_each_device(sec_bus, pci_bus_num(sec_bus),
-> -                        spapr_populate_pci_devices_dt,
-> -                        &s_fdt);
-> +    pci_for_each_device_reverse(sec_bus, pci_bus_num(sec_bus),
-> +                                spapr_populate_pci_devices_dt,
-> +                                &s_fdt);
->  }
-> =20
->  static void spapr_phb_pci_enumerate_bridge(PCIBus *bus, PCIDevice *pdev,
-> @@ -1953,9 +1953,9 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb,
->      s_fdt.fdt =3D fdt;
->      s_fdt.node_off =3D bus_off;
->      s_fdt.sphb =3D phb;
-> -    pci_for_each_device(bus, pci_bus_num(bus),
-> -                        spapr_populate_pci_devices_dt,
-> -                        &s_fdt);
-> +    pci_for_each_device_reverse(bus, pci_bus_num(bus),
-> +                                spapr_populate_pci_devices_dt,
-> +                                &s_fdt);
-> =20
->      ret =3D spapr_drc_populate_dt(fdt, bus_off, OBJECT(phb),
->                                  SPAPR_DR_CONNECTOR_TYPE_PCI);
-> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-> index 6983f13745a5..9349acbfb278 100644
-> --- a/include/hw/pci/pci.h
-> +++ b/include/hw/pci/pci.h
-> @@ -429,6 +429,10 @@ int pci_bus_numa_node(PCIBus *bus);
->  void pci_for_each_device(PCIBus *bus, int bus_num,
->                           void (*fn)(PCIBus *bus, PCIDevice *d, void *opa=
-que),
->                           void *opaque);
-> +void pci_for_each_device_reverse(PCIBus *bus, int bus_num,
-> +                                 void (*fn)(PCIBus *bus, PCIDevice *d,
-> +                                            void *opaque),
-> +                                 void *opaque);
->  void pci_for_each_bus_depth_first(PCIBus *bus,
->                                    void *(*begin)(PCIBus *bus, void *pare=
-nt_state),
->                                    void (*end)(PCIBus *bus, void *state),
->=20
+On this topic, I am really bewildered for a while, thanks for clarification.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+-- 
+Sincerely,
+Cao jin
 
---e6pBmKo+I8wpp27t
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJYtMmUAAoJEGw4ysog2bOSKDEP/0N7fqs6QWC8TXAYrxQr9prW
-cPrWhHhwBEwGBAnXjPWsl0RoINr8YcgtDTJgzt3BTh+Zc1im6OdsPudKt8hjGZDQ
-D/6DGshsll9sGLpBYxfXxDuCfa6llxG9/sVF7LbZUk5H+cXi21NBDfrlrQVeP254
-3gzKEyjzVc0HwOHtFIgt7QSFt1xzexX/acvRrpWnHm9Nw+i5wMvTaQrrfHKjEtK8
-QO56KatBqG1byrsZNzjUl8AFSEbwwGxzRsCC8goW9XDWnJb7VwfzcnIAX5P3HU6F
-iU244mcD4vz2FcYBFvj65HiL5Nuwv5sRcTgTtrqxGdf9kqDkd1Googervmzh9F9o
-ErWHi/BAapeOrNKudwwPrIvLDbSik+rSwZGN3gxHnLHBAKCvrkiUyWtF/ufMU+Ds
-WfKB3ActbcsicRA7uWO8BLIudmbAaR/m9nRep2TzlD3kLKHaXpqIZXVVCgJ8x4Og
-LEhNV+Vz6enoleCKAdJHciyrc7m3wZIQKAObPiCLNLZaigrX9D0vH4MWF+55p8cJ
-e1uxUBy0JQkmbaxhUpU6F/vZX4HQcm+zA/h8+ut8mYRxMp4k+a5qIr+vTH39mkdy
-Bk6yh+JDEGK44QICaRbUS7vlvyzNKuR6CPb0E3mbyryrNZ+y3ImhC4NHruq9KLzw
-g/SmjRtD/FCIDlBwiQda
-=S2LB
------END PGP SIGNATURE-----
-
---e6pBmKo+I8wpp27t--
+> 
+>> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+>> ---
+> 
+> Changelog from my v3?
+> 
+>>  drivers/vfio/pci/vfio_pci.c         | 38 +++++++++++++++++++++++++++++++++++--
+>>  drivers/vfio/pci/vfio_pci_intrs.c   | 19 +++++++++++++++++++
+>>  drivers/vfio/pci/vfio_pci_private.h |  1 +
+>>  include/uapi/linux/vfio.h           |  1 +
+>>  4 files changed, 57 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+>> index 324c52e..3551cc9 100644
+>> --- a/drivers/vfio/pci/vfio_pci.c
+>> +++ b/drivers/vfio/pci/vfio_pci.c
+>> @@ -441,7 +441,8 @@ static int vfio_pci_get_irq_count(struct vfio_pci_device *vdev, int irq_type)
+>>  
+>>  			return (flags & PCI_MSIX_FLAGS_QSIZE) + 1;
+>>  		}
+>> -	} else if (irq_type == VFIO_PCI_ERR_IRQ_INDEX) {
+>> +	} else if (irq_type == VFIO_PCI_ERR_IRQ_INDEX ||
+>> +		   irq_type == VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX) {
+>>  		if (pci_is_pcie(vdev->pdev))
+>>  			return 1;
+>>  	} else if (irq_type == VFIO_PCI_REQ_IRQ_INDEX) {
+>> @@ -796,6 +797,7 @@ static long vfio_pci_ioctl(void *device_data,
+>>  		case VFIO_PCI_REQ_IRQ_INDEX:
+>>  			break;
+>>  		case VFIO_PCI_ERR_IRQ_INDEX:
+>> +		case VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX:
+>>  			if (pci_is_pcie(vdev->pdev))
+>>  				break;
+>>  		/* pass thru to return error */
+>> @@ -1282,7 +1284,9 @@ static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
+>>  
+>>  	mutex_lock(&vdev->igate);
+>>  
+>> -	if (vdev->err_trigger)
+>> +	if (state == pci_channel_io_normal && vdev->non_fatal_err_trigger)
+>> +		eventfd_signal(vdev->non_fatal_err_trigger, 1);
+>> +	else if (vdev->err_trigger)
+>>  		eventfd_signal(vdev->err_trigger, 1);
+>>  
+>>  	mutex_unlock(&vdev->igate);
+>> @@ -1292,8 +1296,38 @@ static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
+>>  	return PCI_ERS_RESULT_CAN_RECOVER;
+>>  }
+>>  
+>> +static pci_ers_result_t vfio_pci_aer_slot_reset(struct pci_dev *pdev)
+>> +{
+>> +	struct vfio_pci_device *vdev;
+>> +	struct vfio_device *device;
+>> +	static pci_ers_result_t err = PCI_ERS_RESULT_NONE;
+>> +
+>> +	device = vfio_device_get_from_dev(&pdev->dev);
+>> +	if (!device)
+>> +		goto err_dev;
+>> +
+>> +	vdev = vfio_device_data(device);
+>> +	if (!vdev)
+>> +		goto err_data;
+>> +
+>> +	mutex_lock(&vdev->igate);
+>> +
+>> +	if (vdev->err_trigger)
+>> +		eventfd_signal(vdev->err_trigger, 1);
+>> +
+>> +	mutex_unlock(&vdev->igate);
+>> +
+>> +	err = PCI_ERS_RESULT_RECOVERED;
+>> +
+>> +err_data:
+>> +	vfio_device_put(device);
+>> +err_dev:
+>> +	return err;
+>> +}
+>> +
+>>  static const struct pci_error_handlers vfio_err_handlers = {
+>>  	.error_detected = vfio_pci_aer_err_detected,
+>> +	.slot_reset = vfio_pci_aer_slot_reset,
+>>  };
+>>  
+>>  static struct pci_driver vfio_pci_driver = {
+>> diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
+>> index 1c46045..270d568 100644
+>> --- a/drivers/vfio/pci/vfio_pci_intrs.c
+>> +++ b/drivers/vfio/pci/vfio_pci_intrs.c
+>> @@ -611,6 +611,17 @@ static int vfio_pci_set_err_trigger(struct vfio_pci_device *vdev,
+>>  					       count, flags, data);
+>>  }
+>>  
+>> +static int vfio_pci_set_non_fatal_err_trigger(struct vfio_pci_device *vdev,
+>> +				    unsigned index, unsigned start,
+>> +				    unsigned count, uint32_t flags, void *data)
+>> +{
+>> +	if (index != VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX || start != 0 || count > 1)
+>> +		return -EINVAL;
+>> +
+>> +	return vfio_pci_set_ctx_trigger_single(&vdev->non_fatal_err_trigger,
+>> +					       count, flags, data);
+>> +}
+>> +
+>>  static int vfio_pci_set_req_trigger(struct vfio_pci_device *vdev,
+>>  				    unsigned index, unsigned start,
+>>  				    unsigned count, uint32_t flags, void *data)
+>> @@ -664,6 +675,14 @@ int vfio_pci_set_irqs_ioctl(struct vfio_pci_device *vdev, uint32_t flags,
+>>  			break;
+>>  		}
+>>  		break;
+>> +	case VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX:
+>> +		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
+>> +		case VFIO_IRQ_SET_ACTION_TRIGGER:
+>> +			if (pci_is_pcie(vdev->pdev))
+>> +				func = vfio_pci_set_non_fatal_err_trigger;
+>> +			break;
+>> +		}
+>> +		break;
+>>  	case VFIO_PCI_REQ_IRQ_INDEX:
+>>  		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
+>>  		case VFIO_IRQ_SET_ACTION_TRIGGER:
+>> diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
+>> index f561ac1..d30f8a3 100644
+>> --- a/drivers/vfio/pci/vfio_pci_private.h
+>> +++ b/drivers/vfio/pci/vfio_pci_private.h
+>> @@ -93,6 +93,7 @@ struct vfio_pci_device {
+>>  	struct pci_saved_state	*pci_saved_state;
+>>  	int			refcnt;
+>>  	struct eventfd_ctx	*err_trigger;
+>> +	struct eventfd_ctx	*non_fatal_err_trigger;
+>>  	struct eventfd_ctx	*req_trigger;
+>>  	struct list_head	dummy_resources_list;
+>>  };
+>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+>> index 519eff3..affa973 100644
+>> --- a/include/uapi/linux/vfio.h
+>> +++ b/include/uapi/linux/vfio.h
+>> @@ -443,6 +443,7 @@ enum {
+>>  	VFIO_PCI_MSIX_IRQ_INDEX,
+>>  	VFIO_PCI_ERR_IRQ_INDEX,
+>>  	VFIO_PCI_REQ_IRQ_INDEX,
+>> +	VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX,
+>>  	VFIO_PCI_NUM_IRQS
+>>  };
+>>  
+>> -- 
+>> 1.8.3.1
+>>
+>>
+> 
+> 
+> .
+> 
