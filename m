@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cihJY-0004lS-Cv
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:55:37 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cihJZ-0004mx-Nu
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:55:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cihJX-0004Sq-Kv
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:55:36 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cihJZ-0004Tb-1a
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:55:37 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 28 Feb 2017 13:54:15 +0100
-Message-Id: <1488286469-9381-31-git-send-email-kwolf@redhat.com>
+Date: Tue, 28 Feb 2017 13:54:16 +0100
+Message-Id: <1488286469-9381-32-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
 References: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 30/44] block: Allow backing file links in
- change_parent_backing_link()
+Subject: [Qemu-devel] [PATCH v3 31/44] blockjob: Factor out
+ block_job_remove_all_bdrv()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +23,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-Now that the backing file child role implements .attach/.detach
-callbacks, nothing prevents us from modifying the graph even if that
-involves changing backing file links.
+In some cases, we want to remove op blockers on intermediate nodes
+before the whole block job transaction has completed (because they block
+restoring the final graph state during completion). Provide a function
+for this.
+
+The whole block job lifecycle is a bit messed up and it's hard to
+actually do all things in the right order, but I'll leave simplifying
+this for another day.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ blockjob.c               | 20 +++++++++++++-------
+ include/block/blockjob.h |  9 +++++++++
+ 2 files changed, 22 insertions(+), 7 deletions(-)
 
-diff --git a/block.c b/block.c
-index 698a5c7..79d9ad0 100644
---- a/block.c
-+++ b/block.c
-@@ -2882,9 +2882,9 @@ static void change_parent_backing_link(BlockDriverState *from,
-             continue;
-         }
-         if (c->role == &child_backing) {
--            /* @from is generally not allowed to be a backing file, except for
--             * when @to is the overlay. In that case, @from may not be replaced
--             * by @to as @to's backing node. */
-+            /* If @from is a backing file of @to, ignore the child to avoid
-+             * creating a loop. We only want to change the pointer of other
-+             * parents. */
-             QLIST_FOREACH(to_c, &to->children, next) {
-                 if (to_c == c) {
-                     break;
-@@ -2895,7 +2895,6 @@ static void change_parent_backing_link(BlockDriverState *from,
-             }
-         }
+diff --git a/blockjob.c b/blockjob.c
+index 4216cde..69126af 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -128,6 +128,18 @@ static void block_job_detach_aio_context(void *opaque)
+     block_job_unref(job);
+ }
  
--        assert(c->role != &child_backing);
-         bdrv_ref(to);
-         /* FIXME Are we sure that bdrv_replace_child() can't run into
-          * &error_abort because of permissions? */
++void block_job_remove_all_bdrv(BlockJob *job)
++{
++    GSList *l;
++    for (l = job->nodes; l; l = l->next) {
++        BdrvChild *c = l->data;
++        bdrv_op_unblock_all(c->bs, job->blocker);
++        bdrv_root_unref_child(c);
++    }
++    g_slist_free(job->nodes);
++    job->nodes = NULL;
++}
++
+ int block_job_add_bdrv(BlockJob *job, const char *name, BlockDriverState *bs,
+                        uint64_t perm, uint64_t shared_perm, Error **errp)
+ {
+@@ -258,15 +270,9 @@ void block_job_ref(BlockJob *job)
+ void block_job_unref(BlockJob *job)
+ {
+     if (--job->refcnt == 0) {
+-        GSList *l;
+         BlockDriverState *bs = blk_bs(job->blk);
+         bs->job = NULL;
+-        for (l = job->nodes; l; l = l->next) {
+-            BdrvChild *c = l->data;
+-            bdrv_op_unblock_all(c->bs, job->blocker);
+-            bdrv_root_unref_child(c);
+-        }
+-        g_slist_free(job->nodes);
++        block_job_remove_all_bdrv(job);
+         blk_remove_aio_context_notifier(job->blk,
+                                         block_job_attached_aio_context,
+                                         block_job_detach_aio_context, job);
+diff --git a/include/block/blockjob.h b/include/block/blockjob.h
+index 9d65ef8..9e906f7 100644
+--- a/include/block/blockjob.h
++++ b/include/block/blockjob.h
+@@ -181,6 +181,15 @@ int block_job_add_bdrv(BlockJob *job, const char *name, BlockDriverState *bs,
+                        uint64_t perm, uint64_t shared_perm, Error **errp);
+ 
+ /**
++ * block_job_remove_all_bdrv:
++ * @job: The block job
++ *
++ * Remove all BlockDriverStates from the list of nodes that are involved in the
++ * job. This removes the blockers added with block_job_add_bdrv().
++ */
++void block_job_remove_all_bdrv(BlockJob *job);
++
++/**
+  * block_job_set_speed:
+  * @job: The job to set the speed for.
+  * @speed: The new value
 -- 
 1.8.3.1
