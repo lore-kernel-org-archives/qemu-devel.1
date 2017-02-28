@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cio2Y-0005nO-It
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:06:31 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cioLQ-000263-Pi
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:26:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cio2X-0005Du-B0
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:06:30 -0500
-References: <1488194450-28056-1-git-send-email-armbru@redhat.com>
-	<1488194450-28056-25-git-send-email-armbru@redhat.com>
-	<20170228192543.GZ4090@noname.redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c1efb07d-e5ab-b627-8cf7-1a0c364e7c86@redhat.com>
-Date: Tue, 28 Feb 2017 14:06:20 -0600
+	(envelope-from <no-reply@patchew.org>) id 1cioLN-0002mw-Kj
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:26:00 -0500
+Resent-Message-Id: <E1cioLN-0002mw-Kj@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21492)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cioLN-0002ln-5j
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:25:57 -0500
+In-Reply-To: <1488308796-28832-1-git-send-email-armbru@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148831349537.258.11067917716928734478@0e2666bad730>
 MIME-Version: 1.0
-In-Reply-To: <20170228192543.GZ4090@noname.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="rRBqMcsn4NxXioPCenxAHGaSkbFF6NaSX"
-Subject: Re: [Qemu-devel] [PATCH 24/24] keyval: Support lists
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 28 Feb 2017 12:24:55 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL 00/26] QAPI patches for 2017-02-28
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,154 +28,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, pkrempa@redhat.com
+To: armbru@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rRBqMcsn4NxXioPCenxAHGaSkbFF6NaSX
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, pkrempa@redhat.com
-Message-ID: <c1efb07d-e5ab-b627-8cf7-1a0c364e7c86@redhat.com>
-Subject: Re: [PATCH 24/24] keyval: Support lists
-References: <1488194450-28056-1-git-send-email-armbru@redhat.com>
- <1488194450-28056-25-git-send-email-armbru@redhat.com>
- <20170228192543.GZ4090@noname.redhat.com>
-In-Reply-To: <20170228192543.GZ4090@noname.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 02/28/2017 01:25 PM, Kevin Wolf wrote:
-> Am 27.02.2017 um 12:20 hat Markus Armbruster geschrieben:
->> Additionally permit non-negative integers as key components.  A
->> dictionary's keys must either be all integers or none.  If all keys
->> are integers, convert the dictionary to a list.  The set of keys must
->> be [0,N].
->>
-
->> @@ -34,16 +36,16 @@
->>   *   doesn't have one, because R.a must be an object to satisfy a.b=3D=
-1
->>   *   and a string to satisfy a=3D2.
->>   *
->> - * Key-fragments must be valid QAPI names.
->> + * Key-fragments must be valid QAPI names or consist only of digits.
-
->>  /*
->> + * Convert @key to a list index.
->> + * Convert all leading digits to a (non-negative) number, capped at
->> + * INT_MAX.
->> + * If @end is non-null, assign a pointer to the first character after=
-
->> + * the number to *@end.
->> + * Else, fail if any characters follow.
->> + * On success, return the converted number.
->> + * On failure, return a negative value.
->> + * Note: since only digits are converted, no two keys can map to the
->> + * same number, except by overflow to INT_MAX.
->> + */
->> +static int key_to_index(const char *key, const char **end)
->> +{
->> +    int ret;
->> +    unsigned long index;
->> +
->> +    if (*key < '0' || *key > '9') {
->> +        return -EINVAL;
->> +    }
-
-So no leading whitespace, '+', or '-', even if strtoul would have
-allowed it.  Such names are also invalid as member id names.  (There's
-still the question if we want to allow arbitrary whitespace after
-between-key-value ',', and maybe even after between-key-segment '.'
-after this series, to make it easier to write strategically line-wrapped
-command lines - but that's an independent thing to be done on top).
-
->> @@ -137,8 +165,13 @@ static const char *keyval_parse_one(QDict *qdict,=
- const char *params,
->>      cur =3D qdict;
->>      s =3D key;
->>      for (;;) {
->> -        ret =3D parse_qapi_name(s, false);
->> -        len =3D ret < 0 ? 0 : ret;
->> +        /* Want a key index (unless it's first) or a QAPI name */
->> +        if (s !=3D key && key_to_index(s, &end) >=3D 0) {
->> +            len =3D end - s;
->> +        } else {
->> +            ret =3D parse_qapi_name(s, false);
->> +            len =3D ret < 0 ? 0 : ret;
->> +        }
-
-Does this mishandle keyval_parse(string, "0", err) - where we want to
-assert that the caller always passes only a valid id name for an
-implicit key?
-
->>          assert(s + len <=3D key_end);
->>          if (!len || (s + len < key_end && s[len] !=3D '.')) {
->>              assert(key !=3D implied_key);
->> @@ -205,6 +238,119 @@ static const char *keyval_parse_one(QDict *qdict=
-, const char *params,
->>      return s;
->>  }
->> =20
->> +static char *reassemble_key(GSList *key)
->> +{
->> +    GString *s =3D g_string_new("");
->> +    GSList *p;
->> +
->> +    for (p =3D key; p; p =3D p->next) {
->> +        g_string_prepend_c(s, '.');
->> +        g_string_prepend(s, (char *)p->data);
-
-Should this use the canonical form of an index, even if the user spelled
-it with extra bytes like leading zero?
-
-
->> +    /* Copy @cur's values to @elt[] */
->> +    nelt =3D qdict_size(cur);
->> +    elt =3D g_new0(QObject *, nelt);
->=20
-> This doesn't seem to be freed.
->=20
->> +    for (ent =3D qdict_first(cur); ent; ent =3D qdict_next(cur, ent))=
- {
->> +        index =3D key_to_index(ent->key, NULL);
->> +        assert(index >=3D 0);
->> +        /*
->> +         * We iterate @nelt times.  Because the dictionary keys are
->> +         * distinct, the indexes are also distinct (key_to_index()
->> +         * ensures it).
->=20
-> Really? What about leading zeros?
-
-key_to_index() should be used to convert "01" and "1" into the same key
-when first computing the QDict during the initial parse; this post-pass
-should thus only see a single "1" key (last-one-wins semantics,
-regardless of the difference in spelling of the same index repeated on
-the command line).
-
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---rRBqMcsn4NxXioPCenxAHGaSkbFF6NaSX
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYtdg8AAoJEKeha0olJ0Nq330IAJ0VUaEDhVbNLkzeH03lvG4B
-BY29ShGv8k1yDUhI8v7UzzThq4CDllrN3d2ijddMMYouywIYNxzdF3JB/7acE3Gr
-OlC5AWfOy71oTRES4SW1WCn8uKpH+SN1PA26Yv7UqcWnkT4+Ea8hEWdcbsPZdZ3i
-Tfy8tIMjBicW6b/dr1aAgkcoG7MeYqstbqw6r4zLwhy7CcV5jZbNztaQh3e0aohZ
-GYKFwb9dQTtFLPmblAapn6+dd53eL1f59dwkS9DujpQPQgtrcUU893mxb10pEpeo
-renDaXkhz0AQZ6bJ6HkuoqbTk6vk+lq8OLw3vKAhm2FyvnPOOV/Ryk6VJKJ8KqY=
-=3KLi
------END PGP SIGNATURE-----
-
---rRBqMcsn4NxXioPCenxAHGaSkbFF6NaSX--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ4
+ODMwODc5Ni0yODgzMi0xLWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tClR5cGU6IHNl
+cmllcwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMDAvMjZdIFFBUEkgcGF0Y2hlcyBmb3Ig
+MjAxNy0wMi0yOAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1i
+YXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVk
+PTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxp
+bWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdp
+dCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsg
+ZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1m
+b3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4v
+c2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0x
+CiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09
+PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
+N2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9x
+ZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTQ4ODMwODc5Ni0yODgzMi0xLWdpdC1z
+ZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMTQ4ODMwODc5Ni0yODgzMi0x
+LWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tCiAtIFt0YWcgdXBkYXRlXSAgICAgIHBh
+dGNoZXcvMjAxNzAyMjcyMDE0NTYuMzE4MTQtMS1iZXJyYW5nZUByZWRoYXQuY29tIC0+IHBhdGNo
+ZXcvMjAxNzAyMjcyMDE0NTYuMzE4MTQtMS1iZXJyYW5nZUByZWRoYXQuY29tClN3aXRjaGVkIHRv
+IGEgbmV3IGJyYW5jaCAndGVzdCcKZTk3NzdlOSBxYXBpOiBJbXByb3ZlIHFvYmplY3QgdmlzaXRv
+ciBkb2N1bWVudGF0aW9uCmRkOWJmNjAgcWFwaTogRml4IG9iamVjdCBpbnB1dCB2aXNpdCBiZXlv
+bmQgZW5kIG9mIGxpc3QKNDQ0MzQ2NSB0ZXN0czogQ292ZXIgaW5wdXQgdmlzaXQgYmV5b25kIGVu
+ZCBvZiBsaXN0Cjg5OGQ5ZTMgcWFwaTogTWFrZSBpbnB1dCB2aXNpdG9ycyBkZXRlY3QgdW52aXNp
+dGVkIGxpc3QgdGFpbHMKYjZkYjYwOCB0ZXN0LXFvYmplY3QtaW5wdXQtdmlzaXRvcjogQ292ZXIg
+bWlzc2luZyBuZXN0ZWQgc3RydWN0IG1lbWJlcgo4MDc1N2IwIHRlc3RzOiBDb3ZlciBwYXJ0aWFs
+IGlucHV0IHZpc2l0IG9mIGxpc3QKZmRhZTNiMiB0ZXN0LXN0cmluZy1pbnB1dC12aXNpdG9yOiBJ
+bXByb3ZlIGxpc3QgY292ZXJhZ2UKNGZhNThmNiB0ZXN0LXN0cmluZy1pbnB1dC12aXNpdG9yOiBU
+ZWFyIGRvd24gZXhpc3RpbmcgdGVzdCBhdXRvbWF0aWNhbGx5CjNhYWIxNmIgdGVzdHMtcW9iamVj
+dC1pbnB1dC1zdHJpY3Q6IE1lcmdlIGludG8gdGVzdC1xb2JqZWN0LWlucHV0LXZpc2l0b3IKODNj
+ODNmOCBxYXBpOiBEcm9wIHVudXNlZCBub24tc3RyaWN0IHFvYmplY3QgaW5wdXQgdmlzaXRvcgo1
+ODU0OTg4IHRlc3QtcW9iamVjdC1pbnB1dC12aXNpdG9yOiBVc2Ugc3RyaWN0IHZpc2l0b3IKMjNk
+YTNlZSBxb206IE1ha2Ugb2JqZWN0X3Byb3BlcnR5X3NldF9xb2JqZWN0KCkncyBpbnB1dCB2aXNp
+dG9yIHN0cmljdAo2N2IzODM1IHFhcGk6IE1ha2Ugc3RyaW5nIGlucHV0IGFuZCBvcHRzIHZpc2l0
+b3IgcmVxdWlyZSBub24tbnVsbCBpbnB1dAo3OTQ4YzNmIHFhcGk6IERyb3Agc3RyaW5nIGlucHV0
+IHZpc2l0b3IgbWV0aG9kIG9wdGlvbmFsKCkKN2U1YWQwMCBxYXBpOiBJbXByb3ZlIHFvYmplY3Qg
+aW5wdXQgdmlzaXRvciBlcnJvciByZXBvcnRpbmcKNWJlOTE5NiBxYXBpOiBNYWtlIFFPYmplY3Qg
+aW5wdXQgdmlzaXRvciBzZXQgKmxpc3QgcmVsaWFibHkKOTc5ZTM4OCBxYXBpOiBDbGVhbiB1cCBh
+ZnRlciBjb21taXQgM2QzNDRjMgo5NDgwNDEwIHFhcGk6IEltcHJvdmUgYSBRT2JqZWN0IGlucHV0
+IHZpc2l0b3IgZXJyb3IgbWVzc2FnZQpiN2UzMmEzIHFtcDogSW1wcm92ZSBRTVAgZGlzcGF0Y2gg
+ZXJyb3IgbWVzc2FnZXMKYmJiZDQ3YyBxbXA6IEVsaW1pbmF0ZSBzaWxseSBRRVJSX1FNUF8qIG1h
+Y3Jvcwo2MmMxMmI3IHFtcDogRHJvcCBkdXBsaWNhdGVkIFFNUCBjb21tYW5kIG9iamVjdCBjaGVj
+a3MKYmU2OGI2ZCBxbXA6IENsZWFuIHVwIGhvdyB3ZSBlbmZvcmNlIGNhcGFiaWxpdHkgbmVnb3Rp
+YXRpb24KY2E3YTVkZSBxbXA6IER1bWIgZG93biBob3cgd2UgcnVuIFFNUCBjb21tYW5kIHJlZ2lz
+dHJhdGlvbgpmNDEyZjBhIHFtcC10ZXN0OiBOZXcsIGNvdmVyaW5nIGJhc2ljIFFNUCBwcm90b2Nv
+bApkZDA2NzlmIGxpYnF0ZXN0OiBXb3JrIGFyb3VuZCBhICJRTVAgd2FudHMgYSBuZXdsaW5lIiBi
+dWcKNDkyOGU5YyBxZ2E6IEZpeCBjcmFzaCBvbiBub24tZGljdGlvbmFyeSBRTVAgYXJndW1lbnQK
+Cj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMjY6IHFnYTogRml4IGNyYXNo
+IG9uIG5vbi1kaWN0aW9uYXJ5IFFNUCBhcmd1bWVudC4uLgpDaGVja2luZyBQQVRDSCAyLzI2OiBs
+aWJxdGVzdDogV29yayBhcm91bmQgYSAiUU1QIHdhbnRzIGEgbmV3bGluZSIgYnVnLi4uCkNoZWNr
+aW5nIFBBVENIIDMvMjY6IHFtcC10ZXN0OiBOZXcsIGNvdmVyaW5nIGJhc2ljIFFNUCBwcm90b2Nv
+bC4uLgpDaGVja2luZyBQQVRDSCA0LzI2OiBxbXA6IER1bWIgZG93biBob3cgd2UgcnVuIFFNUCBj
+b21tYW5kIHJlZ2lzdHJhdGlvbi4uLgpDaGVja2luZyBQQVRDSCA1LzI2OiBxbXA6IENsZWFuIHVw
+IGhvdyB3ZSBlbmZvcmNlIGNhcGFiaWxpdHkgbmVnb3RpYXRpb24uLi4KQ2hlY2tpbmcgUEFUQ0gg
+Ni8yNjogcW1wOiBEcm9wIGR1cGxpY2F0ZWQgUU1QIGNvbW1hbmQgb2JqZWN0IGNoZWNrcy4uLgpD
+aGVja2luZyBQQVRDSCA3LzI2OiBxbXA6IEVsaW1pbmF0ZSBzaWxseSBRRVJSX1FNUF8qIG1hY3Jv
+cy4uLgpDaGVja2luZyBQQVRDSCA4LzI2OiBxbXA6IEltcHJvdmUgUU1QIGRpc3BhdGNoIGVycm9y
+IG1lc3NhZ2VzLi4uCkNoZWNraW5nIFBBVENIIDkvMjY6IHFhcGk6IEltcHJvdmUgYSBRT2JqZWN0
+IGlucHV0IHZpc2l0b3IgZXJyb3IgbWVzc2FnZS4uLgpDaGVja2luZyBQQVRDSCAxMC8yNjogcWFw
+aTogQ2xlYW4gdXAgYWZ0ZXIgY29tbWl0IDNkMzQ0YzIuLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvMjY6
+IHFhcGk6IE1ha2UgUU9iamVjdCBpbnB1dCB2aXNpdG9yIHNldCAqbGlzdCByZWxpYWJseS4uLgpD
+aGVja2luZyBQQVRDSCAxMi8yNjogcWFwaTogSW1wcm92ZSBxb2JqZWN0IGlucHV0IHZpc2l0b3Ig
+ZXJyb3IgcmVwb3J0aW5nLi4uCkNoZWNraW5nIFBBVENIIDEzLzI2OiBxYXBpOiBEcm9wIHN0cmlu
+ZyBpbnB1dCB2aXNpdG9yIG1ldGhvZCBvcHRpb25hbCgpLi4uCkNoZWNraW5nIFBBVENIIDE0LzI2
+OiBxYXBpOiBNYWtlIHN0cmluZyBpbnB1dCBhbmQgb3B0cyB2aXNpdG9yIHJlcXVpcmUgbm9uLW51
+bGwgaW5wdXQuLi4KQ2hlY2tpbmcgUEFUQ0ggMTUvMjY6IHFvbTogTWFrZSBvYmplY3RfcHJvcGVy
+dHlfc2V0X3FvYmplY3QoKSdzIGlucHV0IHZpc2l0b3Igc3RyaWN0Li4uCkNoZWNraW5nIFBBVENI
+IDE2LzI2OiB0ZXN0LXFvYmplY3QtaW5wdXQtdmlzaXRvcjogVXNlIHN0cmljdCB2aXNpdG9yLi4u
+CkNoZWNraW5nIFBBVENIIDE3LzI2OiBxYXBpOiBEcm9wIHVudXNlZCBub24tc3RyaWN0IHFvYmpl
+Y3QgaW5wdXQgdmlzaXRvci4uLgpDaGVja2luZyBQQVRDSCAxOC8yNjogdGVzdHMtcW9iamVjdC1p
+bnB1dC1zdHJpY3Q6IE1lcmdlIGludG8gdGVzdC1xb2JqZWN0LWlucHV0LXZpc2l0b3IuLi4KRVJS
+T1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM0ODc6IEZJTEU6IHRlc3RzL3Rlc3QtcW9iamVj
+dC1pbnB1dC12aXNpdG9yLmM6ODQ3OgorICAgIHYgPSB2aXNpdG9yX2lucHV0X3Rlc3RfaW5pdChk
+YXRhLCAieyAnaW50ZWdlcic6IC00MiwgJ2Jvb2xlYW4nOiB0cnVlLCAnc3RyaW5nJzogJ2Zvbycs
+ICdleHRyYSc6IDQyIH0iKTsKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNTAxOiBG
+SUxFOiB0ZXN0cy90ZXN0LXFvYmplY3QtaW5wdXQtdmlzaXRvci5jOjg2MToKKyAgICB2ID0gdmlz
+aXRvcl9pbnB1dF90ZXN0X2luaXQoZGF0YSwgInsgJ3N0cmluZzAnOiAnc3RyaW5nMCcsICdkaWN0
+MSc6IHsgJ3N0cmluZzEnOiAnc3RyaW5nMScsICdkaWN0Mic6IHsgJ3VzZXJkZWYxJzogeyAnaW50
+ZWdlcic6IDQyLCAnc3RyaW5nJzogJ3N0cmluZycsICdleHRyYSc6IFs0MiwgMjMsIHsnZm9vJzon
+YmFyJ31dIH0sICdzdHJpbmcyJzogJ3N0cmluZzInfX19Iik7CgpFUlJPUjogbGluZSBvdmVyIDkw
+IGNoYXJhY3RlcnMKIzUxNTogRklMRTogdGVzdHMvdGVzdC1xb2JqZWN0LWlucHV0LXZpc2l0b3Iu
+Yzo4NzU6CisgICAgdiA9IHZpc2l0b3JfaW5wdXRfdGVzdF9pbml0KGRhdGEsICJbIHsgJ3N0cmlu
+Zyc6ICdzdHJpbmcwJywgJ2ludGVnZXInOiA0MiB9LCB7ICdzdHJpbmcnOiAnc3RyaW5nMScsICdp
+bnRlZ2VyJzogNDMgfSwgeyAnc3RyaW5nJzogJ3N0cmluZzInLCAnaW50ZWdlcic6IDQ0LCAnZXh0
+cmEnOiAnZ2dnJyB9IF0iKTsKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNTg4OiBG
+SUxFOiB0ZXN0cy90ZXN0LXFvYmplY3QtaW5wdXQtdmlzaXRvci5jOjk0ODoKKyAgICB2ID0gdmlz
+aXRvcl9pbnB1dF90ZXN0X2luaXQoZGF0YSwgInsgJ3N0cmluZyc6ICdjJywgJ2ludGVnZXInOiA0
+MSwgJ2Jvb2xlYW4nOiB0cnVlIH0iKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJz
+CiM1OTU6IEZJTEU6IHRlc3RzL3Rlc3QtcW9iamVjdC1pbnB1dC12aXNpdG9yLmM6OTU1Ogorc3Rh
+dGljIHZvaWQgdGVzdF92aXNpdG9yX2luX2ZhaWxfdW5pb25fZmxhdF9ub19kaXNjcmltKFRlc3RJ
+bnB1dFZpc2l0b3JEYXRhICpkYXRhLAoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM2
+MDM6IEZJTEU6IHRlc3RzL3Rlc3QtcW9iamVjdC1pbnB1dC12aXNpdG9yLmM6OTYzOgorICAgIHYg
+PSB2aXNpdG9yX2lucHV0X3Rlc3RfaW5pdChkYXRhLCAieyAnaW50ZWdlcic6IDQyLCAnc3RyaW5n
+JzogJ2MnLCAnc3RyaW5nMSc6ICdkJywgJ3N0cmluZzInOiAnZScgfSIpOwoKdG90YWw6IDUgZXJy
+b3JzLCAxIHdhcm5pbmdzLCAyMzMgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUg
+cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
+ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
+IGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTkvMjY6IHRlc3Qtc3RyaW5nLWlucHV0
+LXZpc2l0b3I6IFRlYXIgZG93biBleGlzdGluZyB0ZXN0IGF1dG9tYXRpY2FsbHkuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMjAvMjY6IHRlc3Qtc3RyaW5nLWlucHV0LXZpc2l0b3I6IEltcHJvdmUgbGlzdCBj
+b3ZlcmFnZS4uLgpDaGVja2luZyBQQVRDSCAyMS8yNjogdGVzdHM6IENvdmVyIHBhcnRpYWwgaW5w
+dXQgdmlzaXQgb2YgbGlzdC4uLgpDaGVja2luZyBQQVRDSCAyMi8yNjogdGVzdC1xb2JqZWN0LWlu
+cHV0LXZpc2l0b3I6IENvdmVyIG1pc3NpbmcgbmVzdGVkIHN0cnVjdCBtZW1iZXIuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMjMvMjY6IHFhcGk6IE1ha2UgaW5wdXQgdmlzaXRvcnMgZGV0ZWN0IHVudmlzaXRl
+ZCBsaXN0IHRhaWxzLi4uCkNoZWNraW5nIFBBVENIIDI0LzI2OiB0ZXN0czogQ292ZXIgaW5wdXQg
+dmlzaXQgYmV5b25kIGVuZCBvZiBsaXN0Li4uCkVSUk9SOiBpZiB0aGlzIGNvZGUgaXMgcmVkdW5k
+YW50IGNvbnNpZGVyIHJlbW92aW5nIGl0CiM4NjogRklMRTogdGVzdHMvdGVzdC1xb2JqZWN0LWlu
+cHV0LXZpc2l0b3IuYzo5NTY6CisjaWYgMCAvKiBGSVhNRSBjcmFzaCAqLwoKdG90YWw6IDEgZXJy
+b3JzLCAwIHdhcm5pbmdzLCA5NSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBw
+cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
+IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
+aW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyNS8yNjogcWFwaTogRml4IG9iamVjdCBp
+bnB1dCB2aXNpdCBiZXlvbmQgZW5kIG9mIGxpc3QuLi4KQ2hlY2tpbmcgUEFUQ0ggMjYvMjY6IHFh
+cGk6IEltcHJvdmUgcW9iamVjdCB2aXNpdG9yIGRvY3VtZW50YXRpb24uLi4KPT09IE9VVFBVVCBF
+TkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5l
+cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxl
+YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
