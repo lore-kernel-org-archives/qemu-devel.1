@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cih5d-000831-Eg
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:14 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cih5f-00085i-Oc
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cih5c-0000Ey-G5
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51490)
+	(envelope-from <dgilbert@redhat.com>) id 1cih5e-0000Fi-En
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34308)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cih5c-0000Eh-7p
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:12 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cih5e-0000FQ-8z
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:14 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue, 28 Feb 2017 12:40:35 +0000
-Message-Id: <20170228124056.5074-7-dgilbert@redhat.com>
+Date: Tue, 28 Feb 2017 12:40:36 +0000
+Message-Id: <20170228124056.5074-8-dgilbert@redhat.com>
 In-Reply-To: <20170228124056.5074-1-dgilbert@redhat.com>
 References: <20170228124056.5074-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 06/27] tests/test-vmstate.c: test array of ptr
- to primitive
+Subject: [Qemu-devel] [PULL 07/27] vmstate-static-checker: update white list
+ with spapr_pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,85 +27,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: quintela@redhat.com, lvivier@redhat.com, marcandre.lureau@redhat.com, vsementsov@virtuozzo.com, danielhb@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, ashijeetacharya@gmail.com
 
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
+From: Laurent Vivier <lvivier@redhat.com>
 
-Let's have a test for ptr arrays to some primitive type with some
-not-null and null ptrs intermixed.
+To fix migration between 2.7 and 2.8, some fields have
+been renamed and managed with the help of a PHB property
+(pre_2_8_migration):
 
-Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+    5c4537b spapr: Fix 2.7<->2.8 migration of PCI host bridge
 
-Message-Id: <20170222160119.52771-6-pasic@linux.vnet.ibm.com>
+So we need to add them to the white list:
+
+    dma_liobn[0],
+    mem_win_addr, mem_win_size,
+    io_win_addr, io_win_size
+
+become
+
+    mig_liobn,
+    mig_mem_win_addr, mig_mem_win_size,
+    mig_io_win_addr, mig_io_win_size
+
+CC: David Gibson <david@gibson.dropbear.id.au>
+CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+CC: Thomas Huth <thuth@redhat.com>
+CC: Greg Kurz <groug@kaod.org>
+CC: Alexey Kardashevskiy <aik@ozlabs.ru>
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Message-Id: <20170214133331.28997-1-lvivier@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tests/test-vmstate.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
+ scripts/vmstate-static-checker.py | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
-index 2e20756..f694a89 100644
---- a/tests/test-vmstate.c
-+++ b/tests/test-vmstate.c
-@@ -568,6 +568,50 @@ static void test_arr_ptr_str_0_load(void)
+diff --git a/scripts/vmstate-static-checker.py b/scripts/vmstate-static-checker.py
+index 14a27e7..bcef7ee 100755
+--- a/scripts/vmstate-static-checker.py
++++ b/scripts/vmstate-static-checker.py
+@@ -85,6 +85,11 @@ def check_fields_match(name, s_field, d_field):
+         'xio3130-express-upstream-port': ['br.dev', 'parent_obj.parent_obj',
+                                           'br.dev.exp.aer_log',
+                                           'parent_obj.parent_obj.exp.aer_log'],
++        'spapr_pci': ['dma_liobn[0]', 'mig_liobn',
++                      'mem_win_addr', 'mig_mem_win_addr',
++                      'mem_win_size', 'mig_mem_win_size',
++                      'io_win_addr', 'mig_io_win_addr',
++                      'io_win_size', 'mig_io_win_size'],
      }
- }
  
-+typedef struct TestArrayOfPtrToInt {
-+    int32_t *ar[AR_SIZE];
-+} TestArrayOfPtrToInt;
-+
-+const VMStateDescription vmsd_arpp = {
-+    .name = "test/arps",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_ARRAY_OF_POINTER(ar, TestArrayOfPtrToInt,
-+                AR_SIZE, 0, vmstate_info_int32, int32_t*),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void test_arr_ptr_prim_0_save(void)
-+{
-+    int32_t ar[AR_SIZE] = {0 , 1, 2, 3};
-+    TestArrayOfPtrToInt  sample = {.ar = {&ar[0], NULL, &ar[2], &ar[3]} };
-+
-+    save_vmstate(&vmsd_arpp, &sample);
-+    compare_vmstate(wire_arr_ptr_0, sizeof(wire_arr_ptr_0));
-+}
-+
-+static void test_arr_ptr_prim_0_load(void)
-+{
-+    int32_t ar_gt[AR_SIZE] = {0, 1, 2, 3};
-+    int32_t ar[AR_SIZE] = {3 , 42, 1, 0};
-+    TestArrayOfPtrToInt obj = {.ar = {&ar[0], NULL, &ar[2], &ar[3]} };
-+    int idx;
-+
-+    save_buffer(wire_arr_ptr_0, sizeof(wire_arr_ptr_0));
-+    SUCCESS(load_vmstate_one(&vmsd_arpp, &obj, 1,
-+                          wire_arr_ptr_0, sizeof(wire_arr_ptr_0)));
-+    for (idx = 0; idx < AR_SIZE; ++idx) {
-+        /* compare the target array ar with the ground truth array ar_gt */
-+        if (idx == 1) {
-+            g_assert_cmpint(42, ==, ar[idx]);
-+        } else {
-+            g_assert_cmpint(ar_gt[idx], ==, ar[idx]);
-+        }
-+    }
-+}
-+
- /* test QTAILQ migration */
- typedef struct TestQtailqElement TestQtailqElement;
- 
-@@ -821,6 +865,10 @@ int main(int argc, char **argv)
-     g_test_add_func("/vmstate/array/ptr/str/0/save", test_arr_ptr_str_0_save);
-     g_test_add_func("/vmstate/array/ptr/str/0/load",
-                     test_arr_ptr_str_0_load);
-+    g_test_add_func("/vmstate/array/ptr/prim/0/save",
-+                    test_arr_ptr_prim_0_save);
-+    g_test_add_func("/vmstate/array/ptr/prim/0/load",
-+                    test_arr_ptr_prim_0_load);
-     g_test_add_func("/vmstate/qtailq/save/saveq", test_save_q);
-     g_test_add_func("/vmstate/qtailq/load/loadq", test_load_q);
-     g_test_add_func("/vmstate/tmp_struct", test_tmp_struct);
+     if not name in changed_names:
 -- 
 2.9.3
