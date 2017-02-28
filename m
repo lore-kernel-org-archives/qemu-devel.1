@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cilwD-0005vR-8L
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:51:50 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cilzB-00005t-Tr
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:54:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cilwC-0003GI-Fh
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:51:49 -0500
-Date: Tue, 28 Feb 2017 18:51:42 +0100
+	(envelope-from <kwolf@redhat.com>) id 1cilzB-0004tV-9H
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:54:54 -0500
+Date: Tue, 28 Feb 2017 18:54:44 +0100
 From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170228175142.GU4090@noname.redhat.com>
+Message-ID: <20170228175444.GV4090@noname.redhat.com>
 References: <1488194450-28056-1-git-send-email-armbru@redhat.com>
-	<1488194450-28056-20-git-send-email-armbru@redhat.com>
+	<1488194450-28056-21-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1488194450-28056-20-git-send-email-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 19/24] qapi: Improve how keyval input
- visitor reports unexpected dicts
+In-Reply-To: <1488194450-28056-21-git-send-email-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 20/24] docs/qapi-code-gen.txt: Clarify
+ naming rules
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +28,6 @@ To: Markus Armbruster <armbru@redhat.com>
 Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, pkrempa@redhat.com, eblake@redhat.com
 
 Am 27.02.2017 um 12:20 hat Markus Armbruster geschrieben:
-> Incorrect option
-> 
->     -blockdev node-name=foo,driver=file,filename=foo.img,aio.unmap
-> 
-> is rejected with "Invalid parameter type for 'aio', expected: string".
-> To make sense of this, you almost have to translate it into the
-> equivalent QMP command
-> 
->     { "execute": "blockdev-add", "arguments": { "node-name": "foo", "driver": "file", "filename": "foo.img", "aio": { "unmap": true } } }
-> 
-> Improve the error message to "Parameters 'aio.*' are unexpected".
-
-In fact, what I get (after fixing the previous review comments that
-would make it crash) is "Expected '=' after parameter 'aio.unmap'". Only
-if I add a value, I get the newly added message.
-
-Doesn't make the patch less correct, though.
-
-> Take care not to confuse the case "unexpected nested parameters"
-> (i.e. the object is a QDict or QList) with the case "non-string scalar
-> parameter".  The latter is a misuse of the visitor, and should perhaps
-> be an assertion.  Note that test-qobject-input-visitor exercises this
-> misuse in test_visitor_in_int_keyval(), test_visitor_in_bool_keyval()
-> and test_visitor_in_number_keyval().
-> 
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
 Reviewed-by: Kevin Wolf <kwolf@redhat.com>
