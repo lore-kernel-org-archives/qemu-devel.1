@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cinFu-0001Wa-IS
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:16:15 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cinHe-0003DH-Eo
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:18:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cinFq-0001yz-JA
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:16:14 -0500
-Received: from mail.kernel.org ([198.145.29.136]:38504)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1cinFq-0001yL-2V
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:16:10 -0500
-From: Stefano Stabellini <sstabellini@kernel.org>
-Date: Tue, 28 Feb 2017 11:16:03 -0800
-Message-Id: <1488309364-3252-1-git-send-email-sstabellini@kernel.org>
-In-Reply-To: <alpine.DEB.2.10.1702281106420.5551@sstabellini-ThinkPad-X260>
-References: <alpine.DEB.2.10.1702281106420.5551@sstabellini-ThinkPad-X260>
-Subject: [Qemu-devel] [PULL 1/2] Add a new qmp command to start/stop
- replication
+	(envelope-from <peter.maydell@linaro.org>) id 1cinHd-0002ov-3G
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:18:02 -0500
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:35797)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cinHc-0002nq-SZ
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:18:01 -0500
+Received: by mail-wm0-x22c.google.com with SMTP id v186so93395850wmd.0
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 11:18:00 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20170228191226.GI2778@thinpad.lan.raisama.net>
+References: <20170227162501.29280-1-ehabkost@redhat.com>
+	<CAFEAcA8b_tdQAP6YVDRaZKzHLed5xKbfABtJUV0U43HpkTiBdg@mail.gmail.com>
+	<20170227194134.GH2778@thinpad.lan.raisama.net>
+	<20170227205753.60b8a225@bahia.lan>
+	<20170228191226.GI2778@thinpad.lan.raisama.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 28 Feb 2017 19:17:39 +0000
+Message-ID: <CAFEAcA8iZG8yB=4an9O2Mroej8bWNHBcANxsJkCOVbKHcxaGRg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] travis-ci 'make check' timeouts (was Re: [PULL
+ 00/11] x86 queue, 2017-02-27)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,104 +33,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, stefanha@gmail.com
-Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, Wen Congyang <wencongyang@gmail.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Greg Kurz <groug@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+On 28 February 2017 at 19:12, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> I saw a failure on x86-pull-request that seemed to be because of
+> vhost-user-test[1]. However, after restarting the job, it
+> passed[2].
 
-We can call this qmp command to start/stop replication outside of qemu.
-Like Xen colo need this function.
+I'm currently processing a patch which (hopefully) fixes
+vhost-user-test's intermittent failures:
+http://patchwork.ozlabs.org/patch/732747/
 
-Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Signed-off-by: Wen Congyang <wencongyang@gmail.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
-Reviewed-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
----
- migration/colo.c | 26 ++++++++++++++++++++++++++
- qapi-schema.json | 25 +++++++++++++++++++++++++
- 2 files changed, 51 insertions(+)
-
-diff --git a/migration/colo.c b/migration/colo.c
-index 712308e..46bc84d 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -19,6 +19,8 @@
- #include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "migration/failover.h"
-+#include "replication.h"
-+#include "qmp-commands.h"
- 
- static bool vmstate_loading;
- 
-@@ -147,6 +149,30 @@ void colo_do_failover(MigrationState *s)
-     }
- }
- 
-+void qmp_xen_set_replication(bool enable, bool primary,
-+                             bool has_failover, bool failover,
-+                             Error **errp)
-+{
-+    ReplicationMode mode = primary ?
-+                           REPLICATION_MODE_PRIMARY :
-+                           REPLICATION_MODE_SECONDARY;
-+
-+    if (has_failover && enable) {
-+        error_setg(errp, "Parameter 'failover' is only for"
-+                   " stopping replication");
-+        return;
-+    }
-+
-+    if (enable) {
-+        replication_start_all(mode, errp);
-+    } else {
-+        if (!has_failover) {
-+            failover = NULL;
-+        }
-+        replication_stop_all(failover, failover ? NULL : errp);
-+    }
-+}
-+
- static void colo_send_message(QEMUFile *f, COLOMessage msg,
-                               Error **errp)
- {
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 150ee98..dbc1ebc 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -5990,6 +5990,31 @@
- { 'command': 'xen-load-devices-state', 'data': {'filename': 'str'} }
- 
- ##
-+# @xen-set-replication:
-+#
-+# Enable or disable replication.
-+#
-+# @enable: true to enable, false to disable.
-+#
-+# @primary: true for primary or false for secondary.
-+#
-+# @failover: #optional true to do failover, false to stop. but cannot be
-+#            specified if 'enable' is true. default value is false.
-+#
-+# Returns: nothing.
-+#
-+# Example:
-+#
-+# -> { "execute": "xen-set-replication",
-+#      "arguments": {"enable": true, "primary": false} }
-+# <- { "return": {} }
-+#
-+# Since: 2.9
-+##
-+{ 'command': 'xen-set-replication',
-+  'data': { 'enable': 'bool', 'primary': 'bool', '*failover' : 'bool' } }
-+
-+##
- # @GICCapability:
- #
- # The struct describes capability for a specific GIC (Generic
--- 
-1.9.1
+thanks
+-- PMM
