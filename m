@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cioWp-0006Eq-Eo
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:37:48 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cioWs-0006HP-Og
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:37:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cioWo-0007tv-0o
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:37:47 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cioWr-0007wi-LX
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:37:50 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 28 Feb 2017 21:36:22 +0100
-Message-Id: <1488314205-16264-24-git-send-email-kwolf@redhat.com>
+Date: Tue, 28 Feb 2017 21:36:27 +0100
+Message-Id: <1488314205-16264-29-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1488314205-16264-1-git-send-email-kwolf@redhat.com>
 References: <1488314205-16264-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 23/46] block: Add BdrvChildRole.get_parent_desc()
+Subject: [Qemu-devel] [PULL 28/46] commit: Use real permissions for HMP
+ 'commit'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,121 +23,86 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-For meaningful error messages in the permission system, we need to get
-some human-readable description of the parent of a BdrvChild.
+This is a little simpler than the commit block job because it's
+synchronous and only commits into the immediate backing file, but
+otherwise doing more or less the same.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Acked-by: Fam Zheng <famz@redhat.com>
 ---
- block.c                   |  9 +++++++++
- block/block-backend.c     | 21 +++++++++++++++++++++
- include/block/block_int.h |  6 ++++++
- 3 files changed, 36 insertions(+)
+ block/commit.c | 33 +++++++++++++++++++++++++++------
+ 1 file changed, 27 insertions(+), 6 deletions(-)
 
-diff --git a/block.c b/block.c
-index 5f2dd6f..e03cc5d 100644
---- a/block.c
-+++ b/block.c
-@@ -707,6 +707,12 @@ int bdrv_parse_cache_mode(const char *mode, int *flags, bool *writethrough)
-     return 0;
- }
- 
-+static char *bdrv_child_get_parent_desc(BdrvChild *c)
-+{
-+    BlockDriverState *parent = c->opaque;
-+    return g_strdup(bdrv_get_device_or_node_name(parent));
-+}
-+
- static void bdrv_child_cb_drained_begin(BdrvChild *child)
+diff --git a/block/commit.c b/block/commit.c
+index 8de4473..f18026b 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -401,11 +401,14 @@ fail:
+ int bdrv_commit(BlockDriverState *bs)
  {
-     BlockDriverState *bs = child->opaque;
-@@ -774,6 +780,7 @@ static void bdrv_inherited_options(int *child_flags, QDict *child_options,
- }
+     BlockBackend *src, *backing;
++    BlockDriverState *backing_file_bs = NULL;
++    BlockDriverState *commit_top_bs = NULL;
+     BlockDriver *drv = bs->drv;
+     int64_t sector, total_sectors, length, backing_length;
+     int n, ro, open_flags;
+     int ret = 0;
+     uint8_t *buf = NULL;
++    Error *local_err = NULL;
  
- const BdrvChildRole child_file = {
-+    .get_parent_desc = bdrv_child_get_parent_desc,
-     .inherit_options = bdrv_inherited_options,
-     .drained_begin   = bdrv_child_cb_drained_begin,
-     .drained_end     = bdrv_child_cb_drained_end,
-@@ -794,6 +801,7 @@ static void bdrv_inherited_fmt_options(int *child_flags, QDict *child_options,
- }
+     if (!drv)
+         return -ENOMEDIUM;
+@@ -428,17 +431,31 @@ int bdrv_commit(BlockDriverState *bs)
+         }
+     }
  
- const BdrvChildRole child_format = {
-+    .get_parent_desc = bdrv_child_get_parent_desc,
-     .inherit_options = bdrv_inherited_fmt_options,
-     .drained_begin   = bdrv_child_cb_drained_begin,
-     .drained_end     = bdrv_child_cb_drained_end,
-@@ -824,6 +832,7 @@ static void bdrv_backing_options(int *child_flags, QDict *child_options,
- }
+-    /* FIXME Use real permissions */
+-    src = blk_new(0, BLK_PERM_ALL);
+-    backing = blk_new(0, BLK_PERM_ALL);
++    src = blk_new(BLK_PERM_CONSISTENT_READ, BLK_PERM_ALL);
++    backing = blk_new(BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
  
- const BdrvChildRole child_backing = {
-+    .get_parent_desc = bdrv_child_get_parent_desc,
-     .inherit_options = bdrv_backing_options,
-     .drained_begin   = bdrv_child_cb_drained_begin,
-     .drained_end     = bdrv_child_cb_drained_end,
-diff --git a/block/block-backend.c b/block/block-backend.c
-index fcc42b5..38a3858 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -80,6 +80,7 @@ static const AIOCBInfo block_backend_aiocb_info = {
- 
- static void drive_info_del(DriveInfo *dinfo);
- static BlockBackend *bdrv_first_blk(BlockDriverState *bs);
-+static char *blk_get_attached_dev_id(BlockBackend *blk);
- 
- /* All BlockBackends */
- static QTAILQ_HEAD(, BlockBackend) block_backends =
-@@ -102,6 +103,25 @@ static void blk_root_drained_end(BdrvChild *child);
- static void blk_root_change_media(BdrvChild *child, bool load);
- static void blk_root_resize(BdrvChild *child);
- 
-+static char *blk_root_get_parent_desc(BdrvChild *child)
-+{
-+    BlockBackend *blk = child->opaque;
-+    char *dev_id;
-+
-+    if (blk->name) {
-+        return g_strdup(blk->name);
+-    ret = blk_insert_bs(src, bs, NULL);
++    ret = blk_insert_bs(src, bs, &local_err);
+     if (ret < 0) {
++        error_report_err(local_err);
++        goto ro_cleanup;
 +    }
 +
-+    dev_id = blk_get_attached_dev_id(blk);
-+    if (*dev_id) {
-+        return dev_id;
-+    } else {
-+        /* TODO Callback into the BB owner for something more detailed */
-+        g_free(dev_id);
-+        return g_strdup("a block device");
++    /* Insert commit_top block node above backing, so we can write to it */
++    backing_file_bs = backing_bs(bs);
++
++    commit_top_bs = bdrv_new_open_driver(&bdrv_commit_top, NULL, BDRV_O_RDWR,
++                                         &local_err);
++    if (commit_top_bs == NULL) {
++        error_report_err(local_err);
+         goto ro_cleanup;
+     }
+ 
+-    ret = blk_insert_bs(backing, bs->backing->bs, NULL);
++    bdrv_set_backing_hd(commit_top_bs, backing_file_bs);
++    bdrv_set_backing_hd(bs, commit_top_bs);
++
++    ret = blk_insert_bs(backing, backing_file_bs, &local_err);
+     if (ret < 0) {
++        error_report_err(local_err);
+         goto ro_cleanup;
+     }
+ 
+@@ -512,8 +529,12 @@ int bdrv_commit(BlockDriverState *bs)
+ ro_cleanup:
+     qemu_vfree(buf);
+ 
+-    blk_unref(src);
+     blk_unref(backing);
++    if (backing_file_bs) {
++        bdrv_set_backing_hd(bs, backing_file_bs);
 +    }
-+}
-+
- static const char *blk_root_get_name(BdrvChild *child)
- {
-     return blk_name(child->opaque);
-@@ -113,6 +133,7 @@ static const BdrvChildRole child_root = {
-     .change_media       = blk_root_change_media,
-     .resize             = blk_root_resize,
-     .get_name           = blk_root_get_name,
-+    .get_parent_desc    = blk_root_get_parent_desc,
++    bdrv_unref(commit_top_bs);
++    blk_unref(src);
  
-     .drained_begin      = blk_root_drained_begin,
-     .drained_end        = blk_root_drained_end,
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index e00d0f4..3177b9f 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -452,6 +452,12 @@ struct BdrvChildRole {
-      * name), or NULL if the parent can't provide a better name. */
-     const char* (*get_name)(BdrvChild *child);
- 
-+    /* Returns a malloced string that describes the parent of the child for a
-+     * human reader. This could be a node-name, BlockBackend name, qdev ID or
-+     * QOM path of the device owning the BlockBackend, job type and ID etc. The
-+     * caller is responsible for freeing the memory. */
-+    char* (*get_parent_desc)(BdrvChild *child);
-+
-     /*
-      * If this pair of functions is implemented, the parent doesn't issue new
-      * requests after returning from .drained_begin() until .drained_end() is
+     if (ro) {
+         /* ignoring error return here */
 -- 
 1.8.3.1
