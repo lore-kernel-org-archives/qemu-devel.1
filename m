@@ -1,41 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sam.bobroff@au1.ibm.com>) id 1ciXSz-0003pf-K5
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 21:24:42 -0500
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1ciXTV-0004BL-T2
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 21:25:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sam.bobroff@au1.ibm.com>) id 1ciXSw-0005Ua-W5
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 21:24:41 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35088
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sam.bobroff@au1.ibm.com>)
-	id 1ciXSw-0005Tw-Pw
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 21:24:38 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1S2IXdV054201
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 21:24:36 -0500
-Received: from e23smtp01.au.ibm.com (e23smtp01.au.ibm.com [202.81.31.143])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28vsx7pruf-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 27 Feb 2017 21:24:35 -0500
-Received: from localhost
-	by e23smtp01.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <sam.bobroff@au1.ibm.com>;
-	Tue, 28 Feb 2017 12:24:33 +1000
-Date: Tue, 28 Feb 2017 13:23:33 +1100
-From: Sam Bobroff <sam.bobroff@au1.ibm.com>
-References: <cover.1487829585.git.sam.bobroff@au1.ibm.com>
-	<983a6cd6c33f273c0bcb7cb6632a8c23626d9fda.1487829585.git.sam.bobroff@au1.ibm.com>
-	<20170224184629-mutt-send-email-mst@kernel.org>
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1ciXTS-0005bu-Mm
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 21:25:13 -0500
+Received: from [59.151.112.132] (port=49666 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1ciXTR-0005Xt-Mk
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 21:25:10 -0500
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Date: Tue, 28 Feb 2017 10:32:33 +0800
+Message-ID: <1488249153-25964-1-git-send-email-caoj.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170224184629-mutt-send-email-mst@kernel.org>
-Message-Id: <20170228022333.GA10490@tungsten.ozlabs.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 04/12] Move virtio_mmio.h to fix
- update-linux-headers.sh
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v4] vfio error recovery: kernel support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,61 +23,217 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, sjitindarsingh@gmail.com, david@gibson.dropbear.id.au
+To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org
+Cc: alex.williamson@redhat.com, izumi.taku@jp.fujitsu.com, "Michael S.
+	Tsirkin" <mst@redhat.com>
 
-On Fri, Feb 24, 2017 at 06:47:03PM +0200, Michael S. Tsirkin wrote:
-> On Thu, Feb 23, 2017 at 04:59:57PM +1100, Sam Bobroff wrote:
-> > Currently, running update-linux-headers.sh will produce a patch that
-> > deletes virtio_mmio.h, which is still needed. This happens because
-> > virtio_mmio.h is in the directory used to store headers from the linux
-> > kernel that are copied by the kernel's "make headers_install" target
-> > (used by the update script) but it is not one of the files in that
-> > set.
-> > 
-> > Fix this by moving that file into a new directory.
-> > 
-> > In the future if that file is added to the "headers_install" target
-> > then this change should be reverted.
-> > 
-> > Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
-> 
-> This is a temporary condition - I'm adding a patch exporting
-> this header for next linux. So I don't think we should merge this.
+From: "Michael S. Tsirkin" <mst@redhat.com>
 
-Great :-)
+0. What happens now (PCIE AER only)
+   Fatal errors cause a link reset.
+   Non fatal errors don't.
+   All errors stop the VM eventually, but not immediately
+   because it's detected and reported asynchronously.
+   Interrupts are forwarded as usual.
+   Correctable errors are not reported to guest at all.
+   Note: PPC EEH is different. This focuses on AER.
 
-I'll drop this patch from the next version.
+1. Correctable errors
+   There is no need to report these to guest. So let's not.
 
-Cheers,
-Sam.
+2. Fatal errors
+   It's not easy to handle them gracefully since link reset
+   is needed. As a first step, let's use the existing mechanism
+   in that case.
 
-> > ---
-> > v2:
-> > * FWIW, here's one way of fixing it.
-> > 
-> >  hw/virtio/virtio-mmio.c                                          | 2 +-
-> >  include/{standard-headers => kernel-headers}/linux/virtio_mmio.h | 0
-> >  2 files changed, 1 insertion(+), 1 deletion(-)
-> >  rename include/{standard-headers => kernel-headers}/linux/virtio_mmio.h (100%)
-> > 
-> > diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
-> > index 5807aa87fe..cc6afa9da1 100644
-> > --- a/hw/virtio/virtio-mmio.c
-> > +++ b/hw/virtio/virtio-mmio.c
-> > @@ -20,7 +20,7 @@
-> >   */
-> >  
-> >  #include "qemu/osdep.h"
-> > -#include "standard-headers/linux/virtio_mmio.h"
-> > +#include "kernel-headers/linux/virtio_mmio.h"
-> >  #include "hw/sysbus.h"
-> >  #include "hw/virtio/virtio.h"
-> >  #include "qemu/host-utils.h"
-> > diff --git a/include/standard-headers/linux/virtio_mmio.h b/include/kernel-headers/linux/virtio_mmio.h
-> > similarity index 100%
-> > rename from include/standard-headers/linux/virtio_mmio.h
-> > rename to include/kernel-headers/linux/virtio_mmio.h
-> > -- 
-> > 2.11.0
-> > 
+2. Non-fatal errors
+   Here we could make progress by reporting them to guest
+   and have guest handle them.
+
+   Issues:
+   a. this behaviour should only be enabled with new userspace,
+      old userspace should work without changes.
+
+      Suggestion: One way to address this would be to add a new eventfd
+      non_fatal_err_trigger. If not set, invoke err_trigger.
+
+   b. drivers are supposed to stop MMIO when error is reported,
+      if vm keeps going, we will keep doing MMIO/config.
+
+      Suggestion 1: ignore this. vm stop happens much later when
+      userspace runs anyway, so we are not making things much worse.
+
+      Suggestion 2: try to stop MMIO/config, resume on resume call
+
+      Patch below implements Suggestion 1.
+
+      Note that although this is really against the documentation, which
+      states error_detected() is the point at which the driver should quiesce
+      the device and not touch it further (until diagnostic poking at
+      mmio_enabled or full access at resume callback).
+
+      Fixing this won't be easy. However, this is not a regression.
+
+      Also note this does nothing about interrupts, documentation
+      suggests returning IRQ_NONE until reset.
+      Again, not a regression.
+
+   c. PF driver might detect that function is completely broken,
+      if vm keeps going, we will keep doing MMIO/config.
+
+      Suggestion 1: ignore this. vm stop happens much later when
+      userspace runs anyway, so we are not making things much worse.
+
+      Suggestion 2: detect this and invoke err_trigger to stop VM.
+
+      Patch below implements Suggestion 2.
+
+Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+---
+Inherit from MST's v3.
+v4 changelog:
+1. Tiny modification on commit message.
+2. Remove unrelated virtio code.
+3. VFIO_DEVICE_SET_IRQS process for VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX
+
+ drivers/vfio/pci/vfio_pci.c         | 38 +++++++++++++++++++++++++++++++++++--
+ drivers/vfio/pci/vfio_pci_intrs.c   | 19 +++++++++++++++++++
+ drivers/vfio/pci/vfio_pci_private.h |  1 +
+ include/uapi/linux/vfio.h           |  1 +
+ 4 files changed, 57 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index 324c52e..3551cc9 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -441,7 +441,8 @@ static int vfio_pci_get_irq_count(struct vfio_pci_device *vdev, int irq_type)
+ 
+ 			return (flags & PCI_MSIX_FLAGS_QSIZE) + 1;
+ 		}
+-	} else if (irq_type == VFIO_PCI_ERR_IRQ_INDEX) {
++	} else if (irq_type == VFIO_PCI_ERR_IRQ_INDEX ||
++		   irq_type == VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX) {
+ 		if (pci_is_pcie(vdev->pdev))
+ 			return 1;
+ 	} else if (irq_type == VFIO_PCI_REQ_IRQ_INDEX) {
+@@ -796,6 +797,7 @@ static long vfio_pci_ioctl(void *device_data,
+ 		case VFIO_PCI_REQ_IRQ_INDEX:
+ 			break;
+ 		case VFIO_PCI_ERR_IRQ_INDEX:
++		case VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX:
+ 			if (pci_is_pcie(vdev->pdev))
+ 				break;
+ 		/* pass thru to return error */
+@@ -1282,7 +1284,9 @@ static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
+ 
+ 	mutex_lock(&vdev->igate);
+ 
+-	if (vdev->err_trigger)
++	if (state == pci_channel_io_normal && vdev->non_fatal_err_trigger)
++		eventfd_signal(vdev->non_fatal_err_trigger, 1);
++	else if (vdev->err_trigger)
+ 		eventfd_signal(vdev->err_trigger, 1);
+ 
+ 	mutex_unlock(&vdev->igate);
+@@ -1292,8 +1296,38 @@ static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
+ 	return PCI_ERS_RESULT_CAN_RECOVER;
+ }
+ 
++static pci_ers_result_t vfio_pci_aer_slot_reset(struct pci_dev *pdev)
++{
++	struct vfio_pci_device *vdev;
++	struct vfio_device *device;
++	static pci_ers_result_t err = PCI_ERS_RESULT_NONE;
++
++	device = vfio_device_get_from_dev(&pdev->dev);
++	if (!device)
++		goto err_dev;
++
++	vdev = vfio_device_data(device);
++	if (!vdev)
++		goto err_data;
++
++	mutex_lock(&vdev->igate);
++
++	if (vdev->err_trigger)
++		eventfd_signal(vdev->err_trigger, 1);
++
++	mutex_unlock(&vdev->igate);
++
++	err = PCI_ERS_RESULT_RECOVERED;
++
++err_data:
++	vfio_device_put(device);
++err_dev:
++	return err;
++}
++
+ static const struct pci_error_handlers vfio_err_handlers = {
+ 	.error_detected = vfio_pci_aer_err_detected,
++	.slot_reset = vfio_pci_aer_slot_reset,
+ };
+ 
+ static struct pci_driver vfio_pci_driver = {
+diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
+index 1c46045..270d568 100644
+--- a/drivers/vfio/pci/vfio_pci_intrs.c
++++ b/drivers/vfio/pci/vfio_pci_intrs.c
+@@ -611,6 +611,17 @@ static int vfio_pci_set_err_trigger(struct vfio_pci_device *vdev,
+ 					       count, flags, data);
+ }
+ 
++static int vfio_pci_set_non_fatal_err_trigger(struct vfio_pci_device *vdev,
++				    unsigned index, unsigned start,
++				    unsigned count, uint32_t flags, void *data)
++{
++	if (index != VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX || start != 0 || count > 1)
++		return -EINVAL;
++
++	return vfio_pci_set_ctx_trigger_single(&vdev->non_fatal_err_trigger,
++					       count, flags, data);
++}
++
+ static int vfio_pci_set_req_trigger(struct vfio_pci_device *vdev,
+ 				    unsigned index, unsigned start,
+ 				    unsigned count, uint32_t flags, void *data)
+@@ -664,6 +675,14 @@ int vfio_pci_set_irqs_ioctl(struct vfio_pci_device *vdev, uint32_t flags,
+ 			break;
+ 		}
+ 		break;
++	case VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX:
++		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
++		case VFIO_IRQ_SET_ACTION_TRIGGER:
++			if (pci_is_pcie(vdev->pdev))
++				func = vfio_pci_set_non_fatal_err_trigger;
++			break;
++		}
++		break;
+ 	case VFIO_PCI_REQ_IRQ_INDEX:
+ 		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
+ 		case VFIO_IRQ_SET_ACTION_TRIGGER:
+diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
+index f561ac1..d30f8a3 100644
+--- a/drivers/vfio/pci/vfio_pci_private.h
++++ b/drivers/vfio/pci/vfio_pci_private.h
+@@ -93,6 +93,7 @@ struct vfio_pci_device {
+ 	struct pci_saved_state	*pci_saved_state;
+ 	int			refcnt;
+ 	struct eventfd_ctx	*err_trigger;
++	struct eventfd_ctx	*non_fatal_err_trigger;
+ 	struct eventfd_ctx	*req_trigger;
+ 	struct list_head	dummy_resources_list;
+ };
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index 519eff3..affa973 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -443,6 +443,7 @@ enum {
+ 	VFIO_PCI_MSIX_IRQ_INDEX,
+ 	VFIO_PCI_ERR_IRQ_INDEX,
+ 	VFIO_PCI_REQ_IRQ_INDEX,
++	VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX,
+ 	VFIO_PCI_NUM_IRQS
+ };
+ 
+-- 
+1.8.3.1
