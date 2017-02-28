@@ -1,21 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciXqI-0002O5-Ni
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 21:48:47 -0500
+	(envelope-from <jasowang@redhat.com>) id 1ciYFa-0006VH-L2
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 22:14:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciXqH-0003cd-R1
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 21:48:46 -0500
-Date: Tue, 28 Feb 2017 13:00:46 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170228020046.GN17615@umbus.fritz.box>
-References: <1488205773-30436-1-git-send-email-clg@kaod.org>
-	<1488205773-30436-3-git-send-email-clg@kaod.org>
+	(envelope-from <jasowang@redhat.com>) id 1ciYFX-0001bP-Gh
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 22:14:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56752)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1ciYFX-0001bJ-9H
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 22:14:51 -0500
+References: <1487735198-127300-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1487735198-127300-3-git-send-email-zhang.zhanghailiang@huawei.com>
+	<b0b04c02-7c97-ea04-1e38-99fd9344edae@redhat.com>
+	<58AD4F8F.5030703@huawei.com> <58AD5125.4010306@huawei.com>
+	<b792c68e-d67a-ac24-26ea-aaf24f1f9437@redhat.com>
+	<58B398F8.1020205@huawei.com>
+	<c7883f1d-99ed-d082-3eee-7e0c641257e6@redhat.com>
+	<58B3A688.5040707@huawei.com>
+	<3196d413-e99a-561a-310d-4d2fa93559d9@redhat.com>
+	<58B3CCFE.5070909@huawei.com>
+	<562f8a27-63dc-6be8-ca2d-cf91c1ce4fe8@redhat.com>
+	<58B3FFA7.2040205@huawei.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <b2335213-5214-39ba-2c7e-7759577d1735@redhat.com>
+Date: Tue, 28 Feb 2017 11:14:44 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="nTz/38/ObklNZF0h"
-Content-Disposition: inline
-In-Reply-To: <1488205773-30436-3-git-send-email-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v4 02/26] ppc/xics: fix ICP and ICS reset
+In-Reply-To: <58B3FFA7.2040205@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] filter-rewriter: fix memory leak
+ for connection in connection_track_table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,86 +38,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>, zhangchen.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com
+Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, pss.wulizhen@huawei.com
 
 
---nTz/38/ObklNZF0h
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 27, 2017 at 03:29:09PM +0100, C=E9dric Le Goater wrote:
-> commit 5b17c7207938 ("xics: XICS should not be a SysBusDevice")
-> changed the nature of the XICS object to be a descendent of
-> TYPE_DEVICE. By doing so, the object is not on a bus and its reset
-> handler is not called anymore. The direct consequence is that the ICP
-> and ICS objects are not correctly initialized and so the IRQ subsystem
-> is broken in the guest.
->=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+On 2017=E5=B9=B402=E6=9C=8827=E6=97=A5 18:29, Hailiang Zhang wrote:
+> On 2017/2/27 17:05, Jason Wang wrote:
+>>
+>>
+>> On 2017=E5=B9=B402=E6=9C=8827=E6=97=A5 14:53, Hailiang Zhang wrote:
+>>>> I think the issue is that your code can not differ A from B.
+>>>>
+>>>
+>>> We have a parameter 'fin_ack_seq' recording the sequence of
+>>> 'FIN=3D1,ACK=3D1,seq=3Dw,ack=3Du+1' and if the ack value from the opp=
+osite
+>>> side is is 'w+1', we can consider this connection is closed, no ?
+>>
+>
+> Hi Jason,
+>
+> Thanks very much for your patience.
+>
+>> Let's see what happens, consider VM is doing active close (reuse the
+>> figure above):
+>>
+>
+> (We didn't support tracking the connection start
+> by the VM in current rewriter codes.
+> I mean the Client side is VM).
 
-I've merged 1&2 into my tree, but folded together.  First, I don't
-want to break bisects, second you reference an explicit commit above,
-which would have been made incorrect by rebases of the first patch.
+So the questions are still there:
 
-> ---
->  hw/ppc/spapr.c        | 1 +
->  include/hw/ppc/xics.h | 2 +-
->  2 files changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index ceefbb57d0ac..3c79068075e4 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -104,6 +104,7 @@ static XICSState *try_create_xics(const char *type, i=
-nt nr_servers,
->      dev =3D DEVICE(object_new(type));
->      qdev_prop_set_uint32(dev, "nr_servers", nr_servers);
->      qdev_prop_set_uint32(dev, "nr_irqs", nr_irqs);
-> +    qdev_set_parent_bus(dev, sysbus_get_default());
->      object_property_set_bool(OBJECT(dev), true, "realized", &err);
->      if (err) {
->          error_propagate(errp, err);
-> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-> index 3f0c31610aa4..1aefd3d52257 100644
-> --- a/include/hw/ppc/xics.h
-> +++ b/include/hw/ppc/xics.h
-> @@ -80,7 +80,7 @@ struct XICSStateClass {
-> =20
->  struct XICSState {
->      /*< private >*/
-> -    SysBusDevice parent_obj;
-> +    DeviceState parent_obj;
->      /*< public >*/
->      uint32_t nr_servers;
->      uint32_t nr_irqs;
+1) Can this patch knows whether or not the connection is started by VM?=20
+If yes, any specific reason to do this?
+2) Even if it only support VM as server, server can still do active=20
+close for many reasons. What if VM send FIN first?
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+>
+> Your figure is not quite correct, the process should be:
+>                                           (VM)
+> Client:                                    Server:
+>
+> ESTABLISHED|                               |
+>            | -> FIN=3D1,seq=3Du   ->           |
+> FIN_WAIT_1 |                               |
+>            | <- ACK=3D1,seq=3Dv,ack=3Du+1 <-     |
+> FINA_WAIT_2|                               |CLOSE_WAIT
+>            | <- FIN=3D1,ACK=3D1,seq=3Dw,ack=3Du+1<-|
+> handle_secondary():
+> fin_ack_seq =3D w
+> tcp_state =3D TCPS_LAST_ACK
+>
+>            |                               |LAST+ACK
+>            |   -> ACK=3D1,seq=3Du+1,ack=3Dw+1    |
+> TIME_WAIT  |                               |CLOSED
+> CLOSED     |                               |
+>
+> handle_primary():
+> if (ack =3D fin_ack_seq + 1)
+>    g_hash_table_remove()
 
---nTz/38/ObklNZF0h
-Content-Type: application/pgp-signature; name="signature.asc"
+Yes, that's what I said. The code looks correct for passive close.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+Thanks
 
-iQIcBAEBCAAGBQJYtNnLAAoJEGw4ysog2bOSRfMQAJlwfKq1zxPytsQj6LNQqsfa
-YTGyIUaZeLjL6ZPYdD+FRebU1hdgp3sS7BDu0LwVTfFKnjwvAawlXUpDNPeN2qPU
-soYQCe2plRV90BQi2Z1jr9ztCiZCqwQcjcZ12G9anvS3X+VqNoiKqxhypO0rele8
-1g1l6ZRTw+InFWX0A4V0M+0/c5IRYYeIhcc6r6+euYM56B8M9aAPPXah9r1otQrw
-CUnbthYEAoeKnxneWtFdMtJuMVQjEdIBRZEISo90YJm4eFAqTSUgYX6aHi+TJ+CR
-XvJLpbwDJczQafOjxT1O6/RsNUqyhTB7Nyd6RDMkUEMtyJZV5M5HRvP6/A0H9HDs
-aT+LmCLS6eYFx6konkQtcotZWBpMGzwWMrlSmd7p75xU4xZdhusADkTBTYRn8mOS
-+p/YzsaIPNHEbqXjbKteFwa6T2ooQbivNdx1WyuTCaOmRB3x5crE5ZrdirPhNPR/
-XrLrbYr8VZWdoRfFg9HNiMa50MBZ37KgfudSYrTwDNaHYjIrzz1ZdhoeqE3NkVvU
-6uJLbUSy+kweCseupFkQR5YixOQBuvEJIO8BqhvwP5I/zPTav2NqSp3p0SVGGLxN
-0nY6OlwhU6M1Oho1UYTYxpXowaksPD4ZhkWyjyaO5i3w+KNeoWN3h1pu1TJZkTNb
-o9wBvSYL47yEYSTfGYBy
-=DYoy
------END PGP SIGNATURE-----
-
---nTz/38/ObklNZF0h--
+>
+>> (VM)
+>> Client:                                    Server:
+>>
+>> ESTABLISHED|                               |
+>>              | -> FIN=3D1,seq=3Du   ->           |
+>>
+>> handle_secondary():
+>> fin_ack_seq =3D u
+>> tcp_state =3D TCPS_LAST_ACK
+>>
+>> FIN_WAIT_1 |                               |
+>>              | <- ACK=3D1,seq=3Dv,ack=3Du+1 <-     |
+>>
+>> handle_primary():
+>> fin_ack_seq =3D ack + 1
+>> g_hash_table_remove()
+>>
+>> But we probably want it to be removed in TIME_WAIT_CLOSED.
+>>
+>
+> Yes, we should removed it after 2MSL, because the last
+> the sever side may not get the 'ACK=3D1,seq=3Dv,ack=3Du+1' packet,
+> and it will resend the 'FIN=3D1,ACK=3D1,seq=3Dw,ack=3Du+1'.
+>
+> Thanks.
+>
+>
+>> Thanks
+>>
+>> .
+>>
+>
+>
