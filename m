@@ -1,16 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cijK7-0000wN-KR
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:04:20 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cijKu-0001bP-Um
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:05:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cijK3-0001Pl-Mo
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:04:19 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Feb 2017 14:55:09 +0000
-Message-Id: <1488293711-14195-3-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1488293711-14195-1-git-send-email-peter.maydell@linaro.org>
-References: <1488293711-14195-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 2/4] hw/sd: add card-reparenting function
+	(envelope-from <mreitz@redhat.com>) id 1cijKp-0001a6-5P
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:05:08 -0500
+References: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
+	<1488286469-9381-12-git-send-email-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <93c80e10-e1a0-d8a9-d30e-0ccefed70ae6@redhat.com>
+Date: Tue, 28 Feb 2017 16:04:53 +0100
+MIME-Version: 1.0
+In-Reply-To: <1488286469-9381-12-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Ejt7BMCnfg5ReVLa3ET0BHlTv2vT0akU3"
+Subject: Re: [Qemu-devel] [PATCH v3 11/44] block: Request real permissions
+ in bdrv_attach_child()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,87 +25,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Clement Deschamps <clement.deschamps@antfield.fr>, Paolo Bonzini <pbonzini@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-From: Clement Deschamps <clement.deschamps@antfield.fr>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Ejt7BMCnfg5ReVLa3ET0BHlTv2vT0akU3
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+Message-ID: <93c80e10-e1a0-d8a9-d30e-0ccefed70ae6@redhat.com>
+Subject: Re: [PATCH v3 11/44] block: Request real permissions in
+ bdrv_attach_child()
+References: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
+ <1488286469-9381-12-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1488286469-9381-12-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-Provide a new function sdbus_reparent_card() in sd core for reparenting
-a card from a SDBus to another one.
+On 28.02.2017 13:53, Kevin Wolf wrote:
+> Now that all block drivers with children tell us what permissions they
+> need from each of their children, bdrv_attach_child() can use this
+> information and make the right requirements while trying to attach new
+> children.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
 
-This function is required by the raspi platform, where the two SD
-controllers can be dynamically switched.
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-Signed-off-by: Clement Deschamps <clement.deschamps@antfield.fr>
-Message-id: 20170224164021.9066-3-clement.deschamps@antfield.fr
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-[PMM: added a doc comment to the header file; changed to
- use new behaviour of qdev_set_parent_bus()]
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- include/hw/sd/sd.h | 11 +++++++++++
- hw/sd/core.c       | 27 +++++++++++++++++++++++++++
- 2 files changed, 38 insertions(+)
 
-diff --git a/include/hw/sd/sd.h b/include/hw/sd/sd.h
-index 79909b2..96caefe 100644
---- a/include/hw/sd/sd.h
-+++ b/include/hw/sd/sd.h
-@@ -140,6 +140,17 @@ uint8_t sdbus_read_data(SDBus *sd);
- bool sdbus_data_ready(SDBus *sd);
- bool sdbus_get_inserted(SDBus *sd);
- bool sdbus_get_readonly(SDBus *sd);
-+/**
-+ * sdbus_reparent_card: Reparent an SD card from one controller to another
-+ * @from: controller bus to remove card from
-+ * @to: controller bus to move card to
-+ *
-+ * Reparent an SD card, effectively unplugging it from one controller
-+ * and inserting it into another. This is useful for SoCs like the
-+ * bcm2835 which have two SD controllers and connect a single SD card
-+ * to them, selected by the guest reprogramming GPIO line routing.
-+ */
-+void sdbus_reparent_card(SDBus *from, SDBus *to);
- 
- /* Functions to be used by SD devices to report back to qdevified controllers */
- void sdbus_set_inserted(SDBus *sd, bool inserted);
-diff --git a/hw/sd/core.c b/hw/sd/core.c
-index 14c2bdf..295dc44 100644
---- a/hw/sd/core.c
-+++ b/hw/sd/core.c
-@@ -131,6 +131,33 @@ void sdbus_set_readonly(SDBus *sdbus, bool readonly)
-     }
- }
- 
-+void sdbus_reparent_card(SDBus *from, SDBus *to)
-+{
-+    SDState *card = get_card(from);
-+    SDCardClass *sc;
-+    bool readonly;
-+
-+    /* We directly reparent the card object rather than implementing this
-+     * as a hotpluggable connection because we don't want to expose SD cards
-+     * to users as being hotpluggable, and we can get away with it in this
-+     * limited use case. This could perhaps be implemented more cleanly in
-+     * future by adding support to the hotplug infrastructure for "device
-+     * can be hotplugged only via code, not by user".
-+     */
-+
-+    if (!card) {
-+        return;
-+    }
-+
-+    sc = SD_CARD_GET_CLASS(card);
-+    readonly = sc->get_readonly(card);
-+
-+    sdbus_set_inserted(from, false);
-+    qdev_set_parent_bus(DEVICE(card), &to->qbus);
-+    sdbus_set_inserted(to, true);
-+    sdbus_set_readonly(to, readonly);
-+}
-+
- static const TypeInfo sd_bus_info = {
-     .name = TYPE_SD_BUS,
-     .parent = TYPE_BUS,
--- 
-2.7.4
+--Ejt7BMCnfg5ReVLa3ET0BHlTv2vT0akU3
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAli1kZUSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AU5sH/2ZdSUklrjZvlXLEkom/3UWld00/4+Yq
+aUET2+yqE1MP656klQI7uSyE31/7c7x4/sPLr3CiNc4aKEnvDQ2/ZGEncjGmKwPe
+ZfUJ0xL/WcXG7YCSsocpKr8IoHkgZtR6fyZUsbPKH02VX/iU4ylnaP7jxrOB3yaw
+S7fEKWagKrmc5M/asq4rpqiRAvIujh1AUxtxybl9PCiwlt6+VWYpbtO0A/ZMcPsX
+Z1xeWL0kKdrP+ZnsrHD9fXKrUgy+PGQSZsKvJdaNDG6KnoGJNGKCb5i4SvI2WedI
+3ID9ychFFHrHL7B6tyb9RbiRmSzT1qwHnFFU5+IL2MsUbQoiokzKN2o=
+=gHRb
+-----END PGP SIGNATURE-----
+
+--Ejt7BMCnfg5ReVLa3ET0BHlTv2vT0akU3--
