@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cigtz-0002TU-QT
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:29:13 -0500
+	(envelope-from <jcody@redhat.com>) id 1cigzd-0005jG-9v
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:35:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cigtx-0004RY-T4
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:29:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38088)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cigtx-0004RF-KZ
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:29:09 -0500
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Tue, 28 Feb 2017 12:29:00 +0000
-Message-Id: <20170228122901.24520-2-berrange@redhat.com>
-In-Reply-To: <20170228122901.24520-1-berrange@redhat.com>
-References: <20170228122901.24520-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/2] makefile: merge GENERATED_HEADERS &
- GENERATED_SOURCES variables
+	(envelope-from <jcody@redhat.com>) id 1cigzc-0005Xj-5O
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:35:01 -0500
+Date: Tue, 28 Feb 2017 07:34:52 -0500
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170228123452.GQ25637@localhost.localdomain>
+References: <cover.1488220970.git.jcody@redhat.com>
+	<12a16b28300f871052a49897ec7875a082fc63e3.1488220970.git.jcody@redhat.com>
+	<c5869fe5-fa51-3f2f-26d6-26a733c15493@redhat.com>
+	<20170228035744.GO25637@localhost.localdomain>
+	<20170228101651.GE2762@redhat.com>
+	<20170228102849.GF2762@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170228102849.GF2762@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] block/rbd: add support for
+ 'mon_host', 'auth_supported' via QAPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,147 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Markus Armbruster <armbru@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com
 
-The only functional difference between the GENERATED_HEADERS
-and GENERATED_SOURCES variables is that 'Makefile' has a
-dependancy on GENERATED_HEADERS, causing generated header files
-to be created immediatey at the start of the build process.
-There is no reason why this early creation should be restricted
-to the .h files, and not include .c files too. Merge both of
-the variables into a single GENERATED_FILES variable to make
-it clear it is for any type of generated file.
+On Tue, Feb 28, 2017 at 10:28:49AM +0000, Daniel P. Berrange wrote:
+> On Tue, Feb 28, 2017 at 10:16:51AM +0000, Daniel P. Berrange wrote:
+> > On Mon, Feb 27, 2017 at 10:57:44PM -0500, Jeff Cody wrote:
+> > > On Mon, Feb 27, 2017 at 04:47:54PM -0600, Eric Blake wrote:
+> > > > On 02/27/2017 12:58 PM, Jeff Cody wrote:
+> > > > > @@ -604,6 +620,29 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+> > > > >          goto failed_shutdown;
+> > > > >      }
+> > > > >  
+> > > > > +    /* if mon_host was specified */
+> > > > > +    if (host) {
+> > > > > +        const char *hostname = host;
+> > > > > +        char *mon_host = NULL;
+> > > > > +
+> > > > > +        if (port) {
+> > > > > +            mon_host = g_strdup_printf("%s:%s", host, port);
+> > > > 
+> > > > Does Ceph care about IPv6 (in which case you may need [host]:port when
+> > > > host itself includes ':')?
+> > > >
+> > > 
+> > > Some quick sanity testing seems to show that it does not need [] for ipv6
+> > > addresses, which is nice.
+> > 
+> > Hmm, that is very odd to me, as that means parsing is ambiguous. The
+> > ceph 'mon_host' option allows the port to be omitted, so given a
+> > string  2001:242:24:23   there's no way of knowing whether it is
+> > a IPv6 addr 2001:242:24:23, with no port, or an addr 2001:242:24 with
+> > port of 23
+> 
+> Looking at the source code to ceph it appears that if you omit the
+> use of [], then it will treat the entire string as being the address
+> without port. It does look to support use of [], so we should use
+> that IIUC.
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- Makefile                   | 35 +++++++++++++++++------------------
- Makefile.target            |  6 +++---
- target/s390x/Makefile.objs |  2 +-
- tests/Makefile.include     |  2 +-
- 4 files changed, 22 insertions(+), 23 deletions(-)
+For the sake of clarity, when you say we should use [] for ipv6, you mean
+QEMU (rather than doing it in libvirt)?
+> 
+> https://blog.widodh.nl/2014/11/ceph-with-a-cluster-and-public-network-on-ipv6/
+> 
+> See also entity_addr_t::parse in $CEPH/src/msg/msg_types.cc which is
+> what I think parses the mon addr. NB, I've not tested this yet, so
+> if you have a live ceph cluster with ipv6, it'd be good to verify that
+> using [] is correct.
+>
 
-diff --git a/Makefile b/Makefile
-index 1c4c04f..a8024c0 100644
---- a/Makefile
-+++ b/Makefile
-@@ -50,24 +50,24 @@ endif
- 
- include $(SRC_PATH)/rules.mak
- 
--GENERATED_HEADERS = qemu-version.h config-host.h qemu-options.def
--GENERATED_HEADERS += qmp-commands.h qapi-types.h qapi-visit.h qapi-event.h
--GENERATED_SOURCES += qmp-marshal.c qapi-types.c qapi-visit.c qapi-event.c
--GENERATED_HEADERS += qmp-introspect.h
--GENERATED_SOURCES += qmp-introspect.c
-+GENERATED_FILES = qemu-version.h config-host.h qemu-options.def
-+GENERATED_FILES += qmp-commands.h qapi-types.h qapi-visit.h qapi-event.h
-+GENERATED_FILES += qmp-marshal.c qapi-types.c qapi-visit.c qapi-event.c
-+GENERATED_FILES += qmp-introspect.h
-+GENERATED_FILES += qmp-introspect.c
- 
--GENERATED_HEADERS += trace/generated-tcg-tracers.h
-+GENERATED_FILES += trace/generated-tcg-tracers.h
- 
--GENERATED_HEADERS += trace/generated-helpers-wrappers.h
--GENERATED_HEADERS += trace/generated-helpers.h
--GENERATED_SOURCES += trace/generated-helpers.c
-+GENERATED_FILES += trace/generated-helpers-wrappers.h
-+GENERATED_FILES += trace/generated-helpers.h
-+GENERATED_FILES += trace/generated-helpers.c
- 
- ifdef CONFIG_TRACE_UST
--GENERATED_HEADERS += trace-ust-all.h
--GENERATED_SOURCES += trace-ust-all.c
-+GENERATED_FILES += trace-ust-all.h
-+GENERATED_FILES += trace-ust-all.c
- endif
- 
--GENERATED_HEADERS += module_block.h
-+GENERATED_FILES += module_block.h
- 
- TRACE_HEADERS = trace-root.h $(trace-events-subdirs:%=%/trace.h)
- TRACE_SOURCES = trace-root.c $(trace-events-subdirs:%=%/trace.c)
-@@ -80,8 +80,8 @@ ifdef CONFIG_TRACE_UST
- TRACE_HEADERS += trace-ust-root.h $(trace-events-subdirs:%=%/trace-ust.h)
- endif
- 
--GENERATED_HEADERS += $(TRACE_HEADERS)
--GENERATED_SOURCES += $(TRACE_SOURCES)
-+GENERATED_FILES += $(TRACE_HEADERS)
-+GENERATED_FILES += $(TRACE_SOURCES)
- 
- trace-group-name = $(shell dirname $1 | sed -e 's/[^a-zA-Z0-9]/_/g')
- 
-@@ -485,11 +485,10 @@ clean:
- 	rm -f fsdev/*.pod
- 	rm -f qemu-img-cmds.h
- 	rm -f ui/shader/*-vert.h ui/shader/*-frag.h
--	@# May not be present in GENERATED_HEADERS
-+	@# May not be present in GENERATED_FILES
- 	rm -f trace/generated-tracers-dtrace.dtrace*
- 	rm -f trace/generated-tracers-dtrace.h*
--	rm -f $(foreach f,$(GENERATED_HEADERS),$(f) $(f)-timestamp)
--	rm -f $(foreach f,$(GENERATED_SOURCES),$(f) $(f)-timestamp)
-+	rm -f $(foreach f,$(GENERATED_FILES),$(f) $(f)-timestamp)
- 	rm -rf qapi-generated
- 	rm -rf qga/qapi-generated
- 	for d in $(ALL_SUBDIRS); do \
-@@ -784,7 +783,7 @@ endif # CONFIG_WIN
- # Add a dependency on the generated files, so that they are always
- # rebuilt before other object files
- ifneq ($(filter-out $(UNCHECKED_GOALS),$(MAKECMDGOALS)),$(if $(MAKECMDGOALS),,fail))
--Makefile: $(GENERATED_HEADERS)
-+Makefile: $(GENERATED_FILES)
- endif
- 
- .SECONDARY: $(TRACE_HEADERS) $(TRACE_HEADERS:%=%-timestamp) \
-diff --git a/Makefile.target b/Makefile.target
-index 924304c..7df2b8c 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -162,7 +162,7 @@ else
- obj-y += hw/$(TARGET_BASE_ARCH)/
- endif
- 
--GENERATED_HEADERS += hmp-commands.h hmp-commands-info.h
-+GENERATED_FILES += hmp-commands.h hmp-commands-info.h
- 
- endif # CONFIG_SOFTMMU
- 
-@@ -238,5 +238,5 @@ ifdef CONFIG_TRACE_SYSTEMTAP
- 	$(INSTALL_DATA) $(QEMU_PROG)-simpletrace.stp "$(DESTDIR)$(qemu_datadir)/../systemtap/tapset/$(QEMU_PROG)-simpletrace.stp"
- endif
- 
--GENERATED_HEADERS += config-target.h
--Makefile: $(GENERATED_HEADERS)
-+GENERATED_FILES += config-target.h
-+Makefile: $(GENERATED_FILES)
-diff --git a/target/s390x/Makefile.objs b/target/s390x/Makefile.objs
-index c573633..46f6a8c 100644
---- a/target/s390x/Makefile.objs
-+++ b/target/s390x/Makefile.objs
-@@ -8,7 +8,7 @@ obj-$(CONFIG_KVM) += kvm.o
- feat-src = $(SRC_PATH)/target/$(TARGET_BASE_ARCH)/
- feat-dst = $(BUILD_DIR)/$(TARGET_DIR)
- ifneq ($(MAKECMDGOALS),clean)
--GENERATED_HEADERS += $(feat-dst)gen-features.h
-+GENERATED_FILES += $(feat-dst)gen-features.h
- endif
- 
- $(feat-dst)gen-features.h: $(feat-dst)gen-features.h-timestamp
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index e60bb6c..8cca626 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -478,7 +478,7 @@ qapi-schema += unknown-expr-key.json
- 
- check-qapi-schema-y := $(addprefix tests/qapi-schema/, $(qapi-schema))
- 
--GENERATED_HEADERS += tests/test-qapi-types.h tests/test-qapi-visit.h \
-+GENERATED_FILES += tests/test-qapi-types.h tests/test-qapi-visit.h \
- 	tests/test-qmp-commands.h tests/test-qapi-event.h \
- 	tests/test-qmp-introspect.h
- 
--- 
-2.9.3
+Do you think this needs to be in place before either A) we pull the series
+for softfreeze, or B) 2.10?  I.e., is this something we can fix up later?
+It is OK if not, but I have a flight leaving soon and can't work on the
+series anymore -- so depending on this and how v3 review goes, we may just
+need to slip the series to 2.10.
