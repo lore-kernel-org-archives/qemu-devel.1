@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45055)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cioWd-00064T-Ba
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:37:36 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cioWY-0005zV-JS
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:37:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cioWc-0007qH-0p
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:37:35 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cioWX-0007oW-7V
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:37:30 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 28 Feb 2017 21:36:18 +0100
-Message-Id: <1488314205-16264-20-git-send-email-kwolf@redhat.com>
+Date: Tue, 28 Feb 2017 21:36:16 +0100
+Message-Id: <1488314205-16264-18-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1488314205-16264-1-git-send-email-kwolf@redhat.com>
 References: <1488314205-16264-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 19/46] block: Allow error return in
- BlockDevOps.change_media_cb()
+Subject: [Qemu-devel] [PULL 17/46] block: Add BDRV_O_RESIZE for
+ blk_new_open()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,214 +23,208 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-Some devices allow a media change between read-only and read-write
-media. They need to adapt the permissions in their .change_media_cb()
-implementation, which can fail. So add an Error parameter to the
-function.
+blk_new_open() is a convenience function that processes flags rather
+than QDict options as a simple way to just open an image file.
+
+In order to keep it convenient in the future, it must automatically
+request the necessary permissions. This can easily be inferred from the
+flags for read and write, but we need another flag that tells us whether
+to get the resize permission.
+
+We can't just always request it because that means that no block jobs
+can run on the resulting BlockBackend (which is something that e.g.
+qemu-img commit wants to do), but we also can't request it never because
+most of the .bdrv_create() implementations call blk_truncate().
+
+The solution is to introduce another flag that is passed by all users
+that want to resize the image.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 Acked-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/block-backend.c          | 20 +++++++++++++++-----
- blockdev.c                     | 19 +++++++++++++++----
- hw/block/fdc.c                 |  2 +-
- hw/ide/core.c                  |  2 +-
- hw/scsi/scsi-disk.c            |  2 +-
- hw/sd/sd.c                     |  2 +-
- include/block/block_int.h      |  2 +-
- include/sysemu/block-backend.h |  2 +-
- 8 files changed, 36 insertions(+), 15 deletions(-)
+ block/parallels.c     | 3 ++-
+ block/qcow.c          | 3 ++-
+ block/qcow2.c         | 6 ++++--
+ block/qed.c           | 3 ++-
+ block/sheepdog.c      | 2 +-
+ block/vdi.c           | 3 ++-
+ block/vhdx.c          | 3 ++-
+ block/vmdk.c          | 6 ++++--
+ block/vpc.c           | 3 ++-
+ include/block/block.h | 1 +
+ qemu-img.c            | 2 +-
+ 11 files changed, 23 insertions(+), 12 deletions(-)
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 03d5495..fcc42b5 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -677,19 +677,29 @@ void blk_set_dev_ops(BlockBackend *blk, const BlockDevOps *ops,
- 
- /*
-  * Notify @blk's attached device model of media change.
-- * If @load is true, notify of media load.
-- * Else, notify of media eject.
-+ *
-+ * If @load is true, notify of media load. This action can fail, meaning that
-+ * the medium cannot be loaded. @errp is set then.
-+ *
-+ * If @load is false, notify of media eject. This can never fail.
-+ *
-  * Also send DEVICE_TRAY_MOVED events as appropriate.
-  */
--void blk_dev_change_media_cb(BlockBackend *blk, bool load)
-+void blk_dev_change_media_cb(BlockBackend *blk, bool load, Error **errp)
- {
-     if (blk->dev_ops && blk->dev_ops->change_media_cb) {
-         bool tray_was_open, tray_is_open;
-+        Error *local_err = NULL;
- 
-         assert(!blk->legacy_dev);
- 
-         tray_was_open = blk_dev_is_tray_open(blk);
--        blk->dev_ops->change_media_cb(blk->dev_opaque, load);
-+        blk->dev_ops->change_media_cb(blk->dev_opaque, load, &local_err);
-+        if (local_err) {
-+            assert(load == true);
-+            error_propagate(errp, local_err);
-+            return;
-+        }
-         tray_is_open = blk_dev_is_tray_open(blk);
- 
-         if (tray_was_open != tray_is_open) {
-@@ -703,7 +713,7 @@ void blk_dev_change_media_cb(BlockBackend *blk, bool load)
- 
- static void blk_root_change_media(BdrvChild *child, bool load)
- {
--    blk_dev_change_media_cb(child->opaque, load);
-+    blk_dev_change_media_cb(child->opaque, load, NULL);
- }
- 
- /*
-diff --git a/blockdev.c b/blockdev.c
-index 84a64b7..0a0226b 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2311,7 +2311,7 @@ static int do_open_tray(const char *blk_name, const char *qdev_id,
+diff --git a/block/parallels.c b/block/parallels.c
+index 6b0c0a9..19935e2 100644
+--- a/block/parallels.c
++++ b/block/parallels.c
+@@ -488,7 +488,8 @@ static int parallels_create(const char *filename, QemuOpts *opts, Error **errp)
      }
  
-     if (!locked || force) {
--        blk_dev_change_media_cb(blk, false);
-+        blk_dev_change_media_cb(blk, false, &error_abort);
+     file = blk_new_open(filename, NULL, NULL,
+-                        BDRV_O_RDWR | BDRV_O_PROTOCOL, &local_err);
++                        BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
++                        &local_err);
+     if (file == NULL) {
+         error_propagate(errp, local_err);
+         return -EIO;
+diff --git a/block/qcow.c b/block/qcow.c
+index eb5d54c..9d6ac83 100644
+--- a/block/qcow.c
++++ b/block/qcow.c
+@@ -823,7 +823,8 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
      }
  
-     if (locked && !force) {
-@@ -2349,6 +2349,7 @@ void qmp_blockdev_close_tray(bool has_device, const char *device,
-                              Error **errp)
- {
-     BlockBackend *blk;
-+    Error *local_err = NULL;
- 
-     device = has_device ? device : NULL;
-     id = has_id ? id : NULL;
-@@ -2372,7 +2373,11 @@ void qmp_blockdev_close_tray(bool has_device, const char *device,
-         return;
+     qcow_blk = blk_new_open(filename, NULL, NULL,
+-                            BDRV_O_RDWR | BDRV_O_PROTOCOL, &local_err);
++                            BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
++                            &local_err);
+     if (qcow_blk == NULL) {
+         error_propagate(errp, local_err);
+         ret = -EIO;
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 6f79df8..6a92d2e 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2202,7 +2202,8 @@ static int qcow2_create2(const char *filename, int64_t total_size,
      }
  
--    blk_dev_change_media_cb(blk, true);
-+    blk_dev_change_media_cb(blk, true, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
- }
- 
- void qmp_x_blockdev_remove_medium(bool has_device, const char *device,
-@@ -2425,7 +2430,7 @@ void qmp_x_blockdev_remove_medium(bool has_device, const char *device,
-          * called at all); therefore, the medium needs to be ejected here.
-          * Do it after blk_remove_bs() so blk_is_inserted(blk) returns the @load
-          * value passed here (i.e. false). */
--        blk_dev_change_media_cb(blk, false);
-+        blk_dev_change_media_cb(blk, false, &error_abort);
+     blk = blk_new_open(filename, NULL, NULL,
+-                       BDRV_O_RDWR | BDRV_O_PROTOCOL, &local_err);
++                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
++                       &local_err);
+     if (blk == NULL) {
+         error_propagate(errp, local_err);
+         return -EIO;
+@@ -2266,7 +2267,8 @@ static int qcow2_create2(const char *filename, int64_t total_size,
+     options = qdict_new();
+     qdict_put(options, "driver", qstring_from_str("qcow2"));
+     blk = blk_new_open(filename, NULL, options,
+-                       BDRV_O_RDWR | BDRV_O_NO_FLUSH, &local_err);
++                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_NO_FLUSH,
++                       &local_err);
+     if (blk == NULL) {
+         error_propagate(errp, local_err);
+         ret = -EIO;
+diff --git a/block/qed.c b/block/qed.c
+index d8f947a..5ec7fd8 100644
+--- a/block/qed.c
++++ b/block/qed.c
+@@ -625,7 +625,8 @@ static int qed_create(const char *filename, uint32_t cluster_size,
      }
  
- out:
-@@ -2435,6 +2440,7 @@ out:
- static void qmp_blockdev_insert_anon_medium(BlockBackend *blk,
-                                             BlockDriverState *bs, Error **errp)
- {
-+    Error *local_err = NULL;
-     bool has_device;
+     blk = blk_new_open(filename, NULL, NULL,
+-                       BDRV_O_RDWR | BDRV_O_PROTOCOL, &local_err);
++                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
++                       &local_err);
+     if (blk == NULL) {
+         error_propagate(errp, local_err);
+         return -EIO;
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index 860ba61..7434710 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -1609,7 +1609,7 @@ static int sd_prealloc(const char *filename, Error **errp)
      int ret;
  
-@@ -2467,7 +2473,12 @@ static void qmp_blockdev_insert_anon_medium(BlockBackend *blk,
-          * slot here.
-          * Do it after blk_insert_bs() so blk_is_inserted(blk) returns the @load
-          * value passed here (i.e. true). */
--        blk_dev_change_media_cb(blk, true);
-+        blk_dev_change_media_cb(blk, true, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            blk_remove_bs(blk);
-+            return;
-+        }
+     blk = blk_new_open(filename, NULL, NULL,
+-                       BDRV_O_RDWR | BDRV_O_PROTOCOL, errp);
++                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL, errp);
+     if (blk == NULL) {
+         ret = -EIO;
+         goto out_with_err_set;
+diff --git a/block/vdi.c b/block/vdi.c
+index fd6e26d..9b4f70e 100644
+--- a/block/vdi.c
++++ b/block/vdi.c
+@@ -763,7 +763,8 @@ static int vdi_create(const char *filename, QemuOpts *opts, Error **errp)
      }
- }
  
-diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-index 74f3634..5f6c496 100644
---- a/hw/block/fdc.c
-+++ b/hw/block/fdc.c
-@@ -469,7 +469,7 @@ static void fd_revalidate(FDrive *drv)
+     blk = blk_new_open(filename, NULL, NULL,
+-                       BDRV_O_RDWR | BDRV_O_PROTOCOL, &local_err);
++                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
++                       &local_err);
+     if (blk == NULL) {
+         error_propagate(errp, local_err);
+         ret = -EIO;
+diff --git a/block/vhdx.c b/block/vhdx.c
+index ab747f6..052a753 100644
+--- a/block/vhdx.c
++++ b/block/vhdx.c
+@@ -1859,7 +1859,8 @@ static int vhdx_create(const char *filename, QemuOpts *opts, Error **errp)
      }
- }
  
--static void fd_change_cb(void *opaque, bool load)
-+static void fd_change_cb(void *opaque, bool load, Error **errp)
- {
-     FDrive *drive = opaque;
- 
-diff --git a/hw/ide/core.c b/hw/ide/core.c
-index cfa5de6..db509b3 100644
---- a/hw/ide/core.c
-+++ b/hw/ide/core.c
-@@ -1120,7 +1120,7 @@ static void ide_cfata_metadata_write(IDEState *s)
- }
- 
- /* called when the inserted state of the media has changed */
--static void ide_cd_change_cb(void *opaque, bool load)
-+static void ide_cd_change_cb(void *opaque, bool load, Error **errp)
- {
-     IDEState *s = opaque;
-     uint64_t nb_sectors;
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index 546acc7..c1ccfad 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -2240,7 +2240,7 @@ static void scsi_disk_resize_cb(void *opaque)
+     blk = blk_new_open(filename, NULL, NULL,
+-                       BDRV_O_RDWR | BDRV_O_PROTOCOL, &local_err);
++                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
++                       &local_err);
+     if (blk == NULL) {
+         error_propagate(errp, local_err);
+         ret = -EIO;
+diff --git a/block/vmdk.c b/block/vmdk.c
+index f5e2fb5..a9bd22b 100644
+--- a/block/vmdk.c
++++ b/block/vmdk.c
+@@ -1703,7 +1703,8 @@ static int vmdk_create_extent(const char *filename, int64_t filesize,
      }
- }
  
--static void scsi_cd_change_media_cb(void *opaque, bool load)
-+static void scsi_cd_change_media_cb(void *opaque, bool load, Error **errp)
- {
-     SCSIDiskState *s = opaque;
+     blk = blk_new_open(filename, NULL, NULL,
+-                       BDRV_O_RDWR | BDRV_O_PROTOCOL, &local_err);
++                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
++                       &local_err);
+     if (blk == NULL) {
+         error_propagate(errp, local_err);
+         ret = -EIO;
+@@ -2071,7 +2072,8 @@ static int vmdk_create(const char *filename, QemuOpts *opts, Error **errp)
+     }
  
-diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 8e88e83..8e31491 100644
---- a/hw/sd/sd.c
-+++ b/hw/sd/sd.c
-@@ -458,7 +458,7 @@ static bool sd_get_readonly(SDState *sd)
-     return sd->wp_switch;
- }
+     new_blk = blk_new_open(filename, NULL, NULL,
+-                           BDRV_O_RDWR | BDRV_O_PROTOCOL, &local_err);
++                           BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
++                           &local_err);
+     if (new_blk == NULL) {
+         error_propagate(errp, local_err);
+         ret = -EIO;
+diff --git a/block/vpc.c b/block/vpc.c
+index b9c9832..f591d4b 100644
+--- a/block/vpc.c
++++ b/block/vpc.c
+@@ -915,7 +915,8 @@ static int vpc_create(const char *filename, QemuOpts *opts, Error **errp)
+     }
  
--static void sd_cardchange(void *opaque, bool load)
-+static void sd_cardchange(void *opaque, bool load, Error **errp)
- {
-     SDState *sd = opaque;
-     DeviceState *dev = DEVICE(sd);
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 63d5446..e00d0f4 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -891,7 +891,7 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
-                                uint64_t *nperm, uint64_t *nshared);
+     blk = blk_new_open(filename, NULL, NULL,
+-                       BDRV_O_RDWR | BDRV_O_PROTOCOL, &local_err);
++                       BDRV_O_RDWR | BDRV_O_RESIZE | BDRV_O_PROTOCOL,
++                       &local_err);
+     if (blk == NULL) {
+         error_propagate(errp, local_err);
+         ret = -EIO;
+diff --git a/include/block/block.h b/include/block/block.h
+index ff951ea..07f7561 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -82,6 +82,7 @@ typedef struct HDGeometry {
+ } HDGeometry;
  
- const char *bdrv_get_parent_name(const BlockDriverState *bs);
--void blk_dev_change_media_cb(BlockBackend *blk, bool load);
-+void blk_dev_change_media_cb(BlockBackend *blk, bool load, Error **errp);
- bool blk_dev_has_removable_media(BlockBackend *blk);
- bool blk_dev_has_tray(BlockBackend *blk);
- void blk_dev_eject_request(BlockBackend *blk, bool force);
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
-index 0861113..b23f683 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -34,7 +34,7 @@ typedef struct BlockDevOps {
-      * changes.  Sure would be useful if it did.
-      * Device models with removable media must implement this callback.
-      */
--    void (*change_media_cb)(void *opaque, bool load);
-+    void (*change_media_cb)(void *opaque, bool load, Error **errp);
-     /*
-      * Runs when an eject request is issued from the monitor, the tray
-      * is closed, and the medium is locked.
+ #define BDRV_O_RDWR        0x0002
++#define BDRV_O_RESIZE      0x0004 /* request permission for resizing the node */
+ #define BDRV_O_SNAPSHOT    0x0008 /* open the file read only and save writes in a snapshot */
+ #define BDRV_O_TEMPORARY   0x0010 /* delete the file after use */
+ #define BDRV_O_NOCACHE     0x0020 /* do not use the host page cache */
+diff --git a/qemu-img.c b/qemu-img.c
+index caa76a7..a48a471 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -3419,7 +3419,7 @@ static int img_resize(int argc, char **argv)
+     qemu_opts_del(param);
+ 
+     blk = img_open(image_opts, filename, fmt,
+-                   BDRV_O_RDWR, false, quiet);
++                   BDRV_O_RDWR | BDRV_O_RESIZE, false, quiet);
+     if (!blk) {
+         ret = -1;
+         goto out;
 -- 
 1.8.3.1
