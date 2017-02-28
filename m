@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ciiz5-0007xz-DV
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:42:36 -0500
+	(envelope-from <programmingkidx@gmail.com>) id 1cij0n-0000sv-2p
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:44:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ciiz4-0000eL-D6
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:42:35 -0500
-Date: Tue, 28 Feb 2017 09:42:28 -0500
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170228144228.GB15696@localhost.localdomain>
-References: <cover.1488254329.git.jcody@redhat.com>
-	<cover.1488254329.git.jcody@redhat.com>
-	<64a3308bbe51f78ccd2a53b30e8ba576e979ac4f.1488254329.git.jcody@redhat.com>
-	<87shmyxu3h.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87shmyxu3h.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v3 5/5] block/rbd: add support for
- 'mon_host', 'auth_supported' via QAPI
+	(envelope-from <programmingkidx@gmail.com>) id 1cij0i-0001LX-5G
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:44:21 -0500
+Received: from mail-io0-x236.google.com ([2607:f8b0:4001:c06::236]:36278)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1cij0i-0001L4-0M
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:44:16 -0500
+Received: by mail-io0-x236.google.com with SMTP id l7so10487489ioe.3
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 06:44:14 -0800 (PST)
+In-Reply-To: <mailman.55294.1488229147.22740.qemu-devel@nongnu.org>
+References: <mailman.55294.1488229147.22740.qemu-devel@nongnu.org>
+Mime-Version: 1.0 (Apple Message framework v753.1)
+Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
+Message-Id: <343C2370-9629-45CB-8733-BB7EDB34C2BA@gmail.com>
+Content-Transfer-Encoding: 7bit
+From: G 3 <programmingkidx@gmail.com>
+Date: Tue, 28 Feb 2017 09:44:08 -0500
+Subject: [Qemu-devel] Qemu-devel] Interested in GSoC 2017: Add a
+ Hypervisor.framework accelerator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,96 +30,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, qemu-block@nongnu.org
+To: Sergio Andr?s G?mez del Real <sergio.g.delreal@gmail.com>
+Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-On Tue, Feb 28, 2017 at 03:34:10PM +0100, Markus Armbruster wrote:
-> Starting with just the QAPI schema.
-> 
-> Jeff Cody <jcody@redhat.com> writes:
-> 
-> > This adds support for three additional options that may be specified
-> > by QAPI in blockdev-add:
-> >
-> >     server: host, port
-> >     auth method: either 'cephx' or 'none'
-> >
-> > The "server" and "auth-supported" QAPI parameters are arrays.  To conform
-> > with the rados API, the array items are join as a single string with a ';'
-> > character as a delimiter when setting the configuration values.
-> >
-> > Signed-off-by: Jeff Cody <jcody@redhat.com>
-> > ---
-> [...]
-> > diff --git a/qapi/block-core.json b/qapi/block-core.json
-> > index f152953..5f74f92 100644
-> > --- a/qapi/block-core.json
-> > +++ b/qapi/block-core.json
-> > @@ -2666,6 +2666,28 @@
-> >              '*header-digest': 'IscsiHeaderDigest',
-> >              '*timeout': 'int' } }
-> >  
-> > +
-> > +##
-> > +# @RbdAuthSupport:
-> > +#
-> > +# An enumeration of RBD auth support
-> > +#
-> > +# Since: 2.9
-> > +##
-> > +{ 'enum': 'RbdAuthSupport',
-> > +  'data': [ 'cephx', 'none' ] }
-> > +
-> > +
-> > +##
-> > +# @RbdAuthMethod:
-> > +#
-> > +# An enumeration of rados auth_supported types
-> > +#
-> > +# Since: 2.9
-> > +##
-> > +{ 'struct': 'RbdAuthMethod',
-> > +  'data': { 'auth': 'RbdAuthSupport' } }
-> > +
-> 
-> Any particular reason for wrapping the enum in a struct?  Do you
-> envisage adding members to the struct?
+
+On Feb 27, 2017, at 3:59 PM, qemu-devel-request@nongnu.org wrote:
 >
+> Hello, my name is Sergio G?mez.
+> It seems that QEMU has been accepted into GSoC 2017. I'm interested in
+> working with QEMU due to my interest in virtual machines in general.
+> Particularly, taking into account that I have experience developing a
+> (simple) emulator, and a (very simple) operating system, and done lots
+> of C and Assembly Language programming, I find the project proposal
+> "Add a Hypervisor.framework accelerator", mentored by Mr. Alexander
+> Graf an ideal and stimulating task for me to tackle.
+>
+> Besides considering having the technical knowledge to accomplish what
+> is proposed, I think that my communication skills would also be very
+> valuable not only for this project, but to continue involved with QEMU
+> (which is what I'd like).
+>
+> I wrote to Mr. Stefan Hajnoczi a while ago showing my interest in QEMU
+> and GSoC 2017. I've been studying some of the project's code, for
+> example, the C routines that are 'hooked' into the C runtime before
+> main() which does some work for initializing the QEMU Object Model
+> (QOM), which I've also been studying a little bit.
+>
+> I feel very comfortable writing and debugging low-level code, with all
+> its intricacies. I would like and opportunity to show these skills.
+>
+> I am looking forward to his opportunity and full of motivation to get
+> involved with the QEMU project.
+>
+> Thank you for your attention, and feedback on how to proceed would  
+> be great.
 
-I am going to admit, mainly it was my frustration with trying to deal with a
-qapi array of just enums in a QDict, and structs was more straightforward.
-What is the best way to parse an array of enums inside a QDict?  Do you need
-to extract the subqdict via qdict_extract_subqdict() still?
-
-> >  ##
-> >  # @BlockdevOptionsRbd:
-> >  #
-> > @@ -2681,6 +2703,11 @@
-> >  #
-> >  # @user:               #optional Ceph id name.
-> >  #
-> > +# @server:             #optional Monitor host address and port.  This maps
-> > +#                      to the "mon_host" Ceph option.
-> 
-> Suggest something like "Monitor addresses", for consistency with how we
-> document *SocketAddress members elsewhere, and plural to hint at it
-> being a list, not just one.
-> 
-
-OK, thanks.
-
-> > +#
-> > +# @auth-supported:     #optional Authentication supported.
-> > +#
-> >  # @password-secret:    #optional The ID of a QCryptoSecret object providing
-> >  #                      the password for the login.
-> >  #
-> > @@ -2692,6 +2719,8 @@
-> >              '*conf': 'str',
-> >              '*snapshot': 'str',
-> >              '*user': 'str',
-> > +            '*server': ['InetSocketAddress'],
-> > +            '*auth-supported': ['RbdAuthMethod'],
-> >              '*password-secret': 'str' } }
-> >  
-> >  ##
+Would this be for Mac OS X's Hypervisor?
