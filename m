@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cih5V-0007wF-IM
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:06 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cih5X-0007xr-SY
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cih5U-0000A8-I7
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34248)
+	(envelope-from <dgilbert@redhat.com>) id 1cih5W-0000CZ-HT
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42666)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cih5U-00007R-A5
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:04 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cih5W-0000CL-8g
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:06 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue, 28 Feb 2017 12:40:31 +0000
-Message-Id: <20170228124056.5074-3-dgilbert@redhat.com>
+Date: Tue, 28 Feb 2017 12:40:32 +0000
+Message-Id: <20170228124056.5074-4-dgilbert@redhat.com>
 In-Reply-To: <20170228124056.5074-1-dgilbert@redhat.com>
 References: <20170228124056.5074-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 02/27] migration/vmstate: renames in
- (load|save)_state
+Subject: [Qemu-devel] [PULL 03/27] migration/vmstate: split up
+ vmstate_base_addr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,98 +29,106 @@ Cc: quintela@redhat.com, lvivier@redhat.com, marcandre.lureau@redhat.com, vsemen
 
 From: Halil Pasic <pasic@linux.vnet.ibm.com>
 
-The vmstate_(load|save)_state start out with an a void *opaque pointing
-to some struct, and manipulate one or more elements of one field within
-that struct.
+Currently vmstate_base_addr does several things: it pinpoints the field
+within the struct, possibly allocates memory and possibly does the first
+pointer dereference. Obviously allocation is needed only for load.
 
-First the field within the struct is pinpointed as opaque + offset, then
-if this is a pointer the pointer is dereferenced to obtain a pointer to
-the first element of the vmstate field. Pointers to further elements if
-any are calculated as first_element + i * element_size (where i is the
-zero based index of the element in question).
+Let us split up the functionality in vmstate_base_addr and move the
+address manipulations (that is everything but the allocation logic) to
+load and save so it becomes more obvious what is actually going on. Like
+this all the address calculations (and the handling of the flags
+controlling these) is in one place and the sequence is more obvious.
 
-Currently base_addr and addr is used as a variable name for the pointer
-to the first element and the pointer to the current element being
-processed. This is suboptimal because base_addr is somewhat
-counter-intuitive (because obtained as base + offset) and both base_addr
-and addr not very descriptive (that we have a pointer should be clear
-from the fact that it is declared as a pointer).
+The newly introduced function vmstate_handle_alloc also fixes the
+allocation for the unused VMS_VBUFFER|VMS_MULTIPLY|VMS_ALLOC scenario
+and is substantially simpler than the original vmstate_base_addr.
 
-Let make things easier to understand by renaming base_addr to first_elem
-and addr to curr_elem. This has the additional benefit of harmonizing
-with other names within the scope (n_elems, vmstate_n_elems).
+In load and save some asserts are added so it's easier to debug
+situations where we would end up with a null pointer dereference.
 
 Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Message-Id: <20170222160119.52771-2-pasic@linux.vnet.ibm.com>
+Message-Id: <20170222160119.52771-3-pasic@linux.vnet.ibm.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/vmstate.c | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+ migration/vmstate.c | 39 +++++++++++++++++----------------------
+ 1 file changed, 17 insertions(+), 22 deletions(-)
 
 diff --git a/migration/vmstate.c b/migration/vmstate.c
-index b4d8ae9..36efa80 100644
+index 36efa80..836a7a4 100644
 --- a/migration/vmstate.c
 +++ b/migration/vmstate.c
-@@ -116,21 +116,21 @@ int vmstate_load_state(QEMUFile *f, const VMStateDescription *vmsd,
+@@ -52,29 +52,15 @@ static int vmstate_size(void *opaque, VMStateField *field)
+     return size;
+ }
+ 
+-static void *vmstate_base_addr(void *opaque, VMStateField *field, bool alloc)
++static void vmstate_handle_alloc(void *ptr, VMStateField *field, void *opaque)
+ {
+-    void *base_addr = opaque + field->offset;
+-
+-    if (field->flags & VMS_POINTER) {
+-        if (alloc && (field->flags & VMS_ALLOC)) {
+-            gsize size = 0;
+-            if (field->flags & VMS_VBUFFER) {
+-                size = vmstate_size(opaque, field);
+-            } else {
+-                int n_elems = vmstate_n_elems(opaque, field);
+-                if (n_elems) {
+-                    size = n_elems * field->size;
+-                }
+-            }
+-            if (size) {
+-                *(void **)base_addr = g_malloc(size);
+-            }
++    if (field->flags & VMS_POINTER && field->flags & VMS_ALLOC) {
++        gsize size = vmstate_size(opaque, field);
++        size *= vmstate_n_elems(opaque, field);
++        if (size) {
++            *(void **)ptr = g_malloc(size);
+         }
+-        base_addr = *(void **)base_addr;
+     }
+-
+-    return base_addr;
+ }
+ 
+ int vmstate_load_state(QEMUFile *f, const VMStateDescription *vmsd,
+@@ -116,10 +102,15 @@ int vmstate_load_state(QEMUFile *f, const VMStateDescription *vmsd,
               field->field_exists(opaque, version_id)) ||
              (!field->field_exists &&
               field->version_id <= version_id)) {
--            void *base_addr = vmstate_base_addr(opaque, field, true);
-+            void *first_elem = vmstate_base_addr(opaque, field, true);
+-            void *first_elem = vmstate_base_addr(opaque, field, true);
++            void *first_elem = opaque + field->offset;
              int i, n_elems = vmstate_n_elems(opaque, field);
              int size = vmstate_size(opaque, field);
  
++            vmstate_handle_alloc(first_elem, field, opaque);
++            if (field->flags & VMS_POINTER) {
++                first_elem = *(void **)first_elem;
++                assert(first_elem  || !n_elems);
++            }
              for (i = 0; i < n_elems; i++) {
--                void *addr = base_addr + size * i;
-+                void *curr_elem = first_elem + size * i;
+                 void *curr_elem = first_elem + size * i;
  
-                 if (field->flags & VMS_ARRAY_OF_POINTER) {
--                    addr = *(void **)addr;
-+                    curr_elem = *(void **)curr_elem;
-                 }
-                 if (field->flags & VMS_STRUCT) {
--                    ret = vmstate_load_state(f, field->vmsd, addr,
-+                    ret = vmstate_load_state(f, field->vmsd, curr_elem,
-                                              field->vmsd->version_id);
-                 } else {
--                   ret = field->info->get(f, addr, size, field);
-+                    ret = field->info->get(f, curr_elem, size, field);
-                 }
-                 if (ret >= 0) {
-                     ret = qemu_file_get_error(f);
-@@ -321,7 +321,7 @@ void vmstate_save_state(QEMUFile *f, const VMStateDescription *vmsd,
+@@ -321,13 +312,17 @@ void vmstate_save_state(QEMUFile *f, const VMStateDescription *vmsd,
      while (field->name) {
          if (!field->field_exists ||
              field->field_exists(opaque, vmsd->version_id)) {
--            void *base_addr = vmstate_base_addr(opaque, field, false);
-+            void *first_elem = vmstate_base_addr(opaque, field, false);
+-            void *first_elem = vmstate_base_addr(opaque, field, false);
++            void *first_elem = opaque + field->offset;
              int i, n_elems = vmstate_n_elems(opaque, field);
              int size = vmstate_size(opaque, field);
              int64_t old_offset, written_bytes;
-@@ -329,18 +329,18 @@ void vmstate_save_state(QEMUFile *f, const VMStateDescription *vmsd,
+             QJSON *vmdesc_loop = vmdesc;
  
              trace_vmstate_save_state_loop(vmsd->name, field->name, n_elems);
++            if (field->flags & VMS_POINTER) {
++                first_elem = *(void **)first_elem;
++                assert(first_elem  || !n_elems);
++            }
              for (i = 0; i < n_elems; i++) {
--                void *addr = base_addr + size * i;
-+                void *curr_elem = first_elem + size * i;
+                 void *curr_elem = first_elem + size * i;
  
-                 vmsd_desc_field_start(vmsd, vmdesc_loop, field, i, n_elems);
-                 old_offset = qemu_ftell_fast(f);
--
-                 if (field->flags & VMS_ARRAY_OF_POINTER) {
--                    addr = *(void **)addr;
-+                    assert(curr_elem);
-+                    curr_elem = *(void **)curr_elem;
-                 }
-                 if (field->flags & VMS_STRUCT) {
--                    vmstate_save_state(f, field->vmsd, addr, vmdesc_loop);
-+                    vmstate_save_state(f, field->vmsd, curr_elem, vmdesc_loop);
-                 } else {
--                    field->info->put(f, addr, size, field, vmdesc_loop);
-+                    field->info->put(f, curr_elem, size, field, vmdesc_loop);
-                 }
- 
-                 written_bytes = qemu_ftell_fast(f) - old_offset;
 -- 
 2.9.3
