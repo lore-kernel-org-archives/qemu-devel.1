@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cihJZ-0004mx-Nu
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:55:38 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cihJf-0004ss-3I
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:55:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cihJZ-0004Tb-1a
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:55:37 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cihJc-0004Ui-G8
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:55:43 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 28 Feb 2017 13:54:16 +0100
-Message-Id: <1488286469-9381-32-git-send-email-kwolf@redhat.com>
+Date: Tue, 28 Feb 2017 13:54:18 +0100
+Message-Id: <1488286469-9381-34-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
 References: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 31/44] blockjob: Factor out
- block_job_remove_all_bdrv()
+Subject: [Qemu-devel] [PATCH v3 33/44] stream: Use real permissions in
+ streaming block job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,80 +23,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-In some cases, we want to remove op blockers on intermediate nodes
-before the whole block job transaction has completed (because they block
-restoring the final graph state during completion). Provide a function
-for this.
-
-The whole block job lifecycle is a bit messed up and it's hard to
-actually do all things in the right order, but I'll leave simplifying
-this for another day.
+The correct permissions are relatively obvious here (and explained in
+code comments). For intermediate streaming, we need to reopen the top
+node read-write before creating the job now because the permissions
+system catches attempts to get the BLK_PERM_WRITE_UNCHANGED permission
+on a read-only node.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- blockjob.c               | 20 +++++++++++++-------
- include/block/blockjob.h |  9 +++++++++
- 2 files changed, 22 insertions(+), 7 deletions(-)
+ block/stream.c | 39 +++++++++++++++++++++++++++------------
+ 1 file changed, 27 insertions(+), 12 deletions(-)
 
-diff --git a/blockjob.c b/blockjob.c
-index 4216cde..69126af 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -128,6 +128,18 @@ static void block_job_detach_aio_context(void *opaque)
-     block_job_unref(job);
- }
+diff --git a/block/stream.c b/block/stream.c
+index ba8650f..b9c2f43 100644
+--- a/block/stream.c
++++ b/block/stream.c
+@@ -84,6 +84,8 @@ static void stream_complete(BlockJob *job, void *opaque)
  
-+void block_job_remove_all_bdrv(BlockJob *job)
-+{
-+    GSList *l;
-+    for (l = job->nodes; l; l = l->next) {
-+        BdrvChild *c = l->data;
-+        bdrv_op_unblock_all(c->bs, job->blocker);
-+        bdrv_root_unref_child(c);
+     /* Reopen the image back in read-only mode if necessary */
+     if (s->bs_flags != bdrv_get_flags(bs)) {
++        /* Give up write permissions before making it read-only */
++        blk_set_perm(job->blk, 0, BLK_PERM_ALL, &error_abort);
+         bdrv_reopen(bs, s->bs_flags, NULL);
+     }
+ 
+@@ -229,28 +231,35 @@ void stream_start(const char *job_id, BlockDriverState *bs,
+     BlockDriverState *iter;
+     int orig_bs_flags;
+ 
+-    /* FIXME Use real permissions */
+-    s = block_job_create(job_id, &stream_job_driver, bs, 0, BLK_PERM_ALL,
+-                         speed, BLOCK_JOB_DEFAULT, NULL, NULL, errp);
+-    if (!s) {
+-        return;
+-    }
+-
+     /* Make sure that the image is opened in read-write mode */
+     orig_bs_flags = bdrv_get_flags(bs);
+     if (!(orig_bs_flags & BDRV_O_RDWR)) {
+         if (bdrv_reopen(bs, orig_bs_flags | BDRV_O_RDWR, errp) != 0) {
+-            block_job_unref(&s->common);
+             return;
+         }
+     }
+ 
+-    /* Block all intermediate nodes between bs and base, because they
+-     * will disappear from the chain after this operation */
++    /* Prevent concurrent jobs trying to modify the graph structure here, we
++     * already have our own plans. Also don't allow resize as the image size is
++     * queried only at the job start and then cached. */
++    s = block_job_create(job_id, &stream_job_driver, bs,
++                         BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
++                         BLK_PERM_GRAPH_MOD,
++                         BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
++                         BLK_PERM_WRITE,
++                         speed, BLOCK_JOB_DEFAULT, NULL, NULL, errp);
++    if (!s) {
++        goto fail;
 +    }
-+    g_slist_free(job->nodes);
-+    job->nodes = NULL;
-+}
 +
- int block_job_add_bdrv(BlockJob *job, const char *name, BlockDriverState *bs,
-                        uint64_t perm, uint64_t shared_perm, Error **errp)
- {
-@@ -258,15 +270,9 @@ void block_job_ref(BlockJob *job)
- void block_job_unref(BlockJob *job)
- {
-     if (--job->refcnt == 0) {
--        GSList *l;
-         BlockDriverState *bs = blk_bs(job->blk);
-         bs->job = NULL;
--        for (l = job->nodes; l; l = l->next) {
--            BdrvChild *c = l->data;
--            bdrv_op_unblock_all(c->bs, job->blocker);
--            bdrv_root_unref_child(c);
--        }
--        g_slist_free(job->nodes);
-+        block_job_remove_all_bdrv(job);
-         blk_remove_aio_context_notifier(job->blk,
-                                         block_job_attached_aio_context,
-                                         block_job_detach_aio_context, job);
-diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-index 9d65ef8..9e906f7 100644
---- a/include/block/blockjob.h
-+++ b/include/block/blockjob.h
-@@ -181,6 +181,15 @@ int block_job_add_bdrv(BlockJob *job, const char *name, BlockDriverState *bs,
-                        uint64_t perm, uint64_t shared_perm, Error **errp);
++    /* Block all intermediate nodes between bs and base, because they will
++     * disappear from the chain after this operation. The streaming job reads
++     * every block only once, assuming that it doesn't change, so block writes
++     * and resizes. */
+     for (iter = backing_bs(bs); iter && iter != base; iter = backing_bs(iter)) {
+-        /* FIXME Use real permissions */
+         block_job_add_bdrv(&s->common, "intermediate node", iter, 0,
+-                           BLK_PERM_ALL, &error_abort);
++                           BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED,
++                           &error_abort);
+     }
  
- /**
-+ * block_job_remove_all_bdrv:
-+ * @job: The block job
-+ *
-+ * Remove all BlockDriverStates from the list of nodes that are involved in the
-+ * job. This removes the blockers added with block_job_add_bdrv().
-+ */
-+void block_job_remove_all_bdrv(BlockJob *job);
+     s->base = base;
+@@ -260,4 +269,10 @@ void stream_start(const char *job_id, BlockDriverState *bs,
+     s->on_error = on_error;
+     trace_stream_start(bs, base, s);
+     block_job_start(&s->common);
++    return;
 +
-+/**
-  * block_job_set_speed:
-  * @job: The job to set the speed for.
-  * @speed: The new value
++fail:
++    if (orig_bs_flags != bdrv_get_flags(bs)) {
++        bdrv_reopen(bs, s->bs_flags, NULL);
++    }
+ }
 -- 
 1.8.3.1
