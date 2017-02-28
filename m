@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ciiSx-00052m-RR
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:09:24 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ciiTf-0005eZ-9w
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:10:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ciiSs-0003zc-Ss
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:09:23 -0500
-Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:35923)
+	(envelope-from <alex.bennee@linaro.org>) id 1ciiTa-0004Bp-Cd
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:10:07 -0500
+Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:36174)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ciiSs-0003zS-Ir
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:09:18 -0500
-Received: by mail-wr0-x22f.google.com with SMTP id u108so9617336wrb.3
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 06:09:18 -0800 (PST)
+	id 1ciiTa-0004BS-69
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:10:02 -0500
+Received: by mail-wr0-x22b.google.com with SMTP id u108so9632133wrb.3
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 06:10:02 -0800 (PST)
 References: <1487604965-23220-1-git-send-email-peter.maydell@linaro.org>
-	<1487604965-23220-11-git-send-email-peter.maydell@linaro.org>
+	<1487604965-23220-12-git-send-email-peter.maydell@linaro.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1487604965-23220-11-git-send-email-peter.maydell@linaro.org>
-Date: Tue, 28 Feb 2017 14:09:16 +0000
-Message-ID: <87a8962yr7.fsf@linaro.org>
+In-reply-to: <1487604965-23220-12-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 28 Feb 2017 14:10:00 +0000
+Message-ID: <878toq2ypz.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 10/11] stm32f205: Create armv7m object
- without using armv7m_init()
+Subject: Re: [Qemu-devel] [PATCH 11/11] stm32f205: Rename 'nvic' local to
+ 'armv7m'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,116 +37,88 @@ Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Alistair Fra
 
 Peter Maydell <peter.maydell@linaro.org> writes:
 
-> Switch the stm32f205 SoC to create the armv7m object directly
-> rather than via the armv7m_init() wrapper. This fits better
-> with the SoC model's very QOMified design.
->
-> In particular this means we can push loading the guest image
-> out to the top level board code where it belongs, rather
-> than the SoC object having a QOM property for the filename
-> to load.
+> The local variable 'nvic' in stm32f205_soc_realize() no longer
+> holds a direct pointer to the NVIC device; it is a pointer to
+> the ARMv7M container object. Rename it 'armv7m' accordingly.
 >
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 
 > ---
->  include/hw/arm/stm32f205_soc.h |  4 +++-
->  hw/arm/netduino2.c             |  7 ++++---
->  hw/arm/stm32f205_soc.c         | 16 +++++++++++++---
->  3 files changed, 20 insertions(+), 7 deletions(-)
+>  hw/arm/stm32f205_soc.c | 18 +++++++++---------
+>  1 file changed, 9 insertions(+), 9 deletions(-)
 >
-> diff --git a/include/hw/arm/stm32f205_soc.h b/include/hw/arm/stm32f205_soc.h
-> index 1332141..e2dce11 100644
-> --- a/include/hw/arm/stm32f205_soc.h
-> +++ b/include/hw/arm/stm32f205_soc.h
-> @@ -31,6 +31,7 @@
->  #include "hw/adc/stm32f2xx_adc.h"
->  #include "hw/or-irq.h"
->  #include "hw/ssi/stm32f2xx_spi.h"
-> +#include "hw/arm/armv7m.h"
->
->  #define TYPE_STM32F205_SOC "stm32f205-soc"
->  #define STM32F205_SOC(obj) \
-> @@ -51,9 +52,10 @@ typedef struct STM32F205State {
->      SysBusDevice parent_obj;
->      /*< public >*/
->
-> -    char *kernel_filename;
->      char *cpu_model;
->
-> +    ARMv7MState armv7m;
-> +
->      STM32F2XXSyscfgState syscfg;
->      STM32F2XXUsartState usart[STM_NUM_USARTS];
->      STM32F2XXTimerState timer[STM_NUM_TIMERS];
-> diff --git a/hw/arm/netduino2.c b/hw/arm/netduino2.c
-> index 23d7928..3cfe332 100644
-> --- a/hw/arm/netduino2.c
-> +++ b/hw/arm/netduino2.c
-> @@ -27,17 +27,18 @@
->  #include "hw/boards.h"
->  #include "qemu/error-report.h"
->  #include "hw/arm/stm32f205_soc.h"
-> +#include "hw/arm/arm.h"
->
->  static void netduino2_init(MachineState *machine)
->  {
->      DeviceState *dev;
->
->      dev = qdev_create(NULL, TYPE_STM32F205_SOC);
-> -    if (machine->kernel_filename) {
-> -        qdev_prop_set_string(dev, "kernel-filename", machine->kernel_filename);
-> -    }
->      qdev_prop_set_string(dev, "cpu-model", "cortex-m3");
->      object_property_set_bool(OBJECT(dev), true, "realized", &error_fatal);
-> +
-> +    armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
-> +                       FLASH_SIZE);
->  }
->
->  static void netduino2_machine_init(MachineClass *mc)
 > diff --git a/hw/arm/stm32f205_soc.c b/hw/arm/stm32f205_soc.c
-> index 38425bd..e6bd73a 100644
+> index e6bd73a..6e1260d 100644
 > --- a/hw/arm/stm32f205_soc.c
 > +++ b/hw/arm/stm32f205_soc.c
-> @@ -49,6 +49,9 @@ static void stm32f205_soc_initfn(Object *obj)
->      STM32F205State *s = STM32F205_SOC(obj);
+> @@ -85,7 +85,7 @@ static void stm32f205_soc_initfn(Object *obj)
+>  static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+>  {
+>      STM32F205State *s = STM32F205_SOC(dev_soc);
+> -    DeviceState *dev, *nvic;
+> +    DeviceState *dev, *armv7m;
+>      SysBusDevice *busdev;
+>      Error *err = NULL;
 >      int i;
->
-> +    object_initialize(&s->armv7m, sizeof(s->armv7m), TYPE_ARMV7M);
-> +    qdev_set_parent_bus(DEVICE(&s->armv7m), sysbus_get_default());
-> +
->      object_initialize(&s->syscfg, sizeof(s->syscfg), TYPE_STM32F2XX_SYSCFG);
->      qdev_set_parent_bus(DEVICE(&s->syscfg), sysbus_get_default());
->
-> @@ -110,8 +113,16 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+> @@ -113,9 +113,9 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
 >      vmstate_register_ram_global(sram);
 >      memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, sram);
 >
-> -    nvic = armv7m_init(get_system_memory(), FLASH_SIZE, 96,
-> -                       s->kernel_filename, s->cpu_model);
-> +    nvic = DEVICE(&s->armv7m);
-> +    qdev_prop_set_uint32(nvic, "num-irq", 96);
-> +    qdev_prop_set_string(nvic, "cpu-model", s->cpu_model);
-> +    object_property_set_link(OBJECT(&s->armv7m), OBJECT(get_system_memory()),
-> +                                     "memory", &error_abort);
-> +    object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
-> +    if (err != NULL) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
+> -    nvic = DEVICE(&s->armv7m);
+> -    qdev_prop_set_uint32(nvic, "num-irq", 96);
+> -    qdev_prop_set_string(nvic, "cpu-model", s->cpu_model);
+> +    armv7m = DEVICE(&s->armv7m);
+> +    qdev_prop_set_uint32(armv7m, "num-irq", 96);
+> +    qdev_prop_set_string(armv7m, "cpu-model", s->cpu_model);
+>      object_property_set_link(OBJECT(&s->armv7m), OBJECT(get_system_memory()),
+>                                       "memory", &error_abort);
+>      object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
+> @@ -133,7 +133,7 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+>      }
+>      busdev = SYS_BUS_DEVICE(dev);
+>      sysbus_mmio_map(busdev, 0, 0x40013800);
+> -    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(nvic, 71));
+> +    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, 71));
 >
->      /* System configuration controller */
->      dev = DEVICE(&s->syscfg);
-> @@ -192,7 +203,6 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+>      /* Attach UART (uses USART registers) and USART controllers */
+>      for (i = 0; i < STM_NUM_USARTS; i++) {
+> @@ -147,7 +147,7 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+>          }
+>          busdev = SYS_BUS_DEVICE(dev);
+>          sysbus_mmio_map(busdev, 0, usart_addr[i]);
+> -        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(nvic, usart_irq[i]));
+> +        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, usart_irq[i]));
+>      }
+>
+>      /* Timer 2 to 5 */
+> @@ -161,7 +161,7 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+>          }
+>          busdev = SYS_BUS_DEVICE(dev);
+>          sysbus_mmio_map(busdev, 0, timer_addr[i]);
+> -        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(nvic, timer_irq[i]));
+> +        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, timer_irq[i]));
+>      }
+>
+>      /* ADC 1 to 3 */
+> @@ -173,7 +173,7 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+>          return;
+>      }
+>      qdev_connect_gpio_out(DEVICE(s->adc_irqs), 0,
+> -                          qdev_get_gpio_in(nvic, ADC_IRQ));
+> +                          qdev_get_gpio_in(armv7m, ADC_IRQ));
+>
+>      for (i = 0; i < STM_NUM_ADCS; i++) {
+>          dev = DEVICE(&(s->adc[i]));
+> @@ -198,7 +198,7 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+>          }
+>          busdev = SYS_BUS_DEVICE(dev);
+>          sysbus_mmio_map(busdev, 0, spi_addr[i]);
+> -        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(nvic, spi_irq[i]));
+> +        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, spi_irq[i]));
+>      }
 >  }
->
->  static Property stm32f205_soc_properties[] = {
-> -    DEFINE_PROP_STRING("kernel-filename", STM32F205State, kernel_filename),
->      DEFINE_PROP_STRING("cpu-model", STM32F205State, cpu_model),
->      DEFINE_PROP_END_OF_LIST(),
->  };
 
 
 --
