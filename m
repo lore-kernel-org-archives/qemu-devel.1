@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43236)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cilNw-0001fw-3y
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:24 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cilNx-0001hK-UJ
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cilNv-00032q-0g
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:24 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48713)
+	(envelope-from <pm215@archaic.org.uk>) id 1cilNw-00034S-ND
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:25 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48714)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cilNu-00031p-R9
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:22 -0500
+	id 1cilNw-00033w-F8
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:24 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1cilNt-0003RY-UV
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:16:21 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1cilNv-0003TA-LR
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:16:23 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Feb 2017 17:16:03 +0000
-Message-Id: <1488302176-19463-9-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 28 Feb 2017 17:16:06 +0000
+Message-Id: <1488302176-19463-12-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1488302176-19463-1-git-send-email-peter.maydell@linaro.org>
 References: <1488302176-19463-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 08/21] armv7m: Don't put core v7M devices under
- CONFIG_STELLARIS
+Subject: [Qemu-devel] [PULL 11/21] stm32f205: Rename 'nvic' local to 'armv7m'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,47 +32,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The NVIC is a core v7M device that exists for all v7M CPUs;
-put it under a CONFIG_ARM_V7M rather than hiding it under
-CONFIG_STELLARIS.
-
-(We'll use CONFIG_ARM_V7M for the SysTick device too
-when we split it out of the NVIC.)
+The local variable 'nvic' in stm32f205_soc_realize() no longer
+holds a direct pointer to the NVIC device; it is a pointer to
+the ARMv7M container object. Rename it 'armv7m' accordingly.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Message-id: 1487604965-23220-9-git-send-email-peter.maydell@linaro.org
+Message-id: 1487604965-23220-12-git-send-email-peter.maydell@linaro.org
 ---
- hw/intc/Makefile.objs           | 2 +-
- default-configs/arm-softmmu.mak | 2 ++
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ hw/arm/stm32f205_soc.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
-index 8948106..adedd0d 100644
---- a/hw/intc/Makefile.objs
-+++ b/hw/intc/Makefile.objs
-@@ -24,7 +24,7 @@ obj-$(CONFIG_APIC) += apic.o apic_common.o
- obj-$(CONFIG_ARM_GIC_KVM) += arm_gic_kvm.o
- obj-$(call land,$(CONFIG_ARM_GIC_KVM),$(TARGET_AARCH64)) += arm_gicv3_kvm.o
- obj-$(call land,$(CONFIG_ARM_GIC_KVM),$(TARGET_AARCH64)) += arm_gicv3_its_kvm.o
--obj-$(CONFIG_STELLARIS) += armv7m_nvic.o
-+obj-$(CONFIG_ARM_V7M) += armv7m_nvic.o
- obj-$(CONFIG_EXYNOS4) += exynos4210_gic.o exynos4210_combiner.o
- obj-$(CONFIG_GRLIB) += grlib_irqmp.o
- obj-$(CONFIG_IOAPIC) += ioapic.o
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index fdf4089..1e3bd2b 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -42,6 +42,8 @@ CONFIG_ARM11MPCORE=y
- CONFIG_A9MPCORE=y
- CONFIG_A15MPCORE=y
+diff --git a/hw/arm/stm32f205_soc.c b/hw/arm/stm32f205_soc.c
+index e6bd73a..6e1260d 100644
+--- a/hw/arm/stm32f205_soc.c
++++ b/hw/arm/stm32f205_soc.c
+@@ -85,7 +85,7 @@ static void stm32f205_soc_initfn(Object *obj)
+ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+ {
+     STM32F205State *s = STM32F205_SOC(dev_soc);
+-    DeviceState *dev, *nvic;
++    DeviceState *dev, *armv7m;
+     SysBusDevice *busdev;
+     Error *err = NULL;
+     int i;
+@@ -113,9 +113,9 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+     vmstate_register_ram_global(sram);
+     memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, sram);
  
-+CONFIG_ARM_V7M=y
-+
- CONFIG_ARM_GIC=y
- CONFIG_ARM_GIC_KVM=$(CONFIG_KVM)
- CONFIG_ARM_TIMER=y
+-    nvic = DEVICE(&s->armv7m);
+-    qdev_prop_set_uint32(nvic, "num-irq", 96);
+-    qdev_prop_set_string(nvic, "cpu-model", s->cpu_model);
++    armv7m = DEVICE(&s->armv7m);
++    qdev_prop_set_uint32(armv7m, "num-irq", 96);
++    qdev_prop_set_string(armv7m, "cpu-model", s->cpu_model);
+     object_property_set_link(OBJECT(&s->armv7m), OBJECT(get_system_memory()),
+                                      "memory", &error_abort);
+     object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
+@@ -133,7 +133,7 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+     }
+     busdev = SYS_BUS_DEVICE(dev);
+     sysbus_mmio_map(busdev, 0, 0x40013800);
+-    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(nvic, 71));
++    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, 71));
+ 
+     /* Attach UART (uses USART registers) and USART controllers */
+     for (i = 0; i < STM_NUM_USARTS; i++) {
+@@ -147,7 +147,7 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+         }
+         busdev = SYS_BUS_DEVICE(dev);
+         sysbus_mmio_map(busdev, 0, usart_addr[i]);
+-        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(nvic, usart_irq[i]));
++        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, usart_irq[i]));
+     }
+ 
+     /* Timer 2 to 5 */
+@@ -161,7 +161,7 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+         }
+         busdev = SYS_BUS_DEVICE(dev);
+         sysbus_mmio_map(busdev, 0, timer_addr[i]);
+-        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(nvic, timer_irq[i]));
++        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, timer_irq[i]));
+     }
+ 
+     /* ADC 1 to 3 */
+@@ -173,7 +173,7 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+         return;
+     }
+     qdev_connect_gpio_out(DEVICE(s->adc_irqs), 0,
+-                          qdev_get_gpio_in(nvic, ADC_IRQ));
++                          qdev_get_gpio_in(armv7m, ADC_IRQ));
+ 
+     for (i = 0; i < STM_NUM_ADCS; i++) {
+         dev = DEVICE(&(s->adc[i]));
+@@ -198,7 +198,7 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+         }
+         busdev = SYS_BUS_DEVICE(dev);
+         sysbus_mmio_map(busdev, 0, spi_addr[i]);
+-        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(nvic, spi_irq[i]));
++        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, spi_irq[i]));
+     }
+ }
+ 
 -- 
 2.7.4
