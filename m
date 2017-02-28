@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57872)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cica9-0002mT-D2
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 02:52:26 -0500
+	(envelope-from <den@virtuozzo.com>) id 1cickn-0004ty-9e
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 03:03:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cica6-0006ZC-BH
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 02:52:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49248)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cica6-0006X0-5G
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 02:52:22 -0500
-Date: Tue, 28 Feb 2017 15:52:11 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170228075211.GN10022@pxdev.xzpeter.org>
-References: <1486456099-7345-1-git-send-email-peterx@redhat.com>
+	(envelope-from <den@virtuozzo.com>) id 1cicki-0002Zt-3l
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 03:03:25 -0500
+Received: from mail-db5eur01on0115.outbound.protection.outlook.com
+	([104.47.2.115]:9952
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1cickh-0002Zo-Ek
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 03:03:20 -0500
+References: <20170227201456.31814-1-berrange@redhat.com>
+	<739c3a03-fffe-46d0-0ba6-a328a9a18eb2@redhat.com>
+From: "Denis V. Lunev" <den@openvz.org>
+Message-ID: <e4470b32-a66e-a32b-986f-ce5e2183c04e@openvz.org>
+Date: Tue, 28 Feb 2017 10:29:15 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1486456099-7345-1-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7 00/17] VT-d: vfio enablement and misc
- enhances
+In-Reply-To: <739c3a03-fffe-46d0-0ba6-a328a9a18eb2@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] io: ignore case when matching websockets
+ HTTP headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,26 +30,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, David Gibson <david@gibson.dropbear.id.au>, alex.williamson@redhat.com, bd.aviv@gmail.com
+To: Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-On Tue, Feb 07, 2017 at 04:28:02PM +0800, Peter Xu wrote:
-> This is v7 of vt-d vfio enablement series.
-> 
-> v7:
-> - for the two traces patches: Change subjects. Remove vtd_err() and
->   vtd_err_nonzero_rsvd() tracers, instead using standalone trace for
->   each of the places. Don't remove any DPRINTF() if there is no
->   replacement. [Jason]
-> - add r-b and a-b for Alex/David/Jason.
-> - in patch "intel_iommu: renaming gpa to iova where proper", convert
->   one more place where I missed [Jason]
-> - fix the place where I should use "~0ULL" not "~0" [Jason]
-> - squash patch 16 into 18 [Jason]
+On 02/28/2017 12:20 AM, Eric Blake wrote:
+> On 02/27/2017 02:14 PM, Daniel P. Berrange wrote:
+>> According to RFC7230 Section 3.2, header field name is case-insensitive.
+>> Convert the header data into all lowercase before doing string matching
+>> on the headers.
+>>
+>> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+>> ---
+>>  io/channel-websock.c | 14 +++++++++-----
+>>  1 file changed, 9 insertions(+), 5 deletions(-)
+>>
+>> @@ -223,7 +223,7 @@ static int qio_channel_websock_handshake_process(QIOChannelWebsock *ioc,
+>>  static int qio_channel_websock_handshake_read(QIOChannelWebsock *ioc,
+>>                                                Error **errp)
+>>  {
+>> -    char *handshake_end;
+>> +    char *handshake_end, *tmp;
+>>      ssize_t ret;
+>>      /* Typical HTTP headers from novnc are 512 bytes, so limiting
+>>       * total header size to 4096 is easily enough. */
+> Drive-by grammar nit: s/easily/easy/
+>
+>> @@ -249,9 +249,13 @@ static int qio_channel_websock_handshake_read(QIOChannelWebsock *ioc,
+>>          }
+>>      }
+>>  
+>> +    for (tmp = (char *)ioc->encinput.buffer; tmp < handshake_end; tmp++) {
+>> +        *tmp = g_ascii_tolower(*tmp);
+>> +    }
+>> +
+>>      if (qio_channel_websock_handshake_process(ioc,
+>>                                                (char *)ioc->encinput.buffer,
+>> -                                              ioc->encinput.offset,
+>> +                                              handshake_end - (char *)ioc->encinput.buffer,
+> I'm not sure why this change is here; nothing else in the patch changed
+> ioc->encinput.offset.
+>
+yep. The rest seems fine to me.
 
-Hi, Michael,
+Usage of g_ascii_strdown () seems overkill now. We do not need
+the header anymore after this call.
 
-Do you have plan to have patch 11-17 as well in 2.9? Just a kind
-reminder in case you have it since it's reaching soft freeze. Thanks,
-
--- peterx
+Den
