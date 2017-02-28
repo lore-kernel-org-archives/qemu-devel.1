@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45541)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cin6l-0001Zm-Ni
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:06:49 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cin6g-0006vN-RK
+	(envelope-from <armbru@redhat.com>) id 1cin6j-0001Z0-3e
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:06:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59350)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <armbru@redhat.com>) id 1cin6e-0006so-Rg
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:06:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47952)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cin6g-0006uI-Hj
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:06:42 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cin6e-0006sF-MJ
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:06:40 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B409D80483
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 19:06:42 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E1598C04B328
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 19:06:40 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
 	[10.36.116.55])
-	by int-mx09.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v1SJ6fxs020663
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=NO)
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 14:06:42 -0500
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id ABA3515A80
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 19:06:40 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 28 Feb 2017 20:06:31 +0100
-Message-Id: <1488308796-28832-22-git-send-email-armbru@redhat.com>
+Date: Tue, 28 Feb 2017 20:06:20 +0100
+Message-Id: <1488308796-28832-11-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488308796-28832-1-git-send-email-armbru@redhat.com>
 References: <1488308796-28832-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 21/26] tests: Cover partial input visit of list
+Subject: [Qemu-devel] [PULL 10/26] qapi: Clean up after commit 3d344c2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,179 +35,68 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Demonstrates a design flaw: there is no way to for input visitors to
-report that a list visit didn't visit the complete input list.  The
-generated list visits always do, but manual visits needn't.
+Drop unused QIV_STACK_SIZE and unused qobject_input_start_struct()
+parameter errp.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <1488303560-18803-22-git-send-email-armbru@redhat.com>
+Message-Id: <1488303560-18803-11-git-send-email-armbru@redhat.com>
 ---
- tests/test-opts-visitor.c          | 41 +++++++++++++++++++++++++++++++++++
- tests/test-qobject-input-visitor.c | 44 ++++++++++++++++++++++++++++++++++++++
- tests/test-string-input-visitor.c  | 22 +++++++++++++++++++
- 3 files changed, 107 insertions(+)
+ qapi/qobject-input-visitor.c | 14 +++-----------
+ 1 file changed, 3 insertions(+), 11 deletions(-)
 
-diff --git a/tests/test-opts-visitor.c b/tests/test-opts-visitor.c
-index 0a9e75f..d0f7646 100644
---- a/tests/test-opts-visitor.c
-+++ b/tests/test-opts-visitor.c
-@@ -172,6 +172,44 @@ expect_u64_max(OptsVisitorFixture *f, gconstpointer test_data)
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index f3b6713..2c2f883 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -21,8 +21,6 @@
+ #include "qapi/qmp/types.h"
+ #include "qapi/qmp/qerror.h"
  
- /* test cases */
- 
-+static void
-+test_opts_range_unvisited(void)
-+{
-+    intList *list = NULL;
-+    intList *tail;
-+    QemuOpts *opts;
-+    Visitor *v;
-+
-+    opts = qemu_opts_parse(qemu_find_opts("userdef"), "ilist=0-2", false,
-+                           &error_abort);
-+
-+    v = opts_visitor_new(opts);
-+
-+    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-+
-+    /* Would be simpler if the visitor genuinely supported virtual walks */
-+    visit_start_list(v, "ilist", (GenericList **)&list, sizeof(*list),
-+                     &error_abort);
-+    tail = list;
-+    visit_type_int(v, NULL, &tail->value, &error_abort);
-+    g_assert_cmpint(tail->value, ==, 0);
-+    tail = (intList *)visit_next_list(v, (GenericList *)tail, sizeof(*list));
-+    g_assert(tail);
-+    visit_type_int(v, NULL, &tail->value, &error_abort);
-+    g_assert_cmpint(tail->value, ==, 1);
-+    tail = (intList *)visit_next_list(v, (GenericList *)tail, sizeof(*list));
-+    g_assert(tail);
-+    visit_end_list(v, (void **)&list);
-+    /* BUG: unvisited tail not reported; actually not reportable by design */
-+
-+    visit_check_struct(v, &error_abort);
-+    visit_end_struct(v, NULL);
-+
-+    qapi_free_intList(list);
-+    visit_free(v);
-+    qemu_opts_del(opts);
-+}
-+
- int
- main(int argc, char **argv)
+-#define QIV_STACK_SIZE 1024
+-
+ typedef struct StackObject
  {
-@@ -263,6 +301,9 @@ main(int argc, char **argv)
-     add_test("/visitor/opts/i64/range/2big/full", &expect_fail,
-              "i64=-0x8000000000000000-0x7fffffffffffffff");
- 
-+    g_test_add_func("/visitor/opts/range/unvisited",
-+                    test_opts_range_unvisited);
-+
-     g_test_run();
-     return 0;
- }
-diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-input-visitor.c
-index 32c6b3d..10c15c4 100644
---- a/tests/test-qobject-input-visitor.c
-+++ b/tests/test-qobject-input-visitor.c
-@@ -923,6 +923,46 @@ static void test_visitor_in_fail_struct_missing(TestInputVisitorData *data,
-     visit_end_struct(v, NULL);
+     QObject *obj; /* Object being visited */
+@@ -103,8 +101,7 @@ static void qdict_add_key(const char *key, QObject *obj, void *opaque)
  }
  
-+static void test_visitor_in_fail_list(TestInputVisitorData *data,
-+                                      const void *unused)
-+{
-+    int64_t i64 = -1;
-+    Visitor *v;
-+
-+    /* Unvisited list tail */
-+
-+    v = visitor_input_test_init(data, "[ 1, 2, 3 ]");
-+
-+    visit_start_list(v, NULL, NULL, 0, &error_abort);
-+    visit_type_int(v, NULL, &i64, &error_abort);
-+    g_assert_cmpint(i64, ==, 1);
-+    visit_type_int(v, NULL, &i64, &error_abort);
-+    g_assert_cmpint(i64, ==, 2);
-+    visit_end_list(v, NULL);
-+    /* BUG: unvisited tail not reported; actually not reportable by design */
-+}
-+
-+static void test_visitor_in_fail_list_nested(TestInputVisitorData *data,
-+                                             const void *unused)
-+{
-+    int64_t i64 = -1;
-+    Visitor *v;
-+
-+    /* Unvisited nested list tail */
-+
-+    v = visitor_input_test_init(data, "[ 0, [ 1, 2, 3 ] ]");
-+
-+    visit_start_list(v, NULL, NULL, 0, &error_abort);
-+    visit_type_int(v, NULL, &i64, &error_abort);
-+    g_assert_cmpint(i64, ==, 0);
-+    visit_start_list(v, NULL, NULL, 0, &error_abort);
-+    visit_type_int(v, NULL, &i64, &error_abort);
-+    g_assert_cmpint(i64, ==, 1);
-+    visit_end_list(v, NULL);
-+    /* BUG: unvisited tail not reported; actually not reportable by design */
-+    visit_end_list(v, NULL);
-+}
-+
- static void test_visitor_in_fail_union_native_list(TestInputVisitorData *data,
-                                                    const void *unused)
+ static const QListEntry *qobject_input_push(QObjectInputVisitor *qiv,
+-                                            QObject *obj, void *qapi,
+-                                            Error **errp)
++                                            QObject *obj, void *qapi)
  {
-@@ -1070,6 +1110,10 @@ int main(int argc, char **argv)
-                            NULL, test_visitor_in_fail_struct_in_list);
-     input_visitor_test_add("/visitor/input/fail/struct-missing",
-                            NULL, test_visitor_in_fail_struct_missing);
-+    input_visitor_test_add("/visitor/input/fail/list",
-+                           NULL, test_visitor_in_fail_list);
-+    input_visitor_test_add("/visitor/input/fail/list-nested",
-+                           NULL, test_visitor_in_fail_list_nested);
-     input_visitor_test_add("/visitor/input/fail/union-flat",
-                            NULL, test_visitor_in_fail_union_flat);
-     input_visitor_test_add("/visitor/input/fail/union-flat-no-discriminator",
-diff --git a/tests/test-string-input-visitor.c b/tests/test-string-input-visitor.c
-index 72f8732..70cee65 100644
---- a/tests/test-string-input-visitor.c
-+++ b/tests/test-string-input-visitor.c
-@@ -121,6 +121,7 @@ static void test_visitor_in_intList(TestInputVisitorData *data,
-     uint64_t expect4[] = { UINT64_MAX };
-     Error *err = NULL;
-     int64List *res = NULL;
-+    int64List *tail;
-     Visitor *v;
+     GHashTable *h;
+     StackObject *tos = g_new0(StackObject, 1);
+@@ -170,7 +167,6 @@ static void qobject_input_start_struct(Visitor *v, const char *name, void **obj,
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
+     QObject *qobj = qobject_input_get_object(qiv, name, true, errp);
+-    Error *err = NULL;
  
-     /* Valid lists */
-@@ -151,6 +152,27 @@ static void test_visitor_in_intList(TestInputVisitorData *data,
-     visit_type_int64List(v, NULL, &res, &err);
-     error_free_or_abort(&err);
-     g_assert(!res);
-+
-+    /* Unvisited list tail */
-+
-+    v = visitor_input_test_init(data, "0,2-3");
-+
-+    /* Would be simpler if the visitor genuinely supported virtual walks */
-+    visit_start_list(v, NULL, (GenericList **)&res, sizeof(*res),
-+                     &error_abort);
-+    tail = res;
-+    visit_type_int64(v, NULL, &tail->value, &error_abort);
-+    g_assert_cmpint(tail->value, ==, 0);
-+    tail = (int64List *)visit_next_list(v, (GenericList *)tail, sizeof(*res));
-+    g_assert(tail);
-+    visit_type_int64(v, NULL, &tail->value, &error_abort);
-+    g_assert_cmpint(tail->value, ==, 2);
-+    tail = (int64List *)visit_next_list(v, (GenericList *)tail, sizeof(*res));
-+    g_assert(tail);
-+    visit_end_list(v, (void **)&res);
-+    /* BUG: unvisited tail not reported; actually not reportable by design */
-+
-+    qapi_free_int64List(res);
- }
+     if (obj) {
+         *obj = NULL;
+@@ -184,11 +180,7 @@ static void qobject_input_start_struct(Visitor *v, const char *name, void **obj,
+         return;
+     }
  
- static void test_visitor_in_bool(TestInputVisitorData *data,
+-    qobject_input_push(qiv, qobj, obj, &err);
+-    if (err) {
+-        error_propagate(errp, err);
+-        return;
+-    }
++    qobject_input_push(qiv, qobj, obj);
+ 
+     if (obj) {
+         *obj = g_malloc0(size);
+@@ -216,7 +208,7 @@ static void qobject_input_start_list(Visitor *v, const char *name,
+         return;
+     }
+ 
+-    entry = qobject_input_push(qiv, qobj, list, errp);
++    entry = qobject_input_push(qiv, qobj, list);
+     if (list) {
+         if (entry) {
+             *list = g_malloc0(size);
 -- 
 2.7.4
