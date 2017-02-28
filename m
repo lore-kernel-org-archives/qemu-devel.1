@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cifRU-0005IL-2T
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:55:41 -0500
+	(envelope-from <den@virtuozzo.com>) id 1cifjE-0003gq-SR
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 06:14:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cifRT-0006kD-3O
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:55:40 -0500
-From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Date: Tue, 28 Feb 2017 13:55:33 +0300
-Message-ID: <20170228105532.1284.71515.stgit@PASHA-ISP>
-In-Reply-To: <20170228105521.1284.11059.stgit@PASHA-ISP>
-References: <20170228105521.1284.11059.stgit@PASHA-ISP>
+	(envelope-from <den@virtuozzo.com>) id 1cifjB-0004Gk-Lu
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 06:14:00 -0500
+Received: from mail-db5eur01on0108.outbound.protection.outlook.com
+	([104.47.2.108]:61467
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <den@virtuozzo.com>) id 1cifjB-0004Df-0y
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 06:13:57 -0500
+References: <20170227201456.31814-1-berrange@redhat.com>
+	<20170228104828.GA2720@redhat.com>
+	<0bb8488e-ee11-9401-7c40-a0ab1eb275c0@openvz.org>
+From: "Denis V. Lunev" <den@virtuozzo.com>
+Message-ID: <ace8fc68-dd8c-81f6-872f-17798cce3609@virtuozzo.com>
+Date: Tue, 28 Feb 2017 13:58:38 +0300
 MIME-Version: 1.0
+In-Reply-To: <0bb8488e-ee11-9401-7c40-a0ab1eb275c0@openvz.org>
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v2 2/3] blkreplay: create temporary overlay for
- underlaying devices
+Subject: Re: [Qemu-devel] [PATCH] io: ignore case when matching websockets
+ HTTP headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,137 +31,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, pbonzini@redhat.com, dovgaluk@ispras.ru, qemu-block@nongnu.org, mreitz@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-This patch allows using '-snapshot' behavior in record/replay mode.
-blkreplay layer creates temporary overlays on top of underlaying
-disk images. It is needed, because creating an overlay over blkreplay
-breaks the determinism.
-This patch creates similar temporary overlay (when it is needed)
-under the blkreplay driver. Therefore all block operations are controlled
-by blkreplay.
+On 02/28/2017 01:54 PM, Denis V. Lunev wrote:
+> On 02/28/2017 01:48 PM, Daniel P. Berrange wrote:
+>> On Mon, Feb 27, 2017 at 08:14:56PM +0000, Daniel P. Berrange wrote:
+>>> According to RFC7230 Section 3.2, header field name is case-insensitive.
+>>> Convert the header data into all lowercase before doing string matching
+>>> on the headers.
+>>>
+>>> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+>>> ---
+>>>  io/channel-websock.c | 14 +++++++++-----
+>>>  1 file changed, 9 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/io/channel-websock.c b/io/channel-websock.c
+>>> index a06a4a8..32b7f37 100644
+>>> --- a/io/channel-websock.c
+>>> +++ b/io/channel-websock.c
+>>> @@ -33,9 +33,9 @@
+>>>  #define QIO_CHANNEL_WEBSOCK_GUID "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
+>>>  #define QIO_CHANNEL_WEBSOCK_GUID_LEN strlen(QIO_CHANNEL_WEBSOCK_GUID)
+>>>  
+>>> -#define QIO_CHANNEL_WEBSOCK_HEADER_PROTOCOL "Sec-WebSocket-Protocol"
+>>> -#define QIO_CHANNEL_WEBSOCK_HEADER_VERSION "Sec-WebSocket-Version"
+>>> -#define QIO_CHANNEL_WEBSOCK_HEADER_KEY "Sec-WebSocket-Key"
+>>> +#define QIO_CHANNEL_WEBSOCK_HEADER_PROTOCOL "sec-websocket-protocol"
+>>> +#define QIO_CHANNEL_WEBSOCK_HEADER_VERSION "sec-websocket-version"
+>>> +#define QIO_CHANNEL_WEBSOCK_HEADER_KEY "sec-websocket-key"
+>>>  
+>>>  #define QIO_CHANNEL_WEBSOCK_PROTOCOL_BINARY "binary"
+>>>  
+>>> @@ -223,7 +223,7 @@ static int qio_channel_websock_handshake_process(QIOChannelWebsock *ioc,
+>>>  static int qio_channel_websock_handshake_read(QIOChannelWebsock *ioc,
+>>>                                                Error **errp)
+>>>  {
+>>> -    char *handshake_end;
+>>> +    char *handshake_end, *tmp;
+>>>      ssize_t ret;
+>>>      /* Typical HTTP headers from novnc are 512 bytes, so limiting
+>>>       * total header size to 4096 is easily enough. */
+>>> @@ -249,9 +249,13 @@ static int qio_channel_websock_handshake_read(QIOChannelWebsock *ioc,
+>>>          }
+>>>      }
+>>>  
+>>> +    for (tmp = (char *)ioc->encinput.buffer; tmp < handshake_end; tmp++) {
+>>> +        *tmp = g_ascii_tolower(*tmp);
+>>> +    }
+>>> +
+>> self-nack - this does not in fact work - while it is fine to lowercase
+>> the header keys, we must not touch the header values as some data is
+>> case-sensitive
+>>
+>> Regards,
+>> Daniel
+> g-ascii-tolower() will help
+>
+> Den
+ah, sorry, wrong copy/paste. I meant 'g_ascii_strdown ()'
 
-v2: removed useless ref/unref (as suggested by Kevin Wolf)
-
-Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
----
- block/blkreplay.c |   65 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- stubs/replay.c    |    1 +
- vl.c              |    2 +-
- 3 files changed, 67 insertions(+), 1 deletion(-)
-
-diff --git a/block/blkreplay.c b/block/blkreplay.c
-index ddcf344..de91def 100644
---- a/block/blkreplay.c
-+++ b/block/blkreplay.c
-@@ -14,12 +14,69 @@
- #include "block/block_int.h"
- #include "sysemu/replay.h"
- #include "qapi/error.h"
-+#include "qapi/qmp/qstring.h"
- 
- typedef struct Request {
-     Coroutine *co;
-     QEMUBH *bh;
- } Request;
- 
-+static BlockDriverState *blkreplay_append_snapshot(BlockDriverState *bs,
-+                                                   Error **errp)
-+{
-+    int ret;
-+    BlockDriverState *bs_snapshot;
-+    int64_t total_size;
-+    QemuOpts *opts = NULL;
-+    char tmp_filename[PATH_MAX + 1];
-+    QDict *snapshot_options = qdict_new();
-+
-+    /* Prepare options QDict for the overlay file */
-+    qdict_put(snapshot_options, "file.driver", qstring_from_str("file"));
-+    qdict_put(snapshot_options, "driver", qstring_from_str("qcow2"));
-+
-+    /* Create temporary file */
-+    ret = get_tmp_filename(tmp_filename, PATH_MAX + 1);
-+    if (ret < 0) {
-+        error_setg_errno(errp, -ret, "Could not get temporary filename");
-+        goto out;
-+    }
-+    qdict_put(snapshot_options, "file.filename",
-+              qstring_from_str(tmp_filename));
-+
-+    /* Get the required size from the image */
-+    total_size = bdrv_getlength(bs);
-+    if (total_size < 0) {
-+        error_setg_errno(errp, -total_size, "Could not get image size");
-+        goto out;
-+    }
-+
-+    opts = qemu_opts_create(bdrv_qcow2.create_opts, NULL, 0, &error_abort);
-+    qemu_opt_set_number(opts, BLOCK_OPT_SIZE, total_size, &error_abort);
-+    ret = bdrv_create(&bdrv_qcow2, tmp_filename, opts, errp);
-+    qemu_opts_del(opts);
-+    if (ret < 0) {
-+        error_prepend(errp, "Could not create temporary overlay '%s': ",
-+                      tmp_filename);
-+        goto out;
-+    }
-+
-+    bs_snapshot = bdrv_open(NULL, NULL, snapshot_options,
-+                            BDRV_O_RDWR | BDRV_O_TEMPORARY, errp);
-+    snapshot_options = NULL;
-+    if (!bs_snapshot) {
-+        goto out;
-+    }
-+
-+    bdrv_append(bs_snapshot, bs);
-+
-+    return bs_snapshot;
-+
-+out:
-+    QDECREF(snapshot_options);
-+    return NULL;
-+}
-+
- static int blkreplay_open(BlockDriverState *bs, QDict *options, int flags,
-                           Error **errp)
- {
-@@ -35,6 +92,14 @@ static int blkreplay_open(BlockDriverState *bs, QDict *options, int flags,
-         goto fail;
-     }
- 
-+    /* Add temporary snapshot to preserve the image */
-+    if (!replay_snapshot
-+        && !blkreplay_append_snapshot(bs->file->bs, &local_err)) {
-+        ret = -EINVAL;
-+        error_propagate(errp, local_err);
-+        goto fail;
-+    }
-+
-     ret = 0;
- fail:
-     if (ret < 0) {
-diff --git a/stubs/replay.c b/stubs/replay.c
-index 9c8aa48..9991ee5 100644
---- a/stubs/replay.c
-+++ b/stubs/replay.c
-@@ -3,6 +3,7 @@
- #include "sysemu/sysemu.h"
- 
- ReplayMode replay_mode;
-+char *replay_snapshot;
- 
- int64_t replay_save_clock(unsigned int kind, int64_t clock)
- {
-diff --git a/vl.c b/vl.c
-index e10a27b..876a55a 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4450,7 +4450,7 @@ int main(int argc, char **argv, char **envp)
-     }
- 
-     /* open the virtual block devices */
--    if (snapshot || replay_mode != REPLAY_MODE_NONE) {
-+    if (snapshot) {
-         qemu_opts_foreach(qemu_find_opts("drive"), drive_enable_snapshot,
-                           NULL, NULL);
-     }
+Den
