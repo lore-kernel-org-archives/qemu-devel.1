@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45432)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cioWw-0006LQ-6c
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:37:55 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cioWy-0006Ol-Me
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:37:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cioWt-0007xX-21
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:37:54 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cioWx-0007zU-PR
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:37:56 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 28 Feb 2017 21:36:25 +0100
-Message-Id: <1488314205-16264-27-git-send-email-kwolf@redhat.com>
+Date: Tue, 28 Feb 2017 21:36:31 +0100
+Message-Id: <1488314205-16264-33-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1488314205-16264-1-git-send-email-kwolf@redhat.com>
 References: <1488314205-16264-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 26/46] blockjob: Add permissions to
- block_job_add_bdrv()
+Subject: [Qemu-devel] [PULL 32/46] block: Allow backing file links in
+ change_parent_backing_link()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,195 +23,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-Block jobs don't actually do I/O through the the reference they create
-with block_job_add_bdrv(), but they might want to use the permisssion
-system to express what the block job does to intermediate nodes. This
-adds permissions to block_job_add_bdrv() to provide the means to request
-permissions.
+Now that the backing file child role implements .attach/.detach
+callbacks, nothing prevents us from modifying the graph even if that
+involves changing backing file links.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Acked-by: Fam Zheng <famz@redhat.com>
 ---
- block/backup.c           |  4 +++-
- block/commit.c           |  8 ++++++--
- block/mirror.c           |  9 +++++++--
- block/stream.c           |  4 +++-
- blockjob.c               | 36 ++++++++++++++++++++++++++++++------
- include/block/blockjob.h |  5 ++++-
- 6 files changed, 53 insertions(+), 13 deletions(-)
+ block.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/block/backup.c b/block/backup.c
-index c759684..405f271 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -657,7 +657,9 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-         job->cluster_size = MAX(BACKUP_CLUSTER_SIZE_DEFAULT, bdi.cluster_size);
-     }
- 
--    block_job_add_bdrv(&job->common, target);
-+    /* FIXME Use real permissions */
-+    block_job_add_bdrv(&job->common, "target", target, 0, BLK_PERM_ALL,
-+                       &error_abort);
-     job->common.len = len;
-     block_job_txn_add_job(txn, &job->common);
- 
-diff --git a/block/commit.c b/block/commit.c
-index 60d29a9..b69586f 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -267,13 +267,17 @@ void commit_start(const char *job_id, BlockDriverState *bs,
-      * disappear from the chain after this operation. */
-     assert(bdrv_chain_contains(top, base));
-     for (iter = top; iter != backing_bs(base); iter = backing_bs(iter)) {
--        block_job_add_bdrv(&s->common, iter);
-+        /* FIXME Use real permissions */
-+        block_job_add_bdrv(&s->common, "intermediate node", iter, 0,
-+                           BLK_PERM_ALL, &error_abort);
-     }
-     /* overlay_bs must be blocked because it needs to be modified to
-      * update the backing image string, but if it's the root node then
-      * don't block it again */
-     if (bs != overlay_bs) {
--        block_job_add_bdrv(&s->common, overlay_bs);
-+        /* FIXME Use real permissions */
-+        block_job_add_bdrv(&s->common, "overlay of top", overlay_bs, 0,
-+                           BLK_PERM_ALL, &error_abort);
-     }
- 
-     /* FIXME Use real permissions */
-diff --git a/block/mirror.c b/block/mirror.c
-index 18128e6..4d325f1 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1052,13 +1052,18 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
-         return;
-     }
- 
--    block_job_add_bdrv(&s->common, target);
-+    /* FIXME Use real permissions */
-+    block_job_add_bdrv(&s->common, "target", target, 0, BLK_PERM_ALL,
-+                       &error_abort);
-+
-     /* In commit_active_start() all intermediate nodes disappear, so
-      * any jobs in them must be blocked */
-     if (bdrv_chain_contains(bs, target)) {
-         BlockDriverState *iter;
-         for (iter = backing_bs(bs); iter != target; iter = backing_bs(iter)) {
--            block_job_add_bdrv(&s->common, iter);
-+            /* FIXME Use real permissions */
-+            block_job_add_bdrv(&s->common, "intermediate node", iter, 0,
-+                               BLK_PERM_ALL, &error_abort);
+diff --git a/block.c b/block.c
+index 698a5c7..79d9ad0 100644
+--- a/block.c
++++ b/block.c
+@@ -2882,9 +2882,9 @@ static void change_parent_backing_link(BlockDriverState *from,
+             continue;
          }
-     }
- 
-diff --git a/block/stream.c b/block/stream.c
-index 7f49279..ba8650f 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -248,7 +248,9 @@ void stream_start(const char *job_id, BlockDriverState *bs,
-     /* Block all intermediate nodes between bs and base, because they
-      * will disappear from the chain after this operation */
-     for (iter = backing_bs(bs); iter && iter != base; iter = backing_bs(iter)) {
--        block_job_add_bdrv(&s->common, iter);
-+        /* FIXME Use real permissions */
-+        block_job_add_bdrv(&s->common, "intermediate node", iter, 0,
-+                           BLK_PERM_ALL, &error_abort);
-     }
- 
-     s->base = base;
-diff --git a/blockjob.c b/blockjob.c
-index 27833c7..4216cde 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -55,6 +55,19 @@ struct BlockJobTxn {
- 
- static QLIST_HEAD(, BlockJob) block_jobs = QLIST_HEAD_INITIALIZER(block_jobs);
- 
-+static char *child_job_get_parent_desc(BdrvChild *c)
-+{
-+    BlockJob *job = c->opaque;
-+    return g_strdup_printf("%s job '%s'",
-+                           BlockJobType_lookup[job->driver->job_type],
-+                           job->id);
-+}
-+
-+static const BdrvChildRole child_job = {
-+    .get_parent_desc    = child_job_get_parent_desc,
-+    .stay_at_node       = true,
-+};
-+
- BlockJob *block_job_next(BlockJob *job)
- {
-     if (!job) {
-@@ -115,11 +128,22 @@ static void block_job_detach_aio_context(void *opaque)
-     block_job_unref(job);
- }
- 
--void block_job_add_bdrv(BlockJob *job, BlockDriverState *bs)
-+int block_job_add_bdrv(BlockJob *job, const char *name, BlockDriverState *bs,
-+                       uint64_t perm, uint64_t shared_perm, Error **errp)
- {
--    job->nodes = g_slist_prepend(job->nodes, bs);
-+    BdrvChild *c;
-+
-+    c = bdrv_root_attach_child(bs, name, &child_job, perm, shared_perm,
-+                               job, errp);
-+    if (c == NULL) {
-+        return -EPERM;
-+    }
-+
-+    job->nodes = g_slist_prepend(job->nodes, c);
-     bdrv_ref(bs);
-     bdrv_op_block_all(bs, job->blocker);
-+
-+    return 0;
- }
- 
- void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-@@ -171,7 +195,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-     job = g_malloc0(driver->instance_size);
-     error_setg(&job->blocker, "block device is in use by block job: %s",
-                BlockJobType_lookup[driver->job_type]);
--    block_job_add_bdrv(job, bs);
-+    block_job_add_bdrv(job, "main node", bs, 0, BLK_PERM_ALL, &error_abort);
-     bdrv_op_unblock(bs, BLOCK_OP_TYPE_DATAPLANE, job->blocker);
- 
-     job->driver        = driver;
-@@ -238,9 +262,9 @@ void block_job_unref(BlockJob *job)
-         BlockDriverState *bs = blk_bs(job->blk);
-         bs->job = NULL;
-         for (l = job->nodes; l; l = l->next) {
--            bs = l->data;
--            bdrv_op_unblock_all(bs, job->blocker);
--            bdrv_unref(bs);
-+            BdrvChild *c = l->data;
-+            bdrv_op_unblock_all(c->bs, job->blocker);
-+            bdrv_root_unref_child(c);
+         if (c->role == &child_backing) {
+-            /* @from is generally not allowed to be a backing file, except for
+-             * when @to is the overlay. In that case, @from may not be replaced
+-             * by @to as @to's backing node. */
++            /* If @from is a backing file of @to, ignore the child to avoid
++             * creating a loop. We only want to change the pointer of other
++             * parents. */
+             QLIST_FOREACH(to_c, &to->children, next) {
+                 if (to_c == c) {
+                     break;
+@@ -2895,7 +2895,6 @@ static void change_parent_backing_link(BlockDriverState *from,
+             }
          }
-         g_slist_free(job->nodes);
-         blk_remove_aio_context_notifier(job->blk,
-diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-index 1acb256..9d65ef8 100644
---- a/include/block/blockjob.h
-+++ b/include/block/blockjob.h
-@@ -169,13 +169,16 @@ BlockJob *block_job_get(const char *id);
- /**
-  * block_job_add_bdrv:
-  * @job: A block job
-+ * @name: The name to assign to the new BdrvChild
-  * @bs: A BlockDriverState that is involved in @job
-+ * @perm, @shared_perm: Permissions to request on the node
-  *
-  * Add @bs to the list of BlockDriverState that are involved in
-  * @job. This means that all operations will be blocked on @bs while
-  * @job exists.
-  */
--void block_job_add_bdrv(BlockJob *job, BlockDriverState *bs);
-+int block_job_add_bdrv(BlockJob *job, const char *name, BlockDriverState *bs,
-+                       uint64_t perm, uint64_t shared_perm, Error **errp);
  
- /**
-  * block_job_set_speed:
+-        assert(c->role != &child_backing);
+         bdrv_ref(to);
+         /* FIXME Are we sure that bdrv_replace_child() can't run into
+          * &error_abort because of permissions? */
 -- 
 1.8.3.1
