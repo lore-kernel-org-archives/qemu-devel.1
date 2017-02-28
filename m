@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ciiJ6-0004cY-9T
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 08:59:13 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ciiJb-0005JM-Ue
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 08:59:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ciiJ5-0000S9-Bv
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 08:59:12 -0500
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:33378)
+	(envelope-from <alex.bennee@linaro.org>) id 1ciiJX-0000XU-3S
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 08:59:44 -0500
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:36477)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ciiJ5-0000Rl-6D
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 08:59:11 -0500
-Received: by mail-wm0-x232.google.com with SMTP id i17so2985485wmf.0
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 05:59:10 -0800 (PST)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1ciiJW-0000XF-TM
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 08:59:39 -0500
+Received: by mail-wm0-x22a.google.com with SMTP id v77so85765774wmv.1
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 05:59:38 -0800 (PST)
+References: <1487604965-23220-1-git-send-email-peter.maydell@linaro.org>
+	<1487604965-23220-5-git-send-email-peter.maydell@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1487604965-23220-5-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 28 Feb 2017 13:59:36 +0000
+Message-ID: <87h93e2z7b.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170224164021.9066-3-clement.deschamps@antfield.fr>
-References: <20170224164021.9066-1-clement.deschamps@antfield.fr>
-	<20170224164021.9066-3-clement.deschamps@antfield.fr>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Feb 2017 13:58:49 +0000
-Message-ID: <CAFEAcA_ZRB9VRQkWTJRh7D9fg-3+Bb=JGnMduhvu6WbOF2YWMw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v3 2/4] hw/sd: add card-reparenting function
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 04/11] armv7m: Use QOMified armv7m object
+ in armv7m_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +31,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Clement Deschamps <clement.deschamps@antfield.fr>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrew Baumann <andrew.baumann@microsoft.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Alistair Francis <alistair23@gmail.com>, Michael Davidsaver <mdavidsaver@gmail.com>
 
-On 24 February 2017 at 16:40, Clement Deschamps
-<clement.deschamps@antfield.fr> wrote:
-> Provide a new function sdbus_reparent_card() in sd core for reparenting
-> a card from a SDBus to another one.
+
+Peter Maydell <peter.maydell@linaro.org> writes:
+
+> Make the legacy armv7m_init() function use the newly QOMified
+> armv7m object rather than doing everything by hand.
 >
-> This function is required by the raspi platform, where the two SD
-> controllers can be dynamically switched.
+> We can return the armv7m object rather than the NVIC from
+> armv7m_init() because its interface to the rest of the
+> board (GPIOs, etc) is identical.
 >
-> Signed-off-by: Clement Deschamps <clement.deschamps@antfield.fr>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+
 > ---
->  hw/sd/core.c       | 30 ++++++++++++++++++++++++++++++
->  include/hw/sd/sd.h |  1 +
->  2 files changed, 31 insertions(+)
+>  hw/arm/armv7m.c | 49 ++++++++++++-------------------------------------
+>  1 file changed, 12 insertions(+), 37 deletions(-)
 >
+> diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
+> index 56d02d4..36f213c 100644
+> --- a/hw/arm/armv7m.c
+> +++ b/hw/arm/armv7m.c
+> @@ -131,21 +131,6 @@ static void bitband_init(Object *obj)
+>      sysbus_init_mmio(dev, &s->iomem);
+>  }
+>
+> -static void armv7m_bitband_init(void)
+> -{
+> -    DeviceState *dev;
+> -
+> -    dev = qdev_create(NULL, TYPE_BITBAND);
+> -    qdev_prop_set_uint32(dev, "base", 0x20000000);
+> -    qdev_init_nofail(dev);
+> -    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0x22000000);
+> -
+> -    dev = qdev_create(NULL, TYPE_BITBAND);
+> -    qdev_prop_set_uint32(dev, "base", 0x40000000);
+> -    qdev_init_nofail(dev);
+> -    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, 0x42000000);
+> -}
+> -
+>  /* Board init.  */
+>
+>  static const hwaddr bitband_input_addr[ARMV7M_NUM_BITBANDS] = {
+> @@ -283,35 +268,25 @@ static void armv7m_reset(void *opaque)
+>
+>  /* Init CPU and memory for a v7-M based board.
+>     mem_size is in bytes.
+> -   Returns the NVIC array.  */
+> +   Returns the ARMv7M device.  */
+>
+>  DeviceState *armv7m_init(MemoryRegion *system_memory, int mem_size, int num_irq,
+>                        const char *kernel_filename, const char *cpu_model)
+>  {
+> -    ARMCPU *cpu;
+> -    CPUARMState *env;
+> -    DeviceState *nvic;
+> +    DeviceState *armv7m;
+>
+>      if (cpu_model == NULL) {
+> -	cpu_model = "cortex-m3";
+> +        cpu_model = "cortex-m3";
+>      }
+> -    cpu = cpu_arm_init(cpu_model);
+> -    if (cpu == NULL) {
+> -        fprintf(stderr, "Unable to find CPU definition\n");
+> -        exit(1);
+> -    }
+> -    env = &cpu->env;
+> -
+> -    armv7m_bitband_init();
+> -
+> -    nvic = qdev_create(NULL, "armv7m_nvic");
+> -    qdev_prop_set_uint32(nvic, "num-irq", num_irq);
+> -    env->nvic = nvic;
+> -    qdev_init_nofail(nvic);
+> -    sysbus_connect_irq(SYS_BUS_DEVICE(nvic), 0,
+> -                       qdev_get_gpio_in(DEVICE(cpu), ARM_CPU_IRQ));
+> -    armv7m_load_kernel(cpu, kernel_filename, mem_size);
+> -    return nvic;
+> +
+> +    armv7m = qdev_create(NULL, "armv7m");
+> +    qdev_prop_set_uint32(armv7m, "num-irq", num_irq);
+> +    qdev_prop_set_string(armv7m, "cpu-model", cpu_model);
+> +    /* This will exit with an error if the user passed us a bad cpu_model */
+> +    qdev_init_nofail(armv7m);
+> +
+> +    armv7m_load_kernel(ARM_CPU(first_cpu), kernel_filename, mem_size);
+> +    return armv7m;
+>  }
+>
+>  void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem_size)
 
-It turns out we got the logic wrong here -- it causes random
-crashes on OSX, and this valgrind error on Linux:
 
-==19695== Invalid read of size 8
-==19695==    at 0x7DD59C: object_unparent (object.c:446)
-==19695==    by 0x6E920A: sdbus_reparent_card (core.c:158)
-==19695==    by 0x3ED0D5: bcm2835_gpio_reset (bcm2835_gpio.c:268)
-==19695==    by 0x5DE10E: device_reset (qdev.c:1148)
-==19695==    by 0x5DBFA3: qdev_reset_one (qdev.c:295)
-==19695==    by 0x5DCBA7: qdev_walk_children (qdev.c:610)
-==19695==    by 0x5E0D4A: qbus_walk_children (bus.c:59)
-==19695==    by 0x5DC0BD: qbus_reset_all (qdev.c:321)
-==19695==    by 0x5DC0E0: qbus_reset_all_fn (qdev.c:327)
-==19695==    by 0x5E1690: qemu_devices_reset (reset.c:69)
-==19695==    by 0x5258C6: qemu_system_reset (vl.c:1695)
-==19695==    by 0x52D915: main (vl.c:4645)
-==19695==  Address 0x354c9bc0 is 0 bytes after a block of size 32 alloc'd
-==19695==    at 0x4C2FB55: calloc (in
-/usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==19695==    by 0x1B7A5770: g_malloc0 (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.4800.2)
-==19695==    by 0x5DB77C: bus_add_child (qdev.c:85)
-==19695==    by 0x5DB8C9: qdev_set_parent_bus (qdev.c:107)
-==19695==    by 0x5DBA17: qdev_try_create (qdev.c:153)
-==19695==    by 0x5DB8EF: qdev_create (qdev.c:117)
-==19695==    by 0x49E3AB: raspi2_init (raspi.c:152)
-==19695==    by 0x52D68C: main (vl.c:4523)
-
-I've dropped it (and the following patches) from the pull request
-for the moment and will have a look at what the fix is.
-
-thanks
--- PMM
+--
+Alex Bennée
