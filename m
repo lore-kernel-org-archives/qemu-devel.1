@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cipxR-0005S8-Up
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:09:22 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cipzf-0006Th-8H
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:11:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cipxR-0001Iw-5c
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:09:21 -0500
-Received: from hera.aquilenet.fr ([2a01:474::1]:33788)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cipxQ-0001Ia-Vq
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:09:21 -0500
-Date: Tue, 28 Feb 2017 23:09:18 +0100
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20170228220918.24xob7ee7nxdfx5l@var.youpi.perso.aquilenet.fr>
-References: <20170223110433.GL10047@redhat.com> <20170223114045.GB2383@work-vm>
-	<20170226203427.6xjmuvt6okc356e5@var.youpi.perso.aquilenet.fr>
-	<20170228165445.GG2773@work-vm>
-	<20170228165730.ovdh4k6psrd3qv33@var.youpi.perso.aquilenet.fr>
-	<20170228170017.GH2773@work-vm>
-	<20170228170235.4xtrld37c6ymj5ko@var.youpi.perso.aquilenet.fr>
-	<20170228170925.GI2773@work-vm>
-	<20170228171219.ndea2aouukv4tivr@var.youpi.perso.aquilenet.fr>
-	<20170228174018.GJ2773@work-vm>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cipzc-00035V-4D
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:11:39 -0500
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:33220)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cipzb-00035O-W0
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:11:36 -0500
+Received: by mail-qk0-x244.google.com with SMTP id n186so6232167qkb.0
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 14:11:35 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170227143028.16428-1-alex.bennee@linaro.org>
+	<20170227143028.16428-2-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <1aa607c9-8075-0845-9781-60447d42610e@amsat.org>
+Date: Tue, 28 Feb 2017 19:11:31 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20170228174018.GJ2773@work-vm>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 4/5] slirp: VMStatify socket level
+In-Reply-To: <20170227143028.16428-2-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 1/2] new: dockerfiles/debian-s390-cross
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,27 +34,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, jan.kiszka@siemens.com, maethor@subiron.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, famz@redhat.com
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
 
-Dr. David Alan Gilbert, on mar. 28 f=E9vr. 2017 17:40:19 +0000, wrote:
-> * Samuel Thibault (samuel.thibault@gnu.org) wrote:
-> > Dr. David Alan Gilbert, on mar. 28 f=E9vr. 2017 17:09:26 +0000, wrote=
-:
-> > > but only for Linux.
-> >=20
-> > That's what I was referring to.
->=20
-> Yes I think that's OK because:
->    a) The alternative breaks all backwards migration
->    b) This doesn't casuse any problem for forward migration
->=20
-> There is another way, we could add a subsection that's sent whenever
-> we use non-IPv4; that would (probably) fail noisily on a backwards
-> migration to an old setup.  But IMHO it's not worth it in this case
-> given how rare a backwards migration of an IPv6 slirp connection on
-> something other than Linux is.
+Hi Alex,
 
-Alright.
+On 02/27/2017 11:30 AM, Alex Bennée wrote:
+> This adds an s390 cross build target to our library of docker setups.
+> There is an issue with the xfslibs-dev:s390x package having a clash so
+> we do a || apt-get -f install to fixup the rest of the dependencies.
+>
+> This doesn't build on the debian.docker file as we are using the
+> multilib compiler which is only available in stretch (the current
+> testing repo).
+>
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> CC: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  tests/docker/dockerfiles/debian-s390x-cross.docker | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
+>  create mode 100644 tests/docker/dockerfiles/debian-s390x-cross.docker
+>
+> diff --git a/tests/docker/dockerfiles/debian-s390x-cross.docker b/tests/docker/dockerfiles/debian-s390x-cross.docker
+> new file mode 100644
+> index 0000000000..bbb21ed088
+> --- /dev/null
+> +++ b/tests/docker/dockerfiles/debian-s390x-cross.docker
+> @@ -0,0 +1,22 @@
+> +#
+> +# Docker s390 cross-compiler target
+> +#
+> +# This docker target is based on stretch (testing) as the stable build
+> +# doesn't have the cross compiler available.
+> +#
+> +FROM debian:testing-slim
+> +
+> +# Duplicate deb line as deb-src
+> +RUN cat /etc/apt/sources.list | sed "s/deb/deb-src/" >> /etc/apt/sources.list
+> +
+> +# Add the s390x architecture
+> +RUN dpkg --add-architecture s390x
+> +
+> +# Grab the updated list of packages
+> +RUN apt update
+> +RUN apt dist-upgrade -yy
 
-Samuel
+put both in same line since they are related (intermediate layer unuseful):
+
++RUN apt update && \
++    apt dist-upgrade -yy
+
+> +RUN apt-get build-dep -yy -a s390x qemu || apt-get -f install
+> +RUN apt install -yy gcc-multilib-s390x-linux-gnu binutils-multiarch
+> +
+> +# Specify the cross prefix for this image (see tests/docker/common.rc)
+> +ENV QEMU_CONFIGURE_OPTS --cross-prefix=s390x-linux-gnu-
+>
+
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
