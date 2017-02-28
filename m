@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cinl4-0008P4-3Z
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:48:26 -0500
+	(envelope-from <armbru@redhat.com>) id 1cinlb-0000DR-Ax
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:49:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cinl3-0007cQ-8x
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:48:26 -0500
+	(envelope-from <armbru@redhat.com>) id 1cinla-0007gP-6z
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:48:59 -0500
+From: Markus Armbruster <armbru@redhat.com>
 References: <1488194450-28056-1-git-send-email-armbru@redhat.com>
-	<1488194450-28056-23-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <61ac43dd-25fb-0a83-75d5-ade76641444f@redhat.com>
-Date: Tue, 28 Feb 2017 13:48:15 -0600
+	<1488194450-28056-13-git-send-email-armbru@redhat.com>
+	<f2beae5b-482d-7151-cb7a-1f103e031f3b@redhat.com>
+Date: Tue, 28 Feb 2017 20:48:50 +0100
+In-Reply-To: <f2beae5b-482d-7151-cb7a-1f103e031f3b@redhat.com> (Eric Blake's
+	message of "Tue, 28 Feb 2017 13:19:38 -0600")
+Message-ID: <87efyif659.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1488194450-28056-23-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="caVb8DPcRAe4r18BFJHcCr0gInflKqPOm"
-Subject: Re: [Qemu-devel] [PATCH 22/24] qapi: New parse_qapi_name()
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 12/24] qobject: Propagate parse errors
+ through qobject_from_json()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,64 +25,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com, "mdroth@linux.vnet.ibm.commdroth"@linux.vnet.ibm.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, "mdroth@linux.vnet.ibm.commdroth"@linux.vnet.ibm.com, pkrempa@redhat.com, qemu-block@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---caVb8DPcRAe4r18BFJHcCr0gInflKqPOm
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com,
- "mdroth@linux.vnet.ibm.commdroth"@linux.vnet.ibm.com
-Message-ID: <61ac43dd-25fb-0a83-75d5-ade76641444f@redhat.com>
-Subject: Re: [PATCH 22/24] qapi: New parse_qapi_name()
-References: <1488194450-28056-1-git-send-email-armbru@redhat.com>
- <1488194450-28056-23-git-send-email-armbru@redhat.com>
-In-Reply-To: <1488194450-28056-23-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Eric Blake <eblake@redhat.com> writes:
 
-On 02/27/2017 05:20 AM, Markus Armbruster wrote:
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  include/qapi/util.h    |  2 ++
->  qapi/qapi-util.c       | 47 ++++++++++++++++++++++++++++++++++++++++++=
-+++++
->  tests/test-qapi-util.c | 34 ++++++++++++++++++++++++++++++++++
->  3 files changed, 83 insertions(+)
->=20
+> On 02/27/2017 05:20 AM, Markus Armbruster wrote:
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  block.c                            |  2 +-
+>>  include/qapi/qmp/qjson.h           |  5 +--
+>>  monitor.c                          |  2 +-
+>>  qobject/qjson.c                    |  4 +--
+>>  tests/check-qjson.c                | 62 +++++++++++++++++++-------------------
+>>  tests/test-visitor-serialization.c |  2 +-
+>>  6 files changed, 39 insertions(+), 38 deletions(-)
+>> 
+>
+> As with 8/24, this would be a good place for the commit message to
+> mention that this patch adds the parameter and mechanically adjusts
+> callers with minimal semantic changes, but that later patches will take
+> advantage of the parameter.
 
-> +/*
-> + * Parse a valid QAPI name from @str.
-> + * A valid name consists of letters, digits, hyphen and underscore.
-> + * It may be prefixed by __RFQDN_ (downstream extension), where RFQDN
-> + * may contain only letters, digits and hyphen.
+Already done :)
 
-With the doc fix you discussed with Kevin,
-Reviewed-by: Eric Blake <eblake@redhat.com>
+>> +++ b/include/qapi/qmp/qjson.h
+>> @@ -17,8 +17,9 @@
+>>  #include "qapi/qmp/qobject.h"
+>>  #include "qapi/qmp/qstring.h"
+>>  
+>> -QObject *qobject_from_json(const char *string);
+>> -QObject *qobject_from_jsonf(const char *string, ...) GCC_FMT_ATTR(1, 2);
+>> +QObject *qobject_from_json(const char *string, Error **errp);
+>
+> The real change here, vs.
+>
+>> +QObject *qobject_from_jsonf(const char *string, ...)
+>> +    GCC_FMT_ATTR(1, 2);
+>
+> formatting.  Should the formatting be hoisted earlier in the series,
+> when you first touch qobject_from_jsonv?
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+Either that, or simply drop this change.  I'd say drop.
 
+>>  QObject *qobject_from_jsonv(const char *string, va_list *ap, Error **errp)
+>>      GCC_FMT_ATTR(1, 0);
+>
+> This makes qobject_from_jsonf() and qobject_from_jsonv() asymmetric
+> (only one of the two can report errors);
 
---caVb8DPcRAe4r18BFJHcCr0gInflKqPOm
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Yes, but they've always been asymmetric: only qobject_from_jsonv() can
+fail, qobject_from_jsonf() asserts instead.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+>                                          and looks a bit weird to have a
+> va_list not as the last argument (as it is, a 'va_list *' argument is
+> already weird).
 
-iQEcBAEBCAAGBQJYtdP/AAoJEKeha0olJ0NqQngIAJfQuIhphkSocfhPW+1BfrXK
-E2LupDk8zxdDc4/FCGOEbw6dD5zoWcST4OIyRPdDZeQDn3ctbP4CTDy+2MlSBlLy
-cQ4Nl21WlAKg6qPll0q0xDdfhtN/yYCthQlND4YOWAjtBvuZj0Y9cnC97eZnq+Ei
-pDr/KDnGI4/dQ8TE57qyzF0S3jvXzY+pGfafHMCWYEgIf0W4Nsxm/+xsor8gyjJr
-n4LCdb7dD2RH+EW+sjoJxclkq9Ij9x8nFXRw/OCTsF6XXWHn770DrYwI54YW+pi2
-BG9tstSsSAG3Ph62Yfkx7I53w+o/787xJIbzvXDsnxXYS9PdwymXB+LyYlaLaRg=
-=PCy+
------END PGP SIGNATURE-----
+The weirdness precedes the patch, though.
 
---caVb8DPcRAe4r18BFJHcCr0gInflKqPOm--
+>                  If symmetry is important, we can put errp prior to the
+> .../ap argument (then both forms have an errp pointer).  But I don't
+> think it matters in the context of this series.  If you DO change it,
+> though, then 8/24 would be the place to tweak it.
+
+I'd prefer not to change it now.  Perhaps we can improve things around
+here in separate patches.
+
+> At one point, I posted a series that removed all uses of
+> qobject_from_json[fv] (leaving just qobject_from_json); at the time,
+> there was not a strong opinion on whether the series was worthwhile, but
+> if we want it, I'm fine rebasing on top of this.  (One argument in favor
+> of my series would be getting rid of the weird 'va_list *' argument).
+
+I didn't like it at the time.  Perhaps I should have a second look.
+
+>> +++ b/qobject/qjson.c
+>> @@ -50,9 +50,9 @@ QObject *qobject_from_jsonv(const char *string, va_list *ap, Error **errp)
+>>      return state.result;
+>>  }
+>>  
+>> -QObject *qobject_from_json(const char *string)
+>> +QObject *qobject_from_json(const char *string, Error **errp)
+>>  {
+>> -    return qobject_from_jsonv(string, NULL, NULL);
+>> +    return qobject_from_jsonv(string, NULL, errp);
+>
+> Of course, if you rebase the series to rearrange where errp appears in
+> relation to va_list, then be sure this changes to match (the compiler
+> may or may not flag it, if va_list looks too much like void*).
+>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Thanks!
