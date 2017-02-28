@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciVmW-00052m-FU
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 19:36:45 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ciVmX-00053D-08
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 19:36:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciVmV-00058k-8t
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 19:36:44 -0500
-Date: Tue, 28 Feb 2017 11:28:10 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1ciVmV-00058q-KR
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 19:36:45 -0500
+Date: Tue, 28 Feb 2017 11:12:21 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170228002810.GD17615@umbus.fritz.box>
+Message-ID: <20170228001221.GB17615@umbus.fritz.box>
 References: <cover.1487829585.git.sam.bobroff@au1.ibm.com>
-	<034945c1bbc8d4a97e5f568d4d463af2c9a24080.1487829585.git.sam.bobroff@au1.ibm.com>
+	<ca5b4ee7d0dc010a545e5ace603dcf019d8d0c02.1487829585.git.sam.bobroff@au1.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="01b0+GAtiOmVD9T6"
+	protocol="application/pgp-signature"; boundary="XeYnZTu7hwE7l7sm"
 Content-Disposition: inline
-In-Reply-To: <034945c1bbc8d4a97e5f568d4d463af2c9a24080.1487829585.git.sam.bobroff@au1.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 08/12] spapr: Only setup HTP if
- necessary.
+In-Reply-To: <ca5b4ee7d0dc010a545e5ace603dcf019d8d0c02.1487829585.git.sam.bobroff@au1.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 06/12] spapr: Add ibm,
+ processor-radix-AP-encodings to the device tree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,134 +29,170 @@ To: Sam Bobroff <sam.bobroff@au1.ibm.com>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, sjitindarsingh@gmail.com
 
 
---01b0+GAtiOmVD9T6
+--XeYnZTu7hwE7l7sm
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-s/HTP/HPT/ in subject line.
-
-
-On Thu, Feb 23, 2017 at 05:00:01PM +1100, Sam Bobroff wrote:
-> If QEMU is using KVM, and KVM is capable of running in radix mode,
-> guests can be run in real-mode without allocating a HPT (because KVM
-> will use a minimal RPT). So in this case, we avoid creating the HPT
-> at reset time and later (during CAS) create it if it is necessary.
+On Thu, Feb 23, 2017 at 04:59:59PM +1100, Sam Bobroff wrote:
+> Use the new ioctl, KVM_PPC_GET_RMMU_INFO, to fetch radix MMU
+> information from KVM and present the page encodings in the device tree
+> under ibm,processor-radix-AP-encodings. This provides page size
+> information to the guest which is necessary for it to use radix mode.
 >=20
 > Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
-
-So, IIRC, we discussed previously that the logical way to do things
-was to, by default, delay HPT allocation until CAS time, and just do
-it at reset time for the case that needs it: hash host with KVM.
-
-Did you hit a problem with that approach, or is there still work to be
-done here?
-
 > ---
 > v2:
 >=20
-> * This patch has been mostly rewritten to move the late HPT allocation to=
- CAS.
-> This allows a guest to start in radix mode (when it's in real mode) and t=
-hen
-> change to hash, even if it is a legacy guest and will not call
-> h_register_process_table().
-> * Added an exported function to spapr.c to perform HPT allocation and adj=
-ust
-> the vrma if necessary. This makes it possible to allocate the HPT from
-> h_client_architecture_support() in spapr_hcall.c.
+> * ppc_radix_page_info now kept in native format, conversion to BE done wh=
+en adding to the device tree.
+> * radix_page_info moved into the CPU class, cleaning up some code.
+
+Looks pretty good, although I imaginge it will need a little rework to
+rebase on top of the TCG radix stuff.  Also one comment below..
+
 >=20
->  hw/ppc/spapr.c         | 24 +++++++++++++++---------
->  hw/ppc/spapr_hcall.c   | 10 ++++++++++
->  include/hw/ppc/spapr.h |  1 +
->  3 files changed, 26 insertions(+), 9 deletions(-)
+>  hw/ppc/spapr.c       | 12 ++++++++++++
+>  include/sysemu/kvm.h |  1 +
+>  target/ppc/cpu-qom.h |  1 +
+>  target/ppc/cpu.h     |  4 ++++
+>  target/ppc/kvm.c     | 27 +++++++++++++++++++++++++++
+>  5 files changed, 45 insertions(+)
 >=20
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index ca3812555f..dfee0f685f 100644
+> index cceb35f083..ca3812555f 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -1123,6 +1123,17 @@ static void spapr_reallocate_hpt(sPAPRMachineState=
- *spapr, int shift,
->      }
+> @@ -409,6 +409,8 @@ static void spapr_populate_cpu_dt(CPUState *cs, void =
+*fdt, int offset,
+>      sPAPRDRConnector *drc;
+>      sPAPRDRConnectorClass *drck;
+>      int drc_index;
+> +    uint32_t radix_AP_encodings[PPC_PAGE_SIZES_MAX_SZ];
+> +    int i;
+> =20
+>      drc =3D spapr_dr_connector_by_id(SPAPR_DR_CONNECTOR_TYPE_CPU, index);
+>      if (drc) {
+> @@ -494,6 +496,16 @@ static void spapr_populate_cpu_dt(CPUState *cs, void=
+ *fdt, int offset,
+>      _FDT(spapr_fixup_cpu_numa_dt(fdt, offset, cs));
+> =20
+>      _FDT(spapr_fixup_cpu_smt_dt(fdt, offset, cpu, compat_smt));
+> +
+> +    if (pcc->radix_page_info) {
+> +        for (i =3D 0; i < pcc->radix_page_info->count; i++) {
+> +            radix_AP_encodings[i] =3D cpu_to_be32(pcc->radix_page_info->=
+entries[i]);
+> +        }
+> +        _FDT((fdt_setprop(fdt, offset, "ibm,processor-radix-AP-encodings=
+",
+> +                          radix_AP_encodings,
+> +                          pcc->radix_page_info->count *
+> +                          sizeof(radix_AP_encodings[0]))));
+> +    }
 >  }
 > =20
-> +void spapr_setup_hpt_and_vrma(sPAPRMachineState *spapr)
+>  static void spapr_populate_cpus_dt_node(void *fdt, sPAPRMachineState *sp=
+apr)
+> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+> index 3045ee7678..01a8db1180 100644
+> --- a/include/sysemu/kvm.h
+> +++ b/include/sysemu/kvm.h
+> @@ -526,5 +526,6 @@ int kvm_set_one_reg(CPUState *cs, uint64_t id, void *=
+source);
+>   * Returns: 0 on success, or a negative errno on failure.
+>   */
+>  int kvm_get_one_reg(CPUState *cs, uint64_t id, void *target);
+> +struct ppc_radix_page_info *kvm_get_radix_page_info(void);
+>  int kvm_get_max_memslots(void);
+>  #endif
+> diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+> index 4807f4d86c..0efb543912 100644
+> --- a/target/ppc/cpu-qom.h
+> +++ b/target/ppc/cpu-qom.h
+> @@ -195,6 +195,7 @@ typedef struct PowerPCCPUClass {
+>      int bfd_mach;
+>      uint32_t l1_dcache_size, l1_icache_size;
+>      const struct ppc_segment_page_sizes *sps;
+> +    struct ppc_radix_page_info *radix_page_info;
+>      void (*init_proc)(CPUPPCState *env);
+>      int  (*check_pow)(CPUPPCState *env);
+>      int (*handle_mmu_fault)(PowerPCCPU *cpu, vaddr eaddr, int rwx, int m=
+mu_idx);
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index b559b67073..a6c8c5ff4c 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -934,6 +934,10 @@ struct ppc_segment_page_sizes {
+>      struct ppc_one_seg_page_size sps[PPC_PAGE_SIZES_MAX_SZ];
+>  };
+> =20
+> +struct ppc_radix_page_info {
+> +    uint32_t count;
+> +    uint32_t entries[PPC_PAGE_SIZES_MAX_SZ];
+> +};
+> =20
+>  /***********************************************************************=
+******/
+>  /* The whole PowerPC CPU context */
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index d53ede8b4a..cf62a42c1f 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -48,6 +48,7 @@
+>  #if defined(TARGET_PPC64)
+>  #include "hw/ppc/spapr_cpu_core.h"
+>  #endif
+> +#include "sysemu/kvm_int.h"
+> =20
+>  //#define DEBUG_KVM
+> =20
+> @@ -329,6 +330,30 @@ static void kvm_get_smmu_info(PowerPCCPU *cpu, struc=
+t kvm_ppc_smmu_info *info)
+>      kvm_get_fallback_smmu_info(cpu, info);
+>  }
+> =20
+> +struct ppc_radix_page_info *kvm_get_radix_page_info(void)
 > +{
-> +    spapr_reallocate_hpt(spapr,
-> +                     spapr_hpt_shift_for_ramsize(MACHINE(qdev_get_machin=
-e())->maxram_size),
-> +                     &error_fatal);
-> +    if (spapr->vrma_adjust) {
-> +        spapr->rma_size =3D kvmppc_rma_size(spapr_node0_size(),
-> +                                          spapr->htab_shift);
-> +    }
-> +}
+> +    KVMState *s =3D KVM_STATE(current_machine->accelerator);
+> +    struct ppc_radix_page_info *radix_page_info;
+> +    struct kvm_ppc_rmmu_info rmmu_info;
+> +    int i;
 > +
->  static void find_unknown_sysbus_device(SysBusDevice *sbdev, void *opaque)
->  {
->      bool matched =3D false;
-> @@ -1151,15 +1162,10 @@ static void ppc_spapr_reset(void)
->      /* Check for unknown sysbus devices */
->      foreach_dynamic_sysbus_device(find_unknown_sysbus_device, NULL);
-> =20
-> -    /* Allocate and/or reset the hash page table */
-> -    spapr_reallocate_hpt(spapr,
-> -                         spapr_hpt_shift_for_ramsize(machine->maxram_siz=
-e),
-> -                         &error_fatal);
-> -
-> -    /* Update the RMA size if necessary */
-> -    if (spapr->vrma_adjust) {
-> -        spapr->rma_size =3D kvmppc_rma_size(spapr_node0_size(),
-> -                                          spapr->htab_shift);
-> +    /* If using KVM with radix mode available, VCPUs can be started
-> +     * without a HPT because KVM will start them in radix mode. */
-> +    if (!(kvm_enabled() && kvmppc_has_cap_mmu_radix())) {
-> +        spapr_setup_hpt_and_vrma(spapr);
->      }
-> =20
->      qemu_devices_reset();
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 42d20e0b92..cea34073aa 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1002,6 +1002,16 @@ static target_ulong h_client_architecture_support(=
-PowerPCCPU *cpu,
->      ov5_updates =3D spapr_ovec_new();
->      spapr->cas_reboot =3D spapr_ovec_diff(ov5_updates,
->                                          ov5_cas_old, spapr->ov5_cas);
-> +    if (kvm_enabled()) {
-> +        if (kvmppc_has_cap_mmu_radix()) {
-> +            /* If the HPT hasn't yet been set up (see
-> +             * ppc_spapr_reset()), and it's needed, do it now: */
-
-I think it's a bit fragile to have here it explicitly mirror the logic
-which determines whether the HPT is allocated early.  I'd prefer to
-explicitly test here whether we have allocated an HPT - adding a flag,
-if we have to.
-
-> +            if (!spapr_ovec_test(ov5_updates, OV5_MMU_RADIX)) {
-> +                /* legacy hash or new hash: */
-> +                spapr_setup_hpt_and_vrma(spapr);
-> +            }
+> +    if (!kvm_check_extension(s, KVM_CAP_PPC_MMU_RADIX)) {
+> +        return NULL;
+> +    }
+> +    if (kvm_vm_ioctl(s, KVM_PPC_GET_RMMU_INFO, &rmmu_info)) {
+> +        return NULL;
+> +    }
+> +    radix_page_info =3D g_malloc0(sizeof(*radix_page_info));
+> +    radix_page_info->count =3D 0;
+> +    for (i =3D 0; i < PPC_PAGE_SIZES_MAX_SZ; i++) {
+> +        if (rmmu_info.ap_encodings[i]) {
+> +            radix_page_info->entries[i] =3D rmmu_info.ap_encodings[i];
+> +            radix_page_info->count++;
 > +        }
 > +    }
+> +    return radix_page_info;
+> +}
+> +
+>  static long gethugepagesize(const char *mem_path)
+>  {
+>      struct statfs fs;
+> @@ -2379,6 +2404,8 @@ static void kvmppc_host_cpu_class_init(ObjectClass =
+*oc, void *data)
+>          pcc->l1_icache_size =3D icache_size;
+>      }
 > =20
->      if (!spapr->cas_reboot) {
->          spapr->cas_reboot =3D
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index f9b17d860a..a30cbc485c 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -590,6 +590,7 @@ void spapr_dt_events(sPAPRMachineState *sm, void *fdt=
-);
->  int spapr_h_cas_compose_response(sPAPRMachineState *sm,
->                                   target_ulong addr, target_ulong size,
->                                   sPAPROptionVector *ov5_updates);
-> +void spapr_setup_hpt_and_vrma(sPAPRMachineState *spapr);
->  sPAPRTCETable *spapr_tce_new_table(DeviceState *owner, uint32_t liobn);
->  void spapr_tce_table_enable(sPAPRTCETable *tcet,
->                              uint32_t page_shift, uint64_t bus_offset,
+> +    pcc->radix_page_info =3D kvm_enabled() ? kvm_get_radix_page_info() :=
+ NULL;
+
+This whole function is only called in the kvm case: no need to check
+kvm_enabled() here.
+
+>      /* Reason: kvmppc_host_cpu_initfn() dies when !kvm_enabled() */
+>      dc->cannot_destroy_with_object_finalize_yet =3D true;
+>  }
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -164,25 +200,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---01b0+GAtiOmVD9T6
+--XeYnZTu7hwE7l7sm
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYtMQYAAoJEGw4ysog2bOSoOAP/2WGAgeCj0h1naK3julA0uLd
-AqcG4cFEg+Bx1Gg58UFrO4EDWdTjtdNbp9HPXzinyoGC5t97zOosOXK4jjtMZTsp
-Qh635CHMSQSipYwQZhrm12T3X614I0hs7CkqBmTlFQ1h7qenI6jKg9N7Ql9JRr3G
-8iQDdmU9sWcIC/KnKmUCo1S484XYJrR1vNvp8HE4JG1wlztWk4PIBe5THWI7iu44
-3x/twRo9nisZVPT5O9hf3PlT5jE/WikAjzjPW/d1LQXo/9C9OTo3SnESVLDygVxU
-1K62Eqpb8hGOUgFo9mmZV6Al7fNcBPIr2kaII5GTNKZXoIMYyhHJzHrot9pMV5Kx
-N8WOZHt3HO119I2PLyLpXXsXIaV1o2fCV0eh1xknfEYTxk9g8qKmFupTjcZCX0jy
-0uvMIsfyp2W+0mV4z7pQ7pJoTvCTczQssWVsk+lvW+GpsIJSQjvR6cSFUvdz4y87
-2EvcbOXai50QyIEUDAE711Z3eBDuC8hQD/d4BsIaU0tjgmK2eO6iTfprKgDTXiOi
-p9shkJQn0GpX5EtVakSsXLVvVfAzt7GCG2XPQ4SnXBYfv6gqSqCKi7aUzjgpgwFu
-jv+yAUA0ubUfVwdTewidiwMa5BTl7xf4U57IXRCmKLEsjweE1mMpeaEXN88SuPSs
-Uc5YDX2u5LX0uDxW/w6g
-=tWLd
+iQIcBAEBCAAGBQJYtMBlAAoJEGw4ysog2bOSxs0P/1y4pUG6v0CvTF7k3Mb8bT+n
+OFvwhgx34Amzs61yH6FgSvEXDKKpSpHmaQ6hsNU7DqZb4PzZlVhq6wq5baGdM0/3
+sebD2nDmi4OhdVnZU9GlF+NvQTxabGMRHJRZQLE606o0bGK8W68NwxlGCRVXfXUT
+drmqfq3slC63tDmeAVjyZQPwFSQrHs8y4IQcixH301nJuXOPX6W9vPMR+HqnfUDM
+dPJu7PaMLQlta4cj0ntS5DuADPH7PtdDXHweF65MbkNBTs9koJP8LzqIRZpzbpvu
+4WIGSOE0jD1VZKdvPMj0SwEskBuik1+1lqEtw9KniEfcKdQMuJeyPb2cqn+i4r+n
+On8WGDP+et64ipzMK+xitOJJyktrCpp8KNAvgcNIZlU+DRmbOh6G0AhFb5Q+XUr/
+pmenGdvTWOQifgZk9vqGgQrcCenZfGTMBrFHYrWhKJOzoCkybiHS6ufqZiYRwq0h
+o+IdCrVdyVzraOoL3hNJgVpUKrsROpPcUAAt7V0tzKxcdcQBs2f0b5PhtMPtE6e9
+a4QbVdvMJrsRO1WcPmsD7qPOBGR5YWRx/IKnWJGXPUvHV6OJKfO8vTTlWWqHNe/2
+hJJ+xY49wxiEvMQWomVFwt7Pr617IzE0JRFBXXxBkhCKEtUP8kyuTxIgHULOZE0b
+MAP0i3ywjh19TSAj1hbd
+=XPgS
 -----END PGP SIGNATURE-----
 
---01b0+GAtiOmVD9T6--
+--XeYnZTu7hwE7l7sm--
