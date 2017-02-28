@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cihDV-0007YY-Q9
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:49:23 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cihIg-0003km-UN
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:54:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cihDU-0002RZ-HU
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:49:21 -0500
-Date: Tue, 28 Feb 2017 12:49:11 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170228124911.GC2720@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <cover.1488220970.git.jcody@redhat.com>
-	<12a16b28300f871052a49897ec7875a082fc63e3.1488220970.git.jcody@redhat.com>
-	<c5869fe5-fa51-3f2f-26d6-26a733c15493@redhat.com>
-	<20170228035744.GO25637@localhost.localdomain>
-	<20170228101651.GE2762@redhat.com>
-	<20170228102849.GF2762@redhat.com>
-	<20170228123452.GQ25637@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170228123452.GQ25637@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v2 5/5] block/rbd: add support for
- 'mon_host', 'auth_supported' via QAPI
+	(envelope-from <kwolf@redhat.com>) id 1cihIg-0003vg-15
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:54:43 -0500
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Tue, 28 Feb 2017 13:53:47 +0100
+Message-Id: <1488286469-9381-3-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
+References: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 02/44] block: Add Error argument to
+ bdrv_attach_child()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,73 +20,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-On Tue, Feb 28, 2017 at 07:34:52AM -0500, Jeff Cody wrote:
-> On Tue, Feb 28, 2017 at 10:28:49AM +0000, Daniel P. Berrange wrote:
-> > On Tue, Feb 28, 2017 at 10:16:51AM +0000, Daniel P. Berrange wrote:
-> > > On Mon, Feb 27, 2017 at 10:57:44PM -0500, Jeff Cody wrote:
-> > > > On Mon, Feb 27, 2017 at 04:47:54PM -0600, Eric Blake wrote:
-> > > > > On 02/27/2017 12:58 PM, Jeff Cody wrote:
-> > > > > > @@ -604,6 +620,29 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-> > > > > >          goto failed_shutdown;
-> > > > > >      }
-> > > > > >  
-> > > > > > +    /* if mon_host was specified */
-> > > > > > +    if (host) {
-> > > > > > +        const char *hostname = host;
-> > > > > > +        char *mon_host = NULL;
-> > > > > > +
-> > > > > > +        if (port) {
-> > > > > > +            mon_host = g_strdup_printf("%s:%s", host, port);
-> > > > > 
-> > > > > Does Ceph care about IPv6 (in which case you may need [host]:port when
-> > > > > host itself includes ':')?
-> > > > >
-> > > > 
-> > > > Some quick sanity testing seems to show that it does not need [] for ipv6
-> > > > addresses, which is nice.
-> > > 
-> > > Hmm, that is very odd to me, as that means parsing is ambiguous. The
-> > > ceph 'mon_host' option allows the port to be omitted, so given a
-> > > string  2001:242:24:23   there's no way of knowing whether it is
-> > > a IPv6 addr 2001:242:24:23, with no port, or an addr 2001:242:24 with
-> > > port of 23
-> > 
-> > Looking at the source code to ceph it appears that if you omit the
-> > use of [], then it will treat the entire string as being the address
-> > without port. It does look to support use of [], so we should use
-> > that IIUC.
-> 
-> For the sake of clarity, when you say we should use [] for ipv6, you mean
-> QEMU (rather than doing it in libvirt)?
+It will have to return an error soon, so prepare the callers for it.
 
-Yes, in QAPI JSON, it should be the bare IPv6 address in the server
-host field. When QEMU conbines the host + port to form the mon_host
-string, it must add [] if it sees the host from QAPI is a raw IPv6
-address
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+---
+ block.c               | 16 +++++++++++++---
+ block/quorum.c        |  9 ++++++++-
+ include/block/block.h |  3 ++-
+ 3 files changed, 23 insertions(+), 5 deletions(-)
 
-> > https://blog.widodh.nl/2014/11/ceph-with-a-cluster-and-public-network-on-ipv6/
-> > 
-> > See also entity_addr_t::parse in $CEPH/src/msg/msg_types.cc which is
-> > what I think parses the mon addr. NB, I've not tested this yet, so
-> > if you have a live ceph cluster with ipv6, it'd be good to verify that
-> > using [] is correct.
-> >
-> 
-> Do you think this needs to be in place before either A) we pull the series
-> for softfreeze, or B) 2.10?  I.e., is this something we can fix up later?
-> It is OK if not, but I have a flight leaving soon and can't work on the
-> series anymore -- so depending on this and how v3 review goes, we may just
-> need to slip the series to 2.10.
-
-The fix doesn't affect QAPI protocol spec, so as long as it is fixed
-before 2.9 release it'd be ok.
-
-Regards,
-Daniel
+diff --git a/block.c b/block.c
+index b663204..65240fa 100644
+--- a/block.c
++++ b/block.c
+@@ -1368,7 +1368,8 @@ BdrvChild *bdrv_root_attach_child(BlockDriverState *child_bs,
+ BdrvChild *bdrv_attach_child(BlockDriverState *parent_bs,
+                              BlockDriverState *child_bs,
+                              const char *child_name,
+-                             const BdrvChildRole *child_role)
++                             const BdrvChildRole *child_role,
++                             Error **errp)
+ {
+     BdrvChild *child = bdrv_root_attach_child(child_bs, child_name, child_role,
+                                               parent_bs);
+@@ -1469,7 +1470,9 @@ void bdrv_set_backing_hd(BlockDriverState *bs, BlockDriverState *backing_hd)
+         bs->backing = NULL;
+         goto out;
+     }
+-    bs->backing = bdrv_attach_child(bs, backing_hd, "backing", &child_backing);
++    /* FIXME Error handling */
++    bs->backing = bdrv_attach_child(bs, backing_hd, "backing", &child_backing,
++                                    &error_abort);
+     bs->open_flags &= ~BDRV_O_NO_BACKING;
+     pstrcpy(bs->backing_file, sizeof(bs->backing_file), backing_hd->filename);
+     pstrcpy(bs->backing_format, sizeof(bs->backing_format),
+@@ -1648,6 +1651,7 @@ BdrvChild *bdrv_open_child(const char *filename,
+                            const BdrvChildRole *child_role,
+                            bool allow_none, Error **errp)
+ {
++    BdrvChild *c;
+     BlockDriverState *bs;
+ 
+     bs = bdrv_open_child_bs(filename, options, bdref_key, parent, child_role,
+@@ -1656,7 +1660,13 @@ BdrvChild *bdrv_open_child(const char *filename,
+         return NULL;
+     }
+ 
+-    return bdrv_attach_child(parent, bs, bdref_key, child_role);
++    c = bdrv_attach_child(parent, bs, bdref_key, child_role, errp);
++    if (!c) {
++        bdrv_unref(bs);
++        return NULL;
++    }
++
++    return c;
+ }
+ 
+ static BlockDriverState *bdrv_append_temp_snapshot(BlockDriverState *bs,
+diff --git a/block/quorum.c b/block/quorum.c
+index 86e2072..bdbcec6 100644
+--- a/block/quorum.c
++++ b/block/quorum.c
+@@ -1032,10 +1032,17 @@ static void quorum_add_child(BlockDriverState *bs, BlockDriverState *child_bs,
+ 
+     /* We can safely add the child now */
+     bdrv_ref(child_bs);
+-    child = bdrv_attach_child(bs, child_bs, indexstr, &child_format);
++
++    child = bdrv_attach_child(bs, child_bs, indexstr, &child_format, errp);
++    if (child == NULL) {
++        s->next_child_index--;
++        bdrv_unref(child_bs);
++        goto out;
++    }
+     s->children = g_renew(BdrvChild *, s->children, s->num_children + 1);
+     s->children[s->num_children++] = child;
+ 
++out:
+     bdrv_drained_end(bs);
+ }
+ 
+diff --git a/include/block/block.h b/include/block/block.h
+index f62f38e..ff951ea 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -520,7 +520,8 @@ void bdrv_unref_child(BlockDriverState *parent, BdrvChild *child);
+ BdrvChild *bdrv_attach_child(BlockDriverState *parent_bs,
+                              BlockDriverState *child_bs,
+                              const char *child_name,
+-                             const BdrvChildRole *child_role);
++                             const BdrvChildRole *child_role,
++                             Error **errp);
+ 
+ bool bdrv_op_is_blocked(BlockDriverState *bs, BlockOpType op, Error **errp);
+ void bdrv_op_block(BlockDriverState *bs, BlockOpType op, Error *reason);
 -- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+1.8.3.1
