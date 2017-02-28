@@ -1,19 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cihh6-0001rD-6v
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 08:19:57 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cihil-0003OJ-1K
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 08:21:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cihh5-0003UF-89
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 08:19:56 -0500
-Date: Tue, 28 Feb 2017 14:19:45 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170228131945.GB4090@noname.redhat.com>
-References: <1488285607-23657-1-git-send-email-pl@kamp.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1488285607-23657-1-git-send-email-pl@kamp.de>
-Subject: Re: [Qemu-devel] [PATCH V3] qemu-img: make convert async
+	(envelope-from <pbonzini@redhat.com>) id 1cihih-0004Js-1v
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 08:21:38 -0500
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 28 Feb 2017 14:21:32 +0100
+Message-Id: <20170228132132.20231-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH] virtio: always use handle_aio_output if
+ registered
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,44 +18,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, stefanha@gmail.com, ct@flyingcircus.io, mreitz@redhat.com, famz@redhat.com, eblake@redhat.com
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, kraxel@redhat.com, qemu-stable@nongnu.org
 
-Am 28.02.2017 um 13:40 hat Peter Lieven geschrieben:
-> the convert process is currently completely implemented with sync operations.
-> That means it reads one buffer and then writes it. No parallelism and each sync
-> request takes as long as it takes until it is completed.
-> 
-> This can be a big performance hit when the convert process reads and writes
-> to devices which do not benefit from kernel readahead or pagecache.
-> In our environment we heavily have the following two use cases when using
-> qemu-img convert.
-> 
-> a) reading from NFS and writing to iSCSI for deploying templates
-> b) reading from iSCSI and writing to NFS for backups
-> 
-> In both processes we use libiscsi and libnfs so we have no kernel cache.
-> 
-> This patch changes the convert process to work with parallel running coroutines
-> which can significantly improve performance for network storage devices:
-> 
-> qemu-img (master)
->  nfs -> iscsi 22.8 secs
->  nfs -> ram   11.7 secs
->  ram -> iscsi 12.3 secs
-> 
-> qemu-img-async (8 coroutines, in-order write disabled)
->  nfs -> iscsi 11.0 secs
->  nfs -> ram   10.4 secs
->  ram -> iscsi  9.0 secs
-> 
-> This patches introduces 2 new cmdline parameters. The -m parameter to specify
-> the number of coroutines running in parallel (defaults to 8). And the -W parameter to
-> allow qemu-img to write to the target out of order rather than sequential. This improves
-> performance as the writes do not have to wait for each other to complete.
-> 
-> Signed-off-by: Peter Lieven <pl@kamp.de>
+Commit ad07cd6 ("virtio-scsi: always use dataplane path if ioeventfd is
+active", 2016-10-30) and 9ffe337 ("virtio-blk: always use dataplane
+path if ioeventfd is active", 2016-10-30) broke the virtio 1.0
+indirect access registers.
 
-Thanks, updated in the block branch.
+The indirect access registers bypass the ioeventfd, so that virtio-blk
+and virtio-scsi now repeatedly try to initialize dataplane instead of
+triggering the guest->host EventNotifier.  Detect the situation by
+checking vq->handle_aio_output; if it is not NULL, trigger the
+EventNotifier, which is how the device expects to get notifications
+and in fact the only thread-safe manner to deliver them.
 
-Kevin
+Fixes: ad07cd6
+Fixes: 9ffe337
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hw/virtio/virtio.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 23483c7..1206f6c 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -1458,7 +1458,18 @@ static void virtio_queue_notify_vq(VirtQueue *vq)
+ 
+ void virtio_queue_notify(VirtIODevice *vdev, int n)
+ {
+-    virtio_queue_notify_vq(&vdev->vq[n]);
++    VirtQueue *vq = &vdev->vq[n];
++
++    if (unlikely(!vq->vring.desc || vdev->broken)) {
++        return;
++    }
++
++    trace_virtio_queue_notify(vdev, vq - vdev->vq, vq);
++    if (vq->handle_aio_output) {
++        event_notifier_set(&vq->host_notifier);
++    } else if (vq->handle_output) {
++        vq->handle_output(vdev, vq);
++    }
+ }
+ 
+ uint16_t virtio_queue_vector(VirtIODevice *vdev, int n)
+-- 
+2.9.3
