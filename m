@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cied6-0006oW-CA
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:37 -0500
+	(envelope-from <fred.konrad@greensocs.com>) id 1cied7-0006oz-5M
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cied4-00048t-WF
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:36 -0500
-Received: from greensocs.com ([193.104.36.180]:38421)
+	(envelope-from <fred.konrad@greensocs.com>) id 1cied5-00049C-Ok
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:37 -0500
+Received: from greensocs.com ([193.104.36.180]:38433)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cied4-00048g-Iq
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:34 -0500
+	(envelope-from <fred.konrad@greensocs.com>) id 1cied5-00048y-DO
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:35 -0500
 From: fred.konrad@greensocs.com
-Date: Tue, 28 Feb 2017 11:03:01 +0100
-Message-Id: <1488276185-31168-7-git-send-email-fred.konrad@greensocs.com>
+Date: Tue, 28 Feb 2017 11:03:02 +0100
+Message-Id: <1488276185-31168-8-git-send-email-fred.konrad@greensocs.com>
 In-Reply-To: <1488276185-31168-1-git-send-email-fred.konrad@greensocs.com>
 References: <1488276185-31168-1-git-send-email-fred.konrad@greensocs.com>
-Subject: [Qemu-devel] [PATCH v3 06/10] docs: add qemu-clock documentation
+Subject: [Qemu-devel] [PATCH v3 07/10] introduce fixed-clock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,141 +28,71 @@ Cc: peter.maydell@linaro.org, edgar.iglesias@xilinx.com, alistair.francis@xilinx
 
 From: KONRAD Frederic <fred.konrad@greensocs.com>
 
-This adds the qemu-clock documentation.
+This is a fixed clock device.
+It justs behave as an empty device with a parametrable output rate.
 
 Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
-
-V1 -> V2:
-  * Fixed in accordance with the changes in the previous patches.
 ---
- docs/clock.txt | 278 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 278 insertions(+)
- create mode 100644 docs/clock.txt
+ hw/misc/Makefile.objs         |  1 +
+ hw/misc/fixed-clock.c         | 88 +++++++++++++++++++++++++++++++++++++++++++
+ include/hw/misc/fixed-clock.h | 30 +++++++++++++++
+ 3 files changed, 119 insertions(+)
+ create mode 100644 hw/misc/fixed-clock.c
+ create mode 100644 include/hw/misc/fixed-clock.h
 
-diff --git a/docs/clock.txt b/docs/clock.txt
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index 898e4cc..e9c4dd3 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -55,3 +55,4 @@ obj-$(CONFIG_EDU) += edu.o
+ obj-$(CONFIG_HYPERV_TESTDEV) += hyperv_testdev.o
+ obj-$(CONFIG_AUX) += auxbus.o
+ obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
++obj-y += fixed-clock.o
+diff --git a/hw/misc/fixed-clock.c b/hw/misc/fixed-clock.c
 new file mode 100644
-index 0000000..010ae50
+index 0000000..b5af24d
 --- /dev/null
-+++ b/docs/clock.txt
-@@ -0,0 +1,278 @@
++++ b/hw/misc/fixed-clock.c
+@@ -0,0 +1,88 @@
++/*
++ * Fixed clock
++ *
++ *  Copyright (C) 2016 : GreenSocs Ltd
++ *      http://www.greensocs.com/ , email: info@greensocs.com
++ *
++ *  Frederic Konrad   <fred.konrad@greensocs.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation, either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ *
++ */
 +
-+What is a QEMU_CLOCK
-+====================
++#include "qemu/osdep.h"
++#include "hw/qdev.h"
++#include "hw/misc/fixed-clock.h"
++#include "qemu/qemu-clock.h"
++#include "qapi/error.h"
 +
-+A QEMU_CLOCK is a QOM Object developed for the purpose of modeling a clock tree
-+with QEMU.
++#ifndef DEBUG_FIXED_CLOCK
++#define DEBUG_FIXED_CLOCK 0
++#endif
 +
-+It only simulates the clock by keeping a copy of the current frequency and
-+doesn't model the signal itself such as pin toggle or duty cycle.
-+
-+It allows to model the impact of badly configured PLL, clock source selection
-+or disabled clock on the models.
-+
-+Binding the clock together to create a tree
-+===========================================
-+
-+In order to create a clock tree with QEMU_CLOCK two or more clock must be bound
-+together. Let's say there are two clocks clk_a and clk_b:
-+Using qemu_clk_bind(clk_a, clk_b) will bind clk_a and clk_b.
-+
-+Binding two qemu-clk together creates a unidirectional link which means that
-+changing the rate of clk_a will propagate to clk_b and not the opposite.
-+The binding process automatically refreshes clk_b rate.
-+
-+Clock can be bound and unbound during execution for modeling eg: a clock
-+selector.
-+
-+A clock can drive more than one other clock. eg with this code:
-+qemu_clk_bind(clk_a, clk_b);
-+qemu_clk_bind(clk_a, clk_c);
-+
-+A clock rate change one clk_a will propagate to clk_b and clk_c.
-+
-+Implementing a callback on a rate change
-+========================================
-+
-+The function prototype is the following:
-+typedef uint64_t QEMUClkRateUpdateCallback(void *opaque, uint64_t rate);
-+
-+It's main goal is to modify the rate before it's passed to the next clocks in
-+the tree.
-+
-+eg: for a 4x PLL the function will be:
-+uint64_t qemu_clk_rate_change_cb(void *opaque, uint64_t rate)
-+{
-+    return 4 * rate;
-+}
-+
-+To set the callback for the clock:
-+void qemu_clk_set_callback(qemu_clk clk, QEMUClkRateUpdateCallback *cb,
-+                           void *opaque);
-+can be called.
-+
-+The rate update process
-+=======================
-+
-+The rate update happen in this way:
-+When a model wants to update a clock frequency (eg: based on a register change
-+or something similar) it will call qemu_clk_update_rate(..) on the clock:
-+  * The callback associated to the clock is called with the new rate.
-+  * qemu_clk_update_rate(..) is then called on all bound clocks with the value
-+    returned by the callback.
-+
-+NOTE: When no callback is attached, the clock qemu_clk_update_rate(..) is called
-+on the next clock in the tree with the rate unmodified.
-+
-+Adding a QEMU_CLOCK to a DeviceState
-+====================================
-+
-+Adding a qemu-clk to a DeviceState is required to be able to get the clock
-+outside the model through qemu_clk_device_get_clock(..).
-+
-+It is also required to be able to print the clock and its rate with info qtree.
-+For example:
-+
-+  type System
-+  dev: xlnx.zynqmp_crf, id ""
-+    gpio-out "sysbus-irq" 1
-+    gpio-out "RST_A9" 4
-+    qemu-clk "dbg_trace" 0
-+    qemu-clk "vpll_to_lpd" 625000000
-+    qemu-clk "dp_stc_ref" 0
-+    qemu-clk "dpll_to_lpd" 12500000
-+    qemu-clk "acpu_clk" 0
-+    qemu-clk "pcie_ref" 0
-+    qemu-clk "topsw_main" 0
-+    qemu-clk "topsw_lsbus" 0
-+    qemu-clk "dp_audio_ref" 0
-+    qemu-clk "sata_ref" 0
-+    qemu-clk "dp_video_ref" 71428568
-+    qemu-clk "vpll_clk" 2500000000
-+    qemu-clk "apll_to_lpd" 12500000
-+    qemu-clk "dpll_clk" 50000000
-+    qemu-clk "gpu_ref" 0
-+    qemu-clk "aux_refclk" 0
-+    qemu-clk "video_clk" 27000000
-+    qemu-clk "gdma_ref" 0
-+    qemu-clk "gt_crx_ref_clk" 0
-+    qemu-clk "dbg_fdp" 0
-+    qemu-clk "apll_clk" 50000000
-+    qemu-clk "pss_alt_ref_clk" 0
-+    qemu-clk "ddr" 0
-+    qemu-clk "pss_ref_clk" 50000000
-+    qemu-clk "dpdma_ref" 0
-+    qemu-clk "dbg_tstmp" 0
-+    mmio 00000000fd1a0000/000000000000010c
-+
-+This way a DeviceState can have multiple clock input or output.
-+
-+Examples
-+========
-+
-+Those are the different way of using the QEMUClock object.
-+
-+Modelling a fixed clock generator
-+=================================
-+
-+Here is a brief example of a device acting as a clock source:
++#define DPRINTF(fmt, ...) do {                                               \
++    if (DEBUG_FIXED_CLOCK) {                                                 \
++        qemu_log(__FILE__": " fmt , ## __VA_ARGS__);                         \
++    }                                                                        \
++} while (0);
 +
 +typedef struct {
 +    DeviceState parent_obj;
@@ -171,7 +101,17 @@ index 0000000..010ae50
 +    QEMUClock out;
 +} FixedClock;
 +
-+During the initialization the device must initialize its clock object:
++static Property fixed_clock_properties[] = {
++    DEFINE_PROP_UINT32("rate", FixedClock, rate, 0),
++    DEFINE_PROP_END_OF_LIST()
++};
++
++static void fixed_clock_realizefn(DeviceState *dev, Error **errp)
++{
++    FixedClock *s = FIXED_CLOCK(dev);
++
++    qemu_clk_update_rate(&s->out, s->rate);
++}
 +
 +static void fixed_clock_instance_init(Object *obj)
 +{
@@ -181,147 +121,63 @@ index 0000000..010ae50
 +    qemu_clk_device_add_clock(DEVICE(obj), &s->out, "clk_out");
 +}
 +
-+As the device acts as a clock source it must refresh the clock tree during the
-+realize phase:
-+
-+static void fixed_clock_realizefn(DeviceState *dev, Error **errp)
++static void fixed_clock_class_init(ObjectClass *klass, void *data)
 +{
-+    FixedClock *s = FIXED_CLOCK(dev);
++    DeviceClass *dc = DEVICE_CLASS(klass);
 +
-+    qemu_clk_update_rate(&s->out, s->rate);
++    dc->realize = fixed_clock_realizefn;
++    dc->props = fixed_clock_properties;
 +}
 +
-+This means that the clock tree must be finished before realize is called on the
-+fixed clock.
++static const TypeInfo fixed_clock_info = {
++    .name          = TYPE_FIXED_CLOCK,
++    .parent        = TYPE_DEVICE,
++    .instance_size = sizeof(FixedClock),
++    .instance_init = fixed_clock_instance_init,
++    .class_init    = fixed_clock_class_init,
++};
 +
-+Modelling a clock user device
-+=============================
-+
-+Here is a brief example of a clock user:
-+
-+typedef struct {
-+    DeviceState parent_obj;
-+
-+    QEMUClock in;
-+} ClockUser;
-+
-+As before the clock must be initialized through the device initialize function:
-+
-+static void clock_user_instance_init(Object *obj)
++static void fixed_clock_register_types(void)
 +{
-+    ClockUser *s = CLOCK_USER(obj);
-+
-+    object_initialize(&s->in, sizeof(s->in), TYPE_CLOCK);
-+    qemu_clk_device_add_clock(DEVICE(obj), &s->in, "clk_in");
-+    /*
-+     * Call on_rate_change_cb when something change on clk_in.
-+     */
-+    qemu_clk_set_callback(s->in, on_rate_change_cb, obj);
++    type_register_static(&fixed_clock_info);
 +}
 +
-+The callback is in this case used as a notifier when the clock tree which
-+sources the device change:
++type_init(fixed_clock_register_types);
+diff --git a/include/hw/misc/fixed-clock.h b/include/hw/misc/fixed-clock.h
+new file mode 100644
+index 0000000..1376444
+--- /dev/null
++++ b/include/hw/misc/fixed-clock.h
+@@ -0,0 +1,30 @@
++/*
++ * Fixed clock
++ *
++ *  Copyright (C) 2016 : GreenSocs Ltd
++ *      http://www.greensocs.com/ , email: info@greensocs.com
++ *
++ *  Frederic Konrad   <fred.konrad@greensocs.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation, either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ *
++ */
 +
-+static uint64_t on_rate_change_cb(void *opaque, uint64_t input_rate)
-+{
-+    printf("the new rate is %ld\n", input_rate);
++#ifndef FIXED_CLOCK_H
++#define FIXED_CLOCK_H
 +
-+    /* The return is ignored if nothing is bound to clk_in. */
-+    return input_rate;
-+}
++#define TYPE_FIXED_CLOCK "fixed-clock"
++#define FIXED_CLOCK(obj) OBJECT_CHECK(FixedClock, (obj), TYPE_FIXED_CLOCK)
 +
-+Modelling a clock multiplier
-+============================
-+
-+Here is a brief example of a device acting as a clock modifier:
-+
-+typedef struct {
-+    DeviceState parent_obj;
-+
-+    uint32_t rate;
-+    QEMUClock out;
-+    QEMUClock in;
-+} ClockMultiplier;
-+
-+As before the clocks must be initialized through the device initialize function
-+but they must be bound together so a change on the input will propagate on the
-+output:
-+
-+static void clock_multiplier_instance_init(Object *obj)
-+{
-+    ClockMultiplier *s = CLOCK_MULTIPLIER(obj);
-+
-+    object_initialize(&s->out, sizeof(s->out), TYPE_CLOCK);
-+    object_initialize(&s->in, sizeof(s->in), TYPE_CLOCK);
-+
-+    qemu_clk_device_add_clock(DEVICE(obj), &s->in, "clk_in");
-+    qemu_clk_device_add_clock(DEVICE(obj), &s->out, "clk_out");
-+    /*
-+     * Propagate the change from in to out, this can be done dynamically during
-+     * the simulation but we need to do the initial binding here to get the
-+     * initial refresh happening when the realize function is called on the
-+     * fixed clock.
-+     */
-+    qemu_clk_bind(s->in, s->out);
-+    /*
-+     * But before propagating the rate modify it with multiplier_cb.
-+     */
-+    qemu_clk_set_callback(s->out, multiplier_cb, obj);
-+}
-+
-+In this example when clk_in changes it will trigger a change on clk_out and this
-+callback can modify the rate of clk_out (the return value of this callback)
-+accordingly to clk_in rate (input_rate).
-+
-+static uint64_t multiplier_cb(void *opaque, uint64_t input_rate)
-+{
-+    return input_rate * 4;
-+}
-+
-+This device doesn't refresh the clock tree as it will be done by the clock tree
-+source.
-+
-+Modelling a clock selector
-+==========================
-+
-+Here is a brief example of a device acting as a device which alter the clock
-+topology such as a clock selector:
-+
-+typedef struct {
-+    DeviceState parent_obj;
-+
-+    QEMUClock out;
-+    QEMUClock in_a;
-+    QEMUClock in_b;
-+} ClockSelector;
-+
-+The clocks must be initialized through the device initialize function but they
-+must be bound together like they will be when the device is reset so a change on
-+the input during the realize of the fixed clock will propagate to the output:
-+
-+static void clock_selector_instance_init(Object *obj)
-+{
-+    ClockSelector *s = CLOCK_SELECTOR(obj);
-+
-+    object_initialize(&s->out, sizeof(s->out), TYPE_CLOCK);
-+    object_initialize(&s->in_a, sizeof(s->in_a), TYPE_CLOCK);
-+    object_initialize(&s->in_b, sizeof(s->in_b), TYPE_CLOCK);
-+
-+    qemu_clk_device_add_clock(DEVICE(obj), &s->in_a, "clk_in_a");
-+    qemu_clk_device_add_clock(DEVICE(obj), &s->in_b, "clk_in_b");
-+    qemu_clk_device_add_clock(DEVICE(obj), &s->out, "clk_out");
-+
-+    /* Assuming at the reset that the input_a is connected to output. */
-+    qemu_clk_bind(s->in_a, s->out);
-+}
-+
-+/* This is called for example by a register change or something like that */
-+void update_topology(ClockSelector *s)
-+{
-+    /* Unbind the old clock */
-+    qemu_clk_unbind(s->in_a, s->out);
-+    /* Bind the new one, the rate is automatically refreshed. */
-+    qemu_clk_bind(s->in_b, s->out);
-+}
++#endif /* FIXED_CLOCK_H */
 -- 
 1.8.3.1
