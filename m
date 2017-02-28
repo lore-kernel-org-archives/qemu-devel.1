@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cied7-0006oz-5M
+	(envelope-from <fred.konrad@greensocs.com>) id 1cied7-0006pE-HL
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cied5-00049C-Ok
+	(envelope-from <fred.konrad@greensocs.com>) id 1cied2-00047c-QA
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:37 -0500
-Received: from greensocs.com ([193.104.36.180]:38433)
+Received: from greensocs.com ([193.104.36.180]:38329)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cied5-00048y-DO
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:35 -0500
+	(envelope-from <fred.konrad@greensocs.com>) id 1cied2-00046c-B1
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:32 -0500
 From: fred.konrad@greensocs.com
-Date: Tue, 28 Feb 2017 11:03:02 +0100
-Message-Id: <1488276185-31168-8-git-send-email-fred.konrad@greensocs.com>
-In-Reply-To: <1488276185-31168-1-git-send-email-fred.konrad@greensocs.com>
-References: <1488276185-31168-1-git-send-email-fred.konrad@greensocs.com>
-Subject: [Qemu-devel] [PATCH v3 07/10] introduce fixed-clock
+Date: Tue, 28 Feb 2017 11:02:55 +0100
+Message-Id: <1488276185-31168-1-git-send-email-fred.konrad@greensocs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 00/10] Clock framework API.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,156 +29,109 @@ Cc: peter.maydell@linaro.org, edgar.iglesias@xilinx.com, alistair.francis@xilinx
 
 From: KONRAD Frederic <fred.konrad@greensocs.com>
 
-This is a fixed clock device.
-It justs behave as an empty device with a parametrable output rate.
+Hi,
 
-Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
----
- hw/misc/Makefile.objs         |  1 +
- hw/misc/fixed-clock.c         | 88 +++++++++++++++++++++++++++++++++++++++++++
- include/hw/misc/fixed-clock.h | 30 +++++++++++++++
- 3 files changed, 119 insertions(+)
+This is the third version of the clock framework API it contains:
+
+  * The first 6 patches which introduce the framework.
+  * The 7th patch which introduces a fixed-clock model.
+  * The rest which gives an example how to model a PLL from the existing
+    zynqmp-crf extracted from the qemu xilinx tree.
+
+No specific behavior is expected yet when the CRF register set is accesse=
+d but
+the user can see for example the dp_video_ref and vpll_to_lpd rate changi=
+ng in
+the monitor with the "info qtree" command when the vpll_ctrl register is
+modified.
+
+bus: main-system-bus
+  type System
+  dev: xlnx.zynqmp_crf, id ""
+    gpio-out "sysbus-irq" 1
+    qemu-clk "dbg_trace" 0
+    qemu-clk "dp_stc_ref" 0
+    qemu-clk "dpll_to_lpd" 12500000
+    qemu-clk "acpu_clk" 0
+    qemu-clk "pcie_ref" 0
+    qemu-clk "topsw_main" 0
+    qemu-clk "topsw_lsbus" 0
+    qemu-clk "dp_audio_ref" 0
+    qemu-clk "sata_ref" 0
+    qemu-clk "dp_video_ref" 1428571
+    qemu-clk "vpll_clk" 50000000
+    qemu-clk "apll_to_lpd" 12500000
+    qemu-clk "dpll_clk" 50000000
+    qemu-clk "gpu_ref" 0
+    qemu-clk "aux_refclk" 0
+    qemu-clk "video_clk" 27000000
+    qemu-clk "gdma_ref" 0
+    qemu-clk "gt_crx_ref_clk" 0
+    qemu-clk "dbg_fdp" 0
+    qemu-clk "apll_clk" 50000000
+    qemu-clk "pss_alt_ref_clk" 0
+    qemu-clk "ddr" 0
+    qemu-clk "dbg_tstmp" 0
+    qemu-clk "pss_ref_clk" 50000000
+    qemu-clk "dpdma_ref" 0
+    qemu-clk "vpll_to_lpd" 12500000
+    mmio 00000000fd1a0000/000000000000010c
+   =20
+This series is based on the current master
+(d992f2f1368ceb92e6bfd8efece174110f4236ff).
+
+Thanks,
+Fred
+
+V2 -> V3:
+  * Rebased on current master.
+  * Renamed qemu_clk / QEMUClock as suggested by C=C3=A9dric.
+  * Renamed in_rate to ref_rate and out_rate to rate.
+  * Renamed qemu_clk_bind_clock to qemu_clk_bind.
+  * Example added to the documentation as suggested by Peter.
+
+V1 -> V2:
+  * Rebased on current master.
+  * Some function renamed and documentation fixed.
+
+RFC -> V1:
+  * Rebased on current master.
+  * The docs has been fixed.
+  * qemu_clk_init_device helper has been provided to ease the initializat=
+ion
+    of the devices.
+
+KONRAD Frederic (10):
+  qemu-clk: introduce qemu-clk qom object
+  qemu-clk: allow to add a clock to a device
+  qemu-clk: allow to bind two clocks together
+  qemu-clk: introduce an init array to help the device construction
+  qdev-monitor: print the device's clock with info qtree
+  docs: add qemu-clock documentation
+  introduce fixed-clock
+  introduce zynqmp_crf
+  zynqmp: add the zynqmp_crf to the platform
+  zynqmp: add reference clock
+
+ Makefile.objs                 |   1 +
+ docs/clock.txt                | 278 ++++++++++++
+ hw/arm/xlnx-zynqmp.c          |  56 +++
+ hw/misc/Makefile.objs         |   2 +
+ hw/misc/fixed-clock.c         |  88 ++++
+ hw/misc/xilinx_zynqmp_crf.c   | 968 ++++++++++++++++++++++++++++++++++++=
+++++++
+ include/hw/arm/xlnx-zynqmp.h  |   8 +
+ include/hw/misc/fixed-clock.h |  30 ++
+ include/qemu/qemu-clock.h     | 161 +++++++
+ qdev-monitor.c                |   2 +
+ qemu-clock.c                  | 176 ++++++++
+ 11 files changed, 1770 insertions(+)
+ create mode 100644 docs/clock.txt
  create mode 100644 hw/misc/fixed-clock.c
+ create mode 100644 hw/misc/xilinx_zynqmp_crf.c
  create mode 100644 include/hw/misc/fixed-clock.h
+ create mode 100644 include/qemu/qemu-clock.h
+ create mode 100644 qemu-clock.c
 
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 898e4cc..e9c4dd3 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -55,3 +55,4 @@ obj-$(CONFIG_EDU) += edu.o
- obj-$(CONFIG_HYPERV_TESTDEV) += hyperv_testdev.o
- obj-$(CONFIG_AUX) += auxbus.o
- obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
-+obj-y += fixed-clock.o
-diff --git a/hw/misc/fixed-clock.c b/hw/misc/fixed-clock.c
-new file mode 100644
-index 0000000..b5af24d
---- /dev/null
-+++ b/hw/misc/fixed-clock.c
-@@ -0,0 +1,88 @@
-+/*
-+ * Fixed clock
-+ *
-+ *  Copyright (C) 2016 : GreenSocs Ltd
-+ *      http://www.greensocs.com/ , email: info@greensocs.com
-+ *
-+ *  Frederic Konrad   <fred.konrad@greensocs.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation, either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/qdev.h"
-+#include "hw/misc/fixed-clock.h"
-+#include "qemu/qemu-clock.h"
-+#include "qapi/error.h"
-+
-+#ifndef DEBUG_FIXED_CLOCK
-+#define DEBUG_FIXED_CLOCK 0
-+#endif
-+
-+#define DPRINTF(fmt, ...) do {                                               \
-+    if (DEBUG_FIXED_CLOCK) {                                                 \
-+        qemu_log(__FILE__": " fmt , ## __VA_ARGS__);                         \
-+    }                                                                        \
-+} while (0);
-+
-+typedef struct {
-+    DeviceState parent_obj;
-+
-+    uint32_t rate;
-+    QEMUClock out;
-+} FixedClock;
-+
-+static Property fixed_clock_properties[] = {
-+    DEFINE_PROP_UINT32("rate", FixedClock, rate, 0),
-+    DEFINE_PROP_END_OF_LIST()
-+};
-+
-+static void fixed_clock_realizefn(DeviceState *dev, Error **errp)
-+{
-+    FixedClock *s = FIXED_CLOCK(dev);
-+
-+    qemu_clk_update_rate(&s->out, s->rate);
-+}
-+
-+static void fixed_clock_instance_init(Object *obj)
-+{
-+    FixedClock *s = FIXED_CLOCK(obj);
-+
-+    object_initialize(&s->out, sizeof(s->out), TYPE_CLOCK);
-+    qemu_clk_device_add_clock(DEVICE(obj), &s->out, "clk_out");
-+}
-+
-+static void fixed_clock_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = fixed_clock_realizefn;
-+    dc->props = fixed_clock_properties;
-+}
-+
-+static const TypeInfo fixed_clock_info = {
-+    .name          = TYPE_FIXED_CLOCK,
-+    .parent        = TYPE_DEVICE,
-+    .instance_size = sizeof(FixedClock),
-+    .instance_init = fixed_clock_instance_init,
-+    .class_init    = fixed_clock_class_init,
-+};
-+
-+static void fixed_clock_register_types(void)
-+{
-+    type_register_static(&fixed_clock_info);
-+}
-+
-+type_init(fixed_clock_register_types);
-diff --git a/include/hw/misc/fixed-clock.h b/include/hw/misc/fixed-clock.h
-new file mode 100644
-index 0000000..1376444
---- /dev/null
-+++ b/include/hw/misc/fixed-clock.h
-@@ -0,0 +1,30 @@
-+/*
-+ * Fixed clock
-+ *
-+ *  Copyright (C) 2016 : GreenSocs Ltd
-+ *      http://www.greensocs.com/ , email: info@greensocs.com
-+ *
-+ *  Frederic Konrad   <fred.konrad@greensocs.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation, either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ */
-+
-+#ifndef FIXED_CLOCK_H
-+#define FIXED_CLOCK_H
-+
-+#define TYPE_FIXED_CLOCK "fixed-clock"
-+#define FIXED_CLOCK(obj) OBJECT_CHECK(FixedClock, (obj), TYPE_FIXED_CLOCK)
-+
-+#endif /* FIXED_CLOCK_H */
--- 
+--=20
 1.8.3.1
