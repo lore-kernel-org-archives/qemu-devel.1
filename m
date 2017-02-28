@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cik1A-0006N2-7O
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:48:51 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cik3G-00081z-D4
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:50:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cik18-0000ru-QW
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:48:48 -0500
-Date: Tue, 28 Feb 2017 16:48:36 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170228154836.GF4090@noname.redhat.com>
-References: <1488194450-28056-1-git-send-email-armbru@redhat.com>
-	<1488194450-28056-4-git-send-email-armbru@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1cik3F-0001YJ-El
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:50:58 -0500
+References: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
+	<1488286469-9381-33-git-send-email-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <53b3e0fc-2368-8d8a-4ee0-ccc1fed774d1@redhat.com>
+Date: Tue, 28 Feb 2017 16:50:47 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1488194450-28056-4-git-send-email-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 03/24] keyval: New keyval_parse()
+In-Reply-To: <1488286469-9381-33-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="MF2NW7lelRl5L6PVfCaPX1gXgW899RmO9"
+Subject: Re: [Qemu-devel] [PATCH v3 32/44] mirror: Use real permissions in
+ mirror/active commit block job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,276 +25,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, pkrempa@redhat.com, eblake@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-Am 27.02.2017 um 12:20 hat Markus Armbruster geschrieben:
-> keyval_parse() parses KEY=VALUE,... into a QDict.  Works like
-> qemu_opts_parse(), except:
-> 
-> * Returns a QDict instead of a QemuOpts (d'oh).
-> 
-> * Supports nesting, unlike QemuOpts: a KEY is split into key
->   fragments at '.' (dotted key convention; the block layer does
->   something similar on top of QemuOpts).  The key fragments are QDict
->   keys, and the last one's value is updated to VALUE.
-> 
-> * Each key fragment may be up to 127 bytes long.  qemu_opts_parse()
->   limits the entire key to 127 bytes.
-> 
-> * Overlong key fragments are rejected.  qemu_opts_parse() silently
->   truncates them.
-> 
-> * Empty key fragments are rejected.  qemu_opts_parse() happily
->   accepts empty keys.
-> 
-> * It does not store the returned value.  qemu_opts_parse() stores it
->   in the QemuOptsList.
-> 
-> * It does not treat parameter "id" specially.  qemu_opts_parse()
->   ignores all but the first "id", and fails when its value isn't
->   id_wellformed(), or duplicate (a QemuOpts with the same ID is
->   already stored).  It also screws up when a value contains ",id=".
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--MF2NW7lelRl5L6PVfCaPX1gXgW899RmO9
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+Message-ID: <53b3e0fc-2368-8d8a-4ee0-ccc1fed774d1@redhat.com>
+Subject: Re: [PATCH v3 32/44] mirror: Use real permissions in mirror/active
+ commit block job
+References: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
+ <1488286469-9381-33-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1488286469-9381-33-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-This is important to keep in mind, callers need to explicitly check
-validity of the "id" key themselves.
+On 28.02.2017 13:54, Kevin Wolf wrote:
+> The mirror block job is mainly used for two different scenarios:
+> Mirroring to an otherwise unused, independent target node, or for activ=
+e
+> commit where the target node is part of the backing chain of the source=
+=2E
+>=20
+> Similarly to the commit block job patch, we need to insert a new filter=
 
-> * Implied value is not supported.  qemu_opts_parse() desugars "foo" to
->   "foo=on", and "nofoo" to "foo=off".
-> 
-> * An implied key's value can't be empty, and can't contain ','.
-> 
-> I intend to grow this into a saner replacement for QemuOpts.  It'll
-> take time, though.
-> 
-> Note: keyval_parse() provides no way to do lists, and its key syntax
-> is incompatible with the __RFQDN_ prefix convention for downstream
-> extensions, because it blindly splits at '.', even in __RFQDN_.  Both
-> issues will be addressed later in the series.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> node to keep the permissions correct during active commit.
+>=20
+> Note that one change this implies is that job->blk points to
+> mirror_top_bs as its root now, and mirror_top_bs (rather than the actua=
+l
+> source node) contains the bs->job pointer. This requires qemu-img commi=
+t
+> to get the job by name now rather than just taking bs->job.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/mirror.c             | 216 +++++++++++++++++++++++++++++++++++++=
++-------
+>  qemu-img.c                 |   6 +-
+>  tests/qemu-iotests/141     |   2 +-
+>  tests/qemu-iotests/141.out |   4 +-
+>  4 files changed, 190 insertions(+), 38 deletions(-)
 
-> diff --git a/util/keyval.c b/util/keyval.c
-> new file mode 100644
-> index 0000000..3904c39
-> --- /dev/null
-> +++ b/util/keyval.c
-> @@ -0,0 +1,228 @@
-> +/*
-> + * Parsing KEY=VALUE,... strings
-> + *
-> + * Copyright (C) 2017 Red Hat Inc.
-> + *
-> + * Authors:
-> + *  Markus Armbruster <armbru@redhat.com>,
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +/*
-> + * KEY=VALUE,... syntax:
-> + *
-> + *   key-vals     = [ key-val { ',' key-vals } ]
-> + *   key-val      = key '=' val
-> + *   key          = key-fragment { '.' key-fragment }
-> + *   key-fragment = / [^=,.]* /
-> + *   val          = { / [^,]* / | ',,' }
-> + *
-> + * Semantics defined by reduction to JSON:
-> + *
-> + *   key-vals defines a tree of objects rooted at R
-> + *   where for each key-val = key-fragment . ... = val in key-vals
-> + *       R op key-fragment op ... = val'
-> + *       where (left-associative) op is member reference L.key-fragment
+BTW, seeing this commit made me remember that the additional functions I
+requested for the dummy block driver (flush etc.) were not meant to be
+limited to mirror; the commit node would need get_block_status, too, of
+course (not necessarily flush, discard, or write_zeroes, because the
+commit node doesn't allow writing anyway). Can be fixed during freeze,
+though.
 
-Maybe it's just me, but I can't say that I fully understand what these
-last two lines are supposed to tell me.
+> diff --git a/block/mirror.c b/block/mirror.c
+> index beaac6f..a2f22e1 100644
+> --- a/block/mirror.c
+> +++ b/block/mirror.c
 
-> + *             val' is val with ',,' replaced by ','
-> + *   and only R may be empty.
-> + *
-> + *   Duplicate keys are permitted; all but the last one are ignored.
-> + *
-> + *   The equations must have a solution.  Counter-example: a.b=1,a=2
-> + *   doesn't have one, because R.a must be an object to satisfy a.b=1
-> + *   and a string to satisfy a=2.
-> + *
-> + * The length of any key-fragment must be between 1 and 127.
-> + *
-> + * Design flaw: there is no way to denote an empty non-root object.
-> + * While interpreting "key absent" as empty object seems natural
-> + * (removing a key-val from the input string removes the member when
-> + * there are more, so why not when it's the last), it doesn't work:
-> + * "key absent" already means "optional object absent", which isn't
-> + * the same as "empty object present".
-> + *
-> + * Additional syntax for use with an implied key:
-> + *
-> + *   key-vals-ik  = val-no-key [ ',' key-vals ]
-> + *   val-no-key   = / [^,]* /
-> + *
-> + * where no-key is syntactic sugar for implied-key=val-no-key.
+[...]
 
-s/no-key/val-no-key/ ?
-
-> + *
-> + * TODO support lists
-> + * TODO support key-fragment with __RFQDN_ prefix (downstream extensions)
-
-Worth another TODO comment for implied values that contain a comma? The
-current restriction feels a bit artificial.
-
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "qapi/qmp/qstring.h"
-> +#include "qemu/option.h"
-> +
-> +/*
-> + * Ensure @cur maps @key_in_cur the right way.
-> + * If @value is null, it needs to map to a QDict, else to this
-> + * QString.
-> + * If @cur doesn't have @key_in_cur, put an empty QDict or @value,
-> + * respectively.
-> + * Else, if it needs to map to a QDict, and already does, do nothing.
-> + * Else, if it needs to map to this QString, and already maps to a
-> + * QString, replace it by @value.
-> + * Else, fail because we have conflicting needs on how to map
-> + * @key_in_cur.
-> + * Use @key up to @key_cursor to identify the key in error messages.
-> + * On success, return the mapped value.
-> + * On failure, store an error through @errp and return NULL.
-> + */
-> +static QObject *keyval_parse_put(QDict *cur,
-> +                                 const char *key_in_cur, QString *value,
-> +                                 const char *key, const char *key_cursor,
-> +                                 Error **errp)
+> @@ -983,6 +1005,77 @@ static const BlockJobDriver commit_active_job_dri=
+ver =3D {
+>      .drain                  =3D mirror_drain,
+>  };
+> =20
+> +static int coroutine_fn bdrv_mirror_top_preadv(BlockDriverState *bs,
+> +    uint64_t offset, uint64_t bytes, QEMUIOVector *qiov, int flags)
 > +{
-> +    QObject *old, *new;
-> +
-> +    old = qdict_get(cur, key_in_cur);
-> +    if (old) {
-> +        if (qobject_type(old) != (value ? QTYPE_QSTRING : QTYPE_QDICT)) {
-> +            error_setg(errp, "Parameters '%.*s.*' used inconsistently",
-> +                       (int)(key_cursor - key), key);
-> +            return NULL;
-> +        }
-> +        if (!value) {
-> +            return old;         /* already QDict, do nothing */
-> +        }
-> +        new = QOBJECT(value);   /* replacement */
-> +    } else {
-> +        new = QOBJECT(value) ?: QOBJECT(qdict_new());
-> +    }
-> +    qdict_put_obj(cur, key_in_cur, new);
-> +    return new;
+> +    return bdrv_co_preadv(bs->backing, offset, bytes, qiov, flags);
 > +}
 > +
-> +/*
-> + * Parse one KEY=VALUE from @params, store result in @qdict.
-> + * The first fragment of KEY applies to @qdict.  Subsequent fragments
-> + * apply to nested QDicts, which are created on demand.  @implied_key
-> + * is as in keyval_parse().
-> + * On success, return a pointer to the next KEY=VALUE, or else to '\0'.
-> + * On failure, return NULL.
-> + */
-> +static const char *keyval_parse_one(QDict *qdict, const char *params,
-> +                                    const char *implied_key,
-> +                                    Error **errp)
+> +static int coroutine_fn bdrv_mirror_top_pwritev(BlockDriverState *bs,
+> +    uint64_t offset, uint64_t bytes, QEMUIOVector *qiov, int flags)
 > +{
-> +    const char *key, *key_end, *s;
-> +    size_t len;
-> +    char key_in_cur[128];
-> +    QDict *cur;
-> +    QObject *next;
-> +    QString *val;
+> +    return bdrv_co_pwritev(bs->backing, offset, bytes, qiov, flags);
+> +}
 > +
-> +    key = params;
-> +    len = strcspn(params, "=,");
-> +    if (implied_key && len && key[len] != '=') {
-> +        /* Desugar implied key */
-> +        key = implied_key;
-> +        len = strlen(implied_key);
-> +    }
-> +    key_end = key + len;
+> +static int coroutine_fn bdrv_mirror_top_flush(BlockDriverState *bs)
+> +{
+> +    return bdrv_co_flush(bs->backing->bs);
+> +}
 > +
-> +    /*
-> +     * Loop over key fragments: @s points to current fragment, it
-> +     * applies to @cur.  @key_in_cur[] holds the previous fragment.
-> +     */
-> +    cur = qdict;
-> +    s = key;
-> +    for (;;) {
-> +        for (len = 0; s + len < key_end && s[len] != '.'; len++) {
-> +        }
-> +        if (!len) {
-> +            assert(key != implied_key);
-> +            error_setg(errp, "Invalid parameter '%.*s'",
-> +                       (int)(key_end - key), key);
-> +            return NULL;
-> +        }
-> +        if (len >= sizeof(key_in_cur)) {
-> +            assert(key != implied_key);
-> +            error_setg(errp, "Parameter%s '%.*s' is too long",
-> +                       s != key || s + len != key_end ? " fragment" : "",
-> +                       (int)len, s);
-> +            return NULL;
-> +        }
-> +
-> +        if (s != key) {
-> +            next = keyval_parse_put(cur, key_in_cur, NULL,
-> +                                    key, s - 1, errp);
-> +            if (!next) {
-> +                return NULL;
-> +            }
-> +            cur = qobject_to_qdict(next);
-> +            assert(cur);
-> +        }
-> +
-> +        memcpy(key_in_cur, s, len);
-> +        key_in_cur[len] = 0;
-> +        s += len;
-> +
-> +        if (*s != '.') {
-> +            break;
-> +        }
-> +        s++;
-> +    }
-> +
-> +    if (key == implied_key) {
-> +        assert(!*s);
-> +        s = params;
-> +    } else {
-> +        if (*s != '=') {
-> +            error_setg(errp, "Expected '=' after parameter '%.*s'",
-> +                       (int)(s - key), key);
-> +            return NULL;
-> +        }
-> +        s++;
-> +    }
-> +
-> +    val = qstring_new();
-> +    for (;;) {
-> +        if (!*s) {
-> +            break;
-> +        } else if (*s == ',') {
-> +            s++;
-> +            if (*s != ',') {
-> +                break;
-> +            }
-> +        }
-> +        qstring_append_chr(val, *s++);
-> +    }
-> +
-> +    if (!keyval_parse_put(cur, key_in_cur, val, key, key_end, errp)) {
-> +        return NULL;
+> +static int64_t coroutine_fn bdrv_mirror_top_get_block_status(
+> +    BlockDriverState *bs, int64_t sector_num, int nb_sectors, int *pnu=
+m,
+> +    BlockDriverState **file)
+> +{
+> +    *pnum =3D nb_sectors;
+> +    *file =3D bs->backing->bs;
+> +    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID | BDRV_BLOCK_DATA =
+|
 
-This leaks val.
+BDRV_BLOCK_RAW makes bdrv_co_get_block_status() fall through to
+bs->file, though.
 
-> +    }
-> +    return s;
+I'm willing to turn two blind eyes on this, though, and consider that to
+be a bug in bdrv_co_get_block_status(); it should fall through to *file.
+
+OTOH, as I said before, the bs->backing without bs->file thing also
+breaks bdrv_refresh_filename(). We could fix that, too, by falling
+through to bs->backing if there is no bs->file, but that would be a
+hack. The other solution is to implement .bdrv_refresh_filename(), of
+course.
+
+Since I only have two eyes I can turn blind, I can't really give an R-b, =
+so:
+
+Acked-by: Max Reitz <mreitz@redhat.com>
+
+> +           (sector_num << BDRV_SECTOR_BITS);
 > +}
 
-Kevin
+
+--MF2NW7lelRl5L6PVfCaPX1gXgW899RmO9
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAli1nFgSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AvNMH/1wIfr/N+9cmtuOlLD/ETt126ehiBvKM
+v3HHBgxYgLUNva8H89jD+HJSOkCi5a9c2spi84l6roVRbvIwehnRhxUThoPr3o8F
+GDrjz1tZEqOCv3rNjZO2PL9cVM3JKpKv6P+VTkuAlNdtwRODLbBCRLwqzlufGQir
+IM/kEYT2eRIivBJV0iQuWKybEuBUrcti8jZE5HiX4F5lWNM6LKBUcPko15NN48bJ
+os6vU7+yJri37uDncGU1qPFVzD9VOeYUobiaZlYRlFyHxZv5Pof7215Lawao14EQ
+suRhEFsPvv8MnjcZlDN3D6TXPzl4/gW+GTiT2N8xBRHsgupKQ3xTtc0=
+=7wjs
+-----END PGP SIGNATURE-----
+
+--MF2NW7lelRl5L6PVfCaPX1gXgW899RmO9--
