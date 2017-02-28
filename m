@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49900)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cilkE-0003d0-KN
+	(envelope-from <armbru@redhat.com>) id 1cilkE-0003cv-IY
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:39:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cilkB-0005PI-E8
+	(envelope-from <armbru@redhat.com>) id 1cilkD-0005QW-2B
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:39:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48336)
+Received: from mx1.redhat.com ([209.132.183.28]:48350)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cilkB-0005P1-7d
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:39:23 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cilkC-0005Pv-T3
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:39:25 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 02246C054939
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 17:39:25 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 28 Feb 2017 18:38:55 +0100
-Message-Id: <1488303560-18803-2-git-send-email-armbru@redhat.com>
+Date: Tue, 28 Feb 2017 18:39:02 +0100
+Message-Id: <1488303560-18803-9-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488303560-18803-1-git-send-email-armbru@redhat.com>
 References: <1488303560-18803-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 01/26] qga: Fix crash on non-dictionary QMP
- argument
+Subject: [Qemu-devel] [PATCH v3 08/26] qmp: Improve QMP dispatch error
+ messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,53 +31,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: eblake@redhat.com, Michael Roth <mdroth@linux.vnet.ibm.com>
-
-The value of key 'arguments' must be a JSON object.  qemu-ga neglects
-to check, and crashes.  To reproduce, send
-
-    { 'execute': 'guest-sync', 'arguments': [] }
-
-to qemu-ga.
-
-do_qmp_dispatch() uses qdict_get_qdict() to get the arguments.  When
-not a JSON object, this gets a null pointer, which flows through the
-generated marshalling function to qobject_input_visitor_new(), where
-it fails the assertion.  qmp_dispatch_check_obj() needs to catch this
-error.
-
-QEMU isn't affected, because it runs qmp_check_input_obj() first,
-which basically duplicates qmp_dispatch_check_obj()'s checks, plus the
-missing one.
-
-Fix by copying the missing one from qmp_check_input_obj() to
-qmp_dispatch_check_obj().
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qapi/qmp-dispatch.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ qapi/qmp-dispatch.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-index 48bec20..621922f 100644
+index 377ebb5..4610b6d 100644
 --- a/qapi/qmp-dispatch.c
 +++ b/qapi/qmp-dispatch.c
-@@ -47,7 +47,13 @@ static QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
+@@ -30,7 +30,7 @@ static QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
+ 
+     dict = qobject_to_qdict(request);
+     if (!dict) {
+-        error_setg(errp, "Expected '%s' in QMP input", "object");
++        error_setg(errp, "QMP input must be a JSON object");
+         return NULL;
+     }
+ 
+@@ -41,15 +41,17 @@ static QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
+ 
+         if (!strcmp(arg_name, "execute")) {
+             if (qobject_type(arg_obj) != QTYPE_QSTRING) {
+-                error_setg(errp, "QMP input object member '%s' expects '%s'",
+-                           "execute", "string");
++                error_setg(errp,
++                           "QMP input object member '%s' must be %s",
++                           "execute", "a string");
                  return NULL;
              }
              has_exec_key = true;
--        } else if (strcmp(arg_name, "arguments")) {
-+        } else if (!strcmp(arg_name, "arguments")) {
-+            if (qobject_type(arg_obj) != QTYPE_QDICT) {
-+                error_setg(errp, QERR_QMP_BAD_INPUT_OBJECT_MEMBER,
-+                           "arguments", "object");
-+                return NULL;
-+            }
-+        } else {
-             error_setg(errp, QERR_QMP_EXTRA_MEMBER, arg_name);
-             return NULL;
-         }
+         } else if (!strcmp(arg_name, "arguments")) {
+             if (qobject_type(arg_obj) != QTYPE_QDICT) {
+-                error_setg(errp, "QMP input object member '%s' expects '%s'",
+-                           "arguments", "object");
++                error_setg(errp,
++                           "QMP input object member '%s' must be %s",
++                           "arguments", "an object");
+                 return NULL;
+             }
+         } else {
+@@ -60,7 +62,7 @@ static QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
+     }
+ 
+     if (!has_exec_key) {
+-        error_setg(errp, "Expected '%s' in QMP input", "execute");
++        error_setg(errp, "QMP input object lacks key 'execute'");
+         return NULL;
+     }
+ 
 -- 
 2.7.4
