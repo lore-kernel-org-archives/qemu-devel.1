@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cif1f-0008KS-G3
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:29:00 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cif3U-00013Y-1o
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:30:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cif1e-0007Nm-HD
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:28:59 -0500
-Date: Tue, 28 Feb 2017 10:28:49 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170228102849.GF2762@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <cover.1488220970.git.jcody@redhat.com>
-	<12a16b28300f871052a49897ec7875a082fc63e3.1488220970.git.jcody@redhat.com>
-	<c5869fe5-fa51-3f2f-26d6-26a733c15493@redhat.com>
-	<20170228035744.GO25637@localhost.localdomain>
-	<20170228101651.GE2762@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1cif3T-0007qn-6I
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:30:52 -0500
+Date: Tue, 28 Feb 2017 11:30:42 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170228103042.GA4090@noname.redhat.com>
+References: <1488193394-28453-1-git-send-email-pl@kamp.de>
+	<07ef9e24-a17b-536b-8ef3-9a105cfe6bc6@redhat.com>
+	<11860d28-91e1-3858-e5f6-4176e9f72816@kamp.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170228101651.GE2762@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 5/5] block/rbd: add support for
- 'mon_host', 'auth_supported' via QAPI
+In-Reply-To: <11860d28-91e1-3858-e5f6-4176e9f72816@kamp.de>
+Subject: Re: [Qemu-devel] [PATCH V2] qemu-img: make convert async
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +24,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com
+To: Peter Lieven <pl@kamp.de>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, stefanha@gmail.com, ct@flyingcircus.io, mreitz@redhat.com, famz@redhat.com
 
-On Tue, Feb 28, 2017 at 10:16:51AM +0000, Daniel P. Berrange wrote:
-> On Mon, Feb 27, 2017 at 10:57:44PM -0500, Jeff Cody wrote:
-> > On Mon, Feb 27, 2017 at 04:47:54PM -0600, Eric Blake wrote:
-> > > On 02/27/2017 12:58 PM, Jeff Cody wrote:
-> > > > @@ -604,6 +620,29 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-> > > >          goto failed_shutdown;
-> > > >      }
-> > > >  
-> > > > +    /* if mon_host was specified */
-> > > > +    if (host) {
-> > > > +        const char *hostname = host;
-> > > > +        char *mon_host = NULL;
-> > > > +
-> > > > +        if (port) {
-> > > > +            mon_host = g_strdup_printf("%s:%s", host, port);
-> > > 
-> > > Does Ceph care about IPv6 (in which case you may need [host]:port when
-> > > host itself includes ':')?
-> > >
-> > 
-> > Some quick sanity testing seems to show that it does not need [] for ipv6
-> > addresses, which is nice.
+Am 28.02.2017 um 10:59 hat Peter Lieven geschrieben:
+> Am 27.02.2017 um 22:09 schrieb Eric Blake:
+> >On 02/27/2017 05:03 AM, Peter Lieven wrote:
+> >>the convert process is currently completely implemented with sync operations.
+> >>That means it reads one buffer and then writes it. No parallelism and each sync
+> >>request takes as long as it takes until it is completed.
+> >>
+> >>This patches introduces 2 new cmdline parameters. The -m parameter to specify
+> >>the number of coroutines running in parallel (defaults to 8). And the -W paremeter to
+> >s/paremeter/parameter/
+> >
+> >>allow qemu-img to write to the target out of order rather than sequential. This improves
+> >>performance as the writes do not have to wait for each other to complete.
+> >>
+> >>Signed-off-by: Peter Lieven <pl@kamp.de>
+> >>---
+> >>@@ -1798,7 +1908,7 @@ static int img_convert(int argc, char **argv)
+> >>              {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
+> >>              {0, 0, 0, 0}
+> >>          };
+> >>-        c = getopt_long(argc, argv, "hf:O:B:ce6o:s:l:S:pt:T:qn",
+> >>+        c = getopt_long(argc, argv, "hf:O:B:ce6o:s:l:S:pt:T:qnm:W",
+> >>                          long_options, NULL);
+> >>          if (c == -1) {
+> >>              break;
+> >>@@ -1890,6 +2000,18 @@ static int img_convert(int argc, char **argv)
+> >>          case 'n':
+> >>              skip_create = 1;
+> >>              break;
+> >>+        case 'm':
+> >>+            num_coroutines = atoi(optarg);
+> >atoi() should be avoided. It has no error checking, so it treats '-m 1'
+> >and '-m 1k' identically.  You are a bit justified in that '-m junk' gets
+> >treated like '-m 0' and rejected, but it's still a poor error message in
+> >that case.
 > 
-> Hmm, that is very odd to me, as that means parsing is ambiguous. The
-> ceph 'mon_host' option allows the port to be omitted, so given a
-> string  2001:242:24:23   there's no way of knowing whether it is
-> a IPv6 addr 2001:242:24:23, with no port, or an addr 2001:242:24 with
-> port of 23
+> would you use qemu_strtoul or parse_uint instead?
+> 
+> Kevin, shall I send a V3?
 
-Looking at the source code to ceph it appears that if you omit the
-use of [], then it will treat the entire string as being the address
-without port. It does look to support use of [], so we should use
-that IIUC.
+If you can send a v3 today, I'll replace the patch in my queue with it.
+Otherwise we'll fix it on top during the freeze.
 
-https://blog.widodh.nl/2014/11/ceph-with-a-cluster-and-public-network-on-ipv6/
-
-See also entity_addr_t::parse in $CEPH/src/msg/msg_types.cc which is
-what I think parses the mon addr. NB, I've not tested this yet, so
-if you have a live ceph cluster with ipv6, it'd be good to verify that
-using [] is correct.
-
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+Kevin
