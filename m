@@ -1,35 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <c.pinto@virtualopensystems.com>) id 1cidBO-000371-SL
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 03:30:56 -0500
+	(envelope-from <armbru@redhat.com>) id 1cidM3-0005nB-Vt
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 03:41:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <c.pinto@virtualopensystems.com>) id 1cidBL-0002xg-Il
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 03:30:54 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:34074)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <c.pinto@virtualopensystems.com>)
-	id 1cidBL-0002xH-6B
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 03:30:51 -0500
-Received: by mail-wm0-x244.google.com with SMTP id m70so1101230wma.1
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 00:30:50 -0800 (PST)
-References: <1452169208-840-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<CAN9JPjHxb1RgtG=3f9+HWz80gwARymEKgX0N+OLGTi5Svgy6qw@mail.gmail.com>
-	<577B1238.7040605@huawei.com>
-	<CAN9JPjH_AQjHGbMMdSZofRp8nxcfgtkzpK6LZsd7bWyfGhJkCQ@mail.gmail.com>
-	<577B8BA7.6010001@huawei.com>
-	<20160818155636.l46t4ha65eybnnhe@redhat.com>
-	<57B7F948.9040701@huawei.com>
-	<cc27b58b-8751-f720-1370-d30c20c8d76a@virtualopensystems.com>
-	<58B4D6EA.5050804@huawei.com>
-From: Christian Pinto <c.pinto@virtualopensystems.com>
-Message-ID: <3d86610f-a7e6-e0ff-a641-9168b9ef5437@virtualopensystems.com>
-Date: Tue, 28 Feb 2017 09:30:43 +0100
+	(envelope-from <armbru@redhat.com>) id 1cidM3-0001PY-1L
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 03:41:56 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <87bmukmlau.fsf@dusky.pond.sub.org>
+	<87poi4c4jd.fsf@dusky.pond.sub.org>
+	<8332e5e7-5e27-5c0b-7990-af814716acf8@redhat.com>
+Date: Tue, 28 Feb 2017 09:41:46 +0100
+In-Reply-To: <8332e5e7-5e27-5c0b-7990-af814716acf8@redhat.com> (Eric Blake's
+	message of "Mon, 27 Feb 2017 13:43:23 -0600")
+Message-ID: <87r32i1zcl.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <58B4D6EA.5050804@huawei.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 00/13] Live memory snapshot based on
- userfaultfd
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] Non-flat command line option argument syntax
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,146 +24,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>, Andrea Arcangeli <aarcange@redhat.com>, Juan Quintela <quintela@redhat.com>, dgilbert@redhat.com
-Cc: xuquan8@huawei.com, peter.huangpeng@huawei.com, Baptiste Reynal <b.reynal@virtualopensystems.com>, qemu list <qemu-devel@nongnu.org>, "Huangweidong (C)" <weidong.huang@huawei.com>, colo-ft@hotmail.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>, qemu-block@nongnu.org
 
-Thanks a lot Hailiang
+Eric Blake <eblake@redhat.com> writes:
 
-
-On 28/02/2017 02:48, Hailiang Zhang wrote:
-> Hi,
+> On 02/27/2017 04:27 AM, Markus Armbruster wrote:
+>> Design flaw: there is no good way to denote an empty array or object
+>> other than the root object.
+>> 
+>> Empty KEY=VALUE,... is valid and results in an empty root object.
+>> 
+>> Presence of a KEY that contains periods results in additional non-root
+>> objects or arrays.  For instance, KEY a.b.c results in root object
+>> member "a" that has member "b" that has (scalar) member "c".
+>> 
+>> These additional objects and arrays all have at least one member, by
+>> construction.
+>> 
+>> Begs the question how to denote an empty object or array other than the
+>> root.
 >
-> On 2017/2/27 23:37, Christian Pinto wrote:
->> Hello Hailiang,
->>
->> are there any updates on this patch series? Are you planning to release
->> a new version?
->>
+> If a.b.c=1 means root object has member "a" with child object "b", and
+> object "b" has key "c" with scalar value, I suppose we could allow:
 >
-> No, userfaultfd still does not support write-protect for KVM.
-> You can see the newest discussion about it here:
-> https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg01127.html
+> a.b,
 >
+> (with no =val) to mean root object "a" has an empty child "b"
+> (indeterminate if "b" is an object or a list) - but only if we don't
+> allow the 'foo' => 'foo=on' magic already in use by QemuOpts.  And you
+> still have to figure out how to choose empty list vs. empty object.
 
-Yes, I have read that part of the discussion and quickly managed to 
-reproduce the "Bad address" on ARMv8.
+What if "b" is an alternate?  Should it be [], {} or true?
 
->> You say there are some issues with the current snapshot-v2 version,
->> which issues were you referring to? On my side the only problem I have
->> seen was that the live snapshot was not working on ARMv8, but I have
->> fixed that and managed to successfully snapshot and restore a QEMU ARMv8
->> tcg machine on an ARMv8 host. I will gladly contribute with these fixes
->> once you will release a new version of the patches.
->>
+>> Without additional syntax, all we can do is choose what exactly to make
+>> impossible:
+>> 
+>> * Absent key means absent, period.  No way to do empty array or object.
+>>   This is what I implemented.
 >
-> Yes, for current implementing of live snapshot, it supports tcg,
-> but does not support kvm mode, the reason i have mentioned above,
-> if you try to implement it, i think you need to start from userfaultfd
-> supporting KVM. There is scenario for it, But I'm blocked by other things
-> these days. I'm glad to discuss with you if you planed to do it.
->
+> I lean towards this meaning. It should generally possible to allow an
+> empty object/list to mean the same thing as an optional omitted
+> object/list in all contexts - so omitting KEY=VALUE for a list means you
+> are omitting the list, but the omitted list behaves the same as an
+> explicitly empty one would have done (even though dotted syntax doesn't
+> have an easy way to express an explicit empty list).
 
-I will have a deeper look at why userfault is not yet working with KVM 
-and get back on this thread for feedback/suggestions.
+It certainly feels "natural" (whatever that may mean) to imagine QAPI
+used this way, but nothing stops users from making "absent" and "empty"
+mean different things.
 
-Thanks,
-Christian
+Say we have a configurable object in QEMU that sports an arbitrary
+number of configurable sub-objects.  Like BlockdevOptionsBlkdebug has
+BlkdebugInjectErrorOptions.  Except in our case, and just to make my
+point, the sub-object configuration has only optional members, because a
+perfectly sensible default configuration exists.  Let's further assume
+that one sub-object in default configuration is not the same as zero sub
+objects.
 
+Now let's configure a single sub-object that is completely default.  In
+JSON, that's
 
-> Thanks.
-> Hailiang
->
->>
->> Thanks a lot,
->>
->> Christian
->>
->> On 20/08/2016 08:31, Hailiang Zhang wrote:
->>> Hi,
->>>
->>> I updated this series, but didn't post it, because there are some
->>> problems while i tested the snapshot function.
->>> I didn't know if it is the userfaultfd issue or not.
->>> I don't have time to investigate it this month. I have put them in 
->>> github
->>> https://github.com/coloft/qemu/tree/snapshot-v2
->>>
->>> Anyone who want to test and modify it are welcomed!
->>>
->>> Besides, will you join the linuxcon or KVM forum in Canada ?
->>> I wish to see you there if you join the conference ;)
->>>
->>> Thanks,
->>> Hailiang
->>>
->>>
->>>
->>> On 2016/8/18 23:56, Andrea Arcangeli wrote:
->>>> Hello everyone,
->>>>
->>>> I've an aa.git tree uptodate on the master & userfault branch (master
->>>> includes other pending VM stuff, userfault branch only contains
->>>> userfault enhancements):
->>>>
->>>> https://git.kernel.org/cgit/linux/kernel/git/andrea/aa.git/log/?h=userfault 
->>>>
->>>>
->>>>
->>>> I didn't have time to test KVM live memory snapshot on it yet as I'm
->>>> still working to improve it. Did anybody test it? However I'd be happy
->>>> to take any bugreports and quickly solve anything that isn't working
->>>> right with the shadow MMU.
->>>>
->>>> I got positive report already for another usage of the uffd WP 
->>>> support:
->>>>
->>>> https://medium.com/@MartinCracauer/generational-garbage-collection-write-barriers-write-protection-and-userfaultfd-2-8b0e796b8f7f 
->>>>
->>>>
->>>>
->>>> The last few things I'm working on to finish the WP support are:
->>>>
->>>> 1) pte_swp_mkuffd_wp equivalent of pte_swp_mksoft_dirty to mark in a
->>>>      vma->vm_flags with VM_UFFD_WP set, which swap entries were
->>>>      generated while the pte was wrprotected.
->>>>
->>>> 2) to avoid all false positives the equivalent of pte_mksoft_dirty is
->>>>      needed too... and that requires spare software bits on the pte
->>>>      which are available on x86. I considered also taking over the
->>>>      soft_dirty bit but then you couldn't do checkpoint restore of a
->>>>      JIT/to-native compiler that uses uffd WP support so it wasn't
->>>>      ideal. Perhaps it would be ok as an incremental patch to make the
->>>>      two options mutually exclusive to defer the arch changes that
->>>>      pte_mkuffd_wp would require for later.
->>>>
->>>> 3) prevent UFFDIO_ZEROPAGE if registering WP|MISSING or trigger a
->>>>      cow in userfaultfd_writeprotect.
->>>>
->>>> 4) WP selftest
->>>>
->>>> In theory things should work ok already if the userland code is
->>>> tolerant against false positives through swap and after fork() and
->>>> KSM. For an usage like snapshotting false positives shouldn't be an
->>>> issue (it'll just run slower if you swap in the worst case), and point
->>>> 3) above also isn't an issue because it's going to register into uffd
->>>> with WP only.
->>>>
->>>> The current status includes:
->>>>
->>>> 1) WP support for anon (with false positives.. work in progress)
->>>>
->>>> 2) MISSING support for tmpfs and hugetlbfs
->>>>
->>>> 3) non cooperative support
->>>>
->>>> Thanks,
->>>> Andrea
->>>>
->>>> .
->>>>
->>>
->>
->>
->> .
->>
->
+    "sub-objects": [ {} ]
+
+With dotted keys, you can't express it.
