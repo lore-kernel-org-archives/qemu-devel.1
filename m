@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cioWw-0006LO-6W
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:37:55 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cioWs-0006HD-KO
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:37:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cioWt-0007xh-7I
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:37:54 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cioWq-0007vx-Tz
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:37:50 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 28 Feb 2017 21:36:28 +0100
-Message-Id: <1488314205-16264-30-git-send-email-kwolf@redhat.com>
+Date: Tue, 28 Feb 2017 21:36:23 +0100
+Message-Id: <1488314205-16264-25-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1488314205-16264-1-git-send-email-kwolf@redhat.com>
 References: <1488314205-16264-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 29/46] backup: Use real permissions in backup
- block job
+Subject: [Qemu-devel] [PULL 24/46] block: Include details on permission
+ errors in message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,104 +23,101 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-The backup block job doesn't have very complicated requirements: It
-needs to read from the source and write to the target, but it's fine
-with either side being changed. The only restriction is that we can't
-resize the image because the job uses a cached value.
-
-qemu-iotests 055 needs to be changed because it used a target which was
-already attached to a virtio-blk device. The permission system correctly
-forbids this (virtio-blk can't accept another writer with its default
-share-rw=off).
+Instead of just telling that there was some conflict, we can be specific
+and tell which permissions were in conflict and which way the conflict
+is.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 Acked-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/backup.c         | 15 ++++++++++-----
- tests/qemu-iotests/055 | 11 +++++++----
- 2 files changed, 17 insertions(+), 9 deletions(-)
+ block.c | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 56 insertions(+), 11 deletions(-)
 
-diff --git a/block/backup.c b/block/backup.c
-index 405f271..d1ab617 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -618,15 +618,20 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-         goto error;
-     }
+diff --git a/block.c b/block.c
+index e03cc5d..f72a67f 100644
+--- a/block.c
++++ b/block.c
+@@ -1462,6 +1462,43 @@ static void bdrv_get_cumulative_perm(BlockDriverState *bs, uint64_t *perm,
+     *shared_perm = cumulative_shared_perms;
+ }
  
--    /* FIXME Use real permissions */
--    job = block_job_create(job_id, &backup_job_driver, bs, 0, BLK_PERM_ALL,
-+    /* job->common.len is fixed, so we can't allow resize */
-+    job = block_job_create(job_id, &backup_job_driver, bs,
-+                           BLK_PERM_CONSISTENT_READ,
-+                           BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE |
-+                           BLK_PERM_WRITE_UNCHANGED | BLK_PERM_GRAPH_MOD,
-                            speed, creation_flags, cb, opaque, errp);
-     if (!job) {
-         goto error;
-     }
++static char *bdrv_child_user_desc(BdrvChild *c)
++{
++    if (c->role->get_parent_desc) {
++        return c->role->get_parent_desc(c);
++    }
++
++    return g_strdup("another user");
++}
++
++static char *bdrv_perm_names(uint64_t perm)
++{
++    struct perm_name {
++        uint64_t perm;
++        const char *name;
++    } permissions[] = {
++        { BLK_PERM_CONSISTENT_READ, "consistent read" },
++        { BLK_PERM_WRITE,           "write" },
++        { BLK_PERM_WRITE_UNCHANGED, "write unchanged" },
++        { BLK_PERM_RESIZE,          "resize" },
++        { BLK_PERM_GRAPH_MOD,       "change children" },
++        { 0, NULL }
++    };
++
++    char *result = g_strdup("");
++    struct perm_name *p;
++
++    for (p = permissions; p->name; p++) {
++        if (perm & p->perm) {
++            char *old = result;
++            result = g_strdup_printf("%s%s%s", old, *old ? ", " : "", p->name);
++            g_free(old);
++        }
++    }
++
++    return result;
++}
++
+ /*
+  * Checks whether a new reference to @bs can be added if the new user requires
+  * @new_used_perm/@new_shared_perm as its permissions. If @ignore_child is set,
+@@ -1486,17 +1523,25 @@ static int bdrv_check_update_perm(BlockDriverState *bs, uint64_t new_used_perm,
+             continue;
+         }
  
--    /* FIXME Use real permissions */
--    job->target = blk_new(0, BLK_PERM_ALL);
-+    /* The target must match the source in size, so no resize here either */
-+    job->target = blk_new(BLK_PERM_WRITE,
-+                          BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE |
-+                          BLK_PERM_WRITE_UNCHANGED | BLK_PERM_GRAPH_MOD);
-     ret = blk_insert_bs(job->target, target, errp);
-     if (ret < 0) {
-         goto error;
-@@ -657,7 +662,7 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-         job->cluster_size = MAX(BACKUP_CLUSTER_SIZE_DEFAULT, bdi.cluster_size);
-     }
- 
--    /* FIXME Use real permissions */
-+    /* Required permissions are already taken with target's blk_new() */
-     block_job_add_bdrv(&job->common, "target", target, 0, BLK_PERM_ALL,
-                        &error_abort);
-     job->common.len = len;
-diff --git a/tests/qemu-iotests/055 b/tests/qemu-iotests/055
-index 1d3fd04..aafcd24 100755
---- a/tests/qemu-iotests/055
-+++ b/tests/qemu-iotests/055
-@@ -48,7 +48,8 @@ class TestSingleDrive(iotests.QMPTestCase):
-     def setUp(self):
-         qemu_img('create', '-f', iotests.imgfmt, blockdev_target_img, str(image_len))
- 
--        self.vm = iotests.VM().add_drive(test_img).add_drive(blockdev_target_img)
-+        self.vm = iotests.VM().add_drive(test_img)
-+        self.vm.add_drive(blockdev_target_img, interface="none")
-         if iotests.qemu_default_machine == 'pc':
-             self.vm.add_drive(None, 'media=cdrom', 'ide')
-         self.vm.launch()
-@@ -164,7 +165,8 @@ class TestSetSpeed(iotests.QMPTestCase):
-     def setUp(self):
-         qemu_img('create', '-f', iotests.imgfmt, blockdev_target_img, str(image_len))
- 
--        self.vm = iotests.VM().add_drive(test_img).add_drive(blockdev_target_img)
-+        self.vm = iotests.VM().add_drive(test_img)
-+        self.vm.add_drive(blockdev_target_img, interface="none")
-         self.vm.launch()
- 
-     def tearDown(self):
-@@ -247,7 +249,8 @@ class TestSingleTransaction(iotests.QMPTestCase):
-     def setUp(self):
-         qemu_img('create', '-f', iotests.imgfmt, blockdev_target_img, str(image_len))
- 
--        self.vm = iotests.VM().add_drive(test_img).add_drive(blockdev_target_img)
-+        self.vm = iotests.VM().add_drive(test_img)
-+        self.vm.add_drive(blockdev_target_img, interface="none")
-         if iotests.qemu_default_machine == 'pc':
-             self.vm.add_drive(None, 'media=cdrom', 'ide')
-         self.vm.launch()
-@@ -460,7 +463,7 @@ class TestDriveCompression(iotests.QMPTestCase):
- 
-         qemu_img('create', '-f', fmt, blockdev_target_img,
-                  str(TestDriveCompression.image_len), *args)
--        self.vm.add_drive(blockdev_target_img, format=fmt)
-+        self.vm.add_drive(blockdev_target_img, format=fmt, interface="none")
- 
-         self.vm.launch()
+-        if ((new_used_perm & c->shared_perm) != new_used_perm ||
+-            (c->perm & new_shared_perm) != c->perm)
+-        {
+-            const char *user = NULL;
+-            if (c->role->get_name) {
+-                user = c->role->get_name(c);
+-                if (user && !*user) {
+-                    user = NULL;
+-                }
+-            }
+-            error_setg(errp, "Conflicts with %s", user ?: "another operation");
++        if ((new_used_perm & c->shared_perm) != new_used_perm) {
++            char *user = bdrv_child_user_desc(c);
++            char *perm_names = bdrv_perm_names(new_used_perm & ~c->shared_perm);
++            error_setg(errp, "Conflicts with use by %s as '%s', which does not "
++                             "allow '%s' on %s",
++                       user, c->name, perm_names, bdrv_get_node_name(c->bs));
++            g_free(user);
++            g_free(perm_names);
++            return -EPERM;
++        }
++
++        if ((c->perm & new_shared_perm) != c->perm) {
++            char *user = bdrv_child_user_desc(c);
++            char *perm_names = bdrv_perm_names(c->perm & ~new_shared_perm);
++            error_setg(errp, "Conflicts with use by %s as '%s', which uses "
++                             "'%s' on %s",
++                       user, c->name, perm_names, bdrv_get_node_name(c->bs));
++            g_free(user);
++            g_free(perm_names);
+             return -EPERM;
+         }
  
 -- 
 1.8.3.1
