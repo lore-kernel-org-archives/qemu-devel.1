@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cif3p-0001Mh-UU
+	(envelope-from <groug@kaod.org>) id 1cif3q-0001Mp-28
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:31:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cif3m-00080j-OR
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:31:13 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53602)
+	(envelope-from <groug@kaod.org>) id 1cif3m-00080r-TP
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:31:14 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40512)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cif3m-00080C-Er
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cif3m-00080E-KU
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:31:10 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1SASeBC135470
+	v1SAScYV051619
 	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 05:31:09 -0500
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28vm1wv6db-1
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28w3d4jxk5-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 05:31:09 -0500
 Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Tue, 28 Feb 2017 10:31:05 -0000
+	Tue, 28 Feb 2017 10:31:06 -0000
 From: Greg Kurz <groug@kaod.org>
-Date: Tue, 28 Feb 2017 11:30:29 +0100
+Date: Tue, 28 Feb 2017 11:30:31 +0100
 In-Reply-To: <1488277840-18608-1-git-send-email-groug@kaod.org>
 References: <1488277840-18608-1-git-send-email-groug@kaod.org>
-Message-Id: <1488277840-18608-18-git-send-email-groug@kaod.org>
-Subject: [Qemu-devel] [PULL 17/28] 9pfs: local: lstat: don't follow symlinks
+Message-Id: <1488277840-18608-20-git-send-email-groug@kaod.org>
+Subject: [Qemu-devel] [PULL 19/28] 9pfs: local: rename: use renameat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,154 +39,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
 
-The local_lstat() callback is vulnerable to symlink attacks because it
-calls:
+The local_rename() callback is vulnerable to symlink attacks because it
+uses rename() which follows symbolic links in all path elements but the
+rightmost one.
 
-(1) lstat() which follows symbolic links in all path elements but the
-    rightmost one
-(2) getxattr() which follows symbolic links in all path elements
-(3) local_mapped_file_attr()->local_fopen()->openat(O_NOFOLLOW) which
-    follows symbolic links in all path elements but the rightmost
-    one
-
-This patch converts local_lstat() to rely on opendir_nofollow() and
-fstatat(AT_SYMLINK_NOFOLLOW) to fix (1), fgetxattrat_nofollow() to
-fix (2).
-
-A new local_fopenat() helper is introduced as a replacement to
-local_fopen() to fix (3). No effort is made to factor out code
-because local_fopen() will be dropped when all users have been
-converted to call local_fopenat().
+This patch simply transforms local_rename() into a wrapper around
+local_renameat() which is symlink-attack safe.
 
 This partly fixes CVE-2016-9602.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- hw/9pfs/9p-local.c | 78 ++++++++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 61 insertions(+), 17 deletions(-)
+ hw/9pfs/9p-local.c | 57 ++++++++++++++++++++++++++----------------------------
+ 1 file changed, 27 insertions(+), 30 deletions(-)
 
 diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index e373cca3b78d..b810c64aacb6 100644
+index 1136562bdfe9..77f79b60aefa 100644
 --- a/hw/9pfs/9p-local.c
 +++ b/hw/9pfs/9p-local.c
-@@ -111,17 +111,49 @@ static FILE *local_fopen(const char *path, const char *mode)
-     return fp;
+@@ -964,36 +964,6 @@ static int local_truncate(FsContext *ctx, V9fsPath *fs_path, off_t size)
+     return ret;
  }
  
-+static FILE *local_fopenat(int dirfd, const char *name, const char *mode)
+-static int local_rename(FsContext *ctx, const char *oldpath,
+-                        const char *newpath)
+-{
+-    int err;
+-    char *buffer, *buffer1;
+-
+-    if (ctx->export_flags & V9FS_SM_MAPPED_FILE) {
+-        err = local_create_mapped_attr_dir(ctx, newpath);
+-        if (err < 0) {
+-            return err;
+-        }
+-        /* rename the .virtfs_metadata files */
+-        buffer = local_mapped_attr_path(ctx, oldpath);
+-        buffer1 = local_mapped_attr_path(ctx, newpath);
+-        err = rename(buffer, buffer1);
+-        g_free(buffer);
+-        g_free(buffer1);
+-        if (err < 0 && errno != ENOENT) {
+-            return err;
+-        }
+-    }
+-
+-    buffer = rpath(ctx, oldpath);
+-    buffer1 = rpath(ctx, newpath);
+-    err = rename(buffer, buffer1);
+-    g_free(buffer);
+-    g_free(buffer1);
+-    return err;
+-}
+-
+ static int local_chown(FsContext *fs_ctx, V9fsPath *fs_path, FsCred *credp)
+ {
+     char *buffer;
+@@ -1254,6 +1224,33 @@ out:
+     return ret;
+ }
+ 
++static void v9fs_path_init_dirname(V9fsPath *path, const char *str)
 +{
-+    int fd, o_mode = 0;
-+    FILE *fp;
-+    int flags;
-+    /*
-+     * only supports two modes
-+     */
-+    if (mode[0] == 'r') {
-+        flags = O_RDONLY;
-+    } else if (mode[0] == 'w') {
-+        flags = O_WRONLY | O_TRUNC | O_CREAT;
-+        o_mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
-+    } else {
-+        return NULL;
-+    }
-+    fd = openat_file(dirfd, name, flags, o_mode);
-+    if (fd == -1) {
-+        return NULL;
-+    }
-+    fp = fdopen(fd, mode);
-+    if (!fp) {
-+        close(fd);
-+    }
-+    return fp;
++    path->data = g_path_get_dirname(str);
++    path->size = strlen(path->data) + 1;
 +}
 +
- #define ATTR_MAX 100
--static void local_mapped_file_attr(FsContext *ctx, const char *path,
-+static void local_mapped_file_attr(int dirfd, const char *name,
-                                    struct stat *stbuf)
++static int local_rename(FsContext *ctx, const char *oldpath,
++                        const char *newpath)
++{
++    int err;
++    char *oname = g_path_get_basename(oldpath);
++    char *nname = g_path_get_basename(newpath);
++    V9fsPath olddir, newdir;
++
++    v9fs_path_init_dirname(&olddir, oldpath);
++    v9fs_path_init_dirname(&newdir, newpath);
++
++    err = local_renameat(ctx, &olddir, oname, &newdir, nname);
++
++    v9fs_path_free(&newdir);
++    v9fs_path_free(&olddir);
++    g_free(nname);
++    g_free(oname);
++
++    return err;
++}
++
+ static int local_unlinkat(FsContext *ctx, V9fsPath *dir,
+                           const char *name, int flags)
  {
-     FILE *fp;
-     char buf[ATTR_MAX];
--    char *attr_path;
-+    int map_dirfd;
- 
--    attr_path = local_mapped_attr_path(ctx, path);
--    fp = local_fopen(attr_path, "r");
--    g_free(attr_path);
-+    map_dirfd = openat(dirfd, VIRTFS_META_DIR,
-+                       O_RDONLY | O_DIRECTORY | O_NOFOLLOW);
-+    if (map_dirfd == -1) {
-+        return;
-+    }
-+
-+    fp = local_fopenat(map_dirfd, name, "r");
-+    close_preserve_errno(map_dirfd);
-     if (!fp) {
-         return;
-     }
-@@ -143,12 +175,17 @@ static void local_mapped_file_attr(FsContext *ctx, const char *path,
- 
- static int local_lstat(FsContext *fs_ctx, V9fsPath *fs_path, struct stat *stbuf)
- {
--    int err;
--    char *buffer;
--    char *path = fs_path->data;
-+    int err = -1;
-+    char *dirpath = g_path_get_dirname(fs_path->data);
-+    char *name = g_path_get_basename(fs_path->data);
-+    int dirfd;
- 
--    buffer = rpath(fs_ctx, path);
--    err =  lstat(buffer, stbuf);
-+    dirfd = local_opendir_nofollow(fs_ctx, dirpath);
-+    if (dirfd == -1) {
-+        goto out;
-+    }
-+
-+    err = fstatat(dirfd, name, stbuf, AT_SYMLINK_NOFOLLOW);
-     if (err) {
-         goto err_out;
-     }
-@@ -158,25 +195,32 @@ static int local_lstat(FsContext *fs_ctx, V9fsPath *fs_path, struct stat *stbuf)
-         gid_t tmp_gid;
-         mode_t tmp_mode;
-         dev_t tmp_dev;
--        if (getxattr(buffer, "user.virtfs.uid", &tmp_uid, sizeof(uid_t)) > 0) {
-+
-+        if (fgetxattrat_nofollow(dirfd, name, "user.virtfs.uid", &tmp_uid,
-+                                 sizeof(uid_t)) > 0) {
-             stbuf->st_uid = le32_to_cpu(tmp_uid);
-         }
--        if (getxattr(buffer, "user.virtfs.gid", &tmp_gid, sizeof(gid_t)) > 0) {
-+        if (fgetxattrat_nofollow(dirfd, name, "user.virtfs.gid", &tmp_gid,
-+                                 sizeof(gid_t)) > 0) {
-             stbuf->st_gid = le32_to_cpu(tmp_gid);
-         }
--        if (getxattr(buffer, "user.virtfs.mode",
--                    &tmp_mode, sizeof(mode_t)) > 0) {
-+        if (fgetxattrat_nofollow(dirfd, name, "user.virtfs.mode", &tmp_mode,
-+                                 sizeof(mode_t)) > 0) {
-             stbuf->st_mode = le32_to_cpu(tmp_mode);
-         }
--        if (getxattr(buffer, "user.virtfs.rdev", &tmp_dev, sizeof(dev_t)) > 0) {
-+        if (fgetxattrat_nofollow(dirfd, name, "user.virtfs.rdev", &tmp_dev,
-+                                 sizeof(dev_t)) > 0) {
-             stbuf->st_rdev = le64_to_cpu(tmp_dev);
-         }
-     } else if (fs_ctx->export_flags & V9FS_SM_MAPPED_FILE) {
--        local_mapped_file_attr(fs_ctx, path, stbuf);
-+        local_mapped_file_attr(dirfd, name, stbuf);
-     }
- 
- err_out:
--    g_free(buffer);
-+    close_preserve_errno(dirfd);
-+out:
-+    g_free(name);
-+    g_free(dirpath);
-     return err;
- }
- 
 -- 
 2.7.4
