@@ -1,25 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cioLQ-000263-Pi
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:26:02 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cioW3-0005U7-Va
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:37:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cioLN-0002mw-Kj
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:26:00 -0500
-Resent-Message-Id: <E1cioLN-0002mw-Kj@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21492)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cioLN-0002ln-5j
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:25:57 -0500
-In-Reply-To: <1488308796-28832-1-git-send-email-armbru@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148831349537.258.11067917716928734478@0e2666bad730>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 28 Feb 2017 12:24:55 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/26] QAPI patches for 2017-02-28
+	(envelope-from <kwolf@redhat.com>) id 1cioW2-0007VX-Nz
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:36:59 -0500
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Tue, 28 Feb 2017 21:35:59 +0100
+Message-Id: <1488314205-16264-1-git-send-email-kwolf@redhat.com>
+Subject: [Qemu-devel] [PULL 00/46] Block layer patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,123 +17,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: armbru@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ4
-ODMwODc5Ni0yODgzMi0xLWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tClR5cGU6IHNl
-cmllcwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMDAvMjZdIFFBUEkgcGF0Y2hlcyBmb3Ig
-MjAxNy0wMi0yOAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1i
-YXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVk
-PTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxp
-bWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdp
-dCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsg
-ZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1m
-b3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4v
-c2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0x
-CiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09
-PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
-N2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9x
-ZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTQ4ODMwODc5Ni0yODgzMi0xLWdpdC1z
-ZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMTQ4ODMwODc5Ni0yODgzMi0x
-LWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tCiAtIFt0YWcgdXBkYXRlXSAgICAgIHBh
-dGNoZXcvMjAxNzAyMjcyMDE0NTYuMzE4MTQtMS1iZXJyYW5nZUByZWRoYXQuY29tIC0+IHBhdGNo
-ZXcvMjAxNzAyMjcyMDE0NTYuMzE4MTQtMS1iZXJyYW5nZUByZWRoYXQuY29tClN3aXRjaGVkIHRv
-IGEgbmV3IGJyYW5jaCAndGVzdCcKZTk3NzdlOSBxYXBpOiBJbXByb3ZlIHFvYmplY3QgdmlzaXRv
-ciBkb2N1bWVudGF0aW9uCmRkOWJmNjAgcWFwaTogRml4IG9iamVjdCBpbnB1dCB2aXNpdCBiZXlv
-bmQgZW5kIG9mIGxpc3QKNDQ0MzQ2NSB0ZXN0czogQ292ZXIgaW5wdXQgdmlzaXQgYmV5b25kIGVu
-ZCBvZiBsaXN0Cjg5OGQ5ZTMgcWFwaTogTWFrZSBpbnB1dCB2aXNpdG9ycyBkZXRlY3QgdW52aXNp
-dGVkIGxpc3QgdGFpbHMKYjZkYjYwOCB0ZXN0LXFvYmplY3QtaW5wdXQtdmlzaXRvcjogQ292ZXIg
-bWlzc2luZyBuZXN0ZWQgc3RydWN0IG1lbWJlcgo4MDc1N2IwIHRlc3RzOiBDb3ZlciBwYXJ0aWFs
-IGlucHV0IHZpc2l0IG9mIGxpc3QKZmRhZTNiMiB0ZXN0LXN0cmluZy1pbnB1dC12aXNpdG9yOiBJ
-bXByb3ZlIGxpc3QgY292ZXJhZ2UKNGZhNThmNiB0ZXN0LXN0cmluZy1pbnB1dC12aXNpdG9yOiBU
-ZWFyIGRvd24gZXhpc3RpbmcgdGVzdCBhdXRvbWF0aWNhbGx5CjNhYWIxNmIgdGVzdHMtcW9iamVj
-dC1pbnB1dC1zdHJpY3Q6IE1lcmdlIGludG8gdGVzdC1xb2JqZWN0LWlucHV0LXZpc2l0b3IKODNj
-ODNmOCBxYXBpOiBEcm9wIHVudXNlZCBub24tc3RyaWN0IHFvYmplY3QgaW5wdXQgdmlzaXRvcgo1
-ODU0OTg4IHRlc3QtcW9iamVjdC1pbnB1dC12aXNpdG9yOiBVc2Ugc3RyaWN0IHZpc2l0b3IKMjNk
-YTNlZSBxb206IE1ha2Ugb2JqZWN0X3Byb3BlcnR5X3NldF9xb2JqZWN0KCkncyBpbnB1dCB2aXNp
-dG9yIHN0cmljdAo2N2IzODM1IHFhcGk6IE1ha2Ugc3RyaW5nIGlucHV0IGFuZCBvcHRzIHZpc2l0
-b3IgcmVxdWlyZSBub24tbnVsbCBpbnB1dAo3OTQ4YzNmIHFhcGk6IERyb3Agc3RyaW5nIGlucHV0
-IHZpc2l0b3IgbWV0aG9kIG9wdGlvbmFsKCkKN2U1YWQwMCBxYXBpOiBJbXByb3ZlIHFvYmplY3Qg
-aW5wdXQgdmlzaXRvciBlcnJvciByZXBvcnRpbmcKNWJlOTE5NiBxYXBpOiBNYWtlIFFPYmplY3Qg
-aW5wdXQgdmlzaXRvciBzZXQgKmxpc3QgcmVsaWFibHkKOTc5ZTM4OCBxYXBpOiBDbGVhbiB1cCBh
-ZnRlciBjb21taXQgM2QzNDRjMgo5NDgwNDEwIHFhcGk6IEltcHJvdmUgYSBRT2JqZWN0IGlucHV0
-IHZpc2l0b3IgZXJyb3IgbWVzc2FnZQpiN2UzMmEzIHFtcDogSW1wcm92ZSBRTVAgZGlzcGF0Y2gg
-ZXJyb3IgbWVzc2FnZXMKYmJiZDQ3YyBxbXA6IEVsaW1pbmF0ZSBzaWxseSBRRVJSX1FNUF8qIG1h
-Y3Jvcwo2MmMxMmI3IHFtcDogRHJvcCBkdXBsaWNhdGVkIFFNUCBjb21tYW5kIG9iamVjdCBjaGVj
-a3MKYmU2OGI2ZCBxbXA6IENsZWFuIHVwIGhvdyB3ZSBlbmZvcmNlIGNhcGFiaWxpdHkgbmVnb3Rp
-YXRpb24KY2E3YTVkZSBxbXA6IER1bWIgZG93biBob3cgd2UgcnVuIFFNUCBjb21tYW5kIHJlZ2lz
-dHJhdGlvbgpmNDEyZjBhIHFtcC10ZXN0OiBOZXcsIGNvdmVyaW5nIGJhc2ljIFFNUCBwcm90b2Nv
-bApkZDA2NzlmIGxpYnF0ZXN0OiBXb3JrIGFyb3VuZCBhICJRTVAgd2FudHMgYSBuZXdsaW5lIiBi
-dWcKNDkyOGU5YyBxZ2E6IEZpeCBjcmFzaCBvbiBub24tZGljdGlvbmFyeSBRTVAgYXJndW1lbnQK
-Cj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMjY6IHFnYTogRml4IGNyYXNo
-IG9uIG5vbi1kaWN0aW9uYXJ5IFFNUCBhcmd1bWVudC4uLgpDaGVja2luZyBQQVRDSCAyLzI2OiBs
-aWJxdGVzdDogV29yayBhcm91bmQgYSAiUU1QIHdhbnRzIGEgbmV3bGluZSIgYnVnLi4uCkNoZWNr
-aW5nIFBBVENIIDMvMjY6IHFtcC10ZXN0OiBOZXcsIGNvdmVyaW5nIGJhc2ljIFFNUCBwcm90b2Nv
-bC4uLgpDaGVja2luZyBQQVRDSCA0LzI2OiBxbXA6IER1bWIgZG93biBob3cgd2UgcnVuIFFNUCBj
-b21tYW5kIHJlZ2lzdHJhdGlvbi4uLgpDaGVja2luZyBQQVRDSCA1LzI2OiBxbXA6IENsZWFuIHVw
-IGhvdyB3ZSBlbmZvcmNlIGNhcGFiaWxpdHkgbmVnb3RpYXRpb24uLi4KQ2hlY2tpbmcgUEFUQ0gg
-Ni8yNjogcW1wOiBEcm9wIGR1cGxpY2F0ZWQgUU1QIGNvbW1hbmQgb2JqZWN0IGNoZWNrcy4uLgpD
-aGVja2luZyBQQVRDSCA3LzI2OiBxbXA6IEVsaW1pbmF0ZSBzaWxseSBRRVJSX1FNUF8qIG1hY3Jv
-cy4uLgpDaGVja2luZyBQQVRDSCA4LzI2OiBxbXA6IEltcHJvdmUgUU1QIGRpc3BhdGNoIGVycm9y
-IG1lc3NhZ2VzLi4uCkNoZWNraW5nIFBBVENIIDkvMjY6IHFhcGk6IEltcHJvdmUgYSBRT2JqZWN0
-IGlucHV0IHZpc2l0b3IgZXJyb3IgbWVzc2FnZS4uLgpDaGVja2luZyBQQVRDSCAxMC8yNjogcWFw
-aTogQ2xlYW4gdXAgYWZ0ZXIgY29tbWl0IDNkMzQ0YzIuLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvMjY6
-IHFhcGk6IE1ha2UgUU9iamVjdCBpbnB1dCB2aXNpdG9yIHNldCAqbGlzdCByZWxpYWJseS4uLgpD
-aGVja2luZyBQQVRDSCAxMi8yNjogcWFwaTogSW1wcm92ZSBxb2JqZWN0IGlucHV0IHZpc2l0b3Ig
-ZXJyb3IgcmVwb3J0aW5nLi4uCkNoZWNraW5nIFBBVENIIDEzLzI2OiBxYXBpOiBEcm9wIHN0cmlu
-ZyBpbnB1dCB2aXNpdG9yIG1ldGhvZCBvcHRpb25hbCgpLi4uCkNoZWNraW5nIFBBVENIIDE0LzI2
-OiBxYXBpOiBNYWtlIHN0cmluZyBpbnB1dCBhbmQgb3B0cyB2aXNpdG9yIHJlcXVpcmUgbm9uLW51
-bGwgaW5wdXQuLi4KQ2hlY2tpbmcgUEFUQ0ggMTUvMjY6IHFvbTogTWFrZSBvYmplY3RfcHJvcGVy
-dHlfc2V0X3FvYmplY3QoKSdzIGlucHV0IHZpc2l0b3Igc3RyaWN0Li4uCkNoZWNraW5nIFBBVENI
-IDE2LzI2OiB0ZXN0LXFvYmplY3QtaW5wdXQtdmlzaXRvcjogVXNlIHN0cmljdCB2aXNpdG9yLi4u
-CkNoZWNraW5nIFBBVENIIDE3LzI2OiBxYXBpOiBEcm9wIHVudXNlZCBub24tc3RyaWN0IHFvYmpl
-Y3QgaW5wdXQgdmlzaXRvci4uLgpDaGVja2luZyBQQVRDSCAxOC8yNjogdGVzdHMtcW9iamVjdC1p
-bnB1dC1zdHJpY3Q6IE1lcmdlIGludG8gdGVzdC1xb2JqZWN0LWlucHV0LXZpc2l0b3IuLi4KRVJS
-T1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM0ODc6IEZJTEU6IHRlc3RzL3Rlc3QtcW9iamVj
-dC1pbnB1dC12aXNpdG9yLmM6ODQ3OgorICAgIHYgPSB2aXNpdG9yX2lucHV0X3Rlc3RfaW5pdChk
-YXRhLCAieyAnaW50ZWdlcic6IC00MiwgJ2Jvb2xlYW4nOiB0cnVlLCAnc3RyaW5nJzogJ2Zvbycs
-ICdleHRyYSc6IDQyIH0iKTsKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNTAxOiBG
-SUxFOiB0ZXN0cy90ZXN0LXFvYmplY3QtaW5wdXQtdmlzaXRvci5jOjg2MToKKyAgICB2ID0gdmlz
-aXRvcl9pbnB1dF90ZXN0X2luaXQoZGF0YSwgInsgJ3N0cmluZzAnOiAnc3RyaW5nMCcsICdkaWN0
-MSc6IHsgJ3N0cmluZzEnOiAnc3RyaW5nMScsICdkaWN0Mic6IHsgJ3VzZXJkZWYxJzogeyAnaW50
-ZWdlcic6IDQyLCAnc3RyaW5nJzogJ3N0cmluZycsICdleHRyYSc6IFs0MiwgMjMsIHsnZm9vJzon
-YmFyJ31dIH0sICdzdHJpbmcyJzogJ3N0cmluZzInfX19Iik7CgpFUlJPUjogbGluZSBvdmVyIDkw
-IGNoYXJhY3RlcnMKIzUxNTogRklMRTogdGVzdHMvdGVzdC1xb2JqZWN0LWlucHV0LXZpc2l0b3Iu
-Yzo4NzU6CisgICAgdiA9IHZpc2l0b3JfaW5wdXRfdGVzdF9pbml0KGRhdGEsICJbIHsgJ3N0cmlu
-Zyc6ICdzdHJpbmcwJywgJ2ludGVnZXInOiA0MiB9LCB7ICdzdHJpbmcnOiAnc3RyaW5nMScsICdp
-bnRlZ2VyJzogNDMgfSwgeyAnc3RyaW5nJzogJ3N0cmluZzInLCAnaW50ZWdlcic6IDQ0LCAnZXh0
-cmEnOiAnZ2dnJyB9IF0iKTsKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNTg4OiBG
-SUxFOiB0ZXN0cy90ZXN0LXFvYmplY3QtaW5wdXQtdmlzaXRvci5jOjk0ODoKKyAgICB2ID0gdmlz
-aXRvcl9pbnB1dF90ZXN0X2luaXQoZGF0YSwgInsgJ3N0cmluZyc6ICdjJywgJ2ludGVnZXInOiA0
-MSwgJ2Jvb2xlYW4nOiB0cnVlIH0iKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJz
-CiM1OTU6IEZJTEU6IHRlc3RzL3Rlc3QtcW9iamVjdC1pbnB1dC12aXNpdG9yLmM6OTU1Ogorc3Rh
-dGljIHZvaWQgdGVzdF92aXNpdG9yX2luX2ZhaWxfdW5pb25fZmxhdF9ub19kaXNjcmltKFRlc3RJ
-bnB1dFZpc2l0b3JEYXRhICpkYXRhLAoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM2
-MDM6IEZJTEU6IHRlc3RzL3Rlc3QtcW9iamVjdC1pbnB1dC12aXNpdG9yLmM6OTYzOgorICAgIHYg
-PSB2aXNpdG9yX2lucHV0X3Rlc3RfaW5pdChkYXRhLCAieyAnaW50ZWdlcic6IDQyLCAnc3RyaW5n
-JzogJ2MnLCAnc3RyaW5nMSc6ICdkJywgJ3N0cmluZzInOiAnZScgfSIpOwoKdG90YWw6IDUgZXJy
-b3JzLCAxIHdhcm5pbmdzLCAyMzMgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTkvMjY6IHRlc3Qtc3RyaW5nLWlucHV0
-LXZpc2l0b3I6IFRlYXIgZG93biBleGlzdGluZyB0ZXN0IGF1dG9tYXRpY2FsbHkuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMjAvMjY6IHRlc3Qtc3RyaW5nLWlucHV0LXZpc2l0b3I6IEltcHJvdmUgbGlzdCBj
-b3ZlcmFnZS4uLgpDaGVja2luZyBQQVRDSCAyMS8yNjogdGVzdHM6IENvdmVyIHBhcnRpYWwgaW5w
-dXQgdmlzaXQgb2YgbGlzdC4uLgpDaGVja2luZyBQQVRDSCAyMi8yNjogdGVzdC1xb2JqZWN0LWlu
-cHV0LXZpc2l0b3I6IENvdmVyIG1pc3NpbmcgbmVzdGVkIHN0cnVjdCBtZW1iZXIuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMjMvMjY6IHFhcGk6IE1ha2UgaW5wdXQgdmlzaXRvcnMgZGV0ZWN0IHVudmlzaXRl
-ZCBsaXN0IHRhaWxzLi4uCkNoZWNraW5nIFBBVENIIDI0LzI2OiB0ZXN0czogQ292ZXIgaW5wdXQg
-dmlzaXQgYmV5b25kIGVuZCBvZiBsaXN0Li4uCkVSUk9SOiBpZiB0aGlzIGNvZGUgaXMgcmVkdW5k
-YW50IGNvbnNpZGVyIHJlbW92aW5nIGl0CiM4NjogRklMRTogdGVzdHMvdGVzdC1xb2JqZWN0LWlu
-cHV0LXZpc2l0b3IuYzo5NTY6CisjaWYgMCAvKiBGSVhNRSBjcmFzaCAqLwoKdG90YWw6IDEgZXJy
-b3JzLCAwIHdhcm5pbmdzLCA5NSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBw
-cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
-IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
-aW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyNS8yNjogcWFwaTogRml4IG9iamVjdCBp
-bnB1dCB2aXNpdCBiZXlvbmQgZW5kIG9mIGxpc3QuLi4KQ2hlY2tpbmcgUEFUQ0ggMjYvMjY6IHFh
-cGk6IEltcHJvdmUgcW9iamVjdCB2aXNpdG9yIGRvY3VtZW50YXRpb24uLi4KPT09IE9VVFBVVCBF
-TkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5l
-cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxl
-YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+The following changes since commit 9514f2648ca05b38e852b490a12b8cd98d5808c1:
+
+  Merge remote-tracking branch 'remotes/gkurz/tags/for-upstream' into staging (2017-02-28 17:39:49 +0000)
+
+are available in the git repository at:
+
+
+  git://repo.or.cz/qemu/kevin.git tags/for-upstream
+
+for you to fetch changes up to b2c2832c6140cfe3ddc0de2d77eeb0b77dea8fd3:
+
+  block: Add Error parameter to bdrv_append() (2017-02-28 20:47:51 +0100)
+
+----------------------------------------------------------------
+Block layer patches
+
+----------------------------------------------------------------
+Kevin Wolf (44):
+      block: Add op blocker permission constants
+      block: Add Error argument to bdrv_attach_child()
+      block: Let callers request permissions when attaching a child node
+      block: Involve block drivers in permission granting
+      block: Default .bdrv_child_perm() for filter drivers
+      block: Request child permissions in filter drivers
+      block: Default .bdrv_child_perm() for format drivers
+      block: Request child permissions in format drivers
+      vvfat: Implement .bdrv_child_perm()
+      block: Require .bdrv_child_perm() with child nodes
+      block: Request real permissions in bdrv_attach_child()
+      block: Add permissions to BlockBackend
+      block: Add permissions to blk_new()
+      block: Add error parameter to blk_insert_bs()
+      block: Add BDRV_O_RESIZE for blk_new_open()
+      block: Request real permissions in blk_new_open()
+      block: Allow error return in BlockDevOps.change_media_cb()
+      hw/block: Request permissions
+      hw/block: Introduce share-rw qdev property
+      blockjob: Add permissions to block_job_create()
+      block: Add BdrvChildRole.get_parent_desc()
+      block: Include details on permission errors in message
+      block: Add BdrvChildRole.stay_at_node
+      blockjob: Add permissions to block_job_add_bdrv()
+      commit: Use real permissions in commit block job
+      commit: Use real permissions for HMP 'commit'
+      backup: Use real permissions in backup block job
+      block: Fix pending requests check in bdrv_append()
+      block: BdrvChildRole.attach/detach() callbacks
+      block: Allow backing file links in change_parent_backing_link()
+      blockjob: Factor out block_job_remove_all_bdrv()
+      mirror: Use real permissions in mirror/active commit block job
+      stream: Use real permissions in streaming block job
+      mirror: Add filter-node-name to blockdev-mirror
+      commit: Add filter-node-name to block-commit
+      hmp: Request permissions in qemu-io
+      migration/block: Use real permissions
+      nbd/server: Use real permissions for NBD exports
+      tests: Remove FIXME comments
+      block: Pass BdrvChild to bdrv_aligned_preadv/pwritev and copy-on-read
+      block: Assertions for write permissions
+      block: Assertions for resize permission
+      block: Add Error parameter to bdrv_set_backing_hd()
+      block: Add Error parameter to bdrv_append()
+
+Markus Armbruster (1):
+      option: Tweak invalid size error message and unbreak iotest 049
+
+Peter Lieven (1):
+      qemu-img: make convert async
+
+ block.c                          | 583 ++++++++++++++++++++++++++++++++++-----
+ block/backup.c                   |  22 +-
+ block/blkdebug.c                 |   2 +
+ block/blkreplay.c                |   1 +
+ block/blkverify.c                |   1 +
+ block/block-backend.c            | 116 +++++++-
+ block/bochs.c                    |   1 +
+ block/cloop.c                    |   1 +
+ block/commit.c                   | 176 ++++++++++--
+ block/crypto.c                   |   1 +
+ block/dmg.c                      |   1 +
+ block/io.c                       |  41 +--
+ block/mirror.c                   | 237 ++++++++++++++--
+ block/parallels.c                |   4 +-
+ block/qcow.c                     |   4 +-
+ block/qcow2.c                    |  19 +-
+ block/qed.c                      |   4 +-
+ block/quorum.c                   |  11 +-
+ block/raw-format.c               |   1 +
+ block/replication.c              |   3 +-
+ block/sheepdog.c                 |   2 +-
+ block/stream.c                   |  47 +++-
+ block/vdi.c                      |   4 +-
+ block/vhdx.c                     |   4 +-
+ block/vmdk.c                     |   7 +-
+ block/vpc.c                      |   4 +-
+ block/vvfat.c                    |  24 +-
+ blockdev.c                       |  74 ++++-
+ blockjob.c                       |  62 ++++-
+ hmp.c                            |  33 ++-
+ hw/block/block.c                 |  24 +-
+ hw/block/fdc.c                   |  28 +-
+ hw/block/m25p80.c                |   8 +
+ hw/block/nand.c                  |   7 +
+ hw/block/nvme.c                  |   8 +-
+ hw/block/onenand.c               |   7 +
+ hw/block/pflash_cfi01.c          |  18 +-
+ hw/block/pflash_cfi02.c          |  19 +-
+ hw/block/virtio-blk.c            |   8 +-
+ hw/core/qdev-properties-system.c |   9 +-
+ hw/ide/core.c                    |   2 +-
+ hw/ide/qdev.c                    |   9 +-
+ hw/nvram/spapr_nvram.c           |   8 +
+ hw/scsi/scsi-disk.c              |  12 +-
+ hw/sd/sd.c                       |   8 +-
+ hw/usb/dev-storage.c             |   6 +-
+ include/block/block.h            |  46 ++-
+ include/block/block_int.h        | 126 ++++++++-
+ include/block/blockjob.h         |  14 +-
+ include/block/blockjob_int.h     |   4 +-
+ include/hw/block/block.h         |   8 +-
+ include/qemu-io.h                |   1 +
+ include/sysemu/block-backend.h   |   9 +-
+ migration/block.c                |  21 +-
+ nbd/server.c                     |  16 +-
+ qapi/block-core.json             |  16 +-
+ qemu-img-cmds.hx                 |   4 +-
+ qemu-img.c                       | 334 +++++++++++++++-------
+ qemu-img.texi                    |  16 +-
+ qemu-io-cmds.c                   |  28 ++
+ tests/qemu-iotests/049.out       |  14 +-
+ tests/qemu-iotests/051.pc.out    |   6 +-
+ tests/qemu-iotests/055           |  11 +-
+ tests/qemu-iotests/085.out       |   2 +-
+ tests/qemu-iotests/141           |   2 +-
+ tests/qemu-iotests/141.out       |   4 +-
+ tests/qemu-iotests/172.out       |  53 ++++
+ tests/test-blockjob-txn.c        |   6 +-
+ tests/test-blockjob.c            |  10 +-
+ tests/test-throttle.c            |   7 +-
+ util/qemu-option.c               |   2 +-
+ 71 files changed, 2039 insertions(+), 392 deletions(-)
