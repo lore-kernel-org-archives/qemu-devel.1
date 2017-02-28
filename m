@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43820)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ale@clearmind.me>) id 1cilPm-0003J9-04
+	(envelope-from <ale@clearmind.me>) id 1cilPl-0003IM-H7
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:18:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ale@clearmind.me>) id 1cilPj-0003hy-GO
+	(envelope-from <ale@clearmind.me>) id 1cilPi-0003hl-Mr
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:18:17 -0500
-Received: from clearmind.me ([178.32.49.9]:39637)
+Received: from clearmind.me ([178.32.49.9]:41905)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ale@clearmind.me>) id 1cilPj-0003go-6z
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:18:15 -0500
+	(Exim 4.71) (envelope-from <ale@clearmind.me>) id 1cilPi-0003gT-8p
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:18:14 -0500
 From: Alessandro Di Federico <ale+qemu@clearmind.me>
-Date: Tue, 28 Feb 2017 18:19:20 +0100
-Message-Id: <20170228171921.21602-7-ale+qemu@clearmind.me>
+Date: Tue, 28 Feb 2017 18:19:18 +0100
+Message-Id: <20170228171921.21602-5-ale+qemu@clearmind.me>
 In-Reply-To: <20170228171921.21602-1-ale+qemu@clearmind.me>
 References: <20170228171921.21602-1-ale+qemu@clearmind.me>
 Sender: ale@clearmind.me
-Subject: [Qemu-devel] [PATCH 6/7] Factor out tcg/tcg.h
+Subject: [Qemu-devel] [PATCH 4/7] *-user targets object files decoupling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,791 +26,1024 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-This patch factors out all the necessary data structures contained in
-tcg.h into include/tcg-common.h so that they can be made available to
-users of the library version of the TCG, libtcg.
-
-The data structures have been modified in a way that allows them to be
-easily prefixed in different ways depending on the situation. For
-internal use, the prefix will typically be TCG_ for constants and TCG
-for data structures, while it will be LIBTCG_/LibTCG for external use.
-
-In addition to this, certain data types (namely TCGReg, TCGRegSet and
-tcg_temp) have been forced to be the same over all the targets, so that
-the data structures are architecture-independent, a vital requirement to
-provide a uniform interface to libtcg users.
-
-Finally tcg/tcg-opc.h has been moved to include/.
+Move some functions around in target/$arch/*.c to reduce the coupling
+among the various compilation units. In particular, we want to make the
+various translate.c and cpu.c as much standalone as possible, so that
+they can be easily employed by libtcg.
 ---
- include/qemu-common.h      |   3 +
- include/tcg-common.h       | 233 +++++++++++++++++++++++++++++++++++++++++++++
- {tcg => include}/tcg-opc.h |   0
- tcg/aarch64/tcg-target.h   |   4 +-
- tcg/arm/tcg-target.h       |   4 +-
- tcg/i386/tcg-target.h      |   4 +-
- tcg/ia64/tcg-target.h      |   4 +-
- tcg/mips/tcg-target.h      |   4 +-
- tcg/ppc/tcg-target.h       |   4 +-
- tcg/s390/tcg-target.h      |   4 +-
- tcg/sparc/tcg-target.h     |   4 +-
- tcg/tcg.c                  |   7 --
- tcg/tcg.h                  | 212 ++---------------------------------------
- tcg/tci/tcg-target.h       |   4 +-
- 14 files changed, 264 insertions(+), 227 deletions(-)
- create mode 100644 include/tcg-common.h
- rename {tcg => include}/tcg-opc.h (100%)
+ exec.c                      |   6 ++-
+ target/alpha/cpu.c          |  38 +++++++++++++++
+ target/alpha/helper.c       |  39 ----------------
+ target/arm/cpu.h            |  74 ++++++++++++++++++++---------
+ target/arm/helper.c         |  85 ++++++----------------------------
+ target/arm/translate.c      |  33 +++++++++++++
+ target/m68k/cpu.c           |  61 ++++++++++++++++++++++++
+ target/m68k/cpu.h           |  49 ++++++++++++++++++++
+ target/m68k/helper.c        | 110 --------------------------------------------
+ target/mips/op_helper.c     |   8 ----
+ target/mips/translate.c     |   8 ++++
+ target/ppc/gdbstub.c        |  20 --------
+ target/ppc/translate_init.c |  20 ++++++++
+ target/s390x/cpu.c          |  75 ++++++++++++++++++++++++++++++
+ target/s390x/helper.c       |  75 ------------------------------
+ target/sparc/cpu.h          |   2 +
+ target/unicore32/cpu.c      |   5 ++
+ target/unicore32/helper.c   |   5 --
+ 18 files changed, 360 insertions(+), 353 deletions(-)
 
-diff --git a/include/qemu-common.h b/include/qemu-common.h
-index 1430390eb6..c81828ef55 100644
---- a/include/qemu-common.h
-+++ b/include/qemu-common.h
-@@ -12,6 +12,7 @@
- #ifndef QEMU_COMMON_H
- #define QEMU_COMMON_H
+diff --git a/exec.c b/exec.c
+index 865a1e8295..cf9f039dba 100644
+--- a/exec.c
++++ b/exec.c
+@@ -665,16 +665,18 @@ AddressSpace *cpu_get_address_space(CPUState *cpu, int asidx)
  
-+#include <stdint.h>
- #include "qemu/fprintf-fn.h"
+ void cpu_exec_unrealizefn(CPUState *cpu)
+ {
+-    CPUClass *cc = CPU_GET_CLASS(cpu);
+-
+     cpu_list_remove(cpu);
  
- #define TFR(expr) do { if ((expr) != -1) break; } while (errno == EINTR)
-@@ -79,6 +80,8 @@ int qemu_openpty_raw(int *aslave, char *pty_name);
- void tcg_exec_init(unsigned long tb_size);
- bool tcg_enabled(void);
- 
-+typedef uint32_t TCGReg;
++#ifndef CONFIG_USER_ONLY
++    CPUClass *cc = CPU_GET_CLASS(cpu);
 +
- void cpu_exec_init_all(void);
- void cpu_exec_step_atomic(CPUState *cpu);
- 
-diff --git a/include/tcg-common.h b/include/tcg-common.h
-new file mode 100644
-index 0000000000..856c4974a0
---- /dev/null
-+++ b/include/tcg-common.h
-@@ -0,0 +1,233 @@
-+/* This is file has no include guards because it's OK to include it multiple
-+ * times */
-+
-+/* Includers should define the following macros:
-+ *
-+ * PREFIX: prefix for data types and structures.
-+ * PREFIX2: prefix for enum data types.
-+ * PREFIX3: prefix for other enum data types which, internally, do not need a
-+ *          prefix, since they already have one.
-+ */
-+#if !defined(PREFIX) || !defined(PREFIX2) || !defined(PREFIX3)
-+# error You need to define PREFIX, PREFIX2 and PREFIX3 to include this file
+     if (cc->vmsd != NULL) {
+         vmstate_unregister(NULL, cc->vmsd, cpu);
+     }
+     if (qdev_get_vmsd(DEVICE(cpu)) == NULL) {
+         vmstate_unregister(NULL, &vmstate_cpu_common, cpu);
+     }
 +#endif
-+
-+#include <stdint.h>
-+
-+/* Includers outside the QEMU environment might need this. */
-+#ifndef TCG_TARGET_REG_BITS
-+# if __SIZEOF_POINTER__ == 8
-+#  define TCG_TARGET_REG_BITS 64
-+#  define TCG_TARGET_REG_BITS 64
-+# else
-+#  define TCG_TARGET_REG_BITS 32
-+# endif
-+#endif
-+
-+typedef uint64_t PREFIX(RegSet);
-+typedef uint64_t tcg_temp;
-+typedef uint64_t PREFIX(Arg);
-+
-+typedef struct PREFIX(ArgConstraint) {
-+    uint16_t ct;
-+    uint8_t alias_index;
-+    union {
-+        PREFIX(RegSet) regs;
-+    } u;
-+} PREFIX(ArgConstraint);
-+
-+typedef enum PREFIX(Opcode) {
-+#define DEF(name, oargs, iargs, cargs, flags) PREFIX3(INDEX_op_ ## name),
-+#include "tcg-opc.h"
-+#undef DEF
-+    PREFIX3(NB_OPS),
-+} PREFIX(Opcode);
-+
-+typedef enum PREFIX(TempVal) {
-+    PREFIX3(TEMP_VAL_DEAD),
-+    PREFIX3(TEMP_VAL_REG),
-+    PREFIX3(TEMP_VAL_MEM),
-+    PREFIX3(TEMP_VAL_CONST),
-+} PREFIX(TempVal);
-+
-+typedef enum PREFIX(Type) {
-+    PREFIX2(TYPE_I32),
-+    PREFIX2(TYPE_I64),
-+    PREFIX2(TYPE_COUNT), /* number of different types */
-+
-+#ifndef LIBTCG_INTERFACE
-+    /* An alias for the size of the host register.  */
-+#if TCG_TARGET_REG_BITS == 32
-+    PREFIX2(TYPE_REG) = PREFIX2(TYPE_I32),
-+#else
-+    PREFIX2(TYPE_REG) = PREFIX2(TYPE_I64),
-+#endif
-+
-+    /* An alias for the size of the native pointer.  */
-+#if UINTPTR_MAX == UINT32_MAX
-+    PREFIX2(TYPE_PTR) = PREFIX2(TYPE_I32),
-+#else
-+    PREFIX2(TYPE_PTR) = PREFIX2(TYPE_I64),
-+#endif
-+
-+    /* An alias for the size of the target "long", aka register.  */
-+#if TARGET_LONG_BITS == 64
-+    PREFIX2(TYPE_TL) = PREFIX2(TYPE_I64),
-+#else
-+    PREFIX2(TYPE_TL) = PREFIX2(TYPE_I32),
-+#endif
-+#endif
-+} PREFIX(Type);
-+
-+typedef struct PREFIX(Temp) {
-+    PREFIX(Reg) reg:8;
-+    PREFIX(TempVal) val_type:8;
-+    PREFIX(Type) base_type:8;
-+    PREFIX(Type) type:8;
-+    unsigned int fixed_reg:1;
-+    unsigned int indirect_reg:1;
-+    unsigned int indirect_base:1;
-+    unsigned int mem_coherent:1;
-+    unsigned int mem_allocated:1;
-+    unsigned int temp_local:1; /* If true, the temp is saved across
-+                                  basic blocks. Otherwise, it is not
-+                                  preserved across basic blocks. */
-+    unsigned int temp_allocated:1; /* never used for code gen */
-+
-+    tcg_temp val;
-+    struct PREFIX(Temp) *mem_base;
-+    intptr_t mem_offset;
-+    const char *name;
-+} PREFIX(Temp);
-+
-+typedef struct PREFIX(OpDef) {
-+    const char *name;
-+    uint8_t nb_oargs, nb_iargs, nb_cargs, nb_args;
-+    uint8_t flags;
-+    PREFIX(ArgConstraint) *args_ct;
-+    int *sorted_args;
-+#if defined(CONFIG_DEBUG_TCG)
-+    int used;
-+#endif
-+} PREFIX(OpDef);
-+
-+/* Conditions.  Note that these are laid out for easy manipulation by
-+   the functions below:
-+     bit 0 is used for inverting;
-+     bit 1 is signed,
-+     bit 2 is unsigned,
-+     bit 3 is used with bit 0 for swapping signed/unsigned.  */
-+typedef enum {
-+    /* non-signed */
-+    PREFIX2(COND_NEVER)  = 0 | 0 | 0 | 0,
-+    PREFIX2(COND_ALWAYS) = 0 | 0 | 0 | 1,
-+    PREFIX2(COND_EQ)     = 8 | 0 | 0 | 0,
-+    PREFIX2(COND_NE)     = 8 | 0 | 0 | 1,
-+    /* signed */
-+    PREFIX2(COND_LT)     = 0 | 0 | 2 | 0,
-+    PREFIX2(COND_GE)     = 0 | 0 | 2 | 1,
-+    PREFIX2(COND_LE)     = 8 | 0 | 2 | 0,
-+    PREFIX2(COND_GT)     = 8 | 0 | 2 | 1,
-+    /* unsigned */
-+    PREFIX2(COND_LTU)    = 0 | 4 | 0 | 0,
-+    PREFIX2(COND_GEU)    = 0 | 4 | 0 | 1,
-+    PREFIX2(COND_LEU)    = 8 | 4 | 0 | 0,
-+    PREFIX2(COND_GTU)    = 8 | 4 | 0 | 1,
-+} PREFIX(Cond);
-+
-+/* Constants for qemu_ld and qemu_st for the Memory Operation field.  */
-+typedef enum PREFIX(MemOp) {
-+    PREFIX3(MO_8)     = 0,
-+    PREFIX3(MO_16)    = 1,
-+    PREFIX3(MO_32)    = 2,
-+    PREFIX3(MO_64)    = 3,
-+    PREFIX3(MO_SIZE)  = 3,   /* Mask for the above.  */
-+
-+    PREFIX3(MO_SIGN)  = 4,   /* Sign-extended, otherwise zero-extended.  */
-+
-+    PREFIX3(MO_BSWAP) = 8,   /* Host reverse endian.  */
-+#ifndef LIBTCG_INTERFACE
-+#ifdef HOST_WORDS_BIGENDIAN
-+    PREFIX3(MO_LE)    = PREFIX3(MO_BSWAP),
-+    PREFIX3(MO_BE)    = 0,
-+#else
-+    PREFIX3(MO_LE)    = 0,
-+    PREFIX3(MO_BE)    = PREFIX3(MO_BSWAP),
-+#endif
-+#ifdef TARGET_WORDS_BIGENDIAN
-+    PREFIX3(MO_TE)    = PREFIX3(MO_BE),
-+#else
-+    PREFIX3(MO_TE)    = PREFIX3(MO_LE),
-+#endif
-+
-+    /* MO_UNALN accesses are never checked for alignment.
-+     * MO_ALIGN accesses will result in a call to the CPU's
-+     * do_unaligned_access hook if the guest address is not aligned.
-+     * The default depends on whether the target CPU defines ALIGNED_ONLY.
-+     *
-+     * Some architectures (e.g. ARMv8) need the address which is aligned
-+     * to a size more than the size of the memory access.
-+     * Some architectures (e.g. SPARCv9) need an address which is aligned,
-+     * but less strictly than the natural alignment.
-+     *
-+     * MO_ALIGN supposes the alignment size is the size of a memory access.
-+     *
-+     * There are three options:
-+     * - unaligned access permitted (MO_UNALN).
-+     * - an alignment to the size of an access (MO_ALIGN);
-+     * - an alignment to a specified size, which may be more or less than
-+     *   the access size (MO_ALIGN_x where 'x' is a size in bytes);
-+     */
-+    PREFIX3(MO_ASHIFT) = 4,
-+    PREFIX3(MO_AMASK) = 7 << PREFIX3(MO_ASHIFT),
-+#ifdef ALIGNED_ONLY
-+    PREFIX3(MO_ALIGN) = 0,
-+    PREFIX3(MO_UNALN) = PREFIX3(MO_AMASK),
-+#else
-+    PREFIX3(MO_ALIGN) = PREFIX3(MO_AMASK),
-+    PREFIX3(MO_UNALN) = 0,
-+#endif
-+    PREFIX3(MO_ALIGN_2)  = 1 << PREFIX3(MO_ASHIFT),
-+    PREFIX3(MO_ALIGN_4)  = 2 << PREFIX3(MO_ASHIFT),
-+    PREFIX3(MO_ALIGN_8)  = 3 << PREFIX3(MO_ASHIFT),
-+    PREFIX3(MO_ALIGN_16) = 4 << PREFIX3(MO_ASHIFT),
-+    PREFIX3(MO_ALIGN_32) = 5 << PREFIX3(MO_ASHIFT),
-+    PREFIX3(MO_ALIGN_64) = 6 << PREFIX3(MO_ASHIFT),
-+
-+    /* Combinations of the above, for ease of use.  */
-+    PREFIX3(MO_UB)    = PREFIX3(MO_8),
-+    PREFIX3(MO_UW)    = PREFIX3(MO_16),
-+    PREFIX3(MO_UL)    = PREFIX3(MO_32),
-+    PREFIX3(MO_SB)    = PREFIX3(MO_SIGN) | PREFIX3(MO_8),
-+    PREFIX3(MO_SW)    = PREFIX3(MO_SIGN) | PREFIX3(MO_16),
-+    PREFIX3(MO_SL)    = PREFIX3(MO_SIGN) | PREFIX3(MO_32),
-+    PREFIX3(MO_Q)     = PREFIX3(MO_64),
-+
-+    PREFIX3(MO_LEUW)  = PREFIX3(MO_LE) | PREFIX3(MO_UW),
-+    PREFIX3(MO_LEUL)  = PREFIX3(MO_LE) | PREFIX3(MO_UL),
-+    PREFIX3(MO_LESW)  = PREFIX3(MO_LE) | PREFIX3(MO_SW),
-+    PREFIX3(MO_LESL)  = PREFIX3(MO_LE) | PREFIX3(MO_SL),
-+    PREFIX3(MO_LEQ)   = PREFIX3(MO_LE) | PREFIX3(MO_Q),
-+
-+    PREFIX3(MO_BEUW)  = PREFIX3(MO_BE) | PREFIX3(MO_UW),
-+    PREFIX3(MO_BEUL)  = PREFIX3(MO_BE) | PREFIX3(MO_UL),
-+    PREFIX3(MO_BESW)  = PREFIX3(MO_BE) | PREFIX3(MO_SW),
-+    PREFIX3(MO_BESL)  = PREFIX3(MO_BE) | PREFIX3(MO_SL),
-+    PREFIX3(MO_BEQ)   = PREFIX3(MO_BE) | PREFIX3(MO_Q),
-+
-+    PREFIX3(MO_TEUW)  = PREFIX3(MO_TE) | PREFIX3(MO_UW),
-+    PREFIX3(MO_TEUL)  = PREFIX3(MO_TE) | PREFIX3(MO_UL),
-+    PREFIX3(MO_TESW)  = PREFIX3(MO_TE) | PREFIX3(MO_SW),
-+    PREFIX3(MO_TESL)  = PREFIX3(MO_TE) | PREFIX3(MO_SL),
-+    PREFIX3(MO_TEQ)   = PREFIX3(MO_TE) | PREFIX3(MO_Q),
-+
-+    PREFIX3(MO_SSIZE) = PREFIX3(MO_SIZE) | PREFIX3(MO_SIGN),
-+#endif
-+} PREFIX(MemOp);
-+
-+typedef struct PREFIX(HelperInfo) {
-+    void *func;
-+    const char *name;
-+    unsigned flags;
-+    unsigned sizemask;
-+} PREFIX(HelperInfo);
-diff --git a/tcg/tcg-opc.h b/include/tcg-opc.h
-similarity index 100%
-rename from tcg/tcg-opc.h
-rename to include/tcg-opc.h
-diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
-index 1a5ea23844..3a23a4c025 100644
---- a/tcg/aarch64/tcg-target.h
-+++ b/tcg/aarch64/tcg-target.h
-@@ -17,7 +17,7 @@
- #define TCG_TARGET_TLB_DISPLACEMENT_BITS 24
- #undef TCG_TARGET_STACK_GROWSUP
- 
--typedef enum {
-+enum {
-     TCG_REG_X0, TCG_REG_X1, TCG_REG_X2, TCG_REG_X3,
-     TCG_REG_X4, TCG_REG_X5, TCG_REG_X6, TCG_REG_X7,
-     TCG_REG_X8, TCG_REG_X9, TCG_REG_X10, TCG_REG_X11,
-@@ -35,7 +35,7 @@ typedef enum {
-     TCG_REG_FP = TCG_REG_X29,
-     TCG_REG_LR = TCG_REG_X30,
-     TCG_AREG0  = TCG_REG_X19,
--} TCGReg;
-+};
- 
- #define TCG_TARGET_NB_REGS 32
- 
-diff --git a/tcg/arm/tcg-target.h b/tcg/arm/tcg-target.h
-index 09a19c6f35..7e9e5dc372 100644
---- a/tcg/arm/tcg-target.h
-+++ b/tcg/arm/tcg-target.h
-@@ -61,7 +61,7 @@ extern int arm_arch;
- #define TCG_TARGET_INSN_UNIT_SIZE 4
- #define TCG_TARGET_TLB_DISPLACEMENT_BITS 16
- 
--typedef enum {
-+enum {
-     TCG_REG_R0 = 0,
-     TCG_REG_R1,
-     TCG_REG_R2,
-@@ -78,7 +78,7 @@ typedef enum {
-     TCG_REG_R13,
-     TCG_REG_R14,
-     TCG_REG_PC,
--} TCGReg;
-+};
- 
- #define TCG_TARGET_NB_REGS 16
- 
-diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
-index 21d96ec35c..89d0771e90 100644
---- a/tcg/i386/tcg-target.h
-+++ b/tcg/i386/tcg-target.h
-@@ -36,7 +36,7 @@
- # define TCG_TARGET_NB_REGS    8
- #endif
- 
--typedef enum {
-+enum {
-     TCG_REG_EAX = 0,
-     TCG_REG_ECX,
-     TCG_REG_EDX,
-@@ -64,7 +64,7 @@ typedef enum {
-     TCG_REG_RBP = TCG_REG_EBP,
-     TCG_REG_RSI = TCG_REG_ESI,
-     TCG_REG_RDI = TCG_REG_EDI,
--} TCGReg;
-+};
- 
- /* used for function call generation */
- #define TCG_REG_CALL_STACK TCG_REG_ESP 
-diff --git a/tcg/ia64/tcg-target.h b/tcg/ia64/tcg-target.h
-index 42aea03a8b..230f1de1c8 100644
---- a/tcg/ia64/tcg-target.h
-+++ b/tcg/ia64/tcg-target.h
-@@ -36,7 +36,7 @@ typedef struct {
- 
- /* We only map the first 64 registers */
- #define TCG_TARGET_NB_REGS 64
--typedef enum {
-+enum {
-     TCG_REG_R0 = 0,
-     TCG_REG_R1,
-     TCG_REG_R2,
-@@ -103,7 +103,7 @@ typedef enum {
-     TCG_REG_R63,
- 
-     TCG_AREG0 = TCG_REG_R32,
--} TCGReg;
-+};
- 
- #define TCG_CT_CONST_ZERO 0x100
- #define TCG_CT_CONST_S22 0x200
-diff --git a/tcg/mips/tcg-target.h b/tcg/mips/tcg-target.h
-index f46d64a3a7..acd1aea71b 100644
---- a/tcg/mips/tcg-target.h
-+++ b/tcg/mips/tcg-target.h
-@@ -39,7 +39,7 @@
- #define TCG_TARGET_TLB_DISPLACEMENT_BITS 16
- #define TCG_TARGET_NB_REGS 32
- 
--typedef enum {
-+enum {
-     TCG_REG_ZERO = 0,
-     TCG_REG_AT,
-     TCG_REG_V0,
-@@ -75,7 +75,7 @@ typedef enum {
- 
-     TCG_REG_CALL_STACK = TCG_REG_SP,
-     TCG_AREG0 = TCG_REG_S0,
--} TCGReg;
-+};
- 
- /* used for function call generation */
- #define TCG_TARGET_STACK_ALIGN        16
-diff --git a/tcg/ppc/tcg-target.h b/tcg/ppc/tcg-target.h
-index abd8b3d6cd..e08ac7dc91 100644
---- a/tcg/ppc/tcg-target.h
-+++ b/tcg/ppc/tcg-target.h
-@@ -35,7 +35,7 @@
- #define TCG_TARGET_INSN_UNIT_SIZE 4
- #define TCG_TARGET_TLB_DISPLACEMENT_BITS 16
- 
--typedef enum {
-+enum {
-     TCG_REG_R0,  TCG_REG_R1,  TCG_REG_R2,  TCG_REG_R3,
-     TCG_REG_R4,  TCG_REG_R5,  TCG_REG_R6,  TCG_REG_R7,
-     TCG_REG_R8,  TCG_REG_R9,  TCG_REG_R10, TCG_REG_R11,
-@@ -47,7 +47,7 @@ typedef enum {
- 
-     TCG_REG_CALL_STACK = TCG_REG_R1,
-     TCG_AREG0 = TCG_REG_R27
--} TCGReg;
-+};
- 
- extern bool have_isa_2_06;
- extern bool have_isa_3_00;
-diff --git a/tcg/s390/tcg-target.h b/tcg/s390/tcg-target.h
-index cbdd2a6275..2345946c54 100644
---- a/tcg/s390/tcg-target.h
-+++ b/tcg/s390/tcg-target.h
-@@ -28,7 +28,7 @@
- #define TCG_TARGET_INSN_UNIT_SIZE 2
- #define TCG_TARGET_TLB_DISPLACEMENT_BITS 19
- 
--typedef enum TCGReg {
-+enum TCGReg {
-     TCG_REG_R0 = 0,
-     TCG_REG_R1,
-     TCG_REG_R2,
-@@ -45,7 +45,7 @@ typedef enum TCGReg {
-     TCG_REG_R13,
-     TCG_REG_R14,
-     TCG_REG_R15
--} TCGReg;
-+};
- 
- #define TCG_TARGET_NB_REGS 16
- 
-diff --git a/tcg/sparc/tcg-target.h b/tcg/sparc/tcg-target.h
-index b8b74f96ff..6652c776ec 100644
---- a/tcg/sparc/tcg-target.h
-+++ b/tcg/sparc/tcg-target.h
-@@ -31,7 +31,7 @@
- #define TCG_TARGET_TLB_DISPLACEMENT_BITS 32
- #define TCG_TARGET_NB_REGS 32
- 
--typedef enum {
-+enum {
-     TCG_REG_G0 = 0,
-     TCG_REG_G1,
-     TCG_REG_G2,
-@@ -64,7 +64,7 @@ typedef enum {
-     TCG_REG_I5,
-     TCG_REG_I6,
-     TCG_REG_I7,
--} TCGReg;
-+};
- 
- #define TCG_CT_CONST_S11  0x100
- #define TCG_CT_CONST_S13  0x200
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index cb898f1636..652131e5e9 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -307,13 +307,6 @@ void tcg_pool_reset(TCGContext *s)
-     s->pool_current = NULL;
  }
  
--typedef struct TCGHelperInfo {
--    void *func;
--    const char *name;
--    unsigned flags;
--    unsigned sizemask;
--} TCGHelperInfo;
--
+ void cpu_exec_initfn(CPUState *cpu)
+diff --git a/target/alpha/cpu.c b/target/alpha/cpu.c
+index b4f97983e5..a1125fca93 100644
+--- a/target/alpha/cpu.c
++++ b/target/alpha/cpu.c
+@@ -266,6 +266,44 @@ static const TypeInfo ev68_cpu_type_info = {
+     .parent = TYPE("ev67"),
+ };
+ 
++#define CONVERT_BIT(X, SRC, DST) \
++    (SRC > DST ? (X) / (SRC / DST) & (DST) : ((X) & SRC) * (DST / SRC))
++
++void cpu_alpha_store_fpcr (CPUAlphaState *env, uint64_t val)
++{
++    uint32_t fpcr = val >> 32;
++    uint32_t t = 0;
++
++    t |= CONVERT_BIT(fpcr, FPCR_INED, FPCR_INE);
++    t |= CONVERT_BIT(fpcr, FPCR_UNFD, FPCR_UNF);
++    t |= CONVERT_BIT(fpcr, FPCR_OVFD, FPCR_OVF);
++    t |= CONVERT_BIT(fpcr, FPCR_DZED, FPCR_DZE);
++    t |= CONVERT_BIT(fpcr, FPCR_INVD, FPCR_INV);
++
++    env->fpcr = fpcr;
++    env->fpcr_exc_enable = ~t & FPCR_STATUS_MASK;
++
++    switch (fpcr & FPCR_DYN_MASK) {
++    case FPCR_DYN_NORMAL:
++    default:
++        t = float_round_nearest_even;
++        break;
++    case FPCR_DYN_CHOPPED:
++        t = float_round_to_zero;
++        break;
++    case FPCR_DYN_MINUS:
++        t = float_round_down;
++        break;
++    case FPCR_DYN_PLUS:
++        t = float_round_up;
++        break;
++    }
++    env->fpcr_dyn_round = t;
++
++    env->fpcr_flush_to_zero = (fpcr & FPCR_UNFD) && (fpcr & FPCR_UNDZ);
++    env->fp_status.flush_inputs_to_zero = (fpcr & FPCR_DNZ) != 0;
++}
++
+ static void alpha_cpu_initfn(Object *obj)
+ {
+     CPUState *cs = CPU(obj);
+diff --git a/target/alpha/helper.c b/target/alpha/helper.c
+index 041a9d1c2c..a20c7cd421 100644
+--- a/target/alpha/helper.c
++++ b/target/alpha/helper.c
+@@ -24,50 +24,11 @@
+ #include "fpu/softfloat.h"
  #include "exec/helper-proto.h"
  
- static const TCGHelperInfo all_helpers[] = {
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 631c6f69b1..09e452ca46 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -79,13 +79,16 @@ typedef uint64_t tcg_target_ulong;
- #error unsupported
- #endif
- 
--#if TCG_TARGET_NB_REGS <= 32
--typedef uint32_t TCGRegSet;
--#elif TCG_TARGET_NB_REGS <= 64
--typedef uint64_t TCGRegSet;
--#else
--#error unsupported
--#endif
-+#define PREFIX(x) TCG ## x
-+#define PREFIX2(x) TCG_ ## x
-+/* No prefix if not libtcg */
-+#define PREFIX3(x) x
-+
-+#include "tcg-common.h"
-+
-+#undef PREFIX
-+#undef PREFIX2
-+#undef PREFIX3
- 
- #if TCG_TARGET_REG_BITS == 32
- /* Turn some undef macros into false macros.  */
-@@ -169,13 +172,6 @@ typedef uint64_t TCGRegSet;
- # define TARGET_INSN_START_WORDS (1 + TARGET_INSN_START_EXTRA_WORDS)
- #endif
- 
--typedef enum TCGOpcode {
--#define DEF(name, oargs, iargs, cargs, flags) INDEX_op_ ## name,
--#include "tcg-opc.h"
--#undef DEF
--    NB_OPS,
--} TCGOpcode;
 -
- #define tcg_regset_clear(d) (d) = 0
- #define tcg_regset_set(d, s) (d) = (s)
- #define tcg_regset_set32(d, reg, val32) (d) |= (val32) << (reg)
-@@ -243,121 +239,6 @@ typedef struct TCGPool {
-    this value, they are statically allocated in the TB stack frame */
- #define TCG_STATIC_CALL_ARGS_SIZE 128
- 
--typedef enum TCGType {
--    TCG_TYPE_I32,
--    TCG_TYPE_I64,
--    TCG_TYPE_COUNT, /* number of different types */
+-#define CONVERT_BIT(X, SRC, DST) \
+-    (SRC > DST ? (X) / (SRC / DST) & (DST) : ((X) & SRC) * (DST / SRC))
 -
--    /* An alias for the size of the host register.  */
--#if TCG_TARGET_REG_BITS == 32
--    TCG_TYPE_REG = TCG_TYPE_I32,
--#else
--    TCG_TYPE_REG = TCG_TYPE_I64,
--#endif
--
--    /* An alias for the size of the native pointer.  */
--#if UINTPTR_MAX == UINT32_MAX
--    TCG_TYPE_PTR = TCG_TYPE_I32,
--#else
--    TCG_TYPE_PTR = TCG_TYPE_I64,
--#endif
--
--    /* An alias for the size of the target "long", aka register.  */
--#if TARGET_LONG_BITS == 64
--    TCG_TYPE_TL = TCG_TYPE_I64,
--#else
--    TCG_TYPE_TL = TCG_TYPE_I32,
--#endif
--} TCGType;
--
--/* Constants for qemu_ld and qemu_st for the Memory Operation field.  */
--typedef enum TCGMemOp {
--    MO_8     = 0,
--    MO_16    = 1,
--    MO_32    = 2,
--    MO_64    = 3,
--    MO_SIZE  = 3,   /* Mask for the above.  */
--
--    MO_SIGN  = 4,   /* Sign-extended, otherwise zero-extended.  */
--
--    MO_BSWAP = 8,   /* Host reverse endian.  */
--#ifdef HOST_WORDS_BIGENDIAN
--    MO_LE    = MO_BSWAP,
--    MO_BE    = 0,
--#else
--    MO_LE    = 0,
--    MO_BE    = MO_BSWAP,
--#endif
--#ifdef TARGET_WORDS_BIGENDIAN
--    MO_TE    = MO_BE,
--#else
--    MO_TE    = MO_LE,
--#endif
--
--    /* MO_UNALN accesses are never checked for alignment.
--     * MO_ALIGN accesses will result in a call to the CPU's
--     * do_unaligned_access hook if the guest address is not aligned.
--     * The default depends on whether the target CPU defines ALIGNED_ONLY.
--     *
--     * Some architectures (e.g. ARMv8) need the address which is aligned
--     * to a size more than the size of the memory access.
--     * Some architectures (e.g. SPARCv9) need an address which is aligned,
--     * but less strictly than the natural alignment.
--     *
--     * MO_ALIGN supposes the alignment size is the size of a memory access.
--     *
--     * There are three options:
--     * - unaligned access permitted (MO_UNALN).
--     * - an alignment to the size of an access (MO_ALIGN);
--     * - an alignment to a specified size, which may be more or less than
--     *   the access size (MO_ALIGN_x where 'x' is a size in bytes);
--     */
--    MO_ASHIFT = 4,
--    MO_AMASK = 7 << MO_ASHIFT,
--#ifdef ALIGNED_ONLY
--    MO_ALIGN = 0,
--    MO_UNALN = MO_AMASK,
--#else
--    MO_ALIGN = MO_AMASK,
--    MO_UNALN = 0,
--#endif
--    MO_ALIGN_2  = 1 << MO_ASHIFT,
--    MO_ALIGN_4  = 2 << MO_ASHIFT,
--    MO_ALIGN_8  = 3 << MO_ASHIFT,
--    MO_ALIGN_16 = 4 << MO_ASHIFT,
--    MO_ALIGN_32 = 5 << MO_ASHIFT,
--    MO_ALIGN_64 = 6 << MO_ASHIFT,
--
--    /* Combinations of the above, for ease of use.  */
--    MO_UB    = MO_8,
--    MO_UW    = MO_16,
--    MO_UL    = MO_32,
--    MO_SB    = MO_SIGN | MO_8,
--    MO_SW    = MO_SIGN | MO_16,
--    MO_SL    = MO_SIGN | MO_32,
--    MO_Q     = MO_64,
--
--    MO_LEUW  = MO_LE | MO_UW,
--    MO_LEUL  = MO_LE | MO_UL,
--    MO_LESW  = MO_LE | MO_SW,
--    MO_LESL  = MO_LE | MO_SL,
--    MO_LEQ   = MO_LE | MO_Q,
--
--    MO_BEUW  = MO_BE | MO_UW,
--    MO_BEUL  = MO_BE | MO_UL,
--    MO_BESW  = MO_BE | MO_SW,
--    MO_BESL  = MO_BE | MO_SL,
--    MO_BEQ   = MO_BE | MO_Q,
--
--    MO_TEUW  = MO_TE | MO_UW,
--    MO_TEUL  = MO_TE | MO_UL,
--    MO_TESW  = MO_TE | MO_SW,
--    MO_TESL  = MO_TE | MO_SL,
--    MO_TEQ   = MO_TE | MO_Q,
--
--    MO_SSIZE = MO_SIZE | MO_SIGN,
--} TCGMemOp;
--
- /**
-  * get_alignment_bits
-  * @memop: TCGMemOp value
-@@ -385,8 +266,6 @@ static inline unsigned get_alignment_bits(TCGMemOp memop)
-     return a;
+ uint64_t cpu_alpha_load_fpcr (CPUAlphaState *env)
+ {
+     return (uint64_t)env->fpcr << 32;
  }
  
--typedef tcg_target_ulong TCGArg;
+-void cpu_alpha_store_fpcr (CPUAlphaState *env, uint64_t val)
+-{
+-    uint32_t fpcr = val >> 32;
+-    uint32_t t = 0;
 -
- /* Define type and accessor macros for TCG variables.
- 
-    TCG variables are the inputs and outputs of TCG ops, as described
-@@ -515,30 +394,6 @@ typedef enum {
-     TCG_BAR_SC    = 0x30,  /* No ops cross barrier; OR of the above */
- } TCGBar;
- 
--/* Conditions.  Note that these are laid out for easy manipulation by
--   the functions below:
--     bit 0 is used for inverting;
--     bit 1 is signed,
--     bit 2 is unsigned,
--     bit 3 is used with bit 0 for swapping signed/unsigned.  */
--typedef enum {
--    /* non-signed */
--    TCG_COND_NEVER  = 0 | 0 | 0 | 0,
--    TCG_COND_ALWAYS = 0 | 0 | 0 | 1,
--    TCG_COND_EQ     = 8 | 0 | 0 | 0,
--    TCG_COND_NE     = 8 | 0 | 0 | 1,
--    /* signed */
--    TCG_COND_LT     = 0 | 0 | 2 | 0,
--    TCG_COND_GE     = 0 | 0 | 2 | 1,
--    TCG_COND_LE     = 8 | 0 | 2 | 0,
--    TCG_COND_GT     = 8 | 0 | 2 | 1,
--    /* unsigned */
--    TCG_COND_LTU    = 0 | 4 | 0 | 0,
--    TCG_COND_GEU    = 0 | 4 | 0 | 1,
--    TCG_COND_LEU    = 8 | 4 | 0 | 0,
--    TCG_COND_GTU    = 8 | 4 | 0 | 1,
--} TCGCond;
+-    t |= CONVERT_BIT(fpcr, FPCR_INED, FPCR_INE);
+-    t |= CONVERT_BIT(fpcr, FPCR_UNFD, FPCR_UNF);
+-    t |= CONVERT_BIT(fpcr, FPCR_OVFD, FPCR_OVF);
+-    t |= CONVERT_BIT(fpcr, FPCR_DZED, FPCR_DZE);
+-    t |= CONVERT_BIT(fpcr, FPCR_INVD, FPCR_INV);
 -
- /* Invert the sense of the comparison.  */
- static inline TCGCond tcg_invert_cond(TCGCond c)
+-    env->fpcr = fpcr;
+-    env->fpcr_exc_enable = ~t & FPCR_STATUS_MASK;
+-
+-    switch (fpcr & FPCR_DYN_MASK) {
+-    case FPCR_DYN_NORMAL:
+-    default:
+-        t = float_round_nearest_even;
+-        break;
+-    case FPCR_DYN_CHOPPED:
+-        t = float_round_to_zero;
+-        break;
+-    case FPCR_DYN_MINUS:
+-        t = float_round_down;
+-        break;
+-    case FPCR_DYN_PLUS:
+-        t = float_round_up;
+-        break;
+-    }
+-    env->fpcr_dyn_round = t;
+-
+-    env->fpcr_flush_to_zero = (fpcr & FPCR_UNFD) && (fpcr & FPCR_UNDZ);
+-    env->fp_status.flush_inputs_to_zero = (fpcr & FPCR_DNZ) != 0;
+-}
+-
+ uint64_t helper_load_fpcr(CPUAlphaState *env)
  {
-@@ -578,34 +433,6 @@ static inline TCGCond tcg_high_cond(TCGCond c)
+     return cpu_alpha_load_fpcr(env);
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 0956a54e89..a0067e0ffe 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -1038,7 +1038,6 @@ static inline void xpsr_write(CPUARMState *env, uint32_t val, uint32_t mask)
+ #define SCR_AARCH64_MASK      (0x3fff & ~SCR_NET)
+ 
+ /* Return the current FPSCR value.  */
+-uint32_t vfp_get_fpscr(CPUARMState *env);
+ void vfp_set_fpscr(CPUARMState *env, uint32_t val);
+ 
+ /* For A64 the FPSCR is split into two logically distinct registers,
+@@ -1047,27 +1046,6 @@ void vfp_set_fpscr(CPUARMState *env, uint32_t val);
+  */
+ #define FPSR_MASK 0xf800009f
+ #define FPCR_MASK 0x07f79f00
+-static inline uint32_t vfp_get_fpsr(CPUARMState *env)
+-{
+-    return vfp_get_fpscr(env) & FPSR_MASK;
+-}
+-
+-static inline void vfp_set_fpsr(CPUARMState *env, uint32_t val)
+-{
+-    uint32_t new_fpscr = (vfp_get_fpscr(env) & ~FPSR_MASK) | (val & FPSR_MASK);
+-    vfp_set_fpscr(env, new_fpscr);
+-}
+-
+-static inline uint32_t vfp_get_fpcr(CPUARMState *env)
+-{
+-    return vfp_get_fpscr(env) & FPCR_MASK;
+-}
+-
+-static inline void vfp_set_fpcr(CPUARMState *env, uint32_t val)
+-{
+-    uint32_t new_fpscr = (vfp_get_fpscr(env) & ~FPCR_MASK) | (val & FPCR_MASK);
+-    vfp_set_fpscr(env, new_fpscr);
+-}
+ 
+ enum arm_cpu_mode {
+   ARM_CPU_MODE_USR = 0x10,
+@@ -1201,6 +1179,58 @@ enum arm_features {
+     ARM_FEATURE_VBAR, /* has cp15 VBAR */
+ };
+ 
++/* VFP support.  We follow the convention used for VFP instructions:
++   Single precision routines have a "s" suffix, double precision a
++   "d" suffix.  */
++
++/* Convert host exception flags to vfp form.  */
++static inline int vfp_exceptbits_from_host(int host_bits)
++{
++    int target_bits = 0;
++
++    if (host_bits & float_flag_invalid)
++        target_bits |= 1;
++    if (host_bits & float_flag_divbyzero)
++        target_bits |= 2;
++    if (host_bits & float_flag_overflow)
++        target_bits |= 4;
++    if (host_bits & (float_flag_underflow | float_flag_output_denormal))
++        target_bits |= 8;
++    if (host_bits & float_flag_inexact)
++        target_bits |= 0x10;
++    if (host_bits & float_flag_input_denormal)
++        target_bits |= 0x80;
++    return target_bits;
++}
++
++static inline uint32_t vfp_get_fpscr(CPUARMState *env)
++{
++    int i;
++    uint32_t fpscr;
++
++    fpscr = (env->vfp.xregs[ARM_VFP_FPSCR] & 0xffc8ffff)
++            | (env->vfp.vec_len << 16)
++            | (env->vfp.vec_stride << 20);
++    i = get_float_exception_flags(&env->vfp.fp_status);
++    i |= get_float_exception_flags(&env->vfp.standard_fp_status);
++    fpscr |= vfp_exceptbits_from_host(i);
++    return fpscr;
++}
++
++static inline uint32_t vfp_get_fpsr(CPUARMState *env)
++{
++    return vfp_get_fpscr(env) & FPSR_MASK;
++}
++
++void vfp_set_fpsr(CPUARMState *env, uint32_t val);
++
++static inline uint32_t vfp_get_fpcr(CPUARMState *env)
++{
++    return vfp_get_fpscr(env) & FPCR_MASK;
++}
++
++void vfp_set_fpcr(CPUARMState *env, uint32_t val);
++
+ static inline int arm_feature(CPUARMState *env, int feature)
+ {
+     return (env->features & (1ULL << feature)) != 0;
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 47250bcf16..d4075d2afb 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -5560,11 +5560,6 @@ void define_arm_cp_regs_with_opaque(ARMCPU *cpu,
      }
  }
  
--typedef enum TCGTempVal {
--    TEMP_VAL_DEAD,
--    TEMP_VAL_REG,
--    TEMP_VAL_MEM,
--    TEMP_VAL_CONST,
--} TCGTempVal;
+-const ARMCPRegInfo *get_arm_cp_reginfo(GHashTable *cpregs, uint32_t encoded_cp)
+-{
+-    return g_hash_table_lookup(cpregs, &encoded_cp);
+-}
 -
--typedef struct TCGTemp {
--    TCGReg reg:8;
--    TCGTempVal val_type:8;
--    TCGType base_type:8;
--    TCGType type:8;
--    unsigned int fixed_reg:1;
--    unsigned int indirect_reg:1;
--    unsigned int indirect_base:1;
--    unsigned int mem_coherent:1;
--    unsigned int mem_allocated:1;
--    unsigned int temp_local:1; /* If true, the temp is saved across
--                                  basic blocks. Otherwise, it is not
--                                  preserved across basic blocks. */
--    unsigned int temp_allocated:1; /* never used for code gen */
+ void arm_cp_write_ignore(CPUARMState *env, const ARMCPRegInfo *ri,
+                          uint64_t value)
+ {
+@@ -8757,47 +8752,9 @@ uint32_t HELPER(sel_flags)(uint32_t flags, uint32_t a, uint32_t b)
+     return (a & mask) | (b & ~mask);
+ }
+ 
+-/* VFP support.  We follow the convention used for VFP instructions:
+-   Single precision routines have a "s" suffix, double precision a
+-   "d" suffix.  */
 -
--    tcg_target_long val;
--    struct TCGTemp *mem_base;
--    intptr_t mem_offset;
--    const char *name;
--} TCGTemp;
+-/* Convert host exception flags to vfp form.  */
+-static inline int vfp_exceptbits_from_host(int host_bits)
+-{
+-    int target_bits = 0;
 -
- typedef struct TCGContext TCGContext;
- 
- typedef struct TCGTempSet {
-@@ -858,14 +685,6 @@ void tcg_dump_op_count(FILE *f, fprintf_function cpu_fprintf);
- #define TCG_CT_REG    0x01
- #define TCG_CT_CONST  0x02 /* any constant of register size */
- 
--typedef struct TCGArgConstraint {
--    uint16_t ct;
--    uint8_t alias_index;
--    union {
--        TCGRegSet regs;
--    } u;
--} TCGArgConstraint;
+-    if (host_bits & float_flag_invalid)
+-        target_bits |= 1;
+-    if (host_bits & float_flag_divbyzero)
+-        target_bits |= 2;
+-    if (host_bits & float_flag_overflow)
+-        target_bits |= 4;
+-    if (host_bits & (float_flag_underflow | float_flag_output_denormal))
+-        target_bits |= 8;
+-    if (host_bits & float_flag_inexact)
+-        target_bits |= 0x10;
+-    if (host_bits & float_flag_input_denormal)
+-        target_bits |= 0x80;
+-    return target_bits;
+-}
 -
- #define TCG_MAX_OP_ARGS 16
- 
- /* Bits for TCGOpDef->flags, 8 bits available.  */
-@@ -884,17 +703,6 @@ enum {
-     TCG_OPF_NOT_PRESENT  = 0x10,
- };
- 
--typedef struct TCGOpDef {
--    const char *name;
--    uint8_t nb_oargs, nb_iargs, nb_cargs, nb_args;
--    uint8_t flags;
--    TCGArgConstraint *args_ct;
--    int *sorted_args;
--#if defined(CONFIG_DEBUG_TCG)
--    int used;
--#endif
--} TCGOpDef;
+ uint32_t HELPER(vfp_get_fpscr)(CPUARMState *env)
+ {
+-    int i;
+-    uint32_t fpscr;
 -
- extern TCGOpDef tcg_op_defs[];
- extern const size_t tcg_op_defs_max;
+-    fpscr = (env->vfp.xregs[ARM_VFP_FPSCR] & 0xffc8ffff)
+-            | (env->vfp.vec_len << 16)
+-            | (env->vfp.vec_stride << 20);
+-    i = get_float_exception_flags(&env->vfp.fp_status);
+-    i |= get_float_exception_flags(&env->vfp.standard_fp_status);
+-    fpscr |= vfp_exceptbits_from_host(i);
+-    return fpscr;
+-}
+-
+-uint32_t vfp_get_fpscr(CPUARMState *env)
+-{
+-    return HELPER(vfp_get_fpscr)(env);
++    return vfp_get_fpscr(env);
+ }
  
-diff --git a/tcg/tci/tcg-target.h b/tcg/tci/tcg-target.h
-index 838bf3a858..321b5465c4 100644
---- a/tcg/tci/tcg-target.h
-+++ b/tcg/tci/tcg-target.h
-@@ -135,7 +135,7 @@
- /* #define TCG_TARGET_NB_REGS 32 */
+ /* Convert vfp exception flags to target form.  */
+@@ -8820,6 +8777,18 @@ static inline int vfp_exceptbits_to_host(int target_bits)
+     return host_bits;
+ }
  
- /* List of registers which are used by TCG. */
--typedef enum {
-+enum {
-     TCG_REG_R0 = 0,
-     TCG_REG_R1,
-     TCG_REG_R2,
-@@ -174,7 +174,7 @@ typedef enum {
- #endif
-     /* Special value UINT8_MAX is used by TCI to encode constant values. */
-     TCG_CONST = UINT8_MAX
--} TCGReg;
++void vfp_set_fpsr(CPUARMState *env, uint32_t val)
++{
++    uint32_t new_fpscr = (vfp_get_fpscr(env) & ~FPSR_MASK) | (val & FPSR_MASK);
++    vfp_set_fpscr(env, new_fpscr);
++}
++
++void vfp_set_fpcr(CPUARMState *env, uint32_t val)
++{
++    uint32_t new_fpscr = (vfp_get_fpscr(env) & ~FPCR_MASK) | (val & FPCR_MASK);
++    vfp_set_fpscr(env, new_fpscr);
++}
++
+ void HELPER(vfp_set_fpscr)(CPUARMState *env, uint32_t val)
+ {
+     int i;
+@@ -9670,34 +9639,6 @@ float64 HELPER(rintd)(float64 x, void *fp_status)
+     return ret;
+ }
+ 
+-/* Convert ARM rounding mode to softfloat */
+-int arm_rmode_to_sf(int rmode)
+-{
+-    switch (rmode) {
+-    case FPROUNDING_TIEAWAY:
+-        rmode = float_round_ties_away;
+-        break;
+-    case FPROUNDING_ODD:
+-        /* FIXME: add support for TIEAWAY and ODD */
+-        qemu_log_mask(LOG_UNIMP, "arm: unimplemented rounding mode: %d\n",
+-                      rmode);
+-    case FPROUNDING_TIEEVEN:
+-    default:
+-        rmode = float_round_nearest_even;
+-        break;
+-    case FPROUNDING_POSINF:
+-        rmode = float_round_up;
+-        break;
+-    case FPROUNDING_NEGINF:
+-        rmode = float_round_down;
+-        break;
+-    case FPROUNDING_ZERO:
+-        rmode = float_round_to_zero;
+-        break;
+-    }
+-    return rmode;
+-}
+-
+ /* CRC helpers.
+  * The upper bytes of val (above the number specified by 'bytes') must have
+  * been zeroed out by the caller.
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 4436d8f3a2..495f967eb6 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -3007,6 +3007,34 @@ static int handle_vminmaxnm(uint32_t insn, uint32_t rd, uint32_t rn,
+     return 0;
+ }
+ 
++/* Convert ARM rounding mode to softfloat */
++int arm_rmode_to_sf(int rmode)
++{
++    switch (rmode) {
++    case FPROUNDING_TIEAWAY:
++        rmode = float_round_ties_away;
++        break;
++    case FPROUNDING_ODD:
++        /* FIXME: add support for TIEAWAY and ODD */
++        qemu_log_mask(LOG_UNIMP, "arm: unimplemented rounding mode: %d\n",
++                      rmode);
++    case FPROUNDING_TIEEVEN:
++    default:
++        rmode = float_round_nearest_even;
++        break;
++    case FPROUNDING_POSINF:
++        rmode = float_round_up;
++        break;
++    case FPROUNDING_NEGINF:
++        rmode = float_round_down;
++        break;
++    case FPROUNDING_ZERO:
++        rmode = float_round_to_zero;
++        break;
++    }
++    return rmode;
++}
++
+ static int handle_vrint(uint32_t insn, uint32_t rd, uint32_t rm, uint32_t dp,
+                         int rounding)
+ {
+@@ -7435,6 +7463,11 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+     return 0;
+ }
+ 
++const ARMCPRegInfo *get_arm_cp_reginfo(GHashTable *cpregs, uint32_t encoded_cp)
++{
++    return g_hash_table_lookup(cpregs, &encoded_cp);
++}
++
+ static int disas_coproc_insn(DisasContext *s, uint32_t insn)
+ {
+     int cpnum, is64, crn, crm, opc1, opc2, isread, rt, rt2;
+diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
+index fa10b6e4cd..3b00d00461 100644
+--- a/target/m68k/cpu.c
++++ b/target/m68k/cpu.c
+@@ -43,6 +43,47 @@ static void m68k_set_feature(CPUM68KState *env, int feature)
+     env->features |= (1u << feature);
+ }
+ 
++void m68k_switch_sp(CPUM68KState *env)
++{
++    int new_sp;
++
++    env->sp[env->current_sp] = env->aregs[7];
++    new_sp = (env->sr & SR_S && env->cacr & M68K_CACR_EUSP)
++             ? M68K_SSP : M68K_USP;
++    env->aregs[7] = env->sp[new_sp];
++    env->current_sp = new_sp;
++}
++
++void cpu_m68k_set_ccr(CPUM68KState *env, uint32_t ccr)
++{
++    env->cc_x = (ccr & CCF_X ? 1 : 0);
++    env->cc_n = (ccr & CCF_N ? -1 : 0);
++    env->cc_z = (ccr & CCF_Z ? 0 : 1);
++    env->cc_v = (ccr & CCF_V ? -1 : 0);
++    env->cc_c = (ccr & CCF_C ? 1 : 0);
++    env->cc_op = CC_OP_FLAGS;
++}
++
++uint32_t cpu_m68k_get_ccr(CPUM68KState *env)
++{
++    uint32_t x, c, n, z, v;
++    uint32_t res, src1, src2;
++
++    x = env->cc_x;
++    n = env->cc_n;
++    z = env->cc_z;
++    v = env->cc_v;
++    c = env->cc_c;
++
++    COMPUTE_CCR(env->cc_op, x, n, z, v, c);
++
++    n = n >> 31;
++    z = (z == 0);
++    v = v >> 31;
++
++    return x * CCF_X + n * CCF_N + z * CCF_Z + v * CCF_V + c * CCF_C;
++}
++
+ /* CPUClass::reset() */
+ static void m68k_cpu_reset(CPUState *s)
+ {
+@@ -250,6 +291,26 @@ static void m68k_cpu_initfn(Object *obj)
+     }
+ }
+ 
++M68kCPU *cpu_m68k_init(const char *cpu_model)
++{
++    M68kCPU *cpu;
++    CPUM68KState *env;
++    ObjectClass *oc;
++
++    oc = cpu_class_by_name(TYPE_M68K_CPU, cpu_model);
++    if (oc == NULL) {
++        return NULL;
++    }
++    cpu = M68K_CPU(object_new(object_class_get_name(oc)));
++    env = &cpu->env;
++
++    register_m68k_insns(env);
++
++    object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
++
++    return cpu;
++}
++
+ static const VMStateDescription vmstate_m68k_cpu = {
+     .name = "cpu",
+     .unmigratable = 1,
+diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
+index 809582212d..1b219c4952 100644
+--- a/target/m68k/cpu.h
++++ b/target/m68k/cpu.h
+@@ -262,6 +262,55 @@ void m68k_cpu_list(FILE *f, fprintf_function cpu_fprintf);
+ 
+ void register_m68k_insns (CPUM68KState *env);
+ 
++#define EXTSIGN(val, index) (     \
++    (index == 0) ? (int8_t)(val) : ((index == 1) ? (int16_t)(val) : (val)) \
++)
++
++#define COMPUTE_CCR(op, x, n, z, v, c) {                                   \
++    switch (op) {                                                          \
++    case CC_OP_FLAGS:                                                      \
++        /* Everything in place.  */                                        \
++        break;                                                             \
++    case CC_OP_ADDB:                                                       \
++    case CC_OP_ADDW:                                                       \
++    case CC_OP_ADDL:                                                       \
++        res = n;                                                           \
++        src2 = v;                                                          \
++        src1 = EXTSIGN(res - src2, op - CC_OP_ADDB);                       \
++        c = x;                                                             \
++        z = n;                                                             \
++        v = (res ^ src1) & ~(src1 ^ src2);                                 \
++        break;                                                             \
++    case CC_OP_SUBB:                                                       \
++    case CC_OP_SUBW:                                                       \
++    case CC_OP_SUBL:                                                       \
++        res = n;                                                           \
++        src2 = v;                                                          \
++        src1 = EXTSIGN(res + src2, op - CC_OP_SUBB);                       \
++        c = x;                                                             \
++        z = n;                                                             \
++        v = (res ^ src1) & (src1 ^ src2);                                  \
++        break;                                                             \
++    case CC_OP_CMPB:                                                       \
++    case CC_OP_CMPW:                                                       \
++    case CC_OP_CMPL:                                                       \
++        src1 = n;                                                          \
++        src2 = v;                                                          \
++        res = EXTSIGN(src1 - src2, op - CC_OP_CMPB);                       \
++        n = res;                                                           \
++        z = res;                                                           \
++        c = src1 < src2;                                                   \
++        v = (res ^ src1) & (src1 ^ src2);                                  \
++        break;                                                             \
++    case CC_OP_LOGIC:                                                      \
++        c = v = 0;                                                         \
++        z = n;                                                             \
++        break;                                                             \
++    default:                                                               \
++        cpu_abort(CPU(m68k_env_get_cpu(env)), "Bad CC_OP %d", op);         \
++    }                                                                      \
++} while (0)
++
+ #ifdef CONFIG_USER_ONLY
+ /* Coldfire Linux uses 8k pages
+  * and m68k linux uses 4k pages
+diff --git a/target/m68k/helper.c b/target/m68k/helper.c
+index f750d3dbaa..987dc78296 100644
+--- a/target/m68k/helper.c
++++ b/target/m68k/helper.c
+@@ -100,26 +100,6 @@ static int fpu_gdb_set_reg(CPUM68KState *env, uint8_t *mem_buf, int n)
+     return 0;
+ }
+ 
+-M68kCPU *cpu_m68k_init(const char *cpu_model)
+-{
+-    M68kCPU *cpu;
+-    CPUM68KState *env;
+-    ObjectClass *oc;
+-
+-    oc = cpu_class_by_name(TYPE_M68K_CPU, cpu_model);
+-    if (oc == NULL) {
+-        return NULL;
+-    }
+-    cpu = M68K_CPU(object_new(object_class_get_name(oc)));
+-    env = &cpu->env;
+-
+-    register_m68k_insns(env);
+-
+-    object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
+-
+-    return cpu;
+-}
+-
+ void m68k_cpu_init_gdb(M68kCPU *cpu)
+ {
+     CPUState *cs = CPU(cpu);
+@@ -188,17 +168,6 @@ void HELPER(set_macsr)(CPUM68KState *env, uint32_t val)
+     env->macsr = val;
+ }
+ 
+-void m68k_switch_sp(CPUM68KState *env)
+-{
+-    int new_sp;
+-
+-    env->sp[env->current_sp] = env->aregs[7];
+-    new_sp = (env->sr & SR_S && env->cacr & M68K_CACR_EUSP)
+-             ? M68K_SSP : M68K_USP;
+-    env->aregs[7] = env->sp[new_sp];
+-    env->current_sp = new_sp;
+-}
+-
+ #if defined(CONFIG_USER_ONLY)
+ 
+ int m68k_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int rw,
+@@ -532,90 +501,11 @@ void HELPER(mac_set_flags)(CPUM68KState *env, uint32_t acc)
+     }
+ }
+ 
+-#define EXTSIGN(val, index) (     \
+-    (index == 0) ? (int8_t)(val) : ((index == 1) ? (int16_t)(val) : (val)) \
+-)
+-
+-#define COMPUTE_CCR(op, x, n, z, v, c) {                                   \
+-    switch (op) {                                                          \
+-    case CC_OP_FLAGS:                                                      \
+-        /* Everything in place.  */                                        \
+-        break;                                                             \
+-    case CC_OP_ADDB:                                                       \
+-    case CC_OP_ADDW:                                                       \
+-    case CC_OP_ADDL:                                                       \
+-        res = n;                                                           \
+-        src2 = v;                                                          \
+-        src1 = EXTSIGN(res - src2, op - CC_OP_ADDB);                       \
+-        c = x;                                                             \
+-        z = n;                                                             \
+-        v = (res ^ src1) & ~(src1 ^ src2);                                 \
+-        break;                                                             \
+-    case CC_OP_SUBB:                                                       \
+-    case CC_OP_SUBW:                                                       \
+-    case CC_OP_SUBL:                                                       \
+-        res = n;                                                           \
+-        src2 = v;                                                          \
+-        src1 = EXTSIGN(res + src2, op - CC_OP_SUBB);                       \
+-        c = x;                                                             \
+-        z = n;                                                             \
+-        v = (res ^ src1) & (src1 ^ src2);                                  \
+-        break;                                                             \
+-    case CC_OP_CMPB:                                                       \
+-    case CC_OP_CMPW:                                                       \
+-    case CC_OP_CMPL:                                                       \
+-        src1 = n;                                                          \
+-        src2 = v;                                                          \
+-        res = EXTSIGN(src1 - src2, op - CC_OP_CMPB);                       \
+-        n = res;                                                           \
+-        z = res;                                                           \
+-        c = src1 < src2;                                                   \
+-        v = (res ^ src1) & (src1 ^ src2);                                  \
+-        break;                                                             \
+-    case CC_OP_LOGIC:                                                      \
+-        c = v = 0;                                                         \
+-        z = n;                                                             \
+-        break;                                                             \
+-    default:                                                               \
+-        cpu_abort(CPU(m68k_env_get_cpu(env)), "Bad CC_OP %d", op);         \
+-    }                                                                      \
+-} while (0)
+-
+-uint32_t cpu_m68k_get_ccr(CPUM68KState *env)
+-{
+-    uint32_t x, c, n, z, v;
+-    uint32_t res, src1, src2;
+-
+-    x = env->cc_x;
+-    n = env->cc_n;
+-    z = env->cc_z;
+-    v = env->cc_v;
+-    c = env->cc_c;
+-
+-    COMPUTE_CCR(env->cc_op, x, n, z, v, c);
+-
+-    n = n >> 31;
+-    z = (z == 0);
+-    v = v >> 31;
+-
+-    return x * CCF_X + n * CCF_N + z * CCF_Z + v * CCF_V + c * CCF_C;
+-}
+-
+ uint32_t HELPER(get_ccr)(CPUM68KState *env)
+ {
+     return cpu_m68k_get_ccr(env);
+ }
+ 
+-void cpu_m68k_set_ccr(CPUM68KState *env, uint32_t ccr)
+-{
+-    env->cc_x = (ccr & CCF_X ? 1 : 0);
+-    env->cc_n = (ccr & CCF_N ? -1 : 0);
+-    env->cc_z = (ccr & CCF_Z ? 0 : 1);
+-    env->cc_v = (ccr & CCF_V ? -1 : 0);
+-    env->cc_c = (ccr & CCF_C ? 1 : 0);
+-    env->cc_op = CC_OP_FLAGS;
+-}
+-
+ void HELPER(set_ccr)(CPUM68KState *env, uint32_t ccr)
+ {
+     cpu_m68k_set_ccr(env, ccr);
+diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+index b683fcb025..9f3d25b660 100644
+--- a/target/mips/op_helper.c
++++ b/target/mips/op_helper.c
+@@ -2432,14 +2432,6 @@ void mips_cpu_unassigned_access(CPUState *cs, hwaddr addr,
+ #define FP_TO_INT32_OVERFLOW 0x7fffffff
+ #define FP_TO_INT64_OVERFLOW 0x7fffffffffffffffULL
+ 
+-/* convert MIPS rounding mode in FCR31 to IEEE library */
+-unsigned int ieee_rm[] = {
+-    float_round_nearest_even,
+-    float_round_to_zero,
+-    float_round_up,
+-    float_round_down
+-};
+-
+ target_ulong helper_cfc1(CPUMIPSState *env, uint32_t reg)
+ {
+     target_ulong arg1 = 0;
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 8b4a072ecb..5077099a78 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -36,6 +36,14 @@
+ #include "trace-tcg.h"
+ #include "exec/log.h"
+ 
++/* convert MIPS rounding mode in FCR31 to IEEE library */
++unsigned int ieee_rm[] = {
++    float_round_nearest_even,
++    float_round_to_zero,
++    float_round_up,
++    float_round_down
 +};
++
+ #define MIPS_DEBUG_DISAS 0
  
- #define TCG_AREG0                       (TCG_TARGET_NB_REGS - 2)
+ /* MIPS major opcodes */
+diff --git a/target/ppc/gdbstub.c b/target/ppc/gdbstub.c
+index 7a338136a8..4f74946ec9 100644
+--- a/target/ppc/gdbstub.c
++++ b/target/ppc/gdbstub.c
+@@ -84,26 +84,6 @@ static int ppc_gdb_register_len(int n)
+     }
+ }
  
+-/* We need to present the registers to gdb in the "current" memory ordering.
+-   For user-only mode we get this for free; TARGET_WORDS_BIGENDIAN is set to
+-   the proper ordering for the binary, and cannot be changed.
+-   For system mode, TARGET_WORDS_BIGENDIAN is always set, and we must check
+-   the current mode of the chip to see if we're running in little-endian.  */
+-void ppc_maybe_bswap_register(CPUPPCState *env, uint8_t *mem_buf, int len)
+-{
+-#ifndef CONFIG_USER_ONLY
+-    if (!msr_le) {
+-        /* do nothing */
+-    } else if (len == 4) {
+-        bswap32s((uint32_t *)mem_buf);
+-    } else if (len == 8) {
+-        bswap64s((uint64_t *)mem_buf);
+-    } else {
+-        g_assert_not_reached();
+-    }
+-#endif
+-}
+-
+ /* Old gdb always expects FP registers.  Newer (xml-aware) gdb only
+  * expects whatever the target description contains.  Due to a
+  * historical mishap the FP registers appear in between core integer
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index be35cbd3a2..12ef379d50 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -9458,6 +9458,26 @@ static bool avr_need_swap(CPUPPCState *env)
+ #endif
+ }
+ 
++/* We need to present the registers to gdb in the "current" memory ordering.
++   For user-only mode we get this for free; TARGET_WORDS_BIGENDIAN is set to
++   the proper ordering for the binary, and cannot be changed.
++   For system mode, TARGET_WORDS_BIGENDIAN is always set, and we must check
++   the current mode of the chip to see if we're running in little-endian.  */
++void ppc_maybe_bswap_register(CPUPPCState *env, uint8_t *mem_buf, int len)
++{
++#ifndef CONFIG_USER_ONLY
++    if (!msr_le) {
++        /* do nothing */
++    } else if (len == 4) {
++        bswap32s((uint32_t *)mem_buf);
++    } else if (len == 8) {
++        bswap64s((uint64_t *)mem_buf);
++    } else {
++        g_assert_not_reached();
++    }
++#endif
++}
++
+ static int gdb_get_float_reg(CPUPPCState *env, uint8_t *mem_buf, int n)
+ {
+     if (n < 32) {
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index 066dcd17df..2101d1dbf1 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -440,6 +440,81 @@ static void s390_cpu_class_init(ObjectClass *oc, void *data)
+     s390_cpu_model_class_register_props(oc);
+ }
+ 
++S390CPU *cpu_s390x_create(const char *cpu_model, Error **errp)
++{
++    static bool features_parsed;
++    char *name, *features;
++    const char *typename;
++    ObjectClass *oc;
++    CPUClass *cc;
++
++    name = g_strdup(cpu_model);
++    features = strchr(name, ',');
++    if (features) {
++        features[0] = 0;
++        features++;
++    }
++
++    oc = cpu_class_by_name(TYPE_S390_CPU, name);
++    if (!oc) {
++        error_setg(errp, "Unknown CPU definition \'%s\'", name);
++        g_free(name);
++        return NULL;
++    }
++    typename = object_class_get_name(oc);
++
++    if (!features_parsed) {
++        features_parsed = true;
++        cc = CPU_CLASS(oc);
++        cc->parse_features(typename, features, errp);
++    }
++    g_free(name);
++
++    if (*errp) {
++        return NULL;
++    }
++    return S390_CPU(CPU(object_new(typename)));
++}
++
++S390CPU *s390x_new_cpu(const char *cpu_model, int64_t id, Error **errp)
++{
++    S390CPU *cpu;
++    Error *err = NULL;
++
++    cpu = cpu_s390x_create(cpu_model, &err);
++    if (err != NULL) {
++        goto out;
++    }
++
++    object_property_set_int(OBJECT(cpu), id, "id", &err);
++    if (err != NULL) {
++        goto out;
++    }
++    object_property_set_bool(OBJECT(cpu), true, "realized", &err);
++
++out:
++    if (err) {
++        error_propagate(errp, err);
++        object_unref(OBJECT(cpu));
++        cpu = NULL;
++    }
++    return cpu;
++}
++
++S390CPU *cpu_s390x_init(const char *cpu_model)
++{
++    Error *err = NULL;
++    S390CPU *cpu;
++    /* Use to track CPU ID for linux-user only */
++    static int64_t next_cpu_id;
++
++    cpu = s390x_new_cpu(cpu_model, next_cpu_id++, &err);
++    if (err) {
++        error_report_err(err);
++    }
++    return cpu;
++}
++
+ static const TypeInfo s390_cpu_type_info = {
+     .name = TYPE_S390_CPU,
+     .parent = TYPE_CPU,
+diff --git a/target/s390x/helper.c b/target/s390x/helper.c
+index 68bd2f9784..19bcaf12dc 100644
+--- a/target/s390x/helper.c
++++ b/target/s390x/helper.c
+@@ -68,81 +68,6 @@ void s390x_cpu_timer(void *opaque)
+ }
+ #endif
+ 
+-S390CPU *cpu_s390x_create(const char *cpu_model, Error **errp)
+-{
+-    static bool features_parsed;
+-    char *name, *features;
+-    const char *typename;
+-    ObjectClass *oc;
+-    CPUClass *cc;
+-
+-    name = g_strdup(cpu_model);
+-    features = strchr(name, ',');
+-    if (features) {
+-        features[0] = 0;
+-        features++;
+-    }
+-
+-    oc = cpu_class_by_name(TYPE_S390_CPU, name);
+-    if (!oc) {
+-        error_setg(errp, "Unknown CPU definition \'%s\'", name);
+-        g_free(name);
+-        return NULL;
+-    }
+-    typename = object_class_get_name(oc);
+-
+-    if (!features_parsed) {
+-        features_parsed = true;
+-        cc = CPU_CLASS(oc);
+-        cc->parse_features(typename, features, errp);
+-    }
+-    g_free(name);
+-
+-    if (*errp) {
+-        return NULL;
+-    }
+-    return S390_CPU(CPU(object_new(typename)));
+-}
+-
+-S390CPU *s390x_new_cpu(const char *cpu_model, int64_t id, Error **errp)
+-{
+-    S390CPU *cpu;
+-    Error *err = NULL;
+-
+-    cpu = cpu_s390x_create(cpu_model, &err);
+-    if (err != NULL) {
+-        goto out;
+-    }
+-
+-    object_property_set_int(OBJECT(cpu), id, "id", &err);
+-    if (err != NULL) {
+-        goto out;
+-    }
+-    object_property_set_bool(OBJECT(cpu), true, "realized", &err);
+-
+-out:
+-    if (err) {
+-        error_propagate(errp, err);
+-        object_unref(OBJECT(cpu));
+-        cpu = NULL;
+-    }
+-    return cpu;
+-}
+-
+-S390CPU *cpu_s390x_init(const char *cpu_model)
+-{
+-    Error *err = NULL;
+-    S390CPU *cpu;
+-    /* Use to track CPU ID for linux-user only */
+-    static int64_t next_cpu_id;
+-
+-    cpu = s390x_new_cpu(cpu_model, next_cpu_id++, &err);
+-    if (err) {
+-        error_report_err(err);
+-    }
+-    return cpu;
+-}
+-
+ #if defined(CONFIG_USER_ONLY)
+ 
+ void s390_cpu_do_interrupt(CPUState *cs)
+diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
+index 95a36a4bdc..e330bb1f63 100644
+--- a/target/sparc/cpu.h
++++ b/target/sparc/cpu.h
+@@ -740,6 +740,8 @@ static inline int cpu_interrupts_enabled(CPUSPARCState *env1)
+     return 0;
+ }
+ 
++void compute_psr(CPUSPARCState *env);
++
+ static inline int cpu_pil_allowed(CPUSPARCState *env1, int pil)
+ {
+ #if !defined(TARGET_SPARC64)
+diff --git a/target/unicore32/cpu.c b/target/unicore32/cpu.c
+index c9b78ce68e..bab718af7b 100644
+--- a/target/unicore32/cpu.c
++++ b/target/unicore32/cpu.c
+@@ -141,6 +141,11 @@ static void uc32_cpu_initfn(Object *obj)
+     }
+ }
+ 
++UniCore32CPU *uc32_cpu_init(const char *cpu_model)
++{
++    return UNICORE32_CPU(cpu_generic_init(TYPE_UNICORE32_CPU, cpu_model));
++}
++
+ static const VMStateDescription vmstate_uc32_cpu = {
+     .name = "cpu",
+     .unmigratable = 1,
+diff --git a/target/unicore32/helper.c b/target/unicore32/helper.c
+index f9239dc7b8..309dcd1ae1 100644
+--- a/target/unicore32/helper.c
++++ b/target/unicore32/helper.c
+@@ -27,11 +27,6 @@
+ #define DPRINTF(fmt, ...) do {} while (0)
+ #endif
+ 
+-UniCore32CPU *uc32_cpu_init(const char *cpu_model)
+-{
+-    return UNICORE32_CPU(cpu_generic_init(TYPE_UNICORE32_CPU, cpu_model));
+-}
+-
+ #ifndef CONFIG_USER_ONLY
+ void helper_cp0_set(CPUUniCore32State *env, uint32_t val, uint32_t creg,
+         uint32_t cop)
 -- 
 2.11.1
