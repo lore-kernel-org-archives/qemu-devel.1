@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41135)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cifKe-0007Zl-V9
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:48:38 -0500
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cifLz-00006t-4p
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:50:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cifKb-0004Wz-6J
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:48:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60826)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cifKb-0004Wr-0c
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:48:33 -0500
-Date: Tue, 28 Feb 2017 10:48:28 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170228104828.GA2720@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170227201456.31814-1-berrange@redhat.com>
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cifLu-0004ky-OD
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:49:59 -0500
+Received: from [59.151.112.132] (port=36439 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cifLu-0004kD-AM
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:49:54 -0500
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Date: Tue, 28 Feb 2017 18:48:19 +0800
+Message-ID: <1488278902-11223-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170227201456.31814-1-berrange@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] io: ignore case when matching websockets
- HTTP headers
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH 0/3] COLO-compare: Make COLO-compare support Xen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +23,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Denis V. Lunev" <den@openvz.org>, Anton Nefedov <anton.nefedov@virtuozzo.com>
+To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
+Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-On Mon, Feb 27, 2017 at 08:14:56PM +0000, Daniel P. Berrange wrote:
-> According to RFC7230 Section 3.2, header field name is case-insensitive.
-> Convert the header data into all lowercase before doing string matching
-> on the headers.
-> 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  io/channel-websock.c | 14 +++++++++-----
->  1 file changed, 9 insertions(+), 5 deletions(-)
-> 
-> diff --git a/io/channel-websock.c b/io/channel-websock.c
-> index a06a4a8..32b7f37 100644
-> --- a/io/channel-websock.c
-> +++ b/io/channel-websock.c
-> @@ -33,9 +33,9 @@
->  #define QIO_CHANNEL_WEBSOCK_GUID "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
->  #define QIO_CHANNEL_WEBSOCK_GUID_LEN strlen(QIO_CHANNEL_WEBSOCK_GUID)
->  
-> -#define QIO_CHANNEL_WEBSOCK_HEADER_PROTOCOL "Sec-WebSocket-Protocol"
-> -#define QIO_CHANNEL_WEBSOCK_HEADER_VERSION "Sec-WebSocket-Version"
-> -#define QIO_CHANNEL_WEBSOCK_HEADER_KEY "Sec-WebSocket-Key"
-> +#define QIO_CHANNEL_WEBSOCK_HEADER_PROTOCOL "sec-websocket-protocol"
-> +#define QIO_CHANNEL_WEBSOCK_HEADER_VERSION "sec-websocket-version"
-> +#define QIO_CHANNEL_WEBSOCK_HEADER_KEY "sec-websocket-key"
->  
->  #define QIO_CHANNEL_WEBSOCK_PROTOCOL_BINARY "binary"
->  
-> @@ -223,7 +223,7 @@ static int qio_channel_websock_handshake_process(QIOChannelWebsock *ioc,
->  static int qio_channel_websock_handshake_read(QIOChannelWebsock *ioc,
->                                                Error **errp)
->  {
-> -    char *handshake_end;
-> +    char *handshake_end, *tmp;
->      ssize_t ret;
->      /* Typical HTTP headers from novnc are 512 bytes, so limiting
->       * total header size to 4096 is easily enough. */
-> @@ -249,9 +249,13 @@ static int qio_channel_websock_handshake_read(QIOChannelWebsock *ioc,
->          }
->      }
->  
-> +    for (tmp = (char *)ioc->encinput.buffer; tmp < handshake_end; tmp++) {
-> +        *tmp = g_ascii_tolower(*tmp);
-> +    }
-> +
+This series focus on COLO Xen support.
+We add a new chardev socket in colo-compare as the way
+of communicate with Xen COLO-frame.
+Xen part:
+https://lists.xenproject.org/archives/html/xen-devel/2017-02/msg02067.html
 
-self-nack - this does not in fact work - while it is fine to lowercase
-the header keys, we must not touch the header values as some data is
-case-sensitive
+This series is a frame, have some TODO job depend on this patch:
+https://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg05055.html
 
-Regards,
-Daniel
+
+Zhang Chen (3):
+  COLO-compare: Add new parameter for communicate with Xen colo-frame
+  COLO-compare: Add Xen notify chardev socket handler frame
+  COLO-compare: Add colo-compare Xen notify
+
+ net/colo-compare.c | 77 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ qemu-options.hx    | 38 ++++++++++++++++++++++++---
+ 2 files changed, 111 insertions(+), 4 deletions(-)
+
 -- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+2.7.4
