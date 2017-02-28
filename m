@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45432)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cioWy-0006Ol-Me
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:37:57 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cioWw-0006LR-6i
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:37:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cioWx-0007zU-PR
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:37:56 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cioWt-0007y7-TI
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:37:54 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 28 Feb 2017 21:36:31 +0100
-Message-Id: <1488314205-16264-33-git-send-email-kwolf@redhat.com>
+Date: Tue, 28 Feb 2017 21:36:29 +0100
+Message-Id: <1488314205-16264-31-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1488314205-16264-1-git-send-email-kwolf@redhat.com>
 References: <1488314205-16264-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 32/46] block: Allow backing file links in
- change_parent_backing_link()
+Subject: [Qemu-devel] [PULL 30/46] block: Fix pending requests check in
+ bdrv_append()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,41 +23,32 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-Now that the backing file child role implements .attach/.detach
-callbacks, nothing prevents us from modifying the graph even if that
-involves changing backing file links.
+bdrv_append() cares about isolation of the node that it modifies, but
+not about activity in some subtree below it. Instead of using the
+recursive bdrv_requests_pending(), directly check bs->in_flight, which
+considers only the node in question.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Acked-by: Fam Zheng <famz@redhat.com>
 ---
- block.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ block.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/block.c b/block.c
-index 698a5c7..79d9ad0 100644
+index 9e538a5..5189c7c 100644
 --- a/block.c
 +++ b/block.c
-@@ -2882,9 +2882,9 @@ static void change_parent_backing_link(BlockDriverState *from,
-             continue;
-         }
-         if (c->role == &child_backing) {
--            /* @from is generally not allowed to be a backing file, except for
--             * when @to is the overlay. In that case, @from may not be replaced
--             * by @to as @to's backing node. */
-+            /* If @from is a backing file of @to, ignore the child to avoid
-+             * creating a loop. We only want to change the pointer of other
-+             * parents. */
-             QLIST_FOREACH(to_c, &to->children, next) {
-                 if (to_c == c) {
-                     break;
-@@ -2895,7 +2895,6 @@ static void change_parent_backing_link(BlockDriverState *from,
-             }
-         }
+@@ -2897,8 +2897,8 @@ static void change_parent_backing_link(BlockDriverState *from,
+  */
+ void bdrv_append(BlockDriverState *bs_new, BlockDriverState *bs_top)
+ {
+-    assert(!bdrv_requests_pending(bs_top));
+-    assert(!bdrv_requests_pending(bs_new));
++    assert(!atomic_read(&bs_top->in_flight));
++    assert(!atomic_read(&bs_new->in_flight));
  
--        assert(c->role != &child_backing);
-         bdrv_ref(to);
-         /* FIXME Are we sure that bdrv_replace_child() can't run into
-          * &error_abort because of permissions? */
+     bdrv_ref(bs_top);
+ 
 -- 
 1.8.3.1
