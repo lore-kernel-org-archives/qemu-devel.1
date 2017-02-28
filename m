@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58917)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cied5-0006oE-Tp
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:42 -0500
+	(envelope-from <fred.konrad@greensocs.com>) id 1ciedC-0006tW-IN
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cied4-00048W-4I
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:35 -0500
-Received: from greensocs.com ([193.104.36.180]:38408)
+	(envelope-from <fred.konrad@greensocs.com>) id 1cied7-0004Al-PP
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:42 -0500
+Received: from greensocs.com ([193.104.36.180]:38463)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cied3-00048D-Oo
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:34 -0500
+	(envelope-from <fred.konrad@greensocs.com>) id 1cied7-0004AD-FI
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:37 -0500
 From: fred.konrad@greensocs.com
-Date: Tue, 28 Feb 2017 11:03:00 +0100
-Message-Id: <1488276185-31168-6-git-send-email-fred.konrad@greensocs.com>
+Date: Tue, 28 Feb 2017 11:03:05 +0100
+Message-Id: <1488276185-31168-11-git-send-email-fred.konrad@greensocs.com>
 In-Reply-To: <1488276185-31168-1-git-send-email-fred.konrad@greensocs.com>
 References: <1488276185-31168-1-git-send-email-fred.konrad@greensocs.com>
-Subject: [Qemu-devel] [PATCH v3 05/10] qdev-monitor: print the device's
- clock with info qtree
+Subject: [Qemu-devel] [PATCH v3 10/10] zynqmp: add reference clock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,134 +28,112 @@ Cc: peter.maydell@linaro.org, edgar.iglesias@xilinx.com, alistair.francis@xilinx
 
 From: KONRAD Frederic <fred.konrad@greensocs.com>
 
-This prints the clock attached to a DeviceState when using "info qtree" monitor
-command.
-
-For example:
-
-bus: main-system-bus
-  type System
-  dev: xlnx.zynqmp_crf, id ""
-    gpio-out "sysbus-irq" 1
-    gpio-out "RST_A9" 4
-    qemu-clk "dbg_trace" 0.0
-    qemu-clk "vpll_to_lpd" 12500000.0
-    qemu-clk "dp_stc_ref" 0.0
-    qemu-clk "dpll_to_lpd" 12500000.0
-    qemu-clk "acpu_clk" 0.0
-    qemu-clk "pcie_ref" 0.0
-    qemu-clk "topsw_main" 0.0
-    qemu-clk "topsw_lsbus" 0.0
-    qemu-clk "dp_audio_ref" 0.0
-    qemu-clk "sata_ref" 0.0
-    qemu-clk "dp_video_ref" 1428571.4
-    qemu-clk "vpll_clk" 50000000.0
-    qemu-clk "apll_to_lpd" 12500000.0
-    qemu-clk "dpll_clk" 50000000.0
-    qemu-clk "gpu_ref" 0.0
-    qemu-clk "aux_refclk" 0.0
-    qemu-clk "video_clk" 27000000.0
-    qemu-clk "gdma_ref" 0.0
-    qemu-clk "gt_crx_ref_clk" 0.0
-    qemu-clk "dbg_fdp" 0.0
-    qemu-clk "apll_clk" 50000000.0
-    qemu-clk "pss_alt_ref_clk" 0.0
-    qemu-clk "ddr" 0.0
-    qemu-clk "pss_ref_clk" 50000000.0
-    qemu-clk "dpdma_ref" 0.0
-    qemu-clk "dbg_tstmp" 0.0
-    mmio 00000000fd1a0000/000000000000010c
+This adds some fixed reference clock to the zynqmp platform.
+They will feed the zynqmp_crf block.
 
 Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
 ---
- include/qemu/qemu-clock.h |  9 +++++++++
- qdev-monitor.c            |  2 ++
- qemu-clock.c              | 28 ++++++++++++++++++++++++++++
- 3 files changed, 39 insertions(+)
+ hw/arm/xlnx-zynqmp.c         | 49 ++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/arm/xlnx-zynqmp.h |  6 ++++++
+ 2 files changed, 55 insertions(+)
 
-diff --git a/include/qemu/qemu-clock.h b/include/qemu/qemu-clock.h
-index 1c57df4..8f0daa8 100644
---- a/include/qemu/qemu-clock.h
-+++ b/include/qemu/qemu-clock.h
-@@ -149,4 +149,13 @@ void qemu_clk_set_callback(QEMUClock *clk,
-                            QEMUClkRateUpdateCallback *cb,
-                            void *opaque);
- 
-+/**
-+ * qemu_clk_print:
-+ * @dev: the device for which the clock need to be printed.
-+ *
-+ * Print the clock information for a given device.
-+ *
-+ */
-+void qemu_clk_print(Monitor *mon, DeviceState *dev, int indent);
-+
- #endif /* QEMU_CLOCK_H */
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index 549f45f..02f8255 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -30,6 +30,7 @@
- #include "qemu/help_option.h"
- #include "sysemu/block-backend.h"
- #include "migration/migration.h"
+diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+index 27dccdb..b9cd856 100644
+--- a/hw/arm/xlnx-zynqmp.c
++++ b/hw/arm/xlnx-zynqmp.c
+@@ -24,6 +24,7 @@
+ #include "exec/address-spaces.h"
+ #include "sysemu/kvm.h"
+ #include "kvm_arm.h"
 +#include "qemu/qemu-clock.h"
  
- /*
-  * Aliases were a bad idea from the start.  Let's keep them
-@@ -699,6 +700,7 @@ static void qdev_print(Monitor *mon, DeviceState *dev, int indent)
-                         ngl->num_out);
-         }
-     }
-+    qemu_clk_print(mon, dev, indent);
-     class = object_get_class(OBJECT(dev));
-     do {
-         qdev_print_props(mon, dev, DEVICE_CLASS(class)->props, indent);
-diff --git a/qemu-clock.c b/qemu-clock.c
-index 8f342f6..d5dd928 100644
---- a/qemu-clock.c
-+++ b/qemu-clock.c
-@@ -27,6 +27,7 @@
- #include "qemu/log.h"
- #include "qapi/error.h"
- #include "hw/qdev-core.h"
-+#include "monitor/monitor.h"
+ #define GIC_NUM_SPI_INTR 160
  
- #ifndef DEBUG_QEMU_CLOCK
- #define DEBUG_QEMU_CLOCK 0
-@@ -134,6 +135,33 @@ QEMUClock *qemu_clk_device_get_clock(DeviceState *dev, const char *name)
-     return QEMU_CLOCK(clk);
+@@ -182,6 +183,22 @@ static void xlnx_zynqmp_init(Object *obj)
+     qdev_set_parent_bus(DEVICE(s->crf), sysbus_get_default());
+     object_property_add_child(obj, "xlnx.zynqmp_crf", OBJECT(s->crf),
+                               &error_abort);
++
++    s->pss_ref_clk = object_new(TYPE_FIXED_CLOCK);
++    object_property_add_child(obj, "pss_ref_clk", s->pss_ref_clk,
++                              &error_abort);
++    object_property_set_int(s->pss_ref_clk, 50000000, "rate", &error_abort);
++    s->video_clk = object_new(TYPE_FIXED_CLOCK);
++    object_property_add_child(obj, "video_clk", s->video_clk, &error_abort);
++    object_property_set_int(s->video_clk, 27000000, "rate", &error_abort);
++    s->pss_alt_ref_clk = object_new(TYPE_FIXED_CLOCK);
++    object_property_add_child(obj, "pss_alt_ref_clk", s->pss_alt_ref_clk,
++                              &error_abort);
++    s->aux_refclk = object_new(TYPE_FIXED_CLOCK);
++    object_property_add_child(obj, "aux_refclk", s->aux_refclk, &error_abort);
++    s->gt_crx_ref_clk = object_new(TYPE_FIXED_CLOCK);
++    object_property_add_child(obj, "gt_crx_ref_clk", s->gt_crx_ref_clk,
++                              &error_abort);
  }
  
-+struct print_opaque {
-+    Monitor *mon;
-+    int indent;
-+};
+ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+@@ -431,6 +448,38 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+     sysbus_connect_irq(SYS_BUS_DEVICE(&s->dpdma), 0, gic_spi[DPDMA_IRQ]);
+ 
+     sysbus_mmio_map(SYS_BUS_DEVICE(s->crf), 0, 0xFD1A0000);
 +
-+static int qemu_clk_print_rec(Object *obj, void *opaque)
-+{
-+    QEMUClock *clk = (QEMUClock *)(object_dynamic_cast(obj, TYPE_CLOCK));
-+    struct print_opaque *po = opaque;
++    /* Bind the clock */
++    qemu_clk_bind(qemu_clk_device_get_clock(DEVICE(s->pss_ref_clk),
++                                                  "clk_out"),
++                        qemu_clk_device_get_clock(DEVICE(s->crf),
++                                                  "pss_ref_clk"));
 +
-+    if (clk) {
-+        monitor_printf(po->mon, "%*s" "qemu-clk \"%s\" %" PRIu64 "\n",
-+                       po->indent, " ", clk->name, clk->rate);
-+    }
++    qemu_clk_bind(qemu_clk_device_get_clock(DEVICE(s->video_clk),
++                                                  "clk_out"),
++                        qemu_clk_device_get_clock(DEVICE(s->crf), "video_clk"));
 +
-+    return 0;
-+}
++    qemu_clk_bind(qemu_clk_device_get_clock(DEVICE(s->pss_alt_ref_clk),
++                                                  "clk_out"),
++                        qemu_clk_device_get_clock(DEVICE(s->crf),
++                                                  "pss_alt_ref_clk"));
 +
-+void qemu_clk_print(Monitor *mon, DeviceState *dev, int indent)
-+{
-+    struct print_opaque po;
++    qemu_clk_bind(qemu_clk_device_get_clock(DEVICE(s->aux_refclk),
++                                                  "clk_out"),
++                        qemu_clk_device_get_clock(DEVICE(s->crf),
++                                                  "aux_refclk"));
 +
-+    po.indent = indent;
-+    po.mon = mon;
-+    object_child_foreach(OBJECT(dev), qemu_clk_print_rec, &po);
-+}
++    qemu_clk_bind(qemu_clk_device_get_clock(DEVICE(s->gt_crx_ref_clk),
++                                                  "clk_out"),
++                        qemu_clk_device_get_clock(DEVICE(s->crf),
++                                                  "gt_crx_ref_clk"));
 +
- static const TypeInfo qemu_clk_info = {
-     .name          = TYPE_CLOCK,
-     .parent        = TYPE_OBJECT,
++    object_property_set_bool(s->crf, true, "realized", &err);
++    object_property_set_bool(s->pss_ref_clk, true, "realized", &err);
++    object_property_set_bool(s->video_clk, true, "realized", &err);
++    object_property_set_bool(s->pss_alt_ref_clk, true, "realized", &err);
++    object_property_set_bool(s->aux_refclk, true, "realized", &err);
++    object_property_set_bool(s->gt_crx_ref_clk, true, "realized", &err);
+ }
+ 
+ static Property xlnx_zynqmp_props[] = {
+diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
+index 379a17a..d0cc57f 100644
+--- a/include/hw/arm/xlnx-zynqmp.h
++++ b/include/hw/arm/xlnx-zynqmp.h
+@@ -28,6 +28,7 @@
+ #include "hw/ssi/xilinx_spips.h"
+ #include "hw/dma/xlnx_dpdma.h"
+ #include "hw/display/xlnx_dp.h"
++#include "hw/misc/fixed-clock.h"
+ 
+ #define TYPE_XLNX_ZYNQMP "xlnx,zynqmp"
+ #define XLNX_ZYNQMP(obj) OBJECT_CHECK(XlnxZynqMPState, (obj), \
+@@ -86,6 +87,11 @@ typedef struct XlnxZynqMPState {
+     XlnxDPState dp;
+     XlnxDPDMAState dpdma;
+ 
++    Object *pss_ref_clk;
++    Object *video_clk;
++    Object *pss_alt_ref_clk;
++    Object *aux_refclk;
++    Object *gt_crx_ref_clk;
+     Object *crf;
+ 
+     char *boot_cpu;
 -- 
 1.8.3.1
