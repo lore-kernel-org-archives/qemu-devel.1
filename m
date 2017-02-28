@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52209)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53613)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cieHV-0002Or-OV
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 04:41:19 -0500
+	(envelope-from <groug@kaod.org>) id 1cieMd-0004NU-91
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 04:46:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cieHS-0003tv-JB
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 04:41:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54386)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cieHS-0003sx-9k
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 04:41:14 -0500
-Date: Tue, 28 Feb 2017 09:41:09 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170228094108.GC2773@work-vm>
-References: <1487009088-23891-1-git-send-email-ashijeetacharya@gmail.com>
-	<20170223152709.GD2383@work-vm>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170223152709.GD2383@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v4] migrate: Introduce a 'dc->vmsd' check
- to avoid segfault for --only-migratable
+	(envelope-from <groug@kaod.org>) id 1cieMY-0005vl-8T
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 04:46:35 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48728
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cieMY-0005vd-2u
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 04:46:30 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1S9hk7o118687
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 04:46:28 -0500
+Received: from e06smtp06.uk.ibm.com (e06smtp06.uk.ibm.com [195.75.94.102])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28w28km5g3-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 04:46:28 -0500
+Received: from localhost
+	by e06smtp06.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Tue, 28 Feb 2017 09:46:26 -0000
+From: Greg Kurz <groug@kaod.org>
+Date: Tue, 28 Feb 2017 10:46:13 +0100
+Message-Id: <1488275176-16613-1-git-send-email-groug@kaod.org>
+Subject: [Qemu-devel] [PULL 0/3] 9p patches 2018-02-27 for 2.9 soft freeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,227 +35,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Cc: quintela@redhat.com, peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
 
-* Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
-> * Ashijeet Acharya (ashijeetacharya@gmail.com) wrote:
-> > Commit a3a3d8c7 introduced a segfault bug while checking for
-> > 'dc->vmsd->unmigratable' which caused QEMU to crash when trying to add
-> > devices which do no set their 'dc->vmsd' yet while initialization.
-> > Place a 'dc->vmsd' check prior to it so that we do not segfault for
-> > such devices.
-> > 
-> > NOTE: This doesn't compromise the functioning of --only-migratable
-> > option as all the unmigratable devices do set their 'dc->vmsd'.
-> > 
-> > Introduce a new function check_migratable() and move the
-> > only_migratable check inside it, also use stubs to avoid user-mode qemu
-> > build failures.
-> > 
-> > Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
-> 
-> Yep, I think that should work.
-> 
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+The following changes since commit 9b9fbe8a4e9eec9072ee2697a6af59144442785f:
 
-Queued.
+  Merge remote-tracking branch 'remotes/kraxel/tags/pull-ui-20170227-1' into staging (2017-02-27 19:19:46 +0000)
 
-> 
-> > ---
-> > Changes in v4:
-> > - introduce new check_migratable() function and use stubs
-> > Changes is v3:
-> > - move only_migratable check inside device_set_realized() to avoid code
-> > - duplication
-> > - I have dropped Juan's R-b tag for this one
-> > Changes in v2:
-> > - place dc->vmsd check in hw/usb/bus.c as well
-> > ---
-> >  hw/core/qdev.c                |  7 +++++++
-> >  hw/usb/bus.c                  | 19 -------------------
-> >  include/migration/migration.h |  3 +++
-> >  migration/migration.c         | 15 +++++++++++++++
-> >  qdev-monitor.c                |  9 ---------
-> >  stubs/vmstate.c               |  6 ++++++
-> >  6 files changed, 31 insertions(+), 28 deletions(-)
-> > 
-> > diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> > index 5783442..4f49cfe 100644
-> > --- a/hw/core/qdev.c
-> > +++ b/hw/core/qdev.c
-> > @@ -37,6 +37,7 @@
-> >  #include "hw/boards.h"
-> >  #include "hw/sysbus.h"
-> >  #include "qapi-event.h"
-> > +#include "migration/migration.h"
-> >  
-> >  int qdev_hotplug = 0;
-> >  static bool qdev_hot_added = false;
-> > @@ -889,6 +890,7 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
-> >      Error *local_err = NULL;
-> >      bool unattached_parent = false;
-> >      static int unattached_count;
-> > +    int ret;
-> >  
-> >      if (dev->hotplugged && !dc->hotpluggable) {
-> >          error_setg(errp, QERR_DEVICE_NO_HOTPLUG, object_get_typename(obj));
-> > @@ -896,6 +898,11 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
-> >      }
-> >  
-> >      if (value && !dev->realized) {
-> > +        ret = check_migratable(obj, &local_err);
-> > +        if (ret < 0) {
-> > +            goto fail;
-> > +        }
-> > +
-> >          if (!obj->parent) {
-> >              gchar *name = g_strdup_printf("device[%d]", unattached_count++);
-> >  
-> > diff --git a/hw/usb/bus.c b/hw/usb/bus.c
-> > index 1dcc35c..25913ad 100644
-> > --- a/hw/usb/bus.c
-> > +++ b/hw/usb/bus.c
-> > @@ -8,7 +8,6 @@
-> >  #include "monitor/monitor.h"
-> >  #include "trace.h"
-> >  #include "qemu/cutils.h"
-> > -#include "migration/migration.h"
-> >  
-> >  static void usb_bus_dev_print(Monitor *mon, DeviceState *qdev, int indent);
-> >  
-> > @@ -687,8 +686,6 @@ USBDevice *usbdevice_create(const char *cmdline)
-> >      const char *params;
-> >      int len;
-> >      USBDevice *dev;
-> > -    ObjectClass *klass;
-> > -    DeviceClass *dc;
-> >  
-> >      params = strchr(cmdline,':');
-> >      if (params) {
-> > @@ -723,22 +720,6 @@ USBDevice *usbdevice_create(const char *cmdline)
-> >          return NULL;
-> >      }
-> >  
-> > -    klass = object_class_by_name(f->name);
-> > -    if (klass == NULL) {
-> > -        error_report("Device '%s' not found", f->name);
-> > -        return NULL;
-> > -    }
-> > -
-> > -    dc = DEVICE_CLASS(klass);
-> > -
-> > -    if (only_migratable) {
-> > -        if (dc->vmsd->unmigratable) {
-> > -            error_report("Device %s is not migratable, but --only-migratable "
-> > -                         "was specified", f->name);
-> > -            return NULL;
-> > -        }
-> > -    }
-> > -
-> >      if (f->usbdevice_init) {
-> >          dev = f->usbdevice_init(bus, params);
-> >      } else {
-> > diff --git a/include/migration/migration.h b/include/migration/migration.h
-> > index af9135f..a6868cd 100644
-> > --- a/include/migration/migration.h
-> > +++ b/include/migration/migration.h
-> > @@ -22,6 +22,7 @@
-> >  #include "qapi-types.h"
-> >  #include "exec/cpu-common.h"
-> >  #include "qemu/coroutine_int.h"
-> > +#include "qom/object.h"
-> >  
-> >  #define QEMU_VM_FILE_MAGIC           0x5145564d
-> >  #define QEMU_VM_FILE_VERSION_COMPAT  0x00000002
-> > @@ -305,6 +306,8 @@ int migrate_add_blocker(Error *reason, Error **errp);
-> >   */
-> >  void migrate_del_blocker(Error *reason);
-> >  
-> > +int check_migratable(Object *obj, Error **err);
-> > +
-> >  bool migrate_postcopy_ram(void);
-> >  bool migrate_zero_blocks(void);
-> >  
-> > diff --git a/migration/migration.c b/migration/migration.c
-> > index 2766d2f..00b33f3 100644
-> > --- a/migration/migration.c
-> > +++ b/migration/migration.c
-> > @@ -1146,6 +1146,21 @@ void migrate_del_blocker(Error *reason)
-> >      migration_blockers = g_slist_remove(migration_blockers, reason);
-> >  }
-> >  
-> > +int check_migratable(Object *obj, Error **err)
-> > +{
-> > +    DeviceClass *dc = DEVICE_GET_CLASS(obj);
-> > +    if (only_migratable && dc->vmsd) {
-> > +        if (dc->vmsd->unmigratable) {
-> > +            error_setg(err, "Device %s is not migratable, but "
-> > +                       "--only-migratable was specified",
-> > +                       object_get_typename(obj));
-> > +            return -1;
-> > +        }
-> > +    }
-> > +
-> > +    return 0;
-> > +}
-> > +
-> >  void qmp_migrate_incoming(const char *uri, Error **errp)
-> >  {
-> >      Error *local_err = NULL;
-> > diff --git a/qdev-monitor.c b/qdev-monitor.c
-> > index 549f45f..5f2fcdf 100644
-> > --- a/qdev-monitor.c
-> > +++ b/qdev-monitor.c
-> > @@ -29,7 +29,6 @@
-> >  #include "qemu/error-report.h"
-> >  #include "qemu/help_option.h"
-> >  #include "sysemu/block-backend.h"
-> > -#include "migration/migration.h"
-> >  
-> >  /*
-> >   * Aliases were a bad idea from the start.  Let's keep them
-> > @@ -579,14 +578,6 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
-> >          return NULL;
-> >      }
-> >  
-> > -    if (only_migratable) {
-> > -        if (dc->vmsd->unmigratable) {
-> > -            error_setg(errp, "Device %s is not migratable, but "
-> > -                       "--only-migratable was specified", driver);
-> > -            return NULL;
-> > -        }
-> > -    }
-> > -
-> >      /* find bus */
-> >      path = qemu_opt_get(opts, "bus");
-> >      if (path != NULL) {
-> > diff --git a/stubs/vmstate.c b/stubs/vmstate.c
-> > index 6590627..5a71770 100644
-> > --- a/stubs/vmstate.c
-> > +++ b/stubs/vmstate.c
-> > @@ -1,6 +1,7 @@
-> >  #include "qemu/osdep.h"
-> >  #include "qemu-common.h"
-> >  #include "migration/vmstate.h"
-> > +#include "migration/migration.h"
-> >  
-> >  const VMStateDescription vmstate_dummy = {};
-> >  
-> > @@ -18,3 +19,8 @@ void vmstate_unregister(DeviceState *dev,
-> >                          void *opaque)
-> >  {
-> >  }
-> > +
-> > +int check_migratable(Object *obj, Error **err)
-> > +{
-> > +    return 0;
-> > +}
-> > -- 
-> > 2.6.2
-> > 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+are available in the git repository at:
+
+  https://github.com/gkurz/qemu.git tags/for-upstream
+
+for you to fetch changes up to a2a7862ca9ab1689f094c319ec92ecbd6fd1b46d:
+
+  throttle: factor out duplicate code (2017-02-28 10:31:46 +0100)
+
+----------------------------------------------------------------
+This pull request brings:
+- a fix to a minor bug reported by Coverity
+- throttling support in the local backend (command line only)
+
+This replaces the previous pull request I had sent on 02/27:
+- authorship for throttle support was fixed
+- fixes for CVE-2016-9602 will be sent in a separate pull request as
+  suggested by Michael Tokarev
+
+Thanks.
+----------------------------------------------------------------
+Paolo Bonzini (1):
+      9pfs: fix v9fs_lock error case
+
+Pradeep Jagadeesh (2):
+      fsdev: add IO throttle support to fsdev devices
+      throttle: factor out duplicate code
+
+ blockdev.c                      |  83 ++--------------------------
+ fsdev/Makefile.objs             |   2 +-
+ fsdev/file-op-9p.h              |   3 +
+ fsdev/qemu-fsdev-opts.c         |   3 +
+ fsdev/qemu-fsdev-throttle.c     | 118 ++++++++++++++++++++++++++++++++++++++++
+ fsdev/qemu-fsdev-throttle.h     |  39 +++++++++++++
+ hw/9pfs/9p-local.c              |   8 +++
+ hw/9pfs/9p.c                    |  19 ++++---
+ hw/9pfs/cofile.c                |   2 +
+ include/qemu/throttle-options.h |  92 +++++++++++++++++++++++++++++++
+ qemu-options.hx                 |   7 ++-
+ 11 files changed, 289 insertions(+), 87 deletions(-)
+ create mode 100644 fsdev/qemu-fsdev-throttle.c
+ create mode 100644 fsdev/qemu-fsdev-throttle.h
+ create mode 100644 include/qemu/throttle-options.h
+-- 
+2.7.4
