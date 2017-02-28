@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45425)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cin6j-0001Yv-3n
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:06:48 -0500
+	(envelope-from <armbru@redhat.com>) id 1cin6l-0001Z7-3K
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:06:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cin6g-0006v4-Ml
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:06:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41552)
+	(envelope-from <armbru@redhat.com>) id 1cin6g-0006vd-Ue
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:06:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:21415)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cin6g-0006uC-Et
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cin6g-0006uN-LL
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:06:42 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id ACEA864A6D
+	by mx1.redhat.com (Postfix) with ESMTPS id D44ABC0092D4
 	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 19:06:42 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
 	[10.36.116.55])
-	by int-mx10.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v1SJ6f13031380
+	by int-mx09.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v1SJ6f3e020667
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
 	verify=NO)
 	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 14:06:42 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 28 Feb 2017 20:06:30 +0100
-Message-Id: <1488308796-28832-21-git-send-email-armbru@redhat.com>
+Date: Tue, 28 Feb 2017 20:06:36 +0100
+Message-Id: <1488308796-28832-27-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488308796-28832-1-git-send-email-armbru@redhat.com>
 References: <1488308796-28832-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 20/26] test-string-input-visitor: Improve list
- coverage
+Subject: [Qemu-devel] [PULL 26/26] qapi: Improve qobject visitor
+ documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,123 +39,115 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Lists with elements above INT64_MAX don't work (known bug).  Empty
-lists don't work (weird).
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <1488303560-18803-21-git-send-email-armbru@redhat.com>
+Message-Id: <1488303560-18803-27-git-send-email-armbru@redhat.com>
 ---
- tests/test-string-input-visitor.c | 85 +++++++++++++++++++++++++++++++++------
- 1 file changed, 72 insertions(+), 13 deletions(-)
+ include/qapi/qobject-input-visitor.h  | 37 ++++++++++++++++++++++++++++++++++-
+ include/qapi/qobject-output-visitor.h | 35 +++++++++++++++++++++++++++++----
+ 2 files changed, 67 insertions(+), 5 deletions(-)
 
-diff --git a/tests/test-string-input-visitor.c b/tests/test-string-input-visitor.c
-index a32828c..72f8732 100644
---- a/tests/test-string-input-visitor.c
-+++ b/tests/test-string-input-visitor.c
-@@ -65,31 +65,90 @@ static void test_visitor_in_int(TestInputVisitorData *data,
-     error_free_or_abort(&err);
- }
+diff --git a/include/qapi/qobject-input-visitor.h b/include/qapi/qobject-input-visitor.h
+index 21db9c4..0b7633a 100644
+--- a/include/qapi/qobject-input-visitor.h
++++ b/include/qapi/qobject-input-visitor.h
+@@ -1,6 +1,7 @@
+ /*
+  * Input Visitor
+  *
++ * Copyright (C) 2017 Red Hat, Inc.
+  * Copyright IBM, Corp. 2011
+  *
+  * Authors:
+@@ -20,7 +21,41 @@
+ typedef struct QObjectInputVisitor QObjectInputVisitor;
  
-+static void check_ilist(Visitor *v, int64_t *expected, size_t n)
-+{
-+    int64List *res = NULL;
-+    int64List *tail;
-+    int i;
-+
-+    visit_type_int64List(v, NULL, &res, &error_abort);
-+    tail = res;
-+    for (i = 0; i < n; i++) {
-+        g_assert(tail);
-+        g_assert_cmpint(tail->value, ==, expected[i]);
-+        tail = tail->next;
-+    }
-+    g_assert(!tail);
-+
-+    qapi_free_int64List(res);
-+}
-+
-+static void check_ulist(Visitor *v, uint64_t *expected, size_t n)
-+{
-+    uint64List *res = NULL;
-+    uint64List *tail;
-+    int i;
-+
-+    /* BUG: unsigned numbers above INT64_MAX don't work */
-+    for (i = 0; i < n; i++) {
-+        if (expected[i] > INT64_MAX) {
-+            Error *err = NULL;
-+            visit_type_uint64List(v, NULL, &res, &err);
-+            error_free_or_abort(&err);
-+            return;
-+        }
-+    }
-+
-+    visit_type_uint64List(v, NULL, &res, &error_abort);
-+    tail = res;
-+    for (i = 0; i < n; i++) {
-+        g_assert(tail);
-+        g_assert_cmpuint(tail->value, ==, expected[i]);
-+        tail = tail->next;
-+    }
-+    g_assert(!tail);
-+
-+    qapi_free_uint64List(res);
-+}
-+
- static void test_visitor_in_intList(TestInputVisitorData *data,
-                                     const void *unused)
- {
--    int64_t value[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 20};
--    int16List *res = NULL, *tmp;
-+    /* Note: the visitor *sorts* ranges *unsigned* */
-+    int64_t expect1[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 20 };
-+    int64_t expect2[] = { 32767, -32768, -32767 };
-+    int64_t expect3[] = { INT64_MAX, INT64_MIN };
-+    uint64_t expect4[] = { UINT64_MAX };
-     Error *err = NULL;
-+    int64List *res = NULL;
-     Visitor *v;
--    int i = 0;
-+
-+    /* Valid lists */
+ /*
+- * Return a new input visitor that converts a QObject to a QAPI object.
++ * Create a QObject input visitor for @obj
++ *
++ * A QObject input visitor visit builds a QAPI object from a QObject.
++ * This simultaneously walks the QAPI object being built and the
++ * QObject.  The latter walk starts at @obj.
++ *
++ * visit_type_FOO() creates an instance of QAPI type FOO.  The visited
++ * QObject must match FOO.  QDict matches struct/union types, QList
++ * matches list types, QString matches type 'str' and enumeration
++ * types, QInt matches integer types, QFloat matches type 'number',
++ * QBool matches type 'bool'.  Type 'any' is matched by QObject.  A
++ * QAPI alternate type is matched when one of its member types is.
++ *
++ * visit_start_struct() ... visit_end_struct() visits a QDict and
++ * creates a QAPI struct/union.  Visits in between visit the
++ * dictionary members.  visit_optional() is true when the QDict has
++ * this member.  visit_check_struct() fails if unvisited members
++ * remain.
++ *
++ * visit_start_list() ... visit_end_list() visits a QList and creates
++ * a QAPI list.  Visits in between visit list members, one after the
++ * other.  visit_next_list() returns NULL when all QList members have
++ * been visited.  visit_check_list() fails if unvisited members
++ * remain.
++ *
++ * visit_start_alternate() ... visit_end_alternate() visits a QObject
++ * and creates a QAPI alternate.  The visit in between visits the same
++ * QObject and initializes the alternate member that is in use.
++ *
++ * Error messages refer to parts of @obj in JavaScript/Python syntax.
++ * For example, 'a.b[2]' refers to the second member of the QList
++ * member 'b' of the QDict member 'a' of QDict @obj.
++ *
++ * The caller is responsible for freeing the visitor with
++ * visit_free().
+  */
+ Visitor *qobject_input_visitor_new(QObject *obj);
  
-     v = visitor_input_test_init(data, "1,2,0,2-4,20,5-9,1-8");
-+    check_ilist(v, expect1, ARRAY_SIZE(expect1));
+diff --git a/include/qapi/qobject-output-visitor.h b/include/qapi/qobject-output-visitor.h
+index 8241877..9b990c3 100644
+--- a/include/qapi/qobject-output-visitor.h
++++ b/include/qapi/qobject-output-visitor.h
+@@ -19,11 +19,38 @@
  
--    visit_type_int16List(v, NULL, &res, &error_abort);
--    tmp = res;
--    while (i < sizeof(value) / sizeof(value[0])) {
--        g_assert(tmp);
--        g_assert_cmpint(tmp->value, ==, value[i++]);
--        tmp = tmp->next;
--    }
--    g_assert(!tmp);
-+    v = visitor_input_test_init(data, "32767,-32768--32767");
-+    check_ilist(v, expect2, ARRAY_SIZE(expect2));
+ typedef struct QObjectOutputVisitor QObjectOutputVisitor;
  
--    qapi_free_int16List(res);
-+    v = visitor_input_test_init(data,
-+                                "-9223372036854775808,9223372036854775807");
-+    check_ilist(v, expect3, ARRAY_SIZE(expect3));
-+
-+    v = visitor_input_test_init(data, "18446744073709551615");
-+    check_ulist(v, expect4, ARRAY_SIZE(expect4));
-+
-+    /* Empty list is invalid (weird) */
-+
-+    v = visitor_input_test_init(data, "");
-+    visit_type_int64List(v, NULL, &res, &err);
-+    error_free_or_abort(&err);
-+
-+    /* Not a list */
+-/*
+- * Create a new QObject output visitor.
++/**
++ * Create a QObject output visitor for @obj
+  *
+- * If everything else succeeds, pass @result to visit_complete() to
+- * collect the result of the visit.
++ * A QObject output visitor visit builds a QObject from QAPI Object.
++ * This simultaneously walks the QAPI object and the QObject being
++ * built.  The latter walk starts at @obj.
++ *
++ * visit_type_FOO() creates a QObject for QAPI type FOO.  It creates a
++ * QDict for struct/union types, a QList for list types, QString for
++ * type 'str' and enumeration types, QInt for integer types, QFloat
++ * for type 'number', QBool for type 'bool'.  For type 'any', it
++ * increments the QObject's reference count.  For QAPI alternate
++ * types, it creates the QObject for the member that is in use.
++ *
++ * visit_start_struct() ... visit_end_struct() visits a QAPI
++ * struct/union and creates a QDict.  Visits in between visit the
++ * members.  visit_optional() is true when the struct/union has this
++ * member.  visit_check_struct() does nothing.
++ *
++ * visit_start_list() ... visit_end_list() visits a QAPI list and
++ * creates a QList.  Visits in between visit list members, one after
++ * the other.  visit_next_list() returns NULL when all QAPI list
++ * members have been visited.  visit_check_list() does nothing.
++ *
++ * visit_start_alternate() ... visit_end_alternate() visits a QAPI
++ * alternate.  The visit in between creates the QObject for the
++ * alternate member that is in use.
++ *
++ * Errors are not expected to happen.
++ *
++ * The caller is responsible for freeing the visitor with
++ * visit_free().
+  */
+ Visitor *qobject_output_visitor_new(QObject **result);
  
-     v = visitor_input_test_init(data, "not an int list");
- 
--    visit_type_int16List(v, NULL, &res, &err);
-+    visit_type_int64List(v, NULL, &res, &err);
-     error_free_or_abort(&err);
-     g_assert(!res);
- }
 -- 
 2.7.4
