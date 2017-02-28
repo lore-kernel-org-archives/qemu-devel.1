@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1ciXTV-0004BL-T2
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 21:25:15 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1ciXTm-0004WG-GE
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 21:25:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1ciXTS-0005bu-Mm
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 21:25:13 -0500
-Received: from [59.151.112.132] (port=49666 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1ciXTR-0005Xt-Mk
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 21:25:10 -0500
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Date: Tue, 28 Feb 2017 10:32:33 +0800
-Message-ID: <1488249153-25964-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4] vfio error recovery: kernel support
+	(envelope-from <sjitindarsingh@gmail.com>) id 1ciXTl-0005fp-92
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 21:25:30 -0500
+Message-ID: <1488248717.2323.11.camel@gmail.com>
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Date: Tue, 28 Feb 2017 13:25:17 +1100
+In-Reply-To: <20170228002810.GD17615@umbus.fritz.box>
+References: <cover.1487829585.git.sam.bobroff@au1.ibm.com>
+	<034945c1bbc8d4a97e5f568d4d463af2c9a24080.1487829585.git.sam.bobroff@au1.ibm.com>
+	<20170228002810.GD17615@umbus.fritz.box>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH v2 08/12] spapr: Only setup HTP if
+ necessary.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,217 +25,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org
-Cc: alex.williamson@redhat.com, izumi.taku@jp.fujitsu.com, "Michael S.
-	Tsirkin" <mst@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>, Sam Bobroff <sam.bobroff@au1.ibm.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-From: "Michael S. Tsirkin" <mst@redhat.com>
+On Tue, 2017-02-28 at 11:28 +1100, David Gibson wrote:
+> s/HTP/HPT/ in subject line.
+> 
+> 
+> On Thu, Feb 23, 2017 at 05:00:01PM +1100, Sam Bobroff wrote:
+> > 
+> > If QEMU is using KVM, and KVM is capable of running in radix mode,
+> > guests can be run in real-mode without allocating a HPT (because
+> > KVM
+> > will use a minimal RPT). So in this case, we avoid creating the HPT
+> > at reset time and later (during CAS) create it if it is necessary.
+> > 
+> > Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
+> So, IIRC, we discussed previously that the logical way to do things
+> was to, by default, delay HPT allocation until CAS time, and just do
+> it at reset time for the case that needs it: hash host with KVM.
+> 
+> Did you hit a problem with that approach, or is there still work to
+> be
+> done here?
 
-0. What happens now (PCIE AER only)
-   Fatal errors cause a link reset.
-   Non fatal errors don't.
-   All errors stop the VM eventually, but not immediately
-   because it's detected and reported asynchronously.
-   Interrupts are forwarded as usual.
-   Correctable errors are not reported to guest at all.
-   Note: PPC EEH is different. This focuses on AER.
+So what we're doing is assuming radix. Allocate hpt if hash host,
+otherwise delay til CAS time and allocate only if guest chose hash.
 
-1. Correctable errors
-   There is no need to report these to guest. So let's not.
+> 
+> > 
+> > ---
+> > v2:
+> > 
+> > * This patch has been mostly rewritten to move the late HPT
+> > allocation to CAS.
+> > This allows a guest to start in radix mode (when it's in real mode)
+> > and then
+> > change to hash, even if it is a legacy guest and will not call
+> > h_register_process_table().
+> > * Added an exported function to spapr.c to perform HPT allocation
+> > and adjust
+> > the vrma if necessary. This makes it possible to allocate the HPT
+> > from
+> > h_client_architecture_support() in spapr_hcall.c.
+> > 
+> >  hw/ppc/spapr.c         | 24 +++++++++++++++---------
+> >  hw/ppc/spapr_hcall.c   | 10 ++++++++++
+> >  include/hw/ppc/spapr.h |  1 +
+> >  3 files changed, 26 insertions(+), 9 deletions(-)
+> > 
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index ca3812555f..dfee0f685f 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -1123,6 +1123,17 @@ static void
+> > spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
+> >      }
+> >  }
+> >  
+> > +void spapr_setup_hpt_and_vrma(sPAPRMachineState *spapr)
+> > +{
+> > +    spapr_reallocate_hpt(spapr,
+> > +                     spapr_hpt_shift_for_ramsize(MACHINE(qdev_get_
+> > machine())->maxram_size),
+> > +                     &error_fatal);
+> > +    if (spapr->vrma_adjust) {
+> > +        spapr->rma_size = kvmppc_rma_size(spapr_node0_size(),
+> > +                                          spapr->htab_shift);
+> > +    }
+> > +}
+> > +
+> >  static void find_unknown_sysbus_device(SysBusDevice *sbdev, void
+> > *opaque)
+> >  {
+> >      bool matched = false;
+> > @@ -1151,15 +1162,10 @@ static void ppc_spapr_reset(void)
+> >      /* Check for unknown sysbus devices */
+> >      foreach_dynamic_sysbus_device(find_unknown_sysbus_device,
+> > NULL);
+> >  
+> > -    /* Allocate and/or reset the hash page table */
+> > -    spapr_reallocate_hpt(spapr,
+> > -                         spapr_hpt_shift_for_ramsize(machine-
+> > >maxram_size),
+> > -                         &error_fatal);
+> > -
+> > -    /* Update the RMA size if necessary */
+> > -    if (spapr->vrma_adjust) {
+> > -        spapr->rma_size = kvmppc_rma_size(spapr_node0_size(),
+> > -                                          spapr->htab_shift);
+> > +    /* If using KVM with radix mode available, VCPUs can be
+> > started
+> > +     * without a HPT because KVM will start them in radix mode. */
+> > +    if (!(kvm_enabled() && kvmppc_has_cap_mmu_radix())) {
+> > +        spapr_setup_hpt_and_vrma(spapr);
+> >      }
+> >  
+> >      qemu_devices_reset();
+> > diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> > index 42d20e0b92..cea34073aa 100644
+> > --- a/hw/ppc/spapr_hcall.c
+> > +++ b/hw/ppc/spapr_hcall.c
+> > @@ -1002,6 +1002,16 @@ static target_ulong
+> > h_client_architecture_support(PowerPCCPU *cpu,
+> >      ov5_updates = spapr_ovec_new();
+> >      spapr->cas_reboot = spapr_ovec_diff(ov5_updates,
+> >                                          ov5_cas_old, spapr-
+> > >ov5_cas);
+> > +    if (kvm_enabled()) {
+> > +        if (kvmppc_has_cap_mmu_radix()) {
+> > +            /* If the HPT hasn't yet been set up (see
+> > +             * ppc_spapr_reset()), and it's needed, do it now: */
+> I think it's a bit fragile to have here it explicitly mirror the
+> logic
+> which determines whether the HPT is allocated early.  I'd prefer to
+> explicitly test here whether we have allocated an HPT - adding a
+> flag,
+> if we have to.
 
-2. Fatal errors
-   It's not easy to handle them gracefully since link reset
-   is needed. As a first step, let's use the existing mechanism
-   in that case.
+We can use the MSB of patb_entry as that flag.
 
-2. Non-fatal errors
-   Here we could make progress by reporting them to guest
-   and have guest handle them.
+patb_entry & GUEST_RADIX == GUEST_RADIX -> radix, so assume a hpt
+hasn't been allocated.
 
-   Issues:
-   a. this behaviour should only be enabled with new userspace,
-      old userspace should work without changes.
+When we do allocate a hpt we know we're not radix, so set
+patb_entry &= ~GUEST_RADIX;
 
-      Suggestion: One way to address this would be to add a new eventfd
-      non_fatal_err_trigger. If not set, invoke err_trigger.
+Where GUEST_RADIX is the msb in patb_entry which indicates that a guest
+is radix.
 
-   b. drivers are supposed to stop MMIO when error is reported,
-      if vm keeps going, we will keep doing MMIO/config.
+Essentially patb_entry & GUEST_RADIX cleared mean hash with hpt
+allocated, patb_entry & GUEST_RADIX set means radix so assume an hpt
+hasn't been allocated. On the hpt allocation path we clear GUEST_RADIX
+in patb_entry and when we set GUEST_RADIX we free the hpt.
 
-      Suggestion 1: ignore this. vm stop happens much later when
-      userspace runs anyway, so we are not making things much worse.
-
-      Suggestion 2: try to stop MMIO/config, resume on resume call
-
-      Patch below implements Suggestion 1.
-
-      Note that although this is really against the documentation, which
-      states error_detected() is the point at which the driver should quiesce
-      the device and not touch it further (until diagnostic poking at
-      mmio_enabled or full access at resume callback).
-
-      Fixing this won't be easy. However, this is not a regression.
-
-      Also note this does nothing about interrupts, documentation
-      suggests returning IRQ_NONE until reset.
-      Again, not a regression.
-
-   c. PF driver might detect that function is completely broken,
-      if vm keeps going, we will keep doing MMIO/config.
-
-      Suggestion 1: ignore this. vm stop happens much later when
-      userspace runs anyway, so we are not making things much worse.
-
-      Suggestion 2: detect this and invoke err_trigger to stop VM.
-
-      Patch below implements Suggestion 2.
-
-Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
----
-Inherit from MST's v3.
-v4 changelog:
-1. Tiny modification on commit message.
-2. Remove unrelated virtio code.
-3. VFIO_DEVICE_SET_IRQS process for VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX
-
- drivers/vfio/pci/vfio_pci.c         | 38 +++++++++++++++++++++++++++++++++++--
- drivers/vfio/pci/vfio_pci_intrs.c   | 19 +++++++++++++++++++
- drivers/vfio/pci/vfio_pci_private.h |  1 +
- include/uapi/linux/vfio.h           |  1 +
- 4 files changed, 57 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index 324c52e..3551cc9 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -441,7 +441,8 @@ static int vfio_pci_get_irq_count(struct vfio_pci_device *vdev, int irq_type)
- 
- 			return (flags & PCI_MSIX_FLAGS_QSIZE) + 1;
- 		}
--	} else if (irq_type == VFIO_PCI_ERR_IRQ_INDEX) {
-+	} else if (irq_type == VFIO_PCI_ERR_IRQ_INDEX ||
-+		   irq_type == VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX) {
- 		if (pci_is_pcie(vdev->pdev))
- 			return 1;
- 	} else if (irq_type == VFIO_PCI_REQ_IRQ_INDEX) {
-@@ -796,6 +797,7 @@ static long vfio_pci_ioctl(void *device_data,
- 		case VFIO_PCI_REQ_IRQ_INDEX:
- 			break;
- 		case VFIO_PCI_ERR_IRQ_INDEX:
-+		case VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX:
- 			if (pci_is_pcie(vdev->pdev))
- 				break;
- 		/* pass thru to return error */
-@@ -1282,7 +1284,9 @@ static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
- 
- 	mutex_lock(&vdev->igate);
- 
--	if (vdev->err_trigger)
-+	if (state == pci_channel_io_normal && vdev->non_fatal_err_trigger)
-+		eventfd_signal(vdev->non_fatal_err_trigger, 1);
-+	else if (vdev->err_trigger)
- 		eventfd_signal(vdev->err_trigger, 1);
- 
- 	mutex_unlock(&vdev->igate);
-@@ -1292,8 +1296,38 @@ static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
- 	return PCI_ERS_RESULT_CAN_RECOVER;
- }
- 
-+static pci_ers_result_t vfio_pci_aer_slot_reset(struct pci_dev *pdev)
-+{
-+	struct vfio_pci_device *vdev;
-+	struct vfio_device *device;
-+	static pci_ers_result_t err = PCI_ERS_RESULT_NONE;
-+
-+	device = vfio_device_get_from_dev(&pdev->dev);
-+	if (!device)
-+		goto err_dev;
-+
-+	vdev = vfio_device_data(device);
-+	if (!vdev)
-+		goto err_data;
-+
-+	mutex_lock(&vdev->igate);
-+
-+	if (vdev->err_trigger)
-+		eventfd_signal(vdev->err_trigger, 1);
-+
-+	mutex_unlock(&vdev->igate);
-+
-+	err = PCI_ERS_RESULT_RECOVERED;
-+
-+err_data:
-+	vfio_device_put(device);
-+err_dev:
-+	return err;
-+}
-+
- static const struct pci_error_handlers vfio_err_handlers = {
- 	.error_detected = vfio_pci_aer_err_detected,
-+	.slot_reset = vfio_pci_aer_slot_reset,
- };
- 
- static struct pci_driver vfio_pci_driver = {
-diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-index 1c46045..270d568 100644
---- a/drivers/vfio/pci/vfio_pci_intrs.c
-+++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -611,6 +611,17 @@ static int vfio_pci_set_err_trigger(struct vfio_pci_device *vdev,
- 					       count, flags, data);
- }
- 
-+static int vfio_pci_set_non_fatal_err_trigger(struct vfio_pci_device *vdev,
-+				    unsigned index, unsigned start,
-+				    unsigned count, uint32_t flags, void *data)
-+{
-+	if (index != VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX || start != 0 || count > 1)
-+		return -EINVAL;
-+
-+	return vfio_pci_set_ctx_trigger_single(&vdev->non_fatal_err_trigger,
-+					       count, flags, data);
-+}
-+
- static int vfio_pci_set_req_trigger(struct vfio_pci_device *vdev,
- 				    unsigned index, unsigned start,
- 				    unsigned count, uint32_t flags, void *data)
-@@ -664,6 +675,14 @@ int vfio_pci_set_irqs_ioctl(struct vfio_pci_device *vdev, uint32_t flags,
- 			break;
- 		}
- 		break;
-+	case VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX:
-+		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
-+		case VFIO_IRQ_SET_ACTION_TRIGGER:
-+			if (pci_is_pcie(vdev->pdev))
-+				func = vfio_pci_set_non_fatal_err_trigger;
-+			break;
-+		}
-+		break;
- 	case VFIO_PCI_REQ_IRQ_INDEX:
- 		switch (flags & VFIO_IRQ_SET_ACTION_TYPE_MASK) {
- 		case VFIO_IRQ_SET_ACTION_TRIGGER:
-diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
-index f561ac1..d30f8a3 100644
---- a/drivers/vfio/pci/vfio_pci_private.h
-+++ b/drivers/vfio/pci/vfio_pci_private.h
-@@ -93,6 +93,7 @@ struct vfio_pci_device {
- 	struct pci_saved_state	*pci_saved_state;
- 	int			refcnt;
- 	struct eventfd_ctx	*err_trigger;
-+	struct eventfd_ctx	*non_fatal_err_trigger;
- 	struct eventfd_ctx	*req_trigger;
- 	struct list_head	dummy_resources_list;
- };
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index 519eff3..affa973 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -443,6 +443,7 @@ enum {
- 	VFIO_PCI_MSIX_IRQ_INDEX,
- 	VFIO_PCI_ERR_IRQ_INDEX,
- 	VFIO_PCI_REQ_IRQ_INDEX,
-+	VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX,
- 	VFIO_PCI_NUM_IRQS
- };
- 
--- 
-1.8.3.1
+> 
+> > 
+> > +            if (!spapr_ovec_test(ov5_updates, OV5_MMU_RADIX)) {
+> > +                /* legacy hash or new hash: */
+> > +                spapr_setup_hpt_and_vrma(spapr);
+> > +            }
+> > +        }
+> > +    }
+> >  
+> >      if (!spapr->cas_reboot) {
+> >          spapr->cas_reboot =
+> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> > index f9b17d860a..a30cbc485c 100644
+> > --- a/include/hw/ppc/spapr.h
+> > +++ b/include/hw/ppc/spapr.h
+> > @@ -590,6 +590,7 @@ void spapr_dt_events(sPAPRMachineState *sm,
+> > void *fdt);
+> >  int spapr_h_cas_compose_response(sPAPRMachineState *sm,
+> >                                   target_ulong addr, target_ulong
+> > size,
+> >                                   sPAPROptionVector *ov5_updates);
+> > +void spapr_setup_hpt_and_vrma(sPAPRMachineState *spapr);
+> >  sPAPRTCETable *spapr_tce_new_table(DeviceState *owner, uint32_t
+> > liobn);
+> >  void spapr_tce_table_enable(sPAPRTCETable *tcet,
+> >                              uint32_t page_shift, uint64_t
+> > bus_offset,
