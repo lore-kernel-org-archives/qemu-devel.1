@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cih5m-0008Bd-FC
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:23 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cih5p-0008ES-Lg
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cih5k-0000IB-GK
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59376)
+	(envelope-from <dgilbert@redhat.com>) id 1cih5o-0000Jd-H3
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51540)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cih5k-0000Hz-7n
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:20 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cih5o-0000JP-7k
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:24 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue, 28 Feb 2017 12:40:39 +0000
-Message-Id: <20170228124056.5074-11-dgilbert@redhat.com>
+Date: Tue, 28 Feb 2017 12:40:41 +0000
+Message-Id: <20170228124056.5074-13-dgilbert@redhat.com>
 In-Reply-To: <20170228124056.5074-1-dgilbert@redhat.com>
 References: <20170228124056.5074-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 10/27] migration: Update docs to discourage
- version bumps
+Subject: [Qemu-devel] [PULL 12/27] postcopy: Transmit ram size summary word
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,99 +28,126 @@ Cc: quintela@redhat.com, lvivier@redhat.com, marcandre.lureau@redhat.com, vsemen
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Version bumps break backwards migration; update the docs
-to explain to people that's bad and how to avoid it.
+Replace the host page-size in the 'advise' command by a pagesize
+summary bitmap; if the VM is just using normal RAM then
+this will be exactly the same as before, however if they're using
+huge pages they'll be different, and thus:
+   a) Migration from/to old qemu's that don't understand huge pages
+      will fail early.
+   b) Migrations with different size RAMBlocks will also fail early.
+
+This catches it very early; earlier than the detailed per-block
+check in the next patch.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20170210110359.8210-1-dgilbert@redhat.com>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Message-Id: <20170224182844.32452-2-dgilbert@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- docs/migration.txt | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 58 insertions(+)
+ include/migration/migration.h |  1 +
+ migration/ram.c               | 17 +++++++++++++++++
+ migration/savevm.c            | 32 +++++++++++++++++++++-----------
+ 3 files changed, 39 insertions(+), 11 deletions(-)
 
-diff --git a/docs/migration.txt b/docs/migration.txt
-index 6503c17..c8b0304 100644
---- a/docs/migration.txt
-+++ b/docs/migration.txt
-@@ -161,6 +161,11 @@ include/hw/hw.h.
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index 34a383e..6272adf 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -378,6 +378,7 @@ void global_state_store_running(void);
+ void flush_page_queue(MigrationState *ms);
+ int ram_save_queue_pages(MigrationState *ms, const char *rbname,
+                          ram_addr_t start, ram_addr_t len);
++uint64_t ram_pagesize_summary(void);
  
- === More about versions ===
+ PostcopyState postcopy_state_get(void);
+ /* Set the state and return the old state */
+diff --git a/migration/ram.c b/migration/ram.c
+index f289fcd..1f6397a 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -600,6 +600,23 @@ static void migration_bitmap_sync_init(void)
+     iterations_prev = 0;
+ }
  
-+Version numbers are intended for major incompatible changes to the
-+migration of a device, and using them breaks backwards-migration
-+compatibility; in general most changes can be made by adding Subsections
-+(see below) or _TEST macros (see below) which won't break compatibility.
++/* Returns a summary bitmap of the page sizes of all RAMBlocks;
++ * for VMs with just normal pages this is equivalent to the
++ * host page size.  If it's got some huge pages then it's the OR
++ * of all the different page sizes.
++ */
++uint64_t ram_pagesize_summary(void)
++{
++    RAMBlock *block;
++    uint64_t summary = 0;
 +
- You can see that there are several version fields:
++    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
++        summary |= block->page_size;
++    }
++
++    return summary;
++}
++
+ static void migration_bitmap_sync(void)
+ {
+     RAMBlock *block;
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 26d2c44..3b19a4a 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -870,7 +870,7 @@ int qemu_savevm_send_packaged(QEMUFile *f, const uint8_t *buf, size_t len)
+ void qemu_savevm_send_postcopy_advise(QEMUFile *f)
+ {
+     uint64_t tmp[2];
+-    tmp[0] = cpu_to_be64(getpagesize());
++    tmp[0] = cpu_to_be64(ram_pagesize_summary());
+     tmp[1] = cpu_to_be64(1ul << qemu_target_page_bits());
  
- - version_id: the maximum version_id supported by VMState for that device.
-@@ -175,6 +180,9 @@ version_id.  And the function load_state_old() (if present) is able to
- load state from minimum_version_id_old to minimum_version_id.  This
- function is deprecated and will be removed when no more users are left.
+     trace_qemu_savevm_send_postcopy_advise();
+@@ -1352,7 +1352,7 @@ static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis);
+ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
+ {
+     PostcopyState ps = postcopy_state_set(POSTCOPY_INCOMING_ADVISE);
+-    uint64_t remote_hps, remote_tps;
++    uint64_t remote_pagesize_summary, local_pagesize_summary, remote_tps;
  
-+Saving state will always create a section with the 'version_id' value
-+and thus can't be loaded by any older QEMU.
-+
- ===  Massaging functions ===
+     trace_loadvm_postcopy_handle_advise();
+     if (ps != POSTCOPY_INCOMING_NONE) {
+@@ -1365,17 +1365,27 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
+         return -1;
+     }
  
- Sometimes, it is not enough to be able to save the state directly
-@@ -292,6 +300,56 @@ save/send this state when we are in the middle of a pio operation
- not enabled, the values on that fields are garbage and don't need to
- be sent.
+-    remote_hps = qemu_get_be64(mis->from_src_file);
+-    if (remote_hps != getpagesize())  {
++    remote_pagesize_summary = qemu_get_be64(mis->from_src_file);
++    local_pagesize_summary = ram_pagesize_summary();
++
++    if (remote_pagesize_summary != local_pagesize_summary)  {
+         /*
+-         * Some combinations of mismatch are probably possible but it gets
+-         * a bit more complicated.  In particular we need to place whole
+-         * host pages on the dest at once, and we need to ensure that we
+-         * handle dirtying to make sure we never end up sending part of
+-         * a hostpage on it's own.
++         * This detects two potential causes of mismatch:
++         *   a) A mismatch in host page sizes
++         *      Some combinations of mismatch are probably possible but it gets
++         *      a bit more complicated.  In particular we need to place whole
++         *      host pages on the dest at once, and we need to ensure that we
++         *      handle dirtying to make sure we never end up sending part of
++         *      a hostpage on it's own.
++         *   b) The use of different huge page sizes on source/destination
++         *      a more fine grain test is performed during RAM block migration
++         *      but this test here causes a nice early clear failure, and
++         *      also fails when passed to an older qemu that doesn't
++         *      do huge pages.
+          */
+-        error_report("Postcopy needs matching host page sizes (s=%d d=%d)",
+-                     (int)remote_hps, getpagesize());
++        error_report("Postcopy needs matching RAM page sizes (s=%" PRIx64
++                                                             " d=%" PRIx64 ")",
++                     remote_pagesize_summary, local_pagesize_summary);
+         return -1;
+     }
  
-+Using a condition function that checks a 'property' to determine whether
-+to send a subsection allows backwards migration compatibility when
-+new subsections are added.
-+
-+For example;
-+   a) Add a new property using DEFINE_PROP_BOOL - e.g. support-foo and
-+      default it to true.
-+   b) Add an entry to the HW_COMPAT_ for the previous version
-+      that sets the property to false.
-+   c) Add a static bool  support_foo function that tests the property.
-+   d) Add a subsection with a .needed set to the support_foo function
-+   e) (potentially) Add a pre_load that sets up a default value for 'foo'
-+      to be used if the subsection isn't loaded.
-+
-+Now that subsection will not be generated when using an older
-+machine type and the migration stream will be accepted by older
-+QEMU versions. pre-load functions can be used to initialise state
-+on the newer version so that they default to suitable values
-+when loading streams created by older QEMU versions that do not
-+generate the subsection.
-+
-+In some cases subsections are added for data that had been accidentally
-+omitted by earlier versions; if the missing data causes the migration
-+process to succeed but the guest to behave badly then it may be better
-+to send the subsection and cause the migration to explicitly fail
-+with the unknown subsection error.   If the bad behaviour only happens
-+with certain data values, making the subsection conditional on
-+the data value (rather than the machine type) allows migrations to succeed
-+in most cases.  In general the preference is to tie the subsection to
-+the machine type, and allow reliable migrations, unless the behaviour
-+from omission of the subsection is really bad.
-+
-+= Not sending existing elements =
-+
-+Sometimes members of the VMState are no longer needed;
-+  removing them will break migration compatibility
-+  making them version dependent and bumping the version will break backwards
-+   migration compatibility.
-+
-+The best way is to:
-+  a) Add a new property/compatibility/function in the same way for subsections
-+    above.
-+  b) replace the VMSTATE macro with the _TEST version of the macro, e.g.:
-+     VMSTATE_UINT32(foo, barstruct)
-+   becomes
-+     VMSTATE_UINT32_TEST(foo, barstruct, pre_version_baz)
-+
-+  Sometime in the future when we no longer care about the ancient
-+versions these can be killed off.
-+
- = Return path =
- 
- In most migration scenarios there is only a single data path that runs
 -- 
 2.9.3
