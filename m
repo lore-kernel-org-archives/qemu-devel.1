@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cif40-0001Xt-F7
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:31:27 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cif7V-0004S4-2x
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:35:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cif3x-00085N-8e
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:31:24 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34585)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cif3w-00084o-V5
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:31:21 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1SASdUN138474
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 05:31:19 -0500
-Received: from e06smtp08.uk.ibm.com (e06smtp08.uk.ibm.com [195.75.94.104])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28w1xnxhkr-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 05:31:19 -0500
-Received: from localhost
-	by e06smtp08.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Tue, 28 Feb 2017 10:31:16 -0000
-From: Greg Kurz <groug@kaod.org>
-Date: Tue, 28 Feb 2017 11:30:39 +0100
-In-Reply-To: <1488277840-18608-1-git-send-email-groug@kaod.org>
-References: <1488277840-18608-1-git-send-email-groug@kaod.org>
-Message-Id: <1488277840-18608-28-git-send-email-groug@kaod.org>
-Subject: [Qemu-devel] [PULL 27/28] 9pfs: local: open2: don't follow symlinks
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cif7U-0000aw-1O
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:35:01 -0500
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:33555)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1cif7T-0000Zp-Mu
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:34:59 -0500
+Received: by mail-lf0-x242.google.com with SMTP id r36so660885lfi.0
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 02:34:59 -0800 (PST)
+MIME-Version: 1.0
+References: <20170227134202.2991-1-marcandre.lureau@redhat.com>
+	<20170227134202.2991-6-marcandre.lureau@redhat.com>
+	<62892df9-9e1e-8e4c-c4f0-f3c6cf0422c7@redhat.com>
+In-Reply-To: <62892df9-9e1e-8e4c-c4f0-f3c6cf0422c7@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 28 Feb 2017 10:34:46 +0000
+Message-ID: <CAJ+F1CKV9VUn9ahM6w6rSOGd8dMdX+4UZU7kPAU_-1MdgafyCg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 05/21] char: add a /chardevs container
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,139 +31,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-The local_open2() callback is vulnerable to symlink attacks because it
-calls:
+On Mon, Feb 27, 2017 at 8:01 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-(1) open() which follows symbolic links for all path elements but the
-    rightmost one
-(2) local_set_xattr()->setxattr() which follows symbolic links for all
-    path elements
-(3) local_set_mapped_file_attr() which calls in turn local_fopen() and
-    mkdir(), both functions following symbolic links for all path
-    elements but the rightmost one
-(4) local_post_create_passthrough() which calls in turn lchown() and
-    chmod(), both functions also following symbolic links
+>
+>
+> On 27/02/2017 14:41, Marc-Andr=C3=A9 Lureau wrote:
+> >
+> > -    chr =3D CHARDEV(object_new(typename));
+> > +    if (id) {
+> > +        obj =3D object_new_with_props(typename, get_chardevs_root(),
+> > +                                    id, &local_err, NULL);
+> > +    } else {
+> > +        obj =3D object_new(typename);
+> > +    }
+>
+> I think you should open code object_new_with_props.  This can be just
+> object_new(typename)...
+>
+>
+Yes, it simplies things. Done. Any other remark about the rest of the
+series? probably not worth a resend yet.
 
-This patch converts local_open2() to rely on opendir_nofollow() and
-mkdirat() to fix (1), as well as local_set_xattrat(),
-local_set_mapped_file_attrat() and local_set_cred_passthrough() to
-fix (2), (3) and (4) respectively. Since local_open2() already opens
-a descriptor to the target file, local_set_cred_passthrough() is
-modified to reuse it instead of opening a new one.
+thanks
 
-The mapped and mapped-file security modes are supposed to be identical,
-except for the place where credentials and file modes are stored. While
-here, we also make that explicit by sharing the call to openat().
 
-This partly fixes CVE-2016-9602.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- hw/9pfs/9p-local.c | 56 ++++++++++++++++++------------------------------------
- 1 file changed, 19 insertions(+), 37 deletions(-)
-
-diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index 33893d50113c..b9d4e9985181 100644
---- a/hw/9pfs/9p-local.c
-+++ b/hw/9pfs/9p-local.c
-@@ -887,62 +887,45 @@ static int local_fstat(FsContext *fs_ctx, int fid_type,
- static int local_open2(FsContext *fs_ctx, V9fsPath *dir_path, const char *name,
-                        int flags, FsCred *credp, V9fsFidOpenState *fs)
- {
--    char *path;
-     int fd = -1;
-     int err = -1;
--    int serrno = 0;
--    V9fsString fullname;
--    char *buffer = NULL;
-+    int dirfd;
- 
-     /*
-      * Mark all the open to not follow symlinks
-      */
-     flags |= O_NOFOLLOW;
- 
--    v9fs_string_init(&fullname);
--    v9fs_string_sprintf(&fullname, "%s/%s", dir_path->data, name);
--    path = fullname.data;
-+    dirfd = local_opendir_nofollow(fs_ctx, dir_path->data);
-+    if (dirfd == -1) {
-+        return -1;
-+    }
- 
-     /* Determine the security model */
--    if (fs_ctx->export_flags & V9FS_SM_MAPPED) {
--        buffer = rpath(fs_ctx, path);
--        fd = open(buffer, flags, SM_LOCAL_MODE_BITS);
-+    if (fs_ctx->export_flags & V9FS_SM_MAPPED ||
-+        fs_ctx->export_flags & V9FS_SM_MAPPED_FILE) {
-+        fd = openat_file(dirfd, name, flags, SM_LOCAL_MODE_BITS);
-         if (fd == -1) {
--            err = fd;
-             goto out;
-         }
-         credp->fc_mode = credp->fc_mode|S_IFREG;
--        /* Set cleint credentials in xattr */
--        err = local_set_xattr(buffer, credp);
--        if (err == -1) {
--            serrno = errno;
--            goto err_end;
--        }
--    } else if (fs_ctx->export_flags & V9FS_SM_MAPPED_FILE) {
--        buffer = rpath(fs_ctx, path);
--        fd = open(buffer, flags, SM_LOCAL_MODE_BITS);
--        if (fd == -1) {
--            err = fd;
--            goto out;
-+        if (fs_ctx->export_flags & V9FS_SM_MAPPED) {
-+            /* Set cleint credentials in xattr */
-+            err = local_set_xattrat(dirfd, name, credp);
-+        } else {
-+            err = local_set_mapped_file_attrat(dirfd, name, credp);
-         }
--        credp->fc_mode = credp->fc_mode|S_IFREG;
--        /* Set client credentials in .virtfs_metadata directory files */
--        err = local_set_mapped_file_attr(fs_ctx, path, credp);
-         if (err == -1) {
--            serrno = errno;
-             goto err_end;
-         }
-     } else if ((fs_ctx->export_flags & V9FS_SM_PASSTHROUGH) ||
-                (fs_ctx->export_flags & V9FS_SM_NONE)) {
--        buffer = rpath(fs_ctx, path);
--        fd = open(buffer, flags, credp->fc_mode);
-+        fd = openat_file(dirfd, name, flags, credp->fc_mode);
-         if (fd == -1) {
--            err = fd;
-             goto out;
-         }
--        err = local_post_create_passthrough(fs_ctx, path, credp);
-+        err = local_set_cred_passthrough(fs_ctx, dirfd, name, credp);
-         if (err == -1) {
--            serrno = errno;
-             goto err_end;
-         }
-     }
-@@ -951,12 +934,11 @@ static int local_open2(FsContext *fs_ctx, V9fsPath *dir_path, const char *name,
-     goto out;
- 
- err_end:
--    close(fd);
--    remove(buffer);
--    errno = serrno;
-+    unlinkat_preserve_errno(dirfd, name,
-+                            flags & O_DIRECTORY ? AT_REMOVEDIR : 0);
-+    close_preserve_errno(fd);
- out:
--    g_free(buffer);
--    v9fs_string_free(&fullname);
-+    close_preserve_errno(dirfd);
-     return err;
- }
- 
--- 
-2.7.4
+> > +    if (local_err) {
+> > +        assert(!obj);
+> > +        goto end;
+> > +    }
+> > +
+> > +    chr =3D CHARDEV(obj);
+> >      chr->label =3D g_strdup(id);
+> >
+> >      qemu_char_open(chr, backend, &be_opened, &local_err);
+> >      if (local_err) {
+> > -        error_propagate(errp, local_err);
+> > -        object_unref(OBJECT(chr));
+> > -        return NULL;
+> > +        goto end;
+> >      }
+> >
+> >      if (!chr->filename) {
+> > @@ -1250,6 +1263,18 @@ Chardev *qemu_chardev_new(const char *id, const
+> char *typename,
+> >          qemu_chr_be_event(chr, CHR_EVENT_OPENED);
+> >      }
+> >
+> > +end:
+> > +    if (local_err) {
+> > +        error_propagate(errp, local_err);
+> > +        if (chr) {
+> > +            if (id) {
+> > +                object_unparent(OBJECT(chr));
+> > +            } else {
+> > +                object_unref(OBJECT(chr));
+> > +            }
+>
+> Then here you do not have a parent object and you can do only unref...
+>
+> > +        }
+> > +        return NULL;
+> > +    }
+>
+> ... while here you do the object_property_add_child+object_unref.  The
+> object_property_add_child keeps the object alive, while object_unref
+> drops the reference originally returned by object_new.
+>
+> Paolo
+>
+> --
+Marc-Andr=C3=A9 Lureau
