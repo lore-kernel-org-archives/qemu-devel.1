@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57432)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cijbL-0008Jy-Qi
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:22:11 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cijdW-0001li-GV
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:24:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cijbF-00088M-Ho
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:22:07 -0500
-Date: Tue, 28 Feb 2017 10:21:55 -0500
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170228152155.GC15696@localhost.localdomain>
-References: <cover.1488254329.git.jcody@redhat.com>
-	<cover.1488254329.git.jcody@redhat.com>
-	<64a3308bbe51f78ccd2a53b30e8ba576e979ac4f.1488254329.git.jcody@redhat.com>
-	<874lzexskd.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <874lzexskd.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v3 5/5] block/rbd: add support for
- 'mon_host', 'auth_supported' via QAPI
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cijdT-0008UR-79
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:24:22 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45027)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cijdS-0008U1-Ut
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:24:19 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v1SFJnDY083404
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 10:24:17 -0500
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28w1xpceym-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 10:24:17 -0500
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Tue, 28 Feb 2017 15:24:14 -0000
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+Date: Tue, 28 Feb 2017 16:24:11 +0100
+Message-Id: <20170228152411.81609-1-cornelia.huck@de.ibm.com>
+Subject: [Qemu-devel] [PATCH] virtio: guard vring access when setting
+ notification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,300 +36,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, pbonzini@redhat.com, borntraeger@de.ibm.com, Cornelia Huck <cornelia.huck@de.ibm.com>
 
-On Tue, Feb 28, 2017 at 04:07:14PM +0100, Markus Armbruster wrote:
-> Jeff Cody <jcody@redhat.com> writes:
-> 
-> > This adds support for three additional options that may be specified
-> > by QAPI in blockdev-add:
-> >
-> >     server: host, port
-> >     auth method: either 'cephx' or 'none'
-> >
-> > The "server" and "auth-supported" QAPI parameters are arrays.  To conform
-> > with the rados API, the array items are join as a single string with a ';'
-> > character as a delimiter when setting the configuration values.
-> >
-> > Signed-off-by: Jeff Cody <jcody@redhat.com>
-> > ---
-> >  block/rbd.c          | 119 +++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  qapi/block-core.json |  29 +++++++++++++
-> >  2 files changed, 148 insertions(+)
-> >
-> > diff --git a/block/rbd.c b/block/rbd.c
-> > index cc43f42..dfa52cc 100644
-> > --- a/block/rbd.c
-> > +++ b/block/rbd.c
-> > @@ -405,6 +405,19 @@ static QemuOptsList runtime_opts = {
-> >              .type = QEMU_OPT_STRING,
-> >              .help = "Legacy rados key/value option parameters",
-> >          },
-> > +        {
-> > +            .name = "host",
-> > +            .type = QEMU_OPT_STRING,
-> > +        },
-> > +        {
-> > +            .name = "port",
-> > +            .type = QEMU_OPT_STRING,
-> > +        },
-> > +        {
-> > +            .name = "auth",
-> > +            .type = QEMU_OPT_STRING,
-> > +            .help = "Supported authentication method, either cephx or none",
-> > +        },
-> >          { /* end of list */ }
-> >      },
-> >  };
-> > @@ -565,14 +578,89 @@ static void qemu_rbd_complete_aio(RADOSCB *rcb)
-> >      qemu_aio_unref(acb);
-> >  }
-> >  
-> > +#define RBD_MON_HOST          0
-> > +#define RBD_AUTH_SUPPORTED    1
-> 
-> Blank line here, please.
->
+Switching to vring caches exposed an existing bug in
+virtio_queue_set_notification(): We can't access vring structures
+if they have not been set up yet. This may happen, for example,
+for virtio-blk devices with multiple queues: The code will try to
+switch notifiers for every queue, but the guest may have only set up
+a subset of them.
 
-OK
+Fix this by (1) guarding access to the vring memory by checking
+for vring.desc and (2) triggering an update to the vring flags
+for consistency with the configured notification state once the
+queue is actually configured.
 
-> > +static char *qemu_rbd_array_opts(QDict *options, const char *prefix, int type,
-> > +                                 Error **errp)
-> > +{
-> > +    size_t num_entries;
-> > +    QemuOpts *opts = NULL;
-> > +    QDict *sub_options;
-> > +    const char *host;
-> > +    const char *port;
-> > +    char *str;
-> > +    char *rados_str = NULL;
-> > +    Error *local_err = NULL;
-> > +
-> > +    assert(type == RBD_MON_HOST || type == RBD_AUTH_SUPPORTED);
-> > +
-> > +    num_entries = qdict_array_entries(options, prefix);
-> 
-> Can this fail?
-> 
+Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+---
+ hw/virtio/virtio.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
 
-Yes, I should check for < 0 for error.
-
-> > +
-> > +    if (num_entries) {
-> 
-> Superfluous conditional: if !num_entries, the loop rejects.
-> 
-
-Will drop.
-
-> > +        for (int i = 0; i < num_entries; i++) {
-> > +            char *tmp = NULL;
-> > +            const char *value;
-> > +            char *rados_str_tmp;
-> > +
-> > +            str = g_strdup_printf("%s%d.", prefix, i);
-> > +            qdict_extract_subqdict(options, &sub_options, str);
-> > +            g_free(str);
-> > +
-> > +            opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
-> > +            qemu_opts_absorb_qdict(opts, sub_options, &local_err);
-> > +            QDECREF(sub_options);
-> > +            if (local_err) {
-> > +                error_propagate(errp, local_err);
-> > +                goto exit;
-> 
-> Hmm.  Unless this is the first iteration, rados_str is already non-null,
-> i.e. we fail and return a string the caller must free.  That's bad
-> practice; it's better to return NULL on failre.
-> 
-
-OK
-
-> > +            }
-> > +
-> > +            if (type == RBD_MON_HOST) {
-> > +                host = qemu_opt_get(opts, "host");
-> > +                port = qemu_opt_get(opts, "port");
-> > +
-> > +                value = host;
-> > +                if (port) {
-> > +                    tmp = g_strdup_printf("%s:%s", host, port);
-> 
-> Problematic when @host is numeric IPv6.  What syntax does ceph expect in
-> that case?
-> 
-
-I think we will need to encapsulate that with a '[]' for ipv6.
-
-> > +                    value = tmp;
-> > +                }
-> > +            } else {
-> > +                value = qemu_opt_get(opts, "auth");
-> > +            }
-> > +
-> > +
-> > +            /* each iteration in the for loop will build upon the string,
-> > +             * and if rados_str is NULL then it is our first pass */
-> > +            if (rados_str) {
-> > +                /* separate options with ';', as that  is what rados_conf_set()
-> > +                 * requires */
-> > +                rados_str_tmp = rados_str;
-> > +                rados_str = g_strdup_printf("%s;%s", rados_str_tmp, value);
-> > +                g_free(rados_str_tmp);
-> 
-> I'd make rados_str a GString.  But your code isn't wrong.
-> 
-> > +            } else {
-> > +                rados_str = g_strdup(value);
-> > +            }
-> > +
-> > +            g_free(tmp);
-> 
-> Aha, @tmp is just for getting the g_strdup_printf() freed.  Rename to
-> strbuf?
-> 
-
-Sure
-
-> > +            qemu_opts_del(opts);
-> > +            opts = NULL;
-> > +        }
-> > +    }
-> > +
-> > +exit:
-> > +    qemu_opts_del(opts);
-> > +    return rados_str;
-> > +}
-> > +
-> >  static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-> >                           Error **errp)
-> >  {
-> >      BDRVRBDState *s = bs->opaque;
-> >      const char *pool, *snap, *conf, *clientname, *name, *keypairs;
-> > +    const char *auth_supported;
-> >      const char *secretid;
-> >      QemuOpts *opts;
-> >      Error *local_err = NULL;
-> > +    char *mon_host = NULL;
-> >      int r;
-> >  
-> >      opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
-> > @@ -583,6 +671,22 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-> >          return -EINVAL;
-> >      }
-> >  
-> > +   auth_supported = qemu_rbd_array_opts(options, "auth-supported.",
-> 
-> Indentation's off.
-> 
-
-OK, will fix
-
-> > +                                         RBD_AUTH_SUPPORTED, &local_err);
-> > +    if (local_err) {
-> > +        error_propagate(errp, local_err);
-> > +        r = -EINVAL;
-> > +        goto failed_opts;
-> > +    }
-> > +
-> > +    mon_host = qemu_rbd_array_opts(options, "server.",
-> > +                                   RBD_MON_HOST, &local_err);
-> > +    if (local_err) {
-> > +        error_propagate(errp, local_err);
-> > +        r = -EINVAL;
-> > +        goto failed_opts;
-> > +    }
-> > +
-> >      secretid = qemu_opt_get(opts, "password-secret");
-> >  
-> >      pool           = qemu_opt_get(opts, "pool");
-> > @@ -615,6 +719,20 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-> >          goto failed_shutdown;
-> >      }
-> >  
-> > +    if (mon_host) {
-> > +        r = rados_conf_set(s->cluster, "mon_host", mon_host);
-> > +        if (r < 0) {
-> > +            goto failed_shutdown;
-> > +        }
-> > +    }
-> > +
-> > +    if (auth_supported) {
-> > +        r = rados_conf_set(s->cluster, "auth_supported", auth_supported);
-> > +        if (r < 0) {
-> > +            goto failed_shutdown;
-> > +        }
-> > +    }
-> > +
-> >      if (qemu_rbd_set_auth(s->cluster, secretid, errp) < 0) {
-> >          r = -EIO;
-> >          goto failed_shutdown;
-> > @@ -663,6 +781,7 @@ failed_shutdown:
-> >      g_free(s->snap);
-> >  failed_opts:
-> >      qemu_opts_del(opts);
-> > +    g_free(mon_host);
-> 
-> Need to free auth_supported.
->
-
-Thanks
-
-> >      return r;
-> >  }
-> >  
-> > diff --git a/qapi/block-core.json b/qapi/block-core.json
-> > index f152953..5f74f92 100644
-> > --- a/qapi/block-core.json
-> > +++ b/qapi/block-core.json
-> > @@ -2666,6 +2666,28 @@
-> >              '*header-digest': 'IscsiHeaderDigest',
-> >              '*timeout': 'int' } }
-> >  
-> > +
-> > +##
-> > +# @RbdAuthSupport:
-> > +#
-> > +# An enumeration of RBD auth support
-> > +#
-> > +# Since: 2.9
-> > +##
-> > +{ 'enum': 'RbdAuthSupport',
-> > +  'data': [ 'cephx', 'none' ] }
-> > +
-> > +
-> > +##
-> > +# @RbdAuthMethod:
-> > +#
-> > +# An enumeration of rados auth_supported types
-> > +#
-> > +# Since: 2.9
-> > +##
-> > +{ 'struct': 'RbdAuthMethod',
-> > +  'data': { 'auth': 'RbdAuthSupport' } }
-> > +
-> >  ##
-> >  # @BlockdevOptionsRbd:
-> >  #
-> > @@ -2681,6 +2703,11 @@
-> >  #
-> >  # @user:               #optional Ceph id name.
-> >  #
-> > +# @server:             #optional Monitor host address and port.  This maps
-> > +#                      to the "mon_host" Ceph option.
-> > +#
-> > +# @auth-supported:     #optional Authentication supported.
-> > +#
-> >  # @password-secret:    #optional The ID of a QCryptoSecret object providing
-> >  #                      the password for the login.
-> >  #
-> > @@ -2692,6 +2719,8 @@
-> >              '*conf': 'str',
-> >              '*snapshot': 'str',
-> >              '*user': 'str',
-> > +            '*server': ['InetSocketAddress'],
-> > +            '*auth-supported': ['RbdAuthMethod'],
-> >              '*password-secret': 'str' } }
-> >  
-> >  ##
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index e487e36..d2ecd64 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -284,10 +284,11 @@ static inline void vring_set_avail_event(VirtQueue *vq, uint16_t val)
+     virtio_stw_phys_cached(vq->vdev, &caches->used, pa, val);
+ }
+ 
+-void virtio_queue_set_notification(VirtQueue *vq, int enable)
++static void vring_set_notification(VirtQueue *vq, int enable)
+ {
+-    vq->notification = enable;
+-
++    if (!vq->vring.desc) {
++        return;
++    }
+     rcu_read_lock();
+     if (virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX)) {
+         vring_set_avail_event(vq, vring_avail_idx(vq));
+@@ -303,6 +304,13 @@ void virtio_queue_set_notification(VirtQueue *vq, int enable)
+     rcu_read_unlock();
+ }
+ 
++void virtio_queue_set_notification(VirtQueue *vq, int enable)
++{
++    vq->notification = enable;
++
++    vring_set_notification(vq, enable);
++}
++
+ int virtio_queue_ready(VirtQueue *vq)
+ {
+     return vq->vring.avail != 0;
+@@ -1348,6 +1356,7 @@ void virtio_queue_set_addr(VirtIODevice *vdev, int n, hwaddr addr)
+ {
+     vdev->vq[n].vring.desc = addr;
+     virtio_queue_update_rings(vdev, n);
++    vring_set_notification(&vdev->vq[n], vdev->vq[n].notification);
+ }
+ 
+ hwaddr virtio_queue_get_addr(VirtIODevice *vdev, int n)
+@@ -1362,6 +1371,7 @@ void virtio_queue_set_rings(VirtIODevice *vdev, int n, hwaddr desc,
+     vdev->vq[n].vring.avail = avail;
+     vdev->vq[n].vring.used = used;
+     virtio_init_region_cache(vdev, n);
++    vring_set_notification(&vdev->vq[n], vdev->vq[n].notification);
+ }
+ 
+ void virtio_queue_set_num(VirtIODevice *vdev, int n, int num)
+-- 
+2.8.4
