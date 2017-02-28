@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cin6j-0001Yl-3V
+	(envelope-from <armbru@redhat.com>) id 1cin6j-0001Ys-3b
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:06:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cin6e-0006tD-W4
+	(envelope-from <armbru@redhat.com>) id 1cin6g-0006ux-LV
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:06:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47746)
+Received: from mx1.redhat.com ([209.132.183.28]:33082)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cin6e-0006sQ-RC
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:06:40 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cin6g-0006uA-Ez
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:06:42 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1862D4E4F3
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 19:06:41 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id AB0A2811A9
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 19:06:42 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
 	[10.36.116.55])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id D9F2F2D655
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 19:06:40 +0000 (UTC)
+	by int-mx13.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v1SJ6fwf013947
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=NO)
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 14:06:42 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 28 Feb 2017 20:06:23 +0100
-Message-Id: <1488308796-28832-14-git-send-email-armbru@redhat.com>
+Date: Tue, 28 Feb 2017 20:06:35 +0100
+Message-Id: <1488308796-28832-26-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488308796-28832-1-git-send-email-armbru@redhat.com>
 References: <1488308796-28832-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 13/26] qapi: Drop string input visitor method
- optional()
+Subject: [Qemu-devel] [PULL 25/26] qapi: Fix object input visit beyond end
+ of list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,67 +39,51 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-visit_optional() is to be called only between visit_start_struct() and
-visit_end_struct().  Visitors that don't support struct visits,
-i.e. don't implement start_struct(), end_struct(), have no use for it.
-Clarify documentation.
-
-The string input visitor doesn't support struct visits.  Its
-parse_optional() is therefore useless.  Drop it.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <1488303560-18803-14-git-send-email-armbru@redhat.com>
+Message-Id: <1488303560-18803-26-git-send-email-armbru@redhat.com>
 ---
- include/qapi/visitor-impl.h |  4 ++--
- qapi/string-input-visitor.c | 13 -------------
- 2 files changed, 2 insertions(+), 15 deletions(-)
+ qapi/qobject-input-visitor.c       | 11 ++++++++---
+ tests/test-qobject-input-visitor.c |  2 --
+ 2 files changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/include/qapi/visitor-impl.h b/include/qapi/visitor-impl.h
-index 8bd47ee..962ba1d 100644
---- a/include/qapi/visitor-impl.h
-+++ b/include/qapi/visitor-impl.h
-@@ -102,8 +102,8 @@ struct Visitor
-     /* Must be set to visit explicit null values.  */
-     void (*type_null)(Visitor *v, const char *name, Error **errp);
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index 34065ba..d192727 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -122,10 +122,15 @@ static QObject *qobject_input_try_get_object(QObjectInputVisitor *qiv,
+     } else {
+         assert(qobject_type(qobj) == QTYPE_QLIST);
+         assert(!name);
+-        ret = qlist_entry_obj(tos->entry);
+-        assert(ret);
++        if (tos->entry) {
++            ret = qlist_entry_obj(tos->entry);
++            if (consume) {
++                tos->entry = qlist_next(tos->entry);
++            }
++        } else {
++            ret = NULL;
++        }
+         if (consume) {
+-            tos->entry = qlist_next(tos->entry);
+             tos->index++;
+         }
+     }
+diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-input-visitor.c
+index 8011baa..94305f5 100644
+--- a/tests/test-qobject-input-visitor.c
++++ b/tests/test-qobject-input-visitor.c
+@@ -953,10 +953,8 @@ static void test_visitor_in_fail_list(TestInputVisitorData *data,
+     v = visitor_input_test_init(data, "[]");
  
--    /* Must be set for input visitors, optional otherwise.  The core
--     * takes care of the return type in the public interface. */
-+    /* Must be set for input visitors to visit structs, optional otherwise.
-+       The core takes care of the return type in the public interface. */
-     void (*optional)(Visitor *v, const char *name, bool *present);
- 
-     /* Must be set */
-diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.c
-index 8dfa561..1a855c5 100644
---- a/qapi/string-input-visitor.c
-+++ b/qapi/string-input-visitor.c
-@@ -314,18 +314,6 @@ static void parse_type_number(Visitor *v, const char *name, double *obj,
-     *obj = val;
+     visit_start_list(v, NULL, NULL, 0, &error_abort);
+-#if 0 /* FIXME crash */
+     visit_type_int(v, NULL, &i64, &err);
+     error_free_or_abort(&err);
+-#endif
+     visit_end_list(v, NULL);
  }
  
--static void parse_optional(Visitor *v, const char *name, bool *present)
--{
--    StringInputVisitor *siv = to_siv(v);
--
--    if (!siv->string) {
--        *present = false;
--        return;
--    }
--
--    *present = true;
--}
--
- static void string_input_free(Visitor *v)
- {
-     StringInputVisitor *siv = to_siv(v);
-@@ -351,7 +339,6 @@ Visitor *string_input_visitor_new(const char *str)
-     v->visitor.start_list = start_list;
-     v->visitor.next_list = next_list;
-     v->visitor.end_list = end_list;
--    v->visitor.optional = parse_optional;
-     v->visitor.free = string_input_free;
- 
-     v->string = str;
 -- 
 2.7.4
