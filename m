@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cihJi-0004wA-O1
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:55:48 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cihJj-0004x0-UE
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:55:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cihJh-0004WA-Av
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:55:46 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cihJi-0004Wh-MG
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:55:48 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 28 Feb 2017 13:54:20 +0100
-Message-Id: <1488286469-9381-36-git-send-email-kwolf@redhat.com>
+Date: Tue, 28 Feb 2017 13:54:21 +0100
+Message-Id: <1488286469-9381-37-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
 References: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 35/44] commit: Add filter-node-name to
- block-commit
+Subject: [Qemu-devel] [PATCH v3 36/44] hmp: Request permissions in qemu-io
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,210 +22,179 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-Management tools need to be able to know about every node in the graph
-and need a way to address them. Changing the graph structure was okay
-because libvirt doesn't really manage the node level yet, but future
-libvirt versions need to deal with both new and old version of qemu.
-
-This new option to blockdev-commit allows the client to set a node-name
-for the automatically inserted filter driver, and at the same time
-serves as a witness for a future libvirt that this version of qemu does
-automatically insert a filter driver.
+The HMP command 'qemu-io' is a bit tricky because it wants to work on
+the original BlockBackend, but additional permissions could be required.
+The details are explained in a comment in the code, but in summary, just
+request whatever permissions the current qemu-io command needs.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/commit.c            |  5 +++--
- block/mirror.c            |  3 ++-
- block/replication.c       |  2 +-
- blockdev.c                | 10 +++++++---
- include/block/block_int.h | 13 ++++++++++---
- qapi/block-core.json      |  8 +++++++-
- qemu-img.c                |  4 ++--
- 7 files changed, 32 insertions(+), 13 deletions(-)
+ block/block-backend.c          |  6 ++++++
+ hmp.c                          | 26 +++++++++++++++++++++++++-
+ include/qemu-io.h              |  1 +
+ include/sysemu/block-backend.h |  1 +
+ qemu-io-cmds.c                 | 28 ++++++++++++++++++++++++++++
+ 5 files changed, 61 insertions(+), 1 deletion(-)
 
-diff --git a/block/commit.c b/block/commit.c
-index f18026b..1e0f531 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -257,7 +257,7 @@ static BlockDriver bdrv_commit_top = {
- void commit_start(const char *job_id, BlockDriverState *bs,
-                   BlockDriverState *base, BlockDriverState *top, int64_t speed,
-                   BlockdevOnError on_error, const char *backing_file_str,
--                  Error **errp)
-+                  const char *filter_node_name, Error **errp)
- {
-     CommitBlockJob *s;
-     BlockReopenQueue *reopen_queue = NULL;
-@@ -310,7 +310,8 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 38a3858..daa7908 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -584,6 +584,12 @@ int blk_set_perm(BlockBackend *blk, uint64_t perm, uint64_t shared_perm,
+     return 0;
+ }
  
-     /* Insert commit_top block node above top, so we can block consistent read
-      * on the backing chain below it */
--    commit_top_bs = bdrv_new_open_driver(&bdrv_commit_top, NULL, 0, errp);
-+    commit_top_bs = bdrv_new_open_driver(&bdrv_commit_top, filter_node_name, 0,
-+                                         errp);
-     if (commit_top_bs == NULL) {
-         goto fail;
-     }
-diff --git a/block/mirror.c b/block/mirror.c
-index 5d6d9c5..9247ad9 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1246,6 +1246,7 @@ void mirror_start(const char *job_id, BlockDriverState *bs,
- void commit_active_start(const char *job_id, BlockDriverState *bs,
-                          BlockDriverState *base, int creation_flags,
-                          int64_t speed, BlockdevOnError on_error,
-+                         const char *filter_node_name,
-                          BlockCompletionFunc *cb, void *opaque, Error **errp,
-                          bool auto_complete)
++void blk_get_perm(BlockBackend *blk, uint64_t *perm, uint64_t *shared_perm)
++{
++    *perm = blk->perm;
++    *shared_perm = blk->shared_perm;
++}
++
+ static int blk_do_attach_dev(BlockBackend *blk, void *dev)
  {
-@@ -1262,7 +1263,7 @@ void commit_active_start(const char *job_id, BlockDriverState *bs,
-                      MIRROR_LEAVE_BACKING_CHAIN,
-                      on_error, on_error, true, cb, opaque, &local_err,
-                      &commit_active_job_driver, false, base, auto_complete,
--                     NULL);
-+                     filter_node_name);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         goto error_restore_flags;
-diff --git a/block/replication.c b/block/replication.c
-index 91465cb..22f170f 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -644,7 +644,7 @@ static void replication_stop(ReplicationState *rs, bool failover, Error **errp)
-         s->replication_state = BLOCK_REPLICATION_FAILOVER;
-         commit_active_start(NULL, s->active_disk->bs, s->secondary_disk->bs,
-                             BLOCK_JOB_INTERNAL, 0, BLOCKDEV_ON_ERROR_REPORT,
--                            replication_done, bs, errp, true);
-+                            NULL, replication_done, bs, errp, true);
-         break;
-     default:
-         aio_context_release(aio_context);
-diff --git a/blockdev.c b/blockdev.c
-index 5bd09f8..34b522b 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3031,6 +3031,7 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
-                       bool has_top, const char *top,
-                       bool has_backing_file, const char *backing_file,
-                       bool has_speed, int64_t speed,
-+                      bool has_filter_node_name, const char *filter_node_name,
-                       Error **errp)
- {
-     BlockDriverState *bs;
-@@ -3046,6 +3047,9 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
-     if (!has_speed) {
-         speed = 0;
-     }
-+    if (!has_filter_node_name) {
-+        filter_node_name = NULL;
-+    }
- 
-     /* Important Note:
-      *  libvirt relies on the DeviceNotFound error class in order to probe for
-@@ -3120,8 +3124,8 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
-             goto out;
-         }
-         commit_active_start(has_job_id ? job_id : NULL, bs, base_bs,
--                            BLOCK_JOB_DEFAULT, speed, on_error, NULL, NULL,
--                            &local_err, false);
-+                            BLOCK_JOB_DEFAULT, speed, on_error,
-+                            filter_node_name, NULL, NULL, &local_err, false);
-     } else {
-         BlockDriverState *overlay_bs = bdrv_find_overlay(bs, top_bs);
-         if (bdrv_op_is_blocked(overlay_bs, BLOCK_OP_TYPE_COMMIT_TARGET, errp)) {
-@@ -3129,7 +3133,7 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
-         }
-         commit_start(has_job_id ? job_id : NULL, bs, base_bs, top_bs, speed,
-                      on_error, has_backing_file ? backing_file : NULL,
--                     &local_err);
-+                     filter_node_name, &local_err);
-     }
-     if (local_err != NULL) {
-         error_propagate(errp, local_err);
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 563b30c..a57c0bf 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -780,13 +780,16 @@ void stream_start(const char *job_id, BlockDriverState *bs,
-  * @speed: The maximum speed, in bytes per second, or 0 for unlimited.
-  * @on_error: The action to take upon error.
-  * @backing_file_str: String to use as the backing file in @top's overlay
-+ * @filter_node_name: The node name that should be assigned to the filter
-+ * driver that the commit job inserts into the graph above @top. NULL means
-+ * that a node name should be autogenerated.
-  * @errp: Error object.
-  *
-  */
- void commit_start(const char *job_id, BlockDriverState *bs,
-                   BlockDriverState *base, BlockDriverState *top, int64_t speed,
-                   BlockdevOnError on_error, const char *backing_file_str,
--                  Error **errp);
-+                  const char *filter_node_name, Error **errp);
- /**
-  * commit_active_start:
-  * @job_id: The id of the newly-created job, or %NULL to use the
-@@ -797,6 +800,9 @@ void commit_start(const char *job_id, BlockDriverState *bs,
-  *                  See @BlockJobCreateFlags
-  * @speed: The maximum speed, in bytes per second, or 0 for unlimited.
-  * @on_error: The action to take upon error.
-+ * @filter_node_name: The node name that should be assigned to the filter
-+ * driver that the commit job inserts into the graph above @bs. NULL means that
-+ * a node name should be autogenerated.
-  * @cb: Completion function for the job.
-  * @opaque: Opaque pointer value passed to @cb.
-  * @errp: Error object.
-@@ -806,8 +812,9 @@ void commit_start(const char *job_id, BlockDriverState *bs,
- void commit_active_start(const char *job_id, BlockDriverState *bs,
-                          BlockDriverState *base, int creation_flags,
-                          int64_t speed, BlockdevOnError on_error,
--                         BlockCompletionFunc *cb,
--                         void *opaque, Error **errp, bool auto_complete);
-+                         const char *filter_node_name,
-+                         BlockCompletionFunc *cb, void *opaque, Error **errp,
-+                         bool auto_complete);
- /*
-  * mirror_start:
-  * @job_id: The id of the newly-created job, or %NULL to use the
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 63cb86c..fcf80eb 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1304,6 +1304,11 @@
- #
- # @speed:  #optional the maximum speed, in bytes per second
- #
-+# @filter-node-name: #optional the node name that should be assigned to the
-+#                    filter driver that the commit job inserts into the graph
-+#                    above @top. If this option is not given, a node name is
-+#                    autogenerated. (Since: 2.9)
-+#
- # Returns: Nothing on success
- #          If commit or stream is already active on this device, DeviceInUse
- #          If @device does not exist, DeviceNotFound
-@@ -1323,7 +1328,8 @@
- ##
- { 'command': 'block-commit',
-   'data': { '*job-id': 'str', 'device': 'str', '*base': 'str', '*top': 'str',
--            '*backing-file': 'str', '*speed': 'int' } }
-+            '*backing-file': 'str', '*speed': 'int',
-+            '*filter-node-name': 'str' } }
- 
- ##
- # @drive-backup:
-diff --git a/qemu-img.c b/qemu-img.c
-index d629e71..7972dd4 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -953,8 +953,8 @@ static int img_commit(int argc, char **argv)
-     aio_context = bdrv_get_aio_context(bs);
+     if (blk->dev) {
+diff --git a/hmp.c b/hmp.c
+index e219f97..7b44e64 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -2051,7 +2051,6 @@ void hmp_qemu_io(Monitor *mon, const QDict *qdict)
+     if (!blk) {
+         BlockDriverState *bs = bdrv_lookup_bs(NULL, device, &err);
+         if (bs) {
+-            /* FIXME Use real permissions */
+             blk = local_blk = blk_new(0, BLK_PERM_ALL);
+             ret = blk_insert_bs(blk, bs, &err);
+             if (ret < 0) {
+@@ -2065,6 +2064,31 @@ void hmp_qemu_io(Monitor *mon, const QDict *qdict)
+     aio_context = blk_get_aio_context(blk);
      aio_context_acquire(aio_context);
-     commit_active_start("commit", bs, base_bs, BLOCK_JOB_DEFAULT, 0,
--                        BLOCKDEV_ON_ERROR_REPORT, common_block_job_cb, &cbi,
--                        &local_err, false);
-+                        BLOCKDEV_ON_ERROR_REPORT, NULL, common_block_job_cb,
-+                        &cbi, &local_err, false);
+ 
++    /*
++     * Notably absent: Proper permission management. This is sad, but it seems
++     * almost impossible to achieve without changing the semantics and thereby
++     * limiting the use cases of the qemu-io HMP command.
++     *
++     * In an ideal world we would unconditionally create a new BlockBackend for
++     * qemuio_command(), but we have commands like 'reopen' and want them to
++     * take effect on the exact BlockBackend whose name the user passed instead
++     * of just on a temporary copy of it.
++     *
++     * Another problem is that deleting the temporary BlockBackend involves
++     * draining all requests on it first, but some qemu-iotests cases want to
++     * issue multiple aio_read/write requests and expect them to complete in
++     * the background while the monitor has already returned.
++     *
++     * This is also what prevents us from saving the original permissions and
++     * restoring them later: We can't revoke permissions until all requests
++     * have completed, and we don't know when that is nor can we really let
++     * anything else run before we have revoken them to avoid race conditions.
++     *
++     * What happens now is that command() in qemu-io-cmds.c can extend the
++     * permissions if necessary for the qemu-io command. And they simply stay
++     * extended, possibly resulting in a read-only guest device keeping write
++     * permissions. Ugly, but it appears to be the lesser evil.
++     */
+     qemuio_command(blk, command);
+ 
      aio_context_release(aio_context);
-     if (local_err) {
-         goto done;
+diff --git a/include/qemu-io.h b/include/qemu-io.h
+index 4d402b9..196fde0 100644
+--- a/include/qemu-io.h
++++ b/include/qemu-io.h
+@@ -36,6 +36,7 @@ typedef struct cmdinfo {
+     const char  *args;
+     const char  *oneline;
+     helpfunc_t  help;
++    uint64_t    perm;
+ } cmdinfo_t;
+ 
+ extern bool qemuio_misalign;
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
+index b23f683..096c17f 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -107,6 +107,7 @@ bool bdrv_has_blk(BlockDriverState *bs);
+ bool bdrv_is_root_node(BlockDriverState *bs);
+ int blk_set_perm(BlockBackend *blk, uint64_t perm, uint64_t shared_perm,
+                  Error **errp);
++void blk_get_perm(BlockBackend *blk, uint64_t *perm, uint64_t *shared_perm);
+ 
+ void blk_set_allow_write_beyond_eof(BlockBackend *blk, bool allow);
+ void blk_iostatus_enable(BlockBackend *blk);
+diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+index 7ac1576..2c48f9c 100644
+--- a/qemu-io-cmds.c
++++ b/qemu-io-cmds.c
+@@ -83,6 +83,29 @@ static int command(BlockBackend *blk, const cmdinfo_t *ct, int argc,
+         }
+         return 0;
+     }
++
++    /* Request additional permissions if necessary for this command. The caller
++     * is responsible for restoring the original permissions afterwards if this
++     * is what it wants. */
++    if (ct->perm && blk_is_available(blk)) {
++        uint64_t orig_perm, orig_shared_perm;
++        blk_get_perm(blk, &orig_perm, &orig_shared_perm);
++
++        if (ct->perm & ~orig_perm) {
++            uint64_t new_perm;
++            Error *local_err = NULL;
++            int ret;
++
++            new_perm = orig_perm | ct->perm;
++
++            ret = blk_set_perm(blk, new_perm, orig_shared_perm, &local_err);
++            if (ret < 0) {
++                error_report_err(local_err);
++                return 0;
++            }
++        }
++    }
++
+     optind = 0;
+     return ct->cfunc(blk, argc, argv);
+ }
+@@ -918,6 +941,7 @@ static const cmdinfo_t write_cmd = {
+     .name       = "write",
+     .altname    = "w",
+     .cfunc      = write_f,
++    .perm       = BLK_PERM_WRITE,
+     .argmin     = 2,
+     .argmax     = -1,
+     .args       = "[-bcCfquz] [-P pattern] off len",
+@@ -1093,6 +1117,7 @@ static int writev_f(BlockBackend *blk, int argc, char **argv);
+ static const cmdinfo_t writev_cmd = {
+     .name       = "writev",
+     .cfunc      = writev_f,
++    .perm       = BLK_PERM_WRITE,
+     .argmin     = 2,
+     .argmax     = -1,
+     .args       = "[-Cfq] [-P pattern] off len [len..]",
+@@ -1392,6 +1417,7 @@ static int aio_write_f(BlockBackend *blk, int argc, char **argv);
+ static const cmdinfo_t aio_write_cmd = {
+     .name       = "aio_write",
+     .cfunc      = aio_write_f,
++    .perm       = BLK_PERM_WRITE,
+     .argmin     = 2,
+     .argmax     = -1,
+     .args       = "[-Cfiquz] [-P pattern] off len [len..]",
+@@ -1556,6 +1582,7 @@ static const cmdinfo_t truncate_cmd = {
+     .name       = "truncate",
+     .altname    = "t",
+     .cfunc      = truncate_f,
++    .perm       = BLK_PERM_WRITE | BLK_PERM_RESIZE,
+     .argmin     = 1,
+     .argmax     = 1,
+     .args       = "off",
+@@ -1653,6 +1680,7 @@ static const cmdinfo_t discard_cmd = {
+     .name       = "discard",
+     .altname    = "d",
+     .cfunc      = discard_f,
++    .perm       = BLK_PERM_WRITE,
+     .argmin     = 2,
+     .argmax     = -1,
+     .args       = "[-Cq] off len",
 -- 
 1.8.3.1
