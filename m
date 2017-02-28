@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36274)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cipIs-0007Yr-RH
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 16:27:28 -0500
+	(envelope-from <armbru@redhat.com>) id 1cipIm-0007Qv-7Q
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 16:27:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cipIq-0000yF-Dk
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 16:27:26 -0500
+	(envelope-from <armbru@redhat.com>) id 1cipIk-0000sb-On
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 16:27:20 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 28 Feb 2017 22:27:08 +0100
-Message-Id: <1488317230-26248-23-git-send-email-armbru@redhat.com>
+Date: Tue, 28 Feb 2017 22:26:47 +0100
+Message-Id: <1488317230-26248-2-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488317230-26248-1-git-send-email-armbru@redhat.com>
 References: <1488317230-26248-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 22/24] qapi: Improve how keyval input
- visitor reports unexpected dicts
+Subject: [Qemu-devel] [PATCH v2 01/24] test-qemu-opts: Cover
+ qemu_opts_parse() of "no"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,80 +23,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com, eblake@redhat.com, mdroth@linux.vnet.ibm.com
 
-Incorrect option
-
-    -blockdev node-name=foo,driver=file,filename=foo.img,aio.unmap=on
-
-is rejected with "Invalid parameter type for 'aio', expected: string".
-To make sense of this, you almost have to translate it into the
-equivalent QMP command
-
-    { "execute": "blockdev-add", "arguments": { "node-name": "foo", "driver": "file", "filename": "foo.img", "aio": { "unmap": true } } }
-
-Improve the error message to "Parameters 'aio.*' are unexpected".
-Take care not to confuse the case "unexpected nested parameters"
-(i.e. the object is a QDict or QList) with the case "non-string scalar
-parameter".  The latter is a misuse of the visitor, and should perhaps
-be an assertion.  Note that test-qobject-input-visitor exercises this
-misuse in test_visitor_in_int_keyval(), test_visitor_in_bool_keyval()
-and test_visitor_in_number_keyval().
+qemu_opts_parse() interprets "no" as negated empty key.  Consistent
+with its acceptance of empty keys elsewhere, whatever that's worth.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qapi/qobject-input-visitor.c | 26 ++++++++++++++++++++++----
- 1 file changed, 22 insertions(+), 4 deletions(-)
+ tests/test-qemu-opts.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
-index 1a484d5..b9acd86 100644
---- a/qapi/qobject-input-visitor.c
-+++ b/qapi/qobject-input-visitor.c
-@@ -167,9 +167,18 @@ static const char *qobject_input_get_keyval(QObjectInputVisitor *qiv,
+diff --git a/tests/test-qemu-opts.c b/tests/test-qemu-opts.c
+index c46ef31..f6310b3 100644
+--- a/tests/test-qemu-opts.c
++++ b/tests/test-qemu-opts.c
+@@ -532,6 +532,11 @@ static void test_opts_parse(void)
+     g_assert_cmpstr(qemu_opt_get(opts, "aus"), ==, "off");
+     g_assert_cmpstr(qemu_opt_get(opts, "noaus"), ==, "");
  
-     qstr = qobject_to_qstring(qobj);
-     if (!qstr) {
--        error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
--                   full_name(qiv, name), "string");
--        return NULL;
-+        switch (qobject_type(qobj)) {
-+        case QTYPE_QDICT:
-+        case QTYPE_QLIST:
-+            error_setg(errp, "Parameters '%s.*' are unexpected",
-+                       full_name(qiv, name));
-+            return NULL;
-+        default:
-+            /* Non-string scalar (should this be an assertion?) */
-+            error_setg(errp, "Internal error: parameter %s invalid",
-+                       full_name(qiv, name));
-+            return NULL;
-+        }
-     }
- 
-     return qstring_get_str(qstr);
-@@ -479,6 +488,15 @@ static void qobject_input_type_str(Visitor *v, const char *name, char **obj,
-     *obj = g_strdup(qstring_get_str(qstr));
- }
- 
-+static void qobject_input_type_str_keyval(Visitor *v, const char *name,
-+                                          char **obj, Error **errp)
-+{
-+    QObjectInputVisitor *qiv = to_qiv(v);
-+    const char *str = qobject_input_get_keyval(qiv, name, errp);
++    /* Implied value, negated empty key */
++    opts = qemu_opts_parse(&opts_list_03, "no", false, &error_abort);
++    g_assert_cmpuint(opts_count(opts), ==, 1);
++    g_assert_cmpstr(qemu_opt_get(opts, ""), ==, "off");
 +
-+    *obj = g_strdup(str);
-+}
-+
- static void qobject_input_type_number(Visitor *v, const char *name, double *obj,
-                                       Error **errp)
- {
-@@ -650,7 +668,7 @@ Visitor *qobject_input_visitor_new_keyval(QObject *obj)
-     v->visitor.type_int64 = qobject_input_type_int64_keyval;
-     v->visitor.type_uint64 = qobject_input_type_uint64_keyval;
-     v->visitor.type_bool = qobject_input_type_bool_keyval;
--    v->visitor.type_str = qobject_input_type_str;
-+    v->visitor.type_str = qobject_input_type_str_keyval;
-     v->visitor.type_number = qobject_input_type_number_keyval;
-     v->visitor.type_any = qobject_input_type_any;
-     v->visitor.type_null = qobject_input_type_null;
+     /* Implied key */
+     opts = qemu_opts_parse(&opts_list_03, "an,noaus,noaus=", true,
+                            &error_abort);
 -- 
 2.7.4
