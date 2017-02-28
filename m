@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40988)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cimsQ-0004il-9j
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 13:51:59 -0500
+	(envelope-from <armbru@redhat.com>) id 1cimsf-00050h-Hm
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 13:52:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cimsP-00084b-3X
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 13:51:58 -0500
+	(envelope-from <armbru@redhat.com>) id 1cimse-0008Ax-PD
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 13:52:13 -0500
+From: Markus Armbruster <armbru@redhat.com>
 References: <1488194450-28056-1-git-send-email-armbru@redhat.com>
-	<1488194450-28056-4-git-send-email-armbru@redhat.com>
-	<20170228154836.GF4090@noname.redhat.com>
-	<a7bf9848-a8a1-718c-9dd7-4f2d1659cbe1@redhat.com>
-	<87d1e2p4zw.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <880a5146-13ef-bd7e-7fb8-02fb7fb663b2@redhat.com>
-Date: Tue, 28 Feb 2017 12:51:49 -0600
+	<1488194450-28056-20-git-send-email-armbru@redhat.com>
+	<20170228175142.GU4090@noname.redhat.com>
+Date: Tue, 28 Feb 2017 19:52:05 +0100
+In-Reply-To: <20170228175142.GU4090@noname.redhat.com> (Kevin Wolf's message
+	of "Tue, 28 Feb 2017 18:51:42 +0100")
+Message-ID: <87a896jgh6.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <87d1e2p4zw.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="4RfDWnmRU665lKDuw8hDr9cWr4lg8cVkk"
-Subject: Re: [Qemu-devel] [PATCH 03/24] keyval: New keyval_parse()
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 19/24] qapi: Improve how keyval input
+ visitor reports unexpected dicts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,158 +25,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, pkrempa@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: pkrempa@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---4RfDWnmRU665lKDuw8hDr9cWr4lg8cVkk
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, pkrempa@redhat.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
-Message-ID: <880a5146-13ef-bd7e-7fb8-02fb7fb663b2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 03/24] keyval: New keyval_parse()
-References: <1488194450-28056-1-git-send-email-armbru@redhat.com>
- <1488194450-28056-4-git-send-email-armbru@redhat.com>
- <20170228154836.GF4090@noname.redhat.com>
- <a7bf9848-a8a1-718c-9dd7-4f2d1659cbe1@redhat.com>
- <87d1e2p4zw.fsf@dusky.pond.sub.org>
-In-Reply-To: <87d1e2p4zw.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Kevin Wolf <kwolf@redhat.com> writes:
 
-On 02/28/2017 12:03 PM, Markus Armbruster wrote:
-> Eric Blake <eblake@redhat.com> writes:
->=20
->> On 02/28/2017 09:48 AM, Kevin Wolf wrote:
->>> Am 27.02.2017 um 12:20 hat Markus Armbruster geschrieben:
->>>> keyval_parse() parses KEY=3DVALUE,... into a QDict.  Works like
->>>> qemu_opts_parse(), except:
->>>>
->>
->>>> +
->>>> +/*
->>>> + * KEY=3DVALUE,... syntax:
->>>> + *
->>>> + *   key-vals     =3D [ key-val { ',' key-vals } ]
->>
->> Just refreshing my memory: in this grammar, [] means optional (0 or 1)=
-,
->> and {} means repeating (0 or more).
->=20
-> Yes.
->=20
->> That means an empty string satisfies key-vals (as in "-option ''"),
->> intentional?
->=20
-> Yes.  Creates an empty root object.  If we don't want that, or don't
-> want it now, I can make this case an error.
+> Am 27.02.2017 um 12:20 hat Markus Armbruster geschrieben:
+>> Incorrect option
+>> 
+>>     -blockdev node-name=foo,driver=file,filename=foo.img,aio.unmap
+>> 
+>> is rejected with "Invalid parameter type for 'aio', expected: string".
+>> To make sense of this, you almost have to translate it into the
+>> equivalent QMP command
+>> 
+>>     { "execute": "blockdev-add", "arguments": { "node-name": "foo", "driver": "file", "filename": "foo.img", "aio": { "unmap": true } } }
+>> 
+>> Improve the error message to "Parameters 'aio.*' are unexpected".
+>
+> In fact, what I get (after fixing the previous review comments that
+> would make it crash) is "Expected '=' after parameter 'aio.unmap'". Only
+> if I add a value, I get the newly added message.
 
-Making it an error now, with the ability to relax it later, would be in
-line with the fact that dotted notation cannot create an empty
-sub-element.  Supporting it now means we're stuck with it even if we
-decide the empty string could have usefully meant something else
-(although what else is useful besides an empty root object is beyond me).=
+Fallout from ditching implied value sugar some time after this commit
+message was written.  Will fix.
 
+> Doesn't make the patch less correct, though.
+>
+>> Take care not to confuse the case "unexpected nested parameters"
+>> (i.e. the object is a QDict or QList) with the case "non-string scalar
+>> parameter".  The latter is a misuse of the visitor, and should perhaps
+>> be an assertion.  Note that test-qobject-input-visitor exercises this
+>> misuse in test_visitor_in_int_keyval(), test_visitor_in_bool_keyval()
+>> and test_visitor_in_number_keyval().
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>
+> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 
->=20
->> I don't see how this permits a trailing comma, but isn't that one of
->> your goals to allow "-option key=3Dval," the same as "-option key=3Dva=
-l"?
->=20
-> Mistake.  Possible fix:
->=20
->           key-vals     =3D [ key-val { ',' key-val } [ ',' ]
-
-Unbalanced [].  I think you meant:
-
-key-vals =3D [ key-val { ',' key-val } [ ',' ] ]
-
-which properly rejects "-option ," while allowing "-option key=3Dval,".
-
-
->=20
->>>> + *   key-val      =3D key '=3D' val
->>>> + *   key          =3D key-fragment { '.' key-fragment }
->>
->> Ambiguous.
->=20
-> I'm dense.  Can you give me an example string with two derivations?
-
-Sorry, poor editing on my part. (I wrote that before I figured out that
-{} meant 0 or more, then forgot to clean it up).  Looks like this one is
-well-formed after all.
-
->=20
->>>> + *   key-fragment =3D / [^=3D,.]* /
->>
->> Do you want + instead of * in the regex, so as to require a non-empty
->> string for key-fragment?  After all, you want to reject "-option a..b=3D=
-val".
->=20
-> I like to keep syntactic and semantic analysis conceptually separate.
-> keyval_parse() looks for the next '.' to extract a key-fragment
-> (syntactic analysis).  It then rejects key-fragments it doesn't like
-> (semantic analysis).  Right now, it only dislikes lengths outside
-> [1,127].  Later on, it'll additionally dislike key-fragments that are
-> neither valid QAPI names nor digit strings.
->=20
-> Perhaps my comment could explain this better.
-
-Yes, a comment would help (then keeping the grammar accepting a 0-length
-string doesn't hurt, because the semantic analysis kicks in).
-
-
->>>> + *
->>>> + * Semantics defined by reduction to JSON:
->>>> + *
->>>> + *   key-vals defines a tree of objects rooted at R
->>>> + *   where for each key-val =3D key-fragment . ... =3D val in key-v=
-als
->>>> + *       R op key-fragment op ... =3D val'
->>>> + *       where (left-associative) op is member reference L.key-frag=
-ment
->>>
->>> Maybe it's just me, but I can't say that I fully understand what thes=
-e
->>> last two lines are supposed to tell me.
->>
->> I think it's trying to portray dictionary member lookup semantics (eac=
-h
->> key-fragment represents another member lookup one dictionary deeper,
->> before reaching the final lookup to the scalar value) - but yeah, it w=
-as
->> a confusing read to me as well.
->=20
-> We're in a bit of a time squeeze right now.  I'd like to clarify the
-> comment on top.
-
-That's fair.  A poor comment isn't code, so fixing it in soft freeze is
-fine.  Maybe a FIXME is still appropriate, if we don't want to forget
-it, but I trust your judgment on this one.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---4RfDWnmRU665lKDuw8hDr9cWr4lg8cVkk
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYtcbFAAoJEKeha0olJ0NqBnUH/3JVfEzJJfYt706j93WW0DLB
-9+vGMLwKXDn/+MNOIOLghvdklqb+Q9W8r5lfuoe/3rQA4g3AAnkHm83XO3wjdEh+
-j0TUwqNuA4ROtov3vQ3SMU3rMUCQglNm79w7v/5Lcf7aGATTykxaKHYJsjhMwfo5
-xah28yub7IDbIV/oilW+5a+zlBbQSFiMK2gOui/JWHPKRhmSFsYB0D+MOakwAumf
-k9LP9jqMtFpQUeqJMNppxYQHHk9UujRbGI5bWGirpOSOxiHfmFc4uLFwtDrDNAK/
-HUy82cFWF2zk3yd30qRMKsThh1IJ1zwey2XpObYb0Vtre/zrWPnEZ8Oz5ALV7Ko=
-=bZ/0
------END PGP SIGNATURE-----
-
---4RfDWnmRU665lKDuw8hDr9cWr4lg8cVkk--
+Thanks!
