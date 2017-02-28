@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cioX8-0006Zl-Qy
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:38:08 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cioXA-0006bA-07
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:38:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cioX7-00084g-7u
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:38:06 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cioX8-00085M-AN
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:38:08 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 28 Feb 2017 21:36:35 +0100
-Message-Id: <1488314205-16264-37-git-send-email-kwolf@redhat.com>
+Date: Tue, 28 Feb 2017 21:36:36 +0100
+Message-Id: <1488314205-16264-38-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1488314205-16264-1-git-send-email-kwolf@redhat.com>
 References: <1488314205-16264-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 36/46] mirror: Add filter-node-name to
- blockdev-mirror
+Subject: [Qemu-devel] [PULL 37/46] commit: Add filter-node-name to
+ block-commit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,180 +28,207 @@ and need a way to address them. Changing the graph structure was okay
 because libvirt doesn't really manage the node level yet, but future
 libvirt versions need to deal with both new and old version of qemu.
 
-This new option to blockdev-mirror allows the client to set a node-name
+This new option to blockdev-commit allows the client to set a node-name
 for the automatically inserted filter driver, and at the same time
 serves as a witness for a future libvirt that this version of qemu does
 automatically insert a filter driver.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 Acked-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/mirror.c            | 14 ++++++++------
- blockdev.c                | 12 +++++++++++-
- include/block/block_int.h |  5 ++++-
+ block/commit.c            |  5 +++--
+ block/mirror.c            |  3 ++-
+ block/replication.c       |  2 +-
+ blockdev.c                | 10 +++++++---
+ include/block/block_int.h | 13 ++++++++++---
  qapi/block-core.json      |  8 +++++++-
- 4 files changed, 30 insertions(+), 9 deletions(-)
+ qemu-img.c                |  4 ++--
+ 7 files changed, 32 insertions(+), 13 deletions(-)
 
+diff --git a/block/commit.c b/block/commit.c
+index f18026b..1e0f531 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -257,7 +257,7 @@ static BlockDriver bdrv_commit_top = {
+ void commit_start(const char *job_id, BlockDriverState *bs,
+                   BlockDriverState *base, BlockDriverState *top, int64_t speed,
+                   BlockdevOnError on_error, const char *backing_file_str,
+-                  Error **errp)
++                  const char *filter_node_name, Error **errp)
+ {
+     CommitBlockJob *s;
+     BlockReopenQueue *reopen_queue = NULL;
+@@ -310,7 +310,8 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+ 
+     /* Insert commit_top block node above top, so we can block consistent read
+      * on the backing chain below it */
+-    commit_top_bs = bdrv_new_open_driver(&bdrv_commit_top, NULL, 0, errp);
++    commit_top_bs = bdrv_new_open_driver(&bdrv_commit_top, filter_node_name, 0,
++                                         errp);
+     if (commit_top_bs == NULL) {
+         goto fail;
+     }
 diff --git a/block/mirror.c b/block/mirror.c
-index 40e8bcc..f6d988d 100644
+index f6d988d..869212d 100644
 --- a/block/mirror.c
 +++ b/block/mirror.c
-@@ -1088,7 +1088,7 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
-                              void *opaque, Error **errp,
-                              const BlockJobDriver *driver,
-                              bool is_none_mode, BlockDriverState *base,
--                             bool auto_complete)
-+                             bool auto_complete, const char *filter_node_name)
- {
-     MirrorBlockJob *s;
-     BlockDriverState *mirror_top_bs;
-@@ -1114,8 +1114,8 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
-     /* In the case of active commit, add dummy driver to provide consistent
-      * reads on the top, while disabling it in the intermediate nodes, and make
-      * the backing chain writable. */
--    mirror_top_bs = bdrv_new_open_driver(&bdrv_mirror_top, NULL, BDRV_O_RDWR,
--                                         errp);
-+    mirror_top_bs = bdrv_new_open_driver(&bdrv_mirror_top, filter_node_name,
-+                                         BDRV_O_RDWR, errp);
-     if (mirror_top_bs == NULL) {
-         return;
-     }
-@@ -1225,7 +1225,7 @@ void mirror_start(const char *job_id, BlockDriverState *bs,
-                   MirrorSyncMode mode, BlockMirrorBackingMode backing_mode,
-                   BlockdevOnError on_source_error,
-                   BlockdevOnError on_target_error,
--                  bool unmap, Error **errp)
-+                  bool unmap, const char *filter_node_name, Error **errp)
- {
-     bool is_none_mode;
-     BlockDriverState *base;
-@@ -1239,7 +1239,8 @@ void mirror_start(const char *job_id, BlockDriverState *bs,
-     mirror_start_job(job_id, bs, BLOCK_JOB_DEFAULT, target, replaces,
-                      speed, granularity, buf_size, backing_mode,
-                      on_source_error, on_target_error, unmap, NULL, NULL, errp,
--                     &mirror_job_driver, is_none_mode, base, false);
-+                     &mirror_job_driver, is_none_mode, base, false,
-+                     filter_node_name);
- }
- 
+@@ -1246,6 +1246,7 @@ void mirror_start(const char *job_id, BlockDriverState *bs,
  void commit_active_start(const char *job_id, BlockDriverState *bs,
-@@ -1260,7 +1261,8 @@ void commit_active_start(const char *job_id, BlockDriverState *bs,
-     mirror_start_job(job_id, bs, creation_flags, base, NULL, speed, 0, 0,
+                          BlockDriverState *base, int creation_flags,
+                          int64_t speed, BlockdevOnError on_error,
++                         const char *filter_node_name,
+                          BlockCompletionFunc *cb, void *opaque, Error **errp,
+                          bool auto_complete)
+ {
+@@ -1262,7 +1263,7 @@ void commit_active_start(const char *job_id, BlockDriverState *bs,
                       MIRROR_LEAVE_BACKING_CHAIN,
                       on_error, on_error, true, cb, opaque, &local_err,
--                     &commit_active_job_driver, false, base, auto_complete);
-+                     &commit_active_job_driver, false, base, auto_complete,
-+                     NULL);
+                      &commit_active_job_driver, false, base, auto_complete,
+-                     NULL);
++                     filter_node_name);
      if (local_err) {
          error_propagate(errp, local_err);
          goto error_restore_flags;
+diff --git a/block/replication.c b/block/replication.c
+index 91465cb..22f170f 100644
+--- a/block/replication.c
++++ b/block/replication.c
+@@ -644,7 +644,7 @@ static void replication_stop(ReplicationState *rs, bool failover, Error **errp)
+         s->replication_state = BLOCK_REPLICATION_FAILOVER;
+         commit_active_start(NULL, s->active_disk->bs, s->secondary_disk->bs,
+                             BLOCK_JOB_INTERNAL, 0, BLOCKDEV_ON_ERROR_REPORT,
+-                            replication_done, bs, errp, true);
++                            NULL, replication_done, bs, errp, true);
+         break;
+     default:
+         aio_context_release(aio_context);
 diff --git a/blockdev.c b/blockdev.c
-index 0a0226b..e592180 100644
+index e592180..ff781d9 100644
 --- a/blockdev.c
 +++ b/blockdev.c
-@@ -3366,6 +3366,8 @@ static void blockdev_mirror_common(const char *job_id, BlockDriverState *bs,
-                                    bool has_on_target_error,
-                                    BlockdevOnError on_target_error,
-                                    bool has_unmap, bool unmap,
-+                                   bool has_filter_node_name,
-+                                   const char *filter_node_name,
-                                    Error **errp)
+@@ -3032,6 +3032,7 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
+                       bool has_top, const char *top,
+                       bool has_backing_file, const char *backing_file,
+                       bool has_speed, int64_t speed,
++                      bool has_filter_node_name, const char *filter_node_name,
+                       Error **errp)
  {
- 
-@@ -3387,6 +3389,9 @@ static void blockdev_mirror_common(const char *job_id, BlockDriverState *bs,
-     if (!has_unmap) {
-         unmap = true;
+     BlockDriverState *bs;
+@@ -3047,6 +3048,9 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
+     if (!has_speed) {
+         speed = 0;
      }
 +    if (!has_filter_node_name) {
 +        filter_node_name = NULL;
 +    }
  
-     if (granularity != 0 && (granularity < 512 || granularity > 1048576 * 64)) {
-         error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "granularity",
-@@ -3416,7 +3421,8 @@ static void blockdev_mirror_common(const char *job_id, BlockDriverState *bs,
-     mirror_start(job_id, bs, target,
-                  has_replaces ? replaces : NULL,
-                  speed, granularity, buf_size, sync, backing_mode,
--                 on_source_error, on_target_error, unmap, errp);
-+                 on_source_error, on_target_error, unmap, filter_node_name,
-+                 errp);
- }
- 
- void qmp_drive_mirror(DriveMirror *arg, Error **errp)
-@@ -3554,6 +3560,7 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
-                            arg->has_on_source_error, arg->on_source_error,
-                            arg->has_on_target_error, arg->on_target_error,
-                            arg->has_unmap, arg->unmap,
-+                           false, NULL,
-                            &local_err);
-     bdrv_unref(target_bs);
-     error_propagate(errp, local_err);
-@@ -3572,6 +3579,8 @@ void qmp_blockdev_mirror(bool has_job_id, const char *job_id,
-                          BlockdevOnError on_source_error,
-                          bool has_on_target_error,
-                          BlockdevOnError on_target_error,
-+                         bool has_filter_node_name,
-+                         const char *filter_node_name,
-                          Error **errp)
- {
-     BlockDriverState *bs;
-@@ -3603,6 +3612,7 @@ void qmp_blockdev_mirror(bool has_job_id, const char *job_id,
-                            has_on_source_error, on_source_error,
-                            has_on_target_error, on_target_error,
-                            true, true,
-+                           has_filter_node_name, filter_node_name,
-                            &local_err);
-     error_propagate(errp, local_err);
- 
+     /* Important Note:
+      *  libvirt relies on the DeviceNotFound error class in order to probe for
+@@ -3121,8 +3125,8 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
+             goto out;
+         }
+         commit_active_start(has_job_id ? job_id : NULL, bs, base_bs,
+-                            BLOCK_JOB_DEFAULT, speed, on_error, NULL, NULL,
+-                            &local_err, false);
++                            BLOCK_JOB_DEFAULT, speed, on_error,
++                            filter_node_name, NULL, NULL, &local_err, false);
+     } else {
+         BlockDriverState *overlay_bs = bdrv_find_overlay(bs, top_bs);
+         if (bdrv_op_is_blocked(overlay_bs, BLOCK_OP_TYPE_COMMIT_TARGET, errp)) {
+@@ -3130,7 +3134,7 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
+         }
+         commit_start(has_job_id ? job_id : NULL, bs, base_bs, top_bs, speed,
+                      on_error, has_backing_file ? backing_file : NULL,
+-                     &local_err);
++                     filter_node_name, &local_err);
+     }
+     if (local_err != NULL) {
+         error_propagate(errp, local_err);
 diff --git a/include/block/block_int.h b/include/block/block_int.h
-index a5c704b..563b30c 100644
+index 563b30c..a57c0bf 100644
 --- a/include/block/block_int.h
 +++ b/include/block/block_int.h
-@@ -824,6 +824,9 @@ void commit_active_start(const char *job_id, BlockDriverState *bs,
-  * @on_source_error: The action to take upon error reading from the source.
-  * @on_target_error: The action to take upon error writing to the target.
-  * @unmap: Whether to unmap target where source sectors only contain zeroes.
+@@ -780,13 +780,16 @@ void stream_start(const char *job_id, BlockDriverState *bs,
+  * @speed: The maximum speed, in bytes per second, or 0 for unlimited.
+  * @on_error: The action to take upon error.
+  * @backing_file_str: String to use as the backing file in @top's overlay
 + * @filter_node_name: The node name that should be assigned to the filter
-+ * driver that the mirror job inserts into the graph above @bs. NULL means that
-+ * a node name should be autogenerated.
++ * driver that the commit job inserts into the graph above @top. NULL means
++ * that a node name should be autogenerated.
   * @errp: Error object.
   *
-  * Start a mirroring operation on @bs.  Clusters that are allocated
-@@ -837,7 +840,7 @@ void mirror_start(const char *job_id, BlockDriverState *bs,
-                   MirrorSyncMode mode, BlockMirrorBackingMode backing_mode,
-                   BlockdevOnError on_source_error,
-                   BlockdevOnError on_target_error,
--                  bool unmap, Error **errp);
-+                  bool unmap, const char *filter_node_name, Error **errp);
- 
+  */
+ void commit_start(const char *job_id, BlockDriverState *bs,
+                   BlockDriverState *base, BlockDriverState *top, int64_t speed,
+                   BlockdevOnError on_error, const char *backing_file_str,
+-                  Error **errp);
++                  const char *filter_node_name, Error **errp);
+ /**
+  * commit_active_start:
+  * @job_id: The id of the newly-created job, or %NULL to use the
+@@ -797,6 +800,9 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+  *                  See @BlockJobCreateFlags
+  * @speed: The maximum speed, in bytes per second, or 0 for unlimited.
+  * @on_error: The action to take upon error.
++ * @filter_node_name: The node name that should be assigned to the filter
++ * driver that the commit job inserts into the graph above @bs. NULL means that
++ * a node name should be autogenerated.
+  * @cb: Completion function for the job.
+  * @opaque: Opaque pointer value passed to @cb.
+  * @errp: Error object.
+@@ -806,8 +812,9 @@ void commit_start(const char *job_id, BlockDriverState *bs,
+ void commit_active_start(const char *job_id, BlockDriverState *bs,
+                          BlockDriverState *base, int creation_flags,
+                          int64_t speed, BlockdevOnError on_error,
+-                         BlockCompletionFunc *cb,
+-                         void *opaque, Error **errp, bool auto_complete);
++                         const char *filter_node_name,
++                         BlockCompletionFunc *cb, void *opaque, Error **errp,
++                         bool auto_complete);
  /*
-  * backup_job_create:
+  * mirror_start:
+  * @job_id: The id of the newly-created job, or %NULL to use the
 diff --git a/qapi/block-core.json b/qapi/block-core.json
-index cf24c04..f0fa34c 100644
+index f0fa34c..5cc992f 100644
 --- a/qapi/block-core.json
 +++ b/qapi/block-core.json
-@@ -1671,6 +1671,11 @@
- #                   default 'report' (no limitations, since this applies to
- #                   a different block device than @device).
+@@ -1304,6 +1304,11 @@
+ #
+ # @speed:  #optional the maximum speed, in bytes per second
  #
 +# @filter-node-name: #optional the node name that should be assigned to the
-+#                    filter driver that the mirror job inserts into the graph
-+#                    above @device. If this option is not given, a node name is
++#                    filter driver that the commit job inserts into the graph
++#                    above @top. If this option is not given, a node name is
 +#                    autogenerated. (Since: 2.9)
 +#
- # Returns: nothing on success.
- #
- # Since: 2.6
-@@ -1690,7 +1695,8 @@
-             'sync': 'MirrorSyncMode',
-             '*speed': 'int', '*granularity': 'uint32',
-             '*buf-size': 'int', '*on-source-error': 'BlockdevOnError',
--            '*on-target-error': 'BlockdevOnError' } }
-+            '*on-target-error': 'BlockdevOnError',
+ # Returns: Nothing on success
+ #          If commit or stream is already active on this device, DeviceInUse
+ #          If @device does not exist, DeviceNotFound
+@@ -1323,7 +1328,8 @@
+ ##
+ { 'command': 'block-commit',
+   'data': { '*job-id': 'str', 'device': 'str', '*base': 'str', '*top': 'str',
+-            '*backing-file': 'str', '*speed': 'int' } }
++            '*backing-file': 'str', '*speed': 'int',
 +            '*filter-node-name': 'str' } }
  
  ##
- # @block_set_io_throttle:
+ # @drive-backup:
+diff --git a/qemu-img.c b/qemu-img.c
+index 0c76d4c..98b836b 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -958,8 +958,8 @@ static int img_commit(int argc, char **argv)
+     aio_context = bdrv_get_aio_context(bs);
+     aio_context_acquire(aio_context);
+     commit_active_start("commit", bs, base_bs, BLOCK_JOB_DEFAULT, 0,
+-                        BLOCKDEV_ON_ERROR_REPORT, common_block_job_cb, &cbi,
+-                        &local_err, false);
++                        BLOCKDEV_ON_ERROR_REPORT, NULL, common_block_job_cb,
++                        &cbi, &local_err, false);
+     aio_context_release(aio_context);
+     if (local_err) {
+         goto done;
 -- 
 1.8.3.1
