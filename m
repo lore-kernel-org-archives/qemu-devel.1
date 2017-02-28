@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cikLQ-0007FR-2F
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:09:45 -0500
+	(envelope-from <eblake@redhat.com>) id 1cikLZ-0007Nv-Il
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:09:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cikLO-00083Z-VR
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:09:44 -0500
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:35672)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1cikLO-00083U-OQ
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:09:42 -0500
-Received: by mail-oi0-x242.google.com with SMTP id z13so1168945oig.2
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 08:09:42 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1cikLU-00084M-KU
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:09:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34788)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cikLU-00084A-BB
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:09:48 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 95B3019D24B
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 16:09:48 +0000 (UTC)
+References: <1488145424-14974-1-git-send-email-armbru@redhat.com>
+	<1488145424-14974-24-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <02d73850-0c88-ee05-2c24-02f0129dd175@redhat.com>
+Date: Tue, 28 Feb 2017 10:09:46 -0600
 MIME-Version: 1.0
-Sender: bobby.prani@gmail.com
-In-Reply-To: <4e9eeab8-faca-b6ba-d53e-a8fbf5848c0f@msgid.tls.msk.ru>
-References: <1488277840-18608-1-git-send-email-groug@kaod.org>
-	<2a8da4e5-d66d-502c-322b-ec942f250f40@msgid.tls.msk.ru>
-	<20170228152240.6efc1fbc@bahia.lan>
-	<4e9eeab8-faca-b6ba-d53e-a8fbf5848c0f@msgid.tls.msk.ru>
-From: Pranith Kumar <bobby.prani+qemu@gmail.com>
-Date: Tue, 28 Feb 2017 11:09:11 -0500
-Message-ID: <CAJhHMCAWFy4o4br265CXq65rUPafKgxqX_dX+mBTErvqfA0pNA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 00/28] 9p CVE-2016-9602 fixes 2017-02-28 for
- 2.9 soft freeze
+In-Reply-To: <1488145424-14974-24-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="VkBEnXgO6QkMprsIJWBC6xOBQ1dNRGb6A"
+Subject: Re: [Qemu-devel] [PATCH v2 23/26] qapi: Make input visitors detect
+ unvisited list tails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,66 +35,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Tokarev <mjt@tls.msk.ru>
-Cc: Greg Kurz <groug@kaod.org>, qemu-devel <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
-On Tue, Feb 28, 2017 at 9:55 AM, Michael Tokarev <mjt@tls.msk.ru> wrote:
->>
->> https://github.com/gkurz/qemu/commits/cve-2016-9602-for-upstream
->> https://github.com/gkurz/qemu/commit/c23d5f1d5bc0e23aeb845b1af8f996f16783ce98
->
-> Interesting. Perhaps I've never worked with github before.
-> It works when referring to particular commit like this.
-> but the tag isn't visible in github UI, and neither the
-> tag nor this commit ID is visible when cloning github
-> repository locally. I wonder where's that.
->
-> $ git remote -v | grep gkurz
-> gkurz   git://github.com/gkurz/qemu.git (fetch)
-> gkurz   git://github.com/gkurz/qemu.git (push)
-> $ git remote update gkurz
-> Fetching gkurz
-> $ git show c23d5f1d5bc0e23aeb845b1af8f996f16783ce98
-> fatal: bad object c23d5f1d5bc0e23aeb845b1af8f996f16783ce98
-> $ git show cve-2016-9602-for-upstream --
-> fatal: bad revision 'cve-2016-9602-for-upstream'
->
-> that's now.  I'll dig into that later, there's apparently
-> nothing wrong on your side, I'm sorry for the noise.
->
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--VkBEnXgO6QkMprsIJWBC6xOBQ1dNRGb6A
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <02d73850-0c88-ee05-2c24-02f0129dd175@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 23/26] qapi: Make input visitors detect
+ unvisited list tails
+References: <1488145424-14974-1-git-send-email-armbru@redhat.com>
+ <1488145424-14974-24-git-send-email-armbru@redhat.com>
+In-Reply-To: <1488145424-14974-24-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I think the answer is given here:
-https://eddiemoya.com/2013/02/21/better-git-git-fetch-not-getting-tags/
+On 02/26/2017 03:43 PM, Markus Armbruster wrote:
+> Fix the design flaw demonstrated in the previous commit: new method
+> check_list() lets input visitors report that unvisited input remains
+> for a list, exactly like check_struct() lets them report that
+> unvisited input remains for a struct or union.
+>=20
+> Implement the method for the qobject input visitor (straightforward),
+> and the string input visitor (less so, due to the magic list syntax
+> there).  The opts visitor's list magic is even more impenetrable, and
+> all I can do there today is a stub with a FIXME comment.  No worse
+> than before.
 
-You have to explicitly fetch the tags using 'git fetch -t gkurz' to
-get the tags which are not direct references to a commit.
+Yeah, I know what you mean (having worked on all three visitors in prior
+patches).  The opts visitor is just painful.
 
-$ git remote update gkurz
-Fetching gkurz
->From https://github.com/gkurz/qemu
- * [new branch]            9p-attr-fixes         -> gkurz/9p-attr-fixes
- * [new branch]            9p-cleanup            -> gkurz/9p-cleanup
- * [new branch]            9p-fix                -> gkurz/9p-fix
- * [new branch]            9p-next               -> gkurz/9p-next
- * [new branch]            9p-proxy              -> gkurz/9p-proxy
- * [new branch]            9p-security           -> gkurz/9p-security
- * [new branch]            9p-symlink            -> gkurz/9p-symlink
- * [new branch]            9p-tests              -> gkurz/9p-tests
- * [new branch]            ppc-vcpu-dt-id-rework -> gkurz/ppc-vcpu-dt-id-rework
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
 
-$ git fetch -t gkurz
-remote: Counting objects: 155, done.
-remote: Compressing objects: 100% (145/145), done.
-remote: Total 155 (delta 126), reused 8 (delta 8), pack-reused 2
-Receiving objects: 100% (155/155), 41.89 KiB | 0 bytes/s, done.
-Resolving deltas: 100% (126/126), completed with 6 local objects.
->From https://github.com/gkurz/qemu
- * [new tag]               cve-2016-9602-for-upstream ->
-cve-2016-9602-for-upstream
- t [tag update]            for-upstream               -> for-upstream
- t [tag update]            for_anthony                -> for_anthony
+>=20
+> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> index 2de6377..fe7b988 100644
+> --- a/hw/ppc/spapr_drc.c
+> +++ b/hw/ppc/spapr_drc.c
+> @@ -326,6 +326,11 @@ static void prop_get_fdt(Object *obj, Visitor *v, =
+const char *name,
+>                      return;
+>                  }
+>              }
+> +            visit_check_list(v, &err);
+> +            if (err) {
+> +                error_propagate(errp, err);
+> +                return;
+> +            }
+>              visit_end_list(v, NULL);
+
+This doesn't look right.  You want the visit_end_list() call to occur
+unconditionally, even when visit_check_list() fails, so as to free any
+resources allocated by the visitor.
 
 
-Thanks,
---
-Pranith
+> +++ b/tests/test-string-input-visitor.c
+> @@ -160,17 +160,9 @@ static void test_visitor_in_intList(TestInputVisit=
+orData *data,
+>      /* Would be simpler if the visitor genuinely supported virtual wal=
+ks */
+>      visit_start_list(v, NULL, (GenericList **)&res, sizeof(*res),
+>                       &error_abort);
+> -    tail =3D res;
+> -    visit_type_int64(v, NULL, &tail->value, &error_abort);
+> -    g_assert_cmpint(tail->value, =3D=3D, 0);
+> -    tail =3D (int64List *)visit_next_list(v, (GenericList *)tail, size=
+of(*res));
+> -    g_assert(tail);
+> -    visit_type_int64(v, NULL, &tail->value, &error_abort);
+> -    g_assert_cmpint(tail->value, =3D=3D, 2);
+> -    tail =3D (int64List *)visit_next_list(v, (GenericList *)tail, size=
+of(*res));
+> -    g_assert(tail);
+> +    visit_check_list(v, &err);
+
+You are still calling visit_check_list() after a partial visit, but why
+change from a 2/3 visit to a 0/3 visit?
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--VkBEnXgO6QkMprsIJWBC6xOBQ1dNRGb6A
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYtaDKAAoJEKeha0olJ0NqbScH/R6Hc7teumo2NA0nM4djcsFk
+trFJ3UcP0MiuGArNkkETM/PMMM0D3F6Fzlq44A9BwACF1BtthqeZtpiXHOZZB7ul
+yXJYfCVhjdfKZJecS8b+xEvAJ+5k59t0NZ7/LKxpC09161xceMhpPzVmSMT7+WSW
+AdjPhM9a3nxwvpq5CArge0a1bOsi8zTEo0dtkD9OKT7fyjHLGMHMwI/dmGeP8yGN
+/JWwnBAJ0kLY5wuQPaNe+sLmdkuPmalL937K7x82xc4HsjVmgXe5GFRACXmUnZcG
+4+NJIllJY086MF3Dw40ctLbF1ccxiffVK6wX3FhY0Z0ya9yz3oR4WJzDwMwIAy4=
+=ahun
+-----END PGP SIGNATURE-----
+
+--VkBEnXgO6QkMprsIJWBC6xOBQ1dNRGb6A--
