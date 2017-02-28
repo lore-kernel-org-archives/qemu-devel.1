@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40960)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cih9O-0003Yk-8J
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:45:07 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cih9N-0001D1-Im
+	(envelope-from <famz@redhat.com>) id 1cih9N-0003Xt-DV
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:45:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43826)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cih9N-0001Ck-DO
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <famz@redhat.com>) id 1cih9K-0001CR-BG
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:45:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44406)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cih9K-0001C5-5k
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:45:02 -0500
 From: Fam Zheng <famz@redhat.com>
-Date: Tue, 28 Feb 2017 20:44:58 +0800
-Message-Id: <20170228124458.31307-3-famz@redhat.com>
-In-Reply-To: <20170228124458.31307-1-famz@redhat.com>
-References: <20170228124458.31307-1-famz@redhat.com>
+Date: Tue, 28 Feb 2017 20:44:56 +0800
+Message-Id: <20170228124458.31307-1-famz@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 2/2] .shippable: add s390x-cross target
+Subject: [Qemu-devel] [PULL 0/2] Docker patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +27,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>
 
-From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+The following changes since commit 6181478f6395cdd9d6ffd99623d0c9f39ea536=
+06:
 
-Use the new debian-s390x-cross.docker target to cross compile for
-s390.
+  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request'=
+ into staging (2017-02-28 08:46:03 +0000)
 
-Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Message-Id: <20170227143028.16428-3-alex.bennee@linaro.org>
-Reviewed-by: Fam Zheng <famz@redhat.com>
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- .shippable.yml | 2 ++
- 1 file changed, 2 insertions(+)
+are available in the git repository at:
 
-diff --git a/.shippable.yml b/.shippable.yml
-index 1a1fd7a..653bd75 100644
---- a/.shippable.yml
-+++ b/.shippable.yml
-@@ -5,6 +5,8 @@ env:
-       TARGET_LIST=3Darm-softmmu,arm-linux-user
-     - IMAGE=3Ddebian-arm64-cross
-       TARGET_LIST=3Daarch64-softmmu,aarch64-linux-user
-+    - IMAGE=3Ddebian-s390x-cross
-+      TARGET_LIST=3Ds390x-softmmu,s390x-linux-user
- build:
-   pre_ci:
-     - make docker-image-${IMAGE}
+  git://github.com/famz/qemu.git tags/docker-pull-request
+
+for you to fetch changes up to 1ed9251515382a1fc9c6187fee8d7d7bf141dc90:
+
+  .shippable: add s390x-cross target (2017-02-28 20:31:01 +0800)
+
+----------------------------------------------------------------
+
+Two more test/build automation patches from Alex for the freeze. Theoreti=
+cally
+these are okay to merge even after freeze but on the other hand I see no =
+reason
+to delay them.
+
+----------------------------------------------------------------
+
+Alex Benn=C3=A9e (2):
+  new: dockerfiles/debian-s390-cross
+  .shippable: add s390x-cross target
+
+ .shippable.yml                                     |  2 ++
+ tests/docker/dockerfiles/debian-s390x-cross.docker | 22 ++++++++++++++++=
+++++++
+ 2 files changed, 24 insertions(+)
+ create mode 100644 tests/docker/dockerfiles/debian-s390x-cross.docker
+
 --=20
 2.9.3
