@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cih9N-0003Xt-DV
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:45:06 -0500
+	(envelope-from <famz@redhat.com>) id 1cihCG-0006ay-OO
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:48:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cih9K-0001CR-BG
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:45:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44406)
+	(envelope-from <famz@redhat.com>) id 1cihCD-0002B9-O8
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:48:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50418)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cih9K-0001C5-5k
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:45:02 -0500
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cihCD-0002At-Gp
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:48:01 -0500
+Date: Tue, 28 Feb 2017 20:47:57 +0800
 From: Fam Zheng <famz@redhat.com>
-Date: Tue, 28 Feb 2017 20:44:56 +0800
-Message-Id: <20170228124458.31307-1-famz@redhat.com>
+Message-ID: <20170228124757.GC29328@lemon.lan>
+References: <20170228122901.24520-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/2] Docker patches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170228122901.24520-1-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/2] Fix stale 'trace-events-all' file in
+ build dir
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,42 +27,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-The following changes since commit 6181478f6395cdd9d6ffd99623d0c9f39ea536=
-06:
+On Tue, 02/28 12:28, Daniel P. Berrange wrote:
+> If systemtap support was disabled, the trace-events-all file was
+> only getting regenerated at time of 'make instal'. This is bad
+> because it leaves stale files in the build dir for developers.
 
-  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request'=
- into staging (2017-02-28 08:46:03 +0000)
+Apparently 6eab3544f472 wasn't a good job. :-/
 
-are available in the git repository at:
+For both patches:
 
-  git://github.com/famz/qemu.git tags/docker-pull-request
-
-for you to fetch changes up to 1ed9251515382a1fc9c6187fee8d7d7bf141dc90:
-
-  .shippable: add s390x-cross target (2017-02-28 20:31:01 +0800)
-
-----------------------------------------------------------------
-
-Two more test/build automation patches from Alex for the freeze. Theoreti=
-cally
-these are okay to merge even after freeze but on the other hand I see no =
-reason
-to delay them.
-
-----------------------------------------------------------------
-
-Alex Benn=C3=A9e (2):
-  new: dockerfiles/debian-s390-cross
-  .shippable: add s390x-cross target
-
- .shippable.yml                                     |  2 ++
- tests/docker/dockerfiles/debian-s390x-cross.docker | 22 ++++++++++++++++=
-++++++
- 2 files changed, 24 insertions(+)
- create mode 100644 tests/docker/dockerfiles/debian-s390x-cross.docker
-
---=20
-2.9.3
+Reviewed-by: Fam Zheng <famz@redhat.com>
