@@ -1,32 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cikLZ-0007Nv-Il
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:09:54 -0500
+	(envelope-from <jcody@redhat.com>) id 1cikOq-0002D2-Dw
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:13:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cikLU-00084M-KU
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:09:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34788)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cikLU-00084A-BB
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:09:48 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 95B3019D24B
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 16:09:48 +0000 (UTC)
-References: <1488145424-14974-1-git-send-email-armbru@redhat.com>
-	<1488145424-14974-24-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <02d73850-0c88-ee05-2c24-02f0129dd175@redhat.com>
-Date: Tue, 28 Feb 2017 10:09:46 -0600
+	(envelope-from <jcody@redhat.com>) id 1cikOp-0000QQ-CI
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:13:16 -0500
+Date: Tue, 28 Feb 2017 11:13:04 -0500
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170228161304.GD15696@localhost.localdomain>
+References: <cover.1488296634.git.jcody@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1488145424-14974-24-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="VkBEnXgO6QkMprsIJWBC6xOBQ1dNRGb6A"
-Subject: Re: [Qemu-devel] [PATCH v2 23/26] qapi: Make input visitors detect
- unvisited list tails
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1488296634.git.jcody@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 0/5] RBD: blockdev-add (for 2.9?)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,107 +22,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, stefanha@redhat.com, armbru@redhat.com, berrange@redhat.com, eblake@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---VkBEnXgO6QkMprsIJWBC6xOBQ1dNRGb6A
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <02d73850-0c88-ee05-2c24-02f0129dd175@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 23/26] qapi: Make input visitors detect
- unvisited list tails
-References: <1488145424-14974-1-git-send-email-armbru@redhat.com>
- <1488145424-14974-24-git-send-email-armbru@redhat.com>
-In-Reply-To: <1488145424-14974-24-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Feb 28, 2017 at 10:51:02AM -0500, Jeff Cody wrote:
+> 
+> This series adds blockdev-add for rbd.
+> 
+> 
+> Changes from v3:
+> 
+> Patch 5: Encapsulate ipv6 addresses with '[]' (Thanks Daniel, Eric, Markus)
+>          Free auth_supported (Thanks Markus)
+>          check error for qdict_array_entries (Thanks Markus)
+>          Make sure to return NULL on failure (Thanks Markus)
+>          Misc formatting (Thanks Markus)
+> 
+> 
+> Changes from v2:
+> 
+> Patch 2: Updated commit message, and documented the runtime opts
+>          (Thanks Eric)
+> 
+> Patch 3: Fixed commit type, added "FIXME" in ugly string concat spot
+>          (Thanks Eric)
+> 
+> Patch 4: Fixed all the nits - deleted lines, spaces.  Kept list 
+>          alphabetical.  (Thanks Eric)
+> 
+> Patch 5: Significant changes.  Both 'mon_host' became 'server', and an array.
+>          'auth_supported' became 'auth-supported', and an array.
+>          (Thanks Daniel, Eric)
+> 
+>           Patch 5 also contains a new function, qemu_rbd_array_opts(), to
+>           parse the array options.
+> 
+> 
+> Changes from v1:
+> 
+> Overall:
+> 
+> * QAPI interface does not allow arbitrary key/value pairs
+>   in v2 (Thanks Daniel)
+> 
+> * QAPI interface adds 'mon_host' and 'auth_supported' options (Thanks Daniel)
+> 
+> * Use 'user' instead of 'rbd-id' (Thanks Daniel)
+> v
+> By patch:
+> 
+> Patch 1:
+>  * Fixed some indentation in patch 1 (Thanks Markus)
+> 
+> Patch 2:
+>  * 'rbd-id' becomes 'user', and the commit message is fixed. (Thanks Daniel)
+> 
+> Patch 3:
+>  * Ripple-through from changes in patch 2
+>  * Removed the string unescape from qemu_rbd_set_keypairs(), because the
+>    strings have already been unescaped by the time they hit this function.
+> 
+> Patch 4:
+>  * 'rbd-id' becomes 'user'
+>  * drop the 'keyvalue-pairs' from the QAPI  (both, thanks Daniel)
+> 
+> Patch 5:
+>  * new patch
+>  * Adds the 'server' (mon_host) and 'auth_supported' options to the
+>    QAPI (Thanks Daniel)
+> 
+> 
+> Jeff Cody (5):
+>   block/rbd: don't copy strings in qemu_rbd_next_tok()
+>   block/rbd: add all the currently supported runtime_opts
+>   block/rbd: parse all options via bdrv_parse_filename
+>   block/rbd: add blockdev-add support
+>   block/rbd: add support for 'mon_host', 'auth_supported' via QAPI
+> 
+>  block/rbd.c          | 568 ++++++++++++++++++++++++++++++++++-----------------
+>  qapi/block-core.json |  62 +++++-
+>  2 files changed, 442 insertions(+), 188 deletions(-)
+> 
+> -- 
+> 2.9.3
+> 
 
-On 02/26/2017 03:43 PM, Markus Armbruster wrote:
-> Fix the design flaw demonstrated in the previous commit: new method
-> check_list() lets input visitors report that unvisited input remains
-> for a list, exactly like check_struct() lets them report that
-> unvisited input remains for a struct or union.
->=20
-> Implement the method for the qobject input visitor (straightforward),
-> and the string input visitor (less so, due to the magic list syntax
-> there).  The opts visitor's list magic is even more impenetrable, and
-> all I can do there today is a stub with a FIXME comment.  No worse
-> than before.
+Thanks,
 
-Yeah, I know what you mean (having worked on all three visitors in prior
-patches).  The opts visitor is just painful.
+Applied to my block branch:
 
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
+git://github.com/codyprime/qemu-kvm-jtc.git block
 
->=20
-> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-> index 2de6377..fe7b988 100644
-> --- a/hw/ppc/spapr_drc.c
-> +++ b/hw/ppc/spapr_drc.c
-> @@ -326,6 +326,11 @@ static void prop_get_fdt(Object *obj, Visitor *v, =
-const char *name,
->                      return;
->                  }
->              }
-> +            visit_check_list(v, &err);
-> +            if (err) {
-> +                error_propagate(errp, err);
-> +                return;
-> +            }
->              visit_end_list(v, NULL);
-
-This doesn't look right.  You want the visit_end_list() call to occur
-unconditionally, even when visit_check_list() fails, so as to free any
-resources allocated by the visitor.
-
-
-> +++ b/tests/test-string-input-visitor.c
-> @@ -160,17 +160,9 @@ static void test_visitor_in_intList(TestInputVisit=
-orData *data,
->      /* Would be simpler if the visitor genuinely supported virtual wal=
-ks */
->      visit_start_list(v, NULL, (GenericList **)&res, sizeof(*res),
->                       &error_abort);
-> -    tail =3D res;
-> -    visit_type_int64(v, NULL, &tail->value, &error_abort);
-> -    g_assert_cmpint(tail->value, =3D=3D, 0);
-> -    tail =3D (int64List *)visit_next_list(v, (GenericList *)tail, size=
-of(*res));
-> -    g_assert(tail);
-> -    visit_type_int64(v, NULL, &tail->value, &error_abort);
-> -    g_assert_cmpint(tail->value, =3D=3D, 2);
-> -    tail =3D (int64List *)visit_next_list(v, (GenericList *)tail, size=
-of(*res));
-> -    g_assert(tail);
-> +    visit_check_list(v, &err);
-
-You are still calling visit_check_list() after a partial visit, but why
-change from a 2/3 visit to a 0/3 visit?
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---VkBEnXgO6QkMprsIJWBC6xOBQ1dNRGb6A
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYtaDKAAoJEKeha0olJ0NqbScH/R6Hc7teumo2NA0nM4djcsFk
-trFJ3UcP0MiuGArNkkETM/PMMM0D3F6Fzlq44A9BwACF1BtthqeZtpiXHOZZB7ul
-yXJYfCVhjdfKZJecS8b+xEvAJ+5k59t0NZ7/LKxpC09161xceMhpPzVmSMT7+WSW
-AdjPhM9a3nxwvpq5CArge0a1bOsi8zTEo0dtkD9OKT7fyjHLGMHMwI/dmGeP8yGN
-/JWwnBAJ0kLY5wuQPaNe+sLmdkuPmalL937K7x82xc4HsjVmgXe5GFRACXmUnZcG
-4+NJIllJY086MF3Dw40ctLbF1ccxiffVK6wX3FhY0Z0ya9yz3oR4WJzDwMwIAy4=
-=ahun
------END PGP SIGNATURE-----
-
---VkBEnXgO6QkMprsIJWBC6xOBQ1dNRGb6A--
+-Jeff
