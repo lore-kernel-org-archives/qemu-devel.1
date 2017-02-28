@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cioWs-0006HP-Og
+	(envelope-from <kwolf@redhat.com>) id 1cioWs-0006HC-KK
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:37:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cioWr-0007wi-LX
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:37:50 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cioWq-0007vs-Ta
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 15:37:49 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 28 Feb 2017 21:36:27 +0100
-Message-Id: <1488314205-16264-29-git-send-email-kwolf@redhat.com>
+Date: Tue, 28 Feb 2017 21:36:24 +0100
+Message-Id: <1488314205-16264-26-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1488314205-16264-1-git-send-email-kwolf@redhat.com>
 References: <1488314205-16264-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 28/46] commit: Use real permissions for HMP
- 'commit'
+Subject: [Qemu-devel] [PULL 25/46] block: Add BdrvChildRole.stay_at_node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,86 +22,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-This is a little simpler than the commit block job because it's
-synchronous and only commits into the immediate backing file, but
-otherwise doing more or less the same.
+When the parents' child links are updated in bdrv_append() or
+bdrv_replace_in_backing_chain(), this should affect all child links of
+BlockBackends or other nodes, but not on child links held for other
+purposes (like for setting permissions). This patch allows to control
+the behaviour per BdrvChildRole.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Acked-by: Fam Zheng <famz@redhat.com>
 ---
- block/commit.c | 33 +++++++++++++++++++++++++++------
- 1 file changed, 27 insertions(+), 6 deletions(-)
+ block.c                   | 3 +++
+ include/block/block_int.h | 4 ++++
+ 2 files changed, 7 insertions(+)
 
-diff --git a/block/commit.c b/block/commit.c
-index 8de4473..f18026b 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -401,11 +401,14 @@ fail:
- int bdrv_commit(BlockDriverState *bs)
- {
-     BlockBackend *src, *backing;
-+    BlockDriverState *backing_file_bs = NULL;
-+    BlockDriverState *commit_top_bs = NULL;
-     BlockDriver *drv = bs->drv;
-     int64_t sector, total_sectors, length, backing_length;
-     int n, ro, open_flags;
-     int ret = 0;
-     uint8_t *buf = NULL;
-+    Error *local_err = NULL;
+diff --git a/block.c b/block.c
+index f72a67f..9e538a5 100644
+--- a/block.c
++++ b/block.c
+@@ -2853,6 +2853,9 @@ static void change_parent_backing_link(BlockDriverState *from,
+     BdrvChild *c, *next, *to_c;
  
-     if (!drv)
-         return -ENOMEDIUM;
-@@ -428,17 +431,31 @@ int bdrv_commit(BlockDriverState *bs)
-         }
-     }
+     QLIST_FOREACH_SAFE(c, &from->parents, next_parent, next) {
++        if (c->role->stay_at_node) {
++            continue;
++        }
+         if (c->role == &child_backing) {
+             /* @from is generally not allowed to be a backing file, except for
+              * when @to is the overlay. In that case, @from may not be replaced
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 3177b9f..a0d9328 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -441,6 +441,10 @@ typedef struct BdrvAioNotifier {
+ } BdrvAioNotifier;
  
--    /* FIXME Use real permissions */
--    src = blk_new(0, BLK_PERM_ALL);
--    backing = blk_new(0, BLK_PERM_ALL);
-+    src = blk_new(BLK_PERM_CONSISTENT_READ, BLK_PERM_ALL);
-+    backing = blk_new(BLK_PERM_WRITE | BLK_PERM_RESIZE, BLK_PERM_ALL);
- 
--    ret = blk_insert_bs(src, bs, NULL);
-+    ret = blk_insert_bs(src, bs, &local_err);
-     if (ret < 0) {
-+        error_report_err(local_err);
-+        goto ro_cleanup;
-+    }
+ struct BdrvChildRole {
++    /* If true, bdrv_replace_in_backing_chain() doesn't change the node this
++     * BdrvChild points to. */
++    bool stay_at_node;
 +
-+    /* Insert commit_top block node above backing, so we can write to it */
-+    backing_file_bs = backing_bs(bs);
-+
-+    commit_top_bs = bdrv_new_open_driver(&bdrv_commit_top, NULL, BDRV_O_RDWR,
-+                                         &local_err);
-+    if (commit_top_bs == NULL) {
-+        error_report_err(local_err);
-         goto ro_cleanup;
-     }
+     void (*inherit_options)(int *child_flags, QDict *child_options,
+                             int parent_flags, QDict *parent_options);
  
--    ret = blk_insert_bs(backing, bs->backing->bs, NULL);
-+    bdrv_set_backing_hd(commit_top_bs, backing_file_bs);
-+    bdrv_set_backing_hd(bs, commit_top_bs);
-+
-+    ret = blk_insert_bs(backing, backing_file_bs, &local_err);
-     if (ret < 0) {
-+        error_report_err(local_err);
-         goto ro_cleanup;
-     }
- 
-@@ -512,8 +529,12 @@ int bdrv_commit(BlockDriverState *bs)
- ro_cleanup:
-     qemu_vfree(buf);
- 
--    blk_unref(src);
-     blk_unref(backing);
-+    if (backing_file_bs) {
-+        bdrv_set_backing_hd(bs, backing_file_bs);
-+    }
-+    bdrv_unref(commit_top_bs);
-+    blk_unref(src);
- 
-     if (ro) {
-         /* ignoring error return here */
 -- 
 1.8.3.1
