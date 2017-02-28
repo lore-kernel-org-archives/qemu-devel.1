@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cihIp-0003uH-J8
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:54:52 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cihIr-0003wd-OC
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:54:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cihIo-0003z7-Hi
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:54:51 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cihIq-000404-Fb
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:54:53 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 28 Feb 2017 13:53:51 +0100
-Message-Id: <1488286469-9381-7-git-send-email-kwolf@redhat.com>
+Date: Tue, 28 Feb 2017 13:53:52 +0100
+Message-Id: <1488286469-9381-8-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
 References: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 06/44] block: Request child permissions in
- filter drivers
+Subject: [Qemu-devel] [PATCH v3 07/44] block: Default .bdrv_child_perm() for
+ format drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,94 +23,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-All callers will have to request permissions for all of their child
-nodes. Block drivers that act as simply filters can use the default
-implementation of .bdrv_child_perm().
+Almost all format drivers have the same characteristics as far as
+permissions are concerned: They have one or more children for storing
+their own data and, more importantly, metadata (can be written to and
+grow even without external write requests, must be protected against
+other writers and present consistent data) and optionally a backing file
+(this is just data, so like for a filter, it only depends on what the
+parent nodes need).
+
+This provides a default implementation that can be shared by most of
+our format drivers.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/blkdebug.c    | 2 ++
- block/blkreplay.c   | 1 +
- block/blkverify.c   | 1 +
- block/quorum.c      | 2 ++
- block/raw-format.c  | 1 +
- block/replication.c | 1 +
- 6 files changed, 8 insertions(+)
+ block.c                   | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ include/block/block_int.h |  8 ++++++++
+ 2 files changed, 52 insertions(+)
 
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index 6117ce5..67e8024 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -734,6 +734,8 @@ static BlockDriver bdrv_blkdebug = {
-     .bdrv_file_open         = blkdebug_open,
-     .bdrv_close             = blkdebug_close,
-     .bdrv_reopen_prepare    = blkdebug_reopen_prepare,
-+    .bdrv_child_perm        = bdrv_filter_default_perms,
+diff --git a/block.c b/block.c
+index 064e9d7..d67819f 100644
+--- a/block.c
++++ b/block.c
+@@ -1560,6 +1560,50 @@ void bdrv_filter_default_perms(BlockDriverState *bs, BdrvChild *c,
+                (c->shared_perm & DEFAULT_PERM_UNCHANGED);
+ }
+ 
++void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
++                               const BdrvChildRole *role,
++                               uint64_t perm, uint64_t shared,
++                               uint64_t *nperm, uint64_t *nshared)
++{
++    bool backing = (role == &child_backing);
++    assert(role == &child_backing || role == &child_file);
 +
-     .bdrv_getlength         = blkdebug_getlength,
-     .bdrv_truncate          = blkdebug_truncate,
-     .bdrv_refresh_filename  = blkdebug_refresh_filename,
-diff --git a/block/blkreplay.c b/block/blkreplay.c
-index cfc8c5b..e110211 100755
---- a/block/blkreplay.c
-+++ b/block/blkreplay.c
-@@ -137,6 +137,7 @@ static BlockDriver bdrv_blkreplay = {
- 
-     .bdrv_file_open         = blkreplay_open,
-     .bdrv_close             = blkreplay_close,
-+    .bdrv_child_perm        = bdrv_filter_default_perms,
-     .bdrv_getlength         = blkreplay_getlength,
- 
-     .bdrv_co_preadv         = blkreplay_co_preadv,
-diff --git a/block/blkverify.c b/block/blkverify.c
-index 43a940c..9a1e21c 100644
---- a/block/blkverify.c
-+++ b/block/blkverify.c
-@@ -320,6 +320,7 @@ static BlockDriver bdrv_blkverify = {
-     .bdrv_parse_filename              = blkverify_parse_filename,
-     .bdrv_file_open                   = blkverify_open,
-     .bdrv_close                       = blkverify_close,
-+    .bdrv_child_perm                  = bdrv_filter_default_perms,
-     .bdrv_getlength                   = blkverify_getlength,
-     .bdrv_refresh_filename            = blkverify_refresh_filename,
- 
-diff --git a/block/quorum.c b/block/quorum.c
-index bdbcec6..40205fb 100644
---- a/block/quorum.c
-+++ b/block/quorum.c
-@@ -1133,6 +1133,8 @@ static BlockDriver bdrv_quorum = {
-     .bdrv_add_child                     = quorum_add_child,
-     .bdrv_del_child                     = quorum_del_child,
- 
-+    .bdrv_child_perm                    = bdrv_filter_default_perms,
++    if (!backing) {
++        /* Apart from the modifications below, the same permissions are
++         * forwarded and left alone as for filters */
++        bdrv_filter_default_perms(bs, c, role, perm, shared, &perm, &shared);
 +
-     .is_filter                          = true,
-     .bdrv_recurse_is_first_non_filter   = quorum_recurse_is_first_non_filter,
- };
-diff --git a/block/raw-format.c b/block/raw-format.c
-index ce34d1b..86fbc65 100644
---- a/block/raw-format.c
-+++ b/block/raw-format.c
-@@ -467,6 +467,7 @@ BlockDriver bdrv_raw = {
-     .bdrv_reopen_abort    = &raw_reopen_abort,
-     .bdrv_open            = &raw_open,
-     .bdrv_close           = &raw_close,
-+    .bdrv_child_perm      = bdrv_filter_default_perms,
-     .bdrv_create          = &raw_create,
-     .bdrv_co_preadv       = &raw_co_preadv,
-     .bdrv_co_pwritev      = &raw_co_pwritev,
-diff --git a/block/replication.c b/block/replication.c
-index eff85c7..91465cb 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -660,6 +660,7 @@ BlockDriver bdrv_replication = {
++        /* Format drivers may touch metadata even if the guest doesn't write */
++        if (!bdrv_is_read_only(bs)) {
++            perm |= BLK_PERM_WRITE | BLK_PERM_RESIZE;
++        }
++
++        /* bs->file always needs to be consistent because of the metadata. We
++         * can never allow other users to resize or write to it. */
++        perm |= BLK_PERM_CONSISTENT_READ;
++        shared &= ~(BLK_PERM_WRITE | BLK_PERM_RESIZE);
++    } else {
++        /* We want consistent read from backing files if the parent needs it.
++         * No other operations are performed on backing files. */
++        perm &= BLK_PERM_CONSISTENT_READ;
++
++        /* If the parent can deal with changing data, we're okay with a
++         * writable and resizable backing file. */
++        /* TODO Require !(perm & BLK_PERM_CONSISTENT_READ), too? */
++        if (shared & BLK_PERM_WRITE) {
++            shared = BLK_PERM_WRITE | BLK_PERM_RESIZE;
++        } else {
++            shared = 0;
++        }
++
++        shared |= BLK_PERM_CONSISTENT_READ | BLK_PERM_GRAPH_MOD |
++                  BLK_PERM_WRITE_UNCHANGED;
++    }
++
++    *nperm = perm;
++    *nshared = shared;
++}
++
+ static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs,
+                                bool check_new_perm)
+ {
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 17f4c2d..eb0598e 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -880,6 +880,14 @@ void bdrv_filter_default_perms(BlockDriverState *bs, BdrvChild *c,
+                                uint64_t perm, uint64_t shared,
+                                uint64_t *nperm, uint64_t *nshared);
  
-     .bdrv_open                  = replication_open,
-     .bdrv_close                 = replication_close,
-+    .bdrv_child_perm            = bdrv_filter_default_perms,
++/* Default implementation for BlockDriver.bdrv_child_perm() that can be used by
++ * (non-raw) image formats: Like above for bs->backing, but for bs->file it
++ * requires WRITE | RESIZE for read-write images, always requires
++ * CONSISTENT_READ and doesn't share WRITE. */
++void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
++                               const BdrvChildRole *role,
++                               uint64_t perm, uint64_t shared,
++                               uint64_t *nperm, uint64_t *nshared);
  
-     .bdrv_getlength             = replication_getlength,
-     .bdrv_co_readv              = replication_co_readv,
+ const char *bdrv_get_parent_name(const BlockDriverState *bs);
+ void blk_dev_change_media_cb(BlockBackend *blk, bool load);
 -- 
 1.8.3.1
