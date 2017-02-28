@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciYjQ-0003oA-AF
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 22:45:45 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ciYre-0005Kl-76
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 22:54:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciYjO-0001zX-Rn
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 22:45:44 -0500
-Date: Tue, 28 Feb 2017 14:19:12 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1ciYrd-00043N-0A
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 22:54:14 -0500
+Date: Tue, 28 Feb 2017 14:54:00 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170228031912.GP17615@umbus.fritz.box>
-References: <cover.1487829585.git.sam.bobroff@au1.ibm.com>
-	<034945c1bbc8d4a97e5f568d4d463af2c9a24080.1487829585.git.sam.bobroff@au1.ibm.com>
-	<20170228002810.GD17615@umbus.fritz.box>
-	<1488248717.2323.11.camel@gmail.com>
+Message-ID: <20170228035400.GA12655@umbus.fritz.box>
+References: <1488205773-30436-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="k3Hs6P4rqk1MjcAG"
+	protocol="application/pgp-signature"; boundary="qMm9M+Fa2AknHoGS"
 Content-Disposition: inline
-In-Reply-To: <1488248717.2323.11.camel@gmail.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 08/12] spapr: Only setup HTP if
- necessary.
+In-Reply-To: <1488205773-30436-1-git-send-email-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v4 00/26] ppc/xics: simplify ICS and ICP
+ creation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,198 +24,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc: Sam Bobroff <sam.bobroff@au1.ibm.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---k3Hs6P4rqk1MjcAG
+--qMm9M+Fa2AknHoGS
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 28, 2017 at 01:25:17PM +1100, Suraj Jitindar Singh wrote:
-> On Tue, 2017-02-28 at 11:28 +1100, David Gibson wrote:
-> > s/HTP/HPT/ in subject line.
-> >=20
-> >=20
-> > On Thu, Feb 23, 2017 at 05:00:01PM +1100, Sam Bobroff wrote:
-> > >=20
-> > > If QEMU is using KVM, and KVM is capable of running in radix mode,
-> > > guests can be run in real-mode without allocating a HPT (because
-> > > KVM
-> > > will use a minimal RPT). So in this case, we avoid creating the HPT
-> > > at reset time and later (during CAS) create it if it is necessary.
-> > >=20
-> > > Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
-> > So, IIRC, we discussed previously that the logical way to do things
-> > was to, by default, delay HPT allocation until CAS time, and just do
-> > it at reset time for the case that needs it: hash host with KVM.
-> >=20
-> > Did you hit a problem with that approach, or is there still work to
-> > be
-> > done here?
->=20
-> So what we're doing is assuming radix. Allocate hpt if hash host,
-> otherwise delay til CAS time and allocate only if guest chose hash.
->=20
-> >=20
-> > >=20
-> > > ---
-> > > v2:
-> > >=20
-> > > * This patch has been mostly rewritten to move the late HPT
-> > > allocation to CAS.
-> > > This allows a guest to start in radix mode (when it's in real mode)
-> > > and then
-> > > change to hash, even if it is a legacy guest and will not call
-> > > h_register_process_table().
-> > > * Added an exported function to spapr.c to perform HPT allocation
-> > > and adjust
-> > > the vrma if necessary. This makes it possible to allocate the HPT
-> > > from
-> > > h_client_architecture_support() in spapr_hcall.c.
-> > >=20
-> > > =A0hw/ppc/spapr.c=A0=A0=A0=A0=A0=A0=A0=A0=A0| 24 +++++++++++++++-----=
-----
-> > > =A0hw/ppc/spapr_hcall.c=A0=A0=A0| 10 ++++++++++
-> > > =A0include/hw/ppc/spapr.h |=A0=A01 +
-> > > =A03 files changed, 26 insertions(+), 9 deletions(-)
-> > >=20
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index ca3812555f..dfee0f685f 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -1123,6 +1123,17 @@ static void
-> > > spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
-> > > =A0=A0=A0=A0=A0}
-> > > =A0}
-> > > =A0
-> > > +void spapr_setup_hpt_and_vrma(sPAPRMachineState *spapr)
-> > > +{
-> > > +=A0=A0=A0=A0spapr_reallocate_hpt(spapr,
-> > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0spapr=
-_hpt_shift_for_ramsize(MACHINE(qdev_get_
-> > > machine())->maxram_size),
-> > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0&erro=
-r_fatal);
-> > > +=A0=A0=A0=A0if (spapr->vrma_adjust) {
-> > > +=A0=A0=A0=A0=A0=A0=A0=A0spapr->rma_size =3D kvmppc_rma_size(spapr_no=
-de0_size(),
-> > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0spapr->htab_shi=
-ft);
-> > > +=A0=A0=A0=A0}
-> > > +}
-> > > +
-> > > =A0static void find_unknown_sysbus_device(SysBusDevice *sbdev, void
-> > > *opaque)
-> > > =A0{
-> > > =A0=A0=A0=A0=A0bool matched =3D false;
-> > > @@ -1151,15 +1162,10 @@ static void ppc_spapr_reset(void)
-> > > =A0=A0=A0=A0=A0/* Check for unknown sysbus devices */
-> > > =A0=A0=A0=A0=A0foreach_dynamic_sysbus_device(find_unknown_sysbus_devi=
-ce,
-> > > NULL);
-> > > =A0
-> > > -=A0=A0=A0=A0/* Allocate and/or reset the hash page table */
-> > > -=A0=A0=A0=A0spapr_reallocate_hpt(spapr,
-> > > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0spapr_hpt_shift_for_ramsize(machine-
-> > > >maxram_size),
-> > > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0&error_fatal);
-> > > -
-> > > -=A0=A0=A0=A0/* Update the RMA size if necessary */
-> > > -=A0=A0=A0=A0if (spapr->vrma_adjust) {
-> > > -=A0=A0=A0=A0=A0=A0=A0=A0spapr->rma_size =3D kvmppc_rma_size(spapr_no=
-de0_size(),
-> > > -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0spapr->htab_shi=
-ft);
-> > > +=A0=A0=A0=A0/* If using KVM with radix mode available, VCPUs can be
-> > > started
-> > > +=A0=A0=A0=A0=A0* without a HPT because KVM will start them in radix =
-mode. */
-> > > +=A0=A0=A0=A0if (!(kvm_enabled() && kvmppc_has_cap_mmu_radix())) {
-> > > +=A0=A0=A0=A0=A0=A0=A0=A0spapr_setup_hpt_and_vrma(spapr);
-> > > =A0=A0=A0=A0=A0}
-> > > =A0
-> > > =A0=A0=A0=A0=A0qemu_devices_reset();
-> > > diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> > > index 42d20e0b92..cea34073aa 100644
-> > > --- a/hw/ppc/spapr_hcall.c
-> > > +++ b/hw/ppc/spapr_hcall.c
-> > > @@ -1002,6 +1002,16 @@ static target_ulong
-> > > h_client_architecture_support(PowerPCCPU *cpu,
-> > > =A0=A0=A0=A0=A0ov5_updates =3D spapr_ovec_new();
-> > > =A0=A0=A0=A0=A0spapr->cas_reboot =3D spapr_ovec_diff(ov5_updates,
-> > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0ov5_cas_old, spapr-
-> > > >ov5_cas);
-> > > +=A0=A0=A0=A0if (kvm_enabled()) {
-> > > +=A0=A0=A0=A0=A0=A0=A0=A0if (kvmppc_has_cap_mmu_radix()) {
-> > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0/* If the HPT hasn't yet been se=
-t up (see
-> > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0* ppc_spapr_reset()), and it'=
-s needed, do it now: */
-> > I think it's a bit fragile to have here it explicitly mirror the
-> > logic
-> > which determines whether the HPT is allocated early.=A0=A0I'd prefer to
-> > explicitly test here whether we have allocated an HPT - adding a
-> > flag,
-> > if we have to.
->=20
-> We can use the MSB of patb_entry as that flag.
 
-Uh.. only for POWER9..
+On Mon, Feb 27, 2017 at 03:29:07PM +0100, C=E9dric Le Goater wrote:
+>=20
+> Hello,
+>=20
+> The goal behind this series is to simplify the XICS interface by
+> moving back in the machine the way the ICS and ICP objects interact
+> together. It's up to the machine to implement this "fabric" logic by
+> providing a set of handlers of a QOM interface. These handlers are
+> used to grab an ICS or an ICP object and also do irq resends. The idea
+> was suggested by David Gibson.
+>=20
+>=20
+> The patchset is organised as follow. It starts with a preliminary
+> cleanup to get rid of the set_nr_irqs() and set_nr_servers()
+> handlers. It also moves the creation of the ICS and ICP objects from
+> the XICS object to the sPAPR machine. This simplifies the code
+> significantly and prepares ground for future changes.
+>=20
+> As the sPAPR machine only makes use of a single ICS, we can store it
+> at the machine level. This lets us remove dependencies on the list of
+> ICS of the XICS object and simplify even more the code for the
+> following changes.
+>=20
+> The QOM interface to interact with the ICS and ICP objects is then
+> introduced. These are moved under the machine and cleanups are done
+> accordingly.
+>=20
+> Finally, the XICSState classes are removed as they have been
+> deprecated by the QOM interface.
+>=20
+>=20
+> After the initial cleanups, which are rather big, each patch are small
+> and simple. The make target 'check-qtest-ppc64' runs succesfully for
+> each of them and so does migration of HV and TCG guests.
+>=20
+> The tree is available here :
+>=20
+> 	   https://github.com/legoater/qemu/tree/ppc-2.9
 
-> patb_entry & GUEST_RADIX =3D=3D GUEST_RADIX -> radix, so assume a hpt
-> hasn't been allocated.
+There are some things I'd do differently, and I think there's room for
+some future improvements, but this is certainly much better than where
+we started.  So I've merged this into ppc-for-2.9.  Assuming my usual
+tests pass, I hope to send a pull request shortly, to squeeze in just
+in time for the soft freeze.
+
 >=20
-> When we do allocate a hpt we know we're not radix, so set
-> patb_entry &=3D ~GUEST_RADIX;
+> Thanks,
 >=20
-> Where GUEST_RADIX is the msb in patb_entry which indicates that a guest
-> is radix.
+> C.
 >=20
-> Essentially patb_entry & GUEST_RADIX cleared mean hash with hpt
-> allocated, patb_entry & GUEST_RADIX set means radix so assume an hpt
-> hasn't been allocated. On the hpt allocation path we clear GUEST_RADIX
-> in patb_entry and when we set GUEST_RADIX we free the hpt.
 >=20
-> >=20
-> > >=20
-> > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0if (!spapr_ovec_test(ov5_updates=
-, OV5_MMU_RADIX)) {
-> > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0/* legacy hash or ne=
-w hash: */
-> > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0spapr_setup_hpt_and_=
-vrma(spapr);
-> > > +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0}
-> > > +=A0=A0=A0=A0=A0=A0=A0=A0}
-> > > +=A0=A0=A0=A0}
-> > > =A0
-> > > =A0=A0=A0=A0=A0if (!spapr->cas_reboot) {
-> > > =A0=A0=A0=A0=A0=A0=A0=A0=A0spapr->cas_reboot =3D
-> > > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > > index f9b17d860a..a30cbc485c 100644
-> > > --- a/include/hw/ppc/spapr.h
-> > > +++ b/include/hw/ppc/spapr.h
-> > > @@ -590,6 +590,7 @@ void spapr_dt_events(sPAPRMachineState *sm,
-> > > void *fdt);
-> > > =A0int spapr_h_cas_compose_response(sPAPRMachineState *sm,
-> > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0target_ulong addr, target_ulong
-> > > size,
-> > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0sPAPROptionVector *ov5_updates);
-> > > +void spapr_setup_hpt_and_vrma(sPAPRMachineState *spapr);
-> > > =A0sPAPRTCETable *spapr_tce_new_table(DeviceState *owner, uint32_t
-> > > liobn);
-> > > =A0void spapr_tce_table_enable(sPAPRTCETable *tcet,
-> > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0uint32_t page_shift, uint64_t
-> > > bus_offset,
+>=20
+> Caveats:
+>=20
+>  - The kernel ICP file descriptor 'kernel_xics_fd' was made static to
+>    ease changes but that could be an issue. We could move it under the
+>    sPAPR machine if needed.
+>=20
+> Changes since v3:
+>=20
+>  - reintroduced 'xics' backlinks to remove useless calls to
+>    qdev_get_machine()
+>  - moved InterruptStatsProvider to the sPAPR machine for a better
+>    output
+>  - moved move ics-simple post_load under the machine and removed the
+>    icp_resend() XICSFabric handler
+> =20
+> Changes since v2:
+>=20
+>  - renamed QOM Interface to XICSFabric
+>=20
+> C=E9dric Le Goater (25):
+>   ppc/xics: fix ICP and ICS reset
+>   ppc/xics: remove set_nr_irqs() handler from XICSStateClass
+>   ppc/xics: remove set_nr_servers() handler from XICSStateClass
+>   ppc/xics: store the ICS object under the sPAPR machine
+>   ppc/xics: add an InterruptStatsProvider interface to ICS and ICP
+>     objects
+>   ppc/xics: introduce a XICSFabric QOM interface to handle ICSs
+>   ppc/xics: use the QOM interface under the sPAPR machine
+>   ppc/xics: use the QOM interface to get irqs
+>   ppc/xics: use the QOM interface to resend irqs
+>   ppc/xics: remove xics_find_source()
+>   ppc/xics: register the reset handler of ICS objects
+>   ppc/xics: remove the XICS list of ICS
+>   ppc/xics: extend the QOM interface to handle ICPs
+>   ppc/xics: move kernel_xics_fd out of KVMXICSState
+>   ppc/xics: simplify the cpu_setup() handler
+>   ppc/xics: move the cpu_setup() handler under the ICPState class
+>   ppc/xics: use the QOM interface to grab an ICP
+>   ppc/xics: simplify spapr_dt_xics() interface
+>   ppc/xics: register the reset handler of ICP objects
+>   ppc/xics: move the ICP array under the sPAPR machine
+>   ppc/xics: export the XICS init routines
+>   ppc/xics: remove the XICSState classes
+>   ppc/xics: move ics-simple post_load under the machine
+>   ppc/xics: move InterruptStatsProvider to the sPAPR machine
+>   ppc/xics: rename 'ICPState *' variables to 'icp'
+>=20
+> David Gibson (1):
+>   xics: XICS should not be a SysBusDevice
+>=20
+>  hw/intc/xics.c              | 461 +++++++++++++++++---------------------=
+------
+>  hw/intc/xics_kvm.c          | 184 +++++-------------
+>  hw/intc/xics_spapr.c        | 128 +++---------
+>  hw/ppc/spapr.c              | 134 ++++++++++---
+>  hw/ppc/spapr_cpu_core.c     |   4 +-
+>  hw/ppc/spapr_events.c       |  10 +-
+>  hw/ppc/spapr_pci.c          |  10 +-
+>  hw/ppc/spapr_vio.c          |   2 +-
+>  include/hw/pci-host/spapr.h |   2 +-
+>  include/hw/ppc/spapr.h      |   5 +-
+>  include/hw/ppc/spapr_vio.h  |   2 +-
+>  include/hw/ppc/xics.h       |  97 ++++------
+>  12 files changed, 424 insertions(+), 615 deletions(-)
 >=20
 
 --=20
@@ -227,25 +158,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---k3Hs6P4rqk1MjcAG
+--qMm9M+Fa2AknHoGS
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYtOwrAAoJEGw4ysog2bOSnE8P+gLGTZMDSK+h7hLP9R19Eevz
-FANzQzmkLrnz5sOe1HsF38zUv1zkdhRTlb05S74nEZy8mOm4Ii62nXbixhIQtLlw
-GefSSRlsihSvWFbKDC5SnupHrSlTMLTKleZ4Pd4XM1lj/zqUXRnNbZKQHwjPhyEx
-cQGx4jOPDl+PxL7W2EWOpWf1azcftH44nk/bZ7djB6px3OAQ1yCE9RdOdbkQyL+6
-t5KU3GKIXcl3YQ4N71MMpGo7emK9iPBzVfMJArw6+aMZsphNzP2hUr9ZUusxxTKq
-W0r7dm6kD4cFa4/pimx5LTvbs8aU8OR86J3qycJx0o9AnyPGLlK9lAZSmL36dZ8l
-BTYZ0nyX3T4rV6Z1tn5+dT8/4OBBrp9/SujpKbyxwnkJnHei7SmF6yDwfyDK6DUH
-rxiWlQxPqaJSvZ3+p3a076Ld4jwTyb8sbB2ZyxLwSxhcYVnn+AVFa+wwQb2GVH+Y
-uqFyyx6m7hkvKy3J3AFcXP49MD8MEnWBDo7MmFrmfui1kDxXYb7O24hn/MHVH3GQ
-oSpWn2h5l/yuaE88jVQ2AEPigpCsMRKMw5AXKPpHRVO7Bi3Q8dNfs0utS9xMDL8Y
-2s0qDjq+fJZV6jlJh7N1ni9GyAPGT6RxcSdD08frAhj8STnjXYPC2bH0QH+y6CEk
-9Yyf9vlaVPoX/xu1ISPJ
-=eNDe
+iQIcBAEBCAAGBQJYtPRVAAoJEGw4ysog2bOSoqQQAI238Xb2qH7zsKf8AsX6S/jh
+6j4s2ujjyJd0QwZgJAKNej45WxjhxEm89CP8ebtZlInVk4Euy4pimzzbyH7cb2ZN
+DPr7GYMifsxDt0BdHZOdfbJ6CCl+TUNx4sKOwlYzQhW2d1nSAqqWKFrQQ2WdwtbF
+Ylp4F2kmaVOsoKH/6OxgyHctiqxYlahHVHrpStwvMdPoZmNsA7YdUXhv95qP0eEF
+IZwdbbIGMXqBtyYYue/a3dtwUY5PziAg66YPir4JsrrIt6rHcUil16/vpLnjF4z2
+j2D1wc25px0DXNnE/Y6hyERUKOqiwVFt2WfZ8xqZkP6PPwjPaqxZBm+B3Qp/8mtU
+QelPyleXSD2ujj2eWeuSmGQ9TLwKF5CT6kgQb38MZhRa9e5wA8u1Fr1M0mPbI/rz
+qNBIDRB/t+DxUJcM5Lts4DXGMSOj9RsZvRMkHJuvfPTuz8TbXJenAi4refywl/nz
+iFgwHkCOeT7PVSrk2N0BvHZcYN8dbnJSHOhR8Gj0Ndvmb64V2+95SAsK+JRDJti2
+PwAeYsTrGmTg0NuHH2T8NOj3lqTYJLiau9Evj+ywVB7M/TUEvOhP4tDKuiPCg01S
+roQJW/8w6hEF6ObtczWtyuSHwzBu9hf8ge9OUVcfTiQiDESTq520AuQ4dfg7QeDH
+JUx3wbBORuccWCFTbohj
+=1/6K
 -----END PGP SIGNATURE-----
 
---k3Hs6P4rqk1MjcAG--
+--qMm9M+Fa2AknHoGS--
