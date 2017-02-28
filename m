@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43365)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cilO1-0001kj-Ny
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:30 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cilO1-0001kl-OD
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cilO1-00037w-28
+	(envelope-from <pm215@archaic.org.uk>) id 1cilO0-00037T-NL
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:29 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48715)
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48716)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cilO0-00034e-Rs
+	id 1cilO0-00036d-Gi
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:28 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1cilNz-0003Vm-Qi
+	(envelope-from <pm215@archaic.org.uk>) id 1cilNz-0003VL-Ba
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:16:27 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Feb 2017 17:16:13 +0000
-Message-Id: <1488302176-19463-19-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 28 Feb 2017 17:16:12 +0000
+Message-Id: <1488302176-19463-18-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1488302176-19463-1-git-send-email-peter.maydell@linaro.org>
 References: <1488302176-19463-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 18/21] qdev: Have qdev_set_parent_bus() handle
- devices already on a bus
+Subject: [Qemu-devel] [PULL 17/21] hw/intc/arm_gicv3_kvm: Reset GICv3 cpu
+ interface registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +30,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Instead of qdev_set_parent_bus() silently doing the wrong
-thing if it's handed a device that's already on a bus,
-have it remove the device from the old bus and add it to
-the new one. This is useful for the raspi2 sdcard.
+From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 
+Reset CPU interface registers of GICv3 when CPU is reset.
+For this, ARMCPRegInfo struct is registered with one ICC
+register whose resetfn is called when cpu is reset.
+
+All the ICC registers are reset under one single register
+reset function instead of calling resetfn for each ICC
+register.
+
+Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Message-id: 1487850673-26455-6-git-send-email-vijay.kilari@gmail.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Message-id: 1488293711-14195-2-git-send-email-peter.maydell@linaro.org
 ---
- hw/core/qdev.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ hw/intc/arm_gicv3_kvm.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 60 insertions(+)
 
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 06ba02e..923e626 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -102,9 +102,23 @@ static void bus_add_child(BusState *bus, DeviceState *child)
- 
- void qdev_set_parent_bus(DeviceState *dev, BusState *bus)
- {
-+    bool replugging = dev->parent_bus != NULL;
-+
-+    if (replugging) {
-+        /* Keep a reference to the device while it's not plugged into
-+         * any bus, to avoid it potentially evaporating when it is
-+         * dereffed in bus_remove_child().
-+         */
-+        object_ref(OBJECT(dev));
-+        bus_remove_child(dev->parent_bus, dev);
-+        object_unref(OBJECT(dev->parent_bus));
-+    }
-     dev->parent_bus = bus;
-     object_ref(OBJECT(bus));
-     bus_add_child(bus, dev);
-+    if (replugging) {
-+        object_unref(OBJECT(dev));
-+    }
+diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
+index cda1af4..81f0403 100644
+--- a/hw/intc/arm_gicv3_kvm.c
++++ b/hw/intc/arm_gicv3_kvm.c
+@@ -604,6 +604,32 @@ static void kvm_arm_gicv3_get(GICv3State *s)
+     }
  }
  
- /* Create a new device.  This only initializes the device state
++static void arm_gicv3_icc_reset(CPUARMState *env, const ARMCPRegInfo *ri)
++{
++    ARMCPU *cpu;
++    GICv3State *s;
++    GICv3CPUState *c;
++
++    c = (GICv3CPUState *)env->gicv3state;
++    s = c->gic;
++    cpu = ARM_CPU(c->cpu);
++
++    /* Initialize to actual HW supported configuration */
++    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS,
++                      KVM_VGIC_ATTR(ICC_CTLR_EL1, cpu->mp_affinity),
++                      &c->icc_ctlr_el1[GICV3_NS], false);
++
++    c->icc_ctlr_el1[GICV3_S] = c->icc_ctlr_el1[GICV3_NS];
++    c->icc_pmr_el1 = 0;
++    c->icc_bpr[GICV3_G0] = GIC_MIN_BPR;
++    c->icc_bpr[GICV3_G1] = GIC_MIN_BPR;
++    c->icc_bpr[GICV3_G1NS] = GIC_MIN_BPR;
++
++    c->icc_sre_el1 = 0x7;
++    memset(c->icc_apr, 0, sizeof(c->icc_apr));
++    memset(c->icc_igrpen, 0, sizeof(c->icc_igrpen));
++}
++
+ static void kvm_arm_gicv3_reset(DeviceState *dev)
+ {
+     GICv3State *s = ARM_GICV3_COMMON(dev);
+@@ -621,6 +647,34 @@ static void kvm_arm_gicv3_reset(DeviceState *dev)
+     kvm_arm_gicv3_put(s);
+ }
+ 
++/*
++ * CPU interface registers of GIC needs to be reset on CPU reset.
++ * For the calling arm_gicv3_icc_reset() on CPU reset, we register
++ * below ARMCPRegInfo. As we reset the whole cpu interface under single
++ * register reset, we define only one register of CPU interface instead
++ * of defining all the registers.
++ */
++static const ARMCPRegInfo gicv3_cpuif_reginfo[] = {
++    { .name = "ICC_CTLR_EL1", .state = ARM_CP_STATE_BOTH,
++      .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 12, .opc2 = 4,
++      /*
++       * If ARM_CP_NOP is used, resetfn is not called,
++       * So ARM_CP_NO_RAW is appropriate type.
++       */
++      .type = ARM_CP_NO_RAW,
++      .access = PL1_RW,
++      .readfn = arm_cp_read_zero,
++      .writefn = arm_cp_write_ignore,
++      /*
++       * We hang the whole cpu interface reset routine off here
++       * rather than parcelling it out into one little function
++       * per register
++       */
++      .resetfn = arm_gicv3_icc_reset,
++    },
++    REGINFO_SENTINEL
++};
++
+ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
+ {
+     GICv3State *s = KVM_ARM_GICV3(dev);
+@@ -644,6 +698,12 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
+ 
+     gicv3_init_irqs_and_mmio(s, kvm_arm_gicv3_set_irq, NULL);
+ 
++    for (i = 0; i < s->num_cpu; i++) {
++        ARMCPU *cpu = ARM_CPU(qemu_get_cpu(i));
++
++        define_arm_cp_regs(cpu, gicv3_cpuif_reginfo);
++    }
++
+     /* Try to create the device via the device control API */
+     s->dev_fd = kvm_create_device(kvm_state, KVM_DEV_TYPE_ARM_VGIC_V3, false);
+     if (s->dev_fd < 0) {
 -- 
 2.7.4
