@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ciled-00083a-49
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:33:40 -0500
+	(envelope-from <armbru@redhat.com>) id 1cilkE-0003cs-HH
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:39:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cilec-0003pb-AC
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:33:39 -0500
-Date: Tue, 28 Feb 2017 18:33:32 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170228173332.GT4090@noname.redhat.com>
-References: <1488194450-28056-1-git-send-email-armbru@redhat.com>
-	<1488194450-28056-18-git-send-email-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1488194450-28056-18-git-send-email-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 17/24] qapi: New
- qobject_input_visitor_new_str() for convenience
+	(envelope-from <armbru@redhat.com>) id 1cilkD-0005QV-24
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:39:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55688)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cilkC-0005Pz-T7
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:39:25 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1344A8124A
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 17:39:25 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Tue, 28 Feb 2017 18:39:03 +0100
+Message-Id: <1488303560-18803-10-git-send-email-armbru@redhat.com>
+In-Reply-To: <1488303560-18803-1-git-send-email-armbru@redhat.com>
+References: <1488303560-18803-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 09/26] qapi: Improve a QObject input visitor
+ error message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,92 +30,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, pkrempa@redhat.com, eblake@redhat.com
+To: qemu-devel@nongnu.org
 
-Am 27.02.2017 um 12:20 hat Markus Armbruster geschrieben:
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  include/qapi/qobject-input-visitor.h | 12 ++++++++++++
->  qapi/qobject-input-visitor.c         | 33 +++++++++++++++++++++++++++++++++
->  2 files changed, 45 insertions(+)
-> 
-> diff --git a/include/qapi/qobject-input-visitor.h b/include/qapi/qobject-input-visitor.h
-> index 282f9d2..b399285 100644
-> --- a/include/qapi/qobject-input-visitor.h
-> +++ b/include/qapi/qobject-input-visitor.h
-> @@ -68,4 +68,16 @@ Visitor *qobject_input_visitor_new(QObject *obj);
->   */
->  Visitor *qobject_input_visitor_new_keyval(QObject *obj);
->  
-> +/*
-> + * Create a QObject input visitor for parsing @str.
-> + *
-> + * If @str looks like JSON, parse it as JSON, else as KEY=VALUE,...
-> + * @implied_key applies to KEY=VALUE, and works as in keyval_parse().
-> + * On failure, store an error through @errp and return NULL.
-> + * On success, return a new QObject input visitor for the parse.
-> + */
-> +Visitor *qobject_input_visitor_new_str(const char *str,
-> +                                       const char *implied_key,
-> +                                       Error **errp);
-> +
->  #endif
-> diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
-> index 3db5850..64a08d3 100644
-> --- a/qapi/qobject-input-visitor.c
-> +++ b/qapi/qobject-input-visitor.c
-> @@ -18,9 +18,11 @@
->  #include "qapi/visitor-impl.h"
->  #include "qemu/queue.h"
->  #include "qemu-common.h"
-> +#include "qapi/qmp/qjson.h"
->  #include "qapi/qmp/types.h"
->  #include "qapi/qmp/qerror.h"
->  #include "qemu/cutils.h"
-> +#include "qemu/option.h"
->  
->  typedef struct StackObject {
->      const char *name;            /* Name of @obj in its parent, if any */
-> @@ -655,3 +657,34 @@ Visitor *qobject_input_visitor_new_keyval(QObject *obj)
->  
->      return &v->visitor;
->  }
-> +
-> +Visitor *qobject_input_visitor_new_str(const char *str,
-> +                                       const char *implied_key,
-> +                                       Error **errp)
-> +{
-> +    bool is_json = str[0] == '{';
-> +    QObject *obj;
-> +    QDict *args;
-> +    Visitor *v;
-> +
-> +    if (is_json) {
-> +        obj = qobject_from_json(str, errp);
-> +        if (!obj) {
-> +            /* Work around qobject_from_json() lossage TODO fix that */
-> +            if (errp && !*errp) {
-> +                error_setg(errp, "JSON parse error");
-> +                return NULL;
-> +            }
-> +            return NULL;
-> +        }
-> +        args = qobject_to_qdict(obj);
-> +        assert(args);
-> +        v = qobject_input_visitor_new(QOBJECT(args));
-> +    } else {
-> +        args = keyval_parse(optarg, implied_key, errp);
+The QObject input visitor has three error message formats:
 
-No, you don't mean optarg.
+* Parameter '%s' is missing
+* "Invalid parameter type for '%s', expected: %s"
+* "QMP input object member '%s' is unexpected"
 
-Makes all attempts to use -blockdev segfault for me.
+The '%s' are member names (or "null", but I'll fix that later).
 
-> +        v = qobject_input_visitor_new_keyval(QOBJECT(args));
-> +    }
-> +    QDECREF(args);
-> +
-> +    return v;
-> +}
+The last error message calls the thing "QMP input object member"
+instead of "parameter".  Misleading when the visitor is used on
+QObjects that don't come from QMP.  Change it to "Parameter '%s' is
+unexpected".
 
-Kevin
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ qapi/qobject-input-visitor.c | 3 +--
+ tests/test-qga.c             | 2 +-
+ 2 files changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index ed6c24c..f3b6713 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -140,8 +140,7 @@ static void qobject_input_check_struct(Visitor *v, Error **errp)
+ 
+             g_hash_table_iter_init(&iter, top_ht);
+             if (g_hash_table_iter_next(&iter, (void **)&key, NULL)) {
+-                error_setg(errp, "QMP input object member '%s' is unexpected",
+-                           key);
++                error_setg(errp, "Parameter '%s' is unexpected", key);
+             }
+         }
+     }
+diff --git a/tests/test-qga.c b/tests/test-qga.c
+index 868b02a..ae97b57 100644
+--- a/tests/test-qga.c
++++ b/tests/test-qga.c
+@@ -213,7 +213,7 @@ static void test_qga_invalid_args(gconstpointer fix)
+     desc = qdict_get_try_str(error, "desc");
+ 
+     g_assert_cmpstr(class, ==, "GenericError");
+-    g_assert_cmpstr(desc, ==, "QMP input object member 'foo' is unexpected");
++    g_assert_cmpstr(desc, ==, "Parameter 'foo' is unexpected");
+ 
+     QDECREF(ret);
+ }
+-- 
+2.7.4
