@@ -1,42 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cihDE-0007N2-Iy
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:49:05 -0500
+	(envelope-from <berrange@redhat.com>) id 1cihDV-0007YY-Q9
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:49:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cihDB-0002PO-Gz
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:49:04 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39078
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cihDB-0002Ow-B2
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:49:01 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1SChw68034700
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 07:49:00 -0500
-Received: from e06smtp08.uk.ibm.com (e06smtp08.uk.ibm.com [195.75.94.104])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28w2v0jqna-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 07:48:59 -0500
-Received: from localhost
-	by e06smtp08.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Tue, 28 Feb 2017 12:48:58 -0000
-Date: Tue, 28 Feb 2017 13:48:54 +0100
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <a5ada7c2-4166-1cdf-a4e0-7c49a68374f9@redhat.com>
-References: <baa954b4-53fc-2b4e-b79c-917ba9171a60@de.ibm.com>
-	<20170227160609.0d49a87d.cornelia.huck@de.ibm.com>
-	<20170227163708.796ab27f.cornelia.huck@de.ibm.com>
-	<a5ada7c2-4166-1cdf-a4e0-7c49a68374f9@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1cihDU-0002RZ-HU
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:49:21 -0500
+Date: Tue, 28 Feb 2017 12:49:11 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170228124911.GC2720@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <cover.1488220970.git.jcody@redhat.com>
+	<12a16b28300f871052a49897ec7875a082fc63e3.1488220970.git.jcody@redhat.com>
+	<c5869fe5-fa51-3f2f-26d6-26a733c15493@redhat.com>
+	<20170228035744.GO25637@localhost.localdomain>
+	<20170228101651.GE2762@redhat.com>
+	<20170228102849.GF2762@redhat.com>
+	<20170228123452.GQ25637@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170228134854.141a10e6.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] segfault use VRingMemoryRegionCaches for avail and
- used ring vs num-queues
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170228123452.GQ25637@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] block/rbd: add support for
+ 'mon_host', 'auth_supported' via QAPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,52 +30,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com
 
-On Mon, 27 Feb 2017 16:41:09 +0100
-Paolo Bonzini <pbonzini@redhat.com> wrote:
-
-> On 27/02/2017 16:37, Cornelia Huck wrote:
-> > With the following applied (probably whitespace damaged), my guest
-> > starts:
+On Tue, Feb 28, 2017 at 07:34:52AM -0500, Jeff Cody wrote:
+> On Tue, Feb 28, 2017 at 10:28:49AM +0000, Daniel P. Berrange wrote:
+> > On Tue, Feb 28, 2017 at 10:16:51AM +0000, Daniel P. Berrange wrote:
+> > > On Mon, Feb 27, 2017 at 10:57:44PM -0500, Jeff Cody wrote:
+> > > > On Mon, Feb 27, 2017 at 04:47:54PM -0600, Eric Blake wrote:
+> > > > > On 02/27/2017 12:58 PM, Jeff Cody wrote:
+> > > > > > @@ -604,6 +620,29 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+> > > > > >          goto failed_shutdown;
+> > > > > >      }
+> > > > > >  
+> > > > > > +    /* if mon_host was specified */
+> > > > > > +    if (host) {
+> > > > > > +        const char *hostname = host;
+> > > > > > +        char *mon_host = NULL;
+> > > > > > +
+> > > > > > +        if (port) {
+> > > > > > +            mon_host = g_strdup_printf("%s:%s", host, port);
+> > > > > 
+> > > > > Does Ceph care about IPv6 (in which case you may need [host]:port when
+> > > > > host itself includes ':')?
+> > > > >
+> > > > 
+> > > > Some quick sanity testing seems to show that it does not need [] for ipv6
+> > > > addresses, which is nice.
+> > > 
+> > > Hmm, that is very odd to me, as that means parsing is ambiguous. The
+> > > ceph 'mon_host' option allows the port to be omitted, so given a
+> > > string  2001:242:24:23   there's no way of knowing whether it is
+> > > a IPv6 addr 2001:242:24:23, with no port, or an addr 2001:242:24 with
+> > > port of 23
 > > 
-> > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> > index e487e36..28906e5 100644
-> > --- a/hw/virtio/virtio.c
-> > +++ b/hw/virtio/virtio.c
-> > @@ -287,6 +287,9 @@ static inline void vring_set_avail_event(VirtQueue *vq, uint16_t val)
-> >  void virtio_queue_set_notification(VirtQueue *vq, int enable)
-> >  {
-> >      vq->notification = enable;
-> > +    if (!vq->vring.desc) {
-> > +        return;
-> > +    }
-> >  
-> >      rcu_read_lock();
-> >      if (virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX)) {
+> > Looking at the source code to ceph it appears that if you omit the
+> > use of [], then it will treat the entire string as being the address
+> > without port. It does look to support use of [], so we should use
+> > that IIUC.
+> 
+> For the sake of clarity, when you say we should use [] for ipv6, you mean
+> QEMU (rather than doing it in libvirt)?
+
+Yes, in QAPI JSON, it should be the bare IPv6 address in the server
+host field. When QEMU conbines the host + port to form the mon_host
+string, it must add [] if it sees the host from QAPI is a raw IPv6
+address
+
+> > https://blog.widodh.nl/2014/11/ceph-with-a-cluster-and-public-network-on-ipv6/
 > > 
-> > Maybe introduction of caches just exposed bugs that were already there
-> > (trying to muck with vring state for queues that have not been setup?)
+> > See also entity_addr_t::parse in $CEPH/src/msg/msg_types.cc which is
+> > what I think parses the mon addr. NB, I've not tested this yet, so
+> > if you have a live ceph cluster with ipv6, it'd be good to verify that
+> > using [] is correct.
+> >
 > 
-> Yes, it did.  I had caught a few while writing the patches, but it does
-> feel like whack-a-mole...
-> 
-> Paolo
-> 
-> > Should we stick some asserts into the respective functions to help
-> > flush out the remaining bugs?
+> Do you think this needs to be in place before either A) we pull the series
+> for softfreeze, or B) 2.10?  I.e., is this something we can fix up later?
+> It is OK if not, but I have a flight leaving soon and can't work on the
+> series anymore -- so depending on this and how v3 review goes, we may just
+> need to slip the series to 2.10.
 
-I've been staring at the code some more and I'm not really sure how to
-fix this properly.
+The fix doesn't affect QAPI protocol spec, so as long as it is fixed
+before 2.9 release it'd be ok.
 
-The dataplane code tries to switch handlers for all virtqueues,
-regardless whether they are configured or not. My hack above leaves the
-notification in a bit of an ambiguous state, as it cannot
-enable/disable notifications on the real queues.
-
-This is ok for this particular case, where we hand over from the bios
-(which only enables the first queue) to the Linux kernel (which uses
-multiple queues) - but with a virtio reset before additional queues are
-configured. I don't think the spec prohibits configuring extra queues
-(if present) on the fly, however...
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
