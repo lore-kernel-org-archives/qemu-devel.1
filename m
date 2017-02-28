@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33728)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ciqDx-00059N-5T
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:26:29 -0500
+	(envelope-from <armbru@redhat.com>) id 1ciqDy-0005Ab-IE
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:26:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ciqDs-0000ZA-Pg
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:26:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56648)
+	(envelope-from <armbru@redhat.com>) id 1ciqDu-0000cH-7Y
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:26:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40824)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ciqDs-0000Xl-G3
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:26:20 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ciqDt-0000aB-Rt
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:26:22 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AD2D7C04B320
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 22:26:20 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1006D80F8D
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 22:26:22 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
 	[10.36.116.55])
-	by int-mx10.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v1SMQJMd029014
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=NO)
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 17:26:20 -0500
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id A51F91DCC2
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 22:26:21 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 28 Feb 2017 23:26:05 +0100
-Message-Id: <1488320775-9849-15-git-send-email-armbru@redhat.com>
+Date: Tue, 28 Feb 2017 23:26:12 +0100
+Message-Id: <1488320775-9849-22-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488320775-9849-1-git-send-email-armbru@redhat.com>
 References: <1488320775-9849-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 14/24] check-qjson: Test errors from
- qobject_from_json()
+Subject: [Qemu-devel] [PULL 21/24] block: Initial implementation of -blockdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,308 +35,126 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Pass &error_abort with known-good input.  Else pass &err and check
-what comes back.  This demonstrates that the parser fails silently for
-many errors.
+The new command line option -blockdev works like QMP command
+blockdev-add.
+
+The option argument may be given in JSON syntax, exactly as in QMP.
+Example usage:
+
+    -blockdev '{"node-name": "foo", "driver": "raw", "file": {"driver": "file", "filename": "foo.img"} }'
+
+The JSON argument doesn't exactly blend into the existing option
+syntax, so the traditional KEY=VALUE,... syntax is also supported,
+using dotted keys to do the nesting:
+
+    -blockdev node-name=foo,driver=raw,file.driver=file,file.filename=foo.img
+
+This does not yet support lists or downstream extensions, i.e. keys
+with __RFQDN_ prefix, but the next few patches will take care of that.
+
+Note that calling qmp_blockdev_add() (say via qmp_marshal_block_add())
+right away would crash.  We need to stash the configuration for later
+instead.  This is crudely done, and bypasses QemuOpts, even though
+storing configuration is what QemuOpts is for.  Need to revamp option
+infrastructure to support QAPI types like BlockdevOptions.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-Message-Id: <1488317230-26248-15-git-send-email-armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <1488317230-26248-22-git-send-email-armbru@redhat.com>
 ---
- tests/check-qjson.c | 88 ++++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 56 insertions(+), 32 deletions(-)
+ qemu-options.hx |  7 +++++++
+ vl.c            | 39 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 46 insertions(+)
 
-diff --git a/tests/check-qjson.c b/tests/check-qjson.c
-index aa63758..963dd46 100644
---- a/tests/check-qjson.c
-+++ b/tests/check-qjson.c
-@@ -10,8 +10,10 @@
-  * See the COPYING.LIB file in the top-level directory.
-  *
-  */
+diff --git a/qemu-options.hx b/qemu-options.hx
+index c85f77d..f5202c9 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -532,6 +532,13 @@ Use @var{file} as CD-ROM image (you cannot use @option{-hdc} and
+ using @file{/dev/cdrom} as filename (@pxref{host_drives}).
+ ETEXI
+ 
++DEF("blockdev", HAS_ARG, QEMU_OPTION_blockdev,
++    "-blockdev [driver=]driver[,node-name=N][,discard=ignore|unmap]\n"
++    "          [,cache.direct=on|off][,cache.no-flush=on|off]\n"
++    "          [,read-only=on|off][,detect-zeroes=on|off|unmap]\n"
++    "          [,driver specific parameters...]\n"
++    "                configure a block backend\n", QEMU_ARCH_ALL)
 +
- #include "qemu/osdep.h"
- 
-+#include "qapi/error.h"
- #include "qapi/qmp/types.h"
+ DEF("drive", HAS_ARG, QEMU_OPTION_drive,
+     "-drive [file=file][,if=type][,bus=n][,unit=m][,media=d][,index=i]\n"
+     "       [,cyls=c,heads=h,secs=s[,trans=t]][,snapshot=on|off]\n"
+diff --git a/vl.c b/vl.c
+index c6020b9..68405c6 100644
+--- a/vl.c
++++ b/vl.c
+@@ -95,6 +95,9 @@ int main(int argc, char **argv)
+ #include "migration/colo.h"
+ #include "sysemu/kvm.h"
+ #include "sysemu/hax.h"
++#include "qapi/qobject-input-visitor.h"
++#include "qapi/qobject-input-visitor.h"
++#include "qapi-visit.h"
  #include "qapi/qmp/qjson.h"
- #include "qemu-common.h"
-@@ -53,7 +55,7 @@ static void escaped_string(void)
-         QObject *obj;
-         QString *str;
+ #include "qemu/option.h"
+ #include "qemu/config-file.h"
+@@ -2975,6 +2978,13 @@ int main(int argc, char **argv, char **envp)
+     Error *main_loop_err = NULL;
+     Error *err = NULL;
+     bool list_data_dirs = false;
++    typedef struct BlockdevOptions_queue {
++        BlockdevOptions *bdo;
++        Location loc;
++        QSIMPLEQ_ENTRY(BlockdevOptions_queue) entry;
++    } BlockdevOptions_queue;
++    QSIMPLEQ_HEAD(, BlockdevOptions_queue) bdo_queue
++        = QSIMPLEQ_HEAD_INITIALIZER(bdo_queue);
  
--        obj = qobject_from_json(test_cases[i].encoded, NULL);
-+        obj = qobject_from_json(test_cases[i].encoded, &error_abort);
-         str = qobject_to_qstring(obj);
-         g_assert(str);
-         g_assert_cmpstr(qstring_get_str(str), ==, test_cases[i].decoded);
-@@ -85,7 +87,7 @@ static void simple_string(void)
-         QObject *obj;
-         QString *str;
+     module_call_init(MODULE_INIT_TRACE);
  
--        obj = qobject_from_json(test_cases[i].encoded, NULL);
-+        obj = qobject_from_json(test_cases[i].encoded, &error_abort);
-         str = qobject_to_qstring(obj);
-         g_assert(str);
-         g_assert(strcmp(qstring_get_str(str), test_cases[i].decoded) == 0);
-@@ -116,7 +118,7 @@ static void single_quote_string(void)
-         QObject *obj;
-         QString *str;
+@@ -3117,6 +3127,25 @@ int main(int argc, char **argv, char **envp)
+                 drive_add(IF_DEFAULT, popt->index - QEMU_OPTION_hda, optarg,
+                           HD_OPTS);
+                 break;
++            case QEMU_OPTION_blockdev:
++                {
++                    Visitor *v;
++                    BlockdevOptions_queue *bdo;
++
++                    v = qobject_input_visitor_new_str(optarg, "driver", &err);
++                    if (!v) {
++                        error_report_err(err);
++                        exit(1);
++                    }
++
++                    bdo = g_new(BlockdevOptions_queue, 1);
++                    visit_type_BlockdevOptions(v, NULL, &bdo->bdo,
++                                               &error_fatal);
++                    visit_free(v);
++                    loc_save(&bdo->loc);
++                    QSIMPLEQ_INSERT_TAIL(&bdo_queue, bdo, entry);
++                    break;
++                }
+             case QEMU_OPTION_drive:
+                 if (drive_def(optarg) == NULL) {
+                     exit(1);
+@@ -4450,6 +4479,16 @@ int main(int argc, char **argv, char **envp)
+     }
  
--        obj = qobject_from_json(test_cases[i].encoded, NULL);
-+        obj = qobject_from_json(test_cases[i].encoded, &error_abort);
-         str = qobject_to_qstring(obj);
-         g_assert(str);
-         g_assert(strcmp(qstring_get_str(str), test_cases[i].decoded) == 0);
-@@ -809,7 +811,7 @@ static void utf8_string(void)
-         utf8_in = test_cases[i].utf8_in ?: test_cases[i].utf8_out;
-         json_out = test_cases[i].json_out ?: test_cases[i].json_in;
- 
--        obj = qobject_from_json(json_in, NULL);
-+        obj = qobject_from_json(json_in, utf8_out ? &error_abort : NULL);
-         if (utf8_out) {
-             str = qobject_to_qstring(obj);
-             g_assert(str);
-@@ -836,7 +838,7 @@ static void utf8_string(void)
-          * FIXME Enable once these bugs have been fixed.
-          */
-         if (0 && json_out != json_in) {
--            obj = qobject_from_json(json_out, NULL);
-+            obj = qobject_from_json(json_out, &error_abort);
-             str = qobject_to_qstring(obj);
-             g_assert(str);
-             g_assert_cmpstr(qstring_get_str(str), ==, utf8_out);
-@@ -886,7 +888,8 @@ static void simple_number(void)
-     for (i = 0; test_cases[i].encoded; i++) {
-         QInt *qint;
- 
--        qint = qobject_to_qint(qobject_from_json(test_cases[i].encoded, NULL));
-+        qint = qobject_to_qint(qobject_from_json(test_cases[i].encoded,
-+                                                 &error_abort));
-         g_assert(qint);
-         g_assert(qint_get_int(qint) == test_cases[i].decoded);
-         if (test_cases[i].skip == 0) {
-@@ -920,7 +923,7 @@ static void float_number(void)
-         QObject *obj;
-         QFloat *qfloat;
- 
--        obj = qobject_from_json(test_cases[i].encoded, NULL);
-+        obj = qobject_from_json(test_cases[i].encoded, &error_abort);
-         qfloat = qobject_to_qfloat(obj);
-         g_assert(qfloat);
-         g_assert(qfloat_get_double(qfloat) == test_cases[i].decoded);
-@@ -965,7 +968,7 @@ static void keyword_literal(void)
-     QObject *null;
-     QString *str;
- 
--    obj = qobject_from_json("true", NULL);
-+    obj = qobject_from_json("true", &error_abort);
-     qbool = qobject_to_qbool(obj);
-     g_assert(qbool);
-     g_assert(qbool_get_bool(qbool) == true);
-@@ -976,7 +979,7 @@ static void keyword_literal(void)
- 
-     QDECREF(qbool);
- 
--    obj = qobject_from_json("false", NULL);
-+    obj = qobject_from_json("false", &error_abort);
-     qbool = qobject_to_qbool(obj);
-     g_assert(qbool);
-     g_assert(qbool_get_bool(qbool) == false);
-@@ -998,7 +1001,7 @@ static void keyword_literal(void)
-     g_assert(qbool_get_bool(qbool) == true);
-     QDECREF(qbool);
- 
--    obj = qobject_from_json("null", NULL);
-+    obj = qobject_from_json("null", &error_abort);
-     g_assert(obj != NULL);
-     g_assert(qobject_type(obj) == QTYPE_QNULL);
- 
-@@ -1134,13 +1137,13 @@ static void simple_dict(void)
-         QObject *obj;
-         QString *str;
- 
--        obj = qobject_from_json(test_cases[i].encoded, NULL);
-+        obj = qobject_from_json(test_cases[i].encoded, &error_abort);
-         g_assert(compare_litqobj_to_qobj(&test_cases[i].decoded, obj) == 1);
- 
-         str = qobject_to_json(obj);
-         qobject_decref(obj);
- 
--        obj = qobject_from_json(qstring_get_str(str), NULL);
-+        obj = qobject_from_json(qstring_get_str(str), &error_abort);
-         g_assert(compare_litqobj_to_qobj(&test_cases[i].decoded, obj) == 1);
-         qobject_decref(obj);
-         QDECREF(str);
-@@ -1192,7 +1195,7 @@ static void large_dict(void)
-     QObject *obj;
- 
-     gen_test_json(gstr, 10, 100);
--    obj = qobject_from_json(gstr->str, NULL);
-+    obj = qobject_from_json(gstr->str, &error_abort);
-     g_assert(obj != NULL);
- 
-     qobject_decref(obj);
-@@ -1243,13 +1246,13 @@ static void simple_list(void)
-         QObject *obj;
-         QString *str;
- 
--        obj = qobject_from_json(test_cases[i].encoded, NULL);
-+        obj = qobject_from_json(test_cases[i].encoded, &error_abort);
-         g_assert(compare_litqobj_to_qobj(&test_cases[i].decoded, obj) == 1);
- 
-         str = qobject_to_json(obj);
-         qobject_decref(obj);
- 
--        obj = qobject_from_json(qstring_get_str(str), NULL);
-+        obj = qobject_from_json(qstring_get_str(str), &error_abort);
-         g_assert(compare_litqobj_to_qobj(&test_cases[i].decoded, obj) == 1);
-         qobject_decref(obj);
-         QDECREF(str);
-@@ -1305,13 +1308,13 @@ static void simple_whitespace(void)
-         QObject *obj;
-         QString *str;
- 
--        obj = qobject_from_json(test_cases[i].encoded, NULL);
-+        obj = qobject_from_json(test_cases[i].encoded, &error_abort);
-         g_assert(compare_litqobj_to_qobj(&test_cases[i].decoded, obj) == 1);
- 
-         str = qobject_to_json(obj);
-         qobject_decref(obj);
- 
--        obj = qobject_from_json(qstring_get_str(str), NULL);
-+        obj = qobject_from_json(qstring_get_str(str), &error_abort);
-         g_assert(compare_litqobj_to_qobj(&test_cases[i].decoded, obj) == 1);
- 
-         qobject_decref(obj);
-@@ -1332,7 +1335,7 @@ static void simple_varargs(void)
-                         {}})),
-             {}}));
- 
--    embedded_obj = qobject_from_json("[32, 42]", NULL);
-+    embedded_obj = qobject_from_json("[32, 42]", &error_abort);
-     g_assert(embedded_obj != NULL);
- 
-     obj = qobject_from_jsonf("[%d, 2, %p]", 1, embedded_obj);
-@@ -1344,68 +1347,87 @@ static void simple_varargs(void)
- static void empty_input(void)
- {
-     const char *empty = "";
--
--    QObject *obj = qobject_from_json(empty, NULL);
-+    QObject *obj = qobject_from_json(empty, &error_abort);
-     g_assert(obj == NULL);
- }
- 
- static void unterminated_string(void)
- {
--    QObject *obj = qobject_from_json("\"abc", NULL);
-+    Error *err = NULL;
-+    QObject *obj = qobject_from_json("\"abc", &err);
-+    g_assert(!err);             /* BUG */
-     g_assert(obj == NULL);
- }
- 
- static void unterminated_sq_string(void)
- {
--    QObject *obj = qobject_from_json("'abc", NULL);
-+    Error *err = NULL;
-+    QObject *obj = qobject_from_json("'abc", &err);
-+    g_assert(!err);             /* BUG */
-     g_assert(obj == NULL);
- }
- 
- static void unterminated_escape(void)
- {
--    QObject *obj = qobject_from_json("\"abc\\\"", NULL);
-+    Error *err = NULL;
-+    QObject *obj = qobject_from_json("\"abc\\\"", &err);
-+    g_assert(!err);             /* BUG */
-     g_assert(obj == NULL);
- }
- 
- static void unterminated_array(void)
- {
--    QObject *obj = qobject_from_json("[32", NULL);
-+    Error *err = NULL;
-+    QObject *obj = qobject_from_json("[32", &err);
-+    g_assert(!err);             /* BUG */
-     g_assert(obj == NULL);
- }
- 
- static void unterminated_array_comma(void)
- {
--    QObject *obj = qobject_from_json("[32,", NULL);
-+    Error *err = NULL;
-+    QObject *obj = qobject_from_json("[32,", &err);
-+    g_assert(!err);             /* BUG */
-     g_assert(obj == NULL);
- }
- 
- static void invalid_array_comma(void)
- {
--    QObject *obj = qobject_from_json("[32,}", NULL);
-+    Error *err = NULL;
-+    QObject *obj = qobject_from_json("[32,}", &err);
-+    error_free_or_abort(&err);
-     g_assert(obj == NULL);
- }
- 
- static void unterminated_dict(void)
- {
--    QObject *obj = qobject_from_json("{'abc':32", NULL);
-+    Error *err = NULL;
-+    QObject *obj = qobject_from_json("{'abc':32", &err);
-+    g_assert(!err);             /* BUG */
-     g_assert(obj == NULL);
- }
- 
- static void unterminated_dict_comma(void)
- {
--    QObject *obj = qobject_from_json("{'abc':32,", NULL);
-+    Error *err = NULL;
-+    QObject *obj = qobject_from_json("{'abc':32,", &err);
-+    g_assert(!err);             /* BUG */
-     g_assert(obj == NULL);
- }
- 
- static void invalid_dict_comma(void)
- {
--    QObject *obj = qobject_from_json("{'abc':32,}", NULL);
-+    Error *err = NULL;
-+    QObject *obj = qobject_from_json("{'abc':32,}", &err);
-+    error_free_or_abort(&err);
-     g_assert(obj == NULL);
- }
- 
- static void unterminated_literal(void)
- {
--    QObject *obj = qobject_from_json("nul", NULL);
-+    Error *err = NULL;
-+    QObject *obj = qobject_from_json("nul", &err);
-+    error_free_or_abort(&err);
-     g_assert(obj == NULL);
- }
- 
-@@ -1421,15 +1443,17 @@ static char *make_nest(char *buf, size_t cnt)
- 
- static void limits_nesting(void)
- {
-+    Error *err = NULL;
-     enum { max_nesting = 1024 }; /* see qobject/json-streamer.c */
-     char buf[2 * (max_nesting + 1) + 1];
-     QObject *obj;
- 
--    obj = qobject_from_json(make_nest(buf, max_nesting), NULL);
-+    obj = qobject_from_json(make_nest(buf, max_nesting), &error_abort);
-     g_assert(obj != NULL);
-     qobject_decref(obj);
- 
--    obj = qobject_from_json(make_nest(buf, max_nesting + 1), NULL);
-+    obj = qobject_from_json(make_nest(buf, max_nesting + 1), &err);
-+    error_free_or_abort(&err);
-     g_assert(obj == NULL);
- }
- 
+     /* open the virtual block devices */
++    while (!QSIMPLEQ_EMPTY(&bdo_queue)) {
++        BlockdevOptions_queue *bdo = QSIMPLEQ_FIRST(&bdo_queue);
++
++        QSIMPLEQ_REMOVE_HEAD(&bdo_queue, entry);
++        loc_push_restore(&bdo->loc);
++        qmp_blockdev_add(bdo->bdo, &error_fatal);
++        loc_pop(&bdo->loc);
++        qapi_free_BlockdevOptions(bdo->bdo);
++        g_free(bdo);
++    }
+     if (snapshot || replay_mode != REPLAY_MODE_NONE) {
+         qemu_opts_foreach(qemu_find_opts("drive"), drive_enable_snapshot,
+                           NULL, NULL);
 -- 
 2.7.4
