@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58920)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cied5-0006oG-Uk
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:41 -0500
+	(envelope-from <fred.konrad@greensocs.com>) id 1cied5-0006oE-Tp
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cied3-000489-GN
+	(envelope-from <fred.konrad@greensocs.com>) id 1cied4-00048W-4I
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:35 -0500
-Received: from greensocs.com ([193.104.36.180]:38399)
+Received: from greensocs.com ([193.104.36.180]:38408)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cied3-00047r-3c
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:33 -0500
+	(envelope-from <fred.konrad@greensocs.com>) id 1cied3-00048D-Oo
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 05:03:34 -0500
 From: fred.konrad@greensocs.com
-Date: Tue, 28 Feb 2017 11:02:59 +0100
-Message-Id: <1488276185-31168-5-git-send-email-fred.konrad@greensocs.com>
+Date: Tue, 28 Feb 2017 11:03:00 +0100
+Message-Id: <1488276185-31168-6-git-send-email-fred.konrad@greensocs.com>
 In-Reply-To: <1488276185-31168-1-git-send-email-fred.konrad@greensocs.com>
 References: <1488276185-31168-1-git-send-email-fred.konrad@greensocs.com>
-Subject: [Qemu-devel] [PATCH v3 04/10] qemu-clk: introduce an init array to
- help the device construction
+Subject: [Qemu-devel] [PATCH v3 05/10] qdev-monitor: print the device's
+ clock with info qtree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,85 +29,134 @@ Cc: peter.maydell@linaro.org, edgar.iglesias@xilinx.com, alistair.francis@xilinx
 
 From: KONRAD Frederic <fred.konrad@greensocs.com>
 
-This introduces a clock init array to ease the clock tree construction.
+This prints the clock attached to a DeviceState when using "info qtree" monitor
+command.
+
+For example:
+
+bus: main-system-bus
+  type System
+  dev: xlnx.zynqmp_crf, id ""
+    gpio-out "sysbus-irq" 1
+    gpio-out "RST_A9" 4
+    qemu-clk "dbg_trace" 0.0
+    qemu-clk "vpll_to_lpd" 12500000.0
+    qemu-clk "dp_stc_ref" 0.0
+    qemu-clk "dpll_to_lpd" 12500000.0
+    qemu-clk "acpu_clk" 0.0
+    qemu-clk "pcie_ref" 0.0
+    qemu-clk "topsw_main" 0.0
+    qemu-clk "topsw_lsbus" 0.0
+    qemu-clk "dp_audio_ref" 0.0
+    qemu-clk "sata_ref" 0.0
+    qemu-clk "dp_video_ref" 1428571.4
+    qemu-clk "vpll_clk" 50000000.0
+    qemu-clk "apll_to_lpd" 12500000.0
+    qemu-clk "dpll_clk" 50000000.0
+    qemu-clk "gpu_ref" 0.0
+    qemu-clk "aux_refclk" 0.0
+    qemu-clk "video_clk" 27000000.0
+    qemu-clk "gdma_ref" 0.0
+    qemu-clk "gt_crx_ref_clk" 0.0
+    qemu-clk "dbg_fdp" 0.0
+    qemu-clk "apll_clk" 50000000.0
+    qemu-clk "pss_alt_ref_clk" 0.0
+    qemu-clk "ddr" 0.0
+    qemu-clk "pss_ref_clk" 50000000.0
+    qemu-clk "dpdma_ref" 0.0
+    qemu-clk "dbg_tstmp" 0.0
+    mmio 00000000fd1a0000/000000000000010c
 
 Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
-
-V2 -> V3:
-  * s/QEMUClock/qemu_clk/g
 ---
- include/qemu/qemu-clock.h | 23 +++++++++++++++++++++++
- qemu-clock.c              | 17 +++++++++++++++++
- 2 files changed, 40 insertions(+)
+ include/qemu/qemu-clock.h |  9 +++++++++
+ qdev-monitor.c            |  2 ++
+ qemu-clock.c              | 28 ++++++++++++++++++++++++++++
+ 3 files changed, 39 insertions(+)
 
 diff --git a/include/qemu/qemu-clock.h b/include/qemu/qemu-clock.h
-index f80de56..1c57df4 100644
+index 1c57df4..8f0daa8 100644
 --- a/include/qemu/qemu-clock.h
 +++ b/include/qemu/qemu-clock.h
-@@ -49,6 +49,29 @@ struct ClkList {
-     QLIST_ENTRY(ClkList) node;
- };
+@@ -149,4 +149,13 @@ void qemu_clk_set_callback(QEMUClock *clk,
+                            QEMUClkRateUpdateCallback *cb,
+                            void *opaque);
  
-+typedef struct ClockInitElement {
-+    const char *name;      /* Name to give to the clock. */
-+    size_t offset;         /* Offset of the qemu_clk field in the object. */
-+    QEMUClkRateUpdateCallback *cb;
-+} ClockInitElement;
-+
-+#define DEVICE_CLOCK(_state, _field, _cb) {                                  \
-+    .name = #_field,                                                         \
-+    .offset = offsetof(_state, _field),                                      \
-+    .cb = _cb                                                                \
-+}
-+
-+#define DEVICE_CLOCK_END() {                                                 \
-+    .name = NULL                                                             \
-+}
-+
 +/**
-+ * qemu_clk_init_device:
-+ * @obj: the Object which need to be initialized.
-+ * @array: the array of ClockInitElement to be used.
++ * qemu_clk_print:
++ * @dev: the device for which the clock need to be printed.
++ *
++ * Print the clock information for a given device.
++ *
 + */
-+void qemu_clk_init_device(Object *obj, ClockInitElement *array);
++void qemu_clk_print(Monitor *mon, DeviceState *dev, int indent);
 +
- /**
-  * qemu_clk_device_add_clock:
-  * @dev: the device on which the clock needs to be added.
+ #endif /* QEMU_CLOCK_H */
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index 549f45f..02f8255 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -30,6 +30,7 @@
+ #include "qemu/help_option.h"
+ #include "sysemu/block-backend.h"
+ #include "migration/migration.h"
++#include "qemu/qemu-clock.h"
+ 
+ /*
+  * Aliases were a bad idea from the start.  Let's keep them
+@@ -699,6 +700,7 @@ static void qdev_print(Monitor *mon, DeviceState *dev, int indent)
+                         ngl->num_out);
+         }
+     }
++    qemu_clk_print(mon, dev, indent);
+     class = object_get_class(OBJECT(dev));
+     do {
+         qdev_print_props(mon, dev, DEVICE_CLASS(class)->props, indent);
 diff --git a/qemu-clock.c b/qemu-clock.c
-index 24719e2..8f342f6 100644
+index 8f342f6..d5dd928 100644
 --- a/qemu-clock.c
 +++ b/qemu-clock.c
-@@ -26,6 +26,7 @@
- #include "hw/hw.h"
+@@ -27,6 +27,7 @@
  #include "qemu/log.h"
  #include "qapi/error.h"
-+#include "hw/qdev-core.h"
+ #include "hw/qdev-core.h"
++#include "monitor/monitor.h"
  
  #ifndef DEBUG_QEMU_CLOCK
  #define DEBUG_QEMU_CLOCK 0
-@@ -37,6 +38,22 @@
-     }                                                                        \
- } while (0);
+@@ -134,6 +135,33 @@ QEMUClock *qemu_clk_device_get_clock(DeviceState *dev, const char *name)
+     return QEMU_CLOCK(clk);
+ }
  
-+void qemu_clk_init_device(Object *obj, ClockInitElement *array)
-+{
-+    QEMUClock **cur = NULL;
++struct print_opaque {
++    Monitor *mon;
++    int indent;
++};
 +
-+    while (array->name != NULL) {
-+        DPRINTF("init clock named %s\n", array->name);
-+        cur = (((void *)obj) + array->offset);
-+        *cur = QEMU_CLOCK(object_new(TYPE_CLOCK));
-+        qemu_clk_device_add_clock(DEVICE(obj), *cur, array->name);
-+        if (array->cb) {
-+            qemu_clk_set_callback(*cur, array->cb, obj);
-+        }
-+        array++;
++static int qemu_clk_print_rec(Object *obj, void *opaque)
++{
++    QEMUClock *clk = (QEMUClock *)(object_dynamic_cast(obj, TYPE_CLOCK));
++    struct print_opaque *po = opaque;
++
++    if (clk) {
++        monitor_printf(po->mon, "%*s" "qemu-clk \"%s\" %" PRIu64 "\n",
++                       po->indent, " ", clk->name, clk->rate);
 +    }
++
++    return 0;
 +}
 +
- void qemu_clk_refresh(QEMUClock *clk)
- {
-     qemu_clk_update_rate(clk, clk->ref_rate);
++void qemu_clk_print(Monitor *mon, DeviceState *dev, int indent)
++{
++    struct print_opaque po;
++
++    po.indent = indent;
++    po.mon = mon;
++    object_child_foreach(OBJECT(dev), qemu_clk_print_rec, &po);
++}
++
+ static const TypeInfo qemu_clk_info = {
+     .name          = TYPE_CLOCK,
+     .parent        = TYPE_OBJECT,
 -- 
 1.8.3.1
