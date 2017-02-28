@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40568)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cidQB-0007oU-CT
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 03:46:12 -0500
+	(envelope-from <thuth@redhat.com>) id 1cidWj-0000w0-PF
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 03:52:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cidQA-0002KG-Es
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 03:46:11 -0500
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:38028)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cidQA-0002Jj-8Z
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 03:46:10 -0500
-Received: by mail-wm0-x229.google.com with SMTP id u199so5767031wmd.1
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 00:46:10 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <1488212323-26882-1-git-send-email-kraxel@redhat.com>
-References: <1488212323-26882-1-git-send-email-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Feb 2017 08:45:48 +0000
-Message-ID: <CAFEAcA8uJ5E66hDAaRdd2sRps+AfWMSiuWSzHyy95eAoa_KmZg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 0/9] ui patch queue
+	(envelope-from <thuth@redhat.com>) id 1cidWg-0004ZO-Np
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 03:52:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40134)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cidWg-0004ZG-I3
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 03:52:54 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Tue, 28 Feb 2017 09:52:51 +0100
+Message-Id: <1488271971-12624-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/core/null-machine: Print error message when
+ using the -kernel parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +22,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-On 27 February 2017 at 16:18, Gerd Hoffmann <kraxel@redhat.com> wrote:
->   Hi,
->
-> Bringing some opengl improvements and fixes for gtk and vnc.
->
-> please pull,
->   Gerd
->
-> The following changes since commit 3b1d8169844fafee184366b0e0d7080534758b4d:
->
->   tests-aio-multithread: use atomic_read properly (2017-02-27 12:54:08 +0000)
->
-> are available in the git repository at:
->
->   git://git.kraxel.org/qemu tags/pull-ui-20170227-1
->
-> for you to fetch changes up to 2dc120beb89b825033972db441ab540bcc42a17e:
->
->   vnc: fix double free issues (2017-02-27 16:22:01 +0100)
->
-> ----------------------------------------------------------------
-> gtk: fix kbd on xwayland
-> vnc: fix double free issues
-> opengl improvements
->
-> ----------------------------------------------------------------
-> Daniel P. Berrange (1):
->       ui: Use XkbGetMap and XkbGetNames instead of XkbGetKeyboard
->
-> Gerd Hoffmann (8):
->       console: rename dpy_gl_scanout to dpy_gl_scanout_texture
->       console: add dpy_gl_scanout_disable
->       virtio-gpu: use dpy_gl_scanout_disable
->       spice: add scanout_disable support
->       sdl2: add scanout_disable support
->       gtk-egl: add scanout_disable support
->       spice: add display & head options
->       vnc: fix double free issues
+If the user currently tries to use the -kernel parameter, simply nothing
+happens, and the user might get confused that there is nothing loaded
+to memory, but also no error message has been issued. Since there is no
+real generic way to load a kernel on all CPU types (but on some targets,
+the generic loader can be used instead), issue an appropriate error
+message here now to avoid the possible confusion.
 
-Applied, thanks.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/core/null-machine.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
--- PMM
+diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
+index 27c8369..864832d 100644
+--- a/hw/core/null-machine.c
++++ b/hw/core/null-machine.c
+@@ -40,6 +40,12 @@ static void machine_none_init(MachineState *mch)
+         memory_region_allocate_system_memory(ram, NULL, "ram", mch->ram_size);
+         memory_region_add_subregion(get_system_memory(), 0, ram);
+     }
++
++    if (mch->kernel_filename) {
++        error_report("The -kernel parameter is not supported "
++                     "(use the generic 'loader' device instead).");
++        exit(1);
++    }
+ }
+ 
+ static void machine_none_machine_init(MachineClass *mc)
+-- 
+1.8.3.1
