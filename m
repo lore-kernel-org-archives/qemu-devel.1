@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39869)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cih5U-0007v9-BF
+	(envelope-from <dgilbert@redhat.com>) id 1cih5U-0007v6-At
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cih5S-00007C-Jx
+	(envelope-from <dgilbert@redhat.com>) id 1cih5R-00004u-4h
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42846)
+Received: from mx1.redhat.com ([209.132.183.28]:54720)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cih5S-00005D-BZ
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:02 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cih5Q-0008WB-Lt
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:00 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue, 28 Feb 2017 12:40:30 +0000
-Message-Id: <20170228124056.5074-2-dgilbert@redhat.com>
-In-Reply-To: <20170228124056.5074-1-dgilbert@redhat.com>
-References: <20170228124056.5074-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 01/27] Changing error message of QMP
- 'migrate_set_downtime' to seconds
+Date: Tue, 28 Feb 2017 12:40:29 +0000
+Message-Id: <20170228124056.5074-1-dgilbert@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/27] migration queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,79 +27,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: quintela@redhat.com, lvivier@redhat.com, marcandre.lureau@redhat.com, vsementsov@virtuozzo.com, danielhb@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, ashijeetacharya@gmail.com
 
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Using QMP, the error message of 'migrate_set_downtime' was displaying
-the values in milliseconds, being misleading with the command that
-accepts the value in seconds:
+The following changes since commit 6181478f6395cdd9d6ffd99623d0c9f39ea536=
+06:
 
-{ "execute": "migrate_set_downtime", "arguments": {"value": 3000}}
-{"error": {"class": "GenericError", "desc": "Parameter 'downtime_limit'
-expects an integer in the range of 0 to 2000000 milliseconds"}}
+  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request'=
+ into staging (2017-02-28 08:46:03 +0000)
 
-This message is also seen in HMP when trying to set the same
-parameter:
+are available in the git repository at:
 
-(qemu) migrate_set_parameter downtime-limit 3000000
-Parameter 'downtime_limit' expects an integer in the range of 0 to
-2000000 milliseconds
+  git://github.com/dagrh/qemu.git tags/pull-migration-20170228a
 
-To allow for a proper error message when using QMP, a validation
-of the user input was added in 'qmp_migrate_set_downtime'.
+for you to fetch changes up to 665414ad06aa1bc92e615db9641e58fb13d07de1:
 
-Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Message-Id: <20170222151729.5812-1-danielhb@linux.vnet.ibm.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+  postcopy: Add extra check for COPY function (2017-02-28 11:30:24 +0000)
+
+----------------------------------------------------------------
+Migration pull
+
+Note: The 'postcopy: Update userfaultfd.h header' is part of
+Paolo's header update and will disappear if applied after it.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- migration/migration.c | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index c6ae69d..4fab538 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -49,6 +49,10 @@
-  * for sending the last part */
- #define DEFAULT_MIGRATE_SET_DOWNTIME 300
- 
-+/* Maximum migrate downtime set to 2000 seconds */
-+#define MAX_MIGRATE_DOWNTIME_SECONDS 2000
-+#define MAX_MIGRATE_DOWNTIME (MAX_MIGRATE_DOWNTIME_SECONDS * 1000)
-+
- /* Default compression thread count */
- #define DEFAULT_MIGRATE_COMPRESS_THREAD_COUNT 8
- /* Default decompression thread count, usually decompression is at
-@@ -843,10 +847,11 @@ void qmp_migrate_set_parameters(MigrationParameters *params, Error **errp)
-         return;
-     }
-     if (params->has_downtime_limit &&
--        (params->downtime_limit < 0 || params->downtime_limit > 2000000)) {
--        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
--                   "downtime_limit",
--                   "an integer in the range of 0 to 2000000 milliseconds");
-+        (params->downtime_limit < 0 ||
-+         params->downtime_limit > MAX_MIGRATE_DOWNTIME)) {
-+        error_setg(errp, "Parameter 'downtime_limit' expects an integer in "
-+                         "the range of 0 to %d milliseconds",
-+                         MAX_MIGRATE_DOWNTIME);
-         return;
-     }
-     if (params->has_x_checkpoint_delay && (params->x_checkpoint_delay < 0)) {
-@@ -1289,6 +1294,13 @@ void qmp_migrate_set_speed(int64_t value, Error **errp)
- 
- void qmp_migrate_set_downtime(double value, Error **errp)
- {
-+    if (value < 0 || value > MAX_MIGRATE_DOWNTIME_SECONDS) {
-+        error_setg(errp, "Parameter 'downtime_limit' expects an integer in "
-+                         "the range of 0 to %d seconds",
-+                         MAX_MIGRATE_DOWNTIME_SECONDS);
-+        return;
-+    }
-+
-     value *= 1000; /* Convert to milliseconds */
-     value = MAX(0, MIN(INT64_MAX, value));
- 
--- 
-2.9.3
+----------------------------------------------------------------
+Ashijeet Acharya (1):
+      migrate: Introduce a 'dc->vmsd' check to avoid segfault for --only-=
+migratable
+
+Daniel Henrique Barboza (1):
+      Changing error message of QMP 'migrate_set_downtime' to seconds
+
+Dr. David Alan Gilbert (17):
+      migration: Update docs to discourage version bumps
+      postcopy: Transmit ram size summary word
+      postcopy: Transmit and compare individual page sizes
+      postcopy: Chunk discards for hugepages
+      exec: ram_block_discard_range
+      postcopy: enhance ram_block_discard_range for hugepages
+      postcopy: Record largest page size
+      postcopy: Plumb pagesize down into place helpers
+      postcopy: Use temporary for placing zero huge pages
+      postcopy: Load huge pages in one go
+      postcopy: Mask fault addresses to huge page boundary
+      postcopy: Send whole huge pages
+      postcopy: Allow hugepages
+      postcopy: Update userfaultfd.h header
+      postcopy: Check for userfault+hugepage feature
+      postcopy: Add doc about hugepages and postcopy
+      postcopy: Add extra check for COPY function
+
+Halil Pasic (5):
+      migration/vmstate: renames in (load|save)_state
+      migration/vmstate: split up vmstate_base_addr
+      migration/vmstate: fix array of ptr with nullptrs
+      tests/test-vmstate.c: test array of ptr with null
+      tests/test-vmstate.c: test array of ptr to primitive
+
+Laurent Vivier (1):
+      vmstate-static-checker: update white list with spapr_pci
+
+Marc-Andr=C3=A9 Lureau (1):
+      migration: fix id leak regression
+
+Vladimir Sementsov-Ogievskiy (1):
+      migration: fix use-after-free of to_dst_file
+
+ docs/migration.txt                |  71 +++++++++++++++++++
+ exec.c                            |  83 ++++++++++++++++++++++
+ hw/core/qdev.c                    |   7 ++
+ hw/usb/bus.c                      |  19 -----
+ include/exec/cpu-common.h         |   2 +
+ include/migration/migration.h     |   6 ++
+ include/migration/postcopy-ram.h  |  13 ++--
+ include/migration/vmstate.h       |   4 ++
+ linux-headers/linux/userfaultfd.h |  67 +++++++++++++++---
+ migration/migration.c             |  36 ++++++++--
+ migration/postcopy-ram.c          | 142 ++++++++++++++++++--------------=
+------
+ migration/ram.c                   | 109 ++++++++++++++++++-----------
+ migration/savevm.c                |  38 +++++++---
+ migration/trace-events            |   2 +-
+ migration/vmstate.c               |  97 +++++++++++++++++---------
+ qdev-monitor.c                    |   9 ---
+ scripts/vmstate-static-checker.py |   5 ++
+ stubs/vmstate.c                   |   6 ++
+ tests/test-vmstate.c              | 122 +++++++++++++++++++++++++++-----
+ 19 files changed, 608 insertions(+), 230 deletions(-)
