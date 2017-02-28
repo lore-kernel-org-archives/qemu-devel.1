@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ciYvC-0007fB-H1
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 22:57:55 -0500
+	(envelope-from <jcody@redhat.com>) id 1ciZ9R-0004KG-LX
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 23:12:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1ciYvB-00050l-Ay
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 22:57:54 -0500
-Date: Mon, 27 Feb 2017 22:57:44 -0500
+	(envelope-from <jcody@redhat.com>) id 1ciZ9Q-0000m7-AL
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 23:12:37 -0500
 From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170228035744.GO25637@localhost.localdomain>
-References: <cover.1488220970.git.jcody@redhat.com>
-	<12a16b28300f871052a49897ec7875a082fc63e3.1488220970.git.jcody@redhat.com>
-	<c5869fe5-fa51-3f2f-26d6-26a733c15493@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c5869fe5-fa51-3f2f-26d6-26a733c15493@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 5/5] block/rbd: add support for
- 'mon_host', 'auth_supported' via QAPI
+Date: Mon, 27 Feb 2017 23:12:24 -0500
+Message-Id: <b7a1f55f3289aeea82a16b7c45043b550179c05a.1488254329.git.jcody@redhat.com>
+In-Reply-To: <cover.1488254329.git.jcody@redhat.com>
+References: <cover.1488254329.git.jcody@redhat.com>
+In-Reply-To: <cover.1488254329.git.jcody@redhat.com>
+References: <cover.1488254329.git.jcody@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 1/5] block/rbd: don't copy strings in
+ qemu_rbd_next_tok()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,121 +22,204 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com, berrange@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, stefanha@redhat.com, armbru@redhat.com, berrange@redhat.com, eblake@redhat.com
 
-On Mon, Feb 27, 2017 at 04:47:54PM -0600, Eric Blake wrote:
-> On 02/27/2017 12:58 PM, Jeff Cody wrote:
-> > This adds support for two additional options that may be specified
-> > by QAPI in blockdev-add:
-> > 
-> >     mon_host: servername and port
-> >     auth_supported: either 'cephx' or 'none'
-> 
-> Please spell new options with '-'
-> 
-> > 
-> > Signed-off-by: Jeff Cody <jcody@redhat.com>
-> > ---
-> >  block/rbd.c          | 39 +++++++++++++++++++++++++++++++++++++++
-> >  qapi/block-core.json |  8 ++++++++
-> >  2 files changed, 47 insertions(+)
-> > 
-> > diff --git a/block/rbd.c b/block/rbd.c
-> > index e04a5e1..51e971e 100644
-> > --- a/block/rbd.c
-> > +++ b/block/rbd.c
-> > @@ -394,6 +394,18 @@ static QemuOptsList runtime_opts = {
-> >              .name = "keyvalue-pairs",
-> >              .type = QEMU_OPT_STRING,
-> >          },
-> > +        {
-> > +            .name = "server.host",
-> > +            .type = QEMU_OPT_STRING,
-> > +        },
-> > +        {
-> > +            .name = "server.port",
-> > +            .type = QEMU_OPT_STRING,
-> > +        },
-> 
-> See Dan's comment about supporting more than one server via an array in
-> QAPI.
-> 
-> > +        {
-> > +            .name = "auth_supported",
-> 
-> Should be auth-supported in QAPI.
-> 
-> 
-> > @@ -604,6 +620,29 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-> >          goto failed_shutdown;
-> >      }
-> >  
-> > +    /* if mon_host was specified */
-> > +    if (host) {
-> > +        const char *hostname = host;
-> > +        char *mon_host = NULL;
-> > +
-> > +        if (port) {
-> > +            mon_host = g_strdup_printf("%s:%s", host, port);
-> 
-> Does Ceph care about IPv6 (in which case you may need [host]:port when
-> host itself includes ':')?
->
+This patch is prep work for parsing options for .bdrv_parse_filename,
+and using QDict options.
 
-Some quick sanity testing seems to show that it does not need [] for ipv6
-addresses, which is nice.
+The function qemu_rbd_next_tok() searched for various key/value pairs,
+and copied them into buffers.  This will soon be an unnecessary extra
+step, so we will now return found strings by reference only, and
+offload the responsibility for safely handling/coping these strings to
+the caller.
 
+This also cleans up error handling some, as the callers now rely on
+the Error object to determine if there is a parse error.
 
-> > +            hostname = mon_host;
-> > +        }
-> > +        r = rados_conf_set(s->cluster, "mon_host", hostname);
-> > +        g_free(mon_host);
-> > +        if (r < 0) {
-> > +            goto failed_shutdown;
-> > +        }
-> > +    }
-> > +
-> > +    if (auth_supported) {
-> > +        r = rados_conf_set(s->cluster, "auth_supported", auth_supported);
-> 
-> Translating QAPI auth-supported to rados auth_supported is fine.
-> 
-> 
-> > +++ b/qapi/block-core.json
-> > @@ -2680,6 +2680,12 @@
-> >  #
-> >  # @user:               #optional Ceph id name.
-> >  #
-> > +# @server:             #optional Monitor host address and port.  This maps
-> > +#                      to the "mon_host" Ceph option.
-> > +#
-> > +# @auth_supported:     #optional Authentication supported.
-> > +#                      Either "cephx" or"none".
-> 
-> Missing a space.
-> 
-> If you're going to support only a finite set of strings, this should be
-> a QAPI enum type, not 'str'.
-> 
-> > +#
-> >  # @password-secret:    #optional The ID of a QCryptoSecret object providing
-> >  #                       the password for the login.
-> >  #
-> > @@ -2691,6 +2697,8 @@
-> >              '*conf': 'str',
-> >              '*snapshot': 'str',
-> >              '*user': 'str',
-> > +            '*server': 'InetSocketAddress',
-> > +            '*auth_supported': 'str',
-> >              '*password-secret': 'str' } }
-> >  
-> >  ##
-> > 
-> 
-> Looks like we'll need a v3 to tweak this one.
-> 
-> -- 
-> Eric Blake   eblake redhat com    +1-919-301-3266
-> Libvirt virtualization library http://libvirt.org
-> 
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Jeff Cody <jcody@redhat.com>
+---
+ block/rbd.c | 99 +++++++++++++++++++++++++++++++++++++++----------------------
+ 1 file changed, 64 insertions(+), 35 deletions(-)
+
+diff --git a/block/rbd.c b/block/rbd.c
+index 22e8e69..33c21d8 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -102,10 +102,10 @@ typedef struct BDRVRBDState {
+     char *snap;
+ } BDRVRBDState;
+ 
+-static int qemu_rbd_next_tok(char *dst, int dst_len,
+-                             char *src, char delim,
+-                             const char *name,
+-                             char **p, Error **errp)
++static char *qemu_rbd_next_tok(int max_len,
++                               char *src, char delim,
++                               const char *name,
++                               char **p, Error **errp)
+ {
+     int l;
+     char *end;
+@@ -127,17 +127,15 @@ static int qemu_rbd_next_tok(char *dst, int dst_len,
+         }
+     }
+     l = strlen(src);
+-    if (l >= dst_len) {
++    if (l >= max_len) {
+         error_setg(errp, "%s too long", name);
+-        return -EINVAL;
++        return NULL;
+     } else if (l == 0) {
+         error_setg(errp, "%s too short", name);
+-        return -EINVAL;
++        return NULL;
+     }
+ 
+-    pstrcpy(dst, dst_len, src);
+-
+-    return 0;
++    return src;
+ }
+ 
+ static void qemu_rbd_unescape(char *src)
+@@ -162,7 +160,9 @@ static int qemu_rbd_parsename(const char *filename,
+ {
+     const char *start;
+     char *p, *buf;
+-    int ret;
++    int ret = 0;
++    char *found_str;
++    Error *local_err = NULL;
+ 
+     if (!strstart(filename, "rbd:", &start)) {
+         error_setg(errp, "File name must start with 'rbd:'");
+@@ -174,36 +174,60 @@ static int qemu_rbd_parsename(const char *filename,
+     *snap = '\0';
+     *conf = '\0';
+ 
+-    ret = qemu_rbd_next_tok(pool, pool_len, p,
+-                            '/', "pool name", &p, errp);
+-    if (ret < 0 || !p) {
++    found_str = qemu_rbd_next_tok(pool_len, p,
++                                  '/', "pool name", &p, &local_err);
++    if (local_err) {
++        goto done;
++    }
++    if (!p) {
+         ret = -EINVAL;
++        error_setg(errp, "Pool name is required");
+         goto done;
+     }
+-    qemu_rbd_unescape(pool);
++    qemu_rbd_unescape(found_str);
++    g_strlcpy(pool, found_str, pool_len);
+ 
+     if (strchr(p, '@')) {
+-        ret = qemu_rbd_next_tok(name, name_len, p,
+-                                '@', "object name", &p, errp);
+-        if (ret < 0) {
++        found_str = qemu_rbd_next_tok(name_len, p,
++                                      '@', "object name", &p, &local_err);
++        if (local_err) {
+             goto done;
+         }
+-        ret = qemu_rbd_next_tok(snap, snap_len, p,
+-                                ':', "snap name", &p, errp);
+-        qemu_rbd_unescape(snap);
++        qemu_rbd_unescape(found_str);
++        g_strlcpy(name, found_str, name_len);
++
++        found_str = qemu_rbd_next_tok(snap_len, p,
++                                      ':', "snap name", &p, &local_err);
++        if (local_err) {
++            goto done;
++        }
++        qemu_rbd_unescape(found_str);
++        g_strlcpy(snap, found_str, snap_len);
+     } else {
+-        ret = qemu_rbd_next_tok(name, name_len, p,
+-                                ':', "object name", &p, errp);
++        found_str = qemu_rbd_next_tok(name_len, p,
++                                      ':', "object name", &p, &local_err);
++        if (local_err) {
++            goto done;
++        }
++        qemu_rbd_unescape(found_str);
++        g_strlcpy(name, found_str, name_len);
+     }
+-    qemu_rbd_unescape(name);
+-    if (ret < 0 || !p) {
++    if (!p) {
+         goto done;
+     }
+ 
+-    ret = qemu_rbd_next_tok(conf, conf_len, p,
+-                            '\0', "configuration", &p, errp);
++    found_str = qemu_rbd_next_tok(conf_len, p,
++                                  '\0', "configuration", &p, &local_err);
++    if (local_err) {
++        goto done;
++    }
++    g_strlcpy(conf, found_str, conf_len);
+ 
+ done:
++    if (local_err) {
++        ret = -EINVAL;
++        error_propagate(errp, local_err);
++    }
+     g_free(buf);
+     return ret;
+ }
+@@ -262,17 +286,18 @@ static int qemu_rbd_set_conf(rados_t cluster, const char *conf,
+                              Error **errp)
+ {
+     char *p, *buf;
+-    char name[RBD_MAX_CONF_NAME_SIZE];
+-    char value[RBD_MAX_CONF_VAL_SIZE];
++    char *name;
++    char *value;
++    Error *local_err = NULL;
+     int ret = 0;
+ 
+     buf = g_strdup(conf);
+     p = buf;
+ 
+     while (p) {
+-        ret = qemu_rbd_next_tok(name, sizeof(name), p,
+-                                '=', "conf option name", &p, errp);
+-        if (ret < 0) {
++        name = qemu_rbd_next_tok(RBD_MAX_CONF_NAME_SIZE, p,
++                                 '=', "conf option name", &p, &local_err);
++        if (local_err) {
+             break;
+         }
+         qemu_rbd_unescape(name);
+@@ -283,9 +308,9 @@ static int qemu_rbd_set_conf(rados_t cluster, const char *conf,
+             break;
+         }
+ 
+-        ret = qemu_rbd_next_tok(value, sizeof(value), p,
+-                                ':', "conf option value", &p, errp);
+-        if (ret < 0) {
++        value = qemu_rbd_next_tok(RBD_MAX_CONF_VAL_SIZE, p,
++                                  ':', "conf option value", &p, &local_err);
++        if (local_err) {
+             break;
+         }
+         qemu_rbd_unescape(value);
+@@ -313,6 +338,10 @@ static int qemu_rbd_set_conf(rados_t cluster, const char *conf,
+         }
+     }
+ 
++    if (local_err) {
++        error_propagate(errp, local_err);
++        ret = -EINVAL;
++    }
+     g_free(buf);
+     return ret;
+ }
+-- 
+2.9.3
