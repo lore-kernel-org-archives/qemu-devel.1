@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cijMy-0003eD-84
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:07:18 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cijN1-0003fB-3T
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:07:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cijMx-0002n7-EQ
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:07:16 -0500
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:35555)
+	(envelope-from <alex.bennee@linaro.org>) id 1cijMw-0002mv-IM
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:07:19 -0500
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:37790)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cijMx-0002mt-8S
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:07:15 -0500
-Received: by mail-wm0-x231.google.com with SMTP id v186so87825517wmd.0
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 07:07:15 -0800 (PST)
+	id 1cijMw-0002mo-CT
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:07:14 -0500
+Received: by mail-wm0-x230.google.com with SMTP id v77so14046074wmv.0
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 07:07:14 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 28 Feb 2017 15:07:09 +0000
-Message-Id: <20170228150709.27453-4-alex.bennee@linaro.org>
+Date: Tue, 28 Feb 2017 15:07:08 +0000
+Message-Id: <20170228150709.27453-3-alex.bennee@linaro.org>
 In-Reply-To: <20170228150709.27453-1-alex.bennee@linaro.org>
 References: <20170228150709.27453-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 3/3] cpus.c: add additional error_report
- when !TARGET_SUPPORT_MTTCG
+Subject: [Qemu-devel] [PATCH v1 2/3] target/i386/cpu.h: declare
+ TCG_GUEST_DEFAULT_MO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,31 +31,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: rth@twiddle.net
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-While we may fail the memory ordering check later that can be
-confusing. So in cases where TARGET_SUPPORT_MTTCG has yet to be
-defined we should say so specifically.
+This suppresses the incorrect warning when forcing MTTCG for x86
+guests on x86 hosts. A future patch will still warn when
+TARGET_SUPPORT_MTTCG hasn't been defined for the guest (which is still
+pending for x86).
 
+Reported-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- cpus.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ target/i386/cpu.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/cpus.c b/cpus.c
-index e9aab9f70f..2459f564ea 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -206,6 +206,10 @@ void qemu_tcg_configure(QemuOpts *opts, Error **errp)
-             } else if (use_icount) {
-                 error_setg(errp, "No MTTCG when icount is enabled");
-             } else {
-+#ifndef TARGET_SUPPORT_MTTCG
-+                error_report("Guest not yet converted to MTTCG - "
-+                             "you may get unexpected results");
-+#endif
-                 if (!check_tcg_memory_orders_compatible()) {
-                     error_report("Guest expects a stronger memory ordering "
-                                  "than the host provides");
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 573f2aa988..6be19d7e74 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -30,6 +30,9 @@
+ #define TARGET_LONG_BITS 32
+ #endif
+ 
++/* The x86 has a strong memory model with some store-after-load re-ordering */
++#define TCG_GUEST_DEFAULT_MO      (TCG_MO_ALL & ~TCG_MO_ST_LD)
++
+ /* Maximum instruction code size */
+ #define TARGET_MAX_INSN_SIZE 16
+ 
 -- 
 2.11.0
