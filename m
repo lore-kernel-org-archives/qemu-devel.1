@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43194)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cilNv-0001fN-3p
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:24 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cilNt-00030U-Li
+	(envelope-from <pm215@archaic.org.uk>) id 1cilNt-0001fH-RQ
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:23 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48711)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <pm215@archaic.org.uk>) id 1cilNs-0002yT-Ei
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:21 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48710)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cilNt-0002xz-EL
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:21 -0500
+	id 1cilNs-0002wj-6m
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 12:16:20 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1cilNs-0003QM-Eg
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:16:20 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1cilNr-0003Pj-Bk
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:16:19 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 Feb 2017 17:16:00 +0000
-Message-Id: <1488302176-19463-6-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 28 Feb 2017 17:15:58 +0000
+Message-Id: <1488302176-19463-4-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1488302176-19463-1-git-send-email-peter.maydell@linaro.org>
 References: <1488302176-19463-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 05/21] armv7m: Make ARMv7M object take memory
- region link
+Subject: [Qemu-devel] [PULL 03/21] armv7m: QOMify the armv7m container
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,116 +32,245 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Make the ARMv7M object take a memory region link which it uses
-to wire up the bitband rather than having them always put
-themselves in the system address space.
+Create a proper QOM object for the armv7m container, which
+holds the CPU, the NVIC and the bitband regions.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Message-id: 1487604965-23220-6-git-send-email-peter.maydell@linaro.org
+Message-id: 1487604965-23220-4-git-send-email-peter.maydell@linaro.org
 ---
- include/hw/arm/armv7m.h | 10 ++++++++++
- hw/arm/armv7m.c         | 23 ++++++++++++++++++++++-
- 2 files changed, 32 insertions(+), 1 deletion(-)
+ include/hw/arm/armv7m.h |  51 ++++++++++++++++++
+ hw/arm/armv7m.c         | 139 +++++++++++++++++++++++++++++++++++++++++++-----
+ 2 files changed, 178 insertions(+), 12 deletions(-)
+ create mode 100644 include/hw/arm/armv7m.h
 
 diff --git a/include/hw/arm/armv7m.h b/include/hw/arm/armv7m.h
-index 193ad71..3333c91 100644
---- a/include/hw/arm/armv7m.h
+new file mode 100644
+index 0000000..193ad71
+--- /dev/null
 +++ b/include/hw/arm/armv7m.h
-@@ -35,6 +35,9 @@ typedef struct {
-  * + Named GPIO output SYSRESETREQ: signalled for guest AIRCR.SYSRESETREQ
-  * + Property "cpu-model": CPU model to instantiate
-  * + Property "num-irq": number of external IRQ lines
-+ * + Property "memory": MemoryRegion defining the physical address space
-+ *   that CPU accesses see. (The NVIC, bitbanding and other CPU-internal
-+ *   devices will be automatically layered on top of this view.)
-  */
- typedef struct ARMv7MState {
-     /*< private >*/
-@@ -44,8 +47,15 @@ typedef struct ARMv7MState {
-     BitBandState bitband[ARMV7M_NUM_BITBANDS];
-     ARMCPU *cpu;
- 
-+    /* MemoryRegion we pass to the CPU, with our devices layered on
-+     * top of the ones the board provides in board_memory.
-+     */
-+    MemoryRegion container;
+@@ -0,0 +1,51 @@
++/*
++ * ARMv7M CPU object
++ *
++ * Copyright (c) 2017 Linaro Ltd
++ * Written by Peter Maydell <peter.maydell@linaro.org>
++ *
++ * This code is licensed under the GPL version 2 or later.
++ */
 +
-     /* Properties */
-     char *cpu_model;
-+    /* MemoryRegion the board provides to us (with its devices, RAM, etc) */
-+    MemoryRegion *board_memory;
- } ARMv7MState;
- 
- #endif
++#ifndef HW_ARM_ARMV7M_H
++#define HW_ARM_ARMV7M_H
++
++#include "hw/sysbus.h"
++#include "hw/arm/armv7m_nvic.h"
++
++#define TYPE_BITBAND "ARM,bitband-memory"
++#define BITBAND(obj) OBJECT_CHECK(BitBandState, (obj), TYPE_BITBAND)
++
++typedef struct {
++    /*< private >*/
++    SysBusDevice parent_obj;
++    /*< public >*/
++
++    MemoryRegion iomem;
++    uint32_t base;
++} BitBandState;
++
++#define TYPE_ARMV7M "armv7m"
++#define ARMV7M(obj) OBJECT_CHECK(ARMv7MState, (obj), TYPE_ARMV7M)
++
++#define ARMV7M_NUM_BITBANDS 2
++
++/* ARMv7M container object.
++ * + Unnamed GPIO input lines: external IRQ lines for the NVIC
++ * + Named GPIO output SYSRESETREQ: signalled for guest AIRCR.SYSRESETREQ
++ * + Property "cpu-model": CPU model to instantiate
++ * + Property "num-irq": number of external IRQ lines
++ */
++typedef struct ARMv7MState {
++    /*< private >*/
++    SysBusDevice parent_obj;
++    /*< public >*/
++    NVICState nvic;
++    BitBandState bitband[ARMV7M_NUM_BITBANDS];
++    ARMCPU *cpu;
++
++    /* Properties */
++    char *cpu_model;
++} ARMv7MState;
++
++#endif
 diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-index d9baa8c..3332f34 100644
+index b2cc6e9..fca85b2 100644
 --- a/hw/arm/armv7m.c
 +++ b/hw/arm/armv7m.c
-@@ -18,6 +18,7 @@
- #include "elf.h"
- #include "sysemu/qtest.h"
- #include "qemu/error-report.h"
-+#include "exec/address-spaces.h"
+@@ -8,6 +8,7 @@
+  */
  
- /* Bitbanded IO.  Each word corresponds to a single bit.  */
+ #include "qemu/osdep.h"
++#include "hw/arm/armv7m.h"
+ #include "qapi/error.h"
+ #include "qemu-common.h"
+ #include "cpu.h"
+@@ -120,18 +121,6 @@ static const MemoryRegionOps bitband_ops = {
+     .endianness = DEVICE_NATIVE_ENDIAN,
+ };
  
-@@ -148,6 +149,14 @@ static void armv7m_instance_init(Object *obj)
+-#define TYPE_BITBAND "ARM,bitband-memory"
+-#define BITBAND(obj) OBJECT_CHECK(BitBandState, (obj), TYPE_BITBAND)
+-
+-typedef struct {
+-    /*< private >*/
+-    SysBusDevice parent_obj;
+-    /*< public >*/
+-
+-    MemoryRegion iomem;
+-    uint32_t base;
+-} BitBandState;
+-
+ static void bitband_init(Object *obj)
+ {
+     BitBandState *s = BITBAND(obj);
+@@ -159,6 +148,131 @@ static void armv7m_bitband_init(void)
  
-     /* Can't init the cpu here, we don't yet know which model to use */
+ /* Board init.  */
  
-+    object_property_add_link(obj, "memory",
-+                             TYPE_MEMORY_REGION,
-+                             (Object **)&s->board_memory,
-+                             qdev_prop_allow_set_link_before_realize,
-+                             OBJ_PROP_LINK_UNREF_ON_RELEASE,
-+                             &error_abort);
-+    memory_region_init(&s->container, obj, "armv7m-container", UINT64_MAX);
++static const hwaddr bitband_input_addr[ARMV7M_NUM_BITBANDS] = {
++    0x20000000, 0x40000000
++};
 +
-     object_initialize(&s->nvic, sizeof(s->nvic), "armv7m_nvic");
-     qdev_set_parent_bus(DEVICE(&s->nvic), sysbus_get_default());
-     object_property_add_alias(obj, "num-irq",
-@@ -169,6 +178,13 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
-     const char *typename;
-     CPUClass *cc;
- 
-+    if (!s->board_memory) {
-+        error_setg(errp, "memory property was not set");
++static const hwaddr bitband_output_addr[ARMV7M_NUM_BITBANDS] = {
++    0x22000000, 0x42000000
++};
++
++static void armv7m_instance_init(Object *obj)
++{
++    ARMv7MState *s = ARMV7M(obj);
++    int i;
++
++    /* Can't init the cpu here, we don't yet know which model to use */
++
++    object_initialize(&s->nvic, sizeof(s->nvic), "armv7m_nvic");
++    qdev_set_parent_bus(DEVICE(&s->nvic), sysbus_get_default());
++    object_property_add_alias(obj, "num-irq",
++                              OBJECT(&s->nvic), "num-irq", &error_abort);
++
++    for (i = 0; i < ARRAY_SIZE(s->bitband); i++) {
++        object_initialize(&s->bitband[i], sizeof(s->bitband[i]), TYPE_BITBAND);
++        qdev_set_parent_bus(DEVICE(&s->bitband[i]), sysbus_get_default());
++    }
++}
++
++static void armv7m_realize(DeviceState *dev, Error **errp)
++{
++    ARMv7MState *s = ARMV7M(dev);
++    Error *err = NULL;
++    int i;
++    char **cpustr;
++    ObjectClass *oc;
++    const char *typename;
++    CPUClass *cc;
++
++    cpustr = g_strsplit(s->cpu_model, ",", 2);
++
++    oc = cpu_class_by_name(TYPE_ARM_CPU, cpustr[0]);
++    if (!oc) {
++        error_setg(errp, "Unknown CPU model %s", cpustr[0]);
++        g_strfreev(cpustr);
 +        return;
 +    }
 +
-+    memory_region_add_subregion_overlap(&s->container, 0, s->board_memory, -1);
++    cc = CPU_CLASS(oc);
++    typename = object_class_get_name(oc);
++    cc->parse_features(typename, cpustr[1], &err);
++    g_strfreev(cpustr);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
 +
-     cpustr = g_strsplit(s->cpu_model, ",", 2);
- 
-     oc = cpu_class_by_name(TYPE_ARM_CPU, cpustr[0]);
-@@ -193,6 +209,8 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
-+    object_property_set_link(OBJECT(s->cpu), OBJECT(&s->container), "memory",
-+                             &error_abort);
-     object_property_set_bool(OBJECT(s->cpu), true, "realized", &err);
-     if (err != NULL) {
-         error_propagate(errp, err);
-@@ -233,7 +251,8 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
-             return;
-         }
- 
--        sysbus_mmio_map(sbd, 0, bitband_output_addr[i]);
-+        memory_region_add_subregion(&s->container, bitband_output_addr[i],
-+                                    sysbus_mmio_get_region(sbd, 0));
-     }
++    s->cpu = ARM_CPU(object_new(typename));
++    if (!s->cpu) {
++        error_setg(errp, "Unknown CPU model %s", s->cpu_model);
++        return;
++    }
++
++    object_property_set_bool(OBJECT(s->cpu), true, "realized", &err);
++    if (err != NULL) {
++        error_propagate(errp, err);
++        return;
++    }
++
++    /* Note that we must realize the NVIC after the CPU */
++    object_property_set_bool(OBJECT(&s->nvic), true, "realized", &err);
++    if (err != NULL) {
++        error_propagate(errp, err);
++        return;
++    }
++
++    /* Alias the NVIC's input and output GPIOs as our own so the board
++     * code can wire them up. (We do this in realize because the
++     * NVIC doesn't create the input GPIO array until realize.)
++     */
++    qdev_pass_gpios(DEVICE(&s->nvic), dev, NULL);
++    qdev_pass_gpios(DEVICE(&s->nvic), dev, "SYSRESETREQ");
++
++    /* Wire the NVIC up to the CPU */
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->nvic), 0,
++                       qdev_get_gpio_in(DEVICE(s->cpu), ARM_CPU_IRQ));
++    s->cpu->env.nvic = &s->nvic;
++
++    for (i = 0; i < ARRAY_SIZE(s->bitband); i++) {
++        Object *obj = OBJECT(&s->bitband[i]);
++        SysBusDevice *sbd = SYS_BUS_DEVICE(&s->bitband[i]);
++
++        object_property_set_int(obj, bitband_input_addr[i], "base", &err);
++        if (err != NULL) {
++            error_propagate(errp, err);
++            return;
++        }
++        object_property_set_bool(obj, true, "realized", &err);
++        if (err != NULL) {
++            error_propagate(errp, err);
++            return;
++        }
++
++        sysbus_mmio_map(sbd, 0, bitband_output_addr[i]);
++    }
++}
++
++static Property armv7m_properties[] = {
++    DEFINE_PROP_STRING("cpu-model", ARMv7MState, cpu_model),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void armv7m_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->realize = armv7m_realize;
++    dc->props = armv7m_properties;
++}
++
++static const TypeInfo armv7m_info = {
++    .name = TYPE_ARMV7M,
++    .parent = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(ARMv7MState),
++    .instance_init = armv7m_instance_init,
++    .class_init = armv7m_class_init,
++};
++
+ static void armv7m_reset(void *opaque)
+ {
+     ARMCPU *cpu = opaque;
+@@ -264,6 +378,7 @@ static const TypeInfo bitband_info = {
+ static void armv7m_register_types(void)
+ {
+     type_register_static(&bitband_info);
++    type_register_static(&armv7m_info);
  }
  
-@@ -281,6 +300,8 @@ DeviceState *armv7m_init(MemoryRegion *system_memory, int mem_size, int num_irq,
-     armv7m = qdev_create(NULL, "armv7m");
-     qdev_prop_set_uint32(armv7m, "num-irq", num_irq);
-     qdev_prop_set_string(armv7m, "cpu-model", cpu_model);
-+    object_property_set_link(OBJECT(armv7m), OBJECT(get_system_memory()),
-+                                     "memory", &error_abort);
-     /* This will exit with an error if the user passed us a bad cpu_model */
-     qdev_init_nofail(armv7m);
- 
+ type_init(armv7m_register_types)
 -- 
 2.7.4
