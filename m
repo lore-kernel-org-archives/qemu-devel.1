@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cipwC-0003N0-GB
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:08:05 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cipxR-0005S8-Up
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:09:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cipw9-0000aV-9c
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:08:04 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:43619
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1cipw9-0000aC-2I
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:08:01 -0500
-References: <CAFEAcA_KVG19uhPuBUNx4ySmebnL1Hit6=HUX9ug0FkBFMwasg@mail.gmail.com>
-	<4b5d1228-fb99-6b8f-6f8b-bab42b84e7ce@redhat.com>
-	<61a443e9-2e69-149c-1c2f-7c0cd53ba6a2@redhat.com>
-	<bc547cf1-a5b1-c60e-51b9-8e559e37195e@ilande.co.uk>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <6bcc6880-b33c-581d-fa2d-f4835c326320@ilande.co.uk>
-Date: Tue, 28 Feb 2017 22:07:41 +0000
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cipxR-0001Iw-5c
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:09:21 -0500
+Received: from hera.aquilenet.fr ([2a01:474::1]:33788)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cipxQ-0001Ia-Vq
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 17:09:21 -0500
+Date: Tue, 28 Feb 2017 23:09:18 +0100
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20170228220918.24xob7ee7nxdfx5l@var.youpi.perso.aquilenet.fr>
+References: <20170223110433.GL10047@redhat.com> <20170223114045.GB2383@work-vm>
+	<20170226203427.6xjmuvt6okc356e5@var.youpi.perso.aquilenet.fr>
+	<20170228165445.GG2773@work-vm>
+	<20170228165730.ovdh4k6psrd3qv33@var.youpi.perso.aquilenet.fr>
+	<20170228170017.GH2773@work-vm>
+	<20170228170235.4xtrld37c6ymj5ko@var.youpi.perso.aquilenet.fr>
+	<20170228170925.GI2773@work-vm>
+	<20170228171219.ndea2aouukv4tivr@var.youpi.perso.aquilenet.fr>
+	<20170228174018.GJ2773@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <bc547cf1-a5b1-c60e-51b9-8e559e37195e@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] intermittent make check failure:
- "tcg_handle_interrupt: assertion failed: (qemu_mutex_iothread_locked())"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20170228174018.GJ2773@work-vm>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 4/5] slirp: VMStatify socket level
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,50 +35,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, jan.kiszka@siemens.com, maethor@subiron.org
 
-On 28/02/17 21:35, Mark Cave-Ayland wrote:
-> On 28/02/17 21:28, Thomas Huth wrote:
-> 
->>> Maybe worth mentioning that the prom-env test for sparc64 has just been
->>> enabled a couple of commits ago (6b591ad613010f13). There was an issue
->>> with that test for the sparc64 target last year, but IIRC it only
->>> affected 32-bit hosts and has been fixed, so I think/hope this is a
->>> different issue now...
->>
->> OK, I think this is definitively not related to the prom-env test, but
->> to MTTCG (or something else in TCG): I can reproduce this problem
->> reliably when I run QEMU in s390 mode with the Moon Buggy disk image
->> from the QEMU advent calendar
->> (http://www.qemu-advent-calendar.org/2014/download/s390-moon-buggy.tar.xz):
->>
->> qemu-system-s390x -nographic -kernel s390-bb.kernel \
->>                   -initrd s390-moon-buggy.initrd
->>
->> ... starts the kernel, but aborts very soon with:
->>
->> ERROR:qemu/translate-common.c:34:tcg_handle_interrupt: assertion failed:
->> (qemu_mutex_iothread_locked())
->> Aborted (core dumped)
-> 
-> FWIW I've spent some time running the "make check" regression tests
-> locally this evening and I can't seem to reproduce the failure here on
-> my normal qemu-system-ppc/qemu-system-sparc/qemu-system-sparc64 setup.
+Dr. David Alan Gilbert, on mar. 28 f=E9vr. 2017 17:40:19 +0000, wrote:
+> * Samuel Thibault (samuel.thibault@gnu.org) wrote:
+> > Dr. David Alan Gilbert, on mar. 28 f=E9vr. 2017 17:09:26 +0000, wrote=
+:
+> > > but only for Linux.
+> >=20
+> > That's what I was referring to.
+>=20
+> Yes I think that's OK because:
+>    a) The alternative breaks all backwards migration
+>    b) This doesn't casuse any problem for forward migration
+>=20
+> There is another way, we could add a subsection that's sent whenever
+> we use non-IPv4; that would (probably) fail noisily on a backwards
+> migration to an old setup.  But IMHO it's not worth it in this case
+> given how rare a backwards migration of an IPv6 slirp connection on
+> something other than Linux is.
 
-However I can reproduce it consistently booting my OpenBIOS test images
-under qemu-system-sparc:
+Alright.
 
-$ ./qemu-system-sparc -cdrom debian-40r4a-sparc-netinst.iso -boot d
-qemu-system-sparc: -cdrom
-/home/build/src/qemu/image/sparc32/debian-40r4a-sparc-netinst.iso:
-warning: bus=0,unit=2 is deprecated with this machine type
-**
-ERROR:/home/build/src/qemu/git/qemu/translate-common.c:34:tcg_handle_interrupt:
-assertion failed: (qemu_mutex_iothread_locked())
-Aborted
-
-
-ATB,
-
-Mark.
+Samuel
