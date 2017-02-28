@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49476)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cijGp-0006Mi-Lm
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:00:56 -0500
+	(envelope-from <yzlyourself@gmail.com>) id 1ciiTd-0005cX-5B
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:10:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cijGo-0007h3-Vl
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:00:55 -0500
-References: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
-	<1488286469-9381-6-git-send-email-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <897c50a1-8afc-eae1-4edc-b8a24b638a31@redhat.com>
-Date: Tue, 28 Feb 2017 16:00:45 +0100
+	(envelope-from <yzlyourself@gmail.com>) id 1ciiTc-0004CV-86
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:10:05 -0500
+Received: from mail-io0-x22f.google.com ([2607:f8b0:4001:c06::22f]:35478)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <yzlyourself@gmail.com>)
+	id 1ciiTc-0004Bb-0J
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 09:10:04 -0500
+Received: by mail-io0-x22f.google.com with SMTP id j18so9819540ioe.2
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 06:10:02 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1488286469-9381-6-git-send-email-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="qXTMagVpAxRWPm3vNssKSJpKn3cpnIR2w"
-Subject: Re: [Qemu-devel] [PATCH v3 05/44] block: Default .bdrv_child_perm()
- for filter drivers
+From: =?UTF-8?B?6KKB5Luy?= <yzlyourself@gmail.com>
+Date: Tue, 28 Feb 2017 22:10:00 +0800
+Message-ID: <CAHwzzTr=qcMA7jfajxMDzhLHx3GoP2SWM_Tvi3irznrW=U6vZQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] failed to install win2008 with usb,
+ qemu report: cpage out of range(EHCI)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,57 +28,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qXTMagVpAxRWPm3vNssKSJpKn3cpnIR2w
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
-Message-ID: <897c50a1-8afc-eae1-4edc-b8a24b638a31@redhat.com>
-Subject: Re: [PATCH v3 05/44] block: Default .bdrv_child_perm() for filter
- drivers
-References: <1488286469-9381-1-git-send-email-kwolf@redhat.com>
- <1488286469-9381-6-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1488286469-9381-6-git-send-email-kwolf@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
+I use qemu-2.5.0.
 
-On 28.02.2017 13:53, Kevin Wolf wrote:
-> Most filters need permissions related to read and write for their
-> children, but only if the node has a parent that wants to use the same
-> operation on the filter. The same is true for resize.
->=20
-> This adds a default implementation that simply forwards all necessary
-> permissions to all children of the node and leaves the other permission=
-s
-> unchanged.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block.c                   | 23 +++++++++++++++++++++++
->  include/block/block_int.h |  8 ++++++++
->  2 files changed, 31 insertions(+)
+This is a part of my xml:
+......
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+  <vcpu placement=3D'static' current=3D"1">64</vcpu>
+
+  <cpu>
+
+    <topology sockets=3D'4' cores=3D'8' threads=3D'2'/>
+
+      <numa>
+
+          <cell cpus=3D'0-3' memory=3D'524288'/>
+
+          <cell cpus=3D'4-7' memory=3D'524288'/>
+
+      </numa>
+
+  </cpu>
+
+.....
+
+    <hostdev mode=3D'subsystem' type=3D'usb' managed=3D'yes'>
+
+      <source missing=3D'yes'>
+
+        <address bus=3D'1' device=3D'5'/>
+
+      </source>
+
+      <address type=3D'usb' bus=3D'0' port=3D'4'/>
+
+    </hostdev>
+
+....
+
+and this xml will failed to install win2008 with usb, and qemu reports in
+its log: cpage out of range(EHCI) =E3=80=82
+
+but if the part of xml above:  <vcpu placement=3D'static' current=3D"1">64<=
+/vcpu>
+  changes to  <vcpu placement=3D'static' cpuset=3D'0-1' current=3D"1">64</v=
+cpu> ,
+and other part of xml stay the same.
+
+Then it works, I can install win2008 with usb successfully.
 
 
---qXTMagVpAxRWPm3vNssKSJpKn3cpnIR2w
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+I change my qemu to 2.8.0, and the first xml can work too, but I don't know
+the reason, and which part of qemu code fix this bug.
 
------BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAli1kJ0SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A1qwH/3OdXuRKMjl+zSTq6zAS4l4c8kYDNZZh
-JcSXNjoVq0EclTrgHvC5GyePRbILZ3aZk1+FqkwxNboBfzX+mc++FOwNg08zMG4u
-OTHf8bT8e6gTqnJcngjbQC3zxVixFLKI7GoR8G+ODitlQiWlZoWkbiUxgt0PczJU
-AU1pzQMum73NfPvUkS9LJ+a0m1hozqIl931byoIY2Y+8yWgfp91o3Xnyo/+++ggO
-uMJLk5OC7C1AbiYIZojT/Zkjd5cgCC12kV7Vn7VDyqf7qre2hYpcwfdpypEvMIBI
-3XaVBUGrE4lANiXtWrkBsaGERp4Fg0U+oU74LHKHb0BpLEFRtC58Cmg=
-=MoZC
------END PGP SIGNATURE-----
-
---qXTMagVpAxRWPm3vNssKSJpKn3cpnIR2w--
+Ask for help
