@@ -1,36 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52973)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cig0m-0007xK-37
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 06:32:09 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cig0i-0002aq-Vc
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cig0l-0007wu-R3
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 06:32:08 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37777
-	helo=mx0a-001b2d01.pphosted.com)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cig0i-0002ad-Nm
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 06:32:07 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40554)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cig0i-0002aV-PR
+	id 1cig0i-0002a7-EQ
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 06:32:04 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v1SBOwRj084568
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 06:32:04 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28vyqf62nn-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	v1SBNpmD049259
 	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 06:32:03 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28vnajacs5-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 06:32:02 -0500
 Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Tue, 28 Feb 2017 11:32:02 -0000
+	Tue, 28 Feb 2017 11:32:00 -0000
 From: Cornelia Huck <cornelia.huck@de.ibm.com>
-Date: Tue, 28 Feb 2017 12:31:52 +0100
+Date: Tue, 28 Feb 2017 12:31:50 +0100
 In-Reply-To: <20170228113153.23867-1-cornelia.huck@de.ibm.com>
 References: <20170228113153.23867-1-cornelia.huck@de.ibm.com>
-Message-Id: <20170228113153.23867-5-cornelia.huck@de.ibm.com>
-Subject: [Qemu-devel] [PULL for-2.9 4/5] pc-bios/s390-ccw: Use the ccw bios
- to start the network boot
+Message-Id: <20170228113153.23867-3-cornelia.huck@de.ibm.com>
+Subject: [Qemu-devel] [PULL for-2.9 2/5] s390x/ipl: Extend S390IPLState to
+ support network boot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,142 +43,91 @@ Cc: borntraeger@de.ibm.com, agraf@suse.de, jfrei@linux.vnet.ibm.com, qemu-devel@
 
 From: Farhan Ali <alifm@linux.vnet.ibm.com>
 
-We want to use the ccw bios to start final network boot. To do
-this we use ccw bios to detect if the boot device is a virtio
-network device and retrieve the start address of the
-network boot image.
+Add new field to S390IPLState to store the name of the network boot
+loader.
 
 Signed-off-by: Farhan Ali <alifm@linux.vnet.ibm.com>
 Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
 Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/bootmap.c |  8 +++++++-
- pc-bios/s390-ccw/iplb.h    |  3 ++-
- pc-bios/s390-ccw/main.c    | 20 ++++++++++++++------
- pc-bios/s390-ccw/virtio.c  |  1 +
- pc-bios/s390-ccw/virtio.h  |  1 +
- 5 files changed, 25 insertions(+), 8 deletions(-)
+ hw/s390x/ipl.c             | 1 +
+ hw/s390x/ipl.h             | 1 +
+ hw/s390x/s390-virtio-ccw.c | 3 ++-
+ hw/s390x/s390-virtio.c     | 2 ++
+ hw/s390x/s390-virtio.h     | 1 +
+ 5 files changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index 611102e3ef..b21c877b53 100644
---- a/pc-bios/s390-ccw/bootmap.c
-+++ b/pc-bios/s390-ccw/bootmap.c
-@@ -724,11 +724,17 @@ static void zipl_load_vscsi(void)
- 
- void zipl_load(void)
- {
--    if (virtio_get_device()->is_cdrom) {
-+    VDev *vdev = virtio_get_device();
-+
-+    if (vdev->is_cdrom) {
-         ipl_iso_el_torito();
-         panic("\n! Cannot IPL this ISO image !\n");
-     }
- 
-+    if (virtio_get_device_type() == VIRTIO_ID_NET) {
-+        jump_to_IPL_code(vdev->netboot_start_addr);
-+    }
-+
-     ipl_scsi();
- 
-     switch (virtio_get_device_type()) {
-diff --git a/pc-bios/s390-ccw/iplb.h b/pc-bios/s390-ccw/iplb.h
-index 86abc56a90..890aed9ece 100644
---- a/pc-bios/s390-ccw/iplb.h
-+++ b/pc-bios/s390-ccw/iplb.h
-@@ -13,7 +13,8 @@
- #define IPLB_H
- 
- struct IplBlockCcw {
--    uint8_t  reserved0[85];
-+    uint64_t netboot_start_addr;
-+    uint8_t  reserved0[77];
-     uint8_t  ssid;
+diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+index 2e2664f22e..fd656718a7 100644
+--- a/hw/s390x/ipl.c
++++ b/hw/s390x/ipl.c
+@@ -209,6 +209,7 @@ static Property s390_ipl_properties[] = {
+     DEFINE_PROP_STRING("initrd", S390IPLState, initrd),
+     DEFINE_PROP_STRING("cmdline", S390IPLState, cmdline),
+     DEFINE_PROP_STRING("firmware", S390IPLState, firmware),
++    DEFINE_PROP_STRING("netboot_fw", S390IPLState, netboot_fw),
+     DEFINE_PROP_BOOL("enforce_bios", S390IPLState, enforce_bios, false),
+     DEFINE_PROP_BOOL("iplbext_migration", S390IPLState, iplbext_migration,
+                      true),
+diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
+index c89109585a..4ad9a7c05e 100644
+--- a/hw/s390x/ipl.h
++++ b/hw/s390x/ipl.h
+@@ -106,6 +106,7 @@ struct S390IPLState {
+     char *initrd;
+     char *cmdline;
+     char *firmware;
++    char *netboot_fw;
+     uint8_t cssid;
+     uint8_t ssid;
      uint16_t devno;
-     uint8_t  vm_flags;
-diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-index 345b848752..0946766d86 100644
---- a/pc-bios/s390-ccw/main.c
-+++ b/pc-bios/s390-ccw/main.c
-@@ -53,6 +53,12 @@ static bool find_dev(Schib *schib, int dev_no)
-         if (!virtio_is_supported(blk_schid)) {
-             continue;
-         }
-+        /* Skip net devices since no IPLB is created and therefore no
-+         * no network bootloader has been loaded
-+         */
-+        if (virtio_get_device_type() == VIRTIO_ID_NET && dev_no < 0) {
-+            continue;
-+        }
-         if ((dev_no < 0) || (schib->pmcw.dev == dev_no)) {
-             return true;
-         }
-@@ -67,6 +73,7 @@ static void virtio_setup(void)
-     int ssid;
-     bool found = false;
-     uint16_t dev_no;
-+    VDev *vdev = virtio_get_device();
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 4f0d62b2d8..40914fde6f 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -116,7 +116,8 @@ static void ccw_init(MachineState *machine)
+     /* get a BUS */
+     css_bus = virtual_css_bus_init();
+     s390_init_ipl_dev(machine->kernel_filename, machine->kernel_cmdline,
+-                      machine->initrd_filename, "s390-ccw.img", true);
++                      machine->initrd_filename, "s390-ccw.img",
++                      "s390-netboot.img", true);
+     s390_flic_init();
  
-     /*
-      * We unconditionally enable mss support. In every sane configuration,
-@@ -85,9 +92,6 @@ static void virtio_setup(void)
-             found = find_dev(&schib, dev_no);
-             break;
-         case S390_IPL_TYPE_QEMU_SCSI:
--        {
--            VDev *vdev = virtio_get_device();
--
-             vdev->scsi_device_selected = true;
-             vdev->selected_scsi_device.channel = iplb.scsi.channel;
-             vdev->selected_scsi_device.target = iplb.scsi.target;
-@@ -95,7 +99,6 @@ static void virtio_setup(void)
-             blk_schid.ssid = iplb.scsi.ssid & 0x3;
-             found = find_dev(&schib, iplb.scsi.devno);
-             break;
--        }
-         default:
-             panic("List-directed IPL not supported yet!\n");
-         }
-@@ -111,9 +114,14 @@ static void virtio_setup(void)
- 
-     IPL_assert(found, "No virtio device found");
- 
--    virtio_setup_device(blk_schid);
-+    if (virtio_get_device_type() == VIRTIO_ID_NET) {
-+        sclp_print("Network boot device detected\n");
-+        vdev->netboot_start_addr = iplb.ccw.netboot_start_addr;
-+    } else {
-+        virtio_setup_device(blk_schid);
- 
--    IPL_assert(virtio_ipl_disk_is_valid(), "No valid IPL device detected");
-+        IPL_assert(virtio_ipl_disk_is_valid(), "No valid IPL device detected");
-+    }
- }
- 
- int main(void)
-diff --git a/pc-bios/s390-ccw/virtio.c b/pc-bios/s390-ccw/virtio.c
-index b333734955..6ee93d56db 100644
---- a/pc-bios/s390-ccw/virtio.c
-+++ b/pc-bios/s390-ccw/virtio.c
-@@ -585,6 +585,7 @@ bool virtio_is_supported(SubChannelId schid)
-         switch (vdev.senseid.cu_model) {
-         case VIRTIO_ID_BLOCK:
-         case VIRTIO_ID_SCSI:
-+        case VIRTIO_ID_NET:
-             return true;
-         }
+     dev = qdev_create(NULL, TYPE_S390_PCI_HOST_BRIDGE);
+diff --git a/hw/s390x/s390-virtio.c b/hw/s390x/s390-virtio.c
+index 9cfb09057e..afa4148e6b 100644
+--- a/hw/s390x/s390-virtio.c
++++ b/hw/s390x/s390-virtio.c
+@@ -65,6 +65,7 @@ void s390_init_ipl_dev(const char *kernel_filename,
+                        const char *kernel_cmdline,
+                        const char *initrd_filename,
+                        const char *firmware,
++                       const char *netboot_fw,
+                        bool enforce_bios)
+ {
+     Object *new = object_new(TYPE_S390_IPL);
+@@ -78,6 +79,7 @@ void s390_init_ipl_dev(const char *kernel_filename,
      }
-diff --git a/pc-bios/s390-ccw/virtio.h b/pc-bios/s390-ccw/virtio.h
-index eb35ea5faf..3388a423e5 100644
---- a/pc-bios/s390-ccw/virtio.h
-+++ b/pc-bios/s390-ccw/virtio.h
-@@ -276,6 +276,7 @@ struct VDev {
-     uint8_t scsi_dev_heads;
-     bool scsi_device_selected;
-     ScsiDevice selected_scsi_device;
-+    uint64_t netboot_start_addr;
- };
- typedef struct VDev VDev;
- 
+     qdev_prop_set_string(dev, "cmdline", kernel_cmdline);
+     qdev_prop_set_string(dev, "firmware", firmware);
++    qdev_prop_set_string(dev, "netboot_fw", netboot_fw);
+     qdev_prop_set_bit(dev, "enforce_bios", enforce_bios);
+     object_property_add_child(qdev_get_machine(), TYPE_S390_IPL,
+                               new, NULL);
+diff --git a/hw/s390x/s390-virtio.h b/hw/s390x/s390-virtio.h
+index f588b80a6e..f2377a3e0e 100644
+--- a/hw/s390x/s390-virtio.h
++++ b/hw/s390x/s390-virtio.h
+@@ -24,6 +24,7 @@ void s390_init_ipl_dev(const char *kernel_filename,
+                        const char *kernel_cmdline,
+                        const char *initrd_filename,
+                        const char *firmware,
++                       const char *netboot_fw,
+                        bool enforce_bios);
+ void s390_create_virtio_net(BusState *bus, const char *name);
+ void s390_nmi(NMIState *n, int cpu_index, Error **errp);
 -- 
 2.11.0
