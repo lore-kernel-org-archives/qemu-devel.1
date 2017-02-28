@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cijMy-0003e9-2j
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:07:18 -0500
+	(envelope-from <armbru@redhat.com>) id 1cijN8-0003mf-LF
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:07:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cijMv-0002mj-9j
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:07:16 -0500
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:32983)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cijMv-0002mM-3b
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:07:13 -0500
-Received: by mail-wm0-x22d.google.com with SMTP id i17so3363544wmf.0
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 07:07:13 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 28 Feb 2017 15:07:07 +0000
-Message-Id: <20170228150709.27453-2-alex.bennee@linaro.org>
-In-Reply-To: <20170228150709.27453-1-alex.bennee@linaro.org>
-References: <20170228150709.27453-1-alex.bennee@linaro.org>
+	(envelope-from <armbru@redhat.com>) id 1cijN7-0002oP-9N
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 10:07:26 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <cover.1488254329.git.jcody@redhat.com>
+	<cover.1488254329.git.jcody@redhat.com>
+	<64a3308bbe51f78ccd2a53b30e8ba576e979ac4f.1488254329.git.jcody@redhat.com>
+Date: Tue, 28 Feb 2017 16:07:14 +0100
+In-Reply-To: <64a3308bbe51f78ccd2a53b30e8ba576e979ac4f.1488254329.git.jcody@redhat.com>
+	(Jeff Cody's message of "Mon, 27 Feb 2017 23:12:28 -0500")
+Message-ID: <874lzexskd.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 1/3] vl/cpus: be smarter with icount and
- MTTCG
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 5/5] block/rbd: add support for
+ 'mon_host', 'auth_supported' via QAPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,73 +25,275 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: rth@twiddle.net
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, qemu-block@nongnu.org
 
-The sense of the test was inverted. Make it simple, if icount is
-enabled then we disabled MTTCG by default. If the user tries to force
-MTTCG upon us then we tell them "no".
+Jeff Cody <jcody@redhat.com> writes:
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- cpus.c | 7 +++----
- vl.c   | 7 ++-----
- 2 files changed, 5 insertions(+), 9 deletions(-)
+> This adds support for three additional options that may be specified
+> by QAPI in blockdev-add:
+>
+>     server: host, port
+>     auth method: either 'cephx' or 'none'
+>
+> The "server" and "auth-supported" QAPI parameters are arrays.  To conform
+> with the rados API, the array items are join as a single string with a ';'
+> character as a delimiter when setting the configuration values.
+>
+> Signed-off-by: Jeff Cody <jcody@redhat.com>
+> ---
+>  block/rbd.c          | 119 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  qapi/block-core.json |  29 +++++++++++++
+>  2 files changed, 148 insertions(+)
+>
+> diff --git a/block/rbd.c b/block/rbd.c
+> index cc43f42..dfa52cc 100644
+> --- a/block/rbd.c
+> +++ b/block/rbd.c
+> @@ -405,6 +405,19 @@ static QemuOptsList runtime_opts = {
+>              .type = QEMU_OPT_STRING,
+>              .help = "Legacy rados key/value option parameters",
+>          },
+> +        {
+> +            .name = "host",
+> +            .type = QEMU_OPT_STRING,
+> +        },
+> +        {
+> +            .name = "port",
+> +            .type = QEMU_OPT_STRING,
+> +        },
+> +        {
+> +            .name = "auth",
+> +            .type = QEMU_OPT_STRING,
+> +            .help = "Supported authentication method, either cephx or none",
+> +        },
+>          { /* end of list */ }
+>      },
+>  };
+> @@ -565,14 +578,89 @@ static void qemu_rbd_complete_aio(RADOSCB *rcb)
+>      qemu_aio_unref(acb);
+>  }
+>  
+> +#define RBD_MON_HOST          0
+> +#define RBD_AUTH_SUPPORTED    1
 
-diff --git a/cpus.c b/cpus.c
-index 8200ac6b75..e9aab9f70f 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -185,10 +185,7 @@ static bool check_tcg_memory_orders_compatible(void)
- 
- static bool default_mttcg_enabled(void)
- {
--    QemuOpts *icount_opts = qemu_find_opts_singleton("icount");
--    const char *rr = qemu_opt_get(icount_opts, "rr");
--
--    if (rr || TCG_OVERSIZED_GUEST) {
-+    if (use_icount || TCG_OVERSIZED_GUEST) {
-         return false;
-     } else {
- #ifdef TARGET_SUPPORTS_MTTCG
-@@ -206,6 +203,8 @@ void qemu_tcg_configure(QemuOpts *opts, Error **errp)
-         if (strcmp(t, "multi") == 0) {
-             if (TCG_OVERSIZED_GUEST) {
-                 error_setg(errp, "No MTTCG when guest word size > hosts");
-+            } else if (use_icount) {
-+                error_setg(errp, "No MTTCG when icount is enabled");
-             } else {
-                 if (!check_tcg_memory_orders_compatible()) {
-                     error_report("Guest expects a stronger memory ordering "
-diff --git a/vl.c b/vl.c
-index e10a27bdd6..bbbf1baadf 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4025,8 +4025,6 @@ int main(int argc, char **argv, char **envp)
- 
-     replay_configure(icount_opts);
- 
--    qemu_tcg_configure(accel_opts, &error_fatal);
--
-     machine_class = select_machine();
- 
-     set_memory_options(&ram_slots, &maxram_size, machine_class);
-@@ -4393,14 +4391,13 @@ int main(int argc, char **argv, char **envp)
-         if (!tcg_enabled()) {
-             error_report("-icount is not allowed with hardware virtualization");
-             exit(1);
--        } else if (qemu_tcg_mttcg_enabled()) {
--            error_report("-icount does not currently work with MTTCG");
--            exit(1);
-         }
-         configure_icount(icount_opts, &error_abort);
-         qemu_opts_del(icount_opts);
-     }
- 
-+    qemu_tcg_configure(accel_opts, &error_fatal);
-+
-     if (default_net) {
-         QemuOptsList *net = qemu_find_opts("net");
-         qemu_opts_set(net, NULL, "type", "nic", &error_abort);
--- 
-2.11.0
+Blank line here, please.
+
+> +static char *qemu_rbd_array_opts(QDict *options, const char *prefix, int type,
+> +                                 Error **errp)
+> +{
+> +    size_t num_entries;
+> +    QemuOpts *opts = NULL;
+> +    QDict *sub_options;
+> +    const char *host;
+> +    const char *port;
+> +    char *str;
+> +    char *rados_str = NULL;
+> +    Error *local_err = NULL;
+> +
+> +    assert(type == RBD_MON_HOST || type == RBD_AUTH_SUPPORTED);
+> +
+> +    num_entries = qdict_array_entries(options, prefix);
+
+Can this fail?
+
+> +
+> +    if (num_entries) {
+
+Superfluous conditional: if !num_entries, the loop rejects.
+
+> +        for (int i = 0; i < num_entries; i++) {
+> +            char *tmp = NULL;
+> +            const char *value;
+> +            char *rados_str_tmp;
+> +
+> +            str = g_strdup_printf("%s%d.", prefix, i);
+> +            qdict_extract_subqdict(options, &sub_options, str);
+> +            g_free(str);
+> +
+> +            opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+> +            qemu_opts_absorb_qdict(opts, sub_options, &local_err);
+> +            QDECREF(sub_options);
+> +            if (local_err) {
+> +                error_propagate(errp, local_err);
+> +                goto exit;
+
+Hmm.  Unless this is the first iteration, rados_str is already non-null,
+i.e. we fail and return a string the caller must free.  That's bad
+practice; it's better to return NULL on failre.
+
+> +            }
+> +
+> +            if (type == RBD_MON_HOST) {
+> +                host = qemu_opt_get(opts, "host");
+> +                port = qemu_opt_get(opts, "port");
+> +
+> +                value = host;
+> +                if (port) {
+> +                    tmp = g_strdup_printf("%s:%s", host, port);
+
+Problematic when @host is numeric IPv6.  What syntax does ceph expect in
+that case?
+
+> +                    value = tmp;
+> +                }
+> +            } else {
+> +                value = qemu_opt_get(opts, "auth");
+> +            }
+> +
+> +
+> +            /* each iteration in the for loop will build upon the string,
+> +             * and if rados_str is NULL then it is our first pass */
+> +            if (rados_str) {
+> +                /* separate options with ';', as that  is what rados_conf_set()
+> +                 * requires */
+> +                rados_str_tmp = rados_str;
+> +                rados_str = g_strdup_printf("%s;%s", rados_str_tmp, value);
+> +                g_free(rados_str_tmp);
+
+I'd make rados_str a GString.  But your code isn't wrong.
+
+> +            } else {
+> +                rados_str = g_strdup(value);
+> +            }
+> +
+> +            g_free(tmp);
+
+Aha, @tmp is just for getting the g_strdup_printf() freed.  Rename to
+strbuf?
+
+> +            qemu_opts_del(opts);
+> +            opts = NULL;
+> +        }
+> +    }
+> +
+> +exit:
+> +    qemu_opts_del(opts);
+> +    return rados_str;
+> +}
+> +
+>  static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+>                           Error **errp)
+>  {
+>      BDRVRBDState *s = bs->opaque;
+>      const char *pool, *snap, *conf, *clientname, *name, *keypairs;
+> +    const char *auth_supported;
+>      const char *secretid;
+>      QemuOpts *opts;
+>      Error *local_err = NULL;
+> +    char *mon_host = NULL;
+>      int r;
+>  
+>      opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+> @@ -583,6 +671,22 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+>          return -EINVAL;
+>      }
+>  
+> +   auth_supported = qemu_rbd_array_opts(options, "auth-supported.",
+
+Indentation's off.
+
+> +                                         RBD_AUTH_SUPPORTED, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        r = -EINVAL;
+> +        goto failed_opts;
+> +    }
+> +
+> +    mon_host = qemu_rbd_array_opts(options, "server.",
+> +                                   RBD_MON_HOST, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        r = -EINVAL;
+> +        goto failed_opts;
+> +    }
+> +
+>      secretid = qemu_opt_get(opts, "password-secret");
+>  
+>      pool           = qemu_opt_get(opts, "pool");
+> @@ -615,6 +719,20 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+>          goto failed_shutdown;
+>      }
+>  
+> +    if (mon_host) {
+> +        r = rados_conf_set(s->cluster, "mon_host", mon_host);
+> +        if (r < 0) {
+> +            goto failed_shutdown;
+> +        }
+> +    }
+> +
+> +    if (auth_supported) {
+> +        r = rados_conf_set(s->cluster, "auth_supported", auth_supported);
+> +        if (r < 0) {
+> +            goto failed_shutdown;
+> +        }
+> +    }
+> +
+>      if (qemu_rbd_set_auth(s->cluster, secretid, errp) < 0) {
+>          r = -EIO;
+>          goto failed_shutdown;
+> @@ -663,6 +781,7 @@ failed_shutdown:
+>      g_free(s->snap);
+>  failed_opts:
+>      qemu_opts_del(opts);
+> +    g_free(mon_host);
+
+Need to free auth_supported.
+
+>      return r;
+>  }
+>  
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index f152953..5f74f92 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -2666,6 +2666,28 @@
+>              '*header-digest': 'IscsiHeaderDigest',
+>              '*timeout': 'int' } }
+>  
+> +
+> +##
+> +# @RbdAuthSupport:
+> +#
+> +# An enumeration of RBD auth support
+> +#
+> +# Since: 2.9
+> +##
+> +{ 'enum': 'RbdAuthSupport',
+> +  'data': [ 'cephx', 'none' ] }
+> +
+> +
+> +##
+> +# @RbdAuthMethod:
+> +#
+> +# An enumeration of rados auth_supported types
+> +#
+> +# Since: 2.9
+> +##
+> +{ 'struct': 'RbdAuthMethod',
+> +  'data': { 'auth': 'RbdAuthSupport' } }
+> +
+>  ##
+>  # @BlockdevOptionsRbd:
+>  #
+> @@ -2681,6 +2703,11 @@
+>  #
+>  # @user:               #optional Ceph id name.
+>  #
+> +# @server:             #optional Monitor host address and port.  This maps
+> +#                      to the "mon_host" Ceph option.
+> +#
+> +# @auth-supported:     #optional Authentication supported.
+> +#
+>  # @password-secret:    #optional The ID of a QCryptoSecret object providing
+>  #                      the password for the login.
+>  #
+> @@ -2692,6 +2719,8 @@
+>              '*conf': 'str',
+>              '*snapshot': 'str',
+>              '*user': 'str',
+> +            '*server': ['InetSocketAddress'],
+> +            '*auth-supported': ['RbdAuthMethod'],
+>              '*password-secret': 'str' } }
+>  
+>  ##
