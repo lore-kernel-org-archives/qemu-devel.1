@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cinFu-0001WY-I9
+	(envelope-from <sstabellini@kernel.org>) id 1cinFu-0001Wa-IS
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:16:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cinFr-0001zM-K7
+	(envelope-from <sstabellini@kernel.org>) id 1cinFq-0001yz-JA
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:16:14 -0500
-Received: from mail.kernel.org ([198.145.29.136]:38542)
+Received: from mail.kernel.org ([198.145.29.136]:38504)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1cinFr-0001yr-81
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:16:11 -0500
+	id 1cinFq-0001yL-2V
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:16:10 -0500
 From: Stefano Stabellini <sstabellini@kernel.org>
-Date: Tue, 28 Feb 2017 11:16:04 -0800
-Message-Id: <1488309364-3252-2-git-send-email-sstabellini@kernel.org>
-In-Reply-To: <1488309364-3252-1-git-send-email-sstabellini@kernel.org>
+Date: Tue, 28 Feb 2017 11:16:03 -0800
+Message-Id: <1488309364-3252-1-git-send-email-sstabellini@kernel.org>
+In-Reply-To: <alpine.DEB.2.10.1702281106420.5551@sstabellini-ThinkPad-X260>
 References: <alpine.DEB.2.10.1702281106420.5551@sstabellini-ThinkPad-X260>
-	<1488309364-3252-1-git-send-email-sstabellini@kernel.org>
-Subject: [Qemu-devel] [PULL 2/2] Add a new qmp command to do checkpoint,
- query xen replication status
+Subject: [Qemu-devel] [PULL 1/2] Add a new qmp command to start/stop
+ replication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,106 +30,95 @@ Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-
 
 From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 
-We can call this qmp command to do checkpoint outside of qemu.
-Xen colo will need this function.
+We can call this qmp command to start/stop replication outside of qemu.
+Like Xen colo need this function.
 
 Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 Signed-off-by: Wen Congyang <wencongyang@gmail.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+Reviewed-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
- migration/colo.c | 23 +++++++++++++++++++++++
- qapi-schema.json | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 71 insertions(+)
+ migration/colo.c | 26 ++++++++++++++++++++++++++
+ qapi-schema.json | 25 +++++++++++++++++++++++++
+ 2 files changed, 51 insertions(+)
 
 diff --git a/migration/colo.c b/migration/colo.c
-index 46bc84d..c19eb3f 100644
+index 712308e..46bc84d 100644
 --- a/migration/colo.c
 +++ b/migration/colo.c
-@@ -173,6 +173,29 @@ void qmp_xen_set_replication(bool enable, bool primary,
+@@ -19,6 +19,8 @@
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
+ #include "migration/failover.h"
++#include "replication.h"
++#include "qmp-commands.h"
+ 
+ static bool vmstate_loading;
+ 
+@@ -147,6 +149,30 @@ void colo_do_failover(MigrationState *s)
      }
  }
  
-+ReplicationStatus *qmp_query_xen_replication_status(Error **errp)
++void qmp_xen_set_replication(bool enable, bool primary,
++                             bool has_failover, bool failover,
++                             Error **errp)
 +{
-+    Error *err = NULL;
-+    ReplicationStatus *s = g_new0(ReplicationStatus, 1);
++    ReplicationMode mode = primary ?
++                           REPLICATION_MODE_PRIMARY :
++                           REPLICATION_MODE_SECONDARY;
 +
-+    replication_get_error_all(&err);
-+    if (err) {
-+        s->error = true;
-+        s->has_desc = true;
-+        s->desc = g_strdup(error_get_pretty(err));
-+    } else {
-+        s->error = false;
++    if (has_failover && enable) {
++        error_setg(errp, "Parameter 'failover' is only for"
++                   " stopping replication");
++        return;
 +    }
 +
-+    error_free(err);
-+    return s;
-+}
-+
-+void qmp_xen_colo_do_checkpoint(Error **errp)
-+{
-+    replication_do_checkpoint_all(errp);
++    if (enable) {
++        replication_start_all(mode, errp);
++    } else {
++        if (!has_failover) {
++            failover = NULL;
++        }
++        replication_stop_all(failover, failover ? NULL : errp);
++    }
 +}
 +
  static void colo_send_message(QEMUFile *f, COLOMessage msg,
                                Error **errp)
  {
 diff --git a/qapi-schema.json b/qapi-schema.json
-index dbc1ebc..d6186d4 100644
+index 150ee98..dbc1ebc 100644
 --- a/qapi-schema.json
 +++ b/qapi-schema.json
-@@ -6015,6 +6015,54 @@
-   'data': { 'enable': 'bool', 'primary': 'bool', '*failover' : 'bool' } }
+@@ -5990,6 +5990,31 @@
+ { 'command': 'xen-load-devices-state', 'data': {'filename': 'str'} }
  
  ##
-+# @ReplicationStatus:
++# @xen-set-replication:
 +#
-+# The result format for 'query-xen-replication-status'.
++# Enable or disable replication.
 +#
-+# @error: true if an error happened, false if replication is normal.
++# @enable: true to enable, false to disable.
 +#
-+# @desc: #optional the human readable error description string, when
-+#        @error is 'true'.
++# @primary: true for primary or false for secondary.
 +#
-+# Since: 2.9
-+##
-+{ 'struct': 'ReplicationStatus',
-+  'data': { 'error': 'bool', '*desc': 'str' } }
-+
-+##
-+# @query-xen-replication-status:
-+#
-+# Query replication status while the vm is running.
-+#
-+# Returns: A @ReplicationResult object showing the status.
-+#
-+# Example:
-+#
-+# -> { "execute": "query-xen-replication-status" }
-+# <- { "return": { "error": false } }
-+#
-+# Since: 2.9
-+##
-+{ 'command': 'query-xen-replication-status',
-+  'returns': 'ReplicationStatus' }
-+
-+##
-+# @xen-colo-do-checkpoint:
-+#
-+# Xen uses this command to notify replication to trigger a checkpoint.
++# @failover: #optional true to do failover, false to stop. but cannot be
++#            specified if 'enable' is true. default value is false.
 +#
 +# Returns: nothing.
 +#
 +# Example:
 +#
-+# -> { "execute": "xen-colo-do-checkpoint" }
++# -> { "execute": "xen-set-replication",
++#      "arguments": {"enable": true, "primary": false} }
 +# <- { "return": {} }
 +#
 +# Since: 2.9
 +##
-+{ 'command': 'xen-colo-do-checkpoint' }
++{ 'command': 'xen-set-replication',
++  'data': { 'enable': 'bool', 'primary': 'bool', '*failover' : 'bool' } }
 +
 +##
  # @GICCapability:
