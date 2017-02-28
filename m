@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56269)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cigDQ-0001C7-PC
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 06:45:13 -0500
+	(envelope-from <berrange@redhat.com>) id 1cigOM-0003it-6g
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 06:56:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cigDM-0006sE-GN
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 06:45:12 -0500
-Resent-Message-Id: <E1cigDM-0006sE-GN@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21440)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cigDM-0006qa-7g
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 06:45:08 -0500
-In-Reply-To: <20170228113535.7099-2-ebischoff@suse.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148828217147.186.4212905025515476122@0e2666bad730>
+	(envelope-from <berrange@redhat.com>) id 1cigOI-0002dY-Go
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 06:56:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58192)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cigOI-0002cR-8U
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 06:56:26 -0500
+Date: Tue, 28 Feb 2017 11:56:21 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170228115621.GB2720@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170227201456.31814-1-berrange@redhat.com>
+	<20170228104828.GA2720@redhat.com>
+	<0bb8488e-ee11-9401-7c40-a0ab1eb275c0@openvz.org>
+	<ace8fc68-dd8c-81f6-872f-17798cce3609@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 28 Feb 2017 03:42:52 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] Adding support for LPD and LPDG
- instructions
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ace8fc68-dd8c-81f6-872f-17798cce3609@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH] io: ignore case when matching websockets
+ HTTP headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +31,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ebischoff@suse.com
-Cc: famz@redhat.com, rth@twiddle.net, agraf@suse.de, mmarek@suse.cz, mbenes@suse.cz, qemu-devel@nongnu.org, ebischoff@nerim.net
+To: "Denis V. Lunev" <den@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzAyMjgxMTM1MzUuNzA5OS0yLWViaXNjaG9mZkBzdXNlLmNvbQpUeXBlOiBzZXJpZXMKU3ViamVj
-dDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gQWRkaW5nIHN1cHBvcnQgZm9yIExQRCBhbmQgTFBERyBp
-bnN0cnVjdGlvbnMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9
-YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxl
-ZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVs
-aW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChn
-aXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7
-IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0t
-Zm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAu
-L3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9
-MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9
-PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRl
-ZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3Qv
-cWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTcwMjI4MTEzNTM1LjcwOTktMi1l
-YmlzY2hvZmZAc3VzZS5jb20gLT4gcGF0Y2hldy8yMDE3MDIyODExMzUzNS43MDk5LTItZWJpc2No
-b2ZmQHN1c2UuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZjczNTliZCBBZGRp
-bmcgc3VwcG9ydCBmb3IgTFBEIGFuZCBMUERHIGluc3RydWN0aW9ucwoKPT09IE9VVFBVVCBCRUdJ
-TiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBBZGRpbmcgc3VwcG9ydCBmb3IgTFBEIGFuZCBMUERH
-IGluc3RydWN0aW9ucy4uLgpFUlJPUjogc3VzcGVjdCBjb2RlIGluZGVudCBmb3IgY29uZGl0aW9u
-YWwgc3RhdGVtZW50cyAoNiwgMTEpCiM0NjogRklMRTogdGFyZ2V0L3MzOTB4L3RyYW5zbGF0ZS5j
-OjI3NTk6CisgICAgICBpZiAocGFyYWxsZWxfY3B1cykgeworICAgICAgICAgICBwb3RlbnRpYWxf
-cGFnZV9mYXVsdChzKTsKCkVSUk9SOiBzdXNwZWN0IGNvZGUgaW5kZW50IGZvciBjb25kaXRpb25h
-bCBzdGF0ZW1lbnRzICg0LCA5KQojNjk6IEZJTEU6IHRhcmdldC9zMzkweC90cmFuc2xhdGUuYzoy
-NzgyOgorICAgIGlmIChwYXJhbGxlbF9jcHVzKSB7CisgICAgICAgICBwb3RlbnRpYWxfcGFnZV9m
-YXVsdChzKTsKCkVSUk9SOiBNaXNzaW5nIFNpZ25lZC1vZmYtYnk6IGxpbmUocykKCnRvdGFsOiAz
-IGVycm9ycywgMCB3YXJuaW5ncywgOTEgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhp
-dGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQ
-YXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
-byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On Tue, Feb 28, 2017 at 01:58:38PM +0300, Denis V. Lunev wrote:
+> On 02/28/2017 01:54 PM, Denis V. Lunev wrote:
+> > On 02/28/2017 01:48 PM, Daniel P. Berrange wrote:
+> >> On Mon, Feb 27, 2017 at 08:14:56PM +0000, Daniel P. Berrange wrote:
+> >>> According to RFC7230 Section 3.2, header field name is case-insensitive.
+> >>> Convert the header data into all lowercase before doing string matching
+> >>> on the headers.
+> >>>
+> >>> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> >>> ---
+> >>>  io/channel-websock.c | 14 +++++++++-----
+> >>>  1 file changed, 9 insertions(+), 5 deletions(-)
+> >>>
+> >>> diff --git a/io/channel-websock.c b/io/channel-websock.c
+> >>> index a06a4a8..32b7f37 100644
+> >>> --- a/io/channel-websock.c
+> >>> +++ b/io/channel-websock.c
+> >>> @@ -33,9 +33,9 @@
+> >>>  #define QIO_CHANNEL_WEBSOCK_GUID "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
+> >>>  #define QIO_CHANNEL_WEBSOCK_GUID_LEN strlen(QIO_CHANNEL_WEBSOCK_GUID)
+> >>>  
+> >>> -#define QIO_CHANNEL_WEBSOCK_HEADER_PROTOCOL "Sec-WebSocket-Protocol"
+> >>> -#define QIO_CHANNEL_WEBSOCK_HEADER_VERSION "Sec-WebSocket-Version"
+> >>> -#define QIO_CHANNEL_WEBSOCK_HEADER_KEY "Sec-WebSocket-Key"
+> >>> +#define QIO_CHANNEL_WEBSOCK_HEADER_PROTOCOL "sec-websocket-protocol"
+> >>> +#define QIO_CHANNEL_WEBSOCK_HEADER_VERSION "sec-websocket-version"
+> >>> +#define QIO_CHANNEL_WEBSOCK_HEADER_KEY "sec-websocket-key"
+> >>>  
+> >>>  #define QIO_CHANNEL_WEBSOCK_PROTOCOL_BINARY "binary"
+> >>>  
+> >>> @@ -223,7 +223,7 @@ static int qio_channel_websock_handshake_process(QIOChannelWebsock *ioc,
+> >>>  static int qio_channel_websock_handshake_read(QIOChannelWebsock *ioc,
+> >>>                                                Error **errp)
+> >>>  {
+> >>> -    char *handshake_end;
+> >>> +    char *handshake_end, *tmp;
+> >>>      ssize_t ret;
+> >>>      /* Typical HTTP headers from novnc are 512 bytes, so limiting
+> >>>       * total header size to 4096 is easily enough. */
+> >>> @@ -249,9 +249,13 @@ static int qio_channel_websock_handshake_read(QIOChannelWebsock *ioc,
+> >>>          }
+> >>>      }
+> >>>  
+> >>> +    for (tmp = (char *)ioc->encinput.buffer; tmp < handshake_end; tmp++) {
+> >>> +        *tmp = g_ascii_tolower(*tmp);
+> >>> +    }
+> >>> +
+> >> self-nack - this does not in fact work - while it is fine to lowercase
+> >> the header keys, we must not touch the header values as some data is
+> >> case-sensitive
+> >>
+> >> Regards,
+> >> Daniel
+> > g-ascii-tolower() will help
+> >
+> > Den
+> ah, sorry, wrong copy/paste. I meant 'g_ascii_strdown ()'
+
+That would still lowercase both the key & value part of the headers.
+We need to only lowercase the key, ie text between start of line
+and first ':'. This requires properly parsing the HTTP header.
+
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
