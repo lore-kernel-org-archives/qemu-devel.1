@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cintu-0003Ca-Px
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:57:35 -0500
+	(envelope-from <armbru@redhat.com>) id 1cinv8-0003pG-8e
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:58:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cintt-0001qG-QW
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:57:34 -0500
-Date: Tue, 28 Feb 2017 20:57:22 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170228195722.GB4090@noname.redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1cinv6-00027F-LN
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 14:58:50 -0500
+From: Markus Armbruster <armbru@redhat.com>
 References: <1488194450-28056-1-git-send-email-armbru@redhat.com>
-	<1488194450-28056-19-git-send-email-armbru@redhat.com>
+	<1488194450-28056-25-git-send-email-armbru@redhat.com>
+	<20170228192543.GZ4090@noname.redhat.com>
+Date: Tue, 28 Feb 2017 20:58:36 +0100
+In-Reply-To: <20170228192543.GZ4090@noname.redhat.com> (Kevin Wolf's message
+	of "Tue, 28 Feb 2017 20:25:43 +0100")
+Message-ID: <87tw7edr4j.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1488194450-28056-19-git-send-email-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 18/24] block: Initial implementation of
- -blockdev
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 24/24] keyval: Support lists
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,79 +24,357 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, pkrempa@redhat.com, eblake@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: pkrempa@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-Am 27.02.2017 um 12:20 hat Markus Armbruster geschrieben:
-> The new command line option -blockdev works like QMP command
-> blockdev-add.
-> 
-> The option argument may be given in JSON syntax, exactly as in QMP.
-> Example usage:
-> 
->     -blockdev '{"node-name": "foo", "driver": "raw", "file": {"driver": "file", "filename": "foo.img"} }'
-> 
-> The JSON argument doesn't exactly blend into the existing option
-> syntax, so the traditional KEY=VALUE,... syntax is also supported,
-> using dotted keys to do the nesting:
-> 
->     -blockdev node-name=foo,driver=raw,file.driver=file,file.filename=foo.img
-> 
-> This does not yet support lists or downstream extensions, i.e. keys
-> with __RFQDN_ prefix, but the next few patches will take care of that.
-> 
-> Note that calling qmp_blockdev_add() (say via qmp_marshal_block_add())
-> right away would crash.  We need to stash the configuration for later
-> instead.  This is crudely done, and bypasses QemuOpts, even though
-> storing configuration is what QemuOpts is for.  Need to revamp option
-> infrastructure to support QAPI types like BlockdevOptions.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Kevin Wolf <kwolf@redhat.com> writes:
 
-Apparently I forgot to actually reply here after going back to the
-previous patch...
+> Am 27.02.2017 um 12:20 hat Markus Armbruster geschrieben:
+>> Additionally permit non-negative integers as key components.  A
+>> dictionary's keys must either be all integers or none.  If all keys
+>> are integers, convert the dictionary to a list.  The set of keys must
+>> be [0,N].
+>> 
+>> Examples:
+>> 
+>> * list.1=goner,list.0=null,list.1=eins,list.2=zwei
+>>   is equivalent to JSON [ "null", "eins", "zwei" ]
+>> 
+>> * a.b.c=1,a.b.0=2
+>>   is inconsistent: a.b.c clashes with a.b.0
+>> 
+>> * list.0=null,list.2=eins,list.2=zwei
+>>   has a hole: list.1 is missing
+>> 
+>> Similar design flaw as for objects: there is now way to denote an
+>
+> s/now/no/
 
-> @@ -532,6 +532,13 @@ Use @var{file} as CD-ROM image (you cannot use @option{-hdc} and
->  using @file{/dev/cdrom} as filename (@pxref{host_drives}).
->  ETEXI
->  
-> +DEF("blockdev", HAS_ARG, QEMU_OPTION_blockdev,
-> +    "-blockdev driver[,node-name=N][,discard=ignore|unmap]\n"
+Fixing...
 
-I was going to suggest the same thing as Eric here, simply 'driver'
-doesn't look right.
+>> empty list.  While interpreting "key absent" as empty list seems
+>> natural (removing a list member from the input string works when there
+>> are multiple ones, so why not when there's just one), it doesn't work:
+>> "key absent" already means "optional list absent", which isn't the
+>> same as "empty list present".
+>> 
+>> Update the keyval object visitor to use this a.0 syntax in error
+>> messages rather than the usual a[0].
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>
+> valgrind finds a quite a few leaks while running tests/test-keyval. Not
+> sure if I caught all of them, maybe you want to just run it yourself.
 
-> +    "          [,cache.direct=on|off][,cache.no-flush=on|off]\n"
-> +    "          [,read-only=on|off][,detect-zeroes=on|off|unmap]\n"
-> +    "          [,driver specific parameters...]\n"
-> +    "                configure a block backend\n", QEMU_ARCH_ALL)
-> +
->  DEF("drive", HAS_ARG, QEMU_OPTION_drive,
->      "-drive [file=file][,if=type][,bus=n][,unit=m][,media=d][,index=i]\n"
->      "       [,cyls=c,heads=h,secs=s[,trans=t]][,snapshot=on|off]\n"
+Will do.
 
-> @@ -4454,6 +4483,16 @@ int main(int argc, char **argv, char **envp)
->          qemu_opts_foreach(qemu_find_opts("drive"), drive_enable_snapshot,
->                            NULL, NULL);
->      }
-> +    while (!QSIMPLEQ_EMPTY(&bdo_queue)) {
-> +        BlockdevOptions_queue *bdo = QSIMPLEQ_FIRST(&bdo_queue);
-> +
-> +        QSIMPLEQ_REMOVE_HEAD(&bdo_queue, entry);
-> +        loc_push_restore(&bdo->loc);
-> +        qmp_blockdev_add(bdo->bdo, &error_fatal);
-> +        loc_pop(&bdo->loc);
-> +        qapi_free_BlockdevOptions(bdo->bdo);
-> +        g_free(bdo);
-> +    }
->      if (qemu_opts_foreach(qemu_find_opts("drive"), drive_init_func,
->                            &machine_class->block_default_type, NULL)) {
->          exit(1);
+>>  qapi/qobject-input-visitor.c |   5 +-
+>>  tests/test-keyval.c          | 117 ++++++++++++++++++++++++++++
+>>  util/keyval.c                | 177 ++++++++++++++++++++++++++++++++++++++++---
+>>  3 files changed, 286 insertions(+), 13 deletions(-)
+>> 
+>> diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+>> index 1d7b420..4c159e0 100644
+>> --- a/qapi/qobject-input-visitor.c
+>> +++ b/qapi/qobject-input-visitor.c
+>> @@ -41,6 +41,7 @@ struct QObjectInputVisitor {
+>>  
+>>      /* Root of visit at visitor creation. */
+>>      QObject *root;
+>> +    bool keyval;                /* Assume @root made with keyval_parse() */
+>
+> Who sets this? I can't seem to find it in this patch, and it's the final
+> patch of the series.
 
-And here I found the placement of the new code odd, it's in the middle
-of -drive handling. The current placement means that -drive can
-reference -blockdev nodes, but not the other way round. I like this and
-wouldn't recommand changing it. So my suggestion for a better placement
-would be to move the -blockdev code up a bit.
+I either forgot or lost its initialization in
+qobject_input_visitor_new_keyval().  Fixing...
 
-Kevin
+>>      /* Stack of objects being visited (all entries will be either
+>>       * QDict or QList). */
+>> @@ -73,7 +74,9 @@ static const char *full_name_nth(QObjectInputVisitor *qiv, const char *name,
+>>              g_string_prepend(qiv->errname, name ?: "<anonymous>");
+>>              g_string_prepend_c(qiv->errname, '.');
+>>          } else {
+>> -            snprintf(buf, sizeof(buf), "[%u]", so->index);
+>> +            snprintf(buf, sizeof(buf),
+>> +                     qiv->keyval ? ".%u" : "[%u]",
+>> +                     so->index);
+>>              g_string_prepend(qiv->errname, buf);
+>>          }
+>>          name = so->name;
+>
+>> diff --git a/util/keyval.c b/util/keyval.c
+>> index 1170dad..3621f28 100644
+>> --- a/util/keyval.c
+>> +++ b/util/keyval.c
+>> @@ -21,10 +21,12 @@
+>>   *
+>>   * Semantics defined by reduction to JSON:
+>>   *
+>> - *   key-vals defines a tree of objects rooted at R
+>> + *   key-vals is a tree of objects and arrays rooted at object R
+>>   *   where for each key-val = key-fragment . ... = val in key-vals
+>>   *       R op key-fragment op ... = val'
+>> - *       where (left-associative) op is member reference L.key-fragment
+>> + *       where (left-associative) op is
+>> + *                 array subscript L[key-fragment] for numeric key-fragment
+>> + *                 member reference L.key-fragment otherwise
+>>   *             val' is val with ',,' replaced by ','
+>>   *   and only R may be empty.
+>>   *
+>> @@ -34,16 +36,16 @@
+>>   *   doesn't have one, because R.a must be an object to satisfy a.b=1
+>>   *   and a string to satisfy a=2.
+>>   *
+>> - * Key-fragments must be valid QAPI names.
+>> + * Key-fragments must be valid QAPI names or consist only of digits.
+>>   *
+>>   * The length of any key-fragment must be between 1 and 127.
+>>   *
+>> - * Design flaw: there is no way to denote an empty non-root object.
+>> - * While interpreting "key absent" as empty object seems natural
+>> + * Design flaw: there is no way to denote an empty array or non-root
+>> + * object.  While interpreting "key absent" as empty seems natural
+>>   * (removing a key-val from the input string removes the member when
+>>   * there are more, so why not when it's the last), it doesn't work:
+>> - * "key absent" already means "optional object absent", which isn't
+>> - * the same as "empty object present".
+>> + * "key absent" already means "optional object/array absent", which
+>> + * isn't the same as "empty object/array present".
+>>   *
+>>   * Additional syntax for use with an implied key:
+>>   *
+>> @@ -51,17 +53,43 @@
+>>   *   val-no-key   = / [^,]* /
+>>   *
+>>   * where no-key is syntactic sugar for implied-key=val-no-key.
+>> - *
+>> - * TODO support lists
+>>   */
+>>  
+>>  #include "qemu/osdep.h"
+>>  #include "qapi/error.h"
+>>  #include "qapi/qmp/qstring.h"
+>>  #include "qapi/util.h"
+>> +#include "qemu/cutils.h"
+>>  #include "qemu/option.h"
+>>  
+>>  /*
+>> + * Convert @key to a list index.
+>> + * Convert all leading digits to a (non-negative) number, capped at
+>> + * INT_MAX.
+>> + * If @end is non-null, assign a pointer to the first character after
+>> + * the number to *@end.
+>> + * Else, fail if any characters follow.
+>> + * On success, return the converted number.
+>> + * On failure, return a negative value.
+>> + * Note: since only digits are converted, no two keys can map to the
+>> + * same number, except by overflow to INT_MAX.
+>> + */
+>> +static int key_to_index(const char *key, const char **end)
+>> +{
+>> +    int ret;
+>> +    unsigned long index;
+>> +
+>> +    if (*key < '0' || *key > '9') {
+>> +        return -EINVAL;
+>> +    }
+>> +    ret = qemu_strtoul(key, end, 10, &index);
+>> +    if (ret) {
+>> +        return ret == -ERANGE ? INT_MAX : ret;
+>> +    }
+>> +    return index <= INT_MAX ? index : INT_MAX;
+>> +}
+>> +
+>> +/*
+>>   * Ensure @cur maps @key_in_cur the right way.
+>>   * If @value is null, it needs to map to a QDict, else to this
+>>   * QString.
+>> @@ -113,7 +141,7 @@ static const char *keyval_parse_one(QDict *qdict, const char *params,
+>>                                      const char *implied_key,
+>>                                      Error **errp)
+>>  {
+>> -    const char *key, *key_end, *s;
+>> +    const char *key, *key_end, *s, *end;
+>>      size_t len;
+>>      char key_in_cur[128];
+>>      QDict *cur;
+>> @@ -137,8 +165,13 @@ static const char *keyval_parse_one(QDict *qdict, const char *params,
+>>      cur = qdict;
+>>      s = key;
+>>      for (;;) {
+>> -        ret = parse_qapi_name(s, false);
+>> -        len = ret < 0 ? 0 : ret;
+>> +        /* Want a key index (unless it's first) or a QAPI name */
+>> +        if (s != key && key_to_index(s, &end) >= 0) {
+>> +            len = end - s;
+>> +        } else {
+>> +            ret = parse_qapi_name(s, false);
+>> +            len = ret < 0 ? 0 : ret;
+>> +        }
+>>          assert(s + len <= key_end);
+>>          if (!len || (s + len < key_end && s[len] != '.')) {
+>>              assert(key != implied_key);
+>> @@ -205,6 +238,119 @@ static const char *keyval_parse_one(QDict *qdict, const char *params,
+>>      return s;
+>>  }
+>>  
+>> +static char *reassemble_key(GSList *key)
+>> +{
+>> +    GString *s = g_string_new("");
+>> +    GSList *p;
+>> +
+>> +    for (p = key; p; p = p->next) {
+>> +        g_string_prepend_c(s, '.');
+>> +        g_string_prepend(s, (char *)p->data);
+>> +    }
+>> +
+>> +    return g_string_free(s, FALSE);
+>> +}
+>> +
+>> +/*
+>> + * Listify @cur recursively.
+>> + * Replace QDicts whose keys are all valid list indexes by QLists.
+>> + * @key_of_cur is the list of key fragments leading up to @cur.
+>> + * On success, return either @cur or its replacement.
+>> + * On failure, store an error through @errp and return NULL.
+>> + */
+>> +static QObject *keyval_listify(QDict *cur, GSList *key_of_cur, Error **errp)
+>> +{
+>> +    GSList key_node;
+>> +    bool has_index, has_member;
+>> +    const QDictEntry *ent;
+>> +    QDict *qdict;
+>> +    QObject *val;
+>> +    char *key;
+>> +    size_t nelt;
+>> +    QObject **elt;
+>> +    int index, i;
+>> +    QList *list;
+>> +
+>> +    key_node.next = key_of_cur;
+>> +
+>> +    /*
+>> +     * Recursively listify @cur's members, and figure out whether @cur
+>> +     * itself is to be listified.
+>> +     */
+>> +    has_index = false;
+>> +    has_member = false;
+>> +    for (ent = qdict_first(cur); ent; ent = qdict_next(cur, ent)) {
+>> +        if (key_to_index(ent->key, NULL) >= 0) {
+>> +            has_index = true;
+>> +        } else {
+>> +            has_member = true;
+>> +        }
+>> +
+>> +        qdict = qobject_to_qdict(ent->value);
+>> +        if (!qdict) {
+>> +            continue;
+>> +        }
+>> +
+>> +        key_node.data = ent->key;
+>> +        val = keyval_listify(qdict, &key_node, errp);
+>> +        if (!val) {
+>> +            return NULL;
+>> +        }
+>> +        if (val != ent->value) {
+>> +            qdict_put_obj(cur, ent->key, val);
+>> +        }
+>> +    }
+>> +
+>> +    if (has_index && has_member) {
+>> +        key = reassemble_key(key_of_cur);
+>> +        error_setg(errp, "Parameters '%s*' used inconsistently", key);
+>> +        g_free(key);
+>> +        return NULL;
+>> +    }
+>> +    if (!has_index) {
+>> +        return QOBJECT(cur);
+>> +    }
+>> +
+>> +    /* Copy @cur's values to @elt[] */
+>> +    nelt = qdict_size(cur);
+>> +    elt = g_new0(QObject *, nelt);
+>
+> This doesn't seem to be freed.
+
+Yup.  Fixing...
+
+>> +    for (ent = qdict_first(cur); ent; ent = qdict_next(cur, ent)) {
+>> +        index = key_to_index(ent->key, NULL);
+>> +        assert(index >= 0);
+>> +        /*
+>> +         * We iterate @nelt times.  Because the dictionary keys are
+>> +         * distinct, the indexes are also distinct (key_to_index()
+>> +         * ensures it).
+>
+> Really? What about leading zeros?
+
+Bummer.
+
+You know, my first version of this code didn't rely on distinct indexes,
+but I found it a bit complicated, so I "simplified" it.  I'll dig it out
+of git.
+
+>> +                        If we get one exceeding @nelt here, we will
+>> +         * leave a hole in @elt[], triggering the error in the next
+>> +         * loop.
+>> +         *
+>> +         * Well, I lied.  key_to_index() can return INT_MAX multiple
+>> +         * times, but INT_MAX surely exceeds @nelt.
+>> +         */
+>> +        if ((size_t)index >= nelt) {
+>> +            continue;
+>> +        }
+>> +        assert(!elt[index]);
+>> +        elt[index] = ent->value;
+>> +        qobject_incref(elt[index]);
+>
+> We forget to decref this in error cases. Maybe it would be better to
+> only incref immediately before qlist_append_obj().
+
+Will fix one way or another.
+
+>> +    }
+>> +
+>> +    /* Make a list from @elt[] */
+>> +    list = qlist_new();
+>> +    for (i = 0; i < nelt; i++) {
+>> +        if (!elt[i]) {
+>> +            key = reassemble_key(key_of_cur);
+>> +            error_setg(errp, "Parameter '%s%d' missing", key, i);
+>> +            g_free(key);
+>> +            QDECREF(list);
+>> +            return NULL;
+>> +        }
+>> +        qlist_append_obj(list, elt[i]);
+>> +    }
+>> +
+>> +    return QOBJECT(list);
+>> +}
+>> +
+>>  /*
+>>   * Parse @params in QEMU's traditional KEY=VALUE,... syntax.
+>>   * If @implied_key, the first KEY= can be omitted.  @implied_key is
+>> @@ -216,6 +362,7 @@ QDict *keyval_parse(const char *params, const char *implied_key,
+>>                      Error **errp)
+>>  {
+>>      QDict *qdict = qdict_new();
+>> +    QObject *listified;
+>>      const char *s;
+>>  
+>>      s = params;
+>> @@ -228,5 +375,11 @@ QDict *keyval_parse(const char *params, const char *implied_key,
+>>          implied_key = NULL;
+>>      }
+>>  
+>> +    listified = keyval_listify(qdict, NULL, errp);
+>> +    if (!listified) {
+>> +        QDECREF(qdict);
+>> +        return NULL;
+>> +    }
+>> +    assert(listified == QOBJECT(qdict));
+>>      return qdict;
+>>  }
+>
+> Kevin
