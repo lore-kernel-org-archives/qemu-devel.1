@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cih5f-00085i-Oc
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:16 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cih5h-00087f-MX
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cih5e-0000Fi-En
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34308)
+	(envelope-from <dgilbert@redhat.com>) id 1cih5g-0000GF-EH
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57672)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cih5e-0000FQ-8z
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:14 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cih5g-0000G6-5H
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 07:41:16 -0500
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue, 28 Feb 2017 12:40:36 +0000
-Message-Id: <20170228124056.5074-8-dgilbert@redhat.com>
+Date: Tue, 28 Feb 2017 12:40:37 +0000
+Message-Id: <20170228124056.5074-9-dgilbert@redhat.com>
 In-Reply-To: <20170228124056.5074-1-dgilbert@redhat.com>
 References: <20170228124056.5074-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 07/27] vmstate-static-checker: update white list
- with spapr_pci
+Subject: [Qemu-devel] [PULL 08/27] migrate: Introduce a 'dc->vmsd' check to
+ avoid segfault for --only-migratable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +27,204 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: quintela@redhat.com, lvivier@redhat.com, marcandre.lureau@redhat.com, vsementsov@virtuozzo.com, danielhb@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, ashijeetacharya@gmail.com
 
-From: Laurent Vivier <lvivier@redhat.com>
+From: Ashijeet Acharya <ashijeetacharya@gmail.com>
 
-To fix migration between 2.7 and 2.8, some fields have
-been renamed and managed with the help of a PHB property
-(pre_2_8_migration):
+Commit a3a3d8c7 introduced a segfault bug while checking for
+'dc->vmsd->unmigratable' which caused QEMU to crash when trying to add
+devices which do no set their 'dc->vmsd' yet while initialization.
+Place a 'dc->vmsd' check prior to it so that we do not segfault for
+such devices.
 
-    5c4537b spapr: Fix 2.7<->2.8 migration of PCI host bridge
+NOTE: This doesn't compromise the functioning of --only-migratable
+option as all the unmigratable devices do set their 'dc->vmsd'.
 
-So we need to add them to the white list:
+Introduce a new function check_migratable() and move the
+only_migratable check inside it, also use stubs to avoid user-mode qemu
+build failures.
 
-    dma_liobn[0],
-    mem_win_addr, mem_win_size,
-    io_win_addr, io_win_size
-
-become
-
-    mig_liobn,
-    mig_mem_win_addr, mig_mem_win_size,
-    mig_io_win_addr, mig_io_win_size
-
-CC: David Gibson <david@gibson.dropbear.id.au>
-CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-CC: Thomas Huth <thuth@redhat.com>
-CC: Greg Kurz <groug@kaod.org>
-CC: Alexey Kardashevskiy <aik@ozlabs.ru>
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-Message-Id: <20170214133331.28997-1-lvivier@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Message-Id: <1487009088-23891-1-git-send-email-ashijeetacharya@gmail.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- scripts/vmstate-static-checker.py | 5 +++++
- 1 file changed, 5 insertions(+)
+ hw/core/qdev.c                |  7 +++++++
+ hw/usb/bus.c                  | 19 -------------------
+ include/migration/migration.h |  3 +++
+ migration/migration.c         | 15 +++++++++++++++
+ qdev-monitor.c                |  9 ---------
+ stubs/vmstate.c               |  6 ++++++
+ 6 files changed, 31 insertions(+), 28 deletions(-)
 
-diff --git a/scripts/vmstate-static-checker.py b/scripts/vmstate-static-checker.py
-index 14a27e7..bcef7ee 100755
---- a/scripts/vmstate-static-checker.py
-+++ b/scripts/vmstate-static-checker.py
-@@ -85,6 +85,11 @@ def check_fields_match(name, s_field, d_field):
-         'xio3130-express-upstream-port': ['br.dev', 'parent_obj.parent_obj',
-                                           'br.dev.exp.aer_log',
-                                           'parent_obj.parent_obj.exp.aer_log'],
-+        'spapr_pci': ['dma_liobn[0]', 'mig_liobn',
-+                      'mem_win_addr', 'mig_mem_win_addr',
-+                      'mem_win_size', 'mig_mem_win_size',
-+                      'io_win_addr', 'mig_io_win_addr',
-+                      'io_win_size', 'mig_io_win_size'],
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 06ba02e..dd1ca1c 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -37,6 +37,7 @@
+ #include "hw/boards.h"
+ #include "hw/sysbus.h"
+ #include "qapi-event.h"
++#include "migration/migration.h"
+ 
+ int qdev_hotplug = 0;
+ static bool qdev_hot_added = false;
+@@ -889,6 +890,7 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+     Error *local_err = NULL;
+     bool unattached_parent = false;
+     static int unattached_count;
++    int ret;
+ 
+     if (dev->hotplugged && !dc->hotpluggable) {
+         error_setg(errp, QERR_DEVICE_NO_HOTPLUG, object_get_typename(obj));
+@@ -896,6 +898,11 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
      }
  
-     if not name in changed_names:
+     if (value && !dev->realized) {
++        ret = check_migratable(obj, &local_err);
++        if (ret < 0) {
++            goto fail;
++        }
++
+         if (!obj->parent) {
+             gchar *name = g_strdup_printf("device[%d]", unattached_count++);
+ 
+diff --git a/hw/usb/bus.c b/hw/usb/bus.c
+index efe4b8e..24f1608 100644
+--- a/hw/usb/bus.c
++++ b/hw/usb/bus.c
+@@ -8,7 +8,6 @@
+ #include "monitor/monitor.h"
+ #include "trace.h"
+ #include "qemu/cutils.h"
+-#include "migration/migration.h"
+ 
+ static void usb_bus_dev_print(Monitor *mon, DeviceState *qdev, int indent);
+ 
+@@ -688,8 +687,6 @@ USBDevice *usbdevice_create(const char *cmdline)
+     const char *params;
+     int len;
+     USBDevice *dev;
+-    ObjectClass *klass;
+-    DeviceClass *dc;
+ 
+     params = strchr(cmdline,':');
+     if (params) {
+@@ -724,22 +721,6 @@ USBDevice *usbdevice_create(const char *cmdline)
+         return NULL;
+     }
+ 
+-    klass = object_class_by_name(f->name);
+-    if (klass == NULL) {
+-        error_report("Device '%s' not found", f->name);
+-        return NULL;
+-    }
+-
+-    dc = DEVICE_CLASS(klass);
+-
+-    if (only_migratable) {
+-        if (dc->vmsd->unmigratable) {
+-            error_report("Device %s is not migratable, but --only-migratable "
+-                         "was specified", f->name);
+-            return NULL;
+-        }
+-    }
+-
+     if (f->usbdevice_init) {
+         dev = f->usbdevice_init(bus, params);
+     } else {
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index 1735d66..34a383e 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -22,6 +22,7 @@
+ #include "qapi-types.h"
+ #include "exec/cpu-common.h"
+ #include "qemu/coroutine_int.h"
++#include "qom/object.h"
+ 
+ #define QEMU_VM_FILE_MAGIC           0x5145564d
+ #define QEMU_VM_FILE_VERSION_COMPAT  0x00000002
+@@ -313,6 +314,8 @@ int migrate_add_blocker(Error *reason, Error **errp);
+  */
+ void migrate_del_blocker(Error *reason);
+ 
++int check_migratable(Object *obj, Error **err);
++
+ bool migrate_release_ram(void);
+ bool migrate_postcopy_ram(void);
+ bool migrate_zero_blocks(void);
+diff --git a/migration/migration.c b/migration/migration.c
+index 4fab538..481c540 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1150,6 +1150,21 @@ void migrate_del_blocker(Error *reason)
+     migration_blockers = g_slist_remove(migration_blockers, reason);
+ }
+ 
++int check_migratable(Object *obj, Error **err)
++{
++    DeviceClass *dc = DEVICE_GET_CLASS(obj);
++    if (only_migratable && dc->vmsd) {
++        if (dc->vmsd->unmigratable) {
++            error_setg(err, "Device %s is not migratable, but "
++                       "--only-migratable was specified",
++                       object_get_typename(obj));
++            return -1;
++        }
++    }
++
++    return 0;
++}
++
+ void qmp_migrate_incoming(const char *uri, Error **errp)
+ {
+     Error *local_err = NULL;
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index 549f45f..5f2fcdf 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -29,7 +29,6 @@
+ #include "qemu/error-report.h"
+ #include "qemu/help_option.h"
+ #include "sysemu/block-backend.h"
+-#include "migration/migration.h"
+ 
+ /*
+  * Aliases were a bad idea from the start.  Let's keep them
+@@ -579,14 +578,6 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
+         return NULL;
+     }
+ 
+-    if (only_migratable) {
+-        if (dc->vmsd->unmigratable) {
+-            error_setg(errp, "Device %s is not migratable, but "
+-                       "--only-migratable was specified", driver);
+-            return NULL;
+-        }
+-    }
+-
+     /* find bus */
+     path = qemu_opt_get(opts, "bus");
+     if (path != NULL) {
+diff --git a/stubs/vmstate.c b/stubs/vmstate.c
+index bbe158f..6d52f29 100644
+--- a/stubs/vmstate.c
++++ b/stubs/vmstate.c
+@@ -1,6 +1,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "migration/vmstate.h"
++#include "migration/migration.h"
+ 
+ const VMStateDescription vmstate_dummy = {};
+ 
+@@ -19,3 +20,8 @@ void vmstate_unregister(DeviceState *dev,
+                         void *opaque)
+ {
+ }
++
++int check_migratable(Object *obj, Error **err)
++{
++    return 0;
++}
 -- 
 2.9.3
