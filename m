@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciVmZ-00058J-0f
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 19:36:48 -0500
+	(envelope-from <groug@kaod.org>) id 1ciVnH-0005uP-8i
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 19:37:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciVmU-00058Q-SP
-	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 19:36:47 -0500
-Date: Tue, 28 Feb 2017 11:29:14 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170228002914.GE17615@umbus.fritz.box>
-References: <cover.1487829585.git.sam.bobroff@au1.ibm.com>
-	<ac9e5c1e3b571f0286a2ebcd955abfd7be5d7ac7.1487829585.git.sam.bobroff@au1.ibm.com>
+	(envelope-from <groug@kaod.org>) id 1ciVnC-0005Kk-CO
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 19:37:31 -0500
+Received: from mo6.mail-out.ovh.net ([178.32.228.6]:37543)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ciVnC-0005Ke-5c
+	for qemu-devel@nongnu.org; Mon, 27 Feb 2017 19:37:26 -0500
+Received: from player761.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id B0BCBB34DA
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 01:37:24 +0100 (CET)
+Date: Tue, 28 Feb 2017 01:37:21 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170228013721.242076f0@bahia.lan>
+In-Reply-To: <1488236421-30983-1-git-send-email-groug@kaod.org>
+References: <1488236421-30983-1-git-send-email-groug@kaod.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="B6Zh/hwRPruM9rlZ"
-Content-Disposition: inline
-In-Reply-To: <ac9e5c1e3b571f0286a2ebcd955abfd7be5d7ac7.1487829585.git.sam.bobroff@au1.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 10/12] spapr: move
- spapr_populate_pa_features()
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/QuwUzRJF/DkHgMbWZ0yA36=";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PULL 00/31] 9p patches 2017-02-27 for 2.9 soft
+ freeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,173 +31,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sam Bobroff <sam.bobroff@au1.ibm.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, sjitindarsingh@gmail.com
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
 
-
---B6Zh/hwRPruM9rlZ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+--Sig_/QuwUzRJF/DkHgMbWZ0yA36=
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 23, 2017 at 05:00:03PM +1100, Sam Bobroff wrote:
-> In the next patch, spapr_fixup_cpu_dt() will need to call
-> spapr_populate_pa_features() so move it's definition up without making
-> any other changes.
+Peter,
 
-s/it's/its/
+I have some issues with this pull request. Please don't apply it, I'll resp=
+in a
+new one.
 
+Thanks.
+
+On Mon, 27 Feb 2017 23:59:50 +0100
+Greg Kurz <groug@kaod.org> wrote:
+
+> The following changes since commit 8f2d7c341184a95d05476ea3c45dbae2b9ddbe=
+51:
 >=20
-> Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
-> ---
->  hw/ppc/spapr.c | 86 +++++++++++++++++++++++++++++-----------------------=
+>   Merge remote-tracking branch 'remotes/berrange/tags/pull-qcrypto-2017-0=
+2-27-1' into staging (2017-02-27 15:33:21 +0000)
+>=20
+> are available in the git repository at:
+>=20
+>   https://github.com/gkurz/qemu.git tags/for-upstream
+>=20
+> for you to fetch changes up to a07ef65e3aeac852188331708716792930d819ef:
+>=20
+>   9pfs: local: drop unused code (2017-02-27 22:45:17 +0100)
+>=20
+> ----------------------------------------------------------------
+> This pull request brings:
+> - a fix to a minor bug reported by Coverity
+> - throttling support in the local backend (command line only)
+> - a huge fix for CVE-2016-9602 (symlink attack vulnerability)
+>=20
+> ----------------------------------------------------------------
+> Greg Kurz (29):
+>       fsdev: add IO throttle support to fsdev devices
+>       9pfs: local: move xattr security ops to 9p-xattr.c
+>       9pfs: remove side-effects in local_init()
+>       9pfs: remove side-effects in local_open() and local_opendir()
+>       9pfs: introduce relative_openat_nofollow() helper
+>       9pfs: local: keep a file descriptor on the shared folder
+>       9pfs: local: open/opendir: don't follow symlinks
+>       9pfs: local: lgetxattr: don't follow symlinks
+>       9pfs: local: llistxattr: don't follow symlinks
+>       9pfs: local: lsetxattr: don't follow symlinks
+>       9pfs: local: lremovexattr: don't follow symlinks
+>       9pfs: local: unlinkat: don't follow symlinks
+>       9pfs: local: remove: don't follow symlinks
+>       9pfs: local: utimensat: don't follow symlinks
+>       9pfs: local: statfs: don't follow symlinks
+>       9pfs: local: truncate: don't follow symlinks
+>       9pfs: local: readlink: don't follow symlinks
+>       9pfs: local: lstat: don't follow symlinks
+>       9pfs: local: renameat: don't follow symlinks
+>       9pfs: local: rename: use renameat
+>       9pfs: local: improve error handling in link op
+>       9pfs: local: link: don't follow symlinks
+>       9pfs: local: chmod: don't follow symlinks
+>       9pfs: local: chown: don't follow symlinks
+>       9pfs: local: symlink: don't follow symlinks
+>       9pfs: local: mknod: don't follow symlinks
+>       9pfs: local: mkdir: don't follow symlinks
+>       9pfs: local: open2: don't follow symlinks
+>       9pfs: local: drop unused code
+>=20
+> Paolo Bonzini (1):
+>       9pfs: fix v9fs_lock error case
+>=20
+> Pradeep (1):
+>       throttle: factor out duplicate code
+>=20
+>  blockdev.c                      |   83 +---
+>  fsdev/Makefile.objs             |    2 +-
+>  fsdev/file-op-9p.h              |    3 +
+>  fsdev/qemu-fsdev-opts.c         |    3 +
+>  fsdev/qemu-fsdev-throttle.c     |  118 +++++
+>  fsdev/qemu-fsdev-throttle.h     |   39 ++
+>  hw/9pfs/9p-local.c              | 1031 +++++++++++++++++++++------------=
 ------
->  1 file changed, 43 insertions(+), 43 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index dfee0f685f..0c0782b558 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -194,6 +194,49 @@ static int spapr_fixup_cpu_numa_dt(void *fdt, int of=
-fset, CPUState *cs)
->      return ret;
->  }
-> =20
-> +/* Populate the "ibm,pa-features" property */
-> +static void spapr_populate_pa_features(CPUPPCState *env, void *fdt, int =
-offset)
-> +{
-> +    uint8_t pa_features_206[] =3D { 6, 0,
-> +        0xf6, 0x1f, 0xc7, 0x00, 0x80, 0xc0 };
-> +    uint8_t pa_features_207[] =3D { 24, 0,
-> +        0xf6, 0x1f, 0xc7, 0xc0, 0x80, 0xf0,
-> +        0x80, 0x00, 0x00, 0x00, 0x00, 0x00,
-> +        0x00, 0x00, 0x00, 0x00, 0x80, 0x00,
-> +        0x80, 0x00, 0x80, 0x00, 0x00, 0x00 };
-> +    uint8_t *pa_features;
-> +    size_t pa_size;
-> +
-> +    switch (POWERPC_MMU_VER(env->mmu_model)) {
-> +    case POWERPC_MMU_VER_2_06:
-> +        pa_features =3D pa_features_206;
-> +        pa_size =3D sizeof(pa_features_206);
-> +        break;
-> +    case POWERPC_MMU_VER_2_07:
-> +        pa_features =3D pa_features_207;
-> +        pa_size =3D sizeof(pa_features_207);
-> +        break;
-> +    default:
-> +        return;
-> +    }
-> +
-> +    if (env->ci_large_pages) {
-> +        /*
-> +         * Note: we keep CI large pages off by default because a 64K cap=
-able
-> +         * guest provisioned with large pages might otherwise try to map=
- a qemu
-> +         * framebuffer (or other kind of memory mapped PCI BAR) using 64=
-K pages
-> +         * even if that qemu runs on a 4k host.
-> +         * We dd this bit back here if we are confident this is not an i=
-ssue
-> +         */
-> +        pa_features[3] |=3D 0x20;
-> +    }
-> +    if (kvmppc_has_cap_htm() && pa_size > 24) {
-> +        pa_features[24] |=3D 0x80;    /* Transactional memory support */
-> +    }
-> +
-> +    _FDT((fdt_setprop(fdt, offset, "ibm,pa-features", pa_features, pa_si=
-ze)));
-> +}
-> +
->  static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
->  {
->      int ret =3D 0, offset, cpus_offset;
-> @@ -346,49 +389,6 @@ static int spapr_populate_memory(sPAPRMachineState *=
-spapr, void *fdt)
->      return 0;
->  }
-> =20
-> -/* Populate the "ibm,pa-features" property */
-> -static void spapr_populate_pa_features(CPUPPCState *env, void *fdt, int =
-offset)
-> -{
-> -    uint8_t pa_features_206[] =3D { 6, 0,
-> -        0xf6, 0x1f, 0xc7, 0x00, 0x80, 0xc0 };
-> -    uint8_t pa_features_207[] =3D { 24, 0,
-> -        0xf6, 0x1f, 0xc7, 0xc0, 0x80, 0xf0,
-> -        0x80, 0x00, 0x00, 0x00, 0x00, 0x00,
-> -        0x00, 0x00, 0x00, 0x00, 0x80, 0x00,
-> -        0x80, 0x00, 0x80, 0x00, 0x00, 0x00 };
-> -    uint8_t *pa_features;
-> -    size_t pa_size;
-> -
-> -    switch (POWERPC_MMU_VER(env->mmu_model)) {
-> -    case POWERPC_MMU_VER_2_06:
-> -        pa_features =3D pa_features_206;
-> -        pa_size =3D sizeof(pa_features_206);
-> -        break;
-> -    case POWERPC_MMU_VER_2_07:
-> -        pa_features =3D pa_features_207;
-> -        pa_size =3D sizeof(pa_features_207);
-> -        break;
-> -    default:
-> -        return;
-> -    }
-> -
-> -    if (env->ci_large_pages) {
-> -        /*
-> -         * Note: we keep CI large pages off by default because a 64K cap=
-able
-> -         * guest provisioned with large pages might otherwise try to map=
- a qemu
-> -         * framebuffer (or other kind of memory mapped PCI BAR) using 64=
-K pages
-> -         * even if that qemu runs on a 4k host.
-> -         * We dd this bit back here if we are confident this is not an i=
-ssue
-> -         */
-> -        pa_features[3] |=3D 0x20;
-> -    }
-> -    if (kvmppc_has_cap_htm() && pa_size > 24) {
-> -        pa_features[24] |=3D 0x80;    /* Transactional memory support */
-> -    }
-> -
-> -    _FDT((fdt_setprop(fdt, offset, "ibm,pa-features", pa_features, pa_si=
-ze)));
-> -}
-> -
->  static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
->                                    sPAPRMachineState *spapr)
->  {
+>  hw/9pfs/9p-local.h              |   20 +
+>  hw/9pfs/9p-posix-acl.c          |   44 +-
+>  hw/9pfs/9p-util.c               |   68 +++
+>  hw/9pfs/9p-util.h               |   53 ++
+>  hw/9pfs/9p-xattr-user.c         |   24 +-
+>  hw/9pfs/9p-xattr.c              |  166 ++++++-
+>  hw/9pfs/9p-xattr.h              |   87 +---
+>  hw/9pfs/9p.c                    |   19 +-
+>  hw/9pfs/Makefile.objs           |    2 +-
+>  hw/9pfs/cofile.c                |    2 +
+>  include/qemu/throttle-options.h |   92 ++++
+>  qemu-options.hx                 |    7 +-
+>  19 files changed, 1180 insertions(+), 683 deletions(-)
+>  create mode 100644 fsdev/qemu-fsdev-throttle.c
+>  create mode 100644 fsdev/qemu-fsdev-throttle.h
+>  create mode 100644 hw/9pfs/9p-local.h
+>  create mode 100644 hw/9pfs/9p-util.c
+>  create mode 100644 hw/9pfs/9p-util.h
+>  create mode 100644 include/qemu/throttle-options.h
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
 
---B6Zh/hwRPruM9rlZ
-Content-Type: application/pgp-signature; name="signature.asc"
+--Sig_/QuwUzRJF/DkHgMbWZ0yA36=
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYtMRaAAoJEGw4ysog2bOSYk4P/0IpZggqSoLBHka4t9MwHu+E
-wZ93QAVotbZA8wWxoiUmy8z3YwbJNjjwJO7tBn4W5uhIOa9e6cfnrab/GrU3LHPC
-XOuauw/dkVHScToBjsrBuyzxVy8CXEkobXRDWwWhm7f9zFoD06oe+HmSCcLcwGkY
-RVWWZYU7pQ7OaUDDtFV/TqFFxim1scFETK7sNl0l+LPJ7cQ5EglQucsYRA2/+0ts
-e6dhiAlK7rN5vTi8FyIubmBZydX4UIK/W85mHMjVtCM7GGDyHGh+L0FN9mgR+W5q
-jF5yGZcoj6xHupdHIKeq6120xCMTvLJogtAZbrW06o96DiSVDFUo+9YjdjM8H132
-a1OO0G9FpetlV6SY4mhOO6AsIMoMUMWXs6zQAK20ROB/J476ZF6HEEKOErC0+bLw
-Yq7XfGqHfzFpEY1WcEqkTS87HQzBsqEdiX2RXsJTgPbAFYiLwXlPkmo5s2bVN+21
-xOQgoO7urza76f3Ke6hAKX35aGuWHMiVxBuqXyCiJMTsnOspvuguGBZP7NNlavck
-Z5ZKXAwXxuaQH4Py/wyRVm6WJBH7WNUJZwujAJVzFpM/2Ni2w9v3U9gHUqf/gHMY
-4JDh+OmmdlzpZuwHqTYVUk/KsGP/Ewu6Ux1lcNtTo/6DxSl9qR/z0UDE9TD2yuwp
-YAOja7lWWuUnztq29BE3
-=2VD+
+iEYEARECAAYFAli0xkEACgkQAvw66wEB28IMOQCgl3/XeX16h9KuYcGj0bIRRBcb
+N7MAnRfMYKx1xABLXf04fZccoVFaTRO9
+=yi2e
 -----END PGP SIGNATURE-----
 
---B6Zh/hwRPruM9rlZ--
+--Sig_/QuwUzRJF/DkHgMbWZ0yA36=--
