@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52017)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cikam-0004f3-PW
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:25:37 -0500
+	(envelope-from <eblake@redhat.com>) id 1cikcD-0005x6-TP
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:27:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cikal-000722-RG
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:25:36 -0500
-References: <1488194450-28056-1-git-send-email-armbru@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1cikc9-0007sK-UL
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:27:05 -0500
+References: <20170228161553.28142-1-jcody@redhat.com>
+	<20170228161553.28142-6-jcody@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <979c1a7e-5cde-3958-81c9-362715ecf852@redhat.com>
-Date: Tue, 28 Feb 2017 10:25:27 -0600
+Message-ID: <d24c1aa4-c433-feab-38cf-1e1a82a7a1e8@redhat.com>
+Date: Tue, 28 Feb 2017 10:26:49 -0600
 MIME-Version: 1.0
-In-Reply-To: <1488194450-28056-1-git-send-email-armbru@redhat.com>
+In-Reply-To: <20170228161553.28142-6-jcody@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="SCLnoHnWB5e3QUqVAEaQiUmjjnAc1NiDK"
-Subject: Re: [Qemu-devel] [PATCH 00/24] block: Command line option -blockdev
+	boundary="tGgVQmswfOcLBEw9P71GCgs7uJegTVq2q"
+Subject: Re: [Qemu-devel] [PULL 5/5] block/rbd: add support for 'mon_host',
+ 'auth_supported' via QAPI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +25,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com, "mdroth@linux.vnet.ibm.commdroth"@linux.vnet.ibm.com
+To: Jeff Cody <jcody@redhat.com>, qemu-block@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SCLnoHnWB5e3QUqVAEaQiUmjjnAc1NiDK
+--tGgVQmswfOcLBEw9P71GCgs7uJegTVq2q
 From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com,
- "mdroth@linux.vnet.ibm.commdroth"@linux.vnet.ibm.com
-Message-ID: <979c1a7e-5cde-3958-81c9-362715ecf852@redhat.com>
-Subject: Re: [PATCH 00/24] block: Command line option -blockdev
-References: <1488194450-28056-1-git-send-email-armbru@redhat.com>
-In-Reply-To: <1488194450-28056-1-git-send-email-armbru@redhat.com>
+To: Jeff Cody <jcody@redhat.com>, qemu-block@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+Message-ID: <d24c1aa4-c433-feab-38cf-1e1a82a7a1e8@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 5/5] block/rbd: add support for 'mon_host',
+ 'auth_supported' via QAPI
+References: <20170228161553.28142-1-jcody@redhat.com>
+ <20170228161553.28142-6-jcody@redhat.com>
+In-Reply-To: <20170228161553.28142-6-jcody@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 02/27/2017 05:20 AM, Markus Armbruster wrote:
-> Actually, the command line option is the least part of this series.
-> Its bulk is about building infrastructure and getting errors out of
-> the JSON parser[*].  The latter part could be spun out in its own
-> series, if that helps.  We'll see.
+On 02/28/2017 10:15 AM, Jeff Cody wrote:
+> This adds support for three additional options that may be specified
+> by QAPI in blockdev-add:
 >=20
-> The design of the command line interface was discussed here:
-> Subject: Non-flat command line option argument syntax
-> Message-ID: <87bmukmlau.fsf@dusky.pond.sub.org>
-> https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg00555.html
+>     server: host, port
+>     auth method: either 'cephx' or 'none'
 >=20
-> This series is based on "[PATCH v2 00/26] qapi: QMP dispatch and input
-> visitor work".
+> The "server" and "auth-supported" QAPI parameters are arrays.  To confo=
+rm
+> with the rados API, the array items are join as a single string with a =
+';'
+> character as a delimiter when setting the configuration values.
+>=20
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
-which I've now reviewed; it has a couple issues that need fixing before
-I can give R-b everywhere, but we should be able to get to a pull
-request soon. (Wow - soft freeze comes faster than we want!)
+What happened to Signed-off-by? You'll have to resubmit the pull request
 
->  Available as branch blockdev-cmdline in my public repo
-> <http://repo.or.cz/w/qemu/armbru.git>, except that one still has a
-> patch to add implied value sugar, followed by its revert.
+> ---
+>  block/rbd.c          | 134 +++++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  qapi/block-core.json |  29 +++++++++++
+>  2 files changed, 163 insertions(+)
 >=20
 
-It helped. Thanks for posting it.
 
 --=20
 Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---SCLnoHnWB5e3QUqVAEaQiUmjjnAc1NiDK
+--tGgVQmswfOcLBEw9P71GCgs7uJegTVq2q
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -79,13 +82,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYtaR3AAoJEKeha0olJ0Nq1AQH/jeQZ+yP75oWWijPRLQ1fgD/
-TFAJTK4ldxNEKhuuSTZmk2qvAcxWSiVZK8eeKiatR2zQGpcMheaXsb/D2CVli9rl
-KHW+8wOccEHRkP388Y0xyLhXYNNR0aKuLYpw2RcMGf1FmNnBeo6MLFMcIEQi/st2
-Q/QY8KcEcVv3JCdViHyJ5CZU+UfFFkAdzVZ9zeVrcLa9gdeplB/AqyXJOklenfEH
-bLNv5Q+0wrK82fIEu4NS6uLPvL6UPnQWX6nGgj8Af1yEgu3n5o83ncOe+gRYUrAg
-a95B6LaPPm2wXyOvMWE5ZMMi1D6UDX85yMfsuoyGcnPKnmI2MRoDThNEjBQVLF8=
-=Hqn6
+iQEcBAEBCAAGBQJYtaTJAAoJEKeha0olJ0NqvToH+wVbAnPFqWG8etjRFugfXgbM
+AlujfvY10P+C5coIZlv7dy57gX92Mx+xR70E9kfhTmu0WIXCsqpg/sTrqhQ1RJsu
+X1PZctUiTLd17z4ct2ZsnIriYgXv/H6Znz2WA624GqQe2Cq0o7NxPMoXXnQ58I9x
+Wm+iDjQ9SVPWUNPMreln1cDyoCCwexO4UyG3ckXT1w0WuIwElHBM/qRmvPzMEdRB
+Zawo997yzFFBHOkN7KRu9F/jN9Bsl3YKi9RXGl6OGPV/Pauyg4z6NfYeR8qvi3jo
+PLxfj3NpvxrzkzniOkXqgfzzLPdvQsE3SaFGQWTo6Jy/uRoqh1FkvpjiLdD+MwQ=
+=TCgc
 -----END PGP SIGNATURE-----
 
---SCLnoHnWB5e3QUqVAEaQiUmjjnAc1NiDK--
+--tGgVQmswfOcLBEw9P71GCgs7uJegTVq2q--
