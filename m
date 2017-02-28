@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36777)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37013)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cil5c-0006Rf-Ne
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:57:29 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cil6C-0006pS-ED
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:58:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cil5X-0004FV-T5
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:57:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42354)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cil67-0004Yy-KT
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:58:04 -0500
+Received: from mail3-relais-sop.national.inria.fr ([192.134.164.104]:19744)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cil5X-0004FN-NN
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:57:23 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C804F80477
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 16:57:23 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <1488145424-14974-1-git-send-email-armbru@redhat.com>
-	<1488145424-14974-19-git-send-email-armbru@redhat.com>
-	<08607c1c-0293-1f5c-787a-029d08b92ef3@redhat.com>
-Date: Tue, 28 Feb 2017 17:57:21 +0100
-In-Reply-To: <08607c1c-0293-1f5c-787a-029d08b92ef3@redhat.com> (Eric Blake's
-	message of "Tue, 28 Feb 2017 09:39:43 -0600")
-Message-ID: <87y3wql0cu.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1cil67-0004XP-AT
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 11:57:59 -0500
+Date: Tue, 28 Feb 2017 17:57:30 +0100
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20170228165730.ovdh4k6psrd3qv33@var.youpi.perso.aquilenet.fr>
+References: <20170220185020.774-1-dgilbert@redhat.com>
+	<20170220185020.774-5-dgilbert@redhat.com>
+	<8760k3od2r.fsf@emacs.mitica> <20170223105155.GA2383@work-vm>
+	<20170223110433.GL10047@redhat.com> <20170223114045.GB2383@work-vm>
+	<20170226203427.6xjmuvt6okc356e5@var.youpi.perso.aquilenet.fr>
+	<20170228165445.GG2773@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 18/26] tests-qobject-input-strict: Merge
- into test-qobject-input-visitor
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20170228165445.GG2773@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v4 4/5] slirp: VMStatify socket level
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,72 +33,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, jan.kiszka@siemens.com, maethor@subiron.org
 
-Eric Blake <eblake@redhat.com> writes:
+Dr. David Alan Gilbert, on mar. 28 févr. 2017 16:54:46 +0000, wrote:
+> I'm thinking one way to do it without changing the version would
+> be to use the existing value for IPv4, and on reading allow any other
+> value for IPv6 (or just the ones we know about); that would make
+> it inwards migration compatible.
 
-> On 02/26/2017 03:43 PM, Markus Armbruster wrote:
->> Much test-qobject-input-strict.c duplicates
->
-> s/Much/Much of/
->
->> test-qobject-input-strict.c less assertions on expected output:
->
-> s/less/, but with less/
+Right. I don't know if that's enough for QEMU requirements.
 
-Will fix.
-
->
-> ...
->> 
->> Merge the remaining test cases into test-qobject-input-visitor.c, and
->> drop the now redundant test-qobject-input-strict.c.
->> 
->> Test case "/visitor/input-strict/fail/list" isn't really about lists,
->> it's about a bad struct nested in a list.  Rename accordingly.
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->
->
->> -static void test_validate_struct_nested(TestInputVisitorData *data,
->> -                                         const void *unused)
->> -{
->> -    UserDefTwo *udp = NULL;
->> -    Visitor *v;
->> -
->> -    v = validate_test_init(data, "{ 'string0': 'string0', "
->> -                           "'dict1': { 'string1': 'string1', "
->> -                           "'dict2': { 'userdef': { 'integer': 42, "
->> -                           "'string': 'string' }, 'string': 'string2'}}}");
->> -
->
-> Old code had semi-sane line wrapping...
->
->
->> +++ b/tests/test-qobject-input-visitor.c
->> @@ -5,6 +5,7 @@
->>   *
->
->> +static void test_visitor_in_fail_struct_nested(TestInputVisitorData *data,
->> +                                               const void *unused)
->> +{
->> +    UserDefTwo *udp = NULL;
->> +    Error *err = NULL;
->> +    Visitor *v;
->> +
->> +    v = visitor_input_test_init(data, "{ 'string0': 'string0', 'dict1': { 'string1': 'string1', 'dict2': { 'userdef1': { 'integer': 42, 'string': 'string', 'extra': [42, 23, {'foo':'bar'}] }, 'string2': 'string2'}}}");
->
->
-> ...new code has insanely long lines.  Not a show-stopper, but I wouldn't
-> mind if you added line breaks.
-
-Editing accident.  I'll restore the line breaks.
-
-> It's a little bit hard to follow the patch alone, but I didn't spot any
-> obvious loss of coverage and the commit message definitely helps.
->
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Thanks!
+Samuel
