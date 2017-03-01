@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47033)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciw81-0008KP-6v
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:46 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ciw82-0008Lm-1S
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciw7v-0000H5-FU
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:41 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ciw7w-0000Ha-4H
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:42 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed,  1 Mar 2017 15:44:05 +1100
-Message-Id: <20170301044405.1792-51-david@gibson.dropbear.id.au>
+Date: Wed,  1 Mar 2017 15:44:01 +1100
+Message-Id: <20170301044405.1792-47-david@gibson.dropbear.id.au>
 In-Reply-To: <20170301044405.1792-1-david@gibson.dropbear.id.au>
 References: <20170301044405.1792-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 50/50] Add PowerPC 32-bit guest memory dump
- support
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 46/50] ppc/xics: remove the XICSState classes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,361 +23,307 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, thuth@redhat.com, lvivier@redhat.com, Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, thuth@redhat.com, lvivier@redhat.com, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-This patch extends support for the `dump-guest-memory` command to the
-32-bit PowerPC architecture. It relies on the assumption that a 64-bit
-guest will not dump a 32-bit core file (and vice versa).
+The XICSState classes are not used anymore. They have now been fully
+deprecated by the XICSFabric QOM interface. Do the cleanups.
 
-[dwg: I suspect this patch won't cover all cases, in particular a
-32-bit machine type on a 64-bit qemu build.  However, it does strictly
-more than what we had before, so might as well apply as a starting
-point]
-
-Signed-off-by: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/Makefile.objs    |   4 +-
- target/ppc/arch_dump.c      | 154 ++++++++++++++++++++++++--------------------
- target/ppc/cpu.h            |   2 +
- target/ppc/translate_init.c |   7 +-
- 4 files changed, 93 insertions(+), 74 deletions(-)
+ hw/intc/xics.c         | 11 -----------
+ hw/intc/xics_kvm.c     | 13 -------------
+ hw/intc/xics_spapr.c   | 14 --------------
+ hw/ppc/spapr.c         | 45 ++++++++++++++++----------------------------=
+-
+ include/hw/ppc/spapr.h |  1 -
+ include/hw/ppc/xics.h  | 35 -----------------------------------
+ 6 files changed, 16 insertions(+), 103 deletions(-)
 
-diff --git a/target/ppc/Makefile.objs b/target/ppc/Makefile.objs
-index 4f4168f..0057b31 100644
---- a/target/ppc/Makefile.objs
-+++ b/target/ppc/Makefile.objs
-@@ -2,8 +2,8 @@ obj-y += cpu-models.o
- obj-y += cpu.o
- obj-y += translate.o
- ifeq ($(CONFIG_SOFTMMU),y)
--obj-y += machine.o mmu_helper.o mmu-hash32.o monitor.o
--obj-$(TARGET_PPC64) += mmu-hash64.o arch_dump.o compat.o
-+obj-y += machine.o mmu_helper.o mmu-hash32.o monitor.o arch_dump.o
-+obj-$(TARGET_PPC64) += mmu-hash64.o compat.o
- endif
- obj-$(CONFIG_KVM) += kvm.o
- obj-$(call lnot,$(CONFIG_KVM)) += kvm-stub.o
-diff --git a/target/ppc/arch_dump.c b/target/ppc/arch_dump.c
-index 40282a1..28d9cc7 100644
---- a/target/ppc/arch_dump.c
-+++ b/target/ppc/arch_dump.c
-@@ -1,5 +1,5 @@
+diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+index 51e6c0c..159cd13 100644
+--- a/hw/intc/xics.c
++++ b/hw/intc/xics.c
+@@ -135,16 +135,6 @@ static void ics_simple_pic_print_info(InterruptStats=
+Provider *obj,
+ }
+=20
  /*
-- * writing ELF notes for ppc64 arch
-+ * writing ELF notes for ppc{64,} arch
-  *
-  *
-  * Copyright IBM, Corp. 2013
-@@ -19,36 +19,48 @@
- #include "sysemu/dump.h"
- #include "sysemu/kvm.h"
- 
--struct PPC64UserRegStruct {
--    uint64_t gpr[32];
--    uint64_t nip;
--    uint64_t msr;
--    uint64_t orig_gpr3;
--    uint64_t ctr;
--    uint64_t link;
--    uint64_t xer;
--    uint64_t ccr;
--    uint64_t softe;
--    uint64_t trap;
--    uint64_t dar;
--    uint64_t dsisr;
--    uint64_t result;
-+#ifdef TARGET_PPC64
-+#define ELFCLASS ELFCLASS64
-+#define cpu_to_dump_reg cpu_to_dump64
-+typedef uint64_t reg_t;
-+typedef Elf64_Nhdr Elf_Nhdr;
-+#else
-+#define ELFCLASS ELFCLASS32
-+#define cpu_to_dump_reg cpu_to_dump32
-+typedef uint32_t reg_t;
-+typedef Elf32_Nhdr Elf_Nhdr;
-+#endif /* TARGET_PPC64 */
-+
-+struct PPCUserRegStruct {
-+    reg_t gpr[32];
-+    reg_t nip;
-+    reg_t msr;
-+    reg_t orig_gpr3;
-+    reg_t ctr;
-+    reg_t link;
-+    reg_t xer;
-+    reg_t ccr;
-+    reg_t softe;
-+    reg_t trap;
-+    reg_t dar;
-+    reg_t dsisr;
-+    reg_t result;
- } QEMU_PACKED;
- 
--struct PPC64ElfPrstatus {
-+struct PPCElfPrstatus {
-     char pad1[112];
--    struct PPC64UserRegStruct pr_reg;
--    uint64_t pad2[4];
-+    struct PPCUserRegStruct pr_reg;
-+    reg_t pad2[4];
- } QEMU_PACKED;
- 
- 
--struct PPC64ElfFpregset {
-+struct PPCElfFpregset {
-     uint64_t fpr[32];
--    uint64_t fpscr;
-+    reg_t fpscr;
- }  QEMU_PACKED;
- 
- 
--struct PPC64ElfVmxregset {
-+struct PPCElfVmxregset {
-     ppc_avr_t avr[32];
-     ppc_avr_t vscr;
-     union {
-@@ -57,26 +69,26 @@ struct PPC64ElfVmxregset {
-     } vrsave;
- }  QEMU_PACKED;
- 
--struct PPC64ElfVsxregset {
-+struct PPCElfVsxregset {
-     uint64_t vsr[32];
- }  QEMU_PACKED;
- 
--struct PPC64ElfSperegset {
-+struct PPCElfSperegset {
-     uint32_t evr[32];
-     uint64_t spe_acc;
-     uint32_t spe_fscr;
- }  QEMU_PACKED;
- 
- typedef struct noteStruct {
--    Elf64_Nhdr hdr;
-+    Elf_Nhdr hdr;
-     char name[5];
-     char pad3[3];
-     union {
--        struct PPC64ElfPrstatus  prstatus;
--        struct PPC64ElfFpregset  fpregset;
--        struct PPC64ElfVmxregset vmxregset;
--        struct PPC64ElfVsxregset vsxregset;
--        struct PPC64ElfSperegset speregset;
-+        struct PPCElfPrstatus  prstatus;
-+        struct PPCElfFpregset  fpregset;
-+        struct PPCElfVmxregset vmxregset;
-+        struct PPCElfVsxregset vsxregset;
-+        struct PPCElfSperegset speregset;
-     } contents;
- } QEMU_PACKED Note;
- 
-@@ -85,12 +97,12 @@ typedef struct NoteFuncArg {
-     DumpState *state;
- } NoteFuncArg;
- 
--static void ppc64_write_elf64_prstatus(NoteFuncArg *arg, PowerPCCPU *cpu)
-+static void ppc_write_elf_prstatus(NoteFuncArg *arg, PowerPCCPU *cpu)
+- * XICS Common class - parent for emulated XICS and KVM-XICS
+- */
+-static const TypeInfo xics_common_info =3D {
+-    .name          =3D TYPE_XICS_COMMON,
+-    .parent        =3D TYPE_DEVICE,
+-    .instance_size =3D sizeof(XICSState),
+-    .class_size    =3D sizeof(XICSStateClass),
+-};
+-
+-/*
+  * ICP: Presentation layer
+  */
+=20
+@@ -752,7 +742,6 @@ void ics_set_irq_type(ICSState *ics, int srcno, bool =
+lsi)
+=20
+ static void xics_register_types(void)
  {
-     int i;
--    uint64_t cr;
--    struct PPC64ElfPrstatus *prstatus;
--    struct PPC64UserRegStruct *reg;
-+    reg_t cr;
-+    struct PPCElfPrstatus *prstatus;
-+    struct PPCUserRegStruct *reg;
-     Note *note = &arg->note;
-     DumpState *s = arg->state;
- 
-@@ -101,25 +113,25 @@ static void ppc64_write_elf64_prstatus(NoteFuncArg *arg, PowerPCCPU *cpu)
-     reg = &prstatus->pr_reg;
- 
-     for (i = 0; i < 32; i++) {
--        reg->gpr[i] = cpu_to_dump64(s, cpu->env.gpr[i]);
-+        reg->gpr[i] = cpu_to_dump_reg(s, cpu->env.gpr[i]);
-     }
--    reg->nip = cpu_to_dump64(s, cpu->env.nip);
--    reg->msr = cpu_to_dump64(s, cpu->env.msr);
--    reg->ctr = cpu_to_dump64(s, cpu->env.ctr);
--    reg->link = cpu_to_dump64(s, cpu->env.lr);
--    reg->xer = cpu_to_dump64(s, cpu_read_xer(&cpu->env));
-+    reg->nip = cpu_to_dump_reg(s, cpu->env.nip);
-+    reg->msr = cpu_to_dump_reg(s, cpu->env.msr);
-+    reg->ctr = cpu_to_dump_reg(s, cpu->env.ctr);
-+    reg->link = cpu_to_dump_reg(s, cpu->env.lr);
-+    reg->xer = cpu_to_dump_reg(s, cpu_read_xer(&cpu->env));
- 
-     cr = 0;
-     for (i = 0; i < 8; i++) {
-         cr |= (cpu->env.crf[i] & 15) << (4 * (7 - i));
-     }
--    reg->ccr = cpu_to_dump64(s, cr);
-+    reg->ccr = cpu_to_dump_reg(s, cr);
+-    type_register_static(&xics_common_info);
+     type_register_static(&ics_simple_info);
+     type_register_static(&ics_base_info);
+     type_register_static(&icp_info);
+diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+index 9983611..14de5d4 100644
+--- a/hw/intc/xics_kvm.c
++++ b/hw/intc/xics_kvm.c
+@@ -42,12 +42,6 @@
+=20
+ static int kernel_xics_fd =3D -1;
+=20
+-typedef struct KVMXICSState {
+-    XICSState parent_obj;
+-
+-    int kernel_xics_fd;
+-} KVMXICSState;
+-
+ /*
+  * ICP-KVM
+  */
+@@ -429,15 +423,8 @@ fail:
+     return -1;
  }
- 
--static void ppc64_write_elf64_fpregset(NoteFuncArg *arg, PowerPCCPU *cpu)
-+static void ppc_write_elf_fpregset(NoteFuncArg *arg, PowerPCCPU *cpu)
+=20
+-static const TypeInfo xics_spapr_kvm_info =3D {
+-    .name          =3D TYPE_XICS_SPAPR_KVM,
+-    .parent        =3D TYPE_XICS_COMMON,
+-    .instance_size =3D sizeof(KVMXICSState),
+-};
+-
+ static void xics_kvm_register_types(void)
  {
-     int i;
--    struct PPC64ElfFpregset  *fpregset;
-+    struct PPCElfFpregset  *fpregset;
-     Note *note = &arg->note;
-     DumpState *s = arg->state;
- 
-@@ -131,13 +143,13 @@ static void ppc64_write_elf64_fpregset(NoteFuncArg *arg, PowerPCCPU *cpu)
-     for (i = 0; i < 32; i++) {
-         fpregset->fpr[i] = cpu_to_dump64(s, cpu->env.fpr[i]);
-     }
--    fpregset->fpscr = cpu_to_dump64(s, cpu->env.fpscr);
-+    fpregset->fpscr = cpu_to_dump_reg(s, cpu->env.fpscr);
+-    type_register_static(&xics_spapr_kvm_info);
+     type_register_static(&ics_kvm_info);
+     type_register_static(&icp_kvm_info);
  }
- 
--static void ppc64_write_elf64_vmxregset(NoteFuncArg *arg, PowerPCCPU *cpu)
-+static void ppc_write_elf_vmxregset(NoteFuncArg *arg, PowerPCCPU *cpu)
- {
-     int i;
--    struct PPC64ElfVmxregset *vmxregset;
-+    struct PPCElfVmxregset *vmxregset;
-     Note *note = &arg->note;
-     DumpState *s = arg->state;
- 
-@@ -164,10 +176,11 @@ static void ppc64_write_elf64_vmxregset(NoteFuncArg *arg, PowerPCCPU *cpu)
-     }
-     vmxregset->vscr.u32[3] = cpu_to_dump32(s, cpu->env.vscr);
+diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+index aaf6808..84d24b2 100644
+--- a/hw/intc/xics_spapr.c
++++ b/hw/intc/xics_spapr.c
+@@ -257,13 +257,6 @@ int xics_spapr_init(sPAPRMachineState *spapr, Error =
+**errp)
+     return 0;
  }
--static void ppc64_write_elf64_vsxregset(NoteFuncArg *arg, PowerPCCPU *cpu)
-+
-+static void ppc_write_elf_vsxregset(NoteFuncArg *arg, PowerPCCPU *cpu)
- {
-     int i;
--    struct PPC64ElfVsxregset *vsxregset;
-+    struct PPCElfVsxregset *vsxregset;
-     Note *note = &arg->note;
-     DumpState *s = arg->state;
- 
-@@ -179,9 +192,10 @@ static void ppc64_write_elf64_vsxregset(NoteFuncArg *arg, PowerPCCPU *cpu)
-         vsxregset->vsr[i] = cpu_to_dump64(s, cpu->env.vsr[i]);
-     }
+=20
+-static const TypeInfo xics_spapr_info =3D {
+-    .name          =3D TYPE_XICS_SPAPR,
+-    .parent        =3D TYPE_XICS_COMMON,
+-    .instance_size =3D sizeof(XICSState),
+-    .class_size =3D sizeof(XICSStateClass),
+-};
+-
+ #define ICS_IRQ_FREE(ics, srcno)   \
+     (!((ics)->irqs[(srcno)].flags & (XICS_FLAGS_IRQ_MASK)))
+=20
+@@ -400,10 +393,3 @@ void spapr_dt_xics(int nr_servers, void *fdt, uint32=
+_t phandle)
+     _FDT(fdt_setprop_cell(fdt, node, "linux,phandle", phandle));
+     _FDT(fdt_setprop_cell(fdt, node, "phandle", phandle));
  }
--static void ppc64_write_elf64_speregset(NoteFuncArg *arg, PowerPCCPU *cpu)
-+
-+static void ppc_write_elf_speregset(NoteFuncArg *arg, PowerPCCPU *cpu)
+-
+-static void xics_spapr_register_types(void)
+-{
+-    type_register_static(&xics_spapr_info);
+-}
+-
+-type_init(xics_spapr_register_types)
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index b81c95b..6539260 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -95,24 +95,15 @@
+=20
+ #define HTAB_SIZE(spapr)        (1ULL << ((spapr)->htab_shift))
+=20
+-static XICSState *try_create_xics(sPAPRMachineState *spapr,
+-                                  const char *type, const char *type_ics=
+,
+-                                  const char *type_icp, int nr_servers,
+-                                  int nr_irqs, Error **errp)
++static int try_create_xics(sPAPRMachineState *spapr, const char *type_ic=
+s,
++                           const char *type_icp, int nr_servers,
++                           int nr_irqs, Error **errp)
  {
--    struct PPC64ElfSperegset *speregset;
-+    struct PPCElfSperegset *speregset;
-     Note *note = &arg->note;
-     DumpState *s = arg->state;
- 
-@@ -197,11 +211,11 @@ static const struct NoteFuncDescStruct {
-     int contents_size;
-     void (*note_contents_func)(NoteFuncArg *arg, PowerPCCPU *cpu);
- } note_func[] = {
--    {sizeof(((Note *)0)->contents.prstatus),  ppc64_write_elf64_prstatus},
--    {sizeof(((Note *)0)->contents.fpregset),  ppc64_write_elf64_fpregset},
--    {sizeof(((Note *)0)->contents.vmxregset), ppc64_write_elf64_vmxregset},
--    {sizeof(((Note *)0)->contents.vsxregset), ppc64_write_elf64_vsxregset},
--    {sizeof(((Note *)0)->contents.speregset), ppc64_write_elf64_speregset},
-+    {sizeof(((Note *)0)->contents.prstatus),  ppc_write_elf_prstatus},
-+    {sizeof(((Note *)0)->contents.fpregset),  ppc_write_elf_fpregset},
-+    {sizeof(((Note *)0)->contents.vmxregset), ppc_write_elf_vmxregset},
-+    {sizeof(((Note *)0)->contents.vsxregset), ppc_write_elf_vsxregset},
-+    {sizeof(((Note *)0)->contents.speregset), ppc_write_elf_speregset},
-     { 0, NULL}
- };
- 
-@@ -213,8 +227,9 @@ int cpu_get_dump_info(ArchDumpInfo *info,
-     PowerPCCPU *cpu = POWERPC_CPU(first_cpu);
-     PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
- 
--    info->d_machine = EM_PPC64;
--    info->d_class = ELFCLASS64;
-+    info->d_machine = PPC_ELF_MACHINE;
-+    info->d_class = ELFCLASS;
-+
-     if ((*pcc->interrupts_big_endian)(cpu)) {
-         info->d_endian = ELFDATA2MSB;
-     } else {
-@@ -236,25 +251,19 @@ ssize_t cpu_get_note_size(int class, int machine, int nr_cpus)
-     int note_head_size;
-     const NoteFuncDesc *nf;
- 
--    if (class != ELFCLASS64) {
--        return -1;
+     XICSFabric *xi =3D XICS_FABRIC(spapr);
+     Error *err =3D NULL, *local_err =3D NULL;
+-    XICSState *xics;
+     ICSState *ics =3D NULL;
+     int i;
+=20
+-    xics =3D XICS_COMMON(object_new(type));
+-    qdev_set_parent_bus(DEVICE(xics), sysbus_get_default());
+-    object_property_set_bool(OBJECT(xics), true, "realized", &err);
+-    if (err) {
+-        goto error;
 -    }
--    assert(machine == EM_PPC64);
 -
--    note_head_size = sizeof(Elf64_Nhdr);
--
-+    note_head_size = sizeof(Elf_Nhdr);
-     for (nf = note_func; nf->note_contents_func; nf++) {
-         elf_note_size = elf_note_size + note_head_size + name_size +
--                        nf->contents_size;
-+            nf->contents_size;
+     ics =3D ICS_SIMPLE(object_new(type_ics));
+     qdev_set_parent_bus(DEVICE(ics), sysbus_get_default());
+     object_property_add_child(OBJECT(spapr), "ics", OBJECT(ics), NULL);
+@@ -142,32 +133,30 @@ static XICSState *try_create_xics(sPAPRMachineState=
+ *spapr,
      }
- 
-     return (elf_note_size) * nr_cpus;
+=20
+     spapr->ics =3D ics;
+-    return xics;
++    return 0;
+=20
+ error:
+     error_propagate(errp, err);
+     if (ics) {
+         object_unparent(OBJECT(ics));
+     }
+-    object_unparent(OBJECT(xics));
+-    return NULL;
++    return -1;
  }
- 
--static int ppc64_write_all_elf64_notes(const char *note_name,
--                                       WriteCoreDumpFunction f,
--                                       PowerPCCPU *cpu, int id,
--                                       void *opaque)
-+static int ppc_write_all_elf_notes(const char *note_name,
-+                                   WriteCoreDumpFunction f,
-+                                   PowerPCCPU *cpu, int id,
-+                                   void *opaque)
+=20
+-static XICSState *xics_system_init(MachineState *machine,
+-                                   int nr_servers, int nr_irqs, Error **=
+errp)
++static int xics_system_init(MachineState *machine,
++                            int nr_servers, int nr_irqs, Error **errp)
  {
-     NoteFuncArg arg = { .state = opaque };
-     int ret = -1;
-@@ -282,5 +291,12 @@ int ppc64_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
-                                int cpuid, void *opaque)
- {
-     PowerPCCPU *cpu = POWERPC_CPU(cs);
--    return ppc64_write_all_elf64_notes("CORE", f, cpu, cpuid, opaque);
-+    return ppc_write_all_elf_notes("CORE", f, cpu, cpuid, opaque);
-+}
-+
-+int ppc32_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs,
-+                               int cpuid, void *opaque)
-+{
-+    PowerPCCPU *cpu = POWERPC_CPU(cs);
-+    return ppc_write_all_elf_notes("CORE", f, cpu, cpuid, opaque);
+-    XICSState *xics =3D NULL;
++    int rc =3D -1;
+=20
+     if (kvm_enabled()) {
+         Error *err =3D NULL;
+=20
+         if (machine_kernel_irqchip_allowed(machine) &&
+             !xics_kvm_init(SPAPR_MACHINE(machine), errp)) {
+-            xics =3D try_create_xics(SPAPR_MACHINE(machine),
+-                                   TYPE_XICS_SPAPR_KVM, TYPE_ICS_KVM,
+-                                   TYPE_KVM_ICP, nr_servers, nr_irqs, &e=
+rr);
++            rc =3D try_create_xics(SPAPR_MACHINE(machine), TYPE_ICS_KVM,
++                                 TYPE_KVM_ICP, nr_servers, nr_irqs, &err=
+);
+         }
+-        if (machine_kernel_irqchip_required(machine) && !xics) {
++        if (machine_kernel_irqchip_required(machine) && rc < 0) {
+             error_reportf_err(err,
+                               "kernel_irqchip requested but unavailable:=
+ ");
+         } else {
+@@ -175,14 +164,13 @@ static XICSState *xics_system_init(MachineState *ma=
+chine,
+         }
+     }
+=20
+-    if (!xics) {
++    if (rc < 0) {
+         xics_spapr_init(SPAPR_MACHINE(machine), errp);
+-        xics =3D try_create_xics(SPAPR_MACHINE(machine),
+-                               TYPE_XICS_SPAPR, TYPE_ICS_SIMPLE,
++        rc =3D try_create_xics(SPAPR_MACHINE(machine), TYPE_ICS_SIMPLE,
+                                TYPE_ICP, nr_servers, nr_irqs, errp);
+     }
+=20
+-    return xics;
++    return rc;
  }
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 420e6d6..d33c17e 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1241,6 +1241,8 @@ int ppc_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
- int ppc_cpu_gdb_write_register_apple(CPUState *cpu, uint8_t *buf, int reg);
- int ppc64_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
-                                int cpuid, void *opaque);
-+int ppc32_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs,
-+                               int cpuid, void *opaque);
- #ifndef CONFIG_USER_ONLY
- void ppc_cpu_do_system_reset(CPUState *cs);
- extern const struct VMStateDescription vmstate_ppc_cpu;
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 4dd1e36..37f74be 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -10497,11 +10497,12 @@ static void ppc_cpu_class_init(ObjectClass *oc, void *data)
- #else
-     cc->get_phys_page_debug = ppc_cpu_get_phys_page_debug;
-     cc->vmsd = &vmstate_ppc_cpu;
--#if defined(TARGET_PPC64)
--    cc->write_elf64_note = ppc64_cpu_write_elf64_note;
--#endif
- #endif
-     cc->cpu_exec_enter = ppc_cpu_exec_enter;
-+#if defined(CONFIG_SOFTMMU)
-+    cc->write_elf64_note = ppc64_cpu_write_elf64_note;
-+    cc->write_elf32_note = ppc32_cpu_write_elf32_note;
-+#endif
- 
-     cc->gdb_num_core_regs = 71;
- 
--- 
+=20
+ static int spapr_fixup_cpu_smt_dt(void *fdt, int offset, PowerPCCPU *cpu=
+,
+@@ -2003,9 +1991,8 @@ static void ppc_spapr_init(MachineState *machine)
+     load_limit =3D MIN(spapr->rma_size, RTAS_MAX_ADDR) - FW_OVERHEAD;
+=20
+     /* Set up Interrupt Controller before we create the VCPUs */
+-    spapr->xics =3D xics_system_init(machine,
+-                                   DIV_ROUND_UP(max_cpus * smt, smp_thre=
+ads),
+-                                   XICS_IRQS_SPAPR, &error_fatal);
++    xics_system_init(machine, DIV_ROUND_UP(max_cpus * smt, smp_threads),
++                     XICS_IRQS_SPAPR, &error_fatal);
+=20
+     /* Set up containers for ibm,client-set-architecture negotiated opti=
+ons */
+     spapr->ov5 =3D spapr_ovec_new();
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index f5bbb04..cfd2711 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -58,7 +58,6 @@ struct sPAPRMachineState {
+     struct VIOsPAPRBus *vio_bus;
+     QLIST_HEAD(, sPAPRPHBState) phbs;
+     struct sPAPRNVRAM *nvram;
+-    XICSState *xics;
+     ICSState *ics;
+     DeviceState *rtc;
+=20
+diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+index b0b01e2..2514cfd 100644
+--- a/include/hw/ppc/xics.h
++++ b/include/hw/ppc/xics.h
+@@ -30,29 +30,6 @@
+=20
+ #include "hw/sysbus.h"
+=20
+-#define TYPE_XICS_COMMON "xics-common"
+-#define XICS_COMMON(obj) OBJECT_CHECK(XICSState, (obj), TYPE_XICS_COMMON=
+)
+-
+-/*
+- * Retain xics as the type name to be compatible for migration. Rest all=
+ the
+- * functions, class and variables are renamed as xics_spapr.
+- */
+-#define TYPE_XICS_SPAPR "xics"
+-#define XICS_SPAPR(obj) OBJECT_CHECK(XICSState, (obj), TYPE_XICS_SPAPR)
+-
+-#define TYPE_XICS_SPAPR_KVM "xics-spapr-kvm"
+-#define XICS_SPAPR_KVM(obj) \
+-     OBJECT_CHECK(KVMXICSState, (obj), TYPE_XICS_SPAPR_KVM)
+-
+-#define XICS_COMMON_CLASS(klass) \
+-     OBJECT_CLASS_CHECK(XICSStateClass, (klass), TYPE_XICS_COMMON)
+-#define XICS_SPAPR_CLASS(klass) \
+-     OBJECT_CLASS_CHECK(XICSStateClass, (klass), TYPE_XICS_SPAPR)
+-#define XICS_COMMON_GET_CLASS(obj) \
+-     OBJECT_GET_CLASS(XICSStateClass, (obj), TYPE_XICS_COMMON)
+-#define XICS_SPAPR_GET_CLASS(obj) \
+-     OBJECT_GET_CLASS(XICSStateClass, (obj), TYPE_XICS_SPAPR)
+-
+ #define XICS_IPI        0x2
+ #define XICS_BUID       0x1
+ #define XICS_IRQ_BASE   (XICS_BUID << 12)
+@@ -62,8 +39,6 @@
+  * (the kernel implementation supports more but we don't exploit
+  *  that yet)
+  */
+-typedef struct XICSStateClass XICSStateClass;
+-typedef struct XICSState XICSState;
+ typedef struct ICPStateClass ICPStateClass;
+ typedef struct ICPState ICPState;
+ typedef struct ICSStateClass ICSStateClass;
+@@ -71,16 +46,6 @@ typedef struct ICSState ICSState;
+ typedef struct ICSIRQState ICSIRQState;
+ typedef struct XICSFabric XICSFabric;
+=20
+-struct XICSStateClass {
+-    DeviceClass parent_class;
+-};
+-
+-struct XICSState {
+-    /*< private >*/
+-    DeviceState parent_obj;
+-    /*< public >*/
+-};
+-
+ #define TYPE_ICP "icp"
+ #define ICP(obj) OBJECT_CHECK(ICPState, (obj), TYPE_ICP)
+=20
+--=20
 2.9.3
