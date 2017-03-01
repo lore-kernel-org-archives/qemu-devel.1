@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1citDc-0003XM-7q
+	(envelope-from <dgibson@ozlabs.org>) id 1citDc-0003XN-8Y
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 20:38:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1citDb-0001Xj-70
+	(envelope-from <dgibson@ozlabs.org>) id 1citDb-0001XO-5t
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 20:38:16 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:36993)
+Received: from ozlabs.org ([2401:3900:2:1::2]:57317)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1citDa-0001TI-25
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1citDa-0001TK-1h
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 20:38:15 -0500
-Date: Wed, 1 Mar 2017 11:16:02 +1100
+Date: Wed, 1 Mar 2017 11:35:49 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170301001602.GC12571@umbus.fritz.box>
-References: <CAFEAcA8AZup28Sho8hLeCRVf4iSdLdeFHvz1h4-X7FwVBcANyg@mail.gmail.com>
-	<448f3a5f-044e-bcac-60bd-2ce074021be9@redhat.com>
-	<20170223224911.GC17615@umbus.fritz.box>
-	<20170224001613.GG17615@umbus.fritz.box>
-	<CAFEAcA9V_1NA6-JgZd7Pc1hwih+uBKBrt4MPi4+kPWRu-xduPA@mail.gmail.com>
-	<20170227010528.GM17615@umbus.fritz.box>
-	<CAFEAcA9rR8X1Hg=w5FfYsoVSYjZYQAt+MaURKJ82mTyYohJOBw@mail.gmail.com>
+Message-ID: <20170301003549.GD12571@umbus.fritz.box>
+References: <1488171164-28319-1-git-send-email-xyjxie@linux.vnet.ibm.com>
+	<20170228004101.GG17615@umbus.fritz.box>
+	<ba290b8f-5967-eb50-3ba5-514a28bd0dda@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="z4+8/lEcDcG5Ke9S"
+	protocol="application/pgp-signature"; boundary="T7mxYSe680VjQnyC"
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA9rR8X1Hg=w5FfYsoVSYjZYQAt+MaURKJ82mTyYohJOBw@mail.gmail.com>
-Subject: Re: [Qemu-devel] using fdt_setprop() to set properties to empty
- values
+In-Reply-To: <ba290b8f-5967-eb50-3ba5-514a28bd0dda@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2] memory: Introduce DEVICE_HOST_ENDIAN
+ for ram device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,55 +30,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Eric Blake <eblake@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Yongji Xie <xyjxie@linux.vnet.ibm.com>
+Cc: pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, qemu-devel@nongnu.org, alex.williamson@redhat.com, aik@ozlabs.ru, peter.maydell@linaro.org, paulus@samba.org, mdroth@linux.vnet.ibm.com, zhong@linux.vnet.ibm.com
 
 
---z4+8/lEcDcG5Ke9S
+--T7mxYSe680VjQnyC
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 27, 2017 at 10:11:57AM +0000, Peter Maydell wrote:
-> On 27 February 2017 at 01:05, David Gibson <david@gibson.dropbear.id.au> =
-wrote:
-> > On Fri, Feb 24, 2017 at 10:35:35AM +0000, Peter Maydell wrote:
-> >> On 24 February 2017 at 00:16, David Gibson <david@gibson.dropbear.id.a=
-u> wrote:
-> >> > Ok, I've pushed libfdt upstream patches to (a) make passing NULL to
-> >> > setprop() with zero length explicitly safe and (b) add an
-> >> > fdt_setprop_empty() helper macro.  Do you want me to make a pullreq =
-to
-> >> > update the qemu submodule?
-> >>
-> >> Yes, please. Are we OK with using a random libfdt commit or do
-> >> we update only to proper release tags?
-> >
-> > I'm find with a random SHA, but that's not really my department - I'm
-> > upstream libfdt maintainer, but update policy in the qemu tree seems
-> > like a qemu side decision.
-> >
-> >> There's no real rush with
-> >> this so if you have a release due shortly it might be better
-> >> to wait for that.
-> >
-> > dtc/libfdt releases are a rather haphazard affair.  Usually they
-> > happen when somebody complains that there hasn't been a release with
-> > some feature they want.  Our tests are both fast to run and have
-> > reasonaably good coverage, so random commits are usually good.  So a
-> > "release" is usually just slapping a new version number onto whatever
-> > is in master and making a tag and tarball.
+On Tue, Feb 28, 2017 at 06:12:56PM +0800, Yongji Xie wrote:
+> on 2017/2/28 8:41, David Gibson wrote:
 >=20
-> >From my end I think we'd rather use a proper release version
-> (if only because it's then easier to refer to and to state
-> as a dependency for packaged versions if required). It looks
-> like we've done that for our previous updates (starting
-> with 1.3.0 and then moving to 1.4.0 and 1.4.2) so I think
-> we should continue using released versions.
+> > On Mon, Feb 27, 2017 at 12:52:44PM +0800, Yongji Xie wrote:
+> > > At the moment ram device's memory regions are DEVICE_NATIVE_ENDIAN. I=
+t's
+> > > incorrect. This memory region is backed by a MMIO area in host, so the
+> > > uint64_t data that MemoryRegionOps read from/write to this area shoul=
+d be
+> > > host-endian rather than target-endian. Hence, current code does not w=
+ork
+> > > when target and host endianness are different which is the most commo=
+n case
+> > > on PPC64. To fix it, this introduces DEVICE_HOST_ENDIAN for the ram d=
+evice.
+> > >=20
+> > > This has been tested on PPC64 BE/LE host/guest in all possible combin=
+ations
+> > > including TCG.
+> > >=20
+> > > Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> > > Signed-off-by: Yongji Xie <xyjxie@linux.vnet.ibm.com>
+> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> >=20
+> > The effect of the patch is certainly correct.  I remain a little
+> > concerned that the name "host endian" might cause more confusion than
+> > it resolves, but a better term isn't immediately obvious to me.
+>=20
+> If the memory region's endianness indicates the endianness of multi-byte
+> value that
+> MemoryRegionOps read from/write to this memory region, should "host endia=
+n"
+> be reasonable?
+>=20
+> For a mmio store, QEMU just get a bunch of bytes in the memory at the
+> beginning.
+> Then we use ldX_p to load a target-endian multi-byte value from the memor=
+y.
+> Then
+> adjust_endianness() change the endianness of the multi-byte value from
+> target-endian
+> to memory region's endianness.
+>=20
+> For the mmap MMIO area, we should use host-endian multi-byte value to acc=
+ess
+> it.
+>=20
+> *(uint32_t *)(mr->ram_block->host + addr) =3D (uint32_t)data;
+>=20
+> Here it is the same as stl_he_p().
+>=20
+> The "host-endian" means we load a bunch of bytes as a host-endian value, =
+and
+> write the
+> value to the mmap MMIO area. That's my understanding. Not sure if it's
+> correct.
 
-Ok; I just tagged and released dtc 1.4.3.  I'll send a qemu update
-when I get a chance to remind myself how to do submodule updates
-again.
+That's correct.  The difficulty is that generally the endian flag
+describes the device's endianness as it appears to the guest.  The
+guest doesn't (and shouldn't) know the host's endianness, so
+describing something as "host endian" is pretty weird from that point
+of view.  Basically the only way this can work is if the qemu device
+is treating all data from the guest as pieces of a bytestream and
+never interpreting things as multibyte values.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -90,25 +110,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---z4+8/lEcDcG5Ke9S
+--T7mxYSe680VjQnyC
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYthLCAAoJEGw4ysog2bOSY40QAJhv2Qbsx0F/ng6MuP+Y16OS
-+PySMCzq4zs2cCWVRyZ3Ad6SThOEP2WjF3v8Ad4BHZsz6aOzs/oF5PsmKJxoYv8D
-Ey4n+9/23cm/HpB0+M/i3Mdl+39xNyiSjCNWYvAXDmF6fxhTdkKuF0eT0yMAzkUz
-2VzUx7RzhendeT4FSebcRh8jRczdfhgTkN/VecxeCa9LsxZk6E5NVz3nErclazqx
-osCW735pBQocZR1K5MAJ1cO/RuO7wfTSqE95nuKvKx8rODnsLkRY3V5pqadMaeHf
-wWdkRKz1cktq0IJIBD4jpV35RVxuWm0JQ2yfLdZbtZ8dfizLJGfdq9MnEdY7Oaea
-AlxXIH4VOBS7hNLxjOJaQBPON5FmDzHlcyogd0QvyXXPg11bb/BHIK1pHwTcNW0A
-7dwCzD0XhlelR+tRC6OZHtnL7U5V0KJMjB0iCwe/bKakR9haib9IFKEpiNS7419T
-B2+Fsw6JpJD9e0kUfSpn/RV906fvAL6NsZVCe0pZQTMSrp/qZfpvTWgIE3Z6OBxu
-urTw+wMosGuLQCtifclv435VzIxaKPMikWHnKLGoMnH87wBQ88Al6mRcdz/E7nYu
-0i8jYwuc0Y8nshHJ38632aFj/hgS8QNfoz5phE22hru5Y7V76mJwk2Dq7l/W6oVk
-KBvX/RlC5h+Zu1g7iyW7
-=ZEna
+iQIcBAEBCAAGBQJYthdiAAoJEGw4ysog2bOSXR4P/jR36hsLRqsw2qgNsRAbUz62
+0Mf/VpECTHPEI7vS7nR1gkLwXdXxEt+YP30iT11yjNijiNF/mCAv0hlL22j2AZdt
+Coq6hjPf7OSkiLvXjnxyu8Q+riudFI/3Ik4Zqjkx4GP3X+eGMHc5kzKfIM1uG2rJ
+OhiwxNemCBN27JTGwRIb0NnTzfudrcEEJTkgl+x5hc1G0PUzd0Wc+GB+gfLoHE8P
+vcWbk16NJP+q12N9oav5bKYqO8UfhZoN43JTVMYQTmPlQEogwutFizt71QTf9m1c
+Y9CYHh7rsF1sLbfQtNYaoQwZRUTZdttgS45HbzXQ3lIePl5fFDhUapKpStIGcY2j
+7Ca8BHCH91Si9byK7AS3NKMIk/litZI4KVIvAIo41ze02war4NpjUfIfx7dFVOxt
+kJ4QDrzeDMZGb2OZL1/NqhgqDoBaU0RiupFMevmV7ls4jkAGXlsf2nkH3Ndqt5G9
+5/RdVGOkKfx14Wl6RM0bNi0ASsLyuPIYeErdbYyxD/+b/91XnFOZvA72/LvHrUvJ
+yBRmJU/cVEDo4ztJdOwv/53PjkWxgnL3+08rcxpw5fC2Eb7ebsLj8tZnwneMpdY6
+jKcu7ECvawsoPUgSEzmsrwKElz9EfXi7MWUW6X8L/3BO8sOLDWjBLBtSWRCHwLPE
+UA0IpkTylxBNB8zxjFUY
+=xrer
 -----END PGP SIGNATURE-----
 
---z4+8/lEcDcG5Ke9S--
+--T7mxYSe680VjQnyC--
