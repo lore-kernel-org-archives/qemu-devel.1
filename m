@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59112)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cj3S5-0006v2-4N
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 07:33:54 -0500
+	(envelope-from <famz@redhat.com>) id 1cj3XP-0002xI-Jn
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 07:39:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cj3S1-0003IO-TA
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 07:33:53 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33730
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1cj3S1-00032v-Nj
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 07:33:49 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v21CXAO0028538
-	for <qemu-devel@nongnu.org>; Wed, 1 Mar 2017 07:33:13 -0500
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28wxd7r05r-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 01 Mar 2017 07:33:10 -0500
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Wed, 1 Mar 2017 12:25:30 -0000
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Wed,  1 Mar 2017 12:50:04 +0100
-Message-Id: <20170301115004.96073-1-pasic@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 1/1] virtio: fallback from irqfd to non-irqfd
- notify
+	(envelope-from <famz@redhat.com>) id 1cj3XO-0005Wb-Kd
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 07:39:23 -0500
+Date: Wed, 1 Mar 2017 20:39:13 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170301123913.GA26744@lemon.lan>
+References: <20170301081504.23595-1-famz@redhat.com>
+	<20170301094917.GA4799@noname.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170301094917.GA4799@noname.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC] block: Tolerate existing writers on
+ read only BdrvChild
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,46 +24,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-The commits 03de2f527 "virtio-blk: do not use vring in dataplane"  and
-9ffe337c08 "virtio-blk: always use dataplane path if ioeventfd is active"
-changed how notifications are done for virtio-blk substantially. Due to a
-race condition interrupts are lost when irqfd is torn down after
-notify_guest_bh was scheduled but before it actually runs.  Furthermore
-virtio_notify_irqfd ignores the value returned by event_notifier_set
-which correctly indicates that notification has failed due to bad file
-descriptor.
+On Wed, 03/01 10:49, Kevin Wolf wrote:
+> Am 01.03.2017 um 09:15 hat Fam Zheng geschrieben:
+> > In an ideal world, read-write access to an image is inherently
+> > exclusive, because we cannot guarantee other readers and writers a
+> > consistency view of the whole image at all point. That's what the
+> > current permission system does, and it is okay as long as it is entirely
+> > internal. But that would change with the coming image locking. In
+> > practice, both end users and our test cases use tools like qemu-img and
+> > qemu-io to peek at images while guest is running.
+> > 
+> > Relax a bit and accept other writers in this case.
+> > 
+> > Signed-off-by: Fam Zheng <famz@redhat.com>
+> 
+> Hm. On the one hand I think you're right that people are using things
+> like this, on other hand it's also true that the result might not be
+> consistent and therefore image locking is right about forbidding these
+> actions.
+> 
+> I think your patch is too permissive, it allows even launching a second
+> long-running VM on the image, which will definitely see corrupted data
+> sooner or later.
+> 
+> Maybe what we can do is allow shared writers for read-only images if
+> CONSISTENT_READ isn't requested. It's still not 100% correct because we
+> can get inconsistent metadata and cause unexpected failure, but this is
+> probably tolerable. We would then have to change the allowed actions to
+> not request this permission.
+> 
+> In qemu-img, we have these read-only users:
+> 
+> * qemu-img check (without -r): Let's keep this blocked, it will only
+>   report lots of leaks and leads to invalid bug reports. I've had my
+>   share of them.
+> 
+> * qemu-img compare: Not sure if this makes sense with an image that is
+>   in active use?
+> 
+> * qemu-img convert source: Similarly to qemu-img compare, this doesn't
+>   make a whole lot of sense, with one exception: People are using -s to
+>   extract internal snapshots while the VM is still running, and this
+>   usually works because the snapshot doesn't change. However, I don't
+>   want to know what happens if you delete the snapshort from the qemu
+>   process while qemu-img convert is running... Doing 'qemu-img snapshot
+>   -s ...' with a running VM is more tolerated abuse than a supported
+>   feature.
+> 
+> * qemu-img info: This one makes perfect sense even with a running VM
+> 
+> * qemu-img map: Results are potentially meaningless with concurrent I/O,
+>   but there may be cases where it makes sense.
+> 
+> * qemu-img snapshot -l: Somewhat similar to qemu-img convert -s, except
+>   that it's very quick and doesn't access actual data (could even be
+>   BDRV_O_NOIO, I think). Allowing this makes sense, I guess.
+> 
+> * qemu-img rebase, safe mode, backing files: If we allowed concurrent
+>   writes, it wouldn't be safe.
+> 
+> * qemu-img bench: Well... No. You don't need this on an image with an
+>   active VM.
+> 
+> * qemu-img dd: Same as convert, except that there is no -s.
+> 
+> So the list of subcommands where we want to support it is rather short.
+> We can change blk_new_open() to clear CONSISTENT_READ for BDRV_O_NOIO,
+> which could cover 'info' and 'snapshot -l'.
+> 
+> That leaves us with qemu-io, 'convert -s' and 'map', all of which can be
+> imagined to be useful even with a running VM, but all of which can also
+> easily produce wrong results in this case. An explicit command line
+> option to disable CONSISTENT_READ might be the right tool here.
 
-Let's fix this by making virtio_notify_irqfd fall back to the non-irqfd
-notification mechanism if event_notifier_set fails.
+I'm not sure about this because: 1) this is intrusive from a user PoV, many
+scripts and upper layer tools will stop working; 2) CONSISTENT_READ is enforced
+by qcow2 in its .bdrv_child_perm implementation even if blk_new_open() doesn't
+ask for it, therefore such an option has to impact the whole graph; 3) this
+isn't only about asking for "persistent read" perm, but more about granting
+"write" in shared_perm, so it feels messy.
 
-Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
----
+A perhaps more contained way is to add a BDRV_O_RELAXED_LOCK flag and use it in
+those subcommands, then in the image locking code, the "no other writer" byte is
+not locked if it's set. This has a simpler semantic and a more manageable scope.
 
-This is probably not the only way to fix this: suggestions welcome. I
-did not use a fixes tag because I'm not sure yet where exactly things got
-broken. Maybe guys more familiar with dataplane an coroutines can help
-(Paolo, Stefan).
----
- hw/virtio/virtio.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 23483c7..8e1c1e9 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -1581,7 +1581,9 @@ void virtio_notify_irqfd(VirtIODevice *vdev, VirtQueue *vq)
-      * to an atomic operation.
-      */
-     virtio_set_isr(vq->vdev, 0x1);
--    event_notifier_set(&vq->guest_notifier);
-+    if (event_notifier_set(&vq->guest_notifier)) {
-+        virtio_notify_vector(vdev, vq->vector);
-+    }
- }
- 
- static void virtio_irq(VirtQueue *vq)
--- 
-2.8.4
+Fam
