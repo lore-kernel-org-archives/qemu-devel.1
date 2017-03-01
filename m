@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40883)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cj8Wc-00012q-Nd
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 12:58:55 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cj8Wl-00018y-Dg
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 12:59:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cj8Wb-0008KO-RR
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 12:58:54 -0500
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:37279)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cj8Wb-0008KA-K8
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 12:58:53 -0500
-Received: by mail-wm0-x235.google.com with SMTP id n11so5687300wma.0
-	for <qemu-devel@nongnu.org>; Wed, 01 Mar 2017 09:58:53 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20170228161402.25122-1-pbonzini@redhat.com>
-References: <20170228161402.25122-1-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 1 Mar 2017 17:58:31 +0000
-Message-ID: <CAFEAcA-yYjQab=g2C8WbP=zAy5q8r6o=z-UHh0Q9NDO3um_OCA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v4 00/19] KVM and cpu-exec patches for 2.9
- soft freeze
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cj8Wi-0008NJ-Af
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 12:59:03 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33002
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cj8Wi-0008N9-4k
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 12:59:00 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v21HnuIQ039634
+	for <qemu-devel@nongnu.org>; Wed, 1 Mar 2017 12:58:59 -0500
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28wxrb6n4w-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 01 Mar 2017 12:58:58 -0500
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Wed, 1 Mar 2017 17:58:57 -0000
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+Date: Wed,  1 Mar 2017 18:58:52 +0100
+Message-Id: <20170301175852.13517-1-cornelia.huck@de.ibm.com>
+Subject: [Qemu-devel] [PATCH v3] virtio: guard vring access when setting
+ notification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +37,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, pbonzini@redhat.com, borntraeger@de.ibm.com, Cornelia Huck <cornelia.huck@de.ibm.com>
 
-On 28 February 2017 at 16:13, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> The following changes since commit d992f2f1368ceb92e6bfd8efece174110f4236=
-ff:
->
->   Merge remote-tracking branch 'remotes/artyom/tags/pull-sun4v-20170226' =
-into staging (2017-02-26 22:40:23 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to b9a93b6cfddd348286cd8e44d7c4d964d9553a9f:
->
->   vl: disable default cdrom when using explicitely scsi-hd (2017-02-28 11=
-:51:12 +0100)
->
-> v3->v4: added two patches
->
->         fixed #ifdef KVM_HAVE_MCE_INJECTION
->
-> v2->v3: replace SIGPOLL with SIGIO
->
->         another missing #ifdef KVM_HAVE_MCE_INJECTION
->
-> v1->v2: add missing #ifdef KVM_HAVE_MCE_INJECTION
->
->         rebase over MTTCG pull request.  -icount is currently broken but
->         I'd like to preserve bisectability, so this pull request brings
->         in the icount patches through a merge commit.
+Switching to vring caches exposed an existing bug in
+virtio_queue_set_notification(): We can't access vring structures
+if they have not been set up yet. This may happen, for example,
+for virtio-blk devices with multiple queues: The code will try to
+switch notifiers for every queue, but the guest may have only set up
+a subset of them.
 
-Fails to build, ppc64, aarch64 (and probably others):
+Fix this by guarding access to the vring memory by checking for
+vring.desc. The first aio poll will iron out any remaining
+inconsistencies for later-configured queues (buggy legacy drivers).
 
-In file included from /home/pm215/qemu/include/qemu/osdep.h:36:0,
-                 from /home/pm215/qemu/kvm-all.c:16:
-/home/pm215/qemu/kvm-all.c: In function =E2=80=98kvm_cpu_exec=E2=80=99:
-/home/pm215/qemu/kvm-all.c:1995:22: error: =E2=80=98have_sigbus_pending=E2=
-=80=99
-undeclared (first use in this function)
-         if (unlikely(have_sigbus_pending)) {
-                      ^
-/home/pm215/qemu/include/qemu/compiler.h:66:43: note: in definition of
-macro =E2=80=98unlikely=E2=80=99
- #define unlikely(x)   __builtin_expect(!!(x), 0)
-                                           ^
-/home/pm215/qemu/kvm-all.c:1995:22: note: each undeclared identifier
-is reported only once for each function it appears in
-         if (unlikely(have_sigbus_pending)) {
-                      ^
-/home/pm215/qemu/include/qemu/compiler.h:66:43: note: in definition of
-macro =E2=80=98unlikely=E2=80=99
- #define unlikely(x)   __builtin_expect(!!(x), 0)
-                                           ^
+Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+---
+v2->v3:
+- Switch to a very simple check for !desc, which should be fine for
+  the existing users.
 
-thanks
--- PMM
+We might want to assert that callers don't start aio before DRIVER_OK
+resp. first kick, but that can wait until after we've fixed this bug.
+---
+ hw/virtio/virtio.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index e487e36..bf8a644 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -288,6 +288,10 @@ void virtio_queue_set_notification(VirtQueue *vq, int enable)
+ {
+     vq->notification = enable;
+ 
++    if (!vq->vring.desc) {
++        return;
++    }
++
+     rcu_read_lock();
+     if (virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX)) {
+         vring_set_avail_event(vq, vring_avail_idx(vq));
+-- 
+2.8.4
