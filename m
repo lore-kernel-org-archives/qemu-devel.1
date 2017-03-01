@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55219)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cj618-0007iZ-Id
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 10:18:16 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cj62B-0008Jw-KE
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 10:19:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cj615-00018s-7V
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 10:18:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41134)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cj614-00018A-Vs
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 10:18:11 -0500
-Date: Wed, 1 Mar 2017 15:18:03 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170301151803.GF10160@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <57FA3A002D66E049AA7792D931B894C7060F5494@MOKSCY3MSGUSRGB.ITServices.sbc.com>
-	<945CA011AD5F084CBEA3E851C0AB28894B8C3A14@SHSMSX101.ccr.corp.intel.com>
-	<575E92DB.3080904@linux.vnet.ibm.com>
-	<20160615193019.GB7300@work-vm>
-	<5761C092.5070702@linux.vnet.ibm.com>
-	<20160616080520.GA2249@work-vm> <20160616082517.GC11426@redhat.com>
-	<5075d390-a1d1-b707-6b57-deb0154c2e37@linux.vnet.ibm.com>
-	<20170301125414.GD10160@redhat.com>
-	<OF00CA88E0.A7212243-ON002580D6.00498E3C-852580D6.0049CA7A@notes.na.collabserv.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1cj628-0001Xt-C7
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 10:19:19 -0500
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:35576)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cj628-0001Xf-1Y
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 10:19:16 -0500
+Received: by mail-wm0-x234.google.com with SMTP id v186so112887076wmd.0
+	for <qemu-devel@nongnu.org>; Wed, 01 Mar 2017 07:19:14 -0800 (PST)
+References: <CAFEAcA_KVG19uhPuBUNx4ySmebnL1Hit6=HUX9ug0FkBFMwasg@mail.gmail.com>
+	<877f492ppx.fsf@linaro.org>
+	<e28337d0-d572-cd9a-3f45-0ecc074c32c9@ilande.co.uk>
+	<874lzd2mp7.fsf@linaro.org>
+	<9efa47c0-2a5f-0229-7e27-97a0142ff22d@ilande.co.uk>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <9efa47c0-2a5f-0229-7e27-97a0142ff22d@ilande.co.uk>
+Date: Wed, 01 Mar 2017 15:19:12 +0000
+Message-ID: <871suh2ff3.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <OF00CA88E0.A7212243-ON002580D6.00498E3C-852580D6.0049CA7A@notes.na.collabserv.com>
-Subject: Re: [Qemu-devel] [PATCH v5 1/4] Provide support for the CUSE TPM
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] intermittent make check failure:
+ "tcg_handle_interrupt: assertion failed: (qemu_mutex_iothread_locked())"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,94 +34,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@us.ibm.com>
-Cc: "SERBAN, CRISTINA" <cs1731@att.com>, "SHIH, CHING C" <cs1815@att.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "hagen.lauer@huawei.com" <hagen.lauer@huawei.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Xu, Quan" <quan.xu@intel.com>, "silviu.vlasceanu@gmail.com" <silviu.vlasceanu@gmail.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, Mar 01, 2017 at 08:25:43AM -0500, Stefan Berger wrote:
-> "Daniel P. Berrange" <berrange@redhat.com> wrote on 03/01/2017 07:54:14 
-> AM:
-> 
-> > From: "Daniel P. Berrange" <berrange@redhat.com>
-> > To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> > Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Berger/
-> > Watson/IBM@IBMUS, "mst@redhat.com" <mst@redhat.com>, "qemu-
-> > devel@nongnu.org" <qemu-devel@nongnu.org>, "SERBAN, CRISTINA" 
-> > <cs1731@att.com>, "Xu, Quan" <quan.xu@intel.com>, 
-> > "silviu.vlasceanu@gmail.com" <silviu.vlasceanu@gmail.com>, 
-> > "hagen.lauer@huawei.com" <hagen.lauer@huawei.com>, "SHIH, CHING C" 
-> > <cs1815@att.com>
-> > Date: 03/01/2017 08:03 AM
-> > Subject: Re: [Qemu-devel] [PATCH v5 1/4] Provide support for the CUSE 
-> TPM
-> > 
-> > On Wed, Mar 01, 2017 at 07:25:28AM -0500, Stefan Berger wrote:
-> > > On 06/16/2016 04:25 AM, Daniel P. Berrange wrote:
-> > > > On Thu, Jun 16, 2016 at 09:05:20AM +0100, Dr. David Alan Gilbert 
-> wrote:
-> > > > > * Stefan Berger (stefanb@linux.vnet.ibm.com) wrote:
-> > > > > > On 06/15/2016 03:30 PM, Dr. David Alan Gilbert wrote:
-> > > > > <snip>
-> > > > > 
-> > > > > > > So what was the multi-instance vTPM proxy driver patch set 
-> about?
-> > > > > > That's for containers.
-> > > > > Why have the two mechanisms? Can you explain how the 
-> multi-instance
-> > > > > proxy works; my brief reading when I saw your patch series seemed
-> > > > > to suggest it could be used instead of CUSE for the non-container 
-> case.
-> > > > One of the key things that was/is not appealing about this CUSE 
-> approach
-> > > > is that it basically invents a new ioctl() mechanism for talking to
-> > > > a TPM chardev. With in-kernel vTPM support, QEMU probably doesn't 
-> need
-> > > > to have any changes at all - its existing driver for talking to TPM
-> > > 
-> > > We still need the control channel with the vTPM to reset it upon VM 
-> reset,
-> > > for getting and setting the state of the vTPM upon 
-> snapshot/suspend/resume,
-> > > changing locality, etc.
-> > 
-> > You ultimately need the same mechanisms if using in-kernel vTPM with
-> > containers as containers can support snapshot/suspend/resume/etc too.
-> 
-> The vTPM running on the backend side of the vTPM proxy driver is 
-> essentially the same as the CUSE TPM used for QEMU. I has the same control 
-> channel through sockets. So on that level we would have support for the 
-> operations but not integrated with anything that would support container 
-> migration.
 
-This goes back to the question Dave mentions above ? Ignoring the control
-channel aspect temporarily, can the CUSE TPM support the exact same ioctl
-interface as the existing kernel TPM device ? It feels like this should
-be possible, and if so, then this virtal TPM feature can be considered to
-have two separate pieces.
+Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
 
-First enabling basic CUSE TPM device support would not require QEMU changes,
-as we could just use the existing tpm-passthrough driver against the CUSE
-device, albeit with the limitations around migration, snapshot etc.
+> On 01/03/17 12:41, Alex Bennée wrote:
+>
+>>> Here's the backtrace from my test case of qemu-system-sparc running on
+>>> an x86_64 host that I posted yesterday:
+>>>
+>>>
+>>> $ gdb --args ./qemu-system-sparc -cdrom
+>>> /home/build/src/qemu/image/sparc32/debian-40r4a-sparc-netinst.iso -boot d
+>>> GNU gdb (GDB) 7.4.1-debian
+>>> Copyright (C) 2012 Free Software Foundation, Inc.
+>>> License GPLv3+: GNU GPL version 3 or later
+>>> <http://gnu.org/licenses/gpl.html>
+>>> This is free software: you are free to change and redistribute it.
+>>> There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+>>> and "show warranty" for details.
+>>> This GDB was configured as "x86_64-linux-gnu".
+>>> For bug reporting instructions, please see:
+>>> <http://www.gnu.org/software/gdb/bugs/>...
+>>> Reading symbols from /home/build/rel-qemu-git/bin/qemu-system-sparc...done.
+>>> (gdb) r
+>>> Starting program: /home/build/rel-qemu-git/bin/qemu-system-sparc -cdrom
+>>> /home/build/src/qemu/image/sparc32/debian-40r4a-sparc-netinst.iso -boot d
+>>> warning: no loadable sections found in added symbol-file system-supplied
+>>> DSO at 0x7ffff7ffa000
+>>> [Thread debugging using libthread_db enabled]
+>>> Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+>>> [New Thread 0x7fffe9eee700 (LWP 18040)]
+>>> [New Thread 0x7fffe66d6700 (LWP 18041)]
+>>> [New Thread 0x7fffe5ed5700 (LWP 18042)]
+>>> qemu-system-sparc: -cdrom
+>>> /home/build/src/qemu/image/sparc32/debian-40r4a-sparc-netinst.iso:
+>>> warning: bus=0,unit=2 is deprecated with this machine type
+>>> [Thread 0x7fffe66d6700 (LWP 18041) exited]
+>>> [New Thread 0x7fffe66d6700 (LWP 18043)]
+>>> **
+>>> ERROR:/home/build/src/qemu/git/qemu/translate-common.c:34:tcg_handle_interrupt:
+>>> assertion failed: (qemu_mutex_iothread_locked())
+>>>
+>>> Program received signal SIGABRT, Aborted.
+>>> [Switching to Thread 0x7fffe5ed5700 (LWP 18042)]
+>>> 0x00007ffff2939125 in *__GI_raise (sig=<optimized out>) at
+>>> ../nptl/sysdeps/unix/sysv/linux/raise.c:64
+>>>
+>>>
+>>>
+>>> 64      ../nptl/sysdeps/unix/sysv/linux/raise.c: No such file or directory.
+>>> (gdb) thread apply all bt
+>>>
+>>> Thread 5 (Thread 0x7fffe66d6700 (LWP 18043)):
+>>> #0  sem_timedwait () at
+>>> ../nptl/sysdeps/unix/sysv/linux/x86_64/sem_timedwait.S:106
+>>> #1  0x000055555591435c in qemu_sem_timedwait (sem=0x5555561ad408,
+>>> ms=10000) at util/qemu-thread-posix.c:255
+>>> #2  0x000055555590cb51 in worker_thread (opaque=0x5555561ad3a0) at
+>>> util/thread-pool.c:92
+>>> #3  0x00007ffff2c9ab50 in start_thread (arg=<optimized out>) at
+>>> pthread_create.c:304
+>>> #4  0x00007ffff29e4fbd in clone () at
+>>> ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+>>> #5  0x0000000000000000 in ?? ()
+>>>
+>>> Thread 4 (Thread 0x7fffe5ed5700 (LWP 18042)):
+>>> #0  0x00007ffff2939125 in *__GI_raise (sig=<optimized out>) at
+>>> ../nptl/sysdeps/unix/sysv/linux/raise.c:64
+>>> #1  0x00007ffff293c3a0 in *__GI_abort () at abort.c:92
+>>> #2  0x00007ffff407e477 in g_assertion_message () from
+>>> /lib/x86_64-linux-gnu/libglib-2.0.so.0
+>>> #3  0x00007ffff407e994 in g_assertion_message_expr () from
+>>> /lib/x86_64-linux-gnu/libglib-2.0.so.0
+>>> #4  0x000055555561b54f in tcg_handle_interrupt (cpu=0x5555561b3af0,
+>>> mask=2) at /home/build/src/qemu/git/qemu/translate-common.c:34
+>>> #5  0x00005555556a8e7d in cpu_interrupt (cpu=0x5555561b3af0, mask=2) at
+>>> /home/build/src/qemu/git/qemu/include/qom/cpu.h:801
+>>> #6  0x00005555556a95ec in cpu_check_irqs (env=0x5555561bbd80) at
+>>> /home/build/src/qemu/git/qemu/hw/sparc/sun4m.c:157
+>>
+>> Am I correct assuming all the helper functions themselves are concerned
+>> with the vCPU environment they are running in? If so it looking like
+>> cpu_check_irqs() would be the place to wrap the BQL lock in.
+>>
+>> I'll make the change and test against your test case.
+>
+> For the window helpers, definitely yes - each SPARC vCPU contains a
+> large bank of registers of which the current window is a pointer as to
+> which register set is currently active. The current window itself is
+> controlled by a special register called CWP (current window pointer)
+> which is part of the PSR register in 32-bit CPUs or a standalone
+> register for 64-bit CPUs.
 
-Second we could consider the question of supporting a control channel as
-a separate topic. IIUC, QEMU essentially needs a way to trigger various
-operations in the underlying TPM implementation, when certain lifecycle
-operations are performed on the VM. I could see this being done as a
-simple network protocol over a UNIX socket. So, you could then add a
-new 'chardev' property to the tpm-passthrough device, which gives the
-ID of a character device that provides the control channel.
+Actually looking at where cpu_check_irq is I've pushed the BQL wraps
+higher up:
 
-This way QEMU does not need to have any special code to deal with CUSE
-directly. QEMU could be used with a real TPM device, a vTPM device or
-a CUSE TPM device, with the same driver. With both the vTPM and the
-CUSE TPM device, QEMU would have the ability to use a out of band
-control channel when migration/snapshot/etc take place.
+  https://github.com/stsquad/qemu/commit/f52e01bf4d3415ce4fad54cbb491f6c30a8e1903
 
-This cleanly isolates QEMU from the particular design & implementation
-that is currently used by the current swtpm code.
+The reasoning is HW emulation code can expect to be run under the BQL.
+Anything triggered by MMIO for example will automatically have the lock.
+The problem is helpers which trigger hardware actions (ARM has ARM_CP_IO
+for this). We talk about this in the design document:
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+  http://git.qemu-project.org/?p=qemu.git;a=blob;f=docs/multi-thread-tcg.txt;h=a99b4564c6258576acfa141f51f4b80131969519;hb=HEAD#l201
+
+> I ran out of time yesterday to run through all my SPARC64 tests, however
+> if this is the case then the issue will definitely appear in
+> qemu-system-sparc64 which seems to be supported by people seeing
+> intermittent failures in prom-env-test.
+
+So I made the change to both sparc and sparc64 in the above commit.
+
+I haven't managed to run into the intermittent trigger yet. How do I run
+the test directly?
+
+  make tests/prom-env-test
+
+Just makes the test case and
+
+  ./tests/prom-env-test
+**
+ERROR:tests/libqtest.c:589:qtest_get_arch: assertion failed: (qemu != NULL)
+Aborted (core dumped)
+
+
+>
+>
+> ATB,
+>
+> Mark.
+
+
+--
+Alex Bennée
