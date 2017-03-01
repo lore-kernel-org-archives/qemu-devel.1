@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46777)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciw7v-0008DQ-MT
+	(envelope-from <dgibson@ozlabs.org>) id 1ciw7x-0008Es-1W
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciw7p-0000Ay-Dr
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:35 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ciw7s-0000Dt-6H
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:37 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed,  1 Mar 2017 15:43:41 +1100
-Message-Id: <20170301044405.1792-27-david@gibson.dropbear.id.au>
+Date: Wed,  1 Mar 2017 15:43:55 +1100
+Message-Id: <20170301044405.1792-41-david@gibson.dropbear.id.au>
 In-Reply-To: <20170301044405.1792-1-david@gibson.dropbear.id.au>
 References: <20170301044405.1792-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 26/50] ppc/xics: remove set_nr_irqs() handler
- from XICSStateClass
+Subject: [Qemu-devel] [PULL 40/50] ppc/xics: move the cpu_setup() handler
+ under the ICPState class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,452 +28,155 @@ Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-Today, the ICS (Interrupt Controller Source) object is created and
-realized by the init and realize routines of the XICS object, but some
-of the parameters are only known at the machine level.
-
-These parameters are passed from the sPAPR machine to the ICS object
-in a rather convoluted way using property handlers and a class handler
-of the XICS object. The number of irqs required to allocate the IRQ
-state objects in the ICS realize routine is one of them.
-
-Let's simplify the process by creating the ICS object along with the
-XICS object at the machine level and link the ICS into the XICS list
-of ICSs at this level also. In the sPAPR machine, there is only a
-single ICS but that will change with the PowerNV machine.
-
-Also, QOMify the creation of the objects and get rid of the
-superfluous code.
+The cpu_setup() handler is currently under the XICSState class but it
+really belongs under ICPState as it is setting up an individual vCPU.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xics.c        | 72 +++++++++++++++++++++++++--------------------=
+ hw/intc/xics.c        |  8 +++----
+ hw/intc/xics_kvm.c    | 58 +++++++++++++++++++++++++--------------------=
 ------
- hw/intc/xics_kvm.c    | 36 +-------------------------
- hw/intc/xics_spapr.c  | 34 ------------------------
- hw/ppc/spapr.c        | 54 ++++++++++++++++++++++++++------------
  include/hw/ppc/xics.h |  3 +--
- 5 files changed, 75 insertions(+), 124 deletions(-)
+ 3 files changed, 34 insertions(+), 35 deletions(-)
 
 diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index 372b831..f00b77a 100644
+index a5be0d8..674ac4c 100644
 --- a/hw/intc/xics.c
 +++ b/hw/intc/xics.c
-@@ -151,38 +151,6 @@ static void xics_common_reset(DeviceState *d)
+@@ -66,15 +66,15 @@ void xics_cpu_setup(XICSState *xics, PowerPCCPU *cpu)
+     CPUState *cs =3D CPU(cpu);
+     CPUPPCState *env =3D &cpu->env;
+     ICPState *ss =3D &xics->ss[cs->cpu_index];
+-    XICSStateClass *info;
++    ICPStateClass *icpc;
+=20
+     assert(cs->cpu_index < xics->nr_servers);
+=20
+     ss->cs =3D cs;
+=20
+-    info =3D XICS_COMMON_GET_CLASS(xics);
+-    if (info->cpu_setup) {
+-        info->cpu_setup(ss, cpu);
++    icpc =3D ICP_GET_CLASS(ss);
++    if (icpc->cpu_setup) {
++        icpc->cpu_setup(ss, cpu);
      }
- }
 =20
--static void xics_prop_get_nr_irqs(Object *obj, Visitor *v, const char *n=
-ame,
--                                  void *opaque, Error **errp)
--{
--    XICSState *xics =3D XICS_COMMON(obj);
--    int64_t value =3D xics->nr_irqs;
--
--    visit_type_int(v, name, &value, errp);
--}
--
--static void xics_prop_set_nr_irqs(Object *obj, Visitor *v, const char *n=
-ame,
--                                  void *opaque, Error **errp)
--{
--    XICSState *xics =3D XICS_COMMON(obj);
--    XICSStateClass *info =3D XICS_COMMON_GET_CLASS(xics);
--    Error *error =3D NULL;
--    int64_t value;
--
--    visit_type_int(v, name, &value, &error);
--    if (error) {
--        error_propagate(errp, error);
--        return;
--    }
--    if (xics->nr_irqs) {
--        error_setg(errp, "Number of interrupts is already set to %u",
--                   xics->nr_irqs);
--        return;
--    }
--
--    assert(info->set_nr_irqs);
--    info->set_nr_irqs(xics, value, errp);
--}
--
- void xics_set_nr_servers(XICSState *xics, uint32_t nr_servers,
-                          const char *typename, Error **errp)
- {
-@@ -241,9 +209,6 @@ static void xics_common_initfn(Object *obj)
-     XICSState *xics =3D XICS_COMMON(obj);
-=20
-     QLIST_INIT(&xics->ics);
--    object_property_add(obj, "nr_irqs", "int",
--                        xics_prop_get_nr_irqs, xics_prop_set_nr_irqs,
--                        NULL, NULL, NULL);
-     object_property_add(obj, "nr_servers", "int",
-                         xics_prop_get_nr_servers, xics_prop_set_nr_serve=
-rs,
-                         NULL, NULL, NULL);
-@@ -746,12 +711,18 @@ static void ics_simple_realize(DeviceState *dev, Er=
-ror **errp)
-     ics->qirqs =3D qemu_allocate_irqs(ics_simple_set_irq, ics, ics->nr_i=
-rqs);
- }
-=20
-+static Property ics_simple_properties[] =3D {
-+    DEFINE_PROP_UINT32("nr-irqs", ICSState, nr_irqs, 0),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
- static void ics_simple_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-     ICSStateClass *isc =3D ICS_BASE_CLASS(klass);
-=20
--    dc->realize =3D ics_simple_realize;
-+    isc->realize =3D ics_simple_realize;
-+    dc->props =3D ics_simple_properties;
-     dc->vmsd =3D &vmstate_ics_simple;
-     dc->reset =3D ics_simple_reset;
-     isc->post_load =3D ics_simple_post_load;
-@@ -769,11 +740,40 @@ static const TypeInfo ics_simple_info =3D {
-     .instance_init =3D ics_simple_initfn,
- };
-=20
-+static void ics_base_realize(DeviceState *dev, Error **errp)
-+{
-+    ICSStateClass *icsc =3D ICS_BASE_GET_CLASS(dev);
-+    ICSState *ics =3D ICS_BASE(dev);
-+    Object *obj;
-+    Error *err =3D NULL;
-+
-+    obj =3D object_property_get_link(OBJECT(dev), "xics", &err);
-+    if (!obj) {
-+        error_setg(errp, "%s: required link 'xics' not found: %s",
-+                   __func__, error_get_pretty(err));
-+        return;
-+    }
-+    ics->xics =3D XICS_COMMON(obj);
-+
-+
-+    if (icsc->realize) {
-+        icsc->realize(dev, errp);
-+    }
-+}
-+
-+static void ics_base_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+
-+    dc->realize =3D ics_base_realize;
-+}
-+
- static const TypeInfo ics_base_info =3D {
-     .name =3D TYPE_ICS_BASE,
-     .parent =3D TYPE_DEVICE,
-     .abstract =3D true,
-     .instance_size =3D sizeof(ICSState),
-+    .class_init =3D ics_base_class_init,
-     .class_size =3D sizeof(ICSStateClass),
- };
-=20
+     switch (PPC_INPUT(env)) {
 diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-index 17694ea..e5ab00b 100644
+index 7588280..07298b0 100644
 --- a/hw/intc/xics_kvm.c
 +++ b/hw/intc/xics_kvm.c
-@@ -308,7 +308,7 @@ static void ics_kvm_class_init(ObjectClass *klass, vo=
-id *data)
+@@ -124,6 +124,34 @@ static void icp_kvm_reset(DeviceState *dev)
+     icp_set_kvm_state(icp, 1);
+ }
+=20
++static void icp_kvm_cpu_setup(ICPState *ss, PowerPCCPU *cpu)
++{
++    CPUState *cs =3D CPU(cpu);
++    int ret;
++
++    if (kernel_xics_fd =3D=3D -1) {
++        abort();
++    }
++
++    /*
++     * If we are reusing a parked vCPU fd corresponding to the CPU
++     * which was hot-removed earlier we don't have to renable
++     * KVM_CAP_IRQ_XICS capability again.
++     */
++    if (ss->cap_irq_xics_enabled) {
++        return;
++    }
++
++    ret =3D kvm_vcpu_enable_cap(cs, KVM_CAP_IRQ_XICS, 0, kernel_xics_fd,
++                              kvm_arch_vcpu_id(cs));
++    if (ret < 0) {
++        error_report("Unable to connect CPU%ld to kernel XICS: %s",
++                     kvm_arch_vcpu_id(cs), strerror(errno));
++        exit(1);
++    }
++    ss->cap_irq_xics_enabled =3D true;
++}
++
+ static void icp_kvm_class_init(ObjectClass *klass, void *data)
+ {
      DeviceClass *dc =3D DEVICE_CLASS(klass);
-     ICSStateClass *icsc =3D ICS_BASE_CLASS(klass);
-=20
--    dc->realize =3D ics_kvm_realize;
-+    icsc->realize =3D ics_kvm_realize;
-     dc->reset =3D ics_kvm_reset;
-     icsc->pre_save =3D ics_get_kvm_state;
-     icsc->post_load =3D ics_set_kvm_state;
-@@ -358,18 +358,6 @@ static void xics_kvm_cpu_setup(XICSState *xics, Powe=
-rPCCPU *cpu)
-     ss->cap_irq_xics_enabled =3D true;
+@@ -132,6 +160,7 @@ static void icp_kvm_class_init(ObjectClass *klass, vo=
+id *data)
+     dc->reset =3D icp_kvm_reset;
+     icpc->pre_save =3D icp_get_kvm_state;
+     icpc->post_load =3D icp_set_kvm_state;
++    icpc->cpu_setup =3D icp_kvm_cpu_setup;
  }
 =20
--static void xics_kvm_set_nr_irqs(XICSState *xics, uint32_t nr_irqs,
--                                 Error **errp)
+ static const TypeInfo icp_kvm_info =3D {
+@@ -324,33 +353,6 @@ static const TypeInfo ics_kvm_info =3D {
+ /*
+  * XICS-KVM
+  */
+-static void xics_kvm_cpu_setup(ICPState *ss, PowerPCCPU *cpu)
 -{
--    ICSState *ics =3D QLIST_FIRST(&xics->ics);
+-    CPUState *cs =3D CPU(cpu);
+-    int ret;
 -
--    /* This needs to be deprecated ... */
--    xics->nr_irqs =3D nr_irqs;
--    if (ics) {
--        ics->nr_irqs =3D nr_irqs;
--    }
--}
--
- static void xics_kvm_set_nr_servers(XICSState *xics, uint32_t nr_servers=
-,
-                                     Error **errp)
- {
-@@ -389,7 +377,6 @@ static void xics_kvm_realize(DeviceState *dev, Error =
-**errp)
- {
-     KVMXICSState *xicskvm =3D XICS_SPAPR_KVM(dev);
-     XICSState *xics =3D XICS_COMMON(dev);
--    ICSState *ics;
-     int i, rc;
-     Error *error =3D NULL;
-     struct kvm_create_device xics_create_device =3D {
-@@ -441,14 +428,6 @@ static void xics_kvm_realize(DeviceState *dev, Error=
- **errp)
-=20
-     xicskvm->kernel_xics_fd =3D xics_create_device.fd;
-=20
--    QLIST_FOREACH(ics, &xics->ics, list) {
--        object_property_set_bool(OBJECT(ics), true, "realized", &error);
--        if (error) {
--            error_propagate(errp, error);
--            goto fail;
--        }
+-    if (kernel_xics_fd =3D=3D -1) {
+-        abort();
 -    }
 -
-     assert(xics->nr_servers);
-     for (i =3D 0; i < xics->nr_servers; i++) {
-         object_property_set_bool(OBJECT(&xics->ss[i]), true, "realized",
-@@ -472,17 +451,6 @@ fail:
-     kvmppc_define_rtas_kernel_token(0, "ibm,int-off");
- }
-=20
--static void xics_kvm_initfn(Object *obj)
--{
--    XICSState *xics =3D XICS_COMMON(obj);
--    ICSState *ics;
+-    /*
+-     * If we are reusing a parked vCPU fd corresponding to the CPU
+-     * which was hot-removed earlier we don't have to renable
+-     * KVM_CAP_IRQ_XICS capability again.
+-     */
+-    if (ss->cap_irq_xics_enabled) {
+-        return;
+-    }
 -
--    ics =3D ICS_SIMPLE(object_new(TYPE_ICS_KVM));
--    object_property_add_child(obj, "ics", OBJECT(ics), NULL);
--    ics->xics =3D xics;
--    QLIST_INSERT_HEAD(&xics->ics, ics, list);
+-    ret =3D kvm_vcpu_enable_cap(cs, KVM_CAP_IRQ_XICS, 0, kernel_xics_fd,
+-                              kvm_arch_vcpu_id(cs));
+-    if (ret < 0) {
+-        error_report("Unable to connect CPU%ld to kernel XICS: %s",
+-                     kvm_arch_vcpu_id(cs), strerror(errno));
+-        exit(1);
+-    }
+-    ss->cap_irq_xics_enabled =3D true;
 -}
--
+=20
+ static void rtas_dummy(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+                        uint32_t token,
+@@ -429,10 +431,8 @@ fail:
  static void xics_kvm_class_init(ObjectClass *oc, void *data)
  {
      DeviceClass *dc =3D DEVICE_CLASS(oc);
-@@ -490,7 +458,6 @@ static void xics_kvm_class_init(ObjectClass *oc, void=
- *data)
+-    XICSStateClass *xsc =3D XICS_COMMON_CLASS(oc);
 =20
      dc->realize =3D xics_kvm_realize;
-     xsc->cpu_setup =3D xics_kvm_cpu_setup;
--    xsc->set_nr_irqs =3D xics_kvm_set_nr_irqs;
-     xsc->set_nr_servers =3D xics_kvm_set_nr_servers;
+-    xsc->cpu_setup =3D xics_kvm_cpu_setup;
  }
 =20
-@@ -499,7 +466,6 @@ static const TypeInfo xics_spapr_kvm_info =3D {
-     .parent        =3D TYPE_XICS_COMMON,
-     .instance_size =3D sizeof(KVMXICSState),
-     .class_init    =3D xics_kvm_class_init,
--    .instance_init =3D xics_kvm_initfn,
- };
-=20
- static void xics_kvm_register_types(void)
-diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-index 2e3f1c5..03e42a8 100644
---- a/hw/intc/xics_spapr.c
-+++ b/hw/intc/xics_spapr.c
-@@ -239,18 +239,6 @@ static void rtas_int_on(PowerPCCPU *cpu, sPAPRMachin=
-eState *spapr,
-     rtas_st(rets, 0, RTAS_OUT_SUCCESS);
- }
-=20
--static void xics_spapr_set_nr_irqs(XICSState *xics, uint32_t nr_irqs,
--                                   Error **errp)
--{
--    ICSState *ics =3D QLIST_FIRST(&xics->ics);
--
--    /* This needs to be deprecated ... */
--    xics->nr_irqs =3D nr_irqs;
--    if (ics) {
--        ics->nr_irqs =3D nr_irqs;
--    }
--}
--
- static void xics_spapr_set_nr_servers(XICSState *xics, uint32_t nr_serve=
-rs,
-                                       Error **errp)
- {
-@@ -260,7 +248,6 @@ static void xics_spapr_set_nr_servers(XICSState *xics=
-, uint32_t nr_servers,
- static void xics_spapr_realize(DeviceState *dev, Error **errp)
- {
-     XICSState *xics =3D XICS_SPAPR(dev);
--    ICSState *ics;
-     Error *error =3D NULL;
-     int i;
-=20
-@@ -282,14 +269,6 @@ static void xics_spapr_realize(DeviceState *dev, Err=
-or **errp)
-     spapr_register_hypercall(H_EOI, h_eoi);
-     spapr_register_hypercall(H_IPOLL, h_ipoll);
-=20
--    QLIST_FOREACH(ics, &xics->ics, list) {
--        object_property_set_bool(OBJECT(ics), true, "realized", &error);
--        if (error) {
--            error_propagate(errp, error);
--            return;
--        }
--    }
--
-     for (i =3D 0; i < xics->nr_servers; i++) {
-         object_property_set_bool(OBJECT(&xics->ss[i]), true, "realized",
-                                  &error);
-@@ -300,24 +279,12 @@ static void xics_spapr_realize(DeviceState *dev, Er=
-ror **errp)
-     }
- }
-=20
--static void xics_spapr_initfn(Object *obj)
--{
--    XICSState *xics =3D XICS_SPAPR(obj);
--    ICSState *ics;
--
--    ics =3D ICS_SIMPLE(object_new(TYPE_ICS_SIMPLE));
--    object_property_add_child(obj, "ics", OBJECT(ics), NULL);
--    ics->xics =3D xics;
--    QLIST_INSERT_HEAD(&xics->ics, ics, list);
--}
--
- static void xics_spapr_class_init(ObjectClass *oc, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(oc);
-     XICSStateClass *xsc =3D XICS_SPAPR_CLASS(oc);
-=20
-     dc->realize =3D xics_spapr_realize;
--    xsc->set_nr_irqs =3D xics_spapr_set_nr_irqs;
-     xsc->set_nr_servers =3D xics_spapr_set_nr_servers;
- }
-=20
-@@ -327,7 +294,6 @@ static const TypeInfo xics_spapr_info =3D {
-     .instance_size =3D sizeof(XICSState),
-     .class_size =3D sizeof(XICSStateClass),
-     .class_init    =3D xics_spapr_class_init,
--    .instance_init =3D xics_spapr_initfn,
- };
-=20
- #define ICS_IRQ_FREE(ics, srcno)   \
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 0c475f4..6729b4d 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -95,23 +95,42 @@
-=20
- #define HTAB_SIZE(spapr)        (1ULL << ((spapr)->htab_shift))
-=20
--static XICSState *try_create_xics(const char *type, int nr_servers,
--                                  int nr_irqs, Error **errp)
--{
--    Error *err =3D NULL;
--    DeviceState *dev;
-+static XICSState *try_create_xics(const char *type, const char *type_ics=
-,
-+                                  int nr_servers, int nr_irqs, Error **e=
-rrp)
-+{
-+    Error *err =3D NULL, *local_err =3D NULL;
-+    XICSState *xics;
-+    ICSState *ics =3D NULL;
-+
-+    xics =3D XICS_COMMON(object_new(type));
-+    qdev_set_parent_bus(DEVICE(xics), sysbus_get_default());
-+    object_property_set_int(OBJECT(xics), nr_servers, "nr_servers", &err=
-);
-+    object_property_set_bool(OBJECT(xics), true, "realized", &local_err)=
-;
-+    error_propagate(&err, local_err);
-+    if (err) {
-+        goto error;
-+    }
-=20
--    dev =3D DEVICE(object_new(type));
--    qdev_prop_set_uint32(dev, "nr_servers", nr_servers);
--    qdev_prop_set_uint32(dev, "nr_irqs", nr_irqs);
--    qdev_set_parent_bus(dev, sysbus_get_default());
--    object_property_set_bool(OBJECT(dev), true, "realized", &err);
-+    ics =3D ICS_SIMPLE(object_new(type_ics));
-+    object_property_add_child(OBJECT(xics), "ics", OBJECT(ics), NULL);
-+    object_property_set_int(OBJECT(ics), nr_irqs, "nr-irqs", &err);
-+    object_property_add_const_link(OBJECT(ics), "xics", OBJECT(xics), NU=
-LL);
-+    object_property_set_bool(OBJECT(ics), true, "realized", &local_err);
-+    error_propagate(&err, local_err);
-     if (err) {
--        error_propagate(errp, err);
--        object_unparent(OBJECT(dev));
--        return NULL;
-+        goto error;
-     }
--    return XICS_COMMON(dev);
-+    QLIST_INSERT_HEAD(&xics->ics, ics, list);
-+
-+    return xics;
-+
-+error:
-+    error_propagate(errp, err);
-+    if (ics) {
-+        object_unparent(OBJECT(ics));
-+    }
-+    object_unparent(OBJECT(xics));
-+    return NULL;
- }
-=20
- static XICSState *xics_system_init(MachineState *machine,
-@@ -123,8 +142,8 @@ static XICSState *xics_system_init(MachineState *mach=
-ine,
-         Error *err =3D NULL;
-=20
-         if (machine_kernel_irqchip_allowed(machine)) {
--            xics =3D try_create_xics(TYPE_XICS_SPAPR_KVM, nr_servers, nr=
-_irqs,
--                                   &err);
-+            xics =3D try_create_xics(TYPE_XICS_SPAPR_KVM, TYPE_ICS_KVM,
-+                                   nr_servers, nr_irqs, &err);
-         }
-         if (machine_kernel_irqchip_required(machine) && !xics) {
-             error_reportf_err(err,
-@@ -135,7 +154,8 @@ static XICSState *xics_system_init(MachineState *mach=
-ine,
-     }
-=20
-     if (!xics) {
--        xics =3D try_create_xics(TYPE_XICS_SPAPR, nr_servers, nr_irqs, e=
-rrp);
-+        xics =3D try_create_xics(TYPE_XICS_SPAPR, TYPE_ICS_SIMPLE, nr_se=
-rvers,
-+                               nr_irqs, errp);
-     }
-=20
-     return xics;
+ static const TypeInfo xics_spapr_kvm_info =3D {
 diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index 1aefd3d..a1d12d3 100644
+index 8325dbd..d17f62c 100644
 --- a/include/hw/ppc/xics.h
 +++ b/include/hw/ppc/xics.h
-@@ -74,7 +74,6 @@ struct XICSStateClass {
-     DeviceClass parent_class;
+@@ -73,8 +73,6 @@ typedef struct XICSFabric XICSFabric;
 =20
-     void (*cpu_setup)(XICSState *icp, PowerPCCPU *cpu);
--    void (*set_nr_irqs)(XICSState *icp, uint32_t nr_irqs, Error **errp);
-     void (*set_nr_servers)(XICSState *icp, uint32_t nr_servers, Error **=
-errp);
+ struct XICSStateClass {
+     DeviceClass parent_class;
+-
+-    void (*cpu_setup)(ICPState *icp, PowerPCCPU *cpu);
  };
 =20
-@@ -83,7 +82,6 @@ struct XICSState {
-     DeviceState parent_obj;
-     /*< public >*/
-     uint32_t nr_servers;
--    uint32_t nr_irqs;
-     ICPState *ss;
-     QLIST_HEAD(, ICSState) ics;
- };
-@@ -139,6 +137,7 @@ struct ICPState {
- struct ICSStateClass {
-     DeviceClass parent_class;
+ struct XICSState {
+@@ -101,6 +99,7 @@ struct ICPStateClass {
 =20
-+    void (*realize)(DeviceState *dev, Error **errp);
-     void (*pre_save)(ICSState *s);
-     int (*post_load)(ICSState *s, int version_id);
-     void (*reject)(ICSState *s, uint32_t irq);
+     void (*pre_save)(ICPState *s);
+     int (*post_load)(ICPState *s, int version_id);
++    void (*cpu_setup)(ICPState *icp, PowerPCCPU *cpu);
+ };
+=20
+ struct ICPState {
 --=20
 2.9.3
