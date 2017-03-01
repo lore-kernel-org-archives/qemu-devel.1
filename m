@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cj0CN-0002ul-Kv
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:05:28 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cj0CT-0002yw-Ut
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:05:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cj0CM-0001OB-Lw
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:05:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49994)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cj0CQ-0001QL-0O
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:05:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54710)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cj0CM-0001O5-GB
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:05:26 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	id 1cj0CP-0001Py-Qm
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:05:29 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A716B3D940
-	for <qemu-devel@nongnu.org>; Wed,  1 Mar 2017 09:05:26 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id F33677FB65
+	for <qemu-devel@nongnu.org>; Wed,  1 Mar 2017 09:05:29 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed,  1 Mar 2017 13:04:32 +0400
-Message-Id: <20170301090453.11075-8-marcandre.lureau@redhat.com>
+Date: Wed,  1 Mar 2017 13:04:33 +0400
+Message-Id: <20170301090453.11075-9-marcandre.lureau@redhat.com>
 In-Reply-To: <20170301090453.11075-1-marcandre.lureau@redhat.com>
 References: <20170301090453.11075-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 07/28] tests: fix endianness-test leaks
+Subject: [Qemu-devel] [PULL 08/28] tests: fix q35-test leaks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,34 +39,26 @@ Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Spotted by ASAN.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/endianness-test.c | 3 +++
+ tests/q35-test.c | 3 +++
  1 file changed, 3 insertions(+)
 
-diff --git a/tests/endianness-test.c b/tests/endianness-test.c
-index cf8d41b7b4..ed0bf52019 100644
---- a/tests/endianness-test.c
-+++ b/tests/endianness-test.c
-@@ -295,14 +295,17 @@ int main(int argc, char **argv)
-         path =3D g_strdup_printf("endianness/%s",
-                                test_cases[i].machine);
-         qtest_add_data_func(path, &test_cases[i], test_endianness);
-+        g_free(path);
+diff --git a/tests/q35-test.c b/tests/q35-test.c
+index 763fe3d6ae..cc58f3ecf4 100644
+--- a/tests/q35-test.c
++++ b/tests/q35-test.c
+@@ -71,6 +71,9 @@ static void test_smram_lock(void)
+     g_assert(smram_test_bit(pcidev, MCH_HOST_BRIDGE_SMRAM_D_OPEN) =3D=3D=
+ false);
+     smram_set_bit(pcidev, MCH_HOST_BRIDGE_SMRAM_D_OPEN, true);
+     g_assert(smram_test_bit(pcidev, MCH_HOST_BRIDGE_SMRAM_D_OPEN) =3D=3D=
+ true);
++
++    g_free(pcidev);
++    qpci_free_pc(pcibus);
+ }
 =20
-         path =3D g_strdup_printf("endianness/split/%s",
-                                test_cases[i].machine);
-         qtest_add_data_func(path, &test_cases[i], test_endianness_split)=
-;
-+        g_free(path);
-=20
-         path =3D g_strdup_printf("endianness/combine/%s",
-                                test_cases[i].machine);
-         qtest_add_data_func(path, &test_cases[i], test_endianness_combin=
-e);
-+        g_free(path);
-     }
-=20
-     return g_test_run();
+ int main(int argc, char **argv)
 --=20
 2.12.0.rc2.3.gc93709801
