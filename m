@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46579)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciw7q-00086H-Lm
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:36 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ciw7t-0008A6-HM
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciw7l-00006B-AN
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:30 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ciw7p-0000BV-N1
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:33 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed,  1 Mar 2017 15:43:27 +1100
-Message-Id: <20170301044405.1792-13-david@gibson.dropbear.id.au>
+Date: Wed,  1 Mar 2017 15:43:44 +1100
+Message-Id: <20170301044405.1792-30-david@gibson.dropbear.id.au>
 In-Reply-To: <20170301044405.1792-1-david@gibson.dropbear.id.au>
 References: <20170301044405.1792-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 12/50] target/ppc: Eliminate htab_base and
- htab_mask variables
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 29/50] ppc/xics: add an InterruptStatsProvider
+ interface to ICS and ICP objects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,451 +24,183 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, thuth@redhat.com, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, thuth@redhat.com, lvivier@redhat.com, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-CPUPPCState includes fields htab_base and htab_mask which store the base
-address (GPA) and size (as a mask) of the guest's hashed page table (HPT).
-These are set when the SDR1 register is updated.
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-Keeping these in sync with the SDR1 is actually a little bit fiddly, and
-probably not useful for performance, since keeping them expands the size of
-CPUPPCState.  It also makes some upcoming changes harder to implement.
+This is, again, to reduce the use of the list of ICS objects. Let's
+make each individual ICS and ICP object an InterruptStatsProvider and
+remove this same interface from XICSState.
 
-This patch removes these fields, in favour of calculating them directly
-from the SDR1 contents when necessary.
+The InterruptStatsProvider will be moved at the machine level after
+the XICS cleanups are completed.
 
-This does make a change to the behaviour of attempting to write a bad value
-(invalid HPT size) to the SDR1 with an mtspr instruction.  Previously, the
-bad value would be stored in SDR1 and could be retrieved with a later
-mfspr, but the HPT size as used by the softmmu would be, clamped to the
-allowed values.  Now, writing a bad value is treated as a no-op.  An error
-message is printed in both new and old versions.
-
-I'm not sure which behaviour, if either, matches real hardware.  I don't
-think it matters that much, since it's pretty clear that if an OS writes
-a bad value to SDR1, it's not going to boot.
-
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
- hw/ppc/spapr_hcall.c    |  4 ++--
- target/ppc/cpu.h        | 11 -----------
- target/ppc/machine.c    |  1 -
- target/ppc/mmu-hash32.c | 14 +++++++-------
- target/ppc/mmu-hash32.h | 26 ++++++++++++++++++++------
- target/ppc/mmu-hash64.c | 35 +++++++++++++++--------------------
- target/ppc/mmu-hash64.h | 13 +++++++++++++
- target/ppc/mmu_helper.c | 31 ++++++++++++++++---------------
- 8 files changed, 73 insertions(+), 62 deletions(-)
+ hw/intc/xics.c | 76 +++++++++++++++++++++++++++++++---------------------=
+------
+ 1 file changed, 41 insertions(+), 35 deletions(-)
 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index fd961b5..85d96f6 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -50,9 +50,9 @@ static bool has_spr(PowerPCCPU *cpu, int spr)
- static inline bool valid_ptex(PowerPCCPU *cpu, target_ulong ptex)
- {
-     /*
--     * hash value/pteg group index is normalized by htab_mask
-+     * hash value/pteg group index is normalized by HPT mask
-      */
--    if (((ptex & ~7ULL) / HPTES_PER_GROUP) & ~cpu->env.htab_mask) {
-+    if (((ptex & ~7ULL) / HPTES_PER_GROUP) & ~ppc_hash64_hpt_mask(cpu)) {
-         return false;
+diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+index d2a417f..c7c9bd6 100644
+--- a/hw/intc/xics.c
++++ b/hw/intc/xics.c
+@@ -92,44 +92,44 @@ void xics_cpu_setup(XICSState *xics, PowerPCCPU *cpu)
      }
-     return true;
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 051298b..aaf79f5 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -306,14 +306,6 @@ union ppc_tlb_t {
- #define TLB_MAS                3
- #endif
- 
--#define SDR_32_HTABORG         0xFFFF0000UL
--#define SDR_32_HTABMASK        0x000001FFUL
--
--#if defined(TARGET_PPC64)
--#define SDR_64_HTABORG         0xFFFFFFFFFFFC0000ULL
--#define SDR_64_HTABSIZE        0x000000000000001FULL
--#endif /* defined(TARGET_PPC64 */
--
- typedef struct ppc_slb_t ppc_slb_t;
- struct ppc_slb_t {
-     uint64_t esid;
-@@ -1006,9 +998,6 @@ struct CPUPPCState {
-     /* tcg TLB needs flush (deferred slb inval instruction typically) */
- #endif
-     /* segment registers */
--    hwaddr htab_base;
--    /* mask used to normalize hash value to PTEG index */
--    hwaddr htab_mask;
-     target_ulong sr[32];
-     /* externally stored hash table */
-     uint8_t *external_htab;
-diff --git a/target/ppc/machine.c b/target/ppc/machine.c
-index df9f7a4..1ccbc8a 100644
---- a/target/ppc/machine.c
-+++ b/target/ppc/machine.c
-@@ -229,7 +229,6 @@ static int cpu_post_load(void *opaque, int version_id)
-     }
- 
-     if (!env->external_htab) {
--        /* Restore htab_base and htab_mask variables */
-         ppc_store_sdr1(env, env->spr[SPR_SDR1]);
-     }
- 
-diff --git a/target/ppc/mmu-hash32.c b/target/ppc/mmu-hash32.c
-index 29bace6..03ae3c1 100644
---- a/target/ppc/mmu-hash32.c
-+++ b/target/ppc/mmu-hash32.c
-@@ -304,9 +304,9 @@ static int ppc_hash32_direct_store(PowerPCCPU *cpu, target_ulong sr,
- 
- hwaddr get_pteg_offset32(PowerPCCPU *cpu, hwaddr hash)
- {
--    CPUPPCState *env = &cpu->env;
-+    target_ulong mask = ppc_hash32_hpt_mask(cpu);
- 
--    return (hash * HASH_PTEG_SIZE_32) & env->htab_mask;
-+    return (hash * HASH_PTEG_SIZE_32) & mask;
  }
- 
- static hwaddr ppc_hash32_pteg_search(PowerPCCPU *cpu, hwaddr pteg_off,
-@@ -339,7 +339,6 @@ static hwaddr ppc_hash32_htab_lookup(PowerPCCPU *cpu,
-                                      target_ulong sr, target_ulong eaddr,
-                                      ppc_hash_pte32_t *pte)
+=20
+-static void xics_common_pic_print_info(InterruptStatsProvider *obj,
+-                                       Monitor *mon)
++static void icp_pic_print_info(InterruptStatsProvider *obj,
++                           Monitor *mon)
  {
--    CPUPPCState *env = &cpu->env;
-     hwaddr pteg_off, pte_offset;
-     hwaddr hash;
-     uint32_t vsid, pgidx, ptem;
-@@ -353,21 +352,22 @@ static hwaddr ppc_hash32_htab_lookup(PowerPCCPU *cpu,
-     qemu_log_mask(CPU_LOG_MMU, "htab_base " TARGET_FMT_plx
-             " htab_mask " TARGET_FMT_plx
-             " hash " TARGET_FMT_plx "\n",
--            env->htab_base, env->htab_mask, hash);
-+            ppc_hash32_hpt_base(cpu), ppc_hash32_hpt_mask(cpu), hash);
- 
-     /* Primary PTEG lookup */
-     qemu_log_mask(CPU_LOG_MMU, "0 htab=" TARGET_FMT_plx "/" TARGET_FMT_plx
-             " vsid=%" PRIx32 " ptem=%" PRIx32
-             " hash=" TARGET_FMT_plx "\n",
--            env->htab_base, env->htab_mask, vsid, ptem, hash);
-+            ppc_hash32_hpt_base(cpu), ppc_hash32_hpt_mask(cpu),
-+            vsid, ptem, hash);
-     pteg_off = get_pteg_offset32(cpu, hash);
-     pte_offset = ppc_hash32_pteg_search(cpu, pteg_off, 0, ptem, pte);
-     if (pte_offset == -1) {
-         /* Secondary PTEG lookup */
-         qemu_log_mask(CPU_LOG_MMU, "1 htab=" TARGET_FMT_plx "/" TARGET_FMT_plx
-                 " vsid=%" PRIx32 " api=%" PRIx32
--                " hash=" TARGET_FMT_plx "\n", env->htab_base,
--                env->htab_mask, vsid, ptem, ~hash);
-+                " hash=" TARGET_FMT_plx "\n", ppc_hash32_hpt_base(cpu),
-+                ppc_hash32_hpt_mask(cpu), vsid, ptem, ~hash);
-         pteg_off = get_pteg_offset32(cpu, ~hash);
-         pte_offset = ppc_hash32_pteg_search(cpu, pteg_off, 1, ptem, pte);
-     }
-diff --git a/target/ppc/mmu-hash32.h b/target/ppc/mmu-hash32.h
-index 5b9fb08..2ed4888 100644
---- a/target/ppc/mmu-hash32.h
-+++ b/target/ppc/mmu-hash32.h
-@@ -44,6 +44,8 @@ int ppc_hash32_handle_mmu_fault(PowerPCCPU *cpu, vaddr address, int rw,
- /*
-  * Hash page table definitions
-  */
-+#define SDR_32_HTABORG         0xFFFF0000UL
-+#define SDR_32_HTABMASK        0x000001FFUL
- 
- #define HPTES_PER_GROUP         8
- #define HASH_PTE_SIZE_32        8
-@@ -65,42 +67,54 @@ int ppc_hash32_handle_mmu_fault(PowerPCCPU *cpu, vaddr address, int rw,
- #define HPTE32_R_WIMG           0x00000078
- #define HPTE32_R_PP             0x00000003
- 
-+static inline hwaddr ppc_hash32_hpt_base(PowerPCCPU *cpu)
-+{
-+    return cpu->env.spr[SPR_SDR1] & SDR_32_HTABORG;
+-    XICSState *xics =3D XICS_COMMON(obj);
+-    ICSState *ics;
++    ICPState *icp =3D ICP(obj);
++    int cpu_index =3D icp->cs ? icp->cs->cpu_index : -1;
++
++    if (!icp->output) {
++        return;
++    }
++    monitor_printf(mon, "CPU %d XIRR=3D%08x (%p) PP=3D%02x MFRR=3D%02x\n=
+",
++                   cpu_index, icp->xirr, icp->xirr_owner,
++                   icp->pending_priority, icp->mfrr);
 +}
 +
-+static inline hwaddr ppc_hash32_hpt_mask(PowerPCCPU *cpu)
++static void ics_simple_pic_print_info(InterruptStatsProvider *obj,
++                                      Monitor *mon)
 +{
-+    return ((cpu->env.spr[SPR_SDR1] & SDR_32_HTABMASK) << 16) | 0xFFFF;
-+}
-+
- static inline target_ulong ppc_hash32_load_hpte0(PowerPCCPU *cpu,
-                                                  hwaddr pte_offset)
- {
-     CPUPPCState *env = &cpu->env;
-+    target_ulong base = ppc_hash32_hpt_base(cpu);
- 
-     assert(!env->external_htab); /* Not supported on 32-bit for now */
--    return ldl_phys(CPU(cpu)->as, env->htab_base + pte_offset);
-+    return ldl_phys(CPU(cpu)->as, base + pte_offset);
- }
- 
- static inline target_ulong ppc_hash32_load_hpte1(PowerPCCPU *cpu,
-                                                  hwaddr pte_offset)
- {
-+    target_ulong base = ppc_hash32_hpt_base(cpu);
-     CPUPPCState *env = &cpu->env;
- 
-     assert(!env->external_htab); /* Not supported on 32-bit for now */
--    return ldl_phys(CPU(cpu)->as,
--                    env->htab_base + pte_offset + HASH_PTE_SIZE_32 / 2);
-+    return ldl_phys(CPU(cpu)->as, base + pte_offset + HASH_PTE_SIZE_32 / 2);
- }
- 
- static inline void ppc_hash32_store_hpte0(PowerPCCPU *cpu,
-                                           hwaddr pte_offset, target_ulong pte0)
- {
-     CPUPPCState *env = &cpu->env;
-+    target_ulong base = ppc_hash32_hpt_base(cpu);
- 
-     assert(!env->external_htab); /* Not supported on 32-bit for now */
--    stl_phys(CPU(cpu)->as, env->htab_base + pte_offset, pte0);
-+    stl_phys(CPU(cpu)->as, base + pte_offset, pte0);
- }
- 
- static inline void ppc_hash32_store_hpte1(PowerPCCPU *cpu,
-                                           hwaddr pte_offset, target_ulong pte1)
- {
-     CPUPPCState *env = &cpu->env;
-+    target_ulong base = ppc_hash32_hpt_base(cpu);
- 
-     assert(!env->external_htab); /* Not supported on 32-bit for now */
--    stl_phys(CPU(cpu)->as,
--             env->htab_base + pte_offset + HASH_PTE_SIZE_32 / 2, pte1);
-+    stl_phys(CPU(cpu)->as, base + pte_offset + HASH_PTE_SIZE_32 / 2, pte1);
- }
- 
- typedef struct {
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index f503c69..38a6912 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -304,15 +304,13 @@ void ppc_hash64_set_sdr1(PowerPCCPU *cpu, target_ulong value,
-     CPUPPCState *env = &cpu->env;
-     target_ulong htabsize = value & SDR_64_HTABSIZE;
- 
--    env->spr[SPR_SDR1] = value;
-     if (htabsize > 28) {
-         error_setg(errp,
-                    "Invalid HTABSIZE 0x" TARGET_FMT_lx" stored in SDR1",
-                    htabsize);
--        htabsize = 28;
++    ICSState *ics =3D ICS_SIMPLE(obj);
+     uint32_t i;
+=20
+-    for (i =3D 0; i < xics->nr_servers; i++) {
+-        ICPState *icp =3D &xics->ss[i];
++    monitor_printf(mon, "ICS %4x..%4x %p\n",
++                   ics->offset, ics->offset + ics->nr_irqs - 1, ics);
+=20
+-        if (!icp->output) {
+-            continue;
+-        }
+-        monitor_printf(mon, "CPU %d XIRR=3D%08x (%p) PP=3D%02x MFRR=3D%0=
+2x\n",
+-                       i, icp->xirr, icp->xirr_owner,
+-                       icp->pending_priority, icp->mfrr);
++    if (!ics->irqs) {
 +        return;
      }
--    env->htab_mask = (1ULL << (htabsize + 18 - 7)) - 1;
--    env->htab_base = value & SDR_64_HTABORG;
-+    env->spr[SPR_SDR1] = value;
- }
- 
- void ppc_hash64_set_external_hpt(PowerPCCPU *cpu, void *hpt, int shift,
-@@ -333,10 +331,6 @@ void ppc_hash64_set_external_hpt(PowerPCCPU *cpu, void *hpt, int shift,
-         return;
-     }
- 
--    /* Not strictly necessary, but makes it clearer that an external
--     * htab is in use when debugging */
--    env->htab_base = -1;
+=20
+-    QLIST_FOREACH(ics, &xics->ics, list) {
+-        monitor_printf(mon, "ICS %4x..%4x %p\n",
+-                       ics->offset, ics->offset + ics->nr_irqs - 1, ics)=
+;
++    for (i =3D 0; i < ics->nr_irqs; i++) {
++        ICSIRQState *irq =3D ics->irqs + i;
+=20
+-        if (!ics->irqs) {
++        if (!(irq->flags & XICS_FLAGS_IRQ_MASK)) {
+             continue;
+         }
 -
-     if (kvm_enabled()) {
-         if (kvmppc_put_books_sregs(cpu) < 0) {
-             error_setg(errp, "Unable to update SDR1 in KVM");
-@@ -450,10 +444,11 @@ const ppc_hash_pte64_t *ppc_hash64_map_hptes(PowerPCCPU *cpu,
-          * accessible PTEG.
-          */
-         hptes = (ppc_hash_pte64_t *)(cpu->env.external_htab + pte_offset);
--    } else if (cpu->env.htab_base) {
-+    } else if (ppc_hash64_hpt_base(cpu)) {
-+        hwaddr base = ppc_hash64_hpt_base(cpu);
-         hwaddr plen = n * HASH_PTE_SIZE_64;
--        hptes = address_space_map(CPU(cpu)->as, cpu->env.htab_base + pte_offset,
--                                 &plen, false);
-+        hptes = address_space_map(CPU(cpu)->as, base + pte_offset,
-+                                  &plen, false);
-         if (plen < (n * HASH_PTE_SIZE_64)) {
-             hw_error("%s: Unable to map all requested HPTEs\n", __func__);
-         }
-@@ -514,13 +509,12 @@ static hwaddr ppc_hash64_pteg_search(PowerPCCPU *cpu, hwaddr hash,
-                                      target_ulong ptem,
-                                      ppc_hash_pte64_t *pte, unsigned *pshift)
- {
--    CPUPPCState *env = &cpu->env;
-     int i;
-     const ppc_hash_pte64_t *pteg;
-     target_ulong pte0, pte1;
-     target_ulong ptex;
- 
--    ptex = (hash & env->htab_mask) * HPTES_PER_GROUP;
-+    ptex = (hash & ppc_hash64_hpt_mask(cpu)) * HPTES_PER_GROUP;
-     pteg = ppc_hash64_map_hptes(cpu, ptex, HPTES_PER_GROUP);
-     if (!pteg) {
-         return -1;
-@@ -598,14 +592,15 @@ static hwaddr ppc_hash64_htab_lookup(PowerPCCPU *cpu,
-     qemu_log_mask(CPU_LOG_MMU,
-             "htab_base " TARGET_FMT_plx " htab_mask " TARGET_FMT_plx
-             " hash " TARGET_FMT_plx "\n",
--            env->htab_base, env->htab_mask, hash);
-+            ppc_hash64_hpt_base(cpu), ppc_hash64_hpt_mask(cpu), hash);
- 
-     /* Primary PTEG lookup */
-     qemu_log_mask(CPU_LOG_MMU,
-             "0 htab=" TARGET_FMT_plx "/" TARGET_FMT_plx
-             " vsid=" TARGET_FMT_lx " ptem=" TARGET_FMT_lx
-             " hash=" TARGET_FMT_plx "\n",
--            env->htab_base, env->htab_mask, vsid, ptem,  hash);
-+            ppc_hash64_hpt_base(cpu), ppc_hash64_hpt_mask(cpu),
-+            vsid, ptem,  hash);
-     ptex = ppc_hash64_pteg_search(cpu, hash, sps, ptem, pte, pshift);
- 
-     if (ptex == -1) {
-@@ -614,8 +609,8 @@ static hwaddr ppc_hash64_htab_lookup(PowerPCCPU *cpu,
-         qemu_log_mask(CPU_LOG_MMU,
-                 "1 htab=" TARGET_FMT_plx "/" TARGET_FMT_plx
-                 " vsid=" TARGET_FMT_lx " api=" TARGET_FMT_lx
--                " hash=" TARGET_FMT_plx "\n", env->htab_base,
--                env->htab_mask, vsid, ptem, ~hash);
-+                " hash=" TARGET_FMT_plx "\n", ppc_hash64_hpt_base(cpu),
-+                ppc_hash64_hpt_mask(cpu), vsid, ptem, ~hash);
- 
-         ptex = ppc_hash64_pteg_search(cpu, ~hash, sps, ptem, pte, pshift);
-     }
-@@ -933,9 +928,9 @@ void ppc_hash64_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
-         stq_p(env->external_htab + offset, pte0);
-         stq_p(env->external_htab + offset + HASH_PTE_SIZE_64 / 2, pte1);
-     } else {
--        stq_phys(CPU(cpu)->as, env->htab_base + offset, pte0);
--        stq_phys(CPU(cpu)->as,
--                 env->htab_base + offset + HASH_PTE_SIZE_64 / 2, pte1);
-+        hwaddr base = ppc_hash64_hpt_base(cpu);
-+        stq_phys(CPU(cpu)->as, base + offset, pte0);
-+        stq_phys(CPU(cpu)->as, base + offset + HASH_PTE_SIZE_64 / 2, pte1);
+-        for (i =3D 0; i < ics->nr_irqs; i++) {
+-            ICSIRQState *irq =3D ics->irqs + i;
+-
+-            if (!(irq->flags & XICS_FLAGS_IRQ_MASK)) {
+-                continue;
+-            }
+-            monitor_printf(mon, "  %4x %s %02x %02x\n",
+-                           ics->offset + i,
+-                           (irq->flags & XICS_FLAGS_IRQ_LSI) ?
+-                           "LSI" : "MSI",
+-                           irq->priority, irq->status);
+-        }
++        monitor_printf(mon, "  %4x %s %02x %02x\n",
++                       ics->offset + i,
++                       (irq->flags & XICS_FLAGS_IRQ_LSI) ?
++                       "LSI" : "MSI",
++                       irq->priority, irq->status);
      }
  }
- 
-diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
-index edd687b..5914a08 100644
---- a/target/ppc/mmu-hash64.h
-+++ b/target/ppc/mmu-hash64.h
-@@ -56,6 +56,9 @@ void ppc_hash64_update_rmls(CPUPPCState *env);
-  * Hash page table definitions
-  */
- 
-+#define SDR_64_HTABORG         0xFFFFFFFFFFFC0000ULL
-+#define SDR_64_HTABSIZE        0x000000000000001FULL
-+
- #define HPTES_PER_GROUP         8
- #define HASH_PTE_SIZE_64        16
- #define HASH_PTEG_SIZE_64       (HASH_PTE_SIZE_64 * HPTES_PER_GROUP)
-@@ -91,6 +94,16 @@ void ppc_hash64_update_rmls(CPUPPCState *env);
- #define HPTE64_V_1TB_SEG        0x4000000000000000ULL
- #define HPTE64_V_VRMA_MASK      0x4001ffffff000000ULL
- 
-+static inline hwaddr ppc_hash64_hpt_base(PowerPCCPU *cpu)
-+{
-+    return cpu->env.spr[SPR_SDR1] & SDR_64_HTABORG;
-+}
-+
-+static inline hwaddr ppc_hash64_hpt_mask(PowerPCCPU *cpu)
-+{
-+    return (1ULL << ((cpu->env.spr[SPR_SDR1] & SDR_64_HTABSIZE) + 18 - 7)) - 1;
-+}
-+
- void ppc_hash64_set_sdr1(PowerPCCPU *cpu, target_ulong value,
-                          Error **errp);
- void ppc_hash64_set_external_hpt(PowerPCCPU *cpu, void *hpt, int shift,
-diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
-index eb2d482..1381635 100644
---- a/target/ppc/mmu_helper.c
-+++ b/target/ppc/mmu_helper.c
-@@ -466,6 +466,7 @@ static int get_bat_6xx_tlb(CPUPPCState *env, mmu_ctx_t *ctx,
- static inline int get_segment_6xx_tlb(CPUPPCState *env, mmu_ctx_t *ctx,
-                                       target_ulong eaddr, int rw, int type)
+=20
+@@ -161,10 +161,8 @@ static void xics_common_initfn(Object *obj)
+ static void xics_common_class_init(ObjectClass *oc, void *data)
  {
-+    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-     hwaddr hash;
-     target_ulong vsid;
-     int ds, pr, target_page_bits;
-@@ -503,7 +504,7 @@ static inline int get_segment_6xx_tlb(CPUPPCState *env, mmu_ctx_t *ctx,
-             qemu_log_mask(CPU_LOG_MMU, "htab_base " TARGET_FMT_plx
-                     " htab_mask " TARGET_FMT_plx
-                     " hash " TARGET_FMT_plx "\n",
--                    env->htab_base, env->htab_mask, hash);
-+                    ppc_hash32_hpt_base(cpu), ppc_hash32_hpt_mask(cpu), hash);
-             ctx->hash[0] = hash;
-             ctx->hash[1] = ~hash;
- 
-@@ -518,9 +519,11 @@ static inline int get_segment_6xx_tlb(CPUPPCState *env, mmu_ctx_t *ctx,
-                 uint32_t a0, a1, a2, a3;
- 
-                 qemu_log("Page table: " TARGET_FMT_plx " len " TARGET_FMT_plx
--                         "\n", env->htab_base, env->htab_mask + 0x80);
--                for (curaddr = env->htab_base;
--                     curaddr < (env->htab_base + env->htab_mask + 0x80);
-+                         "\n", ppc_hash32_hpt_base(cpu),
-+                         ppc_hash32_hpt_mask(env) + 0x80);
-+                for (curaddr = ppc_hash32_hpt_base(cpu);
-+                     curaddr < (ppc_hash32_hpt_base(cpu)
-+                                + ppc_hash32_hpt_mask(cpu) + 0x80);
-                      curaddr += 16) {
-                     a0 = ldl_phys(cs->as, curaddr);
-                     a1 = ldl_phys(cs->as, curaddr + 4);
-@@ -1205,12 +1208,13 @@ static void mmu6xx_dump_BATs(FILE *f, fprintf_function cpu_fprintf,
- static void mmu6xx_dump_mmu(FILE *f, fprintf_function cpu_fprintf,
-                             CPUPPCState *env)
- {
-+    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-     ppc6xx_tlb_t *tlb;
-     target_ulong sr;
-     int type, way, entry, i;
- 
--    cpu_fprintf(f, "HTAB base = 0x%"HWADDR_PRIx"\n", env->htab_base);
--    cpu_fprintf(f, "HTAB mask = 0x%"HWADDR_PRIx"\n", env->htab_mask);
-+    cpu_fprintf(f, "HTAB base = 0x%"HWADDR_PRIx"\n", ppc_hash32_hpt_base(cpu));
-+    cpu_fprintf(f, "HTAB mask = 0x%"HWADDR_PRIx"\n", ppc_hash32_hpt_mask(cpu));
- 
-     cpu_fprintf(f, "\nSegment registers:\n");
-     for (i = 0; i < 32; i++) {
-@@ -1592,9 +1596,9 @@ static int cpu_ppc_handle_mmu_fault(CPUPPCState *env, target_ulong address,
-                     env->spr[SPR_DCMP] = 0x80000000 | ctx.ptem;
-                 tlb_miss:
-                     env->error_code |= ctx.key << 19;
--                    env->spr[SPR_HASH1] = env->htab_base +
-+                    env->spr[SPR_HASH1] = ppc_hash32_hpt_base(cpu) +
-                         get_pteg_offset32(cpu, ctx.hash[0]);
--                    env->spr[SPR_HASH2] = env->htab_base +
-+                    env->spr[SPR_HASH2] = ppc_hash32_hpt_base(cpu) +
-                         get_pteg_offset32(cpu, ctx.hash[1]);
-                     break;
-                 case POWERPC_MMU_SOFT_74xx:
-@@ -1999,7 +2003,6 @@ void ppc_store_sdr1(CPUPPCState *env, target_ulong value)
- {
-     qemu_log_mask(CPU_LOG_MMU, "%s: " TARGET_FMT_lx "\n", __func__, value);
-     assert(!env->external_htab);
--    env->spr[SPR_SDR1] = value;
- #if defined(TARGET_PPC64)
-     if (env->mmu_model & POWERPC_MMU_64) {
-         PowerPCCPU *cpu = ppc_env_get_cpu(env);
-@@ -2009,14 +2012,12 @@ void ppc_store_sdr1(CPUPPCState *env, target_ulong value)
-         if (local_err) {
-             error_report_err(local_err);
-             error_free(local_err);
-+            return;
-         }
--    } else
--#endif /* defined(TARGET_PPC64) */
--    {
--        /* FIXME: Should check for valid HTABMASK values */
--        env->htab_mask = ((value & SDR_32_HTABMASK) << 16) | 0xFFFF;
--        env->htab_base = value & SDR_32_HTABORG;
-     }
-+#endif /* defined(TARGET_PPC64) */
-+    /* FIXME: Should check for valid HTABMASK values in 32-bit case */
-+    env->spr[SPR_SDR1] = value;
+     DeviceClass *dc =3D DEVICE_CLASS(oc);
+-    InterruptStatsProviderClass *ic =3D INTERRUPT_STATS_PROVIDER_CLASS(o=
+c);
+=20
+     dc->reset =3D xics_common_reset;
+-    ic->print_info =3D xics_common_pic_print_info;
  }
- 
- /* Segment registers load and store */
--- 
+=20
+ static const TypeInfo xics_common_info =3D {
+@@ -174,10 +172,6 @@ static const TypeInfo xics_common_info =3D {
+     .class_size    =3D sizeof(XICSStateClass),
+     .instance_init =3D xics_common_initfn,
+     .class_init    =3D xics_common_class_init,
+-    .interfaces =3D (InterfaceInfo[]) {
+-        { TYPE_INTERRUPT_STATS_PROVIDER },
+-        { }
+-    },
+ };
+=20
+ /*
+@@ -414,10 +408,12 @@ static void icp_realize(DeviceState *dev, Error **e=
+rrp)
+ static void icp_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
++    InterruptStatsProviderClass *ic =3D INTERRUPT_STATS_PROVIDER_CLASS(k=
+lass);
+=20
+     dc->reset =3D icp_reset;
+     dc->vmsd =3D &vmstate_icp_server;
+     dc->realize =3D icp_realize;
++    ic->print_info =3D icp_pic_print_info;
+ }
+=20
+ static const TypeInfo icp_info =3D {
+@@ -426,6 +422,10 @@ static const TypeInfo icp_info =3D {
+     .instance_size =3D sizeof(ICPState),
+     .class_init =3D icp_class_init,
+     .class_size =3D sizeof(ICPStateClass),
++    .interfaces =3D (InterfaceInfo[]) {
++        { TYPE_INTERRUPT_STATS_PROVIDER },
++        { }
++    },
+ };
+=20
+ /*
+@@ -682,6 +682,7 @@ static void ics_simple_class_init(ObjectClass *klass,=
+ void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+     ICSStateClass *isc =3D ICS_BASE_CLASS(klass);
++    InterruptStatsProviderClass *ic =3D INTERRUPT_STATS_PROVIDER_CLASS(k=
+lass);
+=20
+     isc->realize =3D ics_simple_realize;
+     dc->props =3D ics_simple_properties;
+@@ -691,6 +692,7 @@ static void ics_simple_class_init(ObjectClass *klass,=
+ void *data)
+     isc->reject =3D ics_simple_reject;
+     isc->resend =3D ics_simple_resend;
+     isc->eoi =3D ics_simple_eoi;
++    ic->print_info =3D ics_simple_pic_print_info;
+ }
+=20
+ static const TypeInfo ics_simple_info =3D {
+@@ -700,6 +702,10 @@ static const TypeInfo ics_simple_info =3D {
+     .class_init =3D ics_simple_class_init,
+     .class_size =3D sizeof(ICSStateClass),
+     .instance_init =3D ics_simple_initfn,
++    .interfaces =3D (InterfaceInfo[]) {
++        { TYPE_INTERRUPT_STATS_PROVIDER },
++        { }
++    },
+ };
+=20
+ static void ics_base_realize(DeviceState *dev, Error **errp)
+--=20
 2.9.3
