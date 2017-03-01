@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cj946-0001ik-8c
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:33:31 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cj94G-0001qp-Bd
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:33:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cj943-0002LF-2O
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:33:30 -0500
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:37213)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cj942-0002Kr-R8
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:33:27 -0500
-Received: by mail-wm0-x231.google.com with SMTP id n11so6420818wma.0
-	for <qemu-devel@nongnu.org>; Wed, 01 Mar 2017 10:33:26 -0800 (PST)
-References: <CAFEAcA_KVG19uhPuBUNx4ySmebnL1Hit6=HUX9ug0FkBFMwasg@mail.gmail.com>
-	<877f492ppx.fsf@linaro.org>
-	<e28337d0-d572-cd9a-3f45-0ecc074c32c9@ilande.co.uk>
-	<874lzd2mp7.fsf@linaro.org>
-	<9efa47c0-2a5f-0229-7e27-97a0142ff22d@ilande.co.uk>
-	<871suh2ff3.fsf@linaro.org>
-	<99624def-1c99-48f9-2ad3-c93e21956dd6@ilande.co.uk>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <99624def-1c99-48f9-2ad3-c93e21956dd6@ilande.co.uk>
-Date: Wed, 01 Mar 2017 18:33:26 +0000
-Message-ID: <87zih426fd.fsf@linaro.org>
+	(envelope-from <no-reply@patchew.org>) id 1cj94C-0002SS-Um
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:33:40 -0500
+Resent-Message-Id: <E1cj94C-0002SS-Um@eggs.gnu.org>
+In-Reply-To: <20170301182618.22395-1-krzk@kernel.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148839319906.285.10296846671880555758@0e2666bad730>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] intermittent make check failure:
- "tcg_handle_interrupt: assertion failed: (qemu_mutex_iothread_locked())"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 1 Mar 2017 10:33:19 -0800 (PST)
+Subject: Re: [Qemu-devel] [RFC 0/5] hw: arm: exynos: Bring up secondary CPU
+ + CPUIDLE issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,59 +24,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: krzk@kernel.org
+Cc: famz@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, i.mitsyanko@gmail.com, shannon.zhao@linaro.org
 
-
-Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
-
-> On 01/03/17 15:19, Alex Bennée wrote:
->
->> Actually looking at where cpu_check_irq is I've pushed the BQL wraps
->> higher up:
->>
->>   https://github.com/stsquad/qemu/commit/f52e01bf4d3415ce4fad54cbb491f6c30a8e1903
->>
->> The reasoning is HW emulation code can expect to be run under the BQL.
->> Anything triggered by MMIO for example will automatically have the lock.
->> The problem is helpers which trigger hardware actions (ARM has ARM_CP_IO
->> for this). We talk about this in the design document:
->>
->>   http://git.qemu-project.org/?p=qemu.git;a=blob;f=docs/multi-thread-tcg.txt;h=a99b4564c6258576acfa141f51f4b80131969519;hb=HEAD#l201
->>
->>> I ran out of time yesterday to run through all my SPARC64 tests, however
->>> if this is the case then the issue will definitely appear in
->>> qemu-system-sparc64 which seems to be supported by people seeing
->>> intermittent failures in prom-env-test.
->>
->> So I made the change to both sparc and sparc64 in the above commit.
->>
->> I haven't managed to run into the intermittent trigger yet. How do I run
->> the test directly?
->>
->>   make tests/prom-env-test
->>
->> Just makes the test case and
->>
->>   ./tests/prom-env-test
->> **
->> ERROR:tests/libqtest.c:589:qtest_get_arch: assertion failed: (qemu != NULL)
->> Aborted (core dumped)
->
-> Yeah, I couldn't work out how to run a single test either so ended up
-> cycling through a complete set of "make check" runs in order to try and
-> provoke the assert(), and despite all this I was still unable to
-> reproduce the "make check" error locally.
->
-> Fortunately with the debian-40r4a-sparc-netinst.iso I was able to
-> reproduce it fairly easily under qemu-system-sparc so I'd suggest that
-> you go that route. If you can't find anywhere that hosts that particular
-> image for testing, do contact me off-list and I'll temporarily upload it
-> somewhere for you.
-
-It's OK I reproduced with the current etch iso. I have a patch in my
-tree that seems to work. I'll post once I've checked for any other
-places that need it.
-
---
-Alex Bennée
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzAzMDExODI2MTguMjIzOTUtMS1rcnprQGtlcm5lbC5vcmcKVHlwZTogc2VyaWVzClN1YmplY3Q6
+IFtRZW11LWRldmVsXSBbUkZDIDAvNV0gaHc6IGFybTogZXh5bm9zOiBCcmluZyB1cCBzZWNvbmRh
+cnkgQ1BVICsgQ1BVSURMRSBpc3N1ZQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
+YmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3
+YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpj
+b21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBp
+biAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQg
+bG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1h
+dD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAg
+ICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhp
+dCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
+ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNo
+ZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAxNzAzMDExODI2
+MTguMjIzOTUtMS1rcnprQGtlcm5lbC5vcmcgLT4gcGF0Y2hldy8yMDE3MDMwMTE4MjYxOC4yMjM5
+NS0xLWtyemtAa2VybmVsLm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmFjYzIy
+YjIgaHcvdGltZXIvZXh5bm9zNDIxMF9tY3Q6IFJlbW92ZSB1bnVzZWQgZGVmaW5lcwozMTJjM2Zj
+IGh3L3RpbWVyL2V4eW5vczQyMTBfbWN0OiBGaXggY2hlY2twYXRjaCBzdHlsZSBlcnJvcnMKZmI4
+OTIyNCBody90aW1lci9leHlub3M0MjEwX21jdDogQ2xlYW51cCBpbmRlbnRhdGlvbiBhbmQgZW1w
+dHkgbmV3IGxpbmVzCjA0MGYzZjggaHcvaW50Yy9leHlub3M0MjEwX2dpYzogVXNlIG1vcmUgbWVh
+bmluZ2Z1bCBuYW1lIGZvciBsb2NhbCB2YXJpYWJsZQoyMGFhNDIxIGh3L2ludGMvZXh5bm9zNDIx
+MF9naWM6IEZpeCBHSUMgbWVtb3J5IG1hcHBpbmdzIGZvciBzZWNvbmRhcnkgQ1BVCgo9PT0gT1VU
+UFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzU6IGh3L2ludGMvZXh5bm9zNDIxMF9naWM6
+IEZpeCBHSUMgbWVtb3J5IG1hcHBpbmdzIGZvciBzZWNvbmRhcnkgQ1BVLi4uCkNoZWNraW5nIFBB
+VENIIDIvNTogaHcvaW50Yy9leHlub3M0MjEwX2dpYzogVXNlIG1vcmUgbWVhbmluZ2Z1bCBuYW1l
+IGZvciBsb2NhbCB2YXJpYWJsZS4uLgpDaGVja2luZyBQQVRDSCAzLzU6IGh3L3RpbWVyL2V4eW5v
+czQyMTBfbWN0OiBDbGVhbnVwIGluZGVudGF0aW9uIGFuZCBlbXB0eSBuZXcgbGluZXMuLi4KRVJS
+T1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnJicgKGN0eDpWeFYpCiM2NDogRklMRTog
+aHcvdGltZXIvZXh5bm9zNDIxMF9tY3QuYzoxMTYzOgorICAgICAgICBpZiAob2Zmc2V0JjB4NCkg
+ewogICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA5MyBs
+aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
+dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
+bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVj
+a2luZyBQQVRDSCA0LzU6IGh3L3RpbWVyL2V4eW5vczQyMTBfbWN0OiBGaXggY2hlY2twYXRjaCBz
+dHlsZSBlcnJvcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggNS81OiBody90aW1lci9leHlub3M0MjEwX21j
+dDogUmVtb3ZlIHVudXNlZCBkZWZpbmVzLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
+YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2Fs
+bHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
+ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
