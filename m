@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cj0Ci-0003Ab-Ly
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:05:49 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cj0Cp-0003EW-By
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:05:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cj0Ch-0001b0-QN
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:05:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51354)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cj0Cl-0001bm-2H
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:05:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57450)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cj0Ch-0001at-KV
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:05:47 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	id 1cj0Ck-0001bh-Si
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:05:50 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C3ED73A7696
-	for <qemu-devel@nongnu.org>; Wed,  1 Mar 2017 09:05:47 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 18189C0A57C0
+	for <qemu-devel@nongnu.org>; Wed,  1 Mar 2017 09:05:51 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed,  1 Mar 2017 13:04:38 +0400
-Message-Id: <20170301090453.11075-14-marcandre.lureau@redhat.com>
+Date: Wed,  1 Mar 2017 13:04:39 +0400
+Message-Id: <20170301090453.11075-15-marcandre.lureau@redhat.com>
 In-Reply-To: <20170301090453.11075-1-marcandre.lureau@redhat.com>
 References: <20170301090453.11075-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 13/28] tests: fix ipmi-kcs-test leak
+Subject: [Qemu-devel] [PULL 14/28] tests: fix ipmi-bt-test leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,20 +41,20 @@ Spotted by ASAN.
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- tests/ipmi-kcs-test.c | 1 +
+ tests/ipmi-bt-test.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/tests/ipmi-kcs-test.c b/tests/ipmi-kcs-test.c
-index 9cf0b34a33..178ffc1797 100644
---- a/tests/ipmi-kcs-test.c
-+++ b/tests/ipmi-kcs-test.c
-@@ -279,6 +279,7 @@ int main(int argc, char **argv)
-     cmdline =3D g_strdup_printf("-device ipmi-bmc-sim,id=3Dbmc0"
-                               " -device isa-ipmi-kcs,bmc=3Dbmc0");
+diff --git a/tests/ipmi-bt-test.c b/tests/ipmi-bt-test.c
+index e84dd6889b..7e21a9bbcb 100644
+--- a/tests/ipmi-bt-test.c
++++ b/tests/ipmi-bt-test.c
+@@ -420,6 +420,7 @@ int main(int argc, char **argv)
+           " -device ipmi-bmc-extern,chardev=3Dipmi0,id=3Dbmc0"
+           " -device isa-ipmi-bt,bmc=3Dbmc0", emu_port);
      qtest_start(cmdline);
 +    g_free(cmdline);
      qtest_irq_intercept_in(global_qtest, "ioapic");
-     qtest_add_func("/ipmi/local/kcs_base", test_kcs_base);
-     qtest_add_func("/ipmi/local/kcs_abort", test_kcs_abort);
+     qtest_add_func("/ipmi/extern/connect", test_connect);
+     qtest_add_func("/ipmi/extern/bt_base", test_bt_base);
 --=20
 2.12.0.rc2.3.gc93709801
