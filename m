@@ -1,19 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cj0VA-0006c3-Cr
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:24:53 -0500
+	(envelope-from <marcel@redhat.com>) id 1cj0aF-0002h5-NT
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:30:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cj0V8-0000Mp-PP
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:24:52 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <87bmukmlau.fsf@dusky.pond.sub.org>
-Date: Wed, 01 Mar 2017 10:24:41 +0100
-In-Reply-To: <87bmukmlau.fsf@dusky.pond.sub.org> (Markus Armbruster's message
-	of "Thu, 02 Feb 2017 20:42:33 +0100")
-Message-ID: <8737exuz6u.fsf@dusky.pond.sub.org>
+	(envelope-from <marcel@redhat.com>) id 1cj0aB-0002SG-RD
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:30:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39886)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1cj0aB-0002SB-Ki
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:30:03 -0500
+References: <1487910561-17825-1-git-send-email-peterx@redhat.com>
+	<e547f430-d078-27a5-7064-4fc5b9f738d1@redhat.com>
+	<20170301023635.GE13926@pxdev.xzpeter.org>
+	<20170301043802-mutt-send-email-mst@kernel.org>
+	<05a23bbc-4ebc-769b-aa62-d3387af57cae@redhat.com>
+	<a35dbe8f-770e-c792-e5ea-1f4f8ef8df37@redhat.com>
+	<20170301091831.GF13926@pxdev.xzpeter.org>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <4e757875-5b48-6eb6-3847-a27787dd6edd@redhat.com>
+Date: Wed, 1 Mar 2017 11:29:47 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] Non-flat command line option argument syntax
+In-Reply-To: <20170301091831.GF13926@pxdev.xzpeter.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] intel_iommu: check misordered init when
+ realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,130 +33,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>, Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, yi.l.liu@intel.com, qemu-devel@nongnu.org, Jintack Lim <jintack@cs.columbia.edu>
 
-Markus Armbruster <armbru@redhat.com> writes:
-
-[...]
-> == Extensions of the traditional syntax ==
+On 03/01/2017 11:18 AM, Peter Xu wrote:
+> On Wed, Mar 01, 2017 at 09:03:47AM +0200, Marcel Apfelbaum wrote:
+>> On 03/01/2017 06:14 AM, Jason Wang wrote:
 >
-> Even if we accept JSON in addition to the traditional KEY=VALUE,...
-> syntax, we might want to make the traditional syntax more expressive
-> anyway.  Do we?
+> [...]
 >
-> Kevin brought up an argument for yes: without it, going from the simple,
-> flat case to the nested case involves a complete syntax change from
-> KEY=VALUE,... to JSON.
+>> Hi Jason,
+>>
+>> I am not saying we don't need to create the IOMMU before some other device,
+>> I just don't think that the command line order should matter to user.
+>>
+>> BTW, are you working on a way to limit the IOMMU scope to a specific set of devices?
+>> If yes, this approach will also help you work.
 >
-> === Dotted keys ===
+> Marcel,
 >
-> One sufficiently powerful syntax extension already exists: the dotted
-> key convention.  It's syntactically unambiguous only when none of the
-> KEYs involved contains '.'  To adopt it across the board, we'd have to
-> outlaw '.' in KEYs.  QAPI outlaws '.' already, but we have a bunch of
-> QOM properties names with '.'.  We'd have to rename at least the ones
-> that need to be accessible in -object.
+> Do you have any plan after 2.9 to re-arrange the init order thing a
+> bit? In general, maybe we need an ordering support for devices.
+
+I don;t know when I'll start it, but yes, I am thinking about
+taking this project. We need the ordering in order to be able
+to have less "built-in" devices.
+
+> Besides that, I am thinking whether it would be wise that we just init
+> the IOMMUs during machine init just like before, but keep the
+> "-device" interface? After all, at least the root IOMMU device should
+> be with root complex, and it feels a little strange we just split the
+> init process apart (we delay the IOMMU init into device
+> initializations).
 >
-> Dotted keys can't express member names that look like integers.  We'd
-> have to outlaw them at least for the objects that are accessible on the
-> command line.  Once again, QAPI outlaws such names already.  QOM is
-> anarchy when it comes to names, however.
+
+Keeping the IOMMU creation as part of the Root Complex is problematic.
+What happens if we want to limit the IOMMU scope to a subset of devices?
+How will the command line look? Also we may want/need multiple iommu
+devices per system. It will not happen tomorrow, but we don't want to loose
+this possibility.
+
+The device re-ordering is not 2.9 material of course, and we need your patch.
+The only thing we can do better is to take out the "vfio-pci" in another header
+file and and have it in a array of devices that should be checked
+(in order to avoid polluting the IOMMU code with a not related device)
+
+I can try and send a patch for it if you prefer.
+
+Thanks,
+Marcel
+
+> Not sure whether above makes sense though. Thanks,
 >
-> The way dotted keys do arrays is inconsistent with how QOM's automatic
-> arrayification (commit 3396590) do them: foo.0 vs. foo[0].  Backward
-> compatibility makes changing the dotted key convention awkward.  Perhaps
-> we can still change QOM.
+> -- peterx
 >
-> === Structured values ===
->
-> The dotted key convention messes with KEY syntax to permit structured
-> values.  Works, but the more conventional way to support structured
-> values is a syntax for structured values.  
->
-> An obvious one is to use { KEY=VALUE, ...} for objects, and [ VALUE,
-> ... ] for arrays.  Looks like this:
->
->     -drive 'driver=quorum,
->             child=[{ driver=file, filename=disk1.img },
->                    { driver=host_device, filename=/dev/sdb },
->                    { driver=nbd, host=localhost } ]'
->
-> Again, lines broken and indented for legibility; you need to join them
-> for actual use.
->
-> There's a syntactic catch, though: a value of the form [ ... ] can
-> either be an array or a string.  Which one it is depends on the type of
-> the key.  To parse this syntax, you need to know the types, unlike JSON
-> or traditional QemuOpts.  Unless we outlaw strings starting with '{' or
-> '[', which feels impractical.
->
-> But wait, there's another syntactic catch: in traditional QemuOpts, a
-> value ends at the next unescaped ',' or '\0'.  Inside an object, it now
-> also ends at the next unescaped '}', and inside an array, at the next
-> unescaped ']'.  Or perhaps at the next space (the example above assumes
-> it does).  That means we either have to provide a way to escape '}', ']'
-> and space, or find another way to delimit string values, say require '"'
-> around strings whenever the string contains "funny" characters.
->
-> So, if escaped ',' wasn't ugly and confusing enough for you...
-
-=== Implicit value types ===
-
-In JSON, the type of a value is syntactically obvious: "9", "true" and
-"null" are strings.  9, true and null are of number, boolean and null
-type, respectively
-
-Except our internal representation of numbers maps JSON number either to
-an integer (QInt) or a double (QFloat), depending on the value.  The
-QObject input visitor masks this detail: a visit of a numeric type
-succeeds when the value is representable in this type, regardless of
-QInt vs. QFloat.  The detail remains visible when you use type 'any',
-then examine the QObject yourself.  I'd recommend examining it with the
-QObject input visitor.
-
-Actually, the visitor's masking isn't tight around
-visit_start_alternate().  You have to choose whether QInt values trigger
-the integer alternative, or the float alternative.  The generated
-visitors choose the former when it can work, i.e. when the alternate
-contains an integer type.  Even when it can't actually represent the
-value.  Perhaps I can improve this some day.
-
-Traditional KEY=VALUE,... syntax does not distingish types.  With dotted
-keys, all values are scalars, so this affects only string, number,
-boolean and null.  With structured values, it also affects array and
-object.
-
-The obvious solution (proposed and implemented by Daniel Berrange) is to
-resolve this type ambiguity just like the integer vs. float ambiguity:
-you get what you ask for.  This leads to just the same issues with 'any'
-and with alternates.
-
-Code examining the QObject needs to be prepared for the difference
-between a QObject parsed from JSON (or built that way) and a QObject
-parsed from KEY=VALUE,...  You can't just pass a QObject around anymore,
-you have to pass along whether it's from JSON or from KEY=VALUE.  A good
-way to do that is to wrap the correct QObject input visitor around the
-QObject, and pass that instead.
-
-The alternate issue is more serious than with numbers.  Which
-alternative should be picked if one of them is string?  Or an enum with
-sufficiently funny values.
-
-Possible solutions:
-
-* Document as restriction, point to JSON
-
-  This is what we do for the "no way to denote empty array or object"
-  flaw.  I figure it's what we do for 2.9.  I'll make sure we have test
-  coverage.
-
-* Make the QAPI generator reject problematic alternates
-
-  Knee-jerk reaction; there may well be uses of such alternates that are
-  safely isolated from KEY=VALUE,... QObjects, and therefore perfectly
-  unambiguous.
-
-* Optional syntax to disamiguate types
-
-  We discussed this in the context of empty objects and arrays.
