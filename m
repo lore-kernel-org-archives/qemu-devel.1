@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39875)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1civKk-0000an-Eh
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 22:53:47 -0500
+	(envelope-from <jasowang@redhat.com>) id 1civbI-0003Rx-Jn
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:10:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1civKj-0003AS-Lz
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 22:53:46 -0500
-References: <1484884080-28836-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1484884080-28836-3-git-send-email-zhang.zhanghailiang@huawei.com>
-	<20170227171052.GI10201@stefanha-x1.localdomain>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <58B645AA.3030301@huawei.com>
-Date: Wed, 1 Mar 2017 11:53:14 +0800
-MIME-Version: 1.0
-In-Reply-To: <20170227171052.GI10201@stefanha-x1.localdomain>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/6] replication: add shared-disk and
- shared-disk-id options
+	(envelope-from <jasowang@redhat.com>) id 1civbD-0007L5-L0
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:10:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57924)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1civbD-0007Ky-Ft
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:10:47 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 18706C057FA9
+	for <qemu-devel@nongnu.org>; Wed,  1 Mar 2017 04:10:47 +0000 (UTC)
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed,  1 Mar 2017 12:10:40 +0800
+Message-Id: <1488341440-4347-1-git-send-email-jasowang@redhat.com>
+Subject: [Qemu-devel] [PATCH] virtio: unbreak virtio-pci with IOMMU after
+ caching ring translations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,44 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, xiecl.fnst@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, Eric Blake <eblake@redhat.com>, Wen Congyang <wency@cn.fujitsu.com>
+To: mst@redhat.com, qemu-devel@nongnu.org
+Cc: peterx@redhat.com, wexu@redhat.com, Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 2017/2/28 1:10, Stefan Hajnoczi wrote:
-> On Fri, Jan 20, 2017 at 11:47:56AM +0800, zhanghailiang wrote:
->> @@ -119,12 +136,31 @@ static int replication_open(BlockDriverState *bs, QDict *options,
->>                      "The option mode's value should be primary or secondary");
->>           goto fail;
->>       }
->> +    s->is_shared_disk = qemu_opt_get_bool(opts, REPLICATION_SHARED_DISK,
->> +                                          false);
->> +    if (s->is_shared_disk && (s->mode == REPLICATION_MODE_PRIMARY)) {
->> +        shared_disk_id = qemu_opt_get(opts, REPLICATION_SHARED_DISK_ID);
->> +        if (!shared_disk_id) {
->> +            error_setg(&local_err, "Missing shared disk blk option");
->> +            goto fail;
->> +        }
->> +        s->shared_disk_id = g_strdup(shared_disk_id);
->> +        blk = blk_by_name(s->shared_disk_id);
->> +        if (!blk) {
->> +            error_setg(&local_err, "There is no %s block", s->shared_disk_id);
->> +            goto fail;
->> +        }
->> +        /* We can't access root member of BlockBackend directly */
->> +        tmp_bs = blk_bs(blk);
->> +        s->primary_disk = QLIST_FIRST(&tmp_bs->parents);
->
-> Why is this necessary?
->
-> We already have the BlockBackend for the primary disk.  I'm not sure why
-> the BdrvChild is needed.
->
+Commit c611c76417f5 ("virtio: add MemoryListener to cache ring
+translations") registers a memory listener to dma_as. This may not
+work when IOMMU is enabled: dma_as(bus_master_as) were initialized in
+pcibus_machine_done() after virtio_realize(). This will cause a
+segfault. Fixing this by using pci_device_iommu_address_space()
+instead to make sure address space were initialized at this time.
 
-Er, the helper backup_job_create() needs the BlockDriverState for the primary disk,
-besides, we want to make it same with 'secondary_disk' in struct BDRVReplicationState.
+With this fix, IOMMU device were required to be initialized before any
+virtio-pci devices.
 
-Thanks.
-Hailiang
+Fixes: c611c76417f5 ("virtio: add MemoryListener to cache ring translations")
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+ hw/virtio/virtio-pci.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> Stefan
->
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index 5ce42af..b76f3f6 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -1153,7 +1153,7 @@ static AddressSpace *virtio_pci_get_dma_as(DeviceState *d)
+     VirtIOPCIProxy *proxy = VIRTIO_PCI(d);
+     PCIDevice *dev = &proxy->pci_dev;
+ 
+-    return pci_get_address_space(dev);
++    return pci_device_iommu_address_space(dev);
+ }
+ 
+ static int virtio_pci_add_mem_cap(VirtIOPCIProxy *proxy,
+-- 
+2.7.4
