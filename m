@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cj0PB-00064E-Ex
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:18:42 -0500
+	(envelope-from <berrange@redhat.com>) id 1cj0Pc-0006fv-64
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:19:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cj0P8-0006eO-B4
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:18:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51516)
+	(envelope-from <berrange@redhat.com>) id 1cj0PW-0006l0-26
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:19:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53650)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cj0P8-0006e1-5s
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:18:38 -0500
-Date: Wed, 1 Mar 2017 17:18:31 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170301091831.GF13926@pxdev.xzpeter.org>
-References: <1487910561-17825-1-git-send-email-peterx@redhat.com>
-	<e547f430-d078-27a5-7064-4fc5b9f738d1@redhat.com>
-	<20170301023635.GE13926@pxdev.xzpeter.org>
-	<20170301043802-mutt-send-email-mst@kernel.org>
-	<05a23bbc-4ebc-769b-aa62-d3387af57cae@redhat.com>
-	<a35dbe8f-770e-c792-e5ea-1f4f8ef8df37@redhat.com>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cj0PV-0006kd-Pm
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:19:01 -0500
+Date: Wed, 1 Mar 2017 09:18:51 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170301091851.GD17125@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170221105918.GA22731@stefanha-x1.localdomain>
+	<20170221113353.GC17041@redhat.com>
+	<20170222140920.GA10201@stefanha-x1.localdomain>
+	<20170222142230.GR28937@redhat.com>
+	<20170222144407.GS19045@localhost.localdomain>
+	<CAAo6VWPWjRTE3t9myt7Q6gTnZcvP72ypTE03PCFfJkvb2UWLTA@mail.gmail.com>
+	<20170224091916.GD3702@redhat.com>
+	<CAAo6VWPyQrjSp2qjvxqXRPS8=5N85i0-DJdkWhiGaXmND_8+qA@mail.gmail.com>
+	<20170227092207.GA18219@redhat.com>
+	<CAAo6VWO6zAijMMjHOkefO22wh+6dXigZ6a+g-pMNBcM0MN1HHw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <a35dbe8f-770e-c792-e5ea-1f4f8ef8df37@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] intel_iommu: check misordered init when
- realize
+In-Reply-To: <CAAo6VWO6zAijMMjHOkefO22wh+6dXigZ6a+g-pMNBcM0MN1HHw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
+ block device type called "vxhs"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,33 +37,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, yi.l.liu@intel.com, qemu-devel@nongnu.org, Jintack Lim <jintack@cs.columbia.edu>
+To: ashish mittal <ashmit602@gmail.com>
+Cc: Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
 
-On Wed, Mar 01, 2017 at 09:03:47AM +0200, Marcel Apfelbaum wrote:
-> On 03/01/2017 06:14 AM, Jason Wang wrote:
+On Tue, Feb 28, 2017 at 02:51:39PM -0800, ashish mittal wrote:
+> On Mon, Feb 27, 2017 at 1:22 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
 
-[...]
-
-> Hi Jason,
+> >> +        ret = -EINVAL;
+> >> +        goto out;
+> >> +    }
+> >> +
+> >> +    secretid = qemu_opt_get(opts, VXHS_OPT_SECRETID);
+> >> +    if (!secretid) {
+> >> +        error_setg(&local_err, "please specify the ID of the secret to be "
+> >> +                   "used for authenticating to target");
+> >> +        qdict_del(backing_options, str);
+> >> +        ret = -EINVAL;
+> >> +        goto out;
+> >> +    }
+> >> +
+> >> +    /* check if we got password via the --object argument */
+> >> +    password = qcrypto_secret_lookup_as_utf8(secretid, &local_err);
+> >> +    if (local_err != NULL) {
+> >> +        trace_vxhs_get_creds(user, secretid, password);
+> >> +        qdict_del(backing_options, str);
+> >> +        ret = -EINVAL;
+> >> +        goto out;
+> >> +    }
+> >> +    trace_vxhs_get_creds(user, secretid, password);
+> >> +
+> >>      s->vdisk_hostinfo.host = g_strdup(server_host_opt);
+> >>
+> >>      s->vdisk_hostinfo.port = g_ascii_strtoll(qemu_opt_get(tcp_opts,
 > 
-> I am not saying we don't need to create the IOMMU before some other device,
-> I just don't think that the command line order should matter to user.
+> The next thing we need consensus on, is to decide exactly what
+> additional information to pass.
 > 
-> BTW, are you working on a way to limit the IOMMU scope to a specific set of devices?
-> If yes, this approach will also help you work.
+> (1) Current security implementation in VxHS uses the SSL key and
+> certificate files. Do you think we can achieve all the intended
+> security goals if we pass these two files paths (and names?) from the
+> command line?
 
-Marcel,
+Yes, that's how other parts of QEMU deal with SSL
 
-Do you have any plan after 2.9 to re-arrange the init order thing a
-bit? In general, maybe we need an ordering support for devices.
-Besides that, I am thinking whether it would be wise that we just init
-the IOMMUs during machine init just like before, but keep the
-"-device" interface? After all, at least the root IOMMU device should
-be with root complex, and it feels a little strange we just split the
-init process apart (we delay the IOMMU init into device
-initializations).
+NB, QEMU needs to pass 3 paths to libqnoio - the client cert, the
+client key, and the certificate authority certlist 
 
-Not sure whether above makes sense though. Thanks,
+> (2) If we are OK to continue with the present security scheme (using
+> key and cert), then the only additional change needed might be to
+> accept these files on the command line.
 
--- peterx
+Yep, I think that's the minimum required change to make this mergable.
+
+> (3) If we decide to rely on file permissions and SELinux policy to
+> protect these key/cert files, then we don't need to pass the file
+> names as a secret, instead, passing them as regular qemu_opt_get()
+> options might be enough.
+
+That's correct - you can assume file permissions protect the cert
+files. I would expect the syntax to work as follows
+
+  $QEMU  -object tls-creds-x509,id=tls0,dir=/etc/pki/qemu/vxhs,endpoint=client \
+         -drive  driver=vxhs,...other..opts...,tls-creds=tls0
+
+When you see the 'tls-creds' flag, you can lookup the corresponding
+QCryptoTLSCredsX509 object and extract the 'dir' property from it.
+
+The include/crypto/tlscredsx509.h file has constants defined for the
+standard filenames - eg you would concatenate the directory with
+the constants QCRYPTO_TLS_CREDS_X509_CLIENT_KEY.
+
+This gives the filenames you can then pass to libqnio
+
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
