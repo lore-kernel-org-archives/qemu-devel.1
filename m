@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43983)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1ciy6q-0007UZ-BN
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 01:51:37 -0500
+	(envelope-from <marcel@redhat.com>) id 1ciyJ7-0005ZM-GG
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 02:04:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1ciy6n-0005rE-91
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 01:51:36 -0500
-Received: from mga02.intel.com ([134.134.136.20]:19429)
+	(envelope-from <marcel@redhat.com>) id 1ciyJ2-0001S9-Ig
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 02:04:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44684)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kevin.tian@intel.com>)
-	id 1ciy6m-0005oZ-Ve
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 01:51:33 -0500
-From: "Tian, Kevin" <kevin.tian@intel.com>
-Date: Wed, 1 Mar 2017 06:51:22 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D190C4FF94@SHSMSX101.ccr.corp.intel.com>
-References: <A2975661238FB949B60364EF0F2C257436DE3165@shsmsx102.ccr.corp.intel.com>
-	<20170228220719.GD2352@char.us.ORACLE.com>
-In-Reply-To: <20170228220719.GD2352@char.us.ORACLE.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1ciyJ2-0001Rv-9t
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 02:04:12 -0500
+References: <1487910561-17825-1-git-send-email-peterx@redhat.com>
+	<e547f430-d078-27a5-7064-4fc5b9f738d1@redhat.com>
+	<20170301023635.GE13926@pxdev.xzpeter.org>
+	<20170301043802-mutt-send-email-mst@kernel.org>
+	<05a23bbc-4ebc-769b-aa62-d3387af57cae@redhat.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <a35dbe8f-770e-c792-e5ea-1f4f8ef8df37@redhat.com>
+Date: Wed, 1 Mar 2017 09:03:47 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC Design Doc v3] Enable Shared Virtual Memory
- feature in pass-through scenarios
+In-Reply-To: <05a23bbc-4ebc-769b-aa62-d3387af57cae@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] intel_iommu: check misordered init when
+ realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,71 +31,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, "Liu, Yi L" <yi.l.liu@intel.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Lan, Tianyu" <tianyu.lan@intel.com>, "Peng, Chao P" <chao.p.peng@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Hao, Xudong" <xudong.hao@intel.com>, "Sun, Yi Y" <yi.y.sun@intel.com>, 'Peter Xu' <peterx@redhat.com>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "Pan, Jacob jun" <jacob.jun.pan@intel.com>
+To: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Peter Xu <peterx@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, yi.l.liu@intel.com, qemu-devel@nongnu.org, Jintack Lim <jintack@cs.columbia.edu>
 
-> From: Konrad Rzeszutek Wilk [mailto:konrad.wilk@oracle.com]
-> Sent: Wednesday, March 01, 2017 6:07 AM
->=20
-> On Wed, Nov 30, 2016 at 08:49:24AM +0000, Liu, Yi L wrote:
-> > What's changed from v2:
-> > a) Detailed feature description
-> > b) refine description in "Address translation in virtual SVM"
-> > b) "Terms" is added
-> >
-> > Content
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > 1. Feature description
-> > 2. Why use it?
-> > 3. How to enable it
-> > 4. How to test
-> > 5. Terms
-> >
-> > Details
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > 1. Feature description
-> > Shared virtual memory(SVM) is to let application program share its virt=
-ual
-> > address with SVM capable devices.
-> >
-> > Shared virtual memory details:
-> > a) SVM feature requires ATS/PRQ/PASID support on both device side and
-> > IOMMU side.
-> > b) SVM capable devices could send DMA requests with PASID, the address
-> > in the request would be a virtual address within a program's virtual ad=
-dress
-> > space.
-> > c) IOMMU would use first level page table to translate the address in t=
-he
-> > request.
-> > d) First level page table is a HVA->HPA mapping on bare metal.
-> >
-> > Shared Virtual Memory feature in pass-through scenarios is actually SVM
-> > virtualization. It is to let application programs(running in guest)shar=
-e their
-> > virtual address with assigned device(e.g. graphics processors or accele=
-rators).
->=20
-> I think I am missing something obvious, but the current way that DRM
-> works is that the kernel sets up its VA addresses for the GPU and it uses
-> that for its ring. It also setups an user level mapping for the GPU if th=
+On 03/01/2017 06:14 AM, Jason Wang wrote:
+>
+>
+> On 2017=E5=B9=B403=E6=9C=8801=E6=97=A5 11:23, Michael S. Tsirkin wrote:
+>> On Wed, Mar 01, 2017 at 10:36:35AM +0800, Peter Xu wrote:
+>>> On Tue, Feb 28, 2017 at 04:42:25PM +0200, Marcel Apfelbaum wrote:
+>>>> On 02/24/2017 06:29 AM, Peter Xu wrote:
+>>>>> Intel vIOMMU devices are created with "-device" parameter, while he=
+re
+>>>>> actually we need to make sure the dmar device be created before oth=
+er
+>>>>> PCI devices (like vfio-pci) so that we know iommu_fn will be setup
+>>>>> correctly before realizations of those PCI devices (it is sensible =
+that
+>>>>> PCI device fetch these info during its realization). Now this order=
+ing
+>>>>> yet cannot be achieved elsewhere, and devices will be created in th=
 e
-> application (Xorg) really wants it - but most of the time the kernel is
-> in charge of poking at the ring, and the memory that is shared with the
-> Xorg is normal RAM allocated via alloc_pages (see
-> drivers/gpu/drm/ttm/ttm_page_alloc_dma.c
-> and drivers/gpu/drm/ttm/ttm_page_alloc.c).
->=20
-> So are talking about the guest applications having access to the
-> ring of the GPU?
+>>>>> order that user specified. That might be dangerous.
+>>>>>
+>>>>> Here we add one more function to detect this kind of misordering is=
+sue,
+>>>>> then report to guest. Currently, the only known device that is affe=
+cted
+>>>>> by this VT-d defect is the vfio-pci typed devices. So for now we ju=
+st
+>>>>> check against it to make sure we are safe.
+>>>>>
+>>>> Hi,
+>>>> I can't say that I like it but if we want it for 2.9 maybe we don't =
+have a choice.
+>>>>
+>>>> I mentioned in another thread other idea:
+>>>>      Maybe we should follow the same "template" as disk/drive, nic/n=
+etdev ?
+>>>>      I mean something like -device iommu,id=3Di1, -device vfio-pci,i=
+ommu=3De1 .
+>>>> You are able to change the order, I didn't look how it is done.
+>>> I suppose that's done by using different keywords. For example:
+>>>
+>>>    -netdev user,id=3Dnet0 -device e1000,netdev=3Dnet0
+>>>
+>>> Here we are using "netdev" for the backend and "device" for the
+>>> frontend.
+>>>
+>>> Since we have this difference, we can just make sure the ordering by
+>>> init netdev first (in net_init_clients()), then the devices (in
+>>> device_init_func()).
+>>>
+>>>> A nice side effect is that you can:
+>>>>   1. Limit the iommu scope only to the devices you want to protect (=
+tweaking APCI tables)
+>>>>   2. In the future we can support multiple iommu devices.
+>> Unfortunately AFAIK this needs a bunch of work in practice:
+>> host and guest side.
+>> So this opens a can of worms: you can all too easily create
+>> configurations that we don't support.
+>>
+>>
+>>> Yes. Thanks,
+>>>
+>>> -- peterx
+>> While I agree this fixes the specific problem, we have the ordering
+>> issue in many other places.
+>
+> Yes, just post a fix for virtio-pci with IOMMU. With this fix, we meet =
+the exact issue as this patch, IOMMU needs to be created before any virti=
+o-pci devices.
+>
 
-No. SVM is purely about sharing CPU address space with device. Command
-submission is still through kernel driver which controls rings (with SVM th=
-en
-you can put VA into those commands). There are other vendor specific=20
-features to enable direct user space submission which is orthogonal to SVM.
+Hi Jason,
 
-Thanks
-Kevin
+I am not saying we don't need to create the IOMMU before some other devic=
+e,
+I just don't think that the command line order should matter to user.
+
+BTW, are you working on a way to limit the IOMMU scope to a specific set =
+of devices?
+If yes, this approach will also help you work.
+
+Thanks,
+Marcel
+
+> Thanks
+>
+>>   For example, this is one of the reasons we
+>> don't create built-in PC devices using QOM composition.
+>>
+>> So I think that support for dependencies does make a lot of sense
+>> generally.
+>>
+>>
+>
