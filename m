@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43638)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46009)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <oussemakeder@yahoo.fr>) id 1cj0vP-0005eE-76
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:52:00 -0500
+	(envelope-from <peterx@redhat.com>) id 1cj12p-0003HZ-M9
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:59:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <oussemakeder@yahoo.fr>) id 1cj0vL-0004rA-An
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:51:59 -0500
-Received: from nm6.bullet.mail.ir2.yahoo.com ([212.82.96.68]:56623)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <oussemakeder@yahoo.fr>) id 1cj0vK-0004qe-Ux
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:51:55 -0500
-Date: Wed, 1 Mar 2017 09:51:52 +0000 (UTC)
-From: oussema ben khedher <oussemakeder@yahoo.fr>
-Reply-To: oussema ben khedher <oussemakeder@yahoo.fr>
-Message-ID: <1174847004.5500748.1488361912027@mail.yahoo.com>
+	(envelope-from <peterx@redhat.com>) id 1cj12l-0007IV-QF
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:59:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44440)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cj12l-0007ID-IA
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:59:35 -0500
+Date: Wed, 1 Mar 2017 17:59:28 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170301095928.GG13926@pxdev.xzpeter.org>
+References: <1487910561-17825-1-git-send-email-peterx@redhat.com>
+	<e547f430-d078-27a5-7064-4fc5b9f738d1@redhat.com>
+	<20170301023635.GE13926@pxdev.xzpeter.org>
+	<20170301043802-mutt-send-email-mst@kernel.org>
+	<05a23bbc-4ebc-769b-aa62-d3387af57cae@redhat.com>
+	<a35dbe8f-770e-c792-e5ea-1f4f8ef8df37@redhat.com>
+	<20170301091831.GF13926@pxdev.xzpeter.org>
+	<4e757875-5b48-6eb6-3847-a27787dd6edd@redhat.com>
 MIME-Version: 1.0
-References: <1174847004.5500748.1488361912027.ref@mail.yahoo.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] adress of translation block
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <4e757875-5b48-6eb6-3847-a27787dd6edd@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] intel_iommu: check misordered init when
+ realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,11 +34,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, yi.l.liu@intel.com, qemu-devel@nongnu.org, Jintack Lim <jintack@cs.columbia.edu>
 
-hi=C2=A0
-i need help because im really blocked in my educational project=C2=A0
-my problem is i how can i find the adress of the =C2=A0instruction of the e=
-nd of translation block in qemu (usually it's branch instruction) or the ad=
-ress of the translation block
-=C2=A0your advice will be very helpful for me =C2=A0.thanks
+On Wed, Mar 01, 2017 at 11:29:47AM +0200, Marcel Apfelbaum wrote:
+> On 03/01/2017 11:18 AM, Peter Xu wrote:
+> >On Wed, Mar 01, 2017 at 09:03:47AM +0200, Marcel Apfelbaum wrote:
+> >>On 03/01/2017 06:14 AM, Jason Wang wrote:
+> >
+> >[...]
+> >
+> >>Hi Jason,
+> >>
+> >>I am not saying we don't need to create the IOMMU before some other device,
+> >>I just don't think that the command line order should matter to user.
+> >>
+> >>BTW, are you working on a way to limit the IOMMU scope to a specific set of devices?
+> >>If yes, this approach will also help you work.
+> >
+> >Marcel,
+> >
+> >Do you have any plan after 2.9 to re-arrange the init order thing a
+> >bit? In general, maybe we need an ordering support for devices.
+> 
+> I don;t know when I'll start it, but yes, I am thinking about
+> taking this project. We need the ordering in order to be able
+> to have less "built-in" devices.
+
+That'll be great!
+
+> 
+> >Besides that, I am thinking whether it would be wise that we just init
+> >the IOMMUs during machine init just like before, but keep the
+> >"-device" interface? After all, at least the root IOMMU device should
+> >be with root complex, and it feels a little strange we just split the
+> >init process apart (we delay the IOMMU init into device
+> >initializations).
+> >
+> 
+> Keeping the IOMMU creation as part of the Root Complex is problematic.
+> What happens if we want to limit the IOMMU scope to a subset of devices?
+> How will the command line look? Also we may want/need multiple iommu
+> devices per system. It will not happen tomorrow, but we don't want to loose
+> this possibility.
+
+I think that won't be a big problem. E.g., I don't see big problem if
+we just create all these vIOMMUs along with machine init. Is there?
+
+IMHO we can just pick these vIOMMU "devices" out of the device list,
+and we can avoid doing that again in general device_init_func().
+
+> 
+> The device re-ordering is not 2.9 material of course, and we need your patch.
+> The only thing we can do better is to take out the "vfio-pci" in another header
+> file and and have it in a array of devices that should be checked
+> (in order to avoid polluting the IOMMU code with a not related device)
+> 
+> I can try and send a patch for it if you prefer.
+
+IMHO it'll be okay we "pollute" vtd code for a short while. We can
+revert my patch (or any workarounds, like Jason's just posted one)
+when we have device ordering support, and when we have a correct
+bus_master_as when device init.
+
+Thanks,
+
+-- peterx
