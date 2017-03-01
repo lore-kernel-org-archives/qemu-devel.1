@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54568)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cj9vd-0006Wl-Mb
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 14:28:50 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cj9xU-00079f-Jv
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 14:30:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cj9vc-0001NW-RP
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 14:28:49 -0500
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:37652)
+	(envelope-from <rth7680@gmail.com>) id 1cj9xR-00029G-A8
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 14:30:44 -0500
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:33711)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cj9vc-0001Mt-Ju
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 14:28:48 -0500
-Received: by mail-wm0-x234.google.com with SMTP id n11so7521636wma.0
-	for <qemu-devel@nongnu.org>; Wed, 01 Mar 2017 11:28:46 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cj9xR-00028g-3t
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 14:30:41 -0500
+Received: by mail-qk0-x244.google.com with SMTP id n186so13260342qkb.0
+	for <qemu-devel@nongnu.org>; Wed, 01 Mar 2017 11:30:41 -0800 (PST)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <41cc9d11-2e28-5b5e-4772-81a118d79111@redhat.com>
+	<20170227101817.11748-1-mmarek@suse.com>
+	<41e6edc0-204b-62b7-93b8-b376a40542d6@twiddle.net>
+	<bf246870-6e7c-f540-7cd4-3a20d5912162@redhat.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <ea3392d8-cd07-64e0-134a-4f111fe853db@twiddle.net>
+Date: Thu, 2 Mar 2017 06:30:33 +1100
 MIME-Version: 1.0
-In-Reply-To: <1488302176-19463-1-git-send-email-peter.maydell@linaro.org>
-References: <1488302176-19463-1-git-send-email-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 1 Mar 2017 19:28:25 +0000
-Message-ID: <CAFEAcA9VV8d+DGx5qN38npAqve7o5+copu3FFvFF2dnrSRExTg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 00/21] target-arm queue
+In-Reply-To: <bf246870-6e7c-f540-7cd4-3a20d5912162@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4] target-s390x: Implement stfl and stfle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +32,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>, Michal Marek <mmarek@suse.com>, Alexander Graf <agraf@suse.de>
+Cc: qemu-devel@nongnu.org, Miroslav Benes <mbenes@suse.cz>, Eric Bischoff <ebischoff@suse.com>
 
-On 28 February 2017 at 17:15, Peter Maydell <peter.maydell@linaro.org> wrote:
-> Second lot of ARM changes to sneak in before freeze:
->  * fixed version of the raspi2 sd controller patches
->  * GICv3 save/restore
->  * v7M QOMify
+On 03/01/2017 07:00 PM, Thomas Huth wrote:
+>> Primarily, it does not raise an exception for error.
 >
-> I've also included the Linux header update patches stolen
-> from Paolo's pullreq since it hasn't quite hit master yet.
->
-> thanks
-> -- PMM
->
-> The following changes since commit 1bbe5dc66b770d7bedd1d51d7935da948a510dd6:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20170228' into staging (2017-02-28 14:50:17 +0000)
->
-> are available in the git repository at:
->
->   git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20170228-1
->
-> for you to fetch changes up to 1eeb5c7deacbfb4d4cad17590a16a99f3d85eabb:
->
->   bcm2835: add sdhost and gpio controllers (2017-02-28 17:10:00 +0000)
->
-> ----------------------------------------------------------------
-> target-arm queue:
->  * raspi2: add gpio controller and sdhost controller, with
->    the wiring so the guest can switch which controller the
->    SD card is attached to
->    (this is sufficient to get raspbian kernels to boot)
->  * GICv3: support state save/restore from KVM
->  * update Linux headers to 4.11
->  * refactor and QOMify the ARMv7M container object
+> Protection and page faults should be generated properly via
+> trigger_access_exception() there ... or did I miss something?
 
-Applied, thanks.
+So why does s390_cpu_virt_mem_rw document that it returns non-zero if there was 
+an error?
 
--- PMM
+I see you do raise an exception on the TCG path (via translate_pages), but not 
+the KVM path.  That is very confusing.
+
+> AR = Access Register ... they are needed when the CPU runs in access
+> register mode (i.e. the AS PSW bits are 01). AFAIK we don't emulate this
+> in QEMU yet, but the KVM_S390_MEM_OP ioctl already supports it.
+
+Hmm.  I guess I don't know how to read that then.
+
+>> Your writes need to look a lot more like fast_memmove in mem_helper.c,
+>> except that of course only the destination needs translation.
+>
+> I still think that s390_cpu_virt_mem_write() should be fine here, too.
+
+Ideally you'd interact with the TCG TLB in some way so that you didn't have to 
+manage your own translation and your own exceptions.  That's what fast_memmove 
+does.
+
+>
+>> Of course, in practice we could reduce this to just one cpu_stl_data for
+>> STFL and one or two cpu_stq_data for STFLE.
+>
+> I think STFLE can store more than two 64-bit words, can't it?
+
+Technically, yes.  But there are less than 128 bits defined.  Certainly much 
+less than the 4k bits that Michal prepares for.
+
+
+r~
