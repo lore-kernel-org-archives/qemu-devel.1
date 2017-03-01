@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46918)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciw7y-0008HB-QM
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:43 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ciw7y-0008HC-RA
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciw7u-0000GW-Px
+	(envelope-from <dgibson@ozlabs.org>) id 1ciw7t-0000FZ-Ti
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:38 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed,  1 Mar 2017 15:43:50 +1100
-Message-Id: <20170301044405.1792-36-david@gibson.dropbear.id.au>
+Date: Wed,  1 Mar 2017 15:43:54 +1100
+Message-Id: <20170301044405.1792-40-david@gibson.dropbear.id.au>
 In-Reply-To: <20170301044405.1792-1-david@gibson.dropbear.id.au>
 References: <20170301044405.1792-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 35/50] ppc/xics: register the reset handler of
- ICS objects
+Subject: [Qemu-devel] [PULL 39/50] ppc/xics: simplify the cpu_setup() handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +27,78 @@ Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-The reset of the ICS objects is currently handled by XICS but this can
-be done for each individual ICS. This also reduces the use of the XICS
-list of ICS.
+The cpu_setup() handler currently takes a 'XICSState *' argument to
+grab the kernel ICP file descriptor. This interface can be simplified
+by using the 'xics' backlink of the ICP object.
+
+This change is also required by subsequent patches which makes use of
+the QOM interface for XICS.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xics.c | 5 -----
- hw/ppc/spapr.c | 1 +
- 2 files changed, 1 insertion(+), 5 deletions(-)
+ hw/intc/xics.c        | 5 +++--
+ hw/intc/xics_kvm.c    | 9 ++-------
+ include/hw/ppc/xics.h | 2 +-
+ 3 files changed, 6 insertions(+), 10 deletions(-)
 
 diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index a71d385..97775c2 100644
+index f828bcb..a5be0d8 100644
 --- a/hw/intc/xics.c
 +++ b/hw/intc/xics.c
-@@ -139,16 +139,11 @@ static void ics_simple_pic_print_info(InterruptStat=
-sProvider *obj,
- static void xics_common_reset(DeviceState *d)
+@@ -66,14 +66,15 @@ void xics_cpu_setup(XICSState *xics, PowerPCCPU *cpu)
+     CPUState *cs =3D CPU(cpu);
+     CPUPPCState *env =3D &cpu->env;
+     ICPState *ss =3D &xics->ss[cs->cpu_index];
+-    XICSStateClass *info =3D XICS_COMMON_GET_CLASS(xics);
++    XICSStateClass *info;
+=20
+     assert(cs->cpu_index < xics->nr_servers);
+=20
+     ss->cs =3D cs;
+=20
++    info =3D XICS_COMMON_GET_CLASS(xics);
+     if (info->cpu_setup) {
+-        info->cpu_setup(xics, cpu);
++        info->cpu_setup(ss, cpu);
+     }
+=20
+     switch (PPC_INPUT(env)) {
+diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+index 86ddf47..7588280 100644
+--- a/hw/intc/xics_kvm.c
++++ b/hw/intc/xics_kvm.c
+@@ -324,16 +324,11 @@ static const TypeInfo ics_kvm_info =3D {
+ /*
+  * XICS-KVM
+  */
+-static void xics_kvm_cpu_setup(XICSState *xics, PowerPCCPU *cpu)
++static void xics_kvm_cpu_setup(ICPState *ss, PowerPCCPU *cpu)
  {
-     XICSState *xics =3D XICS_COMMON(d);
--    ICSState *ics;
-     int i;
+-    CPUState *cs;
+-    ICPState *ss;
++    CPUState *cs =3D CPU(cpu);
+     int ret;
 =20
-     for (i =3D 0; i < xics->nr_servers; i++) {
-         device_reset(DEVICE(&xics->ss[i]));
-     }
+-    cs =3D CPU(cpu);
+-    ss =3D &xics->ss[cs->cpu_index];
 -
--    QLIST_FOREACH(ics, &xics->ics, list) {
--        device_reset(DEVICE(ics));
--    }
- }
-=20
- static void xics_common_initfn(Object *obj)
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index a4e4b86..a5e6072 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -114,6 +114,7 @@ static XICSState *try_create_xics(sPAPRMachineState *=
-spapr,
+-    assert(cs->cpu_index < xics->nr_servers);
+     if (kernel_xics_fd =3D=3D -1) {
+         abort();
      }
+diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+index 01ca5e2..8325dbd 100644
+--- a/include/hw/ppc/xics.h
++++ b/include/hw/ppc/xics.h
+@@ -74,7 +74,7 @@ typedef struct XICSFabric XICSFabric;
+ struct XICSStateClass {
+     DeviceClass parent_class;
 =20
-     ics =3D ICS_SIMPLE(object_new(type_ics));
-+    qdev_set_parent_bus(DEVICE(ics), sysbus_get_default());
-     object_property_add_child(OBJECT(spapr), "ics", OBJECT(ics), NULL);
-     object_property_set_int(OBJECT(ics), nr_irqs, "nr-irqs", &err);
-     object_property_add_const_link(OBJECT(ics), "xics", OBJECT(xics), NU=
-LL);
+-    void (*cpu_setup)(XICSState *icp, PowerPCCPU *cpu);
++    void (*cpu_setup)(ICPState *icp, PowerPCCPU *cpu);
+ };
+=20
+ struct XICSState {
 --=20
 2.9.3
