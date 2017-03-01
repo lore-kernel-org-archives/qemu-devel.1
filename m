@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cj0DY-0003q8-Qx
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:06:41 -0500
+	(envelope-from <peterx@redhat.com>) id 1cj0PB-00064E-Ex
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:18:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cj0DX-0001mB-RK
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:06:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48162)
+	(envelope-from <peterx@redhat.com>) id 1cj0P8-0006eO-B4
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:18:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51516)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cj0DX-0001m7-JM
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:06:39 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CF8BAC057FA5
-	for <qemu-devel@nongnu.org>; Wed,  1 Mar 2017 09:06:39 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed,  1 Mar 2017 13:04:53 +0400
-Message-Id: <20170301090453.11075-29-marcandre.lureau@redhat.com>
-In-Reply-To: <20170301090453.11075-1-marcandre.lureau@redhat.com>
-References: <20170301090453.11075-1-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cj0P8-0006e1-5s
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:18:38 -0500
+Date: Wed, 1 Mar 2017 17:18:31 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170301091831.GF13926@pxdev.xzpeter.org>
+References: <1487910561-17825-1-git-send-email-peterx@redhat.com>
+	<e547f430-d078-27a5-7064-4fc5b9f738d1@redhat.com>
+	<20170301023635.GE13926@pxdev.xzpeter.org>
+	<20170301043802-mutt-send-email-mst@kernel.org>
+	<05a23bbc-4ebc-769b-aa62-d3387af57cae@redhat.com>
+	<a35dbe8f-770e-c792-e5ea-1f4f8ef8df37@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 28/28] tests: fix virtio-blk-test leaks
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <a35dbe8f-770e-c792-e5ea-1f4f8ef8df37@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] intel_iommu: check misordered init when
+ realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,109 +32,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, yi.l.liu@intel.com, qemu-devel@nongnu.org, Jintack Lim <jintack@cs.columbia.edu>
 
-Use qvirtio_pci_device_find_slot() to avoid leaking the non-hp
-device. Add assert() to avoid further leaks in the future.
+On Wed, Mar 01, 2017 at 09:03:47AM +0200, Marcel Apfelbaum wrote:
+> On 03/01/2017 06:14 AM, Jason Wang wrote:
 
-Use qvirtio_pci_device_free() to correctly free QVirtioPCIDevice.
+[...]
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- tests/libqos/virtio-pci.c |  3 ++-
- tests/virtio-blk-test.c   | 14 +++++++-------
- 2 files changed, 9 insertions(+), 8 deletions(-)
+> Hi Jason,
+> 
+> I am not saying we don't need to create the IOMMU before some other device,
+> I just don't think that the command line order should matter to user.
+> 
+> BTW, are you working on a way to limit the IOMMU scope to a specific set of devices?
+> If yes, this approach will also help you work.
 
-diff --git a/tests/libqos/virtio-pci.c b/tests/libqos/virtio-pci.c
-index 808365e8ca..7ac15c04e1 100644
---- a/tests/libqos/virtio-pci.c
-+++ b/tests/libqos/virtio-pci.c
-@@ -61,13 +61,14 @@ static void qvirtio_pci_foreach_callback(
-         (!d->has_slot || vpcidev->pdev->devfn =3D=3D d->slot << 3)) {
-         d->func(&vpcidev->vdev, d->user_data);
-     } else {
--        g_free(vpcidev);
-+        qvirtio_pci_device_free(vpcidev);
-     }
- }
-=20
- static void qvirtio_pci_assign_device(QVirtioDevice *d, void *data)
- {
-     QVirtioPCIDevice **vpcidev =3D data;
-+    assert(!*vpcidev);
-     *vpcidev =3D (QVirtioPCIDevice *)d;
- }
-=20
-diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
-index 10a92b410a..1eee95df49 100644
---- a/tests/virtio-blk-test.c
-+++ b/tests/virtio-blk-test.c
-@@ -108,7 +108,7 @@ static QVirtioPCIDevice *virtio_blk_pci_init(QPCIBus =
-*bus, int slot)
- {
-     QVirtioPCIDevice *dev;
-=20
--    dev =3D qvirtio_pci_device_find(bus, VIRTIO_ID_BLOCK);
-+    dev =3D qvirtio_pci_device_find_slot(bus, VIRTIO_ID_BLOCK, slot);
-     g_assert(dev !=3D NULL);
-     g_assert_cmphex(dev->vdev.device_type, =3D=3D, VIRTIO_ID_BLOCK);
-     g_assert_cmphex(dev->pdev->devfn, =3D=3D, ((slot << 3) | PCI_FN));
-@@ -296,7 +296,7 @@ static void pci_basic(void)
-     /* End test */
-     qvirtqueue_cleanup(dev->vdev.bus, &vqpci->vq, qs->alloc);
-     qvirtio_pci_device_disable(dev);
--    g_free(dev);
-+    qvirtio_pci_device_free(dev);
-     qtest_shutdown(qs);
- }
-=20
-@@ -389,7 +389,7 @@ static void pci_indirect(void)
-     /* End test */
-     qvirtqueue_cleanup(dev->vdev.bus, &vqpci->vq, qs->alloc);
-     qvirtio_pci_device_disable(dev);
--    g_free(dev);
-+    qvirtio_pci_device_free(dev);
-     qtest_shutdown(qs);
- }
-=20
-@@ -418,7 +418,7 @@ static void pci_config(void)
-     g_assert_cmpint(capacity, =3D=3D, n_size / 512);
-=20
-     qvirtio_pci_device_disable(dev);
--    g_free(dev);
-+    qvirtio_pci_device_free(dev);
-=20
-     qtest_shutdown(qs);
- }
-@@ -526,7 +526,7 @@ static void pci_msix(void)
-     qvirtqueue_cleanup(dev->vdev.bus, &vqpci->vq, qs->alloc);
-     qpci_msix_disable(dev->pdev);
-     qvirtio_pci_device_disable(dev);
--    g_free(dev);
-+    qvirtio_pci_device_free(dev);
-     qtest_shutdown(qs);
- }
-=20
-@@ -642,7 +642,7 @@ static void pci_idx(void)
-     qvirtqueue_cleanup(dev->vdev.bus, &vqpci->vq, qs->alloc);
-     qpci_msix_disable(dev->pdev);
-     qvirtio_pci_device_disable(dev);
--    g_free(dev);
-+    qvirtio_pci_device_free(dev);
-     qtest_shutdown(qs);
- }
-=20
-@@ -661,7 +661,7 @@ static void pci_hotplug(void)
-     dev =3D virtio_blk_pci_init(qs->pcibus, PCI_SLOT_HP);
-     g_assert(dev);
-     qvirtio_pci_device_disable(dev);
--    g_free(dev);
-+    qvirtio_pci_device_free(dev);
-=20
-     /* unplug secondary disk */
-     if (strcmp(arch, "i386") =3D=3D 0 || strcmp(arch, "x86_64") =3D=3D 0=
-) {
---=20
-2.12.0.rc2.3.gc93709801
+Marcel,
+
+Do you have any plan after 2.9 to re-arrange the init order thing a
+bit? In general, maybe we need an ordering support for devices.
+Besides that, I am thinking whether it would be wise that we just init
+the IOMMUs during machine init just like before, but keep the
+"-device" interface? After all, at least the root IOMMU device should
+be with root complex, and it feels a little strange we just split the
+init process apart (we delay the IOMMU init into device
+initializations).
+
+Not sure whether above makes sense though. Thanks,
+
+-- peterx
