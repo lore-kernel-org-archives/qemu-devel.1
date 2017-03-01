@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58048)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cj3OG-0006gk-EP
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 07:30:00 -0500
+	(envelope-from <berto@igalia.com>) id 1cj3P1-0001BN-IZ
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 07:30:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cj3OD-00025s-Be
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 07:29:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52752)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cj3OD-00025d-5Z
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 07:29:53 -0500
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed,  1 Mar 2017 13:29:49 +0100
-Message-Id: <20170301122950.3587-3-pbonzini@redhat.com>
-In-Reply-To: <20170301122950.3587-1-pbonzini@redhat.com>
-References: <20170301122950.3587-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 18/19] memory: Introduce DEVICE_HOST_ENDIAN for
- ram device
+	(envelope-from <berto@igalia.com>) id 1cj3Ox-0002MY-LP
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 07:30:43 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20170301115026.22621-3-stefanha@redhat.com>
+References: <20170301115026.22621-1-stefanha@redhat.com>
+	<20170301115026.22621-3-stefanha@redhat.com>
+Date: Wed, 01 Mar 2017 13:29:58 +0100
+Message-ID: <w51tw7dnprt.fsf@maestria.local.igalia.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] throttle: do not use invalid config
+ in test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,59 +23,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Yongji Xie <xyjxie@linux.vnet.ibm.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Nini Gu <ngu@redhat.com>, qemu-block@nongnu.org
 
-From: Yongji Xie <xyjxie@linux.vnet.ibm.com>
+On Wed 01 Mar 2017 12:50:25 PM CET, Stefan Hajnoczi wrote:
+> The (burst) max parameter cannot be smaller than the avg parameter.
+> There is a test case that uses avg = 56, max = 1 and gets away with it
+> because no input validation is performed by the test case.
+>
+> This patch switches to valid test input parameters.
+>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-At the moment ram device's memory regions are DEVICE_NATIVE_ENDIAN. It's
-incorrect. This memory region is backed by a MMIO area in host, so the
-uint64_t data that MemoryRegionOps read from/write to this area should be
-host-endian rather than target-endian. Hence, current code does not work
-when target and host endianness are different which is the most common case
-on PPC64. To fix it, this introduces DEVICE_HOST_ENDIAN for the ram device.
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
-This has been tested on PPC64 BE/LE host/guest in all possible combinations
-including TCG.
-
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Yongji Xie <xyjxie@linux.vnet.ibm.com>
-Message-Id: <1488171164-28319-1-git-send-email-xyjxie@linux.vnet.ibm.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- include/exec/cpu-common.h | 6 ++++++
- memory.c                  | 2 +-
- 2 files changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-index bd15853..eef74df 100644
---- a/include/exec/cpu-common.h
-+++ b/include/exec/cpu-common.h
-@@ -36,6 +36,12 @@ enum device_endian {
-     DEVICE_LITTLE_ENDIAN,
- };
- 
-+#if defined(HOST_WORDS_BIGENDIAN)
-+#define DEVICE_HOST_ENDIAN DEVICE_BIG_ENDIAN
-+#else
-+#define DEVICE_HOST_ENDIAN DEVICE_LITTLE_ENDIAN
-+#endif
-+
- /* address in the RAM (different from a physical address) */
- #if defined(CONFIG_XEN_BACKEND)
- typedef uint64_t ram_addr_t;
-diff --git a/memory.c b/memory.c
-index d61caee..573fa6e 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1182,7 +1182,7 @@ static void memory_region_ram_device_write(void *opaque, hwaddr addr,
- static const MemoryRegionOps ram_device_mem_ops = {
-     .read = memory_region_ram_device_read,
-     .write = memory_region_ram_device_write,
--    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .endianness = DEVICE_HOST_ENDIAN,
-     .valid = {
-         .min_access_size = 1,
-         .max_access_size = 8,
--- 
-2.9.3
+Berto
