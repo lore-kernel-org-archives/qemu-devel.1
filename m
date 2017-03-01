@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39264)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jiahuanzhang90@gmail.com>) id 1cj5Sh-0004hr-0Z
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 09:42:40 -0500
+	(envelope-from <berrange@redhat.com>) id 1cj5YC-00061m-TJ
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 09:48:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jiahuanzhang90@gmail.com>) id 1cj5Sg-0004ey-5Y
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 09:42:39 -0500
-Received: from mail-qk0-x230.google.com ([2607:f8b0:400d:c09::230]:35152)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jiahuanzhang90@gmail.com>)
-	id 1cj5Sg-0004eN-0l
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 09:42:38 -0500
-Received: by mail-qk0-x230.google.com with SMTP id u188so73318812qkc.2
-	for <qemu-devel@nongnu.org>; Wed, 01 Mar 2017 06:42:37 -0800 (PST)
+	(envelope-from <berrange@redhat.com>) id 1cj5Y8-000658-L0
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 09:48:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34108)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cj5Y8-00064s-CQ
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 09:48:16 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 527557DD34
+	for <qemu-devel@nongnu.org>; Wed,  1 Mar 2017 14:48:16 +0000 (UTC)
+Date: Wed, 1 Mar 2017 14:48:09 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170301144809.GE10160@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170301123223.12489-1-berrange@redhat.com>
+	<a08dc58b-a169-cb17-2187-1b66c6878a39@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CL7VPrbwevNXioH5-gSz6DWRMzZN=OK0qnCn--T7sHC0A@mail.gmail.com>
-References: <CAJy91CZO+XOyzyhG5yKYcYQsfG_jwRF7W_4sxp6Fen=4gNr+YA@mail.gmail.com>
-	<CAJ+F1CL7VPrbwevNXioH5-gSz6DWRMzZN=OK0qnCn--T7sHC0A@mail.gmail.com>
-From: Jiahuan Zhang <jiahuanzhang90@gmail.com>
-Date: Wed, 1 Mar 2017 15:42:37 +0100
-Message-ID: <CAJy91CYYrj58whBJFKKdo-dkQ=3UcXSvJem1qXas=qPeFtX46w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Windows Pipe
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <a08dc58b-a169-cb17-2187-1b66c6878a39@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] migration: allow clearing migration string
+ parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,57 +35,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Hi,
+On Wed, Mar 01, 2017 at 08:36:03AM -0600, Eric Blake wrote:
+> On 03/01/2017 06:32 AM, Daniel P. Berrange wrote:
+> > Some of the migration parameters are strings, which default to NULL,
+> > eg tls_hostname and tls_creds.
+> > 
+> > The mgmt app will set the tls_creds parameter on both source and target
+> > QEMU instances, in order to trigger use of TLS for migration.
+> > 
+> > After performing a TLS encrypted migration though, migration might be
+> > used for other reasons - for example, to save the QEMU state to a file.
+> > We need TLS turned off when doing this, but the migrate-set-parameters
+> > QAPI command does not provide any facility to clear/reset parameters
+> > to their default state.
+> > 
+> > If you simply ommit the tls_creds parameter in migrate-set-parameters,
+> 
+> s/ommit/omit/
+> 
+> > then 'has_tls_creds' will be false and so no action will be taken. The
+> > only option that works with migrate-set-parameters is to treat "" on
+> > the wire as equivalent to requesting NULL. Failing that we would have
+> > to create a new 'migrate-reset-parameters' method to explicitly put
+> > a parameter back to its default value.
+> 
+> That happens to work in this case, because an empty string as the TLS
+> parameter makes no sense.
+> 
+> A nicer solution would be to support JSON null on the wire, so the user
+> can pass "tls-creds":null to explicitly request wiping out the
+> credentials rather than making the empty string magic.  But that's more
+> invasive (the QAPI parser would have to be enhanced to allow an
+> alternate that visits either a string or null).  Ultimately, I think
+> we'll have to do that when we come up with some string property where ""
+> should not be given magic treatment.
+> 
+> So now we have a dilemma: do we special case "" here, to be stuck with
+> it even if we later add nullable-string support later, or do we go all
+> the way to nullable-string support now?  We've missed soft freeze for
+> 2.9, so my vote is that it is okay to special case "" in  this instance,
+> even though we'll have to continue to support it indefinitely even if we
+> gain nullable-string QMP.
 
-I agree with you about win_chr_poll(). But what I wonder is how to write
-data into the pipe for the host to get. I see "writeFile()" in
-"win_chr_write()", but have no idea how to use it. Or I have to write
-something for this writing. In this case, I don't know what the right
-buffer pointer for WriteFile() is.
+FYI, if QEMU ever sends a QMP reply whose value comes from a NULL string,
+it turns that into "". IOW, on output "" and NULL are indistinguishable
 
-Any clue is greatly appreciated!
+So from that POV, treating JSON nil and "" as indistiguishable on input
+would be consistent with what we do on output.
 
-On 1 March 2017 at 15:25, Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.co=
-m>
-wrote:
+I'd only suggest allowing JSON nil on input, if we're willing change the
+output code to map NULL -> nil, instead of NULL -> "".
 
-> Hi
->
-> On Wed, Mar 1, 2017 at 5:16 PM Jiahuan Zhang <jiahuanzhang90@gmail.com>
-> wrote:
->
->> Dear QEMU developers,
->>
->> I want the host-guest communication for QEMU. I want to achieve
->> it via serial port redirection to a pipe. My host is windows and guest i=
-s
->> Linux. QEMU is in version 2.8.50
->>
->> I looked into char-pipe.c and char-win.c, and find that the current QEMU
->> only supports reading data on the pipe from host to guest for Windows.
->> See *win_chr_pipe_init
->> () *in char-pipe.c
->>
->> Is it true?
->>
->
-> Not exactly, for some reason, the win-chr-pipe uses a poll, win_chr_poll(=
-)
-> that read from the pipe and write to the frontend (the vm serial).  I
-> haven't tested the windows pipe implementation, only the console one, but
-> it looks like it should work. Hopefully someone using qemu on windows can
-> help you.
->
->
->> I don't know how to use *win_chr_write() *in char-win.c.
->> Can you please present an example?
->>
->> best regards,
->> Jiahuan
->>
-> --
-> Marc-Andr=C3=A9 Lureau
->
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
