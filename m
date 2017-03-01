@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42235)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1cisfc-0006zQ-8o
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 20:03:10 -0500
+	(envelope-from <bounces@canonical.com>) id 1cisjr-00080u-Hv
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 20:07:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1cisfb-000060-0l
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 20:03:08 -0500
-Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:36705)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1cisfa-00005Y-Qv
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 20:03:06 -0500
-Received: by mail-io0-x244.google.com with SMTP id w10so3230470iod.3
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 17:03:05 -0800 (PST)
+	(envelope-from <bounces@canonical.com>) id 1cisjo-0001lQ-Ck
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 20:07:31 -0500
+Received: from indium.canonical.com ([91.189.90.7]:59720)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cisjo-0001lM-6d
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 20:07:28 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cisjn-0002O4-0V
+	for <qemu-devel@nongnu.org>; Wed, 01 Mar 2017 01:07:27 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id EA8472E80C0
+	for <qemu-devel@nongnu.org>; Wed,  1 Mar 2017 01:07:26 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <eadb7db6-dded-77ce-ac46-7dee688be954@redhat.com>
-References: <1486623844-13140-1-git-send-email-liqiang6-s@360.cn>
-	<1486623844-13140-2-git-send-email-liqiang6-s@360.cn>
-	<eadb7db6-dded-77ce-ac46-7dee688be954@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Wed, 1 Mar 2017 09:03:00 +0800
-Message-ID: <CAKXe6SJyeHEeRujwKTd=TUAXjJ1Btv4K9jX6rjyJ4wtsutQ1fQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 1/2] ide: core: add cleanup function
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 01 Mar 2017 00:53:58 -0000
+From: pranith <1591611@bugs.launchpad.net>
+Reply-To: Bug 1591611 <1591611@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160612061620.2663.17249.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170301005359.6144.88769.launchpad@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1591611] Re: chroot using qemu-x86_64-static
+ fails on ppc64el
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,114 +37,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, pbonzini@redhat.com
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Li Qiang <liqiang6-s@360.cn>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
 
-Hello John, Paolo,
+** Changed in: qemu
+       Status: In Progress =3D> Fix Committed
 
-2017-03-01 8:47 GMT+08:00 John Snow <jsnow@redhat.com>:
+** Changed in: qemu
+     Assignee: Timothy Pearson (kb9vqf) =3D> pranith (bobby-prani)
 
->
->
-> On 02/09/2017 02:04 AM, Li Qiang wrote:
-> > As the pci ahci can be hotplug and unplug, in the ahci unrealize
-> > function it should free all the resource once allocated in the
-> > realized function. This patch adds two cleanup function.
-> >
->
-> So, the peculiarities of the current arrangement of QDEV realization and
-> unrealization is a bit of a mystery to me, so I'm hoping my suggestions
-> here make sense.
->
-> > Signed-off-by: Li Qiang <liqiang6-s@360.cn>
-> > ---
-> >  hw/ide/core.c             | 21 +++++++++++++++++++++
-> >  include/hw/ide/internal.h |  2 ++
-> >  2 files changed, 23 insertions(+)
-> >
-> > diff --git a/hw/ide/core.c b/hw/ide/core.c
-> > index 43709e5..8fe5896 100644
-> > --- a/hw/ide/core.c
-> > +++ b/hw/ide/core.c
-> > @@ -2586,6 +2586,13 @@ void ide_register_restart_cb(IDEBus *bus)
-> >      }
-> >  }
-> >
-> > +void ide_unregister_restart_cb(IDEBus *bus)
-> > +{
-> > +    if (bus->dma->ops->restart_dma) {
-> > +        qemu_del_vm_change_state_handler(bus->vmstate);
-> > +    }
-> > +}
-> > +
->
-> This works perfectly well, though I think the function is named
-> incorrectly -- this should be an AHCI function, as it is AHCI's job to
-> unregister the IDEBus it created (not IDE's -- the bus belongs to the
-> HBA, not the IDE device.)
->
-> However, we DO have the IDEBus unrealize code in qdev.c that should be
-> handling this for us. Can we rename this function and just have it set
-> the "realized" property of the IDEBus to false to handle this cleanup
-> for us?
->
-> I'm not well versed in qdev code management, but it definitely feels
-> wrong to have the cleanup in two places.
->
+-- =
 
- Agree, but I'm not familiar with qdev too, that's why we need Paolo's help.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1591611
 
-@Paolo,
-Could you please have a look at this issue?
+Title:
+  chroot using qemu-x86_64-static fails on ppc64el
 
+Status in QEMU:
+  Fix Committed
 
-> >  static IDEDMA ide_dma_nop = {
-> >      .ops = &ide_dma_nop_ops,
-> >      .aiocb = NULL,
-> > @@ -2603,6 +2610,20 @@ void ide_init2(IDEBus *bus, qemu_irq irq)
-> >      bus->dma = &ide_dma_nop;
-> >  }
-> >
-> > +void ide_exit(IDEBus *bus)
-> > +{
-> > +    int i;
-> > +
-> > +    for (i = 0; i < 2; i++) {
-> > +        IDEState *s = &bus->ifs[i];
-> > +
-> > +        timer_del(s->sector_write_timer);
-> > +        timer_free(s->sector_write_timer);
-> > +        qemu_vfree(s->smart_selftest_data);
-> > +        qemu_vfree(s->io_buffer);
->
-> I would prefer a function that cleans up a single IDE device, and the
-> caller (which has knowledge of the HBA and the buses it owns) loops as
-> appropriate. (In this case, ahci_uninit or ahci_unrealize or whichever.)
->
-> It's correct otherwise, though.
->
-> > +    }
-> > +}
-> > +
-> >  static const MemoryRegionPortio ide_portio_list[] = {
-> >      { 0, 8, 1, .read = ide_ioport_read, .write = ide_ioport_write },
-> >      { 0, 1, 2, .read = ide_data_readw, .write = ide_data_writew },
-> > diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
-> > index 88dc118..09b0404 100644
-> > --- a/include/hw/ide/internal.h
-> > +++ b/include/hw/ide/internal.h
-> > @@ -607,8 +607,10 @@ int ide_init_drive(IDEState *s, BlockBackend *blk,
-> IDEDriveKind kind,
-> >                     uint32_t cylinders, uint32_t heads, uint32_t secs,
-> >                     int chs_trans);
-> >  void ide_init2(IDEBus *bus, qemu_irq irq);
-> > +void ide_exit(IDEBus *bus);
-> >  void ide_init_ioport(IDEBus *bus, ISADevice *isa, int iobase, int
-> iobase2);
-> >  void ide_register_restart_cb(IDEBus *bus);
-> > +void ide_unregister_restart_cb(IDEBus *bus);
-> >
-> >  void ide_exec_cmd(IDEBus *bus, uint32_t val);
-> >
-> >
->
+Bug description:
+  When attempting to use qemu-x86_64-static from qemu 2.5.0 on a ppc64el
+  host to chroot into an amd64 environment, all commands fail with an
+  assertion error.  /usr/bin/qemu-x86_64-static from the host was copied
+  into the chroot /usr/bin, and the host has multiformat support in the
+  kernel.
+
+  Sample output illustrating the problem, as well as bash builtins
+  working:
+
+  # chroot /virtualbox/scratchdisks_local_001/amd64_chroot qemu-x86_64-stat=
+ic /bin/bash
+  # ls
+  bash: ../sysdeps/nptl/fork.c:136: __libc_fork: Assertion `({ __typeof (se=
+lf->tid) __value; if (sizeof (__value) =3D=3D 1) asm volatile ("movb %%fs:%=
+P2,%b0" : "=3Dq" (__value) : "0" (0), "i" (__builtin_offsetof (struct pthre=
+ad, tid))); else if (sizeof (__value) =3D=3D 4) asm volatile ("movl %%fs:%P=
+1,%0" : "=3Dr" (__value) : "i" (__builtin_offsetof (struct pthread, tid)));=
+ else { if (sizeof (__value) !=3D 8) abort (); asm volatile ("movq %%fs:%P1=
+,%q0" : "=3Dr" (__value) : "i" (__builtin_offsetof (struct pthread, tid)));=
+ } __value; }) !=3D ppid' failed.
+  setup_frame: not implemented
+  setup_frame: not implemented
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  Segmentation fault
+  setup_frame: not implemented
+  setup_frame: not implemented
+  # echo TEST
+  TEST
+  # cat test
+  bash: ../sysdeps/nptl/fork.c:136: __libc_fork: Assertion `({ __typeof (se=
+lf->tid) __value; if (sizeof (__value) =3D=3D 1) asm volatile ("movb %%fs:%=
+P2,%b0" : "=3Dq" (__value) : "0" (0), "i" (__builtin_offsetof (struct pthre=
+ad, tid))); else if (sizeof (__value) =3D=3D 4) asm volatile ("movl %%fs:%P=
+1,%0" : "=3Dr" (__value) : "i" (__builtin_offsetof (struct pthread, tid)));=
+ else { if (sizeof (__value) !=3D 8) abort (); asm volatile ("movq %%fs:%P1=
+,%q0" : "=3Dr" (__value) : "i" (__builtin_offsetof (struct pthread, tid)));=
+ } __value; }) !=3D ppid' failed.
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+  Segmentation fault
+
+  It is currently unknown if other host architectures (e.g. aarch64) are
+  also affected.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1591611/+subscriptions
