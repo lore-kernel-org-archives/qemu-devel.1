@@ -1,39 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cizAZ-0003PS-I6
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 02:59:33 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cizAr-0003bm-Fq
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 02:59:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cizAW-0007Zv-Dk
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 02:59:31 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38330)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1cizAW-0007Zf-5X
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 02:59:28 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v217v8t6085326
-	for <qemu-devel@nongnu.org>; Wed, 1 Mar 2017 02:59:26 -0500
-Received: from e28smtp01.in.ibm.com (e28smtp01.in.ibm.com [125.16.236.1])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28wtc2g59d-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 01 Mar 2017 02:59:25 -0500
-Received: from localhost
-	by e28smtp01.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Wed, 1 Mar 2017 13:29:22 +0530
-Date: Wed, 1 Mar 2017 13:29:13 +0530
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Reply-To: bharata@linux.vnet.ibm.com
-References: <1488354251-20802-1-git-send-email-nikunj@linux.vnet.ibm.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cizAq-0007d7-6l
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 02:59:49 -0500
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:33821)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1cizAp-0007ct-S1
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 02:59:48 -0500
+Received: by mail-lf0-x241.google.com with SMTP id y193so1434370lfd.1
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 23:59:47 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1488354251-20802-1-git-send-email-nikunj@linux.vnet.ibm.com>
-Message-Id: <20170301075913.GC17196@in.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] target/ppc: rewrite f[n]m[add,
- sub] using float64_muladd
+References: <20170221141451.28305-1-marcandre.lureau@redhat.com>
+	<20170221141451.28305-29-marcandre.lureau@redhat.com>
+	<304c6066-fea0-f5e4-9c6f-384afa9ff5f2@redhat.com>
+In-Reply-To: <304c6066-fea0-f5e4-9c6f-384afa9ff5f2@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 01 Mar 2017 07:59:34 +0000
+Message-ID: <CAJ+F1CJzf7wre3r3EQxEV76cima8Bp5KRPwBcRVxeFyoxqsFNQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 28/30] tests: add specialized
+ device_find function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,235 +32,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 
-On Wed, Mar 01, 2017 at 01:14:11PM +0530, Nikunj A Dadhania wrote:
-> Use the softfloat api for fused multiply-add. As we are using the fused
-> multiply-add, the intermediate result for setting VXISI is not
-> available.
+On Wed, Mar 1, 2017 at 3:22 AM Eric Blake <eblake@redhat.com> wrote:
 
-Isn't the behaviour of setting VXISI similar to vector muladd instructions ?
-If so refer to VSX_MADD() to see when VXISI is set.
+> On 02/21/2017 08:14 AM, Marc-Andr=C3=A9 Lureau wrote:
+> > Allows to specify which slot to look for the device.
+>
+> "Allow[s] to ${verb}" is not idiomatic; it's missing a subject.  But
+> "Allows $subject to" (as in "allows someone to" or "allows me to") is
+> wordy, compared to just saying "Allows ${verb}ing".  I'd suggest:
+>
+> Allow specifying which slot to favor when looking for the device.
+>
+> >
+> > This will be used in the following patch to avoid leaking when multiple
+> > devices exists and we want to lookup the hotplug one.
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  tests/libqos/virtio-pci.h |  4 ++--
+> >  tests/libqos/virtio-pci.c | 31 ++++++++++++++++++++++++++-----
+> >  2 files changed, 28 insertions(+), 7 deletions(-)
+> >
+>
+> > @@ -55,10 +57,11 @@ static void qvirtio_pci_foreach_callback(
+> >      QVirtioPCIForeachData *d =3D data;
+> >      QVirtioPCIDevice *vpcidev =3D qpcidevice_to_qvirtiodevice(dev);
+> >
+> > -    if (vpcidev->vdev.device_type =3D=3D d->device_type) {
+> > +    if (vpcidev->vdev.device_type =3D=3D d->device_type &&
+> > +        (!d->has_slot || vpcidev->pdev->devfn =3D=3D d->slot << 3)) {
+> >          d->func(&vpcidev->vdev, d->user_data);
+> >      } else {
+> > -        g_free(vpcidev);
+> > +        qvirtio_pci_device_free(vpcidev);
+>
+> Is this an unmentioned leak plug?  Either it should be mentioned, or
+> squashed into the leak fix of 29.
+>
 
-> 
-> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-> ---
->  target/ppc/fpu_helper.c | 201 +++++++-----------------------------------------
->  1 file changed, 29 insertions(+), 172 deletions(-)
-> 
-> diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-> index 58aee64..1701b80 100644
-> --- a/target/ppc/fpu_helper.c
-> +++ b/target/ppc/fpu_helper.c
-> @@ -742,179 +742,36 @@ uint64_t helper_frim(CPUPPCState *env, uint64_t arg)
->  {
->      return do_fri(env, arg, float_round_down);
->  }
-> -
-> -/* fmadd - fmadd. */
-> -uint64_t helper_fmadd(CPUPPCState *env, uint64_t arg1, uint64_t arg2,
-> -                      uint64_t arg3)
-> -{
-> -    CPU_DoubleU farg1, farg2, farg3;
-> -
-> -    farg1.ll = arg1;
-> -    farg2.ll = arg2;
-> -    farg3.ll = arg3;
-> -
-> -    if (unlikely((float64_is_infinity(farg1.d) && float64_is_zero(farg2.d)) ||
-> -                 (float64_is_zero(farg1.d) && float64_is_infinity(farg2.d)))) {
-> -        /* Multiplication of zero by infinity */
-> -        farg1.ll = float_invalid_op_excp(env, POWERPC_EXCP_FP_VXIMZ, 1);
-> -    } else {
-> -        if (unlikely(float64_is_signaling_nan(farg1.d, &env->fp_status) ||
-> -                     float64_is_signaling_nan(farg2.d, &env->fp_status) ||
-> -                     float64_is_signaling_nan(farg3.d, &env->fp_status))) {
-> -            /* sNaN operation */
-> -            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
-> -        }
-> -        /* This is the way the PowerPC specification defines it */
-> -        float128 ft0_128, ft1_128;
-> -
-> -        ft0_128 = float64_to_float128(farg1.d, &env->fp_status);
-> -        ft1_128 = float64_to_float128(farg2.d, &env->fp_status);
-> -        ft0_128 = float128_mul(ft0_128, ft1_128, &env->fp_status);
-> -        if (unlikely(float128_is_infinity(ft0_128) &&
-> -                     float64_is_infinity(farg3.d) &&
-> -                     float128_is_neg(ft0_128) != float64_is_neg(farg3.d))) {
-> -            /* Magnitude subtraction of infinities */
-> -            farg1.ll = float_invalid_op_excp(env, POWERPC_EXCP_FP_VXISI, 1);
-> -        } else {
-> -            ft1_128 = float64_to_float128(farg3.d, &env->fp_status);
-> -            ft0_128 = float128_add(ft0_128, ft1_128, &env->fp_status);
-> -            farg1.d = float128_to_float64(ft0_128, &env->fp_status);
-> -        }
-> -    }
-> -
-> -    return farg1.ll;
-> -}
-> -
-> -/* fmsub - fmsub. */
-> -uint64_t helper_fmsub(CPUPPCState *env, uint64_t arg1, uint64_t arg2,
-> -                      uint64_t arg3)
-> -{
-> -    CPU_DoubleU farg1, farg2, farg3;
-> -
-> -    farg1.ll = arg1;
-> -    farg2.ll = arg2;
-> -    farg3.ll = arg3;
-> -
-> -    if (unlikely((float64_is_infinity(farg1.d) && float64_is_zero(farg2.d)) ||
-> -                 (float64_is_zero(farg1.d) &&
-> -                  float64_is_infinity(farg2.d)))) {
-> -        /* Multiplication of zero by infinity */
-> -        farg1.ll = float_invalid_op_excp(env, POWERPC_EXCP_FP_VXIMZ, 1);
-> -    } else {
-> -        if (unlikely(float64_is_signaling_nan(farg1.d, &env->fp_status) ||
-> -                     float64_is_signaling_nan(farg2.d, &env->fp_status) ||
-> -                     float64_is_signaling_nan(farg3.d, &env->fp_status))) {
-> -            /* sNaN operation */
-> -            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
-> -        }
-> -        /* This is the way the PowerPC specification defines it */
-> -        float128 ft0_128, ft1_128;
-> -
-> -        ft0_128 = float64_to_float128(farg1.d, &env->fp_status);
-> -        ft1_128 = float64_to_float128(farg2.d, &env->fp_status);
-> -        ft0_128 = float128_mul(ft0_128, ft1_128, &env->fp_status);
-> -        if (unlikely(float128_is_infinity(ft0_128) &&
-> -                     float64_is_infinity(farg3.d) &&
-> -                     float128_is_neg(ft0_128) == float64_is_neg(farg3.d))) {
-> -            /* Magnitude subtraction of infinities */
-> -            farg1.ll = float_invalid_op_excp(env, POWERPC_EXCP_FP_VXISI, 1);
-> -        } else {
-> -            ft1_128 = float64_to_float128(farg3.d, &env->fp_status);
-> -            ft0_128 = float128_sub(ft0_128, ft1_128, &env->fp_status);
-> -            farg1.d = float128_to_float64(ft0_128, &env->fp_status);
-> -        }
-> -    }
-> -    return farg1.ll;
-> -}
-> -
-> -/* fnmadd - fnmadd. */
-> -uint64_t helper_fnmadd(CPUPPCState *env, uint64_t arg1, uint64_t arg2,
-> -                       uint64_t arg3)
-> -{
-> -    CPU_DoubleU farg1, farg2, farg3;
-> -
-> -    farg1.ll = arg1;
-> -    farg2.ll = arg2;
-> -    farg3.ll = arg3;
-> -
-> -    if (unlikely((float64_is_infinity(farg1.d) && float64_is_zero(farg2.d)) ||
-> -                 (float64_is_zero(farg1.d) && float64_is_infinity(farg2.d)))) {
-> -        /* Multiplication of zero by infinity */
-> -        farg1.ll = float_invalid_op_excp(env, POWERPC_EXCP_FP_VXIMZ, 1);
-> -    } else {
-> -        if (unlikely(float64_is_signaling_nan(farg1.d, &env->fp_status) ||
-> -                     float64_is_signaling_nan(farg2.d, &env->fp_status) ||
-> -                     float64_is_signaling_nan(farg3.d, &env->fp_status))) {
-> -            /* sNaN operation */
-> -            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
-> -        }
-> -        /* This is the way the PowerPC specification defines it */
-> -        float128 ft0_128, ft1_128;
-> -
-> -        ft0_128 = float64_to_float128(farg1.d, &env->fp_status);
-> -        ft1_128 = float64_to_float128(farg2.d, &env->fp_status);
-> -        ft0_128 = float128_mul(ft0_128, ft1_128, &env->fp_status);
-> -        if (unlikely(float128_is_infinity(ft0_128) &&
-> -                     float64_is_infinity(farg3.d) &&
-> -                     float128_is_neg(ft0_128) != float64_is_neg(farg3.d))) {
-> -            /* Magnitude subtraction of infinities */
-> -            farg1.ll = float_invalid_op_excp(env, POWERPC_EXCP_FP_VXISI, 1);
-> -        } else {
-> -            ft1_128 = float64_to_float128(farg3.d, &env->fp_status);
-> -            ft0_128 = float128_add(ft0_128, ft1_128, &env->fp_status);
-> -            farg1.d = float128_to_float64(ft0_128, &env->fp_status);
-> -        }
-> -        if (likely(!float64_is_any_nan(farg1.d))) {
-> -            farg1.d = float64_chs(farg1.d);
-> -        }
-> -    }
-> -    return farg1.ll;
-> -}
-> -
-> -/* fnmsub - fnmsub. */
-> -uint64_t helper_fnmsub(CPUPPCState *env, uint64_t arg1, uint64_t arg2,
-> -                       uint64_t arg3)
-> -{
-> -    CPU_DoubleU farg1, farg2, farg3;
-> -
-> -    farg1.ll = arg1;
-> -    farg2.ll = arg2;
-> -    farg3.ll = arg3;
-> -
-> -    if (unlikely((float64_is_infinity(farg1.d) && float64_is_zero(farg2.d)) ||
-> -                 (float64_is_zero(farg1.d) &&
-> -                  float64_is_infinity(farg2.d)))) {
-> -        /* Multiplication of zero by infinity */
-> -        farg1.ll = float_invalid_op_excp(env, POWERPC_EXCP_FP_VXIMZ, 1);
-> -    } else {
-> -        if (unlikely(float64_is_signaling_nan(farg1.d, &env->fp_status) ||
-> -                     float64_is_signaling_nan(farg2.d, &env->fp_status) ||
-> -                     float64_is_signaling_nan(farg3.d, &env->fp_status))) {
-> -            /* sNaN operation */
-> -            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
-> -        }
-> -        /* This is the way the PowerPC specification defines it */
-> -        float128 ft0_128, ft1_128;
-> -
-> -        ft0_128 = float64_to_float128(farg1.d, &env->fp_status);
-> -        ft1_128 = float64_to_float128(farg2.d, &env->fp_status);
-> -        ft0_128 = float128_mul(ft0_128, ft1_128, &env->fp_status);
-> -        if (unlikely(float128_is_infinity(ft0_128) &&
-> -                     float64_is_infinity(farg3.d) &&
-> -                     float128_is_neg(ft0_128) == float64_is_neg(farg3.d))) {
-> -            /* Magnitude subtraction of infinities */
-> -            farg1.ll = float_invalid_op_excp(env, POWERPC_EXCP_FP_VXISI, 1);
-> -        } else {
-> -            ft1_128 = float64_to_float128(farg3.d, &env->fp_status);
-> -            ft0_128 = float128_sub(ft0_128, ft1_128, &env->fp_status);
-> -            farg1.d = float128_to_float64(ft0_128, &env->fp_status);
-> -        }
-> -        if (likely(!float64_is_any_nan(farg1.d))) {
-> -            farg1.d = float64_chs(farg1.d);
-> -        }
-> -    }
-> -    return farg1.ll;
-> +#define FPU_FMADD(op, sub, negate)                                      \
-> +uint64_t helper_##op(CPUPPCState *env, uint64_t arg1,                   \
-> +                     uint64_t arg2,                                     \
-> +                     uint64_t arg3)                                     \
-> +{                                                                       \
-> +    if (unlikely((float64_is_infinity(arg1) && float64_is_zero(arg2)) || \
-> +                 (float64_is_zero(arg1) && float64_is_infinity(arg2)))) { \
-> +        /* Multiplication of zero by infinity */                        \
-> +        arg1 = float_invalid_op_excp(env, POWERPC_EXCP_FP_VXIMZ, 1);    \
-> +    } else {                                                            \
-> +        if (unlikely(float64_is_signaling_nan(arg1, &env->fp_status) || \
-> +                     float64_is_signaling_nan(arg2, &env->fp_status) || \
-> +                     float64_is_signaling_nan(arg3, &env->fp_status))) { \
-> +            /* sNaN operation */                                        \
-> +            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);      \
-> +        }                                                               \
-> +        arg1 = float64_muladd(arg1, arg2, arg3, sub, &env->fp_status);  \
-> +        if (negate) {                                                   \
-> +            if (likely(!float64_is_any_nan(arg1))) {                    \
-> +                arg1 = float64_chs(arg1);                               \
-> +            }                                                           \
-> +        }                                                               \
-> +        float_check_status(env);                                        \
-> +    }                                                                   \
-> +    return arg1;                                                        \
->  }
-> +FPU_FMADD(fmadd, 0, 0)
-> +FPU_FMADD(fnmadd, 0, 1)
-> +FPU_FMADD(fmsub, float_muladd_negate_c, 0)
-> +FPU_FMADD(fnmsub, float_muladd_negate_c, 1)
+I'll move it there, thanks
 
-May be you could use MADD_FLGS, MSUB_FLGS, NMADD_FLGS and NMSUB_FLGS ?
-
-Regards,
-Bharata.
+>
+> With those cleanups,
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>
+> --
+> Eric Blake   eblake redhat com    +1-919-301-3266 <+1%20919-301-3266>
+> Libvirt virtualization library http://libvirt.org
+>
+> --
+Marc-Andr=C3=A9 Lureau
