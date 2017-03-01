@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49799)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cj6yo-0007EG-D6
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 11:19:55 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cj71J-0000QF-Nn
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 11:22:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cj6yl-00077Z-Nx
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 11:19:54 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:46327
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1cj6yl-00076p-Fz
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 11:19:51 -0500
-References: <CAFEAcA_KVG19uhPuBUNx4ySmebnL1Hit6=HUX9ug0FkBFMwasg@mail.gmail.com>
-	<877f492ppx.fsf@linaro.org>
-	<e28337d0-d572-cd9a-3f45-0ecc074c32c9@ilande.co.uk>
-	<874lzd2mp7.fsf@linaro.org>
-	<9efa47c0-2a5f-0229-7e27-97a0142ff22d@ilande.co.uk>
-	<871suh2ff3.fsf@linaro.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <99624def-1c99-48f9-2ad3-c93e21956dd6@ilande.co.uk>
-Date: Wed, 1 Mar 2017 16:19:34 +0000
+	(envelope-from <kwolf@redhat.com>) id 1cj71I-0008Mu-TF
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 11:22:29 -0500
+Date: Wed, 1 Mar 2017 17:22:21 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170301162221.GD4799@noname.redhat.com>
+References: <20170301081504.23595-1-famz@redhat.com>
+	<20170301094917.GA4799@noname.redhat.com>
+	<20170301123913.GA26744@lemon.lan>
+	<20170301151626.GB4799@noname.redhat.com>
+	<20170301161023.GA17634@lemon.lan>
 MIME-Version: 1.0
-In-Reply-To: <871suh2ff3.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] intermittent make check failure:
- "tcg_handle_interrupt: assertion failed: (qemu_mutex_iothread_locked())"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170301161023.GA17634@lemon.lan>
+Subject: Re: [Qemu-devel] [PATCH RFC] block: Tolerate existing writers on
+ read only BdrvChild
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,54 +27,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-On 01/03/17 15:19, Alex Bennée wrote:
+Am 01.03.2017 um 17:10 hat Fam Zheng geschrieben:
+> On Wed, 03/01 16:16, Kevin Wolf wrote:
+> > > I'm not sure about this because: 1) this is intrusive from a user PoV, many
+> > > scripts and upper layer tools will stop working;
+> > 
+> > Are you sure? I don't expect user scripts or even proper management
+> > tools to use qemu-io on running VMs. I do expect that some users are
+> > using 'convert -s' with running VMs despite our recommendation against
+> > it.
+> > 
+> > If they are aware that they're doing something that works only in the
+> > right circumstances, then breaking it isn't nice. But my gut feeling is
+> > that most of them don't know about the implications of accessing a live
+> > image. In this case breaking their use case and making them think about
+> > whether they want to add something like a --force option sounds like a
+> > good thing because they aren't caught by surprise when things go wrong
+> > eventually.
+> 
+> Yes, the use case is poor for qcow2, and your points stand there. But image
+> locking will be at the posix level, which has a wider range of users. I cannot
+> draw the same conclusion on raw images as easily.
 
-> Actually looking at where cpu_check_irq is I've pushed the BQL wraps
-> higher up:
-> 
->   https://github.com/stsquad/qemu/commit/f52e01bf4d3415ce4fad54cbb491f6c30a8e1903
-> 
-> The reasoning is HW emulation code can expect to be run under the BQL.
-> Anything triggered by MMIO for example will automatically have the lock.
-> The problem is helpers which trigger hardware actions (ARM has ARM_CP_IO
-> for this). We talk about this in the design document:
-> 
->   http://git.qemu-project.org/?p=qemu.git;a=blob;f=docs/multi-thread-tcg.txt;h=a99b4564c6258576acfa141f51f4b80131969519;hb=HEAD#l201
-> 
->> I ran out of time yesterday to run through all my SPARC64 tests, however
->> if this is the case then the issue will definitely appear in
->> qemu-system-sparc64 which seems to be supported by people seeing
->> intermittent failures in prom-env-test.
-> 
-> So I made the change to both sparc and sparc64 in the above commit.
-> 
-> I haven't managed to run into the intermittent trigger yet. How do I run
-> the test directly?
-> 
->   make tests/prom-env-test
-> 
-> Just makes the test case and
-> 
->   ./tests/prom-env-test
-> **
-> ERROR:tests/libqtest.c:589:qtest_get_arch: assertion failed: (qemu != NULL)
-> Aborted (core dumped)
+Well, with raw, I'm even less concerned about breaking the commands
+related to internal snapshots. :-)
 
-Yeah, I couldn't work out how to run a single test either so ended up
-cycling through a complete set of "make check" runs in order to try and
-provoke the assert(), and despite all this I was still unable to
-reproduce the "make check" error locally.
-
-Fortunately with the debian-40r4a-sparc-netinst.iso I was able to
-reproduce it fairly easily under qemu-system-sparc so I'd suggest that
-you go that route. If you can't find anywhere that hosts that particular
-image for testing, do contact me off-list and I'll temporarily upload it
-somewhere for you.
-
-
-ATB,
-
-Mark.
+Kevin
