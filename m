@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciw7k-0007ws-5D
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:27 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ciw7l-0007yT-GI
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciw7h-0008UT-NJ
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:24 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ciw7i-0008VY-R8
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:25 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed,  1 Mar 2017 15:43:23 +1100
-Message-Id: <20170301044405.1792-9-david@gibson.dropbear.id.au>
+Date: Wed,  1 Mar 2017 15:43:31 +1100
+Message-Id: <20170301044405.1792-17-david@gibson.dropbear.id.au>
 In-Reply-To: <20170301044405.1792-1-david@gibson.dropbear.id.au>
 References: <20170301044405.1792-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 08/50] pseries: Minor cleanups to HPT management
- hypercalls
+Subject: [Qemu-devel] [PULL 16/50] target/ppc: support for 32-bit carry and
+ overflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,197 +21,197 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, thuth@redhat.com, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, thuth@redhat.com, lvivier@redhat.com, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
- * Standardize on 'ptex' instead of 'pte_index' for HPTE index variables
-   for consistency and brevity
- * Avoid variables named 'index'; shadowing index(3) from libc can lead to
-   surprising bugs if the variable is removed, because compiler errors
-   might not appear for remaining references
- * Clarify index calculations in h_enter() - we have two cases, H_EXACT
-   where the exact HPTE slot is given, and !H_EXACT where we search for
-   an empty slot within the hash bucket.  Make the calculation more
-   consistent between the cases.
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
+POWER ISA 3.0 adds CA32 and OV32 status in 64-bit mode. Add the flags
+and corresponding defines.
+
+Moreover, CA32 is updated when CA is updated and OV32 is updated when OV
+is updated.
+
+Arithmetic instructions:
+    * Addition and Substractions:
+
+        addic, addic., subfic, addc, subfc, adde, subfe, addme, subfme,
+        addze, and subfze always updates CA and CA32.
+
+        => CA reflects the carry out of bit 0 in 64-bit mode and out of
+           bit 32 in 32-bit mode.
+        => CA32 reflects the carry out of bit 32 independent of the
+           mode.
+
+        => SO and OV reflects overflow of the 64-bit result in 64-bit
+           mode and overflow of the low-order 32-bit result in 32-bit
+           mode
+        => OV32 reflects overflow of the low-order 32-bit independent of
+           the mode
+
+    * Multiply Low and Divide:
+
+        For mulld, divd, divde, divdu and divdeu: SO, OV, and OV32 bits
+        reflects overflow of the 64-bit result
+
+        For mullw, divw, divwe, divwu and divweu: SO, OV, and OV32 bits
+        reflects overflow of the 32-bit result
+
+     * Negate with OE=1 (nego)
+
+       For 64-bit mode if the register RA contains
+       0x8000_0000_0000_0000, OV and OV32 are set to 1.
+
+       For 32-bit mode if the register RA contains 0x8000_0000, OV and
+       OV32 are set to 1.
+
+Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 ---
- hw/ppc/spapr_hcall.c | 58 +++++++++++++++++++++++++---------------------------
- 1 file changed, 28 insertions(+), 30 deletions(-)
+ target/ppc/cpu.c            | 13 ++++++++++++-
+ target/ppc/cpu.h            |  7 +++++++
+ target/ppc/translate.c      | 21 ++++++++++++++++++---
+ target/ppc/translate_init.c |  2 +-
+ 4 files changed, 38 insertions(+), 5 deletions(-)
 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 42d20e0..3298a14 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -47,12 +47,12 @@ static bool has_spr(PowerPCCPU *cpu, int spr)
-     return cpu->env.spr_cb[spr].name != NULL;
- }
+diff --git a/target/ppc/cpu.c b/target/ppc/cpu.c
+index de3004b..2801166 100644
+--- a/target/ppc/cpu.c
++++ b/target/ppc/cpu.c
+@@ -23,6 +23,12 @@
  
--static inline bool valid_pte_index(CPUPPCState *env, target_ulong pte_index)
-+static inline bool valid_ptex(PowerPCCPU *cpu, target_ulong ptex)
+ target_ulong cpu_read_xer(CPUPPCState *env)
  {
-     /*
-      * hash value/pteg group index is normalized by htab_mask
-      */
--    if (((pte_index & ~7ULL) / HPTES_PER_GROUP) & ~env->htab_mask) {
-+    if (((ptex & ~7ULL) / HPTES_PER_GROUP) & ~cpu->env.htab_mask) {
-         return false;
-     }
-     return true;
-@@ -77,14 +77,13 @@ static bool is_ram_address(sPAPRMachineState *spapr, hwaddr addr)
- static target_ulong h_enter(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                             target_ulong opcode, target_ulong *args)
- {
--    CPUPPCState *env = &cpu->env;
-     target_ulong flags = args[0];
--    target_ulong pte_index = args[1];
-+    target_ulong ptex = args[1];
-     target_ulong pteh = args[2];
-     target_ulong ptel = args[3];
-     unsigned apshift;
-     target_ulong raddr;
--    target_ulong index;
-+    target_ulong slot;
-     uint64_t token;
- 
-     apshift = ppc_hash64_hpte_page_shift_noslb(cpu, pteh, ptel);
-@@ -116,25 +115,26 @@ static target_ulong h_enter(PowerPCCPU *cpu, sPAPRMachineState *spapr,
- 
-     pteh &= ~0x60ULL;
- 
--    if (!valid_pte_index(env, pte_index)) {
-+    if (!valid_ptex(cpu, ptex)) {
-         return H_PARAMETER;
-     }
- 
--    index = 0;
-+    slot = ptex & 7ULL;
-+    ptex = ptex & ~7ULL;
++    if (is_isa300(env)) {
++        return env->xer | (env->so << XER_SO) |
++            (env->ov << XER_OV) | (env->ca << XER_CA) |
++            (env->ov32 << XER_OV32) | (env->ca32 << XER_CA32);
++    }
 +
-     if (likely((flags & H_EXACT) == 0)) {
--        pte_index &= ~7ULL;
--        token = ppc_hash64_start_access(cpu, pte_index);
--        for (; index < 8; index++) {
--            if (!(ppc_hash64_load_hpte0(cpu, token, index) & HPTE64_V_VALID)) {
-+        token = ppc_hash64_start_access(cpu, ptex);
-+        for (slot = 0; slot < 8; slot++) {
-+            if (!(ppc_hash64_load_hpte0(cpu, token, slot) & HPTE64_V_VALID)) {
-                 break;
-             }
-         }
-         ppc_hash64_stop_access(cpu, token);
--        if (index == 8) {
-+        if (slot == 8) {
-             return H_PTEG_FULL;
-         }
-     } else {
--        token = ppc_hash64_start_access(cpu, pte_index);
-+        token = ppc_hash64_start_access(cpu, ptex);
-         if (ppc_hash64_load_hpte0(cpu, token, 0) & HPTE64_V_VALID) {
-             ppc_hash64_stop_access(cpu, token);
-             return H_PTEG_FULL;
-@@ -142,10 +142,9 @@ static target_ulong h_enter(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-         ppc_hash64_stop_access(cpu, token);
-     }
+     return env->xer | (env->so << XER_SO) | (env->ov << XER_OV) |
+         (env->ca << XER_CA);
+ }
+@@ -32,5 +38,10 @@ void cpu_write_xer(CPUPPCState *env, target_ulong xer)
+     env->so = (xer >> XER_SO) & 1;
+     env->ov = (xer >> XER_OV) & 1;
+     env->ca = (xer >> XER_CA) & 1;
+-    env->xer = xer & ~((1u << XER_SO) | (1u << XER_OV) | (1u << XER_CA));
++    /* write all the flags, while reading back check of isa300 */
++    env->ov32 = (xer >> XER_OV32) & 1;
++    env->ca32 = (xer >> XER_CA32) & 1;
++    env->xer = xer & ~((1ul << XER_SO) |
++                       (1ul << XER_OV) | (1ul << XER_CA) |
++                       (1ul << XER_OV32) | (1ul << XER_CA32));
+ }
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 4e7fc2c..420e6d6 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -958,6 +958,8 @@ struct CPUPPCState {
+     target_ulong so;
+     target_ulong ov;
+     target_ulong ca;
++    target_ulong ov32;
++    target_ulong ca32;
+     /* Reservation address */
+     target_ulong reserve_addr;
+     /* Reservation value */
+@@ -1367,11 +1369,15 @@ int ppc_compat_max_threads(PowerPCCPU *cpu);
+ #define XER_SO  31
+ #define XER_OV  30
+ #define XER_CA  29
++#define XER_OV32  19
++#define XER_CA32  18
+ #define XER_CMP  8
+ #define XER_BC   0
+ #define xer_so  (env->so)
+ #define xer_ov  (env->ov)
+ #define xer_ca  (env->ca)
++#define xer_ov32  (env->ov)
++#define xer_ca32  (env->ca)
+ #define xer_cmp ((env->xer >> XER_CMP) & 0xFF)
+ #define xer_bc  ((env->xer >> XER_BC)  & 0x7F)
  
--    ppc_hash64_store_hpte(cpu, pte_index + index,
--                          pteh | HPTE64_V_HPTE_DIRTY, ptel);
-+    ppc_hash64_store_hpte(cpu, ptex + slot, pteh | HPTE64_V_HPTE_DIRTY, ptel);
+@@ -2338,6 +2344,7 @@ enum {
  
--    args[0] = pte_index + index;
-+    args[0] = ptex + slot;
-     return H_SUCCESS;
+ /*****************************************************************************/
+ 
++#define is_isa300(ctx) (!!(ctx->insns_flags2 & PPC2_ISA300))
+ target_ulong cpu_read_xer(CPUPPCState *env);
+ void cpu_write_xer(CPUPPCState *env, target_ulong xer);
+ 
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index b09e16f..be7378b 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -71,7 +71,7 @@ static TCGv cpu_lr;
+ #if defined(TARGET_PPC64)
+ static TCGv cpu_cfar;
+ #endif
+-static TCGv cpu_xer, cpu_so, cpu_ov, cpu_ca;
++static TCGv cpu_xer, cpu_so, cpu_ov, cpu_ca, cpu_ov32, cpu_ca32;
+ static TCGv cpu_reserve;
+ static TCGv cpu_fpscr;
+ static TCGv_i32 cpu_access_type;
+@@ -173,6 +173,10 @@ void ppc_translate_init(void)
+                                 offsetof(CPUPPCState, ov), "OV");
+     cpu_ca = tcg_global_mem_new(cpu_env,
+                                 offsetof(CPUPPCState, ca), "CA");
++    cpu_ov32 = tcg_global_mem_new(cpu_env,
++                                  offsetof(CPUPPCState, ov32), "OV32");
++    cpu_ca32 = tcg_global_mem_new(cpu_env,
++                                  offsetof(CPUPPCState, ca32), "CA32");
+ 
+     cpu_reserve = tcg_global_mem_new(cpu_env,
+                                      offsetof(CPUPPCState, reserve_addr),
+@@ -3703,7 +3707,7 @@ static void gen_tdi(DisasContext *ctx)
+ 
+ /***                          Processor control                            ***/
+ 
+-static void gen_read_xer(TCGv dst)
++static void gen_read_xer(DisasContext *ctx, TCGv dst)
+ {
+     TCGv t0 = tcg_temp_new();
+     TCGv t1 = tcg_temp_new();
+@@ -3715,6 +3719,12 @@ static void gen_read_xer(TCGv dst)
+     tcg_gen_or_tl(t0, t0, t1);
+     tcg_gen_or_tl(dst, dst, t2);
+     tcg_gen_or_tl(dst, dst, t0);
++    if (is_isa300(ctx)) {
++        tcg_gen_shli_tl(t0, cpu_ov32, XER_OV32);
++        tcg_gen_or_tl(dst, dst, t0);
++        tcg_gen_shli_tl(t0, cpu_ca32, XER_CA32);
++        tcg_gen_or_tl(dst, dst, t0);
++    }
+     tcg_temp_free(t0);
+     tcg_temp_free(t1);
+     tcg_temp_free(t2);
+@@ -3722,8 +3732,13 @@ static void gen_read_xer(TCGv dst)
+ 
+ static void gen_write_xer(TCGv src)
+ {
++    /* Write all flags, while reading back check for isa300 */
+     tcg_gen_andi_tl(cpu_xer, src,
+-                    ~((1u << XER_SO) | (1u << XER_OV) | (1u << XER_CA)));
++                    ~((1u << XER_SO) |
++                      (1u << XER_OV) | (1u << XER_OV32) |
++                      (1u << XER_CA) | (1u << XER_CA32)));
++    tcg_gen_extract_tl(cpu_ov32, src, XER_OV32, 1);
++    tcg_gen_extract_tl(cpu_ca32, src, XER_CA32, 1);
+     tcg_gen_extract_tl(cpu_so, src, XER_SO, 1);
+     tcg_gen_extract_tl(cpu_ov, src, XER_OV, 1);
+     tcg_gen_extract_tl(cpu_ca, src, XER_CA, 1);
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index c92435d..4dd1e36 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -107,7 +107,7 @@ static void spr_access_nop(DisasContext *ctx, int sprn, int gprn)
+ /* XER */
+ static void spr_read_xer (DisasContext *ctx, int gprn, int sprn)
+ {
+-    gen_read_xer(cpu_gpr[gprn]);
++    gen_read_xer(ctx, cpu_gpr[gprn]);
  }
  
-@@ -161,11 +160,10 @@ static RemoveResult remove_hpte(PowerPCCPU *cpu, target_ulong ptex,
-                                 target_ulong flags,
-                                 target_ulong *vp, target_ulong *rp)
- {
--    CPUPPCState *env = &cpu->env;
-     uint64_t token;
-     target_ulong v, r;
- 
--    if (!valid_pte_index(env, ptex)) {
-+    if (!valid_ptex(cpu, ptex)) {
-         return REMOVE_PARM;
-     }
- 
-@@ -191,11 +189,11 @@ static target_ulong h_remove(PowerPCCPU *cpu, sPAPRMachineState *spapr,
- {
-     CPUPPCState *env = &cpu->env;
-     target_ulong flags = args[0];
--    target_ulong pte_index = args[1];
-+    target_ulong ptex = args[1];
-     target_ulong avpn = args[2];
-     RemoveResult ret;
- 
--    ret = remove_hpte(cpu, pte_index, avpn, flags,
-+    ret = remove_hpte(cpu, ptex, avpn, flags,
-                       &args[0], &args[1]);
- 
-     switch (ret) {
-@@ -291,16 +289,16 @@ static target_ulong h_protect(PowerPCCPU *cpu, sPAPRMachineState *spapr,
- {
-     CPUPPCState *env = &cpu->env;
-     target_ulong flags = args[0];
--    target_ulong pte_index = args[1];
-+    target_ulong ptex = args[1];
-     target_ulong avpn = args[2];
-     uint64_t token;
-     target_ulong v, r;
- 
--    if (!valid_pte_index(env, pte_index)) {
-+    if (!valid_ptex(cpu, ptex)) {
-         return H_PARAMETER;
-     }
- 
--    token = ppc_hash64_start_access(cpu, pte_index);
-+    token = ppc_hash64_start_access(cpu, ptex);
-     v = ppc_hash64_load_hpte0(cpu, token, 0);
-     r = ppc_hash64_load_hpte1(cpu, token, 0);
-     ppc_hash64_stop_access(cpu, token);
-@@ -315,13 +313,13 @@ static target_ulong h_protect(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-     r |= (flags << 55) & HPTE64_R_PP0;
-     r |= (flags << 48) & HPTE64_R_KEY_HI;
-     r |= flags & (HPTE64_R_PP | HPTE64_R_N | HPTE64_R_KEY_LO);
--    ppc_hash64_store_hpte(cpu, pte_index,
-+    ppc_hash64_store_hpte(cpu, ptex,
-                           (v & ~HPTE64_V_VALID) | HPTE64_V_HPTE_DIRTY, 0);
--    ppc_hash64_tlb_flush_hpte(cpu, pte_index, v, r);
-+    ppc_hash64_tlb_flush_hpte(cpu, ptex, v, r);
-     /* Flush the tlb */
-     check_tlb_flush(env, true);
-     /* Don't need a memory barrier, due to qemu's global lock */
--    ppc_hash64_store_hpte(cpu, pte_index, v | HPTE64_V_HPTE_DIRTY, r);
-+    ppc_hash64_store_hpte(cpu, ptex, v | HPTE64_V_HPTE_DIRTY, r);
-     return H_SUCCESS;
- }
- 
-@@ -330,21 +328,21 @@ static target_ulong h_read(PowerPCCPU *cpu, sPAPRMachineState *spapr,
- {
-     CPUPPCState *env = &cpu->env;
-     target_ulong flags = args[0];
--    target_ulong pte_index = args[1];
-+    target_ulong ptex = args[1];
-     uint8_t *hpte;
-     int i, ridx, n_entries = 1;
- 
--    if (!valid_pte_index(env, pte_index)) {
-+    if (!valid_ptex(cpu, ptex)) {
-         return H_PARAMETER;
-     }
- 
-     if (flags & H_READ_4) {
-         /* Clear the two low order bits */
--        pte_index &= ~(3ULL);
-+        ptex &= ~(3ULL);
-         n_entries = 4;
-     }
- 
--    hpte = env->external_htab + (pte_index * HASH_PTE_SIZE_64);
-+    hpte = env->external_htab + (ptex * HASH_PTE_SIZE_64);
- 
-     for (i = 0, ridx = 0; i < n_entries; i++) {
-         args[ridx++] = ldq_p(hpte);
+ static void spr_write_xer (DisasContext *ctx, int sprn, int gprn)
 -- 
 2.9.3
