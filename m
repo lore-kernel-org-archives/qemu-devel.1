@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46283)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46311)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciw7j-0007vn-5r
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:26 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ciw7j-0007wD-JN
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciw7h-0008Tw-2I
+	(envelope-from <dgibson@ozlabs.org>) id 1ciw7g-0008TZ-Ns
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:23 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed,  1 Mar 2017 15:43:18 +1100
-Message-Id: <20170301044405.1792-4-david@gibson.dropbear.id.au>
+Date: Wed,  1 Mar 2017 15:43:22 +1100
+Message-Id: <20170301044405.1792-8-david@gibson.dropbear.id.au>
 In-Reply-To: <20170301044405.1792-1-david@gibson.dropbear.id.au>
 References: <20170301044405.1792-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 03/50] PCI: add missing classes in pci_ids.h to
- build device tree
+Subject: [Qemu-devel] [PULL 07/50] target/ppc: Fix KVM-HV HPTE accessors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,181 +20,310 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, thuth@redhat.com, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, thuth@redhat.com, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>, "Aneesh Kumar K . V" <aneesh.kumar@linux.vnet.ibm.com>
 
-From: Laurent Vivier <lvivier@redhat.com>
+When a 'pseries' guest is running with KVM-HV, the guest's hashed page
+table (HPT) is stored within the host kernel, so it is not directly
+accessible to qemu.  Most of the time, qemu doesn't need to access it:
+we're using the hardware MMU, and KVM itself implements the guest
+hypercalls for manipulating the HPT.
 
-To allow QEMU to add PCI entries in device tree,
-we must have a more exhaustive list of PCI class IDs.
+However, qemu does need access to the in-KVM HPT to implement
+get_phys_page_debug() for the benefit of the gdbstub, and maybe for
+other debug operations.
 
-This patch synchronizes as much as possible with
-pci_ids.h and add some missing IDs from SLOF.
+To allow this, 7c43bca "target-ppc: Fix page table lookup with kvm
+enabled" added kvmppc_hash64_read_pteg() to target/ppc/kvm.c to read
+in a batch of HPTEs from the KVM table.  Unfortunately, there are a
+couple of problems with this:
 
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+First, the name of the function implies it always reads a whole PTEG
+from the HPT, but in fact in some cases it's used to grab individual
+HPTEs (which ends up pulling 8 HPTEs, not aligned to a PTEG from the
+kernel).
+
+Second, and more importantly, the code to read the HPTEs from KVM is
+simply wrong, in general.  The data from the fd that KVM provides is
+designed mostly for compact migration rather than this sort of one-off
+access, and so needs some decoding for this purpose.  The current code
+will work in some cases, but if there are invalid HPTEs then it will
+not get sane results.
+
+This patch rewrite the HPTE reading function to have a simpler
+interface (just read n HPTEs into a caller provided buffer), and to
+correctly decode the stream from the kernel.
+
+For consistency we also clean up the similar function for altering
+HPTEs within KVM (introduced in c138593 "target-ppc: Update
+ppc_hash64_store_hpte to support updating in-kernel htab").
+
+Cc: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- include/hw/pci/pci_ids.h | 112 +++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 103 insertions(+), 9 deletions(-)
+ target/ppc/cpu.h        |   1 +
+ target/ppc/kvm.c        | 126 +++++++++++++++++++++++-------------------------
+ target/ppc/kvm_ppc.h    |  20 ++------
+ target/ppc/mmu-hash64.c |   8 +--
+ target/ppc/mmu-hash64.h |   2 +-
+ 5 files changed, 73 insertions(+), 84 deletions(-)
 
-diff --git a/include/hw/pci/pci_ids.h b/include/hw/pci/pci_ids.h
-index d77ca60..d22ad8d 100644
---- a/include/hw/pci/pci_ids.h
-+++ b/include/hw/pci/pci_ids.h
-@@ -13,41 +13,84 @@
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index b559b67..c022984 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -228,6 +228,7 @@ typedef struct DisasContext DisasContext;
+ typedef struct ppc_spr_t ppc_spr_t;
+ typedef union ppc_avr_t ppc_avr_t;
+ typedef union ppc_tlb_t ppc_tlb_t;
++typedef struct ppc_hash_pte64 ppc_hash_pte64_t;
  
- /* Device classes and subclasses */
+ /* SPR access micro-ops generations callbacks */
+ struct ppc_spr_t {
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 52bbea5..79c1da6 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -2596,89 +2596,85 @@ void kvm_arch_init_irq_routing(KVMState *s)
+ {
+ }
  
--#define PCI_BASE_CLASS_STORAGE           0x01
--#define PCI_BASE_CLASS_NETWORK           0x02
-+#define PCI_CLASS_NOT_DEFINED            0x0000
-+#define PCI_CLASS_NOT_DEFINED_VGA        0x0001
- 
-+#define PCI_BASE_CLASS_STORAGE           0x01
- #define PCI_CLASS_STORAGE_SCSI           0x0100
- #define PCI_CLASS_STORAGE_IDE            0x0101
-+#define PCI_CLASS_STORAGE_FLOPPY         0x0102
-+#define PCI_CLASS_STORAGE_IPI            0x0103
- #define PCI_CLASS_STORAGE_RAID           0x0104
-+#define PCI_CLASS_STORAGE_ATA            0x0105
- #define PCI_CLASS_STORAGE_SATA           0x0106
-+#define PCI_CLASS_STORAGE_SAS            0x0107
- #define PCI_CLASS_STORAGE_EXPRESS        0x0108
- #define PCI_CLASS_STORAGE_OTHER          0x0180
- 
-+#define PCI_BASE_CLASS_NETWORK           0x02
- #define PCI_CLASS_NETWORK_ETHERNET       0x0200
-+#define PCI_CLASS_NETWORK_TOKEN_RING     0x0201
-+#define PCI_CLASS_NETWORK_FDDI           0x0202
-+#define PCI_CLASS_NETWORK_ATM            0x0203
-+#define PCI_CLASS_NETWORK_ISDN           0x0204
-+#define PCI_CLASS_NETWORK_WORLDFIP       0x0205
-+#define PCI_CLASS_NETWORK_PICMG214       0x0206
- #define PCI_CLASS_NETWORK_OTHER          0x0280
- 
-+#define PCI_BASE_CLASS_DISPLAY           0x03
- #define PCI_CLASS_DISPLAY_VGA            0x0300
-+#define PCI_CLASS_DISPLAY_XGA            0x0301
-+#define PCI_CLASS_DISPLAY_3D             0x0302
- #define PCI_CLASS_DISPLAY_OTHER          0x0380
- 
-+#define PCI_BASE_CLASS_MULTIMEDIA        0x04
-+#define PCI_CLASS_MULTIMEDIA_VIDEO       0x0400
- #define PCI_CLASS_MULTIMEDIA_AUDIO       0x0401
-+#define PCI_CLASS_MULTIMEDIA_PHONE       0x0402
-+#define PCI_CLASS_MULTIMEDIA_OTHER       0x0480
- 
-+#define PCI_BASE_CLASS_MEMORY            0x05
- #define PCI_CLASS_MEMORY_RAM             0x0500
-+#define PCI_CLASS_MEMORY_FLASH           0x0501
-+#define PCI_CLASS_MEMORY_OTHER           0x0580
- 
--#define PCI_CLASS_SYSTEM_SDHCI           0x0805
--#define PCI_CLASS_SYSTEM_OTHER           0x0880
+-struct kvm_get_htab_buf {
+-    struct kvm_get_htab_header header;
+-    /*
+-     * We require one extra byte for read
+-     */
+-    target_ulong hpte[(HPTES_PER_GROUP * 2) + 1];
+-};
 -
--#define PCI_CLASS_SERIAL_USB             0x0c03
--#define PCI_CLASS_SERIAL_SMBUS           0x0c05
+-uint64_t kvmppc_hash64_read_pteg(PowerPCCPU *cpu, target_ulong pte_index)
++void kvmppc_read_hptes(ppc_hash_pte64_t *hptes, hwaddr ptex, int n)
+ {
+-    int htab_fd;
+-    struct kvm_get_htab_fd ghf;
+-    struct kvm_get_htab_buf  *hpte_buf;
++    struct kvm_get_htab_fd ghf = {
++        .flags = 0,
++        .start_index = ptex,
++    };
++    int fd, rc;
++    int i;
+ 
+-    ghf.flags = 0;
+-    ghf.start_index = pte_index;
+-    htab_fd = kvm_vm_ioctl(kvm_state, KVM_PPC_GET_HTAB_FD, &ghf);
+-    if (htab_fd < 0) {
+-        goto error_out;
++    fd = kvm_vm_ioctl(kvm_state, KVM_PPC_GET_HTAB_FD, &ghf);
++    if (fd < 0) {
++        hw_error("kvmppc_read_hptes: Unable to open HPT fd");
+     }
+ 
+-    hpte_buf = g_malloc0(sizeof(*hpte_buf));
+-    /*
+-     * Read the hpte group
+-     */
+-    if (read(htab_fd, hpte_buf, sizeof(*hpte_buf)) < 0) {
+-        goto out_close;
+-    }
++    i = 0;
++    while (i < n) {
++        struct kvm_get_htab_header *hdr;
++        int m = n < HPTES_PER_GROUP ? n : HPTES_PER_GROUP;
++        char buf[sizeof(*hdr) + m * HASH_PTE_SIZE_64];
+ 
+-    close(htab_fd);
+-    return (uint64_t)(uintptr_t) hpte_buf->hpte;
++        rc = read(fd, buf, sizeof(buf));
++        if (rc < 0) {
++            hw_error("kvmppc_read_hptes: Unable to read HPTEs");
++        }
+ 
+-out_close:
+-    g_free(hpte_buf);
+-    close(htab_fd);
+-error_out:
+-    return 0;
+-}
++        hdr = (struct kvm_get_htab_header *)buf;
++        while ((i < n) && ((char *)hdr < (buf + rc))) {
++            int invalid = hdr->n_invalid;
+ 
+-void kvmppc_hash64_free_pteg(uint64_t token)
+-{
+-    struct kvm_get_htab_buf *htab_buf;
++            if (hdr->index != (ptex + i)) {
++                hw_error("kvmppc_read_hptes: Unexpected HPTE index %"PRIu32
++                         " != (%"HWADDR_PRIu" + %d", hdr->index, ptex, i);
++            }
++
++            memcpy(hptes + i, hdr + 1, HASH_PTE_SIZE_64 * hdr->n_valid);
++            i += hdr->n_valid;
+ 
+-    htab_buf = container_of((void *)(uintptr_t) token, struct kvm_get_htab_buf,
+-                            hpte);
+-    g_free(htab_buf);
+-    return;
++            if ((n - i) < invalid) {
++                invalid = n - i;
++            }
++            memset(hptes + i, 0, invalid * HASH_PTE_SIZE_64);
++            i += hdr->n_invalid;
++
++            hdr = (struct kvm_get_htab_header *)
++                ((char *)(hdr + 1) + HASH_PTE_SIZE_64 * hdr->n_valid);
++        }
++    }
++
++    close(fd);
+ }
+ 
+-void kvmppc_hash64_write_pte(CPUPPCState *env, target_ulong pte_index,
+-                             target_ulong pte0, target_ulong pte1)
++void kvmppc_write_hpte(hwaddr ptex, uint64_t pte0, uint64_t pte1)
+ {
+-    int htab_fd;
++    int fd, rc;
+     struct kvm_get_htab_fd ghf;
+-    struct kvm_get_htab_buf hpte_buf;
++    struct {
++        struct kvm_get_htab_header hdr;
++        uint64_t pte0;
++        uint64_t pte1;
++    } buf;
+ 
+     ghf.flags = 0;
+     ghf.start_index = 0;     /* Ignored */
+-    htab_fd = kvm_vm_ioctl(kvm_state, KVM_PPC_GET_HTAB_FD, &ghf);
+-    if (htab_fd < 0) {
+-        goto error_out;
+-    }
 -
-+#define PCI_BASE_CLASS_BRIDGE            0x06
- #define PCI_CLASS_BRIDGE_HOST            0x0600
- #define PCI_CLASS_BRIDGE_ISA             0x0601
-+#define PCI_CLASS_BRIDGE_EISA            0x0602
-+#define PCI_CLASS_BRIDGE_MC              0x0603
- #define PCI_CLASS_BRIDGE_PCI             0x0604
- #define PCI_CLASS_BRIDGE_PCI_INF_SUB     0x01
-+#define PCI_CLASS_BRIDGE_PCMCIA          0x0605
-+#define PCI_CLASS_BRIDGE_NUBUS           0x0606
-+#define PCI_CLASS_BRIDGE_CARDBUS         0x0607
-+#define PCI_CLASS_BRIDGE_RACEWAY         0x0608
-+#define PCI_CLASS_BRIDGE_PCI_SEMITP      0x0609
-+#define PCI_CLASS_BRIDGE_IB_PCI          0x060a
- #define PCI_CLASS_BRIDGE_OTHER           0x0680
+-    hpte_buf.header.n_valid = 1;
+-    hpte_buf.header.n_invalid = 0;
+-    hpte_buf.header.index = pte_index;
+-    hpte_buf.hpte[0] = pte0;
+-    hpte_buf.hpte[1] = pte1;
+-    /*
+-     * Write the hpte entry.
+-     * CAUTION: write() has the warn_unused_result attribute. Hence we
+-     * need to check the return value, even though we do nothing.
+-     */
+-    if (write(htab_fd, &hpte_buf, sizeof(hpte_buf)) < 0) {
+-        goto out_close;
++    fd = kvm_vm_ioctl(kvm_state, KVM_PPC_GET_HTAB_FD, &ghf);
++    if (fd < 0) {
++        hw_error("kvmppc_write_hpte: Unable to open HPT fd");
+     }
  
-+#define PCI_BASE_CLASS_COMMUNICATION     0x07
- #define PCI_CLASS_COMMUNICATION_SERIAL   0x0700
-+#define PCI_CLASS_COMMUNICATION_PARALLEL 0x0701
-+#define PCI_CLASS_COMMUNICATION_MULTISERIAL 0x0702
-+#define PCI_CLASS_COMMUNICATION_MODEM    0x0703
-+#define PCI_CLASS_COMMUNICATION_GPIB     0x0704
-+#define PCI_CLASS_COMMUNICATION_SC       0x0705
- #define PCI_CLASS_COMMUNICATION_OTHER    0x0780
+-out_close:
+-    close(htab_fd);
+-    return;
++    buf.hdr.n_valid = 1;
++    buf.hdr.n_invalid = 0;
++    buf.hdr.index = ptex;
++    buf.pte0 = cpu_to_be64(pte0);
++    buf.pte1 = cpu_to_be64(pte1);
  
-+#define PCI_BASE_CLASS_SYSTEM            0x08
-+#define PCI_CLASS_SYSTEM_PIC             0x0800
-+#define PCI_CLASS_SYSTEM_PIC_IOAPIC      0x080010
-+#define PCI_CLASS_SYSTEM_PIC_IOXAPIC     0x080020
-+#define PCI_CLASS_SYSTEM_DMA             0x0801
-+#define PCI_CLASS_SYSTEM_TIMER           0x0802
-+#define PCI_CLASS_SYSTEM_RTC             0x0803
-+#define PCI_CLASS_SYSTEM_PCI_HOTPLUG     0x0804
-+#define PCI_CLASS_SYSTEM_SDHCI           0x0805
-+#define PCI_CLASS_SYSTEM_OTHER           0x0880
-+
-+#define PCI_BASE_CLASS_INPUT             0x09
- #define PCI_CLASS_INPUT_KEYBOARD         0x0900
- #define PCI_CLASS_INPUT_PEN              0x0901
- #define PCI_CLASS_INPUT_MOUSE            0x0902
-@@ -55,8 +98,59 @@
- #define PCI_CLASS_INPUT_GAMEPORT         0x0904
- #define PCI_CLASS_INPUT_OTHER            0x0980
+-error_out:
+-    return;
++    rc = write(fd, &buf, sizeof(buf));
++    if (rc != sizeof(buf)) {
++        hw_error("kvmppc_write_hpte: Unable to update KVM HPT");
++    }
++    close(fd);
+ }
  
--#define PCI_CLASS_PROCESSOR_CO           0x0b40
-+#define PCI_BASE_CLASS_DOCKING           0x0a
-+#define PCI_CLASS_DOCKING_GENERIC        0x0a00
-+#define PCI_CLASS_DOCKING_OTHER          0x0a80
-+
-+#define PCI_BASE_CLASS_PROCESSOR         0x0b
-+#define PCI_CLASS_PROCESSOR_PENTIUM      0x0b02
- #define PCI_CLASS_PROCESSOR_POWERPC      0x0b20
-+#define PCI_CLASS_PROCESSOR_MIPS         0x0b30
-+#define PCI_CLASS_PROCESSOR_CO           0x0b40
-+
-+#define PCI_BASE_CLASS_SERIAL            0x0c
-+#define PCI_CLASS_SERIAL_FIREWIRE        0x0c00
-+#define PCI_CLASS_SERIAL_ACCESS          0x0c01
-+#define PCI_CLASS_SERIAL_SSA             0x0c02
-+#define PCI_CLASS_SERIAL_USB             0x0c03
-+#define PCI_CLASS_SERIAL_USB_UHCI        0x0c0300
-+#define PCI_CLASS_SERIAL_USB_OHCI        0x0c0310
-+#define PCI_CLASS_SERIAL_USB_EHCI        0x0c0320
-+#define PCI_CLASS_SERIAL_USB_XHCI        0x0c0330
-+#define PCI_CLASS_SERIAL_USB_UNKNOWN     0x0c0380
-+#define PCI_CLASS_SERIAL_USB_DEVICE      0x0c03fe
-+#define PCI_CLASS_SERIAL_FIBER           0x0c04
-+#define PCI_CLASS_SERIAL_SMBUS           0x0c05
-+#define PCI_CLASS_SERIAL_IB              0x0c06
-+#define PCI_CLASS_SERIAL_IPMI            0x0c07
-+#define PCI_CLASS_SERIAL_SERCOS          0x0c08
-+#define PCI_CLASS_SERIAL_CANBUS          0x0c09
-+
-+#define PCI_BASE_CLASS_WIRELESS          0x0d
-+#define PCI_CLASS_WIRELESS_IRDA          0x0d00
-+#define PCI_CLASS_WIRELESS_CIR           0x0d01
-+#define PCI_CLASS_WIRELESS_RF_CONTROLLER 0x0d10
-+#define PCI_CLASS_WIRELESS_BLUETOOTH     0x0d11
-+#define PCI_CLASS_WIRELESS_BROADBAND     0x0d12
-+#define PCI_CLASS_WIRELESS_OTHER         0x0d80
-+
-+#define PCI_BASE_CLASS_SATELLITE         0x0f
-+#define PCI_CLASS_SATELLITE_TV           0x0f00
-+#define PCI_CLASS_SATELLITE_AUDIO        0x0f01
-+#define PCI_CLASS_SATELLITE_VOICE        0x0f03
-+#define PCI_CLASS_SATELLITE_DATA         0x0f04
-+
-+#define PCI_BASE_CLASS_CRYPT             0x10
-+#define PCI_CLASS_CRYPT_NETWORK          0x1000
-+#define PCI_CLASS_CRYPT_ENTERTAINMENT    0x1001
-+#define PCI_CLASS_CRYPT_OTHER            0x1080
-+
-+#define PCI_BASE_CLASS_SIGNAL_PROCESSING 0x11
-+#define PCI_CLASS_SP_DPIO                0x1100
-+#define PCI_CLASS_SP_PERF                0x1101
-+#define PCI_CLASS_SP_SYNCH               0x1110
-+#define PCI_CLASS_SP_MANAGEMENT          0x1120
-+#define PCI_CLASS_SP_OTHER               0x1180
+ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index 8da2ee4..8e9f42d 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -49,11 +49,8 @@ int kvmppc_get_htab_fd(bool write);
+ int kvmppc_save_htab(QEMUFile *f, int fd, size_t bufsize, int64_t max_ns);
+ int kvmppc_load_htab_chunk(QEMUFile *f, int fd, uint32_t index,
+                            uint16_t n_valid, uint16_t n_invalid);
+-uint64_t kvmppc_hash64_read_pteg(PowerPCCPU *cpu, target_ulong pte_index);
+-void kvmppc_hash64_free_pteg(uint64_t token);
+-
+-void kvmppc_hash64_write_pte(CPUPPCState *env, target_ulong pte_index,
+-                             target_ulong pte0, target_ulong pte1);
++void kvmppc_read_hptes(ppc_hash_pte64_t *hptes, hwaddr ptex, int n);
++void kvmppc_write_hpte(hwaddr ptex, uint64_t pte0, uint64_t pte1);
+ bool kvmppc_has_cap_fixup_hcalls(void);
+ bool kvmppc_has_cap_htm(void);
+ int kvmppc_enable_hwrng(void);
+@@ -234,20 +231,13 @@ static inline int kvmppc_load_htab_chunk(QEMUFile *f, int fd, uint32_t index,
+     abort();
+ }
  
- #define PCI_CLASS_OTHERS                 0xff
+-static inline uint64_t kvmppc_hash64_read_pteg(PowerPCCPU *cpu,
+-                                               target_ulong pte_index)
+-{
+-    abort();
+-}
+-
+-static inline void kvmppc_hash64_free_pteg(uint64_t token)
++static inline void kvmppc_read_hptes(ppc_hash_pte64_t *hptes,
++                                     hwaddr ptex, int n)
+ {
+     abort();
+ }
+ 
+-static inline void kvmppc_hash64_write_pte(CPUPPCState *env,
+-                                           target_ulong pte_index,
+-                                           target_ulong pte0, target_ulong pte1)
++static inline void kvmppc_write_hpte(hwaddr ptex, uint64_t pte0, uint64_t pte1)
+ {
+     abort();
+ }
+diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+index 76669ed..862e50e 100644
+--- a/target/ppc/mmu-hash64.c
++++ b/target/ppc/mmu-hash64.c
+@@ -438,10 +438,12 @@ uint64_t ppc_hash64_start_access(PowerPCCPU *cpu, target_ulong pte_index)
+ 
+     pte_offset = pte_index * HASH_PTE_SIZE_64;
+     if (cpu->env.external_htab == MMU_HASH64_KVM_MANAGED_HPT) {
++        ppc_hash_pte64_t *pteg = g_malloc(HASH_PTEG_SIZE_64);
+         /*
+          * HTAB is controlled by KVM. Fetch the PTEG into a new buffer.
+          */
+-        token = kvmppc_hash64_read_pteg(cpu, pte_index);
++        kvmppc_read_hptes(pteg, pte_index, HPTES_PER_GROUP);
++        token = (uint64_t)(uintptr_t)pteg;
+     } else if (cpu->env.external_htab) {
+         /*
+          * HTAB is controlled by QEMU. Just point to the internally
+@@ -457,7 +459,7 @@ uint64_t ppc_hash64_start_access(PowerPCCPU *cpu, target_ulong pte_index)
+ void ppc_hash64_stop_access(PowerPCCPU *cpu, uint64_t token)
+ {
+     if (cpu->env.external_htab == MMU_HASH64_KVM_MANAGED_HPT) {
+-        kvmppc_hash64_free_pteg(token);
++        g_free((void *)token);
+     }
+ }
+ 
+@@ -916,7 +918,7 @@ void ppc_hash64_store_hpte(PowerPCCPU *cpu,
+     CPUPPCState *env = &cpu->env;
+ 
+     if (env->external_htab == MMU_HASH64_KVM_MANAGED_HPT) {
+-        kvmppc_hash64_write_pte(env, pte_index, pte0, pte1);
++        kvmppc_write_hpte(pte_index, pte0, pte1);
+         return;
+     }
+ 
+diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
+index 7a0b7fc..73aeaa3 100644
+--- a/target/ppc/mmu-hash64.h
++++ b/target/ppc/mmu-hash64.h
+@@ -127,7 +127,7 @@ static inline target_ulong ppc_hash64_load_hpte1(PowerPCCPU *cpu,
+     }
+ }
+ 
+-typedef struct {
++typedef struct ppc_hash_pte64 {
+     uint64_t pte0, pte1;
+ } ppc_hash_pte64_t;
  
 -- 
 2.9.3
