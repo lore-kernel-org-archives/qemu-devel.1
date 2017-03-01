@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48521)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cjAk3-0004r8-Ov
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 15:20:57 -0500
+	(envelope-from <thuth@redhat.com>) id 1cjAk3-0004r7-Ok
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 15:20:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cjAk1-00023P-1I
+	(envelope-from <thuth@redhat.com>) id 1cjAk2-00023d-3T
 	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 15:20:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36928)
+Received: from mx1.redhat.com ([209.132.183.28]:53116)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1cjAk0-00023E-OP
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 15:20:52 -0500
-References: <1486623844-13140-1-git-send-email-liqiang6-s@360.cn>
-	<1486623844-13140-2-git-send-email-liqiang6-s@360.cn>
-	<eadb7db6-dded-77ce-ac46-7dee688be954@redhat.com>
-	<CAKXe6SJyeHEeRujwKTd=TUAXjJ1Btv4K9jX6rjyJ4wtsutQ1fQ@mail.gmail.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <8a406a12-5145-bfbe-af18-290e6342f668@redhat.com>
-Date: Wed, 1 Mar 2017 15:20:50 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cjAk1-00023U-R9
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 15:20:54 -0500
+References: <41cc9d11-2e28-5b5e-4772-81a118d79111@redhat.com>
+	<20170227101817.11748-1-mmarek@suse.com>
+	<41e6edc0-204b-62b7-93b8-b376a40542d6@twiddle.net>
+	<bf246870-6e7c-f540-7cd4-3a20d5912162@redhat.com>
+	<ea3392d8-cd07-64e0-134a-4f111fe853db@twiddle.net>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <0ac325ae-6b68-2a03-74a8-c5ab0ebb58e0@redhat.com>
+Date: Wed, 1 Mar 2017 21:20:50 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAKXe6SJyeHEeRujwKTd=TUAXjJ1Btv4K9jX6rjyJ4wtsutQ1fQ@mail.gmail.com>
+In-Reply-To: <ea3392d8-cd07-64e0-134a-4f111fe853db@twiddle.net>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] ide: core: add cleanup function
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4] target-s390x: Implement stfl and stfle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,173 +30,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>, pbonzini@redhat.com
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Li Qiang <liqiang6-s@360.cn>, Markus Armbruster <armbru@redhat.com>
+To: Richard Henderson <rth@twiddle.net>, Michal Marek <mmarek@suse.com>, Alexander Graf <agraf@suse.de>
+Cc: Eric Bischoff <ebischoff@suse.com>, Miroslav Benes <mbenes@suse.cz>, qemu-devel@nongnu.org
 
+On 01.03.2017 20:30, Richard Henderson wrote:
+> On 03/01/2017 07:00 PM, Thomas Huth wrote:
+>>> Primarily, it does not raise an exception for error.
+>>
+>> Protection and page faults should be generated properly via
+>> trigger_access_exception() there ... or did I miss something?
+>=20
+> So why does s390_cpu_virt_mem_rw document that it returns non-zero if
+> there was an error?
 
+The non-zero return code is needed for the callers to decide whether to
+continue or not (this is used in non-TCG code, too, so we need something
+that is independent from TCG magic here). See the usage of
+s390_cpu_virt_mem_read() / ..._write() in target/s390x/ioinst.c for examp=
+le.
 
-On 02/28/2017 08:03 PM, Li Qiang wrote:
-> Hello John, Paolo,
-> 
-> 2017-03-01 8:47 GMT+08:00 John Snow <jsnow@redhat.com
-> <mailto:jsnow@redhat.com>>:
-> 
-> 
-> 
->     On 02/09/2017 02:04 AM, Li Qiang wrote:
->     > As the pci ahci can be hotplug and unplug, in the ahci unrealize
->     > function it should free all the resource once allocated in the
->     > realized function. This patch adds two cleanup function.
->     >
-> 
->     So, the peculiarities of the current arrangement of QDEV realization and
->     unrealization is a bit of a mystery to me, so I'm hoping my suggestions
->     here make sense.
-> 
->     > Signed-off-by: Li Qiang <liqiang6-s@360.cn <mailto:liqiang6-s@360.cn>>
->     > ---
->     >  hw/ide/core.c             | 21 +++++++++++++++++++++
->     >  include/hw/ide/internal.h |  2 ++
->     >  2 files changed, 23 insertions(+)
->     >
->     > diff --git a/hw/ide/core.c b/hw/ide/core.c
->     > index 43709e5..8fe5896 100644
->     > --- a/hw/ide/core.c
->     > +++ b/hw/ide/core.c
->     > @@ -2586,6 +2586,13 @@ void ide_register_restart_cb(IDEBus *bus)
->     >      }
->     >  }
->     >
->     > +void ide_unregister_restart_cb(IDEBus *bus)
->     > +{
->     > +    if (bus->dma->ops->restart_dma) {
->     > +        qemu_del_vm_change_state_handler(bus->vmstate);
->     > +    }
->     > +}
->     > +
-> 
->     This works perfectly well, though I think the function is named
->     incorrectly -- this should be an AHCI function, as it is AHCI's job to
->     unregister the IDEBus it created (not IDE's -- the bus belongs to the
->     HBA, not the IDE device.)
-> 
->     However, we DO have the IDEBus unrealize code in qdev.c that should be
->     handling this for us. Can we rename this function and just have it set
->     the "realized" property of the IDEBus to false to handle this cleanup
->     for us?
-> 
->     I'm not well versed in qdev code management, but it definitely feels
->     wrong to have the cleanup in two places.
-> 
-> 
->  Agree, but I'm not familiar with qdev too, that's why we need Paolo's help.
-> 
-> @Paolo,
-> Could you please have a look at this issue?
-> 
-> 
+> I see you do raise an exception on the TCG path (via translate_pages),
+> but not the KVM path.  That is very confusing.
 
-OK, so here's what it looks like to me from here:
+The KVM_S390_MEM_OP ioctl can raise an exception, too. I konw, it's
+confusing, but that ioctl was necessary since you need to hold a special
+lock in KVM while walking the page tables.
 
-we have an idebus unrealize function, but it was being registered as the
-unrealize function for the IDE Device, so it was not getting invoked on
-device teardown because nothing is "unrealizing" the IDE devices
-themselves, AFAIK.
+>> AR =3D Access Register ... they are needed when the CPU runs in access
+>> register mode (i.e. the AS PSW bits are 01). AFAIK we don't emulate th=
+is
+>> in QEMU yet, but the KVM_S390_MEM_OP ioctl already supports it.
+>=20
+> Hmm.  I guess I don't know how to read that then.
 
-Perhaps what we want is this, which does actually do the proper bus
-teardown:
+The access-register mode is described in the "Access-Register
+Translation" sub-chapter in Chapter 5 ("Program Execution") of the POP.
+Make sure to have some good painkillers ready first, though ... that's
+IMHO really one of the ugliest parts of the architecture ;-)
 
--static void idebus_unrealize(DeviceState *qdev, Error **errp);
-+static void idebus_unrealize(BusState *bus, Error **errp);
+>>> Your writes need to look a lot more like fast_memmove in mem_helper.c=
+,
+>>> except that of course only the destination needs translation.
+>>
+>> I still think that s390_cpu_virt_mem_write() should be fine here, too.
+>=20
+> Ideally you'd interact with the TCG TLB in some way so that you didn't
+> have to manage your own translation and your own exceptions.  That's
+> what fast_memmove does.
 
- static Property ide_props[] = {
-     DEFINE_PROP_UINT32("unit", IDEDevice, unit, -1),
-@@ -43,14 +43,17 @@ static void ide_bus_class_init(ObjectClass *klass,
-void *data)
-     BusClass *k = BUS_CLASS(klass);
+Well, all the code from s390_cpu_virt_mem_rw() can also run with KVM -
+in case the KVM_S390_MEM_OP is not available (which also has just been
+introduced two years ago). So all the code that can be called by
+s390_cpu_virt_mem_rw() has to work also without TCG.
 
-     k->get_fw_dev_path = idebus_get_fw_dev_path;
-+    k->unrealize = idebus_unrealize;
- }
+But I agree, since the original problem here (TCG emulation of stfle) is
+not related to KVM, it's maybe better to use a function a la
+fast_memmove there instead.
 
--static void idebus_unrealize(DeviceState *qdev, Error **errp)
-+static void idebus_unrealize(BusState *bus, Error **errp)
- {
--    IDEBus *bus = DO_UPCAST(IDEBus, qbus, qdev->parent_bus);
--
--    if (bus->vmstate) {
--        qemu_del_vm_change_state_handler(bus->vmstate);
-+    IDEBus *ibus = IDE_BUS(bus);
-+    if (ibus->vmstate) {
-+        qemu_del_vm_change_state_handler(ibus->vmstate);
-     }
- }
-@@ -365,7 +369,6 @@ static void ide_device_class_init(ObjectClass
-*klass, void *data)
-     k->init = ide_qdev_init;
-     set_bit(DEVICE_CATEGORY_STORAGE, k->categories);
-     k->bus_type = TYPE_IDE_BUS;
--    k->unrealize = idebus_unrealize;
-     k->props = ide_props;
- }
+>>> Of course, in practice we could reduce this to just one cpu_stl_data =
+for
+>>> STFL and one or two cpu_stq_data for STFLE.
+>>
+>> I think STFLE can store more than two 64-bit words, can't it?
+>=20
+> Technically, yes.  But there are less than 128 bits defined.  Certainly
+> much less than the 4k bits that Michal prepares for.
 
+True. But maybe we should then also have an assert() or something
+similar here in case the bits exceed the 128 limit one day...?
 
-
-This way the bus teardown calls the existing handler. If you integrate
-this into your patches and recreate ide_exit as a per-device teardown
-function, I'll merge this.
-
-Thanks for your patience and the bug report,
---John
-
->     >  static IDEDMA ide_dma_nop = {
->     >      .ops = &ide_dma_nop_ops,
->     >      .aiocb = NULL,
->     > @@ -2603,6 +2610,20 @@ void ide_init2(IDEBus *bus, qemu_irq irq)
->     >      bus->dma = &ide_dma_nop;
->     >  }
->     >
->     > +void ide_exit(IDEBus *bus)
->     > +{
->     > +    int i;
->     > +
->     > +    for (i = 0; i < 2; i++) {
->     > +        IDEState *s = &bus->ifs[i];
->     > +
->     > +        timer_del(s->sector_write_timer);
->     > +        timer_free(s->sector_write_timer);
->     > +        qemu_vfree(s->smart_selftest_data);
->     > +        qemu_vfree(s->io_buffer);
-> 
->     I would prefer a function that cleans up a single IDE device, and the
->     caller (which has knowledge of the HBA and the buses it owns) loops as
->     appropriate. (In this case, ahci_uninit or ahci_unrealize or whichever.)
-> 
->     It's correct otherwise, though.
-> 
->     > +    }
->     > +}
->     > +
->     >  static const MemoryRegionPortio ide_portio_list[] = {
->     >      { 0, 8, 1, .read = ide_ioport_read, .write = ide_ioport_write },
->     >      { 0, 1, 2, .read = ide_data_readw, .write = ide_data_writew },
->     > diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
->     > index 88dc118..09b0404 100644
->     > --- a/include/hw/ide/internal.h
->     > +++ b/include/hw/ide/internal.h
->     > @@ -607,8 +607,10 @@ int ide_init_drive(IDEState *s, BlockBackend
->     *blk, IDEDriveKind kind,
->     >                     uint32_t cylinders, uint32_t heads, uint32_t secs,
->     >                     int chs_trans);
->     >  void ide_init2(IDEBus *bus, qemu_irq irq);
->     > +void ide_exit(IDEBus *bus);
->     >  void ide_init_ioport(IDEBus *bus, ISADevice *isa, int iobase, int
->     iobase2);
->     >  void ide_register_restart_cb(IDEBus *bus);
->     > +void ide_unregister_restart_cb(IDEBus *bus);
->     >
->     >  void ide_exec_cmd(IDEBus *bus, uint32_t val);
->     >
->     >
-> 
-> 
+ Thomas
