@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1cj8xY-0004lE-JX
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:26:48 -0500
+	(envelope-from <krzk@kernel.org>) id 1cj8xf-00050s-Av
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:26:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1cj8xX-0006uu-O6
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:26:44 -0500
+	(envelope-from <krzk@kernel.org>) id 1cj8xe-0006yw-JT
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:26:51 -0500
 From: Krzysztof Kozlowski <krzk@kernel.org>
-Date: Wed,  1 Mar 2017 20:26:15 +0200
-Message-Id: <20170301182618.22395-3-krzk@kernel.org>
+Date: Wed,  1 Mar 2017 20:26:17 +0200
+Message-Id: <20170301182618.22395-5-krzk@kernel.org>
 In-Reply-To: <20170301182618.22395-1-krzk@kernel.org>
 References: <20170301182618.22395-1-krzk@kernel.org>
-Subject: [Qemu-devel] [PATCH 2/5] hw/intc/exynos4210_gic: Use more
- meaningful name for local variable
+Subject: [Qemu-devel] [PATCH 4/5] hw/timer/exynos4210_mct: Fix checkpatch
+ style errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,66 +23,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: Shannon Zhao <shannon.zhao@linaro.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Krzysztof Kozlowski <krzk@kernel.org>
 
-There are to SysBusDevice variables in exynos4210_gic_realize()
-function: one for the device itself and second for arm_gic device.  Add
-a prefix "gic" to the second one so it will be easier to understand the
-code.
+Fix checkpatch errors:
+1. ERROR: spaces required around that '+' (ctx:VxV)
+2. ERROR: spaces required around that '&' (ctx:VxV)
 
-While at it, put local uninitialized 'i' variable at the end, next to
-other uninitialized ones.
+No functional changes.
 
 Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
 ---
- hw/intc/exynos4210_gic.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ hw/timer/exynos4210_mct.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/intc/exynos4210_gic.c b/hw/intc/exynos4210_gic.c
-index 5986e54d39c9..4f7a8b6ca709 100644
---- a/hw/intc/exynos4210_gic.c
-+++ b/hw/intc/exynos4210_gic.c
-@@ -296,21 +296,21 @@ static void exynos4210_gic_realize(DeviceState *dev, Error **errp)
+diff --git a/hw/timer/exynos4210_mct.c b/hw/timer/exynos4210_mct.c
+index 76634fb1b4fd..4dd3e441e2e6 100644
+--- a/hw/timer/exynos4210_mct.c
++++ b/hw/timer/exynos4210_mct.c
+@@ -936,7 +936,7 @@ static void exynos4210_mct_update_freq(Exynos4210MCTState *s)
  {
-     Exynos4210GicState *s = EXYNOS4210_GIC(dev);
-     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
--    uint32_t i;
-     const char cpu_prefix[] = "exynos4210-gic-alias_cpu";
-     const char dist_prefix[] = "exynos4210-gic-alias_dist";
-     char cpu_alias_name[sizeof(cpu_prefix) + 3];
-     char dist_alias_name[sizeof(cpu_prefix) + 3];
--    SysBusDevice *busdev;
-+    SysBusDevice *gicbusdev;
-+    uint32_t i;
+     uint32_t freq = s->freq;
+     s->freq = 24000000 /
+-            ((MCT_CFG_GET_PRESCALER(s->reg_mct_cfg)+1) *
++            ((MCT_CFG_GET_PRESCALER(s->reg_mct_cfg) + 1) *
+                     MCT_CFG_GET_DIVIDER(s->reg_mct_cfg));
  
-     s->gic = qdev_create(NULL, "arm_gic");
-     qdev_prop_set_uint32(s->gic, "num-cpu", s->num_cpu);
-     qdev_prop_set_uint32(s->gic, "num-irq", EXYNOS4210_GIC_NIRQ);
-     qdev_init_nofail(s->gic);
--    busdev = SYS_BUS_DEVICE(s->gic);
-+    gicbusdev = SYS_BUS_DEVICE(s->gic);
+     if (freq != s->freq) {
+@@ -1160,7 +1160,7 @@ static void exynos4210_mct_write(void *opaque, hwaddr offset,
  
-     /* Pass through outbound IRQ lines from the GIC */
--    sysbus_pass_irq(sbd, busdev);
-+    sysbus_pass_irq(sbd, gicbusdev);
+         DPRINTF("comparator %d write 0x%llx val << %d\n", index, value, shift);
  
-     /* Pass through inbound GPIO lines to the GIC */
-     qdev_init_gpio_in(dev, exynos4210_gic_set_irq,
-@@ -321,7 +321,7 @@ static void exynos4210_gic_realize(DeviceState *dev, Error **errp)
-         sprintf(cpu_alias_name, "%s%x", cpu_prefix, i);
-         memory_region_init_alias(&s->cpu_alias[i], OBJECT(s),
-                                  cpu_alias_name,
--                                 sysbus_mmio_get_region(busdev, 1),
-+                                 sysbus_mmio_get_region(gicbusdev, 1),
-                                  0,
-                                  EXYNOS4210_GIC_CPU_REGION_SIZE);
-         memory_region_add_subregion(&s->cpu_container,
-@@ -331,7 +331,7 @@ static void exynos4210_gic_realize(DeviceState *dev, Error **errp)
-         sprintf(dist_alias_name, "%s%x", dist_prefix, i);
-         memory_region_init_alias(&s->dist_alias[i], OBJECT(s),
-                                  dist_alias_name,
--                                 sysbus_mmio_get_region(busdev, 0),
-+                                 sysbus_mmio_get_region(gicbusdev, 0),
-                                  0,
-                                  EXYNOS4210_GIC_DIST_REGION_SIZE);
-         memory_region_add_subregion(&s->dist_container,
+-        if (offset&0x4) {
++        if (offset & 0x4) {
+             s->g_timer.reg.wstat |= G_WSTAT_COMP_U(index);
+         } else {
+             s->g_timer.reg.wstat |= G_WSTAT_COMP_L(index);
 -- 
 2.9.3
