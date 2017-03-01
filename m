@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41309)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cj44A-00049o-LT
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 08:13:15 -0500
+	(envelope-from <jiahuanzhang90@gmail.com>) id 1cj46h-000565-OQ
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 08:15:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cj446-0007vl-Bx
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 08:13:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50834)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cj446-0007vf-5d
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 08:13:10 -0500
-Date: Wed, 1 Mar 2017 13:13:04 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170301131303.GE2429@work-vm>
-References: <20170228124056.5074-1-dgilbert@redhat.com>
-	<CAFEAcA9M4-ghtYHTaSYPDuDjEECbJ_NTQMR_d4X03hgqBBr-3A@mail.gmail.com>
+	(envelope-from <jiahuanzhang90@gmail.com>) id 1cj46e-00007n-Iw
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 08:15:51 -0500
+Received: from mail-qk0-x234.google.com ([2607:f8b0:400d:c09::234]:35967)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jiahuanzhang90@gmail.com>)
+	id 1cj46e-00004w-E6
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 08:15:48 -0500
+Received: by mail-qk0-x234.google.com with SMTP id n186so67267167qkb.3
+	for <qemu-devel@nongnu.org>; Wed, 01 Mar 2017 05:15:46 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9M4-ghtYHTaSYPDuDjEECbJ_NTQMR_d4X03hgqBBr-3A@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 00/27] migration queue
+From: Jiahuan Zhang <jiahuanzhang90@gmail.com>
+Date: Wed, 1 Mar 2017 14:15:45 +0100
+Message-ID: <CAJy91CZO+XOyzyhG5yKYcYQsfG_jwRF7W_4sxp6Fen=4gNr+YA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: [Qemu-devel] Windows Pipe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +26,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, pasic@linux.vnet.ibm.com, vsementsov@virtuozzo.com, Juan Quintela <quintela@redhat.com>, Ashijeet Acharya <ashijeetacharya@gmail.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, danielhb@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> On 28 February 2017 at 12:40, Dr. David Alan Gilbert (git)
-> <dgilbert@redhat.com> wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> >
-> > The following changes since commit 6181478f6395cdd9d6ffd99623d0c9f39ea53606:
-> >
-> >   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2017-02-28 08:46:03 +0000)
-> >
-> > are available in the git repository at:
-> >
-> >   git://github.com/dagrh/qemu.git tags/pull-migration-20170228a
-> >
-> > for you to fetch changes up to 665414ad06aa1bc92e615db9641e58fb13d07de1:
-> >
-> >   postcopy: Add extra check for COPY function (2017-02-28 11:30:24 +0000)
-> >
-> > ----------------------------------------------------------------
-> > Migration pull
-> >
-> > Note: The 'postcopy: Update userfaultfd.h header' is part of
-> > Paolo's header update and will disappear if applied after it.
-> 
-> Is that a linux-headers update not done via the update script? :-(
+Dear QEMU developers,
 
-It was in earlier version of my patchset, but I replaced it by 
-Paolo's update that he made via the script; the one in the pull
-should be identical to Paolo's change - but just the userfaultfd.h
-change.
+I want the host-guest communication for QEMU. I want to achieve
+it via serial port redirection to a pipe. My host is windows and guest is
+Linux. QEMU is in version 2.8.50
 
-Dave
+I looked into char-pipe.c and char-win.c, and find that the current QEMU
+only supports reading data on the pipe from host to guest for Windows.
+See *win_chr_pipe_init
+() *in char-pipe.c
 
-> thanks
-> -- PMM
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Is it true?
+
+I don't know how to use *win_chr_write() *in char-win.c.
+Can you please present an example?
+
+best regards,
+Jiahuan
