@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cj3Qo-0004aV-KG
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 07:32:35 -0500
+	(envelope-from <marcel@redhat.com>) id 1cj3Qx-0004xO-56
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 07:32:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cj3Qk-0002oR-PG
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 07:32:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33692)
+	(envelope-from <marcel@redhat.com>) id 1cj3Qu-0002te-1L
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 07:32:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53964)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cj3Qk-0002nO-Iy
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 07:32:30 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8F2DB8047F
-	for <qemu-devel@nongnu.org>; Wed,  1 Mar 2017 12:32:30 +0000 (UTC)
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Wed,  1 Mar 2017 12:32:23 +0000
-Message-Id: <20170301123223.12489-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH] migration: allow clearing migration string
- parameters
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1cj3Qt-0002tT-P2
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 07:32:39 -0500
+References: <1487910561-17825-1-git-send-email-peterx@redhat.com>
+	<e547f430-d078-27a5-7064-4fc5b9f738d1@redhat.com>
+	<20170301023635.GE13926@pxdev.xzpeter.org>
+	<20170301043802-mutt-send-email-mst@kernel.org>
+	<05a23bbc-4ebc-769b-aa62-d3387af57cae@redhat.com>
+	<a35dbe8f-770e-c792-e5ea-1f4f8ef8df37@redhat.com>
+	<20170301091831.GF13926@pxdev.xzpeter.org>
+	<4e757875-5b48-6eb6-3847-a27787dd6edd@redhat.com>
+	<20170301095928.GG13926@pxdev.xzpeter.org>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <237f48d3-20eb-af1e-30ad-16a855607cdc@redhat.com>
+Date: Wed, 1 Mar 2017 14:32:34 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170301095928.GG13926@pxdev.xzpeter.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] intel_iommu: check misordered init when
+ realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,62 +35,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, yi.l.liu@intel.com, qemu-devel@nongnu.org, Jintack Lim <jintack@cs.columbia.edu>
 
-Some of the migration parameters are strings, which default to NULL,
-eg tls_hostname and tls_creds.
+On 03/01/2017 11:59 AM, Peter Xu wrote:
+> On Wed, Mar 01, 2017 at 11:29:47AM +0200, Marcel Apfelbaum wrote:
+>> On 03/01/2017 11:18 AM, Peter Xu wrote:
+>>> On Wed, Mar 01, 2017 at 09:03:47AM +0200, Marcel Apfelbaum wrote:
+>>>> On 03/01/2017 06:14 AM, Jason Wang wrote:
+>>>
+>>> [...]
+>>>
+>>>> Hi Jason,
+>>>>
+>>>> I am not saying we don't need to create the IOMMU before some other device,
+>>>> I just don't think that the command line order should matter to user.
+>>>>
+>>>> BTW, are you working on a way to limit the IOMMU scope to a specific set of devices?
+>>>> If yes, this approach will also help you work.
+>>>
+>>> Marcel,
+>>>
+>>> Do you have any plan after 2.9 to re-arrange the init order thing a
+>>> bit? In general, maybe we need an ordering support for devices.
+>>
+>> I don;t know when I'll start it, but yes, I am thinking about
+>> taking this project. We need the ordering in order to be able
+>> to have less "built-in" devices.
+>
+> That'll be great!
+>
+>>
+>>> Besides that, I am thinking whether it would be wise that we just init
+>>> the IOMMUs during machine init just like before, but keep the
+>>> "-device" interface? After all, at least the root IOMMU device should
+>>> be with root complex, and it feels a little strange we just split the
+>>> init process apart (we delay the IOMMU init into device
+>>> initializations).
+>>>
+>>
+>> Keeping the IOMMU creation as part of the Root Complex is problematic.
+>> What happens if we want to limit the IOMMU scope to a subset of devices?
+>> How will the command line look? Also we may want/need multiple iommu
+>> devices per system. It will not happen tomorrow, but we don't want to loose
+>> this possibility.
+>
+> I think that won't be a big problem. E.g., I don't see big problem if
+> we just create all these vIOMMUs along with machine init. Is there?
+>
 
-The mgmt app will set the tls_creds parameter on both source and target
-QEMU instances, in order to trigger use of TLS for migration.
+How would you assign them do devices?
 
-After performing a TLS encrypted migration though, migration might be
-used for other reasons - for example, to save the QEMU state to a file.
-We need TLS turned off when doing this, but the migrate-set-parameters
-QAPI command does not provide any facility to clear/reset parameters
-to their default state.
+The "normal" QEMU cmd line would look like I mentioned earlier:
 
-If you simply ommit the tls_creds parameter in migrate-set-parameters,
-then 'has_tls_creds' will be false and so no action will be taken. The
-only option that works with migrate-set-parameters is to treat "" on
-the wire as equivalent to requesting NULL. Failing that we would have
-to create a new 'migrate-reset-parameters' method to explicitly put
-a parameter back to its default value.
+-device iommu,id=iommu1 -device pcie-root,iommu=iommu1 \
+-device pcie-root \
+-device iommu,id=iommu2 -device pcie-root,iommu=iommu2 \
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
+How do you propose to do it otherwise?
 
-CC'ing Eric & Markus since this is related to QAPI schema for migrate
-monitor commands
+> IMHO we can just pick these vIOMMU "devices" out of the device list,
+> and we can avoid doing that again in general device_init_func().
+>
+>>
+>> The device re-ordering is not 2.9 material of course, and we need your patch.
+>> The only thing we can do better is to take out the "vfio-pci" in another header
+>> file and and have it in a array of devices that should be checked
+>> (in order to avoid polluting the IOMMU code with a not related device)
+>>
+>> I can try and send a patch for it if you prefer.
+>
+> IMHO it'll be okay we "pollute" vtd code for a short while. We can
+> revert my patch (or any workarounds, like Jason's just posted one)
 
- migration/migration.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+Can you please send me a link to Jason's patch?
 
-diff --git a/migration/migration.c b/migration/migration.c
-index c6ae69d..a5d41a9 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -872,11 +872,19 @@ void qmp_migrate_set_parameters(MigrationParameters *params, Error **errp)
-     }
-     if (params->has_tls_creds) {
-         g_free(s->parameters.tls_creds);
--        s->parameters.tls_creds = g_strdup(params->tls_creds);
-+        if (*params->tls_creds == '\0') {
-+            s->parameters.tls_creds = NULL;
-+        } else {
-+            s->parameters.tls_creds = g_strdup(params->tls_creds);
-+        }
-     }
-     if (params->has_tls_hostname) {
-         g_free(s->parameters.tls_hostname);
--        s->parameters.tls_hostname = g_strdup(params->tls_hostname);
-+        if (*params->tls_hostnane == '\0') {
-+            s->parameters.tls_hostnane = NULL;
-+        } else {
-+            s->parameters.tls_hostname = g_strdup(params->tls_hostname);
-+        }
-     }
-     if (params->has_max_bandwidth) {
-         s->parameters.max_bandwidth = params->max_bandwidth;
--- 
-2.9.3
+If nobody else objects I am OK with it.
+
+Thanks,
+Marcel
+
+> when we have device ordering support, and when we have a correct
+> bus_master_as when device init.
+>
+> Thanks,
+>
+> -- peterx
+>
