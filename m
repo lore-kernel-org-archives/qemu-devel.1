@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45031)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45294)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1civwD-00062z-Oy
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:32:30 -0500
+	id 1civyV-0006c4-CW
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:34:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1civwA-0005EK-Kw
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:32:29 -0500
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:33850)
+	id 1civyS-0005Zg-7o
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:34:51 -0500
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:34066)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1civwA-0005EC-HI
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:32:26 -0500
-Received: by mail-qk0-x243.google.com with SMTP id s186so8022566qkb.1
-	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 20:32:26 -0800 (PST)
+	id 1civyS-0005ZX-4D
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:34:48 -0500
+Received: by mail-qk0-x243.google.com with SMTP id s186so8031470qkb.1
+	for <qemu-devel@nongnu.org>; Tue, 28 Feb 2017 20:34:47 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20170227134202.2991-1-marcandre.lureau@redhat.com>
-	<20170227134202.2991-11-marcandre.lureau@redhat.com>
+	<20170227134202.2991-16-marcandre.lureau@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <fedcd439-6523-79a7-9c3f-8a49653d1749@amsat.org>
-Date: Wed, 1 Mar 2017 01:32:22 -0300
+Message-ID: <788221cc-b17c-8d29-81da-9a23e5507686@amsat.org>
+Date: Wed, 1 Mar 2017 01:34:43 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170227134202.2991-11-marcandre.lureau@redhat.com>
+In-Reply-To: <20170227134202.2991-16-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 10/21] char: useless NULL check
+Subject: Re: [Qemu-devel] [PATCH v2 15/21] char-udp: flush as much buffer as
+ possible
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,27 +39,69 @@ To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel
 Cc: pbonzini@redhat.com
 
 On 02/27/2017 10:41 AM, Marc-André Lureau wrote:
-> g_strdup(NULL) returns NULL already.
+> Instead of flushing the buffer byte by byte, call qemu_chr_be_write()
+> with as much byte possible accepted by the front-end.
+>
+> Factor out buffer flushing in a common function udp_chr_flush_buffer().
 >
 > Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  chardev/char.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  chardev/char-udp.c | 26 +++++++++++++++-----------
+>  1 file changed, 15 insertions(+), 11 deletions(-)
 >
-> diff --git a/chardev/char.c b/chardev/char.c
-> index 558fd8b31c..bb20d73fcf 100644
-> --- a/chardev/char.c
-> +++ b/chardev/char.c
-> @@ -764,7 +764,7 @@ void qemu_chr_parse_common(QemuOpts *opts, ChardevCommon *backend)
->      const char *logfile = qemu_opt_get(opts, "logfile");
+> diff --git a/chardev/char-udp.c b/chardev/char-udp.c
+> index 2c6c7ddd73..5364b5fc59 100644
+> --- a/chardev/char-udp.c
+> +++ b/chardev/char-udp.c
+> @@ -51,6 +51,18 @@ static int udp_chr_write(Chardev *chr, const uint8_t *buf, int len)
+>          s->ioc, (const char *)buf, len, NULL);
+>  }
 >
->      backend->has_logfile = logfile != NULL;
-> -    backend->logfile = logfile ? g_strdup(logfile) : NULL;
-> +    backend->logfile = g_strdup(logfile);
+> +static void udp_chr_flush_buffer(UdpChardev *s)
+> +{
+> +    Chardev *chr = CHARDEV(s);
+> +
+> +    while (s->max_size > 0 && s->bufptr < s->bufcnt) {
+> +        int n = MIN(s->max_size, s->bufcnt - s->bufptr);
+> +        qemu_chr_be_write(chr, &s->buf[s->bufptr], n);
+> +        s->bufptr += n;
+> +        s->max_size = qemu_chr_be_can_write(chr);
+> +    }
+> +}
+> +
+>  static int udp_chr_read_poll(void *opaque)
+>  {
+>      Chardev *chr = CHARDEV(opaque);
+> @@ -61,11 +73,8 @@ static int udp_chr_read_poll(void *opaque)
+>      /* If there were any stray characters in the queue process them
+>       * first
+>       */
+> -    while (s->max_size > 0 && s->bufptr < s->bufcnt) {
+> -        qemu_chr_be_write(chr, &s->buf[s->bufptr], 1);
+> -        s->bufptr++;
+> -        s->max_size = qemu_chr_be_can_write(chr);
+> -    }
+> +    udp_chr_flush_buffer(s);
+> +
+>      return s->max_size;
+>  }
 >
->      backend->has_logappend = true;
->      backend->logappend = qemu_opt_get_bool(opts, "logappend", false);
+> @@ -85,13 +94,8 @@ static gboolean udp_chr_read(QIOChannel *chan, GIOCondition cond, void *opaque)
+>          return FALSE;
+>      }
+>      s->bufcnt = ret;
+> -
+>      s->bufptr = 0;
+> -    while (s->max_size > 0 && s->bufptr < s->bufcnt) {
+> -        qemu_chr_be_write(chr, &s->buf[s->bufptr], 1);
+> -        s->bufptr++;
+> -        s->max_size = qemu_chr_be_can_write(chr);
+> -    }
+> +    udp_chr_flush_buffer(s);
+>
+>      return TRUE;
+>  }
 >
