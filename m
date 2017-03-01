@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciw7j-0007wJ-Ni
+	(envelope-from <dgibson@ozlabs.org>) id 1ciw7m-0007zZ-Ba
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciw7g-0008Sx-3c
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:23 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ciw7k-00005R-C3
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:26 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed,  1 Mar 2017 15:43:26 +1100
-Message-Id: <20170301044405.1792-12-david@gibson.dropbear.id.au>
+Date: Wed,  1 Mar 2017 15:43:30 +1100
+Message-Id: <20170301044405.1792-16-david@gibson.dropbear.id.au>
 In-Reply-To: <20170301044405.1792-1-david@gibson.dropbear.id.au>
 References: <20170301044405.1792-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 11/50] target/ppc: Cleanup HPTE accessors for
- 64-bit hash MMU
+Subject: [Qemu-devel] [PULL 15/50] target/ppc: Correct SDR1 masking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,466 +22,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, thuth@redhat.com, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-Accesses to the hashed page table (HPT) are complicated by the fact that
-the HPT could be in one of three places:
-   1) Within guest memory - when we're emulating a full guest CPU at the
-      hardware level (e.g. powernv, mac99, g3beige)
-   2) Within qemu, but outside guest memory - when we're emulating user and
-      supervisor instructions within TCG, but instead of emulating
-      the CPU's hypervisor mode, we just emulate a hypervisor's behaviour
-      (pseries in TCG or KVM-PR)
-   3) Within the host kernel - a pseries machine using KVM-HV
-      acceleration.  Mostly accesses to the HPT are handled by KVM,
-      but there are a few cases where qemu needs to access it via a
-      special fd for the purpose.
+SDR_64_HTABORG, which indicates the bits of the SDR1 register to use for
+the base of a 64-bit machine's hashed page table (HPT) isn't correct.  It
+includes the top 46 bits of the register, but in fact the top 4 bits must
+be zero (according to the ISA v2.07).  No actual implementation has
+supported close to 2^60 bytes of physical address space, so it's kind of
+irrelevant, but we might as well correct this.
 
-In order to batch accesses to the fd in case (3), we use a somewhat awkward
-ppc_hash64_start_access() / ppc_hash64_stop_access() pair, which for case
-(3) reads / releases several HPTEs from the kernel as a batch (usually a
-whole PTEG).  For cases (1) & (2) it just returns an address value.  The
-actual HPTE load helpers then need to interpret the returned token
-differently in the 3 cases.
+In addition, although we checked for bad size values in SDR1, we never
+reported an error if entirely invalid bits were set there.  Add this check
+to ppc_store_sdr1().
 
-This patch keeps the same basic structure, but simplfiies the details.
-First start_access() / stop_access() are renamed to map_hptes() and
-unmap_hptes() to make their operation more obvious.  Second, map_hptes()
-now always returns a qemu pointer, which can always be used in the same way
-by the load_hpte() helpers.  In case (1) it comes from address_space_map()
-in case (2) directly from qemu's HPT buffer and in case (3) from a
-temporary buffer read from the KVM fd.
-
-While we're at it, make things a bit more consistent in terms of types and
-variable names: avoid variables named 'index' (it shadows index(3) which
-can lead to confusing results), use 'hwaddr ptex' for HPTE indices and
-uint64_t for each of the HPTE words, use ptex throughout the call stack
-instead of pte_offset in some places (we still need that at the bottom
-layer, but nowhere else).
-
+Reported-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_hcall.c    |  36 ++++++++---------
- target/ppc/cpu.h        |   2 +-
- target/ppc/mmu-hash64.c | 103 +++++++++++++++++++++++++-----------------------
- target/ppc/mmu-hash64.h |  46 ++++++++-------------
- 4 files changed, 89 insertions(+), 98 deletions(-)
+ target/ppc/mmu-hash64.h | 2 +-
+ target/ppc/mmu_helper.c | 6 ++++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 3298a14..fd961b5 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -84,7 +84,7 @@ static target_ulong h_enter(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-     unsigned apshift;
-     target_ulong raddr;
-     target_ulong slot;
--    uint64_t token;
-+    const ppc_hash_pte64_t *hptes;
- 
-     apshift = ppc_hash64_hpte_page_shift_noslb(cpu, pteh, ptel);
-     if (!apshift) {
-@@ -123,23 +123,23 @@ static target_ulong h_enter(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-     ptex = ptex & ~7ULL;
- 
-     if (likely((flags & H_EXACT) == 0)) {
--        token = ppc_hash64_start_access(cpu, ptex);
-+        hptes = ppc_hash64_map_hptes(cpu, ptex, HPTES_PER_GROUP);
-         for (slot = 0; slot < 8; slot++) {
--            if (!(ppc_hash64_load_hpte0(cpu, token, slot) & HPTE64_V_VALID)) {
-+            if (!(ppc_hash64_hpte0(cpu, hptes, slot) & HPTE64_V_VALID)) {
-                 break;
-             }
-         }
--        ppc_hash64_stop_access(cpu, token);
-+        ppc_hash64_unmap_hptes(cpu, hptes, ptex, HPTES_PER_GROUP);
-         if (slot == 8) {
-             return H_PTEG_FULL;
-         }
-     } else {
--        token = ppc_hash64_start_access(cpu, ptex);
--        if (ppc_hash64_load_hpte0(cpu, token, 0) & HPTE64_V_VALID) {
--            ppc_hash64_stop_access(cpu, token);
-+        hptes = ppc_hash64_map_hptes(cpu, ptex + slot, 1);
-+        if (ppc_hash64_hpte0(cpu, hptes, 0) & HPTE64_V_VALID) {
-+            ppc_hash64_unmap_hptes(cpu, hptes, ptex + slot, 1);
-             return H_PTEG_FULL;
-         }
--        ppc_hash64_stop_access(cpu, token);
-+        ppc_hash64_unmap_hptes(cpu, hptes, ptex, 1);
-     }
- 
-     ppc_hash64_store_hpte(cpu, ptex + slot, pteh | HPTE64_V_HPTE_DIRTY, ptel);
-@@ -160,17 +160,17 @@ static RemoveResult remove_hpte(PowerPCCPU *cpu, target_ulong ptex,
-                                 target_ulong flags,
-                                 target_ulong *vp, target_ulong *rp)
- {
--    uint64_t token;
-+    const ppc_hash_pte64_t *hptes;
-     target_ulong v, r;
- 
-     if (!valid_ptex(cpu, ptex)) {
-         return REMOVE_PARM;
-     }
- 
--    token = ppc_hash64_start_access(cpu, ptex);
--    v = ppc_hash64_load_hpte0(cpu, token, 0);
--    r = ppc_hash64_load_hpte1(cpu, token, 0);
--    ppc_hash64_stop_access(cpu, token);
-+    hptes = ppc_hash64_map_hptes(cpu, ptex, 1);
-+    v = ppc_hash64_hpte0(cpu, hptes, 0);
-+    r = ppc_hash64_hpte1(cpu, hptes, 0);
-+    ppc_hash64_unmap_hptes(cpu, hptes, ptex, 1);
- 
-     if ((v & HPTE64_V_VALID) == 0 ||
-         ((flags & H_AVPN) && (v & ~0x7fULL) != avpn) ||
-@@ -291,17 +291,17 @@ static target_ulong h_protect(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-     target_ulong flags = args[0];
-     target_ulong ptex = args[1];
-     target_ulong avpn = args[2];
--    uint64_t token;
-+    const ppc_hash_pte64_t *hptes;
-     target_ulong v, r;
- 
-     if (!valid_ptex(cpu, ptex)) {
-         return H_PARAMETER;
-     }
- 
--    token = ppc_hash64_start_access(cpu, ptex);
--    v = ppc_hash64_load_hpte0(cpu, token, 0);
--    r = ppc_hash64_load_hpte1(cpu, token, 0);
--    ppc_hash64_stop_access(cpu, token);
-+    hptes = ppc_hash64_map_hptes(cpu, ptex, 1);
-+    v = ppc_hash64_hpte0(cpu, hptes, 0);
-+    r = ppc_hash64_hpte1(cpu, hptes, 0);
-+    ppc_hash64_unmap_hptes(cpu, hptes, ptex, 1);
- 
-     if ((v & HPTE64_V_VALID) == 0 ||
-         ((flags & H_AVPN) && (v & ~0x7fULL) != avpn)) {
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 2a94e76..051298b 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -223,7 +223,7 @@ enum {
- typedef struct opc_handler_t opc_handler_t;
- 
- /*****************************************************************************/
--/* Types used to describe some PowerPC registers */
-+/* Types used to describe some PowerPC registers etc. */
- typedef struct DisasContext DisasContext;
- typedef struct ppc_spr_t ppc_spr_t;
- typedef union ppc_avr_t ppc_avr_t;
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index 862e50e..f503c69 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -27,6 +27,7 @@
- #include "kvm_ppc.h"
- #include "mmu-hash64.h"
- #include "exec/log.h"
-+#include "hw/hw.h"
- 
- //#define DEBUG_SLB
- 
-@@ -431,35 +432,43 @@ static int ppc_hash64_amr_prot(PowerPCCPU *cpu, ppc_hash_pte64_t pte)
-     return prot;
- }
- 
--uint64_t ppc_hash64_start_access(PowerPCCPU *cpu, target_ulong pte_index)
-+const ppc_hash_pte64_t *ppc_hash64_map_hptes(PowerPCCPU *cpu,
-+                                             hwaddr ptex, int n)
- {
--    uint64_t token = 0;
--    hwaddr pte_offset;
-+    ppc_hash_pte64_t *hptes = NULL;
-+    hwaddr pte_offset = ptex * HASH_PTE_SIZE_64;
- 
--    pte_offset = pte_index * HASH_PTE_SIZE_64;
-     if (cpu->env.external_htab == MMU_HASH64_KVM_MANAGED_HPT) {
--        ppc_hash_pte64_t *pteg = g_malloc(HASH_PTEG_SIZE_64);
-         /*
--         * HTAB is controlled by KVM. Fetch the PTEG into a new buffer.
-+         * HTAB is controlled by KVM. Fetch into temporary buffer
-          */
--        kvmppc_read_hptes(pteg, pte_index, HPTES_PER_GROUP);
--        token = (uint64_t)(uintptr_t)pteg;
-+        hptes = g_malloc(HASH_PTEG_SIZE_64);
-+        kvmppc_read_hptes(hptes, ptex, n);
-     } else if (cpu->env.external_htab) {
-         /*
-          * HTAB is controlled by QEMU. Just point to the internally
-          * accessible PTEG.
-          */
--        token = (uint64_t)(uintptr_t) cpu->env.external_htab + pte_offset;
-+        hptes = (ppc_hash_pte64_t *)(cpu->env.external_htab + pte_offset);
-     } else if (cpu->env.htab_base) {
--        token = cpu->env.htab_base + pte_offset;
-+        hwaddr plen = n * HASH_PTE_SIZE_64;
-+        hptes = address_space_map(CPU(cpu)->as, cpu->env.htab_base + pte_offset,
-+                                 &plen, false);
-+        if (plen < (n * HASH_PTE_SIZE_64)) {
-+            hw_error("%s: Unable to map all requested HPTEs\n", __func__);
-+        }
-     }
--    return token;
-+    return hptes;
- }
- 
--void ppc_hash64_stop_access(PowerPCCPU *cpu, uint64_t token)
-+void ppc_hash64_unmap_hptes(PowerPCCPU *cpu, const ppc_hash_pte64_t *hptes,
-+                            hwaddr ptex, int n)
- {
-     if (cpu->env.external_htab == MMU_HASH64_KVM_MANAGED_HPT) {
--        g_free((void *)token);
-+        g_free((void *)hptes);
-+    } else if (!cpu->env.external_htab) {
-+        address_space_unmap(CPU(cpu)->as, (void *)hptes, n * HASH_PTE_SIZE_64,
-+                            false, n * HASH_PTE_SIZE_64);
-     }
- }
- 
-@@ -507,18 +516,18 @@ static hwaddr ppc_hash64_pteg_search(PowerPCCPU *cpu, hwaddr hash,
- {
-     CPUPPCState *env = &cpu->env;
-     int i;
--    uint64_t token;
-+    const ppc_hash_pte64_t *pteg;
-     target_ulong pte0, pte1;
--    target_ulong pte_index;
-+    target_ulong ptex;
- 
--    pte_index = (hash & env->htab_mask) * HPTES_PER_GROUP;
--    token = ppc_hash64_start_access(cpu, pte_index);
--    if (!token) {
-+    ptex = (hash & env->htab_mask) * HPTES_PER_GROUP;
-+    pteg = ppc_hash64_map_hptes(cpu, ptex, HPTES_PER_GROUP);
-+    if (!pteg) {
-         return -1;
-     }
-     for (i = 0; i < HPTES_PER_GROUP; i++) {
--        pte0 = ppc_hash64_load_hpte0(cpu, token, i);
--        pte1 = ppc_hash64_load_hpte1(cpu, token, i);
-+        pte0 = ppc_hash64_hpte0(cpu, pteg, i);
-+        pte1 = ppc_hash64_hpte1(cpu, pteg, i);
- 
-         /* This compares V, B, H (secondary) and the AVPN */
-         if (HPTE64_V_COMPARE(pte0, ptem)) {
-@@ -538,11 +547,11 @@ static hwaddr ppc_hash64_pteg_search(PowerPCCPU *cpu, hwaddr hash,
-              */
-             pte->pte0 = pte0;
-             pte->pte1 = pte1;
--            ppc_hash64_stop_access(cpu, token);
--            return (pte_index + i) * HASH_PTE_SIZE_64;
-+            ppc_hash64_unmap_hptes(cpu, pteg, ptex, HPTES_PER_GROUP);
-+            return ptex + i;
-         }
-     }
--    ppc_hash64_stop_access(cpu, token);
-+    ppc_hash64_unmap_hptes(cpu, pteg, ptex, HPTES_PER_GROUP);
-     /*
-      * We didn't find a valid entry.
-      */
-@@ -554,8 +563,7 @@ static hwaddr ppc_hash64_htab_lookup(PowerPCCPU *cpu,
-                                      ppc_hash_pte64_t *pte, unsigned *pshift)
- {
-     CPUPPCState *env = &cpu->env;
--    hwaddr pte_offset;
--    hwaddr hash;
-+    hwaddr hash, ptex;
-     uint64_t vsid, epnmask, epn, ptem;
-     const struct ppc_one_seg_page_size *sps = slb->sps;
- 
-@@ -598,9 +606,9 @@ static hwaddr ppc_hash64_htab_lookup(PowerPCCPU *cpu,
-             " vsid=" TARGET_FMT_lx " ptem=" TARGET_FMT_lx
-             " hash=" TARGET_FMT_plx "\n",
-             env->htab_base, env->htab_mask, vsid, ptem,  hash);
--    pte_offset = ppc_hash64_pteg_search(cpu, hash, sps, ptem, pte, pshift);
-+    ptex = ppc_hash64_pteg_search(cpu, hash, sps, ptem, pte, pshift);
- 
--    if (pte_offset == -1) {
-+    if (ptex == -1) {
-         /* Secondary PTEG lookup */
-         ptem |= HPTE64_V_SECONDARY;
-         qemu_log_mask(CPU_LOG_MMU,
-@@ -609,10 +617,10 @@ static hwaddr ppc_hash64_htab_lookup(PowerPCCPU *cpu,
-                 " hash=" TARGET_FMT_plx "\n", env->htab_base,
-                 env->htab_mask, vsid, ptem, ~hash);
- 
--        pte_offset = ppc_hash64_pteg_search(cpu, ~hash, sps, ptem, pte, pshift);
-+        ptex = ppc_hash64_pteg_search(cpu, ~hash, sps, ptem, pte, pshift);
-     }
- 
--    return pte_offset;
-+    return ptex;
- }
- 
- unsigned ppc_hash64_hpte_page_shift_noslb(PowerPCCPU *cpu,
-@@ -710,7 +718,7 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr,
-     CPUPPCState *env = &cpu->env;
-     ppc_slb_t *slb;
-     unsigned apshift;
--    hwaddr pte_offset;
-+    hwaddr ptex;
-     ppc_hash_pte64_t pte;
-     int pp_prot, amr_prot, prot;
-     uint64_t new_pte1, dsisr;
-@@ -794,8 +802,8 @@ skip_slb_search:
-     }
- 
-     /* 4. Locate the PTE in the hash table */
--    pte_offset = ppc_hash64_htab_lookup(cpu, slb, eaddr, &pte, &apshift);
--    if (pte_offset == -1) {
-+    ptex = ppc_hash64_htab_lookup(cpu, slb, eaddr, &pte, &apshift);
-+    if (ptex == -1) {
-         dsisr = 0x40000000;
-         if (rwx == 2) {
-             ppc_hash64_set_isi(cs, env, dsisr);
-@@ -808,7 +816,7 @@ skip_slb_search:
-         return 1;
-     }
-     qemu_log_mask(CPU_LOG_MMU,
--                "found PTE at offset %08" HWADDR_PRIx "\n", pte_offset);
-+                  "found PTE at index %08" HWADDR_PRIx "\n", ptex);
- 
-     /* 5. Check access permissions */
- 
-@@ -851,8 +859,7 @@ skip_slb_search:
-     }
- 
-     if (new_pte1 != pte.pte1) {
--        ppc_hash64_store_hpte(cpu, pte_offset / HASH_PTE_SIZE_64,
--                              pte.pte0, new_pte1);
-+        ppc_hash64_store_hpte(cpu, ptex, pte.pte0, new_pte1);
-     }
- 
-     /* 7. Determine the real address from the PTE */
-@@ -869,7 +876,7 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *cpu, target_ulong addr)
- {
-     CPUPPCState *env = &cpu->env;
-     ppc_slb_t *slb;
--    hwaddr pte_offset, raddr;
-+    hwaddr ptex, raddr;
-     ppc_hash_pte64_t pte;
-     unsigned apshift;
- 
-@@ -902,8 +909,8 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *cpu, target_ulong addr)
-         }
-     }
- 
--    pte_offset = ppc_hash64_htab_lookup(cpu, slb, addr, &pte, &apshift);
--    if (pte_offset == -1) {
-+    ptex = ppc_hash64_htab_lookup(cpu, slb, addr, &pte, &apshift);
-+    if (ptex == -1) {
-         return -1;
-     }
- 
-@@ -911,30 +918,28 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *cpu, target_ulong addr)
-         & TARGET_PAGE_MASK;
- }
- 
--void ppc_hash64_store_hpte(PowerPCCPU *cpu,
--                           target_ulong pte_index,
--                           target_ulong pte0, target_ulong pte1)
-+void ppc_hash64_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
-+                           uint64_t pte0, uint64_t pte1)
- {
-     CPUPPCState *env = &cpu->env;
-+    hwaddr offset = ptex * HASH_PTE_SIZE_64;
- 
-     if (env->external_htab == MMU_HASH64_KVM_MANAGED_HPT) {
--        kvmppc_write_hpte(pte_index, pte0, pte1);
-+        kvmppc_write_hpte(ptex, pte0, pte1);
-         return;
-     }
- 
--    pte_index *= HASH_PTE_SIZE_64;
-     if (env->external_htab) {
--        stq_p(env->external_htab + pte_index, pte0);
--        stq_p(env->external_htab + pte_index + HASH_PTE_SIZE_64 / 2, pte1);
-+        stq_p(env->external_htab + offset, pte0);
-+        stq_p(env->external_htab + offset + HASH_PTE_SIZE_64 / 2, pte1);
-     } else {
--        stq_phys(CPU(cpu)->as, env->htab_base + pte_index, pte0);
-+        stq_phys(CPU(cpu)->as, env->htab_base + offset, pte0);
-         stq_phys(CPU(cpu)->as,
--                 env->htab_base + pte_index + HASH_PTE_SIZE_64 / 2, pte1);
-+                 env->htab_base + offset + HASH_PTE_SIZE_64 / 2, pte1);
-     }
- }
- 
--void ppc_hash64_tlb_flush_hpte(PowerPCCPU *cpu,
--                               target_ulong pte_index,
-+void ppc_hash64_tlb_flush_hpte(PowerPCCPU *cpu, target_ulong ptex,
-                                target_ulong pte0, target_ulong pte1)
- {
-     /*
 diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
-index 73aeaa3..edd687b 100644
+index 9c74823..54f1e37 100644
 --- a/target/ppc/mmu-hash64.h
 +++ b/target/ppc/mmu-hash64.h
-@@ -10,8 +10,8 @@ int ppc_store_slb(PowerPCCPU *cpu, target_ulong slot,
- hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *cpu, target_ulong addr);
- int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vaddr address, int rw,
-                                 int mmu_idx);
--void ppc_hash64_store_hpte(PowerPCCPU *cpu, target_ulong index,
--                           target_ulong pte0, target_ulong pte1);
-+void ppc_hash64_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
-+                           uint64_t pte0, uint64_t pte1);
- void ppc_hash64_tlb_flush_hpte(PowerPCCPU *cpu,
-                                target_ulong pte_index,
-                                target_ulong pte0, target_ulong pte1);
-@@ -96,41 +96,27 @@ void ppc_hash64_set_sdr1(PowerPCCPU *cpu, target_ulong value,
- void ppc_hash64_set_external_hpt(PowerPCCPU *cpu, void *hpt, int shift,
-                                  Error **errp);
+@@ -56,7 +56,7 @@ void ppc_hash64_update_rmls(CPUPPCState *env);
+  * Hash page table definitions
+  */
  
--uint64_t ppc_hash64_start_access(PowerPCCPU *cpu, target_ulong pte_index);
--void ppc_hash64_stop_access(PowerPCCPU *cpu, uint64_t token);
-+struct ppc_hash_pte64 {
-+    uint64_t pte0, pte1;
-+};
-+
-+const ppc_hash_pte64_t *ppc_hash64_map_hptes(PowerPCCPU *cpu,
-+                                             hwaddr ptex, int n);
-+void ppc_hash64_unmap_hptes(PowerPCCPU *cpu, const ppc_hash_pte64_t *hptes,
-+                            hwaddr ptex, int n);
+-#define SDR_64_HTABORG         0xFFFFFFFFFFFC0000ULL
++#define SDR_64_HTABORG         0x0FFFFFFFFFFC0000ULL
+ #define SDR_64_HTABSIZE        0x000000000000001FULL
  
--static inline target_ulong ppc_hash64_load_hpte0(PowerPCCPU *cpu,
--                                                 uint64_t token, int index)
-+static inline uint64_t ppc_hash64_hpte0(PowerPCCPU *cpu,
-+                                        const ppc_hash_pte64_t *hptes, int i)
- {
--    CPUPPCState *env = &cpu->env;
--    uint64_t addr;
--
--    addr = token + (index * HASH_PTE_SIZE_64);
--    if (env->external_htab) {
--        return  ldq_p((const void *)(uintptr_t)addr);
--    } else {
--        return ldq_phys(CPU(cpu)->as, addr);
--    }
-+    return ldq_p(&(hptes[i].pte0));
- }
+ #define HPTES_PER_GROUP         8
+diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
+index 3bc8030..a1af3d6 100644
+--- a/target/ppc/mmu_helper.c
++++ b/target/ppc/mmu_helper.c
+@@ -2007,8 +2007,14 @@ void ppc_store_sdr1(CPUPPCState *env, target_ulong value)
+     assert(!cpu->vhyp);
+ #if defined(TARGET_PPC64)
+     if (env->mmu_model & POWERPC_MMU_64) {
++        target_ulong sdr_mask = SDR_64_HTABORG | SDR_64_HTABSIZE;
+         target_ulong htabsize = value & SDR_64_HTABSIZE;
  
--static inline target_ulong ppc_hash64_load_hpte1(PowerPCCPU *cpu,
--                                                 uint64_t token, int index)
-+static inline uint64_t ppc_hash64_hpte1(PowerPCCPU *cpu,
-+                                        const ppc_hash_pte64_t *hptes, int i)
- {
--    CPUPPCState *env = &cpu->env;
--    uint64_t addr;
--
--    addr = token + (index * HASH_PTE_SIZE_64) + HASH_PTE_SIZE_64/2;
--    if (env->external_htab) {
--        return  ldq_p((const void *)(uintptr_t)addr);
--    } else {
--        return ldq_phys(CPU(cpu)->as, addr);
--    }
-+    return ldq_p(&(hptes[i].pte1));
- }
- 
--typedef struct ppc_hash_pte64 {
--    uint64_t pte0, pte1;
--} ppc_hash_pte64_t;
--
- #endif /* CONFIG_USER_ONLY */
- 
- #endif /* MMU_HASH64_H */
++        if (value & ~sdr_mask) {
++            error_report("Invalid bits 0x"TARGET_FMT_lx" set in SDR1",
++                         value & ~sdr_mask);
++            value &= sdr_mask;
++        }
+         if (htabsize > 28) {
+             error_report("Invalid HTABSIZE 0x" TARGET_FMT_lx" stored in SDR1",
+                          htabsize);
 -- 
 2.9.3
