@@ -1,24 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56595)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1ciweE-0005tY-BK
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 00:18:00 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1ciwoO-000407-LC
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 00:28:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1ciweC-0003oQ-Ul
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 00:17:58 -0500
-Message-ID: <1488345463.20743.1.camel@gmail.com>
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Wed, 01 Mar 2017 16:17:43 +1100
-In-Reply-To: <20170228031912.GP17615@umbus.fritz.box>
-References: <cover.1487829585.git.sam.bobroff@au1.ibm.com>
-	<034945c1bbc8d4a97e5f568d4d463af2c9a24080.1487829585.git.sam.bobroff@au1.ibm.com>
-	<20170228002810.GD17615@umbus.fritz.box>
-	<1488248717.2323.11.camel@gmail.com>
-	<20170228031912.GP17615@umbus.fritz.box>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH v2 08/12] spapr: Only setup HTP if
- necessary.
+	(envelope-from <aik@ozlabs.ru>) id 1ciwoL-0006rO-C0
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 00:28:28 -0500
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Date: Wed,  1 Mar 2017 16:28:18 +1100
+Message-Id: <20170301052818.22734-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [PATCH qemu v2] exec, kvm,
+ target-ppc: Move getrampagesize() to common code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,203 +18,342 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Sam Bobroff <sam.bobroff@au1.ibm.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Tue, 2017-02-28 at 14:19 +1100, David Gibson wrote:
-> On Tue, Feb 28, 2017 at 01:25:17PM +1100, Suraj Jitindar Singh wrote:
-> > 
-> > On Tue, 2017-02-28 at 11:28 +1100, David Gibson wrote:
-> > > 
-> > > s/HTP/HPT/ in subject line.
-> > > 
-> > > 
-> > > On Thu, Feb 23, 2017 at 05:00:01PM +1100, Sam Bobroff wrote:
-> > > > 
-> > > > 
-> > > > If QEMU is using KVM, and KVM is capable of running in radix
-> > > > mode,
-> > > > guests can be run in real-mode without allocating a HPT
-> > > > (because
-> > > > KVM
-> > > > will use a minimal RPT). So in this case, we avoid creating the
-> > > > HPT
-> > > > at reset time and later (during CAS) create it if it is
-> > > > necessary.
-> > > > 
-> > > > Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
-> > > So, IIRC, we discussed previously that the logical way to do
-> > > things
-> > > was to, by default, delay HPT allocation until CAS time, and just
-> > > do
-> > > it at reset time for the case that needs it: hash host with KVM.
-> > > 
-> > > Did you hit a problem with that approach, or is there still work
-> > > to
-> > > be
-> > > done here?
-> > So what we're doing is assuming radix. Allocate hpt if hash host,
-> > otherwise delay til CAS time and allocate only if guest chose hash.
-> > 
-> > > 
-> > > 
-> > > > 
-> > > > 
-> > > > ---
-> > > > v2:
-> > > > 
-> > > > * This patch has been mostly rewritten to move the late HPT
-> > > > allocation to CAS.
-> > > > This allows a guest to start in radix mode (when it's in real
-> > > > mode)
-> > > > and then
-> > > > change to hash, even if it is a legacy guest and will not call
-> > > > h_register_process_table().
-> > > > * Added an exported function to spapr.c to perform HPT
-> > > > allocation
-> > > > and adjust
-> > > > the vrma if necessary. This makes it possible to allocate the
-> > > > HPT
-> > > > from
-> > > > h_client_architecture_support() in spapr_hcall.c.
-> > > > 
-> > > >  hw/ppc/spapr.c         | 24 +++++++++++++++---------
-> > > >  hw/ppc/spapr_hcall.c   | 10 ++++++++++
-> > > >  include/hw/ppc/spapr.h |  1 +
-> > > >  3 files changed, 26 insertions(+), 9 deletions(-)
-> > > > 
-> > > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > > index ca3812555f..dfee0f685f 100644
-> > > > --- a/hw/ppc/spapr.c
-> > > > +++ b/hw/ppc/spapr.c
-> > > > @@ -1123,6 +1123,17 @@ static void
-> > > > spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
-> > > >      }
-> > > >  }
-> > > >  
-> > > > +void spapr_setup_hpt_and_vrma(sPAPRMachineState *spapr)
-> > > > +{
-> > > > +    spapr_reallocate_hpt(spapr,
-> > > > +                     spapr_hpt_shift_for_ramsize(MACHINE(qdev_
-> > > > get_
-> > > > machine())->maxram_size),
-> > > > +                     &error_fatal);
-> > > > +    if (spapr->vrma_adjust) {
-> > > > +        spapr->rma_size = kvmppc_rma_size(spapr_node0_size(),
-> > > > +                                          spapr->htab_shift);
-> > > > +    }
-> > > > +}
-> > > > +
-> > > >  static void find_unknown_sysbus_device(SysBusDevice *sbdev,
-> > > > void
-> > > > *opaque)
-> > > >  {
-> > > >      bool matched = false;
-> > > > @@ -1151,15 +1162,10 @@ static void ppc_spapr_reset(void)
-> > > >      /* Check for unknown sysbus devices */
-> > > >      foreach_dynamic_sysbus_device(find_unknown_sysbus_device,
-> > > > NULL);
-> > > >  
-> > > > -    /* Allocate and/or reset the hash page table */
-> > > > -    spapr_reallocate_hpt(spapr,
-> > > > -                         spapr_hpt_shift_for_ramsize(machine-
-> > > > > 
-> > > > > maxram_size),
-> > > > -                         &error_fatal);
-> > > > -
-> > > > -    /* Update the RMA size if necessary */
-> > > > -    if (spapr->vrma_adjust) {
-> > > > -        spapr->rma_size = kvmppc_rma_size(spapr_node0_size(),
-> > > > -                                          spapr->htab_shift);
-> > > > +    /* If using KVM with radix mode available, VCPUs can be
-> > > > started
-> > > > +     * without a HPT because KVM will start them in radix
-> > > > mode. */
-> > > > +    if (!(kvm_enabled() && kvmppc_has_cap_mmu_radix())) {
-> > > > +        spapr_setup_hpt_and_vrma(spapr);
-> > > >      }
-> > > >  
-> > > >      qemu_devices_reset();
-> > > > diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> > > > index 42d20e0b92..cea34073aa 100644
-> > > > --- a/hw/ppc/spapr_hcall.c
-> > > > +++ b/hw/ppc/spapr_hcall.c
-> > > > @@ -1002,6 +1002,16 @@ static target_ulong
-> > > > h_client_architecture_support(PowerPCCPU *cpu,
-> > > >      ov5_updates = spapr_ovec_new();
-> > > >      spapr->cas_reboot = spapr_ovec_diff(ov5_updates,
-> > > >                                          ov5_cas_old, spapr-
-> > > > > 
-> > > > > ov5_cas);
-> > > > +    if (kvm_enabled()) {
-> > > > +        if (kvmppc_has_cap_mmu_radix()) {
-> > > > +            /* If the HPT hasn't yet been set up (see
-> > > > +             * ppc_spapr_reset()), and it's needed, do it now:
-> > > > */
-> > > I think it's a bit fragile to have here it explicitly mirror the
-> > > logic
-> > > which determines whether the HPT is allocated early.  I'd prefer
-> > > to
-> > > explicitly test here whether we have allocated an HPT - adding a
-> > > flag,
-> > > if we have to.
-> > We can use the MSB of patb_entry as that flag.
-> Uh.. only for POWER9..
+getrampagesize() returns the largest supported page size and mainly
+used to know if huge pages are enabled.
 
-Well on <POWER9, patb_entry will always be zero, which we're taking to
-mean a hpt has been allocated.
+However is implemented in target-ppc/kvm.c and not available
+in TCG or other architectures.
 
-We could always just check spapr->htab == NULL...
+This renames and moves gethugepagesize() to mmap-alloc.c where
+fd-based analog of it is already implemented. This renames and moves
+getrampagesize() to exec.c as it seems to be the common place for
+helpers like this.
 
-> 
-> > 
-> > patb_entry & GUEST_RADIX == GUEST_RADIX -> radix, so assume a hpt
-> > hasn't been allocated.
-> > 
-> > When we do allocate a hpt we know we're not radix, so set
-> > patb_entry &= ~GUEST_RADIX;
-> > 
-> > Where GUEST_RADIX is the msb in patb_entry which indicates that a
-> > guest
-> > is radix.
-> > 
-> > Essentially patb_entry & GUEST_RADIX cleared mean hash with hpt
-> > allocated, patb_entry & GUEST_RADIX set means radix so assume an
-> > hpt
-> > hasn't been allocated. On the hpt allocation path we clear
-> > GUEST_RADIX
-> > in patb_entry and when we set GUEST_RADIX we free the hpt.
-> > 
-> > > 
-> > > 
-> > > > 
-> > > > 
-> > > > +            if (!spapr_ovec_test(ov5_updates, OV5_MMU_RADIX))
-> > > > {
-> > > > +                /* legacy hash or new hash: */
-> > > > +                spapr_setup_hpt_and_vrma(spapr);
-> > > > +            }
-> > > > +        }
-> > > > +    }
-> > > >  
-> > > >      if (!spapr->cas_reboot) {
-> > > >          spapr->cas_reboot =
-> > > > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > > > index f9b17d860a..a30cbc485c 100644
-> > > > --- a/include/hw/ppc/spapr.h
-> > > > +++ b/include/hw/ppc/spapr.h
-> > > > @@ -590,6 +590,7 @@ void spapr_dt_events(sPAPRMachineState *sm,
-> > > > void *fdt);
-> > > >  int spapr_h_cas_compose_response(sPAPRMachineState *sm,
-> > > >                                   target_ulong addr,
-> > > > target_ulong
-> > > > size,
-> > > >                                   sPAPROptionVector
-> > > > *ov5_updates);
-> > > > +void spapr_setup_hpt_and_vrma(sPAPRMachineState *spapr);
-> > > >  sPAPRTCETable *spapr_tce_new_table(DeviceState *owner,
-> > > > uint32_t
-> > > > liobn);
-> > > >  void spapr_tce_table_enable(sPAPRTCETable *tcet,
-> > > >                              uint32_t page_shift, uint64_t
-> > > > bus_offset,
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+Changes:
+v2:
+* rebased on top of ppc-for-2.9-20170301
+---
+ include/exec/ram_addr.h   |   1 +
+ include/qemu/mmap-alloc.h |   2 +
+ exec.c                    |  82 +++++++++++++++++++++++++++++++++++
+ target/ppc/kvm.c          | 108 +++-------------------------------------------
+ util/mmap-alloc.c         |  25 +++++++++++
+ 5 files changed, 115 insertions(+), 103 deletions(-)
+
+diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+index 3e79466a44..cd432e73ae 100644
+--- a/include/exec/ram_addr.h
++++ b/include/exec/ram_addr.h
+@@ -52,6 +52,7 @@ static inline void *ramblock_ptr(RAMBlock *block, ram_addr_t offset)
+     return (char *)block->host + offset;
+ }
+ 
++long qemu_getrampagesize(void);
+ ram_addr_t last_ram_offset(void);
+ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
+                                    bool share, const char *mem_path,
+diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
+index 933c024ac5..50385e3f81 100644
+--- a/include/qemu/mmap-alloc.h
++++ b/include/qemu/mmap-alloc.h
+@@ -5,6 +5,8 @@
+ 
+ size_t qemu_fd_getpagesize(int fd);
+ 
++size_t qemu_mempath_getpagesize(const char *mem_path);
++
+ void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared);
+ 
+ void qemu_ram_munmap(void *ptr, size_t size);
+diff --git a/exec.c b/exec.c
+index 3adf2b1861..1e6d25da6e 100644
+--- a/exec.c
++++ b/exec.c
+@@ -32,6 +32,7 @@
+ #endif
+ #include "sysemu/kvm.h"
+ #include "sysemu/sysemu.h"
++#include "sysemu/numa.h"
+ #include "qemu/timer.h"
+ #include "qemu/config-file.h"
+ #include "qemu/error-report.h"
+@@ -1251,6 +1252,87 @@ void qemu_mutex_unlock_ramlist(void)
+ }
+ 
+ #ifdef __linux__
++/*
++ * FIXME TOCTTOU: this iterates over memory backends' mem-path, which
++ * may or may not name the same files / on the same filesystem now as
++ * when we actually open and map them.  Iterate over the file
++ * descriptors instead, and use qemu_fd_getpagesize().
++ */
++static int find_max_supported_pagesize(Object *obj, void *opaque)
++{
++    char *mem_path;
++    long *hpsize_min = opaque;
++
++    if (object_dynamic_cast(obj, TYPE_MEMORY_BACKEND)) {
++        mem_path = object_property_get_str(obj, "mem-path", NULL);
++        if (mem_path) {
++            long hpsize = qemu_mempath_getpagesize(mem_path);
++            if (hpsize < *hpsize_min) {
++                *hpsize_min = hpsize;
++            }
++        } else {
++            *hpsize_min = getpagesize();
++        }
++    }
++
++    return 0;
++}
++
++long qemu_getrampagesize(void)
++{
++    long hpsize = LONG_MAX;
++    long mainrampagesize;
++    Object *memdev_root;
++
++    if (mem_path) {
++        mainrampagesize = qemu_mempath_getpagesize(mem_path);
++    } else {
++        mainrampagesize = getpagesize();
++    }
++
++    /* it's possible we have memory-backend objects with
++     * hugepage-backed RAM. these may get mapped into system
++     * address space via -numa parameters or memory hotplug
++     * hooks. we want to take these into account, but we
++     * also want to make sure these supported hugepage
++     * sizes are applicable across the entire range of memory
++     * we may boot from, so we take the min across all
++     * backends, and assume normal pages in cases where a
++     * backend isn't backed by hugepages.
++     */
++    memdev_root = object_resolve_path("/objects", NULL);
++    if (memdev_root) {
++        object_child_foreach(memdev_root, find_max_supported_pagesize, &hpsize);
++    }
++    if (hpsize == LONG_MAX) {
++        /* No additional memory regions found ==> Report main RAM page size */
++        return mainrampagesize;
++    }
++
++    /* If NUMA is disabled or the NUMA nodes are not backed with a
++     * memory-backend, then there is at least one node using "normal" RAM,
++     * so if its page size is smaller we have got to report that size instead.
++     */
++    if (hpsize > mainrampagesize &&
++        (nb_numa_nodes == 0 || numa_info[0].node_memdev == NULL)) {
++        static bool warned;
++        if (!warned) {
++            error_report("Huge page support disabled (n/a for main memory).");
++            warned = true;
++        }
++        return mainrampagesize;
++    }
++
++    return hpsize;
++}
++#else
++long qemu_getrampagesize(void)
++{
++    return getpagesize();
++}
++#endif
++
++#ifdef __linux__
+ static int64_t get_file_size(int fd)
+ {
+     int64_t size = lseek(fd, 0, SEEK_END);
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 18f33f2d93..d2835ef6b3 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -43,8 +43,10 @@
+ #include "trace.h"
+ #include "exec/gdbstub.h"
+ #include "exec/memattrs.h"
++#include "exec/ram_addr.h"
+ #include "sysemu/hostmem.h"
+ #include "qemu/cutils.h"
++#include "qemu/mmap-alloc.h"
+ #if defined(TARGET_PPC64)
+ #include "hw/ppc/spapr_cpu_core.h"
+ #endif
+@@ -331,106 +333,6 @@ static void kvm_get_smmu_info(PowerPCCPU *cpu, struct kvm_ppc_smmu_info *info)
+     kvm_get_fallback_smmu_info(cpu, info);
+ }
+ 
+-static long gethugepagesize(const char *mem_path)
+-{
+-    struct statfs fs;
+-    int ret;
+-
+-    do {
+-        ret = statfs(mem_path, &fs);
+-    } while (ret != 0 && errno == EINTR);
+-
+-    if (ret != 0) {
+-        fprintf(stderr, "Couldn't statfs() memory path: %s\n",
+-                strerror(errno));
+-        exit(1);
+-    }
+-
+-#define HUGETLBFS_MAGIC       0x958458f6
+-
+-    if (fs.f_type != HUGETLBFS_MAGIC) {
+-        /* Explicit mempath, but it's ordinary pages */
+-        return getpagesize();
+-    }
+-
+-    /* It's hugepage, return the huge page size */
+-    return fs.f_bsize;
+-}
+-
+-/*
+- * FIXME TOCTTOU: this iterates over memory backends' mem-path, which
+- * may or may not name the same files / on the same filesystem now as
+- * when we actually open and map them.  Iterate over the file
+- * descriptors instead, and use qemu_fd_getpagesize().
+- */
+-static int find_max_supported_pagesize(Object *obj, void *opaque)
+-{
+-    char *mem_path;
+-    long *hpsize_min = opaque;
+-
+-    if (object_dynamic_cast(obj, TYPE_MEMORY_BACKEND)) {
+-        mem_path = object_property_get_str(obj, "mem-path", NULL);
+-        if (mem_path) {
+-            long hpsize = gethugepagesize(mem_path);
+-            if (hpsize < *hpsize_min) {
+-                *hpsize_min = hpsize;
+-            }
+-        } else {
+-            *hpsize_min = getpagesize();
+-        }
+-    }
+-
+-    return 0;
+-}
+-
+-static long getrampagesize(void)
+-{
+-    long hpsize = LONG_MAX;
+-    long mainrampagesize;
+-    Object *memdev_root;
+-
+-    if (mem_path) {
+-        mainrampagesize = gethugepagesize(mem_path);
+-    } else {
+-        mainrampagesize = getpagesize();
+-    }
+-
+-    /* it's possible we have memory-backend objects with
+-     * hugepage-backed RAM. these may get mapped into system
+-     * address space via -numa parameters or memory hotplug
+-     * hooks. we want to take these into account, but we
+-     * also want to make sure these supported hugepage
+-     * sizes are applicable across the entire range of memory
+-     * we may boot from, so we take the min across all
+-     * backends, and assume normal pages in cases where a
+-     * backend isn't backed by hugepages.
+-     */
+-    memdev_root = object_resolve_path("/objects", NULL);
+-    if (memdev_root) {
+-        object_child_foreach(memdev_root, find_max_supported_pagesize, &hpsize);
+-    }
+-    if (hpsize == LONG_MAX) {
+-        /* No additional memory regions found ==> Report main RAM page size */
+-        return mainrampagesize;
+-    }
+-
+-    /* If NUMA is disabled or the NUMA nodes are not backed with a
+-     * memory-backend, then there is at least one node using "normal" RAM,
+-     * so if its page size is smaller we have got to report that size instead.
+-     */
+-    if (hpsize > mainrampagesize &&
+-        (nb_numa_nodes == 0 || numa_info[0].node_memdev == NULL)) {
+-        static bool warned;
+-        if (!warned) {
+-            error_report("Huge page support disabled (n/a for main memory).");
+-            warned = true;
+-        }
+-        return mainrampagesize;
+-    }
+-
+-    return hpsize;
+-}
+-
+ static bool kvm_valid_page_size(uint32_t flags, long rampgsize, uint32_t shift)
+ {
+     if (!(flags & KVM_PPC_PAGE_SIZES_REAL)) {
+@@ -462,7 +364,7 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
+     }
+ 
+     if (!max_cpu_page_size) {
+-        max_cpu_page_size = getrampagesize();
++        max_cpu_page_size = qemu_getrampagesize();
+     }
+ 
+     /* Convert to QEMU form */
+@@ -523,7 +425,7 @@ bool kvmppc_is_mem_backend_page_size_ok(char *obj_path)
+     long pagesize;
+ 
+     if (mempath) {
+-        pagesize = gethugepagesize(mempath);
++        pagesize = qemu_mempath_getpagesize(mempath);
+     } else {
+         pagesize = getpagesize();
+     }
+@@ -2207,7 +2109,7 @@ uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift)
+     /* Find the largest hardware supported page size that's less than
+      * or equal to the (logical) backing page size of guest RAM */
+     kvm_get_smmu_info(POWERPC_CPU(first_cpu), &info);
+-    rampagesize = getrampagesize();
++    rampagesize = qemu_getrampagesize();
+     best_page_shift = 0;
+ 
+     for (i = 0; i < KVM_PPC_PAGE_SIZES_MAX_SZ; i++) {
+diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+index 2f55f5e94f..3ec029a9ea 100644
+--- a/util/mmap-alloc.c
++++ b/util/mmap-alloc.c
+@@ -40,6 +40,31 @@ size_t qemu_fd_getpagesize(int fd)
+     return getpagesize();
+ }
+ 
++size_t qemu_mempath_getpagesize(const char *mem_path)
++{
++#ifdef CONFIG_LINUX
++    struct statfs fs;
++    int ret;
++
++    do {
++        ret = statfs(mem_path, &fs);
++    } while (ret != 0 && errno == EINTR);
++
++    if (ret != 0) {
++        fprintf(stderr, "Couldn't statfs() memory path: %s\n",
++                strerror(errno));
++        exit(1);
++    }
++
++    if (fs.f_type == HUGETLBFS_MAGIC) {
++        /* It's hugepage, return the huge page size */
++        return fs.f_bsize;
++    }
++#endif
++
++    return getpagesize();
++}
++
+ void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
+ {
+     /*
+-- 
+2.11.0
