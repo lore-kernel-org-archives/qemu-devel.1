@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cj2Yp-0002iu-A5
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 06:36:48 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cj2fN-0006ZD-E1
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 06:43:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cj2Ym-0002tZ-5n
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 06:36:47 -0500
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:37350)
+	(envelope-from <alex.bennee@linaro.org>) id 1cj2fK-0005DP-BP
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 06:43:33 -0500
+Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:37552)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cj2Yl-0002tR-Vi
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 06:36:44 -0500
-Received: by mail-wm0-x22a.google.com with SMTP id v77so33795668wmv.0
-	for <qemu-devel@nongnu.org>; Wed, 01 Mar 2017 03:36:43 -0800 (PST)
-References: <CAFEAcA_KVG19uhPuBUNx4ySmebnL1Hit6=HUX9ug0FkBFMwasg@mail.gmail.com>
+	id 1cj2fK-0005D3-4n
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 06:43:30 -0500
+Received: by mail-wm0-x22d.google.com with SMTP id v77so33934414wmv.0
+	for <qemu-devel@nongnu.org>; Wed, 01 Mar 2017 03:43:29 -0800 (PST)
+References: <1174847004.5500748.1488361912027.ref@mail.yahoo.com>
+	<1174847004.5500748.1488361912027@mail.yahoo.com>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA_KVG19uhPuBUNx4ySmebnL1Hit6=HUX9ug0FkBFMwasg@mail.gmail.com>
-Date: Wed, 01 Mar 2017 11:36:42 +0000
-Message-ID: <877f492ppx.fsf@linaro.org>
+In-reply-to: <1174847004.5500748.1488361912027@mail.yahoo.com>
+Date: Wed, 01 Mar 2017 11:43:28 +0000
+Message-ID: <8760jt2pen.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] intermittent make check failure:
- "tcg_handle_interrupt: assertion failed: (qemu_mutex_iothread_locked())"
+Subject: Re: [Qemu-devel] adress of translation block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,63 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: oussema ben khedher <oussemakeder@yahoo.fr>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+oussema ben khedher <oussemakeder@yahoo.fr> writes:
 
-> I got a make check failure on aarch64 host running a sparc64 test:
->
->
-> TEST: tests/prom-env-test... (pid=13573)
->   /sparc64/prom-env/sun4u:                                             **
-> ERROR:/home/pm215/qemu/translate-common.c:34:tcg_handle_interrupt:
-> assertion failed: (qemu_mutex_iothread_locked())
+> hi
+> i need help because im really blocked in my educational project
+> my problem is i how can i find the adress of the instruction of the end of translation block in qemu (usually it's branch instruction) or the adress of the translation block
+> your advice will be very helpful for me .thanks
 
-So the assertions where added with MTTCG. The design specifies which
-bits should be protected by the BQL and cpu->interrupt_request is one of
-them. This is because cpu->interrupt_request is often a cross-vCPU
-action (one vCPU triggering an interrupt on another) so there is a
-chance of racing if not protected.
+Rather than continuously spamming the list with the same question you
+might find it better to ask on the IRC channel (OFTC/#qemu). While we do
+want to help people you can't expect immediate feedback on list
+questions, especially when its not clear what you are after.
 
-It's odd this is showing up on a aarch64 host though when it didn't hit
-on my x86_64 host while testing.
+As to the address of the instruction at the end of the block why do you
+need it?
 
-As most of this stuff is triggered by hardware emulation the BQL should
-be in effect when handling MMIO for device emulation. There where other
-entry points in ARM which could trigger stuff which is why we add
-locking for things like ARM_CP_IO which are co-processor register
-accesses which trigger other things in the system.
+The blocks usually end with a branch taken/not taken so most have 2 exit
+points. If you enable -d nochain then the TBs will return to the
+run-loop after every basic block executed. With TB chaining in effect
+these jumps are directly patched to jump to the next translated block.
 
-What will be useful for all these reports is the backtrace. Then it's
-fairly simple to identify the thing triggering the interrupt and
-identify the correct place for the locking.
+Have you read:
 
-Having said that on some setups we are seeing very high BQL contention
-so maybe it will be simpler to move this stuff to atomic updates. I
-believe Paolo has some patches on the list.
+  http://wiki.qemu-project.org/Documentation/TCG
 
-> Broken pipe
-> FAIL
-> GTester: last random seed: R02Sa5fa983185fe5e65cfb5b7fcb39ed3d1
-> (pid=13579)
-> FAIL: tests/prom-env-test
->
-> This is with commit 9514f2648ca05b3.
->
-> It didn't reproduce on a rerun of 'make check' and it didn't
-> look like the merge in question was particularly relevant to
-> the failure, so I went ahead and pushed it to master.
->
-> I'm (perhaps unfairly) assuming that this is fallout from MTTCG
-> landing. (prom-env-test is one of the handful of tests in
-> 'make check' that actually runs TCG code.)
-
-Well I was hoping for a fairly incident free merge but I guess that's
-why we have a softfreeze. The assertions where added so any areas where
-the design is violated can be picked up pretty quickly which they seem
-to be doing their job.
+? These describe how the TCG works and the general code flow.
 
 --
 Alex Bennée
