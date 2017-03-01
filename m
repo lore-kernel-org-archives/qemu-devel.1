@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cj0CI-0002rH-CJ
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:05:23 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cj0CK-0002sf-Kr
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:05:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cj0CE-0001Hd-8p
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:05:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49914)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cj0CJ-0001Lb-4m
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:05:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49946)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cj0CE-0001HO-2y
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:05:18 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	id 1cj0CI-0001KQ-SX
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:05:23 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 46E5D3B71F
-	for <qemu-devel@nongnu.org>; Wed,  1 Mar 2017 09:05:18 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1552A3D940
+	for <qemu-devel@nongnu.org>; Wed,  1 Mar 2017 09:05:23 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed,  1 Mar 2017 13:04:30 +0400
-Message-Id: <20170301090453.11075-6-marcandre.lureau@redhat.com>
+Date: Wed,  1 Mar 2017 13:04:31 +0400
+Message-Id: <20170301090453.11075-7-marcandre.lureau@redhat.com>
 In-Reply-To: <20170301090453.11075-1-marcandre.lureau@redhat.com>
 References: <20170301090453.11075-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 05/28] glib-compat: add
- g_test_add_data_func_full fallback
+Subject: [Qemu-devel] [PULL 06/28] tests: fix ptimer leaks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,76 +36,305 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Move the fallback from qtest_add_data_func_full() to glib-compat.
+Spotted by ASAN.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/glib-compat.h | 21 +++++++++++++++++++++
- tests/libqtest.c      | 10 ----------
- 2 files changed, 21 insertions(+), 10 deletions(-)
+ include/hw/ptimer.h       |   1 +
+ hw/core/ptimer.c          |   8 +++
+ tests/ptimer-test-stubs.c |   5 ++
+ tests/ptimer-test.c       | 122 ++++++++++++++++++++++++++++------------=
+------
+ 4 files changed, 89 insertions(+), 47 deletions(-)
 
-diff --git a/include/glib-compat.h b/include/glib-compat.h
-index 0cd24ffbe9..863c8cf73d 100644
---- a/include/glib-compat.h
-+++ b/include/glib-compat.h
-@@ -328,4 +328,25 @@ static inline void g_source_set_name_by_id(guint tag=
-, const char *name)
- #define g_test_subprocess() (0)
- #endif
+diff --git a/include/hw/ptimer.h b/include/hw/ptimer.h
+index 48cccbdb51..eafc3f0a86 100644
+--- a/include/hw/ptimer.h
++++ b/include/hw/ptimer.h
+@@ -60,6 +60,7 @@ typedef struct ptimer_state ptimer_state;
+ typedef void (*ptimer_cb)(void *opaque);
 =20
+ ptimer_state *ptimer_init(QEMUBH *bh, uint8_t policy_mask);
++void ptimer_free(ptimer_state *s);
+ void ptimer_set_period(ptimer_state *s, int64_t period);
+ void ptimer_set_freq(ptimer_state *s, uint32_t freq);
+ uint64_t ptimer_get_limit(ptimer_state *s);
+diff --git a/hw/core/ptimer.c b/hw/core/ptimer.c
+index 3af82afe78..59ccb00550 100644
+--- a/hw/core/ptimer.c
++++ b/hw/core/ptimer.c
+@@ -12,6 +12,7 @@
+ #include "qemu/host-utils.h"
+ #include "sysemu/replay.h"
+ #include "sysemu/qtest.h"
++#include "block/aio.h"
+=20
+ #define DELTA_ADJUST     1
+ #define DELTA_NO_ADJUST -1
+@@ -353,3 +354,10 @@ ptimer_state *ptimer_init(QEMUBH *bh, uint8_t policy=
+_mask)
+     s->policy_mask =3D policy_mask;
+     return s;
+ }
 +
-+#if !GLIB_CHECK_VERSION(2, 34, 0)
-+static inline void
-+g_test_add_data_func_full(const char *path,
-+                          gpointer data,
-+                          gpointer fn,
-+                          gpointer data_free_func)
++void ptimer_free(ptimer_state *s)
 +{
-+#if GLIB_CHECK_VERSION(2, 26, 0)
-+    /* back-compat casts, remove this once we can require new-enough gli=
-b */
-+    g_test_add_vtable(path, 0, data, NULL,
-+                      (GTestFixtureFunc)fn, (GTestFixtureFunc) data_free=
-_func);
-+#else
-+    /* back-compat casts, remove this once we can require new-enough gli=
-b */
-+    g_test_add_vtable(path, 0, data, NULL,
-+                      (void (*)(void)) fn, (void (*)(void)) data_free_fu=
-nc);
-+#endif
++    qemu_bh_delete(s->bh);
++    timer_free(s->timer);
++    g_free(s);
 +}
-+#endif
-+
-+
- #endif
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index e54354de8a..3a0e0d63a7 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -805,17 +805,7 @@ void qtest_add_data_func_full(const char *str, void =
-*data,
-                               GDestroyNotify data_free_func)
- {
-     gchar *path =3D g_strdup_printf("/%s/%s", qtest_get_arch(), str);
--#if GLIB_CHECK_VERSION(2, 34, 0)
-     g_test_add_data_func_full(path, data, fn, data_free_func);
--#elif GLIB_CHECK_VERSION(2, 26, 0)
--    /* back-compat casts, remove this once we can require new-enough gli=
-b */
--    g_test_add_vtable(path, 0, data, NULL,
--                      (GTestFixtureFunc)fn, (GTestFixtureFunc) data_free=
-_func);
--#else
--    /* back-compat casts, remove this once we can require new-enough gli=
-b */
--    g_test_add_vtable(path, 0, data, NULL,
--                      (void (*)(void)) fn, (void (*)(void)) data_free_fu=
-nc);
--#endif
-     g_free(path);
+diff --git a/tests/ptimer-test-stubs.c b/tests/ptimer-test-stubs.c
+index 21d4ebb0fe..8a1b0a336c 100644
+--- a/tests/ptimer-test-stubs.c
++++ b/tests/ptimer-test-stubs.c
+@@ -108,6 +108,11 @@ QEMUBH *qemu_bh_new(QEMUBHFunc *cb, void *opaque)
+     return bh;
  }
 =20
++void qemu_bh_delete(QEMUBH *bh)
++{
++    g_free(bh);
++}
++
+ void replay_bh_schedule_event(QEMUBH *bh)
+ {
+     bh->cb(bh->opaque);
+diff --git a/tests/ptimer-test.c b/tests/ptimer-test.c
+index b36a476483..5d1a2a8188 100644
+--- a/tests/ptimer-test.c
++++ b/tests/ptimer-test.c
+@@ -73,6 +73,7 @@ static void check_set_count(gconstpointer arg)
+     ptimer_set_count(ptimer, 1000);
+     g_assert_cmpuint(ptimer_get_count(ptimer), =3D=3D, 1000);
+     g_assert_false(triggered);
++    ptimer_free(ptimer);
+ }
+=20
+ static void check_set_limit(gconstpointer arg)
+@@ -92,6 +93,7 @@ static void check_set_limit(gconstpointer arg)
+     g_assert_cmpuint(ptimer_get_count(ptimer), =3D=3D, 2000);
+     g_assert_cmpuint(ptimer_get_limit(ptimer), =3D=3D, 2000);
+     g_assert_false(triggered);
++    ptimer_free(ptimer);
+ }
+=20
+ static void check_oneshot(gconstpointer arg)
+@@ -194,6 +196,7 @@ static void check_oneshot(gconstpointer arg)
+=20
+     g_assert_cmpuint(ptimer_get_count(ptimer), =3D=3D, 0);
+     g_assert_false(triggered);
++    ptimer_free(ptimer);
+ }
+=20
+ static void check_periodic(gconstpointer arg)
+@@ -360,6 +363,7 @@ static void check_periodic(gconstpointer arg)
+     g_assert_cmpuint(ptimer_get_count(ptimer), =3D=3D,
+                     (no_round_down ? 8 : 7) + (wrap_policy ? 1 : 0));
+     g_assert_false(triggered);
++    ptimer_free(ptimer);
+ }
+=20
+ static void check_on_the_fly_mode_change(gconstpointer arg)
+@@ -406,6 +410,7 @@ static void check_on_the_fly_mode_change(gconstpointe=
+r arg)
+=20
+     g_assert_cmpuint(ptimer_get_count(ptimer), =3D=3D, 0);
+     g_assert_true(triggered);
++    ptimer_free(ptimer);
+ }
+=20
+ static void check_on_the_fly_period_change(gconstpointer arg)
+@@ -438,6 +443,7 @@ static void check_on_the_fly_period_change(gconstpoin=
+ter arg)
+=20
+     g_assert_cmpuint(ptimer_get_count(ptimer), =3D=3D, 0);
+     g_assert_true(triggered);
++    ptimer_free(ptimer);
+ }
+=20
+ static void check_on_the_fly_freq_change(gconstpointer arg)
+@@ -470,6 +476,7 @@ static void check_on_the_fly_freq_change(gconstpointe=
+r arg)
+=20
+     g_assert_cmpuint(ptimer_get_count(ptimer), =3D=3D, 0);
+     g_assert_true(triggered);
++    ptimer_free(ptimer);
+ }
+=20
+ static void check_run_with_period_0(gconstpointer arg)
+@@ -487,6 +494,7 @@ static void check_run_with_period_0(gconstpointer arg=
+)
+=20
+     g_assert_cmpuint(ptimer_get_count(ptimer), =3D=3D, 99);
+     g_assert_false(triggered);
++    ptimer_free(ptimer);
+ }
+=20
+ static void check_run_with_delta_0(gconstpointer arg)
+@@ -591,6 +599,7 @@ static void check_run_with_delta_0(gconstpointer arg)
+     g_assert_true(triggered);
+=20
+     ptimer_stop(ptimer);
++    ptimer_free(ptimer);
+ }
+=20
+ static void check_periodic_with_load_0(gconstpointer arg)
+@@ -649,6 +658,7 @@ static void check_periodic_with_load_0(gconstpointer =
+arg)
+     }
+=20
+     ptimer_stop(ptimer);
++    ptimer_free(ptimer);
+ }
+=20
+ static void check_oneshot_with_load_0(gconstpointer arg)
+@@ -682,14 +692,14 @@ static void check_oneshot_with_load_0(gconstpointer=
+ arg)
+     } else {
+         g_assert_false(triggered);
+     }
++
++    ptimer_free(ptimer);
+ }
+=20
+ static void add_ptimer_tests(uint8_t policy)
+ {
+-    uint8_t *ppolicy =3D g_malloc(1);
+-    char *policy_name =3D g_malloc0(256);
+-
+-    *ppolicy =3D policy;
++    char policy_name[256] =3D "";
++    char *tmp;
+=20
+     if (policy =3D=3D PTIMER_POLICY_DEFAULT) {
+         g_sprintf(policy_name, "default");
+@@ -715,49 +725,67 @@ static void add_ptimer_tests(uint8_t policy)
+         g_strlcat(policy_name, "no_counter_rounddown,", 256);
+     }
+=20
+-    g_test_add_data_func(
+-        g_strdup_printf("/ptimer/set_count policy=3D%s", policy_name),
+-        ppolicy, check_set_count);
+-
+-    g_test_add_data_func(
+-        g_strdup_printf("/ptimer/set_limit policy=3D%s", policy_name),
+-        ppolicy, check_set_limit);
+-
+-    g_test_add_data_func(
+-        g_strdup_printf("/ptimer/oneshot policy=3D%s", policy_name),
+-        ppolicy, check_oneshot);
+-
+-    g_test_add_data_func(
+-        g_strdup_printf("/ptimer/periodic policy=3D%s", policy_name),
+-        ppolicy, check_periodic);
+-
+-    g_test_add_data_func(
+-        g_strdup_printf("/ptimer/on_the_fly_mode_change policy=3D%s", po=
+licy_name),
+-        ppolicy, check_on_the_fly_mode_change);
+-
+-    g_test_add_data_func(
+-        g_strdup_printf("/ptimer/on_the_fly_period_change policy=3D%s", =
+policy_name),
+-        ppolicy, check_on_the_fly_period_change);
+-
+-    g_test_add_data_func(
+-        g_strdup_printf("/ptimer/on_the_fly_freq_change policy=3D%s", po=
+licy_name),
+-        ppolicy, check_on_the_fly_freq_change);
+-
+-    g_test_add_data_func(
+-        g_strdup_printf("/ptimer/run_with_period_0 policy=3D%s", policy_=
+name),
+-        ppolicy, check_run_with_period_0);
+-
+-    g_test_add_data_func(
+-        g_strdup_printf("/ptimer/run_with_delta_0 policy=3D%s", policy_n=
+ame),
+-        ppolicy, check_run_with_delta_0);
+-
+-    g_test_add_data_func(
+-        g_strdup_printf("/ptimer/periodic_with_load_0 policy=3D%s", poli=
+cy_name),
+-        ppolicy, check_periodic_with_load_0);
+-
+-    g_test_add_data_func(
+-        g_strdup_printf("/ptimer/oneshot_with_load_0 policy=3D%s", polic=
+y_name),
+-        ppolicy, check_oneshot_with_load_0);
++    g_test_add_data_func_full(
++        tmp =3D g_strdup_printf("/ptimer/set_count policy=3D%s", policy_=
+name),
++        g_memdup(&policy, 1), check_set_count, g_free);
++    g_free(tmp);
++
++    g_test_add_data_func_full(
++        tmp =3D g_strdup_printf("/ptimer/set_limit policy=3D%s", policy_=
+name),
++        g_memdup(&policy, 1), check_set_limit, g_free);
++    g_free(tmp);
++
++    g_test_add_data_func_full(
++        tmp =3D g_strdup_printf("/ptimer/oneshot policy=3D%s", policy_na=
+me),
++        g_memdup(&policy, 1), check_oneshot, g_free);
++    g_free(tmp);
++
++    g_test_add_data_func_full(
++        tmp =3D g_strdup_printf("/ptimer/periodic policy=3D%s", policy_n=
+ame),
++        g_memdup(&policy, 1), check_periodic, g_free);
++    g_free(tmp);
++
++    g_test_add_data_func_full(
++        tmp =3D g_strdup_printf("/ptimer/on_the_fly_mode_change policy=3D=
+%s",
++                              policy_name),
++        g_memdup(&policy, 1), check_on_the_fly_mode_change, g_free);
++    g_free(tmp);
++
++    g_test_add_data_func_full(
++        tmp =3D g_strdup_printf("/ptimer/on_the_fly_period_change policy=
+=3D%s",
++                              policy_name),
++        g_memdup(&policy, 1), check_on_the_fly_period_change, g_free);
++    g_free(tmp);
++
++    g_test_add_data_func_full(
++        tmp =3D g_strdup_printf("/ptimer/on_the_fly_freq_change policy=3D=
+%s",
++                              policy_name),
++        g_memdup(&policy, 1), check_on_the_fly_freq_change, g_free);
++    g_free(tmp);
++
++    g_test_add_data_func_full(
++        tmp =3D g_strdup_printf("/ptimer/run_with_period_0 policy=3D%s",
++                              policy_name),
++        g_memdup(&policy, 1), check_run_with_period_0, g_free);
++    g_free(tmp);
++
++    g_test_add_data_func_full(
++        tmp =3D g_strdup_printf("/ptimer/run_with_delta_0 policy=3D%s",
++                              policy_name),
++        g_memdup(&policy, 1), check_run_with_delta_0, g_free);
++    g_free(tmp);
++
++    g_test_add_data_func_full(
++        tmp =3D g_strdup_printf("/ptimer/periodic_with_load_0 policy=3D%=
+s",
++                              policy_name),
++        g_memdup(&policy, 1), check_periodic_with_load_0, g_free);
++    g_free(tmp);
++
++    g_test_add_data_func_full(
++        tmp =3D g_strdup_printf("/ptimer/oneshot_with_load_0 policy=3D%s=
+",
++                              policy_name),
++        g_memdup(&policy, 1), check_oneshot_with_load_0, g_free);
++    g_free(tmp);
+ }
+=20
+ static void add_all_ptimer_policies_comb_tests(void)
 --=20
 2.12.0.rc2.3.gc93709801
