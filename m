@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cj8Wl-00018y-Dg
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 12:59:04 -0500
+	(envelope-from <mst@redhat.com>) id 1cj8bA-0003Rn-Tq
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:03:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cj8Wi-0008NJ-Af
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 12:59:03 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33002
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cj8Wi-0008N9-4k
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 12:59:00 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v21HnuIQ039634
-	for <qemu-devel@nongnu.org>; Wed, 1 Mar 2017 12:58:59 -0500
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28wxrb6n4w-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 01 Mar 2017 12:58:58 -0500
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Wed, 1 Mar 2017 17:58:57 -0000
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-Date: Wed,  1 Mar 2017 18:58:52 +0100
-Message-Id: <20170301175852.13517-1-cornelia.huck@de.ibm.com>
-Subject: [Qemu-devel] [PATCH v3] virtio: guard vring access when setting
- notification
+	(envelope-from <mst@redhat.com>) id 1cj8b7-0002Df-5N
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:03:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55704)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cj8b6-0002CS-VI
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:03:33 -0500
+Date: Wed, 1 Mar 2017 20:03:28 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170301200153-mutt-send-email-mst@kernel.org>
+References: <20170301125414.GD10160@redhat.com>
+	<OF00CA88E0.A7212243-ON002580D6.00498E3C-852580D6.0049CA7A@notes.na.collabserv.com>
+	<CAJ+F1C+h7iyCSxE6p91NtEoTZSLtLBuF53=6yuWH+n-tBdV5=A@mail.gmail.com>
+	<05b271a3-4bf9-729b-d662-c9886951f26d@linux.vnet.ibm.com>
+	<20170301181146-mutt-send-email-mst@kernel.org>
+	<20170301163104.GJ10160@redhat.com>
+	<20170301185414-mutt-send-email-mst@kernel.org>
+	<1d155a66-8806-8792-b82d-4bebabcd4971@linux.vnet.ibm.com>
+	<20170301191459-mutt-send-email-mst@kernel.org>
+	<20170301172013.GL10160@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170301172013.GL10160@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 1/4] Provide support for the CUSE TPM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,46 +35,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, pbonzini@redhat.com, borntraeger@de.ibm.com, Cornelia Huck <cornelia.huck@de.ibm.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>, Stefan Berger <stefanb@us.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "SERBAN, CRISTINA" <cs1731@att.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, "Xu, Quan" <quan.xu@intel.com>, "silviu.vlasceanu@gmail.com" <silviu.vlasceanu@gmail.com>, "hagen.lauer@huawei.com" <hagen.lauer@huawei.com>, "SHIH, CHING C" <cs1815@att.com>
 
-Switching to vring caches exposed an existing bug in
-virtio_queue_set_notification(): We can't access vring structures
-if they have not been set up yet. This may happen, for example,
-for virtio-blk devices with multiple queues: The code will try to
-switch notifiers for every queue, but the guest may have only set up
-a subset of them.
+On Wed, Mar 01, 2017 at 05:20:13PM +0000, Daniel P. Berrange wrote:
+> > > > > QEMU's defined the vhost-user ABI/API and delegated
+> > > > > impl to something else.
+> > > > The vhost ABI isn't easy to maintain at all though. So I would not
+> > > > commit to that lightly without a good reason.
+> > > > 
+> > > > It will be way more painful if the ABI is dictated by a 3rd party
+> > > > library.
+> > > 
+> > > Who should define it?
+> > 
+> > No one. Put it in same source tree with QEMU and forget ABI stability
+> > issues.
+> 
+> That doesn't work very well in practice as you have to make sure the
+> vTPM process that is running, provides exactly the same ABI as the QEMU
+> process that's connecting to it. You could have a single vTPM process
+> on the host serving many QEMU processes, each of which could be a
+> different QEMU version, due to upgraded RPMs/Debs.
+> 
+> Regards,
+> Daniel
 
-Fix this by guarding access to the vring memory by checking for
-vring.desc. The first aio poll will iron out any remaining
-inconsistencies for later-configured queues (buggy legacy drivers).
+I might be wrong but last time I looked each QEMU instance had to use
+its own CUSE device. So the pain seems entirely self-inflicted, you
+could have a process per QEMU instance, start and stop it from within
+QEMU.
 
-Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
----
-v2->v3:
-- Switch to a very simple check for !desc, which should be fine for
-  the existing users.
 
-We might want to assert that callers don't start aio before DRIVER_OK
-resp. first kick, but that can wait until after we've fixed this bug.
----
- hw/virtio/virtio.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index e487e36..bf8a644 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -288,6 +288,10 @@ void virtio_queue_set_notification(VirtQueue *vq, int enable)
- {
-     vq->notification = enable;
- 
-+    if (!vq->vring.desc) {
-+        return;
-+    }
-+
-     rcu_read_lock();
-     if (virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX)) {
-         vring_set_avail_event(vq, vring_avail_idx(vq));
--- 
-2.8.4
+> -- 
+> |: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+> |: http://libvirt.org              -o-             http://virt-manager.org :|
+> |: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
