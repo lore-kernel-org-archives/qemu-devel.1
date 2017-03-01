@@ -1,40 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cj4Lu-0001HV-LB
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 08:31:36 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cj4fU-00010k-24
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 08:51:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cj4Lq-0005YD-Lv
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 08:31:34 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49438
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1cj4Lq-0005Wx-FM
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 08:31:30 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v21DTBlF020877
-	for <qemu-devel@nongnu.org>; Wed, 1 Mar 2017 08:31:27 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28wxrahxk2-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 01 Mar 2017 08:31:27 -0500
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Wed, 1 Mar 2017 13:31:19 -0000
-References: <20170301115004.96073-1-pasic@linux.vnet.ibm.com>
-	<20170301145306-mutt-send-email-mst@kernel.org>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Wed, 1 Mar 2017 14:31:16 +0100
-MIME-Version: 1.0
-In-Reply-To: <20170301145306-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Message-Id: <d118429d-f9e5-1c44-2223-6ce7bf97575a@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] virtio: fallback from irqfd to
- non-irqfd notify
+	(envelope-from <kraxel@redhat.com>) id 1cj4fR-0003lP-0b
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 08:51:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34014)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cj4fQ-0003iK-Qd
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 08:51:44 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4C13B4E4D2
+	for <qemu-devel@nongnu.org>; Wed,  1 Mar 2017 13:51:43 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed,  1 Mar 2017 14:51:35 +0100
+Message-Id: <1488376297-19711-1-git-send-email-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 0/2] docs: update sample configuration files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,70 +27,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
+  Hi,
 
+$subject says all.  Finally merging this.  Wasn't clear which
+maintainer/tree this should though, so I guess everybody hoped for
+someone else picking it up, causing the series lingering on the list
+for quite a while ...
 
-On 03/01/2017 01:54 PM, Michael S. Tsirkin wrote:
-> On Wed, Mar 01, 2017 at 12:50:04PM +0100, Halil Pasic wrote:
->> The commits 03de2f527 "virtio-blk: do not use vring in dataplane"  and
->> 9ffe337c08 "virtio-blk: always use dataplane path if ioeventfd is active"
->> changed how notifications are done for virtio-blk substantially. Due to a
->> race condition interrupts are lost when irqfd is torn down after
->> notify_guest_bh was scheduled but before it actually runs.  Furthermore
->> virtio_notify_irqfd ignores the value returned by event_notifier_set
->> which correctly indicates that notification has failed due to bad file
->> descriptor.
->>
->> Let's fix this by making virtio_notify_irqfd fall back to the non-irqfd
->> notification mechanism if event_notifier_set fails.
->>
->> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->> ---
->>
->> This is probably not the only way to fix this: suggestions welcome. I
->> did not use a fixes tag because I'm not sure yet where exactly things got
->> broken. Maybe guys more familiar with dataplane an coroutines can help
->> (Paolo, Stefan).
->> ---
->>  hw/virtio/virtio.c | 4 +++-
->>  1 file changed, 3 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
->> index 23483c7..8e1c1e9 100644
->> --- a/hw/virtio/virtio.c
->> +++ b/hw/virtio/virtio.c
->> @@ -1581,7 +1581,9 @@ void virtio_notify_irqfd(VirtIODevice *vdev, VirtQueue *vq)
->>       * to an atomic operation.
->>       */
->>      virtio_set_isr(vq->vdev, 0x1);
->> -    event_notifier_set(&vq->guest_notifier);
->> +    if (event_notifier_set(&vq->guest_notifier)) {
->> +        virtio_notify_vector(vdev, vq->vector);
->> +    }
-> 
-> Does this fail because the underlying fd got closed?
+It's docs, so it'll hardly cause regressions, merging into 2.9 even
+though freeze deadline was yesterday should be fine.
 
-Yes. Its data_plane_stop()->virtio_ccw_set_guest_notifier->event_notifier_cleanup().
-The function event_notifier_cleanup() does not set fds to -1 :(.
-Seems to me, it would be safer to do so. Should I make a patch?
+please pull,
+  Gerd
 
-> Then there's a problem: trying to write to a closed
-> fd might corrupt an unrelated fd.
-> If you want to use this way we need to set fds to -1 when we close.
+The following changes since commit e7c83a885f865128ae3cf1946f8cb538b63cbfba:
 
-Sorry, did not check for that. OTOH Paolo says my approach is
-fundamentally flawed because virtio_notify_vector is not thread
-safe. I suggest we continue the discussion there.
+  vhost-user: delay vhost_user_stop (2017-02-28 19:11:15 +0000)
 
-Regards,
-Halil
+are available in the git repository at:
 
-> 
->>  }
->>  
->>  static void virtio_irq(VirtQueue *vq)
->> -- 
->> 2.8.4
-> 
+  git://git.kraxel.org/qemu tags/pull-docs-20170301-1
+
+for you to fetch changes up to 166d434685ed6da5db88aca0c0599114e0c54462:
+
+  mach-virt: Provide sample configuration files (2017-03-01 14:40:40 +0100)
+
+----------------------------------------------------------------
+docs: update sample configuration files
+
+----------------------------------------------------------------
+Andrea Bolognani (2):
+      q35: Improve sample configuration files
+      mach-virt: Provide sample configuration files
+
+ docs/mach-virt-graphical.cfg  | 281 +++++++++++++++++++++++++++++++++++++++++
+ docs/mach-virt-serial.cfg     | 243 +++++++++++++++++++++++++++++++++++
+ docs/q35-chipset.cfg          | 152 ----------------------
+ docs/q35-emulated.cfg         | 288 ++++++++++++++++++++++++++++++++++++++++++
+ docs/q35-virtio-graphical.cfg | 248 ++++++++++++++++++++++++++++++++++++
+ docs/q35-virtio-serial.cfg    | 193 ++++++++++++++++++++++++++++
+ 6 files changed, 1253 insertions(+), 152 deletions(-)
+ create mode 100644 docs/mach-virt-graphical.cfg
+ create mode 100644 docs/mach-virt-serial.cfg
+ delete mode 100644 docs/q35-chipset.cfg
+ create mode 100644 docs/q35-emulated.cfg
+ create mode 100644 docs/q35-virtio-graphical.cfg
+ create mode 100644 docs/q35-virtio-serial.cfg
