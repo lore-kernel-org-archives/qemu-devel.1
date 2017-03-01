@@ -1,36 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cj93D-00017Y-H8
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:32:37 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cj946-0001ik-8c
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:33:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cj93B-0001qB-4A
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:32:35 -0500
-Received: from mail-lf0-x236.google.com ([2a00:1450:4010:c07::236]:32963)
+	(envelope-from <alex.bennee@linaro.org>) id 1cj943-0002LF-2O
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:33:30 -0500
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:37213)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1cj93A-0001o6-Lw
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:32:33 -0500
-Received: by mail-lf0-x236.google.com with SMTP id a6so23445031lfa.0
-	for <qemu-devel@nongnu.org>; Wed, 01 Mar 2017 10:32:32 -0800 (PST)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cj942-0002Kr-R8
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:33:27 -0500
+Received: by mail-wm0-x231.google.com with SMTP id n11so6420818wma.0
+	for <qemu-devel@nongnu.org>; Wed, 01 Mar 2017 10:33:26 -0800 (PST)
+References: <CAFEAcA_KVG19uhPuBUNx4ySmebnL1Hit6=HUX9ug0FkBFMwasg@mail.gmail.com>
+	<877f492ppx.fsf@linaro.org>
+	<e28337d0-d572-cd9a-3f45-0ecc074c32c9@ilande.co.uk>
+	<874lzd2mp7.fsf@linaro.org>
+	<9efa47c0-2a5f-0229-7e27-97a0142ff22d@ilande.co.uk>
+	<871suh2ff3.fsf@linaro.org>
+	<99624def-1c99-48f9-2ad3-c93e21956dd6@ilande.co.uk>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <99624def-1c99-48f9-2ad3-c93e21956dd6@ilande.co.uk>
+Date: Wed, 01 Mar 2017 18:33:26 +0000
+Message-ID: <87zih426fd.fsf@linaro.org>
 MIME-Version: 1.0
-References: <05b271a3-4bf9-729b-d662-c9886951f26d@linux.vnet.ibm.com>
-	<20170301181146-mutt-send-email-mst@kernel.org>
-	<20170301163104.GJ10160@redhat.com>
-	<20170301185414-mutt-send-email-mst@kernel.org>
-	<1d155a66-8806-8792-b82d-4bebabcd4971@linux.vnet.ibm.com>
-	<20170301191459-mutt-send-email-mst@kernel.org>
-	<4022b3c9-56c3-7cea-928c-9e0e7d070d90@linux.vnet.ibm.com>
-	<20170301173823.GO10160@redhat.com>
-	<20170301194704-mutt-send-email-mst@kernel.org>
-	<20170301181117.GR10160@redhat.com>
-	<20170301201347-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20170301201347-mutt-send-email-mst@kernel.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 01 Mar 2017 18:32:19 +0000
-Message-ID: <CAJ+F1CKM1JEqCv5mVUmP8E8WxEsjKY7zVTqqcTckvgmCDgmrEw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 1/4] Provide support for the CUSE TPM
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] intermittent make check failure:
+ "tcg_handle_interrupt: assertion failed: (qemu_mutex_iothread_locked())"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,85 +36,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>, Stefan Berger <stefanb@us.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "SERBAN, CRISTINA" <cs1731@att.com>, "Xu, Quan" <quan.xu@intel.com>, "silviu.vlasceanu@gmail.com" <silviu.vlasceanu@gmail.com>, "hagen.lauer@huawei.com" <hagen.lauer@huawei.com>, "SHIH,
-	CHING C" <cs1815@att.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Hi
 
-On Wed, Mar 1, 2017 at 10:20 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
 
+> On 01/03/17 15:19, Alex Bennée wrote:
 >
-> > You're also tieing the code
-> > into the QEMU release cycle, again for no tangible benefit.
+>> Actually looking at where cpu_check_irq is I've pushed the BQL wraps
+>> higher up:
+>>
+>>   https://github.com/stsquad/qemu/commit/f52e01bf4d3415ce4fad54cbb491f6c30a8e1903
+>>
+>> The reasoning is HW emulation code can expect to be run under the BQL.
+>> Anything triggered by MMIO for example will automatically have the lock.
+>> The problem is helpers which trigger hardware actions (ARM has ARM_CP_IO
+>> for this). We talk about this in the design document:
+>>
+>>   http://git.qemu-project.org/?p=qemu.git;a=blob;f=docs/multi-thread-tcg.txt;h=a99b4564c6258576acfa141f51f4b80131969519;hb=HEAD#l201
+>>
+>>> I ran out of time yesterday to run through all my SPARC64 tests, however
+>>> if this is the case then the issue will definitely appear in
+>>> qemu-system-sparc64 which seems to be supported by people seeing
+>>> intermittent failures in prom-env-test.
+>>
+>> So I made the change to both sparc and sparc64 in the above commit.
+>>
+>> I haven't managed to run into the intermittent trigger yet. How do I run
+>> the test directly?
+>>
+>>   make tests/prom-env-test
+>>
+>> Just makes the test case and
+>>
+>>   ./tests/prom-env-test
+>> **
+>> ERROR:tests/libqtest.c:589:qtest_get_arch: assertion failed: (qemu != NULL)
+>> Aborted (core dumped)
 >
-> No need for ABI stability would be the benefit.
+> Yeah, I couldn't work out how to run a single test either so ended up
+> cycling through a complete set of "make check" runs in order to try and
+> provoke the assert(), and despite all this I was still unable to
+> reproduce the "make check" error locally.
 >
+> Fortunately with the debian-40r4a-sparc-netinst.iso I was able to
+> reproduce it fairly easily under qemu-system-sparc so I'd suggest that
+> you go that route. If you can't find anywhere that hosts that particular
+> image for testing, do contact me off-list and I'll temporarily upload it
+> somewhere for you.
 
-We are talking about the control channel ABI (the data channel is using TCG
-defined command streams afaict - don't remember what it is called)
+It's OK I reproduced with the current etch iso. I have a patch in my
+tree that seems to work. I'll post once I've checked for any other
+places that need it.
 
-
->
-> > Conceptually
-> > swtpm does not depend on, or require, QEMU to be useful - it can have
-> > other non-QEMU consumers - bundling with QEMU is not helpful there.
->
-> Maybe it could but it isn't.
->
-
-Right, it would be reasonable to have qemu provide it's own private "swtpm"
-(linking with libtpms, doing most of the job), that way it wouldn't have to
-rely on a stable ABI (as long as the process isn't shared across different
-qemu versions, which should be quite easy to achieve)
-
->
-> >
-> > > I don't know what are the other options.  How is depending on an ABI
-> > > with a utility with no other users and not packaged by most distros
-> > > good? You are calling out to a CUSE device but who's reviewing that
-> > > code?
-> >
-> > If anyone is motivated enough to review the code, they can do it whethe=
-r
-> > it is in QEMU git or its own git. Pulling entire of swtpm into QEMU GIT
-> > isn't magically going to get useful reviews done on the code. The QEMU
-> > maintainers already have far more code to review than available review
-> > bandwidth, and lack domain knowledge in TPM concepts.
->
-> I was the only one merging TPM code so far. I don't call myself an
-> expert.  If someone steps up to do the work, is trusted by Peter to
-> maintain it for X years and doesn't care about the extra hurdles, more
-> power to them.
->
-
-Why not give Stefan maintainership of TPM?
-
->
-> > > Anyway, it all boils down to lack of reviewers. I know I am not mergi=
-ng
-> > > the current implementation because I could not figure out what do qem=
-u
-> > > bits do without looking at the implementation. I don't want to jump
-> > > between so many trees and coding styles. bios/qemu/linux/dpdk are
-> > > painful enough to manage. If some other maintainer volunteers, or if
-> > > Peter wants to merge it directly from Stefan, I won't object.
-> >
->
-
-ok
-
-
-> >
-> > Regards,
-> > Daniel
-> > --
-> > |: http://berrange.com      -o-
-> http://www.flickr.com/photos/dberrange/ :|
-> > |: http://libvirt.org              -o-
-> http://virt-manager.org :|
-> > |: http://entangle-photo.org       -o-
-> http://search.cpan.org/~danberr/ :|
->
---=20
-Marc-Andr=C3=A9 Lureau
+--
+Alex Bennée
