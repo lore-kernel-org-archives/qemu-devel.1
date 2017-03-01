@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41063)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cj0By-0002cT-EC
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:05:03 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cj0C5-0002fh-84
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:05:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cj0Bu-000195-E1
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:05:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49808)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cj0C1-0001BD-27
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:05:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57068)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cj0Bu-00018e-6F
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:04:58 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	id 1cj0C0-0001B9-Po
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:05:04 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 82BC43B71F
-	for <qemu-devel@nongnu.org>; Wed,  1 Mar 2017 09:04:57 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E9D9EC051662
+	for <qemu-devel@nongnu.org>; Wed,  1 Mar 2017 09:05:04 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed,  1 Mar 2017 13:04:25 +0400
-Message-Id: <20170301090453.11075-1-marcandre.lureau@redhat.com>
+Date: Wed,  1 Mar 2017 13:04:27 +0400
+Message-Id: <20170301090453.11075-3-marcandre.lureau@redhat.com>
+In-Reply-To: <20170301090453.11075-1-marcandre.lureau@redhat.com>
+References: <20170301090453.11075-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/28] Leak patches
+Subject: [Qemu-devel] [PULL 02/28] tests: fix qmp response leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,99 +36,142 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-The following changes since commit e7c83a885f865128ae3cf1946f8cb538b63cbf=
-ba:
+Spotted by ASAN.
 
-  vhost-user: delay vhost_user_stop (2017-02-28 19:11:15 +0000)
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ tests/libqos/usb.c             |  1 +
+ tests/postcopy-test.c          |  2 +-
+ tests/pvpanic-test.c           |  1 +
+ tests/test-filter-mirror.c     |  2 +-
+ tests/test-filter-redirector.c |  4 ++--
+ tests/virtio-blk-test.c        | 15 +++++++++------
+ 6 files changed, 15 insertions(+), 10 deletions(-)
 
-are available in the git repository at:
-
-  git@github.com:elmarco/qemu.git tags/leak-pull-request
-
-for you to fetch changes up to 80e1eea37a25a7696137e680285e36d0bfdc9f34:
-
-  tests: fix virtio-blk-test leaks (2017-03-01 11:58:57 +0400)
-
-----------------------------------------------------------------
-
-----------------------------------------------------------------
-
-Igor Mammedov (1):
-  pc: pcihp: avoid adding ACPI_PCIHP_PROP_BSEL twice
-
-Marc-Andr=C3=A9 Lureau (27):
-  qtest: fix a memory leak
-  tests: fix qmp response leak
-  tests: fix leaks in test-io-channel-command
-  timer: use an inline function for free
-  glib-compat: add g_test_add_data_func_full fallback
-  tests: fix ptimer leaks
-  tests: fix endianness-test leaks
-  tests: fix q35-test leaks
-  tests: fix vhost-user-test leaks
-  tests: fix ide-test leaks
-  tests: fix hd-geo-test leaks
-  tests: fix bios-tables-test leak
-  tests: fix ipmi-kcs-test leak
-  tests: fix ipmi-bt-test leak
-  tests: fix eepro100-test leak
-  tests: fix tco-test leaks
-  tests: fix e1000-test leak
-  tests: fix i440fx-test leaks
-  tests: fix e1000e leaks
-  tests: fix virtio-scsi-test leak
-  tests: fix virtio-9p-test leaks
-  bus: do not unref hotplug handler
-  usb: release the created buses
-  tests: allows to run single test in usb-hcd-ehci-test
-  tests: fix usb-test leaks
-  tests: add specialized device_find function
-  tests: fix virtio-blk-test leaks
-
- include/glib-compat.h           |  21 +++++++
- include/hw/ptimer.h             |   1 +
- include/qemu/timer.h            |   5 +-
- tests/libqos/usb.h              |   1 +
- tests/libqos/virtio-pci.h       |   6 +-
- hw/acpi/pcihp.c                 |  11 ----
- hw/acpi/piix4.c                 |   2 +
- hw/core/bus.c                   |   2 +-
- hw/core/ptimer.c                |   8 +++
- hw/i386/acpi-build.c            |   4 +-
- hw/usb/dev-storage.c            |  16 ++++++
- hw/usb/dev-uas.c                |   2 +
- qtest.c                         |   1 +
- tests/bios-tables-test.c        |   2 +-
- tests/e1000-test.c              |   1 +
- tests/e1000e-test.c             |   6 +-
- tests/eepro100-test.c           |   1 +
- tests/endianness-test.c         |   3 +
- tests/hd-geo-test.c             |  53 +++++++++++------
- tests/i440fx-test.c             |   5 ++
- tests/ide-test.c                |  12 ++++
- tests/ipmi-bt-test.c            |   1 +
- tests/ipmi-kcs-test.c           |   1 +
- tests/libqos/usb.c              |   6 ++
- tests/libqos/virtio-pci.c       |  38 +++++++++++--
- tests/libqtest.c                |  10 ----
- tests/postcopy-test.c           |   2 +-
- tests/ptimer-test-stubs.c       |   5 ++
- tests/ptimer-test.c             | 122 ++++++++++++++++++++++++----------=
-------
- tests/pvpanic-test.c            |   1 +
- tests/q35-test.c                |   3 +
- tests/tco-test.c                |  35 +++++++-----
- tests/test-filter-mirror.c      |   2 +-
- tests/test-filter-redirector.c  |   4 +-
- tests/test-io-channel-command.c |   6 +-
- tests/usb-hcd-ehci-test.c       |  19 +++++--
- tests/usb-hcd-uhci-test.c       |   1 +
- tests/vhost-user-test.c         |  11 ++--
- tests/virtio-9p-test.c          |   2 +-
- tests/virtio-blk-test.c         |  29 +++++-----
- tests/virtio-scsi-test.c        |   2 +-
- util/qemu-timer.c               |   5 --
- 42 files changed, 319 insertions(+), 149 deletions(-)
-
+diff --git a/tests/libqos/usb.c b/tests/libqos/usb.c
+index 72d7a961fe..98408d93f3 100644
+--- a/tests/libqos/usb.c
++++ b/tests/libqos/usb.c
+@@ -64,4 +64,5 @@ void usb_test_hotplug(const char *hcd_id, const int por=
+t,
+     g_assert(response);
+     g_assert(qdict_haskey(response, "event"));
+     g_assert(!strcmp(qdict_get_str(response, "event"), "DEVICE_DELETED")=
+);
++    QDECREF(response);
+ }
+diff --git a/tests/postcopy-test.c b/tests/postcopy-test.c
+index dafe8beba4..de35a18903 100644
+--- a/tests/postcopy-test.c
++++ b/tests/postcopy-test.c
+@@ -482,7 +482,7 @@ static void test_migrate(void)
+         usleep(10 * 1000);
+     } while (dest_byte_a =3D=3D dest_byte_b);
+=20
+-    qmp("{ 'execute' : 'stop'}");
++    qmp_discard_response("{ 'execute' : 'stop'}");
+     /* With it stopped, check nothing changes */
+     qtest_memread(to, start_address, &dest_byte_c, 1);
+     sleep(1);
+diff --git a/tests/pvpanic-test.c b/tests/pvpanic-test.c
+index 3bfa678667..71ebb5c02c 100644
+--- a/tests/pvpanic-test.c
++++ b/tests/pvpanic-test.c
+@@ -27,6 +27,7 @@ static void test_panic(void)
+     data =3D qdict_get_qdict(response, "data");
+     g_assert(qdict_haskey(data, "action"));
+     g_assert_cmpstr(qdict_get_str(data, "action"), =3D=3D, "pause");
++    QDECREF(response);
+ }
+=20
+ int main(int argc, char **argv)
+diff --git a/tests/test-filter-mirror.c b/tests/test-filter-mirror.c
+index ffaaffabd0..9f84402493 100644
+--- a/tests/test-filter-mirror.c
++++ b/tests/test-filter-mirror.c
+@@ -57,7 +57,7 @@ static void test_mirror(void)
+     };
+=20
+     /* send a qmp command to guarantee that 'connected' is setting to tr=
+ue. */
+-    qmp("{ 'execute' : 'query-status'}");
++    qmp_discard_response("{ 'execute' : 'query-status'}");
+     ret =3D iov_send(send_sock[0], iov, 2, 0, sizeof(size) + sizeof(send=
+_buf));
+     g_assert_cmpint(ret, =3D=3D, sizeof(send_buf) + sizeof(size));
+     close(send_sock[0]);
+diff --git a/tests/test-filter-redirector.c b/tests/test-filter-redirecto=
+r.c
+index c63b68f03a..0c4b8d52ef 100644
+--- a/tests/test-filter-redirector.c
++++ b/tests/test-filter-redirector.c
+@@ -99,7 +99,7 @@ static void test_redirector_tx(void)
+     g_assert_cmpint(recv_sock, !=3D, -1);
+=20
+     /* send a qmp command to guarantee that 'connected' is setting to tr=
+ue. */
+-    qmp("{ 'execute' : 'query-status'}");
++    qmp_discard_response("{ 'execute' : 'query-status'}");
+=20
+     struct iovec iov[] =3D {
+         {
+@@ -184,7 +184,7 @@ static void test_redirector_rx(void)
+     send_sock =3D unix_connect(sock_path1, NULL);
+     g_assert_cmpint(send_sock, !=3D, -1);
+     /* send a qmp command to guarantee that 'connected' is setting to tr=
+ue. */
+-    qmp("{ 'execute' : 'query-status'}");
++    qmp_discard_response("{ 'execute' : 'query-status'}");
+=20
+     ret =3D iov_send(send_sock, iov, 2, 0, sizeof(size) + sizeof(send_bu=
+f));
+     g_assert_cmpint(ret, =3D=3D, sizeof(send_buf) + sizeof(size));
+diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
+index 0e32e416dd..10a92b410a 100644
+--- a/tests/virtio-blk-test.c
++++ b/tests/virtio-blk-test.c
+@@ -409,8 +409,9 @@ static void pci_config(void)
+=20
+     qvirtio_set_driver_ok(&dev->vdev);
+=20
+-    qmp("{ 'execute': 'block_resize', 'arguments': { 'device': 'drive0',=
+ "
+-                                                    " 'size': %d } }", n=
+_size);
++    qmp_discard_response("{ 'execute': 'block_resize', "
++                         " 'arguments': { 'device': 'drive0', "
++                         " 'size': %d } }", n_size);
+     qvirtio_wait_config_isr(&dev->vdev, QVIRTIO_BLK_TIMEOUT_US);
+=20
+     capacity =3D qvirtio_config_readq(&dev->vdev, 0);
+@@ -458,8 +459,9 @@ static void pci_msix(void)
+=20
+     qvirtio_set_driver_ok(&dev->vdev);
+=20
+-    qmp("{ 'execute': 'block_resize', 'arguments': { 'device': 'drive0',=
+ "
+-                                                    " 'size': %d } }", n=
+_size);
++    qmp_discard_response("{ 'execute': 'block_resize', "
++                         " 'arguments': { 'device': 'drive0', "
++                         " 'size': %d } }", n_size);
+=20
+     qvirtio_wait_config_isr(&dev->vdev, QVIRTIO_BLK_TIMEOUT_US);
+=20
+@@ -691,8 +693,9 @@ static void mmio_basic(void)
+=20
+     test_basic(&dev->vdev, alloc, vq);
+=20
+-    qmp("{ 'execute': 'block_resize', 'arguments': { 'device': 'drive0',=
+ "
+-                                                    " 'size': %d } }", n=
+_size);
++    qmp_discard_response("{ 'execute': 'block_resize', "
++                         " 'arguments': { 'device': 'drive0', "
++                         " 'size': %d } }", n_size);
+=20
+     qvirtio_wait_queue_isr(&dev->vdev, vq, QVIRTIO_BLK_TIMEOUT_US);
+=20
 --=20
 2.12.0.rc2.3.gc93709801
