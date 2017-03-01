@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cj8yQ-0005f4-TC
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:27:40 -0500
+	(envelope-from <mst@redhat.com>) id 1cj918-0007qg-LF
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:30:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cj8yM-0007Pu-SW
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:27:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41374)
+	(envelope-from <mst@redhat.com>) id 1cj914-0000Tf-RG
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:30:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56646)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cj8yM-0007PP-Jk
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:27:34 -0500
-References: <CAFEAcA_KVG19uhPuBUNx4ySmebnL1Hit6=HUX9ug0FkBFMwasg@mail.gmail.com>
-	<877f492ppx.fsf@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <c65c1da3-a7bb-c800-e0a6-e7a121f13f2d@redhat.com>
-Date: Wed, 1 Mar 2017 19:27:31 +0100
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cj914-0000SB-HB
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:30:22 -0500
+Date: Wed, 1 Mar 2017 20:30:19 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170301202044-mutt-send-email-mst@kernel.org>
+References: <20170301163104.GJ10160@redhat.com>
+	<20170301185414-mutt-send-email-mst@kernel.org>
+	<1d155a66-8806-8792-b82d-4bebabcd4971@linux.vnet.ibm.com>
+	<20170301191459-mutt-send-email-mst@kernel.org>
+	<4022b3c9-56c3-7cea-928c-9e0e7d070d90@linux.vnet.ibm.com>
+	<20170301173823.GO10160@redhat.com>
+	<20170301194704-mutt-send-email-mst@kernel.org>
+	<20170301180602.GH2429@work-vm>
+	<20170301200804-mutt-send-email-mst@kernel.org>
+	<20170301181801.GI2429@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <877f492ppx.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] s390x failure: "tcg_handle_interrupt: assertion
- failed: (qemu_mutex_iothread_locked())"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170301181801.GI2429@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v5 1/4] Provide support for the CUSE TPM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,104 +35,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Stefan Berger <stefanb@us.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "SERBAN, CRISTINA" <cs1731@att.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, "Xu, Quan" <quan.xu@intel.com>, "silviu.vlasceanu@gmail.com" <silviu.vlasceanu@gmail.com>, "hagen.lauer@huawei.com" <hagen.lauer@huawei.com>, "SHIH, CHING C" <cs1815@att.com>
 
-On 01.03.2017 12:36, Alex Benn=C3=A9e wrote:
->=20
-> Peter Maydell <peter.maydell@linaro.org> writes:
->=20
->> I got a make check failure on aarch64 host running a sparc64 test:
->>
->>
->> TEST: tests/prom-env-test... (pid=3D13573)
->>   /sparc64/prom-env/sun4u:                                            =
- **
->> ERROR:/home/pm215/qemu/translate-common.c:34:tcg_handle_interrupt:
->> assertion failed: (qemu_mutex_iothread_locked())
->=20
-> So the assertions where added with MTTCG. The design specifies which
-> bits should be protected by the BQL and cpu->interrupt_request is one o=
-f
-> them. This is because cpu->interrupt_request is often a cross-vCPU
-> action (one vCPU triggering an interrupt on another) so there is a
-> chance of racing if not protected.
->=20
-> It's odd this is showing up on a aarch64 host though when it didn't hit
-> on my x86_64 host while testing.
->=20
-> As most of this stuff is triggered by hardware emulation the BQL should
-> be in effect when handling MMIO for device emulation. There where other
-> entry points in ARM which could trigger stuff which is why we add
-> locking for things like ARM_CP_IO which are co-processor register
-> accesses which trigger other things in the system.
->=20
-> What will be useful for all these reports is the backtrace. Then it's
-> fairly simple to identify the thing triggering the interrupt and
-> identify the correct place for the locking.
+On Wed, Mar 01, 2017 at 06:18:01PM +0000, Dr. David Alan Gilbert wrote:
+> * Michael S. Tsirkin (mst@redhat.com) wrote:
+> > On Wed, Mar 01, 2017 at 06:06:02PM +0000, Dr. David Alan Gilbert wrote:
+> > > * Michael S. Tsirkin (mst@redhat.com) wrote:
+> > > > On Wed, Mar 01, 2017 at 05:38:23PM +0000, Daniel P. Berrange wrote:
+> > > > > On Wed, Mar 01, 2017 at 12:25:46PM -0500, Stefan Berger wrote:
+> > > > > > On 03/01/2017 12:16 PM, Michael S. Tsirkin wrote:
+> > > > > > > On Wed, Mar 01, 2017 at 12:12:34PM -0500, Stefan Berger wrote:
+> > > > > > > > On 03/01/2017 12:02 PM, Michael S. Tsirkin wrote:
+> > > > > > > > > On Wed, Mar 01, 2017 at 04:31:04PM +0000, Daniel P. Berrange wrote:
+> > > > > > > > > > On Wed, Mar 01, 2017 at 06:22:45PM +0200, Michael S. Tsirkin wrote:
+> > > > > > > > > > > On Wed, Mar 01, 2017 at 09:50:38AM -0500, Stefan Berger wrote:
+> > > > > > > > > > > > I had already proposed a linked-in version before I went to the out-of-process
+> > > > > > > > > > > > design. Anthony's concerns back then were related to the code not being trusted
+> > > > > > > > > > > > and a segfault in the code could bring down all of QEMU. That we have test
+> > > > > > > > > > > > suites running over it didn't work as an argument. Some of the test suite are
+> > > > > > > > > > > > private, though.
+> > > > > > > > > > > Given how bad the alternative is maybe we should go back to that one.
+> > > > > > > > > > > Same argument can be made for any device and we aren't making
+> > > > > > > > > > > them out of process right now.
+> > > > > > > > > > > 
+> > > > > > > > > > > IIMO it's less the in-process question (modularization
+> > > > > > > > > > > of QEMU has been on the agenda since years and I don't
+> > > > > > > > > > > think anyone is against it) it's more a code control/community question.
+> > > > > > > > > > I rather disagree. Modularization of QEMU has seen few results
+> > > > > > > > > > because it is generally a hard problem to solve when you have a
+> > > > > > > > > > complex pre-existing codebase.  I don't think code control has
+> > > > > > > > > > been a factor in this - as long as QEMU can clearly define its
+> > > > > > > > > > ABI/API between core & the modular pieces, it doesn't matter
+> > > > > > > > > > who owns the module. We've seen this with vhost-user which is
+> > > > > > > > > > essentially outsourcing network device backend impls to a 3rd
+> > > > > > > > > > party project.
+> > > > > > > > > And it was done precisely for community reasons.  dpdk/VPP community is
+> > > > > > > > > quite large and fell funded but they just can't all grok QEMU.  They
+> > > > > > > > > work for hardware vendors and do baremetal things.  With the split we
+> > > > > > > > > can focus on virtualization and they can focus on moving packets around.
+> > > > > > > > > 
+> > > > > > > > > 
+> > > > > > > > > > QEMU's defined the vhost-user ABI/API and delegated
+> > > > > > > > > > impl to something else.
+> > > > > > > > > The vhost ABI isn't easy to maintain at all though. So I would not
+> > > > > > > > > commit to that lightly without a good reason.
+> > > > > > > > > 
+> > > > > > > > > It will be way more painful if the ABI is dictated by a 3rd party
+> > > > > > > > > library.
+> > > > > > > > Who should define it?
+> > > > > > > > 
+> > > > > > > No one. Put it in same source tree with QEMU and forget ABI stability
+> > > > > > > issues.
+> > > > > > 
+> > > > > > You mean put the code implementing TPM 1.2 and/or TPM 2 into the QEMU tree?
+> > > > > > These are multiple thousands of lines of code each and we'll break them
+> > > > > > apart into logical chunks and review them?
+> > > > > 
+> > > > > No, lets not make that mistake again - we only just got rid of the
+> > > > > libcacard smartcard library code from QEMU git. 
+> > > > > 
+> > > > > Regards,
+> > > > > Daniel
+> > > > 
+> > > > I don't mean that as an external library. As an integral part of QEMU
+> > > > adhering to our coding style etc - why not?
+> > > > 
+> > > > I don't know what are the other options.  How is depending on an ABI
+> > > > with a utility with no other users and not packaged by most distros
+> > > > good? You are calling out to a CUSE device but who's reviewing that
+> > > > code?
+> > > > 
+> > > > vl.c weights in a 4500 lines of code. several thousand lines is
+> > > > not small but not unmanageable.
+> > > 
+> > > 
+> > > That's 4500 lines of fairly generic code; not like the TPM where the number
+> > > of people who really understand the details of it is pretty slim.
+> > > 
+> > > It's better on most counts to have it as a separate process.
+> > > 
+> > > Dave
+> > 
+> > Separate process we start and stop automatically I don't mind. A
+> > separate tree with a distinct coding style where no one will ever even
+> > look at it? Not so much.
+> 
+> That code is used elsewhere anyway,
 
-Here are the backtraces from the s390x moon buggy image:
+Who uses it? Who packages it? Fedora doesn't ...
 
-Thread 3 (Thread 0x7fffdc608700 (LWP 14468)):
-#0  0x00007ffff18ef1d7 in raise () at /lib64/libc.so.6
-#1  0x00007ffff18f08c8 in abort () at /lib64/libc.so.6
-#2  0x00007ffff2f642a5 in g_assertion_message () at /lib64/libglib-2.0.so=
-.0
-#3  0x00007ffff2f6433a in g_assertion_message_expr () at /lib64/libglib-2=
-.0.so.0
-#4  0x000055555560bd31 in tcg_handle_interrupt (cpu=3D0x55555612fc40, mas=
-k=3D2) at /home/thuth/devel/qemu/translate-common.c:34
-#5  0x000055555568fe03 in css_do_ssch (sch=3Dsch@entry=3D0x5555561740d0, =
-orb=3Dorb@entry=3D0x7fffdc607400)
-    at /home/thuth/devel/qemu/hw/s390x/css.c:945
-#6  0x00005555556b99ad in ioinst_handle_ssch (cpu=3D0x55555612fc40, reg1=3D=
-<optimized out>, ipb=3D<optimized out>)
-    at /home/thuth/devel/qemu/target/s390x/ioinst.c:238
-#7  0x00007fffe60957be in code_gen_buffer ()
-#8  0x000055555560b49d in cpu_exec (itb=3D<optimized out>, itb=3D<optimiz=
-ed out>, cpu=3D0x7fffe52dc790)
-    at /home/thuth/devel/qemu/cpu-exec.c:165
-#9  0x000055555560b49d in cpu_exec (sc=3D0x7fffdc6079b0, tb_exit=3D<synth=
-etic pointer>, last_tb=3D<synthetic pointer>, tb=3D<optimized out>, cpu=3D=
-0x7fffe52dc790) at /home/thuth/devel/qemu/cpu-exec.c:584
-#10 0x000055555560b49d in cpu_exec (cpu=3Dcpu@entry=3D0x55555612fc40) at =
-/home/thuth/devel/qemu/cpu-exec.c:686
-#11 0x000055555563677a in tcg_cpu_exec (cpu=3D0x55555612fc40) at /home/th=
-uth/devel/qemu/cpus.c:1251
-#12 0x0000555555636ab4 in qemu_tcg_rr_cpu_thread_fn (arg=3D<optimized out=
->) at /home/thuth/devel/qemu/cpus.c:1347
-#13 0x00007ffff53b3dc5 in start_thread () at /lib64/libpthread.so.0
-#14 0x00007ffff19b173d in clone () at /lib64/libc.so.6
+> so asking them to change the coding style
+> isn't very nice.
+> Even if they change the coding style it doesn't mean you're suddenly going to
+> understand how a TPM works in detail and be able to review it.
 
-Thread 2 (Thread 0x7fffe82b5700 (LWP 14467)):
-#0  0x00007ffff19abbf9 in syscall () at /lib64/libc.so.6
-#1  0x0000555555853896 in qemu_event_wait (val=3D<optimized out>, f=3D<op=
-timized out>)
-    at /home/thuth/devel/qemu/include/qemu/futex.h:26
-#2  0x0000555555853896 in qemu_event_wait (ev=3Dev@entry=3D0x555556082284=
- <rcu_call_ready_event>)
-    at /home/thuth/devel/qemu/util/qemu-thread-posix.c:399
-#3  0x000055555586243e in call_rcu_thread (opaque=3D<optimized out>) at /=
-home/thuth/devel/qemu/util/rcu.c:249
-#4  0x00007ffff53b3dc5 in start_thread () at /lib64/libpthread.so.0
-#5  0x00007ffff19b173d in clone () at /lib64/libc.so.6
+I did in the past but I didn't kept abreast of the recent developments.
 
-Thread 1 (Thread 0x7ffff7f91c00 (LWP 14463)):
-#0  0x00007ffff19a6ebf in ppoll () at /lib64/libc.so.6
-#1  0x000055555584f819 in qemu_poll_ns (__ss=3D0x0, __timeout=3D0x7ffffff=
-fda20, __nfds=3D<optimized out>, __fds=3D<optimized out>)
-    at /usr/include/bits/poll2.h:77
-#2  0x000055555584f819 in qemu_poll_ns (fds=3D<optimized out>, nfds=3D<op=
-timized out>, timeout=3Dtimeout@entry=3D9897590)
-    at /home/thuth/devel/qemu/util/qemu-timer.c:333
-#3  0x00005555558505e8 in main_loop_wait (timeout=3D9897590) at /home/thu=
-th/devel/qemu/util/main-loop.c:254
-#4  0x00005555558505e8 in main_loop_wait (nonblocking=3D<optimized out>) =
-at /home/thuth/devel/qemu/util/main-loop.c:508
-#5  0x00005555555f83b9 in main () at /home/thuth/devel/qemu/vl.c:1897
-#6  0x00005555555f83b9 in main (argc=3D<optimized out>, argv=3D<optimized=
- out>, envp=3D<optimized out>)
-    at /home/thuth/devel/qemu/vl.c:4675
+> Anyway, having it in a separate process locked down by SELinux means that even
+> if it does go horribly wrong it won't break qemu.
+> 
+> Dave
 
- HTH2,
-  Thomas
+Since qemu does blocking ioctls on it and doesn't validate results
+too much it sure can break QEMU - anything from DOS to random
+code execution. That's why we want to keep it in tree and
+start it ourselves - I don't want CVEs claiming not validating
+some parameter we get from it is a remote code execution.
+It should be just a library that yes, we can keep out of
+process for extra security but no, we can't just out random
+stuff in there and never care.
+
+
+> > > > Anyway, it all boils down to lack of reviewers. I know I am not merging
+> > > > the current implementation because I could not figure out what do qemu
+> > > > bits do without looking at the implementation. I don't want to jump
+> > > > between so many trees and coding styles. bios/qemu/linux/dpdk are
+> > > > painful enough to manage. If some other maintainer volunteers, or if
+> > > > Peter wants to merge it directly from Stefan, I won't object.
+> > > > 
+> > > > > -- 
+> > > > > |: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+> > > > > |: http://libvirt.org              -o-             http://virt-manager.org :|
+> > > > > |: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+> > > --
+> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
