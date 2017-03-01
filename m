@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cj12p-0003HZ-M9
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:59:40 -0500
+	(envelope-from <bounces@canonical.com>) id 1cj1Nu-0002BC-Fj
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 05:21:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cj12l-0007IV-QF
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:59:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44440)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cj12l-0007ID-IA
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:59:35 -0500
-Date: Wed, 1 Mar 2017 17:59:28 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170301095928.GG13926@pxdev.xzpeter.org>
-References: <1487910561-17825-1-git-send-email-peterx@redhat.com>
-	<e547f430-d078-27a5-7064-4fc5b9f738d1@redhat.com>
-	<20170301023635.GE13926@pxdev.xzpeter.org>
-	<20170301043802-mutt-send-email-mst@kernel.org>
-	<05a23bbc-4ebc-769b-aa62-d3387af57cae@redhat.com>
-	<a35dbe8f-770e-c792-e5ea-1f4f8ef8df37@redhat.com>
-	<20170301091831.GF13926@pxdev.xzpeter.org>
-	<4e757875-5b48-6eb6-3847-a27787dd6edd@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1cj1Nr-0007Zh-BY
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 05:21:26 -0500
+Received: from indium.canonical.com ([91.189.90.7]:35256)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cj1Nr-0007ZX-5y
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 05:21:23 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cj1No-0007SB-CN
+	for <qemu-devel@nongnu.org>; Wed, 01 Mar 2017 10:21:20 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 616972E81AE
+	for <qemu-devel@nongnu.org>; Wed,  1 Mar 2017 10:21:14 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <4e757875-5b48-6eb6-3847-a27787dd6edd@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] intel_iommu: check misordered init when
- realize
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 01 Mar 2017 10:13:51 -0000
+From: Bug Watch Updater <1653384@bugs.launchpad.net>
+Reply-To: Bug 1653384 <1653384@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20161231213844.1229.87554.malonedeb@soybean.canonical.com>
+Message-Id: <20170301101352.11186.98836.launchpad@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1653384] Re: Assertion failed with USB pass
+ through with XHCI controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,69 +37,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, yi.l.liu@intel.com, qemu-devel@nongnu.org, Jintack Lim <jintack@cs.columbia.edu>
+To: qemu-devel@nongnu.org
 
-On Wed, Mar 01, 2017 at 11:29:47AM +0200, Marcel Apfelbaum wrote:
-> On 03/01/2017 11:18 AM, Peter Xu wrote:
-> >On Wed, Mar 01, 2017 at 09:03:47AM +0200, Marcel Apfelbaum wrote:
-> >>On 03/01/2017 06:14 AM, Jason Wang wrote:
-> >
-> >[...]
-> >
-> >>Hi Jason,
-> >>
-> >>I am not saying we don't need to create the IOMMU before some other device,
-> >>I just don't think that the command line order should matter to user.
-> >>
-> >>BTW, are you working on a way to limit the IOMMU scope to a specific set of devices?
-> >>If yes, this approach will also help you work.
-> >
-> >Marcel,
-> >
-> >Do you have any plan after 2.9 to re-arrange the init order thing a
-> >bit? In general, maybe we need an ordering support for devices.
-> 
-> I don;t know when I'll start it, but yes, I am thinking about
-> taking this project. We need the ordering in order to be able
-> to have less "built-in" devices.
+** Changed in: qemu (Debian)
+       Status: Confirmed =3D> Fix Committed
 
-That'll be great!
+-- =
 
-> 
-> >Besides that, I am thinking whether it would be wise that we just init
-> >the IOMMUs during machine init just like before, but keep the
-> >"-device" interface? After all, at least the root IOMMU device should
-> >be with root complex, and it feels a little strange we just split the
-> >init process apart (we delay the IOMMU init into device
-> >initializations).
-> >
-> 
-> Keeping the IOMMU creation as part of the Root Complex is problematic.
-> What happens if we want to limit the IOMMU scope to a subset of devices?
-> How will the command line look? Also we may want/need multiple iommu
-> devices per system. It will not happen tomorrow, but we don't want to loose
-> this possibility.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1653384
 
-I think that won't be a big problem. E.g., I don't see big problem if
-we just create all these vIOMMUs along with machine init. Is there?
+Title:
+  Assertion failed with USB pass through with XHCI controller
 
-IMHO we can just pick these vIOMMU "devices" out of the device list,
-and we can avoid doing that again in general device_init_func().
+Status in QEMU:
+  Fix Committed
+Status in qemu package in Debian:
+  Fix Committed
 
-> 
-> The device re-ordering is not 2.9 material of course, and we need your patch.
-> The only thing we can do better is to take out the "vfio-pci" in another header
-> file and and have it in a array of devices that should be checked
-> (in order to avoid polluting the IOMMU code with a not related device)
-> 
-> I can try and send a patch for it if you prefer.
+Bug description:
+  Starting qemu 2.8.0 with XHCI controller and host device passed
+  through results in an assertion failure:
 
-IMHO it'll be okay we "pollute" vtd code for a short while. We can
-revert my patch (or any workarounds, like Jason's just posted one)
-when we have device ordering support, and when we have a correct
-bus_master_as when device init.
+  qemu-system-x86_64: hw/usb/core.c:623: usb_packet_cleanup: Assertion
+  `!usb_packet_is_inflight(p)' failed.
 
-Thanks,
+  Can be reproduced with the following command (passing through a Lenovo
+  keyboard):
 
--- peterx
+  qemu-system-x86_64 -usb  -device nec-usb-xhci,id=3Dusb -device usb-
+  host,vendorid=3D0x04b3,productid=3D0x3025,id=3Dhostdev0,bus=3Dusb.0,port=
+=3D1
+
+  If nec-usb-xhci is changed to usb-ehci, qemu tries to boot without
+  assertion failures.
+
+  =
+
+  Can be reproduced with the latest master (commit dbe2b65) and v2.8.0.
+
+  Bisected the issue to following commit:
+  first bad commit: [94b037f2a451b3dc855f9f2c346e5049a361bd55] xhci: use li=
+nked list for transfers
+
+  =
+
+  Backtrace from commit dbe2b65:
+
+  #0  0x00007f2eb4657227 in __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/=
+unix/sysv/linux/raise.c:55
+          resultvar =3D 0
+          pid =3D 3453
+          selftid =3D 3453
+  #1  0x00007f2eb465867a in __GI_abort () at abort.c:89
+          save_stage =3D 2
+          act =3D {__sigaction_handler =3D {sa_handler =3D 0x4, sa_sigactio=
+n =3D 0x4}, sa_mask =3D {__val =3D {140734740550528, 93876690035339, =
+
+                140734740550624, 48833659808, 0, 0, 0, 21474836480, 1407347=
+40550792, 139838573009553, 140734740550560, 139838573043008, =
+
+                139838573024160, 93876666665872, 139838702616576, 139838573=
+024160}}, sa_flags =3D 1528954938, =
+
+            sa_restorer =3D 0x55615b2202c0 <__PRETTY_FUNCTION__.38612>}
+          sigs =3D {__val =3D {32, 0 <repeats 15 times>}}
+  #2  0x00007f2eb46502cd in __assert_fail_base (fmt=3D0x7f2eb47893a0 "%s%s%=
+s:%u: %s%sAssertion `%s' failed.\n%n", =
+
+      assertion=3Dassertion@entry=3D0x55615b22003a "!usb_packet_is_inflight=
+(p)", file=3Dfile@entry=3D0x55615b21fdf0 "hw/usb/core.c", line=3Dline@entry=
+=3D619, =
+
+      function=3Dfunction@entry=3D0x55615b2202c0 <__PRETTY_FUNCTION__.38612=
+> "usb_packet_cleanup") at assert.c:92
+          str =3D 0x55615cfdf510 ""
+          total =3D 4096
+  #3  0x00007f2eb4650382 in __GI___assert_fail (assertion=3D0x55615b22003a =
+"!usb_packet_is_inflight(p)", file=3D0x55615b21fdf0 "hw/usb/core.c", =
+
+      line=3D619, function=3D0x55615b2202c0 <__PRETTY_FUNCTION__.38612> "us=
+b_packet_cleanup") at assert.c:101
+  No locals.
+  #4  0x000055615afc385e in usb_packet_cleanup ()
+  No symbol table info available.
+  #5  0x000055615afda555 in xhci_ep_free_xfer ()
+  No symbol table info available.
+  #6  0x000055615afdc156 in xhci_kick_epctx ()
+  No symbol table info available.
+  #7  0x000055615afda099 in xhci_ep_kick_timer ()
+  No symbol table info available.
+  #8  0x000055615b08ceee in timerlist_run_timers ()
+  No symbol table info available.
+  #9  0x000055615b08cf36 in qemu_clock_run_timers ()
+  No symbol table info available.
+  #10 0x000055615b08d2df in qemu_clock_run_all_timers ()
+  No symbol table info available.
+  #11 0x000055615b08be40 in main_loop_wait ()
+  No symbol table info available.
+  #12 0x000055615ae3870f in main_loop ()
+  No symbol table info available.
+  #13 0x000055615ae4027b in main ()
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1653384/+subscriptions
