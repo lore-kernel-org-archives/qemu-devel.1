@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47580)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47613)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1citDc-0003XL-5m
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 20:38:17 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1citDe-0003Xc-BD
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 20:38:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1citDb-0001XU-6J
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 20:38:16 -0500
-Date: Wed, 1 Mar 2017 11:12:07 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1citDb-0001XZ-6P
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 20:38:18 -0500
+Date: Wed, 1 Mar 2017 12:04:57 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170301001207.GA12571@umbus.fritz.box>
-References: <1485900317-3256-1-git-send-email-joserz@linux.vnet.ibm.com>
-	<23319194-73e8-8edd-32e5-a8543b91fca9@vivier.eu>
-	<20170228010905.GM17615@umbus.fritz.box>
-	<227638f2-d9fc-c56d-78d1-09d6ee21a600@vivier.eu>
+Message-ID: <20170301010457.GE12571@umbus.fritz.box>
+References: <148825736854.186.587070083826625623@0e2666bad730>
+	<20170228133217.20039-1-michael.nawrocki@gtri.gatech.edu>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="mYCpIKhGyMATD0i+"
+	protocol="application/pgp-signature"; boundary="CGDBiGfvSTbxKZlW"
 Content-Disposition: inline
-In-Reply-To: <227638f2-d9fc-c56d-78d1-09d6ee21a600@vivier.eu>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] linux-user: fill target
- sigcontext struct accordingly
+In-Reply-To: <20170228133217.20039-1-michael.nawrocki@gtri.gatech.edu>
+Subject: Re: [Qemu-devel] [PATCH] Add PowerPC 32-bit guest memory dump
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,82 +25,394 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, qemu-devel@nongnu.org, riku.voipio@iki.fi, qemu-ppc@nongnu.org
+To: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, agraf@suse.de
 
 
---mYCpIKhGyMATD0i+
-Content-Type: text/plain; charset=iso-8859-1
+--CGDBiGfvSTbxKZlW
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 28, 2017 at 11:22:54AM +0100, Laurent Vivier wrote:
-> Le 28/02/2017 =E0 02:09, David Gibson a =E9crit :
-> > On Wed, Feb 01, 2017 at 09:43:57PM +0100, Laurent Vivier wrote:
-> >> Le 31/01/2017 =E0 23:05, Jose Ricardo Ziviani a =E9crit :
-> >>> A segfault is noticed when an emulated program uses any of ucontext
-> >>> regs fields. Risu detected this issue in the following operation when
-> >>> handling a signal:
-> >>>   ucontext_t *uc =3D (ucontext_t*)uc;
-> >>>   uc->uc_mcontext.regs->nip +=3D 4;
-> >>>
-> >>> but this works fine:
-> >>>   uc->uc_mcontext.gp_regs[PT_NIP] +=3D 4;
-> >>>
-> >>> This patch set regs to a valid location as well as other sigcontext
-> >>> fields.
-> >>>
-> >>> Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-> >>> ---
-> >>>  linux-user/signal.c | 5 +++++
-> >>>  1 file changed, 5 insertions(+)
-> >>>
-> >>> diff --git a/linux-user/signal.c b/linux-user/signal.c
-> >>> index 5064de0..8209539 100644
-> >>> --- a/linux-user/signal.c
-> >>> +++ b/linux-user/signal.c
-> >>> @@ -5155,6 +5155,7 @@ static void setup_rt_frame(int sig, struct targ=
-et_sigaction *ka,
-> >>>      target_ulong rt_sf_addr, newsp =3D 0;
-> >>>      int i, err =3D 0;
-> >>>  #if defined(TARGET_PPC64)
-> >>> +    struct target_sigcontext *sc =3D 0;
-> >>>      struct image_info *image =3D ((TaskState *)thread_cpu->opaque)->=
-info;
-> >>>  #endif
-> >>> =20
-> >>> @@ -5183,6 +5184,10 @@ static void setup_rt_frame(int sig, struct tar=
-get_sigaction *ka,
-> >>>  #if defined(TARGET_PPC64)
-> >>>      mctx =3D &rt_sf->uc.tuc_sigcontext.mcontext;
-> >>>      trampptr =3D &rt_sf->trampoline[0];
-> >>> +
-> >>> +    sc =3D &rt_sf->uc.tuc_sigcontext;
-> >>> +    __put_user(h2g(mctx), &sc->regs);
-> >>> +    __put_user(sig, &sc->signal);
-> >>>  #else
-> >>>      mctx =3D &rt_sf->uc.tuc_mcontext;
-> >>>      trampptr =3D (uint32_t *)&rt_sf->uc.tuc_mcontext.tramp;
-> >>>
-> >>
-> >> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-> >>
-> >> This is correct, but QEMU and kernel implementation are really
-> >> different.
-> >=20
+On Tue, Feb 28, 2017 at 08:32:17AM -0500, Mike Nawrocki wrote:
+> Signed-off-by: Mike Nawrocki <michael.nawrocki@gtri.gatech.edu>
 >=20
-> Hi David,
+> Sorry, I was only testing against the ppc-softmmu and ppc64-softmmu targe=
+ts. I've now validated that this compiles against the following targets:
+> ppc-softmmu,ppc64-softmmu,ppcemb-softmmu,s390x-softmmu,sh4-softmmu,ppc-li=
+nux-user,ppc64-linux-user,ppc64abi32-linux-user,ppc64le-linux-user,s390x-li=
+nux-user
 >=20
-> > Laurent, I'm a bit clear on what the upshot is here.
-> >=20
-> > Should I merge the patch above?
->=20
-> I've already included this patch in a linux-user pull request a couple
-> of weeks ago, and it is now in the master.
->=20
-> So you have nothing to do :)
+> Thanks!
 
-Excellent, thanks for the clarification.
+Ok, I've applied this to my tree, but a few conventions for sending
+patches in future:
+
+  - Always include the commit message, even on reposts (I had to add
+    it back in from an earlier posting)
+  - If you have comments that aren't supposed to go into the commit
+    message, put them after the '---' so that git am will drop them
+  - Please linewrap the commit message at <80 columns.
+
+> ---
+>  target/ppc/Makefile.objs    |   4 +-
+>  target/ppc/arch_dump.c      | 154 ++++++++++++++++++++++++--------------=
+------
+>  target/ppc/cpu.h            |   2 +
+>  target/ppc/translate_init.c |   7 +-
+>  4 files changed, 93 insertions(+), 74 deletions(-)
+>=20
+> diff --git a/target/ppc/Makefile.objs b/target/ppc/Makefile.objs
+> index a8c7a30cde..f50ffacfa1 100644
+> --- a/target/ppc/Makefile.objs
+> +++ b/target/ppc/Makefile.objs
+> @@ -1,8 +1,8 @@
+>  obj-y +=3D cpu-models.o
+>  obj-y +=3D translate.o
+>  ifeq ($(CONFIG_SOFTMMU),y)
+> -obj-y +=3D machine.o mmu_helper.o mmu-hash32.o monitor.o
+> -obj-$(TARGET_PPC64) +=3D mmu-hash64.o arch_dump.o compat.o
+> +obj-y +=3D machine.o mmu_helper.o mmu-hash32.o monitor.o arch_dump.o
+> +obj-$(TARGET_PPC64) +=3D mmu-hash64.o compat.o
+>  endif
+>  obj-$(CONFIG_KVM) +=3D kvm.o
+>  obj-$(call lnot,$(CONFIG_KVM)) +=3D kvm-stub.o
+> diff --git a/target/ppc/arch_dump.c b/target/ppc/arch_dump.c
+> index 40282a1f50..28d9cc7d79 100644
+> --- a/target/ppc/arch_dump.c
+> +++ b/target/ppc/arch_dump.c
+> @@ -1,5 +1,5 @@
+>  /*
+> - * writing ELF notes for ppc64 arch
+> + * writing ELF notes for ppc{64,} arch
+>   *
+>   *
+>   * Copyright IBM, Corp. 2013
+> @@ -19,36 +19,48 @@
+>  #include "sysemu/dump.h"
+>  #include "sysemu/kvm.h"
+> =20
+> -struct PPC64UserRegStruct {
+> -    uint64_t gpr[32];
+> -    uint64_t nip;
+> -    uint64_t msr;
+> -    uint64_t orig_gpr3;
+> -    uint64_t ctr;
+> -    uint64_t link;
+> -    uint64_t xer;
+> -    uint64_t ccr;
+> -    uint64_t softe;
+> -    uint64_t trap;
+> -    uint64_t dar;
+> -    uint64_t dsisr;
+> -    uint64_t result;
+> +#ifdef TARGET_PPC64
+> +#define ELFCLASS ELFCLASS64
+> +#define cpu_to_dump_reg cpu_to_dump64
+> +typedef uint64_t reg_t;
+> +typedef Elf64_Nhdr Elf_Nhdr;
+> +#else
+> +#define ELFCLASS ELFCLASS32
+> +#define cpu_to_dump_reg cpu_to_dump32
+> +typedef uint32_t reg_t;
+> +typedef Elf32_Nhdr Elf_Nhdr;
+> +#endif /* TARGET_PPC64 */
+> +
+> +struct PPCUserRegStruct {
+> +    reg_t gpr[32];
+> +    reg_t nip;
+> +    reg_t msr;
+> +    reg_t orig_gpr3;
+> +    reg_t ctr;
+> +    reg_t link;
+> +    reg_t xer;
+> +    reg_t ccr;
+> +    reg_t softe;
+> +    reg_t trap;
+> +    reg_t dar;
+> +    reg_t dsisr;
+> +    reg_t result;
+>  } QEMU_PACKED;
+> =20
+> -struct PPC64ElfPrstatus {
+> +struct PPCElfPrstatus {
+>      char pad1[112];
+> -    struct PPC64UserRegStruct pr_reg;
+> -    uint64_t pad2[4];
+> +    struct PPCUserRegStruct pr_reg;
+> +    reg_t pad2[4];
+>  } QEMU_PACKED;
+> =20
+> =20
+> -struct PPC64ElfFpregset {
+> +struct PPCElfFpregset {
+>      uint64_t fpr[32];
+> -    uint64_t fpscr;
+> +    reg_t fpscr;
+>  }  QEMU_PACKED;
+> =20
+> =20
+> -struct PPC64ElfVmxregset {
+> +struct PPCElfVmxregset {
+>      ppc_avr_t avr[32];
+>      ppc_avr_t vscr;
+>      union {
+> @@ -57,26 +69,26 @@ struct PPC64ElfVmxregset {
+>      } vrsave;
+>  }  QEMU_PACKED;
+> =20
+> -struct PPC64ElfVsxregset {
+> +struct PPCElfVsxregset {
+>      uint64_t vsr[32];
+>  }  QEMU_PACKED;
+> =20
+> -struct PPC64ElfSperegset {
+> +struct PPCElfSperegset {
+>      uint32_t evr[32];
+>      uint64_t spe_acc;
+>      uint32_t spe_fscr;
+>  }  QEMU_PACKED;
+> =20
+>  typedef struct noteStruct {
+> -    Elf64_Nhdr hdr;
+> +    Elf_Nhdr hdr;
+>      char name[5];
+>      char pad3[3];
+>      union {
+> -        struct PPC64ElfPrstatus  prstatus;
+> -        struct PPC64ElfFpregset  fpregset;
+> -        struct PPC64ElfVmxregset vmxregset;
+> -        struct PPC64ElfVsxregset vsxregset;
+> -        struct PPC64ElfSperegset speregset;
+> +        struct PPCElfPrstatus  prstatus;
+> +        struct PPCElfFpregset  fpregset;
+> +        struct PPCElfVmxregset vmxregset;
+> +        struct PPCElfVsxregset vsxregset;
+> +        struct PPCElfSperegset speregset;
+>      } contents;
+>  } QEMU_PACKED Note;
+> =20
+> @@ -85,12 +97,12 @@ typedef struct NoteFuncArg {
+>      DumpState *state;
+>  } NoteFuncArg;
+> =20
+> -static void ppc64_write_elf64_prstatus(NoteFuncArg *arg, PowerPCCPU *cpu)
+> +static void ppc_write_elf_prstatus(NoteFuncArg *arg, PowerPCCPU *cpu)
+>  {
+>      int i;
+> -    uint64_t cr;
+> -    struct PPC64ElfPrstatus *prstatus;
+> -    struct PPC64UserRegStruct *reg;
+> +    reg_t cr;
+> +    struct PPCElfPrstatus *prstatus;
+> +    struct PPCUserRegStruct *reg;
+>      Note *note =3D &arg->note;
+>      DumpState *s =3D arg->state;
+> =20
+> @@ -101,25 +113,25 @@ static void ppc64_write_elf64_prstatus(NoteFuncArg =
+*arg, PowerPCCPU *cpu)
+>      reg =3D &prstatus->pr_reg;
+> =20
+>      for (i =3D 0; i < 32; i++) {
+> -        reg->gpr[i] =3D cpu_to_dump64(s, cpu->env.gpr[i]);
+> +        reg->gpr[i] =3D cpu_to_dump_reg(s, cpu->env.gpr[i]);
+>      }
+> -    reg->nip =3D cpu_to_dump64(s, cpu->env.nip);
+> -    reg->msr =3D cpu_to_dump64(s, cpu->env.msr);
+> -    reg->ctr =3D cpu_to_dump64(s, cpu->env.ctr);
+> -    reg->link =3D cpu_to_dump64(s, cpu->env.lr);
+> -    reg->xer =3D cpu_to_dump64(s, cpu_read_xer(&cpu->env));
+> +    reg->nip =3D cpu_to_dump_reg(s, cpu->env.nip);
+> +    reg->msr =3D cpu_to_dump_reg(s, cpu->env.msr);
+> +    reg->ctr =3D cpu_to_dump_reg(s, cpu->env.ctr);
+> +    reg->link =3D cpu_to_dump_reg(s, cpu->env.lr);
+> +    reg->xer =3D cpu_to_dump_reg(s, cpu_read_xer(&cpu->env));
+> =20
+>      cr =3D 0;
+>      for (i =3D 0; i < 8; i++) {
+>          cr |=3D (cpu->env.crf[i] & 15) << (4 * (7 - i));
+>      }
+> -    reg->ccr =3D cpu_to_dump64(s, cr);
+> +    reg->ccr =3D cpu_to_dump_reg(s, cr);
+>  }
+> =20
+> -static void ppc64_write_elf64_fpregset(NoteFuncArg *arg, PowerPCCPU *cpu)
+> +static void ppc_write_elf_fpregset(NoteFuncArg *arg, PowerPCCPU *cpu)
+>  {
+>      int i;
+> -    struct PPC64ElfFpregset  *fpregset;
+> +    struct PPCElfFpregset  *fpregset;
+>      Note *note =3D &arg->note;
+>      DumpState *s =3D arg->state;
+> =20
+> @@ -131,13 +143,13 @@ static void ppc64_write_elf64_fpregset(NoteFuncArg =
+*arg, PowerPCCPU *cpu)
+>      for (i =3D 0; i < 32; i++) {
+>          fpregset->fpr[i] =3D cpu_to_dump64(s, cpu->env.fpr[i]);
+>      }
+> -    fpregset->fpscr =3D cpu_to_dump64(s, cpu->env.fpscr);
+> +    fpregset->fpscr =3D cpu_to_dump_reg(s, cpu->env.fpscr);
+>  }
+> =20
+> -static void ppc64_write_elf64_vmxregset(NoteFuncArg *arg, PowerPCCPU *cp=
+u)
+> +static void ppc_write_elf_vmxregset(NoteFuncArg *arg, PowerPCCPU *cpu)
+>  {
+>      int i;
+> -    struct PPC64ElfVmxregset *vmxregset;
+> +    struct PPCElfVmxregset *vmxregset;
+>      Note *note =3D &arg->note;
+>      DumpState *s =3D arg->state;
+> =20
+> @@ -164,10 +176,11 @@ static void ppc64_write_elf64_vmxregset(NoteFuncArg=
+ *arg, PowerPCCPU *cpu)
+>      }
+>      vmxregset->vscr.u32[3] =3D cpu_to_dump32(s, cpu->env.vscr);
+>  }
+> -static void ppc64_write_elf64_vsxregset(NoteFuncArg *arg, PowerPCCPU *cp=
+u)
+> +
+> +static void ppc_write_elf_vsxregset(NoteFuncArg *arg, PowerPCCPU *cpu)
+>  {
+>      int i;
+> -    struct PPC64ElfVsxregset *vsxregset;
+> +    struct PPCElfVsxregset *vsxregset;
+>      Note *note =3D &arg->note;
+>      DumpState *s =3D arg->state;
+> =20
+> @@ -179,9 +192,10 @@ static void ppc64_write_elf64_vsxregset(NoteFuncArg =
+*arg, PowerPCCPU *cpu)
+>          vsxregset->vsr[i] =3D cpu_to_dump64(s, cpu->env.vsr[i]);
+>      }
+>  }
+> -static void ppc64_write_elf64_speregset(NoteFuncArg *arg, PowerPCCPU *cp=
+u)
+> +
+> +static void ppc_write_elf_speregset(NoteFuncArg *arg, PowerPCCPU *cpu)
+>  {
+> -    struct PPC64ElfSperegset *speregset;
+> +    struct PPCElfSperegset *speregset;
+>      Note *note =3D &arg->note;
+>      DumpState *s =3D arg->state;
+> =20
+> @@ -197,11 +211,11 @@ static const struct NoteFuncDescStruct {
+>      int contents_size;
+>      void (*note_contents_func)(NoteFuncArg *arg, PowerPCCPU *cpu);
+>  } note_func[] =3D {
+> -    {sizeof(((Note *)0)->contents.prstatus),  ppc64_write_elf64_prstatus=
+},
+> -    {sizeof(((Note *)0)->contents.fpregset),  ppc64_write_elf64_fpregset=
+},
+> -    {sizeof(((Note *)0)->contents.vmxregset), ppc64_write_elf64_vmxregse=
+t},
+> -    {sizeof(((Note *)0)->contents.vsxregset), ppc64_write_elf64_vsxregse=
+t},
+> -    {sizeof(((Note *)0)->contents.speregset), ppc64_write_elf64_speregse=
+t},
+> +    {sizeof(((Note *)0)->contents.prstatus),  ppc_write_elf_prstatus},
+> +    {sizeof(((Note *)0)->contents.fpregset),  ppc_write_elf_fpregset},
+> +    {sizeof(((Note *)0)->contents.vmxregset), ppc_write_elf_vmxregset},
+> +    {sizeof(((Note *)0)->contents.vsxregset), ppc_write_elf_vsxregset},
+> +    {sizeof(((Note *)0)->contents.speregset), ppc_write_elf_speregset},
+>      { 0, NULL}
+>  };
+> =20
+> @@ -213,8 +227,9 @@ int cpu_get_dump_info(ArchDumpInfo *info,
+>      PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
+>      PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
+> =20
+> -    info->d_machine =3D EM_PPC64;
+> -    info->d_class =3D ELFCLASS64;
+> +    info->d_machine =3D PPC_ELF_MACHINE;
+> +    info->d_class =3D ELFCLASS;
+> +
+>      if ((*pcc->interrupts_big_endian)(cpu)) {
+>          info->d_endian =3D ELFDATA2MSB;
+>      } else {
+> @@ -236,25 +251,19 @@ ssize_t cpu_get_note_size(int class, int machine, i=
+nt nr_cpus)
+>      int note_head_size;
+>      const NoteFuncDesc *nf;
+> =20
+> -    if (class !=3D ELFCLASS64) {
+> -        return -1;
+> -    }
+> -    assert(machine =3D=3D EM_PPC64);
+> -
+> -    note_head_size =3D sizeof(Elf64_Nhdr);
+> -
+> +    note_head_size =3D sizeof(Elf_Nhdr);
+>      for (nf =3D note_func; nf->note_contents_func; nf++) {
+>          elf_note_size =3D elf_note_size + note_head_size + name_size +
+> -                        nf->contents_size;
+> +            nf->contents_size;
+>      }
+> =20
+>      return (elf_note_size) * nr_cpus;
+>  }
+> =20
+> -static int ppc64_write_all_elf64_notes(const char *note_name,
+> -                                       WriteCoreDumpFunction f,
+> -                                       PowerPCCPU *cpu, int id,
+> -                                       void *opaque)
+> +static int ppc_write_all_elf_notes(const char *note_name,
+> +                                   WriteCoreDumpFunction f,
+> +                                   PowerPCCPU *cpu, int id,
+> +                                   void *opaque)
+>  {
+>      NoteFuncArg arg =3D { .state =3D opaque };
+>      int ret =3D -1;
+> @@ -282,5 +291,12 @@ int ppc64_cpu_write_elf64_note(WriteCoreDumpFunction=
+ f, CPUState *cs,
+>                                 int cpuid, void *opaque)
+>  {
+>      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> -    return ppc64_write_all_elf64_notes("CORE", f, cpu, cpuid, opaque);
+> +    return ppc_write_all_elf_notes("CORE", f, cpu, cpuid, opaque);
+> +}
+> +
+> +int ppc32_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs,
+> +                               int cpuid, void *opaque)
+> +{
+> +    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> +    return ppc_write_all_elf_notes("CORE", f, cpu, cpuid, opaque);
+>  }
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 425e79d52d..d8a91dfd98 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1243,6 +1243,8 @@ int ppc_cpu_gdb_write_register(CPUState *cpu, uint8=
+_t *buf, int reg);
+>  int ppc_cpu_gdb_write_register_apple(CPUState *cpu, uint8_t *buf, int re=
+g);
+>  int ppc64_cpu_write_elf64_note(WriteCoreDumpFunction f, CPUState *cs,
+>                                 int cpuid, void *opaque);
+> +int ppc32_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs,
+> +                               int cpuid, void *opaque);
+>  #ifndef CONFIG_USER_ONLY
+>  void ppc_cpu_do_system_reset(CPUState *cs);
+>  extern const struct VMStateDescription vmstate_ppc_cpu;
+> diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+> index be35cbd3a2..4cceab09bd 100644
+> --- a/target/ppc/translate_init.c
+> +++ b/target/ppc/translate_init.c
+> @@ -10489,11 +10489,12 @@ static void ppc_cpu_class_init(ObjectClass *oc,=
+ void *data)
+>  #else
+>      cc->get_phys_page_debug =3D ppc_cpu_get_phys_page_debug;
+>      cc->vmsd =3D &vmstate_ppc_cpu;
+> -#if defined(TARGET_PPC64)
+> -    cc->write_elf64_note =3D ppc64_cpu_write_elf64_note;
+> -#endif
+>  #endif
+>      cc->cpu_exec_enter =3D ppc_cpu_exec_enter;
+> +#if defined(CONFIG_SOFTMMU)
+> +    cc->write_elf64_note =3D ppc64_cpu_write_elf64_note;
+> +    cc->write_elf32_note =3D ppc32_cpu_write_elf32_note;
+> +#endif
+> =20
+>      cc->gdb_num_core_regs =3D 71;
+> =20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -110,25 +420,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---mYCpIKhGyMATD0i+
+--CGDBiGfvSTbxKZlW
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYthHUAAoJEGw4ysog2bOSHX0QAOBqemeEydRh4wPOWNXueKzN
-HijgkEXwlgfDsrAwjw+FiT516sibAysgW+6gtCmUefdTm1v32el6B1LVaEYrcC8n
-bNasyPaz5LNAgQxS7516q9kPClPmPH8Tsg5f07EPKYqadQhVyC+Q4xzurygjIVIc
-x8jyNbRnGlt+nf0hJPGgotpr1z7p6CII1fHRjzFjD9+causzz+XxMxLPHGkSyJ0h
-c6//f+STSifobavaAQMxBg7zYr5ziV170hmc8+uaKkwYheQlYterg8zRBO+UmBxa
-R8SNixmnKnOju6foSKZ4o51LMKrzgZDFZ2BcBt32d4ElDNok95wFi6K8eTVjf7zd
-L5+5/mXm7Aww+GX9JQAZYCMSy6FXJZYEy4Qd8kydUMUoOYpuJh5MFuG29aD0GqJL
-npGiYT7fkoNvqzfiIpeCtfvUabO1DPVWfJIRHwrBe6T5TTQz7NO0dwH0rLqrJdC/
-L38vYudt6g+rwsLzSMd4JOTZHqHNGAjrv60IA8fNxP9e2j4AgnwB03fMKfo6vPxL
-s6mgz76JEUjEKmOwOdz7MjYLQecaE8msCHxvryUT04TvLk6dTuPjRiYuvlcaYVJb
-8e2HvMqzynLfQMgBm2+lUzBxlh11Pa3liJ1SFKpnrqwnkOp028B0Y9TU0ZSSwjt8
-CG1xjKEmY4YCp+1BYT+i
-=TbmU
+iQIcBAEBCAAGBQJYth42AAoJEGw4ysog2bOSVekQAM4zmd+FpgK0XkjJeFY2+aJn
+C/sz9QBZ/FBU+h5Jqpt4LLbPPJ0fQ8ZQ4p/bcJK8/W/GbRxTjjZEC6Fwg8jAvBb2
+WTBjd7VT6WoA6k6vRgD6NEyQyuK1SkuijM8vLSBtBidbEWuux9WxgtAdEkxP0MDO
+kb41ksnhm962cgnbu/IH/ypbDkP+TLP/wRobuZ2Rr018q0QGmRjAwC/1eBNoORbK
+M+UCjxmT3hHpj84UFVzOXhvpP4jvcl4hPfFdoDlWGn8bJJQUd/E7GHysp73zGQDg
+vbcNY5dw6oTQMkROeKV3c7ULBqiPistk+yvoeAFT8gLw/mCb5+PI9FLZc+AKh3TX
+5PTewVGWoqKRVyqoMu5Qrwn+3dpsvK0nLCnjCGgG3yEd1nVs1iFP8zD7LEu9m9oS
+WTkl1LHVB2iE7S9EU89YY6zjp3G+GxxrMAV0MKaUlY3JDWQHMxesNBiSurRkVySl
+xd03Uc3xCQFDBE7bQyIaYdLKCc+vya6e8lOM7fzf2fnCJA7/G86xhkLio1U/FpEJ
+SHdxlULvwegn4zYcDtcrTIV0aUwMBe1WfBSUyjwpN4bBycfP3pgliKrxeqVtN3E7
+xjC2FQnx/bTODh3Qx9LiunjeNXSsBX4ApHCWJT8emmIDFWS5Uu/SxxZIDhWyYRNF
+PmkISnKVHKkWhRvlamkp
+=k4a9
 -----END PGP SIGNATURE-----
 
---mYCpIKhGyMATD0i+--
+--CGDBiGfvSTbxKZlW--
