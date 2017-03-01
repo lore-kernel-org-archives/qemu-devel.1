@@ -1,39 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cizcB-00008L-AT
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 03:28:04 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cizrR-0002DU-VH
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 03:43:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cizc6-000882-DL
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 03:28:03 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38581)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cizc6-00087j-39
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 03:27:58 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v218JIp3145243
-	for <qemu-devel@nongnu.org>; Wed, 1 Mar 2017 03:27:56 -0500
-Received: from e28smtp03.in.ibm.com (e28smtp03.in.ibm.com [125.16.236.3])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28wtkx9249-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 01 Mar 2017 03:27:55 -0500
-Received: from localhost
-	by e28smtp03.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Wed, 1 Mar 2017 13:54:15 +0530
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <87h93d5rxg.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-References: <1488354251-20802-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<20170301075913.GC17196@in.ibm.com>
-	<87h93d5rxg.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Date: Wed, 01 Mar 2017 13:54:02 +0530
+	(envelope-from <jasowang@redhat.com>) id 1cizrO-000451-So
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 03:43:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47704)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cizrO-00044X-HF
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 03:43:46 -0500
+References: <1487910561-17825-1-git-send-email-peterx@redhat.com>
+	<e547f430-d078-27a5-7064-4fc5b9f738d1@redhat.com>
+	<20170301023635.GE13926@pxdev.xzpeter.org>
+	<20170301043802-mutt-send-email-mst@kernel.org>
+	<05a23bbc-4ebc-769b-aa62-d3387af57cae@redhat.com>
+	<a35dbe8f-770e-c792-e5ea-1f4f8ef8df37@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <40f5950f-cefe-f15c-c941-79b1e2eb0c48@redhat.com>
+Date: Wed, 1 Mar 2017 16:43:22 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
-Message-Id: <87d1e15rrx.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [PATCH] target/ppc: rewrite f[n]m[add,
- sub] using float64_muladd
+In-Reply-To: <a35dbe8f-770e-c792-e5ea-1f4f8ef8df37@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] intel_iommu: check misordered init when
+ realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,34 +32,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: bharata@linux.vnet.ibm.com
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net, qemu-devel@nongnu.org
+To: Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Peter Xu <peterx@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, yi.l.liu@intel.com, qemu-devel@nongnu.org, Jintack Lim <jintack@cs.columbia.edu>
 
-Nikunj A Dadhania <nikunj@linux.vnet.ibm.com> writes:
 
-> Bharata B Rao <bharata@linux.vnet.ibm.com> writes:
->
->> On Wed, Mar 01, 2017 at 01:14:11PM +0530, Nikunj A Dadhania wrote:
->>> Use the softfloat api for fused multiply-add. As we are using the fused
->>> multiply-add, the intermediate result for setting VXISI is not
->>> available.
+
+On 2017=E5=B9=B403=E6=9C=8801=E6=97=A5 15:03, Marcel Apfelbaum wrote:
+> On 03/01/2017 06:14 AM, Jason Wang wrote:
 >>
->> Isn't the behaviour of setting VXISI similar to vector muladd instructions ?
->> If so refer to VSX_MADD() to see when VXISI is set.
+>>
+>> On 2017=E5=B9=B403=E6=9C=8801=E6=97=A5 11:23, Michael S. Tsirkin wrote=
+:
+>>> On Wed, Mar 01, 2017 at 10:36:35AM +0800, Peter Xu wrote:
+>>>> On Tue, Feb 28, 2017 at 04:42:25PM +0200, Marcel Apfelbaum wrote:
+>>>>> On 02/24/2017 06:29 AM, Peter Xu wrote:
+>>>>>> Intel vIOMMU devices are created with "-device" parameter, while=20
+>>>>>> here
+>>>>>> actually we need to make sure the dmar device be created before=20
+>>>>>> other
+>>>>>> PCI devices (like vfio-pci) so that we know iommu_fn will be setup
+>>>>>> correctly before realizations of those PCI devices (it is=20
+>>>>>> sensible that
+>>>>>> PCI device fetch these info during its realization). Now this=20
+>>>>>> ordering
+>>>>>> yet cannot be achieved elsewhere, and devices will be created in t=
+he
+>>>>>> order that user specified. That might be dangerous.
+>>>>>>
+>>>>>> Here we add one more function to detect this kind of misordering=20
+>>>>>> issue,
+>>>>>> then report to guest. Currently, the only known device that is=20
+>>>>>> affected
+>>>>>> by this VT-d defect is the vfio-pci typed devices. So for now we=20
+>>>>>> just
+>>>>>> check against it to make sure we are safe.
+>>>>>>
+>>>>> Hi,
+>>>>> I can't say that I like it but if we want it for 2.9 maybe we=20
+>>>>> don't have a choice.
+>>>>>
+>>>>> I mentioned in another thread other idea:
+>>>>>      Maybe we should follow the same "template" as disk/drive,=20
+>>>>> nic/netdev ?
+>>>>>      I mean something like -device iommu,id=3Di1, -device=20
+>>>>> vfio-pci,iommu=3De1 .
+>>>>> You are able to change the order, I didn't look how it is done.
+>>>> I suppose that's done by using different keywords. For example:
+>>>>
+>>>>    -netdev user,id=3Dnet0 -device e1000,netdev=3Dnet0
+>>>>
+>>>> Here we are using "netdev" for the backend and "device" for the
+>>>> frontend.
+>>>>
+>>>> Since we have this difference, we can just make sure the ordering by
+>>>> init netdev first (in net_init_clients()), then the devices (in
+>>>> device_init_func()).
+>>>>
+>>>>> A nice side effect is that you can:
+>>>>>   1. Limit the iommu scope only to the devices you want to protect=20
+>>>>> (tweaking APCI tables)
+>>>>>   2. In the future we can support multiple iommu devices.
+>>> Unfortunately AFAIK this needs a bunch of work in practice:
+>>> host and guest side.
+>>> So this opens a can of worms: you can all too easily create
+>>> configurations that we don't support.
+>>>
+>>>
+>>>> Yes. Thanks,
+>>>>
+>>>> -- peterx
+>>> While I agree this fixes the specific problem, we have the ordering
+>>> issue in many other places.
+>>
+>> Yes, just post a fix for virtio-pci with IOMMU. With this fix, we=20
+>> meet the exact issue as this patch, IOMMU needs to be created before=20
+>> any virtio-pci devices.
+>>
 >
->                 if ((float64_is_infinity(xa.fld) ||
->                      float64_is_infinity(b->fld)) &&
->                      float64_is_infinity(c->fld))) {
->                    float_invalid_op_excp(env, POWERPC_EXCP_FP_VXISI, sfprf);
->                }
->                
-> AFAIU, VXISI is set when (infinity - infinity). The above doesn't take
-> into consideration about substraction.
+> Hi Jason,
+>
+> I am not saying we don't need to create the IOMMU before some other=20
+> device,
+> I just don't think that the command line order should matter to user.
+>
+> BTW, are you working on a way to limit the IOMMU scope to a specific=20
+> set of devices?
+> If yes, this approach will also help you work.
 
-To be precise:
+Not yet, this may work (after 2.9) but I believe we still need a fix for=20
+2.9.
 
-"If the product of x and y is an Infinity and z is an Infinity of the
-opposite sign, vxisi_flag is set to 1."
+Thanks
 
-Regards
-Nikunj
+>
+> Thanks,
+> Marcel=20
