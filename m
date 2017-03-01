@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1civbI-0003Rx-Jn
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:10:53 -0500
+	(envelope-from <jasowang@redhat.com>) id 1civet-0004D2-BY
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:14:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1civbD-0007L5-L0
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:10:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57924)
+	(envelope-from <jasowang@redhat.com>) id 1civeo-0008Og-CL
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:14:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41822)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1civbD-0007Ky-Ft
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:10:47 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 18706C057FA9
-	for <qemu-devel@nongnu.org>; Wed,  1 Mar 2017 04:10:47 +0000 (UTC)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1civeo-0008OG-4P
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:14:30 -0500
+References: <1487910561-17825-1-git-send-email-peterx@redhat.com>
+	<e547f430-d078-27a5-7064-4fc5b9f738d1@redhat.com>
+	<20170301023635.GE13926@pxdev.xzpeter.org>
+	<20170301043802-mutt-send-email-mst@kernel.org>
 From: Jason Wang <jasowang@redhat.com>
-Date: Wed,  1 Mar 2017 12:10:40 +0800
-Message-Id: <1488341440-4347-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PATCH] virtio: unbreak virtio-pci with IOMMU after
- caching ring translations
+Message-ID: <05a23bbc-4ebc-769b-aa62-d3387af57cae@redhat.com>
+Date: Wed, 1 Mar 2017 12:14:21 +0800
+MIME-Version: 1.0
+In-Reply-To: <20170301043802-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] intel_iommu: check misordered init when
+ realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +30,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, qemu-devel@nongnu.org
-Cc: peterx@redhat.com, wexu@redhat.com, Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Peter Xu <peterx@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, yi.l.liu@intel.com, qemu-devel@nongnu.org, Jintack Lim <jintack@cs.columbia.edu>
 
-Commit c611c76417f5 ("virtio: add MemoryListener to cache ring
-translations") registers a memory listener to dma_as. This may not
-work when IOMMU is enabled: dma_as(bus_master_as) were initialized in
-pcibus_machine_done() after virtio_realize(). This will cause a
-segfault. Fixing this by using pci_device_iommu_address_space()
-instead to make sure address space were initialized at this time.
 
-With this fix, IOMMU device were required to be initialized before any
+
+On 2017=E5=B9=B403=E6=9C=8801=E6=97=A5 11:23, Michael S. Tsirkin wrote:
+> On Wed, Mar 01, 2017 at 10:36:35AM +0800, Peter Xu wrote:
+>> On Tue, Feb 28, 2017 at 04:42:25PM +0200, Marcel Apfelbaum wrote:
+>>> On 02/24/2017 06:29 AM, Peter Xu wrote:
+>>>> Intel vIOMMU devices are created with "-device" parameter, while her=
+e
+>>>> actually we need to make sure the dmar device be created before othe=
+r
+>>>> PCI devices (like vfio-pci) so that we know iommu_fn will be setup
+>>>> correctly before realizations of those PCI devices (it is sensible t=
+hat
+>>>> PCI device fetch these info during its realization). Now this orderi=
+ng
+>>>> yet cannot be achieved elsewhere, and devices will be created in the
+>>>> order that user specified. That might be dangerous.
+>>>>
+>>>> Here we add one more function to detect this kind of misordering iss=
+ue,
+>>>> then report to guest. Currently, the only known device that is affec=
+ted
+>>>> by this VT-d defect is the vfio-pci typed devices. So for now we jus=
+t
+>>>> check against it to make sure we are safe.
+>>>>
+>>> Hi,
+>>> I can't say that I like it but if we want it for 2.9 maybe we don't h=
+ave a choice.
+>>>
+>>> I mentioned in another thread other idea:
+>>>      Maybe we should follow the same "template" as disk/drive, nic/ne=
+tdev ?
+>>>      I mean something like -device iommu,id=3Di1, -device vfio-pci,io=
+mmu=3De1 .
+>>> You are able to change the order, I didn't look how it is done.
+>> I suppose that's done by using different keywords. For example:
+>>
+>>    -netdev user,id=3Dnet0 -device e1000,netdev=3Dnet0
+>>
+>> Here we are using "netdev" for the backend and "device" for the
+>> frontend.
+>>
+>> Since we have this difference, we can just make sure the ordering by
+>> init netdev first (in net_init_clients()), then the devices (in
+>> device_init_func()).
+>>
+>>> A nice side effect is that you can:
+>>>   1. Limit the iommu scope only to the devices you want to protect (t=
+weaking APCI tables)
+>>>   2. In the future we can support multiple iommu devices.
+> Unfortunately AFAIK this needs a bunch of work in practice:
+> host and guest side.
+> So this opens a can of worms: you can all too easily create
+> configurations that we don't support.
+>
+>
+>> Yes. Thanks,
+>>
+>> -- peterx
+> While I agree this fixes the specific problem, we have the ordering
+> issue in many other places.
+
+Yes, just post a fix for virtio-pci with IOMMU. With this fix, we meet=20
+the exact issue as this patch, IOMMU needs to be created before any=20
 virtio-pci devices.
 
-Fixes: c611c76417f5 ("virtio: add MemoryListener to cache ring translations")
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- hw/virtio/virtio-pci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks
 
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 5ce42af..b76f3f6 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -1153,7 +1153,7 @@ static AddressSpace *virtio_pci_get_dma_as(DeviceState *d)
-     VirtIOPCIProxy *proxy = VIRTIO_PCI(d);
-     PCIDevice *dev = &proxy->pci_dev;
- 
--    return pci_get_address_space(dev);
-+    return pci_device_iommu_address_space(dev);
- }
- 
- static int virtio_pci_add_mem_cap(VirtIOPCIProxy *proxy,
--- 
-2.7.4
+>   For example, this is one of the reasons we
+> don't create built-in PC devices using QOM composition.
+>
+> So I think that support for dependencies does make a lot of sense
+> generally.
+>
+>
