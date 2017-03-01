@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciw7j-0007wD-JN
+	(envelope-from <dgibson@ozlabs.org>) id 1ciw7k-0007ws-5D
 	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciw7g-0008TZ-Ns
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:23 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ciw7h-0008UT-NJ
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:24 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed,  1 Mar 2017 15:43:22 +1100
-Message-Id: <20170301044405.1792-8-david@gibson.dropbear.id.au>
+Date: Wed,  1 Mar 2017 15:43:23 +1100
+Message-Id: <20170301044405.1792-9-david@gibson.dropbear.id.au>
 In-Reply-To: <20170301044405.1792-1-david@gibson.dropbear.id.au>
 References: <20170301044405.1792-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 07/50] target/ppc: Fix KVM-HV HPTE accessors
+Subject: [Qemu-devel] [PULL 08/50] pseries: Minor cleanups to HPT management
+ hypercalls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,310 +21,197 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, thuth@redhat.com, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>, "Aneesh Kumar K . V" <aneesh.kumar@linux.vnet.ibm.com>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, thuth@redhat.com, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-When a 'pseries' guest is running with KVM-HV, the guest's hashed page
-table (HPT) is stored within the host kernel, so it is not directly
-accessible to qemu.  Most of the time, qemu doesn't need to access it:
-we're using the hardware MMU, and KVM itself implements the guest
-hypercalls for manipulating the HPT.
+ * Standardize on 'ptex' instead of 'pte_index' for HPTE index variables
+   for consistency and brevity
+ * Avoid variables named 'index'; shadowing index(3) from libc can lead to
+   surprising bugs if the variable is removed, because compiler errors
+   might not appear for remaining references
+ * Clarify index calculations in h_enter() - we have two cases, H_EXACT
+   where the exact HPTE slot is given, and !H_EXACT where we search for
+   an empty slot within the hash bucket.  Make the calculation more
+   consistent between the cases.
 
-However, qemu does need access to the in-KVM HPT to implement
-get_phys_page_debug() for the benefit of the gdbstub, and maybe for
-other debug operations.
-
-To allow this, 7c43bca "target-ppc: Fix page table lookup with kvm
-enabled" added kvmppc_hash64_read_pteg() to target/ppc/kvm.c to read
-in a batch of HPTEs from the KVM table.  Unfortunately, there are a
-couple of problems with this:
-
-First, the name of the function implies it always reads a whole PTEG
-from the HPT, but in fact in some cases it's used to grab individual
-HPTEs (which ends up pulling 8 HPTEs, not aligned to a PTEG from the
-kernel).
-
-Second, and more importantly, the code to read the HPTEs from KVM is
-simply wrong, in general.  The data from the fd that KVM provides is
-designed mostly for compact migration rather than this sort of one-off
-access, and so needs some decoding for this purpose.  The current code
-will work in some cases, but if there are invalid HPTEs then it will
-not get sane results.
-
-This patch rewrite the HPTE reading function to have a simpler
-interface (just read n HPTEs into a caller provided buffer), and to
-correctly decode the stream from the kernel.
-
-For consistency we also clean up the similar function for altering
-HPTEs within KVM (introduced in c138593 "target-ppc: Update
-ppc_hash64_store_hpte to support updating in-kernel htab").
-
-Cc: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 ---
- target/ppc/cpu.h        |   1 +
- target/ppc/kvm.c        | 126 +++++++++++++++++++++++-------------------------
- target/ppc/kvm_ppc.h    |  20 ++------
- target/ppc/mmu-hash64.c |   8 +--
- target/ppc/mmu-hash64.h |   2 +-
- 5 files changed, 73 insertions(+), 84 deletions(-)
+ hw/ppc/spapr_hcall.c | 58 +++++++++++++++++++++++++---------------------------
+ 1 file changed, 28 insertions(+), 30 deletions(-)
 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index b559b67..c022984 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -228,6 +228,7 @@ typedef struct DisasContext DisasContext;
- typedef struct ppc_spr_t ppc_spr_t;
- typedef union ppc_avr_t ppc_avr_t;
- typedef union ppc_tlb_t ppc_tlb_t;
-+typedef struct ppc_hash_pte64 ppc_hash_pte64_t;
- 
- /* SPR access micro-ops generations callbacks */
- struct ppc_spr_t {
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 52bbea5..79c1da6 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -2596,89 +2596,85 @@ void kvm_arch_init_irq_routing(KVMState *s)
- {
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 42d20e0..3298a14 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -47,12 +47,12 @@ static bool has_spr(PowerPCCPU *cpu, int spr)
+     return cpu->env.spr_cb[spr].name != NULL;
  }
  
--struct kvm_get_htab_buf {
--    struct kvm_get_htab_header header;
--    /*
--     * We require one extra byte for read
--     */
--    target_ulong hpte[(HPTES_PER_GROUP * 2) + 1];
--};
--
--uint64_t kvmppc_hash64_read_pteg(PowerPCCPU *cpu, target_ulong pte_index)
-+void kvmppc_read_hptes(ppc_hash_pte64_t *hptes, hwaddr ptex, int n)
+-static inline bool valid_pte_index(CPUPPCState *env, target_ulong pte_index)
++static inline bool valid_ptex(PowerPCCPU *cpu, target_ulong ptex)
  {
--    int htab_fd;
--    struct kvm_get_htab_fd ghf;
--    struct kvm_get_htab_buf  *hpte_buf;
-+    struct kvm_get_htab_fd ghf = {
-+        .flags = 0,
-+        .start_index = ptex,
-+    };
-+    int fd, rc;
-+    int i;
+     /*
+      * hash value/pteg group index is normalized by htab_mask
+      */
+-    if (((pte_index & ~7ULL) / HPTES_PER_GROUP) & ~env->htab_mask) {
++    if (((ptex & ~7ULL) / HPTES_PER_GROUP) & ~cpu->env.htab_mask) {
+         return false;
+     }
+     return true;
+@@ -77,14 +77,13 @@ static bool is_ram_address(sPAPRMachineState *spapr, hwaddr addr)
+ static target_ulong h_enter(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+                             target_ulong opcode, target_ulong *args)
+ {
+-    CPUPPCState *env = &cpu->env;
+     target_ulong flags = args[0];
+-    target_ulong pte_index = args[1];
++    target_ulong ptex = args[1];
+     target_ulong pteh = args[2];
+     target_ulong ptel = args[3];
+     unsigned apshift;
+     target_ulong raddr;
+-    target_ulong index;
++    target_ulong slot;
+     uint64_t token;
  
--    ghf.flags = 0;
--    ghf.start_index = pte_index;
--    htab_fd = kvm_vm_ioctl(kvm_state, KVM_PPC_GET_HTAB_FD, &ghf);
--    if (htab_fd < 0) {
--        goto error_out;
-+    fd = kvm_vm_ioctl(kvm_state, KVM_PPC_GET_HTAB_FD, &ghf);
-+    if (fd < 0) {
-+        hw_error("kvmppc_read_hptes: Unable to open HPT fd");
+     apshift = ppc_hash64_hpte_page_shift_noslb(cpu, pteh, ptel);
+@@ -116,25 +115,26 @@ static target_ulong h_enter(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+ 
+     pteh &= ~0x60ULL;
+ 
+-    if (!valid_pte_index(env, pte_index)) {
++    if (!valid_ptex(cpu, ptex)) {
+         return H_PARAMETER;
      }
  
--    hpte_buf = g_malloc0(sizeof(*hpte_buf));
--    /*
--     * Read the hpte group
--     */
--    if (read(htab_fd, hpte_buf, sizeof(*hpte_buf)) < 0) {
--        goto out_close;
--    }
-+    i = 0;
-+    while (i < n) {
-+        struct kvm_get_htab_header *hdr;
-+        int m = n < HPTES_PER_GROUP ? n : HPTES_PER_GROUP;
-+        char buf[sizeof(*hdr) + m * HASH_PTE_SIZE_64];
- 
--    close(htab_fd);
--    return (uint64_t)(uintptr_t) hpte_buf->hpte;
-+        rc = read(fd, buf, sizeof(buf));
-+        if (rc < 0) {
-+            hw_error("kvmppc_read_hptes: Unable to read HPTEs");
-+        }
- 
--out_close:
--    g_free(hpte_buf);
--    close(htab_fd);
--error_out:
--    return 0;
--}
-+        hdr = (struct kvm_get_htab_header *)buf;
-+        while ((i < n) && ((char *)hdr < (buf + rc))) {
-+            int invalid = hdr->n_invalid;
- 
--void kvmppc_hash64_free_pteg(uint64_t token)
--{
--    struct kvm_get_htab_buf *htab_buf;
-+            if (hdr->index != (ptex + i)) {
-+                hw_error("kvmppc_read_hptes: Unexpected HPTE index %"PRIu32
-+                         " != (%"HWADDR_PRIu" + %d", hdr->index, ptex, i);
-+            }
+-    index = 0;
++    slot = ptex & 7ULL;
++    ptex = ptex & ~7ULL;
 +
-+            memcpy(hptes + i, hdr + 1, HASH_PTE_SIZE_64 * hdr->n_valid);
-+            i += hdr->n_valid;
- 
--    htab_buf = container_of((void *)(uintptr_t) token, struct kvm_get_htab_buf,
--                            hpte);
--    g_free(htab_buf);
--    return;
-+            if ((n - i) < invalid) {
-+                invalid = n - i;
-+            }
-+            memset(hptes + i, 0, invalid * HASH_PTE_SIZE_64);
-+            i += hdr->n_invalid;
-+
-+            hdr = (struct kvm_get_htab_header *)
-+                ((char *)(hdr + 1) + HASH_PTE_SIZE_64 * hdr->n_valid);
-+        }
-+    }
-+
-+    close(fd);
- }
- 
--void kvmppc_hash64_write_pte(CPUPPCState *env, target_ulong pte_index,
--                             target_ulong pte0, target_ulong pte1)
-+void kvmppc_write_hpte(hwaddr ptex, uint64_t pte0, uint64_t pte1)
- {
--    int htab_fd;
-+    int fd, rc;
-     struct kvm_get_htab_fd ghf;
--    struct kvm_get_htab_buf hpte_buf;
-+    struct {
-+        struct kvm_get_htab_header hdr;
-+        uint64_t pte0;
-+        uint64_t pte1;
-+    } buf;
- 
-     ghf.flags = 0;
-     ghf.start_index = 0;     /* Ignored */
--    htab_fd = kvm_vm_ioctl(kvm_state, KVM_PPC_GET_HTAB_FD, &ghf);
--    if (htab_fd < 0) {
--        goto error_out;
--    }
--
--    hpte_buf.header.n_valid = 1;
--    hpte_buf.header.n_invalid = 0;
--    hpte_buf.header.index = pte_index;
--    hpte_buf.hpte[0] = pte0;
--    hpte_buf.hpte[1] = pte1;
--    /*
--     * Write the hpte entry.
--     * CAUTION: write() has the warn_unused_result attribute. Hence we
--     * need to check the return value, even though we do nothing.
--     */
--    if (write(htab_fd, &hpte_buf, sizeof(hpte_buf)) < 0) {
--        goto out_close;
-+    fd = kvm_vm_ioctl(kvm_state, KVM_PPC_GET_HTAB_FD, &ghf);
-+    if (fd < 0) {
-+        hw_error("kvmppc_write_hpte: Unable to open HPT fd");
+     if (likely((flags & H_EXACT) == 0)) {
+-        pte_index &= ~7ULL;
+-        token = ppc_hash64_start_access(cpu, pte_index);
+-        for (; index < 8; index++) {
+-            if (!(ppc_hash64_load_hpte0(cpu, token, index) & HPTE64_V_VALID)) {
++        token = ppc_hash64_start_access(cpu, ptex);
++        for (slot = 0; slot < 8; slot++) {
++            if (!(ppc_hash64_load_hpte0(cpu, token, slot) & HPTE64_V_VALID)) {
+                 break;
+             }
+         }
+         ppc_hash64_stop_access(cpu, token);
+-        if (index == 8) {
++        if (slot == 8) {
+             return H_PTEG_FULL;
+         }
+     } else {
+-        token = ppc_hash64_start_access(cpu, pte_index);
++        token = ppc_hash64_start_access(cpu, ptex);
+         if (ppc_hash64_load_hpte0(cpu, token, 0) & HPTE64_V_VALID) {
+             ppc_hash64_stop_access(cpu, token);
+             return H_PTEG_FULL;
+@@ -142,10 +142,9 @@ static target_ulong h_enter(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+         ppc_hash64_stop_access(cpu, token);
      }
  
--out_close:
--    close(htab_fd);
--    return;
-+    buf.hdr.n_valid = 1;
-+    buf.hdr.n_invalid = 0;
-+    buf.hdr.index = ptex;
-+    buf.pte0 = cpu_to_be64(pte0);
-+    buf.pte1 = cpu_to_be64(pte1);
+-    ppc_hash64_store_hpte(cpu, pte_index + index,
+-                          pteh | HPTE64_V_HPTE_DIRTY, ptel);
++    ppc_hash64_store_hpte(cpu, ptex + slot, pteh | HPTE64_V_HPTE_DIRTY, ptel);
  
--error_out:
--    return;
-+    rc = write(fd, &buf, sizeof(buf));
-+    if (rc != sizeof(buf)) {
-+        hw_error("kvmppc_write_hpte: Unable to update KVM HPT");
-+    }
-+    close(fd);
+-    args[0] = pte_index + index;
++    args[0] = ptex + slot;
+     return H_SUCCESS;
  }
  
- int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index 8da2ee4..8e9f42d 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -49,11 +49,8 @@ int kvmppc_get_htab_fd(bool write);
- int kvmppc_save_htab(QEMUFile *f, int fd, size_t bufsize, int64_t max_ns);
- int kvmppc_load_htab_chunk(QEMUFile *f, int fd, uint32_t index,
-                            uint16_t n_valid, uint16_t n_invalid);
--uint64_t kvmppc_hash64_read_pteg(PowerPCCPU *cpu, target_ulong pte_index);
--void kvmppc_hash64_free_pteg(uint64_t token);
--
--void kvmppc_hash64_write_pte(CPUPPCState *env, target_ulong pte_index,
--                             target_ulong pte0, target_ulong pte1);
-+void kvmppc_read_hptes(ppc_hash_pte64_t *hptes, hwaddr ptex, int n);
-+void kvmppc_write_hpte(hwaddr ptex, uint64_t pte0, uint64_t pte1);
- bool kvmppc_has_cap_fixup_hcalls(void);
- bool kvmppc_has_cap_htm(void);
- int kvmppc_enable_hwrng(void);
-@@ -234,20 +231,13 @@ static inline int kvmppc_load_htab_chunk(QEMUFile *f, int fd, uint32_t index,
-     abort();
- }
- 
--static inline uint64_t kvmppc_hash64_read_pteg(PowerPCCPU *cpu,
--                                               target_ulong pte_index)
--{
--    abort();
--}
--
--static inline void kvmppc_hash64_free_pteg(uint64_t token)
-+static inline void kvmppc_read_hptes(ppc_hash_pte64_t *hptes,
-+                                     hwaddr ptex, int n)
+@@ -161,11 +160,10 @@ static RemoveResult remove_hpte(PowerPCCPU *cpu, target_ulong ptex,
+                                 target_ulong flags,
+                                 target_ulong *vp, target_ulong *rp)
  {
-     abort();
- }
+-    CPUPPCState *env = &cpu->env;
+     uint64_t token;
+     target_ulong v, r;
  
--static inline void kvmppc_hash64_write_pte(CPUPPCState *env,
--                                           target_ulong pte_index,
--                                           target_ulong pte0, target_ulong pte1)
-+static inline void kvmppc_write_hpte(hwaddr ptex, uint64_t pte0, uint64_t pte1)
- {
-     abort();
- }
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index 76669ed..862e50e 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -438,10 +438,12 @@ uint64_t ppc_hash64_start_access(PowerPCCPU *cpu, target_ulong pte_index)
- 
-     pte_offset = pte_index * HASH_PTE_SIZE_64;
-     if (cpu->env.external_htab == MMU_HASH64_KVM_MANAGED_HPT) {
-+        ppc_hash_pte64_t *pteg = g_malloc(HASH_PTEG_SIZE_64);
-         /*
-          * HTAB is controlled by KVM. Fetch the PTEG into a new buffer.
-          */
--        token = kvmppc_hash64_read_pteg(cpu, pte_index);
-+        kvmppc_read_hptes(pteg, pte_index, HPTES_PER_GROUP);
-+        token = (uint64_t)(uintptr_t)pteg;
-     } else if (cpu->env.external_htab) {
-         /*
-          * HTAB is controlled by QEMU. Just point to the internally
-@@ -457,7 +459,7 @@ uint64_t ppc_hash64_start_access(PowerPCCPU *cpu, target_ulong pte_index)
- void ppc_hash64_stop_access(PowerPCCPU *cpu, uint64_t token)
- {
-     if (cpu->env.external_htab == MMU_HASH64_KVM_MANAGED_HPT) {
--        kvmppc_hash64_free_pteg(token);
-+        g_free((void *)token);
+-    if (!valid_pte_index(env, ptex)) {
++    if (!valid_ptex(cpu, ptex)) {
+         return REMOVE_PARM;
      }
- }
  
-@@ -916,7 +918,7 @@ void ppc_hash64_store_hpte(PowerPCCPU *cpu,
+@@ -191,11 +189,11 @@ static target_ulong h_remove(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+ {
      CPUPPCState *env = &cpu->env;
+     target_ulong flags = args[0];
+-    target_ulong pte_index = args[1];
++    target_ulong ptex = args[1];
+     target_ulong avpn = args[2];
+     RemoveResult ret;
  
-     if (env->external_htab == MMU_HASH64_KVM_MANAGED_HPT) {
--        kvmppc_hash64_write_pte(env, pte_index, pte0, pte1);
-+        kvmppc_write_hpte(pte_index, pte0, pte1);
-         return;
+-    ret = remove_hpte(cpu, pte_index, avpn, flags,
++    ret = remove_hpte(cpu, ptex, avpn, flags,
+                       &args[0], &args[1]);
+ 
+     switch (ret) {
+@@ -291,16 +289,16 @@ static target_ulong h_protect(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+ {
+     CPUPPCState *env = &cpu->env;
+     target_ulong flags = args[0];
+-    target_ulong pte_index = args[1];
++    target_ulong ptex = args[1];
+     target_ulong avpn = args[2];
+     uint64_t token;
+     target_ulong v, r;
+ 
+-    if (!valid_pte_index(env, pte_index)) {
++    if (!valid_ptex(cpu, ptex)) {
+         return H_PARAMETER;
      }
  
-diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
-index 7a0b7fc..73aeaa3 100644
---- a/target/ppc/mmu-hash64.h
-+++ b/target/ppc/mmu-hash64.h
-@@ -127,7 +127,7 @@ static inline target_ulong ppc_hash64_load_hpte1(PowerPCCPU *cpu,
-     }
+-    token = ppc_hash64_start_access(cpu, pte_index);
++    token = ppc_hash64_start_access(cpu, ptex);
+     v = ppc_hash64_load_hpte0(cpu, token, 0);
+     r = ppc_hash64_load_hpte1(cpu, token, 0);
+     ppc_hash64_stop_access(cpu, token);
+@@ -315,13 +313,13 @@ static target_ulong h_protect(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+     r |= (flags << 55) & HPTE64_R_PP0;
+     r |= (flags << 48) & HPTE64_R_KEY_HI;
+     r |= flags & (HPTE64_R_PP | HPTE64_R_N | HPTE64_R_KEY_LO);
+-    ppc_hash64_store_hpte(cpu, pte_index,
++    ppc_hash64_store_hpte(cpu, ptex,
+                           (v & ~HPTE64_V_VALID) | HPTE64_V_HPTE_DIRTY, 0);
+-    ppc_hash64_tlb_flush_hpte(cpu, pte_index, v, r);
++    ppc_hash64_tlb_flush_hpte(cpu, ptex, v, r);
+     /* Flush the tlb */
+     check_tlb_flush(env, true);
+     /* Don't need a memory barrier, due to qemu's global lock */
+-    ppc_hash64_store_hpte(cpu, pte_index, v | HPTE64_V_HPTE_DIRTY, r);
++    ppc_hash64_store_hpte(cpu, ptex, v | HPTE64_V_HPTE_DIRTY, r);
+     return H_SUCCESS;
  }
  
--typedef struct {
-+typedef struct ppc_hash_pte64 {
-     uint64_t pte0, pte1;
- } ppc_hash_pte64_t;
+@@ -330,21 +328,21 @@ static target_ulong h_read(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+ {
+     CPUPPCState *env = &cpu->env;
+     target_ulong flags = args[0];
+-    target_ulong pte_index = args[1];
++    target_ulong ptex = args[1];
+     uint8_t *hpte;
+     int i, ridx, n_entries = 1;
  
+-    if (!valid_pte_index(env, pte_index)) {
++    if (!valid_ptex(cpu, ptex)) {
+         return H_PARAMETER;
+     }
+ 
+     if (flags & H_READ_4) {
+         /* Clear the two low order bits */
+-        pte_index &= ~(3ULL);
++        ptex &= ~(3ULL);
+         n_entries = 4;
+     }
+ 
+-    hpte = env->external_htab + (pte_index * HASH_PTE_SIZE_64);
++    hpte = env->external_htab + (ptex * HASH_PTE_SIZE_64);
+ 
+     for (i = 0, ridx = 0; i < n_entries; i++) {
+         args[ridx++] = ldq_p(hpte);
 -- 
 2.9.3
