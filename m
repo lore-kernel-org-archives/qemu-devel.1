@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50287)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cj8pE-0008Hi-9N
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:18:09 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cj8pF-0008Ir-Rk
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:18:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cj8pA-0001Zx-Bg
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:18:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34188)
+	(envelope-from <dgilbert@redhat.com>) id 1cj8pE-0001gj-7J
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:18:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44152)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cj8pA-0001YL-3C
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:18:04 -0500
-References: <CAFEAcA_KVG19uhPuBUNx4ySmebnL1Hit6=HUX9ug0FkBFMwasg@mail.gmail.com>
-	<877f492ppx.fsf@linaro.org>
-	<e28337d0-d572-cd9a-3f45-0ecc074c32c9@ilande.co.uk>
-	<874lzd2mp7.fsf@linaro.org>
-	<9efa47c0-2a5f-0229-7e27-97a0142ff22d@ilande.co.uk>
-	<871suh2ff3.fsf@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <7db26777-18b6-56ac-7bb1-70ac8d9cc758@redhat.com>
-Date: Wed, 1 Mar 2017 19:17:59 +0100
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cj8pD-0001ew-Ur
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 13:18:08 -0500
+Date: Wed, 1 Mar 2017 18:18:01 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170301181801.GI2429@work-vm>
+References: <20170301181146-mutt-send-email-mst@kernel.org>
+	<20170301163104.GJ10160@redhat.com>
+	<20170301185414-mutt-send-email-mst@kernel.org>
+	<1d155a66-8806-8792-b82d-4bebabcd4971@linux.vnet.ibm.com>
+	<20170301191459-mutt-send-email-mst@kernel.org>
+	<4022b3c9-56c3-7cea-928c-9e0e7d070d90@linux.vnet.ibm.com>
+	<20170301173823.GO10160@redhat.com>
+	<20170301194704-mutt-send-email-mst@kernel.org>
+	<20170301180602.GH2429@work-vm>
+	<20170301200804-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <871suh2ff3.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] intermittent make check failure:
- "tcg_handle_interrupt: assertion failed: (qemu_mutex_iothread_locked())"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170301200804-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v5 1/4] Provide support for the CUSE TPM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,157 +35,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Stefan Berger <stefanb@us.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "SERBAN, CRISTINA" <cs1731@att.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, "Xu, Quan" <quan.xu@intel.com>, "silviu.vlasceanu@gmail.com" <silviu.vlasceanu@gmail.com>, "hagen.lauer@huawei.com" <hagen.lauer@huawei.com>, "SHIH, CHING C" <cs1815@att.com>
 
-On 01.03.2017 16:19, Alex Benn=C3=A9e wrote:
->=20
-> Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
->=20
->> On 01/03/17 12:41, Alex Benn=C3=A9e wrote:
->>
->>>> Here's the backtrace from my test case of qemu-system-sparc running =
-on
->>>> an x86_64 host that I posted yesterday:
->>>>
->>>>
->>>> $ gdb --args ./qemu-system-sparc -cdrom
->>>> /home/build/src/qemu/image/sparc32/debian-40r4a-sparc-netinst.iso -b=
-oot d
->>>> GNU gdb (GDB) 7.4.1-debian
->>>> Copyright (C) 2012 Free Software Foundation, Inc.
->>>> License GPLv3+: GNU GPL version 3 or later
->>>> <http://gnu.org/licenses/gpl.html>
->>>> This is free software: you are free to change and redistribute it.
->>>> There is NO WARRANTY, to the extent permitted by law.  Type "show co=
-pying"
->>>> and "show warranty" for details.
->>>> This GDB was configured as "x86_64-linux-gnu".
->>>> For bug reporting instructions, please see:
->>>> <http://www.gnu.org/software/gdb/bugs/>...
->>>> Reading symbols from /home/build/rel-qemu-git/bin/qemu-system-sparc.=
-..done.
->>>> (gdb) r
->>>> Starting program: /home/build/rel-qemu-git/bin/qemu-system-sparc -cd=
-rom
->>>> /home/build/src/qemu/image/sparc32/debian-40r4a-sparc-netinst.iso -b=
-oot d
->>>> warning: no loadable sections found in added symbol-file system-supp=
-lied
->>>> DSO at 0x7ffff7ffa000
->>>> [Thread debugging using libthread_db enabled]
->>>> Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.=
-so.1".
->>>> [New Thread 0x7fffe9eee700 (LWP 18040)]
->>>> [New Thread 0x7fffe66d6700 (LWP 18041)]
->>>> [New Thread 0x7fffe5ed5700 (LWP 18042)]
->>>> qemu-system-sparc: -cdrom
->>>> /home/build/src/qemu/image/sparc32/debian-40r4a-sparc-netinst.iso:
->>>> warning: bus=3D0,unit=3D2 is deprecated with this machine type
->>>> [Thread 0x7fffe66d6700 (LWP 18041) exited]
->>>> [New Thread 0x7fffe66d6700 (LWP 18043)]
->>>> **
->>>> ERROR:/home/build/src/qemu/git/qemu/translate-common.c:34:tcg_handle=
-_interrupt:
->>>> assertion failed: (qemu_mutex_iothread_locked())
->>>>
->>>> Program received signal SIGABRT, Aborted.
->>>> [Switching to Thread 0x7fffe5ed5700 (LWP 18042)]
->>>> 0x00007ffff2939125 in *__GI_raise (sig=3D<optimized out>) at
->>>> ../nptl/sysdeps/unix/sysv/linux/raise.c:64
->>>>
->>>>
->>>>
->>>> 64      ../nptl/sysdeps/unix/sysv/linux/raise.c: No such file or dir=
-ectory.
->>>> (gdb) thread apply all bt
->>>>
->>>> Thread 5 (Thread 0x7fffe66d6700 (LWP 18043)):
->>>> #0  sem_timedwait () at
->>>> ../nptl/sysdeps/unix/sysv/linux/x86_64/sem_timedwait.S:106
->>>> #1  0x000055555591435c in qemu_sem_timedwait (sem=3D0x5555561ad408,
->>>> ms=3D10000) at util/qemu-thread-posix.c:255
->>>> #2  0x000055555590cb51 in worker_thread (opaque=3D0x5555561ad3a0) at
->>>> util/thread-pool.c:92
->>>> #3  0x00007ffff2c9ab50 in start_thread (arg=3D<optimized out>) at
->>>> pthread_create.c:304
->>>> #4  0x00007ffff29e4fbd in clone () at
->>>> ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
->>>> #5  0x0000000000000000 in ?? ()
->>>>
->>>> Thread 4 (Thread 0x7fffe5ed5700 (LWP 18042)):
->>>> #0  0x00007ffff2939125 in *__GI_raise (sig=3D<optimized out>) at
->>>> ../nptl/sysdeps/unix/sysv/linux/raise.c:64
->>>> #1  0x00007ffff293c3a0 in *__GI_abort () at abort.c:92
->>>> #2  0x00007ffff407e477 in g_assertion_message () from
->>>> /lib/x86_64-linux-gnu/libglib-2.0.so.0
->>>> #3  0x00007ffff407e994 in g_assertion_message_expr () from
->>>> /lib/x86_64-linux-gnu/libglib-2.0.so.0
->>>> #4  0x000055555561b54f in tcg_handle_interrupt (cpu=3D0x5555561b3af0=
-,
->>>> mask=3D2) at /home/build/src/qemu/git/qemu/translate-common.c:34
->>>> #5  0x00005555556a8e7d in cpu_interrupt (cpu=3D0x5555561b3af0, mask=3D=
-2) at
->>>> /home/build/src/qemu/git/qemu/include/qom/cpu.h:801
->>>> #6  0x00005555556a95ec in cpu_check_irqs (env=3D0x5555561bbd80) at
->>>> /home/build/src/qemu/git/qemu/hw/sparc/sun4m.c:157
->>>
->>> Am I correct assuming all the helper functions themselves are concern=
-ed
->>> with the vCPU environment they are running in? If so it looking like
->>> cpu_check_irqs() would be the place to wrap the BQL lock in.
->>>
->>> I'll make the change and test against your test case.
->>
->> For the window helpers, definitely yes - each SPARC vCPU contains a
->> large bank of registers of which the current window is a pointer as to
->> which register set is currently active. The current window itself is
->> controlled by a special register called CWP (current window pointer)
->> which is part of the PSR register in 32-bit CPUs or a standalone
->> register for 64-bit CPUs.
->=20
-> Actually looking at where cpu_check_irq is I've pushed the BQL wraps
-> higher up:
->=20
->   https://github.com/stsquad/qemu/commit/f52e01bf4d3415ce4fad54cbb491f6=
-c30a8e1903
->=20
-> The reasoning is HW emulation code can expect to be run under the BQL.
-> Anything triggered by MMIO for example will automatically have the lock=
-.
-> The problem is helpers which trigger hardware actions (ARM has ARM_CP_I=
-O
-> for this). We talk about this in the design document:
->=20
->   http://git.qemu-project.org/?p=3Dqemu.git;a=3Dblob;f=3Ddocs/multi-thr=
-ead-tcg.txt;h=3Da99b4564c6258576acfa141f51f4b80131969519;hb=3DHEAD#l201
->=20
->> I ran out of time yesterday to run through all my SPARC64 tests, howev=
-er
->> if this is the case then the issue will definitely appear in
->> qemu-system-sparc64 which seems to be supported by people seeing
->> intermittent failures in prom-env-test.
->=20
-> So I made the change to both sparc and sparc64 in the above commit.
->=20
-> I haven't managed to run into the intermittent trigger yet. How do I ru=
-n
-> the test directly?
->=20
->   make tests/prom-env-test
->=20
-> Just makes the test case and
->=20
->   ./tests/prom-env-test
-> **
-> ERROR:tests/libqtest.c:589:qtest_get_arch: assertion failed: (qemu !=3D=
- NULL)
-> Aborted (core dumped)
+* Michael S. Tsirkin (mst@redhat.com) wrote:
+> On Wed, Mar 01, 2017 at 06:06:02PM +0000, Dr. David Alan Gilbert wrote:
+> > * Michael S. Tsirkin (mst@redhat.com) wrote:
+> > > On Wed, Mar 01, 2017 at 05:38:23PM +0000, Daniel P. Berrange wrote:
+> > > > On Wed, Mar 01, 2017 at 12:25:46PM -0500, Stefan Berger wrote:
+> > > > > On 03/01/2017 12:16 PM, Michael S. Tsirkin wrote:
+> > > > > > On Wed, Mar 01, 2017 at 12:12:34PM -0500, Stefan Berger wrote:
+> > > > > > > On 03/01/2017 12:02 PM, Michael S. Tsirkin wrote:
+> > > > > > > > On Wed, Mar 01, 2017 at 04:31:04PM +0000, Daniel P. Berrange wrote:
+> > > > > > > > > On Wed, Mar 01, 2017 at 06:22:45PM +0200, Michael S. Tsirkin wrote:
+> > > > > > > > > > On Wed, Mar 01, 2017 at 09:50:38AM -0500, Stefan Berger wrote:
+> > > > > > > > > > > I had already proposed a linked-in version before I went to the out-of-process
+> > > > > > > > > > > design. Anthony's concerns back then were related to the code not being trusted
+> > > > > > > > > > > and a segfault in the code could bring down all of QEMU. That we have test
+> > > > > > > > > > > suites running over it didn't work as an argument. Some of the test suite are
+> > > > > > > > > > > private, though.
+> > > > > > > > > > Given how bad the alternative is maybe we should go back to that one.
+> > > > > > > > > > Same argument can be made for any device and we aren't making
+> > > > > > > > > > them out of process right now.
+> > > > > > > > > > 
+> > > > > > > > > > IIMO it's less the in-process question (modularization
+> > > > > > > > > > of QEMU has been on the agenda since years and I don't
+> > > > > > > > > > think anyone is against it) it's more a code control/community question.
+> > > > > > > > > I rather disagree. Modularization of QEMU has seen few results
+> > > > > > > > > because it is generally a hard problem to solve when you have a
+> > > > > > > > > complex pre-existing codebase.  I don't think code control has
+> > > > > > > > > been a factor in this - as long as QEMU can clearly define its
+> > > > > > > > > ABI/API between core & the modular pieces, it doesn't matter
+> > > > > > > > > who owns the module. We've seen this with vhost-user which is
+> > > > > > > > > essentially outsourcing network device backend impls to a 3rd
+> > > > > > > > > party project.
+> > > > > > > > And it was done precisely for community reasons.  dpdk/VPP community is
+> > > > > > > > quite large and fell funded but they just can't all grok QEMU.  They
+> > > > > > > > work for hardware vendors and do baremetal things.  With the split we
+> > > > > > > > can focus on virtualization and they can focus on moving packets around.
+> > > > > > > > 
+> > > > > > > > 
+> > > > > > > > > QEMU's defined the vhost-user ABI/API and delegated
+> > > > > > > > > impl to something else.
+> > > > > > > > The vhost ABI isn't easy to maintain at all though. So I would not
+> > > > > > > > commit to that lightly without a good reason.
+> > > > > > > > 
+> > > > > > > > It will be way more painful if the ABI is dictated by a 3rd party
+> > > > > > > > library.
+> > > > > > > Who should define it?
+> > > > > > > 
+> > > > > > No one. Put it in same source tree with QEMU and forget ABI stability
+> > > > > > issues.
+> > > > > 
+> > > > > You mean put the code implementing TPM 1.2 and/or TPM 2 into the QEMU tree?
+> > > > > These are multiple thousands of lines of code each and we'll break them
+> > > > > apart into logical chunks and review them?
+> > > > 
+> > > > No, lets not make that mistake again - we only just got rid of the
+> > > > libcacard smartcard library code from QEMU git. 
+> > > > 
+> > > > Regards,
+> > > > Daniel
+> > > 
+> > > I don't mean that as an external library. As an integral part of QEMU
+> > > adhering to our coding style etc - why not?
+> > > 
+> > > I don't know what are the other options.  How is depending on an ABI
+> > > with a utility with no other users and not packaged by most distros
+> > > good? You are calling out to a CUSE device but who's reviewing that
+> > > code?
+> > > 
+> > > vl.c weights in a 4500 lines of code. several thousand lines is
+> > > not small but not unmanageable.
+> > 
+> > 
+> > That's 4500 lines of fairly generic code; not like the TPM where the number
+> > of people who really understand the details of it is pretty slim.
+> > 
+> > It's better on most counts to have it as a separate process.
+> > 
+> > Dave
+> 
+> Separate process we start and stop automatically I don't mind. A
+> separate tree with a distinct coding style where no one will ever even
+> look at it? Not so much.
 
-QTEST_QEMU_BINARY=3Dsparc64-softmmu/qemu-system-sparc64 \
- tests/prom-env-test
+That code is used elsewhere anyway, so asking them to change the coding style
+isn't very nice.
+Even if they change the coding style it doesn't mean you're suddenly going to
+understand how a TPM works in detail and be able to review it.
 
-... that should do the job here.
-(or use "make check-qtest-sparc64" to run all sparc64 tests)
+Anyway, having it in a separate process locked down by SELinux means that even
+if it does go horribly wrong it won't break qemu.
 
- Thomas
+Dave
+
+> > > Anyway, it all boils down to lack of reviewers. I know I am not merging
+> > > the current implementation because I could not figure out what do qemu
+> > > bits do without looking at the implementation. I don't want to jump
+> > > between so many trees and coding styles. bios/qemu/linux/dpdk are
+> > > painful enough to manage. If some other maintainer volunteers, or if
+> > > Peter wants to merge it directly from Stefan, I won't object.
+> > > 
+> > > > -- 
+> > > > |: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+> > > > |: http://libvirt.org              -o-             http://virt-manager.org :|
+> > > > |: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
