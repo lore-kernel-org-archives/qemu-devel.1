@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cj5dK-0008WJ-1c
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 09:53:39 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cj5hv-0001UB-UX
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 09:58:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cj5dF-0007m9-5M
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 09:53:38 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:46105
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1cj5dE-0007lx-To
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 09:53:33 -0500
-References: <CAFEAcA_KVG19uhPuBUNx4ySmebnL1Hit6=HUX9ug0FkBFMwasg@mail.gmail.com>
-	<877f492ppx.fsf@linaro.org>
-	<e28337d0-d572-cd9a-3f45-0ecc074c32c9@ilande.co.uk>
-	<874lzd2mp7.fsf@linaro.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <9efa47c0-2a5f-0229-7e27-97a0142ff22d@ilande.co.uk>
-Date: Wed, 1 Mar 2017 14:53:10 +0000
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cj5hu-0000m2-27
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 09:58:23 -0500
+Received: from mail-lf0-x236.google.com ([2a00:1450:4010:c07::236]:32986)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1cj5ht-0000kZ-Kv
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 09:58:21 -0500
+Received: by mail-lf0-x236.google.com with SMTP id a6so20614486lfa.0
+	for <qemu-devel@nongnu.org>; Wed, 01 Mar 2017 06:58:21 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <874lzd2mp7.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] intermittent make check failure:
- "tcg_handle_interrupt: assertion failed: (qemu_mutex_iothread_locked())"
+References: <CAJy91CZO+XOyzyhG5yKYcYQsfG_jwRF7W_4sxp6Fen=4gNr+YA@mail.gmail.com>
+	<CAJ+F1CL7VPrbwevNXioH5-gSz6DWRMzZN=OK0qnCn--T7sHC0A@mail.gmail.com>
+	<CAJy91CYYrj58whBJFKKdo-dkQ=3UcXSvJem1qXas=qPeFtX46w@mail.gmail.com>
+In-Reply-To: <CAJy91CYYrj58whBJFKKdo-dkQ=3UcXSvJem1qXas=qPeFtX46w@mail.gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 01 Mar 2017 14:58:08 +0000
+Message-ID: <CAJ+F1CKTWTT2PzGtCCrK_vC7uDGCqmTGXxdYK0LTz-Gwu2Vyuw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Windows Pipe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,104 +31,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Jiahuan Zhang <jiahuanzhang90@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-On 01/03/17 12:41, Alex Bennée wrote:
+Hi
 
->> Here's the backtrace from my test case of qemu-system-sparc running on
->> an x86_64 host that I posted yesterday:
->>
->>
->> $ gdb --args ./qemu-system-sparc -cdrom
->> /home/build/src/qemu/image/sparc32/debian-40r4a-sparc-netinst.iso -boot d
->> GNU gdb (GDB) 7.4.1-debian
->> Copyright (C) 2012 Free Software Foundation, Inc.
->> License GPLv3+: GNU GPL version 3 or later
->> <http://gnu.org/licenses/gpl.html>
->> This is free software: you are free to change and redistribute it.
->> There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
->> and "show warranty" for details.
->> This GDB was configured as "x86_64-linux-gnu".
->> For bug reporting instructions, please see:
->> <http://www.gnu.org/software/gdb/bugs/>...
->> Reading symbols from /home/build/rel-qemu-git/bin/qemu-system-sparc...done.
->> (gdb) r
->> Starting program: /home/build/rel-qemu-git/bin/qemu-system-sparc -cdrom
->> /home/build/src/qemu/image/sparc32/debian-40r4a-sparc-netinst.iso -boot d
->> warning: no loadable sections found in added symbol-file system-supplied
->> DSO at 0x7ffff7ffa000
->> [Thread debugging using libthread_db enabled]
->> Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
->> [New Thread 0x7fffe9eee700 (LWP 18040)]
->> [New Thread 0x7fffe66d6700 (LWP 18041)]
->> [New Thread 0x7fffe5ed5700 (LWP 18042)]
->> qemu-system-sparc: -cdrom
->> /home/build/src/qemu/image/sparc32/debian-40r4a-sparc-netinst.iso:
->> warning: bus=0,unit=2 is deprecated with this machine type
->> [Thread 0x7fffe66d6700 (LWP 18041) exited]
->> [New Thread 0x7fffe66d6700 (LWP 18043)]
->> **
->> ERROR:/home/build/src/qemu/git/qemu/translate-common.c:34:tcg_handle_interrupt:
->> assertion failed: (qemu_mutex_iothread_locked())
->>
->> Program received signal SIGABRT, Aborted.
->> [Switching to Thread 0x7fffe5ed5700 (LWP 18042)]
->> 0x00007ffff2939125 in *__GI_raise (sig=<optimized out>) at
->> ../nptl/sysdeps/unix/sysv/linux/raise.c:64
->>
->>
->>
->> 64      ../nptl/sysdeps/unix/sysv/linux/raise.c: No such file or directory.
->> (gdb) thread apply all bt
->>
->> Thread 5 (Thread 0x7fffe66d6700 (LWP 18043)):
->> #0  sem_timedwait () at
->> ../nptl/sysdeps/unix/sysv/linux/x86_64/sem_timedwait.S:106
->> #1  0x000055555591435c in qemu_sem_timedwait (sem=0x5555561ad408,
->> ms=10000) at util/qemu-thread-posix.c:255
->> #2  0x000055555590cb51 in worker_thread (opaque=0x5555561ad3a0) at
->> util/thread-pool.c:92
->> #3  0x00007ffff2c9ab50 in start_thread (arg=<optimized out>) at
->> pthread_create.c:304
->> #4  0x00007ffff29e4fbd in clone () at
->> ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
->> #5  0x0000000000000000 in ?? ()
->>
->> Thread 4 (Thread 0x7fffe5ed5700 (LWP 18042)):
->> #0  0x00007ffff2939125 in *__GI_raise (sig=<optimized out>) at
->> ../nptl/sysdeps/unix/sysv/linux/raise.c:64
->> #1  0x00007ffff293c3a0 in *__GI_abort () at abort.c:92
->> #2  0x00007ffff407e477 in g_assertion_message () from
->> /lib/x86_64-linux-gnu/libglib-2.0.so.0
->> #3  0x00007ffff407e994 in g_assertion_message_expr () from
->> /lib/x86_64-linux-gnu/libglib-2.0.so.0
->> #4  0x000055555561b54f in tcg_handle_interrupt (cpu=0x5555561b3af0,
->> mask=2) at /home/build/src/qemu/git/qemu/translate-common.c:34
->> #5  0x00005555556a8e7d in cpu_interrupt (cpu=0x5555561b3af0, mask=2) at
->> /home/build/src/qemu/git/qemu/include/qom/cpu.h:801
->> #6  0x00005555556a95ec in cpu_check_irqs (env=0x5555561bbd80) at
->> /home/build/src/qemu/git/qemu/hw/sparc/sun4m.c:157
-> 
-> Am I correct assuming all the helper functions themselves are concerned
-> with the vCPU environment they are running in? If so it looking like
-> cpu_check_irqs() would be the place to wrap the BQL lock in.
-> 
-> I'll make the change and test against your test case.
+On Wed, Mar 1, 2017 at 6:42 PM Jiahuan Zhang <jiahuanzhang90@gmail.com>
+wrote:
 
-For the window helpers, definitely yes - each SPARC vCPU contains a
-large bank of registers of which the current window is a pointer as to
-which register set is currently active. The current window itself is
-controlled by a special register called CWP (current window pointer)
-which is part of the PSR register in 32-bit CPUs or a standalone
-register for 64-bit CPUs.
-
-I ran out of time yesterday to run through all my SPARC64 tests, however
-if this is the case then the issue will definitely appear in
-qemu-system-sparc64 which seems to be supported by people seeing
-intermittent failures in prom-env-test.
+> Hi,
+>
+> I agree with you about win_chr_poll(). But what I wonder is how to write
+> data into the pipe for the host to get. I see "writeFile()" in
+> "win_chr_write()", but have no idea how to use it. Or I have to write
+> something for this writing. In this case, I don't know what the right
+> buffer pointer for WriteFile() is.
+>
+> Any clue is greatly appreciated!
+>
+>
+According to the documentation, it "creates a single duplex pipe at
+\\.pipe\path", you'll have to open and write to it from a different
+application. I don't know if there are console applications that can open
+pipe you can use, you'll have to do some research or write one!
 
 
-ATB,
-
-Mark.
+On 1 March 2017 at 15:25, Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.co=
+m>
+> wrote:
+>
+> Hi
+>
+> On Wed, Mar 1, 2017 at 5:16 PM Jiahuan Zhang <jiahuanzhang90@gmail.com>
+> wrote:
+>
+> Dear QEMU developers,
+>
+> I want the host-guest communication for QEMU. I want to achieve
+> it via serial port redirection to a pipe. My host is windows and guest is
+> Linux. QEMU is in version 2.8.50
+>
+> I looked into char-pipe.c and char-win.c, and find that the current QEMU
+> only supports reading data on the pipe from host to guest for Windows.
+> See *win_chr_pipe_init
+> () *in char-pipe.c
+>
+> Is it true?
+>
+>
+> Not exactly, for some reason, the win-chr-pipe uses a poll, win_chr_poll(=
+)
+> that read from the pipe and write to the frontend (the vm serial).  I
+> haven't tested the windows pipe implementation, only the console one, but
+> it looks like it should work. Hopefully someone using qemu on windows can
+> help you.
+>
+>
+> I don't know how to use *win_chr_write() *in char-win.c.
+> Can you please present an example?
+>
+> best regards,
+> Jiahuan
+>
+> --
+> Marc-Andr=C3=A9 Lureau
+>
+>
+> --
+Marc-Andr=C3=A9 Lureau
