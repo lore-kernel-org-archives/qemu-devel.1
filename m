@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46765)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciw7v-0008Ck-9g
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:41 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ciw80-0008Jd-Lu
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciw7p-0000AX-50
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:35 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ciw7w-0000Hu-AQ
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:40 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed,  1 Mar 2017 15:43:42 +1100
-Message-Id: <20170301044405.1792-28-david@gibson.dropbear.id.au>
+Date: Wed,  1 Mar 2017 15:43:52 +1100
+Message-Id: <20170301044405.1792-38-david@gibson.dropbear.id.au>
 In-Reply-To: <20170301044405.1792-1-david@gibson.dropbear.id.au>
 References: <20170301044405.1792-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 27/50] ppc/xics: remove set_nr_servers() handler
- from XICSStateClass
+Subject: [Qemu-devel] [PULL 37/50] ppc/xics: extend the QOM interface to
+ handle ICPs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,349 +28,94 @@ Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-Today, the ICP (Interrupt Controller Presenter) objects are created by
-the 'nr_servers' property handler of the XICS object and a class
-handler. They are realized in the XICS object realize routine.
+Let's add two new handlers for ICPs. One is to get an ICP object from
+a server number and a second is to resend the irqs when needed.
 
-Let's simplify the process by creating the ICP objects along with the
-XICS object at the machine level.
+The icp_resend() handler is a temporary workaround needed by the
+ics-simple post_load() handler. It will be removed when the post_load
+portion can be done at the machine level.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xics.c        | 74 +++++++++++++--------------------------------=
-------
- hw/intc/xics_kvm.c    | 21 +--------------
- hw/intc/xics_spapr.c  | 26 ------------------
- hw/ppc/spapr.c        | 30 ++++++++++++++++-----
- include/hw/ppc/xics.h |  3 ---
- 5 files changed, 42 insertions(+), 112 deletions(-)
+ hw/intc/xics.c        |  2 +-
+ hw/ppc/spapr.c        | 20 ++++++++++++++++++++
+ include/hw/ppc/xics.h |  3 +++
+ 3 files changed, 24 insertions(+), 1 deletion(-)
 
 diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index f00b77a..d2a417f 100644
+index 76b50dc..f828bcb 100644
 --- a/hw/intc/xics.c
 +++ b/hw/intc/xics.c
-@@ -151,67 +151,11 @@ static void xics_common_reset(DeviceState *d)
-     }
+@@ -216,7 +216,7 @@ static void icp_check_ipi(ICPState *ss)
+     qemu_irq_raise(ss->output);
  }
 =20
--void xics_set_nr_servers(XICSState *xics, uint32_t nr_servers,
--                         const char *typename, Error **errp)
--{
--    int i;
--
--    xics->nr_servers =3D nr_servers;
--
--    xics->ss =3D g_malloc0(xics->nr_servers * sizeof(ICPState));
--    for (i =3D 0; i < xics->nr_servers; i++) {
--        char name[32];
--        ICPState *icp =3D &xics->ss[i];
--
--        object_initialize(icp, sizeof(*icp), typename);
--        snprintf(name, sizeof(name), "icp[%d]", i);
--        object_property_add_child(OBJECT(xics), name, OBJECT(icp), errp)=
-;
--        icp->xics =3D xics;
--    }
--}
--
--static void xics_prop_get_nr_servers(Object *obj, Visitor *v,
--                                     const char *name, void *opaque,
--                                     Error **errp)
--{
--    XICSState *xics =3D XICS_COMMON(obj);
--    int64_t value =3D xics->nr_servers;
--
--    visit_type_int(v, name, &value, errp);
--}
--
--static void xics_prop_set_nr_servers(Object *obj, Visitor *v,
--                                     const char *name, void *opaque,
--                                     Error **errp)
--{
--    XICSState *xics =3D XICS_COMMON(obj);
--    XICSStateClass *xsc =3D XICS_COMMON_GET_CLASS(xics);
--    Error *error =3D NULL;
--    int64_t value;
--
--    visit_type_int(v, name, &value, &error);
--    if (error) {
--        error_propagate(errp, error);
--        return;
--    }
--    if (xics->nr_servers) {
--        error_setg(errp, "Number of servers is already set to %u",
--                   xics->nr_servers);
--        return;
--    }
--
--    assert(xsc->set_nr_servers);
--    xsc->set_nr_servers(xics, value, errp);
--}
--
- static void xics_common_initfn(Object *obj)
+-static void icp_resend(ICPState *ss)
++void icp_resend(ICPState *ss)
  {
-     XICSState *xics =3D XICS_COMMON(obj);
-=20
-     QLIST_INIT(&xics->ics);
--    object_property_add(obj, "nr_servers", "int",
--                        xics_prop_get_nr_servers, xics_prop_set_nr_serve=
-rs,
--                        NULL, NULL, NULL);
- }
-=20
- static void xics_common_class_init(ObjectClass *oc, void *data)
-@@ -450,12 +394,30 @@ static void icp_reset(DeviceState *dev)
-     qemu_set_irq(icp->output, 0);
- }
-=20
-+static void icp_realize(DeviceState *dev, Error **errp)
-+{
-+    ICPState *icp =3D ICP(dev);
-+    Object *obj;
-+    Error *err =3D NULL;
-+
-+    obj =3D object_property_get_link(OBJECT(dev), "xics", &err);
-+    if (!obj) {
-+        error_setg(errp, "%s: required link 'xics' not found: %s",
-+                   __func__, error_get_pretty(err));
-+        return;
-+    }
-+
-+    icp->xics =3D XICS_COMMON(obj);
-+}
-+
-+
- static void icp_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-=20
-     dc->reset =3D icp_reset;
-     dc->vmsd =3D &vmstate_icp_server;
-+    dc->realize =3D icp_realize;
- }
-=20
- static const TypeInfo icp_info =3D {
-diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-index e5ab00b..2d08c40 100644
---- a/hw/intc/xics_kvm.c
-+++ b/hw/intc/xics_kvm.c
-@@ -358,12 +358,6 @@ static void xics_kvm_cpu_setup(XICSState *xics, Powe=
-rPCCPU *cpu)
-     ss->cap_irq_xics_enabled =3D true;
- }
-=20
--static void xics_kvm_set_nr_servers(XICSState *xics, uint32_t nr_servers=
-,
--                                    Error **errp)
--{
--    xics_set_nr_servers(xics, nr_servers, TYPE_KVM_ICP, errp);
--}
--
- static void rtas_dummy(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                        uint32_t token,
-                        uint32_t nargs, target_ulong args,
-@@ -376,9 +370,7 @@ static void rtas_dummy(PowerPCCPU *cpu, sPAPRMachineS=
-tate *spapr,
- static void xics_kvm_realize(DeviceState *dev, Error **errp)
- {
-     KVMXICSState *xicskvm =3D XICS_SPAPR_KVM(dev);
--    XICSState *xics =3D XICS_COMMON(dev);
--    int i, rc;
--    Error *error =3D NULL;
-+    int rc;
-     struct kvm_create_device xics_create_device =3D {
-         .type =3D KVM_DEV_TYPE_XICS,
-         .flags =3D 0,
-@@ -428,16 +420,6 @@ static void xics_kvm_realize(DeviceState *dev, Error=
- **errp)
-=20
-     xicskvm->kernel_xics_fd =3D xics_create_device.fd;
-=20
--    assert(xics->nr_servers);
--    for (i =3D 0; i < xics->nr_servers; i++) {
--        object_property_set_bool(OBJECT(&xics->ss[i]), true, "realized",
--                                 &error);
--        if (error) {
--            error_propagate(errp, error);
--            goto fail;
--        }
--    }
--
-     kvm_kernel_irqchip =3D true;
-     kvm_msi_via_irqfd_allowed =3D true;
-     kvm_gsi_direct_mapping =3D true;
-@@ -458,7 +440,6 @@ static void xics_kvm_class_init(ObjectClass *oc, void=
- *data)
-=20
-     dc->realize =3D xics_kvm_realize;
-     xsc->cpu_setup =3D xics_kvm_cpu_setup;
--    xsc->set_nr_servers =3D xics_kvm_set_nr_servers;
- }
-=20
- static const TypeInfo xics_spapr_kvm_info =3D {
-diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-index 03e42a8..859b567 100644
---- a/hw/intc/xics_spapr.c
-+++ b/hw/intc/xics_spapr.c
-@@ -239,23 +239,8 @@ static void rtas_int_on(PowerPCCPU *cpu, sPAPRMachin=
-eState *spapr,
-     rtas_st(rets, 0, RTAS_OUT_SUCCESS);
- }
-=20
--static void xics_spapr_set_nr_servers(XICSState *xics, uint32_t nr_serve=
-rs,
--                                      Error **errp)
--{
--    xics_set_nr_servers(xics, nr_servers, TYPE_ICP, errp);
--}
--
- static void xics_spapr_realize(DeviceState *dev, Error **errp)
- {
--    XICSState *xics =3D XICS_SPAPR(dev);
--    Error *error =3D NULL;
--    int i;
--
--    if (!xics->nr_servers) {
--        error_setg(errp, "Number of servers needs to be greater 0");
--        return;
--    }
--
-     /* Registration of global state belongs into realize */
-     spapr_rtas_register(RTAS_IBM_SET_XIVE, "ibm,set-xive", rtas_set_xive=
-);
-     spapr_rtas_register(RTAS_IBM_GET_XIVE, "ibm,get-xive", rtas_get_xive=
-);
-@@ -268,24 +253,13 @@ static void xics_spapr_realize(DeviceState *dev, Er=
-ror **errp)
-     spapr_register_hypercall(H_XIRR_X, h_xirr_x);
-     spapr_register_hypercall(H_EOI, h_eoi);
-     spapr_register_hypercall(H_IPOLL, h_ipoll);
--
--    for (i =3D 0; i < xics->nr_servers; i++) {
--        object_property_set_bool(OBJECT(&xics->ss[i]), true, "realized",
--                                 &error);
--        if (error) {
--            error_propagate(errp, error);
--            return;
--        }
--    }
- }
-=20
- static void xics_spapr_class_init(ObjectClass *oc, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(oc);
--    XICSStateClass *xsc =3D XICS_SPAPR_CLASS(oc);
-=20
-     dc->realize =3D xics_spapr_realize;
--    xsc->set_nr_servers =3D xics_spapr_set_nr_servers;
- }
-=20
- static const TypeInfo xics_spapr_info =3D {
+     XICSFabric *xi =3D ss->xics;
+     XICSFabricClass *xic =3D XICS_FABRIC_GET_CLASS(xi);
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 6729b4d..9897898 100644
+index bce975a..5400519 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -96,17 +96,17 @@
- #define HTAB_SIZE(spapr)        (1ULL << ((spapr)->htab_shift))
+@@ -2984,6 +2984,24 @@ static void spapr_ics_resend(XICSFabric *dev)
+     ics_resend(spapr->ics);
+ }
 =20
- static XICSState *try_create_xics(const char *type, const char *type_ics=
-,
--                                  int nr_servers, int nr_irqs, Error **e=
-rrp)
-+                                  const char *type_icp, int nr_servers,
-+                                  int nr_irqs, Error **errp)
- {
-     Error *err =3D NULL, *local_err =3D NULL;
-     XICSState *xics;
-     ICSState *ics =3D NULL;
++static ICPState *spapr_icp_get(XICSFabric *xi, int server)
++{
++    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
++
++    return (server < spapr->xics->nr_servers) ? &spapr->xics->ss[server]=
+ :
++        NULL;
++}
++
++static void spapr_icp_resend(XICSFabric *xi)
++{
++    sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
 +    int i;
-=20
-     xics =3D XICS_COMMON(object_new(type));
-     qdev_set_parent_bus(DEVICE(xics), sysbus_get_default());
--    object_property_set_int(OBJECT(xics), nr_servers, "nr_servers", &err=
-);
--    object_property_set_bool(OBJECT(xics), true, "realized", &local_err)=
-;
--    error_propagate(&err, local_err);
-+    object_property_set_bool(OBJECT(xics), true, "realized", &err);
-     if (err) {
-         goto error;
-     }
-@@ -122,6 +122,22 @@ static XICSState *try_create_xics(const char *type, =
-const char *type_ics,
-     }
-     QLIST_INSERT_HEAD(&xics->ics, ics, list);
-=20
-+    xics->ss =3D g_malloc0(nr_servers * sizeof(ICPState));
-+    xics->nr_servers =3D nr_servers;
 +
-+    for (i =3D 0; i < nr_servers; i++) {
-+        ICPState *icp =3D &xics->ss[i];
-+
-+        object_initialize(icp, sizeof(*icp), type_icp);
-+        object_property_add_child(OBJECT(xics), "icp[*]", OBJECT(icp), N=
-ULL);
-+        object_property_add_const_link(OBJECT(icp), "xics", OBJECT(xics)=
-, NULL);
-+        object_property_set_bool(OBJECT(icp), true, "realized", &err);
-+        if (err) {
-+            goto error;
-+        }
-+        object_unref(OBJECT(icp));
++    for (i =3D 0; i < spapr->xics->nr_servers; i++) {
++        icp_resend(&spapr->xics->ss[i]);
 +    }
++}
 +
-     return xics;
+ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc =3D MACHINE_CLASS(oc);
+@@ -3032,6 +3050,8 @@ static void spapr_machine_class_init(ObjectClass *o=
+c, void *data)
+     vhc->store_hpte =3D spapr_store_hpte;
+     xic->ics_get =3D spapr_ics_get;
+     xic->ics_resend =3D spapr_ics_resend;
++    xic->icp_get =3D spapr_icp_get;
++    xic->icp_resend =3D spapr_icp_resend;
+ }
 =20
- error:
-@@ -143,7 +159,7 @@ static XICSState *xics_system_init(MachineState *mach=
-ine,
-=20
-         if (machine_kernel_irqchip_allowed(machine)) {
-             xics =3D try_create_xics(TYPE_XICS_SPAPR_KVM, TYPE_ICS_KVM,
--                                   nr_servers, nr_irqs, &err);
-+                                   TYPE_KVM_ICP, nr_servers, nr_irqs, &e=
-rr);
-         }
-         if (machine_kernel_irqchip_required(machine) && !xics) {
-             error_reportf_err(err,
-@@ -154,8 +170,8 @@ static XICSState *xics_system_init(MachineState *mach=
-ine,
-     }
-=20
-     if (!xics) {
--        xics =3D try_create_xics(TYPE_XICS_SPAPR, TYPE_ICS_SIMPLE, nr_se=
-rvers,
--                               nr_irqs, errp);
-+        xics =3D try_create_xics(TYPE_XICS_SPAPR, TYPE_ICS_SIMPLE, TYPE_=
-ICP,
-+                               nr_servers, nr_irqs, errp);
-     }
-=20
-     return xics;
+ static const TypeInfo spapr_machine_info =3D {
 diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index a1d12d3..e79a707 100644
+index 15c52f9..01ca5e2 100644
 --- a/include/hw/ppc/xics.h
 +++ b/include/hw/ppc/xics.h
-@@ -74,7 +74,6 @@ struct XICSStateClass {
-     DeviceClass parent_class;
+@@ -193,6 +193,8 @@ typedef struct XICSFabricClass {
+     InterfaceClass parent;
+     ICSState *(*ics_get)(XICSFabric *xi, int irq);
+     void (*ics_resend)(XICSFabric *xi);
++    ICPState *(*icp_get)(XICSFabric *xi, int server);
++    void (*icp_resend)(XICSFabric *xi);
+ } XICSFabricClass;
 =20
-     void (*cpu_setup)(XICSState *icp, PowerPCCPU *cpu);
--    void (*set_nr_servers)(XICSState *icp, uint32_t nr_servers, Error **=
-errp);
- };
+ #define XICS_IRQS_SPAPR               1024
+@@ -223,5 +225,6 @@ void ics_simple_write_xive(ICSState *ics, int nr, int=
+ server,
+ void ics_set_irq_type(ICSState *ics, int srcno, bool lsi);
 =20
- struct XICSState {
-@@ -190,8 +189,6 @@ void spapr_dt_xics(XICSState *xics, void *fdt, uint32=
-_t phandle);
+ void ics_resend(ICSState *ics);
++void icp_resend(ICPState *ss);
 =20
- void xics_cpu_setup(XICSState *icp, PowerPCCPU *cpu);
- void xics_cpu_destroy(XICSState *icp, PowerPCCPU *cpu);
--void xics_set_nr_servers(XICSState *xics, uint32_t nr_servers,
--                         const char *typename, Error **errp);
-=20
- /* Internal XICS interfaces */
- int xics_get_cpu_index_by_dt_id(int cpu_dt_id);
+ #endif /* XICS_H */
 --=20
 2.9.3
