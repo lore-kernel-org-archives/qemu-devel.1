@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46283)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciw7i-0007v0-Gi
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:24 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ciw7j-0007vn-5r
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciw7g-0008Tq-Ur
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:22 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ciw7h-0008Tw-2I
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:23 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed,  1 Mar 2017 15:43:24 +1100
-Message-Id: <20170301044405.1792-10-david@gibson.dropbear.id.au>
+Date: Wed,  1 Mar 2017 15:43:18 +1100
+Message-Id: <20170301044405.1792-4-david@gibson.dropbear.id.au>
 In-Reply-To: <20170301044405.1792-1-david@gibson.dropbear.id.au>
 References: <20170301044405.1792-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 09/50] target/ppc: Merge cpu_ppc_set_vhyp() with
- cpu_ppc_set_papr()
+Subject: [Qemu-devel] [PULL 03/50] PCI: add missing classes in pci_ids.h to
+ build device tree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,73 +23,179 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, thuth@redhat.com, lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-cpu_ppc_set_papr() sets up various aspects of CPU state for use with PAPR
-paravirtualized guests.  However, it doesn't set the virtual hypervisor,
-so callers must also call cpu_ppc_set_vhyp() so that PAPR hypercalls are
-handled properly.  This is a bit silly, so fold setting the virtual
-hypervisor into cpu_ppc_set_papr().
+From: Laurent Vivier <lvivier@redhat.com>
 
+To allow QEMU to add PCI entries in device tree,
+we must have a more exhaustive list of PCI class IDs.
+
+This patch synchronizes as much as possible with
+pci_ids.h and add some missing IDs from SLOF.
+
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 ---
- hw/ppc/spapr_cpu_core.c     |  3 +--
- target/ppc/cpu.h            |  3 +--
- target/ppc/translate_init.c | 10 +++-------
- 3 files changed, 5 insertions(+), 11 deletions(-)
+ include/hw/pci/pci_ids.h | 112 +++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 103 insertions(+), 9 deletions(-)
 
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 55cd045..76563c4 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -57,8 +57,7 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, PowerPCCPU *cpu,
-     cpu_ppc_tb_init(env, SPAPR_TIMEBASE_FREQ);
+diff --git a/include/hw/pci/pci_ids.h b/include/hw/pci/pci_ids.h
+index d77ca60..d22ad8d 100644
+--- a/include/hw/pci/pci_ids.h
++++ b/include/hw/pci/pci_ids.h
+@@ -13,41 +13,84 @@
  
-     /* Enable PAPR mode in TCG or KVM */
--    cpu_ppc_set_vhyp(cpu, PPC_VIRTUAL_HYPERVISOR(spapr));
--    cpu_ppc_set_papr(cpu);
-+    cpu_ppc_set_papr(cpu, PPC_VIRTUAL_HYPERVISOR(spapr));
+ /* Device classes and subclasses */
  
-     if (cpu->max_compat) {
-         Error *local_err = NULL;
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index c022984..2a94e76 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1301,8 +1301,7 @@ void store_booke_tcr (CPUPPCState *env, target_ulong val);
- void store_booke_tsr (CPUPPCState *env, target_ulong val);
- void ppc_tlb_invalidate_all (CPUPPCState *env);
- void ppc_tlb_invalidate_one (CPUPPCState *env, target_ulong addr);
--void cpu_ppc_set_vhyp(PowerPCCPU *cpu, PPCVirtualHypervisor *vhyp);
--void cpu_ppc_set_papr(PowerPCCPU *cpu);
-+void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVirtualHypervisor *vhyp);
- #endif
- #endif
+-#define PCI_BASE_CLASS_STORAGE           0x01
+-#define PCI_BASE_CLASS_NETWORK           0x02
++#define PCI_CLASS_NOT_DEFINED            0x0000
++#define PCI_CLASS_NOT_DEFINED_VGA        0x0001
  
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index be35cbd..a1405e9 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -8835,18 +8835,14 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
- }
++#define PCI_BASE_CLASS_STORAGE           0x01
+ #define PCI_CLASS_STORAGE_SCSI           0x0100
+ #define PCI_CLASS_STORAGE_IDE            0x0101
++#define PCI_CLASS_STORAGE_FLOPPY         0x0102
++#define PCI_CLASS_STORAGE_IPI            0x0103
+ #define PCI_CLASS_STORAGE_RAID           0x0104
++#define PCI_CLASS_STORAGE_ATA            0x0105
+ #define PCI_CLASS_STORAGE_SATA           0x0106
++#define PCI_CLASS_STORAGE_SAS            0x0107
+ #define PCI_CLASS_STORAGE_EXPRESS        0x0108
+ #define PCI_CLASS_STORAGE_OTHER          0x0180
  
- #if !defined(CONFIG_USER_ONLY)
++#define PCI_BASE_CLASS_NETWORK           0x02
+ #define PCI_CLASS_NETWORK_ETHERNET       0x0200
++#define PCI_CLASS_NETWORK_TOKEN_RING     0x0201
++#define PCI_CLASS_NETWORK_FDDI           0x0202
++#define PCI_CLASS_NETWORK_ATM            0x0203
++#define PCI_CLASS_NETWORK_ISDN           0x0204
++#define PCI_CLASS_NETWORK_WORLDFIP       0x0205
++#define PCI_CLASS_NETWORK_PICMG214       0x0206
+ #define PCI_CLASS_NETWORK_OTHER          0x0280
+ 
++#define PCI_BASE_CLASS_DISPLAY           0x03
+ #define PCI_CLASS_DISPLAY_VGA            0x0300
++#define PCI_CLASS_DISPLAY_XGA            0x0301
++#define PCI_CLASS_DISPLAY_3D             0x0302
+ #define PCI_CLASS_DISPLAY_OTHER          0x0380
+ 
++#define PCI_BASE_CLASS_MULTIMEDIA        0x04
++#define PCI_CLASS_MULTIMEDIA_VIDEO       0x0400
+ #define PCI_CLASS_MULTIMEDIA_AUDIO       0x0401
++#define PCI_CLASS_MULTIMEDIA_PHONE       0x0402
++#define PCI_CLASS_MULTIMEDIA_OTHER       0x0480
+ 
++#define PCI_BASE_CLASS_MEMORY            0x05
+ #define PCI_CLASS_MEMORY_RAM             0x0500
++#define PCI_CLASS_MEMORY_FLASH           0x0501
++#define PCI_CLASS_MEMORY_OTHER           0x0580
+ 
+-#define PCI_CLASS_SYSTEM_SDHCI           0x0805
+-#define PCI_CLASS_SYSTEM_OTHER           0x0880
 -
--void cpu_ppc_set_vhyp(PowerPCCPU *cpu, PPCVirtualHypervisor *vhyp)
--{
--    cpu->vhyp = vhyp;
--}
+-#define PCI_CLASS_SERIAL_USB             0x0c03
+-#define PCI_CLASS_SERIAL_SMBUS           0x0c05
 -
--void cpu_ppc_set_papr(PowerPCCPU *cpu)
-+void cpu_ppc_set_papr(PowerPCCPU *cpu, PPCVirtualHypervisor *vhyp)
- {
-     CPUPPCState *env = &cpu->env;
-     ppc_spr_t *lpcr = &env->spr_cb[SPR_LPCR];
-     ppc_spr_t *amor = &env->spr_cb[SPR_AMOR];
++#define PCI_BASE_CLASS_BRIDGE            0x06
+ #define PCI_CLASS_BRIDGE_HOST            0x0600
+ #define PCI_CLASS_BRIDGE_ISA             0x0601
++#define PCI_CLASS_BRIDGE_EISA            0x0602
++#define PCI_CLASS_BRIDGE_MC              0x0603
+ #define PCI_CLASS_BRIDGE_PCI             0x0604
+ #define PCI_CLASS_BRIDGE_PCI_INF_SUB     0x01
++#define PCI_CLASS_BRIDGE_PCMCIA          0x0605
++#define PCI_CLASS_BRIDGE_NUBUS           0x0606
++#define PCI_CLASS_BRIDGE_CARDBUS         0x0607
++#define PCI_CLASS_BRIDGE_RACEWAY         0x0608
++#define PCI_CLASS_BRIDGE_PCI_SEMITP      0x0609
++#define PCI_CLASS_BRIDGE_IB_PCI          0x060a
+ #define PCI_CLASS_BRIDGE_OTHER           0x0680
  
-+    cpu->vhyp = vhyp;
++#define PCI_BASE_CLASS_COMMUNICATION     0x07
+ #define PCI_CLASS_COMMUNICATION_SERIAL   0x0700
++#define PCI_CLASS_COMMUNICATION_PARALLEL 0x0701
++#define PCI_CLASS_COMMUNICATION_MULTISERIAL 0x0702
++#define PCI_CLASS_COMMUNICATION_MODEM    0x0703
++#define PCI_CLASS_COMMUNICATION_GPIB     0x0704
++#define PCI_CLASS_COMMUNICATION_SC       0x0705
+ #define PCI_CLASS_COMMUNICATION_OTHER    0x0780
+ 
++#define PCI_BASE_CLASS_SYSTEM            0x08
++#define PCI_CLASS_SYSTEM_PIC             0x0800
++#define PCI_CLASS_SYSTEM_PIC_IOAPIC      0x080010
++#define PCI_CLASS_SYSTEM_PIC_IOXAPIC     0x080020
++#define PCI_CLASS_SYSTEM_DMA             0x0801
++#define PCI_CLASS_SYSTEM_TIMER           0x0802
++#define PCI_CLASS_SYSTEM_RTC             0x0803
++#define PCI_CLASS_SYSTEM_PCI_HOTPLUG     0x0804
++#define PCI_CLASS_SYSTEM_SDHCI           0x0805
++#define PCI_CLASS_SYSTEM_OTHER           0x0880
 +
-     /* PAPR always has exception vectors in RAM not ROM. To ensure this,
-      * MSR[IP] should never be set.
-      *
++#define PCI_BASE_CLASS_INPUT             0x09
+ #define PCI_CLASS_INPUT_KEYBOARD         0x0900
+ #define PCI_CLASS_INPUT_PEN              0x0901
+ #define PCI_CLASS_INPUT_MOUSE            0x0902
+@@ -55,8 +98,59 @@
+ #define PCI_CLASS_INPUT_GAMEPORT         0x0904
+ #define PCI_CLASS_INPUT_OTHER            0x0980
+ 
+-#define PCI_CLASS_PROCESSOR_CO           0x0b40
++#define PCI_BASE_CLASS_DOCKING           0x0a
++#define PCI_CLASS_DOCKING_GENERIC        0x0a00
++#define PCI_CLASS_DOCKING_OTHER          0x0a80
++
++#define PCI_BASE_CLASS_PROCESSOR         0x0b
++#define PCI_CLASS_PROCESSOR_PENTIUM      0x0b02
+ #define PCI_CLASS_PROCESSOR_POWERPC      0x0b20
++#define PCI_CLASS_PROCESSOR_MIPS         0x0b30
++#define PCI_CLASS_PROCESSOR_CO           0x0b40
++
++#define PCI_BASE_CLASS_SERIAL            0x0c
++#define PCI_CLASS_SERIAL_FIREWIRE        0x0c00
++#define PCI_CLASS_SERIAL_ACCESS          0x0c01
++#define PCI_CLASS_SERIAL_SSA             0x0c02
++#define PCI_CLASS_SERIAL_USB             0x0c03
++#define PCI_CLASS_SERIAL_USB_UHCI        0x0c0300
++#define PCI_CLASS_SERIAL_USB_OHCI        0x0c0310
++#define PCI_CLASS_SERIAL_USB_EHCI        0x0c0320
++#define PCI_CLASS_SERIAL_USB_XHCI        0x0c0330
++#define PCI_CLASS_SERIAL_USB_UNKNOWN     0x0c0380
++#define PCI_CLASS_SERIAL_USB_DEVICE      0x0c03fe
++#define PCI_CLASS_SERIAL_FIBER           0x0c04
++#define PCI_CLASS_SERIAL_SMBUS           0x0c05
++#define PCI_CLASS_SERIAL_IB              0x0c06
++#define PCI_CLASS_SERIAL_IPMI            0x0c07
++#define PCI_CLASS_SERIAL_SERCOS          0x0c08
++#define PCI_CLASS_SERIAL_CANBUS          0x0c09
++
++#define PCI_BASE_CLASS_WIRELESS          0x0d
++#define PCI_CLASS_WIRELESS_IRDA          0x0d00
++#define PCI_CLASS_WIRELESS_CIR           0x0d01
++#define PCI_CLASS_WIRELESS_RF_CONTROLLER 0x0d10
++#define PCI_CLASS_WIRELESS_BLUETOOTH     0x0d11
++#define PCI_CLASS_WIRELESS_BROADBAND     0x0d12
++#define PCI_CLASS_WIRELESS_OTHER         0x0d80
++
++#define PCI_BASE_CLASS_SATELLITE         0x0f
++#define PCI_CLASS_SATELLITE_TV           0x0f00
++#define PCI_CLASS_SATELLITE_AUDIO        0x0f01
++#define PCI_CLASS_SATELLITE_VOICE        0x0f03
++#define PCI_CLASS_SATELLITE_DATA         0x0f04
++
++#define PCI_BASE_CLASS_CRYPT             0x10
++#define PCI_CLASS_CRYPT_NETWORK          0x1000
++#define PCI_CLASS_CRYPT_ENTERTAINMENT    0x1001
++#define PCI_CLASS_CRYPT_OTHER            0x1080
++
++#define PCI_BASE_CLASS_SIGNAL_PROCESSING 0x11
++#define PCI_CLASS_SP_DPIO                0x1100
++#define PCI_CLASS_SP_PERF                0x1101
++#define PCI_CLASS_SP_SYNCH               0x1110
++#define PCI_CLASS_SP_MANAGEMENT          0x1120
++#define PCI_CLASS_SP_OTHER               0x1180
+ 
+ #define PCI_CLASS_OTHERS                 0xff
+ 
 -- 
 2.9.3
