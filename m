@@ -1,30 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54163)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1cj0aF-0002h5-NT
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:30:08 -0500
+	(envelope-from <laurent@vivier.eu>) id 1cj0hy-0006XM-Cx
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:38:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1cj0aB-0002SG-RD
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:30:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39886)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1cj0aB-0002SB-Ki
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:30:03 -0500
-References: <1487910561-17825-1-git-send-email-peterx@redhat.com>
-	<e547f430-d078-27a5-7064-4fc5b9f738d1@redhat.com>
-	<20170301023635.GE13926@pxdev.xzpeter.org>
-	<20170301043802-mutt-send-email-mst@kernel.org>
-	<05a23bbc-4ebc-769b-aa62-d3387af57cae@redhat.com>
-	<a35dbe8f-770e-c792-e5ea-1f4f8ef8df37@redhat.com>
-	<20170301091831.GF13926@pxdev.xzpeter.org>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <4e757875-5b48-6eb6-3847-a27787dd6edd@redhat.com>
-Date: Wed, 1 Mar 2017 11:29:47 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170301091831.GF13926@pxdev.xzpeter.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] intel_iommu: check misordered init when
- realize
+	(envelope-from <laurent@vivier.eu>) id 1cj0ht-0006pb-Gr
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:38:06 -0500
+Received: from mout.kundenserver.de ([217.72.192.73]:49752)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cj0ht-0006p1-6J
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 04:38:01 -0500
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Wed,  1 Mar 2017 10:37:46 +0100
+Message-Id: <20170301093748.28033-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH 0/2] linux-user: fix eventfd()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,57 +21,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, yi.l.liu@intel.com, qemu-devel@nongnu.org, Jintack Lim <jintack@cs.columbia.edu>
+To: Riku Voipio <riku.voipio@iki.fi>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>
 
-On 03/01/2017 11:18 AM, Peter Xu wrote:
-> On Wed, Mar 01, 2017 at 09:03:47AM +0200, Marcel Apfelbaum wrote:
->> On 03/01/2017 06:14 AM, Jason Wang wrote:
->
-> [...]
->
->> Hi Jason,
->>
->> I am not saying we don't need to create the IOMMU before some other device,
->> I just don't think that the command line order should matter to user.
->>
->> BTW, are you working on a way to limit the IOMMU scope to a specific set of devices?
->> If yes, this approach will also help you work.
->
-> Marcel,
->
-> Do you have any plan after 2.9 to re-arrange the init order thing a
-> bit? In general, maybe we need an ordering support for devices.
+This patch series byte-swap the uint64_t data stream
+of a file-descriptor opened with eventfd().
 
-I don;t know when I'll start it, but yes, I am thinking about
-taking this project. We need the ordering in order to be able
-to have less "built-in" devices.
+It allows to pass more LTP test cases:
 
-> Besides that, I am thinking whether it would be wise that we just init
-> the IOMMUs during machine init just like before, but keep the
-> "-device" interface? After all, at least the root IOMMU device should
-> be with root complex, and it feels a little strange we just split the
-> init process apart (we delay the IOMMU init into device
-> initializations).
->
+eventfd01    1  TPASS  :  counter value matches required
+eventfd01    2  TPASS  :  read failed with EAGAIN as expected
+eventfd01    3  TPASS  :  counter value matches required
+eventfd01    4  TPASS  :  write failed with EAGAIN as expected
+eventfd01    5  TPASS  :  read failed with EINVAL as expected
+eventfd01    6  TPASS  :  write failed with EINVAL as expected
+eventfd01    7  TPASS  :  write failed with EINVAL as expected
+eventfd01    8  TPASS  :  fd is set in readfds
+eventfd01    9  TPASS  :  fd is not set in readfds
+eventfd01   10  TPASS  :  fd is set in writefds
+eventfd01   11  TPASS  :  fd is not set in writefds
+eventfd01    1  TPASS  :  counter value matches required
+eventfd01    2  TPASS  :  read failed with EAGAIN as expected
+eventfd01    3  TPASS  :  counter value matches required
+eventfd01    4  TPASS  :  write failed with EAGAIN as expected
+eventfd01    5  TPASS  :  read failed with EINVAL as expected
+eventfd01    6  TPASS  :  write failed with EINVAL as expected
+eventfd01    7  TPASS  :  write failed with EINVAL as expected
+eventfd01    8  TPASS  :  fd is set in readfds
+eventfd01    9  TPASS  :  fd is not set in readfds
+eventfd01   10  TPASS  :  fd is set in writefds
+eventfd01   11  TPASS  :  fd is not set in writefds
+eventfd01   12  TPASS  :  counter value write from child successful
+eventfd01   13  TCONF  :  eventfd01.c:642: eventfd support is not available in AIO subsystem
+eventfd01   14  TCONF  :  eventfd01.c:647: eventfd support is not available in AIO subsystem
+eventfd01   15  TCONF  :  eventfd01.c:652: eventfd support is not available in AIO subsystem
 
-Keeping the IOMMU creation as part of the Root Complex is problematic.
-What happens if we want to limit the IOMMU scope to a subset of devices?
-How will the command line look? Also we may want/need multiple iommu
-devices per system. It will not happen tomorrow, but we don't want to loose
-this possibility.
+Laurent Vivier (2):
+  linux-user: call fd_trans_target_to_host_data() for write()
+  linux-user: fix eventfd
 
-The device re-ordering is not 2.9 material of course, and we need your patch.
-The only thing we can do better is to take out the "vfio-pci" in another header
-file and and have it in a array of devices that should be checked
-(in order to avoid polluting the IOMMU code with a not related device)
+ linux-user/syscall.c | 38 +++++++++++++++++++++++++++++++++++---
+ 1 file changed, 35 insertions(+), 3 deletions(-)
 
-I can try and send a patch for it if you prefer.
-
-Thanks,
-Marcel
-
-> Not sure whether above makes sense though. Thanks,
->
-> -- peterx
->
+-- 
+2.9.3
