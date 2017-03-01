@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cj1Nu-0002BC-Fj
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 05:21:27 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cj1OG-0002P0-Ka
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 05:21:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cj1Nr-0007Zh-BY
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 05:21:26 -0500
-Received: from indium.canonical.com ([91.189.90.7]:35256)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cj1Nr-0007ZX-5y
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 05:21:23 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cj1No-0007SB-CN
-	for <qemu-devel@nongnu.org>; Wed, 01 Mar 2017 10:21:20 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 616972E81AE
-	for <qemu-devel@nongnu.org>; Wed,  1 Mar 2017 10:21:14 +0000 (UTC)
+	(envelope-from <stefanha@gmail.com>) id 1cj1OF-0007fw-La
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 05:21:48 -0500
+Date: Wed, 1 Mar 2017 10:21:29 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170301102129.GA29473@stefanha-x1.localdomain>
+References: <1484884080-28836-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1484884080-28836-3-git-send-email-zhang.zhanghailiang@huawei.com>
+	<20170227171052.GI10201@stefanha-x1.localdomain>
+	<58B645AA.3030301@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 01 Mar 2017 10:13:51 -0000
-From: Bug Watch Updater <1653384@bugs.launchpad.net>
-Reply-To: Bug 1653384 <1653384@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20161231213844.1229.87554.malonedeb@soybean.canonical.com>
-Message-Id: <20170301101352.11186.98836.launchpad@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1653384] Re: Assertion failed with USB pass
- through with XHCI controller
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="IJpNTDwzlM2Ie8A6"
+Content-Disposition: inline
+In-Reply-To: <58B645AA.3030301@huawei.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 2/6] replication: add
+ shared-disk and shared-disk-id options
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,108 +27,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, kwolf@redhat.com, xuquan8@huawei.com, xiecl.fnst@cn.fujitsu.com, Wen Congyang <wency@cn.fujitsu.com>, zhangchen.fnst@cn.fujitsu.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
 
-** Changed in: qemu (Debian)
-       Status: Confirmed =3D> Fix Committed
 
--- =
+--IJpNTDwzlM2Ie8A6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1653384
+On Wed, Mar 01, 2017 at 11:53:14AM +0800, Hailiang Zhang wrote:
+> On 2017/2/28 1:10, Stefan Hajnoczi wrote:
+> > On Fri, Jan 20, 2017 at 11:47:56AM +0800, zhanghailiang wrote:
+> > > @@ -119,12 +136,31 @@ static int replication_open(BlockDriverState *b=
+s, QDict *options,
+> > >                      "The option mode's value should be primary or se=
+condary");
+> > >           goto fail;
+> > >       }
+> > > +    s->is_shared_disk =3D qemu_opt_get_bool(opts, REPLICATION_SHARED=
+_DISK,
+> > > +                                          false);
+> > > +    if (s->is_shared_disk && (s->mode =3D=3D REPLICATION_MODE_PRIMAR=
+Y)) {
+> > > +        shared_disk_id =3D qemu_opt_get(opts, REPLICATION_SHARED_DIS=
+K_ID);
+> > > +        if (!shared_disk_id) {
+> > > +            error_setg(&local_err, "Missing shared disk blk option");
+> > > +            goto fail;
+> > > +        }
+> > > +        s->shared_disk_id =3D g_strdup(shared_disk_id);
+> > > +        blk =3D blk_by_name(s->shared_disk_id);
+> > > +        if (!blk) {
+> > > +            error_setg(&local_err, "There is no %s block", s->shared=
+_disk_id);
+> > > +            goto fail;
+> > > +        }
+> > > +        /* We can't access root member of BlockBackend directly */
+> > > +        tmp_bs =3D blk_bs(blk);
+> > > +        s->primary_disk =3D QLIST_FIRST(&tmp_bs->parents);
+> >=20
+> > Why is this necessary?
+> >=20
+> > We already have the BlockBackend for the primary disk.  I'm not sure why
+> > the BdrvChild is needed.
+> >=20
+>=20
+> Er, the helper backup_job_create() needs the BlockDriverState for the pri=
+mary disk,
 
-Title:
-  Assertion failed with USB pass through with XHCI controller
+You can get the BDS any time using blk_bs().
 
-Status in QEMU:
-  Fix Committed
-Status in qemu package in Debian:
-  Fix Committed
+> besides, we want to make it same with 'secondary_disk' in struct BDRVRepl=
+icationState.
 
-Bug description:
-  Starting qemu 2.8.0 with XHCI controller and host device passed
-  through results in an assertion failure:
+Block drivers are allowed to access BDS->parents so it's not necessarily
+a problem that the code does this.  But it's rare and usually means
+there is a non-standard relationship between BDS nodes.
 
-  qemu-system-x86_64: hw/usb/core.c:623: usb_packet_cleanup: Assertion
-  `!usb_packet_is_inflight(p)' failed.
+It wasn't obvious from the code why you are going through the trouble of
+getting a BdrvChild instead of using the BlockBackend (the normal way of
+accessing a drive).
 
-  Can be reproduced with the following command (passing through a Lenovo
-  keyboard):
+Perhaps a comment would help:
 
-  qemu-system-x86_64 -usb  -device nec-usb-xhci,id=3Dusb -device usb-
-  host,vendorid=3D0x04b3,productid=3D0x3025,id=3Dhostdev0,bus=3Dusb.0,port=
-=3D1
+/* We have a BlockBackend for the primary disk but use BdrvChild for
+ * consistency - active_disk, secondary_disk, etc are also BdrvChild.
+ */
 
-  If nec-usb-xhci is changed to usb-ehci, qemu tries to boot without
-  assertion failures.
+Stefan
 
-  =
+--IJpNTDwzlM2Ie8A6
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  Can be reproduced with the latest master (commit dbe2b65) and v2.8.0.
+-----BEGIN PGP SIGNATURE-----
 
-  Bisected the issue to following commit:
-  first bad commit: [94b037f2a451b3dc855f9f2c346e5049a361bd55] xhci: use li=
-nked list for transfers
+iQEcBAEBAgAGBQJYtqCpAAoJEJykq7OBq3PIrq0H/0PN6ciZRIdoHqOlRcAgQ8Xr
+km7X4W8KexcnFYx09KXffQsReOi0PciYq4WsQEvWz7ixcS6bsJCmWrwhlR6fccBS
+O90z0jHELMdLnGu1x5YjF7yASLKFVqBpoA+zTGV8NOuiTo9/3CNB1jKOCNC+GODi
+PnjUF4Vp4eFwZlI3aPOKGsUiIWgVljHDL9RrAy3rysa0IORH+95rznwXMudLbFCf
+xHlGqCuv/r4sLrqYlUPvMVaGYS6/Sd3xr1m/oHT+0V+vcxRY0UYbiVEdIk9RAoJ8
+mVOSlC1oBZNfXTpTnjLhNQ15XpSXWRNRbxSe3GqGoyaiBLD9JU9hCBwI1N/m9QM=
+=hu4k
+-----END PGP SIGNATURE-----
 
-  =
-
-  Backtrace from commit dbe2b65:
-
-  #0  0x00007f2eb4657227 in __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/=
-unix/sysv/linux/raise.c:55
-          resultvar =3D 0
-          pid =3D 3453
-          selftid =3D 3453
-  #1  0x00007f2eb465867a in __GI_abort () at abort.c:89
-          save_stage =3D 2
-          act =3D {__sigaction_handler =3D {sa_handler =3D 0x4, sa_sigactio=
-n =3D 0x4}, sa_mask =3D {__val =3D {140734740550528, 93876690035339, =
-
-                140734740550624, 48833659808, 0, 0, 0, 21474836480, 1407347=
-40550792, 139838573009553, 140734740550560, 139838573043008, =
-
-                139838573024160, 93876666665872, 139838702616576, 139838573=
-024160}}, sa_flags =3D 1528954938, =
-
-            sa_restorer =3D 0x55615b2202c0 <__PRETTY_FUNCTION__.38612>}
-          sigs =3D {__val =3D {32, 0 <repeats 15 times>}}
-  #2  0x00007f2eb46502cd in __assert_fail_base (fmt=3D0x7f2eb47893a0 "%s%s%=
-s:%u: %s%sAssertion `%s' failed.\n%n", =
-
-      assertion=3Dassertion@entry=3D0x55615b22003a "!usb_packet_is_inflight=
-(p)", file=3Dfile@entry=3D0x55615b21fdf0 "hw/usb/core.c", line=3Dline@entry=
-=3D619, =
-
-      function=3Dfunction@entry=3D0x55615b2202c0 <__PRETTY_FUNCTION__.38612=
-> "usb_packet_cleanup") at assert.c:92
-          str =3D 0x55615cfdf510 ""
-          total =3D 4096
-  #3  0x00007f2eb4650382 in __GI___assert_fail (assertion=3D0x55615b22003a =
-"!usb_packet_is_inflight(p)", file=3D0x55615b21fdf0 "hw/usb/core.c", =
-
-      line=3D619, function=3D0x55615b2202c0 <__PRETTY_FUNCTION__.38612> "us=
-b_packet_cleanup") at assert.c:101
-  No locals.
-  #4  0x000055615afc385e in usb_packet_cleanup ()
-  No symbol table info available.
-  #5  0x000055615afda555 in xhci_ep_free_xfer ()
-  No symbol table info available.
-  #6  0x000055615afdc156 in xhci_kick_epctx ()
-  No symbol table info available.
-  #7  0x000055615afda099 in xhci_ep_kick_timer ()
-  No symbol table info available.
-  #8  0x000055615b08ceee in timerlist_run_timers ()
-  No symbol table info available.
-  #9  0x000055615b08cf36 in qemu_clock_run_timers ()
-  No symbol table info available.
-  #10 0x000055615b08d2df in qemu_clock_run_all_timers ()
-  No symbol table info available.
-  #11 0x000055615b08be40 in main_loop_wait ()
-  No symbol table info available.
-  #12 0x000055615ae3870f in main_loop ()
-  No symbol table info available.
-  #13 0x000055615ae4027b in main ()
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1653384/+subscriptions
+--IJpNTDwzlM2Ie8A6--
