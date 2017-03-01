@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47016)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciw81-0008L7-Iz
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:45 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ciw7p-000853-S1
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ciw7w-0000Hn-8o
-	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:41 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ciw7m-000071-50
+	for qemu-devel@nongnu.org; Tue, 28 Feb 2017 23:44:29 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed,  1 Mar 2017 15:44:00 +1100
-Message-Id: <20170301044405.1792-46-david@gibson.dropbear.id.au>
+Date: Wed,  1 Mar 2017 15:43:43 +1100
+Message-Id: <20170301044405.1792-29-david@gibson.dropbear.id.au>
 In-Reply-To: <20170301044405.1792-1-david@gibson.dropbear.id.au>
 References: <20170301044405.1792-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 45/50] ppc/xics: export the XICS init routines
+Subject: [Qemu-devel] [PULL 28/50] ppc/xics: store the ICS object under the
+ sPAPR machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,143 +28,297 @@ Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, mdroth@linux.vnet
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-There is nothing left related to the XICS object in the realize
-functions of the KVMXICSState and XICSState class. So adapt the
-interfaces to call these routines directly from the sPAPR machine init
-sequence.
+A list of ICS objects was introduced under the XICS object for the
+PowerNV machine but, for the sPAPR machine, it brings extra complexity
+as there is only a single ICS. To simplify the code, let's add the ICS
+pointer under the sPAPR machine and try to reduce the use of this list
+where possible.
+
+Also, change the xics_spapr_*() routines to use an ICS object instead
+of an XICSState and change their name to reflect that these are
+specific to the sPAPR ICS object.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xics_kvm.c    | 13 +++----------
- hw/intc/xics_spapr.c  | 11 ++---------
- hw/ppc/spapr.c        |  4 +++-
- include/hw/ppc/xics.h |  5 +++++
- 4 files changed, 13 insertions(+), 20 deletions(-)
+ hw/intc/xics_spapr.c   | 22 +++++++++-------------
+ hw/ppc/spapr.c         | 14 +++++++++-----
+ hw/ppc/spapr_events.c  |  4 ++--
+ hw/ppc/spapr_pci.c     |  8 ++++----
+ hw/ppc/spapr_vio.c     |  2 +-
+ include/hw/ppc/spapr.h |  1 +
+ include/hw/ppc/xics.h  |  6 +++---
+ 7 files changed, 29 insertions(+), 28 deletions(-)
 
-diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-index 07298b0..9983611 100644
---- a/hw/intc/xics_kvm.c
-+++ b/hw/intc/xics_kvm.c
-@@ -363,7 +363,7 @@ static void rtas_dummy(PowerPCCPU *cpu, sPAPRMachineS=
-tate *spapr,
-                  __func__);
- }
-=20
--static void xics_kvm_realize(DeviceState *dev, Error **errp)
-+int xics_kvm_init(sPAPRMachineState *spapr, Error **errp)
- {
-     int rc;
-     struct kvm_create_device xics_create_device =3D {
-@@ -419,27 +419,20 @@ static void xics_kvm_realize(DeviceState *dev, Erro=
-r **errp)
-     kvm_msi_via_irqfd_allowed =3D true;
-     kvm_gsi_direct_mapping =3D true;
-=20
--    return;
-+    return rc;
-=20
- fail:
-     kvmppc_define_rtas_kernel_token(0, "ibm,set-xive");
-     kvmppc_define_rtas_kernel_token(0, "ibm,get-xive");
-     kvmppc_define_rtas_kernel_token(0, "ibm,int-on");
-     kvmppc_define_rtas_kernel_token(0, "ibm,int-off");
--}
--
--static void xics_kvm_class_init(ObjectClass *oc, void *data)
--{
--    DeviceClass *dc =3D DEVICE_CLASS(oc);
--
--    dc->realize =3D xics_kvm_realize;
-+    return -1;
- }
-=20
- static const TypeInfo xics_spapr_kvm_info =3D {
-     .name          =3D TYPE_XICS_SPAPR_KVM,
-     .parent        =3D TYPE_XICS_COMMON,
-     .instance_size =3D sizeof(KVMXICSState),
--    .class_init    =3D xics_kvm_class_init,
- };
-=20
- static void xics_kvm_register_types(void)
 diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-index 35045a2..aaf6808 100644
+index 859b567..1501e79 100644
 --- a/hw/intc/xics_spapr.c
 +++ b/hw/intc/xics_spapr.c
-@@ -240,7 +240,7 @@ static void rtas_int_on(PowerPCCPU *cpu, sPAPRMachine=
-State *spapr,
-     rtas_st(rets, 0, RTAS_OUT_SUCCESS);
- }
-=20
--static void xics_spapr_realize(DeviceState *dev, Error **errp)
-+int xics_spapr_init(sPAPRMachineState *spapr, Error **errp)
+@@ -118,7 +118,7 @@ static void rtas_set_xive(PowerPCCPU *cpu, sPAPRMachi=
+neState *spapr,
+                           uint32_t nargs, target_ulong args,
+                           uint32_t nret, target_ulong rets)
  {
-     /* Registration of global state belongs into realize */
-     spapr_rtas_register(RTAS_IBM_SET_XIVE, "ibm,set-xive", rtas_set_xive=
-);
-@@ -254,13 +254,7 @@ static void xics_spapr_realize(DeviceState *dev, Err=
-or **errp)
-     spapr_register_hypercall(H_XIRR_X, h_xirr_x);
-     spapr_register_hypercall(H_EOI, h_eoi);
-     spapr_register_hypercall(H_IPOLL, h_ipoll);
--}
--
--static void xics_spapr_class_init(ObjectClass *oc, void *data)
--{
--    DeviceClass *dc =3D DEVICE_CLASS(oc);
--
--    dc->realize =3D xics_spapr_realize;
-+    return 0;
+-    ICSState *ics =3D QLIST_FIRST(&spapr->xics->ics);
++    ICSState *ics =3D spapr->ics;
+     uint32_t nr, srcno, server, priority;
+=20
+     if ((nargs !=3D 3) || (nret !=3D 1)) {
+@@ -151,7 +151,7 @@ static void rtas_get_xive(PowerPCCPU *cpu, sPAPRMachi=
+neState *spapr,
+                           uint32_t nargs, target_ulong args,
+                           uint32_t nret, target_ulong rets)
+ {
+-    ICSState *ics =3D QLIST_FIRST(&spapr->xics->ics);
++    ICSState *ics =3D spapr->ics;
+     uint32_t nr, srcno;
+=20
+     if ((nargs !=3D 1) || (nret !=3D 3)) {
+@@ -181,7 +181,7 @@ static void rtas_int_off(PowerPCCPU *cpu, sPAPRMachin=
+eState *spapr,
+                          uint32_t nargs, target_ulong args,
+                          uint32_t nret, target_ulong rets)
+ {
+-    ICSState *ics =3D QLIST_FIRST(&spapr->xics->ics);
++    ICSState *ics =3D spapr->ics;
+     uint32_t nr, srcno;
+=20
+     if ((nargs !=3D 1) || (nret !=3D 1)) {
+@@ -212,7 +212,7 @@ static void rtas_int_on(PowerPCCPU *cpu, sPAPRMachine=
+State *spapr,
+                         uint32_t nargs, target_ulong args,
+                         uint32_t nret, target_ulong rets)
+ {
+-    ICSState *ics =3D QLIST_FIRST(&spapr->xics->ics);
++    ICSState *ics =3D spapr->ics;
+     uint32_t nr, srcno;
+=20
+     if ((nargs !=3D 1) || (nret !=3D 1)) {
+@@ -294,9 +294,8 @@ static int ics_find_free_block(ICSState *ics, int num=
+, int alignnum)
+     return -1;
  }
 =20
- static const TypeInfo xics_spapr_info =3D {
-@@ -268,7 +262,6 @@ static const TypeInfo xics_spapr_info =3D {
-     .parent        =3D TYPE_XICS_COMMON,
-     .instance_size =3D sizeof(XICSState),
-     .class_size =3D sizeof(XICSStateClass),
--    .class_init    =3D xics_spapr_class_init,
- };
+-int xics_spapr_alloc(XICSState *xics, int irq_hint, bool lsi, Error **er=
+rp)
++int spapr_ics_alloc(ICSState *ics, int irq_hint, bool lsi, Error **errp)
+ {
+-    ICSState *ics =3D QLIST_FIRST(&xics->ics);
+     int irq;
 =20
- #define ICS_IRQ_FREE(ics, srcno)   \
+     if (!ics) {
+@@ -327,10 +326,9 @@ int xics_spapr_alloc(XICSState *xics, int irq_hint, =
+bool lsi, Error **errp)
+  * Allocate block of consecutive IRQs, and return the number of the firs=
+t IRQ in
+  * the block. If align=3D=3Dtrue, aligns the first IRQ number to num.
+  */
+-int xics_spapr_alloc_block(XICSState *xics, int num, bool lsi, bool alig=
+n,
+-                           Error **errp)
++int spapr_ics_alloc_block(ICSState *ics, int num, bool lsi,
++                          bool align, Error **errp)
+ {
+-    ICSState *ics =3D QLIST_FIRST(&xics->ics);
+     int i, first =3D -1;
+=20
+     if (!ics) {
+@@ -380,11 +378,9 @@ static void ics_free(ICSState *ics, int srcno, int n=
+um)
+     }
+ }
+=20
+-void xics_spapr_free(XICSState *xics, int irq, int num)
++void spapr_ics_free(ICSState *ics, int irq, int num)
+ {
+-    ICSState *ics =3D xics_find_source(xics, irq);
+-
+-    if (ics) {
++    if (ics_valid_irq(ics, irq)) {
+         trace_xics_ics_free(0, irq, num);
+         ics_free(ics, irq - ics->offset, num);
+     }
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 47eb503..b81c95b 100644
+index 9897898..153aab4 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -161,7 +161,8 @@ static XICSState *xics_system_init(MachineState *mach=
+@@ -95,7 +95,8 @@
+=20
+ #define HTAB_SIZE(spapr)        (1ULL << ((spapr)->htab_shift))
+=20
+-static XICSState *try_create_xics(const char *type, const char *type_ics=
+,
++static XICSState *try_create_xics(sPAPRMachineState *spapr,
++                                  const char *type, const char *type_ics=
+,
+                                   const char *type_icp, int nr_servers,
+                                   int nr_irqs, Error **errp)
+ {
+@@ -112,7 +113,7 @@ static XICSState *try_create_xics(const char *type, c=
+onst char *type_ics,
+     }
+=20
+     ics =3D ICS_SIMPLE(object_new(type_ics));
+-    object_property_add_child(OBJECT(xics), "ics", OBJECT(ics), NULL);
++    object_property_add_child(OBJECT(spapr), "ics", OBJECT(ics), NULL);
+     object_property_set_int(OBJECT(ics), nr_irqs, "nr-irqs", &err);
+     object_property_add_const_link(OBJECT(ics), "xics", OBJECT(xics), NU=
+LL);
+     object_property_set_bool(OBJECT(ics), true, "realized", &local_err);
+@@ -138,6 +139,7 @@ static XICSState *try_create_xics(const char *type, c=
+onst char *type_ics,
+         object_unref(OBJECT(icp));
+     }
+=20
++    spapr->ics =3D ics;
+     return xics;
+=20
+ error:
+@@ -158,7 +160,8 @@ static XICSState *xics_system_init(MachineState *mach=
 ine,
-     if (kvm_enabled()) {
          Error *err =3D NULL;
 =20
--        if (machine_kernel_irqchip_allowed(machine)) {
-+        if (machine_kernel_irqchip_allowed(machine) &&
-+            !xics_kvm_init(SPAPR_MACHINE(machine), errp)) {
-             xics =3D try_create_xics(SPAPR_MACHINE(machine),
-                                    TYPE_XICS_SPAPR_KVM, TYPE_ICS_KVM,
+         if (machine_kernel_irqchip_allowed(machine)) {
+-            xics =3D try_create_xics(TYPE_XICS_SPAPR_KVM, TYPE_ICS_KVM,
++            xics =3D try_create_xics(SPAPR_MACHINE(machine),
++                                   TYPE_XICS_SPAPR_KVM, TYPE_ICS_KVM,
                                     TYPE_KVM_ICP, nr_servers, nr_irqs, &e=
 rr);
-@@ -175,6 +176,7 @@ static XICSState *xics_system_init(MachineState *mach=
+         }
+         if (machine_kernel_irqchip_required(machine) && !xics) {
+@@ -170,8 +173,9 @@ static XICSState *xics_system_init(MachineState *mach=
 ine,
      }
 =20
      if (!xics) {
-+        xics_spapr_init(SPAPR_MACHINE(machine), errp);
-         xics =3D try_create_xics(SPAPR_MACHINE(machine),
-                                TYPE_XICS_SPAPR, TYPE_ICS_SIMPLE,
-                                TYPE_ICP, nr_servers, nr_irqs, errp);
+-        xics =3D try_create_xics(TYPE_XICS_SPAPR, TYPE_ICS_SIMPLE, TYPE_=
+ICP,
+-                               nr_servers, nr_irqs, errp);
++        xics =3D try_create_xics(SPAPR_MACHINE(machine),
++                               TYPE_XICS_SPAPR, TYPE_ICS_SIMPLE,
++                               TYPE_ICP, nr_servers, nr_irqs, errp);
+     }
+=20
+     return xics;
+diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+index f85a9c3..38b4258 100644
+--- a/hw/ppc/spapr_events.c
++++ b/hw/ppc/spapr_events.c
+@@ -752,7 +752,7 @@ void spapr_events_init(sPAPRMachineState *spapr)
+     spapr->event_sources =3D spapr_event_sources_new();
+=20
+     spapr_event_sources_register(spapr->event_sources, EVENT_CLASS_EPOW,
+-                                 xics_spapr_alloc(spapr->xics, 0, false,
++                                 spapr_ics_alloc(spapr->ics, 0, false,
+                                                   &error_fatal));
+=20
+     /* NOTE: if machine supports modern/dedicated hotplug event source,
+@@ -765,7 +765,7 @@ void spapr_events_init(sPAPRMachineState *spapr)
+      */
+     if (spapr->use_hotplug_event_source) {
+         spapr_event_sources_register(spapr->event_sources, EVENT_CLASS_H=
+OT_PLUG,
+-                                     xics_spapr_alloc(spapr->xics, 0, fa=
+lse,
++                                     spapr_ics_alloc(spapr->ics, 0, fals=
+e,
+                                                       &error_fatal));
+     }
+=20
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index 84a0f31..f371f4e 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -326,7 +326,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAP=
+RMachineState *spapr,
+             return;
+         }
+=20
+-        xics_spapr_free(spapr->xics, msi->first_irq, msi->num);
++        spapr_ics_free(spapr->ics, msi->first_irq, msi->num);
+         if (msi_present(pdev)) {
+             spapr_msi_setmsg(pdev, 0, false, 0, 0);
+         }
+@@ -364,7 +364,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAP=
+RMachineState *spapr,
+     }
+=20
+     /* Allocate MSIs */
+-    irq =3D xics_spapr_alloc_block(spapr->xics, req_num, false,
++    irq =3D spapr_ics_alloc_block(spapr->ics, req_num, false,
+                            ret_intr_type =3D=3D RTAS_TYPE_MSI, &err);
+     if (err) {
+         error_reportf_err(err, "Can't allocate MSIs for device %x: ",
+@@ -375,7 +375,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAP=
+RMachineState *spapr,
+=20
+     /* Release previous MSIs */
+     if (msi) {
+-        xics_spapr_free(spapr->xics, msi->first_irq, msi->num);
++        spapr_ics_free(spapr->ics, msi->first_irq, msi->num);
+         g_hash_table_remove(phb->msi, &config_addr);
+     }
+=20
+@@ -1747,7 +1747,7 @@ static void spapr_phb_realize(DeviceState *dev, Err=
+or **errp)
+         uint32_t irq;
+         Error *local_err =3D NULL;
+=20
+-        irq =3D xics_spapr_alloc_block(spapr->xics, 1, true, false, &loc=
+al_err);
++        irq =3D spapr_ics_alloc_block(spapr->ics, 1, true, false, &local=
+_err);
+         if (local_err) {
+             error_propagate(errp, local_err);
+             error_prepend(errp, "can't allocate LSIs: ");
+diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
+index 8bfc5f9..a0ee4fd 100644
+--- a/hw/ppc/spapr_vio.c
++++ b/hw/ppc/spapr_vio.c
+@@ -454,7 +454,7 @@ static void spapr_vio_busdev_realize(DeviceState *qde=
+v, Error **errp)
+         dev->qdev.id =3D id;
+     }
+=20
+-    dev->irq =3D xics_spapr_alloc(spapr->xics, dev->irq, false, &local_e=
+rr);
++    dev->irq =3D spapr_ics_alloc(spapr->ics, dev->irq, false, &local_err=
+);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index f9b17d8..21e506b 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -59,6 +59,7 @@ struct sPAPRMachineState {
+     QLIST_HEAD(, sPAPRPHBState) phbs;
+     struct sPAPRNVRAM *nvram;
+     XICSState *xics;
++    ICSState *ics;
+     DeviceState *rtc;
+=20
+     void *htab;
 diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index 50a5933..b0b01e2 100644
+index e79a707..37d4d9c 100644
 --- a/include/hw/ppc/xics.h
 +++ b/include/hw/ppc/xics.h
-@@ -224,4 +224,9 @@ void ics_set_irq_type(ICSState *ics, int srcno, bool =
-lsi);
- void ics_resend(ICSState *ics);
- void icp_resend(ICPState *ss);
+@@ -181,10 +181,10 @@ struct ICSIRQState {
+ #define XICS_IRQS_SPAPR               1024
 =20
-+typedef struct sPAPRMachineState sPAPRMachineState;
-+
-+int xics_kvm_init(sPAPRMachineState *spapr, Error **errp);
-+int xics_spapr_init(sPAPRMachineState *spapr, Error **errp);
-+
- #endif /* XICS_H */
+ qemu_irq xics_get_qirq(XICSState *icp, int irq);
+-int xics_spapr_alloc(XICSState *icp, int irq_hint, bool lsi, Error **err=
+p);
+-int xics_spapr_alloc_block(XICSState *icp, int num, bool lsi, bool align=
+,
++int spapr_ics_alloc(ICSState *ics, int irq_hint, bool lsi, Error **errp)=
+;
++int spapr_ics_alloc_block(ICSState *ics, int num, bool lsi, bool align,
+                            Error **errp);
+-void xics_spapr_free(XICSState *icp, int irq, int num);
++void spapr_ics_free(ICSState *ics, int irq, int num);
+ void spapr_dt_xics(XICSState *xics, void *fdt, uint32_t phandle);
+=20
+ void xics_cpu_setup(XICSState *icp, PowerPCCPU *cpu);
 --=20
 2.9.3
