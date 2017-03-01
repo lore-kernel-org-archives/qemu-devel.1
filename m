@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cjAWc-00010y-T4
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 15:07:04 -0500
+	(envelope-from <jsnow@redhat.com>) id 1cjAk3-0004r8-Ov
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 15:20:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cjAWZ-0003i0-HR
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 15:07:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39970)
+	(envelope-from <jsnow@redhat.com>) id 1cjAk1-00023P-1I
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 15:20:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36928)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cjAWZ-0003hY-85
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 15:06:59 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 28AEAC00DE18
-	for <qemu-devel@nongnu.org>; Wed,  1 Mar 2017 20:06:59 +0000 (UTC)
-References: <20170227134202.2991-1-marcandre.lureau@redhat.com>
-	<20170227134202.2991-4-marcandre.lureau@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1e5ebe24-8e7a-68b9-7a59-1950724268c0@redhat.com>
-Date: Wed, 1 Mar 2017 14:06:56 -0600
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1cjAk0-00023E-OP
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 15:20:52 -0500
+References: <1486623844-13140-1-git-send-email-liqiang6-s@360.cn>
+	<1486623844-13140-2-git-send-email-liqiang6-s@360.cn>
+	<eadb7db6-dded-77ce-ac46-7dee688be954@redhat.com>
+	<CAKXe6SJyeHEeRujwKTd=TUAXjJ1Btv4K9jX6rjyJ4wtsutQ1fQ@mail.gmail.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <8a406a12-5145-bfbe-af18-290e6342f668@redhat.com>
+Date: Wed, 1 Mar 2017 15:20:50 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170227134202.2991-4-marcandre.lureau@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="nafrW5pWtsvCFqwRAHguPvcQa9tdq66rX"
-Subject: Re: [Qemu-devel] [PATCH v2 03/21] xen: use a better chardev type
- check
+In-Reply-To: <CAKXe6SJyeHEeRujwKTd=TUAXjJ1Btv4K9jX6rjyJ4wtsutQ1fQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] ide: core: add cleanup function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,70 +29,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nafrW5pWtsvCFqwRAHguPvcQa9tdq66rX
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com
-Message-ID: <1e5ebe24-8e7a-68b9-7a59-1950724268c0@redhat.com>
-Subject: Re: [PATCH v2 03/21] xen: use a better chardev type check
-References: <20170227134202.2991-1-marcandre.lureau@redhat.com>
- <20170227134202.2991-4-marcandre.lureau@redhat.com>
-In-Reply-To: <20170227134202.2991-4-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 02/27/2017 07:41 AM, Marc-Andr=C3=A9 Lureau wrote:
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  xen-common.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
->=20
-> diff --git a/xen-common.c b/xen-common.c
-> index fd2c92847e..d46685ef4e 100644
-> --- a/xen-common.c
-> +++ b/xen-common.c
-> @@ -34,7 +34,7 @@ static int store_dev_info(int domid, Chardev *cs, con=
-st char *string)
->      int ret =3D -1;
-> =20
->      /* Only continue if we're talking to a pty. */
-> -    if (strncmp(cs->filename, "pty:", 4)) {
-> +    if (!CHARDEV_IS_PTY(cs)) {
->          return 0;
->      }
->      pts =3D cs->filename + 4;
->=20
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+To: Li Qiang <liq3ea@gmail.com>, pbonzini@redhat.com
+Cc: Qemu Developers <qemu-devel@nongnu.org>, Li Qiang <liqiang6-s@360.cn>, Markus Armbruster <armbru@redhat.com>
 
 
---nafrW5pWtsvCFqwRAHguPvcQa9tdq66rX
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+On 02/28/2017 08:03 PM, Li Qiang wrote:
+> Hello John, Paolo,
+> 
+> 2017-03-01 8:47 GMT+08:00 John Snow <jsnow@redhat.com
+> <mailto:jsnow@redhat.com>>:
+> 
+> 
+> 
+>     On 02/09/2017 02:04 AM, Li Qiang wrote:
+>     > As the pci ahci can be hotplug and unplug, in the ahci unrealize
+>     > function it should free all the resource once allocated in the
+>     > realized function. This patch adds two cleanup function.
+>     >
+> 
+>     So, the peculiarities of the current arrangement of QDEV realization and
+>     unrealization is a bit of a mystery to me, so I'm hoping my suggestions
+>     here make sense.
+> 
+>     > Signed-off-by: Li Qiang <liqiang6-s@360.cn <mailto:liqiang6-s@360.cn>>
+>     > ---
+>     >  hw/ide/core.c             | 21 +++++++++++++++++++++
+>     >  include/hw/ide/internal.h |  2 ++
+>     >  2 files changed, 23 insertions(+)
+>     >
+>     > diff --git a/hw/ide/core.c b/hw/ide/core.c
+>     > index 43709e5..8fe5896 100644
+>     > --- a/hw/ide/core.c
+>     > +++ b/hw/ide/core.c
+>     > @@ -2586,6 +2586,13 @@ void ide_register_restart_cb(IDEBus *bus)
+>     >      }
+>     >  }
+>     >
+>     > +void ide_unregister_restart_cb(IDEBus *bus)
+>     > +{
+>     > +    if (bus->dma->ops->restart_dma) {
+>     > +        qemu_del_vm_change_state_handler(bus->vmstate);
+>     > +    }
+>     > +}
+>     > +
+> 
+>     This works perfectly well, though I think the function is named
+>     incorrectly -- this should be an AHCI function, as it is AHCI's job to
+>     unregister the IDEBus it created (not IDE's -- the bus belongs to the
+>     HBA, not the IDE device.)
+> 
+>     However, we DO have the IDEBus unrealize code in qdev.c that should be
+>     handling this for us. Can we rename this function and just have it set
+>     the "realized" property of the IDEBus to false to handle this cleanup
+>     for us?
+> 
+>     I'm not well versed in qdev code management, but it definitely feels
+>     wrong to have the cleanup in two places.
+> 
+> 
+>  Agree, but I'm not familiar with qdev too, that's why we need Paolo's help.
+> 
+> @Paolo,
+> Could you please have a look at this issue?
+> 
+> 
 
-iQEcBAEBCAAGBQJYtyngAAoJEKeha0olJ0NqpgAH+gKIew2rUgWIB71UuEXxCDp7
-HhS6TjDZlEh6c66qp6mwjuzXvBaoBXVavxj8OwnHjF8tU8KsxYs0exmoGxLqkx5P
-goUlxCTj/9o50ytlrRsy4uPcWOR28yIMGezx0S2faSqKphpg3Cmk44SJzstvqdAH
-DTQ5HGrNI30itMSuL5fz4umcwPPRDykuSaSOzqvpFlTapDsIyxAptwKUS0uN1MD8
-2Vr7d41MnrH1EJNXpVMwkL/Cd0Fr2P4sO1BpbbxoEYGKHKu1OX8rbmn03cNZYsAN
-nkf4eC8S9F/RCWEFuEWaHsn/7N4QNh13jsp5DoyQmZWHMIj+8mXO/NPgttc+rwg=
-=Z27o
------END PGP SIGNATURE-----
+OK, so here's what it looks like to me from here:
 
---nafrW5pWtsvCFqwRAHguPvcQa9tdq66rX--
+we have an idebus unrealize function, but it was being registered as the
+unrealize function for the IDE Device, so it was not getting invoked on
+device teardown because nothing is "unrealizing" the IDE devices
+themselves, AFAIK.
+
+Perhaps what we want is this, which does actually do the proper bus
+teardown:
+
+-static void idebus_unrealize(DeviceState *qdev, Error **errp);
++static void idebus_unrealize(BusState *bus, Error **errp);
+
+ static Property ide_props[] = {
+     DEFINE_PROP_UINT32("unit", IDEDevice, unit, -1),
+@@ -43,14 +43,17 @@ static void ide_bus_class_init(ObjectClass *klass,
+void *data)
+     BusClass *k = BUS_CLASS(klass);
+
+     k->get_fw_dev_path = idebus_get_fw_dev_path;
++    k->unrealize = idebus_unrealize;
+ }
+
+-static void idebus_unrealize(DeviceState *qdev, Error **errp)
++static void idebus_unrealize(BusState *bus, Error **errp)
+ {
+-    IDEBus *bus = DO_UPCAST(IDEBus, qbus, qdev->parent_bus);
+-
+-    if (bus->vmstate) {
+-        qemu_del_vm_change_state_handler(bus->vmstate);
++    IDEBus *ibus = IDE_BUS(bus);
++    if (ibus->vmstate) {
++        qemu_del_vm_change_state_handler(ibus->vmstate);
+     }
+ }
+@@ -365,7 +369,6 @@ static void ide_device_class_init(ObjectClass
+*klass, void *data)
+     k->init = ide_qdev_init;
+     set_bit(DEVICE_CATEGORY_STORAGE, k->categories);
+     k->bus_type = TYPE_IDE_BUS;
+-    k->unrealize = idebus_unrealize;
+     k->props = ide_props;
+ }
+
+
+
+This way the bus teardown calls the existing handler. If you integrate
+this into your patches and recreate ide_exit as a per-device teardown
+function, I'll merge this.
+
+Thanks for your patience and the bug report,
+--John
+
+>     >  static IDEDMA ide_dma_nop = {
+>     >      .ops = &ide_dma_nop_ops,
+>     >      .aiocb = NULL,
+>     > @@ -2603,6 +2610,20 @@ void ide_init2(IDEBus *bus, qemu_irq irq)
+>     >      bus->dma = &ide_dma_nop;
+>     >  }
+>     >
+>     > +void ide_exit(IDEBus *bus)
+>     > +{
+>     > +    int i;
+>     > +
+>     > +    for (i = 0; i < 2; i++) {
+>     > +        IDEState *s = &bus->ifs[i];
+>     > +
+>     > +        timer_del(s->sector_write_timer);
+>     > +        timer_free(s->sector_write_timer);
+>     > +        qemu_vfree(s->smart_selftest_data);
+>     > +        qemu_vfree(s->io_buffer);
+> 
+>     I would prefer a function that cleans up a single IDE device, and the
+>     caller (which has knowledge of the HBA and the buses it owns) loops as
+>     appropriate. (In this case, ahci_uninit or ahci_unrealize or whichever.)
+> 
+>     It's correct otherwise, though.
+> 
+>     > +    }
+>     > +}
+>     > +
+>     >  static const MemoryRegionPortio ide_portio_list[] = {
+>     >      { 0, 8, 1, .read = ide_ioport_read, .write = ide_ioport_write },
+>     >      { 0, 1, 2, .read = ide_data_readw, .write = ide_data_writew },
+>     > diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
+>     > index 88dc118..09b0404 100644
+>     > --- a/include/hw/ide/internal.h
+>     > +++ b/include/hw/ide/internal.h
+>     > @@ -607,8 +607,10 @@ int ide_init_drive(IDEState *s, BlockBackend
+>     *blk, IDEDriveKind kind,
+>     >                     uint32_t cylinders, uint32_t heads, uint32_t secs,
+>     >                     int chs_trans);
+>     >  void ide_init2(IDEBus *bus, qemu_irq irq);
+>     > +void ide_exit(IDEBus *bus);
+>     >  void ide_init_ioport(IDEBus *bus, ISADevice *isa, int iobase, int
+>     iobase2);
+>     >  void ide_register_restart_cb(IDEBus *bus);
+>     > +void ide_unregister_restart_cb(IDEBus *bus);
+>     >
+>     >  void ide_exec_cmd(IDEBus *bus, uint32_t val);
+>     >
+>     >
+> 
+> 
