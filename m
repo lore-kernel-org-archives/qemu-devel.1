@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50915)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cjGgh-000746-EL
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 21:41:52 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cjGn8-000384-CU
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 21:48:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cjGgg-0006qk-3g
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 21:41:51 -0500
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:33581)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cjGgf-0006qV-VM
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 21:41:50 -0500
-Received: by mail-qk0-x243.google.com with SMTP id n186so15629611qkb.0
-	for <qemu-devel@nongnu.org>; Wed, 01 Mar 2017 18:41:49 -0800 (PST)
-Received: from bigtime.twiddle.net.com (mail.taphouse.com.au. [180.214.90.195])
-	by smtp.gmail.com with ESMTPSA id s3sm4459321qte.57.2017.03.01.18.41.47
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 01 Mar 2017 18:41:48 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Date: Thu,  2 Mar 2017 13:41:10 +1100
-Message-Id: <20170302024110.3978-7-rth@twiddle.net>
+	(envelope-from <no-reply@patchew.org>) id 1cjGn4-00030F-1e
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 21:48:30 -0500
+Resent-Message-Id: <E1cjGn4-00030F-1e@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21335)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cjGn3-0002zf-Px
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 21:48:25 -0500
 In-Reply-To: <20170302024110.3978-1-rth@twiddle.net>
-References: <20170302024110.3978-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH 6/6] target/s390x: Use atomic operations for
- LOAD AND OP
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148842288805.285.1113191831484254762@0e2666bad730>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 1 Mar 2017 18:48:08 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/6] target/s390x patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,156 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: rth@twiddle.net
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-Signed-off-by: Richard Henderson <rth@twiddle.net>
----
- target/s390x/insn-data.def | 20 ++++++------
- target/s390x/translate.c   | 78 +++++++++++++++++++++++++++++-----------------
- 2 files changed, 60 insertions(+), 38 deletions(-)
-
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 0909060..09cfb41 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -390,20 +390,20 @@
- /* LOAD ADDRESS RELATIVE LONG */
-     C(0xc000, LARL,    RIL_b, Z,   0, ri2, 0, r1, mov2, 0)
- /* LOAD AND ADD */
--    C(0xebf8, LAA,     RSY_a, ILA, r3_32s, m2_32s_atomic, new, m2_32_r1_atomic, add, adds32)
--    C(0xebe8, LAAG,    RSY_a, ILA, r3, m2_64_atomic, new, m2_64_r1_atomic, add, adds64)
-+    D(0xebf8, LAA,     RSY_a, ILA, r3_32s, a2, new, in2_r1_32, laa, adds32, MO_TESL)
-+    D(0xebe8, LAAG,    RSY_a, ILA, r3, a2, new, in2_r1, laa, adds64, MO_TEQ)
- /* LOAD AND ADD LOGICAL */
--    C(0xebfa, LAAL,    RSY_a, ILA, r3_32s, m2_32s_atomic, new, m2_32_r1_atomic, add, addu32)
--    C(0xebea, LAALG,   RSY_a, ILA, r3, m2_64_atomic, new, m2_64_r1_atomic, add, addu64)
-+    D(0xebfa, LAAL,    RSY_a, ILA, r3_32u, a2, new, in2_r1_32, laa, addu32, MO_TEUL)
-+    D(0xebea, LAALG,   RSY_a, ILA, r3, a2, new, in2_r1, laa, addu64, MO_TEQ)
- /* LOAD AND AND */
--    C(0xebf4, LAN,     RSY_a, ILA, r3_32s, m2_32s_atomic, new, m2_32_r1_atomic, and, nz32)
--    C(0xebe4, LANG,    RSY_a, ILA, r3, m2_64_atomic, new, m2_64_r1_atomic, and, nz64)
-+    D(0xebf4, LAN,     RSY_a, ILA, r3_32s, a2, new, in2_r1_32, lan, nz32, MO_TESL)
-+    D(0xebe4, LANG,    RSY_a, ILA, r3, a2, new, in2_r1, lan, nz64, MO_TEQ)
- /* LOAD AND EXCLUSIVE OR */
--    C(0xebf7, LAX,     RSY_a, ILA, r3_32s, m2_32s_atomic, new, m2_32_r1_atomic, xor, nz32)
--    C(0xebe7, LAXG,    RSY_a, ILA, r3, m2_64_atomic, new, m2_64_r1_atomic, xor, nz64)
-+    D(0xebf7, LAX,     RSY_a, ILA, r3_32s, a2, new, in2_r1_32, lax, nz32, MO_TESL)
-+    D(0xebe7, LAXG,    RSY_a, ILA, r3, a2, new, in2_r1, lax, nz64, MO_TEQ)
- /* LOAD AND OR */
--    C(0xebf6, LAO,     RSY_a, ILA, r3_32s, m2_32s_atomic, new, m2_32_r1_atomic, or, nz32)
--    C(0xebe6, LAOG,    RSY_a, ILA, r3, m2_64_atomic, new, m2_64_r1_atomic, or, nz64)
-+    D(0xebf6, LAO,     RSY_a, ILA, r3_32s, a2, new, in2_r1_32, lao, nz32, MO_TESL)
-+    D(0xebe6, LAOG,    RSY_a, ILA, r3, a2, new, in2_r1, lao, nz64, MO_TEQ)
- /* LOAD AND TEST */
-     C(0x1200, LTR,     RR_a,  Z,   0, r2_o, 0, cond_r1r2_32, mov2, s32)
-     C(0xb902, LTGR,    RRE,   Z,   0, r2_o, 0, r1, mov2, s64)
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 414378c..53c01e0 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -2311,6 +2311,50 @@ static ExitStatus op_iske(DisasContext *s, DisasOps *o)
- }
- #endif
- 
-+static ExitStatus op_laa(DisasContext *s, DisasOps *o)
-+{
-+    /* The real output is indeed the original value in memory;
-+       recompute the addition for the computation of CC.  */
-+    tcg_gen_atomic_fetch_add_i64(o->in2, o->in2, o->in1, get_mem_index(s),
-+                                 s->insn->data | MO_ALIGN);
-+    /* However, we need to recompute the addition for setting CC.  */
-+    tcg_gen_add_i64(o->out, o->in1, o->in2);
-+    return NO_EXIT;
-+}
-+
-+static ExitStatus op_lan(DisasContext *s, DisasOps *o)
-+{
-+    /* The real output is indeed the original value in memory;
-+       recompute the addition for the computation of CC.  */
-+    tcg_gen_atomic_fetch_and_i64(o->in2, o->in2, o->in1, get_mem_index(s),
-+                                 s->insn->data | MO_ALIGN);
-+    /* However, we need to recompute the addition for setting CC.  */
-+    tcg_gen_and_i64(o->out, o->in1, o->in2);
-+    return NO_EXIT;
-+}
-+
-+static ExitStatus op_lao(DisasContext *s, DisasOps *o)
-+{
-+    /* The real output is indeed the original value in memory;
-+       recompute the addition for the computation of CC.  */
-+    tcg_gen_atomic_fetch_or_i64(o->in2, o->in2, o->in1, get_mem_index(s),
-+                                s->insn->data | MO_ALIGN);
-+    /* However, we need to recompute the addition for setting CC.  */
-+    tcg_gen_or_i64(o->out, o->in1, o->in2);
-+    return NO_EXIT;
-+}
-+
-+static ExitStatus op_lax(DisasContext *s, DisasOps *o)
-+{
-+    /* The real output is indeed the original value in memory;
-+       recompute the addition for the computation of CC.  */
-+    tcg_gen_atomic_fetch_xor_i64(o->in2, o->in2, o->in1, get_mem_index(s),
-+                                 s->insn->data | MO_ALIGN);
-+    /* However, we need to recompute the addition for setting CC.  */
-+    tcg_gen_xor_i64(o->out, o->in1, o->in2);
-+    return NO_EXIT;
-+}
-+
- static ExitStatus op_ldeb(DisasContext *s, DisasOps *o)
- {
-     gen_helper_ldeb(o->out, cpu_env, o->in2);
-@@ -4485,21 +4529,17 @@ static void wout_m2_32(DisasContext *s, DisasFields *f, DisasOps *o)
- }
- #define SPEC_wout_m2_32 0
- 
--static void wout_m2_32_r1_atomic(DisasContext *s, DisasFields *f, DisasOps *o)
-+static void wout_in2_r1(DisasContext *s, DisasFields *f, DisasOps *o)
- {
--    /* XXX release reservation */
--    tcg_gen_qemu_st32(o->out, o->addr1, get_mem_index(s));
--    store_reg32_i64(get_field(f, r1), o->in2);
-+    store_reg(get_field(f, r1), o->in2);
- }
--#define SPEC_wout_m2_32_r1_atomic 0
-+#define SPEC_wout_in2_r1 0
- 
--static void wout_m2_64_r1_atomic(DisasContext *s, DisasFields *f, DisasOps *o)
-+static void wout_in2_r1_32(DisasContext *s, DisasFields *f, DisasOps *o)
- {
--    /* XXX release reservation */
--    tcg_gen_qemu_st64(o->out, o->addr1, get_mem_index(s));
--    store_reg(get_field(f, r1), o->in2);
-+    store_reg32_i64(get_field(f, r1), o->in2);
- }
--#define SPEC_wout_m2_64_r1_atomic 0
-+#define SPEC_wout_in2_r1_32 0
- 
- /* ====================================================================== */
- /* The "INput 1" generators.  These load the first operand to an insn.  */
-@@ -4943,24 +4983,6 @@ static void in2_mri2_64(DisasContext *s, DisasFields *f, DisasOps *o)
- }
- #define SPEC_in2_mri2_64 0
- 
--static void in2_m2_32s_atomic(DisasContext *s, DisasFields *f, DisasOps *o)
--{
--    /* XXX should reserve the address */
--    in1_la2(s, f, o);
--    o->in2 = tcg_temp_new_i64();
--    tcg_gen_qemu_ld32s(o->in2, o->addr1, get_mem_index(s));
--}
--#define SPEC_in2_m2_32s_atomic 0
--
--static void in2_m2_64_atomic(DisasContext *s, DisasFields *f, DisasOps *o)
--{
--    /* XXX should reserve the address */
--    in1_la2(s, f, o);
--    o->in2 = tcg_temp_new_i64();
--    tcg_gen_qemu_ld64(o->in2, o->addr1, get_mem_index(s));
--}
--#define SPEC_in2_m2_64_atomic 0
--
- static void in2_i2(DisasContext *s, DisasFields *f, DisasOps *o)
- {
-     o->in2 = tcg_const_i64(get_field(f, i2));
--- 
-2.9.3
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzAzMDIwMjQxMTAuMzk3OC0xLXJ0aEB0d2lkZGxlLm5ldApUeXBlOiBzZXJpZXMKU3ViamVjdDog
+W1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzZdIHRhcmdldC9zMzkweCBwYXRjaGVzCgo9PT0gVEVTVCBT
+Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxv
+ZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlv
+bnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9j
+YWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJl
+dmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcg
+UEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBp
+ZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
+LS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQog
+ICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0K
+ClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBo
+dHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAg
+ICAgcGF0Y2hldy8yMDE3MDMwMjAyNDExMC4zOTc4LTEtcnRoQHR3aWRkbGUubmV0IC0+IHBhdGNo
+ZXcvMjAxNzAzMDIwMjQxMTAuMzk3OC0xLXJ0aEB0d2lkZGxlLm5ldApTd2l0Y2hlZCB0byBhIG5l
+dyBicmFuY2ggJ3Rlc3QnCjNhMDE1ZGIgdGFyZ2V0L3MzOTB4OiBVc2UgYXRvbWljIG9wZXJhdGlv
+bnMgZm9yIExPQUQgQU5EIE9QCjhjNDI5OGQgdGFyZ2V0L3MzOTB4OiBVc2UgYXRvbWljIG9wZXJh
+dGlvbnMgZm9yIENPTVBBUkUgU1dBUAo4ZjdkNGFkIHRhcmdldC9zMzkweDogSW1wbGVtZW50IExP
+QUQgUEFJUiBESVNKT0lOVApkZTNiMTU5IHRhcmdldC9zMzkweDogRGlhZ25vc2Ugc3BlY2lmaWNh
+dGlvbiBleGNlcHRpb24gZm9yIGF0b21pY3MKYzY4NzczNCB0YXJnZXQvczM5MHg6IEltcGxlbWVu
+dCBMT0FEIFBST0dSQU0gUEFSQU1FVEVSCjRlMDdhNmQgdGFyZ2V0L3MzOTB4OiBJbXBsZW1lbnQg
+U1RPUkUgRkFDSUxJVElFUyBMSVNUIEVYVEVOREVECgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVj
+a2luZyBQQVRDSCAxLzY6IHRhcmdldC9zMzkweDogSW1wbGVtZW50IFNUT1JFIEZBQ0lMSVRJRVMg
+TElTVCBFWFRFTkRFRC4uLgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9u
+IG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiM3MTogRklMRTogdGFyZ2V0L3MzOTB4L21p
+c2NfaGVscGVyLmM6NjgyOgorICAgIGZvciAobWF4X20xID0gQVJSQVlfU0laRSAoYnVmKSAtIDE7
+IG1heF9tMSA+IDA7IC0tbWF4X20xKSB7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDkw
+IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
+aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
+aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNo
+ZWNraW5nIFBBVENIIDIvNjogdGFyZ2V0L3MzOTB4OiBJbXBsZW1lbnQgTE9BRCBQUk9HUkFNIFBB
+UkFNRVRFUi4uLgpDaGVja2luZyBQQVRDSCAzLzY6IHRhcmdldC9zMzkweDogRGlhZ25vc2Ugc3Bl
+Y2lmaWNhdGlvbiBleGNlcHRpb24gZm9yIGF0b21pY3MuLi4KQ2hlY2tpbmcgUEFUQ0ggNC82OiB0
+YXJnZXQvczM5MHg6IEltcGxlbWVudCBMT0FEIFBBSVIgRElTSk9JTlQuLi4KQ2hlY2tpbmcgUEFU
+Q0ggNS82OiB0YXJnZXQvczM5MHg6IFVzZSBhdG9taWMgb3BlcmF0aW9ucyBmb3IgQ09NUEFSRSBT
+V0FQLi4uCkNoZWNraW5nIFBBVENIIDYvNjogdGFyZ2V0L3MzOTB4OiBVc2UgYXRvbWljIG9wZXJh
+dGlvbnMgZm9yIExPQUQgQU5EIE9QLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5k
+IGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
+YnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
+Y2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
