@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46558)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cjHh9-0003hR-EQ
+	(envelope-from <jcody@redhat.com>) id 1cjHh9-0003hv-VG
 	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 22:46:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cjHh8-0004EP-PZ
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 22:46:23 -0500
+	(envelope-from <jcody@redhat.com>) id 1cjHh9-0004Eb-1g
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 22:46:24 -0500
 From: Jeff Cody <jcody@redhat.com>
-Date: Wed,  1 Mar 2017 22:46:08 -0500
-Message-Id: <20170302034613.21609-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL v3 0/5] Block patches for 2.9
+Date: Wed,  1 Mar 2017 22:46:12 -0500
+Message-Id: <20170302034613.21609-5-jcody@redhat.com>
+In-Reply-To: <20170302034613.21609-1-jcody@redhat.com>
+References: <20170302034613.21609-1-jcody@redhat.com>
+Subject: [Qemu-devel] [PULL v3 4/5] block/rbd: add blockdev-add support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,32 +22,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: peter.maydell@linaro.org, jcody@redhat.com, qemu-devel@nongnu.org
 
-The following changes since commit c8c0a1a784cdf70ecea50e93213137c6c89337a7:
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Jeff Cody <jcody@redhat.com>
+---
+ qapi/block-core.json | 33 +++++++++++++++++++++++++++++++--
+ 1 file changed, 31 insertions(+), 2 deletions(-)
 
-  Merge remote-tracking branch 'remotes/cody/tags/block-pull-request' into staging (2017-02-28 13:41:03 +0000)
-
-are available in the git repository at:
-
-  git@github.com:codyprime/qemu-kvm-jtc.git tags/block-pull-request
-
-for you to fetch changes up to 0a55679b4a5061f4d74bdb1a0e81611ba3390b00:
-
-  block/rbd: add support for 'mon_host', 'auth_supported' via QAPI (2017-03-01 22:39:25 -0500)
-
-----------------------------------------------------------------
-RBD blockdev-add patches for 2.9
-----------------------------------------------------------------
-
-Jeff Cody (5):
-  block/rbd: don't copy strings in qemu_rbd_next_tok()
-  block/rbd: add all the currently supported runtime_opts
-  block/rbd: parse all options via bdrv_parse_filename
-  block/rbd: add blockdev-add support
-  block/rbd: add support for 'mon_host', 'auth_supported' via QAPI
-
- block/rbd.c          | 569 ++++++++++++++++++++++++++++++++++-----------------
- qapi/block-core.json |  62 +++++-
- 2 files changed, 443 insertions(+), 188 deletions(-)
-
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index cf24c04..803edc3 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2111,6 +2111,7 @@
+ # @replication: Since 2.8
+ # @ssh: Since 2.8
+ # @iscsi: Since 2.9
++# @rbd: Since 2.9
+ #
+ # Since: 2.0
+ ##
+@@ -2119,7 +2120,7 @@
+             'dmg', 'file', 'ftp', 'ftps', 'gluster', 'host_cdrom',
+             'host_device', 'http', 'https', 'iscsi', 'luks', 'nbd', 'nfs',
+             'null-aio', 'null-co', 'parallels', 'qcow', 'qcow2', 'qed',
+-            'quorum', 'raw', 'replication', 'ssh', 'vdi', 'vhdx', 'vmdk',
++            'quorum', 'raw', 'rbd', 'replication', 'ssh', 'vdi', 'vhdx', 'vmdk',
+             'vpc', 'vvfat' ] }
+ 
+ ##
+@@ -2666,6 +2667,34 @@
+             '*timeout': 'int' } }
+ 
+ ##
++# @BlockdevOptionsRbd:
++#
++# @pool:               Ceph pool name.
++#
++# @image:              Image name in the Ceph pool.
++#
++# @conf:               #optional path to Ceph configuration file.  Values
++#                      in the configuration file will be overridden by
++#                      options specified via QAPI.
++#
++# @snapshot:           #optional Ceph snapshot name.
++#
++# @user:               #optional Ceph id name.
++#
++# @password-secret:    #optional The ID of a QCryptoSecret object providing
++#                      the password for the login.
++#
++# Since: 2.9
++##
++{ 'struct': 'BlockdevOptionsRbd',
++  'data': { 'pool': 'str',
++            'image': 'str',
++            '*conf': 'str',
++            '*snapshot': 'str',
++            '*user': 'str',
++            '*password-secret': 'str' } }
++
++##
+ # @ReplicationMode:
+ #
+ # An enumeration of replication modes.
+@@ -2863,7 +2892,7 @@
+       'qed':        'BlockdevOptionsGenericCOWFormat',
+       'quorum':     'BlockdevOptionsQuorum',
+       'raw':        'BlockdevOptionsRaw',
+-# TODO rbd: Wait for structured options
++      'rbd':        'BlockdevOptionsRbd',
+       'replication':'BlockdevOptionsReplication',
+ # TODO sheepdog: Wait for structured options
+       'ssh':        'BlockdevOptionsSsh',
 -- 
 2.9.3
