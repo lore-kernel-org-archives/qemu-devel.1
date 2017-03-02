@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cjNSC-0007br-SS
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 04:55:21 -0500
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cjNSd-0007tW-23
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 04:55:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cjNSB-0003NU-V6
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 04:55:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50124)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cjNSB-0003MO-Ow
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 04:55:19 -0500
-References: <1488272804-27144-1-git-send-email-kraxel@redhat.com>
-	<CAJSP0QVhb6FPh9HaC--7vqRgetuBQNvYt9BxeCp9KaNOTfLe8g@mail.gmail.com>
-	<CAFEAcA-QvbAUs5bS6w8_BBFS7-2msfxPeDGE8HVS3z5LKMQKPw@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5db40f1e-0fc0-f66b-ba9e-6919a6108cc6@redhat.com>
-Date: Thu, 2 Mar 2017 10:55:14 +0100
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cjNSb-0003YW-8P
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 04:55:47 -0500
+Received: from [59.151.112.132] (port=32331 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cjNSa-0003XR-Rp
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 04:55:45 -0500
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Date: Thu, 2 Mar 2017 17:54:15 +0800
+Message-ID: <1488448458-4976-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-QvbAUs5bS6w8_BBFS7-2msfxPeDGE8HVS3z5LKMQKPw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 0/1] seabios: update to 1.10.2 release
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH V3 0/3] COLO-compare: Optimize the code and fix
+ some bug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +24,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, John Snow <jsnow@redhat.com>
+To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
+Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
+This series we will Optimize the code and fix some bug.
+Patch1: Rename colo_packet_compare() and remove duplicate check in compare icmp.
+Patch2: Optimize compare_common and increase compare performance.
+Patch3: Fix debug info always print bug.
 
+Zhang Chen (3):
+  COLO-compare: Rename compare function and remove duplicate codes
+  COLO-compare: Optimize compare_common and compare_tcp
+  COLO-compare: Fix icmp and udp compare different packet always dump
+    bug
 
-On 01/03/2017 18:40, Peter Maydell wrote:
-> On 1 March 2017 at 13:27, Stefan Hajnoczi <stefanha@gmail.com> wrote:
->> On Tue, Feb 28, 2017 at 9:06 AM, Gerd Hoffmann <kraxel@redhat.com> wrote:
->>> Our seabios.git mirror @ qemu.org seems to not sync properly.  The
->>> commit isn't there even though it was pushed a few days ago already
->>> (only the tag was pushed today).  John, can you have a look please?
->>> master branch, *-stable branches and all tags should be mirrored.
->>
->> Hi Gerd,
->> It looks like the git mirrors weren't updating.  I kicked it and the
->> necessary commit is now in the QEMU seabios.git mirror repo.
->>
->> It should be safe to merge this pull request now.
-> 
-> $ git submodule update
-> fatal: reference is not a tree: 5f4c7b13cdf9c450eb55645f4362ea58fa61b79b
-> Unable to checkout '5f4c7b13cdf9c450eb55645f4362ea58fa61b79b' in
-> submodule path 'roms/seabios'
-> 
-> Maybe this will update overnight?
+ net/colo-compare.c | 74 ++++++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 49 insertions(+), 25 deletions(-)
 
-The commit was there, but HEAD was not being updated.  Fixed now.
-
-Paolo
+-- 
+2.7.4
