@@ -1,16 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51284)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cjHvK-00016y-NN
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 23:01:03 -0500
+	(envelope-from <nikunj.dadhania@gmail.com>) id 1cjI2M-0003DO-Ky
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 23:08:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cjHvH-0003GI-Dx
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 23:01:02 -0500
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Date: Thu, 2 Mar 2017 11:59:30 +0800
-Message-ID: <1488427170-28050-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	(envelope-from <nikunj.dadhania@gmail.com>) id 1cjI2L-0006iX-JQ
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 23:08:18 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] net/filter-mirror: Follow CODING_STYLE
+In-Reply-To: <32926f1f-ec40-420f-210b-8f5991cc9d67@twiddle.net>
+References: <1488381854-7275-1-git-send-email-nikunj@linux.vnet.ibm.com>
+	<20170302002933.GL12571@umbus.fritz.box>
+	<32926f1f-ec40-420f-210b-8f5991cc9d67@twiddle.net>
+From: Nikunj Dadhania <nikunj.dadhania@gmail.com>
+Date: Thu, 2 Mar 2017 09:38:14 +0530
+Message-ID: <CALAZu3_e8AWbOpASxY9s97AyNd+CX=BYCMx3g4KrG2Ki6w1CZg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v1] target/ppc: rewrite
+ f[n]m[add, sub] using float64_muladd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,38 +24,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu devel <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Laurent Vivier <laurent@vivier.eu>, Michael Tokarev <mjt@tls.msk.ru>, Jason Wang <jasowang@redhat.com>
-Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, bharata@linux.vnet.ibm.com
 
-Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
----
- net/filter-mirror.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+On 02-Mar-2017 7:53 AM, "Richard Henderson" <rth@twiddle.net> wrote:
 
-diff --git a/net/filter-mirror.c b/net/filter-mirror.c
-index aa0aa98..72fa7c2 100644
---- a/net/filter-mirror.c
-+++ b/net/filter-mirror.c
-@@ -49,7 +49,7 @@ static int filter_mirror_send(CharBackend *chr_out,
- {
-     int ret = 0;
-     ssize_t size = 0;
--    uint32_t len =  0;
-+    uint32_t len = 0;
-     char *buf;
- 
-     size = iov_size(iov, iovcnt);
-@@ -77,8 +77,9 @@ err:
-     return ret < 0 ? ret : -EIO;
- }
- 
--static void
--redirector_to_filter(NetFilterState *nf, const uint8_t *buf, int len)
-+static void redirector_to_filter(NetFilterState *nf,
-+                                 const uint8_t *buf,
-+                                 int len)
- {
-     struct iovec iov = {
-         .iov_base = (void *)buf,
--- 
-2.7.4
+On 03/02/2017 11:29 AM, David Gibson wrote:
+
+> On Wed, Mar 01, 2017 at 08:54:14PM +0530, Nikunj A Dadhania wrote:
+>
+>> Use the softfloat api for fused multiply-add. Also, generate VXISI using
+>> a helper function by computing intermediate result.
+>>
+>
+> Um.. I really need some information on why this is a good thing to
+> do.  Is it a bugfix?  Enhancement? Simplification?
+>
+
+Looks like a bugfix to me.  Previously we were attempting the operation via
+float128 as an intermediate type, which can result in double rounding
+errors.
+
+Was discussed here
+
+https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg02000.html
+
+Nikunj
