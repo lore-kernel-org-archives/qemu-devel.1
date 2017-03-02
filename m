@@ -1,34 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cjHSs-0001AE-12
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 22:31:39 -0500
+	(envelope-from <peterx@redhat.com>) id 1cjHTl-0001V1-EQ
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 22:32:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cjHSo-0006B9-Se
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 22:31:38 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47435)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cjHSo-0006Ar-NZ
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 22:31:34 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cjHSm-0003JI-Ns
-	for <qemu-devel@nongnu.org>; Thu, 02 Mar 2017 03:31:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A2B092E80C4
-	for <qemu-devel@nongnu.org>; Thu,  2 Mar 2017 03:31:32 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 02 Mar 2017 03:16:45 -0000
-From: Javier <1617114@bugs.launchpad.net>
-Reply-To: Bug 1617114 <1617114@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160826013950.26404.19900.malonedeb@gac.canonical.com>
-Message-Id: <20170302031645.21468.70335.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1617114] Re: Qemu 2.6.0 freezes with windows
- guests
+	(envelope-from <peterx@redhat.com>) id 1cjHTi-0006ag-B4
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 22:32:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54394)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cjHTi-0006aD-4y
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 22:32:30 -0500
+From: Peter Xu <peterx@redhat.com>
+Date: Thu,  2 Mar 2017 11:32:18 +0800
+Message-Id: <1488425538-13785-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v3] intel_iommu: check misordered init when
+ realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,80 +23,72 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, yi.l.liu@intel.com, Marcel Apfelbaum <marcel@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>, "\\  Michael S . Tsirkin \\ " <mst@redhat.com>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
 
-More narrowed now, :-)
+Intel vIOMMU devices are created with "-device" parameter, while here
+actually we need to make sure the dmar device be created before other
+PCI devices (like vfio-pci, virtio-pci ones) so that we know iommu_fn
+will be setup correctly before realizations of those PCI devices (it is
+legal that PCI device fetch these info during its realization). Now this
+ordering yet cannot be achieved elsewhere, and devices will be created
+in the order that user specified. We need to avoid that.
 
-With 2.8.0 qemu keeps freezing bad, when used with "-display sdl".
-However when used with "-display gtk" or "-display none", then it
-doesn't freeze.
+This patch tries to detect this kind of misordering issue during init of
+VT-d device, then report to guest if misordering happened. In the
+future, we can provide something better to solve it, e.g., to support
+device init ordering, then we can live without this patch.
 
-So it seems "-display sdl" is the one totally breaking windows guest on
-qemu.
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+v3: added virtio-pci device detection since we have that requirement as
+    well now.
 
-Notice that if I don't try other displays, then I wouldn't even notice
-it was just the SDL display.
+PS. this patch should be needed along with Jason's:
+ "virtio: unbreak virtio-pci with IOMMU after caching ring translations"
+to make sure virtio devices with vt-d are safe for 2.9.
+---
+ hw/i386/intel_iommu.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-If there's no intention on fixing SDL, given other alternatives are
-available, in particular a GTK one for displaying the graphics output,
-then I'm OK with a "no fix" for this.
-
-As a bonus, it seems no display (-display none), with current qxl-dod
-windows driver from Fedora project, seems to be working fine with spice.
-That was not working before...  So getting away from SDL display now.
-But no sure if this means SDL never again?  :-)
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1617114
-
-Title:
-  Qemu 2.6.0 freezes with windows guests
-
-Status in QEMU:
-  New
-
-Bug description:
-  When launching qemu with the same command line as before 2.6.0, with
-  SDL display, with virtio, for a win-10 guest:
-
-  qemu-system-x86_64 -enable-kvm -name win-10 -machine type=3Dpc,accel=3Dkvm
-  -cpu host -smp cores=3D1,threads=3D2,sockets=3D1 -m 2.7G -balloon virtio
-  -drive
-  file=3D/home/<username>/.qemu/imgs/win10-coe.qcow2,index=3D0,media=3Ddisk=
-,if=3Dvirtio
-  -drive file=3D/usr/share/virtio/virtio-win.iso,index=3D1,media=3Dcdrom
-  -drive file=3D/usr/share/spice-guest-tools/spice-guest-
-  tools.iso,index=3D2,media=3Dcdrom -net nic,model=3Dvirtio -net
-  tap,ifname=3Dtap0,script=3Dno,downscript=3Dno,vhost=3Don -usbdevice tablet
-  -usb -display sdl -vga qxl -soundhw ac97 -rtc base=3Dlocaltime
-  -usbdevice host:0b0e:0032 -usbdevice host:0b0e:0348 -usbdevice
-  host:0b0e:0410
-
-  Qemu at some point just freezes with no error message at all with
-  newer version 2.6.0-1.
-
-  Reverting to prior version 2.5.1-1, things go back to normal.
-
-  A simple way to accelerate the freeze is to have qemu launch in a
-  workspace/desktop, and then move to a different workspace/desktop, and
-  then move back to the qemu workspace/desktop, and you'll find out it's
-  frozen.
-
-  BTW, there's no way to get into qemu monitor mode terminal at all once
-  frozen. The monitor terminal shows up, but does nothing...
-
-  Perhaps it's useful to notice that I have up to date win-10 virtio
-  drivers for ethernet, scsi/storage, qxl-dod, balloon, and serial
-  interface drivers. The ISO version used is 0.1.118.1 (virtio-win AUR
-  package).
-
-  Using the standard (std) qemu video driver, rather than the qxl-dod
-  one makes no difference BTW.
-
-  Just in case, running on up to date x86-64 Arch, plain qemu command
-  line.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1617114/+subscriptions
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 22d8226..1077f90 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -2560,6 +2560,24 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+     return true;
+ }
+ 
++/*
++ * TODO: we should have a better way to achieve the ordering rather
++ * than this misorder check explicitly against vfio-pci and virtio-pci
++ * devices. Here, there's no easy way to detect init of virtio-pci
++ * devices, instead we detect the virtio bus.
++ */
++static bool vtd_detected_misorder_init(Error **errp)
++{
++    if (object_resolve_path_type("", "vfio-pci", NULL) ||
++        object_resolve_path_type("", "virtio-pci-bus", NULL)) {
++        error_setg(errp, "Please specify \"intel-iommu\" before "
++                   "all the rest of the devices.");
++        return true;
++    }
++
++    return false;
++}
++
+ static void vtd_realize(DeviceState *dev, Error **errp)
+ {
+     PCMachineState *pcms = PC_MACHINE(qdev_get_machine());
+@@ -2567,6 +2585,10 @@ static void vtd_realize(DeviceState *dev, Error **errp)
+     IntelIOMMUState *s = INTEL_IOMMU_DEVICE(dev);
+     X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(dev);
+ 
++    if (vtd_detected_misorder_init(errp)) {
++        return;
++    }
++
+     VTD_DPRINTF(GENERAL, "");
+     x86_iommu->type = TYPE_INTEL;
+ 
+-- 
+2.7.4
