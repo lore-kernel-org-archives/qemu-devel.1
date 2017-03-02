@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=2277aaf80=Paul.Durrant@citrix.com>)
-	id 1cjOcN-0003af-JR
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 06:09:56 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cjOkL-0007Mb-Sh
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 06:18:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=2277aaf80=Paul.Durrant@citrix.com>)
-	id 1cjOcL-0005Pc-EP
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 06:09:55 -0500
-Received: from smtp02.citrix.com ([66.165.176.63]:5663)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=2277aaf80=Paul.Durrant@citrix.com>)
-	id 1cjOcL-0005Ob-7i
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 06:09:53 -0500
-From: Paul Durrant <paul.durrant@citrix.com>
-Date: Thu, 2 Mar 2017 11:09:43 +0000
-Message-ID: <1488452986-24501-3-git-send-email-paul.durrant@citrix.com>
-In-Reply-To: <1488452986-24501-1-git-send-email-paul.durrant@citrix.com>
-References: <1488452986-24501-1-git-send-email-paul.durrant@citrix.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cjOkK-0008FY-QM
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 06:18:09 -0500
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:36663)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cjOkK-0008FI-Kh
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 06:18:08 -0500
+Received: by mail-wr0-x231.google.com with SMTP id u108so49598514wrb.3
+	for <qemu-devel@nongnu.org>; Thu, 02 Mar 2017 03:18:08 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 2/5] xen: rename xen_modified_memory() to
- xen_hvm_modified_memory()
+In-Reply-To: <1488272804-27144-1-git-send-email-kraxel@redhat.com>
+References: <1488272804-27144-1-git-send-email-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 2 Mar 2017 11:17:46 +0000
+Message-ID: <CAFEAcA8ekZ0BxeXkH3mNcChZ7BCHGx=+Y+KEkMP9Jqh6iWfjdg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 0/1] seabios: update to 1.10.2 release
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,84 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, John Snow <jsnow@redhat.com>
 
-This patch is a purely cosmetic change that avoids a name collision in
-a subsequent patch.
+On 28 February 2017 at 09:06, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>   Hi,
+>
+> Here comes the seabios update for qemu 2.9,
+> the just tagged 1.10.2 release.
+>
+> Our seabios.git mirror @ qemu.org seems to not sync properly.  The
+> commit isn't there even though it was pushed a few days ago already
+> (only the tag was pushed today).  John, can you have a look please?
+> master branch, *-stable branches and all tags should be mirrored.
+>
+> thanks,
+>   Gerd
+>
+> The following changes since commit 9b9fbe8a4e9eec9072ee2697a6af59144442785f:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/pull-ui-20170227-1' into staging (2017-02-27 19:19:46 +0000)
+>
+> are available in the git repository at:
+>
+>
+>   git://git.kraxel.org/qemu tags/pull-seabios-20170228-1
+>
+> for you to fetch changes up to 8779fccbef0c2e97fd6564ddf9f1df9fc724f2f0:
+>
+>   seabios: update to 1.10.2 release (2017-02-28 09:54:23 +0100)
+>
+> ----------------------------------------------------------------
+> seabios: update to 1.10.2 release
 
-Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-Reviewed-by: Anthony Perard <anthony.perard@citrix.com>
----
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>
----
- include/exec/ram_addr.h | 4 ++--
- include/hw/xen/xen.h    | 2 +-
- xen-hvm-stub.c          | 2 +-
- xen-hvm.c               | 2 +-
- 4 files changed, 5 insertions(+), 5 deletions(-)
+Applied, thanks.
 
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index 3e79466..8715af6 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -259,7 +259,7 @@ static inline void cpu_physical_memory_set_dirty_range(ram_addr_t start,
- 
-     rcu_read_unlock();
- 
--    xen_modified_memory(start, length);
-+    xen_hvm_modified_memory(start, length);
- }
- 
- #if !defined(_WIN32)
-@@ -313,7 +313,7 @@ static inline void cpu_physical_memory_set_dirty_lebitmap(unsigned long *bitmap,
- 
-         rcu_read_unlock();
- 
--        xen_modified_memory(start, pages << TARGET_PAGE_BITS);
-+        xen_hvm_modified_memory(start, pages << TARGET_PAGE_BITS);
-     } else {
-         uint8_t clients = tcg_enabled() ? DIRTY_CLIENTS_ALL : DIRTY_CLIENTS_NOCODE;
-         /*
-diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
-index 09c2ce5..2b1733b 100644
---- a/include/hw/xen/xen.h
-+++ b/include/hw/xen/xen.h
-@@ -43,7 +43,7 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory);
- 
- void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size,
-                    struct MemoryRegion *mr, Error **errp);
--void xen_modified_memory(ram_addr_t start, ram_addr_t length);
-+void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length);
- 
- void xen_register_framebuffer(struct MemoryRegion *mr);
- 
-diff --git a/xen-hvm-stub.c b/xen-hvm-stub.c
-index c500325..3ca6c51 100644
---- a/xen-hvm-stub.c
-+++ b/xen-hvm-stub.c
-@@ -50,7 +50,7 @@ void xen_register_framebuffer(MemoryRegion *mr)
- {
- }
- 
--void xen_modified_memory(ram_addr_t start, ram_addr_t length)
-+void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length)
- {
- }
- 
-diff --git a/xen-hvm.c b/xen-hvm.c
-index dbb8c66..edf4983 100644
---- a/xen-hvm.c
-+++ b/xen-hvm.c
-@@ -1391,7 +1391,7 @@ void xen_shutdown_fatal_error(const char *fmt, ...)
-     qemu_system_shutdown_request();
- }
- 
--void xen_modified_memory(ram_addr_t start, ram_addr_t length)
-+void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length)
- {
-     if (unlikely(xen_in_migration)) {
-         int rc;
--- 
-2.1.4
+-- PMM
