@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59799)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cjG7o-0005Cb-Hw
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 21:05:50 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1cjGN8-0000QD-1K
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 21:21:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cjG7k-00064J-GU
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 21:05:48 -0500
-Received: from mail.kernel.org ([198.145.29.136]:36540)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1cjG7k-00063Z-7N
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 21:05:44 -0500
-Date: Wed, 1 Mar 2017 18:05:37 -0800 (PST)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <1487861635-17560-6-git-send-email-paul.durrant@citrix.com>
-Message-ID: <alpine.DEB.2.10.1703011735140.13077@sstabellini-ThinkPad-X260>
-References: <1487861635-17560-1-git-send-email-paul.durrant@citrix.com>
-	<1487861635-17560-6-git-send-email-paul.durrant@citrix.com>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH 5/5] xen: use libxendevicemodel when
- available
+	(envelope-from <aik@ozlabs.ru>) id 1cjGN4-0006cD-Q4
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 21:21:38 -0500
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Date: Thu,  2 Mar 2017 13:21:27 +1100
+Message-Id: <20170302022127.13741-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [PATCH qemu v3] exec, kvm,
+ target-ppc: Move getrampagesize() to common code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,306 +18,346 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <paul.durrant@citrix.com>
-Cc: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
+To: qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, 23 Feb 2017, Paul Durrant wrote:
-> This patch modifies the wrapper functions in xen_common.h to use the
-> new xendevicemodel interface if it is available along with compatibility
-> code to use the old libxenctrl interface if it is not.
-> 
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+getrampagesize() returns the largest supported page size and mainly
+used to know if huge pages are enabled.
 
-Hi Paul,
+However is implemented in target-ppc/kvm.c and not available
+in TCG or other architectures.
 
-Sorry for the late reply, I am flooded with patches over here. Aside
-from Anthony's comments, the other patches of this series look good to
-me.
+This renames and moves gethugepagesize() to mmap-alloc.c where
+fd-based analog of it is already implemented. This renames and moves
+getrampagesize() to exec.c as it seems to be the common place for
+helpers like this.
 
-The Xen side patches are not in, are they? Do you have a Xen git branch
-with them so that I can test this patch properly?
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+Changes:
+v3:
+* in exec.c, moved "include numa.h" under #ifndef CONFIG_USER_ONLY to
+fix linux-user target build
 
-This patch breaks the build against Xen >= 4.3, with:
+v2:
+* rebased on top of ppc-for-2.9-20170301
+---
+ include/exec/ram_addr.h   |   1 +
+ include/qemu/mmap-alloc.h |   2 +
+ exec.c                    |  82 +++++++++++++++++++++++++++++++++++
+ target/ppc/kvm.c          | 108 +++-------------------------------------------
+ util/mmap-alloc.c         |  25 +++++++++++
+ 5 files changed, 115 insertions(+), 103 deletions(-)
 
-/local/qemu-upstream/xen-common.c: In function 'xen_init':
-/local/qemu-upstream/xen-common.c:135:9: error: implicit declaration of function 'xenforeignmemory_close' [-Werror=implicit-function-declaration]
-/local/qemu-upstream/xen-common.c:135:9: error: nested extern declaration of 'xenforeignmemory_close' [-Werror=nested-externs]
-cc1: all warnings being treated as errors
-
-
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> ---
->  include/hw/xen/xen_common.h | 114 +++++++++++++++++++++++++++++++-------------
->  xen-common.c                |   8 ++++
->  2 files changed, 89 insertions(+), 33 deletions(-)
-> 
-> diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
-> index 31cf25f..2c2a61b 100644
-> --- a/include/hw/xen/xen_common.h
-> +++ b/include/hw/xen/xen_common.h
-> @@ -9,6 +9,7 @@
->  #undef XC_WANT_COMPAT_EVTCHN_API
->  #undef XC_WANT_COMPAT_GNTTAB_API
->  #undef XC_WANT_COMPAT_MAP_FOREIGN_API
-> +#undef XC_WANT_COMPAT_DEVICEMODEL_API
->  
->  #include <xenctrl.h>
->  #include <xenstore.h>
-> @@ -26,48 +27,95 @@ extern xc_interface *xen_xc;
->   * We don't support Xen prior to 4.2.0.
->   */
->  
-> +#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 490
-> +
-> +typedef xc_interface xendevicemodel_handle;
-> +
-> +#define xendevicemodel_open(l, f) xen_xc
-> +
-> +#define xendevicemodel_map_io_range_to_ioreq_server \
-
-Could you please use static inline functions for compatibility rather
-than macros? That way we are going to have some more compile time
-checks. Or at least macros with parameters.
-
-
-> +    xc_hvm_map_io_range_to_ioreq_server
-> +#define xendevicemodel_unmap_io_range_from_ioreq_server \
-> +    xc_hvm_unmap_io_range_from_ioreq_server
-> +#define xendevicemodel_map_pcidev_to_ioreq_server \
-> +    xc_hvm_map_pcidev_to_ioreq_server
-> +#define xendevicemodel_unmap_pcidev_from_ioreq_server \
-> +    xc_hvm_unmap_pcidev_from_ioreq_server
-> +#define xendevicemodel_create_ioreq_server \
-> +    xc_hvm_create_ioreq_server
-> +#define xendevicemodel_destroy_ioreq_server \
-> +    xc_hvm_destroy_ioreq_server
-> +#define xendevicemodel_get_ioreq_server_info \
-> +    xc_hvm_get_ioreq_server_info
-> +#define xendevicemodel_set_ioreq_server_state \
-> +    xc_hvm_set_ioreq_server_state
-> +#define xendevicemodel_set_pci_intx_level \
-> +    xc_hvm_set_pci_intx_level
-> +#define xendevicemodel_set_pci_link_route \
-> +    xc_hvm_set_pci_link_route
-> +#define xendevicemodel_set_isa_irq_level \
-> +    xc_hvm_set_isa_irq_level
-> +#define xendevicemodel_inject_msi \
-> +    xc_hvm_inject_msi
-> +#define xendevicemodel_set_mem_type \
-> +    xc_hvm_set_mem_type
-> +#define xendevicemodel_track_dirty_vram \
-> +    xc_hvm_track_dirty_vram
-> +#define xendevicemodel_modified_memory \
-> +    xc_hvm_modified_memory
-> +
-> +#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 490 */
-> +
-> +#include <xendevicemodel.h>
-> +
-> +#endif
-> +
-> +extern xendevicemodel_handle *xen_dmod;
-> +
->  static inline int xen_set_mem_type(domid_t domid, hvmmem_type_t type,
->                                     uint64_t first_pfn, uint32_t nr)
->  {
-> -    return xc_hvm_set_mem_type(xen_xc, domid, type, first_pfn, nr);
-> +    return xendevicemodel_set_mem_type(xen_dmod, domid, type, first_pfn,
-> +                                       nr);
->  }
->  
->  static inline int xen_set_pci_intx_level(domid_t domid, uint16_t segment,
->                                           uint8_t bus, uint8_t device,
->                                           uint8_t intx, unsigned int level)
->  {
-> -    return xc_hvm_set_pci_intx_level(xen_xc, domid, segment, bus, device,
-> -                                     intx, level);
-> +    return xendevicemodel_set_pci_intx_level(xen_dmod, domid, segment, bus,
-> +                                             device, intx, level);
->  }
->  
->  static inline int xen_set_pci_link_route(domid_t domid, uint8_t link,
->                                           uint8_t irq)
->  {
-> -    return xc_hvm_set_pci_link_route(xen_xc, domid, link, irq);
-> +    return xendevicemodel_set_pci_link_route(xen_dmod, domid, link, irq);
->  }
->  
->  static inline int xen_inject_msi(domid_t domid, uint64_t msi_addr,
->                                   uint32_t msi_data)
->  {
-> -    return xc_hvm_inject_msi(xen_xc, domid, msi_addr, msi_data);
-> +    return xendevicemodel_inject_msi(xen_dmod, domid, msi_addr, msi_data);
->  }
->  
->  static inline int xen_set_isa_irq_level(domid_t domid, uint8_t irq,
->                                          unsigned int level)
->  {
-> -    return xc_hvm_set_isa_irq_level(xen_xc, domid, irq, level);
-> +    return xendevicemodel_set_isa_irq_level(xen_dmod, domid, irq, level);
->  }
->  
->  static inline int xen_track_dirty_vram(domid_t domid, uint64_t first_pfn,
->                                         uint32_t nr, unsigned long *bitmap)
->  {
-> -    return xc_hvm_track_dirty_vram(xen_xc, domid, first_pfn, nr, bitmap);
-> +    return xendevicemodel_track_dirty_vram(xen_dmod, domid, first_pfn, nr,
-> +                                           bitmap);
->  }
->  
->  static inline int xen_modified_memory(domid_t domid, uint64_t first_pfn,
->                                        uint32_t nr)
->  {
-> -    return xc_hvm_modified_memory(xen_xc, domid, first_pfn, nr);
-> +    return xendevicemodel_modified_memory(xen_dmod, domid, first_pfn, nr);
->  }
->  
->  /* Xen 4.2 through 4.6 */
-> @@ -285,8 +333,8 @@ static inline void xen_map_memory_section(domid_t dom,
->      }
->  
->      trace_xen_map_mmio_range(ioservid, start_addr, end_addr);
-> -    xc_hvm_map_io_range_to_ioreq_server(xen_xc, dom, ioservid, 1,
-> -                                        start_addr, end_addr);
-> +    xendevicemodel_map_io_range_to_ioreq_server(xen_dmod, dom, ioservid, 1,
-> +                                                start_addr, end_addr);
->  }
->  
->  static inline void xen_unmap_memory_section(domid_t dom,
-> @@ -302,8 +350,8 @@ static inline void xen_unmap_memory_section(domid_t dom,
->      }
->  
->      trace_xen_unmap_mmio_range(ioservid, start_addr, end_addr);
-> -    xc_hvm_unmap_io_range_from_ioreq_server(xen_xc, dom, ioservid,
-> -                                            1, start_addr, end_addr);
-> +    xendevicemodel_unmap_io_range_from_ioreq_server(xen_dmod, dom, ioservid,
-> +                                                    1, start_addr, end_addr);
->  }
->  
->  static inline void xen_map_io_section(domid_t dom,
-> @@ -319,8 +367,8 @@ static inline void xen_map_io_section(domid_t dom,
->      }
->  
->      trace_xen_map_portio_range(ioservid, start_addr, end_addr);
-> -    xc_hvm_map_io_range_to_ioreq_server(xen_xc, dom, ioservid, 0,
-> -                                        start_addr, end_addr);
-> +    xendevicemodel_map_io_range_to_ioreq_server(xen_dmod, dom, ioservid, 0,
-> +                                                start_addr, end_addr);
->  }
->  
->  static inline void xen_unmap_io_section(domid_t dom,
-> @@ -336,8 +384,8 @@ static inline void xen_unmap_io_section(domid_t dom,
->      }
->  
->      trace_xen_unmap_portio_range(ioservid, start_addr, end_addr);
-> -    xc_hvm_unmap_io_range_from_ioreq_server(xen_xc, dom, ioservid,
-> -                                            0, start_addr, end_addr);
-> +    xendevicemodel_unmap_io_range_from_ioreq_server(xen_dmod, dom, ioservid,
-> +                                                    0, start_addr, end_addr);
->  }
->  
->  static inline void xen_map_pcidev(domid_t dom,
-> @@ -350,10 +398,10 @@ static inline void xen_map_pcidev(domid_t dom,
->  
->      trace_xen_map_pcidev(ioservid, pci_bus_num(pci_dev->bus),
->                           PCI_SLOT(pci_dev->devfn), PCI_FUNC(pci_dev->devfn));
-> -    xc_hvm_map_pcidev_to_ioreq_server(xen_xc, dom, ioservid, 0,
-> -                                      pci_bus_num(pci_dev->bus),
-> -                                      PCI_SLOT(pci_dev->devfn),
-> -                                      PCI_FUNC(pci_dev->devfn));
-> +    xendevicemodel_map_pcidev_to_ioreq_server(xen_dmod, dom, ioservid, 0,
-> +                                              pci_bus_num(pci_dev->bus),
-> +                                              PCI_SLOT(pci_dev->devfn),
-> +                                              PCI_FUNC(pci_dev->devfn));
->  }
->  
->  static inline void xen_unmap_pcidev(domid_t dom,
-> @@ -366,18 +414,18 @@ static inline void xen_unmap_pcidev(domid_t dom,
->  
->      trace_xen_unmap_pcidev(ioservid, pci_bus_num(pci_dev->bus),
->                             PCI_SLOT(pci_dev->devfn), PCI_FUNC(pci_dev->devfn));
-> -    xc_hvm_unmap_pcidev_from_ioreq_server(xen_xc, dom, ioservid, 0,
-> -                                          pci_bus_num(pci_dev->bus),
-> -                                          PCI_SLOT(pci_dev->devfn),
-> -                                          PCI_FUNC(pci_dev->devfn));
-> +    xendevicemodel_unmap_pcidev_from_ioreq_server(xen_dmod, dom, ioservid, 0,
-> +                                                  pci_bus_num(pci_dev->bus),
-> +                                                  PCI_SLOT(pci_dev->devfn),
-> +                                                  PCI_FUNC(pci_dev->devfn));
->  }
->  
->  static inline void xen_create_ioreq_server(domid_t dom,
->                                             ioservid_t *ioservid)
->  {
-> -    int rc = xc_hvm_create_ioreq_server(xen_xc, dom,
-> -                                        HVM_IOREQSRV_BUFIOREQ_ATOMIC,
-> -                                        ioservid);
-> +    int rc = xendevicemodel_create_ioreq_server(xen_dmod, dom,
-> +                                                HVM_IOREQSRV_BUFIOREQ_ATOMIC,
-> +                                                ioservid);
->  
->      if (rc == 0) {
->          trace_xen_ioreq_server_create(*ioservid);
-> @@ -397,7 +445,7 @@ static inline void xen_destroy_ioreq_server(domid_t dom,
->      }
->  
->      trace_xen_ioreq_server_destroy(ioservid);
-> -    xc_hvm_destroy_ioreq_server(xen_xc, dom, ioservid);
-> +    xendevicemodel_destroy_ioreq_server(xen_dmod, dom, ioservid);
->  }
->  
->  static inline int xen_get_ioreq_server_info(domid_t dom,
-> @@ -412,9 +460,9 @@ static inline int xen_get_ioreq_server_info(domid_t dom,
->                                                   bufioreq_evtchn);
->      }
->  
-> -    return xc_hvm_get_ioreq_server_info(xen_xc, dom, ioservid,
-> -                                        ioreq_pfn, bufioreq_pfn,
-> -                                        bufioreq_evtchn);
-> +    return xendevicemodel_get_ioreq_server_info(xen_dmod, dom, ioservid,
-> +                                                ioreq_pfn, bufioreq_pfn,
-> +                                                bufioreq_evtchn);
->  }
->  
->  static inline int xen_set_ioreq_server_state(domid_t dom,
-> @@ -426,8 +474,8 @@ static inline int xen_set_ioreq_server_state(domid_t dom,
->      }
->  
->      trace_xen_ioreq_server_state(ioservid, enable);
-> -    return xc_hvm_set_ioreq_server_state(xen_xc, dom, ioservid,
-> -                                         enable);
-> +    return xendevicemodel_set_ioreq_server_state(xen_dmod, dom, ioservid,
-> +                                                 enable);
->  }
->  
->  #endif
-> diff --git a/xen-common.c b/xen-common.c
-> index 703e7a5..ae76150 100644
-> --- a/xen-common.c
-> +++ b/xen-common.c
-> @@ -27,6 +27,7 @@
->  
->  xc_interface *xen_xc;
->  xenforeignmemory_handle *xen_fmem;
-> +xendevicemodel_handle *xen_dmod;
->  
->  static int store_dev_info(int domid, Chardev *cs, const char *string)
->  {
-> @@ -128,6 +129,13 @@ static int xen_init(MachineState *ms)
->          xc_interface_close(xen_xc);
->          return -1;
->      }
-> +    xen_dmod = xendevicemodel_open(0, 0);
-> +    if (xen_dmod == NULL) {
-> +        xen_pv_printf(NULL, 0, "can't open xen devicemodel interface\n");
-> +        xenforeignmemory_close(xen_fmem);
-> +        xc_interface_close(xen_xc);
-> +        return -1;
-> +    }
->      qemu_add_vm_change_state_handler(xen_change_state_handler, NULL);
->  
->      global_state_set_optional();
-> -- 
-> 2.1.4
-> 
+diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+index 3e79466a44..cd432e73ae 100644
+--- a/include/exec/ram_addr.h
++++ b/include/exec/ram_addr.h
+@@ -52,6 +52,7 @@ static inline void *ramblock_ptr(RAMBlock *block, ram_addr_t offset)
+     return (char *)block->host + offset;
+ }
+ 
++long qemu_getrampagesize(void);
+ ram_addr_t last_ram_offset(void);
+ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
+                                    bool share, const char *mem_path,
+diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
+index 933c024ac5..50385e3f81 100644
+--- a/include/qemu/mmap-alloc.h
++++ b/include/qemu/mmap-alloc.h
+@@ -5,6 +5,8 @@
+ 
+ size_t qemu_fd_getpagesize(int fd);
+ 
++size_t qemu_mempath_getpagesize(const char *mem_path);
++
+ void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared);
+ 
+ void qemu_ram_munmap(void *ptr, size_t size);
+diff --git a/exec.c b/exec.c
+index 3adf2b1861..4c90cbf366 100644
+--- a/exec.c
++++ b/exec.c
+@@ -42,6 +42,7 @@
+ #include "exec/memory.h"
+ #include "exec/ioport.h"
+ #include "sysemu/dma.h"
++#include "sysemu/numa.h"
+ #include "exec/address-spaces.h"
+ #include "sysemu/xen-mapcache.h"
+ #include "trace-root.h"
+@@ -1251,6 +1252,87 @@ void qemu_mutex_unlock_ramlist(void)
+ }
+ 
+ #ifdef __linux__
++/*
++ * FIXME TOCTTOU: this iterates over memory backends' mem-path, which
++ * may or may not name the same files / on the same filesystem now as
++ * when we actually open and map them.  Iterate over the file
++ * descriptors instead, and use qemu_fd_getpagesize().
++ */
++static int find_max_supported_pagesize(Object *obj, void *opaque)
++{
++    char *mem_path;
++    long *hpsize_min = opaque;
++
++    if (object_dynamic_cast(obj, TYPE_MEMORY_BACKEND)) {
++        mem_path = object_property_get_str(obj, "mem-path", NULL);
++        if (mem_path) {
++            long hpsize = qemu_mempath_getpagesize(mem_path);
++            if (hpsize < *hpsize_min) {
++                *hpsize_min = hpsize;
++            }
++        } else {
++            *hpsize_min = getpagesize();
++        }
++    }
++
++    return 0;
++}
++
++long qemu_getrampagesize(void)
++{
++    long hpsize = LONG_MAX;
++    long mainrampagesize;
++    Object *memdev_root;
++
++    if (mem_path) {
++        mainrampagesize = qemu_mempath_getpagesize(mem_path);
++    } else {
++        mainrampagesize = getpagesize();
++    }
++
++    /* it's possible we have memory-backend objects with
++     * hugepage-backed RAM. these may get mapped into system
++     * address space via -numa parameters or memory hotplug
++     * hooks. we want to take these into account, but we
++     * also want to make sure these supported hugepage
++     * sizes are applicable across the entire range of memory
++     * we may boot from, so we take the min across all
++     * backends, and assume normal pages in cases where a
++     * backend isn't backed by hugepages.
++     */
++    memdev_root = object_resolve_path("/objects", NULL);
++    if (memdev_root) {
++        object_child_foreach(memdev_root, find_max_supported_pagesize, &hpsize);
++    }
++    if (hpsize == LONG_MAX) {
++        /* No additional memory regions found ==> Report main RAM page size */
++        return mainrampagesize;
++    }
++
++    /* If NUMA is disabled or the NUMA nodes are not backed with a
++     * memory-backend, then there is at least one node using "normal" RAM,
++     * so if its page size is smaller we have got to report that size instead.
++     */
++    if (hpsize > mainrampagesize &&
++        (nb_numa_nodes == 0 || numa_info[0].node_memdev == NULL)) {
++        static bool warned;
++        if (!warned) {
++            error_report("Huge page support disabled (n/a for main memory).");
++            warned = true;
++        }
++        return mainrampagesize;
++    }
++
++    return hpsize;
++}
++#else
++long qemu_getrampagesize(void)
++{
++    return getpagesize();
++}
++#endif
++
++#ifdef __linux__
+ static int64_t get_file_size(int fd)
+ {
+     int64_t size = lseek(fd, 0, SEEK_END);
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 18f33f2d93..d2835ef6b3 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -43,8 +43,10 @@
+ #include "trace.h"
+ #include "exec/gdbstub.h"
+ #include "exec/memattrs.h"
++#include "exec/ram_addr.h"
+ #include "sysemu/hostmem.h"
+ #include "qemu/cutils.h"
++#include "qemu/mmap-alloc.h"
+ #if defined(TARGET_PPC64)
+ #include "hw/ppc/spapr_cpu_core.h"
+ #endif
+@@ -331,106 +333,6 @@ static void kvm_get_smmu_info(PowerPCCPU *cpu, struct kvm_ppc_smmu_info *info)
+     kvm_get_fallback_smmu_info(cpu, info);
+ }
+ 
+-static long gethugepagesize(const char *mem_path)
+-{
+-    struct statfs fs;
+-    int ret;
+-
+-    do {
+-        ret = statfs(mem_path, &fs);
+-    } while (ret != 0 && errno == EINTR);
+-
+-    if (ret != 0) {
+-        fprintf(stderr, "Couldn't statfs() memory path: %s\n",
+-                strerror(errno));
+-        exit(1);
+-    }
+-
+-#define HUGETLBFS_MAGIC       0x958458f6
+-
+-    if (fs.f_type != HUGETLBFS_MAGIC) {
+-        /* Explicit mempath, but it's ordinary pages */
+-        return getpagesize();
+-    }
+-
+-    /* It's hugepage, return the huge page size */
+-    return fs.f_bsize;
+-}
+-
+-/*
+- * FIXME TOCTTOU: this iterates over memory backends' mem-path, which
+- * may or may not name the same files / on the same filesystem now as
+- * when we actually open and map them.  Iterate over the file
+- * descriptors instead, and use qemu_fd_getpagesize().
+- */
+-static int find_max_supported_pagesize(Object *obj, void *opaque)
+-{
+-    char *mem_path;
+-    long *hpsize_min = opaque;
+-
+-    if (object_dynamic_cast(obj, TYPE_MEMORY_BACKEND)) {
+-        mem_path = object_property_get_str(obj, "mem-path", NULL);
+-        if (mem_path) {
+-            long hpsize = gethugepagesize(mem_path);
+-            if (hpsize < *hpsize_min) {
+-                *hpsize_min = hpsize;
+-            }
+-        } else {
+-            *hpsize_min = getpagesize();
+-        }
+-    }
+-
+-    return 0;
+-}
+-
+-static long getrampagesize(void)
+-{
+-    long hpsize = LONG_MAX;
+-    long mainrampagesize;
+-    Object *memdev_root;
+-
+-    if (mem_path) {
+-        mainrampagesize = gethugepagesize(mem_path);
+-    } else {
+-        mainrampagesize = getpagesize();
+-    }
+-
+-    /* it's possible we have memory-backend objects with
+-     * hugepage-backed RAM. these may get mapped into system
+-     * address space via -numa parameters or memory hotplug
+-     * hooks. we want to take these into account, but we
+-     * also want to make sure these supported hugepage
+-     * sizes are applicable across the entire range of memory
+-     * we may boot from, so we take the min across all
+-     * backends, and assume normal pages in cases where a
+-     * backend isn't backed by hugepages.
+-     */
+-    memdev_root = object_resolve_path("/objects", NULL);
+-    if (memdev_root) {
+-        object_child_foreach(memdev_root, find_max_supported_pagesize, &hpsize);
+-    }
+-    if (hpsize == LONG_MAX) {
+-        /* No additional memory regions found ==> Report main RAM page size */
+-        return mainrampagesize;
+-    }
+-
+-    /* If NUMA is disabled or the NUMA nodes are not backed with a
+-     * memory-backend, then there is at least one node using "normal" RAM,
+-     * so if its page size is smaller we have got to report that size instead.
+-     */
+-    if (hpsize > mainrampagesize &&
+-        (nb_numa_nodes == 0 || numa_info[0].node_memdev == NULL)) {
+-        static bool warned;
+-        if (!warned) {
+-            error_report("Huge page support disabled (n/a for main memory).");
+-            warned = true;
+-        }
+-        return mainrampagesize;
+-    }
+-
+-    return hpsize;
+-}
+-
+ static bool kvm_valid_page_size(uint32_t flags, long rampgsize, uint32_t shift)
+ {
+     if (!(flags & KVM_PPC_PAGE_SIZES_REAL)) {
+@@ -462,7 +364,7 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
+     }
+ 
+     if (!max_cpu_page_size) {
+-        max_cpu_page_size = getrampagesize();
++        max_cpu_page_size = qemu_getrampagesize();
+     }
+ 
+     /* Convert to QEMU form */
+@@ -523,7 +425,7 @@ bool kvmppc_is_mem_backend_page_size_ok(char *obj_path)
+     long pagesize;
+ 
+     if (mempath) {
+-        pagesize = gethugepagesize(mempath);
++        pagesize = qemu_mempath_getpagesize(mempath);
+     } else {
+         pagesize = getpagesize();
+     }
+@@ -2207,7 +2109,7 @@ uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift)
+     /* Find the largest hardware supported page size that's less than
+      * or equal to the (logical) backing page size of guest RAM */
+     kvm_get_smmu_info(POWERPC_CPU(first_cpu), &info);
+-    rampagesize = getrampagesize();
++    rampagesize = qemu_getrampagesize();
+     best_page_shift = 0;
+ 
+     for (i = 0; i < KVM_PPC_PAGE_SIZES_MAX_SZ; i++) {
+diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+index 2f55f5e94f..3ec029a9ea 100644
+--- a/util/mmap-alloc.c
++++ b/util/mmap-alloc.c
+@@ -40,6 +40,31 @@ size_t qemu_fd_getpagesize(int fd)
+     return getpagesize();
+ }
+ 
++size_t qemu_mempath_getpagesize(const char *mem_path)
++{
++#ifdef CONFIG_LINUX
++    struct statfs fs;
++    int ret;
++
++    do {
++        ret = statfs(mem_path, &fs);
++    } while (ret != 0 && errno == EINTR);
++
++    if (ret != 0) {
++        fprintf(stderr, "Couldn't statfs() memory path: %s\n",
++                strerror(errno));
++        exit(1);
++    }
++
++    if (fs.f_type == HUGETLBFS_MAGIC) {
++        /* It's hugepage, return the huge page size */
++        return fs.f_bsize;
++    }
++#endif
++
++    return getpagesize();
++}
++
+ void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
+ {
+     /*
+-- 
+2.11.0
