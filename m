@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cjTGX-0004Ii-Lb
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 11:07:42 -0500
+	(envelope-from <eblake@redhat.com>) id 1cjTGv-0004YN-O9
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 11:08:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cjTGV-0006vF-0y
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 11:07:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54406)
+	(envelope-from <eblake@redhat.com>) id 1cjTGu-0007Bp-QV
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 11:08:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35976)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cjTGU-0006ud-Rs
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 11:07:38 -0500
-Date: Thu, 2 Mar 2017 13:07:34 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170302160734.GB11509@thinpad.lan.raisama.net>
-References: <20170227162501.29280-1-ehabkost@redhat.com>
-	<CAFEAcA8b_tdQAP6YVDRaZKzHLed5xKbfABtJUV0U43HpkTiBdg@mail.gmail.com>
-	<20170227194134.GH2778@thinpad.lan.raisama.net>
-	<20170227205753.60b8a225@bahia.lan>
-	<20170228191226.GI2778@thinpad.lan.raisama.net>
-	<CAFEAcA8iZG8yB=4an9O2Mroej8bWNHBcANxsJkCOVbKHcxaGRg@mail.gmail.com>
-	<20170302153913.GQ2778@thinpad.lan.raisama.net>
-	<9dd3053b-1faf-e7a2-1cd7-aea934f5dc3c@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cjTGu-0007B4-Hd
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 11:08:04 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C069FC04BD4C
+	for <qemu-devel@nongnu.org>; Thu,  2 Mar 2017 16:08:04 +0000 (UTC)
+References: <20170302123746.9694-1-berrange@redhat.com>
+	<20170302123746.9694-3-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b2152672-8e78-3e82-0623-fc88118e901e@redhat.com>
+Date: Thu, 2 Mar 2017 10:08:01 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9dd3053b-1faf-e7a2-1cd7-aea934f5dc3c@redhat.com>
-Subject: Re: [Qemu-devel] travis-ci 'make check' timeouts (was Re: [PULL
- 00/11] x86 queue, 2017-02-27)
+In-Reply-To: <20170302123746.9694-3-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="tsKpqnxQIdCKrjC58GLHHbfSsUT3WEbja"
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] migration: always report tls-creds
+ & tls-hostname migrate parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,43 +35,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, John Ferlan <jferlan@redhat.com>, Jiri Denemark <jdenemar@redhat.com>
 
-On Thu, Mar 02, 2017 at 04:54:26PM +0100, Paolo Bonzini wrote:
-> On 02/03/2017 16:39, Eduardo Habkost wrote:
-> > On Tue, Feb 28, 2017 at 07:17:39PM +0000, Peter Maydell wrote:
-> >> On 28 February 2017 at 19:12, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> >>> I saw a failure on x86-pull-request that seemed to be because of
-> >>> vhost-user-test[1]. However, after restarting the job, it
-> >>> passed[2].
-> >>
-> >> I'm currently processing a patch which (hopefully) fixes
-> >> vhost-user-test's intermittent failures:
-> >> http://patchwork.ozlabs.org/patch/732747/
-> > 
-> > I'm not sure it will solve the issues on hosts without KVM. As
-> > far as I can see, if vhost-user-test is working without KVM, it
-> > is working by accident.
-> 
-> Well, it has worked for a while before the patch.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--tsKpqnxQIdCKrjC58GLHHbfSsUT3WEbja
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Juan Quintela
+ <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ John Ferlan <jferlan@redhat.com>, Jiri Denemark <jdenemar@redhat.com>
+Message-ID: <b2152672-8e78-3e82-0623-fc88118e901e@redhat.com>
+Subject: Re: [PATCH v2 2/2] migration: always report tls-creds & tls-hostname
+ migrate parameters
+References: <20170302123746.9694-1-berrange@redhat.com>
+ <20170302123746.9694-3-berrange@redhat.com>
+In-Reply-To: <20170302123746.9694-3-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Before which patch?
+On 03/02/2017 06:37 AM, Daniel P. Berrange wrote:
+> Currently the query-migrate-parameters command will omit reporting
+> of the tls-creds & tls-hostname parameters if their value is NULL.
+> This makes it impossible for an app to detect if these parameters
+> are supported by QEMU, without trying to actually set them and
+> catching the error. Since the code is treating "" and NULL as
+> equivalent, we can simply always report these values and give them
+> a value of "". This allows apps like libvirt to detect the fact
+> that these parameters are supported by QEMU.
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  migration/migration.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
 
->                                                    As long as you don't
-> overwrite code with vhost-user data and then try to run that data,
-> things will be fine.  Just not something you can use in practice, but it
-> works in tests.
+The .c changes look fine, but I agree that we want to document the
+special-case of "" in the .json file.  Looking forward to v3.
 
-Earlier this week I saw the wait_for_fds assertion (mentioned at
-the thread above) on a travis-ci job again, and I was suspecting
-it was the same vhost_set_mem_table() + TCG error seen at the
-thread above.
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-Unfortunately travis-ci overwrote the previous logs when I
-restarted the job, and now I can't confirm if it was really the
-same vhost_set_mem_table() error. I guess we'll have to simply
-wait and see if it fails again.
 
--- 
-Eduardo
+--tsKpqnxQIdCKrjC58GLHHbfSsUT3WEbja
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYuENhAAoJEKeha0olJ0NqyUkIAJLmq9Jx/GENFcslxxevfPZ/
+pDZ7nHHsjjF3MV5TeGl0/4POx8r8fiRdwpeZ83n/DmzZkGiG4mRSB6vvvqs8dkGA
+NQF+j79ynign2Erbta4GvhYehOcqo8RdZ126iPETZU5UTyZW1fJ4ZnrYj56yY9S8
+fzG5ZEYlhkUMARj17nX/nmtcc40xWg39Tf+JxBIM6DEHZGx2QqJA8SAj1f+kFsjj
+P/PF8i5/D7Xh5PqpOuDwBg+sEWIf/9t4XPCOcVn3MrxK+Gh7zpnkDQnNeIxuYiS2
+vbxuO1tlfuABYYOTMIeCE9ydLgeVp/AcE2Lxle6kZhIXTyneaC/jYRBM4NkeAlo=
+=pJZi
+-----END PGP SIGNATURE-----
+
+--tsKpqnxQIdCKrjC58GLHHbfSsUT3WEbja--
