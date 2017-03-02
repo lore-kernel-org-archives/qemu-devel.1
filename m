@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cjYZk-0000D2-Im
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 16:47:55 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cjYhq-0007Cb-CH
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 16:56:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cjYZj-0005mj-3m
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 16:47:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57638)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cjYZi-0005lV-RW
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 16:47:51 -0500
-Date: Thu, 2 Mar 2017 23:47:46 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170302214746.GA4711@redhat.com>
-References: <1488479153-21203-1-git-send-email-felipe@nutanix.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1488479153-21203-1-git-send-email-felipe@nutanix.com>
-Subject: Re: [Qemu-devel] [PATCH v5 0/4] Introduce vhost-user-scsi and
- sample application
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cjYhl-0008I8-Fx
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 16:56:14 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35369)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cjYhl-0008HJ-A0
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 16:56:09 -0500
+Received: by mail-wm0-x241.google.com with SMTP id u63so438532wmu.2
+	for <qemu-devel@nongnu.org>; Thu, 02 Mar 2017 13:56:07 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu,  2 Mar 2017 22:56:03 +0100
+Message-Id: <20170302215603.27630-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH] memory: show region offset and ROM/RAM type in
+ "info mtree -f"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,87 +26,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Felipe Franciosi <felipe@nutanix.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Xu <peterx@redhat.com>, William Tambe <tambewilliam@gmail.com>
 
-On Thu, Mar 02, 2017 at 10:25:49AM -0800, Felipe Franciosi wrote:
-> Based on various discussions on the 2016 KVM Forum, I'm sending over a
-> vhost-user-scsi implementation for your consideration.
-> 
-> This patchset introduces a new vhost-user SCSI device. While heavily
-> based on vhost-scsi, it is implemented using vhost's userspace
-> counterpart. The device has been coded and tested to work with live
-> migration.
-> 
-> As part of this work, a new vhost-scsi-common device was created and
-> the existing vhost-scsi device moved underneath it. The new
-> vhost-user-scsi device is also placed underneath it.
-> 
-> A sample application based on the newly introduced libvhost-user is
-> also included. It makes use of libiscsi for simplicity.
-> 
-> For convenience, I'm maintaining an up-to-date version of these
-> patches (including some necessary fixes for libvhost-user) on:
-> 
-> https://github.com/franciozzy/qemu/tree/vus-upstream-v5
-> 
-> See the individual patches for build and use instructions.
-> 
-> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
+"info mtree -f" output is currently hard to use for large RAM regions, because
+there is no hint as to what part of the region is being mapped.  Add the offset
+if it is nonzero.
 
-BTW, pls remember to ping after QEMU release.
+Secondly, FlatView has a readonly field, that can override the MemoryRegion
+in the presence of aliases.  Take it into account.
 
-> v4 -> v5:
-> - Add a patch to fix a build issue with libvhost-user.
-> 
-> v3 -> v4:
-> - Drop configure switches and build vus by default.
-> - Add sample application to .gitignore.
-> - Removed a whitespace error.
-> - Rebase on master.
-> 
-> v2 -> v3:
-> - Rebase after vhost notifier fixes by Paolo.
-> - Exposed F_HOTPLUG and F_CHANGE on vhost-user-scsi.
-> 
-> v1 -> v2:
-> - Introduce new vhost-scsi-common device type.
-> - Move vhost-scsi device underneath vhost-scsi-common.
-> - Move sample application from tests/ to contrib/.
-> - Make sample application use the glib event loop.
-> - Minor fixes.
-> 
-> Felipe Franciosi (4):
->   libvhost-user: replace vasprintf() to fix build
->   vhost-scsi: create a vhost-scsi-common abstraction
->   vus: Introduce vhost-user-scsi host device
->   vus: Introduce a vhost-user-scsi sample application
-> 
->  .gitignore                                |   1 +
->  Makefile                                  |   3 +
->  Makefile.objs                             |   4 +
->  configure                                 |   1 +
->  contrib/libvhost-user/libvhost-user.c     |   2 +-
->  contrib/vhost-user-scsi/Makefile.objs     |   1 +
->  contrib/vhost-user-scsi/vhost-user-scsi.c | 886 ++++++++++++++++++++++++++++++
->  default-configs/pci.mak                   |   1 +
->  hw/scsi/Makefile.objs                     |   3 +-
->  hw/scsi/vhost-scsi-common.c               | 143 +++++
->  hw/scsi/vhost-scsi.c                      | 194 ++-----
->  hw/scsi/vhost-user-scsi.c                 | 215 ++++++++
->  hw/virtio/virtio-pci.c                    |  54 ++
->  hw/virtio/virtio-pci.h                    |  11 +
->  include/hw/virtio/vhost-scsi-common.h     |  48 ++
->  include/hw/virtio/vhost-scsi.h            |  11 +-
->  include/hw/virtio/vhost-user-scsi.h       |  35 ++
->  include/hw/virtio/virtio-scsi.h           |   5 +
->  18 files changed, 1469 insertions(+), 149 deletions(-)
->  create mode 100644 contrib/vhost-user-scsi/Makefile.objs
->  create mode 100644 contrib/vhost-user-scsi/vhost-user-scsi.c
->  create mode 100644 hw/scsi/vhost-scsi-common.c
->  create mode 100644 hw/scsi/vhost-user-scsi.c
->  create mode 100644 include/hw/virtio/vhost-scsi-common.h
->  create mode 100644 include/hw/virtio/vhost-user-scsi.h
-> 
-> -- 
-> 1.9.4
+Together, with this patch this:
+
+address-space (flat view): KVM-SMRAM
+  0000000000000000-00000000000bffff (prio 0, ram): pc.ram
+  00000000000c0000-00000000000c9fff (prio 0, ram): pc.ram
+  00000000000ca000-00000000000ccfff (prio 0, ram): pc.ram
+  00000000000cd000-00000000000ebfff (prio 0, ram): pc.ram
+  00000000000ec000-00000000000effff (prio 0, ram): pc.ram
+  00000000000f0000-00000000000fffff (prio 0, ram): pc.ram
+  0000000000100000-00000000bfffffff (prio 0, ram): pc.ram
+  00000000fd000000-00000000fdffffff (prio 1, ram): vga.vram
+  00000000febc0000-00000000febdffff (prio 1, i/o): e1000-mmio
+  00000000febf0400-00000000febf041f (prio 0, i/o): vga ioports remapped
+  00000000febf0500-00000000febf0515 (prio 0, i/o): bochs dispi interface
+  00000000febf0600-00000000febf0607 (prio 0, i/o): qemu extended regs
+  00000000fec00000-00000000fec00fff (prio 0, i/o): kvm-ioapic
+  00000000fed00000-00000000fed003ff (prio 0, i/o): hpet
+  00000000fee00000-00000000feefffff (prio 4096, i/o): kvm-apic-msi
+  00000000fffc0000-00000000ffffffff (prio 0, rom): pc.bios
+  0000000100000000-000000013fffffff (prio 0, ram): pc.ram
+
+becomes this:
+
+address-space (flat view): KVM-SMRAM
+  0000000000000000-00000000000bffff (prio 0, ram): pc.ram
+  00000000000c0000-00000000000c9fff (prio 0, rom): pc.ram @00000000000c0000
+  00000000000ca000-00000000000ccfff (prio 0, ram): pc.ram @00000000000ca000
+  00000000000cd000-00000000000ebfff (prio 0, rom): pc.ram @00000000000cd000
+  00000000000ec000-00000000000effff (prio 0, ram): pc.ram @00000000000ec000
+  00000000000f0000-00000000000fffff (prio 0, rom): pc.ram @00000000000f0000
+  0000000000100000-00000000bfffffff (prio 0, ram): pc.ram @0000000000100000
+  00000000fd000000-00000000fdffffff (prio 1, ram): vga.vram
+  00000000febc0000-00000000febdffff (prio 1, i/o): e1000-mmio
+  00000000febf0400-00000000febf041f (prio 0, i/o): vga ioports remapped
+  00000000febf0500-00000000febf0515 (prio 0, i/o): bochs dispi interface
+  00000000febf0600-00000000febf0607 (prio 0, i/o): qemu extended regs
+  00000000fec00000-00000000fec00fff (prio 0, i/o): kvm-ioapic
+  00000000fed00000-00000000fed003ff (prio 0, i/o): hpet
+  00000000fee00000-00000000feefffff (prio 4096, i/o): kvm-apic-msi
+  00000000fffc0000-00000000ffffffff (prio 0, rom): pc.bios
+  0000000100000000-000000013fffffff (prio 0, ram): pc.ram @00000000c0000000
+
+This should make it easier to understand what's going on.
+
+Cc: Peter Xu <peterx@redhat.com>
+Cc: "William Tambe" <tambewilliam@gmail.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ memory.c | 25 ++++++++++++++++++-------
+ 1 file changed, 18 insertions(+), 7 deletions(-)
+
+diff --git a/memory.c b/memory.c
+index d61caee..44700c3 100644
+--- a/memory.c
++++ b/memory.c
+@@ -2588,13 +2588,24 @@ static void mtree_print_flatview(fprintf_function p, void *f,
+ 
+     while (n--) {
+         mr = range->mr;
+-        p(f, MTREE_INDENT TARGET_FMT_plx "-"
+-          TARGET_FMT_plx " (prio %d, %s): %s\n",
+-          int128_get64(range->addr.start),
+-          int128_get64(range->addr.start) + MR_SIZE(range->addr.size),
+-          mr->priority,
+-          memory_region_type(mr),
+-          memory_region_name(mr));
++        if (range->offset_in_region) {
++            p(f, MTREE_INDENT TARGET_FMT_plx "-"
++              TARGET_FMT_plx " (prio %d, %s): %s @" TARGET_FMT_plx "\n",
++              int128_get64(range->addr.start),
++              int128_get64(range->addr.start) + MR_SIZE(range->addr.size),
++              mr->priority,
++              memory_region_type(mr),
++              memory_region_name(mr),
++              range->offset_in_region);
++        } else {
++            p(f, MTREE_INDENT TARGET_FMT_plx "-"
++              TARGET_FMT_plx " (prio %d, %s): %s\n",
++              int128_get64(range->addr.start),
++              int128_get64(range->addr.start) + MR_SIZE(range->addr.size),
++              mr->priority,
++              memory_region_type(mr),
++              memory_region_name(mr));
++        }
+         range++;
+     }
+ 
+-- 
+2.9.3
