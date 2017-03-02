@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44423)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <SRS0=SaHx=2L=redhat.com=mst@kernel.org>)
-	id 1cjK6e-0001le-9K
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 01:20:53 -0500
+	id 1cjK6g-0001o4-Aq
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 01:20:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <SRS0=SaHx=2L=redhat.com=mst@kernel.org>)
-	id 1cjK6d-00045b-4Z
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 01:20:52 -0500
-Received: from mail.kernel.org ([198.145.29.136]:51326)
+	id 1cjK6f-0004As-7w
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 01:20:54 -0500
+Received: from mail.kernel.org ([198.145.29.136]:51352)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <SRS0=SaHx=2L=redhat.com=mst@kernel.org>)
-	id 1cjK6c-00043W-RS
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 01:20:51 -0500
-Date: Thu, 2 Mar 2017 08:20:46 +0200
+	id 1cjK6f-00048H-1y
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 01:20:53 -0500
+Date: Thu, 2 Mar 2017 08:20:49 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1488435591-17882-12-git-send-email-mst@redhat.com>
+Message-ID: <1488435591-17882-13-git-send-email-mst@redhat.com>
 References: <1488435591-17882-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1488435591-17882-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 11/15] virtio: add missing region cache init in
- virtio_load()
+Subject: [Qemu-devel] [PULL 12/15] virtio: unbreak virtio-pci with IOMMU
+ after caching ring translations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,97 +31,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Eric Auger <eric.auger@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
 
-Commit 97cd965c070152bc626c7507df9fb356bbe1cd81 ("virtio: use
-VRingMemoryRegionCaches for avail and used rings") switched to a memory
-region cache to avoid repeated map/unmap operations.
+Commit c611c76417f5 ("virtio: add MemoryListener to cache ring
+translations") registers a memory listener to dma_as. This may not
+work when IOMMU is enabled: dma_as(bus_master_as) were initialized in
+pcibus_machine_done() after virtio_realize(). This will cause a
+segfault. Fixing this by using pci_device_iommu_address_space()
+instead to make sure address space were initialized at this time.
 
-The virtio_load() process is a little tricky because vring addresses are
-serialized in two separate places.  VIRTIO 1.0 devices serialize desc
-and then a subsection with used and avail.  Legacy devices only
-serialize desc.
+With this fix, IOMMU device were required to be initialized before any
+virtio-pci devices.
 
-Live migration of VIRTIO 1.0 devices fails on the destination host with:
-
-  VQ 0 size 0x80 < last_avail_idx 0x12f8 - used_idx 0x0
-  Failed to load virtio-blk:virtio
-  error while loading state for instance 0x0 of device '0000:00:04.0/virtio-blk'
-
-This happens because the memory region cache is only initialized after
-desc is loaded and not after the used and avail subsection is loaded.
-If the guest chose memory addresses that don't match the legacy ring
-layout then the wrong guest memory location is accessed.
-
-Wait until all ring addresses are known before trying to initialize the
-region cache.  Also clarify the incomplete comment about VIRTIO-1 ring
-address subsection.
-
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Fixes: c611c76417f5 ("virtio: add MemoryListener to cache ring translations")
 Cc: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
-Tested-by: Eric Auger <eric.auger@redhat.com>
 ---
- hw/virtio/virtio.c | 25 +++++++++++++++++++------
- 1 file changed, 19 insertions(+), 6 deletions(-)
+ hw/virtio/virtio-pci.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 294c909..efce4b3 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -1857,7 +1857,10 @@ void virtio_save(VirtIODevice *vdev, QEMUFile *f)
-         if (k->has_variable_vring_alignment) {
-             qemu_put_be32(f, vdev->vq[i].vring.align);
-         }
--        /* XXX virtio-1 devices */
-+        /*
-+         * Save desc now, the rest of the ring addresses are saved in
-+         * subsections for VIRTIO-1 devices.
-+         */
-         qemu_put_be64(f, vdev->vq[i].vring.desc);
-         qemu_put_be16s(f, &vdev->vq[i].last_avail_idx);
-         if (k->save_queue) {
-@@ -1998,14 +2001,11 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int version_id)
-         vdev->vq[i].signalled_used_valid = false;
-         vdev->vq[i].notification = true;
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index 5ce42af..b76f3f6 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -1153,7 +1153,7 @@ static AddressSpace *virtio_pci_get_dma_as(DeviceState *d)
+     VirtIOPCIProxy *proxy = VIRTIO_PCI(d);
+     PCIDevice *dev = &proxy->pci_dev;
  
--        if (vdev->vq[i].vring.desc) {
--            /* XXX virtio-1 devices */
--            virtio_queue_update_rings(vdev, i);
--        } else if (vdev->vq[i].last_avail_idx) {
-+        if (!vdev->vq[i].vring.desc && vdev->vq[i].last_avail_idx) {
-             error_report("VQ %d address 0x0 "
-                          "inconsistent with Host index 0x%x",
-                          i, vdev->vq[i].last_avail_idx);
--                return -1;
-+            return -1;
-         }
-         if (k->load_queue) {
-             ret = k->load_queue(qbus->parent, i, f);
-@@ -2066,6 +2066,19 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int version_id)
-     for (i = 0; i < num; i++) {
-         if (vdev->vq[i].vring.desc) {
-             uint16_t nheads;
-+
-+            /*
-+             * VIRTIO-1 devices migrate desc, used, and avail ring addresses so
-+             * only the region cache needs to be set up.  Legacy devices need
-+             * to calculate used and avail ring addresses based on the desc
-+             * address.
-+             */
-+            if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
-+                virtio_init_region_cache(vdev, i);
-+            } else {
-+                virtio_queue_update_rings(vdev, i);
-+            }
-+
-             nheads = vring_avail_idx(&vdev->vq[i]) - vdev->vq[i].last_avail_idx;
-             /* Check it isn't doing strange things with descriptor numbers. */
-             if (nheads > vdev->vq[i].vring.num) {
+-    return pci_get_address_space(dev);
++    return pci_device_iommu_address_space(dev);
+ }
+ 
+ static int virtio_pci_add_mem_cap(VirtIOPCIProxy *proxy,
 -- 
 MST
