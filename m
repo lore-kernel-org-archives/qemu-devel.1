@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55268)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cjZv8-0003Xd-Dq
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 18:14:03 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cjZwC-00046P-CD
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 18:15:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cjZv7-0001lr-63
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 18:14:02 -0500
-References: <1488491046-2549-1-git-send-email-armbru@redhat.com>
-	<1488491046-2549-3-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ea96afbe-4379-3e17-c0b6-6b615c170a2e@redhat.com>
-Date: Thu, 2 Mar 2017 17:13:52 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1cjZwB-0002Bg-Eb
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 18:15:08 -0500
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:36883)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cjZwB-0002A8-7y
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 18:15:07 -0500
+Received: by mail-wm0-x233.google.com with SMTP id n11so3349893wma.0
+	for <qemu-devel@nongnu.org>; Thu, 02 Mar 2017 15:15:07 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1488491046-2549-3-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="E8bgd00ohhGOtbOg2vENnB9qeLRDTh4w4"
-Subject: Re: [Qemu-devel] [PATCH 02/15] sheepdog: Fix error handling in
- sd_snapshot_delete()
+In-Reply-To: <20170301195502.4432-1-rth@twiddle.net>
+References: <20170301195502.4432-1-rth@twiddle.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 2 Mar 2017 23:14:45 +0000
+Message-ID: <CAFEAcA9NOndeod2ogU4XuHfymcLFx6-eeO7KpJSC74kq6CAQJg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL] target/sparc queued patch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,76 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, qemu-block@nongnu.org, namei.unix@gmail.com
+To: Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---E8bgd00ohhGOtbOg2vENnB9qeLRDTh4w4
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com,
- qemu-block@nongnu.org, namei.unix@gmail.com
-Message-ID: <ea96afbe-4379-3e17-c0b6-6b615c170a2e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 02/15] sheepdog: Fix error handling in
- sd_snapshot_delete()
-References: <1488491046-2549-1-git-send-email-armbru@redhat.com>
- <1488491046-2549-3-git-send-email-armbru@redhat.com>
-In-Reply-To: <1488491046-2549-3-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 03/02/2017 03:43 PM, Markus Armbruster wrote:
-> As a bdrv_snapshot_delete() method, sd_snapshot_delete() must set an
-> error and return negative errno on failure.  It sometimes returns -1,
-> and sometimes neglects to set an error.  It also prints error messages
-> with error_report().  Fix all that.
->=20
-> Moreover, its handling of an attempt to delete an nonexistent snapshot
-> is wrong: it error_report()s and succeeds.  Fix it to set an error and
-> return -ENOENT instead.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  block/sheepdog.c | 37 +++++++++++++++++--------------------
->  1 file changed, 17 insertions(+), 20 deletions(-)
->=20
-
-> @@ -2447,15 +2444,14 @@ static bool remove_objects(BDRVSheepdogState *s=
-)
->                                      data_vdi_id[start_idx]),
->                             false, s->cache_flags);
->          if (ret < 0) {
-> -            error_report("failed to discard snapshot inode.");
-> -            result =3D false;
-> +            error_setg(errp, "failed to discard snapshot inode.");
-
-Lose the trailing '.'
-
-With that fixed,
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+On 1 March 2017 at 19:55, Richard Henderson <rth@twiddle.net> wrote:
+> This one has been languishing for a few weeks.
+>
+>
+> r~
+>
+>
+>
+> The following changes since commit b28f9db1a7ce4d537ce2fae6fbce5e5e37dc265b:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20170228-1' into staging (2017-03-01 17:58:54 +0000)
+>
+> are available in the git repository at:
+>
+>   git://github.com/rth7680/qemu.git tags/pull-tgt-20170302
+>
+> for you to fetch changes up to 3db010c3398d03646d74f2d36a68e62539342e6c:
+>
+>   target/sparc: Restore ldstub of odd asis (2017-03-02 06:52:43 +1100)
+>
+> ----------------------------------------------------------------
+> Queued sparc patch
+>
+> ----------------------------------------------------------------
+> Richard Henderson (1):
+>       target/sparc: Restore ldstub of odd asis
+>
+>  target/sparc/translate.c | 27 +++++++++++++++++++++++++--
+>  1 file changed, 25 insertions(+), 2 deletions(-)
 
 
---E8bgd00ohhGOtbOg2vENnB9qeLRDTh4w4
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Applied, thanks.
 
-iQEcBAEBCAAGBQJYuKcwAAoJEKeha0olJ0NqRBUH/1fBed21WxhCdQ80f24F8JBm
-0dLt0HCUu78ky2Xffmb9zknrPUDMe14AbisU3wEvsASgk0Dc2TwGSP0kLcK4jejK
-tdusv4EHH35w/DXNg+LQzznHSQr0HcHfCVhTF7bLG1FtGxmDRuMG0FIXK3ygYPjY
-Q3NRH2udRevuiybcWbQJRWyyRcO7TBCE6udE+O7zNPvOTanWYbOxxvCXZgJ4LUzo
-/bGEpDn98M/ShIDNBJi9aHUBE8QCU0CpjismE1IH4w2eLLHfimc7nvd1KGzGv0jY
-iy/dohc8fRWaSRvQx+viZPLZq0nQM8B+YK7AFjTu93wZYw03/mI75JW1mZfGBaY=
-=WxDh
------END PGP SIGNATURE-----
-
---E8bgd00ohhGOtbOg2vENnB9qeLRDTh4w4--
+-- PMM
