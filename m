@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cjYYw-0007zF-B9
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 16:47:03 -0500
+	(envelope-from <mst@redhat.com>) id 1cjYZk-0000D2-Im
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 16:47:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cjYYt-000559-8g
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 16:47:02 -0500
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:32817)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cjYYt-000537-3P
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 16:46:59 -0500
-Received: by mail-pg0-x242.google.com with SMTP id 16so2019486pga.0
-	for <qemu-devel@nongnu.org>; Thu, 02 Mar 2017 13:46:58 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170302195337.31558-1-alex.bennee@linaro.org>
-	<20170302195337.31558-6-alex.bennee@linaro.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <4054a3ea-c278-11c3-9c0a-5ec952ef8598@twiddle.net>
-Date: Fri, 3 Mar 2017 08:46:48 +1100
+	(envelope-from <mst@redhat.com>) id 1cjYZj-0005mj-3m
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 16:47:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57638)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cjYZi-0005lV-RW
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 16:47:51 -0500
+Date: Thu, 2 Mar 2017 23:47:46 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170302214746.GA4711@redhat.com>
+References: <1488479153-21203-1-git-send-email-felipe@nutanix.com>
 MIME-Version: 1.0
-In-Reply-To: <20170302195337.31558-6-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 05/11] translate-all: exit
- cpu_restore_state early if translating
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1488479153-21203-1-git-send-email-felipe@nutanix.com>
+Subject: Re: [Qemu-devel] [PATCH v5 0/4] Introduce vhost-user-scsi and
+ sample application
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,30 +27,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, pbonzini@redhat.com
-Cc: qemu-devel@nongnu.org, mttcg@greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: Felipe Franciosi <felipe@nutanix.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On 03/03/2017 06:53 AM, Alex Bennée wrote:
-> The translation code uses cpu_ld*_code which can trigger a tlb_fill
-> which if it fails will attempt a fault resolution. This never works
-> during translation as the TB being generated hasn't been added yet.
-> However with the new locking regime we end up double locking the
-> tb_lock(). As the tcg_ctx.cpu is only set during translation we use
-> this to short circuit the restore code and return with a fail.
+On Thu, Mar 02, 2017 at 10:25:49AM -0800, Felipe Franciosi wrote:
+> Based on various discussions on the 2016 KVM Forum, I'm sending over a
+> vhost-user-scsi implementation for your consideration.
+> 
+> This patchset introduces a new vhost-user SCSI device. While heavily
+> based on vhost-scsi, it is implemented using vhost's userspace
+> counterpart. The device has been coded and tested to work with live
+> migration.
+> 
+> As part of this work, a new vhost-scsi-common device was created and
+> the existing vhost-scsi device moved underneath it. The new
+> vhost-user-scsi device is also placed underneath it.
+> 
+> A sample application based on the newly introduced libvhost-user is
+> also included. It makes use of libiscsi for simplicity.
+> 
+> For convenience, I'm maintaining an up-to-date version of these
+> patches (including some necessary fixes for libvhost-user) on:
+> 
+> https://github.com/franciozzy/qemu/tree/vus-upstream-v5
+> 
+> See the individual patches for build and use instructions.
+> 
+> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
 
-We *should* have retaddr == 0 for this case, which indicates that we should not 
-attempt to restore state.  Are you seeing a non-zero value?
+BTW, pls remember to ping after QEMU release.
 
-Hmm.. Or rather we should not have called cpu_restore_state in the first place. 
-  What is the call chain leading to this point?
-
-Is this in fact linux-user, not softmmu, as you imply from tlb_fill?  Because 
-handle_cpu_signal will in fact pass a genuine non-zero retaddr for the SIGSEGV 
-resulting from a cpu_ld*_code from a non-mapped address.
-
-So... for linux-user I think the qemu_log is unnecessary -- that's just the way 
-things are.  For softmmu, I don't know what to think except that we shouldn't 
-have gotten here.
-
-
-r~
+> v4 -> v5:
+> - Add a patch to fix a build issue with libvhost-user.
+> 
+> v3 -> v4:
+> - Drop configure switches and build vus by default.
+> - Add sample application to .gitignore.
+> - Removed a whitespace error.
+> - Rebase on master.
+> 
+> v2 -> v3:
+> - Rebase after vhost notifier fixes by Paolo.
+> - Exposed F_HOTPLUG and F_CHANGE on vhost-user-scsi.
+> 
+> v1 -> v2:
+> - Introduce new vhost-scsi-common device type.
+> - Move vhost-scsi device underneath vhost-scsi-common.
+> - Move sample application from tests/ to contrib/.
+> - Make sample application use the glib event loop.
+> - Minor fixes.
+> 
+> Felipe Franciosi (4):
+>   libvhost-user: replace vasprintf() to fix build
+>   vhost-scsi: create a vhost-scsi-common abstraction
+>   vus: Introduce vhost-user-scsi host device
+>   vus: Introduce a vhost-user-scsi sample application
+> 
+>  .gitignore                                |   1 +
+>  Makefile                                  |   3 +
+>  Makefile.objs                             |   4 +
+>  configure                                 |   1 +
+>  contrib/libvhost-user/libvhost-user.c     |   2 +-
+>  contrib/vhost-user-scsi/Makefile.objs     |   1 +
+>  contrib/vhost-user-scsi/vhost-user-scsi.c | 886 ++++++++++++++++++++++++++++++
+>  default-configs/pci.mak                   |   1 +
+>  hw/scsi/Makefile.objs                     |   3 +-
+>  hw/scsi/vhost-scsi-common.c               | 143 +++++
+>  hw/scsi/vhost-scsi.c                      | 194 ++-----
+>  hw/scsi/vhost-user-scsi.c                 | 215 ++++++++
+>  hw/virtio/virtio-pci.c                    |  54 ++
+>  hw/virtio/virtio-pci.h                    |  11 +
+>  include/hw/virtio/vhost-scsi-common.h     |  48 ++
+>  include/hw/virtio/vhost-scsi.h            |  11 +-
+>  include/hw/virtio/vhost-user-scsi.h       |  35 ++
+>  include/hw/virtio/virtio-scsi.h           |   5 +
+>  18 files changed, 1469 insertions(+), 149 deletions(-)
+>  create mode 100644 contrib/vhost-user-scsi/Makefile.objs
+>  create mode 100644 contrib/vhost-user-scsi/vhost-user-scsi.c
+>  create mode 100644 hw/scsi/vhost-scsi-common.c
+>  create mode 100644 hw/scsi/vhost-user-scsi.c
+>  create mode 100644 include/hw/virtio/vhost-scsi-common.h
+>  create mode 100644 include/hw/virtio/vhost-user-scsi.h
+> 
+> -- 
+> 1.9.4
