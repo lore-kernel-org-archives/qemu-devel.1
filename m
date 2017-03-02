@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58245)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mmarek@suse.com>) id 1cjOM8-0006Or-Na
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 05:53:09 -0500
+	(envelope-from <prvs=227bda417=anthony.perard@citrix.com>)
+	id 1cjONg-0006us-Ha
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 05:54:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mmarek@suse.com>) id 1cjOM4-0006GT-SM
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 05:53:08 -0500
-Received: from mx2.suse.de ([195.135.220.15]:49516)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mmarek@suse.com>) id 1cjOM4-0006FK-MX
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 05:53:04 -0500
-References: <41cc9d11-2e28-5b5e-4772-81a118d79111@redhat.com>
-	<20170227101817.11748-1-mmarek@suse.com>
-	<41e6edc0-204b-62b7-93b8-b376a40542d6@twiddle.net>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <175599de-8f4f-8d22-d36e-6fb250ec49f4@suse.com>
-Date: Thu, 2 Mar 2017 11:53:01 +0100
+	(envelope-from <prvs=227bda417=anthony.perard@citrix.com>)
+	id 1cjONc-0006vP-Kq
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 05:54:44 -0500
+Received: from smtp.citrix.com ([66.165.176.89]:15676)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=227bda417=anthony.perard@citrix.com>)
+	id 1cjONc-0006vK-DA
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 05:54:40 -0500
+Date: Thu, 2 Mar 2017 10:54:38 +0000
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20170302105438.GG1760@perard.uk.xensource.com>
+References: <1487861635-17560-1-git-send-email-paul.durrant@citrix.com>
+	<1487861635-17560-5-git-send-email-paul.durrant@citrix.com>
+	<20170301171735.GE1760@perard.uk.xensource.com>
+	<61002dc9691a49d98a7feca8c9a676ce@AMSPEX02CL03.citrite.net>
 MIME-Version: 1.0
-In-Reply-To: <41e6edc0-204b-62b7-93b8-b376a40542d6@twiddle.net>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4] target-s390x: Implement stfl and stfle
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <61002dc9691a49d98a7feca8c9a676ce@AMSPEX02CL03.citrite.net>
+Subject: Re: [Qemu-devel] [PATCH 4/5] configure: detect presence of
+ libxendevicemodel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +33,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Miroslav Benes <mbenes@suse.cz>, Eric Bischoff <ebischoff@suse.com>
+To: Paul Durrant <Paul.Durrant@citrix.com>
+Cc: "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefano Stabellini <sstabellini@kernel.org>
 
-Dne 28.2.2017 v 23:11 Richard Henderson napsal(a):
-> On 02/27/2017 09:18 PM, Michal Marek wrote:
->> +static int do_stfle(CPUS390XState *env, uint64_t addr, uint32_t ar,
->> int len)
->> +{
->> +    S390CPU *cpu = s390_env_get_cpu(env);
->> +    /* 256 doublewords as per STFLE documentation */
->> +    uint8_t data[256 * 8] = { 0 };
->> +    int res;
->> +
->> +    res = s390_fill_feat_block(cpu->model->features,
->> S390_FEAT_TYPE_STFL, data);
->> +    res = ROUND_UP(res, 8);
->> +    s390_cpu_virt_mem_write(cpu, addr, ar, data, MIN(res, len));
-> 
-> This does not do what you think it does.  Or indeed, I suspect what the
-> original author thinks it does.  I suspect it works for KVM only, and no
-> one has actually tried the non-KVM code path.
-> 
-> Primarily, it does not raise an exception for error.  Secondarily, I
-> have no idea what the "AR" argument is supposed to be, or how that's
-> supposed to interact with the rest of the virtual memory system.
-> 
-> Your writes need to look a lot more like fast_memmove in mem_helper.c,
-> except that of course only the destination needs translation.
-> 
-> Of course, in practice we could reduce this to just one cpu_stl_data for
-> STFL and one or two cpu_stq_data for STFLE.  So a full fast_memmove loop
-> is overkill.
-> 
-> As it happens, this reminds me that I wrote a version of this several
-> years ago but never submitted it upstream.  I'll dig it out.
+On Thu, Mar 02, 2017 at 09:06:43AM +0000, Paul Durrant wrote:
+> > -----Original Message-----
+> > From: Anthony PERARD [mailto:anthony.perard@citrix.com]
+> > Sent: 01 March 2017 17:18
+> > To: Paul Durrant <Paul.Durrant@citrix.com>
+> > Cc: xen-devel@lists.xenproject.org; qemu-devel@nongnu.org; Stefano
+> > Stabellini <sstabellini@kernel.org>
+> > Subject: Re: [PATCH 4/5] configure: detect presence of libxendevicemodel
+> > 
+> > On Thu, Feb 23, 2017 at 02:53:54PM +0000, Paul Durrant wrote:
+> > > This patch adds code in configure to set
+> > CONFIG_XEN_CTRL_INTERFACE_VERSION
+> > > to a new value of 490 if libxendevicemodel is present in the build
+> > > environment.
+> > >
+> > > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> > > ---
+> > > Cc: Stefano Stabellini <sstabellini@kernel.org>
+> > > Cc: Anthony Perard <anthony.perard@citrix.com>
+> > > ---
+> > >  configure | 19 +++++++++++++++++++
+> > >  1 file changed, 19 insertions(+)
+> > >
+> > > diff --git a/configure b/configure
+> > > index 8e8f18d..fc1e12b 100755
+> > > --- a/configure
+> > > +++ b/configure
+> > > @@ -1980,6 +1980,25 @@ EOF
+> > >    # Xen unstable
+> > >    elif
+> > >        cat > $TMPC <<EOF &&
+> > > +#undef XC_WANT_COMPAT_DEVICEMODEL_API
+> > > +#define __XEN_TOOLS__
+> > 
+> > Isn't __XEN_TOOLS__ supposed to be reserved for some to tools inside
+> > xen.git?
+> > 
+> > Also it seems to be the only time this define is used in your patch
+> > series.
+> >
+> No. QEMU falls under the definition of 'tools' as far as Xen goes and the hypercalls and xendevicemodel API are protected by that. The reason you don't see it elsewhere is that xenctrl.h defines it. (See http://xenbits.xen.org/gitweb/?p=xen.git;a=blob;f=tools/libxc/include/xenctrl.h;hb=HEAD#l27).
+> I think that's a little underhand so I thought I'd make the new code in configure more transparent. I can change it to just include xenctrl.h before xendevicemodel.h if you'd prefer.
 
-So, does it make sense for me to post a v5 again not using
-s390_cpu_virt_mem_write(), or are you going to refresh your stfle
-implementation?
+I guess that is fine with __XEN_TOOLS__.
+You can add my
+Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
 
-Thanks,
-Michal
+-- 
+Anthony PERARD
