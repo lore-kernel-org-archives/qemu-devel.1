@@ -1,15 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cjPmk-0002YA-1g
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 07:24:43 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cjPs5-000447-1d
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 07:30:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cjPmg-0006fJ-Ts
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 07:24:42 -0500
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Thu,  2 Mar 2017 12:24:29 +0000
-Message-Id: <20170302122429.7737-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH] qmp: allow setting properties to empty string
- in qmp-shell
+	(envelope-from <peter.maydell@linaro.org>) id 1cjPrz-0000uS-A3
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 07:30:13 -0500
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:33840)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cjPrz-0000sv-4M
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 07:30:07 -0500
+Received: by mail-wr0-x22a.google.com with SMTP id l37so50925765wrc.1
+	for <qemu-devel@nongnu.org>; Thu, 02 Mar 2017 04:30:06 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA8b_tdQAP6YVDRaZKzHLed5xKbfABtJUV0U43HpkTiBdg@mail.gmail.com>
+References: <20170227162501.29280-1-ehabkost@redhat.com>
+	<CAFEAcA8b_tdQAP6YVDRaZKzHLed5xKbfABtJUV0U43HpkTiBdg@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 2 Mar 2017 12:29:45 +0000
+Message-ID: <CAFEAcA_px_nNvHceAZ7ubdbHaCKec-jG-1OFe+fOE+qY-jmv4A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 00/11] x86 queue, 2017-02-27
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,40 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-trivial@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, QEMU Developers <qemu-devel@nongnu.org>
 
-The qmp-shell property parser currently rejects attempts to
-set string properties to the empty string eg
+On 27 February 2017 at 19:16, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 27 February 2017 at 16:24, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>> The following changes since commit 3b1d8169844fafee184366b0e0d7080534758b4d:
+>>
+>>   tests-aio-multithread: use atomic_read properly (2017-02-27 12:54:08 +0000)
+>>
+>> are available in the git repository at:
+>>
+>>   git://github.com/ehabkost/qemu.git tags/x86-pull-request
+>>
+>> for you to fetch changes up to b8097deb359bbbd92592b9670adfe9e245b2d0bd:
+>>
+>>   i386: Improve query-cpu-model-expansion full mode (2017-02-27 13:23:35 -0300)
+>>
+>> ----------------------------------------------------------------
+>> x86 queue, 2017-02-27
+>>
+>> "-cpu max" and query-cpu-model-expansion support for x86. This
+>> should be the last x86 pull request before 2.9 soft freeze.
+>>
+>> ----------------------------------------------------------------
+>>
+>> Eduardo Habkost (11):
+>>   i386: Unset cannot_destroy_with_object_finalize_yet on "host" model
+>>   i386: Add ordering field to CPUClass
+>>   i386: Rename X86CPU::host_features to X86CPU::max_features
+>>   i386: Reorganize and document CPUID initialization steps
+>>   qapi-schema: Comment about full expansion of non-migration-safe models
+>>   i386: Create "max" CPU model
+>>   i386: Make "max" model not use any host CPUID info on TCG
+>>   i386: Don't set CPUClass::cpu_def on "max" model
+>>   i386: Define static "base" CPU model
+>>   i386: Implement query-cpu-model-expansion QMP command
+>>   i386: Improve query-cpu-model-expansion full mode
+>
+> This seemed to hang in 'make check' on x86. I didn't have time to
+> investigate, so I'll have another go with it later.
 
-  (QEMU) migrate-set-parameters  tls-hostname=
-  Error while parsing command line: Expected a key=value pair, got 'tls-hostname='
-command format: <command-name>  [arg-name1=arg1] ... [arg-nameN=argN]
+Retrying worked ok, so I've applied it, on the assumption the
+hang was not something in this patchset.
 
-This is caused by checking the wrong condition after splitting
-the parameter on '='. The "partition" method will return "" for
-the separator field, if the seperator was not present, so that
-is the correct thing to check for malformed syntax.
-
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- scripts/qmp/qmp-shell | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
-index 0373b24..eccb88a 100755
---- a/scripts/qmp/qmp-shell
-+++ b/scripts/qmp/qmp-shell
-@@ -166,8 +166,8 @@ class QMPShell(qmp.QEMUMonitorProtocol):
- 
-     def __cli_expr(self, tokens, parent):
-         for arg in tokens:
--            (key, _, val) = arg.partition('=')
--            if not val:
-+            (key, sep, val) = arg.partition('=')
-+            if sep != '=':
-                 raise QMPShellError("Expected a key=value pair, got '%s'" % arg)
- 
-             value = self.__parse_value(val)
--- 
-2.9.3
+thanks
+-- PMM
