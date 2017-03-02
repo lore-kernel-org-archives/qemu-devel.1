@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cjYWJ-0005aw-8o
+	(envelope-from <armbru@redhat.com>) id 1cjYWI-0005Zr-AH
 	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 16:44:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cjYWH-0002su-OJ
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 16:44:19 -0500
+	(envelope-from <armbru@redhat.com>) id 1cjYWG-0002sJ-R5
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 16:44:18 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu,  2 Mar 2017 22:44:05 +0100
-Message-Id: <1488491046-2549-15-git-send-email-armbru@redhat.com>
+Date: Thu,  2 Mar 2017 22:43:58 +0100
+Message-Id: <1488491046-2549-8-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488491046-2549-1-git-send-email-armbru@redhat.com>
 References: <1488491046-2549-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 14/15] qapi-schema: Rename SocketAddressFlat's
- variant tcp to inet
+Subject: [Qemu-devel] [PATCH 07/15] sheepdog: Report errors in
+ pseudo-filename more usefully
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,234 +23,220 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com
 
-QAPI type SocketAddressFlat differs from SocketAddress pointlessly:
-the discriminator value for variant InetSocketAddress is 'tcp' instead
-of 'inet'.  Rename.
+Errors in the pseudo-filename are all reported with the same laconic
+"Can't parse filename" message.
 
-The type is far only used by the Gluster block drivers.  Take care to
-keep 'tcp' working there.
+Add real error reporting, such as:
+
+    $ qemu-system-x86_64 --drive driver=sheepdog,filename=sheepdog:///
+    qemu-system-x86_64: --drive driver=sheepdog,filename=sheepdog:///: missing file path in URI
+    $ qemu-system-x86_64 --drive driver=sheepdog,filename=sheepgod:///vdi
+    qemu-system-x86_64: --drive driver=sheepdog,filename=sheepgod:///vdi: URI scheme must be 'sheepdog', 'sheepdog+tcp', or 'sheepdog+unix'
+    $ qemu-system-x86_64 --drive driver=sheepdog,filename=sheepdog+unix:///vdi?socke=sheepdog.sock
+    qemu-system-x86_64: --drive driver=sheepdog,filename=sheepdog+unix:///vdi?socke=sheepdog.sock: unexpected query parameters
+
+The code to translate legacy syntax to URI fails to escape URI
+meta-characters.  The new error messages are misleading then.  Replace
+them by the old "Can't parse filename" message.  "Internal error"
+would be more honest.  Anyway, no worse than before.  Also add a FIXME
+comment.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- block/gluster.c  | 59 +++++++++++++++++++++++++++++---------------------------
- qapi-schema.json |  8 ++++----
- 2 files changed, 35 insertions(+), 32 deletions(-)
+ block/sheepdog.c | 86 ++++++++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 58 insertions(+), 28 deletions(-)
 
-diff --git a/block/gluster.c b/block/gluster.c
-index 77ce45b..0155188 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -152,7 +152,7 @@ static QemuOptsList runtime_type_opts = {
-         {
-             .name = GLUSTER_OPT_TYPE,
-             .type = QEMU_OPT_STRING,
--            .help = "tcp|unix",
-+            .help = "inet|unix",
-         },
-         { /* end of list */ }
-     },
-@@ -171,14 +171,14 @@ static QemuOptsList runtime_unix_opts = {
-     },
- };
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index 72a52a6..ac62225 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -957,16 +957,18 @@ static bool sd_parse_snapid_or_tag(const char *str,
+     return true;
+ }
  
--static QemuOptsList runtime_tcp_opts = {
--    .name = "gluster_tcp",
--    .head = QTAILQ_HEAD_INITIALIZER(runtime_tcp_opts.head),
-+static QemuOptsList runtime_inet_opts = {
-+    .name = "gluster_inet",
-+    .head = QTAILQ_HEAD_INITIALIZER(runtime_inet_opts.head),
-     .desc = {
-         {
-             .name = GLUSTER_OPT_TYPE,
-             .type = QEMU_OPT_STRING,
--            .help = "tcp|unix",
-+            .help = "inet|unix",
-         },
-         {
-             .name = GLUSTER_OPT_HOST,
-@@ -337,14 +337,14 @@ static int qemu_gluster_parse_uri(BlockdevOptionsGluster *gconf,
+-static int sd_parse_uri(BDRVSheepdogState *s, const char *filename,
+-                        char *vdi, uint32_t *snapid, char *tag)
++static void sd_parse_uri(BDRVSheepdogState *s, const char *filename,
++                         char *vdi, uint32_t *snapid, char *tag,
++                         Error **errp)
+ {
++    Error *err = NULL;
+     URI *uri;
+     QueryParams *qp = NULL;
+-    int ret = 0;
  
-     /* transport */
-     if (!uri->scheme || !strcmp(uri->scheme, "gluster")) {
--        gsconf->type = SOCKET_ADDRESS_FLAT_TYPE_TCP;
-+        gsconf->type = SOCKET_ADDRESS_FLAT_TYPE_INET;
-     } else if (!strcmp(uri->scheme, "gluster+tcp")) {
--        gsconf->type = SOCKET_ADDRESS_FLAT_TYPE_TCP;
-+        gsconf->type = SOCKET_ADDRESS_FLAT_TYPE_INET;
-     } else if (!strcmp(uri->scheme, "gluster+unix")) {
-         gsconf->type = SOCKET_ADDRESS_FLAT_TYPE_UNIX;
-         is_unix = true;
-     } else if (!strcmp(uri->scheme, "gluster+rdma")) {
--        gsconf->type = SOCKET_ADDRESS_FLAT_TYPE_TCP;
-+        gsconf->type = SOCKET_ADDRESS_FLAT_TYPE_INET;
-         error_report("Warning: rdma feature is not supported, falling "
-                      "back to tcp");
-     } else {
-@@ -374,11 +374,11 @@ static int qemu_gluster_parse_uri(BlockdevOptionsGluster *gconf,
-         }
-         gsconf->u.q_unix.path = g_strdup(qp->p[0].value);
-     } else {
--        gsconf->u.tcp.host = g_strdup(uri->server ? uri->server : "localhost");
-+        gsconf->u.inet.host = g_strdup(uri->server ? uri->server : "localhost");
-         if (uri->port) {
--            gsconf->u.tcp.port = g_strdup_printf("%d", uri->port);
-+            gsconf->u.inet.port = g_strdup_printf("%d", uri->port);
-         } else {
--            gsconf->u.tcp.port = g_strdup_printf("%d", GLUSTER_DEFAULT_PORT);
-+            gsconf->u.inet.port = g_strdup_printf("%d", GLUSTER_DEFAULT_PORT);
-         }
+     uri = uri_parse(filename);
+     if (!uri) {
+-        return -EINVAL;
++        error_setg(&err, "invalid URI");
++        goto out;
      }
  
-@@ -416,15 +416,15 @@ static struct glfs *qemu_gluster_glfs_init(BlockdevOptionsGluster *gconf,
-             ret = glfs_set_volfile_server(glfs, "unix",
-                                    server->value->u.q_unix.path, 0);
-         } else {
--            if (parse_uint_full(server->value->u.tcp.port, &port, 10) < 0 ||
-+            if (parse_uint_full(server->value->u.inet.port, &port, 10) < 0 ||
-                 port > 65535) {
-                 error_setg(errp, "'%s' is not a valid port number",
--                           server->value->u.tcp.port);
-+                           server->value->u.inet.port);
-                 errno = EINVAL;
-                 goto out;
-             }
-             ret = glfs_set_volfile_server(glfs, "tcp",
--                                   server->value->u.tcp.host,
-+                                   server->value->u.inet.host,
-                                    (int)port);
-         }
+     /* transport */
+@@ -977,33 +979,46 @@ static int sd_parse_uri(BDRVSheepdogState *s, const char *filename,
+     } else if (!strcmp(uri->scheme, "sheepdog+unix")) {
+         s->is_unix = true;
+     } else {
+-        ret = -EINVAL;
++        error_setg(&err, "URI scheme must be 'sheepdog', 'sheepdog+tcp',"
++                   " or 'sheepdog+unix'");
+         goto out;
+     }
  
-@@ -448,8 +448,8 @@ static struct glfs *qemu_gluster_glfs_init(BlockdevOptionsGluster *gconf,
-                                   server->value->u.q_unix.path);
-             } else {
-                 error_append_hint(errp, "hint: failed on host %s and port %s ",
--                                  server->value->u.tcp.host,
--                                  server->value->u.tcp.port);
-+                                  server->value->u.inet.host,
-+                                  server->value->u.inet.port);
-             }
-         }
+     if (uri->path == NULL || !strcmp(uri->path, "/")) {
+-        ret = -EINVAL;
++        error_setg(&err, "missing file path in URI");
+         goto out;
+     }
+     if (g_strlcpy(vdi, uri->path + 1, SD_MAX_VDI_LEN) >= SD_MAX_VDI_LEN) {
++        error_setg(&err, "VDI name is too long");
+         goto out;
+     }
  
-@@ -536,21 +536,24 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+     qp = query_params_parse(uri->query);
+-    if (qp->n > 1 || (s->is_unix && !qp->n) || (!s->is_unix && qp->n)) {
+-        ret = -EINVAL;
+-        goto out;
+-    }
  
-         }
-         gsconf = g_new0(SocketAddressFlat, 1);
-+        if (!strcmp(ptr, "tcp")) {
-+            ptr = "inet";       /* accept legacy "tcp" */
+     if (s->is_unix) {
+         /* sheepdog+unix:///vdiname?socket=path */
+-        if (uri->server || uri->port || strcmp(qp->p[0].name, "socket")) {
+-            ret = -EINVAL;
++        if (uri->server || uri->port) {
++            error_setg(&err, "URI scheme %s doesn't accept a server address",
++                       uri->scheme);
++            goto out;
 +        }
-         gsconf->type = qapi_enum_parse(SocketAddressFlatType_lookup, ptr,
-                                        SOCKET_ADDRESS_FLAT_TYPE__MAX, 0,
-                                        &local_err);
-         if (local_err) {
-             error_append_hint(&local_err,
--                              "Parameter '%s' may be 'tcp' or 'unix'\n",
-+                              "Parameter '%s' may be 'inet' or 'unix'\n",
-                               GLUSTER_OPT_TYPE);
-             error_append_hint(&local_err, GERR_INDEX_HINT, i);
++        if (!qp->n) {
++            error_setg(&err,
++                       "URI scheme %s requires query parameter 'socket'",
++                       uri->scheme);
++            goto out;
++        }
++        if (qp->n != 1 || strcmp(qp->p[0].name, "socket")) {
++            error_setg(&err, "unexpected query parameters");
              goto out;
          }
-         qemu_opts_del(opts);
+         s->host_spec = g_strdup(qp->p[0].value);
+     } else {
+         /* sheepdog[+tcp]://[host:port]/vdiname */
++        if (qp->n) {
++            error_setg(&err, "unexpected query parameters");
++            goto out;
++        }
+         s->host_spec = g_strdup_printf("%s:%d", uri->server ?: SD_DEFAULT_ADDR,
+                                        uri->port ?: SD_DEFAULT_PORT);
+     }
+@@ -1011,7 +1026,8 @@ static int sd_parse_uri(BDRVSheepdogState *s, const char *filename,
+     /* snapshot tag */
+     if (uri->fragment) {
+         if (!sd_parse_snapid_or_tag(uri->fragment, snapid, tag)) {
+-            ret = -EINVAL;
++            error_setg(&err, "'%s' is not a valid snapshot ID",
++                       uri->fragment);
+             goto out;
+         }
+     } else {
+@@ -1019,11 +1035,11 @@ static int sd_parse_uri(BDRVSheepdogState *s, const char *filename,
+     }
  
--        if (gsconf->type == SOCKET_ADDRESS_FLAT_TYPE_TCP) {
--            /* create opts info from runtime_tcp_opts list */
--            opts = qemu_opts_create(&runtime_tcp_opts, NULL, 0, &error_abort);
-+        if (gsconf->type == SOCKET_ADDRESS_FLAT_TYPE_INET) {
-+            /* create opts info from runtime_inet_opts list */
-+            opts = qemu_opts_create(&runtime_inet_opts, NULL, 0, &error_abort);
-             qemu_opts_absorb_qdict(opts, backing_options, &local_err);
-             if (local_err) {
-                 goto out;
-@@ -563,7 +566,7 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
-                 error_append_hint(&local_err, GERR_INDEX_HINT, i);
-                 goto out;
-             }
--            gsconf->u.tcp.host = g_strdup(ptr);
-+            gsconf->u.inet.host = g_strdup(ptr);
-             ptr = qemu_opt_get(opts, GLUSTER_OPT_PORT);
-             if (!ptr) {
-                 error_setg(&local_err, QERR_MISSING_PARAMETER,
-@@ -571,28 +574,28 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
-                 error_append_hint(&local_err, GERR_INDEX_HINT, i);
-                 goto out;
-             }
--            gsconf->u.tcp.port = g_strdup(ptr);
-+            gsconf->u.inet.port = g_strdup(ptr);
+ out:
++    error_propagate(errp, err);
+     if (qp) {
+         query_params_free(qp);
+     }
+     uri_free(uri);
+-    return ret;
+ }
  
-             /* defend for unsupported fields in InetSocketAddress,
-              * i.e. @ipv4, @ipv6  and @to
-              */
-             ptr = qemu_opt_get(opts, GLUSTER_OPT_TO);
-             if (ptr) {
--                gsconf->u.tcp.has_to = true;
-+                gsconf->u.inet.has_to = true;
-             }
-             ptr = qemu_opt_get(opts, GLUSTER_OPT_IPV4);
-             if (ptr) {
--                gsconf->u.tcp.has_ipv4 = true;
-+                gsconf->u.inet.has_ipv4 = true;
-             }
-             ptr = qemu_opt_get(opts, GLUSTER_OPT_IPV6);
-             if (ptr) {
--                gsconf->u.tcp.has_ipv6 = true;
-+                gsconf->u.inet.has_ipv6 = true;
-             }
--            if (gsconf->u.tcp.has_to) {
-+            if (gsconf->u.inet.has_to) {
-                 error_setg(&local_err, "Parameter 'to' not supported");
-                 goto out;
-             }
--            if (gsconf->u.tcp.has_ipv4 || gsconf->u.tcp.has_ipv6) {
-+            if (gsconf->u.inet.has_ipv4 || gsconf->u.inet.has_ipv6) {
-                 error_setg(&local_err, "Parameters 'ipv4/ipv6' not supported");
-                 goto out;
-             }
-@@ -669,7 +672,7 @@ static struct glfs *qemu_gluster_init(BlockdevOptionsGluster *gconf,
-                              "file.volume=testvol,file.path=/path/a.qcow2"
-                              "[,file.debug=9]"
-                              "[,file.logfile=/path/filename.log],"
--                             "file.server.0.type=tcp,"
-+                             "file.server.0.type=inet,"
-                              "file.server.0.host=1.2.3.4,"
-                              "file.server.0.port=24007,"
-                              "file.server.1.transport=unix,"
-diff --git a/qapi-schema.json b/qapi-schema.json
-index a57afeb..dfaebce 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -4105,14 +4105,14 @@
- #
- # Available SocketAddressFlat types
- #
--# @tcp:   Internet address
-+# @inet:   Internet address
- #
- # @unix:  Unix domain socket
- #
- # Since: 2.9
- ##
- { 'enum': 'SocketAddressFlatType',
--  'data': [ 'unix', 'tcp' ] }
-+  'data': [ 'unix', 'inet' ] }
+ /*
+@@ -1043,12 +1059,14 @@ out:
+  * You can run VMs outside the Sheepdog cluster by specifying
+  * `hostname' and `port' (experimental).
+  */
+-static int parse_vdiname(BDRVSheepdogState *s, const char *filename,
+-                         char *vdi, uint32_t *snapid, char *tag)
++static void parse_vdiname(BDRVSheepdogState *s, const char *filename,
++                          char *vdi, uint32_t *snapid, char *tag,
++                          Error **errp)
+ {
++    Error *err = NULL;
+     char *p, *q, *uri;
+     const char *host_spec, *vdi_spec;
+-    int nr_sep, ret;
++    int nr_sep;
  
- ##
- # @SocketAddressFlat:
-@@ -4127,7 +4127,7 @@
- #    A flat union is nicer than simple because it avoids nesting
- #    (i.e. more {}) on the wire.
- #
--# 2. SocketAddressFlat supports only types 'unix' and 'tcp', because
-+# 2. SocketAddressFlat supports only types 'unix' and 'inet', because
- #    that's what its current users need.
- #
- # Since: 2.9
-@@ -4136,7 +4136,7 @@
-   'base': { 'type': 'SocketAddressFlatType' },
-   'discriminator': 'type',
-   'data': { 'unix': 'UnixSocketAddress',
--            'tcp': 'InetSocketAddress' } }
-+            'inet': 'InetSocketAddress' } }
+     strstart(filename, "sheepdog:", &filename);
+     p = q = g_strdup(filename);
+@@ -1083,12 +1101,23 @@ static int parse_vdiname(BDRVSheepdogState *s, const char *filename,
  
- ##
- # @getfd:
+     uri = g_strdup_printf("sheepdog://%s/%s", host_spec, vdi_spec);
+ 
+-    ret = sd_parse_uri(s, uri, vdi, snapid, tag);
++    /*
++     * FIXME We to escape URI meta-characters, e.g. "x?y=z"
++     * produces "sheepdog://x?y=z".  Because of that ...
++     */
++    sd_parse_uri(s, uri, vdi, snapid, tag, &err);
++    if (err) {
++        /*
++         * ... this can fail, but the error message is misleading.
++         * Replace it by the traditional useless one until the
++         * escaping is fixed.
++         */
++        error_free(err);
++        error_setg(errp, "Can't parse filename");
++    }
+ 
+     g_free(q);
+     g_free(uri);
+-
+-    return ret;
+ }
+ 
+ static int find_vdi_name(BDRVSheepdogState *s, const char *filename,
+@@ -1451,12 +1480,12 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
+     memset(tag, 0, sizeof(tag));
+ 
+     if (strstr(filename, "://")) {
+-        ret = sd_parse_uri(s, filename, vdi, &snapid, tag);
++        sd_parse_uri(s, filename, vdi, &snapid, tag, &local_err);
+     } else {
+-        ret = parse_vdiname(s, filename, vdi, &snapid, tag);
++        parse_vdiname(s, filename, vdi, &snapid, tag, &local_err);
+     }
+-    if (ret < 0) {
+-        error_setg(errp, "Can't parse filename");
++    if (local_err) {
++        error_propagate(errp, local_err);
+         goto out_no_fd;
+     }
+     s->fd = get_sheep_fd(s, errp);
+@@ -1785,6 +1814,7 @@ static int parse_block_size_shift(BDRVSheepdogState *s, QemuOpts *opt)
+ static int sd_create(const char *filename, QemuOpts *opts,
+                      Error **errp)
+ {
++    Error *err = NULL;
+     int ret = 0;
+     uint32_t vid = 0;
+     char *backing_file = NULL;
+@@ -1799,12 +1829,12 @@ static int sd_create(const char *filename, QemuOpts *opts,
+ 
+     memset(tag, 0, sizeof(tag));
+     if (strstr(filename, "://")) {
+-        ret = sd_parse_uri(s, filename, s->name, &snapid, tag);
++        sd_parse_uri(s, filename, s->name, &snapid, tag, &err);
+     } else {
+-        ret = parse_vdiname(s, filename, s->name, &snapid, tag);
++        parse_vdiname(s, filename, s->name, &snapid, tag, &err);
+     }
+-    if (ret < 0) {
+-        error_setg(errp, "Can't parse filename");
++    if (err) {
++        error_propagate(errp, err);
+         goto out;
+     }
+ 
 -- 
 2.7.4
