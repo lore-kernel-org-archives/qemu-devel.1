@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cjWN5-0006rK-Ua
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 14:26:41 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cjWO3-0007Mv-RJ
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 14:27:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cjWN1-0007Gd-RT
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 14:26:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41838)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cjWN1-0007GM-IV
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 14:26:35 -0500
-References: <1488472983-9108-1-git-send-email-felipe@nutanix.com>
-	<148847375468.285.999031041241417996@0e2666bad730>
-	<F9FA9F92-B44C-401D-A892-D73D36777B47@nutanix.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7aed6281-a647-78bd-3d39-233ca50d8f71@redhat.com>
-Date: Thu, 2 Mar 2017 13:26:25 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1cjWO2-0007iw-Uc
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 14:27:39 -0500
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:38679)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cjWO2-0007il-ND
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 14:27:38 -0500
+Received: by mail-wm0-x22e.google.com with SMTP id t193so20698343wmt.1
+	for <qemu-devel@nongnu.org>; Thu, 02 Mar 2017 11:27:38 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <F9FA9F92-B44C-401D-A892-D73D36777B47@nutanix.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Mr58deMkxkujULRB3UX9VOwMi7CtMJ6NF"
-Subject: Re: [Qemu-devel] [PATCH v4 0/3] Introduce vhost-user-scsi and
- sample application
+In-Reply-To: <20170228124056.5074-1-dgilbert@redhat.com>
+References: <20170228124056.5074-1-dgilbert@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 2 Mar 2017 19:27:16 +0000
+Message-ID: <CAFEAcA-28jrOb2cnhBT_Lk9=MR1sjDE1Bdo0dC9hCsdeRukK5Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 00/27] migration queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +29,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Felipe Franciosi <felipe@nutanix.com>
-Cc: "famz@redhat.com" <famz@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, pasic@linux.vnet.ibm.com, vsementsov@virtuozzo.com, Juan Quintela <quintela@redhat.com>, Ashijeet Acharya <ashijeetacharya@gmail.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, danielhb@linux.vnet.ibm.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Mr58deMkxkujULRB3UX9VOwMi7CtMJ6NF
-From: Eric Blake <eblake@redhat.com>
-To: Felipe Franciosi <felipe@nutanix.com>
-Cc: "famz@redhat.com" <famz@redhat.com>, "mst@redhat.com" <mst@redhat.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Message-ID: <7aed6281-a647-78bd-3d39-233ca50d8f71@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 0/3] Introduce vhost-user-scsi and sample
- application
-References: <1488472983-9108-1-git-send-email-felipe@nutanix.com>
- <148847375468.285.999031041241417996@0e2666bad730>
- <F9FA9F92-B44C-401D-A892-D73D36777B47@nutanix.com>
-In-Reply-To: <F9FA9F92-B44C-401D-A892-D73D36777B47@nutanix.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 28 February 2017 at 12:40, Dr. David Alan Gilbert (git)
+<dgilbert@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> The following changes since commit 6181478f6395cdd9d6ffd99623d0c9f39ea536=
+06:
+>
+>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request'=
+ into staging (2017-02-28 08:46:03 +0000)
+>
+> are available in the git repository at:
+>
+>   git://github.com/dagrh/qemu.git tags/pull-migration-20170228a
+>
+> for you to fetch changes up to 665414ad06aa1bc92e615db9641e58fb13d07de1:
+>
+>   postcopy: Add extra check for COPY function (2017-02-28 11:30:24 +0000)
+>
+> ----------------------------------------------------------------
+> Migration pull
+>
+> Note: The 'postcopy: Update userfaultfd.h header' is part of
+> Paolo's header update and will disappear if applied after it.
+>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>
+> ----------------------------------------------------------------
+> Ashijeet Acharya (1):
+>       migrate: Introduce a 'dc->vmsd' check to avoid segfault for --only-=
+migratable
+>
+> Daniel Henrique Barboza (1):
+>       Changing error message of QMP 'migrate_set_downtime' to seconds
+>
+> Dr. David Alan Gilbert (17):
+>       migration: Update docs to discourage version bumps
+>       postcopy: Transmit ram size summary word
+>       postcopy: Transmit and compare individual page sizes
+>       postcopy: Chunk discards for hugepages
+>       exec: ram_block_discard_range
+>       postcopy: enhance ram_block_discard_range for hugepages
+>       postcopy: Record largest page size
+>       postcopy: Plumb pagesize down into place helpers
+>       postcopy: Use temporary for placing zero huge pages
+>       postcopy: Load huge pages in one go
+>       postcopy: Mask fault addresses to huge page boundary
+>       postcopy: Send whole huge pages
+>       postcopy: Allow hugepages
+>       postcopy: Update userfaultfd.h header
+>       postcopy: Check for userfault+hugepage feature
+>       postcopy: Add doc about hugepages and postcopy
+>       postcopy: Add extra check for COPY function
+>
+> Halil Pasic (5):
+>       migration/vmstate: renames in (load|save)_state
+>       migration/vmstate: split up vmstate_base_addr
+>       migration/vmstate: fix array of ptr with nullptrs
+>       tests/test-vmstate.c: test array of ptr with null
+>       tests/test-vmstate.c: test array of ptr to primitive
+>
+> Laurent Vivier (1):
+>       vmstate-static-checker: update white list with spapr_pci
+>
+> Marc-Andr=C3=A9 Lureau (1):
+>       migration: fix id leak regression
+>
+> Vladimir Sementsov-Ogievskiy (1):
+>       migration: fix use-after-free of to_dst_file
 
-On 03/02/2017 11:01 AM, Felipe Franciosi wrote:
-> Hi Eric,
->=20
-> Ping on this?
-> http://lists.nongnu.org/archive/html/qemu-devel/2016-10/msg06169.html
->=20
+Applied, thanks.
 
-[context: Re: [Qemu-devel] [PATCH 1/2] compiler: add ignore_value() macro=
-]
-
-I'm still in favor of the patch, but only when it has a client. And I'm
-not sure who the maintainer is for the 2/2 of that series.  But the
-easiest way to get ignore_value() added to the source tree is to
-(re-)submit it as part of a series that uses it.  It's okay for more
-than one patch series to start with a common patch prefix.
-
-For this particular thread, Dan pointed out a nice way to sidestep
-ignore_value(), so that doesn't help much on the ping'd patch.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---Mr58deMkxkujULRB3UX9VOwMi7CtMJ6NF
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYuHHhAAoJEKeha0olJ0NqLMYIAIck/wat4AAnATsDJgvrxoiB
-WzdF1Qo10NVruDieL58GIyE3EE7VALudiLlSytJBScJQUgcYWIcB6nXmtYqZFmGG
-Nbi22N/Vj/Jk6wcpHeEhpas57JUK6298wzCmP7jU1yL2R8b9qX63MYe2kDu1CDuR
-CdHeVz5Gye1VxdeV1AWFgo+69EtRFiFFRacMRJUTvr6MGtZ1YB1H05YrZKo9vr+h
-Rc5ntSgRR4qXd9+zsUArAPjzaAZfGye4HSsrB3sX9RK7bZdRJ0paiXGD1r4X8wph
-kBDu6Ljzrn6QHrZ3xaIiC7b9F6vHgsYnyokHvDM82vfyp+/XX/aP7qSUlEntDlw=
-=4wIa
------END PGP SIGNATURE-----
-
---Mr58deMkxkujULRB3UX9VOwMi7CtMJ6NF--
+-- PMM
