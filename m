@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33283)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36629)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cjVEG-0002e1-ON
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 13:13:29 -0500
+	(envelope-from <felipe@nutanix.com>) id 1cjVQQ-0005CG-GF
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 13:26:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cjVED-0006R5-If
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 13:13:28 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45401)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1cjVED-0006Qb-9T
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 13:13:25 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v22I8hrC061295
-	for <qemu-devel@nongnu.org>; Thu, 2 Mar 2017 13:13:23 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28xpbs6kxa-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 02 Mar 2017 13:13:23 -0500
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Thu, 2 Mar 2017 18:13:21 -0000
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Thu,  2 Mar 2017 19:13:08 +0100
-Message-Id: <20170302181308.69662-1-pasic@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 1/1] event_notifier: prevent accidental use
- after close
+	(envelope-from <felipe@nutanix.com>) id 1cjVQM-0005Sy-9A
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 13:26:02 -0500
+Received: from 206-15-90-246.static.twtelecom.net ([206.15.90.246]:43783
+	helo=felipe-franciosi.localdomain)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <felipe@nutanix.com>) id 1cjVQM-0005ST-1v
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 13:25:58 -0500
+From: Felipe Franciosi <felipe@nutanix.com>
+Date: Thu,  2 Mar 2017 10:25:49 -0800
+Message-Id: <1488479153-21203-1-git-send-email-felipe@nutanix.com>
+Subject: [Qemu-devel] [PATCH v5 0/4] Introduce vhost-user-scsi and sample
+ application
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,54 +23,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Stefan Weil <sw@weilnetz.de>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>, Felipe Franciosi <felipe@nutanix.com>
 
-Let's set the handles to the underlying facilities to their extremal
-value so no accidental misuse can happen, and to make it obvious that the
-notifier is dysfunctional. E.g. if we just close an fd but do not touch
-the int holding the fd eventually a read/write could succeed again when
-the fd gets reused, and corrupt the file addressed by the fd.
+Based on various discussions on the 2016 KVM Forum, I'm sending over a
+vhost-user-scsi implementation for your consideration.
 
-Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
----
+This patchset introduces a new vhost-user SCSI device. While heavily
+based on vhost-scsi, it is implemented using vhost's userspace
+counterpart. The device has been coded and tested to work with live
+migration.
 
-No strong feelings about this, but obviously, I do think it's worth a
-try.
+As part of this work, a new vhost-scsi-common device was created and
+the existing vhost-scsi device moved underneath it. The new
+vhost-user-scsi device is also placed underneath it.
 
-The one who brought this unfortunate possibility to my attention was
-Michael Tsirkin.
----
- util/event_notifier-posix.c | 2 ++
- util/event_notifier-win32.c | 1 +
- 2 files changed, 3 insertions(+)
+A sample application based on the newly introduced libvhost-user is
+also included. It makes use of libiscsi for simplicity.
 
-diff --git a/util/event_notifier-posix.c b/util/event_notifier-posix.c
-index 7e40252..acdbe3b 100644
---- a/util/event_notifier-posix.c
-+++ b/util/event_notifier-posix.c
-@@ -81,8 +81,10 @@ void event_notifier_cleanup(EventNotifier *e)
- {
-     if (e->rfd != e->wfd) {
-         close(e->rfd);
-+        e->rfd = -1;
-     }
-     close(e->wfd);
-+    e->wfd = -1;
- }
- 
- int event_notifier_get_fd(const EventNotifier *e)
-diff --git a/util/event_notifier-win32.c b/util/event_notifier-win32.c
-index 519fb59..62c53b0 100644
---- a/util/event_notifier-win32.c
-+++ b/util/event_notifier-win32.c
-@@ -25,6 +25,7 @@ int event_notifier_init(EventNotifier *e, int active)
- void event_notifier_cleanup(EventNotifier *e)
- {
-     CloseHandle(e->event);
-+    e->event = NULL;
- }
- 
- HANDLE event_notifier_get_handle(EventNotifier *e)
+For convenience, I'm maintaining an up-to-date version of these
+patches (including some necessary fixes for libvhost-user) on:
+
+https://github.com/franciozzy/qemu/tree/vus-upstream-v5
+
+See the individual patches for build and use instructions.
+
+Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
+
+v4 -> v5:
+- Add a patch to fix a build issue with libvhost-user.
+
+v3 -> v4:
+- Drop configure switches and build vus by default.
+- Add sample application to .gitignore.
+- Removed a whitespace error.
+- Rebase on master.
+
+v2 -> v3:
+- Rebase after vhost notifier fixes by Paolo.
+- Exposed F_HOTPLUG and F_CHANGE on vhost-user-scsi.
+
+v1 -> v2:
+- Introduce new vhost-scsi-common device type.
+- Move vhost-scsi device underneath vhost-scsi-common.
+- Move sample application from tests/ to contrib/.
+- Make sample application use the glib event loop.
+- Minor fixes.
+
+Felipe Franciosi (4):
+  libvhost-user: replace vasprintf() to fix build
+  vhost-scsi: create a vhost-scsi-common abstraction
+  vus: Introduce vhost-user-scsi host device
+  vus: Introduce a vhost-user-scsi sample application
+
+ .gitignore                                |   1 +
+ Makefile                                  |   3 +
+ Makefile.objs                             |   4 +
+ configure                                 |   1 +
+ contrib/libvhost-user/libvhost-user.c     |   2 +-
+ contrib/vhost-user-scsi/Makefile.objs     |   1 +
+ contrib/vhost-user-scsi/vhost-user-scsi.c | 886 ++++++++++++++++++++++++++++++
+ default-configs/pci.mak                   |   1 +
+ hw/scsi/Makefile.objs                     |   3 +-
+ hw/scsi/vhost-scsi-common.c               | 143 +++++
+ hw/scsi/vhost-scsi.c                      | 194 ++-----
+ hw/scsi/vhost-user-scsi.c                 | 215 ++++++++
+ hw/virtio/virtio-pci.c                    |  54 ++
+ hw/virtio/virtio-pci.h                    |  11 +
+ include/hw/virtio/vhost-scsi-common.h     |  48 ++
+ include/hw/virtio/vhost-scsi.h            |  11 +-
+ include/hw/virtio/vhost-user-scsi.h       |  35 ++
+ include/hw/virtio/virtio-scsi.h           |   5 +
+ 18 files changed, 1469 insertions(+), 149 deletions(-)
+ create mode 100644 contrib/vhost-user-scsi/Makefile.objs
+ create mode 100644 contrib/vhost-user-scsi/vhost-user-scsi.c
+ create mode 100644 hw/scsi/vhost-scsi-common.c
+ create mode 100644 hw/scsi/vhost-user-scsi.c
+ create mode 100644 include/hw/virtio/vhost-scsi-common.h
+ create mode 100644 include/hw/virtio/vhost-user-scsi.h
+
 -- 
-2.8.4
+1.9.4
