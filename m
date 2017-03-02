@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj.dadhania@gmail.com>) id 1cjI2M-0003DO-Ky
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 23:08:19 -0500
+	(envelope-from <programmingkidx@gmail.com>) id 1cjI39-0003bA-MM
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 23:09:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj.dadhania@gmail.com>) id 1cjI2L-0006iX-JQ
-	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 23:08:18 -0500
-MIME-Version: 1.0
-In-Reply-To: <32926f1f-ec40-420f-210b-8f5991cc9d67@twiddle.net>
-References: <1488381854-7275-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<20170302002933.GL12571@umbus.fritz.box>
-	<32926f1f-ec40-420f-210b-8f5991cc9d67@twiddle.net>
-From: Nikunj Dadhania <nikunj.dadhania@gmail.com>
-Date: Thu, 2 Mar 2017 09:38:14 +0530
-Message-ID: <CALAZu3_e8AWbOpASxY9s97AyNd+CX=BYCMx3g4KrG2Ki6w1CZg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v1] target/ppc: rewrite
- f[n]m[add, sub] using float64_muladd
+	(envelope-from <programmingkidx@gmail.com>) id 1cjI34-00077K-PA
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 23:09:07 -0500
+Received: from mail-io0-x229.google.com ([2607:f8b0:4001:c06::229]:34073)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1cjI34-000772-KI
+	for qemu-devel@nongnu.org; Wed, 01 Mar 2017 23:09:02 -0500
+Received: by mail-io0-x229.google.com with SMTP id 90so45635689ios.1
+	for <qemu-devel@nongnu.org>; Wed, 01 Mar 2017 20:09:01 -0800 (PST)
+From: Programmingkid <programmingkidx@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 1 Mar 2017 23:08:58 -0500
+Message-Id: <38265DF9-8C55-4B4E-9222-F75C5E675ABB@gmail.com>
+Mime-Version: 1.0 (Apple Message framework v1084)
+Subject: [Qemu-devel] Patch causes Mac OS X to print dead controller messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,29 +27,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, bharata@linux.vnet.ibm.com
+To: Gerd Hoffmann <kraxel@redhat.com>, Li Qiang <liqiang6-s@360.cn>
+Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-On 02-Mar-2017 7:53 AM, "Richard Henderson" <rth@twiddle.net> wrote:
+commit 95ed56939eb2eaa4e2f349fe6dcd13ca4edfd8fb
+usb: ohci: limit the number of link eds
 
-On 03/02/2017 11:29 AM, David Gibson wrote:
+This patch causes Mac OS X to continuously print this message:
+USBF: 35.508 AppleUSBOHCI[0x1187000] Watchdog detected dead controller =
+(hcca #: 0, hc#: 863)
 
-> On Wed, Mar 01, 2017 at 08:54:14PM +0530, Nikunj A Dadhania wrote:
->
->> Use the softfloat api for fused multiply-add. Also, generate VXISI using
->> a helper function by computing intermediate result.
->>
->
-> Um.. I really need some information on why this is a good thing to
-> do.  Is it a bugfix?  Enhancement? Simplification?
->
-
-Looks like a bugfix to me.  Previously we were attempting the operation via
-float128 as an intermediate type, which can result in double rounding
-errors.
-
-Was discussed here
-
-https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg02000.html
-
-Nikunj
+I used git bisect to find this patch. None of the USB devices work when =
+connected to the OHCI USB controller.=
