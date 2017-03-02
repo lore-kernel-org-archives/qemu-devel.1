@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46772)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46810)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1cjNf1-0003Xc-Dn
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 05:08:36 -0500
+	(envelope-from <liq3ea@gmail.com>) id 1cjNfB-0003eT-RR
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 05:08:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1cjNf0-0007fh-E5
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 05:08:35 -0500
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:35343)
+	(envelope-from <liq3ea@gmail.com>) id 1cjNf6-0007gg-Mu
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 05:08:45 -0500
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:35356)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1cjNf0-0007fD-8m
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 05:08:34 -0500
-Received: by mail-pf0-x244.google.com with SMTP id 67so1971490pfg.2
-	for <qemu-devel@nongnu.org>; Thu, 02 Mar 2017 02:08:32 -0800 (PST)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1cjNf6-0007gW-Hp
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 05:08:40 -0500
+Received: by mail-pf0-x241.google.com with SMTP id 67so1971809pfg.2
+	for <qemu-devel@nongnu.org>; Thu, 02 Mar 2017 02:08:40 -0800 (PST)
 From: Li Qiang <liq3ea@gmail.com>
-Date: Thu,  2 Mar 2017 02:08:11 -0800
-Message-Id: <1488449293-80280-2-git-send-email-liqiang6-s@360.cn>
+Date: Thu,  2 Mar 2017 02:08:12 -0800
+Message-Id: <1488449293-80280-3-git-send-email-liqiang6-s@360.cn>
 In-Reply-To: <1488449293-80280-1-git-send-email-liqiang6-s@360.cn>
 References: <1488449293-80280-1-git-send-email-liqiang6-s@360.cn>
-Subject: [Qemu-devel] [PATCH 1/3] ide: qdev: register ide bus unrealize
- function
+Subject: [Qemu-devel] [PATCH 2/3] ide: core: add cleanup function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +28,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: jsnow@redhat.com, qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, ppandit@redhat.com, Li Qiang <liqiang6-s@360.cn>
 
-we have an idebus unrealize function, but it was being
-registered as the unrealize function for the IDE Device,
-so it was not getting invoked on device teardown because
-nothing is "unrealizing" the IDE devices themselves.
+As the pci ahci can be hotplug and unplug, in the ahci unrealize
+function it should free all the resource once allocated in the
+realized function. This patch add ide_exit to free the resource.
 
-Suggested-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Li Qiang <liqiang6-s@360.cn>
 ---
- hw/ide/qdev.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ hw/ide/core.c             | 8 ++++++++
+ include/hw/ide/internal.h | 1 +
+ 2 files changed, 9 insertions(+)
 
-diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
-index dbaa75c..fbf7aa5 100644
---- a/hw/ide/qdev.c
-+++ b/hw/ide/qdev.c
-@@ -31,7 +31,7 @@
- /* --------------------------------- */
- 
- static char *idebus_get_fw_dev_path(DeviceState *dev);
--static void idebus_unrealize(DeviceState *qdev, Error **errp);
-+static void idebus_unrealize(BusState *qdev, Error **errp);
- 
- static Property ide_props[] = {
-     DEFINE_PROP_UINT32("unit", IDEDevice, unit, -1),
-@@ -43,14 +43,15 @@ static void ide_bus_class_init(ObjectClass *klass, void *data)
-     BusClass *k = BUS_CLASS(klass);
- 
-     k->get_fw_dev_path = idebus_get_fw_dev_path;
-+    k->unrealize = idebus_unrealize;
+diff --git a/hw/ide/core.c b/hw/ide/core.c
+index cfa5de6..e971a94 100644
+--- a/hw/ide/core.c
++++ b/hw/ide/core.c
+@@ -2603,6 +2603,14 @@ void ide_init2(IDEBus *bus, qemu_irq irq)
+     bus->dma = &ide_dma_nop;
  }
  
--static void idebus_unrealize(DeviceState *qdev, Error **errp)
-+static void idebus_unrealize(BusState *bus, Error **errp)
- {
--    IDEBus *bus = DO_UPCAST(IDEBus, qbus, qdev->parent_bus);
-+    IDEBus *ibus = IDE_BUS(bus);
- 
--    if (bus->vmstate) {
--        qemu_del_vm_change_state_handler(bus->vmstate);
-+    if (ibus->vmstate) {
-+        qemu_del_vm_change_state_handler(ibus->vmstate);
-     }
- }
- 
-@@ -365,7 +366,6 @@ static void ide_device_class_init(ObjectClass *klass, void *data)
-     k->init = ide_qdev_init;
-     set_bit(DEVICE_CATEGORY_STORAGE, k->categories);
-     k->bus_type = TYPE_IDE_BUS;
--    k->unrealize = idebus_unrealize;
-     k->props = ide_props;
- }
++void ide_exit(IDEState *s)
++{
++    timer_del(s->sector_write_timer);
++    timer_free(s->sector_write_timer);
++    qemu_vfree(s->smart_selftest_data);
++    qemu_vfree(s->io_buffer);
++}
++
+ static const MemoryRegionPortio ide_portio_list[] = {
+     { 0, 8, 1, .read = ide_ioport_read, .write = ide_ioport_write },
+     { 0, 1, 2, .read = ide_data_readw, .write = ide_data_writew },
+diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
+index 88dc118..482a951 100644
+--- a/include/hw/ide/internal.h
++++ b/include/hw/ide/internal.h
+@@ -607,6 +607,7 @@ int ide_init_drive(IDEState *s, BlockBackend *blk, IDEDriveKind kind,
+                    uint32_t cylinders, uint32_t heads, uint32_t secs,
+                    int chs_trans);
+ void ide_init2(IDEBus *bus, qemu_irq irq);
++void ide_exit(IDEState *s);
+ void ide_init_ioport(IDEBus *bus, ISADevice *isa, int iobase, int iobase2);
+ void ide_register_restart_cb(IDEBus *bus);
  
 -- 
 1.8.3.1
