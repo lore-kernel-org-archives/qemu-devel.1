@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cjTJQ-00063c-TM
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 11:10:42 -0500
+	(envelope-from <berrange@redhat.com>) id 1cjTJT-000640-A2
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 11:10:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cjTJQ-0008Ra-3g
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 11:10:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52650)
+	(envelope-from <berrange@redhat.com>) id 1cjTJS-0008Sw-FN
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 11:10:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36064)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cjTJP-0008R8-U8
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 11:10:40 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cjTJS-0008SH-9B
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 11:10:42 -0500
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Thu,  2 Mar 2017 16:10:31 +0000
-Message-Id: <20170302161033.4787-2-berrange@redhat.com>
+Date: Thu,  2 Mar 2017 16:10:32 +0000
+Message-Id: <20170302161033.4787-3-berrange@redhat.com>
 In-Reply-To: <20170302161033.4787-1-berrange@redhat.com>
 References: <20170302161033.4787-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PULL v2 1/3] io: fix decoding when multiple
- websockets frames arrive at once
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v2 2/3] tests: fix leaks in
+ test-io-channel-command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,75 +28,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
 
-The qio_channel_websock_read_wire() method will read upto 4096
-bytes off the socket and then decode the websockets header and
-payload. The code was only decoding a single websockets frame,
-even if the buffered data contained multiple frames. This meant
-that decoding of subsequent frames was delayed until further
-input arrived on the socket. This backlog of delayed frames
-gets worse & worse over time.
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Symptom was that when connecting to the VNC server via the
-built-in websockets server, mouse/keyboard interaction would
-start out fine, but slowly get more & more delayed until it
-was unusable.
+No need for strdup, fix leaks when socat is missing.
 
+Spotted by ASAN.
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- io/channel-websock.c | 28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+ tests/test-io-channel-command.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/io/channel-websock.c b/io/channel-websock.c
-index e47279a..a06a4a8 100644
---- a/io/channel-websock.c
-+++ b/io/channel-websock.c
-@@ -570,21 +570,24 @@ static ssize_t qio_channel_websock_read_wire(QIOChannelWebsock *ioc,
-         ioc->encinput.offset += ret;
-     }
- 
--    if (ioc->payload_remain == 0) {
--        ret = qio_channel_websock_decode_header(ioc, errp);
-+    while (ioc->encinput.offset != 0) {
-+        if (ioc->payload_remain == 0) {
-+            ret = qio_channel_websock_decode_header(ioc, errp);
-+            if (ret < 0) {
-+                return ret;
-+            }
-+            if (ret == 0) {
-+                ioc->io_eof = TRUE;
-+                break;
-+            }
-+        }
-+
-+        ret = qio_channel_websock_decode_payload(ioc, errp);
-         if (ret < 0) {
-             return ret;
-         }
--        if (ret == 0) {
--            return 0;
--        }
-     }
--
--    ret = qio_channel_websock_decode_payload(ioc, errp);
--    if (ret < 0) {
--        return ret;
--    }
--    return ret;
-+    return 1;
+diff --git a/tests/test-io-channel-command.c b/tests/test-io-channel-comm=
+and.c
+index 1d1f461..46ce1ff 100644
+--- a/tests/test-io-channel-command.c
++++ b/tests/test-io-channel-command.c
+@@ -29,8 +29,8 @@ static void test_io_channel_command_fifo(bool async)
+ #define TEST_FIFO "tests/test-io-channel-command.fifo"
+     QIOChannel *src, *dst;
+     QIOChannelTest *test;
+-    char *srcfifo =3D g_strdup_printf("PIPE:%s,wronly", TEST_FIFO);
+-    char *dstfifo =3D g_strdup_printf("PIPE:%s,rdonly", TEST_FIFO);
++    const char *srcfifo =3D "PIPE:" TEST_FIFO ",wronly";
++    const char *dstfifo =3D "PIPE:" TEST_FIFO ",rdonly";
+     const char *srcargv[] =3D {
+         "/bin/socat", "-", srcfifo, NULL,
+     };
+@@ -59,8 +59,6 @@ static void test_io_channel_command_fifo(bool async)
+     object_unref(OBJECT(src));
+     object_unref(OBJECT(dst));
+=20
+-    g_free(srcfifo);
+-    g_free(dstfifo);
+     unlink(TEST_FIFO);
  }
- 
- 
-@@ -642,9 +645,6 @@ static gboolean qio_channel_websock_flush(QIOChannel *ioc,
-         if (ret < 0) {
-             goto cleanup;
-         }
--        if (ret == 0) {
--            wioc->io_eof = TRUE;
--        }
-     }
- 
-  cleanup:
--- 
+=20
+--=20
 2.9.3
