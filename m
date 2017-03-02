@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43523)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cjNRe-0007Hq-05
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 04:54:47 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cjNSC-0007br-SS
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 04:55:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cjNRa-00039n-Sx
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 04:54:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51252)
+	(envelope-from <pbonzini@redhat.com>) id 1cjNSB-0003NU-V6
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 04:55:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50124)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cjNRa-00039S-Mi
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 04:54:42 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1488435591-17882-1-git-send-email-mst@redhat.com>
-	<1488435591-17882-6-git-send-email-mst@redhat.com>
-	<87a894m72h.fsf@dusky.pond.sub.org>
-	<15694a65-6ac4-9387-1cc2-89d5bb8660b9@redhat.com>
-	<1987f7ea-6d16-c5c4-2ddb-cec3e18bd9f8@redhat.com>
-Date: Thu, 02 Mar 2017 10:54:38 +0100
-In-Reply-To: <1987f7ea-6d16-c5c4-2ddb-cec3e18bd9f8@redhat.com> (Laszlo Ersek's
-	message of "Thu, 2 Mar 2017 09:37:57 +0100")
-Message-ID: <877f48gg0x.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cjNSB-0003MO-Ow
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 04:55:19 -0500
+References: <1488272804-27144-1-git-send-email-kraxel@redhat.com>
+	<CAJSP0QVhb6FPh9HaC--7vqRgetuBQNvYt9BxeCp9KaNOTfLe8g@mail.gmail.com>
+	<CAFEAcA-QvbAUs5bS6w8_BBFS7-2msfxPeDGE8HVS3z5LKMQKPw@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5db40f1e-0fc0-f66b-ba9e-6919a6108cc6@redhat.com>
+Date: Thu, 2 Mar 2017 10:55:14 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PULL 05/15] qmp/hmp: add query-vm-generation-id
- and 'info vm-generation-id' commands
+In-Reply-To: <CAFEAcA-QvbAUs5bS6w8_BBFS7-2msfxPeDGE8HVS3z5LKMQKPw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 0/1] seabios: update to 1.10.2 release
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,46 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Ben Warren <ben@skyportsystems.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, John Snow <jsnow@redhat.com>
 
-Laszlo Ersek <lersek@redhat.com> writes:
 
-> On 03/02/17 09:25, Laszlo Ersek wrote:
->
-> Regarding your other email ("New QMP command without a test -> automatic
-> NAK"), Ben did write a small test suite for this feature:
->
-> [Qemu-devel] [PATCH v8 7/8] tests: Add unit tests for the VM Generation
->                             ID feature
->
-> and it contains a test called "/vmgenid/vmgenid/query-monitor".
->
-> That patch is not part of the pull request because the functional tests
-> in the same suite only pass if you have an updated SeaBIOS blob in the
-> tree as well. While the SeaBIOS patches have been committed, the update
-> for the blob bundled with QEMU is still in progress. Thus the patch with
-> the tests is being delayed.
 
-Posting the testing part that depends on in-progress work only as RFC
-sounds like a perfectly acceptable case of the "not practical" exception
-mentioned "New QMP command without a test -> automatic NAK".
+On 01/03/2017 18:40, Peter Maydell wrote:
+> On 1 March 2017 at 13:27, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>> On Tue, Feb 28, 2017 at 9:06 AM, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>>> Our seabios.git mirror @ qemu.org seems to not sync properly.  The
+>>> commit isn't there even though it was pushed a few days ago already
+>>> (only the tag was pushed today).  John, can you have a look please?
+>>> master branch, *-stable branches and all tags should be mirrored.
+>>
+>> Hi Gerd,
+>> It looks like the git mirrors weren't updating.  I kicked it and the
+>> necessary commit is now in the QEMU seabios.git mirror repo.
+>>
+>> It should be safe to merge this pull request now.
+> 
+> $ git submodule update
+> fatal: reference is not a tree: 5f4c7b13cdf9c450eb55645f4362ea58fa61b79b
+> Unable to checkout '5f4c7b13cdf9c450eb55645f4362ea58fa61b79b' in
+> submodule path 'roms/seabios'
+> 
+> Maybe this will update overnight?
 
-> So, it wasn't negligence, we simply missed this failure case because we
-> were so focused on the long-awaited functionality. We didn't miss other
-> failure cases that were a bit closer to the functionality.
->
-> BTW, now that I look at said "/vmgenid/vmgenid/query-monitor" test case,
-> it also doesn't seem to catch this error -- the monitor command is
-> apparently not called without the device present.
+The commit was there, but HEAD was not being updated.  Fixed now.
 
-I expect you to try to cover all QMP command error cases with automated
-tests.  I don't expect you to always succeed.  We're all human :)
-
->                                                   So yeah, review
-> focused specifically on QMP / QAPI bits is always welcome.
-
-It's a struggle, to be honest.  Bits of QMP and QAPI are often buried
-deep in patches dealing with other stuff.  QMP can usually be separated
-into its own patch, but QAPI is just infrastructure, it *wants* to be
-used.
+Paolo
