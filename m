@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cja1P-0006Sc-3k
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 18:20:31 -0500
+	(envelope-from <eblake@redhat.com>) id 1cjaBG-0007rS-2z
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 18:30:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cja1O-0004so-7y
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 18:20:31 -0500
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:38895)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cja1O-0004sN-1Z
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 18:20:30 -0500
-Received: by mail-wm0-x230.google.com with SMTP id t193so3381173wmt.1
-	for <qemu-devel@nongnu.org>; Thu, 02 Mar 2017 15:20:29 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1cjaBF-0001Kv-0g
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 18:30:42 -0500
+References: <1488491046-2549-1-git-send-email-armbru@redhat.com>
+	<1488491046-2549-6-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1494c534-50ec-5020-2c9d-76f14fac17e5@redhat.com>
+Date: Thu, 2 Mar 2017 17:30:33 -0600
 MIME-Version: 1.0
-In-Reply-To: <442ad062-5b45-bea0-3276-0cef76234477@redhat.com>
-References: <20170228161402.25122-1-pbonzini@redhat.com>
-	<CAFEAcA-yYjQab=g2C8WbP=zAy5q8r6o=z-UHh0Q9NDO3um_OCA@mail.gmail.com>
-	<442ad062-5b45-bea0-3276-0cef76234477@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 2 Mar 2017 23:20:08 +0000
-Message-ID: <CAFEAcA85Qs9OL=SQNYdNvP_UY2GycLf02EU65=a_25Wd+ZYohg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v4 00/19] KVM and cpu-exec patches for 2.9
- soft freeze
+In-Reply-To: <1488491046-2549-6-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="e4tDfppNlTgJ1nFdsahiV8wpPqF8FdLxK"
+Subject: Re: [Qemu-devel] [PATCH 05/15] sheepdog: Fix snapshot ID parsing in
+ _open(), _create, _goto()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,41 +25,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, qemu-block@nongnu.org, namei.unix@gmail.com
 
-On 2 March 2017 at 18:01, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
->
-> On 01/03/2017 18:58, Peter Maydell wrote:
->> Fails to build, ppc64, aarch64 (and probably others):
->>
->> In file included from /home/pm215/qemu/include/qemu/osdep.h:36:0,
->>                  from /home/pm215/qemu/kvm-all.c:16:
->> /home/pm215/qemu/kvm-all.c: In function =E2=80=98kvm_cpu_exec=E2=80=99:
->> /home/pm215/qemu/kvm-all.c:1995:22: error: =E2=80=98have_sigbus_pending=
-=E2=80=99
->> undeclared (first use in this function)
->>          if (unlikely(have_sigbus_pending)) {
->>                       ^
->> /home/pm215/qemu/include/qemu/compiler.h:66:43: note: in definition of
->> macro =E2=80=98unlikely=E2=80=99
->>  #define unlikely(x)   __builtin_expect(!!(x), 0)
->>                                            ^
->> /home/pm215/qemu/kvm-all.c:1995:22: note: each undeclared identifier
->> is reported only once for each function it appears in
->>          if (unlikely(have_sigbus_pending)) {
->>                       ^
->> /home/pm215/qemu/include/qemu/compiler.h:66:43: note: in definition of
->> macro =E2=80=98unlikely=E2=80=99
->>  #define unlikely(x)   __builtin_expect(!!(x), 0)
->
-> Are you sure you updated the tag?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--e4tDfppNlTgJ1nFdsahiV8wpPqF8FdLxK
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com,
+ qemu-block@nongnu.org, namei.unix@gmail.com
+Message-ID: <1494c534-50ec-5020-2c9d-76f14fac17e5@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 05/15] sheepdog: Fix snapshot ID parsing in
+ _open(), _create, _goto()
+References: <1488491046-2549-1-git-send-email-armbru@redhat.com>
+ <1488491046-2549-6-git-send-email-armbru@redhat.com>
+In-Reply-To: <1488491046-2549-6-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Your cover letter says "changes up to b9a93b6cfd"
-but the tag is of commit 0819248. My script always does
-a git fetch, so it looks to me like maybe you failed to
-push the new tag?
+On 03/02/2017 03:43 PM, Markus Armbruster wrote:
+> sd_parse_uri() and sd_snapshot_goto() screw up error checking after
+> strtoul(), and truncate long tag names silently.  Fix by replacing
+> those parts by new sd_parse_snapid_or_tag(), which checks more
+> carefully.
 
-thanks
--- PMM
+At least we've fixed checkpatch to gripe at new uses of strtoul(), but
+yeah, we've got lots of existing poor usage.  It is a very hard
+interface to use correctly, as evidenced by your cleanups here.
+
+>=20
+> sd_snapshot_delete() also parses snapshot IDs, but is currently too
+> broken for me to touch.  Mark TODO.
+>=20
+> Two calls of strtol() without error checking remain in
+> parse_redundancy().  Mark them FIXME.
+>=20
+> More silent truncation of configuration strings remains elsewhere.
+> Not marked.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  block/sheepdog.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++--=
+--------
+>  1 file changed, 55 insertions(+), 11 deletions(-)
+>=20
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--e4tDfppNlTgJ1nFdsahiV8wpPqF8FdLxK
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYuKsZAAoJEKeha0olJ0NqjqAH/3BV5A81/G9+OwM96wFRuHla
+0itJ//YGNO4YRhSpkNohoSVC23OcDMuXoTRMoOunvRDc4HFgjSXSwxMoeqUmJQ84
+Bj0e35zpY4a9rCtDWS20MIIA7kW21VpdZEniJJeUrpArYAjVK09GvCEu6+wQQhLh
+DIRue8J8Kw+mwhqNEcfMIT6ApshnuOkwKKlrN62NV+38NhS1Z9jU4bGog2rzsPHw
+4KinBTDBu9YCUiZlABYtk9360h2WsOQHQehFkTekKf3L7QD1/rQ9RLlVpTEhZ0tH
+lKpCOIuZSLj6pccxzuxIA4d0ofCDQ1NLQihyNu1U1HxlwQ5Fmye9kXEk3DX0Wkw=
+=T4fP
+-----END PGP SIGNATURE-----
+
+--e4tDfppNlTgJ1nFdsahiV8wpPqF8FdLxK--
