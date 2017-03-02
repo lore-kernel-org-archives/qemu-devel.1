@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60515)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cjWpH-0001Nd-3l
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 14:55:47 -0500
+	(envelope-from <david@redhat.com>) id 1cjWq6-000252-T8
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 14:56:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cjWpG-0003U2-AQ
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 14:55:47 -0500
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:37073)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cjWpG-0003T4-42
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 14:55:46 -0500
-Received: by mail-wm0-x230.google.com with SMTP id n11so168225wma.0
-	for <qemu-devel@nongnu.org>; Thu, 02 Mar 2017 11:55:45 -0800 (PST)
+	(envelope-from <david@redhat.com>) id 1cjWq3-0003w6-PW
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 14:56:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55632)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1cjWq3-0003vC-HQ
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 14:56:35 -0500
+References: <20170130131517.8092-1-sw@weilnetz.de>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <c16d6c6a-96b8-01fd-ca20-978e9c1a2367@redhat.com>
+Date: Thu, 2 Mar 2017 20:56:31 +0100
 MIME-Version: 1.0
-In-Reply-To: <6a3ecc27a153a5e79ba19542760c3037fe5c75f4.1488068248.git.balaton@eik.bme.hu>
-References: <cover.1488068248.git.balaton@eik.bme.hu>
-	<6a3ecc27a153a5e79ba19542760c3037fe5c75f4.1488068248.git.balaton@eik.bme.hu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 2 Mar 2017 19:55:24 +0000
-Message-ID: <CAFEAcA_dY4UF8s8JtxGUtjJ_Mfvz5Gv3Mfypz45TAtnHuHQY7w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2 03/14] sm501: QOMify
+In-Reply-To: <20170130131517.8092-1-sw@weilnetz.de>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] target/s390x: Fix broken user mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +26,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: Stefan Weil <sw@weilnetz.de>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, David Hildenbrand <dahi@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Aurelien Jarno <aurelien@aurel32.net>, Bruce Rogers <brogers@suse.com>
 
-On 3 December 2016 at 02:05, BALATON Zoltan <balaton@eik.bme.hu> wrote:
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Am 30.01.2017 um 14:15 schrieb Stefan Weil:
+> Returning NULL from get_max_cpu_model results in a SIGSEGV runtime error.
+> 
+> Signed-off-by: Stefan Weil <sw@weilnetz.de>
+> ---
+> 
+> v2: Re-sent as v1 was damaged by my mailer.
+> 
+> This is also broken in Debian.
+> 
+> In addition, there is no default CPU ("any"), so binfmt and related
+> actions currently don't work. I hacked my local installation by
+> duplicating the "qemu" cpu definition for "any", but maybe there is
+> a better solution.
 
-It would be helpful to mention in the commit message that we don't
-yet implement reset or vmstate and that those are coming in a
-later commit.
+That should then already work.
 
-(There is almost always something useful to say in a commit
-message body; subject-line-only commit messages should
-be the rare exception in my opinion.)
+> 
+> Regards
+> Stefan
+> 
+>  target/s390x/cpu_models.c | 2 --
+>  1 file changed, 2 deletions(-)
+> 
+> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+> index 2a894ee..6e34763 100644
+> --- a/target/s390x/cpu_models.c
+> +++ b/target/s390x/cpu_models.c
+> @@ -660,7 +660,6 @@ static void check_compatibility(const S390CPUModel *max_model,
+>  
+>  static S390CPUModel *get_max_cpu_model(Error **errp)
+>  {
+> -#ifndef CONFIG_USER_ONLY
+>      static S390CPUModel max_model;
+>      static bool cached;
+>  
+> @@ -680,7 +679,6 @@ static S390CPUModel *get_max_cpu_model(Error **errp)
+>          cached = true;
+>          return &max_model;
+>      }
+> -#endif
+>      return NULL;
+>  }
+>  
+> 
 
-> +
-> +static void sm501_sysbus_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +
-> +    dc->realize = sm501_realize_sysbus;
-> +    set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
-> +    dc->desc = "SM501 Multimedia Companion";
-> +    dc->props = sm501_sysbus_properties;
-> +/* Note: pointer property "chr-state" may remain null, thus
-> + * no need for dc->cannot_instantiate_with_device_add_yet = true;
-> + */
+I thought this was already picked up for stable...
+But looks like only the "any" model fixup got.
 
-This comment should be indented.
+So
 
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Acked-by: David Hildenbrand <david@redhat.com>
 
-thanks
--- PMM
+-- 
+Thanks,
+
+David
