@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38123)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cjN95-0003N3-5Y
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 04:35:36 -0500
+	(envelope-from <armbru@redhat.com>) id 1cjNRe-0007Hq-05
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 04:54:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cjN91-0004wS-GN
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 04:35:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49360)
+	(envelope-from <armbru@redhat.com>) id 1cjNRa-00039n-Sx
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 04:54:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51252)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cjN91-0004wK-Ag
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 04:35:31 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7BC1480F6B
-	for <qemu-devel@nongnu.org>; Thu,  2 Mar 2017 09:35:31 +0000 (UTC)
-Date: Thu, 2 Mar 2017 09:35:26 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170302093526.GB29835@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170215182732.GN24672@redhat.com> <20170215233651.GA30794@vader>
-	<20170216093316.GB7346@redhat.com> <20170301223856.GA20202@vader>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cjNRa-00039S-Mi
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 04:54:42 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1488435591-17882-1-git-send-email-mst@redhat.com>
+	<1488435591-17882-6-git-send-email-mst@redhat.com>
+	<87a894m72h.fsf@dusky.pond.sub.org>
+	<15694a65-6ac4-9387-1cc2-89d5bb8660b9@redhat.com>
+	<1987f7ea-6d16-c5c4-2ddb-cec3e18bd9f8@redhat.com>
+Date: Thu, 02 Mar 2017 10:54:38 +0100
+In-Reply-To: <1987f7ea-6d16-c5c4-2ddb-cec3e18bd9f8@redhat.com> (Laszlo Ersek's
+	message of "Thu, 2 Mar 2017 09:37:57 +0100")
+Message-ID: <877f48gg0x.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170301223856.GA20202@vader>
-Subject: Re: [Qemu-devel] RFC: How to make seccomp reliable and useful ?
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PULL 05/15] qmp/hmp: add query-vm-generation-id
+ and 'info vm-generation-id' commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,55 +31,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, pmoore@redhat.com
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Ben Warren <ben@skyportsystems.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On Wed, Mar 01, 2017 at 11:38:56PM +0100, Eduardo Otubo wrote:
-> On Thu, Feb 16, 2017 at 09=33=16AM +0000, Daniel P. Berrange wrote:
-> > On Thu, Feb 16, 2017 at 12:36:51AM +0100, Eduardo Otubo wrote:
-> > > On Wed, Feb 15, 2017 at 06=27=32PM +0000, Daniel P. Berrange wrote:
-> 
-> [...]
-> 
-> > > > 
-> > > > There is a reasonable easily identifiable set of syscalls that QEMU should
-> > > > never be permitted to use, no matter what configuration it is in, what helpers
-> > > > it spawns, or what libraries it links to. eg reboot, swapon, swapoff,  syslog,
-> > > > mount, unmount, kexec_*, etc - any syscall that affects global system state,
-> > > > rather than process local state should be forbidden.
-> > > > 
-> > > > There are some syscalls that are simply hardcoded to return ENOSYS which can
-> > > > be trivially blacklisted. afs_syscall, break, fattach, ftime, etc (see the
-> > > > man page 'unimplemented(2)').
-> 
-> I've been working on the blacklist, you can see here:
-> https://github.com/otubo/qemu/commit/31e603180081474ff35c5897813cb635f8e9a786
-> 
-> I didn't send as an RFC to the list because it's still an on going work,
-> but if you have any comments, please feel free.
-> 
-> > > > 
-> > > > There are some syscalls which are considered obsolete - they were previously
-> > > > useful, but no modern code would call them, as they have been superceeded.
-> > > > For example, readdir replaced by getdents. We could blacklist these by default
-> > > > but provide a way to allow use of obsolete syscalls if running on older systems.
-> > > > e.g. '-sandbox on,obsolete=allow'. They might be obsolete enough that we decide
-> > > > to just block them permanently with no opt in - would need to analyse when
-> > > > their replacements appeared in widespread use.
-> 
-> The obsolete part is also on my github (didn't send for the same
-> reason):
-> https://github.com/otubo/qemu/commit/54a57eb150ca3e5b67e9a81394c6cfa4ac82a6ff
-> 
-> Also, can't find anywhere a solid list of obsolete system calls, can you
-> elaborate a little more on how to determine this list?
+Laszlo Ersek <lersek@redhat.com> writes:
 
-Systemd has such a list in ./src/shared/seccomp-util.c
-Look for the array containing SYSCALL_FILTER_SET_OBSOLETE
+> On 03/02/17 09:25, Laszlo Ersek wrote:
+>
+> Regarding your other email ("New QMP command without a test -> automatic
+> NAK"), Ben did write a small test suite for this feature:
+>
+> [Qemu-devel] [PATCH v8 7/8] tests: Add unit tests for the VM Generation
+>                             ID feature
+>
+> and it contains a test called "/vmgenid/vmgenid/query-monitor".
+>
+> That patch is not part of the pull request because the functional tests
+> in the same suite only pass if you have an updated SeaBIOS blob in the
+> tree as well. While the SeaBIOS patches have been committed, the update
+> for the blob bundled with QEMU is still in progress. Thus the patch with
+> the tests is being delayed.
 
+Posting the testing part that depends on in-progress work only as RFC
+sounds like a perfectly acceptable case of the "not practical" exception
+mentioned "New QMP command without a test -> automatic NAK".
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+> So, it wasn't negligence, we simply missed this failure case because we
+> were so focused on the long-awaited functionality. We didn't miss other
+> failure cases that were a bit closer to the functionality.
+>
+> BTW, now that I look at said "/vmgenid/vmgenid/query-monitor" test case,
+> it also doesn't seem to catch this error -- the monitor command is
+> apparently not called without the device present.
+
+I expect you to try to cover all QMP command error cases with automated
+tests.  I don't expect you to always succeed.  We're all human :)
+
+>                                                   So yeah, review
+> focused specifically on QMP / QAPI bits is always welcome.
+
+It's a struggle, to be honest.  Bits of QMP and QAPI are often buried
+deep in patches dealing with other stuff.  QMP can usually be separated
+into its own patch, but QAPI is just infrastructure, it *wants* to be
+used.
