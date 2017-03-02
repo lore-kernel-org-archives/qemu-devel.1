@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1cjVQQ-0005CI-TK
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 13:26:05 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cjVW0-0000aD-AA
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 13:31:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1cjVQM-0005TC-JS
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 13:26:02 -0500
-Received: from 206-15-90-246.static.twtelecom.net ([206.15.90.246]:48795
-	helo=felipe-franciosi.localdomain)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1cjVQM-0005SW-26
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 13:25:58 -0500
-From: Felipe Franciosi <felipe@nutanix.com>
-Date: Thu,  2 Mar 2017 10:25:51 -0800
-Message-Id: <1488479153-21203-3-git-send-email-felipe@nutanix.com>
+	(envelope-from <no-reply@patchew.org>) id 1cjVVv-0008Nm-Td
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 13:31:48 -0500
+Resent-Message-Id: <E1cjVVv-0008Nm-Td@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21314)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cjVVv-0008N1-Ls
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 13:31:43 -0500
 In-Reply-To: <1488479153-21203-1-git-send-email-felipe@nutanix.com>
-References: <1488479153-21203-1-git-send-email-felipe@nutanix.com>
-Subject: [Qemu-devel] [PATCH v5 2/4] vhost-scsi: create a vhost-scsi-common
- abstraction
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148847949092.285.1729819062842356358@0e2666bad730>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 2 Mar 2017 10:31:31 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v5 0/4] Introduce vhost-user-scsi and
+ sample application
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,612 +29,264 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>, Felipe Franciosi <felipe@nutanix.com>
+To: felipe@nutanix.com
+Cc: famz@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, marcandre.lureau@redhat.com, mst@redhat.com, qemu-devel@nongnu.org
 
-In order to introduce a new vhost-user-scsi host device type, it makes
-sense to abstract part of vhost-scsi into a common parent class. This
-commit does exactly that.
-
-Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
----
- hw/scsi/Makefile.objs                 |   2 +-
- hw/scsi/vhost-scsi-common.c           | 143 +++++++++++++++++++++++++
- hw/scsi/vhost-scsi.c                  | 194 ++++++++++------------------------
- include/hw/virtio/vhost-scsi-common.h |  48 +++++++++
- include/hw/virtio/vhost-scsi.h        |  11 +-
- include/hw/virtio/virtio-scsi.h       |   2 +
- 6 files changed, 252 insertions(+), 148 deletions(-)
- create mode 100644 hw/scsi/vhost-scsi-common.c
- create mode 100644 include/hw/virtio/vhost-scsi-common.h
-
-diff --git a/hw/scsi/Makefile.objs b/hw/scsi/Makefile.objs
-index 5a2248b..54d8754 100644
---- a/hw/scsi/Makefile.objs
-+++ b/hw/scsi/Makefile.objs
-@@ -10,5 +10,5 @@ obj-$(CONFIG_PSERIES) += spapr_vscsi.o
- 
- ifeq ($(CONFIG_VIRTIO),y)
- obj-y += virtio-scsi.o virtio-scsi-dataplane.o
--obj-$(CONFIG_VHOST_SCSI) += vhost-scsi.o
-+obj-$(CONFIG_VHOST_SCSI) += vhost-scsi-common.o vhost-scsi.o
- endif
-diff --git a/hw/scsi/vhost-scsi-common.c b/hw/scsi/vhost-scsi-common.c
-new file mode 100644
-index 0000000..e41c031
---- /dev/null
-+++ b/hw/scsi/vhost-scsi-common.c
-@@ -0,0 +1,143 @@
-+/*
-+ * vhost-scsi-common
-+ *
-+ * Copyright (c) 2016 Nutanix Inc. All rights reserved.
-+ *
-+ * Author:
-+ *  Felipe Franciosi <felipe@nutanix.com>
-+ *
-+ * This work is largely based on the "vhost-scsi" implementation by:
-+ *  Stefan Hajnoczi    <stefanha@linux.vnet.ibm.com>
-+ *  Nicholas Bellinger <nab@risingtidesystems.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2 or later.
-+ * See the COPYING.LIB file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include <linux/vhost.h>
-+#include "qapi/error.h"
-+#include "qemu/error-report.h"
-+#include "migration/migration.h"
-+#include "hw/virtio/vhost.h"
-+#include "hw/virtio/vhost-scsi-common.h"
-+#include "hw/virtio/virtio-scsi.h"
-+#include "hw/virtio/virtio-bus.h"
-+#include "hw/virtio/virtio-access.h"
-+#include "hw/fw-path-provider.h"
-+
-+int vhost_scsi_common_start(VHostSCSICommon *vsc)
-+{
-+    int ret, i;
-+    VirtIODevice *vdev = VIRTIO_DEVICE(vsc);
-+    BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
-+    VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
-+
-+    if (!k->set_guest_notifiers) {
-+        error_report("binding does not support guest notifiers");
-+        return -ENOSYS;
-+    }
-+
-+    ret = vhost_dev_enable_notifiers(&vsc->dev, vdev);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-+    ret = k->set_guest_notifiers(qbus->parent, vsc->dev.nvqs, true);
-+    if (ret < 0) {
-+        error_report("Error binding guest notifier");
-+        goto err_host_notifiers;
-+    }
-+
-+    vsc->dev.acked_features = vdev->guest_features;
-+    ret = vhost_dev_start(&vsc->dev, vdev);
-+    if (ret < 0) {
-+        error_report("Error start vhost dev");
-+        goto err_guest_notifiers;
-+    }
-+
-+    /* guest_notifier_mask/pending not used yet, so just unmask
-+     * everything here.  virtio-pci will do the right thing by
-+     * enabling/disabling irqfd.
-+     */
-+    for (i = 0; i < vsc->dev.nvqs; i++) {
-+        vhost_virtqueue_mask(&vsc->dev, vdev, vsc->dev.vq_index + i, false);
-+    }
-+
-+    return ret;
-+
-+err_guest_notifiers:
-+    k->set_guest_notifiers(qbus->parent, vsc->dev.nvqs, false);
-+err_host_notifiers:
-+    vhost_dev_disable_notifiers(&vsc->dev, vdev);
-+    return ret;
-+}
-+
-+void vhost_scsi_common_stop(VHostSCSICommon *vsc)
-+{
-+    VirtIODevice *vdev = VIRTIO_DEVICE(vsc);
-+    BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
-+    VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
-+    int ret = 0;
-+
-+    vhost_dev_stop(&vsc->dev, vdev);
-+
-+    if (k->set_guest_notifiers) {
-+        ret = k->set_guest_notifiers(qbus->parent, vsc->dev.nvqs, false);
-+        if (ret < 0) {
-+                error_report("vhost guest notifier cleanup failed: %d", ret);
-+        }
-+    }
-+    assert(ret >= 0);
-+
-+    vhost_dev_disable_notifiers(&vsc->dev, vdev);
-+}
-+
-+uint64_t vhost_scsi_common_get_features(VirtIODevice *vdev, uint64_t features,
-+                                        Error **errp)
-+{
-+    VHostSCSICommon *vsc = VHOST_SCSI_COMMON(vdev);
-+
-+    return vhost_get_features(&vsc->dev, vsc->feature_bits, features);
-+}
-+
-+void vhost_scsi_common_set_config(VirtIODevice *vdev, const uint8_t *config)
-+{
-+    VirtIOSCSIConfig *scsiconf = (VirtIOSCSIConfig *)config;
-+    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(vdev);
-+
-+    if ((uint32_t)virtio_ldl_p(vdev, &scsiconf->sense_size) != vs->sense_size ||
-+        (uint32_t)virtio_ldl_p(vdev, &scsiconf->cdb_size) != vs->cdb_size) {
-+        error_report("vhost-scsi does not support changing the sense data and "
-+                     "CDB sizes");
-+        exit(1);
-+    }
-+}
-+
-+/*
-+ * Implementation of an interface to adjust firmware path
-+ * for the bootindex property handling.
-+ */
-+char *vhost_scsi_common_get_fw_dev_path(FWPathProvider *p, BusState *bus,
-+                                        DeviceState *dev)
-+{
-+    VHostSCSICommon *vsc = VHOST_SCSI_COMMON(dev);
-+    /* format: /channel@channel/vhost-scsi@target,lun */
-+    return g_strdup_printf("/channel@%x/%s@%x,%x", vsc->channel,
-+                           qdev_fw_name(dev), vsc->target, vsc->lun);
-+}
-+
-+static const TypeInfo vhost_scsi_common_info = {
-+    .name = TYPE_VHOST_SCSI_COMMON,
-+    .parent = TYPE_VIRTIO_SCSI_COMMON,
-+    .instance_size = sizeof(VHostSCSICommon),
-+    .abstract = true,
-+};
-+
-+static void virtio_register_types(void)
-+{
-+    type_register_static(&vhost_scsi_common_info);
-+}
-+
-+type_init(virtio_register_types)
-diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
-index c491ece..d402178 100644
---- a/hw/scsi/vhost-scsi.c
-+++ b/hw/scsi/vhost-scsi.c
-@@ -42,13 +42,14 @@ static const int kernel_feature_bits[] = {
- static int vhost_scsi_set_endpoint(VHostSCSI *s)
- {
-     VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(s);
--    const VhostOps *vhost_ops = s->dev.vhost_ops;
-+    VHostSCSICommon *vsc = VHOST_SCSI_COMMON(s);
-+    const VhostOps *vhost_ops = vsc->dev.vhost_ops;
-     struct vhost_scsi_target backend;
-     int ret;
- 
-     memset(&backend, 0, sizeof(backend));
-     pstrcpy(backend.vhost_wwpn, sizeof(backend.vhost_wwpn), vs->conf.wwpn);
--    ret = vhost_ops->vhost_scsi_set_endpoint(&s->dev, &backend);
-+    ret = vhost_ops->vhost_scsi_set_endpoint(&vsc->dev, &backend);
-     if (ret < 0) {
-         return -errno;
-     }
-@@ -58,130 +59,62 @@ static int vhost_scsi_set_endpoint(VHostSCSI *s)
- static void vhost_scsi_clear_endpoint(VHostSCSI *s)
- {
-     VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(s);
-+    VHostSCSICommon *vsc = VHOST_SCSI_COMMON(s);
-     struct vhost_scsi_target backend;
--    const VhostOps *vhost_ops = s->dev.vhost_ops;
-+    const VhostOps *vhost_ops = vsc->dev.vhost_ops;
- 
-     memset(&backend, 0, sizeof(backend));
-     pstrcpy(backend.vhost_wwpn, sizeof(backend.vhost_wwpn), vs->conf.wwpn);
--    vhost_ops->vhost_scsi_clear_endpoint(&s->dev, &backend);
-+    vhost_ops->vhost_scsi_clear_endpoint(&vsc->dev, &backend);
- }
- 
- static int vhost_scsi_start(VHostSCSI *s)
- {
--    int ret, abi_version, i;
--    VirtIODevice *vdev = VIRTIO_DEVICE(s);
--    BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
--    VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
--    const VhostOps *vhost_ops = s->dev.vhost_ops;
--
--    if (!k->set_guest_notifiers) {
--        error_report("binding does not support guest notifiers");
--        return -ENOSYS;
--    }
-+    int ret, abi_version;
-+    VHostSCSICommon *vsc = VHOST_SCSI_COMMON(s);
-+    const VhostOps *vhost_ops = vsc->dev.vhost_ops;
- 
--    ret = vhost_ops->vhost_scsi_get_abi_version(&s->dev, &abi_version);
-+    ret = vhost_ops->vhost_scsi_get_abi_version(&vsc->dev, &abi_version);
-     if (ret < 0) {
-         return -errno;
-     }
-     if (abi_version > VHOST_SCSI_ABI_VERSION) {
-         error_report("vhost-scsi: The running tcm_vhost kernel abi_version:"
--                     " %d is greater than vhost_scsi userspace supports: %d, please"
--                     " upgrade your version of QEMU", abi_version,
-+                     " %d is greater than vhost_scsi userspace supports: %d,"
-+                     " please upgrade your version of QEMU", abi_version,
-                      VHOST_SCSI_ABI_VERSION);
-         return -ENOSYS;
-     }
- 
--    ret = vhost_dev_enable_notifiers(&s->dev, vdev);
-+    ret = vhost_scsi_common_start(vsc);
-     if (ret < 0) {
-         return ret;
-     }
- 
--    s->dev.acked_features = vdev->guest_features;
--    ret = vhost_dev_start(&s->dev, vdev);
--    if (ret < 0) {
--        error_report("Error start vhost dev");
--        goto err_notifiers;
--    }
--
-     ret = vhost_scsi_set_endpoint(s);
-     if (ret < 0) {
--        error_report("Error set vhost-scsi endpoint");
--        goto err_vhost_stop;
--    }
--
--    ret = k->set_guest_notifiers(qbus->parent, s->dev.nvqs, true);
--    if (ret < 0) {
--        error_report("Error binding guest notifier");
--        goto err_endpoint;
--    }
--
--    /* guest_notifier_mask/pending not used yet, so just unmask
--     * everything here.  virtio-pci will do the right thing by
--     * enabling/disabling irqfd.
--     */
--    for (i = 0; i < s->dev.nvqs; i++) {
--        vhost_virtqueue_mask(&s->dev, vdev, s->dev.vq_index + i, false);
-+        error_report("Error setting vhost-scsi endpoint");
-+        vhost_scsi_common_stop(vsc);
-     }
- 
-     return ret;
--
--err_endpoint:
--    vhost_scsi_clear_endpoint(s);
--err_vhost_stop:
--    vhost_dev_stop(&s->dev, vdev);
--err_notifiers:
--    vhost_dev_disable_notifiers(&s->dev, vdev);
--    return ret;
- }
- 
- static void vhost_scsi_stop(VHostSCSI *s)
- {
--    VirtIODevice *vdev = VIRTIO_DEVICE(s);
--    BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
--    VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
--    int ret = 0;
--
--    if (k->set_guest_notifiers) {
--        ret = k->set_guest_notifiers(qbus->parent, s->dev.nvqs, false);
--        if (ret < 0) {
--                error_report("vhost guest notifier cleanup failed: %d", ret);
--        }
--    }
--    assert(ret >= 0);
-+    VHostSCSICommon *vsc = VHOST_SCSI_COMMON(s);
- 
-     vhost_scsi_clear_endpoint(s);
--    vhost_dev_stop(&s->dev, vdev);
--    vhost_dev_disable_notifiers(&s->dev, vdev);
--}
--
--static uint64_t vhost_scsi_get_features(VirtIODevice *vdev,
--                                        uint64_t features,
--                                        Error **errp)
--{
--    VHostSCSI *s = VHOST_SCSI(vdev);
--
--    return vhost_get_features(&s->dev, kernel_feature_bits, features);
--}
--
--static void vhost_scsi_set_config(VirtIODevice *vdev,
--                                  const uint8_t *config)
--{
--    VirtIOSCSIConfig *scsiconf = (VirtIOSCSIConfig *)config;
--    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(vdev);
--
--    if ((uint32_t) virtio_ldl_p(vdev, &scsiconf->sense_size) != vs->sense_size ||
--        (uint32_t) virtio_ldl_p(vdev, &scsiconf->cdb_size) != vs->cdb_size) {
--        error_report("vhost-scsi does not support changing the sense data and CDB sizes");
--        exit(1);
--    }
-+    vhost_scsi_common_stop(vsc);
- }
- 
- static void vhost_scsi_set_status(VirtIODevice *vdev, uint8_t val)
- {
--    VHostSCSI *s = (VHostSCSI *)vdev;
-+    VHostSCSI *s = VHOST_SCSI(vdev);
-+    VHostSCSICommon *vsc = VHOST_SCSI_COMMON(s);
-     bool start = (val & VIRTIO_CONFIG_S_DRIVER_OK);
- 
--    if (s->dev.started == start) {
-+    if (vsc->dev.started == start) {
-         return;
-     }
- 
-@@ -190,10 +123,7 @@ static void vhost_scsi_set_status(VirtIODevice *vdev, uint8_t val)
- 
-         ret = vhost_scsi_start(s);
-         if (ret < 0) {
--            error_report("virtio-scsi: unable to start vhost: %s",
--                         strerror(-ret));
--
--            /* There is no userspace virtio-scsi fallback so exit */
-+            error_report("unable to start vhost-scsi: %s", strerror(-ret));
-             exit(1);
-         }
-     } else {
-@@ -208,7 +138,7 @@ static void vhost_dummy_handle_output(VirtIODevice *vdev, VirtQueue *vq)
- static void vhost_scsi_realize(DeviceState *dev, Error **errp)
- {
-     VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(dev);
--    VHostSCSI *s = VHOST_SCSI(dev);
-+    VHostSCSICommon *vsc = VHOST_SCSI_COMMON(dev);
-     Error *err = NULL;
-     int vhostfd = -1;
-     int ret;
-@@ -241,21 +171,21 @@ static void vhost_scsi_realize(DeviceState *dev, Error **errp)
-         goto close_fd;
-     }
- 
--    error_setg(&s->migration_blocker,
-+    error_setg(&vsc->migration_blocker,
-                "vhost-scsi does not support migration");
--    migrate_add_blocker(s->migration_blocker, &err);
-+    migrate_add_blocker(vsc->migration_blocker, &err);
-     if (err) {
-         error_propagate(errp, err);
--        error_free(s->migration_blocker);
-+        error_free(vsc->migration_blocker);
-         goto close_fd;
-     }
- 
--    s->dev.nvqs = VHOST_SCSI_VQ_NUM_FIXED + vs->conf.num_queues;
--    s->dev.vqs = g_new(struct vhost_virtqueue, s->dev.nvqs);
--    s->dev.vq_index = 0;
--    s->dev.backend_features = 0;
-+    vsc->dev.nvqs = VHOST_SCSI_VQ_NUM_FIXED + vs->conf.num_queues;
-+    vsc->dev.vqs = g_new(struct vhost_virtqueue, vsc->dev.nvqs);
-+    vsc->dev.vq_index = 0;
-+    vsc->dev.backend_features = 0;
- 
--    ret = vhost_dev_init(&s->dev, (void *)(uintptr_t)vhostfd,
-+    ret = vhost_dev_init(&vsc->dev, (void *)(uintptr_t)vhostfd,
-                          VHOST_BACKEND_TYPE_KERNEL, 0);
-     if (ret < 0) {
-         error_setg(errp, "vhost-scsi: vhost initialization failed: %s",
-@@ -264,16 +194,16 @@ static void vhost_scsi_realize(DeviceState *dev, Error **errp)
-     }
- 
-     /* At present, channel and lun both are 0 for bootable vhost-scsi disk */
--    s->channel = 0;
--    s->lun = 0;
-+    vsc->channel = 0;
-+    vsc->lun = 0;
-     /* Note: we can also get the minimum tpgt from kernel */
--    s->target = vs->conf.boot_tpgt;
-+    vsc->target = vs->conf.boot_tpgt;
- 
-     return;
- 
-  free_vqs:
--    migrate_del_blocker(s->migration_blocker);
--    g_free(s->dev.vqs);
-+    migrate_del_blocker(vsc->migration_blocker);
-+    g_free(vsc->dev.vqs);
-  close_fd:
-     close(vhostfd);
-     return;
-@@ -282,42 +212,28 @@ static void vhost_scsi_realize(DeviceState *dev, Error **errp)
- static void vhost_scsi_unrealize(DeviceState *dev, Error **errp)
- {
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
--    VHostSCSI *s = VHOST_SCSI(dev);
-+    VHostSCSICommon *vsc = VHOST_SCSI_COMMON(dev);
- 
--    migrate_del_blocker(s->migration_blocker);
--    error_free(s->migration_blocker);
-+    migrate_del_blocker(vsc->migration_blocker);
-+    error_free(vsc->migration_blocker);
- 
-     /* This will stop vhost backend. */
-     vhost_scsi_set_status(vdev, 0);
- 
--    vhost_dev_cleanup(&s->dev);
--    g_free(s->dev.vqs);
-+    vhost_dev_cleanup(&vsc->dev);
-+    g_free(vsc->dev.vqs);
- 
-     virtio_scsi_common_unrealize(dev, errp);
- }
- 
--/*
-- * Implementation of an interface to adjust firmware path
-- * for the bootindex property handling.
-- */
--static char *vhost_scsi_get_fw_dev_path(FWPathProvider *p, BusState *bus,
--                                        DeviceState *dev)
--{
--    VHostSCSI *s = VHOST_SCSI(dev);
--    /* format: channel@channel/vhost-scsi@target,lun */
--    return g_strdup_printf("/channel@%x/%s@%x,%x", s->channel,
--                           qdev_fw_name(dev), s->target, s->lun);
--}
--
- static Property vhost_scsi_properties[] = {
--    DEFINE_PROP_STRING("vhostfd", VHostSCSI, parent_obj.conf.vhostfd),
--    DEFINE_PROP_STRING("wwpn", VHostSCSI, parent_obj.conf.wwpn),
--    DEFINE_PROP_UINT32("boot_tpgt", VHostSCSI, parent_obj.conf.boot_tpgt, 0),
--    DEFINE_PROP_UINT32("num_queues", VHostSCSI, parent_obj.conf.num_queues, 1),
--    DEFINE_PROP_UINT32("max_sectors", VHostSCSI, parent_obj.conf.max_sectors,
--                                                 0xFFFF),
--    DEFINE_PROP_UINT32("cmd_per_lun", VHostSCSI, parent_obj.conf.cmd_per_lun,
--                                                 128),
-+    DEFINE_PROP_STRING("vhostfd", VirtIOSCSICommon, conf.vhostfd),
-+    DEFINE_PROP_STRING("wwpn", VirtIOSCSICommon, conf.wwpn),
-+    DEFINE_PROP_UINT32("boot_tpgt", VirtIOSCSICommon, conf.boot_tpgt, 0),
-+    DEFINE_PROP_UINT32("num_queues", VirtIOSCSICommon, conf.num_queues, 1),
-+    DEFINE_PROP_UINT32("max_sectors", VirtIOSCSICommon, conf.max_sectors,
-+                       0xFFFF),
-+    DEFINE_PROP_UINT32("cmd_per_lun", VirtIOSCSICommon, conf.cmd_per_lun, 128),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-@@ -331,23 +247,25 @@ static void vhost_scsi_class_init(ObjectClass *klass, void *data)
-     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
-     vdc->realize = vhost_scsi_realize;
-     vdc->unrealize = vhost_scsi_unrealize;
--    vdc->get_features = vhost_scsi_get_features;
--    vdc->set_config = vhost_scsi_set_config;
-+    vdc->get_features = vhost_scsi_common_get_features;
-+    vdc->set_config = vhost_scsi_common_set_config;
-     vdc->set_status = vhost_scsi_set_status;
--    fwc->get_dev_path = vhost_scsi_get_fw_dev_path;
-+    fwc->get_dev_path = vhost_scsi_common_get_fw_dev_path;
- }
- 
- static void vhost_scsi_instance_init(Object *obj)
- {
--    VHostSCSI *dev = VHOST_SCSI(obj);
-+    VHostSCSICommon *vsc = VHOST_SCSI_COMMON(obj);
-+
-+    vsc->feature_bits = kernel_feature_bits;
- 
--    device_add_bootindex_property(obj, &dev->bootindex, "bootindex", NULL,
--                                  DEVICE(dev), NULL);
-+    device_add_bootindex_property(obj, &vsc->bootindex, "bootindex", NULL,
-+                                  DEVICE(vsc), NULL);
- }
- 
- static const TypeInfo vhost_scsi_info = {
-     .name = TYPE_VHOST_SCSI,
--    .parent = TYPE_VIRTIO_SCSI_COMMON,
-+    .parent = TYPE_VHOST_SCSI_COMMON,
-     .instance_size = sizeof(VHostSCSI),
-     .class_init = vhost_scsi_class_init,
-     .instance_init = vhost_scsi_instance_init,
-diff --git a/include/hw/virtio/vhost-scsi-common.h b/include/hw/virtio/vhost-scsi-common.h
-new file mode 100644
-index 0000000..4553be4
---- /dev/null
-+++ b/include/hw/virtio/vhost-scsi-common.h
-@@ -0,0 +1,48 @@
-+/*
-+ * vhost_scsi host device
-+ *
-+ * Copyright (c) 2016 Nutanix Inc. All rights reserved.
-+ *
-+ * Author:
-+ *  Felipe Franciosi <felipe@nutanix.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2 or later.
-+ * See the COPYING.LIB file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef VHOST_SCSI_COMMON_H
-+#define VHOST_SCSI_COMMON_H
-+
-+#include "qemu-common.h"
-+#include "hw/qdev.h"
-+#include "hw/virtio/virtio-scsi.h"
-+#include "hw/virtio/vhost.h"
-+#include "hw/fw-path-provider.h"
-+
-+#define TYPE_VHOST_SCSI_COMMON "vhost-scsi-common"
-+#define VHOST_SCSI_COMMON(obj) \
-+        OBJECT_CHECK(VHostSCSICommon, (obj), TYPE_VHOST_SCSI_COMMON)
-+
-+typedef struct VHostSCSICommon {
-+    VirtIOSCSICommon parent_obj;
-+
-+    Error *migration_blocker;
-+
-+    struct vhost_dev dev;
-+    const int *feature_bits;
-+    int32_t bootindex;
-+    int channel;
-+    int target;
-+    int lun;
-+} VHostSCSICommon;
-+
-+int vhost_scsi_common_start(VHostSCSICommon *vsc);
-+void vhost_scsi_common_stop(VHostSCSICommon *vsc);
-+char *vhost_scsi_common_get_fw_dev_path(FWPathProvider *p, BusState *bus,
-+                                        DeviceState *dev);
-+void vhost_scsi_common_set_config(VirtIODevice *vdev, const uint8_t *config);
-+uint64_t vhost_scsi_common_get_features(VirtIODevice *vdev, uint64_t features,
-+                                        Error **errp);
-+
-+#endif /* VHOST_SCSI_COMMON_H */
-diff --git a/include/hw/virtio/vhost-scsi.h b/include/hw/virtio/vhost-scsi.h
-index 9fd63df..04658d1 100644
---- a/include/hw/virtio/vhost-scsi.h
-+++ b/include/hw/virtio/vhost-scsi.h
-@@ -18,6 +18,7 @@
- #include "hw/qdev.h"
- #include "hw/virtio/virtio-scsi.h"
- #include "hw/virtio/vhost.h"
-+#include "hw/virtio/vhost-scsi-common.h"
- 
- enum vhost_scsi_vq_list {
-     VHOST_SCSI_VQ_CONTROL = 0,
-@@ -30,15 +31,7 @@ enum vhost_scsi_vq_list {
-         OBJECT_CHECK(VHostSCSI, (obj), TYPE_VHOST_SCSI)
- 
- typedef struct VHostSCSI {
--    VirtIOSCSICommon parent_obj;
--
--    Error *migration_blocker;
--
--    struct vhost_dev dev;
--    int32_t bootindex;
--    int channel;
--    int target;
--    int lun;
-+    VHostSCSICommon parent_obj;
- } VHostSCSI;
- 
- #endif
-diff --git a/include/hw/virtio/virtio-scsi.h b/include/hw/virtio/virtio-scsi.h
-index f536f77..0b17250 100644
---- a/include/hw/virtio/virtio-scsi.h
-+++ b/include/hw/virtio/virtio-scsi.h
-@@ -49,8 +49,10 @@ struct VirtIOSCSIConf {
-     uint32_t num_queues;
-     uint32_t max_sectors;
-     uint32_t cmd_per_lun;
-+#ifdef CONFIG_VHOST_SCSI
-     char *vhostfd;
-     char *wwpn;
-+#endif
-     uint32_t boot_tpgt;
-     IOThread *iothread;
- };
--- 
-1.9.4
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ4
+ODQ3OTE1My0yMTIwMy0xLWdpdC1zZW5kLWVtYWlsLWZlbGlwZUBudXRhbml4LmNvbQpUeXBlOiBz
+ZXJpZXMKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2NSAwLzRdIEludHJvZHVjZSB2aG9z
+dC11c2VyLXNjc2kgYW5kIHNhbXBsZSBhcHBsaWNhdGlvbgoKPT09IFRFU1QgU0NSSVBUIEJFR0lO
+ID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5l
+ICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
+YW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNF
+Li4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0
+b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hv
+dyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sg
+LTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisx
+KSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAz
+YzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRo
+dWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcv
+MTQ4ODQ3OTE1My0yMTIwMy0xLWdpdC1zZW5kLWVtYWlsLWZlbGlwZUBudXRhbml4LmNvbSAtPiBw
+YXRjaGV3LzE0ODg0NzkxNTMtMjEyMDMtMS1naXQtc2VuZC1lbWFpbC1mZWxpcGVAbnV0YW5peC5j
+b20KIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDE3MDMwMTA5MDQ1My4xMTA3NS0xLW1h
+cmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTcwMzAxMDkwNDUzLjExMDc1
+LTEtbWFyY2FuZHJlLmx1cmVhdUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
+dGVzdCcKZjMyOWZhMSB2dXM6IEludHJvZHVjZSBhIHZob3N0LXVzZXItc2NzaSBzYW1wbGUgYXBw
+bGljYXRpb24KYmIwNGZkMCB2dXM6IEludHJvZHVjZSB2aG9zdC11c2VyLXNjc2kgaG9zdCBkZXZp
+Y2UKZThkZjQxOSB2aG9zdC1zY3NpOiBjcmVhdGUgYSB2aG9zdC1zY3NpLWNvbW1vbiBhYnN0cmFj
+dGlvbgowMTBhOWM2IGxpYnZob3N0LXVzZXI6IHJlcGxhY2UgdmFzcHJpbnRmKCkgdG8gZml4IGJ1
+aWxkCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzQ6IGxpYnZob3N0LXVz
+ZXI6IHJlcGxhY2UgdmFzcHJpbnRmKCkgdG8gZml4IGJ1aWxkLi4uCkNoZWNraW5nIFBBVENIIDIv
+NDogdmhvc3Qtc2NzaTogY3JlYXRlIGEgdmhvc3Qtc2NzaS1jb21tb24gYWJzdHJhY3Rpb24uLi4K
+Q2hlY2tpbmcgUEFUQ0ggMy80OiB2dXM6IEludHJvZHVjZSB2aG9zdC11c2VyLXNjc2kgaG9zdCBk
+ZXZpY2UuLi4KRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiMyMDQ6IEZJTEU6IGh3
+L3Njc2kvdmhvc3QtdXNlci1zY3NpLmM6MTQ1OgorICAgIC8vIFR1cm4gb24gcHJlZGVmaW5lZCBm
+ZWF0dXJlcyBzdXBwb3J0ZWQgYnkgdGhpcyBkZXZpY2UKCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAv
+LyBjb21tZW50cwojMjQ5OiBGSUxFOiBody9zY3NpL3Zob3N0LXVzZXItc2NzaS5jOjE5MDoKKyAg
+ICAvLyBBZGQgdGhlIGJvb3RpbmRleCBwcm9wZXJ0eSBmb3IgdGhpcyBvYmplY3QKCkVSUk9SOiBk
+byBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMjUzOiBGSUxFOiBody9zY3NpL3Zob3N0LXVzZXIt
+c2NzaS5jOjE5NDoKKyAgICAvLyBTZXQgYm9vdCBpbmRleCBhY2NvcmRpbmcgdGhlIHRoZSBkZXZp
+Y2UgY29uZmlnCgp0b3RhbDogMyBlcnJvcnMsIDAgd2FybmluZ3MsIDM3NiBsaW5lcyBjaGVja2Vk
+CgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA0
+LzQ6IHZ1czogSW50cm9kdWNlIGEgdmhvc3QtdXNlci1zY3NpIHNhbXBsZSBhcHBsaWNhdGlvbi4u
+LgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzExNDogRklMRTogY29udHJpYi92
+aG9zdC11c2VyLXNjc2kvdmhvc3QtdXNlci1zY3NpLmM6Mjg6CisvLyNkZWZpbmUgVlVTX0RFQlVH
+IDEKCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJy8nIChjdHg6VnhWKQojMTI4
+OiBGSUxFOiBjb250cmliL3Zob3N0LXVzZXItc2NzaS92aG9zdC11c2VyLXNjc2kuYzo0MjoKKyAg
+ICAgICAgICAgIHRpbWVidWYsIHRzLnR2X25zZWMvMTAwMCwgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBcCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IF9f
+ZnVuY19fIHNob3VsZCBiZSB1c2VkIGluc3RlYWQgb2YgZ2NjIHNwZWNpZmljIF9fRlVOQ1RJT05f
+XwojMTI5OiBGSUxFOiBjb250cmliL3Zob3N0LXVzZXItc2NzaS92aG9zdC11c2VyLXNjc2kuYzo0
+MzoKKyAgICAgICAgICAgIF9fRklMRV9fLCBfX0ZVTkNUSU9OX18sIF9fTElORV9fLCAjIyBfX1ZB
+X0FSR1NfXyk7ICAgICAgICBcCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoZSBvcGVu
+IHBhcmVudGhlc2lzICcoJwojMTMwOiBGSUxFOiBjb250cmliL3Zob3N0LXVzZXItc2NzaS92aG9z
+dC11c2VyLXNjc2kuYzo0NDoKK30gd2hpbGUoMCkKCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJv
+dW5kIHRoYXQgJy8nIChjdHg6VnhWKQojMTM1OiBGSUxFOiBjb250cmliL3Zob3N0LXVzZXItc2Nz
+aS92aG9zdC11c2VyLXNjc2kuYzo0OToKKyAgICAgICAgICAgIHRpbWVidWYsIHRzLnR2X25zZWMv
+MTAwMCwgIyMgX19WQV9BUkdTX18pOyAgICAgICAgICAgICAgICBcCiAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGJlZm9yZSB0aGUgb3BlbiBw
+YXJlbnRoZXNpcyAnKCcKIzEzNjogRklMRTogY29udHJpYi92aG9zdC11c2VyLXNjc2kvdmhvc3Qt
+dXNlci1zY3NpLmM6NTA6Cit9IHdoaWxlKDApOwoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNv
+bW1lbnRzCiMxNTA6IEZJTEU6IGNvbnRyaWIvdmhvc3QtdXNlci1zY3NpL3Zob3N0LXVzZXItc2Nz
+aS5jOjY0OgorI2RlZmluZSBWVVNfTUFYX0xVTlMgMSAvLyBPbmx5IDEgbHVuIHN1cHBvcnRlZCB0
+b2RheQoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiMxNTE6IEZJTEU6IGNvbnRy
+aWIvdmhvc3QtdXNlci1zY3NpL3Zob3N0LXVzZXItc2NzaS5jOjY1OgorI2RlZmluZSBWVVNfTUFY
+X0RFVlMgMSAvLyBPbmx5IDEgZGV2aWNlcyBzdXBwb3J0ZWQgdG9kYXkKCkVSUk9SOiBkbyBub3Qg
+dXNlIEM5OSAvLyBjb21tZW50cwojMTY0OiBGSUxFOiBjb250cmliL3Zob3N0LXVzZXItc2NzaS92
+aG9zdC11c2VyLXNjc2kuYzo3ODoKKyAgICBHVHJlZSAqZmRtYXA7ICAgLy8gbWFwcyBmZCB0byBn
+c291cmNlIGNvbnRleHQgaWQKCkVSUk9SOiB0cmFpbGluZyBzdGF0ZW1lbnRzIHNob3VsZCBiZSBv
+biBuZXh0IGxpbmUKIzE4MTogRklMRTogY29udHJpYi92aG9zdC11c2VyLXNjc2kvdmhvc3QtdXNl
+ci1zY3NpLmM6OTU6CisgICAgaWYgKGIgPiBhKSByZXR1cm4gMTsKCkVSUk9SOiBicmFjZXMge30g
+YXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzE4MTogRklMRTog
+Y29udHJpYi92aG9zdC11c2VyLXNjc2kvdmhvc3QtdXNlci1zY3NpLmM6OTU6CisgICAgaWYgKGIg
+PiBhKSByZXR1cm4gMTsKWy4uLl0KCkVSUk9SOiB0cmFpbGluZyBzdGF0ZW1lbnRzIHNob3VsZCBi
+ZSBvbiBuZXh0IGxpbmUKIzE4MjogRklMRTogY29udHJpYi92aG9zdC11c2VyLXNjc2kvdmhvc3Qt
+dXNlci1zY3NpLmM6OTY6CisgICAgaWYgKGIgPCBhKSByZXR1cm4gLTE7CgpFUlJPUjogYnJhY2Vz
+IHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMxODI6IEZJ
+TEU6IGNvbnRyaWIvdmhvc3QtdXNlci1zY3NpL3Zob3N0LXVzZXItc2NzaS5jOjk2OgorICAgIGlm
+IChiIDwgYSkgcmV0dXJuIC0xOwpbLi4uXQoKRVJST1I6IHRyYWlsaW5nIHN0YXRlbWVudHMgc2hv
+dWxkIGJlIG9uIG5leHQgbGluZQojMjE4OiBGSUxFOiBjb250cmliL3Zob3N0LXVzZXItc2NzaS92
+aG9zdC11c2VyLXNjc2kuYzoxMzI6CisgICAgICAgIGlmICh2dXNfc3JjLT5nZmQuZXZlbnRzICYg
+R19JT19JTikgIHZ1X2V2dCB8PSBWVV9XQVRDSF9JTjsKCkVSUk9SOiBicmFjZXMge30gYXJlIG5l
+Y2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzIxODogRklMRTogY29udHJp
+Yi92aG9zdC11c2VyLXNjc2kvdmhvc3QtdXNlci1zY3NpLmM6MTMyOgorICAgICAgICBpZiAodnVz
+X3NyYy0+Z2ZkLmV2ZW50cyAmIEdfSU9fSU4pICB2dV9ldnQgfD0gVlVfV0FUQ0hfSU47ClsuLi5d
+CgpFUlJPUjogdHJhaWxpbmcgc3RhdGVtZW50cyBzaG91bGQgYmUgb24gbmV4dCBsaW5lCiMyMTk6
+IEZJTEU6IGNvbnRyaWIvdmhvc3QtdXNlci1zY3NpL3Zob3N0LXVzZXItc2NzaS5jOjEzMzoKKyAg
+ICAgICAgaWYgKHZ1c19zcmMtPmdmZC5ldmVudHMgJiBHX0lPX09VVCkgdnVfZXZ0IHw9IFZVX1dB
+VENIX09VVDsKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2Yg
+dGhpcyBzdGF0ZW1lbnQKIzIxOTogRklMRTogY29udHJpYi92aG9zdC11c2VyLXNjc2kvdmhvc3Qt
+dXNlci1zY3NpLmM6MTMzOgorICAgICAgICBpZiAodnVzX3NyYy0+Z2ZkLmV2ZW50cyAmIEdfSU9f
+T1VUKSB2dV9ldnQgfD0gVlVfV0FUQ0hfT1VUOwpbLi4uXQoKRVJST1I6IHRyYWlsaW5nIHN0YXRl
+bWVudHMgc2hvdWxkIGJlIG9uIG5leHQgbGluZQojMjIwOiBGSUxFOiBjb250cmliL3Zob3N0LXVz
+ZXItc2NzaS92aG9zdC11c2VyLXNjc2kuYzoxMzQ6CisgICAgICAgIGlmICh2dXNfc3JjLT5nZmQu
+ZXZlbnRzICYgR19JT19QUkkpIHZ1X2V2dCB8PSBWVV9XQVRDSF9QUkk7CgpFUlJPUjogYnJhY2Vz
+IHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMyMjA6IEZJ
+TEU6IGNvbnRyaWIvdmhvc3QtdXNlci1zY3NpL3Zob3N0LXVzZXItc2NzaS5jOjEzNDoKKyAgICAg
+ICAgaWYgKHZ1c19zcmMtPmdmZC5ldmVudHMgJiBHX0lPX1BSSSkgdnVfZXZ0IHw9IFZVX1dBVENI
+X1BSSTsKWy4uLl0KCkVSUk9SOiB0cmFpbGluZyBzdGF0ZW1lbnRzIHNob3VsZCBiZSBvbiBuZXh0
+IGxpbmUKIzIyMTogRklMRTogY29udHJpYi92aG9zdC11c2VyLXNjc2kvdmhvc3QtdXNlci1zY3Np
+LmM6MTM1OgorICAgICAgICBpZiAodnVzX3NyYy0+Z2ZkLmV2ZW50cyAmIEdfSU9fRVJSKSB2dV9l
+dnQgfD0gVlVfV0FUQ0hfRVJSOwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBh
+bGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMjIxOiBGSUxFOiBjb250cmliL3Zob3N0LXVzZXIt
+c2NzaS92aG9zdC11c2VyLXNjc2kuYzoxMzU6CisgICAgICAgIGlmICh2dXNfc3JjLT5nZmQuZXZl
+bnRzICYgR19JT19FUlIpIHZ1X2V2dCB8PSBWVV9XQVRDSF9FUlI7ClsuLi5dCgpFUlJPUjogdHJh
+aWxpbmcgc3RhdGVtZW50cyBzaG91bGQgYmUgb24gbmV4dCBsaW5lCiMyMjI6IEZJTEU6IGNvbnRy
+aWIvdmhvc3QtdXNlci1zY3NpL3Zob3N0LXVzZXItc2NzaS5jOjEzNjoKKyAgICAgICAgaWYgKHZ1
+c19zcmMtPmdmZC5ldmVudHMgJiBHX0lPX0hVUCkgdnVfZXZ0IHw9IFZVX1dBVENIX0hVUDsKCkVS
+Uk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1l
+bnQKIzIyMjogRklMRTogY29udHJpYi92aG9zdC11c2VyLXNjc2kvdmhvc3QtdXNlci1zY3NpLmM6
+MTM2OgorICAgICAgICBpZiAodnVzX3NyYy0+Z2ZkLmV2ZW50cyAmIEdfSU9fSFVQKSB2dV9ldnQg
+fD0gVlVfV0FUQ0hfSFVQOwpbLi4uXQoKRVJST1I6IHVzZSBRRU1VIGluc3RlYWQgb2YgUWVtdSBv
+ciBRRW11CiMyODI6IEZJTEU6IGNvbnRyaWIvdmhvc3QtdXNlci1zY3NpL3Zob3N0LXVzZXItc2Nz
+aS5jOjE5NjoKKyAqICAgICBRZW11J3Mgc2NzaS5oIGFsc28gZGVmaW5lcyAiU0NTSV9YRkVSX05P
+TkUiLgoKRVJST1I6IG9wZW4gYnJhY2UgJ3snIGZvbGxvd2luZyBmdW5jdGlvbiBkZWNsYXJhdGlv
+bnMgZ28gb24gdGhlIG5leHQgbGluZQojMzYzOiBGSUxFOiBjb250cmliL3Zob3N0LXVzZXItc2Nz
+aS92aG9zdC11c2VyLXNjc2kuYzoyNzc6CitzdGF0aWMgaW50IGlzY3NpX2FkZF9sdW4oaXNjc2lf
+bHVuX3QgKmx1biwgY2hhciAqaXNjc2lfdXJpKSB7CgpFUlJPUjogb3BlbiBicmFjZSAneycgZm9s
+bG93aW5nIGZ1bmN0aW9uIGRlY2xhcmF0aW9ucyBnbyBvbiB0aGUgbmV4dCBsaW5lCiM0Mjg6IEZJ
+TEU6IGNvbnRyaWIvdmhvc3QtdXNlci1zY3NpL3Zob3N0LXVzZXItc2NzaS5jOjM0MjoKK3N0YXRp
+YyBpbnQgZ2V0X2NkYl9sZW4odWludDhfdCAqY2RiKSB7CgpFUlJPUjogc3BhY2VzIHJlcXVpcmVk
+IGFyb3VuZCB0aGF0ICc+PicgKGN0eDpWeFYpCiM0Mzg6IEZJTEU6IGNvbnRyaWIvdmhvc3QtdXNl
+ci1zY3NpL3Zob3N0LXVzZXItc2NzaS5jOjM1MjoKKyAgICBQRVJSKCJVbmFibGUgdG8gZGV0ZXJt
+aW5lIGNkYiBsZW4gKDB4JTAyaGhYKSIsIGNkYlswXT4+NSk7CiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogZG8gbm90IHVz
+ZSBDOTkgLy8gY29tbWVudHMKIzQ1ODogRklMRTogY29udHJpYi92aG9zdC11c2VyLXNjc2kvdmhv
+c3QtdXNlci1zY3NpLmM6MzcyOgorICAgICAgICAvLyBJZ25vcmUgYW55dGhpbmcgZGlmZmVyZW50
+IHRoYW4gdGFyZ2V0PTAsIGx1bj0wCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0
+ICc9JyAoY3R4OlZ4VikKIzQ4MjogRklMRTogY29udHJpYi92aG9zdC11c2VyLXNjc2kvdmhvc3Qt
+dXNlci1zY3NpLmM6Mzk2OgorICAgICAgICBmb3IgKGk9MDsgaTxvdXRfbGVuOyBpKyspIHsKICAg
+ICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnPCcgKGN0
+eDpWeFYpCiM0ODI6IEZJTEU6IGNvbnRyaWIvdmhvc3QtdXNlci1zY3NpL3Zob3N0LXVzZXItc2Nz
+aS5jOjM5NjoKKyAgICAgICAgZm9yIChpPTA7IGk8b3V0X2xlbjsgaSsrKSB7CiAgICAgICAgICAg
+ICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnPScgKGN0eDpW
+eFYpCiM0ODc6IEZJTEU6IGNvbnRyaWIvdmhvc3QtdXNlci1zY3NpL3Zob3N0LXVzZXItc2NzaS5j
+OjQwMToKKyAgICAgICAgZm9yIChpPTA7IGk8aW5fbGVuOyBpKyspIHsKICAgICAgICAgICAgICAg
+XgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnPCcgKGN0eDpWeFYpCiM0ODc6
+IEZJTEU6IGNvbnRyaWIvdmhvc3QtdXNlci1zY3NpL3Zob3N0LXVzZXItc2NzaS5jOjQwMToKKyAg
+ICAgICAgZm9yIChpPTA7IGk8aW5fbGVuOyBpKyspIHsKICAgICAgICAgICAgICAgICAgICBeCgpF
+UlJPUjogb3BlbiBicmFjZSAneycgZm9sbG93aW5nIGZ1bmN0aW9uIGRlY2xhcmF0aW9ucyBnbyBv
+biB0aGUgbmV4dCBsaW5lCiM1Mzc6IEZJTEU6IGNvbnRyaWIvdmhvc3QtdXNlci1zY3NpL3Zob3N0
+LXVzZXItc2NzaS5jOjQ1MToKK3N0YXRpYyB2b2lkIHZ1c19wYW5pY19jYihWdURldiAqdnVfZGV2
+LCBjb25zdCBjaGFyICpidWYpIHsKCkVSUk9SOiB0cmFpbGluZyBzdGF0ZW1lbnRzIHNob3VsZCBi
+ZSBvbiBuZXh0IGxpbmUKIzU3OTogRklMRTogY29udHJpYi92aG9zdC11c2VyLXNjc2kvdmhvc3Qt
+dXNlci1zY3NpLmM6NDkzOgorICAgIGlmICh2dV9ldnQgJiBWVV9XQVRDSF9JTikgIGNvbmRzIHw9
+IEdfSU9fSU47CgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9m
+IHRoaXMgc3RhdGVtZW50CiM1Nzk6IEZJTEU6IGNvbnRyaWIvdmhvc3QtdXNlci1zY3NpL3Zob3N0
+LXVzZXItc2NzaS5jOjQ5MzoKKyAgICBpZiAodnVfZXZ0ICYgVlVfV0FUQ0hfSU4pICBjb25kcyB8
+PSBHX0lPX0lOOwpbLi4uXQoKRVJST1I6IHRyYWlsaW5nIHN0YXRlbWVudHMgc2hvdWxkIGJlIG9u
+IG5leHQgbGluZQojNTgwOiBGSUxFOiBjb250cmliL3Zob3N0LXVzZXItc2NzaS92aG9zdC11c2Vy
+LXNjc2kuYzo0OTQ6CisgICAgaWYgKHZ1X2V2dCAmIFZVX1dBVENIX09VVCkgY29uZHMgfD0gR19J
+T19PVVQ7CgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRo
+aXMgc3RhdGVtZW50CiM1ODA6IEZJTEU6IGNvbnRyaWIvdmhvc3QtdXNlci1zY3NpL3Zob3N0LXVz
+ZXItc2NzaS5jOjQ5NDoKKyAgICBpZiAodnVfZXZ0ICYgVlVfV0FUQ0hfT1VUKSBjb25kcyB8PSBH
+X0lPX09VVDsKWy4uLl0KCkVSUk9SOiB0cmFpbGluZyBzdGF0ZW1lbnRzIHNob3VsZCBiZSBvbiBu
+ZXh0IGxpbmUKIzU4MTogRklMRTogY29udHJpYi92aG9zdC11c2VyLXNjc2kvdmhvc3QtdXNlci1z
+Y3NpLmM6NDk1OgorICAgIGlmICh2dV9ldnQgJiBWVV9XQVRDSF9QUkkpIGNvbmRzIHw9IEdfSU9f
+UFJJOwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlz
+IHN0YXRlbWVudAojNTgxOiBGSUxFOiBjb250cmliL3Zob3N0LXVzZXItc2NzaS92aG9zdC11c2Vy
+LXNjc2kuYzo0OTU6CisgICAgaWYgKHZ1X2V2dCAmIFZVX1dBVENIX1BSSSkgY29uZHMgfD0gR19J
+T19QUkk7ClsuLi5dCgpFUlJPUjogdHJhaWxpbmcgc3RhdGVtZW50cyBzaG91bGQgYmUgb24gbmV4
+dCBsaW5lCiM1ODI6IEZJTEU6IGNvbnRyaWIvdmhvc3QtdXNlci1zY3NpL3Zob3N0LXVzZXItc2Nz
+aS5jOjQ5NjoKKyAgICBpZiAodnVfZXZ0ICYgVlVfV0FUQ0hfRVJSKSBjb25kcyB8PSBHX0lPX0VS
+UjsKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBz
+dGF0ZW1lbnQKIzU4MjogRklMRTogY29udHJpYi92aG9zdC11c2VyLXNjc2kvdmhvc3QtdXNlci1z
+Y3NpLmM6NDk2OgorICAgIGlmICh2dV9ldnQgJiBWVV9XQVRDSF9FUlIpIGNvbmRzIHw9IEdfSU9f
+RVJSOwpbLi4uXQoKRVJST1I6IHRyYWlsaW5nIHN0YXRlbWVudHMgc2hvdWxkIGJlIG9uIG5leHQg
+bGluZQojNTgzOiBGSUxFOiBjb250cmliL3Zob3N0LXVzZXItc2NzaS92aG9zdC11c2VyLXNjc2ku
+Yzo0OTc6CisgICAgaWYgKHZ1X2V2dCAmIFZVX1dBVENIX0hVUCkgY29uZHMgfD0gR19JT19IVVA7
+CgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3Rh
+dGVtZW50CiM1ODM6IEZJTEU6IGNvbnRyaWIvdmhvc3QtdXNlci1zY3NpL3Zob3N0LXVzZXItc2Nz
+aS5jOjQ5NzoKKyAgICBpZiAodnVfZXZ0ICYgVlVfV0FUQ0hfSFVQKSBjb25kcyB8PSBHX0lPX0hV
+UDsKWy4uLl0KCkVSUk9SOiBvcGVuIGJyYWNlICd7JyBmb2xsb3dpbmcgZnVuY3Rpb24gZGVjbGFy
+YXRpb25zIGdvIG9uIHRoZSBuZXh0IGxpbmUKIzU5MDogRklMRTogY29udHJpYi92aG9zdC11c2Vy
+LXNjc2kvdmhvc3QtdXNlci1zY3NpLmM6NTA0Ogorc3RhdGljIHZvaWQgdnVzX2RlbF93YXRjaF9j
+YihWdURldiAqdnVfZGV2LCBpbnQgZmQpIHsKCkVSUk9SOiBvcGVuIGJyYWNlICd7JyBmb2xsb3dp
+bmcgZnVuY3Rpb24gZGVjbGFyYXRpb25zIGdvIG9uIHRoZSBuZXh0IGxpbmUKIzYxMzogRklMRTog
+Y29udHJpYi92aG9zdC11c2VyLXNjc2kvdmhvc3QtdXNlci1zY3NpLmM6NTI3Ogorc3RhdGljIHZv
+aWQgdnVzX3Byb2NfY3RsKFZ1RGV2ICp2dV9kZXYsIGludCBpZHgpIHsKCkVSUk9SOiBvcGVuIGJy
+YWNlICd7JyBmb2xsb3dpbmcgZnVuY3Rpb24gZGVjbGFyYXRpb25zIGdvIG9uIHRoZSBuZXh0IGxp
+bmUKIzYxNzogRklMRTogY29udHJpYi92aG9zdC11c2VyLXNjc2kvdmhvc3QtdXNlci1zY3NpLmM6
+NTMxOgorc3RhdGljIHZvaWQgdnVzX3Byb2NfZXZ0KFZ1RGV2ICp2dV9kZXYsIGludCBpZHgpIHsK
+CkVSUk9SOiBvcGVuIGJyYWNlICd7JyBmb2xsb3dpbmcgZnVuY3Rpb24gZGVjbGFyYXRpb25zIGdv
+IG9uIHRoZSBuZXh0IGxpbmUKIzYyMTogRklMRTogY29udHJpYi92aG9zdC11c2VyLXNjc2kvdmhv
+c3QtdXNlci1zY3NpLmM6NTM1Ogorc3RhdGljIHZvaWQgdnVzX3Byb2NfcmVxKFZ1RGV2ICp2dV9k
+ZXYsIGludCBpZHgpIHsKCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBiZWZvcmUgdGhlIG9wZW4gcGFy
+ZW50aGVzaXMgJygnCiM2NDg6IEZJTEU6IGNvbnRyaWIvdmhvc3QtdXNlci1zY3NpL3Zob3N0LXVz
+ZXItc2NzaS5jOjU2MjoKKyAgICB3aGlsZSgxKSB7CgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFy
+b3VuZCB0aGF0ICctJyAoY3R4OlZ4VikKIzY3ODogRklMRTogY29udHJpYi92aG9zdC11c2VyLXNj
+c2kvdmhvc3QtdXNlci1zY3NpLmM6NTkyOgorICAgICAgICAgICAgICAgICAgICAgICAgICAgIHJl
+cSwgJmVsZW0tPm91dF9zZ1sxXSwgZWxlbS0+b3V0X251bS0xLAogICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBz
+cGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJy0nIChjdHg6VnhWKQojNjc5OiBGSUxFOiBjb250
+cmliL3Zob3N0LXVzZXItc2NzaS92aG9zdC11c2VyLXNjc2kuYzo1OTM6CisgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgcnNwLCAmZWxlbS0+aW5fc2dbMV0sIGVsZW0tPmluX251bS0xKSAhPSAw
+KSB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIF4KCkVSUk9SOiBvcGVuIGJyYWNlICd7JyBmb2xsb3dpbmcgZnVuY3Rpb24gZGVj
+bGFyYXRpb25zIGdvIG9uIHRoZSBuZXh0IGxpbmUKIzY5MTogRklMRTogY29udHJpYi92aG9zdC11
+c2VyLXNjc2kvdmhvc3QtdXNlci1zY3NpLmM6NjA1Ogorc3RhdGljIHZvaWQgdnVzX3F1ZXVlX3Nl
+dF9zdGFydGVkKFZ1RGV2ICp2dV9kZXYsIGludCBpZHgsIGJvb2wgc3RhcnRlZCkgewoKRVJST1I6
+IHNwYWNlIHJlcXVpcmVkIGJlZm9yZSB0aGUgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzcwNDogRklM
+RTogY29udHJpYi92aG9zdC11c2VyLXNjc2kvdmhvc3QtdXNlci1zY3NpLmM6NjE4OgorICAgIHN3
+aXRjaChpZHgpIHsKCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJz8nIChjdHg6
+VnhWKQojNzA2OiBGSUxFOiBjb250cmliL3Zob3N0LXVzZXItc2NzaS92aG9zdC11c2VyLXNjc2ku
+Yzo2MjA6CisgICAgICAgIHZ1X3NldF9xdWV1ZV9oYW5kbGVyKHZ1X2RldiwgdnEsIHN0YXJ0ZWQ/
+dnVzX3Byb2NfY3RsOk5VTEwpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnOicgKGN0
+eDpWeFYpCiM3MDY6IEZJTEU6IGNvbnRyaWIvdmhvc3QtdXNlci1zY3NpL3Zob3N0LXVzZXItc2Nz
+aS5jOjYyMDoKKyAgICAgICAgdnVfc2V0X3F1ZXVlX2hhbmRsZXIodnVfZGV2LCB2cSwgc3RhcnRl
+ZD92dXNfcHJvY19jdGw6TlVMTCk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91
+bmQgdGhhdCAnPycgKGN0eDpWeFYpCiM3MDk6IEZJTEU6IGNvbnRyaWIvdmhvc3QtdXNlci1zY3Np
+L3Zob3N0LXVzZXItc2NzaS5jOjYyMzoKKyAgICAgICAgdnVfc2V0X3F1ZXVlX2hhbmRsZXIodnVf
+ZGV2LCB2cSwgc3RhcnRlZD92dXNfcHJvY19ldnQ6TlVMTCk7CiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFy
+b3VuZCB0aGF0ICc6JyAoY3R4OlZ4VikKIzcwOTogRklMRTogY29udHJpYi92aG9zdC11c2VyLXNj
+c2kvdmhvc3QtdXNlci1zY3NpLmM6NjIzOgorICAgICAgICB2dV9zZXRfcXVldWVfaGFuZGxlcih2
+dV9kZXYsIHZxLCBzdGFydGVkP3Z1c19wcm9jX2V2dDpOVUxMKTsKICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3Bh
+Y2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc/JyAoY3R4OlZ4VikKIzcxMjogRklMRTogY29udHJp
+Yi92aG9zdC11c2VyLXNjc2kvdmhvc3QtdXNlci1zY3NpLmM6NjI2OgorICAgICAgICB2dV9zZXRf
+cXVldWVfaGFuZGxlcih2dV9kZXYsIHZxLCBzdGFydGVkP3Z1c19wcm9jX3JlcTpOVUxMKTsKICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBz
+cGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJzonIChjdHg6VnhWKQojNzEyOiBGSUxFOiBjb250
+cmliL3Zob3N0LXVzZXItc2NzaS92aG9zdC11c2VyLXNjc2kuYzo2MjY6CisgICAgICAgIHZ1X3Nl
+dF9xdWV1ZV9oYW5kbGVyKHZ1X2RldiwgdnEsIHN0YXJ0ZWQ/dnVzX3Byb2NfcmVxOk5VTEwpOwog
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIF4KCkVSUk9SOiBvcGVuIGJyYWNlICd7JyBmb2xsb3dpbmcgZnVuY3Rpb24gZGVjbGFyYXRp
+b25zIGdvIG9uIHRoZSBuZXh0IGxpbmUKIzcyMDogRklMRTogY29udHJpYi92aG9zdC11c2VyLXNj
+c2kvdmhvc3QtdXNlci1zY3NpLmM6NjM0Ogorc3RhdGljIGdib29sZWFuIHZ1c192aG9zdF9jYihn
+cG9pbnRlciBkYXRhKSB7CgpFUlJPUjogb3BlbiBicmFjZSAneycgZm9sbG93aW5nIGZ1bmN0aW9u
+IGRlY2xhcmF0aW9ucyBnbyBvbiB0aGUgbmV4dCBsaW5lCiM3MzY6IEZJTEU6IGNvbnRyaWIvdmhv
+c3QtdXNlci1zY3NpL3Zob3N0LXVzZXItc2NzaS5jOjY1MDoKK3N0YXRpYyBpbnQgdW5peF9zb2Nr
+X25ldyhjaGFyICp1bml4X2ZuKSB7CgpFUlJPUjogb3BlbiBicmFjZSAneycgZm9sbG93aW5nIGZ1
+bmN0aW9uIGRlY2xhcmF0aW9ucyBnbyBvbiB0aGUgbmV4dCBsaW5lCiM3NzQ6IEZJTEU6IGNvbnRy
+aWIvdmhvc3QtdXNlci1zY3NpL3Zob3N0LXVzZXItc2NzaS5jOjY4ODoKK3N0YXRpYyB2aG9zdF9z
+Y3NpX2Rldl90ICp2ZGV2X3Njc2lfZmluZF9ieV92dShWdURldiAqdnVfZGV2KSB7CgpFUlJPUjog
+c3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc9JyAoY3R4OlZ4VikKIzc3OTogRklMRTogY29u
+dHJpYi92aG9zdC11c2VyLXNjc2kvdmhvc3QtdXNlci1zY3NpLmM6NjkzOgorICAgIGZvciAoaT0w
+OyBpPFZVU19NQVhfREVWUzsgaSsrKSB7CiAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1
+aXJlZCBhcm91bmQgdGhhdCAnPCcgKGN0eDpWeFYpCiM3Nzk6IEZJTEU6IGNvbnRyaWIvdmhvc3Qt
+dXNlci1zY3NpL3Zob3N0LXVzZXItc2NzaS5jOjY5MzoKKyAgICBmb3IgKGk9MDsgaTxWVVNfTUFY
+X0RFVlM7IGkrKykgewogICAgICAgICAgICAgICAgXgoKRVJST1I6IG9wZW4gYnJhY2UgJ3snIGZv
+bGxvd2luZyBmdW5jdGlvbiBkZWNsYXJhdGlvbnMgZ28gb24gdGhlIG5leHQgbGluZQojNzg5OiBG
+SUxFOiBjb250cmliL3Zob3N0LXVzZXItc2NzaS92aG9zdC11c2VyLXNjc2kuYzo3MDM6CitzdGF0
+aWMgdm9pZCB2ZGV2X3Njc2lfZGVpbml0KHZob3N0X3Njc2lfZGV2X3QgKnZkZXZfc2NzaSkgewoK
+RVJST1I6IG9wZW4gYnJhY2UgJ3snIGZvbGxvd2luZyBmdW5jdGlvbiBkZWNsYXJhdGlvbnMgZ28g
+b24gdGhlIG5leHQgbGluZQojODE0OiBGSUxFOiBjb250cmliL3Zob3N0LXVzZXItc2NzaS92aG9z
+dC11c2VyLXNjc2kuYzo3Mjg6CitzdGF0aWMgdmhvc3Rfc2NzaV9kZXZfdCAqdmRldl9zY3NpX25l
+dyhjaGFyICp1bml4X2ZuKSB7CgpFUlJPUjogb3BlbiBicmFjZSAneycgZm9sbG93aW5nIGZ1bmN0
+aW9uIGRlY2xhcmF0aW9ucyBnbyBvbiB0aGUgbmV4dCBsaW5lCiM4Njk6IEZJTEU6IGNvbnRyaWIv
+dmhvc3QtdXNlci1zY3NpL3Zob3N0LXVzZXItc2NzaS5jOjc4MzoKK3N0YXRpYyBpbnQgdmRldl9z
+Y3NpX3J1bih2aG9zdF9zY3NpX2Rldl90ICp2ZGV2X3Njc2kpIHsKCnRvdGFsOiA2NiBlcnJvcnMs
+IDAgd2FybmluZ3MsIDkxOSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9i
+bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
+c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
+TUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0
+aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
+W2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNo
+ZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
