@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49131)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cjTJV-00065w-Mf
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 11:10:47 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cjTMh-0008Oc-OO
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 11:14:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cjTJU-0008Tj-Be
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 11:10:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53056)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cjTJU-0008TR-2u
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 11:10:44 -0500
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Thu,  2 Mar 2017 16:10:33 +0000
-Message-Id: <20170302161033.4787-4-berrange@redhat.com>
-In-Reply-To: <20170302161033.4787-1-berrange@redhat.com>
-References: <20170302161033.4787-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PULL v2 3/3] io: fully parse & validate HTTP headers
- for websocket protocol handshake
+	(envelope-from <peter.maydell@linaro.org>) id 1cjTMg-0001p9-OF
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 11:14:03 -0500
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:32786)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cjTMg-0001os-HJ
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 11:14:02 -0500
+Received: by mail-wm0-x229.google.com with SMTP id i17so3709132wmf.0
+	for <qemu-devel@nongnu.org>; Thu, 02 Mar 2017 08:14:02 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20170227173706.15210-3-drjones@redhat.com>
+References: <20170227173706.15210-1-drjones@redhat.com>
+	<20170227173706.15210-3-drjones@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 2 Mar 2017 16:13:40 +0000
+Message-ID: <CAFEAcA-ScxCc5-pizNjeV4S_NpNziWWmVTbP+zAs2KCY=V0wyg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH 2/2] arm: kvm: set MPIDR when we can
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,351 +29,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Andrew Jones <drjones@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Igor Mammedov <imammedo@redhat.com>
 
-The current websockets protocol handshake code is very relaxed, just
-doing crude string searching across the HTTP header data. This causes
-it to both reject valid connections and fail to reject invalid
-connections. For example, according to the RFC 6455 it:
+On 27 February 2017 at 17:37, Andrew Jones <drjones@redhat.com> wrote:
+> If KVM supports user provided MPIDRs for the vcpus, then provide
+> them. This simplifies management of vcpus as we can be sure of
+> the identity of a vcpu even before it's been instantiated.
+>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  target/arm/cpu.c   |  3 +--
+>  target/arm/kvm32.c | 22 ++++++++++++++--------
+>  target/arm/kvm64.c | 22 ++++++++++++++--------
+>  3 files changed, 29 insertions(+), 18 deletions(-)
+>
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index f7157dc0e59d..83cd5eefbef8 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -741,8 +741,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+>          return;
+>      }
+>
+> -    /* This cpu-id-to-MPIDR affinity is used only for TCG; KVM will override it.
+> -     * We don't support setting cluster ID ([16..23]) (known as Aff2
+> +    /* We don't currently support setting cluster ID ([16..23]) (known as Aff2
+>       * in later ARM ARM versions), or any of the higher affinity level fields,
+>       * so these bits always RAZ.
+>       */
+> diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
+> index 069da0c5fd10..5ad732498e5c 100644
+> --- a/target/arm/kvm32.c
+> +++ b/target/arm/kvm32.c
+> @@ -186,7 +186,6 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>  {
+>      int ret;
+>      uint64_t v;
+> -    uint32_t mpidr;
+>      struct kvm_one_reg r;
+>      ARMCPU *cpu = ARM_CPU(cs);
+>
+> @@ -223,16 +222,23 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>          return -EINVAL;
+>      }
+>
+> -    /*
+> -     * When KVM is in use, PSCI is emulated in-kernel and not by qemu.
+> -     * Currently KVM has its own idea about MPIDR assignment, so we
+> -     * override our defaults with what we get from KVM.
+> -     */
+> -    ret = kvm_get_one_reg(cs, ARM_CP15_REG32(ARM_CPU_ID_MPIDR), &mpidr);
+> +    if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_USER_MPIDR)) {
+> +        ret = kvm_set_one_reg(cs, ARM_CP15_REG32(ARM_CPU_ID_MPIDR),
+> +                              &cpu->mp_affinity);
 
- - MUST reject any method other than "GET"
- - MUST reject any HTTP version less than "HTTP/1.1"
- - MUST reject Connection header without "Upgrade" listed
- - MUST reject Upgrade header which is not 'websocket'
- - MUST reject missing Host header
- - MUST treat HTTP header names as case insensitive
+mp_affinity is only the affinity bits of the MPIDR. I would expect
+the kernel set_one_reg interface for the MPIDR to want a complete
+MPIDR value with M, U and MT bits.
 
-To do all this validation correctly requires that we fully parse the
-HTTP headers, populating a data structure containing the header
-fields.
+(compare the way that when we set mp_affinity from the kernel
+reg. value we mask out the bits we don't care about).
 
-After this change, we also reject any path other than '/'
+Similarly with the 64-bit version of this code.
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- io/channel-websock.c | 236 ++++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 194 insertions(+), 42 deletions(-)
+> +    } else {
+> +        /* If we can't set the MPIDR, then KVM will generate one. We must
+> +         * update our copy to that one in order to stay synchronized.
+> +         */
+> +        uint32_t mpidr;
+> +
+> +        ret = kvm_get_one_reg(cs, ARM_CP15_REG32(ARM_CPU_ID_MPIDR), &mpidr);
+> +        if (!ret) {
+> +            cpu->mp_affinity = mpidr & ARM32_AFFINITY_MASK;
+> +        }
+> +    }
+>      if (ret) {
+>          return ret;
+>      }
+> -    cpu->mp_affinity = mpidr & ARM32_AFFINITY_MASK;
+>
+>      return kvm_arm_init_cpreg_list(cpu);
 
-diff --git a/io/channel-websock.c b/io/channel-websock.c
-index a06a4a8..8fabade 100644
---- a/io/channel-websock.c
-+++ b/io/channel-websock.c
-@@ -33,11 +33,16 @@
- #define QIO_CHANNEL_WEBSOCK_GUID "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
- #define QIO_CHANNEL_WEBSOCK_GUID_LEN strlen(QIO_CHANNEL_WEBSOCK_GUID)
- 
--#define QIO_CHANNEL_WEBSOCK_HEADER_PROTOCOL "Sec-WebSocket-Protocol"
--#define QIO_CHANNEL_WEBSOCK_HEADER_VERSION "Sec-WebSocket-Version"
--#define QIO_CHANNEL_WEBSOCK_HEADER_KEY "Sec-WebSocket-Key"
-+#define QIO_CHANNEL_WEBSOCK_HEADER_PROTOCOL "sec-websocket-protocol"
-+#define QIO_CHANNEL_WEBSOCK_HEADER_VERSION "sec-websocket-version"
-+#define QIO_CHANNEL_WEBSOCK_HEADER_KEY "sec-websocket-key"
-+#define QIO_CHANNEL_WEBSOCK_HEADER_UPGRADE "upgrade"
-+#define QIO_CHANNEL_WEBSOCK_HEADER_HOST "host"
-+#define QIO_CHANNEL_WEBSOCK_HEADER_CONNECTION "connection"
- 
- #define QIO_CHANNEL_WEBSOCK_PROTOCOL_BINARY "binary"
-+#define QIO_CHANNEL_WEBSOCK_CONNECTION_UPGRADE "Upgrade"
-+#define QIO_CHANNEL_WEBSOCK_UPGRADE_WEBSOCKET "websocket"
- 
- #define QIO_CHANNEL_WEBSOCK_HANDSHAKE_RESPONSE  \
-     "HTTP/1.1 101 Switching Protocols\r\n"      \
-@@ -49,6 +54,9 @@
- #define QIO_CHANNEL_WEBSOCK_HANDSHAKE_DELIM "\r\n"
- #define QIO_CHANNEL_WEBSOCK_HANDSHAKE_END "\r\n\r\n"
- #define QIO_CHANNEL_WEBSOCK_SUPPORTED_VERSION "13"
-+#define QIO_CHANNEL_WEBSOCK_HTTP_METHOD "GET"
-+#define QIO_CHANNEL_WEBSOCK_HTTP_PATH "/"
-+#define QIO_CHANNEL_WEBSOCK_HTTP_VERSION "HTTP/1.1"
- 
- /* The websockets packet header is variable length
-  * depending on the size of the payload... */
-@@ -99,6 +107,13 @@ struct QEMU_PACKED QIOChannelWebsockHeader {
-     } u;
- };
- 
-+typedef struct QIOChannelWebsockHTTPHeader QIOChannelWebsockHTTPHeader;
-+
-+struct QIOChannelWebsockHTTPHeader {
-+    char *name;
-+    char *value;
-+};
-+
- enum {
-     QIO_CHANNEL_WEBSOCK_OPCODE_CONTINUATION = 0x0,
-     QIO_CHANNEL_WEBSOCK_OPCODE_TEXT_FRAME = 0x1,
-@@ -108,25 +123,130 @@ enum {
-     QIO_CHANNEL_WEBSOCK_OPCODE_PONG = 0xA
- };
- 
--static char *qio_channel_websock_handshake_entry(const char *handshake,
--                                                 size_t handshake_len,
--                                                 const char *name)
--{
--    char *begin, *end, *ret = NULL;
--    char *line = g_strdup_printf("%s%s: ",
--                                 QIO_CHANNEL_WEBSOCK_HANDSHAKE_DELIM,
--                                 name);
--    begin = g_strstr_len(handshake, handshake_len, line);
--    if (begin != NULL) {
--        begin += strlen(line);
--        end = g_strstr_len(begin, handshake_len - (begin - handshake),
--                QIO_CHANNEL_WEBSOCK_HANDSHAKE_DELIM);
--        if (end != NULL) {
--            ret = g_strndup(begin, end - begin);
-+static size_t
-+qio_channel_websock_extract_headers(char *buffer,
-+                                    QIOChannelWebsockHTTPHeader *hdrs,
-+                                    size_t nhdrsalloc,
-+                                    Error **errp)
-+{
-+    char *nl, *sep, *tmp;
-+    size_t nhdrs = 0;
-+
-+    /*
-+     * First parse the HTTP protocol greeting of format:
-+     *
-+     *   $METHOD $PATH $VERSION
-+     *
-+     * e.g.
-+     *
-+     *   GET / HTTP/1.1
-+     */
-+
-+    nl = strstr(buffer, QIO_CHANNEL_WEBSOCK_HANDSHAKE_DELIM);
-+    if (!nl) {
-+        error_setg(errp, "Missing HTTP header delimiter");
-+        return 0;
-+    }
-+    *nl = '\0';
-+
-+    tmp = strchr(buffer, ' ');
-+    if (!tmp) {
-+        error_setg(errp, "Missing HTTP path delimiter");
-+        return 0;
-+    }
-+    *tmp = '\0';
-+
-+    if (!g_str_equal(buffer, QIO_CHANNEL_WEBSOCK_HTTP_METHOD)) {
-+        error_setg(errp, "Unsupported HTTP method %s", buffer);
-+        return 0;
-+    }
-+
-+    buffer = tmp + 1;
-+    tmp = strchr(buffer, ' ');
-+    if (!tmp) {
-+        error_setg(errp, "Missing HTTP version delimiter");
-+        return 0;
-+    }
-+    *tmp = '\0';
-+
-+    if (!g_str_equal(buffer, QIO_CHANNEL_WEBSOCK_HTTP_PATH)) {
-+        error_setg(errp, "Unexpected HTTP path %s", buffer);
-+        return 0;
-+    }
-+
-+    buffer = tmp + 1;
-+
-+    if (!g_str_equal(buffer, QIO_CHANNEL_WEBSOCK_HTTP_VERSION)) {
-+        error_setg(errp, "Unsupported HTTP version %s", buffer);
-+        return 0;
-+    }
-+
-+    buffer = nl + strlen(QIO_CHANNEL_WEBSOCK_HANDSHAKE_DELIM);
-+
-+    /*
-+     * Now parse all the header fields of format
-+     *
-+     *   $NAME: $VALUE
-+     *
-+     * e.g.
-+     *
-+     *   Cache-control: no-cache
-+     */
-+    do {
-+        QIOChannelWebsockHTTPHeader *hdr;
-+
-+        nl = strstr(buffer, QIO_CHANNEL_WEBSOCK_HANDSHAKE_DELIM);
-+        if (nl) {
-+            *nl = '\0';
-+        }
-+
-+        sep = strchr(buffer, ':');
-+        if (!sep) {
-+            error_setg(errp, "Malformed HTTP header");
-+            return 0;
-+        }
-+        *sep = '\0';
-+        sep++;
-+        while (*sep == ' ') {
-+            sep++;
-+        }
-+
-+        if (nhdrs >= nhdrsalloc) {
-+            error_setg(errp, "Too many HTTP headers");
-+            return 0;
-+        }
-+
-+        hdr = &hdrs[nhdrs++];
-+        hdr->name = buffer;
-+        hdr->value = sep;
-+
-+        /* Canonicalize header name for easier identification later */
-+        for (tmp = hdr->name; *tmp; tmp++) {
-+            *tmp = g_ascii_tolower(*tmp);
-+        }
-+
-+        if (nl) {
-+            buffer = nl + strlen(QIO_CHANNEL_WEBSOCK_HANDSHAKE_DELIM);
-+        }
-+    } while (nl != NULL);
-+
-+    return nhdrs;
-+}
-+
-+static const char *
-+qio_channel_websock_find_header(QIOChannelWebsockHTTPHeader *hdrs,
-+                                size_t nhdrs,
-+                                const char *name)
-+{
-+    size_t i;
-+
-+    for (i = 0; i < nhdrs; i++) {
-+        if (g_str_equal(hdrs[i].name, name)) {
-+            return hdrs[i].value;
-         }
-     }
--    g_free(line);
--    return ret;
-+
-+    return NULL;
- }
- 
- 
-@@ -166,58 +286,90 @@ static int qio_channel_websock_handshake_send_response(QIOChannelWebsock *ioc,
- }
- 
- static int qio_channel_websock_handshake_process(QIOChannelWebsock *ioc,
--                                                 const char *line,
--                                                 size_t size,
-+                                                 char *buffer,
-                                                  Error **errp)
- {
--    int ret = -1;
--    char *protocols = qio_channel_websock_handshake_entry(
--        line, size, QIO_CHANNEL_WEBSOCK_HEADER_PROTOCOL);
--    char *version = qio_channel_websock_handshake_entry(
--        line, size, QIO_CHANNEL_WEBSOCK_HEADER_VERSION);
--    char *key = qio_channel_websock_handshake_entry(
--        line, size, QIO_CHANNEL_WEBSOCK_HEADER_KEY);
-+    QIOChannelWebsockHTTPHeader hdrs[32];
-+    size_t nhdrs = G_N_ELEMENTS(hdrs);
-+    const char *protocols = NULL, *version = NULL, *key = NULL,
-+        *host = NULL, *connection = NULL, *upgrade = NULL;
- 
-+    nhdrs = qio_channel_websock_extract_headers(buffer, hdrs, nhdrs, errp);
-+    if (!nhdrs) {
-+        return -1;
-+    }
-+
-+    protocols = qio_channel_websock_find_header(
-+        hdrs, nhdrs, QIO_CHANNEL_WEBSOCK_HEADER_PROTOCOL);
-     if (!protocols) {
-         error_setg(errp, "Missing websocket protocol header data");
--        goto cleanup;
-+        return -1;
-     }
- 
-+    version = qio_channel_websock_find_header(
-+        hdrs, nhdrs, QIO_CHANNEL_WEBSOCK_HEADER_VERSION);
-     if (!version) {
-         error_setg(errp, "Missing websocket version header data");
--        goto cleanup;
-+        return -1;
-     }
- 
-+    key = qio_channel_websock_find_header(
-+        hdrs, nhdrs, QIO_CHANNEL_WEBSOCK_HEADER_KEY);
-     if (!key) {
-         error_setg(errp, "Missing websocket key header data");
--        goto cleanup;
-+        return -1;
-+    }
-+
-+    host = qio_channel_websock_find_header(
-+        hdrs, nhdrs, QIO_CHANNEL_WEBSOCK_HEADER_HOST);
-+    if (!host) {
-+        error_setg(errp, "Missing websocket host header data");
-+        return -1;
-+    }
-+
-+    connection = qio_channel_websock_find_header(
-+        hdrs, nhdrs, QIO_CHANNEL_WEBSOCK_HEADER_CONNECTION);
-+    if (!connection) {
-+        error_setg(errp, "Missing websocket connection header data");
-+        return -1;
-+    }
-+
-+    upgrade = qio_channel_websock_find_header(
-+        hdrs, nhdrs, QIO_CHANNEL_WEBSOCK_HEADER_UPGRADE);
-+    if (!upgrade) {
-+        error_setg(errp, "Missing websocket upgrade header data");
-+        return -1;
-     }
- 
-     if (!g_strrstr(protocols, QIO_CHANNEL_WEBSOCK_PROTOCOL_BINARY)) {
-         error_setg(errp, "No '%s' protocol is supported by client '%s'",
-                    QIO_CHANNEL_WEBSOCK_PROTOCOL_BINARY, protocols);
--        goto cleanup;
-+        return -1;
-     }
- 
-     if (!g_str_equal(version, QIO_CHANNEL_WEBSOCK_SUPPORTED_VERSION)) {
-         error_setg(errp, "Version '%s' is not supported by client '%s'",
-                    QIO_CHANNEL_WEBSOCK_SUPPORTED_VERSION, version);
--        goto cleanup;
-+        return -1;
-     }
- 
-     if (strlen(key) != QIO_CHANNEL_WEBSOCK_CLIENT_KEY_LEN) {
-         error_setg(errp, "Key length '%zu' was not as expected '%d'",
-                    strlen(key), QIO_CHANNEL_WEBSOCK_CLIENT_KEY_LEN);
--        goto cleanup;
-+        return -1;
-     }
- 
--    ret = qio_channel_websock_handshake_send_response(ioc, key, errp);
-+    if (!g_strrstr(connection, QIO_CHANNEL_WEBSOCK_CONNECTION_UPGRADE)) {
-+        error_setg(errp, "No connection upgrade requested '%s'", connection);
-+        return -1;
-+    }
- 
-- cleanup:
--    g_free(protocols);
--    g_free(version);
--    g_free(key);
--    return ret;
-+    if (!g_str_equal(upgrade, QIO_CHANNEL_WEBSOCK_UPGRADE_WEBSOCKET)) {
-+        error_setg(errp, "Incorrect upgrade method '%s'", upgrade);
-+        return -1;
-+    }
-+
-+    return qio_channel_websock_handshake_send_response(ioc, key, errp);
- }
- 
- static int qio_channel_websock_handshake_read(QIOChannelWebsock *ioc,
-@@ -248,10 +400,10 @@ static int qio_channel_websock_handshake_read(QIOChannelWebsock *ioc,
-             return 0;
-         }
-     }
-+    *handshake_end = '\0';
- 
-     if (qio_channel_websock_handshake_process(ioc,
-                                               (char *)ioc->encinput.buffer,
--                                              ioc->encinput.offset,
-                                               errp) < 0) {
-         return -1;
-     }
--- 
-2.9.3
+Otherwise this looks fine to me.
+
+PS: I assume we are targeting 2.10 (or whatever we call it) with this.
+
+thanks
+-- PMM
