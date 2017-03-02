@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cjW5X-0002zV-Fg
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 14:08:32 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cjWBJ-0003zs-NP
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 14:14:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cjW5U-00080x-Qj
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 14:08:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40448)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cjW5U-0007z9-In
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 14:08:28 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8ABAB19D053
-	for <qemu-devel@nongnu.org>; Thu,  2 Mar 2017 19:08:28 +0000 (UTC)
-References: <20170302161921.10181-1-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <6e8da3a1-9533-cd39-34e9-e4fd27f53f15@redhat.com>
-Date: Thu, 2 Mar 2017 13:08:25 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1cjWBI-0001D5-Kb
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 14:14:29 -0500
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:36270)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cjWBI-0001Cv-Dp
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 14:14:28 -0500
+Received: by mail-wm0-x232.google.com with SMTP id n11so32650160wma.1
+	for <qemu-devel@nongnu.org>; Thu, 02 Mar 2017 11:14:27 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20170302161921.10181-1-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="TuVqXJPUXQBXnd0UbDhennbNkb9NBjWKH"
-Subject: Re: [Qemu-devel] [PATCH for-2.9 v3 0/2] migration: fixes to
- handling tls-hostname/tls-creds
+In-Reply-To: <7c6e8c071cbd47d6d9065635e97dd88a7197b5be.1488068248.git.balaton@eik.bme.hu>
+References: <cover.1488068248.git.balaton@eik.bme.hu>
+	<7c6e8c071cbd47d6d9065635e97dd88a7197b5be.1488068248.git.balaton@eik.bme.hu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 2 Mar 2017 19:14:06 +0000
+Message-ID: <CAFEAcA-01wdWYs_F-Maxoq7Wa=Xo1J1iaheEQFUdVL1G4PDG7w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2 04/14] sm501: Get rid of base address in
+ draw_hwc_line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,68 +30,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, John Ferlan <jferlan@redhat.com>, Jiri Denemark <jdenemar@redhat.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---TuVqXJPUXQBXnd0UbDhennbNkb9NBjWKH
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Juan Quintela
- <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- John Ferlan <jferlan@redhat.com>, Jiri Denemark <jdenemar@redhat.com>
-Message-ID: <6e8da3a1-9533-cd39-34e9-e4fd27f53f15@redhat.com>
-Subject: Re: [PATCH for-2.9 v3 0/2] migration: fixes to handling
- tls-hostname/tls-creds
-References: <20170302161921.10181-1-berrange@redhat.com>
-In-Reply-To: <20170302161921.10181-1-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 25 February 2017 at 18:23, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+> Do not use the base address to access data in local memory. This is in
+> preparation to allow chip connected via PCI where base address depends
+> on where the BAR is mapped so it will be unknown.
+>
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> ---
+>  hw/display/sm501.c          | 6 ++----
+>  hw/display/sm501_template.h | 8 ++++----
+>  2 files changed, 6 insertions(+), 8 deletions(-)
+>
+> diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+> index 22cac97..1cda127 100644
+> --- a/hw/display/sm501.c
+> +++ b/hw/display/sm501.c
+> @@ -460,7 +460,6 @@ typedef struct SM501State {
+>      QemuConsole *con;
+>
+>      /* status & internal resources */
+> -    hwaddr base;
+>      uint32_t local_mem_size_index;
+>      uint8_t *local_mem;
+>      MemoryRegion local_mem_region;
+> @@ -1400,10 +1399,9 @@ static const GraphicHwOps sm501_ops = {
+>      .gfx_update  = sm501_update_display,
+>  };
+>
+> -static void sm501_init(SM501State *s, DeviceState *dev, uint32_t base,
+> +static void sm501_init(SM501State *s, DeviceState *dev,
+>                         uint32_t local_mem_bytes)
+>  {
+> -    s->base = base;
+>      s->local_mem_size_index = get_local_mem_size_index(local_mem_bytes);
+>      SM501_DPRINTF("sm501 local mem size=%x. index=%d\n", get_local_mem_size(s),
+>                    s->local_mem_size_index);
+> @@ -1461,7 +1459,7 @@ static void sm501_realize_sysbus(DeviceState *dev, Error **errp)
+>      SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+>      DeviceState *usb_dev;
+>
+> -    sm501_init(&s->state, dev, s->base, s->vram_size);
+> +    sm501_init(&s->state, dev, s->vram_size);
+>      sysbus_init_mmio(sbd, &s->state.local_mem_region);
+>      sysbus_init_mmio(sbd, &s->state.mmio_region);
+>
+> diff --git a/hw/display/sm501_template.h b/hw/display/sm501_template.h
+> index 16e500b..832ee61 100644
+> --- a/hw/display/sm501_template.h
+> +++ b/hw/display/sm501_template.h
+> @@ -103,13 +103,13 @@ static void glue(draw_hwc_line_, PIXEL_NAME)(SM501State *s, int crt,
+>                   uint8_t *palette, int c_y, uint8_t *d, int width)
+>  {
+>      int x, i;
+> -    uint8_t bitset = 0;
+> +    uint8_t *pixval, bitset = 0;
+>
+>      /* get hardware cursor pattern */
+>      uint32_t cursor_addr = get_hwc_address(s, crt);
+>      assert(0 <= c_y && c_y < SM501_HWC_HEIGHT);
+>      cursor_addr += SM501_HWC_WIDTH * c_y / 4;  /* 4 pixels per byte */
+> -    cursor_addr += s->base;
+> +    pixval = s->local_mem + cursor_addr;
+>
+>      /* get cursor position */
+>      x = get_hwc_x(s, crt);
+> @@ -120,8 +120,8 @@ static void glue(draw_hwc_line_, PIXEL_NAME)(SM501State *s, int crt,
+>
+>          /* get pixel value */
+>          if (i % 4 == 0) {
+> -            bitset = ldub_phys(&address_space_memory, cursor_addr);
+> -            cursor_addr++;
+> +            bitset = ldub_p(pixval);
+> +            pixval++;
+>          }
+>          v = bitset & 3;
+>          bitset >>= 2;
+> --
+> 2.7.4
 
-On 03/02/2017 10:19 AM, Daniel P. Berrange wrote:
-> The need for these two patches was identified during implementation  of=
+(The data sheet suggests that the hardware cursor can also be in
+"external memory", but it looks like we never supported that
+previously and I can't figure out how it is supposed to work either.
+So no problem with restricting it to be in the local video ram blob.)
 
-> TLS encrypted migration in libvirt.
->=20
-> Changed in v3:
->=20
->  - Add to qapi-schema.json docs
->=20
-> Daniel P. Berrange (2):
->   migration: allow clearing migration string parameters
->   migration: always report tls-creds & tls-hostname migrate parameters
->=20
->  migration/migration.c | 22 ++++++++++++++++------
->  qapi-schema.json      |  8 +++++++-
->  2 files changed, 23 insertions(+), 7 deletions(-)
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-The discoverability of whether "" works is not visible in introspection,
-but reporting "" on output helps.  For the series:
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---TuVqXJPUXQBXnd0UbDhennbNkb9NBjWKH
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYuG2pAAoJEKeha0olJ0NqR8cH/2EtpYqbDUdWqlpdPWIFXsOW
-RMF7q8N9PsVBLHvT3YrDEfF5rQRXs+CUqb5S3+EVXGS7sOqQ4RKxz62D3esz5+/u
-g0NAA5+Wk8Ud2v5x+KzJFbp4ohgku9npA+ilTB8JzGTCEiENCx1lij7mb0llHemq
-xkk9TZyGbR1p/YOWuLQ/qq2jBE5G8awbqc0qhe63LlXlRZXOSBnaYQtBI0LP1x2R
-B3gy8ZU8ffl76b/xWTPJJckN0zU3syTCUsYdlvQqyfsu48cSmpN27xuTJCG0feyC
-Xnsp7YhcYOIvRHxj51lLlPecx9w+KCeUjDIXRoKJHCcimrbLgoRzIco5dXgYRgc=
-=/06a
------END PGP SIGNATURE-----
-
---TuVqXJPUXQBXnd0UbDhennbNkb9NBjWKH--
+thanks
+-- PMM
