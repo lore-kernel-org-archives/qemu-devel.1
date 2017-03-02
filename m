@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59653)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cjSfE-0000go-MO
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 10:29:09 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cjSiG-0001Qa-Qj
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 10:32:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cjSf9-0006Wn-NM
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 10:29:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49530)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cjSf9-0006WT-HH
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 10:29:03 -0500
-Date: Thu, 2 Mar 2017 17:29:01 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170302172602-mutt-send-email-mst@kernel.org>
-References: <1488435591-17882-1-git-send-email-mst@redhat.com>
-	<CAFEAcA9eo4f7pNR0vchTrKrASNcRvgizDEnj7OcirkvKqe_kdQ@mail.gmail.com>
+	(envelope-from <pbonzini@redhat.com>) id 1cjSiB-0000Jz-T6
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 10:32:16 -0500
+References: <20170302130422.81380-1-pasic@linux.vnet.ibm.com>
+	<20170302154935.7b8ec875.cornelia.huck@de.ibm.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b12c69aa-67ee-ffbc-cd89-716c24889167@redhat.com>
+Date: Thu, 2 Mar 2017 16:32:08 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9eo4f7pNR0vchTrKrASNcRvgizDEnj7OcirkvKqe_kdQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 00/15] virtio, pc: fixes, features
+In-Reply-To: <20170302154935.7b8ec875.cornelia.huck@de.ibm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/1] virtio-blk: fix race on guest notifiers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,43 +23,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Cornelia Huck <cornelia.huck@de.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-stable@nongnu.org
 
-On Thu, Mar 02, 2017 at 08:34:42AM +0000, Peter Maydell wrote:
-> On 2 March 2017 at 06:20, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > The following changes since commit 1e0addb682c3c552fd97480037d4f8ff18e2b87e:
-> >
-> >   Merge remote-tracking branch 'remotes/sstabellini/tags/xen-20170228-tag' into staging (2017-03-01 20:33:47 +0000)
-> >
-> > are available in the git repository at:
-> >
-> >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
-> >
-> > for you to fetch changes up to 077dd74239a99f6c1e77c5c1aa24cfc7f58cd20c:
-> >
-> >   hw/pxb-pcie: fix PCI Express hotplug support (2017-03-02 07:31:26 +0200)
-> >
-> > ----------------------------------------------------------------
-> > virtio, pc: fixes, features
-> >
-> > virtio support for region caches broke a bunch of stuff - fixing most of
-> > it though it's not ideal.  Still pondering the right way to fix it.
-> > New: VM gen ID and hotplug for PXB.
-> >
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+
+On 02/03/2017 15:49, Cornelia Huck wrote:
+> On Thu,  2 Mar 2017 14:04:22 +0100
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 > 
-> This is now well past the softfreeze deadline; do you have
-> a justification for putting new features in during freeze?
+>> diff --git a/hw/block/dataplane/virtio-blk.c b/hw/block/dataplane/virtio-blk.c
+>> index 5556f0e..13dd14d 100644
+>> --- a/hw/block/dataplane/virtio-blk.c
+>> +++ b/hw/block/dataplane/virtio-blk.c
+>> @@ -258,9 +258,16 @@ void virtio_blk_data_plane_stop(VirtIODevice *vdev)
+>>          virtio_queue_aio_set_host_notifier_handler(vq, s->ctx, NULL);
+>>      }
+>>
+>> -    /* Drain and switch bs back to the QEMU main loop */
+>> +    /* Drain and switch bs back to the QEMU main loop. After drain, the
+>> +     * device will not submit (nor comple) any requests until dataplane
 > 
-> thanks
-> -- PMM
+> s/comple/complete/
+> 
+>> +     * starts again.
+>> +     */
+>>      blk_set_aio_context(s->conf->conf.blk, qemu_get_aio_context());
+>>
+>> +    /* Notify guest before the guest notifiers get cleaned up */
+>> +    qemu_bh_cancel(s->bh);
+>> +    notify_guest_bh(s);
+>> +
+> 
+> Hm... does virtio-scsi dataplane need a similar treatment? Or am I
+> missing something?
 
-pxb hotplug support is more a bugfix than a feature - we just forgot to
-include the acpi bits, and the patches are very small.  vm gen id has
-been in my tree for a long time and bios bits have been merged. If we
-keep it out of this release there's more of a chance they will bitrot
-which would be a mess.
+No, the BH optimization is specific to virtio-blk.  Thanks for the patch
+Halil!
 
--- 
-MST
+Paolo
+
+>>      aio_context_release(s->ctx);
+>>
+>>      for (i = 0; i < nvqs; i++) {
+> 
