@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33686)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35455)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cjaRA-0003SI-A9
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 18:47:09 -0500
+	id 1cjaaW-00055j-F8
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 18:56:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cjaR7-00077k-7T
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 18:47:08 -0500
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:33066)
+	id 1cjaaR-0001br-Iy
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 18:56:48 -0500
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:32786)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cjaR7-00077g-2i
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 18:47:05 -0500
-Received: by mail-qk0-x242.google.com with SMTP id j127so5090059qke.0
-	for <qemu-devel@nongnu.org>; Thu, 02 Mar 2017 15:47:04 -0800 (PST)
+	id 1cjaaR-0001bM-Dh
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 18:56:43 -0500
+Received: by mail-qk0-x241.google.com with SMTP id j127so5135567qke.0
+	for <qemu-devel@nongnu.org>; Thu, 02 Mar 2017 15:56:43 -0800 (PST)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <1488449293-80280-1-git-send-email-liqiang6-s@360.cn>
-	<1488449293-80280-2-git-send-email-liqiang6-s@360.cn>
+References: <20170302215603.27630-1-pbonzini@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <28f76e5b-81cd-e2aa-98e8-4071bd75794c@amsat.org>
-Date: Thu, 2 Mar 2017 20:46:59 -0300
+Message-ID: <fbe823b1-538c-6551-9fa6-4ea4967f1bd4@amsat.org>
+Date: Thu, 2 Mar 2017 20:56:38 -0300
 MIME-Version: 1.0
-In-Reply-To: <1488449293-80280-2-git-send-email-liqiang6-s@360.cn>
+In-Reply-To: <20170302215603.27630-1-pbonzini@redhat.com>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] ide: qdev: register ide bus unrealize
- function
+Subject: Re: [Qemu-devel] [PATCH] memory: show region offset and ROM/RAM
+ type in "info mtree -f"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,69 +34,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>, jsnow@redhat.com, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, Li Qiang <liqiang6-s@360.cn>, ppandit@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: William Tambe <tambewilliam@gmail.com>, Peter Xu <peterx@redhat.com>
 
-On 03/02/2017 07:08 AM, Li Qiang wrote:
-> we have an idebus unrealize function, but it was being
-> registered as the unrealize function for the IDE Device,
-> so it was not getting invoked on device teardown because
-> nothing is "unrealizing" the IDE devices themselves.
+On 03/02/2017 06:56 PM, Paolo Bonzini wrote:
+> "info mtree -f" output is currently hard to use for large RAM regions, because
+> there is no hint as to what part of the region is being mapped.  Add the offset
+> if it is nonzero.
+>
+> Secondly, FlatView has a readonly field, that can override the MemoryRegion
+> in the presence of aliases.  Take it into account.
+>
+> Together, with this patch this:
+>
+> address-space (flat view): KVM-SMRAM
+>   0000000000000000-00000000000bffff (prio 0, ram): pc.ram
+>   00000000000c0000-00000000000c9fff (prio 0, ram): pc.ram
+>   00000000000ca000-00000000000ccfff (prio 0, ram): pc.ram
+>   00000000000cd000-00000000000ebfff (prio 0, ram): pc.ram
+>   00000000000ec000-00000000000effff (prio 0, ram): pc.ram
+>   00000000000f0000-00000000000fffff (prio 0, ram): pc.ram
+>   0000000000100000-00000000bfffffff (prio 0, ram): pc.ram
+>   00000000fd000000-00000000fdffffff (prio 1, ram): vga.vram
+>   00000000febc0000-00000000febdffff (prio 1, i/o): e1000-mmio
+>   00000000febf0400-00000000febf041f (prio 0, i/o): vga ioports remapped
+>   00000000febf0500-00000000febf0515 (prio 0, i/o): bochs dispi interface
+>   00000000febf0600-00000000febf0607 (prio 0, i/o): qemu extended regs
+>   00000000fec00000-00000000fec00fff (prio 0, i/o): kvm-ioapic
+>   00000000fed00000-00000000fed003ff (prio 0, i/o): hpet
+>   00000000fee00000-00000000feefffff (prio 4096, i/o): kvm-apic-msi
+>   00000000fffc0000-00000000ffffffff (prio 0, rom): pc.bios
+>   0000000100000000-000000013fffffff (prio 0, ram): pc.ram
+>
+> becomes this:
+>
+> address-space (flat view): KVM-SMRAM
+>   0000000000000000-00000000000bffff (prio 0, ram): pc.ram
+>   00000000000c0000-00000000000c9fff (prio 0, rom): pc.ram @00000000000c0000
+>   00000000000ca000-00000000000ccfff (prio 0, ram): pc.ram @00000000000ca000
+>   00000000000cd000-00000000000ebfff (prio 0, rom): pc.ram @00000000000cd000
+>   00000000000ec000-00000000000effff (prio 0, ram): pc.ram @00000000000ec000
+>   00000000000f0000-00000000000fffff (prio 0, rom): pc.ram @00000000000f0000
+>   0000000000100000-00000000bfffffff (prio 0, ram): pc.ram @0000000000100000
+>   00000000fd000000-00000000fdffffff (prio 1, ram): vga.vram
+>   00000000febc0000-00000000febdffff (prio 1, i/o): e1000-mmio
+>   00000000febf0400-00000000febf041f (prio 0, i/o): vga ioports remapped
+>   00000000febf0500-00000000febf0515 (prio 0, i/o): bochs dispi interface
+>   00000000febf0600-00000000febf0607 (prio 0, i/o): qemu extended regs
+>   00000000fec00000-00000000fec00fff (prio 0, i/o): kvm-ioapic
+>   00000000fed00000-00000000fed003ff (prio 0, i/o): hpet
+>   00000000fee00000-00000000feefffff (prio 4096, i/o): kvm-apic-msi
+>   00000000fffc0000-00000000ffffffff (prio 0, rom): pc.bios
+>   0000000100000000-000000013fffffff (prio 0, ram): pc.ram @00000000c0000000
 
-nice catch
+nice! the last line specially :)
 
 >
-> Suggested-by: John Snow <jsnow@redhat.com>
-> Signed-off-by: Li Qiang <liqiang6-s@360.cn>
+> This should make it easier to understand what's going on.
+>
+> Cc: Peter Xu <peterx@redhat.com>
+> Cc: "William Tambe" <tambewilliam@gmail.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  hw/ide/qdev.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
+>  memory.c | 25 ++++++++++++++++++-------
+>  1 file changed, 18 insertions(+), 7 deletions(-)
 >
-> diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
-> index dbaa75c..fbf7aa5 100644
-> --- a/hw/ide/qdev.c
-> +++ b/hw/ide/qdev.c
-> @@ -31,7 +31,7 @@
->  /* --------------------------------- */
+> diff --git a/memory.c b/memory.c
+> index d61caee..44700c3 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -2588,13 +2588,24 @@ static void mtree_print_flatview(fprintf_function p, void *f,
 >
->  static char *idebus_get_fw_dev_path(DeviceState *dev);
-> -static void idebus_unrealize(DeviceState *qdev, Error **errp);
-> +static void idebus_unrealize(BusState *qdev, Error **errp);
->
->  static Property ide_props[] = {
->      DEFINE_PROP_UINT32("unit", IDEDevice, unit, -1),
-> @@ -43,14 +43,15 @@ static void ide_bus_class_init(ObjectClass *klass, void *data)
->      BusClass *k = BUS_CLASS(klass);
->
->      k->get_fw_dev_path = idebus_get_fw_dev_path;
-> +    k->unrealize = idebus_unrealize;
->  }
->
-> -static void idebus_unrealize(DeviceState *qdev, Error **errp)
-> +static void idebus_unrealize(BusState *bus, Error **errp)
->  {
-> -    IDEBus *bus = DO_UPCAST(IDEBus, qbus, qdev->parent_bus);
-> +    IDEBus *ibus = IDE_BUS(bus);
-
-:)
-
->
-> -    if (bus->vmstate) {
-> -        qemu_del_vm_change_state_handler(bus->vmstate);
-> +    if (ibus->vmstate) {
-> +        qemu_del_vm_change_state_handler(ibus->vmstate);
+>      while (n--) {
+>          mr = range->mr;
+> -        p(f, MTREE_INDENT TARGET_FMT_plx "-"
+> -          TARGET_FMT_plx " (prio %d, %s): %s\n",
+> -          int128_get64(range->addr.start),
+> -          int128_get64(range->addr.start) + MR_SIZE(range->addr.size),
+> -          mr->priority,
+> -          memory_region_type(mr),
+> -          memory_region_name(mr));
+> +        if (range->offset_in_region) {
+> +            p(f, MTREE_INDENT TARGET_FMT_plx "-"
+> +              TARGET_FMT_plx " (prio %d, %s): %s @" TARGET_FMT_plx "\n",
+> +              int128_get64(range->addr.start),
+> +              int128_get64(range->addr.start) + MR_SIZE(range->addr.size),
+> +              mr->priority,
+> +              memory_region_type(mr),
+> +              memory_region_name(mr),
+> +              range->offset_in_region);
+> +        } else {
+> +            p(f, MTREE_INDENT TARGET_FMT_plx "-"
+> +              TARGET_FMT_plx " (prio %d, %s): %s\n",
+> +              int128_get64(range->addr.start),
+> +              int128_get64(range->addr.start) + MR_SIZE(range->addr.size),
+> +              mr->priority,
+> +              memory_region_type(mr),
+> +              memory_region_name(mr));
+> +        }
+>          range++;
 >      }
->  }
->
-> @@ -365,7 +366,6 @@ static void ide_device_class_init(ObjectClass *klass, void *data)
->      k->init = ide_qdev_init;
->      set_bit(DEVICE_CATEGORY_STORAGE, k->categories);
->      k->bus_type = TYPE_IDE_BUS;
-> -    k->unrealize = idebus_unrealize;
->      k->props = ide_props;
->  }
 >
 >
