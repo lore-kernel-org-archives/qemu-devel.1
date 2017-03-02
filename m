@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1cjToy-00030L-8u
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 11:43:17 -0500
+	(envelope-from <felipe@nutanix.com>) id 1cjToz-00030e-Gm
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 11:43:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1cjTou-0000sE-Jm
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 11:43:16 -0500
-Received: from 206-15-90-246.static.twtelecom.net ([206.15.90.246]:64297
+	(envelope-from <felipe@nutanix.com>) id 1cjTox-0000tr-1Q
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 11:43:17 -0500
+Received: from 206-15-90-246.static.twtelecom.net ([206.15.90.246]:32296
 	helo=felipe-franciosi.localdomain)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1cjTou-0000qi-DJ
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 11:43:12 -0500
+	(envelope-from <felipe@nutanix.com>) id 1cjTow-0000t3-7g
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 11:43:14 -0500
 From: Felipe Franciosi <felipe@nutanix.com>
-Date: Thu,  2 Mar 2017 08:43:00 -0800
-Message-Id: <1488472983-9108-1-git-send-email-felipe@nutanix.com>
-Subject: [Qemu-devel] [PATCH v4 0/3] Introduce vhost-user-scsi and sample
- application
+Date: Thu,  2 Mar 2017 08:43:02 -0800
+Message-Id: <1488472983-9108-3-git-send-email-felipe@nutanix.com>
+In-Reply-To: <1488472983-9108-1-git-send-email-felipe@nutanix.com>
+References: <1488472983-9108-1-git-send-email-felipe@nutanix.com>
+Subject: [Qemu-devel] [PATCH v4 2/3] vus: Introduce vhost-user-scsi host
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,76 +28,455 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Felipe Franciosi <felipe@nutanix.com>
 
-Based on various discussions on the 2016 KVM Forum, I'm sending over a
-vhost-user-scsi implementation for your consideration.
+This commit introduces a vhost-user device for SCSI. This is based
+on the existing vhost-scsi implementation, but done over vhost-user
+instead. It also uses a chardev to connect to the backend. Unlike
+vhost-scsi (today), VMs using vhost-user-scsi can be live migrated.
 
-This patchset introduces a new vhost-user SCSI device. While heavily
-based on vhost-scsi, it is implemented using vhost's userspace
-counterpart. The device has been coded and tested to work with live
-migration.
+To use it, start Qemu with a command line equivalent to:
 
-As part of this work, a new vhost-scsi-common device was created and
-the existing vhost-scsi device moved underneath it. The new
-vhost-user-scsi device is also placed underneath it.
+qemu-system-x86_64 \
+       -chardev socket,id=vus0,path=/tmp/vus.sock \
+       -device vhost-user-scsi-pci,chardev=vus0,bus=pci.0,addr=...
 
-A sample application based on the newly introduced libvhost-user is
-also included. It makes use of libiscsi for simplicity.
-
-For convenience, I'm maintaining an up-to-date version of these
-patches (including some necessary fixes for libvhost-user) on:
-
-https://github.com/franciozzy/qemu/tree/vus-upstream-v4
-
-See the individual patches for build and use instructions.
+A separate commit presents a sample application linked with libiscsi to
+provide a backend for vhost-user-scsi.
 
 Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
-
-v3 -> v4:
-- Drop configure switches and build vus by default.
-- Add sample application to .gitignore.
-- Removed a whitespace error.
-- Rebase on master.
-
-v2 -> v3:
-- Rebase after vhost notifier fixes by Paolo.
-- Exposed F_HOTPLUG and F_CHANGE on vhost-user-scsi.
-
-v1 -> v2:
-- Introduce new vhost-scsi-common device type.
-- Move vhost-scsi device underneath vhost-scsi-common.
-- Move sample application from tests/ to contrib/.
-- Make sample application use the glib event loop.
-- Minor fixes.
-
-Felipe Franciosi (3):
-  vhost-scsi: create a vhost-scsi-common abstraction
-  vus: Introduce vhost-user-scsi host device
-  vus: Introduce a vhost-user-scsi sample application
-
- .gitignore                                |   1 +
- Makefile                                  |   3 +
- Makefile.objs                             |   4 +
- configure                                 |   1 +
- contrib/vhost-user-scsi/Makefile.objs     |   1 +
- contrib/vhost-user-scsi/vhost-user-scsi.c | 886 ++++++++++++++++++++++++++++++
- default-configs/pci.mak                   |   1 +
- hw/scsi/Makefile.objs                     |   3 +-
- hw/scsi/vhost-scsi-common.c               | 143 +++++
- hw/scsi/vhost-scsi.c                      | 194 ++-----
- hw/scsi/vhost-user-scsi.c                 | 215 ++++++++
- hw/virtio/virtio-pci.c                    |  54 ++
- hw/virtio/virtio-pci.h                    |  11 +
- include/hw/virtio/vhost-scsi-common.h     |  48 ++
- include/hw/virtio/vhost-scsi.h            |  11 +-
- include/hw/virtio/vhost-user-scsi.h       |  35 ++
- include/hw/virtio/virtio-scsi.h           |   5 +
- 17 files changed, 1468 insertions(+), 148 deletions(-)
- create mode 100644 contrib/vhost-user-scsi/Makefile.objs
- create mode 100644 contrib/vhost-user-scsi/vhost-user-scsi.c
- create mode 100644 hw/scsi/vhost-scsi-common.c
+---
+ .gitignore                          |   1 +
+ default-configs/pci.mak             |   1 +
+ hw/scsi/Makefile.objs               |   1 +
+ hw/scsi/vhost-user-scsi.c           | 215 ++++++++++++++++++++++++++++++++++++
+ hw/virtio/virtio-pci.c              |  54 +++++++++
+ hw/virtio/virtio-pci.h              |  11 ++
+ include/hw/virtio/vhost-user-scsi.h |  35 ++++++
+ include/hw/virtio/virtio-scsi.h     |   3 +
+ 8 files changed, 321 insertions(+)
  create mode 100644 hw/scsi/vhost-user-scsi.c
- create mode 100644 include/hw/virtio/vhost-scsi-common.h
  create mode 100644 include/hw/virtio/vhost-user-scsi.h
 
+diff --git a/.gitignore b/.gitignore
+index 2849d75..bba0cd5 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -50,6 +50,7 @@
+ /qemu-version.h.tmp
+ /module_block.h
+ /vscclient
++/vhost-user-scsi
+ /fsdev/virtfs-proxy-helper
+ *.[1-9]
+ *.a
+diff --git a/default-configs/pci.mak b/default-configs/pci.mak
+index 60dc651..ada9c6f 100644
+--- a/default-configs/pci.mak
++++ b/default-configs/pci.mak
+@@ -42,3 +42,4 @@ CONFIG_VGA=y
+ CONFIG_VGA_PCI=y
+ CONFIG_IVSHMEM=$(CONFIG_EVENTFD)
+ CONFIG_ROCKER=y
++CONFIG_VHOST_USER_SCSI=$(CONFIG_POSIX)
+diff --git a/hw/scsi/Makefile.objs b/hw/scsi/Makefile.objs
+index 54d8754..b188f72 100644
+--- a/hw/scsi/Makefile.objs
++++ b/hw/scsi/Makefile.objs
+@@ -11,4 +11,5 @@ obj-$(CONFIG_PSERIES) += spapr_vscsi.o
+ ifeq ($(CONFIG_VIRTIO),y)
+ obj-y += virtio-scsi.o virtio-scsi-dataplane.o
+ obj-$(CONFIG_VHOST_SCSI) += vhost-scsi-common.o vhost-scsi.o
++obj-$(CONFIG_VHOST_USER_SCSI) += vhost-scsi-common.o vhost-user-scsi.o
+ endif
+diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
+new file mode 100644
+index 0000000..ff81626
+--- /dev/null
++++ b/hw/scsi/vhost-user-scsi.c
+@@ -0,0 +1,215 @@
++/*
++ * vhost-user-scsi host device
++ *
++ * Copyright (c) 2016 Nutanix Inc. All rights reserved.
++ *
++ * Author:
++ *  Felipe Franciosi <felipe@nutanix.com>
++ *
++ * This work is largely based on the "vhost-scsi" implementation by:
++ *  Stefan Hajnoczi    <stefanha@linux.vnet.ibm.com>
++ *  Nicholas Bellinger <nab@risingtidesystems.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2 or later.
++ * See the COPYING.LIB file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "migration/vmstate.h"
++#include "qapi/error.h"
++#include "qemu/error-report.h"
++#include "qemu/typedefs.h"
++#include "qom/object.h"
++#include "hw/fw-path-provider.h"
++#include "hw/qdev-core.h"
++#include "hw/virtio/vhost.h"
++#include "hw/virtio/vhost-backend.h"
++#include "hw/virtio/vhost-user-scsi.h"
++#include "hw/virtio/virtio.h"
++#include "hw/virtio/virtio-access.h"
++#include "sysemu/char.h"
++
++/* Features supported by the host application */
++static const int user_feature_bits[] = {
++    VIRTIO_F_NOTIFY_ON_EMPTY,
++    VIRTIO_RING_F_INDIRECT_DESC,
++    VIRTIO_RING_F_EVENT_IDX,
++    VIRTIO_SCSI_F_HOTPLUG,
++    VHOST_INVALID_FEATURE_BIT
++};
++
++static void vhost_user_scsi_set_status(VirtIODevice *vdev, uint8_t status)
++{
++    VHostUserSCSI *s = (VHostUserSCSI *)vdev;
++    VHostSCSICommon *vsc = VHOST_SCSI_COMMON(s);
++    bool start = (status & VIRTIO_CONFIG_S_DRIVER_OK) && vdev->vm_running;
++
++    if (vsc->dev.started == start) {
++        return;
++    }
++
++    if (start) {
++        int ret;
++
++        ret = vhost_scsi_common_start(vsc);
++        if (ret < 0) {
++            error_report("unable to start vhost-user-scsi: %s", strerror(-ret));
++            exit(1);
++        }
++    } else {
++        vhost_scsi_common_stop(vsc);
++    }
++}
++
++static void vhost_dummy_handle_output(VirtIODevice *vdev, VirtQueue *vq)
++{
++}
++
++static void vhost_user_scsi_save(QEMUFile *f, void *opaque)
++{
++    VirtIODevice *vdev = VIRTIO_DEVICE(opaque);
++    virtio_save(vdev, f);
++}
++
++static int vhost_user_scsi_load(QEMUFile *f, void *opaque, int version_id)
++{
++    VirtIODevice *vdev = VIRTIO_DEVICE(opaque);
++    return virtio_load(vdev, f, version_id);
++}
++
++static void vhost_user_scsi_realize(DeviceState *dev, Error **errp)
++{
++    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(dev);
++    VHostUserSCSI *s = VHOST_USER_SCSI(dev);
++    VHostSCSICommon *vsc = VHOST_SCSI_COMMON(s);
++    static int vhost_user_scsi_id;
++    Error *err = NULL;
++    int ret;
++
++    if (!vs->conf.chardev.chr) {
++        error_setg(errp, "vhost-user-scsi: missing chardev");
++        return;
++    }
++
++    virtio_scsi_common_realize(dev, &err, vhost_dummy_handle_output,
++                               vhost_dummy_handle_output,
++                               vhost_dummy_handle_output);
++    if (err != NULL) {
++        error_propagate(errp, err);
++        return;
++    }
++
++    vsc->dev.nvqs = 2 + vs->conf.num_queues;
++    vsc->dev.vqs = g_new(struct vhost_virtqueue, vsc->dev.nvqs);
++    vsc->dev.vq_index = 0;
++    vsc->dev.backend_features = 0;
++
++    ret = vhost_dev_init(&vsc->dev, (void *)&vs->conf.chardev,
++                         VHOST_BACKEND_TYPE_USER, 0);
++    if (ret < 0) {
++        error_setg(errp, "vhost-user-scsi: vhost initialization failed: %s",
++                   strerror(-ret));
++        return;
++    }
++
++    /* Channel and lun both are 0 for bootable vhost-user-scsi disk */
++    vsc->channel = 0;
++    vsc->lun = 0;
++    vsc->target = vs->conf.boot_tpgt;
++
++    register_savevm(dev, "vhost-user-scsi", vhost_user_scsi_id++, 1,
++                    vhost_user_scsi_save, vhost_user_scsi_load, s);
++}
++
++static void vhost_user_scsi_unrealize(DeviceState *dev, Error **errp)
++{
++    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
++    VHostUserSCSI *s = VHOST_USER_SCSI(dev);
++    VHostSCSICommon *vsc = VHOST_SCSI_COMMON(s);
++
++    /* This will stop the vhost backend. */
++    vhost_user_scsi_set_status(vdev, 0);
++
++    vhost_dev_cleanup(&vsc->dev);
++    g_free(vsc->dev.vqs);
++
++    virtio_scsi_common_unrealize(dev, errp);
++}
++
++static uint64_t vhost_user_scsi_get_features(VirtIODevice *vdev,
++                                             uint64_t features, Error **errp)
++{
++    VHostUserSCSI *s = VHOST_USER_SCSI(vdev);
++
++    // Turn on predefined features supported by this device
++    features |= s->host_features;
++
++    return vhost_scsi_common_get_features(vdev, features, errp);
++}
++
++static Property vhost_user_scsi_properties[] = {
++    DEFINE_PROP_CHR("chardev", VirtIOSCSICommon, conf.chardev),
++    DEFINE_PROP_UINT32("boot_tpgt", VirtIOSCSICommon, conf.boot_tpgt, 0),
++    DEFINE_PROP_UINT32("num_queues", VirtIOSCSICommon, conf.num_queues, 1),
++    DEFINE_PROP_UINT32("max_sectors", VirtIOSCSICommon, conf.max_sectors,
++                       0xFFFF),
++    DEFINE_PROP_UINT32("cmd_per_lun", VirtIOSCSICommon, conf.cmd_per_lun, 128),
++    DEFINE_PROP_BIT64("hotplug", VHostUserSCSI, host_features,
++                                                VIRTIO_SCSI_F_HOTPLUG,
++                                                true),
++    DEFINE_PROP_BIT64("param_change", VHostUserSCSI, host_features,
++                                                     VIRTIO_SCSI_F_CHANGE,
++                                                     true),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void vhost_user_scsi_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    VirtioDeviceClass *vdc = VIRTIO_DEVICE_CLASS(klass);
++    FWPathProviderClass *fwc = FW_PATH_PROVIDER_CLASS(klass);
++
++    dc->props = vhost_user_scsi_properties;
++    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
++    vdc->realize = vhost_user_scsi_realize;
++    vdc->unrealize = vhost_user_scsi_unrealize;
++    vdc->get_features = vhost_user_scsi_get_features;
++    vdc->set_config = vhost_scsi_common_set_config;
++    vdc->set_status = vhost_user_scsi_set_status;
++    fwc->get_dev_path = vhost_scsi_common_get_fw_dev_path;
++}
++
++static void vhost_user_scsi_instance_init(Object *obj)
++{
++    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(obj);
++    VHostSCSICommon *vsc = VHOST_SCSI_COMMON(obj);
++
++    vsc->feature_bits = user_feature_bits;
++
++    // Add the bootindex property for this object
++    device_add_bootindex_property(obj, &vsc->bootindex, "bootindex", NULL,
++                                  DEVICE(vsc), NULL);
++
++    // Set boot index according the the device config
++    object_property_set_int(obj, vs->conf.bootindex, "bootindex", NULL);
++}
++
++static const TypeInfo vhost_user_scsi_info = {
++    .name = TYPE_VHOST_USER_SCSI,
++    .parent = TYPE_VHOST_SCSI_COMMON,
++    .instance_size = sizeof(VHostUserSCSI),
++    .class_init = vhost_user_scsi_class_init,
++    .instance_init = vhost_user_scsi_instance_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_FW_PATH_PROVIDER },
++        { }
++    },
++};
++
++static void virtio_register_types(void)
++{
++    type_register_static(&vhost_user_scsi_info);
++}
++
++type_init(virtio_register_types)
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index 5ce42af..6c00608 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -2100,6 +2100,59 @@ static const TypeInfo vhost_scsi_pci_info = {
+ };
+ #endif
+ 
++/* vhost-user-scsi-pci */
++static Property vhost_user_scsi_pci_properties[] = {
++    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors,
++                       DEV_NVECTORS_UNSPECIFIED),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void vhost_user_scsi_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
++{
++    VHostUserSCSIPCI *dev = VHOST_USER_SCSI_PCI(vpci_dev);
++    DeviceState *vdev = DEVICE(&dev->vdev);
++    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(vdev);
++
++    if (vpci_dev->nvectors == DEV_NVECTORS_UNSPECIFIED) {
++        vpci_dev->nvectors = vs->conf.num_queues + 3;
++    }
++
++    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
++    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
++}
++
++static void vhost_user_scsi_pci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
++    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
++    k->realize = vhost_user_scsi_pci_realize;
++    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
++    dc->props = vhost_user_scsi_pci_properties;
++    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
++    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_SCSI;
++    pcidev_k->revision = 0x00;
++    pcidev_k->class_id = PCI_CLASS_STORAGE_SCSI;
++}
++
++static void vhost_user_scsi_pci_instance_init(Object *obj)
++{
++    VHostUserSCSIPCI *dev = VHOST_USER_SCSI_PCI(obj);
++
++    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
++                                TYPE_VHOST_USER_SCSI);
++    object_property_add_alias(obj, "bootindex", OBJECT(&dev->vdev),
++                              "bootindex", &error_abort);
++}
++
++static const TypeInfo vhost_user_scsi_pci_info = {
++    .name          = TYPE_VHOST_USER_SCSI_PCI,
++    .parent        = TYPE_VIRTIO_PCI,
++    .instance_size = sizeof(VHostUserSCSIPCI),
++    .instance_init = vhost_user_scsi_pci_instance_init,
++    .class_init    = vhost_user_scsi_pci_class_init,
++};
++
+ /* vhost-vsock-pci */
+ 
+ #ifdef CONFIG_VHOST_VSOCK
+@@ -2577,6 +2630,7 @@ static void virtio_pci_register_types(void)
+ #ifdef CONFIG_VHOST_SCSI
+     type_register_static(&vhost_scsi_pci_info);
+ #endif
++    type_register_static(&vhost_user_scsi_pci_info);
+ #ifdef CONFIG_VHOST_VSOCK
+     type_register_static(&vhost_vsock_pci_info);
+ #endif
+diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+index d00064c..4171157 100644
+--- a/hw/virtio/virtio-pci.h
++++ b/hw/virtio/virtio-pci.h
+@@ -26,6 +26,7 @@
+ #include "hw/virtio/virtio-input.h"
+ #include "hw/virtio/virtio-gpu.h"
+ #include "hw/virtio/virtio-crypto.h"
++#include "hw/virtio/vhost-user-scsi.h"
+ 
+ #ifdef CONFIG_VIRTFS
+ #include "hw/9pfs/virtio-9p.h"
+@@ -44,6 +45,7 @@ typedef struct VirtIOBalloonPCI VirtIOBalloonPCI;
+ typedef struct VirtIOSerialPCI VirtIOSerialPCI;
+ typedef struct VirtIONetPCI VirtIONetPCI;
+ typedef struct VHostSCSIPCI VHostSCSIPCI;
++typedef struct VHostUserSCSIPCI VHostUserSCSIPCI;
+ typedef struct VirtIORngPCI VirtIORngPCI;
+ typedef struct VirtIOInputPCI VirtIOInputPCI;
+ typedef struct VirtIOInputHIDPCI VirtIOInputHIDPCI;
+@@ -218,6 +220,15 @@ struct VHostSCSIPCI {
+ };
+ #endif
+ 
++#define TYPE_VHOST_USER_SCSI_PCI "vhost-user-scsi-pci"
++#define VHOST_USER_SCSI_PCI(obj) \
++        OBJECT_CHECK(VHostUserSCSIPCI, (obj), TYPE_VHOST_USER_SCSI_PCI)
++
++struct VHostUserSCSIPCI {
++    VirtIOPCIProxy parent_obj;
++    VHostUserSCSI vdev;
++};
++
+ /*
+  * virtio-blk-pci: This extends VirtioPCIProxy.
+  */
+diff --git a/include/hw/virtio/vhost-user-scsi.h b/include/hw/virtio/vhost-user-scsi.h
+new file mode 100644
+index 0000000..01861f7
+--- /dev/null
++++ b/include/hw/virtio/vhost-user-scsi.h
+@@ -0,0 +1,35 @@
++/*
++ * vhost-user-scsi host device
++ *
++ * Copyright (c) 2016 Nutanix Inc. All rights reserved.
++ *
++ * Author:
++ *  Felipe Franciosi <felipe@nutanix.com>
++ *
++ * This file is largely based on "vhost-scsi.h" by:
++ *  Stefan Hajnoczi   <stefanha@linux.vnet.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2 or later.
++ * See the COPYING.LIB file in the top-level directory.
++ *
++ */
++
++#ifndef VHOST_USER_SCSI_H
++#define VHOST_USER_SCSI_H
++
++#include "qemu-common.h"
++#include "hw/qdev.h"
++#include "hw/virtio/virtio-scsi.h"
++#include "hw/virtio/vhost.h"
++#include "hw/virtio/vhost-scsi-common.h"
++
++#define TYPE_VHOST_USER_SCSI "vhost-user-scsi"
++#define VHOST_USER_SCSI(obj) \
++        OBJECT_CHECK(VHostUserSCSI, (obj), TYPE_VHOST_USER_SCSI)
++
++typedef struct VHostUserSCSI {
++    VHostSCSICommon parent_obj;
++    uint64_t host_features;
++} VHostUserSCSI;
++
++#endif /* VHOST_USER_SCSI_H */
+diff --git a/include/hw/virtio/virtio-scsi.h b/include/hw/virtio/virtio-scsi.h
+index 0b17250..ac822d4 100644
+--- a/include/hw/virtio/virtio-scsi.h
++++ b/include/hw/virtio/virtio-scsi.h
+@@ -21,6 +21,7 @@
+ #include "hw/virtio/virtio.h"
+ #include "hw/pci/pci.h"
+ #include "hw/scsi/scsi.h"
++#include "sysemu/char.h"
+ #include "sysemu/iothread.h"
+ 
+ #define TYPE_VIRTIO_SCSI_COMMON "virtio-scsi-common"
+@@ -53,6 +54,8 @@ struct VirtIOSCSIConf {
+     char *vhostfd;
+     char *wwpn;
+ #endif
++    CharBackend chardev;
++    int32_t bootindex;
+     uint32_t boot_tpgt;
+     IOThread *iothread;
+ };
 -- 
 1.9.4
