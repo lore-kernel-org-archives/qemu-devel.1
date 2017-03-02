@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1cjOXb-0002D4-2a
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 06:05:00 -0500
+	(envelope-from <prvs=2277aaf80=Paul.Durrant@citrix.com>)
+	id 1cjOZb-0002wR-Nj
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 06:07:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1cjOXZ-0002L5-Ge
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 06:04:59 -0500
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:36571)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <nirsof@gmail.com>) id 1cjOXZ-0002Kw-Ad
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 06:04:57 -0500
-Received: by mail-ot0-x243.google.com with SMTP id i1so7018324ota.3
-	for <qemu-devel@nongnu.org>; Thu, 02 Mar 2017 03:04:57 -0800 (PST)
+	(envelope-from <prvs=2277aaf80=Paul.Durrant@citrix.com>)
+	id 1cjOZY-00040i-Eq
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 06:07:03 -0500
+Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:52973
+	helo=SMTP.EU.CITRIX.COM)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=2277aaf80=Paul.Durrant@citrix.com>)
+	id 1cjOZY-0003zv-59
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 06:07:00 -0500
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Thu, 2 Mar 2017 11:06:54 +0000
+Message-ID: <41a5070ecb3446658c55f807c37eb5ea@AMSPEX02CL03.citrite.net>
+References: <1487861635-17560-1-git-send-email-paul.durrant@citrix.com>
+	<1487861635-17560-5-git-send-email-paul.durrant@citrix.com>
+	<20170301171735.GE1760@perard.uk.xensource.com>
+	<61002dc9691a49d98a7feca8c9a676ce@AMSPEX02CL03.citrite.net>
+	<20170302105438.GG1760@perard.uk.xensource.com>
+	<28a1567a-ef14-e7e6-0de7-b8de0fae7618@suse.com>
+In-Reply-To: <28a1567a-ef14-e7e6-0de7-b8de0fae7618@suse.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <5bd5d17d-aae6-dc8b-0643-fae0bd562bb7@redhat.com>
-References: <20170301194433.23379-1-jsnow@redhat.com>
-	<CAMr-obvmL+fHRvEGq+U7S30FSFDZ2USiw2DKOKbJN0dZ=AUZPA@mail.gmail.com>
-	<5bd5d17d-aae6-dc8b-0643-fae0bd562bb7@redhat.com>
-From: Nir Soffer <nirsof@gmail.com>
-Date: Thu, 2 Mar 2017 13:04:56 +0200
-Message-ID: <CAMr-obu1Ka827VL7z4b0kC2mhFV+Zwy95p=8BTA4e5nJOiVfuw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] qmp-shell: add persistent command history
+Subject: Re: [Qemu-devel] [Xen-devel] [PATCH 4/5] configure: detect presence
+ of libxendevicemodel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,154 +37,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com
+To: 'Juergen Gross' <jgross@suse.com>, Anthony Perard <anthony.perard@citrix.com>
+Cc: "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, Stefano Stabellini <sstabellini@kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Thu, Mar 2, 2017 at 12:19 AM, John Snow <jsnow@redhat.com> wrote:
->
->
-> On 03/01/2017 05:01 PM, Nir Soffer wrote:
->> On Wed, Mar 1, 2017 at 9:44 PM, John Snow <jsnow@redhat.com> wrote:
->>>
->>> Use the existing readline history function we are utilizing
->>> to provide persistent command history across instances of qmp-shell.
->>>
->>> This assists entering debug commands across sessions that may be
->>> interrupted by QEMU sessions terminating, where the qmp-shell has
->>> to be relaunched.
->>>
->>> Signed-off-by: John Snow <jsnow@redhat.com>
->>> ---
->>>  scripts/qmp/qmp-shell | 14 ++++++++++++++
->>>  1 file changed, 14 insertions(+)
->>>
->>> diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
->>> index 0373b24..b19f44b 100755
->>> --- a/scripts/qmp/qmp-shell
->>> +++ b/scripts/qmp/qmp-shell
->>> @@ -70,6 +70,7 @@ import json
->>>  import ast
->>>  import readline
->>>  import sys
->>> +import os
->>>
->>>  class QMPCompleter(list):
->>>      def complete(self, text, state):
->>> @@ -109,6 +110,8 @@ class QMPShell(qmp.QEMUMonitorProtocol):
->>>          self._pretty = pretty
->>>          self._transmode = False
->>>          self._actions = list()
->>> +        self._histfile = os.path.join(os.path.expanduser('~'),
->>> +                                      '.qmp_history')
->>
->> This can be little bit more readable in one line
->>
->
-> I thought I was over 80, but maybe not.
->
->>>
->>>      def __get_address(self, arg):
->>>          """
->>> @@ -137,6 +140,16 @@ class QMPShell(qmp.QEMUMonitorProtocol):
->>>          # XXX: default delimiters conflict with some command names (eg. query-),
->>>          # clearing everything as it doesn't seem to matter
->>>          readline.set_completer_delims('')
->>> +        try:
->>> +            readline.read_history_file(self._histfile)
->>> +        except:
->>> +            pass
->>
->> This hides all errors, including KeyboardInterrupt and SystemExit, and will
->> make debugging impossible.
->>
->
-> Indeed, I want to ignore errors related to a missing history file. It
-> wasn't documented, and this isn't an important feature (for a shell
-> script only used for debugging), so I went with the dumb thing.
->
->> It looks like you want to ignore missing history file, but this way we also
->> ignore permission error or even typo in the code. For example this will
->> fail silently:
->>
->>     try:
->>         readdline.read_history_file(self._histfile)
->>     except:
->>         pass
->>
->> The docs do not specify the possible errors, but the code is raising IOError:
->> https://github.com/python/cpython/blob/2.7/Modules/readline.c#L126
->>
->> So it would be best to handle only IOError, and ignore ENOENT. Any other
->> error should fail in a visible way.
->>
->
-> Maybe not "fail," but perhaps "warn." This feature is not so important
-> that it should inhibit normal operation.
-
-Yes, warning  with the text from the IOError should be best.
-
->
->>> +
->>> +    def __save_history(self):
->>> +        try:
->>> +            readline.write_history_file(self._histfile)
->>> +        except:
->>> +            pass
->>
->> Same, but I'm not sure what errors should be ignored. Do we want to silently
->> ignore a read only file system? no space?
->>
->
-> Pretty much my thought, yes. I could "warn" on the first failure and
-> then stifle subsequent ones. I don't want this to be an irritant.
->
->> I think a safe way would be to print a warning if the history file
->> cannot be saved
->> with the text from the IOError.
->>
->>>
->>>      def __parse_value(self, val):
->>>          try:
->>> @@ -244,6 +257,7 @@ class QMPShell(qmp.QEMUMonitorProtocol):
->>>              print 'command format: <command-name> ',
->>>              print '[arg-name1=arg1] ... [arg-nameN=argN]'
->>>              return True
->>> +        self.__save_history()
->>
->> This will save the history after every command, making error handling
->> more complicated, and also unneeded, since we don't care about history
->> if you kill the qmp-shell process, right?
->>
->
-> I suppose so. My thought was more along the lines of: "If the program
-> explodes, I'd like to have the intervening history saved."
-
-Python programs do not explode in this way usually.
-
-> I didn't
-> think this would complicate performance of a debugging tool.
->
-> Why do you feel this would make error handling more complicated?
-
-Because we have to handle errors on each command, instead of once
-during exit.
-
-> Why do you think we wouldn't care about the history if we kill the
-> qmp-shell process?
-
-We care about the history, but do you expect that the program will not
-handle SIGTERM properly often?
-
->> We can invoke readline.write_history_file() using atexit. This is also
->> what the docs suggest, see:
->> https://docs.python.org/2/library/readline.html#example
->>
->> Nir
->>
->>>          # For transaction mode, we may have just cached the action:
->>>          if qmpcmd is None:
->>>              return True
->>> --
->>> 2.9.3
->>>
->>>
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBKdWVyZ2VuIEdyb3NzIFttYWls
+dG86amdyb3NzQHN1c2UuY29tXQ0KPiBTZW50OiAwMiBNYXJjaCAyMDE3IDExOjAxDQo+IFRvOiBB
+bnRob255IFBlcmFyZCA8YW50aG9ueS5wZXJhcmRAY2l0cml4LmNvbT47IFBhdWwgRHVycmFudA0K
+PiA8UGF1bC5EdXJyYW50QGNpdHJpeC5jb20+DQo+IENjOiB4ZW4tZGV2ZWxAbGlzdHMueGVucHJv
+amVjdC5vcmc7IFN0ZWZhbm8gU3RhYmVsbGluaQ0KPiA8c3N0YWJlbGxpbmlAa2VybmVsLm9yZz47
+IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiBTdWJqZWN0OiBSZTogW1hlbi1kZXZlbF0gW1BBVENI
+IDQvNV0gY29uZmlndXJlOiBkZXRlY3QgcHJlc2VuY2Ugb2YNCj4gbGlieGVuZGV2aWNlbW9kZWwN
+Cj4gDQo+IE9uIDAyLzAzLzE3IDExOjU0LCBBbnRob255IFBFUkFSRCB3cm90ZToNCj4gPiBPbiBU
+aHUsIE1hciAwMiwgMjAxNyBhdCAwOTowNjo0M0FNICswMDAwLCBQYXVsIER1cnJhbnQgd3JvdGU6
+DQo+ID4+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+Pj4gRnJvbTogQW50aG9ueSBQ
+RVJBUkQgW21haWx0bzphbnRob255LnBlcmFyZEBjaXRyaXguY29tXQ0KPiA+Pj4gU2VudDogMDEg
+TWFyY2ggMjAxNyAxNzoxOA0KPiA+Pj4gVG86IFBhdWwgRHVycmFudCA8UGF1bC5EdXJyYW50QGNp
+dHJpeC5jb20+DQo+ID4+PiBDYzogeGVuLWRldmVsQGxpc3RzLnhlbnByb2plY3Qub3JnOyBxZW11
+LWRldmVsQG5vbmdudS5vcmc7IFN0ZWZhbm8NCj4gPj4+IFN0YWJlbGxpbmkgPHNzdGFiZWxsaW5p
+QGtlcm5lbC5vcmc+DQo+ID4+PiBTdWJqZWN0OiBSZTogW1BBVENIIDQvNV0gY29uZmlndXJlOiBk
+ZXRlY3QgcHJlc2VuY2Ugb2YNCj4gbGlieGVuZGV2aWNlbW9kZWwNCj4gPj4+DQo+ID4+PiBPbiBU
+aHUsIEZlYiAyMywgMjAxNyBhdCAwMjo1Mzo1NFBNICswMDAwLCBQYXVsIER1cnJhbnQgd3JvdGU6
+DQo+ID4+Pj4gVGhpcyBwYXRjaCBhZGRzIGNvZGUgaW4gY29uZmlndXJlIHRvIHNldA0KPiA+Pj4g
+Q09ORklHX1hFTl9DVFJMX0lOVEVSRkFDRV9WRVJTSU9ODQo+ID4+Pj4gdG8gYSBuZXcgdmFsdWUg
+b2YgNDkwIGlmIGxpYnhlbmRldmljZW1vZGVsIGlzIHByZXNlbnQgaW4gdGhlIGJ1aWxkDQo+ID4+
+Pj4gZW52aXJvbm1lbnQuDQo+ID4+Pj4NCj4gPj4+PiBTaWduZWQtb2ZmLWJ5OiBQYXVsIER1cnJh
+bnQgPHBhdWwuZHVycmFudEBjaXRyaXguY29tPg0KPiA+Pj4+IC0tLQ0KPiA+Pj4+IENjOiBTdGVm
+YW5vIFN0YWJlbGxpbmkgPHNzdGFiZWxsaW5pQGtlcm5lbC5vcmc+DQo+ID4+Pj4gQ2M6IEFudGhv
+bnkgUGVyYXJkIDxhbnRob255LnBlcmFyZEBjaXRyaXguY29tPg0KPiA+Pj4+IC0tLQ0KPiA+Pj4+
+ICBjb25maWd1cmUgfCAxOSArKysrKysrKysrKysrKysrKysrDQo+ID4+Pj4gIDEgZmlsZSBjaGFu
+Z2VkLCAxOSBpbnNlcnRpb25zKCspDQo+ID4+Pj4NCj4gPj4+PiBkaWZmIC0tZ2l0IGEvY29uZmln
+dXJlIGIvY29uZmlndXJlDQo+ID4+Pj4gaW5kZXggOGU4ZjE4ZC4uZmMxZTEyYiAxMDA3NTUNCj4g
+Pj4+PiAtLS0gYS9jb25maWd1cmUNCj4gPj4+PiArKysgYi9jb25maWd1cmUNCj4gPj4+PiBAQCAt
+MTk4MCw2ICsxOTgwLDI1IEBAIEVPRg0KPiA+Pj4+ICAgICMgWGVuIHVuc3RhYmxlDQo+ID4+Pj4g
+ICAgZWxpZg0KPiA+Pj4+ICAgICAgICBjYXQgPiAkVE1QQyA8PEVPRiAmJg0KPiA+Pj4+ICsjdW5k
+ZWYgWENfV0FOVF9DT01QQVRfREVWSUNFTU9ERUxfQVBJDQo+ID4+Pj4gKyNkZWZpbmUgX19YRU5f
+VE9PTFNfXw0KPiA+Pj4NCj4gPj4+IElzbid0IF9fWEVOX1RPT0xTX18gc3VwcG9zZWQgdG8gYmUg
+cmVzZXJ2ZWQgZm9yIHNvbWUgdG8gdG9vbHMgaW5zaWRlDQo+ID4+PiB4ZW4uZ2l0Pw0KPiA+Pj4N
+Cj4gPj4+IEFsc28gaXQgc2VlbXMgdG8gYmUgdGhlIG9ubHkgdGltZSB0aGlzIGRlZmluZSBpcyB1
+c2VkIGluIHlvdXIgcGF0Y2gNCj4gPj4+IHNlcmllcy4NCj4gPj4+DQo+ID4+IE5vLiBRRU1VIGZh
+bGxzIHVuZGVyIHRoZSBkZWZpbml0aW9uIG9mICd0b29scycgYXMgZmFyIGFzIFhlbiBnb2VzIGFu
+ZCB0aGUNCj4gaHlwZXJjYWxscyBhbmQgeGVuZGV2aWNlbW9kZWwgQVBJIGFyZSBwcm90ZWN0ZWQg
+YnkgdGhhdC4gVGhlIHJlYXNvbiB5b3UNCj4gZG9uJ3Qgc2VlIGl0IGVsc2V3aGVyZSBpcyB0aGF0
+IHhlbmN0cmwuaCBkZWZpbmVzIGl0LiAoU2VlDQo+IGh0dHA6Ly94ZW5iaXRzLnhlbi5vcmcvZ2l0
+d2ViLz9wPXhlbi5naXQ7YT1ibG9iO2Y9dG9vbHMvbGlieGMvaW5jbHVkZS94ZW5jDQo+IHRybC5o
+O2hiPUhFQUQjbDI3KS4NCj4gPj4gSSB0aGluayB0aGF0J3MgYSBsaXR0bGUgdW5kZXJoYW5kIHNv
+IEkgdGhvdWdodCBJJ2QgbWFrZSB0aGUgbmV3IGNvZGUgaW4NCj4gY29uZmlndXJlIG1vcmUgdHJh
+bnNwYXJlbnQuIEkgY2FuIGNoYW5nZSBpdCB0byBqdXN0IGluY2x1ZGUgeGVuY3RybC5oIGJlZm9y
+ZQ0KPiB4ZW5kZXZpY2Vtb2RlbC5oIGlmIHlvdSdkIHByZWZlci4NCj4gPg0KPiA+IEkgZ3Vlc3Mg
+dGhhdCBpcyBmaW5lIHdpdGggX19YRU5fVE9PTFNfXy4NCj4gPiBZb3UgY2FuIGFkZCBteQ0KPiA+
+IFJldmlld2VkLWJ5OiBBbnRob255IFBFUkFSRCA8YW50aG9ueS5wZXJhcmRAY2l0cml4LmNvbT4N
+Cj4gPg0KPiANCj4gU29ycnkgZm9yIGp1bXBpbmcgaW4gb25seSBub3c6DQo+IA0KPiBXb3VsZG4n
+dCBpdCBiZSBiZXR0ZXIgdG8gYmFzZSBxZW11J3MgY29uZmlndXJlIG1vZGlmaWNhdGlvbiBmb3Ig
+c3VwcG9ydA0KPiBvZiBYZW4gNC45IChhbmQgbmV3ZXIpIG9uIG15IGp1c3QgcG9zdGVkIHNlcmll
+cyBpbnRyb2R1Y2luZyBwa2ctY29uZmlnPw0KPiANCj4gSSdtIGp1c3QgYWJvdXQgdG8gZXhwYW5k
+IHRoaXMgc2VyaWVzIHRvIGFsbCBvZiBYZW4ncyBsaWJyYXJpZXMgYW5kIEkNCj4gYWxyZWFkeSBo
+YXZlIGEgcWVtdSBwYXRjaCBhdCBoYW5kIHN1cHBvcnRpbmcgdGhpcyBuZXcgc2NoZW1lLg0KDQpP
+aywgYnV0IEknbSBhdCB2MiBhbmQgSSB3YXMgbGl0ZXJhbGx5IGp1c3QgYWJvdXQgdG8gcG9zdC4g
+SSBndWVzcyBpdCB3aWxsIGFsc28gYmUgcHJldHR5IHRyaXZpYWwgdG8gY2hhbmdlIGNvbmZpZ3Vy
+ZSBhZnRlciB0aGlzIGNoYW5nZSBoYXMgYmVlbiBhcHBsaWVkLg0KDQogIFBhdWwNCg0KPiANCj4g
+DQo+IEp1ZXJnZW4NCg==
