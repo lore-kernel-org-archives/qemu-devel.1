@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45870)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1cjKAd-0005Qw-K9
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 01:25:00 -0500
+	(envelope-from <marcel@redhat.com>) id 1cjKBX-0006Jx-OA
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 01:25:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1cjKAY-00060j-N4
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 01:24:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37520)
+	(envelope-from <marcel@redhat.com>) id 1cjKBS-0006QJ-JH
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 01:25:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48550)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1cjKAY-00060P-El
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 01:24:54 -0500
-References: <1488425538-13785-1-git-send-email-peterx@redhat.com>
-	<20170302071100-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1cjKBS-0006Q7-Av
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 01:25:50 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 84CE380474
+	for <qemu-devel@nongnu.org>; Thu,  2 Mar 2017 06:25:50 +0000 (UTC)
+References: <1487623393-2492-1-git-send-email-marcel@redhat.com>
 From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <213ff4bb-b3b9-fe00-6f0e-b75114e1a5ef@redhat.com>
-Date: Thu, 2 Mar 2017 08:24:44 +0200
+Message-ID: <f17fbbee-4d13-70f8-6143-51aef015bdfc@redhat.com>
+Date: Thu, 2 Mar 2017 08:25:46 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170302071100-mutt-send-email-mst@kernel.org>
+In-Reply-To: <1487623393-2492-1-git-send-email-marcel@redhat.com>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] intel_iommu: check misordered init when
- realize
+Subject: Re: [Qemu-devel] [PATCH V2 0/4] hw/virtio: fix several PCI Express
+ compliance issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,103 +33,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, yi.l.liu@intel.com, Jintack Lim <jintack@cs.columbia.edu>, Jason Wang <jasowang@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com
 
-On 03/02/2017 07:13 AM, Michael S. Tsirkin wrote:
-> On Thu, Mar 02, 2017 at 11:32:18AM +0800, Peter Xu wrote:
->> Intel vIOMMU devices are created with "-device" parameter, while here
->> actually we need to make sure the dmar device be created before other
->> PCI devices (like vfio-pci, virtio-pci ones) so that we know iommu_fn
->> will be setup correctly before realizations of those PCI devices (it is
->> legal that PCI device fetch these info during its realization). Now this
->> ordering yet cannot be achieved elsewhere, and devices will be created
->> in the order that user specified. We need to avoid that.
->>
->> This patch tries to detect this kind of misordering issue during init of
->> VT-d device, then report to guest if misordering happened. In the
->> future, we can provide something better to solve it, e.g., to support
->> device init ordering, then we can live without this patch.
->>
->> Signed-off-by: Peter Xu <peterx@redhat.com>
+On 02/20/2017 10:43 PM, Marcel Apfelbaum wrote:
+> v1 -> v2:
+>   - Added compat properties (Michael S. Tsirkin)
+>   - Rebased on latest master
+>   - Regarding the patch 1/4, we don't need to init the PCI "standard"
+>     config capabilities to 0 since they are "protected" by the Capabilities List bit
+>    (bit 4) to indicate that the Capabilities Pointer is located at offset 34h.
 >
-> Unfortunately with virtio it's a regression, as it used to
-> work with iommu. So I'm afraid we need to look into supporting
-> arbitrary order right now :(
+>
+> Fix a few issues found while running WHQL tests:
 >
 
-Hi,
-
-A fast way to do it is to initialize iommu with a new keyword, like
-     -iommu intel-iommu
-Or maybe use the existing "-object" somehow ?
- From vl.c comments:
-   "Initial object creation happens before all other
-    QEMU data types are created.... "
-
-Another idea is to add a third run on QEMU cmd line arguments,
-but this would affect the whole system.
-
-However having an ordering system beats all other ideas.
+ping
 
 Thanks,
 Marcel
 
->> ---
->> v3: added virtio-pci device detection since we have that requirement as
->>     well now.
->>
->> PS. this patch should be needed along with Jason's:
->>  "virtio: unbreak virtio-pci with IOMMU after caching ring translations"
->> to make sure virtio devices with vt-d are safe for 2.9.
->> ---
->>  hw/i386/intel_iommu.c | 22 ++++++++++++++++++++++
->>  1 file changed, 22 insertions(+)
->>
->> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
->> index 22d8226..1077f90 100644
->> --- a/hw/i386/intel_iommu.c
->> +++ b/hw/i386/intel_iommu.c
->> @@ -2560,6 +2560,24 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
->>      return true;
->>  }
->>
->> +/*
->> + * TODO: we should have a better way to achieve the ordering rather
->> + * than this misorder check explicitly against vfio-pci and virtio-pci
->> + * devices. Here, there's no easy way to detect init of virtio-pci
->> + * devices, instead we detect the virtio bus.
->> + */
->> +static bool vtd_detected_misorder_init(Error **errp)
->> +{
->> +    if (object_resolve_path_type("", "vfio-pci", NULL) ||
->> +        object_resolve_path_type("", "virtio-pci-bus", NULL)) {
->> +        error_setg(errp, "Please specify \"intel-iommu\" before "
->> +                   "all the rest of the devices.");
->> +        return true;
->> +    }
->> +
->> +    return false;
->> +}
->> +
->>  static void vtd_realize(DeviceState *dev, Error **errp)
->>  {
->>      PCMachineState *pcms = PC_MACHINE(qdev_get_machine());
+>  - Assertion 1F27399E-30B9-44BC-8908-D6E6F3836212: FAILED. Enhanced Capability Header register
+>    of the PCI Express Enhanced Capabilities Absent Indicator table must be read-only .
 >
-> We'd put this somewhere central - this hack is not vtd specific.
+>    Solved in patch 1/4
 >
+>  - Assertion 47C39833-84AD-44EA-9723-0695202ADDEA: FAILED. Bit 0 (Correctable Error Reporting Enable)
+>    in the Device Control register (offset 8h) in the PCI Express Capability table must be read-writable .
+>  - Assertion 5CBA2A63-A48E-4443-85FA-A7DCD8EA47BC: FAILED. Bit 1 (Non-Fatal Error Reporting Enable)
+>    in the Device Control register (offset 8h) in the PCI Express Capability table must be read-writable .
+>  - Assertion 0AB06F7C-59CB-4F9A-8363-B51B1ACAB54F: FAILED. Bit 2 (Fatal Error Reporting Enable)
+>    in the Device Control register (offset 8h) in the PCI Express Capability table must be read-writable .
+>  - Assertion E3834E4A-A7BD-410C-9A61-FA91770D2A71: FAILED. Bit 3 (Unsupported Request Reporting Enable)
+>    in the Device Control register (offset 8h) in the PCI Express Capability table must be read-writable
 >
+>    Solved in patch 2/4
 >
->> @@ -2567,6 +2585,10 @@ static void vtd_realize(DeviceState *dev, Error **errp)
->>      IntelIOMMUState *s = INTEL_IOMMU_DEVICE(dev);
->>      X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(dev);
->>
->> +    if (vtd_detected_misorder_init(errp)) {
->> +        return;
->> +    }
->> +
->>      VTD_DPRINTF(GENERAL, "");
->>      x86_iommu->type = TYPE_INTEL;
->>
->> --
->> 2.7.4
+>  - Assertion 1587DC0B-FE59-494E-85B5-C2A59D0CC098: FAILED. Bit 6 (Common Clock Configuration)
+>    in the Link Control register (offset 10h) in the PCI Express Capability table must be read-writable .
+>  - Assertion 13DD25A3-07E4-4477-BE0F-2273BBB32174: FAILED. Bit 7 (Extended Synch) in the Link Control
+>    register (offset 10h) in the PCI Express Capability table must be read-writable .
+>
+>   Solved in patch 3/4
+>
+>   - AM Assertion 06779BD9-0C35-4CA1-9EB3-96E7DA9A74F8: FAILED. Bit range 1:0 (PowerState)in
+>     the Power Management Control/Status register (offset 4h) in the Power Management Capability table is 0h.
+>     It must be 3h after a supported D3 transition.
+>
+> Thanks,
+> Marcel
+>
+> Marcel Apfelbaum (4):
+>   hw/pcie: fix Extended Configuration Space for devices with no Extended
+>     Capabilities
+>   hw/virtio: fix error enabling flags in Device Control register
+>   hw/virtio: fix Link Control Register for PCI Express virtio devices
+>   hw/virtio: fix Power Management Control Register for PCI Express
+>     virtio devices
+>
+>  hw/pci/pci.c           |  2 ++
+>  hw/pci/pcie.c          | 20 ++++++++++++++++++++
+>  hw/virtio/virtio-pci.c | 31 +++++++++++++++++++++++++++++++
+>  hw/virtio/virtio-pci.h | 12 ++++++++++++
+>  include/hw/compat.h    | 16 ++++++++++++++++
+>  include/hw/pci/pci.h   |  2 ++
+>  include/hw/pci/pcie.h  |  5 +++++
+>  7 files changed, 88 insertions(+)
+>
