@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58156)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cjaBG-0007rS-2z
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 18:30:43 -0500
+	(envelope-from <eblake@redhat.com>) id 1cjaCz-000085-2e
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 18:32:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cjaBF-0001Kv-0g
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 18:30:42 -0500
+	(envelope-from <eblake@redhat.com>) id 1cjaCy-0001pc-7B
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 18:32:29 -0500
 References: <1488491046-2549-1-git-send-email-armbru@redhat.com>
-	<1488491046-2549-6-git-send-email-armbru@redhat.com>
+	<1488491046-2549-7-git-send-email-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <1494c534-50ec-5020-2c9d-76f14fac17e5@redhat.com>
-Date: Thu, 2 Mar 2017 17:30:33 -0600
+Message-ID: <d4d7ef14-2b0b-e8f3-69f3-9a2b9e81bd39@redhat.com>
+Date: Thu, 2 Mar 2017 17:32:20 -0600
 MIME-Version: 1.0
-In-Reply-To: <1488491046-2549-6-git-send-email-armbru@redhat.com>
+In-Reply-To: <1488491046-2549-7-git-send-email-armbru@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="e4tDfppNlTgJ1nFdsahiV8wpPqF8FdLxK"
-Subject: Re: [Qemu-devel] [PATCH 05/15] sheepdog: Fix snapshot ID parsing in
- _open(), _create, _goto()
+	boundary="nNhooLQRitRlB0MXmRgk78qiwsJ91Jird"
+Subject: Re: [Qemu-devel] [PATCH 06/15] sheepdog: Don't truncate long VDI
+ name in _open(), _create()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +29,58 @@ To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, qemu-block@nongnu.org, namei.unix@gmail.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---e4tDfppNlTgJ1nFdsahiV8wpPqF8FdLxK
+--nNhooLQRitRlB0MXmRgk78qiwsJ91Jird
 From: Eric Blake <eblake@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com,
  qemu-block@nongnu.org, namei.unix@gmail.com
-Message-ID: <1494c534-50ec-5020-2c9d-76f14fac17e5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 05/15] sheepdog: Fix snapshot ID parsing in
- _open(), _create, _goto()
+Message-ID: <d4d7ef14-2b0b-e8f3-69f3-9a2b9e81bd39@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 06/15] sheepdog: Don't truncate long VDI name
+ in _open(), _create()
 References: <1488491046-2549-1-git-send-email-armbru@redhat.com>
- <1488491046-2549-6-git-send-email-armbru@redhat.com>
-In-Reply-To: <1488491046-2549-6-git-send-email-armbru@redhat.com>
+ <1488491046-2549-7-git-send-email-armbru@redhat.com>
+In-Reply-To: <1488491046-2549-7-git-send-email-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 03/02/2017 03:43 PM, Markus Armbruster wrote:
-> sd_parse_uri() and sd_snapshot_goto() screw up error checking after
-> strtoul(), and truncate long tag names silently.  Fix by replacing
-> those parts by new sd_parse_snapid_or_tag(), which checks more
-> carefully.
-
-At least we've fixed checkpatch to gripe at new uses of strtoul(), but
-yeah, we've got lots of existing poor usage.  It is a very hard
-interface to use correctly, as evidenced by your cleanups here.
-
->=20
-> sd_snapshot_delete() also parses snapshot IDs, but is currently too
-> broken for me to touch.  Mark TODO.
->=20
-> Two calls of strtol() without error checking remain in
-> parse_redundancy().  Mark them FIXME.
->=20
-> More silent truncation of configuration strings remains elsewhere.
-> Not marked.
+> sd_parse_uri() truncates long VDI names silently.  Reject them
+> instead.
 >=20
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  block/sheepdog.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++--=
---------
->  1 file changed, 55 insertions(+), 11 deletions(-)
+>  block/sheepdog.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 >=20
+> diff --git a/block/sheepdog.c b/block/sheepdog.c
+> index deb110e..72a52a6 100644
+> --- a/block/sheepdog.c
+> +++ b/block/sheepdog.c
+> @@ -985,7 +985,9 @@ static int sd_parse_uri(BDRVSheepdogState *s, const=
+ char *filename,
+>          ret =3D -EINVAL;
+>          goto out;
+>      }
+> -    pstrcpy(vdi, SD_MAX_VDI_LEN, uri->path + 1);
+> +    if (g_strlcpy(vdi, uri->path + 1, SD_MAX_VDI_LEN) >=3D SD_MAX_VDI_=
+LEN) {
+> +        goto out;
+> +    }
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Does this need to set ret? Maybe to -EINVAL?
+
+> =20
+>      qp =3D query_params_parse(uri->query);
+>      if (qp->n > 1 || (s->is_unix && !qp->n) || (!s->is_unix && qp->n))=
+ {
+>=20
 
 --=20
 Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---e4tDfppNlTgJ1nFdsahiV8wpPqF8FdLxK
+--nNhooLQRitRlB0MXmRgk78qiwsJ91Jird
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -87,13 +90,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYuKsZAAoJEKeha0olJ0NqjqAH/3BV5A81/G9+OwM96wFRuHla
-0itJ//YGNO4YRhSpkNohoSVC23OcDMuXoTRMoOunvRDc4HFgjSXSwxMoeqUmJQ84
-Bj0e35zpY4a9rCtDWS20MIIA7kW21VpdZEniJJeUrpArYAjVK09GvCEu6+wQQhLh
-DIRue8J8Kw+mwhqNEcfMIT6ApshnuOkwKKlrN62NV+38NhS1Z9jU4bGog2rzsPHw
-4KinBTDBu9YCUiZlABYtk9360h2WsOQHQehFkTekKf3L7QD1/rQ9RLlVpTEhZ0tH
-lKpCOIuZSLj6pccxzuxIA4d0ofCDQ1NLQihyNu1U1HxlwQ5Fmye9kXEk3DX0Wkw=
-=T4fP
+iQEcBAEBCAAGBQJYuKuEAAoJEKeha0olJ0NqW5YH/i/Da/gF9qGcWSmB0GkhRh93
+rKxTaeZjEhmTWMT8AE55pA7Rs2x7pDa6MtSMY1Ut++HCVl7bC1EuZg04kCsC2PuR
+VEX7WM06v8Wgfbisig8dUbMsDiYI5QnzCrwKuDxyMaBXiJ/PVBATaqxsiC8QWOB3
+cwho6LGHR9PjxrT6jVJQF1tH5B7SUoN9gm1lKEXG6kxwiDHbelsb7vkEH247DdOE
+cW4yep+PK5EMnmRSgVcYtBw8kdSbTusshXZs2iufGhmj+/EZnl8pMcQ5S+/srlC2
+AddOhYRxd4IVmTiuql4krkPF5XBOUyKmxdceNvhM7jiHOTOa3EBZ50J6HLZdMZw=
+=iVc1
 -----END PGP SIGNATURE-----
 
---e4tDfppNlTgJ1nFdsahiV8wpPqF8FdLxK--
+--nNhooLQRitRlB0MXmRgk78qiwsJ91Jird--
