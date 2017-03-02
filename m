@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1cjVQR-0005CK-FL
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 13:26:06 -0500
+	(envelope-from <felipe@nutanix.com>) id 1cjVQQ-0005CH-Sb
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 13:26:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1cjVQM-0005TI-ME
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 13:26:03 -0500
-Received: from 206-15-90-246.static.twtelecom.net ([206.15.90.246]:19972
+	(envelope-from <felipe@nutanix.com>) id 1cjVQM-0005T4-Bo
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 13:26:02 -0500
+Received: from 206-15-90-246.static.twtelecom.net ([206.15.90.246]:60253
 	helo=felipe-franciosi.localdomain)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <felipe@nutanix.com>) id 1cjVQM-0005SV-28
+	(envelope-from <felipe@nutanix.com>) id 1cjVQM-0005SU-22
 	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 13:25:58 -0500
 From: Felipe Franciosi <felipe@nutanix.com>
-Date: Thu,  2 Mar 2017 10:25:53 -0800
-Message-Id: <1488479153-21203-5-git-send-email-felipe@nutanix.com>
+Date: Thu,  2 Mar 2017 10:25:52 -0800
+Message-Id: <1488479153-21203-4-git-send-email-felipe@nutanix.com>
 In-Reply-To: <1488479153-21203-1-git-send-email-felipe@nutanix.com>
 References: <1488479153-21203-1-git-send-email-felipe@nutanix.com>
-Subject: [Qemu-devel] [PATCH v5 4/4] vus: Introduce a vhost-user-scsi sample
- application
+Subject: [Qemu-devel] [PATCH v5 3/4] vus: Introduce vhost-user-scsi host
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,980 +28,455 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>, Felipe Franciosi <felipe@nutanix.com>
 
-This commit introduces a vhost-user-scsi backend sample application. It
-must be linked with libiscsi and libvhost-user.
+This commit introduces a vhost-user device for SCSI. This is based
+on the existing vhost-scsi implementation, but done over vhost-user
+instead. It also uses a chardev to connect to the backend. Unlike
+vhost-scsi (today), VMs using vhost-user-scsi can be live migrated.
 
-To use it, compile with:
-make vhost-user-scsi
+To use it, start Qemu with a command line equivalent to:
 
-And run as follows:
-./vhost-user-scsi -u /tmp/vus.sock -i iscsi://uri_to_target/
+qemu-system-x86_64 \
+       -chardev socket,id=vus0,path=/tmp/vus.sock \
+       -device vhost-user-scsi-pci,chardev=vus0,bus=pci.0,addr=...
 
-The application is currently limited at one LUN only and it processes
-requests synchronously (therefore only achieving QD1). The purpose of
-the code is to show how a backend can be implemented and to test the
-vhost-user-scsi Qemu implementation.
-
-If a different instance of this vhost-user-scsi application is executed
-at a remote host, a VM can be live migrated to such a host.
+A separate commit presents a sample application linked with libiscsi to
+provide a backend for vhost-user-scsi.
 
 Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
 ---
- Makefile                                  |   3 +
- Makefile.objs                             |   4 +
- configure                                 |   1 +
- contrib/vhost-user-scsi/Makefile.objs     |   1 +
- contrib/vhost-user-scsi/vhost-user-scsi.c | 886 ++++++++++++++++++++++++++++++
- 5 files changed, 895 insertions(+)
- create mode 100644 contrib/vhost-user-scsi/Makefile.objs
- create mode 100644 contrib/vhost-user-scsi/vhost-user-scsi.c
+ .gitignore                          |   1 +
+ default-configs/pci.mak             |   1 +
+ hw/scsi/Makefile.objs               |   1 +
+ hw/scsi/vhost-user-scsi.c           | 215 ++++++++++++++++++++++++++++++++++++
+ hw/virtio/virtio-pci.c              |  54 +++++++++
+ hw/virtio/virtio-pci.h              |  11 ++
+ include/hw/virtio/vhost-user-scsi.h |  35 ++++++
+ include/hw/virtio/virtio-scsi.h     |   3 +
+ 8 files changed, 321 insertions(+)
+ create mode 100644 hw/scsi/vhost-user-scsi.c
+ create mode 100644 include/hw/virtio/vhost-user-scsi.h
 
-diff --git a/Makefile b/Makefile
-index 1c4c04f..2189394 100644
---- a/Makefile
-+++ b/Makefile
-@@ -264,6 +264,7 @@ dummy := $(call unnest-vars,, \
-                 ivshmem-client-obj-y \
-                 ivshmem-server-obj-y \
-                 libvhost-user-obj-y \
-+                vhost-user-scsi-obj-y \
-                 qga-vss-dll-obj-y \
-                 block-obj-y \
-                 block-obj-m \
-@@ -469,6 +470,8 @@ ivshmem-client$(EXESUF): $(ivshmem-client-obj-y) $(COMMON_LDADDS)
- 	$(call LINK, $^)
- ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(COMMON_LDADDS)
- 	$(call LINK, $^)
-+vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y)
-+	$(call LINK, $^)
- 
- module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.mak
- 	$(call quiet-command,$(PYTHON) $< $@ \
-diff --git a/Makefile.objs b/Makefile.objs
-index e740500..49543c2 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -113,6 +113,10 @@ qga-vss-dll-obj-y = qga/
- ivshmem-client-obj-y = contrib/ivshmem-client/
- ivshmem-server-obj-y = contrib/ivshmem-server/
- libvhost-user-obj-y = contrib/libvhost-user/
-+vhost-user-scsi.o-cflags := $(LIBISCSI_CFLAGS)
-+vhost-user-scsi.o-libs := $(LIBISCSI_LIBS)
-+vhost-user-scsi-obj-y = contrib/vhost-user-scsi/
-+vhost-user-scsi-obj-y += contrib/libvhost-user/libvhost-user.o
- 
- ######################################################################
- trace-events-subdirs =
-diff --git a/configure b/configure
-index 6c21975..cc3fa7b 100755
---- a/configure
-+++ b/configure
-@@ -4812,6 +4812,7 @@ if test "$want_tools" = "yes" ; then
-   if [ "$linux" = "yes" -o "$bsd" = "yes" -o "$solaris" = "yes" ] ; then
-     tools="qemu-nbd\$(EXESUF) $tools"
-     tools="ivshmem-client\$(EXESUF) ivshmem-server\$(EXESUF) $tools"
-+    tools="vhost-user-scsi\$(EXESUF) $tools"
-   fi
- fi
- if test "$softmmu" = yes ; then
-diff --git a/contrib/vhost-user-scsi/Makefile.objs b/contrib/vhost-user-scsi/Makefile.objs
+diff --git a/.gitignore b/.gitignore
+index 2849d75..bba0cd5 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -50,6 +50,7 @@
+ /qemu-version.h.tmp
+ /module_block.h
+ /vscclient
++/vhost-user-scsi
+ /fsdev/virtfs-proxy-helper
+ *.[1-9]
+ *.a
+diff --git a/default-configs/pci.mak b/default-configs/pci.mak
+index 60dc651..ada9c6f 100644
+--- a/default-configs/pci.mak
++++ b/default-configs/pci.mak
+@@ -42,3 +42,4 @@ CONFIG_VGA=y
+ CONFIG_VGA_PCI=y
+ CONFIG_IVSHMEM=$(CONFIG_EVENTFD)
+ CONFIG_ROCKER=y
++CONFIG_VHOST_USER_SCSI=$(CONFIG_POSIX)
+diff --git a/hw/scsi/Makefile.objs b/hw/scsi/Makefile.objs
+index 54d8754..b188f72 100644
+--- a/hw/scsi/Makefile.objs
++++ b/hw/scsi/Makefile.objs
+@@ -11,4 +11,5 @@ obj-$(CONFIG_PSERIES) += spapr_vscsi.o
+ ifeq ($(CONFIG_VIRTIO),y)
+ obj-y += virtio-scsi.o virtio-scsi-dataplane.o
+ obj-$(CONFIG_VHOST_SCSI) += vhost-scsi-common.o vhost-scsi.o
++obj-$(CONFIG_VHOST_USER_SCSI) += vhost-scsi-common.o vhost-user-scsi.o
+ endif
+diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
 new file mode 100644
-index 0000000..e83a38a
+index 0000000..ff81626
 --- /dev/null
-+++ b/contrib/vhost-user-scsi/Makefile.objs
-@@ -0,0 +1 @@
-+vhost-user-scsi-obj-y = vhost-user-scsi.o
-diff --git a/contrib/vhost-user-scsi/vhost-user-scsi.c b/contrib/vhost-user-scsi/vhost-user-scsi.c
-new file mode 100644
-index 0000000..e41bad0
---- /dev/null
-+++ b/contrib/vhost-user-scsi/vhost-user-scsi.c
-@@ -0,0 +1,886 @@
++++ b/hw/scsi/vhost-user-scsi.c
+@@ -0,0 +1,215 @@
 +/*
-+ * vhost-user-scsi sample application
++ * vhost-user-scsi host device
 + *
 + * Copyright (c) 2016 Nutanix Inc. All rights reserved.
 + *
 + * Author:
 + *  Felipe Franciosi <felipe@nutanix.com>
 + *
-+ * This work is licensed under the terms of the GNU GPL, version 2 only.
-+ * See the COPYING file in the top-level directory.
++ * This work is largely based on the "vhost-scsi" implementation by:
++ *  Stefan Hajnoczi    <stefanha@linux.vnet.ibm.com>
++ *  Nicholas Bellinger <nab@risingtidesystems.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2 or later.
++ * See the COPYING.LIB file in the top-level directory.
++ *
 + */
 +
 +#include "qemu/osdep.h"
-+#include "contrib/libvhost-user/libvhost-user.h"
-+#include "hw/virtio/virtio-scsi.h"
-+#include "iscsi/iscsi.h"
++#include "migration/vmstate.h"
++#include "qapi/error.h"
++#include "qemu/error-report.h"
++#include "qemu/typedefs.h"
++#include "qom/object.h"
++#include "hw/fw-path-provider.h"
++#include "hw/qdev-core.h"
++#include "hw/virtio/vhost.h"
++#include "hw/virtio/vhost-backend.h"
++#include "hw/virtio/vhost-user-scsi.h"
++#include "hw/virtio/virtio.h"
++#include "hw/virtio/virtio-access.h"
++#include "sysemu/char.h"
 +
-+#include <glib.h>
++/* Features supported by the host application */
++static const int user_feature_bits[] = {
++    VIRTIO_F_NOTIFY_ON_EMPTY,
++    VIRTIO_RING_F_INDIRECT_DESC,
++    VIRTIO_RING_F_EVENT_IDX,
++    VIRTIO_SCSI_F_HOTPLUG,
++    VHOST_INVALID_FEATURE_BIT
++};
 +
-+/* Small compat shim from glib 2.32 */
-+#ifndef G_SOURCE_CONTINUE
-+#define G_SOURCE_CONTINUE TRUE
-+#endif
-+#ifndef G_SOURCE_REMOVE
-+#define G_SOURCE_REMOVE FALSE
-+#endif
-+
-+//#define VUS_DEBUG 1
-+
-+/** Log helpers **/
-+
-+#define PPRE                                                          \
-+    struct timespec ts;                                               \
-+    char   timebuf[64];                                               \
-+    struct tm tm;                                                     \
-+    (void)clock_gettime(CLOCK_REALTIME, &ts);                         \
-+    (void)strftime(timebuf, 64, "%Y%m%d %T", gmtime_r(&ts.tv_sec, &tm))
-+
-+#define PEXT(lvl, msg, ...) do {                                      \
-+    PPRE;                                                             \
-+    fprintf(stderr, "%s.%06ld " lvl ": %s:%s():%d: " msg "\n",        \
-+            timebuf, ts.tv_nsec/1000,                                 \
-+            __FILE__, __FUNCTION__, __LINE__, ## __VA_ARGS__);        \
-+} while(0)
-+
-+#define PNOR(lvl, msg, ...) do {                                      \
-+    PPRE;                                                             \
-+    fprintf(stderr, "%s.%06ld " lvl ": " msg "\n",                    \
-+            timebuf, ts.tv_nsec/1000, ## __VA_ARGS__);                \
-+} while(0);
-+
-+#ifdef VUS_DEBUG
-+#define PDBG(msg, ...) PEXT("DBG", msg, ## __VA_ARGS__)
-+#define PERR(msg, ...) PEXT("ERR", msg, ## __VA_ARGS__)
-+#define PLOG(msg, ...) PEXT("LOG", msg, ## __VA_ARGS__)
-+#else
-+#define PDBG(msg, ...) { }
-+#define PERR(msg, ...) PNOR("ERR", msg, ## __VA_ARGS__)
-+#define PLOG(msg, ...) PNOR("LOG", msg, ## __VA_ARGS__)
-+#endif
-+
-+/** vhost-user-scsi specific definitions **/
-+
-+#define VUS_MAX_LUNS 1 // Only 1 lun supported today
-+#define VUS_MAX_DEVS 1 // Only 1 devices supported today
-+
-+#define VUS_ISCSI_INITIATOR "iqn.2016-11.com.nutanix:vhost-user-scsi"
-+
-+typedef struct iscsi_lun {
-+    struct iscsi_context *iscsi_ctx;
-+    int iscsi_lun;
-+} iscsi_lun_t;
-+
-+typedef struct vhost_scsi_dev {
-+    VuDev vu_dev;
-+    int server_sock;
-+    GMainLoop *loop;
-+    GTree *fdmap;   // maps fd to gsource context id
-+    iscsi_lun_t luns[VUS_MAX_LUNS];
-+} vhost_scsi_dev_t;
-+
-+static vhost_scsi_dev_t *vhost_scsi_devs[VUS_MAX_DEVS];
-+
-+/** glib event loop integration for libvhost-user and misc callbacks **/
-+
-+typedef struct vus_gsrc {
-+    GSource parent;
-+    vhost_scsi_dev_t *vdev_scsi;
-+    GPollFD gfd;
-+    vu_watch_cb vu_cb;
-+} vus_gsrc_t;
-+
-+static gint vus_fdmap_compare(gconstpointer a, gconstpointer b)
++static void vhost_user_scsi_set_status(VirtIODevice *vdev, uint8_t status)
 +{
-+    if (b > a) return 1;
-+    if (b < a) return -1;
-+    return 0;
-+}
++    VHostUserSCSI *s = (VHostUserSCSI *)vdev;
++    VHostSCSICommon *vsc = VHOST_SCSI_COMMON(s);
++    bool start = (status & VIRTIO_CONFIG_S_DRIVER_OK) && vdev->vm_running;
 +
-+static gboolean vus_gsrc_prepare(GSource *src, gint *timeout)
-+{
-+    assert(timeout);
-+
-+    *timeout = -1;
-+    return FALSE;
-+}
-+
-+static gboolean vus_gsrc_check(GSource *src)
-+{
-+    vus_gsrc_t *vus_src = (vus_gsrc_t *)src;
-+
-+    assert(vus_src);
-+
-+    return vus_src->gfd.revents & vus_src->gfd.events;
-+}
-+
-+static gboolean vus_gsrc_dispatch(GSource *src, GSourceFunc cb, gpointer data)
-+{
-+    vhost_scsi_dev_t *vdev_scsi;
-+    vus_gsrc_t *vus_src = (vus_gsrc_t *)src;
-+
-+    assert(vus_src);
-+    assert(!(vus_src->vu_cb && cb));
-+
-+    vdev_scsi = vus_src->vdev_scsi;
-+
-+    assert(vdev_scsi);
-+
-+    if (vus_src->vu_cb) {
-+        int vu_evt = 0;
-+
-+        if (vus_src->gfd.events & G_IO_IN)  vu_evt |= VU_WATCH_IN;
-+        if (vus_src->gfd.events & G_IO_OUT) vu_evt |= VU_WATCH_OUT;
-+        if (vus_src->gfd.events & G_IO_PRI) vu_evt |= VU_WATCH_PRI;
-+        if (vus_src->gfd.events & G_IO_ERR) vu_evt |= VU_WATCH_ERR;
-+        if (vus_src->gfd.events & G_IO_HUP) vu_evt |= VU_WATCH_HUP;
-+
-+        vus_src->vu_cb(&vdev_scsi->vu_dev, vu_evt, data);
-+
-+        return G_SOURCE_CONTINUE;
++    if (vsc->dev.started == start) {
++        return;
 +    }
 +
-+    if (cb) {
-+        return cb(data);
-+    }
++    if (start) {
++        int ret;
 +
-+    return G_SOURCE_CONTINUE;
-+}
-+
-+static GSourceFuncs vus_gsrc_funcs = {
-+    vus_gsrc_prepare,
-+    vus_gsrc_check,
-+    vus_gsrc_dispatch,
-+    NULL
-+};
-+
-+static int vus_gsrc_new(vhost_scsi_dev_t *vdev_scsi, int fd, GIOCondition cond,
-+                        vu_watch_cb vu_cb, GSourceFunc gsrc_cb, gpointer data)
-+{
-+    GSource *vus_gsrc;
-+    vus_gsrc_t *vus_src;
-+    guint id;
-+
-+    assert(vdev_scsi);
-+    assert(fd >= 0);
-+    assert(vu_cb || gsrc_cb);
-+    assert(!(vu_cb && gsrc_cb));
-+
-+    vus_gsrc = g_source_new(&vus_gsrc_funcs, sizeof(vus_gsrc_t));
-+    if (!vus_gsrc) {
-+        PERR("Error creating GSource for new watch");
-+        return -1;
-+    }
-+    vus_src = (vus_gsrc_t *)vus_gsrc;
-+
-+    vus_src->vdev_scsi = vdev_scsi;
-+    vus_src->gfd.fd = fd;
-+    vus_src->gfd.events = cond;
-+    vus_src->vu_cb = vu_cb;
-+
-+    g_source_add_poll(vus_gsrc, &vus_src->gfd);
-+    g_source_set_callback(vus_gsrc, gsrc_cb, data, NULL);
-+    id = g_source_attach(vus_gsrc, NULL);
-+    assert(id);
-+    g_source_unref(vus_gsrc);
-+
-+    g_tree_insert(vdev_scsi->fdmap, (gpointer)(uintptr_t)fd,
-+                                    (gpointer)(uintptr_t)id);
-+
-+    return 0;
-+}
-+
-+/* from libiscsi's scsi-lowlevel.h **
-+ *
-+ * nb. We can't directly include scsi-lowlevel.h due to a namespace conflict:
-+ *     Qemu's scsi.h also defines "SCSI_XFER_NONE".
-+ */
-+
-+#define SCSI_CDB_MAX_SIZE           16
-+
-+struct scsi_iovector {
-+    struct scsi_iovec *iov;
-+    int niov;
-+    int nalloc;
-+    size_t offset;
-+    int consumed;
-+};
-+
-+struct scsi_allocated_memory {
-+    struct scsi_allocated_memory *next;
-+    char buf[0];
-+};
-+
-+struct scsi_data {
-+    int            size;
-+    unsigned char *data;
-+};
-+
-+enum scsi_sense_key {
-+    SCSI_SENSE_NO_SENSE            = 0x00,
-+    SCSI_SENSE_RECOVERED_ERROR     = 0x01,
-+    SCSI_SENSE_NOT_READY           = 0x02,
-+    SCSI_SENSE_MEDIUM_ERROR        = 0x03,
-+    SCSI_SENSE_HARDWARE_ERROR      = 0x04,
-+    SCSI_SENSE_ILLEGAL_REQUEST     = 0x05,
-+    SCSI_SENSE_UNIT_ATTENTION      = 0x06,
-+    SCSI_SENSE_DATA_PROTECTION     = 0x07,
-+    SCSI_SENSE_BLANK_CHECK         = 0x08,
-+    SCSI_SENSE_VENDOR_SPECIFIC     = 0x09,
-+    SCSI_SENSE_COPY_ABORTED        = 0x0a,
-+    SCSI_SENSE_COMMAND_ABORTED     = 0x0b,
-+    SCSI_SENSE_OBSOLETE_ERROR_CODE = 0x0c,
-+    SCSI_SENSE_OVERFLOW_COMMAND    = 0x0d,
-+    SCSI_SENSE_MISCOMPARE          = 0x0e
-+};
-+
-+struct scsi_sense {
-+    unsigned char       error_type;
-+    enum scsi_sense_key key;
-+    int                 ascq;
-+    unsigned            sense_specific:1;
-+    unsigned            ill_param_in_cdb:1;
-+    unsigned            bit_pointer_valid:1;
-+    unsigned char       bit_pointer;
-+    uint16_t            field_pointer;
-+};
-+
-+enum scsi_residual {
-+    SCSI_RESIDUAL_NO_RESIDUAL = 0,
-+    SCSI_RESIDUAL_UNDERFLOW,
-+    SCSI_RESIDUAL_OVERFLOW
-+};
-+
-+struct scsi_task {
-+    int status;
-+    int cdb_size;
-+    int xfer_dir;
-+    int expxferlen;
-+    unsigned char cdb[SCSI_CDB_MAX_SIZE];
-+    enum scsi_residual residual_status;
-+    size_t residual;
-+    struct scsi_sense sense;
-+    struct scsi_data datain;
-+    struct scsi_allocated_memory *mem;
-+    void *ptr;
-+
-+    uint32_t itt;
-+    uint32_t cmdsn;
-+    uint32_t lun;
-+
-+    struct scsi_iovector iovector_in;
-+    struct scsi_iovector iovector_out;
-+};
-+
-+/** libiscsi integration **/
-+
-+static int iscsi_add_lun(iscsi_lun_t *lun, char *iscsi_uri) {
-+    struct iscsi_url *iscsi_url;
-+    struct iscsi_context *iscsi_ctx;
-+    int ret = 0;
-+
-+    assert(lun);
-+    assert(iscsi_uri);
-+
-+    iscsi_ctx = iscsi_create_context(VUS_ISCSI_INITIATOR);
-+    if (!iscsi_ctx) {
-+        PERR("Unable to create iSCSI context");
-+        return -1;
-+    }
-+
-+    iscsi_url = iscsi_parse_full_url(iscsi_ctx, iscsi_uri);
-+    if (!iscsi_url) {
-+        PERR("Unable to parse iSCSI URL: %s", iscsi_get_error(iscsi_ctx));
-+        goto fail;
-+    }
-+
-+    iscsi_set_session_type(iscsi_ctx, ISCSI_SESSION_NORMAL);
-+    iscsi_set_header_digest(iscsi_ctx, ISCSI_HEADER_DIGEST_NONE_CRC32C);
-+    if (iscsi_full_connect_sync(iscsi_ctx, iscsi_url->portal, iscsi_url->lun)) {
-+        PERR("Unable to login to iSCSI portal: %s", iscsi_get_error(iscsi_ctx));
-+        goto fail;
-+    }
-+
-+    lun->iscsi_ctx = iscsi_ctx;
-+    lun->iscsi_lun = iscsi_url->lun;
-+
-+    PDBG("Context %p created for lun 0: %s", iscsi_ctx, iscsi_uri);
-+
-+out:
-+    if (iscsi_url) {
-+        iscsi_destroy_url(iscsi_url);
-+    }
-+    return ret;
-+
-+fail:
-+    (void)iscsi_destroy_context(iscsi_ctx);
-+    ret = -1;
-+    goto out;
-+}
-+
-+static struct scsi_task *scsi_task_new(int cdb_len, uint8_t *cdb, int dir,
-+                                       int xfer_len) {
-+    struct scsi_task *task;
-+
-+    assert(cdb_len > 0);
-+    assert(cdb);
-+
-+    task = calloc(1, sizeof(struct scsi_task));
-+    if (!task) {
-+        PERR("Error allocating task: %s", strerror(errno));
-+        return NULL;
-+    }
-+
-+    memcpy(task->cdb, cdb, cdb_len);
-+    task->cdb_size = cdb_len;
-+    task->xfer_dir = dir;
-+    task->expxferlen = xfer_len;
-+
-+    return task;
-+}
-+
-+static int get_cdb_len(uint8_t *cdb) {
-+    assert(cdb);
-+
-+    switch (cdb[0] >> 5) {
-+    case 0: return 6;
-+    case 1: /* fall through */
-+    case 2: return 10;
-+    case 4: return 16;
-+    case 5: return 12;
-+    }
-+    PERR("Unable to determine cdb len (0x%02hhX)", cdb[0]>>5);
-+    return -1;
-+}
-+
-+static int handle_cmd_sync(struct iscsi_context *ctx,
-+                           VirtIOSCSICmdReq *req,
-+                           struct iovec *out, unsigned int out_len,
-+                           VirtIOSCSICmdResp *rsp,
-+                           struct iovec *in, unsigned int in_len) {
-+    struct scsi_task *task;
-+    uint32_t dir;
-+    uint32_t len;
-+    int cdb_len;
-+    int i;
-+
-+    assert(ctx);
-+    assert(req);
-+    assert(rsp);
-+
-+    if (!((!req->lun[1]) && (req->lun[2] == 0x40) && (!req->lun[3]))) {
-+        // Ignore anything different than target=0, lun=0
-+        PDBG("Ignoring unconnected lun (0x%hhX, 0x%hhX)",
-+             req->lun[1], req->lun[3]);
-+        rsp->status = SCSI_STATUS_CHECK_CONDITION;
-+        memset(rsp->sense, 0, sizeof(rsp->sense));
-+        rsp->sense_len = 18;
-+        rsp->sense[0] = 0x70;
-+        rsp->sense[2] = SCSI_SENSE_ILLEGAL_REQUEST;
-+        rsp->sense[7] = 10;
-+        rsp->sense[12] = 0x24;
-+
-+        return 0;
-+    }
-+
-+    cdb_len = get_cdb_len(req->cdb);
-+    if (cdb_len == -1) {
-+        return -1;
-+    }
-+
-+    len = 0;
-+    if (!out_len && !in_len) {
-+        dir = SCSI_XFER_NONE;
-+    } else if (out_len) {
-+        dir = SCSI_XFER_TO_DEV;
-+        for (i=0; i<out_len; i++) {
-+            len += out[i].iov_len;
++        ret = vhost_scsi_common_start(vsc);
++        if (ret < 0) {
++            error_report("unable to start vhost-user-scsi: %s", strerror(-ret));
++            exit(1);
 +        }
 +    } else {
-+        dir = SCSI_XFER_FROM_DEV;
-+        for (i=0; i<in_len; i++) {
-+            len += in[i].iov_len;
-+        }
-+    }
-+
-+    task = scsi_task_new(cdb_len, req->cdb, dir, len);
-+    if (!task) {
-+        PERR("Unable to create iscsi task");
-+        return -1;
-+    }
-+
-+    if (dir == SCSI_XFER_TO_DEV) {
-+        task->iovector_out.iov = (struct scsi_iovec *)out;
-+        task->iovector_out.niov = out_len;
-+    } else if (dir == SCSI_XFER_FROM_DEV) {
-+        task->iovector_in.iov = (struct scsi_iovec *)in;
-+        task->iovector_in.niov = in_len;
-+    }
-+
-+    PDBG("Sending iscsi cmd (cdb_len=%d, dir=%d, task=%p)",
-+         cdb_len, dir, task);
-+    if (!iscsi_scsi_command_sync(ctx, 0, task, NULL)) {
-+        PERR("Error serving SCSI command");
-+        free(task);
-+        return -1;
-+    }
-+
-+    memset(rsp, 0, sizeof(*rsp));
-+
-+    rsp->status = task->status;
-+    rsp->resid  = task->residual;
-+
-+    if (task->status == SCSI_STATUS_CHECK_CONDITION) {
-+        rsp->response = VIRTIO_SCSI_S_FAILURE;
-+        rsp->sense_len = task->datain.size - 2;
-+        memcpy(rsp->sense, &task->datain.data[2], rsp->sense_len);
-+    }
-+
-+    free(task);
-+
-+    PDBG("Filled in rsp: status=%hhX, resid=%u, response=%hhX, sense_len=%u",
-+         rsp->status, rsp->resid, rsp->response, rsp->sense_len);
-+
-+    return 0;
-+}
-+
-+/** libvhost-user callbacks **/
-+
-+static vhost_scsi_dev_t *vdev_scsi_find_by_vu(VuDev *vu_dev);
-+
-+static void vus_panic_cb(VuDev *vu_dev, const char *buf) {
-+    vhost_scsi_dev_t *vdev_scsi;
-+
-+    assert(vu_dev);
-+
-+    vdev_scsi = vdev_scsi_find_by_vu(vu_dev);
-+
-+    if (buf) {
-+        PERR("vu_panic: %s", buf);
-+    }
-+
-+    if (vdev_scsi) {
-+        assert(vdev_scsi->loop);
-+        g_main_loop_quit(vdev_scsi->loop);
++        vhost_scsi_common_stop(vsc);
 +    }
 +}
 +
-+static void vus_add_watch_cb(VuDev *vu_dev, int fd, int vu_evt, vu_watch_cb cb,
-+                             void *pvt) {
-+    vhost_scsi_dev_t *vdev_scsi;
-+    gushort conds = 0;
-+    guint id;
++static void vhost_dummy_handle_output(VirtIODevice *vdev, VirtQueue *vq)
++{
++}
 +
-+    assert(vu_dev);
-+    assert(fd >= 0);
-+    assert(cb);
++static void vhost_user_scsi_save(QEMUFile *f, void *opaque)
++{
++    VirtIODevice *vdev = VIRTIO_DEVICE(opaque);
++    virtio_save(vdev, f);
++}
 +
-+    vdev_scsi = vdev_scsi_find_by_vu(vu_dev);
-+    if (!vdev_scsi) {
-+        vus_panic_cb(vu_dev, NULL);
++static int vhost_user_scsi_load(QEMUFile *f, void *opaque, int version_id)
++{
++    VirtIODevice *vdev = VIRTIO_DEVICE(opaque);
++    return virtio_load(vdev, f, version_id);
++}
++
++static void vhost_user_scsi_realize(DeviceState *dev, Error **errp)
++{
++    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(dev);
++    VHostUserSCSI *s = VHOST_USER_SCSI(dev);
++    VHostSCSICommon *vsc = VHOST_SCSI_COMMON(s);
++    static int vhost_user_scsi_id;
++    Error *err = NULL;
++    int ret;
++
++    if (!vs->conf.chardev.chr) {
++        error_setg(errp, "vhost-user-scsi: missing chardev");
 +        return;
 +    }
 +
-+    id = (guint)(uintptr_t)g_tree_lookup(vdev_scsi->fdmap,
-+                                         (gpointer)(uintptr_t)fd);
-+    if (id) {
-+        GSource *vus_src = g_main_context_find_source_by_id(NULL, id);
-+        assert(vus_src);
-+        g_source_destroy(vus_src);
-+        (void)g_tree_remove(vdev_scsi->fdmap, (gpointer)(uintptr_t)fd);
-+    }
-+
-+    if (vu_evt & VU_WATCH_IN)  conds |= G_IO_IN;
-+    if (vu_evt & VU_WATCH_OUT) conds |= G_IO_OUT;
-+    if (vu_evt & VU_WATCH_PRI) conds |= G_IO_PRI;
-+    if (vu_evt & VU_WATCH_ERR) conds |= G_IO_ERR;
-+    if (vu_evt & VU_WATCH_HUP) conds |= G_IO_HUP;
-+
-+    if (vus_gsrc_new(vdev_scsi, fd, conds, cb, NULL, pvt)) {
-+        vus_panic_cb(vu_dev, NULL);
-+    }
-+}
-+
-+static void vus_del_watch_cb(VuDev *vu_dev, int fd) {
-+    vhost_scsi_dev_t *vdev_scsi;
-+    guint id;
-+
-+    assert(vu_dev);
-+    assert(fd >= 0);
-+
-+    vdev_scsi = vdev_scsi_find_by_vu(vu_dev);
-+    if (!vdev_scsi) {
-+        vus_panic_cb(vu_dev, NULL);
++    virtio_scsi_common_realize(dev, &err, vhost_dummy_handle_output,
++                               vhost_dummy_handle_output,
++                               vhost_dummy_handle_output);
++    if (err != NULL) {
++        error_propagate(errp, err);
 +        return;
 +    }
 +
-+    id = (guint)(uintptr_t)g_tree_lookup(vdev_scsi->fdmap,
-+                                         (gpointer)(uintptr_t)fd);
-+    if (id) {
-+        GSource *vus_src = g_main_context_find_source_by_id(NULL, id);
-+        assert(vus_src);
-+        g_source_destroy(vus_src);
-+        (void)g_tree_remove(vdev_scsi->fdmap, (gpointer)(uintptr_t)fd);
-+    }
-+}
++    vsc->dev.nvqs = 2 + vs->conf.num_queues;
++    vsc->dev.vqs = g_new(struct vhost_virtqueue, vsc->dev.nvqs);
++    vsc->dev.vq_index = 0;
++    vsc->dev.backend_features = 0;
 +
-+static void vus_proc_ctl(VuDev *vu_dev, int idx) {
-+    /* Control VQ not implemented */
-+}
-+
-+static void vus_proc_evt(VuDev *vu_dev, int idx) {
-+    /* Event VQ not implemented */
-+}
-+
-+static void vus_proc_req(VuDev *vu_dev, int idx) {
-+    vhost_scsi_dev_t *vdev_scsi;
-+    VuVirtq *vq;
-+
-+    assert(vu_dev);
-+
-+    vdev_scsi = vdev_scsi_find_by_vu(vu_dev);
-+    if (!vdev_scsi) {
-+        vus_panic_cb(vu_dev, NULL);
++    ret = vhost_dev_init(&vsc->dev, (void *)&vs->conf.chardev,
++                         VHOST_BACKEND_TYPE_USER, 0);
++    if (ret < 0) {
++        error_setg(errp, "vhost-user-scsi: vhost initialization failed: %s",
++                   strerror(-ret));
 +        return;
 +    }
 +
-+    if ((idx < 0) || (idx >= VHOST_MAX_NR_VIRTQUEUE)) {
-+        PERR("VQ Index out of range: %d", idx);
-+        vus_panic_cb(vu_dev, NULL);
-+        return;
-+    }
++    /* Channel and lun both are 0 for bootable vhost-user-scsi disk */
++    vsc->channel = 0;
++    vsc->lun = 0;
++    vsc->target = vs->conf.boot_tpgt;
 +
-+    vq = vu_get_queue(vu_dev, idx);
-+    if (!vq) {
-+        PERR("Error fetching VQ (dev=%p, idx=%d)", vu_dev, idx);
-+        vus_panic_cb(vu_dev, NULL);
-+        return;
-+    }
-+
-+    PDBG("Got kicked on vq[%d]@%p", idx, vq);
-+
-+    while(1) {
-+        VuVirtqElement *elem;
-+        VirtIOSCSICmdReq *req;
-+        VirtIOSCSICmdResp *rsp;
-+
-+        elem = vu_queue_pop(vu_dev, vq, sizeof(VuVirtqElement));
-+        if (!elem) {
-+            PDBG("No more elements pending on vq[%d]@%p", idx, vq);
-+            break;
-+        }
-+        PDBG("Popped elem@%p", elem);
-+
-+        assert(!((elem->out_num > 1) && (elem->in_num > 1)));
-+        assert((elem->out_num > 0) && (elem->in_num > 0));
-+
-+        if (elem->out_sg[0].iov_len < sizeof(VirtIOSCSICmdReq)) {
-+            PERR("Invalid virtio-scsi req header");
-+            vus_panic_cb(vu_dev, NULL);
-+            break;
-+        }
-+        req = (VirtIOSCSICmdReq *)elem->out_sg[0].iov_base;
-+
-+        if (elem->in_sg[0].iov_len < sizeof(VirtIOSCSICmdResp)) {
-+            PERR("Invalid virtio-scsi rsp header");
-+            vus_panic_cb(vu_dev, NULL);
-+            break;
-+        }
-+        rsp = (VirtIOSCSICmdResp *)elem->in_sg[0].iov_base;
-+
-+        if (handle_cmd_sync(vdev_scsi->luns[0].iscsi_ctx,
-+                            req, &elem->out_sg[1], elem->out_num-1,
-+                            rsp, &elem->in_sg[1], elem->in_num-1) != 0) {
-+            vus_panic_cb(vu_dev, NULL);
-+            break;
-+        }
-+
-+        vu_queue_push(vu_dev, vq, elem, 0);
-+        vu_queue_notify(vu_dev, vq);
-+
-+        free(elem);
-+    }
++    register_savevm(dev, "vhost-user-scsi", vhost_user_scsi_id++, 1,
++                    vhost_user_scsi_save, vhost_user_scsi_load, s);
 +}
 +
-+static void vus_queue_set_started(VuDev *vu_dev, int idx, bool started) {
-+    VuVirtq *vq;
++static void vhost_user_scsi_unrealize(DeviceState *dev, Error **errp)
++{
++    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
++    VHostUserSCSI *s = VHOST_USER_SCSI(dev);
++    VHostSCSICommon *vsc = VHOST_SCSI_COMMON(s);
 +
-+    assert(vu_dev);
++    /* This will stop the vhost backend. */
++    vhost_user_scsi_set_status(vdev, 0);
 +
-+    if ((idx < 0) || (idx >= VHOST_MAX_NR_VIRTQUEUE)) {
-+        PERR("VQ Index out of range: %d", idx);
-+        vus_panic_cb(vu_dev, NULL);
-+        return;
-+    }
++    vhost_dev_cleanup(&vsc->dev);
++    g_free(vsc->dev.vqs);
 +
-+    vq = vu_get_queue(vu_dev, idx);
-+
-+    switch(idx) {
-+    case 0:
-+        vu_set_queue_handler(vu_dev, vq, started?vus_proc_ctl:NULL);
-+        break;
-+    case 1:
-+        vu_set_queue_handler(vu_dev, vq, started?vus_proc_evt:NULL);
-+        break;
-+    default:
-+        vu_set_queue_handler(vu_dev, vq, started?vus_proc_req:NULL);
-+    }
++    virtio_scsi_common_unrealize(dev, errp);
 +}
 +
-+static const VuDevIface vus_iface = {
-+    .queue_set_started = vus_queue_set_started,
++static uint64_t vhost_user_scsi_get_features(VirtIODevice *vdev,
++                                             uint64_t features, Error **errp)
++{
++    VHostUserSCSI *s = VHOST_USER_SCSI(vdev);
++
++    // Turn on predefined features supported by this device
++    features |= s->host_features;
++
++    return vhost_scsi_common_get_features(vdev, features, errp);
++}
++
++static Property vhost_user_scsi_properties[] = {
++    DEFINE_PROP_CHR("chardev", VirtIOSCSICommon, conf.chardev),
++    DEFINE_PROP_UINT32("boot_tpgt", VirtIOSCSICommon, conf.boot_tpgt, 0),
++    DEFINE_PROP_UINT32("num_queues", VirtIOSCSICommon, conf.num_queues, 1),
++    DEFINE_PROP_UINT32("max_sectors", VirtIOSCSICommon, conf.max_sectors,
++                       0xFFFF),
++    DEFINE_PROP_UINT32("cmd_per_lun", VirtIOSCSICommon, conf.cmd_per_lun, 128),
++    DEFINE_PROP_BIT64("hotplug", VHostUserSCSI, host_features,
++                                                VIRTIO_SCSI_F_HOTPLUG,
++                                                true),
++    DEFINE_PROP_BIT64("param_change", VHostUserSCSI, host_features,
++                                                     VIRTIO_SCSI_F_CHANGE,
++                                                     true),
++    DEFINE_PROP_END_OF_LIST(),
 +};
 +
-+static gboolean vus_vhost_cb(gpointer data) {
-+    VuDev *vu_dev = (VuDev *)data;
-+
-+    assert(vu_dev);
-+
-+    if (!vu_dispatch(vu_dev) != 0) {
-+        PERR("Error processing vhost message");
-+        vus_panic_cb(vu_dev, NULL);
-+        return G_SOURCE_REMOVE;
-+    }
-+
-+    return G_SOURCE_CONTINUE;
-+}
-+
-+/** misc helpers **/
-+
-+static int unix_sock_new(char *unix_fn) {
-+    int sock;
-+    struct sockaddr_un un;
-+    size_t len;
-+
-+    assert(unix_fn);
-+
-+    sock = socket(AF_UNIX, SOCK_STREAM, 0);
-+    if (sock <= 0) {
-+        perror("socket");
-+        return -1;
-+    }
-+
-+    un.sun_family = AF_UNIX;
-+    (void)snprintf(un.sun_path, sizeof(un.sun_path), "%s", unix_fn);
-+    len = sizeof(un.sun_family) + strlen(un.sun_path);
-+
-+    (void)unlink(unix_fn);
-+    if (bind(sock, (struct sockaddr *)&un, len) < 0) {
-+        perror("bind");
-+        goto fail;
-+    }
-+
-+    if (listen(sock, 1) < 0) {
-+        perror("listen");
-+        goto fail;
-+    }
-+
-+    return sock;
-+
-+fail:
-+    (void)close(sock);
-+
-+    return -1;
-+}
-+
-+/** vhost-user-scsi **/
-+
-+static vhost_scsi_dev_t *vdev_scsi_find_by_vu(VuDev *vu_dev) {
-+    int i;
-+
-+    assert(vu_dev);
-+
-+    for (i=0; i<VUS_MAX_DEVS; i++) {
-+        if (&vhost_scsi_devs[i]->vu_dev == vu_dev) {
-+            return vhost_scsi_devs[i];
-+        }
-+    }
-+
-+    PERR("Unknown VuDev %p", vu_dev);
-+    return NULL;
-+}
-+
-+static void vdev_scsi_deinit(vhost_scsi_dev_t *vdev_scsi) {
-+    if (!vdev_scsi) {
-+        return;
-+    }
-+
-+    if (vdev_scsi->server_sock >= 0) {
-+        struct sockaddr_storage ss;
-+        socklen_t sslen = sizeof(ss);
-+
-+        if (getsockname(vdev_scsi->server_sock, (struct sockaddr *)&ss,
-+                        &sslen) == 0) {
-+            struct sockaddr_un *su = (struct sockaddr_un *)&ss;
-+            (void)unlink(su->sun_path);
-+        }
-+
-+        (void)close(vdev_scsi->server_sock);
-+        vdev_scsi->server_sock = -1;
-+    }
-+
-+    if (vdev_scsi->loop) {
-+        g_main_loop_unref(vdev_scsi->loop);
-+        vdev_scsi->loop = NULL;
-+    }
-+}
-+
-+static vhost_scsi_dev_t *vdev_scsi_new(char *unix_fn) {
-+    vhost_scsi_dev_t *vdev_scsi = NULL;
-+
-+    assert(unix_fn);
-+
-+    vdev_scsi = calloc(1, sizeof(vhost_scsi_dev_t));
-+    if (!vdev_scsi) {
-+        PERR("calloc: %s", strerror(errno));
-+        return NULL;
-+    }
-+
-+    vdev_scsi->server_sock = unix_sock_new(unix_fn);
-+    if (vdev_scsi->server_sock < 0) {
-+        goto err;
-+    }
-+
-+    vdev_scsi->loop = g_main_loop_new(NULL, FALSE);
-+    if (!vdev_scsi->loop) {
-+        PERR("Error creating glib event loop");
-+        goto err;
-+    }
-+
-+    vdev_scsi->fdmap = g_tree_new(vus_fdmap_compare);
-+    if (!vdev_scsi->fdmap) {
-+        PERR("Error creating glib tree for fdmap");
-+        goto err;
-+    }
-+
-+    return vdev_scsi;
-+
-+err:
-+    vdev_scsi_deinit(vdev_scsi);
-+    free(vdev_scsi);
-+
-+    return NULL;
-+}
-+
-+static int vdev_scsi_add_iscsi_lun(vhost_scsi_dev_t *vdev_scsi,
-+                                   char *iscsi_uri, uint32_t lun) {
-+    assert(vdev_scsi);
-+    assert(iscsi_uri);
-+    assert(lun < VUS_MAX_LUNS);
-+
-+    if (vdev_scsi->luns[lun].iscsi_ctx) {
-+        PERR("Lun %d already configured", lun);
-+        return -1;
-+    }
-+
-+    if (iscsi_add_lun(&vdev_scsi->luns[lun], iscsi_uri) != 0) {
-+        return -1;
-+    }
-+
-+    return 0;
-+}
-+
-+static int vdev_scsi_run(vhost_scsi_dev_t *vdev_scsi) {
-+    int cli_sock;
-+    int ret = 0;
-+
-+    assert(vdev_scsi);
-+    assert(vdev_scsi->server_sock >= 0);
-+    assert(vdev_scsi->loop);
-+
-+    cli_sock = accept(vdev_scsi->server_sock, (void *)0, (void *)0);
-+    if (cli_sock < 0) {
-+        perror("accept");
-+        return -1;
-+    }
-+
-+    vu_init(&vdev_scsi->vu_dev,
-+            cli_sock,
-+            vus_panic_cb,
-+            vus_add_watch_cb,
-+            vus_del_watch_cb,
-+            &vus_iface);
-+
-+    if (vus_gsrc_new(vdev_scsi, cli_sock, G_IO_IN, NULL, vus_vhost_cb,
-+                     &vdev_scsi->vu_dev)) {
-+        goto fail;
-+    }
-+
-+    g_main_loop_run(vdev_scsi->loop);
-+
-+out:
-+    vu_deinit(&vdev_scsi->vu_dev);
-+
-+    return ret;
-+
-+fail:
-+    ret = -1;
-+    goto out;
-+}
-+
-+int main(int argc, char **argv)
++static void vhost_user_scsi_class_init(ObjectClass *klass, void *data)
 +{
-+    vhost_scsi_dev_t *vdev_scsi = NULL;
-+    char *unix_fn = NULL;
-+    char *iscsi_uri = NULL;
-+    int opt, err = EXIT_SUCCESS;
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    VirtioDeviceClass *vdc = VIRTIO_DEVICE_CLASS(klass);
++    FWPathProviderClass *fwc = FW_PATH_PROVIDER_CLASS(klass);
 +
-+    while ((opt = getopt(argc, argv, "u:i:")) != -1) {
-+        switch (opt) {
-+        case 'h':
-+            goto help;
-+        case 'u':
-+            unix_fn = strdup(optarg);
-+            break;
-+        case 'i':
-+            iscsi_uri = strdup(optarg);
-+            break;
-+        default:
-+            goto help;
-+        }
-+    }
-+    if (!unix_fn || !iscsi_uri) {
-+        goto help;
-+    }
-+
-+    vdev_scsi = vdev_scsi_new(unix_fn);
-+    if (!vdev_scsi) {
-+        goto err;
-+    }
-+    vhost_scsi_devs[0] = vdev_scsi;
-+
-+    if (vdev_scsi_add_iscsi_lun(vdev_scsi, iscsi_uri, 0) != 0) {
-+        goto err;
-+    }
-+
-+    if (vdev_scsi_run(vdev_scsi) != 0) {
-+        goto err;
-+    }
-+
-+out:
-+    if (vdev_scsi) {
-+        vdev_scsi_deinit(vdev_scsi);
-+        free(vdev_scsi);
-+    }
-+    if (unix_fn) {
-+        free(unix_fn);
-+    }
-+    if (iscsi_uri) {
-+        free(iscsi_uri);
-+    }
-+
-+    return err;
-+
-+err:
-+    err = EXIT_FAILURE;
-+    goto out;
-+
-+help:
-+    fprintf(stderr, "Usage: %s [ -u unix_sock_path -i iscsi_uri ] | [ -h ]\n",
-+            argv[0]);
-+    fprintf(stderr, "          -u path to unix socket\n");
-+    fprintf(stderr, "          -i iscsi uri for lun 0\n");
-+    fprintf(stderr, "          -h print help and quit\n");
-+
-+    goto err;
++    dc->props = vhost_user_scsi_properties;
++    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
++    vdc->realize = vhost_user_scsi_realize;
++    vdc->unrealize = vhost_user_scsi_unrealize;
++    vdc->get_features = vhost_user_scsi_get_features;
++    vdc->set_config = vhost_scsi_common_set_config;
++    vdc->set_status = vhost_user_scsi_set_status;
++    fwc->get_dev_path = vhost_scsi_common_get_fw_dev_path;
 +}
++
++static void vhost_user_scsi_instance_init(Object *obj)
++{
++    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(obj);
++    VHostSCSICommon *vsc = VHOST_SCSI_COMMON(obj);
++
++    vsc->feature_bits = user_feature_bits;
++
++    // Add the bootindex property for this object
++    device_add_bootindex_property(obj, &vsc->bootindex, "bootindex", NULL,
++                                  DEVICE(vsc), NULL);
++
++    // Set boot index according the the device config
++    object_property_set_int(obj, vs->conf.bootindex, "bootindex", NULL);
++}
++
++static const TypeInfo vhost_user_scsi_info = {
++    .name = TYPE_VHOST_USER_SCSI,
++    .parent = TYPE_VHOST_SCSI_COMMON,
++    .instance_size = sizeof(VHostUserSCSI),
++    .class_init = vhost_user_scsi_class_init,
++    .instance_init = vhost_user_scsi_instance_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_FW_PATH_PROVIDER },
++        { }
++    },
++};
++
++static void virtio_register_types(void)
++{
++    type_register_static(&vhost_user_scsi_info);
++}
++
++type_init(virtio_register_types)
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index 5ce42af..6c00608 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -2100,6 +2100,59 @@ static const TypeInfo vhost_scsi_pci_info = {
+ };
+ #endif
+ 
++/* vhost-user-scsi-pci */
++static Property vhost_user_scsi_pci_properties[] = {
++    DEFINE_PROP_UINT32("vectors", VirtIOPCIProxy, nvectors,
++                       DEV_NVECTORS_UNSPECIFIED),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void vhost_user_scsi_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
++{
++    VHostUserSCSIPCI *dev = VHOST_USER_SCSI_PCI(vpci_dev);
++    DeviceState *vdev = DEVICE(&dev->vdev);
++    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(vdev);
++
++    if (vpci_dev->nvectors == DEV_NVECTORS_UNSPECIFIED) {
++        vpci_dev->nvectors = vs->conf.num_queues + 3;
++    }
++
++    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
++    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
++}
++
++static void vhost_user_scsi_pci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
++    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
++    k->realize = vhost_user_scsi_pci_realize;
++    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
++    dc->props = vhost_user_scsi_pci_properties;
++    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
++    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_SCSI;
++    pcidev_k->revision = 0x00;
++    pcidev_k->class_id = PCI_CLASS_STORAGE_SCSI;
++}
++
++static void vhost_user_scsi_pci_instance_init(Object *obj)
++{
++    VHostUserSCSIPCI *dev = VHOST_USER_SCSI_PCI(obj);
++
++    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
++                                TYPE_VHOST_USER_SCSI);
++    object_property_add_alias(obj, "bootindex", OBJECT(&dev->vdev),
++                              "bootindex", &error_abort);
++}
++
++static const TypeInfo vhost_user_scsi_pci_info = {
++    .name          = TYPE_VHOST_USER_SCSI_PCI,
++    .parent        = TYPE_VIRTIO_PCI,
++    .instance_size = sizeof(VHostUserSCSIPCI),
++    .instance_init = vhost_user_scsi_pci_instance_init,
++    .class_init    = vhost_user_scsi_pci_class_init,
++};
++
+ /* vhost-vsock-pci */
+ 
+ #ifdef CONFIG_VHOST_VSOCK
+@@ -2577,6 +2630,7 @@ static void virtio_pci_register_types(void)
+ #ifdef CONFIG_VHOST_SCSI
+     type_register_static(&vhost_scsi_pci_info);
+ #endif
++    type_register_static(&vhost_user_scsi_pci_info);
+ #ifdef CONFIG_VHOST_VSOCK
+     type_register_static(&vhost_vsock_pci_info);
+ #endif
+diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+index d00064c..4171157 100644
+--- a/hw/virtio/virtio-pci.h
++++ b/hw/virtio/virtio-pci.h
+@@ -26,6 +26,7 @@
+ #include "hw/virtio/virtio-input.h"
+ #include "hw/virtio/virtio-gpu.h"
+ #include "hw/virtio/virtio-crypto.h"
++#include "hw/virtio/vhost-user-scsi.h"
+ 
+ #ifdef CONFIG_VIRTFS
+ #include "hw/9pfs/virtio-9p.h"
+@@ -44,6 +45,7 @@ typedef struct VirtIOBalloonPCI VirtIOBalloonPCI;
+ typedef struct VirtIOSerialPCI VirtIOSerialPCI;
+ typedef struct VirtIONetPCI VirtIONetPCI;
+ typedef struct VHostSCSIPCI VHostSCSIPCI;
++typedef struct VHostUserSCSIPCI VHostUserSCSIPCI;
+ typedef struct VirtIORngPCI VirtIORngPCI;
+ typedef struct VirtIOInputPCI VirtIOInputPCI;
+ typedef struct VirtIOInputHIDPCI VirtIOInputHIDPCI;
+@@ -218,6 +220,15 @@ struct VHostSCSIPCI {
+ };
+ #endif
+ 
++#define TYPE_VHOST_USER_SCSI_PCI "vhost-user-scsi-pci"
++#define VHOST_USER_SCSI_PCI(obj) \
++        OBJECT_CHECK(VHostUserSCSIPCI, (obj), TYPE_VHOST_USER_SCSI_PCI)
++
++struct VHostUserSCSIPCI {
++    VirtIOPCIProxy parent_obj;
++    VHostUserSCSI vdev;
++};
++
+ /*
+  * virtio-blk-pci: This extends VirtioPCIProxy.
+  */
+diff --git a/include/hw/virtio/vhost-user-scsi.h b/include/hw/virtio/vhost-user-scsi.h
+new file mode 100644
+index 0000000..01861f7
+--- /dev/null
++++ b/include/hw/virtio/vhost-user-scsi.h
+@@ -0,0 +1,35 @@
++/*
++ * vhost-user-scsi host device
++ *
++ * Copyright (c) 2016 Nutanix Inc. All rights reserved.
++ *
++ * Author:
++ *  Felipe Franciosi <felipe@nutanix.com>
++ *
++ * This file is largely based on "vhost-scsi.h" by:
++ *  Stefan Hajnoczi   <stefanha@linux.vnet.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2 or later.
++ * See the COPYING.LIB file in the top-level directory.
++ *
++ */
++
++#ifndef VHOST_USER_SCSI_H
++#define VHOST_USER_SCSI_H
++
++#include "qemu-common.h"
++#include "hw/qdev.h"
++#include "hw/virtio/virtio-scsi.h"
++#include "hw/virtio/vhost.h"
++#include "hw/virtio/vhost-scsi-common.h"
++
++#define TYPE_VHOST_USER_SCSI "vhost-user-scsi"
++#define VHOST_USER_SCSI(obj) \
++        OBJECT_CHECK(VHostUserSCSI, (obj), TYPE_VHOST_USER_SCSI)
++
++typedef struct VHostUserSCSI {
++    VHostSCSICommon parent_obj;
++    uint64_t host_features;
++} VHostUserSCSI;
++
++#endif /* VHOST_USER_SCSI_H */
+diff --git a/include/hw/virtio/virtio-scsi.h b/include/hw/virtio/virtio-scsi.h
+index 0b17250..ac822d4 100644
+--- a/include/hw/virtio/virtio-scsi.h
++++ b/include/hw/virtio/virtio-scsi.h
+@@ -21,6 +21,7 @@
+ #include "hw/virtio/virtio.h"
+ #include "hw/pci/pci.h"
+ #include "hw/scsi/scsi.h"
++#include "sysemu/char.h"
+ #include "sysemu/iothread.h"
+ 
+ #define TYPE_VIRTIO_SCSI_COMMON "virtio-scsi-common"
+@@ -53,6 +54,8 @@ struct VirtIOSCSIConf {
+     char *vhostfd;
+     char *wwpn;
+ #endif
++    CharBackend chardev;
++    int32_t bootindex;
+     uint32_t boot_tpgt;
+     IOThread *iothread;
+ };
 -- 
 1.9.4
