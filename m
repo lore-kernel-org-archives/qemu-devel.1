@@ -1,62 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59285)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jl4312@columbia.edu>) id 1cjaHL-0001SX-Dt
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 18:37:00 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cjaRA-0003SI-A9
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 18:47:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jl4312@columbia.edu>) id 1cjaHH-0002xL-GC
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 18:36:59 -0500
-Received: from outprodmail02.cc.columbia.edu ([128.59.72.51]:52299)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jl4312@columbia.edu>) id 1cjaHH-0002qr-BB
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 18:36:55 -0500
-Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
-	by outprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
-	v22Na1iF007920
-	for <qemu-devel@nongnu.org>; Thu, 2 Mar 2017 18:36:48 -0500
-Received: from hazelnut (localhost.localdomain [127.0.0.1])
-	by hazelnut (Postfix) with ESMTP id DF85D90
-	for <qemu-devel@nongnu.org>; Thu,  2 Mar 2017 18:36:48 -0500 (EST)
-Received: from sendprodmail02.cc.columbia.edu (sendprodmail02.cc.columbia.edu
-	[128.59.72.14]) by hazelnut (Postfix) with ESMTP id F1E4B88
-	for <qemu-devel@nongnu.org>; Thu,  2 Mar 2017 18:36:46 -0500 (EST)
-Received: from mail-oi0-f72.google.com (mail-oi0-f72.google.com
-	[209.85.218.72])
-	by sendprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
-	v22NakjC025140
-	(version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 2 Mar 2017 18:36:46 -0500
-Received: by mail-oi0-f72.google.com with SMTP id 2so71573575oif.7
-	for <qemu-devel@nongnu.org>; Thu, 02 Mar 2017 15:36:46 -0800 (PST)
-Received: from mail-oi0-f49.google.com (mail-oi0-f49.google.com.
-	[209.85.218.49])
-	by smtp.gmail.com with ESMTPSA id o62sm4183649oik.1.2017.03.02.15.36.44
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 02 Mar 2017 15:36:44 -0800 (PST)
-Received: by mail-oi0-f49.google.com with SMTP id f192so47886539oic.3
-	for <qemu-devel@nongnu.org>; Thu, 02 Mar 2017 15:36:44 -0800 (PST)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cjaR7-00077k-7T
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 18:47:08 -0500
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:33066)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cjaR7-00077g-2i
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 18:47:05 -0500
+Received: by mail-qk0-x242.google.com with SMTP id j127so5090059qke.0
+	for <qemu-devel@nongnu.org>; Thu, 02 Mar 2017 15:47:04 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1488449293-80280-1-git-send-email-liqiang6-s@360.cn>
+	<1488449293-80280-2-git-send-email-liqiang6-s@360.cn>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <28f76e5b-81cd-e2aa-98e8-4071bd75794c@amsat.org>
+Date: Thu, 2 Mar 2017 20:46:59 -0300
 MIME-Version: 1.0
-In-Reply-To: <jpgefyfs4m4.fsf@linux.bootlegged.copy>
-References: <20170208031216.GA5151@pxdev.xzpeter.org>
-	<CAHyh4xg7NVPjXu3c+xGWNzQqwLgFqFJTPo4SgN-X+FNuHjGihQ@mail.gmail.com>
-	<CAHyh4xhOPmfLoU_fvtbBF1Wqbzji9q6rp_bRN38qfnwvhQq+9A@mail.gmail.com>
-	<20170209035250.GB22153@pxdev.xzpeter.org>
-	<CAHyh4xi9KZm13mJnE3-EyYkkyN4YDKKwbeJ68AumCBM7kgr+MQ@mail.gmail.com>
-	<20170214073551.GA9055@pxdev.xzpeter.org>
-	<CAHyh4xiATAV801U7zjK1F_B+7e2bDWhH1-gpFKF3U1jNmCfScw@mail.gmail.com>
-	<20170215025243.GA3988@pxdev.xzpeter.org>
-	<20170215033452.GB3988@pxdev.xzpeter.org>
-	<20170215111552.5405418a@t450s.home>
-	<20170216022839.GC15985@pxdev.xzpeter.org>
-	<20170215194758.4622d73c@t450s.home>
-	<CAHyh4xg6oRVoW81QgdQRoL0Oc7jHm7prgyd--ghYQ4d4_aSUpQ@mail.gmail.com>
-	<CAHyh4xi0qOaL5X5E6yLpf2O=RYR=G8X=zjr7g+h8QtntYPnsFA@mail.gmail.com>
-	<jpgefyfs4m4.fsf@linux.bootlegged.copy>
-From: Jintack Lim <jintack@cs.columbia.edu>
-Date: Thu, 2 Mar 2017 18:36:43 -0500
-Message-ID: <CAHyh4xg_ufUiZDv=TPUa-CkDm7bY9dJ7-3ofhec-NK8OoA0WzQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] iommu emulation
+In-Reply-To: <1488449293-80280-2-git-send-email-liqiang6-s@360.cn>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/3] ide: qdev: register ide bus unrealize
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -65,136 +35,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bandan Das <bsd@redhat.com>
-Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, Peter Xu <peterx@redhat.com>, " Michael S . Tsirkin \" <mst@redhat.com>"@redhat.com
+To: Li Qiang <liq3ea@gmail.com>, jsnow@redhat.com, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, Li Qiang <liqiang6-s@360.cn>, ppandit@redhat.com
 
-On Thu, Mar 2, 2017 at 5:20 PM, Bandan Das <bsd@redhat.com> wrote:
-> Jintack Lim <jintack@cs.columbia.edu> writes:
->
->> [cc Bandan]
->>
->> On Tue, Feb 21, 2017 at 5:33 AM, Jintack Lim <jintack@cs.columbia.edu>
->> wrote:
->>
->>>
->>>
->>> On Wed, Feb 15, 2017 at 9:47 PM, Alex Williamson <
->>> alex.williamson@redhat.com> wrote:
-> ...
->>>
->>
->> I've tried another network device on a different machine. It has "Intel
->> Corporation 82599ES 10-Gigabit SFI/SFP+ Network Connection" ethernet
->> controller. I got the same problem of getting the network device
->> initialization failure in L2. I think I'm missing something since I heard
->> from Bandan that he had no problem to assign a device to L2 with ixgbe.
->>
->> This is the error message from dmesg in L2.
->>
->> [    3.692871] ixgbe: Intel(R) 10 Gigabit PCI Express Network Driver -
->> version 4.2.1-k
->> [    3.697716] ixgbe: Copyright (c) 1999-2015 Intel Corporation.
->> [    3.964875] ixgbe 0000:00:02.0: HW Init failed: -12
->> [    3.972362] ixgbe: probe of 0000:00:02.0 failed with error -12
->>
->> I checked that L2 indeed had that device.
->> root@guest0:~# lspci
->> 00:00.0 Host bridge: Intel Corporation 82G33/G31/P35/P31 Express DRAM
->> Controller
->> 00:01.0 VGA compatible controller: Device 1234:1111 (rev 02)
->> 00:02.0 Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+
->> Network Connection (rev 01)
->
-> Jintack, any progress with this ?
+On 03/02/2017 07:08 AM, Li Qiang wrote:
+> we have an idebus unrealize function, but it was being
+> registered as the unrealize function for the IDE Device,
+> so it was not getting invoked on device teardown because
+> nothing is "unrealizing" the IDE devices themselves.
 
-Not much, unfortunately.
+nice catch
 
 >
-> I am testing on a X540-AT2 and I see a different behavior. It appears
-> config succeeds but the driver keeps resetting the device due to a Tx
-> hang:
+> Suggested-by: John Snow <jsnow@redhat.com>
+> Signed-off-by: Li Qiang <liqiang6-s@360.cn>
 
-Thanks for your effort!
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> ---
+>  hw/ide/qdev.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
+> index dbaa75c..fbf7aa5 100644
+> --- a/hw/ide/qdev.c
+> +++ b/hw/ide/qdev.c
+> @@ -31,7 +31,7 @@
+>  /* --------------------------------- */
+>
+>  static char *idebus_get_fw_dev_path(DeviceState *dev);
+> -static void idebus_unrealize(DeviceState *qdev, Error **errp);
+> +static void idebus_unrealize(BusState *qdev, Error **errp);
+>
+>  static Property ide_props[] = {
+>      DEFINE_PROP_UINT32("unit", IDEDevice, unit, -1),
+> @@ -43,14 +43,15 @@ static void ide_bus_class_init(ObjectClass *klass, void *data)
+>      BusClass *k = BUS_CLASS(klass);
+>
+>      k->get_fw_dev_path = idebus_get_fw_dev_path;
+> +    k->unrealize = idebus_unrealize;
+>  }
+>
+> -static void idebus_unrealize(DeviceState *qdev, Error **errp)
+> +static void idebus_unrealize(BusState *bus, Error **errp)
+>  {
+> -    IDEBus *bus = DO_UPCAST(IDEBus, qbus, qdev->parent_bus);
+> +    IDEBus *ibus = IDE_BUS(bus);
+
+:)
 
 >
-> [ 568.612391 ] ixgbe 0000:00:03.0 enp0s3: tx hang 38 detected on queue 0,
-> resetting adapter
-> [ 568.612393 ]  ixgbe 0000:00:03.0 enp0s3: initiating reset due to tx
-> timeout
-> [ 568.612397 ]  ixgbe 0000:00:03.0 enp0s3: Reset adapter
+> -    if (bus->vmstate) {
+> -        qemu_del_vm_change_state_handler(bus->vmstate);
+> +    if (ibus->vmstate) {
+> +        qemu_del_vm_change_state_handler(ibus->vmstate);
+>      }
+>  }
 >
-> This may be device specific but I think the actual behavior you see is
-> also dependent on the ixgbe driver in the guest. Are you on a recent
-> kernel ? Also, can you point me to the hack (by Peter) that you have
-> mentioned above ?
-
-I was using 4.6.0-rc on the machine with Mellanox device, and
-4.10.0-rc on the machine with Intel device. L0, L1 and L2 had the same
-version.
-
-This is the initial hack from Peter,
-------8<-------
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 332f41d..bacd302 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -1925,11 +1925,6 @@ static void vfio_add_ext_cap(VFIOPCIDevice *vdev)
-
-     }
-
--    /* Cleanup chain head ID if necessary */
--    if (pci_get_word(pdev->config + PCI_CONFIG_SPACE_SIZE) == 0xFFFF) {
--        pci_set_word(pdev->config + PCI_CONFIG_SPACE_SIZE, 0);
--    }
--
-     g_free(config);
-     return;
- }
------->8-------
-
-and I believe this is the commit merged into QEMU repo.
-
-commit d0d1cd70d10639273e2a23870e7e7d80b2bc4e21
-Author: Alex Williamson <alex.williamson@redhat.com>
-Date:   Wed Feb 22 13:19:58 2017 -0700
-
-    vfio/pci: Improve extended capability comments, skip masked caps
-
-
-Thanks,
-Jintack
-
+> @@ -365,7 +366,6 @@ static void ide_device_class_init(ObjectClass *klass, void *data)
+>      k->init = ide_qdev_init;
+>      set_bit(DEVICE_CATEGORY_STORAGE, k->categories);
+>      k->bus_type = TYPE_IDE_BUS;
+> -    k->unrealize = idebus_unrealize;
+>      k->props = ide_props;
+>  }
 >
-> Thanks,
-> Bandan
->
->> I'm describing steps I took, so if you notice something wrong, PLEASE let
->> me know.
->>
->> 1. [L0] Check the device with lspci. Result is [1]
->> 2. [L0] Unbind from the original driver and bind to vfio-pci driver
->> following [2][3]
->> 3. [L0] Start L1 with this script. [4]
->> 4. [L1] L1 is able to use the network device.
->> 5. [L1] Unbind from the original driver and bind to vfio-pci driver same as
->> the step 2.
->> 6. [L1] Start L2 with this script. [5]
->> 7. [L2] Got the init failure error message above.
->>
->> [1] https://paste.ubuntu.com/24055745/
->> [2] http://www.linux-kvm.org/page/10G_NIC_performance:_VFIO_vs_virtio
->> [3] http://www.linux-kvm.org/images/b/b4/2012-forum-VFIO.pdf
->> [4] https://paste.ubuntu.com/24055715/
->> [5] https://paste.ubuntu.com/24055720/
->>
->> Thanks,
->> Jintack
->>
->>
->>>
->>>
->>>> Alex
->>>>
->>>>
->>>
 >
