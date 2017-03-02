@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41231)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cjLaQ-0000L2-W4
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 02:55:44 -0500
+	(envelope-from <armbru@redhat.com>) id 1cjLpr-0002yt-P6
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 03:11:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cjLaN-00077z-Pr
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 02:55:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49290)
+	(envelope-from <armbru@redhat.com>) id 1cjLpq-0005pC-2r
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 03:11:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56676)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cjLaN-00077n-Gx
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 02:55:39 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AEAD3C05681D
-	for <qemu-devel@nongnu.org>; Thu,  2 Mar 2017 07:55:38 +0000 (UTC)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cjLpp-0005p4-Qn
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 03:11:38 -0500
 From: Markus Armbruster <armbru@redhat.com>
-References: <20170301123223.12489-1-berrange@redhat.com>
-	<a08dc58b-a169-cb17-2187-1b66c6878a39@redhat.com>
-	<20170301144809.GE10160@redhat.com>
-Date: Thu, 02 Mar 2017 08:55:35 +0100
-In-Reply-To: <20170301144809.GE10160@redhat.com> (Daniel P. Berrange's message
-	of "Wed, 1 Mar 2017 14:48:09 +0000")
-Message-ID: <8760jsp0y0.fsf@dusky.pond.sub.org>
+References: <1488435591-17882-1-git-send-email-mst@redhat.com>
+	<1488435591-17882-6-git-send-email-mst@redhat.com>
+Date: Thu, 02 Mar 2017 09:11:34 +0100
+In-Reply-To: <1488435591-17882-6-git-send-email-mst@redhat.com> (Michael
+	S. Tsirkin's message of "Thu, 2 Mar 2017 08:20:30 +0200")
+Message-ID: <87a894m72h.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] migration: allow clearing migration string
- parameters
+Subject: Re: [Qemu-devel] [PULL 05/15] qmp/hmp: add query-vm-generation-id
+ and 'info vm-generation-id' commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,216 +28,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Ben Warren <ben@skyportsystems.com>, Laszlo Ersek <lersek@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-"Daniel P. Berrange" <berrange@redhat.com> writes:
+Crash bug, I'm afraid...
 
-> On Wed, Mar 01, 2017 at 08:36:03AM -0600, Eric Blake wrote:
->> On 03/01/2017 06:32 AM, Daniel P. Berrange wrote:
->> > Some of the migration parameters are strings, which default to NULL,
->> > eg tls_hostname and tls_creds.
->> > 
->> > The mgmt app will set the tls_creds parameter on both source and target
->> > QEMU instances, in order to trigger use of TLS for migration.
->> > 
->> > After performing a TLS encrypted migration though, migration might be
->> > used for other reasons - for example, to save the QEMU state to a file.
->> > We need TLS turned off when doing this, but the migrate-set-parameters
->> > QAPI command does not provide any facility to clear/reset parameters
->> > to their default state.
->> > 
->> > If you simply ommit the tls_creds parameter in migrate-set-parameters,
->> 
->> s/ommit/omit/
->> 
->> > then 'has_tls_creds' will be false and so no action will be taken. The
->> > only option that works with migrate-set-parameters is to treat "" on
->> > the wire as equivalent to requesting NULL. Failing that we would have
->> > to create a new 'migrate-reset-parameters' method to explicitly put
->> > a parameter back to its default value.
->> 
->> That happens to work in this case, because an empty string as the TLS
->> parameter makes no sense.
+"Michael S. Tsirkin" <mst@redhat.com> writes:
 
-Yes.
-
->> A nicer solution would be to support JSON null on the wire, so the user
->> can pass "tls-creds":null to explicitly request wiping out the
->> credentials rather than making the empty string magic.  But that's more
->> invasive (the QAPI parser would have to be enhanced to allow an
->> alternate that visits either a string or null).
-
-We already support JSON null on the wire, we just lack a built-in null
-type in the schema language.  It's not hard; sketch appended.  I expect
-to have missed a few more checks for the null type.
-
->>                                                  Ultimately, I think
->> we'll have to do that when we come up with some string property where ""
->> should not be given magic treatment.
->> 
->> So now we have a dilemma: do we special case "" here, to be stuck with
->> it even if we later add nullable-string support later, or do we go all
->> the way to nullable-string support now?  We've missed soft freeze for
->> 2.9, so my vote is that it is okay to special case "" in  this instance,
->> even though we'll have to continue to support it indefinitely even if we
->> gain nullable-string QMP.
+> From: Igor Mammedov <imammedo@redhat.com>
 >
-> FYI, if QEMU ever sends a QMP reply whose value comes from a NULL string,
-> it turns that into "". IOW, on output "" and NULL are indistinguishable
+> Add commands to query Virtual Machine Generation ID counter.
+>
+> QMP command example:
+>     { "execute": "query-vm-generation-id" }
+>
+> HMP command example:
+>     info vm-generation-id
+>
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Ben Warren <ben@skyportsystems.com>
+> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+> Tested-by: Laszlo Ersek <lersek@redhat.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  qapi-schema.json     | 20 ++++++++++++++++++++
+>  hmp.h                |  1 +
+>  hmp.c                |  9 +++++++++
+>  hw/acpi/vmgenid.c    | 16 ++++++++++++++++
+>  stubs/vmgenid.c      |  9 +++++++++
+>  hmp-commands-info.hx | 14 ++++++++++++++
+>  stubs/Makefile.objs  |  1 +
+>  7 files changed, 70 insertions(+)
+>  create mode 100644 stubs/vmgenid.c
+>
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index d6186d4..84692da 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -6188,3 +6188,23 @@
+>  #
+>  ##
+>  { 'command': 'query-hotpluggable-cpus', 'returns': ['HotpluggableCPU'] }
+> +
+> +##
+> +# @GuidInfo:
+> +#
+> +# GUID information.
+> +#
+> +# @guid: the globally unique identifier
+> +#
+> +# Since: 2.9
+> +##
+> +{ 'struct': 'GuidInfo', 'data': {'guid': 'str'} }
+> +
+> +##
+> +# @query-vm-generation-id:
+> +#
+> +# Show Virtual Machine Generation ID
+> +#
+> +# Since 2.9
+> +##
+> +{ 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
+[...]
+> diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+> index c8465df..744f284 100644
+> --- a/hw/acpi/vmgenid.c
+> +++ b/hw/acpi/vmgenid.c
+> @@ -240,3 +240,19 @@ static void vmgenid_register_types(void)
+>  }
+>  
+>  type_init(vmgenid_register_types)
+> +
+> +GuidInfo *qmp_query_vm_generation_id(Error **errp)
+> +{
+> +    GuidInfo *info;
+> +    VmGenIdState *vms;
+> +    Object *obj = find_vmgenid_dev();
+> +
+> +    if (!obj) {
+> +        return NULL;
+> +    }
+> +    vms = VMGENID(obj);
+> +
+> +    info = g_malloc0(sizeof(*info));
+> +    info->guid = qemu_uuid_unparse_strdup(&vms->guid);
+> +    return info;
+> +}
 
-C "" != C NULL != JSON null
+This either returns a GuidInfo or NULL.
 
-Let me elaborate.
+If it returns NULL, the generated qmp_marshal_output_GuidInfo() will
+crash like this:
 
-We use QObject * to represent a JSON expression.
+#0  0x00007fffdb4c7765 in raise () at /lib64/libc.so.6
+#1  0x00007fffdb4c936a in abort () at /lib64/libc.so.6
+#2  0x00007fffdb4bff97 in __assert_fail_base () at /lib64/libc.so.6
+#3  0x00007fffdb4c0042 in  () at /lib64/libc.so.6
+#4  0x0000555555c800a0 in visit_start_struct (v=
+    0x555557727000, name=0x555555cf29e8 "unused", obj=0x7fffffffc7c8, size=8, errp=0x7fffffffc790) at /work/armbru/qemu/qapi/qapi-visit-core.c:49
+#5  0x0000555555c5d398 in visit_type_GuidInfo (v=
+    0x555557727000, name=0x555555cf29e8 "unused", obj=0x7fffffffc7c8, errp=0x7fffffffc7d8) at qapi-visit.c:6038
+#6  0x0000555555922fc0 in qmp_marshal_output_GuidInfo (ret_in=0x0, ret_out=0x7fffffffc870, errp=0x7fffffffc820) at qmp-marshal.c:5148
+#7  0x0000555555923123 in qmp_marshal_query_vm_generation_id (args=0x555557a67500, ret=0x7fffffffc870, errp=0x7fffffffc868) at qmp-marshal.c:5186
+#8  0x0000555555c83a73 in do_qmp_dispatch (request=0x555556ab3200, errp=0x7fffffffc8c0) at /work/armbru/qemu/qapi/qmp-dispatch.c:97
+#9  0x0000555555c83ba3 in qmp_dispatch (request=0x555556ab3200)
+    at /work/armbru/qemu/qapi/qmp-dispatch.c:124
+#10 0x00005555557bb671 in handle_qmp_command (parser=
+    0x5555568776b0, tokens=0x555556858520) at /work/armbru/qemu/monitor.c:3789
+#11 0x0000555555c8af2f in json_message_process_token (lexer=0x5555568776b8, input=0x5555568582e0, type=JSON_RCURLY, x=48, y=1)
+    at /work/armbru/qemu/qobject/json-streamer.c:105
 
-The JSON expression that consists of the literal name null is
-represented as a non-null QObject *, created with qnull().
+Sorry for not having reviewed this earlier.  On the other hand, how come
+this survived testing?
 
-A null QObject * could mean something like "I have no JSON expression
-for you", which is not the same as "I'm handing you the JSON expression
-consisting of the literal null".
-
-When a QObject * represents a JSON expression, none of its QObject *
-children may be null.  Absent JSON object members are simply absent in
-the QDict.  There is no such thing as an absent list member.
-
-A QString wraps a char * that cannot be null.  A QString * still can,
-like any other QObject *.
-
-The QObject input visitor converts a QObject representing a JSON
-expression to QAPI object.  It assumes the QObject * are all non-null,
-as are the QString's char *.  It guards its assumptions with assertions.
-
-The QObject output visitor converts a QAPI object to a QObject
-representing a JSON expression.  Corresponding assumptions about the
-pointers within the QAPI object:
-
-* A pointer to a QAPI object can only be null when it represents an
-  optional member that is absent.
-
-* A char * can't be null.
-
-However, we relax the second assumption to map NULL to "" silently.  Bad
-idea going back to the early days of QAPI.  We intend to get rid of it,
-see TODO comment in visit_type_str().
-
-> So from that POV, treating JSON nil and "" as indistiguishable on input
-> would be consistent with what we do on output.
-
-Consistent with a bad idea we want to get rid of, plus external
-exposure, so we can't :)
-
-> I'd only suggest allowing JSON nil on input, if we're willing change the
-> output code to map NULL -> nil, instead of NULL -> "".
-
-No, the mapping is between JSON null and QNull *.  C null pointers are
-something else entirely.
-
-Back when I fitted support for JSON null into this code, I considered
-representing it as NULL, but quickly gave up due to the existing usage
-of NULL for something else entirely.
-
-
-
-
-diff --git a/scripts/qapi-types.py b/scripts/qapi-types.py
-index dabc42e..939d1e7 100644
---- a/scripts/qapi-types.py
-+++ b/scripts/qapi-types.py
-@@ -41,6 +41,8 @@ struct %(c_name)s {
- def gen_struct_members(members):
-     ret = ''
-     for memb in members:
-+        if memb.type.c_type() is None:
-+            continue
-         if memb.optional:
-             ret += mcgen('''
-     bool has_%(c_name)s;
-@@ -123,6 +125,8 @@ def gen_variants(variants):
-                 c_name=c_name(variants.tag_member.name))
- 
-     for var in variants.variants:
-+        if var.type.c_unboxed_type() is None:
-+            continue
-         ret += mcgen('''
-         %(c_type)s %(c_name)s;
- ''',
-@@ -208,6 +212,8 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
- 
-     def visit_array_type(self, name, info, element_type):
-         if isinstance(element_type, QAPISchemaBuiltinType):
-+            if element_type.c_type() is None:
-+                return
-             self._btin += gen_fwd_object_or_array(name)
-             self._btin += gen_array(name, element_type)
-             self._btin += gen_type_cleanup_decl(name)
-diff --git a/scripts/qapi-visit.py b/scripts/qapi-visit.py
-index 330b9f3..58a633f 100644
---- a/scripts/qapi-visit.py
-+++ b/scripts/qapi-visit.py
-@@ -187,6 +187,8 @@ void visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error
-                  c_name=c_name(name), promote_int=promote_int)
- 
-     for var in variants.variants:
-+        if var.type.c_type() is None:
-+            continue
-         ret += mcgen('''
-     case %(case)s:
- ''',
-@@ -301,6 +303,8 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor):
-             self.defn += gen_visit_enum(name)
- 
-     def visit_array_type(self, name, info, element_type):
-+        if element_type.c_type() is None:
-+            return
-         decl = gen_visit_decl(name)
-         defn = gen_visit_list(name, element_type)
-         if isinstance(element_type, QAPISchemaBuiltinType):
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 53a4477..b2ad698 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -34,6 +34,7 @@ builtin_types = {
-     'uint64':   'QTYPE_QINT',
-     'size':     'QTYPE_QINT',
-     'any':      None,           # any QType possible, actually
-+    'null':     'QTYPE_QNULL',
-     'QType':    'QTYPE_QSTRING',
- }
- 
-@@ -1094,7 +1095,8 @@ class QAPISchemaType(QAPISchemaEntity):
-             'number':  'QTYPE_QFLOAT',
-             'int':     'QTYPE_QINT',
-             'boolean': 'QTYPE_QBOOL',
--            'object':  'QTYPE_QDICT'
-+            'object':  'QTYPE_QDICT',
-+            'null':    'QTYPE_QNULL'
-         }
-         return json2qtype.get(self.json_type())
- 
-@@ -1525,7 +1527,8 @@ class QAPISchema(object):
-                   ('uint64', 'int',     'uint64_t'),
-                   ('size',   'int',     'uint64_t'),
-                   ('bool',   'boolean', 'bool'),
--                  ('any',    'value',   'QObject' + pointer_suffix)]:
-+                  ('any',    'value',   'QObject' + pointer_suffix),
-+                  ('null',   'null',    None)]:
-             self._def_builtin_type(*t)
-         self.the_empty_object_type = QAPISchemaObjectType('q_empty', None,
-                                                           None, [], None)
-diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/qapi-schema-test.json
-index f4d8cc4..2629c51 100644
---- a/tests/qapi-schema/qapi-schema-test.json
-+++ b/tests/qapi-schema/qapi-schema-test.json
-@@ -392,3 +392,9 @@
-   'data': { 'a': ['__org.qemu_x-Enum'], 'b': ['__org.qemu_x-Struct'],
-             'c': '__org.qemu_x-Union2', 'd': '__org.qemu_x-Alt' },
-   'returns': '__org.qemu_x-Union1' }
-+
-+##
-+# @str-or-null:
-+##
-+{ 'alternate': 'str-or-null',
-+  'data': { 's': 'str', 'n': 'null' } }
+[...]
