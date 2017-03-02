@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cjNSe-0007uk-SE
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 04:55:50 -0500
+	(envelope-from <liq3ea@gmail.com>) id 1cjNf0-0003Wv-8A
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 05:08:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cjNSd-0003aO-UU
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 04:55:48 -0500
-Received: from [59.151.112.132] (port=32331 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cjNSd-0003XR-GF
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 04:55:47 -0500
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Date: Thu, 2 Mar 2017 17:54:16 +0800
-Message-ID: <1488448458-4976-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-In-Reply-To: <1488448458-4976-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-References: <1488448458-4976-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH V3 1/3] COLO-compare: Rename compare function
- and remove duplicate codes
+	(envelope-from <liq3ea@gmail.com>) id 1cjNet-0007eN-NR
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 05:08:32 -0500
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:34771)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1cjNet-0007dw-Hr
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 05:08:27 -0500
+Received: by mail-pf0-x243.google.com with SMTP id x66so6337257pfb.1
+	for <qemu-devel@nongnu.org>; Thu, 02 Mar 2017 02:08:26 -0800 (PST)
+From: Li Qiang <liq3ea@gmail.com>
+Date: Thu,  2 Mar 2017 02:08:10 -0800
+Message-Id: <1488449293-80280-1-git-send-email-liqiang6-s@360.cn>
+Subject: [Qemu-devel] [PATCH 0/3] ide: ahci: fix memory leak in device unit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,84 +23,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
-Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: jsnow@redhat.com, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, ppandit@redhat.com, Li Qiang <liqiang6-s@360.cn>
 
-Rename colo_packet_compare() to colo_packet_compare_common() that
-make tcp_compare udp_compare icmp_compare reuse this function.
-Remove minimum packet size check in icmp_compare, because we have
-check this in parse_packet_early().
+As the pci ahci can be hotplug and unplug, in the ahci unrealize
+function it should free all the resource once allocated in the
+realized function. This patchset first add cleanup function in
+core layer and then call it in the ahci unit.
 
-Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
----
- net/colo-compare.c | 18 +++++++-----------
- 1 file changed, 7 insertions(+), 11 deletions(-)
+Li Qiang (3):
+  ide: qdev: register ide bus unrealize function
+  ide: core: add cleanup function
+  ide: ahci: call cleanup function in ahci unit
 
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index 300f017..602a758 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -180,7 +180,7 @@ static int packet_enqueue(CompareState *s, int mode)
-  * return:    0  means packet same
-  *            > 0 || < 0 means packet different
-  */
--static int colo_packet_compare(Packet *ppkt, Packet *spkt)
-+static int colo_packet_compare_common(Packet *ppkt, Packet *spkt)
- {
-     trace_colo_compare_ip_info(ppkt->size, inet_ntoa(ppkt->ip->ip_src),
-                                inet_ntoa(ppkt->ip->ip_dst), spkt->size,
-@@ -190,6 +190,7 @@ static int colo_packet_compare(Packet *ppkt, Packet *spkt)
-     if (ppkt->size == spkt->size) {
-         return memcmp(ppkt->data, spkt->data, spkt->size);
-     } else {
-+        trace_colo_compare_main("Net packet size are not the same");
-         return -1;
-     }
- }
-@@ -205,6 +206,7 @@ static int colo_packet_compare_tcp(Packet *spkt, Packet *ppkt)
-     int res;
- 
-     trace_colo_compare_main("compare tcp");
-+
-     if (ppkt->size != spkt->size) {
-         if (trace_event_get_state(TRACE_COLO_COMPARE_MISCOMPARE)) {
-             trace_colo_compare_main("pkt size not same");
-@@ -263,7 +265,8 @@ static int colo_packet_compare_udp(Packet *spkt, Packet *ppkt)
-     int ret;
- 
-     trace_colo_compare_main("compare udp");
--    ret = colo_packet_compare(ppkt, spkt);
-+
-+    ret = colo_packet_compare_common(ppkt, spkt);
- 
-     if (ret) {
-         trace_colo_compare_udp_miscompare("primary pkt size", ppkt->size);
-@@ -281,16 +284,9 @@ static int colo_packet_compare_udp(Packet *spkt, Packet *ppkt)
-  */
- static int colo_packet_compare_icmp(Packet *spkt, Packet *ppkt)
- {
--    int network_length;
--
-     trace_colo_compare_main("compare icmp");
--    network_length = ppkt->ip->ip_hl * 4;
--    if (ppkt->size != spkt->size ||
--        ppkt->size < network_length + ETH_HLEN) {
--        return -1;
--    }
- 
--    if (colo_packet_compare(ppkt, spkt)) {
-+    if (colo_packet_compare_common(ppkt, spkt)) {
-         trace_colo_compare_icmp_miscompare("primary pkt size",
-                                            ppkt->size);
-         qemu_hexdump((char *)ppkt->data, stderr, "colo-compare",
-@@ -316,7 +312,7 @@ static int colo_packet_compare_other(Packet *spkt, Packet *ppkt)
-                                inet_ntoa(ppkt->ip->ip_dst), spkt->size,
-                                inet_ntoa(spkt->ip->ip_src),
-                                inet_ntoa(spkt->ip->ip_dst));
--    return colo_packet_compare(ppkt, spkt);
-+    return colo_packet_compare_common(ppkt, spkt);
- }
- 
- static int colo_old_packet_check_one(Packet *pkt, int64_t *check_time)
+ hw/ide/ahci.c             | 12 ++++++++++++
+ hw/ide/core.c             |  8 ++++++++
+ hw/ide/qdev.c             | 12 ++++++------
+ include/hw/ide/internal.h |  1 +
+ 4 files changed, 27 insertions(+), 6 deletions(-)
+
 -- 
-2.7.4
+1.8.3.1
