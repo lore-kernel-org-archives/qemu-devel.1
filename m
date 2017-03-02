@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cjUaX-0006hm-Ji
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 12:32:26 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cjUhC-0007uq-1n
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 12:39:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cjUaU-0006ur-F9
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 12:32:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49234)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cjUaU-0006uV-6p
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 12:32:22 -0500
-Date: Thu, 2 Mar 2017 17:32:14 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170302173214.GH11445@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1488472983-9108-1-git-send-email-felipe@nutanix.com>
-	<148847375468.285.999031041241417996@0e2666bad730>
-	<F9FA9F92-B44C-401D-A892-D73D36777B47@nutanix.com>
-	<20170302171721.GG11445@redhat.com>
-	<3FB730F1-6067-4FD4-8D3F-19C648472B1B@nutanix.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cjUhB-0002yq-4j
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 12:39:18 -0500
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:34959)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cjUhA-0002yU-Tb
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 12:39:17 -0500
+Received: by mail-wm0-x22e.google.com with SMTP id v186so141657511wmd.0
+	for <qemu-devel@nongnu.org>; Thu, 02 Mar 2017 09:39:16 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <3FB730F1-6067-4FD4-8D3F-19C648472B1B@nutanix.com>
+In-Reply-To: <20170301090453.11075-1-marcandre.lureau@redhat.com>
+References: <20170301090453.11075-1-marcandre.lureau@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 2 Mar 2017 17:38:54 +0000
+Message-ID: <CAFEAcA-gpG8VeW1SSpR9f8-au3L3ac9ZtgjbZjxiNcxX_q4C2Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 0/3] Introduce vhost-user-scsi and
- sample application
+Subject: Re: [Qemu-devel] [PULL 00/28] Leak patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,71 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Felipe Franciosi <felipe@nutanix.com>
-Cc: Eric Blake <eblake@redhat.com>, "famz@redhat.com" <famz@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "stefanha@redhat.com" <stefanha@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Mar 02, 2017 at 05:21:46PM +0000, Felipe Franciosi wrote:
->=20
-> > On 2 Mar 2017, at 17:17, Daniel P. Berrange <berrange@redhat.com> wro=
-te:
-> >=20
-> > On Thu, Mar 02, 2017 at 05:01:06PM +0000, Felipe Franciosi wrote:
-> >> Hi Eric,
-> >>=20
-> >> Ping on this?
-> >> http://lists.nongnu.org/archive/html/qemu-devel/2016-10/msg06169.htm=
-l
-> >=20
-> > [snip]
-> >=20
-> >>      CC      contrib/ivshmem-client/main.o
-> >>    /var/tmp/patchew-tester-tmp-naxuy_ku/src/contrib/libvhost-user/li=
-bvhost-user.c: In function =E2=80=98vu_panic=E2=80=99:
-> >>    /var/tmp/patchew-tester-tmp-naxuy_ku/src/contrib/libvhost-user/li=
-bvhost-user.c:84:5: error: ignoring return value of =E2=80=98vasprintf=E2=
-=80=99, declared with attribute warn_unused_result [-Werror=3Dunused-resu=
-lt]
-> >>         (void)vasprintf(&buf, msg, ap);
-> >>         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >>    cc1: all warnings being treated as errors
-> >=20
-> > You can side-step the issue entirely by simply not using the vasprint=
-f
-> > function. Instead do   'buf =3D g_strdup_vprintf(msg, ap);' - glib do=
-es
-> > abort-on-oom, so there's no error scenario you need to handle.
->=20
-> Thanks for the pointer. That code is in libvhost-user already. I can se=
-nd a separate patch to fix that if you prefer.
+On 1 March 2017 at 09:04, Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.c=
+om> wrote:
+> The following changes since commit e7c83a885f865128ae3cf1946f8cb538b63cbf=
+ba:
+>
+>   vhost-user: delay vhost_user_stop (2017-02-28 19:11:15 +0000)
+>
+> are available in the git repository at:
+>
+>   git@github.com:elmarco/qemu.git tags/leak-pull-request
+>
+> for you to fetch changes up to 80e1eea37a25a7696137e680285e36d0bfdc9f34:
+>
+>   tests: fix virtio-blk-test leaks (2017-03-01 11:58:57 +0400)
+>
+> ----------------------------------------------------------------
+>
+> ----------------------------------------------------------------
+>
+> Igor Mammedov (1):
+>   pc: pcihp: avoid adding ACPI_PCIHP_PROP_BSEL twice
+>
+> Marc-Andr=C3=A9 Lureau (27):
+>   qtest: fix a memory leak
+>   tests: fix qmp response leak
+>   tests: fix leaks in test-io-channel-command
+>   timer: use an inline function for free
+>   glib-compat: add g_test_add_data_func_full fallback
+>   tests: fix ptimer leaks
+>   tests: fix endianness-test leaks
+>   tests: fix q35-test leaks
+>   tests: fix vhost-user-test leaks
+>   tests: fix ide-test leaks
+>   tests: fix hd-geo-test leaks
+>   tests: fix bios-tables-test leak
+>   tests: fix ipmi-kcs-test leak
+>   tests: fix ipmi-bt-test leak
+>   tests: fix eepro100-test leak
+>   tests: fix tco-test leaks
+>   tests: fix e1000-test leak
+>   tests: fix i440fx-test leaks
+>   tests: fix e1000e leaks
+>   tests: fix virtio-scsi-test leak
+>   tests: fix virtio-9p-test leaks
+>   bus: do not unref hotplug handler
+>   usb: release the created buses
+>   tests: allows to run single test in usb-hcd-ehci-test
+>   tests: fix usb-test leaks
+>   tests: add specialized device_find function
+>   tests: fix virtio-blk-test leaks
 
-Yeah, it wasn't previously noticed since these files weren't compiled
-by default. Since you've added make rules to enable build, I'm afraid
-you've got the unfortunate job of cleaning up pre-existing build
-problems. I'd suggest just doing the conversion to g_strdup_vprintf()
-in the first patch your series.
 
-> Just think that for this kind of usage a simple ignore_value(vasprintf(=
-...)) is sufficient; that call is in a panic path already.
+Applied, thanks.
 
-I think it is more correct to switch to g_strdup_vprintf so we get an imm=
-ediate
-abort, than to use ignore_value here.
-
-> There were other cases where ignoring the return value seemed like the
-> preferred thing to do.
-
-Thre's a few scenarios where ignoring an OOM error is appropriate, but as=
- a
-general rule QEMU aims to abort on OOM rather than ignore it or try to ha=
-ndle
-it.
-
-Regards,
-Daniel
---=20
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange=
-/ :|
-|: http://libvirt.org              -o-             http://virt-manager.or=
-g :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr=
-/ :|
+-- PMM
