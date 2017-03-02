@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45970)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cjVxC-0008OW-MO
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 13:59:55 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cjW19-0001mr-At
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 14:04:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cjVx9-000446-HO
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 13:59:54 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54249)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1cjVx9-00043f-7y
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 13:59:51 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v22IxKd3069096
-	for <qemu-devel@nongnu.org>; Thu, 2 Mar 2017 13:59:49 -0500
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28xpbq09p4-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 02 Mar 2017 13:59:49 -0500
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Thu, 2 Mar 2017 18:59:47 -0000
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Thu,  2 Mar 2017 19:59:42 +0100
-Message-Id: <20170302185942.76255-1-pasic@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 1/1] virtio: fail device if set_event_notifier
- fails
+	(envelope-from <peter.maydell@linaro.org>) id 1cjW18-0006HP-Fv
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 14:03:59 -0500
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:36206)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cjW18-0006Gx-88
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 14:03:58 -0500
+Received: by mail-wm0-x22c.google.com with SMTP id n11so32445663wma.1
+	for <qemu-devel@nongnu.org>; Thu, 02 Mar 2017 11:03:58 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA8hgztzBZ=4EK7GR_1V4WnKL_hp-CopC1q5NwxeARkgSA@mail.gmail.com>
+References: <cover.1488068248.git.balaton@eik.bme.hu>
+	<65f979bc1683c46f74ddb5e931810f4e2b8ea27c.1488068248.git.balaton@eik.bme.hu>
+	<CAFEAcA8hgztzBZ=4EK7GR_1V4WnKL_hp-CopC1q5NwxeARkgSA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 2 Mar 2017 19:03:36 +0000
+Message-ID: <CAFEAcA_b_iOCBk0dXGNGLve0hM5sLx5qAzq5mvDN-5yARopkdg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2 02/14] sm501: Use defines instead of
+ constants where available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,55 +31,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-The function virtio_notify_irqfd used to ignore the return code of
-event_notifier_set. Let's fail the device should this occur.
+On 2 March 2017 at 18:53, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 7 November 2016 at 09:03, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+> I just found a datasheet which says that the power-on-default
+> for the misc-control register is 0b0000.0000.0000.00x0.0001.0000.xxx0.0xxx
+> which means that the 0x1000 decimal value is correct and setting
+> the IRQ_INVERT bit is wrong.
+>
+> I think the "active=low" bit is referencing the fact that the
+> DAC_POWER bit is 1 for "disable" and 0 for "enable".
 
-Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+Actually it's referring to bit 17 (which is an "X" in the reset value
+above), which is documented as being set by a GPIO pin on reset,
+and having different meanings for SH and SA1110. In this case we're
+saying 'reset bit 17 to 0, meaning "SH series CPU, Active Low"'.
 
----
+Note also that the low bits indicate the bus type which is 000 for
+SH and 001 for PCI, etc.
 
-This patch is most likely flawed because virtio_notify_irqfd
-is probably supposed to be thread-safe and neither strerror
-nor virtio_error are that. Anyway lets get the discussion started with this.
+So a better comment here would be:
+    /* Bits 17 (SH), 7 (CDR), 6:5 (Test), 2:0 (Bus) are all supposed
+     * to be determined at reset by GPIO lines which set config bits.
+     * We hardwire them:
+     *  SH = 0 : Hitachi Ready Polarity == Active Low
+     *  CDR = 0 : do not reset clock divider
+     *  TEST = 0 : Normal mode (not testing the silicon)
+     *  BUS = 0 : Hitachi SH3/SH4
+     */
+    s->misc_control = SM501_MISC_DAC_POWER;
 
-There was a suggestion by Michael to make event_notifier_set void
-and assert inside. After some thinking, I settled at the opinion,
-that neither doing nothing nor crashing the guest is a good idea
-should this failure happen in production. So I came up with this.
+...and you'll want to put something in to get the right Bus value
+for the PCI version.
 
-Looking forward to your feedback.
----
- hw/virtio/virtio.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 23483c7..e05f3e5 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -1555,6 +1555,8 @@ static bool virtio_should_notify(VirtIODevice *vdev, VirtQueue *vq)
- void virtio_notify_irqfd(VirtIODevice *vdev, VirtQueue *vq)
- {
-     bool should_notify;
-+    int rc;
-+
-     rcu_read_lock();
-     should_notify = virtio_should_notify(vdev, vq);
-     rcu_read_unlock();
-@@ -1581,7 +1583,11 @@ void virtio_notify_irqfd(VirtIODevice *vdev, VirtQueue *vq)
-      * to an atomic operation.
-      */
-     virtio_set_isr(vq->vdev, 0x1);
--    event_notifier_set(&vq->guest_notifier);
-+    rc = event_notifier_set(&vq->guest_notifier);
-+    if (unlikely(rc)) {
-+        virtio_error(vdev, "guest notifier broken for vdev at %p (%s)", vdev,
-+                     strerror(-rc));
-+    }
- }
- 
- static void virtio_irq(VirtQueue *vq)
--- 
-2.8.4
+thanks
+-- PMM
