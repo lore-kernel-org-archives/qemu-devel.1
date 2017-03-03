@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60166)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60998)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cjcgj-00084D-5f
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 21:11:22 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1cjckk-0000xg-JY
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 21:15:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cjcgg-0003Mt-0r
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 21:11:21 -0500
-Date: Fri, 3 Mar 2017 10:11:09 +0800
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170303021109.GA11833@stefanha-x1.localdomain>
-References: <20170301115026.22621-1-stefanha@redhat.com>
-	<20170301222748.2c7a3ead@bahia.lan>
+	(envelope-from <balaton@eik.bme.hu>) id 1cjckh-0005BO-3J
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 21:15:30 -0500
+Date: Fri, 3 Mar 2017 03:15:25 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <CAFEAcA9FL-sshVzKewf+rCs6-5_c2Y86Qy0b=3DMog4MrVOpwA@mail.gmail.com>
+Message-ID: <alpine.BSF.2.20.1703030259350.33600@zero.eik.bme.hu>
+References: <cover.1488068248.git.balaton@eik.bme.hu>
+	<6b70a9dfe56c3a0dc8e874c45d70612aff7b8e3a.1488068248.git.balaton@eik.bme.hu>
+	<CAFEAcA9FL-sshVzKewf+rCs6-5_c2Y86Qy0b=3DMog4MrVOpwA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="u3/rZRmxL6MmkK24"
-Content-Disposition: inline
-In-Reply-To: <20170301222748.2c7a3ead@bahia.lan>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 0/3] throttle: improve
- command-line parameter documentation
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [PATCH v2 07/14] sm501: Fix device endianness
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,73 +23,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Nini Gu <ngu@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
+On Thu, 2 Mar 2017, Peter Maydell wrote:
+> On 25 February 2017 at 18:46, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>> ---
+>>
+>> v2: Split off small clean up to other patch
+>>
+>>  hw/display/sm501.c          |  6 +++---
+>>  hw/display/sm501_template.h | 23 ++++++++++++++---------
+>>  2 files changed, 17 insertions(+), 12 deletions(-)
+>>
+>> diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+>> index b977094..2694081 100644
+>> --- a/hw/display/sm501.c
+>> +++ b/hw/display/sm501.c
+>> @@ -849,7 +849,7 @@ static const MemoryRegionOps sm501_system_config_ops = {
+>>          .min_access_size = 4,
+>>          .max_access_size = 4,
+>>      },
+>> -    .endianness = DEVICE_NATIVE_ENDIAN,
+>> +    .endianness = DEVICE_LITTLE_ENDIAN,
+>>  };
+>>
+>>  static uint32_t sm501_palette_read(void *opaque, hwaddr addr)
+>> @@ -1085,7 +1085,7 @@ static const MemoryRegionOps sm501_disp_ctrl_ops = {
+>>          .min_access_size = 4,
+>>          .max_access_size = 4,
+>>      },
+>> -    .endianness = DEVICE_NATIVE_ENDIAN,
+>> +    .endianness = DEVICE_LITTLE_ENDIAN,
+>>  };
+>>
+>>  static uint64_t sm501_2d_engine_read(void *opaque, hwaddr addr,
+>> @@ -1173,7 +1173,7 @@ static const MemoryRegionOps sm501_2d_engine_ops = {
+>>          .min_access_size = 4,
+>>          .max_access_size = 4,
+>>      },
+>> -    .endianness = DEVICE_NATIVE_ENDIAN,
+>> +    .endianness = DEVICE_LITTLE_ENDIAN,
+>>  };
+>>
+>>  /* draw line functions for all console modes */
+>> diff --git a/hw/display/sm501_template.h b/hw/display/sm501_template.h
+>> index 832ee61..6e56baf 100644
+>> --- a/hw/display/sm501_template.h
+>> +++ b/hw/display/sm501_template.h
+>> @@ -64,10 +64,16 @@ static void glue(draw_line16_, PIXEL_NAME)(
+>>      uint8_t r, g, b;
+>>
+>>      do {
+>> -        rgb565 = lduw_p(s);
+>> -        r = ((rgb565 >> 11) & 0x1f) << 3;
+>> -        g = ((rgb565 >>  5) & 0x3f) << 2;
+>> -        b = ((rgb565 >>  0) & 0x1f) << 3;
+>> +        rgb565 = lduw_le_p(s);
+>> +#if defined(TARGET_WORDS_BIGENDIAN)
+>> +        r = (rgb565 >> 8) & 0xf8;
+>> +        g = (rgb565 >> 3) & 0xfc;
+>> +        b = (rgb565 << 3) & 0xf8;
+>> +#else
+>> +        b = (rgb565 >> 8) & 0xf8;
+>> +        g = (rgb565 >> 3) & 0xfc;
+>> +        r = (rgb565 << 3) & 0xf8;
+>> +#endif
+>>          *(PIXEL_TYPE *)d = glue(rgb_to_pixel, PIXEL_NAME)(r, g, b);
+>>          s += 2;
+>>          d += BPP;
+>> @@ -80,15 +86,14 @@ static void glue(draw_line32_, PIXEL_NAME)(
+>>      uint8_t r, g, b;
+>>
+>>      do {
+>> -        ldub_p(s);
+>>  #if defined(TARGET_WORDS_BIGENDIAN)
+>> +        r = s[0];
+>> +        g = s[1];
+>> +        b = s[2];
+>> +#else
+>>          r = s[1];
+>>          g = s[2];
+>>          b = s[3];
+>> -#else
+>> -        b = s[0];
+>> -        g = s[1];
+>> -        r = s[2];
+>>  #endif
+>>          *(PIXEL_TYPE *)d = glue(rgb_to_pixel, PIXEL_NAME)(r, g, b);
+>>          s += 4;
+>
+> I still suspect this is not correct. In particular, if you
+> look at the Linux driver:
+>
+> http://lxr.free-electrons.com/source/drivers/video/fbdev/sm501fb.c#L341
+>
+> we have for 32 bit two layouts within a 32-bit word:
+> BGRX (if "swap fb endian" is set)
+> XRGB (the usual)
+> (plus the cross-product with "32-bit load is BE or LE",
+> since we've coded this as byte accesses rather than a ldl_*_p()).
+>
+> and for 16 bit we have either RGB or BGR ordering.
+> I'm not completely sure this lines up with the code you have.
 
---u3/rZRmxL6MmkK24
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Maybe it's not correct but works for everything I could test better than 
+the original code (which was broken even for the SH images one can find) 
+so I think we could just go with this until someone complains and provides 
+a test case. I've given up on trying to understand it because I don't 
+really know this device and SH so I could only go by the images I could 
+find and they seem to like it this way.
 
-On Wed, Mar 01, 2017 at 10:27:48PM +0100, Greg Kurz wrote:
-> On Wed,  1 Mar 2017 11:50:23 +0000
-> Stefan Hajnoczi <stefanha@redhat.com> wrote:
->=20
-> > v3:
-> >  * Added Patch 2 to fix invalid test parameters
-> >  * Switched to nicer max < avg check [Berto]
-> > v2:
-> >  * Fixed s/bps/iops/ copy-paste error in Patch 1 [Berto]
-> >  * Rephrased warning about guest hangs and errors [Berto]
-> >  * Added Patch 2 to hide the internal .max value from the monitor
-> >=20
-> > Patch 1 fleshes out the documentation for I/O throttling command-line
-> > parameters.
-> >=20
-> > Patch 2 hides an internal value that was being exposed to users via the
-> > monitor and caused confusion.
-> >=20
-> > I ended up not adding QMP-style throttling.* names to the command-line
-> > documentation because the names are very long and unlikely to be used. =
- I
-> > couldn't see a nice way of adding them while still keeping the document=
-ation
-> > readable.
-> >=20
->=20
-> I only see this series now and it's a bit unfortunate... throttling optio=
-ns
-> are now also available for fsdev. Only QMP-style names were added though,
-> and they appear in the documentation. I agree the names are long, and the
-> result isn't pretty on 80 columns, but it is readable still.
->=20
-> I don't really want to add code, just to have shorter names and a prettier
-> output. But it would be a good thing for fsdev to benefit from this new
-> documentation... any suggestion how to do that ?
+> Looking at how the SWAP_FB_ENDIAN flag gets set:
+> * for the r2d board it is set always
+> * for PCI devices, it is set only if big-endian
+>
+> I suspect that what we actually have here is something
+> like:
+> * for the PCI device it's always little endian (and the
+>   code ought not to need to depend on TARGET_WORDS_BIGENDIAN)
+> * sysbus device may be more complicated
+>
+> Also I note there's an SM501_ENDIAN_CONTROL register on the
+> device, which presumably if written changes the behaviour.
 
-I think another patch series would be good to:
-1. Document QMP-style names for -drive
-2. Reference throttling parameter documention in a common place for both
-   -fsdev and -drive.
+I've seen this but it's not emulated so it can be ignored for now. The 
+spec also says that default is little endian so for regs at least 
+DEVICE_LITTLE_ENDIAN should be OK.
 
-I'll do that.  This is QEMU 2.10 material anyway (it has missed the
-freeze deadline), so there's no time pressure.
-
-Stefan
-
---u3/rZRmxL6MmkK24
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYuNC9AAoJEJykq7OBq3PILKMIAJ/mPkF1JB1OR5GHzKma9Sjv
-tqpFBW4D1GGNCXXHHrpcGcE0upYRdw61R+RBmNGW9RxZI4f53yRkZRje++ghvxe5
-XITJY0t7mmJhKkhRzrrDXucbGYJ8ycUvZcj7OoprjjF0Ims3amDsfq/GZR40LkzX
-Hkv2E3m9tlkZHCl4rFAQg2En5T08hLMy87/w110b11ktI2XF+bWorJ7bpnKbd0dH
-Rygsme2doDMhxgPSPjcVhZ2bOEUEWgPCQ5x3djiD/jrhKacR++alPm2B1Y/OfSUs
-db0Xx8DuH5xFW9bxcxCI25f75JdlI0ZNFPA62mwXMmlvfK12gdx6N/YIgK1E6OI=
-=mJgz
------END PGP SIGNATURE-----
-
---u3/rZRmxL6MmkK24--
+> Plus for the sysbus device if we change the settings to
+> DEVICE_LITTLE_ENDIAN for the various control register
+> regions that suggests we should be consistent about the
+> serial_mm_init() endian order and also the USB controller.
+>
+> It's late evening here though so I can't investigate any
+> further right now.
+>
+> thanks
+> -- PMM
+>
+>
