@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cjnKc-0004gX-VX
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:33:15 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cjnOC-0007Oi-3P
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:36:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cjnKY-00086d-2H
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:33:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58612)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cjnKX-00086Y-QP
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:33:10 -0500
-References: <33183CC9F5247A488A2544077AF19020DA1D01C2@DGGEMA505-MBX.china.huawei.com>
-	<20170303120054.GB2439@work-vm>
-	<10d66d73-a269-acb4-bc3d-2250793cba8e@redhat.com>
-	<20170303131150.GC2439@work-vm>
-	<bcaabb9b-44a6-ee7d-14b9-eade207e1538@redhat.com>
-	<20170303132653.GD2439@work-vm>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4b0de5de-aec7-0388-0a68-cf9e02b48b1d@redhat.com>
-Date: Fri, 3 Mar 2017 14:33:05 +0100
+	(envelope-from <kwolf@redhat.com>) id 1cjnOB-0000i6-5q
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:36:56 -0500
+Date: Fri, 3 Mar 2017 14:36:45 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170303133644.GC14351@noname.redhat.com>
+References: <1488491046-2549-1-git-send-email-armbru@redhat.com>
+	<1488491046-2549-8-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170303132653.GD2439@work-vm>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Bug?] BQL about live migration
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1488491046-2549-8-git-send-email-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 07/15] sheepdog: Report errors in
+ pseudo-filename more usefully
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,90 +24,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "quintela@redhat.com" <quintela@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, yanghongyang <yanghongyang@huawei.com>, Huangzhichao <huangzhichao@huawei.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com
 
-
-
-On 03/03/2017 14:26, Dr. David Alan Gilbert wrote:
-> * Paolo Bonzini (pbonzini@redhat.com) wrote:
->>
->>
->> On 03/03/2017 14:11, Dr. David Alan Gilbert wrote:
->>> * Paolo Bonzini (pbonzini@redhat.com) wrote:
->>>>
->>>>
->>>> On 03/03/2017 13:00, Dr. David Alan Gilbert wrote:
->>>>> Ouch that's pretty nasty; I remember Paolo explaining to me a while ago that
->>>>> their were times when run_on_cpu would have to drop the BQL and I worried about it,
->>>>> but this is the 1st time I've seen an error due to it.
->>>>>
->>>>> Do you know what the migration state was at that point? Was it MIGRATION_STATUS_CANCELLING?
->>>>> I'm thinking perhaps we should stop 'cont' from continuing while migration is in
->>>>> MIGRATION_STATUS_CANCELLING.  Do we send an event when we hit CANCELLED - so that
->>>>> perhaps libvirt could avoid sending the 'cont' until then?
->>>>
->>>> No, there's no event, though I thought libvirt would poll until
->>>> "query-migrate" returns the cancelled state.  Of course that is a small
->>>> consolation, because a segfault is unacceptable.
->>>
->>> I think you might get an event if you set the new migrate capability called
->>> 'events' on!
->>>
->>> void migrate_set_state(int *state, int old_state, int new_state)
->>> {
->>>     if (atomic_cmpxchg(state, old_state, new_state) == old_state) {
->>>         trace_migrate_set_state(new_state);
->>>         migrate_generate_event(new_state);
->>>     }
->>> }
->>>
->>> static void migrate_generate_event(int new_state)
->>> {
->>>     if (migrate_use_events()) {
->>>         qapi_event_send_migration(new_state, &error_abort); 
->>>     }
->>> }
->>>
->>> That event feature went in sometime after 2.3.0.
->>>
->>>> One possibility is to suspend the monitor in qmp_migrate_cancel and
->>>> resume it (with add_migration_state_change_notifier) when we hit the
->>>> CANCELLED state.  I'm not sure what the latency would be between the end
->>>> of migrate_fd_cancel and finally reaching CANCELLED.
->>>
->>> I don't like suspending monitors; it can potentially take quite a significant
->>> time to do a cancel.
->>> How about making 'cont' fail if we're in CANCELLING?
->>
->> Actually I thought that would be the case already (in fact CANCELLING is
->> internal only; the outside world sees it as "active" in query-migrate).
->>
->> Lei, what is the runstate?  (That is, why did cont succeed at all)?
+Am 02.03.2017 um 22:43 hat Markus Armbruster geschrieben:
+> Errors in the pseudo-filename are all reported with the same laconic
+> "Can't parse filename" message.
 > 
-> I suspect it's RUN_STATE_FINISH_MIGRATE - we set that before we do the device
-> save, and that's what we get at the end of a migrate and it's legal to restart
-> from there.
+> Add real error reporting, such as:
+> 
+>     $ qemu-system-x86_64 --drive driver=sheepdog,filename=sheepdog:///
+>     qemu-system-x86_64: --drive driver=sheepdog,filename=sheepdog:///: missing file path in URI
+>     $ qemu-system-x86_64 --drive driver=sheepdog,filename=sheepgod:///vdi
+>     qemu-system-x86_64: --drive driver=sheepdog,filename=sheepgod:///vdi: URI scheme must be 'sheepdog', 'sheepdog+tcp', or 'sheepdog+unix'
+>     $ qemu-system-x86_64 --drive driver=sheepdog,filename=sheepdog+unix:///vdi?socke=sheepdog.sock
+>     qemu-system-x86_64: --drive driver=sheepdog,filename=sheepdog+unix:///vdi?socke=sheepdog.sock: unexpected query parameters
+> 
+> The code to translate legacy syntax to URI fails to escape URI
+> meta-characters.  The new error messages are misleading then.  Replace
+> them by the old "Can't parse filename" message.  "Internal error"
+> would be more honest.  Anyway, no worse than before.  Also add a FIXME
+> comment.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Yeah, but I think we get there at the end of a failed migrate only.  So
-perhaps we can introduce a new state RUN_STATE_FAILED_MIGRATE and forbid
-"cont" from finish-migrate (only allow it from failed-migrate)?
+More upper/lower case inconsistency in error messages. Maybe I should
+simply ignore it.
 
-Paolo
-
->> Paolo
->>
->>> I'd really love to see the 'run_on_cpu' being more careful about the BQL;
->>> we really need all of the rest of the devices to stay quiesced at times.
->>
->> That's not really possible, because of how condition variables work. :(
-> 
-> *Really* we need to find a solution to that - there's probably lots of 
-> other things that can spring up in that small window other than the
-> 'cont'.
-> 
-> Dave
-> 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
