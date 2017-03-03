@@ -1,15 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55667)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1cjcMK-0006IG-9U
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 20:50:18 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1cjcMK-0006IA-8Q
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 20:50:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1cjcMI-0001FC-4Y
+	(envelope-from <balaton@eik.bme.hu>) id 1cjcMG-0001Dk-HL
 	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 20:50:16 -0500
-Message-Id: <7be6454441c7b61a02e22aa2d6f81f0c047d4312.1488504063.git.balaton@eik.bme.hu>
+Message-Id: <7e582e5ca2aaa7b8b6c1f8a040562b099767ff81.1488504063.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1488504063.git.balaton@eik.bme.hu>
 References: <cover.1488504063.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: [Qemu-devel] [PATCH v3 11/13] sm501: Add some more missing registers
+Date: Fri, 3 Mar 2017 02:03:05 +0100
+Subject: [Qemu-devel] [PATCH v3 04/13] sm501: QOMify
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,211 +19,278 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Date: Fri, 03 Mar 2017 01:50:19 -0000
 To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 Cc: Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>
 
-This is to allow clients to initialise these without failing as long
-as no 2D engine function is called that would use the written value.
-Saved values are not used yet (may get used when more of 2D engine is
-added sometimes) and clients normally only write to most of these
-registers, nothing is known to ever read them but they are documented
-as read/write so also implement read for these.
+Adding vmstate saving is not in this patch because the state structure
+will be changed in further patches, then another patch will add
+vmstate descriptor after those changes.
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 ---
 
-v2: Fixed mask of video_control register for a read only bit
-    Changed IRQ status register to write ignored as IRQ is not implemented
-v3: Squashed read implementation into this patch
+v2: Add memory regions to device state instead of allocating them
+v3: Added reset function and make sure to use adjusted mem size when
+    creating local mem region (also print a warning when mem size was
+    adjusted)
 
- hw/display/sm501.c | 107 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 106 insertions(+), 1 deletion(-)
+ hw/display/sm501.c   | 169 +++++++++++++++++++++++++++++++++++++--------------
+ hw/sh4/r2d.c         |  11 +++-
+ include/hw/devices.h |   5 --
+ 3 files changed, 132 insertions(+), 53 deletions(-)
 
 diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index 607eddc..30e39be 100644
+index 6e74200..cc717b9 100644
 --- a/hw/display/sm501.c
 +++ b/hw/display/sm501.c
-@@ -512,6 +512,8 @@ typedef struct SM501State {
-     uint32_t dc_panel_hwc_color_1_2;
-     uint32_t dc_panel_hwc_color_3;
+@@ -59,8 +59,8 @@
+ #define SM501_DPRINTF(fmt, ...) do {} while (0)
+ #endif
  
-+    uint32_t dc_video_control;
-+
-     uint32_t dc_crt_control;
-     uint32_t dc_crt_fb_addr;
-     uint32_t dc_crt_fb_offset;
-@@ -531,13 +533,20 @@ typedef struct SM501State {
-     uint32_t twoD_control;
-     uint32_t twoD_pitch;
-     uint32_t twoD_foreground;
-+    uint32_t twoD_background;
-     uint32_t twoD_stretch;
-+    uint32_t twoD_color_compare;
-     uint32_t twoD_color_compare_mask;
-     uint32_t twoD_mask;
-+    uint32_t twoD_clip_tl;
-+    uint32_t twoD_clip_br;
-+    uint32_t twoD_mono_pattern_low;
-+    uint32_t twoD_mono_pattern_high;
-     uint32_t twoD_window_width;
-     uint32_t twoD_source_base;
-     uint32_t twoD_destination_base;
 -
-+    uint32_t twoD_alpha;
-+    uint32_t twoD_wrap;
- } SM501State;
+ #define MMIO_BASE_OFFSET 0x3e00000
++#define MMIO_SIZE 0x200000
  
- static uint32_t get_local_mem_size_index(uint32_t size)
-@@ -946,6 +955,10 @@ static uint64_t sm501_disp_ctrl_read(void *opaque, hwaddr addr,
-         ret = s->dc_panel_v_sync;
-         break;
+ /* SM501 register definitions taken from "linux/include/linux/sm501-regs.h" */
  
-+    case SM501_DC_VIDEO_CONTROL:
-+        ret = s->dc_video_control;
-+        break;
-+
-     case SM501_DC_CRT_CONTROL:
-         ret = s->dc_crt_control;
-         break;
-@@ -1061,6 +1074,10 @@ static void sm501_disp_ctrl_write(void *opaque, hwaddr addr,
-         s->dc_panel_hwc_color_3 = value & 0x0000FFFF;
-         break;
+@@ -465,6 +465,10 @@ typedef struct SM501State {
+     uint32_t local_mem_size_index;
+     uint8_t *local_mem;
+     MemoryRegion local_mem_region;
++    MemoryRegion mmio_region;
++    MemoryRegion system_config_region;
++    MemoryRegion disp_ctrl_region;
++    MemoryRegion twoD_engine_region;
+     uint32_t last_width;
+     uint32_t last_height;
  
-+    case SM501_DC_VIDEO_CONTROL:
-+        s->dc_video_control = value & 0x00037FFF;
-+        break;
-+
-     case SM501_DC_CRT_CONTROL:
-         s->dc_crt_control = value & 0x0003FFFF;
-         break;
-@@ -1133,9 +1150,69 @@ static uint64_t sm501_2d_engine_read(void *opaque, hwaddr addr,
-     SM501_DPRINTF("sm501 2d engine regs : read addr=%x\n", (int)addr);
+@@ -1404,21 +1408,8 @@ static const GraphicHwOps sm501_ops = {
+     .gfx_update  = sm501_update_display,
+ };
  
-     switch (addr) {
-+    case SM501_2D_SOURCE:
-+        ret = s->twoD_source;
-+        break;
-+    case SM501_2D_DESTINATION:
-+        ret = s->twoD_destination;
-+        break;
-+    case SM501_2D_DIMENSION:
-+        ret = s->twoD_dimension;
-+        break;
-+    case SM501_2D_CONTROL:
-+        ret = s->twoD_control;
-+        break;
-+    case SM501_2D_PITCH:
-+        ret = s->twoD_pitch;
-+        break;
-+    case SM501_2D_FOREGROUND:
-+        ret = s->twoD_foreground;
-+        break;
-+    case SM501_2D_BACKGROUND:
-+        ret = s->twoD_background;
-+        break;
-+    case SM501_2D_STRETCH:
-+        ret = s->twoD_stretch;
-+        break;
-+    case SM501_2D_COLOR_COMPARE:
-+        ret = s->twoD_color_compare;
-+        break;
-+    case SM501_2D_COLOR_COMPARE_MASK:
-+        ret = s->twoD_color_compare_mask;
-+        break;
-+    case SM501_2D_MASK:
-+        ret = s->twoD_mask;
-+        break;
-+    case SM501_2D_CLIP_TL:
-+        ret = s->twoD_clip_tl;
-+        break;
-+    case SM501_2D_CLIP_BR:
-+        ret = s->twoD_clip_br;
-+        break;
-+    case SM501_2D_MONO_PATTERN_LOW:
-+        ret = s->twoD_mono_pattern_low;
-+        break;
-+    case SM501_2D_MONO_PATTERN_HIGH:
-+        ret = s->twoD_mono_pattern_high;
-+        break;
-+    case SM501_2D_WINDOW_WIDTH:
-+        ret = s->twoD_window_width;
-+        break;
-     case SM501_2D_SOURCE_BASE:
-         ret = s->twoD_source_base;
-         break;
-+    case SM501_2D_DESTINATION_BASE:
-+        ret = s->twoD_destination_base;
-+        break;
-+    case SM501_2D_ALPHA:
-+        ret = s->twoD_alpha;
-+        break;
-+    case SM501_2D_WRAP:
-+        ret = s->twoD_wrap;
-+        break;
-+    case SM501_2D_STATUS:
-+        ret = 0; /* Should return interrupt status */
-+        break;
-     default:
-         printf("sm501 disp ctrl : not implemented register read."
-                " addr=%x\n", (int)addr);
-@@ -1178,15 +1255,33 @@ static void sm501_2d_engine_write(void *opaque, hwaddr addr,
-     case SM501_2D_FOREGROUND:
-         s->twoD_foreground = value;
-         break;
-+    case SM501_2D_BACKGROUND:
-+        s->twoD_background = value;
-+        break;
-     case SM501_2D_STRETCH:
-         s->twoD_stretch = value;
-         break;
-+    case SM501_2D_COLOR_COMPARE:
-+        s->twoD_color_compare = value;
-+        break;
-     case SM501_2D_COLOR_COMPARE_MASK:
-         s->twoD_color_compare_mask = value;
-         break;
-     case SM501_2D_MASK:
-         s->twoD_mask = value;
-         break;
-+    case SM501_2D_CLIP_TL:
-+        s->twoD_clip_tl = value;
-+        break;
-+    case SM501_2D_CLIP_BR:
-+        s->twoD_clip_br = value;
-+        break;
-+    case SM501_2D_MONO_PATTERN_LOW:
-+        s->twoD_mono_pattern_low = value;
-+        break;
-+    case SM501_2D_MONO_PATTERN_HIGH:
-+        s->twoD_mono_pattern_high = value;
-+        break;
-     case SM501_2D_WINDOW_WIDTH:
-         s->twoD_window_width = value;
-         break;
-@@ -1196,6 +1291,15 @@ static void sm501_2d_engine_write(void *opaque, hwaddr addr,
-     case SM501_2D_DESTINATION_BASE:
-         s->twoD_destination_base = value;
-         break;
-+    case SM501_2D_ALPHA:
-+        s->twoD_alpha = value;
-+        break;
-+    case SM501_2D_WRAP:
-+        s->twoD_wrap = value;
-+        break;
-+    case SM501_2D_STATUS:
-+        /* ignored, writing 0 should clear interrupt status */
-+        break;
-     default:
-         printf("sm501 2d engine : not implemented register write."
-                " addr=%x, val=%x\n", (int)addr, (unsigned)value);
-@@ -1454,6 +1558,7 @@ static void sm501_reset(SM501State *s)
-     s->misc_timing = 0;
-     s->power_mode_control = 0;
+-void sm501_init(MemoryRegion *address_space_mem, uint32_t base,
+-                uint32_t local_mem_bytes, qemu_irq irq, Chardev *chr)
++static void sm501_reset(SM501State *s)
+ {
+-    SM501State *s;
+-    DeviceState *dev;
+-    MemoryRegion *sm501_system_config = g_new(MemoryRegion, 1);
+-    MemoryRegion *sm501_disp_ctrl = g_new(MemoryRegion, 1);
+-    MemoryRegion *sm501_2d_engine = g_new(MemoryRegion, 1);
+-
+-    /* allocate management data region */
+-    s = g_new0(SM501State, 1);
+-    s->base = base;
+-    s->local_mem_size_index = get_local_mem_size_index(local_mem_bytes);
+-    SM501_DPRINTF("local mem size=%x. index=%d\n", get_local_mem_size(s),
+-                  s->local_mem_size_index);
+     s->system_control = 0x00100000; /* 2D engine FIFO empty */
+     /* Bits 17 (SH), 7 (CDR), 6:5 (Test), 2:0 (Bus) are all supposed
+      * to be determined at reset by GPIO lines which set config bits.
+@@ -1429,51 +1420,137 @@ void sm501_init(MemoryRegion *address_space_mem, uint32_t base,
+      *  BUS = 0 : Hitachi SH3/SH4
+      */
+     s->misc_control = SM501_MISC_DAC_POWER;
++    s->gpio_31_0_control = 0;
++    s->gpio_63_32_control = 0;
++    s->dram_control = 0;
+     s->arbitration_control = 0x05146732;
++    s->irq_mask = 0;
++    s->misc_timing = 0;
++    s->power_mode_control = 0;
      s->dc_panel_control = 0x00010000; /* FIFO level 3 */
-+    s->dc_video_control = 0;
      s->dc_crt_control = 0x00010000;
-     s->twoD_control = 0;
++    s->twoD_control = 0;
++}
++
++static void sm501_init(SM501State *s, DeviceState *dev, uint32_t base,
++                       uint32_t local_mem_bytes)
++{
++    s->base = base;
++    s->local_mem_size_index = get_local_mem_size_index(local_mem_bytes);
++    SM501_DPRINTF("sm501 local mem size=%x. index=%d\n", get_local_mem_size(s),
++                  s->local_mem_size_index);
++    if (get_local_mem_size(s) != local_mem_bytes) {
++        error_report("Warning: sm501 VRAM size adjusted to %" PRIu32,
++                     get_local_mem_size(s));
++    }
+ 
+-    /* allocate local memory */
+-    memory_region_init_ram(&s->local_mem_region, NULL, "sm501.local",
+-                           local_mem_bytes, &error_fatal);
++    /* local memory */
++    memory_region_init_ram(&s->local_mem_region, OBJECT(dev), "sm501.local",
++                           get_local_mem_size(s), &error_fatal);
+     vmstate_register_ram_global(&s->local_mem_region);
+     memory_region_set_log(&s->local_mem_region, true, DIRTY_MEMORY_VGA);
+     s->local_mem = memory_region_get_ram_ptr(&s->local_mem_region);
+-    memory_region_add_subregion(address_space_mem, base, &s->local_mem_region);
+-
+-    /* map mmio */
+-    memory_region_init_io(sm501_system_config, NULL, &sm501_system_config_ops,
+-                          s, "sm501-system-config", 0x6c);
+-    memory_region_add_subregion(address_space_mem, base + MMIO_BASE_OFFSET,
+-                                sm501_system_config);
+-    memory_region_init_io(sm501_disp_ctrl, NULL, &sm501_disp_ctrl_ops, s,
++
++    /* mmio */
++    memory_region_init(&s->mmio_region, OBJECT(dev), "sm501.mmio", MMIO_SIZE);
++    memory_region_init_io(&s->system_config_region, OBJECT(dev),
++                          &sm501_system_config_ops, s,
++                          "sm501-system-config", 0x6c);
++    memory_region_add_subregion(&s->mmio_region, SM501_SYS_CONFIG,
++                                &s->system_config_region);
++    memory_region_init_io(&s->disp_ctrl_region, OBJECT(dev),
++                          &sm501_disp_ctrl_ops, s,
+                           "sm501-disp-ctrl", 0x1000);
+-    memory_region_add_subregion(address_space_mem,
+-                                base + MMIO_BASE_OFFSET + SM501_DC,
+-                                sm501_disp_ctrl);
+-    memory_region_init_io(sm501_2d_engine, NULL, &sm501_2d_engine_ops, s,
++    memory_region_add_subregion(&s->mmio_region, SM501_DC,
++                                &s->disp_ctrl_region);
++    memory_region_init_io(&s->twoD_engine_region, OBJECT(dev),
++                          &sm501_2d_engine_ops, s,
+                           "sm501-2d-engine", 0x54);
+-    memory_region_add_subregion(address_space_mem,
+-                                base + MMIO_BASE_OFFSET + SM501_2D_ENGINE,
+-                                sm501_2d_engine);
++    memory_region_add_subregion(&s->mmio_region, SM501_2D_ENGINE,
++                                &s->twoD_engine_region);
++
++    /* create qemu graphic console */
++    s->con = graphic_console_init(DEVICE(dev), 0, &sm501_ops, s);
++}
++
++#define TYPE_SYSBUS_SM501 "sysbus-sm501"
++#define SYSBUS_SM501(obj) \
++    OBJECT_CHECK(SM501SysBusState, (obj), TYPE_SYSBUS_SM501)
++
++typedef struct {
++    /*< private >*/
++    SysBusDevice parent_obj;
++    /*< public >*/
++    SM501State state;
++    uint32_t vram_size;
++    uint32_t base;
++    void *chr_state;
++} SM501SysBusState;
++
++static void sm501_realize_sysbus(DeviceState *dev, Error **errp)
++{
++    SM501SysBusState *s = SYSBUS_SM501(dev);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
++    DeviceState *usb_dev;
++
++    sm501_init(&s->state, dev, s->base, s->vram_size);
++    sysbus_init_mmio(sbd, &s->state.local_mem_region);
++    sysbus_init_mmio(sbd, &s->state.mmio_region);
+ 
+     /* bridge to usb host emulation module */
+-    dev = qdev_create(NULL, "sysbus-ohci");
+-    qdev_prop_set_uint32(dev, "num-ports", 2);
+-    qdev_prop_set_uint64(dev, "dma-offset", base);
+-    qdev_init_nofail(dev);
+-    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0,
+-                    base + MMIO_BASE_OFFSET + SM501_USB_HOST);
+-    sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, irq);
++    usb_dev = qdev_create(NULL, "sysbus-ohci");
++    qdev_prop_set_uint32(usb_dev, "num-ports", 2);
++    qdev_prop_set_uint64(usb_dev, "dma-offset", s->base);
++    qdev_init_nofail(usb_dev);
++    memory_region_add_subregion(&s->state.mmio_region, SM501_USB_HOST,
++                       sysbus_mmio_get_region(SYS_BUS_DEVICE(usb_dev), 0));
++    sysbus_pass_irq(sbd, SYS_BUS_DEVICE(usb_dev));
+ 
+     /* bridge to serial emulation module */
+-    if (chr) {
+-        serial_mm_init(address_space_mem,
+-                       base + MMIO_BASE_OFFSET + SM501_UART0, 2,
++    if (s->chr_state) {
++        serial_mm_init(&s->state.mmio_region, SM501_UART0, 2,
+                        NULL, /* TODO : chain irq to IRL */
+-                       115200, chr, DEVICE_NATIVE_ENDIAN);
++                       115200, s->chr_state, DEVICE_NATIVE_ENDIAN);
+     }
++}
+ 
+-    /* create qemu graphic console */
+-    s->con = graphic_console_init(DEVICE(dev), 0, &sm501_ops, s);
++static Property sm501_sysbus_properties[] = {
++    DEFINE_PROP_UINT32("vram-size", SM501SysBusState, vram_size, 0),
++    DEFINE_PROP_UINT32("base", SM501SysBusState, base, 0),
++    DEFINE_PROP_PTR("chr-state", SM501SysBusState, chr_state),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void sm501_reset_sysbus(DeviceState *dev)
++{
++    SM501SysBusState *s = SYSBUS_SM501(dev);
++    sm501_reset(&s->state);
  }
++
++static void sm501_sysbus_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->realize = sm501_realize_sysbus;
++    set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
++    dc->desc = "SM501 Multimedia Companion";
++    dc->props = sm501_sysbus_properties;
++    dc->reset = sm501_reset_sysbus;
++    /* Note: pointer property "chr-state" may remain null, thus
++     * no need for dc->cannot_instantiate_with_device_add_yet = true;
++     */
++}
++
++static const TypeInfo sm501_sysbus_info = {
++    .name          = TYPE_SYSBUS_SM501,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(SM501SysBusState),
++    .class_init    = sm501_sysbus_class_init,
++};
++
++static void sm501_register_types(void)
++{
++    type_register_static(&sm501_sysbus_info);
++}
++
++type_init(sm501_register_types)
+diff --git a/hw/sh4/r2d.c b/hw/sh4/r2d.c
+index 6d06968..8f520ce 100644
+--- a/hw/sh4/r2d.c
++++ b/hw/sh4/r2d.c
+@@ -277,8 +277,15 @@ static void r2d_init(MachineState *machine)
+     sysbus_connect_irq(busdev, 2, irq[PCI_INTC]);
+     sysbus_connect_irq(busdev, 3, irq[PCI_INTD]);
+ 
+-    sm501_init(address_space_mem, 0x10000000, SM501_VRAM_SIZE,
+-               irq[SM501], serial_hds[2]);
++    dev = qdev_create(NULL, "sysbus-sm501");
++    busdev = SYS_BUS_DEVICE(dev);
++    qdev_prop_set_uint32(dev, "vram-size", SM501_VRAM_SIZE);
++    qdev_prop_set_uint32(dev, "base", 0x10000000);
++    qdev_prop_set_ptr(dev, "chr-state", serial_hds[2]);
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(busdev, 0, 0x10000000);
++    sysbus_mmio_map(busdev, 1, 0x13e00000);
++    sysbus_connect_irq(busdev, 0, irq[SM501]);
+ 
+     /* onboard CF (True IDE mode, Master only). */
+     dinfo = drive_get(IF_IDE, 0, 0);
+diff --git a/include/hw/devices.h b/include/hw/devices.h
+index 7475b71..861ddea 100644
+--- a/include/hw/devices.h
++++ b/include/hw/devices.h
+@@ -62,9 +62,4 @@ void tc6393xb_gpio_out_set(TC6393xbState *s, int line,
+ qemu_irq *tc6393xb_gpio_in_get(TC6393xbState *s);
+ qemu_irq tc6393xb_l3v_get(TC6393xbState *s);
+ 
+-/* sm501.c */
+-void sm501_init(struct MemoryRegion *address_space_mem, uint32_t base,
+-                uint32_t local_mem_bytes, qemu_irq irq,
+-                Chardev *chr);
+-
+ #endif
 -- 
 2.7.4
