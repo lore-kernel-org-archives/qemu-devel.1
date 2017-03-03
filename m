@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54898)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cjlGb-0004X3-9P
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 06:20:58 -0500
+	(envelope-from <ppandit@redhat.com>) id 1cjlKk-0006y3-Mh
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 06:25:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cjlGW-0007uv-Sv
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 06:20:57 -0500
-Received: from mailapp01.imgtec.com ([195.59.15.196]:40887)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cjlGW-0007uc-G4
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 06:20:52 -0500
-From: Yongbok Kim <yongbok.kim@imgtec.com>
-Date: Fri, 3 Mar 2017 11:20:21 +0000
-Message-ID: <1488540021-35506-1-git-send-email-yongbok.kim@imgtec.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] target/mips: hold BQL for timer interrupts
+	(envelope-from <ppandit@redhat.com>) id 1cjlKg-0001BN-Oi
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 06:25:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40814)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1cjlKg-0001AG-Ij
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 06:25:10 -0500
+From: P J P <ppandit@redhat.com>
+Date: Fri,  3 Mar 2017 16:55:03 +0530
+Message-Id: <20170303112503.32277-1-ppandit@redhat.com>
+Subject: [Qemu-devel] [PATCH] linux-user: limit number of arguments to execve
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,89 +21,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Qemu Developers <qemu-devel@nongnu.org>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Jann Horn <jannh@google.com>, Prasad J Pandit <pjp@fedoraproject.org>
 
-Hold BQL when accessing timer which can cause interrupts
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
-Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
+Limit the number of arguments passed to execve(2) call from
+a user program, as large number of them could lead to a bad
+guest address error.
+
+Reported-by: Jann Horn <jannh@google.com>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 ---
- target/mips/op_helper.c | 21 ++++++++++++++++++---
- 1 file changed, 18 insertions(+), 3 deletions(-)
+ linux-user/syscall.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index b683fcb..e5f3ea4 100644
---- a/target/mips/op_helper.c
-+++ b/target/mips/op_helper.c
-@@ -17,6 +17,7 @@
-  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-  */
- #include "qemu/osdep.h"
-+#include "qemu/main-loop.h"
- #include "cpu.h"
- #include "qemu/host-utils.h"
- #include "exec/helper-proto.h"
-@@ -827,7 +828,11 @@ target_ulong helper_mftc0_tcschefback(CPUMIPSState *env)
- 
- target_ulong helper_mfc0_count(CPUMIPSState *env)
- {
--    return (int32_t)cpu_mips_get_count(env);
-+    int32_t count;
-+    qemu_mutex_lock_iothread();
-+    count = (int32_t) cpu_mips_get_count(env);
-+    qemu_mutex_unlock_iothread();
-+    return count;
- }
- 
- target_ulong helper_mftc0_entryhi(CPUMIPSState *env)
-@@ -1375,7 +1380,9 @@ void helper_mtc0_hwrena(CPUMIPSState *env, target_ulong arg1)
- 
- void helper_mtc0_count(CPUMIPSState *env, target_ulong arg1)
- {
-+    qemu_mutex_lock_iothread();
-     cpu_mips_store_count(env, arg1);
-+    qemu_mutex_unlock_iothread();
- }
- 
- void helper_mtc0_entryhi(CPUMIPSState *env, target_ulong arg1)
-@@ -1424,7 +1431,9 @@ void helper_mttc0_entryhi(CPUMIPSState *env, target_ulong arg1)
- 
- void helper_mtc0_compare(CPUMIPSState *env, target_ulong arg1)
- {
-+    qemu_mutex_lock_iothread();
-     cpu_mips_store_compare(env, arg1);
-+    qemu_mutex_unlock_iothread();
- }
- 
- void helper_mtc0_status(CPUMIPSState *env, target_ulong arg1)
-@@ -1475,7 +1484,9 @@ void helper_mtc0_srsctl(CPUMIPSState *env, target_ulong arg1)
- 
- void helper_mtc0_cause(CPUMIPSState *env, target_ulong arg1)
- {
-+    qemu_mutex_lock_iothread();
-     cpu_mips_store_cause(env, arg1);
-+    qemu_mutex_unlock_iothread();
- }
- 
- void helper_mttc0_cause(CPUMIPSState *env, target_ulong arg1)
-@@ -2296,12 +2307,16 @@ target_ulong helper_rdhwr_synci_step(CPUMIPSState *env)
- 
- target_ulong helper_rdhwr_cc(CPUMIPSState *env)
- {
-+    int32_t count;
-     check_hwrena(env, 2, GETPC());
- #ifdef CONFIG_USER_ONLY
--    return env->CP0_Count;
-+    count = env->CP0_Count;
- #else
--    return (int32_t)cpu_mips_get_count(env);
-+    qemu_mutex_lock_iothread();
-+    count = (int32_t)cpu_mips_get_count(env);
-+    qemu_mutex_unlock_iothread();
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 9be8e95..c545c12 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -7766,6 +7766,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
  #endif
-+    return count;
- }
+     case TARGET_NR_execve:
+         {
++#define ARG_MAX 65535
+             char **argp, **envp;
+             int argc, envc;
+             abi_ulong gp;
+@@ -7794,6 +7795,12 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+                 envc++;
+             }
  
- target_ulong helper_rdhwr_ccres(CPUMIPSState *env)
++            if (argc > ARG_MAX || envc > ARG_MAX) {
++                fprintf(stderr,
++                        "argc(%d), envc(%d) exceed %d\n", argc, envc, ARG_MAX);
++                ret = -TARGET_EFAULT;
++                break;
++            }
+             argp = alloca((argc + 1) * sizeof(void *));
+             envp = alloca((envc + 1) * sizeof(void *));
+ 
 -- 
-2.7.4
+2.9.3
