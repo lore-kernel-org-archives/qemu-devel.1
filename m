@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cjg0q-0001S0-CD
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 00:44:21 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1cjg0r-0001S1-D5
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 00:44:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cjg0l-0006Qg-Fc
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 00:44:20 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1cjg0q-0006Rq-HS
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 00:44:21 -0500
 Received: from mga01.intel.com ([192.55.52.88]:50436)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1cjg0l-0006Q0-5J
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 00:44:15 -0500
+	id 1cjg0q-0006Q0-8R
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 00:44:20 -0500
 From: Wei Wang <wei.w.wang@intel.com>
-Date: Fri,  3 Mar 2017 13:40:25 +0800
-Message-Id: <1488519630-89058-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v7 kernel 0/5] Extend virtio-balloon for fast
- (de)inflating & fast live migration
+Date: Fri,  3 Mar 2017 13:40:27 +0800
+Message-Id: <1488519630-89058-3-git-send-email-wei.w.wang@intel.com>
+In-Reply-To: <1488519630-89058-1-git-send-email-wei.w.wang@intel.com>
+References: <1488519630-89058-1-git-send-email-wei.w.wang@intel.com>
+Subject: [Qemu-devel] [PATCH v7 kernel 2/5] virtio-balloon:
+ VIRTIO_BALLOON_F_CHUNK_TRANSFER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,22 +26,15 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: virtio-dev@lists.oasis-open.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, linux-mm@kvack.org
-Cc: Wei Wang <wei.w.wang@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Amit Shah <amit.shah@redhat.com>, Dave Hansen <dave.hansen@intel.com>, Andrea Arcangeli <aarcange@redhat.com>, David Hildenbrand <david@redhat.com>, Liang Li <liliang324@gmail.com>
+Cc: Liang Li <liang.z.li@intel.com>, Wei Wang <wei.w.wang@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Amit Shah <amit.shah@redhat.com>, Dave Hansen <dave.hansen@intel.com>, Andrea Arcangeli <aarcange@redhat.com>, David Hildenbrand <david@redhat.com>, Liang Li <liliang324@gmail.com>
 
-Take over this work from Liang.
+From: Liang Li <liang.z.li@intel.com>
 
-This patch series implements two optimizations: 1) transfer pages in chuncks
-between the guest and host; 1) transfer the guest unused pages to the host so
-that they can be skipped to migrate in live migration.
+Add a new feature bit, VIRTIO_BALLOON_F_CHUNK_TRANSFER. Please check
+the implementation patch commit for details about this feature.
 
-Please check patch 0003 for more details about optimization 1).
-
-For an idle guest with 8GB RAM, optimization 2) can help shorten the total live
-migration time from 2Sec to about 500ms in 10Gbps network
-environment. For a guest with quite a lot of page cache and little
-unused pages, it's possible to let the guest drop its page cache before
-live migration, this case can benefit from this new feature too.
-
+Signed-off-by: Liang Li <liang.z.li@intel.com>
+Signed-off-by: Wei Wang <wei.w.wang@intel.com>
 Cc: Michael S. Tsirkin <mst@redhat.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
@@ -49,19 +44,41 @@ Cc: Andrea Arcangeli <aarcange@redhat.com>
 Cc: David Hildenbrand <david@redhat.com>
 Cc: Liang Li <liliang324@gmail.com>
 Cc: Wei Wang <wei.w.wang@intel.com>
+---
+ include/uapi/linux/virtio_balloon.h | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-Liang Li (5):
-  virtio-balloon: rework deflate to add page to a list
-  virtio-balloon: VIRTIO_BALLOON_F_CHUNK_TRANSFER
-  virtio-balloon: implementation of VIRTIO_BALLOON_F_CHUNK_TRANSFER
-  virtio-balloon: define flags and head for host request vq
-  This patch contains two parts:
-
- drivers/virtio/virtio_balloon.c     | 510 ++++++++++++++++++++++++++++++++----
- include/linux/mm.h                  |   3 +
- include/uapi/linux/virtio_balloon.h |  34 +++
- mm/page_alloc.c                     | 120 +++++++++
- 4 files changed, 620 insertions(+), 47 deletions(-)
-
+diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/virtio_balloon.h
+index 343d7dd..ed627b2 100644
+--- a/include/uapi/linux/virtio_balloon.h
++++ b/include/uapi/linux/virtio_balloon.h
+@@ -34,10 +34,14 @@
+ #define VIRTIO_BALLOON_F_MUST_TELL_HOST	0 /* Tell before reclaiming pages */
+ #define VIRTIO_BALLOON_F_STATS_VQ	1 /* Memory Stats virtqueue */
+ #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM	2 /* Deflate balloon on OOM */
++#define VIRTIO_BALLOON_F_CHUNK_TRANSFER	3 /* Transfer pages in chunks */
+ 
+ /* Size of a PFN in the balloon interface. */
+ #define VIRTIO_BALLOON_PFN_SHIFT 12
+ 
++/* Shift to get a chunk size */
++#define VIRTIO_BALLOON_CHUNK_SIZE_SHIFT 12
++
+ struct virtio_balloon_config {
+ 	/* Number of pages host wants Guest to give up. */
+ 	__u32 num_pages;
+@@ -82,4 +86,12 @@ struct virtio_balloon_stat {
+ 	__virtio64 val;
+ } __attribute__((packed));
+ 
++/* Response header structure */
++struct virtio_balloon_resp_hdr {
++	u8 cmd;
++	u8 flag;
++	__le16 id; /* cmd id */
++	__le32 data_len; /* Payload len in bytes */
++};
++
+ #endif /* _LINUX_VIRTIO_BALLOON_H */
 -- 
 2.7.4
