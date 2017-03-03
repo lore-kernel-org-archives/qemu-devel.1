@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cjqks-00053u-7O
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 12:12:35 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cjqmk-0005vC-2I
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 12:14:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cjqko-0001jh-C8
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 12:12:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52320)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cjqko-0001j7-31
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 12:12:30 -0500
-Date: Fri, 3 Mar 2017 17:12:22 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170303171222.GK13631@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1488517304-23131-1-git-send-email-he.chen@linux.intel.com>
-	<20170303135704.GX2778@thinpad.lan.raisama.net>
-	<d93b2ebb-c5a3-a774-30fd-2d92c7703549@redhat.com>
-	<20170303162611.GE13631@redhat.com>
-	<20170303164751.GY2778@thinpad.lan.raisama.net>
-	<20170303165218.GI13631@redhat.com>
-	<20170303171050.GA2778@thinpad.lan.raisama.net>
+	(envelope-from <peter.maydell@linaro.org>) id 1cjqmj-0002Kb-9v
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 12:14:30 -0500
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:35866)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cjqmj-0002KF-3e
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 12:14:29 -0500
+Received: by mail-wr0-x232.google.com with SMTP id u108so78012003wrb.3
+	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 09:14:29 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170303171050.GA2778@thinpad.lan.raisama.net>
-Subject: Re: [Qemu-devel] [RFC] x86: Allow to set NUMA distance for
- different NUMA nodes
+In-Reply-To: <1488491046-2549-1-git-send-email-armbru@redhat.com>
+References: <1488491046-2549-1-git-send-email-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 Mar 2017 17:14:07 +0000
+Message-ID: <CAFEAcA-XqZb22ov-PxxGJ8EnF-Yj+m-FETPY0n1kUcZDmskqxA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH 00/15] block: A bunch of fixes for Sheepdog
+ and Gluster
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,131 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, He Chen <he.chen@linux.intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Jeff Cody <jcody@redhat.com>, Qemu-block <qemu-block@nongnu.org>, namei.unix@gmail.com
 
-On Fri, Mar 03, 2017 at 02:10:50PM -0300, Eduardo Habkost wrote:
-> On Fri, Mar 03, 2017 at 04:52:18PM +0000, Daniel P. Berrange wrote:
-> > On Fri, Mar 03, 2017 at 01:47:51PM -0300, Eduardo Habkost wrote:
-> > > On Fri, Mar 03, 2017 at 04:26:12PM +0000, Daniel P. Berrange wrote:
-> > > > On Fri, Mar 03, 2017 at 10:09:22AM -0600, Eric Blake wrote:
-> > > > > On 03/03/2017 07:57 AM, Eduardo Habkost wrote:
-> > > > > 
-> > > > > >> With this patch, when a user wants to create a guest that contains
-> > > > > >> several vNUMA nodes and also wants to set distance among those nodes,
-> > > > > >> the QEMU command would like:
-> > > > > >>
-> > > > > >> ```
-> > > > > >> -object memory-backend-ram,size=1G,prealloc=yes,host-nodes=0,policy=bind,id=node0 \
-> > > > > >> -numa node,nodeid=0,cpus=0,memdev=node0,distance=10,distance=21,distance=31,distance=41 \
-> > > > > 
-> > > > > > 
-> > > > > > It would be nice to have a more intuitive syntax to represent
-> > > > > > ordered lists in QemuOpts. But this is what we have today.
-> > > > > > 
-> > > > > 
-> > > > > Markus has the discussion on representing arrays via the command line;
-> > > > > particularly since this array is very tightly coupled to the order in
-> > > > > which values are presented, it may be worth having:
-> > > > > 
-> > > > > -numa
-> > > > > node,nodeid=0,cpus=0,memdev=nod0,distance.0=10,distance.1=21,distance.2=31,distance.3=41
-> > > > > 
-> > > > > with the explicit distance.0= suffixes to distance making it more
-> > > > > obvious that we are dealing with an array.
-> > > > > 
-> > > > > > I think the proposal makes sense. I would like the semantics of the new option
-> > > > > > to be documented at qapi-schema.json and qemu-options.hx.
-> > > > > > 
-> > > > > > I would call the new NumaNodeOptions field "distances", as it is
-> > > > > > a list of distances.
-> > > > > 
-> > > > > Indeed, Markus is trying (with his work on -blockdev for 2.9) to get the
-> > > > > command line to a point where it is identical to the QMP code, by
-> > > > > reusing qapi-schema.json, so we should very much keep that in mind with
-> > > > > whatever we add to -numa in 2.10.
-> > > > > 
-> > > > > 
-> > > > > > but in the future we could support something like:
-> > > > > > 
-> > > > > >   -numa node,nodeid=0,cpus=0,memdev=node0 \
-> > > > > >   -numa node,nodeid=1,cpus=1,memdev=node1 \
-> > > > > >   -numa node,nodeid=2,cpus=2,memdev=node2 \
-> > > > > >   -numa node,nodeid=3,cpus=3,memdev=node3 \
-> > > > > >   -numa distances,distances[0][0]=10,distances[0][1]=21,distances[0][2]=31,distances[0][3]=41,\
-> > > > > >                   distances[1][0]=21,distances[1][1]=10,distances[1][2]=21,distances[1][3]=31,\
-> > > > > >                   distances[2][0]=31,distances[2][1]=21,distances[2][2]=10,distances[2][3]=21,\
-> > > > > >                   distances[3][0]=41,distances[3][1]=31,distances[3][2]=21,distances[3][3]=10
-> > > > > 
-> > > > > Except that [] requires special shell quoting, so the proposal would be
-> > > > > more like:
-> > > > > 
-> > > > > -numa distances.0.0=10,distances.0.1=21
-> > > > > 
-> > > > > Right now, QMP doesn't support 2-D arrays (although this may be a good
-> > > > > reason to introduce support), so that's also something to think about
-> > > > > (not insurmountable, but makes the task more complex).
-> > > > 
-> > > > What I don't like about this syntax is that it is duplicating information
-> > > > twice. IIUC the NUMA distance information is unidirectional, so specifying
-> > > > the same data for both direetions (node 0 -> node 3, and node 3 -> node 0)
-> > > > looks like overkill. Also the self-node distance isi defined to always be
-> > > > 10 IIUC, so specifying that is not required. IOW, could cut down the data
-> > > > we need to provider to just
-> > > > 
-> > > >    -numa distances,nodea=0,nodeb=1,value=20
-> > > >    -numa distances,nodea=0,nodeb=2,value=20
-> > > >    -numa distances,nodea=0,nodeb=3,value=20
-> > > >    -numa distances,nodea=1,nodeb=2,value=20
-> > > >    -numa distances,nodea=1,nodeb=3,value=20
-> > > >    -numa distances,nodea=2,nodeb=3,value=20
-> > > 
-> > > The ACPI spec (I'm looking at revision 5.0) explicitly mentions
-> > > that A->B distance may be different from B->A distrance:
-> > > 
-> > > "The entry value is a one-byte unsigned integer. The relative
-> > > distance from System Locality i to System Locality j is the
-> > > i*N + j entry in the matrix, where N is the number of System
-> > > Localities.  Except for the relative distance from a System
-> > > Locality to itself, each relative distance is stored twice in the
-> > > matrix. This provides the capability to describe the scenario
-> > > where the relative distances for the two directions between
-> > > System Localities is different."
-> > 
-> > Ah interesting, learn something new every day ? I've only made
-> > that unidirectional assumption for the last 10 years ;-P
-> > 
-> > > But I agree we could figure out a more compact syntax for more
-> > > common cases where self-node distance is 10 and distance is the
-> > > same both ways.
-> > 
-> > QAPI would need a specialized numeric matrix type, which we could
-> > efficiently map into some CLI syntax, in order to avoid needing to
-> > tickle the rather verbose general purpose list syntax. Probably
-> > not worth the hassle though - rather than just picking shorter
-> > variable names eg
-> > 
-> >   -numa dist,a=0,b=1,val=3
-> > 
-> > instead of
-> > 
-> >   -numa distances,nodea=0,nodeb=1,value=20
-> 
-> Whatever syntax/names we choose, we could have reasonable
-> defaults for omitted values:
-> 
-> * If A->B is set and B->A is omitted, use the same value for both
->   A->B and B->A
-> * If A->A is omitted, use min(10, configured_distances)
+On 2 March 2017 at 21:43, Markus Armbruster <armbru@redhat.com> wrote:
+> Bad error handling, memory leaks, and lack of blockdev-add support.
+>
+> Markus Armbruster (15):
+>   sheepdog: Defuse time bomb in sd_open() error handling
+>   sheepdog: Fix error handling in sd_snapshot_delete()
+>   sheepdog: Fix error handling sd_create()
+>   sheepdog: Mark sd_snapshot_delete() lossage FIXME
+>   sheepdog: Fix snapshot ID parsing in _open(), _create, _goto()
+>   sheepdog: Don't truncate long VDI name in _open(), _create()
+>   sheepdog: Report errors in pseudo-filename more usefully
+>   sheepdog: Use SocketAddress and socket_connect()
+>   sheepdog: Implement bdrv_parse_filename()
+>   gluster: Drop assumptions on SocketTransport names
+>   gluster: Don't duplicate qapi-util.c's qapi_enum_parse()
+>   gluster: Plug memory leaks in qemu_gluster_parse_json()
+>   qapi-schema: Rename GlusterServer to SocketAddressFlat
+>   qapi-schema: Rename SocketAddressFlat's variant tcp to inet
+>   sheepdog: Support blockdev-add
+>
+>  block/gluster.c      | 127 +++++++--------
+>  block/sheepdog.c     | 436 +++++++++++++++++++++++++++++++++++++--------------
+>  qapi-schema.json     |  38 +++++
+>  qapi/block-core.json |  73 +++------
+>  4 files changed, 443 insertions(+), 231 deletions(-)
 
-That would be nice for humans, but from libvirt POV, I doubt we'd
-use that since it'd involve us adding special case code for no
-particular benefit. 
+Did you find these by looking at our Coverity results, or
+cross-reference them against Coverity? (Coverity definitely
+found the gluster leaks, for instance.)
 
-
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+thanks
+-- PMM
