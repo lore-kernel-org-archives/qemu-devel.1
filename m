@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cjhDJ-0002KJ-Im
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 02:01:18 -0500
+	(envelope-from <ndevos@redhat.com>) id 1cjhNF-0004Eg-4t
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 02:11:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cjhDI-0006zV-PX
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 02:01:17 -0500
-Received: from 6.mo173.mail-out.ovh.net ([46.105.43.93]:33178)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cjhDI-0006w3-JQ
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 02:01:16 -0500
-Received: from player726.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 7788E16EA7
-	for <qemu-devel@nongnu.org>; Fri,  3 Mar 2017 08:01:07 +0100 (CET)
-Date: Fri, 3 Mar 2017 08:01:01 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170303080101.69703246@bahia.lan>
-In-Reply-To: <20170303021109.GA11833@stefanha-x1.localdomain>
-References: <20170301115026.22621-1-stefanha@redhat.com>
-	<20170301222748.2c7a3ead@bahia.lan>
-	<20170303021109.GA11833@stefanha-x1.localdomain>
+	(envelope-from <ndevos@redhat.com>) id 1cjhNE-0001ai-3x
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 02:11:33 -0500
+Date: Thu, 2 Mar 2017 23:11:25 -0800
+From: Niels de Vos <ndevos@redhat.com>
+Message-ID: <20170303071125.GS16140@ndevos-x240.usersys.redhat.com>
+References: <1488491046-2549-1-git-send-email-armbru@redhat.com>
+	<1488491046-2549-13-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/A3tLBDEWTJ/TVLAd=A0bzUv";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 0/3] throttle: improve
- command-line parameter documentation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1488491046-2549-13-git-send-email-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 12/15] gluster: Plug memory
+ leaks in qemu_gluster_parse_json()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,83 +24,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Nini Gu <ngu@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mitake.hitoshi@lab.ntt.co.jp, qemu-block@nongnu.org, namei.unix@gmail.com
 
---Sig_/A3tLBDEWTJ/TVLAd=A0bzUv
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Thu, Mar 02, 2017 at 10:44:03PM +0100, Markus Armbruster wrote:
+> To reproduce, run
+> 
+>     $ valgrind qemu-system-x86_64 --nodefaults -S --drive driver=gluster,volume=testvol,path=/a/b/c,server.0.type=xxx
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  block/gluster.c | 28 ++++++++++++++--------------
+>  1 file changed, 14 insertions(+), 14 deletions(-)
+> 
+> diff --git a/block/gluster.c b/block/gluster.c
+> index 6fbcf9e..35a7abb 100644
+> --- a/block/gluster.c
+> +++ b/block/gluster.c
+> @@ -480,7 +480,7 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+>                                    QDict *options, Error **errp)
+>  {
+>      QemuOpts *opts;
+> -    GlusterServer *gsconf;
+> +    GlusterServer *gsconf = NULL;
+>      GlusterServerList *curr = NULL;
+>      QDict *backing_options = NULL;
+>      Error *local_err = NULL;
+> @@ -529,17 +529,16 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+>          }
+>  
+>          ptr = qemu_opt_get(opts, GLUSTER_OPT_TYPE);
+> +        if (!ptr) {
+> +            error_setg(&local_err, QERR_MISSING_PARAMETER, GLUSTER_OPT_TYPE);
+> +            error_append_hint(&local_err, GERR_INDEX_HINT, i);
+> +            goto out;
+> +
+> +        }
+>          gsconf = g_new0(GlusterServer, 1);
+>          gsconf->type = qapi_enum_parse(GlusterTransport_lookup, ptr,
+> -                                       GLUSTER_TRANSPORT__MAX,
+> -                                       GLUSTER_TRANSPORT__MAX,
+> +                                       GLUSTER_TRANSPORT__MAX, 0,
 
-On Fri, 3 Mar 2017 10:11:09 +0800
-Stefan Hajnoczi <stefanha@gmail.com> wrote:
+What is the reason to set the default to 0 and not the more readable
+GLUSTER_TRANSPORT_UNIX?
 
-> On Wed, Mar 01, 2017 at 10:27:48PM +0100, Greg Kurz wrote:
-> > On Wed,  1 Mar 2017 11:50:23 +0000
-> > Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> >  =20
-> > > v3:
-> > >  * Added Patch 2 to fix invalid test parameters
-> > >  * Switched to nicer max < avg check [Berto]
-> > > v2:
-> > >  * Fixed s/bps/iops/ copy-paste error in Patch 1 [Berto]
-> > >  * Rephrased warning about guest hangs and errors [Berto]
-> > >  * Added Patch 2 to hide the internal .max value from the monitor
-> > >=20
-> > > Patch 1 fleshes out the documentation for I/O throttling command-line
-> > > parameters.
-> > >=20
-> > > Patch 2 hides an internal value that was being exposed to users via t=
-he
-> > > monitor and caused confusion.
-> > >=20
-> > > I ended up not adding QMP-style throttling.* names to the command-line
-> > > documentation because the names are very long and unlikely to be used=
-.  I
-> > > couldn't see a nice way of adding them while still keeping the docume=
-ntation
-> > > readable.
-> > >  =20
-> >=20
-> > I only see this series now and it's a bit unfortunate... throttling opt=
-ions
-> > are now also available for fsdev. Only QMP-style names were added thoug=
-h,
-> > and they appear in the documentation. I agree the names are long, and t=
-he
-> > result isn't pretty on 80 columns, but it is readable still.
-> >=20
-> > I don't really want to add code, just to have shorter names and a prett=
-ier
-> > output. But it would be a good thing for fsdev to benefit from this new
-> > documentation... any suggestion how to do that ? =20
->=20
-> I think another patch series would be good to:
-> 1. Document QMP-style names for -drive
-> 2. Reference throttling parameter documention in a common place for both
->    -fsdev and -drive.
->=20
-> I'll do that.  This is QEMU 2.10 material anyway (it has missed the
-> freeze deadline), so there's no time pressure.
->=20
-> Stefan
-
-Sure. Please Cc me when you do that.
-
-Thanks.
-
---
-Greg
-
---Sig_/A3tLBDEWTJ/TVLAd=A0bzUv
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAli5FK0ACgkQAvw66wEB28Jd+QCeJcHNa5qUvSBn9JleX4s5iEvn
-/4oAnijLmf1ZjUNhQI6FyKHUjd0y8BFi
-=tTSI
------END PGP SIGNATURE-----
-
---Sig_/A3tLBDEWTJ/TVLAd=A0bzUv--
+>                                         &local_err);
+> -        if (!ptr) {
+> -            error_setg(&local_err, QERR_MISSING_PARAMETER, GLUSTER_OPT_TYPE);
+> -            error_append_hint(&local_err, GERR_INDEX_HINT, i);
+> -            goto out;
+> -
+> -        }
+>          if (local_err) {
+>              error_append_hint(&local_err,
+>                                "Parameter '%s' may be 'tcp' or 'unix'\n",
+> @@ -626,8 +625,10 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+>              curr->next->value = gsconf;
+>              curr = curr->next;
+>          }
+> +        gsconf = NULL;
+>  
+> -        qdict_del(backing_options, str);
+> +        QDECREF(backing_options);
+> +        backing_options = NULL;
+>          g_free(str);
+>          str = NULL;
+>      }
+> @@ -636,11 +637,10 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+>  
+>  out:
+>      error_propagate(errp, local_err);
+> +    qapi_free_GlusterServer(gsconf);
+>      qemu_opts_del(opts);
+> -    if (str) {
+> -        qdict_del(backing_options, str);
+> -        g_free(str);
+> -    }
+> +    g_free(str);
+> +    QDECREF(backing_options);
+>      errno = EINVAL;
+>      return -errno;
+>  }
+> -- 
+> 2.7.4
+> 
+> 
