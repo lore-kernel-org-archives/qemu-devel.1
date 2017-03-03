@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44241)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cjdqV-000840-LL
+	(envelope-from <dgibson@ozlabs.org>) id 1cjdqV-00084R-Vp
 	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 22:25:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cjdqU-0001MC-8T
+	(envelope-from <dgibson@ozlabs.org>) id 1cjdqU-0001M5-6w
 	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 22:25:31 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  3 Mar 2017 14:24:58 +1100
-Message-Id: <20170303032507.16142-9-david@gibson.dropbear.id.au>
+Date: Fri,  3 Mar 2017 14:24:59 +1100
+Message-Id: <20170303032507.16142-10-david@gibson.dropbear.id.au>
 In-Reply-To: <20170303032507.16142-1-david@gibson.dropbear.id.au>
 References: <20170303032507.16142-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 08/17] target/ppc/POWER9: Add POWER9 pa-features
- definition
+Subject: [Qemu-devel] [PULL 09/17] target/ppc/POWER9: Add cpu_has_work
+ function for POWER9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,53 +25,84 @@ Cc: agraf@suse.de, sjitindarsingh@gmail.com, sam.bobroff@au1.ibm.com, qemu-ppc@n
 
 From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-Add a pa-features definition which includes all of the new fields which
-have been added, note we don't claim support for any of these new features
-at this stage.
+The cpu has work function is used to mask interrupts used to determine
+if there is work for the cpu based on the LPCR. Add a function to do this
+for POWER9 and add it to the POWER9 cpu definition. This is similar to that
+for POWER8 except using the LPCR bits as defined for POWER9.
 
 Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Acked-by: Balbir Singh <bsingharora@gmail.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ target/ppc/translate_init.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 1cc5e00..81e2ada 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -390,6 +390,20 @@ static void spapr_populate_pa_features(CPUPPCState *env, void *fdt, int offset)
-         0x80, 0x00, 0x00, 0x00, 0x00, 0x00,
-         0x00, 0x00, 0x00, 0x00, 0x80, 0x00,
-         0x80, 0x00, 0x80, 0x00, 0x00, 0x00 };
-+    /* Currently we don't advertise any of the "new" ISAv3.00 functionality */
-+    uint8_t pa_features_300[] = { 64, 0,
-+        0xf6, 0x1f, 0xc7, 0xc0, 0x80, 0xf0, /*  0 -  5 */
-+        0x80, 0x00, 0x00, 0x00, 0x00, 0x00, /*  6 - 11 */
-+        0x00, 0x00, 0x00, 0x00, 0x80, 0x00, /* 12 - 17 */
-+        0x80, 0x00, 0x80, 0x00, 0x00, 0x00, /* 18 - 23 */
-+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 24 - 29 */
-+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 30 - 35 */
-+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 36 - 41 */
-+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 42 - 47 */
-+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 48 - 53 */
-+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 54 - 59 */
-+        0x00, 0x00, 0x00, 0x00           }; /* 60 - 63 */
-+
-     uint8_t *pa_features;
-     size_t pa_size;
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index dc2f8eb..c1a9014 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -8858,10 +8858,54 @@ static bool ppc_pvr_match_power9(PowerPCCPUClass *pcc, uint32_t pvr)
+     return false;
+ }
  
-@@ -404,6 +418,10 @@ static void spapr_populate_pa_features(CPUPPCState *env, void *fdt, int offset)
-         pa_features = pa_features_207;
-         pa_size = sizeof(pa_features_207);
-         break;
-+    case POWERPC_MMU_3_00:
-+        pa_features = pa_features_300;
-+        pa_size = sizeof(pa_features_300);
-+        break;
-     default:
-         return;
-     }
++static bool cpu_has_work_POWER9(CPUState *cs)
++{
++    PowerPCCPU *cpu = POWERPC_CPU(cs);
++    CPUPPCState *env = &cpu->env;
++
++    if (cs->halted) {
++        if (!(cs->interrupt_request & CPU_INTERRUPT_HARD)) {
++            return false;
++        }
++        /* External Exception */
++        if ((env->pending_interrupts & (1u << PPC_INTERRUPT_EXT)) &&
++            (env->spr[SPR_LPCR] & LPCR_EEE)) {
++            return true;
++        }
++        /* Decrementer Exception */
++        if ((env->pending_interrupts & (1u << PPC_INTERRUPT_DECR)) &&
++            (env->spr[SPR_LPCR] & LPCR_DEE)) {
++            return true;
++        }
++        /* Machine Check or Hypervisor Maintenance Exception */
++        if ((env->pending_interrupts & (1u << PPC_INTERRUPT_MCK |
++            1u << PPC_INTERRUPT_HMI)) && (env->spr[SPR_LPCR] & LPCR_OEE)) {
++            return true;
++        }
++        /* Privileged Doorbell Exception */
++        if ((env->pending_interrupts & (1u << PPC_INTERRUPT_DOORBELL)) &&
++            (env->spr[SPR_LPCR] & LPCR_PDEE)) {
++            return true;
++        }
++        /* Hypervisor Doorbell Exception */
++        if ((env->pending_interrupts & (1u << PPC_INTERRUPT_HDOORBELL)) &&
++            (env->spr[SPR_LPCR] & LPCR_HDEE)) {
++            return true;
++        }
++        if (env->pending_interrupts & (1u << PPC_INTERRUPT_RESET)) {
++            return true;
++        }
++        return false;
++    } else {
++        return msr_ee && (cs->interrupt_request & CPU_INTERRUPT_HARD);
++    }
++}
++
+ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(oc);
+     PowerPCCPUClass *pcc = POWERPC_CPU_CLASS(oc);
++    CPUClass *cc = CPU_CLASS(oc);
+ 
+     dc->fw_name = "PowerPC,POWER9";
+     dc->desc = "POWER9";
+@@ -8872,6 +8916,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
+                          PCR_COMPAT_2_05;
+     pcc->init_proc = init_proc_POWER9;
+     pcc->check_pow = check_pow_nocheck;
++    cc->has_work = cpu_has_work_POWER9;
+     pcc->insns_flags = PPC_INSNS_BASE | PPC_ISEL | PPC_STRING | PPC_MFTB |
+                        PPC_FLOAT | PPC_FLOAT_FSEL | PPC_FLOAT_FRES |
+                        PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE |
 -- 
 2.9.3
