@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cjnd9-0000DZ-6h
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:52:24 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cjndA-0000EV-Gz
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:52:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cjnd5-0005rK-2n
+	(envelope-from <stefanha@redhat.com>) id 1cjnd9-0005s4-CX
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:52:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39642)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cjnd9-0005rt-4D
 	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:52:23 -0500
-Received: from greensocs.com ([193.104.36.180]:34683)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cjnd4-0005r9-Iv
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:52:19 -0500
-References: <1487362633-25018-1-git-send-email-fred.konrad@greensocs.com>
-	<1487362633-25018-5-git-send-email-fred.konrad@greensocs.com>
-	<20170303134451.GW9606@toto>
-From: Frederic Konrad <fred.konrad@greensocs.com>
-Message-ID: <f55061df-6e7a-acdb-3da5-0bf0185ab65b@greensocs.com>
-Date: Fri, 3 Mar 2017 14:52:14 +0100
-MIME-Version: 1.0
-In-Reply-To: <20170303134451.GW9606@toto>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V2 4/7] exec: allow to get a pointer for
- some mmio memory region
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Fri,  3 Mar 2017 21:51:49 +0800
+Message-Id: <20170303135150.12145-4-stefanha@redhat.com>
+In-Reply-To: <20170303135150.12145-1-stefanha@redhat.com>
+References: <20170303135150.12145-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [RFC 3/4] qemu-img: add max-size subcommand
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,202 +23,248 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Cc: qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, peter.maydell@linaro.org, mark.burton@greensocs.com, alistair.francis@xilinx.com, clg@kaod.org, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Nir Soffer <nsoffer@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 03/03/2017 02:44 PM, Edgar E. Iglesias wrote:
-> On Fri, Feb 17, 2017 at 09:17:10PM +0100, fred.konrad@greensocs.com wrote:
->> From: KONRAD Frederic <fred.konrad@greensocs.com>
->>
->> This introduces a special callback which allows to run code from some MMIO
->> devices.
->>
->> SysBusDevice with a MemoryRegion which implements the request_ptr callback will
->> be notified when the guest try to execute code from their offset. Then it will
->> be able to eg: pre-load some code from an SPI device or ask a pointer from an
->> external simulator, etc..
->>
->> When the pointer or the data in it are no longer valid the device has to
->> invalidate it.
->>
->> Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
->>
->> RFC -> V1:
->>   * Use mmio-interface instead of directly creating the subregion.
-> 
-> Hi Fred,
-> 
-> 
-> 
-> 
->> ---
->>  cputlb.c              |  7 +++++++
->>  include/exec/memory.h | 35 +++++++++++++++++++++++++++++++
->>  memory.c              | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++
->>  3 files changed, 99 insertions(+)
->>
->> diff --git a/cputlb.c b/cputlb.c
->> index 846341e..9077247 100644
->> --- a/cputlb.c
->> +++ b/cputlb.c
->> @@ -545,6 +545,13 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
->>      if (memory_region_is_unassigned(mr)) {
->>          CPUClass *cc = CPU_GET_CLASS(cpu);
->>  
->> +        if (memory_region_request_mmio_ptr(mr, addr)) {
->> +            /* A MemoryRegion is potentially added so re-run the
->> +             * get_page_addr_code.
->> +             */
->> +            return get_page_addr_code(env, addr);
->> +        }
->> +
->>          if (cc->do_unassigned_access) {
->>              cc->do_unassigned_access(cpu, addr, false, true, 0, 4);
->>          } else {
->> diff --git a/include/exec/memory.h b/include/exec/memory.h
->> index 987f925..36b0eec 100644
->> --- a/include/exec/memory.h
->> +++ b/include/exec/memory.h
->> @@ -120,6 +120,15 @@ struct MemoryRegionOps {
->>                                      uint64_t data,
->>                                      unsigned size,
->>                                      MemTxAttrs attrs);
->> +    /* Instruction execution pre-callback:
->> +     * @addr is the address of the access relative to the @mr.
->> +     * @size is the size of the area returned by the callback.
->> +     * @offset is the location of the pointer inside @mr.
->> +     *
->> +     * Returns a pointer to a location which contains guest code.
->> +     */
->> +    void *(*request_ptr)(void *opaque, hwaddr addr, unsigned *size,
->> +                         unsigned *offset);
->>  
->>      enum device_endian endianness;
->>      /* Guest-visible constraints: */
->> @@ -1253,6 +1262,32 @@ void memory_global_dirty_log_stop(void);
->>  void mtree_info(fprintf_function mon_printf, void *f, bool flatview);
->>  
->>  /**
->> + * memory_region_request_mmio_ptr: request a pointer to an mmio
->> + * MemoryRegion. If it is possible map a RAM MemoryRegion with this pointer.
->> + * When the device wants to invalidate the pointer it will call
->> + * memory_region_invalidate_mmio_ptr.
->> + *
->> + * @mr: #MemoryRegion to check
->> + * @addr: address within that region
->> + *
->> + * Returns true on success, false otherwise.
->> + */
->> +bool memory_region_request_mmio_ptr(MemoryRegion *mr, hwaddr addr);
->> +
->> +/**
->> + * memory_region_invalidate_mmio_ptr: invalidate the pointer to an mmio
->> + * previously requested.
->> + * In the end that means that if something wants to execute from this area it
->> + * will need to request the pointer again.
->> + *
->> + * @mr: #MemoryRegion associated to the pointer.
->> + * @addr: address within that region
->> + * @size: size of that area.
->> + */
->> +void memory_region_invalidate_mmio_ptr(MemoryRegion *mr, hwaddr offset,
->> +                                       unsigned size);
->> +
->> +/**
->>   * memory_region_dispatch_read: perform a read directly to the specified
->>   * MemoryRegion.
->>   *
->> diff --git a/memory.c b/memory.c
->> index 6c58373..a605250 100644
->> --- a/memory.c
->> +++ b/memory.c
->> @@ -30,6 +30,8 @@
->>  #include "exec/ram_addr.h"
->>  #include "sysemu/kvm.h"
->>  #include "sysemu/sysemu.h"
->> +#include "hw/misc/mmio_interface.h"
->> +#include "hw/qdev-properties.h"
->>  
->>  //#define DEBUG_UNASSIGNED
->>  
->> @@ -2375,6 +2377,61 @@ void memory_listener_unregister(MemoryListener *listener)
->>      QTAILQ_REMOVE(&listener->address_space->listeners, listener, link_as);
->>  }
->>  
->> +bool memory_region_request_mmio_ptr(MemoryRegion *mr, hwaddr addr)
->> +{
->> +    void *host;
->> +    unsigned size = 0;
->> +    unsigned offset = 0;
->> +    Object *new_interface;
->> +
->> +    if (!mr || !mr->ops->request_ptr) {
->> +        return false;
->> +    }
->> +
->> +    /*
->> +     * Avoid an update if the request_ptr call
->> +     * memory_region_invalidate_mmio_ptr which seems to be likely when we use
->> +     * a cache.
->> +     */
->> +    memory_region_transaction_begin();
->> +
->> +    host = mr->ops->request_ptr(mr->opaque, addr - mr->addr, &size, &offset);
->> +
->> +    if (!host || !size) {
->> +        memory_region_transaction_commit();
->> +        return false;
->> +    }
->> +
->> +    new_interface = object_new("mmio_interface");
->> +    qdev_prop_set_uint64(DEVICE(new_interface), "start", offset);
->> +    qdev_prop_set_uint64(DEVICE(new_interface), "end", offset + size - 1);
->> +    qdev_prop_set_bit(DEVICE(new_interface), "ro", true);
->> +    qdev_prop_set_ptr(DEVICE(new_interface), "host_ptr", host);
->> +    qdev_prop_set_ptr(DEVICE(new_interface), "subregion", mr);
->> +    object_property_set_bool(OBJECT(new_interface), true, "realized", NULL);
->> +
->> +    memory_region_transaction_commit();
->> +    return true;
->> +}
->> +
->> +void memory_region_invalidate_mmio_ptr(MemoryRegion *mr, hwaddr offset,
->> +                                       unsigned size)
->> +{
->> +    MemoryRegionSection section = memory_region_find(mr, offset, size);
->> +
->> +    if (section.mr != mr) {
->> +        /* memory_region_find add a ref on section.mr */
->> +        memory_region_unref(section.mr);
->> +        if (!MMIO_INTERFACE(section.mr->owner)) {
-> 
-> Is MMIO_INTERFACE defined yet?
-> This may break bisection...
+The max-size subcommand calculates the maximum size required by a new
+image file.  This can be used by users or management tools that need to
+allocate space on an LVM volume, SAN LUN, etc before creating or
+converting an image file.
 
-OOPS, your right :(..
-I'll resend with the right order!
+Suggested-by: Maor Lipchuk <mlipchuk@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ qemu-img.c       | 196 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ qemu-img-cmds.hx |   6 ++
+ 2 files changed, 202 insertions(+)
 
-Thanks!
-Fred
-
-> 
-> Cheers,
-> Edgar
-> 
-> 
->> +            return;
->> +        }
->> +        /* We found the interface just drop it. */
->> +        object_property_set_bool(section.mr->owner, false, "realized", NULL);
->> +        object_unref(section.mr->owner);
->> +        object_unparent(section.mr->owner);
->> +    }
->> +}
->> +
->>  void address_space_init(AddressSpace *as, MemoryRegion *root, const char *name)
->>  {
->>      memory_region_ref(root);
->> -- 
->> 1.8.3.1
->>
->>
+diff --git a/qemu-img.c b/qemu-img.c
+index 98b836b..f0a5a85 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -59,6 +59,7 @@ enum {
+     OPTION_PATTERN = 260,
+     OPTION_FLUSH_INTERVAL = 261,
+     OPTION_NO_DRAIN = 262,
++    OPTION_SIZE = 263,
+ };
+ 
+ typedef enum OutputFormat {
+@@ -4287,6 +4288,201 @@ out:
+     return 0;
+ }
+ 
++static int img_max_size(int argc, char **argv)
++{
++    static const struct option long_options[] = {
++        {"help", no_argument, 0, 'h'},
++        {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
++        {"object", required_argument, 0, OPTION_OBJECT},
++        {"output", required_argument, 0, OPTION_OUTPUT},
++        {"size", required_argument, 0, OPTION_SIZE},
++        {0, 0, 0, 0}
++    };
++    OutputFormat output_format = OFORMAT_HUMAN;
++    BlockBackend *in_blk = NULL;
++    BlockDriver *drv;
++    const char *filename = NULL;
++    const char *fmt = NULL;
++    const char *out_fmt = "raw";
++    char *options = NULL;
++    char *snapshot_name = NULL;
++    QemuOpts *opts = NULL;
++    QemuOpts *object_opts = NULL;
++    QemuOpts *sn_opts = NULL;
++    QemuOptsList *create_opts = NULL;
++    bool image_opts = false;
++    uint64_t img_size = ~0ULL;
++    uint64_t ret_size;
++    Error *local_err = NULL;
++    int ret = 1;
++    int c;
++
++    while ((c = getopt_long(argc, argv, "hf:O:o:l:",
++                            long_options, NULL)) != -1) {
++        switch (c) {
++        case '?':
++        case 'h':
++            help();
++            break;
++        case 'f':
++            fmt = optarg;
++            break;
++        case 'O':
++            out_fmt = optarg;
++            break;
++        case 'o':
++            if (!is_valid_option_list(optarg)) {
++                error_report("Invalid option list: %s", optarg);
++                goto fail;
++            }
++            if (!options) {
++                options = g_strdup(optarg);
++            } else {
++                char *old_options = options;
++                options = g_strdup_printf("%s,%s", options, optarg);
++                g_free(old_options);
++            }
++            break;
++        case 'l':
++            if (strstart(optarg, SNAPSHOT_OPT_BASE, NULL)) {
++                sn_opts = qemu_opts_parse_noisily(&internal_snapshot_opts,
++                                                  optarg, false);
++                if (!sn_opts) {
++                    error_report("Failed in parsing snapshot param '%s'",
++                                 optarg);
++                    goto fail;
++                }
++            } else {
++                snapshot_name = optarg;
++            }
++            break;
++        case OPTION_OBJECT:
++            object_opts = qemu_opts_parse_noisily(&qemu_object_opts,
++                                                  optarg, true);
++            if (!object_opts) {
++                goto fail;
++            }
++            break;
++        case OPTION_IMAGE_OPTS:
++            image_opts = true;
++            break;
++        case OPTION_OUTPUT:
++            if (!strcmp(optarg, "json")) {
++                output_format = OFORMAT_JSON;
++            } else if (!strcmp(optarg, "human")) {
++                output_format = OFORMAT_HUMAN;
++            } else {
++                error_report("--output must be used with human or json "
++                             "as argument.");
++                goto fail;
++            }
++            break;
++        case OPTION_SIZE:
++        {
++            int64_t sval;
++
++            sval = cvtnum(optarg);
++            if (sval < 0) {
++                if (sval == -ERANGE) {
++                    error_report("Image size must be less than 8 EiB!");
++                } else {
++                    error_report("Invalid image size specified! You may use "
++                                 "k, M, G, T, P or E suffixes for ");
++                    error_report("kilobytes, megabytes, gigabytes, terabytes, "
++                                 "petabytes and exabytes.");
++                }
++                goto fail;
++            }
++            img_size = (uint64_t)sval;
++        }
++        break;
++        }
++    }
++
++    if (qemu_opts_foreach(&qemu_object_opts,
++                          user_creatable_add_opts_foreach,
++                          NULL, NULL)) {
++        goto fail;
++    }
++
++    if (argc - optind > 1) {
++        error_report("At most one filename argument is allowed.");
++        goto fail;
++    } else if (argc - optind == 1) {
++        filename = argv[optind];
++    }
++
++    if (!filename &&
++        (object_opts || image_opts || fmt || snapshot_name || sn_opts)) {
++        error_report("--object, --image-opts, -f, and -l "
++                     "require a filename argument.");
++        goto fail;
++    }
++    if (filename && img_size != ~0ULL) {
++        error_report("--size N cannot be used together with a filename.");
++        goto fail;
++    }
++    if (!filename && img_size == ~0ULL) {
++        error_report("Either --size N or one filename must be specified.");
++        goto fail;
++    }
++
++    if (filename) {
++        in_blk = img_open(image_opts, filename, fmt, 0, false, false);
++        if (!in_blk) {
++            goto fail;
++        }
++    }
++
++    drv = bdrv_find_format(out_fmt);
++    if (!drv) {
++        error_report("Unknown file format '%s'", out_fmt);
++        goto fail;
++    }
++    if (!drv->create_opts) {
++        error_report("Format driver '%s' does not support image creation",
++                     drv->format_name);
++        goto fail;
++    }
++
++    create_opts = qemu_opts_append(create_opts, drv->create_opts);
++    opts = qemu_opts_create(create_opts, NULL, 0, &error_abort);
++    if (options) {
++        qemu_opts_do_parse(opts, options, NULL, &local_err);
++        if (local_err) {
++            error_report_err(local_err);
++            error_report("Invalid options for file format '%s'", out_fmt);
++            goto fail;
++        }
++    }
++    if (img_size != ~0ULL) {
++        qemu_opt_set_number(opts, BLOCK_OPT_SIZE, img_size, &error_abort);
++    }
++
++    ret_size = bdrv_max_size(drv, opts, in_blk ? blk_bs(in_blk) : NULL,
++                             &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++        goto fail;
++    }
++
++    if (output_format == OFORMAT_HUMAN) {
++        printf("%" PRIu64 "\n", ret_size);
++    } else {
++        printf("{ \"size\": %" PRIu64 " }\n", ret_size);
++    }
++
++    ret = 0;
++
++fail:
++    qemu_opts_del(object_opts);
++    qemu_opts_del(opts);
++    qemu_opts_del(sn_opts);
++    qemu_opts_free(create_opts);
++    g_free(options);
++    blk_unref(in_blk);
++    return ret;
++}
+ 
+ static const img_cmd_t img_cmds[] = {
+ #define DEF(option, callback, arg_string)        \
+diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+index 9c9702c..80997f9 100644
+--- a/qemu-img-cmds.hx
++++ b/qemu-img-cmds.hx
+@@ -87,3 +87,9 @@ STEXI
+ @item amend [--object @var{objectdef}] [--image-opts] [-p] [-q] [-f @var{fmt}] [-t @var{cache}] -o @var{options} @var{filename}
+ @end table
+ ETEXI
++
++DEF("max-size", img_max_size,
++"max-size [--output=ofmt] [-O output_fmt] [-o options] [--size N | [--object objectdef] [--image-opts] [-f fmt] [-l snapshot_param] filename]")
++STEXI
++TODO max-size documentation
++ETEXI
+-- 
+2.9.3
