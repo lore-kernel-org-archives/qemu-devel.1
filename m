@@ -1,39 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cjekd-0003VL-Tw
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 23:23:33 -0500
+	(envelope-from <peterx@redhat.com>) id 1cjf81-0007g8-83
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 23:47:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cjeka-0005Ey-Ot
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 23:23:31 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60441)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cjeka-0005Ef-Fo
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 23:23:28 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v234ImrG042317
-	for <qemu-devel@nongnu.org>; Thu, 2 Mar 2017 23:23:27 -0500
-Received: from e23smtp06.au.ibm.com (e23smtp06.au.ibm.com [202.81.31.148])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28xs8e3eup-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 02 Mar 2017 23:23:26 -0500
-Received: from localhost
-	by e23smtp06.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Fri, 3 Mar 2017 14:23:24 +1000
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <20170303035216.GQ4067@umbus.fritz.box>
-References: <1488463829-26839-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<18786e9b-277c-2a66-1662-55a9325a9d2c@twiddle.net>
-	<20170303035216.GQ4067@umbus.fritz.box>
-Date: Fri, 03 Mar 2017 09:52:27 +0530
+	(envelope-from <peterx@redhat.com>) id 1cjf7y-0004zo-59
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 23:47:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45900)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cjf7x-0004zI-Tl
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 23:47:38 -0500
+Date: Fri, 3 Mar 2017 12:47:31 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170303044731.GC20768@pxdev.xzpeter.org>
+References: <20170302215603.27630-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Message-Id: <87shmv2dmk.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [PATCH v2] target/ppc: rewrite f[n]m[add,
- sub] using float64_muladd
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170302215603.27630-1-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] memory: show region offset and ROM/RAM
+ type in "info mtree -f"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,41 +27,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, William Tambe <tambewilliam@gmail.com>
 
-David Gibson <david@gibson.dropbear.id.au> writes:
+On Thu, Mar 02, 2017 at 10:56:03PM +0100, Paolo Bonzini wrote:
+> "info mtree -f" output is currently hard to use for large RAM regions, because
+> there is no hint as to what part of the region is being mapped.  Add the offset
+> if it is nonzero.
+> 
+> Secondly, FlatView has a readonly field, that can override the MemoryRegion
+> in the presence of aliases.  Take it into account.
+> 
+> Together, with this patch this:
+> 
+> address-space (flat view): KVM-SMRAM
+>   0000000000000000-00000000000bffff (prio 0, ram): pc.ram
+>   00000000000c0000-00000000000c9fff (prio 0, ram): pc.ram
+>   00000000000ca000-00000000000ccfff (prio 0, ram): pc.ram
+>   00000000000cd000-00000000000ebfff (prio 0, ram): pc.ram
+>   00000000000ec000-00000000000effff (prio 0, ram): pc.ram
+>   00000000000f0000-00000000000fffff (prio 0, ram): pc.ram
+>   0000000000100000-00000000bfffffff (prio 0, ram): pc.ram
+>   00000000fd000000-00000000fdffffff (prio 1, ram): vga.vram
+>   00000000febc0000-00000000febdffff (prio 1, i/o): e1000-mmio
+>   00000000febf0400-00000000febf041f (prio 0, i/o): vga ioports remapped
+>   00000000febf0500-00000000febf0515 (prio 0, i/o): bochs dispi interface
+>   00000000febf0600-00000000febf0607 (prio 0, i/o): qemu extended regs
+>   00000000fec00000-00000000fec00fff (prio 0, i/o): kvm-ioapic
+>   00000000fed00000-00000000fed003ff (prio 0, i/o): hpet
+>   00000000fee00000-00000000feefffff (prio 4096, i/o): kvm-apic-msi
+>   00000000fffc0000-00000000ffffffff (prio 0, rom): pc.bios
+>   0000000100000000-000000013fffffff (prio 0, ram): pc.ram
+> 
+> becomes this:
+> 
+> address-space (flat view): KVM-SMRAM
+>   0000000000000000-00000000000bffff (prio 0, ram): pc.ram
+>   00000000000c0000-00000000000c9fff (prio 0, rom): pc.ram @00000000000c0000
+>   00000000000ca000-00000000000ccfff (prio 0, ram): pc.ram @00000000000ca000
+>   00000000000cd000-00000000000ebfff (prio 0, rom): pc.ram @00000000000cd000
+>   00000000000ec000-00000000000effff (prio 0, ram): pc.ram @00000000000ec000
+>   00000000000f0000-00000000000fffff (prio 0, rom): pc.ram @00000000000f0000
+>   0000000000100000-00000000bfffffff (prio 0, ram): pc.ram @0000000000100000
+>   00000000fd000000-00000000fdffffff (prio 1, ram): vga.vram
+>   00000000febc0000-00000000febdffff (prio 1, i/o): e1000-mmio
+>   00000000febf0400-00000000febf041f (prio 0, i/o): vga ioports remapped
+>   00000000febf0500-00000000febf0515 (prio 0, i/o): bochs dispi interface
+>   00000000febf0600-00000000febf0607 (prio 0, i/o): qemu extended regs
+>   00000000fec00000-00000000fec00fff (prio 0, i/o): kvm-ioapic
+>   00000000fed00000-00000000fed003ff (prio 0, i/o): hpet
+>   00000000fee00000-00000000feefffff (prio 4096, i/o): kvm-apic-msi
+>   00000000fffc0000-00000000ffffffff (prio 0, rom): pc.bios
+>   0000000100000000-000000013fffffff (prio 0, ram): pc.ram @00000000c0000000
+> 
+> This should make it easier to understand what's going on.
+> 
+> Cc: Peter Xu <peterx@redhat.com>
+> Cc: "William Tambe" <tambewilliam@gmail.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-> [ Unknown signature status ]
-> On Fri, Mar 03, 2017 at 02:31:38PM +1100, Richard Henderson wrote:
->> On 03/03/2017 01:10 AM, Nikunj A Dadhania wrote:
->> > +static void float64_maddsub_update_excp(CPUPPCState *env, float64 arg1,
->> > +                                        float64 arg2, float64 arg3,
->> > +                                        unsigned int madd_flags)
->> >  {
->> > +    if (unlikely((float64_is_infinity(arg1) && float64_is_zero(arg2)) ||
->> > +                 (float64_is_zero(arg1) && float64_is_infinity(arg2)))) {
->> >          /* Multiplication of zero by infinity */
->> > +        arg1 = float_invalid_op_excp(env, POWERPC_EXCP_FP_VXIMZ, 1);
->> > +    } else if (unlikely(float64_is_signaling_nan(arg1, &env->fp_status) ||
->> > +                        float64_is_signaling_nan(arg2, &env->fp_status) ||
->> > +                        float64_is_signaling_nan(arg3, &env->fp_status))) {
->> > +        /* sNaN operation */
->> > +        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
->> 
->> Are you sure you shouldn't be testing for NaN first?
->> Do you really get VXIMZ if arg3 (the addend) is (S)NaN?
->> 
->> You should probably eliminate QNaN as well, before the other checks.
->
-> Oh.. I've already merged and pull requested this.
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-The behaviour has not changed as compared to previous version.
+A nit: if we are only appending a new optional addr to be printed, we
+may just avoid printing the last "\n", then optinally print the last
+address, so that common codes can still be shared. But not worth a
+repost. :) Thanks,
 
-> I'm afraid any further corrections will have to be done as followup
-> patches.
+> ---
+>  memory.c | 25 ++++++++++++++++++-------
+>  1 file changed, 18 insertions(+), 7 deletions(-)
+> 
+> diff --git a/memory.c b/memory.c
+> index d61caee..44700c3 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -2588,13 +2588,24 @@ static void mtree_print_flatview(fprintf_function p, void *f,
+>  
+>      while (n--) {
+>          mr = range->mr;
+> -        p(f, MTREE_INDENT TARGET_FMT_plx "-"
+> -          TARGET_FMT_plx " (prio %d, %s): %s\n",
+> -          int128_get64(range->addr.start),
+> -          int128_get64(range->addr.start) + MR_SIZE(range->addr.size),
+> -          mr->priority,
+> -          memory_region_type(mr),
+> -          memory_region_name(mr));
+> +        if (range->offset_in_region) {
+> +            p(f, MTREE_INDENT TARGET_FMT_plx "-"
+> +              TARGET_FMT_plx " (prio %d, %s): %s @" TARGET_FMT_plx "\n",
+> +              int128_get64(range->addr.start),
+> +              int128_get64(range->addr.start) + MR_SIZE(range->addr.size),
+> +              mr->priority,
+> +              memory_region_type(mr),
+> +              memory_region_name(mr),
+> +              range->offset_in_region);
+> +        } else {
+> +            p(f, MTREE_INDENT TARGET_FMT_plx "-"
+> +              TARGET_FMT_plx " (prio %d, %s): %s\n",
+> +              int128_get64(range->addr.start),
+> +              int128_get64(range->addr.start) + MR_SIZE(range->addr.size),
+> +              mr->priority,
+> +              memory_region_type(mr),
+> +              memory_region_name(mr));
+> +        }
+>          range++;
+>      }
+>  
+> -- 
+> 2.9.3
+> 
 
-I will send a follow-up with fixing other multiply-add versions as well.
-
-Regards
-Nikunj
+-- peterx
