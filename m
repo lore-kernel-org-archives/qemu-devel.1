@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42565)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cjmOF-0007uX-2K
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:33:00 -0500
+	(envelope-from <armbru@redhat.com>) id 1cjmOJ-0007xQ-4t
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:33:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cjmOB-0007xQ-TM
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:32:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52882)
+	(envelope-from <armbru@redhat.com>) id 1cjmOG-000826-4N
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:32:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:32822)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cjmOB-0007wj-O0
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:32:51 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cjmOF-00080D-Oi
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:32:55 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E5E827E9D5
-	for <qemu-devel@nongnu.org>; Fri,  3 Mar 2017 12:32:51 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C379C3D963
+	for <qemu-devel@nongnu.org>; Fri,  3 Mar 2017 12:32:55 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  3 Mar 2017 13:32:22 +0100
-Message-Id: <1488544368-30622-3-git-send-email-armbru@redhat.com>
+Date: Fri,  3 Mar 2017 13:32:42 +0100
+Message-Id: <1488544368-30622-23-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488544368-30622-1-git-send-email-armbru@redhat.com>
 References: <1488544368-30622-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 02/28] libqtest: Work around a "QMP wants a
- newline" bug
+Subject: [Qemu-devel] [PATCH v4 22/28] test-string-input-visitor: Improve
+ list coverage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,72 +32,122 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The next commit is going to add a test that calls qmp("null").
-Curiously, this hangs.  Here's why.
-
-qmp_fd_sendv() doesn't send newlines.  Not even when @fmt contains
-some.  At first glance, the QMP parser seems to be fine with that.
-However, it turns out that it fails to react to input until it sees
-either a newline, an object or an array.  To reproduce, feed to a QMP
-monitor like this:
-
-    $ echo -n 'null' | socat UNIX:/work/armbru/images/test-qmp STDIO
-    {"QMP": {"version": {"qemu": {"micro": 50, "minor": 8, "major": 2}, "package": " (v2.8.0-1195-gf84141e-dirty)"}, "capabilities": []}}
-
-No output after the greeting.
-
-Add a newline:
-
-    $ echo 'null' | socat UNIX:/work/armbru/images/test-qmp STDIO
-    {"QMP": {"version": {"qemu": {"micro": 50, "minor": 8, "major": 2}, "package": " (v2.8.0-1195-gf84141e-dirty)"}, "capabilities": []}}
-    {"error": {"class": "GenericError", "desc": "Expected 'object' in QMP input"}}
-
-Correct output for input 'null'.
-
-Add an object instead:
-
-    $ echo -n 'null { "execute": "qmp_capabilities" }' | socat UNIX:qmp-socket STDIO
-    {"QMP": {"version": {"qemu": {"micro": 50, "minor": 8, "major": 2}, "package": " (v2.8.0-1195-gf84141e-dirty)"}, "capabilities": []}}
-    {"error": {"class": "GenericError", "desc": "Expected 'object' in QMP input"}}
-    {"return": {}}
-
-Also correct output.
-
-Work around this QMP bug by having qmp_fd_sendv() append a newline.
+Lists with elements above INT64_MAX don't work (known bug).  Empty
+lists don't work (weird).
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/libqtest.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ tests/test-string-input-visitor.c | 85 +++++++++++++++++++++++++++++++++------
+ 1 file changed, 72 insertions(+), 13 deletions(-)
 
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 3a0e0d6..951a3b4 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -442,14 +442,20 @@ void qmp_fd_sendv(int fd, const char *fmt, va_list ap)
-     if (qobj) {
-         int log = getenv("QTEST_LOG") != NULL;
-         QString *qstr = qobject_to_json(qobj);
--        const char *str = qstring_get_str(qstr);
--        size_t size = qstring_get_length(qstr);
-+        const char *str;
+diff --git a/tests/test-string-input-visitor.c b/tests/test-string-input-visitor.c
+index a32828c..72f8732 100644
+--- a/tests/test-string-input-visitor.c
++++ b/tests/test-string-input-visitor.c
+@@ -65,31 +65,90 @@ static void test_visitor_in_int(TestInputVisitorData *data,
+     error_free_or_abort(&err);
+ }
+ 
++static void check_ilist(Visitor *v, int64_t *expected, size_t n)
++{
++    int64List *res = NULL;
++    int64List *tail;
++    int i;
 +
-+        /*
-+         * BUG: QMP doesn't react to input until it sees a newline, an
-+         * object, or an array.  Work-around: give it a newline.
-+         */
-+        qstring_append_chr(qstr, '\n');
-+        str = qstring_get_str(qstr);
++    visit_type_int64List(v, NULL, &res, &error_abort);
++    tail = res;
++    for (i = 0; i < n; i++) {
++        g_assert(tail);
++        g_assert_cmpint(tail->value, ==, expected[i]);
++        tail = tail->next;
++    }
++    g_assert(!tail);
++
++    qapi_free_int64List(res);
++}
++
++static void check_ulist(Visitor *v, uint64_t *expected, size_t n)
++{
++    uint64List *res = NULL;
++    uint64List *tail;
++    int i;
++
++    /* BUG: unsigned numbers above INT64_MAX don't work */
++    for (i = 0; i < n; i++) {
++        if (expected[i] > INT64_MAX) {
++            Error *err = NULL;
++            visit_type_uint64List(v, NULL, &res, &err);
++            error_free_or_abort(&err);
++            return;
++        }
++    }
++
++    visit_type_uint64List(v, NULL, &res, &error_abort);
++    tail = res;
++    for (i = 0; i < n; i++) {
++        g_assert(tail);
++        g_assert_cmpuint(tail->value, ==, expected[i]);
++        tail = tail->next;
++    }
++    g_assert(!tail);
++
++    qapi_free_uint64List(res);
++}
++
+ static void test_visitor_in_intList(TestInputVisitorData *data,
+                                     const void *unused)
+ {
+-    int64_t value[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 20};
+-    int16List *res = NULL, *tmp;
++    /* Note: the visitor *sorts* ranges *unsigned* */
++    int64_t expect1[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 20 };
++    int64_t expect2[] = { 32767, -32768, -32767 };
++    int64_t expect3[] = { INT64_MAX, INT64_MIN };
++    uint64_t expect4[] = { UINT64_MAX };
+     Error *err = NULL;
++    int64List *res = NULL;
+     Visitor *v;
+-    int i = 0;
++
++    /* Valid lists */
  
-         if (log) {
-             fprintf(stderr, "%s", str);
-         }
-         /* Send QMP request */
--        socket_send(fd, str, size);
-+        socket_send(fd, str, qstring_get_length(qstr));
+     v = visitor_input_test_init(data, "1,2,0,2-4,20,5-9,1-8");
++    check_ilist(v, expect1, ARRAY_SIZE(expect1));
  
-         QDECREF(qstr);
-         qobject_decref(qobj);
+-    visit_type_int16List(v, NULL, &res, &error_abort);
+-    tmp = res;
+-    while (i < sizeof(value) / sizeof(value[0])) {
+-        g_assert(tmp);
+-        g_assert_cmpint(tmp->value, ==, value[i++]);
+-        tmp = tmp->next;
+-    }
+-    g_assert(!tmp);
++    v = visitor_input_test_init(data, "32767,-32768--32767");
++    check_ilist(v, expect2, ARRAY_SIZE(expect2));
+ 
+-    qapi_free_int16List(res);
++    v = visitor_input_test_init(data,
++                                "-9223372036854775808,9223372036854775807");
++    check_ilist(v, expect3, ARRAY_SIZE(expect3));
++
++    v = visitor_input_test_init(data, "18446744073709551615");
++    check_ulist(v, expect4, ARRAY_SIZE(expect4));
++
++    /* Empty list is invalid (weird) */
++
++    v = visitor_input_test_init(data, "");
++    visit_type_int64List(v, NULL, &res, &err);
++    error_free_or_abort(&err);
++
++    /* Not a list */
+ 
+     v = visitor_input_test_init(data, "not an int list");
+ 
+-    visit_type_int16List(v, NULL, &res, &err);
++    visit_type_int64List(v, NULL, &res, &err);
+     error_free_or_abort(&err);
+     g_assert(!res);
+ }
 -- 
 2.7.4
