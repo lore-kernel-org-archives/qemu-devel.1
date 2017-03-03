@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cjmOF-0007uZ-2Y
+	(envelope-from <armbru@redhat.com>) id 1cjmOF-0007uW-2M
 	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:32:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cjmOC-0007xd-2L
+	(envelope-from <armbru@redhat.com>) id 1cjmOC-0007xX-1Y
 	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:32:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52886)
+Received: from mx1.redhat.com ([209.132.183.28]:52884)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cjmOB-0007wt-RO
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:32:52 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cjmOB-0007wo-Pp
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:32:51 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 133C87E9FF
+	by mx1.redhat.com (Postfix) with ESMTPS id 035BD7E9DC
 	for <qemu-devel@nongnu.org>; Fri,  3 Mar 2017 12:32:52 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  3 Mar 2017 13:32:20 +0100
-Message-Id: <1488544368-30622-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 00/28] qapi: QMP dispatch and input visitor
- work
+Date: Fri,  3 Mar 2017 13:32:23 +0100
+Message-Id: <1488544368-30622-4-git-send-email-armbru@redhat.com>
+In-Reply-To: <1488544368-30622-1-git-send-email-armbru@redhat.com>
+References: <1488544368-30622-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 03/28] qmp-test: New,
+ covering basic QMP protocol
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,102 +32,257 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-v4:
-* PATCH 05+06: New
-* PATCH 07: Messing with the list of commands breaks when multiple
-  monitors race against each other, use two separate lists instead
-  (R-by dropped)
-v3:
-* PATCH 12+18+19: Commit message tidied up [Eric]
-* PATCH 17: Spurious whitespace change dropped [Eric]
-* PATCH 22: Missing visit_end_list() fixed [Eric]
-* PATCH 23: Misplaced visit_end_list() fixed, unwanted test change
-  dropped [Eric]
-v2:
-* PATCH 19-20+22+24-25: New
-* PATCH 03: Update MAINTAINERS new file
-* PATCH 21+23: New test_visitor_in_fail_list_nested(), string visitor
-  patch tweaked, comments polished
-* PATCH 23: full_name() bugs fixed
-
-Markus Armbruster (28):
-  qga: Fix crash on non-dictionary QMP argument
-  libqtest: Work around a "QMP wants a newline" bug
-  qmp-test: New, covering basic QMP protocol
-  qmp: Dumb down how we run QMP command registration
-  qapi: Support multiple command registries per program
-  qapi-introspect: Mangle --prefix argument properly for C
-  qmp: Clean up how we enforce capability negotiation
-  qmp: Drop duplicated QMP command object checks
-  qmp: Eliminate silly QERR_QMP_* macros
-  qmp: Improve QMP dispatch error messages
-  qapi: Improve a QObject input visitor error message
-  qapi: Clean up after commit 3d344c2
-  qapi: Make QObject input visitor set *list reliably
-  qapi: Improve qobject input visitor error reporting
-  qapi: Drop string input visitor method optional()
-  qapi: Make string input and opts visitor require non-null input
-  qom: Make object_property_set_qobject()'s input visitor strict
-  test-qobject-input-visitor: Use strict visitor
-  qapi: Drop unused non-strict qobject input visitor
-  tests-qobject-input-strict: Merge into test-qobject-input-visitor
-  test-string-input-visitor: Tear down existing test automatically
-  test-string-input-visitor: Improve list coverage
-  tests: Cover partial input visit of list
-  test-qobject-input-visitor: Cover missing nested struct member
-  qapi: Make input visitors detect unvisited list tails
-  tests: Cover input visit beyond end of list
-  qapi: Fix object input visit beyond end of list
-  qapi: Improve qobject visitor documentation
-
- MAINTAINERS                           |   1 +
- block/nbd.c                           |   2 +-
- block/nfs.c                           |   2 +-
- block/ssh.c                           |   2 +-
- docs/qapi-code-gen.txt                |   2 +-
- hw/ppc/spapr_drc.c                    |   5 +
- include/monitor/monitor.h             |   1 +
- include/qapi/qmp/dispatch.h           |  22 +-
- include/qapi/qmp/qerror.h             |   9 -
- include/qapi/qobject-input-visitor.h  |  40 +++-
- include/qapi/qobject-output-visitor.h |  35 +++-
- include/qapi/visitor-impl.h           |   7 +-
- include/qapi/visitor.h                |  19 +-
- include/qemu/module.h                 |   2 -
- monitor.c                             | 178 ++++++----------
- qapi/opts-visitor.c                   |  12 ++
- qapi/qapi-visit-core.c                |   8 +
- qapi/qmp-dispatch.c                   |  39 +++-
- qapi/qmp-registry.c                   |  37 ++--
- qapi/qobject-input-visitor.c          | 219 ++++++++++++-------
- qapi/string-input-visitor.c           |  97 +++++----
- qapi/trace-events                     |   1 +
- qga/commands.c                        |   2 +-
- qga/guest-agent-core.h                |   2 +
- qga/main.c                            |  19 +-
- qmp.c                                 |   2 +-
- qom/qom-qobject.c                     |   4 +-
- scripts/qapi-commands.py              |  19 +-
- scripts/qapi-introspect.py            |   2 +-
- scripts/qapi-visit.py                 |   3 +
- target/s390x/cpu_models.c             |   2 +-
- tests/Makefile.include                |   9 +-
- tests/check-qnull.c                   |   2 +-
- tests/libqtest.c                      |  29 ++-
- tests/libqtest.h                      |   8 +
- tests/qmp-test.c                      | 139 +++++++++++++
- tests/test-opts-visitor.c             |  80 +++++++
- tests/test-qga.c                      |   2 +-
- tests/test-qmp-commands.c             |  14 +-
- tests/test-qobject-input-strict.c     | 381 ----------------------------------
- tests/test-qobject-input-visitor.c    | 260 ++++++++++++++++++++++-
- tests/test-string-input-visitor.c     | 142 ++++++++++---
- tests/test-visitor-serialization.c    |   2 +-
- trace-events                          |   1 -
- vl.c                                  |   2 +-
- 45 files changed, 1093 insertions(+), 773 deletions(-)
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ MAINTAINERS            |   1 +
+ tests/Makefile.include |   5 +-
+ tests/libqtest.c       |  17 ++++--
+ tests/libqtest.h       |   8 +++
+ tests/qmp-test.c       | 139 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 164 insertions(+), 6 deletions(-)
  create mode 100644 tests/qmp-test.c
- delete mode 100644 tests/test-qobject-input-strict.c
 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index be79f68..d0ded4b 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1393,6 +1393,7 @@ F: qmp.c
+ F: monitor.c
+ F: docs/*qmp-*
+ F: scripts/qmp/
++F: tests/qmp-test.c
+ T: git git://repo.or.cz/qemu/armbru.git qapi-next
+ 
+ Register API
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 3310c17..4f52239 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -133,7 +133,9 @@ check-block-$(CONFIG_POSIX) += tests/qemu-iotests-quick.sh
+ # All QTests for now are POSIX-only, but the dependencies are
+ # really in libqtest, not in the testcases themselves.
+ 
+-check-qtest-generic-y = tests/device-introspect-test$(EXESUF)
++check-qtest-generic-y = tests/qmp-test$(EXESUF)
++gcov-files-generic-y = monitor.c qapi/qmp-dispatch.c
++check-qtest-generic-y += tests/device-introspect-test$(EXESUF)
+ gcov-files-generic-y = qdev-monitor.c qmp.c
+ 
+ gcov-files-ipack-y += hw/ipack/ipack.c
+@@ -653,6 +655,7 @@ libqos-imx-obj-y = $(libqos-obj-y) tests/libqos/i2c-imx.o
+ libqos-usb-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/usb.o
+ libqos-virtio-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/virtio.o tests/libqos/virtio-pci.o tests/libqos/virtio-mmio.o tests/libqos/malloc-generic.o
+ 
++tests/qmp-test$(EXESUF): tests/qmp-test.o
+ tests/device-introspect-test$(EXESUF): tests/device-introspect-test.o
+ tests/rtc-test$(EXESUF): tests/rtc-test.o
+ tests/m48t59-test$(EXESUF): tests/m48t59-test.o
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index 951a3b4..ca6b641 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -149,7 +149,7 @@ void qtest_add_abrt_handler(GHookFunc fn, const void *data)
+     g_hook_prepend(&abrt_hooks, hook);
+ }
+ 
+-QTestState *qtest_init(const char *extra_args)
++QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
+ {
+     QTestState *s;
+     int sock, qmpsock, i;
+@@ -204,10 +204,6 @@ QTestState *qtest_init(const char *extra_args)
+         s->irq_level[i] = false;
+     }
+ 
+-    /* Read the QMP greeting and then do the handshake */
+-    qtest_qmp_discard_response(s, "");
+-    qtest_qmp_discard_response(s, "{ 'execute': 'qmp_capabilities' }");
+-
+     if (getenv("QTEST_STOP")) {
+         kill(s->qemu_pid, SIGSTOP);
+     }
+@@ -219,6 +215,17 @@ QTestState *qtest_init(const char *extra_args)
+     return s;
+ }
+ 
++QTestState *qtest_init(const char *extra_args)
++{
++    QTestState *s = qtest_init_without_qmp_handshake(extra_args);
++
++    /* Read the QMP greeting and then do the handshake */
++    qtest_qmp_discard_response(s, "");
++    qtest_qmp_discard_response(s, "{ 'execute': 'qmp_capabilities' }");
++
++    return s;
++}
++
+ void qtest_quit(QTestState *s)
+ {
+     qtest_instances = g_list_remove(qtest_instances, s);
+diff --git a/tests/libqtest.h b/tests/libqtest.h
+index 90f182e..2c9962d 100644
+--- a/tests/libqtest.h
++++ b/tests/libqtest.h
+@@ -32,6 +32,14 @@ extern QTestState *global_qtest;
+ QTestState *qtest_init(const char *extra_args);
+ 
+ /**
++ * qtest_init_without_qmp_handshake:
++ * @extra_args: other arguments to pass to QEMU.
++ *
++ * Returns: #QTestState instance.
++ */
++QTestState *qtest_init_without_qmp_handshake(const char *extra_args);
++
++/**
+  * qtest_quit:
+  * @s: #QTestState instance to operate on.
+  *
+diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+new file mode 100644
+index 0000000..405e49e
+--- /dev/null
++++ b/tests/qmp-test.c
+@@ -0,0 +1,139 @@
++/*
++ * QMP protocol test cases
++ *
++ * Copyright (c) 2017 Red Hat Inc.
++ *
++ * Authors:
++ *  Markus Armbruster <armbru@redhat.com>,
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "libqtest.h"
++#include "qapi-visit.h"
++#include "qapi/error.h"
++#include "qapi/qobject-input-visitor.h"
++#include "qapi/visitor.h"
++
++const char common_args[] = "-nodefaults -machine none";
++
++static const char *get_error_class(QDict *resp)
++{
++    QDict *error = qdict_get_qdict(resp, "error");
++    const char *desc = qdict_get_try_str(error, "desc");
++
++    g_assert(desc);
++    return error ? qdict_get_try_str(error, "class") : NULL;
++}
++
++static void test_version(QObject *version)
++{
++    Visitor *v;
++    VersionInfo *vinfo;
++
++    g_assert(version);
++    v = qobject_input_visitor_new(version, true);
++    visit_type_VersionInfo(v, "version", &vinfo, &error_abort);
++    qapi_free_VersionInfo(vinfo);
++    visit_free(v);
++}
++
++static void test_malformed(void)
++{
++    QDict *resp;
++
++    /* Not even a dictionary */
++    resp = qmp("null");
++    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
++    QDECREF(resp);
++
++    /* No "execute" key */
++    resp = qmp("{}");
++    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
++    QDECREF(resp);
++
++    /* "execute" isn't a string */
++    resp = qmp("{ 'execute': true }");
++    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
++    QDECREF(resp);
++
++    /* "arguments" isn't a dictionary */
++    resp = qmp("{ 'execute': 'no-such-cmd', 'arguments': [] }");
++    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
++    QDECREF(resp);
++
++    /* extra key */
++    resp = qmp("{ 'execute': 'no-such-cmd', 'extra': true }");
++    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
++    QDECREF(resp);
++}
++
++static void test_qmp_protocol(void)
++{
++    QDict *resp, *q, *ret;
++    QList *capabilities;
++
++    global_qtest = qtest_init_without_qmp_handshake(common_args);
++
++    /* Test greeting */
++    resp = qmp_receive();
++    q = qdict_get_qdict(resp, "QMP");
++    g_assert(q);
++    test_version(qdict_get(q, "version"));
++    capabilities = qdict_get_qlist(q, "capabilities");
++    g_assert(capabilities && qlist_empty(capabilities));
++    QDECREF(resp);
++
++    /* Test valid command before handshake */
++    resp = qmp("{ 'execute': 'query-version' }");
++    g_assert_cmpstr(get_error_class(resp), ==, "CommandNotFound");
++    QDECREF(resp);
++
++    /* Test malformed commands before handshake */
++    test_malformed();
++
++    /* Test handshake */
++    resp = qmp("{ 'execute': 'qmp_capabilities' }");
++    ret = qdict_get_qdict(resp, "return");
++    g_assert(ret && !qdict_size(ret));
++    QDECREF(resp);
++
++    /* Test repeated handshake */
++    resp = qmp("{ 'execute': 'qmp_capabilities' }");
++    g_assert_cmpstr(get_error_class(resp), ==, "CommandNotFound");
++    QDECREF(resp);
++
++    /* Test valid command */
++    resp = qmp("{ 'execute': 'query-version' }");
++    test_version(qdict_get(resp, "return"));
++    QDECREF(resp);
++
++    /* Test malformed commands */
++    test_malformed();
++
++    /* Test 'id' */
++    resp = qmp("{ 'execute': 'query-name', 'id': 'cookie#1' }");
++    ret = qdict_get_qdict(resp, "return");
++    g_assert(ret);
++    g_assert_cmpstr(qdict_get_try_str(resp, "id"), ==, "cookie#1");
++    QDECREF(resp);
++
++    /* Test command failure with 'id' */
++    resp = qmp("{ 'execute': 'human-monitor-command', 'id': 2 }");
++    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
++    g_assert_cmpint(qdict_get_int(resp, "id"), ==, 2);
++    QDECREF(resp);
++
++    qtest_end();
++}
++
++int main(int argc, char *argv[])
++{
++    g_test_init(&argc, &argv, NULL);
++
++    qtest_add_func("qmp/protocol", test_qmp_protocol);
++
++    return g_test_run();
++}
 -- 
 2.7.4
