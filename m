@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57164)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cjpvA-00081y-Fy
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:19:09 -0500
+	(envelope-from <berrange@redhat.com>) id 1cjpxb-0000Ni-MC
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:21:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cjpv7-0006uJ-9g
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:19:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53084)
+	(envelope-from <berrange@redhat.com>) id 1cjpxY-0007v7-EO
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:21:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53916)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cjpv7-0006tr-0h
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:19:05 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 530F881F01
-	for <qemu-devel@nongnu.org>; Fri,  3 Mar 2017 16:19:04 +0000 (UTC)
-Date: Fri, 3 Mar 2017 16:18:57 +0000
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cjpxY-0007ut-58
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:21:36 -0500
+Date: Fri, 3 Mar 2017 16:21:28 +0000
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170303161857.GC13631@redhat.com>
+Message-ID: <20170303162128.GD13631@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170301123223.12489-1-berrange@redhat.com>
-	<a08dc58b-a169-cb17-2187-1b66c6878a39@redhat.com>
-	<20170302123300.GJ29835@redhat.com>
-	<87d1dys9mr.fsf@dusky.pond.sub.org>
+References: <mailman.56273.1488553194.22740.qemu-devel@nongnu.org>
+	<8FB6923C-8F97-497C-95DC-6F2D937725BC@gmail.com>
+	<20170303164426.42472535@bahia.lan>
+	<AA7BADA2-06D5-4A20-A38F-57D374B6C58D@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <87d1dys9mr.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH] migration: allow clearing migration string
- parameters
+In-Reply-To: <AA7BADA2-06D5-4A20-A38F-57D374B6C58D@gmail.com>
+Subject: Re: [Qemu-devel] git master build failure in 9pfs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,65 +30,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: G 3 <programmingkidx@gmail.com>
+Cc: Greg Kurz <groug@kaod.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-On Fri, Mar 03, 2017 at 03:44:12PM +0100, Markus Armbruster wrote:
-> "Daniel P. Berrange" <berrange@redhat.com> writes:
+On Fri, Mar 03, 2017 at 10:55:01AM -0500, G 3 wrote:
 > 
-> > On Wed, Mar 01, 2017 at 08:36:03AM -0600, Eric Blake wrote:
-> >> On 03/01/2017 06:32 AM, Daniel P. Berrange wrote:
-> >> >      }
-> >> >      if (params->has_tls_creds) {
-> >> >          g_free(s->parameters.tls_creds);
-> >> > -        s->parameters.tls_creds = g_strdup(params->tls_creds);
-> >> > +        if (*params->tls_creds == '\0') {
-> >> > +            s->parameters.tls_creds = NULL;
-> >> 
-> >> I'm wondering if you should also do s->parameters.has_tls_creds = false
-> >> at this point?  The visitors expect that if has_tls_creds is true, then
-> >> the string is non-NULL.
-> >
-> > The fact that s->parameters contains has_* fields is completely ignored
-> > by the migration code afaict. IOW the code behaves as if all the has_*
-> > fields are hardwired to true in s->parameters, even though that is not
-> > the case :-) The has_* fields are only used when the various migration
-> > QMP methods are executed, and those all use a separate MigrationParameters
-> > struct instance.
+> On Mar 3, 2017, at 10:44 AM, Greg Kurz wrote:
 > 
-> Not keeping the has_ members up-to-date is harmless as long as you don't
-> pass the thing to visitors, including the one hiding in qapi_free_FOO().
-> That one ignores scalars, though.
+> > On Fri, 3 Mar 2017 10:28:00 -0500
+> > G 3 <programmingkidx@gmail.com> wrote:
+> > 
+> > > On Mar 3, 2017, at 9:59 AM, qemu-devel-request@nongnu.org wrote:
+> > > > On 02/03/17 17:40, Daniel P. Berrange wrote:
+> > > > 
+> > > > > On Thu, Mar 02, 2017 at 05:28:24PM +0000, Mark Cave-Ayland wrote:
+> > > > > > Does anyone else see the following error when trying to build git
+> > > > > > master?
+> > > > > > 
+> > > > > > cc -I/home/build/src/qemu/git/qemu/hw/9pfs -Ihw/9pfs
+> > > > > > -I/home/build/src/qemu/git/qemu/tcg
+> > > > > > -I/home/build/src/qemu/git/qemu/tcg/i386
+> > > > > > -I/home/build/src/qemu/git/qemu/linux-headers
+> > > > > > -I/home/build/src/qemu/git/qemu/linux-headers -I.
+> > > > > > -I/home/build/src/qemu/git/qemu -I/home/build/src/qemu/git/qemu/
+> > > > > > include
+> > > > > > -I/usr/include/pixman-1
+> > > > > > -I/home/build/src/qemu/git/qemu/dtc/libfdt
+> > > > > > -Werror -pthread -I/usr/include/glib-2.0
+> > > > > > -I/usr/lib/x86_64-linux-gnu/glib-2.0/include   -m64 -mcx16 -
+> > > > > > D_GNU_SOURCE
+> > > > > > -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes
+> > > > > > -Wredundant-decls -Wall -Wundef -Wwrite-strings
+> > > > > > -Wmissing-prototypes
+> > > > > > -fno-strict-aliasing -fno-common -fwrapv  -Wendif-labels
+> > > > > > -Wno-missing-include-dirs -Wempty-body -Wnested-externs
+> > > > > > -Wformat-security -Wformat-y2k -Winit-self -Wignored-qualifiers
+> > > > > > -Wold-style-declaration -Wold-style-definition -Wtype-limits
+> > > > > > -fstack-protector-all -I/usr/include/p11-kit-1
+> > > > > > -I/usr/include/libpng12   -I/home/build/src/qemu/git/qemu/tests -
+> > > > > > MMD -MP
+> > > > > > -MT hw/9pfs/9p-util.o -MF hw/9pfs/9p-util.d -O2 -U_FORTIFY_SOURCE
+> > > > > > -D_FORTIFY_SOURCE=2 -g   -c -o hw/9pfs/9p-util.o hw/9pfs/9p-util.c
+> > > > > > In file included from hw/9pfs/9p-util.c:15:0:
+> > > > > > hw/9pfs/9p-util.h: In function ?openat_dir?:
+> > > > > > hw/9pfs/9p-util.h:25:57: error: ?O_PATH? undeclared (first use in
+> > > > > > this
+> > > > > > function)
+> > > > > > hw/9pfs/9p-util.h:25:57: note: each undeclared identifier is
+> > > > > > reported
+> > > > > > only once for each function it appears in
+> > > > > > hw/9pfs/9p-util.h:26:1: error: control reaches end of non-void
+> > > > > > function
+> > > > > > [-Werror=return-type]
+> > > > > > 
+> > > > > > Build platform is Debian Wheezy on an x86_64 host.
+> > > > > 
+> > > > > IIUC, O_PATH was introduced in glibc 2.14 and Wheezy only has 2.13.
+> > > > > 
+> > > > > So unless we want to make this 9pfs code a configurable
+> > > > > option, this
+> > > > > means Debian Wheezy is no longer a supportable platform for QEMU.
+> > > > 
+> > > > Oh sure, I appreciate that wheezy is getting towards then end of its
+> > > > lifetime - it's just a little bit inconvenient to break my
+> > > > development
+> > > > environment just as we enter 2.9 freeze ;)
+> > > > 
+> > > > If everyone agrees that wheezy is no longer supported after 2.9
+> > > > then I
+> > > > can look to upgrading, however my QEMU development is done on my
+> > > > laptop
+> > > > which is also setup for my day job so it's not a simple case of just
+> > > > switching the repository and running dist-upgrade to get me going
+> > > > again...
+> > > 
+> > > I remember years ago something like O_PATH was not defined on Mac OS
+> > > X,
+> > > so the solution was to define the constant as zero. Something like
+> > > this:
+> > > 
+> > > #ifndef O_PATH
+> > > 	#define O_PATH 0
+> > > #endif
+> > > 
+> > > Maybe this might work in 9p-util.h.
+> > > 
+> > 
+> > Yes. Please send a patch and I'll merge it.
+> > 
+> > Cheers.
+> > 
+> > --
+> > Greg
 > 
 > 
-> From a more abstract point of view, we have two related data types: one
-> for the state, and one for state changes requests.
+> Here is the patch. I think we should let Mark or some else test it to see if
+> it does fix the problem before a real patch is submitted.
 > 
-> In state, members are always present.
+> ---
+>  hw/9pfs/9p-util.h | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> A state change request is a bag of state member change requests, and
-> each request can either specify the new value or ask for a reset to
-> default.  Absent member means no change.
+> diff --git a/hw/9pfs/9p-util.h b/hw/9pfs/9p-util.h
+> index 091f3ce..254d2a9 100644
+> --- a/hw/9pfs/9p-util.h
+> +++ b/hw/9pfs/9p-util.h
+> @@ -13,6 +13,10 @@
+>  #ifndef QEMU_9P_UTIL_H
+>  #define QEMU_9P_UTIL_H
 > 
-> We press the same QAPI type into service for both by making all members
-> optional.
-> 
-> For the state case, we hardwire the has_ to true.  Or even ignore them
-> completely.
-> 
-> For the state change request, we use has_ = false for "no change", has_
-> = true with a special value for "reset to default" (new in this patch)
-> and has_ = true with a non-special value for "set to this value".
-> 
-> Requires a special value outside the set of non-special values.  The
-> obvious one is JSON null, but the QAPI generator doesn't quite support
-> that, yet.  "" works here, but is not general.
-> 
-> I think I can get you null support in 2.10.  Would that work for you?
+> +#ifndef O_PATH
+> +    #define O_PATH 0
+> +#endif
 
-Not really - we need this fix so libvirt can enable TLS migration,
-in addition we'll be wanting to add it to stable branches upstream
-and downstream.
+Isn't the use of O_PATH required in order to fix the recent
+security vulnerability in 9p ?  If so, then defining it to
+0 means the QEMU is silently becoming vulnerable once again
+which I don't think is a good idea.
+
 
 Regards,
 Daniel
