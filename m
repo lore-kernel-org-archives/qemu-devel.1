@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56435)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cjt7A-0003Xx-QI
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 14:43:45 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cjt7H-0003am-Fu
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 14:43:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cjt77-0000Yt-Po
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 14:43:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56780)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cjt77-0000Xq-KJ
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 14:43:41 -0500
-Date: Fri, 3 Mar 2017 16:43:38 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170303194338.GD11509@thinpad.lan.raisama.net>
-References: <20170222192647.19690-1-ehabkost@redhat.com>
-	<87y3wr8q6z.fsf@dusky.pond.sub.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cjt7E-0000d2-88
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 14:43:51 -0500
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:36240)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cjt7E-0000cu-3W
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 14:43:48 -0500
+Received: by mail-qk0-x241.google.com with SMTP id n141so5969499qke.3
+	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 11:43:47 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1488556233-31246-1-git-send-email-peter.maydell@linaro.org>
+	<1488556233-31246-6-git-send-email-peter.maydell@linaro.org>
+	<20170303155859.GZ9606@toto>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <0e19a320-0b97-aef2-033b-b1475641eb84@amsat.org>
+Date: Fri, 3 Mar 2017 16:43:43 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87y3wr8q6z.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH RESEND] qdev: Make "hotplugged" property
- read-only
+In-Reply-To: <20170303155859.GZ9606@toto>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-2.9 5/6] disas/cris: Avoid unintended
+ sign extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +36,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, Laine Stump <laine@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, patches@linaro.org, Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Mon, Feb 27, 2017 at 07:05:24PM +0100, Markus Armbruster wrote:
-> Eduardo Habkost <ehabkost@redhat.com> writes:
-> 
-> > The "hotplugged" property is user visible, but it was never meant
-> > to be set by the user. There are probably multiple ways to break
-> > or crash device code by overriding the property. For example, we
-> > recently fixed a crash in rtc_set_memory() related to the
-> > property (commit 26ef65beab852caf2b1ef4976e3473f2d525164d).
-> >
-> > There has been some discussion about making management software
-> > use "hotplugged=on" on migration, to indicate devices that were
-> > hotplugged in the migration source. There were other suggestions
-> > to address this, like including the "hotplugged" field in the
-> > migration stream instead of requiring it to be set propertly.
-> >
-> > Whatever solution we choose in the future, this patch disables
-> > setting "hotplugged" explicitly in the command-line by now,
-> > because the ability to set the property is unused, untested, and
-> > undocumented.
-> >
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> 
-> I figure this is the safe thing to do for 2.9.
-> 
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+On 03/03/2017 12:58 PM, Edgar E. Iglesias wrote:
+> On Fri, Mar 03, 2017 at 03:50:32PM +0000, Peter Maydell wrote:
+>> In the cris disassembler we were using 'unsigned long' to calculate
+>> addresses which are supposed to be 32 bits.  This meant that we might
+>> accidentally sign extend or calculate a value that was outside the 32
+>> bit range of the guest CPU.  Use 'uint32_t' instead so we give the
+>> right answers on 64-bit hosts.
+>>
+>> (Spotted by Coverity, CID 1005402, 1005403.)
+>
+> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+>
 
-Thanks. I have merged it to my "machine" branch, and I plan to
-include it in a pull request next week.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
--- 
-Eduardo
+>
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>>  disas/cris.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/disas/cris.c b/disas/cris.c
+>> index 8a1daf9..30217f1 100644
+>> --- a/disas/cris.c
+>> +++ b/disas/cris.c
+>> @@ -2009,7 +2009,7 @@ print_with_operands (const struct cris_opcode *opcodep,
+>>        case 'n':
+>>  	{
+>>  	  /* Like N but pc-relative to the start of the insn.  */
+>> -	  unsigned long number
+>> +	  uint32_t number
+>>  	    = (buffer[2] + buffer[3] * 256 + buffer[4] * 65536
+>>  	       + buffer[5] * 0x1000000 + addr);
+>>
+>> @@ -2201,7 +2201,7 @@ print_with_operands (const struct cris_opcode *opcodep,
+>>  		      {
+>>  			/* It's [pc+].  This cannot possibly be anything
+>>  			   but an address.  */
+>> -			unsigned long number
+>> +			uint32_t number
+>>  			  = prefix_buffer[2] + prefix_buffer[3] * 256
+>>  			  + prefix_buffer[4] * 65536
+>>  			  + prefix_buffer[5] * 0x1000000;
+>> --
+>> 2.7.4
+>>
+>
