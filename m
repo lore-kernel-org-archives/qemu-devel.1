@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cjt4F-0002F7-2X
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 14:40:43 -0500
+	(envelope-from <armbru@redhat.com>) id 1cjt4m-0002X4-MJ
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 14:41:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cjt4B-00076f-Vd
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 14:40:43 -0500
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:36555)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cjt4B-00076K-RK
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 14:40:39 -0500
-Received: by mail-qk0-x244.google.com with SMTP id n141so5947207qke.3
-	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 11:40:39 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1488556233-31246-1-git-send-email-peter.maydell@linaro.org>
-	<1488556233-31246-2-git-send-email-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <de6825bd-389d-5390-9834-ad139a72cfc6@amsat.org>
-Date: Fri, 3 Mar 2017 16:40:35 -0300
+	(envelope-from <armbru@redhat.com>) id 1cjt4j-0007Qg-KE
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 14:41:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41392)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cjt4j-0007Ol-EA
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 14:41:13 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8A86E4E4C5
+	for <qemu-devel@nongnu.org>; Fri,  3 Mar 2017 19:41:13 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <1488544368-30622-1-git-send-email-armbru@redhat.com>
+	<1488544368-30622-7-git-send-email-armbru@redhat.com>
+	<6a0b8822-aa82-64e6-68f8-d0e63436ab76@redhat.com>
+Date: Fri, 03 Mar 2017 20:41:10 +0100
+In-Reply-To: <6a0b8822-aa82-64e6-68f8-d0e63436ab76@redhat.com> (Eric Blake's
+	message of "Fri, 3 Mar 2017 12:29:13 -0600")
+Message-ID: <87bmtijgh5.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1488556233-31246-2-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-2.9 1/6] disas/hppa: Remove dead code
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 06/28] qapi-introspect: Mangle --prefix
+ argument properly for C
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,34 +35,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, patches@linaro.org, Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 03/03/2017 12:50 PM, Peter Maydell wrote:
-> Coverity complains (CID 1302705) that the "fr0" part of the ?: in
-> fput_fp_reg_r() is dead.  This looks like cut-n-paste error from
-> fput_fp_reg(); delete the dead code.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Eric Blake <eblake@redhat.com> writes:
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> On 03/03/2017 06:32 AM, Markus Armbruster wrote:
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  scripts/qapi-introspect.py | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>
+> I'm guessing we haven't seen a use of a prefix that matters yet, but
+> that an upcoming patch triggered a compilation failure without this fix.
+>  Mentioning that in the commit message wouldn't hurt.
 
-> ---
->  disas/hppa.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/disas/hppa.c b/disas/hppa.c
-> index 43facdc..a2d371f 100644
-> --- a/disas/hppa.c
-> +++ b/disas/hppa.c
-> @@ -1788,8 +1788,7 @@ fput_fp_reg_r (unsigned reg, disassemble_info *info)
->    if (reg < 4)
->      (*info->fprintf_func) (info->stream, "fpe%d", reg * 2 + 1);
->    else
-> -    (*info->fprintf_func) (info->stream, "%sR",
-> -			   reg ? fp_reg_names[reg] : "fr0");
-> +    (*info->fprintf_func) (info->stream, "%sR", fp_reg_names[reg]);
->  }
->
->  static void
->
+Done.  Thanks!
+
+
+[...]
