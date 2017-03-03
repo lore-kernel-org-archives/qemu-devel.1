@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jannh@google.com>) id 1cjpar-0000tl-UB
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 10:58:10 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cjpbI-0001HY-5d
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 10:58:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jannh@google.com>) id 1cjpar-0006nP-9E
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 10:58:10 -0500
-Received: from mail-it0-x22a.google.com ([2607:f8b0:4001:c0b::22a]:35940)
+	(envelope-from <peter.maydell@linaro.org>) id 1cjpbH-0006vC-B7
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 10:58:36 -0500
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:33058)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jannh@google.com>) id 1cjpar-0006mC-3u
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 10:58:09 -0500
-Received: by mail-it0-x22a.google.com with SMTP id h10so15294983ith.1
-	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 07:58:07 -0800 (PST)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cjpbH-0006uq-4U
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 10:58:35 -0500
+Received: by mail-wr0-x236.google.com with SMTP id u48so76627141wrc.0
+	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 07:58:34 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_V8azXLLptxqNWBwkY7wJZzK+YkZHd6RfHEVS-NoXXBg@mail.gmail.com>
-References: <20170303112503.32277-1-ppandit@redhat.com>
-	<CAFEAcA_V8azXLLptxqNWBwkY7wJZzK+YkZHd6RfHEVS-NoXXBg@mail.gmail.com>
-From: Jann Horn <jannh@google.com>
-Date: Fri, 3 Mar 2017 16:57:46 +0100
-Message-ID: <CAG48ez2eaXFk50puw_bc27tNdfOHDsL08A9jY8=7DnA-mtEXWA@mail.gmail.com>
+In-Reply-To: <AA7BADA2-06D5-4A20-A38F-57D374B6C58D@gmail.com>
+References: <mailman.56273.1488553194.22740.qemu-devel@nongnu.org>
+	<8FB6923C-8F97-497C-95DC-6F2D937725BC@gmail.com>
+	<20170303164426.42472535@bahia.lan>
+	<AA7BADA2-06D5-4A20-A38F-57D374B6C58D@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 Mar 2017 15:58:13 +0000
+Message-ID: <CAFEAcA-_p_N8c+4tu98MgvQsCP3SV9RD9mLP-+kj9FypqCeuJw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] linux-user: limit number of arguments to
- execve
+Subject: Re: [Qemu-devel] git master build failure in 9pfs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,52 +31,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, Prasad J Pandit <pjp@fedoraproject.org>
+To: G 3 <programmingkidx@gmail.com>
+Cc: Greg Kurz <groug@kaod.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-On Fri, Mar 3, 2017 at 4:55 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 3 March 2017 at 11:25, P J P <ppandit@redhat.com> wrote:
->> From: Prasad J Pandit <pjp@fedoraproject.org>
->>
->> Limit the number of arguments passed to execve(2) call from
->> a user program, as large number of them could lead to a bad
->> guest address error.
->>
->> Reported-by: Jann Horn <jannh@google.com>
->> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
->> ---
->>  linux-user/syscall.c | 7 +++++++
->>  1 file changed, 7 insertions(+)
->>
->> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
->> index 9be8e95..c545c12 100644
->> --- a/linux-user/syscall.c
->> +++ b/linux-user/syscall.c
->> @@ -7766,6 +7766,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->>  #endif
->>      case TARGET_NR_execve:
->>          {
->> +#define ARG_MAX 65535
->>              char **argp, **envp;
->>              int argc, envc;
->>              abi_ulong gp;
->> @@ -7794,6 +7795,12 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->>                  envc++;
->>              }
->>
->> +            if (argc > ARG_MAX || envc > ARG_MAX) {
->> +                fprintf(stderr,
->> +                        "argc(%d), envc(%d) exceed %d\n", argc, envc, ARG_MAX);
->> +                ret = -TARGET_EFAULT;
->> +                break;
->> +            }
->>              argp = alloca((argc + 1) * sizeof(void *));
->>              envp = alloca((envc + 1) * sizeof(void *));
+On 3 March 2017 at 15:55, G 3 <programmingkidx@gmail.com> wrote:
+> Here is the patch. I think we should let Mark or some else test it to see if
+> it does fix the problem before a real patch is submitted.
 >
-> This code is already supposed to handle "argument string too big",
-> see commit a6f79cc9a5e.
->
-> What's the actual bug case we're trying to handle here?
+> ---
+>  hw/9pfs/9p-util.h | 4 ++++
+>  1 file changed, 4 insertions(+)
 
-commit a6f79cc9a5e doesn't help here, it only bails out after the two
-alloca() calls
+We can't take any patch without a Signed-off-by: line, not
+even a three line one.
+
+>
+> diff --git a/hw/9pfs/9p-util.h b/hw/9pfs/9p-util.h
+> index 091f3ce..254d2a9 100644
+> --- a/hw/9pfs/9p-util.h
+> +++ b/hw/9pfs/9p-util.h
+> @@ -13,6 +13,10 @@
+>  #ifndef QEMU_9P_UTIL_H
+>  #define QEMU_9P_UTIL_H
+>
+> +#ifndef O_PATH
+> +    #define O_PATH 0
+> +#endif
+
+Could use a comment explaining why it's OK to define it in
+a way that means it's a no-op on hosts without it.
+
+> +
+>  static inline void close_preserve_errno(int fd)
+>  {
+>      int serrno = errno;
+> --
+> 2.10.2
+
+thanks
+-- PMM
