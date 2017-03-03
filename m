@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cjrg8-0004fg-Lp
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:11:46 -0500
+	(envelope-from <berrange@redhat.com>) id 1cjrhx-0005nj-Vz
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:13:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cjrg4-0006zR-GY
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:11:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58902)
+	(envelope-from <berrange@redhat.com>) id 1cjrhu-00005t-6m
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:13:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50174)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cjrg4-0006z4-8C
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:11:40 -0500
-References: <mailman.56273.1488553194.22740.qemu-devel@nongnu.org>
-	<8FB6923C-8F97-497C-95DC-6F2D937725BC@gmail.com>
-	<20170303164426.42472535@bahia.lan>
-	<AA7BADA2-06D5-4A20-A38F-57D374B6C58D@gmail.com>
-	<20170303162128.GD13631@redhat.com> <20170303174353.676c1a7b@bahia.lan>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a93b0903-cf60-d21b-2d68-cd182e06aed3@redhat.com>
-Date: Fri, 3 Mar 2017 12:11:36 -0600
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cjrhu-000057-0w
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:13:34 -0500
+Date: Fri, 3 Mar 2017 18:13:29 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170303181329.GO13631@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <148856422757.9841.6298006998523421948.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20170303174353.676c1a7b@bahia.lan>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="6Sw3N3rnlnHeEgPkiP1feKGILIjVCxl0V"
-Subject: Re: [Qemu-devel] git master build failure in 9pfs
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <148856422757.9841.6298006998523421948.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH] 9pfs: fail local_statfs() earlier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,80 +27,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: G 3 <programmingkidx@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6Sw3N3rnlnHeEgPkiP1feKGILIjVCxl0V
-From: Eric Blake <eblake@redhat.com>
-To: Greg Kurz <groug@kaod.org>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: G 3 <programmingkidx@gmail.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- qemu-devel qemu-devel <qemu-devel@nongnu.org>
-Message-ID: <a93b0903-cf60-d21b-2d68-cd182e06aed3@redhat.com>
-Subject: Re: [Qemu-devel] git master build failure in 9pfs
-References: <mailman.56273.1488553194.22740.qemu-devel@nongnu.org>
- <8FB6923C-8F97-497C-95DC-6F2D937725BC@gmail.com>
- <20170303164426.42472535@bahia.lan>
- <AA7BADA2-06D5-4A20-A38F-57D374B6C58D@gmail.com>
- <20170303162128.GD13631@redhat.com> <20170303174353.676c1a7b@bahia.lan>
-In-Reply-To: <20170303174353.676c1a7b@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Mar 03, 2017 at 07:03:47PM +0100, Greg Kurz wrote:
+> If we cannot open the given path, we can return right away instead of
+> passing -1 to fstatfs() and close(). This will make Coverity happy.
+> 
+> (Coverity issue CID1371729)
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>  hw/9pfs/9p-local.c |    3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+> index fe930300445a..ea9a1ced0394 100644
+> --- a/hw/9pfs/9p-local.c
+> +++ b/hw/9pfs/9p-local.c
+> @@ -1053,6 +1053,9 @@ static int local_statfs(FsContext *s, V9fsPath *fs_path, struct statfs *stbuf)
+>      int fd, ret;
+>  
+>      fd = local_open_nofollow(s, fs_path->data, O_RDONLY, 0);
+> +    if (fd == -1) {
+> +        return -1;
+> +    }
+>      ret = fstatfs(fd, stbuf);
+>      close_preserve_errno(fd);
+>      return ret;
 
-On 03/03/2017 10:43 AM, Greg Kurz wrote:
+Reviewed-by: Daniel P. berrange <berrange@redhat.com>
 
->>> +#ifndef O_PATH
->>> +    #define O_PATH 0
->>> +#endif =20
->>
->> Isn't the use of O_PATH required in order to fix the recent
->> security vulnerability in 9p ?  If so, then defining it to
->> 0 means the QEMU is silently becoming vulnerable once again
->> which I don't think is a good idea.
->>
->=20
-> O_PATH was supposed to be used as an optimization here, since fds retur=
-ned by
-> this function are only passed to openat()... but your comment makes me =
-realize
-> I inadvertently dropped O_NOFOLLOW between v1 and v2 of the patchset. A=
-nd this
-> IS an actual vulnerability issue :) And reading the openat() manpage, I=
- see
-> that O_PATH | O_NOFOLLOW doesn't cause openat() to fail, but to return =
-a fd
-> pointing to the symlink which is certainly not what I want :)
-
-Why not? It works, since openat(fd, ...) fails with EBADF if fd is a
-symlink rather than a directory.  (Well, it SHOULD fail like that,
-according to the man page; I need to write a test program and find out
-for sure).  So you don't have to do any additional syscalls, as your
-very next *at call will tell you if you actually got a directory or a
-symlink.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---6Sw3N3rnlnHeEgPkiP1feKGILIjVCxl0V
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYubHYAAoJEKeha0olJ0NqBxAH/2XckeFzkqq8fV8/lhzHH1Eg
-L54pPL6cuSjNVauVnbfbiqqg6qnr30Y3THDI9nqPFDkoFh4TvQ4qzNBFcQmkli+L
-5fA+peCcNCROqkn7QOlleWgMFprtvns23B2EGCd5y6gRDoJl7GUNWetWmplhBB+g
-OHdDsOK0itZIaImtvSjPkepHqj6ALldAJvlMtXwvzrSJtov3sDVq9Ncab0Khobse
-+fw5jSTz7n79FlXEbG7jV80+zRUrM9fNF+TMmulWY8+dtNZ5QrOo8ivMSEt7noYb
-BY+2TppMbow/WF7BsLAdho6SQCqIBJtUARsx1RFfLZg0v5YaMDCZwfDoi3EgEi4=
-=xg1n
------END PGP SIGNATURE-----
-
---6Sw3N3rnlnHeEgPkiP1feKGILIjVCxl0V--
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
