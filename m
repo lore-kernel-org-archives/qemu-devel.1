@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42609)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cjsCa-00062K-Ew
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:45:17 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cjsGz-0006o2-H8
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:49:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cjsCV-0003oU-JW
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:45:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53202)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cjsCV-0003ny-Dn
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:45:11 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7B64B8048D
-	for <qemu-devel@nongnu.org>; Fri,  3 Mar 2017 18:45:11 +0000 (UTC)
-References: <1488544368-30622-1-git-send-email-armbru@redhat.com>
-	<1488544368-30622-25-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b12059d4-6c50-454a-fb3b-92187d6998c5@redhat.com>
-Date: Fri, 3 Mar 2017 12:45:08 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1cjsGy-0005Xz-If
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:49:49 -0500
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:34583)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cjsGy-0005Xi-BN
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:49:48 -0500
+Received: by mail-wr0-x22f.google.com with SMTP id l37so79680496wrc.1
+	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 10:49:47 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1488544368-30622-25-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="D4eaF0x1DDoKuSJTLxjeJWgT1Utnn87Ae"
-Subject: Re: [Qemu-devel] [PATCH v4 24/28] test-qobject-input-visitor: Cover
- missing nested struct member
+In-Reply-To: <alpine.BSF.2.20.1703030259350.33600@zero.eik.bme.hu>
+References: <cover.1488068248.git.balaton@eik.bme.hu>
+	<6b70a9dfe56c3a0dc8e874c45d70612aff7b8e3a.1488068248.git.balaton@eik.bme.hu>
+	<CAFEAcA9FL-sshVzKewf+rCs6-5_c2Y86Qy0b=3DMog4MrVOpwA@mail.gmail.com>
+	<alpine.BSF.2.20.1703030259350.33600@zero.eik.bme.hu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 Mar 2017 18:49:26 +0000
+Message-ID: <CAFEAcA-PUcPaOPOXXhab1N=YAHja0xCf5yaZYm5m0p1=j6A=WA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2 07/14] sm501: Fix device endianness
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,51 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---D4eaF0x1DDoKuSJTLxjeJWgT1Utnn87Ae
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <b12059d4-6c50-454a-fb3b-92187d6998c5@redhat.com>
-Subject: Re: [PATCH v4 24/28] test-qobject-input-visitor: Cover missing nested
- struct member
-References: <1488544368-30622-1-git-send-email-armbru@redhat.com>
- <1488544368-30622-25-git-send-email-armbru@redhat.com>
-In-Reply-To: <1488544368-30622-25-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 3 March 2017 at 02:15, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+> Maybe it's not correct but works for everything I could test better than the
+> original code (which was broken even for the SH images one can find) so I
+> think we could just go with this until someone complains and provides a test
+> case. I've given up on trying to understand it because I don't really know
+> this device and SH so I could only go by the images I could find and they
+> seem to like it this way.
 
-On 03/03/2017 06:32 AM, Markus Armbruster wrote:
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  tests/test-qobject-input-visitor.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
+So what cases have you tested? The Linux kernel seems to support:
+ * sh embedded device, little endian
+ * PCI card, little endian host
+ * PCI card, big endian host
+and there are also
+ * 16 bit pixel format
+ * 32 bit pixel format
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+which makes 6 different combinations.
+(It's a shame there's no sh4 BE code to run on this.)
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+>> Looking at how the SWAP_FB_ENDIAN flag gets set:
+>> * for the r2d board it is set always
+>> * for PCI devices, it is set only if big-endian
+>>
+>> I suspect that what we actually have here is something
+>> like:
+>> * for the PCI device it's always little endian (and the
+>>   code ought not to need to depend on TARGET_WORDS_BIGENDIAN)
+>> * sysbus device may be more complicated
+>>
+>> Also I note there's an SM501_ENDIAN_CONTROL register on the
+>> device, which presumably if written changes the behaviour.
 
+> I've seen this but it's not emulated so it can be ignored for now. The spec
+> also says that default is little endian so for regs at least
+> DEVICE_LITTLE_ENDIAN should be OK.
 
---D4eaF0x1DDoKuSJTLxjeJWgT1Utnn87Ae
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Yes, that makes sense. So we should be modelling this as an "always
+little endian device".
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+The changes you have to the memory region ops achieve this for
+the registers implemented in this device itself. It looks like
+SYSBUS_OHCI is already always little endian. You also need to
+change the argument to the serial_mm_init() call to pass
+DEVICE_LITTLE_ENDIAN.
 
-iQEcBAEBCAAGBQJYubm0AAoJEKeha0olJ0Nq6JcH/A1N4vRj58L/JbITw491HYXU
-Zi5CliITyVHYteV6zJw8f90EQkRGVGFLRFCl8LbswSMHccZeIie2t08reEes3MDs
-D6zFhgxNQXvld8YXJo7rVkSQyQgdLNexdzRtYRX1fojYXizGhVFr8MvdKvAj2hNa
-5ewCppEjmwYW5rVa63L/7NKCNBth9Fii9mKj7Slle9Z89uxWBHjIVLkTT6dbuAbK
-wSSgfegi++M/+ZIVWqMu9JafgxPJWRP24AJarawmYjvuvWSMdC3do7gD1H74gspw
-97vx+3FWjwzUtzEs3VdO2w5XCBvMxGSonaUTnjWVa9XdSrdgnDO49PQyhsmu5ws=
-=pcr9
------END PGP SIGNATURE-----
-
---D4eaF0x1DDoKuSJTLxjeJWgT1Utnn87Ae--
+thanks
+-- PMM
