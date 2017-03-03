@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cjseZ-00087n-N1
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 14:14:12 -0500
+	(envelope-from <eblake@redhat.com>) id 1cjsfX-0000Os-7f
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 14:15:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cjseW-0004YQ-FH
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 14:14:11 -0500
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1488524289-5305-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<1488524289-5305-2-git-send-email-nikunj@linux.vnet.ibm.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <c776c8cc-b75e-a5a9-f88a-c127b168eef0@twiddle.net>
-Date: Sat, 4 Mar 2017 06:14:00 +1100
+	(envelope-from <eblake@redhat.com>) id 1cjsfU-0004od-1h
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 14:15:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45122)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cjsfT-0004n8-Q1
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 14:15:07 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C7F7CC0099FF
+	for <qemu-devel@nongnu.org>; Fri,  3 Mar 2017 19:15:07 +0000 (UTC)
+References: <1488544368-30622-1-git-send-email-armbru@redhat.com>
+	<1488544368-30622-26-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <82622f99-91d8-7ae0-2a38-53b49e200f72@redhat.com>
+Date: Fri, 3 Mar 2017 13:15:05 -0600
 MIME-Version: 1.0
-In-Reply-To: <1488524289-5305-2-git-send-email-nikunj@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] target/ppc: fmadd check for excp
- independently
+In-Reply-To: <1488544368-30622-26-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="E7dvkNbbs7V5Ka04503XWlJT0wPxARD1W"
+Subject: Re: [Qemu-devel] [PATCH v4 25/28] qapi: Make input visitors detect
+ unvisited list tails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,63 +35,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
-Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
-On 03/03/2017 05:58 PM, Nikunj A Dadhania wrote:
-> Current order of checking does not confirm with the spec
-> (ISA 3.0: MultiplyAddDP page-469). Change the order and make them
-> independent of each other.
->
-> For example: a = infinity, b = zero, c = SNaN, this should set both
-> VXIMZ and VXNAN
->
-> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--E7dvkNbbs7V5Ka04503XWlJT0wPxARD1W
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <82622f99-91d8-7ae0-2a38-53b49e200f72@redhat.com>
+Subject: Re: [PATCH v4 25/28] qapi: Make input visitors detect unvisited list
+ tails
+References: <1488544368-30622-1-git-send-email-armbru@redhat.com>
+ <1488544368-30622-26-git-send-email-armbru@redhat.com>
+In-Reply-To: <1488544368-30622-26-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 03/03/2017 06:32 AM, Markus Armbruster wrote:
+> Fix the design flaw demonstrated in the previous commit: new method
+> check_list() lets input visitors report that unvisited input remains
+> for a list, exactly like check_struct() lets them report that
+> unvisited input remains for a struct or union.
+>=20
+> Implement the method for the qobject input visitor (straightforward),
+> and the string input visitor (less so, due to the magic list syntax
+> there).  The opts visitor's list magic is even more impenetrable, and
+> all I can do there today is a stub with a FIXME comment.  No worse
+> than before.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  target/ppc/fpu_helper.c | 20 ++++++++++++--------
->  1 file changed, 12 insertions(+), 8 deletions(-)
->
-> diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-> index 0535ad0..a547f58 100644
-> --- a/target/ppc/fpu_helper.c
-> +++ b/target/ppc/fpu_helper.c
-> @@ -747,17 +747,21 @@ static void float64_maddsub_update_excp(CPUPPCState *env, float64 arg1,
->                                          float64 arg2, float64 arg3,
->                                          unsigned int madd_flags)
+
+Didn't I already review this one?
+
+Ah, there's my R-b:
+https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg07614.html
+
+But since it disappeared again, I had another look.
+
+> +++ b/qapi/qobject-input-visitor.c
+> @@ -51,7 +51,8 @@ static QObjectInputVisitor *to_qiv(Visitor *v)
+>      return container_of(v, QObjectInputVisitor, visitor);
+>  }
+> =20
+> -static const char *full_name(QObjectInputVisitor *qiv, const char *nam=
+e)
+> +static const char *full_name_nth(QObjectInputVisitor *qiv, const char =
+*name,
+> +                                 int n)
 >  {
-> +    if (unlikely(float64_is_signaling_nan(arg1, &env->fp_status) ||
-> +                 float64_is_signaling_nan(arg2, &env->fp_status) ||
-> +                 float64_is_signaling_nan(arg3, &env->fp_status))) {
-> +        /* sNaN operation */
-> +        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
-> +    }
+>      StackObject *so;
+>      char buf[32];
+> @@ -63,8 +64,10 @@ static const char *full_name(QObjectInputVisitor *qi=
+v, const char *name)
+>      }
+> =20
+>      QSLIST_FOREACH(so , &qiv->stack, node) {
+> -        if (qobject_type(so->obj) =3D=3D QTYPE_QDICT) {
+> -            g_string_prepend(qiv->errname, name);
+> +        if (n) {
+> +            n--;
+> +        } else if (qobject_type(so->obj) =3D=3D QTYPE_QDICT) {
+> +            g_string_prepend(qiv->errname, name ?: "<anonymous>");
+>              g_string_prepend_c(qiv->errname, '.');
+>          } else {
+>              snprintf(buf, sizeof(buf), "[%u]", so->index);
+> @@ -72,18 +75,24 @@ static const char *full_name(QObjectInputVisitor *q=
+iv, const char *name)
+>          }
+>          name =3D so->name;
+>      }
+> +    assert(!n);
+
+If I'm reading this right, your use of n-- in the loop followed by the
+post-condition is to assert that QSLIST_FOREACH() iterated n times, but
+lets see what callers pass for n:
+
+> =20
+>      if (name) {
+>          g_string_prepend(qiv->errname, name);
+>      } else if (qiv->errname->str[0] =3D=3D '.') {
+>          g_string_erase(qiv->errname, 0, 1);
+> -    } else {
+> +    } else if (!qiv->errname->str[0]) {
+>          return "<anonymous>";
+>      }
+> =20
+>      return qiv->errname->str;
+>  }
+> =20
+> +static const char *full_name(QObjectInputVisitor *qiv, const char *nam=
+e)
+> +{
+> +    return full_name_nth(qiv, name, 0);
+> +}
+
+One caller passes 0,
+
+
+> +static void qobject_input_check_list(Visitor *v, Error **errp)
+> +{
+> +    QObjectInputVisitor *qiv =3D to_qiv(v);
+> +    StackObject *tos =3D QSLIST_FIRST(&qiv->stack);
 > +
->      if (unlikely((float64_is_infinity(arg1) && float64_is_zero(arg2)) ||
->                   (float64_is_zero(arg1) && float64_is_infinity(arg2)))) {
->          /* Multiplication of zero by infinity */
-> -        arg1 = float_invalid_op_excp(env, POWERPC_EXCP_FP_VXIMZ, 1);
-> -    } else if (unlikely(float64_is_signaling_nan(arg1, &env->fp_status) ||
-> -                        float64_is_signaling_nan(arg2, &env->fp_status) ||
-> -                        float64_is_signaling_nan(arg3, &env->fp_status))) {
-> -        /* sNaN operation */
-> -        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
-> -    } else if ((float64_is_infinity(arg1) || float64_is_infinity(arg2)) &&
-> -               float64_is_infinity(arg3)) {
-> +        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXIMZ, 1);
-> +    }
+> +    assert(tos && tos->obj && qobject_type(tos->obj) =3D=3D QTYPE_QLIS=
+T);
 > +
+> +    if (tos->entry) {
+> +        error_setg(errp, "Only %u list elements expected in %s",
+> +                   tos->index + 1, full_name_nth(qiv, NULL, 1));
 
-While these two bits should be both be set if the inputs demand, it won't 
-happen if the exception enable bit is set, since the first call will longjmp. 
-I'm not sure what to do about that; perhaps just ignore it for now.
+the other passes 1.  No other calls.  Did we really need an integer,
+where we use n--, or would a bool have done as well?
 
-More importantly, it will longjmp with the wrong source location.  Note that 
-float_invalid_op_excp is attempting to use __always_inline__ to grab a correct 
-value for GETPC.  Which, as one can predict, is doomed to failure.  As here we 
-are, in another function which is not __always_inline__, producing the wrong value.
+At any rate, since I've already reviewed it once, you can add R-b, but
+we may want a followup to make it less confusing.
 
-We need to drop all of the __always_inline__ nonsense, and properly pass down a 
-value for GETPC from the top-level helper, so that we always think about it.
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
 
-r~
+--E7dvkNbbs7V5Ka04503XWlJT0wPxARD1W
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYucC5AAoJEKeha0olJ0NqAtUIAIcE/XnHOCT/hnMQYgmk3nSJ
+D1NqlhlABsJeSLPAcamltbpMzyerVVKoWVUclaVMjXUJWCoES+daaJ8krYfl49sf
+wVIZAYq/GcEuGNz+Nnl3HW03+9kQEJB9fXaK0hyCc0S5OnAL/71xrfaJdbKOP6ZS
+34h7+QDTuY0G7EJVtu61CbOFdOORePUN3XPxs/9eysb9NK/l4ODtdW0g5a9SvlND
+SgYQUVAIRfJ8+SDdUs8vesOZG83Ng0ylrmuZn5v2KWZnjG/LOley41zdR2Kzq6IH
+F7EiPrEP5tJALf+fJydc+JEWbN8o76AoIf1Zvy8soOZw4NMlv6GS7yO1GM721rM=
+=fD/6
+-----END PGP SIGNATURE-----
+
+--E7dvkNbbs7V5Ka04503XWlJT0wPxARD1W--
