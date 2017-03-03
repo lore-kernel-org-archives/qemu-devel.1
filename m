@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36410)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cjqL4-00089d-CB
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:45:55 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cjqN6-0000Zx-LN
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:48:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cjqKz-0008Ax-PD
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:45:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48344)
+	(envelope-from <ehabkost@redhat.com>) id 1cjqN1-0000aV-OB
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:48:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33554)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cjqKz-0008A5-FQ
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:45:49 -0500
-References: <mailman.56273.1488553194.22740.qemu-devel@nongnu.org>
-	<8FB6923C-8F97-497C-95DC-6F2D937725BC@gmail.com>
-	<20170303164426.42472535@bahia.lan>
-	<AA7BADA2-06D5-4A20-A38F-57D374B6C58D@gmail.com>
-	<20170303162128.GD13631@redhat.com>
-	<e7d5aa7e-46a9-efba-bcf2-934b71e3bb74@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a93c2a39-6e10-331c-599a-81a7d8f2f52e@redhat.com>
-Date: Fri, 3 Mar 2017 10:45:46 -0600
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cjqN1-0000ZN-GR
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:47:55 -0500
+Date: Fri, 3 Mar 2017 13:47:51 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170303164751.GY2778@thinpad.lan.raisama.net>
+References: <1488517304-23131-1-git-send-email-he.chen@linux.intel.com>
+	<20170303135704.GX2778@thinpad.lan.raisama.net>
+	<d93b2ebb-c5a3-a774-30fd-2d92c7703549@redhat.com>
+	<20170303162611.GE13631@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <e7d5aa7e-46a9-efba-bcf2-934b71e3bb74@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="46HWIu5Qrd7U542MwKQieLh7r2iucfADH"
-Subject: Re: [Qemu-devel] git master build failure in 9pfs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170303162611.GE13631@redhat.com>
+Subject: Re: [Qemu-devel] [RFC] x86: Allow to set NUMA distance for
+ different NUMA nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,94 +30,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, G 3 <programmingkidx@gmail.com>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Greg Kurz <groug@kaod.org>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, He Chen <he.chen@linux.intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---46HWIu5Qrd7U542MwKQieLh7r2iucfADH
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>,
- G 3 <programmingkidx@gmail.com>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Greg Kurz <groug@kaod.org>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
-Message-ID: <a93c2a39-6e10-331c-599a-81a7d8f2f52e@redhat.com>
-Subject: Re: [Qemu-devel] git master build failure in 9pfs
-References: <mailman.56273.1488553194.22740.qemu-devel@nongnu.org>
- <8FB6923C-8F97-497C-95DC-6F2D937725BC@gmail.com>
- <20170303164426.42472535@bahia.lan>
- <AA7BADA2-06D5-4A20-A38F-57D374B6C58D@gmail.com>
- <20170303162128.GD13631@redhat.com>
- <e7d5aa7e-46a9-efba-bcf2-934b71e3bb74@redhat.com>
-In-Reply-To: <e7d5aa7e-46a9-efba-bcf2-934b71e3bb74@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Mar 03, 2017 at 04:26:12PM +0000, Daniel P. Berrange wrote:
+> On Fri, Mar 03, 2017 at 10:09:22AM -0600, Eric Blake wrote:
+> > On 03/03/2017 07:57 AM, Eduardo Habkost wrote:
+> > 
+> > >> With this patch, when a user wants to create a guest that contains
+> > >> several vNUMA nodes and also wants to set distance among those nodes,
+> > >> the QEMU command would like:
+> > >>
+> > >> ```
+> > >> -object memory-backend-ram,size=1G,prealloc=yes,host-nodes=0,policy=bind,id=node0 \
+> > >> -numa node,nodeid=0,cpus=0,memdev=node0,distance=10,distance=21,distance=31,distance=41 \
+> > 
+> > > 
+> > > It would be nice to have a more intuitive syntax to represent
+> > > ordered lists in QemuOpts. But this is what we have today.
+> > > 
+> > 
+> > Markus has the discussion on representing arrays via the command line;
+> > particularly since this array is very tightly coupled to the order in
+> > which values are presented, it may be worth having:
+> > 
+> > -numa
+> > node,nodeid=0,cpus=0,memdev=nod0,distance.0=10,distance.1=21,distance.2=31,distance.3=41
+> > 
+> > with the explicit distance.0= suffixes to distance making it more
+> > obvious that we are dealing with an array.
+> > 
+> > > I think the proposal makes sense. I would like the semantics of the new option
+> > > to be documented at qapi-schema.json and qemu-options.hx.
+> > > 
+> > > I would call the new NumaNodeOptions field "distances", as it is
+> > > a list of distances.
+> > 
+> > Indeed, Markus is trying (with his work on -blockdev for 2.9) to get the
+> > command line to a point where it is identical to the QMP code, by
+> > reusing qapi-schema.json, so we should very much keep that in mind with
+> > whatever we add to -numa in 2.10.
+> > 
+> > 
+> > > but in the future we could support something like:
+> > > 
+> > >   -numa node,nodeid=0,cpus=0,memdev=node0 \
+> > >   -numa node,nodeid=1,cpus=1,memdev=node1 \
+> > >   -numa node,nodeid=2,cpus=2,memdev=node2 \
+> > >   -numa node,nodeid=3,cpus=3,memdev=node3 \
+> > >   -numa distances,distances[0][0]=10,distances[0][1]=21,distances[0][2]=31,distances[0][3]=41,\
+> > >                   distances[1][0]=21,distances[1][1]=10,distances[1][2]=21,distances[1][3]=31,\
+> > >                   distances[2][0]=31,distances[2][1]=21,distances[2][2]=10,distances[2][3]=21,\
+> > >                   distances[3][0]=41,distances[3][1]=31,distances[3][2]=21,distances[3][3]=10
+> > 
+> > Except that [] requires special shell quoting, so the proposal would be
+> > more like:
+> > 
+> > -numa distances.0.0=10,distances.0.1=21
+> > 
+> > Right now, QMP doesn't support 2-D arrays (although this may be a good
+> > reason to introduce support), so that's also something to think about
+> > (not insurmountable, but makes the task more complex).
+> 
+> What I don't like about this syntax is that it is duplicating information
+> twice. IIUC the NUMA distance information is unidirectional, so specifying
+> the same data for both direetions (node 0 -> node 3, and node 3 -> node 0)
+> looks like overkill. Also the self-node distance isi defined to always be
+> 10 IIUC, so specifying that is not required. IOW, could cut down the data
+> we need to provider to just
+> 
+>    -numa distances,nodea=0,nodeb=1,value=20
+>    -numa distances,nodea=0,nodeb=2,value=20
+>    -numa distances,nodea=0,nodeb=3,value=20
+>    -numa distances,nodea=1,nodeb=2,value=20
+>    -numa distances,nodea=1,nodeb=3,value=20
+>    -numa distances,nodea=2,nodeb=3,value=20
 
-On 03/03/2017 10:40 AM, Eric Blake wrote:
+The ACPI spec (I'm looking at revision 5.0) explicitly mentions
+that A->B distance may be different from B->A distrance:
 
->> Isn't the use of O_PATH required in order to fix the recent
->> security vulnerability in 9p ?  If so, then defining it to
->> 0 means the QEMU is silently becoming vulnerable once again
->> which I don't think is a good idea.
->=20
-> My understanding is that O_PATH is an optimization. It lets openat()
-> succeed in some places where it would ordinarily fail (for example, it
-> can be used to open a dir with mode 0000) - the resulting fd is
-> limited-use (it cannot be used to read() or write(), but CAN be used as=
+"The entry value is a one-byte unsigned integer. The relative
+distance from System Locality i to System Locality j is the
+i*N + j entry in the matrix, where N is the number of System
+Localities.  Except for the relative distance from a System
+Locality to itself, each relative distance is stored twice in the
+matrix. This provides the capability to describe the scenario
+where the relative distances for the two directions between
+System Localities is different."
 
-> the relative fd for a subsequent openat(), for example).  If you define=
+But I agree we could figure out a more compact syntax for more
+common cases where self-node distance is 10 and distance is the
+same both ways.
 
-> O_PATH to 0, then attempts to traverse paths will fail where the could
-> have otherwise succeeded, but failure is okay (the CVE was that we were=
-
-> succeeding at opening through a guest-controlled symlink; whether we no=
-w
-> fail or guarantee that we are not going through a symlink is a quality
-> of implementation, but either way, we are at least immune from
-> succeeding through a symlink).
-
-[I hit send too soon]
-
-To put it in perspective, the 9p fixes included code for chmod() that
-falls back to fchmodat() - but Linux' fchmodat() is broken (it is not
-POSIX-compliant in that there is no race-free way to use
-AT_SYMLINK_NOFOLLOW, at least not until Greg gets his kernel patches
-approved that implement the fchmodat2() syscall [1]).  The symptoms are
-that we now have cases where the guest will get failures where they
-could have otherwise succeeded if fchmodat() were not broken, but such
-cases are limited to corners where permissions are overly-tight; in the
-common case, the permissions will allow opening the file with O_RDONLY
-or O_WRONLY and fchmod() can be used.
-
-So a limited-use fix for the CVE that safely succeeds without symlinks
-in the common case but fails in the corner case of tight permissions
-(which is what defining O_PATH to 0 would do) is better than the pre-CVE
-state of code that succeeds but risks going through a user-controlled
-symlink.
-
-[1] https://lkml.org/lkml/2017/2/28/461
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---46HWIu5Qrd7U542MwKQieLh7r2iucfADH
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYuZ26AAoJEKeha0olJ0NqPb0IAKnzHsMM9nMQh1V2WLsLW6/d
-buXhQWB/kifD7nF8iXcPt5A/fIqGVG86eLzMK03qCIG0nQnyRLvoiQtSBrdHaE2t
-PpLRGH7ioHhWSJuDn2uP7kFgGHV3v+58Ntsu4TfyI3H2hzuyp80mkRGTDsIBCbvJ
-tUYp7nSGgNHVao8HqAGEC9dRK6gNm8mEhRqsPTqjJ7nu7JR1Vsn5pnTLl3bGoKyu
-M0QVoUKHwFebRU0bjezE6I8c5MEm5krzl19p86RIeuk4ypWo74aS8+XzePw+aWtS
-8/X72CIBqYOOvev0Y4U9PhBt+cxtnk0tv1DT9m0gTsaqObGgZVPAug597IVogww=
-=AyBU
------END PGP SIGNATURE-----
-
---46HWIu5Qrd7U542MwKQieLh7r2iucfADH--
+-- 
+Eduardo
