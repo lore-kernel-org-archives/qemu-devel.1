@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cjqFh-0003YL-8X
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:40:22 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cjqGE-000417-VI
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:40:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cjqFc-0005Xx-Do
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:40:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42414)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cjqFc-0005Xm-59
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:40:16 -0500
-References: <mailman.56273.1488553194.22740.qemu-devel@nongnu.org>
-	<8FB6923C-8F97-497C-95DC-6F2D937725BC@gmail.com>
-	<20170303164426.42472535@bahia.lan>
-	<AA7BADA2-06D5-4A20-A38F-57D374B6C58D@gmail.com>
-	<20170303162128.GD13631@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e7d5aa7e-46a9-efba-bcf2-934b71e3bb74@redhat.com>
-Date: Fri, 3 Mar 2017 10:40:13 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1cjqGD-0005n6-Gj
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:40:54 -0500
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:38207)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cjqGD-0005mx-2H
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:40:53 -0500
+Received: by mail-wm0-x234.google.com with SMTP id t193so19686594wmt.1
+	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 08:40:52 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20170303162128.GD13631@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Xbdw4oAs2W2U8b2PMuolPrkFwB0RUIm7H"
-Subject: Re: [Qemu-devel] git master build failure in 9pfs
+In-Reply-To: <CAFEAcA9sbqvqbe2T+W7HtTkdsnCWTHDf6EqtJ_2GGUjtKz64ug@mail.gmail.com>
+References: <1488320775-9849-1-git-send-email-armbru@redhat.com>
+	<CAFEAcA8WXnBXQ-qNmzRw6yD_tuYLQepmSC0be50s8h=-1r-VQw@mail.gmail.com>
+	<CAFEAcA8oG+uODONjXpeAWpNxcmWfoxEbK31LksrLUQp5kbupgA@mail.gmail.com>
+	<CAFEAcA9sbqvqbe2T+W7HtTkdsnCWTHDf6EqtJ_2GGUjtKz64ug@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 Mar 2017 16:40:31 +0000
+Message-ID: <CAFEAcA-2MdeE3CQYVmDOtV+Rc_+1dLFNXFEwGOSKFXdn1mzYJw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 00/24] block: Command line option -blockdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,86 +31,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, G 3 <programmingkidx@gmail.com>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Greg Kurz <groug@kaod.org>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Xbdw4oAs2W2U8b2PMuolPrkFwB0RUIm7H
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>,
- G 3 <programmingkidx@gmail.com>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Greg Kurz <groug@kaod.org>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
-Message-ID: <e7d5aa7e-46a9-efba-bcf2-934b71e3bb74@redhat.com>
-Subject: Re: [Qemu-devel] git master build failure in 9pfs
-References: <mailman.56273.1488553194.22740.qemu-devel@nongnu.org>
- <8FB6923C-8F97-497C-95DC-6F2D937725BC@gmail.com>
- <20170303164426.42472535@bahia.lan>
- <AA7BADA2-06D5-4A20-A38F-57D374B6C58D@gmail.com>
- <20170303162128.GD13631@redhat.com>
-In-Reply-To: <20170303162128.GD13631@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 03/03/2017 10:21 AM, Daniel P. Berrange wrote:
-
->>>> I remember years ago something like O_PATH was not defined on Mac OS=
-
->>>> X,
->>>> so the solution was to define the constant as zero. Something like
->>>> this:
->>>>
->>>> #ifndef O_PATH
->>>> 	#define O_PATH 0
->>>> #endif
->>>>
->>>> Maybe this might work in 9p-util.h.
->>>>
-
+On 3 March 2017 at 16:36, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 3 March 2017 at 16:31, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> x86-64 Linux host:
 >>
->> +#ifndef O_PATH
->> +    #define O_PATH 0
->> +#endif
->=20
-> Isn't the use of O_PATH required in order to fix the recent
-> security vulnerability in 9p ?  If so, then defining it to
-> 0 means the QEMU is silently becoming vulnerable once again
-> which I don't think is a good idea.
+>> QTEST_QEMU_BINARY=cris-softmmu/qemu-system-cris
+>> QTEST_QEMU_IMG=qemu-img MALLOC_PERTURB_=${MALLOC_PERTURB_:-$((RANDOM %
+>> 255 + 1))} gtester -k --verbose -m=quick  tests/qmp-test
+>> tests/device-introspect-test tests/qom-test
+>> TEST: tests/qmp-test... (pid=31974)
+>>   /cris/qmp/protocol:
+>> Broken pipe
+>> FAIL
+>
+> Failure is intermittent.
 
-My understanding is that O_PATH is an optimization. It lets openat()
-succeed in some places where it would ordinarily fail (for example, it
-can be used to open a dir with mode 0000) - the resulting fd is
-limited-use (it cannot be used to read() or write(), but CAN be used as
-the relative fd for a subsequent openat(), for example).  If you define
-O_PATH to 0, then attempts to traverse paths will fail where the could
-have otherwise succeeded, but failure is okay (the CVE was that we were
-succeeding at opening through a guest-controlled symlink; whether we now
-fail or guarantee that we are not going through a symlink is a quality
-of implementation, but either way, we are at least immune from
-succeeding through a symlink).
+gdb'ing the qemu shows a SEGV accessing a NULL qdict:
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+Thread 1 "qemu-system-cri" received signal SIGSEGV, Segmentation fault.
+0x00005555557e98b9 in qdict_find (bucket=<optimised out>,
+    key=0x55555587fd17 "error", qdict=0x0)
+    at /home/petmay01/linaro/qemu-for-merges/qobject/qdict.c:110
+110         QLIST_FOREACH(entry, &qdict->table[bucket], next)
+(gdb) bt
+#0  0x00005555557e98b9 in qdict_get (bucket=<optimised out>,
+key=0x55555587fd17 "error", qdict=0x0)
+    at /home/petmay01/linaro/qemu-for-merges/qobject/qdict.c:110
+#1  0x00005555557e98b9 in qdict_get (qdict=0x0,
+key=key@entry=0x55555587fd17 "error")
+    at /home/petmay01/linaro/qemu-for-merges/qobject/qdict.c:157
+#2  0x00005555557e9a69 in qdict_get_qdict (qdict=<optimised out>,
+key=key@entry=0x55555587fd17 "error")
+    at /home/petmay01/linaro/qemu-for-merges/qobject/qdict.c:242
+#3  0x000055555561c1f8 in handle_qmp_command (parser=<optimised out>,
+tokens=<optimised out>)
+    at /home/petmay01/linaro/qemu-for-merges/monitor.c:3727
+#4  0x00005555557ebca7 in json_message_process_token
+(lexer=0x55555607d148, input=0x55555606b480, type=JSON_RCURLY, x=31,
+y=6)
+    at /home/petmay01/linaro/qemu-for-merges/qobject/json-streamer.c:105
+#5  0x00005555558086fd in json_lexer_feed_char
+(lexer=lexer@entry=0x55555607d148, ch=125 '}',
+flush=flush@entry=false)
+    at /home/petmay01/linaro/qemu-for-merges/qobject/json-lexer.c:319
+#6  0x000055555580880e in json_lexer_feed (lexer=0x55555607d148,
+buffer=<optimised out>, size=<optimised out>)
+    at /home/petmay01/linaro/qemu-for-merges/qobject/json-lexer.c:369
+#7  0x00005555557ebd69 in json_message_parser_feed (parser=<optimised
+out>, buffer=<optimised out>, size=<optimised out>)
+    at /home/petmay01/linaro/qemu-for-merges/qobject/json-streamer.c:124
+#8  0x000055555561ad8b in monitor_qmp_read (opaque=<optimised out>,
+buf=<optimised out>, size=<optimised out>)
+    at /home/petmay01/linaro/qemu-for-merges/monitor.c:3768
+#9  0x00005555557a190d in tcp_chr_read (chan=<optimised out>,
+cond=<optimised out>, opaque=<optimised out>)
+    at /home/petmay01/linaro/qemu-for-merges/chardev/char-socket.c:411
+#10 0x00007fffe144404a in g_main_context_dispatch
+(context=0x55555606ba80) at
+/build/glib2.0-prJhLS/glib2.0-2.48.2/./glib/gmain.c:3154
+#11 0x00007fffe144404a in g_main_context_dispatch
+(context=context@entry=0x55555606ba80)
+    at /build/glib2.0-prJhLS/glib2.0-2.48.2/./glib/gmain.c:3769
+#12 0x00005555557f167b in main_loop_wait () at
+/home/petmay01/linaro/qemu-for-merges/util/main-loop.c:215
+#13 0x00005555557f167b in main_loop_wait (timeout=<optimised out>) at
+/home/petmay01/linaro/qemu-for-merges/util/main-loop.c:260
+#14 0x00005555557f167b in main_loop_wait (nonblocking=<optimised out>)
+at /home/petmay01/linaro/qemu-for-merges/util/main-loop.c:508
+#15 0x00005555555d87c5 in main () at
+/home/petmay01/linaro/qemu-for-merges/vl.c:1900
+#16 0x00005555555d87c5 in main (argc=<optimised out>, argv=<optimised
+out>, envp=<optimised out>)
+    at /home/petmay01/linaro/qemu-for-merges/vl.c:4714
 
+(In frame 3 handle_qmp_command() the rsp returned from qmp_dispatch()
+is NULL.)
 
---Xbdw4oAs2W2U8b2PMuolPrkFwB0RUIm7H
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYuZxtAAoJEKeha0olJ0NqZXcH/jCAZYuGNIJCsQlj1lvGcIbA
-Pffpq6a9Zwvqw6bicbbWHmHSiQfkvOYYRyWG/QqOiJ3iZXAqBdudHbfARze+Gg3Y
-Zx5IoZ74ZnJokV76XbmTLt4FYhtxXT3lkydIFo2W0CWOTrWD3cHHmQJFXOH/8plX
-CdBBU8/Ro9Q+vJurx5Gm8J1bl8oeaTfFgj11OPHxrP5KF6iNfhHEKq7MDSbWZbHK
-LbZWiV5ssKJsqQMH/jgiei1lGHGhMw+Gv4VjWl/iVrcl8Otg+uWl+GsCwxZxaUVF
-iCfo6gmfOo3OVISPXXlkub9D49lgCufDjO+d3aNV5M5hNSegMkL1Tt/i37z8Pg0=
-=sXh9
------END PGP SIGNATURE-----
-
---Xbdw4oAs2W2U8b2PMuolPrkFwB0RUIm7H--
+thanks
+-- PMM
