@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cjnSe-0002EU-96
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:41:33 -0500
+	(envelope-from <edgar.iglesias@gmail.com>) id 1cjnW1-00048C-6E
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:45:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cjnSd-0002Hi-EO
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:41:32 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1488491046-2549-1-git-send-email-armbru@redhat.com>
-	<1488491046-2549-6-git-send-email-armbru@redhat.com>
-	<20170303132535.GB14351@noname.redhat.com>
-Date: Fri, 03 Mar 2017 14:41:23 +0100
-In-Reply-To: <20170303132535.GB14351@noname.redhat.com> (Kevin Wolf's message
-	of "Fri, 3 Mar 2017 14:25:35 +0100")
-Message-ID: <87mvd2scjg.fsf@dusky.pond.sub.org>
+	(envelope-from <edgar.iglesias@gmail.com>) id 1cjnVx-0003YK-7M
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:45:01 -0500
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:35951)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
+	id 1cjnVw-0003W1-Fg
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:44:57 -0500
+Received: by mail-lf0-x241.google.com with SMTP id g70so7088202lfh.3
+	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 05:44:54 -0800 (PST)
+Date: Fri, 3 Mar 2017 14:44:51 +0100
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Message-ID: <20170303134451.GW9606@toto>
+References: <1487362633-25018-1-git-send-email-fred.konrad@greensocs.com>
+	<1487362633-25018-5-git-send-email-fred.konrad@greensocs.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 05/15] sheepdog: Fix snapshot ID parsing in
- _open(), _create, _goto()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1487362633-25018-5-git-send-email-fred.konrad@greensocs.com>
+Subject: Re: [Qemu-devel] [PATCH V2 4/7] exec: allow to get a pointer for
+ some mmio memory region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,73 +31,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: fred.konrad@greensocs.com
+Cc: qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, peter.maydell@linaro.org, mark.burton@greensocs.com, alistair.francis@xilinx.com, clg@kaod.org, pbonzini@redhat.com
 
-Kevin Wolf <kwolf@redhat.com> writes:
+On Fri, Feb 17, 2017 at 09:17:10PM +0100, fred.konrad@greensocs.com wrote:
+> From: KONRAD Frederic <fred.konrad@greensocs.com>
+> 
+> This introduces a special callback which allows to run code from some MMIO
+> devices.
+> 
+> SysBusDevice with a MemoryRegion which implements the request_ptr callback will
+> be notified when the guest try to execute code from their offset. Then it will
+> be able to eg: pre-load some code from an SPI device or ask a pointer from an
+> external simulator, etc..
+> 
+> When the pointer or the data in it are no longer valid the device has to
+> invalidate it.
+> 
+> Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
+> 
+> RFC -> V1:
+>   * Use mmio-interface instead of directly creating the subregion.
 
-> Am 02.03.2017 um 22:43 hat Markus Armbruster geschrieben:
->> sd_parse_uri() and sd_snapshot_goto() screw up error checking after
->> strtoul(), and truncate long tag names silently.  Fix by replacing
->> those parts by new sd_parse_snapid_or_tag(), which checks more
->> carefully.
->> 
->> sd_snapshot_delete() also parses snapshot IDs, but is currently too
->> broken for me to touch.  Mark TODO.
->> 
->> Two calls of strtol() without error checking remain in
->> parse_redundancy().  Mark them FIXME.
->> 
->> More silent truncation of configuration strings remains elsewhere.
->> Not marked.
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  block/sheepdog.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++----------
->>  1 file changed, 55 insertions(+), 11 deletions(-)
->> 
->> diff --git a/block/sheepdog.c b/block/sheepdog.c
->> index 5554f47..deb110e 100644
->> --- a/block/sheepdog.c
->> +++ b/block/sheepdog.c
->> @@ -914,6 +914,49 @@ static int get_sheep_fd(BDRVSheepdogState *s, Error **errp)
->>      return fd;
->>  }
->>  
->> +/*
->> + * Parse numeric snapshot ID in @str
->> + * If @str can't be parsed as number, return false.
->> + * Else, if the number is zero or too large, set *@snapid to zero and
->> + * return true.
->> + * Else, set *@snapid to the number and return true.
->> + */
->> +static bool sd_parse_snapid(const char *str, uint32_t *snapid)
->> +{
->> +    unsigned long ul;
->> +    int ret;
->> +
->> +    ret = qemu_strtoul(str, NULL, 10, &ul);
->> +    if (ret == -ERANGE) {
->> +        ul = ret = 0;
->> +    }
->> +    if (ret) {
->> +        return false;
->> +    }
->> +    if (ul > UINT32_MAX) {
->> +        ul = 0;
->> +    }
->> +
->> +    *snapid  = ul;
->
-> Redundant space.
+Hi Fred,
 
-Will clean up.
 
->> +    return true;
->> +}
->
-> Looks good otherwise.
->
-> Kevin
 
-Thanks!
+
+> ---
+>  cputlb.c              |  7 +++++++
+>  include/exec/memory.h | 35 +++++++++++++++++++++++++++++++
+>  memory.c              | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 99 insertions(+)
+> 
+> diff --git a/cputlb.c b/cputlb.c
+> index 846341e..9077247 100644
+> --- a/cputlb.c
+> +++ b/cputlb.c
+> @@ -545,6 +545,13 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
+>      if (memory_region_is_unassigned(mr)) {
+>          CPUClass *cc = CPU_GET_CLASS(cpu);
+>  
+> +        if (memory_region_request_mmio_ptr(mr, addr)) {
+> +            /* A MemoryRegion is potentially added so re-run the
+> +             * get_page_addr_code.
+> +             */
+> +            return get_page_addr_code(env, addr);
+> +        }
+> +
+>          if (cc->do_unassigned_access) {
+>              cc->do_unassigned_access(cpu, addr, false, true, 0, 4);
+>          } else {
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index 987f925..36b0eec 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -120,6 +120,15 @@ struct MemoryRegionOps {
+>                                      uint64_t data,
+>                                      unsigned size,
+>                                      MemTxAttrs attrs);
+> +    /* Instruction execution pre-callback:
+> +     * @addr is the address of the access relative to the @mr.
+> +     * @size is the size of the area returned by the callback.
+> +     * @offset is the location of the pointer inside @mr.
+> +     *
+> +     * Returns a pointer to a location which contains guest code.
+> +     */
+> +    void *(*request_ptr)(void *opaque, hwaddr addr, unsigned *size,
+> +                         unsigned *offset);
+>  
+>      enum device_endian endianness;
+>      /* Guest-visible constraints: */
+> @@ -1253,6 +1262,32 @@ void memory_global_dirty_log_stop(void);
+>  void mtree_info(fprintf_function mon_printf, void *f, bool flatview);
+>  
+>  /**
+> + * memory_region_request_mmio_ptr: request a pointer to an mmio
+> + * MemoryRegion. If it is possible map a RAM MemoryRegion with this pointer.
+> + * When the device wants to invalidate the pointer it will call
+> + * memory_region_invalidate_mmio_ptr.
+> + *
+> + * @mr: #MemoryRegion to check
+> + * @addr: address within that region
+> + *
+> + * Returns true on success, false otherwise.
+> + */
+> +bool memory_region_request_mmio_ptr(MemoryRegion *mr, hwaddr addr);
+> +
+> +/**
+> + * memory_region_invalidate_mmio_ptr: invalidate the pointer to an mmio
+> + * previously requested.
+> + * In the end that means that if something wants to execute from this area it
+> + * will need to request the pointer again.
+> + *
+> + * @mr: #MemoryRegion associated to the pointer.
+> + * @addr: address within that region
+> + * @size: size of that area.
+> + */
+> +void memory_region_invalidate_mmio_ptr(MemoryRegion *mr, hwaddr offset,
+> +                                       unsigned size);
+> +
+> +/**
+>   * memory_region_dispatch_read: perform a read directly to the specified
+>   * MemoryRegion.
+>   *
+> diff --git a/memory.c b/memory.c
+> index 6c58373..a605250 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -30,6 +30,8 @@
+>  #include "exec/ram_addr.h"
+>  #include "sysemu/kvm.h"
+>  #include "sysemu/sysemu.h"
+> +#include "hw/misc/mmio_interface.h"
+> +#include "hw/qdev-properties.h"
+>  
+>  //#define DEBUG_UNASSIGNED
+>  
+> @@ -2375,6 +2377,61 @@ void memory_listener_unregister(MemoryListener *listener)
+>      QTAILQ_REMOVE(&listener->address_space->listeners, listener, link_as);
+>  }
+>  
+> +bool memory_region_request_mmio_ptr(MemoryRegion *mr, hwaddr addr)
+> +{
+> +    void *host;
+> +    unsigned size = 0;
+> +    unsigned offset = 0;
+> +    Object *new_interface;
+> +
+> +    if (!mr || !mr->ops->request_ptr) {
+> +        return false;
+> +    }
+> +
+> +    /*
+> +     * Avoid an update if the request_ptr call
+> +     * memory_region_invalidate_mmio_ptr which seems to be likely when we use
+> +     * a cache.
+> +     */
+> +    memory_region_transaction_begin();
+> +
+> +    host = mr->ops->request_ptr(mr->opaque, addr - mr->addr, &size, &offset);
+> +
+> +    if (!host || !size) {
+> +        memory_region_transaction_commit();
+> +        return false;
+> +    }
+> +
+> +    new_interface = object_new("mmio_interface");
+> +    qdev_prop_set_uint64(DEVICE(new_interface), "start", offset);
+> +    qdev_prop_set_uint64(DEVICE(new_interface), "end", offset + size - 1);
+> +    qdev_prop_set_bit(DEVICE(new_interface), "ro", true);
+> +    qdev_prop_set_ptr(DEVICE(new_interface), "host_ptr", host);
+> +    qdev_prop_set_ptr(DEVICE(new_interface), "subregion", mr);
+> +    object_property_set_bool(OBJECT(new_interface), true, "realized", NULL);
+> +
+> +    memory_region_transaction_commit();
+> +    return true;
+> +}
+> +
+> +void memory_region_invalidate_mmio_ptr(MemoryRegion *mr, hwaddr offset,
+> +                                       unsigned size)
+> +{
+> +    MemoryRegionSection section = memory_region_find(mr, offset, size);
+> +
+> +    if (section.mr != mr) {
+> +        /* memory_region_find add a ref on section.mr */
+> +        memory_region_unref(section.mr);
+> +        if (!MMIO_INTERFACE(section.mr->owner)) {
+
+Is MMIO_INTERFACE defined yet?
+This may break bisection...
+
+Cheers,
+Edgar
+
+
+> +            return;
+> +        }
+> +        /* We found the interface just drop it. */
+> +        object_property_set_bool(section.mr->owner, false, "realized", NULL);
+> +        object_unref(section.mr->owner);
+> +        object_unparent(section.mr->owner);
+> +    }
+> +}
+> +
+>  void address_space_init(AddressSpace *as, MemoryRegion *root, const char *name)
+>  {
+>      memory_region_ref(root);
+> -- 
+> 1.8.3.1
+> 
+> 
