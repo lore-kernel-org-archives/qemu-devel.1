@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34055)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34738)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1cjhuR-0001pP-C4
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 02:45:52 -0500
+	(envelope-from <bounces@canonical.com>) id 1cjhzp-0003Wt-G9
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 02:51:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1cjhuO-0005nn-3t
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 02:45:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43868)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1cjhuN-0005nN-Ru
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 02:45:48 -0500
-From: Bandan Das <bsd@redhat.com>
-References: <20170214073551.GA9055@pxdev.xzpeter.org>
-	<CAHyh4xiATAV801U7zjK1F_B+7e2bDWhH1-gpFKF3U1jNmCfScw@mail.gmail.com>
-	<20170215025243.GA3988@pxdev.xzpeter.org>
-	<20170215033452.GB3988@pxdev.xzpeter.org>
-	<20170215111552.5405418a@t450s.home>
-	<20170216022839.GC15985@pxdev.xzpeter.org>
-	<20170215194758.4622d73c@t450s.home>
-	<CAHyh4xg6oRVoW81QgdQRoL0Oc7jHm7prgyd--ghYQ4d4_aSUpQ@mail.gmail.com>
-	<CAHyh4xi0qOaL5X5E6yLpf2O=RYR=G8X=zjr7g+h8QtntYPnsFA@mail.gmail.com>
-	<jpgefyfs4m4.fsf@linux.bootlegged.copy>
-	<20170303034303.GA20768@pxdev.xzpeter.org>
-Date: Fri, 03 Mar 2017 02:45:44 -0500
-In-Reply-To: <20170303034303.GA20768@pxdev.xzpeter.org> (Peter Xu's message of
-	"Fri, 3 Mar 2017 11:43:04 +0800")
-Message-ID: <jpg37eupzvb.fsf@linux.bootlegged.copy>
+	(envelope-from <bounces@canonical.com>) id 1cjhzm-0007oX-DE
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 02:51:25 -0500
+Received: from indium.canonical.com ([91.189.90.7]:32835)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cjhzm-0007m9-78
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 02:51:22 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cjhzj-0007X1-7c
+	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 07:51:19 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 35FD22E81A4
+	for <qemu-devel@nongnu.org>; Fri,  3 Mar 2017 07:51:16 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] iommu emulation
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 03 Mar 2017 07:44:43 -0000
+From: Michael Klopf <1668556@bugs.launchpad.net>
+Reply-To: Bug 1668556 <1668556@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170228100937.7789.7367.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170303074444.7789.91280.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1668556] Re: QEMU Guest Agent service fails to
+ start on Windows 10 RS2 preview
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,44 +37,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Jintack Lim <jintack@cs.columbia.edu>, QEMU Devel Mailing List <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>
+To: qemu-devel@nongnu.org
 
-Peter Xu <peterx@redhat.com> writes:
+Not a bug!
 
-> On Thu, Mar 02, 2017 at 05:20:19PM -0500, Bandan Das wrote:
->> Jintack Lim <jintack@cs.columbia.edu> writes:
->> 
->> > [cc Bandan]
->> >
-...
->> 
->> Jintack, any progress with this ?
->> 
->> I am testing on a X540-AT2 and I see a different behavior. It appears
->> config succeeds but the driver keeps resetting the device due to a Tx
->> hang:
->> 
->> [ 568.612391 ] ixgbe 0000:00:03.0 enp0s3: tx hang 38 detected on queue 0,
->> resetting adapter
->> [ 568.612393 ]  ixgbe 0000:00:03.0 enp0s3: initiating reset due to tx
->> timeout
->> [ 568.612397 ]  ixgbe 0000:00:03.0 enp0s3: Reset adapter
->> 
->> This may be device specific but I think the actual behavior you see is
->> also dependent on the ixgbe driver in the guest. Are you on a recent
->> kernel ? Also, can you point me to the hack (by Peter) that you have
->> mentioned above ?
->
-> Hi, Bandan,
->
-> Are you using the vtd vfio v7 series or another branch?
+I have forgotten to add the socket in the start script :(
 
-Thanks for the tip. Jintack pointed me to your repo and I am using v7
-from there.
+-- =
 
-> If it's the upstream one... just a note that we need to make sure
-> "-device intel-iommu" be the first device specified in QEMU command
-> line parameters (need to before "-device vfio-pci,..."). Thanks,
->
-> -- peterx
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1668556
+
+Title:
+  QEMU Guest Agent  service fails to start on Windows 10 RS2 preview
+
+Status in QEMU:
+  New
+
+Bug description:
+  The "QEMU Guest Agent" service cannot be started on Windows 10 RS2
+  preview build. After starting the service this error message is
+  displayed: "Windows could not start QEMU Guest Agent service on Local
+  Computer. Error 1053: The service did not respond to the start or
+  control request in a timely fashion."
+
+  Output from the Windows System event log:
+  <?xml version=3D"1.0" encoding=3D"utf-8" standalone=3D"yes"?>
+  <Events><Event xmlns=3D'http://schemas.microsoft.com/win/2004/08/events/e=
+vent'><System><Provider Name=3D'Service Control Manager' Guid=3D'{555908d1-=
+a6d7-4695-8e1e-26931d2012f4}' EventSourceName=3D'Service Control Manager'/>=
+<EventID Qualifiers=3D'49152'>7009</EventID><Version>0</Version><Level>2</L=
+evel><Task>0</Task><Opcode>0</Opcode><Keywords>0x8080000000000000</Keywords=
+><TimeCreated SystemTime=3D'2017-02-28T09:39:35.713939500Z'/><EventRecordID=
+>1406</EventRecordID><Correlation/><Execution ProcessID=3D'568' ThreadID=3D=
+'964'/><Channel>System</Channel><Computer>LT-WIN10-64</Computer><Security/>=
+</System><EventData><Data Name=3D'param1'>30000</Data><Data Name=3D'param2'=
+>QEMU Guest Agent</Data><Binary>510045004D0055002D00470041000000</Binary></=
+EventData></Event></Events>
+
+  The "QEMU Guest Agent VSS Provider" service is running successfully.
+
+  It worked on Windows 10 RS1 (before the upgrade).
+
+  QEMU Guest Agent version:
+  Installed from virtio-win-0.1.126_amd64
+  which was built from master branch with latest commit (8aaf403) - https:/=
+/github.com/virtio-win/kvm-guest-drivers-windows =
+
+
+  Windows version (upgraded from RS1):
+  Windows 10 Enterprise Insider Preview
+  Evaluation copy. Build 15019.rs_prerelease.170121-1513
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1668556/+subscriptions
