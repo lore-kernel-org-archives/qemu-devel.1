@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44491)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cjdqb-0008Ag-MZ
+	(envelope-from <dgibson@ozlabs.org>) id 1cjdqa-00089z-TM
 	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 22:25:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cjdqX-0001PL-SE
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 22:25:37 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cjdqX-0001OP-2r
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 22:25:36 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  3 Mar 2017 14:25:06 +1100
-Message-Id: <20170303032507.16142-17-david@gibson.dropbear.id.au>
+Date: Fri,  3 Mar 2017 14:25:07 +1100
+Message-Id: <20170303032507.16142-18-david@gibson.dropbear.id.au>
 In-Reply-To: <20170303032507.16142-1-david@gibson.dropbear.id.au>
 References: <20170303032507.16142-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 16/17] spapr: Small cleanup of PPC MMU enums
+Subject: [Qemu-devel] [PULL 17/17] target/ppc: rewrite f[n]m[add,
+ sub] using float64_muladd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,327 +21,259 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, sjitindarsingh@gmail.com, sam.bobroff@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, sjitindarsingh@gmail.com, sam.bobroff@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Sam Bobroff <sam.bobroff@au1.ibm.com>
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-The PPC MMU types are sometimes treated as if they were a bit field
-and sometime as if they were an enum which causes maintenance
-problems: flipping bits in the MMU type (which is done on both the 1TB
-segment and 64K segment bits) currently produces new MMU type
-values that are not handled in every "switch" on it, sometimes causing
-an abort().
+Use the softfloat api for fused multiply-add.
+Introduce routine to set the FPSCR flags VXNAN, VXIMZ nad VMISI.
 
-This patch provides some macros that can be used to filter out the
-"bit field-like" bits so that the remainder of the value can be
-switched on, like an enum. This allows removal of all of the
-"degraded" types from the list and should ease maintenance.
-
-Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
+Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c          | 10 +++----
- target/ppc/cpu-qom.h    | 12 ++++-----
- target/ppc/kvm.c        |  8 +++---
- target/ppc/mmu-hash64.c | 12 ++++-----
- target/ppc/mmu_helper.c | 71 ++++++++++++++++++++-----------------------------
- target/ppc/translate.c  | 14 +++++-----
- 6 files changed, 55 insertions(+), 72 deletions(-)
+ target/ppc/fpu_helper.c | 213 +++++++++++-------------------------------------
+ 1 file changed, 46 insertions(+), 167 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 81e2ada..14192ac 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -407,18 +407,16 @@ static void spapr_populate_pa_features(CPUPPCState *env, void *fdt, int offset)
-     uint8_t *pa_features;
-     size_t pa_size;
- 
--    switch (env->mmu_model) {
--    case POWERPC_MMU_2_06:
--    case POWERPC_MMU_2_06a:
-+    switch (POWERPC_MMU_VER(env->mmu_model)) {
-+    case POWERPC_MMU_VER_2_06:
-         pa_features = pa_features_206;
-         pa_size = sizeof(pa_features_206);
-         break;
--    case POWERPC_MMU_2_07:
--    case POWERPC_MMU_2_07a:
-+    case POWERPC_MMU_VER_2_07:
-         pa_features = pa_features_207;
-         pa_size = sizeof(pa_features_207);
-         break;
--    case POWERPC_MMU_3_00:
-+    case POWERPC_MMU_VER_3_00:
-         pa_features = pa_features_300;
-         pa_size = sizeof(pa_features_300);
-         break;
-diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-index da7eb5a..81500e5 100644
---- a/target/ppc/cpu-qom.h
-+++ b/target/ppc/cpu-qom.h
-@@ -80,22 +80,22 @@ enum powerpc_mmu_t {
-     POWERPC_MMU_2_06       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
-                              | POWERPC_MMU_64K
-                              | POWERPC_MMU_AMR | 0x00000003,
--    /* Architecture 2.06 "degraded" (no 1T segments)           */
--    POWERPC_MMU_2_06a      = POWERPC_MMU_64 | POWERPC_MMU_AMR
--                             | 0x00000003,
-     /* Architecture 2.07 variant                               */
-     POWERPC_MMU_2_07       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
-                              | POWERPC_MMU_64K
-                              | POWERPC_MMU_AMR | 0x00000004,
--    /* Architecture 2.07 "degraded" (no 1T segments)           */
--    POWERPC_MMU_2_07a      = POWERPC_MMU_64 | POWERPC_MMU_AMR
--                             | 0x00000004,
-     /* Architecture 3.00 variant                               */
-     POWERPC_MMU_3_00       = POWERPC_MMU_64 | POWERPC_MMU_1TSEG
-                              | POWERPC_MMU_64K
-                              | POWERPC_MMU_AMR | POWERPC_MMU_V3
-                              | 0x00000005,
- };
-+#define POWERPC_MMU_VER(x) ((x) & (POWERPC_MMU_64 | 0xFFFF))
-+#define POWERPC_MMU_VER_64B POWERPC_MMU_VER(POWERPC_MMU_64B)
-+#define POWERPC_MMU_VER_2_03 POWERPC_MMU_VER(POWERPC_MMU_2_03)
-+#define POWERPC_MMU_VER_2_06 POWERPC_MMU_VER(POWERPC_MMU_2_06)
-+#define POWERPC_MMU_VER_2_07 POWERPC_MMU_VER(POWERPC_MMU_2_07)
-+#define POWERPC_MMU_VER_3_00 POWERPC_MMU_VER(POWERPC_MMU_3_00)
- 
- /*****************************************************************************/
- /* Exception model                                                           */
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 9b51484..1adb55c 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -283,8 +283,8 @@ static void kvm_get_fallback_smmu_info(PowerPCCPU *cpu,
-             info->flags |= KVM_PPC_1T_SEGMENTS;
-         }
- 
--        if (env->mmu_model == POWERPC_MMU_2_06 ||
--            env->mmu_model == POWERPC_MMU_2_07) {
-+        if (POWERPC_MMU_VER(env->mmu_model) == POWERPC_MMU_VER_2_06 ||
-+           POWERPC_MMU_VER(env->mmu_model) == POWERPC_MMU_VER_2_07) {
-             info->slb_size = 32;
-         } else {
-             info->slb_size = 64;
-@@ -298,8 +298,8 @@ static void kvm_get_fallback_smmu_info(PowerPCCPU *cpu,
-         i++;
- 
-         /* 64K on MMU 2.06 and later */
--        if (env->mmu_model == POWERPC_MMU_2_06 ||
--            env->mmu_model == POWERPC_MMU_2_07) {
-+        if (POWERPC_MMU_VER(env->mmu_model) == POWERPC_MMU_VER_2_06 ||
-+            POWERPC_MMU_VER(env->mmu_model) == POWERPC_MMU_VER_2_07) {
-             info->sps[i].page_shift = 16;
-             info->sps[i].slb_enc = 0x110;
-             info->sps[i].enc[0].page_shift = 16;
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index d5a871f..14d34e5 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -1032,8 +1032,8 @@ void helper_store_lpcr(CPUPPCState *env, target_ulong val)
-     uint64_t lpcr = 0;
- 
-     /* Filter out bits */
--    switch (env->mmu_model) {
--    case POWERPC_MMU_64B: /* 970 */
-+    switch (POWERPC_MMU_VER(env->mmu_model)) {
-+    case POWERPC_MMU_VER_64B: /* 970 */
-         if (val & 0x40) {
-             lpcr |= LPCR_LPES0;
-         }
-@@ -1059,26 +1059,26 @@ void helper_store_lpcr(CPUPPCState *env, target_ulong val)
-          * to dig HRMOR out of HID5
-          */
-         break;
--    case POWERPC_MMU_2_03: /* P5p */
-+    case POWERPC_MMU_VER_2_03: /* P5p */
-         lpcr = val & (LPCR_RMLS | LPCR_ILE |
-                       LPCR_LPES0 | LPCR_LPES1 |
-                       LPCR_RMI | LPCR_HDICE);
-         break;
--    case POWERPC_MMU_2_06: /* P7 */
-+    case POWERPC_MMU_VER_2_06: /* P7 */
-         lpcr = val & (LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_DPFD |
-                       LPCR_VRMASD | LPCR_RMLS | LPCR_ILE |
-                       LPCR_P7_PECE0 | LPCR_P7_PECE1 | LPCR_P7_PECE2 |
-                       LPCR_MER | LPCR_TC |
-                       LPCR_LPES0 | LPCR_LPES1 | LPCR_HDICE);
-         break;
--    case POWERPC_MMU_2_07: /* P8 */
-+    case POWERPC_MMU_VER_2_07: /* P8 */
-         lpcr = val & (LPCR_VPM0 | LPCR_VPM1 | LPCR_ISL | LPCR_KBV |
-                       LPCR_DPFD | LPCR_VRMASD | LPCR_RMLS | LPCR_ILE |
-                       LPCR_AIL | LPCR_ONL | LPCR_P8_PECE0 | LPCR_P8_PECE1 |
-                       LPCR_P8_PECE2 | LPCR_P8_PECE3 | LPCR_P8_PECE4 |
-                       LPCR_MER | LPCR_TC | LPCR_LPES0 | LPCR_HDICE);
-         break;
--    case POWERPC_MMU_3_00: /* P9 */
-+    case POWERPC_MMU_VER_3_00: /* P9 */
-         lpcr = val & (LPCR_VPM1 | LPCR_ISL | LPCR_KBV | LPCR_DPFD |
-                       (LPCR_PECE_U_MASK & LPCR_HVEE) | LPCR_ILE | LPCR_AIL |
-                       LPCR_UPRT | LPCR_EVIRT | LPCR_ONL |
-diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
-index 18a76d2..65d1c86 100644
---- a/target/ppc/mmu_helper.c
-+++ b/target/ppc/mmu_helper.c
-@@ -1266,7 +1266,7 @@ static void mmu6xx_dump_mmu(FILE *f, fprintf_function cpu_fprintf,
- 
- void dump_mmu(FILE *f, fprintf_function cpu_fprintf, CPUPPCState *env)
- {
--    switch (env->mmu_model) {
-+    switch (POWERPC_MMU_VER(env->mmu_model)) {
-     case POWERPC_MMU_BOOKE:
-         mmubooke_dump_mmu(f, cpu_fprintf, env);
-         break;
-@@ -1278,15 +1278,13 @@ void dump_mmu(FILE *f, fprintf_function cpu_fprintf, CPUPPCState *env)
-         mmu6xx_dump_mmu(f, cpu_fprintf, env);
-         break;
- #if defined(TARGET_PPC64)
--    case POWERPC_MMU_64B:
--    case POWERPC_MMU_2_03:
--    case POWERPC_MMU_2_06:
--    case POWERPC_MMU_2_06a:
--    case POWERPC_MMU_2_07:
--    case POWERPC_MMU_2_07a:
-+    case POWERPC_MMU_VER_64B:
-+    case POWERPC_MMU_VER_2_03:
-+    case POWERPC_MMU_VER_2_06:
-+    case POWERPC_MMU_VER_2_07:
-         dump_slb(f, cpu_fprintf, ppc_env_get_cpu(env));
-         break;
--    case POWERPC_MMU_3_00:
-+    case POWERPC_MMU_VER_3_00:
-         if (ppc64_radix_guest(ppc_env_get_cpu(env))) {
-             /* TODO - Unsupported */
-         } else {
-@@ -1425,16 +1423,14 @@ hwaddr ppc_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-     CPUPPCState *env = &cpu->env;
-     mmu_ctx_t ctx;
- 
--    switch (env->mmu_model) {
-+    switch (POWERPC_MMU_VER(env->mmu_model)) {
- #if defined(TARGET_PPC64)
--    case POWERPC_MMU_64B:
--    case POWERPC_MMU_2_03:
--    case POWERPC_MMU_2_06:
--    case POWERPC_MMU_2_06a:
--    case POWERPC_MMU_2_07:
--    case POWERPC_MMU_2_07a:
-+    case POWERPC_MMU_VER_64B:
-+    case POWERPC_MMU_VER_2_03:
-+    case POWERPC_MMU_VER_2_06:
-+    case POWERPC_MMU_VER_2_07:
-         return ppc_hash64_get_phys_page_debug(cpu, addr);
--    case POWERPC_MMU_3_00:
-+    case POWERPC_MMU_VER_3_00:
-         if (ppc64_radix_guest(ppc_env_get_cpu(env))) {
-             /* TODO - Unsupported */
-         } else {
-@@ -1924,6 +1920,12 @@ void ppc_tlb_invalidate_all(CPUPPCState *env)
- {
-     PowerPCCPU *cpu = ppc_env_get_cpu(env);
- 
-+#if defined(TARGET_PPC64)
-+    if (env->mmu_model & POWERPC_MMU_64) {
-+        env->tlb_need_flush = 0;
-+        tlb_flush(CPU(cpu));
-+    } else
-+#endif /* defined(TARGET_PPC64) */
-     switch (env->mmu_model) {
-     case POWERPC_MMU_SOFT_6xx:
-     case POWERPC_MMU_SOFT_74xx:
-@@ -1948,21 +1950,12 @@ void ppc_tlb_invalidate_all(CPUPPCState *env)
-         break;
-     case POWERPC_MMU_32B:
-     case POWERPC_MMU_601:
--#if defined(TARGET_PPC64)
--    case POWERPC_MMU_64B:
--    case POWERPC_MMU_2_03:
--    case POWERPC_MMU_2_06:
--    case POWERPC_MMU_2_06a:
--    case POWERPC_MMU_2_07:
--    case POWERPC_MMU_2_07a:
--    case POWERPC_MMU_3_00:
--#endif /* defined(TARGET_PPC64) */
-         env->tlb_need_flush = 0;
-         tlb_flush(CPU(cpu));
-         break;
-     default:
-         /* XXX: TODO */
--        cpu_abort(CPU(cpu), "Unknown MMU model %d\n", env->mmu_model);
-+        cpu_abort(CPU(cpu), "Unknown MMU model %x\n", env->mmu_model);
-         break;
-     }
+diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+index 58aee64..0535ad0 100644
+--- a/target/ppc/fpu_helper.c
++++ b/target/ppc/fpu_helper.c
+@@ -743,178 +743,62 @@ uint64_t helper_frim(CPUPPCState *env, uint64_t arg)
+     return do_fri(env, arg, float_round_down);
  }
-@@ -1971,6 +1964,16 @@ void ppc_tlb_invalidate_one(CPUPPCState *env, target_ulong addr)
- {
- #if !defined(FLUSH_ALL_TLBS)
-     addr &= TARGET_PAGE_MASK;
-+#if defined(TARGET_PPC64)
-+    if (env->mmu_model & POWERPC_MMU_64) {
-+        /* tlbie invalidate TLBs for all segments */
-+        /* XXX: given the fact that there are too many segments to invalidate,
-+         *      and we still don't have a tlb_flush_mask(env, n, mask) in QEMU,
-+         *      we just invalidate all TLBs
-+         */
-+        env->tlb_need_flush |= TLB_NEED_LOCAL_FLUSH;
-+    } else
-+#endif /* defined(TARGET_PPC64) */
-     switch (env->mmu_model) {
-     case POWERPC_MMU_SOFT_6xx:
-     case POWERPC_MMU_SOFT_74xx:
-@@ -1988,22 +1991,6 @@ void ppc_tlb_invalidate_one(CPUPPCState *env, target_ulong addr)
-          */
-         env->tlb_need_flush |= TLB_NEED_LOCAL_FLUSH;
-         break;
--#if defined(TARGET_PPC64)
--    case POWERPC_MMU_64B:
--    case POWERPC_MMU_2_03:
--    case POWERPC_MMU_2_06:
--    case POWERPC_MMU_2_06a:
--    case POWERPC_MMU_2_07:
--    case POWERPC_MMU_2_07a:
--    case POWERPC_MMU_3_00:
--        /* tlbie invalidate TLBs for all segments */
--        /* XXX: given the fact that there are too many segments to invalidate,
--         *      and we still don't have a tlb_flush_mask(env, n, mask) in QEMU,
--         *      we just invalidate all TLBs
--         */
--        env->tlb_need_flush |= TLB_NEED_LOCAL_FLUSH;
--        break;
--#endif /* defined(TARGET_PPC64) */
-     default:
-         /* Should never reach here with other MMU models */
-         assert(0);
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 1de554a..b6abc60 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -7078,19 +7078,17 @@ void ppc_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
-     if (env->spr_cb[SPR_LPCR].name)
-         cpu_fprintf(f, " LPCR " TARGET_FMT_lx "\n", env->spr[SPR_LPCR]);
  
--    switch (env->mmu_model) {
-+    switch (POWERPC_MMU_VER(env->mmu_model)) {
-     case POWERPC_MMU_32B:
-     case POWERPC_MMU_601:
-     case POWERPC_MMU_SOFT_6xx:
-     case POWERPC_MMU_SOFT_74xx:
- #if defined(TARGET_PPC64)
--    case POWERPC_MMU_64B:
--    case POWERPC_MMU_2_03:
--    case POWERPC_MMU_2_06:
--    case POWERPC_MMU_2_06a:
--    case POWERPC_MMU_2_07:
--    case POWERPC_MMU_2_07a:
--    case POWERPC_MMU_3_00:
-+    case POWERPC_MMU_VER_64B:
-+    case POWERPC_MMU_VER_2_03:
-+    case POWERPC_MMU_VER_2_06:
-+    case POWERPC_MMU_VER_2_07:
-+    case POWERPC_MMU_VER_3_00:
- #endif
-         if (env->spr_cb[SPR_SDR1].name) { /* SDR1 Exists */
-             cpu_fprintf(f, " SDR1 " TARGET_FMT_lx " ", env->spr[SPR_SDR1]);
+-/* fmadd - fmadd. */
+-uint64_t helper_fmadd(CPUPPCState *env, uint64_t arg1, uint64_t arg2,
+-                      uint64_t arg3)
++static void float64_maddsub_update_excp(CPUPPCState *env, float64 arg1,
++                                        float64 arg2, float64 arg3,
++                                        unsigned int madd_flags)
+ {
+-    CPU_DoubleU farg1, farg2, farg3;
+-
+-    farg1.ll = arg1;
+-    farg2.ll = arg2;
+-    farg3.ll = arg3;
+-
+-    if (unlikely((float64_is_infinity(farg1.d) && float64_is_zero(farg2.d)) ||
+-                 (float64_is_zero(farg1.d) && float64_is_infinity(farg2.d)))) {
+-        /* Multiplication of zero by infinity */
+-        farg1.ll = float_invalid_op_excp(env, POWERPC_EXCP_FP_VXIMZ, 1);
+-    } else {
+-        if (unlikely(float64_is_signaling_nan(farg1.d, &env->fp_status) ||
+-                     float64_is_signaling_nan(farg2.d, &env->fp_status) ||
+-                     float64_is_signaling_nan(farg3.d, &env->fp_status))) {
+-            /* sNaN operation */
+-            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
+-        }
+-        /* This is the way the PowerPC specification defines it */
+-        float128 ft0_128, ft1_128;
+-
+-        ft0_128 = float64_to_float128(farg1.d, &env->fp_status);
+-        ft1_128 = float64_to_float128(farg2.d, &env->fp_status);
+-        ft0_128 = float128_mul(ft0_128, ft1_128, &env->fp_status);
+-        if (unlikely(float128_is_infinity(ft0_128) &&
+-                     float64_is_infinity(farg3.d) &&
+-                     float128_is_neg(ft0_128) != float64_is_neg(farg3.d))) {
+-            /* Magnitude subtraction of infinities */
+-            farg1.ll = float_invalid_op_excp(env, POWERPC_EXCP_FP_VXISI, 1);
+-        } else {
+-            ft1_128 = float64_to_float128(farg3.d, &env->fp_status);
+-            ft0_128 = float128_add(ft0_128, ft1_128, &env->fp_status);
+-            farg1.d = float128_to_float64(ft0_128, &env->fp_status);
+-        }
+-    }
+-
+-    return farg1.ll;
+-}
+-
+-/* fmsub - fmsub. */
+-uint64_t helper_fmsub(CPUPPCState *env, uint64_t arg1, uint64_t arg2,
+-                      uint64_t arg3)
+-{
+-    CPU_DoubleU farg1, farg2, farg3;
+-
+-    farg1.ll = arg1;
+-    farg2.ll = arg2;
+-    farg3.ll = arg3;
+-
+-    if (unlikely((float64_is_infinity(farg1.d) && float64_is_zero(farg2.d)) ||
+-                 (float64_is_zero(farg1.d) &&
+-                  float64_is_infinity(farg2.d)))) {
++    if (unlikely((float64_is_infinity(arg1) && float64_is_zero(arg2)) ||
++                 (float64_is_zero(arg1) && float64_is_infinity(arg2)))) {
+         /* Multiplication of zero by infinity */
+-        farg1.ll = float_invalid_op_excp(env, POWERPC_EXCP_FP_VXIMZ, 1);
+-    } else {
+-        if (unlikely(float64_is_signaling_nan(farg1.d, &env->fp_status) ||
+-                     float64_is_signaling_nan(farg2.d, &env->fp_status) ||
+-                     float64_is_signaling_nan(farg3.d, &env->fp_status))) {
+-            /* sNaN operation */
+-            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
++        arg1 = float_invalid_op_excp(env, POWERPC_EXCP_FP_VXIMZ, 1);
++    } else if (unlikely(float64_is_signaling_nan(arg1, &env->fp_status) ||
++                        float64_is_signaling_nan(arg2, &env->fp_status) ||
++                        float64_is_signaling_nan(arg3, &env->fp_status))) {
++        /* sNaN operation */
++        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
++    } else if ((float64_is_infinity(arg1) || float64_is_infinity(arg2)) &&
++               float64_is_infinity(arg3)) {
++        uint8_t aSign, bSign, cSign;
++
++        aSign = float64_is_neg(arg1);
++        bSign = float64_is_neg(arg2);
++        cSign = float64_is_neg(arg3);
++        if (madd_flags & float_muladd_negate_c) {
++            cSign ^= 1;
+         }
+-        /* This is the way the PowerPC specification defines it */
+-        float128 ft0_128, ft1_128;
+-
+-        ft0_128 = float64_to_float128(farg1.d, &env->fp_status);
+-        ft1_128 = float64_to_float128(farg2.d, &env->fp_status);
+-        ft0_128 = float128_mul(ft0_128, ft1_128, &env->fp_status);
+-        if (unlikely(float128_is_infinity(ft0_128) &&
+-                     float64_is_infinity(farg3.d) &&
+-                     float128_is_neg(ft0_128) == float64_is_neg(farg3.d))) {
+-            /* Magnitude subtraction of infinities */
+-            farg1.ll = float_invalid_op_excp(env, POWERPC_EXCP_FP_VXISI, 1);
+-        } else {
+-            ft1_128 = float64_to_float128(farg3.d, &env->fp_status);
+-            ft0_128 = float128_sub(ft0_128, ft1_128, &env->fp_status);
+-            farg1.d = float128_to_float64(ft0_128, &env->fp_status);
++        if (aSign ^ bSign ^ cSign) {
++            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXISI, 1);
+         }
+     }
+-    return farg1.ll;
+ }
+ 
+-/* fnmadd - fnmadd. */
+-uint64_t helper_fnmadd(CPUPPCState *env, uint64_t arg1, uint64_t arg2,
+-                       uint64_t arg3)
+-{
+-    CPU_DoubleU farg1, farg2, farg3;
+-
+-    farg1.ll = arg1;
+-    farg2.ll = arg2;
+-    farg3.ll = arg3;
+-
+-    if (unlikely((float64_is_infinity(farg1.d) && float64_is_zero(farg2.d)) ||
+-                 (float64_is_zero(farg1.d) && float64_is_infinity(farg2.d)))) {
+-        /* Multiplication of zero by infinity */
+-        farg1.ll = float_invalid_op_excp(env, POWERPC_EXCP_FP_VXIMZ, 1);
+-    } else {
+-        if (unlikely(float64_is_signaling_nan(farg1.d, &env->fp_status) ||
+-                     float64_is_signaling_nan(farg2.d, &env->fp_status) ||
+-                     float64_is_signaling_nan(farg3.d, &env->fp_status))) {
+-            /* sNaN operation */
+-            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
+-        }
+-        /* This is the way the PowerPC specification defines it */
+-        float128 ft0_128, ft1_128;
+-
+-        ft0_128 = float64_to_float128(farg1.d, &env->fp_status);
+-        ft1_128 = float64_to_float128(farg2.d, &env->fp_status);
+-        ft0_128 = float128_mul(ft0_128, ft1_128, &env->fp_status);
+-        if (unlikely(float128_is_infinity(ft0_128) &&
+-                     float64_is_infinity(farg3.d) &&
+-                     float128_is_neg(ft0_128) != float64_is_neg(farg3.d))) {
+-            /* Magnitude subtraction of infinities */
+-            farg1.ll = float_invalid_op_excp(env, POWERPC_EXCP_FP_VXISI, 1);
+-        } else {
+-            ft1_128 = float64_to_float128(farg3.d, &env->fp_status);
+-            ft0_128 = float128_add(ft0_128, ft1_128, &env->fp_status);
+-            farg1.d = float128_to_float64(ft0_128, &env->fp_status);
+-        }
+-        if (likely(!float64_is_any_nan(farg1.d))) {
+-            farg1.d = float64_chs(farg1.d);
+-        }
+-    }
+-    return farg1.ll;
++#define FPU_FMADD(op, madd_flags)                                       \
++uint64_t helper_##op(CPUPPCState *env, uint64_t arg1,                   \
++                     uint64_t arg2, uint64_t arg3)                      \
++{                                                                       \
++    uint32_t flags;                                                     \
++    float64 ret = float64_muladd(arg1, arg2, arg3, madd_flags,          \
++                                 &env->fp_status);                      \
++    flags = get_float_exception_flags(&env->fp_status);                 \
++    if (flags) {                                                        \
++        if (flags & float_flag_invalid) {                               \
++            float64_maddsub_update_excp(env, arg1, arg2, arg3,          \
++                                        madd_flags);                    \
++        }                                                               \
++        float_check_status(env);                                        \
++    }                                                                   \
++    return ret;                                                         \
+ }
+ 
+-/* fnmsub - fnmsub. */
+-uint64_t helper_fnmsub(CPUPPCState *env, uint64_t arg1, uint64_t arg2,
+-                       uint64_t arg3)
+-{
+-    CPU_DoubleU farg1, farg2, farg3;
+-
+-    farg1.ll = arg1;
+-    farg2.ll = arg2;
+-    farg3.ll = arg3;
++#define MADD_FLGS 0
++#define MSUB_FLGS float_muladd_negate_c
++#define NMADD_FLGS float_muladd_negate_result
++#define NMSUB_FLGS (float_muladd_negate_c | float_muladd_negate_result)
+ 
+-    if (unlikely((float64_is_infinity(farg1.d) && float64_is_zero(farg2.d)) ||
+-                 (float64_is_zero(farg1.d) &&
+-                  float64_is_infinity(farg2.d)))) {
+-        /* Multiplication of zero by infinity */
+-        farg1.ll = float_invalid_op_excp(env, POWERPC_EXCP_FP_VXIMZ, 1);
+-    } else {
+-        if (unlikely(float64_is_signaling_nan(farg1.d, &env->fp_status) ||
+-                     float64_is_signaling_nan(farg2.d, &env->fp_status) ||
+-                     float64_is_signaling_nan(farg3.d, &env->fp_status))) {
+-            /* sNaN operation */
+-            float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
+-        }
+-        /* This is the way the PowerPC specification defines it */
+-        float128 ft0_128, ft1_128;
+-
+-        ft0_128 = float64_to_float128(farg1.d, &env->fp_status);
+-        ft1_128 = float64_to_float128(farg2.d, &env->fp_status);
+-        ft0_128 = float128_mul(ft0_128, ft1_128, &env->fp_status);
+-        if (unlikely(float128_is_infinity(ft0_128) &&
+-                     float64_is_infinity(farg3.d) &&
+-                     float128_is_neg(ft0_128) == float64_is_neg(farg3.d))) {
+-            /* Magnitude subtraction of infinities */
+-            farg1.ll = float_invalid_op_excp(env, POWERPC_EXCP_FP_VXISI, 1);
+-        } else {
+-            ft1_128 = float64_to_float128(farg3.d, &env->fp_status);
+-            ft0_128 = float128_sub(ft0_128, ft1_128, &env->fp_status);
+-            farg1.d = float128_to_float64(ft0_128, &env->fp_status);
+-        }
+-        if (likely(!float64_is_any_nan(farg1.d))) {
+-            farg1.d = float64_chs(farg1.d);
+-        }
+-    }
+-    return farg1.ll;
+-}
++FPU_FMADD(fmadd, MADD_FLGS)
++FPU_FMADD(fnmadd, NMADD_FLGS)
++FPU_FMADD(fmsub, MSUB_FLGS)
++FPU_FMADD(fnmsub, NMSUB_FLGS)
+ 
+ /* frsp - frsp. */
+ uint64_t helper_frsp(CPUPPCState *env, uint64_t arg)
+@@ -2384,11 +2268,6 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)                           \
+     float_check_status(env);                                                  \
+ }
+ 
+-#define MADD_FLGS 0
+-#define MSUB_FLGS float_muladd_negate_c
+-#define NMADD_FLGS float_muladd_negate_result
+-#define NMSUB_FLGS (float_muladd_negate_c | float_muladd_negate_result)
+-
+ VSX_MADD(xsmaddadp, 1, float64, VsrD(0), MADD_FLGS, 1, 1, 0)
+ VSX_MADD(xsmaddmdp, 1, float64, VsrD(0), MADD_FLGS, 0, 1, 0)
+ VSX_MADD(xsmsubadp, 1, float64, VsrD(0), MSUB_FLGS, 1, 1, 0)
 -- 
 2.9.3
