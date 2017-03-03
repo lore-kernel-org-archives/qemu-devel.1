@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54898)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cjn02-0002kp-5l
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:11:59 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cjn1S-00047G-HA
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:13:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cjn00-0007pW-8M
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:11:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53672)
+	(envelope-from <ehabkost@redhat.com>) id 1cjn1P-0008NN-DE
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:13:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51570)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cjn00-0007oz-1a
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:11:56 -0500
-Date: Fri, 3 Mar 2017 13:11:51 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170303131150.GC2439@work-vm>
-References: <33183CC9F5247A488A2544077AF19020DA1D01C2@DGGEMA505-MBX.china.huawei.com>
-	<20170303120054.GB2439@work-vm>
-	<10d66d73-a269-acb4-bc3d-2250793cba8e@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <10d66d73-a269-acb4-bc3d-2250793cba8e@redhat.com>
-Subject: Re: [Qemu-devel] [Bug?] BQL about live migration
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cjn1P-0008MS-7J
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:13:23 -0500
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Fri,  3 Mar 2017 10:13:16 -0300
+Message-Id: <20170303131317.23617-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PULL 0/1] NUMA documentation update
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +21,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "quintela@redhat.com" <quintela@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, yanghongyang <yanghongyang@huawei.com>, Huangzhichao <huangzhichao@huawei.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> 
-> 
-> On 03/03/2017 13:00, Dr. David Alan Gilbert wrote:
-> > Ouch that's pretty nasty; I remember Paolo explaining to me a while ago that
-> > their were times when run_on_cpu would have to drop the BQL and I worried about it,
-> > but this is the 1st time I've seen an error due to it.
-> > 
-> > Do you know what the migration state was at that point? Was it MIGRATION_STATUS_CANCELLING?
-> > I'm thinking perhaps we should stop 'cont' from continuing while migration is in
-> > MIGRATION_STATUS_CANCELLING.  Do we send an event when we hit CANCELLED - so that
-> > perhaps libvirt could avoid sending the 'cont' until then?
-> 
-> No, there's no event, though I thought libvirt would poll until
-> "query-migrate" returns the cancelled state.  Of course that is a small
-> consolation, because a segfault is unacceptable.
+Sorry for sending this after soft freeze. I just noticed that it
+went through the cracks and I believe the documentation update is
+relevant and simple enough to be included in 2.9.
 
-I think you might get an event if you set the new migrate capability called
-'events' on!
+The following changes since commit 508e038a5d725f2aa729f58a1f5209b9be4227de:
 
-void migrate_set_state(int *state, int old_state, int new_state)
-{
-    if (atomic_cmpxchg(state, old_state, new_state) == old_state) {
-        trace_migrate_set_state(new_state);
-        migrate_generate_event(new_state);
-    }
-}
+  dtc: Revert unintentional submodule downgrade from commit 077dd74239a99 (2017-03-03 12:48:42 +0000)
 
-static void migrate_generate_event(int new_state)
-{
-    if (migrate_use_events()) {
-        qapi_event_send_migration(new_state, &error_abort); 
-    }
-}
+are available in the git repository at:
 
-That event feature went in sometime after 2.3.0.
+  git://github.com/ehabkost/qemu.git tags/numa-pull-request
 
-> One possibility is to suspend the monitor in qmp_migrate_cancel and
-> resume it (with add_migration_state_change_notifier) when we hit the
-> CANCELLED state.  I'm not sure what the latency would be between the end
-> of migrate_fd_cancel and finally reaching CANCELLED.
+for you to fetch changes up to 4b9a5dd762ae41acd7df741de3e554b319a2cced:
 
-I don't like suspending monitors; it can potentially take quite a significant
-time to do a cancel.
-How about making 'cont' fail if we're in CANCELLING?
+  qemu-options: Rewrite -numa documentation (2017-03-03 10:08:03 -0300)
 
-I'd really love to see the 'run_on_cpu' being more careful about the BQL;
-we really need all of the rest of the devices to stay quiesced at times.
+----------------------------------------------------------------
+NUMA documentation update
 
-Dave
+----------------------------------------------------------------
 
-> Paolo
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Eduardo Habkost (1):
+  qemu-options: Rewrite -numa documentation
+
+ qemu-options.hx | 38 ++++++++++++++++++++++++++++----------
+ 1 file changed, 28 insertions(+), 10 deletions(-)
+
+-- 
+2.11.0.259.g40922b1
