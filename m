@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42393)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cjmOF-0007uW-2M
+	(envelope-from <armbru@redhat.com>) id 1cjmOF-0007ug-Jv
 	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:32:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cjmOC-0007xX-1Y
+	(envelope-from <armbru@redhat.com>) id 1cjmOD-0007z3-QE
 	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:32:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52884)
+Received: from mx1.redhat.com ([209.132.183.28]:37428)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cjmOB-0007wo-Pp
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:32:51 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cjmOD-0007y5-HD
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:32:53 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 035BD7E9DC
-	for <qemu-devel@nongnu.org>; Fri,  3 Mar 2017 12:32:52 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B2C594DD53
+	for <qemu-devel@nongnu.org>; Fri,  3 Mar 2017 12:32:53 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  3 Mar 2017 13:32:23 +0100
-Message-Id: <1488544368-30622-4-git-send-email-armbru@redhat.com>
+Date: Fri,  3 Mar 2017 13:32:28 +0100
+Message-Id: <1488544368-30622-9-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488544368-30622-1-git-send-email-armbru@redhat.com>
 References: <1488544368-30622-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 03/28] qmp-test: New,
- covering basic QMP protocol
+Subject: [Qemu-devel] [PATCH v4 08/28] qmp: Drop duplicated QMP command
+ object checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,257 +32,151 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
+qmp_check_input_obj() duplicates qmp_dispatch_check_obj(), except the
+latter screws up an error message.  handle_qmp_command() runs first
+the former, then the latter via qmp_dispatch(), masking the screwup.
+
+qemu-ga also masks the screwup, because it also duplicates checks,
+just differently.
+
+qmp_check_input_obj() exists because handle_qmp_command() needs to
+examine the command before dispatching it.  The previous commit got
+rid of this need, except for a tracepoint, and a bit of "id" code that
+relies on qdict not being null.
+
+Fix up the error message in qmp_dispatch_check_obj(), drop
+qmp_check_input_obj() and the tracepoint.  Protect the "id" code with
+a conditional.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- MAINTAINERS            |   1 +
- tests/Makefile.include |   5 +-
- tests/libqtest.c       |  17 ++++--
- tests/libqtest.h       |   8 +++
- tests/qmp-test.c       | 139 +++++++++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 164 insertions(+), 6 deletions(-)
- create mode 100644 tests/qmp-test.c
+ monitor.c           | 74 +++++------------------------------------------------
+ qapi/qmp-dispatch.c |  3 +--
+ trace-events        |  1 -
+ 3 files changed, 7 insertions(+), 71 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index be79f68..d0ded4b 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1393,6 +1393,7 @@ F: qmp.c
- F: monitor.c
- F: docs/*qmp-*
- F: scripts/qmp/
-+F: tests/qmp-test.c
- T: git git://repo.or.cz/qemu/armbru.git qapi-next
- 
- Register API
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 3310c17..4f52239 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -133,7 +133,9 @@ check-block-$(CONFIG_POSIX) += tests/qemu-iotests-quick.sh
- # All QTests for now are POSIX-only, but the dependencies are
- # really in libqtest, not in the testcases themselves.
- 
--check-qtest-generic-y = tests/device-introspect-test$(EXESUF)
-+check-qtest-generic-y = tests/qmp-test$(EXESUF)
-+gcov-files-generic-y = monitor.c qapi/qmp-dispatch.c
-+check-qtest-generic-y += tests/device-introspect-test$(EXESUF)
- gcov-files-generic-y = qdev-monitor.c qmp.c
- 
- gcov-files-ipack-y += hw/ipack/ipack.c
-@@ -653,6 +655,7 @@ libqos-imx-obj-y = $(libqos-obj-y) tests/libqos/i2c-imx.o
- libqos-usb-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/usb.o
- libqos-virtio-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/virtio.o tests/libqos/virtio-pci.o tests/libqos/virtio-mmio.o tests/libqos/malloc-generic.o
- 
-+tests/qmp-test$(EXESUF): tests/qmp-test.o
- tests/device-introspect-test$(EXESUF): tests/device-introspect-test.o
- tests/rtc-test$(EXESUF): tests/rtc-test.o
- tests/m48t59-test$(EXESUF): tests/m48t59-test.o
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 951a3b4..ca6b641 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -149,7 +149,7 @@ void qtest_add_abrt_handler(GHookFunc fn, const void *data)
-     g_hook_prepend(&abrt_hooks, hook);
+diff --git a/monitor.c b/monitor.c
+index b540096..0a65734 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -3700,67 +3700,10 @@ static int monitor_can_read(void *opaque)
+     return (mon->suspend_cnt == 0) ? 1 : 0;
  }
  
--QTestState *qtest_init(const char *extra_args)
-+QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
- {
-     QTestState *s;
-     int sock, qmpsock, i;
-@@ -204,10 +204,6 @@ QTestState *qtest_init(const char *extra_args)
-         s->irq_level[i] = false;
-     }
- 
--    /* Read the QMP greeting and then do the handshake */
--    qtest_qmp_discard_response(s, "");
--    qtest_qmp_discard_response(s, "{ 'execute': 'qmp_capabilities' }");
+-/*
+- * Input object checking rules
+- *
+- * 1. Input object must be a dict
+- * 2. The "execute" key must exist
+- * 3. The "execute" key must be a string
+- * 4. If the "arguments" key exists, it must be a dict
+- * 5. If the "id" key exists, it can be anything (ie. json-value)
+- * 6. Any argument not listed above is considered invalid
+- */
+-static QDict *qmp_check_input_obj(QObject *input_obj, Error **errp)
+-{
+-    const QDictEntry *ent;
+-    int has_exec_key = 0;
+-    QDict *input_dict;
 -
-     if (getenv("QTEST_STOP")) {
-         kill(s->qemu_pid, SIGSTOP);
-     }
-@@ -219,6 +215,17 @@ QTestState *qtest_init(const char *extra_args)
-     return s;
- }
- 
-+QTestState *qtest_init(const char *extra_args)
-+{
-+    QTestState *s = qtest_init_without_qmp_handshake(extra_args);
-+
-+    /* Read the QMP greeting and then do the handshake */
-+    qtest_qmp_discard_response(s, "");
-+    qtest_qmp_discard_response(s, "{ 'execute': 'qmp_capabilities' }");
-+
-+    return s;
-+}
-+
- void qtest_quit(QTestState *s)
+-    input_dict = qobject_to_qdict(input_obj);
+-    if (!input_dict) {
+-        error_setg(errp, QERR_QMP_BAD_INPUT_OBJECT, "object");
+-        return NULL;
+-    }
+-
+-
+-    for (ent = qdict_first(input_dict); ent; ent = qdict_next(input_dict, ent)){
+-        const char *arg_name = qdict_entry_key(ent);
+-        const QObject *arg_obj = qdict_entry_value(ent);
+-
+-        if (!strcmp(arg_name, "execute")) {
+-            if (qobject_type(arg_obj) != QTYPE_QSTRING) {
+-                error_setg(errp, QERR_QMP_BAD_INPUT_OBJECT_MEMBER,
+-                           "execute", "string");
+-                return NULL;
+-            }
+-            has_exec_key = 1;
+-        } else if (!strcmp(arg_name, "arguments")) {
+-            if (qobject_type(arg_obj) != QTYPE_QDICT) {
+-                error_setg(errp, QERR_QMP_BAD_INPUT_OBJECT_MEMBER,
+-                           "arguments", "object");
+-                return NULL;
+-            }
+-        } else if (!strcmp(arg_name, "id")) {
+-            /* Any string is acceptable as "id", so nothing to check */
+-        } else {
+-            error_setg(errp, QERR_QMP_EXTRA_MEMBER, arg_name);
+-            return NULL;
+-        }
+-    }
+-
+-    if (!has_exec_key) {
+-        error_setg(errp, QERR_QMP_BAD_INPUT_OBJECT, "execute");
+-        return NULL;
+-    }
+-
+-    return input_dict;
+-}
+-
+ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
  {
-     qtest_instances = g_list_remove(qtest_instances, s);
-diff --git a/tests/libqtest.h b/tests/libqtest.h
-index 90f182e..2c9962d 100644
---- a/tests/libqtest.h
-+++ b/tests/libqtest.h
-@@ -32,6 +32,14 @@ extern QTestState *global_qtest;
- QTestState *qtest_init(const char *extra_args);
+     QObject *req, *rsp = NULL, *id = NULL;
+     QDict *qdict = NULL;
+-    const char *cmd_name;
+     Monitor *mon = cur_mon;
+     Error *err = NULL;
  
- /**
-+ * qtest_init_without_qmp_handshake:
-+ * @extra_args: other arguments to pass to QEMU.
-+ *
-+ * Returns: #QTestState instance.
-+ */
-+QTestState *qtest_init_without_qmp_handshake(const char *extra_args);
-+
-+/**
-  * qtest_quit:
-  * @s: #QTestState instance to operate on.
-  *
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-new file mode 100644
-index 0000000..405e49e
---- /dev/null
-+++ b/tests/qmp-test.c
-@@ -0,0 +1,139 @@
-+/*
-+ * QMP protocol test cases
-+ *
-+ * Copyright (c) 2017 Red Hat Inc.
-+ *
-+ * Authors:
-+ *  Markus Armbruster <armbru@redhat.com>,
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
-+#include "qapi-visit.h"
-+#include "qapi/error.h"
-+#include "qapi/qobject-input-visitor.h"
-+#include "qapi/visitor.h"
-+
-+const char common_args[] = "-nodefaults -machine none";
-+
-+static const char *get_error_class(QDict *resp)
-+{
-+    QDict *error = qdict_get_qdict(resp, "error");
-+    const char *desc = qdict_get_try_str(error, "desc");
-+
-+    g_assert(desc);
-+    return error ? qdict_get_try_str(error, "class") : NULL;
-+}
-+
-+static void test_version(QObject *version)
-+{
-+    Visitor *v;
-+    VersionInfo *vinfo;
-+
-+    g_assert(version);
-+    v = qobject_input_visitor_new(version, true);
-+    visit_type_VersionInfo(v, "version", &vinfo, &error_abort);
-+    qapi_free_VersionInfo(vinfo);
-+    visit_free(v);
-+}
-+
-+static void test_malformed(void)
-+{
-+    QDict *resp;
-+
-+    /* Not even a dictionary */
-+    resp = qmp("null");
-+    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
-+    QDECREF(resp);
-+
-+    /* No "execute" key */
-+    resp = qmp("{}");
-+    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
-+    QDECREF(resp);
-+
-+    /* "execute" isn't a string */
-+    resp = qmp("{ 'execute': true }");
-+    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
-+    QDECREF(resp);
-+
-+    /* "arguments" isn't a dictionary */
-+    resp = qmp("{ 'execute': 'no-such-cmd', 'arguments': [] }");
-+    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
-+    QDECREF(resp);
-+
-+    /* extra key */
-+    resp = qmp("{ 'execute': 'no-such-cmd', 'extra': true }");
-+    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
-+    QDECREF(resp);
-+}
-+
-+static void test_qmp_protocol(void)
-+{
-+    QDict *resp, *q, *ret;
-+    QList *capabilities;
-+
-+    global_qtest = qtest_init_without_qmp_handshake(common_args);
-+
-+    /* Test greeting */
-+    resp = qmp_receive();
-+    q = qdict_get_qdict(resp, "QMP");
-+    g_assert(q);
-+    test_version(qdict_get(q, "version"));
-+    capabilities = qdict_get_qlist(q, "capabilities");
-+    g_assert(capabilities && qlist_empty(capabilities));
-+    QDECREF(resp);
-+
-+    /* Test valid command before handshake */
-+    resp = qmp("{ 'execute': 'query-version' }");
-+    g_assert_cmpstr(get_error_class(resp), ==, "CommandNotFound");
-+    QDECREF(resp);
-+
-+    /* Test malformed commands before handshake */
-+    test_malformed();
-+
-+    /* Test handshake */
-+    resp = qmp("{ 'execute': 'qmp_capabilities' }");
-+    ret = qdict_get_qdict(resp, "return");
-+    g_assert(ret && !qdict_size(ret));
-+    QDECREF(resp);
-+
-+    /* Test repeated handshake */
-+    resp = qmp("{ 'execute': 'qmp_capabilities' }");
-+    g_assert_cmpstr(get_error_class(resp), ==, "CommandNotFound");
-+    QDECREF(resp);
-+
-+    /* Test valid command */
-+    resp = qmp("{ 'execute': 'query-version' }");
-+    test_version(qdict_get(resp, "return"));
-+    QDECREF(resp);
-+
-+    /* Test malformed commands */
-+    test_malformed();
-+
-+    /* Test 'id' */
-+    resp = qmp("{ 'execute': 'query-name', 'id': 'cookie#1' }");
-+    ret = qdict_get_qdict(resp, "return");
-+    g_assert(ret);
-+    g_assert_cmpstr(qdict_get_try_str(resp, "id"), ==, "cookie#1");
-+    QDECREF(resp);
-+
-+    /* Test command failure with 'id' */
-+    resp = qmp("{ 'execute': 'human-monitor-command', 'id': 2 }");
-+    g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
-+    g_assert_cmpint(qdict_get_int(resp, "id"), ==, 2);
-+    QDECREF(resp);
-+
-+    qtest_end();
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+    g_test_init(&argc, &argv, NULL);
-+
-+    qtest_add_func("qmp/protocol", test_qmp_protocol);
-+
-+    return g_test_run();
-+}
+@@ -3773,17 +3716,12 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
+         goto err_out;
+     }
+ 
+-    qdict = qmp_check_input_obj(req, &err);
+-    if (!qdict) {
+-        goto err_out;
+-    }
+-
+-    id = qdict_get(qdict, "id");
+-    qobject_incref(id);
+-    qdict_del(qdict, "id");
+-
+-    cmd_name = qdict_get_str(qdict, "execute");
+-    trace_handle_qmp_command(mon, cmd_name);
++    qdict = qobject_to_qdict(req);
++    if (qdict) {
++        id = qdict_get(qdict, "id");
++        qobject_incref(id);
++        qdict_del(qdict, "id");
++    } /* else will fail qmp_dispatch() */
+ 
+     rsp = qmp_dispatch(cur_mon->qmp.commands, req);
+ 
+diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+index 95a0f48..2ce6dfb 100644
+--- a/qapi/qmp-dispatch.c
++++ b/qapi/qmp-dispatch.c
+@@ -30,8 +30,7 @@ static QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
+ 
+     dict = qobject_to_qdict(request);
+     if (!dict) {
+-        error_setg(errp, QERR_QMP_BAD_INPUT_OBJECT,
+-                   "request is not a dictionary");
++        error_setg(errp, QERR_QMP_BAD_INPUT_OBJECT, "object");
+         return NULL;
+     }
+ 
+diff --git a/trace-events b/trace-events
+index 7288557..b07a09b 100644
+--- a/trace-events
++++ b/trace-events
+@@ -65,7 +65,6 @@ xen_remap_bucket(uint64_t index) "index %#"PRIx64
+ xen_map_cache_return(void* ptr) "%p"
+ 
+ # monitor.c
+-handle_qmp_command(void *mon, const char *cmd_name) "mon %p cmd_name \"%s\""
+ monitor_protocol_event_handler(uint32_t event, void *qdict) "event=%d data=%p"
+ monitor_protocol_event_emit(uint32_t event, void *data) "event=%d data=%p"
+ monitor_protocol_event_queue(uint32_t event, void *qdict, uint64_t rate) "event=%d data=%p rate=%" PRId64
 -- 
 2.7.4
