@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43333)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=228f1c8ea=Paul.Durrant@citrix.com>)
-	id 1cjkbm-0002by-Bj
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 05:38:47 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cjkcU-0002yx-Ua
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 05:39:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=228f1c8ea=Paul.Durrant@citrix.com>)
-	id 1cjkbj-0000JF-7E
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 05:38:46 -0500
-Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:9143
-	helo=SMTP.EU.CITRIX.COM)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=228f1c8ea=Paul.Durrant@citrix.com>)
-	id 1cjkbi-0000Iv-RX
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 05:38:43 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Fri, 3 Mar 2017 10:38:38 +0000
-Message-ID: <05365905529b4fd78ff67989743a8dfb@AMSPEX02CL03.citrite.net>
-References: <1488452986-24501-1-git-send-email-paul.durrant@citrix.com>
-	<1488452986-24501-6-git-send-email-paul.durrant@citrix.com>
-	<alpine.DEB.2.10.1703021426050.17906@sstabellini-ThinkPad-X260>
-In-Reply-To: <alpine.DEB.2.10.1703021426050.17906@sstabellini-ThinkPad-X260>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <dgilbert@redhat.com>) id 1cjkcR-0000cp-Rm
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 05:39:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39730)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cjkcR-0000ap-J1
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 05:39:27 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D85A48F285
+	for <qemu-devel@nongnu.org>; Fri,  3 Mar 2017 10:39:26 +0000 (UTC)
+Date: Fri, 3 Mar 2017 10:39:20 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170303103919.GA2439@work-vm>
+References: <CANHSq5DhUak9fVpvjG=VyeetP7VQudHwyEa4VevC21BuieSstw@mail.gmail.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 5/5] xen: use libxendevicemodel when
- available
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANHSq5DhUak9fVpvjG=VyeetP7VQudHwyEa4VevC21BuieSstw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH V2] migration: expose qemu_announce_self()
+ via qmp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,137 +33,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Stefano Stabellini' <sstabellini@kernel.org>
-Cc: "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Anthony Perard <anthony.perard@citrix.com>
+To: Germano Veit Michel <germano@redhat.com>, armbru@redhat.com, jasowang@redhat.com
+Cc: qemu-devel@nongnu.org, Juan Jose Quintela Carreira <quintela@redhat.com>
 
-> -----Original Message-----
-> From: Stefano Stabellini [mailto:sstabellini@kernel.org]
-> Sent: 02 March 2017 22:50
-> To: Paul Durrant <Paul.Durrant@citrix.com>
-> Cc: xen-devel@lists.xenproject.org; qemu-devel@nongnu.org; Stefano
-> Stabellini <sstabellini@kernel.org>; Anthony Perard
-> <anthony.perard@citrix.com>
-> Subject: Re: [PATCH v2 5/5] xen: use libxendevicemodel when available
->=20
-> On Thu, 2 Mar 2017, Paul Durrant wrote:
-> > This patch modifies the wrapper functions in xen_common.h to use the
-> > new xendevicemodel interface if it is available along with compatibilit=
-y
-> > code to use the old libxenctrl interface if it is not.
-> >
-> > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-> > ---
-> > Cc: Stefano Stabellini <sstabellini@kernel.org>
-> > Cc: Anthony Perard <anthony.perard@citrix.com>
-> >
-> > v2:
-> > - Add a compat define for xenforeignmemory_close() since this is now
-> >   used.
-> > ---
-> >  include/hw/xen/xen_common.h | 115
-> +++++++++++++++++++++++++++++++-------------
-> >  xen-common.c                |   8 +++
-> >  2 files changed, 90 insertions(+), 33 deletions(-)
-> >
-> > diff --git a/include/hw/xen/xen_common.h
-> b/include/hw/xen/xen_common.h
-> > index 31cf25f..48444e5 100644
-> > --- a/include/hw/xen/xen_common.h
-> > +++ b/include/hw/xen/xen_common.h
-> > @@ -9,6 +9,7 @@
-> >  #undef XC_WANT_COMPAT_EVTCHN_API
-> >  #undef XC_WANT_COMPAT_GNTTAB_API
-> >  #undef XC_WANT_COMPAT_MAP_FOREIGN_API
-> > +#undef XC_WANT_COMPAT_DEVICEMODEL_API
-> >
-> >  #include <xenctrl.h>
-> >  #include <xenstore.h>
-> > @@ -26,48 +27,95 @@ extern xc_interface *xen_xc;
-> >   * We don't support Xen prior to 4.2.0.
-> >   */
-> >
-> > +#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 490
-> > +
-> > +typedef xc_interface xendevicemodel_handle;
-> > +
-> > +#define xendevicemodel_open(l, f) xen_xc
-> > +
-> > +#define xendevicemodel_map_io_range_to_ioreq_server \
-> > +    xc_hvm_map_io_range_to_ioreq_server
-> > +#define xendevicemodel_unmap_io_range_from_ioreq_server \
-> > +    xc_hvm_unmap_io_range_from_ioreq_server
-> > +#define xendevicemodel_map_pcidev_to_ioreq_server \
-> > +    xc_hvm_map_pcidev_to_ioreq_server
-> > +#define xendevicemodel_unmap_pcidev_from_ioreq_server \
-> > +    xc_hvm_unmap_pcidev_from_ioreq_server
-> > +#define xendevicemodel_create_ioreq_server \
-> > +    xc_hvm_create_ioreq_server
-> > +#define xendevicemodel_destroy_ioreq_server \
-> > +    xc_hvm_destroy_ioreq_server
-> > +#define xendevicemodel_get_ioreq_server_info \
-> > +    xc_hvm_get_ioreq_server_info
-> > +#define xendevicemodel_set_ioreq_server_state \
-> > +    xc_hvm_set_ioreq_server_state
-> > +#define xendevicemodel_set_pci_intx_level \
-> > +    xc_hvm_set_pci_intx_level
-> > +#define xendevicemodel_set_pci_link_route \
-> > +    xc_hvm_set_pci_link_route
-> > +#define xendevicemodel_set_isa_irq_level \
-> > +    xc_hvm_set_isa_irq_level
-> > +#define xendevicemodel_inject_msi \
-> > +    xc_hvm_inject_msi
-> > +#define xendevicemodel_set_mem_type \
-> > +    xc_hvm_set_mem_type
-> > +#define xendevicemodel_track_dirty_vram \
-> > +    xc_hvm_track_dirty_vram
-> > +#define xendevicemodel_modified_memory \
-> > +    xc_hvm_modified_memory
->=20
-> It does build correctly now for Xen < 4.9, however it breaks against
-> xen-unstable:
->=20
->   ERROR: configure test passed without -Werror but failed with -Werror.
->          This is probably a bug in the configure script. The failing comm=
-and
->          will be at the bottom of config.log.
->          You can run configure with --disable-werror to bypass this check=
-.
->=20
-> and config.log says:
->=20
->   config-temp/qemu-conf.c: In function 'main':
->   config-temp/qemu-conf.c:32:3: error: implicit declaration of function
-> 'xc_hvm_set_mem_type' [-Werror=3Dimplicit-function-declaration]
->   config-temp/qemu-conf.c:32:3: error: nested extern declaration of
-> 'xc_hvm_set_mem_type' [-Werror=3Dnested-externs]
->   config-temp/qemu-conf.c:34:3: error: implicit declaration of function
-> 'xc_hvm_inject_msi' [-Werror=3Dimplicit-function-declaration]
->   config-temp/qemu-conf.c:34:3: error: nested extern declaration of
-> 'xc_hvm_inject_msi' [-Werror=3Dnested-externs]
->   config-temp/qemu-conf.c:35:3: error: implicit declaration of function
-> 'xc_hvm_create_ioreq_server' [-Werror=3Dimplicit-function-declaration]
->   config-temp/qemu-conf.c:35:3: error: nested extern declaration of
-> 'xc_hvm_create_ioreq_server' [-Werror=3Dnested-externs]
->=20
->=20
-> With -DXC_WANT_COMPAT_DEVICEMODEL_API=3D1:
->=20
->   In file included from /local/qemu-
-> upstream/include/hw/xen/xen_backend.h:4:0,
->                    from hw/block/xen_disk.c:27:
->   /local/qemu-upstream/include/hw/xen/xen_common.h: In function
-> 'xen_set_mem_type':
->   /local/qemu-upstream/include/hw/xen/xen_common.h:78:5: error: implicit
-> declaration of function 'xc_hvm_set_mem_type' [-Werror=3Dimplicit-functio=
-n-
-> declaration]
->=20
+* Germano Veit Michel (germano@redhat.com) wrote:
+> qemu_announce_self() is triggered by qemu at the end of migrations
+> to update the network regarding the path to the guest l2addr.
+> 
+> however it is also useful when there is a network change such as
+> an active bond slave swap. Essentially, it's the same as a migration
+> from a network perspective - the guest moves to a different point
+> in the network topology.
+> 
+> this exposes the function via qmp.
 
-Ah... Do you have Anthony's patch?
+Markus: Since you're asking for tests for qmp commands; how would you
+test this?
 
-http://xenbits.xen.org/gitweb/?p=3Dxen.git;a=3Dcommit;h=3D9970e98ace4857470=
-1f7e2286fb67090481a3fec
+Jason: Does this look OK from the networking side of things?
 
-I suspect that may be the problem you're seeing above.
+> Signed-off-by: Germano Veit Michel <germano@redhat.com>
+> ---
+>  include/migration/vmstate.h |  5 +++++
+>  migration/savevm.c          | 30 +++++++++++++++++++-----------
+>  qapi-schema.json            | 18 ++++++++++++++++++
+>  3 files changed, 42 insertions(+), 11 deletions(-)
+> 
+> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+> index 63e7b02..a08715c 100644
+> --- a/include/migration/vmstate.h
+> +++ b/include/migration/vmstate.h
+> @@ -1042,6 +1042,11 @@ int64_t self_announce_delay(int round)
+>      return 50 + (SELF_ANNOUNCE_ROUNDS - round - 1) * 100;
+>  }
+> 
+> +struct AnnounceRound {
+> +    QEMUTimer *timer;
+> +    int count;
+> +};
+> +
+>  void dump_vmstate_json_to_file(FILE *out_fp);
+> 
+>  #endif
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 5ecd264..44e196b 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -118,29 +118,37 @@ static void qemu_announce_self_iter(NICState
+> *nic, void *opaque)
+>      qemu_send_packet_raw(qemu_get_queue(nic), buf, len);
+>  }
+> 
+> -
+>  static void qemu_announce_self_once(void *opaque)
+>  {
+> -    static int count = SELF_ANNOUNCE_ROUNDS;
+> -    QEMUTimer *timer = *(QEMUTimer **)opaque;
+> +    struct AnnounceRound *round = opaque;
+> 
+>      qemu_foreach_nic(qemu_announce_self_iter, NULL);
+> 
+> -    if (--count) {
+> +    round->count--;
+> +    if (round->count) {
+>          /* delay 50ms, 150ms, 250ms, ... */
+> -        timer_mod(timer, qemu_clock_get_ms(QEMU_CLOCK_REALTIME) +
+> -                  self_announce_delay(count));
+> +        timer_mod(round->timer, qemu_clock_get_ms(QEMU_CLOCK_REALTIME) +
+> +                  self_announce_delay(round->count));
+>      } else {
+> -            timer_del(timer);
+> -            timer_free(timer);
+> +            timer_del(round->timer);
+> +            timer_free(round->timer);
+> +            g_free(round);
+>      }
+>  }
+> 
+>  void qemu_announce_self(void)
+>  {
+> -    static QEMUTimer *timer;
+> -    timer = timer_new_ms(QEMU_CLOCK_REALTIME, qemu_announce_self_once, &timer);
+> -    qemu_announce_self_once(&timer);
+> +    struct AnnounceRound *round = g_malloc(sizeof(struct AnnounceRound));
 
-  Paul
+I prefer g_new0 - i.e.
+   struct AnnounceRound *round = g_new0(struct AnnounceRound, 1)
+
+> +    if (!round)
+> +        return;
+> +    round->count = SELF_ANNOUNCE_ROUNDS;
+> +    round->timer = timer_new_ms(QEMU_CLOCK_REALTIME,
+> qemu_announce_self_once, round);
+
+An odd line break?
+
+> +    qemu_announce_self_once(round);
+> +}
+> +
+> +void qmp_announce_self(Error **errp)
+> +{
+> +    qemu_announce_self();
+>  }
+> 
+>  /***********************************************************/
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index baa0d26..0d9bffd 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -6080,3 +6080,21 @@
+>  #
+>  ##
+>  { 'command': 'query-hotpluggable-cpus', 'returns': ['HotpluggableCPU'] }
+> +
+> +##
+> +# @announce-self:
+> +#
+> +# Trigger generation of broadcast RARP frames to update network switches.
+> +# This can be useful when network bonds fail-over the active slave.
+> +#
+> +# Arguments: None.
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "announce-self" }
+> +# <- { "return": {} }
+> +#
+> +# Since: 2.9
+> +##
+> +{ 'command': 'announce-self' }
+> +
+
+Please wire hmp up as well (see hmp-commands.hx).
+
+Dave
+
+> -- 
+> 2.9.3
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
