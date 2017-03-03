@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cjokI-0000m6-T5
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 10:03:52 -0500
+	(envelope-from <programmingkidx@gmail.com>) id 1cjp7n-0004Uw-Cd
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 10:28:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cjokG-0000CC-96
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 10:03:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37088)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cjokG-0000Bs-0R
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 10:03:48 -0500
-Date: Fri, 3 Mar 2017 15:03:42 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170303150342.GE2439@work-vm>
-References: <33183CC9F5247A488A2544077AF19020DA1D01C2@DGGEMA505-MBX.china.huawei.com>
-	<20170303120054.GB2439@work-vm>
-	<10d66d73-a269-acb4-bc3d-2250793cba8e@redhat.com>
-	<20170303131150.GC2439@work-vm>
-	<bcaabb9b-44a6-ee7d-14b9-eade207e1538@redhat.com>
-	<20170303132653.GD2439@work-vm>
-	<4b0de5de-aec7-0388-0a68-cf9e02b48b1d@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4b0de5de-aec7-0388-0a68-cf9e02b48b1d@redhat.com>
-Subject: Re: [Qemu-devel] [Bug?] BQL about live migration
+	(envelope-from <programmingkidx@gmail.com>) id 1cjp7k-0002cd-8j
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 10:28:07 -0500
+Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:34504)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1cjp7k-0002bm-3U
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 10:28:04 -0500
+Received: by mail-io0-x242.google.com with SMTP id n76so11698848ioe.1
+	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 07:28:03 -0800 (PST)
+In-Reply-To: <mailman.56273.1488553194.22740.qemu-devel@nongnu.org>
+References: <mailman.56273.1488553194.22740.qemu-devel@nongnu.org>
+Mime-Version: 1.0 (Apple Message framework v753.1)
+Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
+Message-Id: <8FB6923C-8F97-497C-95DC-6F2D937725BC@gmail.com>
+Content-Transfer-Encoding: 7bit
+From: G 3 <programmingkidx@gmail.com>
+Date: Fri, 3 Mar 2017 10:28:00 -0500
+Subject: Re: [Qemu-devel] git master build failure in 9pfs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,103 +29,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "quintela@redhat.com" <quintela@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, yanghongyang <yanghongyang@huawei.com>, Huangzhichao <huangzhichao@huawei.com>, jdenemar@redhat.com
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> 
-> 
-> On 03/03/2017 14:26, Dr. David Alan Gilbert wrote:
-> > * Paolo Bonzini (pbonzini@redhat.com) wrote:
-> >>
-> >>
-> >> On 03/03/2017 14:11, Dr. David Alan Gilbert wrote:
-> >>> * Paolo Bonzini (pbonzini@redhat.com) wrote:
-> >>>>
-> >>>>
-> >>>> On 03/03/2017 13:00, Dr. David Alan Gilbert wrote:
-> >>>>> Ouch that's pretty nasty; I remember Paolo explaining to me a while ago that
-> >>>>> their were times when run_on_cpu would have to drop the BQL and I worried about it,
-> >>>>> but this is the 1st time I've seen an error due to it.
-> >>>>>
-> >>>>> Do you know what the migration state was at that point? Was it MIGRATION_STATUS_CANCELLING?
-> >>>>> I'm thinking perhaps we should stop 'cont' from continuing while migration is in
-> >>>>> MIGRATION_STATUS_CANCELLING.  Do we send an event when we hit CANCELLED - so that
-> >>>>> perhaps libvirt could avoid sending the 'cont' until then?
-> >>>>
-> >>>> No, there's no event, though I thought libvirt would poll until
-> >>>> "query-migrate" returns the cancelled state.  Of course that is a small
-> >>>> consolation, because a segfault is unacceptable.
-> >>>
-> >>> I think you might get an event if you set the new migrate capability called
-> >>> 'events' on!
-> >>>
-> >>> void migrate_set_state(int *state, int old_state, int new_state)
-> >>> {
-> >>>     if (atomic_cmpxchg(state, old_state, new_state) == old_state) {
-> >>>         trace_migrate_set_state(new_state);
-> >>>         migrate_generate_event(new_state);
-> >>>     }
-> >>> }
-> >>>
-> >>> static void migrate_generate_event(int new_state)
-> >>> {
-> >>>     if (migrate_use_events()) {
-> >>>         qapi_event_send_migration(new_state, &error_abort); 
-> >>>     }
-> >>> }
-> >>>
-> >>> That event feature went in sometime after 2.3.0.
-> >>>
-> >>>> One possibility is to suspend the monitor in qmp_migrate_cancel and
-> >>>> resume it (with add_migration_state_change_notifier) when we hit the
-> >>>> CANCELLED state.  I'm not sure what the latency would be between the end
-> >>>> of migrate_fd_cancel and finally reaching CANCELLED.
-> >>>
-> >>> I don't like suspending monitors; it can potentially take quite a significant
-> >>> time to do a cancel.
-> >>> How about making 'cont' fail if we're in CANCELLING?
-> >>
-> >> Actually I thought that would be the case already (in fact CANCELLING is
-> >> internal only; the outside world sees it as "active" in query-migrate).
-> >>
-> >> Lei, what is the runstate?  (That is, why did cont succeed at all)?
-> > 
-> > I suspect it's RUN_STATE_FINISH_MIGRATE - we set that before we do the device
-> > save, and that's what we get at the end of a migrate and it's legal to restart
-> > from there.
-> 
-> Yeah, but I think we get there at the end of a failed migrate only.  So
-> perhaps we can introduce a new state RUN_STATE_FAILED_MIGRATE and forbid
-> "cont" from finish-migrate (only allow it from failed-migrate)?
 
-OK, I was wrong in my previous statement; we actually go FINISH_MIGRATE->POSTMIGRATE
-so no new state is needed; you shouldn't be restarting the cpu in FINISH_MIGRATE.
+On Mar 3, 2017, at 9:59 AM, qemu-devel-request@nongnu.org wrote:
+> On 02/03/17 17:40, Daniel P. Berrange wrote:
+>
+>> On Thu, Mar 02, 2017 at 05:28:24PM +0000, Mark Cave-Ayland wrote:
+>>> Does anyone else see the following error when trying to build git  
+>>> master?
+>>>
+>>> cc -I/home/build/src/qemu/git/qemu/hw/9pfs -Ihw/9pfs
+>>> -I/home/build/src/qemu/git/qemu/tcg
+>>> -I/home/build/src/qemu/git/qemu/tcg/i386
+>>> -I/home/build/src/qemu/git/qemu/linux-headers
+>>> -I/home/build/src/qemu/git/qemu/linux-headers -I.
+>>> -I/home/build/src/qemu/git/qemu -I/home/build/src/qemu/git/qemu/ 
+>>> include
+>>> -I/usr/include/pixman-1   -I/home/build/src/qemu/git/qemu/dtc/libfdt
+>>> -Werror -pthread -I/usr/include/glib-2.0
+>>> -I/usr/lib/x86_64-linux-gnu/glib-2.0/include   -m64 -mcx16 - 
+>>> D_GNU_SOURCE
+>>> -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes
+>>> -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes
+>>> -fno-strict-aliasing -fno-common -fwrapv  -Wendif-labels
+>>> -Wno-missing-include-dirs -Wempty-body -Wnested-externs
+>>> -Wformat-security -Wformat-y2k -Winit-self -Wignored-qualifiers
+>>> -Wold-style-declaration -Wold-style-definition -Wtype-limits
+>>> -fstack-protector-all -I/usr/include/p11-kit-1
+>>> -I/usr/include/libpng12   -I/home/build/src/qemu/git/qemu/tests - 
+>>> MMD -MP
+>>> -MT hw/9pfs/9p-util.o -MF hw/9pfs/9p-util.d -O2 -U_FORTIFY_SOURCE
+>>> -D_FORTIFY_SOURCE=2 -g   -c -o hw/9pfs/9p-util.o hw/9pfs/9p-util.c
+>>> In file included from hw/9pfs/9p-util.c:15:0:
+>>> hw/9pfs/9p-util.h: In function ?openat_dir?:
+>>> hw/9pfs/9p-util.h:25:57: error: ?O_PATH? undeclared (first use in  
+>>> this
+>>> function)
+>>> hw/9pfs/9p-util.h:25:57: note: each undeclared identifier is  
+>>> reported
+>>> only once for each function it appears in
+>>> hw/9pfs/9p-util.h:26:1: error: control reaches end of non-void  
+>>> function
+>>> [-Werror=return-type]
+>>>
+>>> Build platform is Debian Wheezy on an x86_64 host.
+>>
+>> IIUC, O_PATH was introduced in glibc 2.14 and Wheezy only has 2.13.
+>>
+>> So unless we want to make this 9pfs code a configurable option, this
+>> means Debian Wheezy is no longer a supportable platform for QEMU.
+>
+> Oh sure, I appreciate that wheezy is getting towards then end of its
+> lifetime - it's just a little bit inconvenient to break my development
+> environment just as we enter 2.9 freeze ;)
+>
+> If everyone agrees that wheezy is no longer supported after 2.9 then I
+> can look to upgrading, however my QEMU development is done on my  
+> laptop
+> which is also setup for my day job so it's not a simple case of just
+> switching the repository and running dist-upgrade to get me going  
+> again...
 
-My preference is to get libvirt to wait for the transition to POSTMIGRATE before
-it issues the 'cont'.  I'd rather not block the monitor with 'cont' but I'm
-not sure how we'd cleanly make cont fail without breaking existing libvirts
-that usually don't hit this race. (cc'ing in Jiri).
+I remember years ago something like O_PATH was not defined on Mac OS X,
+so the solution was to define the constant as zero. Something like this:
 
-Dave
+#ifndef O_PATH
+	#define O_PATH 0
+#endif
 
-> Paolo
-> 
-> >> Paolo
-> >>
-> >>> I'd really love to see the 'run_on_cpu' being more careful about the BQL;
-> >>> we really need all of the rest of the devices to stay quiesced at times.
-> >>
-> >> That's not really possible, because of how condition variables work. :(
-> > 
-> > *Really* we need to find a solution to that - there's probably lots of 
-> > other things that can spring up in that small window other than the
-> > 'cont'.
-> > 
-> > Dave
-> > 
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Maybe this might work in 9p-util.h.
