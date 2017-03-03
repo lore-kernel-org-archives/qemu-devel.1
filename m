@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cjoat-00053O-U8
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 09:54:12 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cjocE-0005tu-Pi
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 09:55:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cjoas-0005sN-T5
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 09:54:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41826)
+	(envelope-from <pbonzini@redhat.com>) id 1cjocC-0006Er-5w
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 09:55:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33004)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cjoas-0005sE-K4
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 09:54:06 -0500
-From: Eric Blake <eblake@redhat.com>
-References: <20170303112503.32277-1-ppandit@redhat.com>
-Message-ID: <bd2e3c1d-0fa5-7be4-c223-81d87c87fe0c@redhat.com>
-Date: Fri, 3 Mar 2017 08:54:03 -0600
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cjocB-0006EK-TP
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 09:55:28 -0500
+References: <20170303131113.25898-1-pbonzini@redhat.com>
+	<20170303131113.25898-3-pbonzini@redhat.com>
+	<87lgsm1kk1.fsf@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <73bf279b-8f1c-7eef-ca51-85485d552311@redhat.com>
+Date: Fri, 3 Mar 2017 15:55:15 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170303112503.32277-1-ppandit@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="IVpGBef2B2Uvw9Nj2cDpQXJeTCELUvjpE"
-Subject: Re: [Qemu-devel] [PATCH] linux-user: limit number of arguments to
- execve
+In-Reply-To: <87lgsm1kk1.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/5] qemu-timer: do not include
+ sysemu/cpus.h from util/qemu-timer.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,120 +29,210 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Prasad J Pandit <pjp@fedoraproject.org>, Jann Horn <jannh@google.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---IVpGBef2B2Uvw9Nj2cDpQXJeTCELUvjpE
-From: Eric Blake <eblake@redhat.com>
-To: P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Prasad J Pandit
- <pjp@fedoraproject.org>, Jann Horn <jannh@google.com>
-Message-ID: <bd2e3c1d-0fa5-7be4-c223-81d87c87fe0c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] linux-user: limit number of arguments to
- execve
-References: <20170303112503.32277-1-ppandit@redhat.com>
-In-Reply-To: <20170303112503.32277-1-ppandit@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 03/03/2017 05:25 AM, P J P wrote:
-> From: Prasad J Pandit <pjp@fedoraproject.org>
+
+On 03/03/2017 15:50, Alex Benn=C3=A9e wrote:
 >=20
-> Limit the number of arguments passed to execve(2) call from
-> a user program, as large number of them could lead to a bad
-> guest address error.
-
-Depending on how the kernel was compiled, you may have a limited maximum
-size for the combined storage used by argc, environ, and all pointers.
-Older kernels had a hard ceiling on storage used by argc and environ as
-small as 128k (not just the bytes pointed to, but also the storage
-occupied by the pointers) - it was possible to trigger E2BIG failures
-with a large number of arguments in the array, but also with a single
-argument that was too long.  Modern kernels have increased the limits
-somewhat (now it is as large as 1/4 available stack size), but still has
-maximum sizes for a single argument (larger than before, but still
-finite).  Any one of these E2BIG failures is something we need to handle
-gracefully, especially if the guest is expecting to be able to use a
-larger limit than the host is supporting.  So I'm not sure that limiting
-the number of arguments is sufficient - you may also have to limit the
-size of the arguments.
-
-I typed the above without looking at your patch.  Now that I've done
-that, I see that you are tackling yet another type of corruption...
-
+> Paolo Bonzini <pbonzini@redhat.com> writes:
 >=20
-> Reported-by: Jann Horn <jannh@google.com>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-> ---
->  linux-user/syscall.c | 7 +++++++
->  1 file changed, 7 insertions(+)
+>> This dependency is the wrong way, and we will need util/qemu-timer.h f=
+rom sysemu/cpus.h
+>> in the next patch.
 >=20
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 9be8e95..c545c12 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -7766,6 +7766,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_l=
-ong arg1,
->  #endif
->      case TARGET_NR_execve:
->          {
-> +#define ARG_MAX 65535
->              char **argp, **envp;
->              int argc, envc;
->              abi_ulong gp;
-> @@ -7794,6 +7795,12 @@ abi_long do_syscall(void *cpu_env, int num, abi_=
-long arg1,
->                  envc++;
->              }
-> =20
-> +            if (argc > ARG_MAX || envc > ARG_MAX) {
-> +                fprintf(stderr,
-> +                        "argc(%d), envc(%d) exceed %d\n", argc, envc, =
-ARG_MAX);
+> This shuffling breaks a couple of targets:
 
-Isn't there something better than fprintf() for reporting errors?
+Oops.  I only tested x86 and aarch64 before.  This will have to wait for
+after soft freeze.
 
-> +                ret =3D -TARGET_EFAULT;
-> +                break;
-> +            }
->              argp =3D alloca((argc + 1) * sizeof(void *));
->              envp =3D alloca((envc + 1) * sizeof(void *));
+Paolo
 
-=2E..Uggh. You're using alloca() but allowing an allocation of way more
-than 4k.  That means a guest can cause corruption of the stack (or, with
-large enough arguments, even escape out of the stack) before you even
-get to the execve() call to even worry about E2BIG issues.  Even though
-your new limit of 64k argc/envc limits the damage compared to what it
-used to be, you are still prone to an allocation that walks beyond the
-guard page and causes bad behavior.  Either you need the limits to be
-much smaller, or you should consider using the heap instead of the stack
-(alloca should never be used for more than about 4k).  And there's still
-the possibility that even with your cap, that you are not handling E2BIG
-correctly.  You'll need to respin this patch.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---IVpGBef2B2Uvw9Nj2cDpQXJeTCELUvjpE
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYuYOMAAoJEKeha0olJ0NqQosH/RiNVL+zQlHIJ0ganey6PQDm
-gTrTCtJ8qMmugElqoedfZQ/A/Oa/getKLLe3mnBS+Awq4njh+YGvn6h/YutH7Kei
-c1r+rhnhrxWID07lin1dTawsHVUznYJCG1B4JXGAXVe6x2WecbcZCMDUmDHjwP0G
-UuXeo1MHdBmf/yF8fLHP5Ocvl5YlFYlny3+G7iCvUtigDlMeScQA8NGX553xb3t9
-WId0Nvp9aezt1zxtLnUXJt3EMQIELRjADvKJUxbnZN/moiMKBe0HJZUYXZgaJqQD
-gAVL3JCgUA342pjp8c00J34vVbI82FVS5jS9+iNMJCnh/d1tdpO74Dln3e1jkv4=
-=lUoC
------END PGP SIGNATURE-----
-
---IVpGBef2B2Uvw9Nj2cDpQXJeTCELUvjpE--
+> make -k -j9
+> 	CHK version_gen.h
+>   CC      alpha-softmmu/target/alpha/translate.o
+> /home/alex/lsrc/qemu/qemu.git/target/alpha/translate.c: In function =E2=
+=80=98gen_mfpr=E2=80=99:
+> /home/alex/lsrc/qemu/qemu.git/target/alpha/translate.c:1321:13: error: =
+=E2=80=98use_icount=E2=80=99 undeclared (first use in this function)
+>          if (use_icount) {
+>              ^
+> /home/alex/lsrc/qemu/qemu.git/target/alpha/translate.c:1321:13: note: e=
+ach undeclared identifier is reported only once for each function it appe=
+ars in
+> /home/alex/lsrc/qemu/qemu.git/rules.mak:69: recipe for target 'target/a=
+lpha/translate.o' failed
+> make[1]: *** [target/alpha/translate.o] Error 1
+> make[1]: Target 'all' not remade because of errors.
+> Makefile:322: recipe for target 'subdir-alpha-softmmu' failed
+> make: *** [subdir-alpha-softmmu] Error 2
+>   CC      ppc64-softmmu/hw/ppc/pnv.o
+> /home/alex/lsrc/qemu/qemu.git/hw/ppc/pnv.c: In function =E2=80=98ppc_po=
+wernv_init=E2=80=99:
+> /home/alex/lsrc/qemu/qemu.git/hw/ppc/pnv.c:446:39: error: =E2=80=98smp_=
+cores=E2=80=99 undeclared (first use in this function)
+>          object_property_set_int(chip, smp_cores, "nr-cores", &error_fa=
+tal);
+>                                        ^
+> /home/alex/lsrc/qemu/qemu.git/hw/ppc/pnv.c:446:39: note: each undeclare=
+d identifier is reported only once for each function it appears in
+> /home/alex/lsrc/qemu/qemu.git/hw/ppc/pnv.c: In function =E2=80=98pnv_ch=
+ip_realize=E2=80=99:
+> /home/alex/lsrc/qemu/qemu.git/hw/ppc/pnv.c:686:57: error: =E2=80=98smp_=
+threads=E2=80=99 undeclared (first use in this function)
+>          object_property_set_int(OBJECT(pnv_core), smp_threads, "nr-thr=
+eads",
+>                                                          ^
+> /home/alex/lsrc/qemu/qemu.git/rules.mak:69: recipe for target 'hw/ppc/p=
+nv.o' failed
+> make[1]: *** [hw/ppc/pnv.o] Error 1
+> make[1]: Target 'all' not remade because of errors.
+> Makefile:322: recipe for target 'subdir-ppc64-softmmu' failed
+> make: *** [subdir-ppc64-softmmu] Error 2
+> make: Target 'all' not remade because of errors.
+>=20
+> Compilation exited abnormally with code 2 at Fri Mar  3 14:49:30
+>=20
+>=20
+>>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>>  cpu-exec.c            | 1 +
+>>  hw/core/ptimer.c      | 1 +
+>>  include/qemu/timer.h  | 1 -
+>>  include/sysemu/cpus.h | 2 ++
+>>  kvm-all.c             | 1 +
+>>  monitor.c             | 1 +
+>>  replay/replay.c       | 1 +
+>>  translate-all.c       | 1 +
+>>  util/main-loop.c      | 1 +
+>>  util/qemu-timer.c     | 1 +
+>>  10 files changed, 10 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/cpu-exec.c b/cpu-exec.c
+>> index 1a5ad48..6dbb4da 100644
+>> --- a/cpu-exec.c
+>> +++ b/cpu-exec.c
+>> @@ -33,6 +33,7 @@
+>>  #if defined(TARGET_I386) && !defined(CONFIG_USER_ONLY)
+>>  #include "hw/i386/apic.h"
+>>  #endif
+>> +#include "sysemu/cpus.h"
+>>  #include "sysemu/replay.h"
+>>
+>>  /* -icount align implementation. */
+>> diff --git a/hw/core/ptimer.c b/hw/core/ptimer.c
+>> index 59ccb00..7221c68 100644
+>> --- a/hw/core/ptimer.c
+>> +++ b/hw/core/ptimer.c
+>> @@ -13,6 +13,7 @@
+>>  #include "sysemu/replay.h"
+>>  #include "sysemu/qtest.h"
+>>  #include "block/aio.h"
+>> +#include "sysemu/cpus.h"
+>>
+>>  #define DELTA_ADJUST     1
+>>  #define DELTA_NO_ADJUST -1
+>> diff --git a/include/qemu/timer.h b/include/qemu/timer.h
+>> index 26e6285..91cd8c8 100644
+>> --- a/include/qemu/timer.h
+>> +++ b/include/qemu/timer.h
+>> @@ -4,7 +4,6 @@
+>>  #include "qemu-common.h"
+>>  #include "qemu/notify.h"
+>>  #include "qemu/host-utils.h"
+>> -#include "sysemu/cpus.h"
+>>
+>>  #define NANOSECONDS_PER_SECOND 1000000000LL
+>>
+>> diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
+>> index a73b5d4..e521a91 100644
+>> --- a/include/sysemu/cpus.h
+>> +++ b/include/sysemu/cpus.h
+>> @@ -1,6 +1,8 @@
+>>  #ifndef QEMU_CPUS_H
+>>  #define QEMU_CPUS_H
+>>
+>> +#include "qemu/timer.h"
+>> +
+>>  /* cpus.c */
+>>  bool qemu_in_vcpu_thread(void);
+>>  void qemu_init_cpu_loop(void);
+>> diff --git a/kvm-all.c b/kvm-all.c
+>> index 0c94637..0fd6655 100644
+>> --- a/kvm-all.c
+>> +++ b/kvm-all.c
+>> @@ -29,6 +29,7 @@
+>>  #include "hw/s390x/adapter.h"
+>>  #include "exec/gdbstub.h"
+>>  #include "sysemu/kvm_int.h"
+>> +#include "sysemu/cpus.h"
+>>  #include "qemu/bswap.h"
+>>  #include "exec/memory.h"
+>>  #include "exec/ram_addr.h"
+>> diff --git a/monitor.c b/monitor.c
+>> index b68944d..d8fba78 100644
+>> --- a/monitor.c
+>> +++ b/monitor.c
+>> @@ -77,6 +77,7 @@
+>>  #include "qapi-event.h"
+>>  #include "qmp-introspect.h"
+>>  #include "sysemu/qtest.h"
+>> +#include "sysemu/cpus.h"
+>>  #include "qemu/cutils.h"
+>>  #include "qapi/qmp/dispatch.h"
+>>
+>> diff --git a/replay/replay.c b/replay/replay.c
+>> index 1835b99..78e2a7e 100644
+>> --- a/replay/replay.c
+>> +++ b/replay/replay.c
+>> @@ -16,6 +16,7 @@
+>>  #include "replay-internal.h"
+>>  #include "qemu/timer.h"
+>>  #include "qemu/main-loop.h"
+>> +#include "sysemu/cpus.h"
+>>  #include "sysemu/sysemu.h"
+>>  #include "qemu/error-report.h"
+>>
+>> diff --git a/translate-all.c b/translate-all.c
+>> index 956d54b..63b8f56 100644
+>> --- a/translate-all.c
+>> +++ b/translate-all.c
+>> @@ -57,6 +57,7 @@
+>>  #include "qemu/timer.h"
+>>  #include "qemu/main-loop.h"
+>>  #include "exec/log.h"
+>> +#include "sysemu/cpus.h"
+>>
+>>  /* #define DEBUG_TB_INVALIDATE */
+>>  /* #define DEBUG_TB_FLUSH */
+>> diff --git a/util/main-loop.c b/util/main-loop.c
+>> index ad10bca..0b2d8c0 100644
+>> --- a/util/main-loop.c
+>> +++ b/util/main-loop.c
+>> @@ -28,6 +28,7 @@
+>>  #include "qemu/timer.h"
+>>  #include "qemu/sockets.h"	// struct in_addr needed for libslirp.h
+>>  #include "sysemu/qtest.h"
+>> +#include "sysemu/cpus.h"
+>>  #include "slirp/libslirp.h"
+>>  #include "qemu/main-loop.h"
+>>  #include "block/aio.h"
+>> diff --git a/util/qemu-timer.c b/util/qemu-timer.c
+>> index 2f20151..ac99340 100644
+>> --- a/util/qemu-timer.c
+>> +++ b/util/qemu-timer.c
+>> @@ -27,6 +27,7 @@
+>>  #include "qemu/timer.h"
+>>  #include "sysemu/replay.h"
+>>  #include "sysemu/sysemu.h"
+>> +#include "sysemu/cpus.h"
+>>
+>>  #ifdef CONFIG_POSIX
+>>  #include <pthread.h>
+>=20
+>=20
+> --
+> Alex Benn=C3=A9e
+>=20
