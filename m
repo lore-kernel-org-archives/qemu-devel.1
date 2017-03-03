@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cjmdE-0004Py-3a
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:48:24 -0500
+	(envelope-from <clg@kaod.org>) id 1cjmeB-0005A8-8r
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:49:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cjmdB-0006dG-2e
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:48:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41122)
+	(envelope-from <clg@kaod.org>) id 1cjme8-00073J-8A
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:49:23 -0500
+Received: from 9.mo4.mail-out.ovh.net ([46.105.40.176]:44950)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cjmdA-0006d1-SJ
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:48:20 -0500
-References: <33183CC9F5247A488A2544077AF19020DA1D01C2@DGGEMA505-MBX.china.huawei.com>
-	<20170303120054.GB2439@work-vm>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <10d66d73-a269-acb4-bc3d-2250793cba8e@redhat.com>
-Date: Fri, 3 Mar 2017 13:48:16 +0100
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cjme8-00072n-1T
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:49:20 -0500
+Received: from player746.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 90944502E3
+	for <qemu-devel@nongnu.org>; Fri,  3 Mar 2017 13:49:17 +0100 (CET)
+References: <5b2054e1-5867-979b-b476-b3aa8ecc5689@redhat.com>
+	<ee977c5e-affd-cf8d-d793-0d153fdf3e7d@kaod.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <b1143d55-715e-0f20-a11f-068430d412e9@kaod.org>
+Date: Fri, 3 Mar 2017 13:49:11 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170303120054.GB2439@work-vm>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <ee977c5e-affd-cf8d-d793-0d153fdf3e7d@kaod.org>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Bug?] BQL about live migration
+Subject: Re: [Qemu-devel] qemu-system-ppc64 crashes during "info qtree"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,33 +30,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Cc: "quintela@redhat.com" <quintela@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, yanghongyang <yanghongyang@huawei.com>, Huangzhichao <huangzhichao@huawei.com>
+To: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
 
-
-
-On 03/03/2017 13:00, Dr. David Alan Gilbert wrote:
-> Ouch that's pretty nasty; I remember Paolo explaining to me a while ago=
- that
-> their were times when run_on_cpu would have to drop the BQL and I worri=
-ed about it,
-> but this is the 1st time I've seen an error due to it.
+On 03/03/2017 12:16 PM, C=C3=A9dric Le Goater wrote:
+> On 03/03/2017 11:48 AM, Thomas Huth wrote:
+>>  Hi C=C3=A9dric, hi David,
+>>
+>> running "info qtree" at the HMP monitor with the pseries machine
+>> currently results in:
+>>
+>>   [...]
+>>       dev: spapr-vty, id "vty@71000000"
+>>         reg =3D 1895825408 (0x71000000)
+>>         chardev =3D "serial0"
+>>         irq =3D 4098 (0x1002)
+>>   dev: spapr-rtc, id ""
+>>   dev: icp, id ""
+>> hw/core/sysbus.c:277:sysbus_dev_print: Object 0x7f83127fc3f0 is not an
+>> instance of type sys-bus-device
+>> Aborted (core dumped)
+>>
+>> Since the last device that is printed here is "icp" ... could that be
+>> related to the recent ICP/XICS reworks that have been merged a couple =
+of
+>> days ago?
 >=20
-> Do you know what the migration state was at that point? Was it MIGRATIO=
-N_STATUS_CANCELLING?
-> I'm thinking perhaps we should stop 'cont' from continuing while migrat=
-ion is in
-> MIGRATION_STATUS_CANCELLING.  Do we send an event when we hit CANCELLED=
- - so that
-> perhaps libvirt could avoid sending the 'cont' until then?
+> The cleanup did not change the nature of ICP but as we removed=20
+> the XICS object, which used to be a SysBusDevice, that might=20
+> be a consequence.=20
+>=20
+> May be we should make the ICP objects SysBus devices now. I will=20
+> check.=20
 
-No, there's no event, though I thought libvirt would poll until
-"query-migrate" returns the cancelled state.  Of course that is a small
-consolation, because a segfault is unacceptable.
+No. The problem came with the reset handlers. Sending a patch.
 
-One possibility is to suspend the monitor in qmp_migrate_cancel and
-resume it (with add_migration_state_change_notifier) when we hit the
-CANCELLED state.  I'm not sure what the latency would be between the end
-of migrate_fd_cancel and finally reaching CANCELLED.
-
-Paolo
+C.=20
