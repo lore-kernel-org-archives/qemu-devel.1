@@ -1,39 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42775)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1cjmOb-0008DV-5v
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:33:18 -0500
+	(envelope-from <armbru@redhat.com>) id 1cjmOF-0007uX-2K
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:33:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1cjmOY-0008BE-2f
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:33:17 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32803)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1cjmOX-0008Aq-Pu
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:33:14 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v23CT4pJ110911
-	for <qemu-devel@nongnu.org>; Fri, 3 Mar 2017 07:33:11 -0500
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28xs8envwe-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 07:33:11 -0500
-Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 3 Mar 2017 05:33:10 -0700
-References: <148847238435.285.7158100214182923369@0e2666bad730>
-	<e58e0463-c12f-31ed-3944-a09735e7a7fc@de.ibm.com>
-	<20170303095301.GE7097@lemon.lan>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 3 Mar 2017 13:33:04 +0100
-MIME-Version: 1.0
-In-Reply-To: <20170303095301.GE7097@lemon.lan>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Message-Id: <6d02fcc5-f5e0-4f33-fe77-1a6b6f167b4a@de.ibm.com>
-Subject: Re: [Qemu-devel] [PULL v2 0/3] Merge qio 2017/02/27
+	(envelope-from <armbru@redhat.com>) id 1cjmOB-0007xQ-TM
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:32:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52882)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cjmOB-0007wj-O0
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:32:51 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E5E827E9D5
+	for <qemu-devel@nongnu.org>; Fri,  3 Mar 2017 12:32:51 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Fri,  3 Mar 2017 13:32:22 +0100
+Message-Id: <1488544368-30622-3-git-send-email-armbru@redhat.com>
+In-Reply-To: <1488544368-30622-1-git-send-email-armbru@redhat.com>
+References: <1488544368-30622-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 02/28] libqtest: Work around a "QMP wants a
+ newline" bug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,18 +30,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 03/03/2017 10:53 AM, Fam Zheng wrote:
-> On Fri, 03/03 09:12, Christian Borntraeger wrote:
->> On 03/02/2017 05:33 PM, no-reply@patchew.org wrote:
->>
->> Fam, this seems to happen sometimes. Can you have a look at that why the qtest 
->> thing fails on the s390 box?
-> 
-> I don't know, when I run the commands manually for a few times, it is not
-> reproduced. :(
+The next commit is going to add a test that calls qmp("null").
+Curiously, this hangs.  Here's why.
 
-Just guessing, maybe you have two runs in parallel that use the same folder
-for some reason?
+qmp_fd_sendv() doesn't send newlines.  Not even when @fmt contains
+some.  At first glance, the QMP parser seems to be fine with that.
+However, it turns out that it fails to react to input until it sees
+either a newline, an object or an array.  To reproduce, feed to a QMP
+monitor like this:
+
+    $ echo -n 'null' | socat UNIX:/work/armbru/images/test-qmp STDIO
+    {"QMP": {"version": {"qemu": {"micro": 50, "minor": 8, "major": 2}, "package": " (v2.8.0-1195-gf84141e-dirty)"}, "capabilities": []}}
+
+No output after the greeting.
+
+Add a newline:
+
+    $ echo 'null' | socat UNIX:/work/armbru/images/test-qmp STDIO
+    {"QMP": {"version": {"qemu": {"micro": 50, "minor": 8, "major": 2}, "package": " (v2.8.0-1195-gf84141e-dirty)"}, "capabilities": []}}
+    {"error": {"class": "GenericError", "desc": "Expected 'object' in QMP input"}}
+
+Correct output for input 'null'.
+
+Add an object instead:
+
+    $ echo -n 'null { "execute": "qmp_capabilities" }' | socat UNIX:qmp-socket STDIO
+    {"QMP": {"version": {"qemu": {"micro": 50, "minor": 8, "major": 2}, "package": " (v2.8.0-1195-gf84141e-dirty)"}, "capabilities": []}}
+    {"error": {"class": "GenericError", "desc": "Expected 'object' in QMP input"}}
+    {"return": {}}
+
+Also correct output.
+
+Work around this QMP bug by having qmp_fd_sendv() append a newline.
+
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ tests/libqtest.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index 3a0e0d6..951a3b4 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -442,14 +442,20 @@ void qmp_fd_sendv(int fd, const char *fmt, va_list ap)
+     if (qobj) {
+         int log = getenv("QTEST_LOG") != NULL;
+         QString *qstr = qobject_to_json(qobj);
+-        const char *str = qstring_get_str(qstr);
+-        size_t size = qstring_get_length(qstr);
++        const char *str;
++
++        /*
++         * BUG: QMP doesn't react to input until it sees a newline, an
++         * object, or an array.  Work-around: give it a newline.
++         */
++        qstring_append_chr(qstr, '\n');
++        str = qstring_get_str(qstr);
+ 
+         if (log) {
+             fprintf(stderr, "%s", str);
+         }
+         /* Send QMP request */
+-        socket_send(fd, str, size);
++        socket_send(fd, str, qstring_get_length(qstr));
+ 
+         QDECREF(qstr);
+         qobject_decref(qobj);
+-- 
+2.7.4
