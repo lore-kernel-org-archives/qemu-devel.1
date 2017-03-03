@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cjrx7-0005R8-De
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:29:18 -0500
+	(envelope-from <eblake@redhat.com>) id 1cjs0y-0006nW-Du
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:33:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cjrx6-0005j9-Iw
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:29:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54750)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cjrx6-0005i8-A0
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:29:16 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6558CC057FA4
-	for <qemu-devel@nongnu.org>; Fri,  3 Mar 2017 18:29:16 +0000 (UTC)
-References: <1488544368-30622-1-git-send-email-armbru@redhat.com>
-	<1488544368-30622-7-git-send-email-armbru@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1cjs0x-0007Gw-BP
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:33:16 -0500
+References: <1488491046-2549-1-git-send-email-armbru@redhat.com>
+	<1488491046-2549-14-git-send-email-armbru@redhat.com>
+	<90d9033f-49b2-6f00-d984-dbfd4f21f1da@redhat.com>
+	<87zih2mgsr.fsf@dusky.pond.sub.org>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <6a0b8822-aa82-64e6-68f8-d0e63436ab76@redhat.com>
-Date: Fri, 3 Mar 2017 12:29:13 -0600
+Message-ID: <0f03a9a8-6361-b5ec-a829-1dcb3677fa25@redhat.com>
+Date: Fri, 3 Mar 2017 12:33:02 -0600
 MIME-Version: 1.0
-In-Reply-To: <1488544368-30622-7-git-send-email-armbru@redhat.com>
+In-Reply-To: <87zih2mgsr.fsf@dusky.pond.sub.org>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="XLCSpTWM2Rf5h9GOVoawSAU6A6axtVGij"
-Subject: Re: [Qemu-devel] [PATCH v4 06/28] qapi-introspect: Mangle --prefix
- argument properly for C
+	boundary="ebG5IAGnxmNjJ3pnfs3LlwKu6uptUxpIc"
+Subject: Re: [Qemu-devel] [PATCH 13/15] qapi-schema: Rename GlusterServer to
+ SocketAddressFlat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,56 +27,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, qemu-block@nongnu.org, namei.unix@gmail.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XLCSpTWM2Rf5h9GOVoawSAU6A6axtVGij
+--ebG5IAGnxmNjJ3pnfs3LlwKu6uptUxpIc
 From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <6a0b8822-aa82-64e6-68f8-d0e63436ab76@redhat.com>
-Subject: Re: [PATCH v4 06/28] qapi-introspect: Mangle --prefix argument
- properly for C
-References: <1488544368-30622-1-git-send-email-armbru@redhat.com>
- <1488544368-30622-7-git-send-email-armbru@redhat.com>
-In-Reply-To: <1488544368-30622-7-git-send-email-armbru@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mitake.hitoshi@lab.ntt.co.jp,
+ jcody@redhat.com, qemu-block@nongnu.org, namei.unix@gmail.com
+Message-ID: <0f03a9a8-6361-b5ec-a829-1dcb3677fa25@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 13/15] qapi-schema: Rename GlusterServer to
+ SocketAddressFlat
+References: <1488491046-2549-1-git-send-email-armbru@redhat.com>
+ <1488491046-2549-14-git-send-email-armbru@redhat.com>
+ <90d9033f-49b2-6f00-d984-dbfd4f21f1da@redhat.com>
+ <87zih2mgsr.fsf@dusky.pond.sub.org>
+In-Reply-To: <87zih2mgsr.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 03/03/2017 06:32 AM, Markus Armbruster wrote:
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  scripts/qapi-introspect.py | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-I'm guessing we haven't seen a use of a prefix that matters yet, but
-that an upcoming patch triggered a compilation failure without this fix.
- Mentioning that in the commit message wouldn't hurt.
-
+On 03/03/2017 11:05 AM, Markus Armbruster wrote:
+> Eric Blake <eblake@redhat.com> writes:
 >=20
-> diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
-> index 541644e..fb72c61 100644
-> --- a/scripts/qapi-introspect.py
-> +++ b/scripts/qapi-introspect.py
-> @@ -64,7 +64,7 @@ class QAPISchemaGenIntrospectVisitor(QAPISchemaVisito=
-r):
->          # generate C
->          # TODO can generate awfully long lines
->          jsons.extend(self._jsons)
-> -        name =3D prefix + 'qmp_schema_json'
-> +        name =3D c_name(prefix, protect=3DFalse) + 'qmp_schema_json'
->          self.decl =3D mcgen('''
->  extern const char %(c_name)s[];
->  ''',
+
+>>> +# @SocketAddressFlatType:
+>>> +#
+>>> +# Available SocketAddressFlat types
+>>> +#
+>>> +# @tcp:   Internet address
+>>> +#
+>>> +# @unix:  Unix domain socket
+>>> +#
+>>> +# Since: 2.9
+>>
+>> I probably would have listed 'since: 2.7', since the type is unchanged=
+
+>> from its pre-move location...
 >=20
+> I'd have to bump it right in the next patch :)
+
+Too true (now that I've read the next patch)!  No need to tweak it, then.=
+
 
 --=20
 Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---XLCSpTWM2Rf5h9GOVoawSAU6A6axtVGij
+--ebG5IAGnxmNjJ3pnfs3LlwKu6uptUxpIc
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -94,13 +85,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYubX5AAoJEKeha0olJ0NqYyAIAJBqo5HOl0QnbZ90SHPQqeUW
-bJGsBV5SKDl1uj8CIxisj/EzCj62R9ohPQiWMRlP/F1Px4Io7j+gKFMDYIxcV6Jf
-6o1MnxUxwpoGstWSfZAW8QzEn1QwLoH7Bs/ntUwJyUTfywodJXUC0pmjQRSI/4dd
-HUtWK6ZPEWYDr7Slhh78/7Z2HnF6z5XDetswSzDVxIFUAVIcuAJeIqbVYSZPrjuZ
-wlvPn/lsWHSPjEXGSuO865JoVJTv8dbTyMjtpfKqWDi64qJW54f6901/MnvuJHrK
-f0Yoo938dWdneUYEs2u5sOKh31J455FNmyB41QqySiAXug1YsIZpZXkfpKRMfsI=
-=WrGz
+iQEcBAEBCAAGBQJYubbeAAoJEKeha0olJ0NqpGUIAI4guwyewIiviCsEqZRRBIBg
+wIx0ywv8WgtHwUmohDCioTueqci7/rOTGa0wP0Sk0r6VEn4eqsVOa+ESQmVdVzfu
+sC/UeNQOHYGs/2sb5Rc96f5Y56Zua5HNnql4pX+bEIS4HFiqONu9+6y1pd+H8Tkv
+9/ii5dN0tShM7xQiWpEZGJPLzLhr6CGRFNafQFkT+jQttLwwQvm4od5wQBSR3XFq
+EYgVs7EMdxUmTXsArNzDD/ezKiv071wVylgfOxpxJ2tRZuNr32R1goTH9WyLbQSi
+e/e1Pa+hnpTVXl3j31zVWg4Ur9UE8hEFjWYtKFGIrVVfYYT3OMi6sLxXKMpH7MY=
+=DWx6
 -----END PGP SIGNATURE-----
 
---XLCSpTWM2Rf5h9GOVoawSAU6A6axtVGij--
+--ebG5IAGnxmNjJ3pnfs3LlwKu6uptUxpIc--
