@@ -1,20 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cje5z-0003dk-Bs
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 22:41:32 -0500
+	(envelope-from <peterx@redhat.com>) id 1cje7g-0004L7-5D
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 22:43:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cje5y-0007SR-0y
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 22:41:31 -0500
-Resent-Message-Id: <E1cje5y-0007SR-0y@eggs.gnu.org>
-In-Reply-To: <20170303032507.16142-1-david@gibson.dropbear.id.au>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148851245749.285.4274943456379606580@0e2666bad730>
+	(envelope-from <peterx@redhat.com>) id 1cje7b-0008CR-MD
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 22:43:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34612)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cje7b-0008Bs-EA
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 22:43:11 -0500
+Date: Fri, 3 Mar 2017 11:43:04 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170303034303.GA20768@pxdev.xzpeter.org>
+References: <20170214073551.GA9055@pxdev.xzpeter.org>
+	<CAHyh4xiATAV801U7zjK1F_B+7e2bDWhH1-gpFKF3U1jNmCfScw@mail.gmail.com>
+	<20170215025243.GA3988@pxdev.xzpeter.org>
+	<20170215033452.GB3988@pxdev.xzpeter.org>
+	<20170215111552.5405418a@t450s.home>
+	<20170216022839.GC15985@pxdev.xzpeter.org>
+	<20170215194758.4622d73c@t450s.home>
+	<CAHyh4xg6oRVoW81QgdQRoL0Oc7jHm7prgyd--ghYQ4d4_aSUpQ@mail.gmail.com>
+	<CAHyh4xi0qOaL5X5E6yLpf2O=RYR=G8X=zjr7g+h8QtntYPnsFA@mail.gmail.com>
+	<jpgefyfs4m4.fsf@linux.bootlegged.copy>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 2 Mar 2017 19:40:58 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/17] ppc-for-2.9 queue 20170303
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <jpgefyfs4m4.fsf@linux.bootlegged.copy>
+Subject: Re: [Qemu-devel] iommu emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,82 +35,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: david@gibson.dropbear.id.au
-Cc: famz@redhat.com, peter.maydell@linaro.org, lvivier@redhat.com, thuth@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, agraf@suse.de, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, sjitindarsingh@gmail.com, sam.bobroff@au1.ibm.com
+To: Bandan Das <bsd@redhat.com>
+Cc: Jintack Lim <jintack@cs.columbia.edu>, QEMU Devel Mailing List <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzAzMDMwMzI1MDcuMTYxNDItMS1kYXZpZEBnaWJzb24uZHJvcGJlYXIuaWQuYXUKVHlwZTogc2Vy
-aWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwMC8xN10gcHBjLWZvci0yLjkgcXVldWUg
-MjAxNzAzMDMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFz
-ZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0w
-CgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQg
-bG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRv
-CiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9y
-bWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Nj
-cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQog
-ICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0g
-VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
-NDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVt
-dQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTcwMzAzMDMyNTA3LjE2MTQyLTEtZGF2
-aWRAZ2lic29uLmRyb3BiZWFyLmlkLmF1IC0+IHBhdGNoZXcvMjAxNzAzMDMwMzI1MDcuMTYxNDIt
-MS1kYXZpZEBnaWJzb24uZHJvcGJlYXIuaWQuYXUKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
-ZXN0JwozMjQ2MDY3IHRhcmdldC9wcGM6IHJld3JpdGUgZltuXW1bYWRkLCBzdWJdIHVzaW5nIGZs
-b2F0NjRfbXVsYWRkCjIwNDMwNjAgc3BhcHI6IFNtYWxsIGNsZWFudXAgb2YgUFBDIE1NVSBlbnVt
-cwo1MGRjMzk1IHNwYXByX3BjaTogQWR2ZXJ0aXNlIGFjY2VzcyB0byBQQ0llIGV4dGVuZGVkIGNv
-bmZpZyBzcGFjZQpjNjhkNmJlIHRhcmdldC9wcGM6IFJld29yayBoYXNoIG1tdSBwYWdlIGZhdWx0
-IGNvZGUgYW5kIGFkZCBkZWZpbmVzIGZvciBjbGFyaXR5CjgwOWEzZjUgdGFyZ2V0L3BwYzogTW92
-ZSBuby1leGVjdXRlIGFuZCBndWFyZGVkIHBhZ2UgY2hlY2tpbmcgaW50byBuZXcgZnVuY3Rpb24K
-Y2JkZGFlNyB0YXJnZXQvcHBjOiBBZGQgZXhlY3V0ZSBwZXJtaXNzaW9uIGNoZWNraW5nIHRvIGFj
-Y2VzcyBhdXRob3JpdHkgY2hlY2sKNTQzOGUzNiB0YXJnZXQvcHBjOiBBZGQgSW5zdHJ1Y3Rpb24g
-QXV0aG9yaXR5IE1hc2sgUmVnaXN0ZXIgQ2hlY2sKOGYwZjI3ZiBody9wcGMvc3BhcHI6IEFkZCBQ
-T1dFUjkgdG8gcHNlcmllcyBjcHUgbW9kZWxzCmE2MzkxYzIgdGFyZ2V0L3BwYy9QT1dFUjk6IEFk
-ZCBjcHVfaGFzX3dvcmsgZnVuY3Rpb24gZm9yIFBPV0VSOQoxZGZkNGRlIHRhcmdldC9wcGMvUE9X
-RVI5OiBBZGQgUE9XRVI5IHBhLWZlYXR1cmVzIGRlZmluaXRpb24KOGJkNmY4OCB0YXJnZXQvcHBj
-L1BPV0VSOTogQWRkIFBPV0VSOSBtbXUgZmF1bHQgaGFuZGxlcgpmY2JiNjAwIHRhcmdldC9wcGM6
-IERvbid0IGdlbiBhbiBTRFIxIG9uIFBPV0VSOSBhbmQgcmV3b3JrIHJlZ2lzdGVyIGNyZWF0aW9u
-Cjk4Zjk3ODEgdGFyZ2V0L3BwYzogQWRkIHBhdGJfZW50cnkgdG8gc1BBUFJNYWNoaW5lU3RhdGUK
-MjZiMmFkMyB0YXJnZXQvcHBjL1BPV0VSOTogQWRkIFBPV0VSUENfTU1VX1YzIGJpdAo3Yjc3ZmNl
-IHBvd2VybnY6IERvbid0IHRlc3QgUE9XRVI5IENQVSB5ZXQKYTA3NmUyNiBleGVjLCBrdm0sIHRh
-cmdldC1wcGM6IE1vdmUgZ2V0cmFtcGFnZXNpemUoKSB0byBjb21tb24gY29kZQpjNTNmNDU5IHRh
-cmdldC9wcGM6IEFkZCBQT1dFUjkvSVNBdjMuMDAgdG8gY29tcGF0X3RhYmxlCgo9PT0gT1VUUFVU
-IEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE3OiB0YXJnZXQvcHBjOiBBZGQgUE9XRVI5L0lT
-QXYzLjAwIHRvIGNvbXBhdF90YWJsZS4uLgpDaGVja2luZyBQQVRDSCAyLzE3OiBleGVjLCBrdm0s
-IHRhcmdldC1wcGM6IE1vdmUgZ2V0cmFtcGFnZXNpemUoKSB0byBjb21tb24gY29kZS4uLgpXQVJO
-SU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojMTE3
-OiBGSUxFOiBleGVjLmM6MTM0MToKKyNpZmRlZiBfX2xpbnV4X18KCnRvdGFsOiAwIGVycm9ycywg
-MSB3YXJuaW5ncywgMjg3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
-ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
-aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
-QUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMy8xNzogcG93ZXJudjogRG9uJ3QgdGVzdCBQT1dF
-UjkgQ1BVIHlldC4uLgpFUlJPUjogaWYgdGhpcyBjb2RlIGlzIHJlZHVuZGFudCBjb25zaWRlciBy
-ZW1vdmluZyBpdAojNDI6IEZJTEU6IHRlc3RzL3Budi14c2NvbS10ZXN0LmM6NDU6CisjaWYgMCAv
-KiBQT1dFUjkgc3VwcG9ydCBpcyBub3QgcmVhZHkgeWV0ICovCgp0b3RhbDogMSBlcnJvcnMsIDAg
-d2FybmluZ3MsIDI1IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDQvMTc6IHRhcmdldC9wcGMvUE9XRVI5OiBBZGQgUE9X
-RVJQQ19NTVVfVjMgYml0Li4uCkNoZWNraW5nIFBBVENIIDUvMTc6IHRhcmdldC9wcGM6IEFkZCBw
-YXRiX2VudHJ5IHRvIHNQQVBSTWFjaGluZVN0YXRlLi4uCkNoZWNraW5nIFBBVENIIDYvMTc6IHRh
-cmdldC9wcGM6IERvbid0IGdlbiBhbiBTRFIxIG9uIFBPV0VSOSBhbmQgcmV3b3JrIHJlZ2lzdGVy
-IGNyZWF0aW9uLi4uCkNoZWNraW5nIFBBVENIIDcvMTc6IHRhcmdldC9wcGMvUE9XRVI5OiBBZGQg
-UE9XRVI5IG1tdSBmYXVsdCBoYW5kbGVyLi4uCkNoZWNraW5nIFBBVENIIDgvMTc6IHRhcmdldC9w
-cGMvUE9XRVI5OiBBZGQgUE9XRVI5IHBhLWZlYXR1cmVzIGRlZmluaXRpb24uLi4KQ2hlY2tpbmcg
-UEFUQ0ggOS8xNzogdGFyZ2V0L3BwYy9QT1dFUjk6IEFkZCBjcHVfaGFzX3dvcmsgZnVuY3Rpb24g
-Zm9yIFBPV0VSOS4uLgpDaGVja2luZyBQQVRDSCAxMC8xNzogaHcvcHBjL3NwYXByOiBBZGQgUE9X
-RVI5IHRvIHBzZXJpZXMgY3B1IG1vZGVscy4uLgpDaGVja2luZyBQQVRDSCAxMS8xNzogdGFyZ2V0
-L3BwYzogQWRkIEluc3RydWN0aW9uIEF1dGhvcml0eSBNYXNrIFJlZ2lzdGVyIENoZWNrLi4uCkNo
-ZWNraW5nIFBBVENIIDEyLzE3OiB0YXJnZXQvcHBjOiBBZGQgZXhlY3V0ZSBwZXJtaXNzaW9uIGNo
-ZWNraW5nIHRvIGFjY2VzcyBhdXRob3JpdHkgY2hlY2suLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvMTc6
-IHRhcmdldC9wcGM6IE1vdmUgbm8tZXhlY3V0ZSBhbmQgZ3VhcmRlZCBwYWdlIGNoZWNraW5nIGlu
-dG8gbmV3IGZ1bmN0aW9uLi4uCkNoZWNraW5nIFBBVENIIDE0LzE3OiB0YXJnZXQvcHBjOiBSZXdv
-cmsgaGFzaCBtbXUgcGFnZSBmYXVsdCBjb2RlIGFuZCBhZGQgZGVmaW5lcyBmb3IgY2xhcml0eS4u
-LgpDaGVja2luZyBQQVRDSCAxNS8xNzogc3BhcHJfcGNpOiBBZHZlcnRpc2UgYWNjZXNzIHRvIFBD
-SWUgZXh0ZW5kZWQgY29uZmlnIHNwYWNlLi4uCkNoZWNraW5nIFBBVENIIDE2LzE3OiBzcGFwcjog
-U21hbGwgY2xlYW51cCBvZiBQUEMgTU1VIGVudW1zLi4uCkNoZWNraW5nIFBBVENIIDE3LzE3OiB0
-YXJnZXQvcHBjOiByZXdyaXRlIGZbbl1tW2FkZCwgc3ViXSB1c2luZyBmbG9hdDY0X211bGFkZC4u
-Lgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoK
-LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRj
-aGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJl
-ZWxpc3RzLm9yZw==
+On Thu, Mar 02, 2017 at 05:20:19PM -0500, Bandan Das wrote:
+> Jintack Lim <jintack@cs.columbia.edu> writes:
+> 
+> > [cc Bandan]
+> >
+> > On Tue, Feb 21, 2017 at 5:33 AM, Jintack Lim <jintack@cs.columbia.edu>
+> > wrote:
+> >
+> >>
+> >>
+> >> On Wed, Feb 15, 2017 at 9:47 PM, Alex Williamson <
+> >> alex.williamson@redhat.com> wrote:
+> ...
+> >>
+> >
+> > I've tried another network device on a different machine. It has "Intel
+> > Corporation 82599ES 10-Gigabit SFI/SFP+ Network Connection" ethernet
+> > controller. I got the same problem of getting the network device
+> > initialization failure in L2. I think I'm missing something since I heard
+> > from Bandan that he had no problem to assign a device to L2 with ixgbe.
+> >
+> > This is the error message from dmesg in L2.
+> >
+> > [    3.692871] ixgbe: Intel(R) 10 Gigabit PCI Express Network Driver -
+> > version 4.2.1-k
+> > [    3.697716] ixgbe: Copyright (c) 1999-2015 Intel Corporation.
+> > [    3.964875] ixgbe 0000:00:02.0: HW Init failed: -12
+> > [    3.972362] ixgbe: probe of 0000:00:02.0 failed with error -12
+> >
+> > I checked that L2 indeed had that device.
+> > root@guest0:~# lspci
+> > 00:00.0 Host bridge: Intel Corporation 82G33/G31/P35/P31 Express DRAM
+> > Controller
+> > 00:01.0 VGA compatible controller: Device 1234:1111 (rev 02)
+> > 00:02.0 Ethernet controller: Intel Corporation 82599ES 10-Gigabit SFI/SFP+
+> > Network Connection (rev 01)
+> 
+> Jintack, any progress with this ?
+> 
+> I am testing on a X540-AT2 and I see a different behavior. It appears
+> config succeeds but the driver keeps resetting the device due to a Tx
+> hang:
+> 
+> [ 568.612391 ] ixgbe 0000:00:03.0 enp0s3: tx hang 38 detected on queue 0,
+> resetting adapter
+> [ 568.612393 ]  ixgbe 0000:00:03.0 enp0s3: initiating reset due to tx
+> timeout
+> [ 568.612397 ]  ixgbe 0000:00:03.0 enp0s3: Reset adapter
+> 
+> This may be device specific but I think the actual behavior you see is
+> also dependent on the ixgbe driver in the guest. Are you on a recent
+> kernel ? Also, can you point me to the hack (by Peter) that you have
+> mentioned above ?
+
+Hi, Bandan,
+
+Are you using the vtd vfio v7 series or another branch?
+
+If it's the upstream one... just a note that we need to make sure
+"-device intel-iommu" be the first device specified in QEMU command
+line parameters (need to before "-device vfio-pci,..."). Thanks,
+
+-- peterx
