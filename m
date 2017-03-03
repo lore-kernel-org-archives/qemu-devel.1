@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57844)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cjnCX-0001Jm-1z
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:24:53 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cjnDP-0001sW-Hl
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:25:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cjnCS-0004A7-Fy
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:24:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54968)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cjnCS-00049h-9O
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:24:48 -0500
-Date: Fri, 3 Mar 2017 21:24:44 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170303132444.GG7097@lemon.lan>
-References: <148847238435.285.7158100214182923369@0e2666bad730>
-	<e58e0463-c12f-31ed-3944-a09735e7a7fc@de.ibm.com>
-	<20170303095301.GE7097@lemon.lan>
-	<6d02fcc5-f5e0-4f33-fe77-1a6b6f167b4a@de.ibm.com>
+	(envelope-from <kwolf@redhat.com>) id 1cjnDK-0004Tq-HV
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:25:47 -0500
+Date: Fri, 3 Mar 2017 14:25:35 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170303132535.GB14351@noname.redhat.com>
+References: <1488491046-2549-1-git-send-email-armbru@redhat.com>
+	<1488491046-2549-6-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6d02fcc5-f5e0-4f33-fe77-1a6b6f167b4a@de.ibm.com>
-Subject: Re: [Qemu-devel] [PULL v2 0/3] Merge qio 2017/02/27
+In-Reply-To: <1488491046-2549-6-git-send-email-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 05/15] sheepdog: Fix snapshot ID parsing in
+ _open(), _create, _goto()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,25 +24,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com
 
-On Fri, 03/03 13:33, Christian Borntraeger wrote:
-> On 03/03/2017 10:53 AM, Fam Zheng wrote:
-> > On Fri, 03/03 09:12, Christian Borntraeger wrote:
-> >> On 03/02/2017 05:33 PM, no-reply@patchew.org wrote:
-> >>
-> >> Fam, this seems to happen sometimes. Can you have a look at that why the qtest 
-> >> thing fails on the s390 box?
-> > 
-> > I don't know, when I run the commands manually for a few times, it is not
-> > reproduced. :(
+Am 02.03.2017 um 22:43 hat Markus Armbruster geschrieben:
+> sd_parse_uri() and sd_snapshot_goto() screw up error checking after
+> strtoul(), and truncate long tag names silently.  Fix by replacing
+> those parts by new sd_parse_snapid_or_tag(), which checks more
+> carefully.
 > 
-> Just guessing, maybe you have two runs in parallel that use the same folder
-> for some reason?
+> sd_snapshot_delete() also parses snapshot IDs, but is currently too
+> broken for me to touch.  Mark TODO.
 > 
+> Two calls of strtol() without error checking remain in
+> parse_redundancy().  Mark them FIXME.
+> 
+> More silent truncation of configuration strings remains elsewhere.
+> Not marked.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  block/sheepdog.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++----------
+>  1 file changed, 55 insertions(+), 11 deletions(-)
+> 
+> diff --git a/block/sheepdog.c b/block/sheepdog.c
+> index 5554f47..deb110e 100644
+> --- a/block/sheepdog.c
+> +++ b/block/sheepdog.c
+> @@ -914,6 +914,49 @@ static int get_sheep_fd(BDRVSheepdogState *s, Error **errp)
+>      return fd;
+>  }
+>  
+> +/*
+> + * Parse numeric snapshot ID in @str
+> + * If @str can't be parsed as number, return false.
+> + * Else, if the number is zero or too large, set *@snapid to zero and
+> + * return true.
+> + * Else, set *@snapid to the number and return true.
+> + */
+> +static bool sd_parse_snapid(const char *str, uint32_t *snapid)
+> +{
+> +    unsigned long ul;
+> +    int ret;
+> +
+> +    ret = qemu_strtoul(str, NULL, 10, &ul);
+> +    if (ret == -ERANGE) {
+> +        ul = ret = 0;
+> +    }
+> +    if (ret) {
+> +        return false;
+> +    }
+> +    if (ul > UINT32_MAX) {
+> +        ul = 0;
+> +    }
+> +
+> +    *snapid  = ul;
 
-The reason to use a fixed temp dir is ccache. Next time such a failure shows up,
-I'll switch to unique dir for each test run.
+Redundant space.
 
-Fam
+> +    return true;
+> +}
+
+Looks good otherwise.
+
+Kevin
