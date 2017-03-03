@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cjq6H-0003v3-P9
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:30:43 -0500
+	(envelope-from <eblake@redhat.com>) id 1cjq6u-0004Sr-WE
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:31:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cjq6E-0002Pg-Ku
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:30:37 -0500
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:33323)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cjq6E-0002PZ-EL
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:30:34 -0500
-Received: by mail-wr0-x234.google.com with SMTP id u48so77253128wrc.0
-	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 08:30:34 -0800 (PST)
-Received: from 640k.lan (94-36-245-171.adsl-ull.clienti.tiscali.it.
-	[94.36.245.171]) by smtp.gmail.com with ESMTPSA id
-	k195sm3667527wmd.7.2017.03.03.08.30.32 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 03 Mar 2017 08:30:32 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri,  3 Mar 2017 17:30:26 +0100
-Message-Id: <1488558630-21522-1-git-send-email-pbonzini@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1cjq6u-0002Yl-03
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:31:17 -0500
+References: <1488491046-2549-1-git-send-email-armbru@redhat.com>
+	<1488491046-2549-14-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <90d9033f-49b2-6f00-d984-dbfd4f21f1da@redhat.com>
+Date: Fri, 3 Mar 2017 10:31:08 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v5 00/21] Misc patches for QEMU soft freeze
+In-Reply-To: <1488491046-2549-14-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="WVjcxvVdrhG4qj2keJWv2ecK03KunR71L"
+Subject: Re: [Qemu-devel] [PATCH 13/15] qapi-schema: Rename GlusterServer to
+ SocketAddressFlat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,106 +25,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, qemu-block@nongnu.org, namei.unix@gmail.com
 
-The following changes since commit 508e038a5d725f2aa729f58a1f5209b9be4227de:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--WVjcxvVdrhG4qj2keJWv2ecK03KunR71L
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com,
+ qemu-block@nongnu.org, namei.unix@gmail.com
+Message-ID: <90d9033f-49b2-6f00-d984-dbfd4f21f1da@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 13/15] qapi-schema: Rename GlusterServer to
+ SocketAddressFlat
+References: <1488491046-2549-1-git-send-email-armbru@redhat.com>
+ <1488491046-2549-14-git-send-email-armbru@redhat.com>
+In-Reply-To: <1488491046-2549-14-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-  dtc: Revert unintentional submodule downgrade from commit 077dd74239a99 (2017-03-03 12:48:42 +0000)
+On 03/02/2017 03:44 PM, Markus Armbruster wrote:
+> As its documentation says, it's not specific to Gluster.  Rename it,
+> as I'm going to use it for something else.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  block/gluster.c      | 38 +++++++++++++++++++-------------------
+>  qapi-schema.json     | 38 ++++++++++++++++++++++++++++++++++++++
+>  qapi/block-core.json | 46 +-------------------------------------------=
+--
+>  3 files changed, 58 insertions(+), 64 deletions(-)
 
-are available in the git repository at:
+Mostly mechanical once you deal with the cross-file motion.  Changing
+the type name has no impact on the wire representation, so it's safe.
 
-  git://github.com/bonzini/qemu.git tags/for-upstream
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-for you to fetch changes up to f6eb0b319e4bad3d01d74d71e3a6cf40f0ede720:
+> +++ b/qapi-schema.json
+> @@ -4101,6 +4101,44 @@
+>      'fd': 'String' } }
+> =20
+>  ##
+> +# @SocketAddressFlatType:
+> +#
+> +# Available SocketAddressFlat types
+> +#
+> +# @tcp:   Internet address
+> +#
+> +# @unix:  Unix domain socket
+> +#
+> +# Since: 2.9
 
-  iscsi: fix missing unlock (2017-03-03 16:41:20 +0100)
+I probably would have listed 'since: 2.7', since the type is unchanged
+from its pre-move location...
 
-v4->v5: 4.11 kernel header already merged
-	added two more patches at the end
+> +#
+> +# Since: 2.9
+> +##
+> +{ 'union': 'SocketAddressFlat',
 
-----------------------------------------------------------------
-* kernel header update (requested by David and Vijay)
-* GuestPanicInformation fixups (Anton)
-* record/replay icount fixes (Pavel)
-* cpu-exec cleanup, unification of icount_decr with tcg_exit_req (me)
-* KVM_CAP_IMMEDIATE_EXIT support (me)
-* vmxcap update (me)
-* iscsi locking fix (me)
-* VFIO ram device fix (Yongji)
-* scsi-hd vs. default CD-ROM (Hervé)
-* SMI migration fix (Dave)
-* spice-char segfault (Li Qiang)
-* improved "info mtree -f" (me)
+and again
 
-----------------------------------------------------------------
-Anton Nefedov (2):
-      qapi: flatten GuestPanicInformation union
-      qmp-events: fix GUEST_PANICKED description formatting
 
-Dr. David Alan Gilbert (1):
-      x86: Work around SMI migration breakages
+> +++ b/qapi/block-core.json
+> @@ -2533,50 +2533,6 @@
+>              '*read-pattern': 'QuorumReadPattern' } }
+> =20
+>  ##
+> -# @GlusterTransport:
+> -#
+> -# An enumeration of Gluster transport types
+> -#
+> -# @tcp:   TCP   - Transmission Control Protocol
+> -#
+> -# @unix:  UNIX  - Unix domain socket
+> -#
+> -# Since: 2.7
 
-Hervé Poussineau (1):
-      vl: disable default cdrom when using explicitely scsi-hd
+=2E..here.
 
-Li Qiang (1):
-      spice-char: fix segfault in char_spice_finalize
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-Paolo Bonzini (15):
-      cpu-exec: unify icount_decr and tcg_exit_req
-      cpu-exec: remove unnecessary check of cpu->exit_request
-      Merge branch 'icount-update' into HEAD
-      cpus: remove ugly cast on sigbus_handler
-      KVM: x86: cleanup SIGBUS handlers
-      cpus: reorganize signal handling code
-      KVM: remove kvm_arch_on_sigbus
-      KVM: do not use sigtimedwait to catch SIGBUS
-      KVM: move SIG_IPI handling to kvm-all.c
-      kvm: use atomic_read/atomic_set to access cpu->exit_request
-      KVM: use KVM_CAP_IMMEDIATE_EXIT
-      vmxcap: port to Python 3
-      vmxcap: update for September 2016 SDM
-      memory: show region offset and ROM/RAM type in "info mtree -f"
-      iscsi: fix missing unlock
 
-Pavel Dovgalyuk (1):
-      replay: check icount in cpu exec loop
+--WVjcxvVdrhG4qj2keJWv2ecK03KunR71L
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Yongji Xie (1):
-      memory: Introduce DEVICE_HOST_ENDIAN for ram device
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
- block/iscsi.c             |   4 ++
- cpu-exec.c                |  93 +++++++++++++---------------
- cpus.c                    | 102 +++++--------------------------
- include/exec/cpu-common.h |   6 ++
- include/exec/gen-icount.h |  53 ++++++++--------
- include/hw/i386/pc.h      |   4 ++
- include/qemu/compatfd.h   |  42 -------------
- include/qemu/osdep.h      |  37 ++++++++++++
- include/qom/cpu.h         |  15 +++--
- include/sysemu/kvm.h      |  11 ++--
- kvm-all.c                 | 150 ++++++++++++++++++++++++++++++++++++++++++----
- kvm-stub.c                |  12 ++--
- memory.c                  |  27 ++++++---
- qapi-schema.json          |  12 ++++
- qapi/event.json           |   4 +-
- qom/cpu.c                 |   2 +-
- scripts/kvm/vmxcap        |  23 ++++---
- spice-qemu-char.c         |   5 +-
- target/arm/kvm.c          |  10 ----
- target/i386/cpu.c         |  17 +++---
- target/i386/cpu.h         |   3 +
- target/i386/kvm.c         |  88 +++++++++------------------
- target/mips/kvm.c         |  12 ----
- target/ppc/kvm.c          |  10 ----
- target/s390x/kvm.c        |  10 ----
- tcg/tcg.h                 |   1 -
- translate-all.c           |   2 +-
- translate-common.c        |  13 ++--
- util/compatfd.c           |   1 -
- util/main-loop.c          |   5 +-
- util/oslib-posix.c        |  33 ++++++++++
- vl.c                      |  13 ++--
- 32 files changed, 428 insertions(+), 392 deletions(-)
- delete mode 100644 include/qemu/compatfd.h
----
+iQEcBAEBCAAGBQJYuZpMAAoJEKeha0olJ0Nqax0H/049cVzYcNpoICb5RBEGCkU0
+DJwHt0laE1O570/47BbOn45ANN5rVPda+rHvy0xzQ6dPVdF0nGdahVtJAdRJi1ij
+mx4StByK4aTy27rON+yOC2HkODm4O1BPf3+6F1tLYKnKxsCdqxibi9G9gPDHbAb5
+X/bSPtN8JFwnc8SWujk2FShcjWfDVE0zhpPVZuVPXlG3NoHSsNBrZ2FbEKf2E1JJ
+JZ1+3bJZ7pLGj2OC/kT33Cew09KHrwo4jbScxHyYPwmexak4MhirrXuaeV1ec8L3
+jlBk9O9r2GS2kx34Dd48xAS6phChUmdwv4zeLl5ZQ5C9t4c0RUIv8BRsHsCfqFw=
+=vAZr
+-----END PGP SIGNATURE-----
+
+--WVjcxvVdrhG4qj2keJWv2ecK03KunR71L--
