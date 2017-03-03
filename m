@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cjs2e-0007pN-AM
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:35:01 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cjs2s-00082P-RP
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:35:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cjs2d-00085e-Fg
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:35:00 -0500
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:35004)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cjs2d-00085N-9h
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:34:59 -0500
-Received: by mail-wm0-x231.google.com with SMTP id v186so21920284wmd.0
-	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 10:34:59 -0800 (PST)
+	(envelope-from <ehabkost@redhat.com>) id 1cjs2p-0008FI-Nw
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:35:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43052)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cjs2p-0008Eu-Is
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:35:11 -0500
+Date: Fri, 3 Mar 2017 15:35:06 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170303183506.GE2778@thinpad.lan.raisama.net>
+References: <1488271971-12624-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <cc6a20fc4a2748f24920c03ce64ae34af0f61799.1488504063.git.balaton@eik.bme.hu>
-References: <cover.1488504063.git.balaton@eik.bme.hu>
-	<cc6a20fc4a2748f24920c03ce64ae34af0f61799.1488504063.git.balaton@eik.bme.hu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 Mar 2017 18:34:37 +0000
-Message-ID: <CAFEAcA9MJbTHT9DdGOpHsPBTW3BXsr9mPtVmOodHgyNF0Jwf_Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v3 13/13] ppc: Add SM501 device in config
- for ppc and ppcemb targets
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1488271971-12624-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/core/null-machine: Print error message
+ when using the -kernel parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +27,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On 13 December 2016 at 21:00, BALATON Zoltan <balaton@eik.bme.hu> wrote:
-> This is not used by default on any emulated machine yet but it is
-> still useful to have it compiled so it can be added from the command
-> line for clients that can use it (e.g. MorphOS has no driver for any
-> other emulated video cards but can output via SM501)
->
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+On Tue, Feb 28, 2017 at 09:52:51AM +0100, Thomas Huth wrote:
+> If the user currently tries to use the -kernel parameter, simply nothing
+> happens, and the user might get confused that there is nothing loaded
+> to memory, but also no error message has been issued. Since there is no
+> real generic way to load a kernel on all CPU types (but on some targets,
+> the generic loader can be used instead), issue an appropriate error
+> message here now to avoid the possible confusion.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+
+Applied to my machine-next branch, but I'm unsure if we should
+break soft freeze and include this on 2.9. I will probably hold
+it for 2.10.
+
 > ---
->  default-configs/ppc-softmmu.mak    | 1 +
->  default-configs/ppcemb-softmmu.mak | 1 +
->  2 files changed, 2 insertions(+)
->
-> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-> index 09c1d45..1f1cd85 100644
-> --- a/default-configs/ppc-softmmu.mak
-> +++ b/default-configs/ppc-softmmu.mak
-> @@ -45,6 +45,7 @@ CONFIG_OPENPIC_KVM=$(and $(CONFIG_E500),$(CONFIG_KVM))
->  CONFIG_PLATFORM_BUS=y
->  CONFIG_ETSEC=y
->  CONFIG_LIBDECNUMBER=y
-> +CONFIG_SM501=y
->  # For PReP
->  CONFIG_SERIAL_ISA=y
->  CONFIG_MC146818RTC=y
-> diff --git a/default-configs/ppcemb-softmmu.mak b/default-configs/ppcemb-softmmu.mak
-> index 7f56004..94340de 100644
-> --- a/default-configs/ppcemb-softmmu.mak
-> +++ b/default-configs/ppcemb-softmmu.mak
-> @@ -15,3 +15,4 @@ CONFIG_I8259=y
->  CONFIG_XILINX=y
->  CONFIG_XILINX_ETHLITE=y
->  CONFIG_LIBDECNUMBER=y
-> +CONFIG_SM501=y
-> --
-> 2.7.4
+>  hw/core/null-machine.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
+> index 27c8369..864832d 100644
+> --- a/hw/core/null-machine.c
+> +++ b/hw/core/null-machine.c
+> @@ -40,6 +40,12 @@ static void machine_none_init(MachineState *mch)
+>          memory_region_allocate_system_memory(ram, NULL, "ram", mch->ram_size);
+>          memory_region_add_subregion(get_system_memory(), 0, ram);
+>      }
+> +
+> +    if (mch->kernel_filename) {
+> +        error_report("The -kernel parameter is not supported "
+> +                     "(use the generic 'loader' device instead).");
+> +        exit(1);
+> +    }
+>  }
+>  
+>  static void machine_none_machine_init(MachineClass *mc)
+> -- 
+> 1.8.3.1
+> 
 
-This looks fine but I'll leave official review of it to a ppc person.
-
-thanks
--- PMM
+-- 
+Eduardo
