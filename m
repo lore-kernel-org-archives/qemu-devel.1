@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cjlD1-0002me-QA
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 06:17:16 -0500
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cjlE1-0003KP-I4
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 06:18:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cjlCw-0006uf-Nl
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 06:17:15 -0500
-Received: from 18.mo4.mail-out.ovh.net ([188.165.54.143]:42129)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cjlCw-0006s5-Hc
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 06:17:10 -0500
-Received: from player746.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 0476650207
-	for <qemu-devel@nongnu.org>; Fri,  3 Mar 2017 12:17:01 +0100 (CET)
-References: <5b2054e1-5867-979b-b476-b3aa8ecc5689@redhat.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <ee977c5e-affd-cf8d-d793-0d153fdf3e7d@kaod.org>
-Date: Fri, 3 Mar 2017 12:16:55 +0100
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cjlDx-0007Fv-5v
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 06:18:17 -0500
+Received: from mailapp01.imgtec.com ([195.59.15.196]:7412)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cjlDw-0007Fl-VF
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 06:18:13 -0500
+References: <20170302195337.31558-1-alex.bennee@linaro.org>
+	<20170302195337.31558-10-alex.bennee@linaro.org>
+From: Yongbok Kim <yongbok.kim@imgtec.com>
+Message-ID: <5a5bfbf9-4935-7b21-ce93-77887581642b@imgtec.com>
+Date: Fri, 3 Mar 2017 11:18:05 +0000
 MIME-Version: 1.0
-In-Reply-To: <5b2054e1-5867-979b-b476-b3aa8ecc5689@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170302195337.31558-10-alex.bennee@linaro.org>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] qemu-system-ppc64 crashes during "info qtree"
+Subject: Re: [Qemu-devel] [PATCH v2 09/11] target/mips/op_helper: hold BQL
+ before calling cpu_mips_get_count
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +28,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, rth@twiddle.net, pbonzini@redhat.com
+Cc: qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, Aurelien Jarno <aurelien@aurel32.net>
 
-On 03/03/2017 11:48 AM, Thomas Huth wrote:
->  Hi C=C3=A9dric, hi David,
+
+
+On 02/03/2017 19:53, Alex Benn=C3=A9e wrote:
+> We should hold the BQL before we transition to HW emulation. This is
+> because all HW emulation needs to be serialised under MTTCG
+> conditions. This is picked up by asserts that fire when
+> cpu_mips_get_count triggers and IRQ.
 >=20
-> running "info qtree" at the HMP monitor with the pseries machine
-> currently results in:
->=20
->   [...]
->       dev: spapr-vty, id "vty@71000000"
->         reg =3D 1895825408 (0x71000000)
->         chardev =3D "serial0"
->         irq =3D 4098 (0x1002)
->   dev: spapr-rtc, id ""
->   dev: icp, id ""
-> hw/core/sysbus.c:277:sysbus_dev_print: Object 0x7f83127fc3f0 is not an
-> instance of type sys-bus-device
-> Aborted (core dumped)
->=20
-> Since the last device that is printed here is "icp" ... could that be
-> related to the recent ICP/XICS reworks that have been merged a couple o=
-f
-> days ago?
+> Reported-by: Yongbok Kim <yongbok.kim@imgtec.com>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-The cleanup did not change the nature of ICP but as we removed=20
-the XICS object, which used to be a SysBusDevice, that might=20
-be a consequence.=20
+Hi Alex,
 
-May be we should make the ICP objects SysBus devices now. I will=20
-check.=20
+Thanks for this but it is required to have few more locks.
+I will send the patch shortly. Please merge it into your patchset.
 
-Thanks,
-
-
-C.
+Regards,
+Yongbok
