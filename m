@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58810)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59402)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cjq4f-0002cI-5H
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:28:58 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cjq6H-0003v4-Pa
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:30:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cjq4c-0001lC-0c
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:28:57 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:33618)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cjq6G-0002Q3-DK
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:30:37 -0500
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:34435)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cjq4b-0001kV-OP
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:28:53 -0500
-Received: by mail-wm0-x243.google.com with SMTP id n11so3945886wma.0
-	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 08:28:53 -0800 (PST)
+	id 1cjq6G-0002Px-6q
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:30:36 -0500
+Received: by mail-wr0-x244.google.com with SMTP id u48so13961333wrc.1
+	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 08:30:36 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri,  3 Mar 2017 17:28:48 +0100
-Message-Id: <1488558530-21016-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH] hppa: avoid anonymous unions in designated
- initializers.
+Date: Fri,  3 Mar 2017 17:30:28 +0100
+Message-Id: <1488558630-21522-3-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1488558630-21522-1-git-send-email-pbonzini@redhat.com>
+References: <1488558630-21522-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 19/21] x86: Work around SMI migration breakages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,196 +28,104 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-These cause compilation failures on CentOS 6 or other operating
-systems with older GCCs.
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Migration from a 2.3.0 qemu results in a reboot on the receiving QEMU
+due to a disagreement about SM (System management) interrupts.
+
+2.3.0 didn't have much SMI support, but it did set CPU_INTERRUPT_SMI
+and this gets into the migration stream, but on 2.3.0 it
+never got delivered.
+
+~2.4.0 SMI interrupt support was added but was broken - so
+that when a 2.3.0 stream was received it cleared the CPU_INTERRUPT_SMI
+but never actually caused an interrupt.
+
+The SMI delivery was recently fixed by 68c6efe07a, but the
+effect now is that an incoming 2.3.0 stream takes the interrupt it
+had flagged but it's bios can't actually handle it(I think
+partly due to the original interrupt not being taken during boot?).
+The consequence is a triple(?) fault and a reboot.
+
+Tested from:
+  2.3.1 -M 2.3.0
+  2.7.0 -M 2.3.0
+  2.8.0 -M 2.3.0
+  2.8.0 -M 2.8.0
+
+This corresponds to RH bugzilla entry 1420679.
+
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Message-Id: <20170223133441.16010-1-dgilbert@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
-	Peter, please consider applying this as a build fix, because
-	the centos6 docker target is broken.
+ include/hw/i386/pc.h | 4 ++++
+ target/i386/cpu.c    | 2 ++
+ target/i386/cpu.h    | 3 +++
+ target/i386/kvm.c    | 7 ++++++-
+ 4 files changed, 15 insertions(+), 1 deletion(-)
 
- target/hppa/translate.c | 66 ++++++++++++++++++++++++-------------------------
- 1 file changed, 33 insertions(+), 33 deletions(-)
-
-diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index 5d571f0..9e8c233 100644
---- a/target/hppa/translate.c
-+++ b/target/hppa/translate.c
-@@ -84,14 +84,14 @@ typedef struct DisasInsn {
-     ExitStatus (*trans)(DisasContext *ctx, uint32_t insn,
-                         const struct DisasInsn *f);
-     union {
--        void (*f_ttt)(TCGv, TCGv, TCGv);
--        void (*f_weww)(TCGv_i32, TCGv_env, TCGv_i32, TCGv_i32);
--        void (*f_dedd)(TCGv_i64, TCGv_env, TCGv_i64, TCGv_i64);
--        void (*f_wew)(TCGv_i32, TCGv_env, TCGv_i32);
--        void (*f_ded)(TCGv_i64, TCGv_env, TCGv_i64);
--        void (*f_wed)(TCGv_i32, TCGv_env, TCGv_i64);
--        void (*f_dew)(TCGv_i64, TCGv_env, TCGv_i32);
--    };
-+        void (*ttt)(TCGv, TCGv, TCGv);
-+        void (*weww)(TCGv_i32, TCGv_env, TCGv_i32, TCGv_i32);
-+        void (*dedd)(TCGv_i64, TCGv_env, TCGv_i64, TCGv_i64);
-+        void (*wew)(TCGv_i32, TCGv_env, TCGv_i32);
-+        void (*ded)(TCGv_i64, TCGv_env, TCGv_i64);
-+        void (*wed)(TCGv_i32, TCGv_env, TCGv_i64);
-+        void (*dew)(TCGv_i64, TCGv_env, TCGv_i32);
-+    } f;
- } DisasInsn;
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index d1f4554..ab303c7 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -623,6 +623,10 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+         .driver   = "Broadwell-noTSX" "-" TYPE_X86_CPU,\
+         .property = "xlevel",\
+         .value    = stringify(0x8000000a),\
++    },{\
++        .driver = TYPE_X86_CPU,\
++        .property = "kvm-no-smi-migration",\
++        .value    = "on",\
+     },
  
- /* global register indexes */
-@@ -1934,7 +1934,7 @@ static ExitStatus trans_log(DisasContext *ctx, uint32_t insn,
+ #define PC_COMPAT_2_2 \
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index aec5d9d..fba9212 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -3983,6 +3983,8 @@ static Property x86_cpu_properties[] = {
+     DEFINE_PROP_BOOL("cpuid-0xb", X86CPU, enable_cpuid_0xb, true),
+     DEFINE_PROP_BOOL("lmce", X86CPU, enable_lmce, false),
+     DEFINE_PROP_BOOL("l3-cache", X86CPU, enable_l3_cache, true),
++    DEFINE_PROP_BOOL("kvm-no-smi-migration", X86CPU, kvm_no_smi_migration,
++                     false),
+     DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, true),
+     DEFINE_PROP_END_OF_LIST()
+ };
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 12a39d5..ac2ad6d 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1255,6 +1255,9 @@ struct X86CPU {
+     /* if true override the phys_bits value with a value read from the host */
+     bool host_phys_bits;
+ 
++    /* Stop SMI delivery for migration compatibility with old machines */
++    bool kvm_no_smi_migration;
++
+     /* Number of physical address bits supported */
+     uint32_t phys_bits;
+ 
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 7698421..887a812 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -2492,7 +2492,12 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int level)
+             events.smi.pending = 0;
+             events.smi.latched_init = 0;
+         }
+-        events.flags |= KVM_VCPUEVENT_VALID_SMM;
++        /* Stop SMI delivery on old machine types to avoid a reboot
++         * on an inward migration of an old VM.
++         */
++        if (!cpu->kvm_no_smi_migration) {
++            events.flags |= KVM_VCPUEVENT_VALID_SMM;
++        }
      }
-     tcg_r1 = load_gpr(ctx, r1);
-     tcg_r2 = load_gpr(ctx, r2);
--    ret = do_log(ctx, rt, tcg_r1, tcg_r2, cf, di->f_ttt);
-+    ret = do_log(ctx, rt, tcg_r1, tcg_r2, cf, di->f.ttt);
-     return nullify_end(ctx, ret);
- }
  
-@@ -2111,10 +2111,10 @@ static ExitStatus trans_ds(DisasContext *ctx, uint32_t insn,
- static const DisasInsn table_arith_log[] = {
-     { 0x08000240u, 0xfc00ffffu, trans_nop },  /* or x,y,0 */
-     { 0x08000240u, 0xffe0ffe0u, trans_copy }, /* or x,0,t */
--    { 0x08000000u, 0xfc000fe0u, trans_log, .f_ttt = tcg_gen_andc_tl },
--    { 0x08000200u, 0xfc000fe0u, trans_log, .f_ttt = tcg_gen_and_tl },
--    { 0x08000240u, 0xfc000fe0u, trans_log, .f_ttt = tcg_gen_or_tl },
--    { 0x08000280u, 0xfc000fe0u, trans_log, .f_ttt = tcg_gen_xor_tl },
-+    { 0x08000000u, 0xfc000fe0u, trans_log, .f.ttt = tcg_gen_andc_tl },
-+    { 0x08000200u, 0xfc000fe0u, trans_log, .f.ttt = tcg_gen_and_tl },
-+    { 0x08000240u, 0xfc000fe0u, trans_log, .f.ttt = tcg_gen_or_tl },
-+    { 0x08000280u, 0xfc000fe0u, trans_log, .f.ttt = tcg_gen_xor_tl },
-     { 0x08000880u, 0xfc000fe0u, trans_cmpclr },
-     { 0x08000380u, 0xfc000fe0u, trans_uxor },
-     { 0x08000980u, 0xfc000fa0u, trans_uaddcm },
-@@ -3061,7 +3061,7 @@ static ExitStatus trans_fop_wew_0c(DisasContext *ctx, uint32_t insn,
- {
-     unsigned rt = extract32(insn, 0, 5);
-     unsigned ra = extract32(insn, 21, 5);
--    return do_fop_wew(ctx, rt, ra, di->f_wew);
-+    return do_fop_wew(ctx, rt, ra, di->f.wew);
- }
- 
- static ExitStatus trans_fop_wew_0e(DisasContext *ctx, uint32_t insn,
-@@ -3069,7 +3069,7 @@ static ExitStatus trans_fop_wew_0e(DisasContext *ctx, uint32_t insn,
- {
-     unsigned rt = assemble_rt64(insn);
-     unsigned ra = assemble_ra64(insn);
--    return do_fop_wew(ctx, rt, ra, di->f_wew);
-+    return do_fop_wew(ctx, rt, ra, di->f.wew);
- }
- 
- static ExitStatus trans_fop_ded(DisasContext *ctx, uint32_t insn,
-@@ -3077,7 +3077,7 @@ static ExitStatus trans_fop_ded(DisasContext *ctx, uint32_t insn,
- {
-     unsigned rt = extract32(insn, 0, 5);
-     unsigned ra = extract32(insn, 21, 5);
--    return do_fop_ded(ctx, rt, ra, di->f_ded);
-+    return do_fop_ded(ctx, rt, ra, di->f.ded);
- }
- 
- static ExitStatus trans_fop_wed_0c(DisasContext *ctx, uint32_t insn,
-@@ -3085,7 +3085,7 @@ static ExitStatus trans_fop_wed_0c(DisasContext *ctx, uint32_t insn,
- {
-     unsigned rt = extract32(insn, 0, 5);
-     unsigned ra = extract32(insn, 21, 5);
--    return do_fop_wed(ctx, rt, ra, di->f_wed);
-+    return do_fop_wed(ctx, rt, ra, di->f.wed);
- }
- 
- static ExitStatus trans_fop_wed_0e(DisasContext *ctx, uint32_t insn,
-@@ -3093,7 +3093,7 @@ static ExitStatus trans_fop_wed_0e(DisasContext *ctx, uint32_t insn,
- {
-     unsigned rt = assemble_rt64(insn);
-     unsigned ra = extract32(insn, 21, 5);
--    return do_fop_wed(ctx, rt, ra, di->f_wed);
-+    return do_fop_wed(ctx, rt, ra, di->f.wed);
- }
- 
- static ExitStatus trans_fop_dew_0c(DisasContext *ctx, uint32_t insn,
-@@ -3101,7 +3101,7 @@ static ExitStatus trans_fop_dew_0c(DisasContext *ctx, uint32_t insn,
- {
-     unsigned rt = extract32(insn, 0, 5);
-     unsigned ra = extract32(insn, 21, 5);
--    return do_fop_dew(ctx, rt, ra, di->f_dew);
-+    return do_fop_dew(ctx, rt, ra, di->f.dew);
- }
- 
- static ExitStatus trans_fop_dew_0e(DisasContext *ctx, uint32_t insn,
-@@ -3109,7 +3109,7 @@ static ExitStatus trans_fop_dew_0e(DisasContext *ctx, uint32_t insn,
- {
-     unsigned rt = extract32(insn, 0, 5);
-     unsigned ra = assemble_ra64(insn);
--    return do_fop_dew(ctx, rt, ra, di->f_dew);
-+    return do_fop_dew(ctx, rt, ra, di->f.dew);
- }
- 
- static ExitStatus trans_fop_weww_0c(DisasContext *ctx, uint32_t insn,
-@@ -3118,7 +3118,7 @@ static ExitStatus trans_fop_weww_0c(DisasContext *ctx, uint32_t insn,
-     unsigned rt = extract32(insn, 0, 5);
-     unsigned rb = extract32(insn, 16, 5);
-     unsigned ra = extract32(insn, 21, 5);
--    return do_fop_weww(ctx, rt, ra, rb, di->f_weww);
-+    return do_fop_weww(ctx, rt, ra, rb, di->f.weww);
- }
- 
- static ExitStatus trans_fop_weww_0e(DisasContext *ctx, uint32_t insn,
-@@ -3127,7 +3127,7 @@ static ExitStatus trans_fop_weww_0e(DisasContext *ctx, uint32_t insn,
-     unsigned rt = assemble_rt64(insn);
-     unsigned rb = assemble_rb64(insn);
-     unsigned ra = assemble_ra64(insn);
--    return do_fop_weww(ctx, rt, ra, rb, di->f_weww);
-+    return do_fop_weww(ctx, rt, ra, rb, di->f.weww);
- }
- 
- static ExitStatus trans_fop_dedd(DisasContext *ctx, uint32_t insn,
-@@ -3136,7 +3136,7 @@ static ExitStatus trans_fop_dedd(DisasContext *ctx, uint32_t insn,
-     unsigned rt = extract32(insn, 0, 5);
-     unsigned rb = extract32(insn, 16, 5);
-     unsigned ra = extract32(insn, 21, 5);
--    return do_fop_dedd(ctx, rt, ra, rb, di->f_dedd);
-+    return do_fop_dedd(ctx, rt, ra, rb, di->f.dedd);
- }
- 
- static void gen_fcpy_s(TCGv_i32 dst, TCGv_env unused, TCGv_i32 src)
-@@ -3340,13 +3340,13 @@ static ExitStatus trans_xmpyu(DisasContext *ctx, uint32_t insn,
-     return nullify_end(ctx, NO_EXIT);
- }
- 
--#define FOP_DED  trans_fop_ded, .f_ded
--#define FOP_DEDD trans_fop_dedd, .f_dedd
-+#define FOP_DED  trans_fop_ded, .f.ded
-+#define FOP_DEDD trans_fop_dedd, .f.dedd
- 
--#define FOP_WEW  trans_fop_wew_0c, .f_wew
--#define FOP_DEW  trans_fop_dew_0c, .f_dew
--#define FOP_WED  trans_fop_wed_0c, .f_wed
--#define FOP_WEWW trans_fop_weww_0c, .f_weww
-+#define FOP_WEW  trans_fop_wew_0c, .f.wew
-+#define FOP_DEW  trans_fop_dew_0c, .f.dew
-+#define FOP_WED  trans_fop_wed_0c, .f.wed
-+#define FOP_WEWW trans_fop_weww_0c, .f.weww
- 
- static const DisasInsn table_float_0c[] = {
-     /* floating point class zero */
-@@ -3425,10 +3425,10 @@ static const DisasInsn table_float_0c[] = {
- #undef FOP_DEW
- #undef FOP_WED
- #undef FOP_WEWW
--#define FOP_WEW  trans_fop_wew_0e, .f_wew
--#define FOP_DEW  trans_fop_dew_0e, .f_dew
--#define FOP_WED  trans_fop_wed_0e, .f_wed
--#define FOP_WEWW trans_fop_weww_0e, .f_weww
-+#define FOP_WEW  trans_fop_wew_0e, .f.wew
-+#define FOP_DEW  trans_fop_dew_0e, .f.dew
-+#define FOP_WED  trans_fop_wed_0e, .f.wed
-+#define FOP_WEWW trans_fop_weww_0e, .f.weww
- 
- static const DisasInsn table_float_0e[] = {
-     /* floating point class zero */
+     if (level >= KVM_PUT_RESET_STATE) {
 -- 
 1.8.3.1
