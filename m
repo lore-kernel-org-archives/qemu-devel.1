@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38543)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cjqTt-0002s2-A2
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:55:02 -0500
+	(envelope-from <armbru@redhat.com>) id 1cjqXo-0003xx-4J
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:59:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cjqTq-0002tF-8e
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:55:01 -0500
-References: <1488548254-456-1-git-send-email-clg@kaod.org>
-	<39ad7cac-b29e-b01e-723c-8cbdb1cf3ca9@redhat.com>
-	<f55bb0be-778c-6ded-1564-9b77c4521f52@kaod.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <b4b5780b-4604-9577-f42a-8821c4cb18d4@redhat.com>
-Date: Fri, 3 Mar 2017 17:54:54 +0100
+	(envelope-from <armbru@redhat.com>) id 1cjqXl-0004G0-38
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:59:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45230)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cjqXk-0004Fg-U5
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:59:01 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1488320775-9849-1-git-send-email-armbru@redhat.com>
+	<CAFEAcA8WXnBXQ-qNmzRw6yD_tuYLQepmSC0be50s8h=-1r-VQw@mail.gmail.com>
+	<CAFEAcA8oG+uODONjXpeAWpNxcmWfoxEbK31LksrLUQp5kbupgA@mail.gmail.com>
+Date: Fri, 03 Mar 2017 17:58:57 +0100
+In-Reply-To: <CAFEAcA8oG+uODONjXpeAWpNxcmWfoxEbK31LksrLUQp5kbupgA@mail.gmail.com>
+	(Peter Maydell's message of "Fri, 3 Mar 2017 16:31:27 +0000")
+Message-ID: <878tomnvou.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <f55bb0be-778c-6ded-1564-9b77c4521f52@kaod.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] ppc/spapr: QOM'ify sPAPRRTCState
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PULL 00/24] block: Command line option -blockdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,30 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 03.03.2017 15:49, C=C3=A9dric Le Goater wrote:
-> On 03/03/2017 03:13 PM, Thomas Huth wrote:
->> On 03.03.2017 14:37, C=C3=A9dric Le Goater wrote:
->>> Also use an 'Object *' under the sPAPR machine to hold the RTC
->>> object.
->>
->> The change from TYPE_SYS_BUS_DEVICE to TYPE_DEVICE is certainly a good
->> idea! But what's the advantage of using Object* instead of DeviceState=
-*
->> in sPAPRMachineState ?
->=20
-> it makes spapr_rtc_create() a little simpler. =20
->=20
-> We could go even further and use a sPAPRRTCState under sPAPRMachineStat=
-e=20
-> that we  would initialize with object_initialize().=20
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-I think a sPAPRRTCState* would make more sense here - if you just see an
-Object* and are not familiar with the code, you wonder what this pointer
-is all about (and you then have to cast it to something different if you
-want to do anything with it) ... so IMHO either a DeviceState* or
-sPAPRRTCState* is the better choice here.
+> On 2 March 2017 at 15:25, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> make check failures on OSX host:
+>
+>> May or may not be this pull's fault.
+>
+> I gave the pull another test, since I've pretty much run out of
+> other stuff in the queue, but it failed again in the same way,
+> on both OSX and x86-64 Linux.
 
- Thomas
+Thanks, I appreciate it.  I already tracked down the problem (I think),
+NAKed the pull request containing it[1], and posted revised patches for
+review [2].  I now realize I should have NAKed the one depending on it,
+too.  Sorry if this wasted your time!
+
+[...]
+
+
+[1] [PULL 00/26] QAPI patches for 2017-02-28
+[2] [PATCH v4 00/28] qapi: QMP dispatch and input visitor work
