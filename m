@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58724)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cjf81-0007g8-83
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 23:47:42 -0500
+	(envelope-from <he.chen@linux.intel.com>) id 1cjfM3-0002Qo-OB
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 00:02:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cjf7y-0004zo-59
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 23:47:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45900)
+	(envelope-from <he.chen@linux.intel.com>) id 1cjfLy-00010S-JO
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 00:02:11 -0500
+Received: from mga05.intel.com ([192.55.52.43]:6696)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cjf7x-0004zI-Tl
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 23:47:38 -0500
-Date: Fri, 3 Mar 2017 12:47:31 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170303044731.GC20768@pxdev.xzpeter.org>
-References: <20170302215603.27630-1-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170302215603.27630-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] memory: show region offset and ROM/RAM
- type in "info mtree -f"
+	(Exim 4.71) (envelope-from <he.chen@linux.intel.com>)
+	id 1cjfLy-0000uo-7e
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 00:02:06 -0500
+From: He Chen <he.chen@linux.intel.com>
+Date: Fri,  3 Mar 2017 13:01:44 +0800
+Message-Id: <1488517304-23131-1-git-send-email-he.chen@linux.intel.com>
+Subject: [Qemu-devel] [RFC] x86: Allow to set NUMA distance for different
+ NUMA nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,114 +23,275 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, William Tambe <tambewilliam@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>
 
-On Thu, Mar 02, 2017 at 10:56:03PM +0100, Paolo Bonzini wrote:
-> "info mtree -f" output is currently hard to use for large RAM regions, because
-> there is no hint as to what part of the region is being mapped.  Add the offset
-> if it is nonzero.
-> 
-> Secondly, FlatView has a readonly field, that can override the MemoryRegion
-> in the presence of aliases.  Take it into account.
-> 
-> Together, with this patch this:
-> 
-> address-space (flat view): KVM-SMRAM
->   0000000000000000-00000000000bffff (prio 0, ram): pc.ram
->   00000000000c0000-00000000000c9fff (prio 0, ram): pc.ram
->   00000000000ca000-00000000000ccfff (prio 0, ram): pc.ram
->   00000000000cd000-00000000000ebfff (prio 0, ram): pc.ram
->   00000000000ec000-00000000000effff (prio 0, ram): pc.ram
->   00000000000f0000-00000000000fffff (prio 0, ram): pc.ram
->   0000000000100000-00000000bfffffff (prio 0, ram): pc.ram
->   00000000fd000000-00000000fdffffff (prio 1, ram): vga.vram
->   00000000febc0000-00000000febdffff (prio 1, i/o): e1000-mmio
->   00000000febf0400-00000000febf041f (prio 0, i/o): vga ioports remapped
->   00000000febf0500-00000000febf0515 (prio 0, i/o): bochs dispi interface
->   00000000febf0600-00000000febf0607 (prio 0, i/o): qemu extended regs
->   00000000fec00000-00000000fec00fff (prio 0, i/o): kvm-ioapic
->   00000000fed00000-00000000fed003ff (prio 0, i/o): hpet
->   00000000fee00000-00000000feefffff (prio 4096, i/o): kvm-apic-msi
->   00000000fffc0000-00000000ffffffff (prio 0, rom): pc.bios
->   0000000100000000-000000013fffffff (prio 0, ram): pc.ram
-> 
-> becomes this:
-> 
-> address-space (flat view): KVM-SMRAM
->   0000000000000000-00000000000bffff (prio 0, ram): pc.ram
->   00000000000c0000-00000000000c9fff (prio 0, rom): pc.ram @00000000000c0000
->   00000000000ca000-00000000000ccfff (prio 0, ram): pc.ram @00000000000ca000
->   00000000000cd000-00000000000ebfff (prio 0, rom): pc.ram @00000000000cd000
->   00000000000ec000-00000000000effff (prio 0, ram): pc.ram @00000000000ec000
->   00000000000f0000-00000000000fffff (prio 0, rom): pc.ram @00000000000f0000
->   0000000000100000-00000000bfffffff (prio 0, ram): pc.ram @0000000000100000
->   00000000fd000000-00000000fdffffff (prio 1, ram): vga.vram
->   00000000febc0000-00000000febdffff (prio 1, i/o): e1000-mmio
->   00000000febf0400-00000000febf041f (prio 0, i/o): vga ioports remapped
->   00000000febf0500-00000000febf0515 (prio 0, i/o): bochs dispi interface
->   00000000febf0600-00000000febf0607 (prio 0, i/o): qemu extended regs
->   00000000fec00000-00000000fec00fff (prio 0, i/o): kvm-ioapic
->   00000000fed00000-00000000fed003ff (prio 0, i/o): hpet
->   00000000fee00000-00000000feefffff (prio 4096, i/o): kvm-apic-msi
->   00000000fffc0000-00000000ffffffff (prio 0, rom): pc.bios
->   0000000100000000-000000013fffffff (prio 0, ram): pc.ram @00000000c0000000
-> 
-> This should make it easier to understand what's going on.
-> 
-> Cc: Peter Xu <peterx@redhat.com>
-> Cc: "William Tambe" <tambewilliam@gmail.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Current, QEMU does not provide a clear command to set vNUMA distance for
+guest although we already have `-numa` command to set vNUMA nodes.
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+vNUMA distance makes sense in certain scenario.
+But now, if we create a guest that has 4 vNUMA nodes, when we check NUMA
+info via `numactl -H`, we will see:
 
-A nit: if we are only appending a new optional addr to be printed, we
-may just avoid printing the last "\n", then optinally print the last
-address, so that common codes can still be shared. But not worth a
-repost. :) Thanks,
+node distance:
+node    0    1    2    3
+  0:   10   20   20   20
+  1:   20   10   20   20
+  2:   20   20   10   20
+  3:   20   20   20   10
 
-> ---
->  memory.c | 25 ++++++++++++++++++-------
->  1 file changed, 18 insertions(+), 7 deletions(-)
-> 
-> diff --git a/memory.c b/memory.c
-> index d61caee..44700c3 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -2588,13 +2588,24 @@ static void mtree_print_flatview(fprintf_function p, void *f,
->  
->      while (n--) {
->          mr = range->mr;
-> -        p(f, MTREE_INDENT TARGET_FMT_plx "-"
-> -          TARGET_FMT_plx " (prio %d, %s): %s\n",
-> -          int128_get64(range->addr.start),
-> -          int128_get64(range->addr.start) + MR_SIZE(range->addr.size),
-> -          mr->priority,
-> -          memory_region_type(mr),
-> -          memory_region_name(mr));
-> +        if (range->offset_in_region) {
-> +            p(f, MTREE_INDENT TARGET_FMT_plx "-"
-> +              TARGET_FMT_plx " (prio %d, %s): %s @" TARGET_FMT_plx "\n",
-> +              int128_get64(range->addr.start),
-> +              int128_get64(range->addr.start) + MR_SIZE(range->addr.size),
-> +              mr->priority,
-> +              memory_region_type(mr),
-> +              memory_region_name(mr),
-> +              range->offset_in_region);
-> +        } else {
-> +            p(f, MTREE_INDENT TARGET_FMT_plx "-"
-> +              TARGET_FMT_plx " (prio %d, %s): %s\n",
-> +              int128_get64(range->addr.start),
-> +              int128_get64(range->addr.start) + MR_SIZE(range->addr.size),
-> +              mr->priority,
-> +              memory_region_type(mr),
-> +              memory_region_name(mr));
-> +        }
->          range++;
->      }
->  
-> -- 
-> 2.9.3
-> 
+Guest kernel regards all local node as distance 10, and all remote node
+as distance 20 when there is no SLIT table since QEMU doesn't build it.
+It looks like a little strange when you have seen the distance in an
+actual physical machine that contains 4 NUMA nodes. My machine shows:
 
--- peterx
+node distance:
+node    0    1    2    3
+  0:   10   21   31   41
+  1:   21   10   21   31
+  2:   31   21   10   21
+  3:   41   31   21   10
+
+To set vNUMA distance, guest should see a complete SLIT table.
+I found QEMU has provide `-acpitable` command that allows users to add
+a ACPI table into guest, but it requires users building ACPI table by
+themselves first. Using `-acpitable` to add a SLIT table may be not so
+straightforward or flexible, imagine that when the vNUMA configuration
+is changes and we need to generate another SLIT table manually. It may
+not be friendly to users or upper software like libvirt.
+
+This RFC patch is going to add SLIT table support in QEMU, and provides
+addtional option `distance` for command `-numa` to allow user set vNUMA
+distance by QEMU command.
+
+With this patch, when a user wants to create a guest that contains
+several vNUMA nodes and also wants to set distance among those nodes,
+the QEMU command would like:
+
+```
+-object memory-backend-ram,size=1G,prealloc=yes,host-nodes=0,policy=bind,id=node0 \
+-numa node,nodeid=0,cpus=0,memdev=node0,distance=10,distance=21,distance=31,distance=41 \
+-object memory-backend-ram,size=1G,prealloc=yes,host-nodes=1,policy=bind,id=node1 \
+-numa node,nodeid=1,cpus=1,memdev=node1,distance=21,distance=10,distance=21,distance=31 \
+-object memory-backend-ram,size=1G,prealloc=yes,host-nodes=2,policy=bind,id=node2 \
+-numa node,nodeid=2,cpus=2,memdev=node2,distance=31,distance=21,distance=10,distance=21 \
+-object memory-backend-ram,size=1G,prealloc=yes,host-nodes=3,policy=bind,id=node3 \
+-numa node,nodeid=3,cpus=3,memdev=node3,distance=41,distance=31,distance=21,distance=10 \
+```
+
+As we can see, for each `-numa` command, we provide a series of
+`distance` that indicate a vNUMA distance array. E.g. for vNode0, the
+distance array is [10, 21, 31, 41] which means the distance between
+vNode0 to vNode0 is 10, to vNode1 is 21 etc. For vNode 1, the array
+is [21, 10, 21, 31] which means vNode1 to vNode0 is 21, to vNode1 is 10
+etc.
+
+BTW. Please forgive me that I don't do a pretty wrapper to `distance`
+option.
+
+What do you think of this RFC patch? And shall we consider to add vNUMA
+distance support to QEMU?
+
+Thanks,
+-He
+
+Signed-off-by: He Chen <he.chen@linux.intel.com>
+---
+ hw/i386/acpi-build.c        | 28 ++++++++++++++++++++++++++++
+ include/hw/acpi/acpi-defs.h |  9 +++++++++
+ include/sysemu/numa.h       |  2 ++
+ numa.c                      | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ qapi-schema.json            | 12 ++++++++----
+ 5 files changed, 91 insertions(+), 4 deletions(-)
+
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 1c928ab..ee8236e 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2395,6 +2395,32 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+ }
+ 
+ static void
++build_slit(GArray *table_data, BIOSLinker *linker, MachineState *machine)
++{
++    struct AcpiSystemLocalityDistanceTable *slit;
++    uint8_t *entry;
++    int slit_start, slit_data_len, i, j;
++    slit_start = table_data->len;
++
++    slit = acpi_data_push(table_data, sizeof(*slit));
++    slit->nb_localities = nb_numa_nodes;
++
++    slit_data_len = sizeof(uint8_t) * nb_numa_nodes * nb_numa_nodes;
++    entry = acpi_data_push(table_data, slit_data_len);
++
++    for (i = 0; i < nb_numa_nodes; i++) {
++        for (j = 0; j < nb_numa_nodes; j++) {
++            entry[i * nb_numa_nodes + j] = numa_info[i].distance[j];
++        }
++    }
++
++    build_header(linker, table_data,
++                 (void *)(table_data->data + slit_start),
++                 "SLIT",
++                 table_data->len - slit_start, 1, NULL, NULL);
++}
++
++static void
+ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+ {
+     AcpiTableMcfg *mcfg;
+@@ -2669,6 +2695,8 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+     if (pcms->numa_nodes) {
+         acpi_add_table(table_offsets, tables_blob);
+         build_srat(tables_blob, tables->linker, machine);
++        acpi_add_table(table_offsets, tables_blob);
++        build_slit(tables_blob, tables->linker, machine);
+     }
+     if (acpi_get_mcfg(&mcfg)) {
+         acpi_add_table(table_offsets, tables_blob);
+diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+index 4cc3630..b183a8f 100644
+--- a/include/hw/acpi/acpi-defs.h
++++ b/include/hw/acpi/acpi-defs.h
+@@ -527,6 +527,15 @@ struct AcpiSratProcessorGiccAffinity
+ 
+ typedef struct AcpiSratProcessorGiccAffinity AcpiSratProcessorGiccAffinity;
+ 
++/*
++ * SLIT (NUMA distance description) table
++ */
++struct AcpiSystemLocalityDistanceTable {
++    ACPI_TABLE_HEADER_DEF
++    uint64_t    nb_localities;
++} QEMU_PACKED;
++typedef struct AcpiSystemLocalityDistanceTable AcpiSystemLocalityDistanceTable;
++
+ /* PCI fw r3.0 MCFG table. */
+ /* Subtable */
+ struct AcpiMcfgAllocation {
+diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+index 8f09dcf..b936eeb 100644
+--- a/include/sysemu/numa.h
++++ b/include/sysemu/numa.h
+@@ -21,6 +21,8 @@ typedef struct node_info {
+     struct HostMemoryBackend *node_memdev;
+     bool present;
+     QLIST_HEAD(, numa_addr_range) addr; /* List to store address ranges */
++    uint8_t distance[MAX_NODES];
++    bool has_distance;
+ } NodeInfo;
+ 
+ extern NodeInfo numa_info[MAX_NODES];
+diff --git a/numa.c b/numa.c
+index 9f56be9..b4e11f3 100644
+--- a/numa.c
++++ b/numa.c
+@@ -50,6 +50,8 @@ static int have_memdevs = -1;
+ static int max_numa_nodeid; /* Highest specified NUMA node ID, plus one.
+                              * For all nodes, nodeid < max_numa_nodeid
+                              */
++static int min_numa_distance = 10;
++static int max_numa_distance = 255;
+ int nb_numa_nodes;
+ NodeInfo numa_info[MAX_NODES];
+ 
+@@ -144,6 +146,8 @@ static void numa_node_parse(NumaNodeOptions *node, QemuOpts *opts, Error **errp)
+ {
+     uint16_t nodenr;
+     uint16List *cpus = NULL;
++    uint8List *distance = NULL;
++    int i;
+ 
+     if (node->has_nodeid) {
+         nodenr = node->nodeid;
+@@ -208,6 +212,28 @@ static void numa_node_parse(NumaNodeOptions *node, QemuOpts *opts, Error **errp)
+         numa_info[nodenr].node_mem = object_property_get_int(o, "size", NULL);
+         numa_info[nodenr].node_memdev = MEMORY_BACKEND(o);
+     }
++
++    if (node->has_distance) {
++        for (i = 0, distance = node->distance; distance; i++, distance = distance->next) {
++            if (distance->value >= max_numa_distance) {
++                error_setg(errp,
++                        "NUMA distance (%" PRIu8 ")"
++                        " should be smaller than maxnumadistance (%d)",
++                        distance->value, max_numa_distance);
++                return;
++            }
++            if (distance->value < min_numa_distance) {
++                error_setg(errp,
++                        "NUMA distance (%" PRIu8 ")"
++                        " should be larger than minnumadistance (%d)",
++                        distance->value, min_numa_distance);
++                return;
++            }
++            numa_info[nodenr].distance[i] = distance->value;
++        }
++        numa_info[nodenr].has_distance = true;
++    }
++
+     numa_info[nodenr].present = true;
+     max_numa_nodeid = MAX(max_numa_nodeid, nodenr + 1);
+ }
+@@ -294,6 +320,23 @@ static void validate_numa_cpus(void)
+     g_free(seen_cpus);
+ }
+ 
++static void validate_numa_distance(void)
++{
++    int i, j;
++
++    for (i = 0; i < nb_numa_nodes; i++) {
++        for (j = i; j < nb_numa_nodes; j++) {
++            if (i == j && numa_info[i].distance[j] != min_numa_distance) {
++                error_report("Local distance must be %d!", min_numa_distance);
++                exit(EXIT_FAILURE);
++            } else if (numa_info[i].distance[j] != numa_info[j].distance[i]) {
++                error_report("Unequal NUMA distance between nodes %d and %d!", i, j);
++                exit(EXIT_FAILURE);
++            }
++        }
++    }
++}
++
+ void parse_numa_opts(MachineClass *mc)
+ {
+     int i;
+@@ -390,6 +433,7 @@ void parse_numa_opts(MachineClass *mc)
+         }
+ 
+         validate_numa_cpus();
++        validate_numa_distance();
+     } else {
+         numa_set_mem_node_id(0, ram_size, 0);
+     }
+diff --git a/qapi-schema.json b/qapi-schema.json
+index baa0d26..f2f2d05 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -5597,14 +5597,18 @@
+ # @memdev: #optional memory backend object.  If specified for one node,
+ #          it must be specified for all nodes.
+ #
++# @distance: #optional NUMA distance array. The length of this array should
++#            be equal to number of NUMA nodes.
++#
+ # Since: 2.1
+ ##
+ { 'struct': 'NumaNodeOptions',
+   'data': {
+-   '*nodeid': 'uint16',
+-   '*cpus':   ['uint16'],
+-   '*mem':    'size',
+-   '*memdev': 'str' }}
++   '*nodeid':   'uint16',
++   '*cpus':     ['uint16'],
++   '*mem':      'size',
++   '*memdev':   'str' ,
++   '*distance': ['uint8'] }}
+ 
+ ##
+ # @HostMemPolicy:
+-- 
+2.7.4
