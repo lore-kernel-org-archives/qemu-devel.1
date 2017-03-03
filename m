@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cjlyi-0002un-Ec
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:06:33 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cjlzJ-0003Bd-OV
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:07:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cjlyd-0007OR-CD
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:06:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55482)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cjlyd-0007OE-35
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:06:27 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EDA5D64450
-	for <qemu-devel@nongnu.org>; Fri,  3 Mar 2017 12:06:25 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <CANHSq5DhUak9fVpvjG=VyeetP7VQudHwyEa4VevC21BuieSstw@mail.gmail.com>
-	<20170303103919.GA2439@work-vm>
-Date: Fri, 03 Mar 2017 13:06:22 +0100
-In-Reply-To: <20170303103919.GA2439@work-vm> (David Alan Gilbert's message of
-	"Fri, 3 Mar 2017 10:39:20 +0000")
-Message-ID: <87o9xizhs1.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1cjlzI-0007Xl-NT
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:07:09 -0500
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:38640)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cjlzI-0007Xh-GJ
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:07:08 -0500
+Received: by mail-wm0-x235.google.com with SMTP id t193so13720857wmt.1
+	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 04:07:08 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH V2] migration: expose qemu_announce_self()
- via qmp
+In-Reply-To: <11a4ab90-650e-7f88-504c-d5ae3e6c5c94@redhat.com>
+References: <1487248176-29602-1-git-send-email-dmitry@daynix.com>
+	<11a4ab90-650e-7f88-504c-d5ae3e6c5c94@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 Mar 2017 12:06:46 +0000
+Message-ID: <CAFEAcA_KqCnxGprcz8yTYwANVqb73Jtm8aU6gXwmDD_P6N7XGQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/5] A few VLAN-related bugfixes for RX
+ packet abstraction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,213 +31,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Germano Veit Michel <germano@redhat.com>, jasowang@redhat.com, qemu-devel@nongnu.org, Juan Jose Quintela Carreira <quintela@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: Dmitry Fleytman <dmitry@daynix.com>, QEMU Developers <qemu-devel@nongnu.org>, Yan Vugenfirer <yan@daynix.com>, P J P <ppandit@redhat.com>
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
-
-> * Germano Veit Michel (germano@redhat.com) wrote:
->> qemu_announce_self() is triggered by qemu at the end of migrations
->> to update the network regarding the path to the guest l2addr.
->> 
->> however it is also useful when there is a network change such as
->> an active bond slave swap. Essentially, it's the same as a migration
->> from a network perspective - the guest moves to a different point
->> in the network topology.
->> 
->> this exposes the function via qmp.
+On 17 February 2017 at 03:04, Jason Wang <jasowang@redhat.com> wrote:
 >
-> Markus: Since you're asking for tests for qmp commands; how would you
-> test this?
-
-Good question, as tests/ isn't exactly full of examples you could crib.
-
-Let me look at the patch...
-
-> Jason: Does this look OK from the networking side of things?
 >
->> Signed-off-by: Germano Veit Michel <germano@redhat.com>
->> ---
->>  include/migration/vmstate.h |  5 +++++
->>  migration/savevm.c          | 30 +++++++++++++++++++-----------
->>  qapi-schema.json            | 18 ++++++++++++++++++
->>  3 files changed, 42 insertions(+), 11 deletions(-)
->> 
->> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
->> index 63e7b02..a08715c 100644
->> --- a/include/migration/vmstate.h
->> +++ b/include/migration/vmstate.h
->> @@ -1042,6 +1042,11 @@ int64_t self_announce_delay(int round)
->>      return 50 + (SELF_ANNOUNCE_ROUNDS - round - 1) * 100;
->>  }
->> 
->> +struct AnnounceRound {
->> +    QEMUTimer *timer;
->> +    int count;
->> +};
->> +
->>  void dump_vmstate_json_to_file(FILE *out_fp);
->> 
->>  #endif
->> diff --git a/migration/savevm.c b/migration/savevm.c
->> index 5ecd264..44e196b 100644
->> --- a/migration/savevm.c
->> +++ b/migration/savevm.c
->> @@ -118,29 +118,37 @@ static void qemu_announce_self_iter(NICState
->> *nic, void *opaque)
->>      qemu_send_packet_raw(qemu_get_queue(nic), buf, len);
->>  }
->> 
->> -
->>  static void qemu_announce_self_once(void *opaque)
->>  {
->> -    static int count = SELF_ANNOUNCE_ROUNDS;
->> -    QEMUTimer *timer = *(QEMUTimer **)opaque;
->> +    struct AnnounceRound *round = opaque;
->> 
->>      qemu_foreach_nic(qemu_announce_self_iter, NULL);
->> 
->> -    if (--count) {
->> +    round->count--;
->> +    if (round->count) {
->>          /* delay 50ms, 150ms, 250ms, ... */
->> -        timer_mod(timer, qemu_clock_get_ms(QEMU_CLOCK_REALTIME) +
->> -                  self_announce_delay(count));
->> +        timer_mod(round->timer, qemu_clock_get_ms(QEMU_CLOCK_REALTIME) +
->> +                  self_announce_delay(round->count));
->>      } else {
->> -            timer_del(timer);
->> -            timer_free(timer);
->> +            timer_del(round->timer);
->> +            timer_free(round->timer);
->> +            g_free(round);
->>      }
->>  }
->> 
->>  void qemu_announce_self(void)
->>  {
->> -    static QEMUTimer *timer;
->> -    timer = timer_new_ms(QEMU_CLOCK_REALTIME, qemu_announce_self_once, &timer);
->> -    qemu_announce_self_once(&timer);
->> +    struct AnnounceRound *round = g_malloc(sizeof(struct AnnounceRound));
+> On 2017=E5=B9=B402=E6=9C=8816=E6=97=A5 20:29, Dmitry Fleytman wrote:
+>>
+>> This series fix a few issues related
+>> to processing of RX packets with VLAN headers.
+>>
+>> See commit messages of specific patches
+>> for information regarding affected devices.
+>>
+>> Dmitry Fleytman (5):
+>>    eth: Extend vlan stripping functions
+>>    NetRxPkt: Fix memory corruption on VLAN header stripping
+>>    NetRxPkt: Do not try to pull more data than present
+>>    NetRxPkt: Account buffer with ETH header in IOV length
+>>    NetRxPkt: Remove code duplication in net_rx_pkt_pull_data()
+>>
+>>   hw/net/net_rx_pkt.c | 40 +++++++++++++++++++++-------------------
+>>   include/net/eth.h   |  4 ++--
+>>   net/eth.c           | 25 ++++++++++++++-----------
+>>   3 files changed, 37 insertions(+), 32 deletions(-)
+>>
 >
-> I prefer g_new0 - i.e.
->    struct AnnounceRound *round = g_new0(struct AnnounceRound, 1)
->
->> +    if (!round)
->> +        return;
->> +    round->count = SELF_ANNOUNCE_ROUNDS;
->> +    round->timer = timer_new_ms(QEMU_CLOCK_REALTIME,
->> qemu_announce_self_once, round);
->
-> An odd line break?
->
->> +    qemu_announce_self_once(round);
->> +}
->> +
->> +void qmp_announce_self(Error **errp)
->> +{
->> +    qemu_announce_self();
->>  }
->> 
->>  /***********************************************************/
->> diff --git a/qapi-schema.json b/qapi-schema.json
->> index baa0d26..0d9bffd 100644
->> --- a/qapi-schema.json
->> +++ b/qapi-schema.json
->> @@ -6080,3 +6080,21 @@
->>  #
->>  ##
->>  { 'command': 'query-hotpluggable-cpus', 'returns': ['HotpluggableCPU'] }
->> +
->> +##
->> +# @announce-self:
->> +#
->> +# Trigger generation of broadcast RARP frames to update network switches.
->> +# This can be useful when network bonds fail-over the active slave.
->> +#
->> +# Arguments: None.
+> Applied. Thanks
 
-Please drop this line.
+Hi Jason -- what's the status of these patches? I don't
+see them in master and I don't think you have them in a pull
+request yet (though I may have missed it in the deluge of
+freeze-deadline pulls...)
 
->> +#
->> +# Example:
->> +#
->> +# -> { "execute": "announce-self" }
->> +# <- { "return": {} }
->> +#
->> +# Since: 2.9
->> +##
->> +{ 'command': 'announce-self' }
->> +
-
->From QMP's point of view, this command is as simple as they get: no
-arguments, no return values, no errors.
-
-I think a basic smoke test would do: try the command, check no magic
-smoke comes out.  Untested sketch adapted from qmp-test.c:
-
-    /*
-     * Test cases for network-related QMP commands
-     *
-     * Copyright (c) 2017 Red Hat Inc.
-     *
-     * Authors:
-     *  Markus Armbruster <armbru@redhat.com>,
-     *
-     * This work is licensed under the terms of the GNU GPL, version 2 or later.
-     * See the COPYING file in the top-level directory.
-     */
-
-    #include "qemu/osdep.h"
-    #include "libqtest.h"
-    #include "qapi/error.h"
-
-    const char common_args[] = "-nodefaults -machine none";
-
-    static void test_qmp_announce_self(void)
-    {
-        QDict *resp, *ret;
-
-        qtest_start(common_args);
-
-        resp = qmp("{ 'execute': 'qmp_capabilities' }");
-        ret = qdict_get_qdict(resp, "return");
-        g_assert(ret && !qdict_size(ret));
-        QDECREF(resp);
-
-        qtest_end();
-    }
-
-    int main(int argc, char *argv[])
-    {
-        g_test_init(&argc, &argv, NULL);
-
-        qtest_add_func("qmp/net/announce_self", test_qmp_announce_self);
-
-        return g_test_run();
-    }
-
-If you want to go the extra mile: is there a way to set up networking so
-you can observe the RARPs this should trigger?
-
-I'd call this qmp-net-test.  Add to Makefile.include exactly like
-qmp-test.
-
-Test cases for existing networking-related QMP commands should be added,
-but not in this patch, and not necessarily by you.
-
-Alternatively, have a more general test program for networking stuff,
-and make this one of its test cases.  Your choice.
-
-Hope this helps!
-
->
-> Please wire hmp up as well (see hmp-commands.hx).
->
-> Dave
->
->> -- 
->> 2.9.3
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+thanks
+-- PMM
