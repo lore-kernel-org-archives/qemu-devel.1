@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60998)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1cjckk-0000xg-JY
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 21:15:31 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cjcoe-0001rk-T5
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 21:19:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1cjckh-0005BO-3J
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 21:15:30 -0500
-Date: Fri, 3 Mar 2017 03:15:25 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <CAFEAcA9FL-sshVzKewf+rCs6-5_c2Y86Qy0b=3DMog4MrVOpwA@mail.gmail.com>
-Message-ID: <alpine.BSF.2.20.1703030259350.33600@zero.eik.bme.hu>
-References: <cover.1488068248.git.balaton@eik.bme.hu>
-	<6b70a9dfe56c3a0dc8e874c45d70612aff7b8e3a.1488068248.git.balaton@eik.bme.hu>
-	<CAFEAcA9FL-sshVzKewf+rCs6-5_c2Y86Qy0b=3DMog4MrVOpwA@mail.gmail.com>
+	(envelope-from <stefanha@gmail.com>) id 1cjcob-0006na-O4
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 21:19:32 -0500
+Received: from mail-pf0-x22a.google.com ([2607:f8b0:400e:c00::22a]:34526)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cjcob-0006mu-HM
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 21:19:29 -0500
+Received: by mail-pf0-x22a.google.com with SMTP id e66so9525581pfe.1
+	for <qemu-devel@nongnu.org>; Thu, 02 Mar 2017 18:19:29 -0800 (PST)
+Date: Fri, 3 Mar 2017 10:19:24 +0800
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170303021924.GB11833@stefanha-x1.localdomain>
+References: <866937F6-BBBD-407A-BA6A-A9185A7AA680@iiitd.ac.in>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH v2 07/14] sm501: Fix device endianness
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="kXdP64Ggrk/fb43R"
+Content-Disposition: inline
+In-Reply-To: <866937F6-BBBD-407A-BA6A-A9185A7AA680@iiitd.ac.in>
+Subject: Re: [Qemu-devel] Regarding Gsoc17
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,144 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: Mohammad Sameer Malik <sameer13140@iiitd.ac.in>
+Cc: qemu-devel@nongnu.org
 
-On Thu, 2 Mar 2017, Peter Maydell wrote:
-> On 25 February 2017 at 18:46, BALATON Zoltan <balaton@eik.bme.hu> wrote:
->> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->> ---
->>
->> v2: Split off small clean up to other patch
->>
->>  hw/display/sm501.c          |  6 +++---
->>  hw/display/sm501_template.h | 23 ++++++++++++++---------
->>  2 files changed, 17 insertions(+), 12 deletions(-)
->>
->> diff --git a/hw/display/sm501.c b/hw/display/sm501.c
->> index b977094..2694081 100644
->> --- a/hw/display/sm501.c
->> +++ b/hw/display/sm501.c
->> @@ -849,7 +849,7 @@ static const MemoryRegionOps sm501_system_config_ops = {
->>          .min_access_size = 4,
->>          .max_access_size = 4,
->>      },
->> -    .endianness = DEVICE_NATIVE_ENDIAN,
->> +    .endianness = DEVICE_LITTLE_ENDIAN,
->>  };
->>
->>  static uint32_t sm501_palette_read(void *opaque, hwaddr addr)
->> @@ -1085,7 +1085,7 @@ static const MemoryRegionOps sm501_disp_ctrl_ops = {
->>          .min_access_size = 4,
->>          .max_access_size = 4,
->>      },
->> -    .endianness = DEVICE_NATIVE_ENDIAN,
->> +    .endianness = DEVICE_LITTLE_ENDIAN,
->>  };
->>
->>  static uint64_t sm501_2d_engine_read(void *opaque, hwaddr addr,
->> @@ -1173,7 +1173,7 @@ static const MemoryRegionOps sm501_2d_engine_ops = {
->>          .min_access_size = 4,
->>          .max_access_size = 4,
->>      },
->> -    .endianness = DEVICE_NATIVE_ENDIAN,
->> +    .endianness = DEVICE_LITTLE_ENDIAN,
->>  };
->>
->>  /* draw line functions for all console modes */
->> diff --git a/hw/display/sm501_template.h b/hw/display/sm501_template.h
->> index 832ee61..6e56baf 100644
->> --- a/hw/display/sm501_template.h
->> +++ b/hw/display/sm501_template.h
->> @@ -64,10 +64,16 @@ static void glue(draw_line16_, PIXEL_NAME)(
->>      uint8_t r, g, b;
->>
->>      do {
->> -        rgb565 = lduw_p(s);
->> -        r = ((rgb565 >> 11) & 0x1f) << 3;
->> -        g = ((rgb565 >>  5) & 0x3f) << 2;
->> -        b = ((rgb565 >>  0) & 0x1f) << 3;
->> +        rgb565 = lduw_le_p(s);
->> +#if defined(TARGET_WORDS_BIGENDIAN)
->> +        r = (rgb565 >> 8) & 0xf8;
->> +        g = (rgb565 >> 3) & 0xfc;
->> +        b = (rgb565 << 3) & 0xf8;
->> +#else
->> +        b = (rgb565 >> 8) & 0xf8;
->> +        g = (rgb565 >> 3) & 0xfc;
->> +        r = (rgb565 << 3) & 0xf8;
->> +#endif
->>          *(PIXEL_TYPE *)d = glue(rgb_to_pixel, PIXEL_NAME)(r, g, b);
->>          s += 2;
->>          d += BPP;
->> @@ -80,15 +86,14 @@ static void glue(draw_line32_, PIXEL_NAME)(
->>      uint8_t r, g, b;
->>
->>      do {
->> -        ldub_p(s);
->>  #if defined(TARGET_WORDS_BIGENDIAN)
->> +        r = s[0];
->> +        g = s[1];
->> +        b = s[2];
->> +#else
->>          r = s[1];
->>          g = s[2];
->>          b = s[3];
->> -#else
->> -        b = s[0];
->> -        g = s[1];
->> -        r = s[2];
->>  #endif
->>          *(PIXEL_TYPE *)d = glue(rgb_to_pixel, PIXEL_NAME)(r, g, b);
->>          s += 4;
->
-> I still suspect this is not correct. In particular, if you
-> look at the Linux driver:
->
-> http://lxr.free-electrons.com/source/drivers/video/fbdev/sm501fb.c#L341
->
-> we have for 32 bit two layouts within a 32-bit word:
-> BGRX (if "swap fb endian" is set)
-> XRGB (the usual)
-> (plus the cross-product with "32-bit load is BE or LE",
-> since we've coded this as byte accesses rather than a ldl_*_p()).
->
-> and for 16 bit we have either RGB or BGR ordering.
-> I'm not completely sure this lines up with the code you have.
 
-Maybe it's not correct but works for everything I could test better than 
-the original code (which was broken even for the SH images one can find) 
-so I think we could just go with this until someone complains and provides 
-a test case. I've given up on trying to understand it because I don't 
-really know this device and SH so I could only go by the images I could 
-find and they seem to like it this way.
+--kXdP64Ggrk/fb43R
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> Looking at how the SWAP_FB_ENDIAN flag gets set:
-> * for the r2d board it is set always
-> * for PCI devices, it is set only if big-endian
->
-> I suspect that what we actually have here is something
-> like:
-> * for the PCI device it's always little endian (and the
->   code ought not to need to depend on TARGET_WORDS_BIGENDIAN)
-> * sysbus device may be more complicated
->
-> Also I note there's an SM501_ENDIAN_CONTROL register on the
-> device, which presumably if written changes the behaviour.
+On Wed, Mar 01, 2017 at 11:03:31PM +0530, Mohammad Sameer Malik wrote:
+> Hi i am Mohammad Sameer Malik a Btech undergraduate in Electronics and Communication at IIIT Delhi and i want to be a part of GSOC 17 as a student and want to chose Qemu as my organisation i have strong web development experience. Skills which i have used are C,Python,HTML/HTML5, CSS/CSS5, javascript , jQuery, AngularJs and i even know android development.. I would like to contribute to your projects. Can you suggest me how can i  get started to increase my chances of selection with your organisation.
 
-I've seen this but it's not emulated so it can be ignored for now. The 
-spec also says that default is little endian so for regs at least 
-DEVICE_LITTLE_ENDIAN should be OK.
+Hi,
+Thanks for your email.
 
-> Plus for the sysbus device if we change the settings to
-> DEVICE_LITTLE_ENDIAN for the various control register
-> regions that suggests we should be consistent about the
-> serial_mm_init() endian order and also the USB controller.
->
-> It's late evening here though so I can't investigate any
-> further right now.
->
-> thanks
-> -- PMM
->
->
+QEMU's project ideas list is here:
+http://wiki.qemu-project.org/Google_Summer_of_Code_2017
+
+Select a project you are interested in and where you have the necessary
+technical skills.
+
+QEMU is a C code base.  The focus is on systems programming and
+emulation.  I strongly suggest looking at organizations that focus on
+web development instead since you'll have a greater chance of being
+accept there.
+
+Good luck,
+Stefan
+
+--kXdP64Ggrk/fb43R
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYuNKsAAoJEJykq7OBq3PIMQwIAL1EQLMPkNBdpB+wVMtsDFFg
+fnDWcOdl+RfMlPmex5WkNjcKwohlQjruxYQRKHHYFsD6i8hoF7Q3JvcY0gH4vpXx
+ou4d8t/GK55MO2PD0tHApz2lHoAmq6osKp6uuDn3F0jkwQpKszqcoYIjA+UDa8jV
+vc91plnpy4wJ3ASu1noo+eHlWkrmDI3X7jkVdz+L7aAhRIRGK2+ptlsdChojVLhI
+oHlVAjgU0andWA4Mgodo0q5DwyCznLVhfbjcAa2QgjbFFG1NQgnGhDtblesTPL6y
+Ri2D6M71hlvZ0aCBI9MwXlLU+jJdhTNASWz40yOqdemXNPQpd7gOLEXx9QR2BCo=
+=wE8K
+-----END PGP SIGNATURE-----
+
+--kXdP64Ggrk/fb43R--
