@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33778)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cjtQc-0005TK-BH
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 15:03:51 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1cjtXr-0007CL-Dw
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 15:11:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cjtQb-0008Gd-Dq
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 15:03:50 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1488491046-2549-1-git-send-email-armbru@redhat.com>
-	<1488491046-2549-15-git-send-email-armbru@redhat.com>
-	<e67251ad-1f7c-d0da-4a82-12a10ae5e126@redhat.com>
-Date: Fri, 03 Mar 2017 21:03:40 +0100
-In-Reply-To: <e67251ad-1f7c-d0da-4a82-12a10ae5e126@redhat.com> (Eric Blake's
-	message of "Fri, 3 Mar 2017 12:35:25 -0600")
-Message-ID: <87varqi0v7.fsf@dusky.pond.sub.org>
+	(envelope-from <balaton@eik.bme.hu>) id 1cjtXn-0003CR-EH
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 15:11:19 -0500
+Date: Fri, 3 Mar 2017 21:11:05 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <CAFEAcA-PUcPaOPOXXhab1N=YAHja0xCf5yaZYm5m0p1=j6A=WA@mail.gmail.com>
+Message-ID: <alpine.BSF.2.20.1703032100430.14293@zero.eik.bme.hu>
+References: <cover.1488068248.git.balaton@eik.bme.hu>
+	<6b70a9dfe56c3a0dc8e874c45d70612aff7b8e3a.1488068248.git.balaton@eik.bme.hu>
+	<CAFEAcA9FL-sshVzKewf+rCs6-5_c2Y86Qy0b=3DMog4MrVOpwA@mail.gmail.com>
+	<alpine.BSF.2.20.1703030259350.33600@zero.eik.bme.hu>
+	<CAFEAcA-PUcPaOPOXXhab1N=YAHja0xCf5yaZYm5m0p1=j6A=WA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 14/15] qapi-schema: Rename
- SocketAddressFlat's variant tcp to inet
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [PATCH v2 07/14] sm501: Fix device endianness
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,76 +25,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, qemu-block@nongnu.org, namei.unix@gmail.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-Eric Blake <eblake@redhat.com> writes:
-
-> On 03/02/2017 03:44 PM, Markus Armbruster wrote:
->> QAPI type SocketAddressFlat differs from SocketAddress pointlessly:
->> the discriminator value for variant InetSocketAddress is 'tcp' instead
->> of 'inet'.  Rename.
->> 
->> The type is far only used by the Gluster block drivers.  Take care to
->> keep 'tcp' working there.
+On Fri, 3 Mar 2017, Peter Maydell wrote:
+> On 3 March 2017 at 02:15, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+>> Maybe it's not correct but works for everything I could test better than the
+>> original code (which was broken even for the SH images one can find) so I
+>> think we could just go with this until someone complains and provides a test
+>> case. I've given up on trying to understand it because I don't really know
+>> this device and SH so I could only go by the images I could find and they
+>> seem to like it this way.
 >
-> The old name was visible in QMP in 2.8, but only by blockdev-add, which
-> we've already argued was not stable (and where we've already made other
-> non-back-compat changes to it).  But that means this HAS to go into 2.9,
-> if we're declaring blockdev-add stable for 2.9.
-
-Yes.
-
-Note that the command line pseudo-filename's URI syntax stays the same
-(file=gluster+tcp://), and the command line's dotted key syntax keeps
-accepting tcp for compatiblity (file.server.0.type=tcp works in addition
-to =inet).
-
-> It wouldn't hurt to mention that additional information in the commit
-> message.
-
-I'll cook something up.
-
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  block/gluster.c  | 59 +++++++++++++++++++++++++++++---------------------------
->>  qapi-schema.json |  8 ++++----
->>  2 files changed, 35 insertions(+), 32 deletions(-)
->> 
->> diff --git a/block/gluster.c b/block/gluster.c
->> index 77ce45b..0155188 100644
->> --- a/block/gluster.c
->> +++ b/block/gluster.c
-[...]
->> @@ -536,21 +536,24 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
->>  
->>          }
->>          gsconf = g_new0(SocketAddressFlat, 1);
->> +        if (!strcmp(ptr, "tcp")) {
->> +            ptr = "inet";       /* accept legacy "tcp" */
->> +        }
->>          gsconf->type = qapi_enum_parse(SocketAddressFlatType_lookup, ptr,
->>                                         SOCKET_ADDRESS_FLAT_TYPE__MAX, 0,
->>                                         &local_err);
-
-This is where I keep file.server.N.type=tcp working.
-
-[...]
->> +++ b/qapi-schema.json
->> @@ -4105,14 +4105,14 @@
->>  #
->>  # Available SocketAddressFlat types
->>  #
->> -# @tcp:   Internet address
->> +# @inet:   Internet address
->>  #
->>  # @unix:  Unix domain socket
+> So what cases have you tested? The Linux kernel seems to support:
+> * sh embedded device, little endian
+> * PCI card, little endian host
+> * PCI card, big endian host
+> and there are also
+> * 16 bit pixel format
+> * 32 bit pixel format
 >
-> Nit: Spacing is now inconsistent.
+> which makes 6 different combinations.
+> (It's a shame there's no sh4 BE code to run on this.)
 
-Will fix.
+As mentioned before I've used this image to test SH:
 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+https://people.debian.org/~aurel32/qemu/sh4/
 
-Thanks!
+with video=800x600-16 kernel parameter where changing -16 to different bit 
+depths (8, 32) reproduces the problem. On ppc I've tested with MorphOS 
+which uses 16 bpp, Linux and U-boot which I think uses 8 bit. These run on 
+real hardware so I think if they work the emulation should be OK.
+
+You've said before that PCI is likely always little endian and SH embedded 
+is LE too so unless something uses the device in BE mode (which we don't 
+emulate) setting it to little endian should be correct. For frame buffer 
+endianness I can only go with what I've seen clients doing and my patch 
+does what worked for the above on SH and PPC. I can't prove it's correct 
+but works for the systems I've targeted and also fixes the SH case which 
+seemed to be broken.
+
+>>> Looking at how the SWAP_FB_ENDIAN flag gets set:
+>>> * for the r2d board it is set always
+>>> * for PCI devices, it is set only if big-endian
+>>>
+>>> I suspect that what we actually have here is something
+>>> like:
+>>> * for the PCI device it's always little endian (and the
+>>>   code ought not to need to depend on TARGET_WORDS_BIGENDIAN)
+>>> * sysbus device may be more complicated
+>>>
+>>> Also I note there's an SM501_ENDIAN_CONTROL register on the
+>>> device, which presumably if written changes the behaviour.
+>
+>> I've seen this but it's not emulated so it can be ignored for now. The spec
+>> also says that default is little endian so for regs at least
+>> DEVICE_LITTLE_ENDIAN should be OK.
+>
+> Yes, that makes sense. So we should be modelling this as an "always
+> little endian device".
+>
+> The changes you have to the memory region ops achieve this for
+> the registers implemented in this device itself. It looks like
+> SYSBUS_OHCI is already always little endian. You also need to
+> change the argument to the serial_mm_init() call to pass
+> DEVICE_LITTLE_ENDIAN.
+
+OK, will do that.
