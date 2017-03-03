@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1cjnWr-0004j0-6K
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:45:54 -0500
+	(envelope-from <armbru@redhat.com>) id 1cjnWx-0004mY-82
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:46:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1cjnWn-00041V-7s
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:45:53 -0500
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:36012)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1cjnWm-00040c-Vy
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:45:49 -0500
-Received: by mail-lf0-x243.google.com with SMTP id g70so7090221lfh.3
-	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 05:45:48 -0800 (PST)
-Date: Fri, 3 Mar 2017 14:45:46 +0100
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20170303134546.GX9606@toto>
-References: <1487362633-25018-1-git-send-email-fred.konrad@greensocs.com>
+	(envelope-from <armbru@redhat.com>) id 1cjnWt-00042y-Be
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:45:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53552)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cjnWt-00042s-3W
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:45:55 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1487834070-31374-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1487834070-31374-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<0f7cd737-e851-1e1f-2fe7-0ac969e0f86b@redhat.com>
+Date: Fri, 03 Mar 2017 14:45:51 +0100
+In-Reply-To: <0f7cd737-e851-1e1f-2fe7-0ac969e0f86b@redhat.com> (Eric Blake's
+	message of "Thu, 23 Feb 2017 09:34:57 -0600")
+Message-ID: <87h93ascc0.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1487362633-25018-1-git-send-email-fred.konrad@greensocs.com>
-Subject: Re: [Qemu-devel] [PATCH V2 0/7] execute code from mmio area
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH V8 2/2] Add a new qmp command to do
+ checkpoint, query xen replication status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,69 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: fred.konrad@greensocs.com
-Cc: qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, peter.maydell@linaro.org, mark.burton@greensocs.com, alistair.francis@xilinx.com, clg@kaod.org, pbonzini@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Stefano Stabellini <sstabellini@kernel.org>, Wen Congyang <wencongyang@gmail.com>, Jason Wang <jasowang@redhat.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-On Fri, Feb 17, 2017 at 09:17:06PM +0100, fred.konrad@greensocs.com wrote:
-> From: KONRAD Frederic <fred.konrad@greensocs.com>
-> 
-> This series allows to execute code from mmio areas.
-> The main goal of this is to be able to run code for example from an SPI device.
-> 
-> The three first patch fixes the way get_page_addr_code fills the TLB.
-> 
-> The fourth patch implements the mmio execution helpers: the device must
-> implement the request_ptr callback of the MemoryRegion and will be notified when
-> the guest wants to execute code from it.
-> 
-> The fifth patch introduces mmio_interface device which allows to dynamically
-> map a host pointer somewhere into the memory.
-> 
-> The sixth patch implements the execution from the SPI memories in the
-> xilinx_spips model.
+Eric Blake <eblake@redhat.com> writes:
 
+> On 02/23/2017 01:14 AM, Zhang Chen wrote:
+>> We can call this qmp command to do checkpoint outside of qemu.
+>> Xen colo will need this function.
+>> 
+>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+>> Signed-off-by: Wen Congyang <wencongyang@gmail.com>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>
+> You made a substantial change to this patch since v7 in response to my
+> comments; when you do that, it's best to remove the R-b to make sure I
+> re-review the changes and am still happy with them.
+>
+>> 
+>> ---
+>>  migration/colo.c | 23 +++++++++++++++++++++++
+>>  qapi-schema.json | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+>>  2 files changed, 71 insertions(+)
+>> 
+>
+>>  ##
+>> +# @ReplicationStatus:
+>> +#
+>> +# The result format for 'query-xen-replication-status'.
+>> +#
+>> +# @status: true to error, false to normal.
+>
+> This is now a poor name for the parameter.  Please rename it; probably
+> to @error (if you want to keep true meaning a problem has been
+> detected), or to @okay (if you want to invert the sense, and @desc is
+> only present when @okay is false).
 
-I had a comment on the possible break of bisection, but the series looks
-good to me. If you fix up the ordering:
+We could replace both members by '*error': 'str', present exactly when
+status is "bad".
 
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-
-Cheers,
-Edgar
-
-
-
-> 
-> Thanks,
-> Fred
-> 
-> V1 -> V2:
->   * Fix the DPRINTF error.
-> RFC -> V1:
->   * Use an interface (mmio-interface) to fix any reference leak issue.
-> 
-> KONRAD Frederic (7):
->   cputlb: cleanup get_page_addr_code to use VICTIM_TLB_HIT
->   cputlb: move get_page_addr_code
->   cputlb: fix the way get_page_addr_code fills the tlb
->   exec: allow to get a pointer for some mmio memory region
->   qdev: add MemoryRegion property
->   introduce mmio_interface
->   xilinx_spips: allow mmio execution
-> 
->  cputlb.c                         |  81 ++++++++++++++-----------
->  hw/misc/Makefile.objs            |   1 +
->  hw/misc/mmio_interface.c         | 128 +++++++++++++++++++++++++++++++++++++++
->  hw/ssi/xilinx_spips.c            |  74 ++++++++++++++++------
->  include/exec/memory.h            |  35 +++++++++++
->  include/hw/misc/mmio_interface.h |  49 +++++++++++++++
->  include/hw/qdev-properties.h     |   2 +
->  memory.c                         |  57 +++++++++++++++++
->  8 files changed, 372 insertions(+), 55 deletions(-)
->  create mode 100644 hw/misc/mmio_interface.c
->  create mode 100644 include/hw/misc/mmio_interface.h
-> 
-> -- 
-> 1.8.3.1
-> 
-> 
+>> +#
+>> +# @desc: #optional the human readable error description string, when
+>> +#        @status is 'true'.
+>> +#
+>> +# Since: 2.9
+>> +##
+>> +{ 'struct': 'ReplicationStatus',
+>> +  'data': { 'status': 'bool', '*desc': 'str' } }
+>> +
+>> +##
+>> +# @query-xen-replication-status:
+>> +#
+>> +# Query replication status while the vm is running.
+>> +#
+>> +# Returns: A @ReplicationResult objects showing the status.
+>
+> s/objects/object/
+>
+>> +#
+>> +# Example:
+>> +#
+>> +# -> { "execute": "query-xen-replication-status" }
+>> +# <- { "return": { "status": "normal" } }
+>
+> This example is now wrong.
+>
+> You'll need a v9.
