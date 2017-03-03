@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cjq7T-0004uH-AM
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:31:52 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cjq8S-0005nF-Vk
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:32:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cjq7R-0002lt-5q
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:31:51 -0500
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:35694)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cjq7Q-0002l6-UP
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:31:49 -0500
-Received: by mail-wm0-x22e.google.com with SMTP id v186so19439346wmd.0
-	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 08:31:48 -0800 (PST)
+	(envelope-from <no-reply@patchew.org>) id 1cjq8P-00037t-SE
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:32:53 -0500
+Resent-Message-Id: <E1cjq8P-00037t-SE@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21376)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cjq8P-00037g-Kw
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:32:49 -0500
+In-Reply-To: <1488558530-21016-1-git-send-email-pbonzini@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148855875112.285.17233717544814027437@0e2666bad730>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8WXnBXQ-qNmzRw6yD_tuYLQepmSC0be50s8h=-1r-VQw@mail.gmail.com>
-References: <1488320775-9849-1-git-send-email-armbru@redhat.com>
-	<CAFEAcA8WXnBXQ-qNmzRw6yD_tuYLQepmSC0be50s8h=-1r-VQw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 Mar 2017 16:31:27 +0000
-Message-ID: <CAFEAcA8oG+uODONjXpeAWpNxcmWfoxEbK31LksrLUQp5kbupgA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 00/24] block: Command line option -blockdev
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 3 Mar 2017 08:32:31 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] hppa: avoid anonymous unions in designated
+ initializers.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,102 +29,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, rth@twiddle.net
 
-On 2 March 2017 at 15:25, Peter Maydell <peter.maydell@linaro.org> wrote:
-> make check failures on OSX host:
-
-> May or may not be this pull's fault.
-
-I gave the pull another test, since I've pretty much run out of
-other stuff in the queue, but it failed again in the same way,
-on both OSX and x86-64 Linux.
-So I think there's definitely something up with this pull.
-
-OSX host:
-TEST: tests/qom-test... (pid=85614)
-  /sparc/qom/SS-4:
-Broken pipe
-FAIL
-GTester: last random seed: R02Sb28294de82a0cf258dc2ca2baf6b18c8
-(pid=85617)
-  /sparc/qom/LX:
-Broken pipe
-FAIL
-GTester: last random seed: R02S4eb26bbab5c416277b06006ad8156cf1
-(pid=85622)
-  /sparc/qom/leon3_generic:                                            OK
-  /sparc/qom/SS-600MP:                                                 OK
-  /sparc/qom/Voyager:                                                  OK
-  /sparc/qom/none:                                                     OK
-  /sparc/qom/SS-10:
-Broken pipe
-FAIL
-GTester: last random seed: R02S469761818cf79d3e6fa4962320fa77b1
-(pid=85639)
-  /sparc/qom/SS-20:
-Broken pipe
-FAIL
-GTester: last random seed: R02S3a7473b699bcfb26035fd7c28443bf95
-(pid=85644)
-  /sparc/qom/SS-5:                                                     OK
-  /sparc/qom/SPARCbook:
-Broken pipe
-FAIL
-GTester: last random seed: R02Se07a10fe8e79e45763039203f04c24a1
-(pid=85652)
-  /sparc/qom/SPARCClassic:
-Broken pipe
-FAIL
-GTester: last random seed: R02S9e34d27b7ec926de3636396718a84757
-(pid=85655)
-FAIL: tests/qom-test
-
-
-x86-64 Linux host:
-
-QTEST_QEMU_BINARY=cris-softmmu/qemu-system-cris
-QTEST_QEMU_IMG=qemu-img MALLOC_PERTURB_=${MALLOC_PERTURB_:-$((RANDOM %
-255 + 1))} gtester -k --verbose -m=quick  tests/qmp-test
-tests/device-introspect-test tests/qom-test
-TEST: tests/qmp-test... (pid=31974)
-  /cris/qmp/protocol:
-Broken pipe
-FAIL
-GTester: last random seed: R02S3574aa418580efa4bcf246970fbc840b
-(pid=31979)
-FAIL: tests/qmp-test
-TEST: tests/device-introspect-test... (pid=31980)
-  /cris/device/introspect/list:
-Broken pipe
-FAIL
-GTester: last random seed: R02Sa1d63dd8533875a5d93dd74844a975d6
-(pid=31984)
-  /cris/device/introspect/none:
-Broken pipe
-FAIL
-GTester: last random seed: R02S356b6ad895fd1c7287d0aca33d282e85
-(pid=31988)
-  /cris/device/introspect/abstract:
-Broken pipe
-FAIL
-GTester: last random seed: R02Sc21ac5a1763bc530d24534be33594f47
-(pid=31992)
-  /cris/device/introspect/concrete:
-Broken pipe
-FAIL
-GTester: last random seed: R02Sa794b06429bb8751ef09a03597812a8a
-(pid=31998)
-  /cris/device/introspect/abstract-interfaces:
-Broken pipe
-FAIL
-GTester: last random seed: R02Scb050561a91791436483fa6e49d517a1
-(pid=32002)
-FAIL: tests/device-introspect-test
-TEST: tests/qom-test... (pid=32003)
-Broken pipe
-FAIL: tests/qom-test
-
-thanks
--- PMM
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ4
+ODU1ODUzMC0yMTAxNi0xLWdpdC1zZW5kLWVtYWlsLXBib256aW5pQHJlZGhhdC5jb20KVHlwZTog
+c2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIGhwcGE6IGF2b2lkIGFub255bW91
+cyB1bmlvbnMgaW4gZGVzaWduYXRlZCBpbml0aWFsaXplcnMuCgo9PT0gVEVTVCBTQ1JJUFQgQkVH
+SU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxp
+bmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNv
+bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
+ZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJB
+U0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4v
+JHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBz
+aG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFj
+ayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChu
+KzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5n
+IDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dp
+dGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hl
+dy8xNDg4NTU4NTMwLTIxMDE2LTEtZ2l0LXNlbmQtZW1haWwtcGJvbnppbmlAcmVkaGF0LmNvbSAt
+PiBwYXRjaGV3LzE0ODg1NTg1MzAtMjEwMTYtMS1naXQtc2VuZC1lbWFpbC1wYm9uemluaUByZWRo
+YXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMGVhYWE5ZiBocHBhOiBhdm9p
+ZCBhbm9ueW1vdXMgdW5pb25zIGluIGRlc2lnbmF0ZWQgaW5pdGlhbGl6ZXJzLgoKPT09IE9VVFBV
+VCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBocHBhOiBhdm9pZCBhbm9ueW1vdXMgdW5p
+b25zIGluIGRlc2lnbmF0ZWQgaW5pdGlhbGl6ZXJzLi4uLgpFUlJPUjogTWFjcm9zIHdpdGggY29t
+cGxleCB2YWx1ZXMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lzCiMxNjE6IEZJTEU6
+IHRhcmdldC9ocHBhL3RyYW5zbGF0ZS5jOjMzNDM6CisjZGVmaW5lIEZPUF9ERUQgIHRyYW5zX2Zv
+cF9kZWQsIC5mLmRlZAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBi
+ZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMTYyOiBGSUxFOiB0YXJnZXQvaHBwYS90cmFuc2xh
+dGUuYzozMzQ0OgorI2RlZmluZSBGT1BfREVERCB0cmFuc19mb3BfZGVkZCwgLmYuZGVkZAoKRVJS
+T1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJl
+bnRoZXNpcwojMTY4OiBGSUxFOiB0YXJnZXQvaHBwYS90cmFuc2xhdGUuYzozMzQ2OgorI2RlZmlu
+ZSBGT1BfV0VXICB0cmFuc19mb3Bfd2V3XzBjLCAuZi53ZXcKCkVSUk9SOiBNYWNyb3Mgd2l0aCBj
+b21wbGV4IHZhbHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMKIzE2OTogRklM
+RTogdGFyZ2V0L2hwcGEvdHJhbnNsYXRlLmM6MzM0NzoKKyNkZWZpbmUgRk9QX0RFVyAgdHJhbnNf
+Zm9wX2Rld18wYywgLmYuZGV3CgpFUlJPUjogTWFjcm9zIHdpdGggY29tcGxleCB2YWx1ZXMgc2hv
+dWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lzCiMxNzA6IEZJTEU6IHRhcmdldC9ocHBhL3Ry
+YW5zbGF0ZS5jOjMzNDg6CisjZGVmaW5lIEZPUF9XRUQgIHRyYW5zX2ZvcF93ZWRfMGMsIC5mLndl
+ZAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBp
+biBwYXJlbnRoZXNpcwojMTcxOiBGSUxFOiB0YXJnZXQvaHBwYS90cmFuc2xhdGUuYzozMzQ5Ogor
+I2RlZmluZSBGT1BfV0VXVyB0cmFuc19mb3Bfd2V3d18wYywgLmYud2V3dwoKRVJST1I6IE1hY3Jv
+cyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwoj
+MTgzOiBGSUxFOiB0YXJnZXQvaHBwYS90cmFuc2xhdGUuYzozNDI4OgorI2RlZmluZSBGT1BfV0VX
+ICB0cmFuc19mb3Bfd2V3XzBlLCAuZi53ZXcKCkVSUk9SOiBNYWNyb3Mgd2l0aCBjb21wbGV4IHZh
+bHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMKIzE4NDogRklMRTogdGFyZ2V0
+L2hwcGEvdHJhbnNsYXRlLmM6MzQyOToKKyNkZWZpbmUgRk9QX0RFVyAgdHJhbnNfZm9wX2Rld18w
+ZSwgLmYuZGV3CgpFUlJPUjogTWFjcm9zIHdpdGggY29tcGxleCB2YWx1ZXMgc2hvdWxkIGJlIGVu
+Y2xvc2VkIGluIHBhcmVudGhlc2lzCiMxODU6IEZJTEU6IHRhcmdldC9ocHBhL3RyYW5zbGF0ZS5j
+OjM0MzA6CisjZGVmaW5lIEZPUF9XRUQgIHRyYW5zX2ZvcF93ZWRfMGUsIC5mLndlZAoKRVJST1I6
+IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRo
+ZXNpcwojMTg2OiBGSUxFOiB0YXJnZXQvaHBwYS90cmFuc2xhdGUuYzozNDMxOgorI2RlZmluZSBG
+T1BfV0VXVyB0cmFuc19mb3Bfd2V3d18wZSwgLmYud2V3dwoKdG90YWw6IDEwIGVycm9ycywgMCB3
+YXJuaW5ncywgMTU3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1z
+LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
+dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
+VEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNv
+ZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0
+cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1k
+ZXZlbEBmcmVlbGlzdHMub3Jn
