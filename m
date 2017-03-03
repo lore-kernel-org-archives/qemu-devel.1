@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44321)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44140)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cjdqX-00085q-Av
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 22:25:36 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cjdqR-00083O-Un
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 22:25:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cjdqV-0001NK-Pu
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 22:25:33 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cjdqQ-0001HV-BM
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 22:25:27 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  3 Mar 2017 14:25:04 +1100
-Message-Id: <20170303032507.16142-15-david@gibson.dropbear.id.au>
+Date: Fri,  3 Mar 2017 14:24:52 +1100
+Message-Id: <20170303032507.16142-3-david@gibson.dropbear.id.au>
 In-Reply-To: <20170303032507.16142-1-david@gibson.dropbear.id.au>
 References: <20170303032507.16142-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 14/17] target/ppc: Rework hash mmu page fault
- code and add defines for clarity
+Subject: [Qemu-devel] [PULL 02/17] exec, kvm,
+ target-ppc: Move getrampagesize() to common code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,125 +23,346 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, sjitindarsingh@gmail.com, sam.bobroff@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>
 
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-The hash mmu page fault handling code is responsible for generating ISIs
-and DSIs when access permissions cause an access to fail. Part of this
-involves setting the srr1 or dsisr registers to indicate what causes the
-access to fail. Add defines for the bit fields of these registers and
-rework the code to use these new defines in order to improve readability
-and code clarity.
+getrampagesize() returns the largest supported page size and mainly
+used to know if huge pages are enabled.
 
-While we're here, update what is logged when an access fails to include
-information as to what caused to access to fail for debug purposes.
+However is implemented in target-ppc/kvm.c and not available
+in TCG or other architectures.
 
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-[dwg: Moved constants to cpu.h since they're not MMUv3 specific]
+This renames and moves gethugepagesize() to mmap-alloc.c where
+fd-based analog of it is already implemented. This renames and moves
+getrampagesize() to exec.c as it seems to be the common place for
+helpers like this.
+
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/cpu.h        | 14 ++++++++++++--
- target/ppc/mmu-hash64.c | 24 ++++++++++++------------
- 2 files changed, 24 insertions(+), 14 deletions(-)
+ exec.c                    |  82 ++++++++++++++++++++++++++++++++++
+ include/exec/ram_addr.h   |   1 +
+ include/qemu/mmap-alloc.h |   2 +
+ target/ppc/kvm.c          | 109 +++-------------------------------------------
+ util/mmap-alloc.c         |  25 +++++++++++
+ 5 files changed, 115 insertions(+), 104 deletions(-)
 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 14c286e..7c4a1f5 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -473,11 +473,21 @@ struct ppc_slb_t {
- #endif
- #endif
+diff --git a/exec.c b/exec.c
+index 785d20f..aabb035 100644
+--- a/exec.c
++++ b/exec.c
+@@ -42,6 +42,7 @@
+ #include "exec/memory.h"
+ #include "exec/ioport.h"
+ #include "sysemu/dma.h"
++#include "sysemu/numa.h"
+ #include "exec/address-spaces.h"
+ #include "sysemu/xen-mapcache.h"
+ #include "trace-root.h"
+@@ -1257,6 +1258,87 @@ void qemu_mutex_unlock_ramlist(void)
+ }
  
-+/* DSISR */
-+#define DSISR_NOPTE              0x40000000
-+/* Not permitted by access authority of encoded access authority */
-+#define DSISR_PROTFAULT          0x08000000
-+#define DSISR_ISSTORE            0x02000000
-+/* Not permitted by virtual page class key protection */
-+#define DSISR_AMR                0x00200000
+ #ifdef __linux__
++/*
++ * FIXME TOCTTOU: this iterates over memory backends' mem-path, which
++ * may or may not name the same files / on the same filesystem now as
++ * when we actually open and map them.  Iterate over the file
++ * descriptors instead, and use qemu_fd_getpagesize().
++ */
++static int find_max_supported_pagesize(Object *obj, void *opaque)
++{
++    char *mem_path;
++    long *hpsize_min = opaque;
 +
- /* SRR1 error code fields */
++    if (object_dynamic_cast(obj, TYPE_MEMORY_BACKEND)) {
++        mem_path = object_property_get_str(obj, "mem-path", NULL);
++        if (mem_path) {
++            long hpsize = qemu_mempath_getpagesize(mem_path);
++            if (hpsize < *hpsize_min) {
++                *hpsize_min = hpsize;
++            }
++        } else {
++            *hpsize_min = getpagesize();
++        }
++    }
++
++    return 0;
++}
++
++long qemu_getrampagesize(void)
++{
++    long hpsize = LONG_MAX;
++    long mainrampagesize;
++    Object *memdev_root;
++
++    if (mem_path) {
++        mainrampagesize = qemu_mempath_getpagesize(mem_path);
++    } else {
++        mainrampagesize = getpagesize();
++    }
++
++    /* it's possible we have memory-backend objects with
++     * hugepage-backed RAM. these may get mapped into system
++     * address space via -numa parameters or memory hotplug
++     * hooks. we want to take these into account, but we
++     * also want to make sure these supported hugepage
++     * sizes are applicable across the entire range of memory
++     * we may boot from, so we take the min across all
++     * backends, and assume normal pages in cases where a
++     * backend isn't backed by hugepages.
++     */
++    memdev_root = object_resolve_path("/objects", NULL);
++    if (memdev_root) {
++        object_child_foreach(memdev_root, find_max_supported_pagesize, &hpsize);
++    }
++    if (hpsize == LONG_MAX) {
++        /* No additional memory regions found ==> Report main RAM page size */
++        return mainrampagesize;
++    }
++
++    /* If NUMA is disabled or the NUMA nodes are not backed with a
++     * memory-backend, then there is at least one node using "normal" RAM,
++     * so if its page size is smaller we have got to report that size instead.
++     */
++    if (hpsize > mainrampagesize &&
++        (nb_numa_nodes == 0 || numa_info[0].node_memdev == NULL)) {
++        static bool warned;
++        if (!warned) {
++            error_report("Huge page support disabled (n/a for main memory).");
++            warned = true;
++        }
++        return mainrampagesize;
++    }
++
++    return hpsize;
++}
++#else
++long qemu_getrampagesize(void)
++{
++    return getpagesize();
++}
++#endif
++
++#ifdef __linux__
+ static int64_t get_file_size(int fd)
+ {
+     int64_t size = lseek(fd, 0, SEEK_END);
+diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+index 3e79466..cd432e7 100644
+--- a/include/exec/ram_addr.h
++++ b/include/exec/ram_addr.h
+@@ -52,6 +52,7 @@ static inline void *ramblock_ptr(RAMBlock *block, ram_addr_t offset)
+     return (char *)block->host + offset;
+ }
  
-+#define SRR1_NOPTE               DSISR_NOPTE
-+/* Not permitted due to no-execute or guard bit set */
- #define SRR1_NOEXEC_GUARD        0x10000000
--#define SRR1_PROTFAULT           0x08000000
--#define SRR1_IAMR                0x00200000
-+#define SRR1_PROTFAULT           DSISR_PROTFAULT
-+#define SRR1_IAMR                DSISR_AMR
++long qemu_getrampagesize(void);
+ ram_addr_t last_ram_offset(void);
+ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
+                                    bool share, const char *mem_path,
+diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
+index 933c024..50385e3 100644
+--- a/include/qemu/mmap-alloc.h
++++ b/include/qemu/mmap-alloc.h
+@@ -5,6 +5,8 @@
  
- /* Facility Status and Control (FSCR) bits */
- #define FSCR_EBB        (63 - 56) /* Event-Based Branch Facility */
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index d985617..d5a871f 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -701,7 +701,7 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr,
-     hwaddr ptex;
-     ppc_hash_pte64_t pte;
-     int exec_prot, pp_prot, amr_prot, prot;
--    uint64_t new_pte1, dsisr;
-+    uint64_t new_pte1;
-     const int need_prot[] = {PAGE_READ, PAGE_WRITE, PAGE_EXEC};
-     hwaddr raddr;
+ size_t qemu_fd_getpagesize(int fd);
  
-@@ -742,11 +742,11 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, vaddr eaddr,
-             } else {
-                 /* The access failed, generate the approriate interrupt */
-                 if (rwx == 2) {
--                    ppc_hash64_set_isi(cs, env, 0x08000000);
-+                    ppc_hash64_set_isi(cs, env, SRR1_PROTFAULT);
-                 } else {
--                    dsisr = 0x08000000;
-+                    int dsisr = DSISR_PROTFAULT;
-                     if (rwx == 1) {
--                        dsisr |= 0x02000000;
-+                        dsisr |= DSISR_ISSTORE;
-                     }
-                     ppc_hash64_set_dsi(cs, env, eaddr, dsisr);
-                 }
-@@ -784,19 +784,19 @@ skip_slb_search:
++size_t qemu_mempath_getpagesize(const char *mem_path);
++
+ void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared);
  
-     /* 3. Check for segment level no-execute violation */
-     if ((rwx == 2) && (slb->vsid & SLB_VSID_N)) {
--        ppc_hash64_set_isi(cs, env, 0x10000000);
-+        ppc_hash64_set_isi(cs, env, SRR1_NOEXEC_GUARD);
-         return 1;
+ void qemu_ram_munmap(void *ptr, size_t size);
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index acc40ec..9b51484 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -28,7 +28,6 @@
+ #include "qemu/timer.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/hw_accel.h"
+-#include "sysemu/numa.h"
+ #include "kvm_ppc.h"
+ #include "sysemu/cpus.h"
+ #include "sysemu/device_tree.h"
+@@ -43,8 +42,10 @@
+ #include "trace.h"
+ #include "exec/gdbstub.h"
+ #include "exec/memattrs.h"
++#include "exec/ram_addr.h"
+ #include "sysemu/hostmem.h"
+ #include "qemu/cutils.h"
++#include "qemu/mmap-alloc.h"
+ #if defined(TARGET_PPC64)
+ #include "hw/ppc/spapr_cpu_core.h"
+ #endif
+@@ -329,106 +330,6 @@ static void kvm_get_smmu_info(PowerPCCPU *cpu, struct kvm_ppc_smmu_info *info)
+     kvm_get_fallback_smmu_info(cpu, info);
+ }
+ 
+-static long gethugepagesize(const char *mem_path)
+-{
+-    struct statfs fs;
+-    int ret;
+-
+-    do {
+-        ret = statfs(mem_path, &fs);
+-    } while (ret != 0 && errno == EINTR);
+-
+-    if (ret != 0) {
+-        fprintf(stderr, "Couldn't statfs() memory path: %s\n",
+-                strerror(errno));
+-        exit(1);
+-    }
+-
+-#define HUGETLBFS_MAGIC       0x958458f6
+-
+-    if (fs.f_type != HUGETLBFS_MAGIC) {
+-        /* Explicit mempath, but it's ordinary pages */
+-        return getpagesize();
+-    }
+-
+-    /* It's hugepage, return the huge page size */
+-    return fs.f_bsize;
+-}
+-
+-/*
+- * FIXME TOCTTOU: this iterates over memory backends' mem-path, which
+- * may or may not name the same files / on the same filesystem now as
+- * when we actually open and map them.  Iterate over the file
+- * descriptors instead, and use qemu_fd_getpagesize().
+- */
+-static int find_max_supported_pagesize(Object *obj, void *opaque)
+-{
+-    char *mem_path;
+-    long *hpsize_min = opaque;
+-
+-    if (object_dynamic_cast(obj, TYPE_MEMORY_BACKEND)) {
+-        mem_path = object_property_get_str(obj, "mem-path", NULL);
+-        if (mem_path) {
+-            long hpsize = gethugepagesize(mem_path);
+-            if (hpsize < *hpsize_min) {
+-                *hpsize_min = hpsize;
+-            }
+-        } else {
+-            *hpsize_min = getpagesize();
+-        }
+-    }
+-
+-    return 0;
+-}
+-
+-static long getrampagesize(void)
+-{
+-    long hpsize = LONG_MAX;
+-    long mainrampagesize;
+-    Object *memdev_root;
+-
+-    if (mem_path) {
+-        mainrampagesize = gethugepagesize(mem_path);
+-    } else {
+-        mainrampagesize = getpagesize();
+-    }
+-
+-    /* it's possible we have memory-backend objects with
+-     * hugepage-backed RAM. these may get mapped into system
+-     * address space via -numa parameters or memory hotplug
+-     * hooks. we want to take these into account, but we
+-     * also want to make sure these supported hugepage
+-     * sizes are applicable across the entire range of memory
+-     * we may boot from, so we take the min across all
+-     * backends, and assume normal pages in cases where a
+-     * backend isn't backed by hugepages.
+-     */
+-    memdev_root = object_resolve_path("/objects", NULL);
+-    if (memdev_root) {
+-        object_child_foreach(memdev_root, find_max_supported_pagesize, &hpsize);
+-    }
+-    if (hpsize == LONG_MAX) {
+-        /* No additional memory regions found ==> Report main RAM page size */
+-        return mainrampagesize;
+-    }
+-
+-    /* If NUMA is disabled or the NUMA nodes are not backed with a
+-     * memory-backend, then there is at least one node using "normal" RAM,
+-     * so if its page size is smaller we have got to report that size instead.
+-     */
+-    if (hpsize > mainrampagesize &&
+-        (nb_numa_nodes == 0 || numa_info[0].node_memdev == NULL)) {
+-        static bool warned;
+-        if (!warned) {
+-            error_report("Huge page support disabled (n/a for main memory).");
+-            warned = true;
+-        }
+-        return mainrampagesize;
+-    }
+-
+-    return hpsize;
+-}
+-
+ static bool kvm_valid_page_size(uint32_t flags, long rampgsize, uint32_t shift)
+ {
+     if (!(flags & KVM_PPC_PAGE_SIZES_REAL)) {
+@@ -460,7 +361,7 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
      }
  
-     /* 4. Locate the PTE in the hash table */
-     ptex = ppc_hash64_htab_lookup(cpu, slb, eaddr, &pte, &apshift);
-     if (ptex == -1) {
--        dsisr = 0x40000000;
-         if (rwx == 2) {
--            ppc_hash64_set_isi(cs, env, dsisr);
-+            ppc_hash64_set_isi(cs, env, SRR1_NOPTE);
-         } else {
-+            int dsisr = DSISR_NOPTE;
-             if (rwx == 1) {
--                dsisr |= 0x02000000;
-+                dsisr |= DSISR_ISSTORE;
-             }
-             ppc_hash64_set_dsi(cs, env, eaddr, dsisr);
-         }
-@@ -827,15 +827,15 @@ skip_slb_search:
-             }
-             ppc_hash64_set_isi(cs, env, srr1);
-         } else {
--            dsisr = 0;
-+            int dsisr = 0;
-             if (need_prot[rwx] & ~pp_prot) {
--                dsisr |= 0x08000000;
-+                dsisr |= DSISR_PROTFAULT;
-             }
-             if (rwx == 1) {
--                dsisr |= 0x02000000;
-+                dsisr |= DSISR_ISSTORE;
-             }
-             if (need_prot[rwx] & ~amr_prot) {
--                dsisr |= 0x00200000;
-+                dsisr |= DSISR_AMR;
-             }
-             ppc_hash64_set_dsi(cs, env, eaddr, dsisr);
-         }
+     if (!max_cpu_page_size) {
+-        max_cpu_page_size = getrampagesize();
++        max_cpu_page_size = qemu_getrampagesize();
+     }
+ 
+     /* Convert to QEMU form */
+@@ -521,7 +422,7 @@ bool kvmppc_is_mem_backend_page_size_ok(char *obj_path)
+     long pagesize;
+ 
+     if (mempath) {
+-        pagesize = gethugepagesize(mempath);
++        pagesize = qemu_mempath_getpagesize(mempath);
+     } else {
+         pagesize = getpagesize();
+     }
+@@ -2205,7 +2106,7 @@ uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift)
+     /* Find the largest hardware supported page size that's less than
+      * or equal to the (logical) backing page size of guest RAM */
+     kvm_get_smmu_info(POWERPC_CPU(first_cpu), &info);
+-    rampagesize = getrampagesize();
++    rampagesize = qemu_getrampagesize();
+     best_page_shift = 0;
+ 
+     for (i = 0; i < KVM_PPC_PAGE_SIZES_MAX_SZ; i++) {
+diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
+index 2f55f5e..3ec029a 100644
+--- a/util/mmap-alloc.c
++++ b/util/mmap-alloc.c
+@@ -40,6 +40,31 @@ size_t qemu_fd_getpagesize(int fd)
+     return getpagesize();
+ }
+ 
++size_t qemu_mempath_getpagesize(const char *mem_path)
++{
++#ifdef CONFIG_LINUX
++    struct statfs fs;
++    int ret;
++
++    do {
++        ret = statfs(mem_path, &fs);
++    } while (ret != 0 && errno == EINTR);
++
++    if (ret != 0) {
++        fprintf(stderr, "Couldn't statfs() memory path: %s\n",
++                strerror(errno));
++        exit(1);
++    }
++
++    if (fs.f_type == HUGETLBFS_MAGIC) {
++        /* It's hugepage, return the huge page size */
++        return fs.f_bsize;
++    }
++#endif
++
++    return getpagesize();
++}
++
+ void *qemu_ram_mmap(int fd, size_t size, size_t align, bool shared)
+ {
+     /*
 -- 
 2.9.3
