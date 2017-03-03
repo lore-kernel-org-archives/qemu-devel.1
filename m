@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cjq8S-0005nF-Vk
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:32:54 -0500
+	(envelope-from <eblake@redhat.com>) id 1cjq9U-0006gp-94
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:33:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cjq8P-00037t-SE
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:32:53 -0500
-Resent-Message-Id: <E1cjq8P-00037t-SE@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21376)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cjq8P-00037g-Kw
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:32:49 -0500
-In-Reply-To: <1488558530-21016-1-git-send-email-pbonzini@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148855875112.285.17233717544814027437@0e2666bad730>
+	(envelope-from <eblake@redhat.com>) id 1cjq9R-0003PJ-4Q
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:33:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43608)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cjq9Q-0003P0-Rz
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:33:53 -0500
+References: <148855786023.23661.6584039229850547004.stgit@bahia>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6ddaeaaa-16e0-eb07-6652-1daac5b05696@redhat.com>
+Date: Fri, 3 Mar 2017 10:33:50 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 3 Mar 2017 08:32:31 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] hppa: avoid anonymous unions in designated
- initializers.
+In-Reply-To: <148855786023.23661.6584039229850547004.stgit@bahia>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="IqwrRNMffomBiO2M7VbjalVrTBAXDjF4p"
+Subject: Re: [Qemu-devel] [PATCH] 9pfs: fix bogus fd check in local_remove()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +27,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, rth@twiddle.net
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ4
-ODU1ODUzMC0yMTAxNi0xLWdpdC1zZW5kLWVtYWlsLXBib256aW5pQHJlZGhhdC5jb20KVHlwZTog
-c2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIGhwcGE6IGF2b2lkIGFub255bW91
-cyB1bmlvbnMgaW4gZGVzaWduYXRlZCBpbml0aWFsaXplcnMuCgo9PT0gVEVTVCBTQ1JJUFQgQkVH
-SU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxp
-bmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
-ZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJB
-U0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4v
-JHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBz
-aG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFj
-ayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChu
-KzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5n
-IDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dp
-dGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hl
-dy8xNDg4NTU4NTMwLTIxMDE2LTEtZ2l0LXNlbmQtZW1haWwtcGJvbnppbmlAcmVkaGF0LmNvbSAt
-PiBwYXRjaGV3LzE0ODg1NTg1MzAtMjEwMTYtMS1naXQtc2VuZC1lbWFpbC1wYm9uemluaUByZWRo
-YXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMGVhYWE5ZiBocHBhOiBhdm9p
-ZCBhbm9ueW1vdXMgdW5pb25zIGluIGRlc2lnbmF0ZWQgaW5pdGlhbGl6ZXJzLgoKPT09IE9VVFBV
-VCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBocHBhOiBhdm9pZCBhbm9ueW1vdXMgdW5p
-b25zIGluIGRlc2lnbmF0ZWQgaW5pdGlhbGl6ZXJzLi4uLgpFUlJPUjogTWFjcm9zIHdpdGggY29t
-cGxleCB2YWx1ZXMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lzCiMxNjE6IEZJTEU6
-IHRhcmdldC9ocHBhL3RyYW5zbGF0ZS5jOjMzNDM6CisjZGVmaW5lIEZPUF9ERUQgIHRyYW5zX2Zv
-cF9kZWQsIC5mLmRlZAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBi
-ZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMTYyOiBGSUxFOiB0YXJnZXQvaHBwYS90cmFuc2xh
-dGUuYzozMzQ0OgorI2RlZmluZSBGT1BfREVERCB0cmFuc19mb3BfZGVkZCwgLmYuZGVkZAoKRVJS
-T1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJl
-bnRoZXNpcwojMTY4OiBGSUxFOiB0YXJnZXQvaHBwYS90cmFuc2xhdGUuYzozMzQ2OgorI2RlZmlu
-ZSBGT1BfV0VXICB0cmFuc19mb3Bfd2V3XzBjLCAuZi53ZXcKCkVSUk9SOiBNYWNyb3Mgd2l0aCBj
-b21wbGV4IHZhbHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMKIzE2OTogRklM
-RTogdGFyZ2V0L2hwcGEvdHJhbnNsYXRlLmM6MzM0NzoKKyNkZWZpbmUgRk9QX0RFVyAgdHJhbnNf
-Zm9wX2Rld18wYywgLmYuZGV3CgpFUlJPUjogTWFjcm9zIHdpdGggY29tcGxleCB2YWx1ZXMgc2hv
-dWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lzCiMxNzA6IEZJTEU6IHRhcmdldC9ocHBhL3Ry
-YW5zbGF0ZS5jOjMzNDg6CisjZGVmaW5lIEZPUF9XRUQgIHRyYW5zX2ZvcF93ZWRfMGMsIC5mLndl
-ZAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBp
-biBwYXJlbnRoZXNpcwojMTcxOiBGSUxFOiB0YXJnZXQvaHBwYS90cmFuc2xhdGUuYzozMzQ5Ogor
-I2RlZmluZSBGT1BfV0VXVyB0cmFuc19mb3Bfd2V3d18wYywgLmYud2V3dwoKRVJST1I6IE1hY3Jv
-cyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwoj
-MTgzOiBGSUxFOiB0YXJnZXQvaHBwYS90cmFuc2xhdGUuYzozNDI4OgorI2RlZmluZSBGT1BfV0VX
-ICB0cmFuc19mb3Bfd2V3XzBlLCAuZi53ZXcKCkVSUk9SOiBNYWNyb3Mgd2l0aCBjb21wbGV4IHZh
-bHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMKIzE4NDogRklMRTogdGFyZ2V0
-L2hwcGEvdHJhbnNsYXRlLmM6MzQyOToKKyNkZWZpbmUgRk9QX0RFVyAgdHJhbnNfZm9wX2Rld18w
-ZSwgLmYuZGV3CgpFUlJPUjogTWFjcm9zIHdpdGggY29tcGxleCB2YWx1ZXMgc2hvdWxkIGJlIGVu
-Y2xvc2VkIGluIHBhcmVudGhlc2lzCiMxODU6IEZJTEU6IHRhcmdldC9ocHBhL3RyYW5zbGF0ZS5j
-OjM0MzA6CisjZGVmaW5lIEZPUF9XRUQgIHRyYW5zX2ZvcF93ZWRfMGUsIC5mLndlZAoKRVJST1I6
-IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRo
-ZXNpcwojMTg2OiBGSUxFOiB0YXJnZXQvaHBwYS90cmFuc2xhdGUuYzozNDMxOgorI2RlZmluZSBG
-T1BfV0VXVyB0cmFuc19mb3Bfd2V3d18wZSwgLmYud2V3dwoKdG90YWw6IDEwIGVycm9ycywgMCB3
-YXJuaW5ncywgMTU3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNv
-ZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0
-cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1k
-ZXZlbEBmcmVlbGlzdHMub3Jn
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--IqwrRNMffomBiO2M7VbjalVrTBAXDjF4p
+From: Eric Blake <eblake@redhat.com>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Message-ID: <6ddaeaaa-16e0-eb07-6652-1daac5b05696@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] 9pfs: fix bogus fd check in local_remove()
+References: <148855786023.23661.6584039229850547004.stgit@bahia>
+In-Reply-To: <148855786023.23661.6584039229850547004.stgit@bahia>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 03/03/2017 10:17 AM, Greg Kurz wrote:
+> This was spotted by Coverity as a fd leak. This is certainly true, but =
+also
+> local_remove() would always return without doing anything, unless the f=
+d is
+> zero, which is very unlikely.
+>=20
+> (Coverity issue CID1371732)
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>  hw/9pfs/9p-local.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+> diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+> index f22a3c3654db..5db7104334d6 100644
+> --- a/hw/9pfs/9p-local.c
+> +++ b/hw/9pfs/9p-local.c
+> @@ -1008,7 +1008,7 @@ static int local_remove(FsContext *ctx, const cha=
+r *path)
+>      int err =3D -1;
+> =20
+>      dirfd =3D local_opendir_nofollow(ctx, dirpath);
+> -    if (dirfd) {
+> +    if (dirfd =3D=3D -1) {
+>          goto out;
+>      }
+> =20
+>=20
+>=20
+>=20
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--IqwrRNMffomBiO2M7VbjalVrTBAXDjF4p
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEbBAEBCAAGBQJYuZruAAoJEKeha0olJ0NqGmMH+JFpjtZMJx6tkeOKp8Z5DUa5
+g+Topj3P0Y3xm/FmWQ02Aeda0nLBylzZBxVhgvd8YB7sF+CHScqrHYisYPRTtI4O
+1YoV+OJSJVFCXlijT7eYhrBC1Gtejwsoi2PNTecQPWFPtjBTkz5tgicjySm5HJZf
+WNpBnM9XZIOukAVDGbKzg6/bTMs4iiPs6lJhID0ghQCZpfTrYz+GYuX7TLadzlLm
+bHiv5PgZ2lrqUfWLDSGD3j1qHuojpVkEoMKoc0TIPnlkZg08ulZ05zwP1HGj5Ypr
+hNhBENo0ekTr6PE7fVO3IE6j7mqgdFQGKpHiwEJEWuBhFHej0zvCE5MC96r/ZA==
+=9VkF
+-----END PGP SIGNATURE-----
+
+--IqwrRNMffomBiO2M7VbjalVrTBAXDjF4p--
