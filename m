@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cjmpX-0005L6-LD
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:01:08 -0500
+	(envelope-from <thuth@redhat.com>) id 1cjmtb-0008DO-Qw
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:05:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cjmpP-0002dK-3t
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:01:03 -0500
-Received: from mailapp01.imgtec.com ([195.59.15.196]:23109)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1cjmpO-0002bq-MA
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:00:58 -0500
-References: <20170302195337.31558-1-alex.bennee@linaro.org>
-	<20170302195337.31558-10-alex.bennee@linaro.org>
-	<5a5bfbf9-4935-7b21-ce93-77887581642b@imgtec.com>
-	<87o9xi1px9.fsf@linaro.org>
-From: Yongbok Kim <yongbok.kim@imgtec.com>
-Message-ID: <0e41c5e6-b8b2-3d83-79c9-873f1a7c96bd@imgtec.com>
-Date: Fri, 3 Mar 2017 13:00:49 +0000
+	(envelope-from <thuth@redhat.com>) id 1cjmtW-0004FZ-SA
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:05:19 -0500
+References: <1488545463-19776-1-git-send-email-clg@kaod.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <82fccacc-4e94-6293-7839-30b96131d719@redhat.com>
+Date: Fri, 3 Mar 2017 14:05:11 +0100
 MIME-Version: 1.0
-In-Reply-To: <87o9xi1px9.fsf@linaro.org>
-Content-Type: text/plain; charset="windows-1252"
+In-Reply-To: <1488545463-19776-1-git-send-email-clg@kaod.org>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 09/11] target/mips/op_helper: hold BQL
- before calling cpu_mips_get_count
+Subject: Re: [Qemu-devel] [PATCH] ppc/xics: register reset handlers for the
+ ICP and ICS objects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +23,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: peter.maydell@linaro.org, rth@twiddle.net, pbonzini@redhat.com, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, Aurelien Jarno <aurelien@aurel32.net>
+To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
+On 03.03.2017 13:51, C=C3=A9dric Le Goater wrote:
+> The recent changes on the XICS layer removed the XICSState object to
+> let the sPAPR machine handle the ICP and ICS directly. The reset of
+> these objects was previously handled by XICSState, which was a SysBus
+> device, and to keep the same behavior, the ICP and ICS were assigned
+> to SysbBus.
+>=20
+> But that broke the 'info qtree' command in the monitor. 'qtree'
+> performs a loop on the children of a bus to print their properties and
+> SysBus devices are expected to be found under SysBus, which is not the
+> case anymore.
+>=20
+> The fix for this problem is to register reset handlers for the ICP and
+> ICS objects and stop using SysBus for such devices.
+>=20
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
+>  hw/intc/xics.c     | 10 ++++++----
+>  hw/intc/xics_kvm.c | 15 ++++++++++-----
+>  hw/ppc/spapr.c     |  2 --
+>  3 files changed, 16 insertions(+), 11 deletions(-)
+>=20
+> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+> index ffc0747c7fa2..e740989a1162 100644
+> --- a/hw/intc/xics.c
+> +++ b/hw/intc/xics.c
+> @@ -333,7 +333,7 @@ static const VMStateDescription vmstate_icp_server =
+=3D {
+>      },
+>  };
+> =20
+> -static void icp_reset(DeviceState *dev)
+> +static void icp_reset(void *dev)
+>  {
+>      ICPState *icp =3D ICP(dev);
+> =20
+> @@ -359,6 +359,8 @@ static void icp_realize(DeviceState *dev, Error **e=
+rrp)
+>      }
+> =20
+>      icp->xics =3D XICS_FABRIC(obj);
+> +
+> +    qemu_register_reset(icp_reset, dev);
+>  }
+> =20
+> =20
+> @@ -366,7 +368,6 @@ static void icp_class_init(ObjectClass *klass, void=
+ *data)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> =20
+> -    dc->reset =3D icp_reset;
+>      dc->vmsd =3D &vmstate_icp_server;
+>      dc->realize =3D icp_realize;
+>  }
+> @@ -522,7 +523,7 @@ static void ics_simple_eoi(ICSState *ics, uint32_t =
+nr)
+>      }
+>  }
+> =20
+> -static void ics_simple_reset(DeviceState *dev)
+> +static void ics_simple_reset(void *dev)
+>  {
+>      ICSState *ics =3D ICS_SIMPLE(dev);
+>      int i;
+> @@ -611,6 +612,8 @@ static void ics_simple_realize(DeviceState *dev, Er=
+ror **errp)
+>      }
+>      ics->irqs =3D g_malloc0(ics->nr_irqs * sizeof(ICSIRQState));
+>      ics->qirqs =3D qemu_allocate_irqs(ics_simple_set_irq, ics, ics->nr=
+_irqs);
+> +
+> +    qemu_register_reset(ics_simple_reset, dev);
+>  }
+> =20
+>  static Property ics_simple_properties[] =3D {
+> @@ -626,7 +629,6 @@ static void ics_simple_class_init(ObjectClass *klas=
+s, void *data)
+>      isc->realize =3D ics_simple_realize;
+>      dc->props =3D ics_simple_properties;
+>      dc->vmsd =3D &vmstate_ics_simple;
+> -    dc->reset =3D ics_simple_reset;
+>      isc->reject =3D ics_simple_reject;
+>      isc->resend =3D ics_simple_resend;
+>      isc->eoi =3D ics_simple_eoi;
+> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+> index 0a3daca3bb5a..42e0e0ef8484 100644
+> --- a/hw/intc/xics_kvm.c
+> +++ b/hw/intc/xics_kvm.c
+> @@ -102,7 +102,7 @@ static int icp_set_kvm_state(ICPState *icp, int ver=
+sion_id)
+>      return 0;
+>  }
+> =20
+> -static void icp_kvm_reset(DeviceState *dev)
+> +static void icp_kvm_reset(void *dev)
+>  {
+>      ICPState *icp =3D ICP(dev);
+> =20
+> @@ -146,12 +146,17 @@ static void icp_kvm_cpu_setup(ICPState *icp, Powe=
+rPCCPU *cpu)
+>      icp->cap_irq_xics_enabled =3D true;
+>  }
+> =20
+> +static void icp_kvm_realize(DeviceState *dev, Error **errp)
+> +{
+> +    qemu_register_reset(icp_kvm_reset, dev);
+> +}
+> +
+>  static void icp_kvm_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+>      ICPStateClass *icpc =3D ICP_CLASS(klass);
+> =20
+> -    dc->reset =3D icp_kvm_reset;
+> +    dc->realize =3D icp_kvm_realize;
+>      icpc->pre_save =3D icp_get_kvm_state;
+>      icpc->post_load =3D icp_set_kvm_state;
+>      icpc->cpu_setup =3D icp_kvm_cpu_setup;
+> @@ -293,7 +298,7 @@ static void ics_kvm_set_irq(void *opaque, int srcno=
+, int val)
+>      }
+>  }
+> =20
+> -static void ics_kvm_reset(DeviceState *dev)
+> +static void ics_kvm_reset(void *dev)
+>  {
+>      ICSState *ics =3D ICS_SIMPLE(dev);
+>      int i;
+> @@ -324,15 +329,15 @@ static void ics_kvm_realize(DeviceState *dev, Err=
+or **errp)
+>      }
+>      ics->irqs =3D g_malloc0(ics->nr_irqs * sizeof(ICSIRQState));
+>      ics->qirqs =3D qemu_allocate_irqs(ics_kvm_set_irq, ics, ics->nr_ir=
+qs);
+> +
+> +    qemu_register_reset(ics_kvm_reset, dev);
+>  }
+> =20
+>  static void ics_kvm_class_init(ObjectClass *klass, void *data)
+>  {
+> -    DeviceClass *dc =3D DEVICE_CLASS(klass);
+>      ICSStateClass *icsc =3D ICS_BASE_CLASS(klass);
+> =20
+>      icsc->realize =3D ics_kvm_realize;
+> -    dc->reset =3D ics_kvm_reset;
+>      icsc->pre_save =3D ics_get_kvm_state;
+>      icsc->post_load =3D ics_set_kvm_state;
+>  }
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 14192accf486..c3bb99160545 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -106,7 +106,6 @@ static int try_create_xics(sPAPRMachineState *spapr=
+, const char *type_ics,
+>      int i;
+> =20
+>      ics =3D ICS_SIMPLE(object_new(type_ics));
+> -    qdev_set_parent_bus(DEVICE(ics), sysbus_get_default());
+>      object_property_add_child(OBJECT(spapr), "ics", OBJECT(ics), NULL)=
+;
+>      object_property_set_int(OBJECT(ics), nr_irqs, "nr-irqs", &err);
+>      object_property_add_const_link(OBJECT(ics), "xics", OBJECT(xi), NU=
+LL);
+> @@ -123,7 +122,6 @@ static int try_create_xics(sPAPRMachineState *spapr=
+, const char *type_ics,
+>          ICPState *icp =3D &spapr->icps[i];
+> =20
+>          object_initialize(icp, sizeof(*icp), type_icp);
+> -        qdev_set_parent_bus(DEVICE(icp), sysbus_get_default());
+>          object_property_add_child(OBJECT(spapr), "icp[*]", OBJECT(icp)=
+, NULL);
+>          object_property_add_const_link(OBJECT(icp), "xics", OBJECT(xi)=
+, NULL);
+>          object_property_set_bool(OBJECT(icp), true, "realized", &err);
 
-
-On 03/03/2017 12:54, Alex Benn=E9e wrote:
->=20
-> Yongbok Kim <yongbok.kim@imgtec.com> writes:
->=20
->> On 02/03/2017 19:53, Alex Benn=E9e wrote:
->>> We should hold the BQL before we transition to HW emulation. This is
->>> because all HW emulation needs to be serialised under MTTCG
->>> conditions. This is picked up by asserts that fire when
->>> cpu_mips_get_count triggers and IRQ.
->>>
->>> Reported-by: Yongbok Kim <yongbok.kim@imgtec.com>
->>> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
->>
->> Hi Alex,
->>
->> Thanks for this but it is required to have few more locks.
->> I will send the patch shortly. Please merge it into your patchset.
->=20
-> Thanks, I'll look out for it.
->=20
-> Have you been tracking the MTTCG work? Once the BQL issues are sorted a=
-s
-> long as atomics, barriers and tlb flushes are updated you can turn on
-> mttcg by default.
->=20
->=20
-
-Yes I have MIPS patches for MTTCG but it has not been rebased to the late=
-st
-version yet. I will send it after 2.9.
-
-Regards,
-Yongbok
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Tested-by: Thomas Huth <thuth@redhat.com>
