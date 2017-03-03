@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cjqCj-00014U-L7
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:37:19 -0500
+	(envelope-from <programmingkidx@gmail.com>) id 1cjqEU-0002aI-Mg
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:39:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cjqCi-0004lU-Mp
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:37:17 -0500
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:33397)
+	(envelope-from <programmingkidx@gmail.com>) id 1cjqER-0005B7-IY
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:39:06 -0500
+Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:35686)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cjqCi-0004km-ED
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:37:16 -0500
-Received: by mail-wr0-x234.google.com with SMTP id u48so77378356wrc.0
-	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 08:37:16 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8oG+uODONjXpeAWpNxcmWfoxEbK31LksrLUQp5kbupgA@mail.gmail.com>
-References: <1488320775-9849-1-git-send-email-armbru@redhat.com>
-	<CAFEAcA8WXnBXQ-qNmzRw6yD_tuYLQepmSC0be50s8h=-1r-VQw@mail.gmail.com>
-	<CAFEAcA8oG+uODONjXpeAWpNxcmWfoxEbK31LksrLUQp5kbupgA@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 Mar 2017 16:36:54 +0000
-Message-ID: <CAFEAcA9sbqvqbe2T+W7HtTkdsnCWTHDf6EqtJ_2GGUjtKz64ug@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 00/24] block: Command line option -blockdev
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1cjqER-0005B1-CI
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:39:03 -0500
+Received: by mail-io0-x243.google.com with SMTP id f103so7281782ioi.2
+	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 08:39:03 -0800 (PST)
+In-Reply-To: <20170303162128.GD13631@redhat.com>
+References: <mailman.56273.1488553194.22740.qemu-devel@nongnu.org>
+	<8FB6923C-8F97-497C-95DC-6F2D937725BC@gmail.com>
+	<20170303164426.42472535@bahia.lan>
+	<AA7BADA2-06D5-4A20-A38F-57D374B6C58D@gmail.com>
+	<20170303162128.GD13631@redhat.com>
+Mime-Version: 1.0 (Apple Message framework v753.1)
+Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
+Message-Id: <7107E67A-8112-42BA-98F5-D0B82163E9ED@gmail.com>
+Content-Transfer-Encoding: 7bit
+From: G 3 <programmingkidx@gmail.com>
+Date: Fri, 3 Mar 2017 11:38:58 -0500
+Subject: Re: [Qemu-devel] git master build failure in 9pfs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,129 +33,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Greg Kurz <groug@kaod.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-On 3 March 2017 at 16:31, Peter Maydell <peter.maydell@linaro.org> wrote:
-> x86-64 Linux host:
+
+On Mar 3, 2017, at 11:21 AM, Daniel P. Berrange wrote:
+
+> On Fri, Mar 03, 2017 at 10:55:01AM -0500, G 3 wrote:
+>>
+>> On Mar 3, 2017, at 10:44 AM, Greg Kurz wrote:
+>>
+>>> On Fri, 3 Mar 2017 10:28:00 -0500
+>>> G 3 <programmingkidx@gmail.com> wrote:
+>>>
+>>>> On Mar 3, 2017, at 9:59 AM, qemu-devel-request@nongnu.org wrote:
+>>>>> On 02/03/17 17:40, Daniel P. Berrange wrote:
+>>>>>
+>>>>>> On Thu, Mar 02, 2017 at 05:28:24PM +0000, Mark Cave-Ayland wrote:
+>>>>>>> Does anyone else see the following error when trying to build  
+>>>>>>> git
+>>>>>>> master?
+>>>>>>>
+>>>>>>> cc -I/home/build/src/qemu/git/qemu/hw/9pfs -Ihw/9pfs
+>>>>>>> -I/home/build/src/qemu/git/qemu/tcg
+>>>>>>> -I/home/build/src/qemu/git/qemu/tcg/i386
+>>>>>>> -I/home/build/src/qemu/git/qemu/linux-headers
+>>>>>>> -I/home/build/src/qemu/git/qemu/linux-headers -I.
+>>>>>>> -I/home/build/src/qemu/git/qemu -I/home/build/src/qemu/git/qemu/
+>>>>>>> include
+>>>>>>> -I/usr/include/pixman-1
+>>>>>>> -I/home/build/src/qemu/git/qemu/dtc/libfdt
+>>>>>>> -Werror -pthread -I/usr/include/glib-2.0
+>>>>>>> -I/usr/lib/x86_64-linux-gnu/glib-2.0/include   -m64 -mcx16 -
+>>>>>>> D_GNU_SOURCE
+>>>>>>> -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes
+>>>>>>> -Wredundant-decls -Wall -Wundef -Wwrite-strings
+>>>>>>> -Wmissing-prototypes
+>>>>>>> -fno-strict-aliasing -fno-common -fwrapv  -Wendif-labels
+>>>>>>> -Wno-missing-include-dirs -Wempty-body -Wnested-externs
+>>>>>>> -Wformat-security -Wformat-y2k -Winit-self -Wignored-qualifiers
+>>>>>>> -Wold-style-declaration -Wold-style-definition -Wtype-limits
+>>>>>>> -fstack-protector-all -I/usr/include/p11-kit-1
+>>>>>>> -I/usr/include/libpng12   -I/home/build/src/qemu/git/qemu/ 
+>>>>>>> tests -
+>>>>>>> MMD -MP
+>>>>>>> -MT hw/9pfs/9p-util.o -MF hw/9pfs/9p-util.d -O2 - 
+>>>>>>> U_FORTIFY_SOURCE
+>>>>>>> -D_FORTIFY_SOURCE=2 -g   -c -o hw/9pfs/9p-util.o hw/9pfs/9p- 
+>>>>>>> util.c
+>>>>>>> In file included from hw/9pfs/9p-util.c:15:0:
+>>>>>>> hw/9pfs/9p-util.h: In function ?openat_dir?:
+>>>>>>> hw/9pfs/9p-util.h:25:57: error: ?O_PATH? undeclared (first  
+>>>>>>> use in
+>>>>>>> this
+>>>>>>> function)
+>>>>>>> hw/9pfs/9p-util.h:25:57: note: each undeclared identifier is
+>>>>>>> reported
+>>>>>>> only once for each function it appears in
+>>>>>>> hw/9pfs/9p-util.h:26:1: error: control reaches end of non-void
+>>>>>>> function
+>>>>>>> [-Werror=return-type]
+>>>>>>>
+>>>>>>> Build platform is Debian Wheezy on an x86_64 host.
+>>>>>>
+>>>>>> IIUC, O_PATH was introduced in glibc 2.14 and Wheezy only has  
+>>>>>> 2.13.
+>>>>>>
+>>>>>> So unless we want to make this 9pfs code a configurable
+>>>>>> option, this
+>>>>>> means Debian Wheezy is no longer a supportable platform for QEMU.
+>>>>>
+>>>>> Oh sure, I appreciate that wheezy is getting towards then end  
+>>>>> of its
+>>>>> lifetime - it's just a little bit inconvenient to break my
+>>>>> development
+>>>>> environment just as we enter 2.9 freeze ;)
+>>>>>
+>>>>> If everyone agrees that wheezy is no longer supported after 2.9
+>>>>> then I
+>>>>> can look to upgrading, however my QEMU development is done on my
+>>>>> laptop
+>>>>> which is also setup for my day job so it's not a simple case of  
+>>>>> just
+>>>>> switching the repository and running dist-upgrade to get me going
+>>>>> again...
+>>>>
+>>>> I remember years ago something like O_PATH was not defined on  
+>>>> Mac OS
+>>>> X,
+>>>> so the solution was to define the constant as zero. Something like
+>>>> this:
+>>>>
+>>>> #ifndef O_PATH
+>>>> 	#define O_PATH 0
+>>>> #endif
+>>>>
+>>>> Maybe this might work in 9p-util.h.
+>>>>
+>>>
+>>> Yes. Please send a patch and I'll merge it.
+>>>
+>>> Cheers.
+>>>
+>>> --
+>>> Greg
+>>
+>>
+>> Here is the patch. I think we should let Mark or some else test it  
+>> to see if
+>> it does fix the problem before a real patch is submitted.
+>>
+>> ---
+>>  hw/9pfs/9p-util.h | 4 ++++
+>>  1 file changed, 4 insertions(+)
+>>
+>> diff --git a/hw/9pfs/9p-util.h b/hw/9pfs/9p-util.h
+>> index 091f3ce..254d2a9 100644
+>> --- a/hw/9pfs/9p-util.h
+>> +++ b/hw/9pfs/9p-util.h
+>> @@ -13,6 +13,10 @@
+>>  #ifndef QEMU_9P_UTIL_H
+>>  #define QEMU_9P_UTIL_H
+>>
+>> +#ifndef O_PATH
+>> +    #define O_PATH 0
+>> +#endif
 >
-> QTEST_QEMU_BINARY=cris-softmmu/qemu-system-cris
-> QTEST_QEMU_IMG=qemu-img MALLOC_PERTURB_=${MALLOC_PERTURB_:-$((RANDOM %
-> 255 + 1))} gtester -k --verbose -m=quick  tests/qmp-test
-> tests/device-introspect-test tests/qom-test
-> TEST: tests/qmp-test... (pid=31974)
->   /cris/qmp/protocol:
-> Broken pipe
-> FAIL
+> Isn't the use of O_PATH required in order to fix the recent
+> security vulnerability in 9p ?  If so, then defining it to
+> 0 means the QEMU is silently becoming vulnerable once again
+> which I don't think is a good idea.
 
-Failure is intermittent. QEMU_LOG=1 output, failure case:
+I haven't found any documentation that states O_PATH is required
+to keep things secure.
 
-e104462:xenial:all$ QTEST_LOG=1
-QTEST_QEMU_BINARY=cris-softmmu/qemu-system-cris
-QTEST_QEMU_IMG=qemu-img MALLOC_PERTURB_=${MALLOC_PERTURB_:-$((RANDOM %
-255 + 1))} gtester -k --verbose -m=quick  tests/qmp-test
-TEST: tests/qmp-test... (pid=1841)
-  /cris/qmp/protocol:
-[I 1488558847.011696] OPENED
-[R +0.000164] endianness
-[S +0.000179] OK little
-{"QMP": {"version": {"qemu": {"micro": 50, "minor": 8, "major": 2},
-"package": " (vfio-updates-20170223.0-593-gde6e31a-dirty)"},
-"capabilities": []}}{"execute": "query-version"}
+https://lists.gnu.org/archive/html/qemu-devel/2016-08/msg04231.html
+This post does talk about fixing security issues with the 9pfs protocol,
+but there is no mention of the 9p-util.h file.
 
-{"error": {"class": "CommandNotFound", "desc": "Expecting capabilities
-negotiation with 'qmp_capabilities'"}}null
-
-{"error": {"class": "GenericError", "desc": "QMP input must be a JSON
-object"}}{}
-
-{"error": {"class": "GenericError", "desc": "QMP input object lacks
-key 'execute'"}}{"execute": true}
-
-{"error": {"class": "GenericError", "desc": "QMP input object member
-'execute' must be a string"}}{"execute": "no-such-cmd", "arguments":
-[]}
-
-{"error": {"class": "GenericError", "desc": "QMP input object member
-'arguments' must be an object"}}{"extra": true, "execute":
-"no-such-cmd"}
-
-{"error": {"class": "GenericError", "desc": "QMP input object member
-'extra' is unexpected"}}{"execute": "qmp_capabilities"}
-
-Broken pipe
-FAIL
-GTester: last random seed: R02S7b62b97f8c425a4013400ffd29bcf904
-(pid=1846)
-FAIL: tests/qmp-test
-
-
-Success case:
-e104462:xenial:all$ QTEST_LOG=1
-QTEST_QEMU_BINARY=cris-softmmu/qemu-system-cris
-QTEST_QEMU_IMG=qemu-img MALLOC_PERTURB_=${MALLOC_PERTURB_:-$((RANDOM %
-255 + 1))} gtester -k --verbose -m=quick  tests/qmp-test
-TEST: tests/qmp-test... (pid=1836)
-  /cris/qmp/protocol:
-[I 1488558845.027917] OPENED
-[R +0.000181] endianness
-[S +0.000186] OK little
-{"QMP": {"version": {"qemu": {"micro": 50, "minor": 8, "major": 2},
-"package": " (vfio-updates-20170223.0-593-gde6e31a-dirty)"},
-"capabilities": []}}{"execute": "query-version"}
-
-{"error": {"class": "CommandNotFound", "desc": "Expecting capabilities
-negotiation with 'qmp_capabilities'"}}null
-
-{"error": {"class": "GenericError", "desc": "QMP input must be a JSON
-object"}}{}
-
-{"error": {"class": "GenericError", "desc": "QMP input object lacks
-key 'execute'"}}{"execute": true}
-
-{"error": {"class": "GenericError", "desc": "QMP input object member
-'execute' must be a string"}}{"execute": "no-such-cmd", "arguments":
-[]}
-
-{"error": {"class": "GenericError", "desc": "QMP input object member
-'arguments' must be an object"}}{"extra": true, "execute":
-"no-such-cmd"}
-
-{"error": {"class": "GenericError", "desc": "QMP input object member
-'extra' is unexpected"}}{"execute": "qmp_capabilities"}
-
-{"return": {}}{"execute": "qmp_capabilities"}
-
-{"error": {"class": "CommandNotFound", "desc": "Capabilities
-negotiation is already complete, command ignored"}}{"execute":
-"query-version"}
-
-{"return": {"qemu": {"micro": 50, "minor": 8, "major": 2}, "package":
-" (vfio-updates-20170223.0-593-gde6e31a-dirty)"}}null
-
-{"error": {"class": "GenericError", "desc": "QMP input must be a JSON
-object"}}{}
-
-{"error": {"class": "GenericError", "desc": "QMP input object lacks
-key 'execute'"}}{"execute": true}
-
-{"error": {"class": "GenericError", "desc": "QMP input object member
-'execute' must be a string"}}{"execute": "no-such-cmd", "arguments":
-[]}
-
-{"error": {"class": "GenericError", "desc": "QMP input object member
-'arguments' must be an object"}}{"extra": true, "execute":
-"no-such-cmd"}
-
-{"error": {"class": "GenericError", "desc": "QMP input object member
-'extra' is unexpected"}}{"execute": "query-name", "id": "cookie#1"}
-
-{"return": {}, "id": "cookie#1"}{"execute": "human-monitor-command", "id": 2}
-
-{"id": 2, "error": {"class": "GenericError", "desc": "Parameter
-'command-line' is missing"}}[I +0.003521] CLOSED
-OK
-PASS: tests/qmp-test
-
-thanks
--- PMM
+Greg Kurz - do you have an option on O_PATH and security?
