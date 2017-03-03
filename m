@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1cjtXr-0007CL-Dw
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 15:11:20 -0500
+	(envelope-from <eblake@redhat.com>) id 1cjteI-0000Y6-DX
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 15:17:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1cjtXn-0003CR-EH
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 15:11:19 -0500
-Date: Fri, 3 Mar 2017 21:11:05 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <CAFEAcA-PUcPaOPOXXhab1N=YAHja0xCf5yaZYm5m0p1=j6A=WA@mail.gmail.com>
-Message-ID: <alpine.BSF.2.20.1703032100430.14293@zero.eik.bme.hu>
-References: <cover.1488068248.git.balaton@eik.bme.hu>
-	<6b70a9dfe56c3a0dc8e874c45d70612aff7b8e3a.1488068248.git.balaton@eik.bme.hu>
-	<CAFEAcA9FL-sshVzKewf+rCs6-5_c2Y86Qy0b=3DMog4MrVOpwA@mail.gmail.com>
-	<alpine.BSF.2.20.1703030259350.33600@zero.eik.bme.hu>
-	<CAFEAcA-PUcPaOPOXXhab1N=YAHja0xCf5yaZYm5m0p1=j6A=WA@mail.gmail.com>
+	(envelope-from <eblake@redhat.com>) id 1cjteH-0005eb-DS
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 15:17:58 -0500
+References: <1488491046-2549-1-git-send-email-armbru@redhat.com>
+	<1488491046-2549-10-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4beb50ce-6d43-2a42-edb1-1e317f3d262a@redhat.com>
+Date: Fri, 3 Mar 2017 14:17:47 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH v2 07/14] sm501: Fix device endianness
+In-Reply-To: <1488491046-2549-10-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="VtcholdqL91spOvtD26474guFE9eiHAT7"
+Subject: Re: [Qemu-devel] [PATCH 09/15] sheepdog: Implement
+ bdrv_parse_filename()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,70 +25,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, qemu-block@nongnu.org, namei.unix@gmail.com
 
-On Fri, 3 Mar 2017, Peter Maydell wrote:
-> On 3 March 2017 at 02:15, BALATON Zoltan <balaton@eik.bme.hu> wrote:
->> Maybe it's not correct but works for everything I could test better than the
->> original code (which was broken even for the SH images one can find) so I
->> think we could just go with this until someone complains and provides a test
->> case. I've given up on trying to understand it because I don't really know
->> this device and SH so I could only go by the images I could find and they
->> seem to like it this way.
->
-> So what cases have you tested? The Linux kernel seems to support:
-> * sh embedded device, little endian
-> * PCI card, little endian host
-> * PCI card, big endian host
-> and there are also
-> * 16 bit pixel format
-> * 32 bit pixel format
->
-> which makes 6 different combinations.
-> (It's a shame there's no sh4 BE code to run on this.)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--VtcholdqL91spOvtD26474guFE9eiHAT7
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com,
+ qemu-block@nongnu.org, namei.unix@gmail.com
+Message-ID: <4beb50ce-6d43-2a42-edb1-1e317f3d262a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 09/15] sheepdog: Implement
+ bdrv_parse_filename()
+References: <1488491046-2549-1-git-send-email-armbru@redhat.com>
+ <1488491046-2549-10-git-send-email-armbru@redhat.com>
+In-Reply-To: <1488491046-2549-10-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-As mentioned before I've used this image to test SH:
+On 03/02/2017 03:44 PM, Markus Armbruster wrote:
+> This permits configuration with driver-specific options in addition to
+> pseudo-filename parsed as URI.  For instance,
+>=20
+>     --drive driver=3Dsheepdog,host=3Dfido,vdi=3Ddolly
+>=20
+> instead of
+>=20
+>     --drive driver=3Dsheepdog,file=3Dsheepdog://fido/dolly
+>=20
+> It's also a first step towards supporting blockdev-add.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  block/sheepdog.c | 233 +++++++++++++++++++++++++++++++++++++++++------=
+--------
+>  1 file changed, 176 insertions(+), 57 deletions(-)
+>=20
 
-https://people.debian.org/~aurel32/qemu/sh4/
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-with video=800x600-16 kernel parameter where changing -16 to different bit 
-depths (8, 32) reproduces the problem. On ppc I've tested with MorphOS 
-which uses 16 bpp, Linux and U-boot which I think uses 8 bit. These run on 
-real hardware so I think if they work the emulation should be OK.
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-You've said before that PCI is likely always little endian and SH embedded 
-is LE too so unless something uses the device in BE mode (which we don't 
-emulate) setting it to little endian should be correct. For frame buffer 
-endianness I can only go with what I've seen clients doing and my patch 
-does what worked for the above on SH and PPC. I can't prove it's correct 
-but works for the systems I've targeted and also fixes the SH case which 
-seemed to be broken.
 
->>> Looking at how the SWAP_FB_ENDIAN flag gets set:
->>> * for the r2d board it is set always
->>> * for PCI devices, it is set only if big-endian
->>>
->>> I suspect that what we actually have here is something
->>> like:
->>> * for the PCI device it's always little endian (and the
->>>   code ought not to need to depend on TARGET_WORDS_BIGENDIAN)
->>> * sysbus device may be more complicated
->>>
->>> Also I note there's an SM501_ENDIAN_CONTROL register on the
->>> device, which presumably if written changes the behaviour.
->
->> I've seen this but it's not emulated so it can be ignored for now. The spec
->> also says that default is little endian so for regs at least
->> DEVICE_LITTLE_ENDIAN should be OK.
->
-> Yes, that makes sense. So we should be modelling this as an "always
-> little endian device".
->
-> The changes you have to the memory region ops achieve this for
-> the registers implemented in this device itself. It looks like
-> SYSBUS_OHCI is already always little endian. You also need to
-> change the argument to the serial_mm_init() call to pass
-> DEVICE_LITTLE_ENDIAN.
+--VtcholdqL91spOvtD26474guFE9eiHAT7
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-OK, will do that.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYuc9rAAoJEKeha0olJ0NqoVYH/26JTsHYAmOEeN4qWjnKj4MU
+oZoyy/8pwpvMcMiXkiGG+vwS3dM2YQFRvwfCxqcq26f7/azTm8nmO9IJ7o3/lq/k
+CyUfzBP6llHGvZWo10UTO7XpHZUu3DceYVtTA1Q68FgyLfxWXFrAp+zs6hmIoPX4
+Tuq2v/mnP1s5skMTmiqk/ft1ixCbBA33qzS7U4yDUbmGmRHbgZUD5JnevOMGpT8V
+aofw3me8BFwj+6RrmXUJnkbASF+NSrw0ajHpRLyny4kq4R2pM20RP3tAyIm7LQyN
+SXhvRCXBGmEsSVzjd2XeU3ByKdIQCFM0KOAb3qwzIOZjUKImGNuAW2MGupXvnLw=
+=mQoK
+-----END PGP SIGNATURE-----
+
+--VtcholdqL91spOvtD26474guFE9eiHAT7--
