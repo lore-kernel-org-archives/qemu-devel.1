@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cjqRM-0001mc-9B
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:52:25 -0500
+	(envelope-from <berrange@redhat.com>) id 1cjqRR-0001od-IA
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:52:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cjqRH-00027W-DK
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:52:24 -0500
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:33222)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cjqRH-00027J-5k
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:52:19 -0500
-Received: by mail-qk0-x241.google.com with SMTP id j127so10379299qke.0
-	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 08:52:19 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1487248176-29602-1-git-send-email-dmitry@daynix.com>
-	<1487248176-29602-2-git-send-email-dmitry@daynix.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <954f8f71-4a6e-7e75-3c60-91ffbc322331@amsat.org>
-Date: Fri, 3 Mar 2017 13:52:13 -0300
+	(envelope-from <berrange@redhat.com>) id 1cjqRN-000286-PX
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:52:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51616)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cjqRN-000280-HM
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:52:25 -0500
+Date: Fri, 3 Mar 2017 16:52:18 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170303165218.GI13631@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1488517304-23131-1-git-send-email-he.chen@linux.intel.com>
+	<20170303135704.GX2778@thinpad.lan.raisama.net>
+	<d93b2ebb-c5a3-a774-30fd-2d92c7703549@redhat.com>
+	<20170303162611.GE13631@redhat.com>
+	<20170303164751.GY2778@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-In-Reply-To: <1487248176-29602-2-git-send-email-dmitry@daynix.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/5] eth: Extend vlan stripping functions
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170303164751.GY2778@thinpad.lan.raisama.net>
+Subject: Re: [Qemu-devel] [RFC] x86: Allow to set NUMA distance for
+ different NUMA nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,137 +32,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dmitry Fleytman <dmitry@daynix.com>, qemu-devel@nongnu.org
-Cc: Yan Vugenfirer <yan@daynix.com>, Jason Wang <jasowang@redhat.com>, P J P <ppandit@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, He Chen <he.chen@linux.intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 02/16/2017 09:29 AM, Dmitry Fleytman wrote:
-> Make VLAN stripping functions return number of bytes
-> copied to given Ethernet header buffer.
->
-> This information should be used to re-compose
-> packet IOV after VLAN stripping.
->
-> Signed-off-by: Dmitry Fleytman <dmitry@daynix.com>
-> ---
->  include/net/eth.h |  4 ++--
->  net/eth.c         | 25 ++++++++++++++-----------
->  2 files changed, 16 insertions(+), 13 deletions(-)
->
-> diff --git a/include/net/eth.h b/include/net/eth.h
-> index 2013175..afeb45b 100644
-> --- a/include/net/eth.h
-> +++ b/include/net/eth.h
-> @@ -331,12 +331,12 @@ eth_get_pkt_tci(const void *p)
->      }
->  }
->
-> -bool
-> +size_t
->  eth_strip_vlan(const struct iovec *iov, int iovcnt, size_t iovoff,
->                 uint8_t *new_ehdr_buf,
->                 uint16_t *payload_offset, uint16_t *tci);
->
-> -bool
-> +size_t
->  eth_strip_vlan_ex(const struct iovec *iov, int iovcnt, size_t iovoff,
->                    uint16_t vet, uint8_t *new_ehdr_buf,
->                    uint16_t *payload_offset, uint16_t *tci);
-> diff --git a/net/eth.c b/net/eth.c
-> index df81efb..5b9ba26 100644
-> --- a/net/eth.c
-> +++ b/net/eth.c
-> @@ -232,7 +232,7 @@ void eth_get_protocols(const struct iovec *iov, int iovcnt,
->      }
->  }
->
-> -bool
-> +size_t
->  eth_strip_vlan(const struct iovec *iov, int iovcnt, size_t iovoff,
->                 uint8_t *new_ehdr_buf,
->                 uint16_t *payload_offset, uint16_t *tci)
-> @@ -244,7 +244,7 @@ eth_strip_vlan(const struct iovec *iov, int iovcnt, size_t iovoff,
->                                 new_ehdr, sizeof(*new_ehdr));
->
->      if (copied < sizeof(*new_ehdr)) {
-> -        return false;
-> +        return 0;
->      }
->
->      switch (be16_to_cpu(new_ehdr->h_proto)) {
-> @@ -254,7 +254,7 @@ eth_strip_vlan(const struct iovec *iov, int iovcnt, size_t iovoff,
->                              &vlan_hdr, sizeof(vlan_hdr));
->
->          if (copied < sizeof(vlan_hdr)) {
-> -            return false;
-> +            return 0;
->          }
->
->          new_ehdr->h_proto = vlan_hdr.h_proto;
-> @@ -268,18 +268,21 @@ eth_strip_vlan(const struct iovec *iov, int iovcnt, size_t iovoff,
->                                  PKT_GET_VLAN_HDR(new_ehdr), sizeof(vlan_hdr));
->
->              if (copied < sizeof(vlan_hdr)) {
-> -                return false;
-> +                return 0;
->              }
->
->              *payload_offset += sizeof(vlan_hdr);
-> +
-> +            return sizeof(struct eth_header) + sizeof(struct vlan_header);
-> +        } else {
-> +            return sizeof(struct eth_header);
+On Fri, Mar 03, 2017 at 01:47:51PM -0300, Eduardo Habkost wrote:
+> On Fri, Mar 03, 2017 at 04:26:12PM +0000, Daniel P. Berrange wrote:
+> > On Fri, Mar 03, 2017 at 10:09:22AM -0600, Eric Blake wrote:
+> > > On 03/03/2017 07:57 AM, Eduardo Habkost wrote:
+> > > 
+> > > >> With this patch, when a user wants to create a guest that contains
+> > > >> several vNUMA nodes and also wants to set distance among those nodes,
+> > > >> the QEMU command would like:
+> > > >>
+> > > >> ```
+> > > >> -object memory-backend-ram,size=1G,prealloc=yes,host-nodes=0,policy=bind,id=node0 \
+> > > >> -numa node,nodeid=0,cpus=0,memdev=node0,distance=10,distance=21,distance=31,distance=41 \
+> > > 
+> > > > 
+> > > > It would be nice to have a more intuitive syntax to represent
+> > > > ordered lists in QemuOpts. But this is what we have today.
+> > > > 
+> > > 
+> > > Markus has the discussion on representing arrays via the command line;
+> > > particularly since this array is very tightly coupled to the order in
+> > > which values are presented, it may be worth having:
+> > > 
+> > > -numa
+> > > node,nodeid=0,cpus=0,memdev=nod0,distance.0=10,distance.1=21,distance.2=31,distance.3=41
+> > > 
+> > > with the explicit distance.0= suffixes to distance making it more
+> > > obvious that we are dealing with an array.
+> > > 
+> > > > I think the proposal makes sense. I would like the semantics of the new option
+> > > > to be documented at qapi-schema.json and qemu-options.hx.
+> > > > 
+> > > > I would call the new NumaNodeOptions field "distances", as it is
+> > > > a list of distances.
+> > > 
+> > > Indeed, Markus is trying (with his work on -blockdev for 2.9) to get the
+> > > command line to a point where it is identical to the QMP code, by
+> > > reusing qapi-schema.json, so we should very much keep that in mind with
+> > > whatever we add to -numa in 2.10.
+> > > 
+> > > 
+> > > > but in the future we could support something like:
+> > > > 
+> > > >   -numa node,nodeid=0,cpus=0,memdev=node0 \
+> > > >   -numa node,nodeid=1,cpus=1,memdev=node1 \
+> > > >   -numa node,nodeid=2,cpus=2,memdev=node2 \
+> > > >   -numa node,nodeid=3,cpus=3,memdev=node3 \
+> > > >   -numa distances,distances[0][0]=10,distances[0][1]=21,distances[0][2]=31,distances[0][3]=41,\
+> > > >                   distances[1][0]=21,distances[1][1]=10,distances[1][2]=21,distances[1][3]=31,\
+> > > >                   distances[2][0]=31,distances[2][1]=21,distances[2][2]=10,distances[2][3]=21,\
+> > > >                   distances[3][0]=41,distances[3][1]=31,distances[3][2]=21,distances[3][3]=10
+> > > 
+> > > Except that [] requires special shell quoting, so the proposal would be
+> > > more like:
+> > > 
+> > > -numa distances.0.0=10,distances.0.1=21
+> > > 
+> > > Right now, QMP doesn't support 2-D arrays (although this may be a good
+> > > reason to introduce support), so that's also something to think about
+> > > (not insurmountable, but makes the task more complex).
+> > 
+> > What I don't like about this syntax is that it is duplicating information
+> > twice. IIUC the NUMA distance information is unidirectional, so specifying
+> > the same data for both direetions (node 0 -> node 3, and node 3 -> node 0)
+> > looks like overkill. Also the self-node distance isi defined to always be
+> > 10 IIUC, so specifying that is not required. IOW, could cut down the data
+> > we need to provider to just
+> > 
+> >    -numa distances,nodea=0,nodeb=1,value=20
+> >    -numa distances,nodea=0,nodeb=2,value=20
+> >    -numa distances,nodea=0,nodeb=3,value=20
+> >    -numa distances,nodea=1,nodeb=2,value=20
+> >    -numa distances,nodea=1,nodeb=3,value=20
+> >    -numa distances,nodea=2,nodeb=3,value=20
+> 
+> The ACPI spec (I'm looking at revision 5.0) explicitly mentions
+> that A->B distance may be different from B->A distrance:
+> 
+> "The entry value is a one-byte unsigned integer. The relative
+> distance from System Locality i to System Locality j is the
+> i*N + j entry in the matrix, where N is the number of System
+> Localities.  Except for the relative distance from a System
+> Locality to itself, each relative distance is stored twice in the
+> matrix. This provides the capability to describe the scenario
+> where the relative distances for the two directions between
+> System Localities is different."
 
-remove this "else return ..."
+Ah interesting, learn something new every day ? I've only made
+that unidirectional assumption for the last 10 years ;-P
 
->          }
-> -        return true;
+> But I agree we could figure out a more compact syntax for more
+> common cases where self-node distance is 10 and distance is the
+> same both ways.
 
-here avoid fall-through with 'return sizeof(struct eth_header);'
+QAPI would need a specialized numeric matrix type, which we could
+efficiently map into some CLI syntax, in order to avoid needing to
+tickle the rather verbose general purpose list syntax. Probably
+not worth the hassle though - rather than just picking shorter
+variable names eg
 
->      default:
-> -        return false;
-> +        return 0;
->      }
->  }
->
-> -bool
-> +size_t
->  eth_strip_vlan_ex(const struct iovec *iov, int iovcnt, size_t iovoff,
->                    uint16_t vet, uint8_t *new_ehdr_buf,
->                    uint16_t *payload_offset, uint16_t *tci)
-> @@ -291,7 +294,7 @@ eth_strip_vlan_ex(const struct iovec *iov, int iovcnt, size_t iovoff,
->                                 new_ehdr, sizeof(*new_ehdr));
->
->      if (copied < sizeof(*new_ehdr)) {
-> -        return false;
-> +        return 0;
->      }
->
->      if (be16_to_cpu(new_ehdr->h_proto) == vet) {
-> @@ -299,17 +302,17 @@ eth_strip_vlan_ex(const struct iovec *iov, int iovcnt, size_t iovoff,
->                              &vlan_hdr, sizeof(vlan_hdr));
->
->          if (copied < sizeof(vlan_hdr)) {
-> -            return false;
-> +            return 0;
->          }
->
->          new_ehdr->h_proto = vlan_hdr.h_proto;
->
->          *tci = be16_to_cpu(vlan_hdr.h_tci);
->          *payload_offset = iovoff + sizeof(*new_ehdr) + sizeof(vlan_hdr);
-> -        return true;
-> +        return sizeof(struct eth_header);
->      }
->
-> -    return false;
-> +    return 0;
->  }
->
->  void
->
+  -numa dist,a=0,b=1,val=3
 
-with changes:
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+instead of
 
-Phil.
+  -numa distances,nodea=0,nodeb=1,value=20
+
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
