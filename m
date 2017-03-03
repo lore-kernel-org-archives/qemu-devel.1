@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48894)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cjmi8-0008Lk-6x
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:53:29 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cjmj8-0000cD-C6
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:54:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cjmi5-0000Kl-3h
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:53:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41306)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cjmi4-0000Jz-U0
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:53:25 -0500
-References: <1487362633-25018-1-git-send-email-fred.konrad@greensocs.com>
-	<5ab6110f-f70a-f0b3-38a0-04eaecfdfc0c@greensocs.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e972424a-60ea-55a9-f722-6c94f33196ff@redhat.com>
-Date: Fri, 3 Mar 2017 13:53:21 +0100
+	(envelope-from <alex.bennee@linaro.org>) id 1cjmj3-0000be-Np
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:54:30 -0500
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:34149)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cjmj3-0000bY-HI
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:54:25 -0500
+Received: by mail-wm0-x22c.google.com with SMTP id 196so8010290wmm.1
+	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 04:54:25 -0800 (PST)
+References: <20170302195337.31558-1-alex.bennee@linaro.org>
+	<20170302195337.31558-10-alex.bennee@linaro.org>
+	<5a5bfbf9-4935-7b21-ce93-77887581642b@imgtec.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <5a5bfbf9-4935-7b21-ce93-77887581642b@imgtec.com>
+Date: Fri, 03 Mar 2017 12:54:26 +0000
+Message-ID: <87o9xi1px9.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <5ab6110f-f70a-f0b3-38a0-04eaecfdfc0c@greensocs.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V2 0/7] execute code from mmio area
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 09/11] target/mips/op_helper: hold BQL
+ before calling cpu_mips_get_count
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,72 +32,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: KONRAD Frederic <fred.konrad@greensocs.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, edgar.iglesias@xilinx.com, alistair.francis@xilinx.com, clg@kaod.org, mark.burton@greensocs.com
+To: Yongbok Kim <yongbok.kim@imgtec.com>
+Cc: peter.maydell@linaro.org, rth@twiddle.net, pbonzini@redhat.com, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, Aurelien Jarno <aurelien@aurel32.net>
 
 
+Yongbok Kim <yongbok.kim@imgtec.com> writes:
 
-On 21/02/2017 09:51, KONRAD Frederic wrote:
-> Ping!
->=20
-> Would be nice for us if we can get this into 2.9.
+> On 02/03/2017 19:53, Alex Bennée wrote:
+>> We should hold the BQL before we transition to HW emulation. This is
+>> because all HW emulation needs to be serialised under MTTCG
+>> conditions. This is picked up by asserts that fire when
+>> cpu_mips_get_count triggers and IRQ.
+>>
+>> Reported-by: Yongbok Kim <yongbok.kim@imgtec.com>
+>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>
+> Hi Alex,
+>
+> Thanks for this but it is required to have few more locks.
+> I will send the patch shortly. Please merge it into your patchset.
 
-Sorry, I've been much busier with icount than I would have liked. :(
+Thanks, I'll look out for it.
 
-Paolo
+Have you been tracking the MTTCG work? Once the BQL issues are sorted as
+long as atomics, barriers and tlb flushes are updated you can turn on
+mttcg by default.
 
-> Thanks,
-> Fred
->=20
-> Le 17/02/2017 =E0 21:17, fred.konrad@greensocs.com a =E9crit :
->> From: KONRAD Frederic <fred.konrad@greensocs.com>
->>
->> This series allows to execute code from mmio areas.
->> The main goal of this is to be able to run code for example from an
->> SPI device.
->>
->> The three first patch fixes the way get_page_addr_code fills the TLB.
->>
->> The fourth patch implements the mmio execution helpers: the device mus=
-t
->> implement the request_ptr callback of the MemoryRegion and will be
->> notified when
->> the guest wants to execute code from it.
->>
->> The fifth patch introduces mmio_interface device which allows to
->> dynamically
->> map a host pointer somewhere into the memory.
->>
->> The sixth patch implements the execution from the SPI memories in the
->> xilinx_spips model.
->>
->> Thanks,
->> Fred
->>
->> V1 -> V2:
->>   * Fix the DPRINTF error.
->> RFC -> V1:
->>   * Use an interface (mmio-interface) to fix any reference leak issue.
->>
->> KONRAD Frederic (7):
->>   cputlb: cleanup get_page_addr_code to use VICTIM_TLB_HIT
->>   cputlb: move get_page_addr_code
->>   cputlb: fix the way get_page_addr_code fills the tlb
->>   exec: allow to get a pointer for some mmio memory region
->>   qdev: add MemoryRegion property
->>   introduce mmio_interface
->>   xilinx_spips: allow mmio execution
->>
->>  cputlb.c                         |  81 ++++++++++++++-----------
->>  hw/misc/Makefile.objs            |   1 +
->>  hw/misc/mmio_interface.c         | 128
->> +++++++++++++++++++++++++++++++++++++++
->>  hw/ssi/xilinx_spips.c            |  74 ++++++++++++++++------
->>  include/exec/memory.h            |  35 +++++++++++
->>  include/hw/misc/mmio_interface.h |  49 +++++++++++++++
->>  include/hw/qdev-properties.h     |   2 +
->>  memory.c                         |  57 +++++++++++++++++
->>  8 files changed, 372 insertions(+), 55 deletions(-)
->>  create mode 100644 hw/misc/mmio_interface.c
->>  create mode 100644 include/hw/misc/mmio_interface.h
->>
+>
+> Regards,
+> Yongbok
+
+
+--
+Alex Bennée
