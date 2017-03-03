@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60149)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60151)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=228f1c8ea=Paul.Durrant@citrix.com>)
-	id 1cjlgj-0004J4-Jz
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 06:47:58 -0500
+	id 1cjlgj-0004J5-KE
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 06:47:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=228f1c8ea=Paul.Durrant@citrix.com>)
-	id 1cjlgg-00016n-ES
+	id 1cjlgh-00017m-6U
 	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 06:47:57 -0500
 Received: from smtp.citrix.com ([66.165.176.89]:7547)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
 	(envelope-from <prvs=228f1c8ea=Paul.Durrant@citrix.com>)
-	id 1cjlgg-00016D-7G
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 06:47:54 -0500
+	id 1cjlgg-00016D-Vj
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 06:47:55 -0500
 From: Paul Durrant <paul.durrant@citrix.com>
-Date: Fri, 3 Mar 2017 11:47:48 +0000
-Message-ID: <1488541671-26740-3-git-send-email-paul.durrant@citrix.com>
+Date: Fri, 3 Mar 2017 11:47:51 +0000
+Message-ID: <1488541671-26740-6-git-send-email-paul.durrant@citrix.com>
 In-Reply-To: <1488541671-26740-1-git-send-email-paul.durrant@citrix.com>
 References: <1488541671-26740-1-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 2/5] xen: rename xen_modified_memory() to
- xen_hvm_modified_memory()
+Subject: [Qemu-devel] [PATCH v3 5/5] xen: use libxendevicemodel when
+ available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,83 +30,381 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
+Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>
 
-This patch is a purely cosmetic change that avoids a name collision in
-a subsequent patch.
+This patch modifies the wrapper functions in xen_common.h to use the
+new xendevicemodel interface if it is available along with compatibility
+code to use the old libxenctrl interface if it is not.
 
 Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 Reviewed-by: Anthony Perard <anthony.perard@citrix.com>
 ---
-Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Stefano Stabellini <sstabellini@kernel.org>
----
- include/exec/ram_addr.h | 4 ++--
- include/hw/xen/xen.h    | 2 +-
- xen-hvm-stub.c          | 2 +-
- xen-hvm.c               | 2 +-
- 4 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index 3e79466..8715af6 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -259,7 +259,7 @@ static inline void cpu_physical_memory_set_dirty_range(ram_addr_t start,
+NOTE: Xen patch 9970e98ace48 is needed to build
+
+v3:
+- Switch from macros to static inlines.
+
+v2:
+- Add a compat define for xenforeignmemory_close() since this is now
+  used.
+---
+ include/hw/xen/xen_common.h | 199 ++++++++++++++++++++++++++++++++++++--------
+ xen-common.c                |   8 ++
+ 2 files changed, 174 insertions(+), 33 deletions(-)
+
+diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
+index 31cf25f..740400a 100644
+--- a/include/hw/xen/xen_common.h
++++ b/include/hw/xen/xen_common.h
+@@ -9,6 +9,7 @@
+ #undef XC_WANT_COMPAT_EVTCHN_API
+ #undef XC_WANT_COMPAT_GNTTAB_API
+ #undef XC_WANT_COMPAT_MAP_FOREIGN_API
++#undef XC_WANT_COMPAT_DEVICEMODEL_API
  
-     rcu_read_unlock();
+ #include <xenctrl.h>
+ #include <xenstore.h>
+@@ -26,48 +27,179 @@ extern xc_interface *xen_xc;
+  * We don't support Xen prior to 4.2.0.
+  */
  
--    xen_modified_memory(start, length);
-+    xen_hvm_modified_memory(start, length);
- }
- 
- #if !defined(_WIN32)
-@@ -313,7 +313,7 @@ static inline void cpu_physical_memory_set_dirty_lebitmap(unsigned long *bitmap,
- 
-         rcu_read_unlock();
- 
--        xen_modified_memory(start, pages << TARGET_PAGE_BITS);
-+        xen_hvm_modified_memory(start, pages << TARGET_PAGE_BITS);
-     } else {
-         uint8_t clients = tcg_enabled() ? DIRTY_CLIENTS_ALL : DIRTY_CLIENTS_NOCODE;
-         /*
-diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
-index 09c2ce5..2b1733b 100644
---- a/include/hw/xen/xen.h
-+++ b/include/hw/xen/xen.h
-@@ -43,7 +43,7 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory);
- 
- void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size,
-                    struct MemoryRegion *mr, Error **errp);
--void xen_modified_memory(ram_addr_t start, ram_addr_t length);
-+void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length);
- 
- void xen_register_framebuffer(struct MemoryRegion *mr);
- 
-diff --git a/xen-hvm-stub.c b/xen-hvm-stub.c
-index c500325..3ca6c51 100644
---- a/xen-hvm-stub.c
-+++ b/xen-hvm-stub.c
-@@ -50,7 +50,7 @@ void xen_register_framebuffer(MemoryRegion *mr)
++#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 490
++
++typedef xc_interface xendevicemodel_handle;
++
++static inline xendevicemodel_handle *xendevicemodel_open(
++    struct xentoollog_logger *logger, unsigned int open_flags)
++{
++    return xen_xc;
++}
++
++static inline int xendevicemodel_create_ioreq_server(
++    xendevicemodel_handle *dmod, domid_t domid, int handle_bufioreq,
++    ioservid_t *id)
++{
++    return xc_hvm_create_ioreq_server(dmod, domid, handle_bufioreq,
++                                      id);
++}
++
++static inline int xendevicemodel_get_ioreq_server_info(
++    xendevicemodel_handle *dmod, domid_t domid, ioservid_t id,
++    xen_pfn_t *ioreq_pfn, xen_pfn_t *bufioreq_pfn,
++    evtchn_port_t *bufioreq_port)
++{
++    return xc_hvm_get_ioreq_server_info(dmod, domid, id, ioreq_pfn,
++                                        bufioreq_pfn, bufioreq_port);
++}
++
++static inline int xendevicemodel_map_io_range_to_ioreq_server(
++    xendevicemodel_handle *dmod, domid_t domid, ioservid_t id, int is_mmio,
++    uint64_t start, uint64_t end)
++{
++    return xc_hvm_map_io_range_to_ioreq_server(dmod, domid, id, is_mmio,
++                                               start, end);
++}
++
++static inline int xendevicemodel_unmap_io_range_from_ioreq_server(
++    xendevicemodel_handle *dmod, domid_t domid, ioservid_t id, int is_mmio,
++    uint64_t start, uint64_t end)
++{
++    return xc_hvm_unmap_io_range_from_ioreq_server(dmod, domid, id, is_mmio,
++                                                   start, end);
++}
++
++static inline int xendevicemodel_map_pcidev_to_ioreq_server(
++    xendevicemodel_handle *dmod, domid_t domid, ioservid_t id,
++    uint16_t segment, uint8_t bus, uint8_t device, uint8_t function)
++{
++    return xc_hvm_map_pcidev_to_ioreq_server(dmod, domid, id, segment,
++                                             bus, device, function);
++}
++
++static inline int xendevicemodel_unmap_pcidev_from_ioreq_server(
++    xendevicemodel_handle *dmod, domid_t domid, ioservid_t id,
++    uint16_t segment, uint8_t bus, uint8_t device, uint8_t function)
++{
++    return xc_hvm_unmap_pcidev_from_ioreq_server(dmod, domid, id, segment,
++                                                 bus, device, function);
++}
++
++static inline int xendevicemodel_destroy_ioreq_server(
++    xendevicemodel_handle *dmod, domid_t domid, ioservid_t id)
++{
++    return xc_hvm__destroy_ioreq_server(dmod, domid, id);
++}
++
++static inline int xendevicemodel_set_ioreq_server_state(
++    xendevicemodel_handle *dmod, domid_t domid, ioservid_t id, int enabled)
++{
++    return xc_hvm_set_ioreq_server_state(dmod, domid, id, enabled);
++}
++
++static inline int xendevicemodel_set_pci_intx_level(
++    xendevicemodel_handle *dmod, domid_t domid, uint16_t segment,
++    uint8_t bus, uint8_t device, uint8_t intx, unsigned int level)
++{
++    return xc_hvm_set_pci_intx_level(dmod, domid, segment, bus, device,
++                                     intx, level);
++}
++
++static inline int xendevicemodel_set_isa_irq_level(
++    xendevicemodel_handle *dmod, domid_t domid, uint8_t irq,
++    unsigned int level)
++{
++    return xc_hvm_set_isa_irq_level(dmod, domid, irq, level);
++}
++
++static inline int xendevicemodel_set_pci_link_route(
++    xendevicemodel_handle *dmod, domid_t domid, uint8_t link, uint8_t irq)
++{
++    return xc_hvm_set_pci_link_route(dmod, domid, link, irq);
++}
++
++static inline int xendevicemodel_inject_msi(
++    xendevicemodel_handle *dmod, domid_t domid, uint64_t msi_addr,
++    uint32_t msi_data)
++{
++    return xc_hvm_inject_msi(dmod, domid, msi_addr, msi_data);
++}
++
++static inline int xendevicemodel_track_dirty_vram(
++    xendevicemodel_handle *dmod, domid_t domid, uint64_t first_pfn,
++    uint32_t nr, unsigned long *dirty_bitmap)
++{
++    return xc_hvm_track_dirty_vram(dmod, domid, first_pfn, nr,
++                                   dirty_bitmap);
++}
++
++static inline int xendevicemodel_modified_memory(
++    xendevicemodel_handle *dmod, domid_t domid, uint64_t first_pfn,
++    uint32_t nr)
++{
++    return xc_hvm_modified_memory(dmod, domid, first_pfn, nr);
++}
++
++static inline int xendevicemodel_set_mem_type(
++    xendevicemodel_handle *dmod, domid_t domid, hvmmem_type_t mem_type,
++    uint64_t first_pfn, uint32_t nr)
++{
++    return xc_hvm_set_mem_type(dmod, domid, mem_type, first_pfn, nr);
++}
++
++#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 490 */
++
++#include <xendevicemodel.h>
++
++#endif
++
++extern xendevicemodel_handle *xen_dmod;
++
+ static inline int xen_set_mem_type(domid_t domid, hvmmem_type_t type,
+                                    uint64_t first_pfn, uint32_t nr)
  {
+-    return xc_hvm_set_mem_type(xen_xc, domid, type, first_pfn, nr);
++    return xendevicemodel_set_mem_type(xen_dmod, domid, type, first_pfn,
++                                       nr);
  }
  
--void xen_modified_memory(ram_addr_t start, ram_addr_t length)
-+void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length)
+ static inline int xen_set_pci_intx_level(domid_t domid, uint16_t segment,
+                                          uint8_t bus, uint8_t device,
+                                          uint8_t intx, unsigned int level)
  {
+-    return xc_hvm_set_pci_intx_level(xen_xc, domid, segment, bus, device,
+-                                     intx, level);
++    return xendevicemodel_set_pci_intx_level(xen_dmod, domid, segment, bus,
++                                             device, intx, level);
  }
  
-diff --git a/xen-hvm.c b/xen-hvm.c
-index dbb8c66..edf4983 100644
---- a/xen-hvm.c
-+++ b/xen-hvm.c
-@@ -1391,7 +1391,7 @@ void xen_shutdown_fatal_error(const char *fmt, ...)
-     qemu_system_shutdown_request();
- }
- 
--void xen_modified_memory(ram_addr_t start, ram_addr_t length)
-+void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length)
+ static inline int xen_set_pci_link_route(domid_t domid, uint8_t link,
+                                          uint8_t irq)
  {
-     if (unlikely(xen_in_migration)) {
-         int rc;
+-    return xc_hvm_set_pci_link_route(xen_xc, domid, link, irq);
++    return xendevicemodel_set_pci_link_route(xen_dmod, domid, link, irq);
+ }
+ 
+ static inline int xen_inject_msi(domid_t domid, uint64_t msi_addr,
+                                  uint32_t msi_data)
+ {
+-    return xc_hvm_inject_msi(xen_xc, domid, msi_addr, msi_data);
++    return xendevicemodel_inject_msi(xen_dmod, domid, msi_addr, msi_data);
+ }
+ 
+ static inline int xen_set_isa_irq_level(domid_t domid, uint8_t irq,
+                                         unsigned int level)
+ {
+-    return xc_hvm_set_isa_irq_level(xen_xc, domid, irq, level);
++    return xendevicemodel_set_isa_irq_level(xen_dmod, domid, irq, level);
+ }
+ 
+ static inline int xen_track_dirty_vram(domid_t domid, uint64_t first_pfn,
+                                        uint32_t nr, unsigned long *bitmap)
+ {
+-    return xc_hvm_track_dirty_vram(xen_xc, domid, first_pfn, nr, bitmap);
++    return xendevicemodel_track_dirty_vram(xen_dmod, domid, first_pfn, nr,
++                                           bitmap);
+ }
+ 
+ static inline int xen_modified_memory(domid_t domid, uint64_t first_pfn,
+                                       uint32_t nr)
+ {
+-    return xc_hvm_modified_memory(xen_xc, domid, first_pfn, nr);
++    return xendevicemodel_modified_memory(xen_dmod, domid, first_pfn, nr);
+ }
+ 
+ /* Xen 4.2 through 4.6 */
+@@ -97,6 +229,7 @@ typedef xc_gnttab xengnttab_handle;
+     xc_gnttab_map_domain_grant_refs(h, c, d, r, p)
+ 
+ #define xenforeignmemory_open(l, f) xen_xc
++#define xenforeignmemory_close(h)
+ 
+ static inline void *xenforeignmemory_map(xc_interface *h, uint32_t dom,
+                                          int prot, size_t pages,
+@@ -285,8 +418,8 @@ static inline void xen_map_memory_section(domid_t dom,
+     }
+ 
+     trace_xen_map_mmio_range(ioservid, start_addr, end_addr);
+-    xc_hvm_map_io_range_to_ioreq_server(xen_xc, dom, ioservid, 1,
+-                                        start_addr, end_addr);
++    xendevicemodel_map_io_range_to_ioreq_server(xen_dmod, dom, ioservid, 1,
++                                                start_addr, end_addr);
+ }
+ 
+ static inline void xen_unmap_memory_section(domid_t dom,
+@@ -302,8 +435,8 @@ static inline void xen_unmap_memory_section(domid_t dom,
+     }
+ 
+     trace_xen_unmap_mmio_range(ioservid, start_addr, end_addr);
+-    xc_hvm_unmap_io_range_from_ioreq_server(xen_xc, dom, ioservid,
+-                                            1, start_addr, end_addr);
++    xendevicemodel_unmap_io_range_from_ioreq_server(xen_dmod, dom, ioservid,
++                                                    1, start_addr, end_addr);
+ }
+ 
+ static inline void xen_map_io_section(domid_t dom,
+@@ -319,8 +452,8 @@ static inline void xen_map_io_section(domid_t dom,
+     }
+ 
+     trace_xen_map_portio_range(ioservid, start_addr, end_addr);
+-    xc_hvm_map_io_range_to_ioreq_server(xen_xc, dom, ioservid, 0,
+-                                        start_addr, end_addr);
++    xendevicemodel_map_io_range_to_ioreq_server(xen_dmod, dom, ioservid, 0,
++                                                start_addr, end_addr);
+ }
+ 
+ static inline void xen_unmap_io_section(domid_t dom,
+@@ -336,8 +469,8 @@ static inline void xen_unmap_io_section(domid_t dom,
+     }
+ 
+     trace_xen_unmap_portio_range(ioservid, start_addr, end_addr);
+-    xc_hvm_unmap_io_range_from_ioreq_server(xen_xc, dom, ioservid,
+-                                            0, start_addr, end_addr);
++    xendevicemodel_unmap_io_range_from_ioreq_server(xen_dmod, dom, ioservid,
++                                                    0, start_addr, end_addr);
+ }
+ 
+ static inline void xen_map_pcidev(domid_t dom,
+@@ -350,10 +483,10 @@ static inline void xen_map_pcidev(domid_t dom,
+ 
+     trace_xen_map_pcidev(ioservid, pci_bus_num(pci_dev->bus),
+                          PCI_SLOT(pci_dev->devfn), PCI_FUNC(pci_dev->devfn));
+-    xc_hvm_map_pcidev_to_ioreq_server(xen_xc, dom, ioservid, 0,
+-                                      pci_bus_num(pci_dev->bus),
+-                                      PCI_SLOT(pci_dev->devfn),
+-                                      PCI_FUNC(pci_dev->devfn));
++    xendevicemodel_map_pcidev_to_ioreq_server(xen_dmod, dom, ioservid, 0,
++                                              pci_bus_num(pci_dev->bus),
++                                              PCI_SLOT(pci_dev->devfn),
++                                              PCI_FUNC(pci_dev->devfn));
+ }
+ 
+ static inline void xen_unmap_pcidev(domid_t dom,
+@@ -366,18 +499,18 @@ static inline void xen_unmap_pcidev(domid_t dom,
+ 
+     trace_xen_unmap_pcidev(ioservid, pci_bus_num(pci_dev->bus),
+                            PCI_SLOT(pci_dev->devfn), PCI_FUNC(pci_dev->devfn));
+-    xc_hvm_unmap_pcidev_from_ioreq_server(xen_xc, dom, ioservid, 0,
+-                                          pci_bus_num(pci_dev->bus),
+-                                          PCI_SLOT(pci_dev->devfn),
+-                                          PCI_FUNC(pci_dev->devfn));
++    xendevicemodel_unmap_pcidev_from_ioreq_server(xen_dmod, dom, ioservid, 0,
++                                                  pci_bus_num(pci_dev->bus),
++                                                  PCI_SLOT(pci_dev->devfn),
++                                                  PCI_FUNC(pci_dev->devfn));
+ }
+ 
+ static inline void xen_create_ioreq_server(domid_t dom,
+                                            ioservid_t *ioservid)
+ {
+-    int rc = xc_hvm_create_ioreq_server(xen_xc, dom,
+-                                        HVM_IOREQSRV_BUFIOREQ_ATOMIC,
+-                                        ioservid);
++    int rc = xendevicemodel_create_ioreq_server(xen_dmod, dom,
++                                                HVM_IOREQSRV_BUFIOREQ_ATOMIC,
++                                                ioservid);
+ 
+     if (rc == 0) {
+         trace_xen_ioreq_server_create(*ioservid);
+@@ -397,7 +530,7 @@ static inline void xen_destroy_ioreq_server(domid_t dom,
+     }
+ 
+     trace_xen_ioreq_server_destroy(ioservid);
+-    xc_hvm_destroy_ioreq_server(xen_xc, dom, ioservid);
++    xendevicemodel_destroy_ioreq_server(xen_dmod, dom, ioservid);
+ }
+ 
+ static inline int xen_get_ioreq_server_info(domid_t dom,
+@@ -412,9 +545,9 @@ static inline int xen_get_ioreq_server_info(domid_t dom,
+                                                  bufioreq_evtchn);
+     }
+ 
+-    return xc_hvm_get_ioreq_server_info(xen_xc, dom, ioservid,
+-                                        ioreq_pfn, bufioreq_pfn,
+-                                        bufioreq_evtchn);
++    return xendevicemodel_get_ioreq_server_info(xen_dmod, dom, ioservid,
++                                                ioreq_pfn, bufioreq_pfn,
++                                                bufioreq_evtchn);
+ }
+ 
+ static inline int xen_set_ioreq_server_state(domid_t dom,
+@@ -426,8 +559,8 @@ static inline int xen_set_ioreq_server_state(domid_t dom,
+     }
+ 
+     trace_xen_ioreq_server_state(ioservid, enable);
+-    return xc_hvm_set_ioreq_server_state(xen_xc, dom, ioservid,
+-                                         enable);
++    return xendevicemodel_set_ioreq_server_state(xen_dmod, dom, ioservid,
++                                                 enable);
+ }
+ 
+ #endif
+diff --git a/xen-common.c b/xen-common.c
+index 703e7a5..ae76150 100644
+--- a/xen-common.c
++++ b/xen-common.c
+@@ -27,6 +27,7 @@
+ 
+ xc_interface *xen_xc;
+ xenforeignmemory_handle *xen_fmem;
++xendevicemodel_handle *xen_dmod;
+ 
+ static int store_dev_info(int domid, Chardev *cs, const char *string)
+ {
+@@ -128,6 +129,13 @@ static int xen_init(MachineState *ms)
+         xc_interface_close(xen_xc);
+         return -1;
+     }
++    xen_dmod = xendevicemodel_open(0, 0);
++    if (xen_dmod == NULL) {
++        xen_pv_printf(NULL, 0, "can't open xen devicemodel interface\n");
++        xenforeignmemory_close(xen_fmem);
++        xc_interface_close(xen_xc);
++        return -1;
++    }
+     qemu_add_vm_change_state_handler(xen_change_state_handler, NULL);
+ 
+     global_state_set_optional();
 -- 
 2.1.4
