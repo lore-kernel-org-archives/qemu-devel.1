@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cjpr7-0005JG-OA
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:14:58 -0500
+	(envelope-from <groug@kaod.org>) id 1cjptw-0007Q5-Mf
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:17:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cjpr4-000579-HB
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:14:57 -0500
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:36107)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cjpr4-00055l-D5
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:14:54 -0500
-Received: by mail-qk0-x244.google.com with SMTP id n141so4467042qke.3
-	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 08:14:52 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1488555707-14669-1-git-send-email-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <14f2a848-1ec6-35f6-a240-9d8ac5e93234@amsat.org>
-Date: Fri, 3 Mar 2017 13:14:48 -0300
+	(envelope-from <groug@kaod.org>) id 1cjptt-0006Kd-GV
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:17:52 -0500
+Received: from 7.mo173.mail-out.ovh.net ([46.105.44.159]:42919)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cjptt-0006Ju-9o
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:17:49 -0500
+Received: from player726.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id DABD02A4D0
+	for <qemu-devel@nongnu.org>; Fri,  3 Mar 2017 17:17:47 +0100 (CET)
+From: Greg Kurz <groug@kaod.org>
+Date: Fri, 03 Mar 2017 17:17:40 +0100
+Message-ID: <148855786023.23661.6584039229850547004.stgit@bahia>
 MIME-Version: 1.0
-In-Reply-To: <1488555707-14669-1-git-send-email-pbonzini@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] iscsi: fix missing unlock
+Subject: [Qemu-devel] [PATCH] 9pfs: fix bogus fd check in local_remove()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,60 +27,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>
 
-Hi Paolo,
+This was spotted by Coverity as a fd leak. This is certainly true, but also
+local_remove() would always return without doing anything, unless the fd is
+zero, which is very unlikely.
 
-On 03/03/2017 12:41 PM, Paolo Bonzini wrote:
-> Reported by Coverity.
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  block/iscsi.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/block/iscsi.c b/block/iscsi.c
-> index 76319a1..75d8905 100644
-> --- a/block/iscsi.c
-> +++ b/block/iscsi.c
-> @@ -637,6 +637,7 @@ retry:
->      }
->  #endif
->      if (iTask.task == NULL) {
-> +        qemu_mutex_unlock(&iscsilun->mutex);
->          return -ENOMEM;
+(Coverity issue CID1371732)
 
-what about:
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/9pfs/9p-local.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-         r = -ENOMEM;
-         goto out_unlock;
-
-to follow the file codestyle? (same following 3)
-
->      }
->  #if LIBISCSI_API_VERSION < (20160603)
-> @@ -864,6 +865,7 @@ retry:
->      }
->  #endif
->      if (iTask.task == NULL) {
-> +        qemu_mutex_unlock(&iscsilun->mutex);
->          return -ENOMEM;
->      }
->  #if LIBISCSI_API_VERSION < (20160603)
-> @@ -904,6 +906,7 @@ static int coroutine_fn iscsi_co_flush(BlockDriverState *bs)
->  retry:
->      if (iscsi_synchronizecache10_task(iscsilun->iscsi, iscsilun->lun, 0, 0, 0,
->                                        0, iscsi_co_generic_cb, &iTask) == NULL) {
-> +        qemu_mutex_unlock(&iscsilun->mutex);
->          return -ENOMEM;
->      }
->
-> @@ -1237,6 +1240,7 @@ retry:
->                                              0, 0, iscsi_co_generic_cb, &iTask);
->      }
->      if (iTask.task == NULL) {
-> +        qemu_mutex_unlock(&iscsilun->mutex);
->          return -ENOMEM;
->      }
->
->
+diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+index f22a3c3654db..5db7104334d6 100644
+--- a/hw/9pfs/9p-local.c
++++ b/hw/9pfs/9p-local.c
+@@ -1008,7 +1008,7 @@ static int local_remove(FsContext *ctx, const char *path)
+     int err = -1;
+ 
+     dirfd = local_opendir_nofollow(ctx, dirpath);
+-    if (dirfd) {
++    if (dirfd == -1) {
+         goto out;
+     }
+ 
