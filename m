@@ -1,27 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46976)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cjmeB-0005A8-8r
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:49:24 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cjmfE-00062Q-3J
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:50:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cjme8-00073J-8A
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:49:23 -0500
-Received: from 9.mo4.mail-out.ovh.net ([46.105.40.176]:44950)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cjme8-00072n-1T
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:49:20 -0500
-Received: from player746.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 90944502E3
-	for <qemu-devel@nongnu.org>; Fri,  3 Mar 2017 13:49:17 +0100 (CET)
-References: <5b2054e1-5867-979b-b476-b3aa8ecc5689@redhat.com>
-	<ee977c5e-affd-cf8d-d793-0d153fdf3e7d@kaod.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <b1143d55-715e-0f20-a11f-068430d412e9@kaod.org>
-Date: Fri, 3 Mar 2017 13:49:11 +0100
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cjmf8-0007QL-Gb
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:50:28 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46349
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cjmf8-0007Q6-9s
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:50:22 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v23CiPps097956
+	for <qemu-devel@nongnu.org>; Fri, 3 Mar 2017 07:50:21 -0500
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28xs8v6kjd-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 07:50:21 -0500
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Fri, 3 Mar 2017 12:50:18 -0000
+Date: Fri, 3 Mar 2017 13:50:12 +0100
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <aa9b9219-f3a6-165c-2d92-156a9295adbb@linux.vnet.ibm.com>
+References: <20170302185942.76255-1-pasic@linux.vnet.ibm.com>
+	<20170303132149.34e5906a.cornelia.huck@de.ibm.com>
+	<aa9b9219-f3a6-165c-2d92-156a9295adbb@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <ee977c5e-affd-cf8d-d793-0d153fdf3e7d@kaod.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] qemu-system-ppc64 crashes during "info qtree"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20170303135012.17edb640.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1] virtio: fail device if
+ set_event_notifier fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +44,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 03/03/2017 12:16 PM, C=C3=A9dric Le Goater wrote:
-> On 03/03/2017 11:48 AM, Thomas Huth wrote:
->>  Hi C=C3=A9dric, hi David,
->>
->> running "info qtree" at the HMP monitor with the pseries machine
->> currently results in:
->>
->>   [...]
->>       dev: spapr-vty, id "vty@71000000"
->>         reg =3D 1895825408 (0x71000000)
->>         chardev =3D "serial0"
->>         irq =3D 4098 (0x1002)
->>   dev: spapr-rtc, id ""
->>   dev: icp, id ""
->> hw/core/sysbus.c:277:sysbus_dev_print: Object 0x7f83127fc3f0 is not an
->> instance of type sys-bus-device
->> Aborted (core dumped)
->>
->> Since the last device that is printed here is "icp" ... could that be
->> related to the recent ICP/XICS reworks that have been merged a couple =
-of
->> days ago?
->=20
-> The cleanup did not change the nature of ICP but as we removed=20
-> the XICS object, which used to be a SysBusDevice, that might=20
-> be a consequence.=20
->=20
-> May be we should make the ICP objects SysBus devices now. I will=20
-> check.=20
+On Fri, 3 Mar 2017 13:43:32 +0100
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
-No. The problem came with the reset handlers. Sending a patch.
+> On 03/03/2017 01:21 PM, Cornelia Huck wrote:
+> > On Thu,  2 Mar 2017 19:59:42 +0100
+> > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> > 
+> >> The function virtio_notify_irqfd used to ignore the return code of
+> >> event_notifier_set. Let's fail the device should this occur.
+> > 
+> > I'm wondering if there are reasons for event_notifier_set() to fail
+> > beyond "we've hit an internal race and should make an effort to fix
+> > that one, or else we have completely messed up in qemu". Marking the
+> > device broken tells the guest that there's something wrong with the
+> > device, but I think we want qemu bug reports when there's something
+> > broken with the irqfd.
+> >
+> 
+> That's why the error is logged. I understand virtio_error like something
+> suitable for indicating bugs.
+> 
+> What do you suggest? Forcing a dump? I would rather leave it to the
+> user to figure out how important is the state sitting in the machine
+> and the device, and how much effort does (s)he want to put into recovering
+> from the failure. 
 
-C.=20
+How likely are those logged messages being brought to attention of the
+admin? Does any management software flag machines with such error
+messages? (that's more of a general question)
+
+I'd like to have some kind of trigger that rings an alarm bell so that
+the admin might consider reporting this, but I don't have a good idea
+on how to do that either...
