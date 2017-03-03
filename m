@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cjhzp-0003Wt-G9
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 02:51:26 -0500
+	(envelope-from <bounces@canonical.com>) id 1cjiJD-00080t-Sb
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 03:11:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cjhzm-0007oX-DE
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 02:51:25 -0500
-Received: from indium.canonical.com ([91.189.90.7]:32835)
+	(envelope-from <bounces@canonical.com>) id 1cjiJA-0005PR-NJ
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 03:11:27 -0500
+Received: from indium.canonical.com ([91.189.90.7]:35187)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cjhzm-0007m9-78
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 02:51:22 -0500
+	id 1cjiJA-0005P7-Gk
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 03:11:24 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cjhzj-0007X1-7c
-	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 07:51:19 +0000
+	id 1cjiJ8-0008RX-FM
+	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 08:11:22 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 35FD22E81A4
-	for <qemu-devel@nongnu.org>; Fri,  3 Mar 2017 07:51:16 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 6CADB2E808D
+	for <qemu-devel@nongnu.org>; Fri,  3 Mar 2017 08:11:22 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 03 Mar 2017 07:44:43 -0000
-From: Michael Klopf <1668556@bugs.launchpad.net>
+Date: Fri, 03 Mar 2017 08:01:16 -0000
+From: Thomas Huth <1668556@bugs.launchpad.net>
 Reply-To: Bug 1668556 <1668556@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20170228100937.7789.7367.malonedeb@chaenomeles.canonical.com>
-Message-Id: <20170303074444.7789.91280.malone@chaenomeles.canonical.com>
+Message-Id: <20170303080117.7109.13274.launchpad@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1668556] Re: QEMU Guest Agent service fails to
  start on Windows 10 RS2 preview
@@ -39,9 +39,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Not a bug!
-
-I have forgotten to add the socket in the start script :(
+** Changed in: qemu
+       Status: New =3D> Invalid
 
 -- =
 
@@ -53,7 +52,7 @@ Title:
   QEMU Guest Agent  service fails to start on Windows 10 RS2 preview
 
 Status in QEMU:
-  New
+  Invalid
 
 Bug description:
   The "QEMU Guest Agent" service cannot be started on Windows 10 RS2
