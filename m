@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42089)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cju2y-0004Uk-Ve
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 15:43:30 -0500
+	(envelope-from <jsnow@redhat.com>) id 1cju7q-00062x-S2
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 15:48:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cju2w-0005Wn-IZ
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 15:43:29 -0500
-Received: from mail.kernel.org ([198.145.29.136]:59408)
+	(envelope-from <jsnow@redhat.com>) id 1cju7l-0007j8-T1
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 15:48:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56630)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1cju2w-0005WJ-8c
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 15:43:26 -0500
-Date: Fri, 3 Mar 2017 12:43:21 -0800 (PST)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <alpine.DEB.2.10.1703031209090.17906@sstabellini-ThinkPad-X260>
-Message-ID: <alpine.DEB.2.10.1703031243050.17906@sstabellini-ThinkPad-X260>
-References: <1488452986-24501-1-git-send-email-paul.durrant@citrix.com>
-	<1488452986-24501-6-git-send-email-paul.durrant@citrix.com>
-	<alpine.DEB.2.10.1703021426050.17906@sstabellini-ThinkPad-X260>
-	<05365905529b4fd78ff67989743a8dfb@AMSPEX02CL03.citrite.net>
-	<alpine.DEB.2.10.1703031209090.17906@sstabellini-ThinkPad-X260>
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1cju7l-0007iy-N1
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 15:48:25 -0500
+References: <20170303135150.12145-1-stefanha@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <10926cf4-d9ae-3094-8905-368dc97f7041@redhat.com>
+Date: Fri, 3 Mar 2017 15:48:23 -0500
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v2 5/5] xen: use libxendevicemodel when
- available
+In-Reply-To: <20170303135150.12145-1-stefanha@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 0/4] qemu-img: add max-size subcommand
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,143 +26,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Paul Durrant <Paul.Durrant@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Anthony Perard <anthony.perard@citrix.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Nir Soffer <nsoffer@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-On Fri, 3 Mar 2017, Stefano Stabellini wrote:
-> On Fri, 3 Mar 2017, Paul Durrant wrote:
-> > > -----Original Message-----
-> > > From: Stefano Stabellini [mailto:sstabellini@kernel.org]
-> > > Sent: 02 March 2017 22:50
-> > > To: Paul Durrant <Paul.Durrant@citrix.com>
-> > > Cc: xen-devel@lists.xenproject.org; qemu-devel@nongnu.org; Stefano
-> > > Stabellini <sstabellini@kernel.org>; Anthony Perard
-> > > <anthony.perard@citrix.com>
-> > > Subject: Re: [PATCH v2 5/5] xen: use libxendevicemodel when available
-> > > 
-> > > On Thu, 2 Mar 2017, Paul Durrant wrote:
-> > > > This patch modifies the wrapper functions in xen_common.h to use the
-> > > > new xendevicemodel interface if it is available along with compatibility
-> > > > code to use the old libxenctrl interface if it is not.
-> > > >
-> > > > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-> > > > ---
-> > > > Cc: Stefano Stabellini <sstabellini@kernel.org>
-> > > > Cc: Anthony Perard <anthony.perard@citrix.com>
-> > > >
-> > > > v2:
-> > > > - Add a compat define for xenforeignmemory_close() since this is now
-> > > >   used.
-> > > > ---
-> > > >  include/hw/xen/xen_common.h | 115
-> > > +++++++++++++++++++++++++++++++-------------
-> > > >  xen-common.c                |   8 +++
-> > > >  2 files changed, 90 insertions(+), 33 deletions(-)
-> > > >
-> > > > diff --git a/include/hw/xen/xen_common.h
-> > > b/include/hw/xen/xen_common.h
-> > > > index 31cf25f..48444e5 100644
-> > > > --- a/include/hw/xen/xen_common.h
-> > > > +++ b/include/hw/xen/xen_common.h
-> > > > @@ -9,6 +9,7 @@
-> > > >  #undef XC_WANT_COMPAT_EVTCHN_API
-> > > >  #undef XC_WANT_COMPAT_GNTTAB_API
-> > > >  #undef XC_WANT_COMPAT_MAP_FOREIGN_API
-> > > > +#undef XC_WANT_COMPAT_DEVICEMODEL_API
-> > > >
-> > > >  #include <xenctrl.h>
-> > > >  #include <xenstore.h>
-> > > > @@ -26,48 +27,95 @@ extern xc_interface *xen_xc;
-> > > >   * We don't support Xen prior to 4.2.0.
-> > > >   */
-> > > >
-> > > > +#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 490
-> > > > +
-> > > > +typedef xc_interface xendevicemodel_handle;
-> > > > +
-> > > > +#define xendevicemodel_open(l, f) xen_xc
-> > > > +
-> > > > +#define xendevicemodel_map_io_range_to_ioreq_server \
-> > > > +    xc_hvm_map_io_range_to_ioreq_server
-> > > > +#define xendevicemodel_unmap_io_range_from_ioreq_server \
-> > > > +    xc_hvm_unmap_io_range_from_ioreq_server
-> > > > +#define xendevicemodel_map_pcidev_to_ioreq_server \
-> > > > +    xc_hvm_map_pcidev_to_ioreq_server
-> > > > +#define xendevicemodel_unmap_pcidev_from_ioreq_server \
-> > > > +    xc_hvm_unmap_pcidev_from_ioreq_server
-> > > > +#define xendevicemodel_create_ioreq_server \
-> > > > +    xc_hvm_create_ioreq_server
-> > > > +#define xendevicemodel_destroy_ioreq_server \
-> > > > +    xc_hvm_destroy_ioreq_server
-> > > > +#define xendevicemodel_get_ioreq_server_info \
-> > > > +    xc_hvm_get_ioreq_server_info
-> > > > +#define xendevicemodel_set_ioreq_server_state \
-> > > > +    xc_hvm_set_ioreq_server_state
-> > > > +#define xendevicemodel_set_pci_intx_level \
-> > > > +    xc_hvm_set_pci_intx_level
-> > > > +#define xendevicemodel_set_pci_link_route \
-> > > > +    xc_hvm_set_pci_link_route
-> > > > +#define xendevicemodel_set_isa_irq_level \
-> > > > +    xc_hvm_set_isa_irq_level
-> > > > +#define xendevicemodel_inject_msi \
-> > > > +    xc_hvm_inject_msi
-> > > > +#define xendevicemodel_set_mem_type \
-> > > > +    xc_hvm_set_mem_type
-> > > > +#define xendevicemodel_track_dirty_vram \
-> > > > +    xc_hvm_track_dirty_vram
-> > > > +#define xendevicemodel_modified_memory \
-> > > > +    xc_hvm_modified_memory
-> > > 
-> > > It does build correctly now for Xen < 4.9, however it breaks against
-> > > xen-unstable:
-> > > 
-> > >   ERROR: configure test passed without -Werror but failed with -Werror.
-> > >          This is probably a bug in the configure script. The failing command
-> > >          will be at the bottom of config.log.
-> > >          You can run configure with --disable-werror to bypass this check.
-> > > 
-> > > and config.log says:
-> > > 
-> > >   config-temp/qemu-conf.c: In function 'main':
-> > >   config-temp/qemu-conf.c:32:3: error: implicit declaration of function
-> > > 'xc_hvm_set_mem_type' [-Werror=implicit-function-declaration]
-> > >   config-temp/qemu-conf.c:32:3: error: nested extern declaration of
-> > > 'xc_hvm_set_mem_type' [-Werror=nested-externs]
-> > >   config-temp/qemu-conf.c:34:3: error: implicit declaration of function
-> > > 'xc_hvm_inject_msi' [-Werror=implicit-function-declaration]
-> > >   config-temp/qemu-conf.c:34:3: error: nested extern declaration of
-> > > 'xc_hvm_inject_msi' [-Werror=nested-externs]
-> > >   config-temp/qemu-conf.c:35:3: error: implicit declaration of function
-> > > 'xc_hvm_create_ioreq_server' [-Werror=implicit-function-declaration]
-> > >   config-temp/qemu-conf.c:35:3: error: nested extern declaration of
-> > > 'xc_hvm_create_ioreq_server' [-Werror=nested-externs]
-> > > 
-> > > 
-> > > With -DXC_WANT_COMPAT_DEVICEMODEL_API=1:
-> > > 
-> > >   In file included from /local/qemu-
-> > > upstream/include/hw/xen/xen_backend.h:4:0,
-> > >                    from hw/block/xen_disk.c:27:
-> > >   /local/qemu-upstream/include/hw/xen/xen_common.h: In function
-> > > 'xen_set_mem_type':
-> > >   /local/qemu-upstream/include/hw/xen/xen_common.h:78:5: error: implicit
-> > > declaration of function 'xc_hvm_set_mem_type' [-Werror=implicit-function-
-> > > declaration]
-> > > 
-> > 
-> > Ah... Do you have Anthony's patch?
-> > 
-> > http://xenbits.xen.org/gitweb/?p=xen.git;a=commit;h=9970e98ace48574701f7e2286fb67090481a3fec
-> > 
-> > I suspect that may be the problem you're seeing above.
+
+
+On 03/03/2017 08:51 AM, Stefan Hajnoczi wrote:
+> RFCv1:
+>  * Publishing patch series with just raw support, no qcow2 yet.  Please review
+>    the command-line interface and let me know if you are happy with this
+>    approach.
 > 
-> Yes, I do have it. I am still having build troubles with v5 too. I am
+> Users and management tools sometimes need to know the size required for a new
+> disk image so that an LVM volume, SAN LUN, etc can be allocated ahead of time.
+> Image formats like qcow2 have non-trivial metadata that makes it hard to
+> estimate the exact size without knowledge of file format internals.
+> 
+> This patch series introduces a new qemu-img subcommand that calculates the
+> required size for both image creation and conversion scenarios.
+> 
+> The conversion scenario is:
+> 
+>   $ qemu-img max-size -f raw -O qcow2 input.img
+>   107374184448
+> 
+> Here an existing image file is taken and the output includes the space required
+> for data from the input image file.
+> 
+> The creation scenario is:
+> 
+>   $ qemu-img max-size -O qcow2 --size 5G
+>   196688
+> 
 
-I meant v3
+It looks sane to me, implementation looks clean enough.
+Thanks!
 
-
-> attaching my build test script: feel free to use it to test the build of
-> a single QEMU branch against multiple Xen versions. It requires one Xen
-> repository checked out and built for each Xen version. I have just
-> added the Xen 4.9 tests, so they might be wrong somehow, but the others
-> are known to work.
+> Stefan Hajnoczi (4):
+>   block: add bdrv_max_size() API
+>   raw-format: add bdrv_max_size() support
+>   qemu-img: add max-size subcommand
+>   iotests: add test 178 for qemu-img max-size
+> 
+>  include/block/block.h      |   2 +
+>  include/block/block_int.h  |   2 +
+>  block.c                    |  37 +++++++++
+>  block/raw-format.c         |  16 ++++
+>  qemu-img.c                 | 196 +++++++++++++++++++++++++++++++++++++++++++++
+>  qemu-img-cmds.hx           |   6 ++
+>  tests/qemu-iotests/178     |  75 +++++++++++++++++
+>  tests/qemu-iotests/178.out |  25 ++++++
+>  tests/qemu-iotests/group   |   1 +
+>  9 files changed, 360 insertions(+)
+>  create mode 100755 tests/qemu-iotests/178
+>  create mode 100644 tests/qemu-iotests/178.out
+> 
