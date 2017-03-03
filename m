@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cjoRQ-0000eQ-Cb
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 09:44:21 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cjoUU-0002PA-N8
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 09:47:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cjoRN-0002f8-4x
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 09:44:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37436)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cjoRM-0002ei-W6
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 09:44:17 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 51F7D3D956
-	for <qemu-devel@nongnu.org>; Fri,  3 Mar 2017 14:44:16 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170301123223.12489-1-berrange@redhat.com>
-	<a08dc58b-a169-cb17-2187-1b66c6878a39@redhat.com>
-	<20170302123300.GJ29835@redhat.com>
-Date: Fri, 03 Mar 2017 15:44:12 +0100
-In-Reply-To: <20170302123300.GJ29835@redhat.com> (Daniel P. Berrange's message
-	of "Thu, 2 Mar 2017 12:33:00 +0000")
-Message-ID: <87d1dys9mr.fsf@dusky.pond.sub.org>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cjoUR-0003sZ-HV
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 09:47:30 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:53218
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1cjoUR-0003rh-AM
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 09:47:27 -0500
+References: <20161023063135.21058-1-zxq_yx_007@163.com>
+	<2f476a20.17fe.1593424b176.Coremail.zxq_yx_007@163.com>
+	<80cfd7e0-b555-b7c9-686a-296e22e32c6b@ilande.co.uk>
+	<ca998a25-38de-a2f3-fc9e-4f3e0deb6031@ilande.co.uk>
+	<5BA33195-2F4A-4489-AA3B-15315DAC2027@163.com>
+	<FD2914CC-DCA5-4B0E-B2C8-639AB15C7752@163.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <7d38edfd-3ce7-3ad2-e4cf-cadc7e510024@ilande.co.uk>
+Date: Fri, 3 Mar 2017 14:47:09 +0000
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] migration: allow clearing migration string
- parameters
+In-Reply-To: <FD2914CC-DCA5-4B0E-B2C8-639AB15C7752@163.com>
+Content-Type: text/plain; charset=gbk
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 0/9] QOM'ify work for sparc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,57 +33,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: =?UTF-8?B?6LW15bCP5by6?= <zxq_yx_007@163.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, pbonzini@redhat.com, atar4qemu@gmail.com, peter.maydell@linaro.org
 
-"Daniel P. Berrange" <berrange@redhat.com> writes:
+On 02/03/17 14:06, ÕÔÐ¡Ç¿ wrote:
 
-> On Wed, Mar 01, 2017 at 08:36:03AM -0600, Eric Blake wrote:
->> On 03/01/2017 06:32 AM, Daniel P. Berrange wrote:
->> >      }
->> >      if (params->has_tls_creds) {
->> >          g_free(s->parameters.tls_creds);
->> > -        s->parameters.tls_creds = g_strdup(params->tls_creds);
->> > +        if (*params->tls_creds == '\0') {
->> > +            s->parameters.tls_creds = NULL;
->> 
->> I'm wondering if you should also do s->parameters.has_tls_creds = false
->> at this point?  The visitors expect that if has_tls_creds is true, then
->> the string is non-NULL.
->
-> The fact that s->parameters contains has_* fields is completely ignored
-> by the migration code afaict. IOW the code behaves as if all the has_*
-> fields are hardwired to true in s->parameters, even though that is not
-> the case :-) The has_* fields are only used when the various migration
-> QMP methods are executed, and those all use a separate MigrationParameters
-> struct instance.
+>> Of course£¡coming soon.
+> 
+> Mark£¬I have resend this series. do you forget do pick it£¿
 
-Not keeping the has_ members up-to-date is harmless as long as you don't
-pass the thing to visitors, including the one hiding in qapi_free_FOO().
-That one ignores scalars, though.
+Yes I did, however due to personal circumstances I haven't had much
+spare development time at all during the 2.9 cycle :(
+
+As we're now in freeze I can't send a pull request for this right now,
+however I promise to look at it again as soon as the 2.10 development
+tree opens.
 
 
->From a more abstract point of view, we have two related data types: one
-for the state, and one for state changes requests.
+Many thanks,
 
-In state, members are always present.
-
-A state change request is a bag of state member change requests, and
-each request can either specify the new value or ask for a reset to
-default.  Absent member means no change.
-
-We press the same QAPI type into service for both by making all members
-optional.
-
-For the state case, we hardwire the has_ to true.  Or even ignore them
-completely.
-
-For the state change request, we use has_ = false for "no change", has_
-= true with a special value for "reset to default" (new in this patch)
-and has_ = true with a non-special value for "set to this value".
-
-Requires a special value outside the set of non-special values.  The
-obvious one is JSON null, but the QAPI generator doesn't quite support
-that, yet.  "" works here, but is not general.
-
-I think I can get you null support in 2.10.  Would that work for you?
+Mark.
