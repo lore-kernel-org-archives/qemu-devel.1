@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cjpc5-0001ze-OK
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 10:59:26 -0500
+	(envelope-from <jannh@google.com>) id 1cjpdI-000384-3V
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:00:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cjpc5-00074A-6V
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 10:59:25 -0500
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:37770)
+	(envelope-from <jannh@google.com>) id 1cjpdH-0007TU-Bt
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:00:40 -0500
+Received: from mail-io0-x22f.google.com ([2607:f8b0:4001:c06::22f]:33957)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cjpc5-00073u-0a
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 10:59:25 -0500
-Received: by mail-wm0-x234.google.com with SMTP id n11so18787944wma.0
-	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 07:59:24 -0800 (PST)
+	(Exim 4.71) (envelope-from <jannh@google.com>) id 1cjpdH-0007Sp-5x
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:00:39 -0500
+Received: by mail-io0-x22f.google.com with SMTP id 90so77409425ios.1
+	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 08:00:38 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAG48ez2eaXFk50puw_bc27tNdfOHDsL08A9jY8=7DnA-mtEXWA@mail.gmail.com>
+In-Reply-To: <CAFEAcA8m2YF4=BOODUJLmAr+Y1JoN2NSh3J+9Yqc__Hh59NXWA@mail.gmail.com>
 References: <20170303112503.32277-1-ppandit@redhat.com>
-	<CAFEAcA_V8azXLLptxqNWBwkY7wJZzK+YkZHd6RfHEVS-NoXXBg@mail.gmail.com>
-	<CAG48ez2eaXFk50puw_bc27tNdfOHDsL08A9jY8=7DnA-mtEXWA@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 3 Mar 2017 15:59:03 +0000
-Message-ID: <CAFEAcA8cchuY8_=kLqSeV6_kixn5OJ0_UmQyxmgkeARmhNcQng@mail.gmail.com>
+	<bd2e3c1d-0fa5-7be4-c223-81d87c87fe0c@redhat.com>
+	<CAFEAcA8m2YF4=BOODUJLmAr+Y1JoN2NSh3J+9Yqc__Hh59NXWA@mail.gmail.com>
+From: Jann Horn <jannh@google.com>
+Date: Fri, 3 Mar 2017 17:00:14 +0100
+Message-ID: <CAG48ez3tR7dJJsDHA4cEawOSn4HxZghOAt2-Xk9sNVdSHb77tA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Subject: Re: [Qemu-devel] [PATCH] linux-user: limit number of arguments to
  execve
@@ -31,20 +30,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jann Horn <jannh@google.com>
-Cc: P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, Prasad J Pandit <pjp@fedoraproject.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Eric Blake <eblake@redhat.com>, P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, Prasad J Pandit <pjp@fedoraproject.org>
 
-On 3 March 2017 at 15:57, Jann Horn <jannh@google.com> wrote:
-> On Fri, Mar 3, 2017 at 4:55 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
->> This code is already supposed to handle "argument string too big",
->> see commit a6f79cc9a5e.
+On Fri, Mar 3, 2017 at 4:56 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 3 March 2017 at 14:54, Eric Blake <eblake@redhat.com> wrote:
+>>> +                ret = -TARGET_EFAULT;
+>>> +                break;
+>>> +            }
+>>>              argp = alloca((argc + 1) * sizeof(void *));
+>>>              envp = alloca((envc + 1) * sizeof(void *));
 >>
->> What's the actual bug case we're trying to handle here?
+>> ...Uggh. You're using alloca() but allowing an allocation of way more
+>> than 4k.  That means a guest can cause corruption of the stack (or, with
+>> large enough arguments, even escape out of the stack) before you even
+>> get to the execve() call to even worry about E2BIG issues.
 >
-> commit a6f79cc9a5e doesn't help here, it only bails out after the two
-> alloca() calls
+> Yeah, linux-user is shot through with that kind of alloca() usage.
+>
+> (It's not great, but it's not a security hole because we already
+> give the guest binary complete control to do anything it likes.
+> Worth fixing bugs if we run into them, though.)
 
-That's why I asked "what's the actual bug case we're trying to handle?"...
-
-thanks
--- PMM
+It could be a security hole if a benign guest userspace process decides to
+allow a remote client to specify a bunch of environment variables or so.
+E.g. HTTP servers with CGI support pass HTTP headers on as
+environment variables whose names start with "HTTP_"; however, since
+HTTP servers usually limit the request size, this isn't actually exploitable
+in that case. But there could theoretically be similar scenarios.
