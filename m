@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37946)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cjqRR-0001od-IA
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:52:31 -0500
+	(envelope-from <thuth@redhat.com>) id 1cjqTt-0002s2-A2
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:55:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cjqRN-000286-PX
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:52:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51616)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cjqRN-000280-HM
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:52:25 -0500
-Date: Fri, 3 Mar 2017 16:52:18 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170303165218.GI13631@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1488517304-23131-1-git-send-email-he.chen@linux.intel.com>
-	<20170303135704.GX2778@thinpad.lan.raisama.net>
-	<d93b2ebb-c5a3-a774-30fd-2d92c7703549@redhat.com>
-	<20170303162611.GE13631@redhat.com>
-	<20170303164751.GY2778@thinpad.lan.raisama.net>
+	(envelope-from <thuth@redhat.com>) id 1cjqTq-0002tF-8e
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:55:01 -0500
+References: <1488548254-456-1-git-send-email-clg@kaod.org>
+	<39ad7cac-b29e-b01e-723c-8cbdb1cf3ca9@redhat.com>
+	<f55bb0be-778c-6ded-1564-9b77c4521f52@kaod.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <b4b5780b-4604-9577-f42a-8821c4cb18d4@redhat.com>
+Date: Fri, 3 Mar 2017 17:54:54 +0100
 MIME-Version: 1.0
+In-Reply-To: <f55bb0be-778c-6ded-1564-9b77c4521f52@kaod.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170303164751.GY2778@thinpad.lan.raisama.net>
-Subject: Re: [Qemu-devel] [RFC] x86: Allow to set NUMA distance for
- different NUMA nodes
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] ppc/spapr: QOM'ify sPAPRRTCState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,117 +24,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, He Chen <he.chen@linux.intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Fri, Mar 03, 2017 at 01:47:51PM -0300, Eduardo Habkost wrote:
-> On Fri, Mar 03, 2017 at 04:26:12PM +0000, Daniel P. Berrange wrote:
-> > On Fri, Mar 03, 2017 at 10:09:22AM -0600, Eric Blake wrote:
-> > > On 03/03/2017 07:57 AM, Eduardo Habkost wrote:
-> > > 
-> > > >> With this patch, when a user wants to create a guest that contains
-> > > >> several vNUMA nodes and also wants to set distance among those nodes,
-> > > >> the QEMU command would like:
-> > > >>
-> > > >> ```
-> > > >> -object memory-backend-ram,size=1G,prealloc=yes,host-nodes=0,policy=bind,id=node0 \
-> > > >> -numa node,nodeid=0,cpus=0,memdev=node0,distance=10,distance=21,distance=31,distance=41 \
-> > > 
-> > > > 
-> > > > It would be nice to have a more intuitive syntax to represent
-> > > > ordered lists in QemuOpts. But this is what we have today.
-> > > > 
-> > > 
-> > > Markus has the discussion on representing arrays via the command line;
-> > > particularly since this array is very tightly coupled to the order in
-> > > which values are presented, it may be worth having:
-> > > 
-> > > -numa
-> > > node,nodeid=0,cpus=0,memdev=nod0,distance.0=10,distance.1=21,distance.2=31,distance.3=41
-> > > 
-> > > with the explicit distance.0= suffixes to distance making it more
-> > > obvious that we are dealing with an array.
-> > > 
-> > > > I think the proposal makes sense. I would like the semantics of the new option
-> > > > to be documented at qapi-schema.json and qemu-options.hx.
-> > > > 
-> > > > I would call the new NumaNodeOptions field "distances", as it is
-> > > > a list of distances.
-> > > 
-> > > Indeed, Markus is trying (with his work on -blockdev for 2.9) to get the
-> > > command line to a point where it is identical to the QMP code, by
-> > > reusing qapi-schema.json, so we should very much keep that in mind with
-> > > whatever we add to -numa in 2.10.
-> > > 
-> > > 
-> > > > but in the future we could support something like:
-> > > > 
-> > > >   -numa node,nodeid=0,cpus=0,memdev=node0 \
-> > > >   -numa node,nodeid=1,cpus=1,memdev=node1 \
-> > > >   -numa node,nodeid=2,cpus=2,memdev=node2 \
-> > > >   -numa node,nodeid=3,cpus=3,memdev=node3 \
-> > > >   -numa distances,distances[0][0]=10,distances[0][1]=21,distances[0][2]=31,distances[0][3]=41,\
-> > > >                   distances[1][0]=21,distances[1][1]=10,distances[1][2]=21,distances[1][3]=31,\
-> > > >                   distances[2][0]=31,distances[2][1]=21,distances[2][2]=10,distances[2][3]=21,\
-> > > >                   distances[3][0]=41,distances[3][1]=31,distances[3][2]=21,distances[3][3]=10
-> > > 
-> > > Except that [] requires special shell quoting, so the proposal would be
-> > > more like:
-> > > 
-> > > -numa distances.0.0=10,distances.0.1=21
-> > > 
-> > > Right now, QMP doesn't support 2-D arrays (although this may be a good
-> > > reason to introduce support), so that's also something to think about
-> > > (not insurmountable, but makes the task more complex).
-> > 
-> > What I don't like about this syntax is that it is duplicating information
-> > twice. IIUC the NUMA distance information is unidirectional, so specifying
-> > the same data for both direetions (node 0 -> node 3, and node 3 -> node 0)
-> > looks like overkill. Also the self-node distance isi defined to always be
-> > 10 IIUC, so specifying that is not required. IOW, could cut down the data
-> > we need to provider to just
-> > 
-> >    -numa distances,nodea=0,nodeb=1,value=20
-> >    -numa distances,nodea=0,nodeb=2,value=20
-> >    -numa distances,nodea=0,nodeb=3,value=20
-> >    -numa distances,nodea=1,nodeb=2,value=20
-> >    -numa distances,nodea=1,nodeb=3,value=20
-> >    -numa distances,nodea=2,nodeb=3,value=20
-> 
-> The ACPI spec (I'm looking at revision 5.0) explicitly mentions
-> that A->B distance may be different from B->A distrance:
-> 
-> "The entry value is a one-byte unsigned integer. The relative
-> distance from System Locality i to System Locality j is the
-> i*N + j entry in the matrix, where N is the number of System
-> Localities.  Except for the relative distance from a System
-> Locality to itself, each relative distance is stored twice in the
-> matrix. This provides the capability to describe the scenario
-> where the relative distances for the two directions between
-> System Localities is different."
+On 03.03.2017 15:49, C=C3=A9dric Le Goater wrote:
+> On 03/03/2017 03:13 PM, Thomas Huth wrote:
+>> On 03.03.2017 14:37, C=C3=A9dric Le Goater wrote:
+>>> Also use an 'Object *' under the sPAPR machine to hold the RTC
+>>> object.
+>>
+>> The change from TYPE_SYS_BUS_DEVICE to TYPE_DEVICE is certainly a good
+>> idea! But what's the advantage of using Object* instead of DeviceState=
+*
+>> in sPAPRMachineState ?
+>=20
+> it makes spapr_rtc_create() a little simpler. =20
+>=20
+> We could go even further and use a sPAPRRTCState under sPAPRMachineStat=
+e=20
+> that we  would initialize with object_initialize().=20
 
-Ah interesting, learn something new every day ? I've only made
-that unidirectional assumption for the last 10 years ;-P
+I think a sPAPRRTCState* would make more sense here - if you just see an
+Object* and are not familiar with the code, you wonder what this pointer
+is all about (and you then have to cast it to something different if you
+want to do anything with it) ... so IMHO either a DeviceState* or
+sPAPRRTCState* is the better choice here.
 
-> But I agree we could figure out a more compact syntax for more
-> common cases where self-node distance is 10 and distance is the
-> same both ways.
-
-QAPI would need a specialized numeric matrix type, which we could
-efficiently map into some CLI syntax, in order to avoid needing to
-tickle the rather verbose general purpose list syntax. Probably
-not worth the hassle though - rather than just picking shorter
-variable names eg
-
-  -numa dist,a=0,b=1,val=3
-
-instead of
-
-  -numa distances,nodea=0,nodeb=1,value=20
-
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+ Thomas
