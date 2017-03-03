@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cjrvz-0004Wj-BT
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:28:08 -0500
+	(envelope-from <eblake@redhat.com>) id 1cjrx7-0005R8-De
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:29:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cjrvw-0005HV-8S
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:28:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45804)
+	(envelope-from <eblake@redhat.com>) id 1cjrx6-0005j9-Iw
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:29:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54750)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cjrvw-0005H3-0h
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:28:04 -0500
-References: <mailman.56273.1488553194.22740.qemu-devel@nongnu.org>
-	<8FB6923C-8F97-497C-95DC-6F2D937725BC@gmail.com>
-	<20170303164426.42472535@bahia.lan>
-	<AA7BADA2-06D5-4A20-A38F-57D374B6C58D@gmail.com>
-	<20170303162128.GD13631@redhat.com> <20170303174353.676c1a7b@bahia.lan>
-	<a93b0903-cf60-d21b-2d68-cd182e06aed3@redhat.com>
-	<20170303191524.048b2d1f@bahia.lan>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cjrx6-0005i8-A0
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:29:16 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6558CC057FA4
+	for <qemu-devel@nongnu.org>; Fri,  3 Mar 2017 18:29:16 +0000 (UTC)
+References: <1488544368-30622-1-git-send-email-armbru@redhat.com>
+	<1488544368-30622-7-git-send-email-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <10a63c3b-26d7-998c-4dcc-c162f144e8b7@redhat.com>
-Date: Fri, 3 Mar 2017 12:28:01 -0600
+Message-ID: <6a0b8822-aa82-64e6-68f8-d0e63436ab76@redhat.com>
+Date: Fri, 3 Mar 2017 12:29:13 -0600
 MIME-Version: 1.0
-In-Reply-To: <20170303191524.048b2d1f@bahia.lan>
+In-Reply-To: <1488544368-30622-7-git-send-email-armbru@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="ffhBejd3QB6RSAf7dxklAHe328qWRFNLf"
-Subject: Re: [Qemu-devel] git master build failure in 9pfs
+	boundary="XLCSpTWM2Rf5h9GOVoawSAU6A6axtVGij"
+Subject: Re: [Qemu-devel] [PATCH v4 06/28] qapi-introspect: Mangle --prefix
+ argument properly for C
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,58 +35,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, G 3 <programmingkidx@gmail.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ffhBejd3QB6RSAf7dxklAHe328qWRFNLf
+--XLCSpTWM2Rf5h9GOVoawSAU6A6axtVGij
 From: Eric Blake <eblake@redhat.com>
-To: Greg Kurz <groug@kaod.org>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- G 3 <programmingkidx@gmail.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- qemu-devel qemu-devel <qemu-devel@nongnu.org>
-Message-ID: <10a63c3b-26d7-998c-4dcc-c162f144e8b7@redhat.com>
-Subject: Re: [Qemu-devel] git master build failure in 9pfs
-References: <mailman.56273.1488553194.22740.qemu-devel@nongnu.org>
- <8FB6923C-8F97-497C-95DC-6F2D937725BC@gmail.com>
- <20170303164426.42472535@bahia.lan>
- <AA7BADA2-06D5-4A20-A38F-57D374B6C58D@gmail.com>
- <20170303162128.GD13631@redhat.com> <20170303174353.676c1a7b@bahia.lan>
- <a93b0903-cf60-d21b-2d68-cd182e06aed3@redhat.com>
- <20170303191524.048b2d1f@bahia.lan>
-In-Reply-To: <20170303191524.048b2d1f@bahia.lan>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <6a0b8822-aa82-64e6-68f8-d0e63436ab76@redhat.com>
+Subject: Re: [PATCH v4 06/28] qapi-introspect: Mangle --prefix argument
+ properly for C
+References: <1488544368-30622-1-git-send-email-armbru@redhat.com>
+ <1488544368-30622-7-git-send-email-armbru@redhat.com>
+In-Reply-To: <1488544368-30622-7-git-send-email-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 03/03/2017 12:15 PM, Greg Kurz wrote:
+On 03/03/2017 06:32 AM, Markus Armbruster wrote:
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  scripts/qapi-introspect.py | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+I'm guessing we haven't seen a use of a prefix that matters yet, but
+that an upcoming patch triggered a compilation failure without this fix.
+ Mentioning that in the commit message wouldn't hurt.
 
 >=20
-> O_PATH | O_NOFOLLOW is a special case as described in the last paragrap=
-h
-> of O_PATH in the man page:
+> diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
+> index 541644e..fb72c61 100644
+> --- a/scripts/qapi-introspect.py
+> +++ b/scripts/qapi-introspect.py
+> @@ -64,7 +64,7 @@ class QAPISchemaGenIntrospectVisitor(QAPISchemaVisito=
+r):
+>          # generate C
+>          # TODO can generate awfully long lines
+>          jsons.extend(self._jsons)
+> -        name =3D prefix + 'qmp_schema_json'
+> +        name =3D c_name(prefix, protect=3DFalse) + 'qmp_schema_json'
+>          self.decl =3D mcgen('''
+>  extern const char %(c_name)s[];
+>  ''',
 >=20
->               If  pathname  is a symbolic link and the O_NOFOLLOW flag =
-is also
->               specified, then the call returns a file descriptor referr=
-ing  to
->               the  symbolic  link.   This  file  descriptor can be used=
- as the
->               dirfd argument in calls to fchownat(2),  fstatat(2),  lin=
-kat(2),
->               and readlinkat(2) with an empty pathname to have the call=
-s oper=E2=80=90
->               ate on the symbolic link.
-
-Only when coupled with AT_EMPTY_PATHNAME.  Without that additional flag,
-then it must be a directory.
 
 --=20
 Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---ffhBejd3QB6RSAf7dxklAHe328qWRFNLf
+--XLCSpTWM2Rf5h9GOVoawSAU6A6axtVGij
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -94,13 +94,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYubWxAAoJEKeha0olJ0NqLNIH/1i9YTV0rLxC/KKjujKYra+4
-cAJXTjChBN71Wb1ZFgOar1uYpH+s+LigwoQDvtRPaSTEeSlJESGCFyRZSj8yx+vg
-CF6kD6iV/VOH+pvvKbFBbCNXGFT/FGC3nud8J3UTR82LtZVG9jiLhMeTgz/TOuQ0
-HAM3QKur0BVW81Wi4o+pawcl02j/UL+4fwLpMN1BxDMxqHecdOhsb9VS+yJDe6A/
-0qpi0/wu/QQySvsyQVYvHfZ26PrdjIr6LCrSyVqyA14etY7d/XTV0lpfOyKQiRXl
-pyNrdVWKLOnIx+IO5jksxjukkyt+Yji7kaQuCqSSr9XqqCtHY61aEP51/9L4H3k=
-=4fAC
+iQEcBAEBCAAGBQJYubX5AAoJEKeha0olJ0NqYyAIAJBqo5HOl0QnbZ90SHPQqeUW
+bJGsBV5SKDl1uj8CIxisj/EzCj62R9ohPQiWMRlP/F1Px4Io7j+gKFMDYIxcV6Jf
+6o1MnxUxwpoGstWSfZAW8QzEn1QwLoH7Bs/ntUwJyUTfywodJXUC0pmjQRSI/4dd
+HUtWK6ZPEWYDr7Slhh78/7Z2HnF6z5XDetswSzDVxIFUAVIcuAJeIqbVYSZPrjuZ
+wlvPn/lsWHSPjEXGSuO865JoVJTv8dbTyMjtpfKqWDi64qJW54f6901/MnvuJHrK
+f0Yoo938dWdneUYEs2u5sOKh31J455FNmyB41QqySiAXug1YsIZpZXkfpKRMfsI=
+=WrGz
 -----END PGP SIGNATURE-----
 
---ffhBejd3QB6RSAf7dxklAHe328qWRFNLf--
+--XLCSpTWM2Rf5h9GOVoawSAU6A6axtVGij--
