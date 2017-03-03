@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cjqFI-00039A-8W
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:39:57 -0500
+	(envelope-from <eblake@redhat.com>) id 1cjqFh-0003YL-8X
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:40:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cjqFD-0005Q1-Ch
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:39:56 -0500
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:36139)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cjqFD-0005Pw-8m
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:39:51 -0500
-Received: by mail-qk0-x243.google.com with SMTP id n141so4653027qke.3
-	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 08:39:51 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1487248176-29602-1-git-send-email-dmitry@daynix.com>
-	<1487248176-29602-5-git-send-email-dmitry@daynix.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <4fd7a104-e49e-1f3f-c4a9-1572e6db9372@amsat.org>
-Date: Fri, 3 Mar 2017 13:39:46 -0300
+	(envelope-from <eblake@redhat.com>) id 1cjqFc-0005Xx-Do
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:40:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42414)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cjqFc-0005Xm-59
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:40:16 -0500
+References: <mailman.56273.1488553194.22740.qemu-devel@nongnu.org>
+	<8FB6923C-8F97-497C-95DC-6F2D937725BC@gmail.com>
+	<20170303164426.42472535@bahia.lan>
+	<AA7BADA2-06D5-4A20-A38F-57D374B6C58D@gmail.com>
+	<20170303162128.GD13631@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e7d5aa7e-46a9-efba-bcf2-934b71e3bb74@redhat.com>
+Date: Fri, 3 Mar 2017 10:40:13 -0600
 MIME-Version: 1.0
-In-Reply-To: <1487248176-29602-5-git-send-email-dmitry@daynix.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/5] NetRxPkt: Account buffer with ETH
- header in IOV length
+In-Reply-To: <20170303162128.GD13631@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Xbdw4oAs2W2U8b2PMuolPrkFwB0RUIm7H"
+Subject: Re: [Qemu-devel] git master build failure in 9pfs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,42 +31,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dmitry Fleytman <dmitry@daynix.com>, qemu-devel@nongnu.org
-Cc: Yan Vugenfirer <yan@daynix.com>, Jason Wang <jasowang@redhat.com>, P J P <ppandit@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, G 3 <programmingkidx@gmail.com>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Greg Kurz <groug@kaod.org>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-Hi Dmitry,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Xbdw4oAs2W2U8b2PMuolPrkFwB0RUIm7H
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>,
+ G 3 <programmingkidx@gmail.com>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Greg Kurz <groug@kaod.org>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
+Message-ID: <e7d5aa7e-46a9-efba-bcf2-934b71e3bb74@redhat.com>
+Subject: Re: [Qemu-devel] git master build failure in 9pfs
+References: <mailman.56273.1488553194.22740.qemu-devel@nongnu.org>
+ <8FB6923C-8F97-497C-95DC-6F2D937725BC@gmail.com>
+ <20170303164426.42472535@bahia.lan>
+ <AA7BADA2-06D5-4A20-A38F-57D374B6C58D@gmail.com>
+ <20170303162128.GD13631@redhat.com>
+In-Reply-To: <20170303162128.GD13631@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 02/16/2017 09:29 AM, Dmitry Fleytman wrote:
-> In case of VLAN stripping ETH header is stored in a
-> separate chunk and length of IOV should take this into
-> account.
->
-> This patch fixes checksum validation for RX packets
-> with VLAN header.
->
-> Devices affected by this problem: e1000e and vmxnet3.
->
-> Signed-off-by: Dmitry Fleytman <dmitry@daynix.com>
-> ---
->  hw/net/net_rx_pkt.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/hw/net/net_rx_pkt.c b/hw/net/net_rx_pkt.c
-> index d38babe..c7ae33d 100644
-> --- a/hw/net/net_rx_pkt.c
-> +++ b/hw/net/net_rx_pkt.c
-> @@ -97,7 +97,7 @@ net_rx_pkt_pull_data(struct NetRxPkt *pkt,
->          pkt->tot_len = iov_size(iov, iovcnt) - ploff + pkt->ehdr_buf_len;
->          pkt->vec_len = iov_copy(pkt->vec + 1, pkt->vec_len_total - 1,
->                                  iov, iovcnt, ploff,
-> -                                pkt->tot_len - pkt->ehdr_buf_len);
-> +                                pkt->tot_len - pkt->ehdr_buf_len) + 1;
+On 03/03/2017 10:21 AM, Daniel P. Berrange wrote:
 
-I can not understand the trailing '1', shouldn't it be 'sizeof(struct 
-vlan_header)' instead? (=4)
-This should be easily unit-testable.
+>>>> I remember years ago something like O_PATH was not defined on Mac OS=
 
->      } else {
->          net_rx_pkt_iovec_realloc(pkt, iovcnt);
->
->
+>>>> X,
+>>>> so the solution was to define the constant as zero. Something like
+>>>> this:
+>>>>
+>>>> #ifndef O_PATH
+>>>> 	#define O_PATH 0
+>>>> #endif
+>>>>
+>>>> Maybe this might work in 9p-util.h.
+>>>>
+
+>>
+>> +#ifndef O_PATH
+>> +    #define O_PATH 0
+>> +#endif
+>=20
+> Isn't the use of O_PATH required in order to fix the recent
+> security vulnerability in 9p ?  If so, then defining it to
+> 0 means the QEMU is silently becoming vulnerable once again
+> which I don't think is a good idea.
+
+My understanding is that O_PATH is an optimization. It lets openat()
+succeed in some places where it would ordinarily fail (for example, it
+can be used to open a dir with mode 0000) - the resulting fd is
+limited-use (it cannot be used to read() or write(), but CAN be used as
+the relative fd for a subsequent openat(), for example).  If you define
+O_PATH to 0, then attempts to traverse paths will fail where the could
+have otherwise succeeded, but failure is okay (the CVE was that we were
+succeeding at opening through a guest-controlled symlink; whether we now
+fail or guarantee that we are not going through a symlink is a quality
+of implementation, but either way, we are at least immune from
+succeeding through a symlink).
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--Xbdw4oAs2W2U8b2PMuolPrkFwB0RUIm7H
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYuZxtAAoJEKeha0olJ0NqZXcH/jCAZYuGNIJCsQlj1lvGcIbA
+Pffpq6a9Zwvqw6bicbbWHmHSiQfkvOYYRyWG/QqOiJ3iZXAqBdudHbfARze+Gg3Y
+Zx5IoZ74ZnJokV76XbmTLt4FYhtxXT3lkydIFo2W0CWOTrWD3cHHmQJFXOH/8plX
+CdBBU8/Ro9Q+vJurx5Gm8J1bl8oeaTfFgj11OPHxrP5KF6iNfhHEKq7MDSbWZbHK
+LbZWiV5ssKJsqQMH/jgiei1lGHGhMw+Gv4VjWl/iVrcl8Otg+uWl+GsCwxZxaUVF
+iCfo6gmfOo3OVISPXXlkub9D49lgCufDjO+d3aNV5M5hNSegMkL1Tt/i37z8Pg0=
+=sXh9
+-----END PGP SIGNATURE-----
+
+--Xbdw4oAs2W2U8b2PMuolPrkFwB0RUIm7H--
