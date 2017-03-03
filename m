@@ -1,26 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cjn26-0004jV-Rl
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:14:07 -0500
+	(envelope-from <borntraeger@de.ibm.com>) id 1cjnAB-0000jT-AE
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:22:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cjn23-0000BY-M2
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:14:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50216)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cjn23-0000BI-Fe
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:14:03 -0500
-References: <33183CC9F5247A488A2544077AF19020DA1D01C2@DGGEMA505-MBX.china.huawei.com>
-	<20170303120054.GB2439@work-vm>
-	<10d66d73-a269-acb4-bc3d-2250793cba8e@redhat.com>
-	<20170303131150.GC2439@work-vm>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bcaabb9b-44a6-ee7d-14b9-eade207e1538@redhat.com>
-Date: Fri, 3 Mar 2017 14:14:00 +0100
+	(envelope-from <borntraeger@de.ibm.com>) id 1cjnA8-0003Xn-5L
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:22:27 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60270
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1cjnA7-0003Xd-Va
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:22:24 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v23DDcHn036237
+	for <qemu-devel@nongnu.org>; Fri, 3 Mar 2017 08:22:23 -0500
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28xs8fftpd-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 08:22:22 -0500
+Received: from localhost
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Fri, 3 Mar 2017 06:22:22 -0700
+References: <148847238435.285.7158100214182923369@0e2666bad730>
+	<e58e0463-c12f-31ed-3944-a09735e7a7fc@de.ibm.com>
+	<20170303095301.GE7097@lemon.lan>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Fri, 3 Mar 2017 14:22:17 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170303131150.GC2439@work-vm>
+In-Reply-To: <20170303095301.GE7097@lemon.lan>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Bug?] BQL about live migration
+Message-Id: <7010a04e-a8c0-16a9-c9bf-c22e32b521c3@de.ibm.com>
+Subject: Re: [Qemu-devel] [PULL v2 0/3] Merge qio 2017/02/27
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,66 +43,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "quintela@redhat.com" <quintela@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, yanghongyang <yanghongyang@huawei.com>, Huangzhichao <huangzhichao@huawei.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, peter.maydell@linaro.org
 
-
-
-On 03/03/2017 14:11, Dr. David Alan Gilbert wrote:
-> * Paolo Bonzini (pbonzini@redhat.com) wrote:
+On 03/03/2017 10:53 AM, Fam Zheng wrote:
+> On Fri, 03/03 09:12, Christian Borntraeger wrote:
+>> On 03/02/2017 05:33 PM, no-reply@patchew.org wrote:
 >>
->>
->> On 03/03/2017 13:00, Dr. David Alan Gilbert wrote:
->>> Ouch that's pretty nasty; I remember Paolo explaining to me a while ago that
->>> their were times when run_on_cpu would have to drop the BQL and I worried about it,
->>> but this is the 1st time I've seen an error due to it.
->>>
->>> Do you know what the migration state was at that point? Was it MIGRATION_STATUS_CANCELLING?
->>> I'm thinking perhaps we should stop 'cont' from continuing while migration is in
->>> MIGRATION_STATUS_CANCELLING.  Do we send an event when we hit CANCELLED - so that
->>> perhaps libvirt could avoid sending the 'cont' until then?
->>
->> No, there's no event, though I thought libvirt would poll until
->> "query-migrate" returns the cancelled state.  Of course that is a small
->> consolation, because a segfault is unacceptable.
+>> Fam, this seems to happen sometimes. Can you have a look at that why the qtest 
+>> thing fails on the s390 box?
 > 
-> I think you might get an event if you set the new migrate capability called
-> 'events' on!
+> I don't know, when I run the commands manually for a few times, it is not
+> reproduced. :(
 > 
-> void migrate_set_state(int *state, int old_state, int new_state)
-> {
->     if (atomic_cmpxchg(state, old_state, new_state) == old_state) {
->         trace_migrate_set_state(new_state);
->         migrate_generate_event(new_state);
->     }
-> }
-> 
-> static void migrate_generate_event(int new_state)
-> {
->     if (migrate_use_events()) {
->         qapi_event_send_migration(new_state, &error_abort); 
->     }
-> }
-> 
-> That event feature went in sometime after 2.3.0.
-> 
->> One possibility is to suspend the monitor in qmp_migrate_cancel and
->> resume it (with add_migration_state_change_notifier) when we hit the
->> CANCELLED state.  I'm not sure what the latency would be between the end
->> of migrate_fd_cancel and finally reaching CANCELLED.
-> 
-> I don't like suspending monitors; it can potentially take quite a significant
-> time to do a cancel.
-> How about making 'cont' fail if we're in CANCELLING?
+> Fam
 
-Actually I thought that would be the case already (in fact CANCELLING is
-internal only; the outside world sees it as "active" in query-migrate).
-
-Lei, what is the runstate?  (That is, why did cont succeed at all)?
-
-Paolo
-
-> I'd really love to see the 'run_on_cpu' being more careful about the BQL;
-> we really need all of the rest of the devices to stay quiesced at times.
-
-That's not really possible, because of how condition variables work. :(
+Any chance to add V=1 to the make check, so that we get the full testcase output?
