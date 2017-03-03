@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54904)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nutarojj@ornl.gov>) id 1cjt2S-0001Yv-MI
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 14:38:53 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cjt4F-0002F7-2X
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 14:40:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nutarojj@ornl.gov>) id 1cjt2P-0006JI-Kl
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 14:38:52 -0500
-Received: from mta02.ornl.gov ([128.219.177.136]:34825)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nutarojj@ornl.gov>) id 1cjt2P-0006IM-Bm
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 14:38:49 -0500
-From: "Nutaro, James J." <nutarojj@ornl.gov>
-Date: Fri, 3 Mar 2017 19:38:43 +0000
-Message-ID: <a7977444b25641cc86352a6818a4df3a@EXCHCS32.ornl.gov>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cjt4B-00076f-Vd
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 14:40:43 -0500
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:36555)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cjt4B-00076K-RK
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 14:40:39 -0500
+Received: by mail-qk0-x244.google.com with SMTP id n141so5947207qke.3
+	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 11:40:39 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1488556233-31246-1-git-send-email-peter.maydell@linaro.org>
+	<1488556233-31246-2-git-send-email-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <de6825bd-389d-5390-9834-ad139a72cfc6@amsat.org>
+Date: Fri, 3 Mar 2017 16:40:35 -0300
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] -rtc clock=vm with -icount 1,
- sleep=off introduces unexpected delays in device interactions
+In-Reply-To: <1488556233-31246-2-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-2.9 1/6] disas/hppa: Remove dead code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,32 +34,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "'mttcg@listserver.greensocs.com'" <mttcg@listserver.greensocs.com>
-Cc: "'qemu-devel@nongnu.org'" <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, patches@linaro.org, Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-My original problem seems to stem from something that changed in the way th=
-at device emulation and instruction execution interact (I'm guessing). To r=
-eproduce the issue, I started a linux image with
+On 03/03/2017 12:50 PM, Peter Maydell wrote:
+> Coverity complains (CID 1302705) that the "fr0" part of the ?: in
+> fput_fp_reg_r() is dead.  This looks like cut-n-paste error from
+> fput_fp_reg(); delete the dead code.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-qemu-system-i386 -rtc clock=3Dvm -monitor none -icount 1,sleep=3Doff jack.i=
-mg
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-After booting, I run
-
-ping localhost
-
-The first round trip time reports look reasonable, being in the millisecond=
- to sub-millisecond range. These occur while the emulator is running slower=
- than real time.=20
-
-After a bit, the emulator speeds up (skipping over idle periods during I/O?=
-) and the round trip times jump to hundreds of milliseconds, which I had no=
-t expected.
-
-If you want to try this experiment yourself, you can get the disk image tha=
-t I used from here:
-
-http://www.ornl.gov/~1qn/qemu-images/jack.img
-
-
-Jim
+> ---
+>  disas/hppa.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/disas/hppa.c b/disas/hppa.c
+> index 43facdc..a2d371f 100644
+> --- a/disas/hppa.c
+> +++ b/disas/hppa.c
+> @@ -1788,8 +1788,7 @@ fput_fp_reg_r (unsigned reg, disassemble_info *info)
+>    if (reg < 4)
+>      (*info->fprintf_func) (info->stream, "fpe%d", reg * 2 + 1);
+>    else
+> -    (*info->fprintf_func) (info->stream, "%sR",
+> -			   reg ? fp_reg_names[reg] : "fr0");
+> +    (*info->fprintf_func) (info->stream, "%sR", fp_reg_names[reg]);
+>  }
+>
+>  static void
+>
