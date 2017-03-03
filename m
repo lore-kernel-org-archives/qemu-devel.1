@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42374)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cjmOF-0007ua-2c
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:32:57 -0500
+	(envelope-from <armbru@redhat.com>) id 1cjmOF-0007uh-R7
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:32:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cjmOC-0007xk-6E
+	(envelope-from <armbru@redhat.com>) id 1cjmOD-0007zJ-S0
 	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:32:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34506)
+Received: from mx1.redhat.com ([209.132.183.28]:60992)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cjmOB-0007wv-Ub
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:32:52 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cjmOD-0007yH-ND
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 07:32:53 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2414BC04BD5A
-	for <qemu-devel@nongnu.org>; Fri,  3 Mar 2017 12:32:52 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D68977FB7D
+	for <qemu-devel@nongnu.org>; Fri,  3 Mar 2017 12:32:53 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri,  3 Mar 2017 13:32:24 +0100
-Message-Id: <1488544368-30622-5-git-send-email-armbru@redhat.com>
+Date: Fri,  3 Mar 2017 13:32:32 +0100
+Message-Id: <1488544368-30622-13-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488544368-30622-1-git-send-email-armbru@redhat.com>
 References: <1488544368-30622-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 04/28] qmp: Dumb down how we run QMP command
- registration
+Subject: [Qemu-devel] [PATCH v4 12/28] qapi: Clean up after commit 3d344c2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,185 +31,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The way we get QMP commands registered is high tech:
-
-* qapi-commands.py generates qmp_init_marshal() that does the actual work
-
-* it also generates the magic to register it as a MODULE_INIT_QAPI
-  function, so it runs when someone calls
-  module_call_init(MODULE_INIT_QAPI)
-
-* main() calls module_call_init()
-
-QEMU needs to register a few non-qapified commands.  Same high tech
-works: monitor.c has its own qmp_init_marshal() along with the magic
-to make it run in module_call_init(MODULE_INIT_QAPI).
-
-QEMU also needs to unregister commands that are not wanted in this
-build's configuration (commit 5032a16).  Simple enough:
-qmp_unregister_commands_hack().  The difficulty is to make it run
-after the generated qmp_init_marshal().  We can't simply run it in
-monitor.c's qmp_init_marshal(), because the order in which the
-registered functions run is indeterminate.  So qmp_init_marshal()
-registers qmp_unregister_commands_hack() separately.  Since
-registering *appends* to the list of registered functions, this will
-make it run after all the functions that have been registered already.
-
-I suspect it takes a long and expensive computer science education to
-not find this silly.
-
-Dumb it down as follows:
-
-* Drop MODULE_INIT_QAPI entirely
-
-* Give the generated qmp_init_marshal() external linkage.
-
-* Call it instead of module_call_init(MODULE_INIT_QAPI)
-
-* Except in QEMU proper, call new monitor_init_qmp_commands() that in
-  turn calls the generated qmp_init_marshal(), registers the
-  additional commands and unregisters the unwanted ones.
+Drop unused QIV_STACK_SIZE and unused qobject_input_start_struct()
+parameter errp.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- include/monitor/monitor.h | 1 +
- include/qemu/module.h     | 2 --
- monitor.c                 | 9 ++++-----
- qga/main.c                | 2 +-
- scripts/qapi-commands.py  | 5 ++---
- tests/test-qmp-commands.c | 2 +-
- vl.c                      | 2 +-
- 7 files changed, 10 insertions(+), 13 deletions(-)
+ qapi/qobject-input-visitor.c | 14 +++-----------
+ 1 file changed, 3 insertions(+), 11 deletions(-)
 
-diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
-index e64b944..d2b3aaf 100644
---- a/include/monitor/monitor.h
-+++ b/include/monitor/monitor.h
-@@ -16,6 +16,7 @@ extern Monitor *cur_mon;
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index f3b6713..2c2f883 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -21,8 +21,6 @@
+ #include "qapi/qmp/types.h"
+ #include "qapi/qmp/qerror.h"
  
- bool monitor_cur_is_qmp(void);
- 
-+void monitor_init_qmp_commands(void);
- void monitor_init(Chardev *chr, int flags);
- void monitor_cleanup(void);
- 
-diff --git a/include/qemu/module.h b/include/qemu/module.h
-index 877cca7..56dd218 100644
---- a/include/qemu/module.h
-+++ b/include/qemu/module.h
-@@ -42,7 +42,6 @@ static void __attribute__((constructor)) do_qemu_init_ ## function(void)    \
- typedef enum {
-     MODULE_INIT_BLOCK,
-     MODULE_INIT_OPTS,
--    MODULE_INIT_QAPI,
-     MODULE_INIT_QOM,
-     MODULE_INIT_TRACE,
-     MODULE_INIT_MAX
-@@ -50,7 +49,6 @@ typedef enum {
- 
- #define block_init(function) module_init(function, MODULE_INIT_BLOCK)
- #define opts_init(function) module_init(function, MODULE_INIT_OPTS)
--#define qapi_init(function) module_init(function, MODULE_INIT_QAPI)
- #define type_init(function) module_init(function, MODULE_INIT_QOM)
- #define trace_init(function) module_init(function, MODULE_INIT_TRACE)
- 
-diff --git a/monitor.c b/monitor.c
-index b68944d..53f5f5a 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -997,8 +997,10 @@ static void qmp_unregister_commands_hack(void)
- #endif
- }
- 
--static void qmp_init_marshal(void)
-+void monitor_init_qmp_commands(void)
- {
-+    qmp_init_marshal();
-+
-     qmp_register_command("query-qmp-schema", qmp_query_qmp_schema,
-                          QCO_NO_OPTIONS);
-     qmp_register_command("device_add", qmp_device_add,
-@@ -1006,12 +1008,9 @@ static void qmp_init_marshal(void)
-     qmp_register_command("netdev_add", qmp_netdev_add,
-                          QCO_NO_OPTIONS);
- 
--    /* call it after the rest of qapi_init() */
--    register_module_init(qmp_unregister_commands_hack, MODULE_INIT_QAPI);
-+    qmp_unregister_commands_hack();
- }
- 
--qapi_init(qmp_init_marshal);
+-#define QIV_STACK_SIZE 1024
 -
- /* set the current CPU defined by the user */
- int monitor_set_cpu(int cpu_index)
+ typedef struct StackObject
  {
-diff --git a/qga/main.c b/qga/main.c
-index 538e4ee..6f8c614 100644
---- a/qga/main.c
-+++ b/qga/main.c
-@@ -1321,7 +1321,7 @@ int main(int argc, char **argv)
- 
-     config->log_level = G_LOG_LEVEL_ERROR | G_LOG_LEVEL_CRITICAL;
- 
--    module_call_init(MODULE_INIT_QAPI);
-+    qmp_init_marshal();
- 
-     init_dfl_pathnames();
-     config_load(config);
-diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
-index 09e8467..a75946f 100644
---- a/scripts/qapi-commands.py
-+++ b/scripts/qapi-commands.py
-@@ -208,14 +208,12 @@ def gen_register_command(name, success_response):
- def gen_registry(registry):
-     ret = mcgen('''
- 
--static void qmp_init_marshal(void)
-+void qmp_init_marshal(void)
- {
- ''')
-     ret += registry
-     ret += mcgen('''
+     QObject *obj; /* Object being visited */
+@@ -103,8 +101,7 @@ static void qdict_add_key(const char *key, QObject *obj, void *opaque)
  }
--
--qapi_init(qmp_init_marshal);
- ''')
-     return ret
  
-@@ -308,6 +306,7 @@ fdecl.write(mcgen('''
- #include "qapi/qmp/qdict.h"
- #include "qapi/error.h"
+ static const QListEntry *qobject_input_push(QObjectInputVisitor *qiv,
+-                                            QObject *obj, void *qapi,
+-                                            Error **errp)
++                                            QObject *obj, void *qapi)
+ {
+     GHashTable *h;
+     StackObject *tos = g_new0(StackObject, 1);
+@@ -170,7 +167,6 @@ static void qobject_input_start_struct(Visitor *v, const char *name, void **obj,
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
+     QObject *qobj = qobject_input_get_object(qiv, name, true, errp);
+-    Error *err = NULL;
  
-+void qmp_init_marshal(void);
- ''',
-                   prefix=prefix))
+     if (obj) {
+         *obj = NULL;
+@@ -184,11 +180,7 @@ static void qobject_input_start_struct(Visitor *v, const char *name, void **obj,
+         return;
+     }
  
-diff --git a/tests/test-qmp-commands.c b/tests/test-qmp-commands.c
-index ff94481..c4e20d1 100644
---- a/tests/test-qmp-commands.c
-+++ b/tests/test-qmp-commands.c
-@@ -273,7 +273,7 @@ int main(int argc, char **argv)
-     g_test_add_func("/0.15/dealloc_types", test_dealloc_types);
-     g_test_add_func("/0.15/dealloc_partial", test_dealloc_partial);
+-    qobject_input_push(qiv, qobj, obj, &err);
+-    if (err) {
+-        error_propagate(errp, err);
+-        return;
+-    }
++    qobject_input_push(qiv, qobj, obj);
  
--    module_call_init(MODULE_INIT_QAPI);
-+    qmp_init_marshal();
-     g_test_run();
+     if (obj) {
+         *obj = g_malloc0(size);
+@@ -216,7 +208,7 @@ static void qobject_input_start_list(Visitor *v, const char *name,
+         return;
+     }
  
-     return 0;
-diff --git a/vl.c b/vl.c
-index e10a27b..c6020b9 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2987,7 +2987,7 @@ int main(int argc, char **argv, char **envp)
-     qemu_init_exec_dir(argv[0]);
- 
-     module_call_init(MODULE_INIT_QOM);
--    module_call_init(MODULE_INIT_QAPI);
-+    monitor_init_qmp_commands();
- 
-     qemu_add_opts(&qemu_drive_opts);
-     qemu_add_drive_opts(&qemu_legacy_drive_opts);
+-    entry = qobject_input_push(qiv, qobj, list, errp);
++    entry = qobject_input_push(qiv, qobj, list);
+     if (list) {
+         if (entry) {
+             *list = g_malloc0(size);
 -- 
 2.7.4
