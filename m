@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58194)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58515)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cjq2D-0001Pj-3r
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:26:26 -0500
+	(envelope-from <eblake@redhat.com>) id 1cjq3n-00028T-VE
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:28:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cjq27-0000ur-W0
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:26:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:30512)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cjq27-0000uE-Mp
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:26:19 -0500
-Date: Fri, 3 Mar 2017 16:26:12 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170303162611.GE13631@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1488517304-23131-1-git-send-email-he.chen@linux.intel.com>
-	<20170303135704.GX2778@thinpad.lan.raisama.net>
-	<d93b2ebb-c5a3-a774-30fd-2d92c7703549@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1cjq3m-0001Xb-Mi
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:28:03 -0500
+References: <1488491046-2549-1-git-send-email-armbru@redhat.com>
+	<dba72030-5a51-c439-ff27-9bb52430b772@redhat.com>
+	<87shmu7wcm.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ff607b9e-ad62-6d44-1593-93a437125a76@redhat.com>
+Date: Fri, 3 Mar 2017 10:27:44 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <d93b2ebb-c5a3-a774-30fd-2d92c7703549@redhat.com>
-Subject: Re: [Qemu-devel] [RFC] x86: Allow to set NUMA distance for
- different NUMA nodes
+In-Reply-To: <87shmu7wcm.fsf@dusky.pond.sub.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="wu2H4D78kBp2Uwnk7MPSBeUOPXInQC7Q6"
+Subject: Re: [Qemu-devel] [PATCH 00/15] block: A bunch of fixes for Sheepdog
+ and Gluster
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +26,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, He Chen <he.chen@linux.intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mitake.hitoshi@lab.ntt.co.jp, jcody@redhat.com, qemu-block@nongnu.org, namei.unix@gmail.com
 
-On Fri, Mar 03, 2017 at 10:09:22AM -0600, Eric Blake wrote:
-> On 03/03/2017 07:57 AM, Eduardo Habkost wrote:
-> 
-> >> With this patch, when a user wants to create a guest that contains
-> >> several vNUMA nodes and also wants to set distance among those nodes,
-> >> the QEMU command would like:
-> >>
-> >> ```
-> >> -object memory-backend-ram,size=1G,prealloc=yes,host-nodes=0,policy=bind,id=node0 \
-> >> -numa node,nodeid=0,cpus=0,memdev=node0,distance=10,distance=21,distance=31,distance=41 \
-> 
-> > 
-> > It would be nice to have a more intuitive syntax to represent
-> > ordered lists in QemuOpts. But this is what we have today.
-> > 
-> 
-> Markus has the discussion on representing arrays via the command line;
-> particularly since this array is very tightly coupled to the order in
-> which values are presented, it may be worth having:
-> 
-> -numa
-> node,nodeid=0,cpus=0,memdev=nod0,distance.0=10,distance.1=21,distance.2=31,distance.3=41
-> 
-> with the explicit distance.0= suffixes to distance making it more
-> obvious that we are dealing with an array.
-> 
-> > I think the proposal makes sense. I would like the semantics of the new option
-> > to be documented at qapi-schema.json and qemu-options.hx.
-> > 
-> > I would call the new NumaNodeOptions field "distances", as it is
-> > a list of distances.
-> 
-> Indeed, Markus is trying (with his work on -blockdev for 2.9) to get the
-> command line to a point where it is identical to the QMP code, by
-> reusing qapi-schema.json, so we should very much keep that in mind with
-> whatever we add to -numa in 2.10.
-> 
-> 
-> > but in the future we could support something like:
-> > 
-> >   -numa node,nodeid=0,cpus=0,memdev=node0 \
-> >   -numa node,nodeid=1,cpus=1,memdev=node1 \
-> >   -numa node,nodeid=2,cpus=2,memdev=node2 \
-> >   -numa node,nodeid=3,cpus=3,memdev=node3 \
-> >   -numa distances,distances[0][0]=10,distances[0][1]=21,distances[0][2]=31,distances[0][3]=41,\
-> >                   distances[1][0]=21,distances[1][1]=10,distances[1][2]=21,distances[1][3]=31,\
-> >                   distances[2][0]=31,distances[2][1]=21,distances[2][2]=10,distances[2][3]=21,\
-> >                   distances[3][0]=41,distances[3][1]=31,distances[3][2]=21,distances[3][3]=10
-> 
-> Except that [] requires special shell quoting, so the proposal would be
-> more like:
-> 
-> -numa distances.0.0=10,distances.0.1=21
-> 
-> Right now, QMP doesn't support 2-D arrays (although this may be a good
-> reason to introduce support), so that's also something to think about
-> (not insurmountable, but makes the task more complex).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--wu2H4D78kBp2Uwnk7MPSBeUOPXInQC7Q6
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mitake.hitoshi@lab.ntt.co.jp,
+ jcody@redhat.com, qemu-block@nongnu.org, namei.unix@gmail.com
+Message-ID: <ff607b9e-ad62-6d44-1593-93a437125a76@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 00/15] block: A bunch of fixes for Sheepdog
+ and Gluster
+References: <1488491046-2549-1-git-send-email-armbru@redhat.com>
+ <dba72030-5a51-c439-ff27-9bb52430b772@redhat.com>
+ <87shmu7wcm.fsf@dusky.pond.sub.org>
+In-Reply-To: <87shmu7wcm.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-What I don't like about this syntax is that it is duplicating information
-twice. IIUC the NUMA distance information is unidirectional, so specifying
-the same data for both direetions (node 0 -> node 3, and node 3 -> node 0)
-looks like overkill. Also the self-node distance isi defined to always be
-10 IIUC, so specifying that is not required. IOW, could cut down the data
-we need to provider to just
+On 03/02/2017 11:39 PM, Markus Armbruster wrote:
+> Eric Blake <eblake@redhat.com> writes:
+>=20
+>> On 03/02/2017 03:43 PM, Markus Armbruster wrote:
+>>> Bad error handling, memory leaks, and lack of blockdev-add support.
+>>
+>> How hard are we trying to get blockdev-add working in 2.9?  Or is this=
 
-   -numa distances,nodea=0,nodeb=1,value=20
-   -numa distances,nodea=0,nodeb=2,value=20
-   -numa distances,nodea=0,nodeb=3,value=20
-   -numa distances,nodea=1,nodeb=2,value=20
-   -numa distances,nodea=1,nodeb=3,value=20
-   -numa distances,nodea=2,nodeb=3,value=20
+>> series 2.10 material now?
+>=20
+> Definitely not 2.10: seven patches fix or document bugs, one improves
+> error messages, five are straightforward cleanups.  The series touches
+> only these two block drivers, including QAPI schema parts not used
+> anywhere else:
+>=20
+>>>  block/gluster.c      | 127 +++++++--------
+>>>  block/sheepdog.c     | 436 +++++++++++++++++++++++++++++++++++++----=
+----------
+>>>  qapi-schema.json     |  38 +++++
+>>>  qapi/block-core.json |  73 +++------
+>>>  4 files changed, 443 insertions(+), 231 deletions(-)
+>=20
+> With the pending pull requests merged, blockdev-add *is* working, excep=
+t
+> for sheepdog.  I'm considering that a bug, and I need *two* patches to
+> fix it.  One touches only sheepdog.c, and the other only adds to the
+> QAPI schema.
+
+I can agree to that. It may help if the v2 is explicit that the series
+is for-2.9 in the subject.
+
+>=20
+> If we decide not to fix the bug, I'd recommend to declare blockdev-add
+> supported in 2.9 anyway, with a release note that sheepdog support is
+> broken.
+>=20
+
+Yes, I think we can still treat the rename of 'x-blockdev-del' to
+'blockdev-del' as a bug fix appropriate for 2.9, finally declaring the
+feature stable.
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+--wu2H4D78kBp2Uwnk7MPSBeUOPXInQC7Q6
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYuZmAAAoJEKeha0olJ0NqO2EH/35NpjaGG/7Zc2MwGxftdb6r
+3G/URMpj+kpkG21LgioRMc8IC+O1xTsJ0VoDRHoBGXykELzWBCm4jx+shk1pMB9m
+rpB7y2+I4Ey0hKDIFJ1LQjhfcWVkeAIvBJiiM5jTX7HHoqK8xGXMBaXC8EG22TCF
+O7RDLuYYChAWsEP13aXHAW2CGw921/hole+avc5Lb1wuQWLK9pEBVVqXqMdFjhar
+SEjCkEeWC9GofV4U3SILKCqJV3dlR8Spma9PMMJAn7hV3FwqGvbhg64tEz3ulWMC
+aEU3+cLpIyv5k1AHa556M111vjl9q1t7+s1+g+XVCd0npV4QukWkQv2dJS1px3s=
+=Po+z
+-----END PGP SIGNATURE-----
+
+--wu2H4D78kBp2Uwnk7MPSBeUOPXInQC7Q6--
