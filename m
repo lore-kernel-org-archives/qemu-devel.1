@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cjpxb-0000Ni-MC
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:21:41 -0500
+	(envelope-from <berrange@redhat.com>) id 1cjq2D-0001Pj-3r
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:26:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cjpxY-0007v7-EO
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:21:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53916)
+	(envelope-from <berrange@redhat.com>) id 1cjq27-0000ur-W0
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:26:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:30512)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cjpxY-0007ut-58
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:21:36 -0500
-Date: Fri, 3 Mar 2017 16:21:28 +0000
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cjq27-0000uE-Mp
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:26:19 -0500
+Date: Fri, 3 Mar 2017 16:26:12 +0000
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170303162128.GD13631@redhat.com>
+Message-ID: <20170303162611.GE13631@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <mailman.56273.1488553194.22740.qemu-devel@nongnu.org>
-	<8FB6923C-8F97-497C-95DC-6F2D937725BC@gmail.com>
-	<20170303164426.42472535@bahia.lan>
-	<AA7BADA2-06D5-4A20-A38F-57D374B6C58D@gmail.com>
+References: <1488517304-23131-1-git-send-email-he.chen@linux.intel.com>
+	<20170303135704.GX2778@thinpad.lan.raisama.net>
+	<d93b2ebb-c5a3-a774-30fd-2d92c7703549@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <AA7BADA2-06D5-4A20-A38F-57D374B6C58D@gmail.com>
-Subject: Re: [Qemu-devel] git master build failure in 9pfs
+In-Reply-To: <d93b2ebb-c5a3-a774-30fd-2d92c7703549@redhat.com>
+Subject: Re: [Qemu-devel] [RFC] x86: Allow to set NUMA distance for
+ different NUMA nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,123 +30,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: G 3 <programmingkidx@gmail.com>
-Cc: Greg Kurz <groug@kaod.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, He Chen <he.chen@linux.intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Fri, Mar 03, 2017 at 10:55:01AM -0500, G 3 wrote:
+On Fri, Mar 03, 2017 at 10:09:22AM -0600, Eric Blake wrote:
+> On 03/03/2017 07:57 AM, Eduardo Habkost wrote:
 > 
-> On Mar 3, 2017, at 10:44 AM, Greg Kurz wrote:
+> >> With this patch, when a user wants to create a guest that contains
+> >> several vNUMA nodes and also wants to set distance among those nodes,
+> >> the QEMU command would like:
+> >>
+> >> ```
+> >> -object memory-backend-ram,size=1G,prealloc=yes,host-nodes=0,policy=bind,id=node0 \
+> >> -numa node,nodeid=0,cpus=0,memdev=node0,distance=10,distance=21,distance=31,distance=41 \
 > 
-> > On Fri, 3 Mar 2017 10:28:00 -0500
-> > G 3 <programmingkidx@gmail.com> wrote:
 > > 
-> > > On Mar 3, 2017, at 9:59 AM, qemu-devel-request@nongnu.org wrote:
-> > > > On 02/03/17 17:40, Daniel P. Berrange wrote:
-> > > > 
-> > > > > On Thu, Mar 02, 2017 at 05:28:24PM +0000, Mark Cave-Ayland wrote:
-> > > > > > Does anyone else see the following error when trying to build git
-> > > > > > master?
-> > > > > > 
-> > > > > > cc -I/home/build/src/qemu/git/qemu/hw/9pfs -Ihw/9pfs
-> > > > > > -I/home/build/src/qemu/git/qemu/tcg
-> > > > > > -I/home/build/src/qemu/git/qemu/tcg/i386
-> > > > > > -I/home/build/src/qemu/git/qemu/linux-headers
-> > > > > > -I/home/build/src/qemu/git/qemu/linux-headers -I.
-> > > > > > -I/home/build/src/qemu/git/qemu -I/home/build/src/qemu/git/qemu/
-> > > > > > include
-> > > > > > -I/usr/include/pixman-1
-> > > > > > -I/home/build/src/qemu/git/qemu/dtc/libfdt
-> > > > > > -Werror -pthread -I/usr/include/glib-2.0
-> > > > > > -I/usr/lib/x86_64-linux-gnu/glib-2.0/include   -m64 -mcx16 -
-> > > > > > D_GNU_SOURCE
-> > > > > > -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes
-> > > > > > -Wredundant-decls -Wall -Wundef -Wwrite-strings
-> > > > > > -Wmissing-prototypes
-> > > > > > -fno-strict-aliasing -fno-common -fwrapv  -Wendif-labels
-> > > > > > -Wno-missing-include-dirs -Wempty-body -Wnested-externs
-> > > > > > -Wformat-security -Wformat-y2k -Winit-self -Wignored-qualifiers
-> > > > > > -Wold-style-declaration -Wold-style-definition -Wtype-limits
-> > > > > > -fstack-protector-all -I/usr/include/p11-kit-1
-> > > > > > -I/usr/include/libpng12   -I/home/build/src/qemu/git/qemu/tests -
-> > > > > > MMD -MP
-> > > > > > -MT hw/9pfs/9p-util.o -MF hw/9pfs/9p-util.d -O2 -U_FORTIFY_SOURCE
-> > > > > > -D_FORTIFY_SOURCE=2 -g   -c -o hw/9pfs/9p-util.o hw/9pfs/9p-util.c
-> > > > > > In file included from hw/9pfs/9p-util.c:15:0:
-> > > > > > hw/9pfs/9p-util.h: In function ?openat_dir?:
-> > > > > > hw/9pfs/9p-util.h:25:57: error: ?O_PATH? undeclared (first use in
-> > > > > > this
-> > > > > > function)
-> > > > > > hw/9pfs/9p-util.h:25:57: note: each undeclared identifier is
-> > > > > > reported
-> > > > > > only once for each function it appears in
-> > > > > > hw/9pfs/9p-util.h:26:1: error: control reaches end of non-void
-> > > > > > function
-> > > > > > [-Werror=return-type]
-> > > > > > 
-> > > > > > Build platform is Debian Wheezy on an x86_64 host.
-> > > > > 
-> > > > > IIUC, O_PATH was introduced in glibc 2.14 and Wheezy only has 2.13.
-> > > > > 
-> > > > > So unless we want to make this 9pfs code a configurable
-> > > > > option, this
-> > > > > means Debian Wheezy is no longer a supportable platform for QEMU.
-> > > > 
-> > > > Oh sure, I appreciate that wheezy is getting towards then end of its
-> > > > lifetime - it's just a little bit inconvenient to break my
-> > > > development
-> > > > environment just as we enter 2.9 freeze ;)
-> > > > 
-> > > > If everyone agrees that wheezy is no longer supported after 2.9
-> > > > then I
-> > > > can look to upgrading, however my QEMU development is done on my
-> > > > laptop
-> > > > which is also setup for my day job so it's not a simple case of just
-> > > > switching the repository and running dist-upgrade to get me going
-> > > > again...
-> > > 
-> > > I remember years ago something like O_PATH was not defined on Mac OS
-> > > X,
-> > > so the solution was to define the constant as zero. Something like
-> > > this:
-> > > 
-> > > #ifndef O_PATH
-> > > 	#define O_PATH 0
-> > > #endif
-> > > 
-> > > Maybe this might work in 9p-util.h.
-> > > 
+> > It would be nice to have a more intuitive syntax to represent
+> > ordered lists in QemuOpts. But this is what we have today.
 > > 
-> > Yes. Please send a patch and I'll merge it.
+> 
+> Markus has the discussion on representing arrays via the command line;
+> particularly since this array is very tightly coupled to the order in
+> which values are presented, it may be worth having:
+> 
+> -numa
+> node,nodeid=0,cpus=0,memdev=nod0,distance.0=10,distance.1=21,distance.2=31,distance.3=41
+> 
+> with the explicit distance.0= suffixes to distance making it more
+> obvious that we are dealing with an array.
+> 
+> > I think the proposal makes sense. I would like the semantics of the new option
+> > to be documented at qapi-schema.json and qemu-options.hx.
 > > 
-> > Cheers.
+> > I would call the new NumaNodeOptions field "distances", as it is
+> > a list of distances.
+> 
+> Indeed, Markus is trying (with his work on -blockdev for 2.9) to get the
+> command line to a point where it is identical to the QMP code, by
+> reusing qapi-schema.json, so we should very much keep that in mind with
+> whatever we add to -numa in 2.10.
+> 
+> 
+> > but in the future we could support something like:
 > > 
-> > --
-> > Greg
+> >   -numa node,nodeid=0,cpus=0,memdev=node0 \
+> >   -numa node,nodeid=1,cpus=1,memdev=node1 \
+> >   -numa node,nodeid=2,cpus=2,memdev=node2 \
+> >   -numa node,nodeid=3,cpus=3,memdev=node3 \
+> >   -numa distances,distances[0][0]=10,distances[0][1]=21,distances[0][2]=31,distances[0][3]=41,\
+> >                   distances[1][0]=21,distances[1][1]=10,distances[1][2]=21,distances[1][3]=31,\
+> >                   distances[2][0]=31,distances[2][1]=21,distances[2][2]=10,distances[2][3]=21,\
+> >                   distances[3][0]=41,distances[3][1]=31,distances[3][2]=21,distances[3][3]=10
 > 
+> Except that [] requires special shell quoting, so the proposal would be
+> more like:
 > 
-> Here is the patch. I think we should let Mark or some else test it to see if
-> it does fix the problem before a real patch is submitted.
+> -numa distances.0.0=10,distances.0.1=21
 > 
-> ---
->  hw/9pfs/9p-util.h | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/hw/9pfs/9p-util.h b/hw/9pfs/9p-util.h
-> index 091f3ce..254d2a9 100644
-> --- a/hw/9pfs/9p-util.h
-> +++ b/hw/9pfs/9p-util.h
-> @@ -13,6 +13,10 @@
->  #ifndef QEMU_9P_UTIL_H
->  #define QEMU_9P_UTIL_H
-> 
-> +#ifndef O_PATH
-> +    #define O_PATH 0
-> +#endif
+> Right now, QMP doesn't support 2-D arrays (although this may be a good
+> reason to introduce support), so that's also something to think about
+> (not insurmountable, but makes the task more complex).
 
-Isn't the use of O_PATH required in order to fix the recent
-security vulnerability in 9p ?  If so, then defining it to
-0 means the QEMU is silently becoming vulnerable once again
-which I don't think is a good idea.
+What I don't like about this syntax is that it is duplicating information
+twice. IIUC the NUMA distance information is unidirectional, so specifying
+the same data for both direetions (node 0 -> node 3, and node 3 -> node 0)
+looks like overkill. Also the self-node distance isi defined to always be
+10 IIUC, so specifying that is not required. IOW, could cut down the data
+we need to provider to just
+
+   -numa distances,nodea=0,nodeb=1,value=20
+   -numa distances,nodea=0,nodeb=2,value=20
+   -numa distances,nodea=0,nodeb=3,value=20
+   -numa distances,nodea=1,nodeb=2,value=20
+   -numa distances,nodea=1,nodeb=3,value=20
+   -numa distances,nodea=2,nodeb=3,value=20
 
 
 Regards,
