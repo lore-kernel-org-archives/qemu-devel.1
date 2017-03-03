@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cjs58-0001Gm-Nw
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:37:35 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cjs7f-0003E6-3k
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:40:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cjs57-0000ud-Ou
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:37:34 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1488491046-2549-1-git-send-email-armbru@redhat.com>
-	<CAFEAcA-XqZb22ov-PxxGJ8EnF-Yj+m-FETPY0n1kUcZDmskqxA@mail.gmail.com>
-Date: Fri, 03 Mar 2017 19:37:26 +0100
-In-Reply-To: <CAFEAcA-XqZb22ov-PxxGJ8EnF-Yj+m-FETPY0n1kUcZDmskqxA@mail.gmail.com>
-	(Peter Maydell's message of "Fri, 3 Mar 2017 17:14:07 +0000")
-Message-ID: <87pohykxzt.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1cjs7e-0001if-HK
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:40:11 -0500
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:37044)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cjs7e-0001hZ-BS
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 13:40:10 -0500
+Received: by mail-wm0-x22e.google.com with SMTP id n11so22140221wma.0
+	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 10:40:10 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 00/15] block: A bunch of fixes for Sheepdog
- and Gluster
+In-Reply-To: <7e582e5ca2aaa7b8b6c1f8a040562b099767ff81.1488504063.git.balaton@eik.bme.hu>
+References: <cover.1488504063.git.balaton@eik.bme.hu>
+	<7e582e5ca2aaa7b8b6c1f8a040562b099767ff81.1488504063.git.balaton@eik.bme.hu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 Mar 2017 18:39:48 +0000
+Message-ID: <CAFEAcA8w9ox2KSSvky6aY3sHG=Xq=h7Wu2F_9UHRtQAKCPTrLg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v3 04/13] sm501: QOMify
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,39 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Jeff Cody <jcody@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, namei.unix@gmail.com
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> On 2 March 2017 at 21:43, Markus Armbruster <armbru@redhat.com> wrote:
->> Bad error handling, memory leaks, and lack of blockdev-add support.
->>
->> Markus Armbruster (15):
->>   sheepdog: Defuse time bomb in sd_open() error handling
->>   sheepdog: Fix error handling in sd_snapshot_delete()
->>   sheepdog: Fix error handling sd_create()
->>   sheepdog: Mark sd_snapshot_delete() lossage FIXME
->>   sheepdog: Fix snapshot ID parsing in _open(), _create, _goto()
->>   sheepdog: Don't truncate long VDI name in _open(), _create()
->>   sheepdog: Report errors in pseudo-filename more usefully
->>   sheepdog: Use SocketAddress and socket_connect()
->>   sheepdog: Implement bdrv_parse_filename()
->>   gluster: Drop assumptions on SocketTransport names
->>   gluster: Don't duplicate qapi-util.c's qapi_enum_parse()
->>   gluster: Plug memory leaks in qemu_gluster_parse_json()
->>   qapi-schema: Rename GlusterServer to SocketAddressFlat
->>   qapi-schema: Rename SocketAddressFlat's variant tcp to inet
->>   sheepdog: Support blockdev-add
->>
->>  block/gluster.c      | 127 +++++++--------
->>  block/sheepdog.c     | 436 +++++++++++++++++++++++++++++++++++++--------------
->>  qapi-schema.json     |  38 +++++
->>  qapi/block-core.json |  73 +++------
->>  4 files changed, 443 insertions(+), 231 deletions(-)
+On 3 March 2017 at 01:03, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+> Adding vmstate saving is not in this patch because the state structure
+> will be changed in further patches, then another patch will add
+> vmstate descriptor after those changes.
 >
-> Did you find these by looking at our Coverity results, or
-> cross-reference them against Coverity? (Coverity definitely
-> found the gluster leaks, for instance.)
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 
-Neither.  I merely hacked myself a path through an unfamliar jungle :)
+> +static void sm501_init(SM501State *s, DeviceState *dev, uint32_t base,
+> +                       uint32_t local_mem_bytes)
+> +{
+> +    s->base = base;
+> +    s->local_mem_size_index = get_local_mem_size_index(local_mem_bytes);
+> +    SM501_DPRINTF("sm501 local mem size=%x. index=%d\n", get_local_mem_size(s),
+> +                  s->local_mem_size_index);
+> +    if (get_local_mem_size(s) != local_mem_bytes) {
+> +        error_report("Warning: sm501 VRAM size adjusted to %" PRIu32,
+> +                     get_local_mem_size(s));
+> +    }
+
+Just noticed this. I think reporting the error upwards by
+failing device realize is better than adjusting the value.
+It's what we tend to do for other devices. Management tools
+like libvirt prefer to get hard errors if there's a config
+file error that means they misconfigure a device.
+
+thanks
+-- PMM
