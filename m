@@ -1,37 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50975)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cjjJJ-0000zc-At
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 04:15:38 -0500
+	(envelope-from <famz@redhat.com>) id 1cjjLn-00025a-TR
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 04:18:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cjjJE-0002tt-Bl
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 04:15:37 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46748
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cjjJE-0002tY-54
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 04:15:32 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v239DmVD014627
-	for <qemu-devel@nongnu.org>; Fri, 3 Mar 2017 04:15:30 -0500
-Received: from e06smtp09.uk.ibm.com (e06smtp09.uk.ibm.com [195.75.94.105])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 28xs8uvrtv-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 04:15:30 -0500
-Received: from localhost
-	by e06smtp09.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Fri, 3 Mar 2017 09:15:23 -0000
-Date: Fri, 3 Mar 2017 10:15:17 +0100
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <1488531088-12483-1-git-send-email-jasowang@redhat.com>
+	(envelope-from <famz@redhat.com>) id 1cjjLj-0004D2-BK
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 04:18:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43738)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cjjLj-0004CZ-2O
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 04:18:07 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0AD1661D3F
+	for <qemu-devel@nongnu.org>; Fri,  3 Mar 2017 09:18:07 +0000 (UTC)
+Date: Fri, 3 Mar 2017 17:18:03 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170303091803.GD7097@lemon.lan>
 References: <1488531088-12483-1-git-send-email-jasowang@redhat.com>
+	<148853172005.285.13690184348448239628@0e2666bad730>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170303101517.20dd05f9.cornelia.huck@de.ibm.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <148853172005.285.13690184348448239628@0e2666bad730>
 Subject: Re: [Qemu-devel] [PATCH] virtio: unbreak 1.0 device load with
  region cache
 List-Id: <qemu-devel.nongnu.org>
@@ -42,37 +34,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: mst@redhat.com, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: jasowang@redhat.com, mst@redhat.com, pbonzini@redhat.com
 
-On Fri,  3 Mar 2017 16:51:28 +0800
-Jason Wang <jasowang@redhat.com> wrote:
+On Fri, 03/03 01:02, no-reply@patchew.org wrote:
+>   CC      ppc-softmmu/hw/misc/ivshmem.o
+> In file included from /var/tmp/patchew-tester-tmp-krtyhjt1/src/hw/misc/ivshmem.c:19:0:
+> /var/tmp/patchew-tester-tmp-krtyhjt1/src/include/qemu/osdep.h:30:25: fatal error: config-host.h: No such file or directory
+>  #include "config-host.h"
+>                          ^
+> compilation terminated.
+> /var/tmp/patchew-tester-tmp-krtyhjt1/src/rules.mak:69: recipe for target 'hw/misc/ivshmem.o' failed
+> make[1]: *** [hw/misc/ivshmem.o] Error 1
+> Makefile:322: recipe for target 'subdir-ppc-softmmu' failed
+> make: *** [subdir-ppc-softmmu] Error 2
+> make: *** Waiting for unfinished jobs....
+> shell-init: error retrieving current directory: getcwd: cannot access parent directories: No such file or directory
+>   CC      ppc64-softmmu/hw/vfio/pci-quirks.o
+> Assembler messages:
+> Fatal error: can't create hw/net/virtio-net.o: No such file or directory
+> /var/tmp/patchew-tester-tmp-krtyhjt1/src/rules.mak:69: recipe for target 'hw/net/virtio-net.o' failed
+> make[1]: *** [hw/net/virtio-net.o] Error 1
+> Makefile:322: recipe for target 'subdir-ppcemb-softmmu' failed
+> make: *** [subdir-ppcemb-softmmu] Error 2
+> shell-init: error retrieving current directory: getcwd: cannot access parent directories: No such file or directory
+>   CC      s390x-softmmu/monitor.o
+> In file included from /var/tmp/patchew-tester-tmp-krtyhjt1/src/monitor.c:24:0:
+> /var/tmp/patchew-tester-tmp-krtyhjt1/src/include/qemu/osdep.h:30:25: fatal error: config-host.h: No such file or directory
+>  #include "config-host.h"
+>                          ^
+> compilation terminated.
+> /var/tmp/patchew-tester-tmp-krtyhjt1/src/rules.mak:69: recipe for target 'monitor.o' failed
+> make[1]: *** [monitor.o] Error 1
+> make[1]: *** Waiting for unfinished jobs....
+> In file included from /var/tmp/patchew-tester-tmp-krtyhjt1/src/hw/vfio/pci-quirks.c:13:0:
+> /var/tmp/patchew-tester-tmp-krtyhjt1/src/include/qemu/osdep.h:30:25: fatal error: config-host.h: No such file or directory
+>  #include "config-host.h"
+>                          ^
+> compilation terminated.
+> /var/tmp/patchew-tester-tmp-krtyhjt1/src/rules.mak:69: recipe for target 'hw/vfio/pci-quirks.o' failed
+> make[1]: *** [hw/vfio/pci-quirks.o] Error 1
+> make[1]: *** Waiting for unfinished jobs....
+> shell-init: error retrieving current directory: getcwd: cannot access parent directories: No such file or directory
+>   CC      ppc64-softmmu/hw/vfio/platform.o
+> In file included from /var/tmp/patchew-tester-tmp-krtyhjt1/src/hw/vfio/platform.c:17:0:
+> /var/tmp/patchew-tester-tmp-krtyhjt1/src/include/qemu/osdep.h:30:25: fatal error: config-host.h: No such file or directory
+>  #include "config-host.h"
+>                          ^
+> compilation terminated.
+> /var/tmp/patchew-tester-tmp-krtyhjt1/src/rules.mak:69: recipe for target 'hw/vfio/platform.o' failed
+> make[1]: *** [hw/vfio/platform.o] Error 1
+> Assembler messages:
+> Fatal error: can't create cpus.o: No such file or directory
+> /var/tmp/patchew-tester-tmp-krtyhjt1/src/rules.mak:69: recipe for target 'cpus.o' failed
+> make[1]: *** [cpus.o] Error 1
+> Makefile:322: recipe for target 'subdir-s390x-softmmu' failed
+> make: *** [subdir-s390x-softmmu] Error 2
+> Assembler messages:
+> Fatal error: can't create hw/vfio/pci.o: No such file or directory
+> /var/tmp/patchew-tester-tmp-krtyhjt1/src/rules.mak:69: recipe for target 'hw/vfio/pci.o' failed
+> make[1]: *** [hw/vfio/pci.o] Error 1
+> Makefile:322: recipe for target 'subdir-ppc64-softmmu' failed
+> make: *** [subdir-ppc64-softmmu] Error 2
+> === OUTPUT END ===
+> 
 
-> Current code depends on virtio_queue_update_rings() to setup address
-> space cache. But this does not work for 1.0 device since we can't infer
-> avail and used. Fixing this by calling virtio_init_region_cache()
-> after subsections load which can guarantee avail and used are correct.
-> 
-> Fixes: 97cd965c0701 ("virtio: use VRingMemoryRegionCaches for avail
->                       and used rings")
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> ---
->  hw/virtio/virtio.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index 23483c7..faa45cb 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -2059,6 +2059,7 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int version_id)
-> 
->      rcu_read_lock();
->      for (i = 0; i < num; i++) {
-> +        virtio_init_region_cache(vdev, i);
->          if (vdev->vq[i].vring.desc) {
->              uint16_t nheads;
->              nheads = vring_avail_idx(&vdev->vq[i]) - vdev->vq[i].last_avail_idx;
+I'm touching the tester machine to investigate into the recent s390x qtest
+failure, this is me stepping onto its toes. Please ignore it, and sorry for the
+noise.
 
-"virtio: add missing region cache init in virtio_load()" should take
-care of that (but has not been pulled yet, it seems).
+Fam
