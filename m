@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51781)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1cjpia-0007Oz-HM
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:06:09 -0500
+	(envelope-from <eblake@redhat.com>) id 1cjplq-0001lb-1w
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:09:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1cjpiW-0000s1-Ix
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:06:08 -0500
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:34019)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1cjpiW-0000rl-Bj
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:06:04 -0500
-Received: by mail-lf0-x244.google.com with SMTP id y193so7101088lfd.1
-	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 08:06:04 -0800 (PST)
-Date: Fri, 3 Mar 2017 17:06:01 +0100
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20170303160601.GA9606@toto>
-References: <1488556233-31246-1-git-send-email-peter.maydell@linaro.org>
-	<1488556233-31246-5-git-send-email-peter.maydell@linaro.org>
-	<20170303155847.GY9606@toto>
-	<CAFEAcA9fm4XmY1LhssvkeAV4eBDC3ooQ7Tep=saRB7XYu10OZQ@mail.gmail.com>
+	(envelope-from <eblake@redhat.com>) id 1cjplm-0002jP-Qx
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:09:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:24381)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cjplm-0002i5-HY
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 11:09:26 -0500
+References: <1488517304-23131-1-git-send-email-he.chen@linux.intel.com>
+	<20170303135704.GX2778@thinpad.lan.raisama.net>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d93b2ebb-c5a3-a774-30fd-2d92c7703549@redhat.com>
+Date: Fri, 3 Mar 2017 10:09:22 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9fm4XmY1LhssvkeAV4eBDC3ooQ7Tep=saRB7XYu10OZQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9 4/6] disas/microblaze: Avoid
- unintended sign extension
+In-Reply-To: <20170303135704.GX2778@thinpad.lan.raisama.net>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="9Ac96HR0eE0RuMqecGrmtGNQ0hjvVFlwK"
+Subject: Re: [Qemu-devel] [RFC] x86: Allow to set NUMA distance for
+ different NUMA nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,30 +29,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <laurent@vivier.eu>
+To: Eduardo Habkost <ehabkost@redhat.com>, He Chen <he.chen@linux.intel.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Markus Armbruster <armbru@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>
 
-On Fri, Mar 03, 2017 at 04:02:07PM +0000, Peter Maydell wrote:
-> On 3 March 2017 at 15:58, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
-> > On Fri, Mar 03, 2017 at 03:50:31PM +0000, Peter Maydell wrote:
-> >> In read_insn_microblaze() we assemble 4 bytes into an 'unsigned
-> >> long'.  If 'unsigned long' is 64 bits and the high byte has its top
-> >> bit set, then C's implicit conversion from 'unsigned char' to 'int'
-> >> for the shift will result in an unintended sign extension which sets
-> >> the top 32 bits in 'inst'.  Add casts to prevent this.  (Spotted by
-> >> Coverity, CID 1005401.)
-> >
-> > I'm OK with this but perhaps it would have been more readable to
-> > change inst to uint32_t ? (All microblaze insns are 32bit).
-> 
-> I thought about that, but it was more invasive a change than
-> I was happy with: you'd want to change not just 'inst' but
-> also the return type of read_insn_microblaze, the opcode_mask
-> field of struct op_code_struct, 'inst' and 'prev_inst' in
-> print_insn_microblaze, the type of the instr arguments to
-> get_field, get_field_imm, etc...
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--9Ac96HR0eE0RuMqecGrmtGNQ0hjvVFlwK
+From: Eric Blake <eblake@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, He Chen <he.chen@linux.intel.com>
+Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Markus Armbruster <armbru@redhat.com>,
+ Chao Peng <chao.p.peng@linux.intel.com>
+Message-ID: <d93b2ebb-c5a3-a774-30fd-2d92c7703549@redhat.com>
+Subject: Re: [RFC] x86: Allow to set NUMA distance for different NUMA nodes
+References: <1488517304-23131-1-git-send-email-he.chen@linux.intel.com>
+ <20170303135704.GX2778@thinpad.lan.raisama.net>
+In-Reply-To: <20170303135704.GX2778@thinpad.lan.raisama.net>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Ah, I see, didn't think about that...
+On 03/03/2017 07:57 AM, Eduardo Habkost wrote:
 
-Cheers,
-Edgar
+>> With this patch, when a user wants to create a guest that contains
+>> several vNUMA nodes and also wants to set distance among those nodes,
+>> the QEMU command would like:
+>>
+>> ```
+>> -object memory-backend-ram,size=3D1G,prealloc=3Dyes,host-nodes=3D0,pol=
+icy=3Dbind,id=3Dnode0 \
+>> -numa node,nodeid=3D0,cpus=3D0,memdev=3Dnode0,distance=3D10,distance=3D=
+21,distance=3D31,distance=3D41 \
+
+>=20
+> It would be nice to have a more intuitive syntax to represent
+> ordered lists in QemuOpts. But this is what we have today.
+>=20
+
+Markus has the discussion on representing arrays via the command line;
+particularly since this array is very tightly coupled to the order in
+which values are presented, it may be worth having:
+
+-numa
+node,nodeid=3D0,cpus=3D0,memdev=3Dnod0,distance.0=3D10,distance.1=3D21,di=
+stance.2=3D31,distance.3=3D41
+
+with the explicit distance.0=3D suffixes to distance making it more
+obvious that we are dealing with an array.
+
+> I think the proposal makes sense. I would like the semantics of the new=
+ option
+> to be documented at qapi-schema.json and qemu-options.hx.
+>=20
+> I would call the new NumaNodeOptions field "distances", as it is
+> a list of distances.
+
+Indeed, Markus is trying (with his work on -blockdev for 2.9) to get the
+command line to a point where it is identical to the QMP code, by
+reusing qapi-schema.json, so we should very much keep that in mind with
+whatever we add to -numa in 2.10.
+
+
+> but in the future we could support something like:
+>=20
+>   -numa node,nodeid=3D0,cpus=3D0,memdev=3Dnode0 \
+>   -numa node,nodeid=3D1,cpus=3D1,memdev=3Dnode1 \
+>   -numa node,nodeid=3D2,cpus=3D2,memdev=3Dnode2 \
+>   -numa node,nodeid=3D3,cpus=3D3,memdev=3Dnode3 \
+>   -numa distances,distances[0][0]=3D10,distances[0][1]=3D21,distances[0=
+][2]=3D31,distances[0][3]=3D41,\
+>                   distances[1][0]=3D21,distances[1][1]=3D10,distances[1=
+][2]=3D21,distances[1][3]=3D31,\
+>                   distances[2][0]=3D31,distances[2][1]=3D21,distances[2=
+][2]=3D10,distances[2][3]=3D21,\
+>                   distances[3][0]=3D41,distances[3][1]=3D31,distances[3=
+][2]=3D21,distances[3][3]=3D10
+
+Except that [] requires special shell quoting, so the proposal would be
+more like:
+
+-numa distances.0.0=3D10,distances.0.1=3D21
+
+Right now, QMP doesn't support 2-D arrays (although this may be a good
+reason to introduce support), so that's also something to think about
+(not insurmountable, but makes the task more complex).
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--9Ac96HR0eE0RuMqecGrmtGNQ0hjvVFlwK
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYuZUzAAoJEKeha0olJ0NqRWQIAIeM70cmDR96eSIc2sKDB0YT
+WexV2wFc/qQ0S5wT3lYfScQW2MEklhSPzE7JWWAlbvNuRV3Bl3OJtYmPWauGtK8w
+MbdN52FFY3q7B7+qYvhFPoo9dVy8GFW2VMxyzmmHYaAAdKlOHgoKbTuezFb+osUR
+CtnPC+RlFUwvQ3FZaxDwAtF3PbNIOhgFjdYQ+KVuulBwSScvHEFIC9yZHKF47C/T
+URp3C447kggX0H/08fJBTfov0oJa8tQLkiwrXjWEcdnbM11H834G/ejYAkWr6BLw
+LbF/lmDchVkqoOSZiUIl8mUqRfsuHPYfwkuq6jd/kkF81OkETNg84YVhp+wJb8s=
+=7whn
+-----END PGP SIGNATURE-----
+
+--9Ac96HR0eE0RuMqecGrmtGNQ0hjvVFlwK--
