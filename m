@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44255)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cjdqV-00084R-Vp
-	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 22:25:33 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cjdqU-0001M5-6w
+	(envelope-from <dgibson@ozlabs.org>) id 1cjdqR-000835-BH
 	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 22:25:31 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1cjdqQ-0001HO-BK
+	for qemu-devel@nongnu.org; Thu, 02 Mar 2017 22:25:27 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  3 Mar 2017 14:24:59 +1100
-Message-Id: <20170303032507.16142-10-david@gibson.dropbear.id.au>
-In-Reply-To: <20170303032507.16142-1-david@gibson.dropbear.id.au>
-References: <20170303032507.16142-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 09/17] target/ppc/POWER9: Add cpu_has_work
- function for POWER9
+Date: Fri,  3 Mar 2017 14:24:50 +1100
+Message-Id: <20170303032507.16142-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PULL 00/17] ppc-for-2.9 queue 20170303
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,86 +20,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, sjitindarsingh@gmail.com, sam.bobroff@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>
 
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+The following changes since commit ecb24d334af1a98ef0329f4b3b0e14ae8cb8770d:
 
-The cpu has work function is used to mask interrupts used to determine
-if there is work for the cpu based on the LPCR. Add a function to do this
-for POWER9 and add it to the POWER9 cpu definition. This is similar to that
-for POWER8 except using the LPCR bits as defined for POWER9.
+  Merge remote-tracking branch 'remotes/rth/tags/pull-tgt-20170302' into staging (2017-03-02 22:06:41 +0000)
 
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- target/ppc/translate_init.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 45 insertions(+)
+are available in the git repository at:
 
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index dc2f8eb..c1a9014 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -8858,10 +8858,54 @@ static bool ppc_pvr_match_power9(PowerPCCPUClass *pcc, uint32_t pvr)
-     return false;
- }
- 
-+static bool cpu_has_work_POWER9(CPUState *cs)
-+{
-+    PowerPCCPU *cpu = POWERPC_CPU(cs);
-+    CPUPPCState *env = &cpu->env;
-+
-+    if (cs->halted) {
-+        if (!(cs->interrupt_request & CPU_INTERRUPT_HARD)) {
-+            return false;
-+        }
-+        /* External Exception */
-+        if ((env->pending_interrupts & (1u << PPC_INTERRUPT_EXT)) &&
-+            (env->spr[SPR_LPCR] & LPCR_EEE)) {
-+            return true;
-+        }
-+        /* Decrementer Exception */
-+        if ((env->pending_interrupts & (1u << PPC_INTERRUPT_DECR)) &&
-+            (env->spr[SPR_LPCR] & LPCR_DEE)) {
-+            return true;
-+        }
-+        /* Machine Check or Hypervisor Maintenance Exception */
-+        if ((env->pending_interrupts & (1u << PPC_INTERRUPT_MCK |
-+            1u << PPC_INTERRUPT_HMI)) && (env->spr[SPR_LPCR] & LPCR_OEE)) {
-+            return true;
-+        }
-+        /* Privileged Doorbell Exception */
-+        if ((env->pending_interrupts & (1u << PPC_INTERRUPT_DOORBELL)) &&
-+            (env->spr[SPR_LPCR] & LPCR_PDEE)) {
-+            return true;
-+        }
-+        /* Hypervisor Doorbell Exception */
-+        if ((env->pending_interrupts & (1u << PPC_INTERRUPT_HDOORBELL)) &&
-+            (env->spr[SPR_LPCR] & LPCR_HDEE)) {
-+            return true;
-+        }
-+        if (env->pending_interrupts & (1u << PPC_INTERRUPT_RESET)) {
-+            return true;
-+        }
-+        return false;
-+    } else {
-+        return msr_ee && (cs->interrupt_request & CPU_INTERRUPT_HARD);
-+    }
-+}
-+
- POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(oc);
-     PowerPCCPUClass *pcc = POWERPC_CPU_CLASS(oc);
-+    CPUClass *cc = CPU_CLASS(oc);
- 
-     dc->fw_name = "PowerPC,POWER9";
-     dc->desc = "POWER9";
-@@ -8872,6 +8916,7 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
-                          PCR_COMPAT_2_05;
-     pcc->init_proc = init_proc_POWER9;
-     pcc->check_pow = check_pow_nocheck;
-+    cc->has_work = cpu_has_work_POWER9;
-     pcc->insns_flags = PPC_INSNS_BASE | PPC_ISEL | PPC_STRING | PPC_MFTB |
-                        PPC_FLOAT | PPC_FLOAT_FSEL | PPC_FLOAT_FRES |
-                        PPC_FLOAT_FSQRT | PPC_FLOAT_FRSQRTE |
--- 
-2.9.3
+  git://github.com/dgibson/qemu.git tags/ppc-for-2.9-20170303
+
+for you to fetch changes up to 992d7e976c7eca2b3129cd4bae4a0d350a8065fa:
+
+  target/ppc: rewrite f[n]m[add,sub] using float64_muladd (2017-03-03 11:38:33 +1100)
+
+----------------------------------------------------------------
+ppc patch queuye for 2017-03-03
+
+This will probably be my last pull request before the hard freeze.  It
+has some new work, but that has all been posted in draft before the
+soft freeze, so I think it's reasonable to include in qemu-2.9.
+
+This batch has:
+    * A substantial amount of POWER9 work
+        * Implements the legacy (hash) MMU for POWER9
+	* Some more preliminaries for implementing the POWER9 radix
+          MMU
+	* POWER9 has_work
+	* Basic POWER9 compatibility mode handling
+	* Removal of some premature tests
+    * Some cleanups and fixes to the existing MMU code to make the
+      POWER9 work simpler
+    * A bugfix for TCG multiply adds on power
+    * Allow pseries guests to access PCIe extended config space
+
+This also includes a code-motion not strictly in ppc code - moving
+getrampagesize() from ppc code to exec.c.  This will make some future
+VFIO improvements easier, Paolo said it was ok to merge via my tree.
+
+----------------------------------------------------------------
+Alexey Kardashevskiy (1):
+      exec, kvm, target-ppc: Move getrampagesize() to common code
+
+David Gibson (3):
+      powernv: Don't test POWER9 CPU yet
+      target/ppc/POWER9: Add POWERPC_MMU_V3 bit
+      spapr_pci: Advertise access to PCIe extended config space
+
+Nikunj A Dadhania (1):
+      target/ppc: rewrite f[n]m[add,sub] using float64_muladd
+
+Sam Bobroff (1):
+      spapr: Small cleanup of PPC MMU enums
+
+Suraj Jitindar Singh (11):
+      target/ppc: Add POWER9/ISAv3.00 to compat_table
+      target/ppc: Add patb_entry to sPAPRMachineState
+      target/ppc: Don't gen an SDR1 on POWER9 and rework register creation
+      target/ppc/POWER9: Add POWER9 mmu fault handler
+      target/ppc/POWER9: Add POWER9 pa-features definition
+      target/ppc/POWER9: Add cpu_has_work function for POWER9
+      hw/ppc/spapr: Add POWER9 to pseries cpu models
+      target/ppc: Add Instruction Authority Mask Register Check
+      target/ppc: Add execute permission checking to access authority check
+      target/ppc: Move no-execute and guarded page checking into new function
+      target/ppc: Rework hash mmu page fault code and add defines for clarity
+
+ exec.c                      |  82 ++++++++++
+ hw/ppc/spapr.c              |  55 ++++++-
+ hw/ppc/spapr_cpu_core.c     |   3 +
+ hw/ppc/spapr_pci.c          |   4 +
+ include/exec/ram_addr.h     |   1 +
+ include/hw/ppc/spapr.h      |   1 +
+ include/qemu/mmap-alloc.h   |   2 +
+ target/ppc/Makefile.objs    |   2 +-
+ target/ppc/compat.c         |  16 +-
+ target/ppc/cpu-qom.h        |  16 +-
+ target/ppc/cpu.h            |  17 +++
+ target/ppc/fpu_helper.c     | 213 ++++++--------------------
+ target/ppc/kvm.c            | 117 ++------------
+ target/ppc/mmu-book3s-v3.c  |  37 +++++
+ target/ppc/mmu-book3s-v3.h  |  50 ++++++
+ target/ppc/mmu-hash64.c     | 117 ++++++++++----
+ target/ppc/mmu_helper.c     |  82 +++++-----
+ target/ppc/translate.c      |  19 +--
+ target/ppc/translate_init.c | 364 +++++++++++++++++++++++++++++---------------
+ tests/boot-serial-test.c    |   2 +-
+ tests/pnv-xscom-test.c      |   5 +-
+ util/mmap-alloc.c           |  25 +++
+ 22 files changed, 735 insertions(+), 495 deletions(-)
+ create mode 100644 target/ppc/mmu-book3s-v3.c
+ create mode 100644 target/ppc/mmu-book3s-v3.h
