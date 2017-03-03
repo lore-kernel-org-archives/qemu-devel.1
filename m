@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50408)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cjwhR-0003Lz-LK
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 18:33:26 -0500
+	(envelope-from <eblake@redhat.com>) id 1cjwrd-0005Az-Hn
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 18:43:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cjwhO-0003x2-J3
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 18:33:25 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43034)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cjwhO-0003w5-9v
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 18:33:22 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v23NSgcn087913
-	for <qemu-devel@nongnu.org>; Fri, 3 Mar 2017 18:33:20 -0500
-Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 28xs8f6vj2-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 18:33:19 -0500
-Received: from localhost
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Fri, 3 Mar 2017 16:33:19 -0700
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Fri,  3 Mar 2017 17:32:57 -0600
-Message-Id: <1488583977-32253-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2] spapr_pci: allow control of BAR alignment
- through SLOF
+	(envelope-from <eblake@redhat.com>) id 1cjwra-000075-E5
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 18:43:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55344)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cjwra-000053-4n
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 18:43:54 -0500
+References: <148856193073.554.6631259860971664030.stgit@bahia>
+	<ef91a081-c25f-881e-eb60-90798df36a5a@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ebe5c30c-0af6-7f5b-15bf-4626773a2a9d@redhat.com>
+Date: Fri, 3 Mar 2017 17:43:49 -0600
+MIME-Version: 1.0
+In-Reply-To: <ef91a081-c25f-881e-eb60-90798df36a5a@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="NdrJEkmW6WTVLg1FH5NXNdKgQV4PQMgps"
+Subject: Re: [Qemu-devel] [PATCH] 9pfs: fix vulnerability in openat_dir()
+ and local_unlinkat_common()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,94 +29,225 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-In certain cases, such as PCI-passthrough with VFIO, we cannot offload
-MMIO accesses to KVM unless the BAR alignment matches the host. This
-patch, in conjunction with a separately submitted patch for SLOF
-which allows for control of this via the device-tree, allows us to
-set this alignment via QEMU.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--NdrJEkmW6WTVLg1FH5NXNdKgQV4PQMgps
+From: Eric Blake <eblake@redhat.com>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <ebe5c30c-0af6-7f5b-15bf-4626773a2a9d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] 9pfs: fix vulnerability in openat_dir() and
+ local_unlinkat_common()
+References: <148856193073.554.6631259860971664030.stgit@bahia>
+ <ef91a081-c25f-881e-eb60-90798df36a5a@redhat.com>
+In-Reply-To: <ef91a081-c25f-881e-eb60-90798df36a5a@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Cc: qemu-ppc@nongnu.org
-Cc: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
----
-v2:
-  * Keep natural alignment as the default in SLOF, only set DT prop if
-    different alignment is specified by QEMU (David)
----
- hw/ppc/spapr.c              |  7 ++++++-
- hw/ppc/spapr_pci.c          | 10 ++++++++++
- include/hw/pci-host/spapr.h |  1 +
- 3 files changed, 17 insertions(+), 1 deletion(-)
+On 03/03/2017 12:14 PM, Eric Blake wrote:
+> On 03/03/2017 11:25 AM, Greg Kurz wrote:
+>> We should pass O_NOFOLLOW otherwise openat() will follow symlinks and =
+make
+>> QEMU vulnerable.
+>>
+>> O_PATH was used as an optimization: the fd returned by openat_dir() is=
+ only
+>> passed to openat() actually, so we don't really need to reach the unde=
+rlying
+>> filesystem.
+>>
+>> O_NOFOLLOW | O_PATH isn't an option: if name is a symlink, openat() wi=
+ll
+>> return a fd, forcing us to do some other syscall to detect we have a
+>> symlink. Also, O_PATH doesn't exist in glibc 2.13 and older.
+>=20
+> But the very next use of openat(fd, ) should fail with EBADF if fd is
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 14192ac..ef8df35 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3166,7 +3166,12 @@ DEFINE_SPAPR_MACHINE(2_9, "2.9", true);
-  * pseries-2.8
-  */
- #define SPAPR_COMPAT_2_8                            \
--    HW_COMPAT_2_8
-+    HW_COMPAT_2_8                                   \
-+    {                                               \
-+        .driver   = TYPE_SPAPR_PCI_HOST_BRIDGE,     \
-+        .property = "mem_bar_min_align",            \
-+        .value    = "0",                            \
-+    },                                              \
- 
- static void spapr_machine_2_8_instance_options(MachineState *machine)
+or ENOTDIR, actually
+
+> not a directory, so you don't need any extra syscalls.  I agree that we=
+
+> _need_ O_NOFOLLOW, but I'm not yet convinced that we must avoid O_PATH
+> where it works.
+>=20
+> I'm in the middle of writing a test program to probe kernel behavior an=
+d
+> demonstrate (at least to myself) whether there are scenarios where
+> O_PATH makes it possible to open something where omitting it did not,
+> while at the same time validating that O_NOFOLLOW doesn't cause problem=
+s
+> if a symlink-fd is returned instead of a directory fd, based on our
+> subsequent use of that fd in a *at call.
+
+My test case is below.  Note that based on my testing, I think you want
+a v2 of this patch, which does:
+
+#ifndef O_PATH
+#define O_PATH 0
+#endif
+
+ static inline int openat_dir(int dirfd, const char *name)
  {
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 919d3c2..485d32d 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1664,6 +1664,10 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
-+    if (sphb->mem_bar_min_align == (uint64_t)-1) {
-+        sphb->mem_bar_min_align = qemu_real_host_page_size;
-+    }
-+
-     sphb->dtbusname = g_strdup_printf("pci@%" PRIx64, sphb->buid);
- 
-     namebuf = alloca(strlen(sphb->dtbusname) + 32);
-@@ -1858,6 +1862,8 @@ static Property spapr_phb_properties[] = {
-     DEFINE_PROP_UINT32("numa_node", sPAPRPHBState, numa_node, -1),
-     DEFINE_PROP_BOOL("pre-2.8-migration", sPAPRPHBState,
-                      pre_2_8_migration, false),
-+    DEFINE_PROP_UINT64("mem_bar_min_align", sPAPRPHBState, mem_bar_min_align,
-+                       -1),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-@@ -2228,6 +2234,10 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb,
-     if (ret) {
-         return ret;
-     }
-+    if (phb->mem_bar_min_align) {
-+        _FDT(fdt_setprop_cell(fdt, bus_off, "qemu,mem-bar-min-align",
-+                              phb->mem_bar_min_align));
-+    }
- 
-     return 0;
+-    return openat(dirfd, name, O_DIRECTORY | O_RDONLY | O_PATH);
++    return openat(dirfd, name, O_DIRECTORY | O_RDONLY | O_NOFOLLOW |
+O_PATH);
  }
-diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
-index dfa7614..fa33346 100644
---- a/include/hw/pci-host/spapr.h
-+++ b/include/hw/pci-host/spapr.h
-@@ -79,6 +79,7 @@ struct sPAPRPHBState {
-     uint64_t dma64_win_addr;
- 
-     uint32_t numa_node;
-+    uint64_t mem_bar_min_align;
- 
-     /* Fields for migration compatibility hacks */
-     bool pre_2_8_migration;
--- 
-2.7.4
+
+
+
+#define _GNU_SOURCE 1
+#include <stdio.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <errno.h>
+#include <stdlib.h>
+
+int main(int argc, char **argv)
+{
+    int i =3D 0;
+    int ret =3D 1;
+    int fd;
+    struct stat st;
+
+    if (mkdir("d", 0700) < 0) {
+        printf("giving up, please try again once 'd' is removed\n");
+        return ret;
+    }
+
+    /* Create a playground for testing with. */
+    i =3D 1;
+    if (creat("d/file", 0600) < 0)
+        goto cleanup;
+    i =3D 2;
+    if (mkdir("d/subdir", 0700) < 0)
+        goto cleanup;
+    i =3D 3;
+    if (creat("d/subdir/subfile", 0600) < 0)
+        goto cleanup;
+    i =3D 4;
+    if (chmod("d/subdir", 0100) < 0)
+        goto cleanup;
+    i =3D 5;
+    if (symlink("file", "d/link-file") < 0)
+        goto cleanup;
+    i =3D 6;
+    if (symlink("subdir", "d/link-subdir") < 0)
+        goto cleanup;
+
+    /* Sanity: We can stat a child file with just search permissions,
+     * whether via a directory or symlink-to-directory */
+    i =3D 7;
+    if (stat("d/subdir/subfile", &st) < 0)
+        goto cleanup;
+    i =3D 8;
+    if (stat("d/link-subdir/subfile", &st) < 0)
+        goto cleanup;
+
+    /* Since the directory is not readable, we can't get a normal fd */
+    fd =3D open("d/subdir", O_DIRECTORY | O_NOFOLLOW | O_RDONLY);
+    if (fd !=3D -1) {
+        printf("unexpected success opening non-readable dir\n");
+        ret =3D 2;
+        goto cleanup;
+    }
+    /* But we can get at it with O_PATH */
+    i =3D 9;
+    fd =3D open("d/subdir", O_DIRECTORY | O_NOFOLLOW | O_RDONLY | O_PATH)=
+;
+    if (fd < 0)
+        goto cleanup;
+    /* And use it in *at functions */
+    i =3D 10;
+    if (fstatat(fd, "subfile", &st, 0) < 0)
+        goto cleanup;
+    i =3D 11;
+    if (close(fd) < 0)
+        goto cleanup;
+
+    /* Note that O_DIRECTORY fails on symlinks with O_PATH... */
+    i =3D 12;
+    fd =3D open("d/link-subdir", O_DIRECTORY | O_NOFOLLOW | O_RDONLY |
+O_PATH);
+    if (fd !=3D -1) {
+        printf("unexpected success on symlink-dir with O_DIRECTORY\n");
+        ret =3D 2;
+        goto cleanup;
+    }
+    /* or on symlinks to files regardless of O_PATH... */
+    i =3D 13;
+    fd =3D open("d/link-file", O_DIRECTORY | O_NOFOLLOW | O_RDONLY | O_PA=
+TH);
+    if (fd !=3D -1) {
+        printf("unexpected success on symlink-file with
+O_DIRECTORY|O_PATH\n");
+        ret =3D 2;
+        goto cleanup;
+    }
+    i =3D 14;
+    fd =3D open("d/link-file", O_DIRECTORY | O_NOFOLLOW | O_RDONLY);
+    if (fd !=3D -1) {
+        printf("unexpected success on symlink-file with just
+O_DIRECTORY\n");
+        ret =3D 2;
+        goto cleanup;
+    }
+    /* but O_PATH without O_DIRECTORY opens a symlink fd */
+    i =3D 15;
+    fd =3D open("d/link-subdir", O_NOFOLLOW | O_RDONLY | O_PATH);
+    if (fd < 0)
+        goto cleanup;
+    /* However, that symlink fd is not usable in *at */
+    i =3D 16;
+    if (fstatat(fd, "subfile", &st, 0) =3D=3D 0) {
+        printf("unexpected success using symlink fd in fstatat\n");
+        ret =3D 2;
+        goto cleanup;
+    }
+    if (errno !=3D EBADF && errno !=3D ENOTDIR)
+        goto cleanup;
+    i =3D 17;
+    if (close(fd) < 0)
+        goto cleanup;
+
+    printf("All tests passed\n");
+    ret =3D 0;
+
+ cleanup:
+    if (ret =3D=3D 1) {
+        perror("unexpected failure");
+        printf("encountered when i=3D%d\n", i);
+    }
+    system("chmod -R u+rwx d; rm -rf d");
+    return ret;
+}
+
+
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--NdrJEkmW6WTVLg1FH5NXNdKgQV4PQMgps
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYuf+1AAoJEKeha0olJ0NqPV8H/0pmcETl8xoOFUN1GUi7fmVT
+SYtP4eDPdDYyNkzym2Fyot6jpa4ePGUJQj4nplwq6KeSekIWBGTOQojGVpS9hFhs
+RcO44TOcKpWOIO9borMZp0HdMpYvArZtA4dSRiufJ2iVt1cjCeHU2GjOO4fakJJQ
+4bwP6F4A5A4NkxrxhLvCHeFkACG5/ntwwn+s4M1bgx/Eq9qvtNRDb2lKCf7yJN7a
+XTBenqZdKt2QsM3IaMCrpmyAZoc+336/J5LDbKrcsojKkpwCZAMhKn/LkSga0Rbi
+yFI27h1kQR3SJhI3gDUTfkItJTFluQD5mK2gUO+eJeUOQ30q0B+IDd8xBUY+D/A=
+=Wg6v
+-----END PGP SIGNATURE-----
+
+--NdrJEkmW6WTVLg1FH5NXNdKgQV4PQMgps--
