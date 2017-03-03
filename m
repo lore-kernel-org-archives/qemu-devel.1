@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1cjnW1-00048C-6E
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:45:02 -0500
+	(envelope-from <edgar.iglesias@gmail.com>) id 1cjnWr-0004j0-6K
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:45:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1cjnVx-0003YK-7M
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:45:01 -0500
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:35951)
+	(envelope-from <edgar.iglesias@gmail.com>) id 1cjnWn-00041V-7s
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:45:53 -0500
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:36012)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1cjnVw-0003W1-Fg
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:44:57 -0500
-Received: by mail-lf0-x241.google.com with SMTP id g70so7088202lfh.3
-	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 05:44:54 -0800 (PST)
-Date: Fri, 3 Mar 2017 14:44:51 +0100
+	id 1cjnWm-00040c-Vy
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 08:45:49 -0500
+Received: by mail-lf0-x243.google.com with SMTP id g70so7090221lfh.3
+	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 05:45:48 -0800 (PST)
+Date: Fri, 3 Mar 2017 14:45:46 +0100
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20170303134451.GW9606@toto>
+Message-ID: <20170303134546.GX9606@toto>
 References: <1487362633-25018-1-git-send-email-fred.konrad@greensocs.com>
-	<1487362633-25018-5-git-send-email-fred.konrad@greensocs.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1487362633-25018-5-git-send-email-fred.konrad@greensocs.com>
-Subject: Re: [Qemu-devel] [PATCH V2 4/7] exec: allow to get a pointer for
- some mmio memory region
+In-Reply-To: <1487362633-25018-1-git-send-email-fred.konrad@greensocs.com>
+Subject: Re: [Qemu-devel] [PATCH V2 0/7] execute code from mmio area
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,190 +32,65 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: fred.konrad@greensocs.com
 Cc: qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, peter.maydell@linaro.org, mark.burton@greensocs.com, alistair.francis@xilinx.com, clg@kaod.org, pbonzini@redhat.com
 
-On Fri, Feb 17, 2017 at 09:17:10PM +0100, fred.konrad@greensocs.com wrote:
+On Fri, Feb 17, 2017 at 09:17:06PM +0100, fred.konrad@greensocs.com wrote:
 > From: KONRAD Frederic <fred.konrad@greensocs.com>
 > 
-> This introduces a special callback which allows to run code from some MMIO
-> devices.
+> This series allows to execute code from mmio areas.
+> The main goal of this is to be able to run code for example from an SPI device.
 > 
-> SysBusDevice with a MemoryRegion which implements the request_ptr callback will
-> be notified when the guest try to execute code from their offset. Then it will
-> be able to eg: pre-load some code from an SPI device or ask a pointer from an
-> external simulator, etc..
+> The three first patch fixes the way get_page_addr_code fills the TLB.
 > 
-> When the pointer or the data in it are no longer valid the device has to
-> invalidate it.
+> The fourth patch implements the mmio execution helpers: the device must
+> implement the request_ptr callback of the MemoryRegion and will be notified when
+> the guest wants to execute code from it.
 > 
-> Signed-off-by: KONRAD Frederic <fred.konrad@greensocs.com>
+> The fifth patch introduces mmio_interface device which allows to dynamically
+> map a host pointer somewhere into the memory.
 > 
-> RFC -> V1:
->   * Use mmio-interface instead of directly creating the subregion.
-
-Hi Fred,
+> The sixth patch implements the execution from the SPI memories in the
+> xilinx_spips model.
 
 
+I had a comment on the possible break of bisection, but the series looks
+good to me. If you fix up the ordering:
 
-
-> ---
->  cputlb.c              |  7 +++++++
->  include/exec/memory.h | 35 +++++++++++++++++++++++++++++++
->  memory.c              | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 99 insertions(+)
-> 
-> diff --git a/cputlb.c b/cputlb.c
-> index 846341e..9077247 100644
-> --- a/cputlb.c
-> +++ b/cputlb.c
-> @@ -545,6 +545,13 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
->      if (memory_region_is_unassigned(mr)) {
->          CPUClass *cc = CPU_GET_CLASS(cpu);
->  
-> +        if (memory_region_request_mmio_ptr(mr, addr)) {
-> +            /* A MemoryRegion is potentially added so re-run the
-> +             * get_page_addr_code.
-> +             */
-> +            return get_page_addr_code(env, addr);
-> +        }
-> +
->          if (cc->do_unassigned_access) {
->              cc->do_unassigned_access(cpu, addr, false, true, 0, 4);
->          } else {
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index 987f925..36b0eec 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -120,6 +120,15 @@ struct MemoryRegionOps {
->                                      uint64_t data,
->                                      unsigned size,
->                                      MemTxAttrs attrs);
-> +    /* Instruction execution pre-callback:
-> +     * @addr is the address of the access relative to the @mr.
-> +     * @size is the size of the area returned by the callback.
-> +     * @offset is the location of the pointer inside @mr.
-> +     *
-> +     * Returns a pointer to a location which contains guest code.
-> +     */
-> +    void *(*request_ptr)(void *opaque, hwaddr addr, unsigned *size,
-> +                         unsigned *offset);
->  
->      enum device_endian endianness;
->      /* Guest-visible constraints: */
-> @@ -1253,6 +1262,32 @@ void memory_global_dirty_log_stop(void);
->  void mtree_info(fprintf_function mon_printf, void *f, bool flatview);
->  
->  /**
-> + * memory_region_request_mmio_ptr: request a pointer to an mmio
-> + * MemoryRegion. If it is possible map a RAM MemoryRegion with this pointer.
-> + * When the device wants to invalidate the pointer it will call
-> + * memory_region_invalidate_mmio_ptr.
-> + *
-> + * @mr: #MemoryRegion to check
-> + * @addr: address within that region
-> + *
-> + * Returns true on success, false otherwise.
-> + */
-> +bool memory_region_request_mmio_ptr(MemoryRegion *mr, hwaddr addr);
-> +
-> +/**
-> + * memory_region_invalidate_mmio_ptr: invalidate the pointer to an mmio
-> + * previously requested.
-> + * In the end that means that if something wants to execute from this area it
-> + * will need to request the pointer again.
-> + *
-> + * @mr: #MemoryRegion associated to the pointer.
-> + * @addr: address within that region
-> + * @size: size of that area.
-> + */
-> +void memory_region_invalidate_mmio_ptr(MemoryRegion *mr, hwaddr offset,
-> +                                       unsigned size);
-> +
-> +/**
->   * memory_region_dispatch_read: perform a read directly to the specified
->   * MemoryRegion.
->   *
-> diff --git a/memory.c b/memory.c
-> index 6c58373..a605250 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -30,6 +30,8 @@
->  #include "exec/ram_addr.h"
->  #include "sysemu/kvm.h"
->  #include "sysemu/sysemu.h"
-> +#include "hw/misc/mmio_interface.h"
-> +#include "hw/qdev-properties.h"
->  
->  //#define DEBUG_UNASSIGNED
->  
-> @@ -2375,6 +2377,61 @@ void memory_listener_unregister(MemoryListener *listener)
->      QTAILQ_REMOVE(&listener->address_space->listeners, listener, link_as);
->  }
->  
-> +bool memory_region_request_mmio_ptr(MemoryRegion *mr, hwaddr addr)
-> +{
-> +    void *host;
-> +    unsigned size = 0;
-> +    unsigned offset = 0;
-> +    Object *new_interface;
-> +
-> +    if (!mr || !mr->ops->request_ptr) {
-> +        return false;
-> +    }
-> +
-> +    /*
-> +     * Avoid an update if the request_ptr call
-> +     * memory_region_invalidate_mmio_ptr which seems to be likely when we use
-> +     * a cache.
-> +     */
-> +    memory_region_transaction_begin();
-> +
-> +    host = mr->ops->request_ptr(mr->opaque, addr - mr->addr, &size, &offset);
-> +
-> +    if (!host || !size) {
-> +        memory_region_transaction_commit();
-> +        return false;
-> +    }
-> +
-> +    new_interface = object_new("mmio_interface");
-> +    qdev_prop_set_uint64(DEVICE(new_interface), "start", offset);
-> +    qdev_prop_set_uint64(DEVICE(new_interface), "end", offset + size - 1);
-> +    qdev_prop_set_bit(DEVICE(new_interface), "ro", true);
-> +    qdev_prop_set_ptr(DEVICE(new_interface), "host_ptr", host);
-> +    qdev_prop_set_ptr(DEVICE(new_interface), "subregion", mr);
-> +    object_property_set_bool(OBJECT(new_interface), true, "realized", NULL);
-> +
-> +    memory_region_transaction_commit();
-> +    return true;
-> +}
-> +
-> +void memory_region_invalidate_mmio_ptr(MemoryRegion *mr, hwaddr offset,
-> +                                       unsigned size)
-> +{
-> +    MemoryRegionSection section = memory_region_find(mr, offset, size);
-> +
-> +    if (section.mr != mr) {
-> +        /* memory_region_find add a ref on section.mr */
-> +        memory_region_unref(section.mr);
-> +        if (!MMIO_INTERFACE(section.mr->owner)) {
-
-Is MMIO_INTERFACE defined yet?
-This may break bisection...
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
 Cheers,
 Edgar
 
 
-> +            return;
-> +        }
-> +        /* We found the interface just drop it. */
-> +        object_property_set_bool(section.mr->owner, false, "realized", NULL);
-> +        object_unref(section.mr->owner);
-> +        object_unparent(section.mr->owner);
-> +    }
-> +}
-> +
->  void address_space_init(AddressSpace *as, MemoryRegion *root, const char *name)
->  {
->      memory_region_ref(root);
+
+> 
+> Thanks,
+> Fred
+> 
+> V1 -> V2:
+>   * Fix the DPRINTF error.
+> RFC -> V1:
+>   * Use an interface (mmio-interface) to fix any reference leak issue.
+> 
+> KONRAD Frederic (7):
+>   cputlb: cleanup get_page_addr_code to use VICTIM_TLB_HIT
+>   cputlb: move get_page_addr_code
+>   cputlb: fix the way get_page_addr_code fills the tlb
+>   exec: allow to get a pointer for some mmio memory region
+>   qdev: add MemoryRegion property
+>   introduce mmio_interface
+>   xilinx_spips: allow mmio execution
+> 
+>  cputlb.c                         |  81 ++++++++++++++-----------
+>  hw/misc/Makefile.objs            |   1 +
+>  hw/misc/mmio_interface.c         | 128 +++++++++++++++++++++++++++++++++++++++
+>  hw/ssi/xilinx_spips.c            |  74 ++++++++++++++++------
+>  include/exec/memory.h            |  35 +++++++++++
+>  include/hw/misc/mmio_interface.h |  49 +++++++++++++++
+>  include/hw/qdev-properties.h     |   2 +
+>  memory.c                         |  57 +++++++++++++++++
+>  8 files changed, 372 insertions(+), 55 deletions(-)
+>  create mode 100644 hw/misc/mmio_interface.c
+>  create mode 100644 include/hw/misc/mmio_interface.h
+> 
 > -- 
 > 1.8.3.1
 > 
