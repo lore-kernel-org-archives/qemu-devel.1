@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37414)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cjkDJ-0005RN-Ot
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 05:13:30 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cjkNp-0000QQ-DZ
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 05:24:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cjkDG-00084g-Kl
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 05:13:29 -0500
-Received: from greensocs.com ([193.104.36.180]:53495)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cjkDG-00084A-7d
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 05:13:26 -0500
-References: <1487362633-25018-1-git-send-email-fred.konrad@greensocs.com>
-From: Frederic Konrad <fred.konrad@greensocs.com>
-Message-ID: <12f41078-825d-2e27-98c0-2654b4a706ef@greensocs.com>
-Date: Fri, 3 Mar 2017 11:13:21 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1cjkNo-0003YB-Bl
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 05:24:21 -0500
+Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:32881)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cjkNo-0003Xo-4E
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 05:24:20 -0500
+Received: by mail-wr0-x22b.google.com with SMTP id u48so70599951wrc.0
+	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 02:24:19 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1487362633-25018-1-git-send-email-fred.konrad@greensocs.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V2 0/7] execute code from mmio area
+In-Reply-To: <20170303032507.16142-1-david@gibson.dropbear.id.au>
+References: <20170303032507.16142-1-david@gibson.dropbear.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 Mar 2017 10:23:58 +0000
+Message-ID: <CAFEAcA_vdv6xY0Q3c4sX2VR8t3kCa2eWbycMs7GqyCQBLbk1cg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 00/17] ppc-for-2.9 queue 20170303
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,60 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, pbonzini@redhat.com, edgar.iglesias@xilinx.com, alistair.francis@xilinx.com, clg@kaod.org, mark.burton@greensocs.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, sjitindarsingh@gmail.com, Sam Bobroff <sam.bobroff@au1.ibm.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Hi All,
+On 3 March 2017 at 03:24, David Gibson <david@gibson.dropbear.id.au> wrote:
+> The following changes since commit ecb24d334af1a98ef0329f4b3b0e14ae8cb8770d:
+>
+>   Merge remote-tracking branch 'remotes/rth/tags/pull-tgt-20170302' into staging (2017-03-02 22:06:41 +0000)
+>
+> are available in the git repository at:
+>
+>   git://github.com/dgibson/qemu.git tags/ppc-for-2.9-20170303
+>
+> for you to fetch changes up to 992d7e976c7eca2b3129cd4bae4a0d350a8065fa:
+>
+>   target/ppc: rewrite f[n]m[add,sub] using float64_muladd (2017-03-03 11:38:33 +1100)
+>
+> ----------------------------------------------------------------
+> ppc patch queuye for 2017-03-03
+>
+> This will probably be my last pull request before the hard freeze.  It
+> has some new work, but that has all been posted in draft before the
+> soft freeze, so I think it's reasonable to include in qemu-2.9.
 
-Any feedback for the 4 last patches?
+The rule is: pull requests on the list by the softfreeze
+date, no new features after that... "OK if a patch hit the list before
+softfreeze" was the old rule which we had for 2.7 and earlier.
 
-Thanks,
-Fred
-
-On 02/17/2017 09:17 PM, fred.konrad@greensocs.com wrote:
-> From: KONRAD Frederic <fred.konrad@greensocs.com>
-> 
-> This series allows to execute code from mmio areas.
-> The main goal of this is to be able to run code for example from an SPI device.
-> 
-> The three first patch fixes the way get_page_addr_code fills the TLB.
-> 
-> The fourth patch implements the mmio execution helpers: the device must
-> implement the request_ptr callback of the MemoryRegion and will be notified when
-> the guest wants to execute code from it.
-> 
-> The fifth patch introduces mmio_interface device which allows to dynamically
-> map a host pointer somewhere into the memory.
-> 
-> The sixth patch implements the execution from the SPI memories in the
-> xilinx_spips model.
-> 
-> Thanks,
-> Fred
-> 
-> V1 -> V2:
->   * Fix the DPRINTF error.
-> RFC -> V1:
->   * Use an interface (mmio-interface) to fix any reference leak issue.
-> 
-> KONRAD Frederic (7):
->   cputlb: cleanup get_page_addr_code to use VICTIM_TLB_HIT
->   cputlb: move get_page_addr_code
->   cputlb: fix the way get_page_addr_code fills the tlb
->   exec: allow to get a pointer for some mmio memory region
->   qdev: add MemoryRegion property
->   introduce mmio_interface
->   xilinx_spips: allow mmio execution
-> 
->  cputlb.c                         |  81 ++++++++++++++-----------
->  hw/misc/Makefile.objs            |   1 +
->  hw/misc/mmio_interface.c         | 128 +++++++++++++++++++++++++++++++++++++++
->  hw/ssi/xilinx_spips.c            |  74 ++++++++++++++++------
->  include/exec/memory.h            |  35 +++++++++++
->  include/hw/misc/mmio_interface.h |  49 +++++++++++++++
->  include/hw/qdev-properties.h     |   2 +
->  memory.c                         |  57 +++++++++++++++++
->  8 files changed, 372 insertions(+), 55 deletions(-)
->  create mode 100644 hw/misc/mmio_interface.c
->  create mode 100644 include/hw/misc/mmio_interface.h
-> 
+thanks
+-- PMM
