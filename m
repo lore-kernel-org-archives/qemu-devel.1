@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54218)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ckBND-0002Dp-Cw
-	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 10:13:32 -0500
+	(envelope-from <eblake@redhat.com>) id 1ckBQH-0002sz-Bl
+	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 10:16:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ckBNC-0003BZ-3r
-	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 10:13:31 -0500
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:38276)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ckBNB-0003BS-P2
-	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 10:13:30 -0500
-Received: by mail-wm0-x22e.google.com with SMTP id t193so34894069wmt.1
-	for <qemu-devel@nongnu.org>; Sat, 04 Mar 2017 07:13:29 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1ckBQD-0003qZ-CP
+	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 10:16:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38158)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ckBQD-0003pj-5Q
+	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 10:16:37 -0500
+References: <148862487677.5452.160308730808722965.stgit@bahia.lan>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <dd56fb9b-2aa8-1787-cd44-ab8b80f0ccac@redhat.com>
+Date: Sat, 4 Mar 2017 09:16:34 -0600
 MIME-Version: 1.0
-In-Reply-To: <1488558530-21016-2-git-send-email-pbonzini@redhat.com>
-References: <1488558530-21016-2-git-send-email-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 4 Mar 2017 15:13:08 +0000
-Message-ID: <CAFEAcA-sFKPdLHS+T-2jk=wq-FpyWR+nCJKoNrbVgtPapGWGZg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] nios2: avoid anonymous unions in
- designated initializers.
+In-Reply-To: <148862487677.5452.160308730808722965.stgit@bahia.lan>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="49xLq5BpKMcjmlq1hcsskQ1sGt622kF7s"
+Subject: Re: [Qemu-devel] [PATCH] 9pfs: don't use AT_EMPTY_PATH in
+ local_set_cred_passthrough()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,127 +28,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-On 3 March 2017 at 16:28, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> These cause compilation failures on CentOS 6 or other operating
-> systems with older GCCs.
->
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--49xLq5BpKMcjmlq1hcsskQ1sGt622kF7s
+From: Eric Blake <eblake@redhat.com>
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <dd56fb9b-2aa8-1787-cd44-ab8b80f0ccac@redhat.com>
+Subject: Re: [PATCH] 9pfs: don't use AT_EMPTY_PATH in
+ local_set_cred_passthrough()
+References: <148862487677.5452.160308730808722965.stgit@bahia.lan>
+In-Reply-To: <148862487677.5452.160308730808722965.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 03/04/2017 04:54 AM, Greg Kurz wrote:
+> The name argument can never be an empty string, and dirfd always point =
+to
+> the containing directory of the file name. AT_EMPTY_PATH is hence usele=
+ss
+> here. Also it breaks build with glibc version 2.13 and older.
+>=20
+> It is actually an oversight of a previous tentative patch to implement =
+this
+> function. We can safely drop it.
+>=20
+> Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
->         Peter, please consider applying this as a build fix, because
->         the centos6 docker target is broken.
+>  hw/9pfs/9p-local.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Applied to master, thanks.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-(The mailing list server seems to have eaten this mail -- I got
-the copy directly by being on cc but patchwork never saw it.)
-
-thanks
--- PMM
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
 
->  target/nios2/translate.c | 36 ++++++++++++++++++------------------
->  1 file changed, 18 insertions(+), 18 deletions(-)
->
-> diff --git a/target/nios2/translate.c b/target/nios2/translate.c
-> index 2d73839..cfec479 100644
-> --- a/target/nios2/translate.c
-> +++ b/target/nios2/translate.c
-> @@ -48,14 +48,14 @@
->      struct {                               \
->          uint8_t op;                        \
->          union {                            \
-> -            uint16_t imm16;                \
-> -            int16_t imm16s;                \
-> -        };                                 \
-> +            uint16_t u;                    \
-> +            int16_t s;                     \
-> +        } imm16;                           \
->          uint8_t b;                         \
->          uint8_t a;                         \
->      } (instr) = {                          \
->          .op    = extract32((code), 0, 6),  \
-> -        .imm16 = extract32((code), 6, 16), \
-> +        .imm16.u = extract32((code), 6, 16), \
->          .b     = extract32((code), 22, 5), \
->          .a     = extract32((code), 27, 5), \
->      }
-> @@ -232,7 +232,7 @@ static void gen_ldx(DisasContext *dc, uint32_t code, uint32_t flags)
->          data = tcg_temp_new();
->      }
->
-> -    tcg_gen_addi_tl(addr, load_gpr(dc, instr.a), instr.imm16s);
-> +    tcg_gen_addi_tl(addr, load_gpr(dc, instr.a), instr.imm16.s);
->      tcg_gen_qemu_ld_tl(data, addr, dc->mem_idx, flags);
->
->      if (unlikely(instr.b == R_ZERO)) {
-> @@ -249,7 +249,7 @@ static void gen_stx(DisasContext *dc, uint32_t code, uint32_t flags)
->      TCGv val = load_gpr(dc, instr.b);
->
->      TCGv addr = tcg_temp_new();
-> -    tcg_gen_addi_tl(addr, load_gpr(dc, instr.a), instr.imm16s);
-> +    tcg_gen_addi_tl(addr, load_gpr(dc, instr.a), instr.imm16.s);
->      tcg_gen_qemu_st_tl(val, addr, dc->mem_idx, flags);
->      tcg_temp_free(addr);
->  }
-> @@ -259,7 +259,7 @@ static void br(DisasContext *dc, uint32_t code, uint32_t flags)
->  {
->      I_TYPE(instr, code);
->
-> -    gen_goto_tb(dc, 0, dc->pc + 4 + (instr.imm16s & -4));
-> +    gen_goto_tb(dc, 0, dc->pc + 4 + (instr.imm16.s & -4));
->      dc->is_jmp = DISAS_TB_JUMP;
->  }
->
-> @@ -271,7 +271,7 @@ static void gen_bxx(DisasContext *dc, uint32_t code, uint32_t flags)
->      tcg_gen_brcond_tl(flags, dc->cpu_R[instr.a], dc->cpu_R[instr.b], l1);
->      gen_goto_tb(dc, 0, dc->pc + 4);
->      gen_set_label(l1);
-> -    gen_goto_tb(dc, 1, dc->pc + 4 + (instr.imm16s & -4));
-> +    gen_goto_tb(dc, 1, dc->pc + 4 + (instr.imm16.s & -4));
->      dc->is_jmp = DISAS_TB_JUMP;
->  }
->
-> @@ -284,8 +284,8 @@ static void (fname)(DisasContext *dc, uint32_t code, uint32_t flags)         \
->                          (op3));                                              \
->  }
->
-> -gen_i_cmpxx(gen_cmpxxsi, instr.imm16s)
-> -gen_i_cmpxx(gen_cmpxxui, instr.imm16)
-> +gen_i_cmpxx(gen_cmpxxsi, instr.imm16.s)
-> +gen_i_cmpxx(gen_cmpxxui, instr.imm16.u)
->
->  /* Math/logic instructions */
->  #define gen_i_math_logic(fname, insn, resimm, op3)                          \
-> @@ -302,16 +302,16 @@ static void (fname)(DisasContext *dc, uint32_t code, uint32_t flags)        \
->      }                                                                       \
->  }
->
-> -gen_i_math_logic(addi,  addi, 1, instr.imm16s)
-> -gen_i_math_logic(muli,  muli, 0, instr.imm16s)
-> +gen_i_math_logic(addi,  addi, 1, instr.imm16.s)
-> +gen_i_math_logic(muli,  muli, 0, instr.imm16.s)
->
-> -gen_i_math_logic(andi,  andi, 0, instr.imm16)
-> -gen_i_math_logic(ori,   ori,  1, instr.imm16)
-> -gen_i_math_logic(xori,  xori, 1, instr.imm16)
-> +gen_i_math_logic(andi,  andi, 0, instr.imm16.u)
-> +gen_i_math_logic(ori,   ori,  1, instr.imm16.u)
-> +gen_i_math_logic(xori,  xori, 1, instr.imm16.u)
->
-> -gen_i_math_logic(andhi, andi, 0, instr.imm16 << 16)
-> -gen_i_math_logic(orhi , ori,  1, instr.imm16 << 16)
-> -gen_i_math_logic(xorhi, xori, 1, instr.imm16 << 16)
-> +gen_i_math_logic(andhi, andi, 0, instr.imm16.u << 16)
-> +gen_i_math_logic(orhi , ori,  1, instr.imm16.u << 16)
-> +gen_i_math_logic(xorhi, xori, 1, instr.imm16.u << 16)
->
->  /* Prototype only, defined below */
->  static void handle_r_type_instr(DisasContext *dc, uint32_t code,
-> --
-> 1.8.3.1
->
+--49xLq5BpKMcjmlq1hcsskQ1sGt622kF7s
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYutpSAAoJEKeha0olJ0NqXjUH/jg+VqIuqpd8xE3+QrtXHdwN
+aiXnl1RZLXOeXY+zP20pUfwOFCIpcW67Fzh+kYSheXVRlMMX96yPZQ4Duz/FjDue
+x1jc+fw0195nfMGVGPsQfe4rdWw8WNzBoz4aDk2ZwR5NJVUjEUSyBhOYVMd+ClWh
+hUREp6tiuaWASPHp5RdeZ8nPekCU8FBBQJ8n9Ede0PnIoCiFUN2KlUoO9tLNtZYa
+OhyJYYZcKQhaW+f17HPHPvQ0hdHaz5yfQ/NDrY3337a6XVq/FRYlm3LvuotmjXlu
+N9hGtAAiCYWjb+VO9tVr/5I2KrG9nBvZvqp+GvfOvdhPB+CeCYOwkQ2aVsjZ0LE=
+=I1UE
+-----END PGP SIGNATURE-----
+
+--49xLq5BpKMcjmlq1hcsskQ1sGt622kF7s--
