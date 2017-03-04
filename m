@@ -1,27 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ckAFd-00052o-L3
-	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 09:01:41 -0500
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1ckAGU-0005Wp-G9
+	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 09:02:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ckAFc-0003lh-QO
-	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 09:01:37 -0500
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:34934)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ckAFc-0003l9-H3
-	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 09:01:36 -0500
-Received: by mail-wm0-x22d.google.com with SMTP id v186so34026139wmd.0
-	for <qemu-devel@nongnu.org>; Sat, 04 Mar 2017 06:01:36 -0800 (PST)
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1ckAGP-00042E-Ka
+	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 09:02:30 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54420
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1ckAGP-00041v-DH
+	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 09:02:25 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v24DxIHn107494
+	for <qemu-devel@nongnu.org>; Sat, 4 Mar 2017 09:02:23 -0500
+Received: from e28smtp06.in.ibm.com (e28smtp06.in.ibm.com [125.16.236.6])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 28yu0mfnpy-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Sat, 04 Mar 2017 09:02:23 -0500
+Received: from localhost
+	by e28smtp06.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Sat, 4 Mar 2017 19:32:20 +0530
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Date: Sat,  4 Mar 2017 19:32:06 +0530
 MIME-Version: 1.0
-In-Reply-To: <aeecd6a5-2593-c3c4-25f0-ae0d6af53653@twiddle.net>
-References: <1488558530-21016-1-git-send-email-pbonzini@redhat.com>
-	<aeecd6a5-2593-c3c4-25f0-ae0d6af53653@twiddle.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 4 Mar 2017 14:01:14 +0000
-Message-ID: <CAFEAcA_2ymGX+9QV=n7Q3j1sMmGuGNJw6XypttJ5r_eQHOeFyQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] hppa: avoid anonymous unions in designated
- initializers.
+Message-Id: <1488636129-19409-1-git-send-email-nikunj@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v1 0/3] target/ppc: floating point multiply-add
+ fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,25 +40,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
+Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
 
-On 3 March 2017 at 19:24, Richard Henderson <rth@twiddle.net> wrote:
-> On 03/04/2017 03:28 AM, Paolo Bonzini wrote:
->>
->> These cause compilation failures on CentOS 6 or other operating
->> systems with older GCCs.
->>
->> Cc: Richard Henderson <rth@twiddle.net>
->> Cc: Peter Maydell <peter.maydell@linaro.org>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>         Peter, please consider applying this as a build fix, because
->>         the centos6 docker target is broken.
->
->
-> Reviewed-by: Richard Henderson <rth@twiddle.net>
+Exception handling in fmadd/fmsub/fnmadd/fnmsub isnt correct as the=20
+order of checking could give wrong settings in FPSCR.
 
-Thanks; applied to master as a buildfix.
+For example, (x * y) + z, if x =3D infinity, y =3D zero and z =3D snan.=20
+After the execution of instruction VXNAN and VXIMZ both should be set. Fo=
+r=20
+this correct the ordering in the float64_maddsub_update_excp() as follows=
+:
 
--- PMM
+      * If x, y or z is an SNaN, vxsnan_flag is set to 1.
+      * If x is a Zero and y, is an Infinity or x is an Infinity and y is
+        an Zero, vximz_flag is set to 1.
+      * If the product of x and y is an Infinity and z is an Infinity of
+        the opposite sign, vxisi_flag is set to 1.
+
+Moreover, all vector multiply-add/substract and vector scalar multiply-ad=
+d/sub=20
+had the bug. VXISI should be set only when (=E2=88=9E - =E2=88=9E), where=
+ as the instruction was
+doing it wrong, was just checking ((a =3D=3D =E2=88=9E OR b =3D=3D =E2=88=
+=9E) && (c =3D=3D =E2=88=9E)). There are two=20
+issues here:
+
+1. infinity can be +ve or -ve, i.e.  (=E2=88=9E + (-=E2=88=9E)), should r=
+esult in setting VXISI
+2. Need to take care of the operation (add or sub). (=E2=88=9E + =E2=88=9E=
+) should not set VXISI
+
+Patch:
+01: Fixes the order of checking and makes them independent as per=20
+    the ISA
+
+02: Introduces the macro to be used by Vector Scalar and Vector Multiply-=
+Add
+
+03: Make Vector Scalar and Vector Multiply Add use the macro for updating=
+=20
+    exception flags=20
+
+Changelog:
+v0:
+* Use ALL CAPS for macro arguments
+* Correct the argument type in the function
+
+Nikunj A Dadhania (3):
+  target/ppc: fmadd check for excp independently
+  target/ppc: fmadd: add macro for updating flags
+  target/ppc: use helper for excp handling
+
+ target/ppc/fpu_helper.c | 77 ++++++++++++++++++++-----------------------=
+------
+ 1 file changed, 32 insertions(+), 45 deletions(-)
+
+--=20
+2.7.4
