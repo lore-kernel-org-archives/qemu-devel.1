@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46091)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ckAWy-0002Qm-4F
-	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 09:19:34 -0500
+	(envelope-from <no-reply@patchew.org>) id 1ckAXc-0002tJ-1p
+	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 09:20:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ckAWu-00021P-0G
-	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 09:19:32 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60831)
+	(envelope-from <no-reply@patchew.org>) id 1ckAXX-0002Kq-Rv
+	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 09:20:12 -0500
+Resent-Message-Id: <E1ckAXX-0002Kq-Rv@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21405)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ckAWt-00020x-O9
-	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 09:19:27 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ckAWr-0006eA-Md
-	for <qemu-devel@nongnu.org>; Sat, 04 Mar 2017 14:19:25 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A51B82E80C2
-	for <qemu-devel@nongnu.org>; Sat,  4 Mar 2017 14:19:25 +0000 (UTC)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1ckAXX-0002Io-KR
+	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 09:20:07 -0500
+In-Reply-To: <20170304110658.1402-1-sauravsachidanand@gmail.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148863719680.294.3451464697867900179@0e2666bad730>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 04 Mar 2017 14:07:33 -0000
-From: Richard Jones <rjones@redhat.com>
-Reply-To: Bug 1224444 <1224444@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20130912120415.31262.22076.malonedeb@chaenomeles.canonical.com>
-Message-Id: <20170304140734.5740.71454.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1224444] Re: virtio-serial loses writes when used
- over virtio-mmio
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sat, 4 Mar 2017 06:19:57 -0800 (PST)
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] util: Use g_malloc/g_free
+ in envlist.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,168 +29,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: sauravsachidanand@gmail.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-I don't know how to close bugs in launchpad, but this one can be closed
-for a couple of reasons:
-
-(1) I benchmarked virtio-mmio the other day using qemu-speed-test on aarch64
-and I did not encounter the bug.
-
-(2) aarch64 has supported virtio-pci for a while, for virtio-mmio is effect=
-ively
-obsolete.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1224444
-
-Title:
-  virtio-serial loses writes when used over virtio-mmio
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  virtio-serial appears to lose writes, but only when used on top of
-  virtio-mmio.  The scenario is this:
-
-  /home/rjones/d/qemu/arm-softmmu/qemu-system-arm \
-  =C2=A0=C2=A0=C2=A0=C2=A0-global virtio-blk-device.scsi=3Doff \
-  =C2=A0=C2=A0=C2=A0=C2=A0-nodefconfig \
-  =C2=A0=C2=A0=C2=A0=C2=A0-nodefaults \
-  =C2=A0=C2=A0=C2=A0=C2=A0-nographic \
-  =C2=A0=C2=A0=C2=A0=C2=A0-M vexpress-a15 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-machine accel=3Dkvm:tcg \
-  =C2=A0=C2=A0=C2=A0=C2=A0-m 500 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-no-reboot \
-  =C2=A0=C2=A0=C2=A0=C2=A0-kernel /home/rjones/d/libguestfs/tmp/.guestfs-10=
-01/kernel.27944 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-dtb /home/rjones/d/libguestfs/tmp/.guestfs-1001/=
-dtb.27944 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-initrd /home/rjones/d/libguestfs/tmp/.guestfs-10=
-01/initrd.27944 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-device virtio-scsi-device,id=3Dscsi \
-  =C2=A0=C2=A0=C2=A0=C2=A0-drive file=3D/home/rjones/d/libguestfs/tmp/libgu=
-estfsLa9dE2/scratch.1,cache=3Dunsafe,format=3Draw,id=3Dhd0,if=3Dnone \
-  =C2=A0=C2=A0=C2=A0=C2=A0-device scsi-hd,drive=3Dhd0 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-drive file=3D/home/rjones/d/libguestfs/tmp/.gues=
-tfs-1001/root.27944,snapshot=3Don,id=3Dappliance,cache=3Dunsafe,if=3Dnone \
-  =C2=A0=C2=A0=C2=A0=C2=A0-device scsi-hd,drive=3Dappliance \
-  =C2=A0=C2=A0=C2=A0=C2=A0-device virtio-serial-device \
-  =C2=A0=C2=A0=C2=A0=C2=A0-serial stdio \
-  =C2=A0=C2=A0=C2=A0=C2=A0-chardev socket,path=3D/home/rjones/d/libguestfs/=
-tmp/libguestfsLa9dE2/guestfsd.sock,id=3Dchannel0 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-device virtserialport,chardev=3Dchannel0,name=3D=
-org.libguestfs.channel.0 \
-  =C2=A0=C2=A0=C2=A0=C2=A0-append 'panic=3D1 mem=3D500M console=3DttyAMA0 u=
-devtimeout=3D600 no_timer_check acpi=3Doff printk.time=3D1 cgroup_disable=
-=3Dmemory root=3D/dev/sdb selinux=3D0 guestfs_verbose=3D1 TERM=3Dxterm-256c=
-olor'
-
-  After the guest starts up, a daemon writes 4 bytes to a virtio-serial
-  socket.  The host side reads these 4 bytes correctly and writes a 64
-  byte message.  The guest never sees this message.
-
-  I enabled virtio-mmio debugging, and this is what is printed (## =3D my
-  comment):
-
-  ## guest opens the socket:
-  trying to open virtio-serial channel '/dev/virtio-ports/org.libguestfs.ch=
-annel.0'
-  virtio_mmio: virtio_mmio_write offset 0x50 value 0x3
-  opened the socket, sock =3D 3
-  udevadm settle
-  ## guest writes 4 bytes to the socket:
-  virtio_mmio: virtio_mmio_write offset 0x50 value 0x5
-  virtio_mmio: virtio_mmio setting IRQ 1
-  virtio_mmio: virtio_mmio_read offset 0x60
-  virtio_mmio: virtio_mmio_write offset 0x64 value 0x1
-  virtio_mmio: virtio_mmio setting IRQ 0
-  sent magic GUESTFS_LAUNCH_FLAG
-  ## host reads 4 bytes successfully:
-  main_loop libguestfs: recv_from_daemon: received GUESTFS_LAUNCH_FLAG
-  libguestfs: [14605ms] appliance is up
-  Guest launched OK.
-  ## host writes 64 bytes to socket:
-  libguestfs: writing the data to the socket (size =3D 64)
-  waiting for next request
-  libguestfs: data written OK
-  ## hangs here forever with guest in read() call never receiving any data
-
-  I am using qemu from git today (2d1fe1873a984).
-
-  Some notes:
-
-  - It's not 100% reproducible.  Sometimes everything works fine, although =
-it fails "often" (eg > 2/3rds of the time).
-  - KVM is being used.
-  - We've long used virtio-serial on x86 and have never seen anything like =
-this.
-
-  This is what the output looks like when it doesn't fail:
-
-  trying to open virtio-serial channel '/dev/virtio-ports/org.libguestfs.ch=
-annel.0
-  '
-  virtio_mmio: virtio_mmio_write offset 0x50 value 0x3
-  opened the socket, sock =3D 3
-  udevadm settle
-  virtio_mmio: virtio_mmio_write offset 0x50 value 0x5
-  virtio_mmio: virtio_mmio setting IRQ 1
-  virtio_mmio: virtio_mmio_read offset 0x60
-  virtio_mmio: virtio_mmio_write offset 0x64 value 0x1
-  virtio_mmio: virtio_mmio setting IRQ 0
-  sent magic GUESTlibguestfs: recv_from_daemon: received GUESTFS_LAUNCH_FLAG
-  libguestfs: [14710ms] appliance is up
-  Guest launched OK.
-  libguestfs: writing the data to the socket (size =3D 64)
-  FS_LAUNCH_FLAG
-  main_loop waiting for next request
-  libguestfs: data written OK
-  virtio_mmio: virtio_mmio_write offset 0x50 value 0x2
-  virtio_mmio: virtio_mmio setting IRQ 1
-  virtio_mmio: virtio_mmio setting IRQ 1
-  virtio_mmio: virtio_mmio_write offset 0x50 value 0x2
-  virtio_mmio: virtio_mmio_read offset 0x60
-  virtio_mmio: virtio_mmio setting IRQ 1
-  virtio_mmio: virtio_mmio_write offset 0x64 value 0x1
-  virtio_mmio: virtio_mmio setting IRQ 0
-  virtio_mmio: virtio_mmio_read offset 0x60
-  virtio_mmio: virtio_mmio_write offset 0x64 value 0x0
-  virtio_mmio: virtio_mmio setting IRQ 0
-  virtio_mmio: virtio_mmio_read offset 0x60
-  virtio_mmio: virtio_mmio_write offset 0x64 value 0x1
-  [... more virtio-mmio lines omitted ...]
-  virtio_mmio: virtio_mmio_write offset 0x64 value 0x0
-  virtio_mmio: virtio_mmio setting IRQ 1
-  virtio_mmio: virtio_mmio_read offset 0x60
-  virtio_mmio: virtio_mmio_write offset 0x64 value 0x1
-  virtio_mmio: virtio_mmio setting IRQ 0
-  guestfsd: main_loop: new request, len 0x3c
-  virtio_mmio: virtio_mmio_write offset 0x50 value 0x4
-  0000: 20 00 f5 f5 00 00 00 04 00 00 00 d2 00 00 00 00 | ...............|v=
-irtio_mmio: virtio_mmio_write offset 0x50 value 0x2
-  virtio_mmio: virtio_mmio setting IRQ 1
-
-  virtio_mmio: virtio_mmio_read offset 0x60
-  virtio_mmio: virtio_mmio_write offset 0x64 value 0x1
-  virtio_mmio: virtio_mmio setting IRQ 0
-  0010: 00 12 34 00 00 00 00 00 00 00 00 00 00 00 00 00 |..4.............|
-  0020: 00 00 00 00 00 00 00 00 00 00 00 08 2f 64 65 76 |............/dev|
-  0030: 2f 73 64 61 00 00 00 03 6d 62 72 00             |/sda....mbr.    |
-  virtio_mmio: virtio_mmio_write offset 0x50 value 0x2
-  virtio_mmio: virtio_mmio setting IRQ 1
-  virtio_mmio: virtio_mmio_read offset 0x60
-  virtio_mmio: virtio_mmio_write offset 0x64 value 0x1
-  virtio_mmio: virtio_mmio setting IRQ 0
-  virtio_mmio: virtio_mmio_write offset 0x50 value 0x2
-  virtio_mmio: virtio_mmio setting IRQ 1
-  virtio_mmio: virtio_mmio_read offset 0x60
-  virtio_mmio: virtio_mmio_write offset 0x64 value 0x1
-  virtio_mmio: virtio_mmio setting IRQ 0
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1224444/+subscriptions
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzAzMDQxMTA2NTguMTQwMi0xLXNhdXJhdnNhY2hpZGFuYW5kQGdtYWlsLmNvbQpTdWJqZWN0OiBb
+UWVtdS1kZXZlbF0gW1FlbXUtdHJpdmlhbF0gW1BBVENIXSB1dGlsOiBVc2UgZ19tYWxsb2MvZ19m
+cmVlIGluIGVudmxpc3QuYwpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
+IyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFT
+RS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMg
+VHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIK
+Zm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6
+ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMg
+LS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRo
+ZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRv
+bmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1
+YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNv
+bS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzE0ODg2
+MjQ4NzY3Ny41NDUyLjE2MDMwODczMDgwODcyMjk2NS5zdGdpdEBiYWhpYS5sYW4gLT4gcGF0Y2hl
+dy8xNDg4NjI0ODc2NzcuNTQ1Mi4xNjAzMDg3MzA4MDg3MjI5NjUuc3RnaXRAYmFoaWEubGFuCiAq
+IFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAxNzAzMDQxMTA2NTguMTQwMi0xLXNhdXJhdnNh
+Y2hpZGFuYW5kQGdtYWlsLmNvbSAtPiBwYXRjaGV3LzIwMTcwMzA0MTEwNjU4LjE0MDItMS1zYXVy
+YXZzYWNoaWRhbmFuZEBnbWFpbC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwpm
+ZmViNGE3IHV0aWw6IFVzZSBnX21hbGxvYy9nX2ZyZWUgaW4gZW52bGlzdC5jCgo9PT0gT1VUUFVU
+IEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IHV0aWw6IFVzZSBnX21hbGxvYy9nX2ZyZWUg
+aW4gZW52bGlzdC5jLi4uCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMK
+IzEwMDogRklMRTogdXRpbC9lbnZsaXN0LmM6Mjc6CiteSWVudmxpc3QgPSBnX21hbGxvYyhzaXpl
+b2YgKCplbnZsaXN0KSk7JAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlv
+biBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMTAwOiBGSUxFOiB1dGlsL2Vudmxpc3Qu
+YzoyNzoKKwllbnZsaXN0ID0gZ19tYWxsb2Moc2l6ZW9mICgqZW52bGlzdCkpOwoKRVJST1I6IGNv
+ZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTA5OiBGSUxFOiB1dGlsL2Vudmxpc3Qu
+Yzo1MDoKK15JXklnX2ZyZWUoZW50cnkpOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2
+ZXIgdXNlIHRhYnMKIzExMjogRklMRTogdXRpbC9lbnZsaXN0LmM6NTI6CiteSWdfZnJlZShlbnZs
+aXN0KTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxMjE6IEZJ
+TEU6IHV0aWwvZW52bGlzdC5jOjE1NzoKK15JXklnX2ZyZWUoZW50cnkpOyQKCkVSUk9SOiBjb2Rl
+IGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzEyODogRklMRTogdXRpbC9lbnZsaXN0LmM6
+MTYyOgorXkllbnRyeSA9IGdfbWFsbG9jKHNpemVvZiAoKmVudHJ5KSk7JAoKRVJST1I6IHNwYWNl
+IHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICco
+JwojMTI4OiBGSUxFOiB1dGlsL2Vudmxpc3QuYzoxNjI6CisJZW50cnkgPSBnX21hbGxvYyhzaXpl
+b2YgKCplbnRyeSkpOwoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwoj
+MTMxOiBGSUxFOiB1dGlsL2Vudmxpc3QuYzoxNjQ6CiteSV5JZ19mcmVlKGVudHJ5KTskCgpFUlJP
+UjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxNDA6IEZJTEU6IHV0aWwvZW52
+bGlzdC5jOjIwMjoKK15JXklnX2ZyZWUoZW50cnkpOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91
+bGQgbmV2ZXIgdXNlIHRhYnMKIzE2ODogRklMRTogdXRpbC9lbnZsaXN0LmM6MjI1OgorXklwZW52
+ID0gZW52ID0gZ19tYWxsb2MoKGVudmxpc3QtPmVsX2NvdW50ICsgMSkgKiBzaXplb2YgKGNoYXIg
+KikpOyQKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQg
+b3BlbiBwYXJlbnRoZXNpcyAnKCcKIzE2ODogRklMRTogdXRpbC9lbnZsaXN0LmM6MjI1OgorCXBl
+bnYgPSBlbnYgPSBnX21hbGxvYygoZW52bGlzdC0+ZWxfY291bnQgKyAxKSAqIHNpemVvZiAoY2hh
+ciAqKSk7Cgp0b3RhbDogMTEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMzAgbGluZXMgY2hlY2tlZAoK
+WW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
+dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
+YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09
+CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQg
+YXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNl
+bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
