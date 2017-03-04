@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1cjxKv-0001SO-IM
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 19:14:14 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cjxS6-0003cT-Cd
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 19:21:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1cjxKu-0001ar-IY
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 19:14:13 -0500
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:35383)
+	(envelope-from <rth7680@gmail.com>) id 1cjxS3-0005Yd-7I
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 19:21:38 -0500
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:34814)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <nirsof@gmail.com>) id 1cjxKu-0001ab-Ch
-	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 19:14:12 -0500
-Received: by mail-ot0-x244.google.com with SMTP id a12so10064773ota.2
-	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 16:14:12 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cjxS3-0005Xv-2U
+	for qemu-devel@nongnu.org; Fri, 03 Mar 2017 19:21:35 -0500
+Received: by mail-qk0-x243.google.com with SMTP id g129so2886947qkd.1
+	for <qemu-devel@nongnu.org>; Fri, 03 Mar 2017 16:21:35 -0800 (PST)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170228171921.21602-1-ale+qemu@clearmind.me>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <a6e8b5ff-0bac-116e-d621-8854884c7e8b@twiddle.net>
+Date: Sat, 4 Mar 2017 11:21:28 +1100
 MIME-Version: 1.0
-In-Reply-To: <CAMr-obvWX5KSh2bk80Hb07qMrtJzg4PxkRahnJXzbk9HLdbYAQ@mail.gmail.com>
-References: <20170303135150.12145-1-stefanha@redhat.com>
-	<CAMRbyysV54S0Sn42WuYFKfNSTMzQxk1yf1PSdrYXSUhiVr9Jjg@mail.gmail.com>
-	<f8913ef5-b949-c330-1737-9382e31dcc48@redhat.com>
-	<CAMr-obvWX5KSh2bk80Hb07qMrtJzg4PxkRahnJXzbk9HLdbYAQ@mail.gmail.com>
-From: Nir Soffer <nirsof@gmail.com>
-Date: Sat, 4 Mar 2017 02:14:11 +0200
-Message-ID: <CAMr-obtcEMoEVg=oJkEfFTqy_+DiO4JJ6UqxOGsLSxS7HcegNQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [RFC 0/4] qemu-img: add max-size subcommand
+In-Reply-To: <20170228171921.21602-1-ale+qemu@clearmind.me>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/7] Introducing libtcg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,133 +29,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Nir Soffer <nsoffer@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Maor Lipchuk <mlipchuk@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: Alessandro Di Federico <ale+qemu@clearmind.me>, qemu-devel@nongnu.org
 
-On Sat, Mar 4, 2017 at 12:15 AM, Nir Soffer <nirsof@gmail.com> wrote:
-> On Sat, Mar 4, 2017 at 12:02 AM, John Snow <jsnow@redhat.com> wrote:
->>
->>
->> On 03/03/2017 04:38 PM, Nir Soffer wrote:
->>> On Fri, Mar 3, 2017 at 3:51 PM, Stefan Hajnoczi <stefanha@redhat.com> wrote:
->>>>
->>>> RFCv1:
->>>>  * Publishing patch series with just raw support, no qcow2 yet.  Please review
->>>>    the command-line interface and let me know if you are happy with this
->>>>    approach.
->>>>
->>>> Users and management tools sometimes need to know the size required for a new
->>>> disk image so that an LVM volume, SAN LUN, etc can be allocated ahead of time.
->>>> Image formats like qcow2 have non-trivial metadata that makes it hard to
->>>> estimate the exact size without knowledge of file format internals.
->>>>
->>>> This patch series introduces a new qemu-img subcommand that calculates the
->>>> required size for both image creation and conversion scenarios.
->>>>
->>>> The conversion scenario is:
->>>>
->>>>   $ qemu-img max-size -f raw -O qcow2 input.img
->>>>   107374184448
->>>
->>> Isn't this the minimal size required to convert input.img?
->>>
->>
->> It's an upper bound for the property being measured, which is current
->> allocation size, not maximum potential size after growth.
+On 03/01/2017 04:19 AM, Alessandro Di Federico wrote:
+> This series of patches is a follow-up to the "Preparing the build system
+> for libtcg" patch set.
 >
-> From my point of view, this is the minimal size you must allocate if you
-> want to convert the image to logical volume.
+> The first six patches' aim is to decouple and factor out some components
+> so that introducing libtcg can be painless and smooth. The last patch
+> instead introduces libtcg, along with a set of simple tests.
+>
+> My main aim is to get the first six patches in mainline as soon as
+> possible, since rebasing when large amounts of code is moved is quite a
+> pain. If possible, letting the last patch in would be nice too.
+>
+> The current implementation of libtcg it's not thread-safe, doesn't allow
+> to change the CPU, munmap memory pages and the library itself cannot be
+> unloaded.
+>
+> Note that if libtcg is enabled in a build directory where it previously
+> wasn't, a `make clean` is required, since everything has to be built
+> with `-fPIC -fvisibility=hidden`. Maybe it's possible to have the build
+> system recognize this automatically (suggestions welcome).
+>
+> Note also that the factoring process excluded the bsd-user targets,
+> which would benefit from it (mainly for mmap.c and qemu.h), but are not
+> in a working state, so I'm leaving them out to avoid making more
+> damage. Once bsd-user is back in shape in mainline I'll be happy to
+> include it in the factoring.
+>
+> For what concerns the test suite, the s390x linux-user target seems to
+> be broken so I've temporarily excluded it from the test suite. Currently
+> I'm testing translation only on a subset of architectures (MIPS, ARM and
+> x86-64). It would be nice to test them all, but manually building all
+> the toolchains can be a pain. Is there an "official" set of toolchains
+> ready to use/compile?
+>
+> For what concerns the PREFIX changes in tcg-common.h, they're not very
+> elegant. Another approach might be to prefix all the data types, data
+> structures and enum entries in there with LibTCG/LIBTCG_ even
+> internally. Opinions?
+>
+> Thanks.
+>
+> Alessandro Di Federico (7):
+>   Factor out linux-user/qemu.h
+>   Factor out *-user/mmap.c
 
-Thinking more about this, max-size is correct for this use case, the
-maximum size of the image, used as the minimal allocation.
+These two patches I can understand, and seem like a good improvment.
 
->
->>
->>>>
->>>> Here an existing image file is taken and the output includes the space required
->>>> for data from the input image file.
->>>>
->>>> The creation scenario is:
->>>>
->>>>   $ qemu-img max-size -O qcow2 --size 5G
->>>>   196688
->>>
->>> Again, this is the minimal size.
->>>
->>> So maybe use min-size?
->>>
->>> Or:
->>>
->>>     qemu-img measure -f raw -O qcow2 input.img
->>>
->>> Works nicely with other verbs like create, convert, check.
->>>
->>
->> Measure what? This is strictly less descriptive even if "max-size" isn't
->> a verb.
->
-> measure-size?
->
->>> Now about the return value, do we want to return both the minimum size
->>> and the maximum size?
->>>
->>> For ovirt use case, we currently calculate the maximum size by multiplying
->>> by 1.1. We use this when doing automatic extending of ovirt thin provisioned
->>> disk. We start with 1G lv, and extend it each time it becomes full, stopping
->>> when we reach virtual size * 1.1. Using more accurate calculation instead
->>> can be nicer.
->>>
->>> So we can retrun:
->>>
->>> {
->>>     "min-size": 196688,
->>>     "max-size": 5905580032
->>> }
->>>
->>> Anyway thanks for working on this!
->>>
->>
->> It sounds like you want something different from what was intuited by
->> Maor Lipchuck. There are two things to estimate:
->>
->> (A) An estimate of the possible size of an image after conversion to a
->> different format, and
->> (B) An estimate of the possible size after full allocation.
->>
->> I got the sense that Maor was asking for (A), but perhaps I am wrong
->> about that. However, both are "maximums" in different senses.
->
-> Both are minimum when you have to allocate the space.
->
-> Maor ask about A because he is working on fixing allocation when
-> converting existing files, but we also have other use cases like B.
->
-> Nir
->
->>
->> --js
->>
->>>>
->>>> Stefan Hajnoczi (4):
->>>>   block: add bdrv_max_size() API
->>>>   raw-format: add bdrv_max_size() support
->>>>   qemu-img: add max-size subcommand
->>>>   iotests: add test 178 for qemu-img max-size
->>>>
->>>>  include/block/block.h      |   2 +
->>>>  include/block/block_int.h  |   2 +
->>>>  block.c                    |  37 +++++++++
->>>>  block/raw-format.c         |  16 ++++
->>>>  qemu-img.c                 | 196 +++++++++++++++++++++++++++++++++++++++++++++
->>>>  qemu-img-cmds.hx           |   6 ++
->>>>  tests/qemu-iotests/178     |  75 +++++++++++++++++
->>>>  tests/qemu-iotests/178.out |  25 ++++++
->>>>  tests/qemu-iotests/group   |   1 +
->>>>  9 files changed, 360 insertions(+)
->>>>  create mode 100755 tests/qemu-iotests/178
->>>>  create mode 100644 tests/qemu-iotests/178.out
->>>>
->>>> --
->>>> 2.9.3
->>>>
->>
+>   Move *_cpu_dump_state to translate.c
+>   *-user targets object files decoupling
+>   Isolate coprocessor parts from target/arm/helper.c
+
+I have no idea what you're going for here.  How does rearranging anything in 
+target/* affect TCG, or creating a library form of TCG?
+
+>   Factor out tcg/tcg.h
+
+Most of this looks totally bogus.  Including:
+
+(1) A common TCGReg?  This ought to be totally private between tcg.c and its 
+backend.  The only reason this escapes at all right now is the history of 
+TCG_AREG0.  Simply adjusting the interface given to target/* would clear that up.
+
+(2) PREFIX(ArgConstraint), PREFIX(TempVal), etc.
+Why is these being exported at all?
+
+(3) PREFIX(Opcode), PREFIX3(NB_OPS), PREFIX(Cond), etc.
+Why do you think these need to be specialized at all?
+
+Indeed, the entire existence of this patch suggests a fundamental disconnect 
+between how you and I interpret the goal and scope of a "libtcg".
+
+>   Introduce libtcg infrastructure
+
+And, this confirms it, in the first sentence:
+
+> * Extend the build system to build libtcg-$arch.so dynamic libraries.
+
+Why in the world would you want a JIT compiler for something other than the 
+host cpu?  There is zero point in building libtcg-mips.so for an x86_64 host.
+
+The only reason to want to pull TCG into a library form is so that another 
+project might be able to also generate code on the fly also for the host.
+
+
+r~
