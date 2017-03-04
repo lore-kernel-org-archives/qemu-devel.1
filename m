@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj.dadhania@gmail.com>) id 1ck9tM-00018H-G8
-	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 08:38:37 -0500
+	(envelope-from <nikunj.dadhania@gmail.com>) id 1ck9wk-00020j-PN
+	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 08:42:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj.dadhania@gmail.com>) id 1ck9tL-0001iD-Eu
-	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 08:38:36 -0500
+	(envelope-from <nikunj.dadhania@gmail.com>) id 1ck9wk-0003SV-20
+	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 08:42:06 -0500
 MIME-Version: 1.0
-In-Reply-To: <3AA8BBB4-FF53-423E-86F6-9F95E7DAB5C6@gmail.com>
-References: <mailman.56219.1488535159.22740.qemu-ppc@nongnu.org>
-	<3AA8BBB4-FF53-423E-86F6-9F95E7DAB5C6@gmail.com>
+In-Reply-To: <03c6d1af-266e-3bed-4475-683200d238e8@twiddle.net>
+References: <1488524289-5305-1-git-send-email-nikunj@linux.vnet.ibm.com>
+	<1488524289-5305-3-git-send-email-nikunj@linux.vnet.ibm.com>
+	<03c6d1af-266e-3bed-4475-683200d238e8@twiddle.net>
 From: Nikunj Dadhania <nikunj.dadhania@gmail.com>
-Date: Sat, 4 Mar 2017 19:08:30 +0530
-Message-ID: <CALAZu3-HkNub==6LDz7qoVg8CHhGDtknrmxXvZdWvq=N1O_Bqw@mail.gmail.com>
+Date: Sat, 4 Mar 2017 19:12:02 +0530
+Message-ID: <CALAZu38RkE2hLXfLLZzzpVZVfn51_b4+jjs29wyEa6ax1Ept9A@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/3] target/ppc: fmadd check for
- excp independently
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 2/3] target/ppc: fmadd: add
+ macro for updating flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +24,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>
-Cc: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, "list@suse.de:PowerPC list:PowerPC" <qemu-ppc@nongnu.org>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: Richard Henderson <rth@twiddle.net>
+Cc: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, "list@suse.de:PowerPC list:PowerPC" <qemu-ppc@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, qemu-devel qemu-devel <qemu-devel@nongnu.org>, Bharata B Rao <bharata@linux.vnet.ibm.com>
 
->> diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
->> index 0535ad0..a547f58 100644
->> --- a/target/ppc/fpu_helper.c
->> +++ b/target/ppc/fpu_helper.c
->> @@ -747,17 +747,21 @@ static void float64_maddsub_update_excp(CPUPPCState *env, float64 arg1,
->>                                         float64 arg2, float64 arg3,
->>                                         unsigned int madd_flags)
->> {
->> +    if (unlikely(float64_is_signaling_nan(arg1, &env->fp_status) ||
->> +                 float64_is_signaling_nan(arg2, &env->fp_status) ||
->> +                 float64_is_signaling_nan(arg3, &env->fp_status))) {
->> +        /* sNaN operation */
->> +        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
->> +    }
->> +
->>     if (unlikely((float64_is_infinity(arg1) && float64_is_zero(arg2)) ||
->>                  (float64_is_zero(arg1) && float64_is_infinity(arg2)))) {
->>         /* Multiplication of zero by infinity */
->> -        arg1 = float_invalid_op_excp(env, POWERPC_EXCP_FP_VXIMZ, 1);
->> -    } else if (unlikely(float64_is_signaling_nan(arg1, &env->fp_status) ||
->> -                        float64_is_signaling_nan(arg2, &env->fp_status) ||
->> -                        float64_is_signaling_nan(arg3, &env->fp_status))) {
->> -        /* sNaN operation */
->> -        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
->> -    } else if ((float64_is_infinity(arg1) || float64_is_infinity(arg2)) &&
->> -               float64_is_infinity(arg3)) {
->> +        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXIMZ, 1);
->> +    }
->> +
->> +    if ((float64_is_infinity(arg1) || float64_is_infinity(arg2)) &&
->> +        float64_is_infinity(arg3)) {
->>         uint8_t aSign, bSign, cSign;
+On 4 March 2017 at 00:45, Richard Henderson <rth@twiddle.net> wrote:
+> On 03/03/2017 05:58 PM, Nikunj A Dadhania wrote:
 >>
->>         aSign = float64_is_neg(arg1);
->> --
->> 2.7.4
+>> +#define FPU_MADDSUB_UPDATE(name, tp)                                    \
+>> +static void name(CPUPPCState *env, float64 arg1,                        \
+>> +                 float64 arg2, float64 arg3,                            \
+>> +                 unsigned int madd_flags)                               \
 >
 >
-> I'm having difficulty applying this patch. I took a look at float64_maddsub_update_excp()
-> in fpu_helper.c and found out why. This function doesn't exist. Are you missing a patch?
+> Use ALL CAPS for macro arguments which you paste.
 
-That patch is in ppc-for-2.9, here is the link
+Sure.
 
-https://github.com/dgibson/qemu/commit/992d7e976c7eca2b3129cd4bae4a0d350a8065fa
+> You forgot to use TP for arg{1,2,3}.
+
+Right, will correct it.
 
 Regards
 Nikunj
