@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46090)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ckAWy-0002Ql-48
-	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 09:19:33 -0500
+	(envelope-from <bounces@canonical.com>) id 1ckAWy-0002Qm-4F
+	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 09:19:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ckAWt-00021J-UX
+	(envelope-from <bounces@canonical.com>) id 1ckAWu-00021P-0G
 	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 09:19:32 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60837)
+Received: from indium.canonical.com ([91.189.90.7]:60831)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ckAWt-000210-OD
+	id 1ckAWt-00020x-O9
 	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 09:19:27 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ckAWs-0006eG-K5
-	for <qemu-devel@nongnu.org>; Sat, 04 Mar 2017 14:19:26 +0000
+	id 1ckAWr-0006eA-Md
+	for <qemu-devel@nongnu.org>; Sat, 04 Mar 2017 14:19:25 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 924622E8025
-	for <qemu-devel@nongnu.org>; Sat,  4 Mar 2017 14:19:26 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id A51B82E80C2
+	for <qemu-devel@nongnu.org>; Sat,  4 Mar 2017 14:19:25 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 04 Mar 2017 14:08:32 -0000
+Date: Sat, 04 Mar 2017 14:07:33 -0000
 From: Richard Jones <rjones@redhat.com>
 Reply-To: Bug 1224444 <1224444@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20130912120415.31262.22076.malonedeb@chaenomeles.canonical.com>
-Message-Id: <20170304140833.21959.77512.malone@gac.canonical.com>
+Message-Id: <20170304140734.5740.71454.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1224444] Re: virtio-serial loses writes when used
  over virtio-mmio
@@ -39,10 +39,15 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Fixed upstream, see previous comment.
+I don't know how to close bugs in launchpad, but this one can be closed
+for a couple of reasons:
 
-** Changed in: qemu
-       Status: New =3D> Fix Released
+(1) I benchmarked virtio-mmio the other day using qemu-speed-test on aarch64
+and I did not encounter the bug.
+
+(2) aarch64 has supported virtio-pci for a while, for virtio-mmio is effect=
+ively
+obsolete.
 
 -- =
 
