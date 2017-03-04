@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ck93n-0001SO-OO
-	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 07:45:20 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ck96j-00028B-UV
+	for Qemu-devel@nongnu.org; Sat, 04 Mar 2017 07:48:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ck93i-00074s-TR
-	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 07:45:19 -0500
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:35909)
+	(envelope-from <peter.maydell@linaro.org>) id 1ck96i-00081c-US
+	for Qemu-devel@nongnu.org; Sat, 04 Mar 2017 07:48:21 -0500
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:37366)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ck93i-00074k-NV
-	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 07:45:14 -0500
-Received: by mail-wr0-x230.google.com with SMTP id u108so89269758wrb.3
-	for <qemu-devel@nongnu.org>; Sat, 04 Mar 2017 04:45:14 -0800 (PST)
+	id 1ck96i-00080d-OP
+	for Qemu-devel@nongnu.org; Sat, 04 Mar 2017 07:48:20 -0500
+Received: by mail-wm0-x229.google.com with SMTP id n11so33418718wma.0
+	for <Qemu-devel@nongnu.org>; Sat, 04 Mar 2017 04:48:20 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <148858561902.285.12747236824169770569@0e2666bad730>
-References: <1488556233-31246-1-git-send-email-peter.maydell@linaro.org>
-	<148858561902.285.12747236824169770569@0e2666bad730>
+In-Reply-To: <CAF++6APFk2KY-7yFYtsgcTwn31RCf_Wxucp3eTLbB2e1c5QAyg@mail.gmail.com>
+References: <CAF++6APFk2KY-7yFYtsgcTwn31RCf_Wxucp3eTLbB2e1c5QAyg@mail.gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 4 Mar 2017 12:44:52 +0000
-Message-ID: <CAFEAcA-D37hty_DmU-VtudwnrEMeS=93HB5pe4HHL9GThRbQxQ@mail.gmail.com>
+Date: Sat, 4 Mar 2017 12:47:59 +0000
+Message-ID: <CAFEAcA9NPoujRE47pyNEui-DwxwisNpmGNp0w4B_+_mwbuV_4Q@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH for-2.9 0/6] disas: Fix various coverity
- nits
+Subject: Re: [Qemu-devel] [PULL 0/2] submodule-update queue 20170303
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,22 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "patches@linaro.org" <patches@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: James Hanley <jhanley@dgtlrift.com>
+Cc: qemu-devel <Qemu-devel@nongnu.org>
 
-On 4 March 2017 at 00:00,  <no-reply@patchew.org> wrote:
-> Hi,
->
-> This series failed build test on s390x host. Please find the details below.
+On 3 March 2017 at 19:45, James Hanley <jhanley@dgtlrift.com> wrote:
+> I'm trying to clone clean and I'm getting the following when initing the
+> submodules updated:
 
-> === TEST BEGIN ===
-> Using CC: /home/fam/bin/cc
-> rm: cannot remove '/var/tmp/patchew-qemu-build/aarch64-softmmu': Directory not empty
-> === OUTPUT END ===
+> It's unclear to me what should be done for a pristine clone - is there a
+> step missing from pulling those submodules?
 
-Fam, can we drop the s390x test from patchew until it gets fixed,
-please? Right now it's just spamming the list and means that
-actually interesting patchew emails are likely to get ignored...
+I just did:
+ git clone git://git.qemu-project.org/qemu.git
+ cd qemu
+ git submodule init
+ git submodule update
+
+and that worked for me.
+
+(We do occasionally accidentally introduce an error where we
+update the submodule but the qemu-project.org mirror of a
+git repo hasn't yet moved forward to include the reference.
+But it seems to all be OK at the moment.)
+
+As an aside you typically don't need all the submodules if
+you're just interested in building QEMU. (You might need
+the dtc module but configure will tell you if you do and
+also what command to ues to just get the dtc submodule
+and not anything else.)
 
 thanks
 -- PMM
