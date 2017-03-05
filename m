@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45781)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ckReE-0000QY-8D
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:12 -0500
+	(envelope-from <armbru@redhat.com>) id 1ckReF-0000Ri-4V
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ckRe9-000303-GQ
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44766)
+	(envelope-from <armbru@redhat.com>) id 1ckRe7-0002yE-Op
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43772)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ckRe9-0002ym-2B
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:05 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ckRe7-0002xE-Aq
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:03 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 378334E357
-	for <qemu-devel@nongnu.org>; Sun,  5 Mar 2017 08:36:05 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 73D8BC04B92E
+	for <qemu-devel@nongnu.org>; Sun,  5 Mar 2017 08:36:03 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
 	[10.36.116.55])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id A055415A80
-	for <qemu-devel@nongnu.org>; Sun,  5 Mar 2017 08:36:04 +0000 (UTC)
+	by int-mx13.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v258a1kA011147
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=NO)
+	for <qemu-devel@nongnu.org>; Sun, 5 Mar 2017 03:36:02 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Sun,  5 Mar 2017 09:35:55 +0100
-Message-Id: <1488702958-24336-25-git-send-email-armbru@redhat.com>
+Date: Sun,  5 Mar 2017 09:35:36 +0100
+Message-Id: <1488702958-24336-6-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488702958-24336-1-git-send-email-armbru@redhat.com>
 References: <1488702958-24336-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v2 24/27] qapi: Make input visitors detect
- unvisited list tails
+Subject: [Qemu-devel] [PULL v2 05/27] qapi: Support multiple command
+ registries per program
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,377 +39,511 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Fix the design flaw demonstrated in the previous commit: new method
-check_list() lets input visitors report that unvisited input remains
-for a list, exactly like check_struct() lets them report that
-unvisited input remains for a struct or union.
-
-Implement the method for the qobject input visitor (straightforward),
-and the string input visitor (less so, due to the magic list syntax
-there).  The opts visitor's list magic is even more impenetrable, and
-all I can do there today is a stub with a FIXME comment.  No worse
-than before.
+The command registry encapsulates a single command list.  Give the
+functions using it a parameter instead.  Define suitable command lists
+in monitor, guest agent and test-qmp-commands.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1488544368-30622-26-git-send-email-armbru@redhat.com>
+Message-Id: <1488544368-30622-6-git-send-email-armbru@redhat.com>
+[Debugging turds buried]
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- hw/ppc/spapr_drc.c                 |  5 +++++
- include/qapi/visitor-impl.h        |  3 +++
- include/qapi/visitor.h             | 13 +++++++++++++
- qapi/opts-visitor.c                | 11 +++++++++++
- qapi/qapi-visit-core.c             |  8 ++++++++
- qapi/qobject-input-visitor.c       | 37 +++++++++++++++++++++++++++++++------
- qapi/string-input-visitor.c        | 30 ++++++++++++++++++++++++++++++
- qapi/trace-events                  |  1 +
- scripts/qapi-visit.py              |  3 +++
- tests/test-opts-visitor.c          |  2 +-
- tests/test-qobject-input-visitor.c |  9 +++++++--
- tests/test-string-input-visitor.c  |  4 +++-
- 12 files changed, 116 insertions(+), 10 deletions(-)
+ include/qapi/qmp/dispatch.h | 22 ++++++++++++++--------
+ monitor.c                   | 31 +++++++++++++++++--------------
+ qapi/qmp-dispatch.c         |  9 +++++----
+ qapi/qmp-registry.c         | 37 ++++++++++++++++++-------------------
+ qga/commands.c              |  2 +-
+ qga/guest-agent-core.h      |  2 ++
+ qga/main.c                  | 19 ++++++++++---------
+ scripts/qapi-commands.py    | 16 ++++++++++------
+ tests/test-qmp-commands.c   | 12 +++++++-----
+ 9 files changed, 84 insertions(+), 66 deletions(-)
 
-diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index 2de6377..150f6bf 100644
---- a/hw/ppc/spapr_drc.c
-+++ b/hw/ppc/spapr_drc.c
-@@ -326,7 +326,12 @@ static void prop_get_fdt(Object *obj, Visitor *v, const char *name,
-                     return;
-                 }
-             }
-+            visit_check_list(v, &err);
-             visit_end_list(v, NULL);
-+            if (err) {
-+                error_propagate(errp, err);
-+                return;
-+            }
+diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
+index 57651ea..20578dc 100644
+--- a/include/qapi/qmp/dispatch.h
++++ b/include/qapi/qmp/dispatch.h
+@@ -34,18 +34,24 @@ typedef struct QmpCommand
+     bool enabled;
+ } QmpCommand;
+ 
+-void qmp_register_command(const char *name, QmpCommandFunc *fn,
+-                          QmpCommandOptions options);
+-void qmp_unregister_command(const char *name);
+-QmpCommand *qmp_find_command(const char *name);
+-QObject *qmp_dispatch(QObject *request);
+-void qmp_disable_command(const char *name);
+-void qmp_enable_command(const char *name);
++typedef QTAILQ_HEAD(QmpCommandList, QmpCommand) QmpCommandList;
++
++void qmp_register_command(QmpCommandList *cmds, const char *name,
++                          QmpCommandFunc *fn, QmpCommandOptions options);
++void qmp_unregister_command(QmpCommandList *cmds, const char *name);
++QmpCommand *qmp_find_command(QmpCommandList *cmds, const char *name);
++QObject *qmp_dispatch(QmpCommandList *cmds, QObject *request);
++void qmp_disable_command(QmpCommandList *cmds, const char *name);
++void qmp_enable_command(QmpCommandList *cmds, const char *name);
++
+ bool qmp_command_is_enabled(const QmpCommand *cmd);
+ const char *qmp_command_name(const QmpCommand *cmd);
+ bool qmp_has_success_response(const QmpCommand *cmd);
+ QObject *qmp_build_error_object(Error *err);
++
+ typedef void (*qmp_cmd_callback_fn)(QmpCommand *cmd, void *opaque);
+-void qmp_for_each_command(qmp_cmd_callback_fn fn, void *opaque);
++
++void qmp_for_each_command(QmpCommandList *cmds, qmp_cmd_callback_fn fn,
++                          void *opaque);
+ 
+ #endif
+diff --git a/monitor.c b/monitor.c
+index 53f5f5a..c7f7602 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -221,6 +221,8 @@ static int mon_refcount;
+ static mon_cmd_t mon_cmds[];
+ static mon_cmd_t info_cmds[];
+ 
++QmpCommandList qmp_commands;
++
+ Monitor *cur_mon;
+ 
+ static QEMUClockType event_clock_type = QEMU_CLOCK_REALTIME;
+@@ -919,7 +921,7 @@ CommandInfoList *qmp_query_commands(Error **errp)
+ {
+     CommandInfoList *list = NULL;
+ 
+-    qmp_for_each_command(query_commands_cb, &list);
++    qmp_for_each_command(&qmp_commands, query_commands_cb, &list);
+ 
+     return list;
+ }
+@@ -973,39 +975,40 @@ static void qmp_query_qmp_schema(QDict *qdict, QObject **ret_data,
+ static void qmp_unregister_commands_hack(void)
+ {
+ #ifndef CONFIG_SPICE
+-    qmp_unregister_command("query-spice");
++    qmp_unregister_command(&qmp_commands, "query-spice");
+ #endif
+ #ifndef TARGET_I386
+-    qmp_unregister_command("rtc-reset-reinjection");
++    qmp_unregister_command(&qmp_commands, "rtc-reset-reinjection");
+ #endif
+ #ifndef TARGET_S390X
+-    qmp_unregister_command("dump-skeys");
++    qmp_unregister_command(&qmp_commands, "dump-skeys");
+ #endif
+ #ifndef TARGET_ARM
+-    qmp_unregister_command("query-gic-capabilities");
++    qmp_unregister_command(&qmp_commands, "query-gic-capabilities");
+ #endif
+ #if !defined(TARGET_S390X) && !defined(TARGET_I386)
+-    qmp_unregister_command("query-cpu-model-expansion");
++    qmp_unregister_command(&qmp_commands, "query-cpu-model-expansion");
+ #endif
+ #if !defined(TARGET_S390X)
+-    qmp_unregister_command("query-cpu-model-baseline");
+-    qmp_unregister_command("query-cpu-model-comparison");
++    qmp_unregister_command(&qmp_commands, "query-cpu-model-baseline");
++    qmp_unregister_command(&qmp_commands, "query-cpu-model-comparison");
+ #endif
+ #if !defined(TARGET_PPC) && !defined(TARGET_ARM) && !defined(TARGET_I386) \
+     && !defined(TARGET_S390X)
+-    qmp_unregister_command("query-cpu-definitions");
++    qmp_unregister_command(&qmp_commands, "query-cpu-definitions");
+ #endif
+ }
+ 
+ void monitor_init_qmp_commands(void)
+ {
+-    qmp_init_marshal();
++    qmp_init_marshal(&qmp_commands);
+ 
+-    qmp_register_command("query-qmp-schema", qmp_query_qmp_schema,
++    qmp_register_command(&qmp_commands, "query-qmp-schema",
++                         qmp_query_qmp_schema,
+                          QCO_NO_OPTIONS);
+-    qmp_register_command("device_add", qmp_device_add,
++    qmp_register_command(&qmp_commands, "device_add", qmp_device_add,
+                          QCO_NO_OPTIONS);
+-    qmp_register_command("netdev_add", qmp_netdev_add,
++    qmp_register_command(&qmp_commands, "netdev_add", qmp_netdev_add,
+                          QCO_NO_OPTIONS);
+ 
+     qmp_unregister_commands_hack();
+@@ -3787,7 +3790,7 @@ static void handle_qmp_command(JSONMessageParser *parser, GQueue *tokens)
+         goto err_out;
+     }
+ 
+-    rsp = qmp_dispatch(req);
++    rsp = qmp_dispatch(&qmp_commands, req);
+ 
+ err_out:
+     if (err) {
+diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+index 621922f..72827a3 100644
+--- a/qapi/qmp-dispatch.c
++++ b/qapi/qmp-dispatch.c
+@@ -67,7 +67,8 @@ static QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
+     return dict;
+ }
+ 
+-static QObject *do_qmp_dispatch(QObject *request, Error **errp)
++static QObject *do_qmp_dispatch(QmpCommandList *cmds, QObject *request,
++                                Error **errp)
+ {
+     Error *local_err = NULL;
+     const char *command;
+@@ -81,7 +82,7 @@ static QObject *do_qmp_dispatch(QObject *request, Error **errp)
+     }
+ 
+     command = qdict_get_str(dict, "execute");
+-    cmd = qmp_find_command(command);
++    cmd = qmp_find_command(cmds, command);
+     if (cmd == NULL) {
+         error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
+                   "The command %s has not been found", command);
+@@ -121,13 +122,13 @@ QObject *qmp_build_error_object(Error *err)
+                               error_get_pretty(err));
+ }
+ 
+-QObject *qmp_dispatch(QObject *request)
++QObject *qmp_dispatch(QmpCommandList *cmds, QObject *request)
+ {
+     Error *err = NULL;
+     QObject *ret;
+     QDict *rsp;
+ 
+-    ret = do_qmp_dispatch(request, &err);
++    ret = do_qmp_dispatch(cmds, request, &err);
+ 
+     rsp = qdict_new();
+     if (err) {
+diff --git a/qapi/qmp-registry.c b/qapi/qmp-registry.c
+index e805368..5af484c 100644
+--- a/qapi/qmp-registry.c
++++ b/qapi/qmp-registry.c
+@@ -15,11 +15,8 @@
+ #include "qemu/osdep.h"
+ #include "qapi/qmp/dispatch.h"
+ 
+-static QTAILQ_HEAD(QmpCommandList, QmpCommand) qmp_commands =
+-    QTAILQ_HEAD_INITIALIZER(qmp_commands);
+-
+-void qmp_register_command(const char *name, QmpCommandFunc *fn,
+-                          QmpCommandOptions options)
++void qmp_register_command(QmpCommandList *cmds, const char *name,
++                          QmpCommandFunc *fn, QmpCommandOptions options)
+ {
+     QmpCommand *cmd = g_malloc0(sizeof(*cmd));
+ 
+@@ -27,22 +24,22 @@ void qmp_register_command(const char *name, QmpCommandFunc *fn,
+     cmd->fn = fn;
+     cmd->enabled = true;
+     cmd->options = options;
+-    QTAILQ_INSERT_TAIL(&qmp_commands, cmd, node);
++    QTAILQ_INSERT_TAIL(cmds, cmd, node);
+ }
+ 
+-void qmp_unregister_command(const char *name)
++void qmp_unregister_command(QmpCommandList *cmds, const char *name)
+ {
+-    QmpCommand *cmd = qmp_find_command(name);
++    QmpCommand *cmd = qmp_find_command(cmds, name);
+ 
+-    QTAILQ_REMOVE(&qmp_commands, cmd, node);
++    QTAILQ_REMOVE(cmds, cmd, node);
+     g_free(cmd);
+ }
+ 
+-QmpCommand *qmp_find_command(const char *name)
++QmpCommand *qmp_find_command(QmpCommandList *cmds, const char *name)
+ {
+     QmpCommand *cmd;
+ 
+-    QTAILQ_FOREACH(cmd, &qmp_commands, node) {
++    QTAILQ_FOREACH(cmd, cmds, node) {
+         if (strcmp(cmd->name, name) == 0) {
+             return cmd;
+         }
+@@ -50,11 +47,12 @@ QmpCommand *qmp_find_command(const char *name)
+     return NULL;
+ }
+ 
+-static void qmp_toggle_command(const char *name, bool enabled)
++static void qmp_toggle_command(QmpCommandList *cmds, const char *name,
++                               bool enabled)
+ {
+     QmpCommand *cmd;
+ 
+-    QTAILQ_FOREACH(cmd, &qmp_commands, node) {
++    QTAILQ_FOREACH(cmd, cmds, node) {
+         if (strcmp(cmd->name, name) == 0) {
+             cmd->enabled = enabled;
+             return;
+@@ -62,14 +60,14 @@ static void qmp_toggle_command(const char *name, bool enabled)
+     }
+ }
+ 
+-void qmp_disable_command(const char *name)
++void qmp_disable_command(QmpCommandList *cmds, const char *name)
+ {
+-    qmp_toggle_command(name, false);
++    qmp_toggle_command(cmds, name, false);
+ }
+ 
+-void qmp_enable_command(const char *name)
++void qmp_enable_command(QmpCommandList *cmds, const char *name)
+ {
+-    qmp_toggle_command(name, true);
++    qmp_toggle_command(cmds, name, true);
+ }
+ 
+ bool qmp_command_is_enabled(const QmpCommand *cmd)
+@@ -87,11 +85,12 @@ bool qmp_has_success_response(const QmpCommand *cmd)
+     return !(cmd->options & QCO_NO_SUCCESS_RESP);
+ }
+ 
+-void qmp_for_each_command(qmp_cmd_callback_fn fn, void *opaque)
++void qmp_for_each_command(QmpCommandList *cmds, qmp_cmd_callback_fn fn,
++                          void *opaque)
+ {
+     QmpCommand *cmd;
+ 
+-    QTAILQ_FOREACH(cmd, &qmp_commands, node) {
++    QTAILQ_FOREACH(cmd, cmds, node) {
+         fn(cmd, opaque);
+     }
+ }
+diff --git a/qga/commands.c b/qga/commands.c
+index edd3e83..4d92946 100644
+--- a/qga/commands.c
++++ b/qga/commands.c
+@@ -75,7 +75,7 @@ struct GuestAgentInfo *qmp_guest_info(Error **errp)
+     GuestAgentInfo *info = g_new0(GuestAgentInfo, 1);
+ 
+     info->version = g_strdup(QEMU_VERSION);
+-    qmp_for_each_command(qmp_command_info, info);
++    qmp_for_each_command(&ga_commands, qmp_command_info, info);
+     return info;
+ }
+ 
+diff --git a/qga/guest-agent-core.h b/qga/guest-agent-core.h
+index 63e9d39..3e8a4ac 100644
+--- a/qga/guest-agent-core.h
++++ b/qga/guest-agent-core.h
+@@ -18,7 +18,9 @@
+ 
+ typedef struct GAState GAState;
+ typedef struct GACommandState GACommandState;
++
+ extern GAState *ga_state;
++extern QmpCommandList ga_commands;
+ 
+ GList *ga_command_blacklist_init(GList *blacklist);
+ void ga_command_state_init(GAState *s, GACommandState *cs);
+diff --git a/qga/main.c b/qga/main.c
+index 6f8c614..9435bc7 100644
+--- a/qga/main.c
++++ b/qga/main.c
+@@ -92,6 +92,7 @@ struct GAState {
+ };
+ 
+ struct GAState *ga_state;
++QmpCommandList ga_commands;
+ 
+ /* commands that are safe to issue while filesystems are frozen */
+ static const char *ga_freeze_whitelist[] = {
+@@ -370,7 +371,7 @@ static void ga_disable_non_whitelisted(QmpCommand *cmd, void *opaque)
+     }
+     if (!whitelisted) {
+         g_debug("disabling command: %s", name);
+-        qmp_disable_command(name);
++        qmp_disable_command(&ga_commands, name);
+     }
+ }
+ 
+@@ -383,7 +384,7 @@ static void ga_enable_non_blacklisted(QmpCommand *cmd, void *opaque)
+     if (g_list_find_custom(blacklist, name, ga_strcmp) == NULL &&
+         !qmp_command_is_enabled(cmd)) {
+         g_debug("enabling command: %s", name);
+-        qmp_enable_command(name);
++        qmp_enable_command(&ga_commands, name);
+     }
+ }
+ 
+@@ -420,7 +421,7 @@ void ga_set_frozen(GAState *s)
+         return;
+     }
+     /* disable all non-whitelisted (for frozen state) commands */
+-    qmp_for_each_command(ga_disable_non_whitelisted, NULL);
++    qmp_for_each_command(&ga_commands, ga_disable_non_whitelisted, NULL);
+     g_warning("disabling logging due to filesystem freeze");
+     ga_disable_logging(s);
+     s->frozen = true;
+@@ -456,7 +457,7 @@ void ga_unset_frozen(GAState *s)
+     }
+ 
+     /* enable all disabled, non-blacklisted commands */
+-    qmp_for_each_command(ga_enable_non_blacklisted, s->blacklist);
++    qmp_for_each_command(&ga_commands, ga_enable_non_blacklisted, s->blacklist);
+     s->frozen = false;
+     if (!ga_delete_file(s->state_filepath_isfrozen)) {
+         g_warning("unable to delete %s, fsfreeze may not function properly",
+@@ -555,7 +556,7 @@ static void process_command(GAState *s, QDict *req)
+ 
+     g_assert(req);
+     g_debug("processing command");
+-    rsp = qmp_dispatch(QOBJECT(req));
++    rsp = qmp_dispatch(&ga_commands, QOBJECT(req));
+     if (rsp) {
+         ret = send_response(s, rsp);
+         if (ret < 0) {
+@@ -1119,7 +1120,7 @@ static void config_parse(GAConfig *config, int argc, char **argv)
              break;
+         case 'b': {
+             if (is_help_option(optarg)) {
+-                qmp_for_each_command(ga_print_cmd, NULL);
++                qmp_for_each_command(&ga_commands, ga_print_cmd, NULL);
+                 exit(EXIT_SUCCESS);
+             }
+             config->blacklist = g_list_concat(config->blacklist,
+@@ -1247,7 +1248,7 @@ static int run_agent(GAState *s, GAConfig *config)
+             s->deferred_options.log_filepath = config->log_filepath;
          }
-         default:
-diff --git a/include/qapi/visitor-impl.h b/include/qapi/visitor-impl.h
-index 962ba1d..e87709d 100644
---- a/include/qapi/visitor-impl.h
-+++ b/include/qapi/visitor-impl.h
-@@ -61,6 +61,9 @@ struct Visitor
-     /* Must be set */
-     GenericList *(*next_list)(Visitor *v, GenericList *tail, size_t size);
- 
-+    /* Optional; intended for input visitors */
-+    void (*check_list)(Visitor *v, Error **errp);
-+
-     /* Must be set */
-     void (*end_list)(Visitor *v, void **list);
- 
-diff --git a/include/qapi/visitor.h b/include/qapi/visitor.h
-index 7c91a50..1a1b620 100644
---- a/include/qapi/visitor.h
-+++ b/include/qapi/visitor.h
-@@ -370,6 +370,19 @@ void visit_start_list(Visitor *v, const char *name, GenericList **list,
- GenericList *visit_next_list(Visitor *v, GenericList *tail, size_t size);
- 
- /*
-+ * Prepare for completing a list visit.
-+ *
-+ * @errp obeys typical error usage, and reports failures such as
-+ * unvisited list tail remaining in the input stream.
-+ *
-+ * Should be called prior to visit_end_list() if all other
-+ * intermediate visit steps were successful, to allow the visitor one
-+ * last chance to report errors.  May be skipped on a cleanup path,
-+ * where there is no need to check for further errors.
-+ */
-+void visit_check_list(Visitor *v, Error **errp);
-+
-+/*
-  * Complete a list visit started earlier.
-  *
-  * @list must match what was passed to the paired visit_start_list().
-diff --git a/qapi/opts-visitor.c b/qapi/opts-visitor.c
-index c50dc4b..026d25b 100644
---- a/qapi/opts-visitor.c
-+++ b/qapi/opts-visitor.c
-@@ -273,6 +273,16 @@ opts_next_list(Visitor *v, GenericList *tail, size_t size)
- 
- 
- static void
-+opts_check_list(Visitor *v, Error **errp)
-+{
-+    /*
-+     * FIXME should set error when unvisited elements remain.  Mostly
-+     * harmless, as the generated visits always visit all elements.
-+     */
-+}
-+
-+
-+static void
- opts_end_list(Visitor *v, void **obj)
- {
-     OptsVisitor *ov = to_ov(v);
-@@ -539,6 +549,7 @@ opts_visitor_new(const QemuOpts *opts)
- 
-     ov->visitor.start_list = &opts_start_list;
-     ov->visitor.next_list  = &opts_next_list;
-+    ov->visitor.check_list = &opts_check_list;
-     ov->visitor.end_list   = &opts_end_list;
- 
-     ov->visitor.type_int64  = &opts_type_int64;
-diff --git a/qapi/qapi-visit-core.c b/qapi/qapi-visit-core.c
-index e6e93f0..43a09d1 100644
---- a/qapi/qapi-visit-core.c
-+++ b/qapi/qapi-visit-core.c
-@@ -90,6 +90,14 @@ GenericList *visit_next_list(Visitor *v, GenericList *tail, size_t size)
-     return v->next_list(v, tail, size);
- }
- 
-+void visit_check_list(Visitor *v, Error **errp)
-+{
-+    trace_visit_check_list(v);
-+    if (v->check_list) {
-+        v->check_list(v, errp);
-+    }
-+}
-+
- void visit_end_list(Visitor *v, void **obj)
- {
-     trace_visit_end_list(v, obj);
-diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
-index eafcdf4..34065ba 100644
---- a/qapi/qobject-input-visitor.c
-+++ b/qapi/qobject-input-visitor.c
-@@ -51,7 +51,8 @@ static QObjectInputVisitor *to_qiv(Visitor *v)
-     return container_of(v, QObjectInputVisitor, visitor);
- }
- 
--static const char *full_name(QObjectInputVisitor *qiv, const char *name)
-+static const char *full_name_nth(QObjectInputVisitor *qiv, const char *name,
-+                                 int n)
- {
-     StackObject *so;
-     char buf[32];
-@@ -63,8 +64,10 @@ static const char *full_name(QObjectInputVisitor *qiv, const char *name)
+         ga_disable_logging(s);
+-        qmp_for_each_command(ga_disable_non_whitelisted, NULL);
++        qmp_for_each_command(&ga_commands, ga_disable_non_whitelisted, NULL);
+     } else {
+         if (config->daemonize) {
+             become_daemon(config->pid_filepath);
+@@ -1277,7 +1278,7 @@ static int run_agent(GAState *s, GAConfig *config)
+         s->blacklist = config->blacklist;
+         do {
+             g_debug("disabling command: %s", (char *)l->data);
+-            qmp_disable_command(l->data);
++            qmp_disable_command(&ga_commands, l->data);
+             l = g_list_next(l);
+         } while (l);
      }
+@@ -1321,7 +1322,7 @@ int main(int argc, char **argv)
  
-     QSLIST_FOREACH(so , &qiv->stack, node) {
--        if (qobject_type(so->obj) == QTYPE_QDICT) {
--            g_string_prepend(qiv->errname, name);
-+        if (n) {
-+            n--;
-+        } else if (qobject_type(so->obj) == QTYPE_QDICT) {
-+            g_string_prepend(qiv->errname, name ?: "<anonymous>");
-             g_string_prepend_c(qiv->errname, '.');
-         } else {
-             snprintf(buf, sizeof(buf), "[%u]", so->index);
-@@ -72,18 +75,24 @@ static const char *full_name(QObjectInputVisitor *qiv, const char *name)
-         }
-         name = so->name;
-     }
-+    assert(!n);
+     config->log_level = G_LOG_LEVEL_ERROR | G_LOG_LEVEL_CRITICAL;
  
-     if (name) {
-         g_string_prepend(qiv->errname, name);
-     } else if (qiv->errname->str[0] == '.') {
-         g_string_erase(qiv->errname, 0, 1);
--    } else {
-+    } else if (!qiv->errname->str[0]) {
-         return "<anonymous>";
-     }
+-    qmp_init_marshal();
++    qga_qmp_init_marshal(&ga_commands);
  
-     return qiv->errname->str;
- }
+     init_dfl_pathnames();
+     config_load(config);
+diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
+index a75946f..2b062ad 100644
+--- a/scripts/qapi-commands.py
++++ b/scripts/qapi-commands.py
+@@ -198,7 +198,8 @@ def gen_register_command(name, success_response):
+         options = 'QCO_NO_SUCCESS_RESP'
  
-+static const char *full_name(QObjectInputVisitor *qiv, const char *name)
-+{
-+    return full_name_nth(qiv, name, 0);
-+}
-+
- static QObject *qobject_input_try_get_object(QObjectInputVisitor *qiv,
-                                              const char *name,
-                                              bool consume)
-@@ -260,15 +269,30 @@ static GenericList *qobject_input_next_list(Visitor *v, GenericList *tail,
-                                             size_t size)
+     ret = mcgen('''
+-    qmp_register_command("%(name)s", qmp_marshal_%(c_name)s, %(opts)s);
++    qmp_register_command(cmds, "%(name)s", 
++                         qmp_marshal_%(c_name)s, %(opts)s);
+ ''',
+                 name=name, c_name=c_name(name),
+                 opts=options)
+@@ -208,9 +209,12 @@ def gen_register_command(name, success_response):
+ def gen_registry(registry):
+     ret = mcgen('''
+ 
+-void qmp_init_marshal(void)
++void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds)
  {
-     QObjectInputVisitor *qiv = to_qiv(v);
--    StackObject *so = QSLIST_FIRST(&qiv->stack);
-+    StackObject *tos = QSLIST_FIRST(&qiv->stack);
- 
--    if (!so->entry) {
-+    assert(tos && tos->obj && qobject_type(tos->obj) == QTYPE_QLIST);
+-''')
++    QTAILQ_INIT(cmds);
 +
-+    if (!tos->entry) {
-         return NULL;
-     }
-     tail->next = g_malloc0(size);
-     return tail->next;
++''',
++                c_prefix=c_name(prefix, protect=False))
+     ret += registry
+     ret += mcgen('''
  }
+@@ -289,7 +293,6 @@ fdef.write(mcgen('''
+ #include "qemu-common.h"
+ #include "qemu/module.h"
+ #include "qapi/qmp/types.h"
+-#include "qapi/qmp/dispatch.h"
+ #include "qapi/visitor.h"
+ #include "qapi/qobject-output-visitor.h"
+ #include "qapi/qobject-input-visitor.h"
+@@ -304,11 +307,12 @@ fdef.write(mcgen('''
+ fdecl.write(mcgen('''
+ #include "%(prefix)sqapi-types.h"
+ #include "qapi/qmp/qdict.h"
++#include "qapi/qmp/dispatch.h"
+ #include "qapi/error.h"
  
-+static void qobject_input_check_list(Visitor *v, Error **errp)
-+{
-+    QObjectInputVisitor *qiv = to_qiv(v);
-+    StackObject *tos = QSLIST_FIRST(&qiv->stack);
-+
-+    assert(tos && tos->obj && qobject_type(tos->obj) == QTYPE_QLIST);
-+
-+    if (tos->entry) {
-+        error_setg(errp, "Only %u list elements expected in %s",
-+                   tos->index + 1, full_name_nth(qiv, NULL, 1));
-+    }
-+}
-+
+-void qmp_init_marshal(void);
++void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds);
+ ''',
+-                  prefix=prefix))
++                  prefix=prefix, c_prefix=c_name(prefix, protect=False)))
  
- static void qobject_input_start_alternate(Visitor *v, const char *name,
-                                           GenericAlternate **obj, size_t size,
-@@ -471,6 +495,7 @@ Visitor *qobject_input_visitor_new(QObject *obj)
-     v->visitor.end_struct = qobject_input_pop;
-     v->visitor.start_list = qobject_input_start_list;
-     v->visitor.next_list = qobject_input_next_list;
-+    v->visitor.check_list = qobject_input_check_list;
-     v->visitor.end_list = qobject_input_pop;
-     v->visitor.start_alternate = qobject_input_start_alternate;
-     v->visitor.type_int64 = qobject_input_type_int64;
-diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.c
-index f126cd9..806b01ae 100644
---- a/qapi/string-input-visitor.c
-+++ b/qapi/string-input-visitor.c
-@@ -170,6 +170,35 @@ static GenericList *next_list(Visitor *v, GenericList *tail, size_t size)
-     return tail->next;
- }
+ schema = QAPISchema(input_file)
+ gen = QAPISchemaGenCommandVisitor()
+diff --git a/tests/test-qmp-commands.c b/tests/test-qmp-commands.c
+index c4e20d1..1cf413b 100644
+--- a/tests/test-qmp-commands.c
++++ b/tests/test-qmp-commands.c
+@@ -8,6 +8,8 @@
+ #include "tests/test-qapi-types.h"
+ #include "tests/test-qapi-visit.h"
  
-+static void check_list(Visitor *v, Error **errp)
-+{
-+    const StringInputVisitor *siv = to_siv(v);
-+    Range *r;
-+    GList *cur_range;
++static QmpCommandList qmp_commands;
 +
-+    if (!siv->ranges || !siv->cur_range) {
-+        return;
-+    }
-+
-+    r = siv->cur_range->data;
-+    if (!r) {
-+        return;
-+    }
-+
-+    if (!range_contains(r, siv->cur)) {
-+        cur_range = g_list_next(siv->cur_range);
-+        if (!cur_range) {
-+            return;
-+        }
-+        r = cur_range->data;
-+        if (!r) {
-+            return;
-+        }
-+    }
-+
-+    error_setg(errp, "Range contains too many values");
-+}
-+
- static void end_list(Visitor *v, void **obj)
+ void qmp_user_def_cmd(Error **errp)
  {
-     StringInputVisitor *siv = to_siv(v);
-@@ -318,6 +347,7 @@ Visitor *string_input_visitor_new(const char *str)
-     v->visitor.type_number = parse_type_number;
-     v->visitor.start_list = start_list;
-     v->visitor.next_list = next_list;
-+    v->visitor.check_list = check_list;
-     v->visitor.end_list = end_list;
-     v->visitor.free = string_input_free;
- 
-diff --git a/qapi/trace-events b/qapi/trace-events
-index 9cbb61b..339cacf 100644
---- a/qapi/trace-events
-+++ b/qapi/trace-events
-@@ -8,6 +8,7 @@ visit_end_struct(void *v, void *obj) "v=%p obj=%p"
- 
- visit_start_list(void *v, const char *name, void *obj, size_t size) "v=%p name=%s obj=%p size=%zu"
- visit_next_list(void *v, void *tail, size_t size) "v=%p tail=%p size=%zu"
-+visit_check_list(void *v) "v=%p"
- visit_end_list(void *v, void *obj) "v=%p obj=%p"
- 
- visit_start_alternate(void *v, const char *name, void *obj, size_t size, bool promote_int) "v=%p name=%s obj=%p size=%zu promote_int=%d"
-diff --git a/scripts/qapi-visit.py b/scripts/qapi-visit.py
-index 96f2491..330b9f3 100644
---- a/scripts/qapi-visit.py
-+++ b/scripts/qapi-visit.py
-@@ -133,6 +133,9 @@ void visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error
-         }
-     }
- 
-+    if (!err) {
-+        visit_check_list(v, &err);
-+    }
-     visit_end_list(v, (void **)obj);
-     if (err && visit_is_input(v)) {
-         qapi_free_%(c_name)s(*obj);
-diff --git a/tests/test-opts-visitor.c b/tests/test-opts-visitor.c
-index d0f7646..b93fd33 100644
---- a/tests/test-opts-visitor.c
-+++ b/tests/test-opts-visitor.c
-@@ -199,8 +199,8 @@ test_opts_range_unvisited(void)
-     g_assert_cmpint(tail->value, ==, 1);
-     tail = (intList *)visit_next_list(v, (GenericList *)tail, sizeof(*list));
-     g_assert(tail);
-+    visit_check_list(v, &error_abort); /* BUG: unvisited tail not reported */
-     visit_end_list(v, (void **)&list);
--    /* BUG: unvisited tail not reported; actually not reportable by design */
- 
-     visit_check_struct(v, &error_abort);
-     visit_end_struct(v, NULL);
-diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-input-visitor.c
-index 9f3a826..87d4a77 100644
---- a/tests/test-qobject-input-visitor.c
-+++ b/tests/test-qobject-input-visitor.c
-@@ -933,6 +933,7 @@ static void test_visitor_in_fail_list(TestInputVisitorData *data,
-                                       const void *unused)
- {
-     int64_t i64 = -1;
-+    Error *err = NULL;
-     Visitor *v;
- 
-     /* Unvisited list tail */
-@@ -944,14 +945,16 @@ static void test_visitor_in_fail_list(TestInputVisitorData *data,
-     g_assert_cmpint(i64, ==, 1);
-     visit_type_int(v, NULL, &i64, &error_abort);
-     g_assert_cmpint(i64, ==, 2);
-+    visit_check_list(v, &err);
-+    error_free_or_abort(&err);
-     visit_end_list(v, NULL);
--    /* BUG: unvisited tail not reported; actually not reportable by design */
  }
+@@ -94,7 +96,7 @@ static void test_dispatch_cmd(void)
  
- static void test_visitor_in_fail_list_nested(TestInputVisitorData *data,
-                                              const void *unused)
- {
-     int64_t i64 = -1;
-+    Error *err = NULL;
-     Visitor *v;
+     qdict_put_obj(req, "execute", QOBJECT(qstring_from_str("user_def_cmd")));
  
-     /* Unvisited nested list tail */
-@@ -964,8 +967,10 @@ static void test_visitor_in_fail_list_nested(TestInputVisitorData *data,
-     visit_start_list(v, NULL, NULL, 0, &error_abort);
-     visit_type_int(v, NULL, &i64, &error_abort);
-     g_assert_cmpint(i64, ==, 1);
-+    visit_check_list(v, &err);
-+    error_free_or_abort(&err);
-     visit_end_list(v, NULL);
--    /* BUG: unvisited tail not reported; actually not reportable by design */
-+    visit_check_list(v, &error_abort);
-     visit_end_list(v, NULL);
- }
+-    resp = qmp_dispatch(QOBJECT(req));
++    resp = qmp_dispatch(&qmp_commands, QOBJECT(req));
+     assert(resp != NULL);
+     assert(!qdict_haskey(qobject_to_qdict(resp), "error"));
  
-diff --git a/tests/test-string-input-visitor.c b/tests/test-string-input-visitor.c
-index 70cee65..fbe380a 100644
---- a/tests/test-string-input-visitor.c
-+++ b/tests/test-string-input-visitor.c
-@@ -169,8 +169,10 @@ static void test_visitor_in_intList(TestInputVisitorData *data,
-     g_assert_cmpint(tail->value, ==, 2);
-     tail = (int64List *)visit_next_list(v, (GenericList *)tail, sizeof(*res));
-     g_assert(tail);
-+
-+    visit_check_list(v, &err);
-+    error_free_or_abort(&err);
-     visit_end_list(v, (void **)&res);
--    /* BUG: unvisited tail not reported; actually not reportable by design */
+@@ -111,7 +113,7 @@ static void test_dispatch_cmd_failure(void)
  
-     qapi_free_int64List(res);
- }
+     qdict_put_obj(req, "execute", QOBJECT(qstring_from_str("user_def_cmd2")));
+ 
+-    resp = qmp_dispatch(QOBJECT(req));
++    resp = qmp_dispatch(&qmp_commands, QOBJECT(req));
+     assert(resp != NULL);
+     assert(qdict_haskey(qobject_to_qdict(resp), "error"));
+ 
+@@ -125,7 +127,7 @@ static void test_dispatch_cmd_failure(void)
+ 
+     qdict_put_obj(req, "execute", QOBJECT(qstring_from_str("user_def_cmd")));
+ 
+-    resp = qmp_dispatch(QOBJECT(req));
++    resp = qmp_dispatch(&qmp_commands, QOBJECT(req));
+     assert(resp != NULL);
+     assert(qdict_haskey(qobject_to_qdict(resp), "error"));
+ 
+@@ -139,7 +141,7 @@ static QObject *test_qmp_dispatch(QDict *req)
+     QDict *resp;
+     QObject *ret;
+ 
+-    resp_obj = qmp_dispatch(QOBJECT(req));
++    resp_obj = qmp_dispatch(&qmp_commands, QOBJECT(req));
+     assert(resp_obj);
+     resp = qobject_to_qdict(resp_obj);
+     assert(resp && !qdict_haskey(resp, "error"));
+@@ -273,7 +275,7 @@ int main(int argc, char **argv)
+     g_test_add_func("/0.15/dealloc_types", test_dealloc_types);
+     g_test_add_func("/0.15/dealloc_partial", test_dealloc_partial);
+ 
+-    qmp_init_marshal();
++    test_qmp_init_marshal(&qmp_commands);
+     g_test_run();
+ 
+     return 0;
 -- 
 2.7.4
