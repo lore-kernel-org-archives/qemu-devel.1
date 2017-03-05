@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52982)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cke8a-0008Lx-R3
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 16:56:22 -0500
+	id 1ckeAk-0000Vk-Ku
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 16:58:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cke8X-0001L1-Kz
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 16:56:20 -0500
+	id 1ckeAf-0001vw-M9
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 16:58:34 -0500
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20170305214857.9510-1-krzk@kernel.org>
+References: <20170305214435.19656-1-krzk@kernel.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <67b0d01e-219a-9df6-1e46-f763e879e767@amsat.org>
-Date: Sun, 5 Mar 2017 18:56:09 -0300
+Message-ID: <f851ac5d-9fe6-c364-c9d9-9c0fbc1ee44e@amsat.org>
+Date: Sun, 5 Mar 2017 18:58:25 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170305214857.9510-1-krzk@kernel.org>
+In-Reply-To: <20170305214435.19656-1-krzk@kernel.org>
 Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 1/3] hw/arm/exynos: Convert
- fprintf to error_report()
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] block: Constify data passed by pointer to
+ blk_name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,161 +27,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Krzysztof Kozlowski <krzk@kernel.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: Krzysztof Kozlowski <krzk@kernel.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-Hi Krzysztof,
-
-On 03/05/2017 06:48 PM, Krzysztof Kozlowski wrote:
-> error_report() is preferred over fprintf() for logging errors.  Also
-> remove square brackets [] and additional new line characters in printed
-> messages.
+On 03/05/2017 06:44 PM, Krzysztof Kozlowski wrote:
+> blk_name() is not modifying data passed to it through pointer and it
+> returns also a pointer to const so the argument can be made const for
+> code safeness.
 >
 > Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 > ---
->  hw/arm/exynos4_boards.c   |  6 +++---
->  hw/timer/exynos4210_mct.c |  5 +++--
->  hw/timer/exynos4210_pwm.c | 11 +++++------
->  hw/timer/exynos4210_rtc.c | 16 +++++++---------
->  4 files changed, 18 insertions(+), 20 deletions(-)
+>  block/block-backend.c          | 2 +-
+>  include/sysemu/block-backend.h | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 >
-> diff --git a/hw/arm/exynos4_boards.c b/hw/arm/exynos4_boards.c
-> index 0efa19405409..5cd94d402b52 100644
-> --- a/hw/arm/exynos4_boards.c
-> +++ b/hw/arm/exynos4_boards.c
-> @@ -22,6 +22,7 @@
+> diff --git a/block/block-backend.c b/block/block-backend.c
+> index daa7908d0151..2d2169a5dfb0 100644
+> --- a/block/block-backend.c
+> +++ b/block/block-backend.c
+> @@ -409,7 +409,7 @@ void monitor_remove_blk(BlockBackend *blk)
+>   * Return @blk's name, a non-null string.
+>   * Returns an empty string iff @blk is not referenced by the monitor.
 >   */
->
->  #include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
->  #include "qemu-common.h"
->  #include "cpu.h"
->  #include "sysemu/sysemu.h"
-> @@ -101,9 +102,8 @@ static Exynos4210State *exynos4_boards_init_common(MachineState *machine,
->      MachineClass *mc = MACHINE_GET_CLASS(machine);
->
->      if (smp_cpus != EXYNOS4210_NCPUS && !qtest_enabled()) {
-> -        fprintf(stderr, "%s board supports only %d CPU cores. Ignoring smp_cpus"
-> -                " value.\n",
-> -                mc->name, EXYNOS4210_NCPUS);
-> +        error_report("%s board supports only %d CPU cores. Ignoring smp_cpus value.",
-> +                     mc->name, EXYNOS4210_NCPUS);
-
-ok, to inform the user
-
->      }
->
->      exynos4_board_binfo.ram_size = exynos4_board_ram_size[board_type];
-> diff --git a/hw/timer/exynos4210_mct.c b/hw/timer/exynos4210_mct.c
-> index 6069116942a4..48041ab036a6 100644
-> --- a/hw/timer/exynos4210_mct.c
-> +++ b/hw/timer/exynos4210_mct.c
-> @@ -53,6 +53,7 @@
->   */
->
->  #include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
->  #include "hw/sysbus.h"
->  #include "qemu/timer.h"
->  #include "qemu/main-loop.h"
-> @@ -1364,8 +1365,8 @@ static void exynos4210_mct_write(void *opaque, hwaddr offset,
->      case L0_TCNTO: case L1_TCNTO:
->      case L0_ICNTO: case L1_ICNTO:
->      case L0_FRCNTO: case L1_FRCNTO:
-> -        fprintf(stderr, "\n[exynos4210.mct: write to RO register "
-> -                TARGET_FMT_plx "]\n\n", offset);
-> +        error_report("exynos4210.mct: write to RO register " TARGET_FMT_plx,
-> +                     offset);
-
-no need to annoy the user here, it seems better to use 
-qemu_log_mask(LOG_UNIMP, ...
-
-same for following diffs
-
->          break;
->
->      case L0_INT_CSTAT: case L1_INT_CSTAT:
-> diff --git a/hw/timer/exynos4210_pwm.c b/hw/timer/exynos4210_pwm.c
-> index f5765075c720..f8826e24e63d 100644
-> --- a/hw/timer/exynos4210_pwm.c
-> +++ b/hw/timer/exynos4210_pwm.c
-> @@ -21,6 +21,7 @@
->   */
->
->  #include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
->  #include "hw/sysbus.h"
->  #include "qemu/timer.h"
->  #include "qemu-common.h"
-> @@ -252,9 +253,8 @@ static uint64_t exynos4210_pwm_read(void *opaque, hwaddr offset,
->          break;
->
->      default:
-> -        fprintf(stderr,
-> -                "[exynos4210.pwm: bad read offset " TARGET_FMT_plx "]\n",
-> -                offset);
-> +        error_report("exynos4210.pwm: bad read offset " TARGET_FMT_plx,
-> +                     offset);
->          break;
->      }
->      return value;
-> @@ -343,9 +343,8 @@ static void exynos4210_pwm_write(void *opaque, hwaddr offset,
->          break;
->
->      default:
-> -        fprintf(stderr,
-> -                "[exynos4210.pwm: bad write offset " TARGET_FMT_plx "]\n",
-> -                offset);
-> +        error_report("exynos4210.pwm: bad write offset " TARGET_FMT_plx,
-> +                     offset);
->          break;
->
->      }
-> diff --git a/hw/timer/exynos4210_rtc.c b/hw/timer/exynos4210_rtc.c
-> index 1a648c5d9e67..f4548cd555f4 100644
-> --- a/hw/timer/exynos4210_rtc.c
-> +++ b/hw/timer/exynos4210_rtc.c
-> @@ -26,6 +26,7 @@
->   */
->
->  #include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
->  #include "hw/sysbus.h"
->  #include "qemu/timer.h"
->  #include "qemu-common.h"
-> @@ -370,9 +371,8 @@ static uint64_t exynos4210_rtc_read(void *opaque, hwaddr offset,
->          break;
->
->      default:
-> -        fprintf(stderr,
-> -                "[exynos4210.rtc: bad read offset " TARGET_FMT_plx "]\n",
-> -                offset);
-> +        error_report("exynos4210.rtc: bad read offset " TARGET_FMT_plx,
-> +                     offset);
->          break;
->      }
->      return value;
-> @@ -433,9 +433,8 @@ static void exynos4210_rtc_write(void *opaque, hwaddr offset,
->          if (value > TICNT_THRESHOLD) {
->              s->reg_ticcnt = value;
->          } else {
-> -            fprintf(stderr,
-> -                    "[exynos4210.rtc: bad TICNT value %u ]\n",
-> -                    (uint32_t)value);
-> +            error_report("exynos4210.rtc: bad TICNT value %u",
-> +                         (uint32_t)value);
->          }
->          break;
->
-> @@ -500,9 +499,8 @@ static void exynos4210_rtc_write(void *opaque, hwaddr offset,
->          break;
->
->      default:
-> -        fprintf(stderr,
-> -                "[exynos4210.rtc: bad write offset " TARGET_FMT_plx "]\n",
-> -                offset);
-> +        error_report("exynos4210.rtc: bad write offset " TARGET_FMT_plx,
-> +                     offset);
->          break;
->
->      }
+> -const char *blk_name(BlockBackend *blk)
+> +const char *blk_name(const BlockBackend *blk)
+>  {
+>      return blk->name ?: "";
+>  }
+> diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
+> index 096c17fce064..d16c85d67b5c 100644
+> --- a/include/sysemu/block-backend.h
+> +++ b/include/sysemu/block-backend.h
+> @@ -91,7 +91,7 @@ int blk_get_refcnt(BlockBackend *blk);
+>  void blk_ref(BlockBackend *blk);
+>  void blk_unref(BlockBackend *blk);
+>  void blk_remove_all_bs(void);
+> -const char *blk_name(BlockBackend *blk);
+> +const char *blk_name(const BlockBackend *blk);
+>  BlockBackend *blk_by_name(const char *name);
+>  BlockBackend *blk_next(BlockBackend *blk);
+>  bool monitor_add_blk(BlockBackend *blk, const char *name, Error **errp);
 >
