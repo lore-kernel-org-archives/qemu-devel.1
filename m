@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ckReF-0000Rh-42
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:14 -0500
+	(envelope-from <no-reply@patchew.org>) id 1ckRzY-0006uk-Ao
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:58:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ckReA-00031U-Rd
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49746)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ckReA-000307-5b
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:06 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 09F1685545
-	for <qemu-devel@nongnu.org>; Sun,  5 Mar 2017 08:36:05 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
-	[10.36.116.55])
-	by int-mx09.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v258a3ht024264
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=NO)
-	for <qemu-devel@nongnu.org>; Sun, 5 Mar 2017 03:36:04 -0500
-From: Markus Armbruster <armbru@redhat.com>
-Date: Sun,  5 Mar 2017 09:35:49 +0100
-Message-Id: <1488702958-24336-19-git-send-email-armbru@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1ckRzT-0002hh-Qw
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:58:12 -0500
+Resent-Message-Id: <E1ckRzT-0002hh-Qw@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21381)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1ckRzT-0002g1-Jk
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:58:07 -0500
 In-Reply-To: <1488702958-24336-1-git-send-email-armbru@redhat.com>
-References: <1488702958-24336-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v2 18/27] qapi: Drop unused non-strict qobject
- input visitor
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148870427649.294.7279470935500835952@0e2666bad730>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 5 Mar 2017 00:57:56 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL v2 00/27] QAPI patches for 2017-02-28
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,304 +28,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: armbru@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-The split between tests/test-qobject-input-visitor.c and
-tests/test-qobject-input-strict.c now makes less sense than ever.  The
-next commit will take care of that.
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <1488544368-30622-20-git-send-email-armbru@redhat.com>
----
- block/nbd.c                          |  2 +-
- block/nfs.c                          |  2 +-
- block/ssh.c                          |  2 +-
- docs/qapi-code-gen.txt               |  2 +-
- include/qapi/qobject-input-visitor.h |  5 +----
- qapi/qobject-input-visitor.c         | 28 ++++++++++------------------
- qmp.c                                |  2 +-
- qom/qom-qobject.c                    |  2 +-
- scripts/qapi-commands.py             |  2 +-
- target/s390x/cpu_models.c            |  2 +-
- tests/check-qnull.c                  |  2 +-
- tests/qmp-test.c                     |  2 +-
- tests/test-qmp-commands.c            |  2 +-
- tests/test-qobject-input-strict.c    |  2 +-
- tests/test-qobject-input-visitor.c   |  2 +-
- tests/test-visitor-serialization.c   |  2 +-
- 16 files changed, 25 insertions(+), 36 deletions(-)
-
-diff --git a/block/nbd.c b/block/nbd.c
-index a7f9108..f478f80 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -278,7 +278,7 @@ static SocketAddress *nbd_config(BDRVNBDState *s, QDict *options, Error **errp)
-         goto done;
-     }
- 
--    iv = qobject_input_visitor_new(crumpled_addr, true);
-+    iv = qobject_input_visitor_new(crumpled_addr);
-     visit_type_SocketAddress(iv, NULL, &saddr, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-diff --git a/block/nfs.c b/block/nfs.c
-index 890d5d4..3f43f6e 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -474,7 +474,7 @@ static NFSServer *nfs_config(QDict *options, Error **errp)
-         goto out;
-     }
- 
--    iv = qobject_input_visitor_new(crumpled_addr, true);
-+    iv = qobject_input_visitor_new(crumpled_addr);
-     visit_type_NFSServer(iv, NULL, &server, &local_error);
-     if (local_error) {
-         error_propagate(errp, local_error);
-diff --git a/block/ssh.c b/block/ssh.c
-index 835932e..278e66f 100644
---- a/block/ssh.c
-+++ b/block/ssh.c
-@@ -601,7 +601,7 @@ static InetSocketAddress *ssh_config(QDict *options, Error **errp)
-         goto out;
-     }
- 
--    iv = qobject_input_visitor_new(crumpled_addr, true);
-+    iv = qobject_input_visitor_new(crumpled_addr);
-     visit_type_InetSocketAddress(iv, NULL, &inet, &local_error);
-     if (local_error) {
-         error_propagate(errp, local_error);
-diff --git a/docs/qapi-code-gen.txt b/docs/qapi-code-gen.txt
-index 7eb7be1..6746c10 100644
---- a/docs/qapi-code-gen.txt
-+++ b/docs/qapi-code-gen.txt
-@@ -1138,7 +1138,7 @@ Example:
-         Visitor *v;
-         UserDefOneList *arg1 = NULL;
- 
--        v = qobject_input_visitor_new(QOBJECT(args), true);
-+        v = qobject_input_visitor_new(QOBJECT(args));
-         visit_start_struct(v, NULL, NULL, 0, &err);
-         if (err) {
-             goto out;
-diff --git a/include/qapi/qobject-input-visitor.h b/include/qapi/qobject-input-visitor.h
-index cde328d..21db9c4 100644
---- a/include/qapi/qobject-input-visitor.h
-+++ b/include/qapi/qobject-input-visitor.h
-@@ -21,10 +21,7 @@ typedef struct QObjectInputVisitor QObjectInputVisitor;
- 
- /*
-  * Return a new input visitor that converts a QObject to a QAPI object.
-- *
-- * Set @strict to reject a parse that doesn't consume all keys of a
-- * dictionary; otherwise excess input is ignored.
-  */
--Visitor *qobject_input_visitor_new(QObject *obj, bool strict);
-+Visitor *qobject_input_visitor_new(QObject *obj);
- 
- #endif
-diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
-index 8015a98..eafcdf4 100644
---- a/qapi/qobject-input-visitor.c
-+++ b/qapi/qobject-input-visitor.c
-@@ -43,9 +43,6 @@ struct QObjectInputVisitor {
-      * QDict or QList). */
-     QSLIST_HEAD(, StackObject) stack;
- 
--    /* True to reject parse in visit_end_struct() if unvisited keys remain. */
--    bool strict;
--
-     GString *errname;           /* Accumulator for full_name() */
- };
- 
-@@ -157,11 +154,12 @@ static const QListEntry *qobject_input_push(QObjectInputVisitor *qiv,
-     tos->obj = obj;
-     tos->qapi = qapi;
- 
--    if (qiv->strict && qobject_type(obj) == QTYPE_QDICT) {
-+    if (qobject_type(obj) == QTYPE_QDICT) {
-         h = g_hash_table_new(g_str_hash, g_str_equal);
-         qdict_iter(qobject_to_qdict(obj), qdict_add_key, h);
-         tos->h = h;
--    } else if (qobject_type(obj) == QTYPE_QLIST) {
-+    } else {
-+        assert(qobject_type(obj) == QTYPE_QLIST);
-         tos->entry = qlist_first(qobject_to_qlist(obj));
-         tos->index = -1;
-     }
-@@ -175,20 +173,15 @@ static void qobject_input_check_struct(Visitor *v, Error **errp)
- {
-     QObjectInputVisitor *qiv = to_qiv(v);
-     StackObject *tos = QSLIST_FIRST(&qiv->stack);
-+    GHashTableIter iter;
-+    const char *key;
- 
-     assert(tos && !tos->entry);
--    if (qiv->strict) {
--        GHashTable *const top_ht = tos->h;
--        if (top_ht) {
--            GHashTableIter iter;
--            const char *key;
- 
--            g_hash_table_iter_init(&iter, top_ht);
--            if (g_hash_table_iter_next(&iter, (void **)&key, NULL)) {
--                error_setg(errp, "Parameter '%s' is unexpected",
--                           full_name(qiv, key));
--            }
--        }
-+    g_hash_table_iter_init(&iter, tos->h);
-+    if (g_hash_table_iter_next(&iter, (void **)&key, NULL)) {
-+        error_setg(errp, "Parameter '%s' is unexpected",
-+                   full_name(qiv, key));
-     }
- }
- 
-@@ -465,7 +458,7 @@ static void qobject_input_free(Visitor *v)
-     g_free(qiv);
- }
- 
--Visitor *qobject_input_visitor_new(QObject *obj, bool strict)
-+Visitor *qobject_input_visitor_new(QObject *obj)
- {
-     QObjectInputVisitor *v;
- 
-@@ -489,7 +482,6 @@ Visitor *qobject_input_visitor_new(QObject *obj, bool strict)
-     v->visitor.type_null = qobject_input_type_null;
-     v->visitor.optional = qobject_input_optional;
-     v->visitor.free = qobject_input_free;
--    v->strict = strict;
- 
-     v->root = obj;
-     qobject_incref(obj);
-diff --git a/qmp.c b/qmp.c
-index dfaabac..fa82b59 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -675,7 +675,7 @@ void qmp_object_add(const char *type, const char *id,
-         pdict = qdict_new();
-     }
- 
--    v = qobject_input_visitor_new(QOBJECT(pdict), true);
-+    v = qobject_input_visitor_new(QOBJECT(pdict));
-     obj = user_creatable_add_type(type, id, pdict, v, errp);
-     visit_free(v);
-     if (obj) {
-diff --git a/qom/qom-qobject.c b/qom/qom-qobject.c
-index bbdedda..4aec20d 100644
---- a/qom/qom-qobject.c
-+++ b/qom/qom-qobject.c
-@@ -23,7 +23,7 @@ void object_property_set_qobject(Object *obj, QObject *value,
- {
-     Visitor *v;
- 
--    v = qobject_input_visitor_new(value, true);
-+    v = qobject_input_visitor_new(value);
-     object_property_set(obj, v, name, errp);
-     visit_free(v);
- }
-diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
-index 2b062ad..0c05449 100644
---- a/scripts/qapi-commands.py
-+++ b/scripts/qapi-commands.py
-@@ -130,7 +130,7 @@ def gen_marshal(name, arg_type, boxed, ret_type):
-         push_indent()
- 
-     ret += mcgen('''
--    v = qobject_input_visitor_new(QOBJECT(args), true);
-+    v = qobject_input_visitor_new(QOBJECT(args));
-     visit_start_struct(v, NULL, NULL, 0, &err);
-     if (err) {
-         goto out;
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 2a894ee..4ea3a2d 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -346,7 +346,7 @@ static void cpu_model_from_info(S390CPUModel *model, const CpuModelInfo *info,
-     }
- 
-     if (qdict) {
--        visitor = qobject_input_visitor_new(info->props, true);
-+        visitor = qobject_input_visitor_new(info->props);
-         visit_start_struct(visitor, NULL, NULL, 0, errp);
-         if (*errp) {
-             object_unref(obj);
-diff --git a/tests/check-qnull.c b/tests/check-qnull.c
-index b50bb8a..8dd1c96 100644
---- a/tests/check-qnull.c
-+++ b/tests/check-qnull.c
-@@ -47,7 +47,7 @@ static void qnull_visit_test(void)
- 
-     g_assert(qnull_.refcnt == 1);
-     obj = qnull();
--    v = qobject_input_visitor_new(obj, true);
-+    v = qobject_input_visitor_new(obj);
-     qobject_decref(obj);
-     visit_type_null(v, NULL, &error_abort);
-     visit_free(v);
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index 405e49e..5d0260b 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -34,7 +34,7 @@ static void test_version(QObject *version)
-     VersionInfo *vinfo;
- 
-     g_assert(version);
--    v = qobject_input_visitor_new(version, true);
-+    v = qobject_input_visitor_new(version);
-     visit_type_VersionInfo(v, "version", &vinfo, &error_abort);
-     qapi_free_VersionInfo(vinfo);
-     visit_free(v);
-diff --git a/tests/test-qmp-commands.c b/tests/test-qmp-commands.c
-index 1cf413b..0f81a98 100644
---- a/tests/test-qmp-commands.c
-+++ b/tests/test-qmp-commands.c
-@@ -246,7 +246,7 @@ static void test_dealloc_partial(void)
-         ud2_dict = qdict_new();
-         qdict_put_obj(ud2_dict, "string0", QOBJECT(qstring_from_str(text)));
- 
--        v = qobject_input_visitor_new(QOBJECT(ud2_dict), true);
-+        v = qobject_input_visitor_new(QOBJECT(ud2_dict));
-         visit_type_UserDefTwo(v, NULL, &ud2, &err);
-         visit_free(v);
-         QDECREF(ud2_dict);
-diff --git a/tests/test-qobject-input-strict.c b/tests/test-qobject-input-strict.c
-index 4087ea3..7d26113 100644
---- a/tests/test-qobject-input-strict.c
-+++ b/tests/test-qobject-input-strict.c
-@@ -53,7 +53,7 @@ static Visitor *validate_test_init_internal(TestInputVisitorData *data,
-     data->obj = qobject_from_jsonv(json_string, ap);
-     g_assert(data->obj);
- 
--    data->qiv = qobject_input_visitor_new(data->obj, true);
-+    data->qiv = qobject_input_visitor_new(data->obj);
-     g_assert(data->qiv);
-     return data->qiv;
- }
-diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-input-visitor.c
-index 125e34c..658fa2c 100644
---- a/tests/test-qobject-input-visitor.c
-+++ b/tests/test-qobject-input-visitor.c
-@@ -49,7 +49,7 @@ static Visitor *visitor_input_test_init_internal(TestInputVisitorData *data,
-     data->obj = qobject_from_jsonv(json_string, ap);
-     g_assert(data->obj);
- 
--    data->qiv = qobject_input_visitor_new(data->obj, true);
-+    data->qiv = qobject_input_visitor_new(data->obj);
-     g_assert(data->qiv);
-     return data->qiv;
- }
-diff --git a/tests/test-visitor-serialization.c b/tests/test-visitor-serialization.c
-index 66b2b1c..c7e64f0 100644
---- a/tests/test-visitor-serialization.c
-+++ b/tests/test-visitor-serialization.c
-@@ -1040,7 +1040,7 @@ static void qmp_deserialize(void **native_out, void *datap,
-     obj = qobject_from_json(qstring_get_str(output_json));
- 
-     QDECREF(output_json);
--    d->qiv = qobject_input_visitor_new(obj, true);
-+    d->qiv = qobject_input_visitor_new(obj);
-     qobject_decref(obj_orig);
-     qobject_decref(obj);
-     visit(d->qiv, native_out, errp);
--- 
-2.7.4
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ4
+ODcwMjk1OC0yNDMzNi0xLWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tClN1YmplY3Q6
+IFtRZW11LWRldmVsXSBbUFVMTCB2MiAwMC8yN10gUUFQSSBwYXRjaGVzIGZvciAyMDE3LTAyLTI4
+ClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFT
+RT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFp
+bGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
+ZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIk
+KGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0
+czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEg
+LS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8
+IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxl
+ZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVk
+Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
+ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
+dC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTQ4ODcwMjk1OC0yNDMzNi0xLWdp
+dC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMTQ4ODcwMjk1OC0yNDMz
+Ni0xLWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJy
+YW5jaCAndGVzdCcKMjM3ZmQ0MiBxYXBpOiBJbXByb3ZlIHFvYmplY3QgdmlzaXRvciBkb2N1bWVu
+dGF0aW9uCmViNTk3YTEgcWFwaTogRml4IG9iamVjdCBpbnB1dCB2aXNpdCBiZXlvbmQgZW5kIG9m
+IGxpc3QKOWNlZGNlZiB0ZXN0czogQ292ZXIgaW5wdXQgdmlzaXQgYmV5b25kIGVuZCBvZiBsaXN0
+CjA4NGJlZDIgcWFwaTogTWFrZSBpbnB1dCB2aXNpdG9ycyBkZXRlY3QgdW52aXNpdGVkIGxpc3Qg
+dGFpbHMKMjY1Y2ZmOSB0ZXN0LXFvYmplY3QtaW5wdXQtdmlzaXRvcjogQ292ZXIgbWlzc2luZyBu
+ZXN0ZWQgc3RydWN0IG1lbWJlcgoxODk1ZThjIHRlc3RzOiBDb3ZlciBwYXJ0aWFsIGlucHV0IHZp
+c2l0IG9mIGxpc3QKOWMzODZkNiB0ZXN0LXN0cmluZy1pbnB1dC12aXNpdG9yOiBJbXByb3ZlIGxp
+c3QgY292ZXJhZ2UKMzI0NmRmZSB0ZXN0LXN0cmluZy1pbnB1dC12aXNpdG9yOiBUZWFyIGRvd24g
+ZXhpc3RpbmcgdGVzdCBhdXRvbWF0aWNhbGx5CjM1YjFjZjIgdGVzdHMtcW9iamVjdC1pbnB1dC1z
+dHJpY3Q6IE1lcmdlIGludG8gdGVzdC1xb2JqZWN0LWlucHV0LXZpc2l0b3IKNGEwZjE4OSBxYXBp
+OiBEcm9wIHVudXNlZCBub24tc3RyaWN0IHFvYmplY3QgaW5wdXQgdmlzaXRvcgozOTlmNjY3IHRl
+c3QtcW9iamVjdC1pbnB1dC12aXNpdG9yOiBVc2Ugc3RyaWN0IHZpc2l0b3IKNWEyN2MyNyBxb206
+IE1ha2Ugb2JqZWN0X3Byb3BlcnR5X3NldF9xb2JqZWN0KCkncyBpbnB1dCB2aXNpdG9yIHN0cmlj
+dApmMTI5OThkIHFhcGk6IE1ha2Ugc3RyaW5nIGlucHV0IGFuZCBvcHRzIHZpc2l0b3IgcmVxdWly
+ZSBub24tbnVsbCBpbnB1dApkNDc1NDAxIHFhcGk6IERyb3Agc3RyaW5nIGlucHV0IHZpc2l0b3Ig
+bWV0aG9kIG9wdGlvbmFsKCkKMmZmNmIzYSBxYXBpOiBJbXByb3ZlIHFvYmplY3QgaW5wdXQgdmlz
+aXRvciBlcnJvciByZXBvcnRpbmcKYWNlZDliYyBxYXBpOiBNYWtlIFFPYmplY3QgaW5wdXQgdmlz
+aXRvciBzZXQgKmxpc3QgcmVsaWFibHkKZjMwZTNlZSBxYXBpOiBDbGVhbiB1cCBhZnRlciBjb21t
+aXQgM2QzNDRjMgphM2QyODM3IHFhcGk6IEltcHJvdmUgYSBRT2JqZWN0IGlucHV0IHZpc2l0b3Ig
+ZXJyb3IgbWVzc2FnZQoxM2Y5NjdkIHFtcDogRWxpbWluYXRlIHNpbGx5IFFFUlJfUU1QXyogbWFj
+cm9zCmY4OTZmMjcgcW1wOiBEcm9wIGR1cGxpY2F0ZWQgUU1QIGNvbW1hbmQgb2JqZWN0IGNoZWNr
+cwo1NmE0ODdlIHFtcDogQ2xlYW4gdXAgaG93IHdlIGVuZm9yY2UgY2FwYWJpbGl0eSBuZWdvdGlh
+dGlvbgoyMGNjZWM4IHFhcGktaW50cm9zcGVjdDogTWFuZ2xlIC0tcHJlZml4IGFyZ3VtZW50IHBy
+b3Blcmx5IGZvciBDCmYwMzZkZjkgcWFwaTogU3VwcG9ydCBtdWx0aXBsZSBjb21tYW5kIHJlZ2lz
+dHJpZXMgcGVyIHByb2dyYW0KMmVhYmIwZSBxbXA6IER1bWIgZG93biBob3cgd2UgcnVuIFFNUCBj
+b21tYW5kIHJlZ2lzdHJhdGlvbgpjN2RlNjhjIHFtcC10ZXN0OiBOZXcsIGNvdmVyaW5nIGJhc2lj
+IFFNUCBwcm90b2NvbAphNmUzMzAwIGxpYnF0ZXN0OiBXb3JrIGFyb3VuZCBhICJRTVAgd2FudHMg
+YSBuZXdsaW5lIiBidWcKZDcxY2E0ZiBxZ2E6IEZpeCBjcmFzaCBvbiBub24tZGljdGlvbmFyeSBR
+TVAgYXJndW1lbnQKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMjc6IHFn
+YTogRml4IGNyYXNoIG9uIG5vbi1kaWN0aW9uYXJ5IFFNUCBhcmd1bWVudC4uLgpDaGVja2luZyBQ
+QVRDSCAyLzI3OiBsaWJxdGVzdDogV29yayBhcm91bmQgYSAiUU1QIHdhbnRzIGEgbmV3bGluZSIg
+YnVnLi4uCkNoZWNraW5nIFBBVENIIDMvMjc6IHFtcC10ZXN0OiBOZXcsIGNvdmVyaW5nIGJhc2lj
+IFFNUCBwcm90b2NvbC4uLgpDaGVja2luZyBQQVRDSCA0LzI3OiBxbXA6IER1bWIgZG93biBob3cg
+d2UgcnVuIFFNUCBjb21tYW5kIHJlZ2lzdHJhdGlvbi4uLgpDaGVja2luZyBQQVRDSCA1LzI3OiBx
+YXBpOiBTdXBwb3J0IG11bHRpcGxlIGNvbW1hbmQgcmVnaXN0cmllcyBwZXIgcHJvZ3JhbS4uLgpF
+UlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojNDAxOiBGSUxFOiBzY3JpcHRzL3FhcGktY29tbWFu
+ZHMucHk6MjAxOgorICAgIHFtcF9yZWdpc3Rlcl9jb21tYW5kKGNtZHMsICIlKG5hbWUpcyIsICQK
+CnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNDE1IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0
+Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
+cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
+ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDYvMjc6IHFhcGkt
+aW50cm9zcGVjdDogTWFuZ2xlIC0tcHJlZml4IGFyZ3VtZW50IHByb3Blcmx5IGZvciBDLi4uCkNo
+ZWNraW5nIFBBVENIIDcvMjc6IHFtcDogQ2xlYW4gdXAgaG93IHdlIGVuZm9yY2UgY2FwYWJpbGl0
+eSBuZWdvdGlhdGlvbi4uLgpDaGVja2luZyBQQVRDSCA4LzI3OiBxbXA6IERyb3AgZHVwbGljYXRl
+ZCBRTVAgY29tbWFuZCBvYmplY3QgY2hlY2tzLi4uCkNoZWNraW5nIFBBVENIIDkvMjc6IHFtcDog
+RWxpbWluYXRlIHNpbGx5IFFFUlJfUU1QXyogbWFjcm9zLi4uCkNoZWNraW5nIFBBVENIIDEwLzI3
+OiBxYXBpOiBJbXByb3ZlIGEgUU9iamVjdCBpbnB1dCB2aXNpdG9yIGVycm9yIG1lc3NhZ2UuLi4K
+Q2hlY2tpbmcgUEFUQ0ggMTEvMjc6IHFhcGk6IENsZWFuIHVwIGFmdGVyIGNvbW1pdCAzZDM0NGMy
+Li4uCkNoZWNraW5nIFBBVENIIDEyLzI3OiBxYXBpOiBNYWtlIFFPYmplY3QgaW5wdXQgdmlzaXRv
+ciBzZXQgKmxpc3QgcmVsaWFibHkuLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvMjc6IHFhcGk6IEltcHJv
+dmUgcW9iamVjdCBpbnB1dCB2aXNpdG9yIGVycm9yIHJlcG9ydGluZy4uLgpDaGVja2luZyBQQVRD
+SCAxNC8yNzogcWFwaTogRHJvcCBzdHJpbmcgaW5wdXQgdmlzaXRvciBtZXRob2Qgb3B0aW9uYWwo
+KS4uLgpDaGVja2luZyBQQVRDSCAxNS8yNzogcWFwaTogTWFrZSBzdHJpbmcgaW5wdXQgYW5kIG9w
+dHMgdmlzaXRvciByZXF1aXJlIG5vbi1udWxsIGlucHV0Li4uCkNoZWNraW5nIFBBVENIIDE2LzI3
+OiBxb206IE1ha2Ugb2JqZWN0X3Byb3BlcnR5X3NldF9xb2JqZWN0KCkncyBpbnB1dCB2aXNpdG9y
+IHN0cmljdC4uLgpDaGVja2luZyBQQVRDSCAxNy8yNzogdGVzdC1xb2JqZWN0LWlucHV0LXZpc2l0
+b3I6IFVzZSBzdHJpY3QgdmlzaXRvci4uLgpDaGVja2luZyBQQVRDSCAxOC8yNzogcWFwaTogRHJv
+cCB1bnVzZWQgbm9uLXN0cmljdCBxb2JqZWN0IGlucHV0IHZpc2l0b3IuLi4KQ2hlY2tpbmcgUEFU
+Q0ggMTkvMjc6IHRlc3RzLXFvYmplY3QtaW5wdXQtc3RyaWN0OiBNZXJnZSBpbnRvIHRlc3QtcW9i
+amVjdC1pbnB1dC12aXNpdG9yLi4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNDg3
+OiBGSUxFOiB0ZXN0cy90ZXN0LXFvYmplY3QtaW5wdXQtdmlzaXRvci5jOjg0NzoKKyAgICB2ID0g
+dmlzaXRvcl9pbnB1dF90ZXN0X2luaXQoZGF0YSwgInsgJ2ludGVnZXInOiAtNDIsICdib29sZWFu
+JzogdHJ1ZSwgJ3N0cmluZyc6ICdmb28nLCAnZXh0cmEnOiA0MiB9Iik7CgpFUlJPUjogbGluZSBv
+dmVyIDkwIGNoYXJhY3RlcnMKIzUwMTogRklMRTogdGVzdHMvdGVzdC1xb2JqZWN0LWlucHV0LXZp
+c2l0b3IuYzo4NjE6CisgICAgdiA9IHZpc2l0b3JfaW5wdXRfdGVzdF9pbml0KGRhdGEsICJ7ICdz
+dHJpbmcwJzogJ3N0cmluZzAnLCAnZGljdDEnOiB7ICdzdHJpbmcxJzogJ3N0cmluZzEnLCAnZGlj
+dDInOiB7ICd1c2VyZGVmMSc6IHsgJ2ludGVnZXInOiA0MiwgJ3N0cmluZyc6ICdzdHJpbmcnLCAn
+ZXh0cmEnOiBbNDIsIDIzLCB7J2Zvbyc6J2Jhcid9XSB9LCAnc3RyaW5nMic6ICdzdHJpbmcyJ319
+fSIpOwoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM1MTU6IEZJTEU6IHRlc3RzL3Rl
+c3QtcW9iamVjdC1pbnB1dC12aXNpdG9yLmM6ODc1OgorICAgIHYgPSB2aXNpdG9yX2lucHV0X3Rl
+c3RfaW5pdChkYXRhLCAiWyB7ICdzdHJpbmcnOiAnc3RyaW5nMCcsICdpbnRlZ2VyJzogNDIgfSwg
+eyAnc3RyaW5nJzogJ3N0cmluZzEnLCAnaW50ZWdlcic6IDQzIH0sIHsgJ3N0cmluZyc6ICdzdHJp
+bmcyJywgJ2ludGVnZXInOiA0NCwgJ2V4dHJhJzogJ2dnZycgfSBdIik7CgpFUlJPUjogbGluZSBv
+dmVyIDkwIGNoYXJhY3RlcnMKIzU4ODogRklMRTogdGVzdHMvdGVzdC1xb2JqZWN0LWlucHV0LXZp
+c2l0b3IuYzo5NDg6CisgICAgdiA9IHZpc2l0b3JfaW5wdXRfdGVzdF9pbml0KGRhdGEsICJ7ICdz
+dHJpbmcnOiAnYycsICdpbnRlZ2VyJzogNDEsICdib29sZWFuJzogdHJ1ZSB9Iik7CgpXQVJOSU5H
+OiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNTk1OiBGSUxFOiB0ZXN0cy90ZXN0LXFvYmplY3Qt
+aW5wdXQtdmlzaXRvci5jOjk1NToKK3N0YXRpYyB2b2lkIHRlc3RfdmlzaXRvcl9pbl9mYWlsX3Vu
+aW9uX2ZsYXRfbm9fZGlzY3JpbShUZXN0SW5wdXRWaXNpdG9yRGF0YSAqZGF0YSwKCkVSUk9SOiBs
+aW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNjAzOiBGSUxFOiB0ZXN0cy90ZXN0LXFvYmplY3QtaW5w
+dXQtdmlzaXRvci5jOjk2MzoKKyAgICB2ID0gdmlzaXRvcl9pbnB1dF90ZXN0X2luaXQoZGF0YSwg
+InsgJ2ludGVnZXInOiA0MiwgJ3N0cmluZyc6ICdjJywgJ3N0cmluZzEnOiAnZCcsICdzdHJpbmcy
+JzogJ2UnIH0iKTsKCnRvdGFsOiA1IGVycm9ycywgMSB3YXJuaW5ncywgMjMzIGxpbmVzIGNoZWNr
+ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENI
+IDIwLzI3OiB0ZXN0LXN0cmluZy1pbnB1dC12aXNpdG9yOiBUZWFyIGRvd24gZXhpc3RpbmcgdGVz
+dCBhdXRvbWF0aWNhbGx5Li4uCkNoZWNraW5nIFBBVENIIDIxLzI3OiB0ZXN0LXN0cmluZy1pbnB1
+dC12aXNpdG9yOiBJbXByb3ZlIGxpc3QgY292ZXJhZ2UuLi4KQ2hlY2tpbmcgUEFUQ0ggMjIvMjc6
+IHRlc3RzOiBDb3ZlciBwYXJ0aWFsIGlucHV0IHZpc2l0IG9mIGxpc3QuLi4KQ2hlY2tpbmcgUEFU
+Q0ggMjMvMjc6IHRlc3QtcW9iamVjdC1pbnB1dC12aXNpdG9yOiBDb3ZlciBtaXNzaW5nIG5lc3Rl
+ZCBzdHJ1Y3QgbWVtYmVyLi4uCkNoZWNraW5nIFBBVENIIDI0LzI3OiBxYXBpOiBNYWtlIGlucHV0
+IHZpc2l0b3JzIGRldGVjdCB1bnZpc2l0ZWQgbGlzdCB0YWlscy4uLgpDaGVja2luZyBQQVRDSCAy
+NS8yNzogdGVzdHM6IENvdmVyIGlucHV0IHZpc2l0IGJleW9uZCBlbmQgb2YgbGlzdC4uLgpFUlJP
+UjogaWYgdGhpcyBjb2RlIGlzIHJlZHVuZGFudCBjb25zaWRlciByZW1vdmluZyBpdAojODY6IEZJ
+TEU6IHRlc3RzL3Rlc3QtcW9iamVjdC1pbnB1dC12aXNpdG9yLmM6OTU2OgorI2lmIDAgLyogRklY
+TUUgY3Jhc2ggKi8KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgOTUgbGluZXMgY2hlY2tl
+ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
+b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
+aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0gg
+MjYvMjc6IHFhcGk6IEZpeCBvYmplY3QgaW5wdXQgdmlzaXQgYmV5b25kIGVuZCBvZiBsaXN0Li4u
+CkNoZWNraW5nIFBBVENIIDI3LzI3OiBxYXBpOiBJbXByb3ZlIHFvYmplY3QgdmlzaXRvciBkb2N1
+bWVudGF0aW9uLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRo
+IGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBb
+aHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
+dy1kZXZlbEBmcmVlbGlzdHMub3Jn
