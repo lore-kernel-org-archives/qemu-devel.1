@@ -1,19 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51112)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1ckdzS-0004om-Ny
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 16:46:55 -0500
+	(envelope-from <krzk@kernel.org>) id 1cke1x-00065D-JQ
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 16:49:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1ckdzP-0006Qb-Il
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 16:46:54 -0500
-Received: from mail.kernel.org ([198.145.29.136]:56642)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <krzk@kernel.org>) id 1ckdzP-0006Or-90
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 16:46:51 -0500
+	(envelope-from <krzk@kernel.org>) id 1cke1w-0007S9-HL
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 16:49:29 -0500
 From: Krzysztof Kozlowski <krzk@kernel.org>
-Date: Sun,  5 Mar 2017 23:46:33 +0200
-Message-Id: <20170305214633.19844-1-krzk@kernel.org>
-Subject: [Qemu-devel] [PATCH] qdev: Constify data pointed by few arguments
- and local variables
+Date: Sun,  5 Mar 2017 23:48:55 +0200
+Message-Id: <20170305214857.9510-1-krzk@kernel.org>
+Subject: [Qemu-devel] [PATCH 1/3] hw/arm/exynos: Convert fprintf to
+ error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,103 +18,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org
+To: Igor Mitsyanko <i.mitsyanko@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: Krzysztof Kozlowski <krzk@kernel.org>
 
-In few places the function arguments and local variables are not
-modifying data passed through pointers so this can be made const for
-code safeness.
+error_report() is preferred over fprintf() for logging errors.  Also
+remove square brackets [] and additional new line characters in printed
+messages.
 
 Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
 ---
- hw/core/qdev-properties-system.c |  6 +++---
- hw/core/qdev-properties.c        |  7 ++++---
- include/hw/qdev-properties.h     | 11 +++++++----
- 3 files changed, 14 insertions(+), 10 deletions(-)
+ hw/arm/exynos4_boards.c   |  6 +++---
+ hw/timer/exynos4210_mct.c |  5 +++--
+ hw/timer/exynos4210_pwm.c | 11 +++++------
+ hw/timer/exynos4210_rtc.c | 16 +++++++---------
+ 4 files changed, 18 insertions(+), 20 deletions(-)
 
-diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
-index c34be1c1bace..abbf3ef754d8 100644
---- a/hw/core/qdev-properties-system.c
-+++ b/hw/core/qdev-properties-system.c
-@@ -405,7 +405,7 @@ void qdev_prop_set_drive(DeviceState *dev, const char *name,
-     if (value) {
-         ref = blk_name(value);
-         if (!*ref) {
--            BlockDriverState *bs = blk_bs(value);
-+            const BlockDriverState *bs = blk_bs(value);
-             if (bs) {
-                 ref = bdrv_get_node_name(bs);
-             }
-@@ -416,7 +416,7 @@ void qdev_prop_set_drive(DeviceState *dev, const char *name,
- }
+diff --git a/hw/arm/exynos4_boards.c b/hw/arm/exynos4_boards.c
+index 0efa19405409..5cd94d402b52 100644
+--- a/hw/arm/exynos4_boards.c
++++ b/hw/arm/exynos4_boards.c
+@@ -22,6 +22,7 @@
+  */
  
- void qdev_prop_set_chr(DeviceState *dev, const char *name,
--                       Chardev *value)
-+                       const Chardev *value)
- {
-     assert(!value || value->label);
-     object_property_set_str(OBJECT(dev),
-@@ -424,7 +424,7 @@ void qdev_prop_set_chr(DeviceState *dev, const char *name,
- }
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "qemu-common.h"
+ #include "cpu.h"
+ #include "sysemu/sysemu.h"
+@@ -101,9 +102,8 @@ static Exynos4210State *exynos4_boards_init_common(MachineState *machine,
+     MachineClass *mc = MACHINE_GET_CLASS(machine);
  
- void qdev_prop_set_netdev(DeviceState *dev, const char *name,
--                          NetClientState *value)
-+                          const NetClientState *value)
- {
-     assert(!value || value->name);
-     object_property_set_str(OBJECT(dev),
-diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index 6ab4265eb478..34ec10f0caac 100644
---- a/hw/core/qdev-properties.c
-+++ b/hw/core/qdev-properties.c
-@@ -1010,7 +1010,8 @@ void qdev_prop_set_string(DeviceState *dev, const char *name, const char *value)
-     object_property_set_str(OBJECT(dev), value, name, &error_abort);
- }
+     if (smp_cpus != EXYNOS4210_NCPUS && !qtest_enabled()) {
+-        fprintf(stderr, "%s board supports only %d CPU cores. Ignoring smp_cpus"
+-                " value.\n",
+-                mc->name, EXYNOS4210_NCPUS);
++        error_report("%s board supports only %d CPU cores. Ignoring smp_cpus value.",
++                     mc->name, EXYNOS4210_NCPUS);
+     }
  
--void qdev_prop_set_macaddr(DeviceState *dev, const char *name, uint8_t *value)
-+void qdev_prop_set_macaddr(DeviceState *dev, const char *name,
-+                           const uint8_t *value)
- {
-     char str[2 * 6 + 5 + 1];
-     snprintf(str, sizeof(str), "%02x:%02x:%02x:%02x:%02x:%02x",
-@@ -1028,10 +1029,10 @@ void qdev_prop_set_enum(DeviceState *dev, const char *name, int value)
-                             name, &error_abort);
- }
+     exynos4_board_binfo.ram_size = exynos4_board_ram_size[board_type];
+diff --git a/hw/timer/exynos4210_mct.c b/hw/timer/exynos4210_mct.c
+index 6069116942a4..48041ab036a6 100644
+--- a/hw/timer/exynos4210_mct.c
++++ b/hw/timer/exynos4210_mct.c
+@@ -53,6 +53,7 @@
+  */
  
--void qdev_prop_set_ptr(DeviceState *dev, const char *name, void *value)
-+void qdev_prop_set_ptr(DeviceState *dev, const char *name, const void *value)
- {
-     Property *prop;
--    void **ptr;
-+    const void **ptr;
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "hw/sysbus.h"
+ #include "qemu/timer.h"
+ #include "qemu/main-loop.h"
+@@ -1364,8 +1365,8 @@ static void exynos4210_mct_write(void *opaque, hwaddr offset,
+     case L0_TCNTO: case L1_TCNTO:
+     case L0_ICNTO: case L1_ICNTO:
+     case L0_FRCNTO: case L1_FRCNTO:
+-        fprintf(stderr, "\n[exynos4210.mct: write to RO register "
+-                TARGET_FMT_plx "]\n\n", offset);
++        error_report("exynos4210.mct: write to RO register " TARGET_FMT_plx,
++                     offset);
+         break;
  
-     prop = qdev_prop_find(dev, name);
-     assert(prop && prop->info == &qdev_prop_ptr);
-diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-index 7ac315331aa0..659561daad0d 100644
---- a/include/hw/qdev-properties.h
-+++ b/include/hw/qdev-properties.h
-@@ -184,14 +184,17 @@ void qdev_prop_set_uint32(DeviceState *dev, const char *name, uint32_t value);
- void qdev_prop_set_int32(DeviceState *dev, const char *name, int32_t value);
- void qdev_prop_set_uint64(DeviceState *dev, const char *name, uint64_t value);
- void qdev_prop_set_string(DeviceState *dev, const char *name, const char *value);
--void qdev_prop_set_chr(DeviceState *dev, const char *name, Chardev *value);
--void qdev_prop_set_netdev(DeviceState *dev, const char *name, NetClientState *value);
-+void qdev_prop_set_chr(DeviceState *dev, const char *name,
-+                       const Chardev *value);
-+void qdev_prop_set_netdev(DeviceState *dev, const char *name,
-+                          const NetClientState *value);
- void qdev_prop_set_drive(DeviceState *dev, const char *name,
-                          BlockBackend *value, Error **errp);
--void qdev_prop_set_macaddr(DeviceState *dev, const char *name, uint8_t *value);
-+void qdev_prop_set_macaddr(DeviceState *dev, const char *name,
-+                           const uint8_t *value);
- void qdev_prop_set_enum(DeviceState *dev, const char *name, int value);
- /* FIXME: Remove opaque pointer properties.  */
--void qdev_prop_set_ptr(DeviceState *dev, const char *name, void *value);
-+void qdev_prop_set_ptr(DeviceState *dev, const char *name, const void *value);
+     case L0_INT_CSTAT: case L1_INT_CSTAT:
+diff --git a/hw/timer/exynos4210_pwm.c b/hw/timer/exynos4210_pwm.c
+index f5765075c720..f8826e24e63d 100644
+--- a/hw/timer/exynos4210_pwm.c
++++ b/hw/timer/exynos4210_pwm.c
+@@ -21,6 +21,7 @@
+  */
  
- void qdev_prop_register_global(GlobalProperty *prop);
- void qdev_prop_register_global_list(GlobalProperty *props);
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "hw/sysbus.h"
+ #include "qemu/timer.h"
+ #include "qemu-common.h"
+@@ -252,9 +253,8 @@ static uint64_t exynos4210_pwm_read(void *opaque, hwaddr offset,
+         break;
+ 
+     default:
+-        fprintf(stderr,
+-                "[exynos4210.pwm: bad read offset " TARGET_FMT_plx "]\n",
+-                offset);
++        error_report("exynos4210.pwm: bad read offset " TARGET_FMT_plx,
++                     offset);
+         break;
+     }
+     return value;
+@@ -343,9 +343,8 @@ static void exynos4210_pwm_write(void *opaque, hwaddr offset,
+         break;
+ 
+     default:
+-        fprintf(stderr,
+-                "[exynos4210.pwm: bad write offset " TARGET_FMT_plx "]\n",
+-                offset);
++        error_report("exynos4210.pwm: bad write offset " TARGET_FMT_plx,
++                     offset);
+         break;
+ 
+     }
+diff --git a/hw/timer/exynos4210_rtc.c b/hw/timer/exynos4210_rtc.c
+index 1a648c5d9e67..f4548cd555f4 100644
+--- a/hw/timer/exynos4210_rtc.c
++++ b/hw/timer/exynos4210_rtc.c
+@@ -26,6 +26,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "hw/sysbus.h"
+ #include "qemu/timer.h"
+ #include "qemu-common.h"
+@@ -370,9 +371,8 @@ static uint64_t exynos4210_rtc_read(void *opaque, hwaddr offset,
+         break;
+ 
+     default:
+-        fprintf(stderr,
+-                "[exynos4210.rtc: bad read offset " TARGET_FMT_plx "]\n",
+-                offset);
++        error_report("exynos4210.rtc: bad read offset " TARGET_FMT_plx,
++                     offset);
+         break;
+     }
+     return value;
+@@ -433,9 +433,8 @@ static void exynos4210_rtc_write(void *opaque, hwaddr offset,
+         if (value > TICNT_THRESHOLD) {
+             s->reg_ticcnt = value;
+         } else {
+-            fprintf(stderr,
+-                    "[exynos4210.rtc: bad TICNT value %u ]\n",
+-                    (uint32_t)value);
++            error_report("exynos4210.rtc: bad TICNT value %u",
++                         (uint32_t)value);
+         }
+         break;
+ 
+@@ -500,9 +499,8 @@ static void exynos4210_rtc_write(void *opaque, hwaddr offset,
+         break;
+ 
+     default:
+-        fprintf(stderr,
+-                "[exynos4210.rtc: bad write offset " TARGET_FMT_plx "]\n",
+-                offset);
++        error_report("exynos4210.rtc: bad write offset " TARGET_FMT_plx,
++                     offset);
+         break;
+ 
+     }
 -- 
 2.9.3
