@@ -1,34 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ckRe9-0000Oa-VQ
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:07 -0500
+	(envelope-from <armbru@redhat.com>) id 1ckReA-0000Oc-0O
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ckRe7-0002xR-7h
+	(envelope-from <armbru@redhat.com>) id 1ckRe7-0002xk-Ar
 	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40628)
+Received: from mx1.redhat.com ([209.132.183.28]:42576)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ckRe6-0002wT-UR
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ckRe7-0002wb-4A
 	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:03 -0500
 Received: from int-mx10.intmail.prod.int.phx2.redhat.com
 	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1C4FA3B712
+	by mx1.redhat.com (Postfix) with ESMTPS id 449248123D
 	for <qemu-devel@nongnu.org>; Sun,  5 Mar 2017 08:36:03 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
 	[10.36.116.55])
 	by int-mx10.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v258a1fr028563
+	id v258a1xa028570
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
 	verify=NO)
-	for <qemu-devel@nongnu.org>; Sun, 5 Mar 2017 03:36:02 -0500
+	for <qemu-devel@nongnu.org>; Sun, 5 Mar 2017 03:36:03 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Sun,  5 Mar 2017 09:35:37 +0100
-Message-Id: <1488702958-24336-7-git-send-email-armbru@redhat.com>
+Date: Sun,  5 Mar 2017 09:35:43 +0100
+Message-Id: <1488702958-24336-13-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488702958-24336-1-git-send-email-armbru@redhat.com>
 References: <1488702958-24336-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v2 06/27] qapi-introspect: Mangle --prefix
- argument properly for C
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v2 12/27] qapi: Make QObject input visitor set
+ *list reliably
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,28 +42,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-qapi-introspect.py --prefix hasn't been used so far, but fix it anyway.
+qobject_input_start_struct() sets *list, except when it fails because
+qobject_input_get_object() fails, i.e. the input object doesn't exist.
+
+All the other input visitor start_struct(), start_list(),
+start_alternate() always set *obj / *list.
+
+Change qobject_input_start_struct() to match.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1488544368-30622-7-git-send-email-armbru@redhat.com>
-[Commit message improved]
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <1488544368-30622-14-git-send-email-armbru@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- scripts/qapi-introspect.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ qapi/qobject-input-visitor.c | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
 
-diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
-index 541644e..fb72c61 100644
---- a/scripts/qapi-introspect.py
-+++ b/scripts/qapi-introspect.py
-@@ -64,7 +64,7 @@ class QAPISchemaGenIntrospectVisitor(QAPISchemaVisitor):
-         # generate C
-         # TODO can generate awfully long lines
-         jsons.extend(self._jsons)
--        name = prefix + 'qmp_schema_json'
-+        name = c_name(prefix, protect=False) + 'qmp_schema_json'
-         self.decl = mcgen('''
- extern const char %(c_name)s[];
- ''',
--- 
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index 2c2f883..d58696c 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -196,25 +196,21 @@ static void qobject_input_start_list(Visitor *v, co=
+nst char *name,
+     QObject *qobj =3D qobject_input_get_object(qiv, name, true, errp);
+     const QListEntry *entry;
+=20
++    if (list) {
++        *list =3D NULL;
++    }
+     if (!qobj) {
+         return;
+     }
+     if (qobject_type(qobj) !=3D QTYPE_QLIST) {
+-        if (list) {
+-            *list =3D NULL;
+-        }
+         error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "nul=
+l",
+                    "list");
+         return;
+     }
+=20
+     entry =3D qobject_input_push(qiv, qobj, list);
+-    if (list) {
+-        if (entry) {
+-            *list =3D g_malloc0(size);
+-        } else {
+-            *list =3D NULL;
+-        }
++    if (entry && list) {
++        *list =3D g_malloc0(size);
+     }
+ }
+=20
+--=20
 2.7.4
