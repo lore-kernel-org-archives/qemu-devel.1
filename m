@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ckReA-0000Og-1e
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:09 -0500
+	(envelope-from <armbru@redhat.com>) id 1ckReB-0000Om-Es
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ckRe6-0002xC-N9
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43766)
+	(envelope-from <armbru@redhat.com>) id 1ckRe7-0002y8-G2
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:32770)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ckRe6-0002vs-E2
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:02 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ckRe7-0002wn-4i
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:03 -0500
 Received: from int-mx09.intmail.prod.int.phx2.redhat.com
 	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9C3ACC04B31F
-	for <qemu-devel@nongnu.org>; Sun,  5 Mar 2017 08:36:01 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4F85A883A6
+	for <qemu-devel@nongnu.org>; Sun,  5 Mar 2017 08:36:03 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
 	[10.36.116.55])
 	by int-mx09.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v258Zxo9024226
+	id v258a1Cp024249
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
 	verify=NO)
-	for <qemu-devel@nongnu.org>; Sun, 5 Mar 2017 03:36:01 -0500
+	for <qemu-devel@nongnu.org>; Sun, 5 Mar 2017 03:36:02 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Sun,  5 Mar 2017 09:35:31 +0100
-Message-Id: <1488702958-24336-1-git-send-email-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 00/27] QAPI patches for 2017-02-28
+Date: Sun,  5 Mar 2017 09:35:40 +0100
+Message-Id: <1488702958-24336-10-git-send-email-armbru@redhat.com>
+In-Reply-To: <1488702958-24336-1-git-send-email-armbru@redhat.com>
+References: <1488702958-24336-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PULL v2 09/27] qmp: Eliminate silly QERR_QMP_* macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,102 +38,101 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The following changes since commit 17783ac828adc694d986698d2d7014aedfeb48=
-c6:
+The QERR_ macros are leftovers from the days of "rich" error objects.
 
-  Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-2.9-20170303=
-' into staging (2017-03-04 16:31:14 +0000)
+QERR_QMP_BAD_INPUT_OBJECT, QERR_QMP_BAD_INPUT_OBJECT_MEMBER,
+QERR_QMP_EXTRA_MEMBER are used in just one place now, except for one
+use that has crept into qobject-input-visitor.c.
 
-are available in the git repository at:
+Drop these macros, to make the (bad) error messages more visible.
 
-  git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2017-02-28
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <1488544368-30622-10-git-send-email-armbru@redhat.com>
+---
+ include/qapi/qmp/qerror.h    |  9 ---------
+ qapi/qmp-dispatch.c          | 13 +++++++------
+ qapi/qobject-input-visitor.c |  3 ++-
+ 3 files changed, 9 insertions(+), 16 deletions(-)
 
-for you to fetch changes up to aa3a982e674b09ae32502940f93ba98b3a8ad50e:
-
-  qapi: Improve qobject visitor documentation (2017-03-05 09:14:20 +0100)
-
-----------------------------------------------------------------
-QAPI patches for 2017-02-28
-
-----------------------------------------------------------------
-Markus Armbruster (27):
-      qga: Fix crash on non-dictionary QMP argument
-      libqtest: Work around a "QMP wants a newline" bug
-      qmp-test: New, covering basic QMP protocol
-      qmp: Dumb down how we run QMP command registration
-      qapi: Support multiple command registries per program
-      qapi-introspect: Mangle --prefix argument properly for C
-      qmp: Clean up how we enforce capability negotiation
-      qmp: Drop duplicated QMP command object checks
-      qmp: Eliminate silly QERR_QMP_* macros
-      qapi: Improve a QObject input visitor error message
-      qapi: Clean up after commit 3d344c2
-      qapi: Make QObject input visitor set *list reliably
-      qapi: Improve qobject input visitor error reporting
-      qapi: Drop string input visitor method optional()
-      qapi: Make string input and opts visitor require non-null input
-      qom: Make object_property_set_qobject()'s input visitor strict
-      test-qobject-input-visitor: Use strict visitor
-      qapi: Drop unused non-strict qobject input visitor
-      tests-qobject-input-strict: Merge into test-qobject-input-visitor
-      test-string-input-visitor: Tear down existing test automatically
-      test-string-input-visitor: Improve list coverage
-      tests: Cover partial input visit of list
-      test-qobject-input-visitor: Cover missing nested struct member
-      qapi: Make input visitors detect unvisited list tails
-      tests: Cover input visit beyond end of list
-      qapi: Fix object input visit beyond end of list
-      qapi: Improve qobject visitor documentation
-
- MAINTAINERS                           |   1 +
- block/nbd.c                           |   2 +-
- block/nfs.c                           |   2 +-
- block/ssh.c                           |   2 +-
- docs/qapi-code-gen.txt                |   2 +-
- hw/ppc/spapr_drc.c                    |   5 +
- include/monitor/monitor.h             |   1 +
- include/qapi/qmp/dispatch.h           |  22 +-
- include/qapi/qmp/qerror.h             |   9 -
- include/qapi/qobject-input-visitor.h  |  40 +++-
- include/qapi/qobject-output-visitor.h |  35 +++-
- include/qapi/visitor-impl.h           |   7 +-
- include/qapi/visitor.h                |  19 +-
- include/qemu/module.h                 |   2 -
- monitor.c                             | 178 ++++++----------
- qapi/opts-visitor.c                   |  12 ++
- qapi/qapi-visit-core.c                |   8 +
- qapi/qmp-dispatch.c                   |  29 ++-
- qapi/qmp-registry.c                   |  37 ++--
- qapi/qobject-input-visitor.c          | 219 ++++++++++++-------
- qapi/string-input-visitor.c           |  97 +++++----
- qapi/trace-events                     |   1 +
- qga/commands.c                        |   2 +-
- qga/guest-agent-core.h                |   2 +
- qga/main.c                            |  19 +-
- qmp.c                                 |   2 +-
- qom/qom-qobject.c                     |   4 +-
- scripts/qapi-commands.py              |  19 +-
- scripts/qapi-introspect.py            |   2 +-
- scripts/qapi-visit.py                 |   3 +
- target/s390x/cpu_models.c             |   2 +-
- tests/Makefile.include                |   9 +-
- tests/check-qnull.c                   |   2 +-
- tests/libqtest.c                      |  29 ++-
- tests/libqtest.h                      |   8 +
- tests/qmp-test.c                      | 139 +++++++++++++
- tests/test-opts-visitor.c             |  80 +++++++
- tests/test-qga.c                      |   2 +-
- tests/test-qmp-commands.c             |  14 +-
- tests/test-qobject-input-strict.c     | 381 ----------------------------=
-------
- tests/test-qobject-input-visitor.c    | 260 ++++++++++++++++++++++-
- tests/test-string-input-visitor.c     | 142 ++++++++++---
- tests/test-visitor-serialization.c    |   2 +-
- trace-events                          |   1 -
- vl.c                                  |   2 +-
- 45 files changed, 1083 insertions(+), 773 deletions(-)
- create mode 100644 tests/qmp-test.c
- delete mode 100644 tests/test-qobject-input-strict.c
-
---=20
+diff --git a/include/qapi/qmp/qerror.h b/include/qapi/qmp/qerror.h
+index 6586c9f..c82360f 100644
+--- a/include/qapi/qmp/qerror.h
++++ b/include/qapi/qmp/qerror.h
+@@ -82,15 +82,6 @@
+ #define QERR_QGA_COMMAND_FAILED \
+     "Guest agent command failed, error was '%s'"
+ 
+-#define QERR_QMP_BAD_INPUT_OBJECT \
+-    "Expected '%s' in QMP input"
+-
+-#define QERR_QMP_BAD_INPUT_OBJECT_MEMBER \
+-    "QMP input object member '%s' expects '%s'"
+-
+-#define QERR_QMP_EXTRA_MEMBER \
+-    "QMP input object member '%s' is unexpected"
+-
+ #define QERR_SET_PASSWD_FAILED \
+     "Could not set password"
+ 
+diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+index 7fb8aef..dc50212 100644
+--- a/qapi/qmp-dispatch.c
++++ b/qapi/qmp-dispatch.c
+@@ -30,7 +30,7 @@ static QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
+ 
+     dict = qobject_to_qdict(request);
+     if (!dict) {
+-        error_setg(errp, QERR_QMP_BAD_INPUT_OBJECT, "object");
++        error_setg(errp, "Expected '%s' in QMP input", "object");
+         return NULL;
+     }
+ 
+@@ -41,25 +41,26 @@ static QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
+ 
+         if (!strcmp(arg_name, "execute")) {
+             if (qobject_type(arg_obj) != QTYPE_QSTRING) {
+-                error_setg(errp, QERR_QMP_BAD_INPUT_OBJECT_MEMBER, "execute",
+-                           "string");
++                error_setg(errp, "QMP input object member '%s' expects '%s'",
++                           "execute", "string");
+                 return NULL;
+             }
+             has_exec_key = true;
+         } else if (!strcmp(arg_name, "arguments")) {
+             if (qobject_type(arg_obj) != QTYPE_QDICT) {
+-                error_setg(errp, QERR_QMP_BAD_INPUT_OBJECT_MEMBER,
++                error_setg(errp, "QMP input object member '%s' expects '%s'",
+                            "arguments", "object");
+                 return NULL;
+             }
+         } else {
+-            error_setg(errp, QERR_QMP_EXTRA_MEMBER, arg_name);
++            error_setg(errp, "QMP input object member '%s' is unexpected",
++                       arg_name);
+             return NULL;
+         }
+     }
+ 
+     if (!has_exec_key) {
+-        error_setg(errp, QERR_QMP_BAD_INPUT_OBJECT, "execute");
++        error_setg(errp, "Expected '%s' in QMP input", "execute");
+         return NULL;
+     }
+ 
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index 0063327..ed6c24c 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -140,7 +140,8 @@ static void qobject_input_check_struct(Visitor *v, Error **errp)
+ 
+             g_hash_table_iter_init(&iter, top_ht);
+             if (g_hash_table_iter_next(&iter, (void **)&key, NULL)) {
+-                error_setg(errp, QERR_QMP_EXTRA_MEMBER, key);
++                error_setg(errp, "QMP input object member '%s' is unexpected",
++                           key);
+             }
+         }
+     }
+-- 
 2.7.4
