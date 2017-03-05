@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49136)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <alexander.boettcher@genode-labs.com>)
-	id 1ckZVv-0006py-TK
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 12:00:09 -0500
+	id 1ckamp-0006Ie-99
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 13:21:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <alexander.boettcher@genode-labs.com>)
-	id 1ckZVs-0003lw-N7
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 12:00:08 -0500
-Received: from mail.genode-labs.com ([88.198.56.169]:51667)
+	id 1ckamm-0001BU-1c
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 13:21:39 -0500
+Received: from mail.genode-labs.com ([88.198.56.169]:51700)
 	by eggs.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <alexander.boettcher@genode-labs.com>)
-	id 1ckZVs-0003ka-Bc
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 12:00:04 -0500
+	id 1ckaml-0001AI-MN
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 13:21:35 -0500
 From: Alexander Boettcher <alexander.boettcher@genode-labs.com>
-Message-ID: <49fcb3c4-df9d-ec64-2927-71c02fc2524b@genode-labs.com>
-Date: Sun, 5 Mar 2017 17:59:56 +0100
+Message-ID: <7005a482-2372-0aaf-eb8b-60cd0a16b002@genode-labs.com>
+Date: Sun, 5 Mar 2017 19:21:33 +0100
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] Qemu deadlocks in tb_lock when using SVM+SoftMMU
+Subject: [Qemu-devel] =?utf-8?q?=5BPATCH=C2=B1_SVM_I/O_permission_bitmap_f?=
+ =?utf-8?q?or_user-level_=28ring-3=29_code_ignored?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,52 +29,27 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, rth@twiddle.net, fred.konrad@greensocs.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, rth@twiddle.net, ehabkost@redhat.com
 
 Hello,
 
-beginning with commit 3bd1d74576bacb120949e13cdeded7a0c792c685
+the SVM I/O permission bitmap for user-level (ring-3) VM code running in
+SVM seems to be ignored and causes a GP-fault. (Actual the IO permission
+was granted by the kernel via the TSS I/O port permission bitmap).
 
-"cputlb: introduce tlb_flush_* async work"
+After some debugging the GP code originates from target/i386/translate.c
+gen_check_io() within the if(s->pe && (s->cpl > s->iopl || s->vm86))
+condition. However, the actual SVM IO permission bitmap is checked after
+that condition, which succeeds and would permit the access.
 
-using Qemu with SoftMMU+SVM virtualization deadlocks because tb_lock is
-taken second time in cputlb.c tlb_flush_nocheck() function. The first
-time tb_lock is taken, according to my debugging, in cpu-exex.c
-tb_find() line 361.
+When I exchange the order, first executing the if(s->flags &
+HF_SVMI_MASK) block and later on executing the if (s->pe && (s->cpl >
+s->iopl || s->vm86)) block my use-case succeeds.
 
-I'm using Qemu with:
+Please check and consider the patch for addition. The patch is based on
+17783ac828adc694d986698d2d7014aedfeb48c6 qemu master.
 
-qemu-system-x86_64 -s -no-kvm -display sdl -m 512 -cpu phenom -nographic
--cdrom genode.iso
-
-When building with
-./configure --target-list=3Dx86_64-softmmu --enable-debug --disable-pie
---enable-debug-tcg
-
-I get also a
-
-translate-all.c:165: tb_lock: Assertion `!have_tb_lock' failed.
-
-beginning with commit 3bd1d74576bacb120949e13cdeded7a0c792c685. Before
-the commit all is fine.
-
-Since I'm not very familiar with Qemu internals, it is not clear to me
-whether this commit breaks things or whether something must be
-handled/added special somewhere else. I attached below the backtrace of
-Qemu when it hangs in tb_lock.
-
-In [0] my branch based on 3bd1d74576bacb120949e13cdeded7a0c792c685 is
-used and [1] contains the iso image, if somebody wants try to reproduce i=
-t.
-
-[0] https://github.com/alex-ab/qemu/commits/genode_svm_issue
-[1]
-https://github.com/alex-ab/qemu/commit/1130fee3b04dd2bee576241de9a5771d68=
-55b327
-
-Thanks in advance,
-
-Alex.
+Thanks,
 
 --=20
 Alexander Boettcher
@@ -85,97 +61,69 @@ Genode Labs GmbH - Amtsgericht Dresden - HRB 28424 - Sitz Dresden
 Gesch=C3=A4ftsf=C3=BChrer: Dr.-Ing. Norman Feske, Christian Helmuth
 
 
+qemu-system-x86_64 -s -no-kvm -display sdl -m 512 -cpu phenom -nographic
+-cdrom ...
 
-
-[init -> log_terminal]
+...
+[init -> log_terminal] NOVA Microhypervisor v7-2436fe2 (x86_32): Feb 25
+2017 17:58:48 [gcc 4.9.2]
 [init -> log_terminal] [ 0] CORE:0:0:0 10:2:3:0 [0] AMD Phenom(tm) 9550
 Quad-Core Processor
-qemu-system-x86_64: qemu.git/translate-all.c:165: tb_lock: Assertion
-`!have_tb_lock' failed.
+[init -> log_terminal] [ 0] Killed EC:0xc002c160 SC:0xc002d100 V:0xd
+CS:0x1b EIP:0x14455e CR2:0xe0004004 ERR:0x0 (PT not found) Pd::root
 
 
 
 
-(gdb) info threads
-  Id   Target Id         Frame
-* 1    Thread 0x7ffbc19d3c00 (LWP 8396) "qemu-system-x86"
-0x00007ffbbfd2ac21 in __GI_ppoll (fds=3D0x273a330, nfds=3D6,
-    timeout=3D<optimized out>, sigmask=3D0x0) at
-../sysdeps/unix/sysv/linux/ppoll.c:50
-  2    Thread 0x7ffbbb970700 (LWP 8397) "qemu-system-x86" syscall () at
-../sysdeps/unix/sysv/linux/x86_64/syscall.S:38
-  3    Thread 0x7ffbb8206700 (LWP 8399) "qemu-system-x86" __lll_lock_wait=
- ()
-    at ../sysdeps/unix/sysv/linux/x86_64/lowlevellock.S:135
-(gdb) thread 3
-[Switching to thread 3 (Thread 0x7ffbb8206700 (LWP 8399))]
-#0  __lll_lock_wait () at
-../sysdeps/unix/sysv/linux/x86_64/lowlevellock.S:135
-135	../sysdeps/unix/sysv/linux/x86_64/lowlevellock.S: No such file or
-directory.
-(gdb) bt
-#0  __lll_lock_wait () at
-../sysdeps/unix/sysv/linux/x86_64/lowlevellock.S:135
-#1  0x00007ffbc0002dbd in __GI___pthread_mutex_lock (mutex=3D0xf6ea18
-<tcg_ctx+280>) at ../nptl/pthread_mutex_lock.c:80
-#2  0x000000000089852c in qemu_mutex_lock (mutex=3D0xf6ea18 <tcg_ctx+280>=
-)
-at util/qemu-thread-posix.c:60
-#3  0x0000000000416103 in tb_lock () at qemu.git/translate-all.c:166
-#4  0x000000000046e8d7 in tlb_flush_nocheck (cpu=3D0x164a360) at
-qemu.git/cputlb.c:93
-#5  0x000000000046ea2e in tlb_flush (cpu=3D0x164a360) at qemu.git/cputlb.=
-c:121
-#6  0x0000000000538987 in cpu_x86_update_cr4 (env=3D0x16525f0, new_cr4=3D=
-1784)
-    at qemu.git/target/i386/helper.c:660
-#7  0x000000000055e318 in cpu_vmexit (env=3D0x16525f0, exit_code=3D78,
-exit_info_1=3D4, retaddr=3D0)
-    at qemu.git/target/i386/svm_helper.c:689
-#8  0x000000000055d9b7 in cpu_svm_check_intercept_param (env=3D0x16525f0,
-type=3D78, param=3D4, retaddr=3D0)
-    at qemu.git/target/i386/svm_helper.c:511
-#9  0x0000000000541acf in raise_interrupt2 (env=3D0x16525f0, intno=3D14,
-is_int=3D0, error_code=3D4, next_eip_addend=3D0, retaddr=3D0)
-    at qemu.git/target/i386/excp_helper.c:96
-#10 0x0000000000541c0d in raise_exception_err_ra (env=3D0x16525f0,
-exception_index=3D14, error_code=3D4, retaddr=3D0)
-    at qemu.git/target/i386/excp_helper.c:127
-#11 0x00000000005621a9 in tlb_fill (cs=3D0x164a360, addr=3D1245184,
-access_type=3DMMU_INST_FETCH, mmu_idx=3D1, retaddr=3D0)
-    at qemu.git/target/i386/mem_helper.c:212
-#12 0x0000000000476c15 in helper_ret_ldb_cmmu (env=3D0x16525f0,
-addr=3D1245184, oi=3D1, retaddr=3D0)
-    at qemu.git/softmmu_template.h:127
-#13 0x000000000051c86e in cpu_ldub_code_ra (env=3D0x16525f0, ptr=3D124518=
-4,
-retaddr=3D0)
-    at qemu.git/include/exec/cpu_ldst_template.h:102
-#14 0x000000000051c8e4 in cpu_ldub_code (env=3D0x16525f0, ptr=3D1245184)
-    at qemu.git/include/exec/cpu_ldst_template.h:114
-#15 0x0000000000522182 in insn_get (env=3D0x16525f0, s=3D0x7ffbb82057e0,
-ot=3DMO_8)
-    at qemu.git/target/i386/translate.c:2107
-#16 0x000000000052ff3c in disas_insn (env=3D0x16525f0, s=3D0x7ffbb82057e0=
-,
-pc_start=3D1245183)
-    at qemu.git/target/i386/translate.c:6520
-#17 0x0000000000536458 in gen_intermediate_code (env=3D0x16525f0,
-tb=3D0x7ffbb9ce3a38)
-    at qemu.git/target/i386/translate.c:8449
----Type <return> to continue, or q <return> to quit---
-#18 0x0000000000417616 in tb_gen_code (cpu=3D0x164a360, pc=3D1245179,
-cs_base=3D0, flags=3D7342771, cflags=3D0)
-    at qemu.git/translate-all.c:1281
-#19 0x000000000041993c in tb_find (cpu=3D0x164a360, last_tb=3D0x0,
-tb_exit=3D0) at qemu.git/cpu-exec.c:370
-#20 0x000000000041a25b in cpu_exec (cpu=3D0x164a360) at
-qemu.git/cpu-exec.c:685
-#21 0x000000000044b078 in tcg_cpu_exec (cpu=3D0x164a360) at
-qemu.git/cpus.c:1251
-#22 0x000000000044b2e7 in qemu_tcg_rr_cpu_thread_fn (arg=3D0x164a360) at
-qemu.git/cpus.c:1347
-#23 0x00007ffbc00006ba in start_thread (arg=3D0x7ffbb8206700) at
-pthread_create.c:333
-#24 0x00007ffbbfd3682d in clone () at
-../sysdeps/unix/sysv/linux/x86_64/clone.S:109
+>From 4a66a5f21085625c770e53cef4968607b897e432 Mon Sep 17 00:00:00 2001
+From: Alexander Boettcher <alexander.boettcher@genode-labs.com>
+Date: Sun, 5 Mar 2017 18:55:32 +0100
+Subject: [PATCH] svm: check io permission bitmap in VMCB first
+
+Signed-off-by: Alexander Boettcher <alexander.boettcher@genode-labs.com>
+---
+ target/i386/translate.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index 72c1b03..b59ca3b 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -606,6 +606,16 @@ static void gen_check_io(DisasContext *s, TCGMemOp
+ot, target_ulong cur_eip,
+ {
+     target_ulong next_eip;
+
++    if(s->flags & HF_SVMI_MASK) {
++        gen_update_cc_op(s);
++        gen_jmp_im(cur_eip);
++        svm_flags |=3D (1 << (4 + ot));
++        next_eip =3D s->pc - s->cs_base;
++        tcg_gen_trunc_tl_i32(cpu_tmp2_i32, cpu_T0);
++        gen_helper_svm_check_io(cpu_env, cpu_tmp2_i32,
++                                tcg_const_i32(svm_flags),
++                                tcg_const_i32(next_eip - cur_eip));
++    }
+     if (s->pe && (s->cpl > s->iopl || s->vm86)) {
+         tcg_gen_trunc_tl_i32(cpu_tmp2_i32, cpu_T0);
+         switch (ot) {
+@@ -622,16 +632,6 @@ static void gen_check_io(DisasContext *s, TCGMemOp
+ot, target_ulong cur_eip,
+             tcg_abort();
+         }
+     }
+-    if(s->flags & HF_SVMI_MASK) {
+-        gen_update_cc_op(s);
+-        gen_jmp_im(cur_eip);
+-        svm_flags |=3D (1 << (4 + ot));
+-        next_eip =3D s->pc - s->cs_base;
+-        tcg_gen_trunc_tl_i32(cpu_tmp2_i32, cpu_T0);
+-        gen_helper_svm_check_io(cpu_env, cpu_tmp2_i32,
+-                                tcg_const_i32(svm_flags),
+-                                tcg_const_i32(next_eip - cur_eip));
+-    }
+ }
+
+ static inline void gen_movs(DisasContext *s, TCGMemOp ot)
+--=20
+2.7.4
