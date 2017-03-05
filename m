@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49136)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alexander.boettcher@genode-labs.com>)
-	id 1ckamp-0006Ie-99
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 13:21:40 -0500
+	(envelope-from <k.kozlowski.k@gmail.com>) id 1ckbGq-0004EV-KD
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 13:52:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alexander.boettcher@genode-labs.com>)
-	id 1ckamm-0001BU-1c
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 13:21:39 -0500
-Received: from mail.genode-labs.com ([88.198.56.169]:51700)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alexander.boettcher@genode-labs.com>)
-	id 1ckaml-0001AI-MN
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 13:21:35 -0500
-From: Alexander Boettcher <alexander.boettcher@genode-labs.com>
-Message-ID: <7005a482-2372-0aaf-eb8b-60cd0a16b002@genode-labs.com>
-Date: Sun, 5 Mar 2017 19:21:33 +0100
+	(envelope-from <k.kozlowski.k@gmail.com>) id 1ckbGp-0001vw-Fp
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 13:52:40 -0500
+Date: Sun, 5 Mar 2017 20:52:26 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Message-ID: <20170305185226.mhyz6cqpmcz5wrxv@kozik-lap>
+References: <20170301182618.22395-1-krzk@kernel.org>
+	<CAFEAcA-A1FFRnbuU8ev_oEF3rdtSY-ewQixSKr4+G1Op-eYSJQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] =?utf-8?q?=5BPATCH=C2=B1_SVM_I/O_permission_bitmap_f?=
- =?utf-8?q?or_user-level_=28ring-3=29_code_ignored?=
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-A1FFRnbuU8ev_oEF3rdtSY-ewQixSKr4+G1Op-eYSJQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [RFC 0/5] hw: arm: exynos: Bring up secondary CPU
+ + CPUIDLE issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,102 +24,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, rth@twiddle.net, ehabkost@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Shannon Zhao <shannon.zhao@linaro.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>
 
-Hello,
+On Thu, Mar 02, 2017 at 04:56:22PM +0000, Peter Maydell wrote:
+> On 1 March 2017 at 18:26, Krzysztof Kozlowski <krzk@kernel.org> wrote:
+> > Overview of the problem
+> > =======================
+> > On Exynos4210, by default Linux kernel uses cpuidle driver which tries
+> > to enter low power mode, called AFTR (Arm Off, Top Running).  On real
+> > hardware this brings some power savings.  This AFTR mode requires second
+> > CPU to be off, so the driver (coupled cpuidle driver) when system is idle:
+> > 1. Turns off second CPU,
+> > 2. Enters AFTR on CPU0.
+> >
+> > However the QEMU system is then totally unresponsive (e.g. on serial console)
+> > and RCU stalls appear from time to time.  I spent some time on it and did not
+> > find the real cause behind the lag.  Maybe it is because the second CPU
+> > does not really power down itself and system just burns the cycles under spin
+> > locks?
+> 
+> Possibly so. You might check whether it still has this behaviour with
+> current head of git now that the multi-threaded TCG support has landed.
 
-the SVM I/O permission bitmap for user-level (ring-3) VM code running in
-SVM seems to be ignored and causes a GP-fault. (Actual the IO permission
-was granted by the kernel via the TSS I/O port permission bitmap).
+No changes.
 
-After some debugging the GP code originates from target/i386/translate.c
-gen_check_io() within the if(s->pe && (s->cpl > s->iopl || s->vm86))
-condition. However, the actual SVM IO permission bitmap is checked after
-that condition, which succeeds and would permit the access.
+> > I am quite new to QEMU.  I do not know the internals (yet), nor the design
+> > how hardware should be emulated in such subtle details.
+> >
+> > The questions I have are:
+> > 1. What is the preferred way to solve it? Maybe some a QEMU
+> >    workaround to disable the cpuidle is okay?
+> > 2. Is it worth implementing a proper secondary CPU power down and
+> >    at the end proper AFTR cpuidle? It might be quite difficult...
+> > 3. How such issues with deep sleep modes were solved for other
+> >    ARM targets?
+> 
+> The general answer to 3 is "we don't bother implementing deep sleep
+> and mostly this hasn't caused problems, but more by luck than
+> judgement". Most of our boards aren't SMP; until now SMP TCG guests
+> have been slower than single core so even on a nominally SMP guest
+> board most users probably use (the default) -smp 1.
+> 
+>  The SMP board that gets most use is the "virt" board whose
+> power-down functionality works through our PSCI implementation.
+> The other board we have which has power-down is the imx6 one:
+> hw/misc/imx6_src.c is the system reset controller model which
+> does this. Basically the model of the whatever-it-is that
+> causes the CPU to be powered down does it via the APIs in
+> target/arm/arm-powerctl.h, which lets you turn CPUs off and on.
+> When a CPU is off then we don't try to let it execute instructions,
+> so it shouldn't chew host CPU at the expense of other guest CPUs.
+> 
+> Minor caution with that API: arm_set_cpu_on() is asynchronous,
+> so if you need to tell the guest "CPU now actually booted" then
+> you'll need to use an async_run_on_cpu() callback the way the
+> imx6_src.c code does.
+> 
+> If the "CPU on" behaviour you need is "CPU powers on as if
+> starting up in standard reset" rather than "CPU powers up
+> and appears to start execution at given address", then it's
+> probably best to improve the arm_powerctl APIs rather than
+> fudge it by trying to work out the arguments to pass to
+> arm_set_cpu_on() to make its "and now go to this address"
+> code not do anything. (The APIs are targeted at the current
+> users which both want "do things which are done in the guest
+> firmware or real hardware".)
 
-When I exchange the order, first executing the if(s->flags &
-HF_SVMI_MASK) block and later on executing the if (s->pe && (s->cpl >
-s->iopl || s->vm86)) block my use-case succeeds.
+Thanks for the hints! Especially the existing implementations might be
+quite useful.
 
-Please check and consider the patch for addition. The patch is based on
-17783ac828adc694d986698d2d7014aedfeb48c6 qemu master.
+The cpuidle driver expects the CPU to come up to the same resume
+address. I'll see what others are doing and learn from that. 
 
-Thanks,
-
---=20
-Alexander Boettcher
-Genode Labs
-
-http://www.genode-labs.com - http://www.genode.org
-
-Genode Labs GmbH - Amtsgericht Dresden - HRB 28424 - Sitz Dresden
-Gesch=C3=A4ftsf=C3=BChrer: Dr.-Ing. Norman Feske, Christian Helmuth
+As I mentioned before, on current master thish patchset makes everything
+more laggish and unresponsive (because of cpuidle) so actually I think
+the first commit could be postponed for now. At least till I figure out
+solution for the cpuidle problem.
 
 
-qemu-system-x86_64 -s -no-kvm -display sdl -m 512 -cpu phenom -nographic
--cdrom ...
-
-...
-[init -> log_terminal] NOVA Microhypervisor v7-2436fe2 (x86_32): Feb 25
-2017 17:58:48 [gcc 4.9.2]
-[init -> log_terminal] [ 0] CORE:0:0:0 10:2:3:0 [0] AMD Phenom(tm) 9550
-Quad-Core Processor
-[init -> log_terminal] [ 0] Killed EC:0xc002c160 SC:0xc002d100 V:0xd
-CS:0x1b EIP:0x14455e CR2:0xe0004004 ERR:0x0 (PT not found) Pd::root
-
-
-
-
->From 4a66a5f21085625c770e53cef4968607b897e432 Mon Sep 17 00:00:00 2001
-From: Alexander Boettcher <alexander.boettcher@genode-labs.com>
-Date: Sun, 5 Mar 2017 18:55:32 +0100
-Subject: [PATCH] svm: check io permission bitmap in VMCB first
-
-Signed-off-by: Alexander Boettcher <alexander.boettcher@genode-labs.com>
----
- target/i386/translate.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
-
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 72c1b03..b59ca3b 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -606,6 +606,16 @@ static void gen_check_io(DisasContext *s, TCGMemOp
-ot, target_ulong cur_eip,
- {
-     target_ulong next_eip;
-
-+    if(s->flags & HF_SVMI_MASK) {
-+        gen_update_cc_op(s);
-+        gen_jmp_im(cur_eip);
-+        svm_flags |=3D (1 << (4 + ot));
-+        next_eip =3D s->pc - s->cs_base;
-+        tcg_gen_trunc_tl_i32(cpu_tmp2_i32, cpu_T0);
-+        gen_helper_svm_check_io(cpu_env, cpu_tmp2_i32,
-+                                tcg_const_i32(svm_flags),
-+                                tcg_const_i32(next_eip - cur_eip));
-+    }
-     if (s->pe && (s->cpl > s->iopl || s->vm86)) {
-         tcg_gen_trunc_tl_i32(cpu_tmp2_i32, cpu_T0);
-         switch (ot) {
-@@ -622,16 +632,6 @@ static void gen_check_io(DisasContext *s, TCGMemOp
-ot, target_ulong cur_eip,
-             tcg_abort();
-         }
-     }
--    if(s->flags & HF_SVMI_MASK) {
--        gen_update_cc_op(s);
--        gen_jmp_im(cur_eip);
--        svm_flags |=3D (1 << (4 + ot));
--        next_eip =3D s->pc - s->cs_base;
--        tcg_gen_trunc_tl_i32(cpu_tmp2_i32, cpu_T0);
--        gen_helper_svm_check_io(cpu_env, cpu_tmp2_i32,
--                                tcg_const_i32(svm_flags),
--                                tcg_const_i32(next_eip - cur_eip));
--    }
- }
-
- static inline void gen_movs(DisasContext *s, TCGMemOp ot)
---=20
-2.7.4
+Best regards,
+Krzysztof
