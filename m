@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ckReA-0000Of-2b
+	(envelope-from <armbru@redhat.com>) id 1ckReB-0000Ol-EF
 	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ckRe6-0002x1-MP
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32768)
+	(envelope-from <armbru@redhat.com>) id 1ckRe9-0002zH-80
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55170)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ckRe6-0002vl-Dx
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:02 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ckRe8-0002yV-Mr
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:04 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DBF8CC05678C
+	for <qemu-devel@nongnu.org>; Sun,  5 Mar 2017 08:36:04 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
+	[10.36.116.55])
+	by int-mx09.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v258a3Hh024268
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=NO)
+	for <qemu-devel@nongnu.org>; Sun, 5 Mar 2017 03:36:04 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Sun,  5 Mar 2017 09:35:32 +0100
-Message-Id: <1488702958-24336-2-git-send-email-armbru@redhat.com>
+Date: Sun,  5 Mar 2017 09:35:54 +0100
+Message-Id: <1488702958-24336-24-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488702958-24336-1-git-send-email-armbru@redhat.com>
 References: <1488702958-24336-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v2 01/27] qga: Fix crash on non-dictionary QMP
- argument
+Subject: [Qemu-devel] [PULL v2 23/27] test-qobject-input-visitor: Cover
+ missing nested struct member
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,54 +38,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
-
-The value of key 'arguments' must be a JSON object.  qemu-ga neglects
-to check, and crashes.  To reproduce, send
-
-    { 'execute': 'guest-sync', 'arguments': [] }
-
-to qemu-ga.
-
-do_qmp_dispatch() uses qdict_get_qdict() to get the arguments.  When
-not a JSON object, this gets a null pointer, which flows through the
-generated marshalling function to qobject_input_visitor_new(), where
-it fails the assertion.  qmp_dispatch_check_obj() needs to catch this
-error.
-
-QEMU isn't affected, because it runs qmp_check_input_obj() first,
-which basically duplicates qmp_dispatch_check_obj()'s checks, plus the
-missing one.
-
-Fix by copying the missing one from qmp_check_input_obj() to
-qmp_dispatch_check_obj().
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+Message-Id: <1488544368-30622-25-git-send-email-armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <1488544368-30622-2-git-send-email-armbru@redhat.com>
 ---
- qapi/qmp-dispatch.c | 8 +++++++-
+ tests/test-qobject-input-visitor.c | 8 +++++++-
  1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-index 48bec20..621922f 100644
---- a/qapi/qmp-dispatch.c
-+++ b/qapi/qmp-dispatch.c
-@@ -47,7 +47,13 @@ static QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
-                 return NULL;
-             }
-             has_exec_key = true;
--        } else if (strcmp(arg_name, "arguments")) {
-+        } else if (!strcmp(arg_name, "arguments")) {
-+            if (qobject_type(arg_obj) != QTYPE_QDICT) {
-+                error_setg(errp, QERR_QMP_BAD_INPUT_OBJECT_MEMBER,
-+                           "arguments", "object");
-+                return NULL;
-+            }
-+        } else {
-             error_setg(errp, QERR_QMP_EXTRA_MEMBER, arg_name);
-             return NULL;
-         }
+diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-input-visitor.c
+index 10c15c4..9f3a826 100644
+--- a/tests/test-qobject-input-visitor.c
++++ b/tests/test-qobject-input-visitor.c
+@@ -894,7 +894,7 @@ static void test_visitor_in_fail_struct_missing(TestInputVisitorData *data,
+     char *str;
+     double dbl;
+ 
+-    v = visitor_input_test_init(data, "{}");
++    v = visitor_input_test_init(data, "{ 'sub': [ {} ] }");
+     visit_start_struct(v, NULL, NULL, 0, &error_abort);
+     visit_start_struct(v, "struct", NULL, 0, &err);
+     error_free_or_abort(&err);
+@@ -920,6 +920,12 @@ static void test_visitor_in_fail_struct_missing(TestInputVisitorData *data,
+     error_free_or_abort(&err);
+     visit_type_null(v, "null", &err);
+     error_free_or_abort(&err);
++    visit_start_list(v, "sub", NULL, 0, &error_abort);
++    visit_start_struct(v, NULL, NULL, 0, &error_abort);
++    visit_type_int(v, "i64", &i64, &err);
++    error_free_or_abort(&err);
++    visit_end_struct(v, NULL);
++    visit_end_list(v, NULL);
+     visit_end_struct(v, NULL);
+ }
+ 
 -- 
 2.7.4
