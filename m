@@ -1,15 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sauravsachidanand@gmail.com>) id 1ckMLT-0003R5-DW
-	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 21:56:28 -0500
+	(envelope-from <dmitry@daynix.com>) id 1ckQNy-0008Vn-7A
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 02:15:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sauravsachidanand@gmail.com>) id 1ckMLQ-0005oZ-BO
-	for qemu-devel@nongnu.org; Sat, 04 Mar 2017 21:56:27 -0500
-From: Saurav Sachidanand <sauravsachidanand@gmail.com>
-Date: Sun,  5 Mar 2017 02:56:05 +0000
-Message-Id: <20170305025605.3824-1-sauravsachidanand@gmail.com>
-Subject: [Qemu-devel] [Qemu-trivial] [PATCH v2] util: Use g_malloc/g_free in
- envlist.c
+	(envelope-from <dmitry@daynix.com>) id 1ckQNt-000453-NW
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 02:15:18 -0500
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:35719)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dmitry@daynix.com>) id 1ckQNt-000449-Cn
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 02:15:13 -0500
+Received: by mail-wm0-x236.google.com with SMTP id v186so42243415wmd.0
+	for <qemu-devel@nongnu.org>; Sat, 04 Mar 2017 23:15:11 -0800 (PST)
+From: Dmitry Fleytman <dmitry@daynix.com>
+Message-Id: <8A54246F-59C1-4600-9FF5-D3DA7D1D7CBE@daynix.com>
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+Date: Sun, 5 Mar 2017 09:15:18 +0200
+In-Reply-To: <4fd7a104-e49e-1f3f-c4a9-1572e6db9372@amsat.org>
+References: <1487248176-29602-1-git-send-email-dmitry@daynix.com>
+	<1487248176-29602-5-git-send-email-dmitry@daynix.com>
+	<4fd7a104-e49e-1f3f-c4a9-1572e6db9372@amsat.org>
+Content-Type: text/plain;
+	charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 4/5] NetRxPkt: Account buffer with ETH
+ header in IOV length
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,182 +32,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, laurent@vivier.eu, Saurav Sachidanand <sauravsachidanand@gmail.com>
+To: =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Yan Vugenfirer <yan@daynix.com>, Jason Wang <jasowang@redhat.com>, P J P <ppandit@redhat.com>
 
-Change malloc/free to g_malloc/g_free in util/envlist.c, except for
-entry->env_var which is allocated using strdup(3).
 
-Remove NULL checks for pointers returned from g_malloc as it exits
-in case of failure. Update calls to envlist_create to reflect this.
+> On 3 Mar 2017, at 18:39 PM, Philippe Mathieu-Daud=C3=A9 =
+<f4bug@amsat.org> wrote:
+>=20
+> Hi Dmitry,
+>=20
+> On 02/16/2017 09:29 AM, Dmitry Fleytman wrote:
+>> In case of VLAN stripping ETH header is stored in a
+>> separate chunk and length of IOV should take this into
+>> account.
+>>=20
+>> This patch fixes checksum validation for RX packets
+>> with VLAN header.
+>>=20
+>> Devices affected by this problem: e1000e and vmxnet3.
+>>=20
+>> Signed-off-by: Dmitry Fleytman <dmitry@daynix.com>
+>> ---
+>> hw/net/net_rx_pkt.c | 2 +-
+>> 1 file changed, 1 insertion(+), 1 deletion(-)
+>>=20
+>> diff --git a/hw/net/net_rx_pkt.c b/hw/net/net_rx_pkt.c
+>> index d38babe..c7ae33d 100644
+>> --- a/hw/net/net_rx_pkt.c
+>> +++ b/hw/net/net_rx_pkt.c
+>> @@ -97,7 +97,7 @@ net_rx_pkt_pull_data(struct NetRxPkt *pkt,
+>>         pkt->tot_len =3D iov_size(iov, iovcnt) - ploff + =
+pkt->ehdr_buf_len;
+>>         pkt->vec_len =3D iov_copy(pkt->vec + 1, pkt->vec_len_total - =
+1,
+>>                                 iov, iovcnt, ploff,
+>> -                                pkt->tot_len - pkt->ehdr_buf_len);
+>> +                                pkt->tot_len - pkt->ehdr_buf_len) + =
+1;
+>=20
+> I can not understand the trailing '1', shouldn't it be 'sizeof(struct =
+vlan_header)' instead? (=3D4)
+> This should be easily unit-testable.
 
-Free array returned by envlist_to_environ using g_free.
+Hi Philippe,
 
-Update comments to reflect change in semantics.
+Please pay attention that iov_copy returns number of items in target =
+IOV,
+pkt->vec_len is number of items as well, so +1 is perfectly fine here.
 
-Refactor nearby code to make scripts/checkpatch.pl happy.
+~Dmitry
 
-Signed-off-by: Saurav Sachidanand <sauravsachidanand@gmail.com>
----
- bsd-user/main.c   | 12 +++---------
- linux-user/main.c |  7 ++-----
- util/envlist.c    | 34 +++++++++++++++-------------------
- 3 files changed, 20 insertions(+), 33 deletions(-)
-
-diff --git a/bsd-user/main.c b/bsd-user/main.c
-index 714a692e6f..4d715840ff 100644
---- a/bsd-user/main.c
-+++ b/bsd-user/main.c
-@@ -744,10 +744,7 @@ int main(int argc, char **argv)
-     qemu_init_cpu_list();
-     module_call_init(MODULE_INIT_QOM);
-
--    if ((envlist = envlist_create()) == NULL) {
--        (void) fprintf(stderr, "Unable to allocate envlist\n");
--        exit(1);
--    }
-+    envlist = envlist_create();
-
-     /* add current environment into the list */
-     for (wrk = environ; *wrk != NULL; wrk++) {
-@@ -785,10 +782,7 @@ int main(int argc, char **argv)
-                 usage();
-         } else if (!strcmp(r, "ignore-environment")) {
-             envlist_free(envlist);
--            if ((envlist = envlist_create()) == NULL) {
--                (void) fprintf(stderr, "Unable to allocate envlist\n");
--                exit(1);
--            }
-+            envlist = envlist_create();
-         } else if (!strcmp(r, "U")) {
-             r = argv[optind++];
-             if (envlist_unsetenv(envlist, r) != 0)
-@@ -959,7 +953,7 @@ int main(int argc, char **argv)
-         free(*wrk);
-     }
-
--    free(target_environ);
-+    g_free(target_environ);
-
-     if (qemu_loglevel_mask(CPU_LOG_PAGE)) {
-         qemu_log("guest_base  0x%lx\n", guest_base);
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 10a3bb3a12..3542c899f6 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -4229,10 +4229,7 @@ int main(int argc, char **argv, char **envp)
-     qemu_init_cpu_list();
-     module_call_init(MODULE_INIT_QOM);
-
--    if ((envlist = envlist_create()) == NULL) {
--        (void) fprintf(stderr, "Unable to allocate envlist\n");
--        exit(EXIT_FAILURE);
--    }
-+    envlist = envlist_create();
-
-     /* add current environment into the list */
-     for (wrk = environ; *wrk != NULL; wrk++) {
-@@ -4432,7 +4429,7 @@ int main(int argc, char **argv, char **envp)
-         free(*wrk);
-     }
-
--    free(target_environ);
-+    g_free(target_environ);
-
-     if (qemu_loglevel_mask(CPU_LOG_PAGE)) {
-         qemu_log("guest_base  0x%lx\n", guest_base);
-diff --git a/util/envlist.c b/util/envlist.c
-index e86857e70a..a42eefa5fe 100644
---- a/util/envlist.c
-+++ b/util/envlist.c
-@@ -17,16 +17,14 @@ static int envlist_parse(envlist_t *envlist,
-     const char *env, int (*)(envlist_t *, const char *));
-
- /*
-- * Allocates new envlist and returns pointer to that or
-- * NULL in case of error.
-+ * Allocates new envlist and returns pointer to it.
-  */
- envlist_t *
- envlist_create(void)
- {
- 	envlist_t *envlist;
-
--	if ((envlist = malloc(sizeof (*envlist))) == NULL)
--		return (NULL);
-+  envlist = g_malloc(sizeof(*envlist));
-
- 	QLIST_INIT(&envlist->el_entries);
- 	envlist->el_count = 0;
-@@ -49,9 +47,9 @@ envlist_free(envlist_t *envlist)
- 		QLIST_REMOVE(entry, ev_link);
-
- 		free((char *)entry->ev_var);
--		free(entry);
-+    g_free(entry);
- 	}
--	free(envlist);
-+  g_free(envlist);
- }
-
- /*
-@@ -156,15 +154,15 @@ envlist_setenv(envlist_t *envlist, const char *env)
- 	if (entry != NULL) {
- 		QLIST_REMOVE(entry, ev_link);
- 		free((char *)entry->ev_var);
--		free(entry);
-+    g_free(entry);
- 	} else {
- 		envlist->el_count++;
- 	}
-
--	if ((entry = malloc(sizeof (*entry))) == NULL)
--		return (errno);
--	if ((entry->ev_var = strdup(env)) == NULL) {
--		free(entry);
-+  entry = g_malloc(sizeof(*entry));
-+  entry->ev_var = strdup(env);
-+  if (entry->ev_var == NULL) {
-+    g_free(entry);
- 		return (errno);
- 	}
- 	QLIST_INSERT_HEAD(&envlist->el_entries, entry, ev_link);
-@@ -202,7 +200,7 @@ envlist_unsetenv(envlist_t *envlist, const char *env)
- 	if (entry != NULL) {
- 		QLIST_REMOVE(entry, ev_link);
- 		free((char *)entry->ev_var);
--		free(entry);
-+    g_free(entry);
-
- 		envlist->el_count--;
- 	}
-@@ -212,12 +210,12 @@ envlist_unsetenv(envlist_t *envlist, const char *env)
- /*
-  * Returns given envlist as array of strings (in same form that
-  * global variable environ is).  Caller must free returned memory
-- * by calling free(3) for each element and for the array.  Returned
-- * array and given envlist are not related (no common references).
-+ * by calling free(3) for each element, and g_free for the array.
-+ * Returned array and given envlist are not related (no common
-+ * references).
-  *
-  * If caller provides count pointer, number of items in array is
-- * stored there.  In case of error, NULL is returned and no memory
-- * is allocated.
-+ * stored there.
-  */
- char **
- envlist_to_environ(const envlist_t *envlist, size_t *count)
-@@ -225,9 +223,7 @@ envlist_to_environ(const envlist_t *envlist, size_t *count)
- 	struct envlist_entry *entry;
- 	char **env, **penv;
-
--	penv = env = malloc((envlist->el_count + 1) * sizeof (char *));
--	if (env == NULL)
--		return (NULL);
-+  penv = env = g_malloc((envlist->el_count + 1) * sizeof(char *));
-
- 	for (entry = envlist->el_entries.lh_first; entry != NULL;
- 	    entry = entry->ev_link.le_next) {
---
-2.12.0
+>=20
+>>     } else {
+>>         net_rx_pkt_iovec_realloc(pkt, iovcnt);
