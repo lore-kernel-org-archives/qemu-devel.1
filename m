@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ckReB-0000Ol-EF
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:09 -0500
+	(envelope-from <armbru@redhat.com>) id 1ckReB-0000Op-Hf
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ckRe9-0002zH-80
+	(envelope-from <armbru@redhat.com>) id 1ckRe9-0002z7-64
 	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55170)
+Received: from mx1.redhat.com ([209.132.183.28]:44762)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ckRe8-0002yV-Mr
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ckRe8-0002yT-Ls
 	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:04 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DBF8CC05678C
+	by mx1.redhat.com (Postfix) with ESMTPS id CFFB34E328
 	for <qemu-devel@nongnu.org>; Sun,  5 Mar 2017 08:36:04 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
 	[10.36.116.55])
-	by int-mx09.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v258a3Hh024268
+	by int-mx10.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v258a3M5028585
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
 	verify=NO)
 	for <qemu-devel@nongnu.org>; Sun, 5 Mar 2017 03:36:04 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Sun,  5 Mar 2017 09:35:54 +0100
-Message-Id: <1488702958-24336-24-git-send-email-armbru@redhat.com>
+Date: Sun,  5 Mar 2017 09:35:48 +0100
+Message-Id: <1488702958-24336-18-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488702958-24336-1-git-send-email-armbru@redhat.com>
 References: <1488702958-24336-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v2 23/27] test-qobject-input-visitor: Cover
- missing nested struct member
+Subject: [Qemu-devel] [PULL v2 17/27] test-qobject-input-visitor: Use strict
+ visitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,38 +39,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
+The qobject input visitor comes in a strict and a non-strict variant.
+This test is the non-strict variant's last user.  Turns out it relies
+on non-strict only in test_visitor_in_null(), and just out of
+laziness.  We don't actually test the non-strict behavior.
+
+Clean up test_visitor_in_null(), and switch to the strict variant.
+The next commit will drop the non-strict variant.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1488544368-30622-25-git-send-email-armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <1488544368-30622-19-git-send-email-armbru@redhat.com>
 ---
- tests/test-qobject-input-visitor.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ tests/test-qobject-input-visitor.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-input-visitor.c
-index 10c15c4..9f3a826 100644
+index 945404a..125e34c 100644
 --- a/tests/test-qobject-input-visitor.c
 +++ b/tests/test-qobject-input-visitor.c
-@@ -894,7 +894,7 @@ static void test_visitor_in_fail_struct_missing(TestInputVisitorData *data,
-     char *str;
-     double dbl;
+@@ -49,7 +49,7 @@ static Visitor *visitor_input_test_init_internal(TestInputVisitorData *data,
+     data->obj = qobject_from_jsonv(json_string, ap);
+     g_assert(data->obj);
  
--    v = visitor_input_test_init(data, "{}");
-+    v = visitor_input_test_init(data, "{ 'sub': [ {} ] }");
+-    data->qiv = qobject_input_visitor_new(data->obj, false);
++    data->qiv = qobject_input_visitor_new(data->obj, true);
+     g_assert(data->qiv);
+     return data->qiv;
+ }
+@@ -290,14 +290,14 @@ static void test_visitor_in_null(TestInputVisitorData *data,
+      * when input is not null.
+      */
+ 
+-    v = visitor_input_test_init(data, "{ 'a': null, 'b': '' }");
++    v = visitor_input_test_init(data, "{ 'a': null, 'b': '', 'c': null }");
      visit_start_struct(v, NULL, NULL, 0, &error_abort);
-     visit_start_struct(v, "struct", NULL, 0, &err);
+     visit_type_null(v, "a", &error_abort);
+-    visit_type_str(v, "a", &tmp, &err);
+-    g_assert(!tmp);
+-    error_free_or_abort(&err);
+     visit_type_null(v, "b", &err);
      error_free_or_abort(&err);
-@@ -920,6 +920,12 @@ static void test_visitor_in_fail_struct_missing(TestInputVisitorData *data,
-     error_free_or_abort(&err);
-     visit_type_null(v, "null", &err);
-     error_free_or_abort(&err);
-+    visit_start_list(v, "sub", NULL, 0, &error_abort);
-+    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-+    visit_type_int(v, "i64", &i64, &err);
++    visit_type_str(v, "c", &tmp, &err);
++    g_assert(!tmp);
 +    error_free_or_abort(&err);
-+    visit_end_struct(v, NULL);
-+    visit_end_list(v, NULL);
+     visit_check_struct(v, &error_abort);
      visit_end_struct(v, NULL);
  }
- 
 -- 
 2.7.4
