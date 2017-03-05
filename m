@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ckaqp-0007S1-Dt
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 13:25:49 -0500
+	(envelope-from <bounces@canonical.com>) id 1ckbYV-0007BL-Dr
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 14:10:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ckaqm-000227-28
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 13:25:47 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60246)
+	(envelope-from <bounces@canonical.com>) id 1ckbYS-0007Zh-6u
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 14:10:55 -0500
+Received: from indium.canonical.com ([91.189.90.7]:36220)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ckaql-00021h-OJ
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 13:25:43 -0500
+	id 1ckbYS-0007Ym-0Y
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 14:10:52 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ckaqj-0003VY-Ew
-	for <qemu-devel@nongnu.org>; Sun, 05 Mar 2017 18:25:41 +0000
+	id 1ckbYO-0004c3-Q4
+	for <qemu-devel@nongnu.org>; Sun, 05 Mar 2017 19:10:48 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 605022E80C8
-	for <qemu-devel@nongnu.org>; Sun,  5 Mar 2017 18:25:41 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id AC6312E80BF
+	for <qemu-devel@nongnu.org>; Sun,  5 Mar 2017 19:10:48 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 05 Mar 2017 18:18:03 -0000
+Date: Sun, 05 Mar 2017 19:01:18 -0000
 From: Michal Nowak <michal.nowak@resist.ca>
-Reply-To: Bug 1670170 <1670170@bugs.launchpad.net>
+Reply-To: Bug 1670175 <1670175@bugs.launchpad.net>
 Sender: bounces@canonical.com
-Message-Id: <20170305181803.7371.53021.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170305190118.21996.2136.malonedeb@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1670170] [NEW] `qemu-system-sparc64 -M Niagara`
- Aborted (core dumped)
+Subject: [Qemu-devel] [Bug 1670175] [NEW] qemu-system-sparc64 with
+ tribblix-sparc-0m16.iso ends with "panic - kernel: no nucleus hblk8 to
+ allocate"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,49 +41,72 @@ To: qemu-devel@nongnu.org
 
 Public bug reported:
 
-> qemu-system-sparc64 -M Niagara
-qemu: fatal: Trap 0x0064 while trap level (6) >=3D MAXTL (6), Error state
-pc: 0000000000004c80  npc: 0000000000004c84
-%g0-3: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-%g4-7: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-%o0-3: 0000000000000000 0000000000000000 0000000000000000 0000000000000000 =
+> qemu-system-sparc64 -m 1024 -cdrom Downloads/tribblix-sparc-0m16.iso -boo=
+t d -nographic
+OpenBIOS for Sparc64
+Configuration device id QEMU version 1 machine id 0
+kernel cmdline =
 
-%o4-7: 0000000000000000 0000000000000000 0000000000000000 0000000000000000 =
+CPUs: 1 x SUNW,UltraSPARC-IIi
+UUID: 00000000-0000-0000-0000-000000000000
+Welcome to OpenBIOS v1.1 built on Nov 24 2016 21:23
+  Type 'help' for detailed information
+Trying cdrom:f...
+Not a bootable ELF image
+Not a bootable a.out image
 
-%l0-3: 0000000007f00000 000001ff00000000 000001fff0080000 0000000000000000 =
+Loading FCode image...
+Loaded 7120 bytes
+entry point is 0x4000
+Evaluating FCode...
+Evaluating FCode...
+Ignoring failed claim for va 10a96a0 memsz 19!
+Ignoring failed claim for va 1000000 memsz d1fb6!
+Ignoring failed claim for va 1402000 memsz 32518!
+Ignoring failed claim for va 1800000 memsz 52ac8!
+SunOS Release 5.11 Version tribblix-m16 64-bit
+Copyright (c) 1983, 2010, Oracle and/or its affiliates. All rights reserved.
+could not find debugger-vocabulary-hook>threads:interpret: exception -13 ca=
+ught
+interpret \ ident	"%Z%%M%	%I%	%E% SMI"
+\ Copyright 2005 Sun Microsystems, Inc.  All rights reserved.
+\ Use is subject to license terms.
+\
+\ CDDL HEADER START
+\
+\ The contents of this file are subject to the terms of the
+\ Common Development and Distribution License, Version 1.0 only
+\ (the "License").  You may not use this file except in compliance
+\ with the License.
+\
+\ You can obtain a copy of the license at usr/src/OPENSOLARIS.LICENSE
+\ or http://www.opensolaris.org/os/licensing.
+\ See the License for =
 
-%l4-7: 0000000000000000 0000000000000000 0000000000000000 0000000000000000 =
+WARNING: add_spec: No major number for sf
+panic - kernel: no nucleus hblk8 to allocate
+EXIT
 
-%i0-3: 0000000000000000 0000000000000000 0000000000000000 0000000000000000 =
+QEMU keeps running (CPU is on 100 % all the time), I can interact with
+the prompt:
 
-%i4-7: 0000000000000000 0000000000000000 0000000000000000 0000000000000000 =
+0 > boot
+Not a Linux kernel image
+Not a bootable ELF image
+Not a bootable a.out image
 
-%f00:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-%f08:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-%f16:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-%f24:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-%f32:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-%f40:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-%f48:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-%f56:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-pstate: 00000414 ccr: 44 (icc: -Z-- xcc: -Z--) asi: 00 tl: 6 pil: 0
-cansave: 6 canrestore: 0 otherwin: 0 wstate: 0 cleanwin: 6 cwp: 7
-fsr: 0000000000000000 y: 0000000000000000 fprs: 0000000000000000
-
-Aborted (core dumped)
-
-> qemu-system-sparc64 -M help
-Supported machines are:
-Niagara              Sun4v platform, Niagara
-none                 empty machine
-sun4u                Sun4u platform (default)
-sun4v                Sun4v platform
+Loading FCode image...
+Unhandled Exception 0x0000000000000018
+PC =3D 0x00000000ffd25310 NPC =3D 0x00000000ffd25314
+Stopping execution
 
 > qemu-system-sparc64 -version
 QEMU emulator version 2.8.0(Virtualization:Staging / SLE_12_SP2)
 
 from https://build.opensuse.org/package/show/Virtualization:Staging/qemu
 on openSUSE Leap 42.2.
+
+ISO: http://pkgs.tribblix.org/iso/tribblix-sparc-0m16.iso.
 
 ** Affects: qemu
      Importance: Undecided
@@ -91,67 +115,79 @@ on openSUSE Leap 42.2.
 
 ** Tags: sparc
 
-** Attachment added: "coredumpctl core dump"
-   https://bugs.launchpad.net/bugs/1670170/+attachment/4831907/+files/core.=
-qemu-system-spa.1000.79fef1d6233b4b989c19ea5c5c809627.451.1488737426000000.=
-xz
-
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1670170
+https://bugs.launchpad.net/bugs/1670175
 
 Title:
-  `qemu-system-sparc64 -M Niagara` Aborted (core dumped)
+  qemu-system-sparc64 with tribblix-sparc-0m16.iso ends with "panic -
+  kernel: no nucleus hblk8 to allocate"
 
 Status in QEMU:
   New
 
 Bug description:
-  > qemu-system-sparc64 -M Niagara
-  qemu: fatal: Trap 0x0064 while trap level (6) >=3D MAXTL (6), Error state
-  pc: 0000000000004c80  npc: 0000000000004c84
-  %g0-3: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  %g4-7: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  %o0-3: 0000000000000000 0000000000000000 0000000000000000 000000000000000=
-0 =
+  > qemu-system-sparc64 -m 1024 -cdrom Downloads/tribblix-sparc-0m16.iso -b=
+oot d -nographic
+  OpenBIOS for Sparc64
+  Configuration device id QEMU version 1 machine id 0
+  kernel cmdline =
 
-  %o4-7: 0000000000000000 0000000000000000 0000000000000000 000000000000000=
-0 =
+  CPUs: 1 x SUNW,UltraSPARC-IIi
+  UUID: 00000000-0000-0000-0000-000000000000
+  Welcome to OpenBIOS v1.1 built on Nov 24 2016 21:23
+    Type 'help' for detailed information
+  Trying cdrom:f...
+  Not a bootable ELF image
+  Not a bootable a.out image
 
-  %l0-3: 0000000007f00000 000001ff00000000 000001fff0080000 000000000000000=
-0 =
+  Loading FCode image...
+  Loaded 7120 bytes
+  entry point is 0x4000
+  Evaluating FCode...
+  Evaluating FCode...
+  Ignoring failed claim for va 10a96a0 memsz 19!
+  Ignoring failed claim for va 1000000 memsz d1fb6!
+  Ignoring failed claim for va 1402000 memsz 32518!
+  Ignoring failed claim for va 1800000 memsz 52ac8!
+  SunOS Release 5.11 Version tribblix-m16 64-bit
+  Copyright (c) 1983, 2010, Oracle and/or its affiliates. All rights reserv=
+ed.
+  could not find debugger-vocabulary-hook>threads:interpret: exception -13 =
+caught
+  interpret \ ident	"%Z%%M%	%I%	%E% SMI"
+  \ Copyright 2005 Sun Microsystems, Inc.  All rights reserved.
+  \ Use is subject to license terms.
+  \
+  \ CDDL HEADER START
+  \
+  \ The contents of this file are subject to the terms of the
+  \ Common Development and Distribution License, Version 1.0 only
+  \ (the "License").  You may not use this file except in compliance
+  \ with the License.
+  \
+  \ You can obtain a copy of the license at usr/src/OPENSOLARIS.LICENSE
+  \ or http://www.opensolaris.org/os/licensing.
+  \ See the License for =
 
-  %l4-7: 0000000000000000 0000000000000000 0000000000000000 000000000000000=
-0 =
+  WARNING: add_spec: No major number for sf
+  panic - kernel: no nucleus hblk8 to allocate
+  EXIT
 
-  %i0-3: 0000000000000000 0000000000000000 0000000000000000 000000000000000=
-0 =
+  QEMU keeps running (CPU is on 100 % all the time), I can interact with
+  the prompt:
 
-  %i4-7: 0000000000000000 0000000000000000 0000000000000000 000000000000000=
-0 =
+  0 > boot
+  Not a Linux kernel image
+  Not a bootable ELF image
+  Not a bootable a.out image
 
-  %f00:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  %f08:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  %f16:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  %f24:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  %f32:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  %f40:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  %f48:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  %f56:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-  pstate: 00000414 ccr: 44 (icc: -Z-- xcc: -Z--) asi: 00 tl: 6 pil: 0
-  cansave: 6 canrestore: 0 otherwin: 0 wstate: 0 cleanwin: 6 cwp: 7
-  fsr: 0000000000000000 y: 0000000000000000 fprs: 0000000000000000
-
-  Aborted (core dumped)
-
-  > qemu-system-sparc64 -M help
-  Supported machines are:
-  Niagara              Sun4v platform, Niagara
-  none                 empty machine
-  sun4u                Sun4u platform (default)
-  sun4v                Sun4v platform
+  Loading FCode image...
+  Unhandled Exception 0x0000000000000018
+  PC =3D 0x00000000ffd25310 NPC =3D 0x00000000ffd25314
+  Stopping execution
 
   > qemu-system-sparc64 -version
   QEMU emulator version 2.8.0(Virtualization:Staging / SLE_12_SP2)
@@ -160,5 +196,7 @@ Bug description:
   https://build.opensuse.org/package/show/Virtualization:Staging/qemu on
   openSUSE Leap 42.2.
 
+  ISO: http://pkgs.tribblix.org/iso/tribblix-sparc-0m16.iso.
+
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1670170/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1670175/+subscriptions
