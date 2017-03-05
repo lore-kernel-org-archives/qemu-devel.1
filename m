@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ckhi0-00022C-Um
+	(envelope-from <dgibson@ozlabs.org>) id 1ckhi0-00022D-Uo
 	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 20:45:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ckhhx-0008PZ-Pl
+	(envelope-from <dgibson@ozlabs.org>) id 1ckhhx-0008PY-PB
 	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 20:45:08 -0500
-Received: from ozlabs.org ([103.22.144.67]:46363)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1ckhhx-0008PN-44
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 20:45:05 -0500
-Date: Mon, 6 Mar 2017 10:34:40 +1100
+Date: Mon, 6 Mar 2017 10:23:28 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170305233440.GC12030@umbus.fritz.box>
-References: <1487928416-131310-1-git-send-email-imammedo@redhat.com>
-	<20170303184104.59e9dd63@nial.brq.redhat.com>
+Message-ID: <20170305232328.GB12030@umbus.fritz.box>
+References: <1488548254-456-1-git-send-email-clg@kaod.org>
+	<39ad7cac-b29e-b01e-723c-8cbdb1cf3ca9@redhat.com>
+	<f55bb0be-778c-6ded-1564-9b77c4521f52@kaod.org>
+	<b4b5780b-4604-9577-f42a-8821c4cb18d4@redhat.com>
+	<c8ea232a-3511-f42a-6643-18a66a3d8e9c@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="OBd5C1Lgu00Gd/Tn"
+	protocol="application/pgp-signature"; boundary="2B/JsCI69OhZNC5r"
 Content-Disposition: inline
-In-Reply-To: <20170303184104.59e9dd63@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] spapr: ensure that all threads within core
- are on the same NUMA node
+In-Reply-To: <c8ea232a-3511-f42a-6643-18a66a3d8e9c@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH] ppc/spapr: QOM'ify sPAPRRTCState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,127 +27,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---OBd5C1Lgu00Gd/Tn
-Content-Type: text/plain; charset=us-ascii
+--2B/JsCI69OhZNC5r
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Mar 03, 2017 at 06:41:04PM +0100, Igor Mammedov wrote:
-> On Fri, 24 Feb 2017 10:26:56 +0100
-> Igor Mammedov <imammedo@redhat.com> wrote:
->=20
-> > Threads within a core shouldn't be on different
-> > NUMA nodes, so if user has misconfgured command
-> > line, fail QEMU at start up to force user fix it.
+On Fri, Mar 03, 2017 at 06:23:15PM +0100, C=E9dric Le Goater wrote:
+> On 03/03/2017 05:54 PM, Thomas Huth wrote:
+> > On 03.03.2017 15:49, C=E9dric Le Goater wrote:
+> >> On 03/03/2017 03:13 PM, Thomas Huth wrote:
+> >>> On 03.03.2017 14:37, C=E9dric Le Goater wrote:
+> >>>> Also use an 'Object *' under the sPAPR machine to hold the RTC
+> >>>> object.
+> >>>
+> >>> The change from TYPE_SYS_BUS_DEVICE to TYPE_DEVICE is certainly a good
+> >>> idea! But what's the advantage of using Object* instead of DeviceStat=
+e*
+> >>> in sPAPRMachineState ?
+> >>
+> >> it makes spapr_rtc_create() a little simpler. =20
+> >>
+> >> We could go even further and use a sPAPRRTCState under sPAPRMachineSta=
+te=20
+> >> that we  would initialize with object_initialize().=20
 > >=20
-> > For now use the first thread on the core as source
-> > of core's node-id. Later when cpu-numa refactoring
-> > lands  it will be switched to core's node-id from
-> > possible_cpus[].
-> >=20
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ping,
+> > I think a sPAPRRTCState* would make more sense here - if you just see an
+> > Object* and are not familiar with the code, you wonder what this pointer
+> > is all about (and you then have to cast it to something different if you
+> > want to do anything with it) ... so IMHO either a DeviceState* or
+> > sPAPRRTCState* is the better choice here.
 >=20
-> David could you review/merge maybe adding to commit
-> message:
->=20
-> "
-> patch prevents the same issues as commit 20bb648d
-> fixes, only instead of default mapping it adds
-> check for manually configured NUMA node mapping
-> "
+> I think having a non-pointer is a better for the object lifecycle=20
+> but I don't have a strong opinion on that. We will see what Dave=20
+> prefers.
 
-Ok, merged.  I'll try to send that up today, just in time for the hard free=
-ze.
+You seem to be talking at cross purposes.  AFAICT Thomas is not
+talking about the difference between a pointer and a non-pointer, he's
+talking about the difference between a generic Object (pointer or
+otherwise) and a concrete type.
 
->=20
-> > ---
-> > Enforcement is necessary to ensure that it would be
-> > possible to map legacy CPU index based CLI mapping
-> > to core based one and replace numa_info[XXX].node_cpu
-> > with possible_cpus[] as storage for mapping info.
-> >=20
-> > CC: qemu-ppc@nongnu.org
-> > CC: lvivier@redhat.com
-> > CC: David Gibson <david@gibson.dropbear.id.au>
-> > CC: thuth@redhat.com
-> > CC: mdroth@linux.vnet.ibm.com
-> > CC: agraf@suse.de
-> > ---
-> >  hw/ppc/spapr_cpu_core.c | 23 +++++++++++++++--------
-> >  1 file changed, 15 insertions(+), 8 deletions(-)
-> >=20
-> > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> > index 55cd045..1499a8b 100644
-> > --- a/hw/ppc/spapr_cpu_core.c
-> > +++ b/hw/ppc/spapr_cpu_core.c
-> > @@ -50,8 +50,6 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, =
-PowerPCCPU *cpu,
-> >                             Error **errp)
-> >  {
-> >      CPUPPCState *env =3D &cpu->env;
-> > -    CPUState *cs =3D CPU(cpu);
-> > -    int i;
-> > =20
-> >      /* Set time-base frequency to 512 MHz */
-> >      cpu_ppc_tb_init(env, SPAPR_TIMEBASE_FREQ);
-> > @@ -70,12 +68,6 @@ static void spapr_cpu_init(sPAPRMachineState *spapr,=
- PowerPCCPU *cpu,
-> >          }
-> >      }
-> > =20
-> > -    /* Set NUMA node for the added CPUs  */
-> > -    i =3D numa_get_node_for_cpu(cs->cpu_index);
-> > -    if (i < nb_numa_nodes) {
-> > -            cs->numa_node =3D i;
-> > -    }
-> > -
-> >      xics_cpu_setup(spapr->xics, cpu);
-> > =20
-> >      qemu_register_reset(spapr_cpu_reset, cpu);
-> > @@ -159,11 +151,13 @@ static void spapr_cpu_core_realize(DeviceState *d=
-ev, Error **errp)
-> >      const char *typename =3D object_class_get_name(scc->cpu_class);
-> >      size_t size =3D object_type_get_instance_size(typename);
-> >      Error *local_err =3D NULL;
-> > +    int core_node_id =3D numa_get_node_for_cpu(cc->core_id);;
-> >      void *obj;
-> >      int i, j;
-> > =20
-> >      sc->threads =3D g_malloc0(size * cc->nr_threads);
-> >      for (i =3D 0; i < cc->nr_threads; i++) {
-> > +        int node_id;
-> >          char id[32];
-> >          CPUState *cs;
-> > =20
-> > @@ -172,6 +166,19 @@ static void spapr_cpu_core_realize(DeviceState *de=
-v, Error **errp)
-> >          object_initialize(obj, size, typename);
-> >          cs =3D CPU(obj);
-> >          cs->cpu_index =3D cc->core_id + i;
-> > +
-> > +        /* Set NUMA node for the added CPUs  */
-> > +        node_id =3D numa_get_node_for_cpu(cs->cpu_index);
-> > +        if (node_id !=3D core_node_id) {
-> > +            error_setg(&local_err, "Invalid node-id=3D%d of thread[cpu=
--index: %d]"
-> > +                " on CPU[core-id: %d, node-id: %d], node-id must be th=
-e same",
-> > +                 node_id, cs->cpu_index, cc->core_id, core_node_id);
-> > +            goto err;
-> > +        }
-> > +        if (node_id < nb_numa_nodes) {
-> > +            cs->numa_node =3D node_id;
-> > +        }
-> > +
-> >          snprintf(id, sizeof(id), "thread[%d]", i);
-> >          object_property_add_child(OBJECT(sc), id, obj, &local_err);
-> >          if (local_err) {
->=20
+I agree with Thomas that a specific type is preferable.  I'm not
+particularly bothered by the difference between pointer and
+non-pointer.
+
+In any case, this has missed the cutoff for qemu-2.9, I'm afraid.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -157,25 +82,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---OBd5C1Lgu00Gd/Tn
+--2B/JsCI69OhZNC5r
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYvKCOAAoJEGw4ysog2bOS8+cQALSs+mmYKjHMvGoK9fnBHOq4
-LdVwIgzxn16aU/SmP3GLmQn2pMsGapTDCqFdzcgUursb4Rzg27jqfhQVj4ecB7Ry
-Lhl11tsaAu3D/5ObLGN6vyqS9GvMcGgwPI14smPxxK2R5XsJCJt2mLIHhdVRmi6K
-og6XOXW3uMXxHRPNM1KdGWX2l24LS5mTOg1p5JohdLZSIfTQB0VOn4/bOFeyjTBz
-o1vx97E0lQitKWqOOV9PxOiCdRKhSuWTNiP0U3sHqkAxjzNcVYe3zqI9GrbZ7OJz
-hothUYYgqBsG5vxaVC8jNY6O9kNUx0mLH6TzSfAB5NKtbVYNHk2rZvo7dpPOthqb
-VaHxZ1ULpNsNCgU+kyQsca4AD5Wo9NPFZUW9TzT46Xkf7Xuw5kz6bCy8M+J2uwHi
-ORO4lpjxBsTgFhtn72TQdiZXVKBIrUmjS1QJiAUSNbU8XBOTt0SvKlaUUvjjIdwN
-NsN8+Og5xmgFwwD6YefQI6cxagcYmMRGW1S+FMN5yPTcgxMOSDQ1rs3kz2bRTCVJ
-O1kAGE2A+qVgZtEDXSNP0Xylpal4P7dvEAjGEf0OJg1nW7mmOYoh/gwtvEXHnqbw
-bRys9ol+WctVPpdS/pwEgvgDIL+P9qEEmj+0kyWJqiTi4Y4GryZW8rEnN5Bu0J8+
-2pgTrqq8+kPp4xdQPxPH
-=k6bR
+iQIcBAEBCAAGBQJYvJ3tAAoJEGw4ysog2bOS8v4QANRe/hwLoZtf8XpV1TLGttIh
+mVpgVL8bNOpoyXxtmXwTNzosk8Iq0QhDWsLHlZPiczbOY2vCXunz+SfcvhLf9zCV
+35oo16ynvgs2H/BrHMRTVcFvXjjcPlJTfXwknxExQOaVShED1iqwNcKriT47mVgb
+ssyn2W1FAY3TO84mHYtC4tw2/pCVKWInWo8DQ8VaXs889FwTFlJD/EnAWkErbS0K
++Qeo9gMqei8BkHPBXVK1zirVmFzOqvdk35rrBSyQIUr/NsWW6sg2nH3/2ByAarVg
+OH3g/MiFHAqkEsqZYdIkLTiw16+7PXVphzdEHhbS4eTVJc0AlkVjdDDsbvAMbnpv
+RDo7c1ZU49JcSlfEZL97iAmqrp4+0D+PPcolGwWwEzJhsYQAnZs1tOjO8xJAwMrh
+pY0XL1w2wmfESHqqook8pNLQu3elPXJgmqjoRkDODlxCtA1TndirZmEEujrz/Ffu
+JY7+ztsh13oepYq+j9qehcn7Wzq+BQjvoVNbvIo0kuZx4WN3KKO2KERS3ahe3ZY1
+rQEuANZtu3gMMufirolW/fHnUirKNwrznrAVg38dDjdFUw0HDHf9Z8DJVgPlfKD6
+0Q/xEvD7Vj5Puqpx+mklEQ2myw5aaRUKfwIVn5Z2KC275LAlsNsD1bnfOaVdJ6S3
+M9pCMojLonbNIf9Az9iv
+=kSqX
 -----END PGP SIGNATURE-----
 
---OBd5C1Lgu00Gd/Tn--
+--2B/JsCI69OhZNC5r--
