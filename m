@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45670)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ckReB-0000Oo-Fz
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:10 -0500
+	(envelope-from <armbru@redhat.com>) id 1ckReA-0000Oi-2q
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ckRe9-0002zS-A0
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55172)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ckRe9-0002yq-2p
+	(envelope-from <armbru@redhat.com>) id 1ckRe7-0002xW-79
 	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:05 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+Received: from mx1.redhat.com ([209.132.183.28]:55658)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ckRe7-0002wV-1o
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 03:36:03 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 40862C05678D
-	for <qemu-devel@nongnu.org>; Sun,  5 Mar 2017 08:36:05 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 34A4D3DD47
+	for <qemu-devel@nongnu.org>; Sun,  5 Mar 2017 08:36:03 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
 	[10.36.116.55])
-	by int-mx11.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v258a3vH022907
+	by int-mx14.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v258a123022757
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
 	verify=NO)
-	for <qemu-devel@nongnu.org>; Sun, 5 Mar 2017 03:36:04 -0500
+	for <qemu-devel@nongnu.org>; Sun, 5 Mar 2017 03:36:02 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Sun,  5 Mar 2017 09:35:57 +0100
-Message-Id: <1488702958-24336-27-git-send-email-armbru@redhat.com>
+Date: Sun,  5 Mar 2017 09:35:41 +0100
+Message-Id: <1488702958-24336-11-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488702958-24336-1-git-send-email-armbru@redhat.com>
 References: <1488702958-24336-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v2 26/27] qapi: Fix object input visit beyond
- end of list
+Subject: [Qemu-devel] [PULL v2 10/27] qapi: Improve a QObject input visitor
+ error message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,51 +39,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
+The QObject input visitor has three error message formats:
+
+* Parameter '%s' is missing
+* "Invalid parameter type for '%s', expected: %s"
+* "QMP input object member '%s' is unexpected"
+
+The '%s' are member names (or "null", but I'll fix that later).
+
+The last error message calls the thing "QMP input object member"
+instead of "parameter".  Misleading when the visitor is used on
+QObjects that don't come from QMP.  Change it to "Parameter '%s' is
+unexpected".
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <1488544368-30622-28-git-send-email-armbru@redhat.com>
+Message-Id: <1488544368-30622-12-git-send-email-armbru@redhat.com>
 ---
- qapi/qobject-input-visitor.c       | 11 ++++++++---
- tests/test-qobject-input-visitor.c |  2 --
- 2 files changed, 8 insertions(+), 5 deletions(-)
+ qapi/qobject-input-visitor.c | 3 +--
+ tests/test-qga.c             | 2 +-
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
-index 34065ba..d192727 100644
+index ed6c24c..f3b6713 100644
 --- a/qapi/qobject-input-visitor.c
 +++ b/qapi/qobject-input-visitor.c
-@@ -122,10 +122,15 @@ static QObject *qobject_input_try_get_object(QObjectInputVisitor *qiv,
-     } else {
-         assert(qobject_type(qobj) == QTYPE_QLIST);
-         assert(!name);
--        ret = qlist_entry_obj(tos->entry);
--        assert(ret);
-+        if (tos->entry) {
-+            ret = qlist_entry_obj(tos->entry);
-+            if (consume) {
-+                tos->entry = qlist_next(tos->entry);
-+            }
-+        } else {
-+            ret = NULL;
-+        }
-         if (consume) {
--            tos->entry = qlist_next(tos->entry);
-             tos->index++;
+@@ -140,8 +140,7 @@ static void qobject_input_check_struct(Visitor *v, Error **errp)
+ 
+             g_hash_table_iter_init(&iter, top_ht);
+             if (g_hash_table_iter_next(&iter, (void **)&key, NULL)) {
+-                error_setg(errp, "QMP input object member '%s' is unexpected",
+-                           key);
++                error_setg(errp, "Parameter '%s' is unexpected", key);
+             }
          }
      }
-diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-input-visitor.c
-index 8011baa..94305f5 100644
---- a/tests/test-qobject-input-visitor.c
-+++ b/tests/test-qobject-input-visitor.c
-@@ -953,10 +953,8 @@ static void test_visitor_in_fail_list(TestInputVisitorData *data,
-     v = visitor_input_test_init(data, "[]");
+diff --git a/tests/test-qga.c b/tests/test-qga.c
+index 868b02a..ae97b57 100644
+--- a/tests/test-qga.c
++++ b/tests/test-qga.c
+@@ -213,7 +213,7 @@ static void test_qga_invalid_args(gconstpointer fix)
+     desc = qdict_get_try_str(error, "desc");
  
-     visit_start_list(v, NULL, NULL, 0, &error_abort);
--#if 0 /* FIXME crash */
-     visit_type_int(v, NULL, &i64, &err);
-     error_free_or_abort(&err);
--#endif
-     visit_end_list(v, NULL);
+     g_assert_cmpstr(class, ==, "GenericError");
+-    g_assert_cmpstr(desc, ==, "QMP input object member 'foo' is unexpected");
++    g_assert_cmpstr(desc, ==, "Parameter 'foo' is unexpected");
+ 
+     QDECREF(ret);
  }
- 
 -- 
 2.7.4
