@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1ckuu3-0006u8-MQ
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:50:28 -0500
+	(envelope-from <eblake@redhat.com>) id 1ckuxO-0007cg-1g
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:53:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1ckuu0-00088H-K5
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:50:27 -0500
-Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:35904)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1ckuu0-000882-EK
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:50:24 -0500
-Received: by mail-it0-x244.google.com with SMTP id w185so9981588ita.3
-	for <qemu-devel@nongnu.org>; Mon, 06 Mar 2017 07:50:24 -0800 (PST)
-Mime-Version: 1.0 (Apple Message framework v1084)
-Content-Type: text/plain; charset=us-ascii
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <mailman.56791.1488797131.22740.qemu-devel@nongnu.org>
-Date: Mon, 6 Mar 2017 10:50:22 -0500
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <5102CE52-05CC-4B15-8D79-860B8557C055@gmail.com>
-References: <mailman.56791.1488797131.22740.qemu-devel@nongnu.org>
-Subject: [Qemu-devel] [Bug 1289788] Re: MIDI access (not only adlib) hangs
- WinNT on QEMU 1.7.x
+	(envelope-from <eblake@redhat.com>) id 1ckuxL-0000kQ-0b
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:53:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39308)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ckuxK-0000kI-NJ
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:53:50 -0500
+References: <20170306071721.26708-1-ppandit@redhat.com>
+	<20170306071721.26708-3-ppandit@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <988a673c-01cd-0c1e-133c-22e299653502@redhat.com>
+Date: Mon, 6 Mar 2017 09:53:46 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170306071721.26708-3-ppandit@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="vCg0S3CrbOtkLq457x5GRt7c7pCoB3cvE"
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] linux-user: allocate heap memory
+ for execve arguments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,48 +29,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <1289788@bugs.launchpad.net>
-Cc: qemu-devel@nongnu.org
+To: P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Jann Horn <jannh@google.com>, Peter Maydell <peter.maydell@linaro.org>, Prasad J Pandit <pjp@fedoraproject.org>
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--vCg0S3CrbOtkLq457x5GRt7c7pCoB3cvE
+From: Eric Blake <eblake@redhat.com>
+To: P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Jann Horn <jannh@google.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Prasad J Pandit <pjp@fedoraproject.org>
+Message-ID: <988a673c-01cd-0c1e-133c-22e299653502@redhat.com>
+Subject: Re: [PATCH v2 2/2] linux-user: allocate heap memory for execve
+ arguments
+References: <20170306071721.26708-1-ppandit@redhat.com>
+ <20170306071721.26708-3-ppandit@redhat.com>
+In-Reply-To: <20170306071721.26708-3-ppandit@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 03/06/2017 01:17 AM, P J P wrote:
+> From: Prasad J Pandit <pjp@fedoraproject.org>
+>=20
+> Arguments passed to execve(2) call from user program could
+> be large, allocating stack memory for them via alloca(3) call
+> would lead to bad behaviour. Use 'g_malloc0' to allocate memory
+> for such arguments.
+>=20
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> ---
+>  linux-user/syscall.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+
+Is this patch alone (without 1/2) sufficient to solve the problem?  If
+so, then drop 1/2.
+
+>=20
+> Update per: replace alloca() with g_malloc0()
+>   -> https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg00750.htm=
+l
+>=20
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 86a4a9c..404fb0b 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -7800,8 +7800,8 @@ abi_long do_syscall(void *cpu_env, int num, abi_l=
+ong arg1,
+
+What version of qemu are you patching?  Line 7800 of current master is
+nowhere near 'case TARGET_NR_execve:' (line 7899)
+
+>                  ret =3D -TARGET_E2BIG;
+>                  break;
+>              }
+
+and current master has 'goto efault' rather than directly setting ret at
+this point.
+
+> -            argp =3D alloca((argc + 1) * sizeof(void *));
+> -            envp =3D alloca((envc + 1) * sizeof(void *));
+> +            argp =3D g_malloc0((argc + 1) * sizeof(void *));
+> +            envp =3D g_malloc0((envc + 1) * sizeof(void *));
+
+Subject to a potential multiplication overflow.  I'd prefer:
+
+g_new0(void *, argc + 1);
+
+as that is guaranteed to not overflow.
+
+> =20
+>              for (gp =3D guest_argp, q =3D argp; gp;
+>                    gp +=3D sizeof(abi_ulong), q++) {
+> @@ -7862,6 +7862,9 @@ abi_long do_syscall(void *cpu_env, int num, abi_l=
+ong arg1,
+>                      break;
+>                  unlock_user(*q, addr, 0);
+>              }
+> +
+> +            g_free(argp);
+> +            g_free(envp);
+>          }
+>          break;
+>      case TARGET_NR_chdir:
+>=20
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
 
-On Mar 6, 2017, at 5:45 AM, qemu-devel-request@nongnu.org wrote:
+--vCg0S3CrbOtkLq457x5GRt7c7pCoB3cvE
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
->=20
-> Is this problem still reproducible with the latest version of QEMU?
->=20
-> ** Changed in: qemu
->       Status: New =3D> Incomplete
->=20
-> --=20
-> You received this bug notification because you are a member of qemu-
-> devel-ml, which is subscribed to QEMU.
-> https://bugs.launchpad.net/bugs/1289788
->=20
-> Title:
->  MIDI access (not only adlib) hangs WinNT on QEMU 1.7.x
->=20
-> Status in QEMU:
->  Incomplete
->=20
-> Bug description:
->  Windows NT 4.0 and 2000 (including the latest git release), when =
-enabling adlib (with sb16 already enabled) or the built-in synth of the =
-es1370, hang on QEMU 1.7.x (also with 1.7.50) when they try to play MIDI =
-files (like canyon.mid, etc). I have already tried bisecting but seems =
-that this bug has been introduced sometime in 1.7.0's development time.
->  Screenshot attached: http://goput.it/ig2l.png
->=20
->  OS Used: Windows 7 x64 Ultimate SP1
->  command-line used: qemu-system-i386w.exe -L pc-bios -m 64 -cpu =
-pentium -drive file=3Dvbent40.img,if=3Dfloppy,id=3Dfda -drive =
-file=3Dvhd.vhd,if=3Dide,media=3Ddisk,bus=3D0,unit=3D0,id=3Dharddisk0 =
--drive file=3DE:,if=3Dide,media=3Dcdrom,bus=3D1,unit=3D0,id=3Dcdrom -net =
-nic,model=3Dpcnet -net user -vga std -device ES1370 -boot menu=3Don =
--monitor telnet:127.0.0.1:4444,server,nowait
->=20
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1289788/+subscriptions
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-A midi file played very will using SB16. It didn't work at all with =
-adlib, and it played poorly in es1370. I used Windows 2000 as the guest. =
-There were no hangs.=20
+iQEcBAEBCAAGBQJYvYYKAAoJEKeha0olJ0NqvIAH/3z+CiwnUOreG/shqdGd47Kz
+fQcUIPiFFwHcBy8DnxWtFn0/jR0VvLc6DFGm2ehSapl4vAulgA4S1pNTPOLm3hSV
+6GhLmXVOLFu8j4TVHprrfeLMH2t+gY+nBAe+IXVNdzS/AwUPP0BusE5x6tm4v8MZ
+bbVpJGtovKHYjXNIOPMCtiKi3/O1Nj71gCNexhCLhlDoTo1Qx2i+bXqJmGQIMdmw
+zYIjCqyUPr6+Hw22mPLqHI4rdb3WXcyLLVqeYiv8Fo4vNLJK+QrJS2H70OeL1zlC
+PqlWw64jPKS8ZPJX70IGZ/f8LNqQH7T72VI0ixXIxeoJgJVXq6i7VMwAtCP5ZpY=
+=xktu
+-----END PGP SIGNATURE-----
+
+--vCg0S3CrbOtkLq457x5GRt7c7pCoB3cvE--
