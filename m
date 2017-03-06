@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54031)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ckznx-00030w-1o
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 16:04:29 -0500
+	(envelope-from <eblake@redhat.com>) id 1ckzrB-00049M-Pi
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 16:07:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ckznt-0006sf-Oh
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 16:04:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60648)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ckznt-0006sG-Gv
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 16:04:25 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 852173B71E
-	for <qemu-devel@nongnu.org>; Mon,  6 Mar 2017 21:04:25 +0000 (UTC)
-References: <20170221115644.28264-1-stefanha@redhat.com>
-	<20170221115644.28264-8-stefanha@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <c27b009c-bdd9-706c-74b3-bc13453c97a5@redhat.com>
-Date: Mon, 6 Mar 2017 22:04:21 +0100
+	(envelope-from <eblake@redhat.com>) id 1ckzrA-0008HJ-9i
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 16:07:49 -0500
+References: <1488817322-11397-1-git-send-email-kwolf@redhat.com>
+	<1488817322-11397-9-git-send-email-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <83d6bdd5-0f46-76c4-5459-e8a6b8dcefb8@redhat.com>
+Date: Mon, 6 Mar 2017 15:07:40 -0600
 MIME-Version: 1.0
-In-Reply-To: <20170221115644.28264-8-stefanha@redhat.com>
+In-Reply-To: <1488817322-11397-9-git-send-email-kwolf@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="FAcBxTakboCV6u6ahskBp3Bv5Ovfcqv98"
-Subject: Re: [Qemu-devel] [PULL v2 07/24] nbd: convert to use
- qio_channel_yield
+	boundary="rfuLLmHMB3JeBIosn6Ao5VhnNllGcNAoP"
+Subject: Re: [Qemu-devel] [PATCH 08/10] block: Ignore multiple children in
+ bdrv_check_update_perm()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,78 +25,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---FAcBxTakboCV6u6ahskBp3Bv5Ovfcqv98
-From: Max Reitz <mreitz@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <c27b009c-bdd9-706c-74b3-bc13453c97a5@redhat.com>
-Subject: Re: [Qemu-devel] [PULL v2 07/24] nbd: convert to use
- qio_channel_yield
-References: <20170221115644.28264-1-stefanha@redhat.com>
- <20170221115644.28264-8-stefanha@redhat.com>
-In-Reply-To: <20170221115644.28264-8-stefanha@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
+--rfuLLmHMB3JeBIosn6Ao5VhnNllGcNAoP
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com
+Message-ID: <83d6bdd5-0f46-76c4-5459-e8a6b8dcefb8@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 08/10] block: Ignore multiple children in
+ bdrv_check_update_perm()
+References: <1488817322-11397-1-git-send-email-kwolf@redhat.com>
+ <1488817322-11397-9-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1488817322-11397-9-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 21.02.2017 12:56, Stefan Hajnoczi wrote:
-> From: Paolo Bonzini <pbonzini@redhat.com>
+On 03/06/2017 10:22 AM, Kevin Wolf wrote:
+> change_parent_backing_link() will need to update multiple BdrvChild
+> objects at once. Checking permissions reference by reference doesn't
+> work because permissions need to be consistent only with all parents
+> moved to the new child.
 >=20
-> In the client, read the reply headers from a coroutine, switching the
-> read side between the "read header" coroutine and the I/O coroutine tha=
-t
-> reads the body of the reply.
->=20
-> In the server, if the server can read more requests it will create a ne=
-w
-> "read request" coroutine as soon as a request has been read.  Otherwise=
-,
-> the new coroutine is created in nbd_request_put.
->=20
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Reviewed-by: Fam Zheng <famz@redhat.com>
-> Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-> Message-id: 20170213135235.12274-8-pbonzini@redhat.com
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  block/nbd-client.h |   2 +-
->  block/nbd-client.c | 117 ++++++++++++++++++++++++---------------------=
---------
->  nbd/client.c       |   2 +-
->  nbd/common.c       |   9 +----
->  nbd/server.c       |  94 +++++++++++++-----------------------------
->  5 files changed, 83 insertions(+), 141 deletions(-)
-
-git-bisect tells me this broke qemu-iotest 083 (which hangs now).
-
-Maybe someone who is more involved with this patch can look into that...?=
+>  block.c                   | 35 ++++++++++++++++++++++-------------
+>  include/block/block_int.h |  2 +-
+>  2 files changed, 23 insertions(+), 14 deletions(-)
+>=20
 
 
-(Although I don't know how urgent it is, probably not too much.)
+>  static int bdrv_check_update_perm(BlockDriverState *bs, uint64_t new_u=
+sed_perm,
+>                                    uint64_t new_shared_perm,
+> -                                  BdrvChild *ignore_child, Error **err=
+p)
+> +                                  GSList *ignore_children, Error **err=
+p)
+>  {
+>      BdrvChild *c;
+>      uint64_t cumulative_perms =3D new_used_perm;
+> @@ -1572,7 +1574,7 @@ static int bdrv_check_update_perm(BlockDriverStat=
+e *bs, uint64_t new_used_perm,
+>      assert(new_shared_perm & BLK_PERM_WRITE_UNCHANGED);
+> =20
+>      QLIST_FOREACH(c, &bs->parents, next_parent) {
+> -        if (c =3D=3D ignore_child) {
+> +        if (g_slist_find(ignore_children, c)) {
 
-Max
+Quadratic complexity (searching one list for each element of another
+list). Hopefully the combination of lists isn't too long in practice (it
+might be a potential problem if someone creates 200 snapshots then tries
+to commit them down to 1 image in a single operation, where
+ignore_children would then be a long list of intermediate children being
+iterated on multiple times, but I don't know if bs->parents can easily
+be made as long).  We could always create some sort of hash table to
+reduce complexity, as a followup patch, if it turns out to be a problem
+in practice, but for now I'm okay with it.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
 
---FAcBxTakboCV6u6ahskBp3Bv5Ovfcqv98
+--rfuLLmHMB3JeBIosn6Ao5VhnNllGcNAoP
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAli9ztUSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ALaYIAIRhvCy5zL0pQp8iPYDT3e77mQXUchC3
-rjskH6aPTjoyUfXWr2B8q7emmIaSlt8aMd76owJJDdEEq7l6zgbBDTW5L17NEYYR
-mDiyiTOKmYv+TSG6vYieKIG17sVYe92I2oCBNHQTfILrdYQS7DPkAqQAyxtI7K0B
-E+APTsk6L8zuiyYVoFMqYYKCzNYggytbV8lUoZcUWeM6gnLyJYW4d4jsAntQewNR
-Yfv4MUn9Qxr5HSWB46uMa88eO7LSTXElKWFfmJ/ZWNZLlOYpJonn9NpT6AItXzCq
-7tpnEyuEP2IZz04IOtk6eesLhC/O+UKGeciKx1NM8nJRiI0GCQUpKZg=
-=xf8I
+iQEcBAEBCAAGBQJYvc+cAAoJEKeha0olJ0NqS8oH/ioa0l+NRGrDpBYFyAB8Jbm6
+p/A/f02SJbc+rChvU62MCnengLIL/FA67naYORgiulRA24kMJT+cmW+bV+ql+30A
+18vhJo0f0ReOobEt8iasfrXRTZh7YMaUmW7JmTbbJMv725CAgZSv31BgsFl0vYt7
+u8GnJHQZKElGFJ2Z4JNFonVm4XuiALIRzUl7a0liIiYMnI9BzNuonVtX+5j8eo34
+K5rys6robi0wUZp/vtkFysaV2W9jXv9sVfm6VYnDED8YFiExW3KbQXulz8Rs/2Kg
+eVJOGz52d3BgtyppJAkGjcdiXuQtgKoncCeBWuSIWPlfKO/xKbOB9THvNl48fjs=
+=oAkL
 -----END PGP SIGNATURE-----
 
---FAcBxTakboCV6u6ahskBp3Bv5Ovfcqv98--
+--rfuLLmHMB3JeBIosn6Ao5VhnNllGcNAoP--
