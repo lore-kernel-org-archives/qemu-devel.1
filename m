@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38170)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cktMp-0002pP-Ib
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:12:06 -0500
+	(envelope-from <armbru@redhat.com>) id 1cktMt-0002r8-II
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:12:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cktMl-0002kp-C0
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:12:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44144)
+	(envelope-from <armbru@redhat.com>) id 1cktMo-0002om-Np
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:12:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46008)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cktMl-0002kC-2R
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:11:59 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cktMo-0002nc-Fg
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:12:02 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3C33F6034
-	for <qemu-devel@nongnu.org>; Mon,  6 Mar 2017 14:11:59 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B3346624CE
+	for <qemu-devel@nongnu.org>; Mon,  6 Mar 2017 14:12:02 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
 	[10.36.116.55])
-	by int-mx11.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v26EBvNU008017
+	by int-mx10.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v26EC1jw011972
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
 	verify=NO)
-	for <qemu-devel@nongnu.org>; Mon, 6 Mar 2017 09:11:58 -0500
+	for <qemu-devel@nongnu.org>; Mon, 6 Mar 2017 09:12:02 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  6 Mar 2017 15:11:31 +0100
-Message-Id: <1488809515-4047-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v2 00/24] block: Command line option -blockdev
+Date: Mon,  6 Mar 2017 15:11:52 +0100
+Message-Id: <1488809515-4047-22-git-send-email-armbru@redhat.com>
+In-Reply-To: <1488809515-4047-1-git-send-email-armbru@redhat.com>
+References: <1488809515-4047-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PULL v2 21/24] block: Initial implementation of
+ -blockdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,86 +39,125 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Actually, the command line option is the least part of this series.
-Its bulk is about building infrastructure and getting errors out of
-the JSON parser.
+The new command line option -blockdev works like QMP command
+blockdev-add.
 
-The design of the command line interface was discussed here:
-Subject: Non-flat command line option argument syntax
-Message-ID: <87bmukmlau.fsf@dusky.pond.sub.org>
-https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg00555.html
+The option argument may be given in JSON syntax, exactly as in QMP.
+Example usage:
 
-The following changes since commit aa3a982e674b09ae32502940f93ba98b3a8ad50e:
+    -blockdev '{"node-name": "foo", "driver": "raw", "file": {"driver": "file", "filename": "foo.img"} }'
 
-  qapi: Improve qobject visitor documentation (2017-03-05 09:14:20 +0100)
+The JSON argument doesn't exactly blend into the existing option
+syntax, so the traditional KEY=VALUE,... syntax is also supported,
+using dotted keys to do the nesting:
 
-are available in the git repository at:
+    -blockdev node-name=foo,driver=raw,file.driver=file,file.filename=foo.img
 
-  git://repo.or.cz/qemu/armbru.git tags/pull-block-2017-02-28-v2
+This does not yet support lists or downstream extensions, i.e. keys
+with __RFQDN_ prefix, but the next few patches will take care of that.
 
-for you to fetch changes up to 3a79d43588cff95636d5ccdfa77b372cfd6d8530:
+Note that calling qmp_blockdev_add() (say via qmp_marshal_block_add())
+right away would crash.  We need to stash the configuration for later
+instead.  This is crudely done, and bypasses QemuOpts, even though
+storing configuration is what QemuOpts is for.  Need to revamp option
+infrastructure to support QAPI types like BlockdevOptions.
 
-  keyval: Support lists (2017-03-05 10:29:58 +0100)
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <1488317230-26248-22-git-send-email-armbru@redhat.com>
+---
+ qemu-options.hx |  7 +++++++
+ vl.c            | 39 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 46 insertions(+)
 
-----------------------------------------------------------------
-block: Command line option -blockdev
-
-----------------------------------------------------------------
-Daniel P. Berrange (1):
-      qapi: qobject input visitor variant for use with keyval_parse()
-
-Markus Armbruster (23):
-      test-qemu-opts: Cover qemu_opts_parse() of "no"
-      tests: Fix gcov-files-test-qemu-opts-y, gcov-files-test-logging-y
-      keyval: New keyval_parse()
-      test-keyval: Cover use with qobject input visitor
-      qapi: Factor out common part of qobject input visitor creation
-      qapi: Factor out common qobject_input_get_keyval()
-      qobject: Propagate parse errors through qobject_from_jsonv()
-      libqtest: Fix qmp() & friends to abort on JSON parse errors
-      qjson: Abort earlier on qobject_from_jsonf() misuse
-      test-qobject-input-visitor: Abort earlier on bad test input
-      qobject: Propagate parse errors through qobject_from_json()
-      block: More detailed syntax error reporting for JSON filenames
-      check-qjson: Test errors from qobject_from_json()
-      test-visitor-serialization: Pass &error_abort to qobject_from_json()
-      monitor: Assert qmp_schema_json[] is sane
-      test-qapi-util: New, covering qapi/qapi-util.c
-      qapi: New parse_qapi_name()
-      keyval: Restrict key components to valid QAPI names
-      qapi: New qobject_input_visitor_new_str() for convenience
-      block: Initial implementation of -blockdev
-      qapi: Improve how keyval input visitor reports unexpected dicts
-      docs/qapi-code-gen.txt: Clarify naming rules
-      keyval: Support lists
-
- block.c                              |   9 +-
- docs/qapi-code-gen.txt               |  61 ++--
- include/qapi/qmp/qjson.h             |   5 +-
- include/qapi/qobject-input-visitor.h |  21 ++
- include/qapi/util.h                  |   2 +
- include/qemu/option.h                |   3 +
- monitor.c                            |   2 +-
- qapi/qapi-util.c                     |  47 +++
- qapi/qobject-input-visitor.c         | 214 +++++++++++-
- qemu-options.hx                      |   7 +
- qobject/qjson.c                      |  14 +-
- tests/.gitignore                     |   2 +
- tests/Makefile.include               |  10 +-
- tests/check-qjson.c                  |  88 +++--
- tests/libqtest.c                     |   3 +-
- tests/test-keyval.c                  | 624 +++++++++++++++++++++++++++++++++++
- tests/test-qapi-util.c               |  85 +++++
- tests/test-qemu-opts.c               |   5 +
- tests/test-qobject-input-visitor.c   | 190 ++++++++++-
- tests/test-visitor-serialization.c   |   2 +-
- util/Makefile.objs                   |   1 +
- util/keyval.c                        | 394 ++++++++++++++++++++++
- vl.c                                 |  39 +++
- 23 files changed, 1746 insertions(+), 82 deletions(-)
- create mode 100644 tests/test-keyval.c
- create mode 100644 tests/test-qapi-util.c
- create mode 100644 util/keyval.c
-
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 2292438..8dd8ee3 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -550,6 +550,13 @@ Use @var{file} as CD-ROM image (you cannot use @option{-hdc} and
+ using @file{/dev/cdrom} as filename (@pxref{host_drives}).
+ ETEXI
+ 
++DEF("blockdev", HAS_ARG, QEMU_OPTION_blockdev,
++    "-blockdev [driver=]driver[,node-name=N][,discard=ignore|unmap]\n"
++    "          [,cache.direct=on|off][,cache.no-flush=on|off]\n"
++    "          [,read-only=on|off][,detect-zeroes=on|off|unmap]\n"
++    "          [,driver specific parameters...]\n"
++    "                configure a block backend\n", QEMU_ARCH_ALL)
++
+ DEF("drive", HAS_ARG, QEMU_OPTION_drive,
+     "-drive [file=file][,if=type][,bus=n][,unit=m][,media=d][,index=i]\n"
+     "       [,cyls=c,heads=h,secs=s[,trans=t]][,snapshot=on|off]\n"
+diff --git a/vl.c b/vl.c
+index 71b75ef..7f1644a 100644
+--- a/vl.c
++++ b/vl.c
+@@ -95,6 +95,9 @@ int main(int argc, char **argv)
+ #include "migration/colo.h"
+ #include "sysemu/kvm.h"
+ #include "sysemu/hax.h"
++#include "qapi/qobject-input-visitor.h"
++#include "qapi/qobject-input-visitor.h"
++#include "qapi-visit.h"
+ #include "qapi/qmp/qjson.h"
+ #include "qemu/option.h"
+ #include "qemu/config-file.h"
+@@ -2976,6 +2979,13 @@ int main(int argc, char **argv, char **envp)
+     Error *main_loop_err = NULL;
+     Error *err = NULL;
+     bool list_data_dirs = false;
++    typedef struct BlockdevOptions_queue {
++        BlockdevOptions *bdo;
++        Location loc;
++        QSIMPLEQ_ENTRY(BlockdevOptions_queue) entry;
++    } BlockdevOptions_queue;
++    QSIMPLEQ_HEAD(, BlockdevOptions_queue) bdo_queue
++        = QSIMPLEQ_HEAD_INITIALIZER(bdo_queue);
+ 
+     module_call_init(MODULE_INIT_TRACE);
+ 
+@@ -3118,6 +3128,25 @@ int main(int argc, char **argv, char **envp)
+                 drive_add(IF_DEFAULT, popt->index - QEMU_OPTION_hda, optarg,
+                           HD_OPTS);
+                 break;
++            case QEMU_OPTION_blockdev:
++                {
++                    Visitor *v;
++                    BlockdevOptions_queue *bdo;
++
++                    v = qobject_input_visitor_new_str(optarg, "driver", &err);
++                    if (!v) {
++                        error_report_err(err);
++                        exit(1);
++                    }
++
++                    bdo = g_new(BlockdevOptions_queue, 1);
++                    visit_type_BlockdevOptions(v, NULL, &bdo->bdo,
++                                               &error_fatal);
++                    visit_free(v);
++                    loc_save(&bdo->loc);
++                    QSIMPLEQ_INSERT_TAIL(&bdo_queue, bdo, entry);
++                    break;
++                }
+             case QEMU_OPTION_drive:
+                 if (drive_def(optarg) == NULL) {
+                     exit(1);
+@@ -4451,6 +4480,16 @@ int main(int argc, char **argv, char **envp)
+     }
+ 
+     /* open the virtual block devices */
++    while (!QSIMPLEQ_EMPTY(&bdo_queue)) {
++        BlockdevOptions_queue *bdo = QSIMPLEQ_FIRST(&bdo_queue);
++
++        QSIMPLEQ_REMOVE_HEAD(&bdo_queue, entry);
++        loc_push_restore(&bdo->loc);
++        qmp_blockdev_add(bdo->bdo, &error_fatal);
++        loc_pop(&bdo->loc);
++        qapi_free_BlockdevOptions(bdo->bdo);
++        g_free(bdo);
++    }
+     if (snapshot || replay_mode != REPLAY_MODE_NONE) {
+         qemu_opts_foreach(qemu_find_opts("drive"), drive_enable_snapshot,
+                           NULL, NULL);
 -- 
 2.7.4
