@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1cksbX-0003Jf-CW
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 08:23:12 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cksmc-00061z-3V
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 08:34:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1cksbU-0006WW-Js
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 08:23:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41396)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1cksbU-0006W0-Dn
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 08:23:08 -0500
-References: <1488519630-89058-1-git-send-email-wei.w.wang@intel.com>
-	<1488519630-89058-6-git-send-email-wei.w.wang@intel.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <d66a8e86-0ead-90fd-b943-f69449e78349@redhat.com>
-Date: Mon, 6 Mar 2017 14:23:02 +0100
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cksmY-0001Eb-4z
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 08:34:38 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170305214857.9510-1-krzk@kernel.org>
+	<20170305214857.9510-3-krzk@kernel.org>
+	<2130c1b2-0f81-13f6-a1f8-c0a2e294e3f0@amsat.org>
+	<CAFEAcA8DOfstrMiEBLsgf6U6S9uT9ahA1ALrJdmQhcV+7K8Obw@mail.gmail.com>
+	<4989d5b6-586a-de18-e8e6-6ab9e9ac131c@redhat.com>
+	<CAFEAcA-6yQ=95hGdia6TDhq4C-swOJ1iZA8C+u99Dy9kfG+f0w@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <5e79860e-3823-1db8-8ba7-5c8bb44046d8@amsat.org>
+Date: Mon, 6 Mar 2017 10:34:29 -0300
 MIME-Version: 1.0
-In-Reply-To: <1488519630-89058-6-git-send-email-wei.w.wang@intel.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 kernel 5/5] This patch contains two
- parts:
+In-Reply-To: <CAFEAcA-6yQ=95hGdia6TDhq4C-swOJ1iZA8C+u99Dy9kfG+f0w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 3/3] hw/misc/exynos4210_pmu:
+ Reorder local variables for readability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +32,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>, virtio-dev@lists.oasis-open.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, linux-mm@kvack.org
-Cc: Liang Li <liang.z.li@intel.com>, Andrew Morton <akpm@linux-foundation.org>, Mel Gorman <mgorman@techsingularity.net>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Amit Shah <amit.shah@redhat.com>, Dave Hansen <dave.hansen@intel.com>, Andrea Arcangeli <aarcange@redhat.com>, Liang Li <liliang324@gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Am 03.03.2017 um 06:40 schrieb Wei Wang:
-> From: Liang Li <liang.z.li@intel.com>
+On 03/06/2017 10:16 AM, Peter Maydell wrote:
+> On 6 March 2017 at 13:03, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>> On 06/03/2017 10:46, Peter Maydell wrote:
+>>> On 6 March 2017 at 04:06, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>>> your change seems OK but while you are here, 'unsigned' is considered
+>>>> harmful since more than a decade.
+>>>
+>>> Considered harmful by who, and why?
 
-I'd prefer to split this into two parts then and to create proper subjects.
+sorry to cry wolf :)
 
-If I remember correctly, the general concept was accepted by most reviewers.
+>> It is true that unsigned has all the disadvantages of "int" (it may be
+>> smaller than the size of the object" and all the disadvantages of
+>> "size_t" (it doesn't optimize as well because the compiler cannot
+>> exploit undefined behavior).
+>>
+>> I wouldn't call it harmful, but it feels like the worst of both worlds.
+>
+> size_t is a pretty silly choice for a variable that's looping
+> through the number of registers in the device, which is a value
+> that would fit in 16 bits, let alone 32. I would probably have
+> written this with 'int', but use of 'unsigned' doesn't come
+> very high up on my list of things to complain about.
 
-> 
-> One is to add a new API to mm go get the unused page information.
-> The virtio balloon driver will use this new API added to get the
-> unused page info and send it to hypervisor(QEMU) to speed up live
-> migration. During sending the bitmap, some the pages may be modified
-> and are used by the guest, this inaccuracy can be corrected by the
-> dirty page logging mechanism.
-> 
-> One is to add support the request for vm's unused page information,
-> QEMU can make use of unused page information and the dirty page
-> logging mechanism to skip the transportation of some of these unused
-> pages, this is very helpful to reduce the network traffic and speed
-> up the live migration process.
+silly would be "typeof(PMU_NUM_OF_REGISTERS) i;" :p
 
--- 
-Thanks,
+I got your point about the complain priority list.
 
-David
+> (since we use -fwrapv the compiler can't exploit undefined
+> behaviour for signed loop indexes either.)
+
+regards,
+
+Phil.
