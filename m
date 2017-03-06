@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ckx6U-00037u-Ao
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 13:11:27 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ckx6l-0003Fv-9d
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 13:11:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ckx6R-0003uV-5c
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 13:11:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46174)
+	(envelope-from <pbonzini@redhat.com>) id 1ckx6j-00041K-1l
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 13:11:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44950)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ckx6Q-0003uI-SY
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 13:11:23 -0500
-References: <20170306071721.26708-1-ppandit@redhat.com>
-	<20170306071721.26708-3-ppandit@redhat.com>
-	<988a673c-01cd-0c1e-133c-22e299653502@redhat.com>
-	<alpine.LFD.2.20.1703062325370.6862@wniryva>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8ba0840f-43cf-601d-f0ea-3094b935c4b0@redhat.com>
-Date: Mon, 6 Mar 2017 12:11:20 -0600
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ckx6i-000419-SM
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 13:11:40 -0500
+References: <20170306140541.10600-1-hangaohuai@huawei.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a3354e81-8671-6951-42a3-ff5c1dc5b55a@redhat.com>
+Date: Mon, 6 Mar 2017 19:11:38 +0100
 MIME-Version: 1.0
-In-Reply-To: <alpine.LFD.2.20.1703062325370.6862@wniryva>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="hf81qaccu4e5LuihwxPhbAR64jHNM6Jki"
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] linux-user: allocate heap memory
- for execve arguments
+In-Reply-To: <20170306140541.10600-1-hangaohuai@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Fix the vm state after vm migration when
+ vm panic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,85 +27,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, Jann Horn <jannh@google.com>, Peter Maydell <peter.maydell@linaro.org>
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---hf81qaccu4e5LuihwxPhbAR64jHNM6Jki
-From: Eric Blake <eblake@redhat.com>
-To: P J P <ppandit@redhat.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Riku Voipio
- <riku.voipio@iki.fi>, Jann Horn <jannh@google.com>,
- Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <8ba0840f-43cf-601d-f0ea-3094b935c4b0@redhat.com>
-Subject: Re: [PATCH v2 2/2] linux-user: allocate heap memory for execve
- arguments
-References: <20170306071721.26708-1-ppandit@redhat.com>
- <20170306071721.26708-3-ppandit@redhat.com>
- <988a673c-01cd-0c1e-133c-22e299653502@redhat.com>
- <alpine.LFD.2.20.1703062325370.6862@wniryva>
-In-Reply-To: <alpine.LFD.2.20.1703062325370.6862@wniryva>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 03/06/2017 12:06 PM, P J P wrote:
-> +-- On Mon, 6 Mar 2017, Eric Blake wrote --+
-> | On 03/06/2017 01:17 AM, P J P wrote:
-> | > Arguments passed to execve(2) call from user program could
-> | > be large, allocating stack memory for them via alloca(3) call
-> | > would lead to bad behaviour. Use 'g_malloc0' to allocate memory
-> | > for such arguments.
-> | >=20
-> | > Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-> | > ---
-> | >  linux-user/syscall.c | 7 +++++--
-> | >  1 file changed, 5 insertions(+), 2 deletions(-)
-> |=20
-> | Is this patch alone (without 1/2) sufficient to solve the problem?  I=
-f
-> | so, then drop 1/2.
->=20
->   Yes, it seems to fix the issue. Still I think having ARG_MAX limit wo=
-uld be=20
-> good, as system exec(3) routines too impose _SC_ARG_MAX limit. I'll sen=
-d a=20
-> revised patch with 'g_try_new' call instead of g_malloc0.
-
-If you impose any limit smaller than _SC_ARG_MAX, you are needlessly
-limiting things.  Furthermore, _SC_ARG_MAX may not always be the same
-value, depending on how the kernel was compiled.  So it's probably
-asiest to just let execve() impose its own limits (and correctly report
-errors to the caller when execve() fails), rather than trying to impose
-limits yourself.
-
-In short, the bug that you are fixing is not caused by the guest
-requesting something beyond execve() limits, but caused by poor use of
-alloca() leading to a stack overrun.  You only need to fix the bug (by
-switching alloca() to heap allocation), not introduce additional ones
-(by imposing arbitrary, and probably wrong, limits).
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+To: hangaohuai <hangaohuai@huawei.com>, qemu-devel@nongnu.org
+Cc: arei.gonglei@huawei.com
 
 
---hf81qaccu4e5LuihwxPhbAR64jHNM6Jki
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+On 06/03/2017 15:05, hangaohuai wrote:
+> Bug steps:
+> 1. windows VM with pvpanic device:<panic model='isa'/>in xml
+> 2. inject the panic in windows, the vm state is paused (guest-panicked)
+> 3. migrate the vm to other host, vm state is running
+> 
+> Check the vmstate before runstate_set(RUN_STATE_RUNNING)
 
-iQEcBAEBCAAGBQJYvaZIAAoJEKeha0olJ0Nq0V4IAK0B6a6//L/QKoh+nialbpfQ
-ha4RYc9o28Pm0QGDEmhBTUgMlaNoyxgTn2UYedF/DjH5KGfYg0dkz0Ufv0C5SEGF
-FcMXzd2uuq3xHkNbVeDIW6LeLhMXejAIKLCb9yXIaf29IUm4kIwTBcd+LdcZf6ao
-E9b9ARsVTe/p9TBOUyskdXVK3rURvjY7MPP9sRPUKrPW6lN0w5kjL8gjoCBHRsFM
-j+rArF2Xj3iDbWPETSb1w+ycODFYGIWz9ropptSIxxRQqJgV2gvmNuoEkBI4efmC
-3e8Shd5Cfuqq3NBdjyXA4Bdp/mTTwDeBgLqnxO8Y/Y4ZKNGE6eSQnA/Urf5xrHQ=
-=hUmN
------END PGP SIGNATURE-----
+What's the backtrace for runstate_set(RUN_STATE_RUNNING)?
 
---hf81qaccu4e5LuihwxPhbAR64jHNM6Jki--
+This should be triggered:
+
+    if (!global_state_received() ||
+        global_state_get_runstate() == RUN_STATE_RUNNING) {
+        if (autostart) {
+            vm_start();
+        } else {
+            runstate_set(RUN_STATE_PAUSED);
+        }
+    } else {
+        runstate_set(global_state_get_runstate());   /* <<<< */
+    }
+
+I also suggest a testcase to tests/pvpanic-test.c.
+
+Paolo
+
+> Signed-off-by: hangaohuai <hangaohuai@huawei.com>
+> ---
+>  cpus.c                  | 3 +++
+>  include/sysemu/sysemu.h | 1 +
+>  vl.c                    | 5 +++++
+>  3 files changed, 9 insertions(+)
+> 
+> diff --git a/cpus.c b/cpus.c
+> index c857ad2..37b93aa 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -1734,6 +1734,9 @@ int vm_prepare_start(void)
+>      if (runstate_is_running()) {
+>          qapi_event_send_stop(&error_abort);
+>          res = -1;
+> +    } else if (runstate_is_paniced()) {
+> +        qemu_system_guest_panicked(NULL);
+> +        res = -1;
+>      } else {
+>          replay_enable_events();
+>          cpu_enable_ticks();
