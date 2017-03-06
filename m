@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ckvR5-0004Gu-Dd
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 11:24:36 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ckvYd-0001av-5H
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 11:32:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ckvR2-0001l5-9k
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 11:24:35 -0500
-Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:35417)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ckvR2-0001kk-1n
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 11:24:32 -0500
-Received: by mail-wr0-x22f.google.com with SMTP id g10so120369103wrg.2
-	for <qemu-devel@nongnu.org>; Mon, 06 Mar 2017 08:24:31 -0800 (PST)
-References: <49fcb3c4-df9d-ec64-2927-71c02fc2524b@genode-labs.com>
-	<87k282im0q.fsf@linaro.org>
-	<6515bcf7-e3cd-21b4-746b-c386b1296d88@genode-labs.com>
-	<87innmii02.fsf@linaro.org>
-	<d208c3f0-2e57-0b54-f18f-b5e27d698e28@genode-labs.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <d208c3f0-2e57-0b54-f18f-b5e27d698e28@genode-labs.com>
-Date: Mon, 06 Mar 2017 16:24:37 +0000
-Message-ID: <87h936ida2.fsf@linaro.org>
+	(envelope-from <kwolf@redhat.com>) id 1ckvYc-0004i2-5z
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 11:32:23 -0500
+Date: Mon, 6 Mar 2017 17:32:12 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170306163212.GE5750@noname.redhat.com>
+References: <20170303133816.30303-1-famz@redhat.com>
+	<20170303133816.30303-2-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] Qemu deadlocks in tb_lock when using SVM+SoftMMU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170303133816.30303-2-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] block: Don't use error_abort in
+ blk_new_open
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,29 +24,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Boettcher <alexander.boettcher@genode-labs.com>
-Cc: qemu-devel@nongnu.org, rth@twiddle.net, fred.konrad@greensocs.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
+Am 03.03.2017 um 14:38 hat Fam Zheng geschrieben:
+> We have an errp and bdrv_root_attach_child can fail permission check,
+> error_abort is not the best choice here.
+> 
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  block/block-backend.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/block-backend.c b/block/block-backend.c
+> index daa7908..4eab68f 100644
+> --- a/block/block-backend.c
+> +++ b/block/block-backend.c
+> @@ -213,7 +213,11 @@ BlockBackend *blk_new_open(const char *filename, const char *reference,
+>      }
+>  
+>      blk->root = bdrv_root_attach_child(bs, "root", &child_root,
+> -                                       perm, BLK_PERM_ALL, blk, &error_abort);
+> +                                       perm, BLK_PERM_ALL, blk, errp);
+> +    if (!blk->root) {
+> +        blk_unref(blk);
+> +        return NULL;
+> +    }
 
-Alexander Boettcher <alexander.boettcher@genode-labs.com> writes:
+Shouldn't we bdrv_unref(bs), too?
 
-> Hi,
-<snip>
->
-> Sometimes Qemu just succeeds if the timing is well, will see.
->
-> But this is not the point of this issue atm.
-
-I've sent a patch that works as Richard suggested. However your test
-image seems to run into other issues. I have tested it on my known good
-x86 image and it works.
-
-However my knowledge of x86's interrupt architecture is fairly minimal
-so I'm looking for testing/feedback on the patch.
-
->
-> Alex.
-
-
---
-Alex Bennée
+Kevin
