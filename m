@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ckjwl-00058R-Ni
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 23:08:32 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ckjwn-00058v-NI
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 23:08:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ckjwk-0003tJ-Rs
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 23:08:31 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ckjwk-0003tD-Lq
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 23:08:33 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon,  6 Mar 2017 15:08:21 +1100
-Message-Id: <20170306040823.28482-4-david@gibson.dropbear.id.au>
+Date: Mon,  6 Mar 2017 15:08:19 +1100
+Message-Id: <20170306040823.28482-2-david@gibson.dropbear.id.au>
 In-Reply-To: <20170306040823.28482-1-david@gibson.dropbear.id.au>
 References: <20170306040823.28482-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 3/5] target/ppc: fmadd check for excp
- independently
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 1/5] ppc/xics: register reset handlers for the
+ ICP and ICS objects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,56 +24,185 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-Current order of checking does not confirm with the spec
-(ISA 3.0: MultiplyAddDP page-469). Change the order and make them
-independent of each other.
+The recent changes on the XICS layer removed the XICSState object to
+let the sPAPR machine handle the ICP and ICS directly. The reset of
+these objects was previously handled by XICSState, which was a SysBus
+device, and to keep the same behavior, the ICP and ICS were assigned
+to SysbBus.
 
-For example: a = infinity, b = zero, c = SNaN, this should set both
-VXIMZ and VXNAN
+But that broke the 'info qtree' command in the monitor. 'qtree'
+performs a loop on the children of a bus to print their properties and
+SysBus devices are expected to be found under SysBus, which is not the
+case anymore.
 
-Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+The fix for this problem is to register reset handlers for the ICP and
+ICS objects and stop using SysBus for such devices.
+
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Tested-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/fpu_helper.c | 20 ++++++++++++--------
- 1 file changed, 12 insertions(+), 8 deletions(-)
+ hw/intc/xics.c     | 10 ++++++----
+ hw/intc/xics_kvm.c | 15 ++++++++++-----
+ hw/ppc/spapr.c     |  2 --
+ 3 files changed, 16 insertions(+), 11 deletions(-)
 
-diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index 0535ad0..a547f58 100644
---- a/target/ppc/fpu_helper.c
-+++ b/target/ppc/fpu_helper.c
-@@ -747,17 +747,21 @@ static void float64_maddsub_update_excp(CPUPPCState *env, float64 arg1,
-                                         float64 arg2, float64 arg3,
-                                         unsigned int madd_flags)
+diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+index ffc0747..e740989 100644
+--- a/hw/intc/xics.c
++++ b/hw/intc/xics.c
+@@ -333,7 +333,7 @@ static const VMStateDescription vmstate_icp_server =3D=
  {
-+    if (unlikely(float64_is_signaling_nan(arg1, &env->fp_status) ||
-+                 float64_is_signaling_nan(arg2, &env->fp_status) ||
-+                 float64_is_signaling_nan(arg3, &env->fp_status))) {
-+        /* sNaN operation */
-+        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
-+    }
+     },
+ };
+=20
+-static void icp_reset(DeviceState *dev)
++static void icp_reset(void *dev)
+ {
+     ICPState *icp =3D ICP(dev);
+=20
+@@ -359,6 +359,8 @@ static void icp_realize(DeviceState *dev, Error **err=
+p)
+     }
+=20
+     icp->xics =3D XICS_FABRIC(obj);
 +
-     if (unlikely((float64_is_infinity(arg1) && float64_is_zero(arg2)) ||
-                  (float64_is_zero(arg1) && float64_is_infinity(arg2)))) {
-         /* Multiplication of zero by infinity */
--        arg1 = float_invalid_op_excp(env, POWERPC_EXCP_FP_VXIMZ, 1);
--    } else if (unlikely(float64_is_signaling_nan(arg1, &env->fp_status) ||
--                        float64_is_signaling_nan(arg2, &env->fp_status) ||
--                        float64_is_signaling_nan(arg3, &env->fp_status))) {
--        /* sNaN operation */
--        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
--    } else if ((float64_is_infinity(arg1) || float64_is_infinity(arg2)) &&
--               float64_is_infinity(arg3)) {
-+        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXIMZ, 1);
-+    }
++    qemu_register_reset(icp_reset, dev);
+ }
+=20
+=20
+@@ -366,7 +368,6 @@ static void icp_class_init(ObjectClass *klass, void *=
+data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+=20
+-    dc->reset =3D icp_reset;
+     dc->vmsd =3D &vmstate_icp_server;
+     dc->realize =3D icp_realize;
+ }
+@@ -522,7 +523,7 @@ static void ics_simple_eoi(ICSState *ics, uint32_t nr=
+)
+     }
+ }
+=20
+-static void ics_simple_reset(DeviceState *dev)
++static void ics_simple_reset(void *dev)
+ {
+     ICSState *ics =3D ICS_SIMPLE(dev);
+     int i;
+@@ -611,6 +612,8 @@ static void ics_simple_realize(DeviceState *dev, Erro=
+r **errp)
+     }
+     ics->irqs =3D g_malloc0(ics->nr_irqs * sizeof(ICSIRQState));
+     ics->qirqs =3D qemu_allocate_irqs(ics_simple_set_irq, ics, ics->nr_i=
+rqs);
 +
-+    if ((float64_is_infinity(arg1) || float64_is_infinity(arg2)) &&
-+        float64_is_infinity(arg3)) {
-         uint8_t aSign, bSign, cSign;
- 
-         aSign = float64_is_neg(arg1);
--- 
++    qemu_register_reset(ics_simple_reset, dev);
+ }
+=20
+ static Property ics_simple_properties[] =3D {
+@@ -626,7 +629,6 @@ static void ics_simple_class_init(ObjectClass *klass,=
+ void *data)
+     isc->realize =3D ics_simple_realize;
+     dc->props =3D ics_simple_properties;
+     dc->vmsd =3D &vmstate_ics_simple;
+-    dc->reset =3D ics_simple_reset;
+     isc->reject =3D ics_simple_reject;
+     isc->resend =3D ics_simple_resend;
+     isc->eoi =3D ics_simple_eoi;
+diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+index 0a3daca..42e0e0e 100644
+--- a/hw/intc/xics_kvm.c
++++ b/hw/intc/xics_kvm.c
+@@ -102,7 +102,7 @@ static int icp_set_kvm_state(ICPState *icp, int versi=
+on_id)
+     return 0;
+ }
+=20
+-static void icp_kvm_reset(DeviceState *dev)
++static void icp_kvm_reset(void *dev)
+ {
+     ICPState *icp =3D ICP(dev);
+=20
+@@ -146,12 +146,17 @@ static void icp_kvm_cpu_setup(ICPState *icp, PowerP=
+CCPU *cpu)
+     icp->cap_irq_xics_enabled =3D true;
+ }
+=20
++static void icp_kvm_realize(DeviceState *dev, Error **errp)
++{
++    qemu_register_reset(icp_kvm_reset, dev);
++}
++
+ static void icp_kvm_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+     ICPStateClass *icpc =3D ICP_CLASS(klass);
+=20
+-    dc->reset =3D icp_kvm_reset;
++    dc->realize =3D icp_kvm_realize;
+     icpc->pre_save =3D icp_get_kvm_state;
+     icpc->post_load =3D icp_set_kvm_state;
+     icpc->cpu_setup =3D icp_kvm_cpu_setup;
+@@ -293,7 +298,7 @@ static void ics_kvm_set_irq(void *opaque, int srcno, =
+int val)
+     }
+ }
+=20
+-static void ics_kvm_reset(DeviceState *dev)
++static void ics_kvm_reset(void *dev)
+ {
+     ICSState *ics =3D ICS_SIMPLE(dev);
+     int i;
+@@ -324,15 +329,15 @@ static void ics_kvm_realize(DeviceState *dev, Error=
+ **errp)
+     }
+     ics->irqs =3D g_malloc0(ics->nr_irqs * sizeof(ICSIRQState));
+     ics->qirqs =3D qemu_allocate_irqs(ics_kvm_set_irq, ics, ics->nr_irqs=
+);
++
++    qemu_register_reset(ics_kvm_reset, dev);
+ }
+=20
+ static void ics_kvm_class_init(ObjectClass *klass, void *data)
+ {
+-    DeviceClass *dc =3D DEVICE_CLASS(klass);
+     ICSStateClass *icsc =3D ICS_BASE_CLASS(klass);
+=20
+     icsc->realize =3D ics_kvm_realize;
+-    dc->reset =3D ics_kvm_reset;
+     icsc->pre_save =3D ics_get_kvm_state;
+     icsc->post_load =3D ics_set_kvm_state;
+ }
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 14192ac..c3bb991 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -106,7 +106,6 @@ static int try_create_xics(sPAPRMachineState *spapr, =
+const char *type_ics,
+     int i;
+=20
+     ics =3D ICS_SIMPLE(object_new(type_ics));
+-    qdev_set_parent_bus(DEVICE(ics), sysbus_get_default());
+     object_property_add_child(OBJECT(spapr), "ics", OBJECT(ics), NULL);
+     object_property_set_int(OBJECT(ics), nr_irqs, "nr-irqs", &err);
+     object_property_add_const_link(OBJECT(ics), "xics", OBJECT(xi), NULL=
+);
+@@ -123,7 +122,6 @@ static int try_create_xics(sPAPRMachineState *spapr, =
+const char *type_ics,
+         ICPState *icp =3D &spapr->icps[i];
+=20
+         object_initialize(icp, sizeof(*icp), type_icp);
+-        qdev_set_parent_bus(DEVICE(icp), sysbus_get_default());
+         object_property_add_child(OBJECT(spapr), "icp[*]", OBJECT(icp), =
+NULL);
+         object_property_add_const_link(OBJECT(icp), "xics", OBJECT(xi), =
+NULL);
+         object_property_set_bool(OBJECT(icp), true, "realized", &err);
+--=20
 2.9.3
