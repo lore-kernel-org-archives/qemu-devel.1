@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cknbb-0001LK-E9
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 03:02:56 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1ckneZ-0002ho-7C
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 03:06:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cknbY-0005J6-BH
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 03:02:55 -0500
-Received: from [59.151.112.132] (port=31528 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cknbW-0005HK-3k
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 03:02:52 -0500
-References: <1488011202-32121-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Message-ID: <58BD1982.30509@cn.fujitsu.com>
-Date: Mon, 6 Mar 2017 16:10:42 +0800
-MIME-Version: 1.0
-In-Reply-To: <1488011202-32121-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v10 0/8] the reset of msix_init series
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1ckneV-0006Sp-Hg
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 03:05:59 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42337
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1ckneV-0006RV-AM
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 03:05:55 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2683rxd049472
+	for <qemu-devel@nongnu.org>; Mon, 6 Mar 2017 03:05:54 -0500
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 290bymbhqg-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 06 Mar 2017 03:05:54 -0500
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Mon, 6 Mar 2017 01:05:53 -0700
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+Date: Mon,  6 Mar 2017 02:03:39 -0600
+Message-Id: <1488787422-30487-1-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PULL for-2.9 0/3] qemu-ga patch queue for 2.9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,69 +36,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Hannes Reinecke <hare@suse.de>, Dmitry Fleytman <dmitry@daynix.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-Michael,
-Is this series ok for 2.9?
+The following changes since commit 17783ac828adc694d986698d2d7014aedfeb48c6:
 
--- 
-Sincerely,
-Cao jin
+  Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-2.9-20170303' into staging (2017-03-04 16:31:14 +0000)
 
-On 02/25/2017 04:26 PM, Cao jin wrote:
-> v10 changelog:
-> 1. drop the unliked patch, introduce a new patch 1 according to mst's comments.
-> 2. base on the new patch, remove the following statements
-> 
->         /* Any error other than -ENOTSUP(board's MSI support is broken)
->          * is a programming error */
->         assert(!ret || ret == -ENOTSUP);
-> 
->    for the affected device: megasas, hcd-xhci. This is trivial changes,
->    so I left the R-bs where it was.
-> 
-> Test:
-> 1. Detailed test via command line as v9
-> 2. make check hangs at: GTESTER check-qtest-x86_64. After ctrl-C, it says:
-> 
->     make: *** [check-qtest-x86_64] Interrupt
->     qemu-system-x86_64: Failed to read msg header. Read -1 instead of 12. Original request 11.
->     qemu-system-x86_64: vhost VQ 0 ring restore failed: -1: Input/output error (5)
->     qemu-system-x86_64: Failed to set msg fds.
->     qemu-system-x86_64: vhost VQ 0 ring restore failed: -1: Invalid argument (22)
-> 
->     qemu-system-x86_64: Failed to set msg fds.
->     qemu-system-x86_64: vhost VQ 1 ring restore failed: -1: Invalid argument (22)
-> 
->    Is it a regresstion or I missed something?
-> 
-> CC: Jason Wang <jasowang@redhat.com>
-> CC: Gerd Hoffmann <kraxel@redhat.com>
-> CC: Dmitry Fleytman <dmitry@daynix.com>
-> CC: Michael S. Tsirkin <mst@redhat.com>
-> CC: Hannes Reinecke <hare@suse.de>
-> CC: Paolo Bonzini <pbonzini@redhat.com>
-> CC: Alex Williamson <alex.williamson@redhat.com>
-> CC: Markus Armbruster <armbru@redhat.com>
-> CC: Marcel Apfelbaum <marcel@redhat.com>
-> 
-> Cao jin (8):
->   msix: Rename and create a wrapper
->   megasas: change behaviour of msix switch
->   hcd-xhci: change behaviour of msix switch
->   megasas: undo the overwrites of msi user configuration
->   vmxnet3: fix reference leak issue
->   vmxnet3: remove unnecessary internal msix flag
->   msi_init: convert assert to return -errno
->   megasas: remove unnecessary megasas_use_msix()
-> 
->  hw/net/vmxnet3.c      | 40 +++++++++++++++-------------------------
->  hw/pci/msi.c          |  9 ++++++---
->  hw/pci/msix.c         | 30 +++++++++++++++++++++---------
->  hw/scsi/megasas.c     | 48 +++++++++++++++++++++++++-----------------------
->  hw/usb/hcd-xhci.c     | 29 +++++++++++++++++++++--------
->  hw/vfio/pci.c         | 12 ++++++------
->  include/hw/pci/msix.h |  5 +++++
->  7 files changed, 99 insertions(+), 74 deletions(-)
-> 
+are available in the git repository at:
+
+  git://github.com/mdroth/qemu.git tags/qga-pull-2017-03-06-tag
+
+for you to fetch changes up to ec72c0e271f2b13953079a4f4dadb49ac5910b54:
+
+  tests: check path to avoid a failing qga/get-vcpus test (2017-03-06 00:54:19 -0600)
+
+----------------------------------------------------------------
+qemu-ga patch queue for 2.9
+
+* fix fsfreeze for filesystems mounted in multiple locations
+* fix test failure when running in a chroot
+* support for socket-based activation
+
+----------------------------------------------------------------
+Bruce Rogers (1):
+      tests: check path to avoid a failing qga/get-vcpus test
+
+Peter Lieven (1):
+      qga: ignore EBUSY when freezing a filesystem
+
+Stefan Hajnoczi (1):
+      qga: add systemd socket activation support
+
+ qga/channel-posix.c  | 68 ++++++++++++++++++++++++++---------------------
+ qga/channel-win32.c  |  2 +-
+ qga/channel.h        |  3 ++-
+ qga/commands-posix.c |  5 +++-
+ qga/main.c           | 74 ++++++++++++++++++++++++++++++++++++++++++++++++----
+ tests/test-qga.c     |  4 ++-
+ 6 files changed, 117 insertions(+), 39 deletions(-)
