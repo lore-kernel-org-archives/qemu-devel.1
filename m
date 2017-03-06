@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ckumM-0004eh-3E
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:42:31 -0500
+	(envelope-from <programmingkidx@gmail.com>) id 1ckuu3-0006u8-MQ
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:50:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ckumK-0006FW-Nz
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:42:30 -0500
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:37870)
+	(envelope-from <programmingkidx@gmail.com>) id 1ckuu0-00088H-K5
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:50:27 -0500
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:35904)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ckumK-0006E5-FE
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:42:28 -0500
-Received: by mail-wm0-x236.google.com with SMTP id n11so67962641wma.0
-	for <qemu-devel@nongnu.org>; Mon, 06 Mar 2017 07:42:28 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20170306071721.26708-2-ppandit@redhat.com>
-References: <20170306071721.26708-1-ppandit@redhat.com>
-	<20170306071721.26708-2-ppandit@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 6 Mar 2017 15:42:06 +0000
-Message-ID: <CAFEAcA-hOsVBnw9gh-VBCr3Q7-+_m-2X3zHRuRnmzDLF8CmsZQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] linux-user: limit number of
- arguments to execve
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1ckuu0-000882-EK
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:50:24 -0500
+Received: by mail-it0-x244.google.com with SMTP id w185so9981588ita.3
+	for <qemu-devel@nongnu.org>; Mon, 06 Mar 2017 07:50:24 -0800 (PST)
+Mime-Version: 1.0 (Apple Message framework v1084)
+Content-Type: text/plain; charset=us-ascii
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <mailman.56791.1488797131.22740.qemu-devel@nongnu.org>
+Date: Mon, 6 Mar 2017 10:50:22 -0500
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <5102CE52-05CC-4B15-8D79-860B8557C055@gmail.com>
+References: <mailman.56791.1488797131.22740.qemu-devel@nongnu.org>
+Subject: [Qemu-devel] [Bug 1289788] Re: MIDI access (not only adlib) hangs
+ WinNT on QEMU 1.7.x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +30,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Jann Horn <jannh@google.com>, Prasad J Pandit <pjp@fedoraproject.org>
-
-On 6 March 2017 at 07:17, P J P <ppandit@redhat.com> wrote:
-> From: Prasad J Pandit <pjp@fedoraproject.org>
->
-> Limit the number of arguments passed to execve(2) call from
-> a user program, as large number of them could lead to a bad
-> guest address error.
->
-> Reported-by: Jann Horn <jannh@google.com>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-> ---
->  linux-user/syscall.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> Update per: use gemu_log() to report error
->   -> https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg00750.html
->
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 9be8e95..86a4a9c 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -7766,6 +7766,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->  #endif
->      case TARGET_NR_execve:
->          {
-> +#define ARG_MAX 65535
->              char **argp, **envp;
->              int argc, envc;
->              abi_ulong gp;
-> @@ -7794,6 +7795,11 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->                  envc++;
->              }
->
-> +            if (argc > ARG_MAX || envc > ARG_MAX) {
-> +                gemu_log("argc(%d), envc(%d) exceed %d\n", argc, envc, ARG_MAX);
-> +                ret = -TARGET_E2BIG;
-> +                break;
-> +            }
->              argp = alloca((argc + 1) * sizeof(void *));
->              envp = alloca((envc + 1) * sizeof(void *));
+To: Thomas Huth <1289788@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org
 
 
-We need to fix this by not using alloca(), not by imposing
-an arbitrary limit that's still rather over-large for an
-alloca allocation, as Eric suggested.
+On Mar 6, 2017, at 5:45 AM, qemu-devel-request@nongnu.org wrote:
 
-thanks
--- PMM
+>=20
+> Is this problem still reproducible with the latest version of QEMU?
+>=20
+> ** Changed in: qemu
+>       Status: New =3D> Incomplete
+>=20
+> --=20
+> You received this bug notification because you are a member of qemu-
+> devel-ml, which is subscribed to QEMU.
+> https://bugs.launchpad.net/bugs/1289788
+>=20
+> Title:
+>  MIDI access (not only adlib) hangs WinNT on QEMU 1.7.x
+>=20
+> Status in QEMU:
+>  Incomplete
+>=20
+> Bug description:
+>  Windows NT 4.0 and 2000 (including the latest git release), when =
+enabling adlib (with sb16 already enabled) or the built-in synth of the =
+es1370, hang on QEMU 1.7.x (also with 1.7.50) when they try to play MIDI =
+files (like canyon.mid, etc). I have already tried bisecting but seems =
+that this bug has been introduced sometime in 1.7.0's development time.
+>  Screenshot attached: http://goput.it/ig2l.png
+>=20
+>  OS Used: Windows 7 x64 Ultimate SP1
+>  command-line used: qemu-system-i386w.exe -L pc-bios -m 64 -cpu =
+pentium -drive file=3Dvbent40.img,if=3Dfloppy,id=3Dfda -drive =
+file=3Dvhd.vhd,if=3Dide,media=3Ddisk,bus=3D0,unit=3D0,id=3Dharddisk0 =
+-drive file=3DE:,if=3Dide,media=3Dcdrom,bus=3D1,unit=3D0,id=3Dcdrom -net =
+nic,model=3Dpcnet -net user -vga std -device ES1370 -boot menu=3Don =
+-monitor telnet:127.0.0.1:4444,server,nowait
+>=20
+> To manage notifications about this bug go to:
+> https://bugs.launchpad.net/qemu/+bug/1289788/+subscriptions
+
+A midi file played very will using SB16. It didn't work at all with =
+adlib, and it played poorly in es1370. I used Windows 2000 as the guest. =
+There were no hangs.=20
