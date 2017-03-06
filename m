@@ -1,24 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cku2r-000085-U7
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:55:31 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cku3z-0000hk-Tq
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:56:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cku2o-0001Rf-24
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:55:30 -0500
-References: <20170302130422.81380-1-pasic@linux.vnet.ibm.com>
-	<20170302154935.7b8ec875.cornelia.huck@de.ibm.com>
-	<b12c69aa-67ee-ffbc-cd89-716c24889167@redhat.com>
-	<9a67d492-5bda-4b2a-0732-4034176d0d28@linux.vnet.ibm.com>
-	<7b6ff676-bf57-d9ab-def7-fe894f821f03@redhat.com>
-	<42da742f-a4fa-b592-904e-5e6f07bfe990@linux.vnet.ibm.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <baababfc-04b0-ad71-3065-381bf8dd1e0d@redhat.com>
-Date: Mon, 6 Mar 2017 15:55:19 +0100
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cku3w-0001qH-RZ
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:56:39 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56190)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cku3w-0001pa-H6
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:56:36 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v26ErrIP070969
+	for <qemu-devel@nongnu.org>; Mon, 6 Mar 2017 09:56:34 -0500
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 290u3j4p21-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 06 Mar 2017 09:56:34 -0500
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Mon, 6 Mar 2017 14:56:31 -0000
+Date: Mon, 6 Mar 2017 15:56:25 +0100
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <d00802cc-150a-2263-604d-9c2eaa5c19d1@linux.vnet.ibm.com>
+References: <20170302185942.76255-1-pasic@linux.vnet.ibm.com>
+	<20170303132149.34e5906a.cornelia.huck@de.ibm.com>
+	<aa9b9219-f3a6-165c-2d92-156a9295adbb@linux.vnet.ibm.com>
+	<20170303135012.17edb640.cornelia.huck@de.ibm.com>
+	<d00802cc-150a-2263-604d-9c2eaa5c19d1@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <42da742f-a4fa-b592-904e-5e6f07bfe990@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/1] virtio-blk: fix race on guest notifiers
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20170306155625.5c426793.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1] virtio: fail device if
+ set_event_notifier fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,67 +45,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: qemu-stable@nongnu.org, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
+On Fri, 3 Mar 2017 14:08:37 +0100
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
+> On 03/03/2017 01:50 PM, Cornelia Huck wrote:
+> > On Fri, 3 Mar 2017 13:43:32 +0100
+> > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> > 
+> >> On 03/03/2017 01:21 PM, Cornelia Huck wrote:
+> >>> On Thu,  2 Mar 2017 19:59:42 +0100
+> >>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> >>>
+> >>>> The function virtio_notify_irqfd used to ignore the return code of
+> >>>> event_notifier_set. Let's fail the device should this occur.
+> >>>
+> >>> I'm wondering if there are reasons for event_notifier_set() to fail
+> >>> beyond "we've hit an internal race and should make an effort to fix
+> >>> that one, or else we have completely messed up in qemu". Marking the
+> >>> device broken tells the guest that there's something wrong with the
+> >>> device, but I think we want qemu bug reports when there's something
+> >>> broken with the irqfd.
+> >>>
+> >>
+> >> That's why the error is logged. I understand virtio_error like something
+> >> suitable for indicating bugs.
+> >>
+> >> What do you suggest? Forcing a dump? I would rather leave it to the
+> >> user to figure out how important is the state sitting in the machine
+> >> and the device, and how much effort does (s)he want to put into recovering
+> >> from the failure. 
+> > 
+> > How likely are those logged messages being brought to attention of the
+> > admin? Does any management software flag machines with such error
+> > messages? (that's more of a general question)
+> > 
+> 
+> I admit, I did not investigate this thoroughly, also because the patch
+> is flawed regarding multi-thread anyway. After a quick investigation
+> it seems the linux guest won't auto-reset the device so the guest should
+> end up with a not working device. I think it's pretty likely that the
+> admin will check the logs if the device was important.
 
-On 03/03/2017 20:43, Halil Pasic wrote:
-> Uh, this is complicated. I'm not out of questions, but I fear taking to
-> much of your precious time. I will ask again nevertheless, but please
-> just cut the conversation with -EBUSY if it gets to expensive.
+Thinking a bit more about this, it seems setting the device broken is
+not the right solution for exactly that reason. Setting the virtio
+device broken is a way to signal the guest to 'you did something
+broken; please reset the device and start anew' (and that's how current
+callers use it). In our case, this is not the guest's fault.
 
-It's the opposite!  I need other people to look at it, understand it and
-poke holes at my own reasoning.
+Maybe go back to the assert 'solution'? But I'm not sure that's enough
+if production builds disable asserts...
 
->         bs_->wakeup =3D true;                                \
->         while ((cond)) {                                   \
->             aio_context_release(ctx_);                     \
->             aio_poll(qemu_get_aio_context(), true);        \
->             aio_context_acquire(ctx_);                     \
->             waited_ =3D true;                                \
->         }                                                  \
->         bs_->wakeup =3D false;                               \
->     }                                                      \
->     waited_; })
->=20
-> where it's interesting (me running with 2 iothreads one assigned to my
-> block device) we are gonna take  the "else" branch , a will end up
-> releasing the ctx belonging to the iothread and then acquire it again,
-> and basically wait till the requests are done.
->=20
-> Since is virtio_blk_rw_complete acquiring-releasing the same ctx this
-> makes a lot of sense. If we would not release the ctx we would end up
-> with a deadlock.
+> 
+> I agree fully that it's a very general question, and I do not feel
+> competent for answering it.
+> 
+> > I'd like to have some kind of trigger that rings an alarm bell so that
+> > the admin might consider reporting this, but I don't have a good idea
+> > on how to do that either...
+> > 
+> 
+> There are tools for aggregating and processing logs, and triggering
+> alarm bells too (for example ELK= logstash + Kibana + Elasticsearch).
+> AFAIK logs are the most common way to deal with such stuff. But I'm far
+> form being an expert. Of course logs are only as good as the messages
+> landing in them...
 
-Related to this, note that the above release/wait/acquire logic is
-itself new to 2.8.  Before, QEMU would run aio_poll(other_aio_context)
-directly in the main thread.  This relied on recursive mutexes and
-special callbacks to pass the lock between the I/O and main threads.
-
-This worked but it hid some thread-unsafe idioms, so I removed this in
-the commits ending at 65c1b5b ("iothread: release AioContext around
-aio_poll", 2016-10-28).  BDRV_POLL_WHILE provides an abstraction that
-will not change once aio_context_acquire/release disappears in favor of
-fine-grained locks.
-
-> But then I do not understand what is the point acquiring
-> the mutex in virtio_blk_rw_complete?
-
-When QEMU does I/O in the main thread, it can call
-BlockBackend/BlockDriverState functions.  Even though their completion
-is processed in the I/O thread (via BDRV_POLL_WHILE), you still need a
-lock to handle mutual exclusion between the two.
-
-In the case of virtio_blk_rw_complete the mutex is needed because, for
-example, block_acct_done is not thread safe yet.
-
-> Is patch b9e413dd required for the correctness of this patch?
-> What is the role of the aio_context_acquire/release introduced by
-> b9e413dd in virtio_blk_rw_complete?
-
-Patch b9e413dd should have no semantic change.  The acquire/release that
-are added are all balanced by removed acquire/releases elsewhere, for
-example in block/linux-aio.c.
-
-Paolo
+Let's hope this works properly, then.
