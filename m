@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ckofE-0000Mw-CX
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 04:10:45 -0500
+	(envelope-from <prvs=23132e6eb=Paul.Durrant@citrix.com>)
+	id 1ckoj9-00019Z-JE
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 04:14:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ckofA-0000R5-EL
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 04:10:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38888)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ckofA-0000Qw-8n
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 04:10:40 -0500
-Message-ID: <1488791436.18653.22.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 06 Mar 2017 10:10:36 +0100
-In-Reply-To: <38265DF9-8C55-4B4E-9222-F75C5E675ABB@gmail.com>
-References: <38265DF9-8C55-4B4E-9222-F75C5E675ABB@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	(envelope-from <prvs=23132e6eb=Paul.Durrant@citrix.com>)
+	id 1ckoj5-0001D4-Ju
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 04:14:47 -0500
+Received: from smtp.eu.citrix.com ([185.25.65.24]:7454)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=23132e6eb=Paul.Durrant@citrix.com>)
+	id 1ckoj5-0001CJ-8D
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 04:14:43 -0500
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Mon, 6 Mar 2017 09:14:39 +0000
+Message-ID: <1636138fa3a948229a4630fe48d5a079@AMSPEX02CL03.citrite.net>
+References: <1488452986-24501-1-git-send-email-paul.durrant@citrix.com>
+	<1488452986-24501-6-git-send-email-paul.durrant@citrix.com>
+	<alpine.DEB.2.10.1703021426050.17906@sstabellini-ThinkPad-X260>
+	<05365905529b4fd78ff67989743a8dfb@AMSPEX02CL03.citrite.net>
+	<alpine.DEB.2.10.1703031209090.17906@sstabellini-ThinkPad-X260>
+	<alpine.DEB.2.10.1703031243050.17906@sstabellini-ThinkPad-X260>
+In-Reply-To: <alpine.DEB.2.10.1703031243050.17906@sstabellini-ThinkPad-X260>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] Patch causes Mac OS X to print dead controller
- messages
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] xen: use libxendevicemodel when
+ available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,22 +36,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>
-Cc: Li Qiang <liqiang6-s@360.cn>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: 'Stefano Stabellini' <sstabellini@kernel.org>
+Cc: "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Anthony Perard <anthony.perard@citrix.com>
 
-On Mi, 2017-03-01 at 23:08 -0500, Programmingkid wrote:
-> commit 95ed56939eb2eaa4e2f349fe6dcd13ca4edfd8fb
-> usb: ohci: limit the number of link eds
+> -----Original Message-----
+> From: Stefano Stabellini [mailto:sstabellini@kernel.org]
+> Sent: 03 March 2017 20:43
+> To: Stefano Stabellini <sstabellini@kernel.org>
+> Cc: Paul Durrant <Paul.Durrant@citrix.com>; xen-devel@lists.xenproject.or=
+g;
+> qemu-devel@nongnu.org; Anthony Perard <anthony.perard@citrix.com>
+> Subject: RE: [PATCH v2 5/5] xen: use libxendevicemodel when available
 >=20
-> This patch causes Mac OS X to continuously print this message:
-> USBF: 35.508 AppleUSBOHCI[0x1187000] Watchdog detected dead controller (h=
-cca #: 0, hc#: 863)
+> On Fri, 3 Mar 2017, Stefano Stabellini wrote:
+> > On Fri, 3 Mar 2017, Paul Durrant wrote:
+> > > > -----Original Message-----
+> > > > From: Stefano Stabellini [mailto:sstabellini@kernel.org]
+> > > > Sent: 02 March 2017 22:50
+> > > > To: Paul Durrant <Paul.Durrant@citrix.com>
+> > > > Cc: xen-devel@lists.xenproject.org; qemu-devel@nongnu.org; Stefano
+> > > > Stabellini <sstabellini@kernel.org>; Anthony Perard
+> > > > <anthony.perard@citrix.com>
+> > > > Subject: Re: [PATCH v2 5/5] xen: use libxendevicemodel when availab=
+le
+> > > >
+> > > > On Thu, 2 Mar 2017, Paul Durrant wrote:
+> > > > > This patch modifies the wrapper functions in xen_common.h to use
+> the
+> > > > > new xendevicemodel interface if it is available along with
+> compatibility
+> > > > > code to use the old libxenctrl interface if it is not.
+> > > > >
+> > > > > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> > > > > ---
+> > > > > Cc: Stefano Stabellini <sstabellini@kernel.org>
+> > > > > Cc: Anthony Perard <anthony.perard@citrix.com>
+> > > > >
+> > > > > v2:
+> > > > > - Add a compat define for xenforeignmemory_close() since this is
+> now
+> > > > >   used.
+> > > > > ---
+> > > > >  include/hw/xen/xen_common.h | 115
+> > > > +++++++++++++++++++++++++++++++-------------
+> > > > >  xen-common.c                |   8 +++
+> > > > >  2 files changed, 90 insertions(+), 33 deletions(-)
+> > > > >
+> > > > > diff --git a/include/hw/xen/xen_common.h
+> > > > b/include/hw/xen/xen_common.h
+> > > > > index 31cf25f..48444e5 100644
+> > > > > --- a/include/hw/xen/xen_common.h
+> > > > > +++ b/include/hw/xen/xen_common.h
+> > > > > @@ -9,6 +9,7 @@
+> > > > >  #undef XC_WANT_COMPAT_EVTCHN_API
+> > > > >  #undef XC_WANT_COMPAT_GNTTAB_API
+> > > > >  #undef XC_WANT_COMPAT_MAP_FOREIGN_API
+> > > > > +#undef XC_WANT_COMPAT_DEVICEMODEL_API
+> > > > >
+> > > > >  #include <xenctrl.h>
+> > > > >  #include <xenstore.h>
+> > > > > @@ -26,48 +27,95 @@ extern xc_interface *xen_xc;
+> > > > >   * We don't support Xen prior to 4.2.0.
+> > > > >   */
+> > > > >
+> > > > > +#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 490
+> > > > > +
+> > > > > +typedef xc_interface xendevicemodel_handle;
+> > > > > +
+> > > > > +#define xendevicemodel_open(l, f) xen_xc
+> > > > > +
+> > > > > +#define xendevicemodel_map_io_range_to_ioreq_server \
+> > > > > +    xc_hvm_map_io_range_to_ioreq_server
+> > > > > +#define xendevicemodel_unmap_io_range_from_ioreq_server \
+> > > > > +    xc_hvm_unmap_io_range_from_ioreq_server
+> > > > > +#define xendevicemodel_map_pcidev_to_ioreq_server \
+> > > > > +    xc_hvm_map_pcidev_to_ioreq_server
+> > > > > +#define xendevicemodel_unmap_pcidev_from_ioreq_server \
+> > > > > +    xc_hvm_unmap_pcidev_from_ioreq_server
+> > > > > +#define xendevicemodel_create_ioreq_server \
+> > > > > +    xc_hvm_create_ioreq_server
+> > > > > +#define xendevicemodel_destroy_ioreq_server \
+> > > > > +    xc_hvm_destroy_ioreq_server
+> > > > > +#define xendevicemodel_get_ioreq_server_info \
+> > > > > +    xc_hvm_get_ioreq_server_info
+> > > > > +#define xendevicemodel_set_ioreq_server_state \
+> > > > > +    xc_hvm_set_ioreq_server_state
+> > > > > +#define xendevicemodel_set_pci_intx_level \
+> > > > > +    xc_hvm_set_pci_intx_level
+> > > > > +#define xendevicemodel_set_pci_link_route \
+> > > > > +    xc_hvm_set_pci_link_route
+> > > > > +#define xendevicemodel_set_isa_irq_level \
+> > > > > +    xc_hvm_set_isa_irq_level
+> > > > > +#define xendevicemodel_inject_msi \
+> > > > > +    xc_hvm_inject_msi
+> > > > > +#define xendevicemodel_set_mem_type \
+> > > > > +    xc_hvm_set_mem_type
+> > > > > +#define xendevicemodel_track_dirty_vram \
+> > > > > +    xc_hvm_track_dirty_vram
+> > > > > +#define xendevicemodel_modified_memory \
+> > > > > +    xc_hvm_modified_memory
+> > > >
+> > > > It does build correctly now for Xen < 4.9, however it breaks agains=
+t
+> > > > xen-unstable:
+> > > >
+> > > >   ERROR: configure test passed without -Werror but failed with -Wer=
+ror.
+> > > >          This is probably a bug in the configure script. The failin=
+g command
+> > > >          will be at the bottom of config.log.
+> > > >          You can run configure with --disable-werror to bypass this=
+ check.
+> > > >
+> > > > and config.log says:
+> > > >
+> > > >   config-temp/qemu-conf.c: In function 'main':
+> > > >   config-temp/qemu-conf.c:32:3: error: implicit declaration of func=
+tion
+> > > > 'xc_hvm_set_mem_type' [-Werror=3Dimplicit-function-declaration]
+> > > >   config-temp/qemu-conf.c:32:3: error: nested extern declaration of
+> > > > 'xc_hvm_set_mem_type' [-Werror=3Dnested-externs]
+> > > >   config-temp/qemu-conf.c:34:3: error: implicit declaration of func=
+tion
+> > > > 'xc_hvm_inject_msi' [-Werror=3Dimplicit-function-declaration]
+> > > >   config-temp/qemu-conf.c:34:3: error: nested extern declaration of
+> > > > 'xc_hvm_inject_msi' [-Werror=3Dnested-externs]
+> > > >   config-temp/qemu-conf.c:35:3: error: implicit declaration of func=
+tion
+> > > > 'xc_hvm_create_ioreq_server' [-Werror=3Dimplicit-function-declarati=
+on]
+> > > >   config-temp/qemu-conf.c:35:3: error: nested extern declaration of
+> > > > 'xc_hvm_create_ioreq_server' [-Werror=3Dnested-externs]
+> > > >
+> > > >
+> > > > With -DXC_WANT_COMPAT_DEVICEMODEL_API=3D1:
+> > > >
+> > > >   In file included from /local/qemu-
+> > > > upstream/include/hw/xen/xen_backend.h:4:0,
+> > > >                    from hw/block/xen_disk.c:27:
+> > > >   /local/qemu-upstream/include/hw/xen/xen_common.h: In function
+> > > > 'xen_set_mem_type':
+> > > >   /local/qemu-upstream/include/hw/xen/xen_common.h:78:5: error:
+> implicit
+> > > > declaration of function 'xc_hvm_set_mem_type' [-Werror=3Dimplicit-
+> function-
+> > > > declaration]
+> > > >
+> > >
+> > > Ah... Do you have Anthony's patch?
+> > >
+> > >
+> http://xenbits.xen.org/gitweb/?p=3Dxen.git;a=3Dcommit;h=3D9970e98ace48574=
+701
+> f7e2286fb67090481a3fec
+> > >
+> > > I suspect that may be the problem you're seeing above.
+> >
+> > Yes, I do have it. I am still having build troubles with v5 too. I am
 >=20
-> I used git bisect to find this patch. None of the USB devices work when c=
-onnected to the OHCI USB controller.
+> I meant v3
+>=20
+>=20
+> > attaching my build test script: feel free to use it to test the build o=
+f
+> > a single QEMU branch against multiple Xen versions. It requires one Xen
+> > repository checked out and built for each Xen version. I have just
+> > added the Xen 4.9 tests, so they might be wrong somehow, but the others
+> > are known to work.
 
-Hmm, ok, appearently the limit is too strict for macos.  Can you try to
-increase ED_LINK_LIMIT ?
+Your script is lacking Anthony's fix. You need to patch your 4.9 configure =
+clause accordingly. I.e. you need -I$(XEN_ROOT)/tools/libs/devicemodel/incl=
+ude and -L$(XEN_ROOT)/tools/libs/devicemodel in the --extra-cflags.
 
-thanks,
-  Gerd
+  Paul
