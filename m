@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cklA1-0007qR-Jb
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 00:26:20 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cklA4-0007tF-QD
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 00:26:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cklA0-00015Z-Sr
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 00:26:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38510)
+	(envelope-from <jasowang@redhat.com>) id 1cklA3-00016e-JE
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 00:26:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41854)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cklA0-00014x-My
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 00:26:16 -0500
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cklA3-00016S-AH
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 00:26:19 -0500
 From: Jason Wang <jasowang@redhat.com>
-Date: Mon,  6 Mar 2017 13:25:41 +0800
-Message-Id: <1488777954-4578-7-git-send-email-jasowang@redhat.com>
+Date: Mon,  6 Mar 2017 13:25:42 +0800
+Message-Id: <1488777954-4578-8-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1488777954-4578-1-git-send-email-jasowang@redhat.com>
 References: <1488777954-4578-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL RESEND 06/19] NetRxPkt: Remove code duplication
- in net_rx_pkt_pull_data()
+Subject: [Qemu-devel] [PULL RESEND 07/19] colo-compare: use
+ g_timeout_source_new() to process the stale packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,47 +25,160 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: Dmitry Fleytman <dmitry@daynix.com>, Jason Wang <jasowang@redhat.com>
+Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, Jason Wang <jasowang@redhat.com>
 
-From: Dmitry Fleytman <dmitry@daynix.com>
+From: zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-This is a refactoring commit that does not change behavior.
+Instead of using qemu timer to process the stale packets,
+We re-use the colo compare thread to process these packets
+by creating a new timeout coroutine.
 
-Signed-off-by: Dmitry Fleytman <dmitry@daynix.com>
+Besides, since we process all the same vNIC's net connection/packets
+in one thread, it is safe to remove the timer_check_lock.
+
+Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/net/net_rx_pkt.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ net/colo-compare.c | 62 +++++++++++++++++++-----------------------------------
+ 1 file changed, 22 insertions(+), 40 deletions(-)
 
-diff --git a/hw/net/net_rx_pkt.c b/hw/net/net_rx_pkt.c
-index 2649d40..cef1c2e 100644
---- a/hw/net/net_rx_pkt.c
-+++ b/hw/net/net_rx_pkt.c
-@@ -88,20 +88,21 @@ net_rx_pkt_pull_data(struct NetRxPkt *pkt,
-                         const struct iovec *iov, int iovcnt,
-                         size_t ploff)
- {
-+    uint32_t pllen = iov_size(iov, iovcnt) - ploff;
-+
-     if (pkt->ehdr_buf_len) {
-         net_rx_pkt_iovec_realloc(pkt, iovcnt + 1);
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index 162fd6a..fdde788 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -83,9 +83,6 @@ typedef struct CompareState {
+     GHashTable *connection_track_table;
+     /* compare thread, a thread for each NIC */
+     QemuThread thread;
+-    /* Timer used on the primary to find packets that are never matched */
+-    QEMUTimer *timer;
+-    QemuMutex timer_check_lock;
+ } CompareState;
  
-         pkt->vec[0].iov_base = pkt->ehdr_buf;
-         pkt->vec[0].iov_len = pkt->ehdr_buf_len;
+ typedef struct CompareClass {
+@@ -374,9 +371,7 @@ static void colo_compare_connection(void *opaque, void *user_data)
  
--        pkt->tot_len = iov_size(iov, iovcnt) - ploff + pkt->ehdr_buf_len;
-+        pkt->tot_len = pllen + pkt->ehdr_buf_len;
-         pkt->vec_len = iov_copy(pkt->vec + 1, pkt->vec_len_total - 1,
--                                iov, iovcnt, ploff,
--                                pkt->tot_len - pkt->ehdr_buf_len) + 1;
-+                                iov, iovcnt, ploff, pllen) + 1;
-     } else {
-         net_rx_pkt_iovec_realloc(pkt, iovcnt);
- 
--        pkt->tot_len = iov_size(iov, iovcnt) - ploff;
-+        pkt->tot_len = pllen;
-         pkt->vec_len = iov_copy(pkt->vec, pkt->vec_len_total,
-                                 iov, iovcnt, ploff, pkt->tot_len);
+     while (!g_queue_is_empty(&conn->primary_list) &&
+            !g_queue_is_empty(&conn->secondary_list)) {
+-        qemu_mutex_lock(&s->timer_check_lock);
+         pkt = g_queue_pop_tail(&conn->primary_list);
+-        qemu_mutex_unlock(&s->timer_check_lock);
+         switch (conn->ip_proto) {
+         case IPPROTO_TCP:
+             result = g_queue_find_custom(&conn->secondary_list,
+@@ -411,9 +406,7 @@ static void colo_compare_connection(void *opaque, void *user_data)
+              * until next comparison.
+              */
+             trace_colo_compare_main("packet different");
+-            qemu_mutex_lock(&s->timer_check_lock);
+             g_queue_push_tail(&conn->primary_list, pkt);
+-            qemu_mutex_unlock(&s->timer_check_lock);
+             /* TODO: colo_notify_checkpoint();*/
+             break;
+         }
+@@ -486,11 +479,26 @@ static void compare_sec_chr_in(void *opaque, const uint8_t *buf, int size)
      }
+ }
+ 
++/*
++ * Check old packet regularly so it can watch for any packets
++ * that the secondary hasn't produced equivalents of.
++ */
++static gboolean check_old_packet_regular(void *opaque)
++{
++    CompareState *s = opaque;
++
++    /* if have old packet we will notify checkpoint */
++    colo_old_packet_check(s);
++
++    return TRUE;
++}
++
+ static void *colo_compare_thread(void *opaque)
+ {
+     GMainContext *worker_context;
+     GMainLoop *compare_loop;
+     CompareState *s = opaque;
++    GSource *timeout_source;
+ 
+     worker_context = g_main_context_new();
+ 
+@@ -501,8 +509,15 @@ static void *colo_compare_thread(void *opaque)
+ 
+     compare_loop = g_main_loop_new(worker_context, FALSE);
+ 
++    /* To kick any packets that the secondary doesn't match */
++    timeout_source = g_timeout_source_new(REGULAR_PACKET_CHECK_MS);
++    g_source_set_callback(timeout_source,
++                          (GSourceFunc)check_old_packet_regular, s, NULL);
++    g_source_attach(timeout_source, worker_context);
++
+     g_main_loop_run(compare_loop);
+ 
++    g_source_unref(timeout_source);
+     g_main_loop_unref(compare_loop);
+     g_main_context_unref(worker_context);
+     return NULL;
+@@ -604,26 +619,6 @@ static int find_and_check_chardev(Chardev **chr,
+ }
+ 
+ /*
+- * Check old packet regularly so it can watch for any packets
+- * that the secondary hasn't produced equivalents of.
+- */
+-static void check_old_packet_regular(void *opaque)
+-{
+-    CompareState *s = opaque;
+-
+-    timer_mod(s->timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
+-              REGULAR_PACKET_CHECK_MS);
+-    /* if have old packet we will notify checkpoint */
+-    /*
+-     * TODO: Make timer handler run in compare thread
+-     * like qemu_chr_add_handlers_full.
+-     */
+-    qemu_mutex_lock(&s->timer_check_lock);
+-    colo_old_packet_check(s);
+-    qemu_mutex_unlock(&s->timer_check_lock);
+-}
+-
+-/*
+  * Called from the main thread on the primary
+  * to setup colo-compare.
+  */
+@@ -665,7 +660,6 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
+     net_socket_rs_init(&s->sec_rs, compare_sec_rs_finalize);
+ 
+     g_queue_init(&s->conn_list);
+-    qemu_mutex_init(&s->timer_check_lock);
+ 
+     s->connection_track_table = g_hash_table_new_full(connection_key_hash,
+                                                       connection_key_equal,
+@@ -678,12 +672,6 @@ static void colo_compare_complete(UserCreatable *uc, Error **errp)
+                        QEMU_THREAD_JOINABLE);
+     compare_id++;
+ 
+-    /* A regular timer to kick any packets that the secondary doesn't match */
+-    s->timer = timer_new_ms(QEMU_CLOCK_VIRTUAL, /* Only when guest runs */
+-                            check_old_packet_regular, s);
+-    timer_mod(s->timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
+-                        REGULAR_PACKET_CHECK_MS);
+-
+     return;
+ }
+ 
+@@ -723,12 +711,6 @@ static void colo_compare_finalize(Object *obj)
+         qemu_thread_join(&s->thread);
+     }
+ 
+-    if (s->timer) {
+-        timer_del(s->timer);
+-    }
+-
+-    qemu_mutex_destroy(&s->timer_check_lock);
+-
+     g_free(s->pri_indev);
+     g_free(s->sec_indev);
+     g_free(s->outdev);
 -- 
 2.7.4
