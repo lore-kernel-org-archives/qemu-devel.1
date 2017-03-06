@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ckxsR-00045p-OY
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 14:01:00 -0500
+	(envelope-from <armbru@redhat.com>) id 1ckxsR-00045q-P6
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 14:01:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ckxsQ-0004iu-9n
+	(envelope-from <armbru@redhat.com>) id 1ckxsQ-0004jN-JM
 	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 14:00:59 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  6 Mar 2017 20:00:37 +0100
-Message-Id: <1488826849-32384-4-git-send-email-armbru@redhat.com>
+Date: Mon,  6 Mar 2017 20:00:35 +0100
+Message-Id: <1488826849-32384-2-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488826849-32384-1-git-send-email-armbru@redhat.com>
 References: <1488826849-32384-1-git-send-email-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 03/15] sheepdog: Fix error handling
- sd_create()
+Subject: [Qemu-devel] [PATCH v2 01/15] sheepdog: Defuse time bomb in
+ sd_open() error handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,46 +23,97 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, ndevos@redhat.com, eblake@redhat.com, f4bug@amsat.org
 
-As a bdrv_create() method, sd_create() must set an error and return
-negative errno on failure.  It prints the error instead of setting it
-when connect_to_sdog() fails.  Fix that.
+When qemu_opts_absorb_qdict() fails, sd_open() closes stdin, because
+sd->fd is still zero.  Fortunately, qemu_opts_absorb_qdict() can't
+fail, because:
 
-While there, return the value of connect_to_sdog() like we do
-elsewhere, instead of -EIO.  No functional change, as
-connect_to_sdog() returns no other error code.
+1. it only fails when qemu_opt_parse() fails, and
+2. the only member of runtime_opts.desc[] is a QEMU_OPT_STRING, and
+3. qemu_opt_parse() can't fail for QEMU_OPT_STRING.
 
-Many more suspicious uses of error_report() and error_report_err()
-remain in other functions.  Left for another day.
+Defuse this ticking time bomb by jumping behind the file descriptor
+cleanup on error.
+
+Also do that for the error paths where sd->fd is still -1.  The file
+descriptor cleanup happens to do nothing then, but let's not rely on
+that here.
+
+While there, rename label out to err, because it's on the error path,
+not the normal path out of the function.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/sheepdog.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ block/sheepdog.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
 diff --git a/block/sheepdog.c b/block/sheepdog.c
-index 0a0803e..be3db1f 100644
+index 7434710..c3ee4ce 100644
 --- a/block/sheepdog.c
 +++ b/block/sheepdog.c
-@@ -1829,14 +1829,12 @@ static int sd_create(const char *filename, QemuOp=
-ts *opts,
-     if (s->inode.block_size_shift =3D=3D 0) {
-         SheepdogVdiReq hdr;
-         SheepdogClusterRsp *rsp =3D (SheepdogClusterRsp *)&hdr;
--        Error *local_err =3D NULL;
-         int fd;
-         unsigned int wlen =3D 0, rlen =3D 0;
-=20
--        fd =3D connect_to_sdog(s, &local_err);
-+        fd =3D connect_to_sdog(s, errp);
-         if (fd < 0) {
--            error_report_err(local_err);
--            ret =3D -EIO;
-+            ret =3D fd;
-             goto out;
-         }
-=20
---=20
+@@ -1392,7 +1392,7 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
+     if (local_err) {
+         error_propagate(errp, local_err);
+         ret = -EINVAL;
+-        goto out;
++        goto err_no_fd;
+     }
+ 
+     filename = qemu_opt_get(opts, "filename");
+@@ -1412,17 +1412,17 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
+     }
+     if (ret < 0) {
+         error_setg(errp, "Can't parse filename");
+-        goto out;
++        goto err_no_fd;
+     }
+     s->fd = get_sheep_fd(s, errp);
+     if (s->fd < 0) {
+         ret = s->fd;
+-        goto out;
++        goto err_no_fd;
+     }
+ 
+     ret = find_vdi_name(s, vdi, snapid, tag, &vid, true, errp);
+     if (ret) {
+-        goto out;
++        goto err;
+     }
+ 
+     /*
+@@ -1443,7 +1443,7 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
+     fd = connect_to_sdog(s, errp);
+     if (fd < 0) {
+         ret = fd;
+-        goto out;
++        goto err;
+     }
+ 
+     buf = g_malloc(SD_INODE_SIZE);
+@@ -1454,7 +1454,7 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
+ 
+     if (ret) {
+         error_setg(errp, "Can't read snapshot inode");
+-        goto out;
++        goto err;
+     }
+ 
+     memcpy(&s->inode, buf, sizeof(s->inode));
+@@ -1466,12 +1466,12 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
+     qemu_opts_del(opts);
+     g_free(buf);
+     return 0;
+-out:
++
++err:
+     aio_set_fd_handler(bdrv_get_aio_context(bs), s->fd,
+                        false, NULL, NULL, NULL, NULL);
+-    if (s->fd >= 0) {
+-        closesocket(s->fd);
+-    }
++    closesocket(s->fd);
++err_no_fd:
+     qemu_opts_del(opts);
+     g_free(buf);
+     return ret;
+-- 
 2.7.4
