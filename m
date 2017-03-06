@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58541)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cklAV-0008Gq-GB
+	(envelope-from <ppandit@redhat.com>) id 1cklAV-0008Gr-GC
 	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 00:26:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cklAS-0001KZ-D5
+	(envelope-from <ppandit@redhat.com>) id 1cklAT-0001LG-5N
 	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 00:26:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42938)
+Received: from mx1.redhat.com ([209.132.183.28]:42254)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cklAS-0001Jz-4F
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 00:26:44 -0500
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon,  6 Mar 2017 13:25:51 +0800
-Message-Id: <1488777954-4578-17-git-send-email-jasowang@redhat.com>
-In-Reply-To: <1488777954-4578-1-git-send-email-jasowang@redhat.com>
-References: <1488777954-4578-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL RESEND 16/19] COLO-compare: Rename compare
- function and remove duplicate codes
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1cklAS-0001KC-W3
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 00:26:45 -0500
+Date: Mon, 6 Mar 2017 10:56:37 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+In-Reply-To: <CAG48ez2eaXFk50puw_bc27tNdfOHDsL08A9jY8=7DnA-mtEXWA@mail.gmail.com>
+Message-ID: <alpine.LFD.2.20.1703061044280.16064@wniryva>
+References: <20170303112503.32277-1-ppandit@redhat.com>
+	<CAFEAcA_V8azXLLptxqNWBwkY7wJZzK+YkZHd6RfHEVS-NoXXBg@mail.gmail.com>
+	<CAG48ez2eaXFk50puw_bc27tNdfOHDsL08A9jY8=7DnA-mtEXWA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH] linux-user: limit number of arguments to
+ execve
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,87 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Jann Horn <jannh@google.com>, Qemu Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
 
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
++-- On Fri, 3 Mar 2017, Jann Horn wrote --+
+| On Fri, Mar 3, 2017 at 4:55 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
+| >> +            if (argc > ARG_MAX || envc > ARG_MAX) {
+| >> +                fprintf(stderr,
+| >> +                        "argc(%d), envc(%d) exceed %d\n", argc, envc, ARG_MAX);
+| >> +                ret = -TARGET_EFAULT;
+| >> +                break;
+| >> +            }
+| >>              argp = alloca((argc + 1) * sizeof(void *));
+| >>              envp = alloca((envc + 1) * sizeof(void *));
+| >
+| > This code is already supposed to handle "argument string too big",
+| > see commit a6f79cc9a5e.
+| >
+| > What's the actual bug case we're trying to handle here?
 
-Rename colo_packet_compare() to colo_packet_compare_common() that
-make tcp_compare udp_compare icmp_compare reuse this function.
-Remove minimum packet size check in icmp_compare, because we have
-check this in parse_packet_early().
+Not argument string, but argument count too big leads to a bad address in 
+get_user_ual(...), resulting in segfault.
 
-Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- net/colo-compare.c | 18 +++++++-----------
- 1 file changed, 7 insertions(+), 11 deletions(-)
-
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index 300f017..602a758 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -180,7 +180,7 @@ static int packet_enqueue(CompareState *s, int mode)
-  * return:    0  means packet same
-  *            > 0 || < 0 means packet different
-  */
--static int colo_packet_compare(Packet *ppkt, Packet *spkt)
-+static int colo_packet_compare_common(Packet *ppkt, Packet *spkt)
- {
-     trace_colo_compare_ip_info(ppkt->size, inet_ntoa(ppkt->ip->ip_src),
-                                inet_ntoa(ppkt->ip->ip_dst), spkt->size,
-@@ -190,6 +190,7 @@ static int colo_packet_compare(Packet *ppkt, Packet *spkt)
-     if (ppkt->size == spkt->size) {
-         return memcmp(ppkt->data, spkt->data, spkt->size);
-     } else {
-+        trace_colo_compare_main("Net packet size are not the same");
-         return -1;
-     }
- }
-@@ -205,6 +206,7 @@ static int colo_packet_compare_tcp(Packet *spkt, Packet *ppkt)
-     int res;
- 
-     trace_colo_compare_main("compare tcp");
-+
-     if (ppkt->size != spkt->size) {
-         if (trace_event_get_state(TRACE_COLO_COMPARE_MISCOMPARE)) {
-             trace_colo_compare_main("pkt size not same");
-@@ -263,7 +265,8 @@ static int colo_packet_compare_udp(Packet *spkt, Packet *ppkt)
-     int ret;
- 
-     trace_colo_compare_main("compare udp");
--    ret = colo_packet_compare(ppkt, spkt);
-+
-+    ret = colo_packet_compare_common(ppkt, spkt);
- 
-     if (ret) {
-         trace_colo_compare_udp_miscompare("primary pkt size", ppkt->size);
-@@ -281,16 +284,9 @@ static int colo_packet_compare_udp(Packet *spkt, Packet *ppkt)
-  */
- static int colo_packet_compare_icmp(Packet *spkt, Packet *ppkt)
- {
--    int network_length;
--
-     trace_colo_compare_main("compare icmp");
--    network_length = ppkt->ip->ip_hl * 4;
--    if (ppkt->size != spkt->size ||
--        ppkt->size < network_length + ETH_HLEN) {
--        return -1;
--    }
- 
--    if (colo_packet_compare(ppkt, spkt)) {
-+    if (colo_packet_compare_common(ppkt, spkt)) {
-         trace_colo_compare_icmp_miscompare("primary pkt size",
-                                            ppkt->size);
-         qemu_hexdump((char *)ppkt->data, stderr, "colo-compare",
-@@ -316,7 +312,7 @@ static int colo_packet_compare_other(Packet *spkt, Packet *ppkt)
-                                inet_ntoa(ppkt->ip->ip_dst), spkt->size,
-                                inet_ntoa(spkt->ip->ip_src),
-                                inet_ntoa(spkt->ip->ip_dst));
--    return colo_packet_compare(ppkt, spkt);
-+    return colo_packet_compare_common(ppkt, spkt);
- }
- 
- static int colo_old_packet_check_one(Packet *pkt, int64_t *check_time)
--- 
-2.7.4
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
