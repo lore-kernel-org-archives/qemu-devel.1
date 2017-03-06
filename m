@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ckz1S-00040d-0U
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 15:14:22 -0500
+	(envelope-from <eblake@redhat.com>) id 1ckz2q-0004ev-2c
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 15:15:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ckz1R-0001G7-0Q
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 15:14:22 -0500
-References: <20170306195255.15806-1-mreitz@redhat.com>
-	<20170306195434.16782-1-mreitz@redhat.com>
-	<ad414a21-b74e-8f25-1b1e-024c0db7986a@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <c694ca93-5c15-40f2-10e5-40fbead92209@redhat.com>
-Date: Mon, 6 Mar 2017 21:14:11 +0100
+	(envelope-from <eblake@redhat.com>) id 1ckz2p-0001j8-0q
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 15:15:47 -0500
+References: <1488817322-11397-1-git-send-email-kwolf@redhat.com>
+	<1488817322-11397-5-git-send-email-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <97f89010-f6e0-4ee2-62a5-2fb8d3760c67@redhat.com>
+Date: Mon, 6 Mar 2017 14:15:38 -0600
 MIME-Version: 1.0
-In-Reply-To: <ad414a21-b74e-8f25-1b1e-024c0db7986a@redhat.com>
+In-Reply-To: <1488817322-11397-5-git-send-email-kwolf@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="pEDtH1HmLkFqAR2Ot9Guhs0CjK5hTmjAc"
-Subject: Re: [Qemu-devel] [PATCH for-2.10 3/3] block: Add some
- bdrv_truncate() error messages
+	boundary="PFaFVHOaDTvTnaDBiJanv8im3iADjUGUG"
+Subject: Re: [Qemu-devel] [PATCH 04/10] mirror: Fix error path for dirty
+ bitmap creation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,99 +25,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pEDtH1HmLkFqAR2Ot9Guhs0CjK5hTmjAc
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <c694ca93-5c15-40f2-10e5-40fbead92209@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 3/3] block: Add some bdrv_truncate()
- error messages
-References: <20170306195255.15806-1-mreitz@redhat.com>
- <20170306195434.16782-1-mreitz@redhat.com>
- <ad414a21-b74e-8f25-1b1e-024c0db7986a@redhat.com>
-In-Reply-To: <ad414a21-b74e-8f25-1b1e-024c0db7986a@redhat.com>
+--PFaFVHOaDTvTnaDBiJanv8im3iADjUGUG
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com
+Message-ID: <97f89010-f6e0-4ee2-62a5-2fb8d3760c67@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 04/10] mirror: Fix error path for dirty
+ bitmap creation
+References: <1488817322-11397-1-git-send-email-kwolf@redhat.com>
+ <1488817322-11397-5-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1488817322-11397-5-git-send-email-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 06.03.2017 21:09, Eric Blake wrote:
-> On 03/06/2017 01:54 PM, Max Reitz wrote:
->> Add missing error messages for the drivers I am comfortable to do this=
-
->> in.
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  block/file-posix.c | 8 +++++++-
->>  block/qcow2.c      | 2 ++
->>  block/qed.c        | 4 +++-
->>  block/raw-format.c | 2 ++
->>  4 files changed, 14 insertions(+), 2 deletions(-)
->>
->> diff --git a/block/file-posix.c b/block/file-posix.c
->> index 9d2bea730d..553213221c 100644
->> --- a/block/file-posix.c
->> +++ b/block/file-posix.c
->> @@ -1341,20 +1341,26 @@ static int raw_truncate(BlockDriverState *bs, =
-int64_t offset, Error **errp)
->>  {
->>      BDRVRawState *s =3D bs->opaque;
->>      struct stat st;
->> +    int ret;
->> =20
->>      if (fstat(s->fd, &st)) {
->> -        return -errno;
->> +        ret =3D -errno;
->> +        error_setg_errno(errp, -ret, "Failed to fstat() the file");
->> +        return ret;
->>      }
->> =20
->>      if (S_ISREG(st.st_mode)) {
->>          if (ftruncate(s->fd, offset) < 0) {
->> +            /* The generic error message will be fine */
->>              return -errno;
+On 03/06/2017 10:21 AM, Kevin Wolf wrote:
+> mirror_top_bs must be removed from the graph again when creating the
+> dirty bitmap fails.
 >=20
-> Relying on a generic error message in the caller is awkward. I see it a=
-s
-> evidence of a partial conversion if we have an interface that requires =
-a
-> return of a negative errno value to make up for when errp is not set.
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/mirror.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
 
-I'm not sure what you mean by this exactly. I can agree that it's not
-nice within a single driver. But I think it's fine to have some drivers
-that generate an Error object and others that do not, as long as the
-generic interface (bdrv_truncate()) masks this behavior.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
->                                                                        =
-I
-> know you aren't comfortable converting all drivers, but for the drivers=
+>=20
+> diff --git a/block/mirror.c b/block/mirror.c
+> index 001b5f0..f24dc51 100644
+> --- a/block/mirror.c
+> +++ b/block/mirror.c
+> @@ -1197,10 +1197,7 @@ static void mirror_start_job(const char *job_id,=
+ BlockDriverState *bs,
+> =20
+>      s->dirty_bitmap =3D bdrv_create_dirty_bitmap(bs, granularity, NULL=
+, errp);
+>      if (!s->dirty_bitmap) {
+> -        g_free(s->replaces);
+> -        blk_unref(s->target);
+> -        block_job_unref(&s->common);
+> -        return;
+> +        goto fail;
+>      }
+> =20
+>      /* Required permissions are already taken with blk_new() */
+>=20
 
-> you do convert, I'd rather guarantee that ALL errors set errp.
-
-Can do, I just felt bad that it be would exactly the same as the message
-that would be generated in bdrv_truncate() anyway.
-
-Max
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
 
---pEDtH1HmLkFqAR2Ot9Guhs0CjK5hTmjAc
+--PFaFVHOaDTvTnaDBiJanv8im3iADjUGUG
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAli9wxMSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9Am9QH/1ZNs4bTtUelDegV33AaE3oeqDl/gLnM
-+IBsS2iBxhczO7H/Z/47O+gv2nKh8TrYwD0PTKEaMvmkNIehuHXDDO3UEm4pedDL
-kwlpkICXTT4jouwOgZ0F4PrWnPsmZK9aO+j2VI2qAHEOAvcYCZnC4+X+LQ3BImsf
-96q0MUh1oD4RL3MDWTw57tdytvjviyTlbLR+/dL4Tjf1Ol5jbQ0xDTHenMTFncWx
-CwsE82fd+IniCV7Cv4nBsQgsseAwizJMmm+8I8agNBA2lgIu7H+QV4E39KEON2hx
-WzZDaLlsvTm6PagJ4BtU5T4x0Ikqt140n7h7tvoNpTFthkNFnj87MTc=
-=PQHu
+iQEcBAEBCAAGBQJYvcNqAAoJEKeha0olJ0NqVmcH/1TX/fwnOAxEHwwftBxH5vWK
+C8J1rnBSFVDF1abdWLbbPpGAlc51/zI21CiOqfU1qhGiD3B1PqDU575k6DXmU5iR
+NY3pfkdog46LVTgTjb2eAtfNKN+12XR0CaMZ9FRMvNaf0Uk7u85mGsVer/XUvm9W
+y791sfmPYtS7414ozz8qMZpJ9liiczo3IUhToF/XSJ56wKfnmF6vncodNsKt4hhA
+r/UUrvuBJsBf9SR0BsB2u81piH9mMC3tRZYAu71noaNowIzaYAT2pfirAOo1Nrdr
+9H9Xp9jGAQtAPRd0r1Nud0/Sx4QI+pZU2HtBMchmDhVFXExFYC5RT1c/RMiMZpw=
+=kVBj
 -----END PGP SIGNATURE-----
 
---pEDtH1HmLkFqAR2Ot9Guhs0CjK5hTmjAc--
+--PFaFVHOaDTvTnaDBiJanv8im3iADjUGUG--
