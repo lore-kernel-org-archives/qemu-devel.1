@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1ckmtk-0001bb-MW
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 02:17:37 -0500
+	(envelope-from <ppandit@redhat.com>) id 1ckmwU-0003OT-IW
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 02:20:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1ckmtj-000092-KB
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 02:17:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43818)
+	(envelope-from <ppandit@redhat.com>) id 1ckmwQ-0000ve-LA
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 02:20:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54480)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1ckmtj-00008b-E9
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 02:17:35 -0500
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1ckmwQ-0000vX-F2
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 02:20:22 -0500
+Date: Mon, 6 Mar 2017 12:50:15 +0530 (IST)
 From: P J P <ppandit@redhat.com>
-Date: Mon,  6 Mar 2017 12:47:21 +0530
-Message-Id: <20170306071721.26708-3-ppandit@redhat.com>
-In-Reply-To: <20170306071721.26708-1-ppandit@redhat.com>
-References: <20170306071721.26708-1-ppandit@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/2] linux-user: allocate heap memory for
- execve arguments
+In-Reply-To: <bd2e3c1d-0fa5-7be4-c223-81d87c87fe0c@redhat.com>
+Message-ID: <alpine.LFD.2.20.1703061247550.22459@wniryva>
+References: <20170303112503.32277-1-ppandit@redhat.com>
+	<bd2e3c1d-0fa5-7be4-c223-81d87c87fe0c@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH] linux-user: limit number of arguments to
+ execve
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,48 +27,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Qemu Developers <qemu-devel@nongnu.org>
-Cc: Eric Blake <eblake@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Jann Horn <jannh@google.com>, Peter Maydell <peter.maydell@linaro.org>, Prasad J Pandit <pjp@fedoraproject.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, Jann Horn <jannh@google.com>, Peter Maydell <peter.maydell@linaro.org>
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
+  Hello Eric,
 
-Arguments passed to execve(2) call from user program could
-be large, allocating stack memory for them via alloca(3) call
-would lead to bad behaviour. Use 'g_malloc0' to allocate memory
-for such arguments.
++-- On Fri, 3 Mar 2017, Eric Blake wrote --+
+| much smaller, or you should consider using the heap instead of the stack
+| (alloca should never be used for more than about 4k).  And there's still
+| the possibility that even with your cap, that you are not handling E2BIG
+| correctly.  You'll need to respin this patch.
 
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
----
- linux-user/syscall.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+  Yes, sent a revised patch set v2.
 
-Update per: replace alloca() with g_malloc0()
-  -> https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg00750.html
-
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 86a4a9c..404fb0b 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -7800,8 +7800,8 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-                 ret = -TARGET_E2BIG;
-                 break;
-             }
--            argp = alloca((argc + 1) * sizeof(void *));
--            envp = alloca((envc + 1) * sizeof(void *));
-+            argp = g_malloc0((argc + 1) * sizeof(void *));
-+            envp = g_malloc0((envc + 1) * sizeof(void *));
- 
-             for (gp = guest_argp, q = argp; gp;
-                   gp += sizeof(abi_ulong), q++) {
-@@ -7862,6 +7862,9 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-                     break;
-                 unlock_user(*q, addr, 0);
-             }
-+
-+            g_free(argp);
-+            g_free(envp);
-         }
-         break;
-     case TARGET_NR_chdir:
--- 
-2.9.3
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
