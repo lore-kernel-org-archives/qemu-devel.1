@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45946)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ckxsR-00045t-Pl
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 14:01:01 -0500
+	(envelope-from <armbru@redhat.com>) id 1ckxsY-0004FQ-1y
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 14:01:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ckxsQ-0004j8-FG
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 14:00:59 -0500
+	(envelope-from <armbru@redhat.com>) id 1ckxsW-0004sM-OI
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 14:01:06 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  6 Mar 2017 20:00:36 +0100
-Message-Id: <1488826849-32384-3-git-send-email-armbru@redhat.com>
+Date: Mon,  6 Mar 2017 20:00:48 +0100
+Message-Id: <1488826849-32384-15-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488826849-32384-1-git-send-email-armbru@redhat.com>
 References: <1488826849-32384-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 02/15] sheepdog: Fix error handling in
- sd_snapshot_delete()
+Subject: [Qemu-devel] [PATCH v2 14/15] qapi-schema: Rename
+ SocketAddressFlat's variant tcp to inet
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,132 +23,238 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, ndevos@redhat.com, eblake@redhat.com, f4bug@amsat.org
 
-As a bdrv_snapshot_delete() method, sd_snapshot_delete() must set an
-error and return negative errno on failure.  It sometimes returns -1,
-and sometimes neglects to set an error.  It also prints error messages
-with error_report().  Fix all that.
+QAPI type SocketAddressFlat differs from SocketAddress pointlessly:
+the discriminator value for variant InetSocketAddress is 'tcp' instead
+of 'inet'.  Rename.
 
-Moreover, its handling of an attempt to delete an nonexistent snapshot
-is wrong: it error_report()s and succeeds.  Fix it to set an error and
-return -ENOENT instead.
+The type is so far only used by the Gluster block drivers.  Take care
+to keep 'tcp' working in things like -drive's file.server.0.type=tcp.
+The "gluster+tcp" URI scheme in pseudo-filenames stays the same.
+blockdev-add changes, but it has changed incompatibly since 2.8
+already.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/sheepdog.c | 41 +++++++++++++++++++----------------------
- 1 file changed, 19 insertions(+), 22 deletions(-)
+ block/gluster.c  | 59 +++++++++++++++++++++++++++++---------------------------
+ qapi-schema.json |  8 ++++----
+ 2 files changed, 35 insertions(+), 32 deletions(-)
 
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index c3ee4ce..0a0803e 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -2405,18 +2405,15 @@ out:
+diff --git a/block/gluster.c b/block/gluster.c
+index 64b0217..a577dae 100644
+--- a/block/gluster.c
++++ b/block/gluster.c
+@@ -152,7 +152,7 @@ static QemuOptsList runtime_type_opts = {
+         {
+             .name = GLUSTER_OPT_TYPE,
+             .type = QEMU_OPT_STRING,
+-            .help = "tcp|unix",
++            .help = "inet|unix",
+         },
+         { /* end of list */ }
+     },
+@@ -171,14 +171,14 @@ static QemuOptsList runtime_unix_opts = {
+     },
+ };
  
- #define NR_BATCHED_DISCARD 128
+-static QemuOptsList runtime_tcp_opts = {
+-    .name = "gluster_tcp",
+-    .head = QTAILQ_HEAD_INITIALIZER(runtime_tcp_opts.head),
++static QemuOptsList runtime_inet_opts = {
++    .name = "gluster_inet",
++    .head = QTAILQ_HEAD_INITIALIZER(runtime_inet_opts.head),
+     .desc = {
+         {
+             .name = GLUSTER_OPT_TYPE,
+             .type = QEMU_OPT_STRING,
+-            .help = "tcp|unix",
++            .help = "inet|unix",
+         },
+         {
+             .name = GLUSTER_OPT_HOST,
+@@ -337,14 +337,14 @@ static int qemu_gluster_parse_uri(BlockdevOptionsGluster *gconf,
  
--static bool remove_objects(BDRVSheepdogState *s)
-+static int remove_objects(BDRVSheepdogState *s, Error **errp)
- {
-     int fd, i = 0, nr_objs = 0;
--    Error *local_err = NULL;
--    int ret = 0;
--    bool result = true;
-+    int ret;
-     SheepdogInode *inode = &s->inode;
- 
--    fd = connect_to_sdog(s, &local_err);
-+    fd = connect_to_sdog(s, errp);
-     if (fd < 0) {
--        error_report_err(local_err);
--        return false;
-+        return fd;
-     }
- 
-     nr_objs = count_data_objs(inode);
-@@ -2446,15 +2443,15 @@ static bool remove_objects(BDRVSheepdogState *s)
-                                     data_vdi_id[start_idx]),
-                            false, s->cache_flags);
-         if (ret < 0) {
--            error_report("failed to discard snapshot inode.");
--            result = false;
-+            error_setg(errp, "Failed to discard snapshot inode");
-             goto out;
+     /* transport */
+     if (!uri->scheme || !strcmp(uri->scheme, "gluster")) {
+-        gsconf->type = SOCKET_ADDRESS_FLAT_TYPE_TCP;
++        gsconf->type = SOCKET_ADDRESS_FLAT_TYPE_INET;
+     } else if (!strcmp(uri->scheme, "gluster+tcp")) {
+-        gsconf->type = SOCKET_ADDRESS_FLAT_TYPE_TCP;
++        gsconf->type = SOCKET_ADDRESS_FLAT_TYPE_INET;
+     } else if (!strcmp(uri->scheme, "gluster+unix")) {
+         gsconf->type = SOCKET_ADDRESS_FLAT_TYPE_UNIX;
+         is_unix = true;
+     } else if (!strcmp(uri->scheme, "gluster+rdma")) {
+-        gsconf->type = SOCKET_ADDRESS_FLAT_TYPE_TCP;
++        gsconf->type = SOCKET_ADDRESS_FLAT_TYPE_INET;
+         error_report("Warning: rdma feature is not supported, falling "
+                      "back to tcp");
+     } else {
+@@ -374,11 +374,11 @@ static int qemu_gluster_parse_uri(BlockdevOptionsGluster *gconf,
+         }
+         gsconf->u.q_unix.path = g_strdup(qp->p[0].value);
+     } else {
+-        gsconf->u.tcp.host = g_strdup(uri->server ? uri->server : "localhost");
++        gsconf->u.inet.host = g_strdup(uri->server ? uri->server : "localhost");
+         if (uri->port) {
+-            gsconf->u.tcp.port = g_strdup_printf("%d", uri->port);
++            gsconf->u.inet.port = g_strdup_printf("%d", uri->port);
+         } else {
+-            gsconf->u.tcp.port = g_strdup_printf("%d", GLUSTER_DEFAULT_PORT);
++            gsconf->u.inet.port = g_strdup_printf("%d", GLUSTER_DEFAULT_PORT);
          }
      }
  
-+    ret = 0;
- out:
-     closesocket(fd);
--    return result;
-+    return ret;
- }
+@@ -416,15 +416,15 @@ static struct glfs *qemu_gluster_glfs_init(BlockdevOptionsGluster *gconf,
+             ret = glfs_set_volfile_server(glfs, "unix",
+                                    server->value->u.q_unix.path, 0);
+         } else {
+-            if (parse_uint_full(server->value->u.tcp.port, &port, 10) < 0 ||
++            if (parse_uint_full(server->value->u.inet.port, &port, 10) < 0 ||
+                 port > 65535) {
+                 error_setg(errp, "'%s' is not a valid port number",
+-                           server->value->u.tcp.port);
++                           server->value->u.inet.port);
+                 errno = EINVAL;
+                 goto out;
+             }
+             ret = glfs_set_volfile_server(glfs, "tcp",
+-                                   server->value->u.tcp.host,
++                                   server->value->u.inet.host,
+                                    (int)port);
+         }
  
- static int sd_snapshot_delete(BlockDriverState *bs,
-@@ -2464,7 +2461,6 @@ static int sd_snapshot_delete(BlockDriverState *bs,
- {
-     unsigned long snap_id = 0;
-     char snap_tag[SD_MAX_VDI_TAG_LEN];
--    Error *local_err = NULL;
-     int fd, ret;
-     char buf[SD_MAX_VDI_LEN + SD_MAX_VDI_TAG_LEN];
-     BDRVSheepdogState *s = bs->opaque;
-@@ -2477,8 +2473,9 @@ static int sd_snapshot_delete(BlockDriverState *bs,
-     };
-     SheepdogVdiRsp *rsp = (SheepdogVdiRsp *)&hdr;
+@@ -448,8 +448,8 @@ static struct glfs *qemu_gluster_glfs_init(BlockdevOptionsGluster *gconf,
+                                   server->value->u.q_unix.path);
+             } else {
+                 error_append_hint(errp, "hint: failed on host %s and port %s ",
+-                                  server->value->u.tcp.host,
+-                                  server->value->u.tcp.port);
++                                  server->value->u.inet.host,
++                                  server->value->u.inet.port);
+             }
+         }
  
--    if (!remove_objects(s)) {
--        return -1;
-+    ret = remove_objects(s, errp);
-+    if (ret) {
-+        return ret;
-     }
+@@ -536,21 +536,24 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
  
-     memset(buf, 0, sizeof(buf));
-@@ -2498,36 +2495,36 @@ static int sd_snapshot_delete(BlockDriverState *bs,
-         pstrcpy(buf + SD_MAX_VDI_LEN, SD_MAX_VDI_TAG_LEN, snap_tag);
-     }
+         }
+         gsconf = g_new0(SocketAddressFlat, 1);
++        if (!strcmp(ptr, "tcp")) {
++            ptr = "inet";       /* accept legacy "tcp" */
++        }
+         gsconf->type = qapi_enum_parse(SocketAddressFlatType_lookup, ptr,
+                                        SOCKET_ADDRESS_FLAT_TYPE__MAX, -1,
+                                        &local_err);
+         if (local_err) {
+             error_append_hint(&local_err,
+-                              "Parameter '%s' may be 'tcp' or 'unix'\n",
++                              "Parameter '%s' may be 'inet' or 'unix'\n",
+                               GLUSTER_OPT_TYPE);
+             error_append_hint(&local_err, GERR_INDEX_HINT, i);
+             goto out;
+         }
+         qemu_opts_del(opts);
  
--    ret = find_vdi_name(s, s->name, snap_id, snap_tag, &vid, true,
--                        &local_err);
-+    ret = find_vdi_name(s, s->name, snap_id, snap_tag, &vid, true, errp);
-     if (ret) {
-         return ret;
-     }
+-        if (gsconf->type == SOCKET_ADDRESS_FLAT_TYPE_TCP) {
+-            /* create opts info from runtime_tcp_opts list */
+-            opts = qemu_opts_create(&runtime_tcp_opts, NULL, 0, &error_abort);
++        if (gsconf->type == SOCKET_ADDRESS_FLAT_TYPE_INET) {
++            /* create opts info from runtime_inet_opts list */
++            opts = qemu_opts_create(&runtime_inet_opts, NULL, 0, &error_abort);
+             qemu_opts_absorb_qdict(opts, backing_options, &local_err);
+             if (local_err) {
+                 goto out;
+@@ -563,7 +566,7 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+                 error_append_hint(&local_err, GERR_INDEX_HINT, i);
+                 goto out;
+             }
+-            gsconf->u.tcp.host = g_strdup(ptr);
++            gsconf->u.inet.host = g_strdup(ptr);
+             ptr = qemu_opt_get(opts, GLUSTER_OPT_PORT);
+             if (!ptr) {
+                 error_setg(&local_err, QERR_MISSING_PARAMETER,
+@@ -571,28 +574,28 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+                 error_append_hint(&local_err, GERR_INDEX_HINT, i);
+                 goto out;
+             }
+-            gsconf->u.tcp.port = g_strdup(ptr);
++            gsconf->u.inet.port = g_strdup(ptr);
  
--    fd = connect_to_sdog(s, &local_err);
-+    fd = connect_to_sdog(s, errp);
-     if (fd < 0) {
--        error_report_err(local_err);
--        return -1;
-+        return fd;
-     }
+             /* defend for unsupported fields in InetSocketAddress,
+              * i.e. @ipv4, @ipv6  and @to
+              */
+             ptr = qemu_opt_get(opts, GLUSTER_OPT_TO);
+             if (ptr) {
+-                gsconf->u.tcp.has_to = true;
++                gsconf->u.inet.has_to = true;
+             }
+             ptr = qemu_opt_get(opts, GLUSTER_OPT_IPV4);
+             if (ptr) {
+-                gsconf->u.tcp.has_ipv4 = true;
++                gsconf->u.inet.has_ipv4 = true;
+             }
+             ptr = qemu_opt_get(opts, GLUSTER_OPT_IPV6);
+             if (ptr) {
+-                gsconf->u.tcp.has_ipv6 = true;
++                gsconf->u.inet.has_ipv6 = true;
+             }
+-            if (gsconf->u.tcp.has_to) {
++            if (gsconf->u.inet.has_to) {
+                 error_setg(&local_err, "Parameter 'to' not supported");
+                 goto out;
+             }
+-            if (gsconf->u.tcp.has_ipv4 || gsconf->u.tcp.has_ipv6) {
++            if (gsconf->u.inet.has_ipv4 || gsconf->u.inet.has_ipv6) {
+                 error_setg(&local_err, "Parameters 'ipv4/ipv6' not supported");
+                 goto out;
+             }
+@@ -669,7 +672,7 @@ static struct glfs *qemu_gluster_init(BlockdevOptionsGluster *gconf,
+                              "file.volume=testvol,file.path=/path/a.qcow2"
+                              "[,file.debug=9]"
+                              "[,file.logfile=/path/filename.log],"
+-                             "file.server.0.type=tcp,"
++                             "file.server.0.type=inet,"
+                              "file.server.0.host=1.2.3.4,"
+                              "file.server.0.port=24007,"
+                              "file.server.1.transport=unix,"
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 15a8f7d..32b4a4b 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -4105,14 +4105,14 @@
+ #
+ # Available SocketAddressFlat types
+ #
+-# @tcp:   Internet address
++# @inet:  Internet address
+ #
+ # @unix:  Unix domain socket
+ #
+ # Since: 2.9
+ ##
+ { 'enum': 'SocketAddressFlatType',
+-  'data': [ 'unix', 'tcp' ] }
++  'data': [ 'unix', 'inet' ] }
  
-     ret = do_req(fd, s->bs, (SheepdogReq *)&hdr,
-                  buf, &wlen, &rlen);
-     closesocket(fd);
-     if (ret) {
-+        error_setg_errno(errp, -ret, "Couldn't send request to server");
-         return ret;
-     }
+ ##
+ # @SocketAddressFlat:
+@@ -4127,7 +4127,7 @@
+ #    A flat union is nicer than simple because it avoids nesting
+ #    (i.e. more {}) on the wire.
+ #
+-# 2. SocketAddressFlat supports only types 'unix' and 'tcp', because
++# 2. SocketAddressFlat supports only types 'unix' and 'inet', because
+ #    that's what its current users need.
+ #
+ # Since: 2.9
+@@ -4136,7 +4136,7 @@
+   'base': { 'type': 'SocketAddressFlatType' },
+   'discriminator': 'type',
+   'data': { 'unix': 'UnixSocketAddress',
+-            'tcp': 'InetSocketAddress' } }
++            'inet': 'InetSocketAddress' } }
  
-     switch (rsp->result) {
-     case SD_RES_NO_VDI:
--        error_report("%s was already deleted", s->name);
-+        error_setg(errp, "Can't find the snapshot");
-+        return -ENOENT;
-     case SD_RES_SUCCESS:
-         break;
-     default:
--        error_report("%s, %s", sd_strerror(rsp->result), s->name);
--        return -1;
-+        error_setg(errp, "%s", sd_strerror(rsp->result));
-+        return -EIO;
-     }
- 
--    return ret;
-+    return 0;
- }
- 
- static int sd_snapshot_list(BlockDriverState *bs, QEMUSnapshotInfo **psn_tab)
+ ##
+ # @getfd:
 -- 
 2.7.4
