@@ -1,43 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1ckuRz-0000ww-Av
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:21:28 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ckumM-0004eh-3E
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:42:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1ckuRu-0000sb-C8
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:21:27 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45554)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1ckuRu-0000r6-2L
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:21:22 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v26F8arO070043
-	for <qemu-devel@nongnu.org>; Mon, 6 Mar 2017 10:21:19 -0500
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2917pm01n7-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 06 Mar 2017 10:21:19 -0500
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Mon, 6 Mar 2017 15:21:17 -0000
-References: <20170302185942.76255-1-pasic@linux.vnet.ibm.com>
-	<20170303132149.34e5906a.cornelia.huck@de.ibm.com>
-	<aa9b9219-f3a6-165c-2d92-156a9295adbb@linux.vnet.ibm.com>
-	<20170303135012.17edb640.cornelia.huck@de.ibm.com>
-	<d00802cc-150a-2263-604d-9c2eaa5c19d1@linux.vnet.ibm.com>
-	<20170306155625.5c426793.cornelia.huck@de.ibm.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Mon, 6 Mar 2017 16:21:13 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1ckumK-0006FW-Nz
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:42:30 -0500
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:37870)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ckumK-0006E5-FE
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:42:28 -0500
+Received: by mail-wm0-x236.google.com with SMTP id n11so67962641wma.0
+	for <qemu-devel@nongnu.org>; Mon, 06 Mar 2017 07:42:28 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20170306155625.5c426793.cornelia.huck@de.ibm.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Message-Id: <bf1f8af2-9d76-c148-24c5-7d00312c10d4@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] virtio: fail device if
- set_event_notifier fails
+In-Reply-To: <20170306071721.26708-2-ppandit@redhat.com>
+References: <20170306071721.26708-1-ppandit@redhat.com>
+	<20170306071721.26708-2-ppandit@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 6 Mar 2017 15:42:06 +0000
+Message-ID: <CAFEAcA-hOsVBnw9gh-VBCr3Q7-+_m-2X3zHRuRnmzDLF8CmsZQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] linux-user: limit number of
+ arguments to execve
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,58 +30,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: P J P <ppandit@redhat.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Jann Horn <jannh@google.com>, Prasad J Pandit <pjp@fedoraproject.org>
+
+On 6 March 2017 at 07:17, P J P <ppandit@redhat.com> wrote:
+> From: Prasad J Pandit <pjp@fedoraproject.org>
+>
+> Limit the number of arguments passed to execve(2) call from
+> a user program, as large number of them could lead to a bad
+> guest address error.
+>
+> Reported-by: Jann Horn <jannh@google.com>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> ---
+>  linux-user/syscall.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> Update per: use gemu_log() to report error
+>   -> https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg00750.html
+>
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 9be8e95..86a4a9c 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -7766,6 +7766,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+>  #endif
+>      case TARGET_NR_execve:
+>          {
+> +#define ARG_MAX 65535
+>              char **argp, **envp;
+>              int argc, envc;
+>              abi_ulong gp;
+> @@ -7794,6 +7795,11 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+>                  envc++;
+>              }
+>
+> +            if (argc > ARG_MAX || envc > ARG_MAX) {
+> +                gemu_log("argc(%d), envc(%d) exceed %d\n", argc, envc, ARG_MAX);
+> +                ret = -TARGET_E2BIG;
+> +                break;
+> +            }
+>              argp = alloca((argc + 1) * sizeof(void *));
+>              envp = alloca((envc + 1) * sizeof(void *));
 
 
+We need to fix this by not using alloca(), not by imposing
+an arbitrary limit that's still rather over-large for an
+alloca allocation, as Eric suggested.
 
-On 03/06/2017 03:56 PM, Cornelia Huck wrote:
-> On Fri, 3 Mar 2017 14:08:37 +0100
-> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-> 
->> On 03/03/2017 01:50 PM, Cornelia Huck wrote:
->>> On Fri, 3 Mar 2017 13:43:32 +0100
->>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
->>>
->>>> On 03/03/2017 01:21 PM, Cornelia Huck wrote:
->>>>> On Thu,  2 Mar 2017 19:59:42 +0100
->>>>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-[...]
->> I admit, I did not investigate this thoroughly, also because the patch
->> is flawed regarding multi-thread anyway. After a quick investigation
->> it seems the linux guest won't auto-reset the device so the guest should
->> end up with a not working device. I think it's pretty likely that the
->> admin will check the logs if the device was important.
-> 
-> Thinking a bit more about this, it seems setting the device broken is
-> not the right solution for exactly that reason. Setting the virtio
-> device broken is a way to signal the guest to 'you did something
-> broken; please reset the device and start anew' (and that's how current
-> callers use it). In our case, this is not the guest's fault.
-
-Do we have something to just say stuff broken without blaming the guest?
-And device reset might not be that stupid at all in the given situation,
-if we want to save what can be saved from the perspective of the guest.
-(After reset stuff should work again until we hit the race again -- and
-since turning ioeventfd on/off should not happen that often during normal
-operation it could help limit damage suffered -- e.g. controlled shutdown).
-
-> 
-> Maybe go back to the assert 'solution'? But I'm not sure that's enough
-> if production builds disable asserts...
-> 
-
-I will wait a bit, maybe other virtio folks are going to have an 
-opinion too.
-
-My concern about the assert solution is that for production it is
-either too rigorous (kill off, hopefully with a dump) or not
-enough (as you have mentioned, if NDEBUG assert does nothing).
-
-
-I think there are setups where a loss of device does not have to be
-fatal, and I would not like to be the one who makes it fatal (for the
-guest).
-
-Regards,
-Halil
+thanks
+-- PMM
