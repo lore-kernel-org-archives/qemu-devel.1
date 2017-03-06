@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ckvPA-0002ah-B4
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 11:22:37 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ckvPC-0002ck-6v
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 11:22:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ckvP9-0001CO-Er
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 11:22:36 -0500
+	(envelope-from <kwolf@redhat.com>) id 1ckvPB-0001DK-A4
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 11:22:38 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon,  6 Mar 2017 17:21:57 +0100
-Message-Id: <1488817322-11397-6-git-send-email-kwolf@redhat.com>
+Date: Mon,  6 Mar 2017 17:21:59 +0100
+Message-Id: <1488817322-11397-8-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1488817322-11397-1-git-send-email-kwolf@redhat.com>
 References: <1488817322-11397-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 05/10] block: Fix blockdev-snapshot error
- handling
+Subject: [Qemu-devel] [PATCH 07/10] block: Factor out
+ bdrv_replace_child_noperm()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,50 +23,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-For blockdev-snapshot, external_snapshot_prepare() accepts an arbitrary
-node reference at first and only checks later whether it already has a
-backing file. Between those places, other errors can occur.
-
-Therefore checking in external_snapshot_abort() whether state->new_bs
-has a backing file is not sufficient to tell whether bdrv_append() was
-already completed or not. Trying to undo the bdrv_append() when it
-wasn't even executed is wrong.
-
-Introduce a new boolean flag in the state to fix this.
-
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- blockdev.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ block.c | 38 +++++++++++++++++++++++++-------------
+ 1 file changed, 25 insertions(+), 13 deletions(-)
 
-diff --git a/blockdev.c b/blockdev.c
-index 8eb4e84..af67ce4 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -1614,6 +1614,7 @@ typedef struct ExternalSnapshotState {
-     BlockDriverState *old_bs;
-     BlockDriverState *new_bs;
-     AioContext *aio_context;
-+    bool overlay_appended;
- } ExternalSnapshotState;
- 
- static void external_snapshot_prepare(BlkActionState *common,
-@@ -1780,6 +1781,7 @@ static void external_snapshot_prepare(BlkActionState *common,
-         error_propagate(errp, local_err);
-         return;
-     }
-+    state->overlay_appended = true;
+diff --git a/block.c b/block.c
+index 6dc02b8..d4570c8 100644
+--- a/block.c
++++ b/block.c
+@@ -1713,11 +1713,10 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
+     *nshared = shared;
  }
  
- static void external_snapshot_commit(BlkActionState *common)
-@@ -1803,7 +1805,7 @@ static void external_snapshot_abort(BlkActionState *common)
-     ExternalSnapshotState *state =
-                              DO_UPCAST(ExternalSnapshotState, common, common);
-     if (state->new_bs) {
--        if (state->new_bs->backing) {
-+        if (state->overlay_appended) {
-             bdrv_replace_in_backing_chain(state->new_bs, state->old_bs);
+-static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs,
+-                               bool check_new_perm)
++static void bdrv_replace_child_noperm(BdrvChild *child,
++                                      BlockDriverState *new_bs)
+ {
+     BlockDriverState *old_bs = child->bs;
+-    uint64_t perm, shared_perm;
+ 
+     if (old_bs) {
+         if (old_bs->quiesce_counter && child->role->drained_end) {
+@@ -1727,7 +1726,29 @@ static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs,
+             child->role->detach(child);
          }
+         QLIST_REMOVE(child, next_parent);
++    }
++
++    child->bs = new_bs;
++
++    if (new_bs) {
++        QLIST_INSERT_HEAD(&new_bs->parents, child, next_parent);
++        if (new_bs->quiesce_counter && child->role->drained_begin) {
++            child->role->drained_begin(child);
++        }
++
++        if (child->role->attach) {
++            child->role->attach(child);
++        }
++    }
++}
+ 
++static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs,
++                               bool check_new_perm)
++{
++    BlockDriverState *old_bs = child->bs;
++    uint64_t perm, shared_perm;
++
++    if (old_bs) {
+         /* Update permissions for old node. This is guaranteed to succeed
+          * because we're just taking a parent away, so we're loosening
+          * restrictions. */
+@@ -1736,23 +1757,14 @@ static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs,
+         bdrv_set_perm(old_bs, perm, shared_perm);
      }
+ 
+-    child->bs = new_bs;
++    bdrv_replace_child_noperm(child, new_bs);
+ 
+     if (new_bs) {
+-        QLIST_INSERT_HEAD(&new_bs->parents, child, next_parent);
+-        if (new_bs->quiesce_counter && child->role->drained_begin) {
+-            child->role->drained_begin(child);
+-        }
+-
+         bdrv_get_cumulative_perm(new_bs, &perm, &shared_perm);
+         if (check_new_perm) {
+             bdrv_check_perm(new_bs, perm, shared_perm, &error_abort);
+         }
+         bdrv_set_perm(new_bs, perm, shared_perm);
+-
+-        if (child->role->attach) {
+-            child->role->attach(child);
+-        }
+     }
+ }
+ 
 -- 
 1.8.3.1
