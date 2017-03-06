@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ckzg6-0000Om-Tl
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 15:56:23 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ckzgY-0000ff-Je
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 15:56:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1ckzg5-0004US-W9
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 15:56:23 -0500
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:33800)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1ckzg5-0004UN-RJ
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 15:56:21 -0500
-Received: by mail-qk0-x243.google.com with SMTP id v125so9349688qkh.1
-	for <qemu-devel@nongnu.org>; Mon, 06 Mar 2017 12:56:21 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Date: Tue,  7 Mar 2017 07:56:09 +1100
-Message-Id: <20170306205609.6525-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH] target/alpha: Take BQL around clock
- manipulations
+	(envelope-from <pbonzini@redhat.com>) id 1ckzgU-0004cf-US
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 15:56:50 -0500
+Received: from mx5-phx2.redhat.com ([209.132.183.37]:39686)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ckzgU-0004aL-Ko
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 15:56:46 -0500
+Date: Mon, 6 Mar 2017 15:56:35 -0500 (EST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1394881299.29178732.1488833795531.JavaMail.zimbra@redhat.com>
+In-Reply-To: <986fbee4-e620-802d-b985-f732768ad039@genode-labs.com>
+References: <49fcb3c4-df9d-ec64-2927-71c02fc2524b@genode-labs.com>
+	<87k282im0q.fsf@linaro.org>
+	<6515bcf7-e3cd-21b4-746b-c386b1296d88@genode-labs.com>
+	<87innmii02.fsf@linaro.org>
+	<d208c3f0-2e57-0b54-f18f-b5e27d698e28@genode-labs.com>
+	<87h936ida2.fsf@linaro.org>
+	<986fbee4-e620-802d-b985-f732768ad039@genode-labs.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Qemu deadlocks in tb_lock when using SVM+SoftMMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,81 +32,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, pbonzini@redhat.com
-
-Signed-off-by: Richard Henderson <rth@twiddle.net>
----
-This is similar to the patch that I saw go by for MIPS.
-
-I hadn't noticed any problems caused by this lack of locking.  This may
-be because interrupts cannot be delivered while in PALmode while these
-registers are being manipulated.  However, it's always better to obey
-the rules, right?
+To: Alexander Boettcher <alexander.boettcher@genode-labs.com>
+Cc: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org, rth@twiddle.net, fred konrad <fred.konrad@greensocs.com>, crosthwaite peter <crosthwaite.peter@gmail.com>
 
 
-r~
----
- target/alpha/sys_helper.c | 21 +++++++++++++++++----
- 1 file changed, 17 insertions(+), 4 deletions(-)
 
-diff --git a/target/alpha/sys_helper.c b/target/alpha/sys_helper.c
-index 652195d..6feb30b 100644
---- a/target/alpha/sys_helper.c
-+++ b/target/alpha/sys_helper.c
-@@ -28,11 +28,14 @@
- uint64_t helper_load_pcc(CPUAlphaState *env)
- {
- #ifndef CONFIG_USER_ONLY
-+    uint64_t pcc;
-     /* In system mode we have access to a decent high-resolution clock.
-        In order to make OS-level time accounting work with the RPCC,
-        present it with a well-timed clock fixed at 250MHz.  */
--    return (((uint64_t)env->pcc_ofs << 32)
--            | (uint32_t)(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) >> 2));
-+    qemu_mutex_lock_iothread();
-+    pcc = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) >> 2;
-+    qemu_mutex_unlock_iothread();
-+    return deposit64(pcc, 32, 32, env->pcc_ofs);
- #else
-     /* In user-mode, QEMU_CLOCK_VIRTUAL doesn't exist.  Just pass through the host cpu
-        clock ticks.  Also, don't bother taking PCC_OFS into account.  */
-@@ -68,24 +71,34 @@ void helper_halt(uint64_t restart)
- 
- uint64_t helper_get_vmtime(void)
- {
--    return qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    uint64_t ret;
-+    qemu_mutex_lock_iothread();
-+    ret = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    qemu_mutex_unlock_iothread();
-+    return ret;
- }
- 
- uint64_t helper_get_walltime(void)
- {
--    return qemu_clock_get_ns(rtc_clock);
-+    uint64_t ret;
-+    qemu_mutex_lock_iothread();
-+    ret = qemu_clock_get_ns(rtc_clock);
-+    qemu_mutex_unlock_iothread();
-+    return ret;
- }
- 
- void helper_set_alarm(CPUAlphaState *env, uint64_t expire)
- {
-     AlphaCPU *cpu = alpha_env_get_cpu(env);
- 
-+    qemu_mutex_lock_iothread();
-     if (expire) {
-         env->alarm_expire = expire;
-         timer_mod(cpu->alarm_timer, expire);
-     } else {
-         timer_del(cpu->alarm_timer);
-     }
-+    qemu_mutex_unlock_iothread();
- }
- 
- #endif /* CONFIG_USER_ONLY */
--- 
-2.9.3
+----- Original Message -----
+> From: "Alexander Boettcher" <alexander.boettcher@genode-labs.com>
+> To: "Alex Benn=C3=A9e" <alex.bennee@linaro.org>
+> Cc: qemu-devel@nongnu.org, rth@twiddle.net, "fred konrad" <fred.konrad@gr=
+eensocs.com>, pbonzini@redhat.com,
+> "crosthwaite peter" <crosthwaite.peter@gmail.com>
+> Sent: Monday, March 6, 2017 9:11:04 PM
+> Subject: Re: Qemu deadlocks in tb_lock when using SVM+SoftMMU
+>=20
+> Hello,
+>=20
+> thank you for your effort.
+>=20
+> With your patch I get now a 0x3f exception shown by the hypervisor,
+> which I have never encountered so far before. The guest kernel seems not
+> to start, at least no life sign is shown.
+>=20
+> For me the patch of Paolo Bonzini works reliable.
+
+Let's use mine then. :)  I'll post it properly tomorrow.
+
+Paolo
+
+> How to proceed ?
+>=20
+> Thanks,
+>=20
+> Alex.
+>=20
+> On 06.03.2017 17:24, Alex Benn=C3=A9e wrote:
+> >=20
+> > Alexander Boettcher <alexander.boettcher@genode-labs.com> writes:
+> >=20
+> >> Hi,
+> > <snip>
+> >>
+> >> Sometimes Qemu just succeeds if the timing is well, will see.
+> >>
+> >> But this is not the point of this issue atm.
+> >=20
+> > I've sent a patch that works as Richard suggested. However your test
+> > image seems to run into other issues. I have tested it on my known good
+> > x86 image and it works.
+> >=20
+> > However my knowledge of x86's interrupt architecture is fairly minimal
+> > so I'm looking for testing/feedback on the patch.
+> >=20
+> >>
+> >> Alex.
+> >=20
+> >=20
+> > --
+> > Alex Benn=C3=A9e
+> >=20
+>=20
+> --
+> Alexander Boettcher
+> Genode Labs
+>=20
+> http://www.genode-labs.com - http://www.genode.org
+>=20
+> Genode Labs GmbH - Amtsgericht Dresden - HRB 28424 - Sitz Dresden
+> Gesch=C3=A4ftsf=C3=BChrer: Dr.-Ing. Norman Feske, Christian Helmuth
+>=20
