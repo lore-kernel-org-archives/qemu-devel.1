@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44194)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <k.kozlowski.k@gmail.com>) id 1ckwMe-0001i6-M5
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 12:24:05 -0500
+	(envelope-from <groug@kaod.org>) id 1ckwq7-0005GX-UV
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 12:54:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <k.kozlowski.k@gmail.com>) id 1ckwMd-0004zR-RO
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 12:24:04 -0500
-Date: Mon, 6 Mar 2017 19:23:46 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Message-ID: <20170306172346.2f7guqfhzzlzmnfq@kozik-lap>
-References: <20170305214857.9510-1-krzk@kernel.org>
-	<20170305214857.9510-3-krzk@kernel.org>
-	<2130c1b2-0f81-13f6-a1f8-c0a2e294e3f0@amsat.org>
+	(envelope-from <groug@kaod.org>) id 1ckwq4-0005bx-OQ
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 12:54:32 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40709)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ckwq4-0005bV-FM
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 12:54:28 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v26HrkcV123017
+	for <qemu-devel@nongnu.org>; Mon, 6 Mar 2017 12:54:25 -0500
+Received: from e06smtp06.uk.ibm.com (e06smtp06.uk.ibm.com [195.75.94.102])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 291814paqj-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 06 Mar 2017 12:54:25 -0500
+Received: from localhost
+	by e06smtp06.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Mon, 6 Mar 2017 17:54:22 -0000
+From: Greg Kurz <groug@kaod.org>
+Date: Mon,  6 Mar 2017 18:54:04 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <2130c1b2-0f81-13f6-a1f8-c0a2e294e3f0@amsat.org>
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 3/3] hw/misc/exynos4210_pmu:
- Reorder local variables for readability
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Message-Id: <1488822850-23070-1-git-send-email-groug@kaod.org>
+Subject: [Qemu-devel] [PULL 0/6] 9pfs fixes for 2.9 2017-03-06
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,55 +37,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>
 
-On Mon, Mar 06, 2017 at 01:06:29AM -0300, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Krzysztof,
->=20
-> On 03/05/2017 06:48 PM, Krzysztof Kozlowski wrote:
-> > Short declaration of 'i' was in the middle of declarations with
-> > assignments.  Make it a little bit more readable.  No functional change.
-> >=20
-> > Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
-> > ---
-> >  hw/misc/exynos4210_pmu.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/hw/misc/exynos4210_pmu.c b/hw/misc/exynos4210_pmu.c
-> > index cbdfa0614600..60d1545c0baa 100644
-> > --- a/hw/misc/exynos4210_pmu.c
-> > +++ b/hw/misc/exynos4210_pmu.c
-> > @@ -401,8 +401,8 @@ static uint64_t exynos4210_pmu_read(void *opaque, h=
-waddr offset,
-> >                                      unsigned size)
-> >  {
-> >      const Exynos4210PmuState *s =3D (Exynos4210PmuState *)opaque;
-> > -    unsigned i;
-> >      const Exynos4210PmuReg *reg_p =3D exynos4210_pmu_regs;
-> > +    unsigned i;
->=20
-> your change seems OK but while you are here, 'unsigned' is considered
-> harmful since more than a decade. why not use 'size_t i' since
-> PMU_NUM_OF_REGISTERS is indeed an ARRAY_SIZE()?
+The following changes since commit 56b51708e9e22809d2a78f38d0ac84bb3f3fca92:
 
-It is a loop counter. I think "unsigned int" for loop counters is the
-most common pattern - easy to understand the true meaning of variable.
-I can expand it to "unsigned int" but that wouldn't change much...
+  Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-2.9-20170306' into staging (2017-03-06 13:06:30 +0000)
 
-Let's look at current style:
-$ git grep "unsigned int i[,;$]" | wc -l
-188
+are available in the git repository at:
 
-$ git grep "unsigned i[,;$]" | wc -l
-92
+  https://github.com/gkurz/qemu.git tags/fixes-for-2.9
 
-$ git grep "size_t i[,;$]" | wc -l
-114
+for you to fetch changes up to b003fc0d8aa5e7060dbf7e5862b8013c73857c7f:
 
-=2E.. where do we go now?
+  9pfs: fix vulnerability in openat_dir() and local_unlinkat_common() (2017-03-06 17:34:01 +0100)
 
+----------------------------------------------------------------
+Fixes issues that got merged with the latest pull request:
+- missing O_NOFOLLOW flag for CVE-2016-960
+- build break with older glibc that don't have O_PATH and AT_EMPTY_PATH
+- various bugs reported by Coverity
 
+----------------------------------------------------------------
+Greg Kurz (6):
+      9pfs: fix bogus fd check in local_remove()
+      9pfs: fix fd leak in local_opendir()
+      9pfs: fail local_statfs() earlier
+      9pfs: don't use AT_EMPTY_PATH in local_set_cred_passthrough()
+      9pfs: fix O_PATH build break with older glibc versions
+      9pfs: fix vulnerability in openat_dir() and local_unlinkat_common()
 
-Best regards,
-Krzysztof
+ hw/9pfs/9p-local.c | 10 +++++++---
+ hw/9pfs/9p-util.h  |  8 +++++++-
+ 2 files changed, 14 insertions(+), 4 deletions(-)
+-- 
+2.7.4
