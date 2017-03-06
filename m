@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1ckpUh-0006Jy-GI
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 05:03:57 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1ckpsN-0001MD-T6
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 05:28:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1ckpUd-0007kw-GK
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 05:03:55 -0500
-Received: from [59.151.112.132] (port=27175 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1ckpUc-0007iP-FA
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 05:03:51 -0500
-References: <20170202150530.1025-1-pbonzini@redhat.com>
-	<20170203150050.GF642@stefanha-x1.localdomain>
-	<55b46fa3-c861-9ba4-da65-25bc392d8900@redhat.com>
-	<20170206115659.GC2524@work-vm>
-	<58B970DD0200004800140A13@prv-mh.provo.novell.com>
-	<20170306090759.GA2394@work-vm>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <5bac684d-b80d-04cf-4558-dec67e4c246e@cn.fujitsu.com>
-Date: Mon, 6 Mar 2017 18:03:11 +0800
+	(envelope-from <alex.bennee@linaro.org>) id 1ckpsK-0006tB-NF
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 05:28:23 -0500
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:36147)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1ckpsK-0006sv-DJ
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 05:28:20 -0500
+Received: by mail-wr0-x236.google.com with SMTP id u108so112983492wrb.3
+	for <qemu-devel@nongnu.org>; Mon, 06 Mar 2017 02:28:20 -0800 (PST)
+References: <20170302195337.31558-1-alex.bennee@linaro.org>
+	<20170302195337.31558-7-alex.bennee@linaro.org>
+	<2ff07353-5044-277a-4c39-48f86756443e@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <2ff07353-5044-277a-4c39-48f86756443e@redhat.com>
+Date: Mon, 06 Mar 2017 10:28:25 +0000
+Message-ID: <87o9xeitrq.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170306090759.GA2394@work-vm>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH] configure: remove
- --enable-replication/--disable-replication
+Subject: Re: [Qemu-devel] [PATCH v2 06/11] sparc/sparc64: grab BQL before
+ calling cpu_check_irqs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,129 +32,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Bruce Rogers <brogers@suse.com>
-Cc: zhangchen.fnst@cn.fujitsu.com, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: peter.maydell@linaro.org, rth@twiddle.net, qemu-devel@nongnu.org, mttcg@greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
 
 
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-On 03/06/2017 05:08 PM, Dr. David Alan Gilbert wrote:
-> * Bruce Rogers (brogers@suse.com) wrote:
->>>>> On 2/6/2017 at 4:57 AM, <dgilbert@redhat.com> wrote:
->>> * Paolo Bonzini (pbonzini@redhat.com) wrote:
->>>>
->>>> On 03/02/2017 07:00, Stefan Hajnoczi wrote:
->>>>> On Thu, Feb 02, 2017 at 07:05:30AM ‑0800, Paolo Bonzini wrote:
->>>>>> The replication feature is a small amount of code, does not
->>>>>> require any external library and unless used does not add
->>>>>> anything to the guest's attack surface.  Since any extra
->>>>>> configure option affects maintainability on the other hand
->>>>>> and is subject to bit rot, I think there is no need to
->>>>>> make it configurable.
->>>>> I think the current state is good: replication is enabled by default but
->>>>> can be compiled out if desired.
->>>>>
->>>>> Downstreams may not be comfortable supporting this feature yet since
->>>>> it's incomplete.  It's fair to offer an option to disable it, otherwise
->>>>> downstreams will have to patch this themselves.
->>>> I understand‑‑‑I just am not sure where to draw the line because there's
->>>> plenty of other incomplete features, hence the RFC.  For example,
->>>> record/replay cannot be enabled or disabled on the configure command
->>>> line.  That was the case even in the beginning, where it didn't support
->>>> either block or character device replay.
->>> The line is certainly fuzzy, but I think it's worth making the following
->>> type of things configurable:
->>>     Features that have a large chunk of code
->>>       ‑ dont lets try and configure tiny things on and off
->>>     That can be trivially configured
->>>       ‑ lets not put big chunks of code around making them configurable
->>> and   that are incomplete
->>>     or are unused by large chunks of the users
->>>
->>> Dave
->>>
->>>> ‑‑enable‑coroutine‑pool is a relic of when Windows builds needed it, but
->>>> all other ‑‑enable‑* options require an external library or at least a
->>>> specific operating system.  See for example this patch:
->>>>
->>>>      commit 52b53c04faab9f7a9879c8dc014930649a3e698d
->>>>      Author: Fam Zheng <famz@redhat.com>
->>>>      Date:   Wed Sep 10 14:17:51 2014 +0800
->>>>
->>>>      block: Always compile virtio‑blk dataplane
->>>>
->>>>      Dataplane doesn't depend on linux‑aio any more, so we don't need the
->>>>      compiling condition now.
->>>>
->>>>      Configure options are kept but just print a message.
->>>>
->>>>      Signed‑off‑by: Fam Zheng <famz@redhat.com>
->>>>      Reviewed‑by: Paolo Bonzini <pbonzini@redhat.com>
->>>>      Message‑id: 1410329871‑28885‑4‑git‑send‑email‑famz@redhat.com
->>>>      Signed‑off‑by: Stefan Hajnoczi <stefanha@redhat.com>
->>>>
->>>>
->>>> I would actually prefer to remove many of the latter
->>>> (‑‑enable‑vhost‑net, ‑‑enable‑vhost‑scsi, ‑‑enable‑vhost‑socket) and
->>>> just use default‑configs.  We are already doing it for ivshmem for example:
->>>>
->>>>      CONFIG_IVSHMEM=$(CONFIG_EVENTFD)
->>>>
->>>> Paolo
->>> ‑‑
->>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->> Was there ever a conclusion here? The reason I ask is that I see that currently
->> using --disable-replication fails for me as follows:
+> On 02/03/2017 20:53, Alex Bennée wrote:
+>> IRQ modification is part of device emulation and should be done while
+>> the BQL is held to prevent races when MTTCG is enabled. This adds
+>> assertions in the hw emulation layer and wraps the calls from helpers
+>> in the BQL.
 >>
->> # ./configure --disable-replication
->> ...
->> # make
->> ...
->> make  all-recursive
->> Making all in pixman
->> make[3]: Nothing to be done for 'all'.
->> Making all in demos
->> make[3]: Nothing to be done for 'all'.
->> Making all in test
->> make[3]: Nothing to be done for 'all'.
->> 	CHK version_gen.h
->>    LINK    aarch64-softmmu/qemu-system-aarch64
->> ../migration/colo.o: In function `qmp_query_xen_replication_status':
->> /home/brogers/osr/git/qemu/migration/colo.c:181: undefined reference to `replication_get_error_all'
->> ../migration/colo.o: In function `qmp_xen_set_replication':
->> /home/brogers/osr/git/qemu/migration/colo.c:172: undefined reference to `replication_stop_all'
->> /home/brogers/osr/git/qemu/migration/colo.c:172: undefined reference to `replication_stop_all'
->> /home/brogers/osr/git/qemu/migration/colo.c:167: undefined reference to `replication_start_all'
->> ../migration/colo.o: In function `qmp_xen_colo_do_checkpoint':
->> /home/brogers/osr/git/qemu/migration/colo.c:196: undefined reference to `replication_do_checkpoint_all'
->> collect2: error: ld returned 1 exit status
->> make[1]: *** [Makefile:208: qemu-system-aarch64] Error 1
->> make: *** [Makefile:322: subdir-aarch64-softmmu] Error 2
-> We should fix that.
-
-COLO needs replication enable.
-So, should I add a new option enable/disable COLO ?
-Then, If you disable replication, colo will be disabled automatically.
-Like that:
-# ./configure --disable-colo
-
-
-Thanks
-Zhang Chen
-
->
-> Dave
->
->> -- 
->> Bruce
->>   
+>> Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>> ---
+>>  hw/sparc/sun4m.c            |  3 +++
+>>  hw/sparc64/sparc64.c        |  3 +++
+>>  target/sparc/int64_helper.c |  3 +++
+>>  target/sparc/win_helper.c   | 11 +++++++++++
+>>  4 files changed, 20 insertions(+)
 >>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+>> index 61416a6426..873cd7df9a 100644
+>> --- a/hw/sparc/sun4m.c
+>> +++ b/hw/sparc/sun4m.c
+>> @@ -142,6 +142,9 @@ void cpu_check_irqs(CPUSPARCState *env)
+>>  {
+>>      CPUState *cs;
+>>
+>> +    /* We should be holding the BQL before we mess with IRQs */
+>> +    g_assert(qemu_mutex_iothread_locked());
+>> +
+>>      if (env->pil_in && (env->interrupt_index == 0 ||
+>>                          (env->interrupt_index & ~15) == TT_EXTINT)) {
+>>          unsigned int i;
+>> diff --git a/hw/sparc64/sparc64.c b/hw/sparc64/sparc64.c
+>> index b3d219c769..4e4fdab065 100644
+>> --- a/hw/sparc64/sparc64.c
+>> +++ b/hw/sparc64/sparc64.c
+>> @@ -55,6 +55,9 @@ void cpu_check_irqs(CPUSPARCState *env)
+>>      uint32_t pil = env->pil_in |
+>>                    (env->softint & ~(SOFTINT_TIMER | SOFTINT_STIMER));
+>>
+>> +    /* We should be holding the BQL before we mess with IRQs */
+>> +    g_assert(qemu_mutex_iothread_locked());
+>> +
+>>      /* TT_IVEC has a higher priority (16) than TT_EXTINT (31..17) */
+>>      if (env->ivec_status & 0x20) {
+>>          return;
+>> diff --git a/target/sparc/int64_helper.c b/target/sparc/int64_helper.c
+>> index 605747c93c..f942973c22 100644
+>> --- a/target/sparc/int64_helper.c
+>> +++ b/target/sparc/int64_helper.c
+>> @@ -18,6 +18,7 @@
+>>   */
+>>
+>>  #include "qemu/osdep.h"
+>> +#include "qemu/main-loop.h"
+>>  #include "cpu.h"
+>>  #include "exec/helper-proto.h"
+>>  #include "exec/log.h"
+>> @@ -208,7 +209,9 @@ static bool do_modify_softint(CPUSPARCState *env, uint32_t value)
+>>          env->softint = value;
+>>  #if !defined(CONFIG_USER_ONLY)
+>>          if (cpu_interrupts_enabled(env)) {
+>> +            qemu_mutex_lock_iothread();
+>>              cpu_check_irqs(env);
+>> +            qemu_mutex_unlock_iothread();
+>>          }
+>>  #endif
+>>          return true;
+>> diff --git a/target/sparc/win_helper.c b/target/sparc/win_helper.c
+>> index 71b3dd37e8..b387b026d8 100644
+>> --- a/target/sparc/win_helper.c
+>> +++ b/target/sparc/win_helper.c
+>> @@ -18,6 +18,7 @@
+>>   */
+>>
+>>  #include "qemu/osdep.h"
+>> +#include "qemu/main-loop.h"
+>>  #include "cpu.h"
+>>  #include "exec/exec-all.h"
+>>  #include "exec/helper-proto.h"
+>> @@ -86,7 +87,9 @@ void cpu_put_psr(CPUSPARCState *env, target_ulong val)
+>>  {
+>>      cpu_put_psr_raw(env, val);
+>>  #if ((!defined(TARGET_SPARC64)) && !defined(CONFIG_USER_ONLY))
+>> +    qemu_mutex_lock_iothread();
+>>      cpu_check_irqs(env);
+>> +    qemu_mutex_unlock_iothread();
+>>  #endif
+>>  }
 >
->
-> .
->
+> This can be called from gdbstub, so you need to put the lock/unlock
+> around helper_wrpsr's call to cpu_put_psr instead.  Also please add a
+> comment /* Called with BQL held.  */ around cpu_put_psr.
 
--- 
-Thanks
-Zhang Chen
+OK will do. I have to say its hard to see the gdbstub being under the
+BQL. Is this a feature of the packet handling being done in the main IO
+thread?
+
+>
+> Paolo
+>
+>> @@ -368,7 +371,9 @@ void helper_wrpstate(CPUSPARCState *env, target_ulong new_state)
+>>
+>>  #if !defined(CONFIG_USER_ONLY)
+>>      if (cpu_interrupts_enabled(env)) {
+>> +        qemu_mutex_lock_iothread();
+>>          cpu_check_irqs(env);
+>> +        qemu_mutex_unlock_iothread();
+>>      }
+>>  #endif
+>>  }
+>> @@ -381,7 +386,9 @@ void helper_wrpil(CPUSPARCState *env, target_ulong new_pil)
+>>      env->psrpil = new_pil;
+>>
+>>      if (cpu_interrupts_enabled(env)) {
+>> +        qemu_mutex_lock_iothread();
+>>          cpu_check_irqs(env);
+>> +        qemu_mutex_unlock_iothread();
+>>      }
+>>  #endif
+>>  }
+>> @@ -408,7 +415,9 @@ void helper_done(CPUSPARCState *env)
+>>
+>>  #if !defined(CONFIG_USER_ONLY)
+>>      if (cpu_interrupts_enabled(env)) {
+>> +        qemu_mutex_lock_iothread();
+>>          cpu_check_irqs(env);
+>> +        qemu_mutex_unlock_iothread();
+>>      }
+>>  #endif
+>>  }
+>> @@ -435,7 +444,9 @@ void helper_retry(CPUSPARCState *env)
+>>
+>>  #if !defined(CONFIG_USER_ONLY)
+>>      if (cpu_interrupts_enabled(env)) {
+>> +        qemu_mutex_lock_iothread();
+>>          cpu_check_irqs(env);
+>> +        qemu_mutex_unlock_iothread();
+>>      }
+>>  #endif
+>>  }
+>>
+
+
+--
+Alex Bennée
