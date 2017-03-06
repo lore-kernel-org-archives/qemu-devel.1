@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60998)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alexander.boettcher@genode-labs.com>)
-	id 1ckuIi-00071g-59
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:11:53 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1ckuK9-0007ie-Lq
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:13:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alexander.boettcher@genode-labs.com>)
-	id 1ckuIf-00071b-06
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:11:52 -0500
-Received: from mail.genode-labs.com ([88.198.56.169]:35884)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alexander.boettcher@genode-labs.com>)
-	id 1ckuIe-00071L-PP
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:11:48 -0500
-References: <49fcb3c4-df9d-ec64-2927-71c02fc2524b@genode-labs.com>
-	<87k282im0q.fsf@linaro.org>
-	<6515bcf7-e3cd-21b4-746b-c386b1296d88@genode-labs.com>
-	<87innmii02.fsf@linaro.org>
-From: Alexander Boettcher <alexander.boettcher@genode-labs.com>
-Message-ID: <d208c3f0-2e57-0b54-f18f-b5e27d698e28@genode-labs.com>
-Date: Mon, 6 Mar 2017 16:11:43 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1ckuK8-0007UQ-Lf
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:13:21 -0500
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:36847)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ckuK8-0007UD-FR
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:13:20 -0500
+Received: by mail-wm0-x22c.google.com with SMTP id n11so66555357wma.1
+	for <qemu-devel@nongnu.org>; Mon, 06 Mar 2017 07:13:20 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <87innmii02.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Qemu deadlocks in tb_lock when using SVM+SoftMMU
+In-Reply-To: <20170306040823.28482-1-david@gibson.dropbear.id.au>
+References: <20170306040823.28482-1-david@gibson.dropbear.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 6 Mar 2017 15:12:58 +0000
+Message-ID: <CAFEAcA8EvwQ0AoudyHFQw+hNDUa7E8_ia6A8xouDP5V5amzkFw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 0/5] ppc-for-2.9 queue 20170306
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,57 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, rth@twiddle.net, fred.konrad@greensocs.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, Alexey Kardashevskiy <aik@ozlabs.ru>, Michael Roth <mdroth@linux.vnet.ibm.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Hi,
+On 6 March 2017 at 04:08, David Gibson <david@gibson.dropbear.id.au> wrote:
+> The following changes since commit 17783ac828adc694d986698d2d7014aedfeb48c6:
+>
+>   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-2.9-20170303' into staging (2017-03-04 16:31:14 +0000)
+>
+> are available in the git repository at:
+>
+>   git://github.com/dgibson/qemu.git tags/ppc-for-2.9-20170306
+>
+> for you to fetch changes up to 182fe2cf19e829e34f63443ee1ccd9f799715c2c:
+>
+>   target/ppc: use helper for excp handling (2017-03-06 13:17:28 +1100)
+>
+> ----------------------------------------------------------------
+> ppc patch queue for 2017-03-06
+>
+> Looks like my previous batch wasn't quite the last before hard freeze.
+> This has a handful of bugfixes to go in.  They're all genuine
+> bugfixes, though not regressions in some cases.
+>
 
-On 06.03.2017 15:42, Alex Benn=C3=A9e wrote:
->=20
-> Alexander Boettcher <alexander.boettcher@genode-labs.com> writes:
->=20
->> Hi,
->>
->> On 06.03.2017 14:15, Alex Benn=C3=A9e wrote:
->>> I found the virtualbox.iso on your branch but I can't trigger the
->>> assert. Running:
->>>
->>> #!/bin/sh
->>>
->>> QEMU=3D"$@"
->>>
->>> ${QEMU} -s -no-kvm -display sdl -m 512 -cpu phenom -nographic -cdrom =
-virtualbox.iso
->>>
->>> I get:
->>>
->>> NOVA Microhypervisor v7-2436fe2 (x86_32): Feb 25 2017 17:58:48 [gcc 4=
-.9.2]
->>> [init -> log_terminal]
->>> [init -> log_terminal] [ 0] CORE:0:0:0 10:2:3:0 [0] AMD Phenom(tm) 95=
-50 Quad-Core Processor
->>> qemu: fatal: invalid tss type
->>
->>
->>> Which is a guest error?
->>
->> It's a race which happens in Qemu (not on hardware), so I still
->> investigating it within Qemu. Because of that on [0] the commit before
->> the virtualbox.iso is one commit to avoid this for the moment in order
->> to continue.
->=20
-> How can a single-threaded system emulation race with itself?
+Applied, thanks.
 
-Good question, I would say interrupts/timing in general. State must be
-saved and restored when switching between the modes. Depending on where
-you run when an interrupt (e.g. timer) happens (in the hypervisor, or in
-user-level VMM respectively in some user-level applications or you run
-in the VM in ring-0/ring-3.), different code paths are executed within
-Qemu. As said, I'm still investigating, looks like something is not
-saved/restored correctly everytime.
-
-Sometimes Qemu just succeeds if the timing is well, will see.
-
-But this is not the point of this issue atm.
-
-Alex.
+-- PMM
