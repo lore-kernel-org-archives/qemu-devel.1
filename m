@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ckqot-0004TM-9x
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 06:28:52 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ckr0G-00062b-7i
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 06:40:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ckqoq-0001Rf-N8
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 06:28:51 -0500
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:35611)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ckr0E-0003wm-SL
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 06:40:36 -0500
+Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:35439)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ckqoq-0001RT-Fa
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 06:28:48 -0500
-Received: by mail-wr0-x230.google.com with SMTP id g10so114167304wrg.2
-	for <qemu-devel@nongnu.org>; Mon, 06 Mar 2017 03:28:48 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon,  6 Mar 2017 11:28:48 +0000
-Message-Id: <20170306112848.659-1-alex.bennee@linaro.org>
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ckr0E-0003wi-Ni
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 06:40:34 -0500
+Received: by mail-it0-x242.google.com with SMTP id 203so9207874ith.2
+	for <qemu-devel@nongnu.org>; Mon, 06 Mar 2017 03:40:34 -0800 (PST)
 MIME-Version: 1.0
+Sender: philippe.mathieu.daude@gmail.com
+In-Reply-To: <1488540021-35506-1-git-send-email-yongbok.kim@imgtec.com>
+References: <1488540021-35506-1-git-send-email-yongbok.kim@imgtec.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philippe@mathieu-daude.net>
+Date: Mon, 6 Mar 2017 08:40:33 -0300
+Message-ID: <CAAdtpL54Y+8MDFjNG1VyfvQ8OvcriakJRqomoG=K2kX3+hUwww@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] docker/dockerfiles/debian-s390-cross: include
- clang
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] target/mips: hold BQL for timer interrupts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +32,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: famz@redhat.com
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Yongbok Kim <yongbok.kim@imgtec.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
-It's a silly little limitation on Shippable that is looks for clang
-in the container even though we won't use it. The arm/aarch64 cross
-builds inherit this from debian.docker but as we needed to use
-debian-testing for this we add it here. We also collapse the update
-step into one RUN line to remove and intermediate layer of the docker
-build.
+On Fri, Mar 3, 2017 at 8:20 AM, Yongbok Kim <yongbok.kim@imgtec.com> wrote:
+> Hold BQL when accessing timer which can cause interrupts
+>
+> Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- tests/docker/dockerfiles/debian-s390x-cross.docker | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-diff --git a/tests/docker/dockerfiles/debian-s390x-cross.docker b/tests/docker/dockerfiles/debian-s390x-cross.docker
-index bbb21ed088..3a687feda0 100644
---- a/tests/docker/dockerfiles/debian-s390x-cross.docker
-+++ b/tests/docker/dockerfiles/debian-s390x-cross.docker
-@@ -13,8 +13,8 @@ RUN cat /etc/apt/sources.list | sed "s/deb/deb-src/" >> /etc/apt/sources.list
- RUN dpkg --add-architecture s390x
- 
- # Grab the updated list of packages
--RUN apt update
--RUN apt dist-upgrade -yy
-+RUN apt update && apt dist-upgrade -yy
-+RUN apt install -yy build-essential clang
- RUN apt-get build-dep -yy -a s390x qemu || apt-get -f install
- RUN apt install -yy gcc-multilib-s390x-linux-gnu binutils-multiarch
- 
--- 
-2.11.0
+> ---
+>  target/mips/op_helper.c | 21 ++++++++++++++++++---
+>  1 file changed, 18 insertions(+), 3 deletions(-)
+>
+> diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+> index b683fcb..e5f3ea4 100644
+> --- a/target/mips/op_helper.c
+> +++ b/target/mips/op_helper.c
+> @@ -17,6 +17,7 @@
+>   * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
+>   */
+>  #include "qemu/osdep.h"
+> +#include "qemu/main-loop.h"
+>  #include "cpu.h"
+>  #include "qemu/host-utils.h"
+>  #include "exec/helper-proto.h"
+> @@ -827,7 +828,11 @@ target_ulong helper_mftc0_tcschefback(CPUMIPSState *=
+env)
+>
+>  target_ulong helper_mfc0_count(CPUMIPSState *env)
+>  {
+> -    return (int32_t)cpu_mips_get_count(env);
+> +    int32_t count;
+> +    qemu_mutex_lock_iothread();
+> +    count =3D (int32_t) cpu_mips_get_count(env);
+> +    qemu_mutex_unlock_iothread();
+> +    return count;
+>  }
+>
+>  target_ulong helper_mftc0_entryhi(CPUMIPSState *env)
+> @@ -1375,7 +1380,9 @@ void helper_mtc0_hwrena(CPUMIPSState *env, target_u=
+long arg1)
+>
+>  void helper_mtc0_count(CPUMIPSState *env, target_ulong arg1)
+>  {
+> +    qemu_mutex_lock_iothread();
+>      cpu_mips_store_count(env, arg1);
+> +    qemu_mutex_unlock_iothread();
+>  }
+>
+>  void helper_mtc0_entryhi(CPUMIPSState *env, target_ulong arg1)
+> @@ -1424,7 +1431,9 @@ void helper_mttc0_entryhi(CPUMIPSState *env, target=
+_ulong arg1)
+>
+>  void helper_mtc0_compare(CPUMIPSState *env, target_ulong arg1)
+>  {
+> +    qemu_mutex_lock_iothread();
+>      cpu_mips_store_compare(env, arg1);
+> +    qemu_mutex_unlock_iothread();
+>  }
+>
+>  void helper_mtc0_status(CPUMIPSState *env, target_ulong arg1)
+> @@ -1475,7 +1484,9 @@ void helper_mtc0_srsctl(CPUMIPSState *env, target_u=
+long arg1)
+>
+>  void helper_mtc0_cause(CPUMIPSState *env, target_ulong arg1)
+>  {
+> +    qemu_mutex_lock_iothread();
+>      cpu_mips_store_cause(env, arg1);
+> +    qemu_mutex_unlock_iothread();
+>  }
+>
+>  void helper_mttc0_cause(CPUMIPSState *env, target_ulong arg1)
+> @@ -2296,12 +2307,16 @@ target_ulong helper_rdhwr_synci_step(CPUMIPSState=
+ *env)
+>
+>  target_ulong helper_rdhwr_cc(CPUMIPSState *env)
+>  {
+> +    int32_t count;
+>      check_hwrena(env, 2, GETPC());
+>  #ifdef CONFIG_USER_ONLY
+> -    return env->CP0_Count;
+> +    count =3D env->CP0_Count;
+>  #else
+> -    return (int32_t)cpu_mips_get_count(env);
+> +    qemu_mutex_lock_iothread();
+> +    count =3D (int32_t)cpu_mips_get_count(env);
+> +    qemu_mutex_unlock_iothread();
+>  #endif
+> +    return count;
+>  }
+>
+>  target_ulong helper_rdhwr_ccres(CPUMIPSState *env)
+> --
+> 2.7.4
+>
+>
