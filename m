@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46468)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1ckjrS-0003fn-JI
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 23:03:03 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ckjuu-0004Ps-US
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 23:06:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1ckjrP-0002fr-FV
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 23:03:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34596)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1ckjrP-0002fk-9s
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 23:02:59 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 644EAFAF3C
-	for <qemu-devel@nongnu.org>; Mon,  6 Mar 2017 04:02:58 +0000 (UTC)
-References: <CANHSq5DhUak9fVpvjG=VyeetP7VQudHwyEa4VevC21BuieSstw@mail.gmail.com>
-	<20170303103919.GA2439@work-vm>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <bebb011d-5cf9-c33a-5920-a029cae5f558@redhat.com>
-Date: Mon, 6 Mar 2017 12:02:52 +0800
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1ckjur-0003VK-Nt
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 23:06:36 -0500
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170305214857.9510-1-krzk@kernel.org>
+	<20170305214857.9510-3-krzk@kernel.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <2130c1b2-0f81-13f6-a1f8-c0a2e294e3f0@amsat.org>
+Date: Mon, 6 Mar 2017 01:06:29 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170303103919.GA2439@work-vm>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V2] migration: expose qemu_announce_self()
- via qmp
+In-Reply-To: <20170305214857.9510-3-krzk@kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 3/3] hw/misc/exynos4210_pmu:
+ Reorder local variables for readability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,31 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Germano Veit Michel <germano@redhat.com>, armbru@redhat.com
-Cc: qemu-devel@nongnu.org, Juan Jose Quintela Carreira <quintela@redhat.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
+Hi Krzysztof,
 
-
-On 2017=E5=B9=B403=E6=9C=8803=E6=97=A5 18:39, Dr. David Alan Gilbert wrot=
-e:
-> * Germano Veit Michel (germano@redhat.com) wrote:
->> qemu_announce_self() is triggered by qemu at the end of migrations
->> to update the network regarding the path to the guest l2addr.
->>
->> however it is also useful when there is a network change such as
->> an active bond slave swap. Essentially, it's the same as a migration
->> from a network perspective - the guest moves to a different point
->> in the network topology.
->>
->> this exposes the function via qmp.
-> Markus: Since you're asking for tests for qmp commands; how would you
-> test this?
+On 03/05/2017 06:48 PM, Krzysztof Kozlowski wrote:
+> Short declaration of 'i' was in the middle of declarations with
+> assignments.  Make it a little bit more readable.  No functional change.
 >
-> Jason: Does this look OK from the networking side of things?
+> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+> ---
+>  hw/misc/exynos4210_pmu.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
+> diff --git a/hw/misc/exynos4210_pmu.c b/hw/misc/exynos4210_pmu.c
+> index cbdfa0614600..60d1545c0baa 100644
+> --- a/hw/misc/exynos4210_pmu.c
+> +++ b/hw/misc/exynos4210_pmu.c
+> @@ -401,8 +401,8 @@ static uint64_t exynos4210_pmu_read(void *opaque, hwaddr offset,
+>                                      unsigned size)
+>  {
+>      const Exynos4210PmuState *s = (Exynos4210PmuState *)opaque;
+> -    unsigned i;
+>      const Exynos4210PmuReg *reg_p = exynos4210_pmu_regs;
+> +    unsigned i;
 
-Good as a start I think. We probably want to add callbacks for each=20
-kinds of nic. This will be useful for virtio, since some guest can=20
-announce themselves with complex configurations (e.g vlans).
+your change seems OK but while you are here, 'unsigned' is considered 
+harmful since more than a decade. why not use 'size_t i' since 
+PMU_NUM_OF_REGISTERS is indeed an ARRAY_SIZE()?
 
-Thanks
+>
+>      for (i = 0; i < PMU_NUM_OF_REGISTERS; i++) {
+>          if (reg_p->offset == offset) {
+> @@ -420,8 +420,8 @@ static void exynos4210_pmu_write(void *opaque, hwaddr offset,
+>                                   uint64_t val, unsigned size)
+>  {
+>      Exynos4210PmuState *s = (Exynos4210PmuState *)opaque;
+> -    unsigned i;
+>      const Exynos4210PmuReg *reg_p = exynos4210_pmu_regs;
+> +    unsigned i;
+>
+>      for (i = 0; i < PMU_NUM_OF_REGISTERS; i++) {
+>          if (reg_p->offset == offset) {
+>
