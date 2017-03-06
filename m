@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45944)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ckxsR-00045q-P6
+	(envelope-from <armbru@redhat.com>) id 1ckxsR-00045w-Qk
 	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 14:01:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ckxsQ-0004jN-JM
+	(envelope-from <armbru@redhat.com>) id 1ckxsQ-0004j3-Dm
 	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 14:00:59 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  6 Mar 2017 20:00:35 +0100
-Message-Id: <1488826849-32384-2-git-send-email-armbru@redhat.com>
+Date: Mon,  6 Mar 2017 20:00:44 +0100
+Message-Id: <1488826849-32384-11-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488826849-32384-1-git-send-email-armbru@redhat.com>
 References: <1488826849-32384-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 01/15] sheepdog: Defuse time bomb in
- sd_open() error handling
+Subject: [Qemu-devel] [PATCH v2 10/15] gluster: Drop assumptions on
+ SocketTransport names
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,97 +23,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, ndevos@redhat.com, eblake@redhat.com, f4bug@amsat.org
 
-When qemu_opts_absorb_qdict() fails, sd_open() closes stdin, because
-sd->fd is still zero.  Fortunately, qemu_opts_absorb_qdict() can't
-fail, because:
-
-1. it only fails when qemu_opt_parse() fails, and
-2. the only member of runtime_opts.desc[] is a QEMU_OPT_STRING, and
-3. qemu_opt_parse() can't fail for QEMU_OPT_STRING.
-
-Defuse this ticking time bomb by jumping behind the file descriptor
-cleanup on error.
-
-Also do that for the error paths where sd->fd is still -1.  The file
-descriptor cleanup happens to do nothing then, but let's not rely on
-that here.
-
-While there, rename label out to err, because it's on the error path,
-not the normal path out of the function.
+qemu_gluster_glfs_init() passes the names of QAPI enumeration type
+SocketTransport to glfs_set_volfile_server().  Works, because they
+were chosen to match.  But the coupling is artificial.  Use the
+appropriate literal strings instead.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Niels de Vos <ndevos@redhat.com>
 ---
- block/sheepdog.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ block/gluster.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index 7434710..c3ee4ce 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -1392,7 +1392,7 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
-     if (local_err) {
-         error_propagate(errp, local_err);
-         ret = -EINVAL;
--        goto out;
-+        goto err_no_fd;
-     }
+diff --git a/block/gluster.c b/block/gluster.c
+index 56b4abe..7236d59 100644
+--- a/block/gluster.c
++++ b/block/gluster.c
+@@ -412,8 +412,7 @@ static struct glfs *qemu_gluster_glfs_init(BlockdevOptionsGluster *gconf,
  
-     filename = qemu_opt_get(opts, "filename");
-@@ -1412,17 +1412,17 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
-     }
-     if (ret < 0) {
-         error_setg(errp, "Can't parse filename");
--        goto out;
-+        goto err_no_fd;
-     }
-     s->fd = get_sheep_fd(s, errp);
-     if (s->fd < 0) {
-         ret = s->fd;
--        goto out;
-+        goto err_no_fd;
-     }
- 
-     ret = find_vdi_name(s, vdi, snapid, tag, &vid, true, errp);
-     if (ret) {
--        goto out;
-+        goto err;
-     }
- 
-     /*
-@@ -1443,7 +1443,7 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
-     fd = connect_to_sdog(s, errp);
-     if (fd < 0) {
-         ret = fd;
--        goto out;
-+        goto err;
-     }
- 
-     buf = g_malloc(SD_INODE_SIZE);
-@@ -1454,7 +1454,7 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
- 
-     if (ret) {
-         error_setg(errp, "Can't read snapshot inode");
--        goto out;
-+        goto err;
-     }
- 
-     memcpy(&s->inode, buf, sizeof(s->inode));
-@@ -1466,12 +1466,12 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
-     qemu_opts_del(opts);
-     g_free(buf);
-     return 0;
--out:
-+
-+err:
-     aio_set_fd_handler(bdrv_get_aio_context(bs), s->fd,
-                        false, NULL, NULL, NULL, NULL);
--    if (s->fd >= 0) {
--        closesocket(s->fd);
--    }
-+    closesocket(s->fd);
-+err_no_fd:
-     qemu_opts_del(opts);
-     g_free(buf);
-     return ret;
+     for (server = gconf->server; server; server = server->next) {
+         if (server->value->type  == GLUSTER_TRANSPORT_UNIX) {
+-            ret = glfs_set_volfile_server(glfs,
+-                                   GlusterTransport_lookup[server->value->type],
++            ret = glfs_set_volfile_server(glfs, "unix",
+                                    server->value->u.q_unix.path, 0);
+         } else {
+             if (parse_uint_full(server->value->u.tcp.port, &port, 10) < 0 ||
+@@ -423,8 +422,7 @@ static struct glfs *qemu_gluster_glfs_init(BlockdevOptionsGluster *gconf,
+                 errno = EINVAL;
+                 goto out;
+             }
+-            ret = glfs_set_volfile_server(glfs,
+-                                   GlusterTransport_lookup[server->value->type],
++            ret = glfs_set_volfile_server(glfs, "tcp",
+                                    server->value->u.tcp.host,
+                                    (int)port);
+         }
 -- 
 2.7.4
