@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1cknVX-0007oK-DZ
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 02:56:41 -0500
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cknbb-0001LK-E9
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 03:02:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1cknVW-0003Fp-7H
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 02:56:39 -0500
-Received: from mail-it0-x235.google.com ([2607:f8b0:4001:c0b::235]:33944)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1cknVV-0003FO-Vy
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 02:56:38 -0500
-Received: by mail-it0-x235.google.com with SMTP id m27so4457645iti.1
-	for <qemu-devel@nongnu.org>; Sun, 05 Mar 2017 23:56:36 -0800 (PST)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cknbY-0005J6-BH
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 03:02:55 -0500
+Received: from [59.151.112.132] (port=31528 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cknbW-0005HK-3k
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 03:02:52 -0500
+References: <1488011202-32121-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Message-ID: <58BD1982.30509@cn.fujitsu.com>
+Date: Mon, 6 Mar 2017 16:10:42 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170305181803.7371.53021.malonedeb@chaenomeles.canonical.com>
-References: <20170305181803.7371.53021.malonedeb@chaenomeles.canonical.com>
-From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Mon, 6 Mar 2017 08:56:15 +0100
-Message-ID: <CACXAS8B_H0PoVKPYq5oeQKiF1MEzJWe-MiGzqxcnHWRk6onehg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [Bug 1670170] [NEW] `qemu-system-sparc64 -M
- Niagara` Aborted (core dumped)
+In-Reply-To: <1488011202-32121-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v10 0/8] the reset of msix_init series
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,122 +26,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1670170 <1670170@bugs.launchpad.net>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Hannes Reinecke <hare@suse.de>, Dmitry Fleytman <dmitry@daynix.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-There was a major rework of the Niagara platform in the upcoming 2.9 release.
-Please use the new version.
-
-On Sun, Mar 5, 2017 at 7:18 PM, Michal Nowak <michal.nowak@resist.ca> wrote:
-> Public bug reported:
->
->> qemu-system-sparc64 -M Niagara
-> qemu: fatal: Trap 0x0064 while trap level (6) >= MAXTL (6), Error state
-> pc: 0000000000004c80  npc: 0000000000004c84
-> %g0-3: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> %g4-7: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> %o0-3: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> %o4-7: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> %l0-3: 0000000007f00000 000001ff00000000 000001fff0080000 0000000000000000
-> %l4-7: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> %i0-3: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> %i4-7: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> %f00:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> %f08:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> %f16:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> %f24:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> %f32:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> %f40:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> %f48:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> %f56:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> pstate: 00000414 ccr: 44 (icc: -Z-- xcc: -Z--) asi: 00 tl: 6 pil: 0
-> cansave: 6 canrestore: 0 otherwin: 0 wstate: 0 cleanwin: 6 cwp: 7
-> fsr: 0000000000000000 y: 0000000000000000 fprs: 0000000000000000
->
-> Aborted (core dumped)
->
->> qemu-system-sparc64 -M help
-> Supported machines are:
-> Niagara              Sun4v platform, Niagara
-> none                 empty machine
-> sun4u                Sun4u platform (default)
-> sun4v                Sun4v platform
->
->> qemu-system-sparc64 -version
-> QEMU emulator version 2.8.0(Virtualization:Staging / SLE_12_SP2)
->
-> from https://build.opensuse.org/package/show/Virtualization:Staging/qemu
-> on openSUSE Leap 42.2.
->
-> ** Affects: qemu
->      Importance: Undecided
->          Status: New
->
->
-> ** Tags: sparc
->
-> ** Attachment added: "coredumpctl core dump"
->    https://bugs.launchpad.net/bugs/1670170/+attachment/4831907/+files/core.qemu-system-spa.1000.79fef1d6233b4b989c19ea5c5c809627.451.1488737426000000.xz
->
-> --
-> You received this bug notification because you are a member of qemu-
-> devel-ml, which is subscribed to QEMU.
-> https://bugs.launchpad.net/bugs/1670170
->
-> Title:
->   `qemu-system-sparc64 -M Niagara` Aborted (core dumped)
->
-> Status in QEMU:
->   New
->
-> Bug description:
->   > qemu-system-sparc64 -M Niagara
->   qemu: fatal: Trap 0x0064 while trap level (6) >= MAXTL (6), Error state
->   pc: 0000000000004c80  npc: 0000000000004c84
->   %g0-3: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
->   %g4-7: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
->   %o0-3: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
->   %o4-7: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
->   %l0-3: 0000000007f00000 000001ff00000000 000001fff0080000 0000000000000000
->   %l4-7: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
->   %i0-3: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
->   %i4-7: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
->   %f00:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
->   %f08:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
->   %f16:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
->   %f24:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
->   %f32:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
->   %f40:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
->   %f48:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
->   %f56:  0000000000000000 0000000000000000 0000000000000000 0000000000000000
->   pstate: 00000414 ccr: 44 (icc: -Z-- xcc: -Z--) asi: 00 tl: 6 pil: 0
->   cansave: 6 canrestore: 0 otherwin: 0 wstate: 0 cleanwin: 6 cwp: 7
->   fsr: 0000000000000000 y: 0000000000000000 fprs: 0000000000000000
->
->   Aborted (core dumped)
->
->   > qemu-system-sparc64 -M help
->   Supported machines are:
->   Niagara              Sun4v platform, Niagara
->   none                 empty machine
->   sun4u                Sun4u platform (default)
->   sun4v                Sun4v platform
->
->   > qemu-system-sparc64 -version
->   QEMU emulator version 2.8.0(Virtualization:Staging / SLE_12_SP2)
->
->   from
->   https://build.opensuse.org/package/show/Virtualization:Staging/qemu on
->   openSUSE Leap 42.2.
->
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1670170/+subscriptions
->
-
-
+Michael,
+Is this series ok for 2.9?
 
 -- 
-Regards,
-Artyom Tarasenko
+Sincerely,
+Cao jin
 
-SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
+On 02/25/2017 04:26 PM, Cao jin wrote:
+> v10 changelog:
+> 1. drop the unliked patch, introduce a new patch 1 according to mst's comments.
+> 2. base on the new patch, remove the following statements
+> 
+>         /* Any error other than -ENOTSUP(board's MSI support is broken)
+>          * is a programming error */
+>         assert(!ret || ret == -ENOTSUP);
+> 
+>    for the affected device: megasas, hcd-xhci. This is trivial changes,
+>    so I left the R-bs where it was.
+> 
+> Test:
+> 1. Detailed test via command line as v9
+> 2. make check hangs at: GTESTER check-qtest-x86_64. After ctrl-C, it says:
+> 
+>     make: *** [check-qtest-x86_64] Interrupt
+>     qemu-system-x86_64: Failed to read msg header. Read -1 instead of 12. Original request 11.
+>     qemu-system-x86_64: vhost VQ 0 ring restore failed: -1: Input/output error (5)
+>     qemu-system-x86_64: Failed to set msg fds.
+>     qemu-system-x86_64: vhost VQ 0 ring restore failed: -1: Invalid argument (22)
+> 
+>     qemu-system-x86_64: Failed to set msg fds.
+>     qemu-system-x86_64: vhost VQ 1 ring restore failed: -1: Invalid argument (22)
+> 
+>    Is it a regresstion or I missed something?
+> 
+> CC: Jason Wang <jasowang@redhat.com>
+> CC: Gerd Hoffmann <kraxel@redhat.com>
+> CC: Dmitry Fleytman <dmitry@daynix.com>
+> CC: Michael S. Tsirkin <mst@redhat.com>
+> CC: Hannes Reinecke <hare@suse.de>
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> CC: Alex Williamson <alex.williamson@redhat.com>
+> CC: Markus Armbruster <armbru@redhat.com>
+> CC: Marcel Apfelbaum <marcel@redhat.com>
+> 
+> Cao jin (8):
+>   msix: Rename and create a wrapper
+>   megasas: change behaviour of msix switch
+>   hcd-xhci: change behaviour of msix switch
+>   megasas: undo the overwrites of msi user configuration
+>   vmxnet3: fix reference leak issue
+>   vmxnet3: remove unnecessary internal msix flag
+>   msi_init: convert assert to return -errno
+>   megasas: remove unnecessary megasas_use_msix()
+> 
+>  hw/net/vmxnet3.c      | 40 +++++++++++++++-------------------------
+>  hw/pci/msi.c          |  9 ++++++---
+>  hw/pci/msix.c         | 30 +++++++++++++++++++++---------
+>  hw/scsi/megasas.c     | 48 +++++++++++++++++++++++++-----------------------
+>  hw/usb/hcd-xhci.c     | 29 +++++++++++++++++++++--------
+>  hw/vfio/pci.c         | 12 ++++++------
+>  include/hw/pci/msix.h |  5 +++++
+>  7 files changed, 99 insertions(+), 74 deletions(-)
+> 
