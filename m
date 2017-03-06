@@ -1,35 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55656)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=23132e6eb=Paul.Durrant@citrix.com>)
-	id 1ckp3e-0005TC-IB
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 04:36:00 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ckp4A-0005fP-Ea
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 04:36:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=23132e6eb=Paul.Durrant@citrix.com>)
-	id 1ckp3b-0008HE-95
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 04:35:58 -0500
-Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:40592
-	helo=SMTP.EU.CITRIX.COM)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=23132e6eb=Paul.Durrant@citrix.com>)
-	id 1ckp3a-0008Gh-PH
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 04:35:55 -0500
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Mon, 6 Mar 2017 09:35:51 +0000
-Message-ID: <31427779196840b3b31171ec9deda91f@AMSPEX02CL03.citrite.net>
-References: <1488452986-24501-1-git-send-email-paul.durrant@citrix.com>
-	<1488452986-24501-6-git-send-email-paul.durrant@citrix.com>
-	<alpine.DEB.2.10.1703021426050.17906@sstabellini-ThinkPad-X260>
-	<05365905529b4fd78ff67989743a8dfb@AMSPEX02CL03.citrite.net>
-	<alpine.DEB.2.10.1703031209090.17906@sstabellini-ThinkPad-X260>
-	<alpine.DEB.2.10.1703031243050.17906@sstabellini-ThinkPad-X260>
-	<1636138fa3a948229a4630fe48d5a079@AMSPEX02CL03.citrite.net>
-In-Reply-To: <1636138fa3a948229a4630fe48d5a079@AMSPEX02CL03.citrite.net>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <dgibson@ozlabs.org>) id 1ckp47-0008Of-8v
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 04:36:30 -0500
+Date: Mon, 6 Mar 2017 20:01:17 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170306090117.GA11260@umbus.fritz.box>
+References: <1488548254-456-1-git-send-email-clg@kaod.org>
+	<39ad7cac-b29e-b01e-723c-8cbdb1cf3ca9@redhat.com>
+	<f55bb0be-778c-6ded-1564-9b77c4521f52@kaod.org>
+	<b4b5780b-4604-9577-f42a-8821c4cb18d4@redhat.com>
+	<c8ea232a-3511-f42a-6643-18a66a3d8e9c@kaod.org>
+	<20170305232328.GB12030@umbus.fritz.box>
+	<4743c70a-c8e4-a8a6-f685-9e7119d575b9@kaod.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v2 5/5] xen: use libxendevicemodel when
- available
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="PNTmBPCT7hxwcZjr"
+Content-Disposition: inline
+In-Reply-To: <4743c70a-c8e4-a8a6-f685-9e7119d575b9@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH] ppc/spapr: QOM'ify sPAPRRTCState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,204 +29,358 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <Paul.Durrant@citrix.com>, 'Stefano Stabellini' <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-> -----Original Message-----
-> From: Qemu-devel [mailto:qemu-devel-
-> bounces+paul.durrant=3Dcitrix.com@nongnu.org] On Behalf Of Paul Durrant
-> Sent: 06 March 2017 09:15
-> To: 'Stefano Stabellini' <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>; xen-
-> devel@lists.xenproject.org; qemu-devel@nongnu.org
-> Subject: Re: [Qemu-devel] [PATCH v2 5/5] xen: use libxendevicemodel when
-> available
+
+--PNTmBPCT7hxwcZjr
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Mar 06, 2017 at 08:56:07AM +0100, C=E9dric Le Goater wrote:
+> On 03/06/2017 12:23 AM, David Gibson wrote:
+> > On Fri, Mar 03, 2017 at 06:23:15PM +0100, C=E9dric Le Goater wrote:
+> >> On 03/03/2017 05:54 PM, Thomas Huth wrote:
+> >>> On 03.03.2017 15:49, C=E9dric Le Goater wrote:
+> >>>> On 03/03/2017 03:13 PM, Thomas Huth wrote:
+> >>>>> On 03.03.2017 14:37, C=E9dric Le Goater wrote:
+> >>>>>> Also use an 'Object *' under the sPAPR machine to hold the RTC
+> >>>>>> object.
+> >>>>>
+> >>>>> The change from TYPE_SYS_BUS_DEVICE to TYPE_DEVICE is certainly a g=
+ood
+> >>>>> idea! But what's the advantage of using Object* instead of DeviceSt=
+ate*
+> >>>>> in sPAPRMachineState ?
+> >>>>
+> >>>> it makes spapr_rtc_create() a little simpler. =20
+> >>>>
+> >>>> We could go even further and use a sPAPRRTCState under sPAPRMachineS=
+tate=20
+> >>>> that we  would initialize with object_initialize().=20
+> >>>
+> >>> I think a sPAPRRTCState* would make more sense here - if you just see=
+ an
+> >>> Object* and are not familiar with the code, you wonder what this poin=
+ter
+> >>> is all about (and you then have to cast it to something different if =
+you
+> >>> want to do anything with it) ... so IMHO either a DeviceState* or
+> >>> sPAPRRTCState* is the better choice here.
+> >>
+> >> I think having a non-pointer is a better for the object lifecycle=20
+> >> but I don't have a strong opinion on that. We will see what Dave=20
+> >> prefers.
+> >=20
+> > You seem to be talking at cross purposes.  AFAICT Thomas is not
+> > talking about the difference between a pointer and a non-pointer, he's
+> > talking about the difference between a generic Object (pointer or
+> > otherwise) and a concrete type.
+> >=20
+> > I agree with Thomas that a specific type is preferable.  I'm not
+> > particularly bothered by the difference between pointer and
+> > non-pointer.
 >=20
-> > -----Original Message-----
-> > From: Stefano Stabellini [mailto:sstabellini@kernel.org]
-> > Sent: 03 March 2017 20:43
-> > To: Stefano Stabellini <sstabellini@kernel.org>
-> > Cc: Paul Durrant <Paul.Durrant@citrix.com>; xen-
-> devel@lists.xenproject.org;
-> > qemu-devel@nongnu.org; Anthony Perard <anthony.perard@citrix.com>
-> > Subject: RE: [PATCH v2 5/5] xen: use libxendevicemodel when available
-> >
-> > On Fri, 3 Mar 2017, Stefano Stabellini wrote:
-> > > On Fri, 3 Mar 2017, Paul Durrant wrote:
-> > > > > -----Original Message-----
-> > > > > From: Stefano Stabellini [mailto:sstabellini@kernel.org]
-> > > > > Sent: 02 March 2017 22:50
-> > > > > To: Paul Durrant <Paul.Durrant@citrix.com>
-> > > > > Cc: xen-devel@lists.xenproject.org; qemu-devel@nongnu.org;
-> Stefano
-> > > > > Stabellini <sstabellini@kernel.org>; Anthony Perard
-> > > > > <anthony.perard@citrix.com>
-> > > > > Subject: Re: [PATCH v2 5/5] xen: use libxendevicemodel when
-> available
-> > > > >
-> > > > > On Thu, 2 Mar 2017, Paul Durrant wrote:
-> > > > > > This patch modifies the wrapper functions in xen_common.h to us=
-e
-> > the
-> > > > > > new xendevicemodel interface if it is available along with
-> > compatibility
-> > > > > > code to use the old libxenctrl interface if it is not.
-> > > > > >
-> > > > > > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-> > > > > > ---
-> > > > > > Cc: Stefano Stabellini <sstabellini@kernel.org>
-> > > > > > Cc: Anthony Perard <anthony.perard@citrix.com>
-> > > > > >
-> > > > > > v2:
-> > > > > > - Add a compat define for xenforeignmemory_close() since this i=
-s
-> > now
-> > > > > >   used.
-> > > > > > ---
-> > > > > >  include/hw/xen/xen_common.h | 115
-> > > > > +++++++++++++++++++++++++++++++-------------
-> > > > > >  xen-common.c                |   8 +++
-> > > > > >  2 files changed, 90 insertions(+), 33 deletions(-)
-> > > > > >
-> > > > > > diff --git a/include/hw/xen/xen_common.h
-> > > > > b/include/hw/xen/xen_common.h
-> > > > > > index 31cf25f..48444e5 100644
-> > > > > > --- a/include/hw/xen/xen_common.h
-> > > > > > +++ b/include/hw/xen/xen_common.h
-> > > > > > @@ -9,6 +9,7 @@
-> > > > > >  #undef XC_WANT_COMPAT_EVTCHN_API
-> > > > > >  #undef XC_WANT_COMPAT_GNTTAB_API
-> > > > > >  #undef XC_WANT_COMPAT_MAP_FOREIGN_API
-> > > > > > +#undef XC_WANT_COMPAT_DEVICEMODEL_API
-> > > > > >
-> > > > > >  #include <xenctrl.h>
-> > > > > >  #include <xenstore.h>
-> > > > > > @@ -26,48 +27,95 @@ extern xc_interface *xen_xc;
-> > > > > >   * We don't support Xen prior to 4.2.0.
-> > > > > >   */
-> > > > > >
-> > > > > > +#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 490
-> > > > > > +
-> > > > > > +typedef xc_interface xendevicemodel_handle;
-> > > > > > +
-> > > > > > +#define xendevicemodel_open(l, f) xen_xc
-> > > > > > +
-> > > > > > +#define xendevicemodel_map_io_range_to_ioreq_server \
-> > > > > > +    xc_hvm_map_io_range_to_ioreq_server
-> > > > > > +#define xendevicemodel_unmap_io_range_from_ioreq_server \
-> > > > > > +    xc_hvm_unmap_io_range_from_ioreq_server
-> > > > > > +#define xendevicemodel_map_pcidev_to_ioreq_server \
-> > > > > > +    xc_hvm_map_pcidev_to_ioreq_server
-> > > > > > +#define xendevicemodel_unmap_pcidev_from_ioreq_server \
-> > > > > > +    xc_hvm_unmap_pcidev_from_ioreq_server
-> > > > > > +#define xendevicemodel_create_ioreq_server \
-> > > > > > +    xc_hvm_create_ioreq_server
-> > > > > > +#define xendevicemodel_destroy_ioreq_server \
-> > > > > > +    xc_hvm_destroy_ioreq_server
-> > > > > > +#define xendevicemodel_get_ioreq_server_info \
-> > > > > > +    xc_hvm_get_ioreq_server_info
-> > > > > > +#define xendevicemodel_set_ioreq_server_state \
-> > > > > > +    xc_hvm_set_ioreq_server_state
-> > > > > > +#define xendevicemodel_set_pci_intx_level \
-> > > > > > +    xc_hvm_set_pci_intx_level
-> > > > > > +#define xendevicemodel_set_pci_link_route \
-> > > > > > +    xc_hvm_set_pci_link_route
-> > > > > > +#define xendevicemodel_set_isa_irq_level \
-> > > > > > +    xc_hvm_set_isa_irq_level
-> > > > > > +#define xendevicemodel_inject_msi \
-> > > > > > +    xc_hvm_inject_msi
-> > > > > > +#define xendevicemodel_set_mem_type \
-> > > > > > +    xc_hvm_set_mem_type
-> > > > > > +#define xendevicemodel_track_dirty_vram \
-> > > > > > +    xc_hvm_track_dirty_vram
-> > > > > > +#define xendevicemodel_modified_memory \
-> > > > > > +    xc_hvm_modified_memory
-> > > > >
-> > > > > It does build correctly now for Xen < 4.9, however it breaks agai=
-nst
-> > > > > xen-unstable:
-> > > > >
-> > > > >   ERROR: configure test passed without -Werror but failed with -
-> Werror.
-> > > > >          This is probably a bug in the configure script. The fail=
-ing command
-> > > > >          will be at the bottom of config.log.
-> > > > >          You can run configure with --disable-werror to bypass th=
-is check.
-> > > > >
-> > > > > and config.log says:
-> > > > >
-> > > > >   config-temp/qemu-conf.c: In function 'main':
-> > > > >   config-temp/qemu-conf.c:32:3: error: implicit declaration of fu=
-nction
-> > > > > 'xc_hvm_set_mem_type' [-Werror=3Dimplicit-function-declaration]
-> > > > >   config-temp/qemu-conf.c:32:3: error: nested extern declaration =
-of
-> > > > > 'xc_hvm_set_mem_type' [-Werror=3Dnested-externs]
-> > > > >   config-temp/qemu-conf.c:34:3: error: implicit declaration of fu=
-nction
-> > > > > 'xc_hvm_inject_msi' [-Werror=3Dimplicit-function-declaration]
-> > > > >   config-temp/qemu-conf.c:34:3: error: nested extern declaration =
-of
-> > > > > 'xc_hvm_inject_msi' [-Werror=3Dnested-externs]
-> > > > >   config-temp/qemu-conf.c:35:3: error: implicit declaration of fu=
-nction
-> > > > > 'xc_hvm_create_ioreq_server' [-Werror=3Dimplicit-function-
-> declaration]
-> > > > >   config-temp/qemu-conf.c:35:3: error: nested extern declaration =
-of
-> > > > > 'xc_hvm_create_ioreq_server' [-Werror=3Dnested-externs]
-> > > > >
-> > > > >
-> > > > > With -DXC_WANT_COMPAT_DEVICEMODEL_API=3D1:
-> > > > >
-> > > > >   In file included from /local/qemu-
-> > > > > upstream/include/hw/xen/xen_backend.h:4:0,
-> > > > >                    from hw/block/xen_disk.c:27:
-> > > > >   /local/qemu-upstream/include/hw/xen/xen_common.h: In function
-> > > > > 'xen_set_mem_type':
-> > > > >   /local/qemu-upstream/include/hw/xen/xen_common.h:78:5: error:
-> > implicit
-> > > > > declaration of function 'xc_hvm_set_mem_type' [-Werror=3Dimplicit=
--
-> > function-
-> > > > > declaration]
-> > > > >
-> > > >
-> > > > Ah... Do you have Anthony's patch?
-> > > >
-> > > >
-> >
-> http://xenbits.xen.org/gitweb/?p=3Dxen.git;a=3Dcommit;h=3D9970e98ace48574=
-701
-> > f7e2286fb67090481a3fec
-> > > >
-> > > > I suspect that may be the problem you're seeing above.
-> > >
-> > > Yes, I do have it. I am still having build troubles with v5 too. I am
-> >
-> > I meant v3
-> >
-> >
-> > > attaching my build test script: feel free to use it to test the build=
- of
-> > > a single QEMU branch against multiple Xen versions. It requires one X=
-en
-> > > repository checked out and built for each Xen version. I have just
-> > > added the Xen 4.9 tests, so they might be wrong somehow, but the
-> others
-> > > are known to work.
+> Using a non-pointer sPAPRRTCState introduces more changes. See below.
+> This is going a further than just removing the dependency on SysBus.=20
+> To remove only the dependency on SysBus, we can keep a 'DeviceState *'=20
+> under the machine and fix the code accordingly. =20
 >=20
-> Your script is lacking Anthony's fix. You need to patch your 4.9 configur=
-e
-> clause accordingly. I.e. you need -
-> I$(XEN_ROOT)/tools/libs/devicemodel/include and -
-> L$(XEN_ROOT)/tools/libs/devicemodel in the --extra-cflags.
+> Just tell me what you prefer. I don't mind. Although I think that=20
 
-Sorry, I meant the latter in --extra-ldflags and I notice you do actually h=
-ave that. It's just the -I that's missing.
+Ok.  I think non-pointer is probably better.  I don't mind if we
+convert directly to that, or go via some pointery intermediate step -
+just do whichever is easier.
 
-  Paul
+> QOM'ifying sPAPR is good thing. After RTC, there is only the NVRAM
+> object left to handle but I am not sure we can do much about it as=20
+> this is a drive.
 
+
+
+> =20
+> > In any case, this has missed the cutoff for qemu-2.9, I'm afraid.
 >=20
->   Paul
+> Well, yes. it's not fixing a bug.
+>=20
+> Thanks,
+>=20
+> C.=20
+>=20
+>=20
+> >From b061c1616cd07d04e795cb817768b3d9833d9036 Mon Sep 17 00:00:00 2001
+> From: =3D?UTF-8?q?C=3DC3=3DA9dric=3D20Le=3D20Goater?=3D <clg@kaod.org>
+> Date: Fri, 3 Mar 2017 14:29:40 +0100
+> Subject: [PATCH] ppc/spapr: QOM'ify sPAPRRTCState
+> MIME-Version: 1.0
+> Content-Type: text/plain; charset=3DUTF-8
+> Content-Transfer-Encoding: 8bit
+>=20
+> Also use an 'sPAPRRTCState' attribute under the sPAPR machine to hold
+> the RTC object. Overall, these changes remove an unnecessary and
+> implicit dependency on SysBus.
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> ---
+>  hw/ppc/spapr.c         | 16 ++++++++--------
+>  hw/ppc/spapr_events.c  |  2 +-
+>  hw/ppc/spapr_rtc.c     | 41 +++++++----------------------------------
+>  include/hw/ppc/spapr.h | 21 ++++++++++++++++-----
+>  include/hw/ppc/xics.h  |  2 +-
+>  5 files changed, 33 insertions(+), 49 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index c3bb99160545..3a7868ed80da 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1333,13 +1333,13 @@ static void spapr_create_nvram(sPAPRMachineState =
+*spapr)
+> =20
+>  static void spapr_rtc_create(sPAPRMachineState *spapr)
+>  {
+> -    DeviceState *dev =3D qdev_create(NULL, TYPE_SPAPR_RTC);
+> -
+> -    qdev_init_nofail(dev);
+> -    spapr->rtc =3D dev;
+> -
+> -    object_property_add_alias(qdev_get_machine(), "rtc-time",
+> -                              OBJECT(spapr->rtc), "date", NULL);
+> +    object_initialize(&spapr->rtc, sizeof(spapr->rtc), TYPE_SPAPR_RTC);
+> +    object_property_add_child(OBJECT(spapr), "rtc", OBJECT(&spapr->rtc),
+> +                              &error_fatal);
+> +    object_property_set_bool(OBJECT(&spapr->rtc), true, "realized",
+> +                              &error_fatal);
+> +    object_property_add_alias(OBJECT(spapr), "rtc-time", OBJECT(&spapr->=
+rtc),
+> +                              "date", &error_fatal);
+>  }
+> =20
+>  /* Returns whether we want to use VGA or not */
+> @@ -1377,7 +1377,7 @@ static int spapr_post_load(void *opaque, int versio=
+n_id)
+>       * So when migrating from those versions, poke the incoming offset
+>       * value into the RTC device */
+>      if (version_id < 3) {
+> -        err =3D spapr_rtc_import_offset(spapr->rtc, spapr->rtc_offset);
+> +        err =3D spapr_rtc_import_offset(&spapr->rtc, spapr->rtc_offset);
+>      }
+> =20
+>      return err;
+> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> index 24a5758e6243..f0b28d811242 100644
+> --- a/hw/ppc/spapr_events.c
+> +++ b/hw/ppc/spapr_events.c
+> @@ -422,7 +422,7 @@ static void spapr_init_maina(struct rtas_event_log_v6=
+_maina *maina,
+>      maina->hdr.section_id =3D cpu_to_be16(RTAS_LOG_V6_SECTION_ID_MAINA);
+>      maina->hdr.section_length =3D cpu_to_be16(sizeof(*maina));
+>      /* FIXME: section version, subtype and creator id? */
+> -    spapr_rtc_read(spapr->rtc, &tm, NULL);
+> +    spapr_rtc_read(&spapr->rtc, &tm, NULL);
+>      year =3D tm.tm_year + 1900;
+>      maina->creation_date =3D cpu_to_be32((to_bcd(year / 100) << 24)
+>                                         | (to_bcd(year % 100) << 16)
+> diff --git a/hw/ppc/spapr_rtc.c b/hw/ppc/spapr_rtc.c
+> index 3a17ac42e44b..00a4e4c717d5 100644
+> --- a/hw/ppc/spapr_rtc.c
+> +++ b/hw/ppc/spapr_rtc.c
+> @@ -33,19 +33,8 @@
+>  #include "qapi-event.h"
+>  #include "qemu/cutils.h"
+> =20
+> -#define SPAPR_RTC(obj) \
+> -    OBJECT_CHECK(sPAPRRTCState, (obj), TYPE_SPAPR_RTC)
+> -
+> -typedef struct sPAPRRTCState sPAPRRTCState;
+> -struct sPAPRRTCState {
+> -    /*< private >*/
+> -    SysBusDevice parent_obj;
+> -    int64_t ns_offset;
+> -};
+> -
+> -void spapr_rtc_read(DeviceState *dev, struct tm *tm, uint32_t *ns)
+> +void spapr_rtc_read(sPAPRRTCState *rtc, struct tm *tm, uint32_t *ns)
+>  {
+> -    sPAPRRTCState *rtc =3D SPAPR_RTC(dev);
+>      int64_t host_ns =3D qemu_clock_get_ns(rtc_clock);
+>      int64_t guest_ns;
+>      time_t guest_s;
+> @@ -63,16 +52,12 @@ void spapr_rtc_read(DeviceState *dev, struct tm *tm, =
+uint32_t *ns)
+>      }
+>  }
+> =20
+> -int spapr_rtc_import_offset(DeviceState *dev, int64_t legacy_offset)
+> +int spapr_rtc_import_offset(sPAPRRTCState *rtc, int64_t legacy_offset)
+>  {
+> -    sPAPRRTCState *rtc;
+> -
+> -    if (!dev) {
+> +    if (!rtc) {
+>          return -ENODEV;
+>      }
+> =20
+> -    rtc =3D SPAPR_RTC(dev);
+> -
+>      rtc->ns_offset =3D legacy_offset * NANOSECONDS_PER_SECOND;
+> =20
+>      return 0;
+> @@ -91,12 +76,7 @@ static void rtas_get_time_of_day(PowerPCCPU *cpu, sPAP=
+RMachineState *spapr,
+>          return;
+>      }
+> =20
+> -    if (!spapr->rtc) {
+> -        rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
+> -        return;
+> -    }
+> -
+> -    spapr_rtc_read(spapr->rtc, &tm, &ns);
+> +    spapr_rtc_read(&spapr->rtc, &tm, &ns);
+> =20
+>      rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+>      rtas_st(rets, 1, tm.tm_year + 1900);
+> @@ -113,7 +93,7 @@ static void rtas_set_time_of_day(PowerPCCPU *cpu, sPAP=
+RMachineState *spapr,
+>                                   target_ulong args,
+>                                   uint32_t nret, target_ulong rets)
+>  {
+> -    sPAPRRTCState *rtc;
+> +    sPAPRRTCState *rtc =3D &spapr->rtc;
+>      struct tm tm;
+>      time_t new_s;
+>      int64_t host_ns;
+> @@ -123,11 +103,6 @@ static void rtas_set_time_of_day(PowerPCCPU *cpu, sP=
+APRMachineState *spapr,
+>          return;
+>      }
+> =20
+> -    if (!spapr->rtc) {
+> -        rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
+> -        return;
+> -    }
+> -
+>      tm.tm_year =3D rtas_ld(args, 0) - 1900;
+>      tm.tm_mon =3D rtas_ld(args, 1) - 1;
+>      tm.tm_mday =3D rtas_ld(args, 2);
+> @@ -144,8 +119,6 @@ static void rtas_set_time_of_day(PowerPCCPU *cpu, sPA=
+PRMachineState *spapr,
+>      /* Generate a monitor event for the change */
+>      qapi_event_send_rtc_change(qemu_timedate_diff(&tm), &error_abort);
+> =20
+> -    rtc =3D SPAPR_RTC(spapr->rtc);
+> -
+>      host_ns =3D qemu_clock_get_ns(rtc_clock);
+> =20
+>      rtc->ns_offset =3D (new_s * NANOSECONDS_PER_SECOND) - host_ns;
+> @@ -155,7 +128,7 @@ static void rtas_set_time_of_day(PowerPCCPU *cpu, sPA=
+PRMachineState *spapr,
+> =20
+>  static void spapr_rtc_qom_date(Object *obj, struct tm *current_tm, Error=
+ **errp)
+>  {
+> -    spapr_rtc_read(DEVICE(obj), current_tm, NULL);
+> +    spapr_rtc_read(SPAPR_RTC(obj), current_tm, NULL);
+>  }
+> =20
+>  static void spapr_rtc_realize(DeviceState *dev, Error **errp)
+> @@ -200,7 +173,7 @@ static void spapr_rtc_class_init(ObjectClass *oc, voi=
+d *data)
+> =20
+>  static const TypeInfo spapr_rtc_info =3D {
+>      .name          =3D TYPE_SPAPR_RTC,
+> -    .parent        =3D TYPE_SYS_BUS_DEVICE,
+> +    .parent        =3D TYPE_DEVICE,
+>      .instance_size =3D sizeof(sPAPRRTCState),
+>      .class_init    =3D spapr_rtc_class_init,
+>  };
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 808aac870359..ba9e689ee230 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -20,6 +20,18 @@ typedef struct sPAPREventSource sPAPREventSource;
+> =20
+>  #define SPAPR_TIMEBASE_FREQ     512000000ULL
+> =20
+> +#define TYPE_SPAPR_RTC "spapr-rtc"
+> +
+> +#define SPAPR_RTC(obj)                                  \
+> +    OBJECT_CHECK(sPAPRRTCState, (obj), TYPE_SPAPR_RTC)
+> +
+> +typedef struct sPAPRRTCState sPAPRRTCState;
+> +struct sPAPRRTCState {
+> +    /*< private >*/
+> +    DeviceState parent_obj;
+> +    int64_t ns_offset;
+> +};
+> +
+>  typedef struct sPAPRMachineClass sPAPRMachineClass;
+> =20
+>  #define TYPE_SPAPR_MACHINE      "spapr-machine"
+> @@ -58,7 +70,7 @@ struct sPAPRMachineState {
+>      QLIST_HEAD(, sPAPRPHBState) phbs;
+>      struct sPAPRNVRAM *nvram;
+>      ICSState *ics;
+> -    DeviceState *rtc;
+> +    sPAPRRTCState rtc;
+> =20
+>      void *htab;
+>      uint32_t htab_shift;
+> @@ -629,11 +641,10 @@ struct sPAPRConfigureConnectorState {
+> =20
+>  void spapr_ccs_reset_hook(void *opaque);
+> =20
+> -#define TYPE_SPAPR_RTC "spapr-rtc"
+> -#define TYPE_SPAPR_RNG "spapr-rng"
+> +void spapr_rtc_read(sPAPRRTCState *rtc, struct tm *tm, uint32_t *ns);
+> +int spapr_rtc_import_offset(sPAPRRTCState *rtc, int64_t legacy_offset);
+> =20
+> -void spapr_rtc_read(DeviceState *dev, struct tm *tm, uint32_t *ns);
+> -int spapr_rtc_import_offset(DeviceState *dev, int64_t legacy_offset);
+> +#define TYPE_SPAPR_RNG "spapr-rng"
+> =20
+>  int spapr_rng_populate_dt(void *fdt);
+> =20
+> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> index 9a5e715fe553..ce230183a106 100644
+> --- a/include/hw/ppc/xics.h
+> +++ b/include/hw/ppc/xics.h
+> @@ -28,7 +28,7 @@
+>  #ifndef XICS_H
+>  #define XICS_H
+> =20
+> -#include "hw/sysbus.h"
+> +#include "hw/qdev.h"
+> =20
+>  #define XICS_IPI        0x2
+>  #define XICS_BUID       0x1
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--PNTmBPCT7hxwcZjr
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYvSVaAAoJEGw4ysog2bOStDIP/ici7C8dlwwxg4EwFr9wYqif
+oibY8sXTkPrrEdvn6TxaU/mSIdqYaSoZA98LQEVfg974ZMJIAKG8ENqKO9u79qoR
+pcZdqAdgXLWOO7qme+iXZWowz1begO1Uxt2pnESkjtsYQKh8HbwhVgNJGF96bURm
+J4TpqEb6bPDjpJeho+cVzhhqOm3xGXdSq+Vc/nyshl3a+/8Y2ZfYmY/rgYr+2k5f
+4jZBEEbKIiYOA51k4WLz/gt/Ie9lPEVcAee8FNSKNw6dOciullWwuospiCaBlfIa
+iEftwbmTFgjfgv4xiZSsCaU4xGoAKgS4bdhmShZZwaS8YDitOgYmmVX7b6wwYxVO
+cWTKXhpPylIJXDDeqivvZY2WCWLt0hEpZBA0OfWE6mqKz8q7Zu5vKf+jhPwlVYYx
+o4bz61BF/em8AfVTvpzZuFPuwpJEKNnHRY0nh0FZbX8LZzCbnLvXEZgnavlXvVGm
+z8dYMv5vN4HYS/GHsPuVmCYbDZOfBF81wOslC+yVC8a/tstkEe2xBJoY9TehJgpO
+iPfllc1hODqosRNDH3F1QMRRHHLMh9oDuERstsTwX3nAtFItW6RoQZqy75nSZ8Cc
+/xhqfx4JS0On4Qh8xMIEuEjL4LlJQuJ6g9k/oLpApC9I4oRxSeJeJ4l65WFli7B+
++Yjhhd5gB9WPIwbyiull
+=gVYL
+-----END PGP SIGNATURE-----
+
+--PNTmBPCT7hxwcZjr--
