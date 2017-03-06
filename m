@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ckylr-0007vE-Ga
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 14:58:16 -0500
+	(envelope-from <eblake@redhat.com>) id 1ckypR-0000Iu-9b
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 15:01:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1ckyln-0004cK-0B
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 14:58:15 -0500
-Resent-Message-Id: <E1ckyln-0004cK-0B@eggs.gnu.org>
-In-Reply-To: <20170306195255.15806-1-mreitz@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148883028050.294.11008388161426256258@0e2666bad730>
+	(envelope-from <eblake@redhat.com>) id 1ckypQ-000612-03
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 15:01:57 -0500
+References: <1488817322-11397-1-git-send-email-kwolf@redhat.com>
+	<1488817322-11397-3-git-send-email-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a8ae7181-5420-c13b-573f-f912510ced1a@redhat.com>
+Date: Mon, 6 Mar 2017 14:01:47 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 6 Mar 2017 11:58:01 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH for-2.10 0/3] block: Add errp to b{lk,
- drv}_turncate()
+In-Reply-To: <1488817322-11397-3-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="chl2EEVQXJopOVvDbqh1DSqwi2mIe96Xa"
+Subject: Re: [Qemu-devel] [PATCH 02/10] mirror: Fix permission problem with
+ 'replaces'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,46 +25,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mreitz@redhat.com
-Cc: famz@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzAzMDYxOTUyNTUuMTU4MDYtMS1tcmVpdHpAcmVkaGF0LmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZl
-bF0gW1BBVENIIGZvci0yLjEwIDAvM10gYmxvY2s6IEFkZCBlcnJwIHRvIGJ7bGssIGRydn1fdHVy
-bmNhdGUoKQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jh
-c2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2Mg
-LWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29t
-bWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4g
-JGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxv
-ZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9
-ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAg
-ICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQg
-JGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3
-ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3
-LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzE0ODg4MjY4NDktMzIz
-ODQtMS1naXQtc2VuZC1lbWFpbC1hcm1icnVAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzE0ODg4MjY4
-NDktMzIzODQtMS1naXQtc2VuZC1lbWFpbC1hcm1icnVAcmVkaGF0LmNvbQogKiBbbmV3IHRhZ10g
-ICAgICAgICBwYXRjaGV3LzIwMTcwMzA2MTk1MjU1LjE1ODA2LTEtbXJlaXR6QHJlZGhhdC5jb20g
-LT4gcGF0Y2hldy8yMDE3MDMwNjE5NTI1NS4xNTgwNi0xLW1yZWl0ekByZWRoYXQuY29tCkF1dG8g
-cGFja2luZyB0aGUgcmVwb3NpdG9yeSBmb3Igb3B0aW11bSBwZXJmb3JtYW5jZS4gWW91IG1heSBh
-bHNvCnJ1biAiZ2l0IGdjIiBtYW51YWxseS4gU2VlICJnaXQgaGVscCBnYyIgZm9yIG1vcmUgaW5m
-b3JtYXRpb24uClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNGVmMTc1NyBibG9jazog
-QWRkIHNvbWUgYmRydl90cnVuY2F0ZSgpIGVycm9yIG1lc3NhZ2VzCjNlMzQ4YzYgYmxvY2s6IEFk
-ZCBlcnJwIHRvIEJELmJkcnZfdHJ1bmNhdGUoKQoxYmEyYzY0IGJsb2NrOiBBZGQgZXJycCB0byBi
-e2xrLCBkcnZ9X3RydW5jYXRlKCkKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENI
-IDEvMzogYmxvY2s6IEFkZCBlcnJwIHRvIGJ7bGssIGRydn1fdHJ1bmNhdGUoKS4uLgpDaGVja2lu
-ZyBQQVRDSCAyLzM6IGJsb2NrOiBBZGQgZXJycCB0byBCRC5iZHJ2X3RydW5jYXRlKCkuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMy8zOiBibG9jazogQWRkIHNvbWUgYmRydl90cnVuY2F0ZSgpIGVycm9yIG1l
-c3NhZ2VzLi4uCkVSUk9SOiBzdXNwZWN0IGNvZGUgaW5kZW50IGZvciBjb25kaXRpb25hbCBzdGF0
-ZW1lbnRzICg3LCAxMSkKIzM1OiBGSUxFOiBibG9jay9maWxlLXBvc2l4LmM6MTM1ODoKICAgICAg
-ICBpZiAob2Zmc2V0ID4gcmF3X2dldGxlbmd0aChicykpIHsKKyAgICAgICAgICAgZXJyb3Jfc2V0
-ZyhlcnJwLCAiQ2Fubm90IGdyb3cgZGV2aWNlIGZpbGVzIik7Cgp0b3RhbDogMSBlcnJvcnMsIDAg
-d2FybmluZ3MsIDczIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNv
-ZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0
-cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1k
-ZXZlbEBmcmVlbGlzdHMub3Jn
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--chl2EEVQXJopOVvDbqh1DSqwi2mIe96Xa
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com
+Message-ID: <a8ae7181-5420-c13b-573f-f912510ced1a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 02/10] mirror: Fix permission problem with
+ 'replaces'
+References: <1488817322-11397-1-git-send-email-kwolf@redhat.com>
+ <1488817322-11397-3-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1488817322-11397-3-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 03/06/2017 10:21 AM, Kevin Wolf wrote:
+> The 'replaces' option of drive-mirror can be used to mirror a Quorum
+> node to a new image and then let the target image replace one of the
+> Quorum children. In order for this graph modification to succeed, the
+> mirror job needs to lift its restrictions on the target node first
+> before actually replacing the child.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/mirror.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+>=20
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--chl2EEVQXJopOVvDbqh1DSqwi2mIe96Xa
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYvcArAAoJEKeha0olJ0NqCNIIAIQ/Bvk/t4jX8KaVr3TTpeX3
+xT6pO1JBo7arSIoiuVAaxY0TxBcY0SQUD5hEplzYHUI40jTMfDCgUpNacgZYHjyv
+TrDtJvgSfDBmXAaR7rnGZLz1VQPu3QeBIU3MBBrERKaW54EHy3KUSQiO1uREbUyq
+YV9WGz2gPnnkvrAmA5GEsQhSCg+g6kwkojgMC2PH9WP7AzsXElFDOIKtVaR1My5f
+sjk2YfH4PkWF5ptMmB/8qUq/iMdFcXaoMlkHaHoD3jODhNdvyMzLDAx5SptgZx8c
++rln6ygF1vu3W6VPRuThCcliDYAsl3HA2u9YfNqHRZ0nR6cpVi35irIcgeYc+K0=
+=Q6OH
+-----END PGP SIGNATURE-----
+
+--chl2EEVQXJopOVvDbqh1DSqwi2mIe96Xa--
