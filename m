@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cktMs-0002qD-MF
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:12:07 -0500
+	(envelope-from <armbru@redhat.com>) id 1cktMv-0002su-LL
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:12:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cktMo-0002oq-OA
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:12:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44202)
+	(envelope-from <armbru@redhat.com>) id 1cktMo-0002oW-Jz
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:12:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52208)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cktMo-0002nV-F6
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cktMo-0002nM-A8
 	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:12:02 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AB6FAD59A4
+	by mx1.redhat.com (Postfix) with ESMTPS id 877224DAF8
 	for <qemu-devel@nongnu.org>; Mon,  6 Mar 2017 14:12:02 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
 	[10.36.116.55])
-	by int-mx09.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v26EC1qk004518
+	by int-mx11.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v26EC1aa008100
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
 	verify=NO)
 	for <qemu-devel@nongnu.org>; Mon, 6 Mar 2017 09:12:02 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  6 Mar 2017 15:11:49 +0100
-Message-Id: <1488809515-4047-19-git-send-email-armbru@redhat.com>
+Date: Mon,  6 Mar 2017 15:11:50 +0100
+Message-Id: <1488809515-4047-20-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488809515-4047-1-git-send-email-armbru@redhat.com>
 References: <1488809515-4047-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v2 18/24] qapi: New parse_qapi_name()
+Subject: [Qemu-devel] [PULL v2 19/24] keyval: Restrict key components to
+ valid QAPI names
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,129 +39,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <1488317230-26248-19-git-send-email-armbru@redhat.com>
----
- include/qapi/util.h    |  2 ++
- qapi/qapi-util.c       | 47 +++++++++++++++++++++++++++++++++++++++++++++++
- tests/test-qapi-util.c | 34 ++++++++++++++++++++++++++++++++++
- 3 files changed, 83 insertions(+)
+Restricting the key components to something sane leaves us room for
+evolving key syntax.  Since they will be commonly used as QAPI member
+names by the QObject input visitor, we can just as well borrow the
+QAPI naming rules here.
 
-diff --git a/include/qapi/util.h b/include/qapi/util.h
-index 7ad26c0..7436ed8 100644
---- a/include/qapi/util.h
-+++ b/include/qapi/util.h
-@@ -14,4 +14,6 @@
- int qapi_enum_parse(const char * const lookup[], const char *buf,
-                     int max, int def, Error **errp);
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Message-Id: <1488317230-26248-20-git-send-email-armbru@redhat.com>
+---
+ tests/test-keyval.c | 10 ++++++++++
+ util/keyval.c       | 12 ++++++++----
+ 2 files changed, 18 insertions(+), 4 deletions(-)
+
+diff --git a/tests/test-keyval.c b/tests/test-keyval.c
+index 1c2aeea..efe27cd 100644
+--- a/tests/test-keyval.c
++++ b/tests/test-keyval.c
+@@ -41,6 +41,11 @@ static void test_keyval_parse(void)
+     error_free_or_abort(&err);
+     g_assert(!qdict);
  
-+int parse_qapi_name(const char *name, bool complete);
++    /* Invalid non-empty key (qemu_opts_parse() doesn't care) */
++    qdict = keyval_parse("7up=val", NULL, &err);
++    error_free_or_abort(&err);
++    g_assert(!qdict);
 +
- #endif
-diff --git a/qapi/qapi-util.c b/qapi/qapi-util.c
-index 818730a..e28dbd0 100644
---- a/qapi/qapi-util.c
-+++ b/qapi/qapi-util.c
-@@ -33,3 +33,50 @@ int qapi_enum_parse(const char * const lookup[], const char *buf,
-     error_setg(errp, "invalid parameter value: %s", buf);
-     return def;
- }
-+
-+/*
-+ * Parse a valid QAPI name from @str.
-+ * A valid name consists of letters, digits, hyphen and underscore.
-+ * It may be prefixed by __RFQDN_ (downstream extension), where RFQDN
-+ * may contain only letters, digits, hyphen and period.
-+ * The special exception for enumeration names is not implemented.
-+ * See docs/qapi-code-gen.txt for more on QAPI naming rules.
-+ * Keep this consistent with scripts/qapi.py!
-+ * If @complete, the parse fails unless it consumes @str completely.
-+ * Return its length on success, -1 on failure.
-+ */
-+int parse_qapi_name(const char *str, bool complete)
-+{
-+    const char *p = str;
-+
-+    if (*p == '_') {            /* Downstream __RFQDN_ */
-+        p++;
-+        if (*p != '_') {
-+            return -1;
-+        }
-+        while (*++p) {
-+            if (!qemu_isalnum(*p) && *p != '-' && *p != '.') {
-+                break;
-+            }
-+        }
-+
-+        if (*p != '_') {
-+            return -1;
-+        }
-+        p++;
-+    }
-+
-+    if (!qemu_isalpha(*p)) {
-+        return -1;
-+    }
-+    while (*++p) {
-+        if (!qemu_isalnum(*p) && *p != '-' && *p != '_') {
-+            break;
-+        }
-+    }
-+
-+    if (complete && *p) {
-+        return -1;
-+    }
-+    return p - str;
-+}
-diff --git a/tests/test-qapi-util.c b/tests/test-qapi-util.c
-index 39db8bf..e869757 100644
---- a/tests/test-qapi-util.c
-+++ b/tests/test-qapi-util.c
-@@ -42,10 +42,44 @@ static void test_qapi_enum_parse(void)
-     g_assert_cmpint(ret, ==, QTYPE__MAX - 1);
- }
+     /* Overlong key */
+     memset(long_key, 'a', 127);
+     long_key[127] = 'z';
+@@ -73,6 +78,11 @@ static void test_keyval_parse(void)
+     QDECREF(qdict);
+     g_free(params);
  
-+static void test_parse_qapi_name(void)
-+{
++    /* Crap after valid key */
++    qdict = keyval_parse("key[0]=val", NULL, &err);
++    error_free_or_abort(&err);
++    g_assert(!qdict);
++
+     /* Multiple keys, last one wins */
+     qdict = keyval_parse("a=1,b=2,,x,a=3", NULL, &error_abort);
+     g_assert_cmpuint(qdict_size(qdict), ==, 2);
+diff --git a/util/keyval.c b/util/keyval.c
+index 990126f..29a6368 100644
+--- a/util/keyval.c
++++ b/util/keyval.c
+@@ -34,6 +34,8 @@
+  *   doesn't have one, because R.a must be an object to satisfy a.b=1
+  *   and a string to satisfy a=2.
+  *
++ * Key-fragments must be valid QAPI names.
++ *
+  * The length of any key-fragment must be between 1 and 127.
+  *
+  * Design flaw: there is no way to denote an empty non-root object.
+@@ -51,12 +53,12 @@
+  * where no-key is syntactic sugar for implied-key=val-no-key.
+  *
+  * TODO support lists
+- * TODO support key-fragment with __RFQDN_ prefix (downstream extensions)
+  */
+ 
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "qapi/qmp/qstring.h"
++#include "qapi/util.h"
+ #include "qemu/option.h"
+ 
+ /*
+@@ -118,6 +120,7 @@ static const char *keyval_parse_one(QDict *qdict, const char *params,
+     size_t len;
+     char key_in_cur[128];
+     QDict *cur;
 +    int ret;
-+
-+    /* Must start with a letter */
-+    ret = parse_qapi_name("a", true);
-+    g_assert(ret == 1);
-+    ret = parse_qapi_name("a$", false);
-+    g_assert(ret == 1);
-+    ret = parse_qapi_name("", false);
-+    g_assert(ret == -1);
-+    ret = parse_qapi_name("1", false);
-+    g_assert(ret == -1);
-+
-+    /* Only letters, digits, hyphen, underscore */
-+    ret = parse_qapi_name("A-Za-z0-9_", true);
-+    g_assert(ret == 10);
-+    ret = parse_qapi_name("A-Za-z0-9_$", false);
-+    g_assert(ret == 10);
-+    ret = parse_qapi_name("A-Za-z0-9_$", true);
-+    g_assert(ret == -1);
-+
-+    /* __RFQDN_ */
-+    ret = parse_qapi_name("__com.redhat_supports", true);
-+    g_assert(ret == 21);
-+    ret = parse_qapi_name("_com.example_", false);
-+    g_assert(ret == -1);
-+    ret = parse_qapi_name("__com.example", false);
-+    g_assert(ret == -1);
-+    ret = parse_qapi_name("__com.example_", false);
-+    g_assert(ret == -1);
-+}
-+
- int main(int argc, char *argv[])
- {
-     g_test_init(&argc, &argv, NULL);
-     g_test_add_func("/qapi/util/qapi_enum_parse", test_qapi_enum_parse);
-+    g_test_add_func("/qapi/util/parse_qapi_name", test_parse_qapi_name);
-     g_test_run();
-     return 0;
- }
+     QObject *next;
+     QString *val;
+ 
+@@ -137,9 +140,10 @@ static const char *keyval_parse_one(QDict *qdict, const char *params,
+     cur = qdict;
+     s = key;
+     for (;;) {
+-        for (len = 0; s + len < key_end && s[len] != '.'; len++) {
+-        }
+-        if (!len) {
++        ret = parse_qapi_name(s, false);
++        len = ret < 0 ? 0 : ret;
++        assert(s + len <= key_end);
++        if (!len || (s + len < key_end && s[len] != '.')) {
+             assert(key != implied_key);
+             error_setg(errp, "Invalid parameter '%.*s'",
+                        (int)(key_end - key), key);
 -- 
 2.7.4
