@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58185)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1ckl9q-0007f1-6o
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 00:26:07 -0500
+	(envelope-from <jasowang@redhat.com>) id 1ckl9v-0007jL-Ce
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 00:26:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1ckl9p-0000zN-5U
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 00:26:06 -0500
+	(envelope-from <jasowang@redhat.com>) id 1ckl9u-00012e-Cp
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 00:26:11 -0500
 From: Jason Wang <jasowang@redhat.com>
-Date: Mon,  6 Mar 2017 13:25:37 +0800
-Message-Id: <1488777954-4578-3-git-send-email-jasowang@redhat.com>
+Date: Mon,  6 Mar 2017 13:25:39 +0800
+Message-Id: <1488777954-4578-5-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1488777954-4578-1-git-send-email-jasowang@redhat.com>
 References: <1488777954-4578-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL RESEND 02/19] eth: Extend vlan stripping
- functions
+Subject: [Qemu-devel] [PULL RESEND 04/19] NetRxPkt: Do not try to pull more
+ data than present
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,125 +25,30 @@ Cc: Dmitry Fleytman <dmitry@daynix.com>, qemu-stable@nongnu.org, Jason Wang <jas
 
 From: Dmitry Fleytman <dmitry@daynix.com>
 
-Make VLAN stripping functions return number of bytes
-copied to given Ethernet header buffer.
-
-This information should be used to re-compose
-packet IOV after VLAN stripping.
+In case of VLAN stripping, ETH header put into a
+separate buffer, therefore amont of data copied
+from original IOV should be smaller.
 
 Cc: qemu-stable@nongnu.org
 Signed-off-by: Dmitry Fleytman <dmitry@daynix.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- include/net/eth.h |  4 ++--
- net/eth.c         | 25 ++++++++++++++-----------
- 2 files changed, 16 insertions(+), 13 deletions(-)
+ hw/net/net_rx_pkt.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/eth.h b/include/net/eth.h
-index 2013175..afeb45b 100644
---- a/include/net/eth.h
-+++ b/include/net/eth.h
-@@ -331,12 +331,12 @@ eth_get_pkt_tci(const void *p)
-     }
- }
+diff --git a/hw/net/net_rx_pkt.c b/hw/net/net_rx_pkt.c
+index 3361d7e..0003a0e 100644
+--- a/hw/net/net_rx_pkt.c
++++ b/hw/net/net_rx_pkt.c
+@@ -96,7 +96,8 @@ net_rx_pkt_pull_data(struct NetRxPkt *pkt,
  
--bool
-+size_t
- eth_strip_vlan(const struct iovec *iov, int iovcnt, size_t iovoff,
-                uint8_t *new_ehdr_buf,
-                uint16_t *payload_offset, uint16_t *tci);
+         pkt->tot_len = iov_size(iov, iovcnt) - ploff + pkt->ehdr_buf_len;
+         pkt->vec_len = iov_copy(pkt->vec + 1, pkt->vec_len_total - 1,
+-                                iov, iovcnt, ploff, pkt->tot_len);
++                                iov, iovcnt, ploff,
++                                pkt->tot_len - pkt->ehdr_buf_len);
+     } else {
+         net_rx_pkt_iovec_realloc(pkt, iovcnt);
  
--bool
-+size_t
- eth_strip_vlan_ex(const struct iovec *iov, int iovcnt, size_t iovoff,
-                   uint16_t vet, uint8_t *new_ehdr_buf,
-                   uint16_t *payload_offset, uint16_t *tci);
-diff --git a/net/eth.c b/net/eth.c
-index df81efb..5b9ba26 100644
---- a/net/eth.c
-+++ b/net/eth.c
-@@ -232,7 +232,7 @@ void eth_get_protocols(const struct iovec *iov, int iovcnt,
-     }
- }
- 
--bool
-+size_t
- eth_strip_vlan(const struct iovec *iov, int iovcnt, size_t iovoff,
-                uint8_t *new_ehdr_buf,
-                uint16_t *payload_offset, uint16_t *tci)
-@@ -244,7 +244,7 @@ eth_strip_vlan(const struct iovec *iov, int iovcnt, size_t iovoff,
-                                new_ehdr, sizeof(*new_ehdr));
- 
-     if (copied < sizeof(*new_ehdr)) {
--        return false;
-+        return 0;
-     }
- 
-     switch (be16_to_cpu(new_ehdr->h_proto)) {
-@@ -254,7 +254,7 @@ eth_strip_vlan(const struct iovec *iov, int iovcnt, size_t iovoff,
-                             &vlan_hdr, sizeof(vlan_hdr));
- 
-         if (copied < sizeof(vlan_hdr)) {
--            return false;
-+            return 0;
-         }
- 
-         new_ehdr->h_proto = vlan_hdr.h_proto;
-@@ -268,18 +268,21 @@ eth_strip_vlan(const struct iovec *iov, int iovcnt, size_t iovoff,
-                                 PKT_GET_VLAN_HDR(new_ehdr), sizeof(vlan_hdr));
- 
-             if (copied < sizeof(vlan_hdr)) {
--                return false;
-+                return 0;
-             }
- 
-             *payload_offset += sizeof(vlan_hdr);
-+
-+            return sizeof(struct eth_header) + sizeof(struct vlan_header);
-+        } else {
-+            return sizeof(struct eth_header);
-         }
--        return true;
-     default:
--        return false;
-+        return 0;
-     }
- }
- 
--bool
-+size_t
- eth_strip_vlan_ex(const struct iovec *iov, int iovcnt, size_t iovoff,
-                   uint16_t vet, uint8_t *new_ehdr_buf,
-                   uint16_t *payload_offset, uint16_t *tci)
-@@ -291,7 +294,7 @@ eth_strip_vlan_ex(const struct iovec *iov, int iovcnt, size_t iovoff,
-                                new_ehdr, sizeof(*new_ehdr));
- 
-     if (copied < sizeof(*new_ehdr)) {
--        return false;
-+        return 0;
-     }
- 
-     if (be16_to_cpu(new_ehdr->h_proto) == vet) {
-@@ -299,17 +302,17 @@ eth_strip_vlan_ex(const struct iovec *iov, int iovcnt, size_t iovoff,
-                             &vlan_hdr, sizeof(vlan_hdr));
- 
-         if (copied < sizeof(vlan_hdr)) {
--            return false;
-+            return 0;
-         }
- 
-         new_ehdr->h_proto = vlan_hdr.h_proto;
- 
-         *tci = be16_to_cpu(vlan_hdr.h_tci);
-         *payload_offset = iovoff + sizeof(*new_ehdr) + sizeof(vlan_hdr);
--        return true;
-+        return sizeof(struct eth_header);
-     }
- 
--    return false;
-+    return 0;
- }
- 
- void
 -- 
 2.7.4
