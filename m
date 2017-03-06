@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1ckx7y-00043h-My
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 13:12:59 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1ckx9H-0004e8-4t
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 13:14:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1ckx7v-0004MB-KB
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 13:12:58 -0500
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:44064)
+	(envelope-from <pbonzini@redhat.com>) id 1ckx9D-0004eK-Up
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 13:14:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55042)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1ckx7v-0004K2-DV
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 13:12:55 -0500
-Date: Mon, 6 Mar 2017 19:12:46 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <1488810230-31945-1-git-send-email-kraxel@redhat.com>
-Message-ID: <alpine.BSF.2.20.1703061907370.39075@zero.eik.bme.hu>
-References: <1488810230-31945-1-git-send-email-kraxel@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ckx9D-0004eA-OV
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 13:14:15 -0500
+References: <1486623844-13140-1-git-send-email-liqiang6-s@360.cn>
+	<1486623844-13140-2-git-send-email-liqiang6-s@360.cn>
+	<eadb7db6-dded-77ce-ac46-7dee688be954@redhat.com>
+	<CAKXe6SJyeHEeRujwKTd=TUAXjJ1Btv4K9jX6rjyJ4wtsutQ1fQ@mail.gmail.com>
+	<8a406a12-5145-bfbe-af18-290e6342f668@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d183120f-c439-246a-5591-73a1cd2536dd@redhat.com>
+Date: Mon, 6 Mar 2017 19:14:10 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH 0/2] sm501: drop obsolete code
+In-Reply-To: <8a406a12-5145-bfbe-af18-290e6342f668@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] ide: core: add cleanup function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,36 +30,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: John Snow <jsnow@redhat.com>, Li Qiang <liq3ea@gmail.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, Li Qiang <liqiang6-s@360.cn>, Markus Armbruster <armbru@redhat.com>
 
-Hello,
 
-On Mon, 6 Mar 2017, Gerd Hoffmann wrote:
-> This little series drops a bunch of code which is not needed any more.
-> Nowdays qemu console only uses 32bpp surfaces.
->
-> BALATON, this should simplify your job of getting the pixel conversions
-> right.  Feel free to add this to your series.
 
-Thanks but this would actually complicate my job, as applying this before 
-my series would need rebasing my patches again to this change and after 
-that it won't apply as it is because the draw functions are changed. Maybe 
-this change could be done independently after my series gets in. Having 
-the unused functions should not cause any problems other than some unused 
-code in the executable so it does not seem to matter for pixel 
-conversions.
+On 01/03/2017 21:20, John Snow wrote:
+> we have an idebus unrealize function, but it was being registered as the
+> unrealize function for the IDE Device, so it was not getting invoked on
+> device teardown because nothing is "unrealizing" the IDE devices
+> themselves, AFAIK.
 
-Regards,
-BALATON Zoltan
+I agree.  Thanks for looking at it!
 
-> Gerd Hoffmann (2):
->  sm501: drop support for anything but 32bpp
->  sm501: drop sm501_template.h
->
-> hw/display/sm501.c          | 167 +++++++++++++++++++++++---------------------
-> hw/display/sm501_template.h | 145 --------------------------------------
-> 2 files changed, 86 insertions(+), 226 deletions(-)
-> delete mode 100644 hw/display/sm501_template.h
->
->
+Paolo
