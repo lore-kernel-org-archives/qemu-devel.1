@@ -1,16 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1ckr82-0007qY-JK
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 06:48:39 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1ckrSe-0004Ft-8f
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 07:09:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1ckr81-0006Oi-J4
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 06:48:38 -0500
-From: Eric Auger <eric.auger@redhat.com>
-Date: Mon,  6 Mar 2017 12:48:14 +0100
-Message-Id: <1488800894-22421-4-git-send-email-eric.auger@redhat.com>
-In-Reply-To: <1488800894-22421-1-git-send-email-eric.auger@redhat.com>
-References: <1488800894-22421-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v2 3/3] hw/intc/arm_gicv3_its: Allow save/restore
+	(envelope-from <ehabkost@redhat.com>) id 1ckrSa-0003fq-8y
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 07:09:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43994)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ckrSa-0003fU-05
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 07:09:52 -0500
+Date: Mon, 6 Mar 2017 09:09:48 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170306120948.GV2778@thinpad.lan.raisama.net>
+References: <20170305214633.19844-1-krzk@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170305214633.19844-1-krzk@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH] qdev: Constify data pointed by few
+ arguments and local variables
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,111 +27,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: vijay.kilari@gmail.com, Vijaya.Kumar@cavium.com, drjones@redhat.com, peterx@redhat.com, quintela@redhat.com, dgilbert@redhat.com, christoffer.dall@linaro.org
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org
 
-We change the restoration priority of both the GICv3 and ITS. The
-GICv3 must be restored before the ITS and the ITS needs to be restored
-before PCIe devices since it translates their MSI transactions.
+Hi,
 
-We typically observe the virtio-pci-net device sending MSI transactions
-very early (even before the first vcpu run) which looks weird. It
-appears that not servicing those transactions cause the virtio-pci-net
-to stall.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+On Sun, Mar 05, 2017 at 11:46:33PM +0200, Krzysztof Kozlowski wrote:
+> In few places the function arguments and local variables are not
+> modifying data passed through pointers so this can be made const for
+> code safeness.
+> 
+> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
 
----
+I believe most changes below are misleading to users of the API,
+and make the code less safe. Most of the pointers passed as
+argument to those functions will be stored at non-const pointer
+fields inside the objects.
 
-v1 -> v2:
-- handle case where migrate_add_blocker fails
-- add comments along with ITS and GICv3 migration priorities
----
- hw/intc/arm_gicv3_common.c     |  1 +
- hw/intc/arm_gicv3_its_common.c |  3 ++-
- hw/intc/arm_gicv3_its_kvm.c    | 23 +++++++++++------------
- include/migration/vmstate.h    |  2 ++
- 4 files changed, 16 insertions(+), 13 deletions(-)
+> ---
+>  hw/core/qdev-properties-system.c |  6 +++---
+>  hw/core/qdev-properties.c        |  7 ++++---
+>  include/hw/qdev-properties.h     | 11 +++++++----
+>  3 files changed, 14 insertions(+), 10 deletions(-)
+> 
+> diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
+> index c34be1c1bace..abbf3ef754d8 100644
+> --- a/hw/core/qdev-properties-system.c
+> +++ b/hw/core/qdev-properties-system.c
+> @@ -405,7 +405,7 @@ void qdev_prop_set_drive(DeviceState *dev, const char *name,
+>      if (value) {
+>          ref = blk_name(value);
+>          if (!*ref) {
+> -            BlockDriverState *bs = blk_bs(value);
+> +            const BlockDriverState *bs = blk_bs(value);
+>              if (bs) {
+>                  ref = bdrv_get_node_name(bs);
+>              }
 
-diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
-index c6493d6..4228b7c 100644
---- a/hw/intc/arm_gicv3_common.c
-+++ b/hw/intc/arm_gicv3_common.c
-@@ -145,6 +145,7 @@ static const VMStateDescription vmstate_gicv3 = {
-     .minimum_version_id = 1,
-     .pre_save = gicv3_pre_save,
-     .post_load = gicv3_post_load,
-+    .priority = MIG_PRI_GICV3,
-     .fields = (VMStateField[]) {
-         VMSTATE_UINT32(gicd_ctlr, GICv3State),
-         VMSTATE_UINT32_ARRAY(gicd_statusr, GICv3State, 2),
-diff --git a/hw/intc/arm_gicv3_its_common.c b/hw/intc/arm_gicv3_its_common.c
-index 75b9f04..854709f 100644
---- a/hw/intc/arm_gicv3_its_common.c
-+++ b/hw/intc/arm_gicv3_its_common.c
-@@ -48,7 +48,8 @@ static const VMStateDescription vmstate_its = {
-     .name = "arm_gicv3_its",
-     .pre_save = gicv3_its_pre_save,
-     .post_load = gicv3_its_post_load,
--    .unmigratable = true,
-+    .unmigratable = false,
-+    .priority = MIG_PRI_GICV3_ITS,
-     .fields = (VMStateField[]) {
-         VMSTATE_UINT32(ctlr, GICv3ITSState),
-         VMSTATE_UINT64(cbaser, GICv3ITSState),
-diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
-index 45e57d6..3bd2873 100644
---- a/hw/intc/arm_gicv3_its_kvm.c
-+++ b/hw/intc/arm_gicv3_its_kvm.c
-@@ -76,18 +76,6 @@ static void kvm_arm_its_realize(DeviceState *dev, Error **errp)
-     GICv3ITSState *s = ARM_GICV3_ITS_COMMON(dev);
-     Error *local_err = NULL;
- 
--    /*
--     * Block migration of a KVM GICv3 ITS device: the API for saving and
--     * restoring the state in the kernel is not yet available
--     */
--    error_setg(&s->migration_blocker, "vITS migration is not implemented");
--    migrate_add_blocker(s->migration_blocker, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        error_free(s->migration_blocker);
--        return;
--    }
--
-     s->dev_fd = kvm_create_device(kvm_state, KVM_DEV_TYPE_ARM_VGIC_ITS, false);
-     if (s->dev_fd < 0) {
-         error_setg_errno(errp, -s->dev_fd, "error creating in-kernel ITS");
-@@ -104,6 +92,17 @@ static void kvm_arm_its_realize(DeviceState *dev, Error **errp)
- 
-     gicv3_its_init_mmio(s, NULL);
- 
-+    if (!kvm_device_check_attr(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
-+        GITS_CTLR)) {
-+        error_setg(&s->migration_blocker, "vITS migration is not implemented");
-+        migrate_add_blocker(s->migration_blocker, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            error_free(s->migration_blocker);
-+            return;
-+        }
-+    }
-+
-     kvm_msi_use_devid = true;
-     kvm_gsi_direct_mapping = false;
-     kvm_msi_via_irqfd_allowed = kvm_irqfds_enabled();
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index f2dbf84..8dab9c7 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -198,6 +198,8 @@ enum VMStateFlags {
- typedef enum {
-     MIG_PRI_DEFAULT = 0,
-     MIG_PRI_IOMMU,              /* Must happen before PCI devices */
-+    MIG_PRI_GICV3_ITS,          /* Must happen before PCI devices */
-+    MIG_PRI_GICV3,              /* Must happen before the ITS */
-     MIG_PRI_MAX,
- } MigrationPriority;
- 
+This part looks safe, but still misleading: the
+object_property_set_str() call will end up changing a non-const
+pointer field in the object. I'm not sure what's the benefit of
+this change.
+
+> @@ -416,7 +416,7 @@ void qdev_prop_set_drive(DeviceState *dev, const char *name,
+>  }
+>  
+>  void qdev_prop_set_chr(DeviceState *dev, const char *name,
+> -                       Chardev *value)
+> +                       const Chardev *value)
+
+This wrapper will end up storing 'value' in a non-const pointer
+in the object (e.g. PL011State::chr). Declaring 'value' as const
+is misleading.
+
+
+>  {
+>      assert(!value || value->label);
+>      object_property_set_str(OBJECT(dev),
+> @@ -424,7 +424,7 @@ void qdev_prop_set_chr(DeviceState *dev, const char *name,
+>  }
+>  
+>  void qdev_prop_set_netdev(DeviceState *dev, const char *name,
+> -                          NetClientState *value)
+> +                          const NetClientState *value)
+
+Same case here: the wrapper will store 'value' in a non-const
+NetClientState pointer in the object.
+
+>  {
+>      assert(!value || value->name);
+>      object_property_set_str(OBJECT(dev),
+> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> index 6ab4265eb478..34ec10f0caac 100644
+> --- a/hw/core/qdev-properties.c
+> +++ b/hw/core/qdev-properties.c
+> @@ -1010,7 +1010,8 @@ void qdev_prop_set_string(DeviceState *dev, const char *name, const char *value)
+>      object_property_set_str(OBJECT(dev), value, name, &error_abort);
+>  }
+>  
+> -void qdev_prop_set_macaddr(DeviceState *dev, const char *name, uint8_t *value)
+> +void qdev_prop_set_macaddr(DeviceState *dev, const char *name,
+> +                           const uint8_t *value)
+
+This one makes sense to me.
+
+>  {
+>      char str[2 * 6 + 5 + 1];
+>      snprintf(str, sizeof(str), "%02x:%02x:%02x:%02x:%02x:%02x",
+> @@ -1028,10 +1029,10 @@ void qdev_prop_set_enum(DeviceState *dev, const char *name, int value)
+>                              name, &error_abort);
+>  }
+>  
+> -void qdev_prop_set_ptr(DeviceState *dev, const char *name, void *value)
+> +void qdev_prop_set_ptr(DeviceState *dev, const char *name, const void *value)
+>  {
+>      Property *prop;
+> -    void **ptr;
+> +    const void **ptr;
+
+This one is also misleading: the field pointed by
+qdev_prop_find() is normally a non-const pointer.
+
+>  
+>      prop = qdev_prop_find(dev, name);
+>      assert(prop && prop->info == &qdev_prop_ptr);
+> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+> index 7ac315331aa0..659561daad0d 100644
+> --- a/include/hw/qdev-properties.h
+> +++ b/include/hw/qdev-properties.h
+> @@ -184,14 +184,17 @@ void qdev_prop_set_uint32(DeviceState *dev, const char *name, uint32_t value);
+>  void qdev_prop_set_int32(DeviceState *dev, const char *name, int32_t value);
+>  void qdev_prop_set_uint64(DeviceState *dev, const char *name, uint64_t value);
+>  void qdev_prop_set_string(DeviceState *dev, const char *name, const char *value);
+> -void qdev_prop_set_chr(DeviceState *dev, const char *name, Chardev *value);
+> -void qdev_prop_set_netdev(DeviceState *dev, const char *name, NetClientState *value);
+> +void qdev_prop_set_chr(DeviceState *dev, const char *name,
+> +                       const Chardev *value);
+> +void qdev_prop_set_netdev(DeviceState *dev, const char *name,
+> +                          const NetClientState *value);
+>  void qdev_prop_set_drive(DeviceState *dev, const char *name,
+>                           BlockBackend *value, Error **errp);
+> -void qdev_prop_set_macaddr(DeviceState *dev, const char *name, uint8_t *value);
+> +void qdev_prop_set_macaddr(DeviceState *dev, const char *name,
+> +                           const uint8_t *value);
+>  void qdev_prop_set_enum(DeviceState *dev, const char *name, int value);
+>  /* FIXME: Remove opaque pointer properties.  */
+> -void qdev_prop_set_ptr(DeviceState *dev, const char *name, void *value);
+> +void qdev_prop_set_ptr(DeviceState *dev, const char *name, const void *value);
+>  
+>  void qdev_prop_register_global(GlobalProperty *prop);
+>  void qdev_prop_register_global_list(GlobalProperty *props);
+> -- 
+> 2.9.3
+> 
+
 -- 
-2.5.5
+Eduardo
