@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ckpBK-0007dq-D5
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 04:43:55 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1ckpC2-0007yV-DP
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 04:44:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1ckpBH-0002On-9m
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 04:43:54 -0500
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:35650)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1ckpBG-0002Ob-VH
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 04:43:51 -0500
-Received: by mail-wr0-x22e.google.com with SMTP id g10so112160232wrg.2
-	for <qemu-devel@nongnu.org>; Mon, 06 Mar 2017 01:43:50 -0800 (PST)
-References: <20170302195337.31558-1-alex.bennee@linaro.org>
-	<058f0960-bc1b-fd44-9871-66d11d2e9b76@greensocs.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <058f0960-bc1b-fd44-9871-66d11d2e9b76@greensocs.com>
-Date: Mon, 06 Mar 2017 09:43:55 +0000
-Message-ID: <87pohuivtw.fsf@linaro.org>
+	(envelope-from <dgibson@ozlabs.org>) id 1ckpBz-0002Uq-AA
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 04:44:38 -0500
+Date: Mon, 6 Mar 2017 20:43:49 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170306094349.GB11260@umbus.fritz.box>
+References: <1488583977-32253-1-git-send-email-mdroth@linux.vnet.ibm.com>
+	<20170306041658.GH12030@umbus.fritz.box>
+	<148877909465.3910.16372626632881517514@loki>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 00/11] MTTCG fixups for 2.9
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="kORqDWCi7qDJ0mEj"
+Content-Disposition: inline
+In-Reply-To: <148877909465.3910.16372626632881517514@loki>
+Subject: Re: [Qemu-devel] [PATCH v2] spapr_pci: allow control of BAR
+ alignment through SLOF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,122 +26,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Frederic Konrad <fred.konrad@greensocs.com>
-Cc: peter.maydell@linaro.org, rth@twiddle.net, pbonzini@redhat.com, mttcg@listserver.greensocs.com, nikunj@linux.vnet.ibm.com, a.rigo@virtualopensystems.com, qemu-devel@nongnu.org, cota@braap.org, bobby.prani@gmail.com
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
 
 
-Frederic Konrad <fred.konrad@greensocs.com> writes:
+--kORqDWCi7qDJ0mEj
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Hi All,
->
-> I've a strangeness with the "drop iolock" patch.
-> It seems it has an impact on the MMIO execution patch-set I'm working
-> on:
+On Sun, Mar 05, 2017 at 11:44:54PM -0600, Michael Roth wrote:
+> Quoting David Gibson (2017-03-05 22:16:58)
+> > On Fri, Mar 03, 2017 at 05:32:57PM -0600, Michael Roth wrote:
+> > > In certain cases, such as PCI-passthrough with VFIO, we cannot offload
+> > > MMIO accesses to KVM unless the BAR alignment matches the host. This
+> > > patch, in conjunction with a separately submitted patch for SLOF
+> > > which allows for control of this via the device-tree, allows us to
+> > > set this alignment via QEMU.
+> > >=20
+> > > Cc: qemu-ppc@nongnu.org
+> > > Cc: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+> > > Cc: David Gibson <david@gibson.dropbear.id.au>
+> > > Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
+> > > Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> > > ---
+> > > v2:
+> > >   * Keep natural alignment as the default in SLOF, only set DT prop if
+> > >     different alignment is specified by QEMU (David)
+> >=20
+> > Unfortunately, this has missed the cutoff for qemu-2.9. =20
+> >=20
+> > I'm afraid I'm still not entirely clear on the rationale here.
+> >=20
+> > Why do we need a variable parameter based on the host page size?
+> > Couldn't we just have SLOF always align to something "big enough"
+> > (64kiB, IIUC)?
+>=20
+> Is it okay for SLOF to assume 64K is sufficient? Since this is a
+> restriction/quirk on the QEMU/platform side it seems like it should be
+> controlled via the device tree.
+>=20
+> That said, I can't think of any situation where we'd want something other
+> than 64K...
 
-Hmm the only real change is the BQL (implicit or explict) being taken on
-entry to the mmio functions.
+That was.. also my thinking.
 
-> Basically modifying the memory tree is causing a Bad Ram Address error.
-> I wonder if this can't happen with hotplug/unplug model as well.
+> But even if we bake the 64k alignment into SLOF, shouldn't we still have a
+> way to switch it off for older machine types so assignments don't change
+> from one boot to the next?
 
-Isn't this all done under an RCU? I don't think any of this should have
-changed for the MTTCG patch series.
+Ah.. hmm.. good question.  I mean technically speaking you're not
+guaranteed stable BAR allocation from one boot to the next anyway.
+But as you mention below that doesn't necessarily mean it won't
+confuse guests.
 
-> I'll look into this.
-> Shoot if you have any evidence of why that doesn't work :).
+> That could be a boolean option/property, but if
+> that at least is deemed necessary it might as well provide the requested
+> alignment as well to reduce assumptions on the SLOF side.
+>=20
+> If neither of these is an issue it can be fixed within SLOF; just want
+> to make sure that's okay from a QEMU perspective. In theory guests
+> shouldn't care how BAR assignments are done, but they also aren't
+> supposed to care about things like enumeration order either...
 
---enable-tcg-debug will turn on more lock checking (at a performance
-  hit). You could try that.
+Not sure what to do with this.  Well, we've missed qemu 2.9 anyway, so
+I guess we've got time to think about it.
 
->
-> Thanks,
-> Fred
->
-> On 03/02/2017 08:53 PM, Alex Bennée wrote:
->> Hi Peter,
->>
->> So perhaps predictably the merging of MTTCG has thrown up some issues
->> during soft-freeze. The following patches fix up some of those:
->>
->> The following where in v1 and just have r-b tags:
->>
->>   vl/cpus: be smarter with icount and MTTCG
->>   target/i386/cpu.h: declare TCG_GUEST_DEFAULT_MO
->>   cpus.c: add additional error_report when !TARGET_SUPPORT_MTTCG
->>
->> The next change downgrades the asserts to tcg_debug_asserts. This will
->> reduce the instances of production builds failing on non-MTTCG enabled
->> guests. The races still need to be fixed but you now have to
->> --enable-debug-tcg to go hunting for them:
->>
->>   translate: downgrade IRQ BQL asserts to tcg_debug_assert
->>
->> This never came up in my testing but it seems some guests can
->> translate while doing a tlb_fill. The call to cpu_restore_state never
->> worked before (as we are translating the block you are looking for)
->> but by bugging out we avoid the double tb_lock().
->>
->>   translate-all: exit cpu_restore_state early if translating
->>
->> Then we have a bunch of fixes from the reports on the list. They are
->> safe to merge but I'll leave that up to the maintainers. There may be
->> an argument for holding these patches back until the guest is
->> converted to be MTTCG aware and a full audit of the CPU<->HW emulation
->> boundaries is done for each one:
->>
->>   sparc/sparc64: grab BQL before calling cpu_check_irqs
->>   s390x/misc_helper.c: wrap IO instructions in BQL
->>   target/xtensa: hold BQL for interrupt processing
->>   target/mips/op_helper: hold BQL before calling cpu_mips_get_count
->>
->> Finally these are just tiny debug fixes while investigating the icount
->> regression:
->>
->>   target/arm/helper: make it clear the EC field is also in hex
->>   hw/intc/arm_gic: modernise the DPRINTF
->>
->> Going forward I think 1-5 are ready to be merged now. For 6-9 we
->> should await decisions from the target maintainers. The last two are
->> entirely up to you.
->>
->> It looks like the -icount regression is a poor interaction between
->> icount timers and the BQL but this is going to require discussion with
->> Paolo in the morning.
->>
->> Cheers,
->>
->>
->> Alex Bennée (11):
->>   vl/cpus: be smarter with icount and MTTCG
->>   target/i386/cpu.h: declare TCG_GUEST_DEFAULT_MO
->>   cpus.c: add additional error_report when !TARGET_SUPPORT_MTTCG
->>   translate: downgrade IRQ BQL asserts to tcg_debug_assert
->>   translate-all: exit cpu_restore_state early if translating
->>   sparc/sparc64: grab BQL before calling cpu_check_irqs
->>   s390x/misc_helper.c: wrap IO instructions in BQL
->>   target/xtensa: hold BQL for interrupt processing
->>   target/mips/op_helper: hold BQL before calling cpu_mips_get_count
->>   target/arm/helper: make it clear the EC field is also in hex
->>   hw/intc/arm_gic: modernise the DPRINTF
->>
->>  cpus.c                      | 11 +++++++----
->>  hw/intc/arm_gic.c           | 13 +++++++++----
->>  hw/sparc/sun4m.c            |  3 +++
->>  hw/sparc64/sparc64.c        |  3 +++
->>  target/arm/helper.c         |  2 +-
->>  target/i386/cpu.h           |  3 +++
->>  target/mips/op_helper.c     | 17 ++++++++++++++---
->>  target/s390x/misc_helper.c  | 21 +++++++++++++++++++++
->>  target/sparc/int64_helper.c |  3 +++
->>  target/sparc/win_helper.c   | 11 +++++++++++
->>  target/xtensa/helper.c      |  1 +
->>  target/xtensa/op_helper.c   |  7 +++++++
->>  translate-all.c             |  9 ++++++++-
->>  translate-common.c          |  3 ++-
->>  vl.c                        |  7 ++-----
->>  15 files changed, 95 insertions(+), 19 deletions(-)
->>
+> > > ---
+> > >  hw/ppc/spapr.c              |  7 ++++++-
+> > >  hw/ppc/spapr_pci.c          | 10 ++++++++++
+> > >  include/hw/pci-host/spapr.h |  1 +
+> > >  3 files changed, 17 insertions(+), 1 deletion(-)
+> > >=20
+> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > > index 14192ac..ef8df35 100644
+> > > --- a/hw/ppc/spapr.c
+> > > +++ b/hw/ppc/spapr.c
+> > > @@ -3166,7 +3166,12 @@ DEFINE_SPAPR_MACHINE(2_9, "2.9", true);
+> > >   * pseries-2.8
+> > >   */
+> > >  #define SPAPR_COMPAT_2_8                            \
+> > > -    HW_COMPAT_2_8
+> > > +    HW_COMPAT_2_8                                   \
+> > > +    {                                               \
+> > > +        .driver   =3D TYPE_SPAPR_PCI_HOST_BRIDGE,     \
+> > > +        .property =3D "mem_bar_min_align",            \
+> > > +        .value    =3D "0",                            \
+> > > +    },                                              \
+> > > =20
+> > >  static void spapr_machine_2_8_instance_options(MachineState *machine)
+> > >  {
+> > > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> > > index 919d3c2..485d32d 100644
+> > > --- a/hw/ppc/spapr_pci.c
+> > > +++ b/hw/ppc/spapr_pci.c
+> > > @@ -1664,6 +1664,10 @@ static void spapr_phb_realize(DeviceState *dev=
+, Error **errp)
+> > >          return;
+> > >      }
+> > > =20
+> > > +    if (sphb->mem_bar_min_align =3D=3D (uint64_t)-1) {
+> > > +        sphb->mem_bar_min_align =3D qemu_real_host_page_size;
+> > > +    }
+> > > +
+> > >      sphb->dtbusname =3D g_strdup_printf("pci@%" PRIx64, sphb->buid);
+> > > =20
+> > >      namebuf =3D alloca(strlen(sphb->dtbusname) + 32);
+> > > @@ -1858,6 +1862,8 @@ static Property spapr_phb_properties[] =3D {
+> > >      DEFINE_PROP_UINT32("numa_node", sPAPRPHBState, numa_node, -1),
+> > >      DEFINE_PROP_BOOL("pre-2.8-migration", sPAPRPHBState,
+> > >                       pre_2_8_migration, false),
+> > > +    DEFINE_PROP_UINT64("mem_bar_min_align", sPAPRPHBState, mem_bar_m=
+in_align,
+> > > +                       -1),
+> > >      DEFINE_PROP_END_OF_LIST(),
+> > >  };
+> > > =20
+> > > @@ -2228,6 +2234,10 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb,
+> > >      if (ret) {
+> > >          return ret;
+> > >      }
+> > > +    if (phb->mem_bar_min_align) {
+> > > +        _FDT(fdt_setprop_cell(fdt, bus_off, "qemu,mem-bar-min-align",
+> > > +                              phb->mem_bar_min_align));
+> > > +    }
+> > > =20
+> > >      return 0;
+> > >  }
+> > > diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
+> > > index dfa7614..fa33346 100644
+> > > --- a/include/hw/pci-host/spapr.h
+> > > +++ b/include/hw/pci-host/spapr.h
+> > > @@ -79,6 +79,7 @@ struct sPAPRPHBState {
+> > >      uint64_t dma64_win_addr;
+> > > =20
+> > >      uint32_t numa_node;
+> > > +    uint64_t mem_bar_min_align;
+> > > =20
+> > >      /* Fields for migration compatibility hacks */
+> > >      bool pre_2_8_migration;
+> >=20
+>=20
 
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
---
-Alex Bennée
+--kORqDWCi7qDJ0mEj
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYvS9TAAoJEGw4ysog2bOS5TMP/irpA/2uXkCc5FkU4PWjzIBi
+xCKl0v+4bPfxYciV174CzM9P6v5G6XPecMAsSInfkLD7Q9/ytYWaAR/Aw7hXJ3hK
+HWJG/MaHLE+cjlKcbm4nE1sKwHInD4FCgMDgQ90o4okYrgakjhZcmTB9/YbYNzP+
+J7+UkBdZ9rxYa4Z8WtQ0zPbyTNYDS49IyjK9zzm+OWkr07FRvLGrqnsB5ls2KQ3s
+7rk8Wk5AmD8a+9eTMrvoLsPY0meUsVTO/CBUKuTc+Q9f2V0hBS4rfs3dc6jmcSyH
+5raLK8etWEPYl7b6sJ+M89s/uRHOBcqgRrfDr5QCU4Upf+JwLBLwnqdqYPh0aBgM
+nSmzEXbuMK3H4oeGOe1anXvY3cQ+kgzE+Ujj01bzCM2Elc3r1re7vMy8acGCz6MZ
+2bBZm/ian7L3t/I3VA8lYaR+iTyAu05rZvNMMCejRvrqstpp2CppYOouxh3sQKPT
+Jkn3cDkoDzxfol703+zFbf8e2sS8h8O5cS9940w3ROTUNCHHiF6mO51TW+obLGpy
+BeW1lpMYiwyyh6BKXsa1zYtbU/ZqvFLxxQqx+qefNpxfc64DuxthSl/hrxPFJUHz
+yAIiUO8GoW2+iZaJ2TplBHYdWpeQBksq4OrEQBn/oYDZl2OitjNbMfkd4Wst54Nn
+2IGvzrJuatnsKEyGm2Dr
+=tMBR
+-----END PGP SIGNATURE-----
+
+--kORqDWCi7qDJ0mEj--
