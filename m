@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40048)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1ckxeH-0001QB-KA
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 13:46:22 -0500
+	(envelope-from <armbru@redhat.com>) id 1ckxsR-00045D-2R
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 14:01:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1ckxeD-0007uY-K5
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 13:46:21 -0500
-Date: Mon, 6 Mar 2017 19:46:15 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <CAFEAcA9euFa=fypaZaO5prpNQ6mdCmaSZgu3dofVgh2bYcSSxA@mail.gmail.com>
-Message-ID: <alpine.BSF.2.20.1703061935550.39075@zero.eik.bme.hu>
-References: <cover.1488068248.git.balaton@eik.bme.hu>
-	<6b70a9dfe56c3a0dc8e874c45d70612aff7b8e3a.1488068248.git.balaton@eik.bme.hu>
-	<CAFEAcA9FL-sshVzKewf+rCs6-5_c2Y86Qy0b=3DMog4MrVOpwA@mail.gmail.com>
-	<alpine.BSF.2.20.1703030259350.33600@zero.eik.bme.hu>
-	<CAFEAcA-PUcPaOPOXXhab1N=YAHja0xCf5yaZYm5m0p1=j6A=WA@mail.gmail.com>
-	<alpine.BSF.2.20.1703032100430.14293@zero.eik.bme.hu>
-	<CAFEAcA_KxS6J3Mzrc+ijg0LGdxZsk_FDd9xAExGROgWYn-3qyQ@mail.gmail.com>
-	<alpine.BSF.2.20.1703042344460.63482@zero.eik.bme.hu>
-	<CAFEAcA9euFa=fypaZaO5prpNQ6mdCmaSZgu3dofVgh2bYcSSxA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH v2 07/14] sm501: Fix device endianness
+	(envelope-from <armbru@redhat.com>) id 1ckxsQ-0004ia-1C
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 14:00:59 -0500
+From: Markus Armbruster <armbru@redhat.com>
+Date: Mon,  6 Mar 2017 20:00:38 +0100
+Message-Id: <1488826849-32384-5-git-send-email-armbru@redhat.com>
+In-Reply-To: <1488826849-32384-1-git-send-email-armbru@redhat.com>
+References: <1488826849-32384-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 04/15] sheepdog: Mark sd_snapshot_delete()
+ lossage FIXME
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +20,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, ndevos@redhat.com, eblake@redhat.com, f4bug@amsat.org
 
-On Mon, 6 Mar 2017, Peter Maydell wrote:
-> On 4 March 2017 at 22:58, BALATON Zoltan <balaton@eik.bme.hu> wrote:
->> On Sat, 4 Mar 2017, Peter Maydell wrote:
->>> Right, but we should test the PCI-on-a-little-endian CPU
->>> case, because right now your code has #ifdef TARGET_WORDS_BIGENDIAN
->>> in it which means that the PCI device will behave differently
->>> on big and little endian CPUs, and you have a case that you
->>> haven't tested.
->>
->>
->> I could not find an image to test this. I've tried removing the sysbus
->> version from SH and add a PCI one instead but then Linux did not seem to
->> find the card.
->
-> I was thinking about testing the PCI card on x86.
->
->> I could not find any other OS images that would have this
->> combination that is also known to work on any real hardware so I think if
->> someone ever finds a problem with such combination then we can fix it when
->> having a test case, since I could not figure out theoretically what should
->> be the right way.
->>
->>> (At the moment with the set of cases you've tested the
->>> sh embedded device ones will always be using the "not
->>> TARGET_WORDS_BIGENDIAN" code and the PCI-on-PPC will
->>> always use the "is TARGET_WORDS_BIGENDIAN" code. But
->>> TARGET_WORDS_BIGENDIAN set/not set is orthogonal to
->>> PCI-vs-embedded.)
->>
->>
->> Why do you think that framebuffer endianness is dependent on PCI-vs-embedded
->> as opposed to target endianness? The latter seems more plausible to me.
->
-> The PCI card should behave the same way whether you plug it
-> into a PPC system or an x86 system (since it's the same
-> hardware). So code in the handling of the PCI card that
-> looks at TARGET_WORDS_BIGENDIAN is suspicious.
+sd_snapshot_delete() should delete the snapshot whose ID matches
+@snapshot_id and whose name matches @name.  But that's not what it
+does.  If @snapshot_id is a valid ID, it deletes the snapshot with
+that ID, else it deletes the snapshot with that name.  It doesn't use
+@name at all.  Add suitable FIXME comments, so someone who actually
+knows Sheepdog can fix it.
 
-I've searched the web for this and read about possible cards having this 
-chip working under Linux on x86 (or not working as these were mostly bug 
-reports) but could not find an image that is known to be working with such 
-card. I've tried a few recent Linux live CDs (Ubuntu and Fedora) with 
-x86_64 and sm501 PCI emulation on QEMU but these did not seem to boot and 
-find the card, only with the default VGA. Probably a card would have some 
-BIOS and some VESA modes that the drivers would use so I'm not sure a PCI 
-card would really behave the same on PPC and x64 (other video cards 
-usually don't work between PC and PPC Macs because of the BIOS on them). 
-Also on PPC this chip is mostly found on embedded boards not on pluggable 
-cards.
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ block/sheepdog.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-Regards,
-BALATON Zoltan
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index be3db1f..187bcd8 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -2457,6 +2457,10 @@ static int sd_snapshot_delete(BlockDriverState *bs,
+                               const char *name,
+                               Error **errp)
+ {
++    /*
++     * FIXME should delete the snapshot matching both @snapshot_id and
++     * @name, but @name not used here
++     */
+     unsigned long snap_id = 0;
+     char snap_tag[SD_MAX_VDI_TAG_LEN];
+     int fd, ret;
+@@ -2481,6 +2485,11 @@ static int sd_snapshot_delete(BlockDriverState *bs,
+     pstrcpy(buf, SD_MAX_VDI_LEN, s->name);
+     ret = qemu_strtoul(snapshot_id, NULL, 10, &snap_id);
+     if (ret || snap_id > UINT32_MAX) {
++        /*
++         * FIXME Since qemu_strtoul() returns -EINVAL when
++         * @snapshot_id is null, @snapshot_id is mandatory.  Correct
++         * would be to require at least one of @snapshot_id and @name.
++         */
+         error_setg(errp, "Invalid snapshot ID: %s",
+                          snapshot_id ? snapshot_id : "<null>");
+         return -EINVAL;
+@@ -2489,6 +2498,7 @@ static int sd_snapshot_delete(BlockDriverState *bs,
+     if (snap_id) {
+         hdr.snapid = (uint32_t) snap_id;
+     } else {
++        /* FIXME I suspect we should use @name here */
+         pstrcpy(snap_tag, sizeof(snap_tag), snapshot_id);
+         pstrcpy(buf + SD_MAX_VDI_LEN, SD_MAX_VDI_TAG_LEN, snap_tag);
+     }
+-- 
+2.7.4
