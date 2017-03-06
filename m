@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48861)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cktq3-0004Tn-1A
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:42:16 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cktqO-0004iL-2A
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:42:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cktpz-0005ks-OR
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:42:15 -0500
-Resent-Message-Id: <E1cktpz-0005ks-OR@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21336)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cktpz-0005kR-Hb
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:42:11 -0500
-In-Reply-To: <1488809515-4047-1-git-send-email-armbru@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148881130799.294.10406952865672486963@0e2666bad730>
+	(envelope-from <alex.bennee@linaro.org>) id 1cktqK-0005s9-SK
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:42:36 -0500
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:33068)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cktqK-0005rz-L1
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:42:32 -0500
+Received: by mail-wm0-x233.google.com with SMTP id v203so4707405wmg.0
+	for <qemu-devel@nongnu.org>; Mon, 06 Mar 2017 06:42:32 -0800 (PST)
+References: <49fcb3c4-df9d-ec64-2927-71c02fc2524b@genode-labs.com>
+	<87k282im0q.fsf@linaro.org>
+	<6515bcf7-e3cd-21b4-746b-c386b1296d88@genode-labs.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <6515bcf7-e3cd-21b4-746b-c386b1296d88@genode-labs.com>
+Date: Mon, 06 Mar 2017 14:42:37 +0000
+Message-ID: <87innmii02.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 6 Mar 2017 06:41:48 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL v2 00/24] block: Command line option
- -blockdev
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] Qemu deadlocks in tb_lock when using SVM+SoftMMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,99 +31,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: armbru@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: Alexander Boettcher <alexander.boettcher@genode-labs.com>
+Cc: qemu-devel@nongnu.org, rth@twiddle.net, fred.konrad@greensocs.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ4
-ODgwOTUxNS00MDQ3LTEtZ2l0LXNlbmQtZW1haWwtYXJtYnJ1QHJlZGhhdC5jb20KU3ViamVjdDog
-W1FlbXUtZGV2ZWxdIFtQVUxMIHYyIDAwLzI0XSBibG9jazogQ29tbWFuZCBsaW5lIG9wdGlvbiAt
-YmxvY2tkZXYKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
-YXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdj
-IC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNv
-bW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGlu
-ICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBs
-b2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0
-PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAg
-ICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0
-ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4
-NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hl
-dy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8xNDg4ODA5NTE1LTQw
-NDctMS1naXQtc2VuZC1lbWFpbC1hcm1icnVAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzE0ODg4MDk1
-MTUtNDA0Ny0xLWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEg
-bmV3IGJyYW5jaCAndGVzdCcKYmNkMGNjMyBrZXl2YWw6IFN1cHBvcnQgbGlzdHMKZmY2MmNmOSBk
-b2NzL3FhcGktY29kZS1nZW4udHh0OiBDbGFyaWZ5IG5hbWluZyBydWxlcwo5YWMwMGY3IHFhcGk6
-IEltcHJvdmUgaG93IGtleXZhbCBpbnB1dCB2aXNpdG9yIHJlcG9ydHMgdW5leHBlY3RlZCBkaWN0
-cwo0OTE3NjNhIGJsb2NrOiBJbml0aWFsIGltcGxlbWVudGF0aW9uIG9mIC1ibG9ja2RldgoyZjk5
-Zjg0IHFhcGk6IE5ldyBxb2JqZWN0X2lucHV0X3Zpc2l0b3JfbmV3X3N0cigpIGZvciBjb252ZW5p
-ZW5jZQo0MWJlNzVkIGtleXZhbDogUmVzdHJpY3Qga2V5IGNvbXBvbmVudHMgdG8gdmFsaWQgUUFQ
-SSBuYW1lcwo3ZjllNjY3IHFhcGk6IE5ldyBwYXJzZV9xYXBpX25hbWUoKQpiNjgyNmM0IHRlc3Qt
-cWFwaS11dGlsOiBOZXcsIGNvdmVyaW5nIHFhcGkvcWFwaS11dGlsLmMKMDBkYzRiYiBtb25pdG9y
-OiBBc3NlcnQgcW1wX3NjaGVtYV9qc29uW10gaXMgc2FuZQo5YTQyNjc4IHRlc3QtdmlzaXRvci1z
-ZXJpYWxpemF0aW9uOiBQYXNzICZlcnJvcl9hYm9ydCB0byBxb2JqZWN0X2Zyb21fanNvbigpCmI0
-ZDE0NzMgY2hlY2stcWpzb246IFRlc3QgZXJyb3JzIGZyb20gcW9iamVjdF9mcm9tX2pzb24oKQox
-MTMyNDg5IGJsb2NrOiBNb3JlIGRldGFpbGVkIHN5bnRheCBlcnJvciByZXBvcnRpbmcgZm9yIEpT
-T04gZmlsZW5hbWVzCjljYmM2YTQgcW9iamVjdDogUHJvcGFnYXRlIHBhcnNlIGVycm9ycyB0aHJv
-dWdoIHFvYmplY3RfZnJvbV9qc29uKCkKY2Y4YmQ2MyB0ZXN0LXFvYmplY3QtaW5wdXQtdmlzaXRv
-cjogQWJvcnQgZWFybGllciBvbiBiYWQgdGVzdCBpbnB1dAozMDgzYjlkIHFqc29uOiBBYm9ydCBl
-YXJsaWVyIG9uIHFvYmplY3RfZnJvbV9qc29uZigpIG1pc3VzZQowNDkzMDEzIGxpYnF0ZXN0OiBG
-aXggcW1wKCkgJiBmcmllbmRzIHRvIGFib3J0IG9uIEpTT04gcGFyc2UgZXJyb3JzCjk1YjIzMjUg
-cW9iamVjdDogUHJvcGFnYXRlIHBhcnNlIGVycm9ycyB0aHJvdWdoIHFvYmplY3RfZnJvbV9qc29u
-digpCjdiMGUzOWUgcWFwaTogRmFjdG9yIG91dCBjb21tb24gcW9iamVjdF9pbnB1dF9nZXRfa2V5
-dmFsKCkKNDQzMGQ3YiBxYXBpOiBGYWN0b3Igb3V0IGNvbW1vbiBwYXJ0IG9mIHFvYmplY3QgaW5w
-dXQgdmlzaXRvciBjcmVhdGlvbgo4NjRhMjk2IHRlc3Qta2V5dmFsOiBDb3ZlciB1c2Ugd2l0aCBx
-b2JqZWN0IGlucHV0IHZpc2l0b3IKMGIyN2VjZSBxYXBpOiBxb2JqZWN0IGlucHV0IHZpc2l0b3Ig
-dmFyaWFudCBmb3IgdXNlIHdpdGgga2V5dmFsX3BhcnNlKCkKMjc2NzgxNyBrZXl2YWw6IE5ldyBr
-ZXl2YWxfcGFyc2UoKQo5YjdlOWMzIHRlc3RzOiBGaXggZ2Nvdi1maWxlcy10ZXN0LXFlbXUtb3B0
-cy15LCBnY292LWZpbGVzLXRlc3QtbG9nZ2luZy15CjAwMjU0NDMgdGVzdC1xZW11LW9wdHM6IENv
-dmVyIHFlbXVfb3B0c19wYXJzZSgpIG9mICJubyIKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNr
-aW5nIFBBVENIIDEvMjQ6IHRlc3QtcWVtdS1vcHRzOiBDb3ZlciBxZW11X29wdHNfcGFyc2UoKSBv
-ZiAibm8iLi4uCkNoZWNraW5nIFBBVENIIDIvMjQ6IHRlc3RzOiBGaXggZ2Nvdi1maWxlcy10ZXN0
-LXFlbXUtb3B0cy15LCBnY292LWZpbGVzLXRlc3QtbG9nZ2luZy15Li4uCkNoZWNraW5nIFBBVENI
-IDMvMjQ6IGtleXZhbDogTmV3IGtleXZhbF9wYXJzZSgpLi4uCkVSUk9SOiBzdXNwZWN0IGNvZGUg
-aW5kZW50IGZvciBjb25kaXRpb25hbCBzdGF0ZW1lbnRzICg4LCA4KQojNDM4OiBGSUxFOiB1dGls
-L2tleXZhbC5jOjE0MDoKKyAgICAgICAgZm9yIChsZW4gPSAwOyBzICsgbGVuIDwga2V5X2VuZCAm
-JiBzW2xlbl0gIT0gJy4nOyBsZW4rKykgeworICAgICAgICB9Cgp0b3RhbDogMSBlcnJvcnMsIDAg
-d2FybmluZ3MsIDQ0NyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA0LzI0OiBxYXBpOiBxb2JqZWN0IGlucHV0IHZpc2l0
-b3IgdmFyaWFudCBmb3IgdXNlIHdpdGgga2V5dmFsX3BhcnNlKCkuLi4KQ2hlY2tpbmcgUEFUQ0gg
-NS8yNDogdGVzdC1rZXl2YWw6IENvdmVyIHVzZSB3aXRoIHFvYmplY3QgaW5wdXQgdmlzaXRvci4u
-LgpDaGVja2luZyBQQVRDSCA2LzI0OiBxYXBpOiBGYWN0b3Igb3V0IGNvbW1vbiBwYXJ0IG9mIHFv
-YmplY3QgaW5wdXQgdmlzaXRvciBjcmVhdGlvbi4uLgpDaGVja2luZyBQQVRDSCA3LzI0OiBxYXBp
-OiBGYWN0b3Igb3V0IGNvbW1vbiBxb2JqZWN0X2lucHV0X2dldF9rZXl2YWwoKS4uLgpDaGVja2lu
-ZyBQQVRDSCA4LzI0OiBxb2JqZWN0OiBQcm9wYWdhdGUgcGFyc2UgZXJyb3JzIHRocm91Z2ggcW9i
-amVjdF9mcm9tX2pzb252KCkuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8yNDogbGlicXRlc3Q6IEZpeCBx
-bXAoKSAmIGZyaWVuZHMgdG8gYWJvcnQgb24gSlNPTiBwYXJzZSBlcnJvcnMuLi4KQ2hlY2tpbmcg
-UEFUQ0ggMTAvMjQ6IHFqc29uOiBBYm9ydCBlYXJsaWVyIG9uIHFvYmplY3RfZnJvbV9qc29uZigp
-IG1pc3VzZS4uLgpDaGVja2luZyBQQVRDSCAxMS8yNDogdGVzdC1xb2JqZWN0LWlucHV0LXZpc2l0
-b3I6IEFib3J0IGVhcmxpZXIgb24gYmFkIHRlc3QgaW5wdXQuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIv
-MjQ6IHFvYmplY3Q6IFByb3BhZ2F0ZSBwYXJzZSBlcnJvcnMgdGhyb3VnaCBxb2JqZWN0X2Zyb21f
-anNvbigpLi4uCkNoZWNraW5nIFBBVENIIDEzLzI0OiBibG9jazogTW9yZSBkZXRhaWxlZCBzeW50
-YXggZXJyb3IgcmVwb3J0aW5nIGZvciBKU09OIGZpbGVuYW1lcy4uLgpDaGVja2luZyBQQVRDSCAx
-NC8yNDogY2hlY2stcWpzb246IFRlc3QgZXJyb3JzIGZyb20gcW9iamVjdF9mcm9tX2pzb24oKS4u
-LgpDaGVja2luZyBQQVRDSCAxNS8yNDogdGVzdC12aXNpdG9yLXNlcmlhbGl6YXRpb246IFBhc3Mg
-JmVycm9yX2Fib3J0IHRvIHFvYmplY3RfZnJvbV9qc29uKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMTYv
-MjQ6IG1vbml0b3I6IEFzc2VydCBxbXBfc2NoZW1hX2pzb25bXSBpcyBzYW5lLi4uCkNoZWNraW5n
-IFBBVENIIDE3LzI0OiB0ZXN0LXFhcGktdXRpbDogTmV3LCBjb3ZlcmluZyBxYXBpL3FhcGktdXRp
-bC5jLi4uCkNoZWNraW5nIFBBVENIIDE4LzI0OiBxYXBpOiBOZXcgcGFyc2VfcWFwaV9uYW1lKCku
-Li4KQ2hlY2tpbmcgUEFUQ0ggMTkvMjQ6IGtleXZhbDogUmVzdHJpY3Qga2V5IGNvbXBvbmVudHMg
-dG8gdmFsaWQgUUFQSSBuYW1lcy4uLgpDaGVja2luZyBQQVRDSCAyMC8yNDogcWFwaTogTmV3IHFv
-YmplY3RfaW5wdXRfdmlzaXRvcl9uZXdfc3RyKCkgZm9yIGNvbnZlbmllbmNlLi4uCkNoZWNraW5n
-IFBBVENIIDIxLzI0OiBibG9jazogSW5pdGlhbCBpbXBsZW1lbnRhdGlvbiBvZiAtYmxvY2tkZXYu
-Li4KQ2hlY2tpbmcgUEFUQ0ggMjIvMjQ6IHFhcGk6IEltcHJvdmUgaG93IGtleXZhbCBpbnB1dCB2
-aXNpdG9yIHJlcG9ydHMgdW5leHBlY3RlZCBkaWN0cy4uLgpDaGVja2luZyBQQVRDSCAyMy8yNDog
-ZG9jcy9xYXBpLWNvZGUtZ2VuLnR4dDogQ2xhcmlmeSBuYW1pbmcgcnVsZXMuLi4KQ2hlY2tpbmcg
-UEFUQ0ggMjQvMjQ6IGtleXZhbDogU3VwcG9ydCBsaXN0cy4uLgpFUlJPUjogc3BhY2VzIHJlcXVp
-cmVkIGFyb3VuZCB0aGF0ICctJyAoY3R4OlZ4VikKIzQ0NDogRklMRTogdXRpbC9rZXl2YWwuYzoz
-NDU6CisgICAgYXNzZXJ0KCFlbHRbbmVsdC0xXSk7ICAgICAgIC8qIG5lZWQgdGhlIHNlbnRpbmVs
-IHRvIGJlIG51bGwgKi8KICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAw
-IHdhcm5pbmdzLCA0MjAgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxl
-bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
-dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
-SU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
-Y29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
-dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
-LWRldmVsQGZyZWVsaXN0cy5vcmc=
+
+Alexander Boettcher <alexander.boettcher@genode-labs.com> writes:
+
+> Hi,
+>
+> On 06.03.2017 14:15, Alex Bennée wrote:
+>> I found the virtualbox.iso on your branch but I can't trigger the
+>> assert. Running:
+>>
+>> #!/bin/sh
+>>
+>> QEMU="$@"
+>>
+>> ${QEMU} -s -no-kvm -display sdl -m 512 -cpu phenom -nographic -cdrom virtualbox.iso
+>>
+>> I get:
+>>
+>> NOVA Microhypervisor v7-2436fe2 (x86_32): Feb 25 2017 17:58:48 [gcc 4.9.2]
+>> [init -> log_terminal]
+>> [init -> log_terminal] [ 0] CORE:0:0:0 10:2:3:0 [0] AMD Phenom(tm) 9550 Quad-Core Processor
+>> qemu: fatal: invalid tss type
+>
+>
+>> Which is a guest error?
+>
+> It's a race which happens in Qemu (not on hardware), so I still
+> investigating it within Qemu. Because of that on [0] the commit before
+> the virtualbox.iso is one commit to avoid this for the moment in order
+> to continue.
+
+How can a single-threaded system emulation race with itself?
+
+>
+>>> [0] https://github.com/alex-ab/qemu/commits/genode_svm_issue
+>
+> Alex.
+
+
+--
+Alex Bennée
