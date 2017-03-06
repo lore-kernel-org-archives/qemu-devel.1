@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ckvmx-0004ga-1o
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 11:47:12 -0500
+	(envelope-from <jhanley@dgtlrift.com>) id 1ckvpu-0005Tl-JJ
+	for Qemu-devel@nongnu.org; Mon, 06 Mar 2017 11:50:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ckvmw-0008WM-2l
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 11:47:11 -0500
-References: <1488288927-4607-1-git-send-email-pl@kamp.de>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <aa13b45a-8d8a-5bb8-e17a-608159270733@redhat.com>
-Date: Mon, 6 Mar 2017 10:46:57 -0600
+	(envelope-from <jhanley@dgtlrift.com>) id 1ckvps-0001OD-Gy
+	for Qemu-devel@nongnu.org; Mon, 06 Mar 2017 11:50:14 -0500
+Received: from mail-ua0-x242.google.com ([2607:f8b0:400c:c08::242]:36677)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jhanley@dgtlrift.com>)
+	id 1ckvps-0001Mx-8g
+	for Qemu-devel@nongnu.org; Mon, 06 Mar 2017 11:50:12 -0500
+Received: by mail-ua0-x242.google.com with SMTP id y16so17613215uay.3
+	for <Qemu-devel@nongnu.org>; Mon, 06 Mar 2017 08:50:10 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1488288927-4607-1-git-send-email-pl@kamp.de>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="kmOqa1UD763lXLuqxMdlMF53ggMiKCCjS"
-Subject: Re: [Qemu-devel] [PATCH] qemu-img: simplify img_convert
+In-Reply-To: <CAFEAcA9NPoujRE47pyNEui-DwxwisNpmGNp0w4B_+_mwbuV_4Q@mail.gmail.com>
+References: <CAF++6APFk2KY-7yFYtsgcTwn31RCf_Wxucp3eTLbB2e1c5QAyg@mail.gmail.com>
+	<CAFEAcA9NPoujRE47pyNEui-DwxwisNpmGNp0w4B_+_mwbuV_4Q@mail.gmail.com>
+From: James Hanley <jhanley@dgtlrift.com>
+Date: Mon, 6 Mar 2017 11:50:08 -0500
+Message-ID: <CAF++6AN8-pKhPKNQPDnCkXzQdqo4hPTH6eJetuzQXmsBkDXRNA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 0/2] submodule-update queue 20170303
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,100 +29,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, stefanha@gmail.com, ct@flyingcircus.io, mreitz@redhat.com, famz@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel <Qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---kmOqa1UD763lXLuqxMdlMF53ggMiKCCjS
-From: Eric Blake <eblake@redhat.com>
-To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, stefanha@gmail.com,
- ct@flyingcircus.io, mreitz@redhat.com, famz@redhat.com
-Message-ID: <aa13b45a-8d8a-5bb8-e17a-608159270733@redhat.com>
-Subject: Re: [PATCH] qemu-img: simplify img_convert
-References: <1488288927-4607-1-git-send-email-pl@kamp.de>
-In-Reply-To: <1488288927-4607-1-git-send-email-pl@kamp.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 02/28/2017 07:35 AM, Peter Lieven wrote:
-> img_convert has been around before there was an ImgConvertState or
-> a block backend, but it has never been modified to directly use
-> these structs. Change this by parsing parameters directly into
-> the ImgConvertState and directly use BlockBackend where possible.
-> Futhermore variable initalization has been reworked and sorted.
-
-s/Futhermore/Furthermore/
-s/initalization/initialization/
-
-I almost wonder if this should be split into multiple patches for ease
-of review.  But since you've already submitted it, I'll review it as-is.
-
->=20
-> Signed-off-by: Peter Lieven <pl@kamp.de>
-> ---
->  qemu-img.c | 197 +++++++++++++++++++++++++----------------------------=
---------
->  1 file changed, 81 insertions(+), 116 deletions(-)
->=20
-> diff --git a/qemu-img.c b/qemu-img.c
-> index caa76a7..f271167 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -1488,7 +1488,7 @@ typedef struct ImgConvertState {
->      int min_sparse;
->      size_t cluster_sectors;
->      size_t buf_sectors;
-> -    int num_coroutines;
-> +    long num_coroutines;
-
-Why is this change needed? A hint in the commit message may be
-appropriate (I'm especially wary of 'long', as it differs between 32-
-and 64-bit platforms).
-
-> @@ -2012,19 +2002,18 @@ static int img_convert(int argc, char **argv)
->              quiet =3D true;
->              break;
->          case 'n':
-> -            skip_create =3D 1;
-> +            skip_create =3D true;
->              break;
->          case 'm':
-> -            if (qemu_strtol(optarg, NULL, 0, &num_coroutines) ||
-> -                num_coroutines < 1 || num_coroutines > MAX_COROUTINES)=
- {
-> +            if (qemu_strtol(optarg, NULL, 0, &s.num_coroutines) ||
-> +                s.num_coroutines < 1 || s.num_coroutines > MAX_COROUTI=
-NES) {
-
-At any rate, it looks like you clamp it, so the change in type doesn't
-matter too much.
-
-I didn't spot any problems in the conversion, so:
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+I'm still seeing the same error - the only change I have in my clone is the
+following so that the submodules are accessible across our firewall -
+should the http URLs be referencing the same backend repo as the git URLs?:
+jim@jim-VirtualBox:~/project/test_qemu_repo/qemu$ git diff -v
+6865190577f240d0c0f15d6537a893d771596404^
+6865190577f240d0c0f15d6537a893d771596404
+diff --git a/.gitmodules b/.gitmodules
+index ca323b4..0156c06 100644
+--- a/.gitmodules
++++ b/.gitmodules
+@@ -1,36 +1,36 @@
+ [submodule "roms/vgabios"]
+        path = roms/vgabios
+-       url = git://git.qemu-project.org/vgabios.git/
++       url = http://git.qemu-project.org/git/vgabios.git
+ [submodule "roms/seabios"]
+        path = roms/seabios
+-       url = git://git.qemu-project.org/seabios.git/
++       url = http://git.qemu-project.org/git/seabios.git
+ [submodule "roms/SLOF"]
+        path = roms/SLOF
+-       url = git://git.qemu-project.org/SLOF.git
++       url = http://git.qemu-project.org/git/SLOF.git
+ [submodule "roms/ipxe"]
+        path = roms/ipxe
+-       url = git://git.qemu-project.org/ipxe.git
++       url = http://git.qemu-project.org/git/ipxe.git
+ [submodule "roms/openbios"]
+        path = roms/openbios
+-       url = git://git.qemu-project.org/openbios.git
++       url = http://git.qemu-project.org/git/openbios.git
+ [submodule "roms/openhackware"]
+        path = roms/openhackware
+-       url = git://git.qemu-project.org/openhackware.git
++       url = http://git.qemu-project.org/git/openhackware.git
+ [submodule "roms/qemu-palcode"]
+        path = roms/qemu-palcode
+-       url = git://github.com/rth7680/qemu-palcode.git
++       url = https://github.com/rth7680/qemu-palcode.git
+ [submodule "roms/sgabios"]
+        path = roms/sgabios
+-       url = git://git.qemu-project.org/sgabios.git
++       url = http://git.qemu-project.org/git/sgabios.git
+ [submodule "pixman"]
+        path = pixman
+-       url = git://anongit.freedesktop.org/pixman
++       url = https://anongit.freedesktop.org/git/pixman.git
+ [submodule "dtc"]
+        path = dtc
+-       url = git://git.qemu-project.org/dtc.git
++       url = http://git.qemu-project.org/git/dtc.git
+ [submodule "roms/u-boot"]
+        path = roms/u-boot
+-       url = git://git.qemu-project.org/u-boot.git
++       url = http://git.qemu-project.org/git/u-boot.git
+ [submodule "roms/skiboot"]
+        path = roms/skiboot
+-       url = git://git.qemu.org/skiboot.git
++       url = http://git.qemu-project.org/git/skiboot.git
 
 
---kmOqa1UD763lXLuqxMdlMF53ggMiKCCjS
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+On Sat, Mar 4, 2017 at 7:47 AM, Peter Maydell <peter.maydell@linaro.org>
+wrote:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYvZKBAAoJEKeha0olJ0NqhF0H/RDgfjsXBvDqfp0l7cCXsVi0
-rzrMe4Tl9PjG2+Ld3tzSEWAFFabPZbQRAmoeT0zVPGG6q1iRZWnZrPqP2KTtNVc6
-/IlDbE7BgsEyhaIbXwLpyG9h+bKb2o2bOBu6ZJEyEut8ULVnT4cmTTjYeBq5HVy7
-PrmdtQxoX6yIdyvZgcqranrjuzIvTMCwmo3dNiS69YMDpThsdRtUiDuUurNsnsYe
-cS2mjE5nCWGrf7NCTMv+xOnkRQYUvthRf6svvPrDfvr6Dsm2orHfUYcxPXDGFbof
-p2TGGs8nD2B0K1wDDFMM3FsaWRQhBTgOK1kmY5mZGxwvugu4ZJG/hONOUO6EjHI=
-=nqDT
------END PGP SIGNATURE-----
-
---kmOqa1UD763lXLuqxMdlMF53ggMiKCCjS--
+> On 3 March 2017 at 19:45, James Hanley <jhanley@dgtlrift.com> wrote:
+> > I'm trying to clone clean and I'm getting the following when initing the
+> > submodules updated:
+>
+> > It's unclear to me what should be done for a pristine clone - is there a
+> > step missing from pulling those submodules?
+>
+> I just did:
+>  git clone git://git.qemu-project.org/qemu.git
+>  cd qemu
+>  git submodule init
+>  git submodule update
+>
+> and that worked for me.
+>
+> (We do occasionally accidentally introduce an error where we
+> update the submodule but the qemu-project.org mirror of a
+> git repo hasn't yet moved forward to include the reference.
+> But it seems to all be OK at the moment.)
+>
+> As an aside you typically don't need all the submodules if
+> you're just interested in building QEMU. (You might need
+> the dtc module but configure will tell you if you do and
+> also what command to ues to just get the dtc submodule
+> and not anything else.)
+>
+> thanks
+> -- PMM
+>
