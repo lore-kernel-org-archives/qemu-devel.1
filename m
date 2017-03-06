@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34898)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ckyiT-0006JV-W0
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 14:54:47 -0500
+	(envelope-from <no-reply@patchew.org>) id 1ckylr-0007vE-Ga
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 14:58:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1ckyiS-0003VO-TL
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 14:54:46 -0500
-From: Max Reitz <mreitz@redhat.com>
-Date: Mon,  6 Mar 2017 20:54:34 +0100
-Message-Id: <20170306195434.16782-1-mreitz@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1ckyln-0004cK-0B
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 14:58:15 -0500
+Resent-Message-Id: <E1ckyln-0004cK-0B@eggs.gnu.org>
 In-Reply-To: <20170306195255.15806-1-mreitz@redhat.com>
-References: <20170306195255.15806-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.10 3/3] block: Add some bdrv_truncate()
- error messages
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148883028050.294.11008388161426256258@0e2666bad730>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 6 Mar 2017 11:58:01 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH for-2.10 0/3] block: Add errp to b{lk,
+ drv}_turncate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,114 +24,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: mreitz@redhat.com
+Cc: famz@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com, qemu-devel@nongnu.org
 
-Add missing error messages for the drivers I am comfortable to do this
-in.
-
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- block/file-posix.c | 8 +++++++-
- block/qcow2.c      | 2 ++
- block/qed.c        | 4 +++-
- block/raw-format.c | 2 ++
- 4 files changed, 14 insertions(+), 2 deletions(-)
-
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 9d2bea730d..553213221c 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1341,20 +1341,26 @@ static int raw_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
- {
-     BDRVRawState *s = bs->opaque;
-     struct stat st;
-+    int ret;
- 
-     if (fstat(s->fd, &st)) {
--        return -errno;
-+        ret = -errno;
-+        error_setg_errno(errp, -ret, "Failed to fstat() the file");
-+        return ret;
-     }
- 
-     if (S_ISREG(st.st_mode)) {
-         if (ftruncate(s->fd, offset) < 0) {
-+            /* The generic error message will be fine */
-             return -errno;
-         }
-     } else if (S_ISCHR(st.st_mode) || S_ISBLK(st.st_mode)) {
-        if (offset > raw_getlength(bs)) {
-+           error_setg(errp, "Cannot grow device files");
-            return -EINVAL;
-        }
-     } else {
-+        error_setg(errp, "Resizing this file is not supported");
-         return -ENOTSUP;
-     }
- 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 17585fbb89..53b0bd61a7 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2550,6 +2550,7 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
-     new_l1_size = size_to_l1(s, offset);
-     ret = qcow2_grow_l1_table(bs, new_l1_size, true);
-     if (ret < 0) {
-+        error_setg(errp, "Failed to grow the L1 table");
-         return ret;
-     }
- 
-@@ -2558,6 +2559,7 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
-     ret = bdrv_pwrite_sync(bs->file, offsetof(QCowHeader, size),
-                            &offset, sizeof(uint64_t));
-     if (ret < 0) {
-+        error_setg(errp, "Failed to update the image size");
-         return ret;
-     }
- 
-diff --git a/block/qed.c b/block/qed.c
-index fa2aeee471..eb346d645b 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -1526,11 +1526,12 @@ static int bdrv_qed_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
- 
-     if (!qed_is_image_size_valid(offset, s->header.cluster_size,
-                                  s->header.table_size)) {
-+        error_setg(errp, "Invalid image size specified");
-         return -EINVAL;
-     }
- 
--    /* Shrinking is currently not supported */
-     if ((uint64_t)offset < s->header.image_size) {
-+        error_setg(errp, "Shrinking images is currently not supported");
-         return -ENOTSUP;
-     }
- 
-@@ -1539,6 +1540,7 @@ static int bdrv_qed_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
-     ret = qed_write_header_sync(s);
-     if (ret < 0) {
-         s->header.image_size = old_image_size;
-+        error_setg(errp, "Failed to update the image size");
-     }
-     return ret;
- }
-diff --git a/block/raw-format.c b/block/raw-format.c
-index 9761bdaff8..36e65036f0 100644
---- a/block/raw-format.c
-+++ b/block/raw-format.c
-@@ -332,10 +332,12 @@ static int raw_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
-     BDRVRawState *s = bs->opaque;
- 
-     if (s->has_size) {
-+        error_setg(errp, "Cannot resize fixed-size raw disks");
-         return -ENOTSUP;
-     }
- 
-     if (INT64_MAX - offset < s->offset) {
-+        error_setg(errp, "Disk size too large for the chosen offset");
-         return -EINVAL;
-     }
- 
--- 
-2.12.0
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzAzMDYxOTUyNTUuMTU4MDYtMS1tcmVpdHpAcmVkaGF0LmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZl
+bF0gW1BBVENIIGZvci0yLjEwIDAvM10gYmxvY2s6IEFkZCBlcnJwIHRvIGJ7bGssIGRydn1fdHVy
+bmNhdGUoKQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jh
+c2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2Mg
+LWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29t
+bWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4g
+JGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxv
+ZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9
+ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAg
+ICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQg
+JGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3
+ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3
+LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzE0ODg4MjY4NDktMzIz
+ODQtMS1naXQtc2VuZC1lbWFpbC1hcm1icnVAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzE0ODg4MjY4
+NDktMzIzODQtMS1naXQtc2VuZC1lbWFpbC1hcm1icnVAcmVkaGF0LmNvbQogKiBbbmV3IHRhZ10g
+ICAgICAgICBwYXRjaGV3LzIwMTcwMzA2MTk1MjU1LjE1ODA2LTEtbXJlaXR6QHJlZGhhdC5jb20g
+LT4gcGF0Y2hldy8yMDE3MDMwNjE5NTI1NS4xNTgwNi0xLW1yZWl0ekByZWRoYXQuY29tCkF1dG8g
+cGFja2luZyB0aGUgcmVwb3NpdG9yeSBmb3Igb3B0aW11bSBwZXJmb3JtYW5jZS4gWW91IG1heSBh
+bHNvCnJ1biAiZ2l0IGdjIiBtYW51YWxseS4gU2VlICJnaXQgaGVscCBnYyIgZm9yIG1vcmUgaW5m
+b3JtYXRpb24uClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNGVmMTc1NyBibG9jazog
+QWRkIHNvbWUgYmRydl90cnVuY2F0ZSgpIGVycm9yIG1lc3NhZ2VzCjNlMzQ4YzYgYmxvY2s6IEFk
+ZCBlcnJwIHRvIEJELmJkcnZfdHJ1bmNhdGUoKQoxYmEyYzY0IGJsb2NrOiBBZGQgZXJycCB0byBi
+e2xrLCBkcnZ9X3RydW5jYXRlKCkKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENI
+IDEvMzogYmxvY2s6IEFkZCBlcnJwIHRvIGJ7bGssIGRydn1fdHJ1bmNhdGUoKS4uLgpDaGVja2lu
+ZyBQQVRDSCAyLzM6IGJsb2NrOiBBZGQgZXJycCB0byBCRC5iZHJ2X3RydW5jYXRlKCkuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMy8zOiBibG9jazogQWRkIHNvbWUgYmRydl90cnVuY2F0ZSgpIGVycm9yIG1l
+c3NhZ2VzLi4uCkVSUk9SOiBzdXNwZWN0IGNvZGUgaW5kZW50IGZvciBjb25kaXRpb25hbCBzdGF0
+ZW1lbnRzICg3LCAxMSkKIzM1OiBGSUxFOiBibG9jay9maWxlLXBvc2l4LmM6MTM1ODoKICAgICAg
+ICBpZiAob2Zmc2V0ID4gcmF3X2dldGxlbmd0aChicykpIHsKKyAgICAgICAgICAgZXJyb3Jfc2V0
+ZyhlcnJwLCAiQ2Fubm90IGdyb3cgZGV2aWNlIGZpbGVzIik7Cgp0b3RhbDogMSBlcnJvcnMsIDAg
+d2FybmluZ3MsIDczIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1z
+LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
+dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
+VEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNv
+ZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0
+cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1k
+ZXZlbEBmcmVlbGlzdHMub3Jn
