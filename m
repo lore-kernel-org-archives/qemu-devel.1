@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1ckl9v-0007jM-Ce
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 00:26:13 -0500
+	(envelope-from <jasowang@redhat.com>) id 1ckl9z-0007oH-8j
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 00:26:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1ckl9s-00010i-1X
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 00:26:11 -0500
+	(envelope-from <jasowang@redhat.com>) id 1ckl9y-000146-D3
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 00:26:15 -0500
 From: Jason Wang <jasowang@redhat.com>
-Date: Mon,  6 Mar 2017 13:25:38 +0800
-Message-Id: <1488777954-4578-4-git-send-email-jasowang@redhat.com>
+Date: Mon,  6 Mar 2017 13:25:40 +0800
+Message-Id: <1488777954-4578-6-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1488777954-4578-1-git-send-email-jasowang@redhat.com>
 References: <1488777954-4578-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL RESEND 03/19] NetRxPkt: Fix memory corruption on
- VLAN header stripping
+Subject: [Qemu-devel] [PULL RESEND 05/19] NetRxPkt: Account buffer with ETH
+ header in IOV length
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,117 +25,34 @@ Cc: Dmitry Fleytman <dmitry@daynix.com>, qemu-stable@nongnu.org, Jason Wang <jas
 
 From: Dmitry Fleytman <dmitry@daynix.com>
 
-This patch fixed a problem that was introduced in commit eb700029.
+In case of VLAN stripping ETH header is stored in a
+separate chunk and length of IOV should take this into
+account.
 
-When net_rx_pkt_attach_iovec() calls eth_strip_vlan()
-this can result in pkt->ehdr_buf being overflowed, because
-ehdr_buf is only sizeof(struct eth_header) bytes large
-but eth_strip_vlan() can write
-sizeof(struct eth_header) + sizeof(struct vlan_header)
-bytes into it.
+This patch fixes checksum validation for RX packets
+with VLAN header.
 
-Devices affected by this problem: vmxnet3.
+Devices affected by this problem: e1000e and vmxnet3.
 
 Cc: qemu-stable@nongnu.org
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Dmitry Fleytman <dmitry@daynix.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/net/net_rx_pkt.c | 34 +++++++++++++++++-----------------
- 1 file changed, 17 insertions(+), 17 deletions(-)
+ hw/net/net_rx_pkt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/hw/net/net_rx_pkt.c b/hw/net/net_rx_pkt.c
-index 7f928d7..3361d7e 100644
+index 0003a0e..2649d40 100644
 --- a/hw/net/net_rx_pkt.c
 +++ b/hw/net/net_rx_pkt.c
-@@ -23,13 +23,13 @@
- 
- struct NetRxPkt {
-     struct virtio_net_hdr virt_hdr;
--    uint8_t ehdr_buf[sizeof(struct eth_header)];
-+    uint8_t ehdr_buf[sizeof(struct eth_header) + sizeof(struct vlan_header)];
-     struct iovec *vec;
-     uint16_t vec_len_total;
-     uint16_t vec_len;
-     uint32_t tot_len;
-     uint16_t tci;
--    bool vlan_stripped;
-+    size_t ehdr_buf_len;
-     bool has_virt_hdr;
-     eth_pkt_types_e packet_type;
- 
-@@ -88,15 +88,13 @@ net_rx_pkt_pull_data(struct NetRxPkt *pkt,
-                         const struct iovec *iov, int iovcnt,
-                         size_t ploff)
- {
--    if (pkt->vlan_stripped) {
-+    if (pkt->ehdr_buf_len) {
-         net_rx_pkt_iovec_realloc(pkt, iovcnt + 1);
- 
-         pkt->vec[0].iov_base = pkt->ehdr_buf;
--        pkt->vec[0].iov_len = sizeof(pkt->ehdr_buf);
--
--        pkt->tot_len =
--            iov_size(iov, iovcnt) - ploff + sizeof(struct eth_header);
-+        pkt->vec[0].iov_len = pkt->ehdr_buf_len;
- 
-+        pkt->tot_len = iov_size(iov, iovcnt) - ploff + pkt->ehdr_buf_len;
+@@ -97,7 +97,7 @@ net_rx_pkt_pull_data(struct NetRxPkt *pkt,
+         pkt->tot_len = iov_size(iov, iovcnt) - ploff + pkt->ehdr_buf_len;
          pkt->vec_len = iov_copy(pkt->vec + 1, pkt->vec_len_total - 1,
-                                 iov, iovcnt, ploff, pkt->tot_len);
+                                 iov, iovcnt, ploff,
+-                                pkt->tot_len - pkt->ehdr_buf_len);
++                                pkt->tot_len - pkt->ehdr_buf_len) + 1;
      } else {
-@@ -123,11 +121,12 @@ void net_rx_pkt_attach_iovec(struct NetRxPkt *pkt,
-     uint16_t tci = 0;
-     uint16_t ploff = iovoff;
-     assert(pkt);
--    pkt->vlan_stripped = false;
+         net_rx_pkt_iovec_realloc(pkt, iovcnt);
  
-     if (strip_vlan) {
--        pkt->vlan_stripped = eth_strip_vlan(iov, iovcnt, iovoff, pkt->ehdr_buf,
--                                            &ploff, &tci);
-+        pkt->ehdr_buf_len = eth_strip_vlan(iov, iovcnt, iovoff, pkt->ehdr_buf,
-+                                           &ploff, &tci);
-+    } else {
-+        pkt->ehdr_buf_len = 0;
-     }
- 
-     pkt->tci = tci;
-@@ -143,12 +142,13 @@ void net_rx_pkt_attach_iovec_ex(struct NetRxPkt *pkt,
-     uint16_t tci = 0;
-     uint16_t ploff = iovoff;
-     assert(pkt);
--    pkt->vlan_stripped = false;
- 
-     if (strip_vlan) {
--        pkt->vlan_stripped = eth_strip_vlan_ex(iov, iovcnt, iovoff, vet,
--                                               pkt->ehdr_buf,
--                                               &ploff, &tci);
-+        pkt->ehdr_buf_len = eth_strip_vlan_ex(iov, iovcnt, iovoff, vet,
-+                                              pkt->ehdr_buf,
-+                                              &ploff, &tci);
-+    } else {
-+        pkt->ehdr_buf_len = 0;
-     }
- 
-     pkt->tci = tci;
-@@ -161,8 +161,8 @@ void net_rx_pkt_dump(struct NetRxPkt *pkt)
- #ifdef NET_RX_PKT_DEBUG
-     assert(pkt);
- 
--    printf("RX PKT: tot_len: %d, vlan_stripped: %d, vlan_tag: %d\n",
--              pkt->tot_len, pkt->vlan_stripped, pkt->tci);
-+    printf("RX PKT: tot_len: %d, ehdr_buf_len: %lu, vlan_tag: %d\n",
-+              pkt->tot_len, pkt->ehdr_buf_len, pkt->tci);
- #endif
- }
- 
-@@ -425,7 +425,7 @@ bool net_rx_pkt_is_vlan_stripped(struct NetRxPkt *pkt)
- {
-     assert(pkt);
- 
--    return pkt->vlan_stripped;
-+    return pkt->ehdr_buf_len ? true : false;
- }
- 
- bool net_rx_pkt_has_virt_hdr(struct NetRxPkt *pkt)
 -- 
 2.7.4
