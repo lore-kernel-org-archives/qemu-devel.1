@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ckxsT-000488-9j
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 14:01:04 -0500
+	(envelope-from <armbru@redhat.com>) id 1ckxsT-00048C-BR
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 14:01:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1ckxsR-0004kd-OY
+	(envelope-from <armbru@redhat.com>) id 1ckxsR-0004kW-MH
 	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 14:01:01 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  6 Mar 2017 20:00:46 +0100
-Message-Id: <1488826849-32384-13-git-send-email-armbru@redhat.com>
+Date: Mon,  6 Mar 2017 20:00:42 +0100
+Message-Id: <1488826849-32384-9-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488826849-32384-1-git-send-email-armbru@redhat.com>
 References: <1488826849-32384-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 12/15] gluster: Plug memory leaks in
- qemu_gluster_parse_json()
+Subject: [Qemu-devel] [PATCH v2 08/15] sheepdog: Use SocketAddress and
+ socket_connect()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,80 +23,150 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, ndevos@redhat.com, eblake@redhat.com, f4bug@amsat.org
 
-To reproduce, run
+sd_parse_uri() builds a string from host and port parts for
+inet_connect().  inet_connect() parses it into host, port and options.
+Whether this gets exactly the same host, port and no options for all
+inputs is not obvious.
 
-    $ valgrind qemu-system-x86_64 --nodefaults -S --drive driver=gluster,volume=testvol,path=/a/b/c,server.0.type=xxx
+Cut out the string middleman and build a SocketAddress for
+socket_connect() instead.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Niels de Vos <ndevos@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/gluster.c | 28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+ block/sheepdog.c | 53 ++++++++++++++++++++++++++++++-----------------------
+ 1 file changed, 30 insertions(+), 23 deletions(-)
 
-diff --git a/block/gluster.c b/block/gluster.c
-index 6fbcf9e..991f18f 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -480,7 +480,7 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
-                                   QDict *options, Error **errp)
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index 161932d..9b1e121 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -374,8 +374,7 @@ struct BDRVSheepdogState {
+     uint32_t cache_flags;
+     bool discard_supported;
+ 
+-    char *host_spec;
+-    bool is_unix;
++    SocketAddress *addr;
+     int fd;
+ 
+     CoMutex lock;
+@@ -532,16 +531,12 @@ static int connect_to_sdog(BDRVSheepdogState *s, Error **errp)
  {
-     QemuOpts *opts;
--    GlusterServer *gsconf;
-+    GlusterServer *gsconf = NULL;
-     GlusterServerList *curr = NULL;
-     QDict *backing_options = NULL;
-     Error *local_err = NULL;
-@@ -529,17 +529,16 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
-         }
+     int fd;
  
-         ptr = qemu_opt_get(opts, GLUSTER_OPT_TYPE);
-+        if (!ptr) {
-+            error_setg(&local_err, QERR_MISSING_PARAMETER, GLUSTER_OPT_TYPE);
-+            error_append_hint(&local_err, GERR_INDEX_HINT, i);
-+            goto out;
-+
-+        }
-         gsconf = g_new0(GlusterServer, 1);
-         gsconf->type = qapi_enum_parse(GlusterTransport_lookup, ptr,
--                                       GLUSTER_TRANSPORT__MAX,
--                                       GLUSTER_TRANSPORT__MAX,
-+                                       GLUSTER_TRANSPORT__MAX, -1,
-                                        &local_err);
--        if (!ptr) {
--            error_setg(&local_err, QERR_MISSING_PARAMETER, GLUSTER_OPT_TYPE);
--            error_append_hint(&local_err, GERR_INDEX_HINT, i);
--            goto out;
--
--        }
-         if (local_err) {
-             error_append_hint(&local_err,
-                               "Parameter '%s' may be 'tcp' or 'unix'\n",
-@@ -626,8 +625,10 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
-             curr->next->value = gsconf;
-             curr = curr->next;
-         }
-+        gsconf = NULL;
+-    if (s->is_unix) {
+-        fd = unix_connect(s->host_spec, errp);
+-    } else {
+-        fd = inet_connect(s->host_spec, errp);
++    fd = socket_connect(s->addr, errp, NULL, NULL);
  
--        qdict_del(backing_options, str);
-+        QDECREF(backing_options);
-+        backing_options = NULL;
-         g_free(str);
-         str = NULL;
+-        if (fd >= 0) {
+-            int ret = socket_set_nodelay(fd);
+-            if (ret < 0) {
+-                error_report("%s", strerror(errno));
+-            }
++    if (s->addr->type == SOCKET_ADDRESS_KIND_INET && fd >= 0) {
++        int ret = socket_set_nodelay(fd);
++        if (ret < 0) {
++            error_report("%s", strerror(errno));
+         }
      }
-@@ -636,11 +637,10 @@ static int qemu_gluster_parse_json(BlockdevOptionsGluster *gconf,
+ 
+@@ -820,8 +815,7 @@ static void coroutine_fn aio_read_response(void *opaque)
+     case AIOCB_DISCARD_OBJ:
+         switch (rsp.result) {
+         case SD_RES_INVALID_PARMS:
+-            error_report("sheep(%s) doesn't support discard command",
+-                         s->host_spec);
++            error_report("server doesn't support discard command");
+             rsp.result = SD_RES_SUCCESS;
+             s->discard_supported = false;
+             break;
+@@ -962,8 +956,10 @@ static void sd_parse_uri(BDRVSheepdogState *s, const char *filename,
+                          Error **errp)
+ {
+     Error *err = NULL;
+-    URI *uri;
+     QueryParams *qp = NULL;
++    SocketAddress *addr = NULL;
++    bool is_unix;
++    URI *uri;
+ 
+     uri = uri_parse(filename);
+     if (!uri) {
+@@ -973,11 +969,11 @@ static void sd_parse_uri(BDRVSheepdogState *s, const char *filename,
+ 
+     /* transport */
+     if (!strcmp(uri->scheme, "sheepdog")) {
+-        s->is_unix = false;
++        is_unix = false;
+     } else if (!strcmp(uri->scheme, "sheepdog+tcp")) {
+-        s->is_unix = false;
++        is_unix = false;
+     } else if (!strcmp(uri->scheme, "sheepdog+unix")) {
+-        s->is_unix = true;
++        is_unix = true;
+     } else {
+         error_setg(&err, "URI scheme must be 'sheepdog', 'sheepdog+tcp',"
+                    " or 'sheepdog+unix'");
+@@ -994,8 +990,9 @@ static void sd_parse_uri(BDRVSheepdogState *s, const char *filename,
+     }
+ 
+     qp = query_params_parse(uri->query);
++    addr = g_new0(SocketAddress, 1);
+ 
+-    if (s->is_unix) {
++    if (is_unix) {
+         /* sheepdog+unix:///vdiname?socket=path */
+         if (uri->server || uri->port) {
+             error_setg(&err, "URI scheme %s doesn't accept a server address",
+@@ -1012,15 +1009,20 @@ static void sd_parse_uri(BDRVSheepdogState *s, const char *filename,
+             error_setg(&err, "unexpected query parameters");
+             goto out;
+         }
+-        s->host_spec = g_strdup(qp->p[0].value);
++        addr->type = SOCKET_ADDRESS_KIND_UNIX;
++        addr->u.q_unix.data = g_new0(UnixSocketAddress, 1);
++        addr->u.q_unix.data->path = g_strdup(qp->p[0].value);
+     } else {
+         /* sheepdog[+tcp]://[host:port]/vdiname */
+         if (qp->n) {
+             error_setg(&err, "unexpected query parameters");
+             goto out;
+         }
+-        s->host_spec = g_strdup_printf("%s:%d", uri->server ?: SD_DEFAULT_ADDR,
+-                                       uri->port ?: SD_DEFAULT_PORT);
++        addr->type = SOCKET_ADDRESS_KIND_INET;
++        addr->u.inet.data = g_new0(InetSocketAddress, 1);
++        addr->u.inet.data->host = g_strdup(uri->server ?: SD_DEFAULT_ADDR);
++        addr->u.inet.data->port = g_strdup_printf("%d",
++                                        uri->port ?: SD_DEFAULT_PORT);
+     }
+ 
+     /* snapshot tag */
+@@ -1035,7 +1037,12 @@ static void sd_parse_uri(BDRVSheepdogState *s, const char *filename,
+     }
  
  out:
-     error_propagate(errp, local_err);
-+    qapi_free_GlusterServer(gsconf);
-     qemu_opts_del(opts);
--    if (str) {
--        qdict_del(backing_options, str);
--        g_free(str);
--    }
-+    g_free(str);
-+    QDECREF(backing_options);
-     errno = EINVAL;
-     return -errno;
+-    error_propagate(errp, err);
++    if (err) {
++        error_propagate(errp, err);
++        qapi_free_SocketAddress(addr);
++    } else {
++        s->addr = addr;
++    }
+     if (qp) {
+         query_params_free(qp);
+     }
+@@ -1998,7 +2005,7 @@ static void sd_close(BlockDriverState *bs)
+     aio_set_fd_handler(bdrv_get_aio_context(bs), s->fd,
+                        false, NULL, NULL, NULL, NULL);
+     closesocket(s->fd);
+-    g_free(s->host_spec);
++    qapi_free_SocketAddress(s->addr);
  }
+ 
+ static int64_t sd_getlength(BlockDriverState *bs)
 -- 
 2.7.4
