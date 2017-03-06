@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ckuFK-0004yd-5c
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:08:23 -0500
+	(envelope-from <mst@redhat.com>) id 1ckuHr-0006c4-TU
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:11:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1ckuFI-0005qm-Ny
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:08:22 -0500
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:38389)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1ckuFI-0005qh-Hq
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:08:20 -0500
-Received: by mail-wm0-x232.google.com with SMTP id t193so67021261wmt.1
-	for <qemu-devel@nongnu.org>; Mon, 06 Mar 2017 07:08:20 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1ckuHo-0006Z4-MM
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:10:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57982)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1ckuHo-0006W5-9o
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 10:10:56 -0500
+Date: Mon, 6 Mar 2017 17:10:52 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170306170940-mutt-send-email-mst@kernel.org>
+References: <1488011202-32121-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+	<58BD1982.30509@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_UAAbfGJz4rQ52e7TX3LR5qY1P8Xk4+zGYp2tMHBUTQg@mail.gmail.com>
-References: <1488809515-4047-1-git-send-email-armbru@redhat.com>
-	<CAFEAcA_UAAbfGJz4rQ52e7TX3LR5qY1P8Xk4+zGYp2tMHBUTQg@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 6 Mar 2017 15:07:59 +0000
-Message-ID: <CAFEAcA8CgUEOZuj1+jhRHqJnDUzFxrGWo=j9EAe4u75S6rnV0w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL v2 00/24] block: Command line option
- -blockdev
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <58BD1982.30509@cn.fujitsu.com>
+Subject: Re: [Qemu-devel] [PATCH v10 0/8] the reset of msix_init series
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +27,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Cao jin <caoj.fnst@cn.fujitsu.com>
+Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Hannes Reinecke <hare@suse.de>, Dmitry Fleytman <dmitry@daynix.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On 6 March 2017 at 15:06, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 6 March 2017 at 14:11, Markus Armbruster <armbru@redhat.com> wrote:
->> Actually, the command line option is the least part of this series.
->> Its bulk is about building infrastructure and getting errors out of
->> the JSON parser.
->>
->> The design of the command line interface was discussed here:
->> Subject: Non-flat command line option argument syntax
->> Message-ID: <87bmukmlau.fsf@dusky.pond.sub.org>
->> https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg00555.html
->>
->> The following changes since commit aa3a982e674b09ae32502940f93ba98b3a8ad50e:
->>
->>   qapi: Improve qobject visitor documentation (2017-03-05 09:14:20 +0100)
->>
->> are available in the git repository at:
->>
->>   git://repo.or.cz/qemu/armbru.git tags/pull-block-2017-02-28-v2
->>
->> for you to fetch changes up to 3a79d43588cff95636d5ccdfa77b372cfd6d8530:
->>
->>   keyval: Support lists (2017-03-05 10:29:58 +0100)
->>
->> ----------------------------------------------------------------
->> block: Command line option -blockdev
->
-> This appears to be a pull request for a feature change
-> after freeze ?
+On Mon, Mar 06, 2017 at 04:10:42PM +0800, Cao jin wrote:
+> Michael,
+> Is this series ok for 2.9?
+> 
+> -- 
+> Sincerely,
+> Cao jin
 
-...oh, v2 of something that failed first time round. Sorry,
-I'm not really awake this afternoon.
+I'll consider it for 2.10.  Sorry it's taking a long time, the benefit
+here is rather small so I don't see a reason to hurry.
 
-thanks
--- PMM
+> On 02/25/2017 04:26 PM, Cao jin wrote:
+> > v10 changelog:
+> > 1. drop the unliked patch, introduce a new patch 1 according to mst's comments.
+> > 2. base on the new patch, remove the following statements
+> > 
+> >         /* Any error other than -ENOTSUP(board's MSI support is broken)
+> >          * is a programming error */
+> >         assert(!ret || ret == -ENOTSUP);
+> > 
+> >    for the affected device: megasas, hcd-xhci. This is trivial changes,
+> >    so I left the R-bs where it was.
+> > 
+> > Test:
+> > 1. Detailed test via command line as v9
+> > 2. make check hangs at: GTESTER check-qtest-x86_64. After ctrl-C, it says:
+> > 
+> >     make: *** [check-qtest-x86_64] Interrupt
+> >     qemu-system-x86_64: Failed to read msg header. Read -1 instead of 12. Original request 11.
+> >     qemu-system-x86_64: vhost VQ 0 ring restore failed: -1: Input/output error (5)
+> >     qemu-system-x86_64: Failed to set msg fds.
+> >     qemu-system-x86_64: vhost VQ 0 ring restore failed: -1: Invalid argument (22)
+> > 
+> >     qemu-system-x86_64: Failed to set msg fds.
+> >     qemu-system-x86_64: vhost VQ 1 ring restore failed: -1: Invalid argument (22)
+> > 
+> >    Is it a regresstion or I missed something?
+> > 
+> > CC: Jason Wang <jasowang@redhat.com>
+> > CC: Gerd Hoffmann <kraxel@redhat.com>
+> > CC: Dmitry Fleytman <dmitry@daynix.com>
+> > CC: Michael S. Tsirkin <mst@redhat.com>
+> > CC: Hannes Reinecke <hare@suse.de>
+> > CC: Paolo Bonzini <pbonzini@redhat.com>
+> > CC: Alex Williamson <alex.williamson@redhat.com>
+> > CC: Markus Armbruster <armbru@redhat.com>
+> > CC: Marcel Apfelbaum <marcel@redhat.com>
+> > 
+> > Cao jin (8):
+> >   msix: Rename and create a wrapper
+> >   megasas: change behaviour of msix switch
+> >   hcd-xhci: change behaviour of msix switch
+> >   megasas: undo the overwrites of msi user configuration
+> >   vmxnet3: fix reference leak issue
+> >   vmxnet3: remove unnecessary internal msix flag
+> >   msi_init: convert assert to return -errno
+> >   megasas: remove unnecessary megasas_use_msix()
+> > 
+> >  hw/net/vmxnet3.c      | 40 +++++++++++++++-------------------------
+> >  hw/pci/msi.c          |  9 ++++++---
+> >  hw/pci/msix.c         | 30 +++++++++++++++++++++---------
+> >  hw/scsi/megasas.c     | 48 +++++++++++++++++++++++++-----------------------
+> >  hw/usb/hcd-xhci.c     | 29 +++++++++++++++++++++--------
+> >  hw/vfio/pci.c         | 12 ++++++------
+> >  include/hw/pci/msix.h |  5 +++++
+> >  7 files changed, 99 insertions(+), 74 deletions(-)
+> > 
+> 
+> 
+> 
