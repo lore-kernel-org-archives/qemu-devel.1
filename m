@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38185)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cktMq-0002pW-E7
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:12:05 -0500
+	(envelope-from <armbru@redhat.com>) id 1cktMq-0002pS-Dn
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:12:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cktMl-0002kk-A2
+	(envelope-from <armbru@redhat.com>) id 1cktMm-0002mB-TA
 	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:12:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45346)
+Received: from mx1.redhat.com ([209.132.183.28]:44170)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cktMl-0002kB-3R
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:11:59 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cktMm-0002lG-Kc
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:12:00 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 111E680461
-	for <qemu-devel@nongnu.org>; Mon,  6 Mar 2017 14:11:59 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D88B176E3
+	for <qemu-devel@nongnu.org>; Mon,  6 Mar 2017 14:12:00 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
 	[10.36.116.55])
-	by int-mx14.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v26EBv7L008375
+	by int-mx13.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v26EBxDt027988
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
 	verify=NO)
-	for <qemu-devel@nongnu.org>; Mon, 6 Mar 2017 09:11:58 -0500
+	for <qemu-devel@nongnu.org>; Mon, 6 Mar 2017 09:12:00 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon,  6 Mar 2017 15:11:33 +0100
-Message-Id: <1488809515-4047-3-git-send-email-armbru@redhat.com>
+Date: Mon,  6 Mar 2017 15:11:38 +0100
+Message-Id: <1488809515-4047-8-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488809515-4047-1-git-send-email-armbru@redhat.com>
 References: <1488809515-4047-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v2 02/24] tests: Fix gcov-files-test-qemu-opts-y,
- gcov-files-test-logging-y
+Subject: [Qemu-devel] [PULL v2 07/24] qapi: Factor out common
+ qobject_input_get_keyval()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,34 +41,164 @@ To: qemu-devel@nongnu.org
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-Message-Id: <1488317230-26248-3-git-send-email-armbru@redhat.com>
+Message-Id: <1488317230-26248-8-git-send-email-armbru@redhat.com>
 ---
- tests/Makefile.include | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ qapi/qobject-input-visitor.c | 87 ++++++++++++++++++--------------------------
+ 1 file changed, 35 insertions(+), 52 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index ace4e80..b65c2b5 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -93,7 +93,7 @@ gcov-files-check-qom-interface-y = qom/object.c
- check-unit-y += tests/check-qom-proplist$(EXESUF)
- gcov-files-check-qom-proplist-y = qom/object.c
- check-unit-y += tests/test-qemu-opts$(EXESUF)
--gcov-files-test-qemu-opts-y = qom/test-qemu-opts.c
-+gcov-files-test-qemu-opts-y = util/qemu-option.c
- check-unit-y += tests/test-write-threshold$(EXESUF)
- gcov-files-test-write-threshold-y = block/write-threshold.c
- check-unit-y += tests/test-crypto-hash$(EXESUF)
-@@ -118,8 +118,8 @@ check-unit-y += tests/test-crypto-ivgen$(EXESUF)
- check-unit-y += tests/test-crypto-afsplit$(EXESUF)
- check-unit-y += tests/test-crypto-xts$(EXESUF)
- check-unit-y += tests/test-crypto-block$(EXESUF)
--gcov-files-test-logging-y = tests/test-logging.c
- check-unit-y += tests/test-logging$(EXESUF)
-+gcov-files-test-logging-y = util/log.c
- check-unit-$(CONFIG_REPLICATION) += tests/test-replication$(EXESUF)
- check-unit-y += tests/test-bufferiszero$(EXESUF)
- gcov-files-check-bufferiszero-y = util/bufferiszero.c
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index 270033e..6c56040 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -151,6 +151,28 @@ static QObject *qobject_input_get_object(QObjectInputVisitor *qiv,
+     return obj;
+ }
+ 
++static const char *qobject_input_get_keyval(QObjectInputVisitor *qiv,
++                                            const char *name,
++                                            Error **errp)
++{
++    QObject *qobj;
++    QString *qstr;
++
++    qobj = qobject_input_get_object(qiv, name, true, errp);
++    if (!qobj) {
++        return NULL;
++    }
++
++    qstr = qobject_to_qstring(qobj);
++    if (!qstr) {
++        error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
++                   full_name(qiv, name), "string");
++        return NULL;
++    }
++
++    return qstring_get_str(qstr);
++}
++
+ static void qdict_add_key(const char *key, QObject *obj, void *opaque)
+ {
+     GHashTable *h = opaque;
+@@ -343,20 +365,13 @@ static void qobject_input_type_int64_keyval(Visitor *v, const char *name,
+                                             int64_t *obj, Error **errp)
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
+-    QObject *qobj = qobject_input_get_object(qiv, name, true, errp);
+-    QString *qstr;
++    const char *str = qobject_input_get_keyval(qiv, name, errp);
+ 
+-    if (!qobj) {
+-        return;
+-    }
+-    qstr = qobject_to_qstring(qobj);
+-    if (!qstr) {
+-        error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
+-                   full_name(qiv, name), "string");
++    if (!str) {
+         return;
+     }
+ 
+-    if (qemu_strtoi64(qstring_get_str(qstr), NULL, 0, obj) < 0) {
++    if (qemu_strtoi64(str, NULL, 0, obj) < 0) {
+         /* TODO report -ERANGE more nicely */
+         error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+                    full_name(qiv, name), "integer");
+@@ -388,20 +403,13 @@ static void qobject_input_type_uint64_keyval(Visitor *v, const char *name,
+                                              uint64_t *obj, Error **errp)
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
+-    QObject *qobj = qobject_input_get_object(qiv, name, true, errp);
+-    QString *qstr;
++    const char *str = qobject_input_get_keyval(qiv, name, errp);
+ 
+-    if (!qobj) {
+-        return;
+-    }
+-    qstr = qobject_to_qstring(qobj);
+-    if (!qstr) {
+-        error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
+-                   full_name(qiv, name), "string");
++    if (!str) {
+         return;
+     }
+ 
+-    if (qemu_strtou64(qstring_get_str(qstr), NULL, 0, obj) < 0) {
++    if (qemu_strtou64(str, NULL, 0, obj) < 0) {
+         /* TODO report -ERANGE more nicely */
+         error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+                    full_name(qiv, name), "integer");
+@@ -432,21 +440,12 @@ static void qobject_input_type_bool_keyval(Visitor *v, const char *name,
+                                            bool *obj, Error **errp)
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
+-    QObject *qobj = qobject_input_get_object(qiv, name, true, errp);
+-    QString *qstr;
+-    const char *str;
++    const char *str = qobject_input_get_keyval(qiv, name, errp);
+ 
+-    if (!qobj) {
+-        return;
+-    }
+-    qstr = qobject_to_qstring(qobj);
+-    if (!qstr) {
+-        error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
+-                   full_name(qiv, name), "string");
++    if (!str) {
+         return;
+     }
+ 
+-    str = qstring_get_str(qstr);
+     if (!strcmp(str, "on")) {
+         *obj = true;
+     } else if (!strcmp(str, "off")) {
+@@ -509,22 +508,13 @@ static void qobject_input_type_number_keyval(Visitor *v, const char *name,
+                                              double *obj, Error **errp)
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
+-    QObject *qobj = qobject_input_get_object(qiv, name, true, errp);
+-    QString *qstr;
+-    const char *str;
++    const char *str = qobject_input_get_keyval(qiv, name, errp);
+     char *endp;
+ 
+-    if (!qobj) {
+-        return;
+-    }
+-    qstr = qobject_to_qstring(qobj);
+-    if (!qstr) {
+-        error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
+-                   full_name(qiv, name), "string");
++    if (!str) {
+         return;
+     }
+ 
+-    str = qstring_get_str(qstr);
+     errno = 0;
+     *obj = strtod(str, &endp);
+     if (errno || endp == str || *endp) {
+@@ -568,20 +558,13 @@ static void qobject_input_type_size_keyval(Visitor *v, const char *name,
+                                            uint64_t *obj, Error **errp)
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
+-    QObject *qobj = qobject_input_get_object(qiv, name, true, errp);
+-    QString *qstr;
++    const char *str = qobject_input_get_keyval(qiv, name, errp);
+ 
+-    if (!qobj) {
+-        return;
+-    }
+-    qstr = qobject_to_qstring(qobj);
+-    if (!qstr) {
+-        error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
+-                   full_name(qiv, name), "string");
++    if (!str) {
+         return;
+     }
+ 
+-    if (qemu_strtosz(qstring_get_str(qstr), NULL, obj) < 0) {
++    if (qemu_strtosz(str, NULL, obj) < 0) {
+         /* TODO report -ERANGE more nicely */
+         error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
+                    full_name(qiv, name), "size");
 -- 
 2.7.4
