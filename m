@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cksmc-00061z-3V
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 08:34:39 -0500
+	(envelope-from <hangaohuai@huawei.com>) id 1cktHA-0001NX-3C
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:06:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cksmY-0001Eb-4z
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 08:34:38 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170305214857.9510-1-krzk@kernel.org>
-	<20170305214857.9510-3-krzk@kernel.org>
-	<2130c1b2-0f81-13f6-a1f8-c0a2e294e3f0@amsat.org>
-	<CAFEAcA8DOfstrMiEBLsgf6U6S9uT9ahA1ALrJdmQhcV+7K8Obw@mail.gmail.com>
-	<4989d5b6-586a-de18-e8e6-6ab9e9ac131c@redhat.com>
-	<CAFEAcA-6yQ=95hGdia6TDhq4C-swOJ1iZA8C+u99Dy9kfG+f0w@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <5e79860e-3823-1db8-8ba7-5c8bb44046d8@amsat.org>
-Date: Mon, 6 Mar 2017 10:34:29 -0300
+	(envelope-from <hangaohuai@huawei.com>) id 1cktH5-0000Xf-BX
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:06:12 -0500
+Received: from [45.249.212.187] (port=2995 helo=dggrg01-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <hangaohuai@huawei.com>) id 1cktH4-0000UG-Ga
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:06:07 -0500
+From: hangaohuai <hangaohuai@huawei.com>
+Date: Mon, 6 Mar 2017 22:05:41 +0800
+Message-ID: <20170306140541.10600-1-hangaohuai@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-6yQ=95hGdia6TDhq4C-swOJ1iZA8C+u99Dy9kfG+f0w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 3/3] hw/misc/exynos4210_pmu:
- Reorder local variables for readability
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] Fix the vm state after vm migration when vm
+ panic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,40 +24,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, arei.gonglei@huawei.com, hangaohuai@huawei.com
 
-On 03/06/2017 10:16 AM, Peter Maydell wrote:
-> On 6 March 2017 at 13:03, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> On 06/03/2017 10:46, Peter Maydell wrote:
->>> On 6 March 2017 at 04:06, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->>>> your change seems OK but while you are here, 'unsigned' is considered
->>>> harmful since more than a decade.
->>>
->>> Considered harmful by who, and why?
+Bug steps:
+1. windows VM with pvpanic device:<panic model='isa'/>in xml
+2. inject the panic in windows, the vm state is paused (guest-panicked)
+3. migrate the vm to other host, vm state is running
 
-sorry to cry wolf :)
+Check the vmstate before runstate_set(RUN_STATE_RUNNING)
 
->> It is true that unsigned has all the disadvantages of "int" (it may be
->> smaller than the size of the object" and all the disadvantages of
->> "size_t" (it doesn't optimize as well because the compiler cannot
->> exploit undefined behavior).
->>
->> I wouldn't call it harmful, but it feels like the worst of both worlds.
->
-> size_t is a pretty silly choice for a variable that's looping
-> through the number of registers in the device, which is a value
-> that would fit in 16 bits, let alone 32. I would probably have
-> written this with 'int', but use of 'unsigned' doesn't come
-> very high up on my list of things to complain about.
+Signed-off-by: hangaohuai <hangaohuai@huawei.com>
+---
+ cpus.c                  | 3 +++
+ include/sysemu/sysemu.h | 1 +
+ vl.c                    | 5 +++++
+ 3 files changed, 9 insertions(+)
 
-silly would be "typeof(PMU_NUM_OF_REGISTERS) i;" :p
-
-I got your point about the complain priority list.
-
-> (since we use -fwrapv the compiler can't exploit undefined
-> behaviour for signed loop indexes either.)
-
-regards,
-
-Phil.
+diff --git a/cpus.c b/cpus.c
+index c857ad2..37b93aa 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1734,6 +1734,9 @@ int vm_prepare_start(void)
+     if (runstate_is_running()) {
+         qapi_event_send_stop(&error_abort);
+         res = -1;
++    } else if (runstate_is_paniced()) {
++        qemu_system_guest_panicked(NULL);
++        res = -1;
+     } else {
+         replay_enable_events();
+         cpu_enable_ticks();
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 576c7ce..08015c7 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -23,6 +23,7 @@ extern bool qemu_uuid_set;
+ bool runstate_check(RunState state);
+ void runstate_set(RunState new_state);
+ int runstate_is_running(void);
++int runstate_is_paniced(void);
+ bool runstate_needs_reset(void);
+ bool runstate_store(char *str, size_t size);
+ typedef struct vm_change_state_entry VMChangeStateEntry;
+diff --git a/vl.c b/vl.c
+index 16a3b5e..ea7e3f8 100644
+--- a/vl.c
++++ b/vl.c
+@@ -729,6 +729,11 @@ int runstate_is_running(void)
+     return runstate_check(RUN_STATE_RUNNING);
+ }
+ 
++int runstate_is_paniced(void)
++{
++    return runstate_check(RUN_STATE_GUEST_PANICKED);
++}
++
+ bool runstate_needs_reset(void)
+ {
+     return runstate_check(RUN_STATE_INTERNAL_ERROR) ||
+-- 
+1.8.3.1
