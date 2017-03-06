@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50515)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cksJ9-0005zx-3v
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 08:04:11 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cksLQ-0006hQ-Mn
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 08:06:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cksJ8-0001Su-9H
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 08:04:11 -0500
-References: <20170305214857.9510-1-krzk@kernel.org>
-	<20170305214857.9510-3-krzk@kernel.org>
-	<2130c1b2-0f81-13f6-a1f8-c0a2e294e3f0@amsat.org>
-	<CAFEAcA8DOfstrMiEBLsgf6U6S9uT9ahA1ALrJdmQhcV+7K8Obw@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4989d5b6-586a-de18-e8e6-6ab9e9ac131c@redhat.com>
-Date: Mon, 6 Mar 2017 14:03:58 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1cksLP-00027J-L3
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 08:06:32 -0500
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:36545)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cksLP-000275-E7
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 08:06:31 -0500
+Received: by mail-wr0-x22d.google.com with SMTP id u108so115995938wrb.3
+	for <qemu-devel@nongnu.org>; Mon, 06 Mar 2017 05:06:31 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8DOfstrMiEBLsgf6U6S9uT9ahA1ALrJdmQhcV+7K8Obw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 3/3] hw/misc/exynos4210_pmu:
- Reorder local variables for readability
+In-Reply-To: <1488702958-24336-1-git-send-email-armbru@redhat.com>
+References: <1488702958-24336-1-git-send-email-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 6 Mar 2017 13:06:09 +0000
+Message-ID: <CAFEAcA9i7g_CHmgXjZd_go1-CeRg5Xm2urf_H1uOeWoeR67WZA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL v2 00/27] QAPI patches for 2017-02-28
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,24 +28,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
+On 5 March 2017 at 08:35, Markus Armbruster <armbru@redhat.com> wrote:
+> The following changes since commit 17783ac828adc694d986698d2d7014aedfeb48c6:
+>
+>   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-2.9-20170303' into staging (2017-03-04 16:31:14 +0000)
+>
+> are available in the git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2017-02-28
+>
+> for you to fetch changes up to aa3a982e674b09ae32502940f93ba98b3a8ad50e:
+>
+>   qapi: Improve qobject visitor documentation (2017-03-05 09:14:20 +0100)
+>
+> ----------------------------------------------------------------
+> QAPI patches for 2017-02-28
+>
 
+Applied, thanks.
 
-On 06/03/2017 10:46, Peter Maydell wrote:
-> On 6 March 2017 at 04:06, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
- wrote:
->> your change seems OK but while you are here, 'unsigned' is considered
->> harmful since more than a decade.
->=20
-> Considered harmful by who, and why?
-
-It is true that unsigned has all the disadvantages of "int" (it may be
-smaller than the size of the object" and all the disadvantages of
-"size_t" (it doesn't optimize as well because the compiler cannot
-exploit undefined behavior).
-
-I wouldn't call it harmful, but it feels like the worst of both worlds.
-
-Paolo
+-- PMM
