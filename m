@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alexander.boettcher@genode-labs.com>)
-	id 1ckyyL-0002v7-LO
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 15:11:10 -0500
+	(envelope-from <eblake@redhat.com>) id 1ckz0U-0003U3-Mx
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 15:13:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alexander.boettcher@genode-labs.com>)
-	id 1ckyyH-0000OS-JB
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 15:11:09 -0500
-Received: from mail.genode-labs.com ([88.198.56.169]:36182)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alexander.boettcher@genode-labs.com>)
-	id 1ckyyH-0000OI-C3
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 15:11:05 -0500
-References: <49fcb3c4-df9d-ec64-2927-71c02fc2524b@genode-labs.com>
-	<87k282im0q.fsf@linaro.org>
-	<6515bcf7-e3cd-21b4-746b-c386b1296d88@genode-labs.com>
-	<87innmii02.fsf@linaro.org>
-	<d208c3f0-2e57-0b54-f18f-b5e27d698e28@genode-labs.com>
-	<87h936ida2.fsf@linaro.org>
-From: Alexander Boettcher <alexander.boettcher@genode-labs.com>
-Message-ID: <986fbee4-e620-802d-b985-f732768ad039@genode-labs.com>
-Date: Mon, 6 Mar 2017 21:11:04 +0100
+	(envelope-from <eblake@redhat.com>) id 1ckz0T-00012s-Hp
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 15:13:22 -0500
+References: <1488817322-11397-1-git-send-email-kwolf@redhat.com>
+	<1488817322-11397-4-git-send-email-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <0e51c7fa-cacd-e4e8-1c5f-5b24da13f028@redhat.com>
+Date: Mon, 6 Mar 2017 14:13:13 -0600
 MIME-Version: 1.0
-In-Reply-To: <87h936ida2.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Qemu deadlocks in tb_lock when using SVM+SoftMMU
+In-Reply-To: <1488817322-11397-4-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="PqaB9o7NtopBBexcRH4K0UksAXoRDt1mu"
+Subject: Re: [Qemu-devel] [PATCH 03/10] mirror: Fix permissions for removing
+ mirror_top_bs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,56 +25,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, rth@twiddle.net, fred.konrad@greensocs.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
-Hello,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--PqaB9o7NtopBBexcRH4K0UksAXoRDt1mu
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com
+Message-ID: <0e51c7fa-cacd-e4e8-1c5f-5b24da13f028@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 03/10] mirror: Fix permissions for removing
+ mirror_top_bs
+References: <1488817322-11397-1-git-send-email-kwolf@redhat.com>
+ <1488817322-11397-4-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1488817322-11397-4-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-thank you for your effort.
+On 03/06/2017 10:21 AM, Kevin Wolf wrote:
+> mirror_top_bs takes write permissions on its backing file, which can
+> make it impossible to attach that backing file node to another parent.
+> However, this is exactly what needs to be done in order to remove
+> mirror_top_bs from the backing chain. So give up the write permission
+> first.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/mirror.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 
-With your patch I get now a 0x3f exception shown by the hypervisor,
-which I have never encountered so far before. The guest kernel seems not
-to start, at least no life sign is shown.
-
-For me the patch of Paolo Bonzini works reliable.
-
-How to proceed ?
-
-Thanks,
-
-Alex.
-
-On 06.03.2017 17:24, Alex Benn=C3=A9e wrote:
->=20
-> Alexander Boettcher <alexander.boettcher@genode-labs.com> writes:
->=20
->> Hi,
-> <snip>
->>
->> Sometimes Qemu just succeeds if the timing is well, will see.
->>
->> But this is not the point of this issue atm.
->=20
-> I've sent a patch that works as Richard suggested. However your test
-> image seems to run into other issues. I have tested it on my known good
-> x86 image and it works.
->=20
-> However my knowledge of x86's interrupt architecture is fairly minimal
-> so I'm looking for testing/feedback on the patch.
->=20
->>
->> Alex.
->=20
->=20
-> --
-> Alex Benn=C3=A9e
->=20
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
-Alexander Boettcher
-Genode Labs
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-http://www.genode-labs.com - http://www.genode.org
 
-Genode Labs GmbH - Amtsgericht Dresden - HRB 28424 - Sitz Dresden
-Gesch=C3=A4ftsf=C3=BChrer: Dr.-Ing. Norman Feske, Christian Helmuth
+--PqaB9o7NtopBBexcRH4K0UksAXoRDt1mu
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYvcLZAAoJEKeha0olJ0Nq5ncH/jA68ilrGbwWFwd7mqbuZbx6
+ZRhueM8wF/HYfVTTOc4iakUtTH8UsnSMTjEd+sbG2Z154+RtLqRNPdi6LRHLPYh1
+U9VEkLaEKezpMfTwWuns/e8lQm7hud+RAKOkyiw4HgPDoCSZ+jzw/kd5BaYsssIZ
+7Soy1FzYVIcRQq9TEWYPmxyDpckPeAC1PXeDSboes1Lz81D/i4l33efqb7eFZdJz
+vdmzPJDBHsdhZO8R8DJzvjbFP85Ve/3LH4RsxHX9h13zwbFHmtCecNcIj28Z3nw2
+FQOH0fQDV1z+Hrv4HlSx7bIzj4gkhC16/phO0GZuYeMwtAqnGck97A3g8CjRxJ4=
+=EmhW
+-----END PGP SIGNATURE-----
+
+--PqaB9o7NtopBBexcRH4K0UksAXoRDt1mu--
