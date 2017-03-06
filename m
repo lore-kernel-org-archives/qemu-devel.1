@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cki5G-0005g2-TK
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 21:09:12 -0500
+	(envelope-from <yanghongyang@huawei.com>) id 1ckiPM-0007fq-Db
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 21:29:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cki5D-0006xI-Ii
-	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 21:09:10 -0500
-Date: Mon, 6 Mar 2017 12:51:34 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170306015134.GD12030@umbus.fritz.box>
-References: <1488545463-19776-1-git-send-email-clg@kaod.org>
+	(envelope-from <yanghongyang@huawei.com>) id 1ckiPH-0003Py-Fx
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 21:29:56 -0500
+Received: from [45.249.212.189] (port=2854 helo=dggrg03-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <yanghongyang@huawei.com>) id 1ckiPG-0003PJ-Ka
+	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 21:29:51 -0500
+References: <33183CC9F5247A488A2544077AF19020DA1D01C2@DGGEMA505-MBX.china.huawei.com>
+	<20170303104204.GF7097@lemon.lan>
+From: yanghongyang <yanghongyang@huawei.com>
+Message-ID: <2262d4d1-a04d-c1b9-3bf2-f30c44b46eb7@huawei.com>
+Date: Mon, 6 Mar 2017 10:07:14 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="NklN7DEeGtkPCoo3"
-Content-Disposition: inline
-In-Reply-To: <1488545463-19776-1-git-send-email-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH] ppc/xics: register reset handlers for the
- ICP and ICS objects
+In-Reply-To: <20170303104204.GF7097@lemon.lan>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Bug?] BQL about live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,218 +27,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Cc: "quintela@redhat.com" <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Huangzhichao <huangzhichao@huawei.com>
 
 
---NklN7DEeGtkPCoo3
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Mar 03, 2017 at 01:51:03PM +0100, C=E9dric Le Goater wrote:
-1;4601;0c> The recent changes on the XICS layer removed the XICSState objec=
-t to
-> let the sPAPR machine handle the ICP and ICS directly. The reset of
-> these objects was previously handled by XICSState, which was a SysBus
-> device, and to keep the same behavior, the ICP and ICS were assigned
-> to SysbBus.
->=20
-> But that broke the 'info qtree' command in the monitor. 'qtree'
-> performs a loop on the children of a bus to print their properties and
-> SysBus devices are expected to be found under SysBus, which is not the
-> case anymore.
->=20
-> The fix for this problem is to register reset handlers for the ICP and
-> ICS objects and stop using SysBus for such devices.
->=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+On 2017/3/3 18:42, Fam Zheng wrote:
+> On Fri, 03/03 09:29, Gonglei (Arei) wrote:
+>> Hello Juan & Dave,
+>>
+>> We hit a bug in our test:
+>> Network error occurs when migrating a guest, libvirt then rollback the
+>> migration, causes qemu coredump
+>> qemu log:
+>> 2017-03-01T12:54:33.904949+08:00|info|qemu[17672]|[33614]|monitor_qapi_event_emit[479]|: {"timestamp": {"seconds": 1488344073, "microseconds": 904914}, "event": "STOP"}
+>> 2017-03-01T12:54:37.522500+08:00|info|qemu[17672]|[17672]|handle_qmp_command[3930]|: qmp_cmd_name: migrate_cancel
+>> 2017-03-01T12:54:37.522607+08:00|info|qemu[17672]|[17672]|monitor_qapi_event_emit[479]|: {"timestamp": {"seconds": 1488344077, "microseconds": 522556}, "event": "MIGRATION", "data": {"status": "cancelling"}}
+>> 2017-03-01T12:54:37.524671+08:00|info|qemu[17672]|[17672]|handle_qmp_command[3930]|: qmp_cmd_name: cont
+>> 2017-03-01T12:54:37.524733+08:00|info|qemu[17672]|[17672]|virtio_set_status[725]|: virtio-balloon device status is 7 that means DRIVER OK
+>> 2017-03-01T12:54:37.525434+08:00|info|qemu[17672]|[17672]|virtio_set_status[725]|: virtio-net device status is 7 that means DRIVER OK
+>> 2017-03-01T12:54:37.525484+08:00|info|qemu[17672]|[17672]|virtio_set_status[725]|: virtio-blk device status is 7 that means DRIVER OK
+>> 2017-03-01T12:54:37.525562+08:00|info|qemu[17672]|[17672]|virtio_set_status[725]|: virtio-serial device status is 7 that means DRIVER OK
+>> 2017-03-01T12:54:37.527653+08:00|info|qemu[17672]|[17672]|vm_start[981]|: vm_state-notify:3ms
+>> 2017-03-01T12:54:37.528523+08:00|info|qemu[17672]|[17672]|monitor_qapi_event_emit[479]|: {"timestamp": {"seconds": 1488344077, "microseconds": 527699}, "event": "RESUME"}
+>> 2017-03-01T12:54:37.530680+08:00|info|qemu[17672]|[33614]|migration_bitmap_sync[720]|: this iteration cycle takes 3s, new dirtied data:0MB
+>> 2017-03-01T12:54:37.530909+08:00|info|qemu[17672]|[33614]|monitor_qapi_event_emit[479]|: {"timestamp": {"seconds": 1488344077, "microseconds": 530733}, "event": "MIGRATION_PASS", "data": {"pass": 3}}
+>> 2017-03-01T04:54:37.530997Z qemu-kvm: socket_writev_buffer: Got err=32 for (131583/18446744073709551615)
+>> qemu-kvm: /home/abuild/rpmbuild/BUILD/qemu-kvm-2.6.0/hw/net/virtio_net.c:1519: virtio_net_save: Assertion `!n->vhost_started' failed.
+>> 2017-03-01 12:54:43.028: shutting down
+>>
+>> From qemu log, qemu received and processed migrate_cancel/cont qmp commands
+>> after guest been stopped and entered the last round of migration. Then
+>> migration thread try to save device state when guest is running(started by
+>> cont command), causes assert and coredump.
+>> This is because in last iter, we call cpu_synchronize_all_states() to
+>> synchronize vcpu states, this call will release qemu_global_mutex and wait
+>> for do_kvm_cpu_synchronize_state() to be executed on target vcpu:
+>> (gdb) bt
+>> #0  0x00007f763d1046d5 in pthread_cond_wait@@GLIBC_2.3.2 () from /lib64/libpthread.so.0
+>> #1  0x00007f7643e51d7f in qemu_cond_wait (cond=0x7f764445eca0 <qemu_work_cond>, mutex=0x7f764445eba0 <qemu_global_mutex>) at util/qemu-thread-posix.c:132
+>> #2  0x00007f7643a2e154 in run_on_cpu (cpu=0x7f7644e06d80, func=0x7f7643a46413 <do_kvm_cpu_synchronize_state>, data=0x7f7644e06d80) at /mnt/public/yanghy/qemu-kvm/cpus.c:995
+>> #3  0x00007f7643a46487 in kvm_cpu_synchronize_state (cpu=0x7f7644e06d80) at /mnt/public/yanghy/qemu-kvm/kvm-all.c:1805
+>> #4  0x00007f7643a2c700 in cpu_synchronize_state (cpu=0x7f7644e06d80) at /mnt/public/yanghy/qemu-kvm/include/sysemu/kvm.h:457
+>> #5  0x00007f7643a2db0c in cpu_synchronize_all_states () at /mnt/public/yanghy/qemu-kvm/cpus.c:766
+>> #6  0x00007f7643a67b5b in qemu_savevm_state_complete_precopy (f=0x7f76462f2d30, iterable_only=false) at /mnt/public/yanghy/qemu-kvm/migration/savevm.c:1051
+>> #7  0x00007f7643d121e9 in migration_completion (s=0x7f76443e78c0 <current_migration.37571>, current_active_state=4, old_vm_running=0x7f74343fda00, start_time=0x7f74343fda08) at migration/migration.c:1753
+>> #8  0x00007f7643d126c5 in migration_thread (opaque=0x7f76443e78c0 <current_migration.37571>) at migration/migration.c:1922
+>> #9  0x00007f763d100dc5 in start_thread () from /lib64/libpthread.so.0
+>> #10 0x00007f763ce2e71d in clone () from /lib64/libc.so.6
+>> (gdb) p iothread_locked
+>> $1 = true
+>>
+>> and then, qemu main thread been executed, it won't block because migration
+>> thread released the qemu_global_mutex:
+>> (gdb) thr 1
+>> [Switching to thread 1 (Thread 0x7fe298e08bc0 (LWP 30767))]
+>> #0  os_host_main_loop_wait (timeout=931565) at main-loop.c:270
+>> 270                 QEMU_LOG(LOG_INFO,"***** after qemu_pool_ns: timeout %d\n", timeout);
+>> (gdb) p iothread_locked
+>> $2 = true
+>> (gdb) l 268
+>> 263
+>> 264         ret = qemu_poll_ns((GPollFD *)gpollfds->data, gpollfds->len, timeout);
+>> 265
+>> 266
+>> 267         if (timeout) {
+>> 268             qemu_mutex_lock_iothread();
+>> 269             if (runstate_check(RUN_STATE_FINISH_MIGRATE)) {
+>> 270                 QEMU_LOG(LOG_INFO,"***** after qemu_pool_ns: timeout %d\n", timeout);
+>> 271             }
+>> 272         }
+>> (gdb)
+>>
+>> So, although we've hold iothread_lock in stop&copy phase of migration, we
+>> can't guarantee the iothread been locked all through the stop & copy phase,
+>> any thoughts on how to solve this problem?
+> 
+> Could you post a backtrace of the assertion?
 
-Applied to ppc-for-2.9, thanks.
+#0  0x00007f97b1fbe5d7 in raise () from /usr/lib64/libc.so.6
+#1  0x00007f97b1fbfcc8 in abort () from /usr/lib64/libc.so.6
+#2  0x00007f97b1fb7546 in __assert_fail_base () from /usr/lib64/libc.so.6
+#3  0x00007f97b1fb75f2 in __assert_fail () from /usr/lib64/libc.so.6
+#4  0x000000000049fd19 in virtio_net_save (f=0x7f97a8ca44d0, opaque=0x7f97a86e9018) at /usr/src/debug/qemu-kvm-2.6.0/hw/
+#5  0x000000000047e380 in vmstate_save_old_style (f=f@entry=0x7f97a8ca44d0, vmdesc=vmdesc@entry=0x7f97a82f2210, se=0x7f9
+#6  0x000000000047fb93 in vmstate_save (f=f@entry=0x7f97a8ca44d0, se=se@entry=0x7f97a8558680, vmdesc=vmdesc@entry=0x7f97
+#7  0x0000000000481ad2 in qemu_savevm_state_complete_precopy (f=0x7f97a8ca44d0, iterable_only=iterable_only@entry=false)
+#8  0x00000000006c6b60 in migration_completion (s=s@entry=0xdb7de0 <current_migration.38312>, current_active_state=curre
+    start_time=start_time@entry=0x7f96263fd9f8) at migration/migration.c:1761
+#9  0x00000000006c71db in migration_thread (opaque=opaque@entry=0xdb7de0 <current_migration.38312>) at migration/migrati
 
-> ---
->  hw/intc/xics.c     | 10 ++++++----
->  hw/intc/xics_kvm.c | 15 ++++++++++-----
->  hw/ppc/spapr.c     |  2 --
->  3 files changed, 16 insertions(+), 11 deletions(-)
->=20
-> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> index ffc0747c7fa2..e740989a1162 100644
-> --- a/hw/intc/xics.c
-> +++ b/hw/intc/xics.c
-> @@ -333,7 +333,7 @@ static const VMStateDescription vmstate_icp_server =
-=3D {
->      },
->  };
-> =20
-> -static void icp_reset(DeviceState *dev)
-> +static void icp_reset(void *dev)
->  {
->      ICPState *icp =3D ICP(dev);
-> =20
-> @@ -359,6 +359,8 @@ static void icp_realize(DeviceState *dev, Error **err=
-p)
->      }
-> =20
->      icp->xics =3D XICS_FABRIC(obj);
-> +
-> +    qemu_register_reset(icp_reset, dev);
->  }
-> =20
-> =20
-> @@ -366,7 +368,6 @@ static void icp_class_init(ObjectClass *klass, void *=
-data)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> =20
-> -    dc->reset =3D icp_reset;
->      dc->vmsd =3D &vmstate_icp_server;
->      dc->realize =3D icp_realize;
->  }
-> @@ -522,7 +523,7 @@ static void ics_simple_eoi(ICSState *ics, uint32_t nr)
->      }
->  }
-> =20
-> -static void ics_simple_reset(DeviceState *dev)
-> +static void ics_simple_reset(void *dev)
->  {
->      ICSState *ics =3D ICS_SIMPLE(dev);
->      int i;
-> @@ -611,6 +612,8 @@ static void ics_simple_realize(DeviceState *dev, Erro=
-r **errp)
->      }
->      ics->irqs =3D g_malloc0(ics->nr_irqs * sizeof(ICSIRQState));
->      ics->qirqs =3D qemu_allocate_irqs(ics_simple_set_irq, ics, ics->nr_i=
-rqs);
-> +
-> +    qemu_register_reset(ics_simple_reset, dev);
->  }
-> =20
->  static Property ics_simple_properties[] =3D {
-> @@ -626,7 +629,6 @@ static void ics_simple_class_init(ObjectClass *klass,=
- void *data)
->      isc->realize =3D ics_simple_realize;
->      dc->props =3D ics_simple_properties;
->      dc->vmsd =3D &vmstate_ics_simple;
-> -    dc->reset =3D ics_simple_reset;
->      isc->reject =3D ics_simple_reject;
->      isc->resend =3D ics_simple_resend;
->      isc->eoi =3D ics_simple_eoi;
-> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-> index 0a3daca3bb5a..42e0e0ef8484 100644
-> --- a/hw/intc/xics_kvm.c
-> +++ b/hw/intc/xics_kvm.c
-> @@ -102,7 +102,7 @@ static int icp_set_kvm_state(ICPState *icp, int versi=
-on_id)
->      return 0;
->  }
-> =20
-> -static void icp_kvm_reset(DeviceState *dev)
-> +static void icp_kvm_reset(void *dev)
->  {
->      ICPState *icp =3D ICP(dev);
-> =20
-> @@ -146,12 +146,17 @@ static void icp_kvm_cpu_setup(ICPState *icp, PowerP=
-CCPU *cpu)
->      icp->cap_irq_xics_enabled =3D true;
->  }
-> =20
-> +static void icp_kvm_realize(DeviceState *dev, Error **errp)
-> +{
-> +    qemu_register_reset(icp_kvm_reset, dev);
-> +}
-> +
->  static void icp_kvm_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
->      ICPStateClass *icpc =3D ICP_CLASS(klass);
-> =20
-> -    dc->reset =3D icp_kvm_reset;
-> +    dc->realize =3D icp_kvm_realize;
->      icpc->pre_save =3D icp_get_kvm_state;
->      icpc->post_load =3D icp_set_kvm_state;
->      icpc->cpu_setup =3D icp_kvm_cpu_setup;
-> @@ -293,7 +298,7 @@ static void ics_kvm_set_irq(void *opaque, int srcno, =
-int val)
->      }
->  }
-> =20
-> -static void ics_kvm_reset(DeviceState *dev)
-> +static void ics_kvm_reset(void *dev)
->  {
->      ICSState *ics =3D ICS_SIMPLE(dev);
->      int i;
-> @@ -324,15 +329,15 @@ static void ics_kvm_realize(DeviceState *dev, Error=
- **errp)
->      }
->      ics->irqs =3D g_malloc0(ics->nr_irqs * sizeof(ICSIRQState));
->      ics->qirqs =3D qemu_allocate_irqs(ics_kvm_set_irq, ics, ics->nr_irqs=
-);
-> +
-> +    qemu_register_reset(ics_kvm_reset, dev);
->  }
-> =20
->  static void ics_kvm_class_init(ObjectClass *klass, void *data)
->  {
-> -    DeviceClass *dc =3D DEVICE_CLASS(klass);
->      ICSStateClass *icsc =3D ICS_BASE_CLASS(klass);
-> =20
->      icsc->realize =3D ics_kvm_realize;
-> -    dc->reset =3D ics_kvm_reset;
->      icsc->pre_save =3D ics_get_kvm_state;
->      icsc->post_load =3D ics_set_kvm_state;
->  }
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 14192accf486..c3bb99160545 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -106,7 +106,6 @@ static int try_create_xics(sPAPRMachineState *spapr, =
-const char *type_ics,
->      int i;
-> =20
->      ics =3D ICS_SIMPLE(object_new(type_ics));
-> -    qdev_set_parent_bus(DEVICE(ics), sysbus_get_default());
->      object_property_add_child(OBJECT(spapr), "ics", OBJECT(ics), NULL);
->      object_property_set_int(OBJECT(ics), nr_irqs, "nr-irqs", &err);
->      object_property_add_const_link(OBJECT(ics), "xics", OBJECT(xi), NULL=
-);
-> @@ -123,7 +122,6 @@ static int try_create_xics(sPAPRMachineState *spapr, =
-const char *type_ics,
->          ICPState *icp =3D &spapr->icps[i];
-> =20
->          object_initialize(icp, sizeof(*icp), type_icp);
-> -        qdev_set_parent_bus(DEVICE(icp), sysbus_get_default());
->          object_property_add_child(OBJECT(spapr), "icp[*]", OBJECT(icp), =
-NULL);
->          object_property_add_const_link(OBJECT(icp), "xics", OBJECT(xi), =
-NULL);
->          object_property_set_bool(OBJECT(icp), true, "realized", &err);
+> 
+> Fam
+> 
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---NklN7DEeGtkPCoo3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJYvMCjAAoJEGw4ysog2bOSLwsQANSCpu89bRYYrPh9HXOCsDzf
-/zwmqU5s73nkBjcYcynfDrJd5JNj4Emwjx6w2uoPeOnP17/yrdKaWefS3ULC+yGt
-a35AgYEk0MCn0PTNuDKCYR19deYzicQ3npJePlqqlgCUU8XHYYImjhFX/GtJo8Fm
-B2xtEEnWthQaugP45fL2VSqOjjKxNj77RXDttZ4vKyadPCLB7nCUxhGR4cIuFpl3
-ENOe1LtsxzKC44T9JwJHSRDhTHQJp5aJWVGgJWV1n6NzqUKuY9q03n0C9srkFzzV
-C/A+owlnW15Z72tdTvxELSFJ7jFsqMHRh9zy9PWJnoTBtjLNWfAFkSPystNsL/C6
-k5ga/Gbf5oVH0I+HmUjEDU2C74GmGQjjy6pOM8RtRW1alva53GOPBN9NAJ5G11Hq
-OsKyzggOV4cqZqzWQj6uL7t7v0wNcUdRG3hZxeuLntTrCEmQ0tSdTRN3BhGlIlWu
-XZahAXdJOBq4Ng5BKz1TtHiJiUpLhafzqSCwD5CYmEvN2ugKd6stlNMtY0mpRqNS
-7ZlSdFKRvf+V67Gz3vfQK5o5XbuS+DprhMumxB0QPxJsCdGilhNFJVZlP6dNgRmy
-pD/GzWs4WDRNOuKBDBPGmbyQRV/4qP0Bc7ym4H6uJZFB7hd+50s1M6lViM7YMZz4
-TK60enIHzlnQ49y9WE7y
-=Nl8+
------END PGP SIGNATURE-----
-
---NklN7DEeGtkPCoo3--
+--
+Thanks,
+Yang
