@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1ckmth-0001Zp-JD
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 02:17:34 -0500
+	(envelope-from <ppandit@redhat.com>) id 1ckmtk-0001bb-MW
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 02:17:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1ckmtd-00005y-MB
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 02:17:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34140)
+	(envelope-from <ppandit@redhat.com>) id 1ckmtj-000092-KB
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 02:17:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43818)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1ckmtd-000053-Gj
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 02:17:29 -0500
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1ckmtj-00008b-E9
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 02:17:35 -0500
 From: P J P <ppandit@redhat.com>
-Date: Mon,  6 Mar 2017 12:47:19 +0530
-Message-Id: <20170306071721.26708-1-ppandit@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/2] Limit and protect execve arguments
+Date: Mon,  6 Mar 2017 12:47:21 +0530
+Message-Id: <20170306071721.26708-3-ppandit@redhat.com>
+In-Reply-To: <20170306071721.26708-1-ppandit@redhat.com>
+References: <20170306071721.26708-1-ppandit@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 2/2] linux-user: allocate heap memory for
+ execve arguments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,25 +29,43 @@ Cc: Eric Blake <eblake@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Jann Horn 
 
 From: Prasad J Pandit <pjp@fedoraproject.org>
 
-Hello,
+Arguments passed to execve(2) call from user program could
+be large, allocating stack memory for them via alloca(3) call
+would lead to bad behaviour. Use 'g_malloc0' to allocate memory
+for such arguments.
 
-A user program could pass large number of 'argv','env' arguments to an
-execve(2) call. It could lead to bad behaviour as the TARGET_NR_execve:
-allocates stack memory(via alloca) for these arguments. alloca(3) is
-better for allocations of upto one page(4KB) of stack memory. As anything
-more could smash stack protectors in place.
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+---
+ linux-user/syscall.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-This patch(v2) set attempts to fix these issues.
+Update per: replace alloca() with g_malloc0()
   -> https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg00750.html
 
-Thank you.
---
-Prasad J Pandit (2):
-  linux-user: limit number of arguments to execve
-  linux-user: allocate heap memory for execve arguments
-
- linux-user/syscall.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
-
---
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 86a4a9c..404fb0b 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -7800,8 +7800,8 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+                 ret = -TARGET_E2BIG;
+                 break;
+             }
+-            argp = alloca((argc + 1) * sizeof(void *));
+-            envp = alloca((envc + 1) * sizeof(void *));
++            argp = g_malloc0((argc + 1) * sizeof(void *));
++            envp = g_malloc0((envc + 1) * sizeof(void *));
+ 
+             for (gp = guest_argp, q = argp; gp;
+                   gp += sizeof(abi_ulong), q++) {
+@@ -7862,6 +7862,9 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+                     break;
+                 unlock_user(*q, addr, 0);
+             }
++
++            g_free(argp);
++            g_free(envp);
+         }
+         break;
+     case TARGET_NR_chdir:
+-- 
 2.9.3
