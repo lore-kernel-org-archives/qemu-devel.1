@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45202)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1ckth3-0002Cb-63
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:32:57 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45223)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <no-reply@patchew.org>) id 1ckth6-0002DQ-03
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:33:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1cktgz-00029H-WF
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:32:57 -0500
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:46548 helo=mx01.kamp.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1cktgz-00027o-Mw
+	(envelope-from <no-reply@patchew.org>) id 1cktgz-000299-Sh
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:33:00 -0500
+Resent-Message-Id: <E1cktgz-000299-Sh@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21473)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cktgz-00026v-MX
 	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:32:53 -0500
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <908ba384-d589-5755-efb2-f4d2fb14ce1e@kamp.de>
-Date: Mon, 6 Mar 2017 15:32:49 +0100
+In-Reply-To: <1488810230-31945-1-git-send-email-kraxel@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148881075517.294.10913197655282103247@0e2666bad730>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] Qemu and CPU wait time
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 6 Mar 2017 06:32:35 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/2] sm501: drop obsolete code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,16 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: kraxel@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-Hi,
-
-
-is there something equivalent to "CPU ready" in VMWare or „Hyper-V Hypervisor Virtual Processor\CPU Wait Time Per Dispatch“ in Hyper-V in
-
-KVM/Qemu?
-
-
-Thanks,
-
-Peter
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ4
+ODgxMDIzMC0zMTk0NS0xLWdpdC1zZW5kLWVtYWlsLWtyYXhlbEByZWRoYXQuY29tClN1YmplY3Q6
+IFtRZW11LWRldmVsXSBbUEFUQ0ggMC8yXSBzbTUwMTogZHJvcCBvYnNvbGV0ZSBjb2RlClR5cGU6
+IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNl
+Cm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAK
+CiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0
+IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBs
+b2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8K
+ICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3Jt
+YXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2Ny
+aXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAg
+ICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBU
+RVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0
+NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11
+CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTQ4ODgxMDIzMC0zMTk0NS0xLWdpdC1zZW5k
+LWVtYWlsLWtyYXhlbEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMTQ4ODgxMDIzMC0zMTk0NS0xLWdp
+dC1zZW5kLWVtYWlsLWtyYXhlbEByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
+dGVzdCcKNmMwMWMwNiBzbTUwMTogZHJvcCBzbTUwMV90ZW1wbGF0ZS5oCjFlYWM1ZGIgc201MDE6
+IGRyb3Agc3VwcG9ydCBmb3IgYW55dGhpbmcgYnV0IDMyYnBwCgo9PT0gT1VUUFVUIEJFR0lOID09
+PQpDaGVja2luZyBQQVRDSCAxLzI6IHNtNTAxOiBkcm9wIHN1cHBvcnQgZm9yIGFueXRoaW5nIGJ1
+dCAzMmJwcC4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxMjA6
+IEZJTEU6IGh3L2Rpc3BsYXkvc201MDEuYzoxMjA0OgorXklkcmF3X2xpbmUgPSBkcmF3X2xpbmU4
+XzMyOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzEyNTogRklM
+RTogaHcvZGlzcGxheS9zbTUwMS5jOjEyMDg6CiteSWRyYXdfbGluZSA9IGRyYXdfbGluZTE2XzMy
+OyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzEzMDogRklMRTog
+aHcvZGlzcGxheS9zbTUwMS5jOjEyMTI6CiteSWRyYXdfbGluZSA9IGRyYXdfbGluZTMyXzMyOyQK
+CnRvdGFsOiAzIGVycm9ycywgMCB3YXJuaW5ncywgMTIyIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0
+Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
+cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
+ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIvMjogc201MDE6
+IGRyb3Agc201MDFfdGVtcGxhdGUuaC4uLgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZWZvcmUg
+dGhhdCAnKysnIChjdHg6V3hPKQojMzU6IEZJTEU6IGh3L2Rpc3BsYXkvc201MDEuYzoxMTgzOgor
+ICAgICAgICBzICsrOwogICAgICAgICAgIF4KCkVSUk9SOiAiZm9vICogYmFyIiBzaG91bGQgYmUg
+ImZvbyAqYmFyIgojODQ6IEZJTEU6IGh3L2Rpc3BsYXkvc201MDEuYzoxMjMwOgorc3RhdGljIHZv
+aWQgZHJhd19od2NfbGluZShTTTUwMVN0YXRlICogcywgaW50IGNydCwKCkVSUk9SOiAiZm9vICog
+YmFyIiBzaG91bGQgYmUgImZvbyAqYmFyIgojODU6IEZJTEU6IGh3L2Rpc3BsYXkvc201MDEuYzox
+MjMxOgorICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50OF90ICogcGFsZXR0ZSwgaW50IGNf
+eSwgdWludDhfdCAqZCwgaW50IHdpZHRoKQoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZl
+ciB1c2UgdGFicwojMTM4OiBGSUxFOiBody9kaXNwbGF5L3NtNTAxLmM6MTI5MzoKK15JZHJhd19s
+aW5lID0gZHJhd19saW5lODskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0
+YWJzCiMxNDM6IEZJTEU6IGh3L2Rpc3BsYXkvc201MDEuYzoxMjk3OgorXklkcmF3X2xpbmUgPSBk
+cmF3X2xpbmUxNjskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMx
+NDg6IEZJTEU6IGh3L2Rpc3BsYXkvc201MDEuYzoxMzAxOgorXklkcmF3X2xpbmUgPSBkcmF3X2xp
+bmUzMjskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxNjc6IEZJ
+TEU6IGh3L2Rpc3BsYXkvc201MDEuYzoxMzM1OgorXklpbnQgdXBkYXRlX2h3YyA9IGlzX2h3Y19l
+bmFibGVkKHMsIDEpICYmIHdpdGhpbl9od2NfeV9yYW5nZShzLCB5LCAxKTskCgp0b3RhbDogNyBl
+cnJvcnMsIDAgd2FybmluZ3MsIDE0NyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
+ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
+bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
+Q0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0
+ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
+dGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
+IHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
