@@ -1,34 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ckorP-0002p8-IW
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 04:23:21 -0500
+	(envelope-from <prvs=23132e6eb=Paul.Durrant@citrix.com>)
+	id 1ckp3e-0005TC-IB
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 04:36:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1ckorM-0004Hg-BU
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 04:23:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41308)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ckorM-0004Gq-3d
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 04:23:16 -0500
-Date: Mon, 6 Mar 2017 09:23:05 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170306092305.GA9866@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170222140920.GA10201@stefanha-x1.localdomain>
-	<20170222142230.GR28937@redhat.com>
-	<20170222144407.GS19045@localhost.localdomain>
-	<CAAo6VWPWjRTE3t9myt7Q6gTnZcvP72ypTE03PCFfJkvb2UWLTA@mail.gmail.com>
-	<20170224091916.GD3702@redhat.com>
-	<CAAo6VWPyQrjSp2qjvxqXRPS8=5N85i0-DJdkWhiGaXmND_8+qA@mail.gmail.com>
-	<20170227092207.GA18219@redhat.com>
-	<CAAo6VWO6zAijMMjHOkefO22wh+6dXigZ6a+g-pMNBcM0MN1HHw@mail.gmail.com>
-	<20170301091851.GD17125@redhat.com>
-	<CAAo6VWNRhK6zvc+CferSd9wYQZNNoXDqCEW_G62crqsamyEC9Q@mail.gmail.com>
+	(envelope-from <prvs=23132e6eb=Paul.Durrant@citrix.com>)
+	id 1ckp3b-0008HE-95
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 04:35:58 -0500
+Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:40592
+	helo=SMTP.EU.CITRIX.COM)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=23132e6eb=Paul.Durrant@citrix.com>)
+	id 1ckp3a-0008Gh-PH
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 04:35:55 -0500
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Mon, 6 Mar 2017 09:35:51 +0000
+Message-ID: <31427779196840b3b31171ec9deda91f@AMSPEX02CL03.citrite.net>
+References: <1488452986-24501-1-git-send-email-paul.durrant@citrix.com>
+	<1488452986-24501-6-git-send-email-paul.durrant@citrix.com>
+	<alpine.DEB.2.10.1703021426050.17906@sstabellini-ThinkPad-X260>
+	<05365905529b4fd78ff67989743a8dfb@AMSPEX02CL03.citrite.net>
+	<alpine.DEB.2.10.1703031209090.17906@sstabellini-ThinkPad-X260>
+	<alpine.DEB.2.10.1703031243050.17906@sstabellini-ThinkPad-X260>
+	<1636138fa3a948229a4630fe48d5a079@AMSPEX02CL03.citrite.net>
+In-Reply-To: <1636138fa3a948229a4630fe48d5a079@AMSPEX02CL03.citrite.net>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAAo6VWNRhK6zvc+CferSd9wYQZNNoXDqCEW_G62crqsamyEC9Q@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
- block device type called "vxhs"
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] xen: use libxendevicemodel when
+ available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,121 +38,204 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ashish mittal <ashmit602@gmail.com>
-Cc: Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
+To: Paul Durrant <Paul.Durrant@citrix.com>, 'Stefano Stabellini' <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Sun, Mar 05, 2017 at 04:26:05PM -0800, ashish mittal wrote:
-> On Wed, Mar 1, 2017 at 1:18 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
+> -----Original Message-----
+> From: Qemu-devel [mailto:qemu-devel-
+> bounces+paul.durrant=3Dcitrix.com@nongnu.org] On Behalf Of Paul Durrant
+> Sent: 06 March 2017 09:15
+> To: 'Stefano Stabellini' <sstabellini@kernel.org>
+> Cc: Anthony Perard <anthony.perard@citrix.com>; xen-
+> devel@lists.xenproject.org; qemu-devel@nongnu.org
+> Subject: Re: [Qemu-devel] [PATCH v2 5/5] xen: use libxendevicemodel when
+> available
+>=20
+> > -----Original Message-----
+> > From: Stefano Stabellini [mailto:sstabellini@kernel.org]
+> > Sent: 03 March 2017 20:43
+> > To: Stefano Stabellini <sstabellini@kernel.org>
+> > Cc: Paul Durrant <Paul.Durrant@citrix.com>; xen-
+> devel@lists.xenproject.org;
+> > qemu-devel@nongnu.org; Anthony Perard <anthony.perard@citrix.com>
+> > Subject: RE: [PATCH v2 5/5] xen: use libxendevicemodel when available
 > >
-> > Yes, that's how other parts of QEMU deal with SSL
+> > On Fri, 3 Mar 2017, Stefano Stabellini wrote:
+> > > On Fri, 3 Mar 2017, Paul Durrant wrote:
+> > > > > -----Original Message-----
+> > > > > From: Stefano Stabellini [mailto:sstabellini@kernel.org]
+> > > > > Sent: 02 March 2017 22:50
+> > > > > To: Paul Durrant <Paul.Durrant@citrix.com>
+> > > > > Cc: xen-devel@lists.xenproject.org; qemu-devel@nongnu.org;
+> Stefano
+> > > > > Stabellini <sstabellini@kernel.org>; Anthony Perard
+> > > > > <anthony.perard@citrix.com>
+> > > > > Subject: Re: [PATCH v2 5/5] xen: use libxendevicemodel when
+> available
+> > > > >
+> > > > > On Thu, 2 Mar 2017, Paul Durrant wrote:
+> > > > > > This patch modifies the wrapper functions in xen_common.h to us=
+e
+> > the
+> > > > > > new xendevicemodel interface if it is available along with
+> > compatibility
+> > > > > > code to use the old libxenctrl interface if it is not.
+> > > > > >
+> > > > > > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> > > > > > ---
+> > > > > > Cc: Stefano Stabellini <sstabellini@kernel.org>
+> > > > > > Cc: Anthony Perard <anthony.perard@citrix.com>
+> > > > > >
+> > > > > > v2:
+> > > > > > - Add a compat define for xenforeignmemory_close() since this i=
+s
+> > now
+> > > > > >   used.
+> > > > > > ---
+> > > > > >  include/hw/xen/xen_common.h | 115
+> > > > > +++++++++++++++++++++++++++++++-------------
+> > > > > >  xen-common.c                |   8 +++
+> > > > > >  2 files changed, 90 insertions(+), 33 deletions(-)
+> > > > > >
+> > > > > > diff --git a/include/hw/xen/xen_common.h
+> > > > > b/include/hw/xen/xen_common.h
+> > > > > > index 31cf25f..48444e5 100644
+> > > > > > --- a/include/hw/xen/xen_common.h
+> > > > > > +++ b/include/hw/xen/xen_common.h
+> > > > > > @@ -9,6 +9,7 @@
+> > > > > >  #undef XC_WANT_COMPAT_EVTCHN_API
+> > > > > >  #undef XC_WANT_COMPAT_GNTTAB_API
+> > > > > >  #undef XC_WANT_COMPAT_MAP_FOREIGN_API
+> > > > > > +#undef XC_WANT_COMPAT_DEVICEMODEL_API
+> > > > > >
+> > > > > >  #include <xenctrl.h>
+> > > > > >  #include <xenstore.h>
+> > > > > > @@ -26,48 +27,95 @@ extern xc_interface *xen_xc;
+> > > > > >   * We don't support Xen prior to 4.2.0.
+> > > > > >   */
+> > > > > >
+> > > > > > +#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 490
+> > > > > > +
+> > > > > > +typedef xc_interface xendevicemodel_handle;
+> > > > > > +
+> > > > > > +#define xendevicemodel_open(l, f) xen_xc
+> > > > > > +
+> > > > > > +#define xendevicemodel_map_io_range_to_ioreq_server \
+> > > > > > +    xc_hvm_map_io_range_to_ioreq_server
+> > > > > > +#define xendevicemodel_unmap_io_range_from_ioreq_server \
+> > > > > > +    xc_hvm_unmap_io_range_from_ioreq_server
+> > > > > > +#define xendevicemodel_map_pcidev_to_ioreq_server \
+> > > > > > +    xc_hvm_map_pcidev_to_ioreq_server
+> > > > > > +#define xendevicemodel_unmap_pcidev_from_ioreq_server \
+> > > > > > +    xc_hvm_unmap_pcidev_from_ioreq_server
+> > > > > > +#define xendevicemodel_create_ioreq_server \
+> > > > > > +    xc_hvm_create_ioreq_server
+> > > > > > +#define xendevicemodel_destroy_ioreq_server \
+> > > > > > +    xc_hvm_destroy_ioreq_server
+> > > > > > +#define xendevicemodel_get_ioreq_server_info \
+> > > > > > +    xc_hvm_get_ioreq_server_info
+> > > > > > +#define xendevicemodel_set_ioreq_server_state \
+> > > > > > +    xc_hvm_set_ioreq_server_state
+> > > > > > +#define xendevicemodel_set_pci_intx_level \
+> > > > > > +    xc_hvm_set_pci_intx_level
+> > > > > > +#define xendevicemodel_set_pci_link_route \
+> > > > > > +    xc_hvm_set_pci_link_route
+> > > > > > +#define xendevicemodel_set_isa_irq_level \
+> > > > > > +    xc_hvm_set_isa_irq_level
+> > > > > > +#define xendevicemodel_inject_msi \
+> > > > > > +    xc_hvm_inject_msi
+> > > > > > +#define xendevicemodel_set_mem_type \
+> > > > > > +    xc_hvm_set_mem_type
+> > > > > > +#define xendevicemodel_track_dirty_vram \
+> > > > > > +    xc_hvm_track_dirty_vram
+> > > > > > +#define xendevicemodel_modified_memory \
+> > > > > > +    xc_hvm_modified_memory
+> > > > >
+> > > > > It does build correctly now for Xen < 4.9, however it breaks agai=
+nst
+> > > > > xen-unstable:
+> > > > >
+> > > > >   ERROR: configure test passed without -Werror but failed with -
+> Werror.
+> > > > >          This is probably a bug in the configure script. The fail=
+ing command
+> > > > >          will be at the bottom of config.log.
+> > > > >          You can run configure with --disable-werror to bypass th=
+is check.
+> > > > >
+> > > > > and config.log says:
+> > > > >
+> > > > >   config-temp/qemu-conf.c: In function 'main':
+> > > > >   config-temp/qemu-conf.c:32:3: error: implicit declaration of fu=
+nction
+> > > > > 'xc_hvm_set_mem_type' [-Werror=3Dimplicit-function-declaration]
+> > > > >   config-temp/qemu-conf.c:32:3: error: nested extern declaration =
+of
+> > > > > 'xc_hvm_set_mem_type' [-Werror=3Dnested-externs]
+> > > > >   config-temp/qemu-conf.c:34:3: error: implicit declaration of fu=
+nction
+> > > > > 'xc_hvm_inject_msi' [-Werror=3Dimplicit-function-declaration]
+> > > > >   config-temp/qemu-conf.c:34:3: error: nested extern declaration =
+of
+> > > > > 'xc_hvm_inject_msi' [-Werror=3Dnested-externs]
+> > > > >   config-temp/qemu-conf.c:35:3: error: implicit declaration of fu=
+nction
+> > > > > 'xc_hvm_create_ioreq_server' [-Werror=3Dimplicit-function-
+> declaration]
+> > > > >   config-temp/qemu-conf.c:35:3: error: nested extern declaration =
+of
+> > > > > 'xc_hvm_create_ioreq_server' [-Werror=3Dnested-externs]
+> > > > >
+> > > > >
+> > > > > With -DXC_WANT_COMPAT_DEVICEMODEL_API=3D1:
+> > > > >
+> > > > >   In file included from /local/qemu-
+> > > > > upstream/include/hw/xen/xen_backend.h:4:0,
+> > > > >                    from hw/block/xen_disk.c:27:
+> > > > >   /local/qemu-upstream/include/hw/xen/xen_common.h: In function
+> > > > > 'xen_set_mem_type':
+> > > > >   /local/qemu-upstream/include/hw/xen/xen_common.h:78:5: error:
+> > implicit
+> > > > > declaration of function 'xc_hvm_set_mem_type' [-Werror=3Dimplicit=
+-
+> > function-
+> > > > > declaration]
+> > > > >
+> > > >
+> > > > Ah... Do you have Anthony's patch?
+> > > >
+> > > >
 > >
-> > NB, QEMU needs to pass 3 paths to libqnoio - the client cert, the
-> > client key, and the certificate authority certlist
+> http://xenbits.xen.org/gitweb/?p=3Dxen.git;a=3Dcommit;h=3D9970e98ace48574=
+701
+> > f7e2286fb67090481a3fec
+> > > >
+> > > > I suspect that may be the problem you're seeing above.
+> > >
+> > > Yes, I do have it. I am still having build troubles with v5 too. I am
 > >
-> 
-> I see that the QEMU TLS code internally does expect to find cacert,
-> and errors out if this is missing. I did have to create one and place
-> it in the dir path where we are keeping the client key,cert files. The
-> code diff below requires all the three files.
-
-Yes, the client cert/key have to be paired with the correct CA cert. We cannot
-assume that the default CA cert bundle contains the right CA, for use with the
-cert/key. The default CA bundle contains all the public commercial CAs, and in
-general a QEMU deployment will never use any of those - the site will use a
-private internal only CA. While you could add the private CA to the global CA
-bundle, that is not desirable from a security POV, as it opens the deployment
-to risk from a rogue CA.
-
-> > The include/crypto/tlscredsx509.h file has constants defined for the
-> > standard filenames - eg you would concatenate the directory with
-> > the constants QCRYPTO_TLS_CREDS_X509_CLIENT_KEY.
+> > I meant v3
 > >
-> > This gives the filenames you can then pass to libqnio
 > >
-> 
-> I am using function qcrypto_tls_creds_get_path() to achieve the same.
-> Hope this is OK.
+> > > attaching my build test script: feel free to use it to test the build=
+ of
+> > > a single QEMU branch against multiple Xen versions. It requires one X=
+en
+> > > repository checked out and built for each Xen version. I have just
+> > > added the Xen 4.9 tests, so they might be wrong somehow, but the
+> others
+> > > are known to work.
+>=20
+> Your script is lacking Anthony's fix. You need to patch your 4.9 configur=
+e
+> clause accordingly. I.e. you need -
+> I$(XEN_ROOT)/tools/libs/devicemodel/include and -
+> L$(XEN_ROOT)/tools/libs/devicemodel in the --extra-cflags.
 
-Yep, that's fine.
+Sorry, I meant the latter in --extra-ldflags and I notice you do actually h=
+ave that. It's just the -I that's missing.
 
-> Example CLI accepting the new TLS credentials:
-> 
-> [amittal2@camshaft qemu] 2017-03-05 15:54:55$ ./qemu-io --trace
-> enable=vxhs* --object
-> tls-creds-x509,id=tls0,dir=/etc/pki/qemu/vxhs,endpoint=client -c 'read
-> 66000 128k' 'json:{"server.host": "127.0.0.1", "server.port": "9999",
-> "vdisk-id": "/test.raw", "driver": "vxhs", "tls-creds":"tls0"}'
-> 15116@1488758101.084355:vxhs_open_vdiskid Opening vdisk-id /test.raw
-> 15116@1488758101.084396:vxhs_get_creds cacert
-> /etc/pki/qemu/vxhs/ca-cert.pem, client_key
-> /etc/pki/qemu/vxhs/client-key.pem, client_cert
-> /etc/pki/qemu/vxhs/client-cert.pem   <===== !!!! NOTE !!!!
-> 15116@1488758101.084402:vxhs_open_hostinfo Adding host 127.0.0.1:9999
-> to BDRVVXHSState
-> 15116@1488758101.092060:vxhs_get_vdisk_stat vDisk /test.raw stat ioctl
-> returned size 1048576
-> read 131072/131072 bytes at offset 66000
-> 128 KiB, 1 ops; 0.0006 sec (188.537 MiB/sec and 1508.2956 ops/sec)
-> 15116@1488758101.094643:vxhs_close Closing vdisk /test.raw
-> [amittal2@camshaft qemu] 2017-03-05 15:55:01$
+  Paul
 
-That looks ok.
-
-> @@ -315,33 +374,39 @@ static int vxhs_open(BlockDriverState *bs, QDict *options,
->      if (strlen(server_host_opt) > MAXHOSTNAMELEN) {
->          error_setg(&local_err, "server.host cannot be more than %d characters",
->                     MAXHOSTNAMELEN);
-> -        qdict_del(backing_options, str);
->          ret = -EINVAL;
->          goto out;
->      }
-> 
-> -    s->vdisk_hostinfo.host = g_strdup(server_host_opt);
-> +    /* check if we got tls-creds via the --object argument */
-> +    s->tlscredsid = g_strdup(qemu_opt_get(opts, "tls-creds"));
-> +    if (s->tlscredsid) {
-> +        vxhs_get_tls_creds(s->tlscredsid, &cacert, &client_key,
-> +                           &client_cert, &local_err);
-> +        if (local_err != NULL) {
-> +            ret = -EINVAL;
-> +            goto out;
-> +        }
-> +        trace_vxhs_get_creds(cacert, client_key, client_cert);
-> +    }
-> 
-> +    s->vdisk_hostinfo.host = g_strdup(server_host_opt);
->      s->vdisk_hostinfo.port = g_ascii_strtoll(qemu_opt_get(tcp_opts,
->                                                            VXHS_OPT_PORT),
->                                                            NULL, 0);
-> 
->      trace_vxhs_open_hostinfo(s->vdisk_hostinfo.host,
-> -                         s->vdisk_hostinfo.port);
-> -
-> -    /* free the 'server.' entries allocated by previous call to
-> -     * qdict_extract_subqdict()
-> -     */
-> -    qdict_del(backing_options, str);
-> +                             s->vdisk_hostinfo.port);
-> 
->      of_vsa_addr = g_strdup_printf("of://%s:%d",
-> -                                s->vdisk_hostinfo.host,
-> -                                s->vdisk_hostinfo.port);
-> +                                  s->vdisk_hostinfo.host,
-> +                                  s->vdisk_hostinfo.port);
-> 
->      /*
->       * Open qnio channel to storage agent if not opened before.
->       */
-> -    dev_handlep = iio_open(of_vsa_addr, s->vdisk_guid, 0);
-> +    dev_handlep = iio_open(of_vsa_addr, s->vdisk_guid, 0,
-> +                           client_key, client_cert);
-
-You need to pass  ca_cert into this method too.
-
-
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+>=20
+>   Paul
