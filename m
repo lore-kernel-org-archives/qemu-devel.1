@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42027)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ckz8i-0006nw-Vg
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 15:21:53 -0500
+	(envelope-from <eblake@redhat.com>) id 1ckzAS-0007bU-Dl
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 15:23:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ckz8f-0002yy-N9
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 15:21:53 -0500
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:34050)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1ckz8f-0002yj-Jp
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 15:21:49 -0500
-Received: by mail-qk0-x242.google.com with SMTP id v125so9106010qkh.1
-	for <qemu-devel@nongnu.org>; Mon, 06 Mar 2017 12:21:49 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon,  6 Mar 2017 17:21:30 -0300
-Message-Id: <20170306202130.23701-1-f4bug@amsat.org>
+	(envelope-from <eblake@redhat.com>) id 1ckzAR-0003Lg-Ei
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 15:23:40 -0500
+References: <1488817322-11397-1-git-send-email-kwolf@redhat.com>
+	<1488817322-11397-6-git-send-email-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <803f7526-e205-a555-e77a-687aa5410ae0@redhat.com>
+Date: Mon, 6 Mar 2017 14:23:32 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2] tests/docker: support proxy / corporate
- firewall
+In-Reply-To: <1488817322-11397-6-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="muPA05sfDjt1QGc4OX63qi1d1moTEum64"
+Subject: Re: [Qemu-devel] [PATCH 05/10] block: Fix blockdev-snapshot error
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,57 +25,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
-if ftp_proxy/http_proxy/https_proxy standard environment variables available,
-pass them to the docker daemon to build images.
-this is required when building behind corporate proxy/firewall, but also help
-when using local cache server (ie: apt/yum).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--muPA05sfDjt1QGc4OX63qi1d1moTEum64
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com
+Message-ID: <803f7526-e205-a555-e77a-687aa5410ae0@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 05/10] block: Fix blockdev-snapshot error
+ handling
+References: <1488817322-11397-1-git-send-email-kwolf@redhat.com>
+ <1488817322-11397-6-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1488817322-11397-6-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
+On 03/06/2017 10:21 AM, Kevin Wolf wrote:
+> For blockdev-snapshot, external_snapshot_prepare() accepts an arbitrary=
 
-v2: use Fam Zheng's pythonized one-line,
-    renamed env vars to lowercase.
+> node reference at first and only checks later whether it already has a
+> backing file. Between those places, other errors can occur.
+>=20
+> Therefore checking in external_snapshot_abort() whether state->new_bs
+> has a backing file is not sufficient to tell whether bdrv_append() was
+> already completed or not. Trying to undo the bdrv_append() when it
+> wasn't even executed is wrong.
+>=20
+> Introduce a new boolean flag in the state to fix this.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  blockdev.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>=20
 
-debian builds can be tested using Sameer Naik docker image
-(see https://github.com/sameersbn/docker-apt-cacher-ng#quickstart)
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-$ docker run --name apt-cacher-ng -d --restart=always \
-  --publish 127.0.0.1:3142:3142 \
-  --volume /var/cache/apt-cacher-ng:/var/cache/apt-cacher-ng \
-  --privileged \
-  sameersbn/apt-cacher-ng:latest
+By the way, how are you finding all these spots? Is it existing qemu-io
+tests that are failing? And if so, would mentioning which test exposed
+the problem being fixed be worth adding in the commit messages?  If not,
+are there some qemu-io tests to be added?
 
-$ HTTP_PROXY=http://172.17.0.1:3142 make docker-test-build@debian-armhf-cross
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
- tests/docker/docker.py | 6 ++++++
- 1 file changed, 6 insertions(+)
 
-diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-index 9fd32ab5fa..8747f6a440 100755
---- a/tests/docker/docker.py
-+++ b/tests/docker/docker.py
-@@ -28,6 +28,9 @@ from shutil import copy, rmtree
- from pwd import getpwuid
- 
- 
-+FILTERED_ENV_NAMES = ['ftp_proxy', 'http_proxy', 'https_proxy']
-+
-+
- DEVNULL = open(os.devnull, 'wb')
- 
- 
-@@ -272,6 +275,9 @@ class BuildCommand(SubCommand):
-                 _copy_binary_with_libs(args.include_executable,
-                                        docker_dir)
- 
-+            argv += ["--build-arg=" + k.lower() + "=" + v
-+                        for k, v in os.environ.iteritems()
-+                        if k.lower() in FILTERED_ENV_NAMES]
-             dkr.build_image(tag, docker_dir, dockerfile,
-                             quiet=args.quiet, user=args.user, argv=argv)
- 
--- 
-2.11.0
+--muPA05sfDjt1QGc4OX63qi1d1moTEum64
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYvcVEAAoJEKeha0olJ0NqMAIIAKEnsCR8I5c18v1DGwzVhIaJ
+pEts8Gqv7ajYGdazHU2LHMPvErb/YD7ACAOzadRnOfhrlZ4xs3YB/9HgZ9ND4WPZ
+5S5B3kZ4jHMZrHH9gL1Bpa8unZh0gygSn2pU5NuNrj+pUMV4ihMIBtRJ7IPTvzo5
+gibWEL+B0QAsiqLTOpJfoI09hrjBNEHEHqsg7D/085g++S2zRZoGD21+TZUITJu8
+PAxTZV29MoxqedTEKw5I/QqFUPLskbAvEbEioIq2f/oqdiR4uYOCNqpJyshHc5L8
+PXCNp7Gj95/hQzJlY5MRQG32T+pIE8BzTSIk+WibymIOvYkwgxa7WAOpBO6pduc=
+=sDlo
+-----END PGP SIGNATURE-----
+
+--muPA05sfDjt1QGc4OX63qi1d1moTEum64--
