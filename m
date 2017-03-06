@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1cklAV-0008Gr-GC
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 00:26:48 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cklAV-0008HG-V5
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 00:26:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1cklAT-0001LG-5N
+	(envelope-from <jasowang@redhat.com>) id 1cklAU-0001Mm-Or
 	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 00:26:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42254)
+Received: from mx1.redhat.com ([209.132.183.28]:41956)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1cklAS-0001KC-W3
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 00:26:45 -0500
-Date: Mon, 6 Mar 2017 10:56:37 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-In-Reply-To: <CAG48ez2eaXFk50puw_bc27tNdfOHDsL08A9jY8=7DnA-mtEXWA@mail.gmail.com>
-Message-ID: <alpine.LFD.2.20.1703061044280.16064@wniryva>
-References: <20170303112503.32277-1-ppandit@redhat.com>
-	<CAFEAcA_V8azXLLptxqNWBwkY7wJZzK+YkZHd6RfHEVS-NoXXBg@mail.gmail.com>
-	<CAG48ez2eaXFk50puw_bc27tNdfOHDsL08A9jY8=7DnA-mtEXWA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH] linux-user: limit number of arguments to
- execve
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cklAU-0001MG-GA
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 00:26:46 -0500
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon,  6 Mar 2017 13:25:52 +0800
+Message-Id: <1488777954-4578-18-git-send-email-jasowang@redhat.com>
+In-Reply-To: <1488777954-4578-1-git-send-email-jasowang@redhat.com>
+References: <1488777954-4578-1-git-send-email-jasowang@redhat.com>
+Subject: [Qemu-devel] [PULL RESEND 17/19] COLO-compare: Optimize
+ compare_common and compare_tcp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,29 +24,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Jann Horn <jannh@google.com>, Qemu Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
+To: peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>
 
-+-- On Fri, 3 Mar 2017, Jann Horn wrote --+
-| On Fri, Mar 3, 2017 at 4:55 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
-| >> +            if (argc > ARG_MAX || envc > ARG_MAX) {
-| >> +                fprintf(stderr,
-| >> +                        "argc(%d), envc(%d) exceed %d\n", argc, envc, ARG_MAX);
-| >> +                ret = -TARGET_EFAULT;
-| >> +                break;
-| >> +            }
-| >>              argp = alloca((argc + 1) * sizeof(void *));
-| >>              envp = alloca((envc + 1) * sizeof(void *));
-| >
-| > This code is already supposed to handle "argument string too big",
-| > see commit a6f79cc9a5e.
-| >
-| > What's the actual bug case we're trying to handle here?
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 
-Not argument string, but argument count too big leads to a bad address in 
-get_user_ual(...), resulting in segfault.
+Add offset args for colo_packet_compare_common, optimize
+colo_packet_compare_icmp() and colo_packet_compare_udp()
+just compare the IP payload. Before compare all tcp packet,
+we compare tcp checksum firstly, this function can get
+better performance.
 
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+ net/colo-compare.c | 50 ++++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 36 insertions(+), 14 deletions(-)
+
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index 602a758..9f5968d 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -180,7 +180,7 @@ static int packet_enqueue(CompareState *s, int mode)
+  * return:    0  means packet same
+  *            > 0 || < 0 means packet different
+  */
+-static int colo_packet_compare_common(Packet *ppkt, Packet *spkt)
++static int colo_packet_compare_common(Packet *ppkt, Packet *spkt, int offset)
+ {
+     trace_colo_compare_ip_info(ppkt->size, inet_ntoa(ppkt->ip->ip_src),
+                                inet_ntoa(ppkt->ip->ip_dst), spkt->size,
+@@ -188,7 +188,8 @@ static int colo_packet_compare_common(Packet *ppkt, Packet *spkt)
+                                inet_ntoa(spkt->ip->ip_dst));
+ 
+     if (ppkt->size == spkt->size) {
+-        return memcmp(ppkt->data, spkt->data, spkt->size);
++        return memcmp(ppkt->data + offset, spkt->data + offset,
++                      spkt->size - offset);
+     } else {
+         trace_colo_compare_main("Net packet size are not the same");
+         return -1;
+@@ -207,13 +208,6 @@ static int colo_packet_compare_tcp(Packet *spkt, Packet *ppkt)
+ 
+     trace_colo_compare_main("compare tcp");
+ 
+-    if (ppkt->size != spkt->size) {
+-        if (trace_event_get_state(TRACE_COLO_COMPARE_MISCOMPARE)) {
+-            trace_colo_compare_main("pkt size not same");
+-        }
+-        return -1;
+-    }
+-
+     ptcp = (struct tcphdr *)ppkt->transport_header;
+     stcp = (struct tcphdr *)spkt->transport_header;
+ 
+@@ -231,8 +225,11 @@ static int colo_packet_compare_tcp(Packet *spkt, Packet *ppkt)
+         spkt->ip->ip_sum = ppkt->ip->ip_sum;
+     }
+ 
+-    res = memcmp(ppkt->data + ETH_HLEN, spkt->data + ETH_HLEN,
+-                (spkt->size - ETH_HLEN));
++    if (ptcp->th_sum == stcp->th_sum) {
++        res = colo_packet_compare_common(ppkt, spkt, ETH_HLEN);
++    } else {
++        res = -1;
++    }
+ 
+     if (res != 0 && trace_event_get_state(TRACE_COLO_COMPARE_MISCOMPARE)) {
+         trace_colo_compare_pkt_info_src(inet_ntoa(ppkt->ip->ip_src),
+@@ -263,10 +260,22 @@ static int colo_packet_compare_tcp(Packet *spkt, Packet *ppkt)
+ static int colo_packet_compare_udp(Packet *spkt, Packet *ppkt)
+ {
+     int ret;
++    int network_header_length = ppkt->ip->ip_hl * 4;
+ 
+     trace_colo_compare_main("compare udp");
+ 
+-    ret = colo_packet_compare_common(ppkt, spkt);
++    /*
++     * Because of ppkt and spkt are both in the same connection,
++     * The ppkt's src ip, dst ip, src port, dst port, ip_proto all are
++     * same with spkt. In addition, IP header's Identification is a random
++     * field, we can handle it in IP fragmentation function later.
++     * COLO just concern the response net packet payload from primary guest
++     * and secondary guest are same or not, So we ignored all IP header include
++     * other field like TOS,TTL,IP Checksum. we only need to compare
++     * the ip payload here.
++     */
++    ret = colo_packet_compare_common(ppkt, spkt,
++                                     network_header_length + ETH_HLEN);
+ 
+     if (ret) {
+         trace_colo_compare_udp_miscompare("primary pkt size", ppkt->size);
+@@ -284,9 +293,22 @@ static int colo_packet_compare_udp(Packet *spkt, Packet *ppkt)
+  */
+ static int colo_packet_compare_icmp(Packet *spkt, Packet *ppkt)
+ {
++    int network_header_length = ppkt->ip->ip_hl * 4;
++
+     trace_colo_compare_main("compare icmp");
+ 
+-    if (colo_packet_compare_common(ppkt, spkt)) {
++    /*
++     * Because of ppkt and spkt are both in the same connection,
++     * The ppkt's src ip, dst ip, src port, dst port, ip_proto all are
++     * same with spkt. In addition, IP header's Identification is a random
++     * field, we can handle it in IP fragmentation function later.
++     * COLO just concern the response net packet payload from primary guest
++     * and secondary guest are same or not, So we ignored all IP header include
++     * other field like TOS,TTL,IP Checksum. we only need to compare
++     * the ip payload here.
++     */
++    if (colo_packet_compare_common(ppkt, spkt,
++                                   network_header_length + ETH_HLEN)) {
+         trace_colo_compare_icmp_miscompare("primary pkt size",
+                                            ppkt->size);
+         qemu_hexdump((char *)ppkt->data, stderr, "colo-compare",
+@@ -312,7 +334,7 @@ static int colo_packet_compare_other(Packet *spkt, Packet *ppkt)
+                                inet_ntoa(ppkt->ip->ip_dst), spkt->size,
+                                inet_ntoa(spkt->ip->ip_src),
+                                inet_ntoa(spkt->ip->ip_dst));
+-    return colo_packet_compare_common(ppkt, spkt);
++    return colo_packet_compare_common(ppkt, spkt, 0);
+ }
+ 
+ static int colo_old_packet_check_one(Packet *pkt, int64_t *check_time)
+-- 
+2.7.4
