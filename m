@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hangaohuai@huawei.com>) id 1cktHA-0001NX-3C
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:06:13 -0500
+	(envelope-from <armbru@redhat.com>) id 1cktMq-0002pY-EM
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:12:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hangaohuai@huawei.com>) id 1cktH5-0000Xf-BX
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:06:12 -0500
-Received: from [45.249.212.187] (port=2995 helo=dggrg01-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <hangaohuai@huawei.com>) id 1cktH4-0000UG-Ga
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:06:07 -0500
-From: hangaohuai <hangaohuai@huawei.com>
-Date: Mon, 6 Mar 2017 22:05:41 +0800
-Message-ID: <20170306140541.10600-1-hangaohuai@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] Fix the vm state after vm migration when vm
- panic
+	(envelope-from <armbru@redhat.com>) id 1cktMl-0002ke-9R
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:12:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39704)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cktMl-0002kA-2P
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 09:11:59 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0F6DE8123F
+	for <qemu-devel@nongnu.org>; Mon,  6 Mar 2017 14:11:59 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
+	[10.36.116.55])
+	by int-mx09.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v26EBvtC004439
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=NO)
+	for <qemu-devel@nongnu.org>; Mon, 6 Mar 2017 09:11:58 -0500
+From: Markus Armbruster <armbru@redhat.com>
+Date: Mon,  6 Mar 2017 15:11:32 +0100
+Message-Id: <1488809515-4047-2-git-send-email-armbru@redhat.com>
+In-Reply-To: <1488809515-4047-1-git-send-email-armbru@redhat.com>
+References: <1488809515-4047-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PULL v2 01/24] test-qemu-opts: Cover
+ qemu_opts_parse() of "no"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,63 +38,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, arei.gonglei@huawei.com, hangaohuai@huawei.com
 
-Bug steps:
-1. windows VM with pvpanic device:<panic model='isa'/>in xml
-2. inject the panic in windows, the vm state is paused (guest-panicked)
-3. migrate the vm to other host, vm state is running
+qemu_opts_parse() interprets "no" as negated empty key.  Consistent
+with its acceptance of empty keys elsewhere, whatever that's worth.
 
-Check the vmstate before runstate_set(RUN_STATE_RUNNING)
-
-Signed-off-by: hangaohuai <hangaohuai@huawei.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Message-Id: <1488317230-26248-2-git-send-email-armbru@redhat.com>
 ---
- cpus.c                  | 3 +++
- include/sysemu/sysemu.h | 1 +
- vl.c                    | 5 +++++
- 3 files changed, 9 insertions(+)
+ tests/test-qemu-opts.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/cpus.c b/cpus.c
-index c857ad2..37b93aa 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1734,6 +1734,9 @@ int vm_prepare_start(void)
-     if (runstate_is_running()) {
-         qapi_event_send_stop(&error_abort);
-         res = -1;
-+    } else if (runstate_is_paniced()) {
-+        qemu_system_guest_panicked(NULL);
-+        res = -1;
-     } else {
-         replay_enable_events();
-         cpu_enable_ticks();
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 576c7ce..08015c7 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -23,6 +23,7 @@ extern bool qemu_uuid_set;
- bool runstate_check(RunState state);
- void runstate_set(RunState new_state);
- int runstate_is_running(void);
-+int runstate_is_paniced(void);
- bool runstate_needs_reset(void);
- bool runstate_store(char *str, size_t size);
- typedef struct vm_change_state_entry VMChangeStateEntry;
-diff --git a/vl.c b/vl.c
-index 16a3b5e..ea7e3f8 100644
---- a/vl.c
-+++ b/vl.c
-@@ -729,6 +729,11 @@ int runstate_is_running(void)
-     return runstate_check(RUN_STATE_RUNNING);
- }
+diff --git a/tests/test-qemu-opts.c b/tests/test-qemu-opts.c
+index c46ef31..f6310b3 100644
+--- a/tests/test-qemu-opts.c
++++ b/tests/test-qemu-opts.c
+@@ -532,6 +532,11 @@ static void test_opts_parse(void)
+     g_assert_cmpstr(qemu_opt_get(opts, "aus"), ==, "off");
+     g_assert_cmpstr(qemu_opt_get(opts, "noaus"), ==, "");
  
-+int runstate_is_paniced(void)
-+{
-+    return runstate_check(RUN_STATE_GUEST_PANICKED);
-+}
++    /* Implied value, negated empty key */
++    opts = qemu_opts_parse(&opts_list_03, "no", false, &error_abort);
++    g_assert_cmpuint(opts_count(opts), ==, 1);
++    g_assert_cmpstr(qemu_opt_get(opts, ""), ==, "off");
 +
- bool runstate_needs_reset(void)
- {
-     return runstate_check(RUN_STATE_INTERNAL_ERROR) ||
+     /* Implied key */
+     opts = qemu_opts_parse(&opts_list_03, "an,noaus,noaus=", true,
+                            &error_abort);
 -- 
-1.8.3.1
+2.7.4
