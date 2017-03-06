@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60460)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cl294-0001mo-5J
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 18:34:27 -0500
+	(envelope-from <bounces@canonical.com>) id 1cl2K0-0002u3-IE
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 18:45:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cl292-0003zU-UM
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 18:34:26 -0500
-References: <20170214192525.18624-1-eblake@redhat.com>
-	<20170214192525.18624-2-eblake@redhat.com>
-	<20170215122517.GB4935@noname.redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <43feafa5-db00-50f5-0d93-919678fe3547@redhat.com>
-Date: Mon, 6 Mar 2017 17:34:17 -0600
+	(envelope-from <bounces@canonical.com>) id 1cl2Jx-00076X-HO
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 18:45:44 -0500
+Received: from indium.canonical.com ([91.189.90.7]:44918)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cl2Jx-00075g-Ba
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 18:45:41 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cl2Jw-0003o3-4E
+	for <qemu-devel@nongnu.org>; Mon, 06 Mar 2017 23:45:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 14D752E80C1
+	for <qemu-devel@nongnu.org>; Mon,  6 Mar 2017 23:45:40 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170215122517.GB4935@noname.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="JbWkJ9eUTHpiFRIJbPQaBcpbv6fImEMUx"
-Subject: Re: [Qemu-devel] [PATCH v5 1/7] qcow2: Assert that cluster
- operations are aligned
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 06 Mar 2017 23:38:54 -0000
+From: Herbie Robinson <1670509@bugs.launchpad.net>
+Reply-To: Bug 1670509 <1670509@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170306224936.27687.97076.malonedeb@gac.canonical.com>
+Message-Id: <20170306233854.27214.29216.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1670509] Re: sgabios outputs incorrect video modes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,75 +36,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JbWkJ9eUTHpiFRIJbPQaBcpbv6fImEMUx
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
-Message-ID: <43feafa5-db00-50f5-0d93-919678fe3547@redhat.com>
-Subject: Re: [PATCH v5 1/7] qcow2: Assert that cluster operations are aligned
-References: <20170214192525.18624-1-eblake@redhat.com>
- <20170214192525.18624-2-eblake@redhat.com>
- <20170215122517.GB4935@noname.redhat.com>
-In-Reply-To: <20170215122517.GB4935@noname.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+** Changed in: qemu
+     Assignee: (unassigned) =3D> Herbie Robinson (hrob)
 
-On 02/15/2017 06:25 AM, Kevin Wolf wrote:
-> Am 14.02.2017 um 20:25 hat Eric Blake geschrieben:
->> qcow2_discard_clusters() is set up to silently ignore sub-cluster
->> head or tail on unaligned requests.  However, it is easy to audit
->> the various callers: qcow2_snapshot_create() has always passed
->> aligned data since the call was introduced in 1ebf561;
->> qcow2_co_pdiscard() has passed aligned clusters since commit
->> ecdbead taught the block layer the preferred discard alignment (the
->> block layer can still pass sub-cluster values, but those are
->> handled directly in qcow2_co_pdiscard()); and qcow2_make_empty()
->> was fixed to pass aligned clusters in commit a3e1505.
->=20
-> I don't think this is true for the very part in the image if the image
-> size isn't cluster aligned:
->=20
->     ret =3D qcow2_discard_clusters(bs, start_sector * BDRV_SECTOR_SIZE,=
+-- =
 
->                                  MIN(sector_step,
->                                      bs->total_sectors - start_sector),=
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1670509
 
->                                  QCOW2_DISCARD_SNAPSHOT, true);
->=20
-> sector_step is alright after commit a3e1505, but bs->total_sectors can
-> be unaligned.
+Title:
+  sgabios outputs incorrect video modes
 
-Indeed; a slight tweak to qemu-iotests/097 exposes the problem.  I'll
-include that in my next spin (although I note that Dan has patches on
-the list to split 097 into two tests, in order to give qcow coverage
-rather than just qcow2).
+Status in QEMU:
+  New
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+Bug description:
+  When run with a bootstrap loader that uses int 0x10 with 0x1301 in
+  %ax, incorrect video modes are output to the serial port.  I believe
+  the VGA image will be correct.  This might also affect the returned
+  values for some interrupts.
 
+  This is caused because the set_cursor_position routine fails to save
+  and restore %bx.
 
---JbWkJ9eUTHpiFRIJbPQaBcpbv6fImEMUx
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  I'm working on a fix for this.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYvfH5AAoJEKeha0olJ0NqCekH/3Y1djpfICLexn8jUdqAFrOh
-nw8qwtABv7rKD4WQwZU8fO3MyBvQuJ9R1kXxASYLH0nFjPesXUYCd/0V+gPaR88O
-hc1BqIZh/OScyVXLeUIrLEpc3qkKgMW0sgfLjCCjmq7b1nwR8PAS4hZdp2wESzxo
-KgRDII548WZ486v53uELkPtbdTF4bzgZFWWXUQ4V1nAhaORUZZ7n4+uObU3dEfiD
-jaMg9vCjyvAvUjGQYMQSvRbRKTofnADMSqD8TRXOHA8TaYjOcclYaYMjMO2D8vPp
-X5IX2NfwsLgWxdTZkVoKYDcSWbIyDAfR+eL66wPm4mWMpOVZOQhuqKBPBrYmNTM=
-=taWz
------END PGP SIGNATURE-----
-
---JbWkJ9eUTHpiFRIJbPQaBcpbv6fImEMUx--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1670509/+subscriptions
