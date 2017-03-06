@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47477)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ckjwn-00058v-NI
+	(envelope-from <dgibson@ozlabs.org>) id 1ckjwn-00058t-MM
 	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 23:08:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ckjwk-0003tD-Lq
+	(envelope-from <dgibson@ozlabs.org>) id 1ckjwk-0003t3-FT
 	for qemu-devel@nongnu.org; Sun, 05 Mar 2017 23:08:33 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon,  6 Mar 2017 15:08:19 +1100
-Message-Id: <20170306040823.28482-2-david@gibson.dropbear.id.au>
+Date: Mon,  6 Mar 2017 15:08:20 +1100
+Message-Id: <20170306040823.28482-3-david@gibson.dropbear.id.au>
 In-Reply-To: <20170306040823.28482-1-david@gibson.dropbear.id.au>
 References: <20170306040823.28482-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/5] ppc/xics: register reset handlers for the
- ICP and ICS objects
+Subject: [Qemu-devel] [PULL 2/5] spapr: ensure that all threads within core
+ are on the same NUMA node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,185 +21,89 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+From: Igor Mammedov <imammedo@redhat.com>
 
-The recent changes on the XICS layer removed the XICSState object to
-let the sPAPR machine handle the ICP and ICS directly. The reset of
-these objects was previously handled by XICSState, which was a SysBus
-device, and to keep the same behavior, the ICP and ICS were assigned
-to SysbBus.
+Threads within a core shouldn't be on different
+NUMA nodes, so if user has misconfgured command
+line, fail QEMU at start up to force user fix it.
 
-But that broke the 'info qtree' command in the monitor. 'qtree'
-performs a loop on the children of a bus to print their properties and
-SysBus devices are expected to be found under SysBus, which is not the
-case anymore.
+For now use the first thread on the core as source
+of core's node-id. Later when cpu-numa refactoring
+lands  it will be switched to core's node-id from
+possible_cpus[].
 
-The fix for this problem is to register reset handlers for the ICP and
-ICS objects and stop using SysBus for such devices.
+This prevents the same problems as commit 20bb648d
+"spapr: Fix default NUMA node allocation for threads",
+but for the case of manually configured NUMA node
+mappings, instead of just the default case.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Tested-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xics.c     | 10 ++++++----
- hw/intc/xics_kvm.c | 15 ++++++++++-----
- hw/ppc/spapr.c     |  2 --
- 3 files changed, 16 insertions(+), 11 deletions(-)
+ hw/ppc/spapr_cpu_core.c | 23 +++++++++++++++--------
+ 1 file changed, 15 insertions(+), 8 deletions(-)
 
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index ffc0747..e740989 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -333,7 +333,7 @@ static const VMStateDescription vmstate_icp_server =3D=
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index d37832d..6883f09 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -63,8 +63,6 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, PowerPCCPU *cpu,
+                            Error **errp)
  {
-     },
- };
-=20
--static void icp_reset(DeviceState *dev)
-+static void icp_reset(void *dev)
- {
-     ICPState *icp =3D ICP(dev);
-=20
-@@ -359,6 +359,8 @@ static void icp_realize(DeviceState *dev, Error **err=
-p)
+     CPUPPCState *env = &cpu->env;
+-    CPUState *cs = CPU(cpu);
+-    int i;
+ 
+     /* Set time-base frequency to 512 MHz */
+     cpu_ppc_tb_init(env, SPAPR_TIMEBASE_FREQ);
+@@ -82,12 +80,6 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, PowerPCCPU *cpu,
+         }
      }
-=20
-     icp->xics =3D XICS_FABRIC(obj);
+ 
+-    /* Set NUMA node for the added CPUs  */
+-    i = numa_get_node_for_cpu(cs->cpu_index);
+-    if (i < nb_numa_nodes) {
+-            cs->numa_node = i;
+-    }
+-
+     xics_cpu_setup(XICS_FABRIC(spapr), cpu);
+ 
+     qemu_register_reset(spapr_cpu_reset, cpu);
+@@ -171,11 +163,13 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+     const char *typename = object_class_get_name(scc->cpu_class);
+     size_t size = object_type_get_instance_size(typename);
+     Error *local_err = NULL;
++    int core_node_id = numa_get_node_for_cpu(cc->core_id);;
+     void *obj;
+     int i, j;
+ 
+     sc->threads = g_malloc0(size * cc->nr_threads);
+     for (i = 0; i < cc->nr_threads; i++) {
++        int node_id;
+         char id[32];
+         CPUState *cs;
+ 
+@@ -184,6 +178,19 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+         object_initialize(obj, size, typename);
+         cs = CPU(obj);
+         cs->cpu_index = cc->core_id + i;
 +
-+    qemu_register_reset(icp_reset, dev);
- }
-=20
-=20
-@@ -366,7 +368,6 @@ static void icp_class_init(ObjectClass *klass, void *=
-data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-=20
--    dc->reset =3D icp_reset;
-     dc->vmsd =3D &vmstate_icp_server;
-     dc->realize =3D icp_realize;
- }
-@@ -522,7 +523,7 @@ static void ics_simple_eoi(ICSState *ics, uint32_t nr=
-)
-     }
- }
-=20
--static void ics_simple_reset(DeviceState *dev)
-+static void ics_simple_reset(void *dev)
- {
-     ICSState *ics =3D ICS_SIMPLE(dev);
-     int i;
-@@ -611,6 +612,8 @@ static void ics_simple_realize(DeviceState *dev, Erro=
-r **errp)
-     }
-     ics->irqs =3D g_malloc0(ics->nr_irqs * sizeof(ICSIRQState));
-     ics->qirqs =3D qemu_allocate_irqs(ics_simple_set_irq, ics, ics->nr_i=
-rqs);
++        /* Set NUMA node for the added CPUs  */
++        node_id = numa_get_node_for_cpu(cs->cpu_index);
++        if (node_id != core_node_id) {
++            error_setg(&local_err, "Invalid node-id=%d of thread[cpu-index: %d]"
++                " on CPU[core-id: %d, node-id: %d], node-id must be the same",
++                 node_id, cs->cpu_index, cc->core_id, core_node_id);
++            goto err;
++        }
++        if (node_id < nb_numa_nodes) {
++            cs->numa_node = node_id;
++        }
 +
-+    qemu_register_reset(ics_simple_reset, dev);
- }
-=20
- static Property ics_simple_properties[] =3D {
-@@ -626,7 +629,6 @@ static void ics_simple_class_init(ObjectClass *klass,=
- void *data)
-     isc->realize =3D ics_simple_realize;
-     dc->props =3D ics_simple_properties;
-     dc->vmsd =3D &vmstate_ics_simple;
--    dc->reset =3D ics_simple_reset;
-     isc->reject =3D ics_simple_reject;
-     isc->resend =3D ics_simple_resend;
-     isc->eoi =3D ics_simple_eoi;
-diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-index 0a3daca..42e0e0e 100644
---- a/hw/intc/xics_kvm.c
-+++ b/hw/intc/xics_kvm.c
-@@ -102,7 +102,7 @@ static int icp_set_kvm_state(ICPState *icp, int versi=
-on_id)
-     return 0;
- }
-=20
--static void icp_kvm_reset(DeviceState *dev)
-+static void icp_kvm_reset(void *dev)
- {
-     ICPState *icp =3D ICP(dev);
-=20
-@@ -146,12 +146,17 @@ static void icp_kvm_cpu_setup(ICPState *icp, PowerP=
-CCPU *cpu)
-     icp->cap_irq_xics_enabled =3D true;
- }
-=20
-+static void icp_kvm_realize(DeviceState *dev, Error **errp)
-+{
-+    qemu_register_reset(icp_kvm_reset, dev);
-+}
-+
- static void icp_kvm_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-     ICPStateClass *icpc =3D ICP_CLASS(klass);
-=20
--    dc->reset =3D icp_kvm_reset;
-+    dc->realize =3D icp_kvm_realize;
-     icpc->pre_save =3D icp_get_kvm_state;
-     icpc->post_load =3D icp_set_kvm_state;
-     icpc->cpu_setup =3D icp_kvm_cpu_setup;
-@@ -293,7 +298,7 @@ static void ics_kvm_set_irq(void *opaque, int srcno, =
-int val)
-     }
- }
-=20
--static void ics_kvm_reset(DeviceState *dev)
-+static void ics_kvm_reset(void *dev)
- {
-     ICSState *ics =3D ICS_SIMPLE(dev);
-     int i;
-@@ -324,15 +329,15 @@ static void ics_kvm_realize(DeviceState *dev, Error=
- **errp)
-     }
-     ics->irqs =3D g_malloc0(ics->nr_irqs * sizeof(ICSIRQState));
-     ics->qirqs =3D qemu_allocate_irqs(ics_kvm_set_irq, ics, ics->nr_irqs=
-);
-+
-+    qemu_register_reset(ics_kvm_reset, dev);
- }
-=20
- static void ics_kvm_class_init(ObjectClass *klass, void *data)
- {
--    DeviceClass *dc =3D DEVICE_CLASS(klass);
-     ICSStateClass *icsc =3D ICS_BASE_CLASS(klass);
-=20
-     icsc->realize =3D ics_kvm_realize;
--    dc->reset =3D ics_kvm_reset;
-     icsc->pre_save =3D ics_get_kvm_state;
-     icsc->post_load =3D ics_set_kvm_state;
- }
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 14192ac..c3bb991 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -106,7 +106,6 @@ static int try_create_xics(sPAPRMachineState *spapr, =
-const char *type_ics,
-     int i;
-=20
-     ics =3D ICS_SIMPLE(object_new(type_ics));
--    qdev_set_parent_bus(DEVICE(ics), sysbus_get_default());
-     object_property_add_child(OBJECT(spapr), "ics", OBJECT(ics), NULL);
-     object_property_set_int(OBJECT(ics), nr_irqs, "nr-irqs", &err);
-     object_property_add_const_link(OBJECT(ics), "xics", OBJECT(xi), NULL=
-);
-@@ -123,7 +122,6 @@ static int try_create_xics(sPAPRMachineState *spapr, =
-const char *type_ics,
-         ICPState *icp =3D &spapr->icps[i];
-=20
-         object_initialize(icp, sizeof(*icp), type_icp);
--        qdev_set_parent_bus(DEVICE(icp), sysbus_get_default());
-         object_property_add_child(OBJECT(spapr), "icp[*]", OBJECT(icp), =
-NULL);
-         object_property_add_const_link(OBJECT(icp), "xics", OBJECT(xi), =
-NULL);
-         object_property_set_bool(OBJECT(icp), true, "realized", &err);
---=20
+         snprintf(id, sizeof(id), "thread[%d]", i);
+         object_property_add_child(OBJECT(sc), id, obj, &local_err);
+         if (local_err) {
+-- 
 2.9.3
