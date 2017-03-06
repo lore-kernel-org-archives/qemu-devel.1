@@ -1,33 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1ckneZ-0002ho-7C
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 03:06:00 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cknec-0002iP-Ge
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 03:06:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1ckneV-0006Sp-Hg
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 03:05:59 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42337
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1ckneZ-0006VM-AQ
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 03:06:02 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38335)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1ckneV-0006RV-AM
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 03:05:55 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	id 1ckneZ-0006Uj-14
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 03:05:59 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2683rxd049472
-	for <qemu-devel@nongnu.org>; Mon, 6 Mar 2017 03:05:54 -0500
+	v2683r9a090909
+	for <qemu-devel@nongnu.org>; Mon, 6 Mar 2017 03:05:57 -0500
 Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 290bymbhqg-1
+	by mx0a-001b2d01.pphosted.com with ESMTP id 28yva2qa2r-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 06 Mar 2017 03:05:54 -0500
+	for <qemu-devel@nongnu.org>; Mon, 06 Mar 2017 03:05:57 -0500
 Received: from localhost
 	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 6 Mar 2017 01:05:53 -0700
+	Mon, 6 Mar 2017 01:05:56 -0700
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon,  6 Mar 2017 02:03:39 -0600
-Message-Id: <1488787422-30487-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PULL for-2.9 0/3] qemu-ga patch queue for 2.9
+Date: Mon,  6 Mar 2017 02:03:42 -0600
+In-Reply-To: <1488787422-30487-1-git-send-email-mdroth@linux.vnet.ibm.com>
+References: <1488787422-30487-1-git-send-email-mdroth@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <1488787422-30487-4-git-send-email-mdroth@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL for-2.9 3/3] tests: check path to avoid a
+ failing qga/get-vcpus test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,41 +42,37 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+Cc: peter.maydell@linaro.org, Bruce Rogers <brogers@suse.com>
 
-The following changes since commit 17783ac828adc694d986698d2d7014aedfeb48c6:
+From: Bruce Rogers <brogers@suse.com>
 
-  Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-2.9-20170303' into staging (2017-03-04 16:31:14 +0000)
+The qga/get-vcpus test fails in a simple chroot environment, as
+used in an openSUSE Build Service local build, so first check
+that the sysfs based path exists in order to avoid calling this
+test in an environment where it won't work right.
 
-are available in the git repository at:
+Signed-off-by: Bruce Rogers <brogers@suse.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+---
+ tests/test-qga.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-  git://github.com/mdroth/qemu.git tags/qga-pull-2017-03-06-tag
-
-for you to fetch changes up to ec72c0e271f2b13953079a4f4dadb49ac5910b54:
-
-  tests: check path to avoid a failing qga/get-vcpus test (2017-03-06 00:54:19 -0600)
-
-----------------------------------------------------------------
-qemu-ga patch queue for 2.9
-
-* fix fsfreeze for filesystems mounted in multiple locations
-* fix test failure when running in a chroot
-* support for socket-based activation
-
-----------------------------------------------------------------
-Bruce Rogers (1):
-      tests: check path to avoid a failing qga/get-vcpus test
-
-Peter Lieven (1):
-      qga: ignore EBUSY when freezing a filesystem
-
-Stefan Hajnoczi (1):
-      qga: add systemd socket activation support
-
- qga/channel-posix.c  | 68 ++++++++++++++++++++++++++---------------------
- qga/channel-win32.c  |  2 +-
- qga/channel.h        |  3 ++-
- qga/commands-posix.c |  5 +++-
- qga/main.c           | 74 ++++++++++++++++++++++++++++++++++++++++++++++++----
- tests/test-qga.c     |  4 ++-
- 6 files changed, 117 insertions(+), 39 deletions(-)
+diff --git a/tests/test-qga.c b/tests/test-qga.c
+index 868b02a..9e6d19a 100644
+--- a/tests/test-qga.c
++++ b/tests/test-qga.c
+@@ -924,7 +924,9 @@ int main(int argc, char **argv)
+     g_test_add_data_func("/qga/info", &fix, test_qga_info);
+     g_test_add_data_func("/qga/network-get-interfaces", &fix,
+                          test_qga_network_get_interfaces);
+-    g_test_add_data_func("/qga/get-vcpus", &fix, test_qga_get_vcpus);
++    if (!access("/sys/devices/system/cpu/cpu0", F_OK)) {
++        g_test_add_data_func("/qga/get-vcpus", &fix, test_qga_get_vcpus)=
+;
++    }
+     g_test_add_data_func("/qga/get-fsinfo", &fix, test_qga_get_fsinfo);
+     g_test_add_data_func("/qga/get-memory-block-info", &fix,
+                          test_qga_get_memory_block_info);
+--=20
+2.7.4
