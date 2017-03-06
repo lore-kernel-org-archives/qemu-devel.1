@@ -1,23 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59292)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ckr7R-0007P2-M9
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 06:48:05 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1ckr7s-0007iK-UC
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 06:48:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1ckr7N-0005zp-Hj
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 06:48:01 -0500
-Date: Mon, 6 Mar 2017 08:47:52 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170306114752.GS2778@thinpad.lan.raisama.net>
-References: <1485868319-16151-1-git-send-email-thuth@redhat.com>
-	<1485868319-16151-3-git-send-email-thuth@redhat.com>
-	<20170303145807.GC11509@thinpad.lan.raisama.net>
-	<20170305230627.GA12030@umbus.fritz.box>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170305230627.GA12030@umbus.fritz.box>
-Subject: Re: [Qemu-devel] [PATCH 2/2] vl: Print CPU help after we've
- registered the CPU accelerators
+	(envelope-from <eric.auger@redhat.com>) id 1ckr7r-0006FC-Ju
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 06:48:28 -0500
+From: Eric Auger <eric.auger@redhat.com>
+Date: Mon,  6 Mar 2017 12:48:12 +0100
+Message-Id: <1488800894-22421-2-git-send-email-eric.auger@redhat.com>
+In-Reply-To: <1488800894-22421-1-git-send-email-eric.auger@redhat.com>
+References: <1488800894-22421-1-git-send-email-eric.auger@redhat.com>
+Subject: [Qemu-devel] [RFC v2 1/3] linux-headers: Update for vITS
+ save/restore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,99 +20,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: vijay.kilari@gmail.com, Vijaya.Kumar@cavium.com, drjones@redhat.com, peterx@redhat.com, quintela@redhat.com, dgilbert@redhat.com, christoffer.dall@linaro.org
 
-On Mon, Mar 06, 2017 at 10:06:27AM +1100, David Gibson wrote:
-> On Fri, Mar 03, 2017 at 11:58:07AM -0300, Eduardo Habkost wrote:
-> > On Tue, Jan 31, 2017 at 02:11:59PM +0100, Thomas Huth wrote:
-> > > When running with KVM on POWER, we register some CPU types during
-> > > the initialization function of the ppc64 KVM code (which unfortunately
-> > > also can not be done via a type_init() like it is done on x86).
-> > 
-> > Can you elaborate why it can't be done via type_init()? If the
-> > QOM type hierarchy depends on any runtime data unavailable at
-> > type_init(), we should fix that.
-> 
-> Hmm.. how?  This is specifically for the special 'host' cpu in the
-> case of KVM.  We can't use a static configuration here, because there
-> are things on the host that could limit what features of the CPU are
-> available for guest use.  So, we need KVM to be initialized in order
-> to query that information.
+This is a linux header update against 4.11-rc1 plus the non
+upstreamed ITS migration series.
 
-There's nothing saying you need to query that information before
-type_register() or during class_init, does it? The behavior of
-TYPE_HOST_POWERPC_CPU after object_new() is called can be as
-dynamic as you want it to, but the QOM type hierarchy is supposed
-to be static.
+https://github.com/eauger/linux/tree/v4.11-rc1-its-mig-v3
 
-Registering QOM types outside type_init() is only causing us
-problems and we should stop doing that.
+It aims at enhancing the KVM user API with vITS save/restore
+capability. This consists in two new groups for the
+ARM_VGIC_ITS KVM device, named: KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
+KVM_DEV_ARM_VGIC_GRP_ITS_TABLES.
 
-> 
-> > >                                                                 So to
-> > > be able to see these updates in the CPU help text, the code that calls
-> > > list_cpus() has to be run after configure_accelerator(). This move should
-> > > be fine since the "cpu_model" variable is also never used before the call
-> > > to configure_accelerator(), and thus there should not be any unwanted
-> > > side effects in the code before configure_accelerator() if the user
-> > > started QEMU with "-cpu ?" or "-cpu help".
-> > > 
-> > > Signed-off-by: Thomas Huth <thuth@redhat.com>
-> > 
-> > I am not convinced that the output of "-cpu help" and
-> > "-cpu help -machine accel=kvm" should look different. Do you have
-> > an example of what exactly is wrong with the output currently?
-> > 
-> > I actually believe list_cpus() needs to be called _earlier_, not
-> > later. Otherwise we won't be able to fix this bug:
-> > 
-> >   $ qemu-system-arm -cpu help
-> >   qemu-system-arm:/usr/local/etc/qemu/qemu.conf:1: No machine specified, and there is no default
-> >   Use -machine help to list supported machines
-> >   $ 
-> > 
-> > > ---
-> > >  vl.c | 10 +++++-----
-> > >  1 file changed, 5 insertions(+), 5 deletions(-)
-> > > 
-> > > diff --git a/vl.c b/vl.c
-> > > index 0b72b12..315c5c3 100644
-> > > --- a/vl.c
-> > > +++ b/vl.c
-> > > @@ -4055,11 +4055,6 @@ int main(int argc, char **argv, char **envp)
-> > >          qemu_set_hw_version(machine_class->hw_version);
-> > >      }
-> > >  
-> > > -    if (cpu_model && is_help_option(cpu_model)) {
-> > > -        list_cpus(stdout, &fprintf, cpu_model);
-> > > -        exit(0);
-> > > -    }
-> > > -
-> > >      if (!trace_init_backends()) {
-> > >          exit(1);
-> > >      }
-> > > @@ -4298,6 +4293,11 @@ int main(int argc, char **argv, char **envp)
-> > >  
-> > >      configure_accelerator(current_machine);
-> > >  
-> > > +    if (cpu_model && is_help_option(cpu_model)) {
-> > > +        list_cpus(stdout, &fprintf, cpu_model);
-> > > +        exit(0);
-> > > +    }
-> > > +
-> > >      if (qtest_chrdev) {
-> > >          qtest_init(qtest_chrdev, qtest_log, &error_fatal);
-> > >      }
-> > 
-> 
-> -- 
-> David Gibson			| I'll have my music baroque, and my code
-> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-> 				| _way_ _around_!
-> http://www.ozlabs.org/~dgibson
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+---
+ include/standard-headers/linux/virtio_pci.h |  2 +-
+ linux-headers/asm-arm/kvm.h                 |  2 ++
+ linux-headers/asm-arm64/kvm.h               |  2 ++
+ linux-headers/linux/userfaultfd.h           | 16 +++++++++++-----
+ 4 files changed, 16 insertions(+), 6 deletions(-)
 
-
-
+diff --git a/include/standard-headers/linux/virtio_pci.h b/include/standard-headers/linux/virtio_pci.h
+index 9262acd..eba3ba4 100644
+--- a/include/standard-headers/linux/virtio_pci.h
++++ b/include/standard-headers/linux/virtio_pci.h
+@@ -79,7 +79,7 @@
+  * configuration space */
+ #define VIRTIO_PCI_CONFIG_OFF(msix_enabled)	((msix_enabled) ? 24 : 20)
+ /* Deprecated: please use VIRTIO_PCI_CONFIG_OFF instead */
+-#define VIRTIO_PCI_CONFIG(dev)	VIRTIO_PCI_CONFIG_OFF((dev)->msix_enabled)
++#define VIRTIO_PCI_CONFIG(dev)	VIRTIO_PCI_CONFIG_OFF((dev)->pci_dev->msix_enabled)
+ 
+ /* Virtio ABI version, this must match exactly */
+ #define VIRTIO_PCI_ABI_VERSION		0
+diff --git a/linux-headers/asm-arm/kvm.h b/linux-headers/asm-arm/kvm.h
+index 1101d55..c8b9a68 100644
+--- a/linux-headers/asm-arm/kvm.h
++++ b/linux-headers/asm-arm/kvm.h
+@@ -192,6 +192,8 @@ struct kvm_arch_memory_slot {
+ #define KVM_DEV_ARM_VGIC_GRP_REDIST_REGS 5
+ #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
+ #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
++#define KVM_DEV_ARM_VGIC_GRP_ITS_REGS	8
++#define KVM_DEV_ARM_VGIC_GRP_ITS_TABLES	9
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
+ 			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
+diff --git a/linux-headers/asm-arm64/kvm.h b/linux-headers/asm-arm64/kvm.h
+index 651ec30..a8d7d67 100644
+--- a/linux-headers/asm-arm64/kvm.h
++++ b/linux-headers/asm-arm64/kvm.h
+@@ -212,6 +212,8 @@ struct kvm_arch_memory_slot {
+ #define KVM_DEV_ARM_VGIC_GRP_REDIST_REGS 5
+ #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
+ #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
++#define KVM_DEV_ARM_VGIC_GRP_ITS_REGS 8
++#define KVM_DEV_ARM_VGIC_GRP_ITS_TABLES 9
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
+ #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
+ 			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
+diff --git a/linux-headers/linux/userfaultfd.h b/linux-headers/linux/userfaultfd.h
+index 2ed5dc3..9d8f313 100644
+--- a/linux-headers/linux/userfaultfd.h
++++ b/linux-headers/linux/userfaultfd.h
+@@ -18,9 +18,11 @@
+  * means the userland is reading).
+  */
+ #define UFFD_API ((__u64)0xAA)
+-#define UFFD_API_FEATURES (UFFD_FEATURE_EVENT_FORK |		\
++#define UFFD_API_FEATURES (UFFD_FEATURE_EVENT_EXIT |		\
++			   UFFD_FEATURE_EVENT_FORK |		\
+ 			   UFFD_FEATURE_EVENT_REMAP |		\
+-			   UFFD_FEATURE_EVENT_MADVDONTNEED |	\
++			   UFFD_FEATURE_EVENT_REMOVE |	\
++			   UFFD_FEATURE_EVENT_UNMAP |		\
+ 			   UFFD_FEATURE_MISSING_HUGETLBFS |	\
+ 			   UFFD_FEATURE_MISSING_SHMEM)
+ #define UFFD_API_IOCTLS				\
+@@ -92,7 +94,7 @@ struct uffd_msg {
+ 		struct {
+ 			__u64	start;
+ 			__u64	end;
+-		} madv_dn;
++		} remove;
+ 
+ 		struct {
+ 			/* unused reserved fields */
+@@ -109,7 +111,9 @@ struct uffd_msg {
+ #define UFFD_EVENT_PAGEFAULT	0x12
+ #define UFFD_EVENT_FORK		0x13
+ #define UFFD_EVENT_REMAP	0x14
+-#define UFFD_EVENT_MADVDONTNEED	0x15
++#define UFFD_EVENT_REMOVE	0x15
++#define UFFD_EVENT_UNMAP	0x16
++#define UFFD_EVENT_EXIT		0x17
+ 
+ /* flags for UFFD_EVENT_PAGEFAULT */
+ #define UFFD_PAGEFAULT_FLAG_WRITE	(1<<0)	/* If this was a write fault */
+@@ -155,9 +159,11 @@ struct uffdio_api {
+ #define UFFD_FEATURE_PAGEFAULT_FLAG_WP		(1<<0)
+ #define UFFD_FEATURE_EVENT_FORK			(1<<1)
+ #define UFFD_FEATURE_EVENT_REMAP		(1<<2)
+-#define UFFD_FEATURE_EVENT_MADVDONTNEED		(1<<3)
++#define UFFD_FEATURE_EVENT_REMOVE		(1<<3)
+ #define UFFD_FEATURE_MISSING_HUGETLBFS		(1<<4)
+ #define UFFD_FEATURE_MISSING_SHMEM		(1<<5)
++#define UFFD_FEATURE_EVENT_UNMAP		(1<<6)
++#define UFFD_FEATURE_EVENT_EXIT			(1<<7)
+ 	__u64 features;
+ 
+ 	__u64 ioctls;
 -- 
-Eduardo
+2.5.5
