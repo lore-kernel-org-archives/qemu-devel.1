@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1clEq9-0005Pd-9b
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 08:07:49 -0500
+	(envelope-from <kwolf@redhat.com>) id 1clErn-0005zN-Jc
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 08:09:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1clEq8-0006sl-3y
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 08:07:45 -0500
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:34587)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1clEq7-0006sZ-Tk
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 08:07:44 -0500
-Received: by mail-wm0-x22f.google.com with SMTP id 196so24219271wmm.1
-	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 05:07:43 -0800 (PST)
+	(envelope-from <kwolf@redhat.com>) id 1clErm-0007E0-MZ
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 08:09:27 -0500
+Date: Tue, 7 Mar 2017 14:09:17 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170307130917.GL5871@noname.str.redhat.com>
+References: <1488826849-32384-1-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1488839828-4231-1-git-send-email-jcmvbkbc@gmail.com>
-References: <1488839828-4231-1-git-send-email-jcmvbkbc@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 7 Mar 2017 13:07:22 +0000
-Message-ID: <CAFEAcA83sCcGQj-TFg2TaQ5JzSHFyspGonkcF_LAeCZQwpVc3w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 0/2] xtensa updates
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1488826849-32384-1-git-send-email-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 00/15] block: A bunch of fixes for
+ Sheepdog and Gluster
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +23,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Filippov <jcmvbkbc@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mitake.hitoshi@lab.ntt.co.jp, namei.unix@gmail.com, jcody@redhat.com, ndevos@redhat.com, eblake@redhat.com, f4bug@amsat.org
 
-On 6 March 2017 at 22:37, Max Filippov <jcmvbkbc@gmail.com> wrote:
-> Hi Peter,
->
-> please pull the following batch of updates for target/xtensa.
->
-> The following changes since commit 10f25e4844cb9b3f02fb032f88051dd5b65b4206:
->
->   Merge remote-tracking branch 'remotes/yongbok/tags/mips-20170222' into staging (2017-02-23 09:59:40 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/OSLL/qemu-xtensa.git tags/20170306-xtensa
->
-> for you to fetch changes up to cb3825b9afdb1800cef1be9c9a732c803d8bb29e:
->
->   target/xtensa: add two missing headers to core import script (2017-02-23 10:50:56 -0800)
->
-> ----------------------------------------------------------------
-> target/xtensa updates:
->
-> - instantiate local memories in xtensa sim machine;
-> - add two missing include files to xtensa core importing script.
->
-> ----------------------------------------------------------------
-> Max Filippov (2):
->       target/xtensa: sim: instantiate local memories
->       target/xtensa: add two missing headers to core import script
->
+Am 06.03.2017 um 20:00 hat Markus Armbruster geschrieben:
+> Bad error handling, memory leaks, and lack of blockdev-add support.
 
-Applied, thanks.
+Thanks, applied to the block branch.
 
--- PMM
+Kevin
