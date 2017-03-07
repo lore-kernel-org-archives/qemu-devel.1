@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1clGOG-0003iy-OG
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 09:47:05 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1clGeI-0006hJ-PM
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:03:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1clGOC-0001Rq-Rm
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 09:47:04 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38851)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1clGOC-0001RY-Lc
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 09:47:00 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1clGOA-0003XM-S6
-	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 14:46:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8EEA42E8326
-	for <qemu-devel@nongnu.org>; Tue,  7 Mar 2017 14:46:46 +0000 (UTC)
+	(envelope-from <alex.bennee@linaro.org>) id 1clGeE-000692-Uu
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:03:38 -0500
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:37100)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1clGeE-00068u-N8
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:03:34 -0500
+Received: by mail-wm0-x22b.google.com with SMTP id n11so7271879wma.0
+	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 07:03:34 -0800 (PST)
+References: <d208c3f0-2e57-0b54-f18f-b5e27d698e28@genode-labs.com>
+	<20170306155722.31315-1-alex.bennee@linaro.org>
+	<5d60b86e-d57d-fbcd-fb54-d7447816244d@twiddle.net>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <5d60b86e-d57d-fbcd-fb54-d7447816244d@twiddle.net>
+Date: Tue, 07 Mar 2017 15:03:41 +0000
+Message-ID: <87a88xi0xe.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Mar 2017 14:33:50 -0000
-From: Herbie Robinson <1670509@bugs.launchpad.net>
-Reply-To: Bug 1670509 <1670509@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170306224936.27687.97076.malonedeb@gac.canonical.com>
-Message-Id: <20170307143352.6329.15319.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1670509] Re: sgabios outputs incorrect video modes
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] target/i386: move nested exception check
+ to x86_cpu_exec_interrupt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,33 +32,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Richard Henderson <rth@twiddle.net>
+Cc: alexander.boettcher@genode-labs.com, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-** Project changed: qemu =3D> sgabios (Ubuntu)
 
--- =
+Richard Henderson <rth@twiddle.net> writes:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1670509
+> On 03/07/2017 02:57 AM, Alex Bennée wrote:
+>>      cs->exception_index = intno;
+>>      env->error_code = error_code;
+>>      env->exception_is_int = is_int;
+>>      env->exception_next_eip = env->eip + next_eip_addend;
+>> +    env->exception_retaddr = retaddr;
+>>      cpu_loop_exit_restore(cs, retaddr);
+>
+> Since you've restored state here, I don't see that you need to save
+> the retaddr at all ...
+>
+>> +    if (!env->exception_is_int) {
+>> +        cpu_svm_check_intercept_param(env,
+>> +                                      SVM_EXIT_EXCP_BASE + cs->exception_index,
+>> +                                      env->error_code,
+>> +                                      env->exception_retaddr);
+>> +        cs->exception_index = check_exception(env, cs->exception_index,
+>> +                                              &env->error_code,
+>> +                                              env->exception_retaddr);
+>> +    } else {
+>> +        cpu_svm_check_intercept_param(env, SVM_EXIT_SWINT, 0,
+>> +                                      env->exception_retaddr);
+>> +    }
+>
+> ... simply pass zero here instead.
+>
+> But do I see correctly from the thread that we don't have a reproducer?
 
-Title:
-  sgabios outputs incorrect video modes
+Yeah - I've nabbed Paolo's much cleaner and more informed fix and that
+seems fine.
 
-Status in sgabios package in Ubuntu:
-  New
-
-Bug description:
-  When run with a bootstrap loader that uses int 0x10 with 0x1301 in
-  %ax, incorrect video modes are output to the serial port.  I believe
-  the VGA image will be correct.  This might also affect the returned
-  values for some interrupts.
-
-  This is caused because the set_cursor_position routine fails to save
-  and restore %bx.
-
-  I'm working on a fix for this.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/ubuntu/+source/sgabios/+bug/1670509/+subscriptio=
-ns
+--
+Alex Bennée
