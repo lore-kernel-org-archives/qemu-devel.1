@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54379)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1clDAC-0003Pd-1m
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 06:20:20 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1clDDI-0004l2-6h
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 06:23:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1clDAB-0001UX-1P
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 06:20:20 -0500
-Date: Tue, 7 Mar 2017 11:20:03 +0000
+	(envelope-from <dgilbert@redhat.com>) id 1clDDG-00049j-F2
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 06:23:32 -0500
+Date: Tue, 7 Mar 2017 11:23:17 +0000
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170307112002.GD2869@work-vm>
+Message-ID: <20170307112316.GE2869@work-vm>
 References: <20170225193155.447462-1-vsementsov@virtuozzo.com>
-	<20170225193155.447462-4-vsementsov@virtuozzo.com>
-	<20170307095323.GB5871@noname.str.redhat.com>
-	<b2c86843-1506-dba6-2446-a253f77f5b58@virtuozzo.com>
-	<20170307110155.GH5871@noname.str.redhat.com>
+	<20170225193155.447462-2-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170307110155.GH5871@noname.str.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/4] savevm: fix savevm after migration
+In-Reply-To: <20170225193155.447462-2-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 1/4] iotests: add migration corner cases
+ test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,42 +24,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, peter.maydell@linaro.org, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
 
-* Kevin Wolf (kwolf@redhat.com) wrote:
-> Am 07.03.2017 um 10:59 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> > 07.03.2017 12:53, Kevin Wolf wrote:
-> > >Am 25.02.2017 um 20:31 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> > >>After migration all drives are inactive and savevm will fail with
-> > >>
-> > >>qemu-kvm: block/io.c:1406: bdrv_co_do_pwritev:
-> > >>    Assertion `!(bs->open_flags & 0x0800)' failed.
-> > >>
-> > >>Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> > >What's the exact state you're in? I tried to reproduce this, but just
-> > >doing a live migration and then savevm on the destination works fine for
-> > >me.
-> > >
-> > >Hm... Or do you mean on the source? In that case, I think the operation
-> > >must fail, but of course more gracefully than now.
-> > 
-> > Yes, I mean on the source. It may not be migration for "mirgration",
-> > but for dumping state to file. In that case it seems not wrong to
-> > make a snapshot on source.
-> 
-> Yes, resuming on the source is definitely valid. I'm only questioning if
-> 'savevm' (and by extension, any other command that modifies the VM or
-> its images) should automagically regain control of the VM, or whether
-> that should be more explicit.
+* Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-How many things other than 'cont' and 'savevm' are there?
-
-We should definitely fix it so  a savevm there doesn't assert,
-but I'm also unsure if it's worth a separate explicit command.
+If I understand this correctly, these are tests that currently fail and
+are fixed by the following patches;  in which case it needs reordering
+to keep stuff bisectable.
 
 Dave
 
-> Kevin
+> ---
+>  tests/qemu-iotests/175     | 71 ++++++++++++++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/175.out |  5 ++++
+>  tests/qemu-iotests/group   |  1 +
+>  3 files changed, 77 insertions(+)
+>  create mode 100644 tests/qemu-iotests/175
+>  create mode 100644 tests/qemu-iotests/175.out
+> 
+> diff --git a/tests/qemu-iotests/175 b/tests/qemu-iotests/175
+> new file mode 100644
+> index 0000000000..ef86c70db5
+> --- /dev/null
+> +++ b/tests/qemu-iotests/175
+> @@ -0,0 +1,71 @@
+> +#!/usr/bin/env python
+> +#
+> +# Test migration corner-cases
+> +#
+> +# Copyright (C) Vladimir Sementsov-Ogievskiy 2017
+> +#
+> +# This program is free software; you can redistribute it and/or modify
+> +# it under the terms of the GNU General Public License as published by
+> +# the Free Software Foundation; either version 2 of the License, or
+> +# (at your option) any later version.
+> +#
+> +# This program is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +# GNU General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU General Public License
+> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> +#
+> +
+> +import os
+> +import iotests
+> +import time
+> +from iotests import qemu_img
+> +
+> +disk = os.path.join(iotests.test_dir, 'disk')
+> +
+> +class TestMigrationCornerCases(iotests.QMPTestCase):
+> +    def setUp(self):
+> +        qemu_img('create', '-f', iotests.imgfmt, disk, '10M')
+> +        self.vm = iotests.VM().add_drive(disk)
+> +        self.vm.launch()
+> +
+> +    def tearDown(self):
+> +        self.vm.shutdown()
+> +        os.remove(disk)
+> +
+> +    def test_migrate_reset_cont_write(self):
+> +        result = self.vm.qmp('migrate', uri='exec:cat>/dev/null')
+> +        self.assert_qmp(result, 'return', {})
+> +        time.sleep(4)
+> +
+> +        result = self.vm.qmp('human-monitor-command',
+> +                             command_line='system_reset')
+> +        self.assert_qmp(result, 'return', '')
+> +
+> +        result = self.vm.qmp('cont')
+> +        self.assert_qmp(result, 'return', {})
+> +
+> +        result = self.vm.qmp('human-monitor-command',
+> +                             command_line='qemu-io drive0 "write 0 512"')
+> +        self.assert_qmp(result, 'return', '')
+> +
+> +    def test_migrate_savevm(self):
+> +        result = self.vm.qmp('migrate', uri='exec:cat>/dev/null')
+> +        self.assert_qmp(result, 'return', {})
+> +        time.sleep(4)
+> +
+> +        result = self.vm.qmp('human-monitor-command', command_line='savevm')
+> +        self.assert_qmp(result, 'return', '')
+> +
+> +    def test_savevm_set_speed_savevm(self):
+> +        for i in range(10):
+> +            result = self.vm.qmp('human-monitor-command', command_line='savevm')
+> +            self.assert_qmp(result, 'return', '')
+> +
+> +            result = self.vm.qmp('migrate_set_speed', value=9223372036853727232)
+> +            self.assert_qmp(result, 'return', {})
+> +
+> +if __name__ == '__main__':
+> +    iotests.main()
+> diff --git a/tests/qemu-iotests/175.out b/tests/qemu-iotests/175.out
+> new file mode 100644
+> index 0000000000..8d7e996700
+> --- /dev/null
+> +++ b/tests/qemu-iotests/175.out
+> @@ -0,0 +1,5 @@
+> +...
+> +----------------------------------------------------------------------
+> +Ran 3 tests
+> +
+> +OK
+> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+> index 985b9a6a36..1f4bf03185 100644
+> --- a/tests/qemu-iotests/group
+> +++ b/tests/qemu-iotests/group
+> @@ -167,3 +167,4 @@
+>  172 auto
+>  173 rw auto
+>  174 auto
+> +175 auto quick
+> -- 
+> 2.11.1
+> 
 --
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
