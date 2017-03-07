@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cl9gD-0006XA-P1
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:37:11 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cl9kI-0007V8-6S
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:41:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cl9gA-0002Vs-NR
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:37:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42532)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cl9gA-0002VN-Ei
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:37:06 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1488517304-23131-1-git-send-email-he.chen@linux.intel.com>
-	<20170303135704.GX2778@thinpad.lan.raisama.net>
-	<d93b2ebb-c5a3-a774-30fd-2d92c7703549@redhat.com>
-	<20170303162611.GE13631@redhat.com>
-	<20170303164751.GY2778@thinpad.lan.raisama.net>
-	<20170303165218.GI13631@redhat.com>
-	<20170303171050.GA2778@thinpad.lan.raisama.net>
-	<20170307015038.GA17728@he>
-Date: Tue, 07 Mar 2017 08:37:03 +0100
-In-Reply-To: <20170307015038.GA17728@he> (He Chen's message of "Tue, 7 Mar
-	2017 09:50:38 +0800")
-Message-ID: <871su9k068.fsf@dusky.pond.sub.org>
+	(envelope-from <no-reply@patchew.org>) id 1cl9kD-00049X-M5
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:41:22 -0500
+Resent-Message-Id: <E1cl9kD-00049X-M5@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21304)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cl9kD-00048z-FK
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:41:17 -0500
+In-Reply-To: <1488871237-12332-1-git-send-email-armbru@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148887246874.294.4659140132872706261@0e2666bad730>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC] x86: Allow to set NUMA distance for
- different NUMA nodes
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 6 Mar 2017 23:41:09 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL v3 00/24] block: Command line option
+ -blockdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,161 +29,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: He Chen <he.chen@linux.intel.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Chao Peng <chao.p.peng@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: armbru@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-He Chen <he.chen@linux.intel.com> writes:
-
-> On Fri, Mar 03, 2017 at 02:10:50PM -0300, Eduardo Habkost wrote:
->> On Fri, Mar 03, 2017 at 04:52:18PM +0000, Daniel P. Berrange wrote:
->> > On Fri, Mar 03, 2017 at 01:47:51PM -0300, Eduardo Habkost wrote:
->> > > On Fri, Mar 03, 2017 at 04:26:12PM +0000, Daniel P. Berrange wrote:
->> > > > On Fri, Mar 03, 2017 at 10:09:22AM -0600, Eric Blake wrote:
->> > > > > On 03/03/2017 07:57 AM, Eduardo Habkost wrote:
->> > > > > 
->> > > > > >> With this patch, when a user wants to create a guest that contains
->> > > > > >> several vNUMA nodes and also wants to set distance among those nodes,
->> > > > > >> the QEMU command would like:
->> > > > > >>
->> > > > > >> ```
->> > > > > >> -object memory-backend-ram,size=1G,prealloc=yes,host-nodes=0,policy=bind,id=node0 \
->> > > > > >> -numa node,nodeid=0,cpus=0,memdev=node0,distance=10,distance=21,distance=31,distance=41 \
->> > > > > 
->> > > > > > 
->> > > > > > It would be nice to have a more intuitive syntax to represent
->> > > > > > ordered lists in QemuOpts. But this is what we have today.
->> > > > > > 
->> > > > > 
->> > > > > Markus has the discussion on representing arrays via the command line;
->> > > > > particularly since this array is very tightly coupled to the order in
->> > > > > which values are presented, it may be worth having:
->> > > > > 
->> > > > > -numa
->> > > > > node,nodeid=0,cpus=0,memdev=nod0,distance.0=10,distance.1=21,distance.2=31,distance.3=41
->> > > > > 
->> > > > > with the explicit distance.0= suffixes to distance making it more
->> > > > > obvious that we are dealing with an array.
->> > > > > 
->> > > > > > I think the proposal makes sense. I would like the semantics of the new option
->> > > > > > to be documented at qapi-schema.json and qemu-options.hx.
->> > > > > > 
->> > > > > > I would call the new NumaNodeOptions field "distances", as it is
->> > > > > > a list of distances.
->> > > > > 
->> > > > > Indeed, Markus is trying (with his work on -blockdev for 2.9) to get the
->> > > > > command line to a point where it is identical to the QMP code, by
->> > > > > reusing qapi-schema.json, so we should very much keep that in mind with
->> > > > > whatever we add to -numa in 2.10.
->> > > > > 
->> > > > > 
->> > > > > > but in the future we could support something like:
->> > > > > > 
->> > > > > >   -numa node,nodeid=0,cpus=0,memdev=node0 \
->> > > > > >   -numa node,nodeid=1,cpus=1,memdev=node1 \
->> > > > > >   -numa node,nodeid=2,cpus=2,memdev=node2 \
->> > > > > >   -numa node,nodeid=3,cpus=3,memdev=node3 \
->> > > > > >   -numa distances,distances[0][0]=10,distances[0][1]=21,distances[0][2]=31,distances[0][3]=41,\
->> > > > > >                   distances[1][0]=21,distances[1][1]=10,distances[1][2]=21,distances[1][3]=31,\
->> > > > > >                   distances[2][0]=31,distances[2][1]=21,distances[2][2]=10,distances[2][3]=21,\
->> > > > > >                   distances[3][0]=41,distances[3][1]=31,distances[3][2]=21,distances[3][3]=10
->> > > > > 
->> > > > > Except that [] requires special shell quoting, so the proposal would be
->> > > > > more like:
->> > > > > 
->> > > > > -numa distances.0.0=10,distances.0.1=21
->> > > > > 
->> > > > > Right now, QMP doesn't support 2-D arrays (although this may be a good
->> > > > > reason to introduce support), so that's also something to think about
->> > > > > (not insurmountable, but makes the task more complex).
->> > > > 
->> > > > What I don't like about this syntax is that it is duplicating information
->> > > > twice. IIUC the NUMA distance information is unidirectional, so specifying
->> > > > the same data for both direetions (node 0 -> node 3, and node 3 -> node 0)
->> > > > looks like overkill. Also the self-node distance isi defined to always be
->> > > > 10 IIUC, so specifying that is not required. IOW, could cut down the data
->> > > > we need to provider to just
->> > > > 
->> > > >    -numa distances,nodea=0,nodeb=1,value=20
->> > > >    -numa distances,nodea=0,nodeb=2,value=20
->> > > >    -numa distances,nodea=0,nodeb=3,value=20
->> > > >    -numa distances,nodea=1,nodeb=2,value=20
->> > > >    -numa distances,nodea=1,nodeb=3,value=20
->> > > >    -numa distances,nodea=2,nodeb=3,value=20
->> > > 
->> > > The ACPI spec (I'm looking at revision 5.0) explicitly mentions
->> > > that A->B distance may be different from B->A distrance:
->> > > 
->> > > "The entry value is a one-byte unsigned integer. The relative
->> > > distance from System Locality i to System Locality j is the
->> > > i*N + j entry in the matrix, where N is the number of System
->> > > Localities.  Except for the relative distance from a System
->> > > Locality to itself, each relative distance is stored twice in the
->> > > matrix. This provides the capability to describe the scenario
->> > > where the relative distances for the two directions between
->> > > System Localities is different."
->> > 
->> > Ah interesting, learn something new every day ? I've only made
->> > that unidirectional assumption for the last 10 years ;-P
->> > 
->> > > But I agree we could figure out a more compact syntax for more
->> > > common cases where self-node distance is 10 and distance is the
->> > > same both ways.
->> > 
->> > QAPI would need a specialized numeric matrix type, which we could
->> > efficiently map into some CLI syntax, in order to avoid needing to
->> > tickle the rather verbose general purpose list syntax. Probably
->> > not worth the hassle though - rather than just picking shorter
->> > variable names eg
->> > 
->> >   -numa dist,a=0,b=1,val=3
->> > 
->> > instead of
->> > 
->> >   -numa distances,nodea=0,nodeb=1,value=20
->> 
->> Whatever syntax/names we choose, we could have reasonable
->> defaults for omitted values:
->> 
->> * If A->B is set and B->A is omitted, use the same value for both
->>   A->B and B->A
->> * If A->A is omitted, use min(10, configured_distances)
->> 
->> This way, the previous example:
->> 
->>    -numa distances,distances.0.0=10,distances.0.1=21,distances.0.2=31,distances.0.3=41,\
->>                    distances.1.0=21,distances.1.1=10,distances.1.2=21,distances.1.3=31,\
->>                    distances.2.0=31,distances.2.1=21,distances.2.2=10,distances.2.3=21,\
->>                    distances.3.0=41,distances.3.1=31,distances.3.2=21,distances.3.3=10
->> 
->> could be written as:
->> 
->>    -numa distances,distances.0.1=21,distances.0.2=31,distances.0.3=41,\
->>                                     distances.1.2=21,distances.1.3=31,\
->>                                                      distances.2.3=21
->> 
-> It seems that the dotted key convention has not been supported yet.
-
-It's being built.  We're going to use an initial version for -blockdev
-in 2.9:
-
-    [PULL v3 00/24] block: Command line option -blockdev
-    Message-Id: <1488871237-12332-1-git-send-email-armbru@redhat.com>
-    http://repo.or.cz/w/qemu/armbru.git tag pull-block-2017-02-28-v3
-
-PATCH 03 lists user interface differences to QemuOpts, briefly.  PATCH
-21 shows how to use it.
-
-It's not a drop-in replacement for QemuOpts.  It's meant to be used it
-with the QObject input visitor to produce a QAPI type holding the
-configuration, like PATCH 21 does.
-
-There is no support for -readconfig and -writeconfig, yet.  I guess
-that's a show stopper for -numa.  We'll get there, but it'll take time.
-
-> So which syntax do you think is proper for NUMA distance?
-> Maybe I will implement something like `-numa dist,a=0,b=1,val=21` first
-> then change the syntax to dotted key convention when it get merged?
-
-I don't have an opinion there, just want to point out that we can mess
-around during development, but once we released an external interface,
-we better stick to it.  So keep that in mind.
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ4
+ODg3MTIzNy0xMjMzMi0xLWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tClN1YmplY3Q6
+IFtRZW11LWRldmVsXSBbUFVMTCB2MyAwMC8yNF0gYmxvY2s6IENvbW1hbmQgbGluZSBvcHRpb24g
+LWJsb2NrZGV2ClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
+YmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3
+YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpj
+b21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBp
+biAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQg
+bG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1h
+dD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAg
+ICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhp
+dCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
+ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNo
+ZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTQ4ODg3MTIzNy0x
+MjMzMi0xLWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMTQ4ODg3
+MTIzNy0xMjMzMi0xLWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tClN3aXRjaGVkIHRv
+IGEgbmV3IGJyYW5jaCAndGVzdCcKYTUzOTk0MiBrZXl2YWw6IFN1cHBvcnQgbGlzdHMKMzMzOGYx
+OCBkb2NzL3FhcGktY29kZS1nZW4udHh0OiBDbGFyaWZ5IG5hbWluZyBydWxlcwo3MzM1MTc1IHFh
+cGk6IEltcHJvdmUgaG93IGtleXZhbCBpbnB1dCB2aXNpdG9yIHJlcG9ydHMgdW5leHBlY3RlZCBk
+aWN0cwpiNzlkNTlkIGJsb2NrOiBJbml0aWFsIGltcGxlbWVudGF0aW9uIG9mIC1ibG9ja2Rldgo1
+YTE5M2ZmIHFhcGk6IE5ldyBxb2JqZWN0X2lucHV0X3Zpc2l0b3JfbmV3X3N0cigpIGZvciBjb252
+ZW5pZW5jZQowODRlY2FmIGtleXZhbDogUmVzdHJpY3Qga2V5IGNvbXBvbmVudHMgdG8gdmFsaWQg
+UUFQSSBuYW1lcwowMjQxOGE5IHFhcGk6IE5ldyBwYXJzZV9xYXBpX25hbWUoKQpmY2QyOTIyIHRl
+c3QtcWFwaS11dGlsOiBOZXcsIGNvdmVyaW5nIHFhcGkvcWFwaS11dGlsLmMKNWEzNDRkNSBtb25p
+dG9yOiBBc3NlcnQgcW1wX3NjaGVtYV9qc29uW10gaXMgc2FuZQoxZTdmNzdlIHRlc3QtdmlzaXRv
+ci1zZXJpYWxpemF0aW9uOiBQYXNzICZlcnJvcl9hYm9ydCB0byBxb2JqZWN0X2Zyb21fanNvbigp
+CmQ2YmRkNzkgY2hlY2stcWpzb246IFRlc3QgZXJyb3JzIGZyb20gcW9iamVjdF9mcm9tX2pzb24o
+KQo5MjNmOGFlIGJsb2NrOiBNb3JlIGRldGFpbGVkIHN5bnRheCBlcnJvciByZXBvcnRpbmcgZm9y
+IEpTT04gZmlsZW5hbWVzCjBlNjBiYjIgcW9iamVjdDogUHJvcGFnYXRlIHBhcnNlIGVycm9ycyB0
+aHJvdWdoIHFvYmplY3RfZnJvbV9qc29uKCkKZWQ3YTJlYyB0ZXN0LXFvYmplY3QtaW5wdXQtdmlz
+aXRvcjogQWJvcnQgZWFybGllciBvbiBiYWQgdGVzdCBpbnB1dAo4NThiYjUwIHFqc29uOiBBYm9y
+dCBlYXJsaWVyIG9uIHFvYmplY3RfZnJvbV9qc29uZigpIG1pc3VzZQoyNGZjNTVkIGxpYnF0ZXN0
+OiBGaXggcW1wKCkgJiBmcmllbmRzIHRvIGFib3J0IG9uIEpTT04gcGFyc2UgZXJyb3JzCjM2NWNm
+NjMgcW9iamVjdDogUHJvcGFnYXRlIHBhcnNlIGVycm9ycyB0aHJvdWdoIHFvYmplY3RfZnJvbV9q
+c29udigpCmNmMjQxOTkgcWFwaTogRmFjdG9yIG91dCBjb21tb24gcW9iamVjdF9pbnB1dF9nZXRf
+a2V5dmFsKCkKY2M0MWU2OCBxYXBpOiBGYWN0b3Igb3V0IGNvbW1vbiBwYXJ0IG9mIHFvYmplY3Qg
+aW5wdXQgdmlzaXRvciBjcmVhdGlvbgo2ZDUxOTdiIHRlc3Qta2V5dmFsOiBDb3ZlciB1c2Ugd2l0
+aCBxb2JqZWN0IGlucHV0IHZpc2l0b3IKZGU1MGMzYSBxYXBpOiBxb2JqZWN0IGlucHV0IHZpc2l0
+b3IgdmFyaWFudCBmb3IgdXNlIHdpdGgga2V5dmFsX3BhcnNlKCkKMjI3MmNkMCBrZXl2YWw6IE5l
+dyBrZXl2YWxfcGFyc2UoKQpiNDIxOGQ0IHRlc3RzOiBGaXggZ2Nvdi1maWxlcy10ZXN0LXFlbXUt
+b3B0cy15LCBnY292LWZpbGVzLXRlc3QtbG9nZ2luZy15CjdmMzQxYjQgdGVzdC1xZW11LW9wdHM6
+IENvdmVyIHFlbXVfb3B0c19wYXJzZSgpIG9mICJubyIKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNo
+ZWNraW5nIFBBVENIIDEvMjQ6IHRlc3QtcWVtdS1vcHRzOiBDb3ZlciBxZW11X29wdHNfcGFyc2Uo
+KSBvZiAibm8iLi4uCkNoZWNraW5nIFBBVENIIDIvMjQ6IHRlc3RzOiBGaXggZ2Nvdi1maWxlcy10
+ZXN0LXFlbXUtb3B0cy15LCBnY292LWZpbGVzLXRlc3QtbG9nZ2luZy15Li4uCkNoZWNraW5nIFBB
+VENIIDMvMjQ6IGtleXZhbDogTmV3IGtleXZhbF9wYXJzZSgpLi4uCkVSUk9SOiBzdXNwZWN0IGNv
+ZGUgaW5kZW50IGZvciBjb25kaXRpb25hbCBzdGF0ZW1lbnRzICg4LCA4KQojNDM4OiBGSUxFOiB1
+dGlsL2tleXZhbC5jOjE0MDoKKyAgICAgICAgZm9yIChsZW4gPSAwOyBzICsgbGVuIDwga2V5X2Vu
+ZCAmJiBzW2xlbl0gIT0gJy4nOyBsZW4rKykgeworICAgICAgICB9Cgp0b3RhbDogMSBlcnJvcnMs
+IDAgd2FybmluZ3MsIDQ0NyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9i
+bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
+c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
+TUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA0LzI0OiBxYXBpOiBxb2JqZWN0IGlucHV0IHZp
+c2l0b3IgdmFyaWFudCBmb3IgdXNlIHdpdGgga2V5dmFsX3BhcnNlKCkuLi4KQ2hlY2tpbmcgUEFU
+Q0ggNS8yNDogdGVzdC1rZXl2YWw6IENvdmVyIHVzZSB3aXRoIHFvYmplY3QgaW5wdXQgdmlzaXRv
+ci4uLgpDaGVja2luZyBQQVRDSCA2LzI0OiBxYXBpOiBGYWN0b3Igb3V0IGNvbW1vbiBwYXJ0IG9m
+IHFvYmplY3QgaW5wdXQgdmlzaXRvciBjcmVhdGlvbi4uLgpDaGVja2luZyBQQVRDSCA3LzI0OiBx
+YXBpOiBGYWN0b3Igb3V0IGNvbW1vbiBxb2JqZWN0X2lucHV0X2dldF9rZXl2YWwoKS4uLgpDaGVj
+a2luZyBQQVRDSCA4LzI0OiBxb2JqZWN0OiBQcm9wYWdhdGUgcGFyc2UgZXJyb3JzIHRocm91Z2gg
+cW9iamVjdF9mcm9tX2pzb252KCkuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8yNDogbGlicXRlc3Q6IEZp
+eCBxbXAoKSAmIGZyaWVuZHMgdG8gYWJvcnQgb24gSlNPTiBwYXJzZSBlcnJvcnMuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMTAvMjQ6IHFqc29uOiBBYm9ydCBlYXJsaWVyIG9uIHFvYmplY3RfZnJvbV9qc29u
+ZigpIG1pc3VzZS4uLgpDaGVja2luZyBQQVRDSCAxMS8yNDogdGVzdC1xb2JqZWN0LWlucHV0LXZp
+c2l0b3I6IEFib3J0IGVhcmxpZXIgb24gYmFkIHRlc3QgaW5wdXQuLi4KQ2hlY2tpbmcgUEFUQ0gg
+MTIvMjQ6IHFvYmplY3Q6IFByb3BhZ2F0ZSBwYXJzZSBlcnJvcnMgdGhyb3VnaCBxb2JqZWN0X2Zy
+b21fanNvbigpLi4uCkNoZWNraW5nIFBBVENIIDEzLzI0OiBibG9jazogTW9yZSBkZXRhaWxlZCBz
+eW50YXggZXJyb3IgcmVwb3J0aW5nIGZvciBKU09OIGZpbGVuYW1lcy4uLgpDaGVja2luZyBQQVRD
+SCAxNC8yNDogY2hlY2stcWpzb246IFRlc3QgZXJyb3JzIGZyb20gcW9iamVjdF9mcm9tX2pzb24o
+KS4uLgpDaGVja2luZyBQQVRDSCAxNS8yNDogdGVzdC12aXNpdG9yLXNlcmlhbGl6YXRpb246IFBh
+c3MgJmVycm9yX2Fib3J0IHRvIHFvYmplY3RfZnJvbV9qc29uKCkuLi4KQ2hlY2tpbmcgUEFUQ0gg
+MTYvMjQ6IG1vbml0b3I6IEFzc2VydCBxbXBfc2NoZW1hX2pzb25bXSBpcyBzYW5lLi4uCkNoZWNr
+aW5nIFBBVENIIDE3LzI0OiB0ZXN0LXFhcGktdXRpbDogTmV3LCBjb3ZlcmluZyBxYXBpL3FhcGkt
+dXRpbC5jLi4uCkNoZWNraW5nIFBBVENIIDE4LzI0OiBxYXBpOiBOZXcgcGFyc2VfcWFwaV9uYW1l
+KCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMTkvMjQ6IGtleXZhbDogUmVzdHJpY3Qga2V5IGNvbXBvbmVu
+dHMgdG8gdmFsaWQgUUFQSSBuYW1lcy4uLgpDaGVja2luZyBQQVRDSCAyMC8yNDogcWFwaTogTmV3
+IHFvYmplY3RfaW5wdXRfdmlzaXRvcl9uZXdfc3RyKCkgZm9yIGNvbnZlbmllbmNlLi4uCkNoZWNr
+aW5nIFBBVENIIDIxLzI0OiBibG9jazogSW5pdGlhbCBpbXBsZW1lbnRhdGlvbiBvZiAtYmxvY2tk
+ZXYuLi4KQ2hlY2tpbmcgUEFUQ0ggMjIvMjQ6IHFhcGk6IEltcHJvdmUgaG93IGtleXZhbCBpbnB1
+dCB2aXNpdG9yIHJlcG9ydHMgdW5leHBlY3RlZCBkaWN0cy4uLgpDaGVja2luZyBQQVRDSCAyMy8y
+NDogZG9jcy9xYXBpLWNvZGUtZ2VuLnR4dDogQ2xhcmlmeSBuYW1pbmcgcnVsZXMuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMjQvMjQ6IGtleXZhbDogU3VwcG9ydCBsaXN0cy4uLgpFUlJPUjogc3BhY2VzIHJl
+cXVpcmVkIGFyb3VuZCB0aGF0ICctJyAoY3R4OlZ4VikKIzQ0NDogRklMRTogdXRpbC9rZXl2YWwu
+YzozNDU6CisgICAgYXNzZXJ0KCFlbHRbbmVsdC0xXSk7ICAgICAgIC8qIG5lZWQgdGhlIHNlbnRp
+bmVsIHRvIGJlIG51bGwgKi8KICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3Jz
+LCAwIHdhcm5pbmdzLCA0MjAgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJv
+YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
+b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
+IE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdp
+dGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3
+IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRj
+aGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
