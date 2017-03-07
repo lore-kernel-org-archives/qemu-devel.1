@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cl9oi-0000fP-AY
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:45:57 -0500
+	(envelope-from <armbru@redhat.com>) id 1cl9qA-0001Lg-My
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:47:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cl9oc-0005Bf-Tb
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:45:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38204)
+	(envelope-from <armbru@redhat.com>) id 1cl9q5-0005fw-S1
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:47:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46464)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cl9oc-0005BJ-OG
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:45:50 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cl9q5-0005fr-MH
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:47:21 -0500
 From: Markus Armbruster <armbru@redhat.com>
 References: <1488544368-30622-1-git-send-email-armbru@redhat.com>
-	<1488544368-30622-11-git-send-email-armbru@redhat.com>
-	<dd7a93a5-87d5-83c9-b608-8511036ac394@amsat.org>
-	<87efycduf0.fsf@dusky.pond.sub.org>
-	<1ea524b7-bc6b-553a-d548-76faf99fccbb@redhat.com>
-Date: Tue, 07 Mar 2017 08:45:46 +0100
-In-Reply-To: <1ea524b7-bc6b-553a-d548-76faf99fccbb@redhat.com> (Eric Blake's
-	message of "Mon, 6 Mar 2017 10:10:18 -0600")
-Message-ID: <87pohtil79.fsf@dusky.pond.sub.org>
+	<1488544368-30622-17-git-send-email-armbru@redhat.com>
+	<49e43891-f2cc-6ba8-5abf-09e24fde70be@amsat.org>
+Date: Tue, 07 Mar 2017 08:47:18 +0100
+In-Reply-To: <49e43891-f2cc-6ba8-5abf-09e24fde70be@amsat.org> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon, 6 Mar 2017 14:07:29
+	-0300")
+Message-ID: <87lgshil4p.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 10/28] qmp: Improve QMP dispatch error
- messages
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 16/28] qapi: Make string input and opts
+ visitor require non-null input
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,37 +31,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org
 
-Eric Blake <eblake@redhat.com> writes:
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-> On 03/05/2017 02:01 AM, Markus Armbruster wrote:
+> On 03/03/2017 09:32 AM, Markus Armbruster wrote:
+>> The string input visitor tries to cope with null input.  Null input
+>> isn't used anywhere, and isn't covered by tests.  Unsurprisingly, it
+>> doesn't fully work: start_list() crashes because it passes the input
+>> via parse_str() to strtoll() unchecked.
+>>
+>> Make string_input_visitor_new() assert its argument isn't null, and
+>> drop the code trying to deal with null input.
+>>
+>> The opts visitor crashes when you try to actually visit something with
+>> null input.  Make opts_visitor_new() assert its argument isn't null,
+>> mostly for clarity.
+>>
+>> qobject_input_visitor_new() already asserts its argument isn't null.
+>>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
 >
->>>> @@ -41,15 +41,17 @@ static QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
->>>>
->>>>          if (!strcmp(arg_name, "execute")) {
->>>>              if (qobject_type(arg_obj) != QTYPE_QSTRING) {
->>>> -                error_setg(errp, "QMP input object member '%s' expects '%s'",
->>>> -                           "execute", "string");
->>>> +                error_setg(errp,
->>>> +                           "QMP input object member '%s' must be %s",
->>>> +                           "execute", "a string");
->>>
->>> let's avoid formatting like the rest of this patch.
->>>
->
->> Since substantial other work depends on this series, it needs to go in
->> sooner rather than later.  I'm therefore *dropping* this patch from the
->> series.  We can then bikeshed^Wpolish to our heart's content without
->> holding up other work.
->
-> Agreed.
->
->> 
->> That said: what about this?
->
-> Looks better.  Do you want R-b now, or when you re-post it as an
-> official patch?
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-I'll gladly take it either way :)
+Since the series has been merged already, there's no way for me to
+record your review with the commit.  Thanks anyway!
