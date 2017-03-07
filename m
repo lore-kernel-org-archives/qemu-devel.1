@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46196)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46193)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=232365128=Paul.Durrant@citrix.com>)
-	id 1clCmN-0003w6-7L
+	id 1clCmN-0003w2-6e
 	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:55:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=232365128=Paul.Durrant@citrix.com>)
-	id 1clCmK-0002ew-4B
+	id 1clCmK-0002f6-Al
 	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:55:43 -0500
-Received: from smtp02.citrix.com ([66.165.176.63]:15103)
+Received: from smtp.citrix.com ([66.165.176.89]:55067)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
 	(envelope-from <prvs=232365128=Paul.Durrant@citrix.com>)
-	id 1clCmJ-0002eR-So
+	id 1clCmK-0002eS-4Z
 	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:55:40 -0500
 From: Paul Durrant <paul.durrant@citrix.com>
-Date: Tue, 7 Mar 2017 10:55:31 +0000
-Message-ID: <1488884134-29190-3-git-send-email-paul.durrant@citrix.com>
+Date: Tue, 7 Mar 2017 10:55:33 +0000
+Message-ID: <1488884134-29190-5-git-send-email-paul.durrant@citrix.com>
 In-Reply-To: <1488884134-29190-1-git-send-email-paul.durrant@citrix.com>
 References: <1488884134-29190-1-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 2/5] xen: rename xen_modified_memory() to
- xen_hvm_modified_memory()
+Subject: [Qemu-devel] [PATCH v4 4/5] configure: detect presence of
+ libxendevicemodel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,83 +30,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
+Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>
 
-This patch is a purely cosmetic change that avoids a name collision in
-a subsequent patch.
+This patch adds code in configure to set CONFIG_XEN_CTRL_INTERFACE_VERSION
+to a new value of 490 if libxendevicemodel is present in the build
+environment.
 
 Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 Reviewed-by: Anthony Perard <anthony.perard@citrix.com>
 ---
-Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Stefano Stabellini <sstabellini@kernel.org>
 ---
- include/exec/ram_addr.h | 4 ++--
- include/hw/xen/xen.h    | 2 +-
- xen-hvm-stub.c          | 2 +-
- xen-hvm.c               | 2 +-
- 4 files changed, 5 insertions(+), 5 deletions(-)
+ configure | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index 3e79466..8715af6 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -259,7 +259,7 @@ static inline void cpu_physical_memory_set_dirty_range(ram_addr_t start,
- 
-     rcu_read_unlock();
- 
--    xen_modified_memory(start, length);
-+    xen_hvm_modified_memory(start, length);
- }
- 
- #if !defined(_WIN32)
-@@ -313,7 +313,7 @@ static inline void cpu_physical_memory_set_dirty_lebitmap(unsigned long *bitmap,
- 
-         rcu_read_unlock();
- 
--        xen_modified_memory(start, pages << TARGET_PAGE_BITS);
-+        xen_hvm_modified_memory(start, pages << TARGET_PAGE_BITS);
-     } else {
-         uint8_t clients = tcg_enabled() ? DIRTY_CLIENTS_ALL : DIRTY_CLIENTS_NOCODE;
-         /*
-diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
-index 09c2ce5..2b1733b 100644
---- a/include/hw/xen/xen.h
-+++ b/include/hw/xen/xen.h
-@@ -43,7 +43,7 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory);
- 
- void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size,
-                    struct MemoryRegion *mr, Error **errp);
--void xen_modified_memory(ram_addr_t start, ram_addr_t length);
-+void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length);
- 
- void xen_register_framebuffer(struct MemoryRegion *mr);
- 
-diff --git a/xen-hvm-stub.c b/xen-hvm-stub.c
-index c500325..3ca6c51 100644
---- a/xen-hvm-stub.c
-+++ b/xen-hvm-stub.c
-@@ -50,7 +50,7 @@ void xen_register_framebuffer(MemoryRegion *mr)
- {
- }
- 
--void xen_modified_memory(ram_addr_t start, ram_addr_t length)
-+void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length)
- {
- }
- 
-diff --git a/xen-hvm.c b/xen-hvm.c
-index dbb8c66..edf4983 100644
---- a/xen-hvm.c
-+++ b/xen-hvm.c
-@@ -1391,7 +1391,7 @@ void xen_shutdown_fatal_error(const char *fmt, ...)
-     qemu_system_shutdown_request();
- }
- 
--void xen_modified_memory(ram_addr_t start, ram_addr_t length)
-+void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length)
- {
-     if (unlikely(xen_in_migration)) {
-         int rc;
+diff --git a/configure b/configure
+index 8e8f18d..fc1e12b 100755
+--- a/configure
++++ b/configure
+@@ -1980,6 +1980,25 @@ EOF
+   # Xen unstable
+   elif
+       cat > $TMPC <<EOF &&
++#undef XC_WANT_COMPAT_DEVICEMODEL_API
++#define __XEN_TOOLS__
++#include <xendevicemodel.h>
++int main(void) {
++  xendevicemodel_handle *xd;
++
++  xd = xendevicemodel_open(0, 0);
++  xendevicemodel_close(xd);
++
++  return 0;
++}
++EOF
++      compile_prog "" "$xen_libs $xen_stable_libs -lxendevicemodel"
++    then
++    xen_stable_libs="$xen_stable_libs -lxendevicemodel"
++    xen_ctrl_version=490
++    xen=yes
++  elif
++      cat > $TMPC <<EOF &&
+ /*
+  * If we have stable libs the we don't want the libxc compat
+  * layers, regardless of what CFLAGS we may have been given.
 -- 
 2.1.4
