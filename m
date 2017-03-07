@@ -1,18 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59148)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1clDR2-0006Wq-4n
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 06:37:45 -0500
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1clDRX-0006nu-5P
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 06:38:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1clDQz-0000Od-1u
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 06:37:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53156)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1clDQy-0000O9-Ow
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 06:37:40 -0500
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue,  7 Mar 2017 12:37:36 +0100
-Message-Id: <20170307113736.13864-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH] target-i386: defer VMEXIT to do_interrupt
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1clDRU-0000m7-4A
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 06:38:15 -0500
+Received: from [59.151.112.132] (port=49412 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1clDRT-0000jN-Bx
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 06:38:12 -0500
+References: <1488180627-18258-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Message-ID: <58BE9D7B.5070600@cn.fujitsu.com>
+Date: Tue, 7 Mar 2017 19:46:03 +0800
+MIME-Version: 1.0
+In-Reply-To: <1488180627-18258-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/3] vfio-pci: support recovery of AER non
+ fatal error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,127 +28,78 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: alexander.boettcher@genode-labs.com, alex.bennee@linaro.org
+Cc: izumi.taku@jp.fujitsu.com, alex.williamson@redhat.com, mst@redhat.com
 
-Paths through the softmmu code during code generation now need to be audited
-to check for double locking of tb_lock.  In particular, VMEXIT can take tb_lock
-through cpu_vmexit -> cpu_x86_update_cr4 -> tlb_flush.
+ping
 
-To avoid this, split VMEXIT delivery in two parts, similar to what is done with
-exceptions.  cpu_vmexit only records the VMEXIT exit code and information, and
-cc->do_interrupt can then deliver it when it is safe to take the lock.
+On 02/27/2017 03:30 PM, Cao jin wrote:
+> This is nearly new design of the feature, so re-number the verion from 0.
+> 
+> About The test:
+> Hardware problem(unsteady) still occurs like before. The test server is in
+> another country spot A, and my contact of the country located spot B, so
+> it is not quite convenient to find help(plug cable, or check the hardware).
+> So, my NIC(has 2 functions) still just has func1 connected to gateway.
+> If there is other people who has the hardware could test the patches, that
+> would be great help.
+> 
+> 
+> Basically, there are two phenomenon of unsteady hardware:
+> 1. Start vm, the hardware emit fatal error itself before I did anything,
+>    cause vm stop.
+> 2. Start vm, assign IP to func1, then ping the gateway, it will show
+>    "Destination Host Unreachable" after dozens of or hundreds of successful
+>    ping, and guest dmesg shows nothing abnormal.  I think this phenomenon is
+>    the *strong evidence* of saying unsteady hardware, I speculate that
+>    the cable has problem.
+> 
+>    on the opposite, I also saw perfect result 2 times in my numerous tests,
+>    which just assign func1 while func0 has no user. It can ping several housrs(
+>    more than 15000 times ping) withtout any problem, during the period, inject
+>    non fatal error to func0 & func1, error recovery is very good.
+> 
+>    So, most of time, I must do the test quickly before the hardware goes crazy,
+>    until get what I expected.
+> 
+> 
+> Test:
+> scenario 1: assign func1 to vm while func0 has no user.
+> scenario 2: assign both functions to 1 vm, with the same topology as host.
+> scenario 3: assign both functions to 1 vm, under different bus.
+> scenario 4: assign each function to a separate vm.
+> 
+> the steps is: assign IP to func1, ping the gateway, inject non fatal error to
+> both functions, see if func1 still can ping after recovery.
+> 
+> Although we don't have cable for func0, but in the test like scenario 4,
+> inject to func0, it doesn't affect func1's recovery, so I think it can prove
+> that one function's recovery doesn't affect another.
+> 
+> 
+> Extra info FYI:
+> 1. During the test, some debug lines are added in vfio_err_notifier_handler,
+>    read the uncor status register in this function when fatal error occured,
+>    it shows all F's every time.
+> 2. Based on the v10 patch & the corresponding kernel part, modified as
+>    comments: revert the eventfd handling(don't signal uncor status), and
+>    guest link reset will induce the host link reset. The test result shows:
+>    non fatal error recovery is good; fatal error recovery has same result
+>    with what Alex find before(guest kernel crash), because guest device
+>    driver's error_detected() access the MMIO registers, get all F's.
+> 
+> 
+> Cao jin (3):
+>   pcie aer: verify if AER functionality is available
+>   vfio pci: new function to init AER capability
+>   vfio-pci: process non fatal error of AER
+> 
+>  hw/pci/pcie_aer.c          |  28 +++++++
+>  hw/vfio/pci.c              | 180 +++++++++++++++++++++++++++++++++++++++++++--
+>  hw/vfio/pci.h              |   3 +
+>  linux-headers/linux/vfio.h |   1 +
+>  4 files changed, 207 insertions(+), 5 deletions(-)
+> 
 
-Reported-by: Alexander Boettcher <alexander.boettcher@genode-labs.com>
-Suggested-by: Richard Henderson <rth@twiddle.net>
-Tested-by: Alexander Boettcher <alexander.boettcher@genode-labs.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- target/i386/cpu.h        |  2 ++
- target/i386/seg_helper.c | 20 +++++++++++---------
- target/i386/svm_helper.c | 22 +++++++++++++---------
- 3 files changed, 26 insertions(+), 18 deletions(-)
-
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index ac2ad6d..40a6ff7 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -694,6 +694,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
- 
- #define EXCP_SYSCALL    0x100 /* only happens in user only emulation
-                                  for syscall instruction */
-+#define EXCP_VMEXIT     0x100
- 
- /* i386-specific interrupt pending bits.  */
- #define CPU_INTERRUPT_POLL      CPU_INTERRUPT_TGT_EXT_1
-@@ -1629,6 +1630,7 @@ void cpu_svm_check_intercept_param(CPUX86State *env1, uint32_t type,
-                                    uint64_t param, uintptr_t retaddr);
- void cpu_vmexit(CPUX86State *nenv, uint32_t exit_code, uint64_t exit_info_1,
-                 uintptr_t retaddr);
-+void do_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1);
- 
- /* seg_helper.c */
- void do_interrupt_x86_hardirq(CPUX86State *env, int intno, int is_hw);
-diff --git a/target/i386/seg_helper.c b/target/i386/seg_helper.c
-index 5c845dc..0374031 100644
---- a/target/i386/seg_helper.c
-+++ b/target/i386/seg_helper.c
-@@ -1297,15 +1297,17 @@ void x86_cpu_do_interrupt(CPUState *cs)
-     /* successfully delivered */
-     env->old_exception = -1;
- #else
--    /* simulate a real cpu exception. On i386, it can
--       trigger new exceptions, but we do not handle
--       double or triple faults yet. */
--    do_interrupt_all(cpu, cs->exception_index,
--                     env->exception_is_int,
--                     env->error_code,
--                     env->exception_next_eip, 0);
--    /* successfully delivered */
--    env->old_exception = -1;
-+    if (cs->exception_index >= EXCP_VMEXIT) {
-+        assert(env->old_exception == -1);
-+        do_vmexit(env, cs->exception_index - EXCP_VMEXIT, env->error_code);
-+    } else {
-+        do_interrupt_all(cpu, cs->exception_index,
-+                         env->exception_is_int,
-+                         env->error_code,
-+                         env->exception_next_eip, 0);
-+        /* successfully delivered */
-+        env->old_exception = -1;
-+    }
- #endif
- }
- 
-diff --git a/target/i386/svm_helper.c b/target/i386/svm_helper.c
-index 78d8df4..59e8b50 100644
---- a/target/i386/svm_helper.c
-+++ b/target/i386/svm_helper.c
-@@ -580,12 +580,10 @@ void helper_svm_check_io(CPUX86State *env, uint32_t port, uint32_t param,
-     }
- }
- 
--/* Note: currently only 32 bits of exit_code are used */
- void cpu_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1,
-                 uintptr_t retaddr)
- {
-     CPUState *cs = CPU(x86_env_get_cpu(env));
--    uint32_t int_ctl;
- 
-     if (retaddr) {
-         cpu_restore_state(cs, retaddr);
-@@ -598,6 +596,19 @@ void cpu_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1,
-                                                    control.exit_info_2)),
-                   env->eip);
- 
-+    cs->exception_index = EXCP_VMEXIT + exit_code;
-+    env->error_code = exit_info_1;
-+
-+    /* remove any pending exception */
-+    env->old_exception = -1;
-+    cpu_loop_exit(cs);
-+}
-+
-+void do_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1)
-+{
-+    CPUState *cs = CPU(x86_env_get_cpu(env));
-+    uint32_t int_ctl;
-+
-     if (env->hflags & HF_INHIBIT_IRQ_MASK) {
-         x86_stl_phys(cs,
-                  env->vm_vmcb + offsetof(struct vmcb, control.int_state),
-@@ -759,13 +770,6 @@ void cpu_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1,
-     /* If the host's rIP reloaded by #VMEXIT is outside the limit of the
-        host's code segment or non-canonical (in the case of long mode), a
-        #GP fault is delivered inside the host. */
--
--    /* remove any pending exception */
--    cs->exception_index = -1;
--    env->error_code = 0;
--    env->old_exception = -1;
--
--    cpu_loop_exit(cs);
- }
- 
- #endif
 -- 
-2.9.3
+Sincerely,
+Cao jin
