@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50032)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1clG8h-0005hP-36
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 09:31:00 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1clG8i-0005hR-4F
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 09:31:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1clG8a-0004dG-Uk
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 09:30:59 -0500
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:35339)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1clG8a-0004cx-Mv
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 09:30:52 -0500
-Received: by mail-wr0-x234.google.com with SMTP id g10so2606687wrg.2
-	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 06:30:52 -0800 (PST)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1clG8g-0004hg-U7
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 09:31:00 -0500
+References: <1484884080-28836-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1484884080-28836-6-git-send-email-zhang.zhanghailiang@huawei.com>
+	<20170227173720.GJ10201@stefanha-x1.localdomain>
+From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Message-ID: <58BEC406.1050903@huawei.com>
+Date: Tue, 7 Mar 2017 22:30:30 +0800
 MIME-Version: 1.0
-In-Reply-To: <1488871237-12332-1-git-send-email-armbru@redhat.com>
-References: <1488871237-12332-1-git-send-email-armbru@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 7 Mar 2017 14:30:30 +0000
-Message-ID: <CAFEAcA-SBSz5M_GDEQhqvb+=5WprkwURKb_sY2M9VewJJ+N1Zw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL v3 00/24] block: Command line option
- -blockdev
+In-Reply-To: <20170227173720.GJ10201@stefanha-x1.localdomain>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 5/6] replication: Implement block
+ replication for shared disk case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +25,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, xiecl.fnst@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, wencongyang2@huawei.com
 
-On 7 March 2017 at 07:20, Markus Armbruster <armbru@redhat.com> wrote:
-> Actually, the command line option is the least part of this series.
-> Its bulk is about building infrastructure and getting errors out of
-> the JSON parser.
+Hi Stefan,
+
+Sorry for the delayed reply.
+
+On 2017/2/28 1:37, Stefan Hajnoczi wrote:
+> On Fri, Jan 20, 2017 at 11:47:59AM +0800, zhanghailiang wrote:
+>> Just as the scenario of non-shared disk block replication,
+>> we are going to implement block replication from many basic
+>> blocks that are already in QEMU.
+>> The architecture is:
+>>
+>>           virtio-blk                     ||                               .----------
+>>               /                          ||                               | Secondary
+>>              /                           ||                               '----------
+>>             /                            ||                                 virtio-blk
+>>            /                             ||                                      |
+>>            |                             ||                               replication(5)
+>>            |                    NBD  -------->   NBD   (2)                       |
+>>            |                  client     ||    server ---> hidden disk <-- active disk(4)
+>>            |                     ^       ||                      |
+>>            |              replication(1) ||                      |
+>>            |                     |       ||                      |
+>>            |   +-----------------'       ||                      |
+>>           (3)  |drive-backup sync=none   ||                      |
+>> --------. |   +-----------------+       ||                      |
+>> Primary | |                     |       ||           backing    |
+>> --------' |                     |       ||                      |
+>>            V                     |                               |
+>>         +-------------------------------------------+            |
+>>         |               shared disk                 | <----------+
+>>         +-------------------------------------------+
+>>
+>>      1) Primary writes will read original data and forward it to Secondary
+>>         QEMU.
+>>      2) The hidden-disk is created automatically. It buffers the original content
+>>         that is modified by the primary VM. It should also be an empty disk, and
+>>         the driver supports bdrv_make_empty() and backing file.
+>>      3) Primary write requests will be written to Shared disk.
+>>      4) Secondary write requests will be buffered in the active disk and it
+>>         will overwrite the existing sector content in the buffer.
+>>
+>> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+>> Signed-off-by: Wen Congyang <wency@cn.fujitsu.com>
+>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 >
-> The design of the command line interface was discussed here:
-> Subject: Non-flat command line option argument syntax
-> Message-ID: <87bmukmlau.fsf@dusky.pond.sub.org>
-> https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg00555.html
+> Are there any restrictions on the shared disk?  For example the -drive
+> cache= mode must be 'none'.  If the cache mode isn't 'none' the
+> secondary host might have old data in the host page cache.  The
+
+While do checkpoint, we will call vm_stop(), in which, the bdrv_flush_all()
+will be called, is it enough ?
+
+> Secondary QEMU would have an inconsistent view of the shared disk.
 >
-> v3: A few commit messages touched up, code unchanged
+> Are image file formats like qcow2 supported for the shared disk?  Extra
+
+In the above scenario, it has no limitation of formats for the shared disk.
+
+> steps are required to achieve consistency, see bdrv_invalidate_cache().
 >
-> The following changes since commit fbddc2e5608eb655493253d080598375db61a748:
+
+Hmm, in that case, we should call bdrv_invalidate_cache_all() while checkpoint.
+
+
+Thanks,
+Hailiang
+
+> Stefan
 >
->   Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2017-02-28' into staging (2017-03-06 10:18:33 +0000)
->
-> are available in the git repository at:
->
->   git://repo.or.cz/qemu/armbru.git tags/pull-block-2017-02-28-v3
->
-> for you to fetch changes up to de479f01438d974100ac9ec10ab82c2ee1ad124f:
->
->   keyval: Support lists (2017-03-07 08:15:18 +0100)
-
-The clang sanitizer has a complaint about your new test:
-
-  GTESTER tests/test-keyval
-/home/petmay01/linaro/qemu-for-merges/util/keyval.c:129:15: runtime
-error: member access within null pointer of type 'QString' (aka
-'struct QString')
-
-which is the line:
-        new = QOBJECT(value) ?: QOBJECT(qdict_new());
-
-This is because QOBJECT is defined as:
-
-#define QOBJECT(obj) (&(obj)->base)
-
-and so it doesn't have the "if you pass in NULL you get NULL"
-semantics that OBJECT() and all the QOM object typecast
-macros do.
-
-(As an aside, it's rather confusing to have a QObject
-whose header claims it's part of the "QEMU Object Model"
-which is completely different from the QOM Object...)
-
-thanks
--- PMM
