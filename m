@@ -1,39 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1cl9JQ-0000Le-Nl
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:13:37 -0500
+	(envelope-from <armbru@redhat.com>) id 1cl9QK-0001XM-9R
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:20:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1cl9JM-0004Px-LX
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:13:36 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53089)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haoqf@linux.vnet.ibm.com>)
-	id 1cl9JM-0004Pf-Bb
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:13:32 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v277CmYL100347
-	for <qemu-devel@nongnu.org>; Tue, 7 Mar 2017 02:13:30 -0500
-Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 291dchmq3s-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 02:13:30 -0500
-Received: from localhost
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <haoqf@linux.vnet.ibm.com>;
-	Tue, 7 Mar 2017 00:13:28 -0700
-References: <20170307025328.53409-1-haoqf@linux.vnet.ibm.com>
-	<20170307063738.GB29283@lemon.lan>
-From: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-Date: Tue, 7 Mar 2017 15:12:59 +0800
-MIME-Version: 1.0
-In-Reply-To: <20170307063738.GB29283@lemon.lan>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Message-Id: <d1b8e0a0-be1c-9a57-33f5-1b8886e7d263@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC 0/1] vmstate: fix the failed iotests
- case 68 and 91
+	(envelope-from <armbru@redhat.com>) id 1cl9QH-00067h-3S
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:20:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42552)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cl9QG-00067G-TR
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:20:41 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C1DE476E0
+	for <qemu-devel@nongnu.org>; Tue,  7 Mar 2017 07:20:40 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
+	[10.36.116.55])
+	by int-mx09.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v277Kdma016827
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=NO)
+	for <qemu-devel@nongnu.org>; Tue, 7 Mar 2017 02:20:40 -0500
+From: Markus Armbruster <armbru@redhat.com>
+Date: Tue,  7 Mar 2017 08:20:14 +0100
+Message-Id: <1488871237-12332-2-git-send-email-armbru@redhat.com>
+In-Reply-To: <1488871237-12332-1-git-send-email-armbru@redhat.com>
+References: <1488871237-12332-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PULL v3 01/24] test-qemu-opts: Cover
+ qemu_opts_parse() of "no"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,86 +37,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com, pasic@linux.vnet.ibm.com, liujbjl@linux.vnet.ibm.com, kwolf@redhat.com, mreitz@redhat.com
+To: qemu-devel@nongnu.org
 
+qemu_opts_parse() interprets "no" as negated empty key.  Consistent
+with its acceptance of empty keys elsewhere, whatever that's worth.
 
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Message-Id: <1488317230-26248-2-git-send-email-armbru@redhat.com>
+---
+ tests/test-qemu-opts.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-=E5=9C=A8 2017/3/7 14:37, Fam Zheng =E5=86=99=E9=81=93:
-> On Tue, 03/07 03:53, QingFeng Hao wrote:
->> Hi All,
->> I am not sure if the fix is correct because I am not very clear about =
-the
->> logic in vmstate.c. From my test, once size=3D0, the iotests case 68 f=
-ailed
->> due to the assert. So just send this draft patch for your comments!
->> The patch is based on commit 17783ac828a "Merge remote-tracking branch
->> 'remotes/dgibson/tags/ppc-for-2.9-20170303' into staging".
-> I cannot reproduce the failure on either 17783ac828a or current head
-> 56b51708e9e. Both passes for me. I wonder where do you get the size=3D0.
-The error happens when running "savevm 0" in case 068. It can be=20
-manually reproduced
-by "./check -qcow2 68" or "./s390x-softmmu/qemu-system-s390x -nodefaults =
-\
--machine accel=3Dqtest -no-shutdown -nographic -monitor stdio -serial non=
-e \
--hda /home/mc/gitcheck/work/qemu-master/tree/qemu/tests/t.img.bak", then=20
-type
-"savevm 0".  t.img.bak is the backup image for t.img generated by 068.
-
-I added the print in vmstate_save_state:
-    QJSON *vmdesc_loop =3D vmdesc;
-+ error_report("haoqf:%s:opaque:%p, offset:%lx, size:%d, field name:%s,=20
-vname:%s\n", __FUNCTION__, opaque, field->offset, size, field->name,=20
-vmsd->name);
-
-And here is the test log:
-haoqf:vmstate_save_state:opaque:0x2aa5a5715c0, offset:122e1, size:1,=20
-field name:env.sigp_order, vname:cpu
-
-haoqf:vmstate_size: field size:4, offset:0
-
-haoqf:vmstate_save_state:opaque:0x2aa5a5715c0, offset:12300, size:4,=20
-field name:irqstate_saved_size, vname:cpu
-
-haoqf:vmstate_size: field size:0, offset:74496
-
-haoqf:vmstate_size: calculated size:0
-
-haoqf:vmstate_save_state:opaque:0x2aa5a5715c0, offset:122f8, size:0,=20
-field name:irqstate, vname:cpu
-
-haoqf:vmstate_save_state:firstelem:(nil), elements: 1
-
-qemu-system-s390x: ../migration/vmstate.c:336: vmstate_save_state:=20
-Assertion `first_elem || !n_elems' failed.
-Aborted (core dumped)
-
-I also did the test for x86 with: "./x86_64-softmmu/qemu-system-x86_64=20
--nodefaults \
--machine accel=3Dqtest -no-shutdown -nographic -monitor stdio -serial non=
-e \
--hda /home/mc/gitcheck/work/qemu-master/tree/qemu/tests/t.img.bak",
-and then ran "savevm 0", but it didn't core and the size are all non-zero=
-:
-haoqf:vmstate_save calling vmstate_save_state:
-
-haoqf:vmstate_size: field size:4, offset:0
-
-haoqf:vmstate_save_state:opaque:0x2aa13325438, offset:4, size:4, field=20
-name:size, vname:globalstate
-
-haoqf:vmstate_size: field size:100, offset:0
-
-haoqf:vmstate_save_state:opaque:0x2aa13325438, offset:8, size:100, field=20
-name:runstate, vname:globalstate
-
-haoqf:vmstate_save:called vmstate_save_state
-
-So probably x86 doesn't have this problem.
-> Fam
->
-
---=20
-Regards
-QingFeng Hao
+diff --git a/tests/test-qemu-opts.c b/tests/test-qemu-opts.c
+index c46ef31..f6310b3 100644
+--- a/tests/test-qemu-opts.c
++++ b/tests/test-qemu-opts.c
+@@ -532,6 +532,11 @@ static void test_opts_parse(void)
+     g_assert_cmpstr(qemu_opt_get(opts, "aus"), ==, "off");
+     g_assert_cmpstr(qemu_opt_get(opts, "noaus"), ==, "");
+ 
++    /* Implied value, negated empty key */
++    opts = qemu_opts_parse(&opts_list_03, "no", false, &error_abort);
++    g_assert_cmpuint(opts_count(opts), ==, 1);
++    g_assert_cmpstr(qemu_opt_get(opts, ""), ==, "off");
++
+     /* Implied key */
+     opts = qemu_opts_parse(&opts_list_03, "an,noaus,noaus=", true,
+                            &error_abort);
+-- 
+2.7.4
