@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1clAIk-0008Fw-TB
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 03:17:00 -0500
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1clALV-0000XK-Es
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 03:19:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1clAIh-0004Le-Jv
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 03:16:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48402)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1clAIh-0004LZ-BX
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 03:16:55 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170303185427.32681-1-jsnow@redhat.com>
-	<CAMr-obuiwE_ef6OPSJbBtmZYsaqo_mzU9E6q8zhbrviZ6_=krQ@mail.gmail.com>
-	<5303cac4-a8d8-bf89-b525-3b0fb1b19127@redhat.com>
-	<CAMr-obsrUqvqbLabYgKgv1J+ztn5XCwto6LowoN=S0ZWuFLZMA@mail.gmail.com>
-	<871sua4y3u.fsf@dusky.pond.sub.org>
-	<3fbdfabf-82b4-d774-d5f4-2c50a6d740dc@redhat.com>
-Date: Tue, 07 Mar 2017 09:16:52 +0100
-In-Reply-To: <3fbdfabf-82b4-d774-d5f4-2c50a6d740dc@redhat.com> (John Snow's
-	message of "Mon, 6 Mar 2017 12:56:45 -0500")
-Message-ID: <87efy9ijrf.fsf@dusky.pond.sub.org>
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1clALS-0004qT-9P
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 03:19:49 -0500
+Received: from [59.151.112.132] (port=22791 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1clALR-0004p6-5w
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 03:19:46 -0500
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Date: Tue, 7 Mar 2017 16:27:37 +0800
+Message-ID: <1488875257-7870-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+In-Reply-To: <1488011202-32121-2-git-send-email-caoj.fnst@cn.fujitsu.com>
+References: <1488011202-32121-2-git-send-email-caoj.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2] qmp-shell: add persistent command
- history
+Subject: [Qemu-devel] [PATCH v10] msix: rename and create a wrapper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,141 +25,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Nir Soffer <nirsof@gmail.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Alex Williamson <alex.williamson@redhat.com>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S.
+	Tsirkin" <mst@redhat.com>
 
-John Snow <jsnow@redhat.com> writes:
+Rename msix_init to msix_validate_and_init which doesn't assert;
+New a wrapper msix_init to assert programming error.
 
-> On 03/06/2017 03:18 AM, Markus Armbruster wrote:
->> Nir Soffer <nirsof@gmail.com> writes:
->> 
->>> On Fri, Mar 3, 2017 at 9:29 PM, John Snow <jsnow@redhat.com> wrote:
->>>>
->>>>
->>>> On 03/03/2017 02:26 PM, Nir Soffer wrote:
->>>>> On Fri, Mar 3, 2017 at 8:54 PM, John Snow <jsnow@redhat.com> wrote:
->>>>>> Use the existing readline history function we are utilizing
->>>>>> to provide persistent command history across instances of qmp-shell.
->>>>>>
->>>>>> This assists entering debug commands across sessions that may be
->>>>>> interrupted by QEMU sessions terminating, where the qmp-shell has
->>>>>> to be relaunched.
->>>>>>
->>>>>> Signed-off-by: John Snow <jsnow@redhat.com>
->>>>>> ---
->>>>>>
->>>>>> v2: Adjusted the errors to whine about non-ENOENT errors, but still
->>>>>>     intercept all errors as non-fatal.
->>>>>>     Save history atexit() to match bash standard behavior
->>>>>>
->>>>>>  scripts/qmp/qmp-shell | 19 +++++++++++++++++++
->>>>>>  1 file changed, 19 insertions(+)
->>>>>>
->>>>>> diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
->>>>>> index 0373b24..55a8285 100755
->>>>>> --- a/scripts/qmp/qmp-shell
->>>>>> +++ b/scripts/qmp/qmp-shell
->>>>>> @@ -70,6 +70,9 @@ import json
->>>>>>  import ast
->>>>>>  import readline
->>>>>>  import sys
->>>>>> +import os
->>>>>> +import errno
->>>>>> +import atexit
->>>>>>
->>>>>>  class QMPCompleter(list):
->>>>>>      def complete(self, text, state):
->>>>>> @@ -109,6 +112,7 @@ class QMPShell(qmp.QEMUMonitorProtocol):
->>>>>>          self._pretty = pretty
->>>>>>          self._transmode = False
->>>>>>          self._actions = list()
->>>>>> +        self._histfile = os.path.join(os.path.expanduser('~'), '.qmp_history')
->> 
->> I selfishly object to this filename, because I'm using it with
->> 
->>     $ socat UNIX:/work/armbru/images/test-qmp READLINE,history=$HOME/.qmp_history,prompt='QMP> '
->> 
->> Just kidding.  But seriously, shouldn't this be named after the
->> *application* (qmp-shell) rather than the protocol (qmp)?
->> 
->
-> Seeing as the history itself is the qmp-shell syntax, you are correct.
->
-> (Hey, it would be interesting to store the generated QMP into the
-> qmp_history, though...!)
+CC: Alex Williamson <alex.williamson@redhat.com>
+CC: Markus Armbruster <armbru@redhat.com>
+CC: Marcel Apfelbaum <marcel@redhat.com>
+CC: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+---
+revert the modification in msix_init_exclusive_bar()
 
-Hah!  Saving it would be easy enough, but reloading it...  okay, call it
-a "backup" and declare victory when saving works.
+ hw/pci/msix.c         | 23 ++++++++++++++++++-----
+ hw/vfio/pci.c         | 12 ++++++------
+ include/hw/pci/msix.h |  5 +++++
+ 3 files changed, 29 insertions(+), 11 deletions(-)
 
->>>>>>
->>>>>>      def __get_address(self, arg):
->>>>>>          """
->>>>>> @@ -137,6 +141,21 @@ class QMPShell(qmp.QEMUMonitorProtocol):
->>>>>>          # XXX: default delimiters conflict with some command names (eg. query-),
->>>>>>          # clearing everything as it doesn't seem to matter
->>>>>>          readline.set_completer_delims('')
->>>>>> +        try:
->>>>>> +            readline.read_history_file(self._histfile)
->>>>>> +        except Exception as e:
->>>>>> +            if isinstance(e, IOError) and e.errno == errno.ENOENT:
->>>>>> +                # File not found. No problem.
->>>>>> +                pass
->>>>>> +            else:
->>>>>> +                print "Failed to read history '%s'; %s" % (self._histfile, e)
->>>>>
->>>>> I would handle only IOError, since any other error means a bug in this code
->>>>> or in the underlying readline library, and the best way to handle this is to
->>>>> let it fail loudly.
->>>>>
->>>>
->>>> Disagree. No reason to stop the shell from working because a QOL feature
->>>> didn't initialize correctly.
->>>>
->>>> The warning will be enough to solicit reports and fixes if necessary.
->>>
->>> I agree, the current solution is good tradeoff.
->> 
->> For what it's worth, bash seems to silently ignore a history file it
->> can't read.  Tested by running "HISTFILE=xxx bash", then chmod 0 xxx, da
->> capo.
->> 
->
-> Right, done by example.
->
->>> One thing missing, is a call to readline.set_history_length, without
->>> it the history
->>> will grow without limit, see:
->>> https://docs.python.org/2/library/readline.html#readline.set_history_length
->> 
->> Should this be addressed for 2.9?
->> 
->
-> You can add a limit if you want to; I don't have suggestions for which
-> completely arbitrary limit makes sense, so I left it blank intentionally.
-
-For what it's worth, bash defaults HISTSIZE to 500.
-
-GNU Readline lets users configure it in ~/.inputrc.  Conditional
-configuration is possible, i.e. something like
-
-    $if Qmp-shell
-    set history-size 5000
-    $endif
-
-should work, provided qmp-shell sets rl_readline_name as it should.
-
->>>>>> +        atexit.register(self.__save_history)
->>>>>> +
->>>>>> +    def __save_history(self):
->>>>>> +        try:
->>>>>> +            readline.write_history_file(self._histfile)
->>>>>> +        except Exception as e:
->>>>>> +            print "Failed to save history file '%s'; %s" % (self._histfile, e)
->>>>>>
->>>>>>      def __parse_value(self, val):
->>>>>>          try:
->>>>>
->>>>> But I think this is good enough and useful as is.
->>>>>
->>>>> Reviewed-by: Nir Soffer <nirsof@gmail.com>
->>>>>
+diff --git a/hw/pci/msix.c b/hw/pci/msix.c
+index bb54e8b0ac37..02697de32dfc 100644
+--- a/hw/pci/msix.c
++++ b/hw/pci/msix.c
+@@ -239,6 +239,19 @@ static void msix_mask_all(struct PCIDevice *dev, unsigned nentries)
+     }
+ }
+ 
++/* Just a wrapper to check the return value */
++int msix_init(struct PCIDevice *dev, unsigned short nentries,
++              MemoryRegion *table_bar, uint8_t table_bar_nr,
++              unsigned table_offset, MemoryRegion *pba_bar,
++              uint8_t pba_bar_nr, unsigned pba_offset, uint8_t cap_pos,
++              Error **errp)
++{
++    int ret = msix_validate_and_init(dev, nentries, table_bar, table_bar_nr,
++            table_offset, pba_bar, pba_bar_nr, pba_offset, cap_pos, errp);
++
++    assert(ret != -EINVAL);
++    return ret;
++}
+ /*
+  * Make PCI device @dev MSI-X capable
+  * @nentries is the max number of MSI-X vectors that the device support.
+@@ -259,11 +272,11 @@ static void msix_mask_all(struct PCIDevice *dev, unsigned nentries)
+  * also means a programming error, except device assignment, which can check
+  * if a real HW is broken.
+  */
+-int msix_init(struct PCIDevice *dev, unsigned short nentries,
+-              MemoryRegion *table_bar, uint8_t table_bar_nr,
+-              unsigned table_offset, MemoryRegion *pba_bar,
+-              uint8_t pba_bar_nr, unsigned pba_offset, uint8_t cap_pos,
+-              Error **errp)
++int msix_validate_and_init(struct PCIDevice *dev, unsigned short nentries,
++                           MemoryRegion *table_bar, uint8_t table_bar_nr,
++                           unsigned table_offset, MemoryRegion *pba_bar,
++                           uint8_t pba_bar_nr, unsigned pba_offset,
++                           uint8_t cap_pos, Error **errp)
+ {
+     int cap;
+     unsigned table_size, pba_size;
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 332f41d6627f..06828b537a75 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -1436,12 +1436,12 @@ static int vfio_msix_setup(VFIOPCIDevice *vdev, int pos, Error **errp)
+ 
+     vdev->msix->pending = g_malloc0(BITS_TO_LONGS(vdev->msix->entries) *
+                                     sizeof(unsigned long));
+-    ret = msix_init(&vdev->pdev, vdev->msix->entries,
+-                    vdev->bars[vdev->msix->table_bar].region.mem,
+-                    vdev->msix->table_bar, vdev->msix->table_offset,
+-                    vdev->bars[vdev->msix->pba_bar].region.mem,
+-                    vdev->msix->pba_bar, vdev->msix->pba_offset, pos,
+-                    &err);
++    ret = msix_validate_and_init(&vdev->pdev, vdev->msix->entries,
++                             vdev->bars[vdev->msix->table_bar].region.mem,
++                             vdev->msix->table_bar, vdev->msix->table_offset,
++                             vdev->bars[vdev->msix->pba_bar].region.mem,
++                             vdev->msix->pba_bar, vdev->msix->pba_offset, pos,
++                             &err);
+     if (ret < 0) {
+         if (ret == -ENOTSUP) {
+             error_report_err(err);
+diff --git a/include/hw/pci/msix.h b/include/hw/pci/msix.h
+index 1f27658d352f..815e59bc96f3 100644
+--- a/include/hw/pci/msix.h
++++ b/include/hw/pci/msix.h
+@@ -11,6 +11,11 @@ int msix_init(PCIDevice *dev, unsigned short nentries,
+               unsigned table_offset, MemoryRegion *pba_bar,
+               uint8_t pba_bar_nr, unsigned pba_offset, uint8_t cap_pos,
+               Error **errp);
++int msix_validate_and_init(PCIDevice *dev, unsigned short nentries,
++                           MemoryRegion *table_bar, uint8_t table_bar_nr,
++                           unsigned table_offset, MemoryRegion *pba_bar,
++                           uint8_t pba_bar_nr, unsigned pba_offset,
++                           uint8_t cap_pos, Error **errp);
+ int msix_init_exclusive_bar(PCIDevice *dev, unsigned short nentries,
+                             uint8_t bar_nr, Error **errp);
+ 
+-- 
+2.1.0
