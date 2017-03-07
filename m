@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1clEzf-0007DL-GV
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 08:17:36 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1clFLv-0001eZ-VQ
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 08:40:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1clEzc-00040l-6M
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 08:17:35 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58391)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1clEzb-00040E-Sf
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 08:17:32 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v27DDZBi145024
-	for <qemu-devel@nongnu.org>; Tue, 7 Mar 2017 08:17:30 -0500
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 291w62he03-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 08:17:30 -0500
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Tue, 7 Mar 2017 13:17:27 -0000
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Tue,  7 Mar 2017 14:16:50 +0100
-Message-Id: <20170307131650.90167-1-pasic@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 1/1] virtio-blk: fix race on guest notifiers
+	(envelope-from <alex.bennee@linaro.org>) id 1clFLt-00062X-Bs
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 08:40:36 -0500
+Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:35888)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1clFLt-00062L-5K
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 08:40:33 -0500
+Received: by mail-wr0-x230.google.com with SMTP id u108so1518176wrb.3
+	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 05:40:32 -0800 (PST)
+References: <20170306112848.659-1-alex.bennee@linaro.org>
+	<20170307103744.GA6117@lemon.lan>
+	<6e49aedc-acab-44fb-a4b5-94e51117da2c@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <6e49aedc-acab-44fb-a4b5-94e51117da2c@amsat.org>
+Date: Tue, 07 Mar 2017 13:40:39 +0000
+Message-ID: <87efy9i4rs.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] docker/dockerfiles/debian-s390-cross:
+ include clang
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,58 +32,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-stable@nongnu.org
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 
-The commits 03de2f527 "virtio-blk: do not use vring in dataplane"  and
-9ffe337c08 "virtio-blk: always use dataplane path if ioeventfd is active"
-changed how notifications are done for virtio-blk substantially. Due to a
-race condition, interrupts are lost when irqfd behind the guest notifier
-is torn down after notify_guest_bh was scheduled but before it actually
-runs.
 
-Let's fix this by forcing guest notifications before cleaning up the
-irqfd's. Let's also add some explanatory comments.
+Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
 
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-Reported-by: Michael A. Tebolt <miket@us.ibm.com>
-Tested-by: Michael A. Tebolt <miket@us.ibm.com>
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
----
+> Hi Alex, Fam.
+>
+> I tested this way but got an error:
+>
+> qemu (docker_alex)$ make docker-test-clang@debian-s390x-cross
+>   BUILD   debian-s390x-cross
+> make[1]: Entering directory 'qemu'
+>   ARCHIVE qemu.tgz
+>   ARCHIVE dtc.tgz
+>   ARCHIVE pixman.tgz
+>   COPY    RUNNER
+>     RUN test-clang in qemu:debian-s390x-cross
+> Prerequisite 'clang' not present, skip
+> make[1]: Leaving directory 'qemu'
+>
+> am I missing something? like a FEATURES/clang.tgz?
+>
+> qemu (docker_alex)$ docker run qemu:debian-s390x-cross which clang
+> /usr/bin/clang
+>
+> On 03/07/2017 07:37 AM, Fam Zheng wrote:
+>> On Mon, 03/06 11:28, Alex Bennée wrote:
+>>> It's a silly little limitation on Shippable that is looks for clang
+>>> in the container even though we won't use it. The arm/aarch64 cross
 
-This patch withstood the test case which discovered the problem
-for several days (as reported by Michale Tebolt).
+The clang is only to keep shippable happy. It scans for compilers
+despite the fact our actual build is using the cross-compiler. AFAIK
+Debian don't package cross-built versions of clang. It would be nice if
+they did by currently all our cross-build containers use GCC.
 
-v1 --> v2:
-* Fixed typo pointed out by Connie
-* Added Tested-by
+>>> builds inherit this from debian.docker but as we needed to use
+>>> debian-testing for this we add it here. We also collapse the update
+>>> step into one RUN line to remove and intermediate layer of the docker
+>>> build.
+>>>
+>>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>>> ---
+>>>  tests/docker/dockerfiles/debian-s390x-cross.docker | 4 ++--
+>>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/tests/docker/dockerfiles/debian-s390x-cross.docker b/tests/docker/dockerfiles/debian-s390x-cross.docker
+>>> index bbb21ed088..3a687feda0 100644
+>>> --- a/tests/docker/dockerfiles/debian-s390x-cross.docker
+>>> +++ b/tests/docker/dockerfiles/debian-s390x-cross.docker
+>>> @@ -13,8 +13,8 @@ RUN cat /etc/apt/sources.list | sed "s/deb/deb-src/" >> /etc/apt/sources.list
+>>>  RUN dpkg --add-architecture s390x
+>>>
+>>>  # Grab the updated list of packages
+>>> -RUN apt update
+>>> -RUN apt dist-upgrade -yy
+>>> +RUN apt update && apt dist-upgrade -yy
+>
+> ^ good!
+>
+>>> +RUN apt install -yy build-essential clang
+>>>  RUN apt-get build-dep -yy -a s390x qemu || apt-get -f install
+>>>  RUN apt install -yy gcc-multilib-s390x-linux-gnu binutils-multiarch
+>>>
+>>> --
+>>> 2.11.0
+>>>
+>>
+>> Looks sane. Is this for 2.9?
+>>
+>> Fam
+>>
 
----
- hw/block/dataplane/virtio-blk.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/hw/block/dataplane/virtio-blk.c b/hw/block/dataplane/virtio-blk.c
-index 5556f0e..045a580 100644
---- a/hw/block/dataplane/virtio-blk.c
-+++ b/hw/block/dataplane/virtio-blk.c
-@@ -258,9 +258,16 @@ void virtio_blk_data_plane_stop(VirtIODevice *vdev)
-         virtio_queue_aio_set_host_notifier_handler(vq, s->ctx, NULL);
-     }
- 
--    /* Drain and switch bs back to the QEMU main loop */
-+    /* Drain and switch bs back to the QEMU main loop. After drain, the
-+     * device will not submit (nor complete) any requests until dataplane
-+     * starts again.
-+     */
-     blk_set_aio_context(s->conf->conf.blk, qemu_get_aio_context());
- 
-+    /* Notify guest before the guest notifiers get cleaned up */
-+    qemu_bh_cancel(s->bh);
-+    notify_guest_bh(s);
-+
-     aio_context_release(s->ctx);
- 
-     for (i = 0; i < nvqs; i++) {
--- 
-2.8.4
+--
+Alex Bennée
