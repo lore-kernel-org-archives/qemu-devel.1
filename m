@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42489)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1clHEg-00029M-Rv
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:41:19 -0500
+	(envelope-from <kwolf@redhat.com>) id 1clHEm-0002Fp-Ba
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:41:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1clHEf-0002go-Li
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:41:14 -0500
+	(envelope-from <kwolf@redhat.com>) id 1clHEh-0002kk-FH
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:41:20 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue,  7 Mar 2017 16:40:32 +0100
-Message-Id: <1488901251-16214-9-git-send-email-kwolf@redhat.com>
+Date: Tue,  7 Mar 2017 16:40:33 +0100
+Message-Id: <1488901251-16214-10-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1488901251-16214-1-git-send-email-kwolf@redhat.com>
 References: <1488901251-16214-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 08/27] block: Ignore multiple children in
- bdrv_check_update_perm()
+Subject: [Qemu-devel] [PULL 09/27] block: Handle permission errors in
+ change_parent_backing_link()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,137 +23,103 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-change_parent_backing_link() will need to update multiple BdrvChild
-objects at once. Checking permissions reference by reference doesn't
-work because permissions need to be consistent only with all parents
-moved to the new child.
+Instead of just trying to change parents by parent over to reference @to
+instead of @from, and abort()ing whenever the permissions don't allow
+this, do proper permission checking beforehand and pass any error to the
+callers.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Fam Zheng <famz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block.c                   | 35 ++++++++++++++++++++++-------------
- include/block/block_int.h |  2 +-
- 2 files changed, 23 insertions(+), 14 deletions(-)
+ block.c | 50 ++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 44 insertions(+), 6 deletions(-)
 
 diff --git a/block.c b/block.c
-index d4570c8..a7b09d3 100644
+index a7b09d3..a310132 100644
 --- a/block.c
 +++ b/block.c
-@@ -1398,7 +1398,8 @@ static int bdrv_fill_options(QDict **options, const char *filename,
-  * or bdrv_abort_perm_update().
-  */
- static int bdrv_check_perm(BlockDriverState *bs, uint64_t cumulative_perms,
--                           uint64_t cumulative_shared_perms, Error **errp)
-+                           uint64_t cumulative_shared_perms,
-+                           GSList *ignore_children, Error **errp)
- {
-     BlockDriver *drv = bs->drv;
-     BdrvChild *c;
-@@ -1434,7 +1435,8 @@ static int bdrv_check_perm(BlockDriverState *bs, uint64_t cumulative_perms,
-         drv->bdrv_child_perm(bs, c, c->role,
-                              cumulative_perms, cumulative_shared_perms,
-                              &cur_perm, &cur_shared);
--        ret = bdrv_child_check_perm(c, cur_perm, cur_shared, errp);
-+        ret = bdrv_child_check_perm(c, cur_perm, cur_shared, ignore_children,
-+                                    errp);
-         if (ret < 0) {
-             return ret;
-         }
-@@ -1554,15 +1556,15 @@ static char *bdrv_perm_names(uint64_t perm)
- 
- /*
-  * Checks whether a new reference to @bs can be added if the new user requires
-- * @new_used_perm/@new_shared_perm as its permissions. If @ignore_child is set,
-- * this old reference is ignored in the calculations; this allows checking
-- * permission updates for an existing reference.
-+ * @new_used_perm/@new_shared_perm as its permissions. If @ignore_children is
-+ * set, the BdrvChild objects in this list are ignored in the calculations;
-+ * this allows checking permission updates for an existing reference.
-  *
-  * Needs to be followed by a call to either bdrv_set_perm() or
-  * bdrv_abort_perm_update(). */
- static int bdrv_check_update_perm(BlockDriverState *bs, uint64_t new_used_perm,
-                                   uint64_t new_shared_perm,
--                                  BdrvChild *ignore_child, Error **errp)
-+                                  GSList *ignore_children, Error **errp)
- {
-     BdrvChild *c;
-     uint64_t cumulative_perms = new_used_perm;
-@@ -1572,7 +1574,7 @@ static int bdrv_check_update_perm(BlockDriverState *bs, uint64_t new_used_perm,
-     assert(new_shared_perm & BLK_PERM_WRITE_UNCHANGED);
- 
-     QLIST_FOREACH(c, &bs->parents, next_parent) {
--        if (c == ignore_child) {
-+        if (g_slist_find(ignore_children, c)) {
-             continue;
-         }
- 
-@@ -1602,15 +1604,22 @@ static int bdrv_check_update_perm(BlockDriverState *bs, uint64_t new_used_perm,
-         cumulative_shared_perms &= c->shared_perm;
-     }
- 
--    return bdrv_check_perm(bs, cumulative_perms, cumulative_shared_perms, errp);
-+    return bdrv_check_perm(bs, cumulative_perms, cumulative_shared_perms,
-+                           ignore_children, errp);
+@@ -2933,21 +2933,53 @@ static bool should_update_child(BdrvChild *c, BlockDriverState *to)
  }
  
- /* Needs to be followed by a call to either bdrv_child_set_perm() or
-  * bdrv_child_abort_perm_update(). */
- int bdrv_child_check_perm(BdrvChild *c, uint64_t perm, uint64_t shared,
--                          Error **errp)
-+                          GSList *ignore_children, Error **errp)
+ static void change_parent_backing_link(BlockDriverState *from,
+-                                       BlockDriverState *to)
++                                       BlockDriverState *to, Error **errp)
  {
--    return bdrv_check_update_perm(c->bs, perm, shared, c, errp);
+     BdrvChild *c, *next;
++    GSList *list = NULL, *p;
++    uint64_t old_perm, old_shared;
++    uint64_t perm = 0, shared = BLK_PERM_ALL;
 +    int ret;
 +
-+    ignore_children = g_slist_prepend(g_slist_copy(ignore_children), c);
-+    ret = bdrv_check_update_perm(c->bs, perm, shared, ignore_children, errp);
-+    g_slist_free(ignore_children);
++    /* Make sure that @from doesn't go away until we have successfully attached
++     * all of its parents to @to. */
++    bdrv_ref(from);
+ 
++    /* Put all parents into @list and calculate their cumulative permissions */
+     QLIST_FOREACH_SAFE(c, &from->parents, next_parent, next) {
+         if (!should_update_child(c, to)) {
+             continue;
+         }
++        list = g_slist_prepend(list, c);
++        perm |= c->perm;
++        shared &= c->shared_perm;
++    }
 +
-+    return ret;
++    /* Check whether the required permissions can be granted on @to, ignoring
++     * all BdrvChild in @list so that they can't block themselves. */
++    ret = bdrv_check_update_perm(to, perm, shared, list, errp);
++    if (ret < 0) {
++        bdrv_abort_perm_update(to);
++        goto out;
++    }
++
++    /* Now actually perform the change. We performed the permission check for
++     * all elements of @list at once, so set the permissions all at once at the
++     * very end. */
++    for (p = list; p != NULL; p = p->next) {
++        c = p->data;
+ 
+         bdrv_ref(to);
+-        /* FIXME Are we sure that bdrv_replace_child() can't run into
+-         * &error_abort because of permissions? */
+-        bdrv_replace_child(c, to, true);
++        bdrv_replace_child_noperm(c, to);
+         bdrv_unref(from);
+     }
++
++    bdrv_get_cumulative_perm(to, &old_perm, &old_shared);
++    bdrv_set_perm(to, old_perm | perm, old_shared | shared);
++
++out:
++    g_slist_free(list);
++    bdrv_unref(from);
  }
  
- void bdrv_child_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared)
-@@ -1635,7 +1644,7 @@ int bdrv_child_try_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared,
- {
-     int ret;
- 
--    ret = bdrv_child_check_perm(c, perm, shared, errp);
-+    ret = bdrv_child_check_perm(c, perm, shared, NULL, errp);
-     if (ret < 0) {
-         bdrv_child_abort_perm_update(c);
-         return ret;
-@@ -1753,7 +1762,7 @@ static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs,
-          * because we're just taking a parent away, so we're loosening
-          * restrictions. */
-         bdrv_get_cumulative_perm(old_bs, &perm, &shared_perm);
--        bdrv_check_perm(old_bs, perm, shared_perm, &error_abort);
-+        bdrv_check_perm(old_bs, perm, shared_perm, NULL, &error_abort);
-         bdrv_set_perm(old_bs, perm, shared_perm);
+ /*
+@@ -2980,7 +3012,12 @@ void bdrv_append(BlockDriverState *bs_new, BlockDriverState *bs_top,
+         goto out;
      }
  
-@@ -1762,7 +1771,7 @@ static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs,
-     if (new_bs) {
-         bdrv_get_cumulative_perm(new_bs, &perm, &shared_perm);
-         if (check_new_perm) {
--            bdrv_check_perm(new_bs, perm, shared_perm, &error_abort);
-+            bdrv_check_perm(new_bs, perm, shared_perm, NULL, &error_abort);
-         }
-         bdrv_set_perm(new_bs, perm, shared_perm);
-     }
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index a57c0bf..fc83f7f 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -890,7 +890,7 @@ BdrvChild *bdrv_root_attach_child(BlockDriverState *child_bs,
- void bdrv_root_unref_child(BdrvChild *child);
+-    change_parent_backing_link(bs_top, bs_new);
++    change_parent_backing_link(bs_top, bs_new, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        bdrv_set_backing_hd(bs_new, NULL, &error_abort);
++        goto out;
++    }
  
- int bdrv_child_check_perm(BdrvChild *c, uint64_t perm, uint64_t shared,
--                          Error **errp);
-+                          GSList *ignore_children, Error **errp);
- void bdrv_child_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared);
- void bdrv_child_abort_perm_update(BdrvChild *c);
- int bdrv_child_try_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared,
+     /* bs_new is now referenced by its new parents, we don't need the
+      * additional reference any more. */
+@@ -2995,7 +3032,8 @@ void bdrv_replace_in_backing_chain(BlockDriverState *old, BlockDriverState *new)
+ 
+     bdrv_ref(old);
+ 
+-    change_parent_backing_link(old, new);
++    /* FIXME Proper error handling */
++    change_parent_backing_link(old, new, &error_abort);
+ 
+     bdrv_unref(old);
+ }
 -- 
 1.8.3.1
