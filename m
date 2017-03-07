@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1clBwC-00069Z-N1
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:01:53 -0500
+	(envelope-from <kwolf@redhat.com>) id 1clBwr-0006dP-F7
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:02:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1clBw8-0005O5-Rc
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:01:48 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:36147 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1clBw8-0005Lb-Fu
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:01:44 -0500
-References: <20170306223054.25666-1-eblake@redhat.com>
-	<01052592-5c40-8dc6-da15-5376a6ee8354@amsat.org>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <c81fe070-da3c-254c-2f2e-d19ce097f307@virtuozzo.com>
-Date: Tue, 7 Mar 2017 13:01:39 +0300
+	(envelope-from <kwolf@redhat.com>) id 1clBwh-0006Ts-El
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:02:25 -0500
+Date: Tue, 7 Mar 2017 11:02:04 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170307100204.GC5871@noname.str.redhat.com>
+References: <20170225193155.447462-1-vsementsov@virtuozzo.com>
+	<20170225193155.447462-3-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <01052592-5c40-8dc6-da15-5376a6ee8354@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.9] nbd/client: fix drop_sync
- [CVE-2017-2630]
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170225193155.447462-3-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 2/4] qmp-cont: invalidate on
+ RUN_STATE_PRELAUNCH
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +24,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: pbonzini@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
 
-07.03.2017 03:10, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Vladimir,
->
-> On 03/06/2017 07:30 PM, Eric Blake wrote:
->> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>
->> Comparison symbol is misused. It may lead to memory corruption.
->> Introduced in commit 7d3123e.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> Message-Id: <20170203154757.36140-6-vsementsov@virtuozzo.com>
->> [eblake: add CVE details]
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->> Reviewed-by: Marc-Andr=C3=A9 Lureau <address@hidden>
->> ---
->>
->> This one still hasn't been merged in; sending separately since the
->> rest of my NBD series is now 2.10 material:
->> https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg04528.html
->>
->>  nbd/client.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/nbd/client.c b/nbd/client.c
->> index 5c9dee3..165b33e 100644
->> --- a/nbd/client.c
->> +++ b/nbd/client.c
->> @@ -94,7 +94,7 @@ static ssize_t drop_sync(QIOChannel *ioc, size_t siz=
-e)
->>      char small[1024];
->>      char *buffer;
->>
->> -    buffer =3D sizeof(small) < size ? small : g_malloc(MIN(65536, siz=
-e));
->> +    buffer =3D sizeof(small) > size ? small : g_malloc(MIN(65536, siz=
-e));
->
-> here ">=3D" seems correct/safe.
-> (if size is 1024, use small stack buffer too).
+Am 25.02.2017 um 20:31 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> We must invalidate on RUN_STATE_PRELAUNCH too, as it is available
+> through qmp_system_reset from RUN_STATE_POSTMIGRATE. Otherwise, we will
+> come to
+> 
+> qemu-kvm: block/io.c:1406: bdrv_co_do_pwritev:
+>        Assertion `!(bs->open_flags & 0x0800)' failed.
+> 
+> on the first write after vm start.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Agree.
+Wouldn't it make more sense to invalidate in qmp_system_reset() where
+the migration states are left?
 
->
->>      while (size > 0) {
->>          ssize_t count =3D read_sync(ioc, buffer, MIN(65536, size));
->>
+Or maybe BDRV_O_INACTIVE could even be tied directly to runstates? Not
+sure how realistic this one is, but if we start adding invalidate_cache
+calls all over the place, maybe that's a sign that we need to look for a
+more central place.
 
+Kevin
 
---=20
-Best regards,
-Vladimir
+>  qmp.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/qmp.c b/qmp.c
+> index dfaabac1a6..e61795d033 100644
+> --- a/qmp.c
+> +++ b/qmp.c
+> @@ -198,7 +198,8 @@ void qmp_cont(Error **errp)
+>      /* Continuing after completed migration. Images have been inactivated to
+>       * allow the destination to take control. Need to get control back now. */
+>      if (runstate_check(RUN_STATE_FINISH_MIGRATE) ||
+> -        runstate_check(RUN_STATE_POSTMIGRATE))
+> +        runstate_check(RUN_STATE_POSTMIGRATE) ||
+> +        runstate_check(RUN_STATE_PRELAUNCH))
+>      {
+>          bdrv_invalidate_cache_all(&local_err);
+>          if (local_err) {
+> -- 
+> 2.11.1
+> 
