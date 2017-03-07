@@ -1,37 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1clCB3-0002BL-7W
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:17:10 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1clCDo-0003CG-HV
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:20:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1clCAz-0000Sh-5e
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:17:09 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40165)
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1clCDm-000164-Vo
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:20:00 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45768)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1clCAy-0000SP-QZ
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:17:05 -0500
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1clCDm-00015X-NA
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:19:58 -0500
 Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v27A8sev036009
-	for <qemu-devel@nongnu.org>; Tue, 7 Mar 2017 05:16:26 -0500
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2917uvysbn-1
+	v27AIT7v063091
+	for <qemu-devel@nongnu.org>; Tue, 7 Mar 2017 05:19:57 -0500
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2917uvyxuu-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 05:16:26 -0500
+	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 05:19:54 -0500
 Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Tue, 7 Mar 2017 10:16:23 -0000
-Date: Tue, 7 Mar 2017 11:16:18 +0100
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <1488876478-6889-1-git-send-email-jasowang@redhat.com>
-References: <1488876478-6889-1-git-send-email-jasowang@redhat.com>
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Tue, 7 Mar 2017 10:19:50 -0000
+References: <20170307025328.53409-1-haoqf@linux.vnet.ibm.com>
+	<20170307025328.53409-2-haoqf@linux.vnet.ibm.com>
+	<20170307092951.GA5871@noname.str.redhat.com>
+	<80495689-674c-5dde-ae49-d80a2eb20372@linux.vnet.ibm.com>
+	<20170307100525.GD5871@noname.str.redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Tue, 7 Mar 2017 11:19:46 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170307111618.43ffbd13.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio: destroy region cache during reset
+In-Reply-To: <20170307100525.GD5871@noname.str.redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Message-Id: <cbd5b0ac-4cae-6f5b-2583-a6e32eb65f38@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 1/1] vmstate: draft fix for failed
+ iotests case 68 and 91
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,266 +45,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: mst@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, peterx@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: QingFeng Hao <haoqf@linux.vnet.ibm.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com, liujbjl@linux.vnet.ibm.com, famz@redhat.com, mreitz@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 
-On Tue,  7 Mar 2017 16:47:58 +0800
-Jason Wang <jasowang@redhat.com> wrote:
 
-> We don't destroy region cache during reset which can make the maps
-> of previous driver leaked to a buggy or malicious driver that don't
-> set vring address before starting to use the device. Fix this by
-> destroy the region cache during reset and validate it before trying to
-> use them. While at it, also validate address_space_cache_init() during
-> virtio_init_region_cache() to make sure we have a correct region
-> cache.
-> 
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> ---
->  hw/virtio/virtio.c | 88 ++++++++++++++++++++++++++++++++++++++++++++++--------
->  1 file changed, 76 insertions(+), 12 deletions(-)
-> 
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index 09f4cf4..90324f6 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -131,6 +131,7 @@ static void virtio_init_region_cache(VirtIODevice *vdev, int n)
->      VRingMemoryRegionCaches *new;
->      hwaddr addr, size;
->      int event_size;
-> +    int64_t len;
-> 
->      event_size = virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX) ? 2 : 0;
-> 
-> @@ -140,21 +141,41 @@ static void virtio_init_region_cache(VirtIODevice *vdev, int n)
->      }
->      new = g_new0(VRingMemoryRegionCaches, 1);
->      size = virtio_queue_get_desc_size(vdev, n);
-> -    address_space_cache_init(&new->desc, vdev->dma_as,
-> -                             addr, size, false);
-> +    len = address_space_cache_init(&new->desc, vdev->dma_as,
-> +                                   addr, size, false);
-> +    if (len < size) {
-> +        virtio_error(vdev, "Cannot map desc");
-> +        goto err_desc;
-> +    }
-> 
->      size = virtio_queue_get_used_size(vdev, n) + event_size;
-> -    address_space_cache_init(&new->used, vdev->dma_as,
-> -                             vq->vring.used, size, true);
-> +    len = address_space_cache_init(&new->used, vdev->dma_as,
-> +                                   vq->vring.used, size, true);
-> +    if (len < size) {
-> +        virtio_error(vdev, "Cannot map used");
-> +        goto err_used;
-> +    }
-> 
->      size = virtio_queue_get_avail_size(vdev, n) + event_size;
-> -    address_space_cache_init(&new->avail, vdev->dma_as,
-> -                             vq->vring.avail, size, false);
-> +    len = address_space_cache_init(&new->avail, vdev->dma_as,
-> +                                   vq->vring.avail, size, false);
-> +    if (len < size) {
-> +        virtio_error(vdev, "Cannot map avail");
-> +        goto err_avail;
-> +    }
-> 
->      atomic_rcu_set(&vq->vring.caches, new);
->      if (old) {
->          call_rcu(old, virtio_free_region_cache, rcu);
->      }
-> +    return;
-> +
-> +err_avail:
-> +    address_space_cache_destroy(&new->used);
-> +err_used:
-> +    address_space_cache_destroy(&new->desc);
-> +err_desc:
-> +    g_free(new);
->  }
 
-I think it would be more readable if you moved adding this check (which
-is a good idea) into a separate patch.
-
+On 03/07/2017 11:05 AM, Kevin Wolf wrote:
+> Am 07.03.2017 um 10:54 hat Halil Pasic geschrieben:
+>>
+>>
+>> On 03/07/2017 10:29 AM, Kevin Wolf wrote:
+>>> Am 07.03.2017 um 03:53 hat QingFeng Hao geschrieben:
+>>>> I am not very clear about the logic in vmstate.c, but from its context in
+>>>> vmstate_save_state, it seems size should not be 0, otherwise the followed
+>>>> for loop will keep working on the same element. So I just add a simple
+>>>> check to pass that case, not sure if it's right but it can pass iotest
+>>>> case 68 and 91 now.
+>>>>
+>>>> The iotest's failed output is:
+>>>> 068 1s ... - output mismatch (see 068.out.bad)
+>>>> --- /home/haoqf/KVMonz/gitcheck/work/qemu-master/tree/qemu/tests/qemu-iotests/068.out   2017-03-06 05:52:24.817328899 +0100
+>>>> +++ 068.out.bad 2017-03-07 03:28:44.426714519 +0100
+>>>> @@ -3,9 +3,13 @@
+>>>>  === Saving and reloading a VM state to/from a qcow2 image ===
+>>>>
+>>>>  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072
+>>>> +qemu-system-s390x: migration/vmstate.c:336: vmstate_save_state: Assertion `first_elem || !n_elems' failed.
+>>>> +./common.config: line 109: 52497 Aborted                 ( if [ -n "${QEMU_NEED_PID}" ]; then
+>>>> +    echo $BASHPID > "${QEMU_TEST_DIR}/qemu-${_QEMU_HANDLE}.pid";
+>>>> +fi; exec "$QEMU_PROG" $QEMU_OPTIONS "$@" )
+>>>>  QEMU X.Y.Z monitor - type 'help' for more information
+>>>>  (qemu) savevm 0
+>>>> -(qemu) quit
+>>>> +qemu-system-s390x: Device 'virtio0' does not have the requested snapshot '0'
+>>>>  QEMU X.Y.Z monitor - type 'help' for more information
+>>>>  (qemu) quit
+>>>>  *** done
+>>>>
+>>>> 091 1s ... [failed, exit status 1] - output mismatch (see 091.out.bad)
+>>>>     --- tests/qemu-iotests/091.out	2016-08-30 12:35:04.207683276 +0200
+>>>>     +++ 091.out.bad	2017-03-06 13:08:03.717135426 +0100
+>>>>     @@ -11,18 +11,23 @@
+>>>>      
+>>>>      vm1: qemu-io disk write complete
+>>>>      vm1: live migration started
+>>>>     -vm1: live migration completed
+>>>>     -
+>>>>     -=== VM 2: Post-migration, write to disk, verify running ===
+>>>>     -
+>>>>     -vm2: qemu-io disk write complete
+>>>>     -vm2: qemu process running successfully
+>>>>     -vm2: flush io, and quit
+>>>>     -Check image pattern
+>>>>     -read 4194304/4194304 bytes at offset 0
+>>>>     -4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>>>>     -Running 'qemu-img check -r all $TEST_IMG'
+>>>>     -No errors were found on the image.
+>>>>     -80/16384 = 0.49% allocated, 0.00% fragmented, 0.00% compressed clusters
+>>>>     -Image end offset: 5570560
+>>>>     -*** done
+>>>>     +./common.qemu: line 110: write error: Broken pipe
+>>>>     +./common.qemu: line 110: write error: Broken pipe
+>>>>     +./common.qemu: line 110: write error: Broken pipe
+>>>>     +./common.qemu: line 110: write error: Broken pipe
+>>>>     +./common.qemu: line 110: write error: Broken pipe
+>>>>     +./common.qemu: line 110: write error: Broken pipe
+>>>>     +./common.qemu: line 110: write error: Broken pipe
+>>>>     +./common.qemu: line 110: write error: Broken pipe
+>>>>     +./common.qemu: line 110: write error: Broken pipe
+>>>>     +./common.qemu: line 110: write error: Broken pipe
+>>>>     +./common.qemu: line 110: write error: Broken pipe
+>>>>     +./common.qemu: line 110: write error: Broken pipe
+>>>>     +./common.qemu: line 110: write error: Broken pipe
+>>>>     +./common.qemu: line 110: write error: Broken pipe
+>>>>     +./common.qemu: line 110: write error: Broken pipe
+>>>>     +./common.qemu: line 110: write error: Broken pipe
+>>>>     +./common.qemu: line 110: write error: Broken pipe
+>>>>     +./common.qemu: line 110: write error: Broken pipe
+>>>>     +./common.qemu: line 110: write error: Broken pipe
+>>>>     +Timeout waiting for completed on handle 0
+>>>>
+>>>> Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+>>>> ---
+>>>>  migration/vmstate.c | 8 ++++++++
+>>>>  1 file changed, 8 insertions(+)
+>>>>
+>>>> diff --git a/migration/vmstate.c b/migration/vmstate.c
+>>>> index 78b3cd4..ff28dde 100644
+>>>> --- a/migration/vmstate.c
+>>>> +++ b/migration/vmstate.c
+>>>> @@ -106,6 +106,10 @@ int vmstate_load_state(QEMUFile *f, const VMStateDescription *vmsd,
+>>>>              int i, n_elems = vmstate_n_elems(opaque, field);
+>>>>              int size = vmstate_size(opaque, field);
+>>>>  
+>>>> +            if (size == 0) {
+>>>> +                field++;
+>>>> +                continue;
+>>>> +            }
+>>>>              vmstate_handle_alloc(first_elem, field, opaque);
+>>>>              if (field->flags & VMS_POINTER) {
+>>>>                  first_elem = *(void **)first_elem;
+>>>> @@ -322,6 +326,10 @@ void vmstate_save_state(QEMUFile *f, const VMStateDescription *vmsd,
+>>>>              int64_t old_offset, written_bytes;
+>>>>              QJSON *vmdesc_loop = vmdesc;
+>>>>  
+>>>> +            if (size == 0) {
+>>>> +                field++;
+>>>> +                continue;
+>>>> +            }
+>>>>              trace_vmstate_save_state_loop(vmsd->name, field->name, n_elems);
+>>>>              if (field->flags & VMS_POINTER) {
+>>>>                  first_elem = *(void **)first_elem;
+>>>
+>>> This is really a live migration fix, so I'm adding Juan and Dave to CC.
+>>
+>> You are right, this is migration stuff and has very little to do with
+>> qemu-block.
+>>>
+>>> I suspect the real question is why a field with size 0 was even stored
+>>> in the vmstate to begin with.
+>>>
+>>
+>> I have looked onto the issue. It affects s390x only if we
+>> are running without KVM. Basically, S390CPU.irqstate is unused
+>> if we do not use KVM, and thus no buffer is allocated.
+>>
+>> IMHO this is a missing field and the cleaner way to handle such
+>> missing fields is exist. However this used to work, and I recommended
+>> QuiFeng Hao to discuss the problem upstream.
+>>
+>> By the way, I think, if we want to go back to the old behavior
+>> and support VMS_VBUFFER with size 0 and nullptr, a much
+>> cleaner way to do the fix is to change the assert to:
+>>
+>> assert(first_elem  || !n_elems || !size)
+>>
+>> Obviously the other clean way to fix is to implement exists.
 > 
->  /* virt queue functions */
-> @@ -190,6 +211,10 @@ static inline uint16_t vring_avail_flags(VirtQueue *vq)
->  {
->      VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
->      hwaddr pa = offsetof(VRingAvail, flags);
-> +    if (!caches) {
-> +        virtio_error(vq->vdev, "Cannot map avail flags");
+> If you're right that this specific vmstate was valid in earlier
+> versions, then I think it's clear that we need to make it work again.
+> Otherwise we're breaking migration from old versions.
 
-I'm not sure that virtio_error is the right thing here; ending up in
-this function with !caches indicates an error in our logic. An assert
-might be better (and I hope we can sort out all of those errors exposed
-by the introduction of region caches for 2.9...)
+Not really. We would not break migration because nothing was written to
+the stream for VMS_VBUFFER of size 0 except the vmdesc which is at the end,
+'debug only', and does not affect migration compatibility. 
 
-> +        return 0;
-> +    }
->      return virtio_lduw_phys_cached(vq->vdev, &caches->avail, pa);
->  }
-> 
-> @@ -198,6 +223,10 @@ static inline uint16_t vring_avail_idx(VirtQueue *vq)
->  {
->      VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
->      hwaddr pa = offsetof(VRingAvail, idx);
-> +    if (!caches) {
-> +        virtio_error(vq->vdev, "Cannot map avail idx");
-> +        return vq->shadow_avail_idx;
-> +    }
->      vq->shadow_avail_idx = virtio_lduw_phys_cached(vq->vdev, &caches->avail, pa);
->      return vq->shadow_avail_idx;
->  }
-> @@ -207,6 +236,10 @@ static inline uint16_t vring_avail_ring(VirtQueue *vq, int i)
->  {
->      VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
->      hwaddr pa = offsetof(VRingAvail, ring[i]);
-> +    if (!caches) {
-> +        virtio_error(vq->vdev, "Cannot map avail ring");
-> +        return 0;
-> +    }
->      return virtio_lduw_phys_cached(vq->vdev, &caches->avail, pa);
->  }
-> 
-> @@ -222,6 +255,10 @@ static inline void vring_used_write(VirtQueue *vq, VRingUsedElem *uelem,
->  {
->      VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
->      hwaddr pa = offsetof(VRingUsed, ring[i]);
-> +    if (!caches) {
-> +        virtio_error(vq->vdev, "Cannot map used ring");
-> +        return;
-> +    }
->      virtio_tswap32s(vq->vdev, &uelem->id);
->      virtio_tswap32s(vq->vdev, &uelem->len);
->      address_space_write_cached(&caches->used, pa, uelem, sizeof(VRingUsedElem));
-> @@ -233,6 +270,10 @@ static uint16_t vring_used_idx(VirtQueue *vq)
->  {
->      VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
->      hwaddr pa = offsetof(VRingUsed, idx);
-> +    if (!caches) {
-> +        virtio_error(vq->vdev, "Cannot map used ring");
-> +        return 0;
-> +    }
->      return virtio_lduw_phys_cached(vq->vdev, &caches->used, pa);
->  }
-> 
-> @@ -241,6 +282,10 @@ static inline void vring_used_idx_set(VirtQueue *vq, uint16_t val)
->  {
->      VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
->      hwaddr pa = offsetof(VRingUsed, idx);
-> +    if (!caches) {
-> +        virtio_error(vq->vdev, "Cannot map used idx");
-> +        return;
-> +    }
->      virtio_stw_phys_cached(vq->vdev, &caches->used, pa, val);
->      address_space_cache_invalidate(&caches->used, pa, sizeof(val));
->      vq->used_idx = val;
-> @@ -254,6 +299,10 @@ static inline void vring_used_flags_set_bit(VirtQueue *vq, int mask)
->      hwaddr pa = offsetof(VRingUsed, flags);
->      uint16_t flags = virtio_lduw_phys_cached(vq->vdev, &caches->used, pa);
-> 
-> +    if (!caches) {
-> +        virtio_error(vq->vdev, "Cannot map used flags");
+IMHO it is an API question. I would have said, there is no data, therefore
+there is no field if it's from scratch. But with prior history, I agree
+with Dave, we should restore old behavior -- which was changed unintentionally
+because I made a wrong assumption.
 
-Regardless of whether using virtio_error here is fine: caches was
-already dereferenced above...
-
-> +        return;
-> +    }
->      virtio_stw_phys_cached(vdev, &caches->used, pa, flags | mask);
->      address_space_cache_invalidate(&caches->used, pa, sizeof(flags));
->  }
-> @@ -266,6 +315,10 @@ static inline void vring_used_flags_unset_bit(VirtQueue *vq, int mask)
->      hwaddr pa = offsetof(VRingUsed, flags);
->      uint16_t flags = virtio_lduw_phys_cached(vq->vdev, &caches->used, pa);
-> 
-> +    if (!caches) {
-> +        virtio_error(vq->vdev, "Cannot map used flags");
-
-dito
-
-> +        return;
-> +    }
->      virtio_stw_phys_cached(vdev, &caches->used, pa, flags & ~mask);
->      address_space_cache_invalidate(&caches->used, pa, sizeof(flags));
->  }
-> @@ -280,6 +333,10 @@ static inline void vring_set_avail_event(VirtQueue *vq, uint16_t val)
->      }
-> 
->      caches = atomic_rcu_read(&vq->vring.caches);
-> +    if (!caches) {
-> +        virtio_error(vq->vdev, "Cannot map avail event");
-> +        return;
-> +    }
->      pa = offsetof(VRingUsed, ring[vq->vring.num]);
->      virtio_stw_phys_cached(vq->vdev, &caches->used, pa, val);
->      address_space_cache_invalidate(&caches->used, pa, sizeof(val));
-> @@ -552,7 +609,7 @@ void virtqueue_get_avail_bytes(VirtQueue *vq, unsigned int *in_bytes,
-> 
->      max = vq->vring.num;
->      caches = atomic_rcu_read(&vq->vring.caches);
-> -    if (caches->desc.len < max * sizeof(VRingDesc)) {
-> +    if (!caches || caches->desc.len < max * sizeof(VRingDesc)) {
->          virtio_error(vdev, "Cannot map descriptor ring");
->          goto err;
->      }
-> @@ -819,7 +876,7 @@ void *virtqueue_pop(VirtQueue *vq, size_t sz)
->      i = head;
-> 
->      caches = atomic_rcu_read(&vq->vring.caches);
-> -    if (caches->desc.len < max * sizeof(VRingDesc)) {
-> +    if (!caches || caches->desc.len < max * sizeof(VRingDesc)) {
->          virtio_error(vdev, "Cannot map descriptor ring");
->          goto done;
->      }
-> @@ -1117,6 +1174,15 @@ static enum virtio_device_endian virtio_current_cpu_endian(void)
->      }
->  }
-> 
-> +static void virtio_virtqueue_reset_region_cache(struct VirtQueue *vq)
-> +{
-> +    VRingMemoryRegionCaches *caches;
-> +
-> +    caches = atomic_read(&vq->vring.caches);
-> +    atomic_set(&vq->vring.caches, NULL);
-> +    virtio_free_region_cache(caches);
-
-Shouldn't this use rcu to free it? Unconditionally setting caches to
-NULL feels wrong...
-
-> +}
-> +
->  void virtio_reset(void *opaque)
->  {
->      VirtIODevice *vdev = opaque;
-> @@ -1157,6 +1223,7 @@ void virtio_reset(void *opaque)
->          vdev->vq[i].notification = true;
->          vdev->vq[i].vring.num = vdev->vq[i].vring.num_default;
->          vdev->vq[i].inuse = 0;
-> +        virtio_virtqueue_reset_region_cache(&vdev->vq[i]);
-
-...especially as you call it in a reset context here.
-
->      }
->  }
-> 
-> @@ -2451,13 +2518,10 @@ static void virtio_device_free_virtqueues(VirtIODevice *vdev)
->      }
-> 
->      for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
-> -        VRingMemoryRegionCaches *caches;
->          if (vdev->vq[i].vring.num == 0) {
->              break;
->          }
-> -        caches = atomic_read(&vdev->vq[i].vring.caches);
-> -        atomic_set(&vdev->vq[i].vring.caches, NULL);
-> -        virtio_free_region_cache(caches);
-> +        virtio_virtqueue_reset_region_cache(&vdev->vq[i]);
-
-OTOH, immediate destruction may still be called for during device
-finalization.
-
->      }
->      g_free(vdev->vq);
->  }
+Regards,
+Halil
