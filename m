@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1clGgg-0007qq-S2
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:06:08 -0500
+	(envelope-from <eblake@redhat.com>) id 1clGpv-0001Gq-VC
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:15:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1clGgb-0006xb-1V
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:06:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43566)
+	(envelope-from <eblake@redhat.com>) id 1clGps-0001UV-QB
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:15:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50600)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1clGga-0006xF-Ri
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:06:00 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1488871237-12332-1-git-send-email-armbru@redhat.com>
-	<CAFEAcA-SBSz5M_GDEQhqvb+=5WprkwURKb_sY2M9VewJJ+N1Zw@mail.gmail.com>
-Date: Tue, 07 Mar 2017 16:05:58 +0100
-In-Reply-To: <CAFEAcA-SBSz5M_GDEQhqvb+=5WprkwURKb_sY2M9VewJJ+N1Zw@mail.gmail.com>
-	(Peter Maydell's message of "Tue, 7 Mar 2017 14:30:30 +0000")
-Message-ID: <87efy99lex.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1clGps-0001UK-KT
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:15:36 -0500
+References: <20170306223054.25666-1-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2d061a9c-05b4-b5dc-1353-4796310b5ecc@redhat.com>
+Date: Tue, 7 Mar 2017 09:15:34 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PULL v3 00/24] block: Command line option
- -blockdev
+In-Reply-To: <20170306223054.25666-1-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="sDX3VtOCVg0FKUm37NjffmnsxHaLA6HJi"
+Subject: Re: [Qemu-devel] [PATCH for-2.9] nbd/client: fix drop_sync
+ [CVE-2017-2630]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,64 +28,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--sDX3VtOCVg0FKUm37NjffmnsxHaLA6HJi
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <2d061a9c-05b4-b5dc-1353-4796310b5ecc@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.9] nbd/client: fix drop_sync
+ [CVE-2017-2630]
+References: <20170306223054.25666-1-eblake@redhat.com>
+In-Reply-To: <20170306223054.25666-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On 7 March 2017 at 07:20, Markus Armbruster <armbru@redhat.com> wrote:
->> Actually, the command line option is the least part of this series.
->> Its bulk is about building infrastructure and getting errors out of
->> the JSON parser.
->>
->> The design of the command line interface was discussed here:
->> Subject: Non-flat command line option argument syntax
->> Message-ID: <87bmukmlau.fsf@dusky.pond.sub.org>
->> https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg00555.html
->>
->> v3: A few commit messages touched up, code unchanged
->>
->> The following changes since commit fbddc2e5608eb655493253d080598375db61a748:
->>
->>   Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2017-02-28' into staging (2017-03-06 10:18:33 +0000)
->>
->> are available in the git repository at:
->>
->>   git://repo.or.cz/qemu/armbru.git tags/pull-block-2017-02-28-v3
->>
->> for you to fetch changes up to de479f01438d974100ac9ec10ab82c2ee1ad124f:
->>
->>   keyval: Support lists (2017-03-07 08:15:18 +0100)
->
-> The clang sanitizer has a complaint about your new test:
->
->   GTESTER tests/test-keyval
-> /home/petmay01/linaro/qemu-for-merges/util/keyval.c:129:15: runtime
-> error: member access within null pointer of type 'QString' (aka
-> 'struct QString')
->
-> which is the line:
->         new = QOBJECT(value) ?: QOBJECT(qdict_new());
->
-> This is because QOBJECT is defined as:
->
-> #define QOBJECT(obj) (&(obj)->base)
->
-> and so it doesn't have the "if you pass in NULL you get NULL"
-> semantics that OBJECT() and all the QOM object typecast
-> macros do.
+On 03/06/2017 04:30 PM, Eric Blake wrote:
+> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>=20
+> Comparison symbol is misused. It may lead to memory corruption.
+> Introduced in commit 7d3123e.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Message-Id: <20170203154757.36140-6-vsementsov@virtuozzo.com>
+> [eblake: add CVE details]
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <address@hidden>
 
-QOBJECT() returns its argument, so this is rather pedantic.  However,
-placating the sanitize isn't too onerous; this should do:
+Blergh. This R-b isn't correct.
 
-        new = value ? QOBJECT(value) : QOBJECT(qdict_new());
+Sending v2 with fixed attributions, and with >=3D instead of >.
 
-> (As an aside, it's rather confusing to have a QObject
-> whose header claims it's part of the "QEMU Object Model"
-> which is completely different from the QOM Object...)
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-Hey, QObject claimed the name first!
 
-Seriously, I hate the name clash, too.  Rewording the comment is easy
-enough.  Even better would be renaming QObject, but that's a lot of
-churn.
+--sDX3VtOCVg0FKUm37NjffmnsxHaLA6HJi
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYvs6WAAoJEKeha0olJ0NqDboIAK/u/eJrWSwBHX6RCQocs35E
+hEzBxo5UXNxP1qunBE32nL7SV9CLR6elN9D6q2HV1dRQUv0TXRmMiVIN2k2tWhDS
+vlKQoksA97Ag8aRP7QKJoGy/XGLXodBl0XS/W/Ci5B0xRNEYy44LwnakqwGhBU/X
+OxCWP62DM2FD0PB+N/+mQ3Lh9W7ubaTlvkIGT8sa07Ffuh2uYhE5uWv9FNP2pzjE
+4zy9l5w5r9CPc0Zo5oH4ZcqYiwbHYM1V8FADiXT4Si4KURXXSm0XZphLqmzoD1Xm
+gz7t6nlus3FhFhTnU2uiBbO7I09l3v/q67kGwyParHfJz2+ocmoiKTS8ccfVmmg=
+=Ktdz
+-----END PGP SIGNATURE-----
+
+--sDX3VtOCVg0FKUm37NjffmnsxHaLA6HJi--
