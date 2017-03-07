@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1clHEg-00029D-L0
+	(envelope-from <kwolf@redhat.com>) id 1clHEf-00028K-Vy
 	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:41:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1clHEf-0002gV-HD
+	(envelope-from <kwolf@redhat.com>) id 1clHEf-0002g5-6W
 	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:41:14 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue,  7 Mar 2017 16:40:30 +0100
-Message-Id: <1488901251-16214-7-git-send-email-kwolf@redhat.com>
+Date: Tue,  7 Mar 2017 16:40:31 +0100
+Message-Id: <1488901251-16214-8-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1488901251-16214-1-git-send-email-kwolf@redhat.com>
 References: <1488901251-16214-1-git-send-email-kwolf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 06/27] block: Factor out should_update_child()
+Subject: [Qemu-devel] [PULL 07/27] block: Factor out
+ bdrv_replace_child_noperm()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,72 +26,82 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Fam Zheng <famz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- block.c | 42 +++++++++++++++++++++++++++---------------
- 1 file changed, 27 insertions(+), 15 deletions(-)
+ block.c | 38 +++++++++++++++++++++++++-------------
+ 1 file changed, 25 insertions(+), 13 deletions(-)
 
 diff --git a/block.c b/block.c
-index f293ccb..6dc02b8 100644
+index 6dc02b8..d4570c8 100644
 --- a/block.c
 +++ b/block.c
-@@ -2886,28 +2886,40 @@ void bdrv_close_all(void)
-     assert(QTAILQ_EMPTY(&all_bdrv_states));
+@@ -1713,11 +1713,10 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
+     *nshared = shared;
  }
-=20
-+static bool should_update_child(BdrvChild *c, BlockDriverState *to)
-+{
-+    BdrvChild *to_c;
-+
-+    if (c->role->stay_at_node) {
-+        return false;
-+    }
-+
-+    if (c->role =3D=3D &child_backing) {
-+        /* If @from is a backing file of @to, ignore the child to avoid
-+         * creating a loop. We only want to change the pointer of other
-+         * parents. */
-+        QLIST_FOREACH(to_c, &to->children, next) {
-+            if (to_c =3D=3D c) {
-+                break;
-+            }
-+        }
-+        if (to_c) {
-+            return false;
-+        }
-+    }
-+
-+    return true;
-+}
-+
- static void change_parent_backing_link(BlockDriverState *from,
-                                        BlockDriverState *to)
+ 
+-static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs,
+-                               bool check_new_perm)
++static void bdrv_replace_child_noperm(BdrvChild *child,
++                                      BlockDriverState *new_bs)
  {
--    BdrvChild *c, *next, *to_c;
-+    BdrvChild *c, *next;
-=20
-     QLIST_FOREACH_SAFE(c, &from->parents, next_parent, next) {
--        if (c->role->stay_at_node) {
-+        if (!should_update_child(c, to)) {
-             continue;
+     BlockDriverState *old_bs = child->bs;
+-    uint64_t perm, shared_perm;
+ 
+     if (old_bs) {
+         if (old_bs->quiesce_counter && child->role->drained_end) {
+@@ -1727,7 +1726,29 @@ static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs,
+             child->role->detach(child);
          }
--        if (c->role =3D=3D &child_backing) {
--            /* If @from is a backing file of @to, ignore the child to av=
-oid
--             * creating a loop. We only want to change the pointer of ot=
-her
--             * parents. */
--            QLIST_FOREACH(to_c, &to->children, next) {
--                if (to_c =3D=3D c) {
--                    break;
--                }
--            }
--            if (to_c) {
--                continue;
--            }
+         QLIST_REMOVE(child, next_parent);
++    }
++
++    child->bs = new_bs;
++
++    if (new_bs) {
++        QLIST_INSERT_HEAD(&new_bs->parents, child, next_parent);
++        if (new_bs->quiesce_counter && child->role->drained_begin) {
++            child->role->drained_begin(child);
++        }
++
++        if (child->role->attach) {
++            child->role->attach(child);
++        }
++    }
++}
+ 
++static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs,
++                               bool check_new_perm)
++{
++    BlockDriverState *old_bs = child->bs;
++    uint64_t perm, shared_perm;
++
++    if (old_bs) {
+         /* Update permissions for old node. This is guaranteed to succeed
+          * because we're just taking a parent away, so we're loosening
+          * restrictions. */
+@@ -1736,23 +1757,14 @@ static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs,
+         bdrv_set_perm(old_bs, perm, shared_perm);
+     }
+ 
+-    child->bs = new_bs;
++    bdrv_replace_child_noperm(child, new_bs);
+ 
+     if (new_bs) {
+-        QLIST_INSERT_HEAD(&new_bs->parents, child, next_parent);
+-        if (new_bs->quiesce_counter && child->role->drained_begin) {
+-            child->role->drained_begin(child);
 -        }
-=20
-         bdrv_ref(to);
-         /* FIXME Are we sure that bdrv_replace_child() can't run into
---=20
+-
+         bdrv_get_cumulative_perm(new_bs, &perm, &shared_perm);
+         if (check_new_perm) {
+             bdrv_check_perm(new_bs, perm, shared_perm, &error_abort);
+         }
+         bdrv_set_perm(new_bs, perm, shared_perm);
+-
+-        if (child->role->attach) {
+-            child->role->attach(child);
+-        }
+     }
+ }
+ 
+-- 
 1.8.3.1
