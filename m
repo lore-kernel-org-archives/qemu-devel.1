@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1clHEn-0002HU-Sa
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:41:23 -0500
+	(envelope-from <kwolf@redhat.com>) id 1clHEq-0002K8-Bp
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:41:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1clHEj-0002ll-TR
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:41:21 -0500
+	(envelope-from <kwolf@redhat.com>) id 1clHEp-0002o6-7Z
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:41:24 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue,  7 Mar 2017 16:40:34 +0100
-Message-Id: <1488901251-16214-11-git-send-email-kwolf@redhat.com>
+Date: Tue,  7 Mar 2017 16:40:36 +0100
+Message-Id: <1488901251-16214-13-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1488901251-16214-1-git-send-email-kwolf@redhat.com>
 References: <1488901251-16214-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 10/27] block: Fix error handling in
- bdrv_replace_in_backing_chain()
+Subject: [Qemu-devel] [PULL 12/27] sheepdog: Fix error handling in
+ sd_snapshot_delete()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,174 +23,135 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-When adding an Error parameter, bdrv_replace_in_backing_chain() would
-become nothing more than a wrapper around change_parent_backing_link().
-So make the latter public, renamed as bdrv_replace_node(), and remove
-bdrv_replace_in_backing_chain().
+From: Markus Armbruster <armbru@redhat.com>
 
-Most of the callers just remove a node from the graph that they just
-inserted, so they can use &error_abort, but completion of a mirror job
-with 'replaces' set can actually fail.
+As a bdrv_snapshot_delete() method, sd_snapshot_delete() must set an
+error and return negative errno on failure.  It sometimes returns -1,
+and sometimes neglects to set an error.  It also prints error messages
+with error_report().  Fix all that.
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
+Moreover, its handling of an attempt to delete a nonexistent snapshot
+is wrong: it error_report()s and succeeds.  Fix it to set an error and
+return -ENOENT instead.
+
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block.c                   | 25 ++++++-------------------
- block/mirror.c            | 15 +++++++++------
- blockdev.c                |  2 +-
- include/block/block.h     |  4 ++--
- include/block/block_int.h |  4 ++--
- 5 files changed, 20 insertions(+), 30 deletions(-)
+ block/sheepdog.c | 41 +++++++++++++++++++----------------------
+ 1 file changed, 19 insertions(+), 22 deletions(-)
 
-diff --git a/block.c b/block.c
-index a310132..dd9ded8 100644
---- a/block.c
-+++ b/block.c
-@@ -2932,8 +2932,8 @@ static bool should_update_child(BdrvChild *c, BlockDriverState *to)
-     return true;
- }
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index c3ee4ce..0a0803e 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -2405,18 +2405,15 @@ out:
  
--static void change_parent_backing_link(BlockDriverState *from,
--                                       BlockDriverState *to, Error **errp)
-+void bdrv_replace_node(BlockDriverState *from, BlockDriverState *to,
-+                       Error **errp)
+ #define NR_BATCHED_DISCARD 128
+ 
+-static bool remove_objects(BDRVSheepdogState *s)
++static int remove_objects(BDRVSheepdogState *s, Error **errp)
  {
-     BdrvChild *c, *next;
-     GSList *list = NULL, *p;
-@@ -2941,6 +2941,9 @@ static void change_parent_backing_link(BlockDriverState *from,
-     uint64_t perm = 0, shared = BLK_PERM_ALL;
-     int ret;
+     int fd, i = 0, nr_objs = 0;
+-    Error *local_err = NULL;
+-    int ret = 0;
+-    bool result = true;
++    int ret;
+     SheepdogInode *inode = &s->inode;
  
-+    assert(!atomic_read(&from->in_flight));
-+    assert(!atomic_read(&to->in_flight));
-+
-     /* Make sure that @from doesn't go away until we have successfully attached
-      * all of its parents to @to. */
-     bdrv_ref(from);
-@@ -3003,16 +3006,13 @@ void bdrv_append(BlockDriverState *bs_new, BlockDriverState *bs_top,
- {
-     Error *local_err = NULL;
- 
--    assert(!atomic_read(&bs_top->in_flight));
--    assert(!atomic_read(&bs_new->in_flight));
--
-     bdrv_set_backing_hd(bs_new, bs_top, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         goto out;
+-    fd = connect_to_sdog(s, &local_err);
++    fd = connect_to_sdog(s, errp);
+     if (fd < 0) {
+-        error_report_err(local_err);
+-        return false;
++        return fd;
      }
  
--    change_parent_backing_link(bs_top, bs_new, &local_err);
-+    bdrv_replace_node(bs_top, bs_new, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         bdrv_set_backing_hd(bs_new, NULL, &error_abort);
-@@ -3025,19 +3025,6 @@ out:
-     bdrv_unref(bs_new);
- }
- 
--void bdrv_replace_in_backing_chain(BlockDriverState *old, BlockDriverState *new)
--{
--    assert(!bdrv_requests_pending(old));
--    assert(!bdrv_requests_pending(new));
--
--    bdrv_ref(old);
--
--    /* FIXME Proper error handling */
--    change_parent_backing_link(old, new, &error_abort);
--
--    bdrv_unref(old);
--}
--
- static void bdrv_delete(BlockDriverState *bs)
- {
-     assert(!bs->job);
-diff --git a/block/mirror.c b/block/mirror.c
-index f24dc51..a5d30ee 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -550,8 +550,12 @@ static void mirror_exit(BlockJob *job, void *opaque)
-         /* The mirror job has no requests in flight any more, but we need to
-          * drain potential other users of the BDS before changing the graph. */
-         bdrv_drained_begin(target_bs);
--        bdrv_replace_in_backing_chain(to_replace, target_bs);
-+        bdrv_replace_node(to_replace, target_bs, &local_err);
-         bdrv_drained_end(target_bs);
-+        if (local_err) {
-+            error_report_err(local_err);
-+            data->ret = -EPERM;
-+        }
-     }
-     if (s->to_replace) {
-         bdrv_op_unblock_all(s->to_replace, s->replace_blocker);
-@@ -570,12 +574,11 @@ static void mirror_exit(BlockJob *job, void *opaque)
-      * block the removal. */
-     block_job_remove_all_bdrv(job);
-     bdrv_child_set_perm(mirror_top_bs->backing, 0, BLK_PERM_ALL);
--    bdrv_replace_in_backing_chain(mirror_top_bs, backing_bs(mirror_top_bs));
-+    bdrv_replace_node(mirror_top_bs, backing_bs(mirror_top_bs), &error_abort);
- 
-     /* We just changed the BDS the job BB refers to (with either or both of the
--     * bdrv_replace_in_backing_chain() calls), so switch the BB back so the
--     * cleanup does the right thing. We don't need any permissions any more
--     * now. */
-+     * bdrv_replace_node() calls), so switch the BB back so the cleanup does
-+     * the right thing. We don't need any permissions any more now. */
-     blk_remove_bs(job->blk);
-     blk_set_perm(job->blk, 0, BLK_PERM_ALL, &error_abort);
-     blk_insert_bs(job->blk, mirror_top_bs, &error_abort);
-@@ -1234,7 +1237,7 @@ fail:
-     }
- 
-     bdrv_child_set_perm(mirror_top_bs->backing, 0, BLK_PERM_ALL);
--    bdrv_replace_in_backing_chain(mirror_top_bs, backing_bs(mirror_top_bs));
-+    bdrv_replace_node(mirror_top_bs, backing_bs(mirror_top_bs), &error_abort);
- }
- 
- void mirror_start(const char *job_id, BlockDriverState *bs,
-diff --git a/blockdev.c b/blockdev.c
-index af67ce4..f1f49bd 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -1806,7 +1806,7 @@ static void external_snapshot_abort(BlkActionState *common)
-                              DO_UPCAST(ExternalSnapshotState, common, common);
-     if (state->new_bs) {
-         if (state->overlay_appended) {
--            bdrv_replace_in_backing_chain(state->new_bs, state->old_bs);
-+            bdrv_replace_node(state->new_bs, state->old_bs, &error_abort);
+     nr_objs = count_data_objs(inode);
+@@ -2446,15 +2443,15 @@ static bool remove_objects(BDRVSheepdogState *s)
+                                     data_vdi_id[start_idx]),
+                            false, s->cache_flags);
+         if (ret < 0) {
+-            error_report("failed to discard snapshot inode.");
+-            result = false;
++            error_setg(errp, "Failed to discard snapshot inode");
+             goto out;
          }
      }
+ 
++    ret = 0;
+ out:
+     closesocket(fd);
+-    return result;
++    return ret;
  }
-diff --git a/include/block/block.h b/include/block/block.h
-index c7c4a3a..5149260 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -238,8 +238,8 @@ int bdrv_create_file(const char *filename, QemuOpts *opts, Error **errp);
- BlockDriverState *bdrv_new(void);
- void bdrv_append(BlockDriverState *bs_new, BlockDriverState *bs_top,
-                  Error **errp);
--void bdrv_replace_in_backing_chain(BlockDriverState *old,
--                                   BlockDriverState *new);
-+void bdrv_replace_node(BlockDriverState *from, BlockDriverState *to,
-+                       Error **errp);
  
- int bdrv_parse_cache_mode(const char *mode, int *flags, bool *writethrough);
- int bdrv_parse_discard_flags(const char *mode, int *flags);
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index fc83f7f..6c699ac 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -441,8 +441,8 @@ typedef struct BdrvAioNotifier {
- } BdrvAioNotifier;
+ static int sd_snapshot_delete(BlockDriverState *bs,
+@@ -2464,7 +2461,6 @@ static int sd_snapshot_delete(BlockDriverState *bs,
+ {
+     unsigned long snap_id = 0;
+     char snap_tag[SD_MAX_VDI_TAG_LEN];
+-    Error *local_err = NULL;
+     int fd, ret;
+     char buf[SD_MAX_VDI_LEN + SD_MAX_VDI_TAG_LEN];
+     BDRVSheepdogState *s = bs->opaque;
+@@ -2477,8 +2473,9 @@ static int sd_snapshot_delete(BlockDriverState *bs,
+     };
+     SheepdogVdiRsp *rsp = (SheepdogVdiRsp *)&hdr;
  
- struct BdrvChildRole {
--    /* If true, bdrv_replace_in_backing_chain() doesn't change the node this
--     * BdrvChild points to. */
-+    /* If true, bdrv_replace_node() doesn't change the node this BdrvChild
-+     * points to. */
-     bool stay_at_node;
+-    if (!remove_objects(s)) {
+-        return -1;
++    ret = remove_objects(s, errp);
++    if (ret) {
++        return ret;
+     }
  
-     void (*inherit_options)(int *child_flags, QDict *child_options,
+     memset(buf, 0, sizeof(buf));
+@@ -2498,36 +2495,36 @@ static int sd_snapshot_delete(BlockDriverState *bs,
+         pstrcpy(buf + SD_MAX_VDI_LEN, SD_MAX_VDI_TAG_LEN, snap_tag);
+     }
+ 
+-    ret = find_vdi_name(s, s->name, snap_id, snap_tag, &vid, true,
+-                        &local_err);
++    ret = find_vdi_name(s, s->name, snap_id, snap_tag, &vid, true, errp);
+     if (ret) {
+         return ret;
+     }
+ 
+-    fd = connect_to_sdog(s, &local_err);
++    fd = connect_to_sdog(s, errp);
+     if (fd < 0) {
+-        error_report_err(local_err);
+-        return -1;
++        return fd;
+     }
+ 
+     ret = do_req(fd, s->bs, (SheepdogReq *)&hdr,
+                  buf, &wlen, &rlen);
+     closesocket(fd);
+     if (ret) {
++        error_setg_errno(errp, -ret, "Couldn't send request to server");
+         return ret;
+     }
+ 
+     switch (rsp->result) {
+     case SD_RES_NO_VDI:
+-        error_report("%s was already deleted", s->name);
++        error_setg(errp, "Can't find the snapshot");
++        return -ENOENT;
+     case SD_RES_SUCCESS:
+         break;
+     default:
+-        error_report("%s, %s", sd_strerror(rsp->result), s->name);
+-        return -1;
++        error_setg(errp, "%s", sd_strerror(rsp->result));
++        return -EIO;
+     }
+ 
+-    return ret;
++    return 0;
+ }
+ 
+ static int sd_snapshot_list(BlockDriverState *bs, QEMUSnapshotInfo **psn_tab)
 -- 
 1.8.3.1
