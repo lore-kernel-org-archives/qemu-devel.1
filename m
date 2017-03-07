@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1clMRn-0004ff-P0
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 16:15:08 -0500
+	(envelope-from <amit@kernel.org>) id 1clLIq-0000rO-Ra
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 15:01:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1clMRm-0007Cw-IR
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 16:15:07 -0500
-References: <20170214192525.18624-1-eblake@redhat.com>
-	<20170214192525.18624-7-eblake@redhat.com>
-	<20170215162007.GF4935@noname.redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9f1103c9-142b-85c5-bc29-69110407136e@redhat.com>
-Date: Tue, 7 Mar 2017 15:14:58 -0600
+	(envelope-from <amit@kernel.org>) id 1clLIn-0007Nj-PY
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 15:01:48 -0500
+Received: from relay6-d.mail.gandi.net ([217.70.183.198]:40560)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amit@kernel.org>) id 1clLIn-0007Ne-JA
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 15:01:45 -0500
+Date: Tue, 7 Mar 2017 21:01:36 +0100
+From: Amit Shah <amit@kernel.org>
+Message-ID: <20170307200136.GJ25129@grmbl.mre>
+References: <1488770972-322500-1-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20170215162007.GF4935@noname.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="X7MT9uhjJt7xKuP4CGKI1N8FSwB90Pk42"
-Subject: Re: [Qemu-devel] [PATCH v5 6/7] blkdebug: Add ability to override
- unmap geometries
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1488770972-322500-1-git-send-email-zhang.zhanghailiang@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH] virtio-serial-bus: Delete timer from list
+ before free it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,112 +27,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, Markus Armbruster <armbru@redhat.com>
+To: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Cc: mst@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---X7MT9uhjJt7xKuP4CGKI1N8FSwB90Pk42
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com,
- Markus Armbruster <armbru@redhat.com>
-Message-ID: <9f1103c9-142b-85c5-bc29-69110407136e@redhat.com>
-Subject: Re: [PATCH v5 6/7] blkdebug: Add ability to override unmap geometries
-References: <20170214192525.18624-1-eblake@redhat.com>
- <20170214192525.18624-7-eblake@redhat.com>
- <20170215162007.GF4935@noname.redhat.com>
-In-Reply-To: <20170215162007.GF4935@noname.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On (Mon) 06 Mar 2017 [11:29:31], zhanghailiang wrote:
+> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-On 02/15/2017 10:20 AM, Kevin Wolf wrote:
-> Am 14.02.2017 um 20:25 hat Eric Blake geschrieben:
->> Make it easier to simulate various unusual hardware setups (for
->> example, recent commits 3482b9b and b8d0a98 affect the Dell
->> Equallogic iSCSI with its 15M preferred and maximum unmap and
->> write zero sizing, or b2f95fe deals with the Linux loopback
->> block device having a max_transfer of 64k), by allowing blkdebug
->> to wrap any other device with further restrictions on various
->> alignments.
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->>
+Reviewed-by: Amit Shah <amit@kernel.org>
 
->>  # @inject-error:    #optional array of error injection descriptions
->>  #
->>  # @set-state:       #optional array of state-change descriptions
->> @@ -2472,7 +2493,9 @@
->>  { 'struct': 'BlockdevOptionsBlkdebug',
->>    'data': { 'image': 'BlockdevRef',
->>              '*config': 'str',
->> -            '*align': 'int',
->> +            '*align': 'int', '*max-transfer': 'int32',
->> +            '*opt-write-zero': 'int32', '*max-write-zero': 'int32',
->> +            '*opt-discard': 'int32', '*max-discard': 'int32',
->=20
-> Hm, strictly speaking, this schema allows for negative values. Should w=
-e
-> document that they aren't allowed?
+Michael, please pick this up.
 
-Doesn't power of two imply positive? But yes, I can tweak the wording.
-
-
->> -    /* Set request alignment */
->> +    /* Set alignment overrides */
->>      s->align =3D qemu_opt_get_size(opts, "align", 0);
->>      if (s->align && (s->align >=3D INT_MAX || !is_power_of_2(s->align=
-))) {
->>          error_setg(errp, "Invalid alignment, align must be integer po=
-wer of 2");
->>          goto fail_unref;
->>      }
->> +    align =3D MAX(s->align, bs->file->bs->bl.request_alignment);
->> +
->> +    s->max_transfer =3D qemu_opt_get_size(opts, "max-transfer", 0);
->> +    if (s->max_transfer &&
->> +        (s->max_transfer >=3D INT_MAX ||
->> +         !QEMU_IS_ALIGNED(s->max_transfer, align))) {
->> +        error_setg(errp, "Invalid max-transfer, must be multiple of a=
-lign");
->=20
-> It's not that I'm generally a friend of unspecific messages, but in thi=
-s
-> case I think I would prefer being unspecific to the potentially wrong
-> error message that is returned here. We're checking multiple conditions=
-
-> and the error message mentions only one of them as the reason, which ma=
-y
-> or may not be the right one.
->=20
-> This is the same for all new options.
-
-I'm leaning towards "Cannot meet constraints with max-transfer %lld" as
-being non-specific enough to cover all the cases while still describing
-the problem to be fixed.  Any other wording suggestions would be
-welcome, if someone has a particular bikeshed color they like.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---X7MT9uhjJt7xKuP4CGKI1N8FSwB90Pk42
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYvyLSAAoJEKeha0olJ0NqmQ8IAJ3uvzJBrMh54d8gYXLCEukh
-YG0+BuywkpbzYiG3ziOETjDS/mEtRrDsWA27UOe9tNW6odEGGrMgG4HRRjoyxoQS
-tphVSpF3w/hhaIuUPvt6YdainaCDdtpcnCwhUl7O1kOgVNAb8sSyn0UEmFavcB2p
-10muR38kcHMGEX7WIcrlMXT3MdGuLuwG2cZbvTTTekZh5eAuePU0BX58yLwIYTjB
-aEo9BogeVyvpuBOdQ9Zd8wPUuNMWiMUsNzPpZqiBk1e8yPC9ohyKt/r85IBSXvUi
-f7DoGDzgqbnhALbUBdASAkJbc3bR5b4lXRlvjoEFT9XqXtMvGYA/2uTVrtEKWuU=
-=kDCU
------END PGP SIGNATURE-----
-
---X7MT9uhjJt7xKuP4CGKI1N8FSwB90Pk42--
+		Amit
+-- 
+http://log.amitshah.net/
