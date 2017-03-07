@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53983)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1clA30-0004nQ-JJ
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 03:00:43 -0500
+	(envelope-from <thuth@redhat.com>) id 1clA8x-0005i8-VL
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 03:06:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1clA2w-0008Sw-KK
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 03:00:42 -0500
-Received: from [59.151.112.132] (port=8520 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1clA2v-0008QO-Hl
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 03:00:38 -0500
-References: <1488011202-32121-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-	<1488011202-32121-2-git-send-email-caoj.fnst@cn.fujitsu.com>
-	<87tw75il8m.fsf@dusky.pond.sub.org>
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Message-ID: <58BE6A80.7010108@cn.fujitsu.com>
-Date: Tue, 7 Mar 2017 16:08:32 +0800
+	(envelope-from <thuth@redhat.com>) id 1clA8u-0001Xj-Oi
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 03:06:51 -0500
+References: <CABLmASHDwFx9LLVB2nWQ=TPLE_MJ-NPx38GLX+jRaHcWjA4_dA@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <5f75feb4-56a2-d34b-6ead-602952404ee0@redhat.com>
+Date: Tue, 7 Mar 2017 09:06:40 +0100
 MIME-Version: 1.0
-In-Reply-To: <87tw75il8m.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset="windows-1252"
+In-Reply-To: <CABLmASHDwFx9LLVB2nWQ=TPLE_MJ-NPx38GLX+jRaHcWjA4_dA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v10 1/8] msix: Rename and create a wrapper
+Subject: Re: [Qemu-devel] [Qemu-ppc] BUG: qemu-system-ppc boots Mac OS
+ 9.2.1/9.2.2 iso's extremely slow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,96 +23,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Howard Spoelstra <hsp.cat7@gmail.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-
-
-On 03/07/2017 03:44 PM, Markus Armbruster wrote:
-> Uh, two weeks since your posted this already.  I apologize for taking so
-> long to review.
+On 06.03.2017 22:49, Howard Spoelstra wrote:
+> Hi,
 > 
-> Cao jin <caoj.fnst@cn.fujitsu.com> writes:
+> I noticed qemu-system-ppc currently has difficulty booting Mac OS
+> 9.2.1/9.2.2 iso's. Even after 5 minutes the happy mac hasn't appeared.
+> This does not happen with 9.0.4 or 9.1 iso's, or PPC OS X versions.
 > 
->> Rename msix_init to msix_validate_and_init, and use it from vfio which
->> might get a reasonable -EINVAL.  New a wrapper msix_init which assert the
->> programming error for debug purpose and use it from other devices.
->>
->> CC: Alex Williamson <alex.williamson@redhat.com>
->> CC: Markus Armbruster <armbru@redhat.com>
->> CC: Marcel Apfelbaum <marcel@redhat.com>
->> CC: Michael S. Tsirkin <mst@redhat.com>
->>
->> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
->> ---
->>  hw/pci/msix.c         | 30 +++++++++++++++++++++---------
->>  hw/vfio/pci.c         | 12 ++++++------
->>  include/hw/pci/msix.h |  5 +++++
->>  3 files changed, 32 insertions(+), 15 deletions(-)
->>
->> diff --git a/hw/pci/msix.c b/hw/pci/msix.c
->> index bb54e8b0ac37..2b7541ab2c8d 100644
->> --- a/hw/pci/msix.c
->> +++ b/hw/pci/msix.c
->> @@ -239,6 +239,19 @@ static void msix_mask_all(struct PCIDevice *dev, unsigned nentries)
->>      }
->>  }
->>  
->> +/* Just a wrapper to check the return value */
->> +int msix_init(struct PCIDevice *dev, unsigned short nentries,
->> +              MemoryRegion *table_bar, uint8_t table_bar_nr,
->> +              unsigned table_offset, MemoryRegion *pba_bar,
->> +              uint8_t pba_bar_nr, unsigned pba_offset, uint8_t cap_pos,
->> +              Error **errp)
->> +{
->> +    int ret = msix_validate_and_init(dev, nentries, table_bar, table_bar_nr,
->> +            table_offset, pba_bar, pba_bar_nr, pba_offset, cap_pos, errp);
->> +
->> +    assert(ret != -EINVAL);
->> +    return ret;
->> +}
->>  /*
->>   * Make PCI device @dev MSI-X capable
->>   * @nentries is the max number of MSI-X vectors that the device support.
->> @@ -259,11 +272,11 @@ static void msix_mask_all(struct PCIDevice *dev, unsigned nentries)
->>   * also means a programming error, except device assignment, which can check
->>   * if a real HW is broken.
->>   */
->> -int msix_init(struct PCIDevice *dev, unsigned short nentries,
->> -              MemoryRegion *table_bar, uint8_t table_bar_nr,
->> -              unsigned table_offset, MemoryRegion *pba_bar,
->> -              uint8_t pba_bar_nr, unsigned pba_offset, uint8_t cap_pos,
->> -              Error **errp)
->> +int msix_validate_and_init(struct PCIDevice *dev, unsigned short nentries,
->> +                           MemoryRegion *table_bar, uint8_t table_bar_nr,
->> +                           unsigned table_offset, MemoryRegion *pba_bar,
->> +                           uint8_t pba_bar_nr, unsigned pba_offset,
->> +                           uint8_t cap_pos, Error **errp)
->>  {
->>      int cap;
->>      unsigned table_size, pba_size;
->> @@ -361,10 +374,9 @@ int msix_init_exclusive_bar(PCIDevice *dev, unsigned short nentries,
->>      memory_region_init(&dev->msix_exclusive_bar, OBJECT(dev), name, bar_size);
->>      g_free(name);
->>  
->> -    ret = msix_init(dev, nentries, &dev->msix_exclusive_bar, bar_nr,
->> -                    0, &dev->msix_exclusive_bar,
->> -                    bar_nr, bar_pba_offset,
->> -                    0, errp);
->> +    ret = msix_validate_and_init(dev, nentries, &dev->msix_exclusive_bar,
->> +                                 bar_nr, 0, &dev->msix_exclusive_bar,
->> +                                 bar_nr, bar_pba_offset, 0, errp);
->>      if (ret) {
->>          return ret;
->>      }
+> I bisected to this commit:
 > 
-> This change assumes that for the callers of msix_exclusive_bar(),
-> -EINVAL (capability overlap) is not a programming error.  Is that true?
+> 95ed56939eb2eaa4e2f349fe6dcd13ca4edfd8fb is the first bad commit
+> commit 95ed56939eb2eaa4e2f349fe6dcd13ca4edfd8fb
+> Author: Li Qiang <liqiang6-s@360.cn>
+> Date:   Tue Feb 7 02:23:33 2017 -0800
 > 
+>     usb: ohci: limit the number of link eds
+> 
+>     The guest may builds an infinite loop with link eds. This patch
+>     limit the number of linked ed to avoid this.
+> 
+>     Signed-off-by: Li Qiang <liqiang6-s@360.cn>
+>     Message-id: 5899a02e.45ca240a.6c373.93c1@mx.google.com
+>     Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> 
+> After reverting boot time is ~20 seconds.
+> 
+> It seems setting "#define ED_LINK_LIMIT 4" in hw/usb/hcd-ohci.c to a
+> higher limit solves this issue.
 
-Oh...it looks as you said. Will revert this part and send a new one
-in-reply-to this one.
+Could you maybe find out the lowest value for that define which is still
+working fine with that version of Mac OS ?
 
--- 
-Sincerely,
-Cao jin
+ Thanks,
+  Thomas
