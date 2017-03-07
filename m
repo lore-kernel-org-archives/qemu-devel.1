@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1clHtf-0001c3-Mt
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 11:23:36 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1clHy1-0003tw-D5
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 11:28:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1clHtb-0006aB-La
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 11:23:35 -0500
-Received: from mailapp01.imgtec.com ([195.59.15.196]:3620)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1clHtb-0006Wl-FZ
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 11:23:31 -0500
-From: Yongbok Kim <yongbok.kim@imgtec.com>
-Date: Tue, 7 Mar 2017 16:23:14 +0000
-Message-ID: <1488903794-10789-1-git-send-email-yongbok.kim@imgtec.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1clHxx-0004Xr-CL
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 11:28:05 -0500
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:34894)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1clHxx-0004XD-72
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 11:28:01 -0500
+Received: by mail-qk0-x244.google.com with SMTP id o135so2221714qke.2
+	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 08:28:01 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170307151627.27212-1-eblake@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <6913fffa-cb23-2792-fbc7-5950c8e73993@amsat.org>
+Date: Tue, 7 Mar 2017 13:27:57 -0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] target/mips: fix delay slot detection in
- gen_msa_branch()
+In-Reply-To: <20170307151627.27212-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-2.9 v2] nbd/client: fix drop_sync
+ [CVE-2017-2630]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,32 +34,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Brian Campbell <bacam@z273.org.uk>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, vsementsov@virtuozzo.com
 
-It is unnecessary to test R6 from delay/forbidden slot check
-in gen_msa_branch().
+On 03/07/2017 12:16 PM, Eric Blake wrote:
+> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>
+> Comparison symbol is misused. It may lead to memory corruption.
+> Introduced in commit 7d3123e.
+>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Message-Id: <20170203154757.36140-6-vsementsov@virtuozzo.com>
+> [eblake: add CVE details, update conditional]
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-https://bugs.launchpad.net/qemu/+bug/1663287
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Reported-by: Brian Campbell <bacam@z273.org.uk>
-Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
----
- target/mips/translate.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 8b4a072..756a9b7 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -18169,7 +18169,7 @@ static void gen_msa_branch(CPUMIPSState *env, DisasContext *ctx, uint32_t op1)
- 
-     check_msa_access(ctx);
- 
--    if (ctx->insn_flags & ISA_MIPS32R6 && ctx->hflags & MIPS_HFLAG_BMASK) {
-+    if (ctx->hflags & MIPS_HFLAG_BMASK) {
-         generate_exception_end(ctx, EXCP_RI);
-         return;
-     }
--- 
-2.7.4
+> ---
+> v2: use >= instead of >, fix R-b
+> ---
+>  nbd/client.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/nbd/client.c b/nbd/client.c
+> index 5c9dee3..3dc2564 100644
+> --- a/nbd/client.c
+> +++ b/nbd/client.c
+> @@ -94,7 +94,7 @@ static ssize_t drop_sync(QIOChannel *ioc, size_t size)
+>      char small[1024];
+>      char *buffer;
+>
+> -    buffer = sizeof(small) < size ? small : g_malloc(MIN(65536, size));
+> +    buffer = sizeof(small) >= size ? small : g_malloc(MIN(65536, size));
+>      while (size > 0) {
+>          ssize_t count = read_sync(ioc, buffer, MIN(65536, size));
+>
