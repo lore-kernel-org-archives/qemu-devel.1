@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1clHOD-0002dh-RJ
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:51:06 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1clHVQ-0000ul-7J
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:58:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1clHO9-0005tQ-QN
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:51:05 -0500
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:38614)
+	(envelope-from <alex.bennee@linaro.org>) id 1clHVO-0008C0-FI
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:58:32 -0500
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:36669)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1clHO9-0005sz-7c
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:51:01 -0500
-Received: by mail-wm0-x22e.google.com with SMTP id t189so8507409wmt.1
-	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 07:51:01 -0800 (PST)
+	id 1clHVO-0008BW-97
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:58:30 -0500
+Received: by mail-wm0-x231.google.com with SMTP id n11so93408762wma.1
+	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 07:58:30 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue,  7 Mar 2017 15:50:48 +0000
-Message-Id: <20170307155054.5833-6-alex.bennee@linaro.org>
+Date: Tue,  7 Mar 2017 15:50:50 +0000
+Message-Id: <20170307155054.5833-8-alex.bennee@linaro.org>
 In-Reply-To: <20170307155054.5833-1-alex.bennee@linaro.org>
 References: <20170307155054.5833-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 05/11] s390x/misc_helper.c: wrap IO
- instructions in BQL
+Subject: [Qemu-devel] [PATCH v3 07/11] translate-all: exit cpu_restore_state
+ early if translating
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,111 +31,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, rth@twiddle.net, pbonzini@redhat.com
-Cc: qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Alexander Graf <agraf@suse.de>
+Cc: qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-Helpers that can trigger IO events (including interrupts) need to be
-protected by the BQL. I've updated all the helpers that call into an
-ioinst_handle_* functions.
+The translation code uses cpu_ld*_code which can trigger a tlb_fill
+which if it fails will erroneously attempts a fault resolution. This
+never works during translation as the TB being generated hasn't been
+added yet. The target should have checked retaddr before calling
+cpu_restore_state but for those that have yet to be fixed we do it
+here to avoid a recursive tb_lock() under MTTCG's new locking regime.
 
-Reported-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- target/s390x/misc_helper.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
 
-diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-index 3cb942e8bb..93b0e61366 100644
---- a/target/s390x/misc_helper.c
-+++ b/target/s390x/misc_helper.c
-@@ -19,6 +19,7 @@
-  */
+---
+v3
+  - check retaddr instead
+  - reword commit/comments to be clearer
+---
+ translate-all.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/translate-all.c b/translate-all.c
+index d42d003e67..34480aebba 100644
+--- a/translate-all.c
++++ b/translate-all.c
+@@ -333,6 +333,19 @@ bool cpu_restore_state(CPUState *cpu, uintptr_t retaddr)
+     TranslationBlock *tb;
+     bool r = false;
  
- #include "qemu/osdep.h"
-+#include "qemu/main-loop.h"
- #include "cpu.h"
- #include "exec/memory.h"
- #include "qemu/host-utils.h"
-@@ -551,61 +552,81 @@ uint32_t HELPER(sigp)(CPUS390XState *env, uint64_t order_code, uint32_t r1,
- void HELPER(xsch)(CPUS390XState *env, uint64_t r1)
- {
-     S390CPU *cpu = s390_env_get_cpu(env);
-+    qemu_mutex_lock_iothread();
-     ioinst_handle_xsch(cpu, r1);
-+    qemu_mutex_unlock_iothread();
- }
- 
- void HELPER(csch)(CPUS390XState *env, uint64_t r1)
- {
-     S390CPU *cpu = s390_env_get_cpu(env);
-+    qemu_mutex_lock_iothread();
-     ioinst_handle_csch(cpu, r1);
-+    qemu_mutex_unlock_iothread();
- }
- 
- void HELPER(hsch)(CPUS390XState *env, uint64_t r1)
- {
-     S390CPU *cpu = s390_env_get_cpu(env);
-+    qemu_mutex_lock_iothread();
-     ioinst_handle_hsch(cpu, r1);
-+    qemu_mutex_unlock_iothread();
- }
- 
- void HELPER(msch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
- {
-     S390CPU *cpu = s390_env_get_cpu(env);
-+    qemu_mutex_lock_iothread();
-     ioinst_handle_msch(cpu, r1, inst >> 16);
-+    qemu_mutex_unlock_iothread();
- }
- 
- void HELPER(rchp)(CPUS390XState *env, uint64_t r1)
- {
-     S390CPU *cpu = s390_env_get_cpu(env);
-+    qemu_mutex_lock_iothread();
-     ioinst_handle_rchp(cpu, r1);
-+    qemu_mutex_unlock_iothread();
- }
- 
- void HELPER(rsch)(CPUS390XState *env, uint64_t r1)
- {
-     S390CPU *cpu = s390_env_get_cpu(env);
-+    qemu_mutex_lock_iothread();
-     ioinst_handle_rsch(cpu, r1);
-+    qemu_mutex_unlock_iothread();
- }
- 
- void HELPER(ssch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
- {
-     S390CPU *cpu = s390_env_get_cpu(env);
-+    qemu_mutex_lock_iothread();
-     ioinst_handle_ssch(cpu, r1, inst >> 16);
-+    qemu_mutex_unlock_iothread();
- }
- 
- void HELPER(stsch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
- {
-     S390CPU *cpu = s390_env_get_cpu(env);
-+    qemu_mutex_lock_iothread();
-     ioinst_handle_stsch(cpu, r1, inst >> 16);
-+    qemu_mutex_unlock_iothread();
- }
- 
- void HELPER(tsch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
- {
-     S390CPU *cpu = s390_env_get_cpu(env);
-+    qemu_mutex_lock_iothread();
-     ioinst_handle_tsch(cpu, r1, inst >> 16);
-+    qemu_mutex_unlock_iothread();
- }
- 
- void HELPER(chsc)(CPUS390XState *env, uint64_t inst)
- {
-     S390CPU *cpu = s390_env_get_cpu(env);
-+    qemu_mutex_lock_iothread();
-     ioinst_handle_chsc(cpu, inst >> 16);
-+    qemu_mutex_unlock_iothread();
- }
- #endif
- 
++    /* A retaddr of zero is invalid so we really shouldn't have ended
++     * up here. The target code has likely forgotten to check retaddr
++     * != 0 before attempting to restore state. We return early to
++     * avoid blowing up on a recursive tb_lock(). The target must have
++     * previously survived a failed cpu_restore_state because
++     * tb_find_pc(0) would have failed anyway. It still should be
++     * fixed though.
++     */
++
++    if (!retaddr) {
++        return r;
++    }
++
+     tb_lock();
+     tb = tb_find_pc(retaddr);
+     if (tb) {
 -- 
 2.11.0
