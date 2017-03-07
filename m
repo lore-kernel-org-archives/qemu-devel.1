@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44981)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1cl9RW-0002eK-Mp
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:21:59 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cl9b7-0002eo-8j
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:31:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1cl9RT-0006a6-Ig
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:21:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37746)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1cl9RT-0006ZY-CI
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:21:55 -0500
-From: P J P <ppandit@redhat.com>
-Date: Tue,  7 Mar 2017 12:51:47 +0530
-Message-Id: <20170307072147.1425-1-ppandit@redhat.com>
-Subject: [Qemu-devel] [PATCH v3] linux-user: allocate heap memory for execve
- arguments
+	(envelope-from <peter.maydell@linaro.org>) id 1cl9b6-0000tB-89
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:31:53 -0500
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:36712)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cl9b5-0000sy-W3
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:31:52 -0500
+Received: by mail-wr0-x22e.google.com with SMTP id u108so132490139wrb.3
+	for <qemu-devel@nongnu.org>; Mon, 06 Mar 2017 23:31:51 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <1488777954-4578-1-git-send-email-jasowang@redhat.com>
+References: <1488777954-4578-1-git-send-email-jasowang@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 7 Mar 2017 07:31:30 +0000
+Message-ID: <CAFEAcA8JSDHsOFvpPcrv3=PbEiHF5nog1AFOCEpT8QmqDhMttg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL RESEND 00/19] Net patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,49 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Qemu Developers <qemu-devel@nongnu.org>
-Cc: Eric Blake <eblake@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Jann Horn <jannh@google.com>, Peter Maydell <peter.maydell@linaro.org>, Prasad J Pandit <pjp@fedoraproject.org>
+To: Jason Wang <jasowang@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
+On 6 March 2017 at 05:25, Jason Wang <jasowang@redhat.com> wrote:
+> The following changes since commit 17783ac828adc694d986698d2d7014aedfeb48c6:
+>
+>   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-2.9-20170303' into staging (2017-03-04 16:31:14 +0000)
+>
+> are available in the git repository at:
+>
+>   https://github.com/jasowang/qemu.git tags/net-pull-request
+>
+> for you to fetch changes up to f0aabd5c4ae11fde704d138e8f06c69e5c902a16:
+>
+>   net/filter-mirror: Follow CODING_STYLE (2017-03-06 11:46:02 +0800)
+>
+> ----------------------------------------------------------------
+> Preview pull does not reach list.
+>
+> - fix vlan issues for e1000e
+> - convert to use vmstate for vmxnet3
+> - several fixes for colo
+> ----------------------------------------------------------------
 
-Arguments passed to execve(2) call from user program could
-be large, allocating stack memory for them via alloca(3) call
-would lead to bad behaviour. Use 'g_new0' to allocate memory
-for such arguments.
+Applied, thanks.
 
-Reported-by: Jann Horn <jannh@google.com>
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
----
- linux-user/syscall.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-Update: use g_new0 instead of g_malloc0
-  -> https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg01193.html
-
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index cec8428..c672581 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -7926,8 +7926,8 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-                 envc++;
-             }
-
--            argp = alloca((argc + 1) * sizeof(void *));
--            envp = alloca((envc + 1) * sizeof(void *));
-+            argp = g_new0(char *, argc + 1);
-+            envp = g_new0(char *, envc + 1);
-
-             for (gp = guest_argp, q = argp; gp;
-                   gp += sizeof(abi_ulong), q++) {
-@@ -7988,6 +7988,9 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-                     break;
-                 unlock_user(*q, addr, 0);
-             }
-+
-+            g_free(argp);
-+            g_free(envp);
-         }
-         break;
-     case TARGET_NR_chdir:
---
-2.9.3
+-- PMM
