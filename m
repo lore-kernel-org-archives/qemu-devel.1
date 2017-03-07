@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1clHEn-0002HR-Rk
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:41:22 -0500
+	(envelope-from <kwolf@redhat.com>) id 1clHEp-0002Jf-UU
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:41:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1clHEk-0002lt-2I
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:41:21 -0500
+	(envelope-from <kwolf@redhat.com>) id 1clHEp-0002nv-3W
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:41:23 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue,  7 Mar 2017 16:40:35 +0100
-Message-Id: <1488901251-16214-12-git-send-email-kwolf@redhat.com>
+Date: Tue,  7 Mar 2017 16:40:38 +0100
+Message-Id: <1488901251-16214-15-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1488901251-16214-1-git-send-email-kwolf@redhat.com>
 References: <1488901251-16214-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 11/27] sheepdog: Defuse time bomb in sd_open()
- error handling
+Subject: [Qemu-devel] [PULL 14/27] sheepdog: Mark sd_snapshot_delete()
+ lossage FIXME
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,99 +25,54 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Markus Armbruster <armbru@redhat.com>
 
-When qemu_opts_absorb_qdict() fails, sd_open() closes stdin, because
-sd->fd is still zero.  Fortunately, qemu_opts_absorb_qdict() can't
-fail, because:
-
-1. it only fails when qemu_opt_parse() fails, and
-2. the only member of runtime_opts.desc[] is a QEMU_OPT_STRING, and
-3. qemu_opt_parse() can't fail for QEMU_OPT_STRING.
-
-Defuse this ticking time bomb by jumping behind the file descriptor
-cleanup on error.
-
-Also do that for the error paths where sd->fd is still -1.  The file
-descriptor cleanup happens to do nothing then, but let's not rely on
-that here.
-
-While there, rename label out to err, because it's on the error path,
-not the normal path out of the function.
+sd_snapshot_delete() should delete the snapshot whose ID matches
+@snapshot_id and whose name matches @name.  But that's not what it
+does.  If @snapshot_id is a valid ID, it deletes the snapshot with
+that ID, else it deletes the snapshot with that name.  It doesn't use
+@name at all.  Add suitable FIXME comments, so someone who actually
+knows Sheepdog can fix it.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/sheepdog.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ block/sheepdog.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
 diff --git a/block/sheepdog.c b/block/sheepdog.c
-index 7434710..c3ee4ce 100644
+index be3db1f..187bcd8 100644
 --- a/block/sheepdog.c
 +++ b/block/sheepdog.c
-@@ -1392,7 +1392,7 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
-     if (local_err) {
-         error_propagate(errp, local_err);
-         ret = -EINVAL;
--        goto out;
-+        goto err_no_fd;
+@@ -2457,6 +2457,10 @@ static int sd_snapshot_delete(BlockDriverState *bs,
+                               const char *name,
+                               Error **errp)
+ {
++    /*
++     * FIXME should delete the snapshot matching both @snapshot_id and
++     * @name, but @name not used here
++     */
+     unsigned long snap_id = 0;
+     char snap_tag[SD_MAX_VDI_TAG_LEN];
+     int fd, ret;
+@@ -2481,6 +2485,11 @@ static int sd_snapshot_delete(BlockDriverState *bs,
+     pstrcpy(buf, SD_MAX_VDI_LEN, s->name);
+     ret = qemu_strtoul(snapshot_id, NULL, 10, &snap_id);
+     if (ret || snap_id > UINT32_MAX) {
++        /*
++         * FIXME Since qemu_strtoul() returns -EINVAL when
++         * @snapshot_id is null, @snapshot_id is mandatory.  Correct
++         * would be to require at least one of @snapshot_id and @name.
++         */
+         error_setg(errp, "Invalid snapshot ID: %s",
+                          snapshot_id ? snapshot_id : "<null>");
+         return -EINVAL;
+@@ -2489,6 +2498,7 @@ static int sd_snapshot_delete(BlockDriverState *bs,
+     if (snap_id) {
+         hdr.snapid = (uint32_t) snap_id;
+     } else {
++        /* FIXME I suspect we should use @name here */
+         pstrcpy(snap_tag, sizeof(snap_tag), snapshot_id);
+         pstrcpy(buf + SD_MAX_VDI_LEN, SD_MAX_VDI_TAG_LEN, snap_tag);
      }
- 
-     filename = qemu_opt_get(opts, "filename");
-@@ -1412,17 +1412,17 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
-     }
-     if (ret < 0) {
-         error_setg(errp, "Can't parse filename");
--        goto out;
-+        goto err_no_fd;
-     }
-     s->fd = get_sheep_fd(s, errp);
-     if (s->fd < 0) {
-         ret = s->fd;
--        goto out;
-+        goto err_no_fd;
-     }
- 
-     ret = find_vdi_name(s, vdi, snapid, tag, &vid, true, errp);
-     if (ret) {
--        goto out;
-+        goto err;
-     }
- 
-     /*
-@@ -1443,7 +1443,7 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
-     fd = connect_to_sdog(s, errp);
-     if (fd < 0) {
-         ret = fd;
--        goto out;
-+        goto err;
-     }
- 
-     buf = g_malloc(SD_INODE_SIZE);
-@@ -1454,7 +1454,7 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
- 
-     if (ret) {
-         error_setg(errp, "Can't read snapshot inode");
--        goto out;
-+        goto err;
-     }
- 
-     memcpy(&s->inode, buf, sizeof(s->inode));
-@@ -1466,12 +1466,12 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
-     qemu_opts_del(opts);
-     g_free(buf);
-     return 0;
--out:
-+
-+err:
-     aio_set_fd_handler(bdrv_get_aio_context(bs), s->fd,
-                        false, NULL, NULL, NULL, NULL);
--    if (s->fd >= 0) {
--        closesocket(s->fd);
--    }
-+    closesocket(s->fd);
-+err_no_fd:
-     qemu_opts_del(opts);
-     g_free(buf);
-     return ret;
 -- 
 1.8.3.1
