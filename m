@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1clCer-0002l4-Cj
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:47:58 -0500
+	(envelope-from <prvs=232365128=Paul.Durrant@citrix.com>)
+	id 1clCmN-0003w6-7L
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:55:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1clCeq-0000oo-HZ
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:47:57 -0500
-Date: Tue, 7 Mar 2017 11:47:48 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170307104748.GG5871@noname.str.redhat.com>
-References: <20170306195255.15806-1-mreitz@redhat.com>
-	<20170306195407.16415-1-mreitz@redhat.com>
+	(envelope-from <prvs=232365128=Paul.Durrant@citrix.com>)
+	id 1clCmK-0002ew-4B
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:55:43 -0500
+Received: from smtp02.citrix.com ([66.165.176.63]:15103)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=232365128=Paul.Durrant@citrix.com>)
+	id 1clCmJ-0002eR-So
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:55:40 -0500
+From: Paul Durrant <paul.durrant@citrix.com>
+Date: Tue, 7 Mar 2017 10:55:31 +0000
+Message-ID: <1488884134-29190-3-git-send-email-paul.durrant@citrix.com>
+In-Reply-To: <1488884134-29190-1-git-send-email-paul.durrant@citrix.com>
+References: <1488884134-29190-1-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170306195407.16415-1-mreitz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 1/3] block: Add errp to b{lk,
- drv}_truncate()
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v4 2/5] xen: rename xen_modified_memory() to
+ xen_hvm_modified_memory()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,43 +29,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
+Cc: Paul Durrant <paul.durrant@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
 
-Am 06.03.2017 um 20:54 hat Max Reitz geschrieben:
-> For one thing, this allows us to drop the error message generation from
-> qemu-img.c and blockdev.c and instead have it unified in
-> bdrv_truncate().
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+This patch is a purely cosmetic change that avoids a name collision in
+a subsequent patch.
 
->  block/commit.c                 |  5 +++--
->  block/mirror.c                 |  2 +-
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+Reviewed-by: Anthony Perard <anthony.perard@citrix.com>
+---
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+---
+ include/exec/ram_addr.h | 4 ++--
+ include/hw/xen/xen.h    | 2 +-
+ xen-hvm-stub.c          | 2 +-
+ xen-hvm.c               | 2 +-
+ 4 files changed, 5 insertions(+), 5 deletions(-)
 
-These still pass NULL after the series. Fixing it would require to add a
-way to complete jobs with an Error object, but maybe we should do this
-sooner or later anyway. Not necessarily part of this series, though.
-
->  block/vhdx.c                   |  6 +++---
->  block/vpc.c                    |  2 +-
-
-vpc can easily be fixed to pass the actual errp from vpc_create() to the
-blk_truncate() call. In vhdx.c, the blk_truncate() call is a bit more
-deeply nested, but it doesn't seem completely unreasonable there either.
-
-> --- a/qemu-io-cmds.c
-> +++ b/qemu-io-cmds.c
-> @@ -1569,7 +1569,7 @@ static int truncate_f(BlockBackend *blk, int argc, char **argv)
->          return 0;
->      }
->  
-> -    ret = blk_truncate(blk, offset);
-> +    ret = blk_truncate(blk, offset, NULL);
->      if (ret < 0) {
->          printf("truncate: %s\n", strerror(-ret));
->          return 0;
-
-Come on, using NULL immediately before a printf()? Doing the right thing
-here is trivial.
-
-Kevin
+diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+index 3e79466..8715af6 100644
+--- a/include/exec/ram_addr.h
++++ b/include/exec/ram_addr.h
+@@ -259,7 +259,7 @@ static inline void cpu_physical_memory_set_dirty_range(ram_addr_t start,
+ 
+     rcu_read_unlock();
+ 
+-    xen_modified_memory(start, length);
++    xen_hvm_modified_memory(start, length);
+ }
+ 
+ #if !defined(_WIN32)
+@@ -313,7 +313,7 @@ static inline void cpu_physical_memory_set_dirty_lebitmap(unsigned long *bitmap,
+ 
+         rcu_read_unlock();
+ 
+-        xen_modified_memory(start, pages << TARGET_PAGE_BITS);
++        xen_hvm_modified_memory(start, pages << TARGET_PAGE_BITS);
+     } else {
+         uint8_t clients = tcg_enabled() ? DIRTY_CLIENTS_ALL : DIRTY_CLIENTS_NOCODE;
+         /*
+diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
+index 09c2ce5..2b1733b 100644
+--- a/include/hw/xen/xen.h
++++ b/include/hw/xen/xen.h
+@@ -43,7 +43,7 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory);
+ 
+ void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size,
+                    struct MemoryRegion *mr, Error **errp);
+-void xen_modified_memory(ram_addr_t start, ram_addr_t length);
++void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length);
+ 
+ void xen_register_framebuffer(struct MemoryRegion *mr);
+ 
+diff --git a/xen-hvm-stub.c b/xen-hvm-stub.c
+index c500325..3ca6c51 100644
+--- a/xen-hvm-stub.c
++++ b/xen-hvm-stub.c
+@@ -50,7 +50,7 @@ void xen_register_framebuffer(MemoryRegion *mr)
+ {
+ }
+ 
+-void xen_modified_memory(ram_addr_t start, ram_addr_t length)
++void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length)
+ {
+ }
+ 
+diff --git a/xen-hvm.c b/xen-hvm.c
+index dbb8c66..edf4983 100644
+--- a/xen-hvm.c
++++ b/xen-hvm.c
+@@ -1391,7 +1391,7 @@ void xen_shutdown_fatal_error(const char *fmt, ...)
+     qemu_system_shutdown_request();
+ }
+ 
+-void xen_modified_memory(ram_addr_t start, ram_addr_t length)
++void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length)
+ {
+     if (unlikely(xen_in_migration)) {
+         int rc;
+-- 
+2.1.4
