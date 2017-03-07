@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1clJCA-000698-Gf
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 12:46:51 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1clJCJ-0006Cb-Ax
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 12:46:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1clJC7-0002oM-At
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 12:46:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34638)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1clJC7-0002oH-2J
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 12:46:43 -0500
-References: <20170303185427.32681-1-jsnow@redhat.com>
-	<CAMr-obuiwE_ef6OPSJbBtmZYsaqo_mzU9E6q8zhbrviZ6_=krQ@mail.gmail.com>
-	<5303cac4-a8d8-bf89-b525-3b0fb1b19127@redhat.com>
-	<CAMr-obsrUqvqbLabYgKgv1J+ztn5XCwto6LowoN=S0ZWuFLZMA@mail.gmail.com>
-	<871sua4y3u.fsf@dusky.pond.sub.org>
-	<3fbdfabf-82b4-d774-d5f4-2c50a6d740dc@redhat.com>
-	<87efy9ijrf.fsf@dusky.pond.sub.org>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <9fa615cc-bfea-df2b-733d-69ccf636e514@redhat.com>
-Date: Tue, 7 Mar 2017 12:46:40 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1clJCG-0002p9-5Y
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 12:46:55 -0500
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:35693)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1clJCG-0002p3-0O
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 12:46:52 -0500
+Received: by mail-qk0-x242.google.com with SMTP id o135so2948852qke.2
+	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 09:46:51 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170307155054.5833-1-alex.bennee@linaro.org>
+	<20170307155054.5833-6-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <b8326233-2274-431a-0c4c-e4c7d77aa951@amsat.org>
+Date: Tue, 7 Mar 2017 14:46:46 -0300
 MIME-Version: 1.0
-In-Reply-To: <87efy9ijrf.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] qmp-shell: add persistent command
- history
+In-Reply-To: <20170307155054.5833-6-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 05/11] s390x/misc_helper.c: wrap IO
+ instructions in BQL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,147 +35,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Nir Soffer <nirsof@gmail.com>, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, rth@twiddle.net, pbonzini@redhat.com
+Cc: mttcg@listserver.greensocs.com, Alexander Graf <agraf@suse.de>, nikunj@linux.vnet.ibm.com, a.rigo@virtualopensystems.com, qemu-devel@nongnu.org, cota@braap.org, bobby.prani@gmail.com, fred.konrad@greensocs.com
 
+On 03/07/2017 12:50 PM, Alex Bennée wrote:
+> Helpers that can trigger IO events (including interrupts) need to be
+> protected by the BQL. I've updated all the helpers that call into an
+> ioinst_handle_* functions.
+>
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-On 03/07/2017 03:16 AM, Markus Armbruster wrote:
-> John Snow <jsnow@redhat.com> writes:
-> 
->> On 03/06/2017 03:18 AM, Markus Armbruster wrote:
->>> Nir Soffer <nirsof@gmail.com> writes:
->>>
->>>> On Fri, Mar 3, 2017 at 9:29 PM, John Snow <jsnow@redhat.com> wrote:
->>>>>
->>>>>
->>>>> On 03/03/2017 02:26 PM, Nir Soffer wrote:
->>>>>> On Fri, Mar 3, 2017 at 8:54 PM, John Snow <jsnow@redhat.com> wrote:
->>>>>>> Use the existing readline history function we are utilizing
->>>>>>> to provide persistent command history across instances of qmp-shell.
->>>>>>>
->>>>>>> This assists entering debug commands across sessions that may be
->>>>>>> interrupted by QEMU sessions terminating, where the qmp-shell has
->>>>>>> to be relaunched.
->>>>>>>
->>>>>>> Signed-off-by: John Snow <jsnow@redhat.com>
->>>>>>> ---
->>>>>>>
->>>>>>> v2: Adjusted the errors to whine about non-ENOENT errors, but still
->>>>>>>     intercept all errors as non-fatal.
->>>>>>>     Save history atexit() to match bash standard behavior
->>>>>>>
->>>>>>>  scripts/qmp/qmp-shell | 19 +++++++++++++++++++
->>>>>>>  1 file changed, 19 insertions(+)
->>>>>>>
->>>>>>> diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
->>>>>>> index 0373b24..55a8285 100755
->>>>>>> --- a/scripts/qmp/qmp-shell
->>>>>>> +++ b/scripts/qmp/qmp-shell
->>>>>>> @@ -70,6 +70,9 @@ import json
->>>>>>>  import ast
->>>>>>>  import readline
->>>>>>>  import sys
->>>>>>> +import os
->>>>>>> +import errno
->>>>>>> +import atexit
->>>>>>>
->>>>>>>  class QMPCompleter(list):
->>>>>>>      def complete(self, text, state):
->>>>>>> @@ -109,6 +112,7 @@ class QMPShell(qmp.QEMUMonitorProtocol):
->>>>>>>          self._pretty = pretty
->>>>>>>          self._transmode = False
->>>>>>>          self._actions = list()
->>>>>>> +        self._histfile = os.path.join(os.path.expanduser('~'), '.qmp_history')
->>>
->>> I selfishly object to this filename, because I'm using it with
->>>
->>>     $ socat UNIX:/work/armbru/images/test-qmp READLINE,history=$HOME/.qmp_history,prompt='QMP> '
->>>
->>> Just kidding.  But seriously, shouldn't this be named after the
->>> *application* (qmp-shell) rather than the protocol (qmp)?
->>>
->>
->> Seeing as the history itself is the qmp-shell syntax, you are correct.
->>
->> (Hey, it would be interesting to store the generated QMP into the
->> qmp_history, though...!)
-> 
-> Hah!  Saving it would be easy enough, but reloading it...  okay, call it
-> a "backup" and declare victory when saving works.
-> 
->>>>>>>
->>>>>>>      def __get_address(self, arg):
->>>>>>>          """
->>>>>>> @@ -137,6 +141,21 @@ class QMPShell(qmp.QEMUMonitorProtocol):
->>>>>>>          # XXX: default delimiters conflict with some command names (eg. query-),
->>>>>>>          # clearing everything as it doesn't seem to matter
->>>>>>>          readline.set_completer_delims('')
->>>>>>> +        try:
->>>>>>> +            readline.read_history_file(self._histfile)
->>>>>>> +        except Exception as e:
->>>>>>> +            if isinstance(e, IOError) and e.errno == errno.ENOENT:
->>>>>>> +                # File not found. No problem.
->>>>>>> +                pass
->>>>>>> +            else:
->>>>>>> +                print "Failed to read history '%s'; %s" % (self._histfile, e)
->>>>>>
->>>>>> I would handle only IOError, since any other error means a bug in this code
->>>>>> or in the underlying readline library, and the best way to handle this is to
->>>>>> let it fail loudly.
->>>>>>
->>>>>
->>>>> Disagree. No reason to stop the shell from working because a QOL feature
->>>>> didn't initialize correctly.
->>>>>
->>>>> The warning will be enough to solicit reports and fixes if necessary.
->>>>
->>>> I agree, the current solution is good tradeoff.
->>>
->>> For what it's worth, bash seems to silently ignore a history file it
->>> can't read.  Tested by running "HISTFILE=xxx bash", then chmod 0 xxx, da
->>> capo.
->>>
->>
->> Right, done by example.
->>
->>>> One thing missing, is a call to readline.set_history_length, without
->>>> it the history
->>>> will grow without limit, see:
->>>> https://docs.python.org/2/library/readline.html#readline.set_history_length
->>>
->>> Should this be addressed for 2.9?
->>>
->>
->> You can add a limit if you want to; I don't have suggestions for which
->> completely arbitrary limit makes sense, so I left it blank intentionally.
-> 
-> For what it's worth, bash defaults HISTSIZE to 500.
-> 
-> GNU Readline lets users configure it in ~/.inputrc.  Conditional
-> configuration is possible, i.e. something like
-> 
->     $if Qmp-shell
->     set history-size 5000
->     $endif
-> 
-> should work, provided qmp-shell sets rl_readline_name as it should.
-> 
-
-There's the winning ticket!
-
->>>>>>> +        atexit.register(self.__save_history)
->>>>>>> +
->>>>>>> +    def __save_history(self):
->>>>>>> +        try:
->>>>>>> +            readline.write_history_file(self._histfile)
->>>>>>> +        except Exception as e:
->>>>>>> +            print "Failed to save history file '%s'; %s" % (self._histfile, e)
->>>>>>>
->>>>>>>      def __parse_value(self, val):
->>>>>>>          try:
->>>>>>
->>>>>> But I think this is good enough and useful as is.
->>>>>>
->>>>>> Reviewed-by: Nir Soffer <nirsof@gmail.com>
->>>>>>
+> ---
+>  target/s390x/misc_helper.c | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
+>
+> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+> index 3cb942e8bb..93b0e61366 100644
+> --- a/target/s390x/misc_helper.c
+> +++ b/target/s390x/misc_helper.c
+> @@ -19,6 +19,7 @@
+>   */
+>
+>  #include "qemu/osdep.h"
+> +#include "qemu/main-loop.h"
+>  #include "cpu.h"
+>  #include "exec/memory.h"
+>  #include "qemu/host-utils.h"
+> @@ -551,61 +552,81 @@ uint32_t HELPER(sigp)(CPUS390XState *env, uint64_t order_code, uint32_t r1,
+>  void HELPER(xsch)(CPUS390XState *env, uint64_t r1)
+>  {
+>      S390CPU *cpu = s390_env_get_cpu(env);
+> +    qemu_mutex_lock_iothread();
+>      ioinst_handle_xsch(cpu, r1);
+> +    qemu_mutex_unlock_iothread();
+>  }
+>
+>  void HELPER(csch)(CPUS390XState *env, uint64_t r1)
+>  {
+>      S390CPU *cpu = s390_env_get_cpu(env);
+> +    qemu_mutex_lock_iothread();
+>      ioinst_handle_csch(cpu, r1);
+> +    qemu_mutex_unlock_iothread();
+>  }
+>
+>  void HELPER(hsch)(CPUS390XState *env, uint64_t r1)
+>  {
+>      S390CPU *cpu = s390_env_get_cpu(env);
+> +    qemu_mutex_lock_iothread();
+>      ioinst_handle_hsch(cpu, r1);
+> +    qemu_mutex_unlock_iothread();
+>  }
+>
+>  void HELPER(msch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
+>  {
+>      S390CPU *cpu = s390_env_get_cpu(env);
+> +    qemu_mutex_lock_iothread();
+>      ioinst_handle_msch(cpu, r1, inst >> 16);
+> +    qemu_mutex_unlock_iothread();
+>  }
+>
+>  void HELPER(rchp)(CPUS390XState *env, uint64_t r1)
+>  {
+>      S390CPU *cpu = s390_env_get_cpu(env);
+> +    qemu_mutex_lock_iothread();
+>      ioinst_handle_rchp(cpu, r1);
+> +    qemu_mutex_unlock_iothread();
+>  }
+>
+>  void HELPER(rsch)(CPUS390XState *env, uint64_t r1)
+>  {
+>      S390CPU *cpu = s390_env_get_cpu(env);
+> +    qemu_mutex_lock_iothread();
+>      ioinst_handle_rsch(cpu, r1);
+> +    qemu_mutex_unlock_iothread();
+>  }
+>
+>  void HELPER(ssch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
+>  {
+>      S390CPU *cpu = s390_env_get_cpu(env);
+> +    qemu_mutex_lock_iothread();
+>      ioinst_handle_ssch(cpu, r1, inst >> 16);
+> +    qemu_mutex_unlock_iothread();
+>  }
+>
+>  void HELPER(stsch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
+>  {
+>      S390CPU *cpu = s390_env_get_cpu(env);
+> +    qemu_mutex_lock_iothread();
+>      ioinst_handle_stsch(cpu, r1, inst >> 16);
+> +    qemu_mutex_unlock_iothread();
+>  }
+>
+>  void HELPER(tsch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
+>  {
+>      S390CPU *cpu = s390_env_get_cpu(env);
+> +    qemu_mutex_lock_iothread();
+>      ioinst_handle_tsch(cpu, r1, inst >> 16);
+> +    qemu_mutex_unlock_iothread();
+>  }
+>
+>  void HELPER(chsc)(CPUS390XState *env, uint64_t inst)
+>  {
+>      S390CPU *cpu = s390_env_get_cpu(env);
+> +    qemu_mutex_lock_iothread();
+>      ioinst_handle_chsc(cpu, inst >> 16);
+> +    qemu_mutex_unlock_iothread();
+>  }
+>  #endif
+>
+>
