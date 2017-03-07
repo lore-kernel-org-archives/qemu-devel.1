@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1clGv2-0003Vw-MR
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:20:58 -0500
+	(envelope-from <armbru@redhat.com>) id 1clGv3-0003Wf-Mg
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:20:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1clGv0-0003Pi-43
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:20:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58772)
+	(envelope-from <armbru@redhat.com>) id 1clGv1-0003Rp-FP
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:20:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:29803)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1clGuz-0003On-PO
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:20:53 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1clGv0-0003Pt-Tr
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:20:55 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DDD516AAC7
+	by mx1.redhat.com (Postfix) with ESMTPS id EF966C05493E
 	for <qemu-devel@nongnu.org>; Tue,  7 Mar 2017 15:20:53 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
 	[10.36.116.55])
-	by int-mx14.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v27FKqwB007575
+	by int-mx11.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v27FKqEv017433
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
 	verify=NO)
 	for <qemu-devel@nongnu.org>; Tue, 7 Mar 2017 10:20:53 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  7 Mar 2017 16:20:44 +0100
-Message-Id: <1488900045-26344-24-git-send-email-armbru@redhat.com>
+Date: Tue,  7 Mar 2017 16:20:42 +0100
+Message-Id: <1488900045-26344-22-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488900045-26344-1-git-send-email-armbru@redhat.com>
 References: <1488900045-26344-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v4 23/24] docs/qapi-code-gen.txt: Clarify naming
- rules
+Subject: [Qemu-devel] [PULL v4 21/24] block: Initial implementation of
+ -blockdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,96 +39,124 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-Message-Id: <1488317230-26248-24-git-send-email-armbru@redhat.com>
----
- docs/qapi-code-gen.txt | 61 ++++++++++++++++++++++++++++++++------------------
- 1 file changed, 39 insertions(+), 22 deletions(-)
+The new command line option -blockdev works like QMP command
+blockdev-add.
 
-diff --git a/docs/qapi-code-gen.txt b/docs/qapi-code-gen.txt
-index 6746c10..9514d93 100644
---- a/docs/qapi-code-gen.txt
-+++ b/docs/qapi-code-gen.txt
-@@ -216,33 +216,38 @@ single-dimension array of that type; multi-dimension arrays are not
- directly supported (although an array of a complex struct that
- contains an array member is possible).
+The option argument may be given in JSON syntax, exactly as in QMP.
+Example usage:
+
+    -blockdev '{"node-name": "foo", "driver": "raw", "file": {"driver": "file", "filename": "foo.img"} }'
+
+The JSON argument doesn't exactly blend into the existing option
+syntax, so the traditional KEY=VALUE,... syntax is also supported,
+using dotted keys to do the nesting:
+
+    -blockdev node-name=foo,driver=raw,file.driver=file,file.filename=foo.img
+
+This does not yet support lists, but that will be addressed shortly.
+
+Note that calling qmp_blockdev_add() (say via qmp_marshal_block_add())
+right away would crash.  We need to stash the configuration for later
+instead.  This is crudely done, and bypasses QemuOpts, even though
+storing configuration is what QemuOpts is for.  Need to revamp option
+infrastructure to support QAPI types like BlockdevOptions.
+
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <1488317230-26248-22-git-send-email-armbru@redhat.com>
+---
+ qemu-options.hx |  7 +++++++
+ vl.c            | 39 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 46 insertions(+)
+
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 2292438..8dd8ee3 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -550,6 +550,13 @@ Use @var{file} as CD-ROM image (you cannot use @option{-hdc} and
+ using @file{/dev/cdrom} as filename (@pxref{host_drives}).
+ ETEXI
  
-+All names must begin with a letter, and contain only ASCII letters,
-+digits, hyphen, and underscore.  There are two exceptions: enum values
-+may start with a digit, and names that are downstream extensions (see
-+section Downstream extensions) start with underscore.
++DEF("blockdev", HAS_ARG, QEMU_OPTION_blockdev,
++    "-blockdev [driver=]driver[,node-name=N][,discard=ignore|unmap]\n"
++    "          [,cache.direct=on|off][,cache.no-flush=on|off]\n"
++    "          [,read-only=on|off][,detect-zeroes=on|off|unmap]\n"
++    "          [,driver specific parameters...]\n"
++    "                configure a block backend\n", QEMU_ARCH_ALL)
 +
-+Names beginning with 'q_' are reserved for the generator, which uses
-+them for munging QMP names that resemble C keywords or other
-+problematic strings.  For example, a member named "default" in qapi
-+becomes "q_default" in the generated C code.
-+
- Types, commands, and events share a common namespace.  Therefore,
- generally speaking, type definitions should always use CamelCase for
--user-defined type names, while built-in types are lowercase. Type
--definitions should not end in 'Kind', as this namespace is used for
--creating implicit C enums for visiting union types, or in 'List', as
--this namespace is used for creating array types.  Command names,
--and member names within a type, should be all lower case with words
--separated by a hyphen.  However, some existing older commands and
--complex types use underscore; when extending such expressions,
--consistency is preferred over blindly avoiding underscore.  Event
--names should be ALL_CAPS with words separated by underscore.  Member
--names cannot start with 'has-' or 'has_', as this is reserved for
--tracking optional members.
-+user-defined type names, while built-in types are lowercase.
-+
-+Type names ending with 'Kind' or 'List' are reserved for the
-+generator, which uses them for implicit union enums and array types,
-+respectively.
-+
-+Command names, and member names within a type, should be all lower
-+case with words separated by a hyphen.  However, some existing older
-+commands and complex types use underscore; when extending such
-+expressions, consistency is preferred over blindly avoiding
-+underscore.
-+
-+Event names should be ALL_CAPS with words separated by underscore.
-+
-+Member names starting with 'has-' or 'has_' are reserved for the
-+generator, which uses them for tracking optional members.
+ DEF("drive", HAS_ARG, QEMU_OPTION_drive,
+     "-drive [file=file][,if=type][,bus=n][,unit=m][,media=d][,index=i]\n"
+     "       [,cyls=c,heads=h,secs=s[,trans=t]][,snapshot=on|off]\n"
+diff --git a/vl.c b/vl.c
+index 71b75ef..7f1644a 100644
+--- a/vl.c
++++ b/vl.c
+@@ -95,6 +95,9 @@ int main(int argc, char **argv)
+ #include "migration/colo.h"
+ #include "sysemu/kvm.h"
+ #include "sysemu/hax.h"
++#include "qapi/qobject-input-visitor.h"
++#include "qapi/qobject-input-visitor.h"
++#include "qapi-visit.h"
+ #include "qapi/qmp/qjson.h"
+ #include "qemu/option.h"
+ #include "qemu/config-file.h"
+@@ -2976,6 +2979,13 @@ int main(int argc, char **argv, char **envp)
+     Error *main_loop_err = NULL;
+     Error *err = NULL;
+     bool list_data_dirs = false;
++    typedef struct BlockdevOptions_queue {
++        BlockdevOptions *bdo;
++        Location loc;
++        QSIMPLEQ_ENTRY(BlockdevOptions_queue) entry;
++    } BlockdevOptions_queue;
++    QSIMPLEQ_HEAD(, BlockdevOptions_queue) bdo_queue
++        = QSIMPLEQ_HEAD_INITIALIZER(bdo_queue);
  
- Any name (command, event, type, member, or enum value) beginning with
- "x-" is marked experimental, and may be withdrawn or changed
--incompatibly in a future release.  All names must begin with a letter,
--and contain only ASCII letters, digits, dash, and underscore.  There
--are two exceptions: enum values may start with a digit, and any
--extensions added by downstream vendors should start with a prefix
--matching "__RFQDN_" (for the reverse-fully-qualified-domain-name of
--the vendor), even if the rest of the name uses dash (example:
--__com.redhat_drive-mirror).  Names beginning with 'q_' are reserved
--for the generator: QMP names that resemble C keywords or other
--problematic strings will be munged in C to use this prefix.  For
--example, a member named "default" in qapi becomes "q_default" in the
--generated C code.
-+incompatibly in a future release.
+     module_call_init(MODULE_INIT_TRACE);
  
- In the rest of this document, usage lines are given for each
- expression type, with literal strings written in lower case and
-@@ -643,6 +648,18 @@ any non-empty complex type (struct, union, or alternate), and a
- pointer to that QAPI type is passed as a single argument.
+@@ -3118,6 +3128,25 @@ int main(int argc, char **argv, char **envp)
+                 drive_add(IF_DEFAULT, popt->index - QEMU_OPTION_hda, optarg,
+                           HD_OPTS);
+                 break;
++            case QEMU_OPTION_blockdev:
++                {
++                    Visitor *v;
++                    BlockdevOptions_queue *bdo;
++
++                    v = qobject_input_visitor_new_str(optarg, "driver", &err);
++                    if (!v) {
++                        error_report_err(err);
++                        exit(1);
++                    }
++
++                    bdo = g_new(BlockdevOptions_queue, 1);
++                    visit_type_BlockdevOptions(v, NULL, &bdo->bdo,
++                                               &error_fatal);
++                    visit_free(v);
++                    loc_save(&bdo->loc);
++                    QSIMPLEQ_INSERT_TAIL(&bdo_queue, bdo, entry);
++                    break;
++                }
+             case QEMU_OPTION_drive:
+                 if (drive_def(optarg) == NULL) {
+                     exit(1);
+@@ -4451,6 +4480,16 @@ int main(int argc, char **argv, char **envp)
+     }
  
- 
-+=== Downstream extensions ===
+     /* open the virtual block devices */
++    while (!QSIMPLEQ_EMPTY(&bdo_queue)) {
++        BlockdevOptions_queue *bdo = QSIMPLEQ_FIRST(&bdo_queue);
 +
-+QAPI schema names that are externally visible, say in the Client JSON
-+Protocol, need to be managed with care.  Names starting with a
-+downstream prefix of the form __RFQDN_ are reserved for the downstream
-+who controls the valid, reverse fully qualified domain name RFQDN.
-+RFQDN may only contain ASCII letters, digits, hyphen and period.
-+
-+Example: Red Hat, Inc. controls redhat.com, and may therefore add a
-+downstream command __com.redhat_drive-mirror.
-+
-+
- == Client JSON Protocol introspection ==
- 
- Clients of a Client JSON Protocol commonly need to figure out what
++        QSIMPLEQ_REMOVE_HEAD(&bdo_queue, entry);
++        loc_push_restore(&bdo->loc);
++        qmp_blockdev_add(bdo->bdo, &error_fatal);
++        loc_pop(&bdo->loc);
++        qapi_free_BlockdevOptions(bdo->bdo);
++        g_free(bdo);
++    }
+     if (snapshot || replay_mode != REPLAY_MODE_NONE) {
+         qemu_opts_foreach(qemu_find_opts("drive"), drive_enable_snapshot,
+                           NULL, NULL);
 -- 
 2.7.4
