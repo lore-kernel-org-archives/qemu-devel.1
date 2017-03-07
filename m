@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1clCmc-00048B-GM
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:55:59 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1clCpI-0006Jx-JN
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:58:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1clCmZ-0002mX-9Y
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:55:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51988)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1clCmZ-0002mJ-31
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:55:55 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1F9D080461
-	for <qemu-devel@nongnu.org>; Tue,  7 Mar 2017 10:55:55 +0000 (UTC)
-References: <1488876478-6889-1-git-send-email-jasowang@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1clCpH-0003ZS-KE
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:58:44 -0500
+References: <20170307021748.7743-1-famz@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <313e32c5-140d-ec13-6b10-98043756f2e6@redhat.com>
-Date: Tue, 7 Mar 2017 11:55:52 +0100
+Message-ID: <453cf467-9b0c-efa8-a523-a3f35072e70d@redhat.com>
+Date: Tue, 7 Mar 2017 11:58:35 +0100
 MIME-Version: 1.0
-In-Reply-To: <1488876478-6889-1-git-send-email-jasowang@redhat.com>
+In-Reply-To: <20170307021748.7743-1-famz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] virtio: destroy region cache during reset
+Subject: Re: [Qemu-devel] [PATCH] file-posix: Incoporate max_segments in
+ block limit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,23 +23,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, mst@redhat.com, qemu-devel@nongnu.org
-Cc: peterx@redhat.com
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, eblake@redhat.com
 
 
 
-On 07/03/2017 09:47, Jason Wang wrote:
-> We don't destroy region cache during reset which can make the maps
-> of previous driver leaked to a buggy or malicious driver that don't
-> set vring address before starting to use the device.
+On 07/03/2017 03:17, Fam Zheng wrote:
+> Linux exposes a separate limit, /sys/block/.../queue/max_segments, which
+> in the worst case can be more restrictive than BLKSECTGET (as they are
+> two different things). Similar to the BLKSECTGET story, guests don't see
+> this limit and send big requests will get -EINVAL error on SG_IO.
+> 
+> Lean on the safer side to clamp max_transfer according to max_segments
+> and page size, because in the end what host HBA gets is the mapped host
+> pages rather than a guest buffer.
+> 
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  block/file-posix.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 58 insertions(+)
+> 
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 4de1abd..b615262 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -668,6 +668,59 @@ static int hdev_get_max_transfer_length(BlockDriverState *bs, int fd)
+>  #endif
+>  }
+>  
+> +static int hdev_get_max_segments(BlockDriverState *bs)
+> +{
+> +#ifdef CONFIG_LINUX
+> +    char buf[32];
+> +    const char *end;
+> +    char *sysfspath, *fullpath;
+> +    int ret;
+> +    int fd = -1;
+> +    long max_segments;
+> +
+> +    fullpath = realpath(bs->exact_filename, NULL);
+> +    if (!fullpath) {
+> +        return -errno;
+> +    }
+> +    if (strncmp(fullpath, "/dev/", 5) || !fullpath[5]) {
+> +        ret = -ENOTSUP;
+> +        goto out;
+> +    }
+> +    sysfspath = g_strdup_printf("/sys/block/%s/queue/max_segments",
+> +                                &fullpath[5]);
 
-I'm still not sure as to how this can happen.  Reset does clear
-desc/used/avail, which should then be checked before accessing the caches.
+I think you cannot rely on the /dev/... path.  Luckily, there is an
+alternative path to "queue" via /sys/dev/block/MAJOR:MINOR/queue, where
+MAJOR:MINOR can be retrieved via fstat.  This also avoids any possible
+TOC-TOU races.
+
+Thanks,
 
 Paolo
 
-> Fix this by
-> destroy the region cache during reset and validate it before trying to
-> use them. While at it, also validate address_space_cache_init() during
-> virtio_init_region_cache() to make sure we have a correct region
-> cache.
+> +    fd = open(sysfspath, O_RDONLY);
+> +    if (fd == -1) {
+> +        ret = -errno;
+> +        goto out;
+> +    }
+> +    do {
+> +        ret = read(fd, buf, sizeof(buf));
+> +    } while (ret == -1 && errno == EINTR);
+> +    if (ret < 0) {
+> +        ret = -errno;
+> +        goto out;
+> +    } else if (ret == 0) {
+> +        ret = -EIO;
+> +        goto out;
+> +    }
+> +    buf[ret] = 0;
+> +    /* The file is ended with '\n', pass 'end' to accept that. */
+> +    ret = qemu_strtol(buf, &end, 10, &max_segments);
+> +    if (ret == 0 && end && *end == '\n') {
+> +        ret = max_segments;
+> +    }
+> +
+> +out:
+> +    if (fd >= 0) {
+> +        close(fd);
+> +    }
+> +    free(fullpath);
+> +    return ret;
+> +#else
+> +    return -ENOTSUP;
+> +#endif
+> +}
+> +
+>  static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
+>  {
+>      BDRVRawState *s = bs->opaque;
+> @@ -679,6 +732,11 @@ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
+>              if (ret > 0 && ret <= BDRV_REQUEST_MAX_BYTES) {
+>                  bs->bl.max_transfer = pow2floor(ret);
+>              }
+> +            ret = hdev_get_max_segments(bs);
+> +            if (ret > 0) {
+> +                bs->bl.max_transfer = MIN(bs->bl.max_transfer,
+> +                                          ret * getpagesize());
+> +            }
+>          }
+>      }
+>  
+> 
