@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1clDZ3-0008C4-Bs
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 06:46:02 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1clDpn-0001qC-2L
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 07:03:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1clDZ0-0004dh-6p
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 06:46:01 -0500
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:36165)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1clDZ0-0004cp-2h
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 06:45:58 -0500
-Received: by mail-qk0-x243.google.com with SMTP id n141so27982893qke.3
-	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 03:45:57 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170306112848.659-1-alex.bennee@linaro.org>
-	<20170307103744.GA6117@lemon.lan>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6e49aedc-acab-44fb-a4b5-94e51117da2c@amsat.org>
-Date: Tue, 7 Mar 2017 08:45:53 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1clDpj-00031u-Th
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 07:03:19 -0500
+Date: Tue, 7 Mar 2017 09:02:37 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170307120237.GF2778@thinpad.lan.raisama.net>
+References: <1485868319-16151-1-git-send-email-thuth@redhat.com>
+	<1485868319-16151-3-git-send-email-thuth@redhat.com>
+	<20170303145807.GC11509@thinpad.lan.raisama.net>
+	<20170305230627.GA12030@umbus.fritz.box>
+	<20170306114752.GS2778@thinpad.lan.raisama.net>
+	<20170307033105.GB19967@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <20170307103744.GA6117@lemon.lan>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] docker/dockerfiles/debian-s390-cross:
- include clang
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170307033105.GB19967@umbus.fritz.box>
+Subject: Re: [Qemu-devel] [PATCH 2/2] vl: Print CPU help after we've
+ registered the CPU accelerators
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,66 +28,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>
 
-Hi Alex, Fam.
+On Tue, Mar 07, 2017 at 02:31:05PM +1100, David Gibson wrote:
+> On Mon, Mar 06, 2017 at 08:47:52AM -0300, Eduardo Habkost wrote:
+> > On Mon, Mar 06, 2017 at 10:06:27AM +1100, David Gibson wrote:
+> > > On Fri, Mar 03, 2017 at 11:58:07AM -0300, Eduardo Habkost wrote:
+> > > > On Tue, Jan 31, 2017 at 02:11:59PM +0100, Thomas Huth wrote:
+> > > > > When running with KVM on POWER, we register some CPU types during
+> > > > > the initialization function of the ppc64 KVM code (which unfortunately
+> > > > > also can not be done via a type_init() like it is done on x86).
+> > > > 
+> > > > Can you elaborate why it can't be done via type_init()? If the
+> > > > QOM type hierarchy depends on any runtime data unavailable at
+> > > > type_init(), we should fix that.
+> > > 
+> > > Hmm.. how?  This is specifically for the special 'host' cpu in the
+> > > case of KVM.  We can't use a static configuration here, because there
+> > > are things on the host that could limit what features of the CPU are
+> > > available for guest use.  So, we need KVM to be initialized in order
+> > > to query that information.
+> > 
+> > There's nothing saying you need to query that information before
+> > type_register() or during class_init, does it? The behavior of
+> > TYPE_HOST_POWERPC_CPU after object_new() is called can be as
+> > dynamic as you want it to, but the QOM type hierarchy is supposed
+> > to be static.
+> 
+> So, the thing is we have some properties that logically belong in the
+> CPU class, rather than instance, and that's correct for all TCG CPUs,
+> but not for the KVM host CPU.  It seems nasty to have to force all
+> those things into the instance just because of KVM.
 
-I tested this way but got an error:
+You can still register any class properties you want, without
+querying KVM first. Are there properties that you are able to
+register only after querying KVM? Is the set of class properties
+on TYPE_HOST_POWERPC_CPU different depending on the host
+capabilities?
 
-qemu (docker_alex)$ make docker-test-clang@debian-s390x-cross
-   BUILD   debian-s390x-cross
-make[1]: Entering directory 'qemu'
-   ARCHIVE qemu.tgz
-   ARCHIVE dtc.tgz
-   ARCHIVE pixman.tgz
-   COPY    RUNNER
-     RUN test-clang in qemu:debian-s390x-cross
-Prerequisite 'clang' not present, skip
-make[1]: Leaving directory 'qemu'
+I'm looking at target/ppc/cpu-models.c, and I only see the
+class_init function setting PowerPCCPUClass::pvr and
+PowerPCCPUClass::svr. Am I missing anything?
 
-am I missing something? like a FEATURES/clang.tgz?
+You can still keep pvr and svr on the CPU class. The only thing
+that's different on TYPE_HOST_POWERPC_CPU is that it won't have
+the preset values on PowerPCCPUClass. But it can initialize the
+instance values on ->instance_init() or ->realize() instead.
 
-qemu (docker_alex)$ docker run qemu:debian-s390x-cross which clang
-/usr/bin/clang
+I even see ppc_cpu_class_by_pvr*() treating TYPE_HOST_POWERPC_CPU
+as special on PVR lookup, already. So it looks like the code is
+almost ready for that?
 
-On 03/07/2017 07:37 AM, Fam Zheng wrote:
-> On Mon, 03/06 11:28, Alex Bennée wrote:
->> It's a silly little limitation on Shippable that is looks for clang
->> in the container even though we won't use it. The arm/aarch64 cross
->> builds inherit this from debian.docker but as we needed to use
->> debian-testing for this we add it here. We also collapse the update
->> step into one RUN line to remove and intermediate layer of the docker
->> build.
->>
->> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->> ---
->>  tests/docker/dockerfiles/debian-s390x-cross.docker | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/tests/docker/dockerfiles/debian-s390x-cross.docker b/tests/docker/dockerfiles/debian-s390x-cross.docker
->> index bbb21ed088..3a687feda0 100644
->> --- a/tests/docker/dockerfiles/debian-s390x-cross.docker
->> +++ b/tests/docker/dockerfiles/debian-s390x-cross.docker
->> @@ -13,8 +13,8 @@ RUN cat /etc/apt/sources.list | sed "s/deb/deb-src/" >> /etc/apt/sources.list
->>  RUN dpkg --add-architecture s390x
->>
->>  # Grab the updated list of packages
->> -RUN apt update
->> -RUN apt dist-upgrade -yy
->> +RUN apt update && apt dist-upgrade -yy
+> 
+> > Registering QOM types outside type_init() is only causing us
+> > problems and we should stop doing that.
+> > 
+> > > 
+> > > > >                                                                 So to
+> > > > > be able to see these updates in the CPU help text, the code that calls
+> > > > > list_cpus() has to be run after configure_accelerator(). This move should
+> > > > > be fine since the "cpu_model" variable is also never used before the call
+> > > > > to configure_accelerator(), and thus there should not be any unwanted
+> > > > > side effects in the code before configure_accelerator() if the user
+> > > > > started QEMU with "-cpu ?" or "-cpu help".
+> > > > > 
+> > > > > Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > > > 
+> > > > I am not convinced that the output of "-cpu help" and
+> > > > "-cpu help -machine accel=kvm" should look different. Do you have
+> > > > an example of what exactly is wrong with the output currently?
+> > > > 
+> > > > I actually believe list_cpus() needs to be called _earlier_, not
+> > > > later. Otherwise we won't be able to fix this bug:
+> > > > 
+> > > >   $ qemu-system-arm -cpu help
+> > > >   qemu-system-arm:/usr/local/etc/qemu/qemu.conf:1: No machine specified, and there is no default
+> > > >   Use -machine help to list supported machines
+> > > >   $ 
+> > > > 
+> > > > > ---
+> > > > >  vl.c | 10 +++++-----
+> > > > >  1 file changed, 5 insertions(+), 5 deletions(-)
+> > > > > 
+> > > > > diff --git a/vl.c b/vl.c
+> > > > > index 0b72b12..315c5c3 100644
+> > > > > --- a/vl.c
+> > > > > +++ b/vl.c
+> > > > > @@ -4055,11 +4055,6 @@ int main(int argc, char **argv, char **envp)
+> > > > >          qemu_set_hw_version(machine_class->hw_version);
+> > > > >      }
+> > > > >  
+> > > > > -    if (cpu_model && is_help_option(cpu_model)) {
+> > > > > -        list_cpus(stdout, &fprintf, cpu_model);
+> > > > > -        exit(0);
+> > > > > -    }
+> > > > > -
+> > > > >      if (!trace_init_backends()) {
+> > > > >          exit(1);
+> > > > >      }
+> > > > > @@ -4298,6 +4293,11 @@ int main(int argc, char **argv, char **envp)
+> > > > >  
+> > > > >      configure_accelerator(current_machine);
+> > > > >  
+> > > > > +    if (cpu_model && is_help_option(cpu_model)) {
+> > > > > +        list_cpus(stdout, &fprintf, cpu_model);
+> > > > > +        exit(0);
+> > > > > +    }
+> > > > > +
+> > > > >      if (qtest_chrdev) {
+> > > > >          qtest_init(qtest_chrdev, qtest_log, &error_fatal);
+> > > > >      }
+> > > > 
+> > > 
+> > 
+> > 
+> > 
+> 
+> -- 
+> David Gibson			| I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+> 				| _way_ _around_!
+> http://www.ozlabs.org/~dgibson
 
-^ good!
 
->> +RUN apt install -yy build-essential clang
->>  RUN apt-get build-dep -yy -a s390x qemu || apt-get -f install
->>  RUN apt install -yy gcc-multilib-s390x-linux-gnu binutils-multiarch
->>
->> --
->> 2.11.0
->>
->
-> Looks sane. Is this for 2.9?
->
-> Fam
->
+
+-- 
+Eduardo
