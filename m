@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1clGCz-0007ZW-Ov
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 09:35:27 -0500
+	(envelope-from <alexander.boettcher@genode-labs.com>)
+	id 1clGHl-00010h-Sc
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 09:40:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1clGCv-0005uV-JQ
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 09:35:25 -0500
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:37110)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1clGCv-0005uD-Ad
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 09:35:21 -0500
-Received: by mail-wm0-x236.google.com with SMTP id n11so6526434wma.0
-	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 06:35:21 -0800 (PST)
+	(envelope-from <alexander.boettcher@genode-labs.com>)
+	id 1clGHh-0007Pk-Uf
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 09:40:21 -0500
+Received: from mail.genode-labs.com ([88.198.56.169]:55281)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <alexander.boettcher@genode-labs.com>)
+	id 1clGHh-0007PY-Ni
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 09:40:17 -0500
 References: <20170307113736.13864-1-pbonzini@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170307113736.13864-1-pbonzini@redhat.com>
-Date: Tue, 07 Mar 2017 14:35:27 +0000
-Message-ID: <87bmtdi28g.fsf@linaro.org>
+	<87bmtdi28g.fsf@linaro.org>
+From: Alexander Boettcher <alexander.boettcher@genode-labs.com>
+Message-ID: <5cbb1c3a-9b74-2bb5-3b59-6209a0aaeca5@genode-labs.com>
+Date: Tue, 7 Mar 2017 15:40:08 +0100
 MIME-Version: 1.0
+In-Reply-To: <87bmtdi28g.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH] target-i386: defer VMEXIT to do_interrupt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,148 +30,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, alexander.boettcher@genode-labs.com
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+On 07.03.2017 15:35, Alex Benn=C3=A9e wrote:
+>=20
+> Paolo Bonzini <pbonzini@redhat.com> writes:
+>=20
+>> Paths through the softmmu code during code generation now need to be a=
+udited
+>> to check for double locking of tb_lock.  In particular, VMEXIT can tak=
+e tb_lock
+>> through cpu_vmexit -> cpu_x86_update_cr4 -> tlb_flush.
+>>
+>> To avoid this, split VMEXIT delivery in two parts, similar to what is =
+done with
+>> exceptions.  cpu_vmexit only records the VMEXIT exit code and informat=
+ion, and
+>> cc->do_interrupt can then deliver it when it is safe to take the lock.
+>>
+>> Reported-by: Alexander Boettcher <alexander.boettcher@genode-labs.com>
+>> Suggested-by: Richard Henderson <rth@twiddle.net>
+>> Tested-by: Alexander Boettcher <alexander.boettcher@genode-labs.com>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>=20
+> Looks good to me. When I ran it against Alexander's test case I got:
+>=20
+>   [init -> log_terminal]
+>   [init -> log_terminal] [ 0] CORE:0:0:0 10:2:3:0 [0] AMD Phenom(tm) 95=
+50 Quad-Core Processor
+>   [init -> log_terminal] [ 0] Killed EC:0xc002c160 SC:0xc002d100 V:0xd =
+CS:0x1b EIP:0x14455e CR2:0xe0004004 ERR:0x0 (PT not found) Pd::root
+>=20
+> But that could be because I'm running remotely in a terminal environmen=
+t
+> with a null display. I did test against my known good x86 setup and gav=
+e
+> it some stress and it looks good on that. As long as Alexander is happy
+> with his testing I'll snarf this into my series and post today.
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+That is fine. The GP (0xd) exception will be fixed as soon as the
+reorder SVM I/O patch get into qemu master ( I posted it some days ago
+with subject "[PATCH=C2=B1 SVM I/O permission bitmap for user-level (ring=
+-3)
+code ignored" )
 
-> Paths through the softmmu code during code generation now need to be audited
-> to check for double locking of tb_lock.  In particular, VMEXIT can take tb_lock
-> through cpu_vmexit -> cpu_x86_update_cr4 -> tlb_flush.
->
-> To avoid this, split VMEXIT delivery in two parts, similar to what is done with
-> exceptions.  cpu_vmexit only records the VMEXIT exit code and information, and
-> cc->do_interrupt can then deliver it when it is safe to take the lock.
->
-> Reported-by: Alexander Boettcher <alexander.boettcher@genode-labs.com>
-> Suggested-by: Richard Henderson <rth@twiddle.net>
-> Tested-by: Alexander Boettcher <alexander.boettcher@genode-labs.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Thanks!
 
-Looks good to me. When I ran it against Alexander's test case I got:
+--=20
+Alexander Boettcher
+Genode Labs
 
-  [init -> log_terminal]
-  [init -> log_terminal] [ 0] CORE:0:0:0 10:2:3:0 [0] AMD Phenom(tm) 9550 Quad-Core Processor
-  [init -> log_terminal] [ 0] Killed EC:0xc002c160 SC:0xc002d100 V:0xd CS:0x1b EIP:0x14455e CR2:0xe0004004 ERR:0x0 (PT not found) Pd::root
+http://www.genode-labs.com - http://www.genode.org
 
-But that could be because I'm running remotely in a terminal environment
-with a null display. I did test against my known good x86 setup and gave
-it some stress and it looks good on that. As long as Alexander is happy
-with his testing I'll snarf this into my series and post today.
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-
-
-> ---
->  target/i386/cpu.h        |  2 ++
->  target/i386/seg_helper.c | 20 +++++++++++---------
->  target/i386/svm_helper.c | 22 +++++++++++++---------
->  3 files changed, 26 insertions(+), 18 deletions(-)
->
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index ac2ad6d..40a6ff7 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -694,6 +694,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
->
->  #define EXCP_SYSCALL    0x100 /* only happens in user only emulation
->                                   for syscall instruction */
-> +#define EXCP_VMEXIT     0x100
->
->  /* i386-specific interrupt pending bits.  */
->  #define CPU_INTERRUPT_POLL      CPU_INTERRUPT_TGT_EXT_1
-> @@ -1629,6 +1630,7 @@ void cpu_svm_check_intercept_param(CPUX86State *env1, uint32_t type,
->                                     uint64_t param, uintptr_t retaddr);
->  void cpu_vmexit(CPUX86State *nenv, uint32_t exit_code, uint64_t exit_info_1,
->                  uintptr_t retaddr);
-> +void do_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1);
->
->  /* seg_helper.c */
->  void do_interrupt_x86_hardirq(CPUX86State *env, int intno, int is_hw);
-> diff --git a/target/i386/seg_helper.c b/target/i386/seg_helper.c
-> index 5c845dc..0374031 100644
-> --- a/target/i386/seg_helper.c
-> +++ b/target/i386/seg_helper.c
-> @@ -1297,15 +1297,17 @@ void x86_cpu_do_interrupt(CPUState *cs)
->      /* successfully delivered */
->      env->old_exception = -1;
->  #else
-> -    /* simulate a real cpu exception. On i386, it can
-> -       trigger new exceptions, but we do not handle
-> -       double or triple faults yet. */
-> -    do_interrupt_all(cpu, cs->exception_index,
-> -                     env->exception_is_int,
-> -                     env->error_code,
-> -                     env->exception_next_eip, 0);
-> -    /* successfully delivered */
-> -    env->old_exception = -1;
-> +    if (cs->exception_index >= EXCP_VMEXIT) {
-> +        assert(env->old_exception == -1);
-> +        do_vmexit(env, cs->exception_index - EXCP_VMEXIT, env->error_code);
-> +    } else {
-> +        do_interrupt_all(cpu, cs->exception_index,
-> +                         env->exception_is_int,
-> +                         env->error_code,
-> +                         env->exception_next_eip, 0);
-> +        /* successfully delivered */
-> +        env->old_exception = -1;
-> +    }
->  #endif
->  }
->
-> diff --git a/target/i386/svm_helper.c b/target/i386/svm_helper.c
-> index 78d8df4..59e8b50 100644
-> --- a/target/i386/svm_helper.c
-> +++ b/target/i386/svm_helper.c
-> @@ -580,12 +580,10 @@ void helper_svm_check_io(CPUX86State *env, uint32_t port, uint32_t param,
->      }
->  }
->
-> -/* Note: currently only 32 bits of exit_code are used */
->  void cpu_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1,
->                  uintptr_t retaddr)
->  {
->      CPUState *cs = CPU(x86_env_get_cpu(env));
-> -    uint32_t int_ctl;
->
->      if (retaddr) {
->          cpu_restore_state(cs, retaddr);
-> @@ -598,6 +596,19 @@ void cpu_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1,
->                                                     control.exit_info_2)),
->                    env->eip);
->
-> +    cs->exception_index = EXCP_VMEXIT + exit_code;
-> +    env->error_code = exit_info_1;
-> +
-> +    /* remove any pending exception */
-> +    env->old_exception = -1;
-> +    cpu_loop_exit(cs);
-> +}
-> +
-> +void do_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1)
-> +{
-> +    CPUState *cs = CPU(x86_env_get_cpu(env));
-> +    uint32_t int_ctl;
-> +
->      if (env->hflags & HF_INHIBIT_IRQ_MASK) {
->          x86_stl_phys(cs,
->                   env->vm_vmcb + offsetof(struct vmcb, control.int_state),
-> @@ -759,13 +770,6 @@ void cpu_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1,
->      /* If the host's rIP reloaded by #VMEXIT is outside the limit of the
->         host's code segment or non-canonical (in the case of long mode), a
->         #GP fault is delivered inside the host. */
-> -
-> -    /* remove any pending exception */
-> -    cs->exception_index = -1;
-> -    env->error_code = 0;
-> -    env->old_exception = -1;
-> -
-> -    cpu_loop_exit(cs);
->  }
->
->  #endif
-
-
---
-Alex Bennée
+Genode Labs GmbH - Amtsgericht Dresden - HRB 28424 - Sitz Dresden
+Gesch=C3=A4ftsf=C3=BChrer: Dr.-Ing. Norman Feske, Christian Helmuth
