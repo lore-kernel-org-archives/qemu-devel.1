@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50042)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1clG8i-0005hR-4F
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 09:31:01 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1clGCz-0007ZW-Ov
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 09:35:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1clG8g-0004hg-U7
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 09:31:00 -0500
-References: <1484884080-28836-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1484884080-28836-6-git-send-email-zhang.zhanghailiang@huawei.com>
-	<20170227173720.GJ10201@stefanha-x1.localdomain>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <58BEC406.1050903@huawei.com>
-Date: Tue, 7 Mar 2017 22:30:30 +0800
+	(envelope-from <alex.bennee@linaro.org>) id 1clGCv-0005uV-JQ
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 09:35:25 -0500
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:37110)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1clGCv-0005uD-Ad
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 09:35:21 -0500
+Received: by mail-wm0-x236.google.com with SMTP id n11so6526434wma.0
+	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 06:35:21 -0800 (PST)
+References: <20170307113736.13864-1-pbonzini@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170307113736.13864-1-pbonzini@redhat.com>
+Date: Tue, 07 Mar 2017 14:35:27 +0000
+Message-ID: <87bmtdi28g.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170227173720.GJ10201@stefanha-x1.localdomain>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 5/6] replication: Implement block
- replication for shared disk case
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] target-i386: defer VMEXIT to do_interrupt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,75 +29,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, xiecl.fnst@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, wencongyang2@huawei.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, alexander.boettcher@genode-labs.com
 
-Hi Stefan,
 
-Sorry for the delayed reply.
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-On 2017/2/28 1:37, Stefan Hajnoczi wrote:
-> On Fri, Jan 20, 2017 at 11:47:59AM +0800, zhanghailiang wrote:
->> Just as the scenario of non-shared disk block replication,
->> we are going to implement block replication from many basic
->> blocks that are already in QEMU.
->> The architecture is:
->>
->>           virtio-blk                     ||                               .----------
->>               /                          ||                               | Secondary
->>              /                           ||                               '----------
->>             /                            ||                                 virtio-blk
->>            /                             ||                                      |
->>            |                             ||                               replication(5)
->>            |                    NBD  -------->   NBD   (2)                       |
->>            |                  client     ||    server ---> hidden disk <-- active disk(4)
->>            |                     ^       ||                      |
->>            |              replication(1) ||                      |
->>            |                     |       ||                      |
->>            |   +-----------------'       ||                      |
->>           (3)  |drive-backup sync=none   ||                      |
->> --------. |   +-----------------+       ||                      |
->> Primary | |                     |       ||           backing    |
->> --------' |                     |       ||                      |
->>            V                     |                               |
->>         +-------------------------------------------+            |
->>         |               shared disk                 | <----------+
->>         +-------------------------------------------+
->>
->>      1) Primary writes will read original data and forward it to Secondary
->>         QEMU.
->>      2) The hidden-disk is created automatically. It buffers the original content
->>         that is modified by the primary VM. It should also be an empty disk, and
->>         the driver supports bdrv_make_empty() and backing file.
->>      3) Primary write requests will be written to Shared disk.
->>      4) Secondary write requests will be buffered in the active disk and it
->>         will overwrite the existing sector content in the buffer.
->>
->> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
->> Signed-off-by: Wen Congyang <wency@cn.fujitsu.com>
->> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+> Paths through the softmmu code during code generation now need to be audited
+> to check for double locking of tb_lock.  In particular, VMEXIT can take tb_lock
+> through cpu_vmexit -> cpu_x86_update_cr4 -> tlb_flush.
 >
-> Are there any restrictions on the shared disk?  For example the -drive
-> cache= mode must be 'none'.  If the cache mode isn't 'none' the
-> secondary host might have old data in the host page cache.  The
-
-While do checkpoint, we will call vm_stop(), in which, the bdrv_flush_all()
-will be called, is it enough ?
-
-> Secondary QEMU would have an inconsistent view of the shared disk.
+> To avoid this, split VMEXIT delivery in two parts, similar to what is done with
+> exceptions.  cpu_vmexit only records the VMEXIT exit code and information, and
+> cc->do_interrupt can then deliver it when it is safe to take the lock.
 >
-> Are image file formats like qcow2 supported for the shared disk?  Extra
+> Reported-by: Alexander Boettcher <alexander.boettcher@genode-labs.com>
+> Suggested-by: Richard Henderson <rth@twiddle.net>
+> Tested-by: Alexander Boettcher <alexander.boettcher@genode-labs.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-In the above scenario, it has no limitation of formats for the shared disk.
+Looks good to me. When I ran it against Alexander's test case I got:
 
-> steps are required to achieve consistency, see bdrv_invalidate_cache().
+  [init -> log_terminal]
+  [init -> log_terminal] [ 0] CORE:0:0:0 10:2:3:0 [0] AMD Phenom(tm) 9550 Quad-Core Processor
+  [init -> log_terminal] [ 0] Killed EC:0xc002c160 SC:0xc002d100 V:0xd CS:0x1b EIP:0x14455e CR2:0xe0004004 ERR:0x0 (PT not found) Pd::root
+
+But that could be because I'm running remotely in a terminal environment
+with a null display. I did test against my known good x86 setup and gave
+it some stress and it looks good on that. As long as Alexander is happy
+with his testing I'll snarf this into my series and post today.
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+
+
+> ---
+>  target/i386/cpu.h        |  2 ++
+>  target/i386/seg_helper.c | 20 +++++++++++---------
+>  target/i386/svm_helper.c | 22 +++++++++++++---------
+>  3 files changed, 26 insertions(+), 18 deletions(-)
 >
-
-Hmm, in that case, we should call bdrv_invalidate_cache_all() while checkpoint.
-
-
-Thanks,
-Hailiang
-
-> Stefan
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index ac2ad6d..40a6ff7 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -694,6 +694,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
 >
+>  #define EXCP_SYSCALL    0x100 /* only happens in user only emulation
+>                                   for syscall instruction */
+> +#define EXCP_VMEXIT     0x100
+>
+>  /* i386-specific interrupt pending bits.  */
+>  #define CPU_INTERRUPT_POLL      CPU_INTERRUPT_TGT_EXT_1
+> @@ -1629,6 +1630,7 @@ void cpu_svm_check_intercept_param(CPUX86State *env1, uint32_t type,
+>                                     uint64_t param, uintptr_t retaddr);
+>  void cpu_vmexit(CPUX86State *nenv, uint32_t exit_code, uint64_t exit_info_1,
+>                  uintptr_t retaddr);
+> +void do_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1);
+>
+>  /* seg_helper.c */
+>  void do_interrupt_x86_hardirq(CPUX86State *env, int intno, int is_hw);
+> diff --git a/target/i386/seg_helper.c b/target/i386/seg_helper.c
+> index 5c845dc..0374031 100644
+> --- a/target/i386/seg_helper.c
+> +++ b/target/i386/seg_helper.c
+> @@ -1297,15 +1297,17 @@ void x86_cpu_do_interrupt(CPUState *cs)
+>      /* successfully delivered */
+>      env->old_exception = -1;
+>  #else
+> -    /* simulate a real cpu exception. On i386, it can
+> -       trigger new exceptions, but we do not handle
+> -       double or triple faults yet. */
+> -    do_interrupt_all(cpu, cs->exception_index,
+> -                     env->exception_is_int,
+> -                     env->error_code,
+> -                     env->exception_next_eip, 0);
+> -    /* successfully delivered */
+> -    env->old_exception = -1;
+> +    if (cs->exception_index >= EXCP_VMEXIT) {
+> +        assert(env->old_exception == -1);
+> +        do_vmexit(env, cs->exception_index - EXCP_VMEXIT, env->error_code);
+> +    } else {
+> +        do_interrupt_all(cpu, cs->exception_index,
+> +                         env->exception_is_int,
+> +                         env->error_code,
+> +                         env->exception_next_eip, 0);
+> +        /* successfully delivered */
+> +        env->old_exception = -1;
+> +    }
+>  #endif
+>  }
+>
+> diff --git a/target/i386/svm_helper.c b/target/i386/svm_helper.c
+> index 78d8df4..59e8b50 100644
+> --- a/target/i386/svm_helper.c
+> +++ b/target/i386/svm_helper.c
+> @@ -580,12 +580,10 @@ void helper_svm_check_io(CPUX86State *env, uint32_t port, uint32_t param,
+>      }
+>  }
+>
+> -/* Note: currently only 32 bits of exit_code are used */
+>  void cpu_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1,
+>                  uintptr_t retaddr)
+>  {
+>      CPUState *cs = CPU(x86_env_get_cpu(env));
+> -    uint32_t int_ctl;
+>
+>      if (retaddr) {
+>          cpu_restore_state(cs, retaddr);
+> @@ -598,6 +596,19 @@ void cpu_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1,
+>                                                     control.exit_info_2)),
+>                    env->eip);
+>
+> +    cs->exception_index = EXCP_VMEXIT + exit_code;
+> +    env->error_code = exit_info_1;
+> +
+> +    /* remove any pending exception */
+> +    env->old_exception = -1;
+> +    cpu_loop_exit(cs);
+> +}
+> +
+> +void do_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1)
+> +{
+> +    CPUState *cs = CPU(x86_env_get_cpu(env));
+> +    uint32_t int_ctl;
+> +
+>      if (env->hflags & HF_INHIBIT_IRQ_MASK) {
+>          x86_stl_phys(cs,
+>                   env->vm_vmcb + offsetof(struct vmcb, control.int_state),
+> @@ -759,13 +770,6 @@ void cpu_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1,
+>      /* If the host's rIP reloaded by #VMEXIT is outside the limit of the
+>         host's code segment or non-canonical (in the case of long mode), a
+>         #GP fault is delivered inside the host. */
+> -
+> -    /* remove any pending exception */
+> -    cs->exception_index = -1;
+> -    env->error_code = 0;
+> -    env->old_exception = -1;
+> -
+> -    cpu_loop_exit(cs);
+>  }
+>
+>  #endif
+
+
+--
+Alex Bennée
