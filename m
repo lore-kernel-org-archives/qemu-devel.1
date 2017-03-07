@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1clFMe-0001yC-11
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 08:41:20 -0500
+	(envelope-from <kwolf@redhat.com>) id 1clFSQ-0003A4-ND
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 08:47:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1clFMb-0006Ws-Gc
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 08:41:20 -0500
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:37602)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1clFMb-0006WF-AQ
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 08:41:17 -0500
-Received: by mail-wm0-x229.google.com with SMTP id n11so5109886wma.0
-	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 05:41:17 -0800 (PST)
-References: <20170306112848.659-1-alex.bennee@linaro.org>
-	<20170307103744.GA6117@lemon.lan>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170307103744.GA6117@lemon.lan>
-Date: Tue, 07 Mar 2017 13:41:23 +0000
-Message-ID: <87d1dti4qk.fsf@linaro.org>
+	(envelope-from <kwolf@redhat.com>) id 1clFSO-0007mr-5e
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 08:47:18 -0500
+Date: Tue, 7 Mar 2017 14:47:02 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170307134702.GM5871@noname.str.redhat.com>
+References: <20170228193340.63980-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] docker/dockerfiles/debian-s390-cross:
- include clang
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170228193340.63980-1-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH v4] backup: allow target without
+ .bdrv_get_info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +23,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, jcody@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com
 
+Am 28.02.2017 um 20:33 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> Currently backup to nbd target is broken, as nbd doesn't have
+> .bdrv_get_info realization.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+> 
+> v4: use error_report()
+>     add article
+> 
+> v3: fix compilation (I feel like an idiot)
+>     adjust wording (Fam)
+>     
+> v2: add WARNING
+> 
+> ===
+> 
+> Since commit
+> 
+> commit 4c9bca7e39a6e07ad02c1dcde3478363344ec60b
+> Author: John Snow <jsnow@redhat.com>
+> Date:   Thu Feb 25 15:58:30 2016 -0500
+> 
+>     block/backup: avoid copying less than full target clusters
+> 
+> backup to nbd target is broken, we have "Couldn't determine the cluster size of
+> the target image".
+> 
+> Proposed NBD protocol extension - NBD_OPT_INFO should finally solve this problem.
+> But until it is not realized, we need allow backup to nbd target due to backward
+> compatibility.
+> 
+> Furthermore, is it entirely ok to disallow backup if bds lacks .bdrv_get_info?
+> Which behavior should be default: to fail backup or to use default cluster size?
+> 
+>  block/backup.c | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/backup.c b/block/backup.c
+> index ea38733849..ea160e9e82 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -24,6 +24,7 @@
+>  #include "qemu/cutils.h"
+>  #include "sysemu/block-backend.h"
+>  #include "qemu/bitmap.h"
+> +#include "qemu/error-report.h"
+>  
+>  #define BACKUP_CLUSTER_SIZE_DEFAULT (1 << 16)
+>  #define SLICE_TIME 100000000ULL /* ns */
+> @@ -638,7 +639,16 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
+>       * backup cluster size is smaller than the target cluster size. Even for
+>       * targets with a backing file, try to avoid COW if possible. */
+>      ret = bdrv_get_info(target, &bdi);
+> -    if (ret < 0 && !target->backing) {
+> +    if (ret == -ENOTSUP) {
 
-Fam Zheng <famz@redhat.com> writes:
+I think this should be if (ret == -ENOTSUP && !target->backing) because
+the warning explicitly says "doesn't have a backing file", and the case
+with a backing file is already handled below (without a warning).
 
-> On Mon, 03/06 11:28, Alex Bennée wrote:
->> It's a silly little limitation on Shippable that is looks for clang
->> in the container even though we won't use it. The arm/aarch64 cross
->> builds inherit this from debian.docker but as we needed to use
->> debian-testing for this we add it here. We also collapse the update
->> step into one RUN line to remove and intermediate layer of the docker
->> build.
->>
->> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->> ---
->>  tests/docker/dockerfiles/debian-s390x-cross.docker | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/tests/docker/dockerfiles/debian-s390x-cross.docker b/tests/docker/dockerfiles/debian-s390x-cross.docker
->> index bbb21ed088..3a687feda0 100644
->> --- a/tests/docker/dockerfiles/debian-s390x-cross.docker
->> +++ b/tests/docker/dockerfiles/debian-s390x-cross.docker
->> @@ -13,8 +13,8 @@ RUN cat /etc/apt/sources.list | sed "s/deb/deb-src/" >> /etc/apt/sources.list
->>  RUN dpkg --add-architecture s390x
->>
->>  # Grab the updated list of packages
->> -RUN apt update
->> -RUN apt dist-upgrade -yy
->> +RUN apt update && apt dist-upgrade -yy
->> +RUN apt install -yy build-essential clang
->>  RUN apt-get build-dep -yy -a s390x qemu || apt-get -f install
->>  RUN apt install -yy gcc-multilib-s390x-linux-gnu binutils-multiarch
->>
->> --
->> 2.11.0
->>
->
-> Looks sane. Is this for 2.9?
+I can fix this while applying if you agree.
 
-Yes please. The s390x cross build on shippable is currently broken
-without it although we can use the container locally.
+> +        /* Cluster size is not defined */
+> +        error_report("WARNING: The target block device doesn't provide "
+> +                     "information about the block size and it doesn't have a "
+> +                     "backing file. The default block size of %u bytes is "
+> +                     "used. If the actual block size of the target exceeds "
+> +                     "this default, the backup may be unusable",
+> +                     BACKUP_CLUSTER_SIZE_DEFAULT);
+> +        job->cluster_size = BACKUP_CLUSTER_SIZE_DEFAULT;
+> +    } else if (ret < 0 && !target->backing) {
+>          error_setg_errno(errp, -ret,
+>              "Couldn't determine the cluster size of the target image, "
+>              "which has no backing file");
 
---
-Alex Bennée
+Kevin
