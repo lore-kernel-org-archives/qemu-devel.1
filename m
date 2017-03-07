@@ -1,13 +1,13 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1clBy4-0007Nr-8P
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:03:45 -0500
+	(envelope-from <kwolf@redhat.com>) id 1clBzs-000883-Km
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:05:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1clBy2-0008Og-Qi
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:03:44 -0500
-Date: Tue, 7 Mar 2017 10:03:29 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170307100328.GC2869@work-vm>
+	(envelope-from <kwolf@redhat.com>) id 1clBzr-0003RI-4X
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:05:36 -0500
+Date: Tue, 7 Mar 2017 11:05:25 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170307100525.GD5871@noname.str.redhat.com>
 References: <20170307025328.53409-1-haoqf@linux.vnet.ibm.com>
 	<20170307025328.53409-2-haoqf@linux.vnet.ibm.com>
 	<20170307092951.GA5871@noname.str.redhat.com>
@@ -27,9 +27,9 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, QingFeng Hao <haoqf@linux.vnet.ibm.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com, liujbjl@linux.vnet.ibm.com, famz@redhat.com, mreitz@redhat.com, quintela@redhat.com
+Cc: QingFeng Hao <haoqf@linux.vnet.ibm.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com, liujbjl@linux.vnet.ibm.com, famz@redhat.com, mreitz@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 
-* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
+Am 07.03.2017 um 10:54 hat Halil Pasic geschrieben:
 > 
 > 
 > On 03/07/2017 10:29 AM, Kevin Wolf wrote:
@@ -159,27 +159,13 @@ Cc: Kevin Wolf <kwolf@redhat.com>, QingFeng Hao <haoqf@linux.vnet.ibm.com>, qemu
 > assert(first_elem  || !n_elems || !size)
 > 
 > Obviously the other clean way to fix is to implement exists.
-> 
+
+If you're right that this specific vmstate was valid in earlier
+versions, then I think it's clear that we need to make it work again.
+Otherwise we're breaking migration from old versions.
+
 > I think the migration maintainers (Juan and Dave) should make a
 > call regarding if the described usage  of VMS_BUFFER is a legal
 > or an illegal one.
 
-So is it this code in target/s390x/machine.c ?
-
-        VMSTATE_VBUFFER_UINT32(irqstate, S390CPU, 4, NULL,
-                               irqstate_saved_size),
-
-it should be legal for that to be zero length.
-It also makes sense that if that's zero length it should be OK for
-the pointer to be NULL.
-
-I think it's best if you do change that assert.
-
-Dave
-
-
-> Regards,
-> Halil
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Kevin
