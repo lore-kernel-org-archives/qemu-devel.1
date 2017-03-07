@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34811)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36270)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cl2Yp-0004Cp-4T
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 19:01:04 -0500
+	id 1cl2iE-0005Nk-OO
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 19:10:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cl2Yo-0002Vt-8V
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 19:01:03 -0500
+	id 1cl2iA-0004Op-PX
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 19:10:46 -0500
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:36067)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cl2iA-0004Ol-L0
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 19:10:42 -0500
+Received: by mail-qk0-x244.google.com with SMTP id n141so24912647qke.3
+	for <qemu-devel@nongnu.org>; Mon, 06 Mar 2017 16:10:42 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170306223054.25666-1-eblake@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <01052592-5c40-8dc6-da15-5376a6ee8354@amsat.org>
+Date: Mon, 6 Mar 2017 21:10:37 -0300
 MIME-Version: 1.0
-Sender: philippe.mathieu.daude@gmail.com
-In-Reply-To: <0f0225c6-cf7f-e4dd-a91a-340303dafec7@redhat.com>
-References: <1488817322-11397-1-git-send-email-kwolf@redhat.com>
-	<1488817322-11397-7-git-send-email-kwolf@redhat.com>
-	<0f0225c6-cf7f-e4dd-a91a-340303dafec7@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philippe@mathieu-daude.net>
-Date: Mon, 6 Mar 2017 21:00:55 -0300
-Message-ID: <CAAdtpL7NtBH=LP-xB4F7KeDH5tSwhFT2=gdpFNv2_4B_OS1Dpw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 06/10] block: Factor out
- should_update_child()
+In-Reply-To: <20170306223054.25666-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-2.9] nbd/client: fix drop_sync
+ [CVE-2017-2630]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,23 +34,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, jcody@redhat.com, Fam Zheng <famz@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
+Cc: pbonzini@redhat.com, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-On Mon, Mar 6, 2017 at 5:35 PM, Eric Blake <eblake@redhat.com> wrote:
-> On 03/06/2017 10:21 AM, Kevin Wolf wrote:
->> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->> ---
->>  block.c | 42 +++++++++++++++++++++++++++---------------
->>  1 file changed, 27 insertions(+), 15 deletions(-)
->>
+Hi Vladimir,
+
+On 03/06/2017 07:30 PM, Eric Blake wrote:
+> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 >
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-
+> Comparison symbol is misused. It may lead to memory corruption.
+> Introduced in commit 7d3123e.
 >
-> --
-> Eric Blake   eblake redhat com    +1-919-301-3266
-> Libvirt virtualization library http://libvirt.org
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Message-Id: <20170203154757.36140-6-vsementsov@virtuozzo.com>
+> [eblake: add CVE details]
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Marc-André Lureau <address@hidden>
+> ---
+>
+> This one still hasn't been merged in; sending separately since the
+> rest of my NBD series is now 2.10 material:
+> https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg04528.html
+>
+>  nbd/client.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/nbd/client.c b/nbd/client.c
+> index 5c9dee3..165b33e 100644
+> --- a/nbd/client.c
+> +++ b/nbd/client.c
+> @@ -94,7 +94,7 @@ static ssize_t drop_sync(QIOChannel *ioc, size_t size)
+>      char small[1024];
+>      char *buffer;
+>
+> -    buffer = sizeof(small) < size ? small : g_malloc(MIN(65536, size));
+> +    buffer = sizeof(small) > size ? small : g_malloc(MIN(65536, size));
+
+here ">=" seems correct/safe.
+(if size is 1024, use small stack buffer too).
+
+>      while (size > 0) {
+>          ssize_t count = read_sync(ioc, buffer, MIN(65536, size));
 >
