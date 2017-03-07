@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1clNcO-0001jo-9a
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 17:30:18 -0500
+	(envelope-from <bounces@canonical.com>) id 1clNh5-00044s-Rr
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 17:35:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1clNcG-0000xM-Nq
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 17:30:08 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48540)
+	(envelope-from <bounces@canonical.com>) id 1clNh2-0002z5-N0
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 17:34:59 -0500
+Received: from indium.canonical.com ([91.189.90.7]:49375)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1clNcG-0000x2-F7
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 17:30:00 -0500
+	id 1clNh2-0002yj-H0
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 17:34:56 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1clNcE-00030M-A1
-	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 22:29:58 +0000
+	id 1clNh1-0003qI-Ja
+	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 22:34:55 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BA1692E80CF
-	for <qemu-devel@nongnu.org>; Tue,  7 Mar 2017 22:29:57 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 92A492E80C2
+	for <qemu-devel@nongnu.org>; Tue,  7 Mar 2017 22:34:55 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Mar 2017 22:18:23 -0000
-From: Thomas Huth <986318@bugs.launchpad.net>
-Reply-To: Bug 986318 <986318@bugs.launchpad.net>
+Date: Tue, 07 Mar 2017 22:23:05 -0000
+From: Thomas Huth <1274170@bugs.launchpad.net>
+Reply-To: Bug 1274170 <1274170@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20120420175203.15444.55707.malonedeb@chaenomeles.canonical.com>
-Message-Id: <20170307221823.27214.23571.malone@gac.canonical.com>
+References: <20140129161114.30551.55586.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170307222305.27415.10598.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 986318] Re: [sdl] Mouse grab breaks GNOME 3
- screensaver unlock screen
+Subject: [Qemu-devel] [Bug 1274170] Re: qemu window hides in the background
+ on osx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,33 +39,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Does this problem still happen with the latest version of QEMU and
-GNOME?
+Looks like such a line has been added with this commit here:
+http://git.qemu-project.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D43227af88a36fa=
+ed
+Is the latest version of QEMU now working as expected?
 
 ** Changed in: qemu
-       Status: New =3D> Incomplete
+       Status: Confirmed =3D> Incomplete
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/986318
+https://bugs.launchpad.net/bugs/1274170
 
 Title:
-  [sdl] Mouse grab breaks GNOME 3 screensaver unlock screen
+  qemu window hides in the background on osx
 
 Status in QEMU:
   Incomplete
 
 Bug description:
-  When the GNOME 3 screensaver activates with the mouse cursor over the
-  SDL window, the screensaver will not unlock unless the gnome-shell
-  process is killed and restarted manually. This seems to be related to
-  the fact that the key strokes are grabbed by SDL, but the screensaver
-  will not allow the Ctrl and Alt keys to be passed to QEMU to exit the
-  mouse grab.
-
-  Qemu-kvm 1.0.1, QEMU 1.0.1, kernel 3.2.15.
+  When launching qemu on OSX (10.8.5), the window comes up in the
+  background.  A bit of googling shows that the addition of [NSApp
+  activateIgnoringOtherApps:YES]; before the [NSApp run]; in main fixes
+  this.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/986318/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1274170/+subscriptions
