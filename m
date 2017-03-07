@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47162)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1cl5Ft-0006WL-Fx
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 21:53:42 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cl5xv-0002QH-39
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 22:39:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1cl5Fo-0005TR-GW
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 21:53:41 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40604)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haoqf@linux.vnet.ibm.com>)
-	id 1cl5Fo-0005Sy-6k
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 21:53:36 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v272mjLs020471
-	for <qemu-devel@nongnu.org>; Mon, 6 Mar 2017 21:53:34 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2917qnkft8-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 06 Mar 2017 21:53:34 -0500
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <haoqf@linux.vnet.ibm.com>;
-	Tue, 7 Mar 2017 02:53:32 -0000
-From: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-Date: Tue,  7 Mar 2017 03:53:28 +0100
-In-Reply-To: <20170307025328.53409-1-haoqf@linux.vnet.ibm.com>
-References: <20170307025328.53409-1-haoqf@linux.vnet.ibm.com>
-Message-Id: <20170307025328.53409-2-haoqf@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH RFC 1/1] vmstate: draft fix for failed iotests
- case 68 and 91
+	(envelope-from <dgibson@ozlabs.org>) id 1cl5xr-0000n3-VX
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 22:39:11 -0500
+Date: Tue, 7 Mar 2017 14:31:05 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170307033105.GB19967@umbus.fritz.box>
+References: <1485868319-16151-1-git-send-email-thuth@redhat.com>
+	<1485868319-16151-3-git-send-email-thuth@redhat.com>
+	<20170303145807.GC11509@thinpad.lan.raisama.net>
+	<20170305230627.GA12030@umbus.fritz.box>
+	<20170306114752.GS2778@thinpad.lan.raisama.net>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="qlTNgmc+xy1dBmNv"
+Content-Disposition: inline
+In-Reply-To: <20170306114752.GS2778@thinpad.lan.raisama.net>
+Subject: Re: [Qemu-devel] [PATCH 2/2] vl: Print CPU help after we've
+ registered the CPU accelerators
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,108 +28,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, cornelia.huck@de.ibm.com, pasic@linux.vnet.ibm.com, liujbjl@linux.vnet.ibm.com, kwolf@redhat.com, famz@redhat.com, mreitz@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>
 
-I am not very clear about the logic in vmstate.c, but from its context in
-vmstate_save_state, it seems size should not be 0, otherwise the followed
-for loop will keep working on the same element. So I just add a simple
-check to pass that case, not sure if it's right but it can pass iotest
-case 68 and 91 now.
 
-The iotest's failed output is:
-068 1s ... - output mismatch (see 068.out.bad)
---- /home/haoqf/KVMonz/gitcheck/work/qemu-master/tree/qemu/tests/qemu-iotests/068.out   2017-03-06 05:52:24.817328899 +0100
-+++ 068.out.bad 2017-03-07 03:28:44.426714519 +0100
-@@ -3,9 +3,13 @@
- === Saving and reloading a VM state to/from a qcow2 image ===
+--qlTNgmc+xy1dBmNv
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072
-+qemu-system-s390x: migration/vmstate.c:336: vmstate_save_state: Assertion `first_elem || !n_elems' failed.
-+./common.config: line 109: 52497 Aborted                 ( if [ -n "${QEMU_NEED_PID}" ]; then
-+    echo $BASHPID > "${QEMU_TEST_DIR}/qemu-${_QEMU_HANDLE}.pid";
-+fi; exec "$QEMU_PROG" $QEMU_OPTIONS "$@" )
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) savevm 0
--(qemu) quit
-+qemu-system-s390x: Device 'virtio0' does not have the requested snapshot '0'
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) quit
- *** done
+On Mon, Mar 06, 2017 at 08:47:52AM -0300, Eduardo Habkost wrote:
+> On Mon, Mar 06, 2017 at 10:06:27AM +1100, David Gibson wrote:
+> > On Fri, Mar 03, 2017 at 11:58:07AM -0300, Eduardo Habkost wrote:
+> > > On Tue, Jan 31, 2017 at 02:11:59PM +0100, Thomas Huth wrote:
+> > > > When running with KVM on POWER, we register some CPU types during
+> > > > the initialization function of the ppc64 KVM code (which unfortunat=
+ely
+> > > > also can not be done via a type_init() like it is done on x86).
+> > >=20
+> > > Can you elaborate why it can't be done via type_init()? If the
+> > > QOM type hierarchy depends on any runtime data unavailable at
+> > > type_init(), we should fix that.
+> >=20
+> > Hmm.. how?  This is specifically for the special 'host' cpu in the
+> > case of KVM.  We can't use a static configuration here, because there
+> > are things on the host that could limit what features of the CPU are
+> > available for guest use.  So, we need KVM to be initialized in order
+> > to query that information.
+>=20
+> There's nothing saying you need to query that information before
+> type_register() or during class_init, does it? The behavior of
+> TYPE_HOST_POWERPC_CPU after object_new() is called can be as
+> dynamic as you want it to, but the QOM type hierarchy is supposed
+> to be static.
 
-091 1s ... [failed, exit status 1] - output mismatch (see 091.out.bad)
-    --- tests/qemu-iotests/091.out	2016-08-30 12:35:04.207683276 +0200
-    +++ 091.out.bad	2017-03-06 13:08:03.717135426 +0100
-    @@ -11,18 +11,23 @@
-     
-     vm1: qemu-io disk write complete
-     vm1: live migration started
-    -vm1: live migration completed
-    -
-    -=== VM 2: Post-migration, write to disk, verify running ===
-    -
-    -vm2: qemu-io disk write complete
-    -vm2: qemu process running successfully
-    -vm2: flush io, and quit
-    -Check image pattern
-    -read 4194304/4194304 bytes at offset 0
-    -4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-    -Running 'qemu-img check -r all $TEST_IMG'
-    -No errors were found on the image.
-    -80/16384 = 0.49% allocated, 0.00% fragmented, 0.00% compressed clusters
-    -Image end offset: 5570560
-    -*** done
-    +./common.qemu: line 110: write error: Broken pipe
-    +./common.qemu: line 110: write error: Broken pipe
-    +./common.qemu: line 110: write error: Broken pipe
-    +./common.qemu: line 110: write error: Broken pipe
-    +./common.qemu: line 110: write error: Broken pipe
-    +./common.qemu: line 110: write error: Broken pipe
-    +./common.qemu: line 110: write error: Broken pipe
-    +./common.qemu: line 110: write error: Broken pipe
-    +./common.qemu: line 110: write error: Broken pipe
-    +./common.qemu: line 110: write error: Broken pipe
-    +./common.qemu: line 110: write error: Broken pipe
-    +./common.qemu: line 110: write error: Broken pipe
-    +./common.qemu: line 110: write error: Broken pipe
-    +./common.qemu: line 110: write error: Broken pipe
-    +./common.qemu: line 110: write error: Broken pipe
-    +./common.qemu: line 110: write error: Broken pipe
-    +./common.qemu: line 110: write error: Broken pipe
-    +./common.qemu: line 110: write error: Broken pipe
-    +./common.qemu: line 110: write error: Broken pipe
-    +Timeout waiting for completed on handle 0
+So, the thing is we have some properties that logically belong in the
+CPU class, rather than instance, and that's correct for all TCG CPUs,
+but not for the KVM host CPU.  It seems nasty to have to force all
+those things into the instance just because of KVM.
 
-Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
----
- migration/vmstate.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+> Registering QOM types outside type_init() is only causing us
+> problems and we should stop doing that.
+>=20
+> >=20
+> > > >                                                                 So =
+to
+> > > > be able to see these updates in the CPU help text, the code that ca=
+lls
+> > > > list_cpus() has to be run after configure_accelerator(). This move =
+should
+> > > > be fine since the "cpu_model" variable is also never used before th=
+e call
+> > > > to configure_accelerator(), and thus there should not be any unwant=
+ed
+> > > > side effects in the code before configure_accelerator() if the user
+> > > > started QEMU with "-cpu ?" or "-cpu help".
+> > > >=20
+> > > > Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > >=20
+> > > I am not convinced that the output of "-cpu help" and
+> > > "-cpu help -machine accel=3Dkvm" should look different. Do you have
+> > > an example of what exactly is wrong with the output currently?
+> > >=20
+> > > I actually believe list_cpus() needs to be called _earlier_, not
+> > > later. Otherwise we won't be able to fix this bug:
+> > >=20
+> > >   $ qemu-system-arm -cpu help
+> > >   qemu-system-arm:/usr/local/etc/qemu/qemu.conf:1: No machine specifi=
+ed, and there is no default
+> > >   Use -machine help to list supported machines
+> > >   $=20
+> > >=20
+> > > > ---
+> > > >  vl.c | 10 +++++-----
+> > > >  1 file changed, 5 insertions(+), 5 deletions(-)
+> > > >=20
+> > > > diff --git a/vl.c b/vl.c
+> > > > index 0b72b12..315c5c3 100644
+> > > > --- a/vl.c
+> > > > +++ b/vl.c
+> > > > @@ -4055,11 +4055,6 @@ int main(int argc, char **argv, char **envp)
+> > > >          qemu_set_hw_version(machine_class->hw_version);
+> > > >      }
+> > > > =20
+> > > > -    if (cpu_model && is_help_option(cpu_model)) {
+> > > > -        list_cpus(stdout, &fprintf, cpu_model);
+> > > > -        exit(0);
+> > > > -    }
+> > > > -
+> > > >      if (!trace_init_backends()) {
+> > > >          exit(1);
+> > > >      }
+> > > > @@ -4298,6 +4293,11 @@ int main(int argc, char **argv, char **envp)
+> > > > =20
+> > > >      configure_accelerator(current_machine);
+> > > > =20
+> > > > +    if (cpu_model && is_help_option(cpu_model)) {
+> > > > +        list_cpus(stdout, &fprintf, cpu_model);
+> > > > +        exit(0);
+> > > > +    }
+> > > > +
+> > > >      if (qtest_chrdev) {
+> > > >          qtest_init(qtest_chrdev, qtest_log, &error_fatal);
+> > > >      }
+> > >=20
+> >=20
+>=20
+>=20
+>=20
 
-diff --git a/migration/vmstate.c b/migration/vmstate.c
-index 78b3cd4..ff28dde 100644
---- a/migration/vmstate.c
-+++ b/migration/vmstate.c
-@@ -106,6 +106,10 @@ int vmstate_load_state(QEMUFile *f, const VMStateDescription *vmsd,
-             int i, n_elems = vmstate_n_elems(opaque, field);
-             int size = vmstate_size(opaque, field);
- 
-+            if (size == 0) {
-+                field++;
-+                continue;
-+            }
-             vmstate_handle_alloc(first_elem, field, opaque);
-             if (field->flags & VMS_POINTER) {
-                 first_elem = *(void **)first_elem;
-@@ -322,6 +326,10 @@ void vmstate_save_state(QEMUFile *f, const VMStateDescription *vmsd,
-             int64_t old_offset, written_bytes;
-             QJSON *vmdesc_loop = vmdesc;
- 
-+            if (size == 0) {
-+                field++;
-+                continue;
-+            }
-             trace_vmstate_save_state_loop(vmsd->name, field->name, n_elems);
-             if (field->flags & VMS_POINTER) {
-                 first_elem = *(void **)first_elem;
--- 
-2.8.4
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--qlTNgmc+xy1dBmNv
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYvil3AAoJEGw4ysog2bOSWaoP/2jSwJbBwH58z7QcHQfY4QNx
+DRfgz0FL2jm/sI/r2ZWXE49doWnOd3v7eVVE6ADf/2F/KGgemigfZQysQKnhQYP5
+NAr8wVQiNh8O9MKhT4YV//B1ce9aKYd/pUBNRiEv4ZifGujlOpD2mmJxKOSQizks
+JM6cuaSIgwWfgqohW73WqypjERBvVZ0LuBA5pTAfYzyHRzXKrMLrkwvHe8lxzBbC
+0Jx1lTKgW4OBCkO4m3+eByXS63Q8jmPb2WkNZaFZjn+THN2HoP5bSKQ/9JsMYog2
+tggS+kqyUd41VrBGvvvyUVkCmSRSyluV0zMB6Ljc16qlchwGPvAr5nXezNiR6CKx
+mOU+7kYNI3Tpv3zjG28i6/p0CdxZfBwx9p3lKJIs8TSPlGRwlaHPZsjYOW9Vefzb
+xp1q5Vf4xBYzbxPNRcoCT5FWbN2ZheAeHFX9wUMiDBgr+H9kobl14TiVIdbttqsx
+Wzu8HAt+st9vO/WhN+xK5HJyc9GvHzyplRH0FnbpLpQV1QcyfJvUfuZtz8uMF1OW
+oTEfdZpjUkMyXachnnc752ygLd0h4wR603uea+gHSADLJYqVFMFYkIXZPDhNjtN6
+z4rRraZqSNEazfQf1wWFsiLGHip4AUsU+Hl/l08Na71hdkaLO8HwFjhGcY4fWb5k
+3yx/yhNzKxiUzCIls5NO
+=KQ7P
+-----END PGP SIGNATURE-----
+
+--qlTNgmc+xy1dBmNv--
