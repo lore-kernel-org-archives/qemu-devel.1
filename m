@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44516)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cl9QN-0001Yw-Q2
+	(envelope-from <armbru@redhat.com>) id 1cl9QN-0001ZC-WA
 	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:20:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cl9QK-0006BS-LN
+	(envelope-from <armbru@redhat.com>) id 1cl9QL-0006Bi-87
 	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:20:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33670)
+Received: from mx1.redhat.com ([209.132.183.28]:33672)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cl9QK-00069s-9l
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:20:44 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cl9QK-0006A7-SV
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:20:45 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 86F7264A4C
-	for <qemu-devel@nongnu.org>; Tue,  7 Mar 2017 07:20:44 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 918867E9FF
+	for <qemu-devel@nongnu.org>; Tue,  7 Mar 2017 07:20:42 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
 	[10.36.116.55])
-	by int-mx11.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v277Khn2024489
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=NO)
-	for <qemu-devel@nongnu.org>; Tue, 7 Mar 2017 02:20:44 -0500
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 31A7C2D654
+	for <qemu-devel@nongnu.org>; Tue,  7 Mar 2017 07:20:42 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  7 Mar 2017 08:20:34 +0100
-Message-Id: <1488871237-12332-22-git-send-email-armbru@redhat.com>
+Date: Tue,  7 Mar 2017 08:20:21 +0100
+Message-Id: <1488871237-12332-9-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488871237-12332-1-git-send-email-armbru@redhat.com>
 References: <1488871237-12332-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v3 21/24] block: Initial implementation of
- -blockdev
+Subject: [Qemu-devel] [PULL v3 08/24] qobject: Propagate parse errors
+ through qobject_from_jsonv()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,124 +36,113 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The new command line option -blockdev works like QMP command
-blockdev-add.
-
-The option argument may be given in JSON syntax, exactly as in QMP.
-Example usage:
-
-    -blockdev '{"node-name": "foo", "driver": "raw", "file": {"driver": "file", "filename": "foo.img"} }'
-
-The JSON argument doesn't exactly blend into the existing option
-syntax, so the traditional KEY=VALUE,... syntax is also supported,
-using dotted keys to do the nesting:
-
-    -blockdev node-name=foo,driver=raw,file.driver=file,file.filename=foo.img
-
-This does not yet support lists, but that will be addressed shortly.
-
-Note that calling qmp_blockdev_add() (say via qmp_marshal_block_add())
-right away would crash.  We need to stash the configuration for later
-instead.  This is crudely done, and bypasses QemuOpts, even though
-storing configuration is what QemuOpts is for.  Need to revamp option
-infrastructure to support QAPI types like BlockdevOptions.
+The next few commits will put the errors to use where appropriate.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <1488317230-26248-22-git-send-email-armbru@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Message-Id: <1488317230-26248-9-git-send-email-armbru@redhat.com>
 ---
- qemu-options.hx |  7 +++++++
- vl.c            | 39 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 46 insertions(+)
+ include/qapi/qmp/qjson.h           |  3 ++-
+ qobject/qjson.c                    | 12 ++++++++----
+ tests/libqtest.c                   |  2 +-
+ tests/test-qobject-input-visitor.c |  2 +-
+ 4 files changed, 12 insertions(+), 7 deletions(-)
 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 2292438..8dd8ee3 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -550,6 +550,13 @@ Use @var{file} as CD-ROM image (you cannot use @option{-hdc} and
- using @file{/dev/cdrom} as filename (@pxref{host_drives}).
- ETEXI
+diff --git a/include/qapi/qmp/qjson.h b/include/qapi/qmp/qjson.h
+index 02b1f2c..6fe42d0 100644
+--- a/include/qapi/qmp/qjson.h
++++ b/include/qapi/qmp/qjson.h
+@@ -19,7 +19,8 @@
  
-+DEF("blockdev", HAS_ARG, QEMU_OPTION_blockdev,
-+    "-blockdev [driver=]driver[,node-name=N][,discard=ignore|unmap]\n"
-+    "          [,cache.direct=on|off][,cache.no-flush=on|off]\n"
-+    "          [,read-only=on|off][,detect-zeroes=on|off|unmap]\n"
-+    "          [,driver specific parameters...]\n"
-+    "                configure a block backend\n", QEMU_ARCH_ALL)
-+
- DEF("drive", HAS_ARG, QEMU_OPTION_drive,
-     "-drive [file=file][,if=type][,bus=n][,unit=m][,media=d][,index=i]\n"
-     "       [,cyls=c,heads=h,secs=s[,trans=t]][,snapshot=on|off]\n"
-diff --git a/vl.c b/vl.c
-index 71b75ef..7f1644a 100644
---- a/vl.c
-+++ b/vl.c
-@@ -95,6 +95,9 @@ int main(int argc, char **argv)
- #include "migration/colo.h"
- #include "sysemu/kvm.h"
- #include "sysemu/hax.h"
-+#include "qapi/qobject-input-visitor.h"
-+#include "qapi/qobject-input-visitor.h"
-+#include "qapi-visit.h"
- #include "qapi/qmp/qjson.h"
- #include "qemu/option.h"
- #include "qemu/config-file.h"
-@@ -2976,6 +2979,13 @@ int main(int argc, char **argv, char **envp)
-     Error *main_loop_err = NULL;
-     Error *err = NULL;
-     bool list_data_dirs = false;
-+    typedef struct BlockdevOptions_queue {
-+        BlockdevOptions *bdo;
-+        Location loc;
-+        QSIMPLEQ_ENTRY(BlockdevOptions_queue) entry;
-+    } BlockdevOptions_queue;
-+    QSIMPLEQ_HEAD(, BlockdevOptions_queue) bdo_queue
-+        = QSIMPLEQ_HEAD_INITIALIZER(bdo_queue);
+ QObject *qobject_from_json(const char *string);
+ QObject *qobject_from_jsonf(const char *string, ...) GCC_FMT_ATTR(1, 2);
+-QObject *qobject_from_jsonv(const char *string, va_list *ap) GCC_FMT_ATTR(1, 0);
++QObject *qobject_from_jsonv(const char *string, va_list *ap, Error **errp)
++    GCC_FMT_ATTR(1, 0);
  
-     module_call_init(MODULE_INIT_TRACE);
+ QString *qobject_to_json(const QObject *obj);
+ QString *qobject_to_json_pretty(const QObject *obj);
+diff --git a/qobject/qjson.c b/qobject/qjson.c
+index 9a0de89..339c9f7 100644
+--- a/qobject/qjson.c
++++ b/qobject/qjson.c
+@@ -12,6 +12,7 @@
+  */
  
-@@ -3118,6 +3128,25 @@ int main(int argc, char **argv, char **envp)
-                 drive_add(IF_DEFAULT, popt->index - QEMU_OPTION_hda, optarg,
-                           HD_OPTS);
-                 break;
-+            case QEMU_OPTION_blockdev:
-+                {
-+                    Visitor *v;
-+                    BlockdevOptions_queue *bdo;
-+
-+                    v = qobject_input_visitor_new_str(optarg, "driver", &err);
-+                    if (!v) {
-+                        error_report_err(err);
-+                        exit(1);
-+                    }
-+
-+                    bdo = g_new(BlockdevOptions_queue, 1);
-+                    visit_type_BlockdevOptions(v, NULL, &bdo->bdo,
-+                                               &error_fatal);
-+                    visit_free(v);
-+                    loc_save(&bdo->loc);
-+                    QSIMPLEQ_INSERT_TAIL(&bdo_queue, bdo, entry);
-+                    break;
-+                }
-             case QEMU_OPTION_drive:
-                 if (drive_def(optarg) == NULL) {
-                     exit(1);
-@@ -4451,6 +4480,16 @@ int main(int argc, char **argv, char **envp)
-     }
+ #include "qemu/osdep.h"
++#include "qapi/error.h"
+ #include "qapi/qmp/json-lexer.h"
+ #include "qapi/qmp/json-parser.h"
+ #include "qapi/qmp/json-streamer.h"
+@@ -24,15 +25,17 @@ typedef struct JSONParsingState
+     JSONMessageParser parser;
+     va_list *ap;
+     QObject *result;
++    Error *err;
+ } JSONParsingState;
  
-     /* open the virtual block devices */
-+    while (!QSIMPLEQ_EMPTY(&bdo_queue)) {
-+        BlockdevOptions_queue *bdo = QSIMPLEQ_FIRST(&bdo_queue);
+ static void parse_json(JSONMessageParser *parser, GQueue *tokens)
+ {
+     JSONParsingState *s = container_of(parser, JSONParsingState, parser);
+-    s->result = json_parser_parse(tokens, s->ap);
 +
-+        QSIMPLEQ_REMOVE_HEAD(&bdo_queue, entry);
-+        loc_push_restore(&bdo->loc);
-+        qmp_blockdev_add(bdo->bdo, &error_fatal);
-+        loc_pop(&bdo->loc);
-+        qapi_free_BlockdevOptions(bdo->bdo);
-+        g_free(bdo);
-+    }
-     if (snapshot || replay_mode != REPLAY_MODE_NONE) {
-         qemu_opts_foreach(qemu_find_opts("drive"), drive_enable_snapshot,
-                           NULL, NULL);
++    s->result = json_parser_parse_err(tokens, s->ap, &s->err);
+ }
+ 
+-QObject *qobject_from_jsonv(const char *string, va_list *ap)
++QObject *qobject_from_jsonv(const char *string, va_list *ap, Error **errp)
+ {
+     JSONParsingState state = {};
+ 
+@@ -43,12 +46,13 @@ QObject *qobject_from_jsonv(const char *string, va_list *ap)
+     json_message_parser_flush(&state.parser);
+     json_message_parser_destroy(&state.parser);
+ 
++    error_propagate(errp, state.err);
+     return state.result;
+ }
+ 
+ QObject *qobject_from_json(const char *string)
+ {
+-    return qobject_from_jsonv(string, NULL);
++    return qobject_from_jsonv(string, NULL, NULL);
+ }
+ 
+ /*
+@@ -61,7 +65,7 @@ QObject *qobject_from_jsonf(const char *string, ...)
+     va_list ap;
+ 
+     va_start(ap, string);
+-    obj = qobject_from_jsonv(string, &ap);
++    obj = qobject_from_jsonv(string, &ap, NULL);
+     va_end(ap);
+ 
+     assert(obj != NULL);
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index ca6b641..9033c5f 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -442,7 +442,7 @@ void qmp_fd_sendv(int fd, const char *fmt, va_list ap)
+      * is an array type.
+      */
+     va_copy(ap_copy, ap);
+-    qobj = qobject_from_jsonv(fmt, &ap_copy);
++    qobj = qobject_from_jsonv(fmt, &ap_copy, NULL);
+     va_end(ap_copy);
+ 
+     /* No need to send anything for an empty QObject.  */
+diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-input-visitor.c
+index 32ba492..36cc4b5 100644
+--- a/tests/test-qobject-input-visitor.c
++++ b/tests/test-qobject-input-visitor.c
+@@ -51,7 +51,7 @@ static Visitor *visitor_input_test_init_internal(TestInputVisitorData *data,
+ {
+     visitor_input_teardown(data, NULL);
+ 
+-    data->obj = qobject_from_jsonv(json_string, ap);
++    data->obj = qobject_from_jsonv(json_string, ap, NULL);
+     g_assert(data->obj);
+ 
+     if (keyval) {
 -- 
 2.7.4
