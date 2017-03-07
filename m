@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1clBtH-000494-2c
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 04:59:08 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1clBud-0005CB-Vc
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:00:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1clBsl-0007t4-MH
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 04:58:47 -0500
-Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:34142)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1clBsl-0007oc-D6
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 04:58:15 -0500
-Received: by mail-wr0-x22a.google.com with SMTP id l37so135269192wrc.1
-	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 01:58:13 -0800 (PST)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1clBuZ-0002Wx-1J
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:00:12 -0500
+References: <20170225193155.447462-1-vsementsov@virtuozzo.com>
+	<20170225193155.447462-4-vsementsov@virtuozzo.com>
+	<20170307095323.GB5871@noname.str.redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <b2c86843-1506-dba6-2446-a253f77f5b58@virtuozzo.com>
+Date: Tue, 7 Mar 2017 12:59:43 +0300
 MIME-Version: 1.0
-In-Reply-To: <1488822850-23070-1-git-send-email-groug@kaod.org>
-References: <1488822850-23070-1-git-send-email-groug@kaod.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 7 Mar 2017 09:57:52 +0000
-Message-ID: <CAFEAcA-c1mNqzFoHYLjpqPMi5_cmz-7ADHAZQKO=uD7D11BrWw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 0/6] 9pfs fixes for 2.9 2017-03-06
+In-Reply-To: <20170307095323.GB5871@noname.str.redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/4] savevm: fix savevm after migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +24,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
 
-On 6 March 2017 at 17:54, Greg Kurz <groug@kaod.org> wrote:
-> The following changes since commit 56b51708e9e22809d2a78f38d0ac84bb3f3fca92:
+07.03.2017 12:53, Kevin Wolf wrote:
+> Am 25.02.2017 um 20:31 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>> After migration all drives are inactive and savevm will fail with
+>>
+>> qemu-kvm: block/io.c:1406: bdrv_co_do_pwritev:
+>>     Assertion `!(bs->open_flags & 0x0800)' failed.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> What's the exact state you're in? I tried to reproduce this, but just
+> doing a live migration and then savevm on the destination works fine for
+> me.
 >
->   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-2.9-20170306' into staging (2017-03-06 13:06:30 +0000)
->
-> are available in the git repository at:
->
->   https://github.com/gkurz/qemu.git tags/fixes-for-2.9
->
-> for you to fetch changes up to b003fc0d8aa5e7060dbf7e5862b8013c73857c7f:
->
->   9pfs: fix vulnerability in openat_dir() and local_unlinkat_common() (2017-03-06 17:34:01 +0100)
->
-> ----------------------------------------------------------------
-> Fixes issues that got merged with the latest pull request:
-> - missing O_NOFOLLOW flag for CVE-2016-960
-> - build break with older glibc that don't have O_PATH and AT_EMPTY_PATH
-> - various bugs reported by Coverity
->
-> ----------------------------------------------------------------
-> Greg Kurz (6):
->       9pfs: fix bogus fd check in local_remove()
->       9pfs: fix fd leak in local_opendir()
->       9pfs: fail local_statfs() earlier
->       9pfs: don't use AT_EMPTY_PATH in local_set_cred_passthrough()
->       9pfs: fix O_PATH build break with older glibc versions
->       9pfs: fix vulnerability in openat_dir() and local_unlinkat_common()
->
+> Hm... Or do you mean on the source? In that case, I think the operation
+> must fail, but of course more gracefully than now.
 
-Applied, thanks.
+Yes, I mean on the source. It may not be migration for "mirgration", but 
+for dumping state to file. In that case it seems not wrong to make a 
+snapshot on source.
 
--- PMM
+>
+> Actually, the question that you're asking implicitly here is how the
+> source qemu process should be "reactivated" after a failed migration.
+> Currently, as far as I know, this is only with issuing a "cont" command.
+> It might make sense to provide a way to get control without resuming the
+> VM, but I doubt that adding automatic resume to every QMP command is the
+> right way to achieve it.
+>
+> Dave, Juan, what do you think?
+>
+>> diff --git a/block/snapshot.c b/block/snapshot.c
+>> index bf5c2ca5e1..256d06ac9f 100644
+>> --- a/block/snapshot.c
+>> +++ b/block/snapshot.c
+>> @@ -145,7 +145,8 @@ bool bdrv_snapshot_find_by_id_and_name(BlockDriverState *bs,
+>>   int bdrv_can_snapshot(BlockDriverState *bs)
+>>   {
+>>       BlockDriver *drv = bs->drv;
+>> -    if (!drv || !bdrv_is_inserted(bs) || bdrv_is_read_only(bs)) {
+>> +    if (!drv || !bdrv_is_inserted(bs) || bdrv_is_read_only(bs) ||
+>> +        (bs->open_flags & BDRV_O_INACTIVE)) {
+>>           return 0;
+>>       }
+> I wasn't sure if this doesn't disable too much, but it seems it only
+> makes 'info snapshots' turn up empty, which might not be nice, but maybe
+> tolerable.
+>
+> At least it should definitely fix the assertion.
+>
+>> diff --git a/migration/savevm.c b/migration/savevm.c
+>> index 5ecd264134..75e56d2d07 100644
+>> --- a/migration/savevm.c
+>> +++ b/migration/savevm.c
+>> @@ -2068,6 +2068,17 @@ int save_vmstate(Monitor *mon, const char *name)
+>>       Error *local_err = NULL;
+>>       AioContext *aio_context;
+>>   
+>> +    if (runstate_check(RUN_STATE_FINISH_MIGRATE) ||
+>> +        runstate_check(RUN_STATE_POSTMIGRATE) ||
+>> +        runstate_check(RUN_STATE_PRELAUNCH))
+>> +    {
+>> +        bdrv_invalidate_cache_all(&local_err);
+>> +        if (local_err) {
+>> +            error_report_err(local_err);
+>> +            return -EINVAL;
+>> +        }
+>> +    }
+>> +
+> This hunk can't go in before the more general question of implicitly or
+> explicitly regaining control after a failed migration is answered.
+>
+> Kevin
+
+
+-- 
+Best regards,
+Vladimir
