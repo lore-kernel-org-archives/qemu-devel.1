@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36843)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1clCGY-0004s4-KD
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:22:51 -0500
+	(envelope-from <famz@redhat.com>) id 1clCLq-0006QM-9U
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:28:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1clCGX-0001xn-NL
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:22:50 -0500
-Date: Tue, 7 Mar 2017 11:22:40 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170307102240.GE5871@noname.str.redhat.com>
-References: <20170225193155.447462-1-vsementsov@virtuozzo.com>
-	<20170225193155.447462-3-vsementsov@virtuozzo.com>
-	<20170307100204.GC5871@noname.str.redhat.com>
-	<ec621d28-d6bd-a125-fa1c-5e9a09b04c22@virtuozzo.com>
+	(envelope-from <famz@redhat.com>) id 1clCLp-0003tO-Gg
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 05:28:18 -0500
+Date: Tue, 7 Mar 2017 18:28:09 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170307102809.GA6623@lemon.lan>
+References: <20170207132723.13934-1-famz@redhat.com>
+	<20170207132723.13934-2-famz@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ec621d28-d6bd-a125-fa1c-5e9a09b04c22@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH 2/4] qmp-cont: invalidate on
- RUN_STATE_PRELAUNCH
+In-Reply-To: <20170207132723.13934-2-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] virtio-blk: Remove useless condition
+ around g_free()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,48 +24,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
+To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: Laszlo Ersek <lersek@redhat.com>, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-Am 07.03.2017 um 11:11 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 07.03.2017 13:02, Kevin Wolf wrote:
-> >Am 25.02.2017 um 20:31 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> >>We must invalidate on RUN_STATE_PRELAUNCH too, as it is available
-> >>through qmp_system_reset from RUN_STATE_POSTMIGRATE. Otherwise, we will
-> >>come to
-> >>
-> >>qemu-kvm: block/io.c:1406: bdrv_co_do_pwritev:
-> >>        Assertion `!(bs->open_flags & 0x0800)' failed.
-> >>
-> >>on the first write after vm start.
-> >>
-> >>Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> >Wouldn't it make more sense to invalidate in qmp_system_reset() where
-> >the migration states are left?
-> >
-> >Or maybe BDRV_O_INACTIVE could even be tied directly to runstates? Not
-> >sure how realistic this one is, but if we start adding invalidate_cache
-> >calls all over the place, maybe that's a sign that we need to look for a
-> >more central place.
+On Tue, 02/07 21:27, Fam Zheng wrote:
+> Laszlo spotted and studied this wasteful "if". He pointed out:
 > 
-> I've proposed it in cover letter) These bugs and my fixes are just
-> show that something should be rethought.. I don't claim that these
-> fixes are true way, they are just the simplest.
+> The original virtio_blk_free_request needed an "if" as it accesses one
+> field, since 671ec3f05655 ("virtio-blk: Convert VirtIOBlockReq.elem to
+> pointer", 2014-06-11); later on in f897bf751fbd ("virtio-blk: embed
+> VirtQueueElement in VirtIOBlockReq", 2014-07-09) the field became
+> embedded, so the "if" became unnecessary (at which point we were using
+> g_slice_free(), but it is the same.
+> 
+> Now drop it.
+> 
+> Reported-by: Laszlo Ersek <lersek@redhat.com>
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  hw/block/virtio-blk.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+> 
+> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+> index 702eda8..2858c31 100644
+> --- a/hw/block/virtio-blk.c
+> +++ b/hw/block/virtio-blk.c
+> @@ -42,9 +42,7 @@ static void virtio_blk_init_request(VirtIOBlock *s, VirtQueue *vq,
+>  
+>  static void virtio_blk_free_request(VirtIOBlockReq *req)
+>  {
+> -    if (req) {
+> -        g_free(req);
+> -    }
+> +    g_free(req);
+>  }
+>  
+>  static void virtio_blk_req_complete(VirtIOBlockReq *req, unsigned char status)
+> -- 
+> 2.9.3
+> 
+> 
 
-Ah, sorry, I read the cover letter a while ago, but not again before
-reading the patches now. You're right that it's something that needs to
-be addressed in some way. Your patches may be simple, but I think there
-is no hope to ever get it completely correct with that approach because
-there are so many cases (basically each QMP command is one case).
+Cc: qemu-trivial@nongnu.org
 
-The cover letter seems to propose that INACTIVE could be a runstate. I
-don't think that's quite right, because we already have many runstates
-that would qualify as inactive in this sense, but that still need to be
-separate. But possibly we can have a mapping from runstates to the
-inactive flag.
+(Let's drop 2/2 and perhaps merge this via trivial)
 
-One (implementation) problem with directly coupling inactive with
-runstates is that runstate_set() can't fail at the moment, but
-bdrv_inactivate/invalidate_cache() can.
-
-Kevin
+Fam
