@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1clJIp-0001YU-7l
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 12:53:40 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1clJyW-0008MF-0J
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 13:36:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1clJIo-0004lv-AP
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 12:53:39 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170307155054.5833-1-alex.bennee@linaro.org>
-	<20170307155054.5833-12-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f46089b3-d794-5d86-b623-92f131693b5e@amsat.org>
-Date: Tue, 7 Mar 2017 14:53:27 -0300
-MIME-Version: 1.0
-In-Reply-To: <20170307155054.5833-12-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v3 11/11] hw/intc/arm_gic:
- modernise the DPRINTF
+	(envelope-from <dgilbert@redhat.com>) id 1clJyS-0001Fu-Ut
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 13:36:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53960)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1clJyS-0001Fn-P2
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 13:36:40 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A7D673D940
+	for <qemu-devel@nongnu.org>; Tue,  7 Mar 2017 18:36:40 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Tue,  7 Mar 2017 18:36:35 +0000
+Message-Id: <20170307183637.21245-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/2] migration/postcopy: Disable shared RAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,52 +27,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, rth@twiddle.net, pbonzini@redhat.com
-Cc: mttcg@listserver.greensocs.com, nikunj@linux.vnet.ibm.com, a.rigo@virtualopensystems.com, qemu-devel@nongnu.org, cota@braap.org, "open list:ARM cores" <qemu-arm@nongnu.org>, bobby.prani@gmail.com, fred.konrad@greensocs.com
+To: qemu-devel@nongnu.org, quintela@redhat.com
+Cc: pbonzini@redhat.com, lvivier@redhat.com
 
-On 03/07/2017 12:50 PM, Alex Bennée wrote:
-> While I was debugging the icount issues I realised a bunch of the
-> messages look quite similar. I've fixed this by including __func__ in
-> the debug print. At the same time I move the a modern if (GATE) style
-> printf which ensures the compiler can check for format string errors
-> even if the code gets optimised away in the non-DEBUG_GIC case.
->
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Disable postcopy migration when there's shared RAM, we're
+still figuring out the details.  Without this patch
+there's a chance it might appear to succeed in some
+cases.
 
-> ---
->  hw/intc/arm_gic.c | 13 +++++++++----
->  1 file changed, 9 insertions(+), 4 deletions(-)
->
-> diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
-> index 8e5a9d8a3e..b305d9032a 100644
-> --- a/hw/intc/arm_gic.c
-> +++ b/hw/intc/arm_gic.c
-> @@ -26,15 +26,20 @@
->  #include "qemu/log.h"
->  #include "trace.h"
->
-> -//#define DEBUG_GIC
-> +/* #define DEBUG_GIC */
->
->  #ifdef DEBUG_GIC
-> -#define DPRINTF(fmt, ...) \
-> -do { fprintf(stderr, "arm_gic: " fmt , ## __VA_ARGS__); } while (0)
-> +#define DEBUG_GIC_GATE 1
->  #else
-> -#define DPRINTF(fmt, ...) do {} while(0)
-> +#define DEBUG_GIC_GATE 0
->  #endif
->
-> +#define DPRINTF(fmt, ...) do {                                          \
-> +        if (DEBUG_GIC_GATE) {                                           \
-> +            fprintf(stderr, "%s: " fmt, __func__, ## __VA_ARGS__);      \
-> +        }                                                               \
-> +    } while (0)
-> +
->  static const uint8_t gic_id_11mpcore[] = {
->      0x00, 0x00, 0x00, 0x00, 0x90, 0x13, 0x04, 0x00, 0x0d, 0xf0, 0x05, 0xb1
->  };
->
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+Dr. David Alan Gilbert (2):
+  RAMBlocks: qemu_ram_is_shared
+  postcopy: Check for shared memory
+
+ exec.c                    |  5 +++++
+ include/exec/cpu-common.h |  1 +
+ migration/postcopy-ram.c  | 18 ++++++++++++++++++
+ 3 files changed, 24 insertions(+)
+
+-- 
+2.9.3
