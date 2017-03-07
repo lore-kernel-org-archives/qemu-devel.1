@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44468)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cl9QM-0001Xv-KQ
+	(envelope-from <armbru@redhat.com>) id 1cl9QN-0001YJ-7t
 	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:20:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cl9QK-0006BI-Kw
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:20:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38780)
+	(envelope-from <armbru@redhat.com>) id 1cl9QK-0006BO-J4
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:20:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37382)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cl9QK-00069q-90
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cl9QK-00069t-Ac
 	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:20:44 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8473BC0586B4
+	by mx1.redhat.com (Postfix) with ESMTPS id 87D2381226
 	for <qemu-devel@nongnu.org>; Tue,  7 Mar 2017 07:20:44 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
 	[10.36.116.55])
-	by int-mx13.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v277Khsi007198
+	by int-mx11.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v277KhCe024491
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
 	verify=NO)
 	for <qemu-devel@nongnu.org>; Tue, 7 Mar 2017 02:20:44 -0500
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  7 Mar 2017 08:20:31 +0100
-Message-Id: <1488871237-12332-19-git-send-email-armbru@redhat.com>
+Date: Tue,  7 Mar 2017 08:20:36 +0100
+Message-Id: <1488871237-12332-24-git-send-email-armbru@redhat.com>
 In-Reply-To: <1488871237-12332-1-git-send-email-armbru@redhat.com>
 References: <1488871237-12332-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v3 18/24] qapi: New parse_qapi_name()
+Subject: [Qemu-devel] [PULL v3 23/24] docs/qapi-code-gen.txt: Clarify naming
+ rules
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,128 +40,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <1488317230-26248-19-git-send-email-armbru@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Message-Id: <1488317230-26248-24-git-send-email-armbru@redhat.com>
 ---
- include/qapi/util.h    |  2 ++
- qapi/qapi-util.c       | 47 +++++++++++++++++++++++++++++++++++++++++++++++
- tests/test-qapi-util.c | 34 ++++++++++++++++++++++++++++++++++
- 3 files changed, 83 insertions(+)
+ docs/qapi-code-gen.txt | 61 ++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 39 insertions(+), 22 deletions(-)
 
-diff --git a/include/qapi/util.h b/include/qapi/util.h
-index 7ad26c0..7436ed8 100644
---- a/include/qapi/util.h
-+++ b/include/qapi/util.h
-@@ -14,4 +14,6 @@
- int qapi_enum_parse(const char * const lookup[], const char *buf,
-                     int max, int def, Error **errp);
+diff --git a/docs/qapi-code-gen.txt b/docs/qapi-code-gen.txt
+index 6746c10..9514d93 100644
+--- a/docs/qapi-code-gen.txt
++++ b/docs/qapi-code-gen.txt
+@@ -216,33 +216,38 @@ single-dimension array of that type; multi-dimension arrays are not
+ directly supported (although an array of a complex struct that
+ contains an array member is possible).
  
-+int parse_qapi_name(const char *name, bool complete);
++All names must begin with a letter, and contain only ASCII letters,
++digits, hyphen, and underscore.  There are two exceptions: enum values
++may start with a digit, and names that are downstream extensions (see
++section Downstream extensions) start with underscore.
 +
- #endif
-diff --git a/qapi/qapi-util.c b/qapi/qapi-util.c
-index 818730a..e28dbd0 100644
---- a/qapi/qapi-util.c
-+++ b/qapi/qapi-util.c
-@@ -33,3 +33,50 @@ int qapi_enum_parse(const char * const lookup[], const char *buf,
-     error_setg(errp, "invalid parameter value: %s", buf);
-     return def;
- }
++Names beginning with 'q_' are reserved for the generator, which uses
++them for munging QMP names that resemble C keywords or other
++problematic strings.  For example, a member named "default" in qapi
++becomes "q_default" in the generated C code.
 +
-+/*
-+ * Parse a valid QAPI name from @str.
-+ * A valid name consists of letters, digits, hyphen and underscore.
-+ * It may be prefixed by __RFQDN_ (downstream extension), where RFQDN
-+ * may contain only letters, digits, hyphen and period.
-+ * The special exception for enumeration names is not implemented.
-+ * See docs/qapi-code-gen.txt for more on QAPI naming rules.
-+ * Keep this consistent with scripts/qapi.py!
-+ * If @complete, the parse fails unless it consumes @str completely.
-+ * Return its length on success, -1 on failure.
-+ */
-+int parse_qapi_name(const char *str, bool complete)
-+{
-+    const char *p = str;
+ Types, commands, and events share a common namespace.  Therefore,
+ generally speaking, type definitions should always use CamelCase for
+-user-defined type names, while built-in types are lowercase. Type
+-definitions should not end in 'Kind', as this namespace is used for
+-creating implicit C enums for visiting union types, or in 'List', as
+-this namespace is used for creating array types.  Command names,
+-and member names within a type, should be all lower case with words
+-separated by a hyphen.  However, some existing older commands and
+-complex types use underscore; when extending such expressions,
+-consistency is preferred over blindly avoiding underscore.  Event
+-names should be ALL_CAPS with words separated by underscore.  Member
+-names cannot start with 'has-' or 'has_', as this is reserved for
+-tracking optional members.
++user-defined type names, while built-in types are lowercase.
 +
-+    if (*p == '_') {            /* Downstream __RFQDN_ */
-+        p++;
-+        if (*p != '_') {
-+            return -1;
-+        }
-+        while (*++p) {
-+            if (!qemu_isalnum(*p) && *p != '-' && *p != '.') {
-+                break;
-+            }
-+        }
++Type names ending with 'Kind' or 'List' are reserved for the
++generator, which uses them for implicit union enums and array types,
++respectively.
 +
-+        if (*p != '_') {
-+            return -1;
-+        }
-+        p++;
-+    }
++Command names, and member names within a type, should be all lower
++case with words separated by a hyphen.  However, some existing older
++commands and complex types use underscore; when extending such
++expressions, consistency is preferred over blindly avoiding
++underscore.
 +
-+    if (!qemu_isalpha(*p)) {
-+        return -1;
-+    }
-+    while (*++p) {
-+        if (!qemu_isalnum(*p) && *p != '-' && *p != '_') {
-+            break;
-+        }
-+    }
++Event names should be ALL_CAPS with words separated by underscore.
 +
-+    if (complete && *p) {
-+        return -1;
-+    }
-+    return p - str;
-+}
-diff --git a/tests/test-qapi-util.c b/tests/test-qapi-util.c
-index 39db8bf..e869757 100644
---- a/tests/test-qapi-util.c
-+++ b/tests/test-qapi-util.c
-@@ -42,10 +42,44 @@ static void test_qapi_enum_parse(void)
-     g_assert_cmpint(ret, ==, QTYPE__MAX - 1);
- }
++Member names starting with 'has-' or 'has_' are reserved for the
++generator, which uses them for tracking optional members.
  
-+static void test_parse_qapi_name(void)
-+{
-+    int ret;
+ Any name (command, event, type, member, or enum value) beginning with
+ "x-" is marked experimental, and may be withdrawn or changed
+-incompatibly in a future release.  All names must begin with a letter,
+-and contain only ASCII letters, digits, dash, and underscore.  There
+-are two exceptions: enum values may start with a digit, and any
+-extensions added by downstream vendors should start with a prefix
+-matching "__RFQDN_" (for the reverse-fully-qualified-domain-name of
+-the vendor), even if the rest of the name uses dash (example:
+-__com.redhat_drive-mirror).  Names beginning with 'q_' are reserved
+-for the generator: QMP names that resemble C keywords or other
+-problematic strings will be munged in C to use this prefix.  For
+-example, a member named "default" in qapi becomes "q_default" in the
+-generated C code.
++incompatibly in a future release.
+ 
+ In the rest of this document, usage lines are given for each
+ expression type, with literal strings written in lower case and
+@@ -643,6 +648,18 @@ any non-empty complex type (struct, union, or alternate), and a
+ pointer to that QAPI type is passed as a single argument.
+ 
+ 
++=== Downstream extensions ===
 +
-+    /* Must start with a letter */
-+    ret = parse_qapi_name("a", true);
-+    g_assert(ret == 1);
-+    ret = parse_qapi_name("a$", false);
-+    g_assert(ret == 1);
-+    ret = parse_qapi_name("", false);
-+    g_assert(ret == -1);
-+    ret = parse_qapi_name("1", false);
-+    g_assert(ret == -1);
++QAPI schema names that are externally visible, say in the Client JSON
++Protocol, need to be managed with care.  Names starting with a
++downstream prefix of the form __RFQDN_ are reserved for the downstream
++who controls the valid, reverse fully qualified domain name RFQDN.
++RFQDN may only contain ASCII letters, digits, hyphen and period.
 +
-+    /* Only letters, digits, hyphen, underscore */
-+    ret = parse_qapi_name("A-Za-z0-9_", true);
-+    g_assert(ret == 10);
-+    ret = parse_qapi_name("A-Za-z0-9_$", false);
-+    g_assert(ret == 10);
-+    ret = parse_qapi_name("A-Za-z0-9_$", true);
-+    g_assert(ret == -1);
++Example: Red Hat, Inc. controls redhat.com, and may therefore add a
++downstream command __com.redhat_drive-mirror.
 +
-+    /* __RFQDN_ */
-+    ret = parse_qapi_name("__com.redhat_supports", true);
-+    g_assert(ret == 21);
-+    ret = parse_qapi_name("_com.example_", false);
-+    g_assert(ret == -1);
-+    ret = parse_qapi_name("__com.example", false);
-+    g_assert(ret == -1);
-+    ret = parse_qapi_name("__com.example_", false);
-+    g_assert(ret == -1);
-+}
 +
- int main(int argc, char *argv[])
- {
-     g_test_init(&argc, &argv, NULL);
-     g_test_add_func("/qapi/util/qapi_enum_parse", test_qapi_enum_parse);
-+    g_test_add_func("/qapi/util/parse_qapi_name", test_parse_qapi_name);
-     g_test_run();
-     return 0;
- }
+ == Client JSON Protocol introspection ==
+ 
+ Clients of a Client JSON Protocol commonly need to figure out what
 -- 
 2.7.4
