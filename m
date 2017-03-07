@@ -1,22 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1clBdC-0008Oy-9o
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 04:42:11 -0500
+	(envelope-from <prvs=232365128=Paul.Durrant@citrix.com>)
+	id 1clBmT-0001np-1z
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 04:51:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1clBdB-0004En-36
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 04:42:10 -0500
-Date: Tue, 7 Mar 2017 09:41:55 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170307094154.GB2869@work-vm>
-References: <20170307025328.53409-1-haoqf@linux.vnet.ibm.com>
-	<20170307025328.53409-2-haoqf@linux.vnet.ibm.com>
-	<20170307092951.GA5871@noname.str.redhat.com>
+	(envelope-from <prvs=232365128=Paul.Durrant@citrix.com>)
+	id 1clBmP-0004WC-3H
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 04:51:45 -0500
+Received: from smtp.eu.citrix.com ([185.25.65.24]:45945)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=232365128=Paul.Durrant@citrix.com>)
+	id 1clBmO-0004RB-Np
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 04:51:41 -0500
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Tue, 7 Mar 2017 09:51:36 +0000
+Message-ID: <34e649bb86964b40bd2f5ccf63773cc2@AMSPEX02CL03.citrite.net>
+References: <1488452986-24501-1-git-send-email-paul.durrant@citrix.com>
+	<1488452986-24501-6-git-send-email-paul.durrant@citrix.com>
+	<alpine.DEB.2.10.1703021426050.17906@sstabellini-ThinkPad-X260>
+	<05365905529b4fd78ff67989743a8dfb@AMSPEX02CL03.citrite.net>
+	<alpine.DEB.2.10.1703031209090.17906@sstabellini-ThinkPad-X260>
+	<alpine.DEB.2.10.1703031243050.17906@sstabellini-ThinkPad-X260>
+	<1636138fa3a948229a4630fe48d5a079@AMSPEX02CL03.citrite.net>
+	<31427779196840b3b31171ec9deda91f@AMSPEX02CL03.citrite.net>
+	<alpine.DEB.2.10.1703061101050.17906@sstabellini-ThinkPad-X260>
+In-Reply-To: <alpine.DEB.2.10.1703061101050.17906@sstabellini-ThinkPad-X260>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170307092951.GA5871@noname.str.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC 1/1] vmstate: draft fix for failed
- iotests case 68 and 91
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] xen: use libxendevicemodel when
+ available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,121 +39,289 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: QingFeng Hao <haoqf@linux.vnet.ibm.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com, pasic@linux.vnet.ibm.com, liujbjl@linux.vnet.ibm.com, famz@redhat.com, mreitz@redhat.com, quintela@redhat.com
+To: 'Stefano Stabellini' <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-* Kevin Wolf (kwolf@redhat.com) wrote:
-> Am 07.03.2017 um 03:53 hat QingFeng Hao geschrieben:
-> > I am not very clear about the logic in vmstate.c, but from its context in
-> > vmstate_save_state, it seems size should not be 0, otherwise the followed
-> > for loop will keep working on the same element. So I just add a simple
-> > check to pass that case, not sure if it's right but it can pass iotest
-> > case 68 and 91 now.
-> > 
-> > The iotest's failed output is:
-> > 068 1s ... - output mismatch (see 068.out.bad)
-> > --- /home/haoqf/KVMonz/gitcheck/work/qemu-master/tree/qemu/tests/qemu-iotests/068.out   2017-03-06 05:52:24.817328899 +0100
-> > +++ 068.out.bad 2017-03-07 03:28:44.426714519 +0100
-> > @@ -3,9 +3,13 @@
-> >  === Saving and reloading a VM state to/from a qcow2 image ===
-> > 
-> >  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072
-> > +qemu-system-s390x: migration/vmstate.c:336: vmstate_save_state: Assertion `first_elem || !n_elems' failed.
-> > +./common.config: line 109: 52497 Aborted                 ( if [ -n "${QEMU_NEED_PID}" ]; then
-> > +    echo $BASHPID > "${QEMU_TEST_DIR}/qemu-${_QEMU_HANDLE}.pid";
-> > +fi; exec "$QEMU_PROG" $QEMU_OPTIONS "$@" )
-> >  QEMU X.Y.Z monitor - type 'help' for more information
-> >  (qemu) savevm 0
-> > -(qemu) quit
-> > +qemu-system-s390x: Device 'virtio0' does not have the requested snapshot '0'
-> >  QEMU X.Y.Z monitor - type 'help' for more information
-> >  (qemu) quit
-> >  *** done
-> > 
-> > 091 1s ... [failed, exit status 1] - output mismatch (see 091.out.bad)
-> >     --- tests/qemu-iotests/091.out	2016-08-30 12:35:04.207683276 +0200
-> >     +++ 091.out.bad	2017-03-06 13:08:03.717135426 +0100
-> >     @@ -11,18 +11,23 @@
-> >      
-> >      vm1: qemu-io disk write complete
-> >      vm1: live migration started
-> >     -vm1: live migration completed
-> >     -
-> >     -=== VM 2: Post-migration, write to disk, verify running ===
-> >     -
-> >     -vm2: qemu-io disk write complete
-> >     -vm2: qemu process running successfully
-> >     -vm2: flush io, and quit
-> >     -Check image pattern
-> >     -read 4194304/4194304 bytes at offset 0
-> >     -4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> >     -Running 'qemu-img check -r all $TEST_IMG'
-> >     -No errors were found on the image.
-> >     -80/16384 = 0.49% allocated, 0.00% fragmented, 0.00% compressed clusters
-> >     -Image end offset: 5570560
-> >     -*** done
-> >     +./common.qemu: line 110: write error: Broken pipe
-> >     +./common.qemu: line 110: write error: Broken pipe
-> >     +./common.qemu: line 110: write error: Broken pipe
-> >     +./common.qemu: line 110: write error: Broken pipe
-> >     +./common.qemu: line 110: write error: Broken pipe
-> >     +./common.qemu: line 110: write error: Broken pipe
-> >     +./common.qemu: line 110: write error: Broken pipe
-> >     +./common.qemu: line 110: write error: Broken pipe
-> >     +./common.qemu: line 110: write error: Broken pipe
-> >     +./common.qemu: line 110: write error: Broken pipe
-> >     +./common.qemu: line 110: write error: Broken pipe
-> >     +./common.qemu: line 110: write error: Broken pipe
-> >     +./common.qemu: line 110: write error: Broken pipe
-> >     +./common.qemu: line 110: write error: Broken pipe
-> >     +./common.qemu: line 110: write error: Broken pipe
-> >     +./common.qemu: line 110: write error: Broken pipe
-> >     +./common.qemu: line 110: write error: Broken pipe
-> >     +./common.qemu: line 110: write error: Broken pipe
-> >     +./common.qemu: line 110: write error: Broken pipe
-> >     +Timeout waiting for completed on handle 0
-> > 
-> > Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-> > ---
-> >  migration/vmstate.c | 8 ++++++++
-> >  1 file changed, 8 insertions(+)
-> > 
-> > diff --git a/migration/vmstate.c b/migration/vmstate.c
-> > index 78b3cd4..ff28dde 100644
-> > --- a/migration/vmstate.c
-> > +++ b/migration/vmstate.c
-> > @@ -106,6 +106,10 @@ int vmstate_load_state(QEMUFile *f, const VMStateDescription *vmsd,
-> >              int i, n_elems = vmstate_n_elems(opaque, field);
-> >              int size = vmstate_size(opaque, field);
-> >  
-> > +            if (size == 0) {
-> > +                field++;
-> > +                continue;
-> > +            }
-> >              vmstate_handle_alloc(first_elem, field, opaque);
-> >              if (field->flags & VMS_POINTER) {
-> >                  first_elem = *(void **)first_elem;
-> > @@ -322,6 +326,10 @@ void vmstate_save_state(QEMUFile *f, const VMStateDescription *vmsd,
-> >              int64_t old_offset, written_bytes;
-> >              QJSON *vmdesc_loop = vmdesc;
-> >  
-> > +            if (size == 0) {
-> > +                field++;
-> > +                continue;
-> > +            }
-> >              trace_vmstate_save_state_loop(vmsd->name, field->name, n_elems);
-> >              if (field->flags & VMS_POINTER) {
-> >                  first_elem = *(void **)first_elem;
-> 
-> This is really a live migration fix, so I'm adding Juan and Dave to CC.
-> 
-> I suspect the real question is why a field with size 0 was even stored
-> in the vmstate to begin with.
+> -----Original Message-----
+> From: Stefano Stabellini [mailto:sstabellini@kernel.org]
+> Sent: 06 March 2017 19:14
+> To: Paul Durrant <Paul.Durrant@citrix.com>
+> Cc: 'Stefano Stabellini' <sstabellini@kernel.org>; Anthony Perard
+> <anthony.perard@citrix.com>; xen-devel@lists.xenproject.org; qemu-
+> devel@nongnu.org
+> Subject: RE: [PATCH v2 5/5] xen: use libxendevicemodel when available
+>=20
+> On Mon, 6 Mar 2017, Paul Durrant wrote:
+> > > -----Original Message-----
+> > > From: Qemu-devel [mailto:qemu-devel-
+> > > bounces+paul.durrant=3Dcitrix.com@nongnu.org] On Behalf Of Paul
+> Durrant
+> > > Sent: 06 March 2017 09:15
+> > > To: 'Stefano Stabellini' <sstabellini@kernel.org>
+> > > Cc: Anthony Perard <anthony.perard@citrix.com>; xen-
+> > > devel@lists.xenproject.org; qemu-devel@nongnu.org
+> > > Subject: Re: [Qemu-devel] [PATCH v2 5/5] xen: use libxendevicemodel
+> when
+> > > available
+> > >
+> > > > -----Original Message-----
+> > > > From: Stefano Stabellini [mailto:sstabellini@kernel.org]
+> > > > Sent: 03 March 2017 20:43
+> > > > To: Stefano Stabellini <sstabellini@kernel.org>
+> > > > Cc: Paul Durrant <Paul.Durrant@citrix.com>; xen-
+> > > devel@lists.xenproject.org;
+> > > > qemu-devel@nongnu.org; Anthony Perard
+> <anthony.perard@citrix.com>
+> > > > Subject: RE: [PATCH v2 5/5] xen: use libxendevicemodel when availab=
+le
+> > > >
+> > > > On Fri, 3 Mar 2017, Stefano Stabellini wrote:
+> > > > > On Fri, 3 Mar 2017, Paul Durrant wrote:
+> > > > > > > -----Original Message-----
+> > > > > > > From: Stefano Stabellini [mailto:sstabellini@kernel.org]
+> > > > > > > Sent: 02 March 2017 22:50
+> > > > > > > To: Paul Durrant <Paul.Durrant@citrix.com>
+> > > > > > > Cc: xen-devel@lists.xenproject.org; qemu-devel@nongnu.org;
+> > > Stefano
+> > > > > > > Stabellini <sstabellini@kernel.org>; Anthony Perard
+> > > > > > > <anthony.perard@citrix.com>
+> > > > > > > Subject: Re: [PATCH v2 5/5] xen: use libxendevicemodel when
+> > > available
+> > > > > > >
+> > > > > > > On Thu, 2 Mar 2017, Paul Durrant wrote:
+> > > > > > > > This patch modifies the wrapper functions in xen_common.h t=
+o
+> use
+> > > > the
+> > > > > > > > new xendevicemodel interface if it is available along with
+> > > > compatibility
+> > > > > > > > code to use the old libxenctrl interface if it is not.
+> > > > > > > >
+> > > > > > > > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> > > > > > > > ---
+> > > > > > > > Cc: Stefano Stabellini <sstabellini@kernel.org>
+> > > > > > > > Cc: Anthony Perard <anthony.perard@citrix.com>
+> > > > > > > >
+> > > > > > > > v2:
+> > > > > > > > - Add a compat define for xenforeignmemory_close() since th=
+is
+> is
+> > > > now
+> > > > > > > >   used.
+> > > > > > > > ---
+> > > > > > > >  include/hw/xen/xen_common.h | 115
+> > > > > > > +++++++++++++++++++++++++++++++-------------
+> > > > > > > >  xen-common.c                |   8 +++
+> > > > > > > >  2 files changed, 90 insertions(+), 33 deletions(-)
+> > > > > > > >
+> > > > > > > > diff --git a/include/hw/xen/xen_common.h
+> > > > > > > b/include/hw/xen/xen_common.h
+> > > > > > > > index 31cf25f..48444e5 100644
+> > > > > > > > --- a/include/hw/xen/xen_common.h
+> > > > > > > > +++ b/include/hw/xen/xen_common.h
+> > > > > > > > @@ -9,6 +9,7 @@
+> > > > > > > >  #undef XC_WANT_COMPAT_EVTCHN_API
+> > > > > > > >  #undef XC_WANT_COMPAT_GNTTAB_API
+> > > > > > > >  #undef XC_WANT_COMPAT_MAP_FOREIGN_API
+> > > > > > > > +#undef XC_WANT_COMPAT_DEVICEMODEL_API
+> > > > > > > >
+> > > > > > > >  #include <xenctrl.h>
+> > > > > > > >  #include <xenstore.h>
+> > > > > > > > @@ -26,48 +27,95 @@ extern xc_interface *xen_xc;
+> > > > > > > >   * We don't support Xen prior to 4.2.0.
+> > > > > > > >   */
+> > > > > > > >
+> > > > > > > > +#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 490
+> > > > > > > > +
+> > > > > > > > +typedef xc_interface xendevicemodel_handle;
+> > > > > > > > +
+> > > > > > > > +#define xendevicemodel_open(l, f) xen_xc
+> > > > > > > > +
+> > > > > > > > +#define xendevicemodel_map_io_range_to_ioreq_server \
+> > > > > > > > +    xc_hvm_map_io_range_to_ioreq_server
+> > > > > > > > +#define
+> xendevicemodel_unmap_io_range_from_ioreq_server \
+> > > > > > > > +    xc_hvm_unmap_io_range_from_ioreq_server
+> > > > > > > > +#define xendevicemodel_map_pcidev_to_ioreq_server \
+> > > > > > > > +    xc_hvm_map_pcidev_to_ioreq_server
+> > > > > > > > +#define xendevicemodel_unmap_pcidev_from_ioreq_server
+> \
+> > > > > > > > +    xc_hvm_unmap_pcidev_from_ioreq_server
+> > > > > > > > +#define xendevicemodel_create_ioreq_server \
+> > > > > > > > +    xc_hvm_create_ioreq_server
+> > > > > > > > +#define xendevicemodel_destroy_ioreq_server \
+> > > > > > > > +    xc_hvm_destroy_ioreq_server
+> > > > > > > > +#define xendevicemodel_get_ioreq_server_info \
+> > > > > > > > +    xc_hvm_get_ioreq_server_info
+> > > > > > > > +#define xendevicemodel_set_ioreq_server_state \
+> > > > > > > > +    xc_hvm_set_ioreq_server_state
+> > > > > > > > +#define xendevicemodel_set_pci_intx_level \
+> > > > > > > > +    xc_hvm_set_pci_intx_level
+> > > > > > > > +#define xendevicemodel_set_pci_link_route \
+> > > > > > > > +    xc_hvm_set_pci_link_route
+> > > > > > > > +#define xendevicemodel_set_isa_irq_level \
+> > > > > > > > +    xc_hvm_set_isa_irq_level
+> > > > > > > > +#define xendevicemodel_inject_msi \
+> > > > > > > > +    xc_hvm_inject_msi
+> > > > > > > > +#define xendevicemodel_set_mem_type \
+> > > > > > > > +    xc_hvm_set_mem_type
+> > > > > > > > +#define xendevicemodel_track_dirty_vram \
+> > > > > > > > +    xc_hvm_track_dirty_vram
+> > > > > > > > +#define xendevicemodel_modified_memory \
+> > > > > > > > +    xc_hvm_modified_memory
+> > > > > > >
+> > > > > > > It does build correctly now for Xen < 4.9, however it breaks =
+against
+> > > > > > > xen-unstable:
+> > > > > > >
+> > > > > > >   ERROR: configure test passed without -Werror but failed wit=
+h -
+> > > Werror.
+> > > > > > >          This is probably a bug in the configure script. The =
+failing
+> command
+> > > > > > >          will be at the bottom of config.log.
+> > > > > > >          You can run configure with --disable-werror to bypas=
+s this
+> check.
+> > > > > > >
+> > > > > > > and config.log says:
+> > > > > > >
+> > > > > > >   config-temp/qemu-conf.c: In function 'main':
+> > > > > > >   config-temp/qemu-conf.c:32:3: error: implicit declaration o=
+f
+> function
+> > > > > > > 'xc_hvm_set_mem_type' [-Werror=3Dimplicit-function-declaratio=
+n]
+> > > > > > >   config-temp/qemu-conf.c:32:3: error: nested extern declarat=
+ion
+> of
+> > > > > > > 'xc_hvm_set_mem_type' [-Werror=3Dnested-externs]
+> > > > > > >   config-temp/qemu-conf.c:34:3: error: implicit declaration o=
+f
+> function
+> > > > > > > 'xc_hvm_inject_msi' [-Werror=3Dimplicit-function-declaration]
+> > > > > > >   config-temp/qemu-conf.c:34:3: error: nested extern declarat=
+ion
+> of
+> > > > > > > 'xc_hvm_inject_msi' [-Werror=3Dnested-externs]
+> > > > > > >   config-temp/qemu-conf.c:35:3: error: implicit declaration o=
+f
+> function
+> > > > > > > 'xc_hvm_create_ioreq_server' [-Werror=3Dimplicit-function-
+> > > declaration]
+> > > > > > >   config-temp/qemu-conf.c:35:3: error: nested extern declarat=
+ion
+> of
+> > > > > > > 'xc_hvm_create_ioreq_server' [-Werror=3Dnested-externs]
+> > > > > > >
+> > > > > > >
+> > > > > > > With -DXC_WANT_COMPAT_DEVICEMODEL_API=3D1:
+> > > > > > >
+> > > > > > >   In file included from /local/qemu-
+> > > > > > > upstream/include/hw/xen/xen_backend.h:4:0,
+> > > > > > >                    from hw/block/xen_disk.c:27:
+> > > > > > >   /local/qemu-upstream/include/hw/xen/xen_common.h: In
+> function
+> > > > > > > 'xen_set_mem_type':
+> > > > > > >   /local/qemu-upstream/include/hw/xen/xen_common.h:78:5:
+> error:
+> > > > implicit
+> > > > > > > declaration of function 'xc_hvm_set_mem_type' [-
+> Werror=3Dimplicit-
+> > > > function-
+> > > > > > > declaration]
+> > > > > > >
+> > > > > >
+> > > > > > Ah... Do you have Anthony's patch?
+> > > > > >
+> > > > > >
+> > > >
+> > >
+> http://xenbits.xen.org/gitweb/?p=3Dxen.git;a=3Dcommit;h=3D9970e98ace48574=
+701
+> > > > f7e2286fb67090481a3fec
+> > > > > >
+> > > > > > I suspect that may be the problem you're seeing above.
+> > > > >
+> > > > > Yes, I do have it. I am still having build troubles with v5 too. =
+I am
+> > > >
+> > > > I meant v3
+> > > >
+> > > >
+> > > > > attaching my build test script: feel free to use it to test the b=
+uild of
+> > > > > a single QEMU branch against multiple Xen versions. It requires o=
+ne
+> Xen
+> > > > > repository checked out and built for each Xen version. I have jus=
+t
+> > > > > added the Xen 4.9 tests, so they might be wrong somehow, but the
+> > > others
+> > > > > are known to work.
+> > >
+> > > Your script is lacking Anthony's fix. You need to patch your 4.9 conf=
+igure
+> > > clause accordingly. I.e. you need -
+> > > I$(XEN_ROOT)/tools/libs/devicemodel/include and -
+> > > L$(XEN_ROOT)/tools/libs/devicemodel in the --extra-cflags.
+> >
+> > Sorry, I meant the latter in --extra-ldflags and I notice you do actual=
+ly have
+> that. It's just the -I that's missing.
+>=20
+> Thank you, you are right, that fixes the build against 4.9, but there
+> are problems with all other versions:
+>=20
+> [4.3, 4.4]
+>=20
+> In file included from /local/qemu-
+> upstream/include/hw/xen/xen_backend.h:4:0,
+>                  from hw/block/xen_disk.c:27:
+> /local/qemu-upstream/include/hw/xen/xen_common.h:42:5: error:
+> unknown type name 'ioservid_t'
+> /local/qemu-upstream/include/hw/xen/xen_common.h:49:49: error:
+> unknown type name 'ioservid_t'
+> /local/qemu-upstream/include/hw/xen/xen_common.h:58:49: error:
+> unknown type name 'ioservid_t'
+> /local/qemu-upstream/include/hw/xen/xen_common.h:66:49: error:
+> unknown type name 'ioservid_t'
+> /local/qemu-upstream/include/hw/xen/xen_common.h:74:49: error:
+> unknown type name 'ioservid_t'
+> /local/qemu-upstream/include/hw/xen/xen_common.h:82:49: error:
+> unknown type name 'ioservid_t'
+> /local/qemu-upstream/include/hw/xen/xen_common.h:90:49: error:
+> unknown type name 'ioservid_t'
+> /local/qemu-upstream/include/hw/xen/xen_common.h:96:49: error:
+> unknown type name 'ioservid_t'
+> make: *** [hw/block/xen_disk.o] Error 1
+>=20
 
-Yes; which field is it that's failing?
+That's one I'd not considered. I need to cater for an old enough xen where =
+even the old ioreq server API is not available.
 
-Dave
+>=20
+> [4.5, 4.6, 4.7, 4.8]
+>=20
+> In file included from /local/qemu-
+> upstream/include/hw/xen/xen_backend.h:4:0,
+>                  from hw/block/xen_disk.c:27:
+> /local/qemu-upstream/include/hw/xen/xen_common.h: In function
+> 'xendevicemodel_destroy_ioreq_server':
+> /local/qemu-upstream/include/hw/xen/xen_common.h:92:5: error: implicit
+> declaration of function 'xc_hvm__destroy_ioreq_server' [-Werror=3Dimplici=
+t-
+> function-declaration]
+> /local/qemu-upstream/include/hw/xen/xen_common.h:92:5: error: nested
+> extern declaration of 'xc_hvm__destroy_ioreq_server' [-Werror=3Dnested-
+> externs]
+> cc1: all warnings being treated as errors
 
-> Kevin
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+That's a typo (double _) which I've now found.
+
+V4 coming up.
+
+Thanks,
+
+  Paul
