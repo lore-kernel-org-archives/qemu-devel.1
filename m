@@ -1,15 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cl4hM-0003Q0-H5
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 21:18:01 -0500
+	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1cl5Fs-0006WJ-RR
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 21:53:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cl4hL-0003kf-FP
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 21:18:00 -0500
-From: Fam Zheng <famz@redhat.com>
-Date: Tue,  7 Mar 2017 10:17:48 +0800
-Message-Id: <20170307021748.7743-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH] file-posix: Incoporate max_segments in block
- limit
+	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1cl5Fo-0005TC-3Q
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 21:53:40 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57335
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <haoqf@linux.vnet.ibm.com>)
+	id 1cl5Fn-0005St-T8
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 21:53:36 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v272mj2v057088
+	for <qemu-devel@nongnu.org>; Mon, 6 Mar 2017 21:53:34 -0500
+Received: from e06smtp08.uk.ibm.com (e06smtp08.uk.ibm.com [195.75.94.104])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2917d4c1k7-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 06 Mar 2017 21:53:33 -0500
+Received: from localhost
+	by e06smtp08.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <haoqf@linux.vnet.ibm.com>;
+	Tue, 7 Mar 2017 02:53:32 -0000
+From: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+Date: Tue,  7 Mar 2017 03:53:27 +0100
+Message-Id: <20170307025328.53409-1-haoqf@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH RFC 0/1] vmstate: fix the failed iotests case
+ 68 and 91
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,98 +37,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, eblake@redhat.com
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, cornelia.huck@de.ibm.com, pasic@linux.vnet.ibm.com, liujbjl@linux.vnet.ibm.com, kwolf@redhat.com, famz@redhat.com, mreitz@redhat.com
 
-Linux exposes a separate limit, /sys/block/.../queue/max_segments, which
-in the worst case can be more restrictive than BLKSECTGET (as they are
-two different things). Similar to the BLKSECTGET story, guests don't see
-this limit and send big requests will get -EINVAL error on SG_IO.
+Hi All,
+I am not sure if the fix is correct because I am not very clear about the
+logic in vmstate.c. From my test, once size=0, the iotests case 68 failed
+due to the assert. So just send this draft patch for your comments!
+The patch is based on commit 17783ac828a "Merge remote-tracking branch
+'remotes/dgibson/tags/ppc-for-2.9-20170303' into staging".
+Thanks!
 
-Lean on the safer side to clamp max_transfer according to max_segments
-and page size, because in the end what host HBA gets is the mapped host
-pages rather than a guest buffer.
+QingFeng Hao (1):
+  vmstate: fix the failure of iotests cases 68 and 91
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- block/file-posix.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 58 insertions(+)
+ migration/vmstate.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 4de1abd..b615262 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -668,6 +668,59 @@ static int hdev_get_max_transfer_length(BlockDriverState *bs, int fd)
- #endif
- }
- 
-+static int hdev_get_max_segments(BlockDriverState *bs)
-+{
-+#ifdef CONFIG_LINUX
-+    char buf[32];
-+    const char *end;
-+    char *sysfspath, *fullpath;
-+    int ret;
-+    int fd = -1;
-+    long max_segments;
-+
-+    fullpath = realpath(bs->exact_filename, NULL);
-+    if (!fullpath) {
-+        return -errno;
-+    }
-+    if (strncmp(fullpath, "/dev/", 5) || !fullpath[5]) {
-+        ret = -ENOTSUP;
-+        goto out;
-+    }
-+    sysfspath = g_strdup_printf("/sys/block/%s/queue/max_segments",
-+                                &fullpath[5]);
-+    fd = open(sysfspath, O_RDONLY);
-+    if (fd == -1) {
-+        ret = -errno;
-+        goto out;
-+    }
-+    do {
-+        ret = read(fd, buf, sizeof(buf));
-+    } while (ret == -1 && errno == EINTR);
-+    if (ret < 0) {
-+        ret = -errno;
-+        goto out;
-+    } else if (ret == 0) {
-+        ret = -EIO;
-+        goto out;
-+    }
-+    buf[ret] = 0;
-+    /* The file is ended with '\n', pass 'end' to accept that. */
-+    ret = qemu_strtol(buf, &end, 10, &max_segments);
-+    if (ret == 0 && end && *end == '\n') {
-+        ret = max_segments;
-+    }
-+
-+out:
-+    if (fd >= 0) {
-+        close(fd);
-+    }
-+    free(fullpath);
-+    return ret;
-+#else
-+    return -ENOTSUP;
-+#endif
-+}
-+
- static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
- {
-     BDRVRawState *s = bs->opaque;
-@@ -679,6 +732,11 @@ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
-             if (ret > 0 && ret <= BDRV_REQUEST_MAX_BYTES) {
-                 bs->bl.max_transfer = pow2floor(ret);
-             }
-+            ret = hdev_get_max_segments(bs);
-+            if (ret > 0) {
-+                bs->bl.max_transfer = MIN(bs->bl.max_transfer,
-+                                          ret * getpagesize());
-+            }
-         }
-     }
- 
 -- 
-2.9.3
+2.8.4
