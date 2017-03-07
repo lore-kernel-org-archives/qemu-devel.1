@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1clB7n-00021i-Jb
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 04:09:44 -0500
+	(envelope-from <famz@redhat.com>) id 1clBCK-00039o-RU
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 04:14:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1clB7m-0003G5-KU
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 04:09:43 -0500
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:35239)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1clB7m-0003Fn-Cw
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 04:09:42 -0500
-Received: by mail-wm0-x22a.google.com with SMTP id v186so84014784wmd.0
-	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 01:09:42 -0800 (PST)
+	(envelope-from <famz@redhat.com>) id 1clBCG-0004US-DT
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 04:14:24 -0500
+Date: Tue, 7 Mar 2017 17:14:10 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170307091410.GE29283@lemon.lan>
+References: <20170225193155.447462-1-vsementsov@virtuozzo.com>
+	<20170225193155.447462-2-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <1488787422-30487-1-git-send-email-mdroth@linux.vnet.ibm.com>
-References: <1488787422-30487-1-git-send-email-mdroth@linux.vnet.ibm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 7 Mar 2017 09:09:20 +0000
-Message-ID: <CAFEAcA_wYK3YVX8J=GxF1m2-SEzqHvhUoShQcvTU_gqTczbc2A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL for-2.9 0/3] qemu-ga patch queue for 2.9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170225193155.447462-2-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 1/4] iotests: add migration corner cases
+ test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +24,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
 
-On 6 March 2017 at 08:03, Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
-> The following changes since commit 17783ac828adc694d986698d2d7014aedfeb48c6:
->
->   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-2.9-20170303' into staging (2017-03-04 16:31:14 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/mdroth/qemu.git tags/qga-pull-2017-03-06-tag
->
-> for you to fetch changes up to ec72c0e271f2b13953079a4f4dadb49ac5910b54:
->
->   tests: check path to avoid a failing qga/get-vcpus test (2017-03-06 00:54:19 -0600)
->
-> ----------------------------------------------------------------
-> qemu-ga patch queue for 2.9
->
-> * fix fsfreeze for filesystems mounted in multiple locations
-> * fix test failure when running in a chroot
-> * support for socket-based activation
->
-> ----------------------------------------------------------------
-> Bruce Rogers (1):
->       tests: check path to avoid a failing qga/get-vcpus test
->
-> Peter Lieven (1):
->       qga: ignore EBUSY when freezing a filesystem
->
-> Stefan Hajnoczi (1):
->       qga: add systemd socket activation support
->
->  qga/channel-posix.c  | 68 ++++++++++++++++++++++++++---------------------
->  qga/channel-win32.c  |  2 +-
->  qga/channel.h        |  3 ++-
->  qga/commands-posix.c |  5 +++-
->  qga/main.c           | 74 ++++++++++++++++++++++++++++++++++++++++++++++++----
->  tests/test-qga.c     |  4 ++-
->  6 files changed, 117 insertions(+), 39 deletions(-)
->
+On Sat, 02/25 22:31, Vladimir Sementsov-Ogievskiy wrote:
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  tests/qemu-iotests/175     | 71 ++++++++++++++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/175.out |  5 ++++
+>  tests/qemu-iotests/group   |  1 +
+>  3 files changed, 77 insertions(+)
+>  create mode 100644 tests/qemu-iotests/175
+>  create mode 100644 tests/qemu-iotests/175.out
+> 
+> diff --git a/tests/qemu-iotests/175 b/tests/qemu-iotests/175
+> new file mode 100644
+> index 0000000000..ef86c70db5
+> --- /dev/null
+> +++ b/tests/qemu-iotests/175
+> @@ -0,0 +1,71 @@
+> +#!/usr/bin/env python
+> +#
+> +# Test migration corner-cases
+> +#
+> +# Copyright (C) Vladimir Sementsov-Ogievskiy 2017
+> +#
+> +# This program is free software; you can redistribute it and/or modify
+> +# it under the terms of the GNU General Public License as published by
+> +# the Free Software Foundation; either version 2 of the License, or
+> +# (at your option) any later version.
+> +#
+> +# This program is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +# GNU General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU General Public License
+> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> +#
+> +
+> +import os
+> +import iotests
+> +import time
+> +from iotests import qemu_img
+> +
+> +disk = os.path.join(iotests.test_dir, 'disk')
+> +
+> +class TestMigrationCornerCases(iotests.QMPTestCase):
+> +    def setUp(self):
+> +        qemu_img('create', '-f', iotests.imgfmt, disk, '10M')
+> +        self.vm = iotests.VM().add_drive(disk)
+> +        self.vm.launch()
+> +
+> +    def tearDown(self):
+> +        self.vm.shutdown()
+> +        os.remove(disk)
+> +
+> +    def test_migrate_reset_cont_write(self):
+> +        result = self.vm.qmp('migrate', uri='exec:cat>/dev/null')
+> +        self.assert_qmp(result, 'return', {})
+> +        time.sleep(4)
 
-Applied, thanks.
+Should you query the migration status instead of blink sleep?
 
--- PMM
+> +
+> +        result = self.vm.qmp('human-monitor-command',
+> +                             command_line='system_reset')
+> +        self.assert_qmp(result, 'return', '')
+> +
+> +        result = self.vm.qmp('cont')
+> +        self.assert_qmp(result, 'return', {})
+> +
+> +        result = self.vm.qmp('human-monitor-command',
+> +                             command_line='qemu-io drive0 "write 0 512"')
+> +        self.assert_qmp(result, 'return', '')
+> +
+> +    def test_migrate_savevm(self):
+> +        result = self.vm.qmp('migrate', uri='exec:cat>/dev/null')
+> +        self.assert_qmp(result, 'return', {})
+> +        time.sleep(4)
+
+Ditto.
+
+> +
+> +        result = self.vm.qmp('human-monitor-command', command_line='savevm')
+> +        self.assert_qmp(result, 'return', '')
+> +
+> +    def test_savevm_set_speed_savevm(self):
+> +        for i in range(10):
+> +            result = self.vm.qmp('human-monitor-command', command_line='savevm')
+> +            self.assert_qmp(result, 'return', '')
+> +
+> +            result = self.vm.qmp('migrate_set_speed', value=9223372036853727232)
+> +            self.assert_qmp(result, 'return', {})
+> +
+> +if __name__ == '__main__':
+> +    iotests.main()
+> diff --git a/tests/qemu-iotests/175.out b/tests/qemu-iotests/175.out
+> new file mode 100644
+> index 0000000000..8d7e996700
+> --- /dev/null
+> +++ b/tests/qemu-iotests/175.out
+> @@ -0,0 +1,5 @@
+> +...
+> +----------------------------------------------------------------------
+> +Ran 3 tests
+> +
+> +OK
+> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+> index 985b9a6a36..1f4bf03185 100644
+> --- a/tests/qemu-iotests/group
+> +++ b/tests/qemu-iotests/group
+> @@ -167,3 +167,4 @@
+>  172 auto
+>  173 rw auto
+>  174 auto
+> +175 auto quick
+
+Not sure it still qualifies as "quick" given the two "time.sleep(4)", but more
+importantly I wonder if the sleep should be improved.
+
+Fam
