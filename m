@@ -1,26 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cl99k-0007EW-BV
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:03:37 -0500
+	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1cl9JQ-0000Le-Nl
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:13:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cl99f-0001qL-Md
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:03:36 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:47848)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cl99f-0001qE-G0
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:03:31 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <a7977444b25641cc86352a6818a4df3a@EXCHCS32.ornl.gov>
-In-Reply-To: <a7977444b25641cc86352a6818a4df3a@EXCHCS32.ornl.gov>
-Date: Tue, 7 Mar 2017 10:03:30 +0300
-Message-ID: <000601d29710$edf987b0$c9ec9710$@ru>
+	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1cl9JM-0004Px-LX
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:13:36 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53089)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <haoqf@linux.vnet.ibm.com>)
+	id 1cl9JM-0004Pf-Bb
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:13:32 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v277CmYL100347
+	for <qemu-devel@nongnu.org>; Tue, 7 Mar 2017 02:13:30 -0500
+Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 291dchmq3s-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 02:13:30 -0500
+Received: from localhost
+	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <haoqf@linux.vnet.ibm.com>;
+	Tue, 7 Mar 2017 00:13:28 -0700
+References: <20170307025328.53409-1-haoqf@linux.vnet.ibm.com>
+	<20170307063738.GB29283@lemon.lan>
+From: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+Date: Tue, 7 Mar 2017 15:12:59 +0800
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] -rtc clock=vm with -icount 1,
- sleep=off introduces unexpected delays in device interactions
+In-Reply-To: <20170307063738.GB29283@lemon.lan>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Message-Id: <d1b8e0a0-be1c-9a57-33f5-1b8886e7d263@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH RFC 0/1] vmstate: fix the failed iotests
+ case 68 and 91
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,52 +42,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "'Nutaro, James J.'" <nutarojj@ornl.gov>, mttcg@listserver.greensocs.com, pbonzini@redhat.com
-Cc: qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com, pasic@linux.vnet.ibm.com, liujbjl@linux.vnet.ibm.com, kwolf@redhat.com, mreitz@redhat.com
 
-I also encountered icount problems with new MTTCG patches.
 
-Record/replay now cannot work, because iothread requests timers
-without kicking the CPU. And cpu thread updates icount (that
-are used for the clock).
 
-Therefore invocation of iothread uses incorrect clock and
-all virtual timers behave incorrectly.
+=E5=9C=A8 2017/3/7 14:37, Fam Zheng =E5=86=99=E9=81=93:
+> On Tue, 03/07 03:53, QingFeng Hao wrote:
+>> Hi All,
+>> I am not sure if the fix is correct because I am not very clear about =
+the
+>> logic in vmstate.c. From my test, once size=3D0, the iotests case 68 f=
+ailed
+>> due to the assert. So just send this draft patch for your comments!
+>> The patch is based on commit 17783ac828a "Merge remote-tracking branch
+>> 'remotes/dgibson/tags/ppc-for-2.9-20170303' into staging".
+> I cannot reproduce the failure on either 17783ac828a or current head
+> 56b51708e9e. Both passes for me. I wonder where do you get the size=3D0.
+The error happens when running "savevm 0" in case 068. It can be=20
+manually reproduced
+by "./check -qcow2 68" or "./s390x-softmmu/qemu-system-s390x -nodefaults =
+\
+-machine accel=3Dqtest -no-shutdown -nographic -monitor stdio -serial non=
+e \
+-hda /home/mc/gitcheck/work/qemu-master/tree/qemu/tests/t.img.bak", then=20
+type
+"savevm 0".  t.img.bak is the backup image for t.img generated by 068.
 
-Record/replay is also broken because current icount is requested
-from iothread where current_cpu (and icount progress stored in icount_extra)
-is unavailable.
+I added the print in vmstate_save_state:
+    QJSON *vmdesc_loop =3D vmdesc;
++ error_report("haoqf:%s:opaque:%p, offset:%lx, size:%d, field name:%s,=20
+vname:%s\n", __FUNCTION__, opaque, field->offset, size, field->name,=20
+vmsd->name);
 
-Pavel Dovgalyuk
+And here is the test log:
+haoqf:vmstate_save_state:opaque:0x2aa5a5715c0, offset:122e1, size:1,=20
+field name:env.sigp_order, vname:cpu
 
-> -----Original Message-----
-> From: mttcg-request@listserver.greensocs.com [mailto:mttcg-request@listserver.greensocs.com]
-> On Behalf Of Nutaro, James J.
-> Sent: Friday, March 03, 2017 10:39 PM
-> To: 'mttcg@listserver.greensocs.com'
-> Cc: 'qemu-devel@nongnu.org'
-> Subject: RE: -rtc clock=vm with -icount 1,sleep=off introduces unexpected delays in device
-> interactions
-> 
-> My original problem seems to stem from something that changed in the way that device emulation
-> and instruction execution interact (I'm guessing). To reproduce the issue, I started a linux
-> image with
-> 
-> qemu-system-i386 -rtc clock=vm -monitor none -icount 1,sleep=off jack.img
-> 
-> After booting, I run
-> 
-> ping localhost
-> 
-> The first round trip time reports look reasonable, being in the millisecond to sub-millisecond
-> range. These occur while the emulator is running slower than real time.
-> 
-> After a bit, the emulator speeds up (skipping over idle periods during I/O?) and the round
-> trip times jump to hundreds of milliseconds, which I had not expected.
-> 
-> If you want to try this experiment yourself, you can get the disk image that I used from here:
-> 
-> http://www.ornl.gov/~1qn/qemu-images/jack.img
-> 
-> 
-> Jim
+haoqf:vmstate_size: field size:4, offset:0
+
+haoqf:vmstate_save_state:opaque:0x2aa5a5715c0, offset:12300, size:4,=20
+field name:irqstate_saved_size, vname:cpu
+
+haoqf:vmstate_size: field size:0, offset:74496
+
+haoqf:vmstate_size: calculated size:0
+
+haoqf:vmstate_save_state:opaque:0x2aa5a5715c0, offset:122f8, size:0,=20
+field name:irqstate, vname:cpu
+
+haoqf:vmstate_save_state:firstelem:(nil), elements: 1
+
+qemu-system-s390x: ../migration/vmstate.c:336: vmstate_save_state:=20
+Assertion `first_elem || !n_elems' failed.
+Aborted (core dumped)
+
+I also did the test for x86 with: "./x86_64-softmmu/qemu-system-x86_64=20
+-nodefaults \
+-machine accel=3Dqtest -no-shutdown -nographic -monitor stdio -serial non=
+e \
+-hda /home/mc/gitcheck/work/qemu-master/tree/qemu/tests/t.img.bak",
+and then ran "savevm 0", but it didn't core and the size are all non-zero=
+:
+haoqf:vmstate_save calling vmstate_save_state:
+
+haoqf:vmstate_size: field size:4, offset:0
+
+haoqf:vmstate_save_state:opaque:0x2aa13325438, offset:4, size:4, field=20
+name:size, vname:globalstate
+
+haoqf:vmstate_size: field size:100, offset:0
+
+haoqf:vmstate_save_state:opaque:0x2aa13325438, offset:8, size:100, field=20
+name:runstate, vname:globalstate
+
+haoqf:vmstate_save:called vmstate_save_state
+
+So probably x86 doesn't have this problem.
+> Fam
+>
+
+--=20
+Regards
+QingFeng Hao
