@@ -1,23 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cl4ch-0008Bp-PL
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 21:13:14 -0500
+	(envelope-from <famz@redhat.com>) id 1cl4hM-0003Q0-H5
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 21:18:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cl4cg-0002cn-MJ
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 21:13:11 -0500
-Received: from mail.kernel.org ([198.145.29.136]:59638)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1cl4cg-0002cV-Bq
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 21:13:10 -0500
-From: Stefano Stabellini <sstabellini@kernel.org>
-Date: Mon,  6 Mar 2017 18:12:46 -0800
-Message-Id: <1488852768-8935-6-git-send-email-sstabellini@kernel.org>
-In-Reply-To: <1488852768-8935-1-git-send-email-sstabellini@kernel.org>
-References: <alpine.DEB.2.10.1703061807431.17906@sstabellini-ThinkPad-X260>
-	<1488852768-8935-1-git-send-email-sstabellini@kernel.org>
-Subject: [Qemu-devel] [PATCH 6/8] xen/9pfs: implement in/out_iov_from_pdu
- and vmarshal/vunmarshal
+	(envelope-from <famz@redhat.com>) id 1cl4hL-0003kf-FP
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 21:18:00 -0500
+From: Fam Zheng <famz@redhat.com>
+Date: Tue,  7 Mar 2017 10:17:48 +0800
+Message-Id: <20170307021748.7743-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH] file-posix: Incoporate max_segments in block
+ limit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,149 +19,97 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: xen-devel@lists.xenproject.org, sstabellini@kernel.org, Stefano Stabellini <stefano@aporeto.com>, anthony.perard@citrix.com, jgross@suse.com, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
+Cc: pbonzini@redhat.com, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, eblake@redhat.com
 
-Implement xen_9pfs_init_in/out_iov_from_pdu and
-xen_9pfs_pdu_vmarshal/vunmarshall by creating new sg pointing to the
-data on the ring.
+Linux exposes a separate limit, /sys/block/.../queue/max_segments, which
+in the worst case can be more restrictive than BLKSECTGET (as they are
+two different things). Similar to the BLKSECTGET story, guests don't see
+this limit and send big requests will get -EINVAL error on SG_IO.
 
-This is safe as we only handle one request per ring at any given time.
+Lean on the safer side to clamp max_transfer according to max_segments
+and page size, because in the end what host HBA gets is the mapped host
+pages rather than a guest buffer.
 
-Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
-CC: anthony.perard@citrix.com
-CC: jgross@suse.com
-CC: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
-CC: Greg Kurz <groug@kaod.org>
+Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- hw/9pfs/xen-9p-backend.c | 91 ++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 89 insertions(+), 2 deletions(-)
+ block/file-posix.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 58 insertions(+)
 
-diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
-index d4c3d36..0570e07 100644
---- a/hw/9pfs/xen-9p-backend.c
-+++ b/hw/9pfs/xen-9p-backend.c
-@@ -48,12 +48,77 @@ struct Xen9pfsDev {
-     struct Xen9pfsRing *rings;
- };
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 4de1abd..b615262 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -668,6 +668,59 @@ static int hdev_get_max_transfer_length(BlockDriverState *bs, int fd)
+ #endif
+ }
  
-+static void xen_9pfs_in_sg(struct Xen9pfsRing *ring,
-+                           struct iovec *in_sg,
-+                           int *num,
-+                           uint32_t idx,
-+                           uint32_t size)
++static int hdev_get_max_segments(BlockDriverState *bs)
 +{
-+    RING_IDX cons, prod, masked_prod, masked_cons;
++#ifdef CONFIG_LINUX
++    char buf[32];
++    const char *end;
++    char *sysfspath, *fullpath;
++    int ret;
++    int fd = -1;
++    long max_segments;
 +
-+    cons = ring->intf->in_cons;
-+    prod = ring->intf->in_prod;
-+    xen_rmb();
-+    masked_prod = xen_9pfs_mask(prod, XEN_9PFS_RING_SIZE);
-+    masked_cons = xen_9pfs_mask(cons, XEN_9PFS_RING_SIZE);
-+
-+    if (masked_prod < masked_cons) {
-+        in_sg[0].iov_base = ring->ring.in + masked_prod;
-+        in_sg[0].iov_len = masked_cons - masked_prod;
-+        *num = 1;
-+    } else {
-+        in_sg[0].iov_base = ring->ring.in + masked_prod;
-+        in_sg[0].iov_len = XEN_9PFS_RING_SIZE - masked_prod;
-+        in_sg[1].iov_base = ring->ring.in;
-+        in_sg[1].iov_len = masked_cons;
-+        *num = 2;
++    fullpath = realpath(bs->exact_filename, NULL);
++    if (!fullpath) {
++        return -errno;
 +    }
++    if (strncmp(fullpath, "/dev/", 5) || !fullpath[5]) {
++        ret = -ENOTSUP;
++        goto out;
++    }
++    sysfspath = g_strdup_printf("/sys/block/%s/queue/max_segments",
++                                &fullpath[5]);
++    fd = open(sysfspath, O_RDONLY);
++    if (fd == -1) {
++        ret = -errno;
++        goto out;
++    }
++    do {
++        ret = read(fd, buf, sizeof(buf));
++    } while (ret == -1 && errno == EINTR);
++    if (ret < 0) {
++        ret = -errno;
++        goto out;
++    } else if (ret == 0) {
++        ret = -EIO;
++        goto out;
++    }
++    buf[ret] = 0;
++    /* The file is ended with '\n', pass 'end' to accept that. */
++    ret = qemu_strtol(buf, &end, 10, &max_segments);
++    if (ret == 0 && end && *end == '\n') {
++        ret = max_segments;
++    }
++
++out:
++    if (fd >= 0) {
++        close(fd);
++    }
++    free(fullpath);
++    return ret;
++#else
++    return -ENOTSUP;
++#endif
 +}
 +
-+static void xen_9pfs_out_sg(struct Xen9pfsRing *ring,
-+                            struct iovec *out_sg,
-+                            int *num,
-+                            uint32_t idx)
-+{
-+    RING_IDX cons, prod, masked_prod, masked_cons;
-+
-+    cons = ring->intf->out_cons;
-+    prod = ring->intf->out_prod;
-+    xen_rmb();
-+    masked_prod = xen_9pfs_mask(prod, XEN_9PFS_RING_SIZE);
-+    masked_cons = xen_9pfs_mask(cons, XEN_9PFS_RING_SIZE);
-+
-+    if (masked_cons < masked_prod) {
-+        out_sg[0].iov_base = ring->ring.out + masked_cons;
-+        out_sg[0].iov_len = ring->out_size;
-+        *num = 1;
-+    } else {
-+        if (ring->out_size > (XEN_9PFS_RING_SIZE - masked_cons)) {
-+            out_sg[0].iov_base = ring->ring.out + masked_cons;
-+            out_sg[0].iov_len = XEN_9PFS_RING_SIZE - masked_cons;
-+            out_sg[1].iov_base = ring->ring.out;
-+            out_sg[1].iov_len = ring->out_size - (XEN_9PFS_RING_SIZE - masked_cons);
-+            *num = 2;
-+        } else {
-+            out_sg[0].iov_base = ring->ring.out + masked_cons;
-+            out_sg[0].iov_len = ring->out_size;
-+            *num = 1;
-+        }
-+    }
-+}
-+
- static ssize_t xen_9pfs_pdu_vmarshal(V9fsPDU *pdu,
-                                      size_t offset,
-                                      const char *fmt,
-                                      va_list ap)
+ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
  {
--    return 0;
-+    struct Xen9pfsDev *xen_9pfs = container_of(pdu->s, struct Xen9pfsDev, state);
-+    struct iovec in_sg[2];
-+    int num;
-+
-+    xen_9pfs_in_sg(&xen_9pfs->rings[pdu->tag % xen_9pfs->num_rings],
-+                   in_sg, &num, pdu->idx, ROUND_UP(offset + 128, 512));
-+    return v9fs_iov_vmarshal(in_sg, num, offset, 0, fmt, ap);
- }
+     BDRVRawState *s = bs->opaque;
+@@ -679,6 +732,11 @@ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
+             if (ret > 0 && ret <= BDRV_REQUEST_MAX_BYTES) {
+                 bs->bl.max_transfer = pow2floor(ret);
+             }
++            ret = hdev_get_max_segments(bs);
++            if (ret > 0) {
++                bs->bl.max_transfer = MIN(bs->bl.max_transfer,
++                                          ret * getpagesize());
++            }
+         }
+     }
  
- static ssize_t xen_9pfs_pdu_vunmarshal(V9fsPDU *pdu,
-@@ -61,13 +126,27 @@ static ssize_t xen_9pfs_pdu_vunmarshal(V9fsPDU *pdu,
-                                        const char *fmt,
-                                        va_list ap)
- {
--    return 0;
-+    struct Xen9pfsDev *xen_9pfs = container_of(pdu->s, struct Xen9pfsDev, state);
-+    struct iovec out_sg[2];
-+    int num;
-+
-+    xen_9pfs_out_sg(&xen_9pfs->rings[pdu->tag % xen_9pfs->num_rings],
-+                    out_sg, &num, pdu->idx);
-+    return v9fs_iov_vunmarshal(out_sg, num, offset, 0, fmt, ap);
- }
- 
- static void xen_9pfs_init_out_iov_from_pdu(V9fsPDU *pdu,
-                                            struct iovec **piov,
-                                            unsigned int *pniov)
- {
-+    struct Xen9pfsDev *xen_9pfs = container_of(pdu->s, struct Xen9pfsDev, state);
-+    struct Xen9pfsRing *ring = &xen_9pfs->rings[pdu->tag % xen_9pfs->num_rings];
-+    struct iovec *sg = g_malloc0(sizeof(*sg)*2);
-+    int num;
-+
-+    xen_9pfs_out_sg(ring, sg, &num, pdu->idx);
-+    *piov = sg;
-+    *pniov = num;
- }
- 
- static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pdu,
-@@ -75,6 +154,14 @@ static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pdu,
-                                           unsigned int *pniov,
-                                           size_t size)
- {
-+    struct Xen9pfsDev *xen_9pfs = container_of(pdu->s, struct Xen9pfsDev, state);
-+    struct Xen9pfsRing *ring = &xen_9pfs->rings[pdu->tag % xen_9pfs->num_rings];
-+    struct iovec *sg = g_malloc0(sizeof(*sg)*2);
-+    int num;
-+
-+    xen_9pfs_in_sg(ring, sg, &num, pdu->idx, size);
-+    *piov = sg;
-+    *pniov = num;
- }
- 
- static void xen_9pfs_push_and_notify(V9fsPDU *pdu)
 -- 
-1.9.1
+2.9.3
