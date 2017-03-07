@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amit@kernel.org>) id 1clLIq-0000rO-Ra
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 15:01:49 -0500
+	(envelope-from <bounces@canonical.com>) id 1clNcE-0001ah-OB
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 17:30:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amit@kernel.org>) id 1clLIn-0007Nj-PY
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 15:01:48 -0500
-Received: from relay6-d.mail.gandi.net ([217.70.183.198]:40560)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amit@kernel.org>) id 1clLIn-0007Ne-JA
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 15:01:45 -0500
-Date: Tue, 7 Mar 2017 21:01:36 +0100
-From: Amit Shah <amit@kernel.org>
-Message-ID: <20170307200136.GJ25129@grmbl.mre>
-References: <1488770972-322500-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	(envelope-from <bounces@canonical.com>) id 1clNcB-0000u6-EB
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 17:29:58 -0500
+Received: from indium.canonical.com ([91.189.90.7]:48421)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1clNcB-0000ti-8y
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 17:29:55 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1clNcA-0002xU-BV
+	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 22:29:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4EAD12E807D
+	for <qemu-devel@nongnu.org>; Tue,  7 Mar 2017 22:29:54 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1488770972-322500-1-git-send-email-zhang.zhanghailiang@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio-serial-bus: Delete timer from list
- before free it
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 07 Mar 2017 22:16:56 -0000
+From: Thomas Huth <1131757@bugs.launchpad.net>
+Reply-To: Bug 1131757 <1131757@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130222143343.3624.57532.malonedeb@soybean.canonical.com>
+Message-Id: <20170307221657.22932.39940.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1131757] Re: QEMU 1.4.0 fails to boot sparc64
+ linux image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,16 +37,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Cc: mst@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On (Mon) 06 Mar 2017 [11:29:31], zhanghailiang wrote:
-> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Comment #2 sounds like the issue has been resolved? Or is there
+something left to do here?
 
-Reviewed-by: Amit Shah <amit@kernel.org>
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-Michael, please pick this up.
+-- =
 
-		Amit
--- 
-http://log.amitshah.net/
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1131757
+
+Title:
+  QEMU 1.4.0 fails to boot sparc64 linux image
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Hi!
+
+  I tried to boot sparc64 linux image
+  (http://packages.debian.org/sid/sparc64/linux-
+  image-2.6-sparc64-smp/download) with qemu and received the  error.
+
+  host:~$qemu-system-sparc64 -nographic -kernel vmlinuz-3.2.0-4-sparc64-smp
+  OpenBIOS for Sparc64
+  Configuration device id QEMU version tion device id QEMUkernel addr n dev=
+ice id QEMUkernel cmdline =
+
+  CPUs:  cmdline =
+
+   x SUNW,UltraSPARC-IIi
+  UUID: 00UltraSPARC-IIi
+  Welcome to OpenBIOS v1.0 built on Aug 19 2012 13:06
+    Type 'help' for detailed information
+  [sparc64] Kernel already loaded
+  Unhandled Exception 0x0000000000000020
+  PC =3D 0x0000000000404000 NPC =3D 0x0000000000404004
+  Stopping execution
+
+  Also, I tried to follow instruction from Artyom Tarasenko blog
+  (http://tyom.blogspot.ru/2012/05/booting-linuxsparc64-on-todays-
+  openbios.html), but it's still impossible to boot linux.
+
+  Regards,
+  Kirill
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1131757/+subscriptions
