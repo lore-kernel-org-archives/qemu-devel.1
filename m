@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1clBLi-00064r-JN
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 04:24:08 -0500
+	(envelope-from <kwolf@redhat.com>) id 1clBRS-0006zZ-JO
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 04:30:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1clBLf-00085o-DT
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 04:24:06 -0500
-Received: from mo6.mail-out.ovh.net ([178.32.228.6]:56226)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1clBLf-00085J-41
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 04:24:03 -0500
-Received: from player774.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id B40A0B5841
-	for <qemu-devel@nongnu.org>; Tue,  7 Mar 2017 10:23:59 +0100 (CET)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Tue,  7 Mar 2017 10:23:40 +0100
-Message-Id: <1488878620-30617-1-git-send-email-clg@kaod.org>
+	(envelope-from <kwolf@redhat.com>) id 1clBRR-00016I-7f
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 04:30:02 -0500
+Date: Tue, 7 Mar 2017 10:29:52 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170307092951.GA5871@noname.str.redhat.com>
+References: <20170307025328.53409-1-haoqf@linux.vnet.ibm.com>
+	<20170307025328.53409-2-haoqf@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-2.10] ppc/spapr: QOM'ify sPAPRRTCState
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170307025328.53409-2-haoqf@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 1/1] vmstate: draft fix for failed
+ iotests case 68 and 91
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,246 +24,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com, pasic@linux.vnet.ibm.com, liujbjl@linux.vnet.ibm.com, famz@redhat.com, mreitz@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 
-Also use an 'sPAPRRTCState' attribute under the sPAPR machine to hold
-the RTC object. Overall, these changes remove an unnecessary and
-implicit dependency on SysBus.
+Am 07.03.2017 um 03:53 hat QingFeng Hao geschrieben:
+> I am not very clear about the logic in vmstate.c, but from its context in
+> vmstate_save_state, it seems size should not be 0, otherwise the followed
+> for loop will keep working on the same element. So I just add a simple
+> check to pass that case, not sure if it's right but it can pass iotest
+> case 68 and 91 now.
+> 
+> The iotest's failed output is:
+> 068 1s ... - output mismatch (see 068.out.bad)
+> --- /home/haoqf/KVMonz/gitcheck/work/qemu-master/tree/qemu/tests/qemu-iotests/068.out   2017-03-06 05:52:24.817328899 +0100
+> +++ 068.out.bad 2017-03-07 03:28:44.426714519 +0100
+> @@ -3,9 +3,13 @@
+>  === Saving and reloading a VM state to/from a qcow2 image ===
+> 
+>  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072
+> +qemu-system-s390x: migration/vmstate.c:336: vmstate_save_state: Assertion `first_elem || !n_elems' failed.
+> +./common.config: line 109: 52497 Aborted                 ( if [ -n "${QEMU_NEED_PID}" ]; then
+> +    echo $BASHPID > "${QEMU_TEST_DIR}/qemu-${_QEMU_HANDLE}.pid";
+> +fi; exec "$QEMU_PROG" $QEMU_OPTIONS "$@" )
+>  QEMU X.Y.Z monitor - type 'help' for more information
+>  (qemu) savevm 0
+> -(qemu) quit
+> +qemu-system-s390x: Device 'virtio0' does not have the requested snapshot '0'
+>  QEMU X.Y.Z monitor - type 'help' for more information
+>  (qemu) quit
+>  *** done
+> 
+> 091 1s ... [failed, exit status 1] - output mismatch (see 091.out.bad)
+>     --- tests/qemu-iotests/091.out	2016-08-30 12:35:04.207683276 +0200
+>     +++ 091.out.bad	2017-03-06 13:08:03.717135426 +0100
+>     @@ -11,18 +11,23 @@
+>      
+>      vm1: qemu-io disk write complete
+>      vm1: live migration started
+>     -vm1: live migration completed
+>     -
+>     -=== VM 2: Post-migration, write to disk, verify running ===
+>     -
+>     -vm2: qemu-io disk write complete
+>     -vm2: qemu process running successfully
+>     -vm2: flush io, and quit
+>     -Check image pattern
+>     -read 4194304/4194304 bytes at offset 0
+>     -4 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>     -Running 'qemu-img check -r all $TEST_IMG'
+>     -No errors were found on the image.
+>     -80/16384 = 0.49% allocated, 0.00% fragmented, 0.00% compressed clusters
+>     -Image end offset: 5570560
+>     -*** done
+>     +./common.qemu: line 110: write error: Broken pipe
+>     +./common.qemu: line 110: write error: Broken pipe
+>     +./common.qemu: line 110: write error: Broken pipe
+>     +./common.qemu: line 110: write error: Broken pipe
+>     +./common.qemu: line 110: write error: Broken pipe
+>     +./common.qemu: line 110: write error: Broken pipe
+>     +./common.qemu: line 110: write error: Broken pipe
+>     +./common.qemu: line 110: write error: Broken pipe
+>     +./common.qemu: line 110: write error: Broken pipe
+>     +./common.qemu: line 110: write error: Broken pipe
+>     +./common.qemu: line 110: write error: Broken pipe
+>     +./common.qemu: line 110: write error: Broken pipe
+>     +./common.qemu: line 110: write error: Broken pipe
+>     +./common.qemu: line 110: write error: Broken pipe
+>     +./common.qemu: line 110: write error: Broken pipe
+>     +./common.qemu: line 110: write error: Broken pipe
+>     +./common.qemu: line 110: write error: Broken pipe
+>     +./common.qemu: line 110: write error: Broken pipe
+>     +./common.qemu: line 110: write error: Broken pipe
+>     +Timeout waiting for completed on handle 0
+> 
+> Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+> ---
+>  migration/vmstate.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/migration/vmstate.c b/migration/vmstate.c
+> index 78b3cd4..ff28dde 100644
+> --- a/migration/vmstate.c
+> +++ b/migration/vmstate.c
+> @@ -106,6 +106,10 @@ int vmstate_load_state(QEMUFile *f, const VMStateDescription *vmsd,
+>              int i, n_elems = vmstate_n_elems(opaque, field);
+>              int size = vmstate_size(opaque, field);
+>  
+> +            if (size == 0) {
+> +                field++;
+> +                continue;
+> +            }
+>              vmstate_handle_alloc(first_elem, field, opaque);
+>              if (field->flags & VMS_POINTER) {
+>                  first_elem = *(void **)first_elem;
+> @@ -322,6 +326,10 @@ void vmstate_save_state(QEMUFile *f, const VMStateDescription *vmsd,
+>              int64_t old_offset, written_bytes;
+>              QJSON *vmdesc_loop = vmdesc;
+>  
+> +            if (size == 0) {
+> +                field++;
+> +                continue;
+> +            }
+>              trace_vmstate_save_state_loop(vmsd->name, field->name, n_elems);
+>              if (field->flags & VMS_POINTER) {
+>                  first_elem = *(void **)first_elem;
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- hw/ppc/spapr.c         | 16 ++++++++--------
- hw/ppc/spapr_events.c  |  2 +-
- hw/ppc/spapr_rtc.c     | 41 +++++++----------------------------------
- include/hw/ppc/spapr.h | 21 ++++++++++++++++-----
- include/hw/ppc/xics.h  |  2 +-
- 5 files changed, 33 insertions(+), 49 deletions(-)
+This is really a live migration fix, so I'm adding Juan and Dave to CC.
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index c3bb99160545..3a7868ed80da 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1333,13 +1333,13 @@ static void spapr_create_nvram(sPAPRMachineState =
-*spapr)
-=20
- static void spapr_rtc_create(sPAPRMachineState *spapr)
- {
--    DeviceState *dev =3D qdev_create(NULL, TYPE_SPAPR_RTC);
--
--    qdev_init_nofail(dev);
--    spapr->rtc =3D dev;
--
--    object_property_add_alias(qdev_get_machine(), "rtc-time",
--                              OBJECT(spapr->rtc), "date", NULL);
-+    object_initialize(&spapr->rtc, sizeof(spapr->rtc), TYPE_SPAPR_RTC);
-+    object_property_add_child(OBJECT(spapr), "rtc", OBJECT(&spapr->rtc),
-+                              &error_fatal);
-+    object_property_set_bool(OBJECT(&spapr->rtc), true, "realized",
-+                              &error_fatal);
-+    object_property_add_alias(OBJECT(spapr), "rtc-time", OBJECT(&spapr->=
-rtc),
-+                              "date", &error_fatal);
- }
-=20
- /* Returns whether we want to use VGA or not */
-@@ -1377,7 +1377,7 @@ static int spapr_post_load(void *opaque, int versio=
-n_id)
-      * So when migrating from those versions, poke the incoming offset
-      * value into the RTC device */
-     if (version_id < 3) {
--        err =3D spapr_rtc_import_offset(spapr->rtc, spapr->rtc_offset);
-+        err =3D spapr_rtc_import_offset(&spapr->rtc, spapr->rtc_offset);
-     }
-=20
-     return err;
-diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-index 24a5758e6243..f0b28d811242 100644
---- a/hw/ppc/spapr_events.c
-+++ b/hw/ppc/spapr_events.c
-@@ -422,7 +422,7 @@ static void spapr_init_maina(struct rtas_event_log_v6=
-_maina *maina,
-     maina->hdr.section_id =3D cpu_to_be16(RTAS_LOG_V6_SECTION_ID_MAINA);
-     maina->hdr.section_length =3D cpu_to_be16(sizeof(*maina));
-     /* FIXME: section version, subtype and creator id? */
--    spapr_rtc_read(spapr->rtc, &tm, NULL);
-+    spapr_rtc_read(&spapr->rtc, &tm, NULL);
-     year =3D tm.tm_year + 1900;
-     maina->creation_date =3D cpu_to_be32((to_bcd(year / 100) << 24)
-                                        | (to_bcd(year % 100) << 16)
-diff --git a/hw/ppc/spapr_rtc.c b/hw/ppc/spapr_rtc.c
-index 3a17ac42e44b..00a4e4c717d5 100644
---- a/hw/ppc/spapr_rtc.c
-+++ b/hw/ppc/spapr_rtc.c
-@@ -33,19 +33,8 @@
- #include "qapi-event.h"
- #include "qemu/cutils.h"
-=20
--#define SPAPR_RTC(obj) \
--    OBJECT_CHECK(sPAPRRTCState, (obj), TYPE_SPAPR_RTC)
--
--typedef struct sPAPRRTCState sPAPRRTCState;
--struct sPAPRRTCState {
--    /*< private >*/
--    SysBusDevice parent_obj;
--    int64_t ns_offset;
--};
--
--void spapr_rtc_read(DeviceState *dev, struct tm *tm, uint32_t *ns)
-+void spapr_rtc_read(sPAPRRTCState *rtc, struct tm *tm, uint32_t *ns)
- {
--    sPAPRRTCState *rtc =3D SPAPR_RTC(dev);
-     int64_t host_ns =3D qemu_clock_get_ns(rtc_clock);
-     int64_t guest_ns;
-     time_t guest_s;
-@@ -63,16 +52,12 @@ void spapr_rtc_read(DeviceState *dev, struct tm *tm, =
-uint32_t *ns)
-     }
- }
-=20
--int spapr_rtc_import_offset(DeviceState *dev, int64_t legacy_offset)
-+int spapr_rtc_import_offset(sPAPRRTCState *rtc, int64_t legacy_offset)
- {
--    sPAPRRTCState *rtc;
--
--    if (!dev) {
-+    if (!rtc) {
-         return -ENODEV;
-     }
-=20
--    rtc =3D SPAPR_RTC(dev);
--
-     rtc->ns_offset =3D legacy_offset * NANOSECONDS_PER_SECOND;
-=20
-     return 0;
-@@ -91,12 +76,7 @@ static void rtas_get_time_of_day(PowerPCCPU *cpu, sPAP=
-RMachineState *spapr,
-         return;
-     }
-=20
--    if (!spapr->rtc) {
--        rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
--        return;
--    }
--
--    spapr_rtc_read(spapr->rtc, &tm, &ns);
-+    spapr_rtc_read(&spapr->rtc, &tm, &ns);
-=20
-     rtas_st(rets, 0, RTAS_OUT_SUCCESS);
-     rtas_st(rets, 1, tm.tm_year + 1900);
-@@ -113,7 +93,7 @@ static void rtas_set_time_of_day(PowerPCCPU *cpu, sPAP=
-RMachineState *spapr,
-                                  target_ulong args,
-                                  uint32_t nret, target_ulong rets)
- {
--    sPAPRRTCState *rtc;
-+    sPAPRRTCState *rtc =3D &spapr->rtc;
-     struct tm tm;
-     time_t new_s;
-     int64_t host_ns;
-@@ -123,11 +103,6 @@ static void rtas_set_time_of_day(PowerPCCPU *cpu, sP=
-APRMachineState *spapr,
-         return;
-     }
-=20
--    if (!spapr->rtc) {
--        rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
--        return;
--    }
--
-     tm.tm_year =3D rtas_ld(args, 0) - 1900;
-     tm.tm_mon =3D rtas_ld(args, 1) - 1;
-     tm.tm_mday =3D rtas_ld(args, 2);
-@@ -144,8 +119,6 @@ static void rtas_set_time_of_day(PowerPCCPU *cpu, sPA=
-PRMachineState *spapr,
-     /* Generate a monitor event for the change */
-     qapi_event_send_rtc_change(qemu_timedate_diff(&tm), &error_abort);
-=20
--    rtc =3D SPAPR_RTC(spapr->rtc);
--
-     host_ns =3D qemu_clock_get_ns(rtc_clock);
-=20
-     rtc->ns_offset =3D (new_s * NANOSECONDS_PER_SECOND) - host_ns;
-@@ -155,7 +128,7 @@ static void rtas_set_time_of_day(PowerPCCPU *cpu, sPA=
-PRMachineState *spapr,
-=20
- static void spapr_rtc_qom_date(Object *obj, struct tm *current_tm, Error=
- **errp)
- {
--    spapr_rtc_read(DEVICE(obj), current_tm, NULL);
-+    spapr_rtc_read(SPAPR_RTC(obj), current_tm, NULL);
- }
-=20
- static void spapr_rtc_realize(DeviceState *dev, Error **errp)
-@@ -200,7 +173,7 @@ static void spapr_rtc_class_init(ObjectClass *oc, voi=
-d *data)
-=20
- static const TypeInfo spapr_rtc_info =3D {
-     .name          =3D TYPE_SPAPR_RTC,
--    .parent        =3D TYPE_SYS_BUS_DEVICE,
-+    .parent        =3D TYPE_DEVICE,
-     .instance_size =3D sizeof(sPAPRRTCState),
-     .class_init    =3D spapr_rtc_class_init,
- };
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 808aac870359..ba9e689ee230 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -20,6 +20,18 @@ typedef struct sPAPREventSource sPAPREventSource;
-=20
- #define SPAPR_TIMEBASE_FREQ     512000000ULL
-=20
-+#define TYPE_SPAPR_RTC "spapr-rtc"
-+
-+#define SPAPR_RTC(obj)                                  \
-+    OBJECT_CHECK(sPAPRRTCState, (obj), TYPE_SPAPR_RTC)
-+
-+typedef struct sPAPRRTCState sPAPRRTCState;
-+struct sPAPRRTCState {
-+    /*< private >*/
-+    DeviceState parent_obj;
-+    int64_t ns_offset;
-+};
-+
- typedef struct sPAPRMachineClass sPAPRMachineClass;
-=20
- #define TYPE_SPAPR_MACHINE      "spapr-machine"
-@@ -58,7 +70,7 @@ struct sPAPRMachineState {
-     QLIST_HEAD(, sPAPRPHBState) phbs;
-     struct sPAPRNVRAM *nvram;
-     ICSState *ics;
--    DeviceState *rtc;
-+    sPAPRRTCState rtc;
-=20
-     void *htab;
-     uint32_t htab_shift;
-@@ -629,11 +641,10 @@ struct sPAPRConfigureConnectorState {
-=20
- void spapr_ccs_reset_hook(void *opaque);
-=20
--#define TYPE_SPAPR_RTC "spapr-rtc"
--#define TYPE_SPAPR_RNG "spapr-rng"
-+void spapr_rtc_read(sPAPRRTCState *rtc, struct tm *tm, uint32_t *ns);
-+int spapr_rtc_import_offset(sPAPRRTCState *rtc, int64_t legacy_offset);
-=20
--void spapr_rtc_read(DeviceState *dev, struct tm *tm, uint32_t *ns);
--int spapr_rtc_import_offset(DeviceState *dev, int64_t legacy_offset);
-+#define TYPE_SPAPR_RNG "spapr-rng"
-=20
- int spapr_rng_populate_dt(void *fdt);
-=20
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index 9a5e715fe553..ce230183a106 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -28,7 +28,7 @@
- #ifndef XICS_H
- #define XICS_H
-=20
--#include "hw/sysbus.h"
-+#include "hw/qdev.h"
-=20
- #define XICS_IPI        0x2
- #define XICS_BUID       0x1
---=20
-2.7.4
+I suspect the real question is why a field with size 0 was even stored
+in the vmstate to begin with.
+
+Kevin
