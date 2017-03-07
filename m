@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1clGeI-0006hJ-PM
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:03:39 -0500
+	(envelope-from <armbru@redhat.com>) id 1clGgg-0007qq-S2
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:06:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1clGeE-000692-Uu
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:03:38 -0500
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:37100)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1clGeE-00068u-N8
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:03:34 -0500
-Received: by mail-wm0-x22b.google.com with SMTP id n11so7271879wma.0
-	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 07:03:34 -0800 (PST)
-References: <d208c3f0-2e57-0b54-f18f-b5e27d698e28@genode-labs.com>
-	<20170306155722.31315-1-alex.bennee@linaro.org>
-	<5d60b86e-d57d-fbcd-fb54-d7447816244d@twiddle.net>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <5d60b86e-d57d-fbcd-fb54-d7447816244d@twiddle.net>
-Date: Tue, 07 Mar 2017 15:03:41 +0000
-Message-ID: <87a88xi0xe.fsf@linaro.org>
+	(envelope-from <armbru@redhat.com>) id 1clGgb-0006xb-1V
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:06:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43566)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1clGga-0006xF-Ri
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:06:00 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1488871237-12332-1-git-send-email-armbru@redhat.com>
+	<CAFEAcA-SBSz5M_GDEQhqvb+=5WprkwURKb_sY2M9VewJJ+N1Zw@mail.gmail.com>
+Date: Tue, 07 Mar 2017 16:05:58 +0100
+In-Reply-To: <CAFEAcA-SBSz5M_GDEQhqvb+=5WprkwURKb_sY2M9VewJJ+N1Zw@mail.gmail.com>
+	(Peter Maydell's message of "Tue, 7 Mar 2017 14:30:30 +0000")
+Message-ID: <87efy99lex.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] target/i386: move nested exception check
- to x86_cpu_exec_interrupt
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PULL v3 00/24] block: Command line option
+ -blockdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,42 +28,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: alexander.boettcher@genode-labs.com, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-Richard Henderson <rth@twiddle.net> writes:
-
-> On 03/07/2017 02:57 AM, Alex Bennée wrote:
->>      cs->exception_index = intno;
->>      env->error_code = error_code;
->>      env->exception_is_int = is_int;
->>      env->exception_next_eip = env->eip + next_eip_addend;
->> +    env->exception_retaddr = retaddr;
->>      cpu_loop_exit_restore(cs, retaddr);
+> On 7 March 2017 at 07:20, Markus Armbruster <armbru@redhat.com> wrote:
+>> Actually, the command line option is the least part of this series.
+>> Its bulk is about building infrastructure and getting errors out of
+>> the JSON parser.
+>>
+>> The design of the command line interface was discussed here:
+>> Subject: Non-flat command line option argument syntax
+>> Message-ID: <87bmukmlau.fsf@dusky.pond.sub.org>
+>> https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg00555.html
+>>
+>> v3: A few commit messages touched up, code unchanged
+>>
+>> The following changes since commit fbddc2e5608eb655493253d080598375db61a748:
+>>
+>>   Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2017-02-28' into staging (2017-03-06 10:18:33 +0000)
+>>
+>> are available in the git repository at:
+>>
+>>   git://repo.or.cz/qemu/armbru.git tags/pull-block-2017-02-28-v3
+>>
+>> for you to fetch changes up to de479f01438d974100ac9ec10ab82c2ee1ad124f:
+>>
+>>   keyval: Support lists (2017-03-07 08:15:18 +0100)
 >
-> Since you've restored state here, I don't see that you need to save
-> the retaddr at all ...
+> The clang sanitizer has a complaint about your new test:
 >
->> +    if (!env->exception_is_int) {
->> +        cpu_svm_check_intercept_param(env,
->> +                                      SVM_EXIT_EXCP_BASE + cs->exception_index,
->> +                                      env->error_code,
->> +                                      env->exception_retaddr);
->> +        cs->exception_index = check_exception(env, cs->exception_index,
->> +                                              &env->error_code,
->> +                                              env->exception_retaddr);
->> +    } else {
->> +        cpu_svm_check_intercept_param(env, SVM_EXIT_SWINT, 0,
->> +                                      env->exception_retaddr);
->> +    }
+>   GTESTER tests/test-keyval
+> /home/petmay01/linaro/qemu-for-merges/util/keyval.c:129:15: runtime
+> error: member access within null pointer of type 'QString' (aka
+> 'struct QString')
 >
-> ... simply pass zero here instead.
+> which is the line:
+>         new = QOBJECT(value) ?: QOBJECT(qdict_new());
 >
-> But do I see correctly from the thread that we don't have a reproducer?
+> This is because QOBJECT is defined as:
+>
+> #define QOBJECT(obj) (&(obj)->base)
+>
+> and so it doesn't have the "if you pass in NULL you get NULL"
+> semantics that OBJECT() and all the QOM object typecast
+> macros do.
 
-Yeah - I've nabbed Paolo's much cleaner and more informed fix and that
-seems fine.
+QOBJECT() returns its argument, so this is rather pedantic.  However,
+placating the sanitize isn't too onerous; this should do:
 
---
-Alex Bennée
+        new = value ? QOBJECT(value) : QOBJECT(qdict_new());
+
+> (As an aside, it's rather confusing to have a QObject
+> whose header claims it's part of the "QEMU Object Model"
+> which is completely different from the QOM Object...)
+
+Hey, QObject claimed the name first!
+
+Seriously, I hate the name clash, too.  Rewording the comment is easy
+enough.  Even better would be renaming QObject, but that's a lot of
+churn.
