@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43017)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1clBHJ-000416-CU
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 04:19:34 -0500
+	(envelope-from <famz@redhat.com>) id 1clBHk-0004Bv-C8
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 04:20:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1clBHG-000686-8F
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 04:19:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51054)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1clBHG-000672-2D
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 04:19:30 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7A8F04E4C8
-	for <qemu-devel@nongnu.org>; Tue,  7 Mar 2017 09:19:29 +0000 (UTC)
-Date: Tue, 7 Mar 2017 17:19:23 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170307091923.GA31585@pxdev.xzpeter.org>
-References: <1488877751-13419-1-git-send-email-jasowang@redhat.com>
+	(envelope-from <famz@redhat.com>) id 1clBHj-0006QK-Jo
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 04:20:00 -0500
+Date: Tue, 7 Mar 2017 17:19:52 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170307091952.GF29283@lemon.lan>
+References: <20170225193155.447462-1-vsementsov@virtuozzo.com>
+	<20170225193155.447462-3-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1488877751-13419-1-git-send-email-jasowang@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V3] virtio: do not require IOMMU to be
- created in advance
+In-Reply-To: <20170225193155.447462-3-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 2/4] qmp-cont: invalidate on
+ RUN_STATE_PRELAUNCH
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,22 +24,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: mst@redhat.com, marcel@redhat.com, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, den@openvz.org, jsnow@redhat.com, lirans@il.ibm.com
 
-On Tue, Mar 07, 2017 at 05:09:11PM +0800, Jason Wang wrote:
-> After commit 96a8821d2141 ("virtio: unbreak virtio-pci with IOMMU
-> after caching ring translations"), IOMMU was required to be created in
-> advance. This is because we can only get the correct dma_as after pci
-> IOMMU (e.g intel_iommu) was initialized. This is suboptimal and
-> inconvenient for user. This patch releases this by:
+On Sat, 02/25 22:31, Vladimir Sementsov-Ogievskiy wrote:
+> We must invalidate on RUN_STATE_PRELAUNCH too, as it is available
+> through qmp_system_reset from RUN_STATE_POSTMIGRATE. Otherwise, we will
+> come to
 > 
-> - introduce a bus_master_ready method for PCIDeviceClass and trigger
->   this during pci_init_bus_master
-> - implement virtio-pci method and 1) reset the dma_as 2) re-register
->   the memory listener to the new dma_as
+> qemu-kvm: block/io.c:1406: bdrv_co_do_pwritev:
+>        Assertion `!(bs->open_flags & 0x0800)' failed.
 > 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> on the first write after vm start.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  qmp.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/qmp.c b/qmp.c
+> index dfaabac1a6..e61795d033 100644
+> --- a/qmp.c
+> +++ b/qmp.c
+> @@ -198,7 +198,8 @@ void qmp_cont(Error **errp)
+>      /* Continuing after completed migration. Images have been inactivated to
+>       * allow the destination to take control. Need to get control back now. */
+>      if (runstate_check(RUN_STATE_FINISH_MIGRATE) ||
+> -        runstate_check(RUN_STATE_POSTMIGRATE))
+> +        runstate_check(RUN_STATE_POSTMIGRATE) ||
+> +        runstate_check(RUN_STATE_PRELAUNCH))
+>      {
+>          bdrv_invalidate_cache_all(&local_err);
+>          if (local_err) {
+> -- 
+> 2.11.1
+> 
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
