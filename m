@@ -1,35 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50032)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1clG4d-00047x-LU
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 09:26:48 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1clG8h-0005hP-36
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 09:31:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1clG4Y-00031S-Nc
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 09:26:47 -0500
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:34658)
+	(envelope-from <peter.maydell@linaro.org>) id 1clG8a-0004dG-Uk
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 09:30:59 -0500
+Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:35339)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1clG4Y-00031L-HW
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 09:26:42 -0500
-Received: by mail-qk0-x243.google.com with SMTP id v125so1110961qkh.1
-	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 06:26:42 -0800 (PST)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1488544368-30622-1-git-send-email-armbru@redhat.com>
-	<1488544368-30622-11-git-send-email-armbru@redhat.com>
-	<dd7a93a5-87d5-83c9-b608-8511036ac394@amsat.org>
-	<87efycduf0.fsf@dusky.pond.sub.org>
-	<52bc1274-8d93-d477-a3e3-d3b7b5094d7a@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e09b7c61-b2dc-757a-b7b0-c093f543c4f3@amsat.org>
-Date: Tue, 7 Mar 2017 11:26:38 -0300
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1clG8a-0004cx-Mv
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 09:30:52 -0500
+Received: by mail-wr0-x234.google.com with SMTP id g10so2606687wrg.2
+	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 06:30:52 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <52bc1274-8d93-d477-a3e3-d3b7b5094d7a@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 10/28] qmp: Improve QMP dispatch error
- messages
+In-Reply-To: <1488871237-12332-1-git-send-email-armbru@redhat.com>
+References: <1488871237-12332-1-git-send-email-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 7 Mar 2017 14:30:30 +0000
+Message-ID: <CAFEAcA-SBSz5M_GDEQhqvb+=5WprkwURKb_sY2M9VewJJ+N1Zw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL v3 00/24] block: Command line option
+ -blockdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,72 +29,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 03/07/2017 11:21 AM, Eric Blake wrote:
-> On 03/05/2017 02:01 AM, Markus Armbruster wrote:
+On 7 March 2017 at 07:20, Markus Armbruster <armbru@redhat.com> wrote:
+> Actually, the command line option is the least part of this series.
+> Its bulk is about building infrastructure and getting errors out of
+> the JSON parser.
 >
->> Since substantial other work depends on this series, it needs to go in
->> sooner rather than later.  I'm therefore *dropping* this patch from the
->> series.  We can then bikeshed^Wpolish to our heart's content without
->> holding up other work.
->>
->> That said: what about this?
->>
->> diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
->> index dc50212..5ad36f8 100644
->> --- a/qapi/qmp-dispatch.c
->> +++ b/qapi/qmp-dispatch.c
->> @@ -30,7 +30,7 @@ static QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
->>
->>      dict = qobject_to_qdict(request);
->>      if (!dict) {
->> -        error_setg(errp, "Expected '%s' in QMP input", "object");
->> +        error_setg(errp, "QMP input must be a JSON object");
->>          return NULL;
->>      }
->>
->> @@ -41,26 +41,26 @@ static QDict *qmp_dispatch_check_obj(const QObject *request, Error **errp)
->>
->>          if (!strcmp(arg_name, "execute")) {
->>              if (qobject_type(arg_obj) != QTYPE_QSTRING) {
->> -                error_setg(errp, "QMP input object member '%s' expects '%s'",
->> -                           "execute", "string");
->> +                error_setg(errp,
->> +                           "QMP input member 'execute' must be a string");
->>                  return NULL;
->>              }
->>              has_exec_key = true;
->>          } else if (!strcmp(arg_name, "arguments")) {
->>              if (qobject_type(arg_obj) != QTYPE_QDICT) {
->> -                error_setg(errp, "QMP input object member '%s' expects '%s'",
->> -                           "arguments", "object");
->> +                error_setg(errp,
->> +                           "QMP input member 'arguments' must be an object");
->>                  return NULL;
->>              }
->>          } else {
->> -            error_setg(errp, "QMP input object member '%s' is unexpected",
->> +            error_setg(errp, "QMP input member '%s' is unexpected",
->>                         arg_name);
->>              return NULL;
->>          }
->>      }
->>
->>      if (!has_exec_key) {
->> -        error_setg(errp, "Expected '%s' in QMP input", "execute");
->> +        error_setg(errp, "QMP input lacks member 'execute'");
->>          return NULL;
->>      }
->>
->>
->>
+> The design of the command line interface was discussed here:
+> Subject: Non-flat command line option argument syntax
+> Message-ID: <87bmukmlau.fsf@dusky.pond.sub.org>
+> https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg00555.html
 >
-> Based on the rest of this sub-thread, I'm making it explicit that you
-> can add:
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+> v3: A few commit messages touched up, code unchanged
+>
+> The following changes since commit fbddc2e5608eb655493253d080598375db61a748:
+>
+>   Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2017-02-28' into staging (2017-03-06 10:18:33 +0000)
+>
+> are available in the git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-block-2017-02-28-v3
+>
+> for you to fetch changes up to de479f01438d974100ac9ec10ab82c2ee1ad124f:
+>
+>   keyval: Support lists (2017-03-07 08:15:18 +0100)
 
-this is not a blocking issue, this code is OK, no need to drop!
+The clang sanitizer has a complaint about your new test:
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+  GTESTER tests/test-keyval
+/home/petmay01/linaro/qemu-for-merges/util/keyval.c:129:15: runtime
+error: member access within null pointer of type 'QString' (aka
+'struct QString')
+
+which is the line:
+        new = QOBJECT(value) ?: QOBJECT(qdict_new());
+
+This is because QOBJECT is defined as:
+
+#define QOBJECT(obj) (&(obj)->base)
+
+and so it doesn't have the "if you pass in NULL you get NULL"
+semantics that OBJECT() and all the QOM object typecast
+macros do.
+
+(As an aside, it's rather confusing to have a QObject
+whose header claims it's part of the "QEMU Object Model"
+which is completely different from the QOM Object...)
+
+thanks
+-- PMM
