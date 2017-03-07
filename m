@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60460)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cl2K0-0002u3-IE
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 18:45:45 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cl2Yp-0004Cp-4T
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 19:01:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cl2Jx-00076X-HO
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 18:45:44 -0500
-Received: from indium.canonical.com ([91.189.90.7]:44918)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cl2Jx-00075g-Ba
-	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 18:45:41 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cl2Jw-0003o3-4E
-	for <qemu-devel@nongnu.org>; Mon, 06 Mar 2017 23:45:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 14D752E80C1
-	for <qemu-devel@nongnu.org>; Mon,  6 Mar 2017 23:45:40 +0000 (UTC)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cl2Yo-0002Vt-8V
+	for qemu-devel@nongnu.org; Mon, 06 Mar 2017 19:01:03 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Sender: philippe.mathieu.daude@gmail.com
+In-Reply-To: <0f0225c6-cf7f-e4dd-a91a-340303dafec7@redhat.com>
+References: <1488817322-11397-1-git-send-email-kwolf@redhat.com>
+	<1488817322-11397-7-git-send-email-kwolf@redhat.com>
+	<0f0225c6-cf7f-e4dd-a91a-340303dafec7@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philippe@mathieu-daude.net>
+Date: Mon, 6 Mar 2017 21:00:55 -0300
+Message-ID: <CAAdtpL7NtBH=LP-xB4F7KeDH5tSwhFT2=gdpFNv2_4B_OS1Dpw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Mar 2017 23:38:54 -0000
-From: Herbie Robinson <1670509@bugs.launchpad.net>
-Reply-To: Bug 1670509 <1670509@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170306224936.27687.97076.malonedeb@gac.canonical.com>
-Message-Id: <20170306233854.27214.29216.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1670509] Re: sgabios outputs incorrect video modes
+Subject: Re: [Qemu-devel] [PATCH 06/10] block: Factor out
+ should_update_child()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,33 +28,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, jcody@redhat.com, Fam Zheng <famz@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-** Changed in: qemu
-     Assignee: (unassigned) =3D> Herbie Robinson (hrob)
+On Mon, Mar 6, 2017 at 5:35 PM, Eric Blake <eblake@redhat.com> wrote:
+> On 03/06/2017 10:21 AM, Kevin Wolf wrote:
+>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>> ---
+>>  block.c | 42 +++++++++++++++++++++++++++---------------
+>>  1 file changed, 27 insertions(+), 15 deletions(-)
+>>
+>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
--- =
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1670509
-
-Title:
-  sgabios outputs incorrect video modes
-
-Status in QEMU:
-  New
-
-Bug description:
-  When run with a bootstrap loader that uses int 0x10 with 0x1301 in
-  %ax, incorrect video modes are output to the serial port.  I believe
-  the VGA image will be correct.  This might also affect the returned
-  values for some interrupts.
-
-  This is caused because the set_cursor_position routine fails to save
-  and restore %bx.
-
-  I'm working on a fix for this.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1670509/+subscriptions
+>
+> --
+> Eric Blake   eblake redhat com    +1-919-301-3266
+> Libvirt virtualization library http://libvirt.org
+>
