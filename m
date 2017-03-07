@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44460)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cl9QK-0001XO-9X
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:20:46 -0500
+	(envelope-from <armbru@redhat.com>) id 1cl9QM-0001Xp-6Y
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:20:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cl9QH-00067o-4E
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:20:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59994)
+	(envelope-from <armbru@redhat.com>) id 1cl9QK-0006B7-GF
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:20:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60002)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cl9QG-00067I-SX
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:20:41 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cl9QK-00069e-5H
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:20:44 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F02D981129
-	for <qemu-devel@nongnu.org>; Tue,  7 Mar 2017 07:20:40 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 59FF883F44
+	for <qemu-devel@nongnu.org>; Tue,  7 Mar 2017 07:20:44 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-55.ams2.redhat.com
 	[10.36.116.55])
-	by int-mx14.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v277KdfL016932
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=NO)
-	for <qemu-devel@nongnu.org>; Tue, 7 Mar 2017 02:20:40 -0500
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2320F2D655
+	for <qemu-devel@nongnu.org>; Tue,  7 Mar 2017 07:20:44 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue,  7 Mar 2017 08:20:13 +0100
-Message-Id: <1488871237-12332-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v3 00/24] block: Command line option -blockdev
+Date: Tue,  7 Mar 2017 08:20:35 +0100
+Message-Id: <1488871237-12332-23-git-send-email-armbru@redhat.com>
+In-Reply-To: <1488871237-12332-1-git-send-email-armbru@redhat.com>
+References: <1488871237-12332-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PULL v3 22/24] qapi: Improve how keyval input visitor
+ reports unexpected dicts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,88 +36,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Actually, the command line option is the least part of this series.
-Its bulk is about building infrastructure and getting errors out of
-the JSON parser.
+Incorrect option
 
-The design of the command line interface was discussed here:
-Subject: Non-flat command line option argument syntax
-Message-ID: <87bmukmlau.fsf@dusky.pond.sub.org>
-https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg00555.html
+    -blockdev node-name=foo,driver=file,filename=foo.img,aio.unmap=on
 
-v3: A few commit messages touched up, code unchanged
+is rejected with "Invalid parameter type for 'aio', expected: string".
+To make sense of this, you almost have to translate it into the
+equivalent QMP command
 
-The following changes since commit fbddc2e5608eb655493253d080598375db61a748:
+    { "execute": "blockdev-add", "arguments": { "node-name": "foo", "driver": "file", "filename": "foo.img", "aio": { "unmap": true } } }
 
-  Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2017-02-28' into staging (2017-03-06 10:18:33 +0000)
+Improve the error message to "Parameters 'aio.*' are unexpected".
+Take care not to confuse the case "unexpected nested parameters"
+(i.e. the object is a QDict or QList) with the case "non-string scalar
+parameter".  The latter is a misuse of the visitor, and should perhaps
+be an assertion.  Note that test-qobject-input-visitor exercises this
+misuse in test_visitor_in_int_keyval(), test_visitor_in_bool_keyval()
+and test_visitor_in_number_keyval().
 
-are available in the git repository at:
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Message-Id: <1488317230-26248-23-git-send-email-armbru@redhat.com>
+---
+ qapi/qobject-input-visitor.c | 26 ++++++++++++++++++++++----
+ 1 file changed, 22 insertions(+), 4 deletions(-)
 
-  git://repo.or.cz/qemu/armbru.git tags/pull-block-2017-02-28-v3
-
-for you to fetch changes up to de479f01438d974100ac9ec10ab82c2ee1ad124f:
-
-  keyval: Support lists (2017-03-07 08:15:18 +0100)
-
-----------------------------------------------------------------
-block: Command line option -blockdev
-
-----------------------------------------------------------------
-Daniel P. Berrange (1):
-      qapi: qobject input visitor variant for use with keyval_parse()
-
-Markus Armbruster (23):
-      test-qemu-opts: Cover qemu_opts_parse() of "no"
-      tests: Fix gcov-files-test-qemu-opts-y, gcov-files-test-logging-y
-      keyval: New keyval_parse()
-      test-keyval: Cover use with qobject input visitor
-      qapi: Factor out common part of qobject input visitor creation
-      qapi: Factor out common qobject_input_get_keyval()
-      qobject: Propagate parse errors through qobject_from_jsonv()
-      libqtest: Fix qmp() & friends to abort on JSON parse errors
-      qjson: Abort earlier on qobject_from_jsonf() misuse
-      test-qobject-input-visitor: Abort earlier on bad test input
-      qobject: Propagate parse errors through qobject_from_json()
-      block: More detailed syntax error reporting for JSON filenames
-      check-qjson: Test errors from qobject_from_json()
-      test-visitor-serialization: Pass &error_abort to qobject_from_json()
-      monitor: Assert qmp_schema_json[] is sane
-      test-qapi-util: New, covering qapi/qapi-util.c
-      qapi: New parse_qapi_name()
-      keyval: Restrict key components to valid QAPI names
-      qapi: New qobject_input_visitor_new_str() for convenience
-      block: Initial implementation of -blockdev
-      qapi: Improve how keyval input visitor reports unexpected dicts
-      docs/qapi-code-gen.txt: Clarify naming rules
-      keyval: Support lists
-
- block.c                              |   9 +-
- docs/qapi-code-gen.txt               |  61 ++--
- include/qapi/qmp/qjson.h             |   5 +-
- include/qapi/qobject-input-visitor.h |  21 ++
- include/qapi/util.h                  |   2 +
- include/qemu/option.h                |   3 +
- monitor.c                            |   2 +-
- qapi/qapi-util.c                     |  47 +++
- qapi/qobject-input-visitor.c         | 214 +++++++++++-
- qemu-options.hx                      |   7 +
- qobject/qjson.c                      |  14 +-
- tests/.gitignore                     |   2 +
- tests/Makefile.include               |  10 +-
- tests/check-qjson.c                  |  88 +++--
- tests/libqtest.c                     |   3 +-
- tests/test-keyval.c                  | 624 +++++++++++++++++++++++++++++++++++
- tests/test-qapi-util.c               |  85 +++++
- tests/test-qemu-opts.c               |   5 +
- tests/test-qobject-input-visitor.c   | 190 ++++++++++-
- tests/test-visitor-serialization.c   |   2 +-
- util/Makefile.objs                   |   1 +
- util/keyval.c                        | 394 ++++++++++++++++++++++
- vl.c                                 |  39 +++
- 23 files changed, 1746 insertions(+), 82 deletions(-)
- create mode 100644 tests/test-keyval.c
- create mode 100644 tests/test-qapi-util.c
- create mode 100644 util/keyval.c
-
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index 1a484d5..b9acd86 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -167,9 +167,18 @@ static const char *qobject_input_get_keyval(QObjectInputVisitor *qiv,
+ 
+     qstr = qobject_to_qstring(qobj);
+     if (!qstr) {
+-        error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
+-                   full_name(qiv, name), "string");
+-        return NULL;
++        switch (qobject_type(qobj)) {
++        case QTYPE_QDICT:
++        case QTYPE_QLIST:
++            error_setg(errp, "Parameters '%s.*' are unexpected",
++                       full_name(qiv, name));
++            return NULL;
++        default:
++            /* Non-string scalar (should this be an assertion?) */
++            error_setg(errp, "Internal error: parameter %s invalid",
++                       full_name(qiv, name));
++            return NULL;
++        }
+     }
+ 
+     return qstring_get_str(qstr);
+@@ -479,6 +488,15 @@ static void qobject_input_type_str(Visitor *v, const char *name, char **obj,
+     *obj = g_strdup(qstring_get_str(qstr));
+ }
+ 
++static void qobject_input_type_str_keyval(Visitor *v, const char *name,
++                                          char **obj, Error **errp)
++{
++    QObjectInputVisitor *qiv = to_qiv(v);
++    const char *str = qobject_input_get_keyval(qiv, name, errp);
++
++    *obj = g_strdup(str);
++}
++
+ static void qobject_input_type_number(Visitor *v, const char *name, double *obj,
+                                       Error **errp)
+ {
+@@ -650,7 +668,7 @@ Visitor *qobject_input_visitor_new_keyval(QObject *obj)
+     v->visitor.type_int64 = qobject_input_type_int64_keyval;
+     v->visitor.type_uint64 = qobject_input_type_uint64_keyval;
+     v->visitor.type_bool = qobject_input_type_bool_keyval;
+-    v->visitor.type_str = qobject_input_type_str;
++    v->visitor.type_str = qobject_input_type_str_keyval;
+     v->visitor.type_number = qobject_input_type_number_keyval;
+     v->visitor.type_any = qobject_input_type_any;
+     v->visitor.type_null = qobject_input_type_null;
 -- 
 2.7.4
