@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41651)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1clL4c-0007Gy-If
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 14:47:07 -0500
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1clLUw-0002Nu-1J
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 15:14:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1clL4X-0001vh-KC
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 14:47:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49782)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1clL4X-0001vZ-E2
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 14:47:01 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 553E5C04B943
-	for <qemu-devel@nongnu.org>; Tue,  7 Mar 2017 19:47:01 +0000 (UTC)
-Date: Tue, 7 Mar 2017 19:46:56 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170307194617.GJ2869@work-vm>
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1clLUr-0002ss-0H
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 15:14:17 -0500
+Received: from mail-db5eur01on0100.outbound.protection.outlook.com
+	([104.47.2.100]:43850
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbutsykin@virtuozzo.com>)
+	id 1clLUq-0002sQ-Ek
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 15:14:12 -0500
+References: <20170203152321.19739-1-pbutsykin@virtuozzo.com>
+	<20170214140249.GJ2463@work-vm> <58B92BD6.2030404@virtuozzo.com>
+	<20170307135625.GF2869@work-vm>
+From: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Message-ID: <58BEC6CC.5090905@virtuozzo.com>
+Date: Tue, 7 Mar 2017 17:42:20 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] RAMBlock's named ""
+In-Reply-To: <20170307135625.GF2869@work-vm>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] migration capability to discard the
+ migrated ram pages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +32,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: quintela@redhat.com, marcel@redhat.com, pbonzini@redhat.com, imammedo@redhat.com, lvivier@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com
 
-We seem to have a couple of weird cases where we end up with
-RAMBlocks with no name;  I think they'll badly confuse
-the migration code, but I don't quite understand how they're
-happening.
+On 07.03.2017 16:56, Dr. David Alan Gilbert wrote:
+> * Pavel Butsykin (pbutsykin@virtuozzo.com) wrote:
+>> On 14.02.2017 17:02, Dr. David Alan Gilbert wrote:
+>>> Hi Pavel,
+>>>     I was curious, having merged this, how you're using postcopy; do you switch
+>>> into postcopy mode immediately or wait until the first sync or what?
+>>> Do you find yourself in postcopy mode long enough that it's worth
+>>> doing the release?  If so on what size VMs are you working with?
+>>>
+>>> Dave
+>>
+>> Hi Dave,
+>> I'm sorry it took so long, I was on vacation. And thanks for the quick
+>> review and merge!
+>>
+>> We want to use this function to update Qemu without rebooting VMs. It
+>> looks like a local migration on the same host. Now, switching into
+>> postcopy mode is done immediately, the size of VMs can be very
+>> different.
+>
+> Thanks! Do you have libvirt magic to do that update?
 
-1) device_del e1000e
-2) -object memory-backend-file  without wiring it up
+Yes, there are patches that add a flag "--local" for migration. The
+flag adds start incoming VM and other magic about replacement source on
+destination.
 
-I added some debug into migration/ram.c ram_save_setup to
-dump the names it was seeing in it's FOREACH.
-
-1)
-  (from https://bugzilla.redhat.com/show_bug.cgi?id=1425273)
-  The simplest reproducer of this is:
-
-./qemu-system-x86_64 -nographic  -device e1000e,id=foo -m 1G -M pc,accel=kvm my.img
-
-  with a Linux image and after it's booted do a device_del foo
-
-  migration at that point sees an empty RAMBlock that was the ROM
-  associated with the device.  This doesn't happen on an e1000 device,
-  so I've not figured out what the difference is.
-
-  This gives a : Unknown ramblock "", cannot accept migration
-  on the destination (correctly).
-
-  (This happens on 2.7.0 as well, so it's nothing new)
-
-2)
-  ./qemu-system-x86_64 -nographic -object memory-backend-file,id=mem,size=512M,mem-path=/tmp
-
-  Note I've not wired that memory to a NUMA node or a DIMM or anything, so
-  it's just hanging around.
-  Again that RAMBlock does exist and shows up in the migration code,
-  I think it'll try and migrate it.
-
-The real fun is that there doesn't seem to be anything that stops
-two blocks having the same name!
-
-Dave
-
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Dave
+>
+>>> * Pavel Butsykin (pbutsykin@virtuozzo.com) wrote:
+>>>> This feature frees the migrated memory on the source during postcopy-ram
+>>>> migration. In the second step of postcopy-ram migration when the source vm
+>>>> is put on pause we can free unnecessary memory. It will allow, in particular,
+>>>> to start relaxing the memory stress on the source host in a load-balancing
+>>>> scenario.
+>>>>
+>>>> Changes from v1:
+>>>> - changed name of the interfaces (discard to release)
+>>>> - fix make check error
+>>>> - add more comments to qemu_iovec_release_ram()
+>>>> - rebase on "Postcopy: Hugepage support" (David's patch series)
+>>>> - removed ram_discard_page for xbzrle
+>>>> - fix erroneous release memory in complete precopy (tie release-ram to postcopy)
+>>>>
+>>>> Pavel Butsykin (3):
+>>>>     migration: add MigrationState arg for ram_save_/compressed_/page()
+>>>>     add 'release-ram' migrate capability
+>>>>     migration: discard non-dirty ram pages after the start of postcopy
+>>>>
+>>>>    include/migration/migration.h |  2 ++
+>>>>    include/migration/qemu-file.h |  3 ++-
+>>>>    migration/migration.c         | 13 ++++++++++
+>>>>    migration/qemu-file.c         | 59 ++++++++++++++++++++++++++++++++++++++-----
+>>>>    migration/ram.c               | 56 ++++++++++++++++++++++++++++++++++------
+>>>>    qapi-schema.json              |  5 +++-
+>>>>    6 files changed, 121 insertions(+), 17 deletions(-)
+>>>>
+>>>> --
+>>>> 2.11.0
+>>>>
+>>>>
+>>> --
+>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
