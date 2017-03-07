@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1clH9B-0007aj-GE
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:35:34 -0500
+	(envelope-from <no-reply@patchew.org>) id 1clHDV-0001Kh-2w
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:40:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1clH97-0000OA-IY
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:35:33 -0500
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:33515)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1clH97-0000Nr-Bw
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:35:29 -0500
-Received: by mail-wm0-x22e.google.com with SMTP id v203so10963299wmg.0
-	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 07:35:29 -0800 (PST)
-References: <1488896348-13560-1-git-send-email-borntraeger@de.ibm.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1488896348-13560-1-git-send-email-borntraeger@de.ibm.com>
-Date: Tue, 07 Mar 2017 15:35:36 +0000
-Message-ID: <878tohhzg7.fsf@linaro.org>
+	(envelope-from <no-reply@patchew.org>) id 1clHDR-0001yi-6E
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:40:01 -0500
+Resent-Message-Id: <E1clHDR-0001yi-6E@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21495)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1clHDQ-0001yM-VW
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:39:57 -0500
+In-Reply-To: <1488900045-26344-1-git-send-email-armbru@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148890118381.294.16280797336369394485@0e2666bad730>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH/RFC] exec: add cpu_synchronize_state to
- cpu_memory_rw_debug
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 7 Mar 2017 07:39:44 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL v4 00/24] block: Command line option
+ -blockdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +29,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: armbru@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-
-Christian Borntraeger <borntraeger@de.ibm.com> writes:
-
-> I sometimes got "Cannot access memory" when using the x command
-> on the monitor. Turns out that the cpu env did contain stale data
-> (e.g. wrong control register content for page table origin).
-> We must synchronize the state of the CPU before walking the page
-> tables. A similar issues happens for a remote gdb, so lets
-> do the cpu_synchronize_state in cpu_memory_rw_debug.
->
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  exec.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/exec.c b/exec.c
-> index aabb035..e754a03 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -43,6 +43,7 @@
->  #include "exec/ioport.h"
->  #include "sysemu/dma.h"
->  #include "sysemu/numa.h"
-> +#include "sysemu/hw_accel.h"
->  #include "exec/address-spaces.h"
->  #include "sysemu/xen-mapcache.h"
->  #include "trace-root.h"
-> @@ -3309,6 +3310,7 @@ int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
->      hwaddr phys_addr;
->      target_ulong page;
->
-> +    cpu_synchronize_state(cpu);
->      while (len > 0) {
->          int asidx;
->          MemTxAttrs attrs;
-
-This seems like the wrong place to put it. Would we end up doing a
-potentially expensive sync operations for every byte/word we dump out?
-
-Certainly when I was messing around with ARM KVM debug I did the
-synchronise state as we entered the debug handling (e.g.
-gdb_handle_packet/memory_dump)?
-
---
-Alex Bennée
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ4
+ODkwMDA0NS0yNjM0NC0xLWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tClN1YmplY3Q6
+IFtRZW11LWRldmVsXSBbUFVMTCB2NCAwMC8yNF0gYmxvY2s6IENvbW1hbmQgbGluZSBvcHRpb24g
+LWJsb2NrZGV2ClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
+YmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3
+YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpj
+b21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBp
+biAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQg
+bG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1h
+dD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAg
+ICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhp
+dCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
+ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNo
+ZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTQ4ODkwMDA0NS0y
+NjM0NC0xLWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMTQ4ODkw
+MDA0NS0yNjM0NC0xLWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tClN3aXRjaGVkIHRv
+IGEgbmV3IGJyYW5jaCAndGVzdCcKYTc2MmYwYiBrZXl2YWw6IFN1cHBvcnQgbGlzdHMKZjllMTE5
+ZCBkb2NzL3FhcGktY29kZS1nZW4udHh0OiBDbGFyaWZ5IG5hbWluZyBydWxlcwoyN2QyZjRhIHFh
+cGk6IEltcHJvdmUgaG93IGtleXZhbCBpbnB1dCB2aXNpdG9yIHJlcG9ydHMgdW5leHBlY3RlZCBk
+aWN0cwpiMjU5YTMwIGJsb2NrOiBJbml0aWFsIGltcGxlbWVudGF0aW9uIG9mIC1ibG9ja2Rldgox
+NjkzNjlmIHFhcGk6IE5ldyBxb2JqZWN0X2lucHV0X3Zpc2l0b3JfbmV3X3N0cigpIGZvciBjb252
+ZW5pZW5jZQowNGJkNGY0IGtleXZhbDogUmVzdHJpY3Qga2V5IGNvbXBvbmVudHMgdG8gdmFsaWQg
+UUFQSSBuYW1lcwo1YzNhMGIzIHFhcGk6IE5ldyBwYXJzZV9xYXBpX25hbWUoKQpmZTUyY2U2IHRl
+c3QtcWFwaS11dGlsOiBOZXcsIGNvdmVyaW5nIHFhcGkvcWFwaS11dGlsLmMKYzQzNzIwMCBtb25p
+dG9yOiBBc3NlcnQgcW1wX3NjaGVtYV9qc29uW10gaXMgc2FuZQplNzc3OWFmIHRlc3QtdmlzaXRv
+ci1zZXJpYWxpemF0aW9uOiBQYXNzICZlcnJvcl9hYm9ydCB0byBxb2JqZWN0X2Zyb21fanNvbigp
+CmM3ZDcwZWQgY2hlY2stcWpzb246IFRlc3QgZXJyb3JzIGZyb20gcW9iamVjdF9mcm9tX2pzb24o
+KQplN2Q0MmMyIGJsb2NrOiBNb3JlIGRldGFpbGVkIHN5bnRheCBlcnJvciByZXBvcnRpbmcgZm9y
+IEpTT04gZmlsZW5hbWVzCjAyNTY5MjMgcW9iamVjdDogUHJvcGFnYXRlIHBhcnNlIGVycm9ycyB0
+aHJvdWdoIHFvYmplY3RfZnJvbV9qc29uKCkKNTQ5NWFkMiB0ZXN0LXFvYmplY3QtaW5wdXQtdmlz
+aXRvcjogQWJvcnQgZWFybGllciBvbiBiYWQgdGVzdCBpbnB1dAo1ZDRlMjBkIHFqc29uOiBBYm9y
+dCBlYXJsaWVyIG9uIHFvYmplY3RfZnJvbV9qc29uZigpIG1pc3VzZQpiNTljMWI2IGxpYnF0ZXN0
+OiBGaXggcW1wKCkgJiBmcmllbmRzIHRvIGFib3J0IG9uIEpTT04gcGFyc2UgZXJyb3JzCjNlZGNi
+YjYgcW9iamVjdDogUHJvcGFnYXRlIHBhcnNlIGVycm9ycyB0aHJvdWdoIHFvYmplY3RfZnJvbV9q
+c29udigpCmQ3Y2ZlODMgcWFwaTogRmFjdG9yIG91dCBjb21tb24gcW9iamVjdF9pbnB1dF9nZXRf
+a2V5dmFsKCkKYTdiOGUxOSBxYXBpOiBGYWN0b3Igb3V0IGNvbW1vbiBwYXJ0IG9mIHFvYmplY3Qg
+aW5wdXQgdmlzaXRvciBjcmVhdGlvbgo4YjU1YTNmIHRlc3Qta2V5dmFsOiBDb3ZlciB1c2Ugd2l0
+aCBxb2JqZWN0IGlucHV0IHZpc2l0b3IKYmQyMTE5MCBxYXBpOiBxb2JqZWN0IGlucHV0IHZpc2l0
+b3IgdmFyaWFudCBmb3IgdXNlIHdpdGgga2V5dmFsX3BhcnNlKCkKZjRhMDA3ZiBrZXl2YWw6IE5l
+dyBrZXl2YWxfcGFyc2UoKQowZjNhNTg1IHRlc3RzOiBGaXggZ2Nvdi1maWxlcy10ZXN0LXFlbXUt
+b3B0cy15LCBnY292LWZpbGVzLXRlc3QtbG9nZ2luZy15CjFiY2Y3YTkgdGVzdC1xZW11LW9wdHM6
+IENvdmVyIHFlbXVfb3B0c19wYXJzZSgpIG9mICJubyIKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNo
+ZWNraW5nIFBBVENIIDEvMjQ6IHRlc3QtcWVtdS1vcHRzOiBDb3ZlciBxZW11X29wdHNfcGFyc2Uo
+KSBvZiAibm8iLi4uCkNoZWNraW5nIFBBVENIIDIvMjQ6IHRlc3RzOiBGaXggZ2Nvdi1maWxlcy10
+ZXN0LXFlbXUtb3B0cy15LCBnY292LWZpbGVzLXRlc3QtbG9nZ2luZy15Li4uCkNoZWNraW5nIFBB
+VENIIDMvMjQ6IGtleXZhbDogTmV3IGtleXZhbF9wYXJzZSgpLi4uCkVSUk9SOiBzdXNwZWN0IGNv
+ZGUgaW5kZW50IGZvciBjb25kaXRpb25hbCBzdGF0ZW1lbnRzICg4LCA4KQojNDM4OiBGSUxFOiB1
+dGlsL2tleXZhbC5jOjE0MDoKKyAgICAgICAgZm9yIChsZW4gPSAwOyBzICsgbGVuIDwga2V5X2Vu
+ZCAmJiBzW2xlbl0gIT0gJy4nOyBsZW4rKykgeworICAgICAgICB9Cgp0b3RhbDogMSBlcnJvcnMs
+IDAgd2FybmluZ3MsIDQ0NyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9i
+bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
+c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
+TUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA0LzI0OiBxYXBpOiBxb2JqZWN0IGlucHV0IHZp
+c2l0b3IgdmFyaWFudCBmb3IgdXNlIHdpdGgga2V5dmFsX3BhcnNlKCkuLi4KQ2hlY2tpbmcgUEFU
+Q0ggNS8yNDogdGVzdC1rZXl2YWw6IENvdmVyIHVzZSB3aXRoIHFvYmplY3QgaW5wdXQgdmlzaXRv
+ci4uLgpDaGVja2luZyBQQVRDSCA2LzI0OiBxYXBpOiBGYWN0b3Igb3V0IGNvbW1vbiBwYXJ0IG9m
+IHFvYmplY3QgaW5wdXQgdmlzaXRvciBjcmVhdGlvbi4uLgpDaGVja2luZyBQQVRDSCA3LzI0OiBx
+YXBpOiBGYWN0b3Igb3V0IGNvbW1vbiBxb2JqZWN0X2lucHV0X2dldF9rZXl2YWwoKS4uLgpDaGVj
+a2luZyBQQVRDSCA4LzI0OiBxb2JqZWN0OiBQcm9wYWdhdGUgcGFyc2UgZXJyb3JzIHRocm91Z2gg
+cW9iamVjdF9mcm9tX2pzb252KCkuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8yNDogbGlicXRlc3Q6IEZp
+eCBxbXAoKSAmIGZyaWVuZHMgdG8gYWJvcnQgb24gSlNPTiBwYXJzZSBlcnJvcnMuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMTAvMjQ6IHFqc29uOiBBYm9ydCBlYXJsaWVyIG9uIHFvYmplY3RfZnJvbV9qc29u
+ZigpIG1pc3VzZS4uLgpDaGVja2luZyBQQVRDSCAxMS8yNDogdGVzdC1xb2JqZWN0LWlucHV0LXZp
+c2l0b3I6IEFib3J0IGVhcmxpZXIgb24gYmFkIHRlc3QgaW5wdXQuLi4KQ2hlY2tpbmcgUEFUQ0gg
+MTIvMjQ6IHFvYmplY3Q6IFByb3BhZ2F0ZSBwYXJzZSBlcnJvcnMgdGhyb3VnaCBxb2JqZWN0X2Zy
+b21fanNvbigpLi4uCkNoZWNraW5nIFBBVENIIDEzLzI0OiBibG9jazogTW9yZSBkZXRhaWxlZCBz
+eW50YXggZXJyb3IgcmVwb3J0aW5nIGZvciBKU09OIGZpbGVuYW1lcy4uLgpDaGVja2luZyBQQVRD
+SCAxNC8yNDogY2hlY2stcWpzb246IFRlc3QgZXJyb3JzIGZyb20gcW9iamVjdF9mcm9tX2pzb24o
+KS4uLgpDaGVja2luZyBQQVRDSCAxNS8yNDogdGVzdC12aXNpdG9yLXNlcmlhbGl6YXRpb246IFBh
+c3MgJmVycm9yX2Fib3J0IHRvIHFvYmplY3RfZnJvbV9qc29uKCkuLi4KQ2hlY2tpbmcgUEFUQ0gg
+MTYvMjQ6IG1vbml0b3I6IEFzc2VydCBxbXBfc2NoZW1hX2pzb25bXSBpcyBzYW5lLi4uCkNoZWNr
+aW5nIFBBVENIIDE3LzI0OiB0ZXN0LXFhcGktdXRpbDogTmV3LCBjb3ZlcmluZyBxYXBpL3FhcGkt
+dXRpbC5jLi4uCkNoZWNraW5nIFBBVENIIDE4LzI0OiBxYXBpOiBOZXcgcGFyc2VfcWFwaV9uYW1l
+KCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMTkvMjQ6IGtleXZhbDogUmVzdHJpY3Qga2V5IGNvbXBvbmVu
+dHMgdG8gdmFsaWQgUUFQSSBuYW1lcy4uLgpDaGVja2luZyBQQVRDSCAyMC8yNDogcWFwaTogTmV3
+IHFvYmplY3RfaW5wdXRfdmlzaXRvcl9uZXdfc3RyKCkgZm9yIGNvbnZlbmllbmNlLi4uCkNoZWNr
+aW5nIFBBVENIIDIxLzI0OiBibG9jazogSW5pdGlhbCBpbXBsZW1lbnRhdGlvbiBvZiAtYmxvY2tk
+ZXYuLi4KQ2hlY2tpbmcgUEFUQ0ggMjIvMjQ6IHFhcGk6IEltcHJvdmUgaG93IGtleXZhbCBpbnB1
+dCB2aXNpdG9yIHJlcG9ydHMgdW5leHBlY3RlZCBkaWN0cy4uLgpDaGVja2luZyBQQVRDSCAyMy8y
+NDogZG9jcy9xYXBpLWNvZGUtZ2VuLnR4dDogQ2xhcmlmeSBuYW1pbmcgcnVsZXMuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMjQvMjQ6IGtleXZhbDogU3VwcG9ydCBsaXN0cy4uLgpFUlJPUjogc3BhY2VzIHJl
+cXVpcmVkIGFyb3VuZCB0aGF0ICctJyAoY3R4OlZ4VikKIzQ0NDogRklMRTogdXRpbC9rZXl2YWwu
+YzozNDU6CisgICAgYXNzZXJ0KCFlbHRbbmVsdC0xXSk7ICAgICAgIC8qIG5lZWQgdGhlIHNlbnRp
+bmVsIHRvIGJlIG51bGwgKi8KICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3Jz
+LCAwIHdhcm5pbmdzLCA0MjAgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJv
+YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
+b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
+IE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdp
+dGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3
+IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRj
+aGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
