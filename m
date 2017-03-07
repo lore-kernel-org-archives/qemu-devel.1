@@ -1,20 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1clHF0-0002Vf-Vs
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:41:36 -0500
+	(envelope-from <kwolf@redhat.com>) id 1clHF1-0002WG-Hv
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:41:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1clHEz-0002u2-Ea
+	(envelope-from <kwolf@redhat.com>) id 1clHEz-0002uB-GR
 	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 10:41:35 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue,  7 Mar 2017 16:40:41 +0100
-Message-Id: <1488901251-16214-18-git-send-email-kwolf@redhat.com>
+Date: Tue,  7 Mar 2017 16:40:43 +0100
+Message-Id: <1488901251-16214-20-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1488901251-16214-1-git-send-email-kwolf@redhat.com>
 References: <1488901251-16214-1-git-send-email-kwolf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 17/27] sheepdog: Report errors in
- pseudo-filename more usefully
+Subject: [Qemu-devel] [PULL 19/27] sheepdog: Implement bdrv_parse_filename()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,245 +24,436 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Markus Armbruster <armbru@redhat.com>
 
-Errors in the pseudo-filename are all reported with the same laconic
-"Can't parse filename" message.
+This permits configuration with driver-specific options in addition to
+pseudo-filename parsed as URI.  For instance,
 
-Add real error reporting, such as:
+    --drive driver=sheepdog,host=fido,vdi=dolly
 
-    $ qemu-system-x86_64 --drive driver=3Dsheepdog,filename=3Dsheepdog://=
-/
-    qemu-system-x86_64: --drive driver=3Dsheepdog,filename=3Dsheepdog:///=
-: missing file path in URI
-    $ qemu-system-x86_64 --drive driver=3Dsheepdog,filename=3Dsheepgod://=
-/vdi
-    qemu-system-x86_64: --drive driver=3Dsheepdog,filename=3Dsheepgod:///=
-vdi: URI scheme must be 'sheepdog', 'sheepdog+tcp', or 'sheepdog+unix'
-    $ qemu-system-x86_64 --drive driver=3Dsheepdog,filename=3Dsheepdog+un=
-ix:///vdi?socke=3Dsheepdog.sock
-    qemu-system-x86_64: --drive driver=3Dsheepdog,filename=3Dsheepdog+uni=
-x:///vdi?socke=3Dsheepdog.sock: unexpected query parameters
+instead of
 
-The code to translate legacy syntax to URI fails to escape URI
-meta-characters.  The new error messages are misleading then.  Replace
-them by the old "Can't parse filename" message.  "Internal error"
-would be more honest.  Anyway, no worse than before.  Also add a FIXME
-comment.
+    --drive driver=sheepdog,file=sheepdog://fido/dolly
+
+It's also a first step towards supporting blockdev-add.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/sheepdog.c | 88 +++++++++++++++++++++++++++++++++++++-------------=
-------
- 1 file changed, 59 insertions(+), 29 deletions(-)
+ block/sheepdog.c | 230 +++++++++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 174 insertions(+), 56 deletions(-)
 
 diff --git a/block/sheepdog.c b/block/sheepdog.c
-index fed7264..161932d 100644
+index 9b1e121..89e98ed 100644
 --- a/block/sheepdog.c
 +++ b/block/sheepdog.c
-@@ -957,16 +957,18 @@ static bool sd_parse_snapid_or_tag(const char *str,
+@@ -14,6 +14,8 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
++#include "qapi/qmp/qdict.h"
++#include "qapi/qmp/qint.h"
+ #include "qemu/uri.h"
+ #include "qemu/error-report.h"
+ #include "qemu/sockets.h"
+@@ -526,6 +528,25 @@ static void sd_aio_setup(SheepdogAIOCB *acb, BDRVSheepdogState *s,
+     QLIST_INSERT_HEAD(&s->inflight_aiocb_head, acb, aiocb_siblings);
+ }
+ 
++static SocketAddress *sd_socket_address(const char *path,
++                                        const char *host, const char *port)
++{
++    SocketAddress *addr = g_new0(SocketAddress, 1);
++
++    if (path) {
++        addr->type = SOCKET_ADDRESS_KIND_UNIX;
++        addr->u.q_unix.data = g_new0(UnixSocketAddress, 1);
++        addr->u.q_unix.data->path = g_strdup(path);
++    } else {
++        addr->type = SOCKET_ADDRESS_KIND_INET;
++        addr->u.inet.data = g_new0(InetSocketAddress, 1);
++        addr->u.inet.data->host = g_strdup(host ?: SD_DEFAULT_ADDR);
++        addr->u.inet.data->port = g_strdup(port ?: stringify(SD_DEFAULT_PORT));
++    }
++
++    return addr;
++}
++
+ /* Return -EIO in case of error, file descriptor on success */
+ static int connect_to_sdog(BDRVSheepdogState *s, Error **errp)
+ {
+@@ -951,17 +972,37 @@ static bool sd_parse_snapid_or_tag(const char *str,
      return true;
  }
-=20
--static int sd_parse_uri(BDRVSheepdogState *s, const char *filename,
--                        char *vdi, uint32_t *snapid, char *tag)
-+static void sd_parse_uri(BDRVSheepdogState *s, const char *filename,
-+                         char *vdi, uint32_t *snapid, char *tag,
-+                         Error **errp)
+ 
+-static void sd_parse_uri(BDRVSheepdogState *s, const char *filename,
+-                         char *vdi, uint32_t *snapid, char *tag,
++typedef struct {
++    const char *path;           /* non-null iff transport is tcp */
++    const char *host;           /* valid when transport is tcp */
++    int port;                   /* valid when transport is tcp */
++    char vdi[SD_MAX_VDI_LEN];
++    char tag[SD_MAX_VDI_TAG_LEN];
++    uint32_t snap_id;
++    /* Remainder is only for sd_config_done() */
++    URI *uri;
++    QueryParams *qp;
++} SheepdogConfig;
++
++static void sd_config_done(SheepdogConfig *cfg)
++{
++    if (cfg->qp) {
++        query_params_free(cfg->qp);
++    }
++    uri_free(cfg->uri);
++}
++
++static void sd_parse_uri(SheepdogConfig *cfg, const char *filename,
+                          Error **errp)
  {
-+    Error *err =3D NULL;
+     Error *err = NULL;
+     QueryParams *qp = NULL;
+-    SocketAddress *addr = NULL;
+     bool is_unix;
      URI *uri;
-     QueryParams *qp =3D NULL;
--    int ret =3D 0;
-=20
-     uri =3D uri_parse(filename);
+ 
+-    uri = uri_parse(filename);
++    memset(cfg, 0, sizeof(*cfg));
++
++    cfg->uri = uri = uri_parse(filename);
      if (!uri) {
--        return -EINVAL;
-+        error_setg(&err, "invalid URI");
-+        goto out;
-     }
-=20
-     /* transport */
-@@ -977,34 +979,46 @@ static int sd_parse_uri(BDRVSheepdogState *s, const=
- char *filename,
-     } else if (!strcmp(uri->scheme, "sheepdog+unix")) {
-         s->is_unix =3D true;
-     } else {
--        ret =3D -EINVAL;
-+        error_setg(&err, "URI scheme must be 'sheepdog', 'sheepdog+tcp',=
-"
-+                   " or 'sheepdog+unix'");
+         error_setg(&err, "invalid URI");
+         goto out;
+@@ -984,13 +1025,13 @@ static void sd_parse_uri(BDRVSheepdogState *s, const char *filename,
+         error_setg(&err, "missing file path in URI");
          goto out;
      }
-=20
-     if (uri->path =3D=3D NULL || !strcmp(uri->path, "/")) {
--        ret =3D -EINVAL;
-+        error_setg(&err, "missing file path in URI");
+-    if (g_strlcpy(vdi, uri->path + 1, SD_MAX_VDI_LEN) >= SD_MAX_VDI_LEN) {
++    if (g_strlcpy(cfg->vdi, uri->path + 1, SD_MAX_VDI_LEN)
++        >= SD_MAX_VDI_LEN) {
+         error_setg(&err, "VDI name is too long");
          goto out;
      }
-     if (g_strlcpy(vdi, uri->path + 1, SD_MAX_VDI_LEN) >=3D SD_MAX_VDI_LE=
-N) {
--        ret =3D -EINVAL;
-+        error_setg(&err, "VDI name is too long");
-         goto out;
-     }
-=20
-     qp =3D query_params_parse(uri->query);
--    if (qp->n > 1 || (s->is_unix && !qp->n) || (!s->is_unix && qp->n)) {
--        ret =3D -EINVAL;
--        goto out;
--    }
-=20
-     if (s->is_unix) {
-         /* sheepdog+unix:///vdiname?socket=3Dpath */
--        if (uri->server || uri->port || strcmp(qp->p[0].name, "socket"))=
- {
--            ret =3D -EINVAL;
-+        if (uri->server || uri->port) {
-+            error_setg(&err, "URI scheme %s doesn't accept a server addr=
-ess",
-+                       uri->scheme);
-+            goto out;
-+        }
-+        if (!qp->n) {
-+            error_setg(&err,
-+                       "URI scheme %s requires query parameter 'socket'"=
-,
-+                       uri->scheme);
-+            goto out;
-+        }
-+        if (qp->n !=3D 1 || strcmp(qp->p[0].name, "socket")) {
-+            error_setg(&err, "unexpected query parameters");
+ 
+-    qp = query_params_parse(uri->query);
+-    addr = g_new0(SocketAddress, 1);
++    cfg->qp = qp = query_params_parse(uri->query);
+ 
+     if (is_unix) {
+         /* sheepdog+unix:///vdiname?socket=path */
+@@ -1009,44 +1050,34 @@ static void sd_parse_uri(BDRVSheepdogState *s, const char *filename,
+             error_setg(&err, "unexpected query parameters");
              goto out;
          }
-         s->host_spec =3D g_strdup(qp->p[0].value);
+-        addr->type = SOCKET_ADDRESS_KIND_UNIX;
+-        addr->u.q_unix.data = g_new0(UnixSocketAddress, 1);
+-        addr->u.q_unix.data->path = g_strdup(qp->p[0].value);
++        cfg->path = qp->p[0].value;
      } else {
          /* sheepdog[+tcp]://[host:port]/vdiname */
-+        if (qp->n) {
-+            error_setg(&err, "unexpected query parameters");
-+            goto out;
-+        }
-         s->host_spec =3D g_strdup_printf("%s:%d", uri->server ?: SD_DEFA=
-ULT_ADDR,
-                                        uri->port ?: SD_DEFAULT_PORT);
+         if (qp->n) {
+             error_setg(&err, "unexpected query parameters");
+             goto out;
+         }
+-        addr->type = SOCKET_ADDRESS_KIND_INET;
+-        addr->u.inet.data = g_new0(InetSocketAddress, 1);
+-        addr->u.inet.data->host = g_strdup(uri->server ?: SD_DEFAULT_ADDR);
+-        addr->u.inet.data->port = g_strdup_printf("%d",
+-                                        uri->port ?: SD_DEFAULT_PORT);
++        cfg->host = uri->server;
++        cfg->port = uri->port;
      }
-@@ -1012,7 +1026,8 @@ static int sd_parse_uri(BDRVSheepdogState *s, const=
- char *filename,
+ 
      /* snapshot tag */
      if (uri->fragment) {
-         if (!sd_parse_snapid_or_tag(uri->fragment, snapid, tag)) {
--            ret =3D -EINVAL;
-+            error_setg(&err, "'%s' is not a valid snapshot ID",
-+                       uri->fragment);
+-        if (!sd_parse_snapid_or_tag(uri->fragment, snapid, tag)) {
++        if (!sd_parse_snapid_or_tag(uri->fragment,
++                                    &cfg->snap_id, cfg->tag)) {
+             error_setg(&err, "'%s' is not a valid snapshot ID",
+                        uri->fragment);
              goto out;
          }
      } else {
-@@ -1020,11 +1035,11 @@ static int sd_parse_uri(BDRVSheepdogState *s, con=
-st char *filename,
+-        *snapid = CURRENT_VDI_ID; /* search current vdi */
++        cfg->snap_id = CURRENT_VDI_ID; /* search current vdi */
      }
-=20
+ 
  out:
-+    error_propagate(errp, err);
-     if (qp) {
-         query_params_free(qp);
+     if (err) {
+         error_propagate(errp, err);
+-        qapi_free_SocketAddress(addr);
+-    } else {
+-        s->addr = addr;
+-    }
+-    if (qp) {
+-        query_params_free(qp);
++        sd_config_done(cfg);
      }
-     uri_free(uri);
--    return ret;
+-    uri_free(uri);
  }
-=20
+ 
  /*
-@@ -1044,12 +1059,14 @@ out:
+@@ -1066,8 +1097,7 @@ out:
   * You can run VMs outside the Sheepdog cluster by specifying
   * `hostname' and `port' (experimental).
   */
--static int parse_vdiname(BDRVSheepdogState *s, const char *filename,
--                         char *vdi, uint32_t *snapid, char *tag)
-+static void parse_vdiname(BDRVSheepdogState *s, const char *filename,
-+                          char *vdi, uint32_t *snapid, char *tag,
-+                          Error **errp)
+-static void parse_vdiname(BDRVSheepdogState *s, const char *filename,
+-                          char *vdi, uint32_t *snapid, char *tag,
++static void parse_vdiname(SheepdogConfig *cfg, const char *filename,
+                           Error **errp)
  {
-+    Error *err =3D NULL;
-     char *p, *q, *uri;
-     const char *host_spec, *vdi_spec;
--    int nr_sep, ret;
-+    int nr_sep;
-=20
-     strstart(filename, "sheepdog:", &filename);
-     p =3D q =3D g_strdup(filename);
-@@ -1084,12 +1101,23 @@ static int parse_vdiname(BDRVSheepdogState *s, co=
-nst char *filename,
-=20
-     uri =3D g_strdup_printf("sheepdog://%s/%s", host_spec, vdi_spec);
-=20
--    ret =3D sd_parse_uri(s, uri, vdi, snapid, tag);
-+    /*
-+     * FIXME We to escape URI meta-characters, e.g. "x?y=3Dz"
-+     * produces "sheepdog://x?y=3Dz".  Because of that ...
-+     */
-+    sd_parse_uri(s, uri, vdi, snapid, tag, &err);
-+    if (err) {
-+        /*
-+         * ... this can fail, but the error message is misleading.
-+         * Replace it by the traditional useless one until the
-+         * escaping is fixed.
-+         */
-+        error_free(err);
-+        error_setg(errp, "Can't parse filename");
-+    }
-=20
-     g_free(q);
+     Error *err = NULL;
+@@ -1112,7 +1142,7 @@ static void parse_vdiname(BDRVSheepdogState *s, const char *filename,
+      * FIXME We to escape URI meta-characters, e.g. "x?y=z"
+      * produces "sheepdog://x?y=z".  Because of that ...
+      */
+-    sd_parse_uri(s, uri, vdi, snapid, tag, &err);
++    sd_parse_uri(cfg, uri, &err);
+     if (err) {
+         /*
+          * ... this can fail, but the error message is misleading.
+@@ -1127,6 +1157,43 @@ static void parse_vdiname(BDRVSheepdogState *s, const char *filename,
      g_free(uri);
--
--    return ret;
  }
-=20
- static int find_vdi_name(BDRVSheepdogState *s, const char *filename,
-@@ -1452,12 +1480,13 @@ static int sd_open(BlockDriverState *bs, QDict *o=
-ptions, int flags,
-     memset(tag, 0, sizeof(tag));
-=20
-     if (strstr(filename, "://")) {
--        ret =3D sd_parse_uri(s, filename, vdi, &snapid, tag);
-+        sd_parse_uri(s, filename, vdi, &snapid, tag, &local_err);
-     } else {
--        ret =3D parse_vdiname(s, filename, vdi, &snapid, tag);
-+        parse_vdiname(s, filename, vdi, &snapid, tag, &local_err);
-     }
--    if (ret < 0) {
--        error_setg(errp, "Can't parse filename");
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        ret =3D -EINVAL;
-         goto err_no_fd;
-     }
-     s->fd =3D get_sheep_fd(s, errp);
-@@ -1785,6 +1814,7 @@ static int parse_block_size_shift(BDRVSheepdogState=
- *s, QemuOpts *opt)
- static int sd_create(const char *filename, QemuOpts *opts,
-                      Error **errp)
- {
-+    Error *err =3D NULL;
-     int ret =3D 0;
-     uint32_t vid =3D 0;
-     char *backing_file =3D NULL;
-@@ -1799,12 +1829,12 @@ static int sd_create(const char *filename, QemuOp=
-ts *opts,
-=20
-     memset(tag, 0, sizeof(tag));
-     if (strstr(filename, "://")) {
--        ret =3D sd_parse_uri(s, filename, s->name, &snapid, tag);
-+        sd_parse_uri(s, filename, s->name, &snapid, tag, &err);
-     } else {
--        ret =3D parse_vdiname(s, filename, s->name, &snapid, tag);
-+        parse_vdiname(s, filename, s->name, &snapid, tag, &err);
-     }
--    if (ret < 0) {
--        error_setg(errp, "Can't parse filename");
+ 
++static void sd_parse_filename(const char *filename, QDict *options,
++                              Error **errp)
++{
++    Error *err = NULL;
++    SheepdogConfig cfg;
++    char buf[32];
++
++    if (strstr(filename, "://")) {
++        sd_parse_uri(&cfg, filename, &err);
++    } else {
++        parse_vdiname(&cfg, filename, &err);
++    }
 +    if (err) {
 +        error_propagate(errp, err);
++        return;
++    }
++
++    if (cfg.host) {
++        qdict_set_default_str(options, "host", cfg.host);
++    }
++    if (cfg.port) {
++        snprintf(buf, sizeof(buf), "%d", cfg.port);
++        qdict_set_default_str(options, "port", buf);
++    }
++    if (cfg.path) {
++        qdict_set_default_str(options, "path", cfg.path);
++    }
++    qdict_set_default_str(options, "vdi", cfg.vdi);
++    qdict_set_default_str(options, "tag", cfg.tag);
++    if (cfg.snap_id) {
++        snprintf(buf, sizeof(buf), "%d", cfg.snap_id);
++        qdict_set_default_str(options, "snap-id", buf);
++    }
++
++    sd_config_done(&cfg);
++}
++
+ static int find_vdi_name(BDRVSheepdogState *s, const char *filename,
+                          uint32_t snapid, const char *tag, uint32_t *vid,
+                          bool lock, Error **errp)
+@@ -1438,15 +1505,33 @@ static void sd_attach_aio_context(BlockDriverState *bs,
+                        co_read_response, NULL, NULL, s);
+ }
+ 
+-/* TODO Convert to fine grained options */
+ static QemuOptsList runtime_opts = {
+     .name = "sheepdog",
+     .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
+     .desc = {
+         {
+-            .name = "filename",
++            .name = "host",
++            .type = QEMU_OPT_STRING,
++        },
++        {
++            .name = "port",
++            .type = QEMU_OPT_STRING,
++        },
++        {
++            .name = "path",
++            .type = QEMU_OPT_STRING,
++        },
++        {
++            .name = "vdi",
++            .type = QEMU_OPT_STRING,
++        },
++        {
++            .name = "snap-id",
++            .type = QEMU_OPT_NUMBER,
++        },
++        {
++            .name = "tag",
+             .type = QEMU_OPT_STRING,
+-            .help = "URL to the sheepdog image",
+         },
+         { /* end of list */ }
+     },
+@@ -1458,12 +1543,11 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
+     int ret, fd;
+     uint32_t vid = 0;
+     BDRVSheepdogState *s = bs->opaque;
+-    char vdi[SD_MAX_VDI_LEN], tag[SD_MAX_VDI_TAG_LEN];
+-    uint32_t snapid;
++    const char *host, *port, *path, *vdi, *snap_id_str, *tag;
++    uint64_t snap_id;
+     char *buf = NULL;
+     QemuOpts *opts;
+     Error *local_err = NULL;
+-    const char *filename;
+ 
+     s->bs = bs;
+     s->aio_context = bdrv_get_aio_context(bs);
+@@ -1476,33 +1560,63 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
+         goto err_no_fd;
+     }
+ 
+-    filename = qemu_opt_get(opts, "filename");
++    host = qemu_opt_get(opts, "host");
++    port = qemu_opt_get(opts, "port");
++    path = qemu_opt_get(opts, "path");
++    vdi = qemu_opt_get(opts, "vdi");
++    snap_id_str = qemu_opt_get(opts, "snap-id");
++    snap_id = qemu_opt_get_number(opts, "snap-id", CURRENT_VDI_ID);
++    tag = qemu_opt_get(opts, "tag");
+ 
+-    QLIST_INIT(&s->inflight_aio_head);
+-    QLIST_INIT(&s->failed_aio_head);
+-    QLIST_INIT(&s->inflight_aiocb_head);
+-    s->fd = -1;
++    if ((host || port) && path) {
++        error_setg(errp, "can't use 'path' together with 'host' or 'port'");
++        ret = -EINVAL;
++        goto err_no_fd;
++    }
++
++    if (!vdi) {
++        error_setg(errp, "parameter 'vdi' is missing");
++        ret = -EINVAL;
++        goto err_no_fd;
++    }
++    if (strlen(vdi) >= SD_MAX_VDI_LEN) {
++        error_setg(errp, "value of parameter 'vdi' is too long");
++        ret = -EINVAL;
++        goto err_no_fd;
++    }
+ 
+-    memset(vdi, 0, sizeof(vdi));
+-    memset(tag, 0, sizeof(tag));
++    if (snap_id > UINT32_MAX) {
++        snap_id = 0;
++    }
++    if (snap_id_str && !snap_id) {
++        error_setg(errp, "'snap-id=%s' is not a valid snapshot ID",
++                   snap_id_str);
++        ret = -EINVAL;
++        goto err_no_fd;
++    }
+ 
+-    if (strstr(filename, "://")) {
+-        sd_parse_uri(s, filename, vdi, &snapid, tag, &local_err);
+-    } else {
+-        parse_vdiname(s, filename, vdi, &snapid, tag, &local_err);
++    if (!tag) {
++        tag = "";
+     }
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    if (tag && strlen(tag) >= SD_MAX_VDI_TAG_LEN) {
++        error_setg(errp, "value of parameter 'tag' is too long");
+         ret = -EINVAL;
+         goto err_no_fd;
+     }
++
++    s->addr = sd_socket_address(path, host, port);
++
++    QLIST_INIT(&s->inflight_aio_head);
++    QLIST_INIT(&s->failed_aio_head);
++    QLIST_INIT(&s->inflight_aiocb_head);
++
+     s->fd = get_sheep_fd(s, errp);
+     if (s->fd < 0) {
+         ret = s->fd;
+         goto err_no_fd;
+     }
+ 
+-    ret = find_vdi_name(s, vdi, snapid, tag, &vid, true, errp);
++    ret = find_vdi_name(s, vdi, (uint32_t)snap_id, tag, &vid, true, errp);
+     if (ret) {
+         goto err;
+     }
+@@ -1517,7 +1631,7 @@ static int sd_open(BlockDriverState *bs, QDict *options, int flags,
+     }
+     s->discard_supported = true;
+ 
+-    if (snapid || tag[0] != '\0') {
++    if (snap_id || tag[0]) {
+         DPRINTF("%" PRIx32 " snapshot inode was open.\n", vid);
+         s->is_snapshot = true;
+     }
+@@ -1827,24 +1941,28 @@ static int sd_create(const char *filename, QemuOpts *opts,
+     char *backing_file = NULL;
+     char *buf = NULL;
+     BDRVSheepdogState *s;
+-    char tag[SD_MAX_VDI_TAG_LEN];
+-    uint32_t snapid;
++    SheepdogConfig cfg;
+     uint64_t max_vdi_size;
+     bool prealloc = false;
+ 
+     s = g_new0(BDRVSheepdogState, 1);
+ 
+-    memset(tag, 0, sizeof(tag));
+     if (strstr(filename, "://")) {
+-        sd_parse_uri(s, filename, s->name, &snapid, tag, &err);
++        sd_parse_uri(&cfg, filename, &err);
+     } else {
+-        parse_vdiname(s, filename, s->name, &snapid, tag, &err);
++        parse_vdiname(&cfg, filename, &err);
+     }
+     if (err) {
+         error_propagate(errp, err);
          goto out;
      }
-=20
---=20
+ 
++    buf = cfg.port ? g_strdup_printf("%d", cfg.port) : NULL;
++    s->addr = sd_socket_address(cfg.path, cfg.host, buf);
++    g_free(buf);
++    strcpy(s->name, cfg.vdi);
++    sd_config_done(&cfg);
++
+     s->inode.vdi_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+                                  BDRV_SECTOR_SIZE);
+     backing_file = qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FILE);
+@@ -2921,7 +3039,7 @@ static BlockDriver bdrv_sheepdog = {
+     .format_name    = "sheepdog",
+     .protocol_name  = "sheepdog",
+     .instance_size  = sizeof(BDRVSheepdogState),
+-    .bdrv_needs_filename = true,
++    .bdrv_parse_filename    = sd_parse_filename,
+     .bdrv_file_open = sd_open,
+     .bdrv_reopen_prepare    = sd_reopen_prepare,
+     .bdrv_reopen_commit     = sd_reopen_commit,
+@@ -2957,7 +3075,7 @@ static BlockDriver bdrv_sheepdog_tcp = {
+     .format_name    = "sheepdog",
+     .protocol_name  = "sheepdog+tcp",
+     .instance_size  = sizeof(BDRVSheepdogState),
+-    .bdrv_needs_filename = true,
++    .bdrv_parse_filename    = sd_parse_filename,
+     .bdrv_file_open = sd_open,
+     .bdrv_reopen_prepare    = sd_reopen_prepare,
+     .bdrv_reopen_commit     = sd_reopen_commit,
+@@ -2993,7 +3111,7 @@ static BlockDriver bdrv_sheepdog_unix = {
+     .format_name    = "sheepdog",
+     .protocol_name  = "sheepdog+unix",
+     .instance_size  = sizeof(BDRVSheepdogState),
+-    .bdrv_needs_filename = true,
++    .bdrv_parse_filename    = sd_parse_filename,
+     .bdrv_file_open = sd_open,
+     .bdrv_reopen_prepare    = sd_reopen_prepare,
+     .bdrv_reopen_commit     = sd_reopen_commit,
+-- 
 1.8.3.1
