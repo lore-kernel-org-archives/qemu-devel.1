@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50427)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cl9kI-0007V8-6S
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:41:23 -0500
+	(envelope-from <armbru@redhat.com>) id 1cl9nt-0000Bf-G6
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:45:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cl9kD-00049X-M5
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:41:22 -0500
-Resent-Message-Id: <E1cl9kD-00049X-M5@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21304)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cl9kD-00048z-FK
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:41:17 -0500
-In-Reply-To: <1488871237-12332-1-git-send-email-armbru@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148887246874.294.4659140132872706261@0e2666bad730>
+	(envelope-from <armbru@redhat.com>) id 1cl9no-0004oh-Vp
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:45:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45870)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cl9no-0004oV-N7
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 02:45:00 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1488011202-32121-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+	<1488011202-32121-2-git-send-email-caoj.fnst@cn.fujitsu.com>
+Date: Tue, 07 Mar 2017 08:44:57 +0100
+In-Reply-To: <1488011202-32121-2-git-send-email-caoj.fnst@cn.fujitsu.com> (Cao
+	jin's message of "Sat, 25 Feb 2017 16:26:35 +0800")
+Message-ID: <87tw75il8m.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 6 Mar 2017 23:41:09 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL v3 00/24] block: Command line option
- -blockdev
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v10 1/8] msix: Rename and create a wrapper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,99 +27,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: armbru@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: Cao jin <caoj.fnst@cn.fujitsu.com>
+Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ4
-ODg3MTIzNy0xMjMzMi0xLWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tClN1YmplY3Q6
-IFtRZW11LWRldmVsXSBbUFVMTCB2MyAwMC8yNF0gYmxvY2s6IENvbW1hbmQgbGluZSBvcHRpb24g
-LWJsb2NrZGV2ClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
-YmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3
-YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpj
-b21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBp
-biAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQg
-bG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1h
-dD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAg
-ICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhp
-dCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
-ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNo
-ZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTQ4ODg3MTIzNy0x
-MjMzMi0xLWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMTQ4ODg3
-MTIzNy0xMjMzMi0xLWdpdC1zZW5kLWVtYWlsLWFybWJydUByZWRoYXQuY29tClN3aXRjaGVkIHRv
-IGEgbmV3IGJyYW5jaCAndGVzdCcKYTUzOTk0MiBrZXl2YWw6IFN1cHBvcnQgbGlzdHMKMzMzOGYx
-OCBkb2NzL3FhcGktY29kZS1nZW4udHh0OiBDbGFyaWZ5IG5hbWluZyBydWxlcwo3MzM1MTc1IHFh
-cGk6IEltcHJvdmUgaG93IGtleXZhbCBpbnB1dCB2aXNpdG9yIHJlcG9ydHMgdW5leHBlY3RlZCBk
-aWN0cwpiNzlkNTlkIGJsb2NrOiBJbml0aWFsIGltcGxlbWVudGF0aW9uIG9mIC1ibG9ja2Rldgo1
-YTE5M2ZmIHFhcGk6IE5ldyBxb2JqZWN0X2lucHV0X3Zpc2l0b3JfbmV3X3N0cigpIGZvciBjb252
-ZW5pZW5jZQowODRlY2FmIGtleXZhbDogUmVzdHJpY3Qga2V5IGNvbXBvbmVudHMgdG8gdmFsaWQg
-UUFQSSBuYW1lcwowMjQxOGE5IHFhcGk6IE5ldyBwYXJzZV9xYXBpX25hbWUoKQpmY2QyOTIyIHRl
-c3QtcWFwaS11dGlsOiBOZXcsIGNvdmVyaW5nIHFhcGkvcWFwaS11dGlsLmMKNWEzNDRkNSBtb25p
-dG9yOiBBc3NlcnQgcW1wX3NjaGVtYV9qc29uW10gaXMgc2FuZQoxZTdmNzdlIHRlc3QtdmlzaXRv
-ci1zZXJpYWxpemF0aW9uOiBQYXNzICZlcnJvcl9hYm9ydCB0byBxb2JqZWN0X2Zyb21fanNvbigp
-CmQ2YmRkNzkgY2hlY2stcWpzb246IFRlc3QgZXJyb3JzIGZyb20gcW9iamVjdF9mcm9tX2pzb24o
-KQo5MjNmOGFlIGJsb2NrOiBNb3JlIGRldGFpbGVkIHN5bnRheCBlcnJvciByZXBvcnRpbmcgZm9y
-IEpTT04gZmlsZW5hbWVzCjBlNjBiYjIgcW9iamVjdDogUHJvcGFnYXRlIHBhcnNlIGVycm9ycyB0
-aHJvdWdoIHFvYmplY3RfZnJvbV9qc29uKCkKZWQ3YTJlYyB0ZXN0LXFvYmplY3QtaW5wdXQtdmlz
-aXRvcjogQWJvcnQgZWFybGllciBvbiBiYWQgdGVzdCBpbnB1dAo4NThiYjUwIHFqc29uOiBBYm9y
-dCBlYXJsaWVyIG9uIHFvYmplY3RfZnJvbV9qc29uZigpIG1pc3VzZQoyNGZjNTVkIGxpYnF0ZXN0
-OiBGaXggcW1wKCkgJiBmcmllbmRzIHRvIGFib3J0IG9uIEpTT04gcGFyc2UgZXJyb3JzCjM2NWNm
-NjMgcW9iamVjdDogUHJvcGFnYXRlIHBhcnNlIGVycm9ycyB0aHJvdWdoIHFvYmplY3RfZnJvbV9q
-c29udigpCmNmMjQxOTkgcWFwaTogRmFjdG9yIG91dCBjb21tb24gcW9iamVjdF9pbnB1dF9nZXRf
-a2V5dmFsKCkKY2M0MWU2OCBxYXBpOiBGYWN0b3Igb3V0IGNvbW1vbiBwYXJ0IG9mIHFvYmplY3Qg
-aW5wdXQgdmlzaXRvciBjcmVhdGlvbgo2ZDUxOTdiIHRlc3Qta2V5dmFsOiBDb3ZlciB1c2Ugd2l0
-aCBxb2JqZWN0IGlucHV0IHZpc2l0b3IKZGU1MGMzYSBxYXBpOiBxb2JqZWN0IGlucHV0IHZpc2l0
-b3IgdmFyaWFudCBmb3IgdXNlIHdpdGgga2V5dmFsX3BhcnNlKCkKMjI3MmNkMCBrZXl2YWw6IE5l
-dyBrZXl2YWxfcGFyc2UoKQpiNDIxOGQ0IHRlc3RzOiBGaXggZ2Nvdi1maWxlcy10ZXN0LXFlbXUt
-b3B0cy15LCBnY292LWZpbGVzLXRlc3QtbG9nZ2luZy15CjdmMzQxYjQgdGVzdC1xZW11LW9wdHM6
-IENvdmVyIHFlbXVfb3B0c19wYXJzZSgpIG9mICJubyIKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNo
-ZWNraW5nIFBBVENIIDEvMjQ6IHRlc3QtcWVtdS1vcHRzOiBDb3ZlciBxZW11X29wdHNfcGFyc2Uo
-KSBvZiAibm8iLi4uCkNoZWNraW5nIFBBVENIIDIvMjQ6IHRlc3RzOiBGaXggZ2Nvdi1maWxlcy10
-ZXN0LXFlbXUtb3B0cy15LCBnY292LWZpbGVzLXRlc3QtbG9nZ2luZy15Li4uCkNoZWNraW5nIFBB
-VENIIDMvMjQ6IGtleXZhbDogTmV3IGtleXZhbF9wYXJzZSgpLi4uCkVSUk9SOiBzdXNwZWN0IGNv
-ZGUgaW5kZW50IGZvciBjb25kaXRpb25hbCBzdGF0ZW1lbnRzICg4LCA4KQojNDM4OiBGSUxFOiB1
-dGlsL2tleXZhbC5jOjE0MDoKKyAgICAgICAgZm9yIChsZW4gPSAwOyBzICsgbGVuIDwga2V5X2Vu
-ZCAmJiBzW2xlbl0gIT0gJy4nOyBsZW4rKykgeworICAgICAgICB9Cgp0b3RhbDogMSBlcnJvcnMs
-IDAgd2FybmluZ3MsIDQ0NyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9i
-bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
-c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
-TUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA0LzI0OiBxYXBpOiBxb2JqZWN0IGlucHV0IHZp
-c2l0b3IgdmFyaWFudCBmb3IgdXNlIHdpdGgga2V5dmFsX3BhcnNlKCkuLi4KQ2hlY2tpbmcgUEFU
-Q0ggNS8yNDogdGVzdC1rZXl2YWw6IENvdmVyIHVzZSB3aXRoIHFvYmplY3QgaW5wdXQgdmlzaXRv
-ci4uLgpDaGVja2luZyBQQVRDSCA2LzI0OiBxYXBpOiBGYWN0b3Igb3V0IGNvbW1vbiBwYXJ0IG9m
-IHFvYmplY3QgaW5wdXQgdmlzaXRvciBjcmVhdGlvbi4uLgpDaGVja2luZyBQQVRDSCA3LzI0OiBx
-YXBpOiBGYWN0b3Igb3V0IGNvbW1vbiBxb2JqZWN0X2lucHV0X2dldF9rZXl2YWwoKS4uLgpDaGVj
-a2luZyBQQVRDSCA4LzI0OiBxb2JqZWN0OiBQcm9wYWdhdGUgcGFyc2UgZXJyb3JzIHRocm91Z2gg
-cW9iamVjdF9mcm9tX2pzb252KCkuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8yNDogbGlicXRlc3Q6IEZp
-eCBxbXAoKSAmIGZyaWVuZHMgdG8gYWJvcnQgb24gSlNPTiBwYXJzZSBlcnJvcnMuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMTAvMjQ6IHFqc29uOiBBYm9ydCBlYXJsaWVyIG9uIHFvYmplY3RfZnJvbV9qc29u
-ZigpIG1pc3VzZS4uLgpDaGVja2luZyBQQVRDSCAxMS8yNDogdGVzdC1xb2JqZWN0LWlucHV0LXZp
-c2l0b3I6IEFib3J0IGVhcmxpZXIgb24gYmFkIHRlc3QgaW5wdXQuLi4KQ2hlY2tpbmcgUEFUQ0gg
-MTIvMjQ6IHFvYmplY3Q6IFByb3BhZ2F0ZSBwYXJzZSBlcnJvcnMgdGhyb3VnaCBxb2JqZWN0X2Zy
-b21fanNvbigpLi4uCkNoZWNraW5nIFBBVENIIDEzLzI0OiBibG9jazogTW9yZSBkZXRhaWxlZCBz
-eW50YXggZXJyb3IgcmVwb3J0aW5nIGZvciBKU09OIGZpbGVuYW1lcy4uLgpDaGVja2luZyBQQVRD
-SCAxNC8yNDogY2hlY2stcWpzb246IFRlc3QgZXJyb3JzIGZyb20gcW9iamVjdF9mcm9tX2pzb24o
-KS4uLgpDaGVja2luZyBQQVRDSCAxNS8yNDogdGVzdC12aXNpdG9yLXNlcmlhbGl6YXRpb246IFBh
-c3MgJmVycm9yX2Fib3J0IHRvIHFvYmplY3RfZnJvbV9qc29uKCkuLi4KQ2hlY2tpbmcgUEFUQ0gg
-MTYvMjQ6IG1vbml0b3I6IEFzc2VydCBxbXBfc2NoZW1hX2pzb25bXSBpcyBzYW5lLi4uCkNoZWNr
-aW5nIFBBVENIIDE3LzI0OiB0ZXN0LXFhcGktdXRpbDogTmV3LCBjb3ZlcmluZyBxYXBpL3FhcGkt
-dXRpbC5jLi4uCkNoZWNraW5nIFBBVENIIDE4LzI0OiBxYXBpOiBOZXcgcGFyc2VfcWFwaV9uYW1l
-KCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMTkvMjQ6IGtleXZhbDogUmVzdHJpY3Qga2V5IGNvbXBvbmVu
-dHMgdG8gdmFsaWQgUUFQSSBuYW1lcy4uLgpDaGVja2luZyBQQVRDSCAyMC8yNDogcWFwaTogTmV3
-IHFvYmplY3RfaW5wdXRfdmlzaXRvcl9uZXdfc3RyKCkgZm9yIGNvbnZlbmllbmNlLi4uCkNoZWNr
-aW5nIFBBVENIIDIxLzI0OiBibG9jazogSW5pdGlhbCBpbXBsZW1lbnRhdGlvbiBvZiAtYmxvY2tk
-ZXYuLi4KQ2hlY2tpbmcgUEFUQ0ggMjIvMjQ6IHFhcGk6IEltcHJvdmUgaG93IGtleXZhbCBpbnB1
-dCB2aXNpdG9yIHJlcG9ydHMgdW5leHBlY3RlZCBkaWN0cy4uLgpDaGVja2luZyBQQVRDSCAyMy8y
-NDogZG9jcy9xYXBpLWNvZGUtZ2VuLnR4dDogQ2xhcmlmeSBuYW1pbmcgcnVsZXMuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMjQvMjQ6IGtleXZhbDogU3VwcG9ydCBsaXN0cy4uLgpFUlJPUjogc3BhY2VzIHJl
-cXVpcmVkIGFyb3VuZCB0aGF0ICctJyAoY3R4OlZ4VikKIzQ0NDogRklMRTogdXRpbC9rZXl2YWwu
-YzozNDU6CisgICAgYXNzZXJ0KCFlbHRbbmVsdC0xXSk7ICAgICAgIC8qIG5lZWQgdGhlIHNlbnRp
-bmVsIHRvIGJlIG51bGwgKi8KICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3Jz
-LCAwIHdhcm5pbmdzLCA0MjAgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJv
-YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
-b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
-IE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdp
-dGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3
-IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRj
-aGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+Uh, two weeks since your posted this already.  I apologize for taking so
+long to review.
+
+Cao jin <caoj.fnst@cn.fujitsu.com> writes:
+
+> Rename msix_init to msix_validate_and_init, and use it from vfio which
+> might get a reasonable -EINVAL.  New a wrapper msix_init which assert the
+> programming error for debug purpose and use it from other devices.
+>
+> CC: Alex Williamson <alex.williamson@redhat.com>
+> CC: Markus Armbruster <armbru@redhat.com>
+> CC: Marcel Apfelbaum <marcel@redhat.com>
+> CC: Michael S. Tsirkin <mst@redhat.com>
+>
+> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+> ---
+>  hw/pci/msix.c         | 30 +++++++++++++++++++++---------
+>  hw/vfio/pci.c         | 12 ++++++------
+>  include/hw/pci/msix.h |  5 +++++
+>  3 files changed, 32 insertions(+), 15 deletions(-)
+>
+> diff --git a/hw/pci/msix.c b/hw/pci/msix.c
+> index bb54e8b0ac37..2b7541ab2c8d 100644
+> --- a/hw/pci/msix.c
+> +++ b/hw/pci/msix.c
+> @@ -239,6 +239,19 @@ static void msix_mask_all(struct PCIDevice *dev, unsigned nentries)
+>      }
+>  }
+>  
+> +/* Just a wrapper to check the return value */
+> +int msix_init(struct PCIDevice *dev, unsigned short nentries,
+> +              MemoryRegion *table_bar, uint8_t table_bar_nr,
+> +              unsigned table_offset, MemoryRegion *pba_bar,
+> +              uint8_t pba_bar_nr, unsigned pba_offset, uint8_t cap_pos,
+> +              Error **errp)
+> +{
+> +    int ret = msix_validate_and_init(dev, nentries, table_bar, table_bar_nr,
+> +            table_offset, pba_bar, pba_bar_nr, pba_offset, cap_pos, errp);
+> +
+> +    assert(ret != -EINVAL);
+> +    return ret;
+> +}
+>  /*
+>   * Make PCI device @dev MSI-X capable
+>   * @nentries is the max number of MSI-X vectors that the device support.
+> @@ -259,11 +272,11 @@ static void msix_mask_all(struct PCIDevice *dev, unsigned nentries)
+>   * also means a programming error, except device assignment, which can check
+>   * if a real HW is broken.
+>   */
+> -int msix_init(struct PCIDevice *dev, unsigned short nentries,
+> -              MemoryRegion *table_bar, uint8_t table_bar_nr,
+> -              unsigned table_offset, MemoryRegion *pba_bar,
+> -              uint8_t pba_bar_nr, unsigned pba_offset, uint8_t cap_pos,
+> -              Error **errp)
+> +int msix_validate_and_init(struct PCIDevice *dev, unsigned short nentries,
+> +                           MemoryRegion *table_bar, uint8_t table_bar_nr,
+> +                           unsigned table_offset, MemoryRegion *pba_bar,
+> +                           uint8_t pba_bar_nr, unsigned pba_offset,
+> +                           uint8_t cap_pos, Error **errp)
+>  {
+>      int cap;
+>      unsigned table_size, pba_size;
+> @@ -361,10 +374,9 @@ int msix_init_exclusive_bar(PCIDevice *dev, unsigned short nentries,
+>      memory_region_init(&dev->msix_exclusive_bar, OBJECT(dev), name, bar_size);
+>      g_free(name);
+>  
+> -    ret = msix_init(dev, nentries, &dev->msix_exclusive_bar, bar_nr,
+> -                    0, &dev->msix_exclusive_bar,
+> -                    bar_nr, bar_pba_offset,
+> -                    0, errp);
+> +    ret = msix_validate_and_init(dev, nentries, &dev->msix_exclusive_bar,
+> +                                 bar_nr, 0, &dev->msix_exclusive_bar,
+> +                                 bar_nr, bar_pba_offset, 0, errp);
+>      if (ret) {
+>          return ret;
+>      }
+
+This change assumes that for the callers of msix_exclusive_bar(),
+-EINVAL (capability overlap) is not a programming error.  Is that true?
+
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index 332f41d6627f..06828b537a75 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -1436,12 +1436,12 @@ static int vfio_msix_setup(VFIOPCIDevice *vdev, int pos, Error **errp)
+>  
+>      vdev->msix->pending = g_malloc0(BITS_TO_LONGS(vdev->msix->entries) *
+>                                      sizeof(unsigned long));
+> -    ret = msix_init(&vdev->pdev, vdev->msix->entries,
+> -                    vdev->bars[vdev->msix->table_bar].region.mem,
+> -                    vdev->msix->table_bar, vdev->msix->table_offset,
+> -                    vdev->bars[vdev->msix->pba_bar].region.mem,
+> -                    vdev->msix->pba_bar, vdev->msix->pba_offset, pos,
+> -                    &err);
+> +    ret = msix_validate_and_init(&vdev->pdev, vdev->msix->entries,
+> +                             vdev->bars[vdev->msix->table_bar].region.mem,
+> +                             vdev->msix->table_bar, vdev->msix->table_offset,
+> +                             vdev->bars[vdev->msix->pba_bar].region.mem,
+> +                             vdev->msix->pba_bar, vdev->msix->pba_offset, pos,
+> +                             &err);
+>      if (ret < 0) {
+>          if (ret == -ENOTSUP) {
+>              error_report_err(err);
+> diff --git a/include/hw/pci/msix.h b/include/hw/pci/msix.h
+> index 1f27658d352f..815e59bc96f3 100644
+> --- a/include/hw/pci/msix.h
+> +++ b/include/hw/pci/msix.h
+> @@ -11,6 +11,11 @@ int msix_init(PCIDevice *dev, unsigned short nentries,
+>                unsigned table_offset, MemoryRegion *pba_bar,
+>                uint8_t pba_bar_nr, unsigned pba_offset, uint8_t cap_pos,
+>                Error **errp);
+> +int msix_validate_and_init(PCIDevice *dev, unsigned short nentries,
+> +                           MemoryRegion *table_bar, uint8_t table_bar_nr,
+> +                           unsigned table_offset, MemoryRegion *pba_bar,
+> +                           uint8_t pba_bar_nr, unsigned pba_offset,
+> +                           uint8_t cap_pos, Error **errp);
+>  int msix_init_exclusive_bar(PCIDevice *dev, unsigned short nentries,
+>                              uint8_t bar_nr, Error **errp);
