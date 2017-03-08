@@ -1,40 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44409)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1clXve-0007pi-2f
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 04:30:43 -0500
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1clXwC-00084z-Pt
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 04:31:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1clXvZ-0006Ig-2D
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 04:30:42 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43007)
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1clXw9-0006TC-Il
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 04:31:16 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46247)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1clXvY-0006IX-Oq
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 04:30:36 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1clXw9-0006So-Bm
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 04:31:13 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v289TBUO029873
-	for <qemu-devel@nongnu.org>; Wed, 8 Mar 2017 04:30:32 -0500
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 292f2vrtt6-1
+	v289TN7l027282
+	for <qemu-devel@nongnu.org>; Wed, 8 Mar 2017 04:31:12 -0500
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 292dgdcefq-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 08 Mar 2017 04:30:32 -0500
+	for <qemu-devel@nongnu.org>; Wed, 08 Mar 2017 04:31:12 -0500
 Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Wed, 8 Mar 2017 09:30:29 -0000
-Date: Wed, 8 Mar 2017 10:30:23 +0100
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <61938aa1-2698-f55e-ea1c-e7d96da0b5d7@redhat.com>
-References: <1488876478-6889-1-git-send-email-jasowang@redhat.com>
-	<313e32c5-140d-ec13-6b10-98043756f2e6@redhat.com>
-	<f3e9db7e-f3ab-1ae5-4da6-05dbd8d0206f@redhat.com>
-	<61938aa1-2698-f55e-ea1c-e7d96da0b5d7@redhat.com>
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Wed, 8 Mar 2017 04:31:10 -0500
+Date: Wed, 8 Mar 2017 17:31:05 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20170308021533.78292-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170308021533.78292-2-bjsdjshi@linux.vnet.ibm.com>
+	<20170308091346.GB5211@noname.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <20170308103023.5e0d9d81.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio: destroy region cache during reset
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170308091346.GB5211@noname.redhat.com>
+Message-Id: <20170308093105.GC7563@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 1/1] block: Handle NULL options
+ correctly in raw_open
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,37 +43,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-block@nongnu.org, mreitz@redhat.com, qemu-devel@nongnu.org, cornelia.huck@de.ibm.com, pasic@linux.vnet.ibm.com
 
-On Wed, 8 Mar 2017 14:22:06 +0800
-Jason Wang <jasowang@redhat.com> wrote:
+* Kevin Wolf <kwolf@redhat.com> [2017-03-08 10:13:46 +0100]:
 
-> On 2017=E5=B9=B403=E6=9C=8808=E6=97=A5 11:21, Jason Wang wrote:
-> >
-> > On 2017=E5=B9=B403=E6=9C=8807=E6=97=A5 18:55, Paolo Bonzini wrote:
-> >>
-> >> On 07/03/2017 09:47, Jason Wang wrote:
-> >>> We don't destroy region cache during reset which can make the maps
-> >>> of previous driver leaked to a buggy or malicious driver that don't
-> >>> set vring address before starting to use the device.
-> >> I'm still not sure as to how this can happen.  Reset does clear
-> >> desc/used/avail, which should then be checked before accessing the=20
-> >> caches.
-> >
-> > But the code does not check them in fact? (E.g the attached qtest=20
-> > patch can still pass check-qtest).
-> >
-> > Thanks=20
->=20
-> Ok, the reproducer seems wrong. And I think what you mean is something=20
-> like the check done in virtio_queue_ready(). But looks like not all=20
-> virtqueue check for this. One example is virtio_net_handle_ctrl(), and=20
+> Am 08.03.2017 um 03:15 hat Dong Jia Shi geschrieben:
+> > A normal call for raw_open should always pass in a non-NULL @options,
+> > but for some certain cases (e.g. trying to applying snapshot on a RBD
+> > image), they call raw_open with a NULL @options right after the calling
+> > for raw_close.
+> > 
+> > Let's take the NULL @options as a sign of trying to do raw_open again,
+> > and just simply return a success code.
+> > 
+> > Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> 
+> I think we rather need to fix bdrv_snapshot_goto() so that it doesn't
+> pass NULL, but the actual options that were given for the node (i.e.
+> bs->options).
+I've tried that before the current try. bs->options does not have the
+"file" key-value pair, so that leads to a fail too. Should we put "file"
+in to the options manually? I noticed that it was removed from
+bs->options during the calling of bdrv_open_inherit.
 
-Shouldn't the check for desc in virtio_queue_notify_vq() already take
-care of that?
+> 
+> Kevin
+> 
 
-> there may be even more. So you want to fix them all?
-
-Obviously not speaking for Paolo, but I think the virtio core should
-have be audited for missing guards.
+-- 
+Dong Jia
