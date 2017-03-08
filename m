@@ -1,15 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57425)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1claOS-00029V-DI
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 07:08:37 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1claOt-0002Sn-K0
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 07:09:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1claOR-0007xb-57
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 07:08:36 -0500
-From: Fam Zheng <famz@redhat.com>
-Date: Wed,  8 Mar 2017 20:08:14 +0800
-Message-Id: <20170308120814.29967-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.9 v3] file-posix: Consider max_segments
- for BlockLimits.max_transfer
+	(envelope-from <ehabkost@redhat.com>) id 1claOp-00082b-Cl
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 07:09:03 -0500
+Date: Wed, 8 Mar 2017 09:08:50 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170308120850.GA4694@thinpad.lan.raisama.net>
+References: <1485868319-16151-1-git-send-email-thuth@redhat.com>
+	<1485868319-16151-3-git-send-email-thuth@redhat.com>
+	<20170303145807.GC11509@thinpad.lan.raisama.net>
+	<20170305230627.GA12030@umbus.fritz.box>
+	<20170306114752.GS2778@thinpad.lan.raisama.net>
+	<20170307033105.GB19967@umbus.fritz.box>
+	<20170307120237.GF2778@thinpad.lan.raisama.net>
+	<20170308023345.GH19967@umbus.fritz.box>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170308023345.GH19967@umbus.fritz.box>
+Subject: Re: [Qemu-devel] [PATCH 2/2] vl: Print CPU help after we've
+ registered the CPU accelerators
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,124 +30,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, pbonzini@redhat.com, eblake@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>
 
-BlockLimits.max_transfer can be too high without this fix, guest will
-encounter I/O error or even get paused with werror=stop or rerror=stop. The
-cause is explained below.
+On Wed, Mar 08, 2017 at 01:33:45PM +1100, David Gibson wrote:
+> On Tue, Mar 07, 2017 at 09:02:37AM -0300, Eduardo Habkost wrote:
+> > On Tue, Mar 07, 2017 at 02:31:05PM +1100, David Gibson wrote:
+> > > On Mon, Mar 06, 2017 at 08:47:52AM -0300, Eduardo Habkost wrote:
+> > > > On Mon, Mar 06, 2017 at 10:06:27AM +1100, David Gibson wrote:
+> > > > > On Fri, Mar 03, 2017 at 11:58:07AM -0300, Eduardo Habkost wrote:
+> > > > > > On Tue, Jan 31, 2017 at 02:11:59PM +0100, Thomas Huth wrote:
+> > > > > > > When running with KVM on POWER, we register some CPU types during
+> > > > > > > the initialization function of the ppc64 KVM code (which unfortunately
+> > > > > > > also can not be done via a type_init() like it is done on x86).
+> > > > > > 
+> > > > > > Can you elaborate why it can't be done via type_init()? If the
+> > > > > > QOM type hierarchy depends on any runtime data unavailable at
+> > > > > > type_init(), we should fix that.
+> > > > > 
+> > > > > Hmm.. how?  This is specifically for the special 'host' cpu in the
+> > > > > case of KVM.  We can't use a static configuration here, because there
+> > > > > are things on the host that could limit what features of the CPU are
+> > > > > available for guest use.  So, we need KVM to be initialized in order
+> > > > > to query that information.
+> > > > 
+> > > > There's nothing saying you need to query that information before
+> > > > type_register() or during class_init, does it? The behavior of
+> > > > TYPE_HOST_POWERPC_CPU after object_new() is called can be as
+> > > > dynamic as you want it to, but the QOM type hierarchy is supposed
+> > > > to be static.
+> > > 
+> > > So, the thing is we have some properties that logically belong in the
+> > > CPU class, rather than instance, and that's correct for all TCG CPUs,
+> > > but not for the KVM host CPU.  It seems nasty to have to force all
+> > > those things into the instance just because of KVM.
+> > 
+> > You can still register any class properties you want, without
+> > querying KVM first. Are there properties that you are able to
+> > register only after querying KVM? Is the set of class properties
+> > on TYPE_HOST_POWERPC_CPU different depending on the host
+> > capabilities?
+> 
+> Sorry, I used "properties" sloppily, not meaning QOM properties.
+> 
+> There are several fields in the CPU class which describe CPU
+> capabilities - bitmasks indicating which instructions are available,
+> and L1 cacheline sizes.  There are some other things that are in the
+> CPU instance at the moment, but arguably would belong better in the
+> class: available page sizes and PTE encodings, for example.
+> 
+> At the real hardware level these things are dependent only the model
+> of CPU - hence belonging in cpu class, not instance.  But, because of
+> the way virtualization works on POWER, some of the features may not be
+> available to guests, due to configuration of the hypervisor.  So for
+> the "host" cpu we need to query KVM to see which CPU features are
+> actually available.
+> 
 
-Linux has a separate limit, /sys/block/.../queue/max_segments, which in
-the worst case can be more restrictive than the BLKSECTGET which we
-already consider (note that they are two different things). So, the
-failure scenario before this patch is:
+I see. If there is data that is available only at PowerPCCPUClass
+and you don't want to duplicate it at PowerPCCPU, we can have a
+solution for that: instead of late-registration of the class, we
+could leave those fields to be populated after KVM is
+initialized.
 
-1) host device has max_sectors_kb = 4096 and max_segments = 64;
-2) guest learns max_sectors_kb limit from QEMU, but doesn't know
-   max_segments;
-3) guest issues e.g. a 512KB request thinking it's okay, but actually
-   it's not, because it will be passed through to host device as an
-   SG_IO req that has niov > 64;
-4) host kernel doesn't like the segmenting of the request, and returns
-   -EINVAL;
+Anyway, I don't think this is urgent: the code already treats
+"host" as an exception in ppc_cpu_list(), and (AFAICS) the
+original problem this patch addresses is related to the
+inaccurate alias information only (which is not a consequence of
+the late type_register() call).
 
-This patch checks the max_segments sysfs entry for the host device and
-calculates a "conservative" bytes limit using the page size, which is
-then merged into the existing max_transfer limit. Guest will discover
-this from the usual virtual block device interfaces. (In the case of
-scsi-generic, it will be done in the INQUIRY reply interception in
-device model.)
+> > I'm looking at target/ppc/cpu-models.c, and I only see the
+> > class_init function setting PowerPCCPUClass::pvr and
+> > PowerPCCPUClass::svr. Am I missing anything?
+> 
+> Yes.  Notice that the .parent set there is not the base powerpc cpu
+> class, but a "family" class.  Those families are defined in
+> translate_init.c by another hairy macro POWERPC_FAMILY().  The family
+> class_init function (generally done as a block below the macro
+> invocation) initializes several other things, including insns_flags.
+> 
+> kvmppc_host_cpu_class_init(), uses the family's copy of insns_flags as
+> a base, but needs to query the host and adjust it for a couple of
+> instruction groups that can be disabled from the hypervisor.
+> 
+> [Aside: we also update the cache sizes based on host information.
+> The reasons for that are complicated.  This particular case doesn't
+> require a late class init though, because although it's queried from
+> the host, it's not queried from kvm specifically]
+> 
+> > You can still keep pvr and svr on the CPU class. The only thing
+> > that's different on TYPE_HOST_POWERPC_CPU is that it won't have
+> > the preset values on PowerPCCPUClass. But it can initialize the
+> > instance values on ->instance_init() or ->realize() instead.
+> > 
+> > I even see ppc_cpu_class_by_pvr*() treating TYPE_HOST_POWERPC_CPU
+> > as special on PVR lookup, already. So it looks like the code is
+> > almost ready for that?
+> 
+> PVR is a red herring.  insn_flags is the real issue.
+> 
+> > 
+> > > 
+> > > > Registering QOM types outside type_init() is only causing us
+> > > > problems and we should stop doing that.
+> > > > 
+> > > > > 
+> > > > > > >                                                                 So to
+> > > > > > > be able to see these updates in the CPU help text, the code that calls
+> > > > > > > list_cpus() has to be run after configure_accelerator(). This move should
+> > > > > > > be fine since the "cpu_model" variable is also never used before the call
+> > > > > > > to configure_accelerator(), and thus there should not be any unwanted
+> > > > > > > side effects in the code before configure_accelerator() if the user
+> > > > > > > started QEMU with "-cpu ?" or "-cpu help".
+> > > > > > > 
+> > > > > > > Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > > > > > 
+> > > > > > I am not convinced that the output of "-cpu help" and
+> > > > > > "-cpu help -machine accel=kvm" should look different. Do you have
+> > > > > > an example of what exactly is wrong with the output currently?
+> > > > > > 
+> > > > > > I actually believe list_cpus() needs to be called _earlier_, not
+> > > > > > later. Otherwise we won't be able to fix this bug:
+> > > > > > 
+> > > > > >   $ qemu-system-arm -cpu help
+> > > > > >   qemu-system-arm:/usr/local/etc/qemu/qemu.conf:1: No machine specified, and there is no default
+> > > > > >   Use -machine help to list supported machines
+> > > > > >   $ 
+> > > > > > 
+> > > > > > > ---
+> > > > > > >  vl.c | 10 +++++-----
+> > > > > > >  1 file changed, 5 insertions(+), 5 deletions(-)
+> > > > > > > 
+> > > > > > > diff --git a/vl.c b/vl.c
+> > > > > > > index 0b72b12..315c5c3 100644
+> > > > > > > --- a/vl.c
+> > > > > > > +++ b/vl.c
+> > > > > > > @@ -4055,11 +4055,6 @@ int main(int argc, char **argv, char **envp)
+> > > > > > >          qemu_set_hw_version(machine_class->hw_version);
+> > > > > > >      }
+> > > > > > >  
+> > > > > > > -    if (cpu_model && is_help_option(cpu_model)) {
+> > > > > > > -        list_cpus(stdout, &fprintf, cpu_model);
+> > > > > > > -        exit(0);
+> > > > > > > -    }
+> > > > > > > -
+> > > > > > >      if (!trace_init_backends()) {
+> > > > > > >          exit(1);
+> > > > > > >      }
+> > > > > > > @@ -4298,6 +4293,11 @@ int main(int argc, char **argv, char **envp)
+> > > > > > >  
+> > > > > > >      configure_accelerator(current_machine);
+> > > > > > >  
+> > > > > > > +    if (cpu_model && is_help_option(cpu_model)) {
+> > > > > > > +        list_cpus(stdout, &fprintf, cpu_model);
+> > > > > > > +        exit(0);
+> > > > > > > +    }
+> > > > > > > +
+> > > > > > >      if (qtest_chrdev) {
+> > > > > > >          qtest_init(qtest_chrdev, qtest_log, &error_fatal);
+> > > > > > >      }
+> > > > > > 
+> > > > > 
+> > > > 
+> > > > 
+> > > > 
+> > > 
+> > 
+> > 
+> > 
+> 
+> -- 
+> David Gibson			| I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+> 				| _way_ _around_!
+> http://www.ozlabs.org/~dgibson
 
-The other possibility is to actually propagate it as a separate limit,
-but it's not better. On the one hand, there is a big complication: the
-limit is per-LUN in QEMU PoV (because we can attach LUNs from different
-host HBAs to the same virtio-scsi bus), but the channel to communicate
-it in a per-LUN manner is missing down the stack; on the other hand,
-two limits versus one doesn't change much about the valid size of I/O
-(because guest has no control over host segmenting).
 
-Also, the idea to fall back to bounce buffering in QEMU, upon -EINVAL,
-was explored. Unfortunately there is no neat way to ensure the bounce
-buffer is less segmented (in terms of DMA addr) than the guest buffer.
 
-Practically, this bug is not very common. It is only reported on a
-Emulex (lpfc), so it's okay to get it fixed in the easier way.
-
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Fam Zheng <famz@redhat.com>
-
----
-
-v3: Clearer commit message. [Kevin]
-v2: Use /sys/dev/block/MAJOR:MINOR/queue/max_segments. [Paolo]
----
- block/file-posix.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 47 insertions(+)
-
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 4de1abd..c4c0663 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -668,6 +668,48 @@ static int hdev_get_max_transfer_length(BlockDriverState *bs, int fd)
- #endif
- }
- 
-+static int hdev_get_max_segments(const struct stat *st)
-+{
-+#ifdef CONFIG_LINUX
-+    char buf[32];
-+    const char *end;
-+    char *sysfspath;
-+    int ret;
-+    int fd = -1;
-+    long max_segments;
-+
-+    sysfspath = g_strdup_printf("/sys/dev/block/%u:%u/queue/max_segments",
-+                                major(st->st_rdev), minor(st->st_rdev));
-+    fd = open(sysfspath, O_RDONLY);
-+    if (fd == -1) {
-+        ret = -errno;
-+        goto out;
-+    }
-+    do {
-+        ret = read(fd, buf, sizeof(buf));
-+    } while (ret == -1 && errno == EINTR);
-+    if (ret < 0) {
-+        ret = -errno;
-+        goto out;
-+    } else if (ret == 0) {
-+        ret = -EIO;
-+        goto out;
-+    }
-+    buf[ret] = 0;
-+    /* The file is ended with '\n', pass 'end' to accept that. */
-+    ret = qemu_strtol(buf, &end, 10, &max_segments);
-+    if (ret == 0 && end && *end == '\n') {
-+        ret = max_segments;
-+    }
-+
-+out:
-+    g_free(sysfspath);
-+    return ret;
-+#else
-+    return -ENOTSUP;
-+#endif
-+}
-+
- static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
- {
-     BDRVRawState *s = bs->opaque;
-@@ -679,6 +721,11 @@ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
-             if (ret > 0 && ret <= BDRV_REQUEST_MAX_BYTES) {
-                 bs->bl.max_transfer = pow2floor(ret);
-             }
-+            ret = hdev_get_max_segments(&st);
-+            if (ret > 0) {
-+                bs->bl.max_transfer = MIN(bs->bl.max_transfer,
-+                                          ret * getpagesize());
-+            }
-         }
-     }
- 
 -- 
-2.9.3
+Eduardo
