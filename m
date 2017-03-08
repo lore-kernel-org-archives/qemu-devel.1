@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <git@kirschju.re>) id 1clWwm-0006cE-2r
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 03:27:49 -0500
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1clWy5-0007DG-HR
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 03:29:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <git@kirschju.re>) id 1clWwi-0006bY-3L
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 03:27:48 -0500
-Received: from h2042504.stratoserver.net ([85.214.107.226]:48352)
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1clWy1-0006nv-I6
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 03:29:09 -0500
+Received: from [59.151.112.132] (port=52016 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <git@kirschju.re>) id 1clWwh-0006bA-PQ
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 03:27:44 -0500
-References: <20170308001637.9838-1-git@kirschju.re>
-	<acb6dafc-ff73-9b59-22c0-aa5e8219e925@redhat.com>
-From: Julian Kirsch <git@kirschju.re>
-Message-ID: <4684e745-3cf1-49e9-0a9d-13f86f1cc8f1@kirschju.re>
-Date: Wed, 8 Mar 2017 09:26:58 +0100
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1clWxz-0006mn-Pe
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 03:29:05 -0500
+From: Chao Fan <fanc.fnst@cn.fujitsu.com>
+Date: Wed, 8 Mar 2017 16:28:19 +0800
+Message-ID: <20170308082819.12196-1-fanc.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <acb6dafc-ff73-9b59-22c0-aa5e8219e925@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] X86/HMP: Expose x86 model specific
- registers via human monitor
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2] Add inst_dirty_pages_rate in 'info migrate'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,131 +23,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Julian Kirsch <git@kirschju.re>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: dgilbert@redhat.com, qemu-devel@nongnu.org, quintela@redhat.com, eblake@redhat.com, armbru@redhat.com
+Cc: caoj.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com, douly.fnst@cn.fujitsu.com, maozy.fnst@cn.fujitsu.com, Chao Fan <fanc.fnst@cn.fujitsu.com>
 
-Hi Eric,
+Auto-converge aims to accelerate migration by slowing down the
+generation of dirty pages. But user doesn't know how to determine the
+throttle value, so, a new item "inst-dirty-pages-rate" in "info migrate"
+would be helpful for user's determination.
 
-thank you for your comments. My answers are inlined.
+Signed-off-by: Chao Fan <fanc.fnst@cn.fujitsu.com>
 
-On 08.03.2017 03:36, Eric Blake wrote:
+---
+v2:
+  Update the way to caculate the time.
+  Add tag '(since 2.9)' in documentation of qapi-schema.json
+---
+ hmp.c                         |  4 ++++
+ include/migration/migration.h |  1 +
+ include/qemu/bitmap.h         | 17 ++++++++++++++++
+ migration/migration.c         |  2 ++
+ migration/ram.c               | 45 +++++++++++++++++++++++++++++++++++++++++++
+ qapi-schema.json              |  4 ++++
+ 6 files changed, 73 insertions(+)
 
->=20
-> I'm just focusing on the QMP interface portion of this.
->=20
-> Is any of this information...
->=20
->> This patch moves the logic of the rdmsr and wrmsr functions to helper.=
-c and
->> replaces their current versions in misc_helper.c with stubs calling th=
-e new
->> functions. The ordering of MSRs now loosely follows the ordering used =
-in the KVM
->> module. As qemu operates on cached values in the CPUX86State struct, t=
-he msr-set
->> command is implemented in a hackish way: In order to force qemu to flu=
-sh the new
->> values to KVM a call to cpu_synchronize_post_init is triggered, eventu=
-ally
->> ending up in calling kvm_put_msrs at KVM_PUT_FULL_STATE level. As MSR =
-writes
->> could *still* be caught by the code logic in this function, the msr-se=
-t function
->> reads back the values written to determine whether the write was succe=
-ssful.
->> This way, we don't have to duplicate the logic used in kvm_put_msrs (h=
-as_msr_XXX)
->> to x86_cpu_wrmsr.
->> There are several things I would like to pooint out about this patch:
->>   - The "msr-list" command currently displays MSR values for all virtu=
-al cpus.
->>     This is somewhat inconsistent with "info registers" just displayin=
-g the
->>     value of the current default cpu. One might think about just displ=
-aying the
->>     current value and offer access to other CPU's MSRs by means of swi=
-tching
->>     between CPUs using the "cpu" monitor command.
->>   - The new version of x86_cpu_rdmsr exposes MSRs that are arguably of
->>     questionable help for any human / tool using the monitor. However =
-I merely
->>     felt a deep urge to reflect the full MSR list from kvm.c when writ=
-ing the
->>     code.
->>   - While the need for msr-list is evident (see commit msg), msr-set c=
-ould be
->>     used in more obscure cases. For instance, one might offer a way to=
- access
->>     and configure performance counter MSRs of the guest via the hmp. I=
-f this
->>     feels too much like an inacceptable hack, I'll happily drop the ms=
-r-set
->>     part.
->=20
-> ...useful above the --- as part of the commit message?
->=20
-
-I tried to explain the issue of qemu not flushing back the msrs to kvm in=
- cpu.c
-. The remainder is merely design questions that are imho not important fo=
-r the
-commit message.
-
->=20
->> +++ b/qapi-schema.json
->> @@ -2365,6 +2365,55 @@
->>    'data': {'val': 'int', 'size': 'int', 'filename': 'str'} }
->> =20
->>  ##
->> +# @MsrInfo:
->> +#
->> +# Information about a MSR
->> +#
->> +# @cpu_idx: CPU index
->> +#
->> +# @msr_idx: MSR index
->> +#
->> +# @value: MSR value
->> +#
->> +# Since: 2.8.1
->=20
-> You've missed 2.8 by a long shot; you've even missed soft freeze for
-> 2.9.  This should be 2.10.
->=20
-
-Ops. thanks for pointing this out, will update it. I sticked to the lates=
-t
-version returned by "git tag".
-
->> +##
->> +{ 'struct': 'MsrInfo',
->> +  'data': {'cpu_idx': 'int', 'msr_idx': 'uint32', 'value': 'uint64'} =
-}
->=20
-> Please spell new members with '-' rather than '_', as in 'cpu-idx' (or
-> even spell it out as 'cpu-index') and 'msr-idx'.
->=20
-
-Again, thank you, will take care of it.
-
->> +
->> +##
->> +# @msr-set:
->> +#
->> +# Set model specific registers (MSRs) on x86
->> +#
->> +# @cpu_idx: CPU holding the MSR that should be written
->> +#
->> +# @msr_idx: MSR index to write
->> +#
->> +# @value: Value to write
->> +#
->> +# Returns: Nothing on success
->=20
-> Useless Returns: line.
->=20
-
-Removed.
-
-Best,
-Julian
+diff --git a/hmp.c b/hmp.c
+index 2bc4f06..c7892ea 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -219,6 +219,10 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+             monitor_printf(mon, "dirty pages rate: %" PRIu64 " pages\n",
+                            info->ram->dirty_pages_rate);
+         }
++        if (info->ram->inst_dirty_pages_rate) {
++            monitor_printf(mon, "inst dirty pages rate: %" PRIu64 " bytes/s\n",
++                           info->ram->inst_dirty_pages_rate);
++        }
+         if (info->ram->postcopy_requests) {
+             monitor_printf(mon, "postcopy request count: %" PRIu64 "\n",
+                            info->ram->postcopy_requests);
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index 1735d66..95f0453 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -164,6 +164,7 @@ struct MigrationState
+     int64_t downtime;
+     int64_t expected_downtime;
+     int64_t dirty_pages_rate;
++    int64_t inst_dirty_pages_rate;
+     int64_t dirty_bytes_rate;
+     bool enabled_capabilities[MIGRATION_CAPABILITY__MAX];
+     int64_t xbzrle_cache_size;
+diff --git a/include/qemu/bitmap.h b/include/qemu/bitmap.h
+index 63ea2d0..dc99f9b 100644
+--- a/include/qemu/bitmap.h
++++ b/include/qemu/bitmap.h
+@@ -235,4 +235,21 @@ static inline unsigned long *bitmap_zero_extend(unsigned long *old,
+     return new;
+ }
+ 
++static inline unsigned long bitmap_weight(const unsigned long *src, long nbits)
++{
++    unsigned long i, count = 0, nlong = nbits / BITS_PER_LONG;
++
++    if (small_nbits(nbits)) {
++        return hweight_long(*src & BITMAP_LAST_WORD_MASK(nbits));
++    }
++    for (i = 0; i < nlong; i++) {
++        count += hweight_long(src[i]);
++    }
++    if (nbits % BITS_PER_LONG) {
++        count += hweight_long(src[i] & BITMAP_LAST_WORD_MASK(nbits));
++    }
++
++    return count;
++}
++
+ #endif /* BITMAP_H */
+diff --git a/migration/migration.c b/migration/migration.c
+index c6ae69d..18fc2ec 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -644,6 +644,7 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
+     if (s->state != MIGRATION_STATUS_COMPLETED) {
+         info->ram->remaining = ram_bytes_remaining();
+         info->ram->dirty_pages_rate = s->dirty_pages_rate;
++        info->ram->inst_dirty_pages_rate = s->inst_dirty_pages_rate;
+     }
+ }
+ 
+@@ -1099,6 +1100,7 @@ MigrationState *migrate_init(const MigrationParams *params)
+     s->downtime = 0;
+     s->expected_downtime = 0;
+     s->dirty_pages_rate = 0;
++    s->inst_dirty_pages_rate = 0;
+     s->dirty_bytes_rate = 0;
+     s->setup_time = 0;
+     s->dirty_sync_count = 0;
+diff --git a/migration/ram.c b/migration/ram.c
+index f289fcd..7b440fd 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -44,6 +44,7 @@
+ #include "exec/ram_addr.h"
+ #include "qemu/rcu_queue.h"
+ #include "migration/colo.h"
++#include "hw/boards.h"
+ 
+ static int dirty_rate_high_cnt;
+ 
+@@ -590,6 +591,7 @@ static int64_t bytes_xfer_prev;
+ static int64_t num_dirty_pages_period;
+ static uint64_t xbzrle_cache_miss_prev;
+ static uint64_t iterations_prev;
++static int64_t dirty_pages_time_prev;
+ 
+ static void migration_bitmap_sync_init(void)
+ {
+@@ -598,6 +600,47 @@ static void migration_bitmap_sync_init(void)
+     num_dirty_pages_period = 0;
+     xbzrle_cache_miss_prev = 0;
+     iterations_prev = 0;
++    dirty_pages_time_prev = 0;
++}
++
++static void migration_inst_rate(void)
++{
++    int64_t dirty_pages_time_now;
++    if (!dirty_pages_time_prev) {
++        dirty_pages_time_prev = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
++    }
++    dirty_pages_time_now = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
++    if (dirty_pages_time_now > dirty_pages_time_prev + 1000) {
++        RAMBlock *block;
++        MigrationState *s = migrate_get_current();
++        int64_t inst_dirty_pages = 0;
++        int64_t i;
++        unsigned long *num;
++        unsigned long len = 0;
++
++        rcu_read_lock();
++        DirtyMemoryBlocks *blocks = atomic_rcu_read(
++                         &ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION]);
++        QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
++            if (len == 0) {
++                len = block->offset;
++            }
++            len += block->used_length;
++        }
++        ram_addr_t idx = (len >> TARGET_PAGE_BITS) / DIRTY_MEMORY_BLOCK_SIZE;
++        if (((len >> TARGET_PAGE_BITS) % DIRTY_MEMORY_BLOCK_SIZE) != 0) {
++            idx++;
++        }
++        for (i = 0; i < idx; i++) {
++            num = blocks->blocks[i];
++            inst_dirty_pages += bitmap_weight(num, DIRTY_MEMORY_BLOCK_SIZE);
++        }
++        rcu_read_unlock();
++
++        s->inst_dirty_pages_rate = inst_dirty_pages * TARGET_PAGE_SIZE *
++                    1000 / (dirty_pages_time_now - dirty_pages_time_prev);
++    }
++    dirty_pages_time_prev = dirty_pages_time_now;
+ }
+ 
+ static void migration_bitmap_sync(void)
+@@ -621,6 +664,8 @@ static void migration_bitmap_sync(void)
+     trace_migration_bitmap_sync_start();
+     memory_global_dirty_log_sync();
+ 
++    migration_inst_rate();
++
+     qemu_mutex_lock(&migration_bitmap_mutex);
+     rcu_read_lock();
+     QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+diff --git a/qapi-schema.json b/qapi-schema.json
+index e9a6364..bf00717 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -575,12 +575,16 @@
+ # @postcopy-requests: The number of page requests received from the destination
+ #        (since 2.7)
+ #
++# @inst-dirty-pages-rate: The number of bytes new dirtied pages by second.
++#        (since 2.9)
++#
+ # Since: 0.14.0
+ ##
+ { 'struct': 'MigrationStats',
+   'data': {'transferred': 'int', 'remaining': 'int', 'total': 'int' ,
+            'duplicate': 'int', 'skipped': 'int', 'normal': 'int',
+            'normal-bytes': 'int', 'dirty-pages-rate' : 'int',
++           'inst-dirty-pages-rate' : 'int',
+            'mbps' : 'number', 'dirty-sync-count' : 'int',
+            'postcopy-requests' : 'int' } }
+ 
+-- 
+2.9.3
