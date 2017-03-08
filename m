@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1clgTg-0002QT-UM
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 13:38:26 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1clgan-0004Cz-9R
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 13:45:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1clgTd-0002Zx-Qa
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 13:38:24 -0500
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170308181833.32110-1-mreitz@redhat.com>
-	<e7e616d7-441f-9cff-d182-cbda19700ec5@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <0ff7c286-72d8-d1c6-053a-26b6af7376b6@amsat.org>
-Date: Wed, 8 Mar 2017 15:38:16 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1clgai-0004lU-Co
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 13:45:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47430)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1clgai-0004kA-7K
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 13:45:40 -0500
+Date: Wed, 8 Mar 2017 15:44:26 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170308184426.GG4694@thinpad.lan.raisama.net>
+References: <20170308001637.9838-1-git@kirschju.re>
+	<20170308115909.GD10232@work-vm>
+	<20170308135751.GE4694@thinpad.lan.raisama.net>
+	<aa16a480-d3cd-e73c-00d4-947bc0b95deb@kirschju.re>
 MIME-Version: 1.0
-In-Reply-To: <e7e616d7-441f-9cff-d182-cbda19700ec5@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-2.9] block/archipelago: Make it compile
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aa16a480-d3cd-e73c-00d4-947bc0b95deb@kirschju.re>
+Subject: Re: [Qemu-devel] [PATCH] X86/HMP: Expose x86 model specific
+ registers via human monitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,39 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Chrysostomos Nanakos <chris@include.gr>
+To: Julian Kirsch <git@kirschju.re>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 03/08/2017 03:25 PM, Eric Blake wrote:
-> On 03/08/2017 12:18 PM, Max Reitz wrote:
->> In order to use error_setg() and similar functions, we need to include
->> qapi/error.h.
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  block/archipelago.c | 1 +
->>  1 file changed, 1 insertion(+)
->
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+On Wed, Mar 08, 2017 at 05:08:42PM +0100, Julian Kirsch wrote:
+> On 08.03.2017 14:57, Eduardo Habkost wrote:
+> 
+> >>
+> >> This should be abstracted some how so that we don't need
+> >> x86 specifics in cpus.c; perhaps just an architecture call
+> >> back on the CPU.
+> > 
+> > If it's only supported by x86, I would just move the
+> > implementation to a x86-specific file, and add a stub for the
+> > other architectures. See qmp_query_gic_capabilities() for an
+> > example.
+> > 
+> > Also, the command should be added to
+> > qmp_unregister_commands_hack() so we don't even report it as
+> > available on other architectures.
+> > 
+> 
+> Awesome, thanks for your comments, I'll move the qmp commands to
+> target/i386/monitor.c and unregister them for architectures other than I386. Do
+> I have to explicitly take care of unregistering the hmp commands as well?
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+For HMP commands, it looks like you can simply use #ifdefs inside
+hmp-commands.hx.
 
->
-> Does this mean our automated buildbots aren't building archipelago by
-> default?
->
->>
->> diff --git a/block/archipelago.c b/block/archipelago.c
->> index 2449cfc702..01c4ff2f7d 100644
->> --- a/block/archipelago.c
->> +++ b/block/archipelago.c
->> @@ -55,6 +55,7 @@
->>  #include "block/block_int.h"
->>  #include "qemu/error-report.h"
->>  #include "qemu/thread.h"
->> +#include "qapi/error.h"
->>  #include "qapi/qmp/qint.h"
->>  #include "qapi/qmp/qstring.h"
->>  #include "qapi/qmp/qjson.h"
->>
->
+-- 
+Eduardo
