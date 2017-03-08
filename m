@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1clWy5-0007DG-HR
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 03:29:10 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1clX4o-0000XE-68
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 03:36:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1clWy1-0006nv-I6
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 03:29:09 -0500
-Received: from [59.151.112.132] (port=52016 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1clWxz-0006mn-Pe
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 03:29:05 -0500
-From: Chao Fan <fanc.fnst@cn.fujitsu.com>
-Date: Wed, 8 Mar 2017 16:28:19 +0800
-Message-ID: <20170308082819.12196-1-fanc.fnst@cn.fujitsu.com>
+	(envelope-from <pbonzini@redhat.com>) id 1clX4k-0000Gl-7p
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 03:36:06 -0500
+Received: from mx5-phx2.redhat.com ([209.132.183.37]:51114)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1clX4j-0000GW-Ur
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 03:36:02 -0500
+Date: Wed, 8 Mar 2017 03:35:50 -0500 (EST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1149211275.29885713.1488962150826.JavaMail.zimbra@redhat.com>
+In-Reply-To: <213ff4bb-b3b9-fe00-6f0e-b75114e1a5ef@redhat.com>
+References: <1488425538-13785-1-git-send-email-peterx@redhat.com>
+	<20170302071100-mutt-send-email-mst@kernel.org>
+	<213ff4bb-b3b9-fe00-6f0e-b75114e1a5ef@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2] Add inst_dirty_pages_rate in 'info migrate'
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3] intel_iommu: check misordered init when
+ realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,199 +29,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: dgilbert@redhat.com, qemu-devel@nongnu.org, quintela@redhat.com, eblake@redhat.com, armbru@redhat.com
-Cc: caoj.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com, douly.fnst@cn.fujitsu.com, maozy.fnst@cn.fujitsu.com, Chao Fan <fanc.fnst@cn.fujitsu.com>
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, yi l liu <yi.l.liu@intel.com>, Jintack Lim <jintack@cs.columbia.edu>, Jason Wang <jasowang@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
 
-Auto-converge aims to accelerate migration by slowing down the
-generation of dirty pages. But user doesn't know how to determine the
-throttle value, so, a new item "inst-dirty-pages-rate" in "info migrate"
-would be helpful for user's determination.
 
-Signed-off-by: Chao Fan <fanc.fnst@cn.fujitsu.com>
 
----
-v2:
-  Update the way to caculate the time.
-  Add tag '(since 2.9)' in documentation of qapi-schema.json
----
- hmp.c                         |  4 ++++
- include/migration/migration.h |  1 +
- include/qemu/bitmap.h         | 17 ++++++++++++++++
- migration/migration.c         |  2 ++
- migration/ram.c               | 45 +++++++++++++++++++++++++++++++++++++++++++
- qapi-schema.json              |  4 ++++
- 6 files changed, 73 insertions(+)
+----- Original Message -----
+> From: "Marcel Apfelbaum" <marcel@redhat.com>
+> To: "Michael S. Tsirkin" <mst@redhat.com>, "Peter Xu" <peterx@redhat.com>
+> Cc: qemu-devel@nongnu.org, "Paolo Bonzini" <pbonzini@redhat.com>, "yi l liu" <yi.l.liu@intel.com>, "Jintack Lim"
+> <jintack@cs.columbia.edu>, "Jason Wang" <jasowang@redhat.com>, "Alex Williamson" <alex.williamson@redhat.com>
+> Sent: Thursday, March 2, 2017 7:24:44 AM
+> Subject: Re: [PATCH v3] intel_iommu: check misordered init when realize
+> 
+> On 03/02/2017 07:13 AM, Michael S. Tsirkin wrote:
+> > On Thu, Mar 02, 2017 at 11:32:18AM +0800, Peter Xu wrote:
+> >> Intel vIOMMU devices are created with "-device" parameter, while here
+> >> actually we need to make sure the dmar device be created before other
+> >> PCI devices (like vfio-pci, virtio-pci ones) so that we know iommu_fn
+> >> will be setup correctly before realizations of those PCI devices (it is
+> >> legal that PCI device fetch these info during its realization). Now this
+> >> ordering yet cannot be achieved elsewhere, and devices will be created
+> >> in the order that user specified. We need to avoid that.
+> >>
+> >> This patch tries to detect this kind of misordering issue during init of
+> >> VT-d device, then report to guest if misordering happened. In the
+> >> future, we can provide something better to solve it, e.g., to support
+> >> device init ordering, then we can live without this patch.
+> >>
+> >> Signed-off-by: Peter Xu <peterx@redhat.com>
+> >
+> > Unfortunately with virtio it's a regression, as it used to
+> > work with iommu. So I'm afraid we need to look into supporting
+> > arbitrary order right now :(
+> >
+> 
+> Hi,
+> 
+> A fast way to do it is to initialize iommu with a new keyword, like
+>      -iommu intel-iommu
+> Or maybe use the existing "-object" somehow ?
+>  From vl.c comments:
+>    "Initial object creation happens before all other
+>     QEMU data types are created.... "
+> 
+> Another idea is to add a third run on QEMU cmd line arguments,
+> but this would affect the whole system.
+> 
+> However having an ordering system beats all other ideas.
 
-diff --git a/hmp.c b/hmp.c
-index 2bc4f06..c7892ea 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -219,6 +219,10 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
-             monitor_printf(mon, "dirty pages rate: %" PRIu64 " pages\n",
-                            info->ram->dirty_pages_rate);
-         }
-+        if (info->ram->inst_dirty_pages_rate) {
-+            monitor_printf(mon, "inst dirty pages rate: %" PRIu64 " bytes/s\n",
-+                           info->ram->inst_dirty_pages_rate);
-+        }
-         if (info->ram->postcopy_requests) {
-             monitor_printf(mon, "postcopy request count: %" PRIu64 "\n",
-                            info->ram->postcopy_requests);
-diff --git a/include/migration/migration.h b/include/migration/migration.h
-index 1735d66..95f0453 100644
---- a/include/migration/migration.h
-+++ b/include/migration/migration.h
-@@ -164,6 +164,7 @@ struct MigrationState
-     int64_t downtime;
-     int64_t expected_downtime;
-     int64_t dirty_pages_rate;
-+    int64_t inst_dirty_pages_rate;
-     int64_t dirty_bytes_rate;
-     bool enabled_capabilities[MIGRATION_CAPABILITY__MAX];
-     int64_t xbzrle_cache_size;
-diff --git a/include/qemu/bitmap.h b/include/qemu/bitmap.h
-index 63ea2d0..dc99f9b 100644
---- a/include/qemu/bitmap.h
-+++ b/include/qemu/bitmap.h
-@@ -235,4 +235,21 @@ static inline unsigned long *bitmap_zero_extend(unsigned long *old,
-     return new;
- }
- 
-+static inline unsigned long bitmap_weight(const unsigned long *src, long nbits)
-+{
-+    unsigned long i, count = 0, nlong = nbits / BITS_PER_LONG;
-+
-+    if (small_nbits(nbits)) {
-+        return hweight_long(*src & BITMAP_LAST_WORD_MASK(nbits));
-+    }
-+    for (i = 0; i < nlong; i++) {
-+        count += hweight_long(src[i]);
-+    }
-+    if (nbits % BITS_PER_LONG) {
-+        count += hweight_long(src[i] & BITMAP_LAST_WORD_MASK(nbits));
-+    }
-+
-+    return count;
-+}
-+
- #endif /* BITMAP_H */
-diff --git a/migration/migration.c b/migration/migration.c
-index c6ae69d..18fc2ec 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -644,6 +644,7 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
-     if (s->state != MIGRATION_STATUS_COMPLETED) {
-         info->ram->remaining = ram_bytes_remaining();
-         info->ram->dirty_pages_rate = s->dirty_pages_rate;
-+        info->ram->inst_dirty_pages_rate = s->inst_dirty_pages_rate;
-     }
- }
- 
-@@ -1099,6 +1100,7 @@ MigrationState *migrate_init(const MigrationParams *params)
-     s->downtime = 0;
-     s->expected_downtime = 0;
-     s->dirty_pages_rate = 0;
-+    s->inst_dirty_pages_rate = 0;
-     s->dirty_bytes_rate = 0;
-     s->setup_time = 0;
-     s->dirty_sync_count = 0;
-diff --git a/migration/ram.c b/migration/ram.c
-index f289fcd..7b440fd 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -44,6 +44,7 @@
- #include "exec/ram_addr.h"
- #include "qemu/rcu_queue.h"
- #include "migration/colo.h"
-+#include "hw/boards.h"
- 
- static int dirty_rate_high_cnt;
- 
-@@ -590,6 +591,7 @@ static int64_t bytes_xfer_prev;
- static int64_t num_dirty_pages_period;
- static uint64_t xbzrle_cache_miss_prev;
- static uint64_t iterations_prev;
-+static int64_t dirty_pages_time_prev;
- 
- static void migration_bitmap_sync_init(void)
- {
-@@ -598,6 +600,47 @@ static void migration_bitmap_sync_init(void)
-     num_dirty_pages_period = 0;
-     xbzrle_cache_miss_prev = 0;
-     iterations_prev = 0;
-+    dirty_pages_time_prev = 0;
-+}
-+
-+static void migration_inst_rate(void)
-+{
-+    int64_t dirty_pages_time_now;
-+    if (!dirty_pages_time_prev) {
-+        dirty_pages_time_prev = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-+    }
-+    dirty_pages_time_now = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-+    if (dirty_pages_time_now > dirty_pages_time_prev + 1000) {
-+        RAMBlock *block;
-+        MigrationState *s = migrate_get_current();
-+        int64_t inst_dirty_pages = 0;
-+        int64_t i;
-+        unsigned long *num;
-+        unsigned long len = 0;
-+
-+        rcu_read_lock();
-+        DirtyMemoryBlocks *blocks = atomic_rcu_read(
-+                         &ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION]);
-+        QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+            if (len == 0) {
-+                len = block->offset;
-+            }
-+            len += block->used_length;
-+        }
-+        ram_addr_t idx = (len >> TARGET_PAGE_BITS) / DIRTY_MEMORY_BLOCK_SIZE;
-+        if (((len >> TARGET_PAGE_BITS) % DIRTY_MEMORY_BLOCK_SIZE) != 0) {
-+            idx++;
-+        }
-+        for (i = 0; i < idx; i++) {
-+            num = blocks->blocks[i];
-+            inst_dirty_pages += bitmap_weight(num, DIRTY_MEMORY_BLOCK_SIZE);
-+        }
-+        rcu_read_unlock();
-+
-+        s->inst_dirty_pages_rate = inst_dirty_pages * TARGET_PAGE_SIZE *
-+                    1000 / (dirty_pages_time_now - dirty_pages_time_prev);
-+    }
-+    dirty_pages_time_prev = dirty_pages_time_now;
- }
- 
- static void migration_bitmap_sync(void)
-@@ -621,6 +664,8 @@ static void migration_bitmap_sync(void)
-     trace_migration_bitmap_sync_start();
-     memory_global_dirty_log_sync();
- 
-+    migration_inst_rate();
-+
-     qemu_mutex_lock(&migration_bitmap_mutex);
-     rcu_read_lock();
-     QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-diff --git a/qapi-schema.json b/qapi-schema.json
-index e9a6364..bf00717 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -575,12 +575,16 @@
- # @postcopy-requests: The number of page requests received from the destination
- #        (since 2.7)
- #
-+# @inst-dirty-pages-rate: The number of bytes new dirtied pages by second.
-+#        (since 2.9)
-+#
- # Since: 0.14.0
- ##
- { 'struct': 'MigrationStats',
-   'data': {'transferred': 'int', 'remaining': 'int', 'total': 'int' ,
-            'duplicate': 'int', 'skipped': 'int', 'normal': 'int',
-            'normal-bytes': 'int', 'dirty-pages-rate' : 'int',
-+           'inst-dirty-pages-rate' : 'int',
-            'mbps' : 'number', 'dirty-sync-count' : 'int',
-            'postcopy-requests' : 'int' } }
- 
--- 
-2.9.3
+The ordering should be explicit in the command line.  Since we do not have
+cycles, it should be possible.
+
+The best solution would have been to add something like
+
+   -device intel-iommu,id=root-complex-iommu -global mch.iommu=root-complex-iommu
+
+but it's too late for that.
+
+Paolo
