@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1clgbP-0004a8-Jq
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 13:46:24 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1clgmO-000729-RZ
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 13:57:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1clgbO-0005Gf-I7
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 13:46:23 -0500
-Date: Wed, 8 Mar 2017 19:46:10 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170308184610.GE5211@noname.redhat.com>
-References: <20170308181833.32110-1-mreitz@redhat.com>
-	<e7e616d7-441f-9cff-d182-cbda19700ec5@redhat.com>
-	<91dff396-0e71-cb32-8353-edc4b644d5af@redhat.com>
-	<cf2a46ae-afd3-58ea-7a1b-2de4e1d89a16@redhat.com>
+	(envelope-from <ehabkost@redhat.com>) id 1clgmK-0000py-Vz
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 13:57:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50978)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1clgmK-0000pm-Mc
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 13:57:40 -0500
+Date: Wed, 8 Mar 2017 15:57:26 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170308185726.GH4694@thinpad.lan.raisama.net>
+References: <20170305214633.19844-1-krzk@kernel.org>
+	<20170306120948.GV2778@thinpad.lan.raisama.net>
+	<20170308162213.kcs3udn6ckvl7jd7@kozik-lap>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="gBBFr7Ir9EOA20Yy"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cf2a46ae-afd3-58ea-7a1b-2de4e1d89a16@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9] block/archipelago: Make it compile
+In-Reply-To: <20170308162213.kcs3udn6ckvl7jd7@kozik-lap>
+Subject: Re: [Qemu-devel] [PATCH] qdev: Constify data pointed by few
+ arguments and local variables
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,68 +29,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Chrysostomos Nanakos <chris@include.gr>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org
 
+On Wed, Mar 08, 2017 at 06:22:13PM +0200, Krzysztof Kozlowski wrote:
+> On Mon, Mar 06, 2017 at 09:09:48AM -0300, Eduardo Habkost wrote:
+> > Hi,
+> > 
+> > 
+> > On Sun, Mar 05, 2017 at 11:46:33PM +0200, Krzysztof Kozlowski wrote:
+> > > In few places the function arguments and local variables are not
+> > > modifying data passed through pointers so this can be made const for
+> > > code safeness.
+> > > 
+> > > Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+> > 
+> > I believe most changes below are misleading to users of the API,
+> > and make the code less safe. Most of the pointers passed as
+> > argument to those functions will be stored at non-const pointer
+> > fields inside the objects.
+> > 
+> > > ---
+> > >  hw/core/qdev-properties-system.c |  6 +++---
+> > >  hw/core/qdev-properties.c        |  7 ++++---
+> > >  include/hw/qdev-properties.h     | 11 +++++++----
+> > >  3 files changed, 14 insertions(+), 10 deletions(-)
+> > > 
+> > > diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
+> > > index c34be1c1bace..abbf3ef754d8 100644
+> > > --- a/hw/core/qdev-properties-system.c
+> > > +++ b/hw/core/qdev-properties-system.c
+> > > @@ -405,7 +405,7 @@ void qdev_prop_set_drive(DeviceState *dev, const char *name,
+> > >      if (value) {
+> > >          ref = blk_name(value);
+> > >          if (!*ref) {
+> > > -            BlockDriverState *bs = blk_bs(value);
+> > > +            const BlockDriverState *bs = blk_bs(value);
+> > >              if (bs) {
+> > >                  ref = bdrv_get_node_name(bs);
+> > >              }
+> > 
+> > This part looks safe, but still misleading: the
+> > object_property_set_str() call will end up changing a non-const
+> > pointer field in the object. I'm not sure what's the benefit of
+> > this change.
+> 
+> I might be missing something... but I am touching only the 'bs' and it
+> is passed to bdrv_get_node_name() also as const. The
+> bdrv_get_node_name() just accepts pointer to const.
+> 
+> I am not sure why are you referring to object_property_set_str(). The
+> value returned by bdrv_get_node_name() is pointer to const.
+> object_property_set_str() also takes pointer to const.
+> 
+> So entire path, starting from 'bs' uses pointer to const... thus I
+> find misleading that 'bs' is not pointing to const data. It should.
 
---gBBFr7Ir9EOA20Yy
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This code path is correct, yes. That's why I don't mind either
+way. What I find misleading is that the object_property_set_str()
+call will end up setting a pointer inside the object to 'bs', and
+that pointer is not const.
 
-Am 08.03.2017 um 19:32 hat Max Reitz geschrieben:
-> On 08.03.2017 19:28, Eric Blake wrote:
-> > On 03/08/2017 12:25 PM, Eric Blake wrote:
-> >> On 03/08/2017 12:18 PM, Max Reitz wrote:
-> >>> In order to use error_setg() and similar functions, we need to include
-> >>> qapi/error.h.
-> >>>
-> >>> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> >>> ---
-> >>>  block/archipelago.c | 1 +
-> >>>  1 file changed, 1 insertion(+)
-> >>
-> >> Reviewed-by: Eric Blake <eblake@redhat.com>
-> >>
-> >> Does this mean our automated buildbots aren't building archipelago by
-> >> default?
-> >>
-> >=20
-> > Oh, I meant to add:
-> >=20
-> > Should probably mention that it was commit da34e65 that introduced the
-> > problem (if I'm right?).  Does that mean we have not been compiling
-> > archipelago.c since Mar 2016?
->=20
-> At least here on my machine it does indeed compile before that commit
-> and fails afterwards. So, yes, maybe we actually have not. :-)
+> 
+> > 
+> > > @@ -416,7 +416,7 @@ void qdev_prop_set_drive(DeviceState *dev, const char *name,
+> > >  }
+> > >  
+> > >  void qdev_prop_set_chr(DeviceState *dev, const char *name,
+> > > -                       Chardev *value)
+> > > +                       const Chardev *value)
+> > 
+> > This wrapper will end up storing 'value' in a non-const pointer
+> > in the object (e.g. PL011State::chr). Declaring 'value' as const
+> > is misleading.
+> 
+> The object_property_set_str() takes data as pointer to const. If data
+> ends up as being non-const, then this is the mistake -
+> object_property_set_str().
 
-In that case, maybe we should rather remove the driver because very
-obviously nobody is interested in it, not even the maintainer. Keeping
-things around that nobody tests (and consequently, nobody uses) is just
-a useless maintenance burden.
+I don't see the mistake. The whole purpose of:
+  qdev_prop_set_chr(dev, "some-field", v)
+is to end up doing this assignment internally:
+  dev->some_field = v;
+and on most (or all?) cases dev->some_field is not a const
+pointer. The details are hidden behind the
+object_property_set_str() call.
 
-Kevin
+That means code must never call qdev_prop_set_chr(dev, field, v)
+if 'v' is a const pointer.
 
---gBBFr7Ir9EOA20Yy
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJYwFFyAAoJEH8JsnLIjy/WMvcP/jUGKHjV5zUB1WX3bQPS7fVR
-7zYsTzwjCeGshZNc9gxoKMufjw9QxarPJEQNyY4RHLQuVKmbi484AyKwhCECJ0sy
-dKOkIXUfC1skAJ1fqtJLkMQZ8ot4iQkamYyBFyDF7CNJ0TYdrpXOdG2EaOI9hIiz
-ck3QG4dvHyK47GPAJdreipEtFT9N7C2YNYRBnHhP8/1PdakTPKAV15GOF0qIJn0D
-wZp9+zGEm+peqlagltWmK/UJnVhYeLRM44e59B3k+m/Wl+43fSkiNol/oDi65yxh
-PP3aF9TSLDWbTL5qQS9+SSW+DY7sfJjD1BMfkOgFRaSpm351pCkCJq8eFd1mFGF+
-nl4hd3vwTzIA4AT4X97mj++MfiBIgAFk/FmSeZFYRcYFrb8JUFrqE59Kj2QmJB64
-Z0w2H0UXHMQ+S5smpc0703sfKIrpvvsnQQk0J4HOljC2ED9QaGBB9E4Nug78H2sI
-uJ6sSkzQqZdrK5YPc7eBm9c1dfEMvR8XhkDdaXOiT05Zl3bFEms9XBAJX1ZwmewO
-n33fdfuq5vTnwmCpyn9wO+rF3wWf+ZhzDFXm+5x6Pbi1oE6ACKmitbYXn5haL3nG
-kQT8a9x9/vZ3vmzYMBH3+kBbGAfNFQPIP2zUFm1ONolAAaejJGVB9y+fmZEZlb9m
-FbzD+Gsm4zwWf7DvOfBG
-=OPE4
------END PGP SIGNATURE-----
-
---gBBFr7Ir9EOA20Yy--
+-- 
+Eduardo
