@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39353)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1clXc6-0008BA-T0
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 04:10:31 -0500
+	(envelope-from <berrange@redhat.com>) id 1clXex-0001I1-S2
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 04:13:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1clXc2-0000hO-Qs
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 04:10:30 -0500
-Received: from mx3-phx2.redhat.com ([209.132.183.24]:52517)
+	(envelope-from <berrange@redhat.com>) id 1clXeu-0001XV-1U
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 04:13:27 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39404)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1clXc2-0000h6-IR
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 04:10:26 -0500
-Date: Wed, 8 Mar 2017 04:10:26 -0500 (EST)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <519330901.29898313.1488964226313.JavaMail.zimbra@redhat.com>
-In-Reply-To: <61938aa1-2698-f55e-ea1c-e7d96da0b5d7@redhat.com>
-References: <1488876478-6889-1-git-send-email-jasowang@redhat.com>
-	<313e32c5-140d-ec13-6b10-98043756f2e6@redhat.com>
-	<f3e9db7e-f3ab-1ae5-4da6-05dbd8d0206f@redhat.com>
-	<61938aa1-2698-f55e-ea1c-e7d96da0b5d7@redhat.com>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1clXet-0001XK-PJ
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 04:13:23 -0500
+Date: Wed, 8 Mar 2017 09:13:11 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170308091311.GC7470@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170222144407.GS19045@localhost.localdomain>
+	<CAAo6VWPWjRTE3t9myt7Q6gTnZcvP72ypTE03PCFfJkvb2UWLTA@mail.gmail.com>
+	<20170224091916.GD3702@redhat.com>
+	<CAAo6VWPyQrjSp2qjvxqXRPS8=5N85i0-DJdkWhiGaXmND_8+qA@mail.gmail.com>
+	<20170227092207.GA18219@redhat.com>
+	<CAAo6VWO6zAijMMjHOkefO22wh+6dXigZ6a+g-pMNBcM0MN1HHw@mail.gmail.com>
+	<20170301091851.GD17125@redhat.com>
+	<CAAo6VWNRhK6zvc+CferSd9wYQZNNoXDqCEW_G62crqsamyEC9Q@mail.gmail.com>
+	<20170306092305.GA9866@redhat.com>
+	<CAAo6VWMo-wYwkOAENk4swYk3dkbxaJObXrj85yDRLAUofK2qtw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] virtio: destroy region cache during reset
+Content-Disposition: inline
+In-Reply-To: <CAAo6VWMo-wYwkOAENk4swYk3dkbxaJObXrj85yDRLAUofK2qtw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
+ block device type called "vxhs"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +37,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: mst@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com
+To: ashish mittal <ashmit602@gmail.com>
+Cc: Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
 
+On Tue, Mar 07, 2017 at 05:27:55PM -0800, ashish mittal wrote:
+> Thanks! There is one more input I need some help with!
+> 
+> VxHS network library opens a fixed number of connection channels to a
+> given host, and all the vdisks (that connect to the same host) share
+> these connection channels.
+> 
+> Therefore, we need to open secure channels to a specific target host
+> only once for the first vdisk that connects to that host. All the
+> other vdisks that connect to the same target host will share the same
+> set of secure communication channels.
+> 
+> I hope the above scheme is acceptable?
 
+I don't think I'm in favour of such an approach, as it forces a single
+QEMU process to use the same privileges for all disks it uses.
 
------ Original Message -----
-> From: "Jason Wang" <jasowang@redhat.com>
-> To: "Paolo Bonzini" <pbonzini@redhat.com>, mst@redhat.com, qemu-devel@non=
-gnu.org
-> Cc: peterx@redhat.com
-> Sent: Wednesday, March 8, 2017 7:22:06 AM
-> Subject: Re: [Qemu-devel] [PATCH] virtio: destroy region cache during res=
-et
->=20
->=20
->=20
-> On 2017=E5=B9=B403=E6=9C=8808=E6=97=A5 11:21, Jason Wang wrote:
-> >
-> > On 2017=E5=B9=B403=E6=9C=8807=E6=97=A5 18:55, Paolo Bonzini wrote:
-> >>
-> >> On 07/03/2017 09:47, Jason Wang wrote:
-> >>> We don't destroy region cache during reset which can make the maps
-> >>> of previous driver leaked to a buggy or malicious driver that don't
-> >>> set vring address before starting to use the device.
-> >> I'm still not sure as to how this can happen.  Reset does clear
-> >> desc/used/avail, which should then be checked before accessing the
-> >> caches.
-> >
-> > But the code does not check them in fact? (E.g the attached qtest
-> > patch can still pass check-qtest).
-> >
-> > Thanks
->=20
-> Ok, the reproducer seems wrong. And I think what you mean is something
-> like the check done in virtio_queue_ready(). But looks like not all
-> virtqueue check for this. One example is virtio_net_handle_ctrl(), and
-> there may be even more. So you want to fix them all?
+Consider an example where a QEMU process has two disks, one shared
+readonly disk and one exclusive writable disk, both on the same host.
 
-Why would virtio_net_handle_ctrl be called when desc =3D=3D 0?  The checks
-are all in common virtio code.
+It is reasonable as an administrator to want to use different credentials
+for each of these. ie, they might have a set of well known credentials to
+authenticate to get access to the read-only disk, but have a different set
+of strictly limited access credentials to get access to the writable disk
 
-static void virtio_queue_notify_vq(VirtQueue *vq)
-{
-    if (vq->vring.desc && vq->handle_output) {
-        VirtIODevice *vdev =3D vq->vdev;
+Trying to re-use the same connection for multiple cause prevents QEMU from
+authenticating with different credentials per disk, so I don't think that
+is a good approach - each disk should have totally independant state.
 
-        if (unlikely(vdev->broken)) {
-            return;
-        }
+ > 
+> If yes, then we have a couple of options to implement this:
+> 
+> (1) Accept the TLS credentials per vdisk using the previously
+> discussed --object tls-creds-x509 mechanism. In this case, if more
+> than one vdisk have the same host info, then we will use only the
+> first one's creds to set up the secure connection, and ignore the
+> others. vdisks that connect to different target hosts will use their
+> individual tls-creds-x509 to set up the secure channels. This is, of
+> course, not relevant for qemu-img/qemu-io as they can open only one
+> vdisk at a time.
+> 
+> (2) Instead of having a per-vdisk --object tls-creds-x509, have a
+> single such argument on the command line for vxhs block device code to
+> consume - if that is possible! One way to achieve this could be the
+> user/password authentication we discussed earlier, which we could use
+> to pass the directory where cert/keys are kept.
+> 
+> (3) Use the instance UUID, when available, to lookup the cert files
+> per instance (i.e. for qemu-kvm), and use the --object tls-creds-x509
+> mechanism, when instance UUID is NULL (i.e. qemu-io, qemu-img etc).
+> The cert/key files are anyway protected by file permissions in either
+> case, so I guess there is no additional security provided by either
+> method.
 
-        trace_virtio_queue_notify(vdev, vq - vdev->vq, vq);
-        vq->handle_output(vdev, vq);
-    }
-}
-                                                                           =
-                                                                           =
-                         1440,29       55%
-Paolo
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
