@@ -1,33 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1clfQG-0000VK-7f
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 12:30:50 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1clfVc-0001iB-SM
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 12:36:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1clfQD-00085D-1G
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 12:30:48 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37253)
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1clfVZ-0001oV-LK
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 12:36:20 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42138
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1clfQC-000850-QM
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 12:30:44 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1clfQB-0006vt-7m
-	for <qemu-devel@nongnu.org>; Wed, 08 Mar 2017 17:30:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 228582E80CA
-	for <qemu-devel@nongnu.org>; Wed,  8 Mar 2017 17:30:43 +0000 (UTC)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1clfVZ-0001oJ-D5
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 12:36:17 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v28HSWpR083105
+	for <qemu-devel@nongnu.org>; Wed, 8 Mar 2017 12:36:16 -0500
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 292fxp4khk-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 08 Mar 2017 12:36:15 -0500
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Wed, 8 Mar 2017 17:36:14 -0000
+References: <20170307183637.21245-1-dgilbert@redhat.com>
+	<20170307183637.21245-2-dgilbert@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Wed, 8 Mar 2017 18:36:09 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 08 Mar 2017 17:23:25 -0000
-From: Konstantin Tcholokachvili <1671173@bugs.launchpad.net>
-Reply-To: Bug 1671173 <1671173@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20170308172325.8219.67729.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1671173] [NEW] OS started to crash with a
- message: "Trying to execute code outside RAM or ROM"
+In-Reply-To: <20170307183637.21245-2-dgilbert@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Message-Id: <af15f78f-774f-f657-1554-a086488cc1a9@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] RAMBlocks: qemu_ram_is_shared
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,117 +42,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-Public bug reported:
-
-There is a project (https://github.com/narke/colorForth ) wich always
-worked with qemu up to version 2.5.1.1 but doesn't works from version
-2.6 onwards. It continues to work with bochs.
-
-Downlaod: git clone https://github.com/narke/colorForth.git
-Build: make
-Test: qemu-system-i386 -drive format=3Draw,file=3Dcf2012.img,index=3D0,if=
-=3Dfloppy
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, quintela@redhat.com
+Cc: lvivier@redhat.com, pbonzini@redhat.com
 
 
-System information: Ubuntu LTS 16.04 x86-64
-Affected qemu versions: 2.6 to present (2.8)
 
+On 03/07/2017 07:36 PM, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> Provide a helper to say whether a RAMBlock was created as a
+> shared mapping.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  exec.c                    | 5 +++++
+>  include/exec/cpu-common.h | 1 +
+>  2 files changed, 6 insertions(+)
+> 
+> diff --git a/exec.c b/exec.c
+> index aabb035..c2cc455 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -1560,6 +1560,11 @@ const char *qemu_ram_get_idstr(RAMBlock *rb)
+>      return rb->idstr;
+>  }
+> 
+> +bool qemu_ram_is_shared(RAMBlock *rb)
+> +{
+> +    return rb->flags & RAM_SHARED;
 
-I got the message:
+Hm, it appears to me RAM_SHARED is defined conditionally, that's within 
+#if !defined(CONFIG_USER_ONLY)
+#endif
 
+The function however seems to be defined and using RAM_SHARED
+unconditionally. Either one or the other seems inappropriate to me.
 
-WARNING: Image format was not specified for 'cf2012.img' and probing guesse=
-d raw.
-         Automatically detecting the format is dangerous for raw images, wr=
-ite operations on block 0 will be restricted.
-         Specify the 'raw' format explicitly to remove the restrictions.
-qemu-system-i386: Trying to execute code outside RAM or ROM at 0x8998c426
-This usually means one of the following happened:
-
-(1) You told QEMU to execute a kernel for the wrong machine type, and it cr=
-ashed on startup (eg trying to run a raspberry pi kernel on a versatilepb Q=
-EMU machine)
-(2) You didn't give QEMU a kernel or BIOS filename at all, and QEMU execute=
-d a ROM full of no-op instructions until it fell off the end
-(3) Your guest kernel has a bug and crashed by jumping off into nowhere
-
-This is almost always one of the first two, so check your command line and =
-that you are using the right type of kernel for this machine.
-If you think option (3) is likely then you can try debugging your guest wit=
-h the -d debug options; in particular -d guest_errors will cause the log to=
- include a dump of the guest register state at this point.
-
-Execution cannot continue; stopping here.
-
-
-Thank you in advance.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1671173
-
-Title:
-  OS started to crash with a message: "Trying to execute code outside
-  RAM or ROM"
-
-Status in QEMU:
-  New
-
-Bug description:
-  There is a project (https://github.com/narke/colorForth ) wich always
-  worked with qemu up to version 2.5.1.1 but doesn't works from version
-  2.6 onwards. It continues to work with bochs.
-
-  Downlaod: git clone https://github.com/narke/colorForth.git
-  Build: make
-  Test: qemu-system-i386 -drive format=3Draw,file=3Dcf2012.img,index=3D0,if=
-=3Dfloppy
-
-  =
-
-  System information: Ubuntu LTS 16.04 x86-64
-  Affected qemu versions: 2.6 to present (2.8)
-
-  =
-
-  I got the message:
-
-  =
-
-  WARNING: Image format was not specified for 'cf2012.img' and probing gues=
-sed raw.
-           Automatically detecting the format is dangerous for raw images, =
-write operations on block 0 will be restricted.
-           Specify the 'raw' format explicitly to remove the restrictions.
-  qemu-system-i386: Trying to execute code outside RAM or ROM at 0x8998c426
-  This usually means one of the following happened:
-
-  (1) You told QEMU to execute a kernel for the wrong machine type, and it =
-crashed on startup (eg trying to run a raspberry pi kernel on a versatilepb=
- QEMU machine)
-  (2) You didn't give QEMU a kernel or BIOS filename at all, and QEMU execu=
-ted a ROM full of no-op instructions until it fell off the end
-  (3) Your guest kernel has a bug and crashed by jumping off into nowhere
-
-  This is almost always one of the first two, so check your command line an=
-d that you are using the right type of kernel for this machine.
-  If you think option (3) is likely then you can try debugging your guest w=
-ith the -d debug options; in particular -d guest_errors will cause the log =
-to include a dump of the guest register state at this point.
-
-  Execution cannot continue; stopping here.
-
-  =
-
-  Thank you in advance.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1671173/+subscriptions
+Regards,
+Halil
