@@ -1,36 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wenwang@cs.umn.edu>) id 1cll1i-0000G1-By
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 18:29:51 -0500
+	(envelope-from <bounces@canonical.com>) id 1cllHN-0003KB-9y
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 18:46:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wenwang@cs.umn.edu>) id 1cll1f-0003Bt-2a
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 18:29:50 -0500
-Received: from mail.cs.umn.edu ([128.101.32.201]:56866)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wenwang@cs.umn.edu>) id 1cll1e-0003B1-RS
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 18:29:46 -0500
-Received: from localhost (enchanter.cs.umn.edu [160.94.22.228])
-	by mail.cs.umn.edu (Postfix) with ESMTP id 90DA9B1396
-	for <qemu-devel@nongnu.org>; Wed,  8 Mar 2017 17:29:45 -0600 (CST)
-Received: from mail.cs.umn.edu ([128.101.32.201])
-	by localhost (enchanter.cs.umn.edu [160.94.22.228]) (amavisd-new,
-	port 10024) with ESMTP id D_e6yMHhlmNB for <qemu-devel@nongnu.org>;
-	Wed,  8 Mar 2017 17:29:43 -0600 (CST)
-Received: from mail-it0-f47.google.com (mail-it0-f47.google.com
-	[209.85.214.47])
-	by mail.cs.umn.edu (Postfix) with ESMTPSA id B968AB1390
-	for <qemu-devel@nongnu.org>; Wed,  8 Mar 2017 17:29:43 -0600 (CST)
-Received: by mail-it0-f47.google.com with SMTP id h10so118953910ith.1
-	for <qemu-devel@nongnu.org>; Wed, 08 Mar 2017 15:29:43 -0800 (PST)
+	(envelope-from <bounces@canonical.com>) id 1cllHI-00061Q-9c
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 18:46:01 -0500
+Received: from indium.canonical.com ([91.189.90.7]:40970)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cllHH-0005zO-Qo
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 18:45:56 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cllHD-0003G2-5f
+	for <qemu-devel@nongnu.org>; Wed, 08 Mar 2017 23:45:51 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5EE362E80E5
+	for <qemu-devel@nongnu.org>; Wed,  8 Mar 2017 23:45:50 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_Oms7=XCqnaZKhdmweB5bO2dPAZUBfMfb=tjHZiA5CoA@mail.gmail.com>
-References: <CAAa=b7c4LFiBfNYWhoWPPmV00yRPjQ58RRgbKYV+ZPddL7RRPQ@mail.gmail.com>
-	<CAFEAcA_Oms7=XCqnaZKhdmweB5bO2dPAZUBfMfb=tjHZiA5CoA@mail.gmail.com>
-From: Wenwen Wang <wenwang@cs.umn.edu>
-Date: Wed, 8 Mar 2017 17:29:02 -0600
-Message-ID: <CAAa=b7fs=Ya4Brgu_cuN5UY4_xbBRHu=Sw1GZmjxDKX--WHhpg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] Performance difference between QEMU 2.2.0 and 2.6.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 08 Mar 2017 23:35:47 -0000
+From: Herbie Robinson <1670509@bugs.launchpad.net>
+Reply-To: Bug 1670509 <1670509@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170306224936.27687.97076.malonedeb@gac.canonical.com>
+Message-Id: <20170308233547.5629.52541.launchpad@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1670509] Re: sgabios outputs incorrect video modes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,42 +36,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, MTTCG Devel <mttcg@listserver.greensocs.com>, Wenwen Wang <wenwang@cs.umn.edu>
+To: qemu-devel@nongnu.org
 
-Hi Peter,
+** Also affects: qemu
+   Importance: Undecided
+       Status: New
 
-Thanks for your suggestions! Will test some newer versions.
+** Changed in: qemu
+     Assignee: (unassigned) =3D> Herbie Robinson (hrob)
 
-Best,
-Wenwen
+-- =
 
-On Wed, Mar 8, 2017 at 2:42 PM, Peter Maydell <peter.maydell@linaro.org>
-wrote:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1670509
 
-> On 8 March 2017 at 18:17, Wenwen Wang <wenwang@cs.umn.edu> wrote:
-> > I just found that there is a significant performance difference between
-> QEMU
-> > version 2.2.0 and 2.6.0.
-> >
-> > Here are the execution times of the benchmark 458.sjeng from SPEC
-> CINT2006
-> > with test workload using user only emulation from ARM guest to x86-32
-> host:
-> >
-> > qemu-2.2.0: 29 seconds
-> > qemu-2.6.0: 38 seconds
->
-> 2.6.0 is now quite old -- it would be interesting to test this on
-> the current git master.
->
-> > Could anyone tell me what this difference comes from or give me any hint?
->
-> There are lots of changes between those two releases, and we don't
-> in general track performance at all, so a regression is not very
-> surprising to me. If you wanted to try to identify what caused it
-> you could try a git bisect.
->
-> thanks
-> -- PMM
->
+Title:
+  sgabios outputs incorrect video modes
+
+Status in QEMU:
+  New
+Status in sgabios package in Ubuntu:
+  New
+
+Bug description:
+  When run with a bootstrap loader that uses int 0x10 with 0x1301 in
+  %ax, incorrect video modes are output to the serial port.  I believe
+  the VGA image will be correct.  This might also affect the returned
+  values for some interrupts.
+
+  This is caused because the set_cursor_position routine fails to save
+  and restore %bx.
+
+  I'm working on a fix for this.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1670509/+subscriptions
