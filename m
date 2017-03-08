@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57834)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1clUt1-0004jC-GN
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 01:15:48 -0500
+	(envelope-from <famz@redhat.com>) id 1clUu8-0005Gn-3N
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 01:16:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1clUsy-0006Ka-AR
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 01:15:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44182)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1clUsy-0006II-4G
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 01:15:44 -0500
-Date: Wed, 8 Mar 2017 14:15:31 +0800
+	(envelope-from <famz@redhat.com>) id 1clUu7-0006lM-AN
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 01:16:56 -0500
+Date: Wed, 8 Mar 2017 14:16:47 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170308061531.GC7835@lemon.lan>
-References: <20170306112848.659-1-alex.bennee@linaro.org>
-	<20170307103744.GA6117@lemon.lan> <87d1dti4qk.fsf@linaro.org>
+Message-ID: <20170308061647.GD7835@lemon.lan>
+References: <20170307021748.7743-1-famz@redhat.com>
+	<453cf467-9b0c-efa8-a523-a3f35072e70d@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87d1dti4qk.fsf@linaro.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] docker/dockerfiles/debian-s390-cross:
- include clang
+In-Reply-To: <453cf467-9b0c-efa8-a523-a3f35072e70d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] file-posix: Incoporate max_segments in
+ block limit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +24,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, eblake@redhat.com
 
-On Tue, 03/07 13:41, Alex Benn=E9e wrote:
->=20
-> Fam Zheng <famz@redhat.com> writes:
->=20
-> > On Mon, 03/06 11:28, Alex Benn=E9e wrote:
-> >> It's a silly little limitation on Shippable that is looks for clang
-> >> in the container even though we won't use it. The arm/aarch64 cross
-> >> builds inherit this from debian.docker but as we needed to use
-> >> debian-testing for this we add it here. We also collapse the update
-> >> step into one RUN line to remove and intermediate layer of the docke=
-r
-> >> build.
-> >>
-> >> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> >> ---
-> >>  tests/docker/dockerfiles/debian-s390x-cross.docker | 4 ++--
-> >>  1 file changed, 2 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/tests/docker/dockerfiles/debian-s390x-cross.docker b/te=
-sts/docker/dockerfiles/debian-s390x-cross.docker
-> >> index bbb21ed088..3a687feda0 100644
-> >> --- a/tests/docker/dockerfiles/debian-s390x-cross.docker
-> >> +++ b/tests/docker/dockerfiles/debian-s390x-cross.docker
-> >> @@ -13,8 +13,8 @@ RUN cat /etc/apt/sources.list | sed "s/deb/deb-src=
-/" >> /etc/apt/sources.list
-> >>  RUN dpkg --add-architecture s390x
-> >>
-> >>  # Grab the updated list of packages
-> >> -RUN apt update
-> >> -RUN apt dist-upgrade -yy
-> >> +RUN apt update && apt dist-upgrade -yy
-> >> +RUN apt install -yy build-essential clang
-> >>  RUN apt-get build-dep -yy -a s390x qemu || apt-get -f install
-> >>  RUN apt install -yy gcc-multilib-s390x-linux-gnu binutils-multiarch
-> >>
-> >> --
-> >> 2.11.0
-> >>
-> >
-> > Looks sane. Is this for 2.9?
->=20
-> Yes please. The s390x cross build on shippable is currently broken
-> without it although we can use the container locally.
+On Tue, 03/07 11:58, Paolo Bonzini wrote:
+> 
+> 
+> On 07/03/2017 03:17, Fam Zheng wrote:
+> > Linux exposes a separate limit, /sys/block/.../queue/max_segments, which
+> > in the worst case can be more restrictive than BLKSECTGET (as they are
+> > two different things). Similar to the BLKSECTGET story, guests don't see
+> > this limit and send big requests will get -EINVAL error on SG_IO.
+> > 
+> > Lean on the safer side to clamp max_transfer according to max_segments
+> > and page size, because in the end what host HBA gets is the mapped host
+> > pages rather than a guest buffer.
+> > 
+> > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > ---
+> >  block/file-posix.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 58 insertions(+)
+> > 
+> > diff --git a/block/file-posix.c b/block/file-posix.c
+> > index 4de1abd..b615262 100644
+> > --- a/block/file-posix.c
+> > +++ b/block/file-posix.c
+> > @@ -668,6 +668,59 @@ static int hdev_get_max_transfer_length(BlockDriverState *bs, int fd)
+> >  #endif
+> >  }
+> >  
+> > +static int hdev_get_max_segments(BlockDriverState *bs)
+> > +{
+> > +#ifdef CONFIG_LINUX
+> > +    char buf[32];
+> > +    const char *end;
+> > +    char *sysfspath, *fullpath;
+> > +    int ret;
+> > +    int fd = -1;
+> > +    long max_segments;
+> > +
+> > +    fullpath = realpath(bs->exact_filename, NULL);
+> > +    if (!fullpath) {
+> > +        return -errno;
+> > +    }
+> > +    if (strncmp(fullpath, "/dev/", 5) || !fullpath[5]) {
+> > +        ret = -ENOTSUP;
+> > +        goto out;
+> > +    }
+> > +    sysfspath = g_strdup_printf("/sys/block/%s/queue/max_segments",
+> > +                                &fullpath[5]);
+> 
+> I think you cannot rely on the /dev/... path.  Luckily, there is an
+> alternative path to "queue" via /sys/dev/block/MAJOR:MINOR/queue, where
+> MAJOR:MINOR can be retrieved via fstat.  This also avoids any possible
+> TOC-TOU races.
 
-OK, I'll send a pull request soon.
+Sounds good, I'll send another version.
 
 Fam
