@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44369)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1clZdA-0003Md-Sc
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 06:19:45 -0500
+	(envelope-from <thuth@redhat.com>) id 1clZfs-0004vD-QE
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 06:22:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1clZd5-0002HT-Rw
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 06:19:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49952)
+	(envelope-from <thuth@redhat.com>) id 1clZfn-0003IY-UL
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 06:22:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48726)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1clZd5-0002HH-Lz
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 06:19:39 -0500
-Message-ID: <1488971976.6514.54.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 08 Mar 2017 12:19:36 +0100
-In-Reply-To: <20170308102009.GF7470@redhat.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1clZfn-0003IT-Oi
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 06:22:27 -0500
 References: <3d1c16a1-ec05-0367-e569-64a63b34f2e3@redhat.com>
-	<20170308102009.GF7470@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+	<CAFEAcA9cM=LjBRzrZdfsOss2xm4bKC6QM7gyg3HD4z-yeumTyw@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <940ff281-82cd-18cf-160e-c5234f65db18@redhat.com>
+Date: Wed, 8 Mar 2017 12:22:24 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA9cM=LjBRzrZdfsOss2xm4bKC6QM7gyg3HD4z-yeumTyw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
 Subject: Re: [Qemu-devel] What's the next QEMU version after 2.9 ? (or: when
  is a good point in time to get rid of old interfaces)
 List-Id: <qemu-devel.nongnu.org>
@@ -28,45 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Jason Wang <jasowang@redhat.com>
 
-  Hi,
+On 08.03.2017 11:03, Peter Maydell wrote:
+> On 8 March 2017 at 09:26, Thomas Huth <thuth@redhat.com> wrote:
+>> But anyway, the more important thing that keeps me concerned is: Someo=
+ne
+>>  once told me that we should get rid of old parameters and interfaces
+>> (like HMP commands) primarily only when we're changing to a new major
+>> version number. As you all know, QEMU has a lot of legacy options, whi=
+ch
+>> are likely rather confusing than helpful for the new users nowadays,
+>> e.g. things like the "-net channel" option (which is fortunately even
+>> hardly documented), but maybe also even the whole vlan/hub concept in
+>> the net code, or legacy parameters like "-usbdevice". If we switch to
+>> version 3.0, could we agree to remove at least some of them?
+>=20
+> I think if we are going to deprecate and remove options we need
+> a clear transition plan for doing so, which means at least one
+> release where options are "still works, but warn that they
+> are going away with pointer to documentation or similar info
+> about their replacement syntax", before actually dropping them.
 
-> libvirt suffered similar lack of clarity around when to bump major versio=
-n
-> number as opposed to minor version. To address this we recently adopted t=
-he
-> rule[1] that major version number changes have no relation to features. T=
-he
-> major number is simply incremented at the start of each calendar year.
+Yes, that's certainly a good idea. But as Daniel suggested in his mail,
+I think we should also have the rule that the option should be marked as
+deprecated in multiple releases first - so that the users have a chance
+to speak up before something gets really removed (otherwise the option
+could be removed right on the first day after the initial release with
+the deprecation message, so there is no time for the user to notice this
+and complain). Not sure whether we need three releases, as Daniel
+suggested, though, but if that's common sense, that's fine for me, too.
 
-I like the idea of time-based version numbering.  Changing the plan for
-2.9 still is probably a bad idea given we have a 2.9 machine type
-already etc.
+Anyway, I've now started a Wiki page where we could track the removal of
+deprecated interfaces:
 
-But we can start changing things afterwards.  So we could start with 3.x
-after 2.9, and bump the major for the first release each year
-(libvirt-style).  Or we could use the year as major number and jump
-straight to 17.x (mesa-style).
+ http://wiki.qemu-project.org/Features/LegacyRemoval
 
-> From the POV of libvirt, I don't think saying that .0 releases have
-> incompatible changes is particularly useful in itself. What *is* useful
-> is to have a clear rule around a deprecation cycle. ie, a rule that says
-> a feature will be marked deprecated for 3 releases or 12 months, before i=
-t
-> is permitted to be removed/changed. If that were followed, there is no
-> need to batch up such changes in a .0 release IMHO.
+Feedback / updates / addition of other legacy interfaces is welcome!
 
-Yes, it's probably a good idea to deprecate things first.  When going
-with the 12 months rule it could be useful to batch things and do a
-yearly "spring cleaning" when the major is bumped.
-
-We could also create new machine types for major versions only, to keep
-the number somewhat under control.  Not sure how well that would work in
-practice.  We'd probably need a ${type}-next machine type then (future
-${type}-4 machine type, for development, incompatible changes allowed)
-and make ${type}-3 the default machine type.
-
-cheers,=20
-  Gerd
+ Thomas
