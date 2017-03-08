@@ -1,35 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashmit602@gmail.com>) id 1clQOX-0001QW-6J
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 20:28:02 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1clQpg-0004e9-6B
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 20:56:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashmit602@gmail.com>) id 1clQOV-0001M0-NP
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 20:28:01 -0500
-Received: from mail-it0-x22f.google.com ([2607:f8b0:4001:c0b::22f]:35315)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ashmit602@gmail.com>) id 1clQOV-0001Lu-GZ
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 20:27:59 -0500
-Received: by mail-it0-x22f.google.com with SMTP id m27so25638405iti.0
-	for <qemu-devel@nongnu.org>; Tue, 07 Mar 2017 17:27:57 -0800 (PST)
+	(envelope-from <dgibson@ozlabs.org>) id 1clQpc-0000Mi-U0
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 20:56:04 -0500
+Date: Wed, 8 Mar 2017 12:47:30 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170308014730.GF19967@umbus.fritz.box>
+References: <1488878620-30617-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <20170306092305.GA9866@redhat.com>
-References: <20170222140920.GA10201@stefanha-x1.localdomain>
-	<20170222142230.GR28937@redhat.com>
-	<20170222144407.GS19045@localhost.localdomain>
-	<CAAo6VWPWjRTE3t9myt7Q6gTnZcvP72ypTE03PCFfJkvb2UWLTA@mail.gmail.com>
-	<20170224091916.GD3702@redhat.com>
-	<CAAo6VWPyQrjSp2qjvxqXRPS8=5N85i0-DJdkWhiGaXmND_8+qA@mail.gmail.com>
-	<20170227092207.GA18219@redhat.com>
-	<CAAo6VWO6zAijMMjHOkefO22wh+6dXigZ6a+g-pMNBcM0MN1HHw@mail.gmail.com>
-	<20170301091851.GD17125@redhat.com>
-	<CAAo6VWNRhK6zvc+CferSd9wYQZNNoXDqCEW_G62crqsamyEC9Q@mail.gmail.com>
-	<20170306092305.GA9866@redhat.com>
-From: ashish mittal <ashmit602@gmail.com>
-Date: Tue, 7 Mar 2017 17:27:55 -0800
-Message-ID: <CAAo6VWMo-wYwkOAENk4swYk3dkbxaJObXrj85yDRLAUofK2qtw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
- block device type called "vxhs"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="0rSojgWGcpz+ezC3"
+Content-Disposition: inline
+In-Reply-To: <1488878620-30617-1-git-send-email-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH for-2.10] ppc/spapr: QOM'ify sPAPRRTCState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,162 +23,283 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Thanks! There is one more input I need some help with!
 
-VxHS network library opens a fixed number of connection channels to a
-given host, and all the vdisks (that connect to the same host) share
-these connection channels.
+--0rSojgWGcpz+ezC3
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Therefore, we need to open secure channels to a specific target host
-only once for the first vdisk that connects to that host. All the
-other vdisks that connect to the same target host will share the same
-set of secure communication channels.
+On Tue, Mar 07, 2017 at 10:23:40AM +0100, C=E9dric Le Goater wrote:
+> Also use an 'sPAPRRTCState' attribute under the sPAPR machine to hold
+> the RTC object. Overall, these changes remove an unnecessary and
+> implicit dependency on SysBus.
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-I hope the above scheme is acceptable?
+Applied to ppc-for-2.10.
 
-If yes, then we have a couple of options to implement this:
+> ---
+>  hw/ppc/spapr.c         | 16 ++++++++--------
+>  hw/ppc/spapr_events.c  |  2 +-
+>  hw/ppc/spapr_rtc.c     | 41 +++++++----------------------------------
+>  include/hw/ppc/spapr.h | 21 ++++++++++++++++-----
+>  include/hw/ppc/xics.h  |  2 +-
+>  5 files changed, 33 insertions(+), 49 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index c3bb99160545..3a7868ed80da 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1333,13 +1333,13 @@ static void spapr_create_nvram(sPAPRMachineState =
+*spapr)
+> =20
+>  static void spapr_rtc_create(sPAPRMachineState *spapr)
+>  {
+> -    DeviceState *dev =3D qdev_create(NULL, TYPE_SPAPR_RTC);
+> -
+> -    qdev_init_nofail(dev);
+> -    spapr->rtc =3D dev;
+> -
+> -    object_property_add_alias(qdev_get_machine(), "rtc-time",
+> -                              OBJECT(spapr->rtc), "date", NULL);
+> +    object_initialize(&spapr->rtc, sizeof(spapr->rtc), TYPE_SPAPR_RTC);
+> +    object_property_add_child(OBJECT(spapr), "rtc", OBJECT(&spapr->rtc),
+> +                              &error_fatal);
+> +    object_property_set_bool(OBJECT(&spapr->rtc), true, "realized",
+> +                              &error_fatal);
+> +    object_property_add_alias(OBJECT(spapr), "rtc-time", OBJECT(&spapr->=
+rtc),
+> +                              "date", &error_fatal);
+>  }
+> =20
+>  /* Returns whether we want to use VGA or not */
+> @@ -1377,7 +1377,7 @@ static int spapr_post_load(void *opaque, int versio=
+n_id)
+>       * So when migrating from those versions, poke the incoming offset
+>       * value into the RTC device */
+>      if (version_id < 3) {
+> -        err =3D spapr_rtc_import_offset(spapr->rtc, spapr->rtc_offset);
+> +        err =3D spapr_rtc_import_offset(&spapr->rtc, spapr->rtc_offset);
+>      }
+> =20
+>      return err;
+> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> index 24a5758e6243..f0b28d811242 100644
+> --- a/hw/ppc/spapr_events.c
+> +++ b/hw/ppc/spapr_events.c
+> @@ -422,7 +422,7 @@ static void spapr_init_maina(struct rtas_event_log_v6=
+_maina *maina,
+>      maina->hdr.section_id =3D cpu_to_be16(RTAS_LOG_V6_SECTION_ID_MAINA);
+>      maina->hdr.section_length =3D cpu_to_be16(sizeof(*maina));
+>      /* FIXME: section version, subtype and creator id? */
+> -    spapr_rtc_read(spapr->rtc, &tm, NULL);
+> +    spapr_rtc_read(&spapr->rtc, &tm, NULL);
+>      year =3D tm.tm_year + 1900;
+>      maina->creation_date =3D cpu_to_be32((to_bcd(year / 100) << 24)
+>                                         | (to_bcd(year % 100) << 16)
+> diff --git a/hw/ppc/spapr_rtc.c b/hw/ppc/spapr_rtc.c
+> index 3a17ac42e44b..00a4e4c717d5 100644
+> --- a/hw/ppc/spapr_rtc.c
+> +++ b/hw/ppc/spapr_rtc.c
+> @@ -33,19 +33,8 @@
+>  #include "qapi-event.h"
+>  #include "qemu/cutils.h"
+> =20
+> -#define SPAPR_RTC(obj) \
+> -    OBJECT_CHECK(sPAPRRTCState, (obj), TYPE_SPAPR_RTC)
+> -
+> -typedef struct sPAPRRTCState sPAPRRTCState;
+> -struct sPAPRRTCState {
+> -    /*< private >*/
+> -    SysBusDevice parent_obj;
+> -    int64_t ns_offset;
+> -};
+> -
+> -void spapr_rtc_read(DeviceState *dev, struct tm *tm, uint32_t *ns)
+> +void spapr_rtc_read(sPAPRRTCState *rtc, struct tm *tm, uint32_t *ns)
+>  {
+> -    sPAPRRTCState *rtc =3D SPAPR_RTC(dev);
+>      int64_t host_ns =3D qemu_clock_get_ns(rtc_clock);
+>      int64_t guest_ns;
+>      time_t guest_s;
+> @@ -63,16 +52,12 @@ void spapr_rtc_read(DeviceState *dev, struct tm *tm, =
+uint32_t *ns)
+>      }
+>  }
+> =20
+> -int spapr_rtc_import_offset(DeviceState *dev, int64_t legacy_offset)
+> +int spapr_rtc_import_offset(sPAPRRTCState *rtc, int64_t legacy_offset)
+>  {
+> -    sPAPRRTCState *rtc;
+> -
+> -    if (!dev) {
+> +    if (!rtc) {
+>          return -ENODEV;
+>      }
+> =20
+> -    rtc =3D SPAPR_RTC(dev);
+> -
+>      rtc->ns_offset =3D legacy_offset * NANOSECONDS_PER_SECOND;
+> =20
+>      return 0;
+> @@ -91,12 +76,7 @@ static void rtas_get_time_of_day(PowerPCCPU *cpu, sPAP=
+RMachineState *spapr,
+>          return;
+>      }
+> =20
+> -    if (!spapr->rtc) {
+> -        rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
+> -        return;
+> -    }
+> -
+> -    spapr_rtc_read(spapr->rtc, &tm, &ns);
+> +    spapr_rtc_read(&spapr->rtc, &tm, &ns);
+> =20
+>      rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+>      rtas_st(rets, 1, tm.tm_year + 1900);
+> @@ -113,7 +93,7 @@ static void rtas_set_time_of_day(PowerPCCPU *cpu, sPAP=
+RMachineState *spapr,
+>                                   target_ulong args,
+>                                   uint32_t nret, target_ulong rets)
+>  {
+> -    sPAPRRTCState *rtc;
+> +    sPAPRRTCState *rtc =3D &spapr->rtc;
+>      struct tm tm;
+>      time_t new_s;
+>      int64_t host_ns;
+> @@ -123,11 +103,6 @@ static void rtas_set_time_of_day(PowerPCCPU *cpu, sP=
+APRMachineState *spapr,
+>          return;
+>      }
+> =20
+> -    if (!spapr->rtc) {
+> -        rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
+> -        return;
+> -    }
+> -
+>      tm.tm_year =3D rtas_ld(args, 0) - 1900;
+>      tm.tm_mon =3D rtas_ld(args, 1) - 1;
+>      tm.tm_mday =3D rtas_ld(args, 2);
+> @@ -144,8 +119,6 @@ static void rtas_set_time_of_day(PowerPCCPU *cpu, sPA=
+PRMachineState *spapr,
+>      /* Generate a monitor event for the change */
+>      qapi_event_send_rtc_change(qemu_timedate_diff(&tm), &error_abort);
+> =20
+> -    rtc =3D SPAPR_RTC(spapr->rtc);
+> -
+>      host_ns =3D qemu_clock_get_ns(rtc_clock);
+> =20
+>      rtc->ns_offset =3D (new_s * NANOSECONDS_PER_SECOND) - host_ns;
+> @@ -155,7 +128,7 @@ static void rtas_set_time_of_day(PowerPCCPU *cpu, sPA=
+PRMachineState *spapr,
+> =20
+>  static void spapr_rtc_qom_date(Object *obj, struct tm *current_tm, Error=
+ **errp)
+>  {
+> -    spapr_rtc_read(DEVICE(obj), current_tm, NULL);
+> +    spapr_rtc_read(SPAPR_RTC(obj), current_tm, NULL);
+>  }
+> =20
+>  static void spapr_rtc_realize(DeviceState *dev, Error **errp)
+> @@ -200,7 +173,7 @@ static void spapr_rtc_class_init(ObjectClass *oc, voi=
+d *data)
+> =20
+>  static const TypeInfo spapr_rtc_info =3D {
+>      .name          =3D TYPE_SPAPR_RTC,
+> -    .parent        =3D TYPE_SYS_BUS_DEVICE,
+> +    .parent        =3D TYPE_DEVICE,
+>      .instance_size =3D sizeof(sPAPRRTCState),
+>      .class_init    =3D spapr_rtc_class_init,
+>  };
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 808aac870359..ba9e689ee230 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -20,6 +20,18 @@ typedef struct sPAPREventSource sPAPREventSource;
+> =20
+>  #define SPAPR_TIMEBASE_FREQ     512000000ULL
+> =20
+> +#define TYPE_SPAPR_RTC "spapr-rtc"
+> +
+> +#define SPAPR_RTC(obj)                                  \
+> +    OBJECT_CHECK(sPAPRRTCState, (obj), TYPE_SPAPR_RTC)
+> +
+> +typedef struct sPAPRRTCState sPAPRRTCState;
+> +struct sPAPRRTCState {
+> +    /*< private >*/
+> +    DeviceState parent_obj;
+> +    int64_t ns_offset;
+> +};
+> +
+>  typedef struct sPAPRMachineClass sPAPRMachineClass;
+> =20
+>  #define TYPE_SPAPR_MACHINE      "spapr-machine"
+> @@ -58,7 +70,7 @@ struct sPAPRMachineState {
+>      QLIST_HEAD(, sPAPRPHBState) phbs;
+>      struct sPAPRNVRAM *nvram;
+>      ICSState *ics;
+> -    DeviceState *rtc;
+> +    sPAPRRTCState rtc;
+> =20
+>      void *htab;
+>      uint32_t htab_shift;
+> @@ -629,11 +641,10 @@ struct sPAPRConfigureConnectorState {
+> =20
+>  void spapr_ccs_reset_hook(void *opaque);
+> =20
+> -#define TYPE_SPAPR_RTC "spapr-rtc"
+> -#define TYPE_SPAPR_RNG "spapr-rng"
+> +void spapr_rtc_read(sPAPRRTCState *rtc, struct tm *tm, uint32_t *ns);
+> +int spapr_rtc_import_offset(sPAPRRTCState *rtc, int64_t legacy_offset);
+> =20
+> -void spapr_rtc_read(DeviceState *dev, struct tm *tm, uint32_t *ns);
+> -int spapr_rtc_import_offset(DeviceState *dev, int64_t legacy_offset);
+> +#define TYPE_SPAPR_RNG "spapr-rng"
+> =20
+>  int spapr_rng_populate_dt(void *fdt);
+> =20
+> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> index 9a5e715fe553..ce230183a106 100644
+> --- a/include/hw/ppc/xics.h
+> +++ b/include/hw/ppc/xics.h
+> @@ -28,7 +28,7 @@
+>  #ifndef XICS_H
+>  #define XICS_H
+> =20
+> -#include "hw/sysbus.h"
+> +#include "hw/qdev.h"
+> =20
+>  #define XICS_IPI        0x2
+>  #define XICS_BUID       0x1
 
-(1) Accept the TLS credentials per vdisk using the previously
-discussed --object tls-creds-x509 mechanism. In this case, if more
-than one vdisk have the same host info, then we will use only the
-first one's creds to set up the secure connection, and ignore the
-others. vdisks that connect to different target hosts will use their
-individual tls-creds-x509 to set up the secure channels. This is, of
-course, not relevant for qemu-img/qemu-io as they can open only one
-vdisk at a time.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-(2) Instead of having a per-vdisk --object tls-creds-x509, have a
-single such argument on the command line for vxhs block device code to
-consume - if that is possible! One way to achieve this could be the
-user/password authentication we discussed earlier, which we could use
-to pass the directory where cert/keys are kept.
+--0rSojgWGcpz+ezC3
+Content-Type: application/pgp-signature; name="signature.asc"
 
-(3) Use the instance UUID, when available, to lookup the cert files
-per instance (i.e. for qemu-kvm), and use the --object tls-creds-x509
-mechanism, when instance UUID is NULL (i.e. qemu-io, qemu-img etc).
-The cert/key files are anyway protected by file permissions in either
-case, so I guess there is no additional security provided by either
-method.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-Regards,
-Ashish
+iQIcBAEBCAAGBQJYv2KyAAoJEGw4ysog2bOSBbIQAJ30+2omvJikJ6P1Tb8M2ZFR
+H/h3TCuoiv3tQuw+idyKU+Haj120HtguAwuKiULG6PgSu8hLBdhpeBfruUHok+8F
+dPogWqE9dQsT+Hcg2BrDmd8X5DS5sypCbnk09rElMtaKMJ0HepRuMvTjip0xVDNZ
+4HdUtSPqnt+86UdFlXiXWCr4sCJtbSsVE49xB+HnRHSVpNX8c2f++FV4cavh7oce
+OHFIBxzkyk7rLBpLp8iUJSXL/6hhLR3PywARAU7aTAaxbJiNYmF7Y9YGT09B8rlc
+gGDOPS5SA5Q8glPjBfmD21thM/Rzs1oqFNbj+2YqOd1IaikeNT1XZnfgOm6c+TXw
+jLLDhZtrwXEnMFsbNMe1tH5CzOXoo1OIoDh7aXB5KWGATDqXjXjfSTW9Ib3BjKuW
+law3CD1TTSJ/PCQerZ0gWl0Qweea/qqes+5Ft44zCsBGJDbbek/zyJ199JX8n4Bb
+ylVuW3F2XPqWyaVdEDgibOrc23jCQQ6Rbk98FRSfsVMAvcLdhdyir3DEAFWnGAiQ
+04vS+2+EzG4pnjeultndaeLJFLSJw3QQQX7sEeBMaMbcOLvxT5LYjRcqqHuKzbk0
+UCllDE4HI11awoNvd7dK8yIumupD0N6QtGpwJXTyE/ehnIGubDZc+96ghL8BW6bE
+EghfUcCZWfEXT4BwUWfJ
+=JoBA
+-----END PGP SIGNATURE-----
 
-On Mon, Mar 6, 2017 at 1:23 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
-> On Sun, Mar 05, 2017 at 04:26:05PM -0800, ashish mittal wrote:
->> On Wed, Mar 1, 2017 at 1:18 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
->> >
->> > Yes, that's how other parts of QEMU deal with SSL
->> >
->> > NB, QEMU needs to pass 3 paths to libqnoio - the client cert, the
->> > client key, and the certificate authority certlist
->> >
->>
->> I see that the QEMU TLS code internally does expect to find cacert,
->> and errors out if this is missing. I did have to create one and place
->> it in the dir path where we are keeping the client key,cert files. The
->> code diff below requires all the three files.
->
-> Yes, the client cert/key have to be paired with the correct CA cert. We cannot
-> assume that the default CA cert bundle contains the right CA, for use with the
-> cert/key. The default CA bundle contains all the public commercial CAs, and in
-> general a QEMU deployment will never use any of those - the site will use a
-> private internal only CA. While you could add the private CA to the global CA
-> bundle, that is not desirable from a security POV, as it opens the deployment
-> to risk from a rogue CA.
->
->> > The include/crypto/tlscredsx509.h file has constants defined for the
->> > standard filenames - eg you would concatenate the directory with
->> > the constants QCRYPTO_TLS_CREDS_X509_CLIENT_KEY.
->> >
->> > This gives the filenames you can then pass to libqnio
->> >
->>
->> I am using function qcrypto_tls_creds_get_path() to achieve the same.
->> Hope this is OK.
->
-> Yep, that's fine.
->
->> Example CLI accepting the new TLS credentials:
->>
->> [amittal2@camshaft qemu] 2017-03-05 15:54:55$ ./qemu-io --trace
->> enable=vxhs* --object
->> tls-creds-x509,id=tls0,dir=/etc/pki/qemu/vxhs,endpoint=client -c 'read
->> 66000 128k' 'json:{"server.host": "127.0.0.1", "server.port": "9999",
->> "vdisk-id": "/test.raw", "driver": "vxhs", "tls-creds":"tls0"}'
->> 15116@1488758101.084355:vxhs_open_vdiskid Opening vdisk-id /test.raw
->> 15116@1488758101.084396:vxhs_get_creds cacert
->> /etc/pki/qemu/vxhs/ca-cert.pem, client_key
->> /etc/pki/qemu/vxhs/client-key.pem, client_cert
->> /etc/pki/qemu/vxhs/client-cert.pem   <===== !!!! NOTE !!!!
->> 15116@1488758101.084402:vxhs_open_hostinfo Adding host 127.0.0.1:9999
->> to BDRVVXHSState
->> 15116@1488758101.092060:vxhs_get_vdisk_stat vDisk /test.raw stat ioctl
->> returned size 1048576
->> read 131072/131072 bytes at offset 66000
->> 128 KiB, 1 ops; 0.0006 sec (188.537 MiB/sec and 1508.2956 ops/sec)
->> 15116@1488758101.094643:vxhs_close Closing vdisk /test.raw
->> [amittal2@camshaft qemu] 2017-03-05 15:55:01$
->
-> That looks ok.
->
->> @@ -315,33 +374,39 @@ static int vxhs_open(BlockDriverState *bs, QDict *options,
->>      if (strlen(server_host_opt) > MAXHOSTNAMELEN) {
->>          error_setg(&local_err, "server.host cannot be more than %d characters",
->>                     MAXHOSTNAMELEN);
->> -        qdict_del(backing_options, str);
->>          ret = -EINVAL;
->>          goto out;
->>      }
->>
->> -    s->vdisk_hostinfo.host = g_strdup(server_host_opt);
->> +    /* check if we got tls-creds via the --object argument */
->> +    s->tlscredsid = g_strdup(qemu_opt_get(opts, "tls-creds"));
->> +    if (s->tlscredsid) {
->> +        vxhs_get_tls_creds(s->tlscredsid, &cacert, &client_key,
->> +                           &client_cert, &local_err);
->> +        if (local_err != NULL) {
->> +            ret = -EINVAL;
->> +            goto out;
->> +        }
->> +        trace_vxhs_get_creds(cacert, client_key, client_cert);
->> +    }
->>
->> +    s->vdisk_hostinfo.host = g_strdup(server_host_opt);
->>      s->vdisk_hostinfo.port = g_ascii_strtoll(qemu_opt_get(tcp_opts,
->>                                                            VXHS_OPT_PORT),
->>                                                            NULL, 0);
->>
->>      trace_vxhs_open_hostinfo(s->vdisk_hostinfo.host,
->> -                         s->vdisk_hostinfo.port);
->> -
->> -    /* free the 'server.' entries allocated by previous call to
->> -     * qdict_extract_subqdict()
->> -     */
->> -    qdict_del(backing_options, str);
->> +                             s->vdisk_hostinfo.port);
->>
->>      of_vsa_addr = g_strdup_printf("of://%s:%d",
->> -                                s->vdisk_hostinfo.host,
->> -                                s->vdisk_hostinfo.port);
->> +                                  s->vdisk_hostinfo.host,
->> +                                  s->vdisk_hostinfo.port);
->>
->>      /*
->>       * Open qnio channel to storage agent if not opened before.
->>       */
->> -    dev_handlep = iio_open(of_vsa_addr, s->vdisk_guid, 0);
->> +    dev_handlep = iio_open(of_vsa_addr, s->vdisk_guid, 0,
->> +                           client_key, client_cert);
->
-> You need to pass  ca_cert into this method too.
->
->
-> Regards,
-> Daniel
-> --
-> |: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-> |: http://libvirt.org              -o-             http://virt-manager.org :|
-> |: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+--0rSojgWGcpz+ezC3--
