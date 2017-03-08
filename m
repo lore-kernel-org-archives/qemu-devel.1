@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36960)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1clZDW-0007ah-00
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 05:53:15 -0500
+	(envelope-from <clg@kaod.org>) id 1clZDZ-0007dx-HI
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 05:53:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1clZDV-00037G-4M
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 05:53:14 -0500
-Received: from 9.mo177.mail-out.ovh.net ([46.105.72.238]:57780)
+	(envelope-from <clg@kaod.org>) id 1clZDY-00038K-4P
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 05:53:17 -0500
+Received: from 9.mo177.mail-out.ovh.net ([46.105.72.238]:32876)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1clZDU-00035G-UE
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 05:53:13 -0500
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1clZDX-000386-RL
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 05:53:16 -0500
 Received: from player714.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id BF9023BD53
-	for <qemu-devel@nongnu.org>; Wed,  8 Mar 2017 11:53:05 +0100 (CET)
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id E879338686
+	for <qemu-devel@nongnu.org>; Wed,  8 Mar 2017 11:53:13 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Wed,  8 Mar 2017 11:52:45 +0100
-Message-Id: <1488970371-8865-3-git-send-email-clg@kaod.org>
+Date: Wed,  8 Mar 2017 11:52:47 +0100
+Message-Id: <1488970371-8865-5-git-send-email-clg@kaod.org>
 In-Reply-To: <1488970371-8865-1-git-send-email-clg@kaod.org>
 References: <1488970371-8865-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-2.10 2/8] ppc/xics: add an ics_eoi()
- handler to XICSFabric
+Subject: [Qemu-devel] [PATCH for-2.10 4/8] ppc/pnv: add memory regions for
+ the ICP registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,100 +33,322 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-This handler will be required by PowerPC machines using multiple ICS
-objects, like this is the case for PowerNV. Also update the sPAPR
-machine to use the new handler.
+This provides to a PowerNV chip (POWER8) access to the Interrupt
+Management area, which contains the registers of the Interrupt Control
+Presenters of each thread. These are used to accept, return, forward
+interrupts in the system.
+
+This area is modeled with a per-chip container memory region holding
+all the ICP registers. Each thread of a chip is then associated with
+its ICP registers using a memory subregion indexed by its PIR number
+in the overall region.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/intc/xics.c        |  9 +++------
- hw/ppc/spapr.c        | 11 +++++++++++
- include/hw/ppc/xics.h |  2 ++
- 3 files changed, 16 insertions(+), 6 deletions(-)
+ hw/ppc/pnv.c              |  20 +++++++
+ hw/ppc/pnv_core.c         | 146 ++++++++++++++++++++++++++++++++++++++++=
+++++++
+ include/hw/ppc/pnv.h      |  20 +++++++
+ include/hw/ppc/pnv_core.h |   1 +
+ include/hw/ppc/xics.h     |   3 +
+ 5 files changed, 190 insertions(+)
 
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index 209e1a75ecb9..e6fecd6e1a89 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -169,7 +169,7 @@ void ics_resend(ICSState *ics)
-     }
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 461d3535e99c..7b13b08deadf 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -658,6 +658,16 @@ static void pnv_chip_init(Object *obj)
+     object_property_add_child(obj, "lpc", OBJECT(&chip->lpc), NULL);
  }
 =20
--static void ics_eoi(ICSState *ics, int nr)
-+void ics_eoi(ICSState *ics, int nr)
- {
-     ICSStateClass *k =3D ICS_BASE_GET_CLASS(ics);
-=20
-@@ -268,7 +268,6 @@ void icp_eoi(ICPState *icp, uint32_t xirr)
- {
-     XICSFabric *xi =3D icp->xics;
-     XICSFabricClass *xic =3D XICS_FABRIC_GET_CLASS(xi);
--    ICSState *ics;
-     uint32_t irq;
-=20
-     /* Send EOI -> ICS */
-@@ -276,10 +275,8 @@ void icp_eoi(ICPState *icp, uint32_t xirr)
-     trace_xics_icp_eoi(icp->cs->cpu_index, xirr, icp->xirr);
-     irq =3D xirr & XISR_MASK;
-=20
--    ics =3D xic->ics_get(xi, irq);
--    if (ics) {
--        ics_eoi(ics, irq);
--    }
-+    xic->ics_eoi(xi, irq);
-+
-     if (!XISR(icp)) {
-         icp_resend(icp);
-     }
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index c3bb99160545..043629cc5c54 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3024,6 +3024,16 @@ static void spapr_ics_resend(XICSFabric *dev)
-     ics_resend(spapr->ics);
- }
-=20
-+static void spapr_ics_eoi(XICSFabric *xi, int irq)
++static void pnv_chip_icp_realize(PnvChip *chip, Error **errp)
 +{
-+    ICSState *ics;
++    char *name;
 +
-+    ics =3D spapr_ics_get(xi, irq);
-+    if (ics) {
-+        ics_eoi(ics, irq);
++    name =3D g_strdup_printf("icp-%x", chip->chip_id);
++    memory_region_init(&chip->icp_mmio, OBJECT(chip), name, PNV_ICP_SIZE=
+);
++    sysbus_init_mmio(SYS_BUS_DEVICE(chip), &chip->icp_mmio);
++    g_free(name);
++}
++
+ static void pnv_chip_realize(DeviceState *dev, Error **errp)
+ {
+     PnvChip *chip =3D PNV_CHIP(dev);
+@@ -680,6 +690,14 @@ static void pnv_chip_realize(DeviceState *dev, Error=
+ **errp)
+     }
+     sysbus_mmio_map(SYS_BUS_DEVICE(chip), 0, PNV_XSCOM_BASE(chip));
+=20
++    /* Interrupt Management Area. This is the memory region holding
++     * all the Interrupt Control Presenter (ICP) registers */
++    pnv_chip_icp_realize(chip, &error);
++    if (error) {
++        error_propagate(errp, error);
++        return;
++    }
++
+     /* Cores */
+     pnv_chip_core_sanitize(chip, &error);
+     if (error) {
+@@ -709,6 +727,8 @@ static void pnv_chip_realize(DeviceState *dev, Error =
+**errp)
+         object_property_set_int(OBJECT(pnv_core),
+                                 pcc->core_pir(chip, core_hwid),
+                                 "pir", &error_fatal);
++        object_property_add_const_link(OBJECT(pnv_core), "xics",
++                                       qdev_get_machine(), &error_fatal)=
+;
+         object_property_set_bool(OBJECT(pnv_core), true, "realized",
+                                  &error_fatal);
+         object_unref(OBJECT(pnv_core));
+diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+index d79d530b4881..8633afbff795 100644
+--- a/hw/ppc/pnv_core.c
++++ b/hw/ppc/pnv_core.c
+@@ -26,6 +26,128 @@
+ #include "hw/ppc/pnv_core.h"
+ #include "hw/ppc/pnv_xscom.h"
+=20
++static uint64_t pnv_core_icp_read(void *opaque, hwaddr addr, unsigned wi=
+dth)
++{
++    ICPState *icp =3D opaque;
++    bool byte0 =3D (width =3D=3D 1 && (addr & 0x3) =3D=3D 0);
++    uint64_t val =3D 0xffffffff;
++
++    switch (addr & 0xffc) {
++    case 0: /* poll */
++        val =3D icp_ipoll(icp, NULL);
++        if (byte0) {
++            val >>=3D 24;
++        } else if (width !=3D 4) {
++            goto bad_access;
++        }
++        break;
++    case 4: /* xirr */
++        if (byte0) {
++            val =3D icp_ipoll(icp, NULL) >> 24;
++        } else if (width =3D=3D 4) {
++            val =3D icp_accept(icp);
++        } else {
++            goto bad_access;
++        }
++        break;
++    case 12:
++        if (byte0) {
++            val =3D icp->mfrr;
++        } else {
++            goto bad_access;
++        }
++        break;
++    case 16:
++        if (width =3D=3D 4) {
++            val =3D icp->links[0];
++        } else {
++            goto bad_access;
++        }
++        break;
++    case 20:
++        if (width =3D=3D 4) {
++            val =3D icp->links[1];
++        } else {
++            goto bad_access;
++        }
++        break;
++    case 24:
++        if (width =3D=3D 4) {
++            val =3D icp->links[2];
++        } else {
++            goto bad_access;
++        }
++        break;
++    default:
++bad_access:
++        qemu_log_mask(LOG_GUEST_ERROR, "XICS: Bad ICP access 0x%"
++                      HWADDR_PRIx"/%d\n", addr, width);
++    }
++
++    return val;
++}
++
++static void pnv_core_icp_write(void *opaque, hwaddr addr, uint64_t val,
++                              unsigned width)
++{
++    ICPState *icp =3D opaque;
++    bool byte0 =3D (width =3D=3D 1 && (addr & 0x3) =3D=3D 0);
++
++    switch (addr & 0xffc) {
++    case 4: /* xirr */
++        if (byte0) {
++            icp_set_cppr(icp, val);
++        } else if (width =3D=3D 4) {
++            icp_eoi(icp, val);
++        } else {
++            goto bad_access;
++        }
++        break;
++    case 12:
++        if (byte0) {
++            icp_set_mfrr(icp, val);
++        } else {
++            goto bad_access;
++        }
++        break;
++    case 16:
++        if (width =3D=3D 4) {
++            icp->links[0] =3D val;
++        } else {
++            goto bad_access;
++        }
++        break;
++    case 20:
++        if (width =3D=3D 4) {
++            icp->links[1] =3D val;
++        } else {
++            goto bad_access;
++        }
++        break;
++    case 24:
++        if (width =3D=3D 4) {
++            icp->links[2] =3D val;
++        } else {
++            goto bad_access;
++        }
++        break;
++    default:
++bad_access:
++        qemu_log_mask(LOG_GUEST_ERROR, "XICS: Bad ICP access 0x%"
++                      HWADDR_PRIx"/%d\n", addr, width);
 +    }
 +}
 +
- static ICPState *spapr_icp_get(XICSFabric *xi, int server)
++static const MemoryRegionOps pnv_core_icp_ops =3D {
++    .read =3D pnv_core_icp_read,
++    .write =3D pnv_core_icp_write,
++    .valid.min_access_size =3D 1,
++    .valid.max_access_size =3D 4,
++    .impl.min_access_size =3D 1,
++    .impl.max_access_size =3D 4,
++    .endianness =3D DEVICE_BIG_ENDIAN,
++};
++
+ static void powernv_cpu_reset(void *opaque)
  {
-     sPAPRMachineState *spapr =3D SPAPR_MACHINE(xi);
-@@ -3094,6 +3104,7 @@ static void spapr_machine_class_init(ObjectClass *o=
-c, void *data)
-     vhc->get_patbe =3D spapr_get_patbe;
-     xic->ics_get =3D spapr_ics_get;
-     xic->ics_resend =3D spapr_ics_resend;
-+    xic->ics_eoi =3D spapr_ics_eoi;
-     xic->icp_get =3D spapr_icp_get;
-     ispc->print_info =3D spapr_pic_print_info;
+     PowerPCCPU *cpu =3D opaque;
+@@ -129,6 +251,14 @@ static void pnv_core_realize_child(Object *child, Er=
+ror **errp)
+     }
  }
+=20
++static ICPState *xics_get_icp_per_pir(XICSFabric *xi, int pir)
++{
++    int index =3D xics_get_cpu_index_by_pir(pir);
++    assert(index !=3D -1);
++
++    return xics_icp_get(xi, index);
++}
++
+ static void pnv_core_realize(DeviceState *dev, Error **errp)
+ {
+     PnvCore *pc =3D PNV_CORE(OBJECT(dev));
+@@ -140,6 +270,14 @@ static void pnv_core_realize(DeviceState *dev, Error=
+ **errp)
+     void *obj;
+     int i, j;
+     char name[32];
++    Object *xi;
++
++    xi =3D object_property_get_link(OBJECT(dev), "xics", &local_err);
++    if (!xi) {
++        error_setg(errp, "%s: required link 'xics' not found: %s",
++                   __func__, error_get_pretty(local_err));
++        return;
++    }
+=20
+     pc->threads =3D g_malloc0(size * cc->nr_threads);
+     for (i =3D 0; i < cc->nr_threads; i++) {
+@@ -169,6 +307,14 @@ static void pnv_core_realize(DeviceState *dev, Error=
+ **errp)
+     snprintf(name, sizeof(name), "xscom-core.%d", cc->core_id);
+     pnv_xscom_region_init(&pc->xscom_regs, OBJECT(dev), &pnv_core_xscom_=
+ops,
+                           pc, name, PNV_XSCOM_EX_CORE_SIZE);
++
++    pc->icp_mmios =3D g_new0(MemoryRegion, cc->nr_threads);
++    for (i =3D 0; i < cc->nr_threads; i++) {
++        ICPState *icp =3D xics_get_icp_per_pir(XICS_FABRIC(xi), pc->pir =
++ i);
++        snprintf(name, sizeof(name), "icp-core.%d", cc->core_id);
++        memory_region_init_io(&pc->icp_mmios[i], OBJECT(dev),
++                              &pnv_core_icp_ops, icp, name, 0x1000);
++    }
+     return;
+=20
+ err:
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index 6a0b004cea93..f11215ea31f2 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -55,6 +55,7 @@ typedef struct PnvChip {
+     MemoryRegion xscom_mmio;
+     MemoryRegion xscom;
+     AddressSpace xscom_as;
++    MemoryRegion icp_mmio;
+=20
+     PnvLpcController lpc;
+ } PnvChip;
+@@ -130,4 +131,23 @@ typedef struct PnvMachineState {
+ #define PNV_XSCOM_BASE(chip)                                            =
+\
+     (chip->xscom_base + ((uint64_t)(chip)->chip_id) * PNV_XSCOM_SIZE)
+=20
++/*
++ * XSCOM 0x20109CA defines the ICP BAR:
++ *
++ * 0:29   : bits 14 to 43 of address to define 1 MB region.
++ * 30     : 1 to enable ICP to receive loads/stores against its BAR regi=
+on
++ * 31:63  : Constant 0
++ *
++ * Usually defined as :
++ *
++ *      0xffffe00200000000 -> 0x0003ffff80000000
++ *      0xffffe00600000000 -> 0x0003ffff80100000
++ *      0xffffe02200000000 -> 0x0003ffff80800000
++ *      0xffffe02600000000 -> 0x0003ffff80900000
++ *
++ * TODO: make a macro using the chip hw id
++ */
++#define PNV_ICP_BASE(chip)   0x0003ffff80000000ull
++#define PNV_ICP_SIZE         0x0000000000100000ull
++
+ #endif /* _PPC_PNV_H */
+diff --git a/include/hw/ppc/pnv_core.h b/include/hw/ppc/pnv_core.h
+index 2955a41c901f..f2fad8f6361b 100644
+--- a/include/hw/ppc/pnv_core.h
++++ b/include/hw/ppc/pnv_core.h
+@@ -38,6 +38,7 @@ typedef struct PnvCore {
+     uint32_t pir;
+=20
+     MemoryRegion xscom_regs;
++    MemoryRegion *icp_mmios;
+ } PnvCore;
+=20
+ typedef struct PnvCoreClass {
 diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index 42bd24e975cb..00b003b2392d 100644
+index c2032cac55f6..a3dcdf93bbe3 100644
 --- a/include/hw/ppc/xics.h
 +++ b/include/hw/ppc/xics.h
-@@ -155,6 +155,7 @@ typedef struct XICSFabricClass {
-     InterfaceClass parent;
-     ICSState *(*ics_get)(XICSFabric *xi, int irq);
-     void (*ics_resend)(XICSFabric *xi);
-+    void (*ics_eoi)(XICSFabric *xi, int irq);
-     ICPState *(*icp_get)(XICSFabric *xi, int server);
- } XICSFabricClass;
+@@ -78,6 +78,9 @@ struct ICPState {
+     bool cap_irq_xics_enabled;
 =20
-@@ -189,6 +190,7 @@ void icp_pic_print_info(ICPState *icp, Monitor *mon);
- void ics_pic_print_info(ICSState *ics, Monitor *mon);
+     XICSFabric *xics;
++
++    /* for the PowerNV ICP registers (not used by Linux). */
++    uint32_t links[3];
+ };
 =20
- void ics_resend(ICSState *ics);
-+void ics_eoi(ICSState *ics, int irq);
- void icp_resend(ICPState *ss);
-=20
- typedef struct sPAPRMachineState sPAPRMachineState;
+ #define TYPE_ICS_BASE "ics-base"
 --=20
 2.7.4
