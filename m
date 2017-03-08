@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46487)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1clRkP-0005gR-LP
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 21:54:42 -0500
+	(envelope-from <eblake@redhat.com>) id 1clRkP-0005gn-V8
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 21:54:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1clRkO-0005u8-EM
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 21:54:41 -0500
+	(envelope-from <eblake@redhat.com>) id 1clRkP-0005uR-6c
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 21:54:42 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Tue,  7 Mar 2017 20:54:18 -0600
-Message-Id: <20170308025428.1037-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 00/10] add blkdebug tests
+Date: Tue,  7 Mar 2017 20:54:21 -0600
+Message-Id: <20170308025428.1037-4-eblake@redhat.com>
+In-Reply-To: <20170308025428.1037-1-eblake@redhat.com>
+References: <20170308025428.1037-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v6 03/10] qcow2: Assert that cluster operations
+ are aligned
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,62 +23,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-Available as a tag at:
-git fetch git://repo.or.cz/qemu/ericb.git nbd-blkdebug-v6
+qcow2_discard_clusters() is set up to silently ignore sub-cluster
+head or tail on unaligned requests.  However, it is easy to audit
+the various callers: qcow2_snapshot_create() has always passed
+aligned data since the call was introduced in 1ebf561;
+qcow2_co_pdiscard() has passed aligned clusters since commit
+ecdbead taught the block layer the preferred discard alignment (the
+block layer can still pass sub-cluster values, but those are
+handled directly in qcow2_co_pdiscard()); and qcow2_make_empty()
+was fixed to pass aligned clusters in commit a3e1505.  Replace
+rounding with assertions to hold us to the tighter contract,
+eliminating the now-impossible case of an early exit for a
+sub-cluster request.
 
-v5 was:
-https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg03042.html
+qcow2_zero_clusters() has always been called with cluster-aligned
+arguments from its lone caller qcow2_co_pwrite_zeroes() (like
+qcow2_co_pdiscard(), the caller takes care of sub-cluster requests
+from the block layer; and qcow2_zero_clusters() would have
+misbehaved on unaligned requests), but it deserves the same
+assertion for symmetry.
 
-Since then:
-- Rebase to master
-- Pull in Dan's patch that splits test 97 for qcow (patch 1)
-- Address comments from Kevin (includes creating new patch 2, 6)
-- Update patches to reflect that this is now 2.10 material, since it
-missed soft freeze and is not fixing a bug
+Signed-off-by: Eric Blake <eblake@redhat.com>
 
-001/10:[down] 'iotests: fix 097 when run with qcow'
-002/10:[down] 'iotests: Improve image-clear tests on non-aligned image'
-003/10:[0007] [FC] 'qcow2: Assert that cluster operations are aligned'
-004/10:[0002] [FC] 'qcow2: Discard/zero clusters by byte count'
-005/10:[----] [--] 'blkdebug: Sanity check block layer guarantees'
-006/10:[down] 'blkdebug: Refactor error injection'
-007/10:[0046] [FC] 'blkdebug: Add pass-through write_zero and discard support'
-008/10:[0003] [FC] 'blkdebug: Simplify override logic'
-009/10:[0045] [FC] 'blkdebug: Add ability to override unmap geometries'
-010/10:[0004] [FC] 'tests: Add coverage for recent block geometry fixes'
+---
+v6: avoid assertion on non-cluster-aligned image, use s->cluster_sectors
+to avoid a shift, drop R-b
+v5: no change
+v4: new patch
+---
+ block/qcow2-cluster.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-Daniel P. Berrange (1):
-  iotests: fix 097 when run with qcow
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 78c11d4..046fbd8 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -1519,13 +1519,10 @@ int qcow2_discard_clusters(BlockDriverState *bs, uint64_t offset,
 
-Eric Blake (9):
-  iotests: Improve image-clear tests on non-aligned image
-  qcow2: Assert that cluster operations are aligned
-  qcow2: Discard/zero clusters by byte count
-  blkdebug: Sanity check block layer guarantees
-  blkdebug: Refactor error injection
-  blkdebug: Add pass-through write_zero and discard support
-  blkdebug: Simplify override logic
-  blkdebug: Add ability to override unmap geometries
-  tests: Add coverage for recent block geometry fixes
+     end_offset = offset + (nb_sectors << BDRV_SECTOR_BITS);
 
- qapi/block-core.json       |  31 +++++-
- block/qcow2.h              |   9 +-
- block/blkdebug.c           | 264 +++++++++++++++++++++++++++++++++++++--------
- block/qcow2-cluster.c      |  51 +++++----
- block/qcow2-snapshot.c     |   7 +-
- block/qcow2.c              |  21 ++--
- tests/qemu-iotests/097     |  17 +--
- tests/qemu-iotests/097.out | 149 +++----------------------
- tests/qemu-iotests/176     | 127 ++++++++++++++++++++++
- tests/qemu-iotests/176.out | 119 ++++++++++++++++++++
- tests/qemu-iotests/177     | 114 ++++++++++++++++++++
- tests/qemu-iotests/177.out |  49 +++++++++
- tests/qemu-iotests/group   |   2 +
- 13 files changed, 724 insertions(+), 236 deletions(-)
- create mode 100755 tests/qemu-iotests/176
- create mode 100644 tests/qemu-iotests/176.out
- create mode 100755 tests/qemu-iotests/177
- create mode 100644 tests/qemu-iotests/177.out
+-    /* Round start up and end down */
+-    offset = align_offset(offset, s->cluster_size);
+-    end_offset = start_of_cluster(s, end_offset);
+-
+-    if (offset > end_offset) {
+-        return 0;
+-    }
++    /* Caller must pass aligned values, except at image end */
++    assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
++    assert(QEMU_IS_ALIGNED(end_offset, s->cluster_size) ||
++           end_offset == bs->total_sectors << BDRV_SECTOR_BITS);
 
+     nb_clusters = size_to_clusters(s, end_offset - offset);
+
+@@ -1600,6 +1597,10 @@ int qcow2_zero_clusters(BlockDriverState *bs, uint64_t offset, int nb_sectors,
+     uint64_t nb_clusters;
+     int ret;
+
++    /* Caller must pass aligned values */
++    assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
++    assert(QEMU_IS_ALIGNED(nb_sectors, s->cluster_sectors));
++
+     /* The zero flag is only supported by version 3 and newer */
+     if (s->qcow_version < 3) {
+         return -ENOTSUP;
 -- 
 2.9.3
