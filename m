@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cldrp-0000W5-1e
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 10:51:10 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cle4k-0007sU-Gk
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 11:04:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cldrm-000627-2Z
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 10:51:09 -0500
-References: <1485868319-16151-1-git-send-email-thuth@redhat.com>
-	<1485868319-16151-3-git-send-email-thuth@redhat.com>
-	<20170303145807.GC11509@thinpad.lan.raisama.net>
-	<CAFEAcA8VV-UW7M+W=KcN=XycPUS=FmFJmVhd0DpruzaoKEVjuQ@mail.gmail.com>
-	<20170308145038.GF4694@thinpad.lan.raisama.net>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <56f4b053-9104-265f-5aec-67c78ae9d7e0@redhat.com>
-Date: Wed, 8 Mar 2017 16:50:50 +0100
+	(envelope-from <mreitz@redhat.com>) id 1cle4j-0003iK-5n
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 11:04:30 -0500
+References: <20170306195255.15806-1-mreitz@redhat.com>
+	<20170306195407.16415-1-mreitz@redhat.com>
+	<20170307104748.GG5871@noname.str.redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <54b7dbc7-9a04-f8b5-2d01-9332b725f46b@redhat.com>
+Date: Wed, 8 Mar 2017 17:04:10 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170308145038.GF4694@thinpad.lan.raisama.net>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] vl: Print CPU help after we've
- registered the CPU accelerators
+In-Reply-To: <20170307104748.GG5871@noname.str.redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="XlrcAlRnUrVWSLM25ODKlu98SmoR2SgG8"
+Subject: Re: [Qemu-devel] [PATCH for-2.10 1/3] block: Add errp to b{lk,
+ drv}_truncate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,49 +26,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-On 08.03.2017 15:50, Eduardo Habkost wrote:
-> On Wed, Mar 08, 2017 at 03:31:01PM +0100, Peter Maydell wrote:
->> On 3 March 2017 at 15:58, Eduardo Habkost <ehabkost@redhat.com> wrote:
->>> On Tue, Jan 31, 2017 at 02:11:59PM +0100, Thomas Huth wrote:
->>>> When running with KVM on POWER, we register some CPU types during
->>>> the initialization function of the ppc64 KVM code (which unfortunately
->>>> also can not be done via a type_init() like it is done on x86).
->>>
->>> Can you elaborate why it can't be done via type_init()? If the
->>> QOM type hierarchy depends on any runtime data unavailable at
->>> type_init(), we should fix that.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--XlrcAlRnUrVWSLM25ODKlu98SmoR2SgG8
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Message-ID: <54b7dbc7-9a04-f8b5-2d01-9332b725f46b@redhat.com>
+Subject: Re: [PATCH for-2.10 1/3] block: Add errp to b{lk,drv}_truncate()
+References: <20170306195255.15806-1-mreitz@redhat.com>
+ <20170306195407.16415-1-mreitz@redhat.com>
+ <20170307104748.GG5871@noname.str.redhat.com>
+In-Reply-To: <20170307104748.GG5871@noname.str.redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+
+On 07.03.2017 11:47, Kevin Wolf wrote:
+> Am 06.03.2017 um 20:54 hat Max Reitz geschrieben:
+>> For one thing, this allows us to drop the error message generation fro=
+m
+>> qemu-img.c and blockdev.c and instead have it unified in
+>> bdrv_truncate().
 >>
->> On ARM we (currently) have the KVM-only 'host' CPU type be
->> added to the type hierarchy only at runtime in kvm_init(),
->> but we deal with the '-help' problem by having arm_cpu_list() do
->>
->> #ifdef CONFIG_KVM
->>     /* The 'host' CPU type is dynamically registered only if KVM is
->>      * enabled, so we have to special-case it here:
->>      */
->>     (*cpu_fprintf)(f, "  host (only available in KVM mode)\n");
->> #endif
->>
-> 
-> We already have similar code at ppc_cpu_list():
-> 
-> #ifdef CONFIG_KVM
->     cpu_fprintf(f, "\n");
->     cpu_fprintf(f, "PowerPC %-16s\n", "host");
-> #endif
-> 
-> If I understood it correctly, the current problem is just
-> inaccurate alias information being printed because the alias
-> table is modified by the accelerator.
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>=20
+>>  block/commit.c                 |  5 +++--
+>>  block/mirror.c                 |  2 +-
+>=20
+> These still pass NULL after the series. Fixing it would require to add =
+a
+> way to complete jobs with an Error object, but maybe we should do this
+> sooner or later anyway. Not necessarily part of this series, though.
+>=20
+>>  block/vhdx.c                   |  6 +++---
+>>  block/vpc.c                    |  2 +-
+>=20
+> vpc can easily be fixed to pass the actual errp from vpc_create() to th=
+e
+> blk_truncate() call. In vhdx.c, the blk_truncate() call is a bit more
+> deeply nested, but it doesn't seem completely unreasonable there either=
+=2E
 
-Yes.
+I'll look into it, thanks.
 
-> My current suggestion is to avoid printing anything that depends
-> on the current machine/accelerator at the help output.
+>> --- a/qemu-io-cmds.c
+>> +++ b/qemu-io-cmds.c
+>> @@ -1569,7 +1569,7 @@ static int truncate_f(BlockBackend *blk, int arg=
+c, char **argv)
+>>          return 0;
+>>      }
+>> =20
+>> -    ret =3D blk_truncate(blk, offset);
+>> +    ret =3D blk_truncate(blk, offset, NULL);
+>>      if (ret < 0) {
+>>          printf("truncate: %s\n", strerror(-ret));
+>>          return 0;
+>=20
+> Come on, using NULL immediately before a printf()? Doing the right thin=
+g
+> here is trivial.
 
-I'll have a look at that...
+Yeah, but it's also qemu-io, so I somehow felt both "Better not touch it
+because it may break tests" and "Nobody really cares about a nice
+message here anyway".
 
- Thomas
+Will fix, since apparently at least you do care. ;-)
+
+Max
+
+
+--XlrcAlRnUrVWSLM25ODKlu98SmoR2SgG8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFFBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljAK3oSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A/ksH91rzCQkEDYhRlcZ81bCZdVooxcMcELCc
+FTPjlCl8z0uQpZHhWLlwHqAhqP/7J/07+NKnKB4Gzcmg2h82HoXqEOF3QTcVtImB
+M6nBeFdaBGjWk279pAchBT9REA/8PUFY1W9hj+1BovVJij0FEYCMQuVhL55jgtmf
+6nt9IuKRuKR0muaKYv6+DRPb7DOIbdMaR9NyRVSjGMLO0oFbM9uTCY2P6Fisuegq
+ifP3NHEUJVsr4FCnCHJe07McfNkO12gDrl6N9BoD84yGUcCL6MaZ75K0wBTJvSts
+UB7oRuPUF55Ps0n7+p2f4j9LRLwh14Ir6RCE4I6O3C/O/akdE2ydfw==
+=P1+d
+-----END PGP SIGNATURE-----
+
+--XlrcAlRnUrVWSLM25ODKlu98SmoR2SgG8--
