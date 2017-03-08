@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cli2r-0002DG-Uw
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 15:18:51 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cliPo-0005Lp-Py
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 15:42:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cli2q-0004My-LA
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 15:18:49 -0500
-References: <20170308200216.5931-1-eblake@redhat.com>
-	<c25bd323-1324-511b-57c0-d417312b6252@redhat.com>
-	<0eac6b1c-2dc0-b0aa-7392-3b7f344cae48@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <995ef14c-4a0d-0b9b-db21-743c4cc3d584@redhat.com>
-Date: Wed, 8 Mar 2017 21:18:37 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1cliPn-0001L3-HU
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 15:42:32 -0500
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:36276)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cliPn-0001KZ-9u
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 15:42:31 -0500
+Received: by mail-wm0-x235.google.com with SMTP id n11so124545876wma.1
+	for <qemu-devel@nongnu.org>; Wed, 08 Mar 2017 12:42:31 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <0eac6b1c-2dc0-b0aa-7392-3b7f344cae48@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="DCSmnkDJDq5RWHJuOMfVB48pUEvugf8cT"
-Subject: Re: [Qemu-devel] [PATCH for-2.9] block: Drop unmaintained
- 'archipelago' driver
+In-Reply-To: <CAAa=b7c4LFiBfNYWhoWPPmV00yRPjQ58RRgbKYV+ZPddL7RRPQ@mail.gmail.com>
+References: <CAAa=b7c4LFiBfNYWhoWPPmV00yRPjQ58RRgbKYV+ZPddL7RRPQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 8 Mar 2017 21:42:09 +0100
+Message-ID: <CAFEAcA_Oms7=XCqnaZKhdmweB5bO2dPAZUBfMfb=tjHZiA5CoA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] Performance difference between QEMU 2.2.0 and 2.6.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,94 +28,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: chris@include.gr, jcody@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>
+To: Wenwen Wang <wenwang@cs.umn.edu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, MTTCG Devel <mttcg@listserver.greensocs.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---DCSmnkDJDq5RWHJuOMfVB48pUEvugf8cT
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: chris@include.gr, jcody@redhat.com, qemu-block@nongnu.org,
- kwolf@redhat.com, Markus Armbruster <armbru@redhat.com>
-Message-ID: <995ef14c-4a0d-0b9b-db21-743c4cc3d584@redhat.com>
-Subject: Re: [PATCH for-2.9] block: Drop unmaintained 'archipelago' driver
-References: <20170308200216.5931-1-eblake@redhat.com>
- <c25bd323-1324-511b-57c0-d417312b6252@redhat.com>
- <0eac6b1c-2dc0-b0aa-7392-3b7f344cae48@redhat.com>
-In-Reply-To: <0eac6b1c-2dc0-b0aa-7392-3b7f344cae48@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 8 March 2017 at 18:17, Wenwen Wang <wenwang@cs.umn.edu> wrote:
+> I just found that there is a significant performance difference between QEMU
+> version 2.2.0 and 2.6.0.
+>
+> Here are the execution times of the benchmark 458.sjeng from SPEC CINT2006
+> with test workload using user only emulation from ARM guest to x86-32 host:
+>
+> qemu-2.2.0: 29 seconds
+> qemu-2.6.0: 38 seconds
 
-On 08.03.2017 21:09, Eric Blake wrote:
-> On 03/08/2017 02:05 PM, Max Reitz wrote:
->> On 08.03.2017 21:02, Eric Blake wrote:
->>> The driver has failed to build since commit da34e65, in qemu 2.6,
->>> due to a missing include of qapi/error.h for error_setg().
->>> Since no one has complained in three releases, it is easier to
->>> remove the dead code than to keep it around, especially since it
->>> is not being built by default and therefore prone to bitrot.
->>>
->>> Signed-off-by: Eric Blake <eblake@redhat.com>
->>> ---
->>>
->>> My proposed alternative for Max's "block/archipelago: Make it compile=
-"
->>>
->>>  qapi/block-core.json             |   33 +-
->>>  block/archipelago.c              | 1079 ----------------------------=
-----------
->>>  MAINTAINERS                      |    8 -
->>>  block/Makefile.objs              |    2 -
->>>  configure                        |   43 --
->>>  tests/qemu-iotests/025           |    2 +-
->>>  tests/qemu-iotests/common        |    6 -
->>>  tests/qemu-iotests/common.filter |    4 +-
->>>  tests/qemu-iotests/common.rc     |    8 -
->>>  9 files changed, 4 insertions(+), 1181 deletions(-)
->>>  delete mode 100644 block/archipelago.c
->>
->> Reviewed-by: Max Reitz <mreitz@redhat.com>
->>
->> But I'd like someone to confirm that I'm not the only one who can't
->> compile archipelago. ;-)
->=20
-> With my proposed patch not installed, I tried:
->=20
-> ./config.status --enable-archipelago
->=20
-> but got the error:
->=20
-> ERROR: User requested feature Archipelago backend support
->        configure was not able to find it.
->        Install libxseg devel
->=20
->=20
-> I don't see libxseg-devel available for Fedora; where does one get it t=
-o
-> even attempt compilation?
+2.6.0 is now quite old -- it would be interesting to test this on
+the current git master.
 
-I got it from https://github.com/grnet/libxseg, and got it to compile by
-removing all "python" instances from CMakeLists.txt (including the
-find_program() blocks).
+> Could anyone tell me what this difference comes from or give me any hint?
 
-Max
+There are lots of changes between those two releases, and we don't
+in general track performance at all, so a regression is not very
+surprising to me. If you wanted to try to identify what caused it
+you could try a git bisect.
 
-
---DCSmnkDJDq5RWHJuOMfVB48pUEvugf8cT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljAZx0SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AbBMIAJ2NOtBygPylS46gX22IfmEeFZqjkOvT
-p88AEqC6DhtmPitRXhtu+93u1kShBU1ZTzrv57Yp0XeTgI85bpJ8m8oXK2CWae6b
-hXIa9+l6a8KRq/OtZpglYFn0+E1+nu/0c+o/7GtW8V86h7A3uteHl73dzACdOy6m
-dCSGf9/D1wJZJTglUiqiNQTSkQwpGtngmljFrv1pnuQGmNA8XYdVZ9MRTbm0Data
-tEnolrwy1bwRDL/u5rDHcwJ4kJ40duKfikH77y7LMW8xMXfthLvi9dcSC1BRwsr7
-yj1ZT/YsK6dGdEYDTn5eMhp26m//zP7+PfFQ1Csg2NE8aTjuIhRc07o=
-=UENK
------END PGP SIGNATURE-----
-
---DCSmnkDJDq5RWHJuOMfVB48pUEvugf8cT--
+thanks
+-- PMM
