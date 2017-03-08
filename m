@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1clRkS-0005jF-Ei
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 21:54:47 -0500
+	(envelope-from <eblake@redhat.com>) id 1clRkV-0005mA-4i
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 21:54:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1clRkQ-0005vE-PX
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 21:54:44 -0500
+	(envelope-from <eblake@redhat.com>) id 1clRkT-0005wW-4P
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 21:54:47 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Tue,  7 Mar 2017 20:54:22 -0600
-Message-Id: <20170308025428.1037-5-eblake@redhat.com>
+Date: Tue,  7 Mar 2017 20:54:24 -0600
+Message-Id: <20170308025428.1037-7-eblake@redhat.com>
 In-Reply-To: <20170308025428.1037-1-eblake@redhat.com>
 References: <20170308025428.1037-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v6 04/10] qcow2: Discard/zero clusters by byte
- count
+Subject: [Qemu-devel] [PATCH v6 06/10] blkdebug: Refactor error injection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,233 +22,142 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-Passing a byte offset, but sector count, when we ultimately
-want to operate on cluster granularity, is madness.  Clean up
-the external interfaces to take both offset and count as bytes,
-while still keeping the assertion added previously that the
-caller must align the values to a cluster.  Then rename things
-to make sure backports don't get confused by changed units:
-instead of qcow2_discard_clusters() and qcow2_zero_clusters(),
-we now have qcow2_cluster_discard() and qcow2_cluster_zeroize().
-
-The internal functions still operate on clusters at a time, and
-return an int for number of cleared clusters; but on an image
-with 2M clusters, a single L2 table holds 256k entries that each
-represent a 2M cluster, totalling well over INT_MAX bytes if we
-ever had a request for that many bytes at once.  All our callers
-currently limit themselves to 32-bit bytes (and therefore fewer
-clusters), but by making this function 64-bit clean, we have one
-less place to clean up if we later improve the block layer to
-support 64-bit bytes through all operations (with the block layer
-auto-fragmenting on behalf of more-limited drivers), rather than
-the current state where some interfaces are artificially limited
-to INT_MAX at a time.
+Rather than repeat the logic at each caller of checking if a Rule
+exists that warrants an error injection, fold that logic into
+inject_error(); and rename it to rule_check() for legibility.
+This will help the next patch, which adds two more callers that
+need to check rules for the potential of injecting errors.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 
 ---
-v6: rebase due to context
-v5: s/count/byte/ to make the units obvious, and rework the math
-to ensure no 32-bit integer overflow on large clusters
-v4: improve function names, split assertion additions into earlier patch
-[no v3 or v2]
-v1: https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg00339.html
+v6: new patch
 ---
- block/qcow2.h          |  9 +++++----
- block/qcow2-cluster.c  | 38 +++++++++++++++++++++-----------------
- block/qcow2-snapshot.c |  7 +++----
- block/qcow2.c          | 21 +++++++++------------
- 4 files changed, 38 insertions(+), 37 deletions(-)
+ block/blkdebug.c | 74 +++++++++++++++++++++++++-------------------------------
+ 1 file changed, 33 insertions(+), 41 deletions(-)
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index f8aeb08..808104c 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -544,10 +544,11 @@ uint64_t qcow2_alloc_compressed_cluster_offset(BlockDriverState *bs,
-                                          int compressed_size);
-
- int qcow2_alloc_cluster_link_l2(BlockDriverState *bs, QCowL2Meta *m);
--int qcow2_discard_clusters(BlockDriverState *bs, uint64_t offset,
--    int nb_sectors, enum qcow2_discard_type type, bool full_discard);
--int qcow2_zero_clusters(BlockDriverState *bs, uint64_t offset, int nb_sectors,
--                        int flags);
-+int qcow2_cluster_discard(BlockDriverState *bs, uint64_t offset,
-+                          uint64_t bytes, enum qcow2_discard_type type,
-+                          bool full_discard);
-+int qcow2_cluster_zeroize(BlockDriverState *bs, uint64_t offset,
-+                          uint64_t bytes, int flags);
-
- int qcow2_expand_zero_clusters(BlockDriverState *bs,
-                                BlockDriverAmendStatusCB *status_cb,
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 046fbd8..ca9e7e6 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -1509,16 +1509,16 @@ static int discard_single_l2(BlockDriverState *bs, uint64_t offset,
-     return nb_clusters;
+diff --git a/block/blkdebug.c b/block/blkdebug.c
+index 7c804b2..f721bcb 100644
+--- a/block/blkdebug.c
++++ b/block/blkdebug.c
+@@ -405,11 +405,30 @@ out:
+     return ret;
  }
 
--int qcow2_discard_clusters(BlockDriverState *bs, uint64_t offset,
--    int nb_sectors, enum qcow2_discard_type type, bool full_discard)
-+int qcow2_cluster_discard(BlockDriverState *bs, uint64_t offset,
-+                          uint64_t bytes, enum qcow2_discard_type type,
-+                          bool full_discard)
+-static int inject_error(BlockDriverState *bs, BlkdebugRule *rule)
++static int rule_check(BlockDriverState *bs, uint64_t offset, uint64_t bytes)
  {
-     BDRVQcow2State *s = bs->opaque;
--    uint64_t end_offset;
-+    uint64_t end_offset = offset + bytes;
-     uint64_t nb_clusters;
-+    int64_t cleared;
-     int ret;
+     BDRVBlkdebugState *s = bs->opaque;
+-    int error = rule->options.inject.error;
+-    bool immediately = rule->options.inject.immediately;
++    BlkdebugRule *rule = NULL;
++    int error;
++    bool immediately;
++
++    QSIMPLEQ_FOREACH(rule, &s->active_rules, active_next) {
++        uint64_t inject_offset = rule->options.inject.offset;
++
++        if (inject_offset == -1 ||
++            (bytes && inject_offset >= offset &&
++             inject_offset < offset + bytes))
++        {
++            break;
++        }
++    }
++
++    if (!rule || !rule->options.inject.error) {
++        return 0;
++    }
++
++    immediately = rule->options.inject.immediately;
++    error = rule->options.inject.error;
 
--    end_offset = offset + (nb_sectors << BDRV_SECTOR_BITS);
+     if (rule->options.inject.once) {
+         QSIMPLEQ_REMOVE(&s->active_rules, rule, BlkdebugRule, active_next);
+@@ -428,8 +447,7 @@ static int coroutine_fn
+ blkdebug_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
+                    QEMUIOVector *qiov, int flags)
+ {
+-    BDRVBlkdebugState *s = bs->opaque;
+-    BlkdebugRule *rule = NULL;
++    int err;
+
+     /* Sanity check block layer guarantees */
+     assert(QEMU_IS_ALIGNED(offset, bs->bl.request_alignment));
+@@ -438,18 +456,9 @@ blkdebug_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
+         assert(bytes <= bs->bl.max_transfer);
+     }
+
+-    QSIMPLEQ_FOREACH(rule, &s->active_rules, active_next) {
+-        uint64_t inject_offset = rule->options.inject.offset;
 -
-     /* Caller must pass aligned values, except at image end */
-     assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
-     assert(QEMU_IS_ALIGNED(end_offset, s->cluster_size) ||
-@@ -1530,13 +1530,15 @@ int qcow2_discard_clusters(BlockDriverState *bs, uint64_t offset,
-
-     /* Each L2 table is handled by its own loop iteration */
-     while (nb_clusters > 0) {
--        ret = discard_single_l2(bs, offset, nb_clusters, type, full_discard);
--        if (ret < 0) {
-+        cleared = discard_single_l2(bs, offset, nb_clusters, type,
-+                                    full_discard);
-+        if (cleared < 0) {
-+            ret = cleared;
-             goto fail;
-         }
-
--        nb_clusters -= ret;
--        offset += (ret * s->cluster_size);
-+        nb_clusters -= cleared;
-+        offset += (cleared * s->cluster_size);
+-        if (inject_offset == -1 ||
+-            (inject_offset >= offset && inject_offset < offset + bytes))
+-        {
+-            break;
+-        }
+-    }
+-
+-    if (rule && rule->options.inject.error) {
+-        return inject_error(bs, rule);
++    err = rule_check(bs, offset, bytes);
++    if (err) {
++        return err;
      }
 
-     ret = 0;
-@@ -1590,16 +1592,17 @@ static int zero_single_l2(BlockDriverState *bs, uint64_t offset,
-     return nb_clusters;
- }
-
--int qcow2_zero_clusters(BlockDriverState *bs, uint64_t offset, int nb_sectors,
--                        int flags)
-+int qcow2_cluster_zeroize(BlockDriverState *bs, uint64_t offset,
-+                          uint64_t bytes, int flags)
+     return bdrv_co_preadv(bs->file, offset, bytes, qiov, flags);
+@@ -459,8 +468,7 @@ static int coroutine_fn
+ blkdebug_co_pwritev(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
+                     QEMUIOVector *qiov, int flags)
  {
-     BDRVQcow2State *s = bs->opaque;
-     uint64_t nb_clusters;
-+    int64_t cleared;
-     int ret;
+-    BDRVBlkdebugState *s = bs->opaque;
+-    BlkdebugRule *rule = NULL;
++    int err;
 
-     /* Caller must pass aligned values */
-     assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
--    assert(QEMU_IS_ALIGNED(nb_sectors, s->cluster_sectors));
-+    assert(QEMU_IS_ALIGNED(bytes, s->cluster_size));
-
-     /* The zero flag is only supported by version 3 and newer */
-     if (s->qcow_version < 3) {
-@@ -1607,18 +1610,19 @@ int qcow2_zero_clusters(BlockDriverState *bs, uint64_t offset, int nb_sectors,
+     /* Sanity check block layer guarantees */
+     assert(QEMU_IS_ALIGNED(offset, bs->bl.request_alignment));
+@@ -469,18 +477,9 @@ blkdebug_co_pwritev(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
+         assert(bytes <= bs->bl.max_transfer);
      }
 
-     /* Each L2 table is handled by its own loop iteration */
--    nb_clusters = size_to_clusters(s, nb_sectors << BDRV_SECTOR_BITS);
-+    nb_clusters = size_to_clusters(s, bytes);
-
-     s->cache_discards = true;
-
-     while (nb_clusters > 0) {
--        ret = zero_single_l2(bs, offset, nb_clusters, flags);
--        if (ret < 0) {
-+        cleared = zero_single_l2(bs, offset, nb_clusters, flags);
-+        if (cleared < 0) {
-+            ret = cleared;
-             goto fail;
-         }
-
--        nb_clusters -= ret;
--        offset += (ret * s->cluster_size);
-+        nb_clusters -= cleared;
-+        offset += (cleared * s->cluster_size);
+-    QSIMPLEQ_FOREACH(rule, &s->active_rules, active_next) {
+-        uint64_t inject_offset = rule->options.inject.offset;
+-
+-        if (inject_offset == -1 ||
+-            (inject_offset >= offset && inject_offset < offset + bytes))
+-        {
+-            break;
+-        }
+-    }
+-
+-    if (rule && rule->options.inject.error) {
+-        return inject_error(bs, rule);
++    err = rule_check(bs, offset, bytes);
++    if (err) {
++        return err;
      }
 
-     ret = 0;
-diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
-index 0324243..44243e0 100644
---- a/block/qcow2-snapshot.c
-+++ b/block/qcow2-snapshot.c
-@@ -440,10 +440,9 @@ int qcow2_snapshot_create(BlockDriverState *bs, QEMUSnapshotInfo *sn_info)
+     return bdrv_co_pwritev(bs->file, offset, bytes, qiov, flags);
+@@ -488,17 +487,10 @@ blkdebug_co_pwritev(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
 
-     /* The VM state isn't needed any more in the active L1 table; in fact, it
-      * hurts by causing expensive COW for the next snapshot. */
--    qcow2_discard_clusters(bs, qcow2_vm_state_offset(s),
--                           align_offset(sn->vm_state_size, s->cluster_size)
--                                >> BDRV_SECTOR_BITS,
--                           QCOW2_DISCARD_NEVER, false);
-+    qcow2_cluster_discard(bs, qcow2_vm_state_offset(s),
-+                          align_offset(sn->vm_state_size, s->cluster_size),
-+                          QCOW2_DISCARD_NEVER, false);
-
- #ifdef DEBUG_ALLOC
-     {
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 6a92d2e..03215e2 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2501,7 +2501,7 @@ static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
-     trace_qcow2_pwrite_zeroes(qemu_coroutine_self(), offset, count);
-
-     /* Whatever is left can use real zero clusters */
--    ret = qcow2_zero_clusters(bs, offset, count >> BDRV_SECTOR_BITS, flags);
-+    ret = qcow2_cluster_zeroize(bs, offset, count, flags);
-     qemu_co_mutex_unlock(&s->lock);
-
-     return ret;
-@@ -2519,8 +2519,8 @@ static coroutine_fn int qcow2_co_pdiscard(BlockDriverState *bs,
-     }
-
-     qemu_co_mutex_lock(&s->lock);
--    ret = qcow2_discard_clusters(bs, offset, count >> BDRV_SECTOR_BITS,
--                                 QCOW2_DISCARD_REQUEST, false);
-+    ret = qcow2_cluster_discard(bs, offset, count, QCOW2_DISCARD_REQUEST,
-+                                false);
-     qemu_co_mutex_unlock(&s->lock);
-     return ret;
- }
-@@ -2822,9 +2822,8 @@ fail:
- static int qcow2_make_empty(BlockDriverState *bs)
+ static int blkdebug_co_flush(BlockDriverState *bs)
  {
-     BDRVQcow2State *s = bs->opaque;
--    uint64_t start_sector;
--    int sector_step = (QEMU_ALIGN_DOWN(INT_MAX, s->cluster_size) /
--                       BDRV_SECTOR_SIZE);
-+    uint64_t offset, end_offset;
-+    int step = QEMU_ALIGN_DOWN(INT_MAX, s->cluster_size);
-     int l1_clusters, ret = 0;
+-    BDRVBlkdebugState *s = bs->opaque;
+-    BlkdebugRule *rule = NULL;
++    int err = rule_check(bs, 0, 0);
 
-     l1_clusters = DIV_ROUND_UP(s->l1_size, s->cluster_size / sizeof(uint64_t));
-@@ -2841,18 +2840,16 @@ static int qcow2_make_empty(BlockDriverState *bs)
+-    QSIMPLEQ_FOREACH(rule, &s->active_rules, active_next) {
+-        if (rule->options.inject.offset == -1) {
+-            break;
+-        }
+-    }
+-
+-    if (rule && rule->options.inject.error) {
+-        return inject_error(bs, rule);
++    if (err) {
++        return err;
+     }
 
-     /* This fallback code simply discards every active cluster; this is slow,
-      * but works in all cases */
--    for (start_sector = 0; start_sector < bs->total_sectors;
--         start_sector += sector_step)
-+    end_offset = bs->total_sectors * BDRV_SECTOR_SIZE;
-+    for (offset = 0; offset < end_offset; offset += step)
-     {
-         /* As this function is generally used after committing an external
-          * snapshot, QCOW2_DISCARD_SNAPSHOT seems appropriate. Also, the
-          * default action for this kind of discard is to pass the discard,
-          * which will ideally result in an actually smaller image file, as
-          * is probably desired. */
--        ret = qcow2_discard_clusters(bs, start_sector * BDRV_SECTOR_SIZE,
--                                     MIN(sector_step,
--                                         bs->total_sectors - start_sector),
--                                     QCOW2_DISCARD_SNAPSHOT, true);
-+        ret = qcow2_cluster_discard(bs, offset, MIN(step, end_offset - offset),
-+                                    QCOW2_DISCARD_SNAPSHOT, true);
-         if (ret < 0) {
-             break;
-         }
+     return bdrv_co_flush(bs->file->bs);
 -- 
 2.9.3
