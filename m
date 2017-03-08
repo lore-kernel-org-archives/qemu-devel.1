@@ -1,36 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Ketan.Nilangekar@veritas.com>) id 1clbGI-0007jz-5w
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 08:04:15 -0500
+	(envelope-from <marcel@redhat.com>) id 1clbQS-0001Sm-LH
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 08:14:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Ketan.Nilangekar@veritas.com>) id 1clbGF-0007Or-0p
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 08:04:14 -0500
-Received: from mail1.bemta8.messagelabs.com ([216.82.243.199]:45168)
+	(envelope-from <marcel@redhat.com>) id 1clbQN-0001y4-NM
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 08:14:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43436)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Ketan.Nilangekar@veritas.com>)
-	id 1clbGE-0007On-Sr
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 08:04:10 -0500
-From: Ketan Nilangekar <Ketan.Nilangekar@veritas.com>
-Date: Wed, 8 Mar 2017 13:04:07 +0000
-Message-ID: <2881DEEC-922E-4A55-9F11-5C681F5D3648@veritas.com>
-References: <20170222144407.GS19045@localhost.localdomain>
-	<CAAo6VWPWjRTE3t9myt7Q6gTnZcvP72ypTE03PCFfJkvb2UWLTA@mail.gmail.com>
-	<20170224091916.GD3702@redhat.com>
-	<CAAo6VWPyQrjSp2qjvxqXRPS8=5N85i0-DJdkWhiGaXmND_8+qA@mail.gmail.com>
-	<20170227092207.GA18219@redhat.com>
-	<CAAo6VWO6zAijMMjHOkefO22wh+6dXigZ6a+g-pMNBcM0MN1HHw@mail.gmail.com>
-	<20170301091851.GD17125@redhat.com>
-	<CAAo6VWNRhK6zvc+CferSd9wYQZNNoXDqCEW_G62crqsamyEC9Q@mail.gmail.com>
-	<20170306092305.GA9866@redhat.com>
-	<CAAo6VWMo-wYwkOAENk4swYk3dkbxaJObXrj85yDRLAUofK2qtw@mail.gmail.com>,
-	<20170308091311.GC7470@redhat.com>
-In-Reply-To: <20170308091311.GC7470@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1clbQN-0001xx-H2
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 08:14:39 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0E5AB6AAE3
+	for <qemu-devel@nongnu.org>; Wed,  8 Mar 2017 13:14:37 +0000 (UTC)
+References: <1488877751-13419-1-git-send-email-jasowang@redhat.com>
+	<7594c183-6d38-3dce-75e7-62bf3be324fc@redhat.com>
+	<20170308024349.GC31585@pxdev.xzpeter.org>
+	<9d2dd1a4-aadc-a497-3dbb-6afb6d621587@redhat.com>
+	<5b388627-dcae-6c11-008d-f3c5da57b334@redhat.com>
+	<20170308090945.GD7135@pxdev.xzpeter.org>
+	<20170308091608.GE7135@pxdev.xzpeter.org>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <bd08fd44-e630-84ad-5f42-873094768fd3@redhat.com>
+Date: Wed, 8 Mar 2017 15:14:30 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
- block device type called "vxhs"
+In-Reply-To: <20170308091608.GE7135@pxdev.xzpeter.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V3] virtio: do not require IOMMU to be
+ created in advance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,91 +39,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: ashish mittal <ashmit602@gmail.com>, Jeff Cody <jcody@redhat.com>, Stefan
-	Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo
-	Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus
-	Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin
-	Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, mst@redhat.com, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
+On 03/08/2017 11:16 AM, Peter Xu wrote:
+> On Wed, Mar 08, 2017 at 05:09:45PM +0800, Peter Xu wrote:
+>> On Wed, Mar 08, 2017 at 10:17:09AM +0200, Marcel Apfelbaum wrote:
+>>
+>> [...]
+>>
+>>>
+>>> I am sorry I was not clear enough:
+>>> If a device is added after the system is up (hotplug), we cannot depend on the "machine_done"
+>>> event to enable "bus master".
+>>> This is why we have
+>>>    if (qdev_hotplug)
+>>>         pci_init_bus_master(pci_dev);
+>>>
+>>> The code you proposed changes the order, so this call is done *after* realize.
+>>>
+>>> My question was: What if any other device may require the bus_master_as
+>>> at realize time (and can be hot-plugged) ?
+>>> For example: hcd-ehci/hcd-ohci devices call pci_get_address_space()
+>>> and caches the bus_master_as.
+>>
+>> Oh, I didn't notice that there are other devices that used
+>> bus_master_as during realization. If so... Would this really work even
+>> without hot plug? Considering that bus_master_as won't be inited until
+>> machine done phase?
+>
+> Please ignore my question... I think the answer is that these devices
+> are only caching the pointer of bus_master_as. So it won't really use
+> the address space before machine_done.
+>
+> If so, IMHO moving pci_init_bus_master() after device specific
+> realize() is okay as well then, right?
+>
 
+It should work, right. But you may want to double-check anyway :)
 
-> On Mar 8, 2017, at 1:13 AM, Daniel P. Berrange <berrange@redhat.com> wrot=
-e:
->=20
->> On Tue, Mar 07, 2017 at 05:27:55PM -0800, ashish mittal wrote:
->> Thanks! There is one more input I need some help with!
->>=20
->> VxHS network library opens a fixed number of connection channels to a
->> given host, and all the vdisks (that connect to the same host) share
->> these connection channels.
->>=20
->> Therefore, we need to open secure channels to a specific target host
->> only once for the first vdisk that connects to that host. All the
->> other vdisks that connect to the same target host will share the same
->> set of secure communication channels.
->>=20
->> I hope the above scheme is acceptable?
->=20
-> I don't think I'm in favour of such an approach, as it forces a single
-> QEMU process to use the same privileges for all disks it uses.
->=20
-> Consider an example where a QEMU process has two disks, one shared
-> readonly disk and one exclusive writable disk, both on the same host.
->=20
+Thanks,
+Marcel
 
-This is not a use case for VxHS as a solution. We do not support sharing of=
- vdisks across QEMU instances.
-
-Vxhs library was thus not designed to open different connections for indivi=
-dual vdisks within a QEMU instance.
-
-Implementing this will involve rewrite of significant parts of libvxhs clie=
-nt and server. Is this a new requirement for acceptance into QEMU?
-
-
-> It is reasonable as an administrator to want to use different credentials
-> for each of these. ie, they might have a set of well known credentials to
-> authenticate to get access to the read-only disk, but have a different se=
-t
-> of strictly limited access credentials to get access to the writable disk
->=20
-> Trying to re-use the same connection for multiple cause prevents QEMU fro=
-m
-> authenticating with different credentials per disk, so I don't think that
-> is a good approach - each disk should have totally independant state.
->=20
->>=20
->> If yes, then we have a couple of options to implement this:
->>=20
->> (1) Accept the TLS credentials per vdisk using the previously
->> discussed --object tls-creds-x509 mechanism. In this case, if more
->> than one vdisk have the same host info, then we will use only the
->> first one's creds to set up the secure connection, and ignore the
->> others. vdisks that connect to different target hosts will use their
->> individual tls-creds-x509 to set up the secure channels. This is, of
->> course, not relevant for qemu-img/qemu-io as they can open only one
->> vdisk at a time.
->>=20
->> (2) Instead of having a per-vdisk --object tls-creds-x509, have a
->> single such argument on the command line for vxhs block device code to
->> consume - if that is possible! One way to achieve this could be the
->> user/password authentication we discussed earlier, which we could use
->> to pass the directory where cert/keys are kept.
->>=20
->> (3) Use the instance UUID, when available, to lookup the cert files
->> per instance (i.e. for qemu-kvm), and use the --object tls-creds-x509
->> mechanism, when instance UUID is NULL (i.e. qemu-io, qemu-img etc).
->> The cert/key files are anyway protected by file permissions in either
->> case, so I guess there is no additional security provided by either
->> method.
->=20
-> Regards,
-> Daniel
-> --=20
-> |: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange=
-/ :|
-> |: http://libvirt.org              -o-             http://virt-manager.or=
-g :|
-> |: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr=
-/ :|
+> Thanks,
+>
+> -- peterx
+>
