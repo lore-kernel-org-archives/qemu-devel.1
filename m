@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1clcvP-0002kP-4s
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 09:50:48 -0500
+	(envelope-from <eblake@redhat.com>) id 1cldGF-0006wX-Sn
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 10:12:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1clcvM-0005Je-JL
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 09:50:47 -0500
-Date: Wed, 8 Mar 2017 11:50:38 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170308145038.GF4694@thinpad.lan.raisama.net>
-References: <1485868319-16151-1-git-send-email-thuth@redhat.com>
-	<1485868319-16151-3-git-send-email-thuth@redhat.com>
-	<20170303145807.GC11509@thinpad.lan.raisama.net>
-	<CAFEAcA8VV-UW7M+W=KcN=XycPUS=FmFJmVhd0DpruzaoKEVjuQ@mail.gmail.com>
+	(envelope-from <eblake@redhat.com>) id 1cldGC-0003DN-F7
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 10:12:19 -0500
+References: <20170307184517.21521-1-eblake@redhat.com>
+	<32c14d52-e8d0-09a7-4232-52dab2ae3e8c@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <8dda4d42-59ed-5ed3-2037-ca1202df87a6@redhat.com>
+Date: Wed, 8 Mar 2017 09:12:13 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8VV-UW7M+W=KcN=XycPUS=FmFJmVhd0DpruzaoKEVjuQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] vl: Print CPU help after we've
- registered the CPU accelerators
+In-Reply-To: <32c14d52-e8d0-09a7-4232-52dab2ae3e8c@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="oh54W3q65IbssfXdjV9jJNtoOJ19kLSHA"
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH for-2.9?] tests: Ignore more
+ test executables
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,45 +25,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org
 
-On Wed, Mar 08, 2017 at 03:31:01PM +0100, Peter Maydell wrote:
-> On 3 March 2017 at 15:58, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > On Tue, Jan 31, 2017 at 02:11:59PM +0100, Thomas Huth wrote:
-> >> When running with KVM on POWER, we register some CPU types during
-> >> the initialization function of the ppc64 KVM code (which unfortunately
-> >> also can not be done via a type_init() like it is done on x86).
-> >
-> > Can you elaborate why it can't be done via type_init()? If the
-> > QOM type hierarchy depends on any runtime data unavailable at
-> > type_init(), we should fix that.
-> 
-> On ARM we (currently) have the KVM-only 'host' CPU type be
-> added to the type hierarchy only at runtime in kvm_init(),
-> but we deal with the '-help' problem by having arm_cpu_list() do
-> 
-> #ifdef CONFIG_KVM
->     /* The 'host' CPU type is dynamically registered only if KVM is
->      * enabled, so we have to special-case it here:
->      */
->     (*cpu_fprintf)(f, "  host (only available in KVM mode)\n");
-> #endif
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--oh54W3q65IbssfXdjV9jJNtoOJ19kLSHA
+From: Eric Blake <eblake@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org
+Message-ID: <8dda4d42-59ed-5ed3-2037-ca1202df87a6@redhat.com>
+Subject: Re: [Qemu-trivial] [PATCH for-2.9?] tests: Ignore more test
+ executables
+References: <20170307184517.21521-1-eblake@redhat.com>
+ <32c14d52-e8d0-09a7-4232-52dab2ae3e8c@redhat.com>
+In-Reply-To: <32c14d52-e8d0-09a7-4232-52dab2ae3e8c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-We already have similar code at ppc_cpu_list():
+On 03/08/2017 04:00 AM, Laurent Vivier wrote:
+> and tests/test-arm-mptimer?
 
-#ifdef CONFIG_KVM
-    cpu_fprintf(f, "\n");
-    cpu_fprintf(f, "PowerPC %-16s\n", "host");
-#endif
+Introduced in commit 882fac37. Looks like my usual subset build focusing
+on x86 doesn't see it, but indeed an all-targets build shows it. I'll
+spin a v2.
 
-If I understood it correctly, the current problem is just
-inaccurate alias information being printed because the alias
-table is modified by the accelerator.
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-My current suggestion is to avoid printing anything that depends
-on the current machine/accelerator at the help output.
 
--- 
-Eduardo
+--oh54W3q65IbssfXdjV9jJNtoOJ19kLSHA
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYwB9NAAoJEKeha0olJ0NqH5AH/R8o0hmRnYz7zgBOiZeylxB9
+9Wr1Lk8ziG91lAL11yJq4G/Sw8dRK7KQ1JfqAJJI1IXxvVZs4Icnwu5ojXd0BWrm
+RJNOPJ3WHBUYBXIGcQSFTaqY5IxT3RqPRJC4QSNCtGCkopbOJjd6pORVNdSealMF
+T4AWjXfdYdZRMQm+IP4KjKGC452bRkWruSUVw4ZCu0WzbYbhxGFoB1ilEMUcIoR2
+Mo2flm76oJn8q3oZImnr8Einweuu6+A+hTkp5Eavg45dMjWqnuh/z/7/GntRnTBL
+eh0L0Z5JXL2ma5Ib5+wln/Q3/zsNSZpSCfFxISSJgfLngk7+AtSDDynTeOLTvNI=
+=aUj4
+-----END PGP SIGNATURE-----
+
+--oh54W3q65IbssfXdjV9jJNtoOJ19kLSHA--
