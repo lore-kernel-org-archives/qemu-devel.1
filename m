@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cle4k-0007sU-Gk
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 11:04:34 -0500
+	(envelope-from <git@kirschju.re>) id 1cle93-0003Qi-0l
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 11:09:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cle4j-0003iK-5n
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 11:04:30 -0500
-References: <20170306195255.15806-1-mreitz@redhat.com>
-	<20170306195407.16415-1-mreitz@redhat.com>
-	<20170307104748.GG5871@noname.str.redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <54b7dbc7-9a04-f8b5-2d01-9332b725f46b@redhat.com>
-Date: Wed, 8 Mar 2017 17:04:10 +0100
+	(envelope-from <git@kirschju.re>) id 1cle8w-0005Zk-TN
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 11:08:56 -0500
+Received: from h2042504.stratoserver.net ([85.214.107.226]:54528)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <git@kirschju.re>) id 1cle8w-0005ZT-L6
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 11:08:50 -0500
+References: <20170308001637.9838-1-git@kirschju.re>
+	<20170308115909.GD10232@work-vm>
+	<20170308135751.GE4694@thinpad.lan.raisama.net>
+From: Julian Kirsch <git@kirschju.re>
+Message-ID: <aa16a480-d3cd-e73c-00d4-947bc0b95deb@kirschju.re>
+Date: Wed, 8 Mar 2017 17:08:42 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170307104748.GG5871@noname.str.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="XlrcAlRnUrVWSLM25ODKlu98SmoR2SgG8"
-Subject: Re: [Qemu-devel] [PATCH for-2.10 1/3] block: Add errp to b{lk,
- drv}_truncate()
+In-Reply-To: <20170308135751.GE4694@thinpad.lan.raisama.net>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] X86/HMP: Expose x86 model specific
+ registers via human monitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,92 +29,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XlrcAlRnUrVWSLM25ODKlu98SmoR2SgG8
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Message-ID: <54b7dbc7-9a04-f8b5-2d01-9332b725f46b@redhat.com>
-Subject: Re: [PATCH for-2.10 1/3] block: Add errp to b{lk,drv}_truncate()
-References: <20170306195255.15806-1-mreitz@redhat.com>
- <20170306195407.16415-1-mreitz@redhat.com>
- <20170307104748.GG5871@noname.str.redhat.com>
-In-Reply-To: <20170307104748.GG5871@noname.str.redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+On 08.03.2017 14:57, Eduardo Habkost wrote:
 
-On 07.03.2017 11:47, Kevin Wolf wrote:
-> Am 06.03.2017 um 20:54 hat Max Reitz geschrieben:
->> For one thing, this allows us to drop the error message generation fro=
-m
->> qemu-img.c and blockdev.c and instead have it unified in
->> bdrv_truncate().
 >>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->=20
->>  block/commit.c                 |  5 +++--
->>  block/mirror.c                 |  2 +-
->=20
-> These still pass NULL after the series. Fixing it would require to add =
-a
-> way to complete jobs with an Error object, but maybe we should do this
-> sooner or later anyway. Not necessarily part of this series, though.
->=20
->>  block/vhdx.c                   |  6 +++---
->>  block/vpc.c                    |  2 +-
->=20
-> vpc can easily be fixed to pass the actual errp from vpc_create() to th=
-e
-> blk_truncate() call. In vhdx.c, the blk_truncate() call is a bit more
-> deeply nested, but it doesn't seem completely unreasonable there either=
-=2E
+>> This should be abstracted some how so that we don't need
+>> x86 specifics in cpus.c; perhaps just an architecture call
+>> back on the CPU.
+> 
+> If it's only supported by x86, I would just move the
+> implementation to a x86-specific file, and add a stub for the
+> other architectures. See qmp_query_gic_capabilities() for an
+> example.
+> 
+> Also, the command should be added to
+> qmp_unregister_commands_hack() so we don't even report it as
+> available on other architectures.
+> 
 
-I'll look into it, thanks.
+Awesome, thanks for your comments, I'll move the qmp commands to
+target/i386/monitor.c and unregister them for architectures other than I386. Do
+I have to explicitly take care of unregistering the hmp commands as well?
 
->> --- a/qemu-io-cmds.c
->> +++ b/qemu-io-cmds.c
->> @@ -1569,7 +1569,7 @@ static int truncate_f(BlockBackend *blk, int arg=
-c, char **argv)
->>          return 0;
->>      }
->> =20
->> -    ret =3D blk_truncate(blk, offset);
->> +    ret =3D blk_truncate(blk, offset, NULL);
->>      if (ret < 0) {
->>          printf("truncate: %s\n", strerror(-ret));
->>          return 0;
->=20
-> Come on, using NULL immediately before a printf()? Doing the right thin=
-g
-> here is trivial.
-
-Yeah, but it's also qemu-io, so I somehow felt both "Better not touch it
-because it may break tests" and "Nobody really cares about a nice
-message here anyway".
-
-Will fix, since apparently at least you do care. ;-)
-
-Max
-
-
---XlrcAlRnUrVWSLM25ODKlu98SmoR2SgG8
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFFBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljAK3oSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A/ksH91rzCQkEDYhRlcZ81bCZdVooxcMcELCc
-FTPjlCl8z0uQpZHhWLlwHqAhqP/7J/07+NKnKB4Gzcmg2h82HoXqEOF3QTcVtImB
-M6nBeFdaBGjWk279pAchBT9REA/8PUFY1W9hj+1BovVJij0FEYCMQuVhL55jgtmf
-6nt9IuKRuKR0muaKYv6+DRPb7DOIbdMaR9NyRVSjGMLO0oFbM9uTCY2P6Fisuegq
-ifP3NHEUJVsr4FCnCHJe07McfNkO12gDrl6N9BoD84yGUcCL6MaZ75K0wBTJvSts
-UB7oRuPUF55Ps0n7+p2f4j9LRLwh14Ir6RCE4I6O3C/O/akdE2ydfw==
-=P1+d
------END PGP SIGNATURE-----
-
---XlrcAlRnUrVWSLM25ODKlu98SmoR2SgG8--
+-Julian
