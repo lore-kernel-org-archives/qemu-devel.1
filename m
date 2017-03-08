@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1clhKq-0000sS-9i
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 14:33:21 -0500
+	(envelope-from <k.kozlowski.k@gmail.com>) id 1clhLy-0001UU-GG
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 14:34:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1clhKo-0006gw-RH
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 14:33:20 -0500
-References: <20170308181833.32110-1-mreitz@redhat.com>
-	<e7e616d7-441f-9cff-d182-cbda19700ec5@redhat.com>
-	<91dff396-0e71-cb32-8353-edc4b644d5af@redhat.com>
-	<cf2a46ae-afd3-58ea-7a1b-2de4e1d89a16@redhat.com>
-	<20170308184610.GE5211@noname.redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <63437c2c-239e-a0af-d02e-c2993018ea93@redhat.com>
-Date: Wed, 8 Mar 2017 13:33:06 -0600
+	(envelope-from <k.kozlowski.k@gmail.com>) id 1clhLt-00077o-G9
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 14:34:30 -0500
+Received: from mail-wr0-f195.google.com ([209.85.128.195]:36153)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <k.kozlowski.k@gmail.com>)
+	id 1clhLt-00077T-9o
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 14:34:25 -0500
+Received: by mail-wr0-f195.google.com with SMTP id l37so5375614wrc.3
+	for <qemu-devel@nongnu.org>; Wed, 08 Mar 2017 11:34:25 -0800 (PST)
+Date: Wed, 8 Mar 2017 21:34:19 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Message-ID: <20170308193419.qj7xfour4xql4xzi@kozik-lap>
+References: <20170305214633.19844-1-krzk@kernel.org>
+	<20170306120948.GV2778@thinpad.lan.raisama.net>
+	<20170308162213.kcs3udn6ckvl7jd7@kozik-lap>
+	<20170308185726.GH4694@thinpad.lan.raisama.net>
+	<20170308190606.s7lthax42fndpyqx@kozik-lap>
+	<20170308192201.GI4694@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-In-Reply-To: <20170308184610.GE5211@noname.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="IDHRg15BiIno6HvElGnMh7Ph85qlva0Gh"
-Subject: Re: [Qemu-devel] [PATCH for-2.9] block/archipelago: Make it compile
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20170308192201.GI4694@thinpad.lan.raisama.net>
+Subject: Re: [Qemu-devel] [PATCH] qdev: Constify data pointed by few
+ arguments and local variables
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,68 +36,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Chrysostomos Nanakos <chris@include.gr>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---IDHRg15BiIno6HvElGnMh7Ph85qlva0Gh
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>,
- qemu-devel@nongnu.org, Chrysostomos Nanakos <chris@include.gr>
-Message-ID: <63437c2c-239e-a0af-d02e-c2993018ea93@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9] block/archipelago: Make it compile
-References: <20170308181833.32110-1-mreitz@redhat.com>
- <e7e616d7-441f-9cff-d182-cbda19700ec5@redhat.com>
- <91dff396-0e71-cb32-8353-edc4b644d5af@redhat.com>
- <cf2a46ae-afd3-58ea-7a1b-2de4e1d89a16@redhat.com>
- <20170308184610.GE5211@noname.redhat.com>
-In-Reply-To: <20170308184610.GE5211@noname.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 03/08/2017 12:46 PM, Kevin Wolf wrote:
->>> Oh, I meant to add:
->>>
->>> Should probably mention that it was commit da34e65 that introduced th=
-e
->>> problem (if I'm right?).  Does that mean we have not been compiling
->>> archipelago.c since Mar 2016?
->>
->> At least here on my machine it does indeed compile before that commit
->> and fails afterwards. So, yes, maybe we actually have not. :-)
+On Wed, Mar 08, 2017 at 04:22:01PM -0300, Eduardo Habkost wrote:
+> On Wed, Mar 08, 2017 at 09:06:06PM +0200, Krzysztof Kozlowski wrote:
+> > > > The object_property_set_str() takes data as pointer to const. If da=
+ta
+> > > > ends up as being non-const, then this is the mistake -
+> > > > object_property_set_str().
+> > >=20
+> > > I don't see the mistake. The whole purpose of:
+> > >   qdev_prop_set_chr(dev, "some-field", v)
+> > > is to end up doing this assignment internally:
+> > >   dev->some_field =3D v;
+> > > and on most (or all?) cases dev->some_field is not a const
+> > > pointer. The details are hidden behind the
+> > > object_property_set_str() call.
+> >=20
+> > If that would be the case, the object_property_set_str() cannot take a
+> > pinter to const. Not only because of the safety and logic but also C
+> > will prohibit it without a case.
+> >=20
+> > 	const char *c =3D "foo bar";
+> > 	char *v =3D c;
+> >=20
+> > 	/home/dev/qemu/qemu/qobject/qstring.c:67:15: error: initialization dis=
+cards =E2=80=98const=E2=80=99 qualifier from pointer target type [-Werror=
+=3Ddiscarded-qualifiers]
+> > 	     char *v =3D c;
+> >                ^
 >=20
-> In that case, maybe we should rather remove the driver because very
-> obviously nobody is interested in it, not even the maintainer. Keeping
-> things around that nobody tests (and consequently, nobody uses) is just=
+> The 'value' parameter to object_property_set_str() is const, and
+> that's correct. But the set_chr() setter will take care of the
+> 'dev->some_field =3D value' part.
 
-> a useless maintenance burden.
+In current implementation (v2.8.0-2132-gb64842dee42d) the
+only thing qdev_prop_set_chr() does is to call
+object_property_set_str() for value->label.
 
-We've released 2.6, 2.7, and 2.8 with no complaints about failure to
-compile. Sounds like a good candidate for removal in 2.9.
+So the flow is:
+    qdev_prop_set_chr(char *value)
+        const char *l =3D value->label
+        object_property_set_str(const char *l)
+            dev->some_field =3D copy_of(l);
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+The only non-const part of the flow is the first call. All of others are
+const.
 
+Of course the implementation might change and maybe that is the
+intention/plan - the qdev_prop_set_chr() should not commit to the caller
+that it will not store the value itself.
 
---IDHRg15BiIno6HvElGnMh7Ph85qlva0Gh
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Then I understand it.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+However if there are no such plans, then in current implementation the
+qdev_prop_set_chr() does not store any part of the 'value' itself but
+only a copy of it through object_property_set_str(). Thus it can provide
+this hint to the caller: I will not store the 'value' directly so I am
+taking pointer to const.
 
-iQEcBAEBCAAGBQJYwFxyAAoJEKeha0olJ0NqelcH/10I3ez1uavK2nJwLaZ0ov34
-ovW+7th8lyKa+E7k8C4VFfY3UGqU+QVEdnKEqfDCDFJxY2kAXtebRpJw84pXF/a0
-j/zzdi1YSyUtv3iHqJ3rqmBgelTEOGeSAgzYKlHbHjMSvLjvqd1Y7KBlfC+eqILg
-q5aFZZXsdq7manUa3WnWUt9p7vGcwTRvSdlW8L4iU4yFRmDL+tRAjtooqhtwwtRY
-6gWv1BOytSVoTL6v78wScRcdXaERd/9sPQigGNUgGuquL3NyqRuLEVXCu/+5aXAT
-9INqyzO3KX/Icm1gcF8K7Jlq0NAmF4tlkM2x6Uh5vfC96rtB2GG1S8Kum2hRMcU=
-=9tiF
------END PGP SIGNATURE-----
+Anyway, this is a trivial, boring and correctness-like change. :) Not worth
+all the talks so I do not mind resending without this (and others which
+were disapproved).
 
---IDHRg15BiIno6HvElGnMh7Ph85qlva0Gh--
+Best regards,
+Krzysztof
