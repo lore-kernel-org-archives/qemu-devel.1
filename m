@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39796)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1clRXN-0002Xg-Ok
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 21:41:15 -0500
+	(envelope-from <peterx@redhat.com>) id 1clRa3-0003J7-9a
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 21:44:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1clRXK-0000ZE-Fo
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 21:41:13 -0500
-Date: Wed, 8 Mar 2017 13:33:45 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170308023345.GH19967@umbus.fritz.box>
-References: <1485868319-16151-1-git-send-email-thuth@redhat.com>
-	<1485868319-16151-3-git-send-email-thuth@redhat.com>
-	<20170303145807.GC11509@thinpad.lan.raisama.net>
-	<20170305230627.GA12030@umbus.fritz.box>
-	<20170306114752.GS2778@thinpad.lan.raisama.net>
-	<20170307033105.GB19967@umbus.fritz.box>
-	<20170307120237.GF2778@thinpad.lan.raisama.net>
+	(envelope-from <peterx@redhat.com>) id 1clRa0-000180-2h
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 21:43:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46200)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1clRZz-00017h-QD
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 21:43:56 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C86A861D23
+	for <qemu-devel@nongnu.org>; Wed,  8 Mar 2017 02:43:55 +0000 (UTC)
+Date: Wed, 8 Mar 2017 10:43:49 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170308024349.GC31585@pxdev.xzpeter.org>
+References: <1488877751-13419-1-git-send-email-jasowang@redhat.com>
+	<7594c183-6d38-3dce-75e7-62bf3be324fc@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="2xzXx3ruJf7hsAzo"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170307120237.GF2778@thinpad.lan.raisama.net>
-Subject: Re: [Qemu-devel] [PATCH 2/2] vl: Print CPU help after we've
- registered the CPU accelerators
+In-Reply-To: <7594c183-6d38-3dce-75e7-62bf3be324fc@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V3] virtio: do not require IOMMU to be
+ created in advance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,205 +34,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, mst@redhat.com, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
+On Tue, Mar 07, 2017 at 02:47:30PM +0200, Marcel Apfelbaum wrote:
+> On 03/07/2017 11:09 AM, Jason Wang wrote:
+> >After commit 96a8821d2141 ("virtio: unbreak virtio-pci with IOMMU
+> >after caching ring translations"), IOMMU was required to be created in
+> >advance. This is because we can only get the correct dma_as after pci
+> >IOMMU (e.g intel_iommu) was initialized. This is suboptimal and
+> >inconvenient for user. This patch releases this by:
+> >
+> >- introduce a bus_master_ready method for PCIDeviceClass and trigger
+> >  this during pci_init_bus_master
+> >- implement virtio-pci method and 1) reset the dma_as 2) re-register
+> >  the memory listener to the new dma_as
+> >
+> 
+> Hi Jason,
+> 
+> >Cc: Paolo Bonzini <pbonzini@redhat.com>
+> >Signed-off-by: Jason Wang <jasowang@redhat.com>
+> >---
+> >Changes from V2:
+> >- delay pci_init_bus_master() after pci device is realized to make
+> >  bus_master_ready a more generic method
+> >---
+> > hw/pci/pci.c               | 11 ++++++++---
+> > hw/virtio/virtio-pci.c     |  9 +++++++++
+> > hw/virtio/virtio.c         | 19 +++++++++++++++++++
+> > include/hw/pci/pci.h       |  1 +
+> > include/hw/virtio/virtio.h |  1 +
+> > 5 files changed, 38 insertions(+), 3 deletions(-)
+> >
+> >diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> >index 273f1e4..22e6ad9 100644
+> >--- a/hw/pci/pci.c
+> >+++ b/hw/pci/pci.c
+> >@@ -83,6 +83,7 @@ static const VMStateDescription vmstate_pcibus = {
+> > static void pci_init_bus_master(PCIDevice *pci_dev)
+> > {
+> >     AddressSpace *dma_as = pci_device_iommu_address_space(pci_dev);
+> >+    PCIDeviceClass *pc = PCI_DEVICE_GET_CLASS(pci_dev);
+> >
+> >     memory_region_init_alias(&pci_dev->bus_master_enable_region,
+> >                              OBJECT(pci_dev), "bus master",
+> >@@ -90,6 +91,9 @@ static void pci_init_bus_master(PCIDevice *pci_dev)
+> >     memory_region_set_enabled(&pci_dev->bus_master_enable_region, false);
+> >     address_space_init(&pci_dev->bus_master_as,
+> >                        &pci_dev->bus_master_enable_region, pci_dev->name);
+> >+    if (pc->bus_master_ready) {
+> >+        pc->bus_master_ready(pci_dev);
+> >+    }
+> > }
+> >
+> > static void pcibus_machine_done(Notifier *notifier, void *data)
+> >@@ -995,9 +999,6 @@ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
+> >     pci_dev->devfn = devfn;
+> >     pci_dev->requester_id_cache = pci_req_id_cache_get(pci_dev);
+> >
+> >-    if (qdev_hotplug) {
+> >-        pci_init_bus_master(pci_dev);
+> >-    }
+> >     pstrcpy(pci_dev->name, sizeof(pci_dev->name), name);
+> >     pci_dev->irq_state = 0;
+> >     pci_config_alloc(pci_dev);
+> >@@ -1995,6 +1996,10 @@ static void pci_qdev_realize(DeviceState *qdev, Error **errp)
+> >         }
+> >     }
+> >
+> >+    if (qdev_hotplug) {
+> >+        pci_init_bus_master(pci_dev);
+> >+    }
+> >+
+> 
+> How does it help if we move qdev_hotplug check outside "do_pci_register_device"?
+> I suppose you want the code to run after the "realize" function?
+> If so, what happens if a "realize" function of another device needs the bus_master_as
+> (at hotplug time)?
 
---2xzXx3ruJf7hsAzo
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+My unmature understanding is that, we can just call
+pci_device_iommu_address_space() if device realization really needs
+the address space, rather than using bus_master_as.
 
-On Tue, Mar 07, 2017 at 09:02:37AM -0300, Eduardo Habkost wrote:
-> On Tue, Mar 07, 2017 at 02:31:05PM +1100, David Gibson wrote:
-> > On Mon, Mar 06, 2017 at 08:47:52AM -0300, Eduardo Habkost wrote:
-> > > On Mon, Mar 06, 2017 at 10:06:27AM +1100, David Gibson wrote:
-> > > > On Fri, Mar 03, 2017 at 11:58:07AM -0300, Eduardo Habkost wrote:
-> > > > > On Tue, Jan 31, 2017 at 02:11:59PM +0100, Thomas Huth wrote:
-> > > > > > When running with KVM on POWER, we register some CPU types duri=
-ng
-> > > > > > the initialization function of the ppc64 KVM code (which unfort=
-unately
-> > > > > > also can not be done via a type_init() like it is done on x86).
-> > > > >=20
-> > > > > Can you elaborate why it can't be done via type_init()? If the
-> > > > > QOM type hierarchy depends on any runtime data unavailable at
-> > > > > type_init(), we should fix that.
-> > > >=20
-> > > > Hmm.. how?  This is specifically for the special 'host' cpu in the
-> > > > case of KVM.  We can't use a static configuration here, because the=
-re
-> > > > are things on the host that could limit what features of the CPU are
-> > > > available for guest use.  So, we need KVM to be initialized in order
-> > > > to query that information.
-> > >=20
-> > > There's nothing saying you need to query that information before
-> > > type_register() or during class_init, does it? The behavior of
-> > > TYPE_HOST_POWERPC_CPU after object_new() is called can be as
-> > > dynamic as you want it to, but the QOM type hierarchy is supposed
-> > > to be static.
-> >=20
-> > So, the thing is we have some properties that logically belong in the
-> > CPU class, rather than instance, and that's correct for all TCG CPUs,
-> > but not for the KVM host CPU.  It seems nasty to have to force all
-> > those things into the instance just because of KVM.
->=20
-> You can still register any class properties you want, without
-> querying KVM first. Are there properties that you are able to
-> register only after querying KVM? Is the set of class properties
-> on TYPE_HOST_POWERPC_CPU different depending on the host
-> capabilities?
+An example is vfio-pci device. It is using
+pci_device_iommu_address_space() in vfio_realize(). Though I _guess_
+there may be other reasons behind, e.g., VFIOAddressSpace should be
+1:1 mapped to bus master address space, so we may want to make sure
+this address space will be the same when different devices are using
+the same address space (while bus_master_as is one per device, even if
+two devices have the same backend address space, there will be two
+distinct bus_master_as).
 
-Sorry, I used "properties" sloppily, not meaning QOM properties.
+IIUC, bus_master_as is only used to emulate the master bit in PCI
+command register. In that case, that should only be there for the
+guest operations, while imho device realization is "emulation code",
+which can directly use pci_device_iommu_address_space(). Actually, if
+it plays with bus_master_as even if it can, I guess it'll just fail
+since that region has not yet been enabled.
 
-There are several fields in the CPU class which describe CPU
-capabilities - bitmasks indicating which instructions are available,
-and L1 cacheline sizes.  There are some other things that are in the
-CPU instance at the moment, but arguably would belong better in the
-class: available page sizes and PTE encodings, for example.
+Please kindly correct me if I made a mistake...
 
-At the real hardware level these things are dependent only the model
-of CPU - hence belonging in cpu class, not instance.  But, because of
-the way virtualization works on POWER, some of the features may not be
-available to guests, due to configuration of the hypervisor.  So for
-the "host" cpu we need to query KVM to see which CPU features are
-actually available.
+Thanks,
 
-> I'm looking at target/ppc/cpu-models.c, and I only see the
-> class_init function setting PowerPCCPUClass::pvr and
-> PowerPCCPUClass::svr. Am I missing anything?
-
-Yes.  Notice that the .parent set there is not the base powerpc cpu
-class, but a "family" class.  Those families are defined in
-translate_init.c by another hairy macro POWERPC_FAMILY().  The family
-class_init function (generally done as a block below the macro
-invocation) initializes several other things, including insns_flags.
-
-kvmppc_host_cpu_class_init(), uses the family's copy of insns_flags as
-a base, but needs to query the host and adjust it for a couple of
-instruction groups that can be disabled from the hypervisor.
-
-[Aside: we also update the cache sizes based on host information.
-The reasons for that are complicated.  This particular case doesn't
-require a late class init though, because although it's queried from
-the host, it's not queried from kvm specifically]
-
-> You can still keep pvr and svr on the CPU class. The only thing
-> that's different on TYPE_HOST_POWERPC_CPU is that it won't have
-> the preset values on PowerPCCPUClass. But it can initialize the
-> instance values on ->instance_init() or ->realize() instead.
->=20
-> I even see ppc_cpu_class_by_pvr*() treating TYPE_HOST_POWERPC_CPU
-> as special on PVR lookup, already. So it looks like the code is
-> almost ready for that?
-
-PVR is a red herring.  insn_flags is the real issue.
-
->=20
-> >=20
-> > > Registering QOM types outside type_init() is only causing us
-> > > problems and we should stop doing that.
-> > >=20
-> > > >=20
-> > > > > >                                                                =
- So to
-> > > > > > be able to see these updates in the CPU help text, the code tha=
-t calls
-> > > > > > list_cpus() has to be run after configure_accelerator(). This m=
-ove should
-> > > > > > be fine since the "cpu_model" variable is also never used befor=
-e the call
-> > > > > > to configure_accelerator(), and thus there should not be any un=
-wanted
-> > > > > > side effects in the code before configure_accelerator() if the =
-user
-> > > > > > started QEMU with "-cpu ?" or "-cpu help".
-> > > > > >=20
-> > > > > > Signed-off-by: Thomas Huth <thuth@redhat.com>
-> > > > >=20
-> > > > > I am not convinced that the output of "-cpu help" and
-> > > > > "-cpu help -machine accel=3Dkvm" should look different. Do you ha=
-ve
-> > > > > an example of what exactly is wrong with the output currently?
-> > > > >=20
-> > > > > I actually believe list_cpus() needs to be called _earlier_, not
-> > > > > later. Otherwise we won't be able to fix this bug:
-> > > > >=20
-> > > > >   $ qemu-system-arm -cpu help
-> > > > >   qemu-system-arm:/usr/local/etc/qemu/qemu.conf:1: No machine spe=
-cified, and there is no default
-> > > > >   Use -machine help to list supported machines
-> > > > >   $=20
-> > > > >=20
-> > > > > > ---
-> > > > > >  vl.c | 10 +++++-----
-> > > > > >  1 file changed, 5 insertions(+), 5 deletions(-)
-> > > > > >=20
-> > > > > > diff --git a/vl.c b/vl.c
-> > > > > > index 0b72b12..315c5c3 100644
-> > > > > > --- a/vl.c
-> > > > > > +++ b/vl.c
-> > > > > > @@ -4055,11 +4055,6 @@ int main(int argc, char **argv, char **e=
-nvp)
-> > > > > >          qemu_set_hw_version(machine_class->hw_version);
-> > > > > >      }
-> > > > > > =20
-> > > > > > -    if (cpu_model && is_help_option(cpu_model)) {
-> > > > > > -        list_cpus(stdout, &fprintf, cpu_model);
-> > > > > > -        exit(0);
-> > > > > > -    }
-> > > > > > -
-> > > > > >      if (!trace_init_backends()) {
-> > > > > >          exit(1);
-> > > > > >      }
-> > > > > > @@ -4298,6 +4293,11 @@ int main(int argc, char **argv, char **e=
-nvp)
-> > > > > > =20
-> > > > > >      configure_accelerator(current_machine);
-> > > > > > =20
-> > > > > > +    if (cpu_model && is_help_option(cpu_model)) {
-> > > > > > +        list_cpus(stdout, &fprintf, cpu_model);
-> > > > > > +        exit(0);
-> > > > > > +    }
-> > > > > > +
-> > > > > >      if (qtest_chrdev) {
-> > > > > >          qtest_init(qtest_chrdev, qtest_log, &error_fatal);
-> > > > > >      }
-> > > > >=20
-> > > >=20
-> > >=20
-> > >=20
-> > >=20
-> >=20
->=20
->=20
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---2xzXx3ruJf7hsAzo
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJYv22HAAoJEGw4ysog2bOSelQQANaa71e3JXI/ALP/YoSy9MV9
-9RiiY7D/xAIvT+GOMuCn9q3FwSTnuYCV8DxxAcqJM4kYFMPcaisFq7mmdKhaRWio
-qM4MpccVu4jtybUVKXdqO72SCKD3zRkmaTyYAh1exTvILs+qVi4qTQOt1UJLv1yt
-CeJfipQcy+MlCU2FSJulGkcUTwRzqW4N1GDru4cCDuXTNSuGvxAB3tNy/uaXnc9X
-gFPJF1sqHH0WpdKWkLt6RTVREbQWGWEv6dPBXAr/ElJ7D2IfqIaBH7fIV2zFhL6R
-Wtf8smCV75vqPGO3RQ2Zh/BkddDiGO/6PZ+6RyM8GxvK5tSf2fZh2AneKisMSQhh
-p2Jqoqfe9g9mOH8QtLn6cWk/2E/glvPM43xvr3S4FpSM7DYiGNBahV/wrKrdRpsk
-n/S6DQ4wfF4XvQiotQA07xJ0GsUftjpKwqOeBpyzPmrWt0WlHE8JxuFh0+teFz/M
-uZMjQshqzm0sX8OemFh0QtmDlF5+LI4mpBWyvRVsPwJ0LYBCGdobb1XJZQ+nFAdy
-u5e7IJE1pQcYl1RYgoCZitfyJ4tN1lzI/Fg+DKBs1eeDnzx0DqxDknD0m1T2wKUM
-wU85MYt0/5fHAcCKGikmfFQ8nMubz2F8fgVqzIQslqlmuJpocQzaeyzYB+K3LjqQ
-n/yxq4MrAxepPQ68WRTx
-=BPIg
------END PGP SIGNATURE-----
-
---2xzXx3ruJf7hsAzo--
+-- peterx
