@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58396)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1clX4o-0000XE-68
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 03:36:07 -0500
+	(envelope-from <kwolf@redhat.com>) id 1clX9E-0001fg-Oh
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 03:40:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1clX4k-0000Gl-7p
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 03:36:06 -0500
-Received: from mx5-phx2.redhat.com ([209.132.183.37]:51114)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1clX4j-0000GW-Ur
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 03:36:02 -0500
-Date: Wed, 8 Mar 2017 03:35:50 -0500 (EST)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1149211275.29885713.1488962150826.JavaMail.zimbra@redhat.com>
-In-Reply-To: <213ff4bb-b3b9-fe00-6f0e-b75114e1a5ef@redhat.com>
-References: <1488425538-13785-1-git-send-email-peterx@redhat.com>
-	<20170302071100-mutt-send-email-mst@kernel.org>
-	<213ff4bb-b3b9-fe00-6f0e-b75114e1a5ef@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1clX9D-0001mD-Tv
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 03:40:40 -0500
+Date: Wed, 8 Mar 2017 09:40:30 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170308084030.GA5211@noname.redhat.com>
+References: <20170308025428.1037-1-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] intel_iommu: check misordered init when
- realize
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170308025428.1037-1-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 00/10] add blkdebug tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +22,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, yi l liu <yi.l.liu@intel.com>, Jintack Lim <jintack@cs.columbia.edu>, Jason Wang <jasowang@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-
-
------ Original Message -----
-> From: "Marcel Apfelbaum" <marcel@redhat.com>
-> To: "Michael S. Tsirkin" <mst@redhat.com>, "Peter Xu" <peterx@redhat.com>
-> Cc: qemu-devel@nongnu.org, "Paolo Bonzini" <pbonzini@redhat.com>, "yi l liu" <yi.l.liu@intel.com>, "Jintack Lim"
-> <jintack@cs.columbia.edu>, "Jason Wang" <jasowang@redhat.com>, "Alex Williamson" <alex.williamson@redhat.com>
-> Sent: Thursday, March 2, 2017 7:24:44 AM
-> Subject: Re: [PATCH v3] intel_iommu: check misordered init when realize
+Am 08.03.2017 um 03:54 hat Eric Blake geschrieben:
+> Available as a tag at:
+> git fetch git://repo.or.cz/qemu/ericb.git nbd-blkdebug-v6
 > 
-> On 03/02/2017 07:13 AM, Michael S. Tsirkin wrote:
-> > On Thu, Mar 02, 2017 at 11:32:18AM +0800, Peter Xu wrote:
-> >> Intel vIOMMU devices are created with "-device" parameter, while here
-> >> actually we need to make sure the dmar device be created before other
-> >> PCI devices (like vfio-pci, virtio-pci ones) so that we know iommu_fn
-> >> will be setup correctly before realizations of those PCI devices (it is
-> >> legal that PCI device fetch these info during its realization). Now this
-> >> ordering yet cannot be achieved elsewhere, and devices will be created
-> >> in the order that user specified. We need to avoid that.
-> >>
-> >> This patch tries to detect this kind of misordering issue during init of
-> >> VT-d device, then report to guest if misordering happened. In the
-> >> future, we can provide something better to solve it, e.g., to support
-> >> device init ordering, then we can live without this patch.
-> >>
-> >> Signed-off-by: Peter Xu <peterx@redhat.com>
-> >
-> > Unfortunately with virtio it's a regression, as it used to
-> > work with iommu. So I'm afraid we need to look into supporting
-> > arbitrary order right now :(
-> >
+> v5 was:
+> https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg03042.html
 > 
-> Hi,
-> 
-> A fast way to do it is to initialize iommu with a new keyword, like
->      -iommu intel-iommu
-> Or maybe use the existing "-object" somehow ?
->  From vl.c comments:
->    "Initial object creation happens before all other
->     QEMU data types are created.... "
-> 
-> Another idea is to add a third run on QEMU cmd line arguments,
-> but this would affect the whole system.
-> 
-> However having an ordering system beats all other ideas.
+> Since then:
+> - Rebase to master
+> - Pull in Dan's patch that splits test 97 for qcow (patch 1)
+> - Address comments from Kevin (includes creating new patch 2, 6)
+> - Update patches to reflect that this is now 2.10 material, since it
+> missed soft freeze and is not fixing a bug
 
-The ordering should be explicit in the command line.  Since we do not have
-cycles, it should be possible.
+I think if patches 1 and 2 pass review, we can take at least those into
+2.9. Improving test cases is okay during the freeze (and obviously
+fixing them is allowed anyway).
 
-The best solution would have been to add something like
-
-   -device intel-iommu,id=root-complex-iommu -global mch.iommu=root-complex-iommu
-
-but it's too late for that.
-
-Paolo
+Kevin
