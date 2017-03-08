@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1clcTe-00032u-Gp
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 09:22:07 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1clcce-0006xN-Pd
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 09:31:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1clcTd-00059q-Ie
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 09:22:06 -0500
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:37822)
+	(envelope-from <peter.maydell@linaro.org>) id 1clccd-0007dh-Pt
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 09:31:24 -0500
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:36422)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1clcTd-00059k-C2
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 09:22:05 -0500
-Received: by mail-wm0-x232.google.com with SMTP id n11so32071759wma.0
-	for <qemu-devel@nongnu.org>; Wed, 08 Mar 2017 06:22:05 -0800 (PST)
+	id 1clccd-0007dA-J2
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 09:31:23 -0500
+Received: by mail-wr0-x22e.google.com with SMTP id u108so24529412wrb.3
+	for <qemu-devel@nongnu.org>; Wed, 08 Mar 2017 06:31:23 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20170308124955.35623-1-aik@ozlabs.ru>
-References: <20170308124955.35623-1-aik@ozlabs.ru>
+In-Reply-To: <20170303145807.GC11509@thinpad.lan.raisama.net>
+References: <1485868319-16151-1-git-send-email-thuth@redhat.com>
+	<1485868319-16151-3-git-send-email-thuth@redhat.com>
+	<20170303145807.GC11509@thinpad.lan.raisama.net>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 8 Mar 2017 15:21:43 +0100
-Message-ID: <CAFEAcA_pq6cUVVqzg0in-QTKngsf2cSpzpaGnP=gH5X2GnzOQQ@mail.gmail.com>
+Date: Wed, 8 Mar 2017 15:31:01 +0100
+Message-ID: <CAFEAcA8VV-UW7M+W=KcN=XycPUS=FmFJmVhd0DpruzaoKEVjuQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [RFC PATCH qemu] dtc: Allow compiling with old gcc
+Subject: Re: [Qemu-devel] [PATCH 2/2] vl: Print CPU help after we've
+ registered the CPU accelerators
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +31,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On 8 March 2017 at 13:49, Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-> After 6e85fce0225f "dtc: Update requirement to v1.4.2" QEMU stopped
-> compiling in CentOS7:
+On 3 March 2017 at 15:58, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> On Tue, Jan 31, 2017 at 02:11:59PM +0100, Thomas Huth wrote:
+>> When running with KVM on POWER, we register some CPU types during
+>> the initialization function of the ppc64 KVM code (which unfortunately
+>> also can not be done via a type_init() like it is done on x86).
 >
-> In file included from /home/aik/p/qemu/dtc/libfdt/libfdt.h:54:0,
->                  from /home/aik/p/qemu/device_tree.c:30:
-> /home/aik/p/qemu/dtc/libfdt/libfdt_env.h:64:0: error: "__bitwise" redefined [-Werror]
->  #define __bitwise
->  ^
-> In file included from /usr/include/asm/ptrace.h:27:0,
->                  from /usr/include/asm/sigcontext.h:11,
->                  from /usr/include/bits/sigcontext.h:27,
->                  from /usr/include/signal.h:340,
->                  from /home/aik/p/qemu/include/qemu/osdep.h:86,
->                  from /home/aik/p/qemu/device_tree.c:14:
-> /usr/include/linux/types.h:21:0: note: this is the location of the previous definition
->  #define __bitwise __bitwise__
->  ^
-> cc1: all warnings being treated as errors
-> make: *** [device_tree.o] Error 1
-> make: *** Waiting for unfinished jobs....
->
-> The reason is that CentOS7 comes with libfdt 1.4.0 so QEMU tries using
-> the internal one which does not compile as CentOS7 comes with gcc v4.8.5
-> which reports warnings which it would not if the OS's libfdt was used
-> (libfdt_env.h has not changed between 1.4.0 and 1.4.2).
->
-> gcc 6.2.0 from Ubuntu v16.10 handles this fine.
->
-> This replaces -I with -isystem to suppress the warning (which turns
-> to an error because of -Werror).
+> Can you elaborate why it can't be done via type_init()? If the
+> QOM type hierarchy depends on any runtime data unavailable at
+> type_init(), we should fix that.
 
-Thanks for the bug report. I think it would be cleaner to fix this
-by fixing the problem upstream in libfdt and then moving our
-submodule forward to the fixed version. (libfdt should not be
-defining __ prefixed symbols as these are reserved for the
-system.)
+On ARM we (currently) have the KVM-only 'host' CPU type be
+added to the type hierarchy only at runtime in kvm_init(),
+but we deal with the '-help' problem by having arm_cpu_list() do
+
+#ifdef CONFIG_KVM
+    /* The 'host' CPU type is dynamically registered only if KVM is
+     * enabled, so we have to special-case it here:
+     */
+    (*cpu_fprintf)(f, "  host (only available in KVM mode)\n");
+#endif
 
 thanks
 -- PMM
