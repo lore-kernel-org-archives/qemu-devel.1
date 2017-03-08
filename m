@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1clRTE-0001he-Pc
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 21:36:57 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1clRXN-0002Xg-Ok
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 21:41:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1clRTB-0007kI-Gw
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 21:36:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33398)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1clRTB-0007k0-7h
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 21:36:53 -0500
-References: <20170308001637.9838-1-git@kirschju.re>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <acb6dafc-ff73-9b59-22c0-aa5e8219e925@redhat.com>
-Date: Tue, 7 Mar 2017 20:36:46 -0600
+	(envelope-from <dgibson@ozlabs.org>) id 1clRXK-0000ZE-Fo
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 21:41:13 -0500
+Date: Wed, 8 Mar 2017 13:33:45 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170308023345.GH19967@umbus.fritz.box>
+References: <1485868319-16151-1-git-send-email-thuth@redhat.com>
+	<1485868319-16151-3-git-send-email-thuth@redhat.com>
+	<20170303145807.GC11509@thinpad.lan.raisama.net>
+	<20170305230627.GA12030@umbus.fritz.box>
+	<20170306114752.GS2778@thinpad.lan.raisama.net>
+	<20170307033105.GB19967@umbus.fritz.box>
+	<20170307120237.GF2778@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-In-Reply-To: <20170308001637.9838-1-git@kirschju.re>
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Im5jdvMb5Jm5WMbxfSS6Dc2sKEOGGItrQ"
-Subject: Re: [Qemu-devel] [PATCH] X86/HMP: Expose x86 model specific
- registers via human monitor
+	protocol="application/pgp-signature"; boundary="2xzXx3ruJf7hsAzo"
+Content-Disposition: inline
+In-Reply-To: <20170307120237.GF2778@thinpad.lan.raisama.net>
+Subject: Re: [Qemu-devel] [PATCH 2/2] vl: Print CPU help after we've
+ registered the CPU accelerators
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,194 +30,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julian Kirsch <git@kirschju.re>, qemu-devel@nongnu.org
-Cc: Julian Kirsch <mail@kirschju.re>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Im5jdvMb5Jm5WMbxfSS6Dc2sKEOGGItrQ
-From: Eric Blake <eblake@redhat.com>
-To: Julian Kirsch <git@kirschju.re>, qemu-devel@nongnu.org
-Cc: Julian Kirsch <mail@kirschju.re>, Paolo Bonzini <pbonzini@redhat.com>,
- Peter Crosthwaite <crosthwaite.peter@gmail.com>,
- Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <acb6dafc-ff73-9b59-22c0-aa5e8219e925@redhat.com>
-Subject: Re: [PATCH] X86/HMP: Expose x86 model specific registers via human
- monitor
-References: <20170308001637.9838-1-git@kirschju.re>
-In-Reply-To: <20170308001637.9838-1-git@kirschju.re>
-Content-Type: text/plain; charset=utf-8
+
+--2xzXx3ruJf7hsAzo
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 03/07/2017 06:16 PM, Julian Kirsch wrote:
-> Provide read/write access to x86 model specific registers (MSRs) by mea=
-ns of
-> two new HMP commands "msr-list" and "msr-set". The rationale behind thi=
-s
-> is to improve introspection capabilities for system virtualization mode=
-=2E
-> For instance, many modern x86-64 operating systems maintain access to i=
-nternal
-> data structures via the MSR_GSBASE/MSR_KERNELGSBASE MSRs. Giving
-> introspection utilities (such as a remotely attached gdb) a way of
-> accessing these registers improves analysis results drastically.
+On Tue, Mar 07, 2017 at 09:02:37AM -0300, Eduardo Habkost wrote:
+> On Tue, Mar 07, 2017 at 02:31:05PM +1100, David Gibson wrote:
+> > On Mon, Mar 06, 2017 at 08:47:52AM -0300, Eduardo Habkost wrote:
+> > > On Mon, Mar 06, 2017 at 10:06:27AM +1100, David Gibson wrote:
+> > > > On Fri, Mar 03, 2017 at 11:58:07AM -0300, Eduardo Habkost wrote:
+> > > > > On Tue, Jan 31, 2017 at 02:11:59PM +0100, Thomas Huth wrote:
+> > > > > > When running with KVM on POWER, we register some CPU types duri=
+ng
+> > > > > > the initialization function of the ppc64 KVM code (which unfort=
+unately
+> > > > > > also can not be done via a type_init() like it is done on x86).
+> > > > >=20
+> > > > > Can you elaborate why it can't be done via type_init()? If the
+> > > > > QOM type hierarchy depends on any runtime data unavailable at
+> > > > > type_init(), we should fix that.
+> > > >=20
+> > > > Hmm.. how?  This is specifically for the special 'host' cpu in the
+> > > > case of KVM.  We can't use a static configuration here, because the=
+re
+> > > > are things on the host that could limit what features of the CPU are
+> > > > available for guest use.  So, we need KVM to be initialized in order
+> > > > to query that information.
+> > >=20
+> > > There's nothing saying you need to query that information before
+> > > type_register() or during class_init, does it? The behavior of
+> > > TYPE_HOST_POWERPC_CPU after object_new() is called can be as
+> > > dynamic as you want it to, but the QOM type hierarchy is supposed
+> > > to be static.
+> >=20
+> > So, the thing is we have some properties that logically belong in the
+> > CPU class, rather than instance, and that's correct for all TCG CPUs,
+> > but not for the KVM host CPU.  It seems nasty to have to force all
+> > those things into the instance just because of KVM.
 >=20
-> Signed-off-by: Julian Kirsch <git@kirschju.re>
-> ---
+> You can still register any class properties you want, without
+> querying KVM first. Are there properties that you are able to
+> register only after querying KVM? Is the set of class properties
+> on TYPE_HOST_POWERPC_CPU different depending on the host
+> capabilities?
 
-I'm just focusing on the QMP interface portion of this.
+Sorry, I used "properties" sloppily, not meaning QOM properties.
 
-Is any of this information...
+There are several fields in the CPU class which describe CPU
+capabilities - bitmasks indicating which instructions are available,
+and L1 cacheline sizes.  There are some other things that are in the
+CPU instance at the moment, but arguably would belong better in the
+class: available page sizes and PTE encodings, for example.
 
-> This patch moves the logic of the rdmsr and wrmsr functions to helper.c=
- and
-> replaces their current versions in misc_helper.c with stubs calling the=
- new
-> functions. The ordering of MSRs now loosely follows the ordering used i=
-n the KVM
-> module. As qemu operates on cached values in the CPUX86State struct, th=
-e msr-set
-> command is implemented in a hackish way: In order to force qemu to flus=
-h the new
-> values to KVM a call to cpu_synchronize_post_init is triggered, eventua=
-lly
-> ending up in calling kvm_put_msrs at KVM_PUT_FULL_STATE level. As MSR w=
-rites
-> could *still* be caught by the code logic in this function, the msr-set=
- function
-> reads back the values written to determine whether the write was succes=
-sful.
-> This way, we don't have to duplicate the logic used in kvm_put_msrs (ha=
-s_msr_XXX)
-> to x86_cpu_wrmsr.
-> There are several things I would like to pooint out about this patch:
->   - The "msr-list" command currently displays MSR values for all virtua=
-l cpus.
->     This is somewhat inconsistent with "info registers" just displaying=
- the
->     value of the current default cpu. One might think about just displa=
-ying the
->     current value and offer access to other CPU's MSRs by means of swit=
-ching
->     between CPUs using the "cpu" monitor command.
->   - The new version of x86_cpu_rdmsr exposes MSRs that are arguably of
->     questionable help for any human / tool using the monitor. However I=
- merely
->     felt a deep urge to reflect the full MSR list from kvm.c when writi=
-ng the
->     code.
->   - While the need for msr-list is evident (see commit msg), msr-set co=
-uld be
->     used in more obscure cases. For instance, one might offer a way to =
-access
->     and configure performance counter MSRs of the guest via the hmp. If=
- this
->     feels too much like an inacceptable hack, I'll happily drop the msr=
--set
->     part.
+At the real hardware level these things are dependent only the model
+of CPU - hence belonging in cpu class, not instance.  But, because of
+the way virtualization works on POWER, some of the features may not be
+available to guests, due to configuration of the hypervisor.  So for
+the "host" cpu we need to query KVM to see which CPU features are
+actually available.
 
-=2E..useful above the --- as part of the commit message?
+> I'm looking at target/ppc/cpu-models.c, and I only see the
+> class_init function setting PowerPCCPUClass::pvr and
+> PowerPCCPUClass::svr. Am I missing anything?
 
+Yes.  Notice that the .parent set there is not the base powerpc cpu
+class, but a "family" class.  Those families are defined in
+translate_init.c by another hairy macro POWERPC_FAMILY().  The family
+class_init function (generally done as a block below the macro
+invocation) initializes several other things, including insns_flags.
 
-> +++ b/qapi-schema.json
-> @@ -2365,6 +2365,55 @@
->    'data': {'val': 'int', 'size': 'int', 'filename': 'str'} }
-> =20
->  ##
-> +# @MsrInfo:
-> +#
-> +# Information about a MSR
-> +#
-> +# @cpu_idx: CPU index
-> +#
-> +# @msr_idx: MSR index
-> +#
-> +# @value: MSR value
-> +#
-> +# Since: 2.8.1
+kvmppc_host_cpu_class_init(), uses the family's copy of insns_flags as
+a base, but needs to query the host and adjust it for a couple of
+instruction groups that can be disabled from the hypervisor.
 
-You've missed 2.8 by a long shot; you've even missed soft freeze for
-2.9.  This should be 2.10.
+[Aside: we also update the cache sizes based on host information.
+The reasons for that are complicated.  This particular case doesn't
+require a late class init though, because although it's queried from
+the host, it's not queried from kvm specifically]
 
-> +##
-> +{ 'struct': 'MsrInfo',
-> +  'data': {'cpu_idx': 'int', 'msr_idx': 'uint32', 'value': 'uint64'} }=
+> You can still keep pvr and svr on the CPU class. The only thing
+> that's different on TYPE_HOST_POWERPC_CPU is that it won't have
+> the preset values on PowerPCCPUClass. But it can initialize the
+> instance values on ->instance_init() or ->realize() instead.
+>=20
+> I even see ppc_cpu_class_by_pvr*() treating TYPE_HOST_POWERPC_CPU
+> as special on PVR lookup, already. So it looks like the code is
+> almost ready for that?
 
+PVR is a red herring.  insn_flags is the real issue.
 
-Please spell new members with '-' rather than '_', as in 'cpu-idx' (or
-even spell it out as 'cpu-index') and 'msr-idx'.
-
-> +
-> +##
-> +# @msr-list:
-> +#
-> +# Retrieve model specific registers (MSRs) on x86
-> +#
-> +# @msr_idx: MSR index to read
-> +#
-> +# Returns: A list of one MSR value per CPU, or nothing
-> +#
-> +# Since: 2.8.1
-
-2.10
-
-> +##
-> +{ 'command': 'msr-list', 'returns': ['MsrInfo'],
-> +  'data': {'msr_idx': 'uint32'} }
-
-'msr-idx' (or even 'msr-index')
-
-> +
-> +##
-> +# @msr-set:
-> +#
-> +# Set model specific registers (MSRs) on x86
-> +#
-> +# @cpu_idx: CPU holding the MSR that should be written
-> +#
-> +# @msr_idx: MSR index to write
-> +#
-> +# @value: Value to write
-> +#
-> +# Returns: Nothing on success
-
-Useless Returns: line.
-
-> +#
-> +# Since: 2.8.1
-
-2.10
-
-> +##
-> +{ 'command': 'msr-set',
-> +  'data': {'cpu_idx': 'uint32', 'msr_idx': 'uint32', 'value': 'uint64'=
-} }
-
-again, dash instead of underscore
-
+>=20
+> >=20
+> > > Registering QOM types outside type_init() is only causing us
+> > > problems and we should stop doing that.
+> > >=20
+> > > >=20
+> > > > > >                                                                =
+ So to
+> > > > > > be able to see these updates in the CPU help text, the code tha=
+t calls
+> > > > > > list_cpus() has to be run after configure_accelerator(). This m=
+ove should
+> > > > > > be fine since the "cpu_model" variable is also never used befor=
+e the call
+> > > > > > to configure_accelerator(), and thus there should not be any un=
+wanted
+> > > > > > side effects in the code before configure_accelerator() if the =
+user
+> > > > > > started QEMU with "-cpu ?" or "-cpu help".
+> > > > > >=20
+> > > > > > Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > > > >=20
+> > > > > I am not convinced that the output of "-cpu help" and
+> > > > > "-cpu help -machine accel=3Dkvm" should look different. Do you ha=
+ve
+> > > > > an example of what exactly is wrong with the output currently?
+> > > > >=20
+> > > > > I actually believe list_cpus() needs to be called _earlier_, not
+> > > > > later. Otherwise we won't be able to fix this bug:
+> > > > >=20
+> > > > >   $ qemu-system-arm -cpu help
+> > > > >   qemu-system-arm:/usr/local/etc/qemu/qemu.conf:1: No machine spe=
+cified, and there is no default
+> > > > >   Use -machine help to list supported machines
+> > > > >   $=20
+> > > > >=20
+> > > > > > ---
+> > > > > >  vl.c | 10 +++++-----
+> > > > > >  1 file changed, 5 insertions(+), 5 deletions(-)
+> > > > > >=20
+> > > > > > diff --git a/vl.c b/vl.c
+> > > > > > index 0b72b12..315c5c3 100644
+> > > > > > --- a/vl.c
+> > > > > > +++ b/vl.c
+> > > > > > @@ -4055,11 +4055,6 @@ int main(int argc, char **argv, char **e=
+nvp)
+> > > > > >          qemu_set_hw_version(machine_class->hw_version);
+> > > > > >      }
+> > > > > > =20
+> > > > > > -    if (cpu_model && is_help_option(cpu_model)) {
+> > > > > > -        list_cpus(stdout, &fprintf, cpu_model);
+> > > > > > -        exit(0);
+> > > > > > -    }
+> > > > > > -
+> > > > > >      if (!trace_init_backends()) {
+> > > > > >          exit(1);
+> > > > > >      }
+> > > > > > @@ -4298,6 +4293,11 @@ int main(int argc, char **argv, char **e=
+nvp)
+> > > > > > =20
+> > > > > >      configure_accelerator(current_machine);
+> > > > > > =20
+> > > > > > +    if (cpu_model && is_help_option(cpu_model)) {
+> > > > > > +        list_cpus(stdout, &fprintf, cpu_model);
+> > > > > > +        exit(0);
+> > > > > > +    }
+> > > > > > +
+> > > > > >      if (qtest_chrdev) {
+> > > > > >          qtest_init(qtest_chrdev, qtest_log, &error_fatal);
+> > > > > >      }
+> > > > >=20
+> > > >=20
+> > >=20
+> > >=20
+> > >=20
+> >=20
+>=20
+>=20
+>=20
 
 --=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-
---Im5jdvMb5Jm5WMbxfSS6Dc2sKEOGGItrQ
+--2xzXx3ruJf7hsAzo
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYv24/AAoJEKeha0olJ0NqWk0H/joz74QopZ3dG8h9WFa8C8F+
-9gxFWgbNzaTXUSTMCpJAeL76OL6iJJEc28QVyltUBQblP3iN6TN79SGqQwg9WL8U
-bTpAQmMSJ9BHJ1pMXViOrvk+TO7eGfAhOfQkW1+wx3RxeQScD2EtT7G92U+22Omz
-wW5P8nO6FBqDL0tyogjofpOW5CY9LA7HdJ5tBmbUGKagSEoaDqioldEUYrcvGtDM
-dLdrQ3hV7KFPTMUG9Sh0S1TXMLCwNbzyGN1v0GuFx4yHrWvP67tBv8sjtH3ruuYw
-0p0AebQX8FDQzHEpWbTP2nOEbGy+KU0iHTn25rBQ/gUPLxUXfkH0Njzap2nnnDo=
-=XtO6
+iQIcBAEBCAAGBQJYv22HAAoJEGw4ysog2bOSelQQANaa71e3JXI/ALP/YoSy9MV9
+9RiiY7D/xAIvT+GOMuCn9q3FwSTnuYCV8DxxAcqJM4kYFMPcaisFq7mmdKhaRWio
+qM4MpccVu4jtybUVKXdqO72SCKD3zRkmaTyYAh1exTvILs+qVi4qTQOt1UJLv1yt
+CeJfipQcy+MlCU2FSJulGkcUTwRzqW4N1GDru4cCDuXTNSuGvxAB3tNy/uaXnc9X
+gFPJF1sqHH0WpdKWkLt6RTVREbQWGWEv6dPBXAr/ElJ7D2IfqIaBH7fIV2zFhL6R
+Wtf8smCV75vqPGO3RQ2Zh/BkddDiGO/6PZ+6RyM8GxvK5tSf2fZh2AneKisMSQhh
+p2Jqoqfe9g9mOH8QtLn6cWk/2E/glvPM43xvr3S4FpSM7DYiGNBahV/wrKrdRpsk
+n/S6DQ4wfF4XvQiotQA07xJ0GsUftjpKwqOeBpyzPmrWt0WlHE8JxuFh0+teFz/M
+uZMjQshqzm0sX8OemFh0QtmDlF5+LI4mpBWyvRVsPwJ0LYBCGdobb1XJZQ+nFAdy
+u5e7IJE1pQcYl1RYgoCZitfyJ4tN1lzI/Fg+DKBs1eeDnzx0DqxDknD0m1T2wKUM
+wU85MYt0/5fHAcCKGikmfFQ8nMubz2F8fgVqzIQslqlmuJpocQzaeyzYB+K3LjqQ
+n/yxq4MrAxepPQ68WRTx
+=BPIg
 -----END PGP SIGNATURE-----
 
---Im5jdvMb5Jm5WMbxfSS6Dc2sKEOGGItrQ--
+--2xzXx3ruJf7hsAzo--
