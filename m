@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1clS4r-0005kD-NL
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 22:15:51 -0500
+	(envelope-from <jasowang@redhat.com>) id 1clS7c-0006Q5-IG
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 22:18:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1clS4o-0004Ox-I9
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 22:15:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39672)
+	(envelope-from <jasowang@redhat.com>) id 1clS7Z-00061Y-De
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 22:18:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42062)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1clS4o-0004OM-8Y
-	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 22:15:46 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 15B7181226
-	for <qemu-devel@nongnu.org>; Wed,  8 Mar 2017 03:15:46 +0000 (UTC)
-References: <1488877751-13419-1-git-send-email-jasowang@redhat.com>
-	<7594c183-6d38-3dce-75e7-62bf3be324fc@redhat.com>
-	<20170308024349.GC31585@pxdev.xzpeter.org>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1clS7Z-00061C-3i
+	for qemu-devel@nongnu.org; Tue, 07 Mar 2017 22:18:37 -0500
+References: <1488876478-6889-1-git-send-email-jasowang@redhat.com>
+	<20170307111618.43ffbd13.cornelia.huck@de.ibm.com>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <9d2dd1a4-aadc-a497-3dbb-6afb6d621587@redhat.com>
-Date: Wed, 8 Mar 2017 11:15:39 +0800
+Message-ID: <cb84b888-4917-162d-31a5-f708f4783444@redhat.com>
+Date: Wed, 8 Mar 2017 11:18:27 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170308024349.GC31585@pxdev.xzpeter.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20170307111618.43ffbd13.cornelia.huck@de.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V3] virtio: do not require IOMMU to be
- created in advance
+Subject: Re: [Qemu-devel] [PATCH] virtio: destroy region cache during reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,130 +27,306 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
-Cc: mst@redhat.com, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: mst@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, peterx@redhat.com
 
 
 
-On 2017=E5=B9=B403=E6=9C=8808=E6=97=A5 10:43, Peter Xu wrote:
-> On Tue, Mar 07, 2017 at 02:47:30PM +0200, Marcel Apfelbaum wrote:
->> On 03/07/2017 11:09 AM, Jason Wang wrote:
->>> After commit 96a8821d2141 ("virtio: unbreak virtio-pci with IOMMU
->>> after caching ring translations"), IOMMU was required to be created i=
-n
->>> advance. This is because we can only get the correct dma_as after pci
->>> IOMMU (e.g intel_iommu) was initialized. This is suboptimal and
->>> inconvenient for user. This patch releases this by:
->>>
->>> - introduce a bus_master_ready method for PCIDeviceClass and trigger
->>>   this during pci_init_bus_master
->>> - implement virtio-pci method and 1) reset the dma_as 2) re-register
->>>   the memory listener to the new dma_as
->>>
->> Hi Jason,
+On 2017=E5=B9=B403=E6=9C=8807=E6=97=A5 18:16, Cornelia Huck wrote:
+> On Tue,  7 Mar 2017 16:47:58 +0800
+> Jason Wang <jasowang@redhat.com> wrote:
+>
+>> We don't destroy region cache during reset which can make the maps
+>> of previous driver leaked to a buggy or malicious driver that don't
+>> set vring address before starting to use the device. Fix this by
+>> destroy the region cache during reset and validate it before trying to
+>> use them. While at it, also validate address_space_cache_init() during
+>> virtio_init_region_cache() to make sure we have a correct region
+>> cache.
 >>
->>> Cc: Paolo Bonzini <pbonzini@redhat.com>
->>> Signed-off-by: Jason Wang <jasowang@redhat.com>
->>> ---
->>> Changes from V2:
->>> - delay pci_init_bus_master() after pci device is realized to make
->>>   bus_master_ready a more generic method
->>> ---
->>> hw/pci/pci.c               | 11 ++++++++---
->>> hw/virtio/virtio-pci.c     |  9 +++++++++
->>> hw/virtio/virtio.c         | 19 +++++++++++++++++++
->>> include/hw/pci/pci.h       |  1 +
->>> include/hw/virtio/virtio.h |  1 +
->>> 5 files changed, 38 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
->>> index 273f1e4..22e6ad9 100644
->>> --- a/hw/pci/pci.c
->>> +++ b/hw/pci/pci.c
->>> @@ -83,6 +83,7 @@ static const VMStateDescription vmstate_pcibus =3D =
-{
->>> static void pci_init_bus_master(PCIDevice *pci_dev)
->>> {
->>>      AddressSpace *dma_as =3D pci_device_iommu_address_space(pci_dev)=
+>> Signed-off-by: Jason Wang <jasowang@redhat.com>
+>> ---
+>>   hw/virtio/virtio.c | 88 ++++++++++++++++++++++++++++++++++++++++++++=
+++--------
+>>   1 file changed, 76 insertions(+), 12 deletions(-)
+>>
+>> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+>> index 09f4cf4..90324f6 100644
+>> --- a/hw/virtio/virtio.c
+>> +++ b/hw/virtio/virtio.c
+>> @@ -131,6 +131,7 @@ static void virtio_init_region_cache(VirtIODevice =
+*vdev, int n)
+>>       VRingMemoryRegionCaches *new;
+>>       hwaddr addr, size;
+>>       int event_size;
+>> +    int64_t len;
+>>
+>>       event_size =3D virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_E=
+VENT_IDX) ? 2 : 0;
+>>
+>> @@ -140,21 +141,41 @@ static void virtio_init_region_cache(VirtIODevic=
+e *vdev, int n)
+>>       }
+>>       new =3D g_new0(VRingMemoryRegionCaches, 1);
+>>       size =3D virtio_queue_get_desc_size(vdev, n);
+>> -    address_space_cache_init(&new->desc, vdev->dma_as,
+>> -                             addr, size, false);
+>> +    len =3D address_space_cache_init(&new->desc, vdev->dma_as,
+>> +                                   addr, size, false);
+>> +    if (len < size) {
+>> +        virtio_error(vdev, "Cannot map desc");
+>> +        goto err_desc;
+>> +    }
+>>
+>>       size =3D virtio_queue_get_used_size(vdev, n) + event_size;
+>> -    address_space_cache_init(&new->used, vdev->dma_as,
+>> -                             vq->vring.used, size, true);
+>> +    len =3D address_space_cache_init(&new->used, vdev->dma_as,
+>> +                                   vq->vring.used, size, true);
+>> +    if (len < size) {
+>> +        virtio_error(vdev, "Cannot map used");
+>> +        goto err_used;
+>> +    }
+>>
+>>       size =3D virtio_queue_get_avail_size(vdev, n) + event_size;
+>> -    address_space_cache_init(&new->avail, vdev->dma_as,
+>> -                             vq->vring.avail, size, false);
+>> +    len =3D address_space_cache_init(&new->avail, vdev->dma_as,
+>> +                                   vq->vring.avail, size, false);
+>> +    if (len < size) {
+>> +        virtio_error(vdev, "Cannot map avail");
+>> +        goto err_avail;
+>> +    }
+>>
+>>       atomic_rcu_set(&vq->vring.caches, new);
+>>       if (old) {
+>>           call_rcu(old, virtio_free_region_cache, rcu);
+>>       }
+>> +    return;
+>> +
+>> +err_avail:
+>> +    address_space_cache_destroy(&new->used);
+>> +err_used:
+>> +    address_space_cache_destroy(&new->desc);
+>> +err_desc:
+>> +    g_free(new);
+>>   }
+> I think it would be more readable if you moved adding this check (which
+> is a good idea) into a separate patch.
+
+Ok.
+
+>>   /* virt queue functions */
+>> @@ -190,6 +211,10 @@ static inline uint16_t vring_avail_flags(VirtQueu=
+e *vq)
+>>   {
+>>       VRingMemoryRegionCaches *caches =3D atomic_rcu_read(&vq->vring.c=
+aches);
+>>       hwaddr pa =3D offsetof(VRingAvail, flags);
+>> +    if (!caches) {
+>> +        virtio_error(vq->vdev, "Cannot map avail flags");
+> I'm not sure that virtio_error is the right thing here; ending up in
+> this function with !caches indicates an error in our logic.
+
+Probably not, this can be triggered by buggy guest.
+
+> An assert
+> might be better (and I hope we can sort out all of those errors exposed
+> by the introduction of region caches for 2.9...)
+
+I thought we should avoid assert as much as possible in this case. But=20
+if you and maintainer want an assert, it's also fine.
+
+>
+>> +        return 0;
+>> +    }
+>>       return virtio_lduw_phys_cached(vq->vdev, &caches->avail, pa);
+>>   }
+>>
+>> @@ -198,6 +223,10 @@ static inline uint16_t vring_avail_idx(VirtQueue =
+*vq)
+>>   {
+>>       VRingMemoryRegionCaches *caches =3D atomic_rcu_read(&vq->vring.c=
+aches);
+>>       hwaddr pa =3D offsetof(VRingAvail, idx);
+>> +    if (!caches) {
+>> +        virtio_error(vq->vdev, "Cannot map avail idx");
+>> +        return vq->shadow_avail_idx;
+>> +    }
+>>       vq->shadow_avail_idx =3D virtio_lduw_phys_cached(vq->vdev, &cach=
+es->avail, pa);
+>>       return vq->shadow_avail_idx;
+>>   }
+>> @@ -207,6 +236,10 @@ static inline uint16_t vring_avail_ring(VirtQueue=
+ *vq, int i)
+>>   {
+>>       VRingMemoryRegionCaches *caches =3D atomic_rcu_read(&vq->vring.c=
+aches);
+>>       hwaddr pa =3D offsetof(VRingAvail, ring[i]);
+>> +    if (!caches) {
+>> +        virtio_error(vq->vdev, "Cannot map avail ring");
+>> +        return 0;
+>> +    }
+>>       return virtio_lduw_phys_cached(vq->vdev, &caches->avail, pa);
+>>   }
+>>
+>> @@ -222,6 +255,10 @@ static inline void vring_used_write(VirtQueue *vq=
+, VRingUsedElem *uelem,
+>>   {
+>>       VRingMemoryRegionCaches *caches =3D atomic_rcu_read(&vq->vring.c=
+aches);
+>>       hwaddr pa =3D offsetof(VRingUsed, ring[i]);
+>> +    if (!caches) {
+>> +        virtio_error(vq->vdev, "Cannot map used ring");
+>> +        return;
+>> +    }
+>>       virtio_tswap32s(vq->vdev, &uelem->id);
+>>       virtio_tswap32s(vq->vdev, &uelem->len);
+>>       address_space_write_cached(&caches->used, pa, uelem, sizeof(VRin=
+gUsedElem));
+>> @@ -233,6 +270,10 @@ static uint16_t vring_used_idx(VirtQueue *vq)
+>>   {
+>>       VRingMemoryRegionCaches *caches =3D atomic_rcu_read(&vq->vring.c=
+aches);
+>>       hwaddr pa =3D offsetof(VRingUsed, idx);
+>> +    if (!caches) {
+>> +        virtio_error(vq->vdev, "Cannot map used ring");
+>> +        return 0;
+>> +    }
+>>       return virtio_lduw_phys_cached(vq->vdev, &caches->used, pa);
+>>   }
+>>
+>> @@ -241,6 +282,10 @@ static inline void vring_used_idx_set(VirtQueue *=
+vq, uint16_t val)
+>>   {
+>>       VRingMemoryRegionCaches *caches =3D atomic_rcu_read(&vq->vring.c=
+aches);
+>>       hwaddr pa =3D offsetof(VRingUsed, idx);
+>> +    if (!caches) {
+>> +        virtio_error(vq->vdev, "Cannot map used idx");
+>> +        return;
+>> +    }
+>>       virtio_stw_phys_cached(vq->vdev, &caches->used, pa, val);
+>>       address_space_cache_invalidate(&caches->used, pa, sizeof(val));
+>>       vq->used_idx =3D val;
+>> @@ -254,6 +299,10 @@ static inline void vring_used_flags_set_bit(VirtQ=
+ueue *vq, int mask)
+>>       hwaddr pa =3D offsetof(VRingUsed, flags);
+>>       uint16_t flags =3D virtio_lduw_phys_cached(vq->vdev, &caches->us=
+ed, pa);
+>>
+>> +    if (!caches) {
+>> +        virtio_error(vq->vdev, "Cannot map used flags");
+> Regardless of whether using virtio_error here is fine: caches was
+> already dereferenced above...
+>
+>> +        return;
+>> +    }
+>>       virtio_stw_phys_cached(vdev, &caches->used, pa, flags | mask);
+>>       address_space_cache_invalidate(&caches->used, pa, sizeof(flags))=
 ;
->>> +    PCIDeviceClass *pc =3D PCI_DEVICE_GET_CLASS(pci_dev);
->>>
->>>      memory_region_init_alias(&pci_dev->bus_master_enable_region,
->>>                               OBJECT(pci_dev), "bus master",
->>> @@ -90,6 +91,9 @@ static void pci_init_bus_master(PCIDevice *pci_dev)
->>>      memory_region_set_enabled(&pci_dev->bus_master_enable_region, fa=
-lse);
->>>      address_space_init(&pci_dev->bus_master_as,
->>>                         &pci_dev->bus_master_enable_region, pci_dev->=
-name);
->>> +    if (pc->bus_master_ready) {
->>> +        pc->bus_master_ready(pci_dev);
->>> +    }
->>> }
->>>
->>> static void pcibus_machine_done(Notifier *notifier, void *data)
->>> @@ -995,9 +999,6 @@ static PCIDevice *do_pci_register_device(PCIDevic=
-e *pci_dev, PCIBus *bus,
->>>      pci_dev->devfn =3D devfn;
->>>      pci_dev->requester_id_cache =3D pci_req_id_cache_get(pci_dev);
->>>
->>> -    if (qdev_hotplug) {
->>> -        pci_init_bus_master(pci_dev);
->>> -    }
->>>      pstrcpy(pci_dev->name, sizeof(pci_dev->name), name);
->>>      pci_dev->irq_state =3D 0;
->>>      pci_config_alloc(pci_dev);
->>> @@ -1995,6 +1996,10 @@ static void pci_qdev_realize(DeviceState *qdev=
-, Error **errp)
->>>          }
->>>      }
->>>
->>> +    if (qdev_hotplug) {
->>> +        pci_init_bus_master(pci_dev);
->>> +    }
->>> +
->> How does it help if we move qdev_hotplug check outside "do_pci_registe=
-r_device"?
->> I suppose you want the code to run after the "realize" function?
+>>   }
+>> @@ -266,6 +315,10 @@ static inline void vring_used_flags_unset_bit(Vir=
+tQueue *vq, int mask)
+>>       hwaddr pa =3D offsetof(VRingUsed, flags);
+>>       uint16_t flags =3D virtio_lduw_phys_cached(vq->vdev, &caches->us=
+ed, pa);
+>>
+>> +    if (!caches) {
+>> +        virtio_error(vq->vdev, "Cannot map used flags");
+> dito
+>
+>> +        return;
+>> +    }
+>>       virtio_stw_phys_cached(vdev, &caches->used, pa, flags & ~mask);
+>>       address_space_cache_invalidate(&caches->used, pa, sizeof(flags))=
+;
+>>   }
+>> @@ -280,6 +333,10 @@ static inline void vring_set_avail_event(VirtQueu=
+e *vq, uint16_t val)
+>>       }
+>>
+>>       caches =3D atomic_rcu_read(&vq->vring.caches);
+>> +    if (!caches) {
+>> +        virtio_error(vq->vdev, "Cannot map avail event");
+>> +        return;
+>> +    }
+>>       pa =3D offsetof(VRingUsed, ring[vq->vring.num]);
+>>       virtio_stw_phys_cached(vq->vdev, &caches->used, pa, val);
+>>       address_space_cache_invalidate(&caches->used, pa, sizeof(val));
+>> @@ -552,7 +609,7 @@ void virtqueue_get_avail_bytes(VirtQueue *vq, unsi=
+gned int *in_bytes,
+>>
+>>       max =3D vq->vring.num;
+>>       caches =3D atomic_rcu_read(&vq->vring.caches);
+>> -    if (caches->desc.len < max * sizeof(VRingDesc)) {
+>> +    if (!caches || caches->desc.len < max * sizeof(VRingDesc)) {
+>>           virtio_error(vdev, "Cannot map descriptor ring");
+>>           goto err;
+>>       }
+>> @@ -819,7 +876,7 @@ void *virtqueue_pop(VirtQueue *vq, size_t sz)
+>>       i =3D head;
+>>
+>>       caches =3D atomic_rcu_read(&vq->vring.caches);
+>> -    if (caches->desc.len < max * sizeof(VRingDesc)) {
+>> +    if (!caches || caches->desc.len < max * sizeof(VRingDesc)) {
+>>           virtio_error(vdev, "Cannot map descriptor ring");
+>>           goto done;
+>>       }
+>> @@ -1117,6 +1174,15 @@ static enum virtio_device_endian virtio_current=
+_cpu_endian(void)
+>>       }
+>>   }
+>>
+>> +static void virtio_virtqueue_reset_region_cache(struct VirtQueue *vq)
+>> +{
+>> +    VRingMemoryRegionCaches *caches;
+>> +
+>> +    caches =3D atomic_read(&vq->vring.caches);
+>> +    atomic_set(&vq->vring.caches, NULL);
+>> +    virtio_free_region_cache(caches);
+> Shouldn't this use rcu to free it? Unconditionally setting caches to
+> NULL feels wrong...
 
-Yes.
+Right, will switch to use rcu.
 
->> If so, what happens if a "realize" function of another device needs th=
-e bus_master_as
->> (at hotplug time)?
+>> +}
+>> +
+>>   void virtio_reset(void *opaque)
+>>   {
+>>       VirtIODevice *vdev =3D opaque;
+>> @@ -1157,6 +1223,7 @@ void virtio_reset(void *opaque)
+>>           vdev->vq[i].notification =3D true;
+>>           vdev->vq[i].vring.num =3D vdev->vq[i].vring.num_default;
+>>           vdev->vq[i].inuse =3D 0;
+>> +        virtio_virtqueue_reset_region_cache(&vdev->vq[i]);
+> ...especially as you call it in a reset context here.
+>
+>>       }
+>>   }
+>>
+>> @@ -2451,13 +2518,10 @@ static void virtio_device_free_virtqueues(Virt=
+IODevice *vdev)
+>>       }
+>>
+>>       for (i =3D 0; i < VIRTIO_QUEUE_MAX; i++) {
+>> -        VRingMemoryRegionCaches *caches;
+>>           if (vdev->vq[i].vring.num =3D=3D 0) {
+>>               break;
+>>           }
+>> -        caches =3D atomic_read(&vdev->vq[i].vring.caches);
+>> -        atomic_set(&vdev->vq[i].vring.caches, NULL);
+>> -        virtio_free_region_cache(caches);
+>> +        virtio_virtqueue_reset_region_cache(&vdev->vq[i]);
+> OTOH, immediate destruction may still be called for during device
+> finalization.
+>
 
-I'm not sure this is really needed. What kind of device need to check=20
-hotplug during their realize? (Looks like we don't have such kind of=20
-device now).
-
-> My unmature understanding is that, we can just call
-> pci_device_iommu_address_space() if device realization really needs
-> the address space, rather than using bus_master_as.
-
-A little issue is pci_device_iommu_address_space() can be wrong if it=20
-was called before OMMU was created.
+Right but to avoid code duplication, use rcu unconditionally should be=20
+no harm here.
 
 Thanks
 
->
-> An example is vfio-pci device. It is using
-> pci_device_iommu_address_space() in vfio_realize(). Though I _guess_
-> there may be other reasons behind, e.g., VFIOAddressSpace should be
-> 1:1 mapped to bus master address space, so we may want to make sure
-> this address space will be the same when different devices are using
-> the same address space (while bus_master_as is one per device, even if
-> two devices have the same backend address space, there will be two
-> distinct bus_master_as).
->
-> IIUC, bus_master_as is only used to emulate the master bit in PCI
-> command register. In that case, that should only be there for the
-> guest operations, while imho device realization is "emulation code",
-> which can directly use pci_device_iommu_address_space(). Actually, if
-> it plays with bus_master_as even if it can, I guess it'll just fail
-> since that region has not yet been enabled.
->
-> Please kindly correct me if I made a mistake...
->
-> Thanks,
->
-> -- peterx
+>>       }
+>>       g_free(vdev->vq);
+>>   }
