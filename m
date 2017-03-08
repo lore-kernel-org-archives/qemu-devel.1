@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1clanQ-0000dc-2E
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 07:34:25 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1clb2d-00048h-9Z
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 07:50:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1clanO-0006hF-SY
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 07:34:24 -0500
-Date: Wed, 8 Mar 2017 13:34:10 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170308123410.GD5211@noname.redhat.com>
-References: <20170308120814.29967-1-famz@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170308120814.29967-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9 v3] file-posix: Consider
- max_segments for BlockLimits.max_transfer
+	(envelope-from <aik@ozlabs.ru>) id 1clb2X-0002xe-EW
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 07:50:07 -0500
+Received: from ozlabs.ru ([107.173.13.209]:49878)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <aik@ozlabs.ru>) id 1clb2X-0002xT-95
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 07:50:01 -0500
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Date: Wed,  8 Mar 2017 23:49:55 +1100
+Message-Id: <20170308124955.35623-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [RFC PATCH qemu] dtc: Allow compiling with old gcc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +21,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, pbonzini@redhat.com, eblake@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
 
-Am 08.03.2017 um 13:08 hat Fam Zheng geschrieben:
-> BlockLimits.max_transfer can be too high without this fix, guest will
-> encounter I/O error or even get paused with werror=stop or rerror=stop. The
-> cause is explained below.
-> 
-> Linux has a separate limit, /sys/block/.../queue/max_segments, which in
-> the worst case can be more restrictive than the BLKSECTGET which we
-> already consider (note that they are two different things). So, the
-> failure scenario before this patch is:
-> 
-> 1) host device has max_sectors_kb = 4096 and max_segments = 64;
-> 2) guest learns max_sectors_kb limit from QEMU, but doesn't know
->    max_segments;
-> 3) guest issues e.g. a 512KB request thinking it's okay, but actually
->    it's not, because it will be passed through to host device as an
->    SG_IO req that has niov > 64;
-> 4) host kernel doesn't like the segmenting of the request, and returns
->    -EINVAL;
-> 
-> This patch checks the max_segments sysfs entry for the host device and
-> calculates a "conservative" bytes limit using the page size, which is
-> then merged into the existing max_transfer limit. Guest will discover
-> this from the usual virtual block device interfaces. (In the case of
-> scsi-generic, it will be done in the INQUIRY reply interception in
-> device model.)
-> 
-> The other possibility is to actually propagate it as a separate limit,
-> but it's not better. On the one hand, there is a big complication: the
-> limit is per-LUN in QEMU PoV (because we can attach LUNs from different
-> host HBAs to the same virtio-scsi bus), but the channel to communicate
-> it in a per-LUN manner is missing down the stack; on the other hand,
-> two limits versus one doesn't change much about the valid size of I/O
-> (because guest has no control over host segmenting).
-> 
-> Also, the idea to fall back to bounce buffering in QEMU, upon -EINVAL,
-> was explored. Unfortunately there is no neat way to ensure the bounce
-> buffer is less segmented (in terms of DMA addr) than the guest buffer.
-> 
-> Practically, this bug is not very common. It is only reported on a
-> Emulex (lpfc), so it's okay to get it fixed in the easier way.
-> 
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Fam Zheng <famz@redhat.com>
+After 6e85fce0225f "dtc: Update requirement to v1.4.2" QEMU stopped
+compiling in CentOS7:
 
-Thanks, applied to the block branch.
+In file included from /home/aik/p/qemu/dtc/libfdt/libfdt.h:54:0,
+                 from /home/aik/p/qemu/device_tree.c:30:
+/home/aik/p/qemu/dtc/libfdt/libfdt_env.h:64:0: error: "__bitwise" redefined [-Werror]
+ #define __bitwise
+ ^
+In file included from /usr/include/asm/ptrace.h:27:0,
+                 from /usr/include/asm/sigcontext.h:11,
+                 from /usr/include/bits/sigcontext.h:27,
+                 from /usr/include/signal.h:340,
+                 from /home/aik/p/qemu/include/qemu/osdep.h:86,
+                 from /home/aik/p/qemu/device_tree.c:14:
+/usr/include/linux/types.h:21:0: note: this is the location of the previous definition
+ #define __bitwise __bitwise__
+ ^
+cc1: all warnings being treated as errors
+make: *** [device_tree.o] Error 1
+make: *** Waiting for unfinished jobs....
 
-Kevin
+The reason is that CentOS7 comes with libfdt 1.4.0 so QEMU tries using
+the internal one which does not compile as CentOS7 comes with gcc v4.8.5
+which reports warnings which it would not if the OS's libfdt was used
+(libfdt_env.h has not changed between 1.4.0 and 1.4.2).
+
+gcc 6.2.0 from Ubuntu v16.10 handles this fine.
+
+This replaces -I with -isystem to suppress the warning (which turns
+to an error because of -Werror).
+
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure b/configure
+index 6c21975f02..2c2a5df14a 100755
+--- a/configure
++++ b/configure
+@@ -3414,7 +3414,7 @@ EOF
+        symlink "$source_path/dtc/Makefile" "dtc/Makefile"
+        symlink "$source_path/dtc/scripts" "dtc/scripts"
+     fi
+-    fdt_cflags="-I\$(SRC_PATH)/dtc/libfdt"
++    fdt_cflags="-isystem\$(SRC_PATH)/dtc/libfdt"
+     fdt_libs="-L\$(BUILD_DIR)/dtc/libfdt $fdt_libs"
+   elif test "$fdt" = "yes" ; then
+     # have neither and want - prompt for system/submodule install
+-- 
+2.11.0
