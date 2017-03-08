@@ -1,36 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46809)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1clbQS-0001Sm-LH
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 08:14:45 -0500
+	(envelope-from <marcel@redhat.com>) id 1clbWn-0003In-N5
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 08:21:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1clbQN-0001y4-NM
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 08:14:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43436)
+	(envelope-from <marcel@redhat.com>) id 1clbWj-0004LX-KW
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 08:21:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:8443)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1clbQN-0001xx-H2
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 08:14:39 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0E5AB6AAE3
-	for <qemu-devel@nongnu.org>; Wed,  8 Mar 2017 13:14:37 +0000 (UTC)
-References: <1488877751-13419-1-git-send-email-jasowang@redhat.com>
-	<7594c183-6d38-3dce-75e7-62bf3be324fc@redhat.com>
-	<20170308024349.GC31585@pxdev.xzpeter.org>
-	<9d2dd1a4-aadc-a497-3dbb-6afb6d621587@redhat.com>
-	<5b388627-dcae-6c11-008d-f3c5da57b334@redhat.com>
-	<20170308090945.GD7135@pxdev.xzpeter.org>
-	<20170308091608.GE7135@pxdev.xzpeter.org>
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1clbWj-0004LS-By
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 08:21:13 -0500
+References: <1488425538-13785-1-git-send-email-peterx@redhat.com>
+	<20170302071100-mutt-send-email-mst@kernel.org>
+	<213ff4bb-b3b9-fe00-6f0e-b75114e1a5ef@redhat.com>
+	<1149211275.29885713.1488962150826.JavaMail.zimbra@redhat.com>
+	<d7882933-68f0-f4dd-4d1e-a16dde079ce3@redhat.com>
 From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <bd08fd44-e630-84ad-5f42-873094768fd3@redhat.com>
-Date: Wed, 8 Mar 2017 15:14:30 +0200
+Message-ID: <37ddf664-4620-a2d4-e4aa-57e8de0dfe95@redhat.com>
+Date: Wed, 8 Mar 2017 15:20:57 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170308091608.GE7135@pxdev.xzpeter.org>
+In-Reply-To: <d7882933-68f0-f4dd-4d1e-a16dde079ce3@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V3] virtio: do not require IOMMU to be
- created in advance
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3] intel_iommu: check misordered init when
+ realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,49 +31,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, mst@redhat.com, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: yi l liu <yi.l.liu@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>, Laine Stump <lstump@redhat.com>
 
-On 03/08/2017 11:16 AM, Peter Xu wrote:
-> On Wed, Mar 08, 2017 at 05:09:45PM +0800, Peter Xu wrote:
->> On Wed, Mar 08, 2017 at 10:17:09AM +0200, Marcel Apfelbaum wrote:
->>
->> [...]
->>
->>>
->>> I am sorry I was not clear enough:
->>> If a device is added after the system is up (hotplug), we cannot depend on the "machine_done"
->>> event to enable "bus master".
->>> This is why we have
->>>    if (qdev_hotplug)
->>>         pci_init_bus_master(pci_dev);
->>>
->>> The code you proposed changes the order, so this call is done *after* realize.
->>>
->>> My question was: What if any other device may require the bus_master_as
->>> at realize time (and can be hot-plugged) ?
->>> For example: hcd-ehci/hcd-ohci devices call pci_get_address_space()
->>> and caches the bus_master_as.
->>
->> Oh, I didn't notice that there are other devices that used
->> bus_master_as during realization. If so... Would this really work even
->> without hot plug? Considering that bus_master_as won't be inited until
->> machine done phase?
+On 03/08/2017 12:08 PM, Jason Wang wrote:
 >
-> Please ignore my question... I think the answer is that these devices
-> are only caching the pointer of bus_master_as. So it won't really use
-> the address space before machine_done.
 >
-> If so, IMHO moving pci_init_bus_master() after device specific
-> realize() is okay as well then, right?
+> On 2017=E5=B9=B403=E6=9C=8808=E6=97=A5 16:35, Paolo Bonzini wrote:
+>>
+>> ----- Original Message -----
+>>> From: "Marcel Apfelbaum" <marcel@redhat.com>
+>>> To: "Michael S. Tsirkin" <mst@redhat.com>, "Peter Xu" <peterx@redhat.=
+com>
+>>> Cc: qemu-devel@nongnu.org, "Paolo Bonzini" <pbonzini@redhat.com>, "yi=
+ l liu" <yi.l.liu@intel.com>, "Jintack Lim"
+>>> <jintack@cs.columbia.edu>, "Jason Wang" <jasowang@redhat.com>, "Alex =
+Williamson" <alex.williamson@redhat.com>
+>>> Sent: Thursday, March 2, 2017 7:24:44 AM
+>>> Subject: Re: [PATCH v3] intel_iommu: check misordered init when reali=
+ze
+>>>
+>>> On 03/02/2017 07:13 AM, Michael S. Tsirkin wrote:
+>>>> On Thu, Mar 02, 2017 at 11:32:18AM +0800, Peter Xu wrote:
+>>>>> Intel vIOMMU devices are created with "-device" parameter, while he=
+re
+>>>>> actually we need to make sure the dmar device be created before oth=
+er
+>>>>> PCI devices (like vfio-pci, virtio-pci ones) so that we know iommu_=
+fn
+>>>>> will be setup correctly before realizations of those PCI devices (i=
+t is
+>>>>> legal that PCI device fetch these info during its realization). Now=
+ this
+>>>>> ordering yet cannot be achieved elsewhere, and devices will be crea=
+ted
+>>>>> in the order that user specified. We need to avoid that.
+>>>>>
+>>>>> This patch tries to detect this kind of misordering issue during in=
+it of
+>>>>> VT-d device, then report to guest if misordering happened. In the
+>>>>> future, we can provide something better to solve it, e.g., to suppo=
+rt
+>>>>> device init ordering, then we can live without this patch.
+>>>>>
+>>>>> Signed-off-by: Peter Xu <peterx@redhat.com>
+>>>> Unfortunately with virtio it's a regression, as it used to
+>>>> work with iommu. So I'm afraid we need to look into supporting
+>>>> arbitrary order right now :(
+>>>>
+>>> Hi,
+>>>
+>>> A fast way to do it is to initialize iommu with a new keyword, like
+>>>       -iommu intel-iommu
+>>> Or maybe use the existing "-object" somehow ?
+>>>   From vl.c comments:
+>>>     "Initial object creation happens before all other
+>>>      QEMU data types are created.... "
+>>>
+>>> Another idea is to add a third run on QEMU cmd line arguments,
+>>> but this would affect the whole system.
+>>>
+>>> However having an ordering system beats all other ideas.
+>> The ordering should be explicit in the command line.  Since we do not =
+have
+>> cycles, it should be possible.
+>>
+>> The best solution would have been to add something like
+>>
+>>     -device intel-iommu,id=3Droot-complex-iommu -global mch.iommu=3Dro=
+ot-complex-iommu
+>>
+>> but it's too late for that.
+>>
+>> Paolo
+>>
 >
+> Yes, it's probably too late other than having workarounds for 2.9.
 
-It should work, right. But you may want to double-check anyway :)
+I suggested to Laine to require libvirt to initialize first the iommu dev=
+ice.
+and since most QEMU users use libvirt anyway, we may just be OK (kind of)=
+.
+
+> And to eliminate similar issues, we may initializing the pci devices by=
+ traversing the PCI tree from root complex in level order.
+
+Interesting idea, we'll explore it for 2.10.
+But we need initialization order for all machine components, not only PCI=
+.
 
 Thanks,
 Marcel
 
-> Thanks,
 >
-> -- peterx
->
+> Thanks
