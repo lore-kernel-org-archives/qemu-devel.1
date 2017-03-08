@@ -1,24 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42049)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1clffL-00054N-4A
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 12:46:24 -0500
+	(envelope-from <ashmit602@gmail.com>) id 1clfs8-0007Pd-9Q
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 12:59:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1clffI-00062p-Hs
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 12:46:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37822)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1clffI-00062D-9F
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 12:46:20 -0500
-References: <20160822161740.4252-1-prem.mallappa@broadcom.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <465528b8-332b-083e-fc04-5613fadc57fa@redhat.com>
-Date: Wed, 8 Mar 2017 18:46:13 +0100
+	(envelope-from <ashmit602@gmail.com>) id 1clfs6-0003Eu-Kl
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 12:59:36 -0500
+Received: from mail-it0-x22d.google.com ([2607:f8b0:4001:c0b::22d]:37962)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ashmit602@gmail.com>) id 1clfs6-0003Ee-FH
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 12:59:34 -0500
+Received: by mail-it0-x22d.google.com with SMTP id m27so44684454iti.1
+	for <qemu-devel@nongnu.org>; Wed, 08 Mar 2017 09:59:34 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20160822161740.4252-1-prem.mallappa@broadcom.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/9] SMMUv3 Emulation support
+In-Reply-To: <2881DEEC-922E-4A55-9F11-5C681F5D3648@veritas.com>
+References: <20170222144407.GS19045@localhost.localdomain>
+	<CAAo6VWPWjRTE3t9myt7Q6gTnZcvP72ypTE03PCFfJkvb2UWLTA@mail.gmail.com>
+	<20170224091916.GD3702@redhat.com>
+	<CAAo6VWPyQrjSp2qjvxqXRPS8=5N85i0-DJdkWhiGaXmND_8+qA@mail.gmail.com>
+	<20170227092207.GA18219@redhat.com>
+	<CAAo6VWO6zAijMMjHOkefO22wh+6dXigZ6a+g-pMNBcM0MN1HHw@mail.gmail.com>
+	<20170301091851.GD17125@redhat.com>
+	<CAAo6VWNRhK6zvc+CferSd9wYQZNNoXDqCEW_G62crqsamyEC9Q@mail.gmail.com>
+	<20170306092305.GA9866@redhat.com>
+	<CAAo6VWMo-wYwkOAENk4swYk3dkbxaJObXrj85yDRLAUofK2qtw@mail.gmail.com>
+	<20170308091311.GC7470@redhat.com>
+	<2881DEEC-922E-4A55-9F11-5C681F5D3648@veritas.com>
+From: ashish mittal <ashmit602@gmail.com>
+Date: Wed, 8 Mar 2017 09:59:32 -0800
+Message-ID: <CAAo6VWPz9dv71ma871W69VX7iiTD0koa_32HV85u5pZZHux-0w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
+ block device type called "vxhs"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,142 +39,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Prem Mallappa <prem.mallappa@broadcom.com>, Peter Maydell <peter.maydell@linaro.org>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
+To: Ketan Nilangekar <Ketan.Nilangekar@veritas.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
 
-Hi,
-On 22/08/2016 18:17, Prem Mallappa wrote:
-> v1 -> v2:
-> 	- Adopted review comments from Eric Auger
-> 		- Make SMMU_DPRINTF to internally call qemu_log
-> 	            (since translation requests are too many, we need control
-> 		     on the type of log we want)
-> 		- SMMUTransCfg modified to suite simplicity
-> 		- Change RegInfo to uint64 register array
-> 		- Code cleanup
-> 		- Test cleanups
-> 	- Reshuffled patches
-> 
-> RFC -> v1:
-> 	- As per SMMUv3 spec 16.0 (only is_ste_consistant() is noticeable)
-> 	- Reworked register access/update logic
-> 	- Factored out translation code for
-> 		- single point bug fix
-> 		- sharing/removal in future
-> 	- (optional) Unit tests added, with PCI test device
-> 		- S1 with 4k/64k, S1+S2 with 4k/64k
-> 		- (S1 or S2) only can be verified by Linux 4.7 driver
-> 	- (optional) Priliminary ACPI support
-> 
-> RFC:
-> 	- Implements SMMUv3 spec 11.0
-> 	- Supported for PCIe devices, 
-> 	- Command Queue and Event Queue supported
-> 	- LPAE only, S1 is supported and Tested, S2 not tested
-> 	- BE mode Translation not supported
-> 	- IRQ support (legacy, no MSI)
-> 	- Tested with DPDK and e1000 
-> 
-> Patch 1: Add new log type for IOMMU transactions
-> 
-> Patch 2: Adds support in virt.c to create both SMMUv3 device and dts entries
-> 
-> Patch 2: Adds SMMUv3 model to QEMU
-> 	Multiple files, big ones, translate functionality is split across to
-> 	accomodate SMMUv2 model, and to remove when common translation feature
-> 	(if) becomes available.
-> 
-> Patch 3: Adds SMMU build support
-> 
-> Patch 4: Some devicetree function to add support for SMMU's multiple interrupt
-> 	 assignment with names
-> 
-> << optional patches >>
-> Optional patches are posted for completeness or for those who wants to test.
-> 
-> Patch 5: A simple PCI device which does DMA from 'src' to 'dst' given
-> 	 src_addr, dst_addr and size, and is used by unit test, uses
-> 	 pci_dma_read and pci_dma_write in a crude way but serves the purpose.
-> 
-> Patch 6: Current libqos PCI helpers are x86 only, this addes a generic interface
-> 
-> Patch 7: Unit tests for SMMU, 
-> 		- initializes SMMU device 
-> 		- initializes Test device
-> 		- allocates page tables 1:1 mapping va == pa
-> 		- allocates STE/CD accordingly for S1, S2, S1+S2
-> 		- initiates DMA via PCI test device
-> 		- verifies transfered data
-> 
-> Patch 8: Added ACPI IORT tables, was needed for internal project purpose, but 
-> 	 posting here for anyone looking for testing ACPI on ARM platforms.
-> 	 (P.S: Linux side IORT patches are WIP)
-> 
-> Repo:
-> https://github.com/pmallappa/qemu/tree/upstream/smmuv3/v2
-> 
-> To Test:
-> $ make tests/smmuv3-test
-> $ QTEST_QEMU_BINARY=aarch64-softmmu/qemu-system-aarch64 tests/smmuv3-test
-> << expect lot of prints >>
-> 
-> Any comments welcome..
-As Prem was forced to stop his activity on this series, I volunteer to
-pursue his work. Prior to starting the work, I just would like to check
-nobody works on this already or objects.
+On Wed, Mar 8, 2017 at 5:04 AM, Ketan Nilangekar
+<Ketan.Nilangekar@veritas.com> wrote:
+>
+>
+>> On Mar 8, 2017, at 1:13 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
+>>
+>>> On Tue, Mar 07, 2017 at 05:27:55PM -0800, ashish mittal wrote:
+>>> Thanks! There is one more input I need some help with!
+>>>
+>>> VxHS network library opens a fixed number of connection channels to a
+>>> given host, and all the vdisks (that connect to the same host) share
+>>> these connection channels.
+>>>
+>>> Therefore, we need to open secure channels to a specific target host
+>>> only once for the first vdisk that connects to that host. All the
+>>> other vdisks that connect to the same target host will share the same
+>>> set of secure communication channels.
+>>>
+>>> I hope the above scheme is acceptable?
+>>
+>> I don't think I'm in favour of such an approach, as it forces a single
+>> QEMU process to use the same privileges for all disks it uses.
+>>
+>> Consider an example where a QEMU process has two disks, one shared
+>> readonly disk and one exclusive writable disk, both on the same host.
+>>
+>
+> This is not a use case for VxHS as a solution. We do not support sharing of vdisks across QEMU instances.
+>
+> Vxhs library was thus not designed to open different connections for individual vdisks within a QEMU instance.
+>
+> Implementing this will involve rewrite of significant parts of libvxhs client and server. Is this a new requirement for acceptance into QEMU?
+>
+>
+>> It is reasonable as an administrator to want to use different credentials
+>> for each of these. ie, they might have a set of well known credentials to
+>> authenticate to get access to the read-only disk, but have a different set
+>> of strictly limited access credentials to get access to the writable disk
+>>
+>> Trying to re-use the same connection for multiple cause prevents QEMU from
+>> authenticating with different credentials per disk, so I don't think that
+>> is a good approach - each disk should have totally independant state.
+>>
 
-If not, I intend to rebase and will do my utmost to align, when sensible
-with what was done on Xilinx vsmmuv2/intel iommu.
+libvxhs does not make any claim to fit all the general purpose
+use-cases. It was purpose-built to be the communication channel for
+our block device service. As such, we do not need/support all the
+general use-cases. For the same reason we changed the name of the
+library from linqnio to libvxhs (v8 changelog, #2).
 
-Thanks
+Having dedicated communication channels for each device, or sharing
+the channels between multiple devices, should both be acceptable
+choices. The latter, IO multiplexing, is also a widely adopted IO
+model. It just happens to fit our use-cases better.
 
-Eric
-> 
-> Cheers
-> /Prem
-> 
-> Prem Mallappa (9):
->   log: Add new IOMMU type
->   devicetree: Added new APIs to make use of more fdt functions
->   hw: arm: SMMUv3 emulation model
->   hw: arm: Added SMMUv3 files for build
->   hw: arm: Add SMMUv3 to virt platform, create DTS accordingly
->   [optional] hw: misc: added testdev for smmu
->   [optional] tests: libqos: generic pci probing helpers
->   [optional] tests: SMMUv3 unit tests
->   [optional] arm: smmu-v3: ACPI IORT initial support
-> 
->  default-configs/aarch64-softmmu.mak |    1 +
->  device_tree.c                       |   35 +
->  hw/arm/Makefile.objs                |    1 +
->  hw/arm/smmu-common.c                |  152 ++++
->  hw/arm/smmu-common.h                |  141 ++++
->  hw/arm/smmu-v3.c                    | 1369 +++++++++++++++++++++++++++++++++++
->  hw/arm/smmuv3-internal.h            |  432 +++++++++++
->  hw/arm/virt-acpi-build.c            |   43 ++
->  hw/arm/virt.c                       |   62 ++
->  hw/misc/Makefile.objs               |    2 +-
->  hw/misc/pci-testdev-smmu.c          |  239 ++++++
->  hw/misc/pci-testdev-smmu.h          |   22 +
->  hw/vfio/common.c                    |    2 +-
->  include/hw/acpi/acpi-defs.h         |   84 +++
->  include/hw/arm/smmu.h               |   33 +
->  include/hw/arm/virt.h               |    2 +
->  include/qemu/log.h                  |    1 +
->  include/sysemu/device_tree.h        |   18 +
->  tests/Makefile.include              |    4 +
->  tests/libqos/pci-generic.c          |  197 +++++
->  tests/libqos/pci-generic.h          |   58 ++
->  tests/smmuv3-test.c                 |  952 ++++++++++++++++++++++++
->  util/log.c                          |    2 +
->  23 files changed, 3850 insertions(+), 2 deletions(-)
->  create mode 100644 hw/arm/smmu-common.c
->  create mode 100644 hw/arm/smmu-common.h
->  create mode 100644 hw/arm/smmu-v3.c
->  create mode 100644 hw/arm/smmuv3-internal.h
->  create mode 100644 hw/misc/pci-testdev-smmu.c
->  create mode 100644 hw/misc/pci-testdev-smmu.h
->  create mode 100644 include/hw/arm/smmu.h
->  create mode 100644 tests/libqos/pci-generic.c
->  create mode 100644 tests/libqos/pci-generic.h
->  create mode 100644 tests/smmuv3-test.c
-> 
+Binding access control to a communication channel would prevent
+anybody from using the latter approach. Having a separate way to allow
+access-control would permit the use of latter also.
+
+>>>
+>>> If yes, then we have a couple of options to implement this:
+>>>
+>>> (1) Accept the TLS credentials per vdisk using the previously
+>>> discussed --object tls-creds-x509 mechanism. In this case, if more
+>>> than one vdisk have the same host info, then we will use only the
+>>> first one's creds to set up the secure connection, and ignore the
+>>> others. vdisks that connect to different target hosts will use their
+>>> individual tls-creds-x509 to set up the secure channels. This is, of
+>>> course, not relevant for qemu-img/qemu-io as they can open only one
+>>> vdisk at a time.
+>>>
+>>> (2) Instead of having a per-vdisk --object tls-creds-x509, have a
+>>> single such argument on the command line for vxhs block device code to
+>>> consume - if that is possible! One way to achieve this could be the
+>>> user/password authentication we discussed earlier, which we could use
+>>> to pass the directory where cert/keys are kept.
+>>>
+>>> (3) Use the instance UUID, when available, to lookup the cert files
+>>> per instance (i.e. for qemu-kvm), and use the --object tls-creds-x509
+>>> mechanism, when instance UUID is NULL (i.e. qemu-io, qemu-img etc).
+>>> The cert/key files are anyway protected by file permissions in either
+>>> case, so I guess there is no additional security provided by either
+>>> method.
+>>
+>> Regards,
+>> Daniel
+>> --
+>> |: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+>> |: http://libvirt.org              -o-             http://virt-manager.org :|
+>> |: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
