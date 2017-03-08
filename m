@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58929)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1clUzH-0007Ky-EP
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 01:22:16 -0500
+	(envelope-from <armbru@redhat.com>) id 1clV6U-0000sK-S8
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 01:29:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1clUzE-0007kM-9i
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 01:22:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54764)
+	(envelope-from <armbru@redhat.com>) id 1clV6R-00010g-Kr
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 01:29:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48498)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1clUzE-0007jE-35
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 01:22:12 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 25AC4624B1
-	for <qemu-devel@nongnu.org>; Wed,  8 Mar 2017 06:22:12 +0000 (UTC)
-References: <1488876478-6889-1-git-send-email-jasowang@redhat.com>
-	<313e32c5-140d-ec13-6b10-98043756f2e6@redhat.com>
-	<f3e9db7e-f3ab-1ae5-4da6-05dbd8d0206f@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <61938aa1-2698-f55e-ea1c-e7d96da0b5d7@redhat.com>
-Date: Wed, 8 Mar 2017 14:22:06 +0800
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1clV6R-00010a-CK
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 01:29:39 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170303185427.32681-1-jsnow@redhat.com>
+	<CAMr-obuiwE_ef6OPSJbBtmZYsaqo_mzU9E6q8zhbrviZ6_=krQ@mail.gmail.com>
+	<5303cac4-a8d8-bf89-b525-3b0fb1b19127@redhat.com>
+	<CAMr-obsrUqvqbLabYgKgv1J+ztn5XCwto6LowoN=S0ZWuFLZMA@mail.gmail.com>
+	<871sua4y3u.fsf@dusky.pond.sub.org>
+	<3fbdfabf-82b4-d774-d5f4-2c50a6d740dc@redhat.com>
+	<87efy9ijrf.fsf@dusky.pond.sub.org>
+	<c9905f84-846a-4656-14cd-a8bd7628ea08@redhat.com>
+Date: Wed, 08 Mar 2017 07:29:35 +0100
+In-Reply-To: <c9905f84-846a-4656-14cd-a8bd7628ea08@redhat.com> (John Snow's
+	message of "Tue, 7 Mar 2017 14:39:28 -0500")
+Message-ID: <878tog1dtc.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <f3e9db7e-f3ab-1ae5-4da6-05dbd8d0206f@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] virtio: destroy region cache during reset
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2] qmp-shell: add persistent command
+ history
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,31 +34,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, qemu-devel@nongnu.org
-Cc: peterx@redhat.com
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-devel@nongnu.org, Nir Soffer <nirsof@gmail.com>
 
+John Snow <jsnow@redhat.com> writes:
 
-
-On 2017=E5=B9=B403=E6=9C=8808=E6=97=A5 11:21, Jason Wang wrote:
+> On 03/07/2017 03:16 AM, Markus Armbruster wrote:
+>> John Snow <jsnow@redhat.com> writes:
+>> 
+>>> On 03/06/2017 03:18 AM, Markus Armbruster wrote:
+>>>> Nir Soffer <nirsof@gmail.com> writes:
+>>>>
+>>>>> On Fri, Mar 3, 2017 at 9:29 PM, John Snow <jsnow@redhat.com> wrote:
+>>>>>>
+>>>>>>
+>>>>>> On 03/03/2017 02:26 PM, Nir Soffer wrote:
+>>>>>>> On Fri, Mar 3, 2017 at 8:54 PM, John Snow <jsnow@redhat.com> wrote:
+>>>>>>>> Use the existing readline history function we are utilizing
+>>>>>>>> to provide persistent command history across instances of qmp-shell.
+>>>>>>>>
+>>>>>>>> This assists entering debug commands across sessions that may be
+>>>>>>>> interrupted by QEMU sessions terminating, where the qmp-shell has
+>>>>>>>> to be relaunched.
+>>>>>>>>
+>>>>>>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>>>>>>> ---
+>>>>>>>>
+>>>>>>>> v2: Adjusted the errors to whine about non-ENOENT errors, but still
+>>>>>>>>     intercept all errors as non-fatal.
+>>>>>>>>     Save history atexit() to match bash standard behavior
+>>>>>>>>
+>>>>>>>>  scripts/qmp/qmp-shell | 19 +++++++++++++++++++
+>>>>>>>>  1 file changed, 19 insertions(+)
+>>>>>>>>
+>>>>>>>> diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
+>>>>>>>> index 0373b24..55a8285 100755
+>>>>>>>> --- a/scripts/qmp/qmp-shell
+>>>>>>>> +++ b/scripts/qmp/qmp-shell
+>>>>>>>> @@ -70,6 +70,9 @@ import json
+>>>>>>>>  import ast
+>>>>>>>>  import readline
+>>>>>>>>  import sys
+>>>>>>>> +import os
+>>>>>>>> +import errno
+>>>>>>>> +import atexit
+>>>>>>>>
+>>>>>>>>  class QMPCompleter(list):
+>>>>>>>>      def complete(self, text, state):
+>>>>>>>> @@ -109,6 +112,7 @@ class QMPShell(qmp.QEMUMonitorProtocol):
+>>>>>>>>          self._pretty = pretty
+>>>>>>>>          self._transmode = False
+>>>>>>>>          self._actions = list()
+>>>>>>>> +        self._histfile = os.path.join(os.path.expanduser('~'), '.qmp_history')
+>>>>
+>>>> I selfishly object to this filename, because I'm using it with
+>>>>
+>>>>     $ socat UNIX:/work/armbru/images/test-qmp READLINE,history=$HOME/.qmp_history,prompt='QMP> '
+>>>>
+>>>> Just kidding.  But seriously, shouldn't this be named after the
+>>>> *application* (qmp-shell) rather than the protocol (qmp)?
+>>>>
+>>>
+>>> Seeing as the history itself is the qmp-shell syntax, you are correct.
+>>>
+>>> (Hey, it would be interesting to store the generated QMP into the
+>>> qmp_history, though...!)
+>> 
+>> Hah!  Saving it would be easy enough, but reloading it...  okay, call it
+>> a "backup" and declare victory when saving works.
+>> 
+>>>>>>>>
+>>>>>>>>      def __get_address(self, arg):
+>>>>>>>>          """
+>>>>>>>> @@ -137,6 +141,21 @@ class QMPShell(qmp.QEMUMonitorProtocol):
+>>>>>>>>          # XXX: default delimiters conflict with some command names (eg. query-),
+>>>>>>>>          # clearing everything as it doesn't seem to matter
+>>>>>>>>          readline.set_completer_delims('')
+>>>>>>>> +        try:
+>>>>>>>> +            readline.read_history_file(self._histfile)
+>>>>>>>> +        except Exception as e:
+>>>>>>>> +            if isinstance(e, IOError) and e.errno == errno.ENOENT:
+>>>>>>>> +                # File not found. No problem.
+>>>>>>>> +                pass
+>>>>>>>> +            else:
+>>>>>>>> +                print "Failed to read history '%s'; %s" % (self._histfile, e)
+>>>>>>>
+>>>>>>> I would handle only IOError, since any other error means a bug in this code
+>>>>>>> or in the underlying readline library, and the best way to handle this is to
+>>>>>>> let it fail loudly.
+>>>>>>>
+>>>>>>
+>>>>>> Disagree. No reason to stop the shell from working because a QOL feature
+>>>>>> didn't initialize correctly.
+>>>>>>
+>>>>>> The warning will be enough to solicit reports and fixes if necessary.
+>>>>>
+>>>>> I agree, the current solution is good tradeoff.
+>>>>
+>>>> For what it's worth, bash seems to silently ignore a history file it
+>>>> can't read.  Tested by running "HISTFILE=xxx bash", then chmod 0 xxx, da
+>>>> capo.
+>>>>
+>>>
+>>> Right, done by example.
+>>>
+>>>>> One thing missing, is a call to readline.set_history_length, without
+>>>>> it the history
+>>>>> will grow without limit, see:
+>>>>> https://docs.python.org/2/library/readline.html#readline.set_history_length
+>>>>
+>>>> Should this be addressed for 2.9?
+>>>>
+>>>
+>>> You can add a limit if you want to; I don't have suggestions for which
+>>> completely arbitrary limit makes sense, so I left it blank intentionally.
+>> 
+>> For what it's worth, bash defaults HISTSIZE to 500.
+>> 
+>> GNU Readline lets users configure it in ~/.inputrc.  Conditional
+>> configuration is possible, i.e. something like
+>> 
+>>     $if Qmp-shell
+>>     set history-size 5000
+>>     $endif
+>> 
+>> should work, provided qmp-shell sets rl_readline_name as it should.
+>> 
 >
-> On 2017=E5=B9=B403=E6=9C=8807=E6=97=A5 18:55, Paolo Bonzini wrote:
->>
->> On 07/03/2017 09:47, Jason Wang wrote:
->>> We don't destroy region cache during reset which can make the maps
->>> of previous driver leaked to a buggy or malicious driver that don't
->>> set vring address before starting to use the device.
->> I'm still not sure as to how this can happen.  Reset does clear
->> desc/used/avail, which should then be checked before accessing the=20
->> caches.
->
-> But the code does not check them in fact? (E.g the attached qtest=20
-> patch can still pass check-qtest).
->
-> Thanks=20
+> Spoke too soon. I don't see a way to control this in python's readline
+> library... I'm not very familiar with readline, is there some
+> environment variable or something perhaps?
+> (It looks like python's code just hard-sets it to "python" ...)
 
-Ok, the reproducer seems wrong. And I think what you mean is something=20
-like the check done in virtio_queue_ready(). But looks like not all=20
-virtqueue check for this. One example is virtio_net_handle_ctrl(), and=20
-there may be even more. So you want to fix them all?
+How sad.  If https://bugs.python.org/ didn't require a login, I would've
+filed a bug already.
 
-Thanks
+I'm afraid all I can offer meanwhile is INPUTRC:
+
+    Any user can customize programs that use Readline by putting
+    commands in an "inputrc" file, conventionally in his home directory.
+    The name of this file is taken from the value of the environment
+    variable `INPUTRC'.  If that variable is unset, the default is
+    `~/.inputrc'.  If that file does not exist or cannot be read, the
+    ultimate default is `/etc/inputrc'.
+
+>>>>>>>> +        atexit.register(self.__save_history)
+>>>>>>>> +
+>>>>>>>> +    def __save_history(self):
+>>>>>>>> +        try:
+>>>>>>>> +            readline.write_history_file(self._histfile)
+>>>>>>>> +        except Exception as e:
+>>>>>>>> +            print "Failed to save history file '%s'; %s" % (self._histfile, e)
+>>>>>>>>
+>>>>>>>>      def __parse_value(self, val):
+>>>>>>>>          try:
+>>>>>>>
+>>>>>>> But I think this is good enough and useful as is.
+>>>>>>>
+>>>>>>> Reviewed-by: Nir Soffer <nirsof@gmail.com>
+>>>>>>>
