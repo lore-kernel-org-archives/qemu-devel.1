@@ -1,18 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40063)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1clb2d-00048h-9Z
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 07:50:11 -0500
+	(envelope-from <Ketan.Nilangekar@veritas.com>) id 1clbGI-0007jz-5w
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 08:04:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1clb2X-0002xe-EW
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 07:50:07 -0500
-Received: from ozlabs.ru ([107.173.13.209]:49878)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1clb2X-0002xT-95
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 07:50:01 -0500
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Wed,  8 Mar 2017 23:49:55 +1100
-Message-Id: <20170308124955.35623-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [RFC PATCH qemu] dtc: Allow compiling with old gcc
+	(envelope-from <Ketan.Nilangekar@veritas.com>) id 1clbGF-0007Or-0p
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 08:04:14 -0500
+Received: from mail1.bemta8.messagelabs.com ([216.82.243.199]:45168)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Ketan.Nilangekar@veritas.com>)
+	id 1clbGE-0007On-Sr
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 08:04:10 -0500
+From: Ketan Nilangekar <Ketan.Nilangekar@veritas.com>
+Date: Wed, 8 Mar 2017 13:04:07 +0000
+Message-ID: <2881DEEC-922E-4A55-9F11-5C681F5D3648@veritas.com>
+References: <20170222144407.GS19045@localhost.localdomain>
+	<CAAo6VWPWjRTE3t9myt7Q6gTnZcvP72ypTE03PCFfJkvb2UWLTA@mail.gmail.com>
+	<20170224091916.GD3702@redhat.com>
+	<CAAo6VWPyQrjSp2qjvxqXRPS8=5N85i0-DJdkWhiGaXmND_8+qA@mail.gmail.com>
+	<20170227092207.GA18219@redhat.com>
+	<CAAo6VWO6zAijMMjHOkefO22wh+6dXigZ6a+g-pMNBcM0MN1HHw@mail.gmail.com>
+	<20170301091851.GD17125@redhat.com>
+	<CAAo6VWNRhK6zvc+CferSd9wYQZNNoXDqCEW_G62crqsamyEC9Q@mail.gmail.com>
+	<20170306092305.GA9866@redhat.com>
+	<CAAo6VWMo-wYwkOAENk4swYk3dkbxaJObXrj85yDRLAUofK2qtw@mail.gmail.com>,
+	<20170308091311.GC7470@redhat.com>
+In-Reply-To: <20170308091311.GC7470@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
+ block device type called "vxhs"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,57 +39,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: ashish mittal <ashmit602@gmail.com>, Jeff Cody <jcody@redhat.com>, Stefan
+	Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo
+	Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus
+	Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin
+	Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
 
-After 6e85fce0225f "dtc: Update requirement to v1.4.2" QEMU stopped
-compiling in CentOS7:
 
-In file included from /home/aik/p/qemu/dtc/libfdt/libfdt.h:54:0,
-                 from /home/aik/p/qemu/device_tree.c:30:
-/home/aik/p/qemu/dtc/libfdt/libfdt_env.h:64:0: error: "__bitwise" redefined [-Werror]
- #define __bitwise
- ^
-In file included from /usr/include/asm/ptrace.h:27:0,
-                 from /usr/include/asm/sigcontext.h:11,
-                 from /usr/include/bits/sigcontext.h:27,
-                 from /usr/include/signal.h:340,
-                 from /home/aik/p/qemu/include/qemu/osdep.h:86,
-                 from /home/aik/p/qemu/device_tree.c:14:
-/usr/include/linux/types.h:21:0: note: this is the location of the previous definition
- #define __bitwise __bitwise__
- ^
-cc1: all warnings being treated as errors
-make: *** [device_tree.o] Error 1
-make: *** Waiting for unfinished jobs....
 
-The reason is that CentOS7 comes with libfdt 1.4.0 so QEMU tries using
-the internal one which does not compile as CentOS7 comes with gcc v4.8.5
-which reports warnings which it would not if the OS's libfdt was used
-(libfdt_env.h has not changed between 1.4.0 and 1.4.2).
+> On Mar 8, 2017, at 1:13 AM, Daniel P. Berrange <berrange@redhat.com> wrot=
+e:
+>=20
+>> On Tue, Mar 07, 2017 at 05:27:55PM -0800, ashish mittal wrote:
+>> Thanks! There is one more input I need some help with!
+>>=20
+>> VxHS network library opens a fixed number of connection channels to a
+>> given host, and all the vdisks (that connect to the same host) share
+>> these connection channels.
+>>=20
+>> Therefore, we need to open secure channels to a specific target host
+>> only once for the first vdisk that connects to that host. All the
+>> other vdisks that connect to the same target host will share the same
+>> set of secure communication channels.
+>>=20
+>> I hope the above scheme is acceptable?
+>=20
+> I don't think I'm in favour of such an approach, as it forces a single
+> QEMU process to use the same privileges for all disks it uses.
+>=20
+> Consider an example where a QEMU process has two disks, one shared
+> readonly disk and one exclusive writable disk, both on the same host.
+>=20
 
-gcc 6.2.0 from Ubuntu v16.10 handles this fine.
+This is not a use case for VxHS as a solution. We do not support sharing of=
+ vdisks across QEMU instances.
 
-This replaces -I with -isystem to suppress the warning (which turns
-to an error because of -Werror).
+Vxhs library was thus not designed to open different connections for indivi=
+dual vdisks within a QEMU instance.
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
- configure | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Implementing this will involve rewrite of significant parts of libvxhs clie=
+nt and server. Is this a new requirement for acceptance into QEMU?
 
-diff --git a/configure b/configure
-index 6c21975f02..2c2a5df14a 100755
---- a/configure
-+++ b/configure
-@@ -3414,7 +3414,7 @@ EOF
-        symlink "$source_path/dtc/Makefile" "dtc/Makefile"
-        symlink "$source_path/dtc/scripts" "dtc/scripts"
-     fi
--    fdt_cflags="-I\$(SRC_PATH)/dtc/libfdt"
-+    fdt_cflags="-isystem\$(SRC_PATH)/dtc/libfdt"
-     fdt_libs="-L\$(BUILD_DIR)/dtc/libfdt $fdt_libs"
-   elif test "$fdt" = "yes" ; then
-     # have neither and want - prompt for system/submodule install
--- 
-2.11.0
+
+> It is reasonable as an administrator to want to use different credentials
+> for each of these. ie, they might have a set of well known credentials to
+> authenticate to get access to the read-only disk, but have a different se=
+t
+> of strictly limited access credentials to get access to the writable disk
+>=20
+> Trying to re-use the same connection for multiple cause prevents QEMU fro=
+m
+> authenticating with different credentials per disk, so I don't think that
+> is a good approach - each disk should have totally independant state.
+>=20
+>>=20
+>> If yes, then we have a couple of options to implement this:
+>>=20
+>> (1) Accept the TLS credentials per vdisk using the previously
+>> discussed --object tls-creds-x509 mechanism. In this case, if more
+>> than one vdisk have the same host info, then we will use only the
+>> first one's creds to set up the secure connection, and ignore the
+>> others. vdisks that connect to different target hosts will use their
+>> individual tls-creds-x509 to set up the secure channels. This is, of
+>> course, not relevant for qemu-img/qemu-io as they can open only one
+>> vdisk at a time.
+>>=20
+>> (2) Instead of having a per-vdisk --object tls-creds-x509, have a
+>> single such argument on the command line for vxhs block device code to
+>> consume - if that is possible! One way to achieve this could be the
+>> user/password authentication we discussed earlier, which we could use
+>> to pass the directory where cert/keys are kept.
+>>=20
+>> (3) Use the instance UUID, when available, to lookup the cert files
+>> per instance (i.e. for qemu-kvm), and use the --object tls-creds-x509
+>> mechanism, when instance UUID is NULL (i.e. qemu-io, qemu-img etc).
+>> The cert/key files are anyway protected by file permissions in either
+>> case, so I guess there is no additional security provided by either
+>> method.
+>=20
+> Regards,
+> Daniel
+> --=20
+> |: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange=
+/ :|
+> |: http://libvirt.org              -o-             http://virt-manager.or=
+g :|
+> |: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr=
+/ :|
