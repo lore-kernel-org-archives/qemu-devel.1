@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58825)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1clgJ7-0007Ea-Qz
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 13:27:31 -0500
+	(envelope-from <eblake@redhat.com>) id 1clgKF-0007pJ-2z
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 13:28:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1clgJ6-0006Nw-KL
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 13:27:29 -0500
+	(envelope-from <eblake@redhat.com>) id 1clgKD-0006sO-Sa
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 13:28:39 -0500
 References: <20170308181833.32110-1-mreitz@redhat.com>
 	<e7e616d7-441f-9cff-d182-cbda19700ec5@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <a1ba003c-9737-4d3d-a495-c8267f11beb2@redhat.com>
-Date: Wed, 8 Mar 2017 19:27:19 +0100
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <91dff396-0e71-cb32-8353-edc4b644d5af@redhat.com>
+Date: Wed, 8 Mar 2017 12:28:30 -0600
 MIME-Version: 1.0
 In-Reply-To: <e7e616d7-441f-9cff-d182-cbda19700ec5@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="pvt4mrTrT4EkEH6qGj7lBpjB74P4A2th2"
+	boundary="kQsoAEEbbHJ5NAAf3E0T1aR457gLsTiGE"
 Subject: Re: [Qemu-devel] [PATCH for-2.9] block/archipelago: Make it compile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -24,17 +24,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Chrysostomos Nanakos <chris@include.gr>, Fam Zheng <famz@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Chrysostomos Nanakos <chris@include.gr>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pvt4mrTrT4EkEH6qGj7lBpjB74P4A2th2
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+--kQsoAEEbbHJ5NAAf3E0T1aR457gLsTiGE
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>,
- qemu-devel@nongnu.org, Chrysostomos Nanakos <chris@include.gr>,
- Fam Zheng <famz@redhat.com>
-Message-ID: <a1ba003c-9737-4d3d-a495-c8267f11beb2@redhat.com>
+ qemu-devel@nongnu.org, Chrysostomos Nanakos <chris@include.gr>
+Message-ID: <91dff396-0e71-cb32-8353-edc4b644d5af@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH for-2.9] block/archipelago: Make it compile
 References: <20170308181833.32110-1-mreitz@redhat.com>
  <e7e616d7-441f-9cff-d182-cbda19700ec5@redhat.com>
@@ -42,7 +41,7 @@ In-Reply-To: <e7e616d7-441f-9cff-d182-cbda19700ec5@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 08.03.2017 19:25, Eric Blake wrote:
+On 03/08/2017 12:25 PM, Eric Blake wrote:
 > On 03/08/2017 12:18 PM, Max Reitz wrote:
 >> In order to use error_setg() and similar functions, we need to include=
 
@@ -57,30 +56,36 @@ On 08.03.2017 19:25, Eric Blake wrote:
 >=20
 > Does this mean our automated buildbots aren't building archipelago by
 > default?
+>=20
 
-Well, at least patchew didn't catch that I definitely broke archipelago
-in my bdrv_truncate() errp series...
+Oh, I meant to add:
 
-[CC-ing Fam]
+Should probably mention that it was commit da34e65 that introduced the
+problem (if I'm right?).  Does that mean we have not been compiling
+archipelago.c since Mar 2016?
 
-Max
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
 
---pvt4mrTrT4EkEH6qGj7lBpjB74P4A2th2
+--kQsoAEEbbHJ5NAAf3E0T1aR457gLsTiGE
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljATQcSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AbtUIAKzrnCLT5R/jLWPKyOrEPVEtZ2Z0x702
-AWAZnT/CaEhzIohQVyJXQXR2aP0SMEJhyju2wKaO37kikjYnODf2wxjARCuwnw33
-YXq3TRJ/MUiAmOJG+adJulQreDhi8u5HoToA9DIgIUQ+Twvfjeddcey+HxzX4Jzo
-sRLErgqbs4QOqIqrwt5iV81z0e3tmV+6cVH3hTCcJYDZxSGro6iJ5yL/c3AyN127
-W0qfQg6HeE9RiGEFzVBpetQPS197b0gqoLqRwLChoQ2V2yvxaPy1Ka9mTohykt8t
-AFfP0SfeqwkB823DxUvYfmMNCPM466ndh5RmR9qoCuFI3ITTxKPajGI=
-=HHUh
+iQEcBAEBCAAGBQJYwE1OAAoJEKeha0olJ0NqSXQIAItHfeZoBdBE1bDEjygSZWS4
+eybXIR/C2nOOiTqQtB4AM76z5hp7uSsbL4I+2fnwrFb3eI8E7IMqyG/avo+3pKeW
+Rq8PEoObLQhQRQXURyQhc6ZrmhQ1s9nT83ZRz8VURMyzRQHNEj9bS2zx+Jz5Fip2
+iNCtxEkKLFpbVs35qp03/eUfjsA2GZj8VzLelvNGIbZolAKomqW0Urdhva5x6Tj2
+SKBMKIZnMt0owy1p3ozBHCWdncpbpthg8T98iEv2XUAn5/JCDcCWUcQowK/+F4QF
+c6q06fXIkRnS6n2IHIUoBk46MZO2YbEwkeSB5xVShhddCbqWslBL1FAqxahiuGg=
+=O+Mx
 -----END PGP SIGNATURE-----
 
---pvt4mrTrT4EkEH6qGj7lBpjB74P4A2th2--
+--kQsoAEEbbHJ5NAAf3E0T1aR457gLsTiGE--
