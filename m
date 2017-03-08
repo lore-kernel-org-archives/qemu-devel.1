@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56038)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56499)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1cljH6-0007C6-1O
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 16:37:37 -0500
+	(envelope-from <brijesh.singh@amd.com>) id 1cljIi-0000V9-9M
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 16:39:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brijesh.singh@amd.com>) id 1cljH2-0001Ae-RY
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 16:37:36 -0500
-Received: from mail-sn1nam01on0063.outbound.protection.outlook.com
-	([104.47.32.63]:58368
-	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+	(envelope-from <brijesh.singh@amd.com>) id 1cljIe-0001gG-Po
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 16:39:16 -0500
+Received: from mail-sn1nam02on0059.outbound.protection.outlook.com
+	([104.47.36.59]:53071
+	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
-	id 1cljH2-0001Aa-IV
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 16:37:32 -0500
+	id 1cljIe-0001fy-GP
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 16:39:12 -0500
 References: <148900626714.27090.1616990932333159904.stgit@brijesh-build-machine>
-	<20170308212715.GQ4694@thinpad.lan.raisama.net>
+	<148900638368.27090.17089251247635148558.stgit@brijesh-build-machine>
+	<20170308211302.GO4694@thinpad.lan.raisama.net>
 From: Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <849e49ba-67c7-9df6-bb4f-8a59619d9e19@amd.com>
-Date: Wed, 8 Mar 2017 15:37:25 -0600
+Message-ID: <937f9576-b227-e1a9-34cd-50d67f07d08c@amd.com>
+Date: Wed, 8 Mar 2017 15:39:06 -0600
 MIME-Version: 1.0
-In-Reply-To: <20170308212715.GQ4694@thinpad.lan.raisama.net>
+In-Reply-To: <20170308211302.GO4694@thinpad.lan.raisama.net>
 Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v4 00/20] x86: Secure Encrypted
- Virtualization (AMD)
+Subject: Re: [Qemu-devel] [RFC PATCH v4 11/20] sev: add LAUNCH_START command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,66 +36,130 @@ Cc: brijesh.singh@amd.com, crosthwaite.peter@gmail.com, armbru@redhat.com, mst@r
 
 
 
-On 03/08/2017 03:27 PM, Eduardo Habkost wrote:
-> On Wed, Mar 08, 2017 at 03:51:07PM -0500, Brijesh Singh wrote:
->> This RFC series provides support for AMD's new Secure Encrypted
->> Virtualization (SEV) feature. This RFC is based KVM RFC [1].
+On 03/08/2017 03:13 PM, Eduardo Habkost wrote:
+> On Wed, Mar 08, 2017 at 03:53:03PM -0500, Brijesh Singh wrote:
+>> The command is used to bootstrap SEV guest from unencrypted boot images.
+>> The command creates a new VM encryption key (VEK) using guest owner's public
+>> DH certificate, and security policy and session parameters. The encryption
+>> key created during launch start process will be used for encryption the boot
+>> images (such as BIOS).
 >>
->> SEV is an extension to the AMD-V architecture which supports running
->> multiple VMs under the control of a hypervisor. The SEV feature allows
->> the memory contents of a virtual machine (VM) to be transparently encrypted
->> with a key unique to the guest VM. The memory controller contains a
->> high performance encryption engine which can be programmed with multiple
->> keys for use by a different VMs in the system. The programming and
->> management of these keys is handled by the AMD Secure Processor firmware
->> which exposes a commands for these tasks.
->>
->> The KVM RFC introduced a new ioctl (KVM_MEMORY_ENCRYPTION_OP) which can be
->> used by qemu to issue the SEV commands to assist performing common hypervisor
->> activities such as a launching, running, snapshooting, migration and debugging
->> guests.
->>
->> The following links provide additional details:
->>
->> AMD Memory Encryption whitepaper:
->>
->> http://amd-dev.wpengine.netdna-cdn.com/wordpress/media/2013/12/AMD_Memory_Encryption_Whitepaper_v7-Public.pdf
->>
->> AMD64 Architecture Programmer's Manual:
->>     http://support.amd.com/TechDocs/24593.pdf
->>     SME is section 7.10
->>     SEV is section 15.34
+>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 >
-> I am looking for detailed CPUID documentation, and latest version
-> of Volume 3 I can find
-> (http://support.amd.com/TechDocs/24594.pdf) is from June 2015 and
-> doesn't include CPUID Fn8000_001F.
->
-> Is there a public updated version of AMD64 Architecture
-> Programmer's Manual Volume 3 including SEV CPUID info?
+> These descriptions of what the commands do are very useful. I
+> suggest including something similar (but more generic and not
+> SEV-specific?) as the documentation of the kvm_memcrypt_*() API
+> functions, as it is not clear what each kvm_memcrypt_*() function
+> is supposed to do.
 >
 
-Right now the SEV specific CPUID is in AMD64 APM volume 2 [1].
+Thanks for quick feedback. I will include some generic documentation of the kvm_memcrypt_*() APIs.
 
-[1] http://support.amd.com/TechDocs/24593.pdf
+-Brijesh
 
-I will ask around to check when documentation team will update volume 3 to include this CPUID.
-
-~ Brijesh
-
+>
+>> ---
+>>  include/sysemu/sev.h |    1 +
+>>  kvm-all.c            |    1 +
+>>  sev.c                |   55 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  3 files changed, 57 insertions(+)
 >>
->> Secure Encrypted Virutualization Key Management:
->> http://support.amd.com/TechDocs/55766_SEV-KM API_Specification.pdf
+>> diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
+>> index dbc3c6c..747fe87 100644
+>> --- a/include/sysemu/sev.h
+>> +++ b/include/sysemu/sev.h
+>> @@ -86,6 +86,7 @@ typedef struct SEVState SEVState;
+>>  bool sev_enabled(void);
+>>  void *sev_guest_init(const char *keyid);
+>>  void sev_set_debug_ops(void *handle, MemoryRegion *mr);
+>> +int sev_create_launch_context(void *handle);
 >>
->> KVM Forum slides:
->> http://www.linux-kvm.org/images/7/74/02x08A-Thomas_Lendacky-AMDs_Virtualizatoin_Memory_Encryption_Technology.pdf
+>>  #endif
 >>
->> KVM RFC link:
+>> diff --git a/kvm-all.c b/kvm-all.c
+>> index 1fa6413..a13d62f 100644
+>> --- a/kvm-all.c
+>> +++ b/kvm-all.c
+>> @@ -1826,6 +1826,7 @@ static int kvm_init(MachineState *ms)
+>>                  goto err;
+>>              }
+>>              kvm_state->memcrypt_debug_ops = sev_set_debug_ops;
+>> +            kvm_state->create_launch_context = sev_create_launch_context;
+>>              g_free(id);
+>>          }
+>>      }
+>> diff --git a/sev.c b/sev.c
+>> index 3e02453..4b3f39a 100644
+>> --- a/sev.c
+>> +++ b/sev.c
+>> @@ -148,6 +148,55 @@ static const TypeInfo qsev_launch_info = {
+>>  };
 >>
->> [1] http://marc.info/?l=linux-mm&m=148846752931115&w=2
+>>  static int
+>> +sev_ioctl(int cmd, void *data, int *error)
+>> +{
+>> +    int r;
+>> +    struct kvm_sev_cmd input;
+>> +
+>> +    input.id = cmd;
+>> +    input.sev_fd = sev_fd;
+>> +    input.data = (__u64)data;
+>> +
+>> +    r = kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_OP, &input);
+>> +    *error = input.error;
+>> +    return r;
+>> +}
+>> +
+>> +static int
+>> +sev_launch_start(SEVState *s)
+>> +{
+>> +    int ret = 1;
+>> +    Object *obj;
+>> +    int fw_error;
+>> +    struct kvm_sev_launch_start *start;
+>> +
+>> +    if (!s) {
+>> +        return 1;
+>> +    }
+>> +
+>> +    start = g_malloc0(sizeof(*start));
+>> +    if (!start) {
+>> +        return 1;
+>> +    }
+>> +
+>> +    obj = object_property_get_link(OBJECT(s->sev_info), "launch", &error_abort);
+>> +    if (!obj) {
+>> +        goto err;
+>> +    }
+>> +
+>> +    ret = sev_ioctl(KVM_SEV_LAUNCH_START, start, &fw_error);
+>> +    if (ret < 0) {
+>> +        fprintf(stderr, "failed LAUNCH_START %d (%#x)\n", ret, fw_error);
+>> +        goto err;
+>> +    }
+>> +
+>> +    DPRINTF("SEV: LAUNCH_START\n");
+>> +err:
+>> +    g_free(start);
+>> +    return ret;
+>> +}
+>> +
+>> +static int
+>>  sev_mem_write(uint8_t *dst, const uint8_t *src, uint32_t len, MemTxAttrs attrs)
+>>  {
+>>      return 0;
+>> @@ -200,6 +249,12 @@ err:
+>>      return NULL;
+>>  }
 >>
->> Video of the KVM Forum Talk:
->> https://www.youtube.com/watch?v=RcvQ1xN55Ew
+>> +int
+>> +sev_create_launch_context(void *handle)
+>> +{
+>> +    return sev_launch_start((SEVState *)handle);
+>> +}
+>> +
+>>  void
+>>  sev_set_debug_ops(void *handle, MemoryRegion *mr)
+>>  {
 >>
-> [...]
 >
