@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1clina-0001h9-3e
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 16:07:07 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1clitT-0003Nz-Uj
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 16:13:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1clinV-0000OH-6G
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 16:07:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42440)
+	(envelope-from <ehabkost@redhat.com>) id 1clitP-0002gN-VO
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 16:13:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34166)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1clinU-0000MB-Uf
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 16:07:01 -0500
-Date: Wed, 8 Mar 2017 18:06:55 -0300
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1clitP-0002g6-Mb
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 16:13:07 -0500
+Date: Wed, 8 Mar 2017 18:13:02 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170308210655.GN4694@thinpad.lan.raisama.net>
+Message-ID: <20170308211302.GO4694@thinpad.lan.raisama.net>
 References: <148900626714.27090.1616990932333159904.stgit@brijesh-build-machine>
-	<148900634659.27090.2157657994637303677.stgit@brijesh-build-machine>
+	<148900638368.27090.17089251247635148558.stgit@brijesh-build-machine>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <148900634659.27090.2157657994637303677.stgit@brijesh-build-machine>
-Subject: Re: [Qemu-devel] [RFC PATCH v4 07/20] kvm: add memory encryption
- api support
+In-Reply-To: <148900638368.27090.17089251247635148558.stgit@brijesh-build-machine>
+Subject: Re: [Qemu-devel] [RFC PATCH v4 11/20] sev: add LAUNCH_START command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,120 +30,124 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Brijesh Singh <brijesh.singh@amd.com>
 Cc: crosthwaite.peter@gmail.com, armbru@redhat.com, mst@redhat.com, p.fedin@samsung.com, qemu-devel@nongnu.org, lcapitulino@redhat.com, pbonzini@redhat.com, rth@twiddle.net, Thomas.Lendacky@amd.com
 
-On Wed, Mar 08, 2017 at 03:52:26PM -0500, Brijesh Singh wrote:
-> Add high level API's to provide guest memory encryption support.
+On Wed, Mar 08, 2017 at 03:53:03PM -0500, Brijesh Singh wrote:
+> The command is used to bootstrap SEV guest from unencrypted boot images.
+> The command creates a new VM encryption key (VEK) using guest owner's public
+> DH certificate, and security policy and session parameters. The encryption
+> key created during launch start process will be used for encryption the boot
+> images (such as BIOS).
 > 
 > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+
+These descriptions of what the commands do are very useful. I
+suggest including something similar (but more generic and not
+SEV-specific?) as the documentation of the kvm_memcrypt_*() API
+functions, as it is not clear what each kvm_memcrypt_*() function
+is supposed to do.
+
+
 > ---
->  include/sysemu/kvm.h |    7 +++++++
->  kvm-all.c            |   52 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  kvm-stub.c           |   31 ++++++++++++++++++++++++++++++
->  3 files changed, 90 insertions(+)
+>  include/sysemu/sev.h |    1 +
+>  kvm-all.c            |    1 +
+>  sev.c                |   55 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 57 insertions(+)
 > 
-> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-> index 24281fc..6f88a06 100644
-> --- a/include/sysemu/kvm.h
-> +++ b/include/sysemu/kvm.h
-> @@ -227,6 +227,13 @@ int kvm_init_vcpu(CPUState *cpu);
->  int kvm_cpu_exec(CPUState *cpu);
->  int kvm_destroy_vcpu(CPUState *cpu);
+> diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
+> index dbc3c6c..747fe87 100644
+> --- a/include/sysemu/sev.h
+> +++ b/include/sysemu/sev.h
+> @@ -86,6 +86,7 @@ typedef struct SEVState SEVState;
+>  bool sev_enabled(void);
+>  void *sev_guest_init(const char *keyid);
+>  void sev_set_debug_ops(void *handle, MemoryRegion *mr);
+> +int sev_create_launch_context(void *handle);
 >  
-> +bool kvm_memcrypt_enabled(void);
-> +void *kvm_memcrypt_get_handle(void);
-> +void kvm_memcrypt_set_debug_ops(MemoryRegion *mr);
-> +int kvm_memcrypt_create_launch_context(void);
-> +int kvm_memcrypt_release_launch_context(void);
-> +int kvm_memcrypt_encrypt_launch_data(uint8_t *ptr, uint64_t len);
-
-Please document what the return value of those functions mean.
-
-[...]
-> +int kvm_memcrypt_create_launch_context(void)
+>  #endif
+>  
+> diff --git a/kvm-all.c b/kvm-all.c
+> index 1fa6413..a13d62f 100644
+> --- a/kvm-all.c
+> +++ b/kvm-all.c
+> @@ -1826,6 +1826,7 @@ static int kvm_init(MachineState *ms)
+>                  goto err;
+>              }
+>              kvm_state->memcrypt_debug_ops = sev_set_debug_ops;
+> +            kvm_state->create_launch_context = sev_create_launch_context;
+>              g_free(id);
+>          }
+>      }
+> diff --git a/sev.c b/sev.c
+> index 3e02453..4b3f39a 100644
+> --- a/sev.c
+> +++ b/sev.c
+> @@ -148,6 +148,55 @@ static const TypeInfo qsev_launch_info = {
+>  };
+>  
+>  static int
+> +sev_ioctl(int cmd, void *data, int *error)
 > +{
-> +    if (kvm_state->create_launch_context) {
-> +        return kvm_state->create_launch_context(kvm_state->ehandle);
+> +    int r;
+> +    struct kvm_sev_cmd input;
+> +
+> +    input.id = cmd;
+> +    input.sev_fd = sev_fd;
+> +    input.data = (__u64)data;
+> +
+> +    r = kvm_vm_ioctl(kvm_state, KVM_MEMORY_ENCRYPT_OP, &input);
+> +    *error = input.error;
+> +    return r;
+> +}
+> +
+> +static int
+> +sev_launch_start(SEVState *s)
+> +{
+> +    int ret = 1;
+> +    Object *obj;
+> +    int fw_error;
+> +    struct kvm_sev_launch_start *start;
+> +
+> +    if (!s) {
+> +        return 1;
 > +    }
 > +
-> +    return 1;
-
-I suggest returning -ENOTSUP if not implemented.
-
-> +}
-> +
-> +int kvm_memcrypt_release_launch_context(void)
-> +{
-> +    if (kvm_state->release_launch_context) {
-> +        return kvm_state->release_launch_context(kvm_state->ehandle);
+> +    start = g_malloc0(sizeof(*start));
+> +    if (!start) {
+> +        return 1;
 > +    }
 > +
-> +    return 1;
-> +}
-> +
-> +int kvm_memcrypt_encrypt_launch_data(uint8_t *dst, uint64_t len)
-> +{
-> +    if (kvm_state->encrypt_launch_data) {
-> +        return kvm_state->encrypt_launch_data(kvm_state->ehandle, dst, len);
+> +    obj = object_property_get_link(OBJECT(s->sev_info), "launch", &error_abort);
+> +    if (!obj) {
+> +        goto err;
 > +    }
 > +
-> +    return 1;
-> +}
-> +
-> +void kvm_memcrypt_set_debug_ops(MemoryRegion *mr)
-> +{
-> +    if (kvm_state->memcrypt_debug_ops) {
-> +        return kvm_state->memcrypt_debug_ops(kvm_state->ehandle, mr);
+> +    ret = sev_ioctl(KVM_SEV_LAUNCH_START, start, &fw_error);
+> +    if (ret < 0) {
+> +        fprintf(stderr, "failed LAUNCH_START %d (%#x)\n", ret, fw_error);
+> +        goto err;
 > +    }
+> +
+> +    DPRINTF("SEV: LAUNCH_START\n");
+> +err:
+> +    g_free(start);
+> +    return ret;
 > +}
 > +
-> +void *kvm_memcrypt_get_handle(void)
-> +{
-> +    return kvm_state->ehandle;
-> +}
-> +
->  int kvm_get_max_memslots(void)
+> +static int
+>  sev_mem_write(uint8_t *dst, const uint8_t *src, uint32_t len, MemTxAttrs attrs)
 >  {
->      KVMState *s = KVM_STATE(current_machine->accelerator);
-> diff --git a/kvm-stub.c b/kvm-stub.c
-> index ef0c734..20920aa 100644
-> --- a/kvm-stub.c
-> +++ b/kvm-stub.c
-> @@ -105,6 +105,37 @@ int kvm_on_sigbus(int code, void *addr)
->      return 1;
+>      return 0;
+> @@ -200,6 +249,12 @@ err:
+>      return NULL;
 >  }
 >  
-> +bool kvm_memcrypt_enabled(void)
+> +int
+> +sev_create_launch_context(void *handle)
 > +{
-> +    return false;
+> +    return sev_launch_start((SEVState *)handle);
 > +}
 > +
-> +void *kvm_memcrypt_get_handle(void)
-> +{
-> +    return NULL;
-> +}
-> +
-> +void kvm_memcrypt_set_debug_ops(MemoryRegion *mr)
-> +{
-> +    return;
-> +}
-> +
-> +int kvm_memcrypt_create_launch_context(void)
-> +{
-> +    return 1;
-> +}
-> +
-> +int kvm_memcrypt_release_launch_context(void)
-> +{
-> +    return 1;
-> +}
-> +
-> +int kvm_memcrypt_encrypt_launch_data(uint8_t *ptr, uint64_t len)
-> +{
-> +    return 1;
-> +}
-> +
-> +
->  #ifndef CONFIG_USER_ONLY
->  int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
+>  void
+>  sev_set_debug_ops(void *handle, MemoryRegion *mr)
 >  {
 > 
 
