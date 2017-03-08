@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48694)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1clh41-0003xC-KO
+	(envelope-from <mreitz@redhat.com>) id 1clh42-0003yN-Sz
 	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 14:16:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1clh3z-0008Ju-O4
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 14:15:57 -0500
+	(envelope-from <mreitz@redhat.com>) id 1clh41-0008KS-9c
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 14:15:58 -0500
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed,  8 Mar 2017 20:15:43 +0100
-Message-Id: <20170308191544.3025-1-mreitz@redhat.com>
+Date: Wed,  8 Mar 2017 20:15:44 +0100
+Message-Id: <20170308191544.3025-2-mreitz@redhat.com>
 In-Reply-To: <20170308191434.2413-1-mreitz@redhat.com>
 References: <20170308191434.2413-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 for-2.10 3/4] block: Add errp to
- BD.bdrv_truncate()
+Subject: [Qemu-devel] [PATCH v2 for-2.10 4/4] block: Add some
+ bdrv_truncate() error messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,342 +23,120 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Add an Error parameter to the block drivers' bdrv_truncate() interface.
-If a block driver does not set this in case of an error, the generic
-bdrv_truncate() implementation will do so.
+Add missing error messages for the drivers I am comfortable to do this
+in.
 
-Where it is obvious, this patch also makes some block drivers set this
-value.
+Since one of these changes touches a mis-indented block in
+block/file-posix.c, this patch fixes that coding style issue along the
+way.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- include/block/block_int.h |  2 +-
- block.c                   |  4 ++--
- block/archipelago.c       |  3 ++-
- block/blkdebug.c          |  4 ++--
- block/crypto.c            |  5 +++--
- block/file-posix.c        |  2 +-
- block/file-win32.c        |  6 +++---
- block/gluster.c           |  3 ++-
- block/iscsi.c             |  4 ++--
- block/nfs.c               |  2 +-
- block/qcow2.c             |  8 ++++----
- block/qed.c               |  2 +-
- block/raw-format.c        |  4 ++--
- block/rbd.c               |  2 +-
- block/sheepdog.c          | 14 ++++++--------
- 15 files changed, 33 insertions(+), 32 deletions(-)
+ block/file-posix.c | 17 ++++++++++++-----
+ block/qcow2.c      |  2 ++
+ block/qed.c        |  4 +++-
+ block/raw-format.c |  2 ++
+ 4 files changed, 19 insertions(+), 6 deletions(-)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 6c699ac9c3..ee55d5e9cd 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -196,7 +196,7 @@ struct BlockDriver {
-     int coroutine_fn (*bdrv_co_flush_to_os)(BlockDriverState *bs);
- 
-     const char *protocol_name;
--    int (*bdrv_truncate)(BlockDriverState *bs, int64_t offset);
-+    int (*bdrv_truncate)(BlockDriverState *bs, int64_t offset, Error **errp);
- 
-     int64_t (*bdrv_getlength)(BlockDriverState *bs);
-     bool has_variable_length;
-diff --git a/block.c b/block.c
-index 8e8ba60dc0..01872b6f5a 100644
---- a/block.c
-+++ b/block.c
-@@ -3228,13 +3228,13 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, Error **errp)
-         return -EACCES;
-     }
- 
--    ret = drv->bdrv_truncate(bs, offset);
-+    ret = drv->bdrv_truncate(bs, offset, errp);
-     if (ret == 0) {
-         ret = refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
-         bdrv_dirty_bitmap_truncate(bs);
-         bdrv_parent_cb_resize(bs);
-         ++bs->write_gen;
--    } else {
-+    } else if (errp && !*errp) {
-         error_setg_errno(errp, -ret, "Failed to resize image");
-     }
-     return ret;
-diff --git a/block/archipelago.c b/block/archipelago.c
-index 01c4ff2f7d..e65a3ff230 100644
---- a/block/archipelago.c
-+++ b/block/archipelago.c
-@@ -977,7 +977,8 @@ static int64_t qemu_archipelago_getlength(BlockDriverState *bs)
-     return archipelago_volume_info(s);
- }
- 
--static int qemu_archipelago_truncate(BlockDriverState *bs, int64_t offset)
-+static int qemu_archipelago_truncate(BlockDriverState *bs, int64_t offset,
-+                                     Error **errp)
- {
-     int ret, targetlen;
-     struct xseg_request *req;
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index 15a9966096..c795ae9e72 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -661,9 +661,9 @@ static int64_t blkdebug_getlength(BlockDriverState *bs)
-     return bdrv_getlength(bs->file->bs);
- }
- 
--static int blkdebug_truncate(BlockDriverState *bs, int64_t offset)
-+static int blkdebug_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
- {
--    return bdrv_truncate(bs->file, offset, NULL);
-+    return bdrv_truncate(bs->file, offset, errp);
- }
- 
- static void blkdebug_refresh_filename(BlockDriverState *bs, QDict *options)
-diff --git a/block/crypto.c b/block/crypto.c
-index 52e4f2b20f..17b3140998 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -381,7 +381,8 @@ static int block_crypto_create_generic(QCryptoBlockFormat format,
-     return ret;
- }
- 
--static int block_crypto_truncate(BlockDriverState *bs, int64_t offset)
-+static int block_crypto_truncate(BlockDriverState *bs, int64_t offset,
-+                                 Error **errp)
- {
-     BlockCrypto *crypto = bs->opaque;
-     size_t payload_offset =
-@@ -389,7 +390,7 @@ static int block_crypto_truncate(BlockDriverState *bs, int64_t offset)
- 
-     offset += payload_offset;
- 
--    return bdrv_truncate(bs->file, offset, NULL);
-+    return bdrv_truncate(bs->file, offset, errp);
- }
- 
- static void block_crypto_close(BlockDriverState *bs)
 diff --git a/block/file-posix.c b/block/file-posix.c
-index 4de1abd023..9d2bea730d 100644
+index 9d2bea730d..013aa07437 100644
 --- a/block/file-posix.c
 +++ b/block/file-posix.c
-@@ -1337,7 +1337,7 @@ static void raw_close(BlockDriverState *bs)
-     }
- }
- 
--static int raw_truncate(BlockDriverState *bs, int64_t offset)
-+static int raw_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
+@@ -1341,20 +1341,27 @@ static int raw_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
  {
      BDRVRawState *s = bs->opaque;
      struct stat st;
-diff --git a/block/file-win32.c b/block/file-win32.c
-index 800fabdd72..3f3925623f 100644
---- a/block/file-win32.c
-+++ b/block/file-win32.c
-@@ -461,7 +461,7 @@ static void raw_close(BlockDriverState *bs)
-     }
- }
++    int ret;
  
--static int raw_truncate(BlockDriverState *bs, int64_t offset)
-+static int raw_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
- {
-     BDRVRawState *s = bs->opaque;
-     LONG low, high;
-@@ -476,11 +476,11 @@ static int raw_truncate(BlockDriverState *bs, int64_t offset)
-      */
-     dwPtrLow = SetFilePointer(s->hfile, low, &high, FILE_BEGIN);
-     if (dwPtrLow == INVALID_SET_FILE_POINTER && GetLastError() != NO_ERROR) {
--        fprintf(stderr, "SetFilePointer error: %lu\n", GetLastError());
-+        error_setg_win32(errp, GetLastError(), "SetFilePointer error");
-         return -EIO;
-     }
-     if (SetEndOfFile(s->hfile) == 0) {
--        fprintf(stderr, "SetEndOfFile error: %lu\n", GetLastError());
-+        error_setg_win32(errp, GetLastError(), "SetEndOfFile error");
-         return -EIO;
-     }
-     return 0;
-diff --git a/block/gluster.c b/block/gluster.c
-index a577daef10..00b8240562 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -1084,7 +1084,8 @@ static coroutine_fn int qemu_gluster_co_rw(BlockDriverState *bs,
-     return acb.ret;
- }
- 
--static int qemu_gluster_truncate(BlockDriverState *bs, int64_t offset)
-+static int qemu_gluster_truncate(BlockDriverState *bs, int64_t offset,
-+                                 Error **errp)
- {
-     int ret;
-     BDRVGlusterState *s = bs->opaque;
-diff --git a/block/iscsi.c b/block/iscsi.c
-index 75d890538e..ab559a6f71 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -2060,7 +2060,7 @@ static void iscsi_reopen_commit(BDRVReopenState *reopen_state)
-     }
- }
- 
--static int iscsi_truncate(BlockDriverState *bs, int64_t offset)
-+static int iscsi_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
- {
-     IscsiLun *iscsilun = bs->opaque;
-     Error *local_err = NULL;
-@@ -2071,7 +2071,7 @@ static int iscsi_truncate(BlockDriverState *bs, int64_t offset)
- 
-     iscsi_readcapacity_sync(iscsilun, &local_err);
-     if (local_err != NULL) {
--        error_free(local_err);
-+        error_propagate(errp, local_err);
-         return -EIO;
+     if (fstat(s->fd, &st)) {
+-        return -errno;
++        ret = -errno;
++        error_setg_errno(errp, -ret, "Failed to fstat() the file");
++        return ret;
      }
  
-diff --git a/block/nfs.c b/block/nfs.c
-index 3f43f6e26a..57d12efc51 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -757,7 +757,7 @@ static int64_t nfs_get_allocated_file_size(BlockDriverState *bs)
-     return (task.ret < 0 ? task.ret : st.st_blocks * 512);
- }
+     if (S_ISREG(st.st_mode)) {
+         if (ftruncate(s->fd, offset) < 0) {
+-            return -errno;
++            ret = -errno;
++            error_setg_errno(errp, -ret, "Failed to resize the file");
++            return ret;
+         }
+     } else if (S_ISCHR(st.st_mode) || S_ISBLK(st.st_mode)) {
+-       if (offset > raw_getlength(bs)) {
+-           return -EINVAL;
+-       }
++        if (offset > raw_getlength(bs)) {
++            error_setg(errp, "Cannot grow device files");
++            return -EINVAL;
++        }
+     } else {
++        error_setg(errp, "Resizing this file is not supported");
+         return -ENOTSUP;
+     }
  
--static int nfs_file_truncate(BlockDriverState *bs, int64_t offset)
-+static int nfs_file_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
- {
-     NFSClient *client = bs->opaque;
-     return nfs_ftruncate(client->context, client->fh, offset);
 diff --git a/block/qcow2.c b/block/qcow2.c
-index 43b8a986f0..17585fbb89 100644
+index 17585fbb89..53b0bd61a7 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -2524,26 +2524,26 @@ static coroutine_fn int qcow2_co_pdiscard(BlockDriverState *bs,
-     return ret;
- }
- 
--static int qcow2_truncate(BlockDriverState *bs, int64_t offset)
-+static int qcow2_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
- {
-     BDRVQcow2State *s = bs->opaque;
-     int64_t new_l1_size;
-     int ret;
- 
-     if (offset & 511) {
--        error_report("The new size must be a multiple of 512");
-+        error_setg(errp, "The new size must be a multiple of 512");
-         return -EINVAL;
+@@ -2550,6 +2550,7 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
+     new_l1_size = size_to_l1(s, offset);
+     ret = qcow2_grow_l1_table(bs, new_l1_size, true);
+     if (ret < 0) {
++        error_setg(errp, "Failed to grow the L1 table");
+         return ret;
      }
  
-     /* cannot proceed if image has snapshots */
-     if (s->nb_snapshots) {
--        error_report("Can't resize an image which has snapshots");
-+        error_setg(errp, "Can't resize an image which has snapshots");
-         return -ENOTSUP;
-     }
- 
-     /* shrinking is currently not supported */
-     if (offset < bs->total_sectors * 512) {
--        error_report("qcow2 doesn't support shrinking images yet");
-+        error_setg(errp, "qcow2 doesn't support shrinking images yet");
-         return -ENOTSUP;
+@@ -2558,6 +2559,7 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
+     ret = bdrv_pwrite_sync(bs->file, offsetof(QCowHeader, size),
+                            &offset, sizeof(uint64_t));
+     if (ret < 0) {
++        error_setg(errp, "Failed to update the image size");
+         return ret;
      }
  
 diff --git a/block/qed.c b/block/qed.c
-index 53199ac8d7..fa2aeee471 100644
+index fa2aeee471..eb346d645b 100644
 --- a/block/qed.c
 +++ b/block/qed.c
-@@ -1518,7 +1518,7 @@ static int coroutine_fn bdrv_qed_co_pwrite_zeroes(BlockDriverState *bs,
-     return cb.ret;
- }
+@@ -1526,11 +1526,12 @@ static int bdrv_qed_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
  
--static int bdrv_qed_truncate(BlockDriverState *bs, int64_t offset)
-+static int bdrv_qed_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
- {
-     BDRVQEDState *s = bs->opaque;
-     uint64_t old_image_size;
+     if (!qed_is_image_size_valid(offset, s->header.cluster_size,
+                                  s->header.table_size)) {
++        error_setg(errp, "Invalid image size specified");
+         return -EINVAL;
+     }
+ 
+-    /* Shrinking is currently not supported */
+     if ((uint64_t)offset < s->header.image_size) {
++        error_setg(errp, "Shrinking images is currently not supported");
+         return -ENOTSUP;
+     }
+ 
+@@ -1539,6 +1540,7 @@ static int bdrv_qed_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
+     ret = qed_write_header_sync(s);
+     if (ret < 0) {
+         s->header.image_size = old_image_size;
++        error_setg(errp, "Failed to update the image size");
+     }
+     return ret;
+ }
 diff --git a/block/raw-format.c b/block/raw-format.c
-index a80073369a..9761bdaff8 100644
+index 9761bdaff8..36e65036f0 100644
 --- a/block/raw-format.c
 +++ b/block/raw-format.c
-@@ -327,7 +327,7 @@ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
-     }
- }
- 
--static int raw_truncate(BlockDriverState *bs, int64_t offset)
-+static int raw_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
- {
+@@ -332,10 +332,12 @@ static int raw_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
      BDRVRawState *s = bs->opaque;
  
-@@ -341,7 +341,7 @@ static int raw_truncate(BlockDriverState *bs, int64_t offset)
+     if (s->has_size) {
++        error_setg(errp, "Cannot resize fixed-size raw disks");
+         return -ENOTSUP;
+     }
  
-     s->size = offset;
-     offset += s->offset;
--    return bdrv_truncate(bs->file, offset, NULL);
-+    return bdrv_truncate(bs->file, offset, errp);
- }
- 
- static int raw_media_changed(BlockDriverState *bs)
-diff --git a/block/rbd.c b/block/rbd.c
-index ee13f3d9d3..f7d4dd93fe 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -1028,7 +1028,7 @@ static int64_t qemu_rbd_getlength(BlockDriverState *bs)
-     return info.size;
- }
- 
--static int qemu_rbd_truncate(BlockDriverState *bs, int64_t offset)
-+static int qemu_rbd_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
- {
-     BDRVRBDState *s = bs->opaque;
-     int r;
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index 89e98edab6..27126ea474 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -2133,9 +2133,8 @@ static int64_t sd_getlength(BlockDriverState *bs)
-     return s->inode.vdi_size;
- }
- 
--static int sd_truncate(BlockDriverState *bs, int64_t offset)
-+static int sd_truncate(BlockDriverState *bs, int64_t offset, Error **errp)
- {
--    Error *local_err = NULL;
-     BDRVSheepdogState *s = bs->opaque;
-     int ret, fd;
-     unsigned int datalen;
-@@ -2143,16 +2142,15 @@ static int sd_truncate(BlockDriverState *bs, int64_t offset)
- 
-     max_vdi_size = (UINT64_C(1) << s->inode.block_size_shift) * MAX_DATA_OBJS;
-     if (offset < s->inode.vdi_size) {
--        error_report("shrinking is not supported");
-+        error_setg(errp, "shrinking is not supported");
-         return -EINVAL;
-     } else if (offset > max_vdi_size) {
--        error_report("too big image size");
-+        error_setg(errp, "too big image size");
+     if (INT64_MAX - offset < s->offset) {
++        error_setg(errp, "Disk size too large for the chosen offset");
          return -EINVAL;
      }
  
--    fd = connect_to_sdog(s, &local_err);
-+    fd = connect_to_sdog(s, errp);
-     if (fd < 0) {
--        error_report_err(local_err);
-         return fd;
-     }
- 
-@@ -2165,7 +2163,7 @@ static int sd_truncate(BlockDriverState *bs, int64_t offset)
-     close(fd);
- 
-     if (ret < 0) {
--        error_report("failed to update an inode.");
-+        error_setg_errno(errp, -ret, "failed to update an inode");
-     }
- 
-     return ret;
-@@ -2430,7 +2428,7 @@ static coroutine_fn int sd_co_writev(BlockDriverState *bs, int64_t sector_num,
-     BDRVSheepdogState *s = bs->opaque;
- 
-     if (offset > s->inode.vdi_size) {
--        ret = sd_truncate(bs, offset);
-+        ret = sd_truncate(bs, offset, NULL);
-         if (ret < 0) {
-             return ret;
-         }
 -- 
 2.12.0
