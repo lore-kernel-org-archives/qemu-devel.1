@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39353)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1clXbY-0007rQ-C7
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 04:09:57 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1clXc6-0008BA-T0
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 04:10:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1clXbU-0000XP-62
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 04:09:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37592)
+	(envelope-from <pbonzini@redhat.com>) id 1clXc2-0000hO-Qs
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 04:10:30 -0500
+Received: from mx3-phx2.redhat.com ([209.132.183.24]:52517)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1clXbU-0000XA-0C
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 04:09:52 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DC2B913A5E
-	for <qemu-devel@nongnu.org>; Wed,  8 Mar 2017 09:09:51 +0000 (UTC)
-Date: Wed, 8 Mar 2017 17:09:46 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170308090945.GD7135@pxdev.xzpeter.org>
-References: <1488877751-13419-1-git-send-email-jasowang@redhat.com>
-	<7594c183-6d38-3dce-75e7-62bf3be324fc@redhat.com>
-	<20170308024349.GC31585@pxdev.xzpeter.org>
-	<9d2dd1a4-aadc-a497-3dbb-6afb6d621587@redhat.com>
-	<5b388627-dcae-6c11-008d-f3c5da57b334@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1clXc2-0000h6-IR
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 04:10:26 -0500
+Date: Wed, 8 Mar 2017 04:10:26 -0500 (EST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <519330901.29898313.1488964226313.JavaMail.zimbra@redhat.com>
+In-Reply-To: <61938aa1-2698-f55e-ea1c-e7d96da0b5d7@redhat.com>
+References: <1488876478-6889-1-git-send-email-jasowang@redhat.com>
+	<313e32c5-140d-ec13-6b10-98043756f2e6@redhat.com>
+	<f3e9db7e-f3ab-1ae5-4da6-05dbd8d0206f@redhat.com>
+	<61938aa1-2698-f55e-ea1c-e7d96da0b5d7@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <5b388627-dcae-6c11-008d-f3c5da57b334@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH V3] virtio: do not require IOMMU to be
- created in advance
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] virtio: destroy region cache during reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,31 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, mst@redhat.com, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: mst@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com
 
-On Wed, Mar 08, 2017 at 10:17:09AM +0200, Marcel Apfelbaum wrote:
 
-[...]
 
-> 
-> I am sorry I was not clear enough:
-> If a device is added after the system is up (hotplug), we cannot depend on the "machine_done"
-> event to enable "bus master".
-> This is why we have
->    if (qdev_hotplug)
->         pci_init_bus_master(pci_dev);
-> 
-> The code you proposed changes the order, so this call is done *after* realize.
-> 
-> My question was: What if any other device may require the bus_master_as
-> at realize time (and can be hot-plugged) ?
-> For example: hcd-ehci/hcd-ohci devices call pci_get_address_space()
-> and caches the bus_master_as.
+----- Original Message -----
+> From: "Jason Wang" <jasowang@redhat.com>
+> To: "Paolo Bonzini" <pbonzini@redhat.com>, mst@redhat.com, qemu-devel@non=
+gnu.org
+> Cc: peterx@redhat.com
+> Sent: Wednesday, March 8, 2017 7:22:06 AM
+> Subject: Re: [Qemu-devel] [PATCH] virtio: destroy region cache during res=
+et
+>=20
+>=20
+>=20
+> On 2017=E5=B9=B403=E6=9C=8808=E6=97=A5 11:21, Jason Wang wrote:
+> >
+> > On 2017=E5=B9=B403=E6=9C=8807=E6=97=A5 18:55, Paolo Bonzini wrote:
+> >>
+> >> On 07/03/2017 09:47, Jason Wang wrote:
+> >>> We don't destroy region cache during reset which can make the maps
+> >>> of previous driver leaked to a buggy or malicious driver that don't
+> >>> set vring address before starting to use the device.
+> >> I'm still not sure as to how this can happen.  Reset does clear
+> >> desc/used/avail, which should then be checked before accessing the
+> >> caches.
+> >
+> > But the code does not check them in fact? (E.g the attached qtest
+> > patch can still pass check-qtest).
+> >
+> > Thanks
+>=20
+> Ok, the reproducer seems wrong. And I think what you mean is something
+> like the check done in virtio_queue_ready(). But looks like not all
+> virtqueue check for this. One example is virtio_net_handle_ctrl(), and
+> there may be even more. So you want to fix them all?
 
-Oh, I didn't notice that there are other devices that used
-bus_master_as during realization. If so... Would this really work even
-without hot plug? Considering that bus_master_as won't be inited until
-machine done phase?
+Why would virtio_net_handle_ctrl be called when desc =3D=3D 0?  The checks
+are all in common virtio code.
 
--- peterx
+static void virtio_queue_notify_vq(VirtQueue *vq)
+{
+    if (vq->vring.desc && vq->handle_output) {
+        VirtIODevice *vdev =3D vq->vdev;
+
+        if (unlikely(vdev->broken)) {
+            return;
+        }
+
+        trace_virtio_queue_notify(vdev, vq - vdev->vq, vq);
+        vq->handle_output(vdev, vq);
+    }
+}
+                                                                           =
+                                                                           =
+                         1440,29       55%
+Paolo
