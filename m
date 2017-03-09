@@ -1,25 +1,46 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60982)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <c.pinto@virtualopensystems.com>) id 1clwM0-0005zm-KI
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 06:35:33 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1clwP5-0008PL-Pa
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 06:38:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <c.pinto@virtualopensystems.com>) id 1clwLz-0004mn-BH
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 06:35:32 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:36728)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <c.pinto@virtualopensystems.com>)
-	id 1clwLz-0004mb-52
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 06:35:31 -0500
-Received: by mail-wm0-x241.google.com with SMTP id v190so10451982wme.3
-	for <qemu-devel@nongnu.org>; Thu, 09 Mar 2017 03:35:31 -0800 (PST)
-From: Christian Pinto <c.pinto@virtualopensystems.com>
-Date: Thu,  9 Mar 2017 12:34:37 +0100
-Message-Id: <20170309113437.9667-5-c.pinto@virtualopensystems.com>
-In-Reply-To: <20170309113437.9667-1-c.pinto@virtualopensystems.com>
-References: <57B7F948.9040701@huawei.com>
-	<20170309113437.9667-1-c.pinto@virtualopensystems.com>
-Subject: [Qemu-devel] [RFC PATCH 4/4] migration/postcopy-ram:
- ram_set_pages_wp fix
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1clwP1-0006P1-RS
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 06:38:43 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60202
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1clwP1-0006Oq-Kx
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 06:38:39 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v29Bca74087755
+	for <qemu-devel@nongnu.org>; Thu, 9 Mar 2017 06:38:38 -0500
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2932yxh11c-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 09 Mar 2017 06:38:37 -0500
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Thu, 9 Mar 2017 11:38:28 -0000
+Date: Thu, 9 Mar 2017 12:38:23 +0100
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <5de53ca5-ecd2-033e-17fb-6ecb2875dd5d@redhat.com>
+References: <1488876478-6889-1-git-send-email-jasowang@redhat.com>
+	<20170307111618.43ffbd13.cornelia.huck@de.ibm.com>
+	<cb84b888-4917-162d-31a5-f708f4783444@redhat.com>
+	<20170308101922.730b1579.cornelia.huck@de.ibm.com>
+	<64df071f-27b0-9ee6-0b76-d8fa7a9cc8ec@redhat.com>
+	<20170308111214.591b49fe.cornelia.huck@de.ibm.com>
+	<a8f854b2-bbd3-1665-0b09-2abcad928b9d@redhat.com>
+	<20170309120734.390a7cda.cornelia.huck@de.ibm.com>
+	<5de53ca5-ecd2-033e-17fb-6ecb2875dd5d@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20170309123823.5af4d65c.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] virtio: destroy region cache during reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +49,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhang.zhanghailiang@huawei.com
-Cc: b.reynal@virtualopensystems.com, aarcange@redhat.com, quintela@redhat.com, dgilbert@redhat.com, amit.shah@redhat.com, peter.huangpeng@huawei.com, hanweidong@huawei.com, qemu-devel@nongnu.org, tech@virtualopensystems.com, Christian Pinto <c.pinto@virtualopensystems.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, peterx@redhat.com, mst@redhat.com
 
-setting UFFDIO_WRITEPROTECT_MODE_DONTWAKE when write un-protecting a page
-does not wake up the faulting thread.
-Set to 0 to force the faulting (VM) thread to wake-up.
+On Thu, 9 Mar 2017 12:12:00 +0100
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-Signed-off-by: Christian Pinto <c.pinto@virtualopensystems.com>
-Signed-off-by: Baptiste Reynal <b.reynal@virtualopensystems.com>
----
- migration/postcopy-ram.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> On 09/03/2017 12:07, Cornelia Huck wrote:
+> >>> - Driver #2 uses the device without doing a reset or proper setup
+> >> Without this patch, even if driver #2 do a reset, it can still use the 
+> >> old map if it don't set queue pfn.
+> > 
+> > Yes, the cleanup-on-reset is definetly needed.
+> 
+> It is good to have for defensiveness, but it would still cause a
+> segfault so we should also add the checks on vq->vring.desc throughout.
 
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index 6252eb379a..684faae614 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -384,7 +384,7 @@ int ram_set_pages_wp(ram_addr_t page_addr,
-     wp_struct.range.start = (uint64_t)(uintptr_t)page_addr;
-     wp_struct.range.len = size;
-     if (remove) {
--        wp_struct.mode = UFFDIO_WRITEPROTECT_MODE_DONTWAKE;
-+        wp_struct.mode = 0;
-     } else {
-         wp_struct.mode = UFFDIO_WRITEPROTECT_MODE_WP;
-     }
--- 
-2.11.0
+Agreed.
