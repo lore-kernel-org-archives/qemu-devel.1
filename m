@@ -1,46 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1cloEv-0001Bo-RQ
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 21:55:43 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cloJ8-0001v8-Mo
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 22:00:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1cloEq-0002lR-Tp
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 21:55:41 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47033
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haoqf@linux.vnet.ibm.com>)
-	id 1cloEq-0002kB-NH
-	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 21:55:36 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v292riLT016349
-	for <qemu-devel@nongnu.org>; Wed, 8 Mar 2017 21:55:35 -0500
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 292mrk2ejd-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 08 Mar 2017 21:55:35 -0500
-Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <haoqf@linux.vnet.ibm.com>;
-	Wed, 8 Mar 2017 21:55:34 -0500
-References: <20170307025328.53409-1-haoqf@linux.vnet.ibm.com>
-	<20170307025328.53409-2-haoqf@linux.vnet.ibm.com>
-	<20170307092951.GA5871@noname.str.redhat.com>
-	<80495689-674c-5dde-ae49-d80a2eb20372@linux.vnet.ibm.com>
-	<20170307100525.GD5871@noname.str.redhat.com>
-	<cbd5b0ac-4cae-6f5b-2583-a6e32eb65f38@linux.vnet.ibm.com>
-	<a0013bf9-4e53-7a38-3249-b7267ae33307@linux.vnet.ibm.com>
-	<6c0b3128-37e6-8607-abab-4f655cd91426@linux.vnet.ibm.com>
-From: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-Date: Thu, 9 Mar 2017 10:55:04 +0800
+	(envelope-from <dgibson@ozlabs.org>) id 1cloJ4-0003yP-JW
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 22:00:02 -0500
+Date: Thu, 9 Mar 2017 12:34:14 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170309013414.GL19967@umbus.fritz.box>
+References: <1489003123-3641-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <6c0b3128-37e6-8607-abab-4f655cd91426@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <e041a9d5-e5f0-dc15-5332-3a389bb4ef98@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC 1/1] vmstate: draft fix for failed
- iotests case 68 and 91
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="37cJpJlYZwAfNbm5"
+Content-Disposition: inline
+In-Reply-To: <1489003123-3641-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] target/ppc: Fix wrong number of UAMR
+ register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,176 +24,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: famz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, liujbjl@linux.vnet.ibm.com, qemu-devel@nongnu.org, mreitz@redhat.com, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com, dgilbert@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
 
 
+--37cJpJlYZwAfNbm5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-=E5=9C=A8 2017/3/8 19:33, Halil Pasic =E5=86=99=E9=81=93:
->
-> On 03/08/2017 08:05 AM, QingFeng Hao wrote:
->>
->> =E5=9C=A8 2017/3/7 18:19, Halil Pasic =E5=86=99=E9=81=93:
->>> On 03/07/2017 11:05 AM, Kevin Wolf wrote:
->>>> Am 07.03.2017 um 10:54 hat Halil Pasic geschrieben:
->>>>> On 03/07/2017 10:29 AM, Kevin Wolf wrote:
->>>>>> Am 07.03.2017 um 03:53 hat QingFeng Hao geschrieben:
->>>>>>> I am not very clear about the logic in vmstate.c, but from its co=
-ntext in
->>>>>>> vmstate_save_state, it seems size should not be 0, otherwise the =
-followed
->>>>>>> for loop will keep working on the same element. So I just add a s=
-imple
->>>>>>> check to pass that case, not sure if it's right but it can pass i=
-otest
->>>>>>> case 68 and 91 now.
->>>>>>>
->>>>>>> The iotest's failed output is:
->>>>>>> 068 1s ... - output mismatch (see 068.out.bad)
->>>>>>> --- /home/haoqf/KVMonz/gitcheck/work/qemu-master/tree/qemu/tests/=
-qemu-iotests/068.out   2017-03-06 05:52:24.817328899 +0100
->>>>>>> +++ 068.out.bad 2017-03-07 03:28:44.426714519 +0100
->>>>>>> @@ -3,9 +3,13 @@
->>>>>>>    =3D=3D=3D Saving and reloading a VM state to/from a qcow2 imag=
-e =3D=3D=3D
->>>>>>>
->>>>>>>    Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D131072
->>>>>>> +qemu-system-s390x: migration/vmstate.c:336: vmstate_save_state: =
-Assertion `first_elem || !n_elems' failed.
->>>>>>> +./common.config: line 109: 52497 Aborted                 ( if [ =
--n "${QEMU_NEED_PID}" ]; then
->>>>>>> +    echo $BASHPID > "${QEMU_TEST_DIR}/qemu-${_QEMU_HANDLE}.pid";
->>>>>>> +fi; exec "$QEMU_PROG" $QEMU_OPTIONS "$@" )
->>>>>>>
->>>>>>>
->>>>>>> Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
->>>>>>> ---
->>>>>>>    migration/vmstate.c | 8 ++++++++
->>>>>>>    1 file changed, 8 insertions(+)
->>>>>>>
->>>>>>> diff --git a/migration/vmstate.c b/migration/vmstate.c
->>>>>>> index 78b3cd4..ff28dde 100644
->>>>>>> --- a/migration/vmstate.c
->>>>>>> +++ b/migration/vmstate.c
->>>>>>> @@ -106,6 +106,10 @@ int vmstate_load_state(QEMUFile *f, const VM=
-StateDescription *vmsd,
->>>>>>>                int i, n_elems =3D vmstate_n_elems(opaque, field);
->>>>>>>                int size =3D vmstate_size(opaque, field);
->>>>>>>    +            if (size =3D=3D 0) {
->>>>>>> +                field++;
->>>>>>> +                continue;
->>>>>>> +            }
->>>>>>>                vmstate_handle_alloc(first_elem, field, opaque);
->>>>>>>                if (field->flags & VMS_POINTER) {
->>>>>>>                    first_elem =3D *(void **)first_elem;
->>>>>>> @@ -322,6 +326,10 @@ void vmstate_save_state(QEMUFile *f, const V=
-MStateDescription *vmsd,
->>>>>>>                int64_t old_offset, written_bytes;
->>>>>>>                QJSON *vmdesc_loop =3D vmdesc;
->>>>>>>    +            if (size =3D=3D 0) {
->>>>>>> +                field++;
->>>>>>> +                continue;
->>>>>>> +            }
->>>>>>>                trace_vmstate_save_state_loop(vmsd->name, field->n=
-ame, n_elems);
->>>>>>>                if (field->flags & VMS_POINTER) {
->>>>>>>                    first_elem =3D *(void **)first_elem;
->>>>>> This is really a live migration fix, so I'm adding Juan and Dave t=
-o CC.
->>>>> You are right, this is migration stuff and has very little to do wi=
-th
->>>>> qemu-block.
->>>>>> I suspect the real question is why a field with size 0 was even st=
-ored
->>>>>> in the vmstate to begin with.
->>>>>>
->>>>> I have looked onto the issue. It affects s390x only if we
->>>>> are running without KVM. Basically, S390CPU.irqstate is unused
->>>>> if we do not use KVM, and thus no buffer is allocated.
->>>>>
->>>>> IMHO this is a missing field and the cleaner way to handle such
->>>>> missing fields is exist. However this used to work, and I recommend=
-ed
->>>>> QuiFeng Hao to discuss the problem upstream.
->>>>>
->>>>> By the way, I think, if we want to go back to the old behavior
->>>>> and support VMS_VBUFFER with size 0 and nullptr, a much
->>>>> cleaner way to do the fix is to change the assert to:
->>>>>
->>>>> assert(first_elem  || !n_elems || !size)
->>>>>
->>>>> Obviously the other clean way to fix is to implement exists.
->>>> If you're right that this specific vmstate was valid in earlier
->>>> versions, then I think it's clear that we need to make it work again.
->>>> Otherwise we're breaking migration from old versions.
->>> Not really. We would not break migration because nothing was written =
-to
->>> the stream for VMS_VBUFFER of size 0 except the vmdesc which is at th=
-e end,
->>> 'debug only', and does not affect migration compatibility.
->>>
->>> IMHO it is an API question. I would have said, there is no data, ther=
-efore
->>> there is no field if it's from scratch. But with prior history, I agr=
-ee
->>> with Dave, we should restore old behavior -- which was changed uninte=
-ntionally
->>> because I made a wrong assumption.
->> Halil,
->> Unfortunately, another assert failed after I change the code as below =
-in
->> vmstate_save_state and vmstate_load_state:
->> assert(first_elem  || !n_elems || !size);
->>
->> The error is:
->> +qemu-system-s390x: migration/vmstate.c:341: vmstate_save_state: Asser=
-tion `field->flags & VMS_ARRAY_OF_POINTER' failed.
->> It's the code as below:
->>   if (!curr_elem) {
-> Sorry, I failed to mention this yesterday. You should also do
->
-> -                 if (!curr_elem) {
-> +                 if (!curr_elem && size) {
->
-yes, this works per my test!
->
->
->>                      /* if null pointer write placeholder and do not f=
-ollow      */
->>                    assert(field->flags & VMS_ARRAY_OF_POINTER);
->> After debug, I found that the assert failure was still of irqstate and=
- its field flags is 0x102(VMS_VBUFFER | VMS_POINTER),
->> while VMS_ARRAY_OF_POINTER is 0x040. The flags's value matches Dave's =
-former assumption
->> on machine.c although machine.c wasn't compiled, which also confuses m=
-e.
->>
->> Then I commented out that assert(field->flags & VMS_ARRAY_OF_POINTER) =
-and the case 68 & 91
->> can both work!
-> Yeah but that would break migration compatibility for write by
-> writing a nullptr-marker character into the stream.
->
->> The question is: can we do that change and what the second assert of f=
-ield's flags is used for?
-> The assert is there to guard against unintended use of this nullptr-mar=
-ker
-> mechanism.
->
-> I have tested so this should work. By the way a vmstate test covering t=
-his
-> corner-case would be a good idea too (IMHO). Would you like to write on=
-e?
-Sorry, I don't know how to write that test case. Can you please write one=
-?
-thanks!
-> Regards,
-> Halil
->
->> Thanks!
->>> Regards,
->>> Halil
+On Wed, Mar 08, 2017 at 08:58:43PM +0100, Thomas Huth wrote:
+> The SPR UAMR has the number 13, and not 12. (Fortunately it seems like
+> Linux is not using this register yet - only the privileged version with
+> number 29 ... that's why nobody noticed this problem yet)
+>=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  target/ppc/cpu.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+
+Applied to ppc-for-2.9, thanks.
+
+>=20
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 7c4a1f5..5ee33b3 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1408,7 +1408,7 @@ int ppc_compat_max_threads(PowerPCCPU *cpu);
+>  #define SPR_601_UDECR         (0x006)
+>  #define SPR_LR                (0x008)
+>  #define SPR_CTR               (0x009)
+> -#define SPR_UAMR              (0x00C)
+> +#define SPR_UAMR              (0x00D)
+>  #define SPR_DSCR              (0x011)
+>  #define SPR_DSISR             (0x012)
+>  #define SPR_DAR               (0x013) /* DAE for PowerPC 601 */
 
 --=20
-Regards
-QingFeng Hao
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--37cJpJlYZwAfNbm5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYwLEWAAoJEGw4ysog2bOSon0QAIknoQ58Xsq5RVBNJ9VNUKNA
+RJNGyUZPzJKDsqvEUDdPtmk0piW5IjHdWmPuoDBnt7ogh6UVRlb+KMq+0tRK+CPd
+y4LZQKHX7tOw70Vhxpuvao0q9Xn+fXCwXtygQLiipn42q3B6RbYU2xgogPmktiCU
+kTAK/V4RkKkTxibUVBIzP4H6Zqo3i/WCIDa2/3w2edfzca8mkk7nwDFnbj5615o1
+TGcSf+6LPXVCs2NLtDAB2FmJN9MyLThUI2X5RELvLKlwg1az1km/a438pHfZ6EHY
+5Y9iC6gQGBFxxWlIH3hXkPEkAZ685uc833DQNf3SD8E3RSggM6VOQ11nTXfHvJnq
+N5xhnNBG1fXJSCrdmFuHqYaDoVnAnOvmuu6XsysB8wLz94JjLzQzuv97oGn8gzf+
+3nTjZsrA/eb3pMFL7c7+Cc17biP+1APkwHHQlGxXRpw3TutNdMhmb/bBmdTFHv2m
+6BRMkLvQLSONpR/zhHqf7PtEKv7tgdR4koyjPUbQxwxT9tRHmsrhcmzeUCI/NdB3
+cEimKFsehNopN/JBDqEB0aoxMcjKeIxYSwkyX8sYUo3yeZOXjYlSrYfYD6YAav9S
+4Ix07XTzIOq6xUGuD6jK6lmRYF15WNhXWJCJlQE9fW42Na0PuEMzjgbcvE0UMl6K
+lQO8u/OBNdlP21eFUIKl
+=sK5b
+-----END PGP SIGNATURE-----
+
+--37cJpJlYZwAfNbm5--
