@@ -1,25 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37652)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cluxe-0000hR-I7
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 05:06:20 -0500
+	(envelope-from <piotr.rybicki@innervision.pl>) id 1clv2T-0001zB-JM
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 05:11:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cluxb-0003Vj-BN
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 05:06:18 -0500
-Received: from [59.151.112.132] (port=54203 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cluxa-0003QO-Fl
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 05:06:15 -0500
-Date: Thu, 9 Mar 2017 18:05:38 +0800
-From: Chao Fan <fanc.fnst@cn.fujitsu.com>
-Message-ID: <20170309100538.GA22103@localhost.localdomain>
-References: <20170308082819.12196-1-fanc.fnst@cn.fujitsu.com>
-	<20170308134559.GK7470@redhat.com>
+	(envelope-from <piotr.rybicki@innervision.pl>) id 1clv2Q-0005sY-DV
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 05:11:17 -0500
+Received: from mail.iv.net.pl ([195.191.233.10]:60682)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <piotr.rybicki@innervision.pl>)
+	id 1clv2Q-0005rG-1G
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 05:11:14 -0500
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.iv.net.pl (Postfix) with ESMTP id 8374B1F0AD88
+	for <qemu-devel@nongnu.org>; Thu,  9 Mar 2017 11:11:11 +0100 (CET)
+Received: from mail.iv.net.pl ([127.0.0.1])
+	by localhost (mail.iv.net.pl [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id VrgW02kzFL3z for <qemu-devel@nongnu.org>;
+	Thu,  9 Mar 2017 11:11:11 +0100 (CET)
+Received: from [192.168.127.114] (195.191.233.250.rev.iv.net.pl
+	[195.191.233.250])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by mail.iv.net.pl (Postfix) with ESMTPSA id 62AAA1F0AD86
+	for <qemu-devel@nongnu.org>; Thu,  9 Mar 2017 11:11:11 +0100 (CET)
+References: <3d1c16a1-ec05-0367-e569-64a63b34f2e3@redhat.com>
+	<CAFEAcA9cM=LjBRzrZdfsOss2xm4bKC6QM7gyg3HD4z-yeumTyw@mail.gmail.com>
+	<940ff281-82cd-18cf-160e-c5234f65db18@redhat.com>
+	<9d6c61bc-4a95-ce72-3565-e498f9c2b351@redhat.com>
+	<b815c2f9-1ce9-efed-4afa-c3553786dab1@redhat.com>
+From: Piotr Rybicki <piotr.rybicki@innervision.pl>
+Message-ID: <7829c1dc-9138-c784-dcc5-3c46ec9b5c05@innervision.pl>
+Date: Thu, 9 Mar 2017 11:11:09 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20170308134559.GK7470@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] Add inst_dirty_pages_rate in 'info
- migrate'
+In-Reply-To: <b815c2f9-1ce9-efed-4afa-c3553786dab1@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] external snapshots freezes block device since qemu 2.8
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,99 +44,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: dgilbert@redhat.com, qemu-devel@nongnu.org, quintela@redhat.com, eblake@redhat.com, armbru@redhat.com, douly.fnst@cn.fujitsu.com, caoj.fnst@cn.fujitsu.com, maozy.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com
+To: qemu-devel@nongnu.org
 
-On Wed, Mar 08, 2017 at 01:45:59PM +0000, Daniel P. Berrange wrote:
->On Wed, Mar 08, 2017 at 04:28:19PM +0800, Chao Fan wrote:
->> Auto-converge aims to accelerate migration by slowing down the
->> generation of dirty pages. But user doesn't know how to determine the
->> throttle value, so, a new item "inst-dirty-pages-rate" in "info migrate"
->> would be helpful for user's determination.
-Hi Daniel,
+Hello there.
 
-Thank you for your reply.
->
->The "info migrate" command already reports a "dirty-pages-rate" value.
->
->Maybe I'm mis-understanding what you're calculcating, this this proposal
->looks the same, except reporting in bytes rather than page counts.
->
->QEMU in fact already records the bytes count internally too in the
->'dirty_pages_bytes' parameter which is calculated from taking
->'dirty_pages_size * TARGET_PAGE_SIZE'.
->
->So I wonder if we can just export the existing dirty-pages-bytes
->value in info migrate, and avoid needing this new code here:
->
-It's different, inst-dirty-pages-rate in this patch is greater than
-or equal to dirty-pages-bytes. Because in function
-cpu_physical_memory_sync_dirty_bitmap, file include/exec/ram_addr.h:
+I discovered, that since qemu 2.8 , external snapshots (very similar to: 
+http://wiki.libvirt.org/page/Live-disk-backup-with-active-blockcommit), 
+freezes block device after:
 
-if (src[idx][offset]) {
-    unsigned long bits = atomic_xchg(&src[idx][offset], 0);
-    unsigned long new_dirty;
-    new_dirty = ~dest[k];
-    dest[k] |= bits;
-    new_dirty &= bits;
-    num_dirty += ctpopl(new_dirty);
-}
+# virsh blockcommit (...)
 
-After these codes, only the pages not dirtied in bitmap(dest), but dirtied
-in dirty_memory[DIRTY_MEMORY_MIGRATION] will be calculated. For example:
-When ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION] = 0b00001111,
-and atomic_rcu_read(&migration_bitmap_rcu)->bmap = 0b00000011,
-the new_dirty will be 0b00001100, and this function will return 2 but not
-4 which is expected.
+There is no error message after completion of the command above.
+I'm using gluster + ZFS fuse mount as a storage for a VM on gentoo.
+libvirt debug showed nothing helpful.
+With qemu <2.8 -: snapshots are working as expected.
 
-Thanks,
-Chao Fan
+Is this a known issue?
+Is it qemu or libvirt ?
 
->> +static void migration_inst_rate(void)
->> +{
->> +    int64_t dirty_pages_time_now;
->> +    if (!dirty_pages_time_prev) {
->> +        dirty_pages_time_prev = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
->> +    }
->> +    dirty_pages_time_now = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
->> +    if (dirty_pages_time_now > dirty_pages_time_prev + 1000) {
->> +        RAMBlock *block;
->> +        MigrationState *s = migrate_get_current();
->> +        int64_t inst_dirty_pages = 0;
->> +        int64_t i;
->> +        unsigned long *num;
->> +        unsigned long len = 0;
->> +
->> +        rcu_read_lock();
->> +        DirtyMemoryBlocks *blocks = atomic_rcu_read(
->> +                         &ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION]);
->> +        QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
->> +            if (len == 0) {
->> +                len = block->offset;
->> +            }
->> +            len += block->used_length;
->> +        }
->> +        ram_addr_t idx = (len >> TARGET_PAGE_BITS) / DIRTY_MEMORY_BLOCK_SIZE;
->> +        if (((len >> TARGET_PAGE_BITS) % DIRTY_MEMORY_BLOCK_SIZE) != 0) {
->> +            idx++;
->> +        }
->> +        for (i = 0; i < idx; i++) {
->> +            num = blocks->blocks[i];
->> +            inst_dirty_pages += bitmap_weight(num, DIRTY_MEMORY_BLOCK_SIZE);
->> +        }
->> +        rcu_read_unlock();
->> +
->> +        s->inst_dirty_pages_rate = inst_dirty_pages * TARGET_PAGE_SIZE *
->> +                    1000 / (dirty_pages_time_now - dirty_pages_time_prev);
->> +    }
->> +    dirty_pages_time_prev = dirty_pages_time_now;
->>  }
->
->Regards,
->Daniel
->-- 
->|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
->|: http://libvirt.org              -o-             http://virt-manager.org :|
->|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
->
->
+If it helps, how can i diagnose this further?
+
+Thank You & Best regards
+Piotr Rybicki
