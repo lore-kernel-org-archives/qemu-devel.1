@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cluxB-0000UM-69
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 05:05:50 -0500
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cluxe-0000hR-I7
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 05:06:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1clux8-0003GM-1K
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 05:05:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:25566)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1clux7-0003FW-RR
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 05:05:45 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C4C2E201FB
-	for <qemu-devel@nongnu.org>; Thu,  9 Mar 2017 10:05:45 +0000 (UTC)
-References: <1488877751-13419-1-git-send-email-jasowang@redhat.com>
-	<7594c183-6d38-3dce-75e7-62bf3be324fc@redhat.com>
-	<20170308174043.10c2f056@nial.brq.redhat.com>
-	<322da7ca-793c-fe83-9b9b-aded87742c18@redhat.com>
-	<20170309102849.1db72ad5@nial.brq.redhat.com>
-	<925a58ec-2a6a-6709-8139-db492af7800c@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2add94d5-4d6f-6c62-4d63-085901afc63e@redhat.com>
-Date: Thu, 9 Mar 2017 11:05:36 +0100
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cluxb-0003Vj-BN
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 05:06:18 -0500
+Received: from [59.151.112.132] (port=54203 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cluxa-0003QO-Fl
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 05:06:15 -0500
+Date: Thu, 9 Mar 2017 18:05:38 +0800
+From: Chao Fan <fanc.fnst@cn.fujitsu.com>
+Message-ID: <20170309100538.GA22103@localhost.localdomain>
+References: <20170308082819.12196-1-fanc.fnst@cn.fujitsu.com>
+	<20170308134559.GK7470@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <925a58ec-2a6a-6709-8139-db492af7800c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V3] virtio: do not require IOMMU to be
- created in advance
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20170308134559.GK7470@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] Add inst_dirty_pages_rate in 'info
+ migrate'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,54 +28,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, mst@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: dgilbert@redhat.com, qemu-devel@nongnu.org, quintela@redhat.com, eblake@redhat.com, armbru@redhat.com, douly.fnst@cn.fujitsu.com, caoj.fnst@cn.fujitsu.com, maozy.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com
 
+On Wed, Mar 08, 2017 at 01:45:59PM +0000, Daniel P. Berrange wrote:
+>On Wed, Mar 08, 2017 at 04:28:19PM +0800, Chao Fan wrote:
+>> Auto-converge aims to accelerate migration by slowing down the
+>> generation of dirty pages. But user doesn't know how to determine the
+>> throttle value, so, a new item "inst-dirty-pages-rate" in "info migrate"
+>> would be helpful for user's determination.
+Hi Daniel,
 
+Thank you for your reply.
+>
+>The "info migrate" command already reports a "dirty-pages-rate" value.
+>
+>Maybe I'm mis-understanding what you're calculcating, this this proposal
+>looks the same, except reporting in bytes rather than page counts.
+>
+>QEMU in fact already records the bytes count internally too in the
+>'dirty_pages_bytes' parameter which is calculated from taking
+>'dirty_pages_size * TARGET_PAGE_SIZE'.
+>
+>So I wonder if we can just export the existing dirty-pages-bytes
+>value in info migrate, and avoid needing this new code here:
+>
+It's different, inst-dirty-pages-rate in this patch is greater than
+or equal to dirty-pages-bytes. Because in function
+cpu_physical_memory_sync_dirty_bitmap, file include/exec/ram_addr.h:
 
-On 09/03/2017 10:58, Jason Wang wrote:
->=20
->=20
-> On 2017=E5=B9=B403=E6=9C=8809=E6=97=A5 17:28, Igor Mammedov wrote:
->> On Thu, 9 Mar 2017 10:32:44 +0800
->> Jason Wang<jasowang@redhat.com>  wrote:
->>
->>> On 2017=E5=B9=B403=E6=9C=8809=E6=97=A5 00:40, Igor Mammedov wrote:
->>>> On Tue, 7 Mar 2017 14:47:30 +0200
->>>> Marcel Apfelbaum<marcel@redhat.com>   wrote:
->>>> =20
->>>>> On 03/07/2017 11:09 AM, Jason Wang wrote:
->>>>>> After commit 96a8821d2141 ("virtio: unbreak virtio-pci with IOMMU
->>>>>> after caching ring translations"), IOMMU was required to be
->>>>>> created in
->>>>>> advance. This is because we can only get the correct dma_as after =
-pci
->>>>>> IOMMU (e.g intel_iommu) was initialized. This is suboptimal and
->>>>>> inconvenient for user. This patch releases this by:
->>>>>>
->>>>>> - introduce a bus_master_ready method for PCIDeviceClass and trigg=
-er
->>>>>>     this during pci_init_bus_master
->>>>>> - implement virtio-pci method and 1) reset the dma_as 2) re-regist=
-er
->>>>>>     the memory listener to the new dma_as
->> Instead of trying to fix up later it's possible to refuse
->> adding iommu device if other devices has been added before
->> it with -device/device_add.
->> That would match current CLI semantics where device that
->> others depend on should be listed on CLI before that others
->> are listed.
->=20
-> Yes, but it works by chance in the past for the device that does not
-> want bus_master_as in their realize. This change may surprise their use=
-rs.
+if (src[idx][offset]) {
+    unsigned long bits = atomic_xchg(&src[idx][offset], 0);
+    unsigned long new_dirty;
+    new_dirty = ~dest[k];
+    dest[k] |= bits;
+    new_dirty &= bits;
+    num_dirty += ctpopl(new_dirty);
+}
 
-There is another posssibility.  Create the address space at init time
-and add a container region instead of the bus_master_enable_region
-alias.  Then at machine_done time you create the bus_master_enable_region=
-.
+After these codes, only the pages not dirtied in bitmap(dest), but dirtied
+in dirty_memory[DIRTY_MEMORY_MIGRATION] will be calculated. For example:
+When ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION] = 0b00001111,
+and atomic_rcu_read(&migration_bitmap_rcu)->bmap = 0b00000011,
+the new_dirty will be 0b00001100, and this function will return 2 but not
+4 which is expected.
 
-This removes the need for the callbacks and makes the MemoryListener
-just work.
+Thanks,
+Chao Fan
 
-Paolo
+>> +static void migration_inst_rate(void)
+>> +{
+>> +    int64_t dirty_pages_time_now;
+>> +    if (!dirty_pages_time_prev) {
+>> +        dirty_pages_time_prev = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+>> +    }
+>> +    dirty_pages_time_now = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+>> +    if (dirty_pages_time_now > dirty_pages_time_prev + 1000) {
+>> +        RAMBlock *block;
+>> +        MigrationState *s = migrate_get_current();
+>> +        int64_t inst_dirty_pages = 0;
+>> +        int64_t i;
+>> +        unsigned long *num;
+>> +        unsigned long len = 0;
+>> +
+>> +        rcu_read_lock();
+>> +        DirtyMemoryBlocks *blocks = atomic_rcu_read(
+>> +                         &ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION]);
+>> +        QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+>> +            if (len == 0) {
+>> +                len = block->offset;
+>> +            }
+>> +            len += block->used_length;
+>> +        }
+>> +        ram_addr_t idx = (len >> TARGET_PAGE_BITS) / DIRTY_MEMORY_BLOCK_SIZE;
+>> +        if (((len >> TARGET_PAGE_BITS) % DIRTY_MEMORY_BLOCK_SIZE) != 0) {
+>> +            idx++;
+>> +        }
+>> +        for (i = 0; i < idx; i++) {
+>> +            num = blocks->blocks[i];
+>> +            inst_dirty_pages += bitmap_weight(num, DIRTY_MEMORY_BLOCK_SIZE);
+>> +        }
+>> +        rcu_read_unlock();
+>> +
+>> +        s->inst_dirty_pages_rate = inst_dirty_pages * TARGET_PAGE_SIZE *
+>> +                    1000 / (dirty_pages_time_now - dirty_pages_time_prev);
+>> +    }
+>> +    dirty_pages_time_prev = dirty_pages_time_now;
+>>  }
+>
+>Regards,
+>Daniel
+>-- 
+>|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+>|: http://libvirt.org              -o-             http://virt-manager.org :|
+>|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+>
+>
