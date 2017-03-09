@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cm2YF-000899-AM
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 13:12:37 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cm2gQ-0002l2-4P
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 13:21:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cm2YD-000246-MY
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 13:12:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49126)
+	(envelope-from <ehabkost@redhat.com>) id 1cm2gO-0004p7-SZ
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 13:21:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35158)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cm2YD-00023P-G4
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 13:12:33 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cm2gO-0004ot-LB
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 13:21:00 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B0D1DC04B95B
-	for <qemu-devel@nongnu.org>; Thu,  9 Mar 2017 18:12:33 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D4BE176F4
+	for <qemu-devel@nongnu.org>; Thu,  9 Mar 2017 18:21:00 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu,  9 Mar 2017 15:12:12 -0300
-Message-Id: <20170309181212.18864-4-ehabkost@redhat.com>
-In-Reply-To: <20170309181212.18864-1-ehabkost@redhat.com>
-References: <20170309181212.18864-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.9 v3 3/3] i386: Change stepping of
- Haswell to non-blacklisted value
+Date: Thu,  9 Mar 2017 15:20:49 -0300
+Message-Id: <20170309182049.30040-3-ehabkost@redhat.com>
+In-Reply-To: <20170309182049.30040-1-ehabkost@redhat.com>
+References: <20170309182049.30040-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.9? v2 2/2] vl: Print warning when a
+ default config file is loaded
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +31,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: libvir-list@redhat.com
+Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-glibc blacklists TSX on Haswell CPUs with model==60 and
-stepping < 4. To make the Haswell CPU model more useful, make
-those guests actually use TSX by changing CPU stepping to 4.
+In case there were options set in the default config file, print
+a warning so users can update their scripts.
 
-References:
-* glibc commit 2702856bf45c82cf8e69f2064f5aa15c0ceb6359
-  https://sourceware.org/git/?p=glibc.git;a=commit;h=2702856bf45c82cf8e69f2064f5aa15c0ceb6359
+If somebody wants to keep the config file as-is, avoid the
+warning and use a command-line that will work in future QEMU
+versions, they can use:
 
+ $QEMU -nodefconfig -readconfig /etc/qemu/qemu.conf
+
+I was going to add an additional message suggesting it as a
+solution, but I thought it could make it more confusing. The
+solution can be documented in the QEMU 2.9 ChangeLog.
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/hw/i386/pc.h | 5 +++++
- target/i386/cpu.c    | 2 +-
- 2 files changed, 6 insertions(+), 1 deletion(-)
+ vl.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index ab303c7fee..f278b3ae89 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -389,6 +389,11 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-         .driver   = TYPE_X86_CPU,\
-         .property = "vmware-cpuid-freq",\
-         .value    = "off",\
-+    },\
-+    {\
-+        .driver   = "Haswell-" TYPE_X86_CPU,\
-+        .property = "stepping",\
-+        .value    = "1",\
-     },
+diff --git a/vl.c b/vl.c
+index 7f1644a2be..dae86fd4a8 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2939,6 +2939,12 @@ static int qemu_read_default_config_file(void)
+         return ret;
+     }
  
- #define PC_COMPAT_2_7 \
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 30ba1bd06b..7aa762245a 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1196,7 +1196,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
-         .vendor = CPUID_VENDOR_INTEL,
-         .family = 6,
-         .model = 60,
--        .stepping = 1,
-+        .stepping = 4,
-         .features[FEAT_1_EDX] =
-             CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
-             CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
++    if (ret > 0) {
++        loc_set_none();
++        error_report("Warning: Future QEMU versions won't load %s automatically",
++                     CONFIG_QEMU_CONFDIR "/qemu.conf");
++    }
++
+     return 0;
+ }
+ 
 -- 
 2.11.0.259.g40922b1
