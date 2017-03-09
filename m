@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33351)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cm2Gt-0004VK-LI
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 12:54:40 -0500
+	(envelope-from <git@kirschju.re>) id 1cm2SI-0006hx-P5
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 13:06:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cm2Gq-0004dZ-IP
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 12:54:39 -0500
-Received: from mo3.mail-out.ovh.net ([178.32.228.3]:48149)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cm2Gq-0004dA-BP
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 12:54:36 -0500
-Received: from player693.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 86DF4B4078
-	for <qemu-devel@nongnu.org>; Thu,  9 Mar 2017 18:54:34 +0100 (CET)
-Date: Thu, 9 Mar 2017 18:54:26 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170309185426.3506a17b@bahia>
-In-Reply-To: <1488852768-8935-3-git-send-email-sstabellini@kernel.org>
-References: <alpine.DEB.2.10.1703061807431.17906@sstabellini-ThinkPad-X260>
-	<1488852768-8935-1-git-send-email-sstabellini@kernel.org>
-	<1488852768-8935-3-git-send-email-sstabellini@kernel.org>
+	(envelope-from <git@kirschju.re>) id 1cm2SF-0000Bk-LK
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 13:06:26 -0500
+Received: from h2042504.stratoserver.net ([85.214.107.226]:34290)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <git@kirschju.re>) id 1cm2SF-0000BB-DX
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 13:06:23 -0500
+References: <20170308001637.9838-1-git@kirschju.re>
+	<20170308115909.GD10232@work-vm>
+	<20170308135751.GE4694@thinpad.lan.raisama.net>
+	<aa16a480-d3cd-e73c-00d4-947bc0b95deb@kirschju.re>
+	<20170308184426.GG4694@thinpad.lan.raisama.net>
+	<21562465-f6db-e36c-3578-27b43ea9928b@redhat.com>
+	<20170309172722.GV4694@thinpad.lan.raisama.net>
+From: Julian Kirsch <git@kirschju.re>
+Message-ID: <030d486f-b98e-03b8-dcfe-276d2b9b0000@kirschju.re>
+Date: Thu, 9 Mar 2017 19:05:47 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/Ort.bac0tQzNmav1Ziw2DyD";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH 3/8] xen/9pfs: introduce Xen 9pfs backend
+In-Reply-To: <20170309172722.GV4694@thinpad.lan.raisama.net>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] X86/HMP: Expose x86 model specific
+ registers via human monitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,161 +33,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <stefano@aporeto.com>, anthony.perard@citrix.com, jgross@suse.com, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
---Sig_/Ort.bac0tQzNmav1Ziw2DyD
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 09.03.2017 18:27, Eduardo Habkost wrote:
+> On Thu, Mar 09, 2017 at 05:32:08PM +0100, Paolo Bonzini wrote:
+>>
+>>
+>> On 08/03/2017 19:44, Eduardo Habkost wrote:
+>>>>> If it's only supported by x86, I would just move the
+>>>>> implementation to a x86-specific file, and add a stub for the
+>>>>> other architectures. See qmp_query_gic_capabilities() for an
+>>>>> example.
+>>>>>
+>>>>> Also, the command should be added to
+>>>>> qmp_unregister_commands_hack() so we don't even report it as
+>>>>> available on other architectures.
+>>>>>
+>>>> Awesome, thanks for your comments, I'll move the qmp commands to
+>>>> target/i386/monitor.c and unregister them for architectures other than I386. Do
+>>>> I have to explicitly take care of unregistering the hmp commands as well?
+>>> For HMP commands, it looks like you can simply use #ifdefs inside
+>>> hmp-commands.hx.
+>>
+>> Do we need the QMP commands?  There is no QMP version of info registers,
+>> for example.
+> 
+> Good point. If we really want to expose additional CPU info
+> through QMP, we already have qom_path on 'query-cpus', which
+> allows QOM properties to be queried directly from the CPU object.
+> 
 
-On Mon,  6 Mar 2017 18:12:43 -0800
-Stefano Stabellini <sstabellini@kernel.org> wrote:
+Good catch. Will look into it.
 
-> Introduce the Xen 9pfs backend: add struct XenDevOps to register as a
-> Xen backend and add struct V9fsTransport to register as v9fs transport.
->=20
-> All functions are empty stubs for now.
->=20
-> Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
-> CC: anthony.perard@citrix.com
-> CC: jgross@suse.com
-> CC: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
-> CC: Greg Kurz <groug@kaod.org>
-> ---
->  hw/9pfs/xen-9p-backend.c | 96 ++++++++++++++++++++++++++++++++++++++++++=
-++++++
->  1 file changed, 96 insertions(+)
->  create mode 100644 hw/9pfs/xen-9p-backend.c
->=20
-> diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
-> new file mode 100644
-> index 0000000..924fb64
-> --- /dev/null
-> +++ b/hw/9pfs/xen-9p-backend.c
-> @@ -0,0 +1,96 @@
-> +/*
-> + * Xen 9p backend
-> + *
-> + * Copyright Aporeto 2017
-> + *
-> + * Authors:
-> + *  Stefano Stabellini <stefano@aporeto.com>
-> + *
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +
-> +#include "hw/hw.h"
-> +#include "hw/9pfs/9p.h"
-> +#include "hw/xen/xen_backend.h"
-> +#include "xen_9pfs.h"
-> +#include "qemu/config-file.h"
-> +#include "fsdev/qemu-fsdev.h"
-> +
-> +struct Xen9pfsDev {
-> +    struct XenDevice xendev;  /* must be first */
-> +};
-
-According to HACKING, this should be:
-
-typedef struct Xen9pfsDev {
-    struct XenDevice xendev;  /* must be first */
-} Xen9pfsDev;
-
-and...
-
-> +
-> +static ssize_t xen_9pfs_pdu_vmarshal(V9fsPDU *pdu,
-> +                                     size_t offset,
-> +                                     const char *fmt,
-> +                                     va_list ap)
-> +{
-> +    return 0;
-> +}
-> +
-> +static ssize_t xen_9pfs_pdu_vunmarshal(V9fsPDU *pdu,
-> +                                       size_t offset,
-> +                                       const char *fmt,
-> +                                       va_list ap)
-> +{
-> +    return 0;
-> +}
-> +
-> +static void xen_9pfs_init_out_iov_from_pdu(V9fsPDU *pdu,
-> +                                           struct iovec **piov,
-> +                                           unsigned int *pniov)
-> +{
-> +}
-> +
-> +static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pdu,
-> +                                          struct iovec **piov,
-> +                                          unsigned int *pniov,
-> +                                          size_t size)
-> +{
-> +}
-> +
-> +static void xen_9pfs_push_and_notify(V9fsPDU *pdu)
-> +{
-> +}
-> +
-> +static const struct V9fsTransport xen_9p_transport =3D {
-> +    .pdu_vmarshal =3D xen_9pfs_pdu_vmarshal,
-> +    .pdu_vunmarshal =3D xen_9pfs_pdu_vunmarshal,
-> +    .init_in_iov_from_pdu =3D xen_9pfs_init_in_iov_from_pdu,
-> +    .init_out_iov_from_pdu =3D xen_9pfs_init_out_iov_from_pdu,
-> +    .push_and_notify =3D xen_9pfs_push_and_notify,
-> +};
-> +
-> +static int xen_9pfs_init(struct XenDevice *xendev)
-> +{
-> +    return 0;
-> +}
-> +
-> +static int xen_9pfs_free(struct XenDevice *xendev)
-> +{
-> +    return -1;
-> +}
-> +
-> +static int xen_9pfs_connect(struct XenDevice *xendev)
-> +{
-> +    return 0;
-> +}
-> +
-> +static void xen_9pfs_alloc(struct XenDevice *xendev)
-> +{
-> +}
-> +
-> +static void xen_9pfs_disconnect(struct XenDevice *xendev)
-> +{
-> +}
-> +
-> +struct XenDevOps xen_9pfs_ops =3D {
-> +    .size       =3D sizeof(struct Xen9pfsDev),
-
-... s/struct //
-
-> +    .flags      =3D DEVOPS_FLAG_NEED_GNTDEV,
-> +    .alloc      =3D xen_9pfs_alloc,
-> +    .init       =3D xen_9pfs_init,
-> +    .initialise    =3D xen_9pfs_connect,
-> +    .disconnect =3D xen_9pfs_disconnect,
-> +    .free       =3D xen_9pfs_free,
-> +};
-
-With the above comments addressed:
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
---Sig_/Ort.bac0tQzNmav1Ziw2DyD
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAljBltMACgkQAvw66wEB28KxDQCeJGYNO7iVhdXZo3nJODzjKv8Q
-Z5UAmwTRlPTAiJzqtn8QBKtfTBgJfTeA
-=pB1H
------END PGP SIGNATURE-----
-
---Sig_/Ort.bac0tQzNmav1Ziw2DyD--
+-Julian
