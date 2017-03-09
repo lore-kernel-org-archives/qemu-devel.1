@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <herbie.robinson@stratus.com>) id 1cm1Hm-0006eP-2B
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 11:51:34 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cm1dV-0007HI-EO
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 12:14:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <herbie.robinson@stratus.com>) id 1cm1Hh-0003vE-7Z
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 11:51:30 -0500
-Received: from us-smtp-delivery-131.mimecast.com ([63.128.21.131]:31542)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <herbie.robinson@stratus.com>)
-	id 1cm1Hh-0003tM-2Y
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 11:51:25 -0500
-From: herbierobinson <Herbie.Robinson@stratus.com>
-Date: Mon, 6 Mar 2017 20:30:49 -0500
-Message-Id: <20170309165120.960B540827A6@vostest4.mno.stratus.com>
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] SGABIOS: fix wrong video attrs for int 10h,
- ah==13h
+	(envelope-from <no-reply@patchew.org>) id 1cm1dP-0004Qh-Ru
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 12:13:57 -0500
+Resent-Message-Id: <E1cm1dP-0004Qh-Ru@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21359)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cm1dP-0004QL-Kv
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 12:13:51 -0500
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148907961278.30.11550666536793100732@6c512846dbc7>
+In-Reply-To: <1489079383-11162-1-git-send-email-ard.biesheuvel@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 9 Mar 2017 09:13:33 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/boot: take Linux/arm64 TEXT_OFFSET
+ header field into account
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,52 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+To: ard.biesheuvel@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-Fix Bug #1670509: wrong video attrs for int 10h, ah=3D=3D13h
-The subroutine set_cursor_position is trashing %bx.
-Unfortunately, %bl contains the video attribute for write_string.
-
-The fix saves %bx in the function prolog and restores it in
-the epilog.  Also, remove save and restore in set_current_cursor,
-because set_cursor_position does it.
-
-Signed-off-by: herbierobinson <Herbie.Robinson@stratus.com>
----
- sgabios.S | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/sgabios.S b/sgabios.S
-index 275d063..da5acc2 100644
---- a/sgabios.S
-+++ b/sgabios.S
-@@ -1728,6 +1728,7 @@ write_string_tail:
-=20
- set_cursor_position:
-   pushw %ax
-+  pushw %bx
-   pushw %ds
-   pushw $BDA_SEG
-   popw %ds                             /* ds =3D 0x40 */
-@@ -1738,6 +1739,7 @@ set_cursor_position:
-   movw %ax, %bx                        /* bx =3D cursor save offset */
-   movw %dx, (%bx)                      /* save new cursor value */
-   popw %ds
-+  popw %bx
-   popw %ax
-   ret
-=20
-@@ -1752,12 +1754,10 @@ set_cursor_position:
-=20
- set_current_cursor:
-   pushw %ds
--  pushw %bx
-   pushw $BDA_SEG
-   popw %ds                             /* ds =3D 0x40 */
-   movb BDA_ACTIVE_PAGE, %bh
-   call set_cursor_position
--  popw %bx
-   popw %ds
-   ret
-=20
---=20
-1.8.3.1
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIGh3L2FybS9ib290OiB0YWtlIExpbnV4L2FybTY0
+IFRFWFRfT0ZGU0VUIGhlYWRlciBmaWVsZCBpbnRvIGFjY291bnQKTWVzc2FnZS1pZDogMTQ4OTA3
+OTM4My0xMTE2Mi0xLWdpdC1zZW5kLWVtYWlsLWFyZC5iaWVzaGV1dmVsQGxpbmFyby5vcmcKCj09
+PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9
+JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBn
+aXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0
+PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJD
+aGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4u
+LiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2tw
+YXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8K
+ICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQg
+RU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
+NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRh
+Z10gICAgICAgICBwYXRjaGV3LzE0ODkwNzkzODMtMTExNjItMS1naXQtc2VuZC1lbWFpbC1hcmQu
+Ymllc2hldXZlbEBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMTQ4OTA3OTM4My0xMTE2Mi0xLWdpdC1z
+ZW5kLWVtYWlsLWFyZC5iaWVzaGV1dmVsQGxpbmFyby5vcmcKIC0gW3RhZyB1cGRhdGVdICAgICAg
+cGF0Y2hldy8yMDE3MDMwOTEzMjIxNi4yMzQ4Mi0xLWRnaWxiZXJ0QHJlZGhhdC5jb20gLT4gcGF0
+Y2hldy8yMDE3MDMwOTEzMjIxNi4yMzQ4Mi0xLWRnaWxiZXJ0QHJlZGhhdC5jb20KU3dpdGNoZWQg
+dG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo1NWFiMTRkIGh3L2FybS9ib290OiB0YWtlIExpbnV4L2Fy
+bTY0IFRFWFRfT0ZGU0VUIGhlYWRlciBmaWVsZCBpbnRvIGFjY291bnQKCj09PSBPVVRQVVQgQkVH
+SU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogaHcvYXJtL2Jvb3Q6IHRha2UgTGludXgvYXJtNjQg
+VEVYVF9PRkZTRVQgaGVhZGVyIGZpZWxkIGludG8gYWNjb3VudC4uLgpFUlJPUjogYnJhY2VzIHt9
+IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiM1NTogRklMRTog
+aHcvYXJtL2Jvb3QuYzo3OTE6CisgICAgICAgIGlmIChmZCA8IDApClsuLi5dCgpFUlJPUjogYnJh
+Y2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiM2Mjog
+RklMRTogaHcvYXJtL2Jvb3QuYzo3OTg6CisgICAgICAgIGlmIChieXRlcyA8IEFSTTY0X0lNQUdF
+X0hFQURFUl9TSVpFKQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBh
+bGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNjc6IEZJTEU6IGh3L2FybS9ib290LmM6ODAzOgor
+ICAgIGlmIChtZW1jbXAoYnVmZmVyICsgQVJNNjRfTUFHSUNfT0ZGU0VULCAiQVJNXHg2NCIsIDQp
+ICE9IDApClsuLi5dCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1z
+IG9mIHRoaXMgc3RhdGVtZW50CiM3NTogRklMRTogaHcvYXJtL2Jvb3QuYzo4MTE6CisgICAgaWYg
+KGhlYWRlcnZhbCA9PSAwKQpbLi4uXQoKdG90YWw6IDQgZXJyb3JzLCAwIHdhcm5pbmdzLCA3NCBs
+aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
+dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
+bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0g
+T1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVt
+YWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9y
+Zy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3Rz
+Lm9yZw==
