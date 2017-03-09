@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60997)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1clxOz-0004tt-5A
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 07:42:42 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cly1Q-0002dD-Rv
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 08:22:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1clxOw-0008B0-17
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 07:42:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44694)
+	(envelope-from <dgilbert@redhat.com>) id 1cly1M-0003ec-05
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 08:22:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37594)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1clxOv-0008At-RA
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 07:42:37 -0500
-References: <7005a482-2372-0aaf-eb8b-60cd0a16b002@genode-labs.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c088c706-392f-e978-8edd-9db85a265681@redhat.com>
-Date: Thu, 9 Mar 2017 13:42:34 +0100
-MIME-Version: 1.0
-In-Reply-To: <7005a482-2372-0aaf-eb8b-60cd0a16b002@genode-labs.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BPATCH=C2=B1_SVM_I/O_permission_bitmap_?=
- =?utf-8?q?for_user-level_=28ring-3=29_code_ignored?=
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cly1L-0003eR-Q8
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 08:22:19 -0500
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Thu,  9 Mar 2017 13:22:14 +0000
+Message-Id: <20170309132216.23482-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/2] migration/postcopy: Disable shared RAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +21,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Boettcher <alexander.boettcher@genode-labs.com>, qemu-devel@nongnu.org
-Cc: rth@twiddle.net, ehabkost@redhat.com
+To: qemu-devel@nongnu.org, quintela@redhat.com
+Cc: pbonzini@redhat.com, lvivier@redhat.com, pasic@linux.vnet.ibm.com
 
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
+Disable postcopy migration when there's shared RAM, we're
+still figuring out the details.  Without this patch
+there's a chance it might appear to succeed in some
+cases.
 
-On 05/03/2017 19:21, Alexander Boettcher wrote:
-> the SVM I/O permission bitmap for user-level (ring-3) VM code running in
-> SVM seems to be ignored and causes a GP-fault. (Actual the IO permission
-> was granted by the kernel via the TSS I/O port permission bitmap).
-> 
-> After some debugging the GP code originates from target/i386/translate.c
-> gen_check_io() within the if(s->pe && (s->cpl > s->iopl || s->vm86))
-> condition. However, the actual SVM IO permission bitmap is checked after
-> that condition, which succeeds and would permit the access.
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
->From your message it's not clear what is going wrong.  The code as is
-written now matches the AMD manual: "Exceptions related to virtual x86
-mode, IOPL, or the TSS-bitmap are checked before the SVM intercept
-check. All other exceptions are checked after the SVM intercept check".
+v2
+  Make sure user-only build works (Halil)
 
-Please explain better what is going on:
+Dr. David Alan Gilbert (2):
+  RAMBlocks: qemu_ram_is_shared
+  postcopy: Check for shared memory
 
-1) does the TSS I/O permission bitmap grant permission to access the
-port (the answer seems to be yes here)?
+ exec.c                    |  5 +++++
+ include/exec/cpu-common.h |  1 +
+ migration/postcopy-ram.c  | 18 ++++++++++++++++++
+ 3 files changed, 24 insertions(+)
 
-2) does the SVM I/O permission bitmap grant permission to access the port?
-
-3) you get a #GP, do you expect the access to be trapped to the
-hypervisor or not?
-
-4) what is the exact instruction that the user-level code is executing?
-
-Paolo
+-- 
+2.9.3
