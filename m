@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48097)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cloJ8-0001v7-ML
+	(envelope-from <dgibson@ozlabs.org>) id 1cloJ8-0001v6-E6
 	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 22:00:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cloJ4-0003yL-Jb
+	(envelope-from <dgibson@ozlabs.org>) id 1cloJ4-0003yW-Jr
 	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 22:00:02 -0500
-Date: Thu, 9 Mar 2017 12:29:10 +1100
+Received: from ozlabs.org ([103.22.144.67]:40135)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1cloJ4-0003wt-6N
+	for qemu-devel@nongnu.org; Wed, 08 Mar 2017 21:59:58 -0500
+Date: Thu, 9 Mar 2017 12:31:50 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170309012910.GJ19967@umbus.fritz.box>
-References: <1485868319-16151-1-git-send-email-thuth@redhat.com>
-	<1485868319-16151-3-git-send-email-thuth@redhat.com>
-	<20170303145807.GC11509@thinpad.lan.raisama.net>
-	<20170305230627.GA12030@umbus.fritz.box>
-	<20170306114752.GS2778@thinpad.lan.raisama.net>
-	<20170307033105.GB19967@umbus.fritz.box>
-	<20170307120237.GF2778@thinpad.lan.raisama.net>
-	<20170308023345.GH19967@umbus.fritz.box>
-	<20170308120850.GA4694@thinpad.lan.raisama.net>
+Message-ID: <20170309013150.GK19967@umbus.fritz.box>
+References: <20170308124955.35623-1-aik@ozlabs.ru>
+	<CAFEAcA_pq6cUVVqzg0in-QTKngsf2cSpzpaGnP=gH5X2GnzOQQ@mail.gmail.com>
+	<4c8ab05b-9e6d-10db-6480-e6b58d3ca390@ozlabs.ru>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="7AwgMNpd3VkAVXjS"
+	protocol="application/pgp-signature"; boundary="KaGhPsiNaI6/sRd6"
 Content-Disposition: inline
-In-Reply-To: <20170308120850.GA4694@thinpad.lan.raisama.net>
-Subject: Re: [Qemu-devel] [PATCH 2/2] vl: Print CPU help after we've
- registered the CPU accelerators
+In-Reply-To: <4c8ab05b-9e6d-10db-6480-e6b58d3ca390@ozlabs.ru>
+Subject: Re: [Qemu-devel] [RFC PATCH qemu] dtc: Allow compiling with old gcc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,94 +29,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
 
 
---7AwgMNpd3VkAVXjS
+--KaGhPsiNaI6/sRd6
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 08, 2017 at 09:08:50AM -0300, Eduardo Habkost wrote:
-> On Wed, Mar 08, 2017 at 01:33:45PM +1100, David Gibson wrote:
-> > On Tue, Mar 07, 2017 at 09:02:37AM -0300, Eduardo Habkost wrote:
-> > > On Tue, Mar 07, 2017 at 02:31:05PM +1100, David Gibson wrote:
-> > > > On Mon, Mar 06, 2017 at 08:47:52AM -0300, Eduardo Habkost wrote:
-> > > > > On Mon, Mar 06, 2017 at 10:06:27AM +1100, David Gibson wrote:
-> > > > > > On Fri, Mar 03, 2017 at 11:58:07AM -0300, Eduardo Habkost wrote:
-> > > > > > > On Tue, Jan 31, 2017 at 02:11:59PM +0100, Thomas Huth wrote:
-> > > > > > > > When running with KVM on POWER, we register some CPU types =
-during
-> > > > > > > > the initialization function of the ppc64 KVM code (which un=
-fortunately
-> > > > > > > > also can not be done via a type_init() like it is done on x=
-86).
-> > > > > > >=20
-> > > > > > > Can you elaborate why it can't be done via type_init()? If the
-> > > > > > > QOM type hierarchy depends on any runtime data unavailable at
-> > > > > > > type_init(), we should fix that.
-> > > > > >=20
-> > > > > > Hmm.. how?  This is specifically for the special 'host' cpu in =
-the
-> > > > > > case of KVM.  We can't use a static configuration here, because=
- there
-> > > > > > are things on the host that could limit what features of the CP=
-U are
-> > > > > > available for guest use.  So, we need KVM to be initialized in =
-order
-> > > > > > to query that information.
-> > > > >=20
-> > > > > There's nothing saying you need to query that information before
-> > > > > type_register() or during class_init, does it? The behavior of
-> > > > > TYPE_HOST_POWERPC_CPU after object_new() is called can be as
-> > > > > dynamic as you want it to, but the QOM type hierarchy is supposed
-> > > > > to be static.
-> > > >=20
-> > > > So, the thing is we have some properties that logically belong in t=
-he
-> > > > CPU class, rather than instance, and that's correct for all TCG CPU=
-s,
-> > > > but not for the KVM host CPU.  It seems nasty to have to force all
-> > > > those things into the instance just because of KVM.
-> > >=20
-> > > You can still register any class properties you want, without
-> > > querying KVM first. Are there properties that you are able to
-> > > register only after querying KVM? Is the set of class properties
-> > > on TYPE_HOST_POWERPC_CPU different depending on the host
-> > > capabilities?
+On Thu, Mar 09, 2017 at 11:52:17AM +1100, Alexey Kardashevskiy wrote:
+> On 09/03/17 01:21, Peter Maydell wrote:
+> > On 8 March 2017 at 13:49, Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+> >> After 6e85fce0225f "dtc: Update requirement to v1.4.2" QEMU stopped
+> >> compiling in CentOS7:
+> >>
+> >> In file included from /home/aik/p/qemu/dtc/libfdt/libfdt.h:54:0,
+> >>                  from /home/aik/p/qemu/device_tree.c:30:
+> >> /home/aik/p/qemu/dtc/libfdt/libfdt_env.h:64:0: error: "__bitwise" rede=
+fined [-Werror]
+> >>  #define __bitwise
+> >>  ^
+> >> In file included from /usr/include/asm/ptrace.h:27:0,
+> >>                  from /usr/include/asm/sigcontext.h:11,
+> >>                  from /usr/include/bits/sigcontext.h:27,
+> >>                  from /usr/include/signal.h:340,
+> >>                  from /home/aik/p/qemu/include/qemu/osdep.h:86,
+> >>                  from /home/aik/p/qemu/device_tree.c:14:
+> >> /usr/include/linux/types.h:21:0: note: this is the location of the pre=
+vious definition
+> >>  #define __bitwise __bitwise__
+> >>  ^
+> >> cc1: all warnings being treated as errors
+> >> make: *** [device_tree.o] Error 1
+> >> make: *** Waiting for unfinished jobs....
+> >>
+> >> The reason is that CentOS7 comes with libfdt 1.4.0 so QEMU tries using
+> >> the internal one which does not compile as CentOS7 comes with gcc v4.8=
+=2E5
+> >> which reports warnings which it would not if the OS's libfdt was used
+> >> (libfdt_env.h has not changed between 1.4.0 and 1.4.2).
+> >>
+> >> gcc 6.2.0 from Ubuntu v16.10 handles this fine.
+> >>
+> >> This replaces -I with -isystem to suppress the warning (which turns
+> >> to an error because of -Werror).
 > >=20
-> > Sorry, I used "properties" sloppily, not meaning QOM properties.
-> >=20
-> > There are several fields in the CPU class which describe CPU
-> > capabilities - bitmasks indicating which instructions are available,
-> > and L1 cacheline sizes.  There are some other things that are in the
-> > CPU instance at the moment, but arguably would belong better in the
-> > class: available page sizes and PTE encodings, for example.
-> >=20
-> > At the real hardware level these things are dependent only the model
-> > of CPU - hence belonging in cpu class, not instance.  But, because of
-> > the way virtualization works on POWER, some of the features may not be
-> > available to guests, due to configuration of the hypervisor.  So for
-> > the "host" cpu we need to query KVM to see which CPU features are
-> > actually available.
-> >=20
+> > Thanks for the bug report. I think it would be cleaner to fix this
 >=20
-> I see. If there is data that is available only at PowerPCCPUClass
-> and you don't want to duplicate it at PowerPCCPU, we can have a
-> solution for that: instead of late-registration of the class, we
-> could leave those fields to be populated after KVM is
-> initialized.
+> Agree.
+>=20
+> > by fixing the problem upstream in libfdt and then moving our
+> > submodule forward to the fixed version. (libfdt should not be
+> > defining __ prefixed symbols as these are reserved for the
+> > system.)
 
-Ok, that sounds workable.
+Yes.  I've now fixed this in upstream libfdt, at Paolo's suggestion.
+Unfortunately, it came just after the 1.4.3 release.  I was just leery
+about making a new release and qemu pull so soon after the last one.
+Should I do that anyway?
 
-> Anyway, I don't think this is urgent: the code already treats
-> "host" as an exception in ppc_cpu_list(), and (AFAICS) the
-> original problem this patch addresses is related to the
-> inaccurate alias information only (which is not a consequence of
-> the late type_register() call).
+> Also agree, regardless my proposal, libfdt should be fixed. However v2.9
+> won't compile on CentOS7 (and I suppose on RHEL7) which is a bit annoying.
+> And having "-isystem" makes some sense as these headers are normally syst=
+em
+> ones and I'd think they should be treated the same way (i.e. path should =
+be
+> included via -isystem vs. -I).
 
-I agree.
+I'm not really clear on why -isystem fixes this problem anyway.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -127,25 +105,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---7AwgMNpd3VkAVXjS
+--KaGhPsiNaI6/sRd6
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYwK/kAAoJEGw4ysog2bOSo1gP/2iM39PfIsM+XcX4/7wWhxoY
-XJWtrHfsBZ8Mdmsc/B41mydDxGcdZC/8aKcmGDFfgH7Ay7tlzg4DDJFfJMgUzMXX
-Ge2mOQ1hezoIy8s9XXhwkRsSTBqjSo2x9c33KI2Jd1NUoT9sKo18Nl3HavDviaUv
-8R9BtBojSc7qNZEgCVbtUtYeLTv0mQ5eYMON5yW9arfNJBAlL5htuk+eyXx+zObo
-Uf01Rxdxj8aJShm3vev9rQCb9sgJt/5GsJg4nuFIoFCS0+3jD3/cEoqgMqY0IVdG
-A85Gka+ec1fvn12853M6fMxyRK9F8Jj4LdFpmRQA3dZPinGUH9WcTii0lY/vmDVy
-74hruFQsARAhTXz6obV39n+RM4ns2c55jCVaXAsCc61OjVA6ikk5nPRLPjMpgV1U
-1XHRJuOnb7U1cQ/3R6l4Y1pb88NYURLjqAmCoC/ccwmXnhLjUGeIRkDr7zTsLH+t
-3iFbSxTTxa8HBY0F5mw++ZvFC6uk9D8U45y51rtVAQbct8NIHV+5ngJCIJLgR5Ic
-yJ114XcYn1q7dLo/P/FPqcHECFHm3aE040EJ1owwzp9yvzVuvNpiYFUreXhU1dNT
-TIE9+qQ39ChkrPYfHstpevRwNvlpX8UPf9x6QvAevWw74Qs+jr/QOlGEXpAEGsbD
-kIaq7Csvwv5wb5/oK+vy
-=aDTZ
+iQIcBAEBCAAGBQJYwLCGAAoJEGw4ysog2bOSf7gP/A5x2/XOaIpYV4LlE0Ke4MBA
+voSW2a55oVa9xP4FlJ3BFX7sTp4SEcAawLVemHYBoopVv4hE2tyzPNWpJz6Eur8L
+HulXpwoTBmrNHR093PDWYzr6NEfdU+mnRAn3GQNy5i5dkkvogngS6QYtLEYivfI7
+Dxmu/w1l9F3PXCS+tYsoCBB6xCZVwzcikdY130Q1LcbFIp2OiJYFri5eyidCYmLP
+957Jl/D13RnbXwZzq7w3Sy6S+EUctU2/zHywxXgS9SO1zwB3hpfxcZyJ0KLuMrGL
+wsrRMZQ6kN5QpMpw6nsmE87DtR/TGeN1ifDToN07HowNRScUh3kOGhCLQG6EDdPa
+Fdlhr5vYqDfQbem/FHLIR00ZXj+UJs/kEEtn7JYhvmxhhqOPTDp2eZcfTz3YCuxH
+KuX8y0CZ8knoIhDyqqwmO+aIl5hfTVXLptnavP0XMM3u/7qI+Ns/EjLr3Kx3J30Q
+e1EQsO6wA18X0n7faJxpeag/y99Ux0nByi5cjK6WTXD3Dz696ckO7nRM7UXmWQ8C
+hWv14N8m6KsQQveDhyFotgPHxwFwLBcx2ViEGwF0Y7OMjcaKCWknM0BG3pOhNBpN
+6u1GpdncFEfCLmxK2RHC8MEZt2WBnZ5aifKhFlRnpsaQPK6s+wwJ2l3DOdR7leMN
+mCtuDiLBEJ1bOeyqoeMF
+=0WUD
 -----END PGP SIGNATURE-----
 
---7AwgMNpd3VkAVXjS--
+--KaGhPsiNaI6/sRd6--
