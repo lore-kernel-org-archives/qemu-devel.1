@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49390)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1clxEv-0001XI-KB
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 07:32:18 -0500
+	(envelope-from <armbru@redhat.com>) id 1clxGA-00024q-Dg
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 07:33:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1clxEr-0005dR-MN
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 07:32:17 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:34810)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1clxEr-0005bD-G0
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 07:32:13 -0500
-Received: by mail-wm0-x243.google.com with SMTP id u132so10679463wmg.1
-	for <qemu-devel@nongnu.org>; Thu, 09 Mar 2017 04:32:11 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <1487742565-2513-1-git-send-email-peterx@redhat.com>
-	<20170222103047.2c1b63f2@t450s.home>
-	<20170223030647.GB4015@pxdev.xzpeter.org>
-	<7cd743a2-b4c2-1d96-892e-c3a7db07da16@redhat.com>
-	<20170223081616.GI4015@pxdev.xzpeter.org>
-	<52e4d43f-c51f-0ac5-7409-f3087f61f44e@redhat.com>
-	<20170223083533.17899e2f@t450s.home>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d7bd30e6-c166-24c8-3cf2-31bb0d4f6525@redhat.com>
-Date: Thu, 9 Mar 2017 13:31:45 +0100
+	(envelope-from <armbru@redhat.com>) id 1clxG6-0005so-Ck
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 07:33:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57388)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1clxG6-0005sf-4s
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 07:33:30 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <3d1c16a1-ec05-0367-e569-64a63b34f2e3@redhat.com>
+	<CAFEAcA9cM=LjBRzrZdfsOss2xm4bKC6QM7gyg3HD4z-yeumTyw@mail.gmail.com>
+	<940ff281-82cd-18cf-160e-c5234f65db18@redhat.com>
+	<20170308112441.GI7470@redhat.com>
+Date: Thu, 09 Mar 2017 13:33:26 +0100
+In-Reply-To: <20170308112441.GI7470@redhat.com> (Daniel P. Berrange's message
+	of "Wed, 8 Mar 2017 11:24:41 +0000")
+Message-ID: <87bmtavdd5.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170223083533.17899e2f@t450s.home>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] intel_iommu: make sure its init before PCI
- dev
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] What's the next QEMU version after 2.9 ? (or: when
+ is a good point in time to get rid of old interfaces)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,31 +30,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
-Cc: yi.l.liu@intel.com, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
+"Daniel P. Berrange" <berrange@redhat.com> writes:
 
+> On Wed, Mar 08, 2017 at 12:22:24PM +0100, Thomas Huth wrote:
+>> On 08.03.2017 11:03, Peter Maydell wrote:
+>> > On 8 March 2017 at 09:26, Thomas Huth <thuth@redhat.com> wrote:
+>> >> But anyway, the more important thing that keeps me concerned is: Someone
+>> >>  once told me that we should get rid of old parameters and interfaces
+>> >> (like HMP commands) primarily only when we're changing to a new major
+>> >> version number. As you all know, QEMU has a lot of legacy options, which
+>> >> are likely rather confusing than helpful for the new users nowadays,
+>> >> e.g. things like the "-net channel" option (which is fortunately even
+>> >> hardly documented), but maybe also even the whole vlan/hub concept in
+>> >> the net code, or legacy parameters like "-usbdevice". If we switch to
+>> >> version 3.0, could we agree to remove at least some of them?
+>> > 
+>> > I think if we are going to deprecate and remove options we need
+>> > a clear transition plan for doing so, which means at least one
+>> > release where options are "still works, but warn that they
+>> > are going away with pointer to documentation or similar info
+>> > about their replacement syntax", before actually dropping them.
+>> 
+>> Yes, that's certainly a good idea. But as Daniel suggested in his mail,
+>> I think we should also have the rule that the option should be marked as
+>> deprecated in multiple releases first - so that the users have a chance
+>> to speak up before something gets really removed (otherwise the option
+>> could be removed right on the first day after the initial release with
+>> the deprecation message, so there is no time for the user to notice this
+>> and complain). Not sure whether we need three releases, as Daniel
+>> suggested, though, but if that's common sense, that's fine for me, too.
+>
+> FYI, I didn't put any thought into my 3 releases / 12 months numbers. I
+> just arbitrarily picked them out of the hat, so don't consider it my
+> endorsement of that particular length of time :-) I think 2 is the minimum
+> number of releases we should deprecate for, beyond that, I'm open minded
 
-On 23/02/2017 16:35, Alex Williamson wrote:
-> It's the architecture of vfio, the user only gets access to the device
-> when the container has iommu protection, therefore vfio needs to look
-> at the device address space to determine if it can share a container
-> with other devices.  Without an iommu all devices share the system
-> address space and use the same container.  With an iommu, each device
-> is in a separate address space and each gets its own container.
-> Without a container, the user doesn't get access to the device.
-> Deferring the address space to machine done would essentially defer the
-> entire vfio device initialization or else we'd need to close the
-> device and re-open and initialize it through a new container at that
-> time.  Thanks,
-
-If you used only one container you could still provide a working VFIO
-configuration to the guest, even if the guest had an IOMMU.  All devices
-ending up in one IOMMU domain is not particularly useful, but it would work.
-
-If VFIO had an iommu property, to be used like "-device
-intel_iommu,id=iommu0 -device vfio-pci,iommu=iommu0", It could tell VFIO
-to use separate containers and also ensure proper ordering of command
-line arguments.
-
-Paolo
+I don't think a hard rule for the grace period makes sense.  It really
+depends.  A guideline like "normally 12 months" is of course fine.
