@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36040)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <git@kirschju.re>) id 1cm2SI-0006hx-P5
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 13:06:28 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cm2Y4-00084M-0s
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 13:12:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <git@kirschju.re>) id 1cm2SF-0000Bk-LK
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 13:06:26 -0500
-Received: from h2042504.stratoserver.net ([85.214.107.226]:34290)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <git@kirschju.re>) id 1cm2SF-0000BB-DX
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 13:06:23 -0500
-References: <20170308001637.9838-1-git@kirschju.re>
-	<20170308115909.GD10232@work-vm>
-	<20170308135751.GE4694@thinpad.lan.raisama.net>
-	<aa16a480-d3cd-e73c-00d4-947bc0b95deb@kirschju.re>
-	<20170308184426.GG4694@thinpad.lan.raisama.net>
-	<21562465-f6db-e36c-3578-27b43ea9928b@redhat.com>
-	<20170309172722.GV4694@thinpad.lan.raisama.net>
-From: Julian Kirsch <git@kirschju.re>
-Message-ID: <030d486f-b98e-03b8-dcfe-276d2b9b0000@kirschju.re>
-Date: Thu, 9 Mar 2017 19:05:47 +0100
-MIME-Version: 1.0
-In-Reply-To: <20170309172722.GV4694@thinpad.lan.raisama.net>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] X86/HMP: Expose x86 model specific
- registers via human monitor
+	(envelope-from <ehabkost@redhat.com>) id 1cm2Y0-0001su-T7
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 13:12:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35782)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cm2Y0-0001sP-Ko
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 13:12:20 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id ADA60C05AA70
+	for <qemu-devel@nongnu.org>; Thu,  9 Mar 2017 18:12:20 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Thu,  9 Mar 2017 15:12:09 -0300
+Message-Id: <20170309181212.18864-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.9 v3 0/3] Use non-blacklisted
+ family/model/stepping for Haswell CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,37 +28,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: libvir-list@redhat.com, dgilbert@redhat.com, fweimer@redhat.com, carlos@redhat.com, triegel@redhat.com, berrange@redhat.com, jdenemar@redhat.com, pbonzini@redhat.com
 
-On 09.03.2017 18:27, Eduardo Habkost wrote:
-> On Thu, Mar 09, 2017 at 05:32:08PM +0100, Paolo Bonzini wrote:
->>
->>
->> On 08/03/2017 19:44, Eduardo Habkost wrote:
->>>>> If it's only supported by x86, I would just move the
->>>>> implementation to a x86-specific file, and add a stub for the
->>>>> other architectures. See qmp_query_gic_capabilities() for an
->>>>> example.
->>>>>
->>>>> Also, the command should be added to
->>>>> qmp_unregister_commands_hack() so we don't even report it as
->>>>> available on other architectures.
->>>>>
->>>> Awesome, thanks for your comments, I'll move the qmp commands to
->>>> target/i386/monitor.c and unregister them for architectures other than I386. Do
->>>> I have to explicitly take care of unregistering the hmp commands as well?
->>> For HMP commands, it looks like you can simply use #ifdefs inside
->>> hmp-commands.hx.
->>
->> Do we need the QMP commands?  There is no QMP version of info registers,
->> for example.
-> 
-> Good point. If we really want to expose additional CPU info
-> through QMP, we already have qom_path on 'query-cpus', which
-> allows QOM properties to be queried directly from the CPU object.
-> 
+I plan to merge this bug fix into 2.9.
 
-Good catch. Will look into it.
+Changes v2 -> v3:
+* Rebase to latest master
+* Don't touch max_x86_cpu_initfn() to reduce risk post
+  hard freeze
 
--Julian
+Changes v1 -> v2:
+* Coding style fixes
+* Make series simpler:
+  * Don't use trick: char vendor[static (CPUID_VENDOR_SZ + 1)]
+    because it confuses checkpatch.pl
+  * Removed patch "Add explicit array size to x86_cpu_vendor_words2str()"
+* Rebased on top of my x86-next branch:
+  https://github.com/ehabkost/qemu x86-next
+
+Git branch for testing:
+  https://github.com/ehabkost/qemu-hacks work/x86-rtm-blacklist
+
+Diff from v1:
+
+  diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+  index cd94726e43..647435a1d9 100644
+  --- a/target/i386/cpu.h
+  +++ b/target/i386/cpu.h
+  @@ -1431,7 +1431,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+   void cpu_clear_apic_feature(CPUX86State *env);
+   void host_cpuid(uint32_t function, uint32_t count,
+                   uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx);
+  -void host_vendor_fms(char vendor[static (CPUID_VENDOR_SZ + 1)], int *family, int *model, int *stepping);
+  +void host_vendor_fms(char *vendor, int *family, int *model, int *stepping);
+
+   /* helper.c */
+   int x86_cpu_handle_mmu_fault(CPUState *cpu, vaddr addr,
+  diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+  index 25c6c5e115..eab1ad7935 100644
+  --- a/target/i386/cpu.c
+  +++ b/target/i386/cpu.c
+  @@ -682,7 +682,7 @@ void host_cpuid(uint32_t function, uint32_t count,
+           *edx = vec[3];
+   }
+
+  -void host_vendor_fms(char vendor[static (CPUID_VENDOR_SZ + 1)], int *family, int *model, int *stepping)
+  +void host_vendor_fms(char *vendor, int *family, int *model, int *stepping)
+   {
+       uint32_t eax, ebx, ecx, edx;
+
+  @@ -1570,7 +1570,8 @@ static void host_x86_cpu_class_init(ObjectClass *oc, void *data)
+       xcc->kvm_required = true;
+       xcc->ordering = 9;
+
+  -    host_vendor_fms(host_cpudef.vendor, &host_cpudef.family, &host_cpudef.model, &host_cpudef.stepping);
+  +    host_vendor_fms(host_cpudef.vendor, &host_cpudef.family,
+  +                    &host_cpudef.model, &host_cpudef.stepping);
+
+       cpu_x86_fill_model_id(host_cpudef.model_id);
+
+---
+
+A recent glibc commit[1] added a blacklist to ensure it won't use
+TSX on hosts that are known to have a broken TSX implementation.
+
+Our existing Haswell CPU model has a blacklisted
+family/model/stepping combination, so it has to be updated to
+make sure guests will really use TSX. This is done by patch 5/5.
+
+However, to do this safely we need to ensure the host CPU is not
+a blacklisted one, so we won't mislead guests by exposing
+known-to-be-good FMS values on a known-to-be-broken host. This is
+done by patch 3/5.
+
+[1] https://sourceware.org/git/?p=glibc.git;a=commit;h=2702856bf45c82cf8e69f2064f5aa15c0ceb6359
+
+---
+Cc: dgilbert@redhat.com
+Cc: fweimer@redhat.com
+Cc: carlos@redhat.com
+Cc: triegel@redhat.com
+Cc: berrange@redhat.com
+Cc: jdenemar@redhat.com
+Cc: pbonzini@redhat.com
+
+Eduardo Habkost (3):
+  i386: host_vendor_fms() helper function
+  i386/kvm: Blacklist TSX on known broken hosts
+  i386: Change stepping of Haswell to non-blacklisted value
+
+ include/hw/i386/pc.h |  5 +++++
+ target/i386/cpu.h    |  1 +
+ target/i386/cpu.c    | 21 ++++++++++++++++++++-
+ target/i386/kvm.c    | 17 +++++++++++++++++
+ 4 files changed, 43 insertions(+), 1 deletion(-)
+
+-- 
+2.11.0.259.g40922b1
