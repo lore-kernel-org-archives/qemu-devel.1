@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alexander.boettcher@genode-labs.com>)
-	id 1cm3s4-0002bT-IU
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 14:37:10 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cm3un-0003F0-OY
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 14:39:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alexander.boettcher@genode-labs.com>)
-	id 1cm3s1-0002xO-Ey
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 14:37:08 -0500
-Received: from mail.genode-labs.com ([88.198.56.169]:47952)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alexander.boettcher@genode-labs.com>)
-	id 1cm3s1-0002wz-7N
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 14:37:05 -0500
-References: <7005a482-2372-0aaf-eb8b-60cd0a16b002@genode-labs.com>
-	<c088c706-392f-e978-8edd-9db85a265681@redhat.com>
-From: Alexander Boettcher <alexander.boettcher@genode-labs.com>
-Message-ID: <51941cb9-ac7a-bbe2-0185-b8c0ad587b51@genode-labs.com>
-Date: Thu, 9 Mar 2017 20:36:57 +0100
+	(envelope-from <ehabkost@redhat.com>) id 1cm3uk-0003yc-JM
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 14:39:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60922)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cm3uk-0003y9-D3
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 14:39:54 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 36CC780F95
+	for <qemu-devel@nongnu.org>; Thu,  9 Mar 2017 19:39:54 +0000 (UTC)
+Date: Thu, 9 Mar 2017 16:39:49 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170309193949.GY4694@thinpad.lan.raisama.net>
+References: <20170309193117.24885-1-ehabkost@redhat.com>
+	<20170309193415.GN2480@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <c088c706-392f-e978-8edd-9db85a265681@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BPATCH=C2=B1_SVM_I/O_permission_bitmap_?=
- =?utf-8?q?for_user-level_=28ring-3=29_code_ignored?=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170309193415.GN2480@work-vm>
+Subject: Re: [Qemu-devel] [PATCH for-2.10] kvm: Print MSR information if
+ KVM_SET_MSRS failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,38 +34,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: rth@twiddle.net, ehabkost@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-On 09.03.2017 13:42, Paolo Bonzini wrote:
-> On 05/03/2017 19:21, Alexander Boettcher wrote:
->> the SVM I/O permission bitmap for user-level (ring-3) VM code running =
-in
->> SVM seems to be ignored and causes a GP-fault. (Actual the IO permissi=
-on
->> was granted by the kernel via the TSS I/O port permission bitmap).
->>
->> After some debugging the GP code originates from target/i386/translate=
-.c
->> gen_check_io() within the if(s->pe && (s->cpl > s->iopl || s->vm86))
->> condition. However, the actual SVM IO permission bitmap is checked aft=
-er
->> that condition, which succeeds and would permit the access.
+On Thu, Mar 09, 2017 at 07:34:15PM +0000, Dr. David Alan Gilbert wrote:
+> * Eduardo Habkost (ehabkost@redhat.com) wrote:
+> > When a KVM_SET_MSRS ioctl() fails, it is difficult to find out
+> > which MSR caused the problem. Print an error message for
+> > debugging, before we trigger the (ret == cpu->kvm_msr_buf->nmsrs)
+> > assert.
+> > 
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> >  target/i386/kvm.c | 6 ++++++
+> >  1 file changed, 6 insertions(+)
+> > 
+> > diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> > index 887a81268f..3a874e4717 100644
+> > --- a/target/i386/kvm.c
+> > +++ b/target/i386/kvm.c
+> > @@ -1807,6 +1807,12 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+> >          return ret;
+> >      }
+> >  
+> > +    if (ret < cpu->kvm_msr_buf->nmsrs) {
+> > +        struct kvm_msr_entry *e = &cpu->kvm_msr_buf->entries[ret];
+> > +        error_report("error: failed to set MSR 0x%" PRIx32 " to 0x%" PRIx64,
+> > +                     (uint32_t)e->index, (uint64_t)e->data);
+> > +    }
+> > +
+> 
+> Yes, I'd thought about doing the same;
+
+Actually, I forgot to add:
+
+Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+as it was your idea. :)
 
 
-> The code as is
-> written now matches the AMD manual: "Exceptions related to virtual x86
-> mode, IOPL, or the TSS-bitmap are checked before the SVM intercept
-> check. All other exceptions are checked after the SVM intercept check".
+>                                        had you considered adding it on the get
+> as well?
 
-I see. I will re-check, maybe we're doing things wrong in the VMM.
+I don't remember hitting the kvm_get_msrs() assert(), so I didn't
+consider doing it.
 
-Thanks.
---=20
-Alexander Boettcher
-Genode Labs
+But it looks useful, I will submit a separate patch.
 
-http://www.genode-labs.com - http://www.genode.org
+> 
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Genode Labs GmbH - Amtsgericht Dresden - HRB 28424 - Sitz Dresden
-Gesch=C3=A4ftsf=C3=BChrer: Dr.-Ing. Norman Feske, Christian Helmuth
+Thanks!
+
+> 
+> Dave
+> 
+> >      assert(ret == cpu->kvm_msr_buf->nmsrs);
+> >      return 0;
+> >  }
+> > -- 
+> > 2.11.0.259.g40922b1
+> > 
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+-- 
+Eduardo
