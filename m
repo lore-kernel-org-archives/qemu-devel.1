@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cm11K-0001oG-Qm
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 11:34:31 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cm14w-00034h-CO
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 11:38:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cm11H-0005n4-MD
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 11:34:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50620)
+	(envelope-from <dgilbert@redhat.com>) id 1cm14t-00078m-2j
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 11:38:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:26532)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cm11H-0005mu-Fh
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 11:34:27 -0500
-References: <1488985872-22447-1-git-send-email-yang.zhong@intel.com>
-	<eb781f48-a5cf-4790-f0e8-4ef083c1e1a4@amsat.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0c8f4fb6-89c4-84a5-6bbe-8fa849f17764@redhat.com>
-Date: Thu, 9 Mar 2017 17:34:24 +0100
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cm14s-00078O-Sx
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 11:38:11 -0500
+Date: Thu, 9 Mar 2017 16:38:06 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170309163805.GJ2480@work-vm>
+References: <20170309152708.30635-1-dgilbert@redhat.com>
+	<fa186054-0b8c-924f-b30b-34ed92a83337@redhat.com>
+	<20170309161352.GI2480@work-vm>
+	<b3f5e4e8-1039-0d50-235a-8616ec67aedc@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <eb781f48-a5cf-4790-f0e8-4ef083c1e1a4@amsat.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] memory: reduce heap Rss size around 3M
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b3f5e4e8-1039-0d50-235a-8616ec67aedc@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] memory_region: Fix name comments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,47 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
-Cc: anthony.xu@intel.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
+* Paolo Bonzini (pbonzini@redhat.com) wrote:
+> 
+> 
+> On 09/03/2017 17:13, Dr. David Alan Gilbert wrote:
+> >>> + * @name: Region name, becomes part of RAMBlock name used in migration stream
+> >>> + *        must be unique within any device
+> >>>   * @size: size of the region; any subregions beyond this size will be clipped
+> >>>   */
+> >>>  void memory_region_init(MemoryRegion *mr,
+> >>>                          struct Object *owner,
+> >>>                          const char *name,
+> >>>                          uint64_t size);
+> >> This one should not be necessary I guess?
+> > Why? It's not static so something else could be calling it for
+> > any use.
+> 
+> But why would the name end up in a RAMBlock?
 
+It is used by all of the _ram specific functions, so it seemed worth
+including the comment.
 
-On 08/03/2017 12:17, Philippe Mathieu-Daud=E9 wrote:
-> On 03/08/2017 12:11 PM, Yang Zhong wrote:
->> Since cpu-memory and memory have same address space,one malloced
->> memory is enough. This patch will skip memory malloc for memory
->> address space,which will reduce around 3M physical memory in heap.
->>
->> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
->=20
-> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
->=20
->> ---
->>  memory.c | 6 ++++--
->>  1 file changed, 4 insertions(+), 2 deletions(-)
->>
->> diff --git a/memory.c b/memory.c
->> index 284894b..799ca4c 100644
->> --- a/memory.c
->> +++ b/memory.c
->> @@ -2422,8 +2422,10 @@ AddressSpace
->> *address_space_init_shareable(MemoryRegion *root, const char *name)
->>      AddressSpace *as;
->>
->>      QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
->> -        if (root =3D=3D as->root && as->malloced) {
->> -            as->ref_count++;
->> +        if (root =3D=3D as->root) {
->> +            if (as->malloced) {
->> +                as->ref_count++;
->> +            }
->>              return as;
->>          }
->>      }
->>
+(I also see it's used in some of the boards but I don't understand
+why - e.g. hw/ppc/ppc405_boards.c calls it on something that looks
+like RAM.  Although perhaps that's related to the 'fix this' above it)
 
-This is wrong.  If as->malloced is false, the AddressSpace might be
-embedded in another struct.  This other struct could be freed when
-as->ref_count is still greater than 0, causing a use-after-free bug.
+Dave
 
-Paolo
+> Paolo
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
