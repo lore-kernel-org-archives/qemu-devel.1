@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54468)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1clw4J-0005BO-Qo
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 06:17:17 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1clw4M-0005GX-3u
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 06:17:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1clw4I-0006X3-6N
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 06:17:15 -0500
-Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:34500)
+	(envelope-from <alex.bennee@linaro.org>) id 1clw4K-0006a2-R9
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 06:17:18 -0500
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:36662)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1clw4I-0006Wj-0r
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 06:17:14 -0500
-Received: by mail-wr0-x233.google.com with SMTP id l37so42725835wrc.1
-	for <qemu-devel@nongnu.org>; Thu, 09 Mar 2017 03:17:13 -0800 (PST)
+	id 1clw4K-0006Ym-KM
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 06:17:16 -0500
+Received: by mail-wm0-x22b.google.com with SMTP id n11so136796593wma.1
+	for <qemu-devel@nongnu.org>; Thu, 09 Mar 2017 03:17:16 -0800 (PST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu,  9 Mar 2017 11:17:11 +0000
-Message-Id: <20170309111714.20394-9-alex.bennee@linaro.org>
+Date: Thu,  9 Mar 2017 11:17:14 +0000
+Message-Id: <20170309111714.20394-12-alex.bennee@linaro.org>
 In-Reply-To: <20170309111714.20394-1-alex.bennee@linaro.org>
 References: <20170309111714.20394-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 08/11] target/mips: hold BQL for timer interrupts
+Subject: [Qemu-devel] [PULL 11/11] hw/intc/arm_gic: modernise the DPRINTF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,92 +30,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, Yongbok Kim <yongbok.kim@imgtec.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, "open list:ARM cores" <qemu-arm@nongnu.org>
 
-From: Yongbok Kim <yongbok.kim@imgtec.com>
+While I was debugging the icount issues I realised a bunch of the
+messages look quite similar. I've fixed this by including __func__ in
+the debug print. At the same time I move the a modern if (GATE) style
+printf which ensures the compiler can check for format string errors
+even if the code gets optimised away in the non-DEBUG_GIC case.
 
-Hold BQL when accessing timer which can cause interrupts
-
-Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- target/mips/op_helper.c | 21 ++++++++++++++++++---
- 1 file changed, 18 insertions(+), 3 deletions(-)
+ hw/intc/arm_gic.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index b683fcb025..e5f3ea4042 100644
---- a/target/mips/op_helper.c
-+++ b/target/mips/op_helper.c
-@@ -17,6 +17,7 @@
-  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-  */
- #include "qemu/osdep.h"
-+#include "qemu/main-loop.h"
- #include "cpu.h"
- #include "qemu/host-utils.h"
- #include "exec/helper-proto.h"
-@@ -827,7 +828,11 @@ target_ulong helper_mftc0_tcschefback(CPUMIPSState *env)
+diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
+index 8e5a9d8a3e..b305d9032a 100644
+--- a/hw/intc/arm_gic.c
++++ b/hw/intc/arm_gic.c
+@@ -26,15 +26,20 @@
+ #include "qemu/log.h"
+ #include "trace.h"
  
- target_ulong helper_mfc0_count(CPUMIPSState *env)
- {
--    return (int32_t)cpu_mips_get_count(env);
-+    int32_t count;
-+    qemu_mutex_lock_iothread();
-+    count = (int32_t) cpu_mips_get_count(env);
-+    qemu_mutex_unlock_iothread();
-+    return count;
- }
+-//#define DEBUG_GIC
++/* #define DEBUG_GIC */
  
- target_ulong helper_mftc0_entryhi(CPUMIPSState *env)
-@@ -1375,7 +1380,9 @@ void helper_mtc0_hwrena(CPUMIPSState *env, target_ulong arg1)
- 
- void helper_mtc0_count(CPUMIPSState *env, target_ulong arg1)
- {
-+    qemu_mutex_lock_iothread();
-     cpu_mips_store_count(env, arg1);
-+    qemu_mutex_unlock_iothread();
- }
- 
- void helper_mtc0_entryhi(CPUMIPSState *env, target_ulong arg1)
-@@ -1424,7 +1431,9 @@ void helper_mttc0_entryhi(CPUMIPSState *env, target_ulong arg1)
- 
- void helper_mtc0_compare(CPUMIPSState *env, target_ulong arg1)
- {
-+    qemu_mutex_lock_iothread();
-     cpu_mips_store_compare(env, arg1);
-+    qemu_mutex_unlock_iothread();
- }
- 
- void helper_mtc0_status(CPUMIPSState *env, target_ulong arg1)
-@@ -1475,7 +1484,9 @@ void helper_mtc0_srsctl(CPUMIPSState *env, target_ulong arg1)
- 
- void helper_mtc0_cause(CPUMIPSState *env, target_ulong arg1)
- {
-+    qemu_mutex_lock_iothread();
-     cpu_mips_store_cause(env, arg1);
-+    qemu_mutex_unlock_iothread();
- }
- 
- void helper_mttc0_cause(CPUMIPSState *env, target_ulong arg1)
-@@ -2296,12 +2307,16 @@ target_ulong helper_rdhwr_synci_step(CPUMIPSState *env)
- 
- target_ulong helper_rdhwr_cc(CPUMIPSState *env)
- {
-+    int32_t count;
-     check_hwrena(env, 2, GETPC());
- #ifdef CONFIG_USER_ONLY
--    return env->CP0_Count;
-+    count = env->CP0_Count;
+ #ifdef DEBUG_GIC
+-#define DPRINTF(fmt, ...) \
+-do { fprintf(stderr, "arm_gic: " fmt , ## __VA_ARGS__); } while (0)
++#define DEBUG_GIC_GATE 1
  #else
--    return (int32_t)cpu_mips_get_count(env);
-+    qemu_mutex_lock_iothread();
-+    count = (int32_t)cpu_mips_get_count(env);
-+    qemu_mutex_unlock_iothread();
+-#define DPRINTF(fmt, ...) do {} while(0)
++#define DEBUG_GIC_GATE 0
  #endif
-+    return count;
- }
  
- target_ulong helper_rdhwr_ccres(CPUMIPSState *env)
++#define DPRINTF(fmt, ...) do {                                          \
++        if (DEBUG_GIC_GATE) {                                           \
++            fprintf(stderr, "%s: " fmt, __func__, ## __VA_ARGS__);      \
++        }                                                               \
++    } while (0)
++
+ static const uint8_t gic_id_11mpcore[] = {
+     0x00, 0x00, 0x00, 0x00, 0x90, 0x13, 0x04, 0x00, 0x0d, 0xf0, 0x05, 0xb1
+ };
 -- 
 2.11.0
