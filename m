@@ -1,26 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53475)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1clu6M-0005kt-4M
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 04:11:15 -0500
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cluKJ-00010w-BZ
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 04:25:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1clu6I-0003Be-Ot
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 04:11:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55426)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1clu6I-0003BR-Ht
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 04:11:10 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BF290C067C1A
-	for <qemu-devel@nongnu.org>; Thu,  9 Mar 2017 09:11:10 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu,  9 Mar 2017 10:11:00 +0100
-Message-Id: <1489050661-17989-2-git-send-email-kraxel@redhat.com>
-In-Reply-To: <1489050661-17989-1-git-send-email-kraxel@redhat.com>
-References: <1489050661-17989-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 1/2] ohci: relax link check
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cluKG-0007kk-8r
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 04:25:39 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39024)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1cluKF-0007eS-Ul
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 04:25:36 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v299NbFZ023280
+	for <qemu-devel@nongnu.org>; Thu, 9 Mar 2017 04:25:32 -0500
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 292gtfure7-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 09 Mar 2017 04:25:32 -0500
+Received: from localhost
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Thu, 9 Mar 2017 04:25:31 -0500
+Date: Thu, 9 Mar 2017 17:25:25 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20170217082939.33208-1-bjsdjshi@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170217082939.33208-1-bjsdjshi@linux.vnet.ibm.com>
+Message-Id: <20170309092525.GA10189@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH RFC v3 00/15] basic vfio-ccw infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,35 +40,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, wkywang@linux.vnet.ibm.com
 
-The strict td link limit added by commit "95ed569 usb: ohci: limit the
-number of link eds" causes problems with macos guests.  Lets raise the
-limit.
+* Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> [2017-02-17 09:29:24 +0100]:
 
-Reported-by: Programmingkid <programmingkidx@gmail.com>
-Reported-by: Howard Spoelstra <hsp.cat7@gmail.com>
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: BALATON Zoltan <balaton@eik.bme.hu>
-Reviewed-by: John Arbuckle <programmingkidx@gmail.com>
-Message-id: 1488876018-31576-1-git-send-email-kraxel@redhat.com
----
- hw/usb/hcd-ohci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> vfio-ccw: the basic infrastructure
+> ==================================
+> 
+> Introduction
+> ------------
+> 
+> Here we describe the vfio support for I/O subchannel devices for
+> Linux/s390. Motivation for vfio-ccw is to passthrough subchannels to a
+> virtual machine, while vfio is the means.
+> 
 
-diff --git a/hw/usb/hcd-ohci.c b/hw/usb/hcd-ohci.c
-index fe8406a..3ada35e 100644
---- a/hw/usb/hcd-ohci.c
-+++ b/hw/usb/hcd-ohci.c
-@@ -42,7 +42,7 @@
- 
- #define OHCI_MAX_PORTS 15
- 
--#define ED_LINK_LIMIT 4
-+#define ED_LINK_LIMIT 32
- 
- static int64_t usb_frame_time;
- static int64_t usb_bit_time;
+Ping.
+
+Any more comment for this version?
+
+Thanks.
+
+[...]
+
 -- 
-1.8.3.1
+Dong Jia
