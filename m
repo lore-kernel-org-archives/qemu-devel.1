@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1clwum-0005RU-RI
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 07:11:30 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1clx9f-00086h-2k
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 07:26:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1clwul-0008Rg-JJ
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 07:11:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51098)
+	(envelope-from <dgilbert@redhat.com>) id 1clx9a-0004AD-Kv
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 07:26:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50798)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1clwul-0008Rb-Cs
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 07:11:27 -0500
-References: <1489017212-2990-1-git-send-email-mst@redhat.com>
-	<1a475607-b876-d79a-5e0b-e1a4a006c65d@redhat.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <a5ac15ac-b6df-6d3c-d898-177ed5e163d0@redhat.com>
-Date: Thu, 9 Mar 2017 14:11:08 +0200
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1clx9a-00049v-FQ
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 07:26:46 -0500
+Date: Thu, 9 Mar 2017 12:26:41 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170309122641.GE2480@work-vm>
+References: <3d1c16a1-ec05-0367-e569-64a63b34f2e3@redhat.com>
+	<CAFEAcA9cM=LjBRzrZdfsOss2xm4bKC6QM7gyg3HD4z-yeumTyw@mail.gmail.com>
+	<940ff281-82cd-18cf-160e-c5234f65db18@redhat.com>
+	<9d6c61bc-4a95-ce72-3565-e498f9c2b351@redhat.com>
+	<b815c2f9-1ce9-efed-4afa-c3553786dab1@redhat.com>
+	<7829c1dc-9138-c784-dcc5-3c46ec9b5c05@innervision.pl>
 MIME-Version: 1.0
-In-Reply-To: <1a475607-b876-d79a-5e0b-e1a4a006c65d@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC] qdev: add init order filter
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7829c1dc-9138-c784-dcc5-3c46ec9b5c05@innervision.pl>
+Subject: Re: [Qemu-devel] external snapshots freezes block device since qemu
+ 2.8
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +32,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel.a@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Alex Williamson <alex.williamson@redhat.com>, Peter Xu <peterx@redhat.com>, Jason Wang <jasowang@redhat.com>
+To: Piotr Rybicki <piotr.rybicki@innervision.pl>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com
 
-On 03/09/2017 01:13 PM, Paolo Bonzini wrote:
->
->
-> On 09/03/2017 00:59, Michael S. Tsirkin wrote:
->> Allow forcing a specific order of initialization on
->> devices created with -device.
->> Helpful e.g. for built-in devices such as IOMMUs which must
->> exist before all other devices.
->>
->> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->> ---
->>
->> Looks like we have a ton of problems because devices
->> are initialized in a random order, while we
->> really want e.g. iommu to be initialized
->> earlier than devices.
->>
->> This will be helpful for other things, e.g.
->> real hardware often is initialized in a specific order,
->> creating built-in devices for the board often
->> has to happen in a specific order, etc.
->
-> In the specific case of PCI bus_master_as there is a simple workaround
-> by placing a dummy container (which lets us build the AddressSpace) and
-> then adding the alias region at machine_done time.
->
-> This is exactly how MemoryListener is supposed to work, so I would start
-> from there.
->
+* Piotr Rybicki (piotr.rybicki@innervision.pl) wrote:
+> Hello there.
+> 
+> I discovered, that since qemu 2.8 , external snapshots (very similar to:
+> http://wiki.libvirt.org/page/Live-disk-backup-with-active-blockcommit),
+> freezes block device after:
+> 
+> # virsh blockcommit (...)
+> 
+> There is no error message after completion of the command above.
+> I'm using gluster + ZFS fuse mount as a storage for a VM on gentoo.
+> libvirt debug showed nothing helpful.
+> With qemu <2.8 -: snapshots are working as expected.
+> 
+> Is this a known issue?
+> Is it qemu or libvirt ?
+> 
+> If it helps, how can i diagnose this further?
 
-Hi Paolo,
+I don't know of it, cc'd in jsnow.
+Have you tried bisecting?
 
-This will certainly solve virtio-pci ordering issue, but I am not sure
-it solves the vfio-pci problem. Here is a link to Alex's explanation:
+Dave
 
-http://www.mail-archive.com/qemu-devel@nongnu.org/msg432365.html
-
-Thanks,
-Marcel
-
-> Paolo
->
+> Thank You & Best regards
+> Piotr Rybicki
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
