@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52515)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=234c6cd0c=igor.druzhinin@citrix.com>)
-	id 1cm2xS-0002AN-9t
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 13:38:40 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cm3NJ-00020Q-PL
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 14:05:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=234c6cd0c=igor.druzhinin@citrix.com>)
-	id 1cm2xO-0002YJ-8H
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 13:38:38 -0500
-Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:37174
-	helo=SMTP.EU.CITRIX.COM)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=234c6cd0c=igor.druzhinin@citrix.com>)
-	id 1cm2xN-0002Xw-QI
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 13:38:34 -0500
-From: Igor Druzhinin <igor.druzhinin@citrix.com>
-Date: Thu, 9 Mar 2017 18:38:09 +0000
-Message-ID: <1489084689-19008-1-git-send-email-igor.druzhinin@citrix.com>
+	(envelope-from <no-reply@patchew.org>) id 1cm3NF-0001gm-DM
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 14:05:21 -0500
+Resent-Message-Id: <E1cm3NF-0001gm-DM@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21363)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cm3NF-0001ge-5r
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 14:05:17 -0500
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148908629924.30.3483951739538219568@6c512846dbc7>
+In-Reply-To: <1489084689-19008-1-git-send-email-igor.druzhinin@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] xen: don't save/restore the physmap on VM
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 9 Mar 2017 11:04:59 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] xen: don't save/restore the physmap on VM
  save/restore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,262 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sstabellini@kernel.org, anthony.perard@citrix.com
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Igor Druzhinin <igor.druzhinin@citrix.com>
+To: igor.druzhinin@citrix.com
+Cc: famz@redhat.com, sstabellini@kernel.org, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
 
-Saving/restoring the physmap to/from xenstore was introduced to
-QEMU majorly in order to cover up the VRAM region restore issue.
-The sequence of restore operations implies that we should know
-the effective guest VRAM address *before* we have the VRAM region
-restored (which happens later). Unfortunately, in Xen environment
-VRAM memory does actually belong to a guest - not QEMU itself -
-which means the position of this region is unknown beforehand and
-can't be mapped into QEMU address space immediately.
-
-Previously, recreating xenstore keys, holding the physmap, by the
-toolstack helped to get this information in place at the right
-moment ready to be consumed by QEMU to map the region properly.
-
-The extraneous complexity of having those keys transferred by the
-toolstack and unnecessary redundancy prompted us to propose a
-solution which doesn't require any extra data in xenstore. The idea
-is to defer the VRAM region mapping till the point we actually know
-the effective address and able to map it. To that end, we initially
-only register the pointer to the framebuffer without actual mapping.
-Then, during the memory region restore phase, we perform the mapping
-of the known address and update the VRAM region metadata (including
-previously registered pointer) accordingly.
-
-Signed-off-by: Igor Druzhinin <igor.druzhinin@citrix.com>
----
- exec.c               |   3 ++
- hw/display/vga.c     |   2 +-
- include/hw/xen/xen.h |   2 +-
- xen-hvm.c            | 114 ++++++++++++---------------------------------------
- 4 files changed, 32 insertions(+), 89 deletions(-)
-
-diff --git a/exec.c b/exec.c
-index aabb035..5f2809e 100644
---- a/exec.c
-+++ b/exec.c
-@@ -2008,6 +2008,9 @@ void *qemu_map_ram_ptr(RAMBlock *ram_block, ram_addr_t addr)
-         }
- 
-         block->host = xen_map_cache(block->offset, block->max_length, 1);
-+        if (block->host == NULL) {
-+            return NULL;
-+        }
-     }
-     return ramblock_ptr(block, addr);
- }
-diff --git a/hw/display/vga.c b/hw/display/vga.c
-index 69c3e1d..be554c2 100644
---- a/hw/display/vga.c
-+++ b/hw/display/vga.c
-@@ -2163,7 +2163,7 @@ void vga_common_init(VGACommonState *s, Object *obj, bool global_vmstate)
-     memory_region_init_ram(&s->vram, obj, "vga.vram", s->vram_size,
-                            &error_fatal);
-     vmstate_register_ram(&s->vram, global_vmstate ? NULL : DEVICE(obj));
--    xen_register_framebuffer(&s->vram);
-+    xen_register_framebuffer(&s->vram, &s->vram_ptr);
-     s->vram_ptr = memory_region_get_ram_ptr(&s->vram);
-     s->get_bpp = vga_get_bpp;
-     s->get_offsets = vga_get_offsets;
-diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
-index 09c2ce5..3831843 100644
---- a/include/hw/xen/xen.h
-+++ b/include/hw/xen/xen.h
-@@ -45,6 +45,6 @@ void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size,
-                    struct MemoryRegion *mr, Error **errp);
- void xen_modified_memory(ram_addr_t start, ram_addr_t length);
- 
--void xen_register_framebuffer(struct MemoryRegion *mr);
-+void xen_register_framebuffer(struct MemoryRegion *mr, uint8_t **ptr);
- 
- #endif /* QEMU_HW_XEN_H */
-diff --git a/xen-hvm.c b/xen-hvm.c
-index 5043beb..ea5ed24 100644
---- a/xen-hvm.c
-+++ b/xen-hvm.c
-@@ -41,6 +41,7 @@
- 
- static MemoryRegion ram_memory, ram_640k, ram_lo, ram_hi;
- static MemoryRegion *framebuffer;
-+static uint8_t **framebuffer_ptr;
- static bool xen_in_migration;
- 
- /* Compatibility with older version */
-@@ -302,7 +303,6 @@ static hwaddr xen_phys_offset_to_gaddr(hwaddr start_addr,
-             return physmap->start_addr;
-         }
-     }
--
-     return start_addr;
- }
- 
-@@ -317,7 +317,6 @@ static int xen_add_to_physmap(XenIOState *state,
-     XenPhysmap *physmap = NULL;
-     hwaddr pfn, start_gpfn;
-     hwaddr phys_offset = memory_region_get_ram_addr(mr);
--    char path[80], value[17];
-     const char *mr_name;
- 
-     if (get_physmapping(state, start_addr, size)) {
-@@ -340,6 +339,27 @@ go_physmap:
-     DPRINTF("mapping vram to %"HWADDR_PRIx" - %"HWADDR_PRIx"\n",
-             start_addr, start_addr + size);
- 
-+    mr_name = memory_region_name(mr);
-+
-+    physmap = g_malloc(sizeof (XenPhysmap));
-+
-+    physmap->start_addr = start_addr;
-+    physmap->size = size;
-+    physmap->name = mr_name;
-+    physmap->phys_offset = phys_offset;
-+
-+    QLIST_INSERT_HEAD(&state->physmap, physmap, list);
-+
-+    if (runstate_check(RUN_STATE_INMIGRATE))
-+    {
-+        /* At this point we have a physmap entry for the framebuffer region
-+         * established during the restore phase so we can safely update the 
-+         * registered framebuffer address here. */
-+         if (mr == framebuffer)
-+            *framebuffer_ptr = memory_region_get_ram_ptr(framebuffer);
-+        return 0;
-+    }
-+
-     pfn = phys_offset >> TARGET_PAGE_BITS;
-     start_gpfn = start_addr >> TARGET_PAGE_BITS;
-     for (i = 0; i < size >> TARGET_PAGE_BITS; i++) {
-@@ -350,49 +370,17 @@ go_physmap:
-         if (rc) {
-             DPRINTF("add_to_physmap MFN %"PRI_xen_pfn" to PFN %"
-                     PRI_xen_pfn" failed: %d (errno: %d)\n", idx, gpfn, rc, errno);
-+
-+            QLIST_REMOVE(physmap, list);
-+            g_free(physmap);
-             return -rc;
-         }
-     }
- 
--    mr_name = memory_region_name(mr);
--
--    physmap = g_malloc(sizeof (XenPhysmap));
--
--    physmap->start_addr = start_addr;
--    physmap->size = size;
--    physmap->name = mr_name;
--    physmap->phys_offset = phys_offset;
--
--    QLIST_INSERT_HEAD(&state->physmap, physmap, list);
--
-     xc_domain_pin_memory_cacheattr(xen_xc, xen_domid,
-                                    start_addr >> TARGET_PAGE_BITS,
-                                    (start_addr + size - 1) >> TARGET_PAGE_BITS,
-                                    XEN_DOMCTL_MEM_CACHEATTR_WB);
--
--    snprintf(path, sizeof(path),
--            "/local/domain/0/device-model/%d/physmap/%"PRIx64"/start_addr",
--            xen_domid, (uint64_t)phys_offset);
--    snprintf(value, sizeof(value), "%"PRIx64, (uint64_t)start_addr);
--    if (!xs_write(state->xenstore, 0, path, value, strlen(value))) {
--        return -1;
--    }
--    snprintf(path, sizeof(path),
--            "/local/domain/0/device-model/%d/physmap/%"PRIx64"/size",
--            xen_domid, (uint64_t)phys_offset);
--    snprintf(value, sizeof(value), "%"PRIx64, (uint64_t)size);
--    if (!xs_write(state->xenstore, 0, path, value, strlen(value))) {
--        return -1;
--    }
--    if (mr_name) {
--        snprintf(path, sizeof(path),
--                "/local/domain/0/device-model/%d/physmap/%"PRIx64"/name",
--                xen_domid, (uint64_t)phys_offset);
--        if (!xs_write(state->xenstore, 0, path, mr_name, strlen(mr_name))) {
--            return -1;
--        }
--    }
--
-     return 0;
- }
- 
-@@ -1152,54 +1140,6 @@ static void xen_exit_notifier(Notifier *n, void *data)
-     xs_daemon_close(state->xenstore);
- }
- 
--static void xen_read_physmap(XenIOState *state)
--{
--    XenPhysmap *physmap = NULL;
--    unsigned int len, num, i;
--    char path[80], *value = NULL;
--    char **entries = NULL;
--
--    snprintf(path, sizeof(path),
--            "/local/domain/0/device-model/%d/physmap", xen_domid);
--    entries = xs_directory(state->xenstore, 0, path, &num);
--    if (entries == NULL)
--        return;
--
--    for (i = 0; i < num; i++) {
--        physmap = g_malloc(sizeof (XenPhysmap));
--        physmap->phys_offset = strtoull(entries[i], NULL, 16);
--        snprintf(path, sizeof(path),
--                "/local/domain/0/device-model/%d/physmap/%s/start_addr",
--                xen_domid, entries[i]);
--        value = xs_read(state->xenstore, 0, path, &len);
--        if (value == NULL) {
--            g_free(physmap);
--            continue;
--        }
--        physmap->start_addr = strtoull(value, NULL, 16);
--        free(value);
--
--        snprintf(path, sizeof(path),
--                "/local/domain/0/device-model/%d/physmap/%s/size",
--                xen_domid, entries[i]);
--        value = xs_read(state->xenstore, 0, path, &len);
--        if (value == NULL) {
--            g_free(physmap);
--            continue;
--        }
--        physmap->size = strtoull(value, NULL, 16);
--        free(value);
--
--        snprintf(path, sizeof(path),
--                "/local/domain/0/device-model/%d/physmap/%s/name",
--                xen_domid, entries[i]);
--        physmap->name = xs_read(state->xenstore, 0, path, &len);
--
--        QLIST_INSERT_HEAD(&state->physmap, physmap, list);
--    }
--    free(entries);
--}
--
- static void xen_wakeup_notifier(Notifier *notifier, void *data)
- {
-     xc_set_hvm_param(xen_xc, xen_domid, HVM_PARAM_ACPI_S_STATE, 0);
-@@ -1339,7 +1279,6 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
-         goto err;
-     }
-     xen_be_register_common();
--    xen_read_physmap(state);
- 
-     /* Disable ACPI build because Xen handles it */
-     pcms->acpi_build_enabled = false;
-@@ -1374,9 +1313,10 @@ void destroy_hvm_domain(bool reboot)
-     }
- }
- 
--void xen_register_framebuffer(MemoryRegion *mr)
-+void xen_register_framebuffer(MemoryRegion *mr, uint8_t **ptr)
- {
-     framebuffer = mr;
-+    framebuffer_ptr = ptr;
- }
- 
- void xen_shutdown_fatal_error(const char *fmt, ...)
--- 
-2.7.4
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIHhlbjogZG9uJ3Qgc2F2ZS9yZXN0b3JlIHRoZSBw
+aHlzbWFwIG9uIFZNIHNhdmUvcmVzdG9yZQpNZXNzYWdlLWlkOiAxNDg5MDg0Njg5LTE5MDA4LTEt
+Z2l0LXNlbmQtZW1haWwtaWdvci5kcnV6aGluaW5AY2l0cml4LmNvbQoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1v
+bmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdp
+dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNl
+ICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENI
+ICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBn
+aXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
+bGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49
+JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRh
+dGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6
+Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBh
+dGNoZXcvMTQ4OTA4NDY4OS0xOTAwOC0xLWdpdC1zZW5kLWVtYWlsLWlnb3IuZHJ1emhpbmluQGNp
+dHJpeC5jb20gLT4gcGF0Y2hldy8xNDg5MDg0Njg5LTE5MDA4LTEtZ2l0LXNlbmQtZW1haWwtaWdv
+ci5kcnV6aGluaW5AY2l0cml4LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmVi
+ZDJmZDggeGVuOiBkb24ndCBzYXZlL3Jlc3RvcmUgdGhlIHBoeXNtYXAgb24gVk0gc2F2ZS9yZXN0
+b3JlCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IHhlbjogZG9uJ3Qg
+c2F2ZS9yZXN0b3JlIHRoZSBwaHlzbWFwIG9uIFZNIHNhdmUvcmVzdG9yZS4uLgpFUlJPUjogc3Bh
+Y2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMg
+JygnCiMxMDU6IEZJTEU6IHhlbi1odm0uYzozNDQ6CisgICAgcGh5c21hcCA9IGdfbWFsbG9jKHNp
+emVvZiAoWGVuUGh5c21hcCkpOwoKRVJST1I6IHRoYXQgb3BlbiBicmFjZSB7IHNob3VsZCBiZSBv
+biB0aGUgcHJldmlvdXMgbGluZQojMTE0OiBGSUxFOiB4ZW4taHZtLmM6MzUzOgorICAgIGlmIChy
+dW5zdGF0ZV9jaGVjayhSVU5fU1RBVEVfSU5NSUdSQVRFKSkKKyAgICB7CgpFUlJPUjogdHJhaWxp
+bmcgd2hpdGVzcGFjZQojMTE3OiBGSUxFOiB4ZW4taHZtLmM6MzU2OgorICAgICAgICAgKiBlc3Rh
+Ymxpc2hlZCBkdXJpbmcgdGhlIHJlc3RvcmUgcGhhc2Ugc28gd2UgY2FuIHNhZmVseSB1cGRhdGUg
+dGhlICQKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhp
+cyBzdGF0ZW1lbnQKIzExOTogRklMRTogeGVuLWh2bS5jOjM1ODoKKyAgICAgICAgIGlmIChtciA9
+PSBmcmFtZWJ1ZmZlcikKWy4uLl0KCnRvdGFsOiA0IGVycm9ycywgMCB3YXJuaW5ncywgMTk2IGxp
+bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
+LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
+IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBP
+VVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1h
+aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3Jn
+L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMu
+b3Jn
