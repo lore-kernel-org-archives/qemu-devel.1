@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60408)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cm3pP-0001WL-6N
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 14:34:24 -0500
+	(envelope-from <alexander.boettcher@genode-labs.com>)
+	id 1cm3s4-0002bT-IU
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 14:37:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cm3pM-0001bO-2Z
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 14:34:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53788)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cm3pL-0001au-TG
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 14:34:20 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1395781254
-	for <qemu-devel@nongnu.org>; Thu,  9 Mar 2017 19:34:20 +0000 (UTC)
-Date: Thu, 9 Mar 2017 19:34:15 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170309193415.GN2480@work-vm>
-References: <20170309193117.24885-1-ehabkost@redhat.com>
+	(envelope-from <alexander.boettcher@genode-labs.com>)
+	id 1cm3s1-0002xO-Ey
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 14:37:08 -0500
+Received: from mail.genode-labs.com ([88.198.56.169]:47952)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <alexander.boettcher@genode-labs.com>)
+	id 1cm3s1-0002wz-7N
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 14:37:05 -0500
+References: <7005a482-2372-0aaf-eb8b-60cd0a16b002@genode-labs.com>
+	<c088c706-392f-e978-8edd-9db85a265681@redhat.com>
+From: Alexander Boettcher <alexander.boettcher@genode-labs.com>
+Message-ID: <51941cb9-ac7a-bbe2-0185-b8c0ad587b51@genode-labs.com>
+Date: Thu, 9 Mar 2017 20:36:57 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170309193117.24885-1-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10] kvm: Print MSR information if
- KVM_SET_MSRS failed
+In-Reply-To: <c088c706-392f-e978-8edd-9db85a265681@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BPATCH=C2=B1_SVM_I/O_permission_bitmap_?=
+ =?utf-8?q?for_user-level_=28ring-3=29_code_ignored?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,47 +32,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: rth@twiddle.net, ehabkost@redhat.com
 
-* Eduardo Habkost (ehabkost@redhat.com) wrote:
-> When a KVM_SET_MSRS ioctl() fails, it is difficult to find out
-> which MSR caused the problem. Print an error message for
-> debugging, before we trigger the (ret == cpu->kvm_msr_buf->nmsrs)
-> assert.
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  target/i386/kvm.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 887a81268f..3a874e4717 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -1807,6 +1807,12 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
->          return ret;
->      }
->  
-> +    if (ret < cpu->kvm_msr_buf->nmsrs) {
-> +        struct kvm_msr_entry *e = &cpu->kvm_msr_buf->entries[ret];
-> +        error_report("error: failed to set MSR 0x%" PRIx32 " to 0x%" PRIx64,
-> +                     (uint32_t)e->index, (uint64_t)e->data);
-> +    }
-> +
+On 09.03.2017 13:42, Paolo Bonzini wrote:
+> On 05/03/2017 19:21, Alexander Boettcher wrote:
+>> the SVM I/O permission bitmap for user-level (ring-3) VM code running =
+in
+>> SVM seems to be ignored and causes a GP-fault. (Actual the IO permissi=
+on
+>> was granted by the kernel via the TSS I/O port permission bitmap).
+>>
+>> After some debugging the GP code originates from target/i386/translate=
+.c
+>> gen_check_io() within the if(s->pe && (s->cpl > s->iopl || s->vm86))
+>> condition. However, the actual SVM IO permission bitmap is checked aft=
+er
+>> that condition, which succeeds and would permit the access.
 
-Yes, I'd thought about doing the same; had you considered adding it on the get
-as well?
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> The code as is
+> written now matches the AMD manual: "Exceptions related to virtual x86
+> mode, IOPL, or the TSS-bitmap are checked before the SVM intercept
+> check. All other exceptions are checked after the SVM intercept check".
 
-Dave
+I see. I will re-check, maybe we're doing things wrong in the VMM.
 
->      assert(ret == cpu->kvm_msr_buf->nmsrs);
->      return 0;
->  }
-> -- 
-> 2.11.0.259.g40922b1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Thanks.
+--=20
+Alexander Boettcher
+Genode Labs
+
+http://www.genode-labs.com - http://www.genode.org
+
+Genode Labs GmbH - Amtsgericht Dresden - HRB 28424 - Sitz Dresden
+Gesch=C3=A4ftsf=C3=BChrer: Dr.-Ing. Norman Feske, Christian Helmuth
