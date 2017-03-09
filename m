@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54508)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1clw4M-0005GX-3u
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 06:17:22 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1clwDW-0003IF-PO
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 06:26:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1clw4K-0006a2-R9
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 06:17:18 -0500
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:36662)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1clw4K-0006Ym-KM
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 06:17:16 -0500
-Received: by mail-wm0-x22b.google.com with SMTP id n11so136796593wma.1
-	for <qemu-devel@nongnu.org>; Thu, 09 Mar 2017 03:17:16 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu,  9 Mar 2017 11:17:14 +0000
-Message-Id: <20170309111714.20394-12-alex.bennee@linaro.org>
-In-Reply-To: <20170309111714.20394-1-alex.bennee@linaro.org>
-References: <20170309111714.20394-1-alex.bennee@linaro.org>
+	(envelope-from <dgilbert@redhat.com>) id 1clwDR-0001bH-V7
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 06:26:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57704)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1clwDR-0001ar-MK
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 06:26:41 -0500
+Date: Thu, 9 Mar 2017 11:26:36 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170309112635.GA2480@work-vm>
+References: <20170308105409.18183-1-dgilbert@redhat.com>
+	<CAFEAcA9=1c36hkJWycFWUCs5=XOATmadc=xZun7txKgJtk0NPg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 11/11] hw/intc/arm_gic: modernise the DPRINTF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA9=1c36hkJWycFWUCs5=XOATmadc=xZun7txKgJtk0NPg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] memory_region: Fix name comments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +27,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, "open list:ARM cores" <qemu-arm@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-While I was debugging the icount issues I realised a bunch of the
-messages look quite similar. I've fixed this by including __func__ in
-the debug print. At the same time I move the a modern if (GATE) style
-printf which ensures the compiler can check for format string errors
-even if the code gets optimised away in the non-DEBUG_GIC case.
+* Peter Maydell (peter.maydell@linaro.org) wrote:
+> On 8 March 2017 at 11:54, Dr. David Alan Gilbert (git)
+> <dgilbert@redhat.com> wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> >
+> > The 'name' parameter to memory_region_init_* had been marked as debug
+> > only, however vmstate_region_ram uses it as a parameter to
+> > qemu_ram_set_idstr to set RAMBlock names and these form part of the
+> > migration stream.
+> >
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> >  include/exec/memory.h | 10 +++++-----
+> >  1 file changed, 5 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/include/exec/memory.h b/include/exec/memory.h
+> > index 6911023..de8f69e 100644
+> > --- a/include/exec/memory.h
+> > +++ b/include/exec/memory.h
+> > @@ -307,7 +307,7 @@ struct MemoryRegionSection {
+> >   *
+> >   * @mr: the #MemoryRegion to be initialized
+> >   * @owner: the object that tracks the region's reference count
+> > - * @name: used for debugging; not visible to the user or ABI
+> > + * @name: Region name, becomes part of RAMBlock name used in migration stream
+> 
+> ...for RAM-backend MRs only, presumably? Also, what are the
+> uniqueness constraints?
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/intc/arm_gic.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+Hmm; yes RAM backed or things that behave like RAM backed (e.g. file-backed).
+Uniqueness isn't required in all cases; qemu_ram_set_idstr prefixes this name
+by a device name if it's given a device - which it isn't normally for stuff
+on boards.  However the code will at least fail if there's a clash.
+How about:
 
-diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
-index 8e5a9d8a3e..b305d9032a 100644
---- a/hw/intc/arm_gic.c
-+++ b/hw/intc/arm_gic.c
-@@ -26,15 +26,20 @@
- #include "qemu/log.h"
- #include "trace.h"
- 
--//#define DEBUG_GIC
-+/* #define DEBUG_GIC */
- 
- #ifdef DEBUG_GIC
--#define DPRINTF(fmt, ...) \
--do { fprintf(stderr, "arm_gic: " fmt , ## __VA_ARGS__); } while (0)
-+#define DEBUG_GIC_GATE 1
- #else
--#define DPRINTF(fmt, ...) do {} while(0)
-+#define DEBUG_GIC_GATE 0
- #endif
- 
-+#define DPRINTF(fmt, ...) do {                                          \
-+        if (DEBUG_GIC_GATE) {                                           \
-+            fprintf(stderr, "%s: " fmt, __func__, ## __VA_ARGS__);      \
-+        }                                                               \
-+    } while (0)
-+
- static const uint8_t gic_id_11mpcore[] = {
-     0x00, 0x00, 0x00, 0x00, 0x90, 0x13, 0x04, 0x00, 0x0d, 0xf0, 0x05, 0xb1
- };
--- 
-2.11.0
+ * @name: Region name, becomes part of RAMBlock name used in migration stream
+ *        must be unique within any device
+
+
+
+> >   * @size: size of the region; any subregions beyond this size will be clipped
+> >   */
+> >  void memory_region_init(MemoryRegion *mr,
+> > @@ -355,7 +355,7 @@ void memory_region_unref(MemoryRegion *mr);
+> >   * @ops: a structure containing read and write callbacks to be used when
+> >   *       I/O is performed on the region.
+> >   * @opaque: passed to the read and write callbacks of the @ops structure.
+> > - * @name: used for debugging; not visible to the user or ABI
+> > + * @name: Region name, becomes part of RAMBlock name used in migration stream
+> 
+> ditto.
+> 
+> >   * @size: size of the region.
+> >   */
+> >  void memory_region_init_io(MemoryRegion *mr,
+> > @@ -474,7 +474,7 @@ void memory_region_init_ram_device_ptr(MemoryRegion *mr,
+> >   *
+> >   * @mr: the #MemoryRegion to be initialized.
+> >   * @owner: the object that tracks the region's reference count
+> > - * @name: used for debugging; not visible to the user or ABI
+> > + * @name: Region name, becomes part of RAMBlock name used in migration stream
+> >   * @orig: the region to be referenced; @mr will be equivalent to
+> >   *        @orig between @offset and @offset + @size - 1.
+> >   * @offset: start of the section in @orig to be referenced.
+> 
+> The diff here is rather lacking in context, but this comment change
+> is for memory_region_init_alias(). Aliases presumably don't get
+> migrated (the thing they alias into will be migrated if it's RAM),
+> so the comment seems out of place here.
+> 
+> > @@ -537,7 +537,7 @@ void memory_region_init_rom_device(MemoryRegion *mr,
+> >   *
+> >   * @mr: the #MemoryRegion to be initialized
+> >   * @owner: the object that tracks the region's reference count
+> > - * @name: used for debugging; not visible to the user or ABI
+> > + * @name: Region name, becomes part of RAMBlock name used in migration stream
+> >   * @size: size of the region.
+> >   */
+> >  static inline void memory_region_init_reservation(MemoryRegion *mr,
+> 
+> Similarly, a reservation MR isn't RAM-backed.
+> 
+> > @@ -558,7 +558,7 @@ static inline void memory_region_init_reservation(MemoryRegion *mr,
+> >   * @mr: the #MemoryRegion to be initialized
+> >   * @owner: the object that tracks the region's reference count
+> >   * @ops: a function that translates addresses into the @target region
+> > - * @name: used for debugging; not visible to the user or ABI
+> > + * @name: Region name, becomes part of RAMBlock name used in migration stream
+> >   * @size: size of the region.
+> >   */
+> >  void memory_region_init_iommu(MemoryRegion *mr,
+> 
+> ...and nor is an IOMMU MR.
+
+OK, so I think we need it on:
+  memory_region_init, memory_region_init_ram, memory_region_init_resizeable_ram,
+  memory_region_init_ram_from_file, memory_region_init_ram_ptr, memory_region_init_rom,
+  memory_region_init_rom_device (?)
+
+  I don't think it's needed in memory_region_init_ram_device_ptr
+
+Dave
+
+> > --
+> > 2.9.3
+> >
+> 
+> 
+> thanks
+> -- PMM
+> 
+> -- 
+> 12345678901234567890123456789012345678901234567890123456789012345678901234567890
+>          1         2         3         4         5         6         7         8
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
