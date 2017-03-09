@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1clsEY-0004JW-Op
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 02:11:35 -0500
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1clshS-0007HG-3i
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 02:41:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1clsEV-0006pC-Jv
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 02:11:34 -0500
-Received: from mga11.intel.com ([192.55.52.93]:38460)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1clsEV-0006p8-AX
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 02:11:31 -0500
-Message-ID: <58C1006F.6080206@intel.com>
-Date: Thu, 09 Mar 2017 15:12:47 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1clshO-0005iR-6N
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 02:41:26 -0500
+Received: from [59.151.112.132] (port=2879 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1clshN-0005KQ-P4
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 02:41:22 -0500
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Date: Thu, 9 Mar 2017 15:40:07 +0800
+Message-ID: <1489045207-27706-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-References: <1488519630-89058-1-git-send-email-wei.w.wang@intel.com>
-	<1488519630-89058-3-git-send-email-wei.w.wang@intel.com>
-	<20170308060131-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20170308060131-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 kernel 2/5] virtio-balloon:
- VIRTIO_BALLOON_F_CHUNK_TRANSFER
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] COLO-compare: Fix trace_event print bug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,19 +23,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Amit Shah <amit.shah@redhat.com>, "Hansen, Dave" <dave.hansen@intel.com>, Andrea Arcangeli <aarcange@redhat.com>, David Hildenbrand <david@redhat.com>, Liang Li <liliang.opensource@gmail.com>
+To: qemu devel <qemu-devel@nongnu.org>
+Cc: Jason Wang <jasowang@redhat.com>, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 
-On 03/08/2017 12:01 PM, Michael S. Tsirkin wrote:
-> On Fri, Mar 03, 2017 at 01:40:27PM +0800, Wei Wang wrote:
->> From: Liang Li <liang.z.li@intel.com>
->>
->> Add a new feature bit, VIRTIO_BALLOON_F_CHUNK_TRANSFER. Please check
->> the implementation patch commit for details about this feature.
->
-> better squash into next patch.
+Because of inet_ntoa() return a statically allocated buffer,
+subsequent calls will overwrite, So we fix this bug.
 
-OK, will do.
+Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+---
+ net/colo-compare.c | 33 +++++++++++++++++++++++++--------
+ 1 file changed, 25 insertions(+), 8 deletions(-)
 
-Best,
-Wei
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index 282727b..54e6d40 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -182,10 +182,18 @@ static int packet_enqueue(CompareState *s, int mode)
+  */
+ static int colo_packet_compare_common(Packet *ppkt, Packet *spkt, int offset)
+ {
+-    trace_colo_compare_ip_info(ppkt->size, inet_ntoa(ppkt->ip->ip_src),
+-                               inet_ntoa(ppkt->ip->ip_dst), spkt->size,
+-                               inet_ntoa(spkt->ip->ip_src),
+-                               inet_ntoa(spkt->ip->ip_dst));
++    if (trace_event_get_state(TRACE_COLO_COMPARE_MISCOMPARE)) {
++        char pri_ip_src[20], pri_ip_dst[20], sec_ip_src[20], sec_ip_dst[20];
++
++        strcpy(pri_ip_src, inet_ntoa(ppkt->ip->ip_src));
++        strcpy(pri_ip_dst, inet_ntoa(ppkt->ip->ip_dst));
++        strcpy(sec_ip_src, inet_ntoa(spkt->ip->ip_src));
++        strcpy(sec_ip_dst, inet_ntoa(spkt->ip->ip_dst));
++
++        trace_colo_compare_ip_info(ppkt->size, pri_ip_src,
++                                   pri_ip_dst, spkt->size,
++                                   sec_ip_src, sec_ip_dst);
++    }
+ 
+     if (ppkt->size == spkt->size) {
+         return memcmp(ppkt->data + offset, spkt->data + offset,
+@@ -336,10 +344,19 @@ static int colo_packet_compare_icmp(Packet *spkt, Packet *ppkt)
+ static int colo_packet_compare_other(Packet *spkt, Packet *ppkt)
+ {
+     trace_colo_compare_main("compare other");
+-    trace_colo_compare_ip_info(ppkt->size, inet_ntoa(ppkt->ip->ip_src),
+-                               inet_ntoa(ppkt->ip->ip_dst), spkt->size,
+-                               inet_ntoa(spkt->ip->ip_src),
+-                               inet_ntoa(spkt->ip->ip_dst));
++    if (trace_event_get_state(TRACE_COLO_COMPARE_MISCOMPARE)) {
++        char pri_ip_src[20], pri_ip_dst[20], sec_ip_src[20], sec_ip_dst[20];
++
++        strcpy(pri_ip_src, inet_ntoa(ppkt->ip->ip_src));
++        strcpy(pri_ip_dst, inet_ntoa(ppkt->ip->ip_dst));
++        strcpy(sec_ip_src, inet_ntoa(spkt->ip->ip_src));
++        strcpy(sec_ip_dst, inet_ntoa(spkt->ip->ip_dst));
++
++        trace_colo_compare_ip_info(ppkt->size, pri_ip_src,
++                                   pri_ip_dst, spkt->size,
++                                   sec_ip_src, sec_ip_dst);
++    }
++
+     return colo_packet_compare_common(ppkt, spkt, 0);
+ }
+ 
+-- 
+2.7.4
