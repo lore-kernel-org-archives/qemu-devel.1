@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1clrnP-0000vo-4g
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 01:43:32 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1cls71-0003Iy-Rn
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 02:03:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1clrnN-0006Wp-R4
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 01:43:31 -0500
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:33978)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1clrnN-0006Wh-Jq
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 01:43:29 -0500
-Received: by mail-wr0-x231.google.com with SMTP id l37so38158771wrc.1
-	for <qemu-devel@nongnu.org>; Wed, 08 Mar 2017 22:43:29 -0800 (PST)
+	(envelope-from <wei.w.wang@intel.com>) id 1cls6y-0003hc-Nl
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 02:03:47 -0500
+Received: from mga01.intel.com ([192.55.52.88]:7976)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1cls6y-0003fI-Ey
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 02:03:44 -0500
+Message-ID: <58C0FE98.3080903@intel.com>
+Date: Thu, 09 Mar 2017 15:04:56 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20170309013150.GK19967@umbus.fritz.box>
-References: <20170308124955.35623-1-aik@ozlabs.ru>
-	<CAFEAcA_pq6cUVVqzg0in-QTKngsf2cSpzpaGnP=gH5X2GnzOQQ@mail.gmail.com>
-	<4c8ab05b-9e6d-10db-6480-e6b58d3ca390@ozlabs.ru>
-	<20170309013150.GK19967@umbus.fritz.box>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 9 Mar 2017 07:43:07 +0100
-Message-ID: <CAFEAcA9QzBASyBELx7fxp1pexVaZfLRP6fKaZX63LTOzV=hZjQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [RFC PATCH qemu] dtc: Allow compiling with old gcc
+References: <1488519630-89058-1-git-send-email-wei.w.wang@intel.com>
+	<1488519630-89058-6-git-send-email-wei.w.wang@intel.com>
+	<d66a8e86-0ead-90fd-b943-f69449e78349@redhat.com>
+In-Reply-To: <d66a8e86-0ead-90fd-b943-f69449e78349@redhat.com>
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 kernel 5/5] This patch contains two
+ parts:
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,16 +30,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, Andrew Morton <akpm@linux-foundation.org>, Mel Gorman <mgorman@techsingularity.net>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Amit Shah <amit.shah@redhat.com>, "Hansen, Dave" <dave.hansen@intel.com>, Andrea Arcangeli <aarcange@redhat.com>, Liang Li <liliang.opensource@gmail.com>
 
-On 9 March 2017 at 02:31, David Gibson <david@gibson.dropbear.id.au> wrote:
-> Yes.  I've now fixed this in upstream libfdt, at Paolo's suggestion.
-> Unfortunately, it came just after the 1.4.3 release.  I was just leery
-> about making a new release and qemu pull so soon after the last one.
-> Should I do that anyway?
+On 03/06/2017 09:23 PM, David Hildenbrand wrote:Am 03.03.2017 um 06:40 
+schrieb Wei Wang:
+>> From: Liang Li <liang.z.li@intel.com>
+Sorry, I just saw the message due to an email issue.
 
-Yes, I would go ahead and do that.
+> I'd prefer to split this into two parts then and to create proper subjects.
+Agree, will do.
 
-thanks
--- PMM
+>
+> If I remember correctly, the general concept was accepted by most reviewers.
+>
+
+Yes, that's also what I was told.
+
+Best,
+Wei
