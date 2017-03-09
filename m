@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cm1is-00012z-Dv
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 12:19:31 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cm1lP-0001oG-67
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 12:22:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cm1ip-0007CG-6s
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 12:19:30 -0500
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:35490)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cm1io-0007Bj-W2
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 12:19:27 -0500
-Received: by mail-wr0-x22c.google.com with SMTP id g10so49600614wrg.2
-	for <qemu-devel@nongnu.org>; Thu, 09 Mar 2017 09:19:26 -0800 (PST)
+	(envelope-from <pbonzini@redhat.com>) id 1cm1lM-0008PM-1E
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 12:22:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59948)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cm1lL-0008Nr-Rj
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 12:22:03 -0500
 References: <20170303131113.25898-1-pbonzini@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170303131113.25898-1-pbonzini@redhat.com>
-Date: Thu, 09 Mar 2017 17:19:36 +0000
-Message-ID: <8737emid07.fsf@linaro.org>
+	<8737emid07.fsf@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0a70ecd0-6340-d97e-a185-dc7cf06d958b@redhat.com>
+Date: Thu, 9 Mar 2017 18:22:01 +0100
 MIME-Version: 1.0
+In-Reply-To: <8737emid07.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH 0/6] tcg: fix icount super slowdown
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,26 +27,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Cc: qemu-devel@nongnu.org
 
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Hmm your subject line was:
+On 09/03/2017 18:19, Alex Benn=C3=A9e wrote:
+>=20
+> Hmm your subject line was:
+>=20
+>   Subject: [PATCH 0/6] tcg: fix icount super slowdown
+>=20
+> But:
+>=20
+>> Paolo Bonzini (5):
+>>   qemu-timer: fix off-by-one
+>>   qemu-timer: do not include sysemu/cpus.h from util/qemu-timer.h
+>>   cpus: define QEMUTimerListNotifyCB for QEMU system emulation
+>>   main-loop: remove now unnecessary optimization
+>>   icount: process QEMU_CLOCK_VIRTUAL timers in vCPU thread
+> Did the tooling missing something or is this just a git-format-patch bu=
+rp?
 
-  Subject: [PATCH 0/6] tcg: fix icount super slowdown
+Patch 1 was the nios2 fix that I ended up posting as a separate thread.
 
-But:
-
-> Paolo Bonzini (5):
->   qemu-timer: fix off-by-one
->   qemu-timer: do not include sysemu/cpus.h from util/qemu-timer.h
->   cpus: define QEMUTimerListNotifyCB for QEMU system emulation
->   main-loop: remove now unnecessary optimization
->   icount: process QEMU_CLOCK_VIRTUAL timers in vCPU thread
-
-Did the tooling missing something or is this just a git-format-patch burp?
-
---
-Alex Bennée
+Paolo
