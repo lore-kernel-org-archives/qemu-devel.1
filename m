@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34728)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cm7f7-0002dr-PE
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 18:40:03 -0500
+	(envelope-from <bounces@canonical.com>) id 1cm8Dl-00069t-42
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 19:15:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cm7f3-0003dA-Ro
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 18:40:01 -0500
-Received: from indium.canonical.com ([91.189.90.7]:40959)
+	(envelope-from <bounces@canonical.com>) id 1cm8Dh-00053o-Ts
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 19:15:49 -0500
+Received: from indium.canonical.com ([91.189.90.7]:49752)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cm7f3-0003cw-Kc
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 18:39:57 -0500
+	id 1cm8Dh-00053D-NQ
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 19:15:45 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cm7f0-0000Dh-Um
-	for <qemu-devel@nongnu.org>; Thu, 09 Mar 2017 23:39:55 +0000
+	id 1cm8Dd-0002ya-4m
+	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 00:15:41 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id DA0812E80E1
-	for <qemu-devel@nongnu.org>; Thu,  9 Mar 2017 23:39:53 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 46B3F2E80CF
+	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 00:15:39 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 09 Mar 2017 23:24:08 -0000
-From: Matthias Schiffer <1581936@bugs.launchpad.net>
-Reply-To: Bug 1581936 <1581936@bugs.launchpad.net>
+Date: Thu, 09 Mar 2017 23:58:35 -0000
+From: Edoardo Tirtarahardja <1257352@bugs.launchpad.net>
+Reply-To: Bug 1257352 <1257352@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20160515095432.8440.97382.malonedeb@soybean.canonical.com>
-Message-Id: <20170309232409.25214.83956.malone@wampee.canonical.com>
+References: <20131203160523.17652.24548.malonedeb@wampee.canonical.com>
+Message-Id: <20170309235835.24941.62151.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1581936] Re: Frozen Windows 7 VMs with VGA
- CVE-2016-3712 fix (2.6.0 and 2.5.1.1)
+Subject: [Qemu-devel] [Bug 1257352] Re: kvm hangs occasionally when
+ switching out of the qemu console
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,98 +39,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Will the fix be backported? Right now, this is a regression in xenial
-(caused by the security update in 1:2.5+dfsg-5ubuntu10.6).
+Still happened in qemu 2.5.0 on Ubuntu 16.04, it's random but you can
+only switch between console, monitor, serial, parallel several times,
+then it hangs.
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1581936
+https://bugs.launchpad.net/bugs/1257352
 
 Title:
-  Frozen Windows 7 VMs with VGA CVE-2016-3712 fix (2.6.0 and 2.5.1.1)
+  kvm hangs occasionally when switching out of the qemu console
 
 Status in QEMU:
-  Fix Released
+  Incomplete
+Status in qemu package in Ubuntu:
+  Confirmed
 
 Bug description:
-  Hi,
+  To recreate (although this does *NOT* fail most of the time alas):
 
-  As already posted on the QEMU devel list [1] I stumbled upon a problem
-  with QEMU in version 2.5.1.1 and 2.6.0.
+  1) press "ctrl-alt-2" to switch to the qemu console.
+  2) type say "sendkey ctrl-alt-f1"
+  3) press "ctrl-alt-1".
 
-  the VM shows Windows loading
-  files for the installation, then the "Starting Windows" screen appears
-  here it hangs and never continues.
+  Expected outcome: Switch to tty1 in the VM.
 
-  Changing the "-vga" option to cirrus solves this, the installation can
-  proceed and finish. When changing back to std (or also qxl, vmware) the
-  installed VM also hangs on the "Starting Windows" screen while qemu
-  showing a little but no excessive load.
-
-  This phenomena appears also with QEMU 2.6.0 but not with 2.6.0-rc4, a
-  git bisect shows fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7 (vga: make
-  sure vga register setup for vbe stays intact (CVE-2016-3712)) as the
-  culprit for this regression, as its a fix for a DoS its not an option to
-  just revert it, I guess.
-
-  The bisect log is:
-
-  git bisect start
-  # bad: [bfc766d38e1fae5767d43845c15c79ac8fa6d6af] Update version for v2.6=
-.0 release
-  git bisect bad bfc766d38e1fae5767d43845c15c79ac8fa6d6af
-  # good: [975eb6a547f809608ccb08c221552f666611af25] Update version for v2.=
-6.0-rc4 release
-  git bisect good 975eb6a547f809608ccb08c221552f666611af25
-  # good: [2068192dcccd8a80dddfcc8df6164cf9c26e0fc4] vga: update vga regist=
-er setup on vbe changes
-  git bisect good 2068192dcccd8a80dddfcc8df6164cf9c26e0fc4
-  # bad: [53db932604dfa7bb9241d132e0173894cf54261c] Merge remote-tracking b=
-ranch 'remotes/kraxel/tags/pull-vga-20160509-1' into staging
-  git bisect bad 53db932604dfa7bb9241d132e0173894cf54261c
-  # bad: [fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7] vga: make sure vga regi=
-ster setup for vbe stays intact (CVE-2016-3712).
-  git bisect bad fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7
-  # first bad commit: [fd3c136b3e1482cd0ec7285d6bc2a3e6a62c38d7] vga: make =
-sure vga register setup for vbe stays intact (CVE-2016-3712).
+  Actual outcome: No switch to tty1 in the VM. and qemu console
+  unresponsive to any keyboard input.
 
   =
 
-  I could reproduce that with QEMU 2.5.1 and QEMU 2.6 on a Debian derivate
-  (Promox VE) with 4.4 Kernel and also with QEMU 2.6 on an Arch Linux
-  System with a 4.5 Kernel, so it should not be host distro depended. Both
-  machines have Intel x86_64 processors.
-  The problem should be reproducible with said Versions or a build from
-  git including the above mentioned commit (fd3c136) by starting a VM with
-  an Windows 7 ISO, e.g.:
+  Rather a vague problem description I'm afraid but this has happened to me=
+ 3 times recently. No crash and no excessive CPU is observed.
 
-  Freezing installation (as vga defaults to std I marked it as optional):
-  ./x86_64-softmmu/qemu-system-x86_64 -boot d -cdrom win7.iso -m 1024 [-vga=
- (std|qxl|vmware)]
+  I'll grab an strace when it happens again and attach...
 
-  Working installation:
-  ./x86_64-softmmu/qemu-system-x86_64 -boot d -cdrom win7.iso -m 1024 -vga =
-cirrus
-
-  If someone has already an installed Windows 7 VM this behaviour should be
-  also observable when trying to start it with the new versions of QEMU.
-
-  Noteworthy may be that Windows 10 is working, I do not had time to get
-  other Windows versions and test them, I'll do that as soon as possible.
-  Various Linux system also seems do work fine, at least I did not ran
-  into an issue there yet.
-
-  I also tried testing with SeaBIOS and OVMF as firmware, as initially I
-  had no idea what broke, both lead to the same result - without the =
-
-  CVE-2016-3712 fix they both work, with not.
-  Further, KVM enabled and disabled does not make any difference.
-
-  =
-
-  [1] http://lists.nongnu.org/archive/html/qemu-devel/2016-05/msg02416.html
+  ProblemType: Bug
+  DistroRelease: Ubuntu 14.04
+  Package: qemu-system-x86 1.6.0+dfsg-2ubuntu4
+  ProcVersionSignature: Ubuntu 3.12.0-4.12-generic 3.12.1
+  Uname: Linux 3.12.0-4-generic i686
+  NonfreeKernelModules: nvidia
+  ApportVersion: 2.12.7-0ubuntu1
+  Architecture: i386
+  CurrentDesktop: Unity
+  Date: Tue Dec  3 15:41:40 2013
+  InstallationDate: Installed on 2010-10-21 (1139 days ago)
+  InstallationMedia: Ubuntu 10.10 "Maverick Meerkat" - Release i386 (201010=
+07)
+  SourcePackage: qemu
+  UpgradeStatus: Upgraded to trusty on 2013-11-01 (31 days ago)
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1581936/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1257352/+subscriptions
