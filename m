@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cly1Q-0002dF-SQ
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 08:22:26 -0500
+	(envelope-from <kwolf@redhat.com>) id 1clyQ0-0002Aa-Mt
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 08:47:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cly1O-0003h5-Iv
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 08:22:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45264)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cly1O-0003fT-De
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 08:22:22 -0500
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Thu,  9 Mar 2017 13:22:16 +0000
-Message-Id: <20170309132216.23482-3-dgilbert@redhat.com>
-In-Reply-To: <20170309132216.23482-1-dgilbert@redhat.com>
-References: <20170309132216.23482-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/2] postcopy: Check for shared memory
+	(envelope-from <kwolf@redhat.com>) id 1clyPz-0002kz-Rt
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 08:47:48 -0500
+Date: Thu, 9 Mar 2017 14:47:31 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170309134731.GA4910@noname.redhat.com>
+References: <20170308200216.5931-1-eblake@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170308200216.5931-1-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.9] block: Drop unmaintained
+ 'archipelago' driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,55 +23,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, quintela@redhat.com
-Cc: pbonzini@redhat.com, lvivier@redhat.com, pasic@linux.vnet.ibm.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, chris@include.gr, jcody@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, Markus Armbruster <armbru@redhat.com>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Am 08.03.2017 um 21:02 hat Eric Blake geschrieben:
+> The driver has failed to build since commit da34e65, in qemu 2.6,
+> due to a missing include of qapi/error.h for error_setg().
+> Since no one has complained in three releases, it is easier to
+> remove the dead code than to keep it around, especially since it
+> is not being built by default and therefore prone to bitrot.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-Postcopy doesn't support migration of RAM shared with another process
-yet (we've got a bunch of things to understand).
-Check for the case and don't allow postcopy to be enabled.
+Thanks, applied to the block branch.
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- migration/postcopy-ram.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
-
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index effbeb6..dc80dbb 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -95,6 +95,19 @@ static bool ufd_version_check(int ufd)
-     return true;
- }
- 
-+/* Callback from postcopy_ram_supported_by_host block iterator.
-+ */
-+static int test_range_shared(const char *block_name, void *host_addr,
-+                             ram_addr_t offset, ram_addr_t length, void *opaque)
-+{
-+    if (qemu_ram_is_shared(qemu_ram_block_by_name(block_name))) {
-+        error_report("Postcopy on shared RAM (%s) is not yet supported",
-+                     block_name);
-+        return 1;
-+    }
-+    return 0;
-+}
-+
- /*
-  * Note: This has the side effect of munlock'ing all of RAM, that's
-  * normally fine since if the postcopy succeeds it gets turned back on at the
-@@ -127,6 +140,11 @@ bool postcopy_ram_supported_by_host(void)
-         goto out;
-     }
- 
-+    /* We don't support postcopy with shared RAM yet */
-+    if (qemu_ram_foreach_block(test_range_shared, NULL)) {
-+        goto out;
-+    }
-+
-     /*
-      * userfault and mlock don't go together; we'll put it back later if
-      * it was enabled.
--- 
-2.9.3
+Kevin
