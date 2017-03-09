@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1clwPh-0000PB-W1
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 06:39:23 -0500
+	(envelope-from <kwolf@redhat.com>) id 1clwPe-0000LR-5W
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 06:39:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1clwPe-0006Zd-Ui
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 06:39:22 -0500
+	(envelope-from <kwolf@redhat.com>) id 1clwPd-0006Yo-0P
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 06:39:18 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu,  9 Mar 2017 12:39:01 +0100
-Message-Id: <1489059542-14232-6-git-send-email-kwolf@redhat.com>
+Date: Thu,  9 Mar 2017 12:39:00 +0100
+Message-Id: <1489059542-14232-5-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1489059542-14232-1-git-send-email-kwolf@redhat.com>
 References: <1489059542-14232-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 5/6] mirror: Implement .bdrv_refresh_filename
+Subject: [Qemu-devel] [PATCH 4/6] block: Refresh filename after changing
+ backing file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,49 +23,27 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-We want query-block to return the right filename, even if a mirror job
-put a bdrv_mirror_top on top of the actual image format driver. Let
-bdrv_mirror_top.bdrv_refresh_filename get the filename from its backing
-file.
+In bdrv_open_inherit(), the filename is refreshed after opening the
+backing file, but we neglected to do the same when the backing file
+changes later.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/mirror.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ block.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/block/mirror.c b/block/mirror.c
-index a5d30ee..4f3a5cb 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -12,6 +12,7 @@
-  */
+diff --git a/block.c b/block.c
+index 756d607..516cefe 100644
+--- a/block.c
++++ b/block.c
+@@ -1933,6 +1933,8 @@ void bdrv_set_backing_hd(BlockDriverState *bs, BlockDriverState *backing_hd,
+         bdrv_unref(backing_hd);
+     }
  
- #include "qemu/osdep.h"
-+#include "qemu/cutils.h"
- #include "trace.h"
- #include "block/blockjob_int.h"
- #include "block/block_int.h"
-@@ -1060,6 +1061,13 @@ static int coroutine_fn bdrv_mirror_top_pdiscard(BlockDriverState *bs,
-     return bdrv_co_pdiscard(bs->backing->bs, offset, count);
- }
- 
-+static void bdrv_mirror_top_refresh_filename(BlockDriverState *bs, QDict *opts)
-+{
-+    bdrv_refresh_filename(bs->backing->bs);
-+    pstrcpy(bs->exact_filename, sizeof(bs->exact_filename),
-+            bs->backing->bs->filename);
-+}
++    bdrv_refresh_filename(bs);
 +
- static void bdrv_mirror_top_close(BlockDriverState *bs)
- {
+ out:
+     bdrv_refresh_limits(bs, NULL);
  }
-@@ -1088,6 +1096,7 @@ static BlockDriver bdrv_mirror_top = {
-     .bdrv_co_pdiscard           = bdrv_mirror_top_pdiscard,
-     .bdrv_co_flush              = bdrv_mirror_top_flush,
-     .bdrv_co_get_block_status   = bdrv_mirror_top_get_block_status,
-+    .bdrv_refresh_filename      = bdrv_mirror_top_refresh_filename,
-     .bdrv_close                 = bdrv_mirror_top_close,
-     .bdrv_child_perm            = bdrv_mirror_top_child_perm,
- };
 -- 
 1.8.3.1
