@@ -1,20 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32923)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1clshS-0007HG-3i
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 02:41:27 -0500
+	(envelope-from <bounces@canonical.com>) id 1cltAX-0003dB-Vp
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 03:11:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1clshO-0005iR-6N
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 02:41:26 -0500
-Received: from [59.151.112.132] (port=2879 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1clshN-0005KQ-P4
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 02:41:22 -0500
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Date: Thu, 9 Mar 2017 15:40:07 +0800
-Message-ID: <1489045207-27706-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	(envelope-from <bounces@canonical.com>) id 1cltAU-0001gk-OZ
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 03:11:29 -0500
+Received: from indium.canonical.com ([91.189.90.7]:54130)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cltAU-0001eZ-HT
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 03:11:26 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cltAS-0003dd-2j
+	for <qemu-devel@nongnu.org>; Thu, 09 Mar 2017 08:11:24 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 12F432E80C3
+	for <qemu-devel@nongnu.org>; Thu,  9 Mar 2017 08:11:24 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] COLO-compare: Fix trace_event print bug
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 09 Mar 2017 08:00:49 -0000
+From: Michal Nowak <michal.nowak@resist.ca>
+Reply-To: Bug 1670175 <1670175@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170305190118.21996.2136.malonedeb@gac.canonical.com>
+Message-Id: <20170309080049.23256.5661.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1670175] Re: qemu-system-sparc64 with
+ tribblix-sparc-0m16.iso ends with "panic - kernel: no nucleus hblk8 to
+ allocate"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,67 +38,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu devel <qemu-devel@nongnu.org>
-Cc: Jason Wang <jasowang@redhat.com>, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+To: qemu-devel@nongnu.org
 
-Because of inet_ntoa() return a statically allocated buffer,
-subsequent calls will overwrite, So we fix this bug.
+This is how it ends with 2048 MB of memory instead of 1024:
 
-Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
----
- net/colo-compare.c | 33 +++++++++++++++++++++++++--------
- 1 file changed, 25 insertions(+), 8 deletions(-)
+> qemu-system-sparc64 -m 2048 -cdrom Downloads/tmp/tribblix-sparc-0m16.iso =
+-boot d -nographic
+OpenBIOS for Sparc64
+Configuration device id QEMU version 1 machine id 0
+kernel cmdline =
 
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index 282727b..54e6d40 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -182,10 +182,18 @@ static int packet_enqueue(CompareState *s, int mode)
-  */
- static int colo_packet_compare_common(Packet *ppkt, Packet *spkt, int offset)
- {
--    trace_colo_compare_ip_info(ppkt->size, inet_ntoa(ppkt->ip->ip_src),
--                               inet_ntoa(ppkt->ip->ip_dst), spkt->size,
--                               inet_ntoa(spkt->ip->ip_src),
--                               inet_ntoa(spkt->ip->ip_dst));
-+    if (trace_event_get_state(TRACE_COLO_COMPARE_MISCOMPARE)) {
-+        char pri_ip_src[20], pri_ip_dst[20], sec_ip_src[20], sec_ip_dst[20];
-+
-+        strcpy(pri_ip_src, inet_ntoa(ppkt->ip->ip_src));
-+        strcpy(pri_ip_dst, inet_ntoa(ppkt->ip->ip_dst));
-+        strcpy(sec_ip_src, inet_ntoa(spkt->ip->ip_src));
-+        strcpy(sec_ip_dst, inet_ntoa(spkt->ip->ip_dst));
-+
-+        trace_colo_compare_ip_info(ppkt->size, pri_ip_src,
-+                                   pri_ip_dst, spkt->size,
-+                                   sec_ip_src, sec_ip_dst);
-+    }
- 
-     if (ppkt->size == spkt->size) {
-         return memcmp(ppkt->data + offset, spkt->data + offset,
-@@ -336,10 +344,19 @@ static int colo_packet_compare_icmp(Packet *spkt, Packet *ppkt)
- static int colo_packet_compare_other(Packet *spkt, Packet *ppkt)
- {
-     trace_colo_compare_main("compare other");
--    trace_colo_compare_ip_info(ppkt->size, inet_ntoa(ppkt->ip->ip_src),
--                               inet_ntoa(ppkt->ip->ip_dst), spkt->size,
--                               inet_ntoa(spkt->ip->ip_src),
--                               inet_ntoa(spkt->ip->ip_dst));
-+    if (trace_event_get_state(TRACE_COLO_COMPARE_MISCOMPARE)) {
-+        char pri_ip_src[20], pri_ip_dst[20], sec_ip_src[20], sec_ip_dst[20];
-+
-+        strcpy(pri_ip_src, inet_ntoa(ppkt->ip->ip_src));
-+        strcpy(pri_ip_dst, inet_ntoa(ppkt->ip->ip_dst));
-+        strcpy(sec_ip_src, inet_ntoa(spkt->ip->ip_src));
-+        strcpy(sec_ip_dst, inet_ntoa(spkt->ip->ip_dst));
-+
-+        trace_colo_compare_ip_info(ppkt->size, pri_ip_src,
-+                                   pri_ip_dst, spkt->size,
-+                                   sec_ip_src, sec_ip_dst);
-+    }
-+
-     return colo_packet_compare_common(ppkt, spkt, 0);
- }
- 
--- 
-2.7.4
+CPUs: 1 x SUNW,UltraSPARC-IIi
+UUID: 00000000-0000-0000-0000-000000000000
+Welcome to OpenBIOS v1.1 built on Nov 24 2016 21:23
+  Type 'help' for detailed information
+Trying cdrom:f...
+Not a bootable ELF image
+Not a bootable a.out image
+
+Loading FCode image...
+Loaded 7120 bytes
+entry point is 0x4000
+Evaluating FCode...
+Evaluating FCode...
+Ignoring failed claim for va 10a96a0 memsz 19!
+Ignoring failed claim for va 1000000 memsz d1fb6!
+Ignoring failed claim for va 1402000 memsz 32518!
+Ignoring failed claim for va 1800000 memsz 52ac8!
+SunOS Release 5.11 Version tribblix-m16 64-bit
+Copyright (c) 1983, 2010, Oracle and/or its affiliates. All rights reserved.
+could not find debugger-vocabulary-hook>threads:interpret: exception -13 ca=
+ught
+interpret \ ident	"%Z%%M%	%I%	%E% SMI"
+\ Copyright 2005 Sun Microsystems, Inc.  All rights reserved.
+\ Use is subject to license terms.
+\
+\ CDDL HEADER START
+\
+\ The contents of this file are subject to the terms of the
+\ Common Development and Distribution License, Version 1.0 only
+\ (the "License").  You may not use this file except in compliance
+\ with the License.
+\
+\ You can obtain a copy of the license at usr/src/OPENSOLARIS.LICENSE
+\ or http://www.opensolaris.org/os/licensing.
+\ See the License for WARNING: add_spec: No major number for sf
+unix-tte:interpret: exception -13 caught
+interpret ' unix-tte is va>tte-data failed with error ffffffffffffffed
+WARNING: consconfig: cannot find driver for screen device /pci@1fe,0/QEMU,V=
+GA@2
+Hostname: tribblix
+Remounting root read/write
+Probing for device nodes ...
+WARNING: pcipsy0: unable to map reg entry 1
+
+Preparing image for use
+Requesting System Maintenance Mode
+(See /lib/svc/share/README for more information.)
+Console login service(s) cannot run
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1670175
+
+Title:
+  qemu-system-sparc64 with tribblix-sparc-0m16.iso ends with "panic -
+  kernel: no nucleus hblk8 to allocate"
+
+Status in QEMU:
+  New
+
+Bug description:
+  > qemu-system-sparc64 -m 1024 -cdrom Downloads/tribblix-sparc-0m16.iso -b=
+oot d -nographic
+  OpenBIOS for Sparc64
+  Configuration device id QEMU version 1 machine id 0
+  kernel cmdline =
+
+  CPUs: 1 x SUNW,UltraSPARC-IIi
+  UUID: 00000000-0000-0000-0000-000000000000
+  Welcome to OpenBIOS v1.1 built on Nov 24 2016 21:23
+    Type 'help' for detailed information
+  Trying cdrom:f...
+  Not a bootable ELF image
+  Not a bootable a.out image
+
+  Loading FCode image...
+  Loaded 7120 bytes
+  entry point is 0x4000
+  Evaluating FCode...
+  Evaluating FCode...
+  Ignoring failed claim for va 10a96a0 memsz 19!
+  Ignoring failed claim for va 1000000 memsz d1fb6!
+  Ignoring failed claim for va 1402000 memsz 32518!
+  Ignoring failed claim for va 1800000 memsz 52ac8!
+  SunOS Release 5.11 Version tribblix-m16 64-bit
+  Copyright (c) 1983, 2010, Oracle and/or its affiliates. All rights reserv=
+ed.
+  could not find debugger-vocabulary-hook>threads:interpret: exception -13 =
+caught
+  interpret \ ident	"%Z%%M%	%I%	%E% SMI"
+  \ Copyright 2005 Sun Microsystems, Inc.  All rights reserved.
+  \ Use is subject to license terms.
+  \
+  \ CDDL HEADER START
+  \
+  \ The contents of this file are subject to the terms of the
+  \ Common Development and Distribution License, Version 1.0 only
+  \ (the "License").  You may not use this file except in compliance
+  \ with the License.
+  \
+  \ You can obtain a copy of the license at usr/src/OPENSOLARIS.LICENSE
+  \ or http://www.opensolaris.org/os/licensing.
+  \ See the License for =
+
+  WARNING: add_spec: No major number for sf
+  panic - kernel: no nucleus hblk8 to allocate
+  EXIT
+
+  QEMU keeps running (CPU is on 100 % all the time), I can interact with
+  the prompt:
+
+  0 > boot
+  Not a Linux kernel image
+  Not a bootable ELF image
+  Not a bootable a.out image
+
+  Loading FCode image...
+  Unhandled Exception 0x0000000000000018
+  PC =3D 0x00000000ffd25310 NPC =3D 0x00000000ffd25314
+  Stopping execution
+
+  > qemu-system-sparc64 -version
+  QEMU emulator version 2.8.0(Virtualization:Staging / SLE_12_SP2)
+
+  from
+  https://build.opensuse.org/package/show/Virtualization:Staging/qemu on
+  openSUSE Leap 42.2.
+
+  ISO: http://pkgs.tribblix.org/iso/tribblix-sparc-0m16.iso.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1670175/+subscriptions
