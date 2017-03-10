@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cmPwI-0004Yz-8P
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 14:10:59 -0500
+	(envelope-from <anthony.xu@intel.com>) id 1cmQEx-0001uw-5a
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 14:30:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cmPwH-0004LQ-5H
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 14:10:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50444)
+	(envelope-from <anthony.xu@intel.com>) id 1cmQEu-00018b-42
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 14:30:15 -0500
+Received: from mga11.intel.com ([192.55.52.93]:20037)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cmPwG-0004KZ-TJ
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 14:10:57 -0500
-Date: Fri, 10 Mar 2017 21:10:53 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170310211037-mutt-send-email-mst@kernel.org>
-References: <1488519630-89058-1-git-send-email-wei.w.wang@intel.com>
-	<1488519630-89058-4-git-send-email-wei.w.wang@intel.com>
-	<20170309141411.GZ16328@bombadil.infradead.org>
-	<58C28FF8.5040403@intel.com>
-	<20170310175349-mutt-send-email-mst@kernel.org>
-	<20170310171143.GA16328@bombadil.infradead.org>
+	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
+	id 1cmQEt-00017A-Qn
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 14:30:12 -0500
+From: "Xu, Anthony" <anthony.xu@intel.com>
+Date: Fri, 10 Mar 2017 19:30:06 +0000
+Message-ID: <4712D8F4B26E034E80552F30A67BE0B1A0FC31@ORSMSX112.amr.corp.intel.com>
+References: <1489158897-9206-1-git-send-email-yang.zhong@intel.com>
+	<867e2a13-b48e-cb85-1eb9-38694e28c172@redhat.com>
+	<4712D8F4B26E034E80552F30A67BE0B1A0F66A@ORSMSX112.amr.corp.intel.com>
+	<a5f6ed2f-2580-beaa-a5d2-42857588844c@redhat.com>
+In-Reply-To: <a5f6ed2f-2580-beaa-a5d2-42857588844c@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170310171143.GA16328@bombadil.infradead.org>
-Subject: Re: [Qemu-devel] [PATCH v7 kernel 3/5] virtio-balloon:
- implementation of VIRTIO_BALLOON_F_CHUNK_TRANSFER
+Subject: Re: [Qemu-devel] [PATCH v1 1/2] reduce qemu's heap Rss size from
+ 12252kB to 2752KB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,55 +32,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Wei Wang <wei.w.wang@intel.com>, virtio-dev@lists.oasis-open.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, linux-mm@kvack.org, Liang Li <liang.z.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Amit Shah <amit.shah@redhat.com>, Dave Hansen <dave.hansen@intel.com>, Andrea Arcangeli <aarcange@redhat.com>, David Hildenbrand <david@redhat.com>, Liang Li <liliang324@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, "Zhong, Yang" <yang.zhong@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "Peng, Chao P" <chao.p.peng@intel.com>
 
-On Fri, Mar 10, 2017 at 09:11:44AM -0800, Matthew Wilcox wrote:
-> On Fri, Mar 10, 2017 at 05:58:28PM +0200, Michael S. Tsirkin wrote:
-> > One of the issues of current balloon is the 4k page size
-> > assumption. For example if you free a huge page you
-> > have to split it up and pass 4k chunks to host.
-> > Quite often host can't free these 4k chunks at all (e.g.
-> > when it's using huge tlb fs).
-> > It's even sillier for architectures with base page size >4k.
-> 
-> I completely agree with you that we should be able to pass a hugepage
-> as a single chunk.  Also we shouldn't assume that host and guest have
-> the same page size.  I think we can come up with a scheme that actually
-> lets us encode that into a 64-bit word, something like this:
-> 
-> bit 0 clear => bits 1-11 encode a page count, bits 12-63 encode a PFN, page size 4k.
-> bit 0 set, bit 1 clear => bits 2-12 encode a page count, bits 13-63 encode a PFN, page size 8k
-> bits 0+1 set, bit 2 clear => bits 3-13 for page count, bits 14-63 for PFN, page size 16k.
-> bits 0-2 set, bit 3 clear => bits 4-14 for page count, bits 15-63 for PFN, page size 32k
-> bits 0-3 set, bit 4 clear => bits 5-15 for page count, bits 16-63 for PFN, page size 64k
-
-huge page sizes go up to gigabytes.
-
-> That means we can always pass 2048 pages (of whatever page size) in a single chunk.  And
-> we support arbitrary power of two page sizes.  I suggest something like this:
-> 
-> u64 page_to_chunk(struct page *page)
-> {
-> 	u64 chunk = page_to_pfn(page) << PAGE_SHIFT;
-> 	chunk |= (1UL << compound_order(page)) - 1;
-> }
-> 
-> (note this is a single page of order N, so we leave the page count bits
-> set to 0, meaning one page).
-> 
-> > Two things to consider:
-> > - host should pass its base page size to guest
-> >   this can be a separate patch and for now we can fall back on 12 bit if not there
-> 
-> With this encoding scheme, I don't think we need to do this?  As long as
-> it's *at least* 12 bit, then we're fine.
-> 
-> > - guest should pass full huge pages to host
-> >   this should be done correctly to avoid breaking up huge pages
-> >   I would say yes let's use a single format but drop the "normal chunk"
-> >   and always use the extended one.
-> >   Also, size is in units of 4k, right? Please document that low 12 bit
-> >   are reserved, they will be handy as e.g. flags.
-> 
-> What per-chunk flags are you thinking would be useful?
+PiA+IElkZWFsbHksIGZyZWVpbmcgUU9NIG9iamVjdCBzaG91bGQgbm90IHJlcXVpcmUgYSBnbG9i
+YWwgbG9jay4NCj4gPiBJZiB5b3Ugc2VlIGFueSBvdGhlciBRT00gcmVxdWlyaW5nIGEgZ2xvYmFs
+IGxvY2ssIHBsZWFzZSBsZXQgdXMga25vdywgd2UNCj4gYXJlIHdpbGxpbmcgdG8gZml4IGl0Lg0K
+PiANCj4gQWxsIG9mIHRoZW0uICBXaGVuIHVucGx1Z2dpbmcgYSBkZXZpY2UsIHRoZSBkZXZpY2Ug
+b2JqZWN0IHdpbGwgYmUgZnJlZWQNCj4gZnJvbSBhbiBSQ1UgY2FsbGJhY2suDQo+IA0KDQpUaGFu
+a3MgZm9yIHlvdXIgcmVwbHksDQpTb21lIG9iamVjdHMgbWF5IG5vdCBuZWVkIGxvY2sgYXQgYWxs
+IHRvIGJlIGZyZWVkLA0KU29tZSBvYmplY3RzIG1heSBqdXN0IG5lZWQgYSBzbWFsbCBsb2NrIHRv
+IGJlIGZyZWVkLA0KDQpTaG91bGQgd2UgbGV0IFJDVSBjYWxsYmFja3MgdG8gZGVjaWRlIHdoaWNo
+IGxvY2sgdGhleSBuZWVkIGluc3RlYWQgb2YgZW5mb3JjaW5nICANCnRoZSBnbG9iYWwgbG9jayBp
+biBSQ1UgdGhyZWFkPw0KDQpBcyBmb3IgdGhlIGRldmljZSBvYmplY3QsIGNhbiB3ZSBnZXQgdGhl
+IGdsb2JhbCBsb2NrIGluc2lkZSB0aGUgb2JqZWN0IGZyZWUvZGVzdHJveSBmdW5jdGlvbiBmb3Ig
+bm93Pw0KDQpJZiB3ZSBjYW4gcmVtb3ZlIHRoZSBnbG9iYWwgbG9jayBpbnNpZGUgUkNVIHRocmVh
+ZCwgd2UgY2FuIHNhdmUgOU1CIGhlYXAgbWVtb3J5LCB0aGF0J3MgYSBsb3QhDQoNClBsZWFzZSBz
+aGFyZSB3aXRoIHVzIGlmIHlvdSBoYXZlIG90aGVyIGlkZWEgdG8gZG8gdGhpcy4NCg0KVGhhbmtz
+DQpBbnRob255DQoNCg0KDQo=
