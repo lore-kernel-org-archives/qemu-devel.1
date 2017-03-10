@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1cmEo2-0006aw-Av
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 02:17:43 -0500
+	(envelope-from <famz@redhat.com>) id 1cmErE-0008TJ-1w
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 02:21:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1cmEnz-0004KT-7O
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 02:17:42 -0500
-Received: from mga02.intel.com ([134.134.136.20]:50058)
+	(envelope-from <famz@redhat.com>) id 1cmErC-0005YR-1J
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 02:20:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34440)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1cmEny-0004IN-UB
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 02:17:39 -0500
-From: Yang Zhong <yang.zhong@intel.com>
-Date: Fri, 10 Mar 2017 23:14:57 +0800
-Message-Id: <1489158897-9206-2-git-send-email-yang.zhong@intel.com>
-In-Reply-To: <1489158897-9206-1-git-send-email-yang.zhong@intel.com>
-References: <1489158897-9206-1-git-send-email-yang.zhong@intel.com>
-Subject: [Qemu-devel] [PATCH v1 2/2] reduce qemu's heap Rss size from
- 12252kB to 2752KB
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cmErB-0005Y8-HD
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 02:20:57 -0500
+From: Fam Zheng <famz@redhat.com>
+Date: Fri, 10 Mar 2017 15:20:50 +0800
+Message-Id: <20170310072051.15704-2-famz@redhat.com>
+In-Reply-To: <20170310072051.15704-1-famz@redhat.com>
+References: <20170310072051.15704-1-famz@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 1/2] tests/docker: support proxy / corporate
+ firewall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,42 +28,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, anthony.xu@intel.com, chao.p.peng@intel.com, Yang Zhong <yang.zhong@intel.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-There is no need to delete subregion and do memory begin/commit for
-subpage in memory_region_finalize().
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-This patch is from Anthony Xu <anthony.xu@intel.com>.
+if ftp_proxy/http_proxy/https_proxy standard environment variables availa=
+ble,
+pass them to the docker daemon to build images.
+this is required when building behind corporate proxy/firewall, but also =
+help
+when using local cache server (ie: apt/yum).
 
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Message-Id: <20170306205520.32311-1-f4bug@amsat.org>
+Reviewed-by: Fam Zheng <famz@redhat.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- memory.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ tests/docker/docker.py | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/memory.c b/memory.c
-index 284894b..3e9bfff 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1505,13 +1505,14 @@ static void memory_region_finalize(Object *obj)
-      * and cause an infinite loop.
-      */
-     mr->enabled = false;
--    memory_region_transaction_begin();
--    while (!QTAILQ_EMPTY(&mr->subregions)) {
--        MemoryRegion *subregion = QTAILQ_FIRST(&mr->subregions);
--        memory_region_del_subregion(mr, subregion);
-+    if (!mr->subpage) {
-+        memory_region_transaction_begin();
-+        while (!QTAILQ_EMPTY(&mr->subregions)) {
-+            MemoryRegion *subregion = QTAILQ_FIRST(&mr->subregions);
-+            memory_region_del_subregion(mr, subregion);
-+        }
-+        memory_region_transaction_commit();
-     }
--    memory_region_transaction_commit();
--
-     mr->destructor(mr);
-     memory_region_clear_coalescing(mr);
-     g_free((char *)mr->name);
--- 
-1.9.1
+diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+index 9fd32ab..8747f6a 100755
+--- a/tests/docker/docker.py
++++ b/tests/docker/docker.py
+@@ -28,6 +28,9 @@ from shutil import copy, rmtree
+ from pwd import getpwuid
+=20
+=20
++FILTERED_ENV_NAMES =3D ['ftp_proxy', 'http_proxy', 'https_proxy']
++
++
+ DEVNULL =3D open(os.devnull, 'wb')
+=20
+=20
+@@ -272,6 +275,9 @@ class BuildCommand(SubCommand):
+                 _copy_binary_with_libs(args.include_executable,
+                                        docker_dir)
+=20
++            argv +=3D ["--build-arg=3D" + k.lower() + "=3D" + v
++                        for k, v in os.environ.iteritems()
++                        if k.lower() in FILTERED_ENV_NAMES]
+             dkr.build_image(tag, docker_dir, dockerfile,
+                             quiet=3Dargs.quiet, user=3Dargs.user, argv=3D=
+argv)
+=20
+--=20
+2.9.3
