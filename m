@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44692)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cmH3Y-00005X-WD
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 04:41:54 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cmH7V-0001J7-3S
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 04:45:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cmH3V-0003GT-Lr
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 04:41:53 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33928)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cmH3V-0003FN-FE
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 04:41:49 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cmH3T-0001Tk-T3
-	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 09:41:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 12A722E81FF
-	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 09:41:45 +0000 (UTC)
+	(envelope-from <alex.bennee@linaro.org>) id 1cmH7R-0004dv-IZ
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 04:45:56 -0500
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:33324)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cmH7R-0004dZ-44
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 04:45:53 -0500
+Received: by mail-wr0-x236.google.com with SMTP id u48so61425882wrc.0
+	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 01:45:52 -0800 (PST)
+References: <20170303131113.25898-1-pbonzini@redhat.com>
+	<20170303131113.25898-2-pbonzini@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170303131113.25898-2-pbonzini@redhat.com>
+Date: Fri, 10 Mar 2017 09:46:02 +0000
+Message-ID: <871su5ihwl.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 10 Mar 2017 09:28:49 -0000
-From: Rudolf Marek <1645355@bugs.launchpad.net>
-Reply-To: Bug 1645355 <1645355@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20161128150552.28561.31457.malonedeb@soybean.canonical.com>
-Message-Id: <20170310092849.25439.46661.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1645355] Re: x86: singlestepping through SYSCALL
- instruction causes exception in kernelspace
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/5] qemu-timer: fix off-by-one
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,77 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-Hi Andreas, man thanks for your reply. I can confirm that applying the
-two patches fixes my problem in the older version of the QEMU.
-
-** Changed in: qemu
-       Status: New =3D> Fix Committed
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1645355
-
-Title:
-  x86: singlestepping through SYSCALL instruction causes exception in
-  kernelspace
-
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  Hi,
-
-  The bug was originally reported [1] and [2] here. There is a problem
-  inside QEMU with singlestepping from userspace until SYSCALL
-  instruction is reached. The OS has in FMASK TF bit set, therefore
-  there should be no singlestepping exception when transitioning to
-  kernelmode. But, inside QEMU there is (TF is clear seems FMASK is
-  applied). See below for further details.
-
-  The reproducer is available at [2].
-
-  Here is the original text with some minor clarifications:
-
-  It seems that there is something wrong with QEMU with respect to
-  handle the singlestepping and AMD64 syscall instruction.
-
-  The AMD "syscall" instruction will clear defined flag in the FMASK
-  MSR. Normally the TF flag is set there, so the first instruction when
-  kernel is entered after syscall won't cause single step exception in
-  the kernel.
-
-  The observed scenario is a unhandled singlestep fault in the kernel or
-  host reboot or QEMU crash.
-
-  The possible way how to reproduce it is to single step through any
-  function (in userspace) which does "syscall" instruction. After
-  syscall is entered QEMU will trigger singlestepping exception in the
-  kernel despite that the TF is set in FMASK MSR. Real HW behaves
-  correctly and does not trigger this exception.
-
-  =
-
-  What is interesting is that I was not able to trigger it if I just enable=
-d TF and did the syscall instruction, perhaps for this bug is somewhat impo=
-rtant to have TF set for previous few instruction.
-
-  =
-
-  I have stumbled to this problem while working with our custom OS. However=
- after some googling I found out that the NetBSD guys (CCed) are having ver=
-y similar problem and I asked them to prepare a ISO image where the problem=
- ends with QEMU SIGSEGV or host reboot. =
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 
 
-  Thanks
-  Rudolf
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-  [1] https://lists.gnu.org/archive/html/qemu-devel/2015-10/msg02289.html
-  [2] http://gnats.netbsd.org/49603
+> If the first timer is exactly at the current value of the clock, the
+> deadline is met and the timer should fire.  This fixes itself without icount,
+> but with icount execution of instructions will stop exactly at the deadline.
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1645355/+subscriptions
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+
+> ---
+>  util/qemu-timer.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/util/qemu-timer.c b/util/qemu-timer.c
+> index 6cf70b9..2f20151 100644
+> --- a/util/qemu-timer.c
+> +++ b/util/qemu-timer.c
+> @@ -199,7 +199,7 @@ bool timerlist_expired(QEMUTimerList *timer_list)
+>      expire_time = timer_list->active_timers->expire_time;
+>      qemu_mutex_unlock(&timer_list->active_timers_lock);
+>
+> -    return expire_time < qemu_clock_get_ns(timer_list->clock->type);
+> +    return expire_time <= qemu_clock_get_ns(timer_list->clock->type);
+>  }
+>
+>  bool qemu_clock_expired(QEMUClockType type)
+
+
+--
+Alex Bennée
