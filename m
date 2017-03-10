@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50185)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cm97m-0006Fg-Em
+	(envelope-from <dgibson@ozlabs.org>) id 1cm97m-0006Fl-H1
 	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 20:13:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cm97h-0003rr-Ol
+	(envelope-from <dgibson@ozlabs.org>) id 1cm97k-0003ss-Db
 	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 20:13:42 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 10 Mar 2017 12:13:27 +1100
-Message-Id: <20170310011328.30719-5-david@gibson.dropbear.id.au>
+Date: Fri, 10 Mar 2017 12:13:28 +1100
+Message-Id: <20170310011328.30719-6-david@gibson.dropbear.id.au>
 In-Reply-To: <20170310011328.30719-1-david@gibson.dropbear.id.au>
 References: <20170310011328.30719-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCH for-2.10 4/5] pseries: Use smaller default hash
- page tables when guest can resize
+Subject: [Qemu-devel] [PATCH for-2.10 5/5] pseries: Allow HPT resizing with
+ KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,159 +23,276 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org
 Cc: qemu-devel@nongnu.org, agraf@suse.de, sjitindarsingh@gmail.com, sam.bobroff@au1.ibm.com, David Gibson <david@gibson.dropbear.id.au>
 
-We've now implemented a PAPR extension allowing PAPR guest to resize
-their hash page table (HPT) during runtime.
+So far, qemu implements the PAPR Hash Page Table (HPT) resizing extension
+with TCG.  The same implementation will work with KVM PR, but we don't
+currently allow that.  For KVM HV we can only implement resizing with the
+assistance of the host kernel, which needs a new capability and ioctl()s.
 
-This patch makes use of that facility to allocate smaller HPTs by default.
-Specifically when a guest is aware of the HPT resize facility, qemu sizes
-the HPT to the initial memory size, rather than the maximum memory size on
-the assumption that the guest will resize its HPT if necessary for hot
-plugged memory.
+This patch adds support for testing the new KVM capability and implementing
+the resize in terms of KVM facilities when necessary.  If we're running on
+a kernel which doesn't have the new capability flag at all, we fall back to
+testing for PR vs. HV KVM using the same hack that we already use in a
+number of places for older kernels.
 
-When the initial memory size is much smaller than the maximum memory size
-(a common configuration with e.g. oVirt / RHEV) then this can save
-significant memory on the HPT.
-
-If the guest does *not* advertise HPT resize awareness when it makes the
-ibm,client-architecture-support call, qemu resizes the HPT for maxmimum
-memory size (unless it's been configured not to allow such guests at all).
-
-For now we make that reallocation assuming the guest has not yet used the
-HPT at all.  That's true in practice, but not, strictly, an architectural
-or PAPR requirement.  If we need to in future we can fix this by having
-the client-architecture-support call reboot the guest with the revised
-HPT size (the client-architecture-support call is explicitly permitted to
-trigger a reboot in this way).
+NOTE: This patch updates the linux-headers tree with the define for the
+new capability and ioctl()s.  Since the corresponding kernel changes aren't
+yet upstream this is a temporary hack to be replaced by a proper headers
+update before merge.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 ---
- hw/ppc/spapr.c              | 21 ++++++++++++++++-----
- hw/ppc/spapr_hcall.c        | 32 ++++++++++++++++++++++++++++++++
- include/hw/ppc/spapr.h      |  2 ++
- include/hw/ppc/spapr_ovec.h |  1 +
- 4 files changed, 51 insertions(+), 5 deletions(-)
+ hw/ppc/spapr_hcall.c | 65 +++++++++++++++++++++++++++++++++++++++++++++++---
+ target/ppc/kvm.c     | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++--
+ target/ppc/kvm_ppc.h | 21 ++++++++++++++++
+ 3 files changed, 148 insertions(+), 5 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 6553f2c..573515f 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1180,8 +1180,8 @@ int spapr_hpt_shift_for_ramsize(uint64_t ramsize)
-     return shift;
- }
- 
--static void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
--                                 Error **errp)
-+void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
-+                          Error **errp)
- {
-     long rc;
- 
-@@ -1254,6 +1254,7 @@ static void ppc_spapr_reset(void)
-     hwaddr rtas_addr, fdt_addr;
-     void *fdt;
-     int rc;
-+    int hpt_shift;
- 
-     /* Check for unknown sysbus devices */
-     foreach_dynamic_sysbus_device(find_unknown_sysbus_device, NULL);
-@@ -1261,9 +1262,14 @@ static void ppc_spapr_reset(void)
-     spapr->patb_entry = 0;
- 
-     /* Allocate and/or reset the hash page table */
--    spapr_reallocate_hpt(spapr,
--                         spapr_hpt_shift_for_ramsize(machine->maxram_size),
--                         &error_fatal);
-+    if ((spapr->resize_hpt == SPAPR_RESIZE_HPT_DISABLED)
-+        || (spapr->cas_reboot
-+            && !spapr_ovec_test(spapr->ov5_cas, OV5_HPT_RESIZE))) {
-+        hpt_shift = spapr_hpt_shift_for_ramsize(machine->maxram_size);
-+    } else {
-+        hpt_shift = spapr_hpt_shift_for_ramsize(machine->ram_size);
-+    }
-+    spapr_reallocate_hpt(spapr, hpt_shift, &error_fatal);
- 
-     /* Update the RMA size if necessary */
-     if (spapr->vrma_adjust) {
-@@ -2092,6 +2098,11 @@ static void ppc_spapr_init(MachineState *machine)
-         spapr_ovec_set(spapr->ov5, OV5_HP_EVT);
-     }
- 
-+    /* advertise support for HPT resizing */
-+    if (spapr->resize_hpt != SPAPR_RESIZE_HPT_DISABLED) {
-+        spapr_ovec_set(spapr->ov5, OV5_HPT_RESIZE);
-+    }
-+
-     /* init CPUs */
-     if (machine->cpu_model == NULL) {
-         machine->cpu_model = kvm_enabled() ? "host" : smc->tcg_default_cpu;
 diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 4c0b0fb..ee1b7fa 100644
+index ee1b7fa..f66bc4f 100644
 --- a/hw/ppc/spapr_hcall.c
 +++ b/hw/ppc/spapr_hcall.c
-@@ -1346,6 +1346,38 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+@@ -457,6 +457,44 @@ static ram_addr_t get_current_ram_size(void)
+     return size;
+ }
  
-     ov5_guest = spapr_ovec_parse_vector(ov_table, 5);
- 
-+    /*
-+     * HPT resizing is a bit of a special case, because when enabled
-+     * we assume the guest will support it until it says it doesn't,
-+     * instead of assuming it won't support it until it says it does.
-+     * Strictly speaking that approach could break for guests which
-+     * don't make a CAS call, but those are so old we don't care about
-+     * them.  Without that assumption we'd have to make at least a
-+     * temporary allocation of an HPT sized for max memory, which
-+     * could be impossibly difficult under KVM HV if maxram is large.
-+     */
-+    if (!spapr_ovec_test(ov5_guest, OV5_HPT_RESIZE)) {
-+        int maxshift = spapr_hpt_shift_for_ramsize(MACHINE(spapr)->maxram_size);
-+
-+        if (spapr->resize_hpt == SPAPR_RESIZE_HPT_REQUIRED) {
-+            error_report(
-+                "h_client_architecture_support: Guest doesn't support HPT resizing, but resize-hpt=required");
-+            exit(1);
-+        }
-+
-+        if (spapr->htab_shift < maxshift) {
-+            CPUState *cs;
-+            /* Guest doesn't know about HPT resizing, so we
-+             * pre-emptively resize for the maximum permitted RAM.  At
-+             * the point this is called, nothing should have been
-+             * entered into the existing HPT */
-+            spapr_reallocate_hpt(spapr, maxshift, &error_fatal);
-+            CPU_FOREACH(cs) {
-+                run_on_cpu(cs, pivot_hpt, RUN_ON_CPU_HOST_PTR(spapr));
-+            }
-+        }
++/* Convert a return code from the KVM ioctl()s implementing resize HPT
++ * into a PAPR hypercall return code */
++static target_ulong resize_hpt_convert_rc(int ret)
++{
++    if (ret >= 100000) {
++        return H_LONG_BUSY_ORDER_100_SEC;
++    } else if (ret >= 10000) {
++        return H_LONG_BUSY_ORDER_10_SEC;
++    } else if (ret >= 1000) {
++        return H_LONG_BUSY_ORDER_1_SEC;
++    } else if (ret >= 100) {
++        return H_LONG_BUSY_ORDER_100_MSEC;
++    } else if (ret >= 10) {
++        return H_LONG_BUSY_ORDER_10_MSEC;
++    } else if (ret > 0) {
++        return H_LONG_BUSY_ORDER_1_MSEC;
 +    }
 +
-     /* NOTE: there are actually a number of ov5 bits where input from the
-      * guest is always zero, and the platform/QEMU enables them independently
-      * of guest input. To model these properly we'd want some sort of mask,
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index ba5c7d5..d4a9ed7 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -645,6 +645,8 @@ void spapr_hotplug_req_remove_by_count_indexed(sPAPRDRConnectorType drc_type,
- void *spapr_populate_hotplug_cpu_dt(CPUState *cs, int *fdt_offset,
-                                     sPAPRMachineState *spapr);
- int spapr_hpt_shift_for_ramsize(uint64_t ramsize);
-+void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
-+                          Error **errp);
++    switch (ret) {
++    case 0:
++        return H_SUCCESS;
++    case -EPERM:
++        return H_AUTHORITY;
++    case -EINVAL:
++        return H_PARAMETER;
++    case -ENXIO:
++        return H_CLOSED;
++    case -ENOSPC:
++        return H_PTEG_FULL;
++    case -EBUSY:
++        return H_BUSY;
++    case -ENOMEM:
++        return H_NO_MEM;
++    default:
++        return H_HARDWARE;
++    }
++}
++
+ static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
+                                          sPAPRMachineState *spapr,
+                                          target_ulong opcode,
+@@ -465,6 +503,7 @@ static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
+     target_ulong flags = args[0];
+     int shift = args[1];
+     sPAPRPendingHPT *pending = spapr->pending_hpt;
++    int rc;
  
- /* rtas-configure-connector state */
- struct sPAPRConfigureConnectorState {
-diff --git a/include/hw/ppc/spapr_ovec.h b/include/hw/ppc/spapr_ovec.h
-index 355a344..f5fed87 100644
---- a/include/hw/ppc/spapr_ovec.h
-+++ b/include/hw/ppc/spapr_ovec.h
-@@ -47,6 +47,7 @@ typedef struct sPAPROptionVector sPAPROptionVector;
- #define OV5_DRCONF_MEMORY       OV_BIT(2, 2)
- #define OV5_FORM1_AFFINITY      OV_BIT(5, 0)
- #define OV5_HP_EVT              OV_BIT(6, 5)
-+#define OV5_HPT_RESIZE          OV_BIT(6, 7)
+     if (spapr->resize_hpt == SPAPR_RESIZE_HPT_DISABLED) {
+         return H_AUTHORITY;
+@@ -487,6 +526,11 @@ static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
+         return H_RESOURCE;
+     }
  
- /* interfaces */
- sPAPROptionVector *spapr_ovec_new(void);
++    rc = kvmppc_resize_hpt_prepare(cpu, flags, shift);
++    if (rc != -ENOSYS) {
++        return resize_hpt_convert_rc(rc);
++    }
++
+     if (pending) {
+         /* something already in progress */
+         if (pending->shift == shift) {
+@@ -682,6 +726,11 @@ static target_ulong h_resize_hpt_commit(PowerPCCPU *cpu,
+ 
+     trace_spapr_h_resize_hpt_commit(flags, shift);
+ 
++    rc = kvmppc_resize_hpt_commit(cpu, flags, shift);
++    if (rc != -ENOSYS) {
++        return resize_hpt_convert_rc(rc);
++    }
++
+     if (flags != 0) {
+         return H_PARAMETER;
+     }
+@@ -700,12 +749,17 @@ static target_ulong h_resize_hpt_commit(PowerPCCPU *cpu,
+     rc = rehash_hpt(cpu, spapr->htab, HTAB_SIZE(spapr),
+                     pending->hpt, newsize);
+     if (rc == H_SUCCESS) {
+-        CPUState *cs;
+-
+         qemu_vfree(spapr->htab);
+         spapr->htab = pending->hpt;
+         spapr->htab_shift = pending->shift;
+ 
++        if (kvm_enabled()) {
++            /* For KVM PR, update the HPT pointer */
++            target_ulong sdr1 = (target_ulong)(uintptr_t)spapr->htab
++                | (spapr->htab_shift - 18);
++            kvmppc_update_sdr1(sdr1);
++        }
++
+         pending->hpt = NULL; /* so it's not free()d */
+     }
+ 
+@@ -1373,7 +1427,12 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+              * entered into the existing HPT */
+             spapr_reallocate_hpt(spapr, maxshift, &error_fatal);
+             CPU_FOREACH(cs) {
+-                run_on_cpu(cs, pivot_hpt, RUN_ON_CPU_HOST_PTR(spapr));
++                if (kvm_enabled()) {
++                    /* For KVM PR, update the HPT pointer */
++                    target_ulong sdr1 = (target_ulong)(uintptr_t)spapr->htab
++                        | (spapr->htab_shift - 18);
++                    kvmppc_update_sdr1(sdr1);
++                }
+             }
+         }
+     }
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 97591d2..bff04ff 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -84,6 +84,7 @@ static int cap_papr;
+ static int cap_htab_fd;
+ static int cap_fixup_hcalls;
+ static int cap_htm;             /* Hardware transactional memory support */
++static int cap_resize_hpt;
+ 
+ static uint32_t debug_inst_opcode;
+ 
+@@ -137,6 +138,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     cap_htab_fd = kvm_check_extension(s, KVM_CAP_PPC_HTAB_FD);
+     cap_fixup_hcalls = kvm_check_extension(s, KVM_CAP_PPC_FIXUP_HCALL);
+     cap_htm = kvm_vm_check_extension(s, KVM_CAP_PPC_HTM);
++    cap_resize_hpt = kvm_vm_check_extension(s, KVM_CAP_SPAPR_RESIZE_HPT);
+ 
+     if (!cap_interrupt_level) {
+         fprintf(stderr, "KVM: Couldn't find level irq capability. Expect the "
+@@ -2603,10 +2605,71 @@ int kvmppc_enable_hwrng(void)
+ void kvmppc_check_papr_resize_hpt(Error **errp)
+ {
+     if (!kvm_enabled()) {
+-        return;
++        return; /* No KVM, we're good */
++    }
++
++    if (cap_resize_hpt) {
++        return; /* Kernel has explicit support, we're good */
+     }
+ 
+-    /* TODO: Check for resize-capable KVM implementations */
++    /* Otherwise fallback on looking for PR KVM */
++    if (kvmppc_is_pr(kvm_state)) {
++        return;
++    }
+ 
+     error_setg(errp, "Hash page table resizing not available with this KVM version");
+ }
++
++int kvmppc_resize_hpt_prepare(PowerPCCPU *cpu, target_ulong flags, int shift)
++{
++    CPUState *cs = CPU(cpu);
++    struct kvm_ppc_resize_hpt rhpt = {
++        .flags = flags,
++        .shift = shift,
++    };
++
++    if (!cap_resize_hpt) {
++        return -ENOSYS;
++    }
++
++    return kvm_vm_ioctl(cs->kvm_state, KVM_PPC_RESIZE_HPT_PREPARE, &rhpt);
++}
++
++int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ulong flags, int shift)
++{
++    CPUState *cs = CPU(cpu);
++    struct kvm_ppc_resize_hpt rhpt = {
++        .flags = flags,
++        .shift = shift,
++    };
++
++    if (!cap_resize_hpt) {
++        return -ENOSYS;
++    }
++
++    return kvm_vm_ioctl(cs->kvm_state, KVM_PPC_RESIZE_HPT_COMMIT, &rhpt);
++}
++
++static void kvmppc_pivot_hpt_cpu(CPUState *cs, run_on_cpu_data arg)
++{
++    target_ulong sdr1 = arg.target_ptr;
++    PowerPCCPU *cpu = POWERPC_CPU(cs);
++    CPUPPCState *env = &cpu->env;
++
++    /* This is just for the benefit of PR KVM */
++    cpu_synchronize_state(cs);
++    env->spr[SPR_SDR1] = sdr1;
++    if (kvmppc_put_books_sregs(cpu) < 0) {
++        error_report("Unable to update SDR1 in KVM");
++        exit(1);
++    }
++}
++
++void kvmppc_update_sdr1(target_ulong sdr1)
++{
++    CPUState *cs;
++
++    CPU_FOREACH(cs) {
++        run_on_cpu(cs, kvmppc_pivot_hpt_cpu, RUN_ON_CPU_TARGET_PTR(sdr1));
++    }
++}
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index cd3b234..493ff2e 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -57,6 +57,9 @@ int kvmppc_enable_hwrng(void);
+ int kvmppc_put_books_sregs(PowerPCCPU *cpu);
+ PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
+ void kvmppc_check_papr_resize_hpt(Error **errp);
++int kvmppc_resize_hpt_prepare(PowerPCCPU *cpu, target_ulong flags, int shift);
++int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ulong flags, int shift);
++void kvmppc_update_sdr1(target_ulong sdr1);
+ 
+ bool kvmppc_is_mem_backend_page_size_ok(char *obj_path);
+ 
+@@ -272,6 +275,24 @@ static inline void kvmppc_check_papr_resize_hpt(Error **errp)
+ {
+     return;
+ }
++
++static inline int kvmppc_resize_hpt_prepare(PowerPCCPU *cpu,
++                                            target_ulong flags, int shift)
++{
++    return -ENOSYS;
++}
++
++static inline int kvmppc_resize_hpt_commit(PowerPCCPU *cpu,
++                                           target_ulong flags, int shift)
++{
++    return -ENOSYS;
++}
++
++static inline void kvmppc_update_sdr1(target_ulong sdr1)
++{
++    abort();
++}
++
+ #endif
+ 
+ #ifndef CONFIG_KVM
 -- 
 2.9.3
