@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cmErE-0008TJ-1w
+	(envelope-from <famz@redhat.com>) id 1cmErE-0008TI-1q
 	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 02:21:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cmErC-0005YR-1J
+	(envelope-from <famz@redhat.com>) id 1cmErA-0005Y2-K4
 	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 02:20:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34440)
+Received: from mx1.redhat.com ([209.132.183.28]:49296)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cmErB-0005Y8-HD
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 02:20:57 -0500
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cmErA-0005Xg-Ep
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 02:20:56 -0500
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 10 Mar 2017 15:20:50 +0800
-Message-Id: <20170310072051.15704-2-famz@redhat.com>
-In-Reply-To: <20170310072051.15704-1-famz@redhat.com>
-References: <20170310072051.15704-1-famz@redhat.com>
+Date: Fri, 10 Mar 2017 15:20:49 +0800
+Message-Id: <20170310072051.15704-1-famz@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/2] tests/docker: support proxy / corporate
- firewall
+Subject: [Qemu-devel] [PULL 0/2] Docker patches for 2.9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +27,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+The following changes since commit eba44e9339fc13c36e24c8c59e2b73ea231b46=
+a1:
 
-if ftp_proxy/http_proxy/https_proxy standard environment variables availa=
-ble,
-pass them to the docker daemon to build images.
-this is required when building behind corporate proxy/firewall, but also =
-help
-when using local cache server (ie: apt/yum).
+  Merge remote-tracking branch 'remotes/jasowang/tags/net-pull-request' i=
+nto staging (2017-03-06 15:13:23 +0000)
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <20170306205520.32311-1-f4bug@amsat.org>
-Reviewed-by: Fam Zheng <famz@redhat.com>
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- tests/docker/docker.py | 6 ++++++
- 1 file changed, 6 insertions(+)
+are available in the git repository at:
 
-diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-index 9fd32ab..8747f6a 100755
---- a/tests/docker/docker.py
-+++ b/tests/docker/docker.py
-@@ -28,6 +28,9 @@ from shutil import copy, rmtree
- from pwd import getpwuid
-=20
-=20
-+FILTERED_ENV_NAMES =3D ['ftp_proxy', 'http_proxy', 'https_proxy']
-+
-+
- DEVNULL =3D open(os.devnull, 'wb')
-=20
-=20
-@@ -272,6 +275,9 @@ class BuildCommand(SubCommand):
-                 _copy_binary_with_libs(args.include_executable,
-                                        docker_dir)
-=20
-+            argv +=3D ["--build-arg=3D" + k.lower() + "=3D" + v
-+                        for k, v in os.environ.iteritems()
-+                        if k.lower() in FILTERED_ENV_NAMES]
-             dkr.build_image(tag, docker_dir, dockerfile,
-                             quiet=3Dargs.quiet, user=3Dargs.user, argv=3D=
-argv)
-=20
+  git://github.com/famz/qemu.git tags/docker-pull-request
+
+for you to fetch changes up to 8ba1e5f72b17584f23e17c54494bb4beeb05174e:
+
+  docker/dockerfiles/debian-s390-cross: include clang (2017-03-10 15:05:2=
+2 +0800)
+
+----------------------------------------------------------------
+
+Hi Peter, here are two more docker patches:
+
+- Fix for shippable.
+- Improvement on proxy env var. Technically it's not a fix but since it's=
+ under
+  tests/, it doesn't have to wait for the 2.10 window.
+
+----------------------------------------------------------------
+
+Alex Benn=C3=A9e (1):
+  docker/dockerfiles/debian-s390-cross: include clang
+
+Philippe Mathieu-Daud=C3=A9 (1):
+  tests/docker: support proxy / corporate firewall
+
+ tests/docker/docker.py                             | 6 ++++++
+ tests/docker/dockerfiles/debian-s390x-cross.docker | 4 ++--
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
 --=20
 2.9.3
