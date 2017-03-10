@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cmH8W-0001xp-4c
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 04:47:01 -0500
+	(envelope-from <groug@kaod.org>) id 1cmHAC-0002Za-0S
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 04:48:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cmH8T-00056r-FR
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 04:47:00 -0500
-Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:35240)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cmH8T-00056Z-8k
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 04:46:57 -0500
-Received: by mail-wr0-x22f.google.com with SMTP id g10so61391038wrg.2
-	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 01:46:57 -0800 (PST)
-References: <20170303131113.25898-1-pbonzini@redhat.com>
-	<20170303131113.25898-3-pbonzini@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170303131113.25898-3-pbonzini@redhat.com>
-Date: Fri, 10 Mar 2017 09:47:07 +0000
-Message-ID: <87zigth3ac.fsf@linaro.org>
+	(envelope-from <groug@kaod.org>) id 1cmHA9-0005iM-Bk
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 04:48:44 -0500
+Received: from 17.mo3.mail-out.ovh.net ([87.98.178.58]:59819)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cmHA9-0005hw-0l
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 04:48:41 -0500
+Received: from player693.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id B7B21B48AD
+	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 10:48:37 +0100 (CET)
+Date: Fri, 10 Mar 2017 10:48:28 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170310104828.78604daf@bahia>
+In-Reply-To: <20170309185426.3506a17b@bahia>
+References: <alpine.DEB.2.10.1703061807431.17906@sstabellini-ThinkPad-X260>
+	<1488852768-8935-1-git-send-email-sstabellini@kernel.org>
+	<1488852768-8935-3-git-send-email-sstabellini@kernel.org>
+	<20170309185426.3506a17b@bahia>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/5] qemu-timer: do not include
- sysemu/cpus.h from util/qemu-timer.h
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/wI20=p6ac62gZp=LQwj4pOq";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH 3/8] xen/9pfs: introduce Xen 9pfs backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,156 +33,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Stefano Stabellini <sstabellini@kernel.org>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <stefano@aporeto.com>, anthony.perard@citrix.com, jgross@suse.com, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
 
+--Sig_/wI20=p6ac62gZp=LQwj4pOq
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On Thu, 9 Mar 2017 18:54:26 +0100
+Greg Kurz <groug@kaod.org> wrote:
 
-> This dependency is the wrong way, and we will need util/qemu-timer.h from sysemu/cpus.h
-> in the next patch.
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> On Mon,  6 Mar 2017 18:12:43 -0800
+> Stefano Stabellini <sstabellini@kernel.org> wrote:
+>=20
+> > Introduce the Xen 9pfs backend: add struct XenDevOps to register as a
+> > Xen backend and add struct V9fsTransport to register as v9fs transport.
+> >=20
+> > All functions are empty stubs for now.
+> >=20
+> > Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
+> > CC: anthony.perard@citrix.com
+> > CC: jgross@suse.com
+> > CC: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
+> > CC: Greg Kurz <groug@kaod.org>
+> > ---
+> >  hw/9pfs/xen-9p-backend.c | 96 ++++++++++++++++++++++++++++++++++++++++=
+++++++++
+> >  1 file changed, 96 insertions(+)
+> >  create mode 100644 hw/9pfs/xen-9p-backend.c
+> >=20
+> > diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
+> > new file mode 100644
+> > index 0000000..924fb64
+> > --- /dev/null
+> > +++ b/hw/9pfs/xen-9p-backend.c
+> > @@ -0,0 +1,96 @@
+> > +/*
+> > + * Xen 9p backend
+> > + *
+> > + * Copyright Aporeto 2017
+> > + *
+> > + * Authors:
+> > + *  Stefano Stabellini <stefano@aporeto.com>
+> > + *
+> > + */
+> > +
+> > +#include "qemu/osdep.h"
+> > +
+> > +#include "hw/hw.h"
+> > +#include "hw/9pfs/9p.h"
+> > +#include "hw/xen/xen_backend.h"
+> > +#include "xen_9pfs.h"
+> > +#include "qemu/config-file.h"
+> > +#include "fsdev/qemu-fsdev.h"
+> > +
+> > +struct Xen9pfsDev {
+> > +    struct XenDevice xendev;  /* must be first */
+> > +}; =20
+>=20
+> According to HACKING, this should be:
+>=20
+> typedef struct Xen9pfsDev {
+>     struct XenDevice xendev;  /* must be first */
+> } Xen9pfsDev;
+>=20
+> and...
+>=20
+> > +
+> > +static ssize_t xen_9pfs_pdu_vmarshal(V9fsPDU *pdu,
+> > +                                     size_t offset,
+> > +                                     const char *fmt,
+> > +                                     va_list ap)
+> > +{
+> > +    return 0;
+> > +}
+> > +
+> > +static ssize_t xen_9pfs_pdu_vunmarshal(V9fsPDU *pdu,
+> > +                                       size_t offset,
+> > +                                       const char *fmt,
+> > +                                       va_list ap)
+> > +{
+> > +    return 0;
+> > +}
+> > +
+> > +static void xen_9pfs_init_out_iov_from_pdu(V9fsPDU *pdu,
+> > +                                           struct iovec **piov,
+> > +                                           unsigned int *pniov)
+> > +{
+> > +}
+> > +
+> > +static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pdu,
+> > +                                          struct iovec **piov,
+> > +                                          unsigned int *pniov,
+> > +                                          size_t size)
+> > +{
+> > +}
+> > +
+> > +static void xen_9pfs_push_and_notify(V9fsPDU *pdu)
+> > +{
+> > +}
+> > +
+> > +static const struct V9fsTransport xen_9p_transport =3D {
+> > +    .pdu_vmarshal =3D xen_9pfs_pdu_vmarshal,
+> > +    .pdu_vunmarshal =3D xen_9pfs_pdu_vunmarshal,
+> > +    .init_in_iov_from_pdu =3D xen_9pfs_init_in_iov_from_pdu,
+> > +    .init_out_iov_from_pdu =3D xen_9pfs_init_out_iov_from_pdu,
+> > +    .push_and_notify =3D xen_9pfs_push_and_notify,
+> > +};
+> > +
+> > +static int xen_9pfs_init(struct XenDevice *xendev)
+> > +{
+> > +    return 0;
+> > +}
+> > +
+> > +static int xen_9pfs_free(struct XenDevice *xendev)
+> > +{
+> > +    return -1;
+> > +}
+> > +
+> > +static int xen_9pfs_connect(struct XenDevice *xendev)
+> > +{
+> > +    return 0;
+> > +}
+> > +
+> > +static void xen_9pfs_alloc(struct XenDevice *xendev)
+> > +{
+> > +}
+> > +
+> > +static void xen_9pfs_disconnect(struct XenDevice *xendev)
+> > +{
+> > +}
+> > +
+> > +struct XenDevOps xen_9pfs_ops =3D {
+> > +    .size       =3D sizeof(struct Xen9pfsDev), =20
+>=20
+> ... s/struct //
+>=20
+> > +    .flags      =3D DEVOPS_FLAG_NEED_GNTDEV,
+> > +    .alloc      =3D xen_9pfs_alloc,
+> > +    .init       =3D xen_9pfs_init,
+> > +    .initialise    =3D xen_9pfs_connect,
+> > +    .disconnect =3D xen_9pfs_disconnect,
+> > +    .free       =3D xen_9pfs_free,
+> > +}; =20
+>=20
+> With the above comments addressed:
+>=20
+> Reviewed-by: Greg Kurz <groug@kaod.org>
 
-With the compile fixes I posted as a !fixup patch:
+Hmm... there's still a problem actually. This patch breaks build for some
+targets with '--enable-xen --enable-virtfs':
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+  LINK    cris-softmmu/qemu-system-cris
+../hw/xen/xen_backend.o: In function `xen_be_register_common':
+/home/greg/Work/qemu/qemu-9p/hw/xen/xen_backend.c:588: undefined reference =
+to `xen_9pfs_ops'
 
-> ---
->  cpu-exec.c            | 1 +
->  hw/core/ptimer.c      | 1 +
->  include/qemu/timer.h  | 1 -
->  include/sysemu/cpus.h | 2 ++
->  kvm-all.c             | 1 +
->  monitor.c             | 1 +
->  replay/replay.c       | 1 +
->  translate-all.c       | 1 +
->  util/main-loop.c      | 1 +
->  util/qemu-timer.c     | 1 +
->  10 files changed, 10 insertions(+), 1 deletion(-)
->
-> diff --git a/cpu-exec.c b/cpu-exec.c
-> index 1a5ad48..6dbb4da 100644
-> --- a/cpu-exec.c
-> +++ b/cpu-exec.c
-> @@ -33,6 +33,7 @@
->  #if defined(TARGET_I386) && !defined(CONFIG_USER_ONLY)
->  #include "hw/i386/apic.h"
->  #endif
-> +#include "sysemu/cpus.h"
->  #include "sysemu/replay.h"
->
->  /* -icount align implementation. */
-> diff --git a/hw/core/ptimer.c b/hw/core/ptimer.c
-> index 59ccb00..7221c68 100644
-> --- a/hw/core/ptimer.c
-> +++ b/hw/core/ptimer.c
-> @@ -13,6 +13,7 @@
->  #include "sysemu/replay.h"
->  #include "sysemu/qtest.h"
->  #include "block/aio.h"
-> +#include "sysemu/cpus.h"
->
->  #define DELTA_ADJUST     1
->  #define DELTA_NO_ADJUST -1
-> diff --git a/include/qemu/timer.h b/include/qemu/timer.h
-> index 26e6285..91cd8c8 100644
-> --- a/include/qemu/timer.h
-> +++ b/include/qemu/timer.h
-> @@ -4,7 +4,6 @@
->  #include "qemu-common.h"
->  #include "qemu/notify.h"
->  #include "qemu/host-utils.h"
-> -#include "sysemu/cpus.h"
->
->  #define NANOSECONDS_PER_SECOND 1000000000LL
->
-> diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
-> index a73b5d4..e521a91 100644
-> --- a/include/sysemu/cpus.h
-> +++ b/include/sysemu/cpus.h
-> @@ -1,6 +1,8 @@
->  #ifndef QEMU_CPUS_H
->  #define QEMU_CPUS_H
->
-> +#include "qemu/timer.h"
-> +
->  /* cpus.c */
->  bool qemu_in_vcpu_thread(void);
->  void qemu_init_cpu_loop(void);
-> diff --git a/kvm-all.c b/kvm-all.c
-> index 0c94637..0fd6655 100644
-> --- a/kvm-all.c
-> +++ b/kvm-all.c
-> @@ -29,6 +29,7 @@
->  #include "hw/s390x/adapter.h"
->  #include "exec/gdbstub.h"
->  #include "sysemu/kvm_int.h"
-> +#include "sysemu/cpus.h"
->  #include "qemu/bswap.h"
->  #include "exec/memory.h"
->  #include "exec/ram_addr.h"
-> diff --git a/monitor.c b/monitor.c
-> index b68944d..d8fba78 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -77,6 +77,7 @@
->  #include "qapi-event.h"
->  #include "qmp-introspect.h"
->  #include "sysemu/qtest.h"
-> +#include "sysemu/cpus.h"
->  #include "qemu/cutils.h"
->  #include "qapi/qmp/dispatch.h"
->
-> diff --git a/replay/replay.c b/replay/replay.c
-> index 1835b99..78e2a7e 100644
-> --- a/replay/replay.c
-> +++ b/replay/replay.c
-> @@ -16,6 +16,7 @@
->  #include "replay-internal.h"
->  #include "qemu/timer.h"
->  #include "qemu/main-loop.h"
-> +#include "sysemu/cpus.h"
->  #include "sysemu/sysemu.h"
->  #include "qemu/error-report.h"
->
-> diff --git a/translate-all.c b/translate-all.c
-> index 956d54b..63b8f56 100644
-> --- a/translate-all.c
-> +++ b/translate-all.c
-> @@ -57,6 +57,7 @@
->  #include "qemu/timer.h"
->  #include "qemu/main-loop.h"
->  #include "exec/log.h"
-> +#include "sysemu/cpus.h"
->
->  /* #define DEBUG_TB_INVALIDATE */
->  /* #define DEBUG_TB_FLUSH */
-> diff --git a/util/main-loop.c b/util/main-loop.c
-> index ad10bca..0b2d8c0 100644
-> --- a/util/main-loop.c
-> +++ b/util/main-loop.c
-> @@ -28,6 +28,7 @@
->  #include "qemu/timer.h"
->  #include "qemu/sockets.h"	// struct in_addr needed for libslirp.h
->  #include "sysemu/qtest.h"
-> +#include "sysemu/cpus.h"
->  #include "slirp/libslirp.h"
->  #include "qemu/main-loop.h"
->  #include "block/aio.h"
-> diff --git a/util/qemu-timer.c b/util/qemu-timer.c
-> index 2f20151..ac99340 100644
-> --- a/util/qemu-timer.c
-> +++ b/util/qemu-timer.c
-> @@ -27,6 +27,7 @@
->  #include "qemu/timer.h"
->  #include "sysemu/replay.h"
->  #include "sysemu/sysemu.h"
-> +#include "sysemu/cpus.h"
->
->  #ifdef CONFIG_POSIX
->  #include <pthread.h>
+This happens because only targets that support virtio and PCI pull the
+9pfs/fsdev object files. This is an effort to have smaller QEMU binaries,
+based on the historical dependency of 9pfs on virtio. This patch breaks
+this assumption if CONFIG_XEN_BACKEND is defined but the target doesn't
+define CONFIG_VIRTIO and CONFIG_PCI.
 
+Since 9pfs can now be used with another transport, I guess that the
+dependency on virtio and PCI isn't right anymore. The new condition
+for targets to support 9pfs should rather be something like:
 
---
-Alex Bennée
+CONFIG_VIRTFS =3D=3D y && CONFIG_SOFTMMU =3D=3D y && (CONFIG_VIRTIO =3D=3D =
+y || CONFIG_XEN_BACKEND =3D=3D y)
+
+This would cause all targets to pull the 9pfs/fsdev object files though.
+
+So I have a question: do all targets need to support the Xen backend, reall=
+y ?
+
+--Sig_/wI20=p6ac62gZp=LQwj4pOq
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAljCdmwACgkQAvw66wEB28JGYQCeMgjpa8np/TbGxQOoVnCUp1iG
+6Y0An27cB9tqtrTMHCX+t89KTemTr+hE
+=4ZTa
+-----END PGP SIGNATURE-----
+
+--Sig_/wI20=p6ac62gZp=LQwj4pOq--
