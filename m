@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1cmLrO-0007An-1M
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 09:49:39 -0500
+	(envelope-from <abologna@redhat.com>) id 1cmMQB-0005nC-66
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 10:25:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1cmLrL-0005LT-Ea
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 09:49:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53612)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1cmLrL-0005Kk-8I
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 09:49:35 -0500
-Date: Fri, 10 Mar 2017 15:49:28 +0100
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20170310144928.h5ozia5cybxstuwc@eukaryote>
-References: <3d1c16a1-ec05-0367-e569-64a63b34f2e3@redhat.com>
-	<CAFEAcA9cM=LjBRzrZdfsOss2xm4bKC6QM7gyg3HD4z-yeumTyw@mail.gmail.com>
-	<940ff281-82cd-18cf-160e-c5234f65db18@redhat.com>
-	<9d6c61bc-4a95-ce72-3565-e498f9c2b351@redhat.com>
-	<b815c2f9-1ce9-efed-4afa-c3553786dab1@redhat.com>
-	<7829c1dc-9138-c784-dcc5-3c46ec9b5c05@innervision.pl>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7829c1dc-9138-c784-dcc5-3c46ec9b5c05@innervision.pl>
-Subject: Re: [Qemu-devel] external snapshots freezes block device since qemu
- 2.8
+	(envelope-from <abologna@redhat.com>) id 1cmMQ2-0001Pq-0J
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 10:25:29 -0500
+Message-ID: <1489159521.3805.43.camel@redhat.com>
+From: Andrea Bolognani <abologna@redhat.com>
+Date: Fri, 10 Mar 2017 16:25:21 +0100
+In-Reply-To: <20170303032507.16142-16-david@gibson.dropbear.id.au>
+References: <20170303032507.16142-1-david@gibson.dropbear.id.au>
+	<20170303032507.16142-16-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 15/17] spapr_pci: Advertise access to PCIe
+ extended config space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,51 +24,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Piotr Rybicki <piotr.rybicki@innervision.pl>
-Cc: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>, peter.maydell@linaro.org
+Cc: lvivier@redhat.com, thuth@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, agraf@suse.de, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, sjitindarsingh@gmail.com, sam.bobroff@au1.ibm.com
 
-On Thu, Mar 09, 2017 at 11:11:09AM +0100, Piotr Rybicki wrote:
-> Hello there.
-> 
-> I discovered, that since qemu 2.8 , external snapshots (very similar to:
-> http://wiki.libvirt.org/page/Live-disk-backup-with-active-blockcommit),
+On Fri, 2017-03-03 at 14:25 +1100, David Gibson wrote:
+> The (paravirtual) PCI host bridge on the 'pseries' machine in most
+> regards acts like a regular PCI bus, rather than a PCIe bus.=C2=A0=C2=A0=
+Despite
+> this, though, it does allow access to the PCIe extended config space.
+>=C2=A0
+> We already implemented the RTAS methods to allow this access.. but
+> forgot to put the markers into the device tree so that guest's know it
+> is there.=C2=A0=C2=A0This adds them in.
+>=C2=A0
+> With this, a pseries guest is able to view extended config space on
+> (for example an e1000e device.=C2=A0=C2=A0This should be enough to allo=
+w guests
+> to use at least some PCIe devices.
+>=C2=A0
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>=C2=A0=C2=A0hw/ppc/spapr_pci.c | 4 ++++
+>=C2=A0=C2=A01 file changed, 4 insertions(+)
+>=C2=A0
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index 2a3499e..919d3c2 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -1321,6 +1321,10 @@ static int spapr_populate_pci_child_dt(PCIDevice=
+ *dev, void *fdt, int offset,
+>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0_FDT(fdt_setprop(fdt, offset, "assig=
+ned-addresses",
+>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(uint8_=
+t *)rp.assigned, rp.assigned_len));
+>=C2=A0=C2=A0
+> +=C2=A0=C2=A0=C2=A0=C2=A0if (pci_is_express(dev)) {
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0_FDT(fdt_setprop_cell(=
+fdt, offset, "ibm,pci-config-space-type", 0x1));
+> +=C2=A0=C2=A0=C2=A0=C2=A0}
+> +
+>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return 0;
+>=C2=A0=C2=A0}
 
-When I wrote this Wiki page, I tested it only with regular QCOW2 files
-on EXT4 file system.
+I've just realized that this is not tied to the pseries-2.9
+machine type, which means existing guests will suddenly get
+access to the Extended Config Space after upgrading QEMU.
 
-> freezes block device after:
-> 
-> # virsh blockcommit (...)
-> 
-> There is no error message after completion of the command above.
-> I'm using gluster + ZFS fuse mount as a storage for a VM on gentoo.
-> libvirt debug showed nothing helpful.
-> With qemu <2.8 -: snapshots are working as expected.
-> 
-> Is this a known issue?
-> Is it qemu or libvirt ?
-> 
-> If it helps, how can i diagnose this further?a
+I'm not sure this will cause any issue in practice, but it
+seems like it would be safer to enable the Extended Config
+Space only for pseries-2.9 and newer machine types.
 
-To see what libvirt is sending to QEMU, you can enable the debug log
-filters, which can give some clue:
-
-- In /etc/libvirt/libvirtd.conf, set these config attributes
-
-    log_filters="1:libvirt 1:qemu 1:conf 1:security 3:event 3:json 3:file 3:object 1:util"
-    log_outputs="1:file:/var/log/libvirt/libvirtd.log"
-
-- Restart libvirtd:
-
-    $ systemctl restart libvirtd
-
-- Perform your `blockcommit` test.
-
-PS: A gentle reminder -- when reporting upstream, you'll likely better
-help if you at least test with the latest releases (libvirt-3.1.0, and
-QEMU 2.8), if not from Git.
-
-[...]
-
--- 
-/kashyap
+--=C2=A0
+Andrea Bolognani / Red Hat / Virtualization
