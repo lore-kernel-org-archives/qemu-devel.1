@@ -1,38 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35468)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cmIC7-00048r-SF
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 05:54:49 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cmICS-0004Jn-5c
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 05:55:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cmIC4-0001gN-FO
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 05:54:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35432)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cmIC4-0001fZ-6T
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 05:54:44 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8E9BD85547
-	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 10:54:42 +0000 (UTC)
-References: <1488877751-13419-1-git-send-email-jasowang@redhat.com>
-	<7594c183-6d38-3dce-75e7-62bf3be324fc@redhat.com>
-	<20170308174043.10c2f056@nial.brq.redhat.com>
-	<322da7ca-793c-fe83-9b9b-aded87742c18@redhat.com>
-	<20170309102849.1db72ad5@nial.brq.redhat.com>
-	<925a58ec-2a6a-6709-8139-db492af7800c@redhat.com>
-	<2add94d5-4d6f-6c62-4d63-085901afc63e@redhat.com>
-	<20170309172959-mutt-send-email-mst@kernel.org>
-	<019a8675-1716-39b1-221f-b70fd17b1700@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <f384923d-70c0-58fe-8c0d-8eba15e1477e@redhat.com>
-Date: Fri, 10 Mar 2017 18:54:35 +0800
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cmICQ-0001ly-QU
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 05:55:08 -0500
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:35091)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1cmICQ-0001lC-F5
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 05:55:06 -0500
+Received: by mail-lf0-x244.google.com with SMTP id v2so6582456lfi.2
+	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 02:55:04 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <019a8675-1716-39b1-221f-b70fd17b1700@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+References: <20170310085331.17916-1-marcandre.lureau@redhat.com>
+	<479b756e-b808-eee7-7780-69d2b2669cdf@redhat.com>
+In-Reply-To: <479b756e-b808-eee7-7780-69d2b2669cdf@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 10 Mar 2017 10:54:52 +0000
+Message-ID: <CAJ+F1CJuPGJ9DOQMy7PP=DJtTxbcDFoBA+rA-NKStcSTrUEPuA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V3] virtio: do not require IOMMU to be
- created in advance
+Subject: Re: [Qemu-devel] [PATCH] scripts/dump-guest-memory.py: fix
+ int128_get64 on recent gcc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,71 +31,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org, peterx@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: lersek@redhat.com
 
+Hi
 
+On Fri, Mar 10, 2017 at 2:00 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-On 2017=E5=B9=B403=E6=9C=8809=E6=97=A5 23:32, Paolo Bonzini wrote:
 >
-> On 09/03/2017 16:31, Michael S. Tsirkin wrote:
->> On Thu, Mar 09, 2017 at 11:05:36AM +0100, Paolo Bonzini wrote:
->>>
->>> On 09/03/2017 10:58, Jason Wang wrote:
->>>>
->>>> On 2017=E5=B9=B403=E6=9C=8809=E6=97=A5 17:28, Igor Mammedov wrote:
->>>>> On Thu, 9 Mar 2017 10:32:44 +0800
->>>>> Jason Wang<jasowang@redhat.com>  wrote:
->>>>>
->>>>>> On 2017=E5=B9=B403=E6=9C=8809=E6=97=A5 00:40, Igor Mammedov wrote:
->>>>>>> On Tue, 7 Mar 2017 14:47:30 +0200
->>>>>>> Marcel Apfelbaum<marcel@redhat.com>   wrote:
->>>>>>>  =20
->>>>>>>> On 03/07/2017 11:09 AM, Jason Wang wrote:
->>>>>>>>> After commit 96a8821d2141 ("virtio: unbreak virtio-pci with IOM=
-MU
->>>>>>>>> after caching ring translations"), IOMMU was required to be
->>>>>>>>> created in
->>>>>>>>> advance. This is because we can only get the correct dma_as aft=
-er pci
->>>>>>>>> IOMMU (e.g intel_iommu) was initialized. This is suboptimal and
->>>>>>>>> inconvenient for user. This patch releases this by:
->>>>>>>>>
->>>>>>>>> - introduce a bus_master_ready method for PCIDeviceClass and tr=
-igger
->>>>>>>>>      this during pci_init_bus_master
->>>>>>>>> - implement virtio-pci method and 1) reset the dma_as 2) re-reg=
-ister
->>>>>>>>>      the memory listener to the new dma_as
->>>>> Instead of trying to fix up later it's possible to refuse
->>>>> adding iommu device if other devices has been added before
->>>>> it with -device/device_add.
->>>>> That would match current CLI semantics where device that
->>>>> others depend on should be listed on CLI before that others
->>>>> are listed.
->>>> Yes, but it works by chance in the past for the device that does not
->>>> want bus_master_as in their realize. This change may surprise their =
-users.
->>> There is another posssibility.  Create the address space at init time
->>> and add a container region instead of the bus_master_enable_region
->>> alias.  Then at machine_done time you create the bus_master_enable_re=
-gion.
->>>
->>> This removes the need for the callbacks and makes the MemoryListener
->>> just work.
->>>
->>> Paolo
->> That's definitely cleaner than a callback, though a bit tricky
->> so needs a good comment explaining what is going on.
->> And then I think we can revert
->> 96a8821d21411f10d77ea994af369c6e5c35a2cc, right?
-> Yes. 96a8821d21411f10d77ea994af369c6e5c35a2cc can go then (and this is
-> how I expected it to work all the time---my bad).
 >
+> On 10/03/2017 09:53, Marc-Andr=C3=A9 Lureau wrote:
+> > The Int128 is no longer a struct, reaching a python exception:
+> > Python Exception <class 'gdb.error'> Attempt to extract a component of =
+a
+> value that is not a (null).:
+> >
+> > Replace struct access with a cast to uint64 instead.
+> >
+> > Fixes:
+> > https://bugzilla.redhat.com/show_bug.cgi?id=3D1427466
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  scripts/dump-guest-memory.py | 6 ++++--
+> >  1 file changed, 4 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.p=
+y
+> > index 9956fc036c..bbe1c14ba2 100644
+> > --- a/scripts/dump-guest-memory.py
+> > +++ b/scripts/dump-guest-memory.py
+> > @@ -314,8 +314,10 @@ def get_arch_phdr(endianness, elfclass):
+> >  def int128_get64(val):
+> >      """Returns low 64bit part of Int128 struct."""
+> >
+> > -    assert val["hi"] =3D=3D 0
+> > -    return val["lo"]
+> > +    u64t =3D gdb.lookup_type('uint64_t').array(2)
+> > +    u64 =3D val.cast(u64t)
+> > +    assert u64[1] =3D=3D 0
+> > +    return u64[0]
+> >
+> >
+> >  def qlist_foreach(head, field_str):
+> >
+>
+> I'm afraid this is not big-endian-friendly (Python lets you check that
+> with "sys.byteorder =3D=3D 'little'").
+>
+> Also when building on a 32-bit machine the old code should be used; I
+> think you need to use try/except to choose between the two.
+>
+
+Do you think that would be enough?
+
+ diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.py
+index 9956fc036c..f7c6635f15 100644
+--- a/scripts/dump-guest-memory.py
++++ b/scripts/dump-guest-memory.py
+@@ -314,8 +314,18 @@ def get_arch_phdr(endianness, elfclass):
+ def int128_get64(val):
+     """Returns low 64bit part of Int128 struct."""
+
+-    assert val["hi"] =3D=3D 0
+-    return val["lo"]
++    try:
++        assert val["hi"] =3D=3D 0
++        return val["lo"]
++    except gdb.error:
++        u64t =3D gdb.lookup_type('uint64_t').array(2)
++        u64 =3D val.cast(u64t)
++        if sys.byteorder =3D=3D 'little':
++            assert u64[1] =3D=3D 0
++            return u64[0]
++        else:
++            assert u64[0] =3D=3D 0
++            return u64[1]
+
+(I don't have a 32-bit system handy to check it, and cross-compilation with
+m32 etc is tricky to get right, I am trying though)
+
+
 > Paolo
 >
->
-
-Will prepare patches for this (probably next week).
-
-Thanks
+> --
+Marc-Andr=C3=A9 Lureau
