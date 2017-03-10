@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52364)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1cmKYw-0006VQ-BH
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 08:26:31 -0500
+	(envelope-from <berrange@redhat.com>) id 1cmKda-0007gL-2u
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 08:31:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1cmKYr-0002Nd-BB
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 08:26:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57858)
+	(envelope-from <berrange@redhat.com>) id 1cmKdW-0004tK-64
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 08:31:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60158)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1cmKYr-0002Mz-2N
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 08:26:25 -0500
-References: <1488519630-89058-1-git-send-email-wei.w.wang@intel.com>
-	<1488519630-89058-4-git-send-email-wei.w.wang@intel.com>
-	<20170308054813-mutt-send-email-mst@kernel.org>
-	<58C279B7.2060106@intel.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <2572fe97-4d28-fb34-4513-924959bc5cb2@redhat.com>
-Date: Fri, 10 Mar 2017 14:26:18 +0100
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cmKdV-0004sQ-U2
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 08:31:14 -0500
+Date: Fri, 10 Mar 2017 13:31:08 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170310133108.GG32264@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170308082819.12196-1-fanc.fnst@cn.fujitsu.com>
+	<20170308134559.GK7470@redhat.com>
+	<20170309100538.GA22103@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <58C279B7.2060106@intel.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v7 kernel 3/5]
- virtio-balloon: implementation of VIRTIO_BALLOON_F_CHUNK_TRANSFER
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170309100538.GA22103@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v2] Add inst_dirty_pages_rate in 'info
+ migrate'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,79 +30,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, Liang Li <liang.z.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Amit Shah <amit.shah@redhat.com>, "Hansen, Dave" <dave.hansen@intel.com>, Andrea Arcangeli <aarcange@redhat.com>, Liang Li <liliang324@gmail.com>
+To: Chao Fan <fanc.fnst@cn.fujitsu.com>
+Cc: dgilbert@redhat.com, qemu-devel@nongnu.org, quintela@redhat.com, eblake@redhat.com, armbru@redhat.com, douly.fnst@cn.fujitsu.com, caoj.fnst@cn.fujitsu.com, maozy.fnst@cn.fujitsu.com, lizhijian@cn.fujitsu.com
 
-Am 10.03.2017 um 11:02 schrieb Wei Wang:
-> On 03/08/2017 12:01 PM, Michael S. Tsirkin wrote:
->> On Fri, Mar 03, 2017 at 01:40:28PM +0800, Wei Wang wrote:
->>> From: Liang Li <liang.z.li@intel.com>
->>>
->>> The implementation of the current virtio-balloon is not very
->>> efficient, because the pages are transferred to the host one by one.
->>> Here is the breakdown of the time in percentage spent on each
->>> step of the balloon inflating process (inflating 7GB of an 8GB
->>> idle guest).
->>>
->>> 1) allocating pages (6.5%)
->>> 2) sending PFNs to host (68.3%)
->>> 3) address translation (6.1%)
->>> 4) madvise (19%)
->>>
->>> It takes about 4126ms for the inflating process to complete.
->>> The above profiling shows that the bottlenecks are stage 2)
->>> and stage 4).
->>>
->>> This patch optimizes step 2) by transfering pages to the host in
->>> chunks. A chunk consists of guest physically continuous pages, and
->>> it is offered to the host via a base PFN (i.e. the start PFN of
->>> those physically continuous pages) and the size (i.e. the total
->>> number of the pages). A normal chunk is formated as below:
->>> -----------------------------------------------
->>> |  Base (52 bit)               | Size (12 bit)|
->>> -----------------------------------------------
->>> For large size chunks, an extended chunk format is used:
->>> -----------------------------------------------
->>> |                 Base (64 bit)               |
->>> -----------------------------------------------
->>> -----------------------------------------------
->>> |                 Size (64 bit)               |
->>> -----------------------------------------------
->>>
->>> By doing so, step 4) can also be optimized by doing address
->>> translation and madvise() in chunks rather than page by page.
->>>
->>> This optimization requires the negotation of a new feature bit,
->>> VIRTIO_BALLOON_F_CHUNK_TRANSFER.
->>>
->>> With this new feature, the above ballooning process takes ~590ms
->>> resulting in an improvement of ~85%.
->>>
->>> TODO: optimize stage 1) by allocating/freeing a chunk of pages
->>> instead of a single page each time.
->>>
->>> Signed-off-by: Liang Li <liang.z.li@intel.com>
->>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
->>> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
->>> Cc: Michael S. Tsirkin <mst@redhat.com>
->>> Cc: Paolo Bonzini <pbonzini@redhat.com>
->>> Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
->>> Cc: Amit Shah <amit.shah@redhat.com>
->>> Cc: Dave Hansen <dave.hansen@intel.com>
->>> Cc: Andrea Arcangeli <aarcange@redhat.com>
->>> Cc: David Hildenbrand <david@redhat.com>
->>> Cc: Liang Li <liliang324@gmail.com>
->>> Cc: Wei Wang <wei.w.wang@intel.com>
->> Does this pass sparse? I see some endian-ness issues here.
+On Thu, Mar 09, 2017 at 06:05:38PM +0800, Chao Fan wrote:
+> On Wed, Mar 08, 2017 at 01:45:59PM +0000, Daniel P. Berrange wrote:
+> >On Wed, Mar 08, 2017 at 04:28:19PM +0800, Chao Fan wrote:
+> >> Auto-converge aims to accelerate migration by slowing down the
+> >> generation of dirty pages. But user doesn't know how to determine the
+> >> throttle value, so, a new item "inst-dirty-pages-rate" in "info migrate"
+> >> would be helpful for user's determination.
+> Hi Daniel,
 > 
-> "pass sparse"- what does that mean?
-> I didn't see any complaints from "make" on my machine.
+> Thank you for your reply.
+> >
+> >The "info migrate" command already reports a "dirty-pages-rate" value.
+> >
+> >Maybe I'm mis-understanding what you're calculcating, this this proposal
+> >looks the same, except reporting in bytes rather than page counts.
+> >
+> >QEMU in fact already records the bytes count internally too in the
+> >'dirty_pages_bytes' parameter which is calculated from taking
+> >'dirty_pages_size * TARGET_PAGE_SIZE'.
+> >
+> >So I wonder if we can just export the existing dirty-pages-bytes
+> >value in info migrate, and avoid needing this new code here:
+> >
+> It's different, inst-dirty-pages-rate in this patch is greater than
+> or equal to dirty-pages-bytes. Because in function
+> cpu_physical_memory_sync_dirty_bitmap, file include/exec/ram_addr.h:
+> 
+> if (src[idx][offset]) {
+>     unsigned long bits = atomic_xchg(&src[idx][offset], 0);
+>     unsigned long new_dirty;
+>     new_dirty = ~dest[k];
+>     dest[k] |= bits;
+>     new_dirty &= bits;
+>     num_dirty += ctpopl(new_dirty);
+> }
+> 
+> After these codes, only the pages not dirtied in bitmap(dest), but dirtied
+> in dirty_memory[DIRTY_MEMORY_MIGRATION] will be calculated. For example:
+> When ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION] = 0b00001111,
+> and atomic_rcu_read(&migration_bitmap_rcu)->bmap = 0b00000011,
+> the new_dirty will be 0b00001100, and this function will return 2 but not
+> 4 which is expected.
 
-https://kernel.org/doc/html/latest/dev-tools/sparse.html
+Perhaps this is a reason to change how the current dirty-pages-rate and
+dirty-pages-bytes values are calculated, rather than adding a new parameter
+inst-dirty-pages-rate.
 
-Static code analysis. You have to run it explicitly.
+IMHO it will be pretty confusing to have two very similar parameters exposed
+in the 'info migration' output, with subtley different calculations behind
+them. You can only really understand the difference by looking at QEMU
+code which is bad for apps consuming QEMU.
 
+Regards,
+Daniel
 -- 
-Thanks,
-
-David
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
