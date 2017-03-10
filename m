@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cm9qy-00080w-Tj
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 21:00:26 -0500
+	(envelope-from <bounces@canonical.com>) id 1cmAPD-00039k-Dt
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 21:35:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cm9qv-00087s-2i
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 21:00:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48570)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cm9qu-00087h-Tb
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 21:00:21 -0500
-Date: Fri, 10 Mar 2017 10:00:12 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170310020012.GB17299@pxdev.xzpeter.org>
-References: <1489017212-2990-1-git-send-email-mst@redhat.com>
-	<1a475607-b876-d79a-5e0b-e1a4a006c65d@redhat.com>
-	<a5ac15ac-b6df-6d3c-d898-177ed5e163d0@redhat.com>
-	<add38c95-d7e0-ca6f-529c-3f3fe8d41527@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1cmAP8-0001LC-Ht
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 21:35:47 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41087)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cmAP8-0001Ks-Ar
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 21:35:42 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cmAP5-0001ei-6U
+	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 02:35:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 3A4A92E80D7
+	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 02:35:38 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <add38c95-d7e0-ca6f-529c-3f3fe8d41527@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC] qdev: add init order filter
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 10 Mar 2017 02:28:16 -0000
+From: Max Ehrlich <1671677@bugs.launchpad.net>
+Reply-To: Bug 1671677 <1671677@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170310022816.24904.27346.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1671677] [NEW] vfio-pci passthrough issue after
+ resume from suspend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,59 +36,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.a@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Alex Williamson <alex.williamson@redhat.com>, Jason Wang <jasowang@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Thu, Mar 09, 2017 at 01:28:09PM +0100, Paolo Bonzini wrote:
-> 
-> 
-> On 09/03/2017 13:11, Marcel Apfelbaum wrote:
-> > On 03/09/2017 01:13 PM, Paolo Bonzini wrote:
-> >>
-> >>
-> >> On 09/03/2017 00:59, Michael S. Tsirkin wrote:
-> >>> Allow forcing a specific order of initialization on
-> >>> devices created with -device.
-> >>> Helpful e.g. for built-in devices such as IOMMUs which must
-> >>> exist before all other devices.
-> >>>
-> >>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> >>> ---
-> >>>
-> >>> Looks like we have a ton of problems because devices
-> >>> are initialized in a random order, while we
-> >>> really want e.g. iommu to be initialized
-> >>> earlier than devices.
-> >>>
-> >>> This will be helpful for other things, e.g.
-> >>> real hardware often is initialized in a specific order,
-> >>> creating built-in devices for the board often
-> >>> has to happen in a specific order, etc.
-> >>
-> >> In the specific case of PCI bus_master_as there is a simple workaround
-> >> by placing a dummy container (which lets us build the AddressSpace) and
-> >> then adding the alias region at machine_done time.
-> >>
-> >> This is exactly how MemoryListener is supposed to work, so I would start
-> >> from there.
-> >>
-> > 
-> > Hi Paolo,
-> > 
-> > This will certainly solve virtio-pci ordering issue, but I am not sure
-> > it solves the vfio-pci problem. Here is a link to Alex's explanation:
-> > 
-> > http://www.mail-archive.com/qemu-devel@nongnu.org/msg432365.html
-> 
-> Right, VFIO is more complicated (hence "in the specific case of PCI
-> bus_master_as").  I answered in that thread.
+Public bug reported:
 
-If we keep allowing vfio-pci to use pci_device_iommu_address_space()
-(IMHO that's exactly the right thing to do there, rather than using
-bus_master_as), this patch should work for vfio-pci as well? Since
-vfio_realize() will get a correct iommu_fn, and that looks to be
-enough.
 
-Thanks,
+I'm running into a weird issue with the vfio-pci driver through qemu
 
--- peterx
+I use it on a laptop and I passthrough an external GPU connected via PCI
+express. In general this works well, however if the laptop has *ever*
+suspended since its last boot, then the windows guest reports an error
+43 on the card and I get no output on the monitor that it is connected
+to. This is really weird to me since it works fine if I boot the latop
+from power-off, and hotplug the card. It's only if the laptop has ever
+suspended since it's last boot that I see this issue. Even if it was
+suspended before the card was ever hotplugged.
+
+In other words:
+laptop off -> boot -> hotplug GPU : works great
+laptop off -> boot -> do stuff (GPU *NOT* connected) -> sleep -> resume -> =
+hotplug GPU: problem
+laptop off -> boot -> hotplug GPU -> unplug GPU -> hotplug GPU : works great
+laptop off -> boot -> hotplug GPU -> unplug GPU -> sleep -> resume -> hotpl=
+ug GPU: problem
+
+Weird stuff...
+
+I'm honestly not sure that vfio-pci/qemu is to blame here since there
+are so many moving parts, but im not really sure where else to report
+this to
+
+What I have tried is using the sysfs interface to
+remove/rescan/poweroff/etc the PCI devices in questions (graphics card
+and it's HDMI audio) and this also does help.
+
+QEMU version: 2.6.1
+
+Please let me know what other information I can provide
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1671677
+
+Title:
+  vfio-pci passthrough issue after resume from suspend
+
+Status in QEMU:
+  New
+
+Bug description:
+  =
+
+  I'm running into a weird issue with the vfio-pci driver through qemu
+
+  I use it on a laptop and I passthrough an external GPU connected via
+  PCI express. In general this works well, however if the laptop has
+  *ever* suspended since its last boot, then the windows guest reports
+  an error 43 on the card and I get no output on the monitor that it is
+  connected to. This is really weird to me since it works fine if I boot
+  the latop from power-off, and hotplug the card. It's only if the
+  laptop has ever suspended since it's last boot that I see this issue.
+  Even if it was suspended before the card was ever hotplugged.
+
+  In other words:
+  laptop off -> boot -> hotplug GPU : works great
+  laptop off -> boot -> do stuff (GPU *NOT* connected) -> sleep -> resume -=
+> hotplug GPU: problem
+  laptop off -> boot -> hotplug GPU -> unplug GPU -> hotplug GPU : works gr=
+eat
+  laptop off -> boot -> hotplug GPU -> unplug GPU -> sleep -> resume -> hot=
+plug GPU: problem
+
+  Weird stuff...
+
+  I'm honestly not sure that vfio-pci/qemu is to blame here since there
+  are so many moving parts, but im not really sure where else to report
+  this to
+
+  What I have tried is using the sysfs interface to
+  remove/rescan/poweroff/etc the PCI devices in questions (graphics card
+  and it's HDMI audio) and this also does help.
+
+  QEMU version: 2.6.1
+
+  Please let me know what other information I can provide
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1671677/+subscriptions
