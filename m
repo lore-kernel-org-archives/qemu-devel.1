@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53254)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cmFzw-0006Y4-8P
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 03:34:05 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cmG0Q-0006mR-5I
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 03:34:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cmFzs-0005QI-7S
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 03:34:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45578)
+	(envelope-from <pbonzini@redhat.com>) id 1cmG0O-0005Zd-O9
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 03:34:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40216)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cmFzs-0005Q9-1p
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 03:34:00 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 20FA281F03
-	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 08:34:00 +0000 (UTC)
-References: <1489119213-977-1-git-send-email-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cmG0O-0005ZV-Id
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 03:34:32 -0500
+References: <20170303113255.28262-1-berrange@redhat.com>
+	<20170310043048.GC4589@stefanha-x1.localdomain>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <da6200fe-c0ac-00bb-d0b7-dbf3c5a8a21f@redhat.com>
-Date: Fri, 10 Mar 2017 09:33:57 +0100
+Message-ID: <8eba7fae-6443-62b7-1ac9-ebcfd5d5f481@redhat.com>
+Date: Fri, 10 Mar 2017 09:34:29 +0100
 MIME-Version: 1.0
-In-Reply-To: <1489119213-977-1-git-send-email-peterx@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hostmem: fix reference to uninit mr
+In-Reply-To: <20170310043048.GC4589@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3] os: don't corrupt pre-existing
+ memory-backend data with prealloc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,61 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Andrea Arcangeli <aarcange@redhat.com>, Michal Privoznik <mprivozn@redhat.com>, Jitendra Kolhe <jitendra.kolhe@hpe.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
 
 
-On 10/03/2017 05:13, Peter Xu wrote:
-> Trying to get memory region size of an uninitialized memory region is
-> probably not a good idea. Let's just do the alloc no matter what.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+On 10/03/2017 05:30, Stefan Hajnoczi wrote:
+> On Fri, Mar 03, 2017 at 11:32:55AM +0000, Daniel P. Berrange wrote:
+>> When using a memory-backend object with prealloc turned on, QEMU
+>> will memset() the first byte in every memory page to zero. While
+>> this might have been acceptable for memory backends associated
+>> with RAM, this corrupts application data for NVDIMMs.
+>>
+>> Instead of setting every page to zero, read the current byte
+>> value and then just write that same value back, so we are not
+>> corrupting the original data. Directly write the value instead
+>> of memset()ing it, since there's no benefit to memset for a
+>> single byte write.
+>>
+>> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+>> ---
+>>
+>> Changed in v3:
+>>
+>>  - Mark the target of the write as volatile, instead of the intermedia
+>>    variable (Andrea)
+>>
+>>  util/oslib-posix.c | 15 ++++++++++++++-
+>>  1 file changed, 14 insertions(+), 1 deletion(-)
+>=20
+> There are no official maintainers for this source file.  I want to make
+> sure this patch goes into QEMU 2.9, so...
+>=20
+> Thanks, applied to my block tree:
+> https://github.com/stefanha/qemu/commits/block
 
-What is the effect of the bug?  The idea was to do the initialization
-once only (memory_region_size ought to be 0 when the MR is
-uninitialized; now it is ugly but it made more sense when MemoryRegion
-was just a C struct and not a QOM object).
+Yeah, I was leaving it to you because it's related to NVDIMM.  Thanks,
 
 Paolo
-
-> ---
->  backends/hostmem-file.c | 17 +++++++----------
->  1 file changed, 7 insertions(+), 10 deletions(-)
-> 
-> diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c
-> index 42efb2f..a61d1bd 100644
-> --- a/backends/hostmem-file.c
-> +++ b/backends/hostmem-file.c
-> @@ -39,6 +39,7 @@ static void
->  file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
->  {
->      HostMemoryBackendFile *fb = MEMORY_BACKEND_FILE(backend);
-> +    gchar *path;
->  
->      if (!backend->size) {
->          error_setg(errp, "can't create backend with size 0");
-> @@ -51,16 +52,12 @@ file_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
->  #ifndef CONFIG_LINUX
->      error_setg(errp, "-mem-path not supported on this host");
->  #else
-> -    if (!memory_region_size(&backend->mr)) {
-> -        gchar *path;
-> -        backend->force_prealloc = mem_prealloc;
-> -        path = object_get_canonical_path(OBJECT(backend));
-> -        memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
-> -                                 path,
-> -                                 backend->size, fb->share,
-> -                                 fb->mem_path, errp);
-> -        g_free(path);
-> -    }
-> +    backend->force_prealloc = mem_prealloc;
-> +    path = object_get_canonical_path(OBJECT(backend));
-> +    memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
-> +                                     path, backend->size, fb->share,
-> +                                     fb->mem_path, errp);
-> +    g_free(path);
->  #endif
->  }
->  
-> 
