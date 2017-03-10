@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40678)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cm8Dl-00069t-42
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 19:15:50 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cm8YQ-00019o-Ez
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 19:37:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cm8Dh-00053o-Ts
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 19:15:49 -0500
-Received: from indium.canonical.com ([91.189.90.7]:49752)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cm8Dh-00053D-NQ
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 19:15:45 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cm8Dd-0002ya-4m
-	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 00:15:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 46B3F2E80CF
-	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 00:15:39 +0000 (UTC)
+	(envelope-from <dgibson@ozlabs.org>) id 1cm8YN-00021R-DH
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 19:37:10 -0500
+Received: from ozlabs.org ([103.22.144.67]:46411)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1cm8YM-0001zK-Hz
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 19:37:07 -0500
+Date: Fri, 10 Mar 2017 11:29:45 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170310002945.GR19967@umbus.fritz.box>
+References: <20170308124955.35623-1-aik@ozlabs.ru>
+	<CAFEAcA_pq6cUVVqzg0in-QTKngsf2cSpzpaGnP=gH5X2GnzOQQ@mail.gmail.com>
+	<4c8ab05b-9e6d-10db-6480-e6b58d3ca390@ozlabs.ru>
+	<20170309013150.GK19967@umbus.fritz.box>
+	<CAFEAcA9QzBASyBELx7fxp1pexVaZfLRP6fKaZX63LTOzV=hZjQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 09 Mar 2017 23:58:35 -0000
-From: Edoardo Tirtarahardja <1257352@bugs.launchpad.net>
-Reply-To: Bug 1257352 <1257352@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20131203160523.17652.24548.malonedeb@wampee.canonical.com>
-Message-Id: <20170309235835.24941.62151.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1257352] Re: kvm hangs occasionally when
- switching out of the qemu console
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="+bDoS+V4AJZnUgoC"
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA9QzBASyBELx7fxp1pexVaZfLRP6fKaZX63LTOzV=hZjQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [RFC PATCH qemu] dtc: Allow compiling with old gcc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,60 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-Still happened in qemu 2.5.0 on Ubuntu 16.04, it's random but you can
-only switch between console, monitor, serial, parallel several times,
-then it hangs.
 
--- =
+--+bDoS+V4AJZnUgoC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1257352
+On Thu, Mar 09, 2017 at 07:43:07AM +0100, Peter Maydell wrote:
+> On 9 March 2017 at 02:31, David Gibson <david@gibson.dropbear.id.au> wrot=
+e:
+> > Yes.  I've now fixed this in upstream libfdt, at Paolo's suggestion.
+> > Unfortunately, it came just after the 1.4.3 release.  I was just leery
+> > about making a new release and qemu pull so soon after the last one.
+> > Should I do that anyway?
+>=20
+> Yes, I would go ahead and do that.
 
-Title:
-  kvm hangs occasionally when switching out of the qemu console
+Ok, release tagged.  I'll send the qemu update once it's mirrored to qemu.o=
+rg.
 
-Status in QEMU:
-  Incomplete
-Status in qemu package in Ubuntu:
-  Confirmed
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Bug description:
-  To recreate (although this does *NOT* fail most of the time alas):
+--+bDoS+V4AJZnUgoC
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  1) press "ctrl-alt-2" to switch to the qemu console.
-  2) type say "sendkey ctrl-alt-f1"
-  3) press "ctrl-alt-1".
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-  Expected outcome: Switch to tty1 in the VM.
+iQIcBAEBCAAGBQJYwfN4AAoJEGw4ysog2bOSvNMP/3pirTN8c95OM3QWXaDaqNnU
+aOlw+g4dpvYawMQBDYAWIP04XEEO9Rwzjiq53ROQ/q/fSHEJlu3VxQaXXQqM0EsE
+JhWZR0GI9+0yjTWdc0K7tQkTCyBZ73Gvd+vcoSOhm/ZLjCKPnWWVhYKY34KkeXYs
+bI2wm0eDy7gTV6M0AG0q8Xxdp26ylwHTvHLos48XMpykwIb9d3meKWx/QGhCK1se
+2qtl3Zz5pNpkK7XEpSkF5Q8hyzSOYjKRDfVLVp5Cee9g/jLvc03NmiwlrNl4tD6c
+MQVkdc9Hd3pa34bN5lR49SoN12a2L9emfuRxRVT2q10EVW6STK2zOaFbEqflC/xD
+cXd1TvVWg96EO0huSM4Bds4xeVX1BbCEFBfmliBNysc9HdD6a5TCmUynmsgpHGIm
+FdCCvhaUcMShmdWVXbo8SiE1d44Mv7V5iusiAy7kK6qjqtyIi2+Hoy8FBlaWmDjy
+fxPpGZCyByWnApzhoEJDEoOs2vXZLA4/a1uZYp67AMoaXiOgpLjL1ceu73uBTA+r
+JRmv/Qt8ik+SRvCTP5GzsJ+Epxmp7dfJEZ4u6TZB5O7h19A0Dh7Yx5KUHYjzjcHd
+IPecoTWVUze7VbH11rqGLvJHZsgnoBwlR8ysTrsh4jB0+tYj7M1EQT2hrVnt7HsW
+S6J6jmxb2e5ZdjgJFpOm
+=IgPJ
+-----END PGP SIGNATURE-----
 
-  Actual outcome: No switch to tty1 in the VM. and qemu console
-  unresponsive to any keyboard input.
-
-  =
-
-  Rather a vague problem description I'm afraid but this has happened to me=
- 3 times recently. No crash and no excessive CPU is observed.
-
-  I'll grab an strace when it happens again and attach...
-
-  ProblemType: Bug
-  DistroRelease: Ubuntu 14.04
-  Package: qemu-system-x86 1.6.0+dfsg-2ubuntu4
-  ProcVersionSignature: Ubuntu 3.12.0-4.12-generic 3.12.1
-  Uname: Linux 3.12.0-4-generic i686
-  NonfreeKernelModules: nvidia
-  ApportVersion: 2.12.7-0ubuntu1
-  Architecture: i386
-  CurrentDesktop: Unity
-  Date: Tue Dec  3 15:41:40 2013
-  InstallationDate: Installed on 2010-10-21 (1139 days ago)
-  InstallationMedia: Ubuntu 10.10 "Maverick Meerkat" - Release i386 (201010=
-07)
-  SourcePackage: qemu
-  UpgradeStatus: Upgraded to trusty on 2013-11-01 (31 days ago)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1257352/+subscriptions
+--+bDoS+V4AJZnUgoC--
