@@ -1,16 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cm97k-0006EX-25
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 20:13:41 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cm97l-0006FE-OL
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 20:13:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cm97i-0003sC-Ak
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 20:13:40 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cm97h-0003rk-HK
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 20:13:41 -0500
+Date: Fri, 10 Mar 2017 12:00:38 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 10 Mar 2017 12:13:24 +1100
-Message-Id: <20170310011328.30719-2-david@gibson.dropbear.id.au>
-In-Reply-To: <20170310011328.30719-1-david@gibson.dropbear.id.au>
-References: <20170310011328.30719-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCH for-2.10 1/5] pseries: Stubs for HPT resizing
+Message-ID: <20170310010038.GV19967@umbus.fritz.box>
+References: <1489084673-31595-1-git-send-email-thuth@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="6h64vBu9tReNbGLX"
+Content-Disposition: inline
+In-Reply-To: <1489084673-31595-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/ppc/pnv: Classify the "PowerNV Chip"
+ devices as CPU devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,312 +24,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org
-Cc: qemu-devel@nongnu.org, agraf@suse.de, sjitindarsingh@gmail.com, sam.bobroff@au1.ibm.com, David Gibson <david@gibson.dropbear.id.au>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 
-This introduces stub implementations of the H_RESIZE_HPT_PREPARE and
-H_RESIZE_HPT_COMMIT hypercalls which we hope to add in a PAPR
-extension to allow run time resizing of a guest's hash page table.  It
-also adds a new machine property for controlling whether this new
-facility is available.
 
-For now we only allow resizing with TCG, allowing it with KVM will require
-kernel changes as well.
+--6h64vBu9tReNbGLX
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Finally, it adds a new string to the hypertas property in the device
-tree, advertising to the guest the availability of the HPT resizing
-hypercalls.  This is a tentative suggested value, and would need to be
-standardized by PAPR before being merged.
+On Thu, Mar 09, 2017 at 07:37:53PM +0100, Thomas Huth wrote:
+> The devices that are derived from TYPE_PNV_CHIP currently show up
+> as "uncategorized" devices in the help text of "-device ?". Since
+> they obviously are related to the CPU, let's put them into the
+> CPU category instead.
+>=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
----
- hw/ppc/spapr.c         | 75 ++++++++++++++++++++++++++++++++++++++++++++++++++
- hw/ppc/spapr_hcall.c   | 36 ++++++++++++++++++++++++
- hw/ppc/trace-events    |  2 ++
- include/hw/ppc/spapr.h | 11 ++++++++
- target/ppc/kvm.c       | 12 ++++++++
- target/ppc/kvm_ppc.h   |  5 ++++
- 6 files changed, 141 insertions(+)
+Applied to ppc-for-2.10.
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 7525c60..06b436d 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -808,6 +808,11 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr, void *fdt)
-     if (!kvm_enabled() || kvmppc_spapr_use_multitce()) {
-         add_str(hypertas, "hcall-multi-tce");
-     }
-+
-+    if (spapr->resize_hpt != SPAPR_RESIZE_HPT_DISABLED) {
-+        add_str(hypertas, "hcall-hpt-resize");
-+    }
-+
-     _FDT(fdt_setprop(fdt, rtas, "ibm,hypertas-functions",
-                      hypertas->str, hypertas->len));
-     g_string_free(hypertas, TRUE);
-@@ -1991,11 +1996,40 @@ static void ppc_spapr_init(MachineState *machine)
-     long load_limit, fw_size;
-     char *filename;
-     int smt = kvmppc_smt_threads();
-+    Error *resize_hpt_err = NULL;
- 
-     msi_nonbroken = true;
- 
-     QLIST_INIT(&spapr->phbs);
- 
-+    /* Check HPT resizing availability */
-+    kvmppc_check_papr_resize_hpt(&resize_hpt_err);
-+    if (spapr->resize_hpt == SPAPR_RESIZE_HPT_DEFAULT) {
-+        /*
-+         * If the user explicitly requested a mode we should either
-+         * supply it, or fail completely (which we do below).  But if
-+         * it's not set explicitly, we reset our mode to something
-+         * that works
-+         */
-+        if (resize_hpt_err) {
-+            spapr->resize_hpt = SPAPR_RESIZE_HPT_DISABLED;
-+            error_free(resize_hpt_err);
-+            resize_hpt_err = NULL;
-+        } else {
-+            spapr->resize_hpt = smc->resize_hpt_default;
-+        }
-+    }
-+
-+    assert(spapr->resize_hpt != SPAPR_RESIZE_HPT_DEFAULT);
-+
-+    if ((spapr->resize_hpt != SPAPR_RESIZE_HPT_DISABLED) && resize_hpt_err) {
-+        /*
-+         * User requested HPT resize, but this host can't supply it.  Bail out
-+         */
-+        error_report_err(resize_hpt_err);
-+        exit(1);
-+    }
-+
-     /* Allocate RMA if necessary */
-     rma_alloc_size = kvmppc_alloc_rma(&rma);
- 
-@@ -2406,6 +2440,40 @@ static void spapr_set_modern_hotplug_events(Object *obj, bool value,
-     spapr->use_hotplug_event_source = value;
- }
- 
-+static char *spapr_get_resize_hpt(Object *obj, Error **errp)
-+{
-+    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
-+
-+    switch (spapr->resize_hpt) {
-+    case SPAPR_RESIZE_HPT_DEFAULT:
-+        return g_strdup("default");
-+    case SPAPR_RESIZE_HPT_DISABLED:
-+        return g_strdup("disabled");
-+    case SPAPR_RESIZE_HPT_ENABLED:
-+        return g_strdup("enabled");
-+    case SPAPR_RESIZE_HPT_REQUIRED:
-+        return g_strdup("required");
-+    }
-+    assert(0);
-+}
-+
-+static void spapr_set_resize_hpt(Object *obj, const char *value, Error **errp)
-+{
-+    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
-+
-+    if (strcmp(value, "default") == 0) {
-+        spapr->resize_hpt = SPAPR_RESIZE_HPT_DEFAULT;
-+    } else if (strcmp(value, "disabled") == 0) {
-+        spapr->resize_hpt = SPAPR_RESIZE_HPT_DISABLED;
-+    } else if (strcmp(value, "enabled") == 0) {
-+        spapr->resize_hpt = SPAPR_RESIZE_HPT_ENABLED;
-+    } else if (strcmp(value, "required") == 0) {
-+        spapr->resize_hpt = SPAPR_RESIZE_HPT_REQUIRED;
-+    } else {
-+        error_setg(errp, "Bad value for \"resize-hpt\" property");
-+    }
-+}
-+
- static void spapr_machine_initfn(Object *obj)
- {
-     sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
-@@ -2426,6 +2494,12 @@ static void spapr_machine_initfn(Object *obj)
-                                     " place of standard EPOW events when possible"
-                                     " (required for memory hot-unplug support)",
-                                     NULL);
-+
-+    object_property_add_str(obj, "resize-hpt",
-+                            spapr_get_resize_hpt, spapr_set_resize_hpt, NULL);
-+    object_property_set_description(obj, "resize-hpt",
-+                                    "Resizing of the Hash Page Table (enabled, disabled, required)",
-+                                    NULL);
- }
- 
- static void spapr_machine_finalizefn(Object *obj)
-@@ -3083,6 +3157,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-     smc->dr_lmb_enabled = true;
-     smc->tcg_default_cpu = "POWER8";
-     mc->has_hotpluggable_cpus = true;
-+    smc->resize_hpt_default = SPAPR_RESIZE_HPT_DISABLED;
-     fwc->get_dev_path = spapr_get_fw_dev_path;
-     nc->nmi_monitor_handler = spapr_nmi;
-     smc->phb_placement = spapr_phb_placement;
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index f05a90e..9f88960 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -352,6 +352,38 @@ static target_ulong h_read(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-     return H_SUCCESS;
- }
- 
-+static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
-+                                         sPAPRMachineState *spapr,
-+                                         target_ulong opcode,
-+                                         target_ulong *args)
-+{
-+    target_ulong flags = args[0];
-+    target_ulong shift = args[1];
-+
-+    if (spapr->resize_hpt == SPAPR_RESIZE_HPT_DISABLED) {
-+        return H_AUTHORITY;
-+    }
-+
-+    trace_spapr_h_resize_hpt_prepare(flags, shift);
-+    return H_HARDWARE;
-+}
-+
-+static target_ulong h_resize_hpt_commit(PowerPCCPU *cpu,
-+                                        sPAPRMachineState *spapr,
-+                                        target_ulong opcode,
-+                                        target_ulong *args)
-+{
-+    target_ulong flags = args[0];
-+    target_ulong shift = args[1];
-+
-+    if (spapr->resize_hpt == SPAPR_RESIZE_HPT_DISABLED) {
-+        return H_AUTHORITY;
-+    }
-+
-+    trace_spapr_h_resize_hpt_commit(flags, shift);
-+    return H_HARDWARE;
-+}
-+
- static target_ulong h_set_sprg0(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                                 target_ulong opcode, target_ulong *args)
- {
-@@ -1072,6 +1104,10 @@ static void hypercall_register_types(void)
-     /* hcall-bulk */
-     spapr_register_hypercall(H_BULK_REMOVE, h_bulk_remove);
- 
-+    /* hcall-hpt-resize */
-+    spapr_register_hypercall(H_RESIZE_HPT_PREPARE, h_resize_hpt_prepare);
-+    spapr_register_hypercall(H_RESIZE_HPT_COMMIT, h_resize_hpt_commit);
-+
-     /* hcall-splpar */
-     spapr_register_hypercall(H_REGISTER_VPA, h_register_vpa);
-     spapr_register_hypercall(H_CEDE, h_cede);
-diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
-index 43d265f..7c77cc6 100644
---- a/hw/ppc/trace-events
-+++ b/hw/ppc/trace-events
-@@ -16,6 +16,8 @@ spapr_cas_continue(unsigned long n) "Copy changes to the guest: %ld bytes"
- # hw/ppc/spapr_hcall.c
- spapr_cas_pvr_try(uint32_t pvr) "%x"
- spapr_cas_pvr(uint32_t cur_pvr, bool explicit_match, uint32_t new_pvr) "current=%x, explicit_match=%u, new=%x"
-+spapr_h_resize_hpt_prepare(uint64_t flags, uint64_t shift) "flags=0x%"PRIx64", shift=%"PRIu64
-+spapr_h_resize_hpt_commit(uint64_t flags, uint64_t shift) "flags=0x%"PRIx64", shift=%"PRIu64
- 
- # hw/ppc/spapr_iommu.c
- spapr_iommu_put(uint64_t liobn, uint64_t ioba, uint64_t tce, uint64_t ret) "liobn=%"PRIx64" ioba=0x%"PRIx64" tce=0x%"PRIx64" ret=%"PRId64
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index ba9e689..4d2c89c 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -42,6 +42,13 @@ typedef struct sPAPRMachineClass sPAPRMachineClass;
- #define SPAPR_MACHINE_CLASS(klass) \
-     OBJECT_CLASS_CHECK(sPAPRMachineClass, klass, TYPE_SPAPR_MACHINE)
- 
-+typedef enum {
-+    SPAPR_RESIZE_HPT_DEFAULT = 0,
-+    SPAPR_RESIZE_HPT_DISABLED,
-+    SPAPR_RESIZE_HPT_ENABLED,
-+    SPAPR_RESIZE_HPT_REQUIRED,
-+} sPAPRResizeHPT;
-+
- /**
-  * sPAPRMachineClass:
-  */
-@@ -57,6 +64,7 @@ struct sPAPRMachineClass {
-                           uint64_t *buid, hwaddr *pio, 
-                           hwaddr *mmio32, hwaddr *mmio64,
-                           unsigned n_dma, uint32_t *liobns, Error **errp);
-+    sPAPRResizeHPT resize_hpt_default;
- };
- 
- /**
-@@ -72,6 +80,7 @@ struct sPAPRMachineState {
-     ICSState *ics;
-     sPAPRRTCState rtc;
- 
-+    sPAPRResizeHPT resize_hpt;
-     void *htab;
-     uint32_t htab_shift;
-     uint64_t patb_entry; /* Process tbl registed in H_REGISTER_PROCESS_TABLE */
-@@ -361,6 +370,8 @@ struct sPAPRMachineState {
- #define H_XIRR_X                0x2FC
- #define H_RANDOM                0x300
- #define H_SET_MODE              0x31C
-+#define H_RESIZE_HPT_PREPARE    0x36C
-+#define H_RESIZE_HPT_COMMIT     0x370
- #define H_SIGNAL_SYS_RESET      0x380
- #define MAX_HCALL_OPCODE        H_SIGNAL_SYS_RESET
- 
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 9f1f132..97591d2 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -22,6 +22,7 @@
- #include <linux/kvm.h>
- 
- #include "qemu-common.h"
-+#include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "cpu.h"
- #include "cpu-models.h"
-@@ -2598,3 +2599,14 @@ int kvmppc_enable_hwrng(void)
- 
-     return kvmppc_enable_hcall(kvm_state, H_RANDOM);
- }
-+
-+void kvmppc_check_papr_resize_hpt(Error **errp)
-+{
-+    if (!kvm_enabled()) {
-+        return;
-+    }
-+
-+    /* TODO: Check for resize-capable KVM implementations */
-+
-+    error_setg(errp, "Hash page table resizing not available with this KVM version");
-+}
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index 8e9f42d..cd3b234 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -56,6 +56,7 @@ bool kvmppc_has_cap_htm(void);
- int kvmppc_enable_hwrng(void);
- int kvmppc_put_books_sregs(PowerPCCPU *cpu);
- PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
-+void kvmppc_check_papr_resize_hpt(Error **errp);
- 
- bool kvmppc_is_mem_backend_page_size_ok(char *obj_path);
- 
-@@ -267,6 +268,10 @@ static inline PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void)
-     return NULL;
- }
- 
-+static inline void kvmppc_check_papr_resize_hpt(Error **errp)
-+{
-+    return;
-+}
- #endif
- 
- #ifndef CONFIG_KVM
--- 
-2.9.3
+> ---
+>  hw/ppc/pnv.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index 09f0d22..b97055c 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -722,6 +722,7 @@ static void pnv_chip_class_init(ObjectClass *klass, v=
+oid *data)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> =20
+> +    set_bit(DEVICE_CATEGORY_CPU, dc->categories);
+>      dc->realize =3D pnv_chip_realize;
+>      dc->props =3D pnv_chip_properties;
+>      dc->desc =3D "PowerNV Chip";
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--6h64vBu9tReNbGLX
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYwfqzAAoJEGw4ysog2bOSXeEP/0t8Pq56hDsY4tuXB5CrqlXe
+qaWwErYlWtEktIzuxZzmbSWYjB9xffSr9ica+SddCwIIYRzgb4pTwkk6OX7pTGj5
+ps33NPKKWVyHdI78hnMcvKDtJIsQ7elV1kUZnMSVZbGq1QsGsnyOwpCpIH/KL7N7
+GWbW6oivzeTJ1M/R5kEb6J3XKoyL7TG2F+yjClh30wPb5ca7qiDaZ40D4WhzGSzl
+60vOcXTbkaLxWasdBnYjkQ8tN7JMXb0F/d1ad6PtaaL94I+8kohokC8Llc7maNU2
+ijrI35pz6dwutFj61L466f7pes6De5Nko8RfZbyh8KytNj3RVQoIH3CBlULAJaLl
+TTBHFR/CMd/sWSqPXLVTsmlHGEgRPR5Wi23JtafOeIwT2htrVw6tdm97K0ikq7T0
++qn46BrWf+5u1fpq3Y22DbcCE6H4gSPtD8SCyeYqRfofVkx0/xMVjc+EUK8HLWDS
+0awEugzv2srp2jK6fSPp/FKaat299VyRYsMbk71BxBZUSv6bP10P2+zqc9TpF21/
+iawSzvpVPUY2nlIDbP+rCMbD+XNbcVVcQRKPp3X3yZS8fAG3dhjrAuiCAq6btcye
+kqUmvKUnQpLBhxWD6cZMqHUB2mbewvbVTclnwFXC6vifwoJlCn0APvUbXNbyaKhy
+bXJGkwQzI+V4OUnvB1Cm
+=mSOD
+-----END PGP SIGNATURE-----
+
+--6h64vBu9tReNbGLX--
