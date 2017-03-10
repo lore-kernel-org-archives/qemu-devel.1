@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cmO90-0000cb-7z
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 12:15:59 -0500
+	(envelope-from <bounces@canonical.com>) id 1cmOIe-0003xS-W6
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 12:25:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cmO8v-0005OL-VP
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 12:15:58 -0500
-Received: from indium.canonical.com ([91.189.90.7]:52641)
+	(envelope-from <bounces@canonical.com>) id 1cmOIb-00035V-Po
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 12:25:57 -0500
+Received: from indium.canonical.com ([91.189.90.7]:55208)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cmO8v-0005Mh-Mq
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 12:15:53 -0500
+	id 1cmOIb-00035F-JX
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 12:25:53 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cmO8s-0001ty-TV
-	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 17:15:51 +0000
+	id 1cmOIZ-0005xl-GD
+	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 17:25:51 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 74A582E818C
-	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 17:15:49 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 3E50A2E81C7
+	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 17:25:48 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 10 Mar 2017 17:04:27 -0000
-From: Mohammed Gamal <m.gamal005@gmail.com>
+Date: Fri, 10 Mar 2017 17:12:08 -0000
+From: Thomas Huth <1671876@bugs.launchpad.net>
 Reply-To: Bug 1671876 <1671876@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20170310164750.14977.41006.malonedeb@soybean.canonical.com>
-Message-Id: <20170310170427.24869.65752.malone@wampee.canonical.com>
+Message-Id: <20170310171208.32535.75549.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1671876] Re: qemu 2.7.0 segfaults in
  qemu_co_queue_run_restart()
@@ -39,20 +39,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The VMs were running with the following arguments
----------------------------------------------------------------------
--m 1024,slots=3D255,maxmem=3D256G -M pc-i440fx-2.7 -enable-kvm -nodefconfig=
- -nodefaults -rtc base=3Dutc -netdev tap,ifname=3Dn020133f0895e,id=3Dhostne=
-t6,vhost=3Don,vhostforce=3Don,vnet_hdr=3Doff,script=3Dno,downscript=3Dno -d=
-evice virtio-net-pci,netdev=3Dhostnet6,id=3Dnet6,mac=3D02:01:33:f0:89:5e,bu=
-s=3Dpci.0,addr=3D0x6 -chardev pty,id=3Dcharserial0 -device isa-serial,chard=
-ev=3Dcharserial0,id=3Dserial0 -usb -device usb-tablet,id=3Dinput0 -vnc 0.0.=
-0.0:94 -vga qxl -cpu Haswell,+vmx -smp 6,sockets=3D32,cores=3D1,maxcpus=3D6=
-4,threads=3D2 -drive file=3D/dev/md10,if=3Dnone,id=3Ddrive-virtio-disk5,for=
-mat=3Draw,snapshot=3Doff,aio=3Dnative,cache=3Dnone -device virtio-blk-pci,b=
-us=3Dpci.0,addr=3D0x5,drive=3Ddrive-virtio-disk5,num-queues=3D3,id=3Dvirtio=
--disk5,bootindex=3D1 -S
----------------------------------------------------------------------
+Could you please retry with the latest stable version (either 2.8.0 or
+2.7.1) ... maybe the problem is already fixed there.
 
 -- =
 
