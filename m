@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59049)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cmCGf-0000z1-Er
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 23:35:06 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cmCOV-00020c-Ff
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 23:43:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cmCGb-0005Wz-IQ
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 23:35:05 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55221)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cmCGb-0005WT-C8
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 23:35:01 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cmCGZ-0008Bb-KW
-	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 04:34:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 95CA22E80CB
-	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 04:34:59 +0000 (UTC)
+	(envelope-from <stefanha@gmail.com>) id 1cmCOR-0000x0-Je
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 23:43:11 -0500
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:34613)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cmCOR-0000w2-CU
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 23:43:07 -0500
+Received: by mail-pf0-x241.google.com with SMTP id o126so9457041pfb.1
+	for <qemu-devel@nongnu.org>; Thu, 09 Mar 2017 20:43:07 -0800 (PST)
+Date: Fri, 10 Mar 2017 12:42:56 +0800
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170310044256.GE4589@stefanha-x1.localdomain>
+References: <20170303135150.12145-1-stefanha@redhat.com>
+	<20170303135150.12145-4-stefanha@redhat.com>
+	<CAMRbyytpufX+9xzshezDuYabbDNt+9jzQqk0NCL1FxmQWnRU+A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 10 Mar 2017 04:17:19 -0000
-From: Launchpad Bug Tracker <887883@bugs.launchpad.net>
-Reply-To: Bug 887883 <887883@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20111109053151.5724.96789.malonedeb@wampee.canonical.com>
-Message-Id: <20170310041721.26893.54903.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 887883] Re: Coverity scan revealed defects
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="0QFb0wBpEddLcDHQ"
+Content-Disposition: inline
+In-Reply-To: <CAMRbyytpufX+9xzshezDuYabbDNt+9jzQqk0NCL1FxmQWnRU+A@mail.gmail.com>
+Subject: Re: [Qemu-devel] [RFC 3/4] qemu-img: add max-size subcommand
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,58 +31,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Nir Soffer <nsoffer@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, Maor Lipchuk <mlipchuk@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-[Expired for QEMU because there has been no activity for 60 days.]
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+--0QFb0wBpEddLcDHQ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On Fri, Mar 03, 2017 at 11:56:54PM +0200, Nir Soffer wrote:
+> On Fri, Mar 3, 2017 at 3:51 PM, Stefan Hajnoczi <stefanha@redhat.com> wro=
+te:
+> > +    ret_size =3D bdrv_max_size(drv, opts, in_blk ? blk_bs(in_blk) : NU=
+LL,
+> > +                             &local_err);
+> > +    if (local_err) {
+> > +        error_report_err(local_err);
+> > +        goto fail;
+> > +    }
+> > +
+> > +    if (output_format =3D=3D OFORMAT_HUMAN) {
+> > +        printf("%" PRIu64 "\n", ret_size);
+> > +    } else {
+> > +        printf("{ \"size\": %" PRIu64 " }\n", ret_size);
+> > +    }
+> > +
+> > +    ret =3D 0;
+> > +
+> > +fail:
+>=20
+> This looks more like out: to me, since we use it both for normal
+> and abnormal flows.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/887883
+Looking at the source file there is no consistency: "err", "fail", "out"
+are all used in various places.  I'm happy to switch this to "out", but
+for the record, I find "fail" clearer since it communicates the
+intention that this is an error return.
 
-Title:
-  Coverity scan revealed defects
+Will fix.
 
-Status in QEMU:
-  Expired
+--0QFb0wBpEddLcDHQ
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Bug description:
-  Coverity scan detected some issues such as  RESOURCE_LEAK and
-  REVERSE_INULL etc on qemu-1.0rc1:
+-----BEGIN PGP SIGNATURE-----
 
-  Analysis summary report:
-  ------------------------
-  Files analyzed                 : 830
-  Total LoC input to cov-analyze : 576549
-  Functions analyzed             : 20721
-  Paths analyzed                 : 858376
-  New defects found              : 428 Total
-                                     2 ARRAY_VS_SINGLETON
-                                     9 CHECKED_RETURN
-                                    19 CONSTANT_EXPRESSION_RESULT
-                                    60 DEADCODE
-                                    43 FORWARD_NULL
-                                    14 INFINITE_LOOP
-                                    36 MISSING_BREAK
-                                     3 MISSING_LOCK
-                                    47 NEGATIVE_RETURNS
-                                     1 NO_EFFECT
-                                    11 NULL_RETURNS
-                                    51 OVERRUN_STATIC
-                                     1 RESOURCE_LEAK
-                                    79 REVERSE_INULL
-                                    20 SIGN_EXTENSION
-                                     7 SIZEOF_MISMATCH
-                                    15 UNINIT
-                                     5 UNREACHABLE
-                                     2 UNUSED_VALUE
-                                     3 USE_AFTER_FREE
+iQEcBAEBAgAGBQJYwi7QAAoJEJykq7OBq3PIV54IAMNTpTPTjGObzsHV150Kl13M
+SIIOca940V8Q9Cro+19lfDRGH5B4a6Ucn5eYV6PCQk0l44JyVeGb4vJrdqM/b1Ef
+Qvrg17K8RSkf9arTrutxxQYLcUaXKszLiN45mRlH8MXqcqtCtvyrIQkruy+uzn8U
+6zNqsQYPDyA8+m05VgjeXxNteePn51tUg58qLXsGgdywyR9sKi+9DUUMUfaQ6pJ3
+IlJuYCtw1Kskg9k3tOorYJ4ugzrNRrrQMXExMj3PQQxKf0Lve11jVjPvLx3k90ad
+2QxLS9opYe96SpG65Ebnvi+a8kRTFUmo9h8Qs+9GZuNzPxrZlseew+0MQqpfn7s=
+=j70N
+-----END PGP SIGNATURE-----
 
-  For details, please see attachment.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/887883/+subscriptions
+--0QFb0wBpEddLcDHQ--
