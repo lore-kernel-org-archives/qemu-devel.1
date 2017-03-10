@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35882)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cmOIe-0003xS-W6
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 12:25:58 -0500
+	(envelope-from <anthony.xu@intel.com>) id 1cmOXC-0006l8-JV
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 12:40:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cmOIb-00035V-Po
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 12:25:57 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55208)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cmOIb-00035F-JX
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 12:25:53 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cmOIZ-0005xl-GD
-	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 17:25:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 3E50A2E81C7
-	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 17:25:48 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <anthony.xu@intel.com>) id 1cmOX7-0007va-P2
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 12:40:58 -0500
+Received: from mga09.intel.com ([134.134.136.24]:5526)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
+	id 1cmOX6-0007uW-Vv
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 12:40:53 -0500
+From: "Xu, Anthony" <anthony.xu@intel.com>
+Date: Fri, 10 Mar 2017 17:40:43 +0000
+Message-ID: <4712D8F4B26E034E80552F30A67BE0B1A0F91A@ORSMSX112.amr.corp.intel.com>
+References: <1489158897-9206-1-git-send-email-yang.zhong@intel.com>
+	<1489158897-9206-2-git-send-email-yang.zhong@intel.com>
+	<53522014-8f70-9358-7d60-8b6c491c9611@redhat.com>
+In-Reply-To: <53522014-8f70-9358-7d60-8b6c491c9611@redhat.com>
+Content-Language: en-US
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 10 Mar 2017 17:12:08 -0000
-From: Thomas Huth <1671876@bugs.launchpad.net>
-Reply-To: Bug 1671876 <1671876@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170310164750.14977.41006.malonedeb@soybean.canonical.com>
-Message-Id: <20170310171208.32535.75549.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1671876] Re: qemu 2.7.0 segfaults in
- qemu_co_queue_run_restart()
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v1 2/2] reduce qemu's heap Rss size from
+ 12252kB to 2752KB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,128 +31,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, "Zhong, Yang" <yang.zhong@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "Peng, Chao P" <chao.p.peng@intel.com>
 
-Could you please retry with the latest stable version (either 2.8.0 or
-2.7.1) ... maybe the problem is already fixed there.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1671876
-
-Title:
-  qemu 2.7.0 segfaults in qemu_co_queue_run_restart()
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hi,
-
-  I've been experiencing frequent segfaults lately with qemu 2.7.0
-  running Ubuntu 16.04 guests. The crash usually happens in
-  qemu_co_queue_run_restart(). I haven't seen this so far with any other
-  guests or distros.
-
-  Here is one back trace I obtained from one of the crashing VMs.
-
-  --------------------------------------------------------------------------
-  (gdb) bt
-  #0  qemu_co_queue_run_restart (co=3D0x7fba8ff05aa0) at /build/pb-qemu-pss=
-KUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:59
-  #1  0x000055c1656f39a9 in qemu_coroutine_enter (co=3D0x7fba8ff05aa0) at /=
-build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-  #2  0x000055c1656f3e74 in qemu_co_queue_run_restart (co=3D0x7fba8dd20430)=
- at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-  #3  0x000055c1656f39a9 in qemu_coroutine_enter (co=3D0x7fba8dd20430) at /=
-build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-  #4  0x000055c1656f3e74 in qemu_co_queue_run_restart (co=3D0x7fba8dd14ea0)=
- at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-  #5  0x000055c1656f39a9 in qemu_coroutine_enter (co=3D0x7fba8dd14ea0) at /=
-build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-  #6  0x000055c1656f3e74 in qemu_co_queue_run_restart (co=3D0x7fba80c11dc0)=
- at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-  #7  0x000055c1656f39a9 in qemu_coroutine_enter (co=3D0x7fba80c11dc0) at /=
-build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-  #8  0x000055c1656f3e74 in qemu_co_queue_run_restart (co=3D0x7fba8dd0bd70)=
- at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-  #9  0x000055c1656f39a9 in qemu_coroutine_enter (co=3D0x7fba8dd0bd70) at /=
-build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-  #10 0x000055c1656f3fa0 in qemu_co_enter_next (queue=3Dqueue@entry=3D0x55c=
-1669e75e0) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.=
-c:106
-  #11 0x000055c165692060 in timer_cb (blk=3D0x55c1669e7590, is_write=3D<opt=
-imized out>) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/block/throttle-groups.c=
-:400
-  #12 0x000055c16564f615 in timerlist_run_timers (timer_list=3D0x55c166a53e=
-80) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/qemu-timer.c:528
-  #13 0x000055c16564f679 in timerlistgroup_run_timers (tlg=3Dtlg@entry=3D0x=
-55c167c81cf8) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/qemu-timer.c:564
-  #14 0x000055c16564ff47 in aio_dispatch (ctx=3Dctx@entry=3D0x55c167c81bb0)=
- at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/aio-posix.c:357
-  #15 0x000055c1656500e8 in aio_poll (ctx=3D0x55c167c81bb0, blocking=3D<opt=
-imized out>) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/aio-posix.c:479
-  #16 0x000055c1654b1c79 in iothread_run (opaque=3D0x55c167c81960) at /buil=
-d/pb-qemu-pssKUp/pb-qemu-2.7.0/iothread.c:46
-  #17 0x00007fbc4b64f0a4 in allocate_stack (stack=3D<synthetic pointer>, pd=
-p=3D<synthetic pointer>, attr=3D0x0) at allocatestack.c:416
-  #18 __pthread_create_2_1 (newthread=3D<error reading variable: Cannot acc=
-ess memory at address 0xffffffffffffff48>, attr=3D<error reading variable: =
-Cannot access memory at address 0xffffffffffffff40>,
-  =C2=A0=C2=A0=C2=A0=C2=A0start_routine=3D<error reading variable: Cannot a=
-ccess memory at address 0xffffffffffffff58>, arg=3D<error reading variable:=
- Cannot access memory at address 0xffffffffffffff50>) at pthread_create.c:5=
-39
-  Backtrace stopped: Cannot access memory at address 0x8
-  --------------------------------------------------------------------------
-
-  The code that crashes is this
-  --------------------------------------------------------------------------
-  void qemu_co_queue_run_restart(Coroutine *co)
-  {
-  =C2=A0=C2=A0=C2=A0=C2=A0Coroutine *next;
-
-  =C2=A0=C2=A0=C2=A0=C2=A0trace_qemu_co_queue_run_restart(co);
-  =C2=A0=C2=A0=C2=A0=C2=A0while ((next =3D QSIMPLEQ_FIRST(&co->co_queue_wak=
-eup))) {
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0QSIMPLEQ_REMOVE_HEAD(&co-=
->co_queue_wakeup, co_queue_next);       <--- Crash occurs here this time
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qemu_coroutine_enter(next=
-);
-  =C2=A0=C2=A0=C2=A0=C2=A0}
-  }
-  --------------------------------------------------------------------------
-
-  Expanding the macro QSIMPLEQ_REMOVE_HEAD gives us
-  --------------------------------------------------------------------------
-  #define QSIMPLEQ_REMOVE_HEAD(head, field) do {                          \
-  =C2=A0=C2=A0=C2=A0=C2=A0if (((head)->sqh_first =3D (head)->sqh_first->fie=
-ld.sqe_next) =3D=3D NULL)\
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(head)->sqh_last =3D &(he=
-ad)->sqh_first;                          \
-  } while (/*CONSTCOND*/0)
-  --------------------------------------------------------------------------
-
-  which corrsponds to
-  --------------------------------------------------------------------------
-  if (((&co->co_queue_wakeup)->sqh_first =3D (&co->co_queue_wakeup)->sqh_fi=
-rst->co_queue_next.sqe_next) =3D=3D NULL)\
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(&co->co_queue_wakeup)->s=
-qh_last =3D &(&co->co_queue_wakeup)->sqh_first;
-  --------------------------------------------------------------------------
-
-  Debugging the list we see
-  --------------------------------------------------------------------------
-  (gdb) print *(&co->co_queue_wakeup->sqh_first)
-  $6 =3D (struct Coroutine *) 0x1000
-  (gdb) print *(&co->co_queue_wakeup->sqh_first->co_queue_next)
-  Cannot access memory at address 0x1030
-  --------------------------------------------------------------------------
-
-  So the data in co->co_queue_wakeup->sqh_first is corrupted and
-  represents an invalid address. Any idea why is that?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1671876/+subscriptions
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQYW9sbyBCb256aW5pIFttYWls
+dG86cGJvbnppbmlAcmVkaGF0LmNvbV0NCj4gU2VudDogRnJpZGF5LCBNYXJjaCAxMCwgMjAxNyAx
+OjE0IEFNDQo+IFRvOiBaaG9uZywgWWFuZyA8eWFuZy56aG9uZ0BpbnRlbC5jb20+OyBxZW11LWRl
+dmVsQG5vbmdudS5vcmcNCj4gQ2M6IFh1LCBBbnRob255IDxhbnRob255Lnh1QGludGVsLmNvbT47
+IFBlbmcsIENoYW8gUA0KPiA8Y2hhby5wLnBlbmdAaW50ZWwuY29tPg0KPiBTdWJqZWN0OiBSZTog
+W1BBVENIIHYxIDIvMl0gcmVkdWNlIHFlbXUncyBoZWFwIFJzcyBzaXplIGZyb20gMTIyNTJrQiB0
+bw0KPiAyNzUyS0INCj4gDQo+IA0KPiANCj4gT24gMTAvMDMvMjAxNyAxNjoxNCwgWWFuZyBaaG9u
+ZyB3cm90ZToNCj4gPiBUaGVyZSBpcyBubyBuZWVkIHRvIGRlbGV0ZSBzdWJyZWdpb24gYW5kIGRv
+IG1lbW9yeSBiZWdpbi9jb21taXQgZm9yDQo+ID4gc3VicGFnZSBpbiBtZW1vcnlfcmVnaW9uX2Zp
+bmFsaXplKCkuDQo+ID4NCj4gPiBUaGlzIHBhdGNoIGlzIGZyb20gQW50aG9ueSBYdSA8YW50aG9u
+eS54dUBpbnRlbC5jb20+Lg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogWWFuZyBaaG9uZyA8eWFu
+Zy56aG9uZ0BpbnRlbC5jb20+DQo+ID4gLS0tDQo+ID4gIG1lbW9yeS5jIHwgMTMgKysrKysrKy0t
+LS0tLQ0KPiA+ICAxIGZpbGUgY2hhbmdlZCwgNyBpbnNlcnRpb25zKCspLCA2IGRlbGV0aW9ucygt
+KQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL21lbW9yeS5jIGIvbWVtb3J5LmMNCj4gPiBpbmRleCAy
+ODQ4OTRiLi4zZTliZmZmIDEwMDY0NA0KPiA+IC0tLSBhL21lbW9yeS5jDQo+ID4gKysrIGIvbWVt
+b3J5LmMNCj4gPiBAQCAtMTUwNSwxMyArMTUwNSwxNCBAQCBzdGF0aWMgdm9pZCBtZW1vcnlfcmVn
+aW9uX2ZpbmFsaXplKE9iamVjdA0KPiAqb2JqKQ0KPiA+ICAgICAgICogYW5kIGNhdXNlIGFuIGlu
+ZmluaXRlIGxvb3AuDQo+ID4gICAgICAgKi8NCj4gPiAgICAgIG1yLT5lbmFibGVkID0gZmFsc2U7
+DQo+ID4gLSAgICBtZW1vcnlfcmVnaW9uX3RyYW5zYWN0aW9uX2JlZ2luKCk7DQo+ID4gLSAgICB3
+aGlsZSAoIVFUQUlMUV9FTVBUWSgmbXItPnN1YnJlZ2lvbnMpKSB7DQo+ID4gLSAgICAgICAgTWVt
+b3J5UmVnaW9uICpzdWJyZWdpb24gPSBRVEFJTFFfRklSU1QoJm1yLT5zdWJyZWdpb25zKTsNCj4g
+PiAtICAgICAgICBtZW1vcnlfcmVnaW9uX2RlbF9zdWJyZWdpb24obXIsIHN1YnJlZ2lvbik7DQo+
+ID4gKyAgICBpZiAoIW1yLT5zdWJwYWdlKSB7DQo+ID4gKyAgICAgICAgbWVtb3J5X3JlZ2lvbl90
+cmFuc2FjdGlvbl9iZWdpbigpOw0KPiA+ICsgICAgICAgIHdoaWxlICghUVRBSUxRX0VNUFRZKCZt
+ci0+c3VicmVnaW9ucykpIHsNCj4gPiArICAgICAgICAgICAgTWVtb3J5UmVnaW9uICpzdWJyZWdp
+b24gPSBRVEFJTFFfRklSU1QoJm1yLT5zdWJyZWdpb25zKTsNCj4gPiArICAgICAgICAgICAgbWVt
+b3J5X3JlZ2lvbl9kZWxfc3VicmVnaW9uKG1yLCBzdWJyZWdpb24pOw0KPiA+ICsgICAgICAgIH0N
+Cj4gPiArICAgICAgICBtZW1vcnlfcmVnaW9uX3RyYW5zYWN0aW9uX2NvbW1pdCgpOw0KPiANCj4g
+U3VicGFnZXMgbmV2ZXIgaGF2ZSBzdWJyZWdpb25zLCBzbyB0aGUgbG9vcCBuZXZlciBydW5zLiAg
+VGhlIGJlZ2luL2NvbW1pdA0KPiBwYWlyIHRoZW4gYmVjb21lczoNCj4gDQo+ICAgICArK21lbW9y
+eV9yZWdpb25fdHJhbnNhY3Rpb25fZGVwdGg7DQo+ICAgICAtLW1lbW9yeV9yZWdpb25fdHJhbnNh
+Y3Rpb25fZGVwdGg7DQo+ICAgICBpZiAoIW1lbW9yeV9yZWdpb25fdHJhbnNhY3Rpb25fZGVwdGgp
+IHsNCj4gICAgICAgICBpZiAobWVtb3J5X3JlZ2lvbl91cGRhdGVfcGVuZGluZykgew0KPiAgICAg
+ICAgICAgICAuLi4NCj4gICAgICAgICB9IGVsc2UgaWYgKGlvZXZlbnRmZF91cGRhdGVfcGVuZGlu
+Zykgew0KPiAgICAgICAgICAgICAuLi4NCj4gICAgICAgICB9DQo+ICAgICAgICAgLy8gbWVtb3J5
+X3JlZ2lvbl9jbGVhcl9wZW5kaW5nKCkNCj4gICAgICAgICBtZW1vcnlfcmVnaW9uX3VwZGF0ZV9w
+ZW5kaW5nID0gZmFsc2U7DQo+ICAgICAgICAgaW9ldmVudGZkX3VwZGF0ZV9wZW5kaW5nID0gZmFs
+c2U7DQo+ICAgIH0NCj4gDQo+IElmIG1lbW9yeV9yZWdpb25fdHJhbnNhY3Rpb25fZGVwdGggaXMg
+PiAwIHRoZSBiZWdpbi9jb21taXQgcGFpciBkb2VzDQo+IG5vdGhpbmcuDQo+IA0KPiBCdXQgaWYg
+bWVtb3J5X3JlZ2lvbl90cmFuc2FjdGlvbl9kZXB0aCBpcyA9PSAwLCB0aGVyZSBzaG91bGQgYmUg
+bm8gdXBkYXRlDQo+IHBlbmRpbmcgYmVjYXVzZSB0aGUgbG9vcCBoYXMgbmV2ZXIgcnVuLiAgU28g
+SSBkb24ndCBzZWUgd2hhdCB5b3VyIHBhdGNoIGNhbg0KPiBjaGFuZ2UuDQoNCkFzIEkgbWVudGlv
+bmVkIGluIFBBVENIMSwgdGhpcyBwYXRjaCBpcyB1c2VkIHRvIGZpeCBhbiBpc3N1ZSBhZnRlciB3
+ZSByZW1vdmUNCnRoZSBnbG9iYWwgbG9jayBpbiBSQ1UgY2FsbGJhY2suIEFmdGVyIGdsb2JhbCBs
+b2NrIGlzIHJlbW92ZWQsIG90aGVyIHRocmVhZCBtYXkgDQpzZXQgdXAgdXBkYXRlIHBlbmRpbmcs
+IHNvIG1lbW9yeV9yZWdpb25fdHJhbnNhY3Rpb25fY29tbWl0IA0KbWF5IHRyeSB0byByZWJ1aWxk
+IFBoeXNQYWdlTWFwIGV2ZW4gdGhlIGxvb3AgZG9lc27igJl0IHJ1biwgb3RoZXIgdGhyZWFkIG1h
+eSB0cnkgdG8gDQpyZWJ1aWxkIFBoeXNQYWdlTWFwIGF0IHRoZSBzYW1lIHRpbWUsIGl0IGlzIGEg
+cmFjZSBjb25kaXRpb24uDQpzdWJwYWdlIE1lbW9yeVJlZ2lvbiBpcyBhIHNwZWNpZmljIE1lbW9y
+eVJlZ2lvbiwgaXQgZG9lc24ndCBiZWxvbmcgdG8gYW55IGFkZHJlc3MgDQpzcGFjZSwgaXQgaXMg
+b25seSB1c2VkIHRvIGhhbmRsZSBzdWJwYWdlLiBXZSBtYXkgdXNlIGEgbmV3IHN0cnVjdHVyZSBv
+dGhlciB0aGFuIA0KTWVtb3J5UmVnaW9uIHRvIGhhbmRsZSBzdWJwYWdlIHRvIG1ha2UgdGhlIGxv
+Z2ljIG1vcmUgY2xlYXJlci4gQWZ0ZXIgdGhlIGNoYW5nZSwgDQpSQ1UgY2FsbGJhY2sgd2lsbCBu
+b3QgZnJlZSBhbnkgTWVtb3J5UmVnaW9uLiANCg0KDQpBbnRob255DQoNCj4gDQo+IE9mIGNvdXJz
+ZSB0aGVyZSBjb3VsZCBiZSBhbiB1cGRhdGUgcGVuZGluZyBiZWNhdXNlIG9mIGEgYnVnIGVsc2V3
+aGVyZSwNCj4gYnV0IEkgdHJpZWQgYWRkaW5nIHRoaXMgcGF0Y2g6DQo+IA0KPiBkaWZmIC0tZ2l0
+IGEvbWVtb3J5LmMgYi9tZW1vcnkuYw0KPiBpbmRleCAyODQ4OTRiLi4yMjA4YTIxIDEwMDY0NA0K
+PiAtLS0gYS9tZW1vcnkuYw0KPiArKysgYi9tZW1vcnkuYw0KPiBAQCAtOTAzLDYgKzkwMywxMCBA
+QCBzdGF0aWMgdm9pZA0KPiBhZGRyZXNzX3NwYWNlX3VwZGF0ZV90b3BvbG9neShBZGRyZXNzU3Bh
+Y2UgKmFzKSAgdm9pZA0KPiBtZW1vcnlfcmVnaW9uX3RyYW5zYWN0aW9uX2JlZ2luKHZvaWQpDQo+
+ICB7DQo+ICAgICAgcWVtdV9mbHVzaF9jb2FsZXNjZWRfbW1pb19idWZmZXIoKTsNCj4gKyAgICBp
+ZiAoIW1lbW9yeV9yZWdpb25fdHJhbnNhY3Rpb25fZGVwdGgpIHsNCj4gKyAgICAgICAgYXNzZXJ0
+KCFtZW1vcnlfcmVnaW9uX3VwZGF0ZV9wZW5kaW5nKTsNCj4gKyAgICAgICAgYXNzZXJ0KCFpb2V2
+ZW50ZmRfdXBkYXRlX3BlbmRpbmcpOw0KPiArICAgIH0NCj4gICAgICArK21lbW9yeV9yZWdpb25f
+dHJhbnNhY3Rpb25fZGVwdGg7DQo+ICB9DQo+IA0KPiBhbmQgYXQgbGVhc3QgYSBiYXNpYyBxZW11
+LXN5c3RlbS14ODZfNjQgcnVuIHN0YXJ0ZWQganVzdCBmaW5lLiAgU28gd2h5IGRvZXMNCj4gdGhp
+cyBwYXRjaCBtYWtlIGEgZGlmZmVyZW5jZT8NCj4gDQo+IFBhb2xvDQo+IA0KPiA+ICAgICAgfQ0K
+PiA+IC0gICAgbWVtb3J5X3JlZ2lvbl90cmFuc2FjdGlvbl9jb21taXQoKTsNCj4gPiAtDQo=
