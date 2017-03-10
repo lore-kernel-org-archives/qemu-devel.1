@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cmNZL-0000Hq-AB
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 11:39:08 -0500
+	(envelope-from <shah.suramya@gmail.com>) id 1cmNah-0001HY-MC
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 11:40:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cmNZI-00021c-5v
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 11:39:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47530)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cmNZH-00021F-T2
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 11:39:04 -0500
-Date: Fri, 10 Mar 2017 16:38:59 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170310163859.GN32264@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1489141097-28587-1-git-send-email-he.chen@linux.intel.com>
-	<89688700-069c-1700-b226-0c1e81203c76@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <89688700-069c-1700-b226-0c1e81203c76@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] x86: Allow to set NUMA distance for
- different NUMA nodes
+	(envelope-from <shah.suramya@gmail.com>) id 1cmNae-0002cN-JP
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 11:40:31 -0500
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:34019)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <shah.suramya@gmail.com>)
+	id 1cmNae-0002bO-CW
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 11:40:28 -0500
+Received: by mail-pg0-x243.google.com with SMTP id b5so10825669pgg.1
+	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 08:40:26 -0800 (PST)
+From: Suramya Shah <shah.suramya@gmail.com>
+Date: Fri, 10 Mar 2017 22:09:48 +0530
+Message-Id: <20170310163948.7567-1-shah.suramya@gmail.com>
+Subject: [Qemu-devel] [PATCH v4] util: Removed unneeded header from path.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,92 +24,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: He Chen <he.chen@linux.intel.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, shah.suramya@gmail.com
 
-On Fri, Mar 10, 2017 at 10:37:08AM -0600, Eric Blake wrote:
-> On 03/10/2017 04:18 AM, He Chen wrote:
-> > Current, QEMU does not provide a clear command to set vNUMA distance for
-> > guest although we already have `-numa` command to set vNUMA nodes.
-> > 
-> 
-> > 
-> > This patch is going to add SLIT table support in QEMU, and provides
-> > addtional option `dist` for command `-numa` to allow user set vNUMA
-> 
-> s/addtional/additional/
-> 
-> > distance by QEMU command.
-> > 
-> > With this patch, when a user wants to create a guest that contains
-> > several vNUMA nodes and also wants to set distance among those nodes,
-> > the QEMU command would like:
-> > 
-> > ```
-> > -object memory-backend-ram,size=1G,prealloc=yes,host-nodes=0,policy=bind,id=node0 \
-> > -numa node,nodeid=0,cpus=0,memdev=node0 \
-> > -object memory-backend-ram,size=1G,prealloc=yes,host-nodes=1,policy=bind,id=node1 \
-> > -numa node,nodeid=1,cpus=1,memdev=node1 \
-> > -object memory-backend-ram,size=1G,prealloc=yes,host-nodes=2,policy=bind,id=node2 \
-> > -numa node,nodeid=2,cpus=2,memdev=node2 \
-> > -object memory-backend-ram,size=1G,prealloc=yes,host-nodes=3,policy=bind,id=node3 \
-> > -numa node,nodeid=3,cpus=3,memdev=node3 \
-> > -numa dist,a=0,b=1,val=21 \
-> > -numa dist,a=0,b=2,val=31 \
-> > -numa dist,a=0,b=3,val=41 \
-> > -numa dist,a=1,b=0,val=21 \
-> > ...
-> > ```
-> 
-> 
-> > +++ b/qapi-schema.json
-> > @@ -5647,7 +5647,7 @@
-> >  # Since: 2.1
-> >  ##
-> >  { 'enum': 'NumaOptionsType',
-> > -  'data': [ 'node' ] }
-> > +  'data': [ 'node', 'dist' ] }
-> 
-> Missing documentation, including the fact that 'dist' is added in 2.10
-> (you've missed 2.9).
-> 
-> >  
-> >  ##
-> > +# @NumaDistOptions:
-> > +#
-> > +# Set distance between 2 NUMA nodes. (for OptsVisitor)
-> > +#
-> > +# @a: first NUMA node.
-> > +#
-> > +# @b: second NUMA node.
-> > +#
-> > +# @val: NUMA distance between 2 given NUMA nodes.
-> > +#
-> > +# Since: 2.9
-> 
-> This is a new feature, but you've missed soft freeze; this will have to
-> be 2.10.
-> 
-> > +##
-> > +{ 'struct': 'NumaDistOptions',
-> > +  'data': {
-> > +   'a':   'uint8',
-> > +   'b':   'uint8',
-> > +   'val': 'uint8' }}
-> 
-> Using uint8 limits us to at most 256 numa nodes. Is that going to bite
-> us in the future?
-> 
-> Is 'a' and 'b' really the best naming convention to use (it's concise,
-> but maybe 'first' and 'second', or 'source' and 'destination' is better)?
+Signed-off-by: Suramya Shah <shah.suramya@gmail.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+--- 
+qemu-common.h is no longer necessary as of refactoring done in commit f348b6d.
+ util/path.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-'src' and 'dst' are probably a reasnoable compromise between meaningful
-and short.
-
-
-Regards,
-Daniel
+diff --git a/util/path.c b/util/path.c
+index 5479f76..7f9fc27 100644
+--- a/util/path.c
++++ b/util/path.c
+@@ -6,7 +6,6 @@
+ #include "qemu/osdep.h"
+ #include <sys/param.h>
+ #include <dirent.h>
+-#include "qemu-common.h"
+ #include "qemu/cutils.h"
+ #include "qemu/path.h"
+ 
 -- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+2.9.3
