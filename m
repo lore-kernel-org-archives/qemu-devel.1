@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52806)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1cm9HV-0003PB-Ig
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 20:23:46 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1cm9YZ-00062m-QZ
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 20:41:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1cm9HR-0006or-J7
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 20:23:45 -0500
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:38175)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1cm9HR-0006nd-AI
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 20:23:41 -0500
-Date: Thu, 9 Mar 2017 20:23:39 -0500
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170310012339.GA7400@flamenco>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] Benchmarking linux-user performance
+	(envelope-from <aik@ozlabs.ru>) id 1cm9YW-0002zr-MM
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 20:41:23 -0500
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Date: Fri, 10 Mar 2017 12:41:13 +1100
+Message-Id: <20170310014113.37988-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [PATCH qemu v2] target-ppc: kvm: make use of
+ KVM_CREATE_SPAPR_TCE_64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,95 +18,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Alex =?utf-8?B?QmVubu+/vWU=?= <alex.bennee@linaro.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-Hi all,
+KVM_CAP_SPAPR_TCE capability allows creating TCE tables in KVM which
+allows having in-kernel acceleration for H_PUT_TCE_xxx hypercalls.
+However it only supports 32bit DMA windows at zero bus offset.
 
-Inspired by SimBench[1], I have written a set of scripts ("DBT-bench")
-to easily obtain and plot performance numbers for linux-user.
+There is a new KVM_CAP_SPAPR_TCE_64 capability which supports 64bit
+window size, variable page size and bus offset.
 
-The (Perl) scripts are available here:
-  https://github.com/cota/dbt-bench
-[ It's better to clone with --recursive because the benchmarks
-(NBench) are pulled as a submodule. ]
+This makes use of the new capability. The kernel headers are already
+updated as the kernel support went in to v4.6.
 
-I'm using NBench because (1) it's just a few files and they take
-very little time to run (~5min per QEMU version, if performance
-on the host machine is stable), (2) AFAICT its sources are in the
-public domain (whereas SPEC's sources cannot be redistributed),
-and (3) with NBench I get results similar to SPEC's.
-
-Here are linux-user performance numbers from v1.0 to v2.8 (higher
-is better):
-
-                        x86_64 NBench Integer Performance
-                 Host: Intel(R) Xeon(R) CPU E5-2690 0 @ 2.90GHz                
-                                                                               
-  36 +-+-+---+---+---+--+---+---+---+---+---+---+---+---+--+---+---+---+-+-+   
-     |   +   +   +   +  +   +   +   +   +   +   +   +   +  +   +   +  ***  |   
-  34 +-+                                                             #*A*+-+   
-     |                                                            *A*      |   
-  32 +-+                                                          #      +-+   
-  30 +-+                                                          #      +-+   
-     |                                                           #         |   
-  28 +-+                                                        #        +-+   
-     |                                 *A*#*A*#*A*#*A*#*A*#     #          |   
-  26 +-+                   *A*#*A*#***#    ***         ******#*A*        +-+   
-     |                     #       *A*                    *A* ***          |   
-  24 +-+                  #                                              +-+   
-  22 +-+                 #                                               +-+   
-     |             #*A**A*                                                 |   
-  20 +-+       #*A*                                                      +-+   
-     |  *A*#*A*  +   +  +   +   +   +   +   +   +   +   +  +   +   +   +   |   
-  18 +-+-+---+---+---+--+---+---+---+---+---+---+---+---+--+---+---+---+-+-+   
-       v1.v1.1v1.2v1.v1.4v1.5v1.6v1.7v2.0v2.1v2.2v2.3v2.v2.5v2.6v2.7v2.8.0     
-                                  QEMU version                                 
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+Changes:
+* rebased on recent dwg/ppc-for-2.10
 
 
-                     x86_64 NBench Floating Point Performance                  
-                  Host: Intel(R) Xeon(R) CPU E5-2690 0 @ 2.90GHz               
-                                                                               
-  1.88 +-+-+---+--+---+---+---+--+---+---+---+---+--+---+---+---+--+---+-+-+   
-       |   +   +  +  *A*#*A*  +  +   +   +   +   +  +   +   +   +  +   +   |   
-  1.86 +-+           *** ***                                             +-+   
-       |            #       #   *A*#***                                    |   
-       |      *A*# #         # ##   *A*                                    |   
-  1.84 +-+    #  *A*         *A*      #                                  +-+   
-       |      #                        #                              *A*  |   
-  1.82 +-+   #                          #                            ##  +-+   
-       |     #                          *A*#                        #      |   
-   1.8 +-+  #                               #  #*A*               *A*    +-+   
-       |    #                               *A*   #                #       |   
-  1.78 +-+*A*                                      #       *A*    #      +-+   
-       |                                           #   ***#  #    #        |   
-       |                                           *A*#*A*    #  #         |   
-  1.76 +-+                                         ***         # #       +-+   
-       |   +   +  +   +   +   +  +   +   +   +   +  +   +   +  *A* +   +   |   
-  1.74 +-+-+---+--+---+---+---+--+---+---+---+---+--+---+---+---+--+---+-+-+   
-         v1.v1.v1.2v1.3v1.4v1.v1.6v1.7v2.0v2.1v2.v2.3v2.4v2.5v2.v2.7v2.8.0     
-                                   QEMU version                                
+---
+ target/ppc/kvm_ppc.h | 12 +++++++-----
+ hw/ppc/spapr_iommu.c |  8 +++++---
+ target/ppc/kvm.c     | 48 +++++++++++++++++++++++++++++++++++++-----------
+ 3 files changed, 49 insertions(+), 19 deletions(-)
 
-Same plots, in PNG: http://imgur.com/a/nF7Ls
-
-These plots are obtained simply by running
-	$ QEMU_PATH=path/to/qemu QEMU_ARCH=x86_64 make -j
-from dbt-bench, although note that some user intervention was needed
-to compile old QEMU versions.
-
-I think having some well-defined, easy-to-run benchmarks (even
-if far from perfect, like these) to aid development is better
-than not having any. My hope is that having these will encourage
-future performance improvements to the emulation loop and TCG -- or
-at least serve as a warning when performance regresses excessively :-)
-
-Let me know if you find this work useful.
-
-Thanks,
-
-		Emilio
-
-[1] https://bitbucket.org/simbench/simbench
-Simbench's authors have a paper on it, although it is not publicly
-available yet (will be presented at the ISPASS'17 conference in April).
-The abstract can be accessed here though: http://tinyurl.com/hahb4yj
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index 8e9f42d0c6..08ecf75a46 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -36,8 +36,9 @@ int kvmppc_booke_watchdog_enable(PowerPCCPU *cpu);
+ #ifndef CONFIG_USER_ONLY
+ off_t kvmppc_alloc_rma(void **rma);
+ bool kvmppc_spapr_use_multitce(void);
+-void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t window_size, int *pfd,
+-                              bool need_vfio);
++void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
++                              uint64_t bus_offset, uint32_t nb_table,
++                              int *pfd, bool need_vfio);
+ int kvmppc_remove_spapr_tce(void *table, int pfd, uint32_t window_size);
+ int kvmppc_reset_htab(int shift_hint);
+ uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift);
+@@ -167,9 +168,10 @@ static inline bool kvmppc_spapr_use_multitce(void)
+     return false;
+ }
+ 
+-static inline void *kvmppc_create_spapr_tce(uint32_t liobn,
+-                                            uint32_t window_size, int *fd,
+-                                            bool need_vfio)
++static inline void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
++                                            uint64_t bus_offset,
++                                            uint32_t nb_table,
++                                            int *pfd, bool need_vfio)
+ {
+     return NULL;
+ }
+diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
+index ae30bbe30f..29c80bb3c8 100644
+--- a/hw/ppc/spapr_iommu.c
++++ b/hw/ppc/spapr_iommu.c
+@@ -79,15 +79,16 @@ static IOMMUAccessFlags spapr_tce_iommu_access_flags(uint64_t tce)
+ 
+ static uint64_t *spapr_tce_alloc_table(uint32_t liobn,
+                                        uint32_t page_shift,
++                                       uint64_t bus_offset,
+                                        uint32_t nb_table,
+                                        int *fd,
+                                        bool need_vfio)
+ {
+     uint64_t *table = NULL;
+-    uint64_t window_size = (uint64_t)nb_table << page_shift;
+ 
+-    if (kvm_enabled() && !(window_size >> 32)) {
+-        table = kvmppc_create_spapr_tce(liobn, window_size, fd, need_vfio);
++    if (kvm_enabled()) {
++        table = kvmppc_create_spapr_tce(liobn, page_shift, bus_offset, nb_table,
++                                        fd, need_vfio);
+     }
+ 
+     if (!table) {
+@@ -342,6 +343,7 @@ void spapr_tce_table_enable(sPAPRTCETable *tcet,
+     tcet->nb_table = nb_table;
+     tcet->table = spapr_tce_alloc_table(tcet->liobn,
+                                         tcet->page_shift,
++                                        tcet->bus_offset,
+                                         tcet->nb_table,
+                                         &tcet->fd,
+                                         tcet->need_vfio);
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 9f1f132cef..031d31f87e 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -73,6 +73,7 @@ static int cap_booke_sregs;
+ static int cap_ppc_smt;
+ static int cap_ppc_rma;
+ static int cap_spapr_tce;
++static int cap_spapr_tce_64;
+ static int cap_spapr_multitce;
+ static int cap_spapr_vfio;
+ static int cap_hior;
+@@ -125,6 +126,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     cap_ppc_smt = kvm_check_extension(s, KVM_CAP_PPC_SMT);
+     cap_ppc_rma = kvm_check_extension(s, KVM_CAP_PPC_RMA);
+     cap_spapr_tce = kvm_check_extension(s, KVM_CAP_SPAPR_TCE);
++    cap_spapr_tce_64 = kvm_check_extension(s, KVM_CAP_SPAPR_TCE_64);
+     cap_spapr_multitce = kvm_check_extension(s, KVM_CAP_SPAPR_MULTITCE);
+     cap_spapr_vfio = false;
+     cap_one_reg = kvm_check_extension(s, KVM_CAP_ONE_REG);
+@@ -2132,13 +2134,10 @@ bool kvmppc_spapr_use_multitce(void)
+     return cap_spapr_multitce;
+ }
+ 
+-void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t window_size, int *pfd,
+-                              bool need_vfio)
++void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
++                              uint64_t bus_offset, uint32_t nb_table,
++                              int *pfd, bool need_vfio)
+ {
+-    struct kvm_create_spapr_tce args = {
+-        .liobn = liobn,
+-        .window_size = window_size,
+-    };
+     long len;
+     int fd;
+     void *table;
+@@ -2151,14 +2150,41 @@ void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t window_size, int *pfd,
+         return NULL;
+     }
+ 
+-    fd = kvm_vm_ioctl(kvm_state, KVM_CREATE_SPAPR_TCE, &args);
+-    if (fd < 0) {
+-        fprintf(stderr, "KVM: Failed to create TCE table for liobn 0x%x\n",
+-                liobn);
++    if (cap_spapr_tce_64) {
++        struct kvm_create_spapr_tce_64 args = {
++            .liobn = liobn,
++            .page_shift = page_shift,
++            .offset = bus_offset >> page_shift,
++            .size = nb_table,
++            .flags = 0
++        };
++        fd = kvm_vm_ioctl(kvm_state, KVM_CREATE_SPAPR_TCE_64, &args);
++        if (fd < 0) {
++            fprintf(stderr,
++                    "KVM: Failed to create TCE64 table for liobn 0x%x\n",
++                    liobn);
++            return NULL;
++        }
++    } else if (cap_spapr_tce) {
++        uint64_t window_size = (uint64_t) nb_table << page_shift;
++        struct kvm_create_spapr_tce args = {
++            .liobn = liobn,
++            .window_size = window_size,
++        };
++        if ((window_size != args.window_size) || bus_offset) {
++            return NULL;
++        }
++        fd = kvm_vm_ioctl(kvm_state, KVM_CREATE_SPAPR_TCE, &args);
++        if (fd < 0) {
++            fprintf(stderr, "KVM: Failed to create TCE table for liobn 0x%x\n",
++                    liobn);
++            return NULL;
++        }
++    } else {
+         return NULL;
+     }
+ 
+-    len = (window_size / SPAPR_TCE_PAGE_SIZE) * sizeof(uint64_t);
++    len = nb_table * sizeof(uint64_t);
+     /* FIXME: round this up to page size */
+ 
+     table = mmap(NULL, len, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+-- 
+2.11.0
