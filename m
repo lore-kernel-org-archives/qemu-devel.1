@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56264)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cmC0G-0006B1-Er
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 23:18:09 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cmC9v-0007cJ-Md
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 23:28:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cmC0F-0007lc-3c
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 23:18:08 -0500
-Date: Fri, 10 Mar 2017 12:17:53 +0800
+	(envelope-from <stefanha@gmail.com>) id 1cmC9q-0002g7-PX
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 23:28:07 -0500
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:34261)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cmC9q-0002fr-Jw
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 23:28:02 -0500
+Received: by mail-pf0-x244.google.com with SMTP id o126so9418733pfb.1
+	for <qemu-devel@nongnu.org>; Thu, 09 Mar 2017 20:28:02 -0800 (PST)
+Date: Fri, 10 Mar 2017 12:27:56 +0800
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170310041753.GA4589@stefanha-x1.localdomain>
-References: <1484884080-28836-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1484884080-28836-6-git-send-email-zhang.zhanghailiang@huawei.com>
-	<20170227173720.GJ10201@stefanha-x1.localdomain>
-	<58BEC406.1050903@huawei.com>
+Message-ID: <20170310042756.GB4589@stefanha-x1.localdomain>
+References: <20170303113255.28262-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="YiEDa0DAkWCtVeE4"
+	protocol="application/pgp-signature"; boundary="tjCHc7DPkfUGtrlw"
 Content-Disposition: inline
-In-Reply-To: <58BEC406.1050903@huawei.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 5/6] replication: Implement
- block replication for shared disk case
+In-Reply-To: <20170303113255.28262-1-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] os: don't corrupt pre-existing
+ memory-backend data with prealloc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,112 +30,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, kwolf@redhat.com, xuquan8@huawei.com, xiecl.fnst@cn.fujitsu.com, zhangchen.fnst@cn.fujitsu.com, qemu-block@nongnu.org, wencongyang2@huawei.com, qemu-devel@nongnu.org, mreitz@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Andrea Arcangeli <aarcange@redhat.com>, Michal Privoznik <mprivozn@redhat.com>, Jitendra Kolhe <jitendra.kolhe@hpe.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 
---YiEDa0DAkWCtVeE4
+--tjCHc7DPkfUGtrlw
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 07, 2017 at 10:30:30PM +0800, Hailiang Zhang wrote:
-> Hi Stefan,
+On Fri, Mar 03, 2017 at 11:32:55AM +0000, Daniel P. Berrange wrote:
+> When using a memory-backend object with prealloc turned on, QEMU
+> will memset() the first byte in every memory page to zero. While
+> this might have been acceptable for memory backends associated
+> with RAM, this corrupts application data for NVDIMMs.
 >=20
-> Sorry for the delayed reply.
+> Instead of setting every page to zero, read the current byte
+> value and then just write that same value back, so we are not
+> corrupting the original data. Directly write the value instead
+> of memset()ing it, since there's no benefit to memset for a
+> single byte write.
 >=20
-> On 2017/2/28 1:37, Stefan Hajnoczi wrote:
-> > On Fri, Jan 20, 2017 at 11:47:59AM +0800, zhanghailiang wrote:
-> > > Just as the scenario of non-shared disk block replication,
-> > > we are going to implement block replication from many basic
-> > > blocks that are already in QEMU.
-> > > The architecture is:
-> > >=20
-> > >           virtio-blk                     ||                          =
-     .----------
-> > >               /                          ||                          =
-     | Secondary
-> > >              /                           ||                          =
-     '----------
-> > >             /                            ||                          =
-       virtio-blk
-> > >            /                             ||                          =
-            |
-> > >            |                             ||                          =
-     replication(5)
-> > >            |                    NBD  -------->   NBD   (2)           =
-            |
-> > >            |                  client     ||    server ---> hidden dis=
-k <-- active disk(4)
-> > >            |                     ^       ||                      |
-> > >            |              replication(1) ||                      |
-> > >            |                     |       ||                      |
-> > >            |   +-----------------'       ||                      |
-> > >           (3)  |drive-backup sync=3Dnone   ||                      |
-> > > --------. |   +-----------------+       ||                      |
-> > > Primary | |                     |       ||           backing    |
-> > > --------' |                     |       ||                      |
-> > >            V                     |                               |
-> > >         +-------------------------------------------+            |
-> > >         |               shared disk                 | <----------+
-> > >         +-------------------------------------------+
-> > >=20
-> > >      1) Primary writes will read original data and forward it to Seco=
-ndary
-> > >         QEMU.
-> > >      2) The hidden-disk is created automatically. It buffers the orig=
-inal content
-> > >         that is modified by the primary VM. It should also be an empt=
-y disk, and
-> > >         the driver supports bdrv_make_empty() and backing file.
-> > >      3) Primary write requests will be written to Shared disk.
-> > >      4) Secondary write requests will be buffered in the active disk =
-and it
-> > >         will overwrite the existing sector content in the buffer.
-> > >=20
-> > > Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> > > Signed-off-by: Wen Congyang <wency@cn.fujitsu.com>
-> > > Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-> >=20
-> > Are there any restrictions on the shared disk?  For example the -drive
-> > cache=3D mode must be 'none'.  If the cache mode isn't 'none' the
-> > secondary host might have old data in the host page cache.  The
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
 >=20
-> While do checkpoint, we will call vm_stop(), in which, the bdrv_flush_all=
-()
-> will be called, is it enough ?
+> Changed in v3:
 >=20
-> > Secondary QEMU would have an inconsistent view of the shared disk.
-> >=20
-> > Are image file formats like qcow2 supported for the shared disk?  Extra
+>  - Mark the target of the write as volatile, instead of the intermedia
+>    variable (Andrea)
 >=20
-> In the above scenario, it has no limitation of formats for the shared dis=
-k.
->=20
-> > steps are required to achieve consistency, see bdrv_invalidate_cache().
-> >=20
->=20
-> Hmm, in that case, we should call bdrv_invalidate_cache_all() while check=
-point.
+>  util/oslib-posix.c | 15 ++++++++++++++-
+>  1 file changed, 14 insertions(+), 1 deletion(-)
 
-Yes, it's not enough to just call bdrv_drain_all()/bdrv_flush_all().
-The Secondary may need to reread metadata that is loaded in memory (e.g.
-qcow2's L2 table cache) so bdrv_invalidate_cache() is needed.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Stefan
-
---YiEDa0DAkWCtVeE4
+--tjCHc7DPkfUGtrlw
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJYwijxAAoJEJykq7OBq3PIybMH/1OOQZxRHg3745vPjLnQDgHF
-gACnCNPlD3WyxlmmTBlVJw328l18FO85GHFBiIHS1aoOZgA/V/g4cagQE1HNSVzr
-tVcWPmTcBBEhtcxz8U/sci3KNeNHurKO76kqU3a9K6I/pLZfSsTE1AZa46SWcZVY
-vAhfOLgd6bQhIhWUTpgHaBdV4EpxEqOX0HEyXPBmd7QqNXwnCGxeBR4yRpMfx7f2
-OoFNs1SU1ecCar8lO6LleL0dxsEzwsxS/226W3t1WHCzzwo408UaHCaifHXEmOi2
-QxiTHehinyDqgEIwFPi4f8S2uop7mwDDB1YclA53Iynv+3g63BJgIY2UqTxyX0U=
-=dL0A
+iQEcBAEBAgAGBQJYwitMAAoJEJykq7OBq3PI0h4IAKsI1M1587YVwIFH30JKnwW+
+lSuu+KeNP32TtdYA/vcVEoh89xQEAuQOSfddqsExFrzuRr6y392PHLInRlN7Gsun
+ip8RD4SsS4Fl1Nr/0LGe7803D0jelqKaEte/4qtHLU3KS2tRdUctJLriT1isIEfg
+ebgQYtohz3SC9kjro5nnYFm/48HFs8JtW6rDFYSZ88s5Q2a2p3AD0UEyUdxg0xNm
+VENtVFISXsknE393BjYdDIo5u+2Ax38JslUtCtHWjEpQaiDFvlrPuW5xep/Xjo4O
+OF0762Oj6kp/TYL94ZgpXPhPExb8IafrXMMeueDtogUjD4Tf4lm7OHmkZz1Oei0=
+=rQCK
 -----END PGP SIGNATURE-----
 
---YiEDa0DAkWCtVeE4--
+--tjCHc7DPkfUGtrlw--
