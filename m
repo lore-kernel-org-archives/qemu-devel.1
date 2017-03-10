@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58022)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cmO2q-0006vm-Ds
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 12:09:37 -0500
+	(envelope-from <willy@infradead.org>) id 1cmO5N-00087b-Vu
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 12:12:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cmO2m-0001Bj-E8
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 12:09:36 -0500
-References: <20170310163948.7567-1-shah.suramya@gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <2b156f0e-4700-c268-d60d-6b23b24d69b0@redhat.com>
-Date: Fri, 10 Mar 2017 18:09:25 +0100
+	(envelope-from <willy@infradead.org>) id 1cmO5M-00034F-Rh
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 12:12:13 -0500
+Received: from bombadil.infradead.org ([65.50.211.133]:57630)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <willy@infradead.org>) id 1cmO5M-0002j5-Jh
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 12:12:12 -0500
+Date: Fri, 10 Mar 2017 09:11:44 -0800
+From: Matthew Wilcox <willy@infradead.org>
+Message-ID: <20170310171143.GA16328@bombadil.infradead.org>
+References: <1488519630-89058-1-git-send-email-wei.w.wang@intel.com>
+	<1488519630-89058-4-git-send-email-wei.w.wang@intel.com>
+	<20170309141411.GZ16328@bombadil.infradead.org>
+	<58C28FF8.5040403@intel.com>
+	<20170310175349-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20170310163948.7567-1-shah.suramya@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4] util: Removed unneeded header from
- path.c
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170310175349-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v7 kernel 3/5] virtio-balloon:
+ implementation of VIRTIO_BALLOON_F_CHUNK_TRANSFER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,29 +31,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suramya Shah <shah.suramya@gmail.com>, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, QEMU Trivial <qemu-trivial@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Wei Wang <wei.w.wang@intel.com>, virtio-dev@lists.oasis-open.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, linux-mm@kvack.org, Liang Li <liang.z.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Amit Shah <amit.shah@redhat.com>, Dave Hansen <dave.hansen@intel.com>, Andrea Arcangeli <aarcange@redhat.com>, David Hildenbrand <david@redhat.com>, Liang Li <liliang324@gmail.com>
 
-On 10.03.2017 17:39, Suramya Shah wrote:
-> Signed-off-by: Suramya Shah <shah.suramya@gmail.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> --- 
-> qemu-common.h is no longer necessary as of refactoring done in commit f348b6d.
->  util/path.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/util/path.c b/util/path.c
-> index 5479f76..7f9fc27 100644
-> --- a/util/path.c
-> +++ b/util/path.c
-> @@ -6,7 +6,6 @@
->  #include "qemu/osdep.h"
->  #include <sys/param.h>
->  #include <dirent.h>
-> -#include "qemu-common.h"
->  #include "qemu/cutils.h"
->  #include "qemu/path.h"
+On Fri, Mar 10, 2017 at 05:58:28PM +0200, Michael S. Tsirkin wrote:
+> One of the issues of current balloon is the 4k page size
+> assumption. For example if you free a huge page you
+> have to split it up and pass 4k chunks to host.
+> Quite often host can't free these 4k chunks at all (e.g.
+> when it's using huge tlb fs).
+> It's even sillier for architectures with base page size >4k.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+I completely agree with you that we should be able to pass a hugepage
+as a single chunk.  Also we shouldn't assume that host and guest have
+the same page size.  I think we can come up with a scheme that actually
+lets us encode that into a 64-bit word, something like this:
 
-(and putting qemu-trivial on CC: for this)
+bit 0 clear => bits 1-11 encode a page count, bits 12-63 encode a PFN, page size 4k.
+bit 0 set, bit 1 clear => bits 2-12 encode a page count, bits 13-63 encode a PFN, page size 8k
+bits 0+1 set, bit 2 clear => bits 3-13 for page count, bits 14-63 for PFN, page size 16k.
+bits 0-2 set, bit 3 clear => bits 4-14 for page count, bits 15-63 for PFN, page size 32k
+bits 0-3 set, bit 4 clear => bits 5-15 for page count, bits 16-63 for PFN, page size 64k
+
+That means we can always pass 2048 pages (of whatever page size) in a single chunk.  And
+we support arbitrary power of two page sizes.  I suggest something like this:
+
+u64 page_to_chunk(struct page *page)
+{
+	u64 chunk = page_to_pfn(page) << PAGE_SHIFT;
+	chunk |= (1UL << compound_order(page)) - 1;
+}
+
+(note this is a single page of order N, so we leave the page count bits
+set to 0, meaning one page).
+
+> Two things to consider:
+> - host should pass its base page size to guest
+>   this can be a separate patch and for now we can fall back on 12 bit if not there
+
+With this encoding scheme, I don't think we need to do this?  As long as
+it's *at least* 12 bit, then we're fine.
+
+> - guest should pass full huge pages to host
+>   this should be done correctly to avoid breaking up huge pages
+>   I would say yes let's use a single format but drop the "normal chunk"
+>   and always use the extended one.
+>   Also, size is in units of 4k, right? Please document that low 12 bit
+>   are reserved, they will be handy as e.g. flags.
+
+What per-chunk flags are you thinking would be useful?
