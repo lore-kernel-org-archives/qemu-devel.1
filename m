@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cmG0Q-0006mR-5I
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 03:34:35 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cmG64-0000ao-LO
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 03:40:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cmG0O-0005Zd-O9
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 03:34:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40216)
+	(envelope-from <pbonzini@redhat.com>) id 1cmG60-0007NR-Mk
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 03:40:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47268)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cmG0O-0005ZV-Id
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 03:34:32 -0500
-References: <20170303113255.28262-1-berrange@redhat.com>
-	<20170310043048.GC4589@stefanha-x1.localdomain>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cmG60-0007NI-GI
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 03:40:20 -0500
+References: <1489153475-14888-1-git-send-email-yang.zhong@intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8eba7fae-6443-62b7-1ac9-ebcfd5d5f481@redhat.com>
-Date: Fri, 10 Mar 2017 09:34:29 +0100
+Message-ID: <d6936cdb-66c8-72a9-9e54-988ac6b77e4c@redhat.com>
+Date: Fri, 10 Mar 2017 09:40:17 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170310043048.GC4589@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] os: don't corrupt pre-existing
- memory-backend data with prealloc
+In-Reply-To: <1489153475-14888-1-git-send-email-yang.zhong@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] memory: reduce heap Rss size around 3M
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +26,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Andrea Arcangeli <aarcange@redhat.com>, Michal Privoznik <mprivozn@redhat.com>, Jitendra Kolhe <jitendra.kolhe@hpe.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Yang Zhong <yang.zhong@intel.com>, qemu-devel@nongnu.org
+Cc: anthony.xu@intel.com
 
 
 
-On 10/03/2017 05:30, Stefan Hajnoczi wrote:
-> On Fri, Mar 03, 2017 at 11:32:55AM +0000, Daniel P. Berrange wrote:
->> When using a memory-backend object with prealloc turned on, QEMU
->> will memset() the first byte in every memory page to zero. While
->> this might have been acceptable for memory backends associated
->> with RAM, this corrupts application data for NVDIMMs.
->>
->> Instead of setting every page to zero, read the current byte
->> value and then just write that same value back, so we are not
->> corrupting the original data. Directly write the value instead
->> of memset()ing it, since there's no benefit to memset for a
->> single byte write.
->>
->> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
->> ---
->>
->> Changed in v3:
->>
->>  - Mark the target of the write as volatile, instead of the intermedia
->>    variable (Andrea)
->>
->>  util/oslib-posix.c | 15 ++++++++++++++-
->>  1 file changed, 14 insertions(+), 1 deletion(-)
->=20
-> There are no official maintainers for this source file.  I want to make
-> sure this patch goes into QEMU 2.9, so...
->=20
-> Thanks, applied to my block tree:
-> https://github.com/stefanha/qemu/commits/block
+On 10/03/2017 14:44, Yang Zhong wrote:
+> Since cpu-memory and memory have same address space,one malloced
+> memory is enough. This patch will skip memory malloc for memory
+> address space,which will reduce around 3M physical memory in heap.
+> 
+> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> ---
+>  memory.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/memory.c b/memory.c
+> index 284894b..6af80e7 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -2422,7 +2422,7 @@ AddressSpace *address_space_init_shareable(MemoryRegion *root, const char *name)
+>      AddressSpace *as;
+>  
+>      QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
+> -        if (root == as->root && as->malloced) {
+> +        if (root == as->root) {
+>              as->ref_count++;
+>              return as;
+>          }
+> 
 
-Yeah, I was leaving it to you because it's related to NVDIMM.  Thanks,
+This has the same problem as v1.
+
+If as->malloced is false, the AddressSpace might be embedded in another
+struct.  This other struct could be freed when as->ref_count is still
+greater than 0, causing a use-after-free bug.
 
 Paolo
