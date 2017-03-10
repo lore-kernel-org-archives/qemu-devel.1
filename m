@@ -1,22 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cmRTh-0002yb-VQ
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 15:49:35 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cmRm7-0007G2-Eu
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 16:08:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cmRTg-0001t3-M3
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 15:49:34 -0500
-References: <20170310031521.630-1-eblake@redhat.com>
-	<033881fe-b3d3-2c3a-48fc-c08691f2c9cb@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <19efa7dc-fa97-410f-df4d-3962453dcd8e@redhat.com>
-Date: Fri, 10 Mar 2017 14:49:22 -0600
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cmRm4-0007Z6-7v
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 16:08:35 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46988
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1cmRm4-0007Yu-19
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 16:08:32 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2AL3kjn038316
+	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 16:08:29 -0500
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2938sw5u41-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 16:08:29 -0500
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Fri, 10 Mar 2017 21:08:27 -0000
+References: <20170307131650.90167-1-pasic@linux.vnet.ibm.com>
+	<0bccd267-1c59-09f1-3098-7a74759d00dd@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Fri, 10 Mar 2017 22:08:24 +0100
 MIME-Version: 1.0
-In-Reply-To: <033881fe-b3d3-2c3a-48fc-c08691f2c9cb@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="MmQUkTcXrbBiEI5q318aeOx3hUvD6BnjM"
-Subject: Re: [Qemu-devel] [PATCH for-2.9] mirror: Fix backwards mirror_yield
- parameters
+In-Reply-To: <0bccd267-1c59-09f1-3098-7a74759d00dd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Message-Id: <669f36ca-990f-229b-c2b1-f583826574f4@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] virtio-blk: fix race on guest
+ notifiers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,120 +43,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---MmQUkTcXrbBiEI5q318aeOx3hUvD6BnjM
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, Jeff Cody <jcody@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <19efa7dc-fa97-410f-df4d-3962453dcd8e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9] mirror: Fix backwards mirror_yield
- parameters
-References: <20170310031521.630-1-eblake@redhat.com>
- <033881fe-b3d3-2c3a-48fc-c08691f2c9cb@redhat.com>
-In-Reply-To: <033881fe-b3d3-2c3a-48fc-c08691f2c9cb@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 03/09/2017 09:25 PM, Eric Blake wrote:
-> [adding Stefan in cc, as trace maintainer]
->=20
-> On 03/09/2017 09:15 PM, Eric Blake wrote:
->=20
-> Perhaps I should update the subject to mention trace?
->=20
->> trace-events lists the parameters for mirror_yield consistently
->> with other events (cnt just after s, like in mirror_before_sleep;
->> in_flight last, like in mirror_yield_in_flight).  But the callers
->> were passing parameters in the wrong order, leading to poor trace
->> messages, including type truncation when there are more than 4G
->> dirty sectors involved.
-
-I traced it back to commit bd48bde. And I started auditing for more,
-finding at least a bad caller to trace_megasas_iovec_underflow since
-commit e8f943ce, so I'll be submitting a v2 that turns this into a
-full-blown series.
-
-My v2 will turn on -Wformat checking to catch any more instances of type
-mismatch between callers and trace-events (I'm turning up LOTS of places
-where the caller and trace-events disagree on types, leading to silent
-truncation such as a caller's uint64_t passed to the trace's uint32_t),
-so it's turning into rather a large series.  The obvious wrong
-parameters and probably even the type mismatch cleanups are probably 2.9
-material (although many of the things I'm fixing have been wrong in 2.8
-or earlier, and are not necessarily 2.9 regressions), but the code to
-actually enable -Wformat flagging may best be left for 2.10 material,
-since there may be latent type mismatches in files that I'm not
-compiling due to my configure/installed-library settings, but which
-would break builds for others (we'll see what the buildbots say, at any
-rate).  Stay tuned for v2...
-
-Oh, how am I enabling -Wformat checking, you ask?  Our existing code
-generates:
-
-static inline void trace_foo(int param)
-{
-    if (cond) {
-         do stuff, including with the log tracer...
-         qemu_log_mask(LOG_TRACE, "%d@%zd.%06zd:mirror_start " "bs %p s
-%p opaque %p" "\n", ..., param);
-    }
-}
-
-and qemu-log_mask() already does -Wformat checking - but ONLY for the
-types declared as the parameters to trace_foo.  It is NOT detecting type
-mismatches at the caller, such as if I call trace_foo(my_long).
-
-So my trick: I taught the generator to output the inline trace_foo() as
-before, but now follow it up with:
-
-#define trace_foo(...) \
-  do { \
-    if (0) { \
-      printf(<format> "\n", ## __VA_ARGS__); \
-    } \
-    trace_foo(__VA_ARGS__); \
-  } while (0)
-
-which creates a dead-code printf for the desired compile-time type
-validations, using the format from the trace-events file.
-
-And here's where I'm stuck: the makefiles are broken.  Touching
-scripts/tracetool/format/h.py does NOT cause tracetool to be re-run by a
-mere 'make'; I've had to resort to 'make -B block/trace.h-timestamp' to
-get things to rebuild.  And this is in spite of the fact that h.py
-_should_ be getting listed in $(tracetool-y) by trace/Makefile.objs, and
-$(tracetool-y) is listed as a dependency of %/trace.h-timestamp in the
-top-level Makefile.  I would appreciate anyone with advice or an idea on
-how to patch Makefile to get the dependency working without me having to
-manually kick it.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-stable@nongnu.org
 
 
---MmQUkTcXrbBiEI5q318aeOx3hUvD6BnjM
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+On 03/10/2017 05:47 PM, Paolo Bonzini wrote:
+> 
+> On 07/03/2017 14:16, Halil Pasic wrote:
+>> The commits 03de2f527 "virtio-blk: do not use vring in dataplane"  and
+>> 9ffe337c08 "virtio-blk: always use dataplane path if ioeventfd is active"
+>> changed how notifications are done for virtio-blk substantially. Due to a
+>> race condition, interrupts are lost when irqfd behind the guest notifier
+>> is torn down after notify_guest_bh was scheduled but before it actually
+>> runs.
+>>
+>> Let's fix this by forcing guest notifications before cleaning up the
+>> irqfd's. Let's also add some explanatory comments.
+>>
+>> Cc: qemu-stable@nongnu.org
+>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>> Reported-by: Michael A. Tebolt <miket@us.ibm.com>
+>> Tested-by: Michael A. Tebolt <miket@us.ibm.com>
+>> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>>
+>> This patch withstood the test case which discovered the problem
+>> for several days (as reported by Michale Tebolt).
+>>
+>> v1 --> v2:
+>> * Fixed typo pointed out by Connie
+>> * Added Tested-by
+> Hi Halil,
+> 
+> I found a similar issue in NBD.  Can you check if this patch fixes
+> the virtio-blk issue too?
+> 
+> Thanks,
+> Paolo
+> 
+> ------ 8< ------------
+> 
+> diff --git a/block.c b/block.c
+> index f293ccb..e159251 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -4272,8 +4272,15 @@ void bdrv_attach_aio_context(BlockDriverState *bs,
+> 
+>  void bdrv_set_aio_context(BlockDriverState *bs, AioContext *new_context)
+>  {
+> +    AioContext *ctx;
+> +
+>      bdrv_drain(bs); /* ensure there are no in-flight requests */
+> 
+> +    ctx = bdrv_get_aio_context(bs);
+> +    while (aio_poll(ctx, false)) {
+> +        /* wait for all bottom halves to execute */
+> +    }
+> +
+>      bdrv_detach_aio_context(bs);
+> 
+>      /* This function executes in the old AioContext so acquire the new one in
+> 
+> 
 
-iQEcBAEBCAAGBQJYwxFSAAoJEKeha0olJ0NqVgYIAK3OUsoUwNHHDVuo/sfhwmbq
-oXFmOM016gGiip7Uam4npxigIoFQ3Ovfn9dIG21uysWBMOW+Iur5z+3w+pSuYIku
-v4TTrziMyaPZ8yH6ICtW4mrlqJ3u8fh7Ue4mBrSmuJi+t9HQdlY9fSQ6LZK8uR2S
-PrwFF6/8J+oTJn8emwlZE6pINinqIZYhqD6RriKyI8JVcNNaOGSVuLpQY3zOygWH
-L7ha+QQHQT/onoK3sgrrHn8VOnifohmMu6aP3VIwNU/zMIv3kJlUNtL4DTGgbZeK
-FtHXXaoOQ0/0DxBT5uCzTvaDsnYDEkQ5oyWEJAqXrO/shdges1/tozGWCEdCCiY=
-=IfVU
------END PGP SIGNATURE-----
+So far so good! I will let it spin over the weekend but I think it's unlikely
+something will turn up.
 
---MmQUkTcXrbBiEI5q318aeOx3hUvD6BnjM--
+I was wondering, would it make sense to push this logic into bdrv_drain?
+(Along the lines: this looks much like tying up loose ends drain has left.
+But I'm not sure about it.)
+
+Regards,
+Halil
