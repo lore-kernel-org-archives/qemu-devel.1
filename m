@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56670)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cmPYK-0005du-2s
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 13:46:13 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cmPYM-0005fF-1e
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 13:46:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cmPYJ-0006AR-07
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 13:46:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36904)
+	(envelope-from <ehabkost@redhat.com>) id 1cmPYK-0006CB-VY
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 13:46:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36594)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cmPYI-00069Q-Qd
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 13:46:10 -0500
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cmPYK-0006Bj-PJ
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 13:46:12 -0500
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri, 10 Mar 2017 15:45:51 -0300
-Message-Id: <20170310184552.1481-3-ehabkost@redhat.com>
+Date: Fri, 10 Mar 2017 15:45:52 -0300
+Message-Id: <20170310184552.1481-4-ehabkost@redhat.com>
 In-Reply-To: <20170310184552.1481-1-ehabkost@redhat.com>
 References: <20170310184552.1481-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 2/3] i386/kvm: Blacklist TSX on known broken
- hosts
+Subject: [Qemu-devel] [PULL 3/3] i386: Change stepping of Haswell to
+ non-blacklisted value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,59 +27,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
 
-Some Intel CPUs are known to have a broken TSX implementation. A
-microcode update from Intel disabled TSX on those CPUs, but
-GET_SUPPORTED_CPUID might be reporting it as supported if the
-hosts were not updated yet.
+glibc blacklists TSX on Haswell CPUs with model==60 and
+stepping < 4. To make the Haswell CPU model more useful, make
+those guests actually use TSX by changing CPU stepping to 4.
 
-Manually fixup the GET_SUPPORTED_CPUID data to ensure we will
-never enable TSX when running on those hosts.
-
-Reference:
-* glibc commit 2702856bf45c82cf8e69f2064f5aa15c0ceb6359:
+References:
+* glibc commit 2702856bf45c82cf8e69f2064f5aa15c0ceb6359
   https://sourceware.org/git/?p=glibc.git;a=commit;h=2702856bf45c82cf8e69f2064f5aa15c0ceb6359
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20170309181212.18864-3-ehabkost@redhat.com>
+Message-Id: <20170309181212.18864-4-ehabkost@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/i386/kvm.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ include/hw/i386/pc.h | 5 +++++
+ target/i386/cpu.c    | 2 +-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 887a81268f..472399fb2c 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -266,6 +266,19 @@ static int get_para_features(KVMState *s)
-     return features;
- }
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index ab303c7fee..f278b3ae89 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -389,6 +389,11 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+         .driver   = TYPE_X86_CPU,\
+         .property = "vmware-cpuid-freq",\
+         .value    = "off",\
++    },\
++    {\
++        .driver   = "Haswell-" TYPE_X86_CPU,\
++        .property = "stepping",\
++        .value    = "1",\
+     },
  
-+static bool host_tsx_blacklisted(void)
-+{
-+    int family, model, stepping;\
-+    char vendor[CPUID_VENDOR_SZ + 1];
-+
-+    host_vendor_fms(vendor, &family, &model, &stepping);
-+
-+    /* Check if we are running on a Haswell host known to have broken TSX */
-+    return !strcmp(vendor, CPUID_VENDOR_INTEL) &&
-+           (family == 6) &&
-+           ((model == 63 && stepping < 4) ||
-+            model == 60 || model == 69 || model == 70);
-+}
- 
- /* Returns the value for a specific register on the cpuid entry
-  */
-@@ -349,6 +362,10 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
-         }
-     } else if (function == 6 && reg == R_EAX) {
-         ret |= CPUID_6_EAX_ARAT; /* safe to allow because of emulated APIC */
-+    } else if (function == 7 && index == 0 && reg == R_EBX) {
-+        if (host_tsx_blacklisted()) {
-+            ret &= ~(CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_HLE);
-+        }
-     } else if (function == 0x80000001 && reg == R_EDX) {
-         /* On Intel, kvm returns cpuid according to the Intel spec,
-          * so add missing bits according to the AMD spec:
+ #define PC_COMPAT_2_7 \
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 30ba1bd06b..7aa762245a 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -1196,7 +1196,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
+         .vendor = CPUID_VENDOR_INTEL,
+         .family = 6,
+         .model = 60,
+-        .stepping = 1,
++        .stepping = 4,
+         .features[FEAT_1_EDX] =
+             CPUID_VME | CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX |
+             CPUID_CLFLUSH | CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA |
 -- 
 2.11.0.259.g40922b1
