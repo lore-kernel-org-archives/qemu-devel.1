@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35468)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cmICS-0004Jn-5c
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 05:55:09 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cmIEU-0005Z4-6v
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 05:57:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cmICQ-0001ly-QU
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 05:55:08 -0500
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:35091)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1cmICQ-0001lC-F5
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 05:55:06 -0500
-Received: by mail-lf0-x244.google.com with SMTP id v2so6582456lfi.2
-	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 02:55:04 -0800 (PST)
+	(envelope-from <jasowang@redhat.com>) id 1cmIER-0002oy-0d
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 05:57:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37230)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cmIEQ-0002oq-OI
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 05:57:10 -0500
+References: <1488876478-6889-1-git-send-email-jasowang@redhat.com>
+	<20170307111618.43ffbd13.cornelia.huck@de.ibm.com>
+	<cb84b888-4917-162d-31a5-f708f4783444@redhat.com>
+	<20170308101922.730b1579.cornelia.huck@de.ibm.com>
+	<64df071f-27b0-9ee6-0b76-d8fa7a9cc8ec@redhat.com>
+	<20170308111214.591b49fe.cornelia.huck@de.ibm.com>
+	<a8f854b2-bbd3-1665-0b09-2abcad928b9d@redhat.com>
+	<20170309120734.390a7cda.cornelia.huck@de.ibm.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <bc2035e9-57a6-93e0-3f6f-46c25172d4d8@redhat.com>
+Date: Fri, 10 Mar 2017 18:57:05 +0800
 MIME-Version: 1.0
-References: <20170310085331.17916-1-marcandre.lureau@redhat.com>
-	<479b756e-b808-eee7-7780-69d2b2669cdf@redhat.com>
-In-Reply-To: <479b756e-b808-eee7-7780-69d2b2669cdf@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 10 Mar 2017 10:54:52 +0000
-Message-ID: <CAJ+F1CJuPGJ9DOQMy7PP=DJtTxbcDFoBA+rA-NKStcSTrUEPuA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20170309120734.390a7cda.cornelia.huck@de.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] scripts/dump-guest-memory.py: fix
- int128_get64 on recent gcc
+Subject: Re: [Qemu-devel] [PATCH] virtio: destroy region cache during reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,88 +33,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: lersek@redhat.com
+To: Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com, mst@redhat.com
 
-Hi
 
-On Fri, Mar 10, 2017 at 2:00 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
 
+On 2017=E5=B9=B403=E6=9C=8809=E6=97=A5 19:07, Cornelia Huck wrote:
+> On Thu, 9 Mar 2017 10:19:47 +0800
+> Jason Wang<jasowang@redhat.com>  wrote:
 >
+>> On 2017=E5=B9=B403=E6=9C=8808=E6=97=A5 18:12, Cornelia Huck wrote:
+>>> On Wed, 8 Mar 2017 17:51:22 +0800
+>>> Jason Wang<jasowang@redhat.com>  wrote:
+>>>
+>>>> On 2017=E5=B9=B403=E6=9C=8808=E6=97=A5 17:19, Cornelia Huck wrote:
+>>>>> On Wed, 8 Mar 2017 11:18:27 +0800
+>>>>> Jason Wang<jasowang@redhat.com>  wrote:
+>>>>>
+>>>>>> On 2017=E5=B9=B403=E6=9C=8807=E6=97=A5 18:16, Cornelia Huck wrote:
+>>>>>>> On Tue,  7 Mar 2017 16:47:58 +0800
+>>>>>>> Jason Wang<jasowang@redhat.com>  wrote:
+>>>>>>>
+>>>>>>>> We don't destroy region cache during reset which can make the ma=
+ps
+>>>>>>>> of previous driver leaked to a buggy or malicious driver that do=
+n't
+>>>>>>>> set vring address before starting to use the device. Fix this by
+>>>>>>>> destroy the region cache during reset and validate it before try=
+ing to
+>>>>>>>> use them. While at it, also validate address_space_cache_init() =
+during
+>>>>>>>> virtio_init_region_cache() to make sure we have a correct region
+>>>>>>>> cache.
+>>>>>>>>
+>>>>>>>> Signed-off-by: Jason Wang<jasowang@redhat.com>
+>>>>>>>> ---
+>>>>>>>>      hw/virtio/virtio.c | 88 +++++++++++++++++++++++++++++++++++=
++++++++++++--------
+>>>>>>>>      1 file changed, 76 insertions(+), 12 deletions(-)
+>>>>>>>> @@ -190,6 +211,10 @@ static inline uint16_t vring_avail_flags(Vi=
+rtQueue *vq)
+>>>>>>>>      {
+>>>>>>>>          VRingMemoryRegionCaches *caches =3D atomic_rcu_read(&vq=
+->vring.caches);
+>>>>>>>>          hwaddr pa =3D offsetof(VRingAvail, flags);
+>>>>>>>> +    if (!caches) {
+>>>>>>>> +        virtio_error(vq->vdev, "Cannot map avail flags");
+>>>>>>> I'm not sure that virtio_error is the right thing here; ending up=
+ in
+>>>>>>> this function with !caches indicates an error in our logic.
+>>>>>> Probably not, this can be triggered by buggy guest.
+>>>>> I would think that even a buggy guest should not be able to trigger
+>>>>> accesses to vring structures that have not yet been set up. What am=
+ I
+>>>>> missing?
+>>>> I think this may happen if a driver start the device without setting=
+ the
+>>>> vring address. In this case, region caches cache the mapping of prev=
+ious
+>>>> driver. But maybe I was wrong.
+>>> So the sequence would be:
+>>>
+>>> - Driver #1 sets up the device, then abandons it without cleaning up
+>>> via reset
+>> If driver #1 reset the device in this case, the caches would be NULL.
+> Hm, how? Without your patch, the queue addresses are reset to 0 in that
+> case but the cache is not cleaned up.
 >
-> On 10/03/2017 09:53, Marc-Andr=C3=A9 Lureau wrote:
-> > The Int128 is no longer a struct, reaching a python exception:
-> > Python Exception <class 'gdb.error'> Attempt to extract a component of =
-a
-> value that is not a (null).:
-> >
-> > Replace struct access with a cast to uint64 instead.
-> >
-> > Fixes:
-> > https://bugzilla.redhat.com/show_bug.cgi?id=3D1427466
-> >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  scripts/dump-guest-memory.py | 6 ++++--
-> >  1 file changed, 4 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.p=
-y
-> > index 9956fc036c..bbe1c14ba2 100644
-> > --- a/scripts/dump-guest-memory.py
-> > +++ b/scripts/dump-guest-memory.py
-> > @@ -314,8 +314,10 @@ def get_arch_phdr(endianness, elfclass):
-> >  def int128_get64(val):
-> >      """Returns low 64bit part of Int128 struct."""
-> >
-> > -    assert val["hi"] =3D=3D 0
-> > -    return val["lo"]
-> > +    u64t =3D gdb.lookup_type('uint64_t').array(2)
-> > +    u64 =3D val.cast(u64t)
-> > +    assert u64[1] =3D=3D 0
-> > +    return u64[0]
-> >
-> >
-> >  def qlist_foreach(head, field_str):
-> >
->
-> I'm afraid this is not big-endian-friendly (Python lets you check that
-> with "sys.byteorder =3D=3D 'little'").
->
-> Also when building on a 32-bit machine the old code should be used; I
-> think you need to use try/except to choose between the two.
->
 
-Do you think that would be enough?
+Yes, but with this patch, caches will be set to NULL during reset. So=20
+the following vq access without seting queue pfn may hit NULL.
 
- diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.py
-index 9956fc036c..f7c6635f15 100644
---- a/scripts/dump-guest-memory.py
-+++ b/scripts/dump-guest-memory.py
-@@ -314,8 +314,18 @@ def get_arch_phdr(endianness, elfclass):
- def int128_get64(val):
-     """Returns low 64bit part of Int128 struct."""
-
--    assert val["hi"] =3D=3D 0
--    return val["lo"]
-+    try:
-+        assert val["hi"] =3D=3D 0
-+        return val["lo"]
-+    except gdb.error:
-+        u64t =3D gdb.lookup_type('uint64_t').array(2)
-+        u64 =3D val.cast(u64t)
-+        if sys.byteorder =3D=3D 'little':
-+            assert u64[1] =3D=3D 0
-+            return u64[0]
-+        else:
-+            assert u64[0] =3D=3D 0
-+            return u64[1]
-
-(I don't have a 32-bit system handy to check it, and cross-compilation with
-m32 etc is tricky to get right, I am trying though)
-
-
-> Paolo
->
-> --
-Marc-Andr=C3=A9 Lureau
+Thanks
