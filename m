@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57181)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cmNzB-0004E7-Sc
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 12:05:52 -0500
+	(envelope-from <bounces@canonical.com>) id 1cmNzB-0004E5-Rt
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 12:05:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cmNz9-0007WR-51
+	(envelope-from <bounces@canonical.com>) id 1cmNz7-0007US-Q7
 	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 12:05:49 -0500
-Received: from indium.canonical.com ([91.189.90.7]:50919)
+Received: from indium.canonical.com ([91.189.90.7]:50897)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cmNz8-0007Uy-Pe
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 12:05:47 -0500
+	id 1cmNz7-0007TQ-Fh
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 12:05:45 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cmNz7-0000ef-Su
-	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 17:05:45 +0000
+	id 1cmNz6-0000ef-8f
+	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 17:05:44 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D65682E80C2
-	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 17:05:45 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 3D67D2E80C7
+	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 17:05:44 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 10 Mar 2017 16:58:35 -0000
+Date: Fri, 10 Mar 2017 16:47:50 -0000
 From: Mohammed Gamal <m.gamal005@gmail.com>
 Reply-To: Bug 1671876 <1671876@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20170310164750.14977.41006.malonedeb@soybean.canonical.com>
-Message-Id: <20170310165835.24797.31537.malone@wampee.canonical.com>
+Message-Id: <20170310164750.14977.41006.malonedeb@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1671876] Re: qemu 2.7.0 segfaults in
+Subject: [Qemu-devel] [Bug 1671876] [NEW] qemu 2.7.0 segfaults in
  qemu_co_queue_run_restart()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -39,133 +38,511 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-A third stack trace
+Public bug reported:
 
-It generates the following stack trace
----------------------------------------------------------------------
+Hi,
+
+I've been experiencing frequent segfaults lately with qemu 2.7.0 running
+Ubuntu 16.04 guests. The crash usually happens in
+qemu_co_queue_run_restart(). I haven't seen this so far with any other
+guests or distros.
+
+Here is one back trace I obtained from one of the crashing VMs.
+
+--------------------------------------------------------------------------
 (gdb) bt
-#0  qemu_co_queue_run_restart (co=3D0x7f75ed30dbc0) at /build/pb-qemu-pssKU=
+#0  qemu_co_queue_run_restart (co=3D0x7fba8ff05aa0) at /build/pb-qemu-pssKU=
 p/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:59
-#1  0x00005619274829a9 in qemu_coroutine_enter (co=3D0x7f75ed30dbc0) at /bu=
+#1  0x000055c1656f39a9 in qemu_coroutine_enter (co=3D0x7fba8ff05aa0) at /bu=
 ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#2  0x0000561927482e74 in qemu_co_queue_run_restart (co=3D0x7f75f1c0f200) a=
+#2  0x000055c1656f3e74 in qemu_co_queue_run_restart (co=3D0x7fba8dd20430) a=
 t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#3  0x00005619274829a9 in qemu_coroutine_enter (co=3D0x7f75f1c0f200) at /bu=
+#3  0x000055c1656f39a9 in qemu_coroutine_enter (co=3D0x7fba8dd20430) at /bu=
 ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#4  0x0000561927482e74 in qemu_co_queue_run_restart (co=3D0x7f75ed304870) a=
+#4  0x000055c1656f3e74 in qemu_co_queue_run_restart (co=3D0x7fba8dd14ea0) a=
 t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#5  0x00005619274829a9 in qemu_coroutine_enter (co=3D0x7f75ed304870) at /bu=
+#5  0x000055c1656f39a9 in qemu_coroutine_enter (co=3D0x7fba8dd14ea0) at /bu=
 ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#6  0x0000561927482e74 in qemu_co_queue_run_restart (co=3D0x7f75e800fcd0) a=
+#6  0x000055c1656f3e74 in qemu_co_queue_run_restart (co=3D0x7fba80c11dc0) a=
 t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#7  0x00005619274829a9 in qemu_coroutine_enter (co=3D0x7f75e800fcd0) at /bu=
+#7  0x000055c1656f39a9 in qemu_coroutine_enter (co=3D0x7fba80c11dc0) at /bu=
 ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#8  0x0000561927482e74 in qemu_co_queue_run_restart (co=3D0x7f75e800fac0) a=
+#8  0x000055c1656f3e74 in qemu_co_queue_run_restart (co=3D0x7fba8dd0bd70) a=
 t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#9  0x00005619274829a9 in qemu_coroutine_enter (co=3D0x7f75e800fac0) at /bu=
+#9  0x000055c1656f39a9 in qemu_coroutine_enter (co=3D0x7fba8dd0bd70) at /bu=
 ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#10 0x0000561927482e74 in qemu_co_queue_run_restart (co=3D0x7f75e800f8b0) a=
-t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#11 0x00005619274829a9 in qemu_coroutine_enter (co=3D0x7f75e800f8b0) at /bu=
-ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#12 0x0000561927482e74 in qemu_co_queue_run_restart (co=3D0x7f75fbf05570) a=
-t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#13 0x00005619274829a9 in qemu_coroutine_enter (co=3D0x7f75fbf05570) at /bu=
-ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#14 0x0000561927482e74 in qemu_co_queue_run_restart (co=3D0x7f75e8009b70) a=
-t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#15 0x00005619274829a9 in qemu_coroutine_enter (co=3D0x7f75e8009b70) at /bu=
-ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#16 0x0000561927482e74 in qemu_co_queue_run_restart (co=3D0x7f75e800b5d0) a=
-t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#17 0x00005619274829a9 in qemu_coroutine_enter (co=3D0x7f75e800b5d0) at /bu=
-ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#18 0x0000561927482e74 in qemu_co_queue_run_restart (co=3D0x7f75e8008910) a=
-t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#19 0x00005619274829a9 in qemu_coroutine_enter (co=3D0x7f75e8008910) at /bu=
-ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#20 0x0000561927482e74 in qemu_co_queue_run_restart (co=3D0x7f75e800f6a0) a=
-t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#21 0x00005619274829a9 in qemu_coroutine_enter (co=3D0x7f75e800f6a0) at /bu=
-ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#22 0x0000561927482e74 in qemu_co_queue_run_restart (co=3D0x7f75fbf05100) a=
-t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#23 0x00005619274829a9 in qemu_coroutine_enter (co=3D0x7f75fbf05100) at /bu=
-ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#24 0x0000561927482e74 in qemu_co_queue_run_restart (co=3D0x7f75fbf04ee0) a=
-t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#25 0x00005619274829a9 in qemu_coroutine_enter (co=3D0x7f75fbf04ee0) at /bu=
-ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#26 0x0000561927482e74 in qemu_co_queue_run_restart (co=3D0x7f75ed301c50) a=
-t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#27 0x00005619274829a9 in qemu_coroutine_enter (co=3D0x7f75ed301c50) at /bu=
-ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#28 0x0000561927482e74 in qemu_co_queue_run_restart (co=3D0x7f75ed315270) a=
-t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#29 0x00005619274829a9 in qemu_coroutine_enter (co=3D0x7f75ed315270) at /bu=
-ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#30 0x0000561927482e74 in qemu_co_queue_run_restart (co=3D0x7f75ed31cf10) a=
-t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#31 0x00005619274829a9 in qemu_coroutine_enter (co=3D0x7f75ed31cf10) at /bu=
-ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#32 0x0000561927482e74 in qemu_co_queue_run_restart (co=3D0x7f75e800a970) a=
-t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#33 0x00005619274829a9 in qemu_coroutine_enter (co=3D0x7f75e800a970) at /bu=
-ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#34 0x0000561927482e74 in qemu_co_queue_run_restart (co=3D0x7f75e8007df0) a=
-t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#35 0x00005619274829a9 in qemu_coroutine_enter (co=3D0x7f75e8007df0) at /bu=
-ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#36 0x0000561927482e74 in qemu_co_queue_run_restart (co=3D0x7f75e8005960) a=
-t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#37 0x00005619274829a9 in qemu_coroutine_enter (co=3D0x7f75e8005960) at /bu=
-ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#38 0x0000561927482e74 in qemu_co_queue_run_restart (co=3D0x7f75e800e1b0) a=
-t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#39 0x00005619274829a9 in qemu_coroutine_enter (co=3D0x7f75e800e1b0) at /bu=
-ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#40 0x0000561927482e74 in qemu_co_queue_run_restart (co=3D0x7f75e8000a00) a=
-t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#41 0x00005619274829a9 in qemu_coroutine_enter (co=3D0x7f75e8000a00) at /bu=
-ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#42 0x0000561927482e74 in qemu_co_queue_run_restart (co=3D0x7f75e8007900) a=
-t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#43 0x00005619274829a9 in qemu_coroutine_enter (co=3D0x7f75e8007900) at /bu=
-ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#44 0x0000561927482fa0 in qemu_co_enter_next (queue=3Dqueue@entry=3D0x56192=
-88d15e0) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:=
+#10 0x000055c1656f3fa0 in qemu_co_enter_next (queue=3Dqueue@entry=3D0x55c16=
+69e75e0) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:=
 106
-#45 0x0000561927421060 in timer_cb (blk=3D0x5619288d1590, is_write=3D<optim=
+#11 0x000055c165692060 in timer_cb (blk=3D0x55c1669e7590, is_write=3D<optim=
 ized out>) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/block/throttle-groups.c:4=
 00
-#46 0x00005619273de615 in timerlist_run_timers (timer_list=3D0x56192893de80=
+#12 0x000055c16564f615 in timerlist_run_timers (timer_list=3D0x55c166a53e80=
 ) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/qemu-timer.c:528
-#47 0x00005619273de679 in timerlistgroup_run_timers (tlg=3Dtlg@entry=3D0x56=
-1929b6bcf8) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/qemu-timer.c:564
-#48 0x00005619273def47 in aio_dispatch (ctx=3Dctx@entry=3D0x561929b6bbb0) a=
+#13 0x000055c16564f679 in timerlistgroup_run_timers (tlg=3Dtlg@entry=3D0x55=
+c167c81cf8) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/qemu-timer.c:564
+#14 0x000055c16564ff47 in aio_dispatch (ctx=3Dctx@entry=3D0x55c167c81bb0) a=
 t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/aio-posix.c:357
-#49 0x00005619273df0e8 in aio_poll (ctx=3D0x561929b6bbb0, blocking=3D<optim=
+#15 0x000055c1656500e8 in aio_poll (ctx=3D0x55c167c81bb0, blocking=3D<optim=
 ized out>) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/aio-posix.c:479
-#50 0x0000561927240c79 in iothread_run (opaque=3D0x561929b6b960) at /build/=
+#16 0x000055c1654b1c79 in iothread_run (opaque=3D0x55c167c81960) at /build/=
 pb-qemu-pssKUp/pb-qemu-2.7.0/iothread.c:46
-#51 0x00007f77b32160a4 in start_thread (arg=3D0x7f77997ff700) at pthread_cr=
-eate.c:403
-#52 0x00007f77b2f4b62d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clo=
-ne.S:111
----------------------------------------------------------------------
+#17 0x00007fbc4b64f0a4 in allocate_stack (stack=3D<synthetic pointer>, pdp=
+=3D<synthetic pointer>, attr=3D0x0) at allocatestack.c:416
+#18 __pthread_create_2_1 (newthread=3D<error reading variable: Cannot acces=
+s memory at address 0xffffffffffffff48>, attr=3D<error reading variable: Ca=
+nnot access memory at address 0xffffffffffffff40>,
+=C2=A0=C2=A0=C2=A0=C2=A0start_routine=3D<error reading variable: Cannot acc=
+ess memory at address 0xffffffffffffff58>, arg=3D<error reading variable: C=
+annot access memory at address 0xffffffffffffff50>) at pthread_create.c:539
+Backtrace stopped: Cannot access memory at address 0x8
+--------------------------------------------------------------------------
 
-It's also crashing in list traversal. Looking at the contained data we
-see:
+The code that crashes is this
+--------------------------------------------------------------------------
+void qemu_co_queue_run_restart(Coroutine *co)
+{
+=C2=A0=C2=A0=C2=A0=C2=A0Coroutine *next;
 
----------------------------------------------------------------------
+=C2=A0=C2=A0=C2=A0=C2=A0trace_qemu_co_queue_run_restart(co);
+=C2=A0=C2=A0=C2=A0=C2=A0while ((next =3D QSIMPLEQ_FIRST(&co->co_queue_wakeu=
+p))) {
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0QSIMPLEQ_REMOVE_HEAD(&co->c=
+o_queue_wakeup, co_queue_next);       <--- Crash occurs here this time
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qemu_coroutine_enter(next);
+=C2=A0=C2=A0=C2=A0=C2=A0}
+}
+--------------------------------------------------------------------------
+
+Expanding the macro QSIMPLEQ_REMOVE_HEAD gives us
+--------------------------------------------------------------------------
+#define QSIMPLEQ_REMOVE_HEAD(head, field) do {                          \
+=C2=A0=C2=A0=C2=A0=C2=A0if (((head)->sqh_first =3D (head)->sqh_first->field=
+.sqe_next) =3D=3D NULL)\
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(head)->sqh_last =3D &(head=
+)->sqh_first;                          \
+} while (/*CONSTCOND*/0)
+--------------------------------------------------------------------------
+
+which corrsponds to
+--------------------------------------------------------------------------
+if (((&co->co_queue_wakeup)->sqh_first =3D (&co->co_queue_wakeup)->sqh_firs=
+t->co_queue_next.sqe_next) =3D=3D NULL)\
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(&co->co_queue_wakeup)->sqh=
+_last =3D &(&co->co_queue_wakeup)->sqh_first;
+--------------------------------------------------------------------------
+
+Debugging the list we see
+--------------------------------------------------------------------------
 (gdb) print *(&co->co_queue_wakeup->sqh_first)
-$1 =3D (struct Coroutine *) 0x1
+$6 =3D (struct Coroutine *) 0x1000
 (gdb) print *(&co->co_queue_wakeup->sqh_first->co_queue_next)
-Cannot access memory at address 0x31
----------------------------------------------------------------------
+Cannot access memory at address 0x1030
+--------------------------------------------------------------------------
 
-So again. Segfault is caused by apparently invalid addresses. And this
-time it occurs after so many invocations of qemu_co_queue_run_restart()
+So the data in co->co_queue_wakeup->sqh_first is corrupted and
+represents an invalid address. Any idea why is that?
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: coroutine qemu segfault ubuntu
+
+** Description changed:
+
+  I've been experiencing frequent segfaults lately with qemu 2.7.0 running
+  Ubuntu 16.04 guests. The crash usually happens in
+  qemu_co_queue_run_restart(). I haven't seen this so far with any other
+  guests or distros.
+  =
+
+  Here is one back trace I obtained from one of the crashing VMs.
+  =
+
+- -------------------------------------------------------------------------=
+------------------------
++ --------------------------------------------------------------------------
+  (gdb) bt
+  #0  qemu_co_queue_run_restart (co=3D0x7fba8ff05aa0) at /build/pb-qemu-pss=
+KUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:59
+  #1  0x000055c1656f39a9 in qemu_coroutine_enter (co=3D0x7fba8ff05aa0) at /=
+build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+  #2  0x000055c1656f3e74 in qemu_co_queue_run_restart (co=3D0x7fba8dd20430)=
+ at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+  #3  0x000055c1656f39a9 in qemu_coroutine_enter (co=3D0x7fba8dd20430) at /=
+build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+  #4  0x000055c1656f3e74 in qemu_co_queue_run_restart (co=3D0x7fba8dd14ea0)=
+ at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+  #5  0x000055c1656f39a9 in qemu_coroutine_enter (co=3D0x7fba8dd14ea0) at /=
+build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+  #6  0x000055c1656f3e74 in qemu_co_queue_run_restart (co=3D0x7fba80c11dc0)=
+ at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+  #7  0x000055c1656f39a9 in qemu_coroutine_enter (co=3D0x7fba80c11dc0) at /=
+build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+  #8  0x000055c1656f3e74 in qemu_co_queue_run_restart (co=3D0x7fba8dd0bd70)=
+ at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+  #9  0x000055c1656f39a9 in qemu_coroutine_enter (co=3D0x7fba8dd0bd70) at /=
+build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+  #10 0x000055c1656f3fa0 in qemu_co_enter_next (queue=3Dqueue@entry=3D0x55c=
+1669e75e0) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.=
+c:106
+  #11 0x000055c165692060 in timer_cb (blk=3D0x55c1669e7590, is_write=3D<opt=
+imized out>) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/block/throttle-groups.c=
+:400
+  #12 0x000055c16564f615 in timerlist_run_timers (timer_list=3D0x55c166a53e=
+80) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/qemu-timer.c:528
+  #13 0x000055c16564f679 in timerlistgroup_run_timers (tlg=3Dtlg@entry=3D0x=
+55c167c81cf8) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/qemu-timer.c:564
+  #14 0x000055c16564ff47 in aio_dispatch (ctx=3Dctx@entry=3D0x55c167c81bb0)=
+ at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/aio-posix.c:357
+  #15 0x000055c1656500e8 in aio_poll (ctx=3D0x55c167c81bb0, blocking=3D<opt=
+imized out>) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/aio-posix.c:479
+  #16 0x000055c1654b1c79 in iothread_run (opaque=3D0x55c167c81960) at /buil=
+d/pb-qemu-pssKUp/pb-qemu-2.7.0/iothread.c:46
+  #17 0x00007fbc4b64f0a4 in allocate_stack (stack=3D<synthetic pointer>, pd=
+p=3D<synthetic pointer>, attr=3D0x0) at allocatestack.c:416
+- #18 __pthread_create_2_1 (newthread=3D<error reading variable: Cannot acc=
+ess memory at address 0xffffffffffffff48>, attr=3D<error reading variable: =
+Cannot access memory at address 0xffffffffffffff40>, =
+
+-     start_routine=3D<error reading variable: Cannot access memory at addr=
+ess 0xffffffffffffff58>, arg=3D<error reading variable: Cannot access memor=
+y at address 0xffffffffffffff50>) at pthread_create.c:539
++ #18 __pthread_create_2_1 (newthread=3D<error reading variable: Cannot acc=
+ess memory at address 0xffffffffffffff48>, attr=3D<error reading variable: =
+Cannot access memory at address 0xffffffffffffff40>,
++ =C2=A0=C2=A0=C2=A0=C2=A0start_routine=3D<error reading variable: Cannot a=
+ccess memory at address 0xffffffffffffff58>, arg=3D<error reading variable:=
+ Cannot access memory at address 0xffffffffffffff50>) at pthread_create.c:5=
+39
+  Backtrace stopped: Cannot access memory at address 0x8
+- -------------------------------------------------------------------------=
+------------------------
++ --------------------------------------------------------------------------
+  =
+
+  The code that crashes is this
+- -------------------------------------------------------------------------=
+------------------------
++ --------------------------------------------------------------------------
+  void qemu_co_queue_run_restart(Coroutine *co)
+  {
+-     Coroutine *next;
++ =C2=A0=C2=A0=C2=A0=C2=A0Coroutine *next;
+  =
+
+-     trace_qemu_co_queue_run_restart(co);
+-     while ((next =3D QSIMPLEQ_FIRST(&co->co_queue_wakeup))) {             =
+
+-         QSIMPLEQ_REMOVE_HEAD(&co->co_queue_wakeup, co_queue_next);       =
+<--- Crash occurs here this time
+-         qemu_coroutine_enter(next);
+-     }
++ =C2=A0=C2=A0=C2=A0=C2=A0trace_qemu_co_queue_run_restart(co);
++ =C2=A0=C2=A0=C2=A0=C2=A0while ((next =3D QSIMPLEQ_FIRST(&co->co_queue_wak=
+eup))) {
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0QSIMPLEQ_REMOVE_HEAD(&co-=
+>co_queue_wakeup, co_queue_next);       <--- Crash occurs here this time
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qemu_coroutine_enter(next=
+);
++ =C2=A0=C2=A0=C2=A0=C2=A0}
+  }
+- -------------------------------------------------------------------------=
+------------------------
++ --------------------------------------------------------------------------
+  =
+
+  Expanding the macro QSIMPLEQ_REMOVE_HEAD gives us
+  -------------------------------------------------------------------------=
+------------------------
+  #define QSIMPLEQ_REMOVE_HEAD(head, field) do {                          \
+-     if (((head)->sqh_first =3D (head)->sqh_first->field.sqe_next) =3D=3D =
+NULL)\
+-         (head)->sqh_last =3D &(head)->sqh_first;                         =
+ \
++ =C2=A0=C2=A0=C2=A0=C2=A0if (((head)->sqh_first =3D (head)->sqh_first->fie=
+ld.sqe_next) =3D=3D NULL)\
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(head)->sqh_last =3D &(he=
+ad)->sqh_first;                          \
+  } while (/*CONSTCOND*/0)
+- -------------------------------------------------------------------------=
+------------------------
++ --------------------------------------------------------------------------
+  =
+
+  which corrsponds to
+  -------------------------------------------------------------------------=
+------------------------
+  if (((&co->co_queue_wakeup)->sqh_first =3D (&co->co_queue_wakeup)->sqh_fi=
+rst->co_queue_next.sqe_next) =3D=3D NULL)\
+-         (&co->co_queue_wakeup)->sqh_last =3D &(&co->co_queue_wakeup)->sqh=
+_first;
+- -------------------------------------------------------------------------=
+------------------------
++ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(&co->co_queue_wakeup)->s=
+qh_last =3D &(&co->co_queue_wakeup)->sqh_first;
++ --------------------------------------------------------------------------
+  =
+
+  Debugging the list we see
+- -------------------------------------------------------------------------=
+------------------------
+- (gdb) print *(&co->co_queue_wakeup->sqh_first) =
+
++ --------------------------------------------------------------------------
++ (gdb) print *(&co->co_queue_wakeup->sqh_first)
+  $6 =3D (struct Coroutine *) 0x1000
+- (gdb) print *(&co->co_queue_wakeup->sqh_first->co_queue_next) =
+
++ (gdb) print *(&co->co_queue_wakeup->sqh_first->co_queue_next)
+  Cannot access memory at address 0x1030
+- -------------------------------------------------------------------------=
+------------------------
++ --------------------------------------------------------------------------
+  =
+
+  So the data in co->co_queue_wakeup->sqh_first is corrupted and
+  represents an invalid address. Any idea why is that?
+
+** Summary changed:
+
+- qemu segfaults in qemu_co_queue_run_restart()
++ qemu 2.7.0 segfaults in qemu_co_queue_run_restart()
+
+** Description changed:
+
+  I've been experiencing frequent segfaults lately with qemu 2.7.0 running
+  Ubuntu 16.04 guests. The crash usually happens in
+  qemu_co_queue_run_restart(). I haven't seen this so far with any other
+  guests or distros.
+  =
+
+  Here is one back trace I obtained from one of the crashing VMs.
+  =
+
+  --------------------------------------------------------------------------
+  (gdb) bt
+  #0  qemu_co_queue_run_restart (co=3D0x7fba8ff05aa0) at /build/pb-qemu-pss=
+KUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:59
+  #1  0x000055c1656f39a9 in qemu_coroutine_enter (co=3D0x7fba8ff05aa0) at /=
+build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+  #2  0x000055c1656f3e74 in qemu_co_queue_run_restart (co=3D0x7fba8dd20430)=
+ at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+  #3  0x000055c1656f39a9 in qemu_coroutine_enter (co=3D0x7fba8dd20430) at /=
+build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+  #4  0x000055c1656f3e74 in qemu_co_queue_run_restart (co=3D0x7fba8dd14ea0)=
+ at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+  #5  0x000055c1656f39a9 in qemu_coroutine_enter (co=3D0x7fba8dd14ea0) at /=
+build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+  #6  0x000055c1656f3e74 in qemu_co_queue_run_restart (co=3D0x7fba80c11dc0)=
+ at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+  #7  0x000055c1656f39a9 in qemu_coroutine_enter (co=3D0x7fba80c11dc0) at /=
+build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+  #8  0x000055c1656f3e74 in qemu_co_queue_run_restart (co=3D0x7fba8dd0bd70)=
+ at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+  #9  0x000055c1656f39a9 in qemu_coroutine_enter (co=3D0x7fba8dd0bd70) at /=
+build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+  #10 0x000055c1656f3fa0 in qemu_co_enter_next (queue=3Dqueue@entry=3D0x55c=
+1669e75e0) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.=
+c:106
+  #11 0x000055c165692060 in timer_cb (blk=3D0x55c1669e7590, is_write=3D<opt=
+imized out>) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/block/throttle-groups.c=
+:400
+  #12 0x000055c16564f615 in timerlist_run_timers (timer_list=3D0x55c166a53e=
+80) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/qemu-timer.c:528
+  #13 0x000055c16564f679 in timerlistgroup_run_timers (tlg=3Dtlg@entry=3D0x=
+55c167c81cf8) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/qemu-timer.c:564
+  #14 0x000055c16564ff47 in aio_dispatch (ctx=3Dctx@entry=3D0x55c167c81bb0)=
+ at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/aio-posix.c:357
+  #15 0x000055c1656500e8 in aio_poll (ctx=3D0x55c167c81bb0, blocking=3D<opt=
+imized out>) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/aio-posix.c:479
+  #16 0x000055c1654b1c79 in iothread_run (opaque=3D0x55c167c81960) at /buil=
+d/pb-qemu-pssKUp/pb-qemu-2.7.0/iothread.c:46
+  #17 0x00007fbc4b64f0a4 in allocate_stack (stack=3D<synthetic pointer>, pd=
+p=3D<synthetic pointer>, attr=3D0x0) at allocatestack.c:416
+  #18 __pthread_create_2_1 (newthread=3D<error reading variable: Cannot acc=
+ess memory at address 0xffffffffffffff48>, attr=3D<error reading variable: =
+Cannot access memory at address 0xffffffffffffff40>,
+  =C2=A0=C2=A0=C2=A0=C2=A0start_routine=3D<error reading variable: Cannot a=
+ccess memory at address 0xffffffffffffff58>, arg=3D<error reading variable:=
+ Cannot access memory at address 0xffffffffffffff50>) at pthread_create.c:5=
+39
+  Backtrace stopped: Cannot access memory at address 0x8
+  --------------------------------------------------------------------------
+  =
+
+  The code that crashes is this
+  --------------------------------------------------------------------------
+  void qemu_co_queue_run_restart(Coroutine *co)
+  {
+  =C2=A0=C2=A0=C2=A0=C2=A0Coroutine *next;
+  =
+
+  =C2=A0=C2=A0=C2=A0=C2=A0trace_qemu_co_queue_run_restart(co);
+  =C2=A0=C2=A0=C2=A0=C2=A0while ((next =3D QSIMPLEQ_FIRST(&co->co_queue_wak=
+eup))) {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0QSIMPLEQ_REMOVE_HEAD(&co-=
+>co_queue_wakeup, co_queue_next);       <--- Crash occurs here this time
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qemu_coroutine_enter(next=
+);
+  =C2=A0=C2=A0=C2=A0=C2=A0}
+  }
+  --------------------------------------------------------------------------
+  =
+
+  Expanding the macro QSIMPLEQ_REMOVE_HEAD gives us
+- -------------------------------------------------------------------------=
+------------------------
++ --------------------------------------------------------------------------
+  #define QSIMPLEQ_REMOVE_HEAD(head, field) do {                          \
+  =C2=A0=C2=A0=C2=A0=C2=A0if (((head)->sqh_first =3D (head)->sqh_first->fie=
+ld.sqe_next) =3D=3D NULL)\
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(head)->sqh_last =3D &(he=
+ad)->sqh_first;                          \
+  } while (/*CONSTCOND*/0)
+  --------------------------------------------------------------------------
+  =
+
+  which corrsponds to
+- -------------------------------------------------------------------------=
+------------------------
++ --------------------------------------------------------------------------
+  if (((&co->co_queue_wakeup)->sqh_first =3D (&co->co_queue_wakeup)->sqh_fi=
+rst->co_queue_next.sqe_next) =3D=3D NULL)\
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(&co->co_queue_wakeup)->s=
+qh_last =3D &(&co->co_queue_wakeup)->sqh_first;
+  --------------------------------------------------------------------------
+  =
+
+  Debugging the list we see
+  --------------------------------------------------------------------------
+  (gdb) print *(&co->co_queue_wakeup->sqh_first)
+  $6 =3D (struct Coroutine *) 0x1000
+  (gdb) print *(&co->co_queue_wakeup->sqh_first->co_queue_next)
+  Cannot access memory at address 0x1030
+  --------------------------------------------------------------------------
+  =
+
+  So the data in co->co_queue_wakeup->sqh_first is corrupted and
+  represents an invalid address. Any idea why is that?
+
+** Description changed:
+
++ Hi,
++ =
+
+  I've been experiencing frequent segfaults lately with qemu 2.7.0 running
+  Ubuntu 16.04 guests. The crash usually happens in
+  qemu_co_queue_run_restart(). I haven't seen this so far with any other
+  guests or distros.
+  =
+
+  Here is one back trace I obtained from one of the crashing VMs.
+  =
+
+  --------------------------------------------------------------------------
+  (gdb) bt
+  #0  qemu_co_queue_run_restart (co=3D0x7fba8ff05aa0) at /build/pb-qemu-pss=
+KUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:59
+  #1  0x000055c1656f39a9 in qemu_coroutine_enter (co=3D0x7fba8ff05aa0) at /=
+build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+  #2  0x000055c1656f3e74 in qemu_co_queue_run_restart (co=3D0x7fba8dd20430)=
+ at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+  #3  0x000055c1656f39a9 in qemu_coroutine_enter (co=3D0x7fba8dd20430) at /=
+build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+  #4  0x000055c1656f3e74 in qemu_co_queue_run_restart (co=3D0x7fba8dd14ea0)=
+ at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+  #5  0x000055c1656f39a9 in qemu_coroutine_enter (co=3D0x7fba8dd14ea0) at /=
+build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+  #6  0x000055c1656f3e74 in qemu_co_queue_run_restart (co=3D0x7fba80c11dc0)=
+ at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+  #7  0x000055c1656f39a9 in qemu_coroutine_enter (co=3D0x7fba80c11dc0) at /=
+build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+  #8  0x000055c1656f3e74 in qemu_co_queue_run_restart (co=3D0x7fba8dd0bd70)=
+ at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+  #9  0x000055c1656f39a9 in qemu_coroutine_enter (co=3D0x7fba8dd0bd70) at /=
+build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+  #10 0x000055c1656f3fa0 in qemu_co_enter_next (queue=3Dqueue@entry=3D0x55c=
+1669e75e0) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.=
+c:106
+  #11 0x000055c165692060 in timer_cb (blk=3D0x55c1669e7590, is_write=3D<opt=
+imized out>) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/block/throttle-groups.c=
+:400
+  #12 0x000055c16564f615 in timerlist_run_timers (timer_list=3D0x55c166a53e=
+80) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/qemu-timer.c:528
+  #13 0x000055c16564f679 in timerlistgroup_run_timers (tlg=3Dtlg@entry=3D0x=
+55c167c81cf8) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/qemu-timer.c:564
+  #14 0x000055c16564ff47 in aio_dispatch (ctx=3Dctx@entry=3D0x55c167c81bb0)=
+ at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/aio-posix.c:357
+  #15 0x000055c1656500e8 in aio_poll (ctx=3D0x55c167c81bb0, blocking=3D<opt=
+imized out>) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/aio-posix.c:479
+  #16 0x000055c1654b1c79 in iothread_run (opaque=3D0x55c167c81960) at /buil=
+d/pb-qemu-pssKUp/pb-qemu-2.7.0/iothread.c:46
+  #17 0x00007fbc4b64f0a4 in allocate_stack (stack=3D<synthetic pointer>, pd=
+p=3D<synthetic pointer>, attr=3D0x0) at allocatestack.c:416
+  #18 __pthread_create_2_1 (newthread=3D<error reading variable: Cannot acc=
+ess memory at address 0xffffffffffffff48>, attr=3D<error reading variable: =
+Cannot access memory at address 0xffffffffffffff40>,
+  =C2=A0=C2=A0=C2=A0=C2=A0start_routine=3D<error reading variable: Cannot a=
+ccess memory at address 0xffffffffffffff58>, arg=3D<error reading variable:=
+ Cannot access memory at address 0xffffffffffffff50>) at pthread_create.c:5=
+39
+  Backtrace stopped: Cannot access memory at address 0x8
+  --------------------------------------------------------------------------
+  =
+
+  The code that crashes is this
+  --------------------------------------------------------------------------
+  void qemu_co_queue_run_restart(Coroutine *co)
+  {
+  =C2=A0=C2=A0=C2=A0=C2=A0Coroutine *next;
+  =
+
+  =C2=A0=C2=A0=C2=A0=C2=A0trace_qemu_co_queue_run_restart(co);
+  =C2=A0=C2=A0=C2=A0=C2=A0while ((next =3D QSIMPLEQ_FIRST(&co->co_queue_wak=
+eup))) {
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0QSIMPLEQ_REMOVE_HEAD(&co-=
+>co_queue_wakeup, co_queue_next);       <--- Crash occurs here this time
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qemu_coroutine_enter(next=
+);
+  =C2=A0=C2=A0=C2=A0=C2=A0}
+  }
+  --------------------------------------------------------------------------
+  =
+
+  Expanding the macro QSIMPLEQ_REMOVE_HEAD gives us
+  --------------------------------------------------------------------------
+  #define QSIMPLEQ_REMOVE_HEAD(head, field) do {                          \
+  =C2=A0=C2=A0=C2=A0=C2=A0if (((head)->sqh_first =3D (head)->sqh_first->fie=
+ld.sqe_next) =3D=3D NULL)\
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(head)->sqh_last =3D &(he=
+ad)->sqh_first;                          \
+  } while (/*CONSTCOND*/0)
+  --------------------------------------------------------------------------
+  =
+
+  which corrsponds to
+  --------------------------------------------------------------------------
+  if (((&co->co_queue_wakeup)->sqh_first =3D (&co->co_queue_wakeup)->sqh_fi=
+rst->co_queue_next.sqe_next) =3D=3D NULL)\
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(&co->co_queue_wakeup)->s=
+qh_last =3D &(&co->co_queue_wakeup)->sqh_first;
+  --------------------------------------------------------------------------
+  =
+
+  Debugging the list we see
+  --------------------------------------------------------------------------
+  (gdb) print *(&co->co_queue_wakeup->sqh_first)
+  $6 =3D (struct Coroutine *) 0x1000
+  (gdb) print *(&co->co_queue_wakeup->sqh_first->co_queue_next)
+  Cannot access memory at address 0x1030
+  --------------------------------------------------------------------------
+  =
+
+  So the data in co->co_queue_wakeup->sqh_first is corrupted and
+  represents an invalid address. Any idea why is that?
 
 -- =
 
