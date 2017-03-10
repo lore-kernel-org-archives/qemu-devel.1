@@ -1,40 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cmRm7-0007G2-Eu
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 16:08:36 -0500
+	(envelope-from <willy@infradead.org>) id 1cmRvr-0001t8-9y
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 16:18:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cmRm4-0007Z6-7v
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 16:08:35 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46988
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <willy@infradead.org>) id 1cmRvo-00022B-50
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 16:18:39 -0500
+Received: from bombadil.infradead.org ([65.50.211.133]:53726)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1cmRm4-0007Yu-19
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 16:08:32 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2AL3kjn038316
-	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 16:08:29 -0500
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2938sw5u41-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 16:08:29 -0500
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Fri, 10 Mar 2017 21:08:27 -0000
-References: <20170307131650.90167-1-pasic@linux.vnet.ibm.com>
-	<0bccd267-1c59-09f1-3098-7a74759d00dd@redhat.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Fri, 10 Mar 2017 22:08:24 +0100
+	(Exim 4.71) (envelope-from <willy@infradead.org>) id 1cmRvn-00021k-P4
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 16:18:36 -0500
+Date: Fri, 10 Mar 2017 13:18:25 -0800
+From: Matthew Wilcox <willy@infradead.org>
+Message-ID: <20170310211825.GB16328@bombadil.infradead.org>
+References: <1488519630-89058-1-git-send-email-wei.w.wang@intel.com>
+	<1488519630-89058-4-git-send-email-wei.w.wang@intel.com>
+	<20170309141411.GZ16328@bombadil.infradead.org>
+	<58C28FF8.5040403@intel.com>
+	<20170310175349-mutt-send-email-mst@kernel.org>
+	<20170310171143.GA16328@bombadil.infradead.org>
+	<20170310211037-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <0bccd267-1c59-09f1-3098-7a74759d00dd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Message-Id: <669f36ca-990f-229b-c2b1-f583826574f4@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] virtio-blk: fix race on guest
- notifiers
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170310211037-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v7 kernel 3/5] virtio-balloon:
+ implementation of VIRTIO_BALLOON_F_CHUNK_TRANSFER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,76 +33,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-stable@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Wei Wang <wei.w.wang@intel.com>, virtio-dev@lists.oasis-open.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, linux-mm@kvack.org, Liang Li <liang.z.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Amit Shah <amit.shah@redhat.com>, Dave Hansen <dave.hansen@intel.com>, Andrea Arcangeli <aarcange@redhat.com>, David Hildenbrand <david@redhat.com>, Liang Li <liliang324@gmail.com>
 
+On Fri, Mar 10, 2017 at 09:10:53PM +0200, Michael S. Tsirkin wrote:
+> > I completely agree with you that we should be able to pass a hugepage
+> > as a single chunk.  Also we shouldn't assume that host and guest have
+> > the same page size.  I think we can come up with a scheme that actually
+> > lets us encode that into a 64-bit word, something like this:
+> > 
+> > bit 0 clear => bits 1-11 encode a page count, bits 12-63 encode a PFN, page size 4k.
+> > bit 0 set, bit 1 clear => bits 2-12 encode a page count, bits 13-63 encode a PFN, page size 8k
+> > bits 0+1 set, bit 2 clear => bits 3-13 for page count, bits 14-63 for PFN, page size 16k.
+> > bits 0-2 set, bit 3 clear => bits 4-14 for page count, bits 15-63 for PFN, page size 32k
+> > bits 0-3 set, bit 4 clear => bits 5-15 for page count, bits 16-63 for PFN, page size 64k
+> 
+> huge page sizes go up to gigabytes.
 
+There was supposed to be a '...' there.  For a 16GB hugepage (largest
+size I know of today), that'd be:
 
-On 03/10/2017 05:47 PM, Paolo Bonzini wrote:
-> 
-> On 07/03/2017 14:16, Halil Pasic wrote:
->> The commits 03de2f527 "virtio-blk: do not use vring in dataplane"  and
->> 9ffe337c08 "virtio-blk: always use dataplane path if ioeventfd is active"
->> changed how notifications are done for virtio-blk substantially. Due to a
->> race condition, interrupts are lost when irqfd behind the guest notifier
->> is torn down after notify_guest_bh was scheduled but before it actually
->> runs.
->>
->> Let's fix this by forcing guest notifications before cleaning up the
->> irqfd's. Let's also add some explanatory comments.
->>
->> Cc: qemu-stable@nongnu.org
->> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->> Reported-by: Michael A. Tebolt <miket@us.ibm.com>
->> Tested-by: Michael A. Tebolt <miket@us.ibm.com>
->> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>
->> This patch withstood the test case which discovered the problem
->> for several days (as reported by Michale Tebolt).
->>
->> v1 --> v2:
->> * Fixed typo pointed out by Connie
->> * Added Tested-by
-> Hi Halil,
-> 
-> I found a similar issue in NBD.  Can you check if this patch fixes
-> the virtio-blk issue too?
-> 
-> Thanks,
-> Paolo
-> 
-> ------ 8< ------------
-> 
-> diff --git a/block.c b/block.c
-> index f293ccb..e159251 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -4272,8 +4272,15 @@ void bdrv_attach_aio_context(BlockDriverState *bs,
-> 
->  void bdrv_set_aio_context(BlockDriverState *bs, AioContext *new_context)
->  {
-> +    AioContext *ctx;
-> +
->      bdrv_drain(bs); /* ensure there are no in-flight requests */
-> 
-> +    ctx = bdrv_get_aio_context(bs);
-> +    while (aio_poll(ctx, false)) {
-> +        /* wait for all bottom halves to execute */
-> +    }
-> +
->      bdrv_detach_aio_context(bs);
-> 
->      /* This function executes in the old AioContext so acquire the new one in
-> 
-> 
-
-So far so good! I will let it spin over the weekend but I think it's unlikely
-something will turn up.
-
-I was wondering, would it make sense to push this logic into bdrv_drain?
-(Along the lines: this looks much like tying up loose ends drain has left.
-But I'm not sure about it.)
-
-Regards,
-Halil
+bits 0-21 set, 22 clear, 23-33 page count, 34-63 PFN, page size 16G
