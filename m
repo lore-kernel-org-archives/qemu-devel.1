@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anthony.xu@intel.com>) id 1cmN3S-0005eN-VM
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 11:06:12 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cmN4r-0006JX-FT
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 11:07:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anthony.xu@intel.com>) id 1cmN3O-0001lY-VE
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 11:06:10 -0500
-Received: from mga14.intel.com ([192.55.52.115]:11946)
+	(envelope-from <pbonzini@redhat.com>) id 1cmN4n-0002rW-GB
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 11:07:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59452)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
-	id 1cmN3O-0001kn-EI
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 11:06:06 -0500
-From: "Xu, Anthony" <anthony.xu@intel.com>
-Date: Fri, 10 Mar 2017 16:05:42 +0000
-Message-ID: <4712D8F4B26E034E80552F30A67BE0B1A0F66A@ORSMSX112.amr.corp.intel.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cmN4n-0002rD-9v
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 11:07:33 -0500
 References: <1489158897-9206-1-git-send-email-yang.zhong@intel.com>
 	<867e2a13-b48e-cb85-1eb9-38694e28c172@redhat.com>
-In-Reply-To: <867e2a13-b48e-cb85-1eb9-38694e28c172@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	<4712D8F4B26E034E80552F30A67BE0B1A0F66A@ORSMSX112.amr.corp.intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a5f6ed2f-2580-beaa-a5d2-42857588844c@redhat.com>
+Date: Fri, 10 Mar 2017 17:07:30 +0100
 MIME-Version: 1.0
+In-Reply-To: <4712D8F4B26E034E80552F30A67BE0B1A0F66A@ORSMSX112.amr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH v1 1/2] reduce qemu's heap Rss size from
  12252kB to 2752KB
 List-Id: <qemu-devel.nongnu.org>
@@ -30,73 +29,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "Zhong, Yang" <yang.zhong@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: "Xu, Anthony" <anthony.xu@intel.com>, "Zhong, Yang" <yang.zhong@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Cc: "Peng, Chao P" <chao.p.peng@intel.com>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQYW9sbyBCb256aW5pIFttYWls
-dG86cGJvbnppbmlAcmVkaGF0LmNvbV0NCj4gU2VudDogRnJpZGF5LCBNYXJjaCAxMCwgMjAxNyAx
-Mjo0MiBBTQ0KPiBUbzogWmhvbmcsIFlhbmcgPHlhbmcuemhvbmdAaW50ZWwuY29tPjsgcWVtdS1k
-ZXZlbEBub25nbnUub3JnDQo+IENjOiBYdSwgQW50aG9ueSA8YW50aG9ueS54dUBpbnRlbC5jb20+
-OyBQZW5nLCBDaGFvIFANCj4gPGNoYW8ucC5wZW5nQGludGVsLmNvbT4NCj4gU3ViamVjdDogUmU6
-IFtQQVRDSCB2MSAxLzJdIHJlZHVjZSBxZW11J3MgaGVhcCBSc3Mgc2l6ZSBmcm9tIDEyMjUya0Ig
-dG8NCj4gMjc1MktCDQo+IA0KPiANCj4gDQo+IE9uIDEwLzAzLzIwMTcgMTY6MTQsIFlhbmcgWmhv
-bmcgd3JvdGU6DQo+ID4gVGhlcmUgYXJlIGEgbG90IG9mIG1lbW9yeSBhbGxvY2F0aW9uIGR1cmlu
-ZyB0aGUgcWVtdSBib290dXAsIHdoaWNoIGFyZQ0KPiA+IGZyZWVkIGxhdGVyIGJ5IFJDVSB0aHJl
-YWQsd2hpY2ggbWVhbnMgdGhlIGhlYXAgc2l6ZSBiZWNvbWVzIGJpZ2VyIGFuZA0KPiA+IGJpZ2Vy
-IHdoZW4gYWxsb2NhdGlvbiBoYXBwZW5zLCBidXQgdGhlIGhlYXAgbWF5IG5vdCBiZSBzaHJpbmtl
-ZCBldmVuDQo+ID4gYWZ0ZXIgcmVsZWFzZSBoYXBwZW5zLGJlY2F1c2Ugc29tZSBtZW1vcnkgYmxv
-Y2tzIGluIHRvcCBvZiBoZWFwIGFyZQ0KPiA+IHN0aWxsIGJlaW5nIHVzZWQuRGVjcmVhc2luZyB0
-aGUgc2xlZXAgYW5kIHJlbW92aW5nDQo+ID4gcWVtdV9tdXRleF91bmxvY2tfaW90aHJlYWQoKSBs
-b2NrLCB3aGljaCBtYWtlIGNhbGxfcmN1X3RocmVhZCgpdGhyZWFkDQo+IHJlc3BvbnNlIHRoZSBm
-cmVlIG1lbW9yeSBpbiB0aW1lLg0KPiA+IFRoaXMgcGF0Y2ggd2lsbCByZWR1Y2UgaGVhcCBSc3Mg
-YXJvdW5kIDEwTS4NCj4gPg0KPiA+IFRoaXMgcGF0Y2ggaXMgZnJvbSBBbnRob255IHh1IDxhbnRo
-b255Lnh1QGludGVsLmNvbT4uDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBZYW5nIFpob25nIDx5
-YW5nLnpob25nQGludGVsLmNvbT4NCj4gPiAtLS0NCj4gPiAgdXRpbC9yY3UuYyB8IDggKystLS0t
-LS0NCj4gPiAgMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgNiBkZWxldGlvbnMoLSkN
-Cj4gPg0KPiA+IGRpZmYgLS1naXQgYS91dGlsL3JjdS5jIGIvdXRpbC9yY3UuYw0KPiA+IGluZGV4
-IDlhZGM1ZTQuLmM1YzM3M2MgMTAwNjQ0DQo+ID4gLS0tIGEvdXRpbC9yY3UuYw0KPiA+ICsrKyBi
-L3V0aWwvcmN1LmMNCj4gPiBAQCAtMTY3LDcgKzE2Nyw3IEBAIHZvaWQgc3luY2hyb25pemVfcmN1
-KHZvaWQpICB9DQo+ID4NCj4gPg0KPiA+IC0jZGVmaW5lIFJDVV9DQUxMX01JTl9TSVpFICAgICAg
-ICAzMA0KPiA+ICsjZGVmaW5lIFJDVV9DQUxMX01JTl9TSVpFICAgICAgICA1DQo+ID4NCj4gPiAg
-LyogTXVsdGktcHJvZHVjZXIsIHNpbmdsZS1jb25zdW1lciBxdWV1ZSBiYXNlZCBvbg0KPiB1cmN1
-L3N0YXRpYy93ZnF1ZXVlLmgNCj4gPiAgICogZnJvbSBsaWJ1cmN1LiAgTm90ZSB0aGF0IGhlYWQg
-aXMgb25seSB1c2VkIGJ5IHRoZSBjb25zdW1lci4NCj4gPiBAQCAtMjQxLDcgKzI0MSw3IEBAIHN0
-YXRpYyB2b2lkICpjYWxsX3JjdV90aHJlYWQodm9pZCAqb3BhcXVlKQ0KPiA+ICAgICAgICAgICAq
-IGFkZGVkIGJlZm9yZSBzeW5jaHJvbml6ZV9yY3UoKSBzdGFydHMuDQo+ID4gICAgICAgICAgICov
-DQo+ID4gICAgICAgICAgd2hpbGUgKG4gPT0gMCB8fCAobiA8IFJDVV9DQUxMX01JTl9TSVpFICYm
-ICsrdHJpZXMgPD0gNSkpIHsNCj4gPiAtICAgICAgICAgICAgZ191c2xlZXAoMTAwMDApOw0KPiA+
-ICsgICAgICAgICAgICBnX3VzbGVlcCgxMDApOw0KPiA+ICAgICAgICAgICAgICBpZiAobiA9PSAw
-KSB7DQo+ID4gICAgICAgICAgICAgICAgICBxZW11X2V2ZW50X3Jlc2V0KCZyY3VfY2FsbF9yZWFk
-eV9ldmVudCk7DQo+ID4gICAgICAgICAgICAgICAgICBuID0gYXRvbWljX3JlYWQoJnJjdV9jYWxs
-X2NvdW50KTsgQEAgLTI1NCwyNCArMjU0LDIwDQo+ID4gQEAgc3RhdGljIHZvaWQgKmNhbGxfcmN1
-X3RocmVhZCh2b2lkICpvcGFxdWUpDQo+ID4NCj4gPiAgICAgICAgICBhdG9taWNfc3ViKCZyY3Vf
-Y2FsbF9jb3VudCwgbik7DQo+ID4gICAgICAgICAgc3luY2hyb25pemVfcmN1KCk7DQo+ID4gLSAg
-ICAgICAgcWVtdV9tdXRleF9sb2NrX2lvdGhyZWFkKCk7DQo+ID4gICAgICAgICAgd2hpbGUgKG4g
-PiAwKSB7DQo+ID4gICAgICAgICAgICAgIG5vZGUgPSB0cnlfZGVxdWV1ZSgpOw0KPiA+ICAgICAg
-ICAgICAgICB3aGlsZSAoIW5vZGUpIHsNCj4gPiAtICAgICAgICAgICAgICAgIHFlbXVfbXV0ZXhf
-dW5sb2NrX2lvdGhyZWFkKCk7DQo+ID4gICAgICAgICAgICAgICAgICBxZW11X2V2ZW50X3Jlc2V0
-KCZyY3VfY2FsbF9yZWFkeV9ldmVudCk7DQo+ID4gICAgICAgICAgICAgICAgICBub2RlID0gdHJ5
-X2RlcXVldWUoKTsNCj4gPiAgICAgICAgICAgICAgICAgIGlmICghbm9kZSkgew0KPiA+ICAgICAg
-ICAgICAgICAgICAgICAgIHFlbXVfZXZlbnRfd2FpdCgmcmN1X2NhbGxfcmVhZHlfZXZlbnQpOw0K
-PiA+ICAgICAgICAgICAgICAgICAgICAgIG5vZGUgPSB0cnlfZGVxdWV1ZSgpOw0KPiA+ICAgICAg
-ICAgICAgICAgICAgfQ0KPiA+IC0gICAgICAgICAgICAgICAgcWVtdV9tdXRleF9sb2NrX2lvdGhy
-ZWFkKCk7DQo+ID4gICAgICAgICAgICAgIH0NCj4gPg0KPiA+ICAgICAgICAgICAgICBuLS07DQo+
-ID4gICAgICAgICAgICAgIG5vZGUtPmZ1bmMobm9kZSk7DQo+ID4gICAgICAgICAgfQ0KPiA+IC0g
-ICAgICAgIHFlbXVfbXV0ZXhfdW5sb2NrX2lvdGhyZWFkKCk7DQo+IA0KPiBUaGlzIGlzIHdyb25n
-LiAgUkNVIGNhbGxiYWNrcyBjdXJyZW50bHkgbmVlZCB0aGUgImJpZyBRRU1VIGxvY2siLCBiZWNh
-dXNlDQo+IHRoZXkgY2FuIGZyZWUgYXJiaXRyYXJ5IFFPTSBvYmplY3RzIChpbmNsdWRpbmcgTWVt
-b3J5UmVnaW9ucykuDQoNClVzaW5nICJiaWcgUUVNVSBsb2NrIiBpbiBSQ1UgY2FsbGJhY2tzIGlz
-IGEgbGl0dGxlIGJpdCBoZWF2eSwgd2UnZCBsaWtlIHRvIHJlbW92ZSBpdC4NCg0KV2Ugbm90aWNl
-ZCBhbiBpc3N1ZSByZWxhdGVkIHRvIE1lbW9yeVJlZ2lvbiBwb3BwaW5nIHVwIGFmdGVyIHdlIHJl
-bW92ZWQgdGhlIGdsb2JhbCBsb2NrLg0KVGhlIHJvb3QgY2F1c2UgaXMgaW4gTWVtb3J5UmVnaW9u
-IGRlc3RydWN0aW9uIG1lbW9yeV9yZWdpb25fdHJhbnNhY3Rpb25fY29tbWl0IGlzIGNhbGxlZCwg
-d2hpY2ggbWF5IGNhdXNlIGlzc3VlLg0KRnJlZWluZyBNZW1vcnlSZWdpb24gc2VlbXMgbm90IGNh
-dXNlIGFueSBpc3N1ZS4NClBhdGNoMiBpbiB0aGlzIHNlcmllcyBmaXhlcyB0aGlzIGlzc3VlLA0K
-V2UgZm91bmQgb3V0IG9ubHkgc3VicGFnZSBNZW1vcnlSZWdpb24gaXMgZnJlZWQgaW4gUkNVIGNh
-bGxiYWNrcywgYW5kIG1lbW9yeV9yZWdpb25fdHJhbnNhY3Rpb25fY29tbWl0DQppcyBub3QgbmVl
-ZGVkIGZvciBzdWJwYWdlIE1lbW9yeVJlZ2lvbiBiZWNhdXNlIGl0IGRvZXNuJ3QgaGF2ZSBzdWIg
-cmVnaW9ucy4NCg0KSWRlYWxseSwgZnJlZWluZyBRT00gb2JqZWN0IHNob3VsZCBub3QgcmVxdWly
-ZSBhIGdsb2JhbCBsb2NrLiANCklmIHlvdSBzZWUgYW55IG90aGVyIFFPTSByZXF1aXJpbmcgYSBn
-bG9iYWwgbG9jaywgcGxlYXNlIGxldCB1cyBrbm93LCB3ZSBhcmUgd2lsbGluZyB0byBmaXggaXQu
-DQoNCg0KVGhhbmtzLA0KQW50aG9ueQ0KDQoNCj4gDQo+IFBhb2xvDQo+IA0KPiA+ICAgICAgfQ0K
-PiA+ICAgICAgYWJvcnQoKTsNCj4gPiAgfQ0KPiA+DQo=
+
+
+On 10/03/2017 17:05, Xu, Anthony wrote:
+> Ideally, freeing QOM object should not require a global lock. 
+> If you see any other QOM requiring a global lock, please let us know, we are willing to fix it.
+
+All of them.  When unplugging a device, the device object will be freed
+from an RCU callback.
+
+Paolo
