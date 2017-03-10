@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41347)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cmFMK-00067C-5e
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 02:53:09 -0500
+	(envelope-from <c.pinto@virtualopensystems.com>) id 1cmFhp-0002IO-8e
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 03:15:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cmFMG-0001XZ-8r
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 02:53:08 -0500
-References: <20170309190313.DFE5240827A6@vostest4.mno.stratus.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <4b953df8-8d34-f243-ca90-9f16723a87a3@redhat.com>
-Date: Fri, 10 Mar 2017 08:53:00 +0100
+	(envelope-from <c.pinto@virtualopensystems.com>) id 1cmFhm-0000Nj-0a
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 03:15:21 -0500
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:33106)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <c.pinto@virtualopensystems.com>)
+	id 1cmFhl-0000N4-KC
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 03:15:17 -0500
+Received: by mail-wr0-x243.google.com with SMTP id g10so10620774wrg.0
+	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 00:15:17 -0800 (PST)
+References: <57B7F948.9040701@huawei.com>
+	<20170309113437.9667-1-c.pinto@virtualopensystems.com>
+	<20170309174642.GM2480@work-vm>
+From: Christian Pinto <c.pinto@virtualopensystems.com>
+Message-ID: <3fbdef4a-6519-69d5-aa7f-ef7c0a1a00d6@virtualopensystems.com>
+Date: Fri, 10 Mar 2017 09:15:12 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170309190313.DFE5240827A6@vostest4.mno.stratus.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170309174642.GM2480@work-vm>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v2] SGABIOS: fix wrong video
- attrs for int 10h, ah==13h
+Subject: Re: [Qemu-devel] [RFC PATCH 0/4] ARM/ARM64 fixes for live memory
+ snapshot based on userfaultfd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,47 +32,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Herbie Robinson <Herbie.Robinson@stratus.com>
-Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: zhang.zhanghailiang@huawei.com, b.reynal@virtualopensystems.com, aarcange@redhat.com, quintela@redhat.com, peter.huangpeng@huawei.com, hanweidong@huawei.com, qemu-devel@nongnu.org, tech@virtualopensystems.com
 
-On 09/03/2017 19:48, Herbie Robinson wrote:
-> Fix Bug #1670509: wrong video attrs for int 10h, ah==13h
-> The subroutine set_cursor_position is trashing %bx.
-> Unfortunately, %bl contains the video attribute for write_string.
-> 
-> The fix saves %bx in the function prolog and restores it in
-> the epilog.  Also, remove save and restore in set_current_cursor,
-> because set_cursor_position does it.
-> 
-> Signed-off-by: Herbie Robinson <Herbie.Robinson@stratus.com>
-> ---
-> Removed incorrect code deletions from set_current_cursor.
+Hello Alan,
 
-You should update the commit message too.
 
-Laurent
-> 
->  sgabios.S | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/sgabios.S b/sgabios.S
-> index 275d063..96c4e23 100644
-> --- a/sgabios.S
-> +++ b/sgabios.S
-> @@ -1728,6 +1728,7 @@ write_string_tail:
->  
->  set_cursor_position:
->    pushw %ax
-> +  pushw %bx
->    pushw %ds
->    pushw $BDA_SEG
->    popw %ds                             /* ds = 0x40 */
-> @@ -1738,6 +1739,7 @@ set_cursor_position:
->    movw %ax, %bx                        /* bx = cursor save offset */
->    movw %dx, (%bx)                      /* save new cursor value */
->    popw %ds
-> +  popw %bx
->    popw %ax
->    ret
->  
-> 
+On 09/03/2017 18:46, Dr. David Alan Gilbert wrote:
+> * Christian Pinto (c.pinto@virtualopensystems.com) wrote:
+>> This patch series introduces a set of fixes to the previous work proposed by
+>> Hailiang Zhang to enable in QEMU live memory snapshot based
+>> on userfaultfd. See discussion here:
+>> http://www.mail-archive.com/qemu-devel@nongnu.org/msg393118.html
+> Thanks for posting this,
+>
+>> These patches apply on top of:
+>> https://github.com/coloft/qemu/tree/snapshot-v2
+>> that is the latest version of Hailiang's work, and rely on the latest work on
+>> userfaultfd available on Andrea Arcangeli's Linux kernel tree:
+>> https://git.kernel.org/cgit/linux/kernel/git/andrea/aa.git/log/?h=userfault
+>>
+>> The original work was mainly tested on x86 tcg machines and was not working
+>> ARM/ARM64 tcg.
+>> The fixes presented in this series enable the live memory snapshot
+>> to work for ARM64 tcg guests running on top of an ARM64 host.
+>>
+>> The main problems encountered were:
+>>      - QEMU uses for ARM a memory page size of 1KB. Even though this size is not
+>>        supported by the Linux kernel, is is kept for backward compatibility
+>>        with older ARM CPU MMUs. Initial work was write-unprotecting pages with
+>>        a granularity not always aligned with host page size, causing userfaultfd
+>>        to fail.
+> Yes, Power similarly has a 4kb size for the target page size even though
+> the host kernel is normally a large page size.
+
+The fix included in this series should solve the problem for Power as well,
+since it is making sure the address passed to userfaultfd is aligned
+to the host page size. So, if someone in the Power community is
+interested in this functionality, this fix might come handy.
+
+>
+>>      - The VM execution was resumed right before the status of the migration
+>>        was switched from MIGRATION_STATUS_SETUP to MIGRATION_STATUS_ACTIVE.
+>>        This was causing again the VM to trigger a "Bus error", due to wrong
+>>        status of some memory pages.
+>>      - When unprotecting a memory page the flag
+>>        UFFDIO_WRITEPROTECT_MODE_DONTWAKE was used. This way, after a page is
+>>        copied into snapshot file, the virtual machine execution is not resumed.
+>>
+>>
+>> To test the patches on an ARM64 host, boot an ARM64 tcg machine:
+>>
+>> qemu-system-aarch64 -machine virt,accel=tcg -cpu cortex-a57\
+>>          -m 256 -kernel Image \
+>>          -initrd rootfs.cpio.gz \
+>>          -append "earlyprintk rw console=ttyAMA0" \
+>>          -net nic -net user \
+>>          -nographic -serial pty -monitor stdio
+>>
+>> start migration from QEMU monitor:
+>>
+>>      (qemu) migrate file:/root/test_snapshot
+>>
+>>
+>> resume VM form snapshot:
+>>
+>> qemu-system-aarch64 -machine virt,accel=tcg -cpu cortex-a57\
+>>          -m 256 -kernel Image \
+>>          -initrd rootfs.cpio.gz \
+>>          -append "earlyprintk rw console=ttyAMA0" \
+>>          -net nic -net user \
+>>          -nographic -serial stdio -monitor pty \
+>>          -incoming file:/root/test_snapshot
+> Nice, what's your use case and how are you dealing with storage?
+
+This is a work done in the context of a H2020 European Project
+named ExaNoDe (http://exanode.eu) that is building a prototype ARM64
+based compute node for the exascale (computing capabilities in the order
+of the Exaflop) domain. In this project, targeting HPC, scientific 
+applications
+using MPI will be executed in virtualized computing nodes (KVM VMs),
+rather than directly on physical machines. This is mainly to improve the
+manageability of the overall system and ease the task of separating
+different workloads. The work done on live memory snapshot is meant
+to tackle the problem of system resiliency, reducing the overall impact
+on the virtualized software, and leading to higher availability of the
+virtualized computing nodes.
+
+For the time being we are focusing on memory, and storage has not yet
+been taken into consideration. However, at a first glance I would say that
+storage in QEMU is already using CoW that could be useful for this scenario
+as well.
+
+
+Thanks,
+
+Christian
+
+>
+> Dave
+>
+>> Christian Pinto (4):
+>>    migration/postcopy-ram: check pagefault flags in userfaultfd thread
+>>    migration/ram: Fix for ARM/ARM64 page size
+>>    migration: snapshot thread
+>>    migration/postcopy-ram: ram_set_pages_wp fix
+>>
+>>   migration/migration.c    |  9 +++++----
+>>   migration/postcopy-ram.c | 25 ++++++++-----------------
+>>   migration/ram.c          | 18 ++++++++++++++----
+>>   3 files changed, 27 insertions(+), 25 deletions(-)
+>>
+>> -- 
+>> 2.11.0
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
