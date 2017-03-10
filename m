@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anthony.xu@intel.com>) id 1cmOXC-0006l8-JV
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 12:40:59 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cmOsB-0003sv-6m
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 13:02:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anthony.xu@intel.com>) id 1cmOX7-0007va-P2
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 12:40:58 -0500
-Received: from mga09.intel.com ([134.134.136.24]:5526)
+	(envelope-from <ehabkost@redhat.com>) id 1cmOs8-00072L-2J
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 13:02:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59584)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
-	id 1cmOX6-0007uW-Vv
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 12:40:53 -0500
-From: "Xu, Anthony" <anthony.xu@intel.com>
-Date: Fri, 10 Mar 2017 17:40:43 +0000
-Message-ID: <4712D8F4B26E034E80552F30A67BE0B1A0F91A@ORSMSX112.amr.corp.intel.com>
-References: <1489158897-9206-1-git-send-email-yang.zhong@intel.com>
-	<1489158897-9206-2-git-send-email-yang.zhong@intel.com>
-	<53522014-8f70-9358-7d60-8b6c491c9611@redhat.com>
-In-Reply-To: <53522014-8f70-9358-7d60-8b6c491c9611@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cmOs7-00071z-TB
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 13:02:35 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EB04E85547
+	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 18:02:34 +0000 (UTC)
+Date: Fri, 10 Mar 2017 15:02:31 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170310180231.GI11509@thinpad.lan.raisama.net>
+References: <20170309182049.30040-1-ehabkost@redhat.com>
+	<2ccd013f-ade7-58e5-aef5-a8aa94659d09@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] reduce qemu's heap Rss size from
- 12252kB to 2752KB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2ccd013f-ade7-58e5-aef5-a8aa94659d09@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.9? v2 0/2] vl: Print warning if a
+ non-empty default config-file is found
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,74 +34,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "Zhong, Yang" <yang.zhong@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "Peng, Chao P" <chao.p.peng@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQYW9sbyBCb256aW5pIFttYWls
-dG86cGJvbnppbmlAcmVkaGF0LmNvbV0NCj4gU2VudDogRnJpZGF5LCBNYXJjaCAxMCwgMjAxNyAx
-OjE0IEFNDQo+IFRvOiBaaG9uZywgWWFuZyA8eWFuZy56aG9uZ0BpbnRlbC5jb20+OyBxZW11LWRl
-dmVsQG5vbmdudS5vcmcNCj4gQ2M6IFh1LCBBbnRob255IDxhbnRob255Lnh1QGludGVsLmNvbT47
-IFBlbmcsIENoYW8gUA0KPiA8Y2hhby5wLnBlbmdAaW50ZWwuY29tPg0KPiBTdWJqZWN0OiBSZTog
-W1BBVENIIHYxIDIvMl0gcmVkdWNlIHFlbXUncyBoZWFwIFJzcyBzaXplIGZyb20gMTIyNTJrQiB0
-bw0KPiAyNzUyS0INCj4gDQo+IA0KPiANCj4gT24gMTAvMDMvMjAxNyAxNjoxNCwgWWFuZyBaaG9u
-ZyB3cm90ZToNCj4gPiBUaGVyZSBpcyBubyBuZWVkIHRvIGRlbGV0ZSBzdWJyZWdpb24gYW5kIGRv
-IG1lbW9yeSBiZWdpbi9jb21taXQgZm9yDQo+ID4gc3VicGFnZSBpbiBtZW1vcnlfcmVnaW9uX2Zp
-bmFsaXplKCkuDQo+ID4NCj4gPiBUaGlzIHBhdGNoIGlzIGZyb20gQW50aG9ueSBYdSA8YW50aG9u
-eS54dUBpbnRlbC5jb20+Lg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogWWFuZyBaaG9uZyA8eWFu
-Zy56aG9uZ0BpbnRlbC5jb20+DQo+ID4gLS0tDQo+ID4gIG1lbW9yeS5jIHwgMTMgKysrKysrKy0t
-LS0tLQ0KPiA+ICAxIGZpbGUgY2hhbmdlZCwgNyBpbnNlcnRpb25zKCspLCA2IGRlbGV0aW9ucygt
-KQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL21lbW9yeS5jIGIvbWVtb3J5LmMNCj4gPiBpbmRleCAy
-ODQ4OTRiLi4zZTliZmZmIDEwMDY0NA0KPiA+IC0tLSBhL21lbW9yeS5jDQo+ID4gKysrIGIvbWVt
-b3J5LmMNCj4gPiBAQCAtMTUwNSwxMyArMTUwNSwxNCBAQCBzdGF0aWMgdm9pZCBtZW1vcnlfcmVn
-aW9uX2ZpbmFsaXplKE9iamVjdA0KPiAqb2JqKQ0KPiA+ICAgICAgICogYW5kIGNhdXNlIGFuIGlu
-ZmluaXRlIGxvb3AuDQo+ID4gICAgICAgKi8NCj4gPiAgICAgIG1yLT5lbmFibGVkID0gZmFsc2U7
-DQo+ID4gLSAgICBtZW1vcnlfcmVnaW9uX3RyYW5zYWN0aW9uX2JlZ2luKCk7DQo+ID4gLSAgICB3
-aGlsZSAoIVFUQUlMUV9FTVBUWSgmbXItPnN1YnJlZ2lvbnMpKSB7DQo+ID4gLSAgICAgICAgTWVt
-b3J5UmVnaW9uICpzdWJyZWdpb24gPSBRVEFJTFFfRklSU1QoJm1yLT5zdWJyZWdpb25zKTsNCj4g
-PiAtICAgICAgICBtZW1vcnlfcmVnaW9uX2RlbF9zdWJyZWdpb24obXIsIHN1YnJlZ2lvbik7DQo+
-ID4gKyAgICBpZiAoIW1yLT5zdWJwYWdlKSB7DQo+ID4gKyAgICAgICAgbWVtb3J5X3JlZ2lvbl90
-cmFuc2FjdGlvbl9iZWdpbigpOw0KPiA+ICsgICAgICAgIHdoaWxlICghUVRBSUxRX0VNUFRZKCZt
-ci0+c3VicmVnaW9ucykpIHsNCj4gPiArICAgICAgICAgICAgTWVtb3J5UmVnaW9uICpzdWJyZWdp
-b24gPSBRVEFJTFFfRklSU1QoJm1yLT5zdWJyZWdpb25zKTsNCj4gPiArICAgICAgICAgICAgbWVt
-b3J5X3JlZ2lvbl9kZWxfc3VicmVnaW9uKG1yLCBzdWJyZWdpb24pOw0KPiA+ICsgICAgICAgIH0N
-Cj4gPiArICAgICAgICBtZW1vcnlfcmVnaW9uX3RyYW5zYWN0aW9uX2NvbW1pdCgpOw0KPiANCj4g
-U3VicGFnZXMgbmV2ZXIgaGF2ZSBzdWJyZWdpb25zLCBzbyB0aGUgbG9vcCBuZXZlciBydW5zLiAg
-VGhlIGJlZ2luL2NvbW1pdA0KPiBwYWlyIHRoZW4gYmVjb21lczoNCj4gDQo+ICAgICArK21lbW9y
-eV9yZWdpb25fdHJhbnNhY3Rpb25fZGVwdGg7DQo+ICAgICAtLW1lbW9yeV9yZWdpb25fdHJhbnNh
-Y3Rpb25fZGVwdGg7DQo+ICAgICBpZiAoIW1lbW9yeV9yZWdpb25fdHJhbnNhY3Rpb25fZGVwdGgp
-IHsNCj4gICAgICAgICBpZiAobWVtb3J5X3JlZ2lvbl91cGRhdGVfcGVuZGluZykgew0KPiAgICAg
-ICAgICAgICAuLi4NCj4gICAgICAgICB9IGVsc2UgaWYgKGlvZXZlbnRmZF91cGRhdGVfcGVuZGlu
-Zykgew0KPiAgICAgICAgICAgICAuLi4NCj4gICAgICAgICB9DQo+ICAgICAgICAgLy8gbWVtb3J5
-X3JlZ2lvbl9jbGVhcl9wZW5kaW5nKCkNCj4gICAgICAgICBtZW1vcnlfcmVnaW9uX3VwZGF0ZV9w
-ZW5kaW5nID0gZmFsc2U7DQo+ICAgICAgICAgaW9ldmVudGZkX3VwZGF0ZV9wZW5kaW5nID0gZmFs
-c2U7DQo+ICAgIH0NCj4gDQo+IElmIG1lbW9yeV9yZWdpb25fdHJhbnNhY3Rpb25fZGVwdGggaXMg
-PiAwIHRoZSBiZWdpbi9jb21taXQgcGFpciBkb2VzDQo+IG5vdGhpbmcuDQo+IA0KPiBCdXQgaWYg
-bWVtb3J5X3JlZ2lvbl90cmFuc2FjdGlvbl9kZXB0aCBpcyA9PSAwLCB0aGVyZSBzaG91bGQgYmUg
-bm8gdXBkYXRlDQo+IHBlbmRpbmcgYmVjYXVzZSB0aGUgbG9vcCBoYXMgbmV2ZXIgcnVuLiAgU28g
-SSBkb24ndCBzZWUgd2hhdCB5b3VyIHBhdGNoIGNhbg0KPiBjaGFuZ2UuDQoNCkFzIEkgbWVudGlv
-bmVkIGluIFBBVENIMSwgdGhpcyBwYXRjaCBpcyB1c2VkIHRvIGZpeCBhbiBpc3N1ZSBhZnRlciB3
-ZSByZW1vdmUNCnRoZSBnbG9iYWwgbG9jayBpbiBSQ1UgY2FsbGJhY2suIEFmdGVyIGdsb2JhbCBs
-b2NrIGlzIHJlbW92ZWQsIG90aGVyIHRocmVhZCBtYXkgDQpzZXQgdXAgdXBkYXRlIHBlbmRpbmcs
-IHNvIG1lbW9yeV9yZWdpb25fdHJhbnNhY3Rpb25fY29tbWl0IA0KbWF5IHRyeSB0byByZWJ1aWxk
-IFBoeXNQYWdlTWFwIGV2ZW4gdGhlIGxvb3AgZG9lc27igJl0IHJ1biwgb3RoZXIgdGhyZWFkIG1h
-eSB0cnkgdG8gDQpyZWJ1aWxkIFBoeXNQYWdlTWFwIGF0IHRoZSBzYW1lIHRpbWUsIGl0IGlzIGEg
-cmFjZSBjb25kaXRpb24uDQpzdWJwYWdlIE1lbW9yeVJlZ2lvbiBpcyBhIHNwZWNpZmljIE1lbW9y
-eVJlZ2lvbiwgaXQgZG9lc24ndCBiZWxvbmcgdG8gYW55IGFkZHJlc3MgDQpzcGFjZSwgaXQgaXMg
-b25seSB1c2VkIHRvIGhhbmRsZSBzdWJwYWdlLiBXZSBtYXkgdXNlIGEgbmV3IHN0cnVjdHVyZSBv
-dGhlciB0aGFuIA0KTWVtb3J5UmVnaW9uIHRvIGhhbmRsZSBzdWJwYWdlIHRvIG1ha2UgdGhlIGxv
-Z2ljIG1vcmUgY2xlYXJlci4gQWZ0ZXIgdGhlIGNoYW5nZSwgDQpSQ1UgY2FsbGJhY2sgd2lsbCBu
-b3QgZnJlZSBhbnkgTWVtb3J5UmVnaW9uLiANCg0KDQpBbnRob255DQoNCj4gDQo+IE9mIGNvdXJz
-ZSB0aGVyZSBjb3VsZCBiZSBhbiB1cGRhdGUgcGVuZGluZyBiZWNhdXNlIG9mIGEgYnVnIGVsc2V3
-aGVyZSwNCj4gYnV0IEkgdHJpZWQgYWRkaW5nIHRoaXMgcGF0Y2g6DQo+IA0KPiBkaWZmIC0tZ2l0
-IGEvbWVtb3J5LmMgYi9tZW1vcnkuYw0KPiBpbmRleCAyODQ4OTRiLi4yMjA4YTIxIDEwMDY0NA0K
-PiAtLS0gYS9tZW1vcnkuYw0KPiArKysgYi9tZW1vcnkuYw0KPiBAQCAtOTAzLDYgKzkwMywxMCBA
-QCBzdGF0aWMgdm9pZA0KPiBhZGRyZXNzX3NwYWNlX3VwZGF0ZV90b3BvbG9neShBZGRyZXNzU3Bh
-Y2UgKmFzKSAgdm9pZA0KPiBtZW1vcnlfcmVnaW9uX3RyYW5zYWN0aW9uX2JlZ2luKHZvaWQpDQo+
-ICB7DQo+ICAgICAgcWVtdV9mbHVzaF9jb2FsZXNjZWRfbW1pb19idWZmZXIoKTsNCj4gKyAgICBp
-ZiAoIW1lbW9yeV9yZWdpb25fdHJhbnNhY3Rpb25fZGVwdGgpIHsNCj4gKyAgICAgICAgYXNzZXJ0
-KCFtZW1vcnlfcmVnaW9uX3VwZGF0ZV9wZW5kaW5nKTsNCj4gKyAgICAgICAgYXNzZXJ0KCFpb2V2
-ZW50ZmRfdXBkYXRlX3BlbmRpbmcpOw0KPiArICAgIH0NCj4gICAgICArK21lbW9yeV9yZWdpb25f
-dHJhbnNhY3Rpb25fZGVwdGg7DQo+ICB9DQo+IA0KPiBhbmQgYXQgbGVhc3QgYSBiYXNpYyBxZW11
-LXN5c3RlbS14ODZfNjQgcnVuIHN0YXJ0ZWQganVzdCBmaW5lLiAgU28gd2h5IGRvZXMNCj4gdGhp
-cyBwYXRjaCBtYWtlIGEgZGlmZmVyZW5jZT8NCj4gDQo+IFBhb2xvDQo+IA0KPiA+ICAgICAgfQ0K
-PiA+IC0gICAgbWVtb3J5X3JlZ2lvbl90cmFuc2FjdGlvbl9jb21taXQoKTsNCj4gPiAtDQo=
+On Fri, Mar 10, 2017 at 10:18:26AM +0100, Paolo Bonzini wrote:
+> 
+> 
+> On 09/03/2017 19:20, Eduardo Habkost wrote:
+> > (This missed hard freeze, but I would still like to include the
+> > warning in 2.9 so we can remove the default config file in 2.10.
+> > I will include this series in a pull request only if at least 2
+> > other maintainers send their Acked-by.)
+> > 
+> > We plan to remove support for /etc/qemu/qemu.conf in the near
+> > future. Make QEMU print a warning in case there a non-empty
+> > /etc/qemu/qemu.conf is loaded, so users have time to adapt.
+> 
+> Thanks, it's certainly good to have this in 2.9.
+
+Thanks. Do you want to queue it?
+
+-- 
+Eduardo
