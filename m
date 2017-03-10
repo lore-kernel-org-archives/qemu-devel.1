@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58028)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cmC9v-0007cJ-Md
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 23:28:09 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cmCCe-0008EW-Ig
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 23:30:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cmC9q-0002g7-PX
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 23:28:07 -0500
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:34261)
+	(envelope-from <stefanha@gmail.com>) id 1cmCCa-0003eX-La
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 23:30:56 -0500
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:33995)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cmC9q-0002fr-Jw
-	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 23:28:02 -0500
-Received: by mail-pf0-x244.google.com with SMTP id o126so9418733pfb.1
-	for <qemu-devel@nongnu.org>; Thu, 09 Mar 2017 20:28:02 -0800 (PST)
-Date: Fri, 10 Mar 2017 12:27:56 +0800
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cmCCa-0003dd-G3
+	for qemu-devel@nongnu.org; Thu, 09 Mar 2017 23:30:52 -0500
+Received: by mail-pg0-x242.google.com with SMTP id b5so8941264pgg.1
+	for <qemu-devel@nongnu.org>; Thu, 09 Mar 2017 20:30:52 -0800 (PST)
+Date: Fri, 10 Mar 2017 12:30:48 +0800
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170310042756.GB4589@stefanha-x1.localdomain>
+Message-ID: <20170310043048.GC4589@stefanha-x1.localdomain>
 References: <20170303113255.28262-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="tjCHc7DPkfUGtrlw"
+	protocol="application/pgp-signature"; boundary="lCAWRPmW1mITcIfM"
 Content-Disposition: inline
 In-Reply-To: <20170303113255.28262-1-berrange@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH v3] os: don't corrupt pre-existing
@@ -34,7 +34,7 @@ To: "Daniel P. Berrange" <berrange@redhat.com>
 Cc: qemu-devel@nongnu.org, Andrea Arcangeli <aarcange@redhat.com>, Michal Privoznik <mprivozn@redhat.com>, Jitendra Kolhe <jitendra.kolhe@hpe.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 
---tjCHc7DPkfUGtrlw
+--lCAWRPmW1mITcIfM
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
@@ -62,20 +62,26 @@ On Fri, Mar 03, 2017 at 11:32:55AM +0000, Daniel P. Berrange wrote:
 >  util/oslib-posix.c | 15 ++++++++++++++-
 >  1 file changed, 14 insertions(+), 1 deletion(-)
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+There are no official maintainers for this source file.  I want to make
+sure this patch goes into QEMU 2.9, so...
 
---tjCHc7DPkfUGtrlw
+Thanks, applied to my block tree:
+https://github.com/stefanha/qemu/commits/block
+
+Stefan
+
+--lCAWRPmW1mITcIfM
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJYwitMAAoJEJykq7OBq3PI0h4IAKsI1M1587YVwIFH30JKnwW+
-lSuu+KeNP32TtdYA/vcVEoh89xQEAuQOSfddqsExFrzuRr6y392PHLInRlN7Gsun
-ip8RD4SsS4Fl1Nr/0LGe7803D0jelqKaEte/4qtHLU3KS2tRdUctJLriT1isIEfg
-ebgQYtohz3SC9kjro5nnYFm/48HFs8JtW6rDFYSZ88s5Q2a2p3AD0UEyUdxg0xNm
-VENtVFISXsknE393BjYdDIo5u+2Ax38JslUtCtHWjEpQaiDFvlrPuW5xep/Xjo4O
-OF0762Oj6kp/TYL94ZgpXPhPExb8IafrXMMeueDtogUjD4Tf4lm7OHmkZz1Oei0=
-=rQCK
+iQEcBAEBAgAGBQJYwiv4AAoJEJykq7OBq3PIQKYH/jwJpMTRqQl1OVoL4pYl8qps
+TWZAVkBF55FTpU/OgrofJrRMPmaJwOrg0aVuYoJbwGX3uMN4aYFj7qj9eliYJInM
+C4Gxk08FsBmnL+lvzu70AREaIZT6CMNvqN5VX7XAD+TM7JlPH6iMWa11m6WovUQS
+i3Y7GjnOO1UBsfY5Ufr3dkChyuFptDuXPOgBDgGOQJr9kx0LyXr9wt2REK58QnEK
+rQgpMGIusiGnOlqTcwZeQRwV6cXADYoLQQoLNSZg98GDkrWsKYFcuJWk+47+ITAE
+ykjT3TPXwmFOD7qjbffsDkeJ3Q4kZjYJiVGoT/NEOxFD391EGU0Esirg3EYc7Kw=
+=o3Cx
 -----END PGP SIGNATURE-----
 
---tjCHc7DPkfUGtrlw--
+--lCAWRPmW1mITcIfM--
