@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42884)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cmGyd-0006nV-1m
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 04:36:48 -0500
+	(envelope-from <bounces@canonical.com>) id 1cmH3Y-00005X-WD
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 04:41:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cmGyZ-0000Wl-OW
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 04:36:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58054)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cmGyZ-0000WJ-J1
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 04:36:43 -0500
-Date: Fri, 10 Mar 2017 17:36:38 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170310093638.GG17299@pxdev.xzpeter.org>
-References: <1489119213-977-1-git-send-email-peterx@redhat.com>
-	<da6200fe-c0ac-00bb-d0b7-dbf3c5a8a21f@redhat.com>
-	<20170310085917.GF17299@pxdev.xzpeter.org>
-	<CAFEAcA9-xxzf-C4j+UPvv9La6pJc+gT2yE1izaej84Dd0SC+2g@mail.gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1cmH3V-0003GT-Lr
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 04:41:53 -0500
+Received: from indium.canonical.com ([91.189.90.7]:33928)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cmH3V-0003FN-FE
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 04:41:49 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cmH3T-0001Tk-T3
+	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 09:41:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 12A722E81FF
+	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 09:41:45 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9-xxzf-C4j+UPvv9La6pJc+gT2yE1izaej84Dd0SC+2g@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] hostmem: fix reference to uninit mr
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 10 Mar 2017 09:28:49 -0000
+From: Rudolf Marek <1645355@bugs.launchpad.net>
+Reply-To: Bug 1645355 <1645355@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20161128150552.28561.31457.malonedeb@soybean.canonical.com>
+Message-Id: <20170310092849.25439.46661.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1645355] Re: x86: singlestepping through SYSCALL
+ instruction causes exception in kernelspace
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +37,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Fri, Mar 10, 2017 at 10:17:30AM +0100, Peter Maydell wrote:
-> On 10 March 2017 at 09:59, Peter Xu <peterx@redhat.com> wrote:
-> > On Fri, Mar 10, 2017 at 09:33:57AM +0100, Paolo Bonzini wrote:
-> >>
-> >>
-> >> On 10/03/2017 05:13, Peter Xu wrote:
-> >> > Trying to get memory region size of an uninitialized memory region is
-> >> > probably not a good idea. Let's just do the alloc no matter what.
-> >> >
-> >> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> >>
-> >> What is the effect of the bug? The idea was to do the initialization
-> >> once only (memory_region_size ought to be 0 when the MR is
-> >> uninitialized; now it is ugly but it made more sense when MemoryRegion
-> >> was just a C struct and not a QOM object).
-> >
-> > It's not really a bug. I just saw it, thought it was something not
-> > quite right, so posted a patch.
-> 
-> We could reasonably abstract out the test into a function
-> bool backend_mr_initialized(HostMemoryBackend *backend)
-> {
->     /* We forbid zero-length in file_backend_memory_alloc,
->      * so zero always means "we haven't allocated the backend
->      * MR yet".
->      */
->     return memory_region_size(&backend->mr) != 0;
-> }
-> 
-> and use it in file_backend_memory_alloc(), set_mem_path()
-> and file_memory_backend_set_share(). That would make the intent
-> clearer here I think.
+Hi Andreas, man thanks for your reply. I can confirm that applying the
+two patches fixes my problem in the older version of the QEMU.
 
-Agree, maybe use it in hostmem.c as well where capable?
+** Changed in: qemu
+       Status: New =3D> Fix Committed
 
-(Paolo: I wasn't planning to add anything there, but if any of you
- like me to do this cleanup, I would be glad to :)
+-- =
 
--- peterx
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1645355
+
+Title:
+  x86: singlestepping through SYSCALL instruction causes exception in
+  kernelspace
+
+Status in QEMU:
+  Fix Committed
+
+Bug description:
+  Hi,
+
+  The bug was originally reported [1] and [2] here. There is a problem
+  inside QEMU with singlestepping from userspace until SYSCALL
+  instruction is reached. The OS has in FMASK TF bit set, therefore
+  there should be no singlestepping exception when transitioning to
+  kernelmode. But, inside QEMU there is (TF is clear seems FMASK is
+  applied). See below for further details.
+
+  The reproducer is available at [2].
+
+  Here is the original text with some minor clarifications:
+
+  It seems that there is something wrong with QEMU with respect to
+  handle the singlestepping and AMD64 syscall instruction.
+
+  The AMD "syscall" instruction will clear defined flag in the FMASK
+  MSR. Normally the TF flag is set there, so the first instruction when
+  kernel is entered after syscall won't cause single step exception in
+  the kernel.
+
+  The observed scenario is a unhandled singlestep fault in the kernel or
+  host reboot or QEMU crash.
+
+  The possible way how to reproduce it is to single step through any
+  function (in userspace) which does "syscall" instruction. After
+  syscall is entered QEMU will trigger singlestepping exception in the
+  kernel despite that the TF is set in FMASK MSR. Real HW behaves
+  correctly and does not trigger this exception.
+
+  =
+
+  What is interesting is that I was not able to trigger it if I just enable=
+d TF and did the syscall instruction, perhaps for this bug is somewhat impo=
+rtant to have TF set for previous few instruction.
+
+  =
+
+  I have stumbled to this problem while working with our custom OS. However=
+ after some googling I found out that the NetBSD guys (CCed) are having ver=
+y similar problem and I asked them to prepare a ISO image where the problem=
+ ends with QEMU SIGSEGV or host reboot. =
+
+
+  Thanks
+  Rudolf
+
+  [1] https://lists.gnu.org/archive/html/qemu-devel/2015-10/msg02289.html
+  [2] http://gnats.netbsd.org/49603
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1645355/+subscriptions
