@@ -1,38 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cmI43-0002N7-Rl
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 05:46:28 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cmIC7-00048r-SF
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 05:54:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cmI3z-0006wF-VJ
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 05:46:27 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48082)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cmI3z-0006vn-LW
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 05:46:23 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2AAhqeJ027350
-	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 05:46:21 -0500
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2937e712b2-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 05:46:21 -0500
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Fri, 10 Mar 2017 10:46:18 -0000
-Date: Fri, 10 Mar 2017 11:46:05 +0100
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <20170309092525.GA10189@bjsdjshi@linux.vnet.ibm.com>
-References: <20170217082939.33208-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170309092525.GA10189@bjsdjshi@linux.vnet.ibm.com>
+	(envelope-from <jasowang@redhat.com>) id 1cmIC4-0001gN-FO
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 05:54:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35432)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cmIC4-0001fZ-6T
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 05:54:44 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8E9BD85547
+	for <qemu-devel@nongnu.org>; Fri, 10 Mar 2017 10:54:42 +0000 (UTC)
+References: <1488877751-13419-1-git-send-email-jasowang@redhat.com>
+	<7594c183-6d38-3dce-75e7-62bf3be324fc@redhat.com>
+	<20170308174043.10c2f056@nial.brq.redhat.com>
+	<322da7ca-793c-fe83-9b9b-aded87742c18@redhat.com>
+	<20170309102849.1db72ad5@nial.brq.redhat.com>
+	<925a58ec-2a6a-6709-8139-db492af7800c@redhat.com>
+	<2add94d5-4d6f-6c62-4d63-085901afc63e@redhat.com>
+	<20170309172959-mutt-send-email-mst@kernel.org>
+	<019a8675-1716-39b1-221f-b70fd17b1700@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <f384923d-70c0-58fe-8c0d-8eba15e1477e@redhat.com>
+Date: Fri, 10 Mar 2017 18:54:35 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170310114605.1353e810.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v3 00/15] basic vfio-ccw infrastructure
+In-Reply-To: <019a8675-1716-39b1-221f-b70fd17b1700@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH V3] virtio: do not require IOMMU to be
+ created in advance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,41 +41,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, wkywang@linux.vnet.ibm.com
+To: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org, peterx@redhat.com
 
-On Thu, 9 Mar 2017 17:25:25 +0800
-Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
 
-> * Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> [2017-02-17 09:29:24 +0100]:
-> 
-> > vfio-ccw: the basic infrastructure
-> > ==================================
-> > 
-> > Introduction
-> > ------------
-> > 
-> > Here we describe the vfio support for I/O subchannel devices for
-> > Linux/s390. Motivation for vfio-ccw is to passthrough subchannels to a
-> > virtual machine, while vfio is the means.
-> > 
-> 
-> Ping.
-> 
-> Any more comment for this version?
-> 
-> Thanks.
-> 
-> [...]
-> 
 
-I just walked through the patch set again and did not notice anything
-else. There's still the area of channel path handling, but I don't see
-why it shouldn't be able to fit into the infrastructure you introduce
-here. (I'd expect most of the interesting stuff there to be handled in
-user space anyway.)
+On 2017=E5=B9=B403=E6=9C=8809=E6=97=A5 23:32, Paolo Bonzini wrote:
+>
+> On 09/03/2017 16:31, Michael S. Tsirkin wrote:
+>> On Thu, Mar 09, 2017 at 11:05:36AM +0100, Paolo Bonzini wrote:
+>>>
+>>> On 09/03/2017 10:58, Jason Wang wrote:
+>>>>
+>>>> On 2017=E5=B9=B403=E6=9C=8809=E6=97=A5 17:28, Igor Mammedov wrote:
+>>>>> On Thu, 9 Mar 2017 10:32:44 +0800
+>>>>> Jason Wang<jasowang@redhat.com>  wrote:
+>>>>>
+>>>>>> On 2017=E5=B9=B403=E6=9C=8809=E6=97=A5 00:40, Igor Mammedov wrote:
+>>>>>>> On Tue, 7 Mar 2017 14:47:30 +0200
+>>>>>>> Marcel Apfelbaum<marcel@redhat.com>   wrote:
+>>>>>>>  =20
+>>>>>>>> On 03/07/2017 11:09 AM, Jason Wang wrote:
+>>>>>>>>> After commit 96a8821d2141 ("virtio: unbreak virtio-pci with IOM=
+MU
+>>>>>>>>> after caching ring translations"), IOMMU was required to be
+>>>>>>>>> created in
+>>>>>>>>> advance. This is because we can only get the correct dma_as aft=
+er pci
+>>>>>>>>> IOMMU (e.g intel_iommu) was initialized. This is suboptimal and
+>>>>>>>>> inconvenient for user. This patch releases this by:
+>>>>>>>>>
+>>>>>>>>> - introduce a bus_master_ready method for PCIDeviceClass and tr=
+igger
+>>>>>>>>>      this during pci_init_bus_master
+>>>>>>>>> - implement virtio-pci method and 1) reset the dma_as 2) re-reg=
+ister
+>>>>>>>>>      the memory listener to the new dma_as
+>>>>> Instead of trying to fix up later it's possible to refuse
+>>>>> adding iommu device if other devices has been added before
+>>>>> it with -device/device_add.
+>>>>> That would match current CLI semantics where device that
+>>>>> others depend on should be listed on CLI before that others
+>>>>> are listed.
+>>>> Yes, but it works by chance in the past for the device that does not
+>>>> want bus_master_as in their realize. This change may surprise their =
+users.
+>>> There is another posssibility.  Create the address space at init time
+>>> and add a container region instead of the bus_master_enable_region
+>>> alias.  Then at machine_done time you create the bus_master_enable_re=
+gion.
+>>>
+>>> This removes the need for the callbacks and makes the MemoryListener
+>>> just work.
+>>>
+>>> Paolo
+>> That's definitely cleaner than a callback, though a bit tricky
+>> so needs a good comment explaining what is going on.
+>> And then I think we can revert
+>> 96a8821d21411f10d77ea994af369c6e5c35a2cc, right?
+> Yes. 96a8821d21411f10d77ea994af369c6e5c35a2cc can go then (and this is
+> how I expected it to work all the time---my bad).
+>
+> Paolo
+>
+>
 
-You should update MAINTAINERS, though. I'm not sure the s390 cio folks
-are prepared to handle vfio-ccw :) (although I think you should cc:
-them on the patches exporting cio interfaces.) It's probably best to
-take vfio-ccw through the kvm-s390 tree.
+Will prepare patches for this (probably next week).
+
+Thanks
