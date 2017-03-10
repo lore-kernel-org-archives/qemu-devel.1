@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1cmDOC-000100-IZ
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 00:46:57 -0500
+	(envelope-from <peterx@redhat.com>) id 1cmEbS-00045g-Mm
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 02:04:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1cmDOA-0002RC-02
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 00:46:56 -0500
-Received: from mga11.intel.com ([192.55.52.93]:48331)
+	(envelope-from <peterx@redhat.com>) id 1cmEbP-0007Ij-J0
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 02:04:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54454)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1cmDO9-0002Pn-O0
-	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 00:46:53 -0500
-From: Yang Zhong <yang.zhong@intel.com>
-Date: Fri, 10 Mar 2017 21:44:35 +0800
-Message-Id: <1489153475-14888-1-git-send-email-yang.zhong@intel.com>
-Subject: [Qemu-devel] [PATCH v2] memory: reduce heap Rss size around 3M
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cmEbP-0007Hz-DE
+	for qemu-devel@nongnu.org; Fri, 10 Mar 2017 02:04:39 -0500
+Date: Fri, 10 Mar 2017 15:04:30 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170310070430.GE17299@pxdev.xzpeter.org>
+References: <1488425538-13785-1-git-send-email-peterx@redhat.com>
+	<20170302071100-mutt-send-email-mst@kernel.org>
+	<213ff4bb-b3b9-fe00-6f0e-b75114e1a5ef@redhat.com>
+	<1149211275.29885713.1488962150826.JavaMail.zimbra@redhat.com>
+	<20170308085917.GC7135@pxdev.xzpeter.org>
+	<1488965141.6514.33.camel@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1488965141.6514.33.camel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] intel_iommu: check misordered init when
+ realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,30 +32,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, anthony.xu@intel.com, Yang Zhong <yang.zhong@intel.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, yi l liu <yi.l.liu@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
 
-Since cpu-memory and memory have same address space,one malloced
-memory is enough. This patch will skip memory malloc for memory
-address space,which will reduce around 3M physical memory in heap.
+On Wed, Mar 08, 2017 at 10:25:41AM +0100, Gerd Hoffmann wrote:
+> > Current QEMU should have no restriction on parameter ordering, right?
+> > Or do we have any existing case that:
+> > 
+> >   "$QEMU -parameter1 -parameter2"
+> > 
+> > will work, while...
+> > 
+> >   "$QEMU -parameter2 -parameter1"
+> > 
+> > won't work?
+> 
+> Well, we have.  If you, for example, add a scsi disk, you have to add a
+> scsi host adapter first.
 
-Signed-off-by: Yang Zhong <yang.zhong@intel.com>
----
- memory.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I wasn't aware of that... Thanks!
 
-diff --git a/memory.c b/memory.c
-index 284894b..6af80e7 100644
---- a/memory.c
-+++ b/memory.c
-@@ -2422,7 +2422,7 @@ AddressSpace *address_space_init_shareable(MemoryRegion *root, const char *name)
-     AddressSpace *as;
- 
-     QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
--        if (root == as->root && as->malloced) {
-+        if (root == as->root) {
-             as->ref_count++;
-             return as;
-         }
--- 
-1.9.1
+-- peterx
