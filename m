@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39805)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <deller@gmx.de>) id 1cmlmn-0005Cp-F7
-	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 13:30:38 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cmlqS-0005vI-9K
+	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 13:34:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <deller@gmx.de>) id 1cmlmj-0003VS-HN
-	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 13:30:37 -0500
-Received: from mout.gmx.net ([212.227.17.22]:65443)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <deller@gmx.de>) id 1cmlmj-0003UB-79
-	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 13:30:33 -0500
-Date: Sat, 11 Mar 2017 19:30:16 +0100
-From: Helge Deller <deller@gmx.de>
-Message-ID: <20170311183016.GA20514@ls3530.fritz.box>
+	(envelope-from <no-reply@patchew.org>) id 1cmlqO-0005IV-Bu
+	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 13:34:24 -0500
+Resent-Message-Id: <E1cmlqO-0005IV-Bu@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21310)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cmlqO-0005H6-4f
+	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 13:34:20 -0500
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148925723343.33.17551118844466062434@6c512846dbc7>
+In-Reply-To: <20170311183016.GA20514@ls3530.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] [PATCH] linux-user: Add TARGET_MAP_STACK and
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sat, 11 Mar 2017 10:33:53 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] linux-user: Add TARGET_MAP_STACK and
  TARGET_MAP_HUGETLB for all remaining architectures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,65 +29,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
-Cc: Richard Henderson <rth@twiddle.net>
+To: deller@gmx.de
+Cc: famz@redhat.com, qemu-devel@nongnu.org, riku.voipio@iki.fi, rth@twiddle.net
 
-Add the missing defines and for TARGET_MAP_STACK and TARGET_MAP_HUGETLB
-for alpha, mips, ppc and x86, and fix the mmap_flags translation table
-to translate those flags between host and target architecture.
-
-Signed-off-by: Helge Deller <deller@gmx.de>
-
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index cec8428..03ed370 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -5875,6 +5875,8 @@ static bitmask_transtbl mmap_flags_tbl[] = {
- 	{ TARGET_MAP_LOCKED, TARGET_MAP_LOCKED, MAP_LOCKED, MAP_LOCKED },
-         { TARGET_MAP_NORESERVE, TARGET_MAP_NORESERVE, MAP_NORESERVE,
-           MAP_NORESERVE },
-+	{ TARGET_MAP_STACK, TARGET_MAP_STACK, MAP_STACK, MAP_STACK },
-+	{ TARGET_MAP_HUGETLB, TARGET_MAP_HUGETLB, MAP_HUGETLB, MAP_HUGETLB },
- 	{ 0, 0, 0, 0 }
- };
- 
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index f356189..a516d77 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -1346,6 +1346,8 @@ struct target_winsize {
- #define TARGET_MAP_NORESERVE	0x0400		/* don't check for reservations */
- #define TARGET_MAP_POPULATE	0x10000		/* populate (prefault) pagetables */
- #define TARGET_MAP_NONBLOCK	0x20000		/* do not block on IO */
-+#define TARGET_MAP_STACK	0x40000		/* give out an address that is best suited for process/thread stacks */
-+#define TARGET_MAP_HUGETLB	0x80000		/* create a huge page mapping */
- #elif defined(TARGET_PPC)
- #define TARGET_MAP_FIXED	0x10		/* Interpret addr exactly */
- #define TARGET_MAP_ANONYMOUS	0x20		/* don't use a file */
-@@ -1356,6 +1358,8 @@ struct target_winsize {
- #define TARGET_MAP_NORESERVE	0x0040		/* don't check for reservations */
- #define TARGET_MAP_POPULATE	0x8000		/* populate (prefault) pagetables */
- #define TARGET_MAP_NONBLOCK	0x10000		/* do not block on IO */
-+#define TARGET_MAP_STACK	0x20000		/* give out an address that is best suited for process/thread stacks */
-+#define TARGET_MAP_HUGETLB	0x40000		/* create a huge page mapping */
- #elif defined(TARGET_ALPHA)
- #define TARGET_MAP_ANONYMOUS	0x10		/* don't use a file */
- #define TARGET_MAP_FIXED	0x100		/* Interpret addr exactly */
-@@ -1366,6 +1370,8 @@ struct target_winsize {
- #define TARGET_MAP_NORESERVE	0x10000		/* no check for reservations */
- #define TARGET_MAP_POPULATE	0x20000		/* pop (prefault) pagetables */
- #define TARGET_MAP_NONBLOCK	0x40000		/* do not block on IO */
-+#define TARGET_MAP_STACK	0x80000		/* give out an address that is best suited for process/thread stacks */
-+#define TARGET_MAP_HUGETLB	0x100000	/* create a huge page mapping */
- #elif defined(TARGET_HPPA)
- #define TARGET_MAP_ANONYMOUS	0x10		/* don't use a file */
- #define TARGET_MAP_FIXED	0x04		/* Interpret addr exactly */
-@@ -1388,6 +1394,8 @@ struct target_winsize {
- #define TARGET_MAP_NORESERVE	0x4000		/* don't check for reservations */
- #define TARGET_MAP_POPULATE	0x8000		/* populate (prefault) pagetables */
- #define TARGET_MAP_NONBLOCK	0x10000		/* do not block on IO */
-+#define TARGET_MAP_STACK	0x20000		/* give out an address that is best suited for process/thread stacks */
-+#define TARGET_MAP_HUGETLB	0x40000		/* create a huge page mapping */
- #define TARGET_MAP_UNINITIALIZED 0x4000000	/* for anonymous mmap, memory could be uninitialized */
- #endif
- 
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIGxpbnV4LXVzZXI6IEFkZCBUQVJHRVRfTUFQX1NU
+QUNLIGFuZCBUQVJHRVRfTUFQX0hVR0VUTEIgZm9yIGFsbCByZW1haW5pbmcgYXJjaGl0ZWN0dXJl
+cwpNZXNzYWdlLWlkOiAyMDE3MDMxMTE4MzAxNi5HQTIwNTE0QGxzMzUzMC5mcml0ei5ib3gKCj09
+PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9
+JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBn
+aXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0
+PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJD
+aGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4u
+LiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2tw
+YXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8K
+ICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQg
+RU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
+NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVw
+ZGF0ZV0gICAgICBwYXRjaGV3LzIwMTcwMzExMDM0MjMyLjE0MjEzLTEtcnRoQHR3aWRkbGUubmV0
+IC0+IHBhdGNoZXcvMjAxNzAzMTEwMzQyMzIuMTQyMTMtMS1ydGhAdHdpZGRsZS5uZXQKICogW25l
+dyB0YWddICAgICAgICAgcGF0Y2hldy8yMDE3MDMxMTE4MzAxNi5HQTIwNTE0QGxzMzUzMC5mcml0
+ei5ib3ggLT4gcGF0Y2hldy8yMDE3MDMxMTE4MzAxNi5HQTIwNTE0QGxzMzUzMC5mcml0ei5ib3gK
+U3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo4YzQ2NWEyIGxpbnV4LXVzZXI6IEFkZCBU
+QVJHRVRfTUFQX1NUQUNLIGFuZCBUQVJHRVRfTUFQX0hVR0VUTEIgZm9yIGFsbCByZW1haW5pbmcg
+YXJjaGl0ZWN0dXJlcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBs
+aW51eC11c2VyOiBBZGQgVEFSR0VUX01BUF9TVEFDSyBhbmQgVEFSR0VUX01BUF9IVUdFVExCIGZv
+ciBhbGwgcmVtYWluaW5nIGFyY2hpdGVjdHVyZXMuLi4KRVJST1I6IGNvZGUgaW5kZW50IHNob3Vs
+ZCBuZXZlciB1c2UgdGFicwojMjM6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjU4Nzg6Cite
+SXsgVEFSR0VUX01BUF9TVEFDSywgVEFSR0VUX01BUF9TVEFDSywgTUFQX1NUQUNLLCBNQVBfU1RB
+Q0sgfSwkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMyNDogRklM
+RTogbGludXgtdXNlci9zeXNjYWxsLmM6NTg3OToKK15JeyBUQVJHRVRfTUFQX0hVR0VUTEIsIFRB
+UkdFVF9NQVBfSFVHRVRMQiwgTUFQX0hVR0VUTEIsIE1BUF9IVUdFVExCIH0sJAoKRVJST1I6IGxp
+bmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMzNjogRklMRTogbGludXgtdXNlci9zeXNjYWxsX2RlZnMu
+aDoxMzI0OgorI2RlZmluZSBUQVJHRVRfTUFQX1NUQUNLCTB4NDAwMDAJCS8qIGdpdmUgb3V0IGFu
+IGFkZHJlc3MgdGhhdCBpcyBiZXN0IHN1aXRlZCBmb3IgcHJvY2Vzcy90aHJlYWQgc3RhY2tzICov
+CgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzNjogRklMRTogbGlu
+dXgtdXNlci9zeXNjYWxsX2RlZnMuaDoxMzI0OgorI2RlZmluZSBUQVJHRVRfTUFQX1NUQUNLXkkw
+eDQwMDAwXkleSS8qIGdpdmUgb3V0IGFuIGFkZHJlc3MgdGhhdCBpcyBiZXN0IHN1aXRlZCBmb3Ig
+cHJvY2Vzcy90aHJlYWQgc3RhY2tzICovJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZl
+ciB1c2UgdGFicwojMzc6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbF9kZWZzLmg6MTMyNToKKyNk
+ZWZpbmUgVEFSR0VUX01BUF9IVUdFVExCXkkweDgwMDAwXkleSS8qIGNyZWF0ZSBhIGh1Z2UgcGFn
+ZSBtYXBwaW5nICovJAoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM0NTogRklMRTog
+bGludXgtdXNlci9zeXNjYWxsX2RlZnMuaDoxMzM2OgorI2RlZmluZSBUQVJHRVRfTUFQX1NUQUNL
+CTB4MjAwMDAJCS8qIGdpdmUgb3V0IGFuIGFkZHJlc3MgdGhhdCBpcyBiZXN0IHN1aXRlZCBmb3Ig
+cHJvY2Vzcy90aHJlYWQgc3RhY2tzICovCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVy
+IHVzZSB0YWJzCiM0NTogRklMRTogbGludXgtdXNlci9zeXNjYWxsX2RlZnMuaDoxMzM2OgorI2Rl
+ZmluZSBUQVJHRVRfTUFQX1NUQUNLXkkweDIwMDAwXkleSS8qIGdpdmUgb3V0IGFuIGFkZHJlc3Mg
+dGhhdCBpcyBiZXN0IHN1aXRlZCBmb3IgcHJvY2Vzcy90aHJlYWQgc3RhY2tzICovJAoKRVJST1I6
+IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDY6IEZJTEU6IGxpbnV4LXVzZXIv
+c3lzY2FsbF9kZWZzLmg6MTMzNzoKKyNkZWZpbmUgVEFSR0VUX01BUF9IVUdFVExCXkkweDQwMDAw
+XkleSS8qIGNyZWF0ZSBhIGh1Z2UgcGFnZSBtYXBwaW5nICovJAoKRVJST1I6IGxpbmUgb3ZlciA5
+MCBjaGFyYWN0ZXJzCiM1NDogRklMRTogbGludXgtdXNlci9zeXNjYWxsX2RlZnMuaDoxMzQ4Ogor
+I2RlZmluZSBUQVJHRVRfTUFQX1NUQUNLCTB4ODAwMDAJCS8qIGdpdmUgb3V0IGFuIGFkZHJlc3Mg
+dGhhdCBpcyBiZXN0IHN1aXRlZCBmb3IgcHJvY2Vzcy90aHJlYWQgc3RhY2tzICovCgpFUlJPUjog
+Y29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM1NDogRklMRTogbGludXgtdXNlci9z
+eXNjYWxsX2RlZnMuaDoxMzQ4OgorI2RlZmluZSBUQVJHRVRfTUFQX1NUQUNLXkkweDgwMDAwXkle
+SS8qIGdpdmUgb3V0IGFuIGFkZHJlc3MgdGhhdCBpcyBiZXN0IHN1aXRlZCBmb3IgcHJvY2Vzcy90
+aHJlYWQgc3RhY2tzICovJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFi
+cwojNTU6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbF9kZWZzLmg6MTM0OToKKyNkZWZpbmUgVEFS
+R0VUX01BUF9IVUdFVExCXkkweDEwMDAwMF5JLyogY3JlYXRlIGEgaHVnZSBwYWdlIG1hcHBpbmcg
+Ki8kCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzYzOiBGSUxFOiBsaW51eC11c2Vy
+L3N5c2NhbGxfZGVmcy5oOjEzNzA6CisjZGVmaW5lIFRBUkdFVF9NQVBfU1RBQ0sJMHgyMDAwMAkJ
+LyogZ2l2ZSBvdXQgYW4gYWRkcmVzcyB0aGF0IGlzIGJlc3Qgc3VpdGVkIGZvciBwcm9jZXNzL3Ro
+cmVhZCBzdGFja3MgKi8KCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMK
+IzYzOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjEzNzA6CisjZGVmaW5lIFRBUkdF
+VF9NQVBfU1RBQ0teSTB4MjAwMDBeSV5JLyogZ2l2ZSBvdXQgYW4gYWRkcmVzcyB0aGF0IGlzIGJl
+c3Qgc3VpdGVkIGZvciBwcm9jZXNzL3RocmVhZCBzdGFja3MgKi8kCgpFUlJPUjogY29kZSBpbmRl
+bnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM2NDogRklMRTogbGludXgtdXNlci9zeXNjYWxsX2Rl
+ZnMuaDoxMzcxOgorI2RlZmluZSBUQVJHRVRfTUFQX0hVR0VUTEJeSTB4NDAwMDBeSV5JLyogY3Jl
+YXRlIGEgaHVnZSBwYWdlIG1hcHBpbmcgKi8kCgp0b3RhbDogMTQgZXJyb3JzLCAwIHdhcm5pbmdz
+LCA0MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
+IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
+cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
+Cgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoK
+LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRj
+aGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJl
+ZWxpc3RzLm9yZw==
