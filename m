@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58559)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cmgzS-0001v1-1i
-	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 08:23:26 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cmgzW-0001yB-4X
+	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 08:23:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cmgzQ-0002Rc-Ox
-	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 08:23:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44814)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cmgzU-0002Sk-AP
+	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 08:23:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40364)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cmgzQ-0002RB-Gp
-	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 08:23:20 -0500
+	id 1cmgzU-0002ST-1p
+	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 08:23:24 -0500
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Sat, 11 Mar 2017 17:22:40 +0400
-Message-Id: <20170311132256.22951-6-marcandre.lureau@redhat.com>
+Date: Sat, 11 Mar 2017 17:22:41 +0400
+Message-Id: <20170311132256.22951-7-marcandre.lureau@redhat.com>
 In-Reply-To: <20170311132256.22951-1-marcandre.lureau@redhat.com>
 References: <20170311132256.22951-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 05/21] qapi: update the qobject visitor to use
- QUInt
+Subject: [Qemu-devel] [PATCH 06/21] json: learn to parse uint64 numbers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,187 +30,175 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, anderson@redhat.com, mdroth@linux.vnet.ibm.com, armbru@redhat.com, lersek@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
+If the parsed number doesn't fit in a int64, try with a uint64 before
+falling back to double.
+
+Switch strtoll() usage to qemu_strtoi64() helper while at it.
+
+Add a few tests for large numbers.
+
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- scripts/qapi-visit.py               |  3 ++-
- qapi/qobject-input-visitor.c        | 30 ++++++++++++++++++++++++------
- qapi/qobject-output-visitor.c       |  3 +--
- tests/test-qobject-input-visitor.c  | 15 +++++++++++++++
- tests/test-qobject-output-visitor.c | 19 +++++++++++++++----
- 5 files changed, 57 insertions(+), 13 deletions(-)
+ qobject/json-lexer.c  |  4 ++++
+ qobject/json-parser.c | 19 +++++++++++++++++--
+ qobject/qjson.c       |  8 ++++++++
+ tests/check-qjson.c   | 28 ++++++++++++++++++++++++++++
+ 4 files changed, 57 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/qapi-visit.py b/scripts/qapi-visit.py
-index 330b9f321b..532f929e18 100644
---- a/scripts/qapi-visit.py
-+++ b/scripts/qapi-visit.py
-@@ -165,7 +165,8 @@ def gen_visit_alternate(name, variants):
-     promote_int =3D 'true'
-     ret =3D ''
-     for var in variants.variants:
--        if var.type.alternate_qtype() =3D=3D 'QTYPE_QINT':
-+        if var.type.alternate_qtype() =3D=3D 'QTYPE_QINT' \
-+            or var.type.alternate_qtype() =3D=3D 'QTYPE_QUINT':
-             promote_int =3D 'false'
+diff --git a/qobject/json-lexer.c b/qobject/json-lexer.c
+index af4a75e05b..a0beb0b106 100644
+--- a/qobject/json-lexer.c
++++ b/qobject/json-lexer.c
+@@ -227,15 +227,18 @@ static const uint8_t json_lexer[][256] =3D  {
+     /* escape */
+     [IN_ESCAPE_LL] =3D {
+         ['d'] =3D JSON_ESCAPE,
++        ['u'] =3D JSON_ESCAPE,
+     },
 =20
-     ret +=3D mcgen('''
-diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
-index 865e948ac0..41a825b06b 100644
---- a/qapi/qobject-input-visitor.c
-+++ b/qapi/qobject-input-visitor.c
-@@ -21,6 +21,7 @@
- #include "qapi/qmp/qjson.h"
+     [IN_ESCAPE_L] =3D {
+         ['d'] =3D JSON_ESCAPE,
++        ['u'] =3D JSON_ESCAPE,
+         ['l'] =3D IN_ESCAPE_LL,
+     },
+=20
+     [IN_ESCAPE_I64] =3D {
+         ['d'] =3D JSON_ESCAPE,
++        ['u'] =3D JSON_ESCAPE,
+     },
+=20
+     [IN_ESCAPE_I6] =3D {
+@@ -247,6 +250,7 @@ static const uint8_t json_lexer[][256] =3D  {
+     },
+=20
+     [IN_ESCAPE] =3D {
++        ['u'] =3D JSON_ESCAPE,
+         ['d'] =3D JSON_ESCAPE,
+         ['i'] =3D JSON_ESCAPE,
+         ['p'] =3D JSON_ESCAPE,
+diff --git a/qobject/json-parser.c b/qobject/json-parser.c
+index c18e48ab94..b39cb4d8d6 100644
+--- a/qobject/json-parser.c
++++ b/qobject/json-parser.c
+@@ -12,6 +12,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "qemu/cutils.h"
+ #include "qapi/error.h"
+ #include "qemu-common.h"
  #include "qapi/qmp/types.h"
- #include "qapi/qmp/qerror.h"
-+#include "qemu/error-report.h"
- #include "qemu/cutils.h"
- #include "qemu/option.h"
+@@ -472,6 +473,13 @@ static QObject *parse_escape(JSONParserContext *ctxt=
+, va_list *ap)
+     } else if (!strcmp(token->str, "%lld") ||
+                !strcmp(token->str, "%I64d")) {
+         return QOBJECT(qint_from_int(va_arg(*ap, long long)));
++    } else if (!strcmp(token->str, "%u")) {
++        return QOBJECT(quint_from_uint(va_arg(*ap, unsigned int)));
++    } else if (!strcmp(token->str, "%lu")) {
++        return QOBJECT(quint_from_uint(va_arg(*ap, unsigned long)));
++    } else if (!strcmp(token->str, "%llu") ||
++               !strcmp(token->str, "%I64u")) {
++        return QOBJECT(quint_from_uint(va_arg(*ap, unsigned long long)))=
+;
+     } else if (!strcmp(token->str, "%s")) {
+         return QOBJECT(qstring_from_str(va_arg(*ap, const char *)));
+     } else if (!strcmp(token->str, "%f")) {
+@@ -504,14 +512,21 @@ static QObject *parse_literal(JSONParserContext *ct=
+xt)
+          * strtoll() indicates these instances by setting errno to ERANG=
+E
+          */
+         int64_t value;
++        uint64_t uvalue;
 =20
-@@ -349,7 +350,8 @@ static void qobject_input_start_alternate(Visitor *v,=
- const char *name,
-     }
-     *obj =3D g_malloc0(size);
-     (*obj)->type =3D qobject_type(qobj);
--    if (promote_int && (*obj)->type =3D=3D QTYPE_QINT) {
-+    if (promote_int &&
-+        ((*obj)->type =3D=3D QTYPE_QINT || (*obj)->type =3D=3D QTYPE_QUI=
-NT)) {
-         (*obj)->type =3D QTYPE_QFLOAT;
-     }
- }
-@@ -395,22 +397,38 @@ static void qobject_input_type_int64_keyval(Visitor=
- *v, const char *name,
- static void qobject_input_type_uint64(Visitor *v, const char *name,
-                                       uint64_t *obj, Error **errp)
- {
--    /* FIXME: qobject_to_qint mishandles values over INT64_MAX */
-     QObjectInputVisitor *qiv =3D to_qiv(v);
-     QObject *qobj =3D qobject_input_get_object(qiv, name, true, errp);
-+    QUInt *quint;
-     QInt *qint;
-+    int64_t val;
-=20
-     if (!qobj) {
-         return;
+-        errno =3D 0; /* strtoll doesn't set errno on success */
+-        value =3D strtoll(token->str, NULL, 10);
++        qemu_strtoi64(token->str, NULL, 10, &value);
+         if (errno !=3D ERANGE) {
+             return QOBJECT(qint_from_int(value));
+         }
++
++        qemu_strtou64(token->str, NULL, 10, &uvalue);
++        if (errno !=3D ERANGE) {
++            return QOBJECT(quint_from_uint(uvalue));
++        }
++
+         /* fall through to JSON_FLOAT */
      }
 +
-+    quint =3D qobject_to_quint(qobj);
-+    if (quint) {
-+        *obj =3D quint_get_uint(quint);
-+        return;
+     case JSON_FLOAT:
+         /* FIXME dependent on locale; a pervasive issue in QEMU */
+         /* FIXME our lexer matches RFC 7159 in forbidding Inf or NaN,
+diff --git a/qobject/qjson.c b/qobject/qjson.c
+index b2f3bfec53..6356cff594 100644
+--- a/qobject/qjson.c
++++ b/qobject/qjson.c
+@@ -140,6 +140,14 @@ static void to_json(const QObject *obj, QString *str=
+, int pretty, int indent)
+         qstring_append(str, buffer);
+         break;
+     }
++    case QTYPE_QUINT: {
++        QUInt *val =3D qobject_to_quint(obj);
++        char buffer[1024];
++
++        snprintf(buffer, sizeof(buffer), "%" PRIu64, quint_get_uint(val)=
+);
++        qstring_append(str, buffer);
++        break;
 +    }
-+
-     qint =3D qobject_to_qint(qobj);
-     if (!qint) {
--        error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
--                   full_name(qiv, name), "integer");
--        return;
-+        goto error;
+     case QTYPE_QSTRING: {
+         QString *val =3D qobject_to_qstring(obj);
+         const char *ptr;
+diff --git a/tests/check-qjson.c b/tests/check-qjson.c
+index 963dd46f07..fd44cd6207 100644
+--- a/tests/check-qjson.c
++++ b/tests/check-qjson.c
+@@ -904,6 +904,33 @@ static void simple_number(void)
      }
-=20
--    *obj =3D qint_get_int(qint);
-+    val =3D qint_get_int(qint);
-+    if (val < 0) {
-+        goto error;
-+    }
-+
-+    *obj =3D val;
-+    return;
-+
-+error:
-+    error_setg(errp, QERR_INVALID_PARAMETER_TYPE,
-+               full_name(qiv, name), "unsigned integer");
  }
 =20
- static void qobject_input_type_uint64_keyval(Visitor *v, const char *nam=
-e,
-diff --git a/qapi/qobject-output-visitor.c b/qapi/qobject-output-visitor.=
-c
-index 871127079d..7066b3b59b 100644
---- a/qapi/qobject-output-visitor.c
-+++ b/qapi/qobject-output-visitor.c
-@@ -150,9 +150,8 @@ static void qobject_output_type_int64(Visitor *v, con=
-st char *name,
- static void qobject_output_type_uint64(Visitor *v, const char *name,
-                                        uint64_t *obj, Error **errp)
- {
--    /* FIXME values larger than INT64_MAX become negative */
-     QObjectOutputVisitor *qov =3D to_qov(v);
--    qobject_output_add(qov, name, qint_from_int(*obj));
-+    qobject_output_add(qov, name, quint_from_uint(*obj));
- }
-=20
- static void qobject_output_type_bool(Visitor *v, const char *name, bool =
-*obj,
-diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-inpu=
-t-visitor.c
-index 6eb48fee7b..011366a65b 100644
---- a/tests/test-qobject-input-visitor.c
-+++ b/tests/test-qobject-input-visitor.c
-@@ -170,6 +170,19 @@ static void test_visitor_in_int_str_fail(TestInputVi=
-sitorData *data,
-     error_free_or_abort(&err);
- }
-=20
-+static void test_visitor_in_uint(TestInputVisitorData *data,
-+                                const void *unused)
++static void large_number(void)
 +{
-+    uint64_t res =3D 0;
-+    uint64_t value =3D G_MAXUINT64;
-+    Visitor *v;
++    const char *maxu64 =3D "18446744073709551615"; /* 2^64-1 */
++    const char *gtu64 =3D "18446744073709551616"; /* 2^64 */
++    QUInt *quint;
++    QFloat *qfloat;
++    QString *str;
 +
-+    v =3D visitor_input_test_init(data, "%" PRIu64, value);
++    quint =3D qobject_to_quint(qobject_from_json(maxu64, &error_abort));
++    g_assert(quint);
++    g_assert_cmpint(quint_get_uint(quint), =3D=3D, 18446744073709551615U=
+);
 +
-+    visit_type_uint64(v, NULL, &res, &error_abort);
-+    g_assert_cmpint(res, =3D=3D, value);
++    str =3D qobject_to_json(QOBJECT(quint));
++    g_assert_cmpstr(qstring_get_str(str), =3D=3D, maxu64);
++    QDECREF(str);
++    QDECREF(quint);
++
++    qfloat =3D qobject_to_qfloat(qobject_from_json(gtu64, &error_abort))=
+;
++    g_assert(qfloat);
++    g_assert_cmpfloat(qfloat_get_double(qfloat), =3D=3D, 184467440737095=
+51616.0);
++
++    str =3D qobject_to_json(QOBJECT(qfloat));
++    g_assert_cmpstr(qstring_get_str(str), =3D=3D, gtu64);
++    QDECREF(str);
++    QDECREF(qfloat);
 +}
 +
- static void test_visitor_in_bool(TestInputVisitorData *data,
-                                  const void *unused)
+ static void float_number(void)
  {
-@@ -1233,6 +1246,8 @@ int main(int argc, char **argv)
-                            NULL, test_visitor_in_int_str_keyval);
-     input_visitor_test_add("/visitor/input/int_str_fail",
-                            NULL, test_visitor_in_int_str_fail);
-+    input_visitor_test_add("/visitor/input/uint",
-+                           NULL, test_visitor_in_uint);
-     input_visitor_test_add("/visitor/input/bool",
-                            NULL, test_visitor_in_bool);
-     input_visitor_test_add("/visitor/input/bool_keyval",
-diff --git a/tests/test-qobject-output-visitor.c b/tests/test-qobject-out=
-put-visitor.c
-index 500b452d98..047c6b5c6c 100644
---- a/tests/test-qobject-output-visitor.c
-+++ b/tests/test-qobject-output-visitor.c
-@@ -597,14 +597,25 @@ static void check_native_list(QObject *qobj,
-     qlist =3D qlist_copy(qobject_to_qlist(qdict_get(qdict, "data")));
+     int i;
+@@ -1468,6 +1495,7 @@ int main(int argc, char **argv)
+     g_test_add_func("/literals/string/vararg", vararg_string);
 =20
-     switch (kind) {
--    case USER_DEF_NATIVE_LIST_UNION_KIND_S8:
--    case USER_DEF_NATIVE_LIST_UNION_KIND_S16:
--    case USER_DEF_NATIVE_LIST_UNION_KIND_S32:
--    case USER_DEF_NATIVE_LIST_UNION_KIND_S64:
-     case USER_DEF_NATIVE_LIST_UNION_KIND_U8:
-     case USER_DEF_NATIVE_LIST_UNION_KIND_U16:
-     case USER_DEF_NATIVE_LIST_UNION_KIND_U32:
-     case USER_DEF_NATIVE_LIST_UNION_KIND_U64:
-+        for (i =3D 0; i < 32; i++) {
-+            QObject *tmp;
-+            QUInt *qvalue;
-+            tmp =3D qlist_peek(qlist);
-+            g_assert(tmp);
-+            qvalue =3D qobject_to_quint(tmp);
-+            g_assert_cmpint(quint_get_uint(qvalue), =3D=3D, i);
-+            qobject_decref(qlist_pop(qlist));
-+        }
-+        break;
-+
-+    case USER_DEF_NATIVE_LIST_UNION_KIND_S8:
-+    case USER_DEF_NATIVE_LIST_UNION_KIND_S16:
-+    case USER_DEF_NATIVE_LIST_UNION_KIND_S32:
-+    case USER_DEF_NATIVE_LIST_UNION_KIND_S64:
-         /* all integer elements in JSON arrays get stored into QInts whe=
-n
-          * we convert to QObjects, so we can check them all in the same
-          * fashion, so simply fall through here
+     g_test_add_func("/literals/number/simple", simple_number);
++    g_test_add_func("/literals/number/large", large_number);
+     g_test_add_func("/literals/number/float", float_number);
+     g_test_add_func("/literals/number/vararg", vararg_number);
+=20
 --=20
 2.12.0.191.gc5d8de91d
