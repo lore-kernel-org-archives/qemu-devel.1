@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42707)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cmff9-0006Kt-2v
-	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 06:58:20 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cmgzC-0001jt-5t
+	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 08:23:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cmff5-0000wC-5U
-	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 06:58:19 -0500
-Received: from mga02.intel.com ([134.134.136.20]:25453)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1cmff4-0000w0-U3
-	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 06:58:15 -0500
-Message-ID: <58C3E6A3.1000000@intel.com>
-Date: Sat, 11 Mar 2017 19:59:31 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cmgzA-0002GB-TX
+	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 08:23:06 -0500
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Sat, 11 Mar 2017 17:22:36 +0400
+Message-Id: <20170311132256.22951-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20170311132256.22951-1-marcandre.lureau@redhat.com>
+References: <20170311132256.22951-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-References: <1488519630-89058-1-git-send-email-wei.w.wang@intel.com>
-	<1488519630-89058-4-git-send-email-wei.w.wang@intel.com>
-	<20170309141411.GZ16328@bombadil.infradead.org>
-	<58C28FF8.5040403@intel.com>
-	<20170310175349-mutt-send-email-mst@kernel.org>
-	<20170310171143.GA16328@bombadil.infradead.org>
-In-Reply-To: <20170310171143.GA16328@bombadil.infradead.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 kernel 3/5] virtio-balloon:
- implementation of VIRTIO_BALLOON_F_CHUNK_TRANSFER
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 01/21] qapi: add info comment for generated
+ types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,47 +23,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, virtio-dev@lists.oasis-open.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, linux-mm@kvack.org, Liang Li <liang.z.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Amit Shah <amit.shah@redhat.com>, Dave Hansen <dave.hansen@intel.com>, Andrea Arcangeli <aarcange@redhat.com>, David Hildenbrand <david@redhat.com>, Liang Li <liliang324@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, anderson@redhat.com, mdroth@linux.vnet.ibm.com, armbru@redhat.com, lersek@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, qemu-trivial@nongnu.org
 
-On 03/11/2017 01:11 AM, Matthew Wilcox wrote:
-> On Fri, Mar 10, 2017 at 05:58:28PM +0200, Michael S. Tsirkin wrote:
->> One of the issues of current balloon is the 4k page size
->> assumption. For example if you free a huge page you
->> have to split it up and pass 4k chunks to host.
->> Quite often host can't free these 4k chunks at all (e.g.
->> when it's using huge tlb fs).
->> It's even sillier for architectures with base page size >4k.
-> I completely agree with you that we should be able to pass a hugepage
-> as a single chunk.  Also we shouldn't assume that host and guest have
-> the same page size.  I think we can come up with a scheme that actually
-> lets us encode that into a 64-bit word, something like this:
->
-> bit 0 clear => bits 1-11 encode a page count, bits 12-63 encode a PFN, page size 4k.
-> bit 0 set, bit 1 clear => bits 2-12 encode a page count, bits 13-63 encode a PFN, page size 8k
-> bits 0+1 set, bit 2 clear => bits 3-13 for page count, bits 14-63 for PFN, page size 16k.
-> bits 0-2 set, bit 3 clear => bits 4-14 for page count, bits 15-63 for PFN, page size 32k
-> bits 0-3 set, bit 4 clear => bits 5-15 for page count, bits 16-63 for PFN, page size 64k
->
-> That means we can always pass 2048 pages (of whatever page size) in a single chunk.  And
-> we support arbitrary power of two page sizes.  I suggest something like this:
->
-> u64 page_to_chunk(struct page *page)
-> {
-> 	u64 chunk = page_to_pfn(page) << PAGE_SHIFT;
-> 	chunk |= (1UL << compound_order(page)) - 1;
-> }
->
-> (note this is a single page of order N, so we leave the page count bits
-> set to 0, meaning one page).
->
+This may help to find where the origin of the type was declared in the
+json (when greping isn't easy enough).
 
-I'm thinking what if the guest needs to transfer these much physically 
-continuous
-memory to host: 1GB+2MB+64KB+32KB+16KB+4KB.
-Is it going to use Six 64-bit chunks? Would it be simpler if we just
-use the 128-bit chunk format (we can drop the previous normal 64-bit 
-format)?
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-trivial@nongnu.org
+---
+ scripts/qapi.py       | 11 +++++++++--
+ scripts/qapi-event.py |  4 +++-
+ scripts/qapi-types.py | 17 +++++++++--------
+ 3 files changed, 21 insertions(+), 11 deletions(-)
 
-Best,
-Wei
+diff --git a/scripts/qapi.py b/scripts/qapi.py
+index 53a44779d0..9504ebd8c7 100644
+--- a/scripts/qapi.py
++++ b/scripts/qapi.py
+@@ -1874,15 +1874,22 @@ const char *const %(c_name)s_lookup[] =3D {
+     return ret
+=20
+=20
+-def gen_enum(name, values, prefix=3DNone):
++def gen_info_comment(info):
++    if info:
++        return "/* %s:%d */" % (info['file'], info['line'])
++    else:
++        return ""
++
++def gen_enum(info, name, values, prefix=3DNone):
+     # append automatically generated _MAX value
+     enum_values =3D values + ['_MAX']
+=20
+     ret =3D mcgen('''
+=20
++%(info)s
+ typedef enum %(c_name)s {
+ ''',
+-                c_name=3Dc_name(name))
++                c_name=3Dc_name(name), info=3Dgen_info_comment(info))
+=20
+     i =3D 0
+     for value in enum_values:
+diff --git a/scripts/qapi-event.py b/scripts/qapi-event.py
+index f4eb7f85b1..ca90d6a5df 100644
+--- a/scripts/qapi-event.py
++++ b/scripts/qapi-event.py
+@@ -152,6 +152,7 @@ class QAPISchemaGenEventVisitor(QAPISchemaVisitor):
+         self.decl =3D None
+         self.defn =3D None
+         self._event_names =3D None
++        self.info =3D None
+=20
+     def visit_begin(self, schema):
+         self.decl =3D ''
+@@ -159,7 +160,7 @@ class QAPISchemaGenEventVisitor(QAPISchemaVisitor):
+         self._event_names =3D []
+=20
+     def visit_end(self):
+-        self.decl +=3D gen_enum(event_enum_name, self._event_names)
++        self.decl +=3D gen_enum(self.info, event_enum_name, self._event_=
+names)
+         self.defn +=3D gen_enum_lookup(event_enum_name, self._event_name=
+s)
+         self._event_names =3D None
+=20
+@@ -167,6 +168,7 @@ class QAPISchemaGenEventVisitor(QAPISchemaVisitor):
+         self.decl +=3D gen_event_send_decl(name, arg_type, boxed)
+         self.defn +=3D gen_event_send(name, arg_type, boxed)
+         self._event_names.append(name)
++        self.info =3D info
+=20
+=20
+ (input_file, output_dir, do_c, do_h, prefix, dummy) =3D parse_command_li=
+ne()
+diff --git a/scripts/qapi-types.py b/scripts/qapi-types.py
+index dabc42e047..896749bf61 100644
+--- a/scripts/qapi-types.py
++++ b/scripts/qapi-types.py
+@@ -19,12 +19,13 @@ from qapi import *
+ objects_seen =3D set()
+=20
+=20
+-def gen_fwd_object_or_array(name):
++def gen_fwd_object_or_array(info, name):
+     return mcgen('''
+=20
++%(info)s
+ typedef struct %(c_name)s %(c_name)s;
+ ''',
+-                 c_name=3Dc_name(name))
++                 c_name=3Dc_name(name), info=3Dgen_info_comment(info))
+=20
+=20
+ def gen_array(name, element_type):
+@@ -199,22 +200,22 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
+         # Special case for our lone builtin enum type
+         # TODO use something cleaner than existence of info
+         if not info:
+-            self._btin +=3D gen_enum(name, values, prefix)
++            self._btin +=3D gen_enum(info, name, values, prefix)
+             if do_builtins:
+                 self.defn +=3D gen_enum_lookup(name, values, prefix)
+         else:
+-            self._fwdecl +=3D gen_enum(name, values, prefix)
++            self._fwdecl +=3D gen_enum(info, name, values, prefix)
+             self.defn +=3D gen_enum_lookup(name, values, prefix)
+=20
+     def visit_array_type(self, name, info, element_type):
+         if isinstance(element_type, QAPISchemaBuiltinType):
+-            self._btin +=3D gen_fwd_object_or_array(name)
++            self._btin +=3D gen_fwd_object_or_array(info, name)
+             self._btin +=3D gen_array(name, element_type)
+             self._btin +=3D gen_type_cleanup_decl(name)
+             if do_builtins:
+                 self.defn +=3D gen_type_cleanup(name)
+         else:
+-            self._fwdecl +=3D gen_fwd_object_or_array(name)
++            self._fwdecl +=3D gen_fwd_object_or_array(info, name)
+             self.decl +=3D gen_array(name, element_type)
+             self._gen_type_cleanup(name)
+=20
+@@ -222,7 +223,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
+         # Nothing to do for the special empty builtin
+         if name =3D=3D 'q_empty':
+             return
+-        self._fwdecl +=3D gen_fwd_object_or_array(name)
++        self._fwdecl +=3D gen_fwd_object_or_array(info, name)
+         self.decl +=3D gen_object(name, base, members, variants)
+         if base and not base.is_implicit():
+             self.decl +=3D gen_upcast(name, base)
+@@ -233,7 +234,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
+             self._gen_type_cleanup(name)
+=20
+     def visit_alternate_type(self, name, info, variants):
+-        self._fwdecl +=3D gen_fwd_object_or_array(name)
++        self._fwdecl +=3D gen_fwd_object_or_array(info, name)
+         self.decl +=3D gen_object(name, None, [variants.tag_member], var=
+iants)
+         self._gen_type_cleanup(name)
+=20
+--=20
+2.12.0.191.gc5d8de91d
