@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cmnS3-0003tP-DI
-	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 15:17:20 -0500
+	(envelope-from <marex@denx.de>) id 1cmnYf-0004h6-Sq
+	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 15:24:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cmnRz-00033m-Er
-	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 15:17:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48042)
+	(envelope-from <marex@denx.de>) id 1cmnYb-0005DP-VO
+	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 15:24:09 -0500
+Received: from mail-out.m-online.net ([2001:a60:0:28:0:1:25:1]:56185)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cmnRz-00032y-6O
-	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 15:17:15 -0500
-References: <20170311132256.22951-1-marcandre.lureau@redhat.com>
-	<20170311132256.22951-5-marcandre.lureau@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <84148275-6410-68f7-4da0-345b635c42f3@redhat.com>
-Date: Sat, 11 Mar 2017 14:17:11 -0600
+	(Exim 4.71) (envelope-from <marex@denx.de>) id 1cmnYb-0005BN-LP
+	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 15:24:05 -0500
+References: <20170227193857.9368-1-marex@denx.de>
+From: Marek Vasut <marex@denx.de>
+Message-ID: <1458a0a7-7ed6-c314-95af-1a2f056968be@denx.de>
+Date: Sat, 11 Mar 2017 21:23:56 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170311132256.22951-5-marcandre.lureau@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="deKoMK2D3XaPuC66EoAjIW2WdBp5APBaS"
-Subject: Re: [Qemu-devel] [PATCH 04/21] qobject: add quint type
+In-Reply-To: <20170227193857.9368-1-marex@denx.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V2] nios2: iic: Convert CPU prop to qom link
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,95 +26,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, armbru@redhat.com, anderson@redhat.com, pbonzini@redhat.com, lersek@redhat.comMarkus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Alexander Graf <agraf@suse.de>, Chris Wulff <crwulff@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Jeff Da Silva <jdasilva@altera.com>, Ley Foon Tan <lftan@altera.com>, Markus Armbruster <armbru@redhat.com>, Richard Henderson <rth@twiddle.net>, Sandra Loosemore <sandra@codesourcery.com>, Yves Vandervennet <yvanderv@altera.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---deKoMK2D3XaPuC66EoAjIW2WdBp5APBaS
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, armbru@redhat.com, anderson@redhat.com,
- pbonzini@redhat.com, lersek@redhat.com, Markus Armbruster <armbru@redhat.com>
-Message-ID: <84148275-6410-68f7-4da0-345b635c42f3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 04/21] qobject: add quint type
-References: <20170311132256.22951-1-marcandre.lureau@redhat.com>
- <20170311132256.22951-5-marcandre.lureau@redhat.com>
-In-Reply-To: <20170311132256.22951-5-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 02/27/2017 08:38 PM, Marek Vasut wrote:
+> Add a const qom link between the CPU and the IIC instead
+> of passing the CPU link through a qom property.
+> 
+> Signed-off-by: Marek Vasut <marex@denx.de>
+> Cc: Alexander Graf <agraf@suse.de>
+> Cc: Chris Wulff <crwulff@gmail.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: Jeff Da Silva <jdasilva@altera.com>
+> Cc: Ley Foon Tan <lftan@altera.com>
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Sandra Loosemore <sandra@codesourcery.com>
+> Cc: Yves Vandervennet <yvanderv@altera.com>
 
-On 03/11/2017 07:22 AM, Marc-Andr=C3=A9 Lureau wrote:
-> The type is not used at all yet. Add some tests to exercice it.
+Why is this patch not applied yet ?
 
-s/exercice/exercise/
+> ---
+> V2: Retain dc->cannot_instantiate_with_device_add_yet = true
+>     in altera_iic_class_init() since the device is still not
+>     device_add() creatable.
+> ---
+>  hw/intc/nios2_iic.c       | 12 ++++--------
+>  hw/nios2/10m50_devboard.c |  3 ++-
+>  2 files changed, 6 insertions(+), 9 deletions(-)
+> 
+> diff --git a/hw/intc/nios2_iic.c b/hw/intc/nios2_iic.c
+> index 818ab1b315..fe15621202 100644
+> --- a/hw/intc/nios2_iic.c
+> +++ b/hw/intc/nios2_iic.c
+> @@ -62,17 +62,15 @@ static void altera_iic_init(Object *obj)
+>      sysbus_init_irq(SYS_BUS_DEVICE(obj), &pv->parent_irq);
+>  }
+>  
+> -static Property altera_iic_properties[] = {
+> -    DEFINE_PROP_PTR("cpu", AlteraIIC, cpu),
+> -    DEFINE_PROP_END_OF_LIST(),
+> -};
+> -
+>  static void altera_iic_realize(DeviceState *dev, Error **errp)
+>  {
+>      struct AlteraIIC *pv = ALTERA_IIC(dev);
+> +    Error *err = NULL;
+>  
+> +    pv->cpu = object_property_get_link(OBJECT(dev), "cpu", &err);
+>      if (!pv->cpu) {
+> -        error_setg(errp, "altera,iic: CPU not connected");
+> +        error_setg(errp, "altera,iic: CPU link not found: %s",
+> +                   error_get_pretty(err));
+>          return;
+>      }
+>  }
+> @@ -81,8 +79,6 @@ static void altera_iic_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+>  
+> -    dc->props = altera_iic_properties;
+> -    /* Reason: pointer property "cpu" */
+>      dc->cannot_instantiate_with_device_add_yet = true;
+>      dc->realize = altera_iic_realize;
+>  }
+> diff --git a/hw/nios2/10m50_devboard.c b/hw/nios2/10m50_devboard.c
+> index 0d8b9aa58f..c18e0b2a17 100644
+> --- a/hw/nios2/10m50_devboard.c
+> +++ b/hw/nios2/10m50_devboard.c
+> @@ -83,7 +83,8 @@ static void nios2_10m50_ghrd_init(MachineState *machine)
+>  
+>      /* Register: Internal Interrupt Controller (IIC) */
+>      dev = qdev_create(NULL, "altera,iic");
+> -    qdev_prop_set_ptr(dev, "cpu", cpu);
+> +    object_property_add_const_link(OBJECT(dev), "cpu", OBJECT(cpu),
+> +                                   &error_abort);
+>      qdev_init_nofail(dev);
+>      sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, cpu_irq[0]);
+>      for (i = 0; i < 32; i++) {
+> 
 
-I wonder if we need this patch at all.
 
-I've been thinking about a possible alternative representation, such
-that a single QInt type can cover _both_ signed and unsigned types, by
-having QInt track a sign bit bool in addition to a uint64_t value.
-
-If the user passes in a value in the range [0, INT64_MAX], the number is
-representable in both uint64_t and int64_t. So the internal sign bit
-would be omitted, as in { value=3Dv, sign=3Dfalse }.  Input visitors can
-visit this value with both the 'uint64' and the 'int64' visitors, and
-output visitors will output the same value.
-
-If the user passes in a value in the range [-INT64_MAX-1, -1], the
-number is intended to be used as a negative signed number.  So the QInt
-representation would be the 2s complement representation, { value=3D-v,
-sign=3Dtrue }.  On input, the uint64_t visitor would reject the value as
-out of range, the int64_t visitor would return the appropriate negative
-value, and the generic int visitor will return the uint64_t value.  On
-output, the number would be given the negative signed value
-representation in anything that stringizes the value.
-
-If the user passes in a value in the range [INT64_MAX+1, UINT64_MAX},
-the number is intended to be used as a large unsigned number. So the
-QInt representation would be { value=3Dv, sign=3Dfalse }.  On input, the
-uint64_t visitor would accept the value, the int64_t visitor would
-reject it as out of range, and the generic int visitor will return the
-uint64_t value.  On output, the number would be given the positive
-unsigned value representation in the stringized form.
-
-That way, you don't have to complicate the (already-awkward) type
-promotion rules of QFloat vs QInt with yet another scalar type.  The
-input parser becomes friendlier - you can either use generic 'int' when
-you want to allow the user to pass in either signed or unsigned values
-(important for back-compat, where callers like libvirt learned that only
-signed values worked even when large unsigned values were wanted); or
-the specific 'int64' and 'uint64' types to force proper ranges.
-
-It's definitely an alternative implementation to the one you pursued in
-your series, so maybe we should first figure out WHAT we want
-represented, before implementing something that will be more baggage
-than we want (you at least have the advantage of patches that are
-written; my idea of adding a sign bool to QInt is still just in the
-initial idea stage).
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---deKoMK2D3XaPuC66EoAjIW2WdBp5APBaS
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYxFtHAAoJEKeha0olJ0NqSqoH/iiYyyg9ELhPaaceHAnI8TcB
-/FN7DI8SutyGWPFT1IjFU5ffa54saUCpjxYjpAzCdCnWFljOMws2tPCbiwKYNYSb
-enJdqYffVUtnxXxycv8cprDJ/k7l/PTSFnOHdX5ILlzFoCkhbTpHxr9QOd26Flri
-zNaBkyS6N1b9ieFAp6J/N5No5slvuTtGPnK7o5zJgcXDlxzMhL/3ifHqdZ3fO6Ni
-xOoWL9k36qrAAxOMjBO15C52b1c24o3Dd3ny+H3IzOv0HZiAkDgfQHEIIIH0o4fu
-yFTio3ANZ9bHTQlod0GLfiX2dhqJFsTCpx9pz0v18MYG/md3qCRWjNfwUGbwFz4=
-=AXiz
------END PGP SIGNATURE-----
-
---deKoMK2D3XaPuC66EoAjIW2WdBp5APBaS--
+-- 
+Best regards,
+Marek Vasut
