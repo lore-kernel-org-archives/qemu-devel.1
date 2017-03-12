@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43103)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cn8zM-0002Mm-RA
-	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 15:17:09 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cn9Hi-0005dw-M4
+	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 15:36:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cn8zI-0001Zi-5u
-	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 15:17:08 -0400
-Resent-Message-Id: <E1cn8zI-0001Zi-5u@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21480)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cn8zH-0001Yx-Vl
-	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 15:17:04 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148934620169.33.450426621801571953@6c512846dbc7>
-In-Reply-To: <1489345956-29167-1-git-send-email-mst@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cn9Hh-00085l-NB
+	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 15:36:06 -0400
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:35718)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cn9Hh-00084R-8v
+	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 15:36:05 -0400
+Received: by mail-wm0-x235.google.com with SMTP id v186so27096207wmd.0
+	for <qemu-devel@nongnu.org>; Sun, 12 Mar 2017 12:36:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 12 Mar 2017 12:16:42 -0700 (PDT)
+In-Reply-To: <1489345956-29167-1-git-send-email-mst@redhat.com>
+References: <1489345956-29167-1-git-send-email-mst@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 12 Mar 2017 20:35:42 +0100
+Message-ID: <CAFEAcA-FFPK_hFEydB7JWj=Zmgp3hs2e=n0vzuun97xnzc9JRQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Subject: Re: [Qemu-devel] [PATCH] memory: use 128 bit in info mtree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,37 +28,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, mark.cave-ayland@ilande.co.uk
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIG1lbW9yeTogdXNlIDEyOCBiaXQgaW4gaW5mbyBt
-dHJlZQpNZXNzYWdlLWlkOiAxNDg5MzQ1OTU2LTI5MTY3LTEtZ2l0LXNlbmQtZW1haWwtbXN0QHJl
-ZGhhdC5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFz
-ZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0w
-CgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQg
-bG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRv
-CiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9y
-bWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Nj
-cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQog
-ICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0g
-VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
-NDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVt
-dQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzE0ODkzNDU5NTYtMjkxNjctMS1naXQtc2Vu
-ZC1lbWFpbC1tc3RAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzE0ODkzNDU5NTYtMjkxNjctMS1naXQt
-c2VuZC1lbWFpbC1tc3RAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
-CmQyZjcyYjcgbWVtb3J5OiB1c2UgMTI4IGJpdCBpbiBpbmZvIG10cmVlCgo9PT0gT1VUUFVUIEJF
-R0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IG1lbW9yeTogdXNlIDEyOCBiaXQgaW4gaW5mbyBt
-dHJlZS4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM3OTogRklM
-RTogbWVtb3J5LmM6MjUyNzoKK15JXkkgICAiLSIgSU5UMTI4X0ZNVDFfcGx4IElOVDEyOF9GTVQy
-X3BseCQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzk4OiBGSUxF
-OiBtZW1vcnkuYzoyNTQxOgorXkleSSAgICItIiBJTlQxMjhfRk1UMV9wbHggSU5UMTI4X0ZNVDJf
-cGx4JAoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCA5NyBsaW5lcyBjaGVja2VkCgpZb3Vy
-IHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRl
-c3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRv
-bWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5
-b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+On 12 March 2017 at 20:12, Michael S. Tsirkin <mst@redhat.com> wrote:
+> info mtree is doing 64 bit math to figure out
+> addresses from offsets, this does not work ncorrectly
+> incase of overflow.
+>
+> Overflow usually indicates a guest bug, so this is unusual
+> but reporting correct addresses makes it easier to discover
+> what is going on.
+>
+> Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  include/qemu/int128.h | 15 +++++++++++++++
+>  memory.c              | 28 +++++++++++++++++-----------
+>  2 files changed, 32 insertions(+), 11 deletions(-)
+>
+> diff --git a/include/qemu/int128.h b/include/qemu/int128.h
+> index 5c9890d..8be5328 100644
+> --- a/include/qemu/int128.h
+> +++ b/include/qemu/int128.h
+> @@ -302,4 +302,19 @@ static inline void int128_subfrom(Int128 *a, Int128 b)
+>  }
+>
+>  #endif /* CONFIG_INT128 */
+> +
+> +#define INT128_FMT1_plx "0x%" PRIx64
+> +#define INT128_FMT2_plx "%015" PRIx64
+> +
+> +static inline uint64_t int128_printf1(Int128 a)
+> +{
+> +    /* We assume 4 highest bits are clear and safe to ignore */
+> +    return (int128_gethi(a) << 4) | (int128_getlo(a) >> 60);
+> +}
+> +
+> +static inline uint64_t int128_printf2(Int128 a)
+> +{
+> +    return (int128_getlo(a) << 4) >> 4;
+> +}
+
+I'm confused -- I was expecting these to just
+be the two halves of the 128 bit integer to be
+printed, but they seem to be doing something
+more complicated...
+
+thanks
+-- PMM
