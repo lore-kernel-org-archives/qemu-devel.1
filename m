@@ -1,17 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cn14Y-00005h-KW
-	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 06:50:00 -0400
+	(envelope-from <bounces@canonical.com>) id 1cn1Tn-0003I7-8w
+	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 07:16:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cn14X-0007Jm-9e
-	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 06:49:58 -0400
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <16ea2d8e-7d41-e323-4df2-cd082080e3db@ilande.co.uk>
-Date: Sun, 12 Mar 2017 10:49:17 +0000
+	(envelope-from <bounces@canonical.com>) id 1cn1Ti-00006R-AQ
+	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 07:16:03 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52308)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cn1Th-00005e-UZ
+	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 07:15:58 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cn1Tf-0001bX-Tc
+	for <qemu-devel@nongnu.org>; Sun, 12 Mar 2017 11:15:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id DC6F42E80C0
+	for <qemu-devel@nongnu.org>; Sun, 12 Mar 2017 11:15:55 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] qemu-system-ppc regression booting MacOS 9.2.1 image
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 12 Mar 2017 11:03:11 -0000
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reply-To: Bug 597362 <597362@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20100622173200.15537.61592.malonedeb@gandwana.canonical.com>
+Message-Id: <20170312110311.25214.27684.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 597362] Re: qemu-system-sparc singlestep not work
+ in gdbstub
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,123 +37,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: nikunj@linux.vnet.ibm.com
-Cc: qemu-devel <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
+To: qemu-devel@nongnu.org
 
-Hi Nikunj,
-
-Testing git master locally I see the following segfault when trying to
-boot my test MacOS 9.2.1 image:
+I'm sure this has been fixed years ago (and qemu-system-sparc single-
+step seems fine in local tests) so I'm marking this as "Fix released".
 
 
-$ gdb --args ./qemu-system-ppc -bios
-/home/build/src/openbios/openbios.git/openbios/obj-ppc/openbios-qemu.elf.nostrip
--cdrom /home/build/src/qemu/image/ppc/MacOS921.iso -boot d -m 512 -M mac99
-GNU gdb (GDB) 7.4.1-debian
-Copyright (C) 2012 Free Software Foundation, Inc.
-License GPLv3+: GNU GPL version 3 or later
-<http://gnu.org/licenses/gpl.html>
-This is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
-and "show warranty" for details.
-This GDB was configured as "x86_64-linux-gnu".
-For bug reporting instructions, please see:
-<http://www.gnu.org/software/gdb/bugs/>...
-Reading symbols from /home/build/rel-qemu-git/bin/qemu-system-ppc...done.
-(gdb) r
-Starting program: /home/build/rel-qemu-git/bin/qemu-system-ppc -bios
-/home/build/src/openbios/openbios.git/openbios/obj-ppc/openbios-qemu.elf.nostrip
--cdrom /home/build/src/qemu/image/ppc/MacOS921.iso -boot d -m 512 -M mac99
-warning: no loadable sections found in added symbol-file system-supplied
-DSO at 0x7ffff7ffa000
-[Thread debugging using libthread_db enabled]
-Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
-[New Thread 0x7fffe9eee700 (LWP 29713)]
-[New Thread 0x7fffe6bf5700 (LWP 29714)]
-[New Thread 0x7fffe63f4700 (LWP 29715)]
-Trying to write invalid spr 0 (0x000) at 00f113c0
-Trying to read invalid spr 0 (0x000) at 00f113c8
-Trying to write privileged spr 955 (0x3bb) at 00f164b8
-Trying to write invalid spr 959 (0x3bf) at 00f16520
-Trying to read invalid spr 959 (0x3bf) at 00f16528
-Trying to write privileged spr 955 (0x3bb) at 00f164b8
-Trying to write invalid spr 959 (0x3bf) at 00f16520
-Trying to read invalid spr 959 (0x3bf) at 00f16528
+** Changed in: qemu
+       Status: Expired =3D> Fix Released
 
-Program received signal SIGSEGV, Segmentation fault.
-[Switching to Thread 0x7fffe63f4700 (LWP 29715)]
-0x00007ffff7e20010 in ?? ()
-(gdb) bt
-#0  0x00007ffff7e20010 in ?? ()
-#1  0x0000000000000002 in ?? ()
-#2  0x0000000068090040 in ?? ()
-#3  0x0000000000000002 in ?? ()
-#4  0x6b67829c063b8d00 in ?? ()
-#5  0x6b67829c063b8d00 in ?? ()
-#6  0x000000000043986d in tcg_temp_new_internal_i32
-(temp_local=temp_local@entry=0) at
-/home/build/src/qemu/git/qemu/tcg/tcg.c:632
-#7  0x00000000004434a5 in tcg_temp_new_i32 () at
-/home/build/src/qemu/git/qemu/tcg/tcg.h:807
-#8  tcg_gen_andc_i32 (ret=0xa, arg1=0x7fffe63f3848, arg2=0x3f) at
-/home/build/src/qemu/git/qemu/tcg/tcg-op.c:411
-#9  0x00000000005099ad in gen_op_arith_compute_ov (arg0=arg0@entry=0xd7,
-arg1=arg1@entry=0x6a, arg2=0xd8, arg2@entry=0xa, sub=sub@entry=0,
-ctx=<error reading variable: Unhandled dwarf expression opcode 0xfa>)
-    at /home/build/src/qemu/git/qemu/target/ppc/translate.c:821
-#10 0x00000000005631b1 in gen_op_arith_add (compute_rc0=true,
-compute_ov=true, compute_ca=true, add_ca=false, arg2=0xa, arg1=0x6a,
-ret=0x3a, ctx=0x7fffe63f3800) at
-/home/build/src/qemu/git/qemu/target/ppc/translate.c:895
-#11 gen_addco (ctx=0x7fffe63f3800) at
-/home/build/src/qemu/git/qemu/target/ppc/translate.c:931
-#12 0x00000000005796ba in gen_intermediate_code
-(env=env@entry=0x7ffff7e282a0, tb=tb@entry=0x7fffe6db6a80) at
-/home/build/src/qemu/git/qemu/target/ppc/translate.c:7287
-#13 0x000000000043381a in tb_gen_code (cpu=cpu@entry=0x7ffff7e20010,
-pc=pc@entry=1745420352, cs_base=cs_base@entry=0, flags=16432,
-cflags=cflags@entry=0) at /home/build/src/qemu/git/qemu/translate-all.c:1281
-#14 0x0000000000435a32 in tb_find (tb_exit=0, last_tb=0x0,
-cpu=0x7ffff7e20010) at /home/build/src/qemu/git/qemu/cpu-exec.c:370
-#15 cpu_exec (cpu=cpu@entry=0x7ffff7e20010) at
-/home/build/src/qemu/git/qemu/cpu-exec.c:685
-#16 0x000000000047457e in tcg_cpu_exec (cpu=0x7ffff7e20010) at
-/home/build/src/qemu/git/qemu/cpus.c:1251
-#17 0x00000000004748b4 in qemu_tcg_rr_cpu_thread_fn (arg=<optimized
-out>) at /home/build/src/qemu/git/qemu/cpus.c:1347
-#18 0x00007ffff2a50b50 in start_thread (arg=<optimized out>) at
-pthread_create.c:304
-#19 0x00007ffff279afbd in clone () at
-../sysdeps/unix/sysv/linux/x86_64/clone.S:112
-#20 0x0000000000000000 in ?? ()
-(gdb)
+-- =
 
-git bisect points to the following commit:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/597362
 
-commit dc0ad84449a4e2f28d2cc055998cb10c1a4d89a9
-Author: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Date:   Mon Feb 27 10:27:57 2017 +0530
+Title:
+  qemu-system-sparc singlestep not work in gdbstub
 
-    target/ppc: update overflow flags for add/sub
+Status in QEMU:
+  Fix Released
 
-    * SO and OV reflects overflow of the 64-bit result in 64-bit mode
-      and overflow of the low-order 32-bit result in 32-bit mode
+Bug description:
+  Debugging with gdb-stub does not work with qemu-system-sparc target
 
-    * OV32 reflects overflow of the low-order 32-bit independent of
-      the mode
+  Qemu compiled from current git tree.
 
-    Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-    Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+  execution string: qemu-system-sparc.exe -s -S -m 256 -L Bios -hda
+  sparc.img -boot c
+  connect with telnet localhost 1234
+  enter '$s#73' (without quotes, this is single step command to gdb stub)
+  gdb stub reply '+' (without quotes, as it accept command)
+  After this qemu continuously execute instructions in single step mode
+  and does not exit to gdb stub after each executed instruction with
+  interrupt signal
+  ("T%02xthread:%02x;" /gdb_vm_state_change in gdbstub.c/ );
 
-Interestingly enough if I recompile with CFLAGS="-O0 -g" to try and get
-a full backtrace then the segfault goes away which suggests this could
-be tickling a compiler bug somewhere - although even in this
-configuration, I am seeing video artifacts during OS 9 boot which
-suggests something still isn't quite right.
+  If we look at target-sparc/translate.c, we can see that
+  gen_helper_debug() is not called in single step mode:
 
-This is on a Debian wheezy x86_64 system with gcc 4.7.2.
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+      if ((pc & TARGET_PAGE_MASK) =3D=3D (tb->pc & TARGET_PAGE_MASK) &&
+          (npc & TARGET_PAGE_MASK) =3D=3D (tb->pc & TARGET_PAGE_MASK) &&
+          !s->singlestep)  {
+          /* jump to same page: we can use a direct jump */
+          tcg_gen_goto_tb(tb_num);
+          tcg_gen_movi_tl(cpu_pc, pc);
+          tcg_gen_movi_tl(cpu_npc, npc);
+          tcg_gen_exit_tb((long)tb + tb_num);
+      } else {
+          /* jump to another page: currently not optimized */
+          tcg_gen_movi_tl(cpu_pc, pc);
+          tcg_gen_movi_tl(cpu_npc, npc);
+          tcg_gen_exit_tb(0);
+      }
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
 
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+          /* if single step mode, we generate only one instruction and
+             generate an exception */
+          if (dc->singlestep) {
+              break;
+          }
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-ATB,
+  If we look similar code at target-sh4/translate.c we can see that is
+  called in this cases:
 
-Mark.
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+      if ((tb->pc & TARGET_PAGE_MASK) =3D=3D (dest & TARGET_PAGE_MASK) &&
+  	!ctx->singlestep_enabled) {
+  	/* Use a direct jump if in same page and singlestep not enabled */
+          tcg_gen_goto_tb(n);
+          tcg_gen_movi_i32(cpu_pc, dest);
+          tcg_gen_exit_tb((long) tb + n);
+      } else {
+          tcg_gen_movi_i32(cpu_pc, dest);
+          if (ctx->singlestep_enabled)
+              gen_helper_debug();
+          tcg_gen_exit_tb(0);
+      }
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+      if (tb->cflags & CF_LAST_IO)
+          gen_io_end();
+      if (env->singlestep_enabled) {
+          tcg_gen_movi_i32(cpu_pc, ctx.pc);
+          gen_helper_debug();
+      } else {
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/597362/+subscriptions
