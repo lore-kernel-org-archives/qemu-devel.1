@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cn1Tn-0003I7-8w
-	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 07:16:04 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cn1Uv-0003o5-16
+	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 07:17:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cn1Ti-00006R-AQ
-	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 07:16:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52308)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cn1Uq-0000Ws-2f
+	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 07:17:12 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:53800
+	helo=s16892447.onlinehome-server.info)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cn1Th-00005e-UZ
-	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 07:15:58 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cn1Tf-0001bX-Tc
-	for <qemu-devel@nongnu.org>; Sun, 12 Mar 2017 11:15:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id DC6F42E80C0
-	for <qemu-devel@nongnu.org>; Sun, 12 Mar 2017 11:15:55 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 12 Mar 2017 11:03:11 -0000
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1cn1Up-0000Wd-Ri
+	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 07:17:08 -0400
+References: <90ac2aef-5fff-ada6-d847-cd3ce20b967a@ilande.co.uk>
+	<20170312025259-mutt-send-email-mst@kernel.org>
+	<20170312055033-mutt-send-email-mst@kernel.org>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reply-To: Bug 597362 <597362@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20100622173200.15537.61592.malonedeb@gandwana.canonical.com>
-Message-Id: <20170312110311.25214.27684.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 597362] Re: qemu-system-sparc singlestep not work
- in gdbstub
+Message-ID: <5f5a4f09-3da7-e200-cda2-85e1053bb9ee@ilande.co.uk>
+Date: Sun, 12 Mar 2017 11:16:44 +0000
+MIME-Version: 1.0
+In-Reply-To: <20170312055033-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Incorrect memory region address with large 64-bit
+ PCI BARs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,98 +31,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-I'm sure this has been fixed years ago (and qemu-system-sparc single-
-step seems fine in local tests) so I'm marking this as "Fix released".
+On 12/03/17 03:56, Michael S. Tsirkin wrote:
+
+> After looking at it some more, I think the issue is merely with how info
+> mtree presents information, which confuses instead of helping when
+> overlap triggers. Specifically
+>     000001ff00000000-000001ffffffffff (prio 0, i/o): pci-mmio
+> 	...
+>       000001fe04040000-000001fe04043fff (prio 1, i/o): virtio-pci
+> 
+> really means that virtio-pci is not visible at all, this
+> happens because it starts at offset ffffffff04040000 which is
+> outside the parent.
+> 
+> I think that the cleanest fix is probably to show 128 bit addresses,
+> then user will see the real addresses:
+> 
+>     000001ff00000000-000001ffffffffff (prio 0, i/o): pci-mmio
+> 	...
+>       1000001fe04040000-1000001fe04043fff (prio 1, i/o): virtio-pci
+> 	
+> and now it's clear what is going on: virtio-pci is outside pci-mmio.
+> 
+> This would have pointed Mark in the right direction earlier.
+> 
+> Thoughts? Patch?
+
+Presumably if someone tried to do this on real hardware, the BAR address
+would lie outside of the pci-mmio region and effectively isn't mapped?
+
+If this is the case I'd be happy with a simple qemu_log() showing the
+full 64-bit address and region name explaining that it couldn't be
+mapped underneath its parent because it was outside its parent region,
+and skip the mapping.
 
 
-** Changed in: qemu
-       Status: Expired =3D> Fix Released
+ATB,
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/597362
-
-Title:
-  qemu-system-sparc singlestep not work in gdbstub
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  Debugging with gdb-stub does not work with qemu-system-sparc target
-
-  Qemu compiled from current git tree.
-
-  execution string: qemu-system-sparc.exe -s -S -m 256 -L Bios -hda
-  sparc.img -boot c
-  connect with telnet localhost 1234
-  enter '$s#73' (without quotes, this is single step command to gdb stub)
-  gdb stub reply '+' (without quotes, as it accept command)
-  After this qemu continuously execute instructions in single step mode
-  and does not exit to gdb stub after each executed instruction with
-  interrupt signal
-  ("T%02xthread:%02x;" /gdb_vm_state_change in gdbstub.c/ );
-
-  If we look at target-sparc/translate.c, we can see that
-  gen_helper_debug() is not called in single step mode:
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-      if ((pc & TARGET_PAGE_MASK) =3D=3D (tb->pc & TARGET_PAGE_MASK) &&
-          (npc & TARGET_PAGE_MASK) =3D=3D (tb->pc & TARGET_PAGE_MASK) &&
-          !s->singlestep)  {
-          /* jump to same page: we can use a direct jump */
-          tcg_gen_goto_tb(tb_num);
-          tcg_gen_movi_tl(cpu_pc, pc);
-          tcg_gen_movi_tl(cpu_npc, npc);
-          tcg_gen_exit_tb((long)tb + tb_num);
-      } else {
-          /* jump to another page: currently not optimized */
-          tcg_gen_movi_tl(cpu_pc, pc);
-          tcg_gen_movi_tl(cpu_npc, npc);
-          tcg_gen_exit_tb(0);
-      }
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-          /* if single step mode, we generate only one instruction and
-             generate an exception */
-          if (dc->singlestep) {
-              break;
-          }
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  If we look similar code at target-sh4/translate.c we can see that is
-  called in this cases:
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-      if ((tb->pc & TARGET_PAGE_MASK) =3D=3D (dest & TARGET_PAGE_MASK) &&
-  	!ctx->singlestep_enabled) {
-  	/* Use a direct jump if in same page and singlestep not enabled */
-          tcg_gen_goto_tb(n);
-          tcg_gen_movi_i32(cpu_pc, dest);
-          tcg_gen_exit_tb((long) tb + n);
-      } else {
-          tcg_gen_movi_i32(cpu_pc, dest);
-          if (ctx->singlestep_enabled)
-              gen_helper_debug();
-          tcg_gen_exit_tb(0);
-      }
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-      if (tb->cflags & CF_LAST_IO)
-          gen_io_end();
-      if (env->singlestep_enabled) {
-          tcg_gen_movi_i32(cpu_pc, ctx.pc);
-          gen_helper_debug();
-      } else {
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/597362/+subscriptions
+Mark.
