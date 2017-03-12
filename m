@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cmr2f-0000JO-00
-	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 19:07:21 -0500
+	(envelope-from <mst@redhat.com>) id 1cmsbB-0000tw-Id
+	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 20:47:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cmr2b-0004f1-Jk
-	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 19:07:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53836)
+	(envelope-from <mst@redhat.com>) id 1cmsb6-00060k-J2
+	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 20:47:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:32930)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cmr2b-0004eT-BH
-	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 19:07:17 -0500
-Date: Sun, 12 Mar 2017 02:07:14 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cmsb6-00060N-Af
+	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 20:47:00 -0500
+Date: Sun, 12 Mar 2017 03:46:57 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170312020638-mutt-send-email-mst@kernel.org>
-References: <1488519630-89058-1-git-send-email-wei.w.wang@intel.com>
-	<1488519630-89058-4-git-send-email-wei.w.wang@intel.com>
-	<20170309141411.GZ16328@bombadil.infradead.org>
-	<58C28FF8.5040403@intel.com>
-	<20170310175349-mutt-send-email-mst@kernel.org>
-	<20170310171143.GA16328@bombadil.infradead.org>
-	<58C3E6A3.1000000@intel.com>
+Message-ID: <20170312025259-mutt-send-email-mst@kernel.org>
+References: <90ac2aef-5fff-ada6-d847-cd3ce20b967a@ilande.co.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <58C3E6A3.1000000@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v7 kernel 3/5] virtio-balloon:
- implementation of VIRTIO_BALLOON_F_CHUNK_TRANSFER
+In-Reply-To: <90ac2aef-5fff-ada6-d847-cd3ce20b967a@ilande.co.uk>
+Subject: Re: [Qemu-devel] Incorrect memory region address with large 64-bit
+ PCI BARs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,55 +27,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: Matthew Wilcox <willy@infradead.org>, virtio-dev@lists.oasis-open.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, linux-mm@kvack.org, Liang Li <liang.z.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Amit Shah <amit.shah@redhat.com>, Dave Hansen <dave.hansen@intel.com>, Andrea Arcangeli <aarcange@redhat.com>, David Hildenbrand <david@redhat.com>, Liang Li <liliang324@gmail.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Sat, Mar 11, 2017 at 07:59:31PM +0800, Wei Wang wrote:
-> On 03/11/2017 01:11 AM, Matthew Wilcox wrote:
-> > On Fri, Mar 10, 2017 at 05:58:28PM +0200, Michael S. Tsirkin wrote:
-> > > One of the issues of current balloon is the 4k page size
-> > > assumption. For example if you free a huge page you
-> > > have to split it up and pass 4k chunks to host.
-> > > Quite often host can't free these 4k chunks at all (e.g.
-> > > when it's using huge tlb fs).
-> > > It's even sillier for architectures with base page size >4k.
-> > I completely agree with you that we should be able to pass a hugepage
-> > as a single chunk.  Also we shouldn't assume that host and guest have
-> > the same page size.  I think we can come up with a scheme that actually
-> > lets us encode that into a 64-bit word, something like this:
-> > 
-> > bit 0 clear => bits 1-11 encode a page count, bits 12-63 encode a PFN, page size 4k.
-> > bit 0 set, bit 1 clear => bits 2-12 encode a page count, bits 13-63 encode a PFN, page size 8k
-> > bits 0+1 set, bit 2 clear => bits 3-13 for page count, bits 14-63 for PFN, page size 16k.
-> > bits 0-2 set, bit 3 clear => bits 4-14 for page count, bits 15-63 for PFN, page size 32k
-> > bits 0-3 set, bit 4 clear => bits 5-15 for page count, bits 16-63 for PFN, page size 64k
-> > 
-> > That means we can always pass 2048 pages (of whatever page size) in a single chunk.  And
-> > we support arbitrary power of two page sizes.  I suggest something like this:
-> > 
-> > u64 page_to_chunk(struct page *page)
-> > {
-> > 	u64 chunk = page_to_pfn(page) << PAGE_SHIFT;
-> > 	chunk |= (1UL << compound_order(page)) - 1;
-> > }
-> > 
-> > (note this is a single page of order N, so we leave the page count bits
-> > set to 0, meaning one page).
-> > 
+On Sat, Mar 11, 2017 at 10:37:09AM +0000, Mark Cave-Ayland wrote:
+> I've been looking at an issue with virtio BARs being mapped incorrectly
+> on qemu-system-sparc64, and as part of this investigation found that
+> some 64-bit PCI BAR memory regions don't appear correctly in "info mtree".
 > 
-> I'm thinking what if the guest needs to transfer these much physically
-> continuous
-> memory to host: 1GB+2MB+64KB+32KB+16KB+4KB.
-> Is it going to use Six 64-bit chunks? Would it be simpler if we just
-> use the 128-bit chunk format (we can drop the previous normal 64-bit
-> format)?
+> The easiest way to see this is to launch QEMU as below and then check
+> the output of "info mtree":
 > 
-> Best,
-> Wei
+> ./qemu-system-sparc64 -device virtio-net-pci
+> 
+> The interesting part is this:
+> 
+> > address-space: memory
+> >   0000000000000000-ffffffffffffffff (prio 0, i/o): system
+> >     0000000000000000-0000000007ffffff (prio 0, ram): sun4u.ram
+> >     000001fe00000000-000001fe0000ffff (prio 0, i/o): apb-config
+> >     000001fe01000000-000001fe01ffffff (prio 0, i/o): apb-pci-config
+> >     000001fe02000000-000001fe0200ffff (prio 0, i/o): alias apb-pci ioport @io 0000000000000000-000000000000ffff
+> >     000001ff00000000-000001ffffffffff (prio 0, i/o): pci-mmio
+> >       000001ff00000000-000001ff000fffff (prio 1, i/o): alias pci_bridge_mem @pci_bridge_pci 0000000000000000-00000000000fffff
+> >       000001ff00000000-000001ff000fffff (prio 1, i/o): alias pci_bridge_pref_mem @pci_bridge_pci 0000000000000000-00000000000fffff
+> >       000001ff00000000-000001ff000fffff (prio 1, i/o): alias pci_bridge_mem @pci_bridge_pci 0000000000000000-00000000000fffff
+> >       000001ff00000000-000001ff000fffff (prio 1, i/o): alias pci_bridge_pref_mem @pci_bridge_pci 0000000000000000-00000000000fffff
+> >       000001ff000a0000-000001ff000affff (prio 2, i/o): alias vga.chain4 @vga.vram 0000000000000000-000000000000ffff
+> >       000001ff000a0000-000001ff000bffff (prio 1, i/o): vga-lowmem
+> >       000001ff01000000-000001ff01ffffff (prio 1, ram): vga.vram
+> >       000001ff02000000-000001ff02000fff (prio 1, i/o): vga.mmio
+> >         000001ff02000400-000001ff0200041f (prio 0, i/o): vga ioports remapped
+> >         000001ff02000500-000001ff02000515 (prio 0, i/o): bochs dispi interface
+> >         000001ff02000600-000001ff02000607 (prio 0, i/o): qemu extended regs
+> >       000001ff02010000-000001ff0201ffff (prio 1, rom): vga.rom
+> >       000001ff03000000-000001ff03ffffff (prio 1, i/o): alias bar0 @io 0000000000000000-0000000000ffffff
+> >       000001ff04000000-000001ff0403ffff (prio 1, rom): ne2000.rom
+> >       000001ff04080000-000001ff040bffff (prio 1, rom): virtio-net-pci.rom
+> >       000001fe04040000-000001fe04043fff (prio 1, i/o): virtio-pci
+>         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 
+> Here virtio-pci is mapped to address 0x1fe04040000 even though its
+> parent pci-mmio memory region is at 0x1ff00000000.
+> 
+> >         000001fe04040000-000001fe04040fff (prio 0, i/o): virtio-pci-common
+> >         000001fe04041000-000001fe04041fff (prio 0, i/o): virtio-pci-isr
+> >         000001fe04042000-000001fe04042fff (prio 0, i/o): virtio-pci-device
+> >         000001fe04043000-000001fe04043fff (prio 0, i/o): virtio-pci-notify
+> >     000001fff0000000-000001fff03fffff (prio 0, rom): sun4u.prom
+> 
+> The bug in the current OpenBIOS is that 64-bit BARs are incorrectly
+> identified, and so the BAR MSB register is set to 0xffffffff to detect
+> the size as per a standard 32-bit BAR. At this point OpenBIOS detects
+> something is wrong and aborts, leaving the 64-bit BAR set to 0xffffffff
+> 0x04040000.
+> 
+> This is accurately reflected in the virtio-pci memory region itself, i.e.
+> 
+> > memory-region: virtio-pci
+> >   ffffffff04040000-ffffffff04043fff (prio 1, i/o): virtio-pci
+> >     ffffffff04040000-ffffffff04040fff (prio 0, i/o): virtio-pci-common
+> >     ffffffff04041000-ffffffff04041fff (prio 0, i/o): virtio-pci-isr
+> >     ffffffff04042000-ffffffff04042fff (prio 0, i/o): virtio-pci-device
+> >     ffffffff04043000-ffffffff04043fff (prio 0, i/o): virtio-pci-notify
+> 
+> But as you can see above the overall effect is that the virtio-pci
+> device ends up somehow being mapped outside (and indeed, before the
+> start of) its parent memory region.
 
-I think I prefer that as a more straightforward approach, but
-I can live with either approach.
+And specifically we have:
+
+000001ff00000000 + ffffffff04040000 = 000001fe04043000
+
+which seems to be where this is coming from.
+
+It does have to indicate some kind of modelling problem:
+since it looks like on sparc BAR is an offset within
+PCI MMIO region, I would expect an offset value bigger than 
+the region size not to be visible.
+
+Specifically documentation states:
+
+- all direct subregions of the root region are matched against the address, in
+  descending priority order
+  - if the address lies outside the region offset/size, the subregion is
+    discarded
 
 
--- 
-MST
+
+> Fixing the bug in OpenBIOS itself is fairly trivial, although it took
+> much longer to diagnose due to the misleading output above. It does seem
+> that something isn't quite right with the handling of the large 64-bit
+> BARs in this case, so Michael suggested I email the list for further
+> comment.
+> 
+> 
+> ATB,
+> 
+> Mark.
