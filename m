@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38810)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1cmq1g-0000S5-UQ
-	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 18:02:17 -0500
+	(envelope-from <mst@redhat.com>) id 1cmr1H-000824-VD
+	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 19:05:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1cmq1f-0000pJ-5Y
-	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 18:02:17 -0500
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:35726)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1cmq1f-0000pC-13
-	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 18:02:15 -0500
-Received: by mail-pf0-x244.google.com with SMTP id 67so14859878pfg.2
-	for <qemu-devel@nongnu.org>; Sat, 11 Mar 2017 15:02:14 -0800 (PST)
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Sat, 11 Mar 2017 15:01:53 -0800
-Message-Id: <1489273313-22628-1-git-send-email-jcmvbkbc@gmail.com>
-Subject: [Qemu-devel] [PATCH] target/xtensa: fix semihosting argc/argv
- implementation
+	(envelope-from <mst@redhat.com>) id 1cmr1E-0004K4-Q3
+	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 19:05:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55236)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cmr1E-0004Jx-HE
+	for qemu-devel@nongnu.org; Sat, 11 Mar 2017 19:05:52 -0500
+Date: Sun, 12 Mar 2017 02:05:47 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170312020203-mutt-send-email-mst@kernel.org>
+References: <1488519630-89058-1-git-send-email-wei.w.wang@intel.com>
+	<1488519630-89058-4-git-send-email-wei.w.wang@intel.com>
+	<20170309141411.GZ16328@bombadil.infradead.org>
+	<58C28FF8.5040403@intel.com>
+	<20170310175349-mutt-send-email-mst@kernel.org>
+	<20170310171143.GA16328@bombadil.infradead.org>
+	<20170310211102-mutt-send-email-mst@kernel.org>
+	<20170310212541.GC16328@bombadil.infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170310212541.GC16328@bombadil.infradead.org>
+Subject: Re: [Qemu-devel] [PATCH v7 kernel 3/5] virtio-balloon:
+ implementation of VIRTIO_BALLOON_F_CHUNK_TRANSFER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,94 +34,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Max Filippov <jcmvbkbc@gmail.com>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Wei Wang <wei.w.wang@intel.com>, virtio-dev@lists.oasis-open.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, linux-mm@kvack.org, Liang Li <liang.z.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Amit Shah <amit.shah@redhat.com>, Dave Hansen <dave.hansen@intel.com>, Andrea Arcangeli <aarcange@redhat.com>, David Hildenbrand <david@redhat.com>, Liang Li <liliang324@gmail.com>
 
-So far xtensa provides fixed dummy argc/argv for the corresponding
-semihosting calls. Now that there are semihosting_get_argc and
-semihosting_get_arg, use them to pass actual command line arguments
-to guest.
+On Fri, Mar 10, 2017 at 01:25:41PM -0800, Matthew Wilcox wrote:
+> On Fri, Mar 10, 2017 at 09:35:21PM +0200, Michael S. Tsirkin wrote:
+> > > bit 0 clear => bits 1-11 encode a page count, bits 12-63 encode a PFN, page size 4k.
+> > > bit 0 set, bit 1 clear => bits 2-12 encode a page count, bits 13-63 encode a PFN, page size 8k
+> > > bits 0+1 set, bit 2 clear => bits 3-13 for page count, bits 14-63 for PFN, page size 16k.
+> > > bits 0-2 set, bit 3 clear => bits 4-14 for page count, bits 15-63 for PFN, page size 32k
+> > > bits 0-3 set, bit 4 clear => bits 5-15 for page count, bits 16-63 for PFN, page size 64k
+> > > That means we can always pass 2048 pages (of whatever page size) in a single chunk.  And
+> > > we support arbitrary power of two page sizes.  I suggest something like this:
+> > > 
+> > > u64 page_to_chunk(struct page *page)
+> > > {
+> > > 	u64 chunk = page_to_pfn(page) << PAGE_SHIFT;
+> > > 	chunk |= (1UL << compound_order(page)) - 1;
+> > > }
+> > 
+> > You need to fill in the size, do you not?
+> 
+> I think I did ... (1UL << compound_order(page)) - 1 sets the bottom
+> N bits.  Bit N+1 will already be clear.  What am I missing?
 
-Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
----
- target/xtensa/xtensa-semi.c | 49 +++++++++++++++++++++++++++++++++------------
- 1 file changed, 36 insertions(+), 13 deletions(-)
+This sets the order but not the number of pages.
+For that you would do something like
 
-diff --git a/target/xtensa/xtensa-semi.c b/target/xtensa/xtensa-semi.c
-index 370e365..a888a9d 100644
---- a/target/xtensa/xtensa-semi.c
-+++ b/target/xtensa/xtensa-semi.c
-@@ -28,6 +28,7 @@
- #include "qemu/osdep.h"
- #include "cpu.h"
- #include "exec/helper-proto.h"
-+#include "exec/semihost.h"
- #include "qemu/log.h"
- 
- enum {
-@@ -261,28 +262,50 @@ void HELPER(simcall)(CPUXtensaState *env)
-         break;
- 
-     case TARGET_SYS_argc:
--        regs[2] = 1;
-+        regs[2] = semihosting_get_argc();
-         regs[3] = 0;
-         break;
- 
-     case TARGET_SYS_argv_sz:
--        regs[2] = 128;
--        regs[3] = 0;
-+        {
-+            int argc = semihosting_get_argc();
-+            int sz = (argc + 1) * sizeof(uint32_t);
-+            int i;
-+
-+            for (i = 0; i < argc; ++i) {
-+                sz += 1 + strlen(semihosting_get_arg(i));
-+            }
-+            regs[2] = sz;
-+            regs[3] = 0;
-+        }
-         break;
- 
-     case TARGET_SYS_argv:
-         {
--            struct Argv {
--                uint32_t argptr[2];
--                char text[120];
--            } argv = {
--                {0, 0},
--                "test"
--            };
--
--            argv.argptr[0] = tswap32(regs[3] + offsetof(struct Argv, text));
-+            int argc = semihosting_get_argc();
-+            int str_offset = (argc + 1) * sizeof(uint32_t);
-+            int i;
-+            uint32_t argptr;
-+
-+            for (i = 0; i < argc; ++i) {
-+                const char *str = semihosting_get_arg(i);
-+                int str_size = strlen(str) + 1;
-+
-+                argptr = tswap32(regs[3] + str_offset);
-+
-+                cpu_memory_rw_debug(cs,
-+                                    regs[3] + i * sizeof(uint32_t),
-+                                    (uint8_t *)&argptr, sizeof(argptr), 1);
-+                cpu_memory_rw_debug(cs,
-+                                    regs[3] + str_offset,
-+                                    (uint8_t *)str, str_size, 1);
-+                str_offset += str_size;
-+            }
-+            argptr = 0;
-             cpu_memory_rw_debug(cs,
--                                regs[3], (uint8_t *)&argv, sizeof(argv), 1);
-+                                regs[3] + i * sizeof(uint32_t),
-+                                (uint8_t *)&argptr, sizeof(argptr), 1);
-+            regs[3] = 0;
-         }
-         break;
- 
+	chunk |= size << compound_order(page)
+
+right?
+
+> > > > - host should pass its base page size to guest
+> > > >   this can be a separate patch and for now we can fall back on 12 bit if not there
+> > > 
+> > > With this encoding scheme, I don't think we need to do this?  As long as
+> > > it's *at least* 12 bit, then we're fine.
+> > 
+> > I think we will still need something like this down the road.  The point
+> > is that not all hosts are able to use 4k pages in a balloon.
+> > So it's pointless for guest to pass 4k pages to such a host,
+> > and we need host to tell guest the page size it needs.
+> > 
+> > However that's a separate feature that can wait until
+> > another day.
+> 
+> Ah, the TRIM/DISCARD debate all over again ... should the guest batch
+> up or should the host do that work ... probably easier to account it in
+> the guest.  Might be better to frame it as 'balloon chunk size' rather than
+> host page size as it might have nothing to do with the host page size.
+
+Exactly.
+
+> > > What per-chunk flags are you thinking would be useful?
+> > 
+> > Not entirely sure but I think would have been prudent to leave some free
+> > if possible. Your encoding seems to use them all up, so be it.
+> 
+> We don't necessarily have to support 2048 pages in a single chunk.
+> If it's worth reserving some bits, we can do that at the expense of
+> reducing the maximum number of pages per chunk.
+
+Well we can always change things with a feature bit ..
+I'll leave this up to you and Wei.
+
 -- 
-2.1.4
+MST
