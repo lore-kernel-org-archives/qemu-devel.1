@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <phil@philjordan.eu>) id 1cmwWj-0005S5-Lg
-	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 00:58:47 -0500
+	(envelope-from <phil@philjordan.eu>) id 1cmwX1-0005dZ-8X
+	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 00:59:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <phil@philjordan.eu>) id 1cmwWh-0004PD-W7
-	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 00:58:45 -0500
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:36447)
+	(envelope-from <phil@philjordan.eu>) id 1cmwWw-0004S8-Kh
+	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 00:59:03 -0500
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:33123)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <phil@philjordan.eu>) id 1cmwWh-0004P7-OQ
-	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 00:58:43 -0500
-Received: by mail-pf0-x242.google.com with SMTP id j5so15447030pfb.3
-	for <qemu-devel@nongnu.org>; Sat, 11 Mar 2017 21:58:43 -0800 (PST)
+	(Exim 4.71) (envelope-from <phil@philjordan.eu>) id 1cmwWw-0004Rx-Ew
+	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 00:58:58 -0500
+Received: by mail-pg0-x241.google.com with SMTP id 77so14697120pgc.0
+	for <qemu-devel@nongnu.org>; Sat, 11 Mar 2017 21:58:58 -0800 (PST)
 From: Phil Dennis-Jordan <phil@philjordan.eu>
-Date: Sun, 12 Mar 2017 18:58:10 +1300
-Message-Id: <1489298291-25154-2-git-send-email-phil@philjordan.eu>
+Date: Sun, 12 Mar 2017 18:58:11 +1300
+Message-Id: <1489298291-25154-3-git-send-email-phil@philjordan.eu>
 In-Reply-To: <1489298291-25154-1-git-send-email-phil@philjordan.eu>
 References: <1489298291-25154-1-git-send-email-phil@philjordan.eu>
-Subject: [Qemu-devel] [PATCH v2 1/2] hw/i386: Use Rev3 FADT (ACPI 2.0)
- instead of Rev1 to improve guest OS support.
+Subject: [Qemu-devel] [PATCH v2 2/2] hw/i386: Build-time assertion on pc/q35
+ reset register being identical.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,203 +29,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>
 Cc: Phil Dennis-Jordan <phil@philjordan.eu>
 
-This updates the FADT generated for x86/64 machine types from Revision 1 to 3. (Based on ACPI standard 2.0 instead of 1.0) The intention is to expose the reset register information to guest operating systems which require it, specifically OS X/macOS. Revision 1 FADTs do not contain the fields relating to the reset register.
-
-The new layout and contents remains backwards-compatible with operating systems which only support ACPI 1.0, as the existing fields are not modified by this change, as the 64-bit and 32-bit variants are allowed to co-exist according to the ACPI 2.0 standard. No regressions became apparent in tests with a range of Windows (XP-10) and Linux versions.
+This adds a clarifying comment and build time assert to the FADT reset register field initialisation: the reset register is the same on both machine types.
 
 Signed-off-by: Phil Dennis-Jordan <phil@philjordan.eu>
 ---
- hw/i386/acpi-build.c        | 32 +++++++++++++++++--
- include/hw/acpi/acpi-defs.h | 77 +++++++++++++++++++++------------------------
- tests/bios-tables-test.c    |  4 +--
- 3 files changed, 67 insertions(+), 46 deletions(-)
+ hw/i386/acpi-build.c | 3 +++
+ hw/pci-host/piix.c   | 6 ------
+ include/hw/i386/pc.h | 6 ++++++
+ 3 files changed, 9 insertions(+), 6 deletions(-)
 
 diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 2073108..7997f06 100644
+index 7997f06..1d8c645 100644
 --- a/hw/i386/acpi-build.c
 +++ b/hw/i386/acpi-build.c
-@@ -272,7 +272,7 @@ build_facs(GArray *table_data, BIOSLinker *linker)
- }
+@@ -310,6 +310,9 @@ static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
+     fadt->reset_register.space_id = AML_SYSTEM_IO;
+     fadt->reset_register.bit_width = 8;
+     fadt->reset_register.address = cpu_to_le64(ICH9_RST_CNT_IOPORT);
++    /* The above need not be conditional on machine type because the reset port
++     * happens to be the same on PIIX (pc) and ICH9 (q35). */
++    QEMU_BUILD_BUG_ON(ICH9_RST_CNT_IOPORT != RCR_IOPORT);
  
- /* Load chipset information in FADT */
--static void fadt_setup(AcpiFadtDescriptorRev1 *fadt, AcpiPmInfo *pm)
-+static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
- {
-     fadt->model = 1;
-     fadt->reserved1 = 0;
-@@ -304,6 +304,28 @@ static void fadt_setup(AcpiFadtDescriptorRev1 *fadt, AcpiPmInfo *pm)
-         fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_FORCE_APIC_CLUSTER_MODEL);
-     }
-     fadt->century = RTC_CENTURY;
-+
-+    fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_RESET_REG_SUP);
-+    fadt->reset_value = 0xf;
-+    fadt->reset_register.space_id = AML_SYSTEM_IO;
-+    fadt->reset_register.bit_width = 8;
-+    fadt->reset_register.address = cpu_to_le64(ICH9_RST_CNT_IOPORT);
-+
-+    fadt->xpm1a_event_block.space_id = AML_SYSTEM_IO;
-+    fadt->xpm1a_event_block.bit_width = fadt->pm1_evt_len * 8;
-+    fadt->xpm1a_event_block.address = cpu_to_le64(pm->io_base);
-+
-+    fadt->xpm1a_control_block.space_id = AML_SYSTEM_IO;
-+    fadt->xpm1a_control_block.bit_width = fadt->pm1_cnt_len * 8;
-+    fadt->xpm1a_control_block.address = cpu_to_le64(pm->io_base + 0x4);
-+
-+    fadt->xpm_timer_block.space_id = AML_SYSTEM_IO;
-+    fadt->xpm_timer_block.bit_width = fadt->pm_tmr_len * 8;
-+    fadt->xpm_timer_block.address = cpu_to_le64(pm->io_base + 0x8);
-+
-+    fadt->xgpe0_block.space_id = AML_SYSTEM_IO;
-+    fadt->xgpe0_block.bit_width = pm->gpe0_blk_len * 8;
-+    fadt->xgpe0_block.address = cpu_to_le64(pm->gpe0_blk);
- }
+     fadt->xpm1a_event_block.space_id = AML_SYSTEM_IO;
+     fadt->xpm1a_event_block.bit_width = fadt->pm1_evt_len * 8;
+diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
+index f9218aa..bf4221d 100644
+--- a/hw/pci-host/piix.c
++++ b/hw/pci-host/piix.c
+@@ -58,12 +58,6 @@ typedef struct I440FXState {
+ #define XEN_PIIX_NUM_PIRQS      128ULL
+ #define PIIX_PIRQC              0x60
  
- 
-@@ -313,9 +335,10 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
-            unsigned facs_tbl_offset, unsigned dsdt_tbl_offset,
-            const char *oem_id, const char *oem_table_id)
- {
--    AcpiFadtDescriptorRev1 *fadt = acpi_data_push(table_data, sizeof(*fadt));
-+    AcpiFadtDescriptorRev3 *fadt = acpi_data_push(table_data, sizeof(*fadt));
-     unsigned fw_ctrl_offset = (char *)&fadt->firmware_ctrl - table_data->data;
-     unsigned dsdt_entry_offset = (char *)&fadt->dsdt - table_data->data;
-+    unsigned xdsdt_entry_offset = (char *)&fadt->Xdsdt - table_data->data;
- 
-     /* FACS address to be filled by Guest linker */
-     bios_linker_loader_add_pointer(linker,
-@@ -327,9 +350,12 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
-     bios_linker_loader_add_pointer(linker,
-         ACPI_BUILD_TABLE_FILE, dsdt_entry_offset, sizeof(fadt->dsdt),
-         ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
-+    bios_linker_loader_add_pointer(linker,
-+        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->Xdsdt),
-+        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
- 
-     build_header(linker, table_data,
--                 (void *)fadt, "FACP", sizeof(*fadt), 1, oem_id, oem_table_id);
-+                 (void *)fadt, "FACP", sizeof(*fadt), 3, oem_id, oem_table_id);
- }
- 
- void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
-diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-index 4cc3630..293ee45 100644
---- a/include/hw/acpi/acpi-defs.h
-+++ b/include/hw/acpi/acpi-defs.h
-@@ -131,17 +131,37 @@ typedef struct AcpiTableHeader AcpiTableHeader;
-     uint8_t  duty_width;   /* Bit width of duty cycle field in p_cnt reg */ \
-     uint8_t  day_alrm;     /* Index to day-of-month alarm in RTC CMOS RAM */ \
-     uint8_t  mon_alrm;     /* Index to month-of-year alarm in RTC CMOS RAM */ \
--    uint8_t  century;      /* Index to century in RTC CMOS RAM */
+-/*
+- * Reset Control Register: PCI-accessible ISA-Compatible Register at address
+- * 0xcf9, provided by the PCI/ISA bridge (PIIX3 PCI function 0, 8086:7000).
+- */
+-#define RCR_IOPORT 0xcf9
 -
--struct AcpiFadtDescriptorRev1
--{
--    ACPI_FADT_COMMON_DEF
--    uint8_t  reserved4;              /* Reserved */
--    uint8_t  reserved4a;             /* Reserved */
--    uint8_t  reserved4b;             /* Reserved */
--    uint32_t flags;
--} QEMU_PACKED;
--typedef struct AcpiFadtDescriptorRev1 AcpiFadtDescriptorRev1;
-+    uint8_t  century;      /* Index to century in RTC CMOS RAM */ \
-+    /* IA-PC Boot Architecture Flags (see below for individual flags) */ \
-+    uint16_t boot_flags; \
-+    uint8_t reserved;    /* Reserved, must be zero */ \
-+    /* Miscellaneous flag bits (see below for individual flags) */ \
-+    uint32_t flags; \
-+    /* 64-bit address of the Reset register */ \
-+    struct AcpiGenericAddress reset_register; \
-+    /* Value to write to the reset_register port to reset the system */ \
-+    uint8_t reset_value; \
-+    /* ARM-Specific Boot Flags (see below for individual flags) (ACPI 5.1) */ \
-+    uint16_t arm_boot_flags; \
-+    uint8_t minor_revision;  /* FADT Minor Revision (ACPI 5.1) */ \
-+    uint64_t Xfacs;          /* 64-bit physical address of FACS */ \
-+    uint64_t Xdsdt;          /* 64-bit physical address of DSDT */ \
-+    /* 64-bit Extended Power Mgt 1a Event Reg Blk address */ \
-+    struct AcpiGenericAddress xpm1a_event_block; \
-+    /* 64-bit Extended Power Mgt 1b Event Reg Blk address */ \
-+    struct AcpiGenericAddress xpm1b_event_block; \
-+    /* 64-bit Extended Power Mgt 1a Control Reg Blk address */ \
-+    struct AcpiGenericAddress xpm1a_control_block; \
-+    /* 64-bit Extended Power Mgt 1b Control Reg Blk address */ \
-+    struct AcpiGenericAddress xpm1b_control_block; \
-+    /* 64-bit Extended Power Mgt 2 Control Reg Blk address */ \
-+    struct AcpiGenericAddress xpm2_control_block; \
-+    /* 64-bit Extended Power Mgt Timer Ctrl Reg Blk address */ \
-+    struct AcpiGenericAddress xpm_timer_block; \
-+    /* 64-bit Extended General Purpose Event 0 Reg Blk address */ \
-+    struct AcpiGenericAddress xgpe0_block; \
-+    /* 64-bit Extended General Purpose Event 1 Reg Blk address */ \
-+    struct AcpiGenericAddress xgpe1_block; \
+ typedef struct PIIX3State {
+     PCIDevice dev;
  
- struct AcpiGenericAddress {
-     uint8_t space_id;        /* Address space where struct or register exists */
-@@ -151,38 +171,13 @@ struct AcpiGenericAddress {
-     uint64_t address;        /* 64-bit address of struct or register */
- } QEMU_PACKED;
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index ab303c7..10cb55f 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -303,6 +303,12 @@ typedef struct PCII440FXState PCII440FXState;
  
-+struct AcpiFadtDescriptorRev3 {
-+    ACPI_FADT_COMMON_DEF
-+} QEMU_PACKED;
-+typedef struct AcpiFadtDescriptorRev3 AcpiFadtDescriptorRev3;
+ #define TYPE_IGD_PASSTHROUGH_I440FX_PCI_DEVICE "igd-passthrough-i440FX"
+ 
++/*
++ * Reset Control Register: PCI-accessible ISA-Compatible Register at address
++ * 0xcf9, provided by the PCI/ISA bridge (PIIX3 PCI function 0, 8086:7000).
++ */
++#define RCR_IOPORT 0xcf9
 +
- struct AcpiFadtDescriptorRev5_1 {
-     ACPI_FADT_COMMON_DEF
--    /* IA-PC Boot Architecture Flags (see below for individual flags) */
--    uint16_t boot_flags;
--    uint8_t reserved;    /* Reserved, must be zero */
--    /* Miscellaneous flag bits (see below for individual flags) */
--    uint32_t flags;
--    /* 64-bit address of the Reset register */
--    struct AcpiGenericAddress reset_register;
--    /* Value to write to the reset_register port to reset the system */
--    uint8_t reset_value;
--    /* ARM-Specific Boot Flags (see below for individual flags) (ACPI 5.1) */
--    uint16_t arm_boot_flags;
--    uint8_t minor_revision;  /* FADT Minor Revision (ACPI 5.1) */
--    uint64_t Xfacs;          /* 64-bit physical address of FACS */
--    uint64_t Xdsdt;          /* 64-bit physical address of DSDT */
--    /* 64-bit Extended Power Mgt 1a Event Reg Blk address */
--    struct AcpiGenericAddress xpm1a_event_block;
--    /* 64-bit Extended Power Mgt 1b Event Reg Blk address */
--    struct AcpiGenericAddress xpm1b_event_block;
--    /* 64-bit Extended Power Mgt 1a Control Reg Blk address */
--    struct AcpiGenericAddress xpm1a_control_block;
--    /* 64-bit Extended Power Mgt 1b Control Reg Blk address */
--    struct AcpiGenericAddress xpm1b_control_block;
--    /* 64-bit Extended Power Mgt 2 Control Reg Blk address */
--    struct AcpiGenericAddress xpm2_control_block;
--    /* 64-bit Extended Power Mgt Timer Ctrl Reg Blk address */
--    struct AcpiGenericAddress xpm_timer_block;
--    /* 64-bit Extended General Purpose Event 0 Reg Blk address */
--    struct AcpiGenericAddress xgpe0_block;
--    /* 64-bit Extended General Purpose Event 1 Reg Blk address */
--    struct AcpiGenericAddress xgpe1_block;
-     /* 64-bit Sleep Control register (ACPI 5.0) */
-     struct AcpiGenericAddress sleep_control;
-     /* 64-bit Sleep Status register (ACPI 5.0) */
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index 88dbf97..73b9ae4 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -29,7 +29,7 @@ typedef struct {
-     uint32_t rsdp_addr;
-     AcpiRsdpDescriptor rsdp_table;
-     AcpiRsdtDescriptorRev1 rsdt_table;
--    AcpiFadtDescriptorRev1 fadt_table;
-+    AcpiFadtDescriptorRev3 fadt_table;
-     AcpiFacsDescriptorRev1 facs_table;
-     uint32_t *rsdt_tables_addr;
-     int rsdt_tables_nr;
-@@ -126,7 +126,7 @@ static void test_acpi_rsdt_table(test_data *data)
- 
- static void test_acpi_fadt_table(test_data *data)
- {
--    AcpiFadtDescriptorRev1 *fadt_table = &data->fadt_table;
-+    AcpiFadtDescriptorRev3 *fadt_table = &data->fadt_table;
-     uint32_t addr;
- 
-     /* FADT table comes first */
+ PCIBus *i440fx_init(const char *host_type, const char *pci_type,
+                     PCII440FXState **pi440fx_state, int *piix_devfn,
+                     ISABus **isa_bus, qemu_irq *pic,
 -- 
 2.3.2 (Apple Git-55)
