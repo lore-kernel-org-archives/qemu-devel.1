@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cnJJp-0007ZD-2A
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:19:02 -0400
+	(envelope-from <armbru@redhat.com>) id 1cnJJr-0007bp-Mk
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:19:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cnJJl-0003ch-TC
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:18:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50812)
+	(envelope-from <armbru@redhat.com>) id 1cnJJn-0003fj-9h
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:18:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41074)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cnJJl-0003a6-GR
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:18:53 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cnJJn-0003de-0m
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:18:55 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 13 Mar 2017 07:18:28 +0100
-Message-Id: <1489385927-6735-29-git-send-email-armbru@redhat.com>
+Date: Mon, 13 Mar 2017 07:18:39 +0100
+Message-Id: <1489385927-6735-40-git-send-email-armbru@redhat.com>
 In-Reply-To: <1489385927-6735-1-git-send-email-armbru@redhat.com>
 References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.9 28/47] qapi2texi: Generate descriptions
- for simple union tags
+Subject: [Qemu-devel] [PATCH for-2.9 39/47] qapi: Drop unused variable events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +26,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, eblake@redhat.com, mdroth@linux.vnet.ibm.com
 
-Simple union tags carry no type information, because their type is
-implicit.  Their description should make up for it, but many have
-none.  Generate one automatically then.
-
-Example change (qemu-qmp-ref.txt):
-
-  -- Simple Union: ImageInfoSpecific
-
-      A discriminated record of image format specific information
-      structures.
-
-      Members:
-      'type'
--          Not documented
-+          One of "qcow2", "vmdk", "luks"
-      'data: ImageInfoSpecificQCow2' when 'type' is "qcow2"
-      'data: ImageInfoSpecificVmdk' when 'type' is "vmdk"
-      'data: QCryptoBlockInfoLUKS' when 'type' is "luks"
+Missed in commit e98859a
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi2texi.py | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ scripts/qapi.py | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-index ab6b6cd..282adf4 100755
---- a/scripts/qapi2texi.py
-+++ b/scripts/qapi2texi.py
-@@ -148,11 +148,16 @@ def texi_members(doc, what, base, variants, member_func):
-     """Format the table of members"""
-     items = ''
-     for section in doc.args.itervalues():
-+        # TODO Drop fallbacks when undocumented members are outlawed
-         if section.content:
--            desc = str(section)
-+            desc = texi_format(str(section))
-+        elif (variants and variants.tag_member == section.member
-+              and not section.member.type.doc_type()):
-+            values = section.member.type.member_names()
-+            desc = 'One of ' + ', '.join(['@t{"%s"}' % v for v in values])
-         else:
-             desc = 'Not documented'
--        items += member_func(section.member) + texi_format(desc) + '\n'
-+        items += member_func(section.member) + desc + '\n'
-     if base:
-         items += '@item The members of @code{%s}\n' % base.doc_type()
-     if variants:
+diff --git a/scripts/qapi.py b/scripts/qapi.py
+index 0da426a..12b1bda 100644
+--- a/scripts/qapi.py
++++ b/scripts/qapi.py
+@@ -49,7 +49,6 @@ name_case_whitelist = []
+ enum_types = []
+ struct_types = []
+ union_types = []
+-events = []
+ all_names = {}
+ 
+ #
+@@ -751,14 +750,12 @@ def check_command(expr, info):
+ 
+ 
+ def check_event(expr, info):
+-    global events
+     name = expr['event']
+     boxed = expr.get('boxed', False)
+ 
+     meta = ['struct']
+     if boxed:
+         meta += ['union', 'alternate']
+-    events.append(name)
+     check_type(info, "'data' for event '%s'" % name,
+                expr.get('data'), allow_dict=not boxed, allow_optional=True,
+                allow_metas=meta)
 -- 
 2.7.4
