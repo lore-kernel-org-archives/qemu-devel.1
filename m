@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cnJJn-0007YP-V3
+	(envelope-from <armbru@redhat.com>) id 1cnJJo-0007ZB-Vl
 	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:19:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cnJJl-0003b4-DQ
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:18:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34534)
+	(envelope-from <armbru@redhat.com>) id 1cnJJl-0003cD-Pk
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:18:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34943)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cnJJl-0003Za-34
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cnJJl-0003Zp-A6
 	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:18:53 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 13 Mar 2017 07:18:18 +0100
-Message-Id: <1489385927-6735-19-git-send-email-armbru@redhat.com>
+Date: Mon, 13 Mar 2017 07:18:23 +0100
+Message-Id: <1489385927-6735-24-git-send-email-armbru@redhat.com>
 In-Reply-To: <1489385927-6735-1-git-send-email-armbru@redhat.com>
 References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.9 18/47] qapi: Use raw strings for
- regular expressions consistently
+Subject: [Qemu-devel] [PATCH for-2.9 23/47] qapi2texi: Don't hide
+ undocumented members and arguments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,45 +27,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, eblake@redhat.com, mdroth@linux.vnet.ibm.com
 
+Show undocumented object, alternate type members and command, event
+arguments exactly like undocumented enumeration type values.
+
+Example change (qemu-qmp-ref.txt):
+
+  -- Command: query-rocker
+
+      Return rocker switch information.
+
++     Arguments:
++     'name'
++          Not documented
++
+      Returns: 'Rocker' information
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi.py | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ scripts/qapi2texi.py | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index c580e76..6d39ec9 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -550,7 +550,7 @@ def discriminator_find_enum_define(expr):
- # Names must be letters, numbers, -, and _.  They must start with letter,
- # except for downstream extensions which must start with __RFQDN_.
- # Dots are only valid in the downstream extension prefix.
--valid_name = re.compile('^(__[a-zA-Z0-9.-]+_)?'
-+valid_name = re.compile(r'^(__[a-zA-Z0-9.-]+_)?'
-                         '[a-zA-Z][a-zA-Z0-9_-]*$')
+diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
+index 1f01817..df87441 100755
+--- a/scripts/qapi2texi.py
++++ b/scripts/qapi2texi.py
+@@ -139,12 +139,10 @@ def texi_member(member):
+         member.name, ' (optional)' if member.optional else '')
  
  
-@@ -1827,10 +1827,10 @@ def cgen(code, **kwds):
-     if indent_level:
-         indent = genindent(indent_level)
-         # re.subn() lacks flags support before Python 2.7, use re.compile()
--        raw = re.subn(re.compile("^.", re.MULTILINE),
-+        raw = re.subn(re.compile(r'^.', re.MULTILINE),
-                       indent + r'\g<0>', raw)
-         raw = raw[0]
--    return re.sub(re.escape(eatspace) + ' *', '', raw)
-+    return re.sub(re.escape(eatspace) + r' *', '', raw)
+-def texi_members(doc, what, member_func, show_undocumented):
++def texi_members(doc, what, member_func):
+     """Format the table of members"""
+     items = ''
+     for section in doc.args.itervalues():
+-        if not section.content and not show_undocumented:
+-            continue          # Undocumented TODO require doc and drop
+         if section.content:
+             desc = str(section)
+         else:
+@@ -172,10 +170,9 @@ def texi_sections(doc):
+     return body
  
  
- def mcgen(code, **kwds):
-@@ -1964,7 +1964,7 @@ def parse_command_line(extra_options="", extra_long_options=[]):
-     for oa in opts:
-         o, a = oa
-         if o in ("-p", "--prefix"):
--            match = re.match('([A-Za-z_.-][A-Za-z0-9_.-]*)?', a)
-+            match = re.match(r'([A-Za-z_.-][A-Za-z0-9_.-]*)?', a)
-             if match.end() != len(a):
-                 print >>sys.stderr, \
-                     "%s: 'funny character '%s' in argument of --prefix" \
+-def texi_entity(doc, what, member_func=texi_member,
+-                show_undocumented=False):
++def texi_entity(doc, what, member_func=texi_member):
+     return (texi_body(doc)
+-            + texi_members(doc, what, member_func, show_undocumented)
++            + texi_members(doc, what, member_func)
+             + texi_sections(doc))
+ 
+ 
+@@ -194,8 +191,7 @@ class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisitor):
+         self.out += TYPE_FMT(type='Enum',
+                              name=doc.symbol,
+                              body=texi_entity(doc, 'Values',
+-                                              member_func=texi_enum_value,
+-                                              show_undocumented=True))
++                                              member_func=texi_enum_value))
+ 
+     def visit_object_type(self, name, info, base, members, variants):
+         doc = self.cur_doc
 -- 
 2.7.4
