@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cnXiD-0007a0-4P
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 17:41:06 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cnXiF-0007cK-CL
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 17:41:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cnXiC-0001vu-BM
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 17:41:05 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cnXiE-0001wr-J7
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 17:41:07 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 13 Mar 2017 22:40:37 +0100
-Message-Id: <20170313214045.26857-6-mreitz@redhat.com>
+Date: Mon, 13 Mar 2017 22:40:38 +0100
+Message-Id: <20170313214045.26857-7-mreitz@redhat.com>
 In-Reply-To: <20170313214001.26339-1-mreitz@redhat.com>
 References: <20170313214001.26339-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.10 08/16] block/file-posix: Preallocation
- for truncate
+Subject: [Qemu-devel] [PATCH for-2.10 09/16] block/qcow2: Generalize
+ preallocate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +23,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-By using raw_regular_truncate() in raw_truncate(), we can now easily
-support preallocation.
+This patch adds two new parameters to the preallocate() function so we
+will be able to use it not just for preallocating a new image but also
+for preallocated image growth.
+
+The offset parameter allows the caller to specify a virtual offset from
+which to start preallocating. For newly created images this is always 0,
+but for preallocating growth this will be the old image length.
+
+The new_length parameter specifies the supposed new length of the image
+(basically the "end offset" for preallocation). During image truncation,
+bdrv_getlength() will return the old image length so we cannot rely on
+its return value then.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/file-posix.c | 22 ++++++++++------------
- 1 file changed, 10 insertions(+), 12 deletions(-)
+ block/qcow2.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index cd229324ba..c181f13e98 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1513,12 +1513,6 @@ static int raw_truncate(BlockDriverState *bs, int64_t offset,
-     struct stat st;
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 210646b60f..9abdf9e0fb 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2034,17 +2034,16 @@ static int qcow2_change_backing_file(BlockDriverState *bs,
+     return qcow2_update_header(bs);
+ }
+ 
+-static int preallocate(BlockDriverState *bs)
++static int preallocate(BlockDriverState *bs, int64_t offset, int64_t new_length)
+ {
+     uint64_t bytes;
+-    uint64_t offset;
+     uint64_t host_offset = 0;
+     unsigned int cur_bytes;
      int ret;
+     QCowL2Meta *meta;
  
--    if (prealloc != PREALLOC_MODE_OFF) {
--        error_setg(errp, "Unsupported preallocation mode '%s'",
--                   PreallocMode_lookup[prealloc]);
--        return -ENOTSUP;
--    }
--
-     if (fstat(s->fd, &st)) {
-         ret = -errno;
-         error_setg_errno(errp, -ret, "Failed to fstat() the file");
-@@ -1526,12 +1520,16 @@ static int raw_truncate(BlockDriverState *bs, int64_t offset,
-     }
+-    bytes = bdrv_getlength(bs);
+-    offset = 0;
++    assert(offset <= new_length);
++    bytes = new_length - offset;
  
-     if (S_ISREG(st.st_mode)) {
--        if (ftruncate(s->fd, offset) < 0) {
--            ret = -errno;
--            error_setg_errno(errp, -ret, "Failed to resize the file");
--            return ret;
--        }
--    } else if (S_ISCHR(st.st_mode) || S_ISBLK(st.st_mode)) {
-+        return raw_regular_truncate(s->fd, bs, offset, prealloc, false, errp);
-+    }
-+
-+    if (prealloc != PREALLOC_MODE_OFF) {
-+        error_setg(errp, "Preallocation mode '%s' unsupported for this "
-+                   "non-regular file", PreallocMode_lookup[prealloc]);
-+        return -ENOTSUP;
-+    }
-+
-+    if (S_ISCHR(st.st_mode) || S_ISBLK(st.st_mode)) {
-         if (offset > raw_getlength(bs)) {
-             error_setg(errp, "Cannot grow device files");
-             return -EINVAL;
+     while (bytes) {
+         cur_bytes = MIN(bytes, INT_MAX);
+@@ -2313,7 +2312,7 @@ static int qcow2_create2(const char *filename, int64_t total_size,
+     if (prealloc != PREALLOC_MODE_OFF) {
+         BDRVQcow2State *s = blk_bs(blk)->opaque;
+         qemu_co_mutex_lock(&s->lock);
+-        ret = preallocate(blk_bs(blk));
++        ret = preallocate(blk_bs(blk), 0, total_size);
+         qemu_co_mutex_unlock(&s->lock);
+         if (ret < 0) {
+             error_setg_errno(errp, -ret, "Could not preallocate metadata");
 -- 
 2.12.0
