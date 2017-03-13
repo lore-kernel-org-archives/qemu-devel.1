@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cnW4T-0000aR-Hw
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 15:56:00 -0400
+	(envelope-from <eblake@redhat.com>) id 1cnW4W-0000bD-ET
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 15:56:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cnW4S-0002LY-GR
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 15:55:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38582)
+	(envelope-from <eblake@redhat.com>) id 1cnW4V-0002Or-OP
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 15:56:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47140)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cnW4S-0002LC-82
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 15:55:56 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cnW4V-0002NQ-HZ
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 15:55:59 -0400
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6AE3B63B05
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 19:55:59 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 13 Mar 2017 14:55:20 -0500
-Message-Id: <20170313195547.21466-4-eblake@redhat.com>
+Date: Mon, 13 Mar 2017 14:55:22 -0500
+Message-Id: <20170313195547.21466-6-eblake@redhat.com>
 In-Reply-To: <20170313195547.21466-1-eblake@redhat.com>
 References: <20170313195547.21466-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 03/30] trace: Avoid abuse of amdvi_mmio_read
+Subject: [Qemu-devel] [PATCH v2 05/30] trace: Fix parameter types in io
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,50 +30,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: stefanha@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>
 
-hw/i386/trace-events has an amdvi_mmio_read trace that is used for
-both normal reads (listing the register name, address, size, and
-offset) and for an error case (abusing the register name to show
-an error message, the address to show the maximum value supported,
-then shoehorning address and size into the size and offset
-parameters).  The change from a wide address to a narrower size
-parameter could truncate a (rather-large) bogus read attempt, so
-it's better to create a separate dedicated trace with correct types,
-rather than abusing the trace mechanism.  Broken since its
-introduction in commit d29a09c.
+An upcoming patch will let the compiler warn us when we are silently
+losing precision in traces.  In this case, the only platform where
+pid_t in the caller does not match int in the trace definition is
+64-bit mingw, where the system headers are still buggy in declaring
+a 64-bit pid_t even though getpid() only returns 32 bits, so a cast
+in the caller is the easiest workaround.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- hw/i386/amd_iommu.c  | 3 +--
- hw/i386/trace-events | 1 +
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ io/channel-command.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
-index e0732cc..f86a40a 100644
---- a/hw/i386/amd_iommu.c
-+++ b/hw/i386/amd_iommu.c
-@@ -572,8 +572,7 @@ static uint64_t amdvi_mmio_read(void *opaque, hwaddr addr, unsigned size)
+diff --git a/io/channel-command.c b/io/channel-command.c
+index 319c5ed..a90a078 100644
+--- a/io/channel-command.c
++++ b/io/channel-command.c
+@@ -39,7 +39,7 @@ qio_channel_command_new_pid(int writefd,
+     ioc->writefd = writefd;
+     ioc->pid = pid;
 
-     uint64_t val = -1;
-     if (addr + size > AMDVI_MMIO_SIZE) {
--        trace_amdvi_mmio_read("error: addr outside region: max ",
--                (uint64_t)AMDVI_MMIO_SIZE, addr, size);
-+        trace_amdvi_mmio_read_invalid(AMDVI_MMIO_SIZE, addr, size);
-         return (uint64_t)-1;
-     }
+-    trace_qio_channel_command_new_pid(ioc, writefd, readfd, pid);
++    trace_qio_channel_command_new_pid(ioc, writefd, readfd, (int) pid);
+     return ioc;
+ }
 
-diff --git a/hw/i386/trace-events b/hw/i386/trace-events
-index 88ad5e4..a213bfd 100644
---- a/hw/i386/trace-events
-+++ b/hw/i386/trace-events
-@@ -37,6 +37,7 @@ amdvi_cache_update(uint16_t domid, uint8_t bus, uint8_t slot, uint8_t func, uint
- amdvi_completion_wait_fail(uint64_t addr) "error: fail to write at address 0x%"PRIx64
- amdvi_mmio_write(const char *reg, uint64_t addr, unsigned size, uint64_t val, uint64_t offset) "%s write addr 0x%"PRIx64", size %u, val 0x%"PRIx64", offset 0x%"PRIx64
- amdvi_mmio_read(const char *reg, uint64_t addr, unsigned size, uint64_t offset) "%s read addr 0x%"PRIx64", size %u offset 0x%"PRIx64
-+amdvi_mmio_read_invalid(int max, hwaddr addr, unsigned size) "error: addr outside region (max 0x%x): read addr 0x%" HWADDR_PRIx ", size %u"
- amdvi_command_error(uint64_t status) "error: Executing commands with command buffer disabled 0x%"PRIx64
- amdvi_command_read_fail(uint64_t addr, uint32_t head) "error: fail to access memory at 0x%"PRIx64" + 0x%"PRIx32
- amdvi_command_exec(uint32_t head, uint32_t tail, uint64_t buf) "command buffer head at 0x%"PRIx32" command buffer tail at 0x%"PRIx32" command buffer base at 0x%"PRIx64
 -- 
 2.9.3
