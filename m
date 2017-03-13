@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40683)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=238af2f37=igor.druzhinin@citrix.com>)
-	id 1cnVuP-0007mZ-4j
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 15:45:34 -0400
+	(envelope-from <eblake@redhat.com>) id 1cnW4S-0000Zg-8q
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 15:55:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=238af2f37=igor.druzhinin@citrix.com>)
-	id 1cnVuL-0005tw-SE
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 15:45:33 -0400
-Received: from smtp.eu.citrix.com ([185.25.65.24]:44701)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=238af2f37=igor.druzhinin@citrix.com>)
-	id 1cnVuL-0005sv-Fy
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 15:45:29 -0400
-From: Igor Druzhinin <igor.druzhinin@citrix.com>
-Date: Mon, 13 Mar 2017 19:45:13 +0000
-Message-ID: <1489434313-11639-1-git-send-email-igor.druzhinin@citrix.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3] xen: don't save/restore the physmap on VM
- save/restore
+	(envelope-from <eblake@redhat.com>) id 1cnW4P-0002It-7s
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 15:55:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53678)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cnW4O-0002I5-Vi
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 15:55:53 -0400
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B211CC04BFD3
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 19:55:52 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+Date: Mon, 13 Mar 2017 14:55:17 -0500
+Message-Id: <20170313195547.21466-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.9 v2 00/30] trace type mismatch cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,296 +27,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sstabellini@kernel.org, anthony.perard@citrix.com
-Cc: paul.durrant@citrix.com, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, Igor Druzhinin <igor.druzhinin@citrix.com>
+To: qemu-devel@nongnu.org
+Cc: stefanha@redhat.com
 
-Saving/restoring the physmap to/from xenstore was introduced to
-QEMU majorly in order to cover up the VRAM region restore issue.
-The sequence of restore operations implies that we should know
-the effective guest VRAM address *before* we have the VRAM region
-restored (which happens later). Unfortunately, in Xen environment
-VRAM memory does actually belong to a guest - not QEMU itself -
-which means the position of this region is unknown beforehand and
-can't be mapped into QEMU address space immediately.
+We have a number of tracepoints that mistakenly truncate 64-bit
+values into 32-bit printouts, making the trace less useful than
+what is fully possible.
 
-Previously, recreating xenstore keys, holding the physmap, by the
-toolstack helped to get this information in place at the right
-moment ready to be consumed by QEMU to map the region properly.
+Previously posted patch 1 here:
+https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg01918.html
 
-The extraneous complexity of having those keys transferred by the
-toolstack and unnecessary redundancy prompted us to propose a
-solution which doesn't require any extra data in xenstore. The idea
-is to defer the VRAM region mapping till the point we actually know
-the effective address and able to map it. To that end, we initially
-only register the pointer to the framebuffer without actual mapping.
-Then, during the memory region restore phase, we perform the mapping
-of the known address and update the VRAM region metadata (including
-previously registered pointer) accordingly.
+At which point I realized the problem may be more pervasive, so I
+started a much bigger audit (aided by patch 30 of this series).
 
-Signed-off-by: Igor Druzhinin <igor.druzhinin@citrix.com>
----
-v3:
-* Modify qemu_ram_ptr_length similarly with qemu_map_ram_ptr
-* Add a comment explaining qemu_map_ram_ptr and qemu_ram_ptr_length 
-  semantic change for Xen
-* Dropped some redundant changes
+Proposing the (bulk of this) series for 2.9.  Patches 1-3 are ready
+to go, and definitely belong in 2.9 as bug-fixes; 4-29 can probably
+be treated as bug-fixes and included per maintainer discretion, but
+may need further tweaks on platforms with different typing setups
+than what I tested with (for example, I have not attempted a 32-bit
+build, which will likely flag some additional misuse of "%lx" that
+should have been "%"PRIx64, and I know that mingw still trips
+things up).
 
-v2:
-* Fix some building and coding style issues
+Patch 30 is NOT 2.9 material - it has too much risk of causing
+compilation failures on platforms with different types, where the
+current behavior of just (silently) switching between types allows
+compilation (even if it is not accurate traces).  But if we like
+the approach, there are enough potential merge-conflict magnets
+that the overall series should probably go early into 2.10 (other
+than the bug-fixes picked into 2.9), and patch 30 is essential to
+keeping us from regressing into future type mismatches.
 
----
- exec.c               |  16 ++++++++
- hw/display/vga.c     |   2 +-
- include/hw/xen/xen.h |   2 +-
- xen-hvm-stub.c       |   2 +-
- xen-hvm.c            | 111 ++++++++++++---------------------------------------
- 5 files changed, 44 insertions(+), 89 deletions(-)
+Eric Blake (30):
+  trace: Fix backwards mirror_yield parameters
+  trace: Fix incorrect megasas trace parameters
+  trace: Avoid abuse of amdvi_mmio_read
+  trace: Fix parameter types in block
+  trace: Fix parameter types in io
+  trace: Fix parameter types in migration
+  trace: Fix parameter types in ui
+  trace: Fix parameter types in top level
+  trace: Fix parameter types in linux-user
+  trace: Fix parameter types in hw/acpi
+  trace: Fix parameter types in hw/audio
+  trace: Fix parameter types in hw/block
+  trace: Fix parameter types in hw/char
+  trace: Fix parameter types in hw/display
+  trace: Fix parameter types in hw/dma
+  trace: Fix parameter types in hw/i386
+  trace: Fix parameter types in hw/input
+  trace: Fix parameter types in hw/intc
+  trace: Fix parameter types in hw/isa
+  trace: Fix parameter types in hw/misc
+  trace: Fix parameter types in hw/net
+  trace: Fix parameter types in hw/nvram
+  trace: Fix parameter types in hw/ppc
+  trace: Fix parameter types in hw/sd
+  trace: Fix parameter types in hw/scsi
+  trace: Fix parameter types in hw/timer
+  trace: Fix parameter types in hw/usb
+  trace: Fix parameter types in hw/vfio
+  trace: Fix parameter types in hw/virtio
+  trace: Force compiler warnings on trace parameter type mismatches
 
-diff --git a/exec.c b/exec.c
-index aabb035..a1ac8cd 100644
---- a/exec.c
-+++ b/exec.c
-@@ -2008,6 +2008,14 @@ void *qemu_map_ram_ptr(RAMBlock *ram_block, ram_addr_t addr)
-         }
- 
-         block->host = xen_map_cache(block->offset, block->max_length, 1);
-+        if (block->host == NULL) {
-+            /* In case we cannot establish the mapping right away we might
-+             * still be able to do it later e.g. on a later stage of restore.
-+             * We don't touch the block and return NULL here to indicate
-+             * that intention.
-+             */
-+            return NULL;
-+        }
-     }
-     return ramblock_ptr(block, addr);
- }
-@@ -2041,6 +2049,14 @@ static void *qemu_ram_ptr_length(RAMBlock *ram_block, ram_addr_t addr,
-         }
- 
-         block->host = xen_map_cache(block->offset, block->max_length, 1);
-+        if (block->host == NULL) {
-+            /* In case we cannot establish the mapping right away we might
-+             * still be able to do it later e.g. on a later stage of restore.
-+             * We don't touch the block and return NULL here to indicate
-+             * that intention.
-+             */
-+            return NULL;
-+        }
-     }
- 
-     return ramblock_ptr(block, addr);
-diff --git a/hw/display/vga.c b/hw/display/vga.c
-index 69c3e1d..be554c2 100644
---- a/hw/display/vga.c
-+++ b/hw/display/vga.c
-@@ -2163,7 +2163,7 @@ void vga_common_init(VGACommonState *s, Object *obj, bool global_vmstate)
-     memory_region_init_ram(&s->vram, obj, "vga.vram", s->vram_size,
-                            &error_fatal);
-     vmstate_register_ram(&s->vram, global_vmstate ? NULL : DEVICE(obj));
--    xen_register_framebuffer(&s->vram);
-+    xen_register_framebuffer(&s->vram, &s->vram_ptr);
-     s->vram_ptr = memory_region_get_ram_ptr(&s->vram);
-     s->get_bpp = vga_get_bpp;
-     s->get_offsets = vga_get_offsets;
-diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
-index 09c2ce5..3831843 100644
---- a/include/hw/xen/xen.h
-+++ b/include/hw/xen/xen.h
-@@ -45,6 +45,6 @@ void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size,
-                    struct MemoryRegion *mr, Error **errp);
- void xen_modified_memory(ram_addr_t start, ram_addr_t length);
- 
--void xen_register_framebuffer(struct MemoryRegion *mr);
-+void xen_register_framebuffer(struct MemoryRegion *mr, uint8_t **ptr);
- 
- #endif /* QEMU_HW_XEN_H */
-diff --git a/xen-hvm-stub.c b/xen-hvm-stub.c
-index c500325..c89065e 100644
---- a/xen-hvm-stub.c
-+++ b/xen-hvm-stub.c
-@@ -46,7 +46,7 @@ qemu_irq *xen_interrupt_controller_init(void)
-     return NULL;
- }
- 
--void xen_register_framebuffer(MemoryRegion *mr)
-+void xen_register_framebuffer(MemoryRegion *mr, uint8_t **ptr)
- {
- }
- 
-diff --git a/xen-hvm.c b/xen-hvm.c
-index 5043beb..221334a 100644
---- a/xen-hvm.c
-+++ b/xen-hvm.c
-@@ -41,6 +41,7 @@
- 
- static MemoryRegion ram_memory, ram_640k, ram_lo, ram_hi;
- static MemoryRegion *framebuffer;
-+static uint8_t **framebuffer_ptr;
- static bool xen_in_migration;
- 
- /* Compatibility with older version */
-@@ -317,7 +318,6 @@ static int xen_add_to_physmap(XenIOState *state,
-     XenPhysmap *physmap = NULL;
-     hwaddr pfn, start_gpfn;
-     hwaddr phys_offset = memory_region_get_ram_addr(mr);
--    char path[80], value[17];
-     const char *mr_name;
- 
-     if (get_physmapping(state, start_addr, size)) {
-@@ -340,6 +340,25 @@ go_physmap:
-     DPRINTF("mapping vram to %"HWADDR_PRIx" - %"HWADDR_PRIx"\n",
-             start_addr, start_addr + size);
- 
-+    mr_name = memory_region_name(mr);
-+
-+    physmap = g_malloc(sizeof(XenPhysmap));
-+
-+    physmap->start_addr = start_addr;
-+    physmap->size = size;
-+    physmap->name = mr_name;
-+    physmap->phys_offset = phys_offset;
-+
-+    QLIST_INSERT_HEAD(&state->physmap, physmap, list);
-+
-+    /* At this point we have a physmap entry for the framebuffer region
-+     * established during the restore phase so we can safely update the
-+     * registered framebuffer address here. */
-+    if (runstate_check(RUN_STATE_INMIGRATE)) {
-+        *framebuffer_ptr = memory_region_get_ram_ptr(framebuffer);
-+        return 0;
-+    }
-+
-     pfn = phys_offset >> TARGET_PAGE_BITS;
-     start_gpfn = start_addr >> TARGET_PAGE_BITS;
-     for (i = 0; i < size >> TARGET_PAGE_BITS; i++) {
-@@ -350,49 +369,17 @@ go_physmap:
-         if (rc) {
-             DPRINTF("add_to_physmap MFN %"PRI_xen_pfn" to PFN %"
-                     PRI_xen_pfn" failed: %d (errno: %d)\n", idx, gpfn, rc, errno);
-+
-+            QLIST_REMOVE(physmap, list);
-+            g_free(physmap);
-             return -rc;
-         }
-     }
- 
--    mr_name = memory_region_name(mr);
--
--    physmap = g_malloc(sizeof (XenPhysmap));
--
--    physmap->start_addr = start_addr;
--    physmap->size = size;
--    physmap->name = mr_name;
--    physmap->phys_offset = phys_offset;
--
--    QLIST_INSERT_HEAD(&state->physmap, physmap, list);
--
-     xc_domain_pin_memory_cacheattr(xen_xc, xen_domid,
-                                    start_addr >> TARGET_PAGE_BITS,
-                                    (start_addr + size - 1) >> TARGET_PAGE_BITS,
-                                    XEN_DOMCTL_MEM_CACHEATTR_WB);
--
--    snprintf(path, sizeof(path),
--            "/local/domain/0/device-model/%d/physmap/%"PRIx64"/start_addr",
--            xen_domid, (uint64_t)phys_offset);
--    snprintf(value, sizeof(value), "%"PRIx64, (uint64_t)start_addr);
--    if (!xs_write(state->xenstore, 0, path, value, strlen(value))) {
--        return -1;
--    }
--    snprintf(path, sizeof(path),
--            "/local/domain/0/device-model/%d/physmap/%"PRIx64"/size",
--            xen_domid, (uint64_t)phys_offset);
--    snprintf(value, sizeof(value), "%"PRIx64, (uint64_t)size);
--    if (!xs_write(state->xenstore, 0, path, value, strlen(value))) {
--        return -1;
--    }
--    if (mr_name) {
--        snprintf(path, sizeof(path),
--                "/local/domain/0/device-model/%d/physmap/%"PRIx64"/name",
--                xen_domid, (uint64_t)phys_offset);
--        if (!xs_write(state->xenstore, 0, path, mr_name, strlen(mr_name))) {
--            return -1;
--        }
--    }
--
-     return 0;
- }
- 
-@@ -1152,54 +1139,6 @@ static void xen_exit_notifier(Notifier *n, void *data)
-     xs_daemon_close(state->xenstore);
- }
- 
--static void xen_read_physmap(XenIOState *state)
--{
--    XenPhysmap *physmap = NULL;
--    unsigned int len, num, i;
--    char path[80], *value = NULL;
--    char **entries = NULL;
--
--    snprintf(path, sizeof(path),
--            "/local/domain/0/device-model/%d/physmap", xen_domid);
--    entries = xs_directory(state->xenstore, 0, path, &num);
--    if (entries == NULL)
--        return;
--
--    for (i = 0; i < num; i++) {
--        physmap = g_malloc(sizeof (XenPhysmap));
--        physmap->phys_offset = strtoull(entries[i], NULL, 16);
--        snprintf(path, sizeof(path),
--                "/local/domain/0/device-model/%d/physmap/%s/start_addr",
--                xen_domid, entries[i]);
--        value = xs_read(state->xenstore, 0, path, &len);
--        if (value == NULL) {
--            g_free(physmap);
--            continue;
--        }
--        physmap->start_addr = strtoull(value, NULL, 16);
--        free(value);
--
--        snprintf(path, sizeof(path),
--                "/local/domain/0/device-model/%d/physmap/%s/size",
--                xen_domid, entries[i]);
--        value = xs_read(state->xenstore, 0, path, &len);
--        if (value == NULL) {
--            g_free(physmap);
--            continue;
--        }
--        physmap->size = strtoull(value, NULL, 16);
--        free(value);
--
--        snprintf(path, sizeof(path),
--                "/local/domain/0/device-model/%d/physmap/%s/name",
--                xen_domid, entries[i]);
--        physmap->name = xs_read(state->xenstore, 0, path, &len);
--
--        QLIST_INSERT_HEAD(&state->physmap, physmap, list);
--    }
--    free(entries);
--}
--
- static void xen_wakeup_notifier(Notifier *notifier, void *data)
- {
-     xc_set_hvm_param(xen_xc, xen_domid, HVM_PARAM_ACPI_S_STATE, 0);
-@@ -1339,7 +1278,6 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
-         goto err;
-     }
-     xen_be_register_common();
--    xen_read_physmap(state);
- 
-     /* Disable ACPI build because Xen handles it */
-     pcms->acpi_build_enabled = false;
-@@ -1374,9 +1312,10 @@ void destroy_hvm_domain(bool reboot)
-     }
- }
- 
--void xen_register_framebuffer(MemoryRegion *mr)
-+void xen_register_framebuffer(MemoryRegion *mr, uint8_t **ptr)
- {
-     framebuffer = mr;
-+    framebuffer_ptr = ptr;
- }
- 
- void xen_shutdown_fatal_error(const char *fmt, ...)
+ scripts/tracetool/format/h.py |  13 +++++
+ block/mirror.c                |   5 +-
+ cpu-exec.c                    |   6 +--
+ hw/block/virtio-blk.c         |   4 +-
+ hw/char/escc.c                |   4 +-
+ hw/i386/amd_iommu.c           |   3 +-
+ hw/intc/apic_common.c         |   2 +-
+ hw/net/e1000e_core.c          |  10 ++--
+ hw/nvram/fw_cfg.c             |   2 +-
+ hw/scsi/esp-pci.c             |   2 +-
+ hw/scsi/megasas.c             |  14 +++---
+ hw/timer/grlib_gptimer.c      |   6 +--
+ hw/usb/hcd-ehci.c             |   9 ++--
+ hw/usb/hcd-xhci.c             |   4 +-
+ hw/vfio/pci.c                 |   3 +-
+ io/channel-command.c          |   2 +-
+ linux-user/signal.c           | 106 +++++++++++++++++++--------------------
+ translate-all.c               |   2 +-
+ block/trace-events            |   4 +-
+ hw/acpi/trace-events          |   6 +--
+ hw/audio/trace-events         |   8 +--
+ hw/char/trace-events          |  14 +++---
+ hw/display/trace-events       |  20 ++++----
+ hw/dma/trace-events           |   8 +--
+ hw/i386/trace-events          |   3 +-
+ hw/input/trace-events         |   4 +-
+ hw/intc/trace-events          |  40 +++++++--------
+ hw/isa/trace-events           |   4 +-
+ hw/misc/trace-events          |  44 ++++++++--------
+ hw/net/trace-events           |  58 ++++++++++-----------
+ hw/nvram/trace-events         |   4 +-
+ hw/ppc/trace-events           |  16 +++---
+ hw/scsi/trace-events          | 114 +++++++++++++++++++++---------------------
+ hw/sd/trace-events            |   4 +-
+ hw/timer/trace-events         |  14 +++---
+ hw/usb/trace-events           |  84 +++++++++++++++----------------
+ hw/vfio/trace-events          |  14 +++---
+ hw/virtio/trace-events        |   2 +-
+ migration/trace-events        |   4 +-
+ trace-events                  |   2 +-
+ ui/trace-events               |   8 +--
+ 41 files changed, 347 insertions(+), 329 deletions(-)
+
 -- 
-2.7.4
+2.9.3
