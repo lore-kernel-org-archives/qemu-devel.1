@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cnQZb-0004s9-Dx
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 10:03:44 -0400
+	(envelope-from <deller@gmx.de>) id 1cnQfF-0005hU-FD
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 10:09:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cnQZX-0003fw-Dj
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 10:03:43 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:55499)
+	(envelope-from <deller@gmx.de>) id 1cnQfC-0005tB-BQ
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 10:09:33 -0400
+Received: from mout.gmx.net ([212.227.17.22]:63053)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cnQZX-0003fC-3E
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 10:03:39 -0400
-References: <20170224112109.3147-1-alex.bennee@linaro.org>
-	<20170224112109.3147-12-alex.bennee@linaro.org>
-	<f7a4cba9-12da-fbb3-684f-68b4a11fbe97@vivier.eu>
-	<87y3wr8zs2.fsf@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <e3f645d0-ea92-b28d-bb2b-9c831dd8b264@vivier.eu>
-Date: Mon, 13 Mar 2017 15:03:17 +0100
+	(Exim 4.71) (envelope-from <deller@gmx.de>) id 1cnQfC-0005sG-23
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 10:09:30 -0400
+References: <20170311183016.GA20514@ls3530.fritz.box>
+	<ccf72219-1498-4434-8dd4-625c49afee7c@twiddle.net>
+From: Helge Deller <deller@gmx.de>
+Message-ID: <198870a8-664f-06a0-e479-2167ebbfb01d@gmx.de>
+Date: Mon, 13 Mar 2017 15:09:14 +0100
 MIME-Version: 1.0
-In-Reply-To: <87y3wr8zs2.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 11/24] tcg: enable thread-per-vCPU
+In-Reply-To: <ccf72219-1498-4434-8dd4-625c49afee7c@twiddle.net>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user: Add TARGET_MAP_STACK and
+ TARGET_MAP_HUGETLB for all remaining architectures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,84 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: peter.maydell@linaro.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, KONRAD Frederic <fred.konrad@greensocs.com>, Richard Henderson <rth@twiddle.net>
+To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
 
-Le 27/02/2017 à 15:38, Alex Bennée a écrit :
-> 
-> Laurent Vivier <laurent@vivier.eu> writes:
-> 
->> Le 24/02/2017 à 12:20, Alex Bennée a écrit :
->>> There are a couple of changes that occur at the same time here:
->>>
->>>   - introduce a single vCPU qemu_tcg_cpu_thread_fn
->>>
->>>   One of these is spawned per vCPU with its own Thread and Condition
->>>   variables. qemu_tcg_rr_cpu_thread_fn is the new name for the old
->>>   single threaded function.
->>>
->>>   - the TLS current_cpu variable is now live for the lifetime of MTTCG
->>>     vCPU threads. This is for future work where async jobs need to know
->>>     the vCPU context they are operating in.
->>>
->>> The user to switch on multi-thread behaviour and spawn a thread
->>> per-vCPU. For a simple test kvm-unit-test like:
->>>
->>>   ./arm/run ./arm/locking-test.flat -smp 4 -accel tcg,thread=multi
->>>
->>> Will now use 4 vCPU threads and have an expected FAIL (instead of the
->>> unexpected PASS) as the default mode of the test has no protection when
->>> incrementing a shared variable.
->>>
->>> We enable the parallel_cpus flag to ensure we generate correct barrier
->>> and atomic code if supported by the front and backends. This doesn't
->>> automatically enable MTTCG until default_mttcg_enabled() is updated to
->>> check the configuration is supported.
+On 11.03.2017 22:53, Richard Henderson wrote:
+> On 03/12/2017 04:30 AM, Helge Deller wrote:
+>> Add the missing defines and for TARGET_MAP_STACK and TARGET_MAP_HUGETLB
+>> for alpha, mips, ppc and x86, and fix the mmap_flags translation table
+>> to translate those flags between host and target architecture.
 >>
->> This commit breaks linux-user mode:
+>> Signed-off-by: Helge Deller <deller@gmx.de>
 >>
->> debian-8 with qemu-ppc on x86_64 with ltp-full-20170116
->>
->> cd /opt/ltp
->> ./runltp -p -l "qemu-$(date +%FT%T).log" -f /opt/ltp/runtest/syscalls -s
->> setgroups03
->>
->> setgroups03    1  TPASS  :  setgroups(65537) fails, Size is >
->> sysconf(_SC_NGROUPS_MAX), errno=22
->> qemu-ppc: /home/laurent/Projects/qemu/include/qemu/rcu.h:89:
->> rcu_read_unlock: Assertion `p_rcu_reader->depth != 0' failed.
->> qemu-ppc: /home/laurent/Projects/qemu/include/qemu/rcu.h:89:
->> rcu_read_unlock: Assertion `p_rcu_reader->depth != 0' failed.
->> qemu-ppc: /home/laurent/Projects/qemu/include/qemu/rcu.h:89:
->> rcu_read_unlock: Assertion `p_rcu_reader->depth != 0' failed.
->> ...
+>> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+>> index cec8428..03ed370 100644
+>> --- a/linux-user/syscall.c
+>> +++ b/linux-user/syscall.c
+>> @@ -5875,6 +5875,8 @@ static bitmask_transtbl mmap_flags_tbl[] = {
+>>      { TARGET_MAP_LOCKED, TARGET_MAP_LOCKED, MAP_LOCKED, MAP_LOCKED },
+>>          { TARGET_MAP_NORESERVE, TARGET_MAP_NORESERVE, MAP_NORESERVE,
+>>            MAP_NORESERVE },
+>> +    { TARGET_MAP_STACK, TARGET_MAP_STACK, MAP_STACK, MAP_STACK },
+>> +    { TARGET_MAP_HUGETLB, TARGET_MAP_HUGETLB, MAP_HUGETLB, MAP_HUGETLB },
 > 
-> Interesting. I can only think the current_cpu change has broken it
-> because most of the changes in this commit affect softmmu targets only
-> (linux-user has its own run loop).
-> 
-> Thanks for the report - I'll look into it.
+> I don't see any point in this. First, MAP_STACK is ignored by the
+> kernel, and has been for some time. 
 
-After:
+Yes, the kernel ignores the native MAP_STACK define.
 
-     95b0eca Merge remote-tracking branch
-'remotes/stsquad/tags/pull-mttcg-fixups-090317-1' into staging
+> Second, the size of huge pages varies widely between different targets,
+> and we're not really able to map the sizes between guest and host.
 
-[Tested with my HEAD on:
-b1616fe Merge remote-tracking branch
-'remotes/famz/tags/docker-pull-request' into staging]
+This might probably not be necessary, if the userspace app simply asks
+which huge page sizes are supported (e.g. by procfs entries or via 
+"hugeadm --page-sizes-all").
 
-I have now:
+But the main intention of my patch was not to fix MAP_STACK or MAP_HUGETLB,
+but more to ensure that those flags are avoided to be handed over to the host.
+For example, TARGET_MAP_STACK is 0x40000 on hppa, and if it's not filtered out
+in e.g. a mmap() call, then this becomes to MAP_HUGETLB on x86_64 (which is 
+0x40000 on x86_64).  
 
-<<<test_start>>>
-tag=setgroups03 stime=1489413401
-cmdline="setgroups03"
-contacts=""
-analysis=exit
-<<<test_output>>>
-**
-ERROR:/home/laurent/Projects/qemu/cpu-exec.c:656:cpu_exec: assertion
-failed: (cpu == current_cpu)
-**
-
-Laurent
+Helge
