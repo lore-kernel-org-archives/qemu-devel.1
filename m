@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37085)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cnKJA-0000aF-V1
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 03:22:21 -0400
+	(envelope-from <oussemakeder@yahoo.fr>) id 1cnLZl-0001Cf-OE
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 04:43:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cnKJ7-0006HR-R5
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 03:22:20 -0400
-Received: from [59.151.112.132] (port=41582 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cnKJ7-0006Fs-Ex
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 03:22:17 -0400
-References: <1488278902-11223-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<ca75b31f-1337-6fef-c799-6902f79798a5@cn.fujitsu.com>
-	<8959bc26-bf4d-1ecb-a606-b602f6699a9f@redhat.com>
-	<64b0e728-d4f0-8b9c-3921-23cf297fb264@cn.fujitsu.com>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <29889b8f-2957-c1be-f71f-5f229f47ee4c@cn.fujitsu.com>
-Date: Mon, 13 Mar 2017 15:21:34 +0800
+	(envelope-from <oussemakeder@yahoo.fr>) id 1cnLZi-0007Gx-IZ
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 04:43:33 -0400
+Received: from nm49-vm0.bullet.mail.ne1.yahoo.com ([98.138.121.128]:41193)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <oussemakeder@yahoo.fr>) id 1cnLZi-0007EQ-A0
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 04:43:30 -0400
+Date: Mon, 13 Mar 2017 08:40:41 +0000 (UTC)
+From: oussema ben khedher <oussemakeder@yahoo.fr>
+Reply-To: oussema ben khedher <oussemakeder@yahoo.fr>
+Message-ID: <928382347.7043935.1489394441716@mail.yahoo.com>
 MIME-Version: 1.0
-In-Reply-To: <64b0e728-d4f0-8b9c-3921-23cf297fb264@cn.fujitsu.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 0/3] COLO-compare: Make COLO-compare
- support Xen
+References: <928382347.7043935.1489394441716.ref@mail.yahoo.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] how to enable trace
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,84 +26,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, qemu devel <qemu-devel@nongnu.org>
-Cc: zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Stefano Stabellini <sstabellini@kernel.org>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-
-
-On 03/13/2017 03:10 PM, Zhang Chen wrote:
->
->
-> On 03/13/2017 02:28 PM, Jason Wang wrote:
->>
->>
->> On 2017年03月13日 14:18, Zhang Chen wrote:
->>> Hi~~~ All~
->>>
->>> No news for a long time, anyone can give me some comments?
->>
->> Hi,
->>
->> A question is why use two kinds of colo-frames? This seems not good 
->> as lots of the code were duplicated.
->
-> Because Xen colo-frame based on Xen Remus.
-> Remus do some job like the migration job in qemu/kvm, and in Xen HVM 
-> we can not do migration in qemu,
-> So colo-frame code must running in Xen side.
-> In addition, Xen HVM use qemu to simulation device that Colo-proxy and 
-> Replication can use same one codes in qemu.
-
-Detail:
-https://wiki.xenproject.org/wiki/COLO_-_Coarse_Grain_Lock_Stepping
-
-Thanks
-Zhang Chen
-
->
-> Thanks
-> Zhang Chen
->
->>
->> Thanks
->>
->>>
->>>
->>> Thanks
->>>
->>> Zhang Chen
->>>
->>>
->>> On 02/28/2017 06:48 PM, Zhang Chen wrote:
->>>> This series focus on COLO Xen support.
->>>> We add a new chardev socket in colo-compare as the way
->>>> of communicate with Xen COLO-frame.
->>>> Xen part:
->>>> https://lists.xenproject.org/archives/html/xen-devel/2017-02/msg02067.html 
->>>>
->>>>
->>>> This series is a frame, have some TODO job depend on this patch:
->>>> https://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg05055.html
->>>>
->>>>
->>>> Zhang Chen (3):
->>>>    COLO-compare: Add new parameter for communicate with Xen colo-frame
->>>>    COLO-compare: Add Xen notify chardev socket handler frame
->>>>    COLO-compare: Add colo-compare Xen notify
->>>>
->>>>   net/colo-compare.c | 77 
->>>> ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>>>   qemu-options.hx    | 38 ++++++++++++++++++++++++---
->>>>   2 files changed, 111 insertions(+), 4 deletions(-)
->>>>
->>>
->>
->>
->>
->> .
->>
->
-
--- 
-Thanks
-Zhang Chen
+i used simple trace back end to trace guest code running in qemu but when i=
+ tried to recompile and disable this trace i have always this problem
+=C2=A0undefined reference to `trace_record_write_u64'
+thanks for your help=C2=A0
