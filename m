@@ -1,25 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56629)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cnGgU-0006Zy-7g
-	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 23:30:11 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cnGhu-0007Z9-Br
+	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 23:31:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cnGgP-00082N-AM
-	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 23:30:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32996)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cnGgP-000821-4a
-	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 23:30:05 -0400
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3E5B661BA8
-	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 03:30:04 +0000 (UTC)
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 13 Mar 2017 11:29:57 +0800
-Message-Id: <1489375798-19518-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/2] Revert "virtio: unbreak virtio-pci with
- IOMMU after caching ring translations"
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cnGhV-0000eO-Ow
+	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 23:31:38 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47381
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1cnGhV-0000ad-Df
+	for qemu-devel@nongnu.org; Sun, 12 Mar 2017 23:31:13 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2D3SaoJ087760
+	for <qemu-devel@nongnu.org>; Sun, 12 Mar 2017 23:31:10 -0400
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 294ea23ebs-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Sun, 12 Mar 2017 23:31:10 -0400
+Received: from localhost
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Sun, 12 Mar 2017 23:31:09 -0400
+Date: Mon, 13 Mar 2017 11:31:05 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20170308021533.78292-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170308021533.78292-2-bjsdjshi@linux.vnet.ibm.com>
+	<20170308091346.GB5211@noname.redhat.com>
+	<20170308093105.GC7563@bjsdjshi@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170308093105.GC7563@bjsdjshi@linux.vnet.ibm.com>
+Message-Id: <20170313033105.GA6756@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 1/1] block: Handle NULL options
+ correctly in raw_open
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +45,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, marcel@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com, pbonzini@redhat.com
-Cc: Jason Wang <jasowang@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-block@nongnu.org, mreitz@redhat.com, qemu-devel@nongnu.org, cornelia.huck@de.ibm.com, pasic@linux.vnet.ibm.com
 
-This reverts commit
-96a8821d21411f10d77ea994af369c6e5c35a2cc. Following patch will come a
-better solution which does not require a strict order between virtio
-and IOMMU.
+* Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> [2017-03-08 17:31:05 +0800]:
 
-CC: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- hw/virtio/virtio-pci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> * Kevin Wolf <kwolf@redhat.com> [2017-03-08 10:13:46 +0100]:
+> 
+> > Am 08.03.2017 um 03:15 hat Dong Jia Shi geschrieben:
+> > > A normal call for raw_open should always pass in a non-NULL @options,
+> > > but for some certain cases (e.g. trying to applying snapshot on a RBD
+> > > image), they call raw_open with a NULL @options right after the calling
+> > > for raw_close.
+> > > 
+> > > Let's take the NULL @options as a sign of trying to do raw_open again,
+> > > and just simply return a success code.
+> > > 
+> > > Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> > 
+> > I think we rather need to fix bdrv_snapshot_goto() so that it doesn't
+> > pass NULL, but the actual options that were given for the node (i.e.
+> > bs->options).
+> I've tried that before the current try. bs->options does not have the
+> "file" key-value pair, so that leads to a fail too. Should we put "file"
+> in to the options manually? I noticed that it was removed from
+> bs->options during the calling of bdrv_open_inherit.
+> 
+Hi Kevin,
 
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index b76f3f6..5ce42af 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -1153,7 +1153,7 @@ static AddressSpace *virtio_pci_get_dma_as(DeviceState *d)
-     VirtIOPCIProxy *proxy = VIRTIO_PCI(d);
-     PCIDevice *dev = &proxy->pci_dev;
+After thinking for quite some time, I still don't think we need to fix
+the caller. The reason is that raw_close always does nothing, so no
+matter what the caller passing in, raw_open should do nothing but just
+return 0.
+
+The following is another proposal. Looking forward for your comments.
+Thanks,
+
+diff --git a/block/raw-format.c b/block/raw-format.c
+index 86fbc65..c309d4c 100644
+--- a/block/raw-format.c
++++ b/block/raw-format.c
+@@ -384,6 +384,11 @@ static int raw_open(BlockDriverState *bs, QDict *options, int flags,
+     BDRVRawState *s = bs->opaque;
+     int ret;
  
--    return pci_device_iommu_address_space(dev);
-+    return pci_get_address_space(dev);
- }
- 
- static int virtio_pci_add_mem_cap(VirtIOPCIProxy *proxy,
++    if (!bs->file) {
++        return 0;
++    }
++
++    assert(options != NULL);
+     bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file,
+                                false, errp);
+     if (!bs->file) {
+
+> > 
+> > Kevin
+> > 
+> 
+> -- 
+> Dong Jia
+
 -- 
-2.7.4
+Dong Jia
