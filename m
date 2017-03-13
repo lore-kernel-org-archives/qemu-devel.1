@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cnMo8-00085y-0t
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:02:29 -0400
+	(envelope-from <hdegoede@redhat.com>) id 1cnMoH-0008CJ-5d
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:02:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cnMo3-0000x9-KM
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:02:28 -0400
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:38445)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cnMo3-0000wa-D5
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:02:23 -0400
-Received: by mail-wm0-x236.google.com with SMTP id t189so35624838wmt.1
-	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 03:02:23 -0700 (PDT)
+	(envelope-from <hdegoede@redhat.com>) id 1cnMoC-00016a-7f
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:02:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52580)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <hdegoede@redhat.com>) id 1cnMoB-00015i-VA
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:02:32 -0400
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 14D0C8553E
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 10:02:32 +0000 (UTC)
+References: <20170220095055.4234-1-fziglio@redhat.com>
+	<cf298d66-cc10-0cf5-b5d1-b36c20fb05f7@redhat.com>
+	<1376895221.1392101.1489397950418.JavaMail.zimbra@redhat.com>
+From: Hans de Goede <hdegoede@redhat.com>
+Message-ID: <33196ff6-be65-9a08-75da-feeffb9c080a@redhat.com>
+Date: Mon, 13 Mar 2017 11:02:28 +0100
 MIME-Version: 1.0
-In-Reply-To: <87tw6y8bs8.fsf@secure.mitica>
-References: <87tw6y8bs8.fsf@secure.mitica>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 13 Mar 2017 11:02:01 +0100
-Message-ID: <CAFEAcA978SJemCfYJPa8jwtuhhi6JGh9pEDGYNJ1npJA3nvEQA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] KVM call for 2017-03-14
+In-Reply-To: <1376895221.1392101.1489397950418.JavaMail.zimbra@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] egl-helpers: Support newer MESA versions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,66 +34,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: KVM devel mailing list <kvm@vger.kernel.org>, QEMU Developer <qemu-devel@nongnu.org>
+To: Frediano Ziglio <fziglio@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, David Airlie <airlied@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <mlureau@redhat.com>, qemu-devel@nongnu.org, Cole Robinson <crobinso@redhat.com>
 
-On 12 March 2017 at 21:45, Juan Quintela <quintela@redhat.com> wrote:
->
->
-> Hi
->
-> Please, send any topic that you are interested in covering.
->
-> So far the agenda is:
->
-> - Direction of QEMU and toolstack in light of Google Cloud blog:
->   https://cloudplatform.googleblog.com/2017/01/7-ways-we-harden-our-KVM-hypervisor-at-Google-Cloud-security-in-plaintext.html
+Hi,
 
+On 13-03-17 10:39, Frediano Ziglio wrote:
+>>
+>> <resend with some more people added to the Cc>
+>>
+>> Hi,
+>>
+>> On 20-02-17 10:50, Frediano Ziglio wrote:
+>>> According to
+>>> https://www.khronos.org/registry/EGL/extensions/MESA/EGL_MESA_platform_gbm.txt
+>>> if MESA_platform_gbm is supported display should be initialized
+>>> from a GBM handle using eglGetPlatformDisplayEXT.
+>>>
+>>> Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
+>>> ---
+>>> This should fix
+>>> http://www.spinics.net/linux/fedora/libvir/msg142837.html
+>>>
+>>> Tested on Fedora rawhide.
+>>> ---
+>>>  ui/egl-helpers.c | 4 ++++
+>>>  1 file changed, 4 insertions(+)
+>>>
+>>> diff --git a/ui/egl-helpers.c b/ui/egl-helpers.c
+>>> index cd24568..964c5a5 100644
+>>> --- a/ui/egl-helpers.c
+>>> +++ b/ui/egl-helpers.c
+>>> @@ -219,7 +219,11 @@ int qemu_egl_init_dpy(EGLNativeDisplayType dpy, bool
+>>> gles, bool debug)
+>>>      }
+>>>
+>>>      egl_dbg("eglGetDisplay (dpy %p) ...\n", dpy);
+>>> +#ifdef EGL_MESA_platform_gbm
+>>> +    qemu_egl_display = eglGetPlatformDisplayEXT(EGL_PLATFORM_GBM_MESA,
+>>> dpy, NULL);
+>>> +#else
+>>>      qemu_egl_display = eglGetDisplay(dpy);
+>>> +#endif
+>>>      if (qemu_egl_display == EGL_NO_DISPLAY) {
+>>>          error_report("egl: eglGetDisplay failed");
+>>>          return -1;
+>>>
+>>
+>> That fix is incomplete, you need some magic to work properly on older libGL
+>> versions.
+>>
+>> Attached is a (compile tested only) proper patch. I do not have a qemu git
+>> clone
+>> handy atm, so this is not a git format-patch patch, it is against the Fedora
+>> Rawhide
+>> srpm. I've a test build with these patches here:
+>>
+>> https://fedorapeople.org/~jwrdegoede/qemu-glvnd/
+>>
+>> I was planning on doing a git clone qemu and send a proper patch after I got
+>> some
+>> testing feedback. Feel free to use this as a base for a v2 of your patch.
+>>
+>> Regards,
+>>
+>> Hans
+>>
+>
+> Wouldn't be easier to call the "old" eglGetDisplay if eglGetPlatformDisplayEXT
+> returns EGL_NO_DISPLAY ? Kind of
 
-Ah, I'd forgotten that this was on the call agenda. I actually
-had an interesting conversation with Alex Graf last week about
-some similar topics, which I guess you could generally summarize
-as "what are the issues we need to address as a project in order
-to not become irrelevant in five years time". Since I wrote them
-up for an internal "what I did on my holi^Wconference trip" report
-I might as well repost them here:
+With libEGL you (unfortunately) cannot assume that the lib your building
+against is the lib you will run against.
 
-  - on the "VM support" side, QEMU is more used because it's the only
-    production-quality option in this space, rather than because its
-    users love it. (cf the Google choice to replace it.) It's also got
-    a pretty poor security record. It wouldn't be too surprising if
-    some time in the next five years somebody writes a replacement in
-    a safer language (perhaps also targeting only the VM support role)
-    and it got enough mindshare and takeup to eclipse QEMU.
-    [Is it too early/daft to think about prototyping being able to
-     write QEMU device emulation in Rust ?]
-    If the "VM support" usecase moves to another project then QEMU
-    will become a very quiet backwater...
-  - on the "emulation" side, nobody is clearly articulating a purpose
-    for QEMU, a reason why you should use it rather than other modelling
-    technologies (or rather than using real hardware). As a result the
-    efforts applied to QEMU are somewhat unfocused. Are we trying to be:
-    . a dev platform before easy h/w availability?
-      [not easy for QEMU for several reasons]
-    . a dev tool that provides better introspection into guest
-      behaviour than running on h/w?
-      [if so we should put more work into improving our introspection
-       and guest tracing capabilities!]
-    . primarily a tool for doing automated CI testing and one-off
-      developer smoke-testing that's easier to set up and scale than
-      trying to test on real h/w?
-    . something else?
-      [your idea goes here!]
-  - in all areas our legacy code and back-compatibility requirements
-    are threatening to choke forward progress if we don't make serious
-    efforts to get on top of them
-  - there's no easy way for people to use parts of QEMU like the CPU
-    emulation, or to add their own devices without having to write lots
-    of C code (we're firmly in a "one monolithic blob of code" setup
-    right now and disentangling and setting clear API dividing lines
-    will be a lot of work)
-    [Making QEMU more modular would help with defeating the legacy
-    and back-compat dragons, though]
+>
+>      egl_dbg("eglGetDisplay (dpy %p) ...\n", dpy);
+> -    qemu_egl_display = eglGetDisplay(dpy);
+> +#ifdef EGL_MESA_platform_gbm
+> +    qemu_egl_display = eglGetPlatformDisplayEXT(EGL_PLATFORM_GBM_MESA, dpy, NULL);
 
-thanks
--- PMM
+So this may very well lead to a runtime unresolved symbol error. IOW you really
+need to do the special magic dance I'm afraid.
+
+> +#else
+> +    qemu_egl_display = EGL_NO_DISPLAY;
+> +#endif
+> +    if (qemu_egl_display == EGL_NO_DISPLAY)
+> +        qemu_egl_display = eglGetDisplay(dpy);
+>      if (qemu_egl_display == EGL_NO_DISPLAY) {
+>          error_report("egl: eglGetDisplay failed");
+>          return -1;
+>
+> Your patch should not even compile on older system which does not define
+> EGL_PLATFORM_GBM_MESA.
+
+True, so I guess my patch needs an #ifdef around the new qemu_egl_get_display()
+function and then on the actual call site #ifdef #else #endif like your patch,
+but instead of directly calling eglGetPlatformDisplayEXT call qemu_egl_get_display.
+
+> I tested my patch and works on both rawhide and FC25 (with very recent Mesa version)
+
+mesa is not the problem, it is say running qemu on ARM and using some binary
+driver libEGL.so which is the problem, without the dance that will result in
+a runtime dynamic linker error and qemu aborting.
+
+Regards,
+
+Hans
