@@ -1,26 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35561)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cnKCx-0007bO-6R
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 03:15:56 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cnKE2-0008D9-Si
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 03:17:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cnKCt-0004AO-S3
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 03:15:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:11105)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cnKCt-0004A6-Ju
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 03:15:51 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170311132256.22951-1-marcandre.lureau@redhat.com>
-	<20170311132256.22951-5-marcandre.lureau@redhat.com>
-	<84148275-6410-68f7-4da0-345b635c42f3@redhat.com>
-Date: Mon, 13 Mar 2017 08:15:48 +0100
-In-Reply-To: <84148275-6410-68f7-4da0-345b635c42f3@redhat.com> (Eric Blake's
-	message of "Sat, 11 Mar 2017 14:17:11 -0600")
-Message-ID: <87h92xk5p7.fsf@dusky.pond.sub.org>
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cnKDz-0004g9-PP
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 03:17:02 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56514
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1cnKDz-0004fw-JG
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 03:16:59 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2D7ANdv130197
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 03:16:58 -0400
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 294e02409g-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 03:16:58 -0400
+Received: from localhost
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Mon, 13 Mar 2017 03:16:58 -0400
+Date: Mon, 13 Mar 2017 15:16:52 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20170217082939.33208-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170309092525.GA10189@bjsdjshi@linux.vnet.ibm.com>
+	<20170310114605.1353e810.cornelia.huck@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 04/21] qobject: add quint type
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170310114605.1353e810.cornelia.huck@de.ibm.com>
+Message-Id: <20170313071652.GD6756@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH RFC v3 00/15] basic vfio-ccw infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +43,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, anderson@redhat.com, mdroth@linux.vnet.ibm.com, lersek@redhat.com
+To: Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, wkywang@linux.vnet.ibm.com
 
-Eric Blake <eblake@redhat.com> writes:
+* Cornelia Huck <cornelia.huck@de.ibm.com> [2017-03-10 11:46:05 +0100]:
 
-> On 03/11/2017 07:22 AM, Marc-Andr=C3=A9 Lureau wrote:
->> The type is not used at all yet. Add some tests to exercice it.
->
-> s/exercice/exercise/
->
-> I wonder if we need this patch at all.
->
-> I've been thinking about a possible alternative representation, such
-> that a single QInt type can cover _both_ signed and unsigned types, by
-> having QInt track a sign bit bool in addition to a uint64_t value.
->
-> If the user passes in a value in the range [0, INT64_MAX], the number is
-> representable in both uint64_t and int64_t. So the internal sign bit
-> would be omitted, as in { value=3Dv, sign=3Dfalse }.  Input visitors can
-> visit this value with both the 'uint64' and the 'int64' visitors, and
-> output visitors will output the same value.
->
-> If the user passes in a value in the range [-INT64_MAX-1, -1], the
-> number is intended to be used as a negative signed number.  So the QInt
-> representation would be the 2s complement representation, { value=3D-v,
-> sign=3Dtrue }.  On input, the uint64_t visitor would reject the value as
-> out of range, the int64_t visitor would return the appropriate negative
-> value, and the generic int visitor will return the uint64_t value.  On
-> output, the number would be given the negative signed value
-> representation in anything that stringizes the value.
->
-> If the user passes in a value in the range [INT64_MAX+1, UINT64_MAX},
-> the number is intended to be used as a large unsigned number. So the
-> QInt representation would be { value=3Dv, sign=3Dfalse }.  On input, the
-> uint64_t visitor would accept the value, the int64_t visitor would
-> reject it as out of range, and the generic int visitor will return the
-> uint64_t value.  On output, the number would be given the positive
-> unsigned value representation in the stringized form.
->
-> That way, you don't have to complicate the (already-awkward) type
-> promotion rules of QFloat vs QInt with yet another scalar type.  The
-> input parser becomes friendlier - you can either use generic 'int' when
-> you want to allow the user to pass in either signed or unsigned values
-> (important for back-compat, where callers like libvirt learned that only
-> signed values worked even when large unsigned values were wanted); or
-> the specific 'int64' and 'uint64' types to force proper ranges.
->
-> It's definitely an alternative implementation to the one you pursued in
-> your series, so maybe we should first figure out WHAT we want
-> represented, before implementing something that will be more baggage
-> than we want (you at least have the advantage of patches that are
-> written; my idea of adding a sign bool to QInt is still just in the
-> initial idea stage).
+> On Thu, 9 Mar 2017 17:25:25 +0800
+> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+> 
+> > * Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> [2017-02-17 09:29:24 +0100]:
+> > 
+> > > vfio-ccw: the basic infrastructure
+> > > ==================================
+> > > 
+> > > Introduction
+> > > ------------
+> > > 
+> > > Here we describe the vfio support for I/O subchannel devices for
+> > > Linux/s390. Motivation for vfio-ccw is to passthrough subchannels to a
+> > > virtual machine, while vfio is the means.
+> > > 
+> > 
+> > Ping.
+> > 
+> > Any more comment for this version?
+> > 
+> > Thanks.
+> > 
+> > [...]
+> > 
+Hey Conny,
 
-RFC 7159 gives implementations wide latitude on number representation
-(this is one of the several reasons why JSON is a poor standard from an
-interoperability point of view).  Our current representation effectively
-is "if it fits into int64_t, use that, else double".  What we need is
-something that can represent uint64_t exactly, too.
+> 
+> I just walked through the patch set again and did not notice anything
+> else. There's still the area of channel path handling, but I don't see
+> why it shouldn't be able to fit into the infrastructure you introduce
+> here. (I'd expect most of the interesting stuff there to be handled in
+> user space anyway.)
+Thanks! I have the same expectation for the channel path handling part.
 
-You say you've been thinking about extending QInt's range to cover
-uint64_t.  I've been thinking even more radically: replace both QInt and
-QFloat by QNumber.  This is how JSON *actually* works.
+> 
+> You should update MAINTAINERS, though. I'm not sure the s390 cio folks
+> are prepared to handle vfio-ccw :) (although I think you should cc:
+> them on the patches exporting cio interfaces.) It's probably best to
+> take vfio-ccw through the kvm-s390 tree.
 
-The new QNumber type provides constructors from double, int64_t and
-uint64_t.  It also provides conversion functions to double, int64_t and
-uint64_t.  The latter two can fail.
+Beside the fixes for former comments form you and Alex, I will also do
+the following stuff in the next version:
+1. Remove the "RFC" tag from the mail subject.
+2. Cc the s390 CIO layer maintainers for patch 1 and 2:
+    Sebastian Ott <sebott@linux.vnet.ibm.com>
+    Peter Oberparleiter <oberpar@linux.vnet.ibm.com>
+3. For the new created files, update MAINTAINERS by adding:
+S390 VFIO-CCW DRIVER
+M:	Cornelia Huck <cornelia.huck@de.ibm.com>
+L:	linux-s390@vger.kernel.org
+L:	kvm@vger.kernel.org
+S:	Supported
+F:	drivers/s390/cio/vfio_ccw*
+F:	Documentation/s390/vfio-ccw.txt
+F:	include/uapi/linux/vfio_ccw.h
 
-I'd expect these to be perfectly servicable for the visitors.
-
-Code messing with QObject directly might become slightly more elaborate.
-But such code should be minimized anyway.
+-- 
+Dong Jia
