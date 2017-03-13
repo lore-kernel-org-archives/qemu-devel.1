@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cnNY3-0000pO-3w
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:49:56 -0400
+	(envelope-from <quintela@redhat.com>) id 1cnNYT-00016W-Am
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:50:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cnNY2-0007Ic-7L
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:49:55 -0400
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:35233)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cnNY2-0007I7-0o
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:49:54 -0400
-Received: by mail-wm0-x22f.google.com with SMTP id v186so37066303wmd.0
-	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 03:49:53 -0700 (PDT)
+	(envelope-from <quintela@redhat.com>) id 1cnNYP-0007RU-CD
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:50:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47720)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cnNYP-0007RN-5X
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:50:17 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170309132216.23482-3-dgilbert@redhat.com> (David Alan
+	Gilbert's message of "Thu, 9 Mar 2017 13:22:16 +0000")
+References: <20170309132216.23482-1-dgilbert@redhat.com>
+	<20170309132216.23482-3-dgilbert@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Mon, 13 Mar 2017 11:50:14 +0100
+Message-ID: <8760jdh2mx.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <CAOuPqTEAw67784gswB_Xz+S1LwfmWhSqXK0DgFt05jb=hm2H5w@mail.gmail.com>
-References: <CAOuPqTEAw67784gswB_Xz+S1LwfmWhSqXK0DgFt05jb=hm2H5w@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 13 Mar 2017 11:49:32 +0100
-Message-ID: <CAFEAcA_=nPsgaN0pPuS=sUU_VdvXf3X83YV27jMO2yF3ddyL6Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] Small patch for getdents syscall
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] postcopy: Check for shared memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,77 +28,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Henry Wertz <hwertz10@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <lvivier@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, lvivier@redhat.com, pasic@linux.vnet.ibm.com
 
-On 8 March 2017 at 00:40, Henry Wertz <hwertz10@gmail.com> wrote:
-> I have a trivial, 1-line patch for getdents function; due to use of
-> unsigned long, the struct on 64-bit and 32-bit systems is not the same.
-> qemu is aware of this, however it currently only checks for a 32-bit target
-> on 64-bit host case; in my case, I'm running 64-bit target on 32-bit host
-> (x86-64 binaries on a 32-bit ARM).
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 >
-> My use case for this patch, I have Android Studio on my (32-bit ARM)
-> chromebook -- thank goodness I got the 4GB model!  Since Android Studio is
-> java, that worked; but it calls aapt from build tools.  Up through 23.x.x
-> (which is build for 32-bit x86) it worked.  With 25.0.0 (and 24.x.x
-> version) aapt is now built for 64-bit x86-64; it would give an odd error
-> about a directory being invalid.  By comparing strace between qemu and real
-> x86-64, I found getdents was behaving differently.  WIth this patch aapt
-> completes.
+> Postcopy doesn't support migration of RAM shared with another process
+> yet (we've got a bunch of things to understand).
+> Check for the case and don't allow postcopy to be enabled.
 >
-> I really wasn't sure if this would be better this way ("if target != host")
-> or if something like  "if (target==32 && host==64) || (target==64 &&
-> host==32)" would be preferrable.
-> ---------------------------------------------------
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  migration/postcopy-ram.c | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
 >
-> Signed-off-by: Henry Wertz <hwertz10@gmail.com>
->
-> *** linux-user/syscall.c~       2017-03-04 10:31:14.000000000 -0600
-> --- linux-user/syscall.c        2017-03-07 17:08:24.615399116 -0600
-> ***************
-> *** 9913,9921 ****
->   #endif
->   #ifdef TARGET_NR_getdents
->       case TARGET_NR_getdents:
->   #ifdef __NR_getdents
-> ! #if TARGET_ABI_BITS == 32 && HOST_LONG_BITS == 64
->           {
->               struct target_dirent *target_dirp;
->               struct linux_dirent *dirp;
->               abi_long count = arg3;
-> --- 9913,9921 ----
->   #endif
->   #ifdef TARGET_NR_getdents
->       case TARGET_NR_getdents:
->   #ifdef __NR_getdents
-> ! #if TARGET_ABI_BITS != HOST_LONG_BITS
->           {
->               struct target_dirent *target_dirp;
->               struct linux_dirent *dirp;
->               abi_long count = arg3;
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index effbeb6..dc80dbb 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -95,6 +95,19 @@ static bool ufd_version_check(int ufd)
+>      return true;
+>  }
+>  
+> +/* Callback from postcopy_ram_supported_by_host block iterator.
+> + */
+> +static int test_range_shared(const char *block_name, void *host_addr,
+> +                             ram_addr_t offset, ram_addr_t length, void *opaque)
 
-There is a theoretically better way to handle the 64-bit
-guest on 32-bit host case: since here you know that the
-guest dirent struct is bigger than the host dirent
-struct you could read them directly into the guest buffer
-and then convert in-place rather than having to malloc
-a temporary buffer. The conversion code is a little
-bit awkward though because you have to make sure you don't
-overwrite host data you haven't read yet, so I think
-you would need to start at the end of the buffer and
-work backwards. This is basically fixing the #else
-part of this code to work for guest > host as well
-as for guest == host.
 
-However, since 64-bit-on-32 is not exactly a very common
-use case these days I think your patch is an OK fix for
-things.
+Direct question for the name?
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+ram_range_is_shared?
 
-PS: we prefer 'unified' format diffs; git format-patch
-should produce those by default.
 
-thanks
--- PMM
+
+> +{
+> +    if (qemu_ram_is_shared(qemu_ram_block_by_name(block_name))) {
+> +        error_report("Postcopy on shared RAM (%s) is not yet supported",
+> +                     block_name);
+> +        return 1;
+> +    }
+> +    return 0;
+> +}
+
+Wow, we still predate use of bool for questions :-p
+
+
+> +
+>  /*
+>   * Note: This has the side effect of munlock'ing all of RAM, that's
+>   * normally fine since if the postcopy succeeds it gets turned back on at the
+> @@ -127,6 +140,11 @@ bool postcopy_ram_supported_by_host(void)
+>          goto out;
+>      }
+>  
+> +    /* We don't support postcopy with shared RAM yet */
+> +    if (qemu_ram_foreach_block(test_range_shared, NULL)) {
+> +        goto out;
+> +    }
+> +
+>      /*
+>       * userfault and mlock don't go together; we'll put it back later if
+>       * it was enabled.
+
+As my comments are only aestetic,
+
+Reviewed-by: Juan Quintela <quintela@redhat.com>
