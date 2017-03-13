@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cnZoZ-00006Y-0p
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 19:55:48 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1cnZot-0000IB-QK
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 19:56:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cnZoV-0004U7-2m
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 19:55:47 -0400
-Received: from mail.kernel.org ([198.145.29.136]:46614)
+	(envelope-from <sstabellini@kernel.org>) id 1cnZor-0004hT-SJ
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 19:56:07 -0400
+Received: from mail.kernel.org ([198.145.29.136]:46648)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1cnZoU-0004T8-S0
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 19:55:43 -0400
-Date: Mon, 13 Mar 2017 16:55:37 -0700 (PDT)
+	id 1cnZor-0004hF-Kf
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 19:56:05 -0400
 From: Stefano Stabellini <sstabellini@kernel.org>
-Message-ID: <alpine.DEB.2.10.1703131650550.21520@sstabellini-ThinkPad-X260>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Qemu-devel] [PATCH v2 0/9] xen/9pfs: introduce the Xen 9pfs backend
+Date: Mon, 13 Mar 2017 16:55:52 -0700
+Message-Id: <1489449360-14411-1-git-send-email-sstabellini@kernel.org>
+In-Reply-To: <alpine.DEB.2.10.1703131650550.21520@sstabellini-ThinkPad-X260>
+References: <alpine.DEB.2.10.1703131650550.21520@sstabellini-ThinkPad-X260>
+Subject: [Qemu-devel] [PATCH v2 1/9] configure: change CONFIG_XEN_BACKEND to
+ be a target property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,51 +26,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: xen-devel@lists.xenproject.org, sstabellini@kernel.org, anthony.perard@citrix.com, jgross@suse.com, aneesh.kumar@linux.vnet.ibm.com, groug@kaod.org
+Cc: xen-devel@lists.xenproject.org, sstabellini@kernel.org, anthony.perard@citrix.com, groug@kaod.org, Stefano Stabellini <stefano@aporeto.com>, pbonzini@redhat.com, peter.maydell@linaro.org, rth@twiddle.net, stefanha@redhat.com
 
-Hi all,
+CONFIG_XEN_BACKEND is currently set when the host supports Xen,
+regardless of the chosen targets. As a consequence, Xen backends can be
+enabled even on targets that don't support Xen.
 
-This patch series implements a new transport for 9pfs, aimed at Xen
-systems.
+Fix the issue by setting CONFIG_XEN_BACKEND only for targets that
+support Xen.
 
-The transport is based on a traditional Xen frontend and backend drivers
-pair. This patch series implements the backend, which typically runs in
-Dom0. I sent another series to implement the frontend in Linux
-(http://marc.info/?l=linux-kernel&m=148883047125960&w=2).
+Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
+CC: groug@kaod.org
+CC: groug@kaod.org
+CC: pbonzini@redhat.com
+CC: peter.maydell@linaro.org
+CC: rth@twiddle.net
+CC: stefanha@redhat.com
+---
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The backend complies to the Xen transport for 9pfs specification
-version 1, available here:
-
-http://xenbits.xen.org/gitweb/?p=xen.git;a=blob_plain;f=docs/misc/9pfs.markdown;hb=HEAD
-
-
-Changes in v2:
-- fix coding style
-- compile xen-9p-backend.c if CONFIG_XEN_BACKEND
-- add patch to set CONFIG_XEN_BACKEND only for the right targets
-- add review-bys
-
-Stefano Stabellini (9):
-      configure: change CONFIG_XEN_BACKEND to be a target property
-      xen: import ring.h from xen
-      xen: introduce the header file for the Xen 9pfs transport protocol
-      xen/9pfs: introduce Xen 9pfs backend
-      xen/9pfs: connect to the frontend
-      xen/9pfs: receive requests from the frontend
-      xen/9pfs: implement in/out_iov_from_pdu and vmarshal/vunmarshal
-      xen/9pfs: send responses back to the frontend
-      xen/9pfs: build and register Xen 9pfs backend
-
- configure                    |   2 +-
- hw/9pfs/Makefile.objs        |   1 +
- hw/9pfs/xen-9p-backend.c     | 403 ++++++++++++++++++++++++++++++++++++++
- hw/9pfs/xen_9pfs.h           |  20 ++
- hw/block/xen_blkif.h         |   2 +-
- hw/usb/xen-usb.c             |   2 +-
- hw/xen/xen_backend.c         |   3 +
- include/hw/xen/io/ring.h     | 455 +++++++++++++++++++++++++++++++++++++++++++
- include/hw/xen/xen_backend.h |   3 +
- 9 files changed, 888 insertions(+), 3 deletions(-)
- create mode 100644 hw/9pfs/xen-9p-backend.c
- create mode 100644 hw/9pfs/xen_9pfs.h
- create mode 100644 include/hw/xen/io/ring.h
+diff --git a/configure b/configure
+index 6c21975..6d8f752 100755
+--- a/configure
++++ b/configure
+@@ -5442,7 +5442,6 @@ if test "$virglrenderer" = "yes" ; then
+   echo "VIRGL_LIBS=$virgl_libs" >> $config_host_mak
+ fi
+ if test "$xen" = "yes" ; then
+-  echo "CONFIG_XEN_BACKEND=y" >> $config_host_mak
+   echo "CONFIG_XEN_CTRL_INTERFACE_VERSION=$xen_ctrl_version" >> $config_host_mak
+   if test "$xen_pv_domain_build" = "yes" ; then
+     echo "CONFIG_XEN_PV_DOMAIN_BUILD=y" >> $config_host_mak
+@@ -6028,6 +6027,7 @@ case "$target_name" in
+   i386|x86_64)
+     if test "$xen" = "yes" -a "$target_softmmu" = "yes" ; then
+       echo "CONFIG_XEN=y" >> $config_target_mak
++      echo "CONFIG_XEN_BACKEND=y" >> $config_target_mak
+       if test "$xen_pci_passthrough" = yes; then
+         echo "CONFIG_XEN_PCI_PASSTHROUGH=y" >> "$config_target_mak"
+       fi
+-- 
+1.9.1
