@@ -1,28 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45918)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cnTDg-0004HU-TM
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 12:53:18 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cnTHd-0005Ws-4r
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 12:57:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cnTDd-00034J-08
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 12:53:17 -0400
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:34334)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cnTHZ-0006JK-As
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 12:57:21 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:34847)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cnTDc-00033o-M6
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 12:53:12 -0400
-Received: by mail-wr0-x230.google.com with SMTP id l37so107797993wrc.1
-	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 09:53:12 -0700 (PDT)
-References: <20170303131113.25898-1-pbonzini@redhat.com>
-	<20170303131113.25898-6-pbonzini@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170303131113.25898-6-pbonzini@redhat.com>
-Date: Mon, 13 Mar 2017 16:53:21 +0000
-Message-ID: <871su1qfsu.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cnTHZ-0006I6-3b
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 12:57:17 -0400
+Received: by mail-wr0-x241.google.com with SMTP id u108so20841660wrb.2
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 09:57:15 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <589C7E96.9060905@huawei.com> <589D83CE.1090803@huawei.com>
+	<589DDC05.9010807@windriver.com> <58AA51D6.6020508@huawei.com>
+	<1487565495.3740.27.camel@intel.com> <58AD0094.90304@windriver.com>
+	<4dd92012-626a-2d80-9adb-0be398f73eb1@redhat.com>
+	<58AD92AE.6040502@windriver.com>
+	<6c5567f4-192d-aefd-90e4-89f53479c24e@redhat.com>
+	<58AF9921.6060201@huawei.com> <58B04CD3.7010304@windriver.com>
+	<7fdf2551-3d55-1bd9-2848-720a880cc93e@redhat.com>
+	<58B0E191.6040108@huawei.com>
+	<50916996-297e-a794-38e8-5c7ca9389419@linux.intel.com>
+	<a865b1b0-558f-900f-06d7-ceace1c46afb@huawei.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d6172fb7-ab1c-0faf-ed71-18fd74781671@redhat.com>
+Date: Mon, 13 Mar 2017 17:57:13 +0100
 MIME-Version: 1.0
+In-Reply-To: <a865b1b0-558f-900f-06d7-ceace1c46afb@huawei.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 5/5] icount: process QEMU_CLOCK_VIRTUAL
- timers in vCPU thread
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] kvm bug in __rmap_clear_dirty during live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,220 +40,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: fangying <fangying1@huawei.com>, "Huang, Kai" <kai.huang@linux.intel.com>, "Herongguang (Stephen)" <herongguang.he@huawei.com>, Chris Friesen <chris.friesen@windriver.com>, "Han, Huaitong" <huaitong.han@intel.com>, "hangaohuai@huawei.com" <hangaohuai@huawei.com>, stable@vger.kernel.org
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "xudong.hao@linux.intel.com" <xudong.hao@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "wangxinxin.wang@huawei.com" <wangxinxin.wang@huawei.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "guangrong.xiao@linux.intel.com" <guangrong.xiao@linux.intel.com>, linux-kernel@vger.kernel.org
 
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
 
-> icount has become much slower after tcg_cpu_exec has stopped
-> using the BQL.  There is also a latent bug that is masked by
-> the slowness.
->
-> The slowness happens because every occurrence of a QEMU_CLOCK_VIRTUAL
-> timer now has to wake up the I/O thread and wait for it.  The rendez-vous
-> is mediated by the BQL QemuMutex:
->
-> - handle_icount_deadline wakes up the I/O thread with BQL taken
-> - the I/O thread wakes up and waits on the BQL
-> - the VCPU thread releases the BQL a little later
-> - the I/O thread raises an interrupt, which calls qemu_cpu_kick
-> - the VCPU thread notices the interrupt, takes the BQL to
->   process it and waits on it
->
-> All this back and forth is extremely expensive, causing a 6 to 8-fold
-> slowdown when icount is turned on.
->
-> One may think that the issue is that the VCPU thread is too dependent
-> on the BQL, but then the latent bug comes in.  I first tried removing
-> the BQL completely from the x86 cpu_exec, only to see everything break.
-> The only way to fix it (and make everything slow again) was to add a dummy
-> BQL lock/unlock pair.
->
-> This is because in -icount mode you really have to process the events
-> before the CPU restarts executing the next instruction.  Therefore, this
-> series moves the processing of QEMU_CLOCK_VIRTUAL timers straight in
-> the vCPU thread when running in icount mode.
->
-> The required changes include:
->
-> - make the timer notification callback wake up TCG's single vCPU thread
->   when run from another thread.  By using async_run_on_cpu, the callback
->   can override all_cpu_threads_idle() when the CPU is halted.
->
-> - move handle_icount_deadline after qemu_tcg_wait_io_event, so that
->   the timer notification callback is invoked after the dummy work item
->   wakes up the vCPU thread
->
-> - make handle_icount_deadline run the timers instead of just waking the
->   I/O thread.
->
-> - stop processing the timers in the main loop
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  cpus.c               | 26 +++++++++++++++++++++++---
->  include/qemu/timer.h | 24 ++++++++++++++++++++++++
->  util/qemu-timer.c    |  4 +++-
->  3 files changed, 50 insertions(+), 4 deletions(-)
->
-> diff --git a/cpus.c b/cpus.c
-> index 747addd..209c196 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -804,9 +804,23 @@ static void qemu_cpu_kick_rr_cpu(void)
->      } while (cpu != atomic_mb_read(&tcg_current_rr_cpu));
->  }
->
-> +static void do_nothing(CPUState *cpu, run_on_cpu_data unused)
-> +{
-> +}
-> +
->  void qemu_timer_notify_cb(void *opaque, QEMUClockType type)
->  {
-> -    qemu_notify_event();
-> +    if (!use_icount || type != QEMU_CLOCK_VIRTUAL) {
-> +        qemu_notify_event();
-> +        return;
-> +    }
-> +
-> +    if (!qemu_in_vcpu_thread() && first_cpu) {
-> +        /* run_on_cpu will also kick the CPU out of halt so that
-> +         * handle_icount_deadline runs
-> +         */
-> +        async_run_on_cpu(first_cpu, do_nothing, RUN_ON_CPU_NULL);
-> +    }
+On 13/03/2017 15:58, fangying wrote:
+> Hi, Huang Kai
+> 
+> After weeks of intensive testing, we think the problem is solved and
+> this issue can be closed.
 
-This doesn't read quite right - otherwise you get the same effect by
-calling qemu_cpu_kick(), or even modify and call qemu_cpu_kick_rr_cpu()?
+Thanks for the update.  We got to the same conclusion.
 
-The only real effect of having something in the work queue is you run
-the outside of the loop before returning into the tcg_cpu_exec.
-
->  }
->
->  static void kick_tcg_thread(void *opaque)
-> @@ -1220,12 +1234,15 @@ static int64_t tcg_get_icount_limit(void)
->
->  static void handle_icount_deadline(void)
->  {
-> +    assert(qemu_in_vcpu_thread());
->      if (use_icount) {
->          int64_t deadline =
->              qemu_clock_deadline_ns_all(QEMU_CLOCK_VIRTUAL);
->
->          if (deadline == 0) {
-> +            /* Wake up other AioContexts.  */
->              qemu_clock_notify(QEMU_CLOCK_VIRTUAL);
-> +            qemu_clock_run_timers(QEMU_CLOCK_VIRTUAL);
->          }
->      }
->  }
-> @@ -1338,6 +1355,11 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
->          /* Account partial waits to QEMU_CLOCK_VIRTUAL.  */
->          qemu_account_warp_timer();
->
-> +        /* Run the timers here.  This is much more efficient than
-> +         * waking up the I/O thread and waiting for completion.
-> +         */
-> +        handle_icount_deadline();
-> +
->          if (!cpu) {
->              cpu = first_cpu;
->          }
-> @@ -1379,8 +1401,6 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
->              atomic_mb_set(&cpu->exit_request, 0);
->          }
->
-> -        handle_icount_deadline();
-> -
-
-I guess we could just as easily move the handling to after
-qemu_tcg_wait_io_event(cpu ? cpu : QTAILQ_FIRST(&cpus))?
-
-I noticed we still call handle_icount_deadline in the multi-thread case
-which is probably superfluous unless/until we figure out a way for it to
-work with MTTCG.
-
->          qemu_tcg_wait_io_event(cpu ? cpu : QTAILQ_FIRST(&cpus));
->          deal_with_unplugged_cpus();
->      }
-> diff --git a/include/qemu/timer.h b/include/qemu/timer.h
-> index 1441b42..e1742f2 100644
-> --- a/include/qemu/timer.h
-> +++ b/include/qemu/timer.h
-> @@ -533,6 +533,12 @@ static inline QEMUTimer *timer_new_tl(QEMUTimerList *timer_list,
->   * Create a new timer and associate it with the default
->   * timer list for the clock type @type.
->   *
-> + * The default timer list has one special feature: in icount mode,
-> + * %QEMU_CLOCK_VIRTUAL timers are run in the vCPU thread.  This is
-> + * not true of other timer lists, which are typically associated
-> + * with an AioContext---each of them runs its timer callbacks in its own
-> + * AioContext thread.
-> + *
->   * Returns: a pointer to the timer
->   */
->  static inline QEMUTimer *timer_new(QEMUClockType type, int scale,
-> @@ -550,6 +556,12 @@ static inline QEMUTimer *timer_new(QEMUClockType type, int scale,
->   * Create a new timer with nanosecond scale on the default timer list
->   * associated with the clock.
->   *
-> + * The default timer list has one special feature: in icount mode,
-> + * %QEMU_CLOCK_VIRTUAL timers are run in the vCPU thread.  This is
-> + * not true of other timer lists, which are typically associated
-> + * with an AioContext---each of them runs its timer callbacks in its own
-> + * AioContext thread.
-> + *
->   * Returns: a pointer to the newly created timer
->   */
->  static inline QEMUTimer *timer_new_ns(QEMUClockType type, QEMUTimerCB *cb,
-> @@ -564,6 +576,12 @@ static inline QEMUTimer *timer_new_ns(QEMUClockType type, QEMUTimerCB *cb,
->   * @cb: the callback to call when the timer expires
->   * @opaque: the opaque pointer to pass to the callback
->   *
-> + * The default timer list has one special feature: in icount mode,
-> + * %QEMU_CLOCK_VIRTUAL timers are run in the vCPU thread.  This is
-> + * not true of other timer lists, which are typically associated
-> + * with an AioContext---each of them runs its timer callbacks in its own
-> + * AioContext thread.
-> + *
->   * Create a new timer with microsecond scale on the default timer list
->   * associated with the clock.
->   *
-> @@ -581,6 +599,12 @@ static inline QEMUTimer *timer_new_us(QEMUClockType type, QEMUTimerCB *cb,
->   * @cb: the callback to call when the timer expires
->   * @opaque: the opaque pointer to pass to the callback
->   *
-> + * The default timer list has one special feature: in icount mode,
-> + * %QEMU_CLOCK_VIRTUAL timers are run in the vCPU thread.  This is
-> + * not true of other timer lists, which are typically associated
-> + * with an AioContext---each of them runs its timer callbacks in its own
-> + * AioContext thread.
-> + *
->   * Create a new timer with millisecond scale on the default timer list
->   * associated with the clock.
->   *
-> diff --git a/util/qemu-timer.c b/util/qemu-timer.c
-> index dc3181e..82d5650 100644
-> --- a/util/qemu-timer.c
-> +++ b/util/qemu-timer.c
-> @@ -658,7 +658,9 @@ bool qemu_clock_run_all_timers(void)
->      QEMUClockType type;
->
->      for (type = 0; type < QEMU_CLOCK_MAX; type++) {
-> -        progress |= qemu_clock_run_timers(type);
-> +        if (qemu_clock_use_for_deadline(type)) {
-> +            progress |= qemu_clock_run_timers(type);
-> +        }
-
-minor nit: its not really qemu_clock_run_all_timers() now is it. We run
-all but the virtual timers (if icount is enabled).
-
->      }
->
->      return progress;
-
-
---
-Alex Bennée
+Paolo
