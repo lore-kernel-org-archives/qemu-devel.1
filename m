@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54361)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cnJT4-0007BK-ED
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:28:31 -0400
+	(envelope-from <jasowang@redhat.com>) id 1cnJUS-0008Nw-Tj
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:29:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cnJT2-0001kU-Hw
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:28:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58624)
+	(envelope-from <jasowang@redhat.com>) id 1cnJUP-00023D-Nw
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:29:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36246)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cnJT2-0001kP-BV
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:28:28 -0400
-References: <1488278902-11223-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<ca75b31f-1337-6fef-c799-6902f79798a5@cn.fujitsu.com>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cnJUP-00022W-Hx
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:29:53 -0400
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <8959bc26-bf4d-1ecb-a606-b602f6699a9f@redhat.com>
-Date: Mon, 13 Mar 2017 14:28:21 +0800
-MIME-Version: 1.0
-In-Reply-To: <ca75b31f-1337-6fef-c799-6902f79798a5@cn.fujitsu.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/3] COLO-compare: Make COLO-compare
- support Xen
+Date: Mon, 13 Mar 2017 14:29:41 +0800
+Message-Id: <1489386583-11564-1-git-send-email-jasowang@redhat.com>
+Subject: [Qemu-devel] [PATCH V2 1/3] virtio: guard against NULL pfn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +21,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Stefano Stabellini <sstabellini@kernel.org>
+To: mst@redhat.com, qemu-devel@nongnu.org
+Cc: Jason Wang <jasowang@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
+To avoid access stale memory region cache after reset, this patch
+check the existence of virtqueue pfn for all exported virtqueue access
+helpers before trying to use them.
 
+Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+ hw/virtio/virtio.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-On 2017=E5=B9=B403=E6=9C=8813=E6=97=A5 14:18, Zhang Chen wrote:
-> Hi~~~ All~
->
-> No news for a long time, anyone can give me some comments?
-
-Hi,
-
-A question is why use two kinds of colo-frames? This seems not good as=20
-lots of the code were duplicated.
-
-Thanks
-
->
->
-> Thanks
->
-> Zhang Chen
->
->
-> On 02/28/2017 06:48 PM, Zhang Chen wrote:
->> This series focus on COLO Xen support.
->> We add a new chardev socket in colo-compare as the way
->> of communicate with Xen COLO-frame.
->> Xen part:
->> https://lists.xenproject.org/archives/html/xen-devel/2017-02/msg02067.=
-html=20
->>
->>
->> This series is a frame, have some TODO job depend on this patch:
->> https://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg05055.html
->>
->>
->> Zhang Chen (3):
->>    COLO-compare: Add new parameter for communicate with Xen colo-frame
->>    COLO-compare: Add Xen notify chardev socket handler frame
->>    COLO-compare: Add colo-compare Xen notify
->>
->>   net/colo-compare.c | 77=20
->> ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>   qemu-options.hx    | 38 ++++++++++++++++++++++++---
->>   2 files changed, 111 insertions(+), 4 deletions(-)
->>
->
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index efce4b3..76cc81b 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -322,6 +322,10 @@ static int virtio_queue_empty_rcu(VirtQueue *vq)
+         return 0;
+     }
+ 
++    if (unlikely(!vq->vring.avail)) {
++        return 0;
++    }
++
+     return vring_avail_idx(vq) == vq->last_avail_idx;
+ }
+ 
+@@ -333,6 +337,10 @@ int virtio_queue_empty(VirtQueue *vq)
+         return 0;
+     }
+ 
++    if (unlikely(!vq->vring.avail)) {
++        return 0;
++    }
++
+     rcu_read_lock();
+     empty = vring_avail_idx(vq) == vq->last_avail_idx;
+     rcu_read_unlock();
+@@ -431,6 +439,10 @@ void virtqueue_fill(VirtQueue *vq, const VirtQueueElement *elem,
+         return;
+     }
+ 
++    if (unlikely(!vq->vring.used)) {
++        return;
++    }
++
+     idx = (idx + vq->used_idx) % vq->vring.num;
+ 
+     uelem.id = elem->index;
+@@ -448,6 +460,10 @@ void virtqueue_flush(VirtQueue *vq, unsigned int count)
+         return;
+     }
+ 
++    if (unlikely(!vq->vring.used)) {
++        return;
++    }
++
+     /* Make sure buffer is written before we update index. */
+     smp_wmb();
+     trace_virtqueue_flush(vq, count);
+@@ -546,6 +562,11 @@ void virtqueue_get_avail_bytes(VirtQueue *vq, unsigned int *in_bytes,
+     int64_t len = 0;
+     int rc;
+ 
++    if (unlikely(!vq->vring.desc)) {
++        *in_bytes = *out_bytes = 0;
++        return;
++    }
++
+     rcu_read_lock();
+     idx = vq->last_avail_idx;
+     total_bufs = in_total = out_total = 0;
+-- 
+2.7.4
