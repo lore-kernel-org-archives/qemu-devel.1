@@ -1,25 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cnP9H-0000pW-B0
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 08:32:31 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1cnPIL-0002eX-Nq
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 08:41:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cnP9E-0001HQ-7D
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 08:32:27 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:59766)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cnP9D-0001GA-Vx
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 08:32:24 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20170307155054.5833-1-alex.bennee@linaro.org>
-In-Reply-To: <20170307155054.5833-1-alex.bennee@linaro.org>
-Date: Mon, 13 Mar 2017 15:32:20 +0300
-Message-ID: <001801d29bf5$dcba37d0$962ea770$@ru>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
+	(envelope-from <wei.w.wang@intel.com>) id 1cnPII-00049q-JY
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 08:41:49 -0400
+Received: from mga01.intel.com ([192.55.52.88]:42401)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1cnPII-00048e-AH
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 08:41:46 -0400
+From: "Wang, Wei W" <wei.w.wang@intel.com>
+Date: Mon, 13 Mar 2017 12:41:39 +0000
+Message-ID: <286AC319A985734F985F78AFA26841F73919FFDB@shsmsx102.ccr.corp.intel.com>
+References: <1488519630-89058-1-git-send-email-wei.w.wang@intel.com>
+	<1488519630-89058-4-git-send-email-wei.w.wang@intel.com>
+	<20170309141411.GZ16328@bombadil.infradead.org>
+	<58C28FF8.5040403@intel.com>
+	<20170310175349-mutt-send-email-mst@kernel.org>
+	<20170310171143.GA16328@bombadil.infradead.org>
+	<58C3E6A3.1000000@intel.com>
+	<20170311140946.GA1860@bombadil.infradead.org>
+	<286AC319A985734F985F78AFA26841F73919E524@shsmsx102.ccr.corp.intel.com>
+	<20170312055658-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20170312055658-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH v3 00/11] MTTCG fix-ups for 2.9
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v7 kernel 3/5] virtio-balloon:
+ implementation of VIRTIO_BALLOON_F_CHUNK_TRANSFER
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +38,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>, peter.maydell@linaro.org, rth@twiddle.net, pbonzini@redhat.com
-Cc: qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Matthew Wilcox <willy@infradead.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Amit Shah <amit.shah@redhat.com>, "Hansen,
+	Dave" <dave.hansen@intel.com>, Andrea Arcangeli <aarcange@redhat.com>, David
+	Hildenbrand <david@redhat.com>, Liang Li <liliang324@gmail.com>
 
-Hi,
-
-> From: mttcg-request@listserver.greensocs.com =
-[mailto:mttcg-request@listserver.greensocs.com]
+On Sunday, March 12, 2017 12:04 PM, Michael S. Tsirkin wrote:
+> On Sun, Mar 12, 2017 at 01:59:54AM +0000, Wang, Wei W wrote:
+> > On 03/11/2017 10:10 PM, Matthew Wilcox wrote:
+> > > On Sat, Mar 11, 2017 at 07:59:31PM +0800, Wei Wang wrote:
+> > > > I'm thinking what if the guest needs to transfer these much
+> > > > physically continuous memory to host: 1GB+2MB+64KB+32KB+16KB+4KB.
+> > > > Is it going to use Six 64-bit chunks? Would it be simpler if we
+> > > > just use the 128-bit chunk format (we can drop the previous normal
+> > > > 64-bit format)?
+> > >
+> > > Is that a likely thing for the guest to need to do though?  Freeing
+> > > a 1GB page is much more liikely, IMO.
+> >
+> > Yes, I think it's very possible. The host can ask for any number of pag=
+es (e.g.
+> 1.5GB) that the guest can afford.  Also, the ballooned 1.5G memory is not
+> guaranteed to be continuous in any pattern like 1GB+512MB. That's why we
+> need to use a bitmap to draw the whole picture first, and then seek for
+> continuous bits to chunk.
+> >
+> > Best,
+> > Wei
 >=20
-> The next thing on my list it to look at the icount problems and review
-> Paolo's fixes for it. However those fixes should go in a separate
-> series and I assume via Paolo's tree.
-=20
-Do you mean those problems that completely broke icount?
-Are you going to fix it?
+> While I like the clever format that Matthew came up with, I'm also inclin=
+ed to
+> say let's keep things simple.
+> the simplest thing seems to be to use the ext format all the time.
+> Except let's reserve the low 12 bits in both address and size, since they=
+ are
+> already 0, we might be able to use them for flags down the road.
 
+Thanks for reminding us about the hugepage story. I'll use the ext format i=
+n the implementation if no further objections from others.
 
-> Alex Benn=C3=A9e (9):
->   vl/cpus: be smarter with icount and MTTCG
->   target/i386/cpu.h: declare TCG_GUEST_DEFAULT_MO
->   cpus.c: add additional error_report when !TARGET_SUPPORT_MTTCG
->   sparc/sparc64: grab BQL before calling cpu_check_irqs
->   s390x/misc_helper.c: wrap IO instructions in BQL
->   target/xtensa: hold BQL for interrupt processing
->   translate-all: exit cpu_restore_state early if translating
->   target/arm/helper: make it clear the EC field is also in hex
->   hw/intc/arm_gic: modernise the DPRINTF
->=20
-> Paolo Bonzini (1):
->   target-i386: defer VMEXIT to do_interrupt
->=20
-> Yongbok Kim (1):
->   target/mips: hold BQL for timer interrupts
-
-
-Pavel Dovgalyuk
+Best,
+Wei
