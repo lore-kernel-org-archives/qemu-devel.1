@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cnPVt-0005AZ-7I
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 08:55:50 -0400
+	(envelope-from <hangaohuai@huawei.com>) id 1cnPlH-00022O-PA
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 09:11:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cnPVo-0003Rq-Am
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 08:55:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54620)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cnPVo-0003Rc-4g
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 08:55:44 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cnPVm-0000u3-Sj
-	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 12:55:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2E5472E80C0
-	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 12:55:41 +0000 (UTC)
+	(envelope-from <hangaohuai@huawei.com>) id 1cnPlD-0003AO-PQ
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 09:11:43 -0400
+Received: from [45.249.212.187] (port=2998 helo=dggrg01-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <hangaohuai@huawei.com>) id 1cnPlD-00032T-1Q
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 09:11:39 -0400
+From: hangaohuai <hangaohuai@huawei.com>
+Date: Mon, 13 Mar 2017 21:10:29 +0800
+Message-ID: <20170313131029.14044-1-hangaohuai@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 Mar 2017 12:48:12 -0000
-From: Leo Gaspard <1672365@bugs.launchpad.net>
-Reply-To: Bug 1672365 <1672365@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170313123815.23571.92915.malonedeb@gac.canonical.com>
-Message-Id: <20170313124813.25399.44473.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1672365] Re: nested 9pfs read fail
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] fix :cirrus_vga fix OOB read case qemu
+ Segmentation fault
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,100 +25,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com, arei.gonglei@huawei.com, hangaohuai@huawei.com, fangying1@huawei.com
 
-Oh, I forgot to mention: it first worked for some time, then in the
-middle of a shell session running over a screen
-/var/lib/vm/consoles/nginx/screen from the outer VM (socat-linked to
-/var/lib/vm/consoles/nginx/socket.unix to provide a predictable pty
-link), the 9pfs stopped returning any data, and it didn't go away after
-a reboot of the inner VM, as it then no longer managed to boot.
+check the validity of parameters in cirrus_bitblt_rop_fwd_transp_xxx
+and cirrus_bitblt_rop_fwd_xxx to avoid the OOB read which causes qemu Segmentation fault.
 
-I was unfortunately unable to identify exactly which operation caused
-the thing to "stop working", but I'd say it is due to zsh's path-full
-autocompletion in paths including directories with ~700 entries, without
-being certain of that.
+After the fix, we will touch the assert in
+cirrus_invalidate_region:
+assert(off_cur_end >= off_cur);
 
--- =
+Signed-off-by: fangying <fangying1@huawei.com>
+Signed-off-by: hangaohuai <hangaohuai@huawei.com>
+---
+ hw/display/cirrus_vga_rop.h | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1672365
-
-Title:
-  nested 9pfs read fail
-
-Status in QEMU:
-  New
-
-Bug description:
-  tl;dr: A virtfs read fails. The init being on this virtfs (mounted by
-  the initrd), the linux kernel guest is unable to boot, and kernel
-  panics. The fact that qemu still takes 100%cpu after the kernel panic
-  makes me think it's a qemu bug.
-
-  Here is the setup (some hashes replaced with "..."):
-   * A (NixOS) host system, with /nix/store as a btrfs on lvm on cryptsetup
-   * Running a qemu-kvm NixOS guest, with /nix/.ro-store as a virtfs mappin=
-g to host /nix/store:
-  ```
-  exec /nix/store/...-qemu-x86-only-for-vm-tests-2.8.0/bin/qemu-kvm \
-      -name test \
-      -m 8192 \
-      -cpu kvm64 \
-      -net nic,vlan=3D0,model=3Dvirtio -net user,vlan=3D0 \
-      -virtfs local,path=3D/nix/store,security_model=3Dnone,mount_tag=3Dsto=
-re \
-      -virtfs local,path=3D/tmp/nix-vm..../xchg,security_model=3Dnone,mount=
-_tag=3Dxchg \
-      -virtfs local,path=3D/tmp/nix-vm..../xchg,security_model=3Dnone,mount=
-_tag=3Dshared \
-      -drive index=3D0,id=3Ddrive1,file=3D/home/ekleog/nixos/test.qcow2,if=
-=3Dvirtio,cache=3Dwriteback,werror=3Dreport \
-  -kernel /nix/store/...-nixos-system-test-17.09.git.deee8da/kernel \
-  -initrd /nix/store/...-nixos-system-test-17.09.git.deee8da/initrd \
-  -append "$(cat /nix/store/...-nixos-system-test-17.09.git.deee8da/kernel-=
-params) init=3D/nix/store/...-nixos-system-test-17.09.git.deee8da/init regI=
-nfo=3D/nix/store/...-reginfo" \
-      -vga std -usbdevice tablet
-  ```
-   * With /nix/store as an overlayfs between /nix/.ro-store and /nix/.rw-st=
-ore
-   * Running a qemu-kvm NixOS guest, with /nix/.ro-store as a virtfs mappin=
-g to host /nix/store/...-vm-nginx-store:
-  ```
-  /nix/store/...-qemu-2.8.0/bin/qemu-kvm \
-    -name nginx -m 128 -smp 2 -cpu kvm64 \
-    -nographic -serial unix:"/var/lib/vm/consoles/nginx/socket.unix",server=
-,nowait \
-    -drive file=3D"/var/lib/vm/images/nginx.img",if=3Dvirtio,media=3Ddisk \
-    -virtfs local,path=3D"/nix/store/...-vm-nginx-store",security_model=3Dn=
-one,mount_tag=3Dstore \
-    -netdev type=3Dtap,id=3Dnet0,ifname=3Dvm-nginx,script=3Dno,dscript=3Dno=
- -device virtio-net-pci,netdev=3Dnet0,mac=3D56:00:00:00:00:01 \
-    -kernel /nix/store/...-nixos-system-nginx-17.09.git.deee8da/kernel \
-    -initrd /nix/store/...-nixos-system-nginx-17.09.git.deee8da/initrd \
-    -append "$(cat /nix/store/...-nixos-system-nginx-17.09.git.deee8da/kern=
-el-params) init=3D/nix/store/...-nixos-system-nginx-17.09.git.deee8da/init =
-console=3DttyS0 boot.shell_on_fail" \
-    -virtfs local,path=3D"/var/lib/vm/persist/nginx/home",security_model=3D=
-mapped-xattr,mount_tag=3D"shared1" \
-    -virtfs local,path=3D"/var/lib",security_model=3Dmapped-xattr,mount_tag=
-=3D"shared2" \
-    -virtfs local,path=3D"/tmp",security_model=3Dmapped-xattr,mount_tag=3D"=
-shared3"
-  ```
-   * With /nix/store as an overlayfs between /nix/.ro-store and /nix/.rw-st=
-ore
-   * With init in /nix/store
-
-  What happens is that at boot time the inner VM doesn't manage to read
-  the init script after the initrd has mounted the 9pfs and overlayfs.
-
-  What makes me think it's a qemu bug is that htop in the outer VM shows
-  the inner VM's qemu as using 100% cpu, despite the fact the kernel
-  it's running is under kernel panic, thus doing nothing.
-
-  What do you think about this?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1672365/+subscriptions
+diff --git a/hw/display/cirrus_vga_rop.h b/hw/display/cirrus_vga_rop.h
+index 0925a00..12a15e0 100644
+--- a/hw/display/cirrus_vga_rop.h
++++ b/hw/display/cirrus_vga_rop.h
+@@ -97,6 +97,11 @@ glue(glue(cirrus_bitblt_rop_fwd_transp_, ROP_NAME),_8)(CirrusVGAState *s,
+     uint8_t p;
+     dstpitch -= bltwidth;
+     srcpitch -= bltwidth;
++
++    if (dstpitch < 0 || srcpitch < 0) {
++        return;
++    }
++
+     for (y = 0; y < bltheight; y++) {
+         for (x = 0; x < bltwidth; x++) {
+ 	    p = *dst;
+@@ -143,6 +148,11 @@ glue(glue(cirrus_bitblt_rop_fwd_transp_, ROP_NAME),_16)(CirrusVGAState *s,
+     uint8_t p1, p2;
+     dstpitch -= bltwidth;
+     srcpitch -= bltwidth;
++
++    if (srcpitch < 0 || dstpitch < 0) {
++        return;
++    }
++
+     for (y = 0; y < bltheight; y++) {
+         for (x = 0; x < bltwidth; x+=2) {
+ 	    p1 = *dst;
+-- 
+1.8.3.1
