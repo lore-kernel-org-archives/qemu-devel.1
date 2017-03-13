@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cnTW7-0002zH-E8
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 13:12:20 -0400
+	(envelope-from <berrange@redhat.com>) id 1cnTWA-0002zr-1u
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 13:12:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cnTW4-0007Ey-6t
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 13:12:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45050)
+	(envelope-from <berrange@redhat.com>) id 1cnTW8-0007HU-Js
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 13:12:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46724)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cnTW3-0007EO-UJ
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 13:12:16 -0400
-References: <20170313165927.19961-1-git@kirschju.re>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <fe605e60-1a67-bedd-753f-aea0617de778@redhat.com>
-Date: Mon, 13 Mar 2017 12:12:12 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cnTW8-0007Gd-Ax
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 13:12:20 -0400
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8D1CDC0ADFAA
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 17:12:20 +0000 (UTC)
+Date: Mon, 13 Mar 2017 17:12:14 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170313171214.GO4799@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170313124434.1043-1-quintela@redhat.com>
+	<20170313124434.1043-8-quintela@redhat.com>
+	<20170313163429.GK4799@redhat.com> <87o9x5unns.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <20170313165927.19961-1-git@kirschju.re>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Lp2FLdVeQqpborSr9vNWuJLR5iUFjUEwW"
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] X86/HMP: Expose x86 model specific
- registers via human monitor
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87o9x5unns.fsf@secure.mitica>
+Subject: Re: [Qemu-devel] [PATCH 07/16] migration: Create x-multifd-group
+ parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,74 +36,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julian Kirsch <git@kirschju.re>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, amit.shah@redhat.com, dgilbert@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Lp2FLdVeQqpborSr9vNWuJLR5iUFjUEwW
-From: Eric Blake <eblake@redhat.com>
-To: Julian Kirsch <git@kirschju.re>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Peter Crosthwaite <crosthwaite.peter@gmail.com>,
- Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <fe605e60-1a67-bedd-753f-aea0617de778@redhat.com>
-Subject: Re: [PATCH v2 0/2] X86/HMP: Expose x86 model specific registers via
- human monitor
-References: <20170313165927.19961-1-git@kirschju.re>
-In-Reply-To: <20170313165927.19961-1-git@kirschju.re>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, Mar 13, 2017 at 05:49:59PM +0100, Juan Quintela wrote:
+> "Daniel P. Berrange" <berrange@redhat.com> wrote:
+> > On Mon, Mar 13, 2017 at 01:44:25PM +0100, Juan Quintela wrote:
+> >> Indicates how many pages we are going to send in each bach to a multifd
+> >> thread.
+> >
+> >
+> >> diff --git a/qapi-schema.json b/qapi-schema.json
+> >> index b7cb26d..33a6267 100644
+> >> --- a/qapi-schema.json
+> >> +++ b/qapi-schema.json
+> >> @@ -988,6 +988,9 @@
+> >>  # @x-multifd-threads: Number of threads used to migrate data in parallel
+> >>  #                     The default value is 2 (since 2.9)
+> >>  #
+> >> +# @x-multifd-group: Number of pages sent together to a thread
+> >> +#                     The default value is 16 (since 2.9)
+> >> +#
+> >>  # Since: 2.4
+> >>  ##
+> >>  { 'enum': 'MigrationParameter',
+> >> @@ -995,7 +998,7 @@
+> >>             'cpu-throttle-initial', 'cpu-throttle-increment',
+> >>             'tls-creds', 'tls-hostname', 'max-bandwidth',
+> >>             'downtime-limit', 'x-checkpoint-delay',
+> >> -           'x-multifd-threads'] }
+> >> +           'x-multifd-threads', 'x-multifd-group'] }
+> >>  
+> >>  ##
+> >>  # @migrate-set-parameters:
+> >> @@ -1062,6 +1065,9 @@
+> >>  # @x-multifd-threads: Number of threads used to migrate data in parallel
+> >>  #                     The default value is 2 (since 2.9)
+> >>  #
+> >> +# @x-multifd-group: Number of pages sent together in a bunch
+> >> +#                     The default value is 16 (since 2.9)
+> >> +#
+> >
+> > How is this parameter supposed to be used ? Or to put it another way,
+> > what are the benefits / effects of changing it from its default
+> > value and can an application usefully decide what value to set ? I'm
+> > loathe to see us expose another "black magic" parameter where you can't
+> > easily determine what values to set, without predicting future guest
+> > workloads
+> 
+> We have multiple threads, we can send to each thread the number of pages
+> that it needs to send one by one, two by two, n x n.  The bigger the
+> number, the less locking to do, and then less contention.  But if it is
+> too big, we could probably end with too few distribution.  Reason to add
+> this parameter is that if we send page by page, we end spending too much
+> time in locking.
 
-On 03/13/2017 11:59 AM, Julian Kirsch wrote:
-> Provide read/write access to x86 model specific registers (MSRs) by mea=
-ns of
-> two new HMP commands "msr-get" and "msr-set". The rationale behind this=
+The question is how is an application like OpenStack / oVirt supposed to
+know what the right number of pages is to get the right tradeoff between
+lock contention & distribution ? Lock contention may well change over
+time as the QEMU impl is improved, so the right answer for setting this
+parameter might vary depending on QEMU version.  IMHO, you should just
+pick a sensible default value and not expose this to applications.
 
-> is to improve introspection capabilities for system virtualization mode=
-=2E
-> For instance, many modern x86-64 operating systems maintain access to i=
-nternal
-> data structures via the MSR_GSBASE/MSR_KERNELGSBASE MSRs. Giving
-> introspection utilities (such as a remotely attached gdb) a way of
-> accessing these registers improves analysis results drastically.
->=20
-> Changes v1 -> v2:
-> * Rename HMP commands to "msr-get" and "msr-set"
-
-Most HMP commands still use '_'; it is only QMP where we insist on '-'
-in new interfaces.  (And yes, there's not much rhyme or reason to that
-other than backwards consistency.)
-
-> * HMP commands Operate on the current default CPU only
->   (removes need for cpu_index argument)
-> * Remove QMP command alltogether
-> * Implement HMP command in target/i386/monitor.c
-> * Add #ifdef TARGET_I386 around msr-get/msr-set in hmp-commands.hx
->=20
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---Lp2FLdVeQqpborSr9vNWuJLR5iUFjUEwW
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYxtLtAAoJEKeha0olJ0NqgXkH/3D8nexMFYfwVIKW0GgersE0
-EohJ+qu00xWOCbPJF57XCjBT8Pn85F0761PDAxGwm7f0OZQUuVn1auC/RZE9eiiG
-ORgta6jzcXmSHvQ9lDFaeFqp0yq//dUDxNE+jNi6HdlRKjI7gFjkd2/QAFLo4NZB
-Io1Tc8se5AhoUKhVNU6qcjoc7+bAc7GxLhGpYPkLNCmNrWn8Is1Iqh55I+JEXO2p
-CsnPXmGk14Bx/Sdf4ZFL2SBsz4dFv0M/0VBhNFtTUYPtlP6/8Bgoahhl5lv4l6yY
-bG2vPLIHgJfXemv/sSUMDqnJ7T3fP0LJT4UNCI3zP2hEq9c2RjMacJ64ikVEXAs=
-=09qW
------END PGP SIGNATURE-----
-
---Lp2FLdVeQqpborSr9vNWuJLR5iUFjUEwW--
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
