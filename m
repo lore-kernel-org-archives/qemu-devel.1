@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cnRNl-0005r0-UU
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 10:55:34 -0400
+	(envelope-from <kwolf@redhat.com>) id 1cnRNk-0005oo-B7
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 10:55:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cnRNl-0002zT-8X
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 10:55:34 -0400
+	(envelope-from <kwolf@redhat.com>) id 1cnRNj-0002xt-N1
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 10:55:32 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 13 Mar 2017 15:55:07 +0100
-Message-Id: <1489416908-3771-12-git-send-email-kwolf@redhat.com>
+Date: Mon, 13 Mar 2017 15:55:04 +0100
+Message-Id: <1489416908-3771-9-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1489416908-3771-1-git-send-email-kwolf@redhat.com>
 References: <1489416908-3771-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 11/12] mirror: Implement .bdrv_refresh_filename
+Subject: [Qemu-devel] [PULL 08/12] block: Request block status from *file
+ for BDRV_BLOCK_RAW
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,50 +23,27 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-We want query-block to return the right filename, even if a mirror job
-put a bdrv_mirror_top on top of the actual image format driver. Let
-bdrv_mirror_top.bdrv_refresh_filename get the filename from its backing
-file.
+This fixes bdrv_co_get_block_status() for the bdrv_mirror_top block
+driver, which must fall through to bs->backing instead of bs->file.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/mirror.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ block/io.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/mirror.c b/block/mirror.c
-index a5d30ee..4f3a5cb 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -12,6 +12,7 @@
-  */
+diff --git a/block/io.c b/block/io.c
+index 8f38d46..2709a70 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -1760,7 +1760,7 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
  
- #include "qemu/osdep.h"
-+#include "qemu/cutils.h"
- #include "trace.h"
- #include "block/blockjob_int.h"
- #include "block/block_int.h"
-@@ -1060,6 +1061,13 @@ static int coroutine_fn bdrv_mirror_top_pdiscard(BlockDriverState *bs,
-     return bdrv_co_pdiscard(bs->backing->bs, offset, count);
- }
- 
-+static void bdrv_mirror_top_refresh_filename(BlockDriverState *bs, QDict *opts)
-+{
-+    bdrv_refresh_filename(bs->backing->bs);
-+    pstrcpy(bs->exact_filename, sizeof(bs->exact_filename),
-+            bs->backing->bs->filename);
-+}
-+
- static void bdrv_mirror_top_close(BlockDriverState *bs)
- {
- }
-@@ -1088,6 +1096,7 @@ static BlockDriver bdrv_mirror_top = {
-     .bdrv_co_pdiscard           = bdrv_mirror_top_pdiscard,
-     .bdrv_co_flush              = bdrv_mirror_top_flush,
-     .bdrv_co_get_block_status   = bdrv_mirror_top_get_block_status,
-+    .bdrv_refresh_filename      = bdrv_mirror_top_refresh_filename,
-     .bdrv_close                 = bdrv_mirror_top_close,
-     .bdrv_child_perm            = bdrv_mirror_top_child_perm,
- };
+     if (ret & BDRV_BLOCK_RAW) {
+         assert(ret & BDRV_BLOCK_OFFSET_VALID);
+-        ret = bdrv_get_block_status(bs->file->bs, ret >> BDRV_SECTOR_BITS,
++        ret = bdrv_get_block_status(*file, ret >> BDRV_SECTOR_BITS,
+                                     *pnum, pnum, file);
+         goto out;
+     }
 -- 
 1.8.3.1
