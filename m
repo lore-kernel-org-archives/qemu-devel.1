@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cnPQZ-0000VC-5z
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 08:50:20 -0400
+	(envelope-from <bounces@canonical.com>) id 1cnPR4-0000wG-65
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 08:50:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cnPQW-0001Ra-1E
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 08:50:19 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:35215)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cnPQV-0001Qk-R2
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 08:50:15 -0400
-Received: by mail-wr0-x231.google.com with SMTP id g10so102917071wrg.2
-	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 05:50:15 -0700 (PDT)
-References: <87tw6y8bs8.fsf@secure.mitica>
-	<CAFEAcA978SJemCfYJPa8jwtuhhi6JGh9pEDGYNJ1npJA3nvEQA@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA978SJemCfYJPa8jwtuhhi6JGh9pEDGYNJ1npJA3nvEQA@mail.gmail.com>
-Date: Mon, 13 Mar 2017 12:50:29 +0000
-Message-ID: <877f3tqr1m.fsf@linaro.org>
+	(envelope-from <bounces@canonical.com>) id 1cnPR1-0001k7-3Z
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 08:50:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53009)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cnPR0-0001jO-QX
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 08:50:47 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cnPQx-0007ie-A1
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 12:50:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B11802E818C
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 12:50:40 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] KVM call for 2017-03-14
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 13 Mar 2017 12:38:15 -0000
+From: Leo Gaspard <1672365@bugs.launchpad.net>
+Reply-To: Bug 1672365 <1672365@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170313123815.23571.92915.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1672365] [NEW] nested 9pfs read fail
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,96 +35,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Juan Quintela <quintela@redhat.com>, KVM devel mailing list <kvm@vger.kernel.org>, QEMU Developer <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
+Public bug reported:
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+tl;dr: A virtfs read fails. The init being on this virtfs (mounted by
+the initrd), the linux kernel guest is unable to boot, and kernel
+panics. The fact that qemu still takes 100%cpu after the kernel panic
+makes me think it's a qemu bug.
 
-> On 12 March 2017 at 21:45, Juan Quintela <quintela@redhat.com> wrote:
->>
->>
->> Hi
->>
->> Please, send any topic that you are interested in covering.
->>
->> So far the agenda is:
->>
->> - Direction of QEMU and toolstack in light of Google Cloud blog:
->>   https://cloudplatform.googleblog.com/2017/01/7-ways-we-harden-our-KVM-hypervisor-at-Google-Cloud-security-in-plaintext.html
->
->
-> Ah, I'd forgotten that this was on the call agenda. I actually
-> had an interesting conversation with Alex Graf last week about
-> some similar topics, which I guess you could generally summarize
-> as "what are the issues we need to address as a project in order
-> to not become irrelevant in five years time". Since I wrote them
-> up for an internal "what I did on my holi^Wconference trip" report
-> I might as well repost them here:
->
->   - on the "VM support" side, QEMU is more used because it's the only
->     production-quality option in this space, rather than because its
->     users love it. (cf the Google choice to replace it.) It's also got
->     a pretty poor security record. It wouldn't be too surprising if
->     some time in the next five years somebody writes a replacement in
->     a safer language (perhaps also targeting only the VM support role)
->     and it got enough mindshare and takeup to eclipse QEMU.
->     [Is it too early/daft to think about prototyping being able to
->      write QEMU device emulation in Rust ?]
+Here is the setup (some hashes replaced with "..."):
+ * A (NixOS) host system, with /nix/store as a btrfs on lvm on cryptsetup
+ * Running a qemu-kvm NixOS guest, with /nix/.ro-store as a virtfs mapping =
+to host /nix/store:
+```
+exec /nix/store/...-qemu-x86-only-for-vm-tests-2.8.0/bin/qemu-kvm \
+    -name test \
+    -m 8192 \
+    -cpu kvm64 \
+    -net nic,vlan=3D0,model=3Dvirtio -net user,vlan=3D0 \
+    -virtfs local,path=3D/nix/store,security_model=3Dnone,mount_tag=3Dstore=
+ \
+    -virtfs local,path=3D/tmp/nix-vm..../xchg,security_model=3Dnone,mount_t=
+ag=3Dxchg \
+    -virtfs local,path=3D/tmp/nix-vm..../xchg,security_model=3Dnone,mount_t=
+ag=3Dshared \
+    -drive index=3D0,id=3Ddrive1,file=3D/home/ekleog/nixos/test.qcow2,if=3D=
+virtio,cache=3Dwriteback,werror=3Dreport \
+-kernel /nix/store/...-nixos-system-test-17.09.git.deee8da/kernel \
+-initrd /nix/store/...-nixos-system-test-17.09.git.deee8da/initrd \
+-append "$(cat /nix/store/...-nixos-system-test-17.09.git.deee8da/kernel-pa=
+rams) init=3D/nix/store/...-nixos-system-test-17.09.git.deee8da/init regInf=
+o=3D/nix/store/...-reginfo" \
+    -vga std -usbdevice tablet
+```
+ * With /nix/store as an overlayfs between /nix/.ro-store and /nix/.rw-store
+ * Running a qemu-kvm NixOS guest, with /nix/.ro-store as a virtfs mapping =
+to host /nix/store/...-vm-nginx-store:
+```
+/nix/store/...-qemu-2.8.0/bin/qemu-kvm \
+  -name nginx -m 128 -smp 2 -cpu kvm64 \
+  -nographic -serial unix:"/var/lib/vm/consoles/nginx/socket.unix",server,n=
+owait \
+  -drive file=3D"/var/lib/vm/images/nginx.img",if=3Dvirtio,media=3Ddisk \
+  -virtfs local,path=3D"/nix/store/...-vm-nginx-store",security_model=3Dnon=
+e,mount_tag=3Dstore \
+  -netdev type=3Dtap,id=3Dnet0,ifname=3Dvm-nginx,script=3Dno,dscript=3Dno -=
+device virtio-net-pci,netdev=3Dnet0,mac=3D56:00:00:00:00:01 \
+  -kernel /nix/store/...-nixos-system-nginx-17.09.git.deee8da/kernel \
+  -initrd /nix/store/...-nixos-system-nginx-17.09.git.deee8da/initrd \
+  -append "$(cat /nix/store/...-nixos-system-nginx-17.09.git.deee8da/kernel=
+-params) init=3D/nix/store/...-nixos-system-nginx-17.09.git.deee8da/init co=
+nsole=3DttyS0 boot.shell_on_fail" \
+  -virtfs local,path=3D"/var/lib/vm/persist/nginx/home",security_model=3Dma=
+pped-xattr,mount_tag=3D"shared1" \
+  -virtfs local,path=3D"/var/lib",security_model=3Dmapped-xattr,mount_tag=
+=3D"shared2" \
+  -virtfs local,path=3D"/tmp",security_model=3Dmapped-xattr,mount_tag=3D"sh=
+ared3"
+```
+ * With /nix/store as an overlayfs between /nix/.ro-store and /nix/.rw-store
+ * With init in /nix/store
 
-I think rust has the potential to be very interesting. I've been
-watching to remacs project with interest:
+What happens is that at boot time the inner VM doesn't manage to read
+the init script after the initrd has mounted the 9pfs and overlayfs.
 
-  https://github.com/Wilfred/remacs
+What makes me think it's a qemu bug is that htop in the outer VM shows
+the inner VM's qemu as using 100% cpu, despite the fact the kernel it's
+running is under kernel panic, thus doing nothing.
 
-They are attempting to port Emacs to rust in a piecemeal way. Whether
-this works remains to be seen but it is certainly an interesting
-approach compared to other "re-write it all" approaches.
+What do you think about this?
 
->     If the "VM support" usecase moves to another project then QEMU
->     will become a very quiet backwater...
->   - on the "emulation" side, nobody is clearly articulating a purpose
->     for QEMU, a reason why you should use it rather than other modelling
->     technologies (or rather than using real hardware). As a result the
->     efforts applied to QEMU are somewhat unfocused. Are we trying to be:
->     . a dev platform before easy h/w availability?
->       [not easy for QEMU for several reasons]
->     . a dev tool that provides better introspection into guest
->       behaviour than running on h/w?
->       [if so we should put more work into improving our introspection
->        and guest tracing capabilities!]
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-For example now we support atomics in the TCG it would be fairly easy* to
-port something like the ThreadSanitizer (which has fairly hefty memory
-requirements) as a tool for debugging system code.
+-- =
 
->     . primarily a tool for doing automated CI testing and one-off
->       developer smoke-testing that's easier to set up and scale than
->       trying to test on real h/w?
->     . something else?
->       [your idea goes here!]
->   - in all areas our legacy code and back-compatibility requirements
->     are threatening to choke forward progress if we don't make serious
->     efforts to get on top of them
->   - there's no easy way for people to use parts of QEMU like the CPU
->     emulation, or to add their own devices without having to write lots
->     of C code (we're firmly in a "one monolithic blob of code" setup
->     right now and disentangling and setting clear API dividing lines
->     will be a lot of work)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1672365
 
-I spoke to Edgar about posting his rports patch set as a catalyst for
-discussion. Certainly for modelling hobby projects or new hardware QEMU
-could do with support for rapid prototyping. Others have mentioned maybe
-including a scripting language integration for device modelling -
-although I still hold the view that what ever language you choose will
-be the "wrong one" according to the majority of developers.
+Title:
+  nested 9pfs read fail
 
->     [Making QEMU more modular would help with defeating the legacy
->     and back-compat dragons, though]
->
-> thanks
-> -- PMM
+Status in QEMU:
+  New
 
+Bug description:
+  tl;dr: A virtfs read fails. The init being on this virtfs (mounted by
+  the initrd), the linux kernel guest is unable to boot, and kernel
+  panics. The fact that qemu still takes 100%cpu after the kernel panic
+  makes me think it's a qemu bug.
 
---
-Alex Bennée
+  Here is the setup (some hashes replaced with "..."):
+   * A (NixOS) host system, with /nix/store as a btrfs on lvm on cryptsetup
+   * Running a qemu-kvm NixOS guest, with /nix/.ro-store as a virtfs mappin=
+g to host /nix/store:
+  ```
+  exec /nix/store/...-qemu-x86-only-for-vm-tests-2.8.0/bin/qemu-kvm \
+      -name test \
+      -m 8192 \
+      -cpu kvm64 \
+      -net nic,vlan=3D0,model=3Dvirtio -net user,vlan=3D0 \
+      -virtfs local,path=3D/nix/store,security_model=3Dnone,mount_tag=3Dsto=
+re \
+      -virtfs local,path=3D/tmp/nix-vm..../xchg,security_model=3Dnone,mount=
+_tag=3Dxchg \
+      -virtfs local,path=3D/tmp/nix-vm..../xchg,security_model=3Dnone,mount=
+_tag=3Dshared \
+      -drive index=3D0,id=3Ddrive1,file=3D/home/ekleog/nixos/test.qcow2,if=
+=3Dvirtio,cache=3Dwriteback,werror=3Dreport \
+  -kernel /nix/store/...-nixos-system-test-17.09.git.deee8da/kernel \
+  -initrd /nix/store/...-nixos-system-test-17.09.git.deee8da/initrd \
+  -append "$(cat /nix/store/...-nixos-system-test-17.09.git.deee8da/kernel-=
+params) init=3D/nix/store/...-nixos-system-test-17.09.git.deee8da/init regI=
+nfo=3D/nix/store/...-reginfo" \
+      -vga std -usbdevice tablet
+  ```
+   * With /nix/store as an overlayfs between /nix/.ro-store and /nix/.rw-st=
+ore
+   * Running a qemu-kvm NixOS guest, with /nix/.ro-store as a virtfs mappin=
+g to host /nix/store/...-vm-nginx-store:
+  ```
+  /nix/store/...-qemu-2.8.0/bin/qemu-kvm \
+    -name nginx -m 128 -smp 2 -cpu kvm64 \
+    -nographic -serial unix:"/var/lib/vm/consoles/nginx/socket.unix",server=
+,nowait \
+    -drive file=3D"/var/lib/vm/images/nginx.img",if=3Dvirtio,media=3Ddisk \
+    -virtfs local,path=3D"/nix/store/...-vm-nginx-store",security_model=3Dn=
+one,mount_tag=3Dstore \
+    -netdev type=3Dtap,id=3Dnet0,ifname=3Dvm-nginx,script=3Dno,dscript=3Dno=
+ -device virtio-net-pci,netdev=3Dnet0,mac=3D56:00:00:00:00:01 \
+    -kernel /nix/store/...-nixos-system-nginx-17.09.git.deee8da/kernel \
+    -initrd /nix/store/...-nixos-system-nginx-17.09.git.deee8da/initrd \
+    -append "$(cat /nix/store/...-nixos-system-nginx-17.09.git.deee8da/kern=
+el-params) init=3D/nix/store/...-nixos-system-nginx-17.09.git.deee8da/init =
+console=3DttyS0 boot.shell_on_fail" \
+    -virtfs local,path=3D"/var/lib/vm/persist/nginx/home",security_model=3D=
+mapped-xattr,mount_tag=3D"shared1" \
+    -virtfs local,path=3D"/var/lib",security_model=3Dmapped-xattr,mount_tag=
+=3D"shared2" \
+    -virtfs local,path=3D"/tmp",security_model=3Dmapped-xattr,mount_tag=3D"=
+shared3"
+  ```
+   * With /nix/store as an overlayfs between /nix/.ro-store and /nix/.rw-st=
+ore
+   * With init in /nix/store
+
+  What happens is that at boot time the inner VM doesn't manage to read
+  the init script after the initrd has mounted the 9pfs and overlayfs.
+
+  What makes me think it's a qemu bug is that htop in the outer VM shows
+  the inner VM's qemu as using 100% cpu, despite the fact the kernel
+  it's running is under kernel panic, thus doing nothing.
+
+  What do you think about this?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1672365/+subscriptions
