@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cnPLG-0004L7-1Q
+	(envelope-from <quintela@redhat.com>) id 1cnPLJ-0004OR-Hm
 	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 08:44:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cnPLD-0005sp-Nu
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 08:44:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46170)
+	(envelope-from <quintela@redhat.com>) id 1cnPLI-0005vm-AG
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 08:44:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32860)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cnPLD-0005sI-F4
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 08:44:47 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cnPLI-0005v7-1f
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 08:44:52 -0400
 Received: from int-mx11.intmail.prod.int.phx2.redhat.com
 	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 969CE7712
-	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 12:44:47 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 363B683F46
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 12:44:52 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Mon, 13 Mar 2017 13:44:24 +0100
-Message-Id: <20170313124434.1043-7-quintela@redhat.com>
+Date: Mon, 13 Mar 2017 13:44:27 +0100
+Message-Id: <20170313124434.1043-10-quintela@redhat.com>
 In-Reply-To: <20170313124434.1043-1-quintela@redhat.com>
 References: <20170313124434.1043-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 06/16] migration: Create x-multifd-threads
- parameter
+Subject: [Qemu-devel] [PATCH 09/16] migration: Start of multiple fd work
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,183 +32,260 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: amit.shah@redhat.com, dgilbert@redhat.com
 
-Indicates the number of threads that we would create.  By default we
-create 2 threads.
+We create new channels for each new thread created. We only send through
+them a character to be sure that we are creating the channels in the
+right order.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
 --
-
-Catch inconsistent defaults.
-Thanks Eric
+Split SocketArgs into incoming and outgoing args
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- hmp.c                         |  8 ++++++++
- include/migration/migration.h |  2 ++
- migration/migration.c         | 23 +++++++++++++++++++++++
- qapi-schema.json              | 13 +++++++++++--
- 4 files changed, 44 insertions(+), 2 deletions(-)
+ include/migration/migration.h |  7 +++++
+ migration/ram.c               | 35 ++++++++++++++++++++++
+ migration/socket.c            | 67 +++++++++++++++++++++++++++++++++++++++++--
+ 3 files changed, 106 insertions(+), 3 deletions(-)
 
-diff --git a/hmp.c b/hmp.c
-index 261843f..7d6db63 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -323,6 +323,9 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
-         monitor_printf(mon, " %s: %" PRId64,
-             MigrationParameter_lookup[MIGRATION_PARAMETER_X_CHECKPOINT_DELAY],
-             params->x_checkpoint_delay);
-+        monitor_printf(mon, " %s: %" PRId64,
-+            MigrationParameter_lookup[MIGRATION_PARAMETER_X_MULTIFD_THREADS],
-+            params->x_multifd_threads);
-         monitor_printf(mon, "\n");
-     }
- 
-@@ -1400,6 +1403,10 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
-                 p.has_x_checkpoint_delay = true;
-                 use_int_value = true;
-                 break;
-+            case MIGRATION_PARAMETER_X_MULTIFD_THREADS:
-+                p.has_x_multifd_threads = true;
-+                use_int_value = true;
-+                break;
-             }
- 
-             if (use_int_value) {
-@@ -1417,6 +1424,7 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
-                 p.cpu_throttle_increment = valueint;
-                 p.downtime_limit = valueint;
-                 p.x_checkpoint_delay = valueint;
-+                p.x_multifd_threads = valueint;
-             }
- 
-             qmp_migrate_set_parameters(&p, &err);
 diff --git a/include/migration/migration.h b/include/migration/migration.h
-index d48934b..2950270 100644
+index e8b9fcb..cbb049d 100644
 --- a/include/migration/migration.h
 +++ b/include/migration/migration.h
-@@ -265,6 +265,8 @@ bool migration_in_postcopy(MigrationState *);
- bool migration_in_postcopy_after_devices(MigrationState *);
- MigrationState *migrate_get_current(void);
+@@ -23,6 +23,7 @@
+ #include "exec/cpu-common.h"
+ #include "qemu/coroutine_int.h"
+ #include "qom/object.h"
++#include "io/channel.h"
  
-+int migrate_multifd_threads(void);
+ #define QEMU_VM_FILE_MAGIC           0x5145564d
+ #define QEMU_VM_FILE_VERSION_COMPAT  0x00000002
+@@ -235,6 +236,12 @@ void tcp_start_incoming_migration(const char *host_port, Error **errp);
+ 
+ void tcp_start_outgoing_migration(MigrationState *s, const char *host_port, Error **errp);
+ 
++QIOChannel *socket_recv_channel_create(void);
++int socket_recv_channel_destroy(QIOChannel *recv);
++int socket_recv_channel_close_listening(void);
++QIOChannel *socket_send_channel_create(void);
++int socket_send_channel_destroy(QIOChannel *send);
 +
- void migrate_compress_threads_create(void);
- void migrate_compress_threads_join(void);
- void migrate_decompress_threads_create(void);
-diff --git a/migration/migration.c b/migration/migration.c
-index 0e5b0bf..cc9440b 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -71,6 +71,7 @@
-  * Note: Please change this default value to 10000 when we support hybrid mode.
-  */
- #define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY 200
-+#define DEFAULT_MIGRATE_MULTIFD_THREADS 2
+ void unix_start_incoming_migration(const char *path, Error **errp);
  
- static NotifierList migration_state_notifiers =
-     NOTIFIER_LIST_INITIALIZER(migration_state_notifiers);
-@@ -105,6 +106,7 @@ MigrationState *migrate_get_current(void)
-             .max_bandwidth = MAX_THROTTLE,
-             .downtime_limit = DEFAULT_MIGRATE_SET_DOWNTIME,
-             .x_checkpoint_delay = DEFAULT_MIGRATE_X_CHECKPOINT_DELAY,
-+            .x_multifd_threads = DEFAULT_MIGRATE_MULTIFD_THREADS,
-         },
-     };
- 
-@@ -596,6 +598,8 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
-     params->downtime_limit = s->parameters.downtime_limit;
-     params->has_x_checkpoint_delay = true;
-     params->x_checkpoint_delay = s->parameters.x_checkpoint_delay;
-+    params->has_x_multifd_threads = true;
-+    params->x_multifd_threads = s->parameters.x_multifd_threads;
- 
-     return params;
- }
-@@ -860,6 +864,13 @@ void qmp_migrate_set_parameters(MigrationParameters *params, Error **errp)
-                     "x_checkpoint_delay",
-                     "is invalid, it should be positive");
+ void unix_start_outgoing_migration(MigrationState *s, const char *path, Error **errp);
+diff --git a/migration/ram.c b/migration/ram.c
+index ee32fa8..7833e6f 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -387,7 +387,9 @@ void migrate_compress_threads_create(void)
+ struct MultiFDSendParams {
+     int id;
+     QemuThread thread;
++    QIOChannel *c;
+     QemuSemaphore sem;
++    QemuSemaphore init;
+     QemuMutex mutex;
+     bool quit;
+ };
+@@ -427,6 +429,8 @@ void migrate_multifd_send_threads_join(void)
+         qemu_thread_join(&p->thread);
+         qemu_mutex_destroy(&p->mutex);
+         qemu_sem_destroy(&p->sem);
++        qemu_sem_destroy(&p->init);
++        socket_send_channel_destroy(p->c);
      }
-+    if (params->has_x_multifd_threads &&
-+        (params->x_multifd_threads < 1 || params->x_multifd_threads > 255)) {
-+        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-+                   "multifd_threads",
-+                   "is invalid, it should be in the range of 1 to 255");
-+        return;
-+    }
+     g_free(multifd_send_state->params);
+     multifd_send_state->params = NULL;
+@@ -438,6 +442,11 @@ static void *multifd_send_thread(void *opaque)
+ {
+     MultiFDSendParams *p = opaque;
  
-     if (params->has_compress_level) {
-         s->parameters.compress_level = params->compress_level;
-@@ -901,6 +912,9 @@ void qmp_migrate_set_parameters(MigrationParameters *params, Error **errp)
-             colo_checkpoint_notify(s);
-         }
++    char start = 's';
++
++    qio_channel_write(p->c, &start, 1, &error_abort);
++    qemu_sem_post(&p->init);
++
+     while (true) {
+         qemu_mutex_lock(&p->mutex);
+         if (p->quit) {
+@@ -468,12 +477,20 @@ int migrate_multifd_send_threads_create(void)
+ 
+         qemu_mutex_init(&p->mutex);
+         qemu_sem_init(&p->sem, 0);
++        qemu_sem_init(&p->init, 0);
+         p->quit = false;
+         p->id = i;
++        p->c = socket_send_channel_create();
++        if (!p->c) {
++            error_report("Error creating a send channel");
++            migrate_multifd_send_threads_join();
++            return -1;
++        }
+         snprintf(thread_name, 15, "multifd_send_%d", i);
+         qemu_thread_create(&p->thread, thread_name, multifd_send_thread, p,
+                            QEMU_THREAD_JOINABLE);
+         multifd_send_state->count++;
++        qemu_sem_wait(&p->init);
      }
-+    if (params->has_x_multifd_threads) {
-+        s->parameters.x_multifd_threads = params->x_multifd_threads;
-+    }
+     return 0;
+ }
+@@ -481,6 +498,8 @@ int migrate_multifd_send_threads_create(void)
+ struct MultiFDRecvParams {
+     int id;
+     QemuThread thread;
++    QIOChannel *c;
++    QemuSemaphore init;
+     QemuSemaphore sem;
+     QemuMutex mutex;
+     bool quit;
+@@ -521,6 +540,8 @@ void migrate_multifd_recv_threads_join(void)
+         qemu_thread_join(&p->thread);
+         qemu_mutex_destroy(&p->mutex);
+         qemu_sem_destroy(&p->sem);
++        qemu_sem_destroy(&p->init);
++        socket_send_channel_destroy(multifd_recv_state->params[i].c);
+     }
+     g_free(multifd_recv_state->params);
+     multifd_recv_state->params = NULL;
+@@ -531,6 +552,10 @@ void migrate_multifd_recv_threads_join(void)
+ static void *multifd_recv_thread(void *opaque)
+ {
+     MultiFDRecvParams *p = opaque;
++    char start;
++
++    qio_channel_read(p->c, &start, 1, &error_abort);
++    qemu_sem_post(&p->init);
+ 
+     while (true) {
+         qemu_mutex_lock(&p->mutex);
+@@ -561,12 +586,22 @@ int migrate_multifd_recv_threads_create(void)
+ 
+         qemu_mutex_init(&p->mutex);
+         qemu_sem_init(&p->sem, 0);
++        qemu_sem_init(&p->init, 0);
+         p->quit = false;
+         p->id = i;
++        p->c = socket_recv_channel_create();
++
++        if (!p->c) {
++            error_report("Error creating a recv channel");
++            migrate_multifd_recv_threads_join();
++            return -1;
++        }
+         qemu_thread_create(&p->thread, "multifd_recv", multifd_recv_thread, p,
+                            QEMU_THREAD_JOINABLE);
+         multifd_recv_state->count++;
++        qemu_sem_wait(&p->init);
+     }
++    socket_recv_channel_close_listening();
+     return 0;
  }
  
+diff --git a/migration/socket.c b/migration/socket.c
+index 13966f1..58a16b5 100644
+--- a/migration/socket.c
++++ b/migration/socket.c
+@@ -24,6 +24,65 @@
+ #include "io/channel-socket.h"
+ #include "trace.h"
  
-@@ -1418,6 +1432,15 @@ bool migrate_use_multifd(void)
-     return s->enabled_capabilities[MIGRATION_CAPABILITY_X_MULTIFD];
- }
- 
-+int migrate_multifd_threads(void)
++struct SocketIncomingArgs {
++    QIOChannelSocket *ioc;
++} incoming_args;
++
++QIOChannel *socket_recv_channel_create(void)
 +{
-+    MigrationState *s;
++    QIOChannelSocket *sioc;
++    Error *err = NULL;
 +
-+    s = migrate_get_current();
-+
-+    return s->parameters.x_multifd_threads;
++    sioc = qio_channel_socket_accept(QIO_CHANNEL_SOCKET(incoming_args.ioc),
++                                     &err);
++    if (!sioc) {
++        error_report("could not accept migration connection (%s)",
++                     error_get_pretty(err));
++        return NULL;
++    }
++    return QIO_CHANNEL(sioc);
 +}
 +
- int migrate_use_xbzrle(void)
++int socket_recv_channel_destroy(QIOChannel *recv)
++{
++    /* Remove channel */
++    object_unref(OBJECT(send));
++    return 0;
++}
++
++/* we have created all the recv channels, we can close the main one */
++int socket_recv_channel_close_listening(void)
++{
++    /* Close listening socket as its no longer needed */
++    qio_channel_close(QIO_CHANNEL(incoming_args.ioc), NULL);
++    return 0;
++}
++
++struct SocketOutgoingArgs {
++    SocketAddress *saddr;
++    Error **errp;
++} outgoing_args;
++
++QIOChannel *socket_send_channel_create(void)
++{
++    QIOChannelSocket *sioc = qio_channel_socket_new();
++
++    qio_channel_socket_connect_sync(sioc, outgoing_args.saddr,
++                                    outgoing_args.errp);
++    qio_channel_set_delay(QIO_CHANNEL(sioc), false);
++    return QIO_CHANNEL(sioc);
++}
++
++int socket_send_channel_destroy(QIOChannel *send)
++{
++    /* Remove channel */
++    object_unref(OBJECT(send));
++    if (outgoing_args.saddr) {
++        qapi_free_SocketAddress(outgoing_args.saddr);
++        outgoing_args.saddr = NULL;
++    }
++    return 0;
++}
+ 
+ static SocketAddress *tcp_build_address(const char *host_port, Error **errp)
  {
-     MigrationState *s;
-diff --git a/qapi-schema.json b/qapi-schema.json
-index d21934b..b7cb26d 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -985,13 +985,17 @@
- # @x-checkpoint-delay: The delay time (in ms) between two COLO checkpoints in
- #          periodic mode. (Since 2.8)
- #
-+# @x-multifd-threads: Number of threads used to migrate data in parallel
-+#                     The default value is 2 (since 2.9)
-+#
- # Since: 2.4
- ##
- { 'enum': 'MigrationParameter',
-   'data': ['compress-level', 'compress-threads', 'decompress-threads',
-            'cpu-throttle-initial', 'cpu-throttle-increment',
-            'tls-creds', 'tls-hostname', 'max-bandwidth',
--           'downtime-limit', 'x-checkpoint-delay' ] }
-+           'downtime-limit', 'x-checkpoint-delay',
-+           'x-multifd-threads'] }
+@@ -97,6 +156,10 @@ static void socket_start_outgoing_migration(MigrationState *s,
+     struct SocketConnectData *data = g_new0(struct SocketConnectData, 1);
  
- ##
- # @migrate-set-parameters:
-@@ -1054,6 +1058,10 @@
- #
- # @x-checkpoint-delay: the delay time between two COLO checkpoints. (Since 2.8)
- #
-+#
-+# @x-multifd-threads: Number of threads used to migrate data in parallel
-+#                     The default value is 2 (since 2.9)
-+#
- # Since: 2.4
- ##
- { 'struct': 'MigrationParameters',
-@@ -1066,7 +1074,8 @@
-             '*tls-hostname': 'str',
-             '*max-bandwidth': 'int',
-             '*downtime-limit': 'int',
--            '*x-checkpoint-delay': 'int'} }
-+            '*x-checkpoint-delay': 'int',
-+            '*x-multifd-threads': 'int'} }
+     data->s = s;
++
++    outgoing_args.saddr = saddr;
++    outgoing_args.errp = errp;
++
+     if (saddr->type == SOCKET_ADDRESS_KIND_INET) {
+         data->hostname = g_strdup(saddr->u.inet.data->host);
+     }
+@@ -107,7 +170,6 @@ static void socket_start_outgoing_migration(MigrationState *s,
+                                      socket_outgoing_migration,
+                                      data,
+                                      socket_connect_data_free);
+-    qapi_free_SocketAddress(saddr);
+ }
  
- ##
- # @query-migrate-parameters:
+ void tcp_start_outgoing_migration(MigrationState *s,
+@@ -154,8 +216,6 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
+     object_unref(OBJECT(sioc));
+ 
+ out:
+-    /* Close listening socket as its no longer needed */
+-    qio_channel_close(ioc, NULL);
+     return FALSE; /* unregister */
+ }
+ 
+@@ -164,6 +224,7 @@ static void socket_start_incoming_migration(SocketAddress *saddr,
+                                             Error **errp)
+ {
+     QIOChannelSocket *listen_ioc = qio_channel_socket_new();
++    incoming_args.ioc = listen_ioc;
+ 
+     qio_channel_set_name(QIO_CHANNEL(listen_ioc),
+                          "migration-socket-listener");
 -- 
 2.9.3
