@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58450)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cnYf2-0002R2-4k
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 18:41:53 -0400
+	(envelope-from <eblake@redhat.com>) id 1cnYjD-000470-3V
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 18:46:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cnYex-0005NK-Iv
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 18:41:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50040)
+	(envelope-from <eblake@redhat.com>) id 1cnYj8-0000KT-HA
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 18:46:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56742)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cnYex-0005Mv-9v
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 18:41:47 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cnYj8-0000Jf-4d
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 18:46:06 -0400
 References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
-	<1489385927-6735-6-git-send-email-armbru@redhat.com>
+	<1489385927-6735-7-git-send-email-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <27b4a5aa-fa4e-ad49-c51a-cc5b49c58525@redhat.com>
-Date: Mon, 13 Mar 2017 17:41:44 -0500
+Message-ID: <4329f1e3-1f8e-7194-3bf6-55ae0d0aae82@redhat.com>
+Date: Mon, 13 Mar 2017 17:46:03 -0500
 MIME-Version: 1.0
-In-Reply-To: <1489385927-6735-6-git-send-email-armbru@redhat.com>
+In-Reply-To: <1489385927-6735-7-git-send-email-armbru@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="7uPTunUBbo7aEW3aL4exFJKnttHfIFGen"
-Subject: Re: [Qemu-devel] [PATCH for-2.9 05/47] qapi: Have each QAPI schema
- declare its returns white-list
+	boundary="j9u0lkPi55EsITRpgrsHiAlFmK3kQdKKM"
+Subject: Re: [Qemu-devel] [PATCH for-2.9 06/47] qapi: Have each QAPI schema
+ declare its name rule violations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,102 +33,85 @@ To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7uPTunUBbo7aEW3aL4exFJKnttHfIFGen
+--j9u0lkPi55EsITRpgrsHiAlFmK3kQdKKM
 From: Eric Blake <eblake@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
-Message-ID: <27b4a5aa-fa4e-ad49-c51a-cc5b49c58525@redhat.com>
-Subject: Re: [PATCH for-2.9 05/47] qapi: Have each QAPI schema declare its
- returns white-list
+Message-ID: <4329f1e3-1f8e-7194-3bf6-55ae0d0aae82@redhat.com>
+Subject: Re: [PATCH for-2.9 06/47] qapi: Have each QAPI schema declare its
+ name rule violations
 References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
- <1489385927-6735-6-git-send-email-armbru@redhat.com>
-In-Reply-To: <1489385927-6735-6-git-send-email-armbru@redhat.com>
+ <1489385927-6735-7-git-send-email-armbru@redhat.com>
+In-Reply-To: <1489385927-6735-7-git-send-email-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 03/13/2017 01:18 AM, Markus Armbruster wrote:
-> qapi.py has a hardcoded white-list of command names that may violate
-> the rules on permitted return types.  Add a new pragma directive
-> 'returns-whitelist', and use it to replace the hard-coded white-list.
-
-So now the list is per-client, rather than global. Nice idea!
-
+> qapi.py has a hardcoded white-list of type names that may violate the
+> rule on use of upper and lower case.  Add a new pragma directive
+> 'name-case-whitelist', and use it to replace the hard-coded
+> white-list.
 >=20
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
+>  docs/qapi-code-gen.txt                  |  6 ++++++
+>  qapi-schema.json                        | 11 ++++++++++-
+>  scripts/qapi.py                         | 22 ++++++++++------------
+>  tests/qapi-schema/enum-member-case.err  |  2 +-
+>  tests/qapi-schema/enum-member-case.json |  1 +
+>  5 files changed, 28 insertions(+), 14 deletions(-)
+>=20
 
 > +++ b/qapi-schema.json
-> @@ -51,6 +51,18 @@
-> =20
->  { 'pragma': { 'doc-required': true } }
-> =20
-> +# Whitelists to permit QAPI rule violations; think twice before you
-> +# add to them!
-> +{ 'pragma': {
-> +    # Commands allowed to return a non-dictionary:
-> +    'returns-whitelist': [
-> +        'human-monitor-command',
-> +        'qom-get',
-> +        'query-migrate-cache-size',
-> +        'query-tpm-models',
-> +        'query-tpm-types',
-> +        'ringbuf-read' ] } }
-> +
+> @@ -61,7 +61,16 @@
+>          'query-migrate-cache-size',
+>          'query-tpm-models',
+>          'query-tpm-types',
+> -        'ringbuf-read' ] } }
+> +        'ringbuf-read' ],
+> +    'name-case-whitelist': [
+> +        'ACPISlotType',         # DIMM, visible through query-acpi-osp=
+m-status
+> +        'CpuInfoMIPS',          # PC, visible through query-cpu
+> +        'CpuInfoTricore',       # PC, visible through query-cpu
+> +        'QapiErrorClass',       # all members, visible through errors
+> +        'UuidInfo',             # UUID, visible through query-uuid
+> +        'X86CPURegister32',     # all members, visible indirectly thro=
+ugh qom-get
+> +        'q_obj_CpuInfo-base'    # CPU, visible through query-cpu
+> +    ] } }
 
-If I'm understanding the code right, we could have also written this all
-as one pragma with a larger dict instead of two pragmas with one-element
-dicts:
+Interesting - here you bunch up 2 of the 3 pragmas into one dict, while
+still leaving the third related to documentation in its own dict.
 
-{ 'pragma': { 'doc-required': true,
-              'returns-whitelist': [ ... ] } }
+That 'q_obj_CpuInfo-base' is ugly, and I had a patch around previously
+that used a saner name rather than making callers reverse-engineer the
+implicit naming rules.  Related to my work on anonymous bases to flat
+unions, so I'll get to rebase that work and post it on top of yours.
+But not a show-stopper for this patch, where it is just moving the locati=
+on.
 
-But see below about another potential for rewriting that I thought of
-before reading your full patch [1]...
 
-> @@ -317,12 +298,19 @@ class QAPISchemaParser(object):
->          self.docs.extend(exprs_include.docs)
-> =20
->      def _pragma(self, name, value, info):
-> -        global doc_required
-> +        global doc_required, returns_whitelist
->          if name =3D=3D 'doc-required':
->              if not isinstance(value, bool):
->                  raise QAPISemError(info,
->                                     "Pragma 'doc-required' must be bool=
-ean")
->              doc_required =3D value
-> +        elif name =3D=3D 'returns-whitelist':
+> @@ -311,6 +302,13 @@ class QAPISchemaParser(object):
+>                                     "Pragma returns-whitelist must be"
+>                                     " a list of strings")
+>              returns_whitelist =3D value
+> +        elif name =3D=3D 'name-case-whitelist':
 > +            if (not isinstance(value, list)
 > +                    or any([not isinstance(elt, str) for elt in value]=
 )):
 > +                raise QAPISemError(info,
-> +                                   "Pragma returns-whitelist must be"
+> +                                   "Pragma name-case-whitelist must be=
+"
 > +                                   " a list of strings")
+> +            name_case_whitelist =3D value
 
-Again, a new error message with no testsuite coverage.
+Same comments as before - new error message with no testsuite coverage,
+and no checking for duplicate assignment where last one silently wins;
+but where I'm okay with deferring if you don't want to delay 2.9 for a
+v2 respin.
 
-> +            returns_whitelist =3D value
-
-[1] Hmm, this precludes the converse direction of specifying things.
-You cannot usefully list the whitelist pragma more than once, because
-only the last one wins.  Why would we want to allow it to be more than
-once? because we could do:
-
-{ 'pragma': 'returns-whitelist': [ 'human-monitor-command' ] }
-{ 'pragma': 'returns-whitelist': [ 'qom-get' ] }
-
-and then spread out the uses of the pragma to be closer to the
-violations, rather than bunched up front.
-
-Or maybe you want to consider rejecting a second whitelist, instead of
-silently losing the first one, if you want to force that all violations
-are bunched up front into a single pragma.
-
-But that's food for thought - I'm leaving it up to you if you want to
-spin a v2 (making non-trivial changes based on my comments), or leave
-improvements (like any testsuite additions) for a followup patch.  If
-you use this patch as-is, you can add:
-
+So if you use it unchanged,
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
@@ -136,7 +119,7 @@ Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---7uPTunUBbo7aEW3aL4exFJKnttHfIFGen
+--j9u0lkPi55EsITRpgrsHiAlFmK3kQdKKM
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -146,13 +129,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYxyAoAAoJEKeha0olJ0NqzckH/35e/FYTw1jDkZBKETiGjB8u
-KQ3TnNozPhtzKMmD7MfNkVguJWDZ20WkJ6gQXkMCA5R6D1joQBujgHbqXtZcxJFL
-Np9KmGtL+RML3/ThIokIBV+Ly1nxrJPMVcjjMhLC9bYA2/7h+Fuxrd8AqvDGLS+D
-Kzlb3jLWBZzX+c3T0KrJ1lT7Nf87ED39SEJu11hwcELaJBUr+36p+WmvTcYaLMWQ
-5plqKrhd7S23dqqoc7xy7ztYt4QK8UrNfwIK7qvm0MVFP5z6nay6U8wHUOzooHH7
-mXaxWL8tOfeoNAxeHVqfMwnr9OUz4V8lIeDlWWHP3M1zOBnPwM16dGyE/dynbkY=
-=2ABX
+iQEcBAEBCAAGBQJYxyErAAoJEKeha0olJ0NqzagH/1Mbo6I5F+r/cl23XnJ0jept
+bxOlnFdaq825ZCL2paic6mTQkzxXsZcqzMX6nxJwyLf+jBzXx/Uj7vOY2/oa5BAI
+ffuyj8yaPLvj12t1gxOhyqXdc4fVBl79AxEKlsBvzoNUxQgbWjriXkdl07oI35DZ
+C7ufTJMAWV2zNPd7jJlV094cqC/nB8HsD9a6uQdDoIc/sscORWPKmj9YvqUqcETC
+SurKLJdfEEJIe9L2wTphF7oEjiMZU4e0PupfCElNuXZ1NmzTcsaxvP9AY5kqo3lt
+he0AD60c+sXjlxWJXEzMpf2wgUCGv1py96Fk8Cl0ghNOBELeLpR3lNgsU+HC4n4=
+=pljY
 -----END PGP SIGNATURE-----
 
---7uPTunUBbo7aEW3aL4exFJKnttHfIFGen--
+--j9u0lkPi55EsITRpgrsHiAlFmK3kQdKKM--
