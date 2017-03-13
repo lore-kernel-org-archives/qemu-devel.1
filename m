@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54113)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cnZp3-0000Oh-Sl
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 19:56:19 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1cnZp6-0000Qi-Ao
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 19:56:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cnZp2-0004pL-Pq
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 19:56:17 -0400
-Received: from mail.kernel.org ([198.145.29.136]:46862)
+	(envelope-from <sstabellini@kernel.org>) id 1cnZp5-0004rF-95
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 19:56:20 -0400
+Received: from mail.kernel.org ([198.145.29.136]:46916)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1cnZp2-0004oh-GU
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 19:56:16 -0400
+	id 1cnZp5-0004qH-2G
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 19:56:19 -0400
 From: Stefano Stabellini <sstabellini@kernel.org>
-Date: Mon, 13 Mar 2017 16:55:58 -0700
-Message-Id: <1489449360-14411-7-git-send-email-sstabellini@kernel.org>
+Date: Mon, 13 Mar 2017 16:56:00 -0700
+Message-Id: <1489449360-14411-9-git-send-email-sstabellini@kernel.org>
 In-Reply-To: <1489449360-14411-1-git-send-email-sstabellini@kernel.org>
 References: <alpine.DEB.2.10.1703131650550.21520@sstabellini-ThinkPad-X260>
 	<1489449360-14411-1-git-send-email-sstabellini@kernel.org>
-Subject: [Qemu-devel] [PATCH v2 7/9] xen/9pfs: implement in/out_iov_from_pdu
- and vmarshal/vunmarshal
+Subject: [Qemu-devel] [PATCH v2 9/9] xen/9pfs: build and register Xen 9pfs
+ backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,147 +29,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: xen-devel@lists.xenproject.org, sstabellini@kernel.org, anthony.perard@citrix.com, groug@kaod.org, Stefano Stabellini <stefano@aporeto.com>, jgross@suse.com, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
 
-Implement xen_9pfs_init_in/out_iov_from_pdu and
-xen_9pfs_pdu_vmarshal/vunmarshall by creating new sg pointing to the
-data on the ring.
-
-This is safe as we only handle one request per ring at any given time.
-
 Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 CC: anthony.perard@citrix.com
 CC: jgross@suse.com
 CC: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
 CC: Greg Kurz <groug@kaod.org>
 ---
- hw/9pfs/xen-9p-backend.c | 91 ++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 89 insertions(+), 2 deletions(-)
+ hw/9pfs/Makefile.objs        | 1 +
+ hw/xen/xen_backend.c         | 3 +++
+ include/hw/xen/xen_backend.h | 3 +++
+ 3 files changed, 7 insertions(+)
 
-diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
-index 741dd31..d72a749 100644
---- a/hw/9pfs/xen-9p-backend.c
-+++ b/hw/9pfs/xen-9p-backend.c
-@@ -48,12 +48,77 @@ typedef struct Xen9pfsDev {
-     struct Xen9pfsRing *rings;
- } Xen9pfsDev;
+diff --git a/hw/9pfs/Makefile.objs b/hw/9pfs/Makefile.objs
+index da0ae0c..673f9f9 100644
+--- a/hw/9pfs/Makefile.objs
++++ b/hw/9pfs/Makefile.objs
+@@ -5,5 +5,6 @@ common-obj-y += coth.o cofs.o codir.o cofile.o
+ common-obj-y += coxattr.o 9p-synth.o
+ common-obj-$(CONFIG_OPEN_BY_HANDLE) +=  9p-handle.o
+ common-obj-y += 9p-proxy.o
++common-obj-$(CONFIG_XEN_BACKEND) += xen-9p-backend.o
  
-+static void xen_9pfs_in_sg(struct Xen9pfsRing *ring,
-+                           struct iovec *in_sg,
-+                           int *num,
-+                           uint32_t idx,
-+                           uint32_t size)
-+{
-+    RING_IDX cons, prod, masked_prod, masked_cons;
-+
-+    cons = ring->intf->in_cons;
-+    prod = ring->intf->in_prod;
-+    xen_rmb();
-+    masked_prod = xen_9pfs_mask(prod, XEN_9PFS_RING_SIZE);
-+    masked_cons = xen_9pfs_mask(cons, XEN_9PFS_RING_SIZE);
-+
-+    if (masked_prod < masked_cons) {
-+        in_sg[0].iov_base = ring->ring.in + masked_prod;
-+        in_sg[0].iov_len = masked_cons - masked_prod;
-+        *num = 1;
-+    } else {
-+        in_sg[0].iov_base = ring->ring.in + masked_prod;
-+        in_sg[0].iov_len = XEN_9PFS_RING_SIZE - masked_prod;
-+        in_sg[1].iov_base = ring->ring.in;
-+        in_sg[1].iov_len = masked_cons;
-+        *num = 2;
-+    }
-+}
-+
-+static void xen_9pfs_out_sg(struct Xen9pfsRing *ring,
-+                            struct iovec *out_sg,
-+                            int *num,
-+                            uint32_t idx)
-+{
-+    RING_IDX cons, prod, masked_prod, masked_cons;
-+
-+    cons = ring->intf->out_cons;
-+    prod = ring->intf->out_prod;
-+    xen_rmb();
-+    masked_prod = xen_9pfs_mask(prod, XEN_9PFS_RING_SIZE);
-+    masked_cons = xen_9pfs_mask(cons, XEN_9PFS_RING_SIZE);
-+
-+    if (masked_cons < masked_prod) {
-+        out_sg[0].iov_base = ring->ring.out + masked_cons;
-+        out_sg[0].iov_len = ring->out_size;
-+        *num = 1;
-+    } else {
-+        if (ring->out_size > (XEN_9PFS_RING_SIZE - masked_cons)) {
-+            out_sg[0].iov_base = ring->ring.out + masked_cons;
-+            out_sg[0].iov_len = XEN_9PFS_RING_SIZE - masked_cons;
-+            out_sg[1].iov_base = ring->ring.out;
-+            out_sg[1].iov_len = ring->out_size - (XEN_9PFS_RING_SIZE - masked_cons);
-+            *num = 2;
-+        } else {
-+            out_sg[0].iov_base = ring->ring.out + masked_cons;
-+            out_sg[0].iov_len = ring->out_size;
-+            *num = 1;
-+        }
-+    }
-+}
-+
- static ssize_t xen_9pfs_pdu_vmarshal(V9fsPDU *pdu,
-                                      size_t offset,
-                                      const char *fmt,
-                                      va_list ap)
- {
--    return 0;
-+    struct Xen9pfsDev *xen_9pfs = container_of(pdu->s, struct Xen9pfsDev, state);
-+    struct iovec in_sg[2];
-+    int num;
-+
-+    xen_9pfs_in_sg(&xen_9pfs->rings[pdu->tag % xen_9pfs->num_rings],
-+                   in_sg, &num, pdu->idx, ROUND_UP(offset + 128, 512));
-+    return v9fs_iov_vmarshal(in_sg, num, offset, 0, fmt, ap);
- }
- 
- static ssize_t xen_9pfs_pdu_vunmarshal(V9fsPDU *pdu,
-@@ -61,13 +126,27 @@ static ssize_t xen_9pfs_pdu_vunmarshal(V9fsPDU *pdu,
-                                        const char *fmt,
-                                        va_list ap)
- {
--    return 0;
-+    struct Xen9pfsDev *xen_9pfs = container_of(pdu->s, struct Xen9pfsDev, state);
-+    struct iovec out_sg[2];
-+    int num;
-+
-+    xen_9pfs_out_sg(&xen_9pfs->rings[pdu->tag % xen_9pfs->num_rings],
-+                    out_sg, &num, pdu->idx);
-+    return v9fs_iov_vunmarshal(out_sg, num, offset, 0, fmt, ap);
- }
- 
- static void xen_9pfs_init_out_iov_from_pdu(V9fsPDU *pdu,
-                                            struct iovec **piov,
-                                            unsigned int *pniov)
- {
-+    struct Xen9pfsDev *xen_9pfs = container_of(pdu->s, struct Xen9pfsDev, state);
-+    struct Xen9pfsRing *ring = &xen_9pfs->rings[pdu->tag % xen_9pfs->num_rings];
-+    struct iovec *sg = g_malloc0(sizeof(*sg)*2);
-+    int num;
-+
-+    xen_9pfs_out_sg(ring, sg, &num, pdu->idx);
-+    *piov = sg;
-+    *pniov = num;
- }
- 
- static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pdu,
-@@ -75,6 +154,14 @@ static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pdu,
-                                           unsigned int *pniov,
-                                           size_t size)
- {
-+    struct Xen9pfsDev *xen_9pfs = container_of(pdu->s, struct Xen9pfsDev, state);
-+    struct Xen9pfsRing *ring = &xen_9pfs->rings[pdu->tag % xen_9pfs->num_rings];
-+    struct iovec *sg = g_malloc0(sizeof(*sg)*2);
-+    int num;
-+
-+    xen_9pfs_in_sg(ring, sg, &num, pdu->idx, size);
-+    *piov = sg;
-+    *pniov = num;
- }
- 
- static void xen_9pfs_push_and_notify(V9fsPDU *pdu)
+ obj-y += virtio-9p-device.o
+diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
+index 6c21c37..fe737e9 100644
+--- a/hw/xen/xen_backend.c
++++ b/hw/xen/xen_backend.c
+@@ -585,6 +585,9 @@ void xen_be_register_common(void)
+     xen_be_register("console", &xen_console_ops);
+     xen_be_register("vkbd", &xen_kbdmouse_ops);
+     xen_be_register("qdisk", &xen_blkdev_ops);
++#ifdef CONFIG_VIRTFS
++    xen_be_register("9pfs", &xen_9pfs_ops);
++#endif
+ #ifdef CONFIG_USB_LIBUSB
+     xen_be_register("qusb", &xen_usb_ops);
+ #endif
+diff --git a/include/hw/xen/xen_backend.h b/include/hw/xen/xen_backend.h
+index 4f4799a..7b72f1a 100644
+--- a/include/hw/xen/xen_backend.h
++++ b/include/hw/xen/xen_backend.h
+@@ -49,6 +49,9 @@ extern struct XenDevOps xen_console_ops;      /* xen_console.c     */
+ extern struct XenDevOps xen_kbdmouse_ops;     /* xen_framebuffer.c */
+ extern struct XenDevOps xen_framebuffer_ops;  /* xen_framebuffer.c */
+ extern struct XenDevOps xen_blkdev_ops;       /* xen_disk.c        */
++#ifdef CONFIG_VIRTFS
++extern struct XenDevOps xen_9pfs_ops;       /* xen-9p-backend.c        */
++#endif
+ extern struct XenDevOps xen_netdev_ops;       /* xen_nic.c         */
+ #ifdef CONFIG_USB_LIBUSB
+ extern struct XenDevOps xen_usb_ops;          /* xen-usb.c         */
 -- 
 1.9.1
