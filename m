@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52543)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52551)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cnJJu-0007cx-8Q
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:19:05 -0400
+	(envelope-from <armbru@redhat.com>) id 1cnJJu-0007d6-9y
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:19:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cnJJn-0003gd-Hh
+	(envelope-from <armbru@redhat.com>) id 1cnJJn-0003gS-GF
 	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:19:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34558)
+Received: from mx1.redhat.com ([209.132.183.28]:56828)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cnJJn-0003eB-5f
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cnJJn-0003dy-4U
 	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:18:55 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 13 Mar 2017 07:18:45 +0100
-Message-Id: <1489385927-6735-46-git-send-email-armbru@redhat.com>
+Date: Mon, 13 Mar 2017 07:18:36 +0100
+Message-Id: <1489385927-6735-37-git-send-email-armbru@redhat.com>
 In-Reply-To: <1489385927-6735-1-git-send-email-armbru@redhat.com>
 References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.9 45/47] qapi: Drop unused .check_clash()
- parameter schema
+Subject: [Qemu-devel] [PATCH for-2.9 36/47] tests/qapi-schema: Improve
+ coverage of bogus member docs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +27,129 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, eblake@redhat.com, mdroth@linux.vnet.ibm.com
 
+New test doc-bad-union-member.json shows we can fail to reject
+documentation for nonexistent members.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi.py | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ tests/Makefile.include                          |  2 ++
+ tests/qapi-schema/doc-bad-alternate-member.err  |  1 +
+ tests/qapi-schema/doc-bad-alternate-member.exit |  1 +
+ tests/qapi-schema/doc-bad-alternate-member.json |  9 +++++++++
+ tests/qapi-schema/doc-bad-alternate-member.out  |  0
+ tests/qapi-schema/doc-bad-union-member.err      |  0
+ tests/qapi-schema/doc-bad-union-member.exit     |  1 +
+ tests/qapi-schema/doc-bad-union-member.json     | 19 +++++++++++++++++++
+ tests/qapi-schema/doc-bad-union-member.out      | 11 +++++++++++
+ 9 files changed, 44 insertions(+)
+ create mode 100644 tests/qapi-schema/doc-bad-alternate-member.err
+ create mode 100644 tests/qapi-schema/doc-bad-alternate-member.exit
+ create mode 100644 tests/qapi-schema/doc-bad-alternate-member.json
+ create mode 100644 tests/qapi-schema/doc-bad-alternate-member.out
+ create mode 100644 tests/qapi-schema/doc-bad-union-member.err
+ create mode 100644 tests/qapi-schema/doc-bad-union-member.exit
+ create mode 100644 tests/qapi-schema/doc-bad-union-member.json
+ create mode 100644 tests/qapi-schema/doc-bad-union-member.out
 
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 870ff4e..4102011 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -1178,7 +1178,7 @@ class QAPISchemaObjectType(QAPISchemaType):
-             self.base = schema.lookup_type(self._base_name)
-             assert isinstance(self.base, QAPISchemaObjectType)
-             self.base.check(schema)
--            self.base.check_clash(schema, self.info, seen)
-+            self.base.check_clash(self.info, seen)
-         for m in self.local_members:
-             m.check(schema)
-             m.check_clash(self.info, seen)
-@@ -1188,14 +1188,14 @@ class QAPISchemaObjectType(QAPISchemaType):
-         if self.variants:
-             self.variants.check(schema, seen)
-             assert self.variants.tag_member in self.members
--            self.variants.check_clash(schema, self.info, seen)
-+            self.variants.check_clash(self.info, seen)
-         if self.doc:
-             self.doc.check()
- 
-     # Check that the members of this type do not cause duplicate JSON members,
-     # and update seen to track the members seen so far. Report any errors
-     # on behalf of info, which is not necessarily self.info
--    def check_clash(self, schema, info, seen):
-+    def check_clash(self, info, seen):
-         assert not self.variants       # not implemented
-         for m in self.members:
-             m.check_clash(info, seen)
-@@ -1324,12 +1324,12 @@ class QAPISchemaObjectTypeVariants(object):
-                 assert isinstance(v.type, QAPISchemaObjectType)
-                 v.type.check(schema)
- 
--    def check_clash(self, schema, info, seen):
-+    def check_clash(self, info, seen):
-         for v in self.variants:
-             # Reset seen map for each variant, since qapi names from one
-             # branch do not affect another branch
-             assert isinstance(v.type, QAPISchemaObjectType)
--            v.type.check_clash(schema, info, dict(seen))
-+            v.type.check_clash(info, dict(seen))
- 
- 
- class QAPISchemaObjectTypeVariant(QAPISchemaObjectTypeMember):
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 8ce9d3d..5edf3fa 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -367,9 +367,11 @@ qapi-schema += base-cycle-direct.json
+ qapi-schema += base-cycle-indirect.json
+ qapi-schema += command-int.json
+ qapi-schema += comments.json
++qapi-schema += doc-bad-alternate-member.json
+ qapi-schema += doc-bad-command-arg.json
+ qapi-schema += doc-bad-expr.json
+ qapi-schema += doc-bad-symbol.json
++qapi-schema += doc-bad-union-member.json
+ qapi-schema += doc-duplicated-arg.json
+ qapi-schema += doc-duplicated-return.json
+ qapi-schema += doc-duplicated-since.json
+diff --git a/tests/qapi-schema/doc-bad-alternate-member.err b/tests/qapi-schema/doc-bad-alternate-member.err
+new file mode 100644
+index 0000000..387f782
+--- /dev/null
++++ b/tests/qapi-schema/doc-bad-alternate-member.err
+@@ -0,0 +1 @@
++tests/qapi-schema/doc-bad-alternate-member.json:3: The following documented members are not in the declaration: aa, bb
+diff --git a/tests/qapi-schema/doc-bad-alternate-member.exit b/tests/qapi-schema/doc-bad-alternate-member.exit
+new file mode 100644
+index 0000000..d00491f
+--- /dev/null
++++ b/tests/qapi-schema/doc-bad-alternate-member.exit
+@@ -0,0 +1 @@
++1
+diff --git a/tests/qapi-schema/doc-bad-alternate-member.json b/tests/qapi-schema/doc-bad-alternate-member.json
+new file mode 100644
+index 0000000..738635c
+--- /dev/null
++++ b/tests/qapi-schema/doc-bad-alternate-member.json
+@@ -0,0 +1,9 @@
++# Arguments listed in the doc comment must exist in the actual schema
++
++##
++# @AorB:
++# @aa: a
++# @bb: b
++##
++{ 'alternate': 'AorB',
++  'data': { 'a': 'str', 'b': 'int' } }
+diff --git a/tests/qapi-schema/doc-bad-alternate-member.out b/tests/qapi-schema/doc-bad-alternate-member.out
+new file mode 100644
+index 0000000..e69de29
+diff --git a/tests/qapi-schema/doc-bad-union-member.err b/tests/qapi-schema/doc-bad-union-member.err
+new file mode 100644
+index 0000000..e69de29
+diff --git a/tests/qapi-schema/doc-bad-union-member.exit b/tests/qapi-schema/doc-bad-union-member.exit
+new file mode 100644
+index 0000000..573541a
+--- /dev/null
++++ b/tests/qapi-schema/doc-bad-union-member.exit
+@@ -0,0 +1 @@
++0
+diff --git a/tests/qapi-schema/doc-bad-union-member.json b/tests/qapi-schema/doc-bad-union-member.json
+new file mode 100644
+index 0000000..d611435
+--- /dev/null
++++ b/tests/qapi-schema/doc-bad-union-member.json
+@@ -0,0 +1,19 @@
++# Arguments listed in the doc comment must exist in the actual schema
++
++##
++# @Frob:
++# @a: a
++# @b: b
++##
++{ 'union': 'Frob',
++  'base': 'Base',
++  'discriminator': 'type',
++  'data': { 'nothing': 'Empty' } }
++
++{ 'struct': 'Base',
++  'data': { 'type': 'T' } }
++
++{ 'struct': 'Empty',
++  'data': { } }
++
++{ 'enum': 'T', 'data': ['nothing'] }
+diff --git a/tests/qapi-schema/doc-bad-union-member.out b/tests/qapi-schema/doc-bad-union-member.out
+new file mode 100644
+index 0000000..2576ecd
+--- /dev/null
++++ b/tests/qapi-schema/doc-bad-union-member.out
+@@ -0,0 +1,11 @@
++object Base
++    member type: T optional=False
++object Empty
++object Frob
++    base Base
++    tag type
++    case nothing: Empty
++enum QType ['none', 'qnull', 'qint', 'qstring', 'qdict', 'qlist', 'qfloat', 'qbool']
++    prefix QTYPE
++enum T ['nothing']
++object q_empty
 -- 
 2.7.4
