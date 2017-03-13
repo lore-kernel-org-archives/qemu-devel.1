@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36128)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cnSjK-0002cT-Ps
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 12:21:55 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1cnSl4-0003IJ-VV
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 12:23:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cnSjH-0004Mr-NM
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 12:21:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35450)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cnSjH-0004MF-HH
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 12:21:51 -0400
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A0FA4C0ADB7B
-	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 16:21:51 +0000 (UTC)
-Date: Mon, 13 Mar 2017 16:21:47 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170313162146.GC5512@work-vm>
-References: <20170313124434.1043-1-quintela@redhat.com>
-	<20170313124434.1043-4-quintela@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1cnSl1-00059H-SW
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 12:23:42 -0400
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:35228)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cnSl1-000598-Lf
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 12:23:39 -0400
+Received: by mail-wm0-x22c.google.com with SMTP id v186so44583219wmd.0
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 09:23:39 -0700 (PDT)
+References: <20170303131113.25898-1-pbonzini@redhat.com>
+	<20170303131113.25898-5-pbonzini@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170303131113.25898-5-pbonzini@redhat.com>
+Date: Mon, 13 Mar 2017 16:23:53 +0000
+Message-ID: <8737ehqh5y.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170313124434.1043-4-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 03/16] migration: Test for disabled
- features on reception
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 4/5] main-loop: remove now unnecessary
+ optimization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,72 +31,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: qemu-devel@nongnu.org
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Right now, if we receive a compressed page while this features are
-> disabled, Bad Things (TM) can happen.  Just add a test for them.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-> 
-> --
-> 
-> I had XBZRLE here also, but it don't need extra resources on
-> destination, only on source.  Additionally libvirt don't enable it on
-> destination, so don't put it here.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> This optimization is not necessary anymore, because the vCPU now drops
+> the I/O thread lock even with TCG.  Drop it to simplify the code and
+> avoid the "I/O thread spun for 1000 iterations" warning.
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+
+
 > ---
->  migration/ram.c | 16 +++++++++++++++-
->  1 file changed, 15 insertions(+), 1 deletion(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 719425b..65419c1 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -2514,7 +2514,7 @@ static int ram_load_postcopy(QEMUFile *f)
->  
->  static int ram_load(QEMUFile *f, void *opaque, int version_id)
+>  vl.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+>
+> diff --git a/vl.c b/vl.c
+> index bbbf1ba..b21b57e 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -1884,17 +1884,14 @@ static bool main_loop_should_exit(void)
+>
+>  static void main_loop(void)
 >  {
-> -    int flags = 0, ret = 0;
-> +    int flags = 0, ret = 0, invalid_flags;
->      static uint64_t seq_iter;
->      int len = 0;
->      /*
-> @@ -2531,6 +2531,11 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->          ret = -EINVAL;
->      }
->  
-> +    invalid_flags = 0;
-> +
-> +    if (!migrate_use_compression()) {
-> +        invalid_flags |= RAM_SAVE_FLAG_COMPRESS_PAGE;
-> +    }
->      /* This RCU critical section can be very long running.
->       * When RCU reclaims in the code start to become numerous,
->       * it will be necessary to reduce the granularity of this
-> @@ -2551,6 +2556,15 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->          flags = addr & ~TARGET_PAGE_MASK;
->          addr &= TARGET_PAGE_MASK;
->  
-> +        if (flags & invalid_flags) {
-> +            if (flags & invalid_flags  & RAM_SAVE_FLAG_COMPRESS_PAGE) {
-> +                error_report("Received an unexpected compressed page");
-> +            }
-> +
-> +            ret = -EINVAL;
-> +            break;
-> +        }
-> +
->          if (flags & (RAM_SAVE_FLAG_COMPRESS | RAM_SAVE_FLAG_PAGE |
->                       RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE)) {
->              RAMBlock *block = ram_block_from_stream(f, flags);
-> -- 
-> 2.9.3
-> 
+> -    bool nonblocking;
+> -    int last_io = 0;
+>  #ifdef CONFIG_PROFILER
+>      int64_t ti;
+>  #endif
+>      do {
+> -        nonblocking = tcg_enabled() && last_io > 0;
+>  #ifdef CONFIG_PROFILER
+>          ti = profile_getclock();
+>  #endif
+> -        last_io = main_loop_wait(nonblocking);
+> +        main_loop_wait(false);
+>  #ifdef CONFIG_PROFILER
+>          dev_time += profile_getclock() - ti;
+>  #endif
+
+
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Alex Bennée
