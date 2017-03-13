@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cnUV8-0001OH-OL
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 14:15:24 -0400
+	(envelope-from <laurent@vivier.eu>) id 1cnUbI-0002ZF-D3
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 14:21:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cnUV5-0007Eq-IB
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 14:15:22 -0400
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:33828)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cnUV5-0007EV-7y
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 14:15:19 -0400
-Received: by mail-wr0-x234.google.com with SMTP id l37so109285987wrc.1
-	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 11:15:19 -0700 (PDT)
-References: <20170303131113.25898-1-pbonzini@redhat.com>
-	<20170303131113.25898-6-pbonzini@redhat.com>
-	<871su1qfsu.fsf@linaro.org>
-	<834de521-e5cc-8857-afeb-8734037f95f3@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <834de521-e5cc-8857-afeb-8734037f95f3@redhat.com>
-Date: Mon, 13 Mar 2017 18:15:32 +0000
-Message-ID: <87y3w9oxff.fsf@linaro.org>
+	(envelope-from <laurent@vivier.eu>) id 1cnUbD-00017u-8a
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 14:21:44 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:56097)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cnUbC-00016s-Sr
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 14:21:39 -0400
+References: <20170224112109.3147-1-alex.bennee@linaro.org>
+	<20170224112109.3147-12-alex.bennee@linaro.org>
+	<f7a4cba9-12da-fbb3-684f-68b4a11fbe97@vivier.eu>
+	<87y3wr8zs2.fsf@linaro.org>
+	<e3f645d0-ea92-b28d-bb2b-9c831dd8b264@vivier.eu>
+	<87zigpp10j.fsf@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <e2cac1ac-c5df-a0e7-9af0-7926fb51f1f4@vivier.eu>
+Date: Mon, 13 Mar 2017 19:21:20 +0100
 MIME-Version: 1.0
+In-Reply-To: <87zigpp10j.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 5/5] icount: process QEMU_CLOCK_VIRTUAL
- timers in vCPU thread
+Subject: Re: [Qemu-devel] [PULL 11/24] tcg: enable thread-per-vCPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,246 +31,227 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: peter.maydell@linaro.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, KONRAD Frederic <fred.konrad@greensocs.com>, Richard Henderson <rth@twiddle.net>
 
-
-Paolo Bonzini <pbonzini@redhat.com> writes:
-
-> On 13/03/2017 17:53, Alex Bennée wrote:
+Le 13/03/2017 à 17:58, Alex Bennée a écrit :
+> 
+> Laurent Vivier <laurent@vivier.eu> writes:
+> 
+>> Le 27/02/2017 à 15:38, Alex Bennée a écrit :
+>>>
+>>> Laurent Vivier <laurent@vivier.eu> writes:
+>>>
+>>>> Le 24/02/2017 à 12:20, Alex Bennée a écrit :
+>>>>> There are a couple of changes that occur at the same time here:
+>>>>>
+>>>>>   - introduce a single vCPU qemu_tcg_cpu_thread_fn
+>>>>>
+>>>>>   One of these is spawned per vCPU with its own Thread and Condition
+>>>>>   variables. qemu_tcg_rr_cpu_thread_fn is the new name for the old
+>>>>>   single threaded function.
+>>>>>
+>>>>>   - the TLS current_cpu variable is now live for the lifetime of MTTCG
+>>>>>     vCPU threads. This is for future work where async jobs need to know
+>>>>>     the vCPU context they are operating in.
+>>>>>
+>>>>> The user to switch on multi-thread behaviour and spawn a thread
+>>>>> per-vCPU. For a simple test kvm-unit-test like:
+>>>>>
+>>>>>   ./arm/run ./arm/locking-test.flat -smp 4 -accel tcg,thread=multi
+>>>>>
+>>>>> Will now use 4 vCPU threads and have an expected FAIL (instead of the
+>>>>> unexpected PASS) as the default mode of the test has no protection when
+>>>>> incrementing a shared variable.
+>>>>>
+>>>>> We enable the parallel_cpus flag to ensure we generate correct barrier
+>>>>> and atomic code if supported by the front and backends. This doesn't
+>>>>> automatically enable MTTCG until default_mttcg_enabled() is updated to
+>>>>> check the configuration is supported.
+>>>>
+>>>> This commit breaks linux-user mode:
+>>>>
+>>>> debian-8 with qemu-ppc on x86_64 with ltp-full-20170116
+>>>>
+>>>> cd /opt/ltp
+>>>> ./runltp -p -l "qemu-$(date +%FT%T).log" -f /opt/ltp/runtest/syscalls -s
+>>>> setgroups03
+>>>>
+>>>> setgroups03    1  TPASS  :  setgroups(65537) fails, Size is >
+>>>> sysconf(_SC_NGROUPS_MAX), errno=22
+>>>> qemu-ppc: /home/laurent/Projects/qemu/include/qemu/rcu.h:89:
+>>>> rcu_read_unlock: Assertion `p_rcu_reader->depth != 0' failed.
+>>>> qemu-ppc: /home/laurent/Projects/qemu/include/qemu/rcu.h:89:
+>>>> rcu_read_unlock: Assertion `p_rcu_reader->depth != 0' failed.
+>>>> qemu-ppc: /home/laurent/Projects/qemu/include/qemu/rcu.h:89:
+>>>> rcu_read_unlock: Assertion `p_rcu_reader->depth != 0' failed.
+>>>> ...
+>>>
+>>> Interesting. I can only think the current_cpu change has broken it
+>>> because most of the changes in this commit affect softmmu targets only
+>>> (linux-user has its own run loop).
+>>>
+>>> Thanks for the report - I'll look into it.
 >>
->> Paolo Bonzini <pbonzini@redhat.com> writes:
+>> After:
 >>
->>> icount has become much slower after tcg_cpu_exec has stopped
->>> using the BQL.  There is also a latent bug that is masked by
->>> the slowness.
->>>
->>> The slowness happens because every occurrence of a QEMU_CLOCK_VIRTUAL
->>> timer now has to wake up the I/O thread and wait for it.  The rendez-vous
->>> is mediated by the BQL QemuMutex:
->>>
->>> - handle_icount_deadline wakes up the I/O thread with BQL taken
->>> - the I/O thread wakes up and waits on the BQL
->>> - the VCPU thread releases the BQL a little later
->>> - the I/O thread raises an interrupt, which calls qemu_cpu_kick
->>> - the VCPU thread notices the interrupt, takes the BQL to
->>>   process it and waits on it
->>>
->>> All this back and forth is extremely expensive, causing a 6 to 8-fold
->>> slowdown when icount is turned on.
->>>
->>> One may think that the issue is that the VCPU thread is too dependent
->>> on the BQL, but then the latent bug comes in.  I first tried removing
->>> the BQL completely from the x86 cpu_exec, only to see everything break.
->>> The only way to fix it (and make everything slow again) was to add a dummy
->>> BQL lock/unlock pair.
->>>
->>> This is because in -icount mode you really have to process the events
->>> before the CPU restarts executing the next instruction.  Therefore, this
->>> series moves the processing of QEMU_CLOCK_VIRTUAL timers straight in
->>> the vCPU thread when running in icount mode.
->>>
->>> The required changes include:
->>>
->>> - make the timer notification callback wake up TCG's single vCPU thread
->>>   when run from another thread.  By using async_run_on_cpu, the callback
->>>   can override all_cpu_threads_idle() when the CPU is halted.
->>>
->>> - move handle_icount_deadline after qemu_tcg_wait_io_event, so that
->>>   the timer notification callback is invoked after the dummy work item
->>>   wakes up the vCPU thread
->>>
->>> - make handle_icount_deadline run the timers instead of just waking the
->>>   I/O thread.
->>>
->>> - stop processing the timers in the main loop
->>>
->>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->>> ---
->>>  cpus.c               | 26 +++++++++++++++++++++++---
->>>  include/qemu/timer.h | 24 ++++++++++++++++++++++++
->>>  util/qemu-timer.c    |  4 +++-
->>>  3 files changed, 50 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/cpus.c b/cpus.c
->>> index 747addd..209c196 100644
->>> --- a/cpus.c
->>> +++ b/cpus.c
->>> @@ -804,9 +804,23 @@ static void qemu_cpu_kick_rr_cpu(void)
->>>      } while (cpu != atomic_mb_read(&tcg_current_rr_cpu));
->>>  }
->>>
->>> +static void do_nothing(CPUState *cpu, run_on_cpu_data unused)
->>> +{
->>> +}
->>> +
->>>  void qemu_timer_notify_cb(void *opaque, QEMUClockType type)
->>>  {
->>> -    qemu_notify_event();
->>> +    if (!use_icount || type != QEMU_CLOCK_VIRTUAL) {
->>> +        qemu_notify_event();
->>> +        return;
->>> +    }
->>> +
->>> +    if (!qemu_in_vcpu_thread() && first_cpu) {
->>> +        /* run_on_cpu will also kick the CPU out of halt so that
->>> +         * handle_icount_deadline runs
->>> +         */
->>> +        async_run_on_cpu(first_cpu, do_nothing, RUN_ON_CPU_NULL);
->>> +    }
+>>      95b0eca Merge remote-tracking branch
+>> 'remotes/stsquad/tags/pull-mttcg-fixups-090317-1' into staging
 >>
->> This doesn't read quite right - otherwise you get the same effect by
->> calling qemu_cpu_kick(), or even modify and call qemu_cpu_kick_rr_cpu()?
+>> [Tested with my HEAD on:
+>> b1616fe Merge remote-tracking branch
+>> 'remotes/famz/tags/docker-pull-request' into staging]
 >>
->> The only real effect of having something in the work queue is you run
->> the outside of the loop before returning into the tcg_cpu_exec.
->
-> Yes, and "the outside of the loop" here means handle_icount_deadline.
->
-> But qemu_cpu_kick_rr_cpu won't signal condition variables, and
-> qemu_cpu_kick does but it won't make cpu_thread_is_idle return false.
-> Therefore, qemu_tcg_wait_io_event keeps looping.
-
-How about:
-
-  Scheduling work with async_run_on_cpu ensures we exit
-  qemu_tcg_wait_io_event if we have halted that
-  handle_icount_deadline can run.
-
->
->>>  }
->>>
->>>  static void kick_tcg_thread(void *opaque)
->>> @@ -1220,12 +1234,15 @@ static int64_t tcg_get_icount_limit(void)
->>>
->>>  static void handle_icount_deadline(void)
->>>  {
->>> +    assert(qemu_in_vcpu_thread());
->>>      if (use_icount) {
->>>          int64_t deadline =
->>>              qemu_clock_deadline_ns_all(QEMU_CLOCK_VIRTUAL);
->>>
->>>          if (deadline == 0) {
->>> +            /* Wake up other AioContexts.  */
->>>              qemu_clock_notify(QEMU_CLOCK_VIRTUAL);
->>> +            qemu_clock_run_timers(QEMU_CLOCK_VIRTUAL);
->>>          }
->>>      }
->>>  }
->>> @@ -1338,6 +1355,11 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
->>>          /* Account partial waits to QEMU_CLOCK_VIRTUAL.  */
->>>          qemu_account_warp_timer();
->>>
->>> +        /* Run the timers here.  This is much more efficient than
->>> +         * waking up the I/O thread and waiting for completion.
->>> +         */
->>> +        handle_icount_deadline();
->>> +
->>>          if (!cpu) {
->>>              cpu = first_cpu;
->>>          }
->>> @@ -1379,8 +1401,6 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
->>>              atomic_mb_set(&cpu->exit_request, 0);
->>>          }
->>>
->>> -        handle_icount_deadline();
->>> -
+>> I have now:
 >>
->> I guess we could just as easily move the handling to after
->> qemu_tcg_wait_io_event(cpu ? cpu : QTAILQ_FIRST(&cpus))?
->>
->> I noticed we still call handle_icount_deadline in the multi-thread case
->> which is probably superfluous unless/until we figure out a way for it to
->> work with MTTCG.
->
-> Should I remove the call?  Add an assert(!use_icount)?
+>> <<<test_start>>>
+>> tag=setgroups03 stime=1489413401
+>> cmdline="setgroups03"
+>> contacts=""
+>> analysis=exit
+>> <<<test_output>>>
+>> **
+>> ERROR:/home/laurent/Projects/qemu/cpu-exec.c:656:cpu_exec: assertion
+>> failed: (cpu == current_cpu)
+>> **
+> 
+> So I think this is saying that we were outside the tcg_exec_loop for
+> this cpu and somehow longjmp'ed back into the loop.
+> 
+> I'll start setting up LTP on my system but in the meantime you might
+> find it useful adding the cpu == current_cpu assert into all the places
+> in cpu-exec-common.c before siglongjmp is called. Then a backtrace of
+> the offending call will be easier to follow.
 
-Yes pretty much that as an independent patch.
+If I patch cpu-exec-common.c:
+diff --git a/cpu-exec-common.c b/cpu-exec-common.c
+index 0504a94..4bdf295 100644
+--- a/cpu-exec-common.c
++++ b/cpu-exec-common.c
+@@ -29,6 +29,7 @@ void cpu_loop_exit_noexc(CPUState *cpu)
+     /* XXX: restore cpu registers saved in host registers */
 
->
->>>          qemu_tcg_wait_io_event(cpu ? cpu : QTAILQ_FIRST(&cpus));
->>>          deal_with_unplugged_cpus();
->>>      }
->>> diff --git a/include/qemu/timer.h b/include/qemu/timer.h
->>> index 1441b42..e1742f2 100644
->>> --- a/include/qemu/timer.h
->>> +++ b/include/qemu/timer.h
->>> @@ -533,6 +533,12 @@ static inline QEMUTimer *timer_new_tl(QEMUTimerList *timer_list,
->>>   * Create a new timer and associate it with the default
->>>   * timer list for the clock type @type.
->>>   *
->>> + * The default timer list has one special feature: in icount mode,
->>> + * %QEMU_CLOCK_VIRTUAL timers are run in the vCPU thread.  This is
->>> + * not true of other timer lists, which are typically associated
->>> + * with an AioContext---each of them runs its timer callbacks in its own
->>> + * AioContext thread.
->>> + *
->>>   * Returns: a pointer to the timer
->>>   */
->>>  static inline QEMUTimer *timer_new(QEMUClockType type, int scale,
->>> @@ -550,6 +556,12 @@ static inline QEMUTimer *timer_new(QEMUClockType type, int scale,
->>>   * Create a new timer with nanosecond scale on the default timer list
->>>   * associated with the clock.
->>>   *
->>> + * The default timer list has one special feature: in icount mode,
->>> + * %QEMU_CLOCK_VIRTUAL timers are run in the vCPU thread.  This is
->>> + * not true of other timer lists, which are typically associated
->>> + * with an AioContext---each of them runs its timer callbacks in its own
->>> + * AioContext thread.
->>> + *
->>>   * Returns: a pointer to the newly created timer
->>>   */
->>>  static inline QEMUTimer *timer_new_ns(QEMUClockType type, QEMUTimerCB *cb,
->>> @@ -564,6 +576,12 @@ static inline QEMUTimer *timer_new_ns(QEMUClockType type, QEMUTimerCB *cb,
->>>   * @cb: the callback to call when the timer expires
->>>   * @opaque: the opaque pointer to pass to the callback
->>>   *
->>> + * The default timer list has one special feature: in icount mode,
->>> + * %QEMU_CLOCK_VIRTUAL timers are run in the vCPU thread.  This is
->>> + * not true of other timer lists, which are typically associated
->>> + * with an AioContext---each of them runs its timer callbacks in its own
->>> + * AioContext thread.
->>> + *
->>>   * Create a new timer with microsecond scale on the default timer list
->>>   * associated with the clock.
->>>   *
->>> @@ -581,6 +599,12 @@ static inline QEMUTimer *timer_new_us(QEMUClockType type, QEMUTimerCB *cb,
->>>   * @cb: the callback to call when the timer expires
->>>   * @opaque: the opaque pointer to pass to the callback
->>>   *
->>> + * The default timer list has one special feature: in icount mode,
->>> + * %QEMU_CLOCK_VIRTUAL timers are run in the vCPU thread.  This is
->>> + * not true of other timer lists, which are typically associated
->>> + * with an AioContext---each of them runs its timer callbacks in its own
->>> + * AioContext thread.
->>> + *
->>>   * Create a new timer with millisecond scale on the default timer list
->>>   * associated with the clock.
->>>   *
->>> diff --git a/util/qemu-timer.c b/util/qemu-timer.c
->>> index dc3181e..82d5650 100644
->>> --- a/util/qemu-timer.c
->>> +++ b/util/qemu-timer.c
->>> @@ -658,7 +658,9 @@ bool qemu_clock_run_all_timers(void)
->>>      QEMUClockType type;
->>>
->>>      for (type = 0; type < QEMU_CLOCK_MAX; type++) {
->>> -        progress |= qemu_clock_run_timers(type);
->>> +        if (qemu_clock_use_for_deadline(type)) {
->>> +            progress |= qemu_clock_run_timers(type);
->>> +        }
->>
->> minor nit: its not really qemu_clock_run_all_timers() now is it. We run
->> all but the virtual timers (if icount is enabled).
->
-> Well yeah, it's all those that pass qemu_clock_use_for_deadline.
->
-> Paolo
+     cpu->exception_index = -1;
++g_assert(cpu == current_cpu);
+     siglongjmp(cpu->jmp_env, 1);
+ }
 
-Have you done any testing with record/replay? So far I have one
-reproducible run and one failure. However it is not entirely clear to me
-how I am meant to cleanly halt and stop a machine so I don't corrupt the
-replay log.
+@@ -64,6 +65,7 @@ void cpu_reloading_memory_map(void)
 
---
-Alex Bennée
+ void cpu_loop_exit(CPUState *cpu)
+ {
++g_assert(cpu == current_cpu);
+     siglongjmp(cpu->jmp_env, 1);
+ }
+
+@@ -72,6 +74,7 @@ void cpu_loop_exit_restore(CPUState *cpu, uintptr_t pc)
+     if (pc) {
+         cpu_restore_state(cpu, pc);
+     }
++g_assert(cpu == current_cpu);
+     siglongjmp(cpu->jmp_env, 1);
+ }
+
+I have exactly the same trace:
+
+**
+ERROR:/home/laurent/Projects/qemu/cpu-exec.c:656:cpu_exec: assertion
+failed: (cpu == current_cpu)
+**
+ERROR:/home/laurent/Projects/qemu/cpu-exec.c:656:cpu_exec: assertion
+failed: (cpu == current_cpu)
+**
+ERROR:/home/laurent/Projects/qemu/cpu-exec.c:656:cpu_exec: assertion
+failed: (cpu == current_cpu)
+**
+ERROR:/home/laurent/Projects/qemu/cpu-exec.c:656:cpu_exec: assertion
+failed: (cpu == current_cpu)
+**
+ERROR:/home/laurent/Projects/qemu/cpu-exec.c:656:cpu_exec: assertion
+failed: (cpu == current_cpu)
+
+QEMU_STRACE gives:
+
+6805 close(3) = 0
+6805 setgroups(65536,-159891448,0,-150998360,0,0)**
+ERROR:/home/laurent/Projects/qemu/cpu-exec.c:656:cpu_exec: assertion
+failed: (cpu == current_cpu)
+
+and strace gives:
+
+sudo strace -ffff chroot /var/lib/lxc/debian-8-ppc/rootfs
+/opt/ltp/testcases/bin/setgroups03
+...
+[pid  6690] futex(0x7ffce8bc3340, FUTEX_WAIT_PRIVATE, 1, NULL
+<unfinished ...>
+[pid  6691] --- SIGRT_1 {si_signo=SIGRT_1, si_code=SI_TKILL,
+si_pid=6690, si_uid=0} ---
+[pid  6691] setgroups(65536, [65534, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...]) = 0
+[pid  6691] futex(0x7f656a601d1c, FUTEX_WAKE_PRIVATE, 1) = 0
+[pid  6691] futex(0x7ffce8bc3340, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+[pid  6690] <... futex resumed> )       = 0
+[pid  6691] <... futex resumed> )       = 1
+[pid  6690] setgroups(65536, [65534, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...]
+<unfinished ...>
+[pid  6691] rt_sigreturn({mask=~[KILL STOP RTMIN RT_1]} <unfinished ...>
+[pid  6690] <... setgroups resumed> )   = -1 EPERM (Operation not permitted)
+[pid  6691] <... rt_sigreturn resumed> ) = 202
+[pid  6690] rt_sigprocmask(SIG_UNBLOCK, [ABRT],  <unfinished ...>
+[pid  6691] futex(0x625ffba4, FUTEX_WAIT, 4294967295, NULL <unfinished ...>
+[pid  6690] <... rt_sigprocmask resumed> NULL, 8) = 0
+[pid  6690] rt_sigprocmask(SIG_BLOCK, ~[RTMIN RT_1], [], 8) = 0
+[pid  6690] getpid()                    = 6690
+[pid  6690] gettid()                    = 6690
+[pid  6690] tgkill(6690, 6690, SIGABRT) = 0
+[pid  6690] rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+[pid  6690] --- SIGABRT {si_signo=SIGABRT, si_code=SI_TKILL,
+si_pid=6690, si_uid=0} ---
+[pid  6690] rt_sigreturn({mask=~[BUS SEGV]}) = 0
+[pid  6690] rt_sigaction(SIGABRT, {sa_handler=SIG_DFL, sa_mask=~[],
+sa_flags=SA_RESTORER, sa_restorer=0x6018b100}, NULL, 8) = 0
+[pid  6690] rt_sigprocmask(SIG_BLOCK, ~[RTMIN RT_1], ~[BUS KILL SEGV
+STOP], 8) = 0
+[pid  6690] getpid()                    = 6690
+[pid  6690] gettid()                    = 6690
+[pid  6690] tgkill(6690, 6690, SIGABRT) = 0
+[pid  6690] rt_sigprocmask(SIG_SETMASK, ~[BUS KILL SEGV STOP], NULL, 8) = 0
+[pid  6690] --- SIGSEGV {si_signo=SIGSEGV, si_code=SI_KERNEL,
+si_addr=NULL} ---
+[pid  6690] rt_sigprocmask(SIG_SETMASK, ~[BUS KILL SEGV STOP], NULL, 8) = 0
+[pid  6690] open("/usr/lib64/charset.alias", O_RDONLY) = -1 ENOENT (No
+such file or directory)
+[pid  6690] open("/usr/lib64/gconv/gconv-modules.cache", O_RDONLY) = -1
+ENOENT (No such file or directory)
+[pid  6690] open("/usr/lib64/gconv/gconv-modules", O_RDONLY|O_CLOEXEC) =
+-1 ENOENT (No such file or directory)
+[pid  6690] futex(0x62605a30, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+[pid  6690] brk(0x636dc000)             = 0x636dc000
+[pid  6690] write(2, "**\nERROR:/home/laurent/Projects/"..., 101**
+ERROR:/home/laurent/Projects/qemu/cpu-exec.c:656:cpu_exec: assertion
+failed: (cpu == current_cpu)
+) = 101
+[pid  6690] brk(0x636d4000)             = 0x636d4000
+[pid  6690] --- SIGSEGV {si_signo=SIGSEGV, si_code=SI_KERNEL,
+si_addr=NULL} ---
+[pid  6690] rt_sigprocmask(SIG_SETMASK, ~[BUS KILL SEGV STOP], NULL, 8) = 0
+[pid  6690] write(2, "**\nERROR:/home/laurent/Projects/"..., 101**
+ERROR:/home/laurent/Projects/qemu/cpu-exec.c:656:cpu_exec: assertion
+failed: (cpu == current_cpu)
+) = 101
+[pid  6690] --- SIGSEGV {si_signo=SIGSEGV, si_code=SI_KERNEL,
+si_addr=NULL} ---
+[pid  6690] rt_sigprocmask(SIG_SETMASK, ~[BUS KILL SEGV STOP], NULL, 8) = 0
+[pid  6690] write(2, "**\nERROR:/home/laurent/Projects/"..., 101**
+ERROR:/home/laurent/Projects/qemu/cpu-exec.c:656:cpu_exec: assertion
+failed: (cpu == current_cpu)
+) = 101
+[pid  6690] --- SIGSEGV {si_signo=SIGSEGV, si_code=SI_KERNEL,
+si_addr=NULL} ---
+[pid  6690] rt_sigprocmask(SIG_SETMASK, ~[BUS KILL SEGV STOP], NULL, 8) = 0
+[pid  6690] write(2, "**\nERROR:/home/laurent/Projects/"..., 101**
+ERROR:/home/laurent/Projects/qemu/cpu-exec.c:656:cpu_exec: assertion
+failed: (cpu == current_cpu)
+
+Laurent
