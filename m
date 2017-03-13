@@ -1,31 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hdegoede@redhat.com>) id 1cnMoH-0008CJ-5d
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:02:38 -0400
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cnMrE-0001Yx-C1
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:05:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hdegoede@redhat.com>) id 1cnMoC-00016a-7f
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:02:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52580)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <hdegoede@redhat.com>) id 1cnMoB-00015i-VA
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:02:32 -0400
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 14D0C8553E
-	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 10:02:32 +0000 (UTC)
-References: <20170220095055.4234-1-fziglio@redhat.com>
-	<cf298d66-cc10-0cf5-b5d1-b36c20fb05f7@redhat.com>
-	<1376895221.1392101.1489397950418.JavaMail.zimbra@redhat.com>
-From: Hans de Goede <hdegoede@redhat.com>
-Message-ID: <33196ff6-be65-9a08-75da-feeffb9c080a@redhat.com>
-Date: Mon, 13 Mar 2017 11:02:28 +0100
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cnMr5-0003aI-JE
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:05:40 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37287
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cnMr5-0003Zz-Cw
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:05:31 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2DA53k0129359
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 06:05:30 -0400
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 294b216rf5-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 06:05:30 -0400
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Mon, 13 Mar 2017 10:05:28 -0000
+Date: Mon, 13 Mar 2017 11:05:23 +0100
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <1489386583-11564-2-git-send-email-jasowang@redhat.com>
+References: <1489386583-11564-1-git-send-email-jasowang@redhat.com>
+	<1489386583-11564-2-git-send-email-jasowang@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1376895221.1392101.1489397950418.JavaMail.zimbra@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] egl-helpers: Support newer MESA versions
+Message-Id: <20170313110523.549e4a99.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH V2 2/3] virtio: destroy region cache during
+ reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,110 +43,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Frediano Ziglio <fziglio@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, David Airlie <airlied@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <mlureau@redhat.com>, qemu-devel@nongnu.org, Cole Robinson <crobinso@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: mst@redhat.com, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-Hi,
+On Mon, 13 Mar 2017 14:29:42 +0800
+Jason Wang <jasowang@redhat.com> wrote:
 
-On 13-03-17 10:39, Frediano Ziglio wrote:
->>
->> <resend with some more people added to the Cc>
->>
->> Hi,
->>
->> On 20-02-17 10:50, Frediano Ziglio wrote:
->>> According to
->>> https://www.khronos.org/registry/EGL/extensions/MESA/EGL_MESA_platform_gbm.txt
->>> if MESA_platform_gbm is supported display should be initialized
->>> from a GBM handle using eglGetPlatformDisplayEXT.
->>>
->>> Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
->>> ---
->>> This should fix
->>> http://www.spinics.net/linux/fedora/libvir/msg142837.html
->>>
->>> Tested on Fedora rawhide.
->>> ---
->>>  ui/egl-helpers.c | 4 ++++
->>>  1 file changed, 4 insertions(+)
->>>
->>> diff --git a/ui/egl-helpers.c b/ui/egl-helpers.c
->>> index cd24568..964c5a5 100644
->>> --- a/ui/egl-helpers.c
->>> +++ b/ui/egl-helpers.c
->>> @@ -219,7 +219,11 @@ int qemu_egl_init_dpy(EGLNativeDisplayType dpy, bool
->>> gles, bool debug)
->>>      }
->>>
->>>      egl_dbg("eglGetDisplay (dpy %p) ...\n", dpy);
->>> +#ifdef EGL_MESA_platform_gbm
->>> +    qemu_egl_display = eglGetPlatformDisplayEXT(EGL_PLATFORM_GBM_MESA,
->>> dpy, NULL);
->>> +#else
->>>      qemu_egl_display = eglGetDisplay(dpy);
->>> +#endif
->>>      if (qemu_egl_display == EGL_NO_DISPLAY) {
->>>          error_report("egl: eglGetDisplay failed");
->>>          return -1;
->>>
->>
->> That fix is incomplete, you need some magic to work properly on older libGL
->> versions.
->>
->> Attached is a (compile tested only) proper patch. I do not have a qemu git
->> clone
->> handy atm, so this is not a git format-patch patch, it is against the Fedora
->> Rawhide
->> srpm. I've a test build with these patches here:
->>
->> https://fedorapeople.org/~jwrdegoede/qemu-glvnd/
->>
->> I was planning on doing a git clone qemu and send a proper patch after I got
->> some
->> testing feedback. Feel free to use this as a base for a v2 of your patch.
->>
->> Regards,
->>
->> Hans
->>
->
-> Wouldn't be easier to call the "old" eglGetDisplay if eglGetPlatformDisplayEXT
-> returns EGL_NO_DISPLAY ? Kind of
+> We don't destroy region cache during reset which can make the maps
+> of previous driver leaked to a buggy or malicious driver that don't
+> set vring address before starting to use the device. Fix this by
+> destroy the region cache during reset and validate it before trying to
+> see them.
+> 
+> Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> ---
+> Changes from v1:
+> - switch to use rcu in virtio_virtqueue_region_cache()
+> - use unlikely() when needed
+> ---
+>  hw/virtio/virtio.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++-------
+>  1 file changed, 53 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index 76cc81b..f086452 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -190,6 +190,10 @@ static inline uint16_t vring_avail_flags(VirtQueue *vq)
+>  {
+>      VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
+>      hwaddr pa = offsetof(VRingAvail, flags);
+> +    if (unlikely(!caches)) {
+> +        virtio_error(vq->vdev, "Cannot map avail flags");
+> +        return 0;
 
-With libEGL you (unfortunately) cannot assume that the lib your building
-against is the lib you will run against.
+I'm still not 100% convinced of those checks; but they don't do any
+harm.
 
->
->      egl_dbg("eglGetDisplay (dpy %p) ...\n", dpy);
-> -    qemu_egl_display = eglGetDisplay(dpy);
-> +#ifdef EGL_MESA_platform_gbm
-> +    qemu_egl_display = eglGetPlatformDisplayEXT(EGL_PLATFORM_GBM_MESA, dpy, NULL);
+> +    }
+>      return virtio_lduw_phys_cached(vq->vdev, &caches->avail, pa);
+>  }
+> 
 
-So this may very well lead to a runtime unresolved symbol error. IOW you really
-need to do the special magic dance I'm afraid.
+(...)
 
-> +#else
-> +    qemu_egl_display = EGL_NO_DISPLAY;
-> +#endif
-> +    if (qemu_egl_display == EGL_NO_DISPLAY)
-> +        qemu_egl_display = eglGetDisplay(dpy);
->      if (qemu_egl_display == EGL_NO_DISPLAY) {
->          error_report("egl: eglGetDisplay failed");
->          return -1;
->
-> Your patch should not even compile on older system which does not define
-> EGL_PLATFORM_GBM_MESA.
+> +static void virtio_virtqueue_reset_region_cache(struct VirtQueue *vq)
+> +{
+> +    VRingMemoryRegionCaches *caches;
+> +
+> +    caches = atomic_read(&vq->vring.caches);
+> +    atomic_set(&vq->vring.caches, NULL);
 
-True, so I guess my patch needs an #ifdef around the new qemu_egl_get_display()
-function and then on the actual call site #ifdef #else #endif like your patch,
-but instead of directly calling eglGetPlatformDisplayEXT call qemu_egl_get_display.
+Needs atomic_rcu_set(), I think.
 
-> I tested my patch and works on both rawhide and FC25 (with very recent Mesa version)
-
-mesa is not the problem, it is say running qemu on ARM and using some binary
-driver libEGL.so which is the problem, without the dance that will result in
-a runtime dynamic linker error and qemu aborting.
-
-Regards,
-
-Hans
+> +    if (caches) {
+> +        call_rcu(caches, virtio_free_region_cache, rcu);
+> +    }
+> +}
+> +
+>  void virtio_reset(void *opaque)
+>  {
+>      VirtIODevice *vdev = opaque;
