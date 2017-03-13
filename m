@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42809)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43053)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1cnULm-0003vC-0B
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 14:05:45 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cnUMB-0004HK-Mq
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 14:06:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1cnULk-0001by-Tt
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 14:05:42 -0400
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Date: Mon, 13 Mar 2017 20:04:31 +0200
-Message-Id: <20170313180432.7067-5-krzk@kernel.org>
-In-Reply-To: <20170313180432.7067-1-krzk@kernel.org>
-References: <20170313180432.7067-1-krzk@kernel.org>
-Subject: [Qemu-devel] [PATCH v2 4/5] hw/timer/exynos4210_mct: Cleanup
- indentation and empty new lines
+	(envelope-from <peter.maydell@linaro.org>) id 1cnUMA-0001qV-GD
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 14:06:07 -0400
+Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:35166)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cnUMA-0001px-9h
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 14:06:06 -0400
+Received: by mail-wr0-x234.google.com with SMTP id g10so109111704wrg.2
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 11:06:06 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <1489416908-3771-1-git-send-email-kwolf@redhat.com>
+References: <1489416908-3771-1-git-send-email-kwolf@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 13 Mar 2017 19:05:44 +0100
+Message-ID: <CAFEAcA9JoOLtUJAVhXijjDVZ4iTH_kYc3r03zmq7R58BesO1Jg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 00/12] Block layer fixes for 2.9.0-rc1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,122 +28,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, Igor Mitsyanko <i.mitsyanko@gmail.com>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Statements under 'case' were in some places wrongly indented bringing
-confusion and making the code less readable.  Remove also few unneeded
-blank lines.  No functional changes.
+On 13 March 2017 at 15:54, Kevin Wolf <kwolf@redhat.com> wrote:
+> The following changes since commit dd4d2578215cd380f40a38028a9904e15b135ef3:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/pull-fixes-20170309-1' into staging (2017-03-09 13:16:05 +0000)
+>
+> are available in the git repository at:
+>
+>
+>   git://repo.or.cz/qemu/kevin.git tags/for-upstream
+>
+> for you to fetch changes up to dcbf37ce41a52698550f8f8b2f14b5e6fee22d2d:
+>
+>   commit: Implement .bdrv_refresh_filename (2017-03-13 12:49:33 +0100)
+>
+> ----------------------------------------------------------------
+> Block layer fixes for 2.9.0-rc1
 
-Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/timer/exynos4210_mct.c | 45 ++++++++++++++++++++-------------------------
- 1 file changed, 20 insertions(+), 25 deletions(-)
+We haven't had rc0 yet :-)
 
-diff --git a/hw/timer/exynos4210_mct.c b/hw/timer/exynos4210_mct.c
-index cd290637f357..4dd3e441e2e6 100644
---- a/hw/timer/exynos4210_mct.c
-+++ b/hw/timer/exynos4210_mct.c
-@@ -1015,9 +1015,9 @@ static uint64_t exynos4210_mct_read(void *opaque, hwaddr offset,
- 
-     case G_COMP_L(0): case G_COMP_L(1): case G_COMP_L(2): case G_COMP_L(3):
-     case G_COMP_U(0): case G_COMP_U(1): case G_COMP_U(2): case G_COMP_U(3):
--    index = GET_G_COMP_IDX(offset);
--    shift = 8 * (offset & 0x4);
--    value = UINT32_MAX & (s->g_timer.reg.comp[index] >> shift);
-+        index = GET_G_COMP_IDX(offset);
-+        shift = 8 * (offset & 0x4);
-+        value = UINT32_MAX & (s->g_timer.reg.comp[index] >> shift);
-     break;
- 
-     case G_TCON:
-@@ -1066,7 +1066,6 @@ static uint64_t exynos4210_mct_read(void *opaque, hwaddr offset,
-         lt_i = GET_L_TIMER_IDX(offset);
- 
-         value = exynos4210_lfrc_get_count(&s->l_timer[lt_i]);
--
-         break;
- 
-     case L0_TCON: case L1_TCON:
-@@ -1152,23 +1151,23 @@ static void exynos4210_mct_write(void *opaque, hwaddr offset,
- 
-     case G_COMP_L(0): case G_COMP_L(1): case G_COMP_L(2): case G_COMP_L(3):
-     case G_COMP_U(0): case G_COMP_U(1): case G_COMP_U(2): case G_COMP_U(3):
--    index = GET_G_COMP_IDX(offset);
--    shift = 8 * (offset & 0x4);
--    s->g_timer.reg.comp[index] =
--            (s->g_timer.reg.comp[index] &
--            (((uint64_t)UINT32_MAX << 32) >> shift)) +
--            (value << shift);
-+        index = GET_G_COMP_IDX(offset);
-+        shift = 8 * (offset & 0x4);
-+        s->g_timer.reg.comp[index] =
-+                (s->g_timer.reg.comp[index] &
-+                (((uint64_t)UINT32_MAX << 32) >> shift)) +
-+                (value << shift);
- 
--    DPRINTF("comparator %d write 0x%llx val << %d\n", index, value, shift);
-+        DPRINTF("comparator %d write 0x%llx val << %d\n", index, value, shift);
- 
--    if (offset & 0x4) {
--        s->g_timer.reg.wstat |= G_WSTAT_COMP_U(index);
--    } else {
--        s->g_timer.reg.wstat |= G_WSTAT_COMP_L(index);
--    }
-+        if (offset & 0x4) {
-+            s->g_timer.reg.wstat |= G_WSTAT_COMP_U(index);
-+        } else {
-+            s->g_timer.reg.wstat |= G_WSTAT_COMP_L(index);
-+        }
- 
--    exynos4210_gfrc_restart(s);
--    break;
-+        exynos4210_gfrc_restart(s);
-+        break;
- 
-     case G_TCON:
-         old_val = s->g_timer.reg.tcon;
-@@ -1206,7 +1205,6 @@ static void exynos4210_mct_write(void *opaque, hwaddr offset,
-         break;
- 
-     case G_INT_ENB:
--
-         /* Raise IRQ if transition from disabled to enabled and CSTAT pending */
-         for (i = 0; i < MCT_GT_CMP_NUM; i++) {
-             if ((value & G_INT_ENABLE(i)) > (s->g_timer.reg.tcon &
-@@ -1287,7 +1285,6 @@ static void exynos4210_mct_write(void *opaque, hwaddr offset,
-         break;
- 
-     case L0_TCNTB: case L1_TCNTB:
--
-         lt_i = GET_L_TIMER_IDX(offset);
-         index = GET_L_TIMER_CNT_REG_IDX(offset, lt_i);
- 
-@@ -1315,7 +1312,6 @@ static void exynos4210_mct_write(void *opaque, hwaddr offset,
-         break;
- 
-     case L0_ICNTB: case L1_ICNTB:
--
-         lt_i = GET_L_TIMER_IDX(offset);
-         index = GET_L_TIMER_CNT_REG_IDX(offset, lt_i);
- 
-@@ -1352,13 +1348,12 @@ static void exynos4210_mct_write(void *opaque, hwaddr offset,
-         if (icntb_max[lt_i] < value) {
-             icntb_max[lt_i] = value;
-         }
--DPRINTF("local timer[%d] ICNTB write %llx; max=%x, min=%x\n\n",
--        lt_i, value, icntb_max[lt_i], icntb_min[lt_i]);
-+        DPRINTF("local timer[%d] ICNTB write %llx; max=%x, min=%x\n\n",
-+                lt_i, value, icntb_max[lt_i], icntb_min[lt_i]);
- #endif
--break;
-+        break;
- 
-     case L0_FRCNTB: case L1_FRCNTB:
--
-         lt_i = GET_L_TIMER_IDX(offset);
-         index = GET_L_TIMER_CNT_REG_IDX(offset, lt_i);
- 
--- 
-2.9.3
+Applied, thanks.
+
+-- PMM
