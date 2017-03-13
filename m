@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1cnQ1M-0006oV-9a
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 09:28:21 -0400
+	(envelope-from <bounces@canonical.com>) id 1cnQDn-00017b-Me
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 09:41:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1cnQ1J-0001r3-4i
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 09:28:20 -0400
-Received: from mx6-phx2.redhat.com ([209.132.183.39]:52582)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1cnQ1I-0001qa-SK
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 09:28:17 -0400
-Date: Mon, 13 Mar 2017 09:28:14 -0400 (EDT)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>
-Message-ID: <1815445054.3686730.1489411694165.JavaMail.zimbra@redhat.com>
-In-Reply-To: <7da78125-495b-4a2b-6383-d0ae22ba282b@redhat.com>
-References: <20170311132256.22951-1-marcandre.lureau@redhat.com>
-	<20170311132256.22951-5-marcandre.lureau@redhat.com>
-	<84148275-6410-68f7-4da0-345b635c42f3@redhat.com>
-	<87h92xk5p7.fsf@dusky.pond.sub.org>
-	<7da78125-495b-4a2b-6383-d0ae22ba282b@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1cnQDi-00076M-Mh
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 09:41:11 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43026)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cnQDi-00075a-FR
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 09:41:06 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cnQDf-0005pY-Jc
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 13:41:03 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 443F82E81D3
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 13:41:00 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 04/21] qobject: add quint type
+Date: Mon, 13 Mar 2017 13:29:27 -0000
+From: Maskim Bakulin <1672383@bugs.launchpad.net>
+Reply-To: Bug 1672383 <1672383@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170313132927.15361.96547.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1672383] [NEW] Slow Windows XP load after commit
+ a9353fe897ca2687e5b3385ed39e3db3927a90e0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +36,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, anderson@redhat.com, mdroth@linux.vnet.ibm.com, lersek@redhat.com
+To: qemu-devel@nongnu.org
 
-Hi
+Public bug reported:
 
------ Original Message -----
-> On 03/13/2017 02:15 AM, Markus Armbruster wrote:
-> > Eric Blake <eblake@redhat.com> writes:
-> >=20
-> >> On 03/11/2017 07:22 AM, Marc-Andr=C3=A9 Lureau wrote:
-> >>> The type is not used at all yet. Add some tests to exercice it.
-> >>
-> >> s/exercice/exercise/
-> >>
-> >> I wonder if we need this patch at all.
-> >>
-> >> I've been thinking about a possible alternative representation, such
-> >> that a single QInt type can cover _both_ signed and unsigned types, by
-> >> having QInt track a sign bit bool in addition to a uint64_t value.
-> >>
->=20
-> > You say you've been thinking about extending QInt's range to cover
-> > uint64_t.  I've been thinking even more radically: replace both QInt an=
-d
-> > QFloat by QNumber.  This is how JSON *actually* works.
-> >=20
-> > The new QNumber type provides constructors from double, int64_t and
-> > uint64_t.  It also provides conversion functions to double, int64_t and
-> > uint64_t.  The latter two can fail.
->=20
-> Interesting - I like it, as it takes my idea and goes one step further.
-> You'd want to track 64 bits of precision rather than just 53, when the
-> input was integral, but the idea seems to have some merit (we have some
-> special case in the testsuite for what happens in alternates with
-> various combinations of 'number' vs. 'int' that may need tweaking when
-> they are no longer distinguishable as QInt vs QFloat, but that's not too
-> onerous).
->=20
+I've recently discovered, that in QEMU 2.8+ my Windows XP loading time
+has significantly worsened. In 2.7 it took 30-40 second to boot, but in
+2.8 it became 2-2,5 minutes.
 
-I wonder the benefits from hiding the real type behind a QNumber "superclas=
-s", then having to type check at a lower level. QType is not only used for =
-json, so I see some benefits from having a bit stricter type declaration an=
-d compile-time check. But I don't have a very good idea of what it would me=
-an to have a generic QNumber type, I could try to implement it to have a mo=
-re informed opinion.
+I've used Git bisect, and found out that the change happened after
+commit a9353fe897ca2687e5b3385ed39e3db3927a90e0, which, as far as I can
+tell from the commit message, handled race condition when invalidating
+breakpoint.
 
-> --
-> Eric Blake   eblake redhat com    +1-919-301-3266
-> Libvirt virtualization library http://libvirt.org
->=20
->=20
+I've set a breakpoint in static void breakpoint_invalidate(CPUState *cpu, t=
+arget_ulong pc), and here's a backtrace:
+#0  cpu_breakpoint_insert (cpu=3Dcpu@entry=3D0x555556a73be0, pc=3D144, =
+
+    flags=3Dflags@entry=3D32, breakpoint=3Dbreakpoint@entry=3D0x555556a7c67=
+0)
+    at /media/sdd2/qemu-work/exec.c:830
+#1  0x00005555558746ac in hw_breakpoint_insert (env=3Denv@entry=3D0x555556a=
+7be60, =
+
+    index=3Dindex@entry=3D0) at /media/sdd2/qemu-work/target-i386/bpt_helpe=
+r.c:64
+#2  0x00005555558748ed in cpu_x86_update_dr7 (env=3D0x555556a7be60, =
+
+    new_dr7=3D<optimised out>)
+    at /media/sdd2/qemu-work/target-i386/bpt_helper.c:160
+#3  0x00007fffa17421f6 in code_gen_buffer ()
+#4  0x000055555577fcb4 in cpu_tb_exec (itb=3D<optimised out>, =
+
+    itb=3D<optimised out>, cpu=3D0x7fff8b7763b0)
+    at /media/sdd2/qemu-work/cpu-exec.c:164
+It seems that XP sets some breakpoints during it's load, and it leads to fr=
+equent TB flushes and slow execution.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1672383
+
+Title:
+  Slow Windows XP load after commit
+  a9353fe897ca2687e5b3385ed39e3db3927a90e0
+
+Status in QEMU:
+  New
+
+Bug description:
+  I've recently discovered, that in QEMU 2.8+ my Windows XP loading time
+  has significantly worsened. In 2.7 it took 30-40 second to boot, but
+  in 2.8 it became 2-2,5 minutes.
+
+  I've used Git bisect, and found out that the change happened after
+  commit a9353fe897ca2687e5b3385ed39e3db3927a90e0, which, as far as I
+  can tell from the commit message, handled race condition when
+  invalidating breakpoint.
+
+  I've set a breakpoint in static void breakpoint_invalidate(CPUState *cpu,=
+ target_ulong pc), and here's a backtrace:
+  #0  cpu_breakpoint_insert (cpu=3Dcpu@entry=3D0x555556a73be0, pc=3D144, =
+
+      flags=3Dflags@entry=3D32, breakpoint=3Dbreakpoint@entry=3D0x555556a7c=
+670)
+      at /media/sdd2/qemu-work/exec.c:830
+  #1  0x00005555558746ac in hw_breakpoint_insert (env=3Denv@entry=3D0x55555=
+6a7be60, =
+
+      index=3Dindex@entry=3D0) at /media/sdd2/qemu-work/target-i386/bpt_hel=
+per.c:64
+  #2  0x00005555558748ed in cpu_x86_update_dr7 (env=3D0x555556a7be60, =
+
+      new_dr7=3D<optimised out>)
+      at /media/sdd2/qemu-work/target-i386/bpt_helper.c:160
+  #3  0x00007fffa17421f6 in code_gen_buffer ()
+  #4  0x000055555577fcb4 in cpu_tb_exec (itb=3D<optimised out>, =
+
+      itb=3D<optimised out>, cpu=3D0x7fff8b7763b0)
+      at /media/sdd2/qemu-work/cpu-exec.c:164
+  It seems that XP sets some breakpoints during it's load, and it leads to =
+frequent TB flushes and slow execution.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1672383/+subscriptions
