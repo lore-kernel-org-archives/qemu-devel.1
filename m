@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cnJJp-0007Zp-Tc
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:19:05 -0400
+	(envelope-from <armbru@redhat.com>) id 1cnJJn-0007Y3-Dm
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:19:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cnJJl-0003cd-So
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:18:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50808)
+	(envelope-from <armbru@redhat.com>) id 1cnJJk-0003Yw-0d
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:18:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41064)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cnJJl-0003Zz-Cm
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:18:53 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cnJJj-0003Xq-R4
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:18:51 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 13 Mar 2017 07:18:21 +0100
-Message-Id: <1489385927-6735-22-git-send-email-armbru@redhat.com>
+Date: Mon, 13 Mar 2017 07:18:11 +0100
+Message-Id: <1489385927-6735-12-git-send-email-armbru@redhat.com>
 In-Reply-To: <1489385927-6735-1-git-send-email-armbru@redhat.com>
 References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.9 21/47] qapi2texi: Present the table of
- members more clearly
+Subject: [Qemu-devel] [PATCH for-2.9 11/47] qapi: Avoid unwanted blank lines
+ in QAPIDoc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,110 +27,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, eblake@redhat.com, mdroth@linux.vnet.ibm.com
 
-The table of members follows the main descriptive text immediately.
-Makes it hard to see what it is about.  Start a new paragraph, and
-lead with a line "Members:" for object and alternate types, "Values:"
-for enumeration types, and "Arguments:" for commands and events.
+We silently fix missing #optional tags for QAPIDoc by appending a line
+"#optional" to the section's .content.  However, this interferes with
+.__repr__ stripping trailing blank lines from .content.
 
-Example change (qemu-qmp-ref.txt):
+Use new ArgSection instance variable .optional instead, and leave
+.content alone.
 
-  -- Command: set_link
-
-      Sets the link status of a virtual network adapter.
-+
-+     Arguments:
-      'name'
-           the device name of the virtual network adapter
-      'up'
-           true to set the link status to be up
-
-      Returns: Nothing on success If 'name' is not a valid network
-      device, DeviceNotFound
+To permit testing .optional in texi_body(), clean up texi_enum()'s
+hack to add empty documentation for undocumented enum values: add an
+ArgSection instead of ''.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi2texi.py | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+ scripts/qapi.py      | 5 +++--
+ scripts/qapi2texi.py | 4 ++--
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
+diff --git a/scripts/qapi.py b/scripts/qapi.py
+index eec7bfb..e6d023f 100644
+--- a/scripts/qapi.py
++++ b/scripts/qapi.py
+@@ -107,6 +107,7 @@ class QAPIDoc(object):
+             self.name = name
+             # the list of lines for this section
+             self.content = []
++            self.optional = False
+ 
+         def append(self, line):
+             self.content.append(line)
+@@ -978,15 +979,15 @@ def check_definition_doc(doc, expr, info):
+             desc = doc.args.get(arg)
+         if not desc:
+             continue
++        desc.optional = opt
+         desc_opt = "#optional" in str(desc)
+         if desc_opt and not opt:
+             raise QAPISemError(info, "Description has #optional, "
+                                "but the declaration doesn't")
+         if not desc_opt and opt:
+-            # silently fix the doc
+             # TODO either fix the schema and make this an error,
+             # or drop #optional entirely
+-            desc.append("#optional")
++            pass
+ 
+     doc_args = set(doc.args.keys())
+     args = set([name.strip('*') for name in args])
 diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-index ecfaeda..35e182d 100755
+index 0f3e573..0aaf45c 100755
 --- a/scripts/qapi2texi.py
 +++ b/scripts/qapi2texi.py
-@@ -139,7 +139,7 @@ def texi_member(member):
-         member.name, ' (optional)' if member.optional else '')
- 
- 
--def texi_members(doc, member_func, show_undocumented):
-+def texi_members(doc, what, member_func, show_undocumented):
-     """Format the table of members"""
-     items = ''
-     for section in doc.args.itervalues():
-@@ -149,7 +149,7 @@ def texi_members(doc, member_func, show_undocumented):
-         items += member_func(section.member) + texi_format(desc) + '\n'
-     if not items:
-         return ''
--    return '@table @asis\n' + items + '@end table\n'
-+    return '\n@b{%s:}\n@table @asis\n%s@end table\n' % (what, items)
- 
- 
- def texi_sections(doc):
-@@ -169,9 +169,10 @@ def texi_sections(doc):
-     return body
- 
- 
--def texi_entity(doc, member_func=texi_member, show_undocumented=False):
-+def texi_entity(doc, what, member_func=texi_member,
-+                show_undocumented=False):
-     return (texi_body(doc)
--            + texi_members(doc, member_func, show_undocumented)
-+            + texi_members(doc, what, member_func, show_undocumented)
-             + texi_sections(doc))
- 
- 
-@@ -189,7 +190,7 @@ class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisitor):
-             self.out += '\n'
-         self.out += TYPE_FMT(type='Enum',
-                              name=doc.symbol,
--                             body=texi_entity(doc,
-+                             body=texi_entity(doc, 'Values',
-                                               member_func=texi_enum_value,
-                                               show_undocumented=True))
- 
-@@ -205,7 +206,7 @@ class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisitor):
-             self.out += '\n'
-         self.out += TYPE_FMT(type=typ,
-                              name=doc.symbol,
--                             body=texi_entity(doc))
-+                             body=texi_entity(doc, 'Members'))
- 
-     def visit_alternate_type(self, name, info, variants):
-         doc = self.cur_doc
-@@ -213,7 +214,7 @@ class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisitor):
-             self.out += '\n'
-         self.out += TYPE_FMT(type='Alternate',
-                              name=doc.symbol,
--                             body=texi_entity(doc))
-+                             body=texi_entity(doc, 'Members'))
- 
-     def visit_command(self, name, info, arg_type, ret_type,
-                       gen, success_response, boxed):
-@@ -222,7 +223,7 @@ class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisitor):
-             self.out += '\n'
-         self.out += MSG_FMT(type='Command',
-                             name=doc.symbol,
--                            body=texi_entity(doc))
-+                            body=texi_entity(doc, 'Arguments'))
- 
-     def visit_event(self, name, info, arg_type, boxed):
-         doc = self.cur_doc
-@@ -230,7 +231,7 @@ class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisitor):
-             self.out += '\n'
-         self.out += MSG_FMT(type='Event',
-                             name=doc.symbol,
--                            body=texi_entity(doc))
-+                            body=texi_entity(doc, 'Arguments'))
- 
-     def symbol(self, doc, entity):
-         self.cur_doc = doc
+@@ -136,7 +136,7 @@ def texi_body(doc):
+         for arg, section in doc.args.iteritems():
+             desc = str(section)
+             opt = ''
+-            if "#optional" in desc:
++            if section.optional:
+                 desc = re.sub(r'^ *#optional *\n?|\n? *#optional *$|#optional',
+                               '', desc)
+                 opt = ' (optional)'
+@@ -185,7 +185,7 @@ def texi_enum(expr, doc):
+     """Format an enum to texi"""
+     for i in expr['data']:
+         if i not in doc.args:
+-            doc.args[i] = ''
++            doc.args[i] = qapi.QAPIDoc.ArgSection(i)
+     body = texi_body(doc)
+     return TYPE_FMT(type="Enum",
+                     name=doc.symbol,
 -- 
 2.7.4
