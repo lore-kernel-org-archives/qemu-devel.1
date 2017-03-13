@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43944)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44911)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cnUPT-0006nz-PL
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 14:09:32 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cnUTG-0000Jd-2k
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 14:13:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cnUPQ-0004Dm-Kp
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 14:09:31 -0400
-Date: Mon, 13 Mar 2017 15:08:07 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170313180807.GK4694@thinpad.lan.raisama.net>
-References: <20170310200550.13313-1-krzk@kernel.org>
-	<20170310200550.13313-3-krzk@kernel.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1cnUTF-0006Ug-7z
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 14:13:26 -0400
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:36555)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cnUTF-0006UN-1S
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 14:13:25 -0400
+Received: by mail-wm0-x230.google.com with SMTP id n11so46945474wma.1
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 11:13:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170310200550.13313-3-krzk@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] qdev: Constify local variable
- returned by blk_bs
+In-Reply-To: <20170103155347.GF14707@stefanha-x1.localdomain>
+References: <a6803686-9435-0276-0118-10961dc97e04@redhat.com>
+	<20170103155347.GF14707@stefanha-x1.localdomain>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 13 Mar 2017 19:13:02 +0100
+Message-ID: <CAFEAcA8mfjHvrM=92QJJ=Q0gSg0SS7jBZGyND1Lbh-Of44EZpw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] Proposal for 2.9 release schedule
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,42 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, qemu-trivial@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-On Fri, Mar 10, 2017 at 10:05:50PM +0200, Krzysztof Kozlowski wrote:
-> Inside qdev_prop_set_drive() the value returned by blk_bs() is passed
-> only as pointer to const to bdrv_get_node_name() and pointed values is
-> not modified in other places so this can be made const for code
-> safeness.
-> 
-> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+On 3 January 2017 at 16:53, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> On Fri, Dec 23, 2016 at 03:15:58PM +0100, Paolo Bonzini wrote:
+>> Considering that Easter is on April 16th, we'd probably want to have the
+>> release before that date even in case of a slip.
+>>
+>> On the other hand, the Christmas / New Year break here means that we'll
+>> have to make the development time 1-2 week shorter in practice.
+>>
+>> 2016-02-21     2.9 soft freeze
+>> 2016-03-07     hard freeze / rc0
+>> 2016-03-28     rc3 (+3 weeks)
+>> 2016-04-04     rc4 or release
+>> 2016-04-11     release (if rc4)
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+[these should all have been 2017, heh]
 
-Unless another maintainer wants to take this, I am queueing it
-for 2.10 on my machine-next branch.
+>> One possibility is to make soft freeze happen a few days later.
+>> Peter/Stefan, how did the experiment go with the new rules for soft
+>> freeze?  Is it worth repeating it for 2.9 and would it make sense to
+>> shorten soft freeze given the new rules?
+>
+> I would shorten the soft freeze by 1 week.
 
-> ---
->  hw/core/qdev-properties-system.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
-> index c34be1c1bace..0d40ce682d05 100644
-> --- a/hw/core/qdev-properties-system.c
-> +++ b/hw/core/qdev-properties-system.c
-> @@ -405,7 +405,7 @@ void qdev_prop_set_drive(DeviceState *dev, const char *name,
->      if (value) {
->          ref = blk_name(value);
->          if (!*ref) {
-> -            BlockDriverState *bs = blk_bs(value);
-> +            const BlockDriverState *bs = blk_bs(value);
->              if (bs) {
->                  ref = bdrv_get_node_name(bs);
->              }
-> -- 
-> 2.9.3
-> 
+I hadn't noticed that this meant that we had a 1 week softfreeze
+period. This completely failed, partly because I didn't think
+we'd gone down to just 1 week, partly because I was away at a
+conference last week when rc0 was theoretically due, and
+partly because of the enormous pile of merges that needed
+to be done -- I only finished the merge work on the Saturday.
 
--- 
-Eduardo
+I plan to tag rc0 tomorrow (the 14th) and push all the other
+dates out by a week accordingly.
+
+thanks
+-- PMM
