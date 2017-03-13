@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45034)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cnT9m-0002Rx-3f
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 12:49:15 -0400
+	(envelope-from <quintela@redhat.com>) id 1cnTAe-0002p0-Ij
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 12:50:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cnT9h-00080G-8N
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 12:49:14 -0400
-References: <20170307131650.90167-1-pasic@linux.vnet.ibm.com>
-	<0bccd267-1c59-09f1-3098-7a74759d00dd@redhat.com>
-	<669f36ca-990f-229b-c2b1-f583826574f4@linux.vnet.ibm.com>
-	<c2610d87-6f9a-22b8-5236-961458a29dfd@linux.vnet.ibm.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3697ff5f-2f30-c921-b74a-307f4aab60ad@redhat.com>
-Date: Mon, 13 Mar 2017 17:49:05 +0100
+	(envelope-from <quintela@redhat.com>) id 1cnTAZ-0008Pv-Kp
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 12:50:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38332)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cnTAZ-0008P8-EH
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 12:50:03 -0400
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8036272B0B
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 16:50:03 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170313163429.GK4799@redhat.com> (Daniel P. Berrange's message
+	of "Mon, 13 Mar 2017 16:34:39 +0000")
+References: <20170313124434.1043-1-quintela@redhat.com>
+	<20170313124434.1043-8-quintela@redhat.com>
+	<20170313163429.GK4799@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Mon, 13 Mar 2017 17:49:59 +0100
+Message-ID: <87o9x5unns.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <c2610d87-6f9a-22b8-5236-961458a29dfd@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] virtio-blk: fix race on guest
- notifiers
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 07/16] migration: Create x-multifd-group
+ parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,87 +36,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-stable@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, amit.shah@redhat.com, dgilbert@redhat.com
 
+"Daniel P. Berrange" <berrange@redhat.com> wrote:
+> On Mon, Mar 13, 2017 at 01:44:25PM +0100, Juan Quintela wrote:
+>> Indicates how many pages we are going to send in each bach to a multifd
+>> thread.
+>
+>
+>> diff --git a/qapi-schema.json b/qapi-schema.json
+>> index b7cb26d..33a6267 100644
+>> --- a/qapi-schema.json
+>> +++ b/qapi-schema.json
+>> @@ -988,6 +988,9 @@
+>>  # @x-multifd-threads: Number of threads used to migrate data in parallel
+>>  #                     The default value is 2 (since 2.9)
+>>  #
+>> +# @x-multifd-group: Number of pages sent together to a thread
+>> +#                     The default value is 16 (since 2.9)
+>> +#
+>>  # Since: 2.4
+>>  ##
+>>  { 'enum': 'MigrationParameter',
+>> @@ -995,7 +998,7 @@
+>>             'cpu-throttle-initial', 'cpu-throttle-increment',
+>>             'tls-creds', 'tls-hostname', 'max-bandwidth',
+>>             'downtime-limit', 'x-checkpoint-delay',
+>> -           'x-multifd-threads'] }
+>> +           'x-multifd-threads', 'x-multifd-group'] }
+>>  
+>>  ##
+>>  # @migrate-set-parameters:
+>> @@ -1062,6 +1065,9 @@
+>>  # @x-multifd-threads: Number of threads used to migrate data in parallel
+>>  #                     The default value is 2 (since 2.9)
+>>  #
+>> +# @x-multifd-group: Number of pages sent together in a bunch
+>> +#                     The default value is 16 (since 2.9)
+>> +#
+>
+> How is this parameter supposed to be used ? Or to put it another way,
+> what are the benefits / effects of changing it from its default
+> value and can an application usefully decide what value to set ? I'm
+> loathe to see us expose another "black magic" parameter where you can't
+> easily determine what values to set, without predicting future guest
+> workloads
 
+We have multiple threads, we can send to each thread the number of pages
+that it needs to send one by one, two by two, n x n.  The bigger the
+number, the less locking to do, and then less contention.  But if it is
+too big, we could probably end with too few distribution.  Reason to add
+this parameter is that if we send page by page, we end spending too much
+time in locking.
 
-On 13/03/2017 13:41, Halil Pasic wrote:
-> 
-> 
-> On 03/10/2017 10:08 PM, Halil Pasic wrote:
->>
->>
->> On 03/10/2017 05:47 PM, Paolo Bonzini wrote:
->>>
->>> On 07/03/2017 14:16, Halil Pasic wrote:
->>>> The commits 03de2f527 "virtio-blk: do not use vring in dataplane"  and
->>>> 9ffe337c08 "virtio-blk: always use dataplane path if ioeventfd is active"
->>>> changed how notifications are done for virtio-blk substantially. Due to a
->>>> race condition, interrupts are lost when irqfd behind the guest notifier
->>>> is torn down after notify_guest_bh was scheduled but before it actually
->>>> runs.
->>>>
->>>> Let's fix this by forcing guest notifications before cleaning up the
->>>> irqfd's. Let's also add some explanatory comments.
->>>>
->>>> Cc: qemu-stable@nongnu.org
->>>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->>>> Reported-by: Michael A. Tebolt <miket@us.ibm.com>
->>>> Tested-by: Michael A. Tebolt <miket@us.ibm.com>
->>>> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
->>>> ---
->>>>
->>>> This patch withstood the test case which discovered the problem
->>>> for several days (as reported by Michale Tebolt).
->>>>
->>>> v1 --> v2:
->>>> * Fixed typo pointed out by Connie
->>>> * Added Tested-by
->>> Hi Halil,
->>>
->>> I found a similar issue in NBD.  Can you check if this patch fixes
->>> the virtio-blk issue too?
->>>
->>> Thanks,
->>> Paolo
->>>
->>> ------ 8< ------------
->>>
->>> diff --git a/block.c b/block.c
->>> index f293ccb..e159251 100644
->>> --- a/block.c
->>> +++ b/block.c
->>> @@ -4272,8 +4272,15 @@ void bdrv_attach_aio_context(BlockDriverState *bs,
->>>
->>>  void bdrv_set_aio_context(BlockDriverState *bs, AioContext *new_context)
->>>  {
->>> +    AioContext *ctx;
->>> +
->>>      bdrv_drain(bs); /* ensure there are no in-flight requests */
->>>
->>> +    ctx = bdrv_get_aio_context(bs);
->>> +    while (aio_poll(ctx, false)) {
->>> +        /* wait for all bottom halves to execute */
->>> +    }
->>> +
->>>      bdrv_detach_aio_context(bs);
->>>
->>>      /* This function executes in the old AioContext so acquire the new one in
->>>
->>>
->>
->> So far so good! I will let it spin over the weekend but I think it's unlikely
->> something will turn up.
->>
->> I was wondering, would it make sense to push this logic into bdrv_drain?
->> (Along the lines: this looks much like tying up loose ends drain has left.
->> But I'm not sure about it.)
->>
-> 
-> I think it's safe to say that this fixes the virtio-blk issue too. Are you
-> going to send a proper patch with this (or an equivalent) change?
-
-Yes, I am, thanks!
-
-Paolo
+Later, Juan.
