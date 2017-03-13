@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51642)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <deller@gmx.de>) id 1cnQfF-0005hU-FD
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 10:09:34 -0400
+	(envelope-from <quintela@redhat.com>) id 1cnQhp-0006Vk-NS
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 10:12:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <deller@gmx.de>) id 1cnQfC-0005tB-BQ
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 10:09:33 -0400
-Received: from mout.gmx.net ([212.227.17.22]:63053)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <deller@gmx.de>) id 1cnQfC-0005sG-23
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 10:09:30 -0400
-References: <20170311183016.GA20514@ls3530.fritz.box>
-	<ccf72219-1498-4434-8dd4-625c49afee7c@twiddle.net>
-From: Helge Deller <deller@gmx.de>
-Message-ID: <198870a8-664f-06a0-e479-2167ebbfb01d@gmx.de>
-Date: Mon, 13 Mar 2017 15:09:14 +0100
+	(envelope-from <quintela@redhat.com>) id 1cnQhm-0007bx-Ha
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 10:12:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59428)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cnQhm-0007bc-8a
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 10:12:10 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <CAFEAcA978SJemCfYJPa8jwtuhhi6JGh9pEDGYNJ1npJA3nvEQA@mail.gmail.com>
+	(Peter Maydell's message of "Mon, 13 Mar 2017 11:02:01 +0100")
+References: <87tw6y8bs8.fsf@secure.mitica>
+	<CAFEAcA978SJemCfYJPa8jwtuhhi6JGh9pEDGYNJ1npJA3nvEQA@mail.gmail.com>
+Reply-To: quintela@redhat.com
+Date: Mon, 13 Mar 2017 15:12:07 +0100
+Message-ID: <871su1w9jc.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <ccf72219-1498-4434-8dd4-625c49afee7c@twiddle.net>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: Add TARGET_MAP_STACK and
- TARGET_MAP_HUGETLB for all remaining architectures
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] KVM call for 2017-03-14
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +28,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: KVM devel mailing list <kvm@vger.kernel.org>, QEMU Developer <qemu-devel@nongnu.org>
 
-On 11.03.2017 22:53, Richard Henderson wrote:
-> On 03/12/2017 04:30 AM, Helge Deller wrote:
->> Add the missing defines and for TARGET_MAP_STACK and TARGET_MAP_HUGETLB
->> for alpha, mips, ppc and x86, and fix the mmap_flags translation table
->> to translate those flags between host and target architecture.
+Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 12 March 2017 at 21:45, Juan Quintela <quintela@redhat.com> wrote:
 >>
->> Signed-off-by: Helge Deller <deller@gmx.de>
 >>
->> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
->> index cec8428..03ed370 100644
->> --- a/linux-user/syscall.c
->> +++ b/linux-user/syscall.c
->> @@ -5875,6 +5875,8 @@ static bitmask_transtbl mmap_flags_tbl[] = {
->>      { TARGET_MAP_LOCKED, TARGET_MAP_LOCKED, MAP_LOCKED, MAP_LOCKED },
->>          { TARGET_MAP_NORESERVE, TARGET_MAP_NORESERVE, MAP_NORESERVE,
->>            MAP_NORESERVE },
->> +    { TARGET_MAP_STACK, TARGET_MAP_STACK, MAP_STACK, MAP_STACK },
->> +    { TARGET_MAP_HUGETLB, TARGET_MAP_HUGETLB, MAP_HUGETLB, MAP_HUGETLB },
-> 
-> I don't see any point in this. First, MAP_STACK is ignored by the
-> kernel, and has been for some time. 
+>> Hi
+>>
+>> Please, send any topic that you are interested in covering.
+>>
+>> So far the agenda is:
+>>
+>> - Direction of QEMU and toolstack in light of Google Cloud blog:
+>>   https://cloudplatform.googleblog.com/2017/01/7-ways-we-harden-our-KVM-hypervisor-at-Google-Cloud-security-in-plaintext.html
+>
+>
+> Ah, I'd forgotten that this was on the call agenda. I actually
+> had an interesting conversation with Alex Graf last week about
+> some similar topics, which I guess you could generally summarize
+> as "what are the issues we need to address as a project in order
+> to not become irrelevant in five years time". Since I wrote them
+> up for an internal "what I did on my holi^Wconference trip" report
+> I might as well repost them here:
+>
+>   - on the "VM support" side, QEMU is more used because it's the only
+>     production-quality option in this space, rather than because its
+>     users love it. (cf the Google choice to replace it.) It's also got
+>     a pretty poor security record.
 
-Yes, the kernel ignores the native MAP_STACK define.
+On a previous life, I have to work on making qemu pass Common Criteria.
+Not to be able to remove large bits of it that we were not interested
+was a mess (basically we care about kvm + a bunch of devices, but it was
+impossible to remove things like TCG).
 
-> Second, the size of huge pages varies widely between different targets,
-> and we're not really able to map the sizes between guest and host.
+>     It wouldn't be too surprising if
+>     some time in the next five years somebody writes a replacement in
+>     a safer language (perhaps also targeting only the VM support role)
+>     and it got enough mindshare and takeup to eclipse QEMU.
+>     [Is it too early/daft to think about prototyping being able to
+>      write QEMU device emulation in Rust ?]
+>     If the "VM support" usecase moves to another project then QEMU
+>     will become a very quiet backwater...
 
-This might probably not be necessary, if the userspace app simply asks
-which huge page sizes are supported (e.g. by procfs entries or via 
-"hugeadm --page-sizes-all").
 
-But the main intention of my patch was not to fix MAP_STACK or MAP_HUGETLB,
-but more to ensure that those flags are avoided to be handed over to the host.
-For example, TARGET_MAP_STACK is 0x40000 on hppa, and if it's not filtered out
-in e.g. a mmap() call, then this becomes to MAP_HUGETLB on x86_64 (which is 
-0x40000 on x86_64).  
 
-Helge
+>   - on the "emulation" side, nobody is clearly articulating a purpose
+>     for QEMU, a reason why you should use it rather than other modelling
+>     technologies (or rather than using real hardware). As a result the
+>     efforts applied to QEMU are somewhat unfocused. Are we trying to be:
+>     . a dev platform before easy h/w availability?
+>       [not easy for QEMU for several reasons]
+>     . a dev tool that provides better introspection into guest
+>       behaviour than running on h/w?
+>       [if so we should put more work into improving our introspection
+>        and guest tracing capabilities!]
+>     . primarily a tool for doing automated CI testing and one-off
+>       developer smoke-testing that's easier to set up and scale than
+>       trying to test on real h/w?
+>     . something else?
+>       [your idea goes here!]
+>   - in all areas our legacy code and back-compatibility requirements
+>     are threatening to choke forward progress if we don't make serious
+>     efforts to get on top of them
+
+But how? and When?
+
+If you get some new interfaces and some devices are not ported, what are
+we going to do?
+- require the people that do the new interfaces to update the legacy
+  code (and they will get bored)
+- remove the unmaintained code after some time
+
+Both approaches have its advantages and disadvantages.
+
+>   - there's no easy way for people to use parts of QEMU like the CPU
+>     emulation, or to add their own devices without having to write lots
+>     of C code (we're firmly in a "one monolithic blob of code" setup
+>     right now and disentangling and setting clear API dividing lines
+>     will be a lot of work)
+>     [Making QEMU more modular would help with defeating the legacy
+>     and back-compat dragons, though]
+
+That would be ideal, but where to start?  Think of something as "simple"
+asd adding a struct of operations that implement the differences for
+TCG, xen and kvm.  And you see that you get into having to rewrite lot
+of code after moving to that abstraction just the more simple
+operations.
+
+Later, Juan.
