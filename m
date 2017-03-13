@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1cnUph-0005lm-VW
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 14:36:39 -0400
+	(envelope-from <k.kozlowski.k@gmail.com>) id 1cnUso-0007x4-9h
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 14:39:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1cnUph-0000iV-9v
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 14:36:38 -0400
+	(envelope-from <k.kozlowski.k@gmail.com>) id 1cnUsn-0001E0-AG
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 14:39:50 -0400
+Date: Mon, 13 Mar 2017 20:39:37 +0200
 From: Krzysztof Kozlowski <krzk@kernel.org>
-Date: Mon, 13 Mar 2017 20:35:56 +0200
-Message-Id: <20170313183557.23195-3-krzk@kernel.org>
-In-Reply-To: <20170313183557.23195-1-krzk@kernel.org>
+Message-ID: <20170313183937.ony4fukk6iny3gop@kozik-lap>
 References: <20170313183557.23195-1-krzk@kernel.org>
-Subject: [Qemu-devel] [PATCH v2 2/3] hw/char/exynos4210_uart: Constify
- static array and few arguments
+	<20170313183557.23195-2-krzk@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170313183557.23195-2-krzk@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] hw/arm/exynos: Convert fprintf to
+ error_report()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,59 +25,68 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Igor Mitsyanko <i.mitsyanko@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: eblake@redhat.com, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Krzysztof Kozlowski <krzk@kernel.org>
+Cc: eblake@redhat.com, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-The static array exynos4210_uart_regs with register values is not
-modified so it can be made const.
+On Mon, Mar 13, 2017 at 08:35:55PM +0200, Krzysztof Kozlowski wrote:
+> error_report() is preferred over fprintf() for logging errors.  Also
+> remove square brackets [] and additional new line characters in printed
+> messages.
+> 
+> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+> ---
+>  hw/arm/exynos4_boards.c   |  6 +++---
+>  hw/timer/exynos4210_mct.c |  5 +++--
+>  hw/timer/exynos4210_pwm.c | 11 +++++------
+>  hw/timer/exynos4210_rtc.c | 16 +++++++---------
+>  4 files changed, 18 insertions(+), 20 deletions(-)
+> 
+> diff --git a/hw/arm/exynos4_boards.c b/hw/arm/exynos4_boards.c
+> index 0efa19405409..0a352815b86d 100644
+> --- a/hw/arm/exynos4_boards.c
+> +++ b/hw/arm/exynos4_boards.c
+> @@ -22,6 +22,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> +#include "qemu/error-report.h"
+>  #include "qemu-common.h"
+>  #include "cpu.h"
+>  #include "sysemu/sysemu.h"
+> @@ -101,9 +102,8 @@ static Exynos4210State *exynos4_boards_init_common(MachineState *machine,
+>      MachineClass *mc = MACHINE_GET_CLASS(machine);
+>  
+>      if (smp_cpus != EXYNOS4210_NCPUS && !qtest_enabled()) {
+> -        fprintf(stderr, "%s board supports only %d CPU cores. Ignoring smp_cpus"
+> -                " value.\n",
+> -                mc->name, EXYNOS4210_NCPUS);
+> +        error_report("%s board supports only %d CPU cores, ignoring smp_cpus value",
+> +                     mc->name, EXYNOS4210_NCPUS);
+>      }
+>  
+>      exynos4_board_binfo.ram_size = exynos4_board_ram_size[board_type];
+> diff --git a/hw/timer/exynos4210_mct.c b/hw/timer/exynos4210_mct.c
+> index 6069116942a4..48041ab036a6 100644
+> --- a/hw/timer/exynos4210_mct.c
+> +++ b/hw/timer/exynos4210_mct.c
+> @@ -53,6 +53,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> +#include "qemu/error-report.h"
+>  #include "hw/sysbus.h"
+>  #include "qemu/timer.h"
+>  #include "qemu/main-loop.h"
+> @@ -1364,8 +1365,8 @@ static void exynos4210_mct_write(void *opaque, hwaddr offset,
+>      case L0_TCNTO: case L1_TCNTO:
+>      case L0_ICNTO: case L1_ICNTO:
+>      case L0_FRCNTO: case L1_FRCNTO:
+> -        fprintf(stderr, "\n[exynos4210.mct: write to RO register "
+> -                TARGET_FMT_plx "]\n\n", offset);
+> +        error_report("exynos4210.mct: write to RO register " TARGET_FMT_plx,
+> +                     offset);
 
-Few other functions accept driver or uart state as an argument but they
-do not change it and do not cast it so this can be made const for code
-safeness.
+Ahh, I missed Philippe's suggestions here and other places. Sorry for
+the mess, I'll fix it and resend v3.
 
-Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
----
- hw/char/exynos4210_uart.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/hw/char/exynos4210_uart.c b/hw/char/exynos4210_uart.c
-index b75f28d473bf..bff706ab3a68 100644
---- a/hw/char/exynos4210_uart.c
-+++ b/hw/char/exynos4210_uart.c
-@@ -102,7 +102,7 @@ typedef struct Exynos4210UartReg {
-     uint32_t            reset_value;
- } Exynos4210UartReg;
- 
--static Exynos4210UartReg exynos4210_uart_regs[] = {
-+static const Exynos4210UartReg exynos4210_uart_regs[] = {
-     {"ULCON",    ULCON,    0x00000000},
-     {"UCON",     UCON,     0x00003000},
-     {"UFCON",    UFCON,    0x00000000},
-@@ -220,7 +220,7 @@ static uint8_t fifo_retrieve(Exynos4210UartFIFO *q)
-     return  ret;
- }
- 
--static int fifo_elements_number(Exynos4210UartFIFO *q)
-+static int fifo_elements_number(const Exynos4210UartFIFO *q)
- {
-     if (q->sp < q->rp) {
-         return q->size - q->rp + q->sp;
-@@ -229,7 +229,7 @@ static int fifo_elements_number(Exynos4210UartFIFO *q)
-     return q->sp - q->rp;
- }
- 
--static int fifo_empty_elements_number(Exynos4210UartFIFO *q)
-+static int fifo_empty_elements_number(const Exynos4210UartFIFO *q)
- {
-     return q->size - fifo_elements_number(q);
- }
-@@ -245,7 +245,7 @@ static void fifo_reset(Exynos4210UartFIFO *q)
-     q->rp = 0;
- }
- 
--static uint32_t exynos4210_uart_Tx_FIFO_trigger_level(Exynos4210UartState *s)
-+static uint32_t exynos4210_uart_Tx_FIFO_trigger_level(const Exynos4210UartState *s)
- {
-     uint32_t level = 0;
-     uint32_t reg;
--- 
-2.9.3
+Best regards,
+Krzysztof
