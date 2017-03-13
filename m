@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hdegoede@redhat.com>) id 1cnMFS-0000HJ-Cp
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 05:26:39 -0400
+	(envelope-from <hdegoede@redhat.com>) id 1cnMGS-0000vs-IV
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 05:27:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hdegoede@redhat.com>) id 1cnMFP-00013H-0b
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 05:26:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39920)
+	(envelope-from <hdegoede@redhat.com>) id 1cnMGP-0001RN-Ah
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 05:27:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58332)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <hdegoede@redhat.com>) id 1cnMFO-00012V-OQ
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 05:26:34 -0400
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Exim 4.71) (envelope-from <hdegoede@redhat.com>) id 1cnMGP-0001RI-11
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 05:27:37 -0400
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B0185C04B93B
-	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 09:26:33 +0000 (UTC)
-References: <20170220095055.4234-1-fziglio@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 31FEF20264
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 09:27:37 +0000 (UTC)
 From: Hans de Goede <hdegoede@redhat.com>
-Message-ID: <ba8f44f4-7329-aa7b-0f00-1d7a26973681@redhat.com>
-Date: Mon, 13 Mar 2017 10:26:30 +0100
+References: <20170220095055.4234-1-fziglio@redhat.com>
+Message-ID: <cf298d66-cc10-0cf5-b5d1-b36c20fb05f7@redhat.com>
+Date: Mon, 13 Mar 2017 10:27:33 +0100
 MIME-Version: 1.0
 In-Reply-To: <20170220095055.4234-1-fziglio@redhat.com>
-Content-Type: multipart/mixed; boundary="------------9F4B686DF70FEC8F95C4097D"
+Content-Type: multipart/mixed; boundary="------------7950B078C0A2957B2BF02C4B"
 Subject: Re: [Qemu-devel] [PATCH] egl-helpers: Support newer MESA versions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -32,12 +32,14 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Frediano Ziglio <fziglio@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <mlureau@redhat.com>, Cole Robinson <crobinso@redhat.com>, David Airlie <airlied@redhat.com>
 
 This is a multi-part message in MIME format.
---------------9F4B686DF70FEC8F95C4097D
+--------------7950B078C0A2957B2BF02C4B
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
+
+<resend with some more people added to the Cc>
 
 Hi,
 
@@ -92,7 +94,8 @@ Hans
 
 
 
---------------9F4B686DF70FEC8F95C4097D
+
+--------------7950B078C0A2957B2BF02C4B
 Content-Type: text/x-patch;
  name="qemu-2.8.0-glvnd.patch"
 Content-Transfer-Encoding: 7bit
@@ -165,4 +168,5 @@ diff -up qemu-2.8.0/ui/egl-helpers.c~ qemu-2.8.0/ui/egl-helpers.c
          error_report("egl: eglGetDisplay failed");
          return -1;
 
---------------9F4B686DF70FEC8F95C4097D--
+
+--------------7950B078C0A2957B2BF02C4B--
