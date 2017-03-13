@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52538)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cnJJt-0007cQ-M9
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:19:06 -0400
+	(envelope-from <armbru@redhat.com>) id 1cnJJp-0007Zs-W6
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:19:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cnJJm-0003d6-3J
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:19:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39036)
+	(envelope-from <armbru@redhat.com>) id 1cnJJk-0003aD-Rb
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:18:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33484)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cnJJl-0003aB-JH
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:18:53 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cnJJk-0003Ym-JU
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:18:52 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 13 Mar 2017 07:18:19 +0100
-Message-Id: <1489385927-6735-20-git-send-email-armbru@redhat.com>
+Date: Mon, 13 Mar 2017 07:18:14 +0100
+Message-Id: <1489385927-6735-15-git-send-email-armbru@redhat.com>
 In-Reply-To: <1489385927-6735-1-git-send-email-armbru@redhat.com>
 References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.9 19/47] qapi: Prefer single-quoted
- strings more consistently
+Subject: [Qemu-devel] [PATCH for-2.9 14/47] qapi: Prepare for requiring more
+ complete documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,484 +27,344 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, eblake@redhat.com, mdroth@linux.vnet.ibm.com
 
-PEP 8 advises:
+We currently neglect to check all enumeration values, common members
+of object types and members of alternate types are documented.
+Unsurprisingly, many aren't.
 
-    In Python, single-quoted strings and double-quoted strings are the
-    same.  This PEP does not make a recommendation for this.  Pick a
-    rule and stick to it.  When a string contains single or double
-    quote characters, however, use the other one to avoid backslashes
-    in the string.  It improves readability.
-
-The QAPI generators succeed at picking a rule, but fail at sticking to
-it.  Convert a bunch of double-quoted strings to single-quoted ones.
+Add the necessary plumbing to find undocumented ones, except for
+variant members of object types.  Don't enforce anything just yet, but
+connect each QAPIDoc.ArgSection to its QAPISchemaMember.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi-event.py      |  2 +-
- scripts/qapi-introspect.py |  4 +-
- scripts/qapi-types.py      |  4 +-
- scripts/qapi-visit.py      |  4 +-
- scripts/qapi.py            | 96 +++++++++++++++++++++++-----------------------
- scripts/qapi2texi.py       | 46 +++++++++++-----------
- 6 files changed, 78 insertions(+), 78 deletions(-)
+ scripts/qapi.py | 110 +++++++++++++++++++++++++++++++++-----------------------
+ 1 file changed, 65 insertions(+), 45 deletions(-)
 
-diff --git a/scripts/qapi-event.py b/scripts/qapi-event.py
-index f4eb7f8..0485e39 100644
---- a/scripts/qapi-event.py
-+++ b/scripts/qapi-event.py
-@@ -223,7 +223,7 @@ fdecl.write(mcgen('''
- ''',
-                   prefix=prefix))
- 
--event_enum_name = c_name(prefix + "QAPIEvent", protect=False)
-+event_enum_name = c_name(prefix + 'QAPIEvent', protect=False)
- 
- schema = QAPISchema(input_file)
- gen = QAPISchemaGenEventVisitor()
-diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
-index fb72c61..032bcea 100644
---- a/scripts/qapi-introspect.py
-+++ b/scripts/qapi-introspect.py
-@@ -170,10 +170,10 @@ const char %(c_name)s[] = %(c_string)s;
- opt_unmask = False
- 
- (input_file, output_dir, do_c, do_h, prefix, opts) = \
--    parse_command_line("u", ["unmask-non-abi-names"])
-+    parse_command_line('u', ['unmask-non-abi-names'])
- 
- for o, a in opts:
--    if o in ("-u", "--unmask-non-abi-names"):
-+    if o in ('-u', '--unmask-non-abi-names'):
-         opt_unmask = True
- 
- c_comment = '''
-diff --git a/scripts/qapi-types.py b/scripts/qapi-types.py
-index dabc42e..b45e7b5 100644
---- a/scripts/qapi-types.py
-+++ b/scripts/qapi-types.py
-@@ -244,10 +244,10 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
- do_builtins = False
- 
- (input_file, output_dir, do_c, do_h, prefix, opts) = \
--    parse_command_line("b", ["builtins"])
-+    parse_command_line('b', ['builtins'])
- 
- for o, a in opts:
--    if o in ("-b", "--builtins"):
-+    if o in ('-b', '--builtins'):
-         do_builtins = True
- 
- c_comment = '''
-diff --git a/scripts/qapi-visit.py b/scripts/qapi-visit.py
-index 330b9f3..3d3936e 100644
---- a/scripts/qapi-visit.py
-+++ b/scripts/qapi-visit.py
-@@ -335,10 +335,10 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor):
- do_builtins = False
- 
- (input_file, output_dir, do_c, do_h, prefix, opts) = \
--    parse_command_line("b", ["builtins"])
-+    parse_command_line('b', ['builtins'])
- 
- for o, a in opts:
--    if o in ("-b", "--builtins"):
-+    if o in ('-b', '--builtins'):
-         do_builtins = True
- 
- c_comment = '''
 diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 6d39ec9..9430493 100644
+index 7a2b6ab..4886417 100644
 --- a/scripts/qapi.py
 +++ b/scripts/qapi.py
-@@ -58,9 +58,9 @@ all_names = {}
- 
- 
- def error_path(parent):
--    res = ""
-+    res = ''
-     while parent:
--        res = ("In file included from %s:%d:\n" % (parent['file'],
-+        res = ('In file included from %s:%d:\n' % (parent['file'],
-                                                    parent['line'])) + res
-         parent = parent['parent']
-     return res
-@@ -76,10 +76,10 @@ class QAPIError(Exception):
-         self.msg = msg
- 
-     def __str__(self):
--        loc = "%s:%d" % (self.fname, self.line)
-+        loc = '%s:%d' % (self.fname, self.line)
-         if self.col is not None:
--            loc += ":%s" % self.col
--        return error_path(self.info) + "%s: %s" % (loc, self.msg)
-+            loc += ':%s' % self.col
-+        return error_path(self.info) + '%s: %s' % (loc, self.msg)
- 
- 
- class QAPIParseError(QAPIError):
-@@ -113,7 +113,7 @@ class QAPIDoc(object):
-             self.content.append(line)
- 
-         def __repr__(self):
--            return "\n".join(self.content).strip()
-+            return '\n'.join(self.content).strip()
+@@ -116,7 +116,12 @@ class QAPIDoc(object):
+             return "\n".join(self.content).strip()
  
      class ArgSection(Section):
-         def __init__(self, name):
-@@ -163,8 +163,8 @@ class QAPIDoc(object):
-         # recognized, and get silently treated as ordinary text
-         if self.symbol:
-             self._append_symbol_line(line)
--        elif not self.body.content and line.startswith("@"):
--            if not line.endswith(":"):
-+        elif not self.body.content and line.startswith('@'):
-+            if not line.endswith(':'):
-                 raise QAPIParseError(self.parser, "Line should end with :")
-             self.symbol = line[1:-1]
-             # FIXME invalid names other than the empty string aren't flagged
-@@ -176,14 +176,14 @@ class QAPIDoc(object):
-     def _append_symbol_line(self, line):
-         name = line.split(' ', 1)[0]
+-        pass
++        def __init__(self, name):
++            QAPIDoc.Section.__init__(self, name)
++            self.member = None
++
++        def connect(self, member):
++            self.member = member
  
--        if name.startswith("@") and name.endswith(":"):
-+        if name.startswith('@') and name.endswith(':'):
-             line = line[len(name)+1:]
-             self._start_args_section(name[1:-1])
--        elif name in ("Returns:", "Since:",
-+        elif name in ('Returns:', 'Since:',
-                       # those are often singular or plural
--                      "Note:", "Notes:",
--                      "Example:", "Examples:",
--                      "TODO:"):
-+                      'Note:', 'Notes:',
-+                      'Example:', 'Examples:',
-+                      'TODO:'):
-             line = line[len(name)+1:]
-             self._start_section(name[:-1])
- 
-@@ -203,8 +203,8 @@ class QAPIDoc(object):
-         self.section = QAPIDoc.ArgSection(name)
-         self.args[name] = self.section
- 
--    def _start_section(self, name=""):
--        if name in ("Returns", "Since") and self.has_section(name):
-+    def _start_section(self, name=''):
-+        if name in ('Returns', 'Since') and self.has_section(name):
-             raise QAPIParseError(self.parser,
-                                  "Duplicated '%s' section" % name)
-         self.section = QAPIDoc.Section(name)
-@@ -217,7 +217,7 @@ class QAPIDoc(object):
-                 and line and not line[0].isspace()):
-             self._start_section()
-         if (in_arg or not self.section.name
--                or not self.section.name.startswith("Example")):
-+                or not self.section.name.startswith('Example')):
+     def __init__(self, parser, info):
+         # self.parser is used to report errors with QAPIParseError.  The
+@@ -216,6 +221,13 @@ class QAPIDoc(object):
              line = line.strip()
-         # TODO Drop this once the dust has settled
-         if (isinstance(self.section, QAPIDoc.ArgSection)
-@@ -262,7 +262,7 @@ class QAPISchemaParser(object):
-             if 'include' in expr:
-                 if len(expr) != 1:
-                     raise QAPISemError(info, "Invalid 'include' directive")
--                include = expr["include"]
-+                include = expr['include']
-                 if not isinstance(include, str):
-                     raise QAPISemError(info,
-                                        "Value of 'include' must be a string")
-@@ -343,7 +343,7 @@ class QAPISchemaParser(object):
-                 if not skip_comment:
-                     self.val = self.src[self.pos:self.cursor]
-                     return
--            elif self.tok in "{}:,[]":
-+            elif self.tok in '{}:,[]':
-                 return
-             elif self.tok == "'":
-                 string = ''
-@@ -369,7 +369,7 @@ class QAPISchemaParser(object):
-                             for _ in range(0, 4):
-                                 ch = self.src[self.cursor]
-                                 self.cursor += 1
--                                if ch not in "0123456789abcdefABCDEF":
-+                                if ch not in '0123456789abcdefABCDEF':
-                                     raise QAPIParseError(self,
-                                                          '\\u escape needs 4 '
-                                                          'hex digits')
-@@ -384,28 +384,28 @@ class QAPISchemaParser(object):
-                                                      'only supports non-zero '
-                                                      'values up to \\u007f')
-                             string += chr(value)
--                        elif ch in "\\/'\"":
-+                        elif ch in '\\/\'"':
-                             string += ch
-                         else:
-                             raise QAPIParseError(self,
-                                                  "Unknown escape \\%s" % ch)
-                         esc = False
--                    elif ch == "\\":
-+                    elif ch == '\\':
-                         esc = True
-                     elif ch == "'":
-                         self.val = string
-                         return
-                     else:
-                         string += ch
--            elif self.src.startswith("true", self.pos):
-+            elif self.src.startswith('true', self.pos):
-                 self.val = True
-                 self.cursor += 3
-                 return
--            elif self.src.startswith("false", self.pos):
-+            elif self.src.startswith('false', self.pos):
-                 self.val = False
-                 self.cursor += 4
-                 return
--            elif self.src.startswith("null", self.pos):
-+            elif self.src.startswith('null', self.pos):
-                 self.val = None
-                 self.cursor += 3
-                 return
-@@ -519,11 +519,11 @@ def find_alternate_member_qtype(qapi_type):
-     if qapi_type in builtin_types:
-         return builtin_types[qapi_type]
-     elif find_struct(qapi_type):
--        return "QTYPE_QDICT"
-+        return 'QTYPE_QDICT'
-     elif find_enum(qapi_type):
--        return "QTYPE_QSTRING"
-+        return 'QTYPE_QSTRING'
-     elif find_union(qapi_type):
--        return "QTYPE_QDICT"
-+        return 'QTYPE_QDICT'
-     return None
+         self.section.append(line)
  
++    def connect_member(self, member):
++        if not member.name in self.args:
++            # Undocumented TODO outlaw
++            pass
++        else:
++            self.args[member.name].connect(member)
++
  
-@@ -624,7 +624,7 @@ def find_union(name):
- def add_enum(name, info, enum_values=None, implicit=False):
-     global enum_types
-     add_name(name, info, 'enum', implicit)
--    enum_types.append({"enum_name": name, "enum_values": enum_values})
-+    enum_types.append({'enum_name': name, 'enum_values': enum_values})
+ class QAPISchemaParser(object):
  
- 
- def find_enum(name):
-@@ -784,7 +784,7 @@ def check_union(expr, info):
-                 raise QAPISemError(info,
-                                    "Discriminator value '%s' is not found in "
-                                    "enum '%s'"
--                                   % (key, enum_define["enum_name"]))
-+                                   % (key, enum_define['enum_name']))
- 
-     # If discriminator is user-defined, ensure all values are covered
-     if enum_define:
-@@ -989,7 +989,7 @@ def check_definition_doc(doc, expr, info):
-     args = set([name.strip('*') for name in args])
-     if not doc_args.issubset(args):
-         raise QAPISemError(info, "The following documented members are not in "
--                           "the declaration: %s" % ", ".join(doc_args - args))
-+                           "the declaration: %s" % ', '.join(doc_args - args))
- 
- 
- def check_docs(docs):
-@@ -1483,7 +1483,7 @@ class QAPISchemaEvent(QAPISchemaEntity):
- class QAPISchema(object):
-     def __init__(self, fname):
-         try:
--            parser = QAPISchemaParser(open(fname, "r"))
-+            parser = QAPISchemaParser(open(fname, 'r'))
-             self.exprs = check_exprs(parser.exprs)
-             self.docs = check_docs(parser.docs)
-             self._entity_dict = {}
-@@ -1736,8 +1736,8 @@ def camel_to_upper(value):
-     l = len(c_fun_str)
-     for i in range(l):
-         c = c_fun_str[i]
--        # When c is upper and no "_" appears before, do more checks
--        if c.isupper() and (i > 0) and c_fun_str[i - 1] != "_":
-+        # When c is upper and no '_' appears before, do more checks
-+        if c.isupper() and (i > 0) and c_fun_str[i - 1] != '_':
-             if i < l - 1 and c_fun_str[i + 1].islower():
-                 new_name += '_'
-             elif c_fun_str[i - 1].isdigit():
-@@ -1756,7 +1756,7 @@ c_name_trans = string.maketrans('.-', '__')
- 
- # Map @name to a valid C identifier.
- # If @protect, avoid returning certain ticklish identifiers (like
--# C keywords) by prepending "q_".
-+# C keywords) by prepending 'q_'.
- #
- # Used for converting 'name' from a 'name':'type' qapi definition
- # into a generated struct member, as well as converting type names
-@@ -1794,7 +1794,7 @@ def c_name(name, protect=True):
-     name = name.translate(c_name_trans)
-     if protect and (name in c89_words | c99_words | c11_words | gcc_words
-                     | cpp_words | polluted_words):
--        return "q_" + name
-+        return 'q_' + name
-     return name
- 
- eatspace = '\033EATSPACE.'
-@@ -1802,9 +1802,9 @@ pointer_suffix = ' *' + eatspace
- 
- 
- def genindent(count):
--    ret = ""
-+    ret = ''
-     for _ in range(count):
--        ret += " "
-+        ret += ' '
-     return ret
- 
- indent_level = 0
-@@ -1944,26 +1944,26 @@ def gen_params(arg_type, boxed, extra):
+@@ -1017,7 +1029,7 @@ def check_docs(docs):
  #
  
+ class QAPISchemaEntity(object):
+-    def __init__(self, name, info):
++    def __init__(self, name, info, doc):
+         assert isinstance(name, str)
+         self.name = name
+         # For explicitly defined entities, info points to the (explicit)
+@@ -1026,6 +1038,7 @@ class QAPISchemaEntity(object):
+         # triggered the implicit definition (there may be more than one
+         # such place).
+         self.info = info
++        self.doc = doc
  
--def parse_command_line(extra_options="", extra_long_options=[]):
-+def parse_command_line(extra_options='', extra_long_options=[]):
+     def c_name(self):
+         return c_name(self.name)
+@@ -1107,7 +1120,7 @@ class QAPISchemaType(QAPISchemaEntity):
  
-     try:
-         opts, args = getopt.gnu_getopt(sys.argv[1:],
--                                       "chp:o:" + extra_options,
--                                       ["source", "header", "prefix=",
--                                        "output-dir="] + extra_long_options)
-+                                       'chp:o:' + extra_options,
-+                                       ['source', 'header', 'prefix=',
-+                                        'output-dir='] + extra_long_options)
-     except getopt.GetoptError as err:
-         print >>sys.stderr, "%s: %s" % (sys.argv[0], str(err))
-         sys.exit(1)
- 
--    output_dir = ""
--    prefix = ""
-+    output_dir = ''
-+    prefix = ''
-     do_c = False
-     do_h = False
-     extra_opts = []
- 
-     for oa in opts:
-         o, a = oa
--        if o in ("-p", "--prefix"):
-+        if o in ('-p', '--prefix'):
-             match = re.match(r'([A-Za-z_.-][A-Za-z0-9_.-]*)?', a)
-             if match.end() != len(a):
-                 print >>sys.stderr, \
-@@ -1971,11 +1971,11 @@ def parse_command_line(extra_options="", extra_long_options=[]):
-                     % (sys.argv[0], a[match.end()])
-                 sys.exit(1)
-             prefix = a
--        elif o in ("-o", "--output-dir"):
--            output_dir = a + "/"
--        elif o in ("-c", "--source"):
-+        elif o in ('-o', '--output-dir'):
-+            output_dir = a + '/'
-+        elif o in ('-c', '--source'):
-             do_c = True
--        elif o in ("-h", "--header"):
-+        elif o in ('-h', '--header'):
-             do_h = True
-         else:
-             extra_opts.append(oa)
-diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-index 4583477..91cd593 100755
---- a/scripts/qapi2texi.py
-+++ b/scripts/qapi2texi.py
-@@ -50,7 +50,7 @@ def subst_vars(doc):
- 
- def subst_braces(doc):
-     """Replaces {} with @{ @}"""
--    return doc.replace("{", "@{").replace("}", "@}")
-+    return doc.replace('{', '@{').replace('}', '@}')
+ class QAPISchemaBuiltinType(QAPISchemaType):
+     def __init__(self, name, json_type, c_type):
+-        QAPISchemaType.__init__(self, name, None)
++        QAPISchemaType.__init__(self, name, None, None)
+         assert not c_type or isinstance(c_type, str)
+         assert json_type in ('string', 'number', 'int', 'boolean', 'null',
+                              'value')
+@@ -1133,8 +1146,8 @@ class QAPISchemaBuiltinType(QAPISchemaType):
  
  
- def texi_example(doc):
-@@ -79,10 +79,10 @@ def texi_format(doc):
-     doc = subst_vars(doc)
-     doc = subst_emph(doc)
-     doc = subst_strong(doc)
--    inlist = ""
-+    inlist = ''
-     lastempty = False
-     for line in doc.split('\n'):
--        empty = line == ""
-+        empty = line == ''
+ class QAPISchemaEnumType(QAPISchemaType):
+-    def __init__(self, name, info, values, prefix):
+-        QAPISchemaType.__init__(self, name, info)
++    def __init__(self, name, info, doc, values, prefix):
++        QAPISchemaType.__init__(self, name, info, doc)
+         for v in values:
+             assert isinstance(v, QAPISchemaMember)
+             v.set_owner(name)
+@@ -1146,6 +1159,8 @@ class QAPISchemaEnumType(QAPISchemaType):
+         seen = {}
+         for v in self.values:
+             v.check_clash(self.info, seen)
++            if self.doc:
++                self.doc.connect_member(v)
  
-         # FIXME: Doing this in a single if / elif chain is
-         # problematic.  For instance, a line without markup terminates
-@@ -92,35 +92,35 @@ def texi_format(doc):
-         #
-         # Make sure to update section "Documentation markup" in
-         # docs/qapi-code-gen.txt when fixing this.
--        if line.startswith("| "):
-+        if line.startswith('| '):
-             line = EXAMPLE_FMT(code=line[2:])
--        elif line.startswith("= "):
--            line = "@section " + line[2:]
--        elif line.startswith("== "):
--            line = "@subsection " + line[3:]
-+        elif line.startswith('= '):
-+            line = '@section ' + line[2:]
-+        elif line.startswith('== '):
-+            line = '@subsection ' + line[3:]
-         elif re.match(r'^([0-9]*\.) ', line):
-             if not inlist:
--                lines.append("@enumerate")
--                inlist = "enumerate"
--            line = line[line.find(" ")+1:]
--            lines.append("@item")
-+                lines.append('@enumerate')
-+                inlist = 'enumerate'
-+            line = line[line.find(' ')+1:]
-+            lines.append('@item')
-         elif re.match(r'^[*-] ', line):
-             if not inlist:
--                lines.append("@itemize %s" % {'*': "@bullet",
--                                              '-': "@minus"}[line[0]])
--                inlist = "itemize"
--            lines.append("@item")
-+                lines.append('@itemize %s' % {'*': '@bullet',
-+                                              '-': '@minus'}[line[0]])
-+                inlist = 'itemize'
-+            lines.append('@item')
-             line = line[2:]
-         elif lastempty and inlist:
--            lines.append("@end %s\n" % inlist)
--            inlist = ""
-+            lines.append('@end %s\n' % inlist)
-+            inlist = ''
+     def is_implicit(self):
+         # See QAPISchema._make_implicit_enum_type() and ._def_predefineds()
+@@ -1167,7 +1182,7 @@ class QAPISchemaEnumType(QAPISchemaType):
  
-         lastempty = empty
-         lines.append(line)
- 
-     if inlist:
--        lines.append("@end %s\n" % inlist)
--    return "\n".join(lines)
-+        lines.append('@end %s\n' % inlist)
-+    return '\n'.join(lines)
+ class QAPISchemaArrayType(QAPISchemaType):
+     def __init__(self, name, info, element_type):
+-        QAPISchemaType.__init__(self, name, info)
++        QAPISchemaType.__init__(self, name, info, None)
+         assert isinstance(element_type, str)
+         self._element_type_name = element_type
+         self.element_type = None
+@@ -1190,11 +1205,11 @@ class QAPISchemaArrayType(QAPISchemaType):
  
  
- def texi_body(doc):
-@@ -158,12 +158,12 @@ def texi_sections(doc):
-     for section in doc.sections:
-         name, doc = (section.name, str(section))
-         func = texi_format
--        if name.startswith("Example"):
-+        if name.startswith('Example'):
-             func = texi_example
+ class QAPISchemaObjectType(QAPISchemaType):
+-    def __init__(self, name, info, base, local_members, variants):
++    def __init__(self, name, info, doc, base, local_members, variants):
+         # struct has local_members, optional base, and no variants
+         # flat union has base, variants, and no local_members
+         # simple union has local_members, variants, and no base
+-        QAPISchemaType.__init__(self, name, info)
++        QAPISchemaType.__init__(self, name, info, doc)
+         assert base is None or isinstance(base, str)
+         for m in local_members:
+             assert isinstance(m, QAPISchemaObjectTypeMember)
+@@ -1224,6 +1239,8 @@ class QAPISchemaObjectType(QAPISchemaType):
+         for m in self.local_members:
+             m.check(schema)
+             m.check_clash(self.info, seen)
++            if self.doc:
++                self.doc.connect_member(m)
+         self.members = seen.values()
+         if self.variants:
+             self.variants.check(schema, seen)
+@@ -1378,8 +1395,8 @@ class QAPISchemaObjectTypeVariant(QAPISchemaObjectTypeMember):
  
-         if name:
-             # prefer @b over @strong, so txt doesn't translate it to *Foo:*
--            body += "\n\n@b{%s:}\n" % name
-+            body += '\n\n@b{%s:}\n' % name
  
-         body += func(doc)
-     return body
-@@ -269,5 +269,5 @@ def main(argv):
-     print texi_schema(schema)
+ class QAPISchemaAlternateType(QAPISchemaType):
+-    def __init__(self, name, info, variants):
+-        QAPISchemaType.__init__(self, name, info)
++    def __init__(self, name, info, doc, variants):
++        QAPISchemaType.__init__(self, name, info, doc)
+         assert isinstance(variants, QAPISchemaObjectTypeVariants)
+         assert variants.tag_member
+         variants.set_owner(name)
+@@ -1396,6 +1413,8 @@ class QAPISchemaAlternateType(QAPISchemaType):
+         seen = {}
+         for v in self.variants.variants:
+             v.check_clash(self.info, seen)
++            if self.doc:
++                self.doc.connect_member(v)
+ 
+     def c_type(self):
+         return c_name(self.name) + pointer_suffix
+@@ -1411,9 +1430,9 @@ class QAPISchemaAlternateType(QAPISchemaType):
  
  
--if __name__ == "__main__":
-+if __name__ == '__main__':
-     main(sys.argv)
+ class QAPISchemaCommand(QAPISchemaEntity):
+-    def __init__(self, name, info, arg_type, ret_type, gen, success_response,
+-                 boxed):
+-        QAPISchemaEntity.__init__(self, name, info)
++    def __init__(self, name, info, doc, arg_type, ret_type,
++                 gen, success_response, boxed):
++        QAPISchemaEntity.__init__(self, name, info, doc)
+         assert not arg_type or isinstance(arg_type, str)
+         assert not ret_type or isinstance(ret_type, str)
+         self._arg_type_name = arg_type
+@@ -1450,8 +1469,8 @@ class QAPISchemaCommand(QAPISchemaEntity):
+ 
+ 
+ class QAPISchemaEvent(QAPISchemaEntity):
+-    def __init__(self, name, info, arg_type, boxed):
+-        QAPISchemaEntity.__init__(self, name, info)
++    def __init__(self, name, info, doc, arg_type, boxed):
++        QAPISchemaEntity.__init__(self, name, info, doc)
+         assert not arg_type or isinstance(arg_type, str)
+         self._arg_type_name = arg_type
+         self.arg_type = None
+@@ -1533,14 +1552,14 @@ class QAPISchema(object):
+                   ('bool',   'boolean', 'bool'),
+                   ('any',    'value',   'QObject' + pointer_suffix)]:
+             self._def_builtin_type(*t)
+-        self.the_empty_object_type = QAPISchemaObjectType('q_empty', None,
+-                                                          None, [], None)
++        self.the_empty_object_type = QAPISchemaObjectType(
++            'q_empty', None, None, None, [], None)
+         self._def_entity(self.the_empty_object_type)
+         qtype_values = self._make_enum_members(['none', 'qnull', 'qint',
+                                                 'qstring', 'qdict', 'qlist',
+                                                 'qfloat', 'qbool'])
+-        self._def_entity(QAPISchemaEnumType('QType', None, qtype_values,
+-                                            'QTYPE'))
++        self._def_entity(QAPISchemaEnumType('QType', None, None,
++                                            qtype_values, 'QTYPE'))
+ 
+     def _make_enum_members(self, values):
+         return [QAPISchemaMember(v) for v in values]
+@@ -1549,7 +1568,7 @@ class QAPISchema(object):
+         # See also QAPISchemaObjectTypeMember._pretty_owner()
+         name = name + 'Kind'   # Use namespace reserved by add_name()
+         self._def_entity(QAPISchemaEnumType(
+-            name, info, self._make_enum_members(values), None))
++            name, info, None, self._make_enum_members(values), None))
+         return name
+ 
+     def _make_array_type(self, element_type, info):
+@@ -1558,22 +1577,22 @@ class QAPISchema(object):
+             self._def_entity(QAPISchemaArrayType(name, info, element_type))
+         return name
+ 
+-    def _make_implicit_object_type(self, name, info, role, members):
++    def _make_implicit_object_type(self, name, info, doc, role, members):
+         if not members:
+             return None
+         # See also QAPISchemaObjectTypeMember._pretty_owner()
+         name = 'q_obj_%s-%s' % (name, role)
+         if not self.lookup_entity(name, QAPISchemaObjectType):
+-            self._def_entity(QAPISchemaObjectType(name, info, None,
++            self._def_entity(QAPISchemaObjectType(name, info, doc, None,
+                                                   members, None))
+         return name
+ 
+-    def _def_enum_type(self, expr, info):
++    def _def_enum_type(self, expr, info, doc):
+         name = expr['enum']
+         data = expr['data']
+         prefix = expr.get('prefix')
+         self._def_entity(QAPISchemaEnumType(
+-            name, info, self._make_enum_members(data), prefix))
++            name, info, doc, self._make_enum_members(data), prefix))
+ 
+     def _make_member(self, name, typ, info):
+         optional = False
+@@ -1589,11 +1608,11 @@ class QAPISchema(object):
+         return [self._make_member(key, value, info)
+                 for (key, value) in data.iteritems()]
+ 
+-    def _def_struct_type(self, expr, info):
++    def _def_struct_type(self, expr, info, doc):
+         name = expr['struct']
+         base = expr.get('base')
+         data = expr['data']
+-        self._def_entity(QAPISchemaObjectType(name, info, base,
++        self._def_entity(QAPISchemaObjectType(name, info, doc, base,
+                                               self._make_members(data, info),
+                                               None))
+ 
+@@ -1605,10 +1624,10 @@ class QAPISchema(object):
+             assert len(typ) == 1
+             typ = self._make_array_type(typ[0], info)
+         typ = self._make_implicit_object_type(
+-            typ, info, 'wrapper', [self._make_member('data', typ, info)])
++            typ, info, None, 'wrapper', [self._make_member('data', typ, info)])
+         return QAPISchemaObjectTypeVariant(case, typ)
+ 
+-    def _def_union_type(self, expr, info):
++    def _def_union_type(self, expr, info, doc):
+         name = expr['union']
+         data = expr['data']
+         base = expr.get('base')
+@@ -1616,7 +1635,7 @@ class QAPISchema(object):
+         tag_member = None
+         if isinstance(base, dict):
+             base = (self._make_implicit_object_type(
+-                    name, info, 'base', self._make_members(base, info)))
++                    name, info, doc, 'base', self._make_members(base, info)))
+         if tag_name:
+             variants = [self._make_variant(key, value)
+                         for (key, value) in data.iteritems()]
+@@ -1629,24 +1648,24 @@ class QAPISchema(object):
+             tag_member = QAPISchemaObjectTypeMember('type', typ, False)
+             members = [tag_member]
+         self._def_entity(
+-            QAPISchemaObjectType(name, info, base, members,
++            QAPISchemaObjectType(name, info, doc, base, members,
+                                  QAPISchemaObjectTypeVariants(tag_name,
+                                                               tag_member,
+                                                               variants)))
+ 
+-    def _def_alternate_type(self, expr, info):
++    def _def_alternate_type(self, expr, info, doc):
+         name = expr['alternate']
+         data = expr['data']
+         variants = [self._make_variant(key, value)
+                     for (key, value) in data.iteritems()]
+         tag_member = QAPISchemaObjectTypeMember('type', 'QType', False)
+         self._def_entity(
+-            QAPISchemaAlternateType(name, info,
++            QAPISchemaAlternateType(name, info, doc,
+                                     QAPISchemaObjectTypeVariants(None,
+                                                                  tag_member,
+                                                                  variants)))
+ 
+-    def _def_command(self, expr, info):
++    def _def_command(self, expr, info, doc):
+         name = expr['command']
+         data = expr.get('data')
+         rets = expr.get('returns')
+@@ -1655,38 +1674,39 @@ class QAPISchema(object):
+         boxed = expr.get('boxed', False)
+         if isinstance(data, OrderedDict):
+             data = self._make_implicit_object_type(
+-                name, info, 'arg', self._make_members(data, info))
++                name, info, doc, 'arg', self._make_members(data, info))
+         if isinstance(rets, list):
+             assert len(rets) == 1
+             rets = self._make_array_type(rets[0], info)
+-        self._def_entity(QAPISchemaCommand(name, info, data, rets, gen,
+-                                           success_response, boxed))
++        self._def_entity(QAPISchemaCommand(name, info, doc, data, rets,
++                                           gen, success_response, boxed))
+ 
+-    def _def_event(self, expr, info):
++    def _def_event(self, expr, info, doc):
+         name = expr['event']
+         data = expr.get('data')
+         boxed = expr.get('boxed', False)
+         if isinstance(data, OrderedDict):
+             data = self._make_implicit_object_type(
+-                name, info, 'arg', self._make_members(data, info))
+-        self._def_entity(QAPISchemaEvent(name, info, data, boxed))
++                name, info, doc, 'arg', self._make_members(data, info))
++        self._def_entity(QAPISchemaEvent(name, info, doc, data, boxed))
+ 
+     def _def_exprs(self):
+         for expr_elem in self.exprs:
+             expr = expr_elem['expr']
+             info = expr_elem['info']
++            doc = expr_elem.get('doc')
+             if 'enum' in expr:
+-                self._def_enum_type(expr, info)
++                self._def_enum_type(expr, info, doc)
+             elif 'struct' in expr:
+-                self._def_struct_type(expr, info)
++                self._def_struct_type(expr, info, doc)
+             elif 'union' in expr:
+-                self._def_union_type(expr, info)
++                self._def_union_type(expr, info, doc)
+             elif 'alternate' in expr:
+-                self._def_alternate_type(expr, info)
++                self._def_alternate_type(expr, info, doc)
+             elif 'command' in expr:
+-                self._def_command(expr, info)
++                self._def_command(expr, info, doc)
+             elif 'event' in expr:
+-                self._def_event(expr, info)
++                self._def_event(expr, info, doc)
+             else:
+                 assert False
+ 
 -- 
 2.7.4
