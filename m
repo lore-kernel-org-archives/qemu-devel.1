@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cnPv3-0005bl-8t
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 09:21:50 -0400
+	(envelope-from <mlureau@redhat.com>) id 1cnQ1M-0006oV-9a
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 09:28:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cnPv0-0008AR-1Y
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 09:21:49 -0400
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:35817)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cnPuz-00089S-QC
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 09:21:45 -0400
-Received: by mail-wr0-x22c.google.com with SMTP id g10so103509034wrg.2
-	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 06:21:45 -0700 (PDT)
-References: <a7977444b25641cc86352a6818a4df3a@EXCHCS32.ornl.gov>
-	<000601d29710$edf987b0$c9ec9710$@ru>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <000601d29710$edf987b0$c9ec9710$@ru>
-Date: Mon, 13 Mar 2017 13:21:59 +0000
-Message-ID: <874lyxqpl4.fsf@linaro.org>
+	(envelope-from <mlureau@redhat.com>) id 1cnQ1J-0001r3-4i
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 09:28:20 -0400
+Received: from mx6-phx2.redhat.com ([209.132.183.39]:52582)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1cnQ1I-0001qa-SK
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 09:28:17 -0400
+Date: Mon, 13 Mar 2017 09:28:14 -0400 (EDT)
+From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>
+Message-ID: <1815445054.3686730.1489411694165.JavaMail.zimbra@redhat.com>
+In-Reply-To: <7da78125-495b-4a2b-6383-d0ae22ba282b@redhat.com>
+References: <20170311132256.22951-1-marcandre.lureau@redhat.com>
+	<20170311132256.22951-5-marcandre.lureau@redhat.com>
+	<84148275-6410-68f7-4da0-345b635c42f3@redhat.com>
+	<87h92xk5p7.fsf@dusky.pond.sub.org>
+	<7da78125-495b-4a2b-6383-d0ae22ba282b@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] -rtc clock=vm with -icount 1,
- sleep=off introduces unexpected delays in device interactions
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 04/21] qobject: add quint type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,71 +30,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: "'Nutaro, James J.'" <nutarojj@ornl.gov>, mttcg@listserver.greensocs.com, pbonzini@redhat.com, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, anderson@redhat.com, mdroth@linux.vnet.ibm.com, lersek@redhat.com
 
+Hi
 
-Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
+----- Original Message -----
+> On 03/13/2017 02:15 AM, Markus Armbruster wrote:
+> > Eric Blake <eblake@redhat.com> writes:
+> >=20
+> >> On 03/11/2017 07:22 AM, Marc-Andr=C3=A9 Lureau wrote:
+> >>> The type is not used at all yet. Add some tests to exercice it.
+> >>
+> >> s/exercice/exercise/
+> >>
+> >> I wonder if we need this patch at all.
+> >>
+> >> I've been thinking about a possible alternative representation, such
+> >> that a single QInt type can cover _both_ signed and unsigned types, by
+> >> having QInt track a sign bit bool in addition to a uint64_t value.
+> >>
+>=20
+> > You say you've been thinking about extending QInt's range to cover
+> > uint64_t.  I've been thinking even more radically: replace both QInt an=
+d
+> > QFloat by QNumber.  This is how JSON *actually* works.
+> >=20
+> > The new QNumber type provides constructors from double, int64_t and
+> > uint64_t.  It also provides conversion functions to double, int64_t and
+> > uint64_t.  The latter two can fail.
+>=20
+> Interesting - I like it, as it takes my idea and goes one step further.
+> You'd want to track 64 bits of precision rather than just 53, when the
+> input was integral, but the idea seems to have some merit (we have some
+> special case in the testsuite for what happens in alternates with
+> various combinations of 'number' vs. 'int' that may need tweaking when
+> they are no longer distinguishable as QInt vs QFloat, but that's not too
+> onerous).
+>=20
 
-> I also encountered icount problems with new MTTCG patches.
->
-> Record/replay now cannot work, because iothread requests timers
-> without kicking the CPU. And cpu thread updates icount (that
-> are used for the clock).
+I wonder the benefits from hiding the real type behind a QNumber "superclas=
+s", then having to type check at a lower level. QType is not only used for =
+json, so I see some benefits from having a bit stricter type declaration an=
+d compile-time check. But I don't have a very good idea of what it would me=
+an to have a generic QNumber type, I could try to implement it to have a mo=
+re informed opinion.
 
-The interaction of kicking the vCPU while grabbing the BQL was a
-side-effect. This is now done explicitly for single-threaded emulation
-by (6546706d28):
-
-  tcg: add kick timer for single-threaded vCPU emulation
-
-> Therefore invocation of iothread uses incorrect clock and
-> all virtual timers behave incorrectly.
->
-> Record/replay is also broken because current icount is requested
-> from iothread where current_cpu (and icount progress stored in icount_extra)
-> is unavailable.
-
-I'm working through Paolo's series now but I don't see it as
-insurmountable. The aim of keeping current_cpu set only during the
-cpu-exec loop was intentional because the system as a whole can't make
-assumptions about it always being valid.
-
->
-> Pavel Dovgalyuk
->
->> -----Original Message-----
->> From: mttcg-request@listserver.greensocs.com [mailto:mttcg-request@listserver.greensocs.com]
->> On Behalf Of Nutaro, James J.
->> Sent: Friday, March 03, 2017 10:39 PM
->> To: 'mttcg@listserver.greensocs.com'
->> Cc: 'qemu-devel@nongnu.org'
->> Subject: RE: -rtc clock=vm with -icount 1,sleep=off introduces unexpected delays in device
->> interactions
->>
->> My original problem seems to stem from something that changed in the way that device emulation
->> and instruction execution interact (I'm guessing). To reproduce the issue, I started a linux
->> image with
->>
->> qemu-system-i386 -rtc clock=vm -monitor none -icount 1,sleep=off jack.img
->>
->> After booting, I run
->>
->> ping localhost
->>
->> The first round trip time reports look reasonable, being in the millisecond to sub-millisecond
->> range. These occur while the emulator is running slower than real time.
->>
->> After a bit, the emulator speeds up (skipping over idle periods during I/O?) and the round
->> trip times jump to hundreds of milliseconds, which I had not expected.
->>
->> If you want to try this experiment yourself, you can get the disk image that I used from here:
->>
->> http://www.ornl.gov/~1qn/qemu-images/jack.img
->>
->>
->> Jim
-
-
---
-Alex Bennée
+> --
+> Eric Blake   eblake redhat com    +1-919-301-3266
+> Libvirt virtualization library http://libvirt.org
+>=20
+>=20
