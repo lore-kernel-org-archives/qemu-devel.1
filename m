@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cnPVb-0004x3-Pe
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 08:55:32 -0400
+	(envelope-from <bounces@canonical.com>) id 1cnPVt-0005AZ-7I
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 08:55:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cnPVW-0003MX-UJ
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 08:55:31 -0400
-References: <20170313093104.1280-1-nikunj@linux.vnet.ibm.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <8401331f-bea9-b255-442c-161fd1d0b56e@ilande.co.uk>
-Date: Mon, 13 Mar 2017 12:54:55 +0000
+	(envelope-from <bounces@canonical.com>) id 1cnPVo-0003Rq-Am
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 08:55:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54620)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cnPVo-0003Rc-4g
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 08:55:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cnPVm-0000u3-Sj
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 12:55:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2E5472E80C0
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 12:55:41 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170313093104.1280-1-nikunj@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH fix for-2.9] target/ppc: fix cpu_ov setting
- for 32-bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 13 Mar 2017 12:48:12 -0000
+From: Leo Gaspard <1672365@bugs.launchpad.net>
+Reply-To: Bug 1672365 <1672365@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170313123815.23571.92915.malonedeb@gac.canonical.com>
+Message-Id: <20170313124813.25399.44473.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1672365] Re: nested 9pfs read fail
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,56 +36,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
-Cc: qemu-devel@nongnu.org, rth@twiddle.net
+To: qemu-devel@nongnu.org
 
-On 13/03/17 09:31, Nikunj A Dadhania wrote:
+Oh, I forgot to mention: it first worked for some time, then in the
+middle of a shell session running over a screen
+/var/lib/vm/consoles/nginx/screen from the outer VM (socat-linked to
+/var/lib/vm/consoles/nginx/socket.unix to provide a predictable pty
+link), the 9pfs stopped returning any data, and it didn't go away after
+a reboot of the inner VM, as it then no longer managed to boot.
 
-> A bug was introduced in following commit:
-> 
->     dc0ad84 target/ppc: update overflow flags for add/sub
-> 
-> As for 32-bit ppc target extracting bit 63 for overflow is not correct.
-> Made it dependent on TARGET_LOG_BITS. This had broken booting MacOS
-> 9.2.1 image
-> 
-> Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-> ---
->  target/ppc/translate.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index b6abc60..f40b5a1 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -818,7 +818,7 @@ static inline void gen_op_arith_compute_ov(DisasContext *ctx, TCGv arg0,
->          if (is_isa300(ctx)) {
->              tcg_gen_extract_tl(cpu_ov32, cpu_ov, 31, 1);
->          }
-> -        tcg_gen_extract_tl(cpu_ov, cpu_ov, 63, 1);
-> +        tcg_gen_extract_tl(cpu_ov, cpu_ov, TARGET_LONG_BITS - 1, 1);
->      }
->      tcg_gen_or_tl(cpu_so, cpu_so, cpu_ov);
->  }
-> 
+I was unfortunately unable to identify exactly which operation caused
+the thing to "stop working", but I'd say it is due to zsh's path-full
+autocompletion in paths including directories with ~700 entries, without
+being certain of that.
 
-Hi Nikunj,
+-- =
 
-I can confirm that this patch fixes the segfault for me - thanks!
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1672365
 
-Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Title:
+  nested 9pfs read fail
 
-However even with this fix in place, I'm still seeing strange horizontal
-artifacts on the screen as demonstrated here:
+Status in QEMU:
+  New
 
-https://www.ilande.co.uk/tmp/qemu/macos9-stripe.png
+Bug description:
+  tl;dr: A virtfs read fails. The init being on this virtfs (mounted by
+  the initrd), the linux kernel guest is unable to boot, and kernel
+  panics. The fact that qemu still takes 100%cpu after the kernel panic
+  makes me think it's a qemu bug.
 
-With the patch above I'll try bisecting again later today to try and
-understand where these lines are coming from. So far I've spotted them
-in MacOS 9 and OS X during tests...
+  Here is the setup (some hashes replaced with "..."):
+   * A (NixOS) host system, with /nix/store as a btrfs on lvm on cryptsetup
+   * Running a qemu-kvm NixOS guest, with /nix/.ro-store as a virtfs mappin=
+g to host /nix/store:
+  ```
+  exec /nix/store/...-qemu-x86-only-for-vm-tests-2.8.0/bin/qemu-kvm \
+      -name test \
+      -m 8192 \
+      -cpu kvm64 \
+      -net nic,vlan=3D0,model=3Dvirtio -net user,vlan=3D0 \
+      -virtfs local,path=3D/nix/store,security_model=3Dnone,mount_tag=3Dsto=
+re \
+      -virtfs local,path=3D/tmp/nix-vm..../xchg,security_model=3Dnone,mount=
+_tag=3Dxchg \
+      -virtfs local,path=3D/tmp/nix-vm..../xchg,security_model=3Dnone,mount=
+_tag=3Dshared \
+      -drive index=3D0,id=3Ddrive1,file=3D/home/ekleog/nixos/test.qcow2,if=
+=3Dvirtio,cache=3Dwriteback,werror=3Dreport \
+  -kernel /nix/store/...-nixos-system-test-17.09.git.deee8da/kernel \
+  -initrd /nix/store/...-nixos-system-test-17.09.git.deee8da/initrd \
+  -append "$(cat /nix/store/...-nixos-system-test-17.09.git.deee8da/kernel-=
+params) init=3D/nix/store/...-nixos-system-test-17.09.git.deee8da/init regI=
+nfo=3D/nix/store/...-reginfo" \
+      -vga std -usbdevice tablet
+  ```
+   * With /nix/store as an overlayfs between /nix/.ro-store and /nix/.rw-st=
+ore
+   * Running a qemu-kvm NixOS guest, with /nix/.ro-store as a virtfs mappin=
+g to host /nix/store/...-vm-nginx-store:
+  ```
+  /nix/store/...-qemu-2.8.0/bin/qemu-kvm \
+    -name nginx -m 128 -smp 2 -cpu kvm64 \
+    -nographic -serial unix:"/var/lib/vm/consoles/nginx/socket.unix",server=
+,nowait \
+    -drive file=3D"/var/lib/vm/images/nginx.img",if=3Dvirtio,media=3Ddisk \
+    -virtfs local,path=3D"/nix/store/...-vm-nginx-store",security_model=3Dn=
+one,mount_tag=3Dstore \
+    -netdev type=3Dtap,id=3Dnet0,ifname=3Dvm-nginx,script=3Dno,dscript=3Dno=
+ -device virtio-net-pci,netdev=3Dnet0,mac=3D56:00:00:00:00:01 \
+    -kernel /nix/store/...-nixos-system-nginx-17.09.git.deee8da/kernel \
+    -initrd /nix/store/...-nixos-system-nginx-17.09.git.deee8da/initrd \
+    -append "$(cat /nix/store/...-nixos-system-nginx-17.09.git.deee8da/kern=
+el-params) init=3D/nix/store/...-nixos-system-nginx-17.09.git.deee8da/init =
+console=3DttyS0 boot.shell_on_fail" \
+    -virtfs local,path=3D"/var/lib/vm/persist/nginx/home",security_model=3D=
+mapped-xattr,mount_tag=3D"shared1" \
+    -virtfs local,path=3D"/var/lib",security_model=3Dmapped-xattr,mount_tag=
+=3D"shared2" \
+    -virtfs local,path=3D"/tmp",security_model=3Dmapped-xattr,mount_tag=3D"=
+shared3"
+  ```
+   * With /nix/store as an overlayfs between /nix/.ro-store and /nix/.rw-st=
+ore
+   * With init in /nix/store
 
+  What happens is that at boot time the inner VM doesn't manage to read
+  the init script after the initrd has mounted the 9pfs and overlayfs.
 
-ATB,
+  What makes me think it's a qemu bug is that htop in the outer VM shows
+  the inner VM's qemu as using 100% cpu, despite the fact the kernel
+  it's running is under kernel panic, thus doing nothing.
 
-Mark.
+  What do you think about this?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1672365/+subscriptions
