@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cnVi4-0004Rw-7V
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 15:32:49 -0400
+	(envelope-from <eblake@redhat.com>) id 1cnVjx-0005ha-Gi
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 15:34:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cnVi0-0007Lm-6Y
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 15:32:48 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170313180432.7067-1-krzk@kernel.org>
-	<20170313180432.7067-2-krzk@kernel.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <cf23c2b4-c4c1-bb46-626e-a54851b25cbb@amsat.org>
-Date: Mon, 13 Mar 2017 16:32:40 -0300
+	(envelope-from <eblake@redhat.com>) id 1cnVjt-0008Dg-HE
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 15:34:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46992)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cnVjt-0008DF-87
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 15:34:41 -0400
+References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
+	<1489385927-6735-2-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <459261c3-cbe8-59a9-7894-942645d826bd@redhat.com>
+Date: Mon, 13 Mar 2017 14:34:38 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170313180432.7067-2-krzk@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 1/5] hw/intc/exynos4210_gic:
- Fix GIC memory mappings for secondary CPU
+In-Reply-To: <1489385927-6735-2-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="rcHI0wJ14Ck9hg5JdSBH92XN7cQukKkTK"
+Subject: Re: [Qemu-devel] [PATCH for-2.9 01/47] qapi: Factor
+ QAPISchemaParser._include() out of .__init__()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,86 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Krzysztof Kozlowski <krzk@kernel.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, Igor Mitsyanko <i.mitsyanko@gmail.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-On 03/13/2017 03:04 PM, Krzysztof Kozlowski wrote:
-> Recent Linux kernel (tested next-20170224) was complaining about missing
-> GIC mask and was unable to bring up secondary CPU:
->
->     [    0.000000] NR_IRQS:16 nr_irqs:16 16
->     [    0.000000] GIC CPU mask not found - kernel will fail to boot.
->     ...
->     [    0.400492] smp: Bringing up secondary CPUs ...
->     [    1.413184] CPU1: failed to boot: -110
->     [    1.423981] smp: Brought up 1 node, 1 CPU
->
-> In its instance_init() call, the Exynos GIC driver was setting GIC
-> memory mappings for each CPU, from 1 up to "num-cpu" property.  The
-> Exynos4210 machine init call on the other hand, first created Exynos GIC
-> device and then set the "num-cpu" property which was too late.  The init
-> already happened with default "num-cpu" value of 1 thus GIC mappings
-> were created only for the first CPU.
->
-> Split the Exynos GIC init code into realize function so the code will
-> see updated "num-cpu" property.  This fixes the warning and brings
-> second CPU:
->     [    0.435780] CPU1: thread -1, cpu 1, socket 9, mpidr 80000901
->     [    0.451838] smp: Brought up 1 node, 2 CPUs
->
-> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--rcHI0wJ14Ck9hg5JdSBH92XN7cQukKkTK
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Message-ID: <459261c3-cbe8-59a9-7894-942645d826bd@redhat.com>
+Subject: Re: [PATCH for-2.9 01/47] qapi: Factor QAPISchemaParser._include()
+ out of .__init__()
+References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
+ <1489385927-6735-2-git-send-email-armbru@redhat.com>
+In-Reply-To: <1489385927-6735-2-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
+On 03/13/2017 01:18 AM, Markus Armbruster wrote:
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  hw/intc/exynos4210_gic.c | 21 ++++++++++++++-------
->  1 file changed, 14 insertions(+), 7 deletions(-)
->
-> diff --git a/hw/intc/exynos4210_gic.c b/hw/intc/exynos4210_gic.c
-> index 2a55817b7660..222cfd6c6387 100644
-> --- a/hw/intc/exynos4210_gic.c
-> +++ b/hw/intc/exynos4210_gic.c
-> @@ -283,9 +283,20 @@ static void exynos4210_gic_set_irq(void *opaque, int irq, int level)
->
->  static void exynos4210_gic_init(Object *obj)
->  {
-> -    DeviceState *dev = DEVICE(obj);
->      Exynos4210GicState *s = EXYNOS4210_GIC(obj);
-> -    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-> +
-> +    memory_region_init(&s->cpu_container, obj, "exynos4210-cpu-container",
-> +            EXYNOS4210_EXT_GIC_CPU_REGION_SIZE);
-> +    memory_region_init(&s->dist_container, obj, "exynos4210-dist-container",
-> +            EXYNOS4210_EXT_GIC_DIST_REGION_SIZE);
-> +
-> +}
-> +
-> +static void exynos4210_gic_realize(DeviceState *dev, Error **errp)
-> +{
-> +    Exynos4210GicState *s = EXYNOS4210_GIC(dev);
-> +    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-> +    Object *obj = OBJECT(dev);
->      uint32_t i;
->      const char cpu_prefix[] = "exynos4210-gic-alias_cpu";
->      const char dist_prefix[] = "exynos4210-gic-alias_dist";
-> @@ -306,11 +317,6 @@ static void exynos4210_gic_init(Object *obj)
->      qdev_init_gpio_in(dev, exynos4210_gic_set_irq,
->                        EXYNOS4210_GIC_NIRQ - 32);
->
-> -    memory_region_init(&s->cpu_container, obj, "exynos4210-cpu-container",
-> -            EXYNOS4210_EXT_GIC_CPU_REGION_SIZE);
-> -    memory_region_init(&s->dist_container, obj, "exynos4210-dist-container",
-> -            EXYNOS4210_EXT_GIC_DIST_REGION_SIZE);
-> -
->      for (i = 0; i < s->num_cpu; i++) {
->          /* Map CPU interface per SMP Core */
->          sprintf(cpu_alias_name, "%s%x", cpu_prefix, i);
-> @@ -346,6 +352,7 @@ static void exynos4210_gic_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc = DEVICE_CLASS(klass);
->
-> +    dc->realize = exynos4210_gic_realize;
->      dc->props = exynos4210_gic_properties;
->  }
->
->
+>  scripts/qapi.py | 45 +++++++++++++++++++++++----------------------
+>  1 file changed, 23 insertions(+), 22 deletions(-)
+>=20
+
+>=20
+> +++ b/scripts/qapi.py
+> @@ -268,34 +268,15 @@ class QAPISchemaParser(object):
+>                  continue
+> =20
+>              expr =3D self.get_expr(False)
+> -            if isinstance(expr, dict) and "include" in expr:
+> +            if 'include' in expr:
+
+What happens when expr is not a dict?
+/me goes and reads get_expr()...
+aha - get_expr() can only return a dict at the top level, and we are
+only checking for includes at the top level (it can return non-dict when
+nested, but this part of __init__ is not nested).
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--rcHI0wJ14Ck9hg5JdSBH92XN7cQukKkTK
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYxvROAAoJEKeha0olJ0Nq66kIAJZnB3iBSKGmREVKau1LqmfH
+tq57q8j2Rbatmx4WBTWhgY3wGuGKrESBqv4rGEVaEODCODSDmWk0Wm//i7XdCnXx
+UiUCGCkXvfDmaqhi5menQ//jG0QEwVg8zQyPgynrIUMWUpEVYhyadKKaYXZ5hyBS
+W8STW3Ty+HLhJ34eqXk19L1XUNlosje7mRCKKQ6wZcQQ9lCiMBw3lxo6QpNgIb4l
+PwUVjj8KLDax0WCqha5lM7h6h9o7DqP0lXzNMjtDUl/WZs2zm+bazXers7873G1Q
+Rb7jL+RjiCw9pYiuFvF4UNavVkE5lmuB7UVLybUIfuiA39X0hr54Xgp2O8Ss06U=
+=HrxJ
+-----END PGP SIGNATURE-----
+
+--rcHI0wJ14Ck9hg5JdSBH92XN7cQukKkTK--
