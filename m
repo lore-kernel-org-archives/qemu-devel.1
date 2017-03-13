@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cnMiE-0006NY-Ew
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 05:56:23 -0400
+	(envelope-from <berrange@redhat.com>) id 1cnMjR-0006xa-SY
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 05:57:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cnMiB-0006sF-Cz
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 05:56:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56014)
+	(envelope-from <berrange@redhat.com>) id 1cnMjO-00079i-SM
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 05:57:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56458)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cnMiB-0006rp-4o
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 05:56:19 -0400
-Date: Mon, 13 Mar 2017 09:56:07 +0000
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cnMjO-00079Q-K6
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 05:57:34 -0400
+Date: Mon, 13 Mar 2017 09:57:23 +0000
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170313095607.GB4799@redhat.com>
+Message-ID: <20170313095723.GC4799@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <CAAo6VWO6zAijMMjHOkefO22wh+6dXigZ6a+g-pMNBcM0MN1HHw@mail.gmail.com>
+References: <20170222144407.GS19045@localhost.localdomain>
+	<CAAo6VWPWjRTE3t9myt7Q6gTnZcvP72ypTE03PCFfJkvb2UWLTA@mail.gmail.com>
+	<20170224091916.GD3702@redhat.com>
+	<CAAo6VWPyQrjSp2qjvxqXRPS8=5N85i0-DJdkWhiGaXmND_8+qA@mail.gmail.com>
+	<20170227092207.GA18219@redhat.com>
+	<CAAo6VWO6zAijMMjHOkefO22wh+6dXigZ6a+g-pMNBcM0MN1HHw@mail.gmail.com>
 	<20170301091851.GD17125@redhat.com>
 	<CAAo6VWNRhK6zvc+CferSd9wYQZNNoXDqCEW_G62crqsamyEC9Q@mail.gmail.com>
 	<20170306092305.GA9866@redhat.com>
 	<CAAo6VWMo-wYwkOAENk4swYk3dkbxaJObXrj85yDRLAUofK2qtw@mail.gmail.com>
-	<20170308091311.GC7470@redhat.com>
-	<2881DEEC-922E-4A55-9F11-5C681F5D3648@veritas.com>
-	<CAAo6VWPz9dv71ma871W69VX7iiTD0koa_32HV85u5pZZHux-0w@mail.gmail.com>
-	<20170308181158.GW7470@redhat.com>
-	<CAAo6VWNWTZ5+MoZfxA_P6p-KHi4Rsmg-gW45x33cr51OVCASSw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAAo6VWNWTZ5+MoZfxA_P6p-KHi4Rsmg-gW45x33cr51OVCASSw@mail.gmail.com>
+In-Reply-To: <CAAo6VWMo-wYwkOAENk4swYk3dkbxaJObXrj85yDRLAUofK2qtw@mail.gmail.com>
 Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
  block device type called "vxhs"
 List-Id: <qemu-devel.nongnu.org>
@@ -38,77 +38,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: ashish mittal <ashmit602@gmail.com>
-Cc: Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
+Cc: Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
 
-On Fri, Mar 10, 2017 at 07:04:38PM -0800, ashish mittal wrote:
-> On Wed, Mar 8, 2017 at 10:11 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
-> > On Wed, Mar 08, 2017 at 09:59:32AM -0800, ashish mittal wrote:
-> >> On Wed, Mar 8, 2017 at 5:04 AM, Ketan Nilangekar
-> >> <Ketan.Nilangekar@veritas.com> wrote:
-> >> >
-> >> >
-> >> >> On Mar 8, 2017, at 1:13 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
-> >> >>
-> >> >>> On Tue, Mar 07, 2017 at 05:27:55PM -0800, ashish mittal wrote:
-> >> >>> Thanks! There is one more input I need some help with!
-> >> >>>
-> >> >>> VxHS network library opens a fixed number of connection channels to a
-> >> >>> given host, and all the vdisks (that connect to the same host) share
-> >> >>> these connection channels.
-> >> >>>
-> >> >>> Therefore, we need to open secure channels to a specific target host
-> >> >>> only once for the first vdisk that connects to that host. All the
-> >> >>> other vdisks that connect to the same target host will share the same
-> >> >>> set of secure communication channels.
-> >> >>>
-> >> >>> I hope the above scheme is acceptable?
-> >> >>
-> >> >> I don't think I'm in favour of such an approach, as it forces a single
-> >> >> QEMU process to use the same privileges for all disks it uses.
-> >> >>
-> >> >> Consider an example where a QEMU process has two disks, one shared
-> >> >> readonly disk and one exclusive writable disk, both on the same host.
-> >> >>
-> >> >
-> >> > This is not a use case for VxHS as a solution. We do not support sharing of vdisks across QEMU instances.
-> >> >
-> >> > Vxhs library was thus not designed to open different connections for individual vdisks within a QEMU instance.
-> >> >
-> >> > Implementing this will involve rewrite of significant parts of libvxhs client and server. Is this a new requirement for acceptance into QEMU?
-> >> >
-> >> >
-> >> >> It is reasonable as an administrator to want to use different credentials
-> >> >> for each of these. ie, they might have a set of well known credentials to
-> >> >> authenticate to get access to the read-only disk, but have a different set
-> >> >> of strictly limited access credentials to get access to the writable disk
-> >> >>
-> >> >> Trying to re-use the same connection for multiple cause prevents QEMU from
-> >> >> authenticating with different credentials per disk, so I don't think that
-> >> >> is a good approach - each disk should have totally independant state.
-> >> >>
-> >>
-> >> libvxhs does not make any claim to fit all the general purpose
-> >> use-cases. It was purpose-built to be the communication channel for
-> >> our block device service. As such, we do not need/support all the
-> >> general use-cases. For the same reason we changed the name of the
-> >> library from linqnio to libvxhs (v8 changelog, #2).
-> >
-> > I raise these kind of points because they are relevant to apps like
-> > OpenStack, against which you've proposed VHXS support. OpenStack
-> > intends to allow a single volume to be shared by multiple guests,
-> > so declare that out of scope you're crippling certain use cases
-> > within openstack. Of course you're free to make such a decision,
-> > but it makes VHXS a less compelling technology to use IMHO.
-> >
+On Tue, Mar 07, 2017 at 05:27:55PM -0800, ashish mittal wrote:
+> Thanks! There is one more input I need some help with!
 > 
-> Fair point! Sharing of the same disk across multiple guests would
-> require significant work from our side, and we would like to evaluate
-> that after OpenStack starts supporting the feature. Would adding this
-> support now, be a prerequisite for merging vxhs code to qemu?
+> VxHS network library opens a fixed number of connection channels to a
+> given host, and all the vdisks (that connect to the same host) share
+> these connection channels.
+> 
+> Therefore, we need to open secure channels to a specific target host
+> only once for the first vdisk that connects to that host. All the
+> other vdisks that connect to the same target host will share the same
+> set of secure communication channels.
+> 
+> I hope the above scheme is acceptable?
+> 
+> If yes, then we have a couple of options to implement this:
+> 
+> (1) Accept the TLS credentials per vdisk using the previously
+> discussed --object tls-creds-x509 mechanism. In this case, if more
+> than one vdisk have the same host info, then we will use only the
+> first one's creds to set up the secure connection, and ignore the
+> others. vdisks that connect to different target hosts will use their
+> individual tls-creds-x509 to set up the secure channels. This is, of
+> course, not relevant for qemu-img/qemu-io as they can open only one
+> vdisk at a time.
 
-No, it isn't a requirement - just a (strong-ish) suggestion. We just need
-to ensure that the CLI syntax allows us to support it in the future without
-backwards incompatible changes to the CLI.
+It looks like option 1 here is the way to go. Just report an error if
+there are multiple creds provided for the same host and they don't
+match.
+
+> 
+> (2) Instead of having a per-vdisk --object tls-creds-x509, have a
+> single such argument on the command line for vxhs block device code to
+> consume - if that is possible! One way to achieve this could be the
+> user/password authentication we discussed earlier, which we could use
+> to pass the directory where cert/keys are kept.
+> 
+> (3) Use the instance UUID, when available, to lookup the cert files
+> per instance (i.e. for qemu-kvm), and use the --object tls-creds-x509
+> mechanism, when instance UUID is NULL (i.e. qemu-io, qemu-img etc).
+> The cert/key files are anyway protected by file permissions in either
+> case, so I guess there is no additional security provided by either
+> method.
 
 Regards,
 Daniel
