@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53710)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cnQnD-0007QD-32
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 10:17:47 -0400
+	(envelope-from <clg@kaod.org>) id 1cnR2l-0002Mp-9e
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 10:33:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cnQnC-0003K4-8n
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 10:17:47 -0400
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:37849)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cnQnC-0003Jq-27
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 10:17:46 -0400
-Received: by mail-wm0-x234.google.com with SMTP id n11so41126636wma.0
-	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 07:17:46 -0700 (PDT)
+	(envelope-from <clg@kaod.org>) id 1cnR2i-0000pr-6v
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 10:33:51 -0400
+Received: from 8.mo1.mail-out.ovh.net ([178.33.110.239]:48343)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cnR2i-0000of-0b
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 10:33:48 -0400
+Received: from player730.ha.ovh.net (b7.ovh.net [213.186.33.57])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id D872461374
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 15:33:43 +0100 (CET)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Mon, 13 Mar 2017 15:33:25 +0100
+Message-Id: <1489415605-13105-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <871su1w9jc.fsf@secure.mitica>
-References: <87tw6y8bs8.fsf@secure.mitica>
-	<CAFEAcA978SJemCfYJPa8jwtuhhi6JGh9pEDGYNJ1npJA3nvEQA@mail.gmail.com>
-	<871su1w9jc.fsf@secure.mitica>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 13 Mar 2017 15:17:24 +0100
-Message-ID: <CAFEAcA8oAFqQrTE5bq_yZvoLkQhm4HqAiA16Kdzo6mSVjPg7eQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] KVM call for 2017-03-14
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] vnc: replace hweight_long() with ctpopl()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,25 +27,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: KVM devel mailing list <kvm@vger.kernel.org>, QEMU Developer <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-On 13 March 2017 at 15:12, Juan Quintela <quintela@redhat.com> wrote:
-> Peter Maydell <peter.maydell@linaro.org> wrote:
->>     [Making QEMU more modular would help with defeating the legacy
->>     and back-compat dragons, though]
->
-> That would be ideal, but where to start?  Think of something as "simple"
-> asd adding a struct of operations that implement the differences for
-> TCG, xen and kvm.  And you see that you get into having to rewrite lot
-> of code after moving to that abstraction just the more simple
-> operations.
+ctpopl() has a better implementation than hweight_long() and ui/vnc.c
+being the last user of hweight_long(), we can simply remove it.
 
-Oh, indeed, it's a huge and painful amount of work that
-doesn't actually produce a product with more features when
-you've done it. But if it was simple and easy we'd have
-already done it and it wouldn't merit listing on a
-"big problems we need to solve somehow" list :-)
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ include/qemu/bitops.h | 10 ----------
+ ui/vnc.c              |  6 +++---
+ 2 files changed, 3 insertions(+), 13 deletions(-)
 
-thanks
--- PMM
+diff --git a/include/qemu/bitops.h b/include/qemu/bitops.h
+index 1881284cb5f3..3f0926cf40ca 100644
+--- a/include/qemu/bitops.h
++++ b/include/qemu/bitops.h
+@@ -201,16 +201,6 @@ static inline unsigned long find_first_zero_bit(cons=
+t unsigned long *addr,
+     return find_next_zero_bit(addr, size, 0);
+ }
+=20
+-static inline unsigned long hweight_long(unsigned long w)
+-{
+-    unsigned long count;
+-
+-    for (count =3D 0; w; w >>=3D 1) {
+-        count +=3D w & 1;
+-    }
+-    return count;
+-}
+-
+ /**
+  * rol8 - rotate an 8-bit value left
+  * @word: value to rotate
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 51f4b309596e..8a2789a8c26b 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -2154,15 +2154,15 @@ static void set_pixel_format(VncState *vs, int bi=
+ts_per_pixel,
+     }
+=20
+     vs->client_pf.rmax =3D red_max ? red_max : 0xFF;
+-    vs->client_pf.rbits =3D hweight_long(red_max);
++    vs->client_pf.rbits =3D ctpopl(red_max);
+     vs->client_pf.rshift =3D red_shift;
+     vs->client_pf.rmask =3D red_max << red_shift;
+     vs->client_pf.gmax =3D green_max ? green_max : 0xFF;
+-    vs->client_pf.gbits =3D hweight_long(green_max);
++    vs->client_pf.gbits =3D ctpopl(green_max);
+     vs->client_pf.gshift =3D green_shift;
+     vs->client_pf.gmask =3D green_max << green_shift;
+     vs->client_pf.bmax =3D blue_max ? blue_max : 0xFF;
+-    vs->client_pf.bbits =3D hweight_long(blue_max);
++    vs->client_pf.bbits =3D ctpopl(blue_max);
+     vs->client_pf.bshift =3D blue_shift;
+     vs->client_pf.bmask =3D blue_max << blue_shift;
+     vs->client_pf.bits_per_pixel =3D bits_per_pixel;
+--=20
+2.7.4
