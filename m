@@ -1,37 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44523)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cnIZa-0001Fa-HV
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 01:31:12 -0400
+	(envelope-from <armbru@redhat.com>) id 1cnJ5y-0004z4-UF
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:04:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cnIZX-0005SW-A4
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 01:31:10 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52579)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cnIZX-0005RK-0Q
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 01:31:07 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2D5Of3t012738
-	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 01:31:05 -0400
-Received: from e23smtp04.au.ibm.com (e23smtp04.au.ibm.com [202.81.31.146])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 294cej2sds-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 01:31:04 -0400
-Received: from localhost
-	by e23smtp04.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Mon, 13 Mar 2017 15:31:02 +1000
-From: aNikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <16ea2d8e-7d41-e323-4df2-cd082080e3db@ilande.co.uk>
-References: <16ea2d8e-7d41-e323-4df2-cd082080e3db@ilande.co.uk>
-Date: Mon, 13 Mar 2017 10:59:56 +0530
+	(envelope-from <armbru@redhat.com>) id 1cnJ5t-0004Nz-9o
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:04:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38362)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cnJ5t-0004Mx-23
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:04:33 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170303185427.32681-1-jsnow@redhat.com>
+	<CAMr-obuiwE_ef6OPSJbBtmZYsaqo_mzU9E6q8zhbrviZ6_=krQ@mail.gmail.com>
+	<5303cac4-a8d8-bf89-b525-3b0fb1b19127@redhat.com>
+	<CAMr-obsrUqvqbLabYgKgv1J+ztn5XCwto6LowoN=S0ZWuFLZMA@mail.gmail.com>
+	<871sua4y3u.fsf@dusky.pond.sub.org>
+	<3fbdfabf-82b4-d774-d5f4-2c50a6d740dc@redhat.com>
+	<87efy9ijrf.fsf@dusky.pond.sub.org>
+	<c9905f84-846a-4656-14cd-a8bd7628ea08@redhat.com>
+	<878tog1dtc.fsf@dusky.pond.sub.org>
+	<CAMr-obtywhYemkHd8=mjXFHT=NZM4uAFC-H8ftJbPjTtciU__g@mail.gmail.com>
+Date: Mon, 13 Mar 2017 07:04:29 +0100
+In-Reply-To: <CAMr-obtywhYemkHd8=mjXFHT=NZM4uAFC-H8ftJbPjTtciU__g@mail.gmail.com>
+	(Nir Soffer's message of "Wed, 8 Mar 2017 18:13:27 +0200")
+Message-ID: <87fuihn24y.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Message-Id: <87r321wxpn.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] qemu-system-ppc regression booting MacOS 9.2.1
- image
+Subject: Re: [Qemu-devel] [PATCH v2] qmp-shell: add persistent command
+ history
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,133 +36,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
+To: Nir Soffer <nirsof@gmail.com>
+Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
 
-Hi Mark,
+Nir Soffer <nirsof@gmail.com> writes:
 
-Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
-> Hi Nikunj,
+> On Wed, Mar 8, 2017 at 8:29 AM, Markus Armbruster <armbru@redhat.com> wrote:
+>> John Snow <jsnow@redhat.com> writes:
+>>
+>>> On 03/07/2017 03:16 AM, Markus Armbruster wrote:
+>>>> John Snow <jsnow@redhat.com> writes:
+>>>>
+>>>>> On 03/06/2017 03:18 AM, Markus Armbruster wrote:
+>>>>>> Nir Soffer <nirsof@gmail.com> writes:
+>>>>>>
+>>>>>>> On Fri, Mar 3, 2017 at 9:29 PM, John Snow <jsnow@redhat.com> wrote:
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> On 03/03/2017 02:26 PM, Nir Soffer wrote:
+>>>>>>>>> On Fri, Mar 3, 2017 at 8:54 PM, John Snow <jsnow@redhat.com> wrote:
+>>>>>>>>>> Use the existing readline history function we are utilizing
+>>>>>>>>>> to provide persistent command history across instances of qmp-shell.
+>>>>>>>>>>
+>>>>>>>>>> This assists entering debug commands across sessions that may be
+>>>>>>>>>> interrupted by QEMU sessions terminating, where the qmp-shell has
+>>>>>>>>>> to be relaunched.
+>>>>>>>>>>
+>>>>>>>>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>>>>>>>>> ---
+>>>>>>>>>>
+>>>>>>>>>> v2: Adjusted the errors to whine about non-ENOENT errors, but still
+>>>>>>>>>>     intercept all errors as non-fatal.
+>>>>>>>>>>     Save history atexit() to match bash standard behavior
+>>>>>>>>>>
+>>>>>>>>>>  scripts/qmp/qmp-shell | 19 +++++++++++++++++++
+>>>>>>>>>>  1 file changed, 19 insertions(+)
+>>>>>>>>>>
+>>>>>>>>>> diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
+>>>>>>>>>> index 0373b24..55a8285 100755
+>>>>>>>>>> --- a/scripts/qmp/qmp-shell
+>>>>>>>>>> +++ b/scripts/qmp/qmp-shell
+>>>>>>>>>> @@ -70,6 +70,9 @@ import json
+>>>>>>>>>>  import ast
+>>>>>>>>>>  import readline
+>>>>>>>>>>  import sys
+>>>>>>>>>> +import os
+>>>>>>>>>> +import errno
+>>>>>>>>>> +import atexit
+>>>>>>>>>>
+>>>>>>>>>>  class QMPCompleter(list):
+>>>>>>>>>>      def complete(self, text, state):
+>>>>>>>>>> @@ -109,6 +112,7 @@ class QMPShell(qmp.QEMUMonitorProtocol):
+>>>>>>>>>>          self._pretty = pretty
+>>>>>>>>>>          self._transmode = False
+>>>>>>>>>>          self._actions = list()
+>>>>>>>>>> +        self._histfile = os.path.join(os.path.expanduser('~'), '.qmp_history')
+>>>>>>
+>>>>>> I selfishly object to this filename, because I'm using it with
+>>>>>>
+>>>>>>     $ socat UNIX:/work/armbru/images/test-qmp READLINE,history=$HOME/.qmp_history,prompt='QMP> '
+>>>>>>
+>>>>>> Just kidding.  But seriously, shouldn't this be named after the
+>>>>>> *application* (qmp-shell) rather than the protocol (qmp)?
+>>>>>>
+>>>>>
+>>>>> Seeing as the history itself is the qmp-shell syntax, you are correct.
+>>>>>
+>>>>> (Hey, it would be interesting to store the generated QMP into the
+>>>>> qmp_history, though...!)
+>>>>
+>>>> Hah!  Saving it would be easy enough, but reloading it...  okay, call it
+>>>> a "backup" and declare victory when saving works.
+>>>>
+>>>>>>>>>>
+>>>>>>>>>>      def __get_address(self, arg):
+>>>>>>>>>>          """
+>>>>>>>>>> @@ -137,6 +141,21 @@ class QMPShell(qmp.QEMUMonitorProtocol):
+>>>>>>>>>>          # XXX: default delimiters conflict with some command names (eg. query-),
+>>>>>>>>>>          # clearing everything as it doesn't seem to matter
+>>>>>>>>>>          readline.set_completer_delims('')
+>>>>>>>>>> +        try:
+>>>>>>>>>> +            readline.read_history_file(self._histfile)
+>>>>>>>>>> +        except Exception as e:
+>>>>>>>>>> +            if isinstance(e, IOError) and e.errno == errno.ENOENT:
+>>>>>>>>>> +                # File not found. No problem.
+>>>>>>>>>> +                pass
+>>>>>>>>>> +            else:
+>>>>>>>>>> +                print "Failed to read history '%s'; %s" % (self._histfile, e)
+>>>>>>>>>
+>>>>>>>>> I would handle only IOError, since any other error means a bug in this code
+>>>>>>>>> or in the underlying readline library, and the best way to handle this is to
+>>>>>>>>> let it fail loudly.
+>>>>>>>>>
+>>>>>>>>
+>>>>>>>> Disagree. No reason to stop the shell from working because a QOL feature
+>>>>>>>> didn't initialize correctly.
+>>>>>>>>
+>>>>>>>> The warning will be enough to solicit reports and fixes if necessary.
+>>>>>>>
+>>>>>>> I agree, the current solution is good tradeoff.
+>>>>>>
+>>>>>> For what it's worth, bash seems to silently ignore a history file it
+>>>>>> can't read.  Tested by running "HISTFILE=xxx bash", then chmod 0 xxx, da
+>>>>>> capo.
+>>>>>>
+>>>>>
+>>>>> Right, done by example.
+>>>>>
+>>>>>>> One thing missing, is a call to readline.set_history_length, without
+>>>>>>> it the history
+>>>>>>> will grow without limit, see:
+>>>>>>> https://docs.python.org/2/library/readline.html#readline.set_history_length
+>>>>>>
+>>>>>> Should this be addressed for 2.9?
+>>>>>>
+>>>>>
+>>>>> You can add a limit if you want to; I don't have suggestions for which
+>>>>> completely arbitrary limit makes sense, so I left it blank intentionally.
+>>>>
+>>>> For what it's worth, bash defaults HISTSIZE to 500.
+>>>>
+>>>> GNU Readline lets users configure it in ~/.inputrc.  Conditional
+>>>> configuration is possible, i.e. something like
+>>>>
+>>>>     $if Qmp-shell
+>>>>     set history-size 5000
+>>>>     $endif
+>>>>
+>>>> should work, provided qmp-shell sets rl_readline_name as it should.
+>>>>
+>>>
+>>> Spoke too soon. I don't see a way to control this in python's readline
+>>> library... I'm not very familiar with readline, is there some
+>>> environment variable or something perhaps?
+>>> (It looks like python's code just hard-sets it to "python" ...)
+>>
+>> How sad.  If https://bugs.python.org/ didn't require a login, I would've
+>> filed a bug already.
+>>
+>> I'm afraid all I can offer meanwhile is INPUTRC:
+>>
+>>     Any user can customize programs that use Readline by putting
+>>     commands in an "inputrc" file, conventionally in his home directory.
+>>     The name of this file is taken from the value of the environment
+>>     variable `INPUTRC'.  If that variable is unset, the default is
+>>     `~/.inputrc'.  If that file does not exist or cannot be read, the
+>>     ultimate default is `/etc/inputrc'.
+>>
 >
-> Testing git master locally I see the following segfault when trying to
-> boot my test MacOS 9.2.1 image:
->
->
-> $ gdb --args ./qemu-system-ppc -bios
-> /home/build/src/openbios/openbios.git/openbios/obj-ppc/openbios-qemu.elf.nostrip
-> -cdrom /home/build/src/qemu/image/ppc/MacOS921.iso -boot d -m 512 -M mac99
+> Having a way to limit history globally looks good enough.
 
-Is it possible for you to share the iso image for MAC ?
+Certainly good enough for merging qmp-shell patches.
 
-> GNU gdb (GDB) 7.4.1-debian
-> Copyright (C) 2012 Free Software Foundation, Inc.
-> License GPLv3+: GNU GPL version 3 or later
-> <http://gnu.org/licenses/gpl.html>
-> This is free software: you are free to change and redistribute it.
-> There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
-> and "show warranty" for details.
-> This GDB was configured as "x86_64-linux-gnu".
-> For bug reporting instructions, please see:
-> <http://www.gnu.org/software/gdb/bugs/>...
-> Reading symbols from /home/build/rel-qemu-git/bin/qemu-system-ppc...done.
-> (gdb) r
-> Starting program: /home/build/rel-qemu-git/bin/qemu-system-ppc -bios
-> /home/build/src/openbios/openbios.git/openbios/obj-ppc/openbios-qemu.elf.nostrip
-> -cdrom /home/build/src/qemu/image/ppc/MacOS921.iso -boot d -m 512 -M mac99
-> warning: no loadable sections found in added symbol-file system-supplied
-> DSO at 0x7ffff7ffa000
-> [Thread debugging using libthread_db enabled]
-> Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
-> [New Thread 0x7fffe9eee700 (LWP 29713)]
-> [New Thread 0x7fffe6bf5700 (LWP 29714)]
-> [New Thread 0x7fffe63f4700 (LWP 29715)]
-> Trying to write invalid spr 0 (0x000) at 00f113c0
-> Trying to read invalid spr 0 (0x000) at 00f113c8
-> Trying to write privileged spr 955 (0x3bb) at 00f164b8
-> Trying to write invalid spr 959 (0x3bf) at 00f16520
-> Trying to read invalid spr 959 (0x3bf) at 00f16528
-> Trying to write privileged spr 955 (0x3bb) at 00f164b8
-> Trying to write invalid spr 959 (0x3bf) at 00f16520
-> Trying to read invalid spr 959 (0x3bf) at 00f16528
+> Note that python readline does not report the readline
+> limit correctly (get_history_length() returns -1), but saving
+> history uses the limit defined  in .inputrc.
 >
-> Program received signal SIGSEGV, Segmentation fault.
-> [Switching to Thread 0x7fffe63f4700 (LWP 29715)]
-> 0x00007ffff7e20010 in ?? ()
-> (gdb) bt
-> #0  0x00007ffff7e20010 in ?? ()
-> #1  0x0000000000000002 in ?? ()
-> #2  0x0000000068090040 in ?? ()
-> #3  0x0000000000000002 in ?? ()
-> #4  0x6b67829c063b8d00 in ?? ()
-> #5  0x6b67829c063b8d00 in ?? ()
-> #6  0x000000000043986d in tcg_temp_new_internal_i32
-> (temp_local=temp_local@entry=0) at
-> /home/build/src/qemu/git/qemu/tcg/tcg.c:632
-> #7  0x00000000004434a5 in tcg_temp_new_i32 () at
-> /home/build/src/qemu/git/qemu/tcg/tcg.h:807
-> #8  tcg_gen_andc_i32 (ret=0xa, arg1=0x7fffe63f3848, arg2=0x3f) at
-> /home/build/src/qemu/git/qemu/tcg/tcg-op.c:411
-> #9  0x00000000005099ad in gen_op_arith_compute_ov (arg0=arg0@entry=0xd7,
-> arg1=arg1@entry=0x6a, arg2=0xd8, arg2@entry=0xa, sub=sub@entry=0,
-> ctx=<error reading variable: Unhandled dwarf expression opcode 0xfa>)
->     at /home/build/src/qemu/git/qemu/target/ppc/translate.c:821
-> #10 0x00000000005631b1 in gen_op_arith_add (compute_rc0=true,
-> compute_ov=true, compute_ca=true, add_ca=false, arg2=0xa, arg1=0x6a,
-> ret=0x3a, ctx=0x7fffe63f3800) at
-> /home/build/src/qemu/git/qemu/target/ppc/translate.c:895
-> #11 gen_addco (ctx=0x7fffe63f3800) at
-> /home/build/src/qemu/git/qemu/target/ppc/translate.c:931
-> #12 0x00000000005796ba in gen_intermediate_code
-> (env=env@entry=0x7ffff7e282a0, tb=tb@entry=0x7fffe6db6a80) at
-> /home/build/src/qemu/git/qemu/target/ppc/translate.c:7287
-> #13 0x000000000043381a in tb_gen_code (cpu=cpu@entry=0x7ffff7e20010,
-> pc=pc@entry=1745420352, cs_base=cs_base@entry=0, flags=16432,
-> cflags=cflags@entry=0) at /home/build/src/qemu/git/qemu/translate-all.c:1281
-> #14 0x0000000000435a32 in tb_find (tb_exit=0, last_tb=0x0,
-> cpu=0x7ffff7e20010) at /home/build/src/qemu/git/qemu/cpu-exec.c:370
-> #15 cpu_exec (cpu=cpu@entry=0x7ffff7e20010) at
-> /home/build/src/qemu/git/qemu/cpu-exec.c:685
-> #16 0x000000000047457e in tcg_cpu_exec (cpu=0x7ffff7e20010) at
-> /home/build/src/qemu/git/qemu/cpus.c:1251
-> #17 0x00000000004748b4 in qemu_tcg_rr_cpu_thread_fn (arg=<optimized
-> out>) at /home/build/src/qemu/git/qemu/cpus.c:1347
-> #18 0x00007ffff2a50b50 in start_thread (arg=<optimized out>) at
-> pthread_create.c:304
-> #19 0x00007ffff279afbd in clone () at
-> ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
-> #20 0x0000000000000000 in ?? ()
-> (gdb)
+> Playing with this, I found a nice bug - if you set history
+> size to N, and your history file contains 2 * N items or more,
+> python segfaults when entering the first input line.
 >
-> git bisect points to the following commit:
->
-> commit dc0ad84449a4e2f28d2cc055998cb10c1a4d89a9
-> Author: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-> Date:   Mon Feb 27 10:27:57 2017 +0530
->
->     target/ppc: update overflow flags for add/sub
->
->     * SO and OV reflects overflow of the 64-bit result in 64-bit mode
->       and overflow of the low-order 32-bit result in 32-bit mode
->
->     * OV32 reflects overflow of the low-order 32-bit independent of
->       the mode
->
->     Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
->     Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->
-> Interestingly enough if I recompile with CFLAGS="-O0 -g" to try and get
-> a full backtrace then the segfault goes away which suggests this could
-> be tickling a compiler bug somewhere - although even in this
-> configuration, I am seeing video artifacts during OS 9 boot which
-> suggests something still isn't quite right.
+> I'll file a python bug later.
 
-Yes, I reviewed the code, looks correct. Should be some optimization
-related.
+Please do.
 
->
-> This is on a Debian wheezy x86_64 system with gcc 4.7.2.
+If you could throw in a (separate) request for letting us set
+rl_readline_name, that would be great.
 
-Will have a detailed look today.
-
-Regards
-Nikunj
+[...]
