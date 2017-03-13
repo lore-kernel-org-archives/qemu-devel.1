@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cnXis-0008DC-KN
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 17:41:49 -0400
+	(envelope-from <aarcange@redhat.com>) id 1cnXnl-0004Lm-PG
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 17:46:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cnXip-0002EG-DP
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 17:41:46 -0400
-From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 13 Mar 2017 22:41:17 +0100
-Message-Id: <20170313214117.27350-7-mreitz@redhat.com>
-In-Reply-To: <20170313214001.26339-1-mreitz@redhat.com>
-References: <20170313214001.26339-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.10 16/16] iotests: Add preallocated
- growth test for qcow2
+	(envelope-from <aarcange@redhat.com>) id 1cnXng-00057Y-H0
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 17:46:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55144)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aarcange@redhat.com>) id 1cnXng-00056v-8j
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 17:46:44 -0400
+Date: Mon, 13 Mar 2017 22:46:36 +0100
+From: Andrea Arcangeli <aarcange@redhat.com>
+Message-ID: <20170313214636.GK27056@redhat.com>
+References: <CGME20170310140816eucas1p2bd85d3759739d64bb184ce0fbd74f90d@eucas1p2.samsung.com>
+	<20170310140806.GA11225@aperevalov-ubuntu>
+	<20170313105338.GA2626@work-vm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170313105338.GA2626@work-vm>
+Subject: Re: [Qemu-devel] Dual userfaultfd behavior
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,557 +28,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Alexey Perevalov <a.perevalov@samsung.com>, qemu-devel@nongnu.org, Mike Kravetz <mike.kravetz@oracle.com>
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/125     | 130 +++++++++++++++
- tests/qemu-iotests/125.out | 386 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 517 insertions(+)
- create mode 100755 tests/qemu-iotests/125
- create mode 100644 tests/qemu-iotests/125.out
+Hello,
 
-diff --git a/tests/qemu-iotests/125 b/tests/qemu-iotests/125
-new file mode 100755
-index 0000000000..9424313e82
---- /dev/null
-+++ b/tests/qemu-iotests/125
-@@ -0,0 +1,130 @@
-+#!/bin/bash
-+#
-+# Test preallocated growth of qcow2 images
-+#
-+# Copyright (C) 2017 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=mreitz@redhat.com
-+
-+seq=$(basename $0)
-+echo "QA output created by $seq"
-+
-+here=$PWD
-+status=1	# failure is the default!
-+
-+_cleanup()
-+{
-+	_cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+get_image_size_on_host()
-+{
-+    $QEMU_IMG info -f "$IMGFMT" "$TEST_IMG" | grep "disk size" \
-+        | sed -e 's/^[^0-9]*\([0-9]\+\).*$/\1/'
-+}
-+
-+# get standard environment and filters
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt qcow2
-+_supported_proto file
-+_supported_os Linux
-+
-+if [ -z "$TEST_IMG_FILE" ]; then
-+    TEST_IMG_FILE=$TEST_IMG
-+fi
-+
-+# Generally, we create some image with or without existing preallocation and
-+# then resize it. Then we write some data into the image and verify that its
-+# size does not change if we have used preallocation.
-+
-+# With a cluster size of 512 B, one L2 table covers 64 * 512 B = 32 kB.
-+# One cluster of the L1 table covers 64 * 32 kB = 2 MB.
-+# There are multiple cases we want to test:
-+# (1) Grow an image without having to allocate a new L2 table.
-+# (2) Grow an image, having to allocate a new L2 table.
-+# (3) Grow an image, having to grow the L1 table.
-+# Therefore, we create an image that is 48 kB below 2 MB. Then:
-+# (1) We resize it to 2 MB - 32 kB. (+ 16 kB)
-+# (2) We resize it to 2 MB.         (+ 48 kB)
-+# (3) We resize it to 2 MB + 32 kB. (+ 80 kB)
-+
-+# in B
-+CREATION_SIZE=$((2 * 1024 * 1024 - 48 * 1024))
-+
-+# in kB
-+for GROWTH_SIZE in 16 48 80; do
-+    for create_mode in off metadata falloc full; do
-+        for growth_mode in off metadata falloc full; do
-+            echo "--- growth_size=$GROWTH_SIZE create_mode=$create_mode growth_mode=$growth_mode ---"
-+
-+            IMGOPTS="preallocation=$create_mode,cluster_size=512" _make_test_img ${CREATION_SIZE}
-+            $QEMU_IMG resize -f "$IMGFMT" --preallocation=$growth_mode "$TEST_IMG" +${GROWTH_SIZE}K
-+
-+            host_size_0=$(get_image_size_on_host)
-+            file_length_0=$(stat -c '%s' "$TEST_IMG_FILE")
-+
-+            $QEMU_IO -c "write 0 $CREATION_SIZE" "$TEST_IMG" | _filter_qemu_io
-+
-+            host_size_1=$(get_image_size_on_host)
-+            file_length_1=$(stat -c '%s' "$TEST_IMG_FILE")
-+
-+            $QEMU_IO -c "write $CREATION_SIZE ${GROWTH_SIZE}K" "$TEST_IMG" | _filter_qemu_io
-+
-+            host_size_2=$(get_image_size_on_host)
-+            file_length_2=$(stat -c '%s' "$TEST_IMG_FILE")
-+
-+            # Test creation preallocation: Compare #0 against #1
-+            if [ $create_mode != off ]; then
-+                # The image length should not have grown
-+                if [ $file_length_1 -gt $file_length_0 ]; then
-+                    echo "ERROR (create): Image length has grown from $file_length_0 to $file_length_1"
-+                fi
-+                if [ $create_mode != metadata ]; then
-+                    # The host size should not have grown either
-+                    if [ $host_size_1 -gt $host_size_0 ]; then
-+                        echo "ERROR (create): Host size has grown from $host_size_0 to $host_size_1"
-+                    fi
-+                fi
-+            fi
-+
-+            # Test resize preallocation: Compare #2 against #1
-+            if [ $growth_mode != off ]; then
-+                # The image length should not have grown
-+                if [ $file_length_2 -gt $file_length_1 ]; then
-+                    echo "ERROR (grow): Image length has grown from $file_length_1 to $file_length_2"
-+                fi
-+                if [ $create_mode != metadata ]; then
-+                    # The host size should not have grown either
-+                    if [ $host_size_2 -gt $host_size_1 ]; then
-+                        echo "ERROR (grow): Host size has grown from $host_size_1 to $host_size_2"
-+                    fi
-+                fi
-+            fi
-+
-+            echo
-+        done
-+    done
-+done
-+
-+# success, all done
-+echo '*** done'
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/125.out b/tests/qemu-iotests/125.out
-new file mode 100644
-index 0000000000..3f4d6e31a6
---- /dev/null
-+++ b/tests/qemu-iotests/125.out
-@@ -0,0 +1,386 @@
-+QA output created by 125
-+--- growth_size=16 create_mode=off growth_mode=off ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 16384/16384 bytes at offset 2048000
-+16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=16 create_mode=off growth_mode=metadata ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 16384/16384 bytes at offset 2048000
-+16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=16 create_mode=off growth_mode=falloc ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 16384/16384 bytes at offset 2048000
-+16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=16 create_mode=off growth_mode=full ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 16384/16384 bytes at offset 2048000
-+16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=16 create_mode=metadata growth_mode=off ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 16384/16384 bytes at offset 2048000
-+16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=16 create_mode=metadata growth_mode=metadata ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 16384/16384 bytes at offset 2048000
-+16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=16 create_mode=metadata growth_mode=falloc ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 16384/16384 bytes at offset 2048000
-+16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=16 create_mode=metadata growth_mode=full ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 16384/16384 bytes at offset 2048000
-+16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=16 create_mode=falloc growth_mode=off ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 16384/16384 bytes at offset 2048000
-+16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=16 create_mode=falloc growth_mode=metadata ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 16384/16384 bytes at offset 2048000
-+16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=16 create_mode=falloc growth_mode=falloc ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 16384/16384 bytes at offset 2048000
-+16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=16 create_mode=falloc growth_mode=full ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 16384/16384 bytes at offset 2048000
-+16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=16 create_mode=full growth_mode=off ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 16384/16384 bytes at offset 2048000
-+16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=16 create_mode=full growth_mode=metadata ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 16384/16384 bytes at offset 2048000
-+16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=16 create_mode=full growth_mode=falloc ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 16384/16384 bytes at offset 2048000
-+16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=16 create_mode=full growth_mode=full ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 16384/16384 bytes at offset 2048000
-+16 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=48 create_mode=off growth_mode=off ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 49152/49152 bytes at offset 2048000
-+48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=48 create_mode=off growth_mode=metadata ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 49152/49152 bytes at offset 2048000
-+48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=48 create_mode=off growth_mode=falloc ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 49152/49152 bytes at offset 2048000
-+48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=48 create_mode=off growth_mode=full ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 49152/49152 bytes at offset 2048000
-+48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=48 create_mode=metadata growth_mode=off ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 49152/49152 bytes at offset 2048000
-+48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=48 create_mode=metadata growth_mode=metadata ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 49152/49152 bytes at offset 2048000
-+48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=48 create_mode=metadata growth_mode=falloc ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 49152/49152 bytes at offset 2048000
-+48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=48 create_mode=metadata growth_mode=full ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 49152/49152 bytes at offset 2048000
-+48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=48 create_mode=falloc growth_mode=off ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 49152/49152 bytes at offset 2048000
-+48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=48 create_mode=falloc growth_mode=metadata ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 49152/49152 bytes at offset 2048000
-+48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=48 create_mode=falloc growth_mode=falloc ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 49152/49152 bytes at offset 2048000
-+48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=48 create_mode=falloc growth_mode=full ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 49152/49152 bytes at offset 2048000
-+48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=48 create_mode=full growth_mode=off ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 49152/49152 bytes at offset 2048000
-+48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=48 create_mode=full growth_mode=metadata ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 49152/49152 bytes at offset 2048000
-+48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=48 create_mode=full growth_mode=falloc ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 49152/49152 bytes at offset 2048000
-+48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=48 create_mode=full growth_mode=full ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 49152/49152 bytes at offset 2048000
-+48 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=80 create_mode=off growth_mode=off ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 81920/81920 bytes at offset 2048000
-+80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=80 create_mode=off growth_mode=metadata ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 81920/81920 bytes at offset 2048000
-+80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=80 create_mode=off growth_mode=falloc ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 81920/81920 bytes at offset 2048000
-+80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=80 create_mode=off growth_mode=full ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=off
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 81920/81920 bytes at offset 2048000
-+80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=80 create_mode=metadata growth_mode=off ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 81920/81920 bytes at offset 2048000
-+80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=80 create_mode=metadata growth_mode=metadata ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 81920/81920 bytes at offset 2048000
-+80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=80 create_mode=metadata growth_mode=falloc ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 81920/81920 bytes at offset 2048000
-+80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=80 create_mode=metadata growth_mode=full ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=metadata
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 81920/81920 bytes at offset 2048000
-+80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=80 create_mode=falloc growth_mode=off ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 81920/81920 bytes at offset 2048000
-+80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=80 create_mode=falloc growth_mode=metadata ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 81920/81920 bytes at offset 2048000
-+80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=80 create_mode=falloc growth_mode=falloc ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 81920/81920 bytes at offset 2048000
-+80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=80 create_mode=falloc growth_mode=full ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=falloc
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 81920/81920 bytes at offset 2048000
-+80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=80 create_mode=full growth_mode=off ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 81920/81920 bytes at offset 2048000
-+80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=80 create_mode=full growth_mode=metadata ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 81920/81920 bytes at offset 2048000
-+80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=80 create_mode=full growth_mode=falloc ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 81920/81920 bytes at offset 2048000
-+80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+--- growth_size=80 create_mode=full growth_mode=full ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2048000 preallocation=full
-+Image resized.
-+wrote 2048000/2048000 bytes at offset 0
-+1.953 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 81920/81920 bytes at offset 2048000
-+80 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 1a89bebe14..a9a3b29db9 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -131,6 +131,7 @@
- 122 rw auto
- 123 rw auto quick
- 124 rw auto backing
-+125 rw auto
- 128 rw auto quick
- 129 rw auto quick
- 130 rw auto quick
--- 
-2.12.0
+On Mon, Mar 13, 2017 at 10:53:39AM +0000, Dr. David Alan Gilbert wrote:
+> * Alexey Perevalov (a.perevalov@samsung.com) wrote:
+> > Hi, David, Andrea and Mike
+> 
+> Hi Alexey,
+> 
+> > The problem I want to discuss it's 1G hugepage based VM and post copy live
+> > migration.
+> > 
+> > I would like to know your opinion on following approach of avoiding such
+> > problem:
+> > Once we have mmap'ed area through 1G hugetlbfs, remap physical pages
+> > with /dev/mem. It will be 2 types of vmas mapped to the same PFN.
+> > Register userfaultfd for newly obtained virtual
+> > addresses, it could reduce granularity of pages and reduce downtime per
+> > one 1G page. So registering userfaultfd for 2Mb, when the real hugepage
+> > was 1G, I think, could help.
+> > 
+> > Current postcopy implementation in QEMU allows to make live migration
+> > from 1G based hugepage VM to 2Mb based hugepages VM (sanity checks prevent
+> > it).
+> > 
+> > Also I checked, it's possible to remap through /dev/mem and get PFN
+> > based vmas, register userfaultfd (with allowance in vma_can_userfault)
+> > and finally make UFFDIO_COPY with allowing PFN based vmas in __mcopy_atomic.
+> > 
+> > But there are a lot of drawback of such approach:
+> > First of all it's /dev/mem interface. Need to provide full access
+> > (kernel w/o CONFIG_STRICT_DEVMEM) and need to disable PAT.
+> > The second drawback, maybe I just didn't find possibility to remap
+> > hugepages again, but mmap of /dev/mem character driver maps 4Kb pages.
+> > I don't know how THP could help here, but madvise with MADV_HUGEPAGE
+> > didn't. So 4Kb is not exactly what needed, due to overhead of
+> > encapsulation summary downtime is worse than in other cases.
+> > It would be great to have interface to obtain new virtual address based
+> > on existing PFN, but for hugepages.
+> 
+> Yes, and I think as well on some architectures there can be cache problems
+> from mapping the same page in two addresses unless we're careful.
+> 
+> I think to do this we'd basically need the kernel to set up something
+> similar to what you're saying, but without the mess of having to
+> go via /dev/mem.  Ideally it would all happen magically when I mark
+
+/dev/mem is problematic also if the hugetlbfs page is being migrated
+for example (the virtual2physical mapping that may change and be
+directed to a different physical page with no notification to userland).
+
+> a hugetlb page as userfault and start UFFDIO_COPYing in 4kb pages;
+> but I can imagine perhaps some more syscalls needed to tell it to do it.
+
+I think what is needed is an extension to UFFDIO_COPY so that it will
+not fail if used with lower granularity than the hugetlbfs page
+size. Then a special feature flag should be set in the
+uffdio_api.features to tell userland it can use a lower granularity
+than the hugetlbfs page size.
+
+UFFDIO_COPY will still allocate a 1GB page, but it will copy only part
+of and then map only the copied part with a pte of 4k granularity (or
+2MB granularity if the uffdio_copy.dst/len parameters allows for
+hugepmds). This way if there's a missing fault in the part that is not
+copied yet, it'll still trigger a page fault and we'll call
+handle_userfault from hugetlb_no_page, which will trigger a new
+UFFDIO_COPY and map another fragment of the 1GB page.
+
+The same code than should allow us to map a 2MB hugetlbfs page with 4k
+granularity in UFFDIO_COPY so then userland can choose if to do
+postcopy live migration on hugetlbfs with 2MB or 4kb granularity (on
+very slow network 4kb would be preferable for example for the latency).
+
+Mapping a 1GB page without a hugepud or mapping a 2MB page without a
+hugepmd breaks all sort of invariants into the hugetlbfs code, page
+migration wouldn't be able to cope with it either. Solving the fallout
+from such breakage is what is required to implement this basically.
+
+Ideally this could be a UFFDIO_COPY-only feature, simply every other
+part of hugetlbfs should be able to cope with whatever UFFDIO_COPY has
+generated in terms of pagetables mapping those hugepages.
+
+The only thing that will change from hugetlbfs point of view is that a
+pte or hugepmd could be mapping a 1GB page, that couldn't be the case
+before it.
+
+Once the entirety of the hugepage has been mapped or when the
+UFFDIO_UNREGISTER is called on the 1GB range, all those hugepmds
+and/or ptes should be dropped and the hugepud would then point
+directly to the 1GB page restoring the current behavior (which is
+required to get a 1GB large TLB and top performance, i.e. immediately
+after the live migration completed).
+
+This is very different concept than THP that in fact never requires to
+allocate hugepages. THP nowadays also allows to map a THP page using
+ptes, instead of hugepmds, just for a different reason (i.e. to allow
+split_huge_page to fail and be deferred, so get/put_page are
+simplified, while still guaranteeing that split_huge_page_pmd cannot
+fail). So we're already doing something like the above with THP but we
+only cover ptes vs hugepmd. The codebase however is different,
+hugetlbfs doesn't interact much with the main VM, so there's likely
+nothing to share with THP, but the concept of mapping an hugepage with
+ptes is somewhat similar.
+
+THP fundamentally always allows fallback, in the UFFDIO_COPY on
+hugetlbfs instead the idea would be to never allow fallback on the
+physical side, but to allow partial mapping so that the UFFDIO_COPY
+granularity can be reduced, despite the physical granularity remains
+native. This also means the collapse after live migration will be
+zerocopy: the collapse would be of the virtual kind for hugetlbfs
+(khugepaged as opposed has to copy the actual data because the
+physical pages were not huge to begin with, to allow the fallback).
+
+When UFFDIO_COPY is called again on the same 1GB range, it would need
+to notice that the pud is not null but is not huge (new case
+introduced), and then keep going in the pagetables lookup until it
+finds the copied range is not mapped, skip the 1GB allocation in such
+case and copy into the pre-existing 1GB page. If instead it finds the
+dst range is already mapped by a pte or a hugepmd, it'll instead
+return -EEXIST as usual.
+
+Thanks,
+Andrea
