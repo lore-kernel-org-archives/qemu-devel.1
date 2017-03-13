@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52861)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cnJJu-0007d6-9y
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:19:06 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cnJKh-0008OT-4X
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:19:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cnJJn-0003gS-GF
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:19:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56828)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cnJJn-0003dy-4U
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:18:55 -0400
-From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 13 Mar 2017 07:18:36 +0100
-Message-Id: <1489385927-6735-37-git-send-email-armbru@redhat.com>
-In-Reply-To: <1489385927-6735-1-git-send-email-armbru@redhat.com>
-References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.9 36/47] tests/qapi-schema: Improve
- coverage of bogus member docs
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cnJKd-0004KB-VZ
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:19:51 -0400
+Received: from [59.151.112.132] (port=48908 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cnJKd-0004HF-K6
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:19:47 -0400
+References: <1488278902-11223-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <ca75b31f-1337-6fef-c799-6902f79798a5@cn.fujitsu.com>
+Date: Mon, 13 Mar 2017 14:18:56 +0800
+MIME-Version: 1.0
+In-Reply-To: <1488278902-11223-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/3] COLO-compare: Make COLO-compare
+ support Xen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,132 +27,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, eblake@redhat.com, mdroth@linux.vnet.ibm.com
+To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
+Cc: zhangchen.fnst@cn.fujitsu.com, zhanghailiang <zhang.zhanghailiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Stefano Stabellini <sstabellini@kernel.org>
 
-New test doc-bad-union-member.json shows we can fail to reject
-documentation for nonexistent members.
+Hi~~~ All~
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- tests/Makefile.include                          |  2 ++
- tests/qapi-schema/doc-bad-alternate-member.err  |  1 +
- tests/qapi-schema/doc-bad-alternate-member.exit |  1 +
- tests/qapi-schema/doc-bad-alternate-member.json |  9 +++++++++
- tests/qapi-schema/doc-bad-alternate-member.out  |  0
- tests/qapi-schema/doc-bad-union-member.err      |  0
- tests/qapi-schema/doc-bad-union-member.exit     |  1 +
- tests/qapi-schema/doc-bad-union-member.json     | 19 +++++++++++++++++++
- tests/qapi-schema/doc-bad-union-member.out      | 11 +++++++++++
- 9 files changed, 44 insertions(+)
- create mode 100644 tests/qapi-schema/doc-bad-alternate-member.err
- create mode 100644 tests/qapi-schema/doc-bad-alternate-member.exit
- create mode 100644 tests/qapi-schema/doc-bad-alternate-member.json
- create mode 100644 tests/qapi-schema/doc-bad-alternate-member.out
- create mode 100644 tests/qapi-schema/doc-bad-union-member.err
- create mode 100644 tests/qapi-schema/doc-bad-union-member.exit
- create mode 100644 tests/qapi-schema/doc-bad-union-member.json
- create mode 100644 tests/qapi-schema/doc-bad-union-member.out
+No news for a long time, anyone can give me some comments?
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 8ce9d3d..5edf3fa 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -367,9 +367,11 @@ qapi-schema += base-cycle-direct.json
- qapi-schema += base-cycle-indirect.json
- qapi-schema += command-int.json
- qapi-schema += comments.json
-+qapi-schema += doc-bad-alternate-member.json
- qapi-schema += doc-bad-command-arg.json
- qapi-schema += doc-bad-expr.json
- qapi-schema += doc-bad-symbol.json
-+qapi-schema += doc-bad-union-member.json
- qapi-schema += doc-duplicated-arg.json
- qapi-schema += doc-duplicated-return.json
- qapi-schema += doc-duplicated-since.json
-diff --git a/tests/qapi-schema/doc-bad-alternate-member.err b/tests/qapi-schema/doc-bad-alternate-member.err
-new file mode 100644
-index 0000000..387f782
---- /dev/null
-+++ b/tests/qapi-schema/doc-bad-alternate-member.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/doc-bad-alternate-member.json:3: The following documented members are not in the declaration: aa, bb
-diff --git a/tests/qapi-schema/doc-bad-alternate-member.exit b/tests/qapi-schema/doc-bad-alternate-member.exit
-new file mode 100644
-index 0000000..d00491f
---- /dev/null
-+++ b/tests/qapi-schema/doc-bad-alternate-member.exit
-@@ -0,0 +1 @@
-+1
-diff --git a/tests/qapi-schema/doc-bad-alternate-member.json b/tests/qapi-schema/doc-bad-alternate-member.json
-new file mode 100644
-index 0000000..738635c
---- /dev/null
-+++ b/tests/qapi-schema/doc-bad-alternate-member.json
-@@ -0,0 +1,9 @@
-+# Arguments listed in the doc comment must exist in the actual schema
-+
-+##
-+# @AorB:
-+# @aa: a
-+# @bb: b
-+##
-+{ 'alternate': 'AorB',
-+  'data': { 'a': 'str', 'b': 'int' } }
-diff --git a/tests/qapi-schema/doc-bad-alternate-member.out b/tests/qapi-schema/doc-bad-alternate-member.out
-new file mode 100644
-index 0000000..e69de29
-diff --git a/tests/qapi-schema/doc-bad-union-member.err b/tests/qapi-schema/doc-bad-union-member.err
-new file mode 100644
-index 0000000..e69de29
-diff --git a/tests/qapi-schema/doc-bad-union-member.exit b/tests/qapi-schema/doc-bad-union-member.exit
-new file mode 100644
-index 0000000..573541a
---- /dev/null
-+++ b/tests/qapi-schema/doc-bad-union-member.exit
-@@ -0,0 +1 @@
-+0
-diff --git a/tests/qapi-schema/doc-bad-union-member.json b/tests/qapi-schema/doc-bad-union-member.json
-new file mode 100644
-index 0000000..d611435
---- /dev/null
-+++ b/tests/qapi-schema/doc-bad-union-member.json
-@@ -0,0 +1,19 @@
-+# Arguments listed in the doc comment must exist in the actual schema
-+
-+##
-+# @Frob:
-+# @a: a
-+# @b: b
-+##
-+{ 'union': 'Frob',
-+  'base': 'Base',
-+  'discriminator': 'type',
-+  'data': { 'nothing': 'Empty' } }
-+
-+{ 'struct': 'Base',
-+  'data': { 'type': 'T' } }
-+
-+{ 'struct': 'Empty',
-+  'data': { } }
-+
-+{ 'enum': 'T', 'data': ['nothing'] }
-diff --git a/tests/qapi-schema/doc-bad-union-member.out b/tests/qapi-schema/doc-bad-union-member.out
-new file mode 100644
-index 0000000..2576ecd
---- /dev/null
-+++ b/tests/qapi-schema/doc-bad-union-member.out
-@@ -0,0 +1,11 @@
-+object Base
-+    member type: T optional=False
-+object Empty
-+object Frob
-+    base Base
-+    tag type
-+    case nothing: Empty
-+enum QType ['none', 'qnull', 'qint', 'qstring', 'qdict', 'qlist', 'qfloat', 'qbool']
-+    prefix QTYPE
-+enum T ['nothing']
-+object q_empty
+
+Thanks
+
+Zhang Chen
+
+
+On 02/28/2017 06:48 PM, Zhang Chen wrote:
+> This series focus on COLO Xen support.
+> We add a new chardev socket in colo-compare as the way
+> of communicate with Xen COLO-frame.
+> Xen part:
+> https://lists.xenproject.org/archives/html/xen-devel/2017-02/msg02067.html
+>
+> This series is a frame, have some TODO job depend on this patch:
+> https://lists.nongnu.org/archive/html/qemu-devel/2017-02/msg05055.html
+>
+>
+> Zhang Chen (3):
+>    COLO-compare: Add new parameter for communicate with Xen colo-frame
+>    COLO-compare: Add Xen notify chardev socket handler frame
+>    COLO-compare: Add colo-compare Xen notify
+>
+>   net/colo-compare.c | 77 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>   qemu-options.hx    | 38 ++++++++++++++++++++++++---
+>   2 files changed, 111 insertions(+), 4 deletions(-)
+>
+
 -- 
-2.7.4
+Thanks
+Zhang Chen
