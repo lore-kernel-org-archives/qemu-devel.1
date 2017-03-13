@@ -1,31 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43558)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cnMew-00057v-It
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 05:52:59 -0400
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cnMhK-0005uU-Bj
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 05:55:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cnMet-0005ub-IB
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 05:52:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:9242)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cnMet-0005uO-9c
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 05:52:55 -0400
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2962161D1A
-	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 09:52:55 +0000 (UTC)
-References: <1489375798-19518-1-git-send-email-jasowang@redhat.com>
-	<1489375798-19518-2-git-send-email-jasowang@redhat.com>
-	<821914c4-f97e-aae3-7408-03c9684effe7@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1c3729b4-447d-a025-c202-656076dfcf10@redhat.com>
-Date: Mon, 13 Mar 2017 10:52:52 +0100
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cnMhH-0006VO-A8
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 05:55:26 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49721
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cnMhH-0006UO-3b
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 05:55:23 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2D9qtJE098050
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 05:55:21 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 294b216bp8-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 05:55:21 -0400
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Mon, 13 Mar 2017 09:55:20 -0000
+Date: Mon, 13 Mar 2017 10:55:15 +0100
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <1489386583-11564-1-git-send-email-jasowang@redhat.com>
+References: <1489386583-11564-1-git-send-email-jasowang@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <821914c4-f97e-aae3-7408-03c9684effe7@redhat.com>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] pci: introduce a bus master container
+Message-Id: <20170313105515.75981fb9.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH V2 1/3] virtio: guard against NULL pfn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,102 +41,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>, Jason Wang <jasowang@redhat.com>, mst@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com
+To: Jason Wang <jasowang@redhat.com>
+Cc: mst@redhat.com, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
+On Mon, 13 Mar 2017 14:29:41 +0800
+Jason Wang <jasowang@redhat.com> wrote:
 
-
-On 13/03/2017 10:38, Marcel Apfelbaum wrote:
-> On 03/13/2017 05:29 AM, Jason Wang wrote:
->> 96a8821d2141 ("virtio: unbreak virtio-pci with IOMMU after caching ring
->> translations") tries to make IOMMU works with virtio memory region
->> cache, but it requires IOMMU to be created before any virtio
->> devices. This is sub optimal, fixing this by introduce a bus master
->> container to make sure address space can be initialized during device
->> registering, and then we can safely set alias and make
->> bus_master_enable_region as its subregion during bus master
->> initialization.
->>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Signed-off-by: Jason Wang <jasowang@redhat.com>
->> ---
->>  hw/pci/pci.c         | 9 +++++++--
->>  include/hw/pci/pci.h | 1 +
->>  2 files changed, 8 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
->> index 273f1e4..ad46390 100644
->> --- a/hw/pci/pci.c
->> +++ b/hw/pci/pci.c
->> @@ -88,8 +88,8 @@ static void pci_init_bus_master(PCIDevice *pci_dev)
->>                               OBJECT(pci_dev), "bus master",
->>                               dma_as->root, 0,
->> memory_region_size(dma_as->root));
->>      memory_region_set_enabled(&pci_dev->bus_master_enable_region,
->> false);
->> -    address_space_init(&pci_dev->bus_master_as,
->> -                       &pci_dev->bus_master_enable_region,
->> pci_dev->name);
->> +   
->> memory_region_add_subregion(&pci_dev->bus_master_container_region, 0,
->> +                                &pci_dev->bus_master_enable_region);
+> To avoid access stale memory region cache after reset, this patch
+> check the existence of virtqueue pfn for all exported virtqueue access
+> helpers before trying to use them.
 > 
-> Hi Jason,
+> Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> ---
+>  hw/virtio/virtio.c | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
 > 
-> The patch looks good to me, I only have one question:
-> On hot-unplug, shouldn't we remove the "new" sub-region ?
-
-It should be done automatically:
-
-    /* We know the region is not visible in any address space (it
-     * does not have a container and cannot be a root either because
-     * it has no references, so we can blindly clear mr->enabled.
-     * memory_region_set_enabled instead could trigger a transaction
-     * and cause an infinite loop.
-     */
-    mr->enabled = false;
-    memory_region_transaction_begin();
-    while (!QTAILQ_EMPTY(&mr->subregions)) {
-        MemoryRegion *subregion = QTAILQ_FIRST(&mr->subregions);
-        memory_region_del_subregion(mr, subregion);
-    }
-    memory_region_transaction_commit();
-
-It's relatively new though (QEMU v2.5+).
-
-Paolo
-
-> Thanks,
-> Marcel
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index efce4b3..76cc81b 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -322,6 +322,10 @@ static int virtio_queue_empty_rcu(VirtQueue *vq)
+>          return 0;
+>      }
 > 
->>  }
->>
->>  static void pcibus_machine_done(Notifier *notifier, void *data)
->> @@ -995,6 +995,11 @@ static PCIDevice
->> *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
->>      pci_dev->devfn = devfn;
->>      pci_dev->requester_id_cache = pci_req_id_cache_get(pci_dev);
->>
->> +    memory_region_init(&pci_dev->bus_master_container_region,
->> OBJECT(pci_dev),
->> +                       "bus master container", UINT64_MAX);
->> +    address_space_init(&pci_dev->bus_master_as,
->> +                       &pci_dev->bus_master_container_region,
->> pci_dev->name);
->> +
->>      if (qdev_hotplug) {
->>          pci_init_bus_master(pci_dev);
->>      }
->> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
->> index 9349acb..713ede0 100644
->> --- a/include/hw/pci/pci.h
->> +++ b/include/hw/pci/pci.h
->> @@ -284,6 +284,7 @@ struct PCIDevice {
->>      char name[64];
->>      PCIIORegion io_regions[PCI_NUM_REGIONS];
->>      AddressSpace bus_master_as;
->> +    MemoryRegion bus_master_container_region;
->>      MemoryRegion bus_master_enable_region;
->>
->>      /* do not access the following fields */
->>
+> +    if (unlikely(!vq->vring.avail)) {
+> +        return 0;
+
+Shouldn't that rather return !0 (denoting a non-existing queue as
+empty)?
+
+> +    }
+> +
+>      return vring_avail_idx(vq) == vq->last_avail_idx;
+>  }
 > 
+> @@ -333,6 +337,10 @@ int virtio_queue_empty(VirtQueue *vq)
+>          return 0;
+>      }
+> 
+> +    if (unlikely(!vq->vring.avail)) {
+> +        return 0;
+
+Likewise.
+
+> +    }
+> +
+>      rcu_read_lock();
+>      empty = vring_avail_idx(vq) == vq->last_avail_idx;
+>      rcu_read_unlock();
+> @@ -431,6 +439,10 @@ void virtqueue_fill(VirtQueue *vq, const VirtQueueElement *elem,
+>          return;
+>      }
+> 
+> +    if (unlikely(!vq->vring.used)) {
+> +        return;
+> +    }
+> +
+>      idx = (idx + vq->used_idx) % vq->vring.num;
+> 
+>      uelem.id = elem->index;
+> @@ -448,6 +460,10 @@ void virtqueue_flush(VirtQueue *vq, unsigned int count)
+>          return;
+>      }
+> 
+> +    if (unlikely(!vq->vring.used)) {
+> +        return;
+> +    }
+> +
+>      /* Make sure buffer is written before we update index. */
+>      smp_wmb();
+>      trace_virtqueue_flush(vq, count);
+> @@ -546,6 +562,11 @@ void virtqueue_get_avail_bytes(VirtQueue *vq, unsigned int *in_bytes,
+>      int64_t len = 0;
+>      int rc;
+> 
+> +    if (unlikely(!vq->vring.desc)) {
+> +        *in_bytes = *out_bytes = 0;
+
+I think you need to check for in_bytes and out_bytes being !NULL first.
+
+> +        return;
+> +    }
+> +
+>      rcu_read_lock();
+>      idx = vq->last_avail_idx;
+>      total_bufs = in_total = out_total = 0;
