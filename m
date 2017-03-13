@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43911)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cnXiF-0007cK-CL
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 17:41:10 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cnXiW-0007pM-0g
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 17:41:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cnXiE-0001wr-J7
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 17:41:07 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cnXiV-00025D-1t
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 17:41:24 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 13 Mar 2017 22:40:38 +0100
-Message-Id: <20170313214045.26857-7-mreitz@redhat.com>
+Date: Mon, 13 Mar 2017 22:41:11 +0100
+Message-Id: <20170313214117.27350-1-mreitz@redhat.com>
 In-Reply-To: <20170313214001.26339-1-mreitz@redhat.com>
 References: <20170313214001.26339-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.10 09/16] block/qcow2: Generalize
+Subject: [Qemu-devel] [PATCH for-2.10 10/16] block/qcow2: Lock s->lock in
  preallocate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,57 +23,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-This patch adds two new parameters to the preallocate() function so we
-will be able to use it not just for preallocating a new image but also
-for preallocated image growth.
+preallocate() is and will be called only from places that do not lock
+s->lock: Currently that is qcow2_create2(), as of a future patch it will
+be called from qcow2_truncate(), too.
 
-The offset parameter allows the caller to specify a virtual offset from
-which to start preallocating. For newly created images this is always 0,
-but for preallocating growth this will be the old image length.
-
-The new_length parameter specifies the supposed new length of the image
-(basically the "end offset" for preallocation). During image truncation,
-bdrv_getlength() will return the old image length so we cannot rely on
-its return value then.
+It therefore makes sense to move locking that mutex into preallocate()
+itself.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ block/qcow2.c | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
 
 diff --git a/block/qcow2.c b/block/qcow2.c
-index 210646b60f..9abdf9e0fb 100644
+index 9abdf9e0fb..5479fed938 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -2034,17 +2034,16 @@ static int qcow2_change_backing_file(BlockDriverState *bs,
-     return qcow2_update_header(bs);
- }
+@@ -2036,12 +2036,15 @@ static int qcow2_change_backing_file(BlockDriverState *bs,
  
--static int preallocate(BlockDriverState *bs)
-+static int preallocate(BlockDriverState *bs, int64_t offset, int64_t new_length)
+ static int preallocate(BlockDriverState *bs, int64_t offset, int64_t new_length)
  {
++    BDRVQcow2State *s = bs->opaque;
      uint64_t bytes;
--    uint64_t offset;
      uint64_t host_offset = 0;
      unsigned int cur_bytes;
      int ret;
      QCowL2Meta *meta;
  
--    bytes = bdrv_getlength(bs);
--    offset = 0;
-+    assert(offset <= new_length);
-+    bytes = new_length - offset;
++    qemu_co_mutex_lock(&s->lock);
++
+     assert(offset <= new_length);
+     bytes = new_length - offset;
  
-     while (bytes) {
-         cur_bytes = MIN(bytes, INT_MAX);
-@@ -2313,7 +2312,7 @@ static int qcow2_create2(const char *filename, int64_t total_size,
+@@ -2050,7 +2053,7 @@ static int preallocate(BlockDriverState *bs, int64_t offset, int64_t new_length)
+         ret = qcow2_alloc_cluster_offset(bs, offset, &cur_bytes,
+                                          &host_offset, &meta);
+         if (ret < 0) {
+-            return ret;
++            goto done;
+         }
+ 
+         while (meta) {
+@@ -2060,7 +2063,7 @@ static int preallocate(BlockDriverState *bs, int64_t offset, int64_t new_length)
+             if (ret < 0) {
+                 qcow2_free_any_clusters(bs, meta->alloc_offset,
+                                         meta->nb_clusters, QCOW2_DISCARD_NEVER);
+-                return ret;
++                goto done;
+             }
+ 
+             /* There are no dependent requests, but we need to remove our
+@@ -2087,11 +2090,15 @@ static int preallocate(BlockDriverState *bs, int64_t offset, int64_t new_length)
+         ret = bdrv_pwrite(bs->file, (host_offset + cur_bytes) - 1,
+                           &data, 1);
+         if (ret < 0) {
+-            return ret;
++            goto done;
+         }
+     }
+ 
+-    return 0;
++    ret = 0;
++
++done:
++    qemu_co_mutex_unlock(&s->lock);
++    return ret;
+ }
+ 
+ static int qcow2_create2(const char *filename, int64_t total_size,
+@@ -2310,10 +2317,7 @@ static int qcow2_create2(const char *filename, int64_t total_size,
+ 
+     /* And if we're supposed to preallocate metadata, do that now */
      if (prealloc != PREALLOC_MODE_OFF) {
-         BDRVQcow2State *s = blk_bs(blk)->opaque;
-         qemu_co_mutex_lock(&s->lock);
--        ret = preallocate(blk_bs(blk));
-+        ret = preallocate(blk_bs(blk), 0, total_size);
-         qemu_co_mutex_unlock(&s->lock);
+-        BDRVQcow2State *s = blk_bs(blk)->opaque;
+-        qemu_co_mutex_lock(&s->lock);
+         ret = preallocate(blk_bs(blk), 0, total_size);
+-        qemu_co_mutex_unlock(&s->lock);
          if (ret < 0) {
              error_setg_errno(errp, -ret, "Could not preallocate metadata");
+             goto out;
 -- 
 2.12.0
