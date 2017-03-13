@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34348)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cnNbp-0001zf-LF
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:53:50 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cnNs1-0004Vb-3x
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 07:10:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cnNbk-0000bz-Tp
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:53:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54934)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cnNbk-0000bZ-Nv
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:53:44 -0400
-Date: Mon, 13 Mar 2017 10:53:39 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170313105338.GA2626@work-vm>
-References: <CGME20170310140816eucas1p2bd85d3759739d64bb184ce0fbd74f90d@eucas1p2.samsung.com>
-	<20170310140806.GA11225@aperevalov-ubuntu>
+	(envelope-from <peter.maydell@linaro.org>) id 1cnNs0-0007Bw-Ah
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 07:10:33 -0400
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:38076)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cnNs0-0007Ba-49
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 07:10:32 -0400
+Received: by mail-wm0-x233.google.com with SMTP id t189so36987261wmt.1
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 04:10:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20170310140806.GA11225@aperevalov-ubuntu>
-Subject: Re: [Qemu-devel] Dual userfaultfd behavior
+In-Reply-To: <1489084718-15294-3-git-send-email-joserz@linux.vnet.ibm.com>
+References: <1489084718-15294-1-git-send-email-joserz@linux.vnet.ibm.com>
+	<1489084718-15294-3-git-send-email-joserz@linux.vnet.ibm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 13 Mar 2017 12:10:10 +0100
+Message-ID: <CAFEAcA8GPTVg-kUXfTJk17KPaPFAHJ-mGOEXPZLxQ0q9CNRckw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH Risu v2 2/3] configure: Add initial support
+ to PPC64 (big endian)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,65 +30,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Perevalov <a.perevalov@samsung.com>
-Cc: qemu-devel@nongnu.org, Andrea Arcangeli <aarcange@redhat.com>, Mike Kravetz <mike.kravetz@oracle.com>
+To: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-* Alexey Perevalov (a.perevalov@samsung.com) wrote:
-> Hi, David, Andrea and Mike
+On 9 March 2017 at 19:38, Jose Ricardo Ziviani
+<joserz@linux.vnet.ibm.com> wrote:
+> This commit set Makefile to point to ppc64le source for both archs
+> (ppc64 and ppc64le) because they do the exact same thing. The
+> difference is in risugen and how the binary is build.
 
-Hi Alexey,
+If we're going to share a single set of source files for ppc64le
+and ppc64 (which makes sense) then I think we should use ARCH=ppc64
+for that, and rename the 'ppc64le' source files to 'ppc64'.
 
-> The problem I want to discuss it's 1G hugepage based VM and post copy live
-> migration.
->=20
-> I would like to know your opinion on following approach of avoiding such
-> problem:
-> Once we have mmap'ed area through 1G hugetlbfs, remap physical pages
-> with /dev/mem. It will be 2 types of vmas mapped to the same PFN.
-> Register userfaultfd for newly obtained virtual
-> addresses, it could reduce granularity of pages and reduce downtime per
-> one 1G page. So registering userfaultfd for 2Mb, when the real hugepage
-> was 1G, I think, could help.
->=20
-> Current postcopy implementation in QEMU allows to make live migration
-> from 1G based hugepage VM to 2Mb based hugepages VM (sanity checks prevent
-> it).
->=20
-> Also I checked, it's possible to remap through /dev/mem and get PFN
-> based vmas, register userfaultfd (with allowance in vma_can_userfault)
-> and finally make UFFDIO_COPY with allowing PFN based vmas in __mcopy_atom=
-ic.
->=20
-> But there are a lot of drawback of such approach:
-> First of all it's /dev/mem interface. Need to provide full access
-> (kernel w/o CONFIG_STRICT_DEVMEM) and need to disable PAT.
-> The second drawback, maybe I just didn't find possibility to remap
-> hugepages again, but mmap of /dev/mem character driver maps 4Kb pages.
-> I don't know how THP could help here, but madvise with MADV_HUGEPAGE
-> didn't. So 4Kb is not exactly what needed, due to overhead of
-> encapsulation summary downtime is worse than in other cases.
-> It would be great to have interface to obtain new virtual address based
-> on existing PFN, but for hugepages.
+The rest of these patches look OK.
 
-Yes, and I think as well on some architectures there can be cache problems
-=66rom mapping the same page in two addresses unless we're careful.
+> Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+> ---
+>  configure | 9 ++++-----
+>  1 file changed, 4 insertions(+), 5 deletions(-)
+>
+> diff --git a/configure b/configure
+> index 055e6d6..dd64d8b 100755
+> --- a/configure
+> +++ b/configure
+> @@ -51,11 +51,7 @@ guess_arch() {
+>      elif check_define __aarch64__ ; then
+>          ARCH="aarch64"
+>      elif check_define __powerpc64__ ; then
+> -        if check_define __BIG_ENDIAN__; then
+> -            ARCH="ppc64"
+> -        else
+> -            ARCH="ppc64le"
+> -        fi
+> +        ARCH="ppc64le"
+>      else
+>          echo "This cpu is not supported by risu. Try -h. " >&2
+>          exit 1
+> @@ -127,6 +123,9 @@ OBJDUMP="${OBJDUMP-${CROSS_PREFIX}objdump}"
+>
+>  if test "x${ARCH}" = "x"; then
+>      guess_arch
+> +elif test "x${ARCH}" = "xppc64"; then
+> +    # ppc64 and ppc64le uses the same C source code
+> +    ARCH="ppc64le"
+>  fi
+>
+>  generate_makefilein
+> --
+> 2.7.4
+>
 
-I think to do this we'd basically need the kernel to set up something
-similar to what you're saying, but without the mess of having to
-go via /dev/mem.  Ideally it would all happen magically when I mark
-a hugetlb page as userfault and start UFFDIO_COPYing in 4kb pages;
-but I can imagine perhaps some more syscalls needed to tell it to do it.
+Incidentally, maybe we should just drop support for
+specifying ARCH= manually to configure. I can't really
+see a use case where the auto-detection won't do the
+right thing.
 
-I've no idea how hard that is to do though.
-
-Dave
-
-> Honestly, I can't find another use case for this feature.
->=20
->=20
-> --=20
->=20
-> BR
-> Alexey
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+thanks
+-- PMM
