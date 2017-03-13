@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cnXi4-0007Qi-Lv
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 17:40:57 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cnXiA-0007Wu-CA
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 17:41:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cnXi3-0001pP-Fk
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 17:40:56 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cnXi9-0001tH-80
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 17:41:02 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 13 Mar 2017 22:40:33 +0100
-Message-Id: <20170313214045.26857-2-mreitz@redhat.com>
+Date: Mon, 13 Mar 2017 22:40:35 +0100
+Message-Id: <20170313214045.26857-4-mreitz@redhat.com>
 In-Reply-To: <20170313214001.26339-1-mreitz@redhat.com>
 References: <20170313214001.26339-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.10 04/16] qemu-img: Expose PreallocMode
- for resizing
+Subject: [Qemu-devel] [PATCH for-2.10 06/16] block/file-posix: Extract
+ raw_regular_truncate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,128 +23,175 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Add a --preallocation command line option to qemu-img resize which can
-be used to set the PreallocMode parameter of blk_truncate().
+This functionality is part of raw_create() which we will be able to
+reuse nicely in raw_truncate().
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- qemu-img.c    | 33 ++++++++++++++++++++++++++++++---
- qemu-img.texi |  7 ++++++-
- 2 files changed, 36 insertions(+), 4 deletions(-)
+ block/file-posix.c | 144 +++++++++++++++++++++++++++++------------------------
+ 1 file changed, 78 insertions(+), 66 deletions(-)
 
-diff --git a/qemu-img.c b/qemu-img.c
-index 3e637a932b..a5fdd30202 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -24,6 +24,7 @@
- #include "qemu/osdep.h"
- #include "qemu-version.h"
- #include "qapi/error.h"
-+#include "qapi/util.h"
- #include "qapi-visit.h"
- #include "qapi/qobject-output-visitor.h"
- #include "qapi/qmp/qerror.h"
-@@ -59,6 +60,7 @@ enum {
-     OPTION_PATTERN = 260,
-     OPTION_FLUSH_INTERVAL = 261,
-     OPTION_NO_DRAIN = 262,
-+    OPTION_PREALLOCATION = 263,
- };
+diff --git a/block/file-posix.c b/block/file-posix.c
+index b02d8fc37b..35a9e43f3e 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -1384,6 +1384,81 @@ static void raw_close(BlockDriverState *bs)
+     }
+ }
  
- typedef enum OutputFormat {
-@@ -3317,9 +3319,10 @@ static int img_resize(int argc, char **argv)
-     Error *err = NULL;
-     int c, ret, relative;
-     const char *filename, *fmt, *size;
--    int64_t n, total_size;
-+    int64_t n, total_size, current_size;
-     bool quiet = false;
-     BlockBackend *blk = NULL;
-+    PreallocMode prealloc = PREALLOC_MODE_OFF;
-     QemuOpts *param;
- 
-     static QemuOptsList resize_options = {
-@@ -3353,6 +3356,7 @@ static int img_resize(int argc, char **argv)
-             {"help", no_argument, 0, 'h'},
-             {"object", required_argument, 0, OPTION_OBJECT},
-             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-+            {"preallocation", required_argument, 0, OPTION_PREALLOCATION},
-             {0, 0, 0, 0}
-         };
-         c = getopt_long(argc, argv, "f:hq",
-@@ -3382,6 +3386,15 @@ static int img_resize(int argc, char **argv)
-         case OPTION_IMAGE_OPTS:
-             image_opts = true;
-             break;
-+        case OPTION_PREALLOCATION:
-+            prealloc = qapi_enum_parse(PreallocMode_lookup, optarg,
-+                                       PREALLOC_MODE__MAX, PREALLOC_MODE__MAX,
-+                                       NULL);
-+            if (prealloc == PREALLOC_MODE__MAX) {
-+                error_report("Invalid preallocation mode '%s'", optarg);
-+                return 1;
++static int raw_regular_truncate(int fd, int64_t offset, PreallocMode prealloc,
++                                Error **errp)
++{
++    int result = 0;
++    char *buf;
++
++    switch (prealloc) {
++#ifdef CONFIG_POSIX_FALLOCATE
++    case PREALLOC_MODE_FALLOC:
++        /*
++         * Truncating before posix_fallocate() makes it about twice slower on
++         * file systems that do not support fallocate(), trying to check if a
++         * block is allocated before allocating it, so don't do that here.
++         */
++        result = -posix_fallocate(fd, 0, offset);
++        if (result != 0) {
++            /* posix_fallocate() doesn't set errno. */
++            error_setg_errno(errp, -result,
++                             "Could not preallocate data for the new file");
++        }
++        return result;
++#endif
++    case PREALLOC_MODE_FULL:
++    {
++        int64_t num = 0, left = offset;
++
++        /*
++         * Knowing the final size from the beginning could allow the file
++         * system driver to do less allocations and possibly avoid
++         * fragmentation of the file.
++         */
++        if (ftruncate(fd, offset) != 0) {
++            result = -errno;
++            error_setg_errno(errp, -result, "Could not resize file");
++            return result;
++        }
++
++        buf = g_malloc0(65536);
++
++        while (left > 0) {
++            num = MIN(left, 65536);
++            result = write(fd, buf, num);
++            if (result < 0) {
++                result = -errno;
++                error_setg_errno(errp, -result,
++                                 "Could not write to the new file");
++                break;
 +            }
-+            break;
-         }
-     }
-     if (optind != argc - 1) {
-@@ -3429,8 +3442,16 @@ static int img_resize(int argc, char **argv)
-         goto out;
-     }
- 
-+    current_size = blk_getlength(blk);
-+    if (current_size < 0) {
-+        error_report("Failed to inquire current image length: %s\n",
-+                     strerror(-current_size));
-+        ret = -1;
-+        goto out;
++            left -= result;
++        }
++        if (result >= 0) {
++            result = fsync(fd);
++            if (result < 0) {
++                result = -errno;
++                error_setg_errno(errp, -result,
++                                 "Could not flush new file to disk");
++            }
++        }
++        g_free(buf);
++        return result;
 +    }
-+
-     if (relative) {
--        total_size = blk_getlength(blk) + n * relative;
-+        total_size = current_size + n * relative;
-     } else {
-         total_size = n;
-     }
-@@ -3440,7 +3461,13 @@ static int img_resize(int argc, char **argv)
-         goto out;
-     }
- 
--    ret = blk_truncate(blk, total_size, PREALLOC_MODE_OFF, &err);
-+    if (total_size <= current_size && prealloc != PREALLOC_MODE_OFF) {
-+        error_report("Preallocation can only be used for growing images");
-+        ret = -1;
-+        goto out;
++    case PREALLOC_MODE_OFF:
++        if (ftruncate(fd, offset) != 0) {
++            result = -errno;
++            error_setg_errno(errp, -result, "Could not resize file");
++        }
++        return result;
++    default:
++        result = -ENOTSUP;
++        error_setg(errp, "Unsupported preallocation mode: %s",
++                   PreallocMode_lookup[prealloc]);
++        return result;
 +    }
++}
 +
-+    ret = blk_truncate(blk, total_size, prealloc, &err);
-     if (!ret) {
-         qprintf(quiet, "Image resized.\n");
-     } else {
-diff --git a/qemu-img.texi b/qemu-img.texi
-index c81db3e81c..ad46fa5f05 100644
---- a/qemu-img.texi
-+++ b/qemu-img.texi
-@@ -490,7 +490,7 @@ qemu-img rebase -b base.img diff.qcow2
- At this point, @code{modified.img} can be discarded, since
- @code{base.img + diff.qcow2} contains the same information.
+ static int raw_truncate(BlockDriverState *bs, int64_t offset,
+                         PreallocMode prealloc, Error **errp)
+ {
+@@ -1652,72 +1727,9 @@ static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
+ #endif
+     }
  
--@item resize @var{filename} [+ | -]@var{size}
-+@item resize [--preallocation=@var{prealloc}] @var{filename} [+ | -]@var{size}
+-    switch (prealloc) {
+-#ifdef CONFIG_POSIX_FALLOCATE
+-    case PREALLOC_MODE_FALLOC:
+-        /*
+-         * Truncating before posix_fallocate() makes it about twice slower on
+-         * file systems that do not support fallocate(), trying to check if a
+-         * block is allocated before allocating it, so don't do that here.
+-         */
+-        result = -posix_fallocate(fd, 0, total_size);
+-        if (result != 0) {
+-            /* posix_fallocate() doesn't set errno. */
+-            error_setg_errno(errp, -result,
+-                             "Could not preallocate data for the new file");
+-        }
+-        break;
+-#endif
+-    case PREALLOC_MODE_FULL:
+-    {
+-        int64_t num = 0, left = total_size;
+-
+-        /*
+-         * Knowing the final size from the beginning could allow the file
+-         * system driver to do less allocations and possibly avoid
+-         * fragmentation of the file.
+-         */
+-        if (ftruncate(fd, total_size) != 0) {
+-            result = -errno;
+-            error_setg_errno(errp, -result, "Could not resize file");
+-            goto out_close;
+-        }
+-
+-        buf = g_malloc0(65536);
+-
+-        while (left > 0) {
+-            num = MIN(left, 65536);
+-            result = write(fd, buf, num);
+-            if (result < 0) {
+-                result = -errno;
+-                error_setg_errno(errp, -result,
+-                                 "Could not write to the new file");
+-                break;
+-            }
+-            left -= result;
+-        }
+-        if (result >= 0) {
+-            result = fsync(fd);
+-            if (result < 0) {
+-                result = -errno;
+-                error_setg_errno(errp, -result,
+-                                 "Could not flush new file to disk");
+-            }
+-        }
+-        g_free(buf);
+-        break;
+-    }
+-    case PREALLOC_MODE_OFF:
+-        if (ftruncate(fd, total_size) != 0) {
+-            result = -errno;
+-            error_setg_errno(errp, -result, "Could not resize file");
+-        }
+-        break;
+-    default:
+-        result = -ENOTSUP;
+-        error_setg(errp, "Unsupported preallocation mode: %s",
+-                   PreallocMode_lookup[prealloc]);
+-        break;
++    result = raw_regular_truncate(fd, total_size, prealloc, errp);
++    if (result < 0) {
++        goto out_close;
+     }
  
- Change the disk image as if it had been created with @var{size}.
- 
-@@ -502,6 +502,11 @@ After using this command to grow a disk image, you must use file system and
- partitioning tools inside the VM to actually begin using the new space on the
- device.
- 
-+When growing an image, the @code{--preallocation} option may be used to specify
-+how the additional image area should be allocated on the host.  See the format
-+description in the @code{NOTES} section which values are allowed.  Using this
-+option may result in more data being allocated than necessary.
-+
- @item amend [-p] [-f @var{fmt}] [-t @var{cache}] -o @var{options} @var{filename}
- 
- Amends the image format specific @var{options} for the image file
+ out_close:
 -- 
 2.12.0
