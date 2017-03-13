@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1cnV15-0001cP-4Y
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 14:48:24 -0400
+	(envelope-from <hwertz10@gmail.com>) id 1cnVCw-0004u2-PV
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 15:00:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <krzk@kernel.org>) id 1cnV14-0004ri-EM
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 14:48:23 -0400
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Date: Mon, 13 Mar 2017 20:47:50 +0200
-Message-Id: <20170313184750.429-4-krzk@kernel.org>
-In-Reply-To: <20170313184750.429-1-krzk@kernel.org>
-References: <20170313184750.429-1-krzk@kernel.org>
-Subject: [Qemu-devel] [PATCH v3 3/3] hw/misc/exynos4210_pmu: Reorder local
- variables for readability
+	(envelope-from <hwertz10@gmail.com>) id 1cnVCv-0003en-OA
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 15:00:38 -0400
+Received: from mail-ua0-x230.google.com ([2607:f8b0:400c:c08::230]:33060)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <hwertz10@gmail.com>) id 1cnVCv-0003bi-JL
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 15:00:37 -0400
+Received: by mail-ua0-x230.google.com with SMTP id u30so159462843uau.0
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 12:00:35 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA_=nPsgaN0pPuS=sUU_VdvXf3X83YV27jMO2yF3ddyL6Q@mail.gmail.com>
+References: <CAOuPqTEAw67784gswB_Xz+S1LwfmWhSqXK0DgFt05jb=hm2H5w@mail.gmail.com>
+	<CAFEAcA_=nPsgaN0pPuS=sUU_VdvXf3X83YV27jMO2yF3ddyL6Q@mail.gmail.com>
+From: Henry Wertz <hwertz10@gmail.com>
+Date: Mon, 13 Mar 2017 14:00:34 -0500
+Message-ID: <CAOuPqTEBik4WC6qDN2ts+H_uqY=0d9Q97==ZGJVA0DJWa+AMoQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] Small patch for getdents syscall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,42 +28,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mitsyanko <i.mitsyanko@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: eblake@redhat.com, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Krzysztof Kozlowski <krzk@kernel.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>
 
-Short declaration of 'i' was in the middle of declarations with
-assignments.  Make it a little bit more readable.  Additionally switch
-from "unsigned" to "unsigned int" as this pattern is more widely used.
-No functional change.
+On Mar 13, 2017 5:49 AM, "Peter Maydell" <peter.maydell@linaro.org> wrote:
+>
+> On 8 March 2017 at 00:40, Henry Wertz <hwertz10@gmail.com> wrote:
+> > I have a trivial, 1-line patch for getdents function; due to
+> >...
+> There is a theoretically better way to handle the 64-bit
+> guest on 32-bit host case: since here you know that the
+> guest dirent struct is bigger than the host dirent
+> struct you could read them directly into the guest buffer
+> and then convert in-place rather than having to malloc
+> a temporary buffer. The conversion code is a little
+> bit awkward though because you have to make sure you don't
+> overwrite host data you haven't read yet, so I think
+> you would need to start at the end of the buffer and
+> work backwards. This is basically fixing the #else
+> part of this code to work for guest > host as well
+> as for guest == host.
 
-Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
----
- hw/misc/exynos4210_pmu.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+That does sound like it'd be better (avoiding one unnecessary malloc at
+least.)
 
-diff --git a/hw/misc/exynos4210_pmu.c b/hw/misc/exynos4210_pmu.c
-index e30dbc7d3d83..63a8ccd35559 100644
---- a/hw/misc/exynos4210_pmu.c
-+++ b/hw/misc/exynos4210_pmu.c
-@@ -401,8 +401,8 @@ static uint64_t exynos4210_pmu_read(void *opaque, hwaddr offset,
-                                     unsigned size)
- {
-     Exynos4210PmuState *s = (Exynos4210PmuState *)opaque;
--    unsigned i;
-     const Exynos4210PmuReg *reg_p = exynos4210_pmu_regs;
-+    unsigned int i;
- 
-     for (i = 0; i < PMU_NUM_OF_REGISTERS; i++) {
-         if (reg_p->offset == offset) {
-@@ -420,8 +420,8 @@ static void exynos4210_pmu_write(void *opaque, hwaddr offset,
-                                  uint64_t val, unsigned size)
- {
-     Exynos4210PmuState *s = (Exynos4210PmuState *)opaque;
--    unsigned i;
-     const Exynos4210PmuReg *reg_p = exynos4210_pmu_regs;
-+    unsigned int i;
- 
-     for (i = 0; i < PMU_NUM_OF_REGISTERS; i++) {
-         if (reg_p->offset == offset) {
--- 
-2.9.3
+>
+> However, since 64-bit-on-32 is not exactly a very common
+> use case these days I think your patch is an OK fix for
+> things.
+I'd guess this use might (slightly) increase if more x86 binary software
+begins to be shipped x86-64 instead.  That said, this particular code path
+may still barely be used; I would have expected most (especially 64-bit)
+software would call getdents64 instead of getdents, and was surprised to
+find aapt uses getdents instead.
+
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+>
+> PS: we prefer 'unified' format diffs; git format-patch
+> should produce those by default.
+>
+> thanks
+> -- PMM
+
+OK I'll make sure to do that next time.
+
+Thanks!
+
+-- Henry Wertz
