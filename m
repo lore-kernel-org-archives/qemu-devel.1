@@ -1,40 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47209)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cnMrE-0001Yx-C1
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:05:41 -0400
+	(envelope-from <kwolf@redhat.com>) id 1cnN0o-0002Zp-Tz
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:15:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cnMr5-0003aI-JE
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:05:40 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37287
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cnMr5-0003Zz-Cw
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:05:31 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2DA53k0129359
-	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 06:05:30 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 294b216rf5-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 06:05:30 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Mon, 13 Mar 2017 10:05:28 -0000
-Date: Mon, 13 Mar 2017 11:05:23 +0100
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <1489386583-11564-2-git-send-email-jasowang@redhat.com>
-References: <1489386583-11564-1-git-send-email-jasowang@redhat.com>
-	<1489386583-11564-2-git-send-email-jasowang@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1cnN0o-0007ad-0f
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:15:34 -0400
+Date: Mon, 13 Mar 2017 11:15:22 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170313101522.GA5545@noname.redhat.com>
+References: <20170308021533.78292-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170308021533.78292-2-bjsdjshi@linux.vnet.ibm.com>
+	<20170308091346.GB5211@noname.redhat.com>
+	<20170308093105.GC7563@bjsdjshi@linux.vnet.ibm.com>
+	<20170313033105.GA6756@bjsdjshi@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170313110523.549e4a99.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH V2 2/3] virtio: destroy region cache during
- reset
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170313033105.GA6756@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 1/1] block: Handle NULL options
+ correctly in raw_open
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,65 +27,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: mst@redhat.com, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-block@nongnu.org, mreitz@redhat.com, qemu-devel@nongnu.org, cornelia.huck@de.ibm.com, pasic@linux.vnet.ibm.com
 
-On Mon, 13 Mar 2017 14:29:42 +0800
-Jason Wang <jasowang@redhat.com> wrote:
-
-> We don't destroy region cache during reset which can make the maps
-> of previous driver leaked to a buggy or malicious driver that don't
-> set vring address before starting to use the device. Fix this by
-> destroy the region cache during reset and validate it before trying to
-> see them.
+Am 13.03.2017 um 04:31 hat Dong Jia Shi geschrieben:
+> * Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> [2017-03-08 17:31:05 +0800]:
 > 
-> Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> ---
-> Changes from v1:
-> - switch to use rcu in virtio_virtqueue_region_cache()
-> - use unlikely() when needed
-> ---
->  hw/virtio/virtio.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++-------
->  1 file changed, 53 insertions(+), 7 deletions(-)
+> > * Kevin Wolf <kwolf@redhat.com> [2017-03-08 10:13:46 +0100]:
+> > 
+> > > Am 08.03.2017 um 03:15 hat Dong Jia Shi geschrieben:
+> > > > A normal call for raw_open should always pass in a non-NULL @options,
+> > > > but for some certain cases (e.g. trying to applying snapshot on a RBD
+> > > > image), they call raw_open with a NULL @options right after the calling
+> > > > for raw_close.
+> > > > 
+> > > > Let's take the NULL @options as a sign of trying to do raw_open again,
+> > > > and just simply return a success code.
+> > > > 
+> > > > Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> > > 
+> > > I think we rather need to fix bdrv_snapshot_goto() so that it doesn't
+> > > pass NULL, but the actual options that were given for the node (i.e.
+> > > bs->options).
+> > I've tried that before the current try. bs->options does not have the
+> > "file" key-value pair, so that leads to a fail too. Should we put "file"
+> > in to the options manually? I noticed that it was removed from
+> > bs->options during the calling of bdrv_open_inherit.
+> > 
+> Hi Kevin,
 > 
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index 76cc81b..f086452 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -190,6 +190,10 @@ static inline uint16_t vring_avail_flags(VirtQueue *vq)
->  {
->      VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
->      hwaddr pa = offsetof(VRingAvail, flags);
-> +    if (unlikely(!caches)) {
-> +        virtio_error(vq->vdev, "Cannot map avail flags");
-> +        return 0;
+> After thinking for quite some time, I still don't think we need to fix
+> the caller. The reason is that raw_close always does nothing, so no
+> matter what the caller passing in, raw_open should do nothing but just
+> return 0.
 
-I'm still not 100% convinced of those checks; but they don't do any
-harm.
+raw is not the only format driver in qemu.
 
-> +    }
->      return virtio_lduw_phys_cached(vq->vdev, &caches->avail, pa);
->  }
-> 
-
-(...)
-
-> +static void virtio_virtqueue_reset_region_cache(struct VirtQueue *vq)
-> +{
-> +    VRingMemoryRegionCaches *caches;
-> +
-> +    caches = atomic_read(&vq->vring.caches);
-> +    atomic_set(&vq->vring.caches, NULL);
-
-Needs atomic_rcu_set(), I think.
-
-> +    if (caches) {
-> +        call_rcu(caches, virtio_free_region_cache, rcu);
-> +    }
-> +}
-> +
->  void virtio_reset(void *opaque)
->  {
->      VirtIODevice *vdev = opaque;
+Kevin
