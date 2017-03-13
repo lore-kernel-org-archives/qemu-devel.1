@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cnXii-000831-LH
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 17:41:39 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cnXin-00088d-HA
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 17:41:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cnXie-00028L-Jb
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 17:41:33 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cnXim-0002Cy-37
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 17:41:41 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 13 Mar 2017 22:41:15 +0100
-Message-Id: <20170313214117.27350-5-mreitz@redhat.com>
+Date: Mon, 13 Mar 2017 22:41:16 +0100
+Message-Id: <20170313214117.27350-6-mreitz@redhat.com>
 In-Reply-To: <20170313214001.26339-1-mreitz@redhat.com>
 References: <20170313214001.26339-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.10 14/16] block/qcow2: falloc/full
- preallocating growth
+Subject: [Qemu-devel] [PATCH for-2.10 15/16] iotests: Add preallocated
+ resize test for raw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,67 +23,180 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Implement the preallocation modes falloc and full for growing qcow2
-images.
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2.c | 36 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 35 insertions(+), 1 deletion(-)
+ tests/qemu-iotests/106     | 92 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/106.out | 50 +++++++++++++++++++++++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 143 insertions(+)
+ create mode 100755 tests/qemu-iotests/106
+ create mode 100644 tests/qemu-iotests/106.out
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 80fb815b15..b6b08d70da 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2604,7 +2604,9 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
-     int64_t new_l1_size;
-     int ret;
- 
--    if (prealloc != PREALLOC_MODE_OFF && prealloc != PREALLOC_MODE_METADATA) {
-+    if (prealloc != PREALLOC_MODE_OFF && prealloc != PREALLOC_MODE_METADATA &&
-+        prealloc != PREALLOC_MODE_FALLOC && prealloc != PREALLOC_MODE_FULL)
-+    {
-         error_setg(errp, "Unsupported preallocation mode '%s'",
-                    PreallocMode_lookup[prealloc]);
-         return -ENOTSUP;
-@@ -2649,6 +2651,38 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
-         }
-         break;
- 
-+    case PREALLOC_MODE_FALLOC:
-+    case PREALLOC_MODE_FULL:
-+    {
-+        uint64_t additional_size = qcow2_calc_size_usage(bs, old_length, offset,
-+                                                         s->cluster_bits,
-+                                                         s->refcount_order);
-+        int64_t old_file_length = bdrv_getlength(bs->file->bs);
-+        if (old_file_length < 0) {
-+            error_setg(errp, "Failed to inquire file length");
-+            return old_file_length;
-+        }
+diff --git a/tests/qemu-iotests/106 b/tests/qemu-iotests/106
+new file mode 100755
+index 0000000000..32649578fb
+--- /dev/null
++++ b/tests/qemu-iotests/106
+@@ -0,0 +1,92 @@
++#!/bin/bash
++#
++# Test preallocated resize of raw images
++#
++# Copyright (C) 2017 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-+        old_file_length = ROUND_UP(old_file_length, s->cluster_size);
++# creator
++owner=mreitz@redhat.com
 +
-+        ret = bdrv_truncate(bs->file, old_file_length + additional_size,
-+                            prealloc, errp);
-+        if (ret < 0) {
-+            error_prepend(errp, "Failed to resize underlying file");
-+            return ret;
-+        }
++seq=$(basename $0)
++echo "QA output created by $seq"
 +
-+        /* Ensure that preallocation is done in the preallocated area */
-+        s->free_cluster_index = old_file_length / s->cluster_size;
-+        ret = preallocate(bs, old_length, offset);
-+        if (ret < 0) {
-+            error_setg_errno(errp, -ret, "Preallocation failed, image may now "
-+                             "occupy more space than necessary");
-+            return ret;
-+        }
-+        break;
-+    }
++here=$PWD
++status=1	# failure is the default!
 +
-     default:
-         g_assert_not_reached();
-     }
++_cleanup()
++{
++	_cleanup_test_img
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment and filters
++. ./common.rc
++. ./common.filter
++
++_supported_fmt raw
++_supported_proto file
++_supported_os Linux
++
++# in kB
++CREATION_SIZE=128
++GROWTH_SIZE=256
++
++echo '=== Testing image growth ==='
++
++for create_mode in off falloc full; do
++    for growth_mode in off falloc full; do
++        echo
++        echo "--- create_mode=$create_mode growth_mode=$growth_mode ---"
++
++        IMGOPTS="preallocation=$create_mode" _make_test_img ${CREATION_SIZE}K
++        $QEMU_IMG resize -f "$IMGFMT" --preallocation=$growth_mode "$TEST_IMG" +${GROWTH_SIZE}K
++
++        expected_size=0
++        if [ $create_mode != off ]; then
++            expected_size=$CREATION_SIZE
++        fi
++        if [ $growth_mode != off ]; then
++            expected_size=$((expected_size + $GROWTH_SIZE))
++        fi
++
++        actual_size=$($QEMU_IMG info -f "$IMGFMT" "$TEST_IMG" | grep 'disk size')
++        actual_size=$(echo "$actual_size" | sed -e 's/^[^0-9]*\([0-9]\+\).*$/\1/')
++
++        # The actual size may exceed the expected size, depending on the file
++        # system. Therefore we just test that the actual size is at least what
++        # we expect.
++        if [ $actual_size -lt $expected_size ]; then
++            echo "ERROR: Image should have at least ${expected_size}K, but has ${actual_size}K"
++        fi
++    done
++done
++
++echo
++echo '=== Testing image shrinking ==='
++
++# None of this should work except for "off", because other modes cannot be used
++# for shrinking
++for growth_mode in falloc full off; do
++    echo
++    echo "--- growth_mode=$growth_mode ---"
++    $QEMU_IMG resize -f "$IMGFMT" --preallocation=$growth_mode "$TEST_IMG" -${GROWTH_SIZE}K
++done
++
++# success, all done
++echo '*** done'
++rm -f $seq.full
++status=0
+diff --git a/tests/qemu-iotests/106.out b/tests/qemu-iotests/106.out
+new file mode 100644
+index 0000000000..0a42312301
+--- /dev/null
++++ b/tests/qemu-iotests/106.out
+@@ -0,0 +1,50 @@
++QA output created by 106
++=== Testing image growth ===
++
++--- create_mode=off growth_mode=off ---
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072 preallocation=off
++Image resized.
++
++--- create_mode=off growth_mode=falloc ---
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072 preallocation=off
++Image resized.
++
++--- create_mode=off growth_mode=full ---
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072 preallocation=off
++Image resized.
++
++--- create_mode=falloc growth_mode=off ---
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072 preallocation=falloc
++Image resized.
++
++--- create_mode=falloc growth_mode=falloc ---
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072 preallocation=falloc
++Image resized.
++
++--- create_mode=falloc growth_mode=full ---
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072 preallocation=falloc
++Image resized.
++
++--- create_mode=full growth_mode=off ---
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072 preallocation=full
++Image resized.
++
++--- create_mode=full growth_mode=falloc ---
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072 preallocation=full
++Image resized.
++
++--- create_mode=full growth_mode=full ---
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072 preallocation=full
++Image resized.
++
++=== Testing image shrinking ===
++
++--- growth_mode=falloc ---
++qemu-img: Preallocation can only be used for growing images
++
++--- growth_mode=full ---
++qemu-img: Preallocation can only be used for growing images
++
++--- growth_mode=off ---
++Image resized.
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 1f4bf03185..1a89bebe14 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -112,6 +112,7 @@
+ 103 rw auto quick
+ 104 rw auto
+ 105 rw auto quick
++106 rw auto quick
+ 107 rw auto quick
+ 108 rw auto quick
+ 109 rw auto
 -- 
 2.12.0
