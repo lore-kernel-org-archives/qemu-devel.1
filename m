@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cnMjR-0006xa-SY
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 05:57:39 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cnMo8-00085y-0t
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:02:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cnMjO-00079i-SM
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 05:57:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56458)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cnMjO-00079Q-K6
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 05:57:34 -0400
-Date: Mon, 13 Mar 2017 09:57:23 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170313095723.GC4799@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170222144407.GS19045@localhost.localdomain>
-	<CAAo6VWPWjRTE3t9myt7Q6gTnZcvP72ypTE03PCFfJkvb2UWLTA@mail.gmail.com>
-	<20170224091916.GD3702@redhat.com>
-	<CAAo6VWPyQrjSp2qjvxqXRPS8=5N85i0-DJdkWhiGaXmND_8+qA@mail.gmail.com>
-	<20170227092207.GA18219@redhat.com>
-	<CAAo6VWO6zAijMMjHOkefO22wh+6dXigZ6a+g-pMNBcM0MN1HHw@mail.gmail.com>
-	<20170301091851.GD17125@redhat.com>
-	<CAAo6VWNRhK6zvc+CferSd9wYQZNNoXDqCEW_G62crqsamyEC9Q@mail.gmail.com>
-	<20170306092305.GA9866@redhat.com>
-	<CAAo6VWMo-wYwkOAENk4swYk3dkbxaJObXrj85yDRLAUofK2qtw@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cnMo3-0000x9-KM
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:02:28 -0400
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:38445)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cnMo3-0000wa-D5
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 06:02:23 -0400
+Received: by mail-wm0-x236.google.com with SMTP id t189so35624838wmt.1
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 03:02:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAAo6VWMo-wYwkOAENk4swYk3dkbxaJObXrj85yDRLAUofK2qtw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
- block device type called "vxhs"
+In-Reply-To: <87tw6y8bs8.fsf@secure.mitica>
+References: <87tw6y8bs8.fsf@secure.mitica>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 13 Mar 2017 11:02:01 +0100
+Message-ID: <CAFEAcA978SJemCfYJPa8jwtuhhi6JGh9pEDGYNJ1npJA3nvEQA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] KVM call for 2017-03-14
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,55 +28,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ashish mittal <ashmit602@gmail.com>
-Cc: Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: KVM devel mailing list <kvm@vger.kernel.org>, QEMU Developer <qemu-devel@nongnu.org>
 
-On Tue, Mar 07, 2017 at 05:27:55PM -0800, ashish mittal wrote:
-> Thanks! There is one more input I need some help with!
-> 
-> VxHS network library opens a fixed number of connection channels to a
-> given host, and all the vdisks (that connect to the same host) share
-> these connection channels.
-> 
-> Therefore, we need to open secure channels to a specific target host
-> only once for the first vdisk that connects to that host. All the
-> other vdisks that connect to the same target host will share the same
-> set of secure communication channels.
-> 
-> I hope the above scheme is acceptable?
-> 
-> If yes, then we have a couple of options to implement this:
-> 
-> (1) Accept the TLS credentials per vdisk using the previously
-> discussed --object tls-creds-x509 mechanism. In this case, if more
-> than one vdisk have the same host info, then we will use only the
-> first one's creds to set up the secure connection, and ignore the
-> others. vdisks that connect to different target hosts will use their
-> individual tls-creds-x509 to set up the secure channels. This is, of
-> course, not relevant for qemu-img/qemu-io as they can open only one
-> vdisk at a time.
+On 12 March 2017 at 21:45, Juan Quintela <quintela@redhat.com> wrote:
+>
+>
+> Hi
+>
+> Please, send any topic that you are interested in covering.
+>
+> So far the agenda is:
+>
+> - Direction of QEMU and toolstack in light of Google Cloud blog:
+>   https://cloudplatform.googleblog.com/2017/01/7-ways-we-harden-our-KVM-hypervisor-at-Google-Cloud-security-in-plaintext.html
 
-It looks like option 1 here is the way to go. Just report an error if
-there are multiple creds provided for the same host and they don't
-match.
 
-> 
-> (2) Instead of having a per-vdisk --object tls-creds-x509, have a
-> single such argument on the command line for vxhs block device code to
-> consume - if that is possible! One way to achieve this could be the
-> user/password authentication we discussed earlier, which we could use
-> to pass the directory where cert/keys are kept.
-> 
-> (3) Use the instance UUID, when available, to lookup the cert files
-> per instance (i.e. for qemu-kvm), and use the --object tls-creds-x509
-> mechanism, when instance UUID is NULL (i.e. qemu-io, qemu-img etc).
-> The cert/key files are anyway protected by file permissions in either
-> case, so I guess there is no additional security provided by either
-> method.
+Ah, I'd forgotten that this was on the call agenda. I actually
+had an interesting conversation with Alex Graf last week about
+some similar topics, which I guess you could generally summarize
+as "what are the issues we need to address as a project in order
+to not become irrelevant in five years time". Since I wrote them
+up for an internal "what I did on my holi^Wconference trip" report
+I might as well repost them here:
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+  - on the "VM support" side, QEMU is more used because it's the only
+    production-quality option in this space, rather than because its
+    users love it. (cf the Google choice to replace it.) It's also got
+    a pretty poor security record. It wouldn't be too surprising if
+    some time in the next five years somebody writes a replacement in
+    a safer language (perhaps also targeting only the VM support role)
+    and it got enough mindshare and takeup to eclipse QEMU.
+    [Is it too early/daft to think about prototyping being able to
+     write QEMU device emulation in Rust ?]
+    If the "VM support" usecase moves to another project then QEMU
+    will become a very quiet backwater...
+  - on the "emulation" side, nobody is clearly articulating a purpose
+    for QEMU, a reason why you should use it rather than other modelling
+    technologies (or rather than using real hardware). As a result the
+    efforts applied to QEMU are somewhat unfocused. Are we trying to be:
+    . a dev platform before easy h/w availability?
+      [not easy for QEMU for several reasons]
+    . a dev tool that provides better introspection into guest
+      behaviour than running on h/w?
+      [if so we should put more work into improving our introspection
+       and guest tracing capabilities!]
+    . primarily a tool for doing automated CI testing and one-off
+      developer smoke-testing that's easier to set up and scale than
+      trying to test on real h/w?
+    . something else?
+      [your idea goes here!]
+  - in all areas our legacy code and back-compatibility requirements
+    are threatening to choke forward progress if we don't make serious
+    efforts to get on top of them
+  - there's no easy way for people to use parts of QEMU like the CPU
+    emulation, or to add their own devices without having to write lots
+    of C code (we're firmly in a "one monolithic blob of code" setup
+    right now and disentangling and setting clear API dividing lines
+    will be a lot of work)
+    [Making QEMU more modular would help with defeating the legacy
+    and back-compat dragons, though]
+
+thanks
+-- PMM
