@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cnJJu-0007d2-8u
+	(envelope-from <armbru@redhat.com>) id 1cnJJr-0007bI-3o
 	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:19:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cnJJn-0003g1-CP
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:19:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49210)
+	(envelope-from <armbru@redhat.com>) id 1cnJJm-0003dW-5r
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:18:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49204)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cnJJn-0003e0-21
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:18:55 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cnJJl-0003aL-Rx
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 02:18:54 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 13 Mar 2017 07:18:46 +0100
-Message-Id: <1489385927-6735-47-git-send-email-armbru@redhat.com>
+Date: Mon, 13 Mar 2017 07:18:27 +0100
+Message-Id: <1489385927-6735-28-git-send-email-armbru@redhat.com>
 In-Reply-To: <1489385927-6735-1-git-send-email-armbru@redhat.com>
 References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.9 46/47] qapi: Make pylint a bit happier
+Subject: [Qemu-devel] [PATCH for-2.9 27/47] qapi2texi: Generate
+ documentation for variant members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,85 +27,114 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, eblake@redhat.com, mdroth@linux.vnet.ibm.com
 
+A flat union's branch brings in the members of another type.  Generate
+a suitable reference to that type.
+
+Example change (qemu-qmp-ref.txt):
+
+  -- Flat Union: QCryptoBlockOpenOptions
+
+      The options that are available for all encryption formats when
+      opening an existing volume
+
+      Members:
+      The members of 'QCryptoBlockOptionsBase'
++     The members of 'QCryptoBlockOptionsQCow' when 'format' is "qcow"
++     The members of 'QCryptoBlockOptionsLUKS' when 'format' is "luks"
+
+      Since: 2.6
+
+A simple union's branch adds a member 'data' of some other type.
+Generate documentation for that member.
+
+Example change (qemu-qmp-ref.txt):
+
+  -- Simple Union: SocketAddress
+
+      Captures the address of a socket, which could also be a named file
+      descriptor
+
+      Members:
+      'type'
+	   Not documented
++     'data: InetSocketAddress' when 'type' is "inet"
++     'data: UnixSocketAddress' when 'type' is "unix"
++     'data: VsockSocketAddress' when 'type' is "vsock"
++     'data: String' when 'type' is "fd"
+
+      Since: 1.3
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi-commands.py | 6 +++---
- scripts/qapi-visit.py    | 1 -
- scripts/qapi.py          | 8 ++++----
- 3 files changed, 7 insertions(+), 8 deletions(-)
+ scripts/qapi2texi.py | 27 ++++++++++++++++++++-------
+ 1 file changed, 20 insertions(+), 7 deletions(-)
 
-diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
-index 0c05449..1943de4 100644
---- a/scripts/qapi-commands.py
-+++ b/scripts/qapi-commands.py
-@@ -13,7 +13,6 @@
- # See the COPYING file in the top-level directory.
- 
- from qapi import *
--import re
+diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
+index 7083d0c..ab6b6cd 100755
+--- a/scripts/qapi2texi.py
++++ b/scripts/qapi2texi.py
+@@ -133,17 +133,18 @@ def texi_enum_value(value):
+     return '@item @code{%s}\n' % value.name
  
  
- def gen_command_decl(name, arg_type, boxed, ret_type):
-@@ -84,7 +83,8 @@ static void qmp_marshal_output_%(c_name)s(%(c_type)s ret_in, QObject **ret_out,
+-def texi_member(member):
++def texi_member(member, suffix=''):
+     """Format a table of members item for an object type member"""
+     typ = member.type.doc_type()
+-    return '@item @code{%s%s%s}%s\n' % (
++    return '@item @code{%s%s%s}%s%s\n' % (
+         member.name,
+         ': ' if typ else '',
+         typ if typ else '',
+-        ' (optional)' if member.optional else '')
++        ' (optional)' if member.optional else '',
++        suffix)
  
  
- def gen_marshal_proto(name):
--    return 'void qmp_marshal_%s(QDict *args, QObject **ret, Error **errp)' % c_name(name)
-+    return ('void qmp_marshal_%s(QDict *args, QObject **ret, Error **errp)'
-+            % c_name(name))
+-def texi_members(doc, what, base, member_func):
++def texi_members(doc, what, base, variants, member_func):
+     """Format the table of members"""
+     items = ''
+     for section in doc.args.itervalues():
+@@ -154,6 +155,17 @@ def texi_members(doc, what, base, member_func):
+         items += member_func(section.member) + texi_format(desc) + '\n'
+     if base:
+         items += '@item The members of @code{%s}\n' % base.doc_type()
++    if variants:
++        for v in variants.variants:
++            when = ' when @code{%s} is @t{"%s"}' % (
++                variants.tag_member.name, v.name)
++            if v.type.is_implicit():
++                assert not v.type.base and not v.type.variants
++                for m in v.type.local_members:
++                    items += member_func(m, when)
++            else:
++                items += '@item The members of @code{%s}%s\n' % (
++                    v.type.doc_type(), when)
+     if not items:
+         return ''
+     return '\n@b{%s:}\n@table @asis\n%s@end table\n' % (what, items)
+@@ -176,9 +188,10 @@ def texi_sections(doc):
+     return body
  
  
- def gen_marshal_decl(name):
-@@ -198,7 +198,7 @@ def gen_register_command(name, success_response):
-         options = 'QCO_NO_SUCCESS_RESP'
- 
-     ret = mcgen('''
--    qmp_register_command(cmds, "%(name)s", 
-+    qmp_register_command(cmds, "%(name)s",
-                          qmp_marshal_%(c_name)s, %(opts)s);
- ''',
-                 name=name, c_name=c_name(name),
-diff --git a/scripts/qapi-visit.py b/scripts/qapi-visit.py
-index 3d3936e..5737aef 100644
---- a/scripts/qapi-visit.py
-+++ b/scripts/qapi-visit.py
-@@ -13,7 +13,6 @@
- # See the COPYING file in the top-level directory.
- 
- from qapi import *
--import re
+-def texi_entity(doc, what, base=None, member_func=texi_member):
++def texi_entity(doc, what, base=None, variants=None,
++                member_func=texi_member):
+     return (texi_body(doc)
+-            + texi_members(doc, what, base, member_func)
++            + texi_members(doc, what, base, variants, member_func)
+             + texi_sections(doc))
  
  
- def gen_visit_decl(name, scalar=False):
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 4102011..a4bf1ea 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -11,13 +11,13 @@
- # This work is licensed under the terms of the GNU GPL, version 2.
- # See the COPYING file in the top-level directory.
+@@ -213,7 +226,7 @@ class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisitor):
+             self.out += '\n'
+         self.out += TYPE_FMT(type=typ,
+                              name=doc.symbol,
+-                             body=texi_entity(doc, 'Members', base))
++                             body=texi_entity(doc, 'Members', base, variants))
  
--import re
--from ordereddict import OrderedDict
- import errno
- import getopt
- import os
--import sys
-+import re
- import string
-+import sys
-+from ordereddict import OrderedDict
- 
- builtin_types = {
-     'str':      'QTYPE_QSTRING',
-@@ -1582,7 +1582,7 @@ class QAPISchema(object):
-         tag_member = None
-         if isinstance(base, dict):
-             base = (self._make_implicit_object_type(
--                    name, info, doc, 'base', self._make_members(base, info)))
-+                name, info, doc, 'base', self._make_members(base, info)))
-         if tag_name:
-             variants = [self._make_variant(key, value)
-                         for (key, value) in data.iteritems()]
+     def visit_alternate_type(self, name, info, variants):
+         doc = self.cur_doc
 -- 
 2.7.4
