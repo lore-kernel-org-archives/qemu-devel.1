@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56303)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cnmPQ-0002FD-CV
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:22:42 -0400
+	(envelope-from <eblake@redhat.com>) id 1cnmR4-000301-0g
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:24:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cnmPO-000201-03
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:22:40 -0400
-Received: from mail-lf0-x229.google.com ([2a00:1450:4010:c07::229]:35162)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1cnmPN-0001yd-GI
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:22:37 -0400
-Received: by mail-lf0-x229.google.com with SMTP id j90so76435812lfk.2
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 06:22:37 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1cnmR0-0003V2-OV
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:24:21 -0400
+References: <1489477952-6901-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <14a8d8e9-fe37-5f32-c3c2-05419447fff6@redhat.com>
+Date: Tue, 14 Mar 2017 08:24:13 -0500
 MIME-Version: 1.0
-References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
-	<CAJ+F1CKiE2FHjS0_K2F+yS-ByZMtVVFh6+NLm_q4_myeg=_KdQ@mail.gmail.com>
-	<87lgs974rd.fsf@dusky.pond.sub.org>
-	<CAJ+F1CL_iQNVN5a=rZ93bWnnG89710aBkN7iT_eiqNtwJRk=7w@mail.gmail.com>
-	<8760jd5nhw.fsf@dusky.pond.sub.org>
-In-Reply-To: <8760jd5nhw.fsf@dusky.pond.sub.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 14 Mar 2017 13:22:24 +0000
-Message-ID: <CAJ+F1C+FBx07+WBx4hZKDdWTS8-Z56JfiJgFzy2gLnWos17GYw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.9 00/47] qapi: Put type information
- back into QMP documentation
+In-Reply-To: <1489477952-6901-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="iFoe0CnpE29WcK9HflLB8fKLl5LCer2Ki"
+Subject: Re: [Qemu-devel] [PATCH] hw/net/virtio-net.c: Follow CODING_STYLE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,247 +23,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>, Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>
 
-Hi
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--iFoe0CnpE29WcK9HflLB8fKLl5LCer2Ki
+From: Eric Blake <eblake@redhat.com>
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>,
+ qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>
+Message-ID: <14a8d8e9-fe37-5f32-c3c2-05419447fff6@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/net/virtio-net.c: Follow CODING_STYLE
+References: <1489477952-6901-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+In-Reply-To: <1489477952-6901-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 13, 2017 at 5:12 PM Markus Armbruster <armbru@redhat.com> wrote=
-:
+On 03/14/2017 02:52 AM, Zhang Chen wrote:
+> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+> ---
+>  hw/net/virtio-net.c | 53 +++++++++++++++++++++++++++++++++------------=
+--------
+>  1 file changed, 33 insertions(+), 20 deletions(-)
+>=20
+> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> index c321680..ede618e 100644
+> --- a/hw/net/virtio-net.c
+> +++ b/hw/net/virtio-net.c
+> @@ -273,7 +273,7 @@ static void virtio_net_set_status(struct VirtIODevi=
+ce *vdev, uint8_t status)
+>          if (queue_started) {
+>              if (q->tx_timer) {
+>                  timer_mod(q->tx_timer,
+> -                               qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +=
+ n->tx_timeout);
+> +                         qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + n->tx=
+_timeout);
 
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
->
-> > Hi
-> >
-> > On Mon, Mar 13, 2017 at 4:14 PM Markus Armbruster <armbru@redhat.com>
-> wrote:
-> >
-> >> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
-> >>
-> >> > Hi
-> >> >
-> >> > On Mon, Mar 13, 2017 at 10:23 AM Markus Armbruster <armbru@redhat.co=
-m
-> >
-> >> > wrote:
-> >> >
-> >> >> I'm proposing this is 2.9 because it fixes a documentation
-> regression.
-> >> >> It affects only documentation; generated C code is unchanged except
-> >> >> for the removal of trailing space in PATCH 46.
-> >> >>
-> >> >> Based on my qapi-next branch, which contains Marc-Andr=C3=A9's PATC=
-H 1/2.
-> >> >>
-> >> >> Marc-Andr=C3=A9's work to merge qmp-commands.txt and qmp-events.txt=
- into
-> >> >> the QAPI schema and generate their replacements from the schema
-> >> >> (commit b6af8ea..56e8bdd) was a big step forward.  As committed, it
-> >> >> also was a step back: the documentation lost information on JSON
-> >> >> types, because I didn't like Marc-Andr=C3=A9's patch to add it.  He
-> >> >> reposted it for further review afterwards:
-> >> >>
-> >> >>     Subject: [PATCH 0/2] qapi2texi: add type information
-> >> >>     Message-Id: <20170125130308.16104-1-marcandre.lureau@redhat.com=
->
-> >> >>
-> https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg05432.html
-> >> >>
-> >> >> His PATCH 1/2 is a straightforward cleanup.  His PATCH 2/2 adds typ=
-e
-> >> >> descriptions in a new formal language to the generated documentatio=
-n.
-> >> >> Quoting the commit message:
-> >> >>
-> >> >>     Array types have the following syntax: type[]. Ex: str[].
-> >> >>
-> >> >>     - Struct, commands and events use the following members syntax:
-> >> >>
-> >> >>       { 'member': type, ('foo': str), ... }
-> >> >>
-> >> >>     Optional members are under parentheses.
-> >> >>
-> >> >>     A structure with a base type will have 'BaseStruct +' prepended=
-.
-> >> >>
-> >> >>     - Alternates use the following syntax:
-> >> >>
-> >> >>       [ 'foo': type, 'bar': type, ... ]
-> >> >>
-> >> >>     - Simple unions use the following syntax:
-> >> >>
-> >> >>       { 'type': str, 'data': 'type' =3D [ 'foo': type, 'bar': type.=
-..
-> ] }
-> >> >>
-> >> >>     - Flat unions use the following syntax:
-> >> >>
-> >> >>       BaseStruct + 'discriminator' =3D [ 'foo': type, 'bar': type..=
-. ]
-> >> >>
-> >> >> End quote.  Looks like this in generated documentation:
-> >> >>
-> >> >>  -- Event: VNC_CONNECTED {'server': VncServerInfo, 'client':
-> >> >>           VncBasicInfo}
-> >> >>
-> >> >>      Emitted when a VNC client establishes a connection
-> >> >>      ''server''
-> >> >>           server information
-> >> >>      ''client''
-> >> >>           client information
-> >> >>
-> >> >>      Note: This event is emitted before any authentication takes
-> place,
-> >> >>      thus the authentication ID is not provided
-> >> >> [...]
-> >> >>
-> >> >>  -- Struct: VncServerInfo VncBasicInfo + {('auth': str)}
-> >> >>
-> >> >>      The network connection information for server
-> >> >>      ''auth'' (optional)
-> >> >>           authentication method used for the plain (non-websocket)
-> VNC
-> >> >>           server
-> >> >>
-> >> >>      Since: 2.1
-> >> >>
-> >> >>  -- Simple Union: SocketAddress { 'type': str, 'data': 'type' =3D
-> ['inet':
-> >> >>           InetSocketAddress, 'unix': UnixSocketAddress, 'vsock':
-> >> >>           VsockSocketAddress, 'fd': String] }
-> >> >>
-> >> >>      Captures the address of a socket, which could also be a named
-> file
-> >> >>      descriptor
-> >> >>
-> >> >>      Since: 1.3
-> >> >>
-> >> >> Here's my counter-proposal: instead of inventing a formal language,
-> >> >> fix the natural language documentation to actually mention *all*
-> >> >> members, and add type information in a plain, easy-to-understand wa=
-y.
-> >> >> Looks like this:
-> >> >>
-> >> >>  -- Event: VNC_CONNECTED
-> >> >>
-> >> >>      Emitted when a VNC client establishes a connection
-> >> >>
-> >> >>      Arguments:
-> >> >>      'server: VncServerInfo'
-> >> >>           server information
-> >> >>      'client: VncBasicInfo'
-> >> >>           client information
-> >> >>
-> >> >>      Note: This event is emitted before any authentication takes
-> place,
-> >> >>      thus the authentication ID is not provided
-> >> >> [...]
-> >> >>
-> >> >>  -- Object: VncServerInfo
-> >> >>
-> >> >>      The network connection information for server
-> >> >>
-> >> >>      Members:
-> >> >>      'auth: string' (optional)
-> >> >>           authentication method used for the plain (non-websocket)
-> VNC
-> >> >>           server
-> >> >>      The members of 'VncBasicInfo'
-> >> >>
-> >> >>      Since: 2.1
-> >> >>
-> >> >>  -- Object: SocketAddress
-> >> >>
-> >> >>      Captures the address of a socket, which could also be a named
-> file
-> >> >>      descriptor
-> >> >>
-> >> >>      Members:
-> >> >>      'type'
-> >> >>           One of "inet", "unix", "vsock", "fd"
-> >> >>      'data: InetSocketAddress' when 'type' is "inet"
-> >> >>      'data: UnixSocketAddress' when 'type' is "unix"
-> >> >>      'data: VsockSocketAddress' when 'type' is "vsock"
-> >> >>      'data: String' when 'type' is "fd"
-> >> >>
-> >> >>      Since: 1.3
-> >> >>
-> >> >>
-> >> > I like both, to me they serve different purposes. I like to have a
-> short
-> >> > overview / signature and then a more detailed documentation for each
-> >> field.
-> >>
-> >> I sympathize with the argument.  Unfortunately, the "short" signatures
-> >> are anything but for real-world QAPI:
-> >>
-> >
-> > That's a worse case, a regular case is more readable.
->
-> There are readable cases, but there are plenty of cases that plainly
-> aren't.
->
-> 102 out of 472 signatures don't count because they're empty.
->
-> Roughly half the non-empty signatures fit on a single line.  That's short=
-.
->
-> A bit under a third take two lines.  I guess that's still short enough.
->
-> More than one in six signatures is three lines or more.
->
-> >                                                       And it is still
-> > useful anyway since the common members would be listed first.
->
-> Whatever comes first in signatures comes first in the table of members,
-> too.  The names are easier to spot there, because they're all on the
-> left.
->
-> Compare
->
->  -- Simple Union: SocketAddress { 'type': str, 'data': 'type' =3D ['inet'=
-:
->           InetSocketAddress, 'unix': UnixSocketAddress, 'vsock':
->           VsockSocketAddress, 'fd': String] }
->
->      Captures the address of a socket, which could also be a named file
->      descriptor
->
->      Since: 1.3
->
-> to
->
->  -- Object: SocketAddress
->
->      Captures the address of a socket, which could also be a named file
->      descriptor
->
->      Members:
->      'type'
->           One of "inet", "unix", "vsock", "fd"
->      'data: InetSocketAddress' when 'type' is "inet"
->      'data: UnixSocketAddress' when 'type' is "unix"
->      'data: VsockSocketAddress' when 'type' is "vsock"
->      'data: String' when 'type' is "fd"
->
->      Since: 1.3
->
-> In my opinion, the three lines of signature add nothing but noise to the
-> six lines of member table.
->
+Indentation still looks off.  You want the two q's to be in the same colu=
+mn.
 
-It is more natural and faster to read to me for commands and events for
-example.  The verbose description is mixing description and sometime even
-providing redundant information (ex: keys: array of KeyValue,  An array of
-'KeyValue' elements...), slowing reading even more. Often you don't need to
-read the documentation / description, you want to quickly check the return
-type, and remind you the arguments.
+Otherwise looks okay. Wholesale reformatting of a file with no other
+changes tends to make 'git blame' attribution a bit noisier than
+necessary, so it's a maintainer's judgment call whether to take it.  But
+with the indentation fixed, you can add:
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-struct/objects are more commonly declared with a line per member, so it
-doesn't bother me as much.
-
-I would appreciate if can have the declarative form for commands and events
-at least. Other types are usually more complex or long, so that may clear
-your concerns for the long declarations.
 --=20
-Marc-Andr=C3=A9 Lureau
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--iFoe0CnpE29WcK9HflLB8fKLl5LCer2Ki
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYx+79AAoJEKeha0olJ0NqWaQH/i46jcXjl+P4en4pWzyAWBl9
+09YiPZ+/KGN8BJdlfFJ+4IMBEuoe7l9nCAkMfUwF8Xbx/3oQxyThiWA+n/kRMXTE
+8a39CL5TGKGz7jcIte0ORa+4nG1w/0tLf8UE1dv/IMr4KkE6HQI+YqKHtS8ZO6L6
+qscIQdu9r7ZgUWaaD6jSK8i9yo0c0u8WkzbE2F6Wk4Evz18zY4MrjEZLXpdg7O+O
+DXcIVd9JI5R0gH6lvxDqfSUTom03gPA6BN8BWonjX5M9hyjPhVM4ekiYLNWdNX5G
+PYMF30j7MSlihaOZLqEniPdD/+r5Gpoz4wfjr8F52u8uHbku8lbMRD5Xs30utKg=
+=EdmU
+-----END PGP SIGNATURE-----
+
+--iFoe0CnpE29WcK9HflLB8fKLl5LCer2Ki--
