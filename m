@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cnkO8-0006w1-Tc
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:13:13 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cnkQb-0004mR-1j
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:15:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cnkO7-0006LS-NV
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:13:12 -0400
-References: <36e41adf-b0b3-3efa-51c4-f1a70cd05b98@ilande.co.uk>
-	<87wpbsp49a.fsf@linaro.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <6491a446-bf23-5ab9-3431-c67efaf83f71@ilande.co.uk>
-Date: Tue, 14 Mar 2017 11:12:42 +0000
+	(envelope-from <peter.maydell@linaro.org>) id 1cnkQa-0007fX-6O
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:15:44 -0400
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:35722)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cnkQa-0007ez-13
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:15:44 -0400
+Received: by mail-wr0-x22e.google.com with SMTP id g10so121736530wrg.2
+	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 04:15:43 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87wpbsp49a.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] qemu-system-ppc video artifacts since "tcg: drop
- global lock during TCG code execution"
+In-Reply-To: <20170314042626.20020-1-david@gibson.dropbear.id.au>
+References: <20170314042626.20020-1-david@gibson.dropbear.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 14 Mar 2017 12:15:22 +0100
+Message-ID: <CAFEAcA_oS+b8dNbP62EUDTizP+NErtWEA+akKy3xjGbC2-b-=g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 0/4] ppc-for-2.9 queue 20170314
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,55 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: jan.kiszka@siemens.com, fred.konrad@greensocs.com, cota@braap.org, rth@twiddle.net, bobby.prani@gmail.com, qemu-devel <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
 
-On 14/03/17 10:00, Alex Bennée wrote:
+On 14 March 2017 at 05:26, David Gibson <david@gibson.dropbear.id.au> wrote:
+> The following changes since commit 5bac3c39c82e149515c10643acafd1d292433775:
+>
+>   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2017-03-13 15:08:01 +0000)
+>
+> are available in the git repository at:
+>
+>   git://github.com/dgibson/qemu.git tags/ppc-for-2.9-20170314
+>
+> for you to fetch changes up to 28df75d8d1aebdb09a2cc511c0b97690eac0b7a7:
+>
+>   dtc: Update submodule to avoid build errors (2017-03-14 12:24:29 +1100)
+>
+> ----------------------------------------------------------------
+> ppc patch queue for 2017-03-14
+>
+> This set has a handful og bugfixes to go into qemu-2.9.  This includes
+> an update to the dtc/libfdt submodule which will fix the build errors
+> seen on some distributions.
+>
+> ----------------------------------------------------------------
 
-> Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
-> 
->> I've recently noticed some video artifacts appearing in the form of
->> horizontal lines whilst testing OpenBIOS boot on some qemu-system-ppc
->> images (see https://www.ilande.co.uk/tmp/qemu/macos9-stripe.png for an
->> example) which I've finally bisected down to this commit.
-> 
-> Interesting. Is the video hardware in this case a simple framebuffer or
-> is there some sort of GPU involved?
+Applied, thanks.
 
-For the mac99 machine it's just the normal QEMU PCI std-vga card, so
-nothing special. Having run tests across SPARC which uses its own
-framebuffer, there have been no obvious artifacts that I've spotted
-there to date.
-
->> The horizontal lines tend to appear at different positions with
->> different lengths, although it seems to be more common that a complete
->> scanline is affected. Reproducing the issue is fairly easy with a MacOS
->> 9.2.1 ISO and the command line below:
->>
->> ./qemu-system-ppc -cdrom MacOS921.iso -boot d -m 512 -M mac99
->>
->> Could it be that this patch is still missing a lock somewhere which
->> causes these artifacts to appear?
-> 
-> It depends. If the hardware is accessed via MMIO then the BQL is taken
-> automatically (unless the area is explicitly marked as doing its own
-> locking see: mr->global_locking).
-> 
-> Is the artefact temporary or permanent? Could it be a change in
-> synchronisation between the emulator updating the framebuffer and
-> whatever backend updating its display?
-
-AFAICT they are temporary in that they appear randomly on the display,
-but the next time that particular area of the display is updated by the
-guest then they tend to either change/disappear.
-
-MacOS 9 is interesting in that it's effectively an emulator within an
-emulator, i.e. 68K code running on a PPC emulator and so does tend to
-stress QEMU in interesting places. Given that I've also seen the
-occasional issue with Darwin/OS X it seems the problem isn't just
-constrained to OS 9, however it seems to occur a lot more often there.
-
-
-ATB,
-
-Mark.
+-- PMM
