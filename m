@@ -1,30 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57126)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anthony.xu@intel.com>) id 1cnenN-0007Il-Pq
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 01:14:55 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1cnf6R-0001Pk-Gr
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 01:34:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anthony.xu@intel.com>) id 1cnenI-0001bI-Qm
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 01:14:53 -0400
-Received: from mga09.intel.com ([134.134.136.24]:40606)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
-	id 1cnenI-0001b0-EX
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 01:14:48 -0400
-From: "Xu, Anthony" <anthony.xu@intel.com>
-Date: Tue, 14 Mar 2017 05:14:44 +0000
-Message-ID: <4712D8F4B26E034E80552F30A67BE0B1A13045@ORSMSX112.amr.corp.intel.com>
-References: <1489158897-9206-1-git-send-email-yang.zhong@intel.com>
-	<1489158897-9206-2-git-send-email-yang.zhong@intel.com>
-	<53522014-8f70-9358-7d60-8b6c491c9611@redhat.com>
-	<4712D8F4B26E034E80552F30A67BE0B1A0F91A@ORSMSX112.amr.corp.intel.com>
-	<920352018.1797331.1489251855464.JavaMail.zimbra@redhat.com>
-In-Reply-To: <920352018.1797331.1489251855464.JavaMail.zimbra@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] reduce qemu's heap Rss size from
- 12252kB to 2752KB
+	(envelope-from <dgibson@ozlabs.org>) id 1cnf6Q-0002iF-JV
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 01:34:35 -0400
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Tue, 14 Mar 2017 16:34:20 +1100
+Message-Id: <20170314053422.10922-4-david@gibson.dropbear.id.au>
+In-Reply-To: <20170314053422.10922-1-david@gibson.dropbear.id.au>
+References: <20170314053422.10922-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PATCHv2 for-2.10 3/5] pseries: Enable HPT resizing
+ for 2.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,102 +20,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Zhong, Yang" <yang.zhong@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Peng, Chao P" <chao.p.peng@intel.com>
+To: qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, agraf@suse.de, thuth@redhat.com, lvivier@redhat.com, benh@kernel.crashing.org, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, David Gibson <david@gibson.dropbear.id.au>
 
-PiA+ID4gU3VicGFnZXMgbmV2ZXIgaGF2ZSBzdWJyZWdpb25zLCBzbyB0aGUgbG9vcCBuZXZlciBy
-dW5zLiAgVGhlDQo+IGJlZ2luL2NvbW1pdA0KPiA+ID4gcGFpciB0aGVuIGJlY29tZXM6DQo+ID4g
-Pg0KPiA+ID4gICAgICsrbWVtb3J5X3JlZ2lvbl90cmFuc2FjdGlvbl9kZXB0aDsNCj4gPiA+ICAg
-ICAtLW1lbW9yeV9yZWdpb25fdHJhbnNhY3Rpb25fZGVwdGg7DQo+ID4gPiAgICAgaWYgKCFtZW1v
-cnlfcmVnaW9uX3RyYW5zYWN0aW9uX2RlcHRoKSB7DQo+ID4gPiAgICAgICAgIGlmIChtZW1vcnlf
-cmVnaW9uX3VwZGF0ZV9wZW5kaW5nKSB7DQo+ID4gPiAgICAgICAgICAgICAuLi4NCj4gPiA+ICAg
-ICAgICAgfSBlbHNlIGlmIChpb2V2ZW50ZmRfdXBkYXRlX3BlbmRpbmcpIHsNCj4gPiA+ICAgICAg
-ICAgICAgIC4uLg0KPiA+ID4gICAgICAgICB9DQo+ID4gPiAgICAgICAgIC8vIG1lbW9yeV9yZWdp
-b25fY2xlYXJfcGVuZGluZygpDQo+ID4gPiAgICAgICAgIG1lbW9yeV9yZWdpb25fdXBkYXRlX3Bl
-bmRpbmcgPSBmYWxzZTsNCj4gPiA+ICAgICAgICAgaW9ldmVudGZkX3VwZGF0ZV9wZW5kaW5nID0g
-ZmFsc2U7DQo+ID4gPiAgICB9DQo+ID4gPg0KPiA+ID4gSWYgbWVtb3J5X3JlZ2lvbl90cmFuc2Fj
-dGlvbl9kZXB0aCBpcyA+IDAgdGhlIGJlZ2luL2NvbW1pdCBwYWlyIGRvZXMNCj4gPiA+IG5vdGhp
-bmcuDQo+ID4gPg0KPiA+ID4gQnV0IGlmIG1lbW9yeV9yZWdpb25fdHJhbnNhY3Rpb25fZGVwdGgg
-aXMgPT0gMCwgdGhlcmUgc2hvdWxkIGJlIG5vDQo+IHVwZGF0ZQ0KPiA+ID4gcGVuZGluZyBiZWNh
-dXNlIHRoZSBsb29wIGhhcyBuZXZlciBydW4uICBTbyBJIGRvbid0IHNlZSB3aGF0IHlvdXIgcGF0
-Y2gNCj4gY2FuDQo+ID4gPiBjaGFuZ2UuDQo+ID4NCj4gPiBBcyBJIG1lbnRpb25lZCBpbiBQQVRD
-SDEsIHRoaXMgcGF0Y2ggaXMgdXNlZCB0byBmaXggYW4gaXNzdWUgYWZ0ZXIgd2UNCj4gcmVtb3Zl
-DQo+ID4gdGhlIGdsb2JhbCBsb2NrIGluIFJDVSBjYWxsYmFjay4gQWZ0ZXIgZ2xvYmFsIGxvY2sg
-aXMgcmVtb3ZlZCwgb3RoZXIgdGhyZWFkDQo+ID4gbWF5IHNldCB1cCB1cGRhdGUgcGVuZGluZywg
-c28gbWVtb3J5X3JlZ2lvbl90cmFuc2FjdGlvbl9jb21taXQNCj4gPiBtYXkgdHJ5IHRvIHJlYnVp
-bGQgUGh5c1BhZ2VNYXAgZXZlbiB0aGUgbG9vcCBkb2VzbuKAmXQgcnVuLCBvdGhlciB0aHJlYWQN
-Cj4gbWF5DQo+ID4gdHJ5IHRvIHJlYnVpbGQgUGh5c1BhZ2VNYXAgYXQgdGhlIHNhbWUgdGltZSwg
-aXQgaXMgYSByYWNlIGNvbmRpdGlvbi4NCj4gPiBzdWJwYWdlIE1lbW9yeVJlZ2lvbiBpcyBhIHNw
-ZWNpZmljIE1lbW9yeVJlZ2lvbiwgaXQgZG9lc24ndCBiZWxvbmcgdG8NCj4gYW55DQo+ID4gYWRk
-cmVzcyBzcGFjZSwgaXQgaXMgb25seSB1c2VkIHRvIGhhbmRsZSBzdWJwYWdlLiBXZSBtYXkgdXNl
-IGEgbmV3DQo+IHN0cnVjdHVyZQ0KPiA+IG90aGVyIHRoYW4gTWVtb3J5UmVnaW9uIHRvIGhhbmRs
-ZSBzdWJwYWdlIHRvIG1ha2UgdGhlIGxvZ2ljIG1vcmUNCj4gY2xlYXJlci4gQWZ0ZXINCj4gPiB0
-aGUgY2hhbmdlLCBSQ1UgY2FsbGJhY2sgd2lsbCBub3QgZnJlZSBhbnkgTWVtb3J5UmVnaW9uLg0K
-PiANCj4gVGhpcyBpcyBub3QgdHJ1ZS4gIFRyeSBob3QtdW5wbHVnZ2luZyBhIGRldmljZS4NCg0K
-WW91IGFyZSByaWdodCwgaG90LXVucGx1Z2dpbmcgZG9lcyBjYXVzZSBtZW1vcnkgcmVnaW9uKG5v
-dCBmb3Igc3VicGFnZSkgZnJlZWQgaW4gUkNVIHRocmVhZC4NCg0KSSB0cmllZCBwY2kgZGV2aWNl
-IGhvdCBwbHVnL3VucGx1ZywNCldoZW4gcGx1ZyBhIGRldmljZSwNCmhhbmRsZV9obXBfY29tbWFu
-ZC0+cW1wX2RldmljZV9hZGQtPnFkZXZfZGV2aWNlX2FkZC0+DQp2aXJ0aW9fcGNpX2RjX3JlYWxp
-emUtPnBjaV9xZGV2X3JlYWxpemUtPnZpcnRpb19wY2lfcmVhbGl6ZS0+DQp2aXJ0aW9fZGV2aWNl
-X3JlYWxpemUtPnZpcnRpb19idXNfZGV2aWNlX3BsdWdnZWQtPnZpcnRpb19wY2lfZGV2aWNlX3Bs
-dWdnZWQgDQphcmUgY2FsbGVkLg0Kd2hlbiB1bnBsdWcgYSBkZXZpY2UsDQprdm1fY3B1X2V4ZWMt
-Pm1lbW9yeV9yZWdpb25fd3JpdGVfYWNjZXNzb3ItPnBjaV93cml0ZS0+DQp2aXJ0aW9fZGV2aWNl
-X3VucmVhbGl6ZS0+dmlydGlvX3BjaV9kZXZpY2VfdW5wbHVnZ2VkIA0KYXJlIGNhbGxlZC4NCg0K
-bWVtb3J5IHJlZ2lvbiBhZGRpdGlvbiBhbmQgcmVtb3ZlIGhhcHBlbiBpbiB2aXJ0aW9fcGNpX2Rl
-dmljZV9wbHVnZ2VkIA0KYW5kIHZpcnRpb19wY2lfZGV2aWNlX3VucGx1Z2dlZCByZXNwZWN0aXZl
-bHksIG1lbW9yeSByZWdpb24gb3BlcmF0aW9uIG5lZWRzDQogdG8gYWNxdWlyZSB0aGUgZ2xvYmFs
-IGxvY2ssIGJ1dCBub25lIG9mIHRoZW0gaGFwcGVucyBpbiBSQ1UgdGhyZWFkLg0KDQpXaGVuIG1l
-bW9yeV9yZWdpb25fZmluYWxpemUgaXMgY2FsbGVkLCB0aGUgbWVtb3J5IHJlZ2lvbiBoYXMgYmVl
-biByZW1vdmVkIA0KZnJvbSB0aGUgYWRkcmVzcyBzcGFjZSAocmVtb3ZlZCBpbiB2aXJ0aW9fcGNp
-X2RldmljZV91bnBsdWdnZWQpLCBib3RoIG1yLT5zdWJyZWdpb25zIA0KYW5kIG1yLT5jb2FsZXNj
-ZWQgYXJlIGVtcHR5LiBJdCBtYWtlcyBzZW5zZSB0byBtZSwgd2hlbiBtZW1vcnlfcmVnaW9uX2Zp
-bmFsaXplIGlzIGNhbGxlZCwgDQptZWFucyB0aGlzIG1lbW9yeSByZWdpb24gaXMgbm90IHVzZWQg
-YW55IG1vcmUuDQpQbGVhc2UgY29ycmVjdCBtZSBpZiBJJ20gd3JvbmcgaGVyZSwgSSBvbmx5IHRy
-aWVkIHBjaSBkZXZpY2UgaG90IHBsdWcvdW5wbHVnLg0KDQpJZiBhYm92ZSBhc3N1bXB0aW9uIGlz
-IGNvcnJlY3QsIHNlZW1zIHdlIGRvbid0IG5lZWQgdGhlIGdsb2JhbCBsb2NrIGZvciBtZW1vcnkg
-cmVnaW9uICANCnJlY2xhbWF0aW9uIGluIFJDVSB0aHJlYWQuIFBsZWFzZSBsZXQgbWUga25vdyBp
-ZiBvdGhlciAgbWVtb3J5IHJlY2xhbWF0aW9uIGluIFJDVSB0aHJlYWQgDQpuZWVkIHRoZSBnbG9i
-YWwgbG9jay4NCg0KVW5kZXIgdGhlIGFzc3VtcHRpb24sIEkgaGF2ZSBiZWxvdyBwYXRjaCB0byBy
-ZW1vdmUgdGhlIGdsb2JhbCBsb2NrIGluIFJDVSB0aHJlYWQsIA0KSSB0ZXN0ZWQgdm0gYm9vdCAs
-cmVib290LCBzaHV0ZG93biBhbmQgcGNpIGRldmljZSBob3QgcGx1Zy91bnBsdWcuDQpQbGVhc2Ug
-cmV2aWV3IHRoZSBwYXRjaCwgDQpJZiBubyBmdXJ0aGVyIGlzc3VlLCBJIHdpbGwgc2VuZCBvdXQg
-YW4gb2ZmaWNpYWwgcGF0Y2ggbGF0ZXIuDQoNClRoYW5rcywNCkFudGhvbnkNCg0KDQpkaWZmIC0t
-Z2l0IGEvbWVtb3J5LmMgYi9tZW1vcnkuYw0KaW5kZXggNmM1ODM3My4uNDNlMDZlOSAxMDA2NDQN
-Ci0tLSBhL21lbW9yeS5jDQorKysgYi9tZW1vcnkuYw0KQEAgLTE1MDMsMTUgKzE1MDMsOSBAQCBz
-dGF0aWMgdm9pZCBtZW1vcnlfcmVnaW9uX2ZpbmFsaXplKE9iamVjdCAqb2JqKQ0KICAgICAgKiBh
-bmQgY2F1c2UgYW4gaW5maW5pdGUgbG9vcC4NCiAgICAgICovDQogICAgIG1yLT5lbmFibGVkID0g
-ZmFsc2U7DQotICAgIG1lbW9yeV9yZWdpb25fdHJhbnNhY3Rpb25fYmVnaW4oKTsNCi0gICAgd2hp
-bGUgKCFRVEFJTFFfRU1QVFkoJm1yLT5zdWJyZWdpb25zKSkgew0KLSAgICAgICAgTWVtb3J5UmVn
-aW9uICpzdWJyZWdpb24gPSBRVEFJTFFfRklSU1QoJm1yLT5zdWJyZWdpb25zKTsNCi0gICAgICAg
-IG1lbW9yeV9yZWdpb25fZGVsX3N1YnJlZ2lvbihtciwgc3VicmVnaW9uKTsNCi0gICAgfQ0KLSAg
-ICBtZW1vcnlfcmVnaW9uX3RyYW5zYWN0aW9uX2NvbW1pdCgpOw0KLQ0KKyAgICBhc3NlcnQoUVRB
-SUxRX0VNUFRZKCZtci0+c3VicmVnaW9ucykpOw0KICAgICBtci0+ZGVzdHJ1Y3Rvcihtcik7DQot
-ICAgIG1lbW9yeV9yZWdpb25fY2xlYXJfY29hbGVzY2luZyhtcik7DQorICAgIGFzc2VydChRVEFJ
-TFFfRU1QVFkoJm1yLT5jb2FsZXNjZWQpKTsNCiAgICAgZ19mcmVlKChjaGFyICopbXItPm5hbWUp
-Ow0KICAgICBnX2ZyZWUobXItPmlvZXZlbnRmZHMpOw0KIH0NCmRpZmYgLS1naXQgYS91dGlsL3Jj
-dS5jIGIvdXRpbC9yY3UuYw0KaW5kZXggOWFkYzVlNC4uNTFlMDI0OCAxMDA2NDQNCi0tLSBhL3V0
-aWwvcmN1LmMNCisrKyBiL3V0aWwvcmN1LmMNCkBAIC0yNTQsMjQgKzI1NCwyMCBAQCBzdGF0aWMg
-dm9pZCAqY2FsbF9yY3VfdGhyZWFkKHZvaWQgKm9wYXF1ZSkNCg0KICAgICAgICAgYXRvbWljX3N1
-YigmcmN1X2NhbGxfY291bnQsIG4pOw0KICAgICAgICAgc3luY2hyb25pemVfcmN1KCk7DQotICAg
-ICAgICBxZW11X211dGV4X2xvY2tfaW90aHJlYWQoKTsNCiAgICAgICAgIHdoaWxlIChuID4gMCkg
-ew0KICAgICAgICAgICAgIG5vZGUgPSB0cnlfZGVxdWV1ZSgpOw0KICAgICAgICAgICAgIHdoaWxl
-ICghbm9kZSkgew0KLSAgICAgICAgICAgICAgICBxZW11X211dGV4X3VubG9ja19pb3RocmVhZCgp
-Ow0KICAgICAgICAgICAgICAgICBxZW11X2V2ZW50X3Jlc2V0KCZyY3VfY2FsbF9yZWFkeV9ldmVu
-dCk7DQogICAgICAgICAgICAgICAgIG5vZGUgPSB0cnlfZGVxdWV1ZSgpOw0KICAgICAgICAgICAg
-ICAgICBpZiAoIW5vZGUpIHsNCiAgICAgICAgICAgICAgICAgICAgIHFlbXVfZXZlbnRfd2FpdCgm
-cmN1X2NhbGxfcmVhZHlfZXZlbnQpOw0KICAgICAgICAgICAgICAgICAgICAgbm9kZSA9IHRyeV9k
-ZXF1ZXVlKCk7DQogICAgICAgICAgICAgICAgIH0NCi0gICAgICAgICAgICAgICAgcWVtdV9tdXRl
-eF9sb2NrX2lvdGhyZWFkKCk7DQogICAgICAgICAgICAgfQ0KDQogICAgICAgICAgICAgbi0tOw0K
-ICAgICAgICAgICAgIG5vZGUtPmZ1bmMobm9kZSk7DQogICAgICAgICB9DQotICAgICAgICBxZW11
-X211dGV4X3VubG9ja19pb3RocmVhZCgpOw0KICAgICB9DQogICAgIGFib3J0KCk7DQogfQ0KDQoN
-Cg0KDQoNCj4gDQo+IEknbSBhbGwgZm9yIHJlZHVjaW5nIHRoZSBzY29wZSBvZiB0aGUgZ2xvYmFs
-IFFFTVUgbG9jaywgDQpUaGFua3MsDQoNCg0KPmJ1dCB0aGlzIG5lZWRzIGEgcGxhbg0KPiBhbmQg
-YSBjYXJlZnVsIGFuYWx5c2lzIG9mIHRoZSBpbnZvbHZlZCBkYXRhIHN0cnVjdHVyZXMgYWNyb3Nz
-IF9hbGxfDQo+IGluc3RhbmNlX2ZpbmFsaXplDQo+IGltcGxlbWVudGF0aW9ucy4NCkFncmVlZCwN
-Cg0KQmVsb3cgZnVuY3Rpb25zIGFyZSByZWdpc3RlcmVkIGluIFJDVSB0aHJlYWQNCmFkZHJlc3Nf
-c3BhY2VfZGlzcGF0Y2hfZnJlZSwNCmRvX2FkZHJlc3Nfc3BhY2VfZGVzdHJveQ0KZmxhdHZpZXdf
-dW5yZWYNCnJlY2xhaW1fcmFtYmxvY2ssDQpxaHRfbWFwX2Rlc3Ryb3ksDQptaWdyYXRpb25fYml0
-bWFwX2ZyZWUNCg0KZmlyc3QgdGhyZWUgYXJlIGFkZHJlc3Mgc3BhY2UgcmVsYXRlZCwgc2hvdWxk
-IHdvcmsgd2l0aG91dCBnbG9iYWwgbG9jayBwZXIgYWJvdmUgYW5hbHlzaXMuDQpUaGUgcmVzdCBh
-cmUgdmVyeSBzaW1wbGUsIHNlZW1zIGRvZXNuJ3QgbmVlZCBnbG9iYWwgbG9jay4NCg0KDQoNCg0K
-PiANCj4gUGFvbG8NCg==
+We've now implemented a PAPR extensions which allows PAPR guests (i.e.
+"pseries" machine type) to resize their hash page table during runtime.
+
+However, that extension is only enabled if explicitly chosen on the
+command line.  This patch enables it by default for spapr-2.10, but leaves
+it disabled (by default) for older machine types.
+
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/ppc/spapr.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 83db110..a6a1c93 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3155,7 +3155,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+     smc->dr_lmb_enabled = true;
+     smc->tcg_default_cpu = "POWER8";
+     mc->has_hotpluggable_cpus = true;
+-    smc->resize_hpt_default = SPAPR_RESIZE_HPT_DISABLED;
++    smc->resize_hpt_default = SPAPR_RESIZE_HPT_ENABLED;
+     fwc->get_dev_path = spapr_get_fw_dev_path;
+     nc->nmi_monitor_handler = spapr_nmi;
+     smc->phb_placement = spapr_phb_placement;
+@@ -3246,8 +3246,11 @@ static void spapr_machine_2_9_instance_options(MachineState *machine)
+ 
+ static void spapr_machine_2_9_class_options(MachineClass *mc)
+ {
++    sPAPRMachineClass *smc = SPAPR_MACHINE_CLASS(mc);
++
+     spapr_machine_2_10_class_options(mc);
+     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_9);
++    smc->resize_hpt_default = SPAPR_RESIZE_HPT_DISABLED;
+ }
+ 
+ DEFINE_SPAPR_MACHINE(2_9, "2.9", false);
+-- 
+2.9.3
