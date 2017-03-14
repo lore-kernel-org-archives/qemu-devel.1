@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cnmNv-0001Ov-LG
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:21:12 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cnmPQ-0002FD-CV
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:22:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cnmNr-0000ix-U2
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:21:07 -0400
-Received: from [59.151.112.132] (port=23903 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cnmNr-0000eI-IH
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:21:03 -0400
-Date: Tue, 14 Mar 2017 21:20:25 +0800
-From: Chao Fan <fanc.fnst@cn.fujitsu.com>
-Message-ID: <20170314132025.GB2473@localhost.localdomain>
-References: <20170314102747.31395-1-fanc.fnst@cn.fujitsu.com>
-	<87o9x4t51k.fsf@secure.mitica> <20170314123730.GO2652@redhat.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cnmPO-000201-03
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:22:40 -0400
+Received: from mail-lf0-x229.google.com ([2a00:1450:4010:c07::229]:35162)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1cnmPN-0001yd-GI
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:22:37 -0400
+Received: by mail-lf0-x229.google.com with SMTP id j90so76435812lfk.2
+	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 06:22:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20170314123730.GO2652@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] Output dirty-bytes-rate instead of
- dirty-pages-rate
+References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
+	<CAJ+F1CKiE2FHjS0_K2F+yS-ByZMtVVFh6+NLm_q4_myeg=_KdQ@mail.gmail.com>
+	<87lgs974rd.fsf@dusky.pond.sub.org>
+	<CAJ+F1CL_iQNVN5a=rZ93bWnnG89710aBkN7iT_eiqNtwJRk=7w@mail.gmail.com>
+	<8760jd5nhw.fsf@dusky.pond.sub.org>
+In-Reply-To: <8760jd5nhw.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 14 Mar 2017 13:22:24 +0000
+Message-ID: <CAJ+F1C+FBx07+WBx4hZKDdWTS8-Z56JfiJgFzy2gLnWos17GYw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.9 00/47] qapi: Put type information
+ back into QMP documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,65 +34,247 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, eblake@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org, caoj.fnst@cn.fujitsu.com, douly.fnst@cn.fujitsu.com, maozy.fnst@cn.fujitsu.com, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 
-On Tue, Mar 14, 2017 at 12:37:30PM +0000, Daniel P. Berrange wrote:
->On Tue, Mar 14, 2017 at 01:29:43PM +0100, Juan Quintela wrote:
->> Chao Fan <fanc.fnst@cn.fujitsu.com> wrote:
->> > In hmp, dirty-bytes-rate is more friendly than dirty-pages-rate.
->> > It's also better for other tools to determine the cpu throttle
->> > value in different architecture.
->> >
->> > Signed-off-by: Chao Fan <fanc.fnst@cn.fujitsu.com>
->> > Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
->> 
->> I agree with Daniel here, you can't change the meaning of a field.  Look
->> at skipped pages.  It is zero know because it is not used anymore, but
->> we can't drop it.
->> 
->> I think it is better to expose page_size.  We have now
->> 
->> trasferred: bytes
->> total: bytes
->> duplicate: number of zero pages
->> skipped: always zero.
->> normal: number of normal pages
->> normal_bytes: the same  in bytes
->> mbps: megabytes per second?  I can't even remember this one
->> dirty_sync_count: number of times we have go through the whole memory
->> postcopy_requests = number of pages asked by postcopy faults?
->> dirty_pages_rate = pages by some kind of unit
->> 
->> And we haven't yet started with compression or xbzrle.  I think that the
->> best approach at this point is putting everything in pages except the
->> things that don't make sense.
->> 
->> We can put everything on bytes, but then everything is HUGE.
->> 
->> Anyways, what do libvirt/management apps preffer?
->
->Since we have many fields already which are reported as page counts, I
->think just adding page size would be preferrable to having twice as many
->fields reported duplicating bytes + pages.
-OK.
+Hi
 
->
->The only reason to favour duplicating all fields to report bytes, is if
->we needed to vary page size to deal with huge pages (eg if some reported
->pages were 4kb and other reported pages with 2MB). You can easily just
->scale huge pages counts to be "normal"  pages for purpose of reporting
+On Mon, Mar 13, 2017 at 5:12 PM Markus Armbruster <armbru@redhat.com> wrote=
+:
 
-Thank you very much for your help!
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+>
+> > Hi
+> >
+> > On Mon, Mar 13, 2017 at 4:14 PM Markus Armbruster <armbru@redhat.com>
+> wrote:
+> >
+> >> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+> >>
+> >> > Hi
+> >> >
+> >> > On Mon, Mar 13, 2017 at 10:23 AM Markus Armbruster <armbru@redhat.co=
+m
+> >
+> >> > wrote:
+> >> >
+> >> >> I'm proposing this is 2.9 because it fixes a documentation
+> regression.
+> >> >> It affects only documentation; generated C code is unchanged except
+> >> >> for the removal of trailing space in PATCH 46.
+> >> >>
+> >> >> Based on my qapi-next branch, which contains Marc-Andr=C3=A9's PATC=
+H 1/2.
+> >> >>
+> >> >> Marc-Andr=C3=A9's work to merge qmp-commands.txt and qmp-events.txt=
+ into
+> >> >> the QAPI schema and generate their replacements from the schema
+> >> >> (commit b6af8ea..56e8bdd) was a big step forward.  As committed, it
+> >> >> also was a step back: the documentation lost information on JSON
+> >> >> types, because I didn't like Marc-Andr=C3=A9's patch to add it.  He
+> >> >> reposted it for further review afterwards:
+> >> >>
+> >> >>     Subject: [PATCH 0/2] qapi2texi: add type information
+> >> >>     Message-Id: <20170125130308.16104-1-marcandre.lureau@redhat.com=
+>
+> >> >>
+> https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg05432.html
+> >> >>
+> >> >> His PATCH 1/2 is a straightforward cleanup.  His PATCH 2/2 adds typ=
+e
+> >> >> descriptions in a new formal language to the generated documentatio=
+n.
+> >> >> Quoting the commit message:
+> >> >>
+> >> >>     Array types have the following syntax: type[]. Ex: str[].
+> >> >>
+> >> >>     - Struct, commands and events use the following members syntax:
+> >> >>
+> >> >>       { 'member': type, ('foo': str), ... }
+> >> >>
+> >> >>     Optional members are under parentheses.
+> >> >>
+> >> >>     A structure with a base type will have 'BaseStruct +' prepended=
+.
+> >> >>
+> >> >>     - Alternates use the following syntax:
+> >> >>
+> >> >>       [ 'foo': type, 'bar': type, ... ]
+> >> >>
+> >> >>     - Simple unions use the following syntax:
+> >> >>
+> >> >>       { 'type': str, 'data': 'type' =3D [ 'foo': type, 'bar': type.=
+..
+> ] }
+> >> >>
+> >> >>     - Flat unions use the following syntax:
+> >> >>
+> >> >>       BaseStruct + 'discriminator' =3D [ 'foo': type, 'bar': type..=
+. ]
+> >> >>
+> >> >> End quote.  Looks like this in generated documentation:
+> >> >>
+> >> >>  -- Event: VNC_CONNECTED {'server': VncServerInfo, 'client':
+> >> >>           VncBasicInfo}
+> >> >>
+> >> >>      Emitted when a VNC client establishes a connection
+> >> >>      ''server''
+> >> >>           server information
+> >> >>      ''client''
+> >> >>           client information
+> >> >>
+> >> >>      Note: This event is emitted before any authentication takes
+> place,
+> >> >>      thus the authentication ID is not provided
+> >> >> [...]
+> >> >>
+> >> >>  -- Struct: VncServerInfo VncBasicInfo + {('auth': str)}
+> >> >>
+> >> >>      The network connection information for server
+> >> >>      ''auth'' (optional)
+> >> >>           authentication method used for the plain (non-websocket)
+> VNC
+> >> >>           server
+> >> >>
+> >> >>      Since: 2.1
+> >> >>
+> >> >>  -- Simple Union: SocketAddress { 'type': str, 'data': 'type' =3D
+> ['inet':
+> >> >>           InetSocketAddress, 'unix': UnixSocketAddress, 'vsock':
+> >> >>           VsockSocketAddress, 'fd': String] }
+> >> >>
+> >> >>      Captures the address of a socket, which could also be a named
+> file
+> >> >>      descriptor
+> >> >>
+> >> >>      Since: 1.3
+> >> >>
+> >> >> Here's my counter-proposal: instead of inventing a formal language,
+> >> >> fix the natural language documentation to actually mention *all*
+> >> >> members, and add type information in a plain, easy-to-understand wa=
+y.
+> >> >> Looks like this:
+> >> >>
+> >> >>  -- Event: VNC_CONNECTED
+> >> >>
+> >> >>      Emitted when a VNC client establishes a connection
+> >> >>
+> >> >>      Arguments:
+> >> >>      'server: VncServerInfo'
+> >> >>           server information
+> >> >>      'client: VncBasicInfo'
+> >> >>           client information
+> >> >>
+> >> >>      Note: This event is emitted before any authentication takes
+> place,
+> >> >>      thus the authentication ID is not provided
+> >> >> [...]
+> >> >>
+> >> >>  -- Object: VncServerInfo
+> >> >>
+> >> >>      The network connection information for server
+> >> >>
+> >> >>      Members:
+> >> >>      'auth: string' (optional)
+> >> >>           authentication method used for the plain (non-websocket)
+> VNC
+> >> >>           server
+> >> >>      The members of 'VncBasicInfo'
+> >> >>
+> >> >>      Since: 2.1
+> >> >>
+> >> >>  -- Object: SocketAddress
+> >> >>
+> >> >>      Captures the address of a socket, which could also be a named
+> file
+> >> >>      descriptor
+> >> >>
+> >> >>      Members:
+> >> >>      'type'
+> >> >>           One of "inet", "unix", "vsock", "fd"
+> >> >>      'data: InetSocketAddress' when 'type' is "inet"
+> >> >>      'data: UnixSocketAddress' when 'type' is "unix"
+> >> >>      'data: VsockSocketAddress' when 'type' is "vsock"
+> >> >>      'data: String' when 'type' is "fd"
+> >> >>
+> >> >>      Since: 1.3
+> >> >>
+> >> >>
+> >> > I like both, to me they serve different purposes. I like to have a
+> short
+> >> > overview / signature and then a more detailed documentation for each
+> >> field.
+> >>
+> >> I sympathize with the argument.  Unfortunately, the "short" signatures
+> >> are anything but for real-world QAPI:
+> >>
+> >
+> > That's a worse case, a regular case is more readable.
+>
+> There are readable cases, but there are plenty of cases that plainly
+> aren't.
+>
+> 102 out of 472 signatures don't count because they're empty.
+>
+> Roughly half the non-empty signatures fit on a single line.  That's short=
+.
+>
+> A bit under a third take two lines.  I guess that's still short enough.
+>
+> More than one in six signatures is three lines or more.
+>
+> >                                                       And it is still
+> > useful anyway since the common members would be listed first.
+>
+> Whatever comes first in signatures comes first in the table of members,
+> too.  The names are easier to spot there, because they're all on the
+> left.
+>
+> Compare
+>
+>  -- Simple Union: SocketAddress { 'type': str, 'data': 'type' =3D ['inet'=
+:
+>           InetSocketAddress, 'unix': UnixSocketAddress, 'vsock':
+>           VsockSocketAddress, 'fd': String] }
+>
+>      Captures the address of a socket, which could also be a named file
+>      descriptor
+>
+>      Since: 1.3
+>
+> to
+>
+>  -- Object: SocketAddress
+>
+>      Captures the address of a socket, which could also be a named file
+>      descriptor
+>
+>      Members:
+>      'type'
+>           One of "inet", "unix", "vsock", "fd"
+>      'data: InetSocketAddress' when 'type' is "inet"
+>      'data: UnixSocketAddress' when 'type' is "unix"
+>      'data: VsockSocketAddress' when 'type' is "vsock"
+>      'data: String' when 'type' is "fd"
+>
+>      Since: 1.3
+>
+> In my opinion, the three lines of signature add nothing but noise to the
+> six lines of member table.
+>
 
-Thanks,
-Chao Fan
->though.
->Regards,
->Daniel
->-- 
->|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
->|: http://libvirt.org              -o-             http://virt-manager.org :|
->|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
->
->
+It is more natural and faster to read to me for commands and events for
+example.  The verbose description is mixing description and sometime even
+providing redundant information (ex: keys: array of KeyValue,  An array of
+'KeyValue' elements...), slowing reading even more. Often you don't need to
+read the documentation / description, you want to quickly check the return
+type, and remind you the arguments.
+
+struct/objects are more commonly declared with a line per member, so it
+doesn't bother me as much.
+
+I would appreciate if can have the declarative form for commands and events
+at least. Other types are usually more complex or long, so that may clear
+your concerns for the long declarations.
+--=20
+Marc-Andr=C3=A9 Lureau
