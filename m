@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58825)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <janne.huttunen@nokia.com>) id 1cnqCe-00035V-VN
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:25:46 -0400
+	(envelope-from <no-reply@patchew.org>) id 1cnqFk-0004S3-Dn
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:28:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <janne.huttunen@nokia.com>) id 1cnqCb-0006OO-1l
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:25:45 -0400
-Received: from mail-he1eur01on0131.outbound.protection.outlook.com
-	([104.47.0.131]:23108
-	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+	(envelope-from <no-reply@patchew.org>) id 1cnqFg-0000SF-9P
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:28:56 -0400
+Resent-Message-Id: <E1cnqFg-0000SF-9P@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21472)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <janne.huttunen@nokia.com>)
-	id 1cnqCa-0006MT-DC
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:25:40 -0400
-From: Janne Huttunen <janne.huttunen@nokia.com>
-Date: Tue, 14 Mar 2017 14:50:09 +0200
-Message-ID: <b2cf1008ef518efeecd539d2481d1a255b27c7d5.1489494746.git.janne.huttunen@nokia.com>
-In-Reply-To: <cover.1489494746.git.janne.huttunen@nokia.com>
-References: <cover.1489494746.git.janne.huttunen@nokia.com>
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cnqFg-0000QO-2I
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:28:52 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148951251542.36.10993833666794580824@6c512846dbc7>
+In-Reply-To: <1489512045-49206-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [RFC][PATCH 2/6] Re-factor bootdevice list handling,
- pt2.
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 14 Mar 2017 10:28:36 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH for 2.9?] hmp: gpa2hva and gpa2hpa hostaddr
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,101 +29,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: janne.huttunen@nokia.com
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com, armbru@redhat.com
 
-Store the list head into the property structure. This allows the callback
-functions to access the correct list even when there are multiple lists.
-
-Signed-off-by: Janne Huttunen <janne.huttunen@nokia.com>
----
- bootdevice.c | 36 ++++++++++++++++++++++++------------
- 1 file changed, 24 insertions(+), 12 deletions(-)
-
-diff --git a/bootdevice.c b/bootdevice.c
-index a29d43b..30e98ae 100644
---- a/bootdevice.c
-+++ b/bootdevice.c
-@@ -33,6 +33,13 @@
- typedef struct FWBootEntry FWBootEntry;
- typedef QTAILQ_HEAD(, FWBootEntry) FWBootList;
- 
-+typedef struct {
-+    FWBootList *bootlist;
-+    int32_t *bootindex;
-+    const char *suffix;
-+    DeviceState *dev;
-+} BootIndexProperty;
-+
- struct FWBootEntry {
-     QTAILQ_ENTRY(FWBootEntry) link;
-     int32_t bootindex;
-@@ -288,12 +295,6 @@ char *get_boot_devices_list(size_t *size, bool ignore_suffixes)
-     return list;
- }
- 
--typedef struct {
--    int32_t *bootindex;
--    const char *suffix;
--    DeviceState *dev;
--} BootIndexProperty;
--
- static void device_get_bootindex(Object *obj, Visitor *v, const char *name,
-                                  void *opaque, Error **errp)
- {
-@@ -313,14 +314,15 @@ static void device_set_bootindex(Object *obj, Visitor *v, const char *name,
-         goto out;
-     }
-     /* check whether bootindex is present in fw_boot_order list  */
--    check_boot_index(boot_index, &local_err);
-+    do_check_boot_index(prop->bootlist, boot_index, &local_err);
-     if (local_err) {
-         goto out;
-     }
-     /* change bootindex to a new one */
-     *prop->bootindex = boot_index;
- 
--    add_boot_device_path(*prop->bootindex, prop->dev, prop->suffix);
-+    do_add_boot_device_path(prop->bootlist, *prop->bootindex,
-+                            prop->dev, prop->suffix);
- 
- out:
-     error_propagate(errp, local_err);
-@@ -332,17 +334,19 @@ static void property_release_bootindex(Object *obj, const char *name,
- {
-     BootIndexProperty *prop = opaque;
- 
--    del_boot_device_path(prop->dev, prop->suffix);
-+    do_del_boot_device_path(prop->bootlist, prop->dev, prop->suffix);
-     g_free(prop);
- }
- 
--void device_add_bootindex_property(Object *obj, int32_t *bootindex,
--                                   const char *name, const char *suffix,
--                                   DeviceState *dev, Error **errp)
-+static void do_add_bootindex_prop(FWBootList *bootlist,
-+                                  Object *obj, int32_t *bootindex,
-+                                  const char *name, const char *suffix,
-+                                  DeviceState *dev, Error **errp)
- {
-     Error *local_err = NULL;
-     BootIndexProperty *prop = g_malloc0(sizeof(*prop));
- 
-+    prop->bootlist = bootlist;
-     prop->bootindex = bootindex;
-     prop->suffix = suffix;
-     prop->dev = dev;
-@@ -361,3 +365,11 @@ void device_add_bootindex_property(Object *obj, int32_t *bootindex,
-     /* initialize devices' bootindex property to -1 */
-     object_property_set_int(obj, -1, name, NULL);
- }
-+
-+void device_add_bootindex_property(Object *obj, int32_t *bootindex,
-+                                   const char *name, const char *suffix,
-+                                   DeviceState *dev, Error **errp)
-+{
-+    do_add_bootindex_prop(&fw_boot_order, obj, bootindex,
-+                          name, suffix, dev, errp);
-+}
--- 
-2.7.4
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggZm9yIDIuOT9dIGhtcDogZ3BhMmh2YSBhbmQgZ3Bh
+MmhwYSBob3N0YWRkciBjb21tYW5kCk1lc3NhZ2UtaWQ6IDE0ODk1MTIwNDUtNDkyMDYtMS1naXQt
+c2VuZC1lbWFpbC1wYm9uemluaUByZWRoYXQuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
+CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJB
+U0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAt
+LWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVz
+IFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLiki
+CmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFs
+OiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRj
+IC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0
+aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpk
+b25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNm
+NWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5j
+b20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8xNDg5
+NTA3NDM3LTMyMzAxLTEtZ2l0LXNlbmQtZW1haWwta3dvbGZAcmVkaGF0LmNvbSAtPiBwYXRjaGV3
+LzE0ODk1MDc0MzctMzIzMDEtMS1naXQtc2VuZC1lbWFpbC1rd29sZkByZWRoYXQuY29tCiAtIFt0
+YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMTQ4OTUwNzQ1MS0zMjM1Ni0xLWdpdC1zZW5kLWVtYWls
+LWt3b2xmQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8xNDg5NTA3NDUxLTMyMzU2LTEtZ2l0LXNlbmQt
+ZW1haWwta3dvbGZAcmVkaGF0LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzE0ODk1
+MTIwNDUtNDkyMDYtMS1naXQtc2VuZC1lbWFpbC1wYm9uemluaUByZWRoYXQuY29tIC0+IHBhdGNo
+ZXcvMTQ4OTUxMjA0NS00OTIwNi0xLWdpdC1zZW5kLWVtYWlsLXBib256aW5pQHJlZGhhdC5jb20K
+U3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwozNDg1NGUxIGhtcDogZ3BhMmh2YSBhbmQg
+Z3BhMmhwYSBob3N0YWRkciBjb21tYW5kCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQ
+QVRDSCAxLzE6IGhtcDogZ3BhMmh2YSBhbmQgZ3BhMmhwYSBob3N0YWRkciBjb21tYW5kLi4uCldB
+Uk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM3MTogRklMRTogbW9uaXRvci5jOjE0Mjk6
+CisgICAgICAgIGVycm9yX3NldGcoZXJycCwgIk5vIG1lbW9yeSBpcyBtYXBwZWQgYXQgYWRkcmVz
+cyAweCUiIEhXQUREUl9QUkl4LCBhZGRyKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
+ZXJzCiM3NjogRklMRTogbW9uaXRvci5jOjE0MzQ6CisgICAgICAgIGVycm9yX3NldGcoZXJycCwg
+Ik1lbW9yeSBhdCBhZGRyZXNzIDB4JSIgSFdBRERSX1BSSXggImlzIG5vdCBSQU0iLCBhZGRyKTsK
+CkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBw
+YXJlbnRoZXNpcyAnKCcKIzExMjogRklMRTogbW9uaXRvci5jOjE0NzA6CisgICAgb2ZmX3Qgb2Zm
+c2V0ID0gYWRkciAvIHBhZ2VzaXplICogc2l6ZW9mIChwaW5mbyk7Cgp0b3RhbDogMSBlcnJvcnMs
+IDIgd2FybmluZ3MsIDE0NyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9i
+bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
+c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
+TUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0
+aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
+W2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNo
+ZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
