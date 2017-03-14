@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37825)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cnlPG-0001p8-Ev
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:18:28 -0400
+	(envelope-from <armbru@redhat.com>) id 1cnlRK-0003DG-Ss
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:20:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cnlPB-0003oJ-Hr
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:18:26 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:52732)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cnlPB-0003o9-9y
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:18:21 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <a7977444b25641cc86352a6818a4df3a@EXCHCS32.ornl.gov>
-	<000601d29710$edf987b0$c9ec9710$@ru> <874lyxqpl4.fsf@linaro.org>
-	<000001d29cbb$f396a800$dac3f800$@ru>
-	<be7ee11c-4c10-cee8-a35e-7905e0c44881@redhat.com>
-In-Reply-To: <be7ee11c-4c10-cee8-a35e-7905e0c44881@redhat.com>
-Date: Tue, 14 Mar 2017 15:18:22 +0300
-Message-ID: <000801d29cbd$12ab64a0$38022de0$@ru>
+	(envelope-from <armbru@redhat.com>) id 1cnlRG-0004O4-1z
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:20:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36876)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cnlRF-0004Ny-RP
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:20:29 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <87tw6y8bs8.fsf@secure.mitica>
+	<CAFEAcA978SJemCfYJPa8jwtuhhi6JGh9pEDGYNJ1npJA3nvEQA@mail.gmail.com>
+	<6559d50e-b8d5-eaa2-4a14-48608644ad29@redhat.com>
+	<20170314101351.GC3952@noname.str.redhat.com>
+Date: Tue, 14 Mar 2017 13:20:26 +0100
+In-Reply-To: <20170314101351.GC3952@noname.str.redhat.com> (Kevin Wolf's
+	message of "Tue, 14 Mar 2017 11:13:51 +0100")
+Message-ID: <87y3w89hit.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] -rtc clock=vm with -icount 1,
- sleep=off introduces unexpected delays in device interactions
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] KVM call for 2017-03-14
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,24 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Paolo Bonzini' <pbonzini@redhat.com>, =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>
-Cc: "'Nutaro, James J.'" <nutarojj@ornl.gov>, mttcg@greensocs.com, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developer <qemu-devel@nongnu.org>, KVM devel mailing list <kvm@vger.kernel.org>, Juan Quintela <quintela@redhat.com>
 
-> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> On 14/03/2017 13:10, Pavel Dovgalyuk wrote:
-> > This is not the same.
-> > BQL helped in making execution deterministic - no io and timer
-> > callbacks were performed while CPU is executing.
-> > Now iothread and CPU thread work simultaneously and timers can't
-> > query virtual time correctly, because (if we could query number of executed
-> > instructions) it may have different values on different runs.
-> >
-> > I guess you'll have to bring kicking CPU back on iothread invocation
-> > to make execution deterministic in icount mode.
-> 
-> Timers are fixed by my patch.  I/O should also work if its effects are
-> only apparent at given QEMU_CLOCK_VIRTUAL values.
+Kevin Wolf <kwolf@redhat.com> writes:
 
-Can you point me on that patch?
+> Am 14.03.2017 um 10:24 hat Thomas Huth geschrieben:
+>> >   - in all areas our legacy code and back-compatibility requirements
+>> >     are threatening to choke forward progress if we don't make serious
+>> >     efforts to get on top of them
+>> 
+>> ... and don't forget all the code that is in "orphan" state since many
+>> years... it's often hard to get patches accepted that primarily touches
+>> files that nobody feels responsible for...
+>> 
+>> Maybe it's really time for a "spring-cleaning", break with some
+>> compatibility cruft and do a 3.0 release afterwards ;-)
+>
+> If we decide that the situation is bad enough to do this, I'd vote for
+> breaking not just "some" compatibility for a usual release after three
+> months, but to take more time for it, completely break with the old
+> interfaces and declare this a new QEMU that libvirt should have a
+> separate driver for. And then throw out _all_ of the interfaces that
+> don't match the design any more that we have in mind, even if this means
+> a temporary regression in features.
+>
+> This means one big cut rather than having every release just slightly
+> incompatible with the previous releases, which should actually make it
+> more managable, even though the change is more radical.
 
-Pavel Dovgalyuk
+Of course, "legacy code and back-compatibility requirements" will start
+to grow back the minute we release new interfaces.  Whether a big cut is
+worthwhile depends on the seriousness of the current situation and the
+rate of regrowth.  There's hope the weeds will grow more slowly around
+well-designed new interfaces.
