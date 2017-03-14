@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cnkoW-0006ro-4y
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:40:29 -0400
+	(envelope-from <no-reply@patchew.org>) id 1cnkos-00075v-DP
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:40:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cnkoS-0005oK-Vz
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:40:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47678)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cnkoS-0005oB-Pq
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:40:24 -0400
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CC6CD811AC
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 11:40:24 +0000 (UTC)
-Date: Tue, 14 Mar 2017 11:40:20 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170314114019.GG2445@work-vm>
-References: <20170313124434.1043-1-quintela@redhat.com>
-	<20170314102142.GC2445@work-vm> <20170314102652.GC2652@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1cnkop-0005wX-7c
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:40:50 -0400
+Resent-Message-Id: <E1cnkop-0005wX-7c@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21322)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cnkop-0005wG-0g
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:40:47 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148949162892.33.7488423206378691305@6c512846dbc7>
+In-Reply-To: <20170314113209.12025-1-eduardo.otubo@profitbricks.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170314102652.GC2652@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 00/16] Multifd v4
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 14 Mar 2017 04:40:29 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/5] seccomp: feature refactoring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,47 +28,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+To: eduardo.otubo@profitbricks.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, thuth@redhat.com
 
-* Daniel P. Berrange (berrange@redhat.com) wrote:
-> On Tue, Mar 14, 2017 at 10:21:43AM +0000, Dr. David Alan Gilbert wrote:
-> > * Juan Quintela (quintela@redhat.com) wrote:
-> > > Hi
-> > > 
-> > > This is the 4th version of multifd. Changes:
-> > > - XBZRLE don't need to be checked for
-> > > - Documentation and defaults are consistent
-> > > - split socketArgs
-> > > - use iovec instead of creating something similar.
-> > > - We use now the exported size of target page (another HACK removal)
-> > > - created qio_chanel_{wirtev,readv}_all functions.  the _full() name
-> > >   was already taken.
-> > >   What they do is the same that the without _all() function, but if it
-> > >   returns due to blocking it redo the call.
-> > > - it is checkpatch.pl clean now.
-> > > 
-> > > Please comment, Juan.
-> > 
-> > High level things,
-> >   a) I think you probably need to do some bandwidth measurements to show
-> >     that multifd is managing to have some benefit - it would be good
-> >     for the cover letter.
-> 
-> multi-fd will certainly benefit encrypted migration, since we'll be able
-> to burn multiple CPUs for AES instead of bottlenecking on one CPU, and
-> thus able to take greater advantage of networks with > 1-GigE bandwidth.
-
-Yes, that's one I really want to see.  It might be odd using lots of fd's
-just to do that, but probably the easiest way.
-
-Dave
-
-> Regards,
-> Daniel
-> -- 
-> |: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-> |: http://libvirt.org              -o-             http://virt-manager.org :|
-> |: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC81XSBzZWNjb21wOiBmZWF0dXJlIHJlZmFjdG9y
+aW5nCk1lc3NhZ2UtaWQ6IDIwMTcwMzE0MTEzMjA5LjEyMDI1LTEtZWR1YXJkby5vdHVib0Bwcm9m
+aXRicmlja3MuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNF
+PWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWls
+ZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1l
+bGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQo
+Z2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRz
+OyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAt
+LWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwg
+Li9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVk
+PTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQK
+PT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFk
+ZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0
+L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8xNDg5NDkxMTI1LTIzNjQ4LTEtZ2l0
+LXNlbmQtZW1haWwtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMTQ4OTQ5MTEy
+NS0yMzY0OC0xLWdpdC1zZW5kLWVtYWlsLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwogKiBbbmV3
+IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTcwMzE0MTEzMjA5LjEyMDI1LTEtZWR1YXJkby5vdHVi
+b0Bwcm9maXRicmlja3MuY29tIC0+IHBhdGNoZXcvMjAxNzAzMTQxMTMyMDkuMTIwMjUtMS1lZHVh
+cmRvLm90dWJvQHByb2ZpdGJyaWNrcy5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0
+JwozZjQ5OWJmIHNlY2NvbXA6IGFkZCByZXNvdXJjZWNvbnRyb2wgYXJndW1lbnQgdG8gY29tbWFu
+ZCBsaW5lCjNmZmJhNmYgc2VjY29tcDogYWRkIHNwYXduIGFyZ3VtZW50IHRvIGNvbW1hbmQgbGlu
+ZQphODMwZmRkIHNlY2NvbXA6IGFkZCBlbGV2YXRlcHJpdmlsZWdlcyBhcmd1bWVudCB0byBjb21t
+YW5kIGxpbmUKNTRjNjM5MCBzZWNjb21wOiBhZGQgb2Jzb2xldGUgYXJndW1lbnQgdG8gY29tbWFu
+ZCBsaW5lCjc3NTkyODYgc2VjY29tcDogY2hhbmdpbmcgZnJvbSB3aGl0ZWxpc3QgdG8gYmxhY2ts
+aXN0Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzU6IHNlY2NvbXA6IGNo
+YW5naW5nIGZyb20gd2hpdGVsaXN0IHRvIGJsYWNrbGlzdC4uLgpDaGVja2luZyBQQVRDSCAyLzU6
+IHNlY2NvbXA6IGFkZCBvYnNvbGV0ZSBhcmd1bWVudCB0byBjb21tYW5kIGxpbmUuLi4KRVJST1I6
+ICJmb28gKiBiYXIiIHNob3VsZCBiZSAiZm9vICpiYXIiCiMxNDY6IEZJTEU6IHZsLmM6MTAzOToK
+KyAgICAgICAgY29uc3QgY2hhciAqIHZhbHVlID0gTlVMTDsKCkVSUk9SOiBzcGFjZSByZXF1aXJl
+ZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzE0ODogRklMRTogdmwuYzoxMDQxOgorICAgICAg
+ICB2YWx1ZSA9IHFlbXVfb3B0X2dldChvcHRzLCJvYnNvbGV0ZSIpOwogICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMjMgbGlu
+ZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
+ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
+dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tp
+bmcgUEFUQ0ggMy81OiBzZWNjb21wOiBhZGQgZWxldmF0ZXByaXZpbGVnZXMgYXJndW1lbnQgdG8g
+Y29tbWFuZCBsaW5lLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM4MTogRklM
+RTogcWVtdS1zZWNjb21wLmM6MTQzOgorICAgICAgICAgICAgcmMgPSBzZWNjb21wX3J1bGVfYWRk
+KGN0eCwgU0NNUF9BQ1RfS0lMTCwgcHJpdmlsZWdlZF9zeXNjYWxsc1tpXS5udW0sIDApOwoKRVJS
+T1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQojMTE2OiBGSUxFOiB2
+bC5jOjEwNTI6CisgICAgICAgIHZhbHVlID0gcWVtdV9vcHRfZ2V0KG9wdHMsImVsZXZhdGVwcml2
+aWxlZ2VzIik7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMSBl
+cnJvcnMsIDEgd2FybmluZ3MsIDkwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxl
+IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
+c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
+SCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDQvNTogc2VjY29tcDogYWRkIHNwYXdu
+IGFyZ3VtZW50IHRvIGNvbW1hbmQgbGluZS4uLgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3Rl
+cnMKIzc5OiBGSUxFOiBxZW11LXNlY2NvbXAuYzoxNjc6CisgICAgICAgICAgICByYyA9IHNlY2Nv
+bXBfc3lzY2FsbF9wcmlvcml0eShjdHgsIHNwYXduX3N5c2NhbGxzW2ldLm51bSwgc3Bhd25fc3lz
+Y2FsbHNbaV0ucHJpb3JpdHkpOwoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywn
+IChjdHg6VnhWKQojMTA3OiBGSUxFOiB2bC5jOjEwNjM6CisgICAgICAgIHZhbHVlID0gcWVtdV9v
+cHRfZ2V0KG9wdHMsInNwYXduIik7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBe
+Cgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDgxIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0
+Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
+cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
+ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDUvNTogc2VjY29t
+cDogYWRkIHJlc291cmNlY29udHJvbCBhcmd1bWVudCB0byBjb21tYW5kIGxpbmUuLi4KV0FSTklO
+RzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzgyOiBGSUxFOiBxZW11LXNlY2NvbXAuYzoxODk6
+CisgICAgICAgICAgICByYyA9IHNlY2NvbXBfcnVsZV9hZGQoY3R4LCBTQ01QX0FDVF9LSUxMLCBy
+ZXNvdXJjZWNvbnRyb2xfc3lzY2FsbHNbaV0ubnVtLCAwKTsKCkVSUk9SOiBsaW5lIG92ZXIgOTAg
+Y2hhcmFjdGVycwojODY6IEZJTEU6IHFlbXUtc2VjY29tcC5jOjE5MzoKKyAgICAgICAgICAgIHJj
+ID0gc2VjY29tcF9zeXNjYWxsX3ByaW9yaXR5KGN0eCwgcmVzb3VyY2Vjb250cm9sX3N5c2NhbGxz
+W2ldLm51bSwgcmVzb3VyY2Vjb250cm9sX3N5c2NhbGxzW2ldLnByaW9yaXR5KTsKCkVSUk9SOiBz
+cGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzExNTogRklMRTogdmwuYzox
+MDc0OgorICAgICAgICB2YWx1ZSA9IHFlbXVfb3B0X2dldChvcHRzLCJyZXNvdXJjZWNvbnRyb2wi
+KTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAyIGVycm9ycywg
+MSB3YXJuaW5ncywgODkgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxl
+bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
+dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
+SU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
+Y29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
+dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
+LWRldmVsQGZyZWVsaXN0cy5vcmc=
