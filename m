@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cni17-0002ri-68
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:41:18 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cni6X-0004Ux-4U
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:46:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cni16-0007RF-2E
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:41:17 -0400
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:34547)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cni6V-00013G-Pd
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:46:53 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:36608)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1cni15-0007QT-Mo
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:41:15 -0400
-Received: by mail-lf0-x242.google.com with SMTP id y193so13552056lfd.1
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 01:41:15 -0700 (PDT)
+	id 1cni6V-000135-Cz
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:46:51 -0400
+Received: by mail-lf0-x243.google.com with SMTP id g70so13536650lfh.3
+	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 01:46:51 -0700 (PDT)
 MIME-Version: 1.0
 References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
-	<1489385927-6735-9-git-send-email-armbru@redhat.com>
-In-Reply-To: <1489385927-6735-9-git-send-email-armbru@redhat.com>
+	<1489385927-6735-12-git-send-email-armbru@redhat.com>
+In-Reply-To: <1489385927-6735-12-git-send-email-armbru@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 14 Mar 2017 08:41:03 +0000
-Message-ID: <CAJ+F1CLXbGE7nngODenZiRa+611fsT4JCE84mGPkm4sREifnkg@mail.gmail.com>
+Date: Tue, 14 Mar 2017 08:46:39 +0000
+Message-ID: <CAJ+F1CKbJWGsZzD=kJh8aN2E3fi1atgLV4A+FmhOO9F=t-z0+A@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.9 08/47] tests/qapi-schema: Cover
- empty union base
+Subject: Re: [Qemu-devel] [PATCH for-2.9 11/47] qapi: Avoid unwanted blank
+ lines in QAPIDoc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,10 +34,21 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: mdroth@linux.vnet.ibm.com
 
-On Mon, Mar 13, 2017 at 10:19 AM Markus Armbruster <armbru@redhat.com>
+Hi
+
+On Mon, Mar 13, 2017 at 10:25 AM Markus Armbruster <armbru@redhat.com>
 wrote:
 
-> The new test case shows off qapi.py choking on an empty union base.
+> We silently fix missing #optional tags for QAPIDoc by appending a line
+> "#optional" to the section's .content.  However, this interferes with
+> .__repr__ stripping trailing blank lines from .content.
+>
+> Use new ArgSection instance variable .optional instead, and leave
+> .content alone.
+>
+> To permit testing .optional in texi_body(), clean up texi_enum()'s
+> hack to add empty documentation for undocumented enum values: add an
+> ArgSection instead of ''.
 >
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 >
@@ -46,74 +57,64 @@ Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 
 > ---
->  tests/Makefile.include                  |  1 +
->  tests/qapi-schema/union-base-empty.err  | 10 ++++++++++
->  tests/qapi-schema/union-base-empty.exit |  1 +
->  tests/qapi-schema/union-base-empty.json |  9 +++++++++
->  tests/qapi-schema/union-base-empty.out  |  0
->  5 files changed, 21 insertions(+)
->  create mode 100644 tests/qapi-schema/union-base-empty.err
->  create mode 100644 tests/qapi-schema/union-base-empty.exit
->  create mode 100644 tests/qapi-schema/union-base-empty.json
->  create mode 100644 tests/qapi-schema/union-base-empty.out
+>  scripts/qapi.py      | 5 +++--
+>  scripts/qapi2texi.py | 4 ++--
+>  2 files changed, 5 insertions(+), 4 deletions(-)
 >
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 736dd15..9f4e890 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -470,6 +470,7 @@ qapi-schema +=3D unclosed-list.json
->  qapi-schema +=3D unclosed-object.json
->  qapi-schema +=3D unclosed-string.json
->  qapi-schema +=3D unicode-str.json
-> +qapi-schema +=3D union-base-empty.json
->  qapi-schema +=3D union-base-no-discriminator.json
->  qapi-schema +=3D union-branch-case.json
->  qapi-schema +=3D union-clash-branches.json
-> diff --git a/tests/qapi-schema/union-base-empty.err
-> b/tests/qapi-schema/union-base-empty.err
-> new file mode 100644
-> index 0000000..61e6ec6
-> --- /dev/null
-> +++ b/tests/qapi-schema/union-base-empty.err
-> @@ -0,0 +1,10 @@
-> +Traceback (most recent call last):
-> +  File "tests/qapi-schema/test-qapi.py", line 56, in <module>
-> +    schema =3D QAPISchema(sys.argv[1])
-> +  File "scripts/qapi.py", line 1483, in __init__
-> +    self.exprs =3D check_exprs(parser.exprs)
-> +  File "scripts/qapi.py", line 917, in check_exprs
-> +    check_union(expr, info)
-> +  File "scripts/qapi.py", line 734, in check_union
-> +    assert base_members
-> +AssertionError
-> diff --git a/tests/qapi-schema/union-base-empty.exit
-> b/tests/qapi-schema/union-base-empty.exit
-> new file mode 100644
-> index 0000000..d00491f
-> --- /dev/null
-> +++ b/tests/qapi-schema/union-base-empty.exit
-> @@ -0,0 +1 @@
-> +1
-> diff --git a/tests/qapi-schema/union-base-empty.json
-> b/tests/qapi-schema/union-base-empty.json
-> new file mode 100644
-> index 0000000..d1843d3
-> --- /dev/null
-> +++ b/tests/qapi-schema/union-base-empty.json
-> @@ -0,0 +1,9 @@
-> +# Flat union with empty base and therefore without discriminator
-> +
-> +{ 'struct': 'Empty', 'data': { } }
-> +
-> +{ 'union': 'TestUnion',
-> +  'base': 'Empty',
-> +  'discriminator': 'type',
-> +  'data': { 'value1': 'int',
-> +            'value2': 'str' } }
-> diff --git a/tests/qapi-schema/union-base-empty.out
-> b/tests/qapi-schema/union-base-empty.out
-> new file mode 100644
-> index 0000000..e69de29
+> diff --git a/scripts/qapi.py b/scripts/qapi.py
+> index eec7bfb..e6d023f 100644
+> --- a/scripts/qapi.py
+> +++ b/scripts/qapi.py
+> @@ -107,6 +107,7 @@ class QAPIDoc(object):
+>              self.name =3D name
+>              # the list of lines for this section
+>              self.content =3D []
+> +            self.optional =3D False
+>
+>          def append(self, line):
+>              self.content.append(line)
+> @@ -978,15 +979,15 @@ def check_definition_doc(doc, expr, info):
+>              desc =3D doc.args.get(arg)
+>          if not desc:
+>              continue
+> +        desc.optional =3D opt
+>          desc_opt =3D "#optional" in str(desc)
+>          if desc_opt and not opt:
+>              raise QAPISemError(info, "Description has #optional, "
+>                                 "but the declaration doesn't")
+>          if not desc_opt and opt:
+> -            # silently fix the doc
+>              # TODO either fix the schema and make this an error,
+>              # or drop #optional entirely
+> -            desc.append("#optional")
+> +            pass
+>
+>      doc_args =3D set(doc.args.keys())
+>      args =3D set([name.strip('*') for name in args])
+> diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
+> index 0f3e573..0aaf45c 100755
+> --- a/scripts/qapi2texi.py
+> +++ b/scripts/qapi2texi.py
+> @@ -136,7 +136,7 @@ def texi_body(doc):
+>          for arg, section in doc.args.iteritems():
+>              desc =3D str(section)
+>              opt =3D ''
+> -            if "#optional" in desc:
+> +            if section.optional:
+>                  desc =3D re.sub(r'^ *#optional *\n?|\n? *#optional
+> *$|#optional',
+>                                '', desc)
+>                  opt =3D ' (optional)'
+> @@ -185,7 +185,7 @@ def texi_enum(expr, doc):
+>      """Format an enum to texi"""
+>      for i in expr['data']:
+>          if i not in doc.args:
+> -            doc.args[i] =3D ''
+> +            doc.args[i] =3D qapi.QAPIDoc.ArgSection(i)
+
+     body =3D texi_body(doc)
+>      return TYPE_FMT(type=3D"Enum",
+>                      name=3Ddoc.symbol,
 > --
 > 2.7.4
 >
