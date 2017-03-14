@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cnoZU-0003vv-Gb
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:41:13 -0400
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cnoZW-0003xA-SO
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:41:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cnoZO-0003i5-B3
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:41:12 -0400
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:35506)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cnoZN-0003h7-U6
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:41:06 -0400
-Received: by mail-wm0-x22f.google.com with SMTP id v186so67170397wmd.0
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 08:41:05 -0700 (PDT)
-References: <36e41adf-b0b3-3efa-51c4-f1a70cd05b98@ilande.co.uk>
-	<87wpbsp49a.fsf@linaro.org>
-	<6491a446-bf23-5ab9-3431-c67efaf83f71@ilande.co.uk>
-	<alpine.BSF.2.20.1703141450560.82811@zero.eik.bme.hu>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <alpine.BSF.2.20.1703141450560.82811@zero.eik.bme.hu>
-Date: Tue, 14 Mar 2017 15:41:20 +0000
-Message-ID: <87shmfq31b.fsf@linaro.org>
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cnoZS-0003lN-Ur
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:41:14 -0400
+Received: from [59.151.112.132] (port=29309 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cnoZS-0003jc-JM
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:41:10 -0400
+Date: Tue, 14 Mar 2017 23:40:28 +0800
+From: Chao Fan <fanc.fnst@cn.fujitsu.com>
+Message-ID: <20170314154028.GA10433@localhost.localdomain>
+References: <20170314102747.31395-1-fanc.fnst@cn.fujitsu.com>
+	<7110d95e-d500-a1ee-c590-2f44460d9881@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] qemu-system-ppc video artifacts since
- "tcg: drop global lock during TCG code execution"
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <7110d95e-d500-a1ee-c590-2f44460d9881@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] Output dirty-bytes-rate instead of
+ dirty-pages-rate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,75 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, jan.kiszka@siemens.com, qemu-devel <qemu-devel@nongnu.org>, cota@braap.org, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, bobby.prani@gmail.com, fred.konrad@greensocs.com, rth@twiddle.net
+To: Eric Blake <eblake@redhat.com>
+Cc: quintela@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org, berrange@redhat.com, caoj.fnst@cn.fujitsu.com, douly.fnst@cn.fujitsu.com, maozy.fnst@cn.fujitsu.com, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-
-BALATON Zoltan <balaton@eik.bme.hu> writes:
-
-> On Tue, 14 Mar 2017, Mark Cave-Ayland wrote:
->> On 14/03/17 10:00, Alex Bennée wrote:
->>> Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
->>>
->>>> I've recently noticed some video artifacts appearing in the form of
->>>> horizontal lines whilst testing OpenBIOS boot on some qemu-system-ppc
->>>> images (see https://www.ilande.co.uk/tmp/qemu/macos9-stripe.png for an
->>>> example) which I've finally bisected down to this commit.
->>>
->>> Interesting. Is the video hardware in this case a simple framebuffer or
->>> is there some sort of GPU involved?
->>
->> For the mac99 machine it's just the normal QEMU PCI std-vga card, so
->> nothing special. Having run tests across SPARC which uses its own
->> framebuffer, there have been no obvious artifacts that I've spotted
->> there to date.
->>
->>>> The horizontal lines tend to appear at different positions with
->>>> different lengths, although it seems to be more common that a complete
->>>> scanline is affected. Reproducing the issue is fairly easy with a MacOS
->>>> 9.2.1 ISO and the command line below:
->>>>
->>>> ./qemu-system-ppc -cdrom MacOS921.iso -boot d -m 512 -M mac99
->>>>
->>>> Could it be that this patch is still missing a lock somewhere which
->>>> causes these artifacts to appear?
->>>
->>> It depends. If the hardware is accessed via MMIO then the BQL is taken
->>> automatically (unless the area is explicitly marked as doing its own
->>> locking see: mr->global_locking).
->>>
->>> Is the artefact temporary or permanent? Could it be a change in
->>> synchronisation between the emulator updating the framebuffer and
->>> whatever backend updating its display?
->>
->> AFAICT they are temporary in that they appear randomly on the display,
->> but the next time that particular area of the display is updated by the
->> guest then they tend to either change/disappear.
+On Tue, Mar 14, 2017 at 09:54:34AM -0500, Eric Blake wrote:
+>On 03/14/2017 05:27 AM, Chao Fan wrote:
+>> In hmp, dirty-bytes-rate is more friendly than dirty-pages-rate.
+>> It's also better for other tools to determine the cpu throttle
+>> value in different architecture.
+>> 
+>> Signed-off-by: Chao Fan <fanc.fnst@cn.fujitsu.com>
+>> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+>> ---
 >
-> I've also noticed artifacts when testing the SM501 changes with
-> MorphOS on recent QEMU so it may not be related to just the std vga.
-> It's shown as bands (larger number of adjacent scanlines) not updating
-> when the client first wrote to the framebuffer but then they
-> disappeared during the next refresh. I'm guessing it may be related to
-> dirty checking of the framebuffer memory which is used to decide when
-> a scan line needs update?
+>In addition to the (good) comments you've gotten on not breaking
+>existing fields, and the choice between a single new field giving the
+>page size (with all fields favoring pages) or lots of new fields giving
+>bytes, I have another comment:
+>
+>> @@ -575,12 +572,15 @@
+>>  # @postcopy-requests: The number of page requests received from the destination
+>>  #        (since 2.7)
+>>  #
+>> +# @dirty-bytes-rate: how many bytes  dirtied by second by the
+>> +#        guest (since 2.9)
+>
+>You've missed soft freeze.  Is this really bug-fix quality to be adding
+>it into the release this late in the game for 2.9, or should it be
+>deferred to 2.10?
 
-Interesting. I guess if the corrupted scan lines are in blocks of
-PAGE_SIZE that might make sense.
+Ok, I will change it.
+Many thanks for your help.
 
-Commit (b0706b716769494f321a0d2bfd9fa9893992f995) made
-tlb_reset_dirty_range update the SoftMMU addr_write entry atomically.
-Now I don't see how that could race in single threaded TCG mode but it
-could explain things.
-
-I notice that tlb_set_dirty/tlb_set_dirty1 should maybe do the same. The
-currently assume they are only called from the CPU's context. If you
-enable #define DEBUG_TLB in cputlb.c does the assert fire?
+Thanks,
+Chao Fan
 
 >
-> Regards,
-> BALATON Zoltan
-
-
---
-Alex Bennée
+>And while this is just a new field to an existing command, rather than a
+>new command entirely, it's also worth thinking about Markus' edict for
+>testsuite coverage:
+>https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg00296.html
+>
+>-- 
+>Eric Blake   eblake redhat com    +1-919-301-3266
+>Libvirt virtualization library http://libvirt.org
+>
