@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48094)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cnhyM-0000se-Hb
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:38:28 -0400
+	(envelope-from <quintela@redhat.com>) id 1cnhym-0001Bt-Iq
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:38:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cnhyH-0005pj-Q6
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:38:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55434)
+	(envelope-from <quintela@redhat.com>) id 1cnhyi-000625-NW
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:38:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36982)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cnhyH-0005oq-K0
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:38:21 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cnhyi-00061p-Hf
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:38:48 -0400
 From: Juan Quintela <quintela@redhat.com>
 In-Reply-To: <20170314015507.13350-1-fanc.fnst@cn.fujitsu.com> (Chao Fan's
 	message of "Tue, 14 Mar 2017 09:55:07 +0800")
 References: <20170314015507.13350-1-fanc.fnst@cn.fujitsu.com>
 Reply-To: quintela@redhat.com
-Date: Tue, 14 Mar 2017 09:38:17 +0100
-Message-ID: <877f3suubq.fsf@secure.mitica>
+Date: Tue, 14 Mar 2017 09:38:46 +0100
+Message-ID: <8760jcuuax.fsf@secure.mitica>
 MIME-Version: 1.0
 Content-Type: text/plain
 Subject: Re: [Qemu-devel] [PATCH v2] Change the method to calculate
@@ -62,3 +62,7 @@ Chao Fan <fanc.fnst@cn.fujitsu.com> wrote:
 >     Fix incoming parameters of trace_migration_bitmap_sync_end
 
 Reviewed-by: Juan Quintela <quintela@redhat.com>
+
+Just curious, does this change show any difference in any load?
+
+Later, Juan.
