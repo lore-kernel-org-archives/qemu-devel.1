@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cne2d-0007Ro-Kd
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 00:26:36 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1cne2f-0007S4-7g
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 00:26:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cne2c-0007AU-BA
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 00:26:35 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1cne2c-00079w-5B
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 00:26:37 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 14 Mar 2017 15:26:24 +1100
-Message-Id: <20170314042626.20020-3-david@gibson.dropbear.id.au>
+Date: Tue, 14 Mar 2017 15:26:26 +1100
+Message-Id: <20170314042626.20020-5-david@gibson.dropbear.id.au>
 In-Reply-To: <20170314042626.20020-1-david@gibson.dropbear.id.au>
 References: <20170314042626.20020-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 2/4] target/ppc: fix cpu_ov setting for 32-bit
+Subject: [Qemu-devel] [PULL 4/4] dtc: Update submodule to avoid build errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,38 +20,28 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, pbonzini@redhat.com, aik@ozlabs.ru, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, pbonzini@redhat.com, aik@ozlabs.ru, David Gibson <david@gibson.dropbear.id.au>
 
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+The currently included version of the dtc/libfdt submodule has some build
+errors on certain distributions (including RHEL7).  This is due to some
+poorly named macros in libfdt.h; they're designed for use with the sparse
+static checker, but use reserved names which conflict with some symbols in
+the standard headers.
 
-A bug was introduced in following commit:
+That's been corrected in upstream dtc, this updates the qemu submodule to
+bring the fix to qemu.
 
-    dc0ad84 target/ppc: update overflow flags for add/sub
-
-As for 32-bit ppc target extracting bit 63 for overflow is not correct.
-Made it dependent on TARGET_LOG_BITS. This had broken booting MacOS
-9.2.1 image
-
-Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- target/ppc/translate.c | 2 +-
+ dtc | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index b6abc60..f40b5a1 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -818,7 +818,7 @@ static inline void gen_op_arith_compute_ov(DisasContext *ctx, TCGv arg0,
-         if (is_isa300(ctx)) {
-             tcg_gen_extract_tl(cpu_ov32, cpu_ov, 31, 1);
-         }
--        tcg_gen_extract_tl(cpu_ov, cpu_ov, 63, 1);
-+        tcg_gen_extract_tl(cpu_ov, cpu_ov, TARGET_LONG_BITS - 1, 1);
-     }
-     tcg_gen_or_tl(cpu_so, cpu_so, cpu_ov);
- }
+diff --git a/dtc b/dtc
+index fa8bc7f..558cd81 160000
+--- a/dtc
++++ b/dtc
+@@ -1 +1 @@
+-Subproject commit fa8bc7f928ac25f23532afc8beb2073efc8fb063
++Subproject commit 558cd81bdd432769b59bff01240c44f82cfb1a9d
 -- 
 2.9.3
