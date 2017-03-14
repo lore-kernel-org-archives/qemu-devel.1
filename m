@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cnq2O-0003e8-3L
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:15:08 -0400
+	(envelope-from <bounces@canonical.com>) id 1cnq2w-0004Ax-9a
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:15:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cnq2J-0001mg-7L
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:15:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52178)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cnq2J-0001mJ-1T
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:15:03 -0400
-References: <87tw6y8bs8.fsf@secure.mitica>
-	<CAFEAcA978SJemCfYJPa8jwtuhhi6JGh9pEDGYNJ1npJA3nvEQA@mail.gmail.com>
-	<20170314081312.GB13140@stefanha-x1.localdomain>
-	<CAFEAcA9F2BPexRieaEhu+UpJxoOdEfw8eggW8b2SjuoMMTNgog@mail.gmail.com>
-	<87wpbstesf.fsf@secure.mitica> <20170314160113.GM2445@work-vm>
-	<20170314162020.GT2652@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <20a2953d-b911-094a-35da-ee71be05ba6f@redhat.com>
-Date: Tue, 14 Mar 2017 18:14:57 +0100
+	(envelope-from <bounces@canonical.com>) id 1cnq2r-00021E-Bv
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:15:42 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53184)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cnq2r-00020n-5Y
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:15:37 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cnq2q-0005Zl-6Y
+	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 17:15:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2CA212E80AD
+	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 17:15:36 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170314162020.GT2652@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] KVM call for 2017-03-14
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 14 Mar 2017 17:03:27 -0000
+From: Thomas Huth <1217339@bugs.launchpad.net>
+Reply-To: Bug 1217339 <1217339@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130827122907.17435.24292.malonedeb@gac.canonical.com>
+Message-Id: <20170314170328.32360.53597.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1217339] Re: SIGQUIT to send ACPI-shutdown to
+ Guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,23 +37,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developer <qemu-devel@nongnu.org>, KVM devel mailing list <kvm@vger.kernel.org>, Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
 
+Please do not add patches to the bugtracker. Post them to the mailing
+list instead. See http://wiki.qemu-project.org/Contribute/SubmitAPatch
+for information how to contribute a patch.
 
+(and I am also not sure whether SIGHUP is the right signal for this job
+- the original request was also about SIGQUIT instead)
 
-On 14/03/2017 17:20, Daniel P. Berrange wrote:
->> I also do a FreeBSD VM, and grab an aarch64 and/or PPC bigendian host
->> to test on.
->>
->> (I could grab an ia64 host, but I don't think I could find anything
->> to install on it that would be new enough for the rest of our build
->> requirements).
->
-> Indeed, ia64 is a fully dead as a host architecture at this point, only
-> interesting as a historical curiosity. Paolo already killed ia64 KVM
-> host support in Linux git back in 2014.
+-- =
 
-QEMU also never supported ia64 KVM, only qemu-kvm ever did.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1217339
 
-Paolo
+Title:
+  SIGQUIT to send ACPI-shutdown to Guest
+
+Status in QEMU:
+  New
+
+Bug description:
+  When qemu receives SIGQUIT, it should first try to run
+  system_powerdown (giving the guest an ACPI signal to begin the
+  shutdown process), before ending the whole qemu process.
+
+  At this point there is no way to do a graceful shutdown if you do not
+  have access to the monitor and you do not use any wrapper like
+  libvirt.
+
+  If, for some reason SIGQUIT would not be accepted as the signal, take
+  any free to use signal, like SIGUSR1. There should be a way to get
+  ACPI shutdown sent to the guest.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1217339/+subscriptions
