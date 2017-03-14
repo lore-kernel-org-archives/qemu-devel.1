@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cnb8t-00015o-Nw
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 21:20:52 -0400
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cnbFO-0002hv-RU
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 21:27:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cnb8s-0001OE-OH
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 21:20:51 -0400
-Date: Tue, 14 Mar 2017 12:20:39 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170314012039.GD12564@umbus.fritz.box>
-References: <20170303032507.16142-1-david@gibson.dropbear.id.au>
-	<20170303032507.16142-16-david@gibson.dropbear.id.au>
-	<1489159521.3805.43.camel@redhat.com>
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cnbFK-0003gX-T0
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 21:27:34 -0400
+Received: from [59.151.112.132] (port=39273 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cnbFK-0003ar-2X
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 21:27:30 -0400
+From: Chao Fan <fanc.fnst@cn.fujitsu.com>
+Date: Tue, 14 Mar 2017 09:26:46 +0800
+Message-ID: <20170314012646.30560-1-fanc.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="rqzD5py0kzyFAOWN"
-Content-Disposition: inline
-In-Reply-To: <1489159521.3805.43.camel@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 15/17] spapr_pci: Advertise access to PCIe
- extended config space
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] Change the method to calculate dirty-pages-rate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,90 +23,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Bolognani <abologna@redhat.com>
-Cc: peter.maydell@linaro.org, lvivier@redhat.com, thuth@redhat.com, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, agraf@suse.de, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, sjitindarsingh@gmail.com, sam.bobroff@au1.ibm.com
+To: pbonzini@redhat.com, quintela@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org, berrange@redhat.com
+Cc: caoj.fnst@cn.fujitsu.com, douly.fnst@cn.fujitsu.com, maozy.fnst@cn.fujitsu.com, Chao Fan <fanc.fnst@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
+In function cpu_physical_memory_sync_dirty_bitmap, file
+include/exec/ram_addr.h:
 
---rqzD5py0kzyFAOWN
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+if (src[idx][offset]) {
+    unsigned long bits = atomic_xchg(&src[idx][offset], 0);
+    unsigned long new_dirty;
+    new_dirty = ~dest[k];
+    dest[k] |= bits;
+    new_dirty &= bits;
+    num_dirty += ctpopl(new_dirty);
+}
 
-On Fri, Mar 10, 2017 at 04:25:21PM +0100, Andrea Bolognani wrote:
-> On Fri, 2017-03-03 at 14:25 +1100, David Gibson wrote:
-> > The (paravirtual) PCI host bridge on the 'pseries' machine in most
-> > regards acts like a regular PCI bus, rather than a PCIe bus.=A0=A0Despi=
-te
-> > this, though, it does allow access to the PCIe extended config space.
-> >=A0
-> > We already implemented the RTAS methods to allow this access.. but
-> > forgot to put the markers into the device tree so that guest's know it
-> > is there.=A0=A0This adds them in.
-> >=A0
-> > With this, a pseries guest is able to view extended config space on
-> > (for example an e1000e device.=A0=A0This should be enough to allow gues=
-ts
-> > to use at least some PCIe devices.
-> >=A0
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
-> >=A0=A0hw/ppc/spapr_pci.c | 4 ++++
-> >=A0=A01 file changed, 4 insertions(+)
-> >=A0
-> > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> > index 2a3499e..919d3c2 100644
-> > --- a/hw/ppc/spapr_pci.c
-> > +++ b/hw/ppc/spapr_pci.c
-> > @@ -1321,6 +1321,10 @@ static int spapr_populate_pci_child_dt(PCIDevice=
- *dev, void *fdt, int offset,
-> >=A0=A0=A0=A0=A0=A0_FDT(fdt_setprop(fdt, offset, "assigned-addresses",
-> >=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0(ui=
-nt8_t *)rp.assigned, rp.assigned_len));
-> >=A0=A0
-> > +=A0=A0=A0=A0if (pci_is_express(dev)) {
-> > +=A0=A0=A0=A0=A0=A0=A0=A0_FDT(fdt_setprop_cell(fdt, offset, "ibm,pci-co=
-nfig-space-type", 0x1));
-> > +=A0=A0=A0=A0}
-> > +
-> >=A0=A0=A0=A0=A0=A0return 0;
-> >=A0=A0}
->=20
-> I've just realized that this is not tied to the pseries-2.9
-> machine type, which means existing guests will suddenly get
-> access to the Extended Config Space after upgrading QEMU.
->=20
-> I'm not sure this will cause any issue in practice, but it
-> seems like it would be safer to enable the Extended Config
-> Space only for pseries-2.9 and newer machine types.
+After these codes executed, only the pages not dirtied in bitmap(dest),
+but dirtied in dirty_memory[DIRTY_MEMORY_MIGRATION] will be calculated.
+For example:
+When ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION] = 0b00001111,
+and atomic_rcu_read(&migration_bitmap_rcu)->bmap = 0b00000011,
+the new_dirty will be 0b00001100, and this function will return 2 but not
+4 which is expected.
+the dirty pages in dirty_memory[DIRTY_MEMORY_MIGRATION] are all new,
+so these should be calculated also.
 
-That's a good point.  I've put a fix into ppc-for-2.9, will send a
-pull request shortly.
+Signed-off-by: Chao Fan <fanc.fnst@cn.fujitsu.com>
+Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+---
+ include/exec/ram_addr.h | 5 ++++-
+ migration/ram.c         | 7 +++----
+ 2 files changed, 7 insertions(+), 5 deletions(-)
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---rqzD5py0kzyFAOWN
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJYx0VkAAoJEGw4ysog2bOSDhoQANFk6r/n13X+KNNSqTAJBtcw
-M2evIsTLGfYaJj/qwLVZsbJ4vUn3zqVVUUhXl1jcV8fsYWh/Y00aRM06Vzdbzg7v
-bzqfBu316IcpvN5qnUes7iApnWmKuswOWHSIQIomto36dbJiQx63zjlQkzQrcmFp
-+ofDbhyKMz9FuNT8AYLJkAiKx2OFlRjU82+J/Xw/teNZe2pQIHRa6omteX2JdDY0
-4eYnoy9VRSzjgBR8dB4NpO6RbvF2eB6p9lQB4awpxiwXiU77t4KbHNwE67JZ11bH
-kR53Kuqk2YINY8nCNoi3xrOrv650NslNXlKiDQVpw2Xh4v30lHP3INh+KPZILftY
-BcGqwXDkV9q+eZRJCi3kHAM97b/ofFO6/bj+PewriDFAVbjFdwB6eLdH5ffVu3GL
-PaHXHqvwpIEy8IDTSBtLCxTgDH0WayjoQxIjkik0fdeJ40Sd472KArKlMaK3uYjK
-JVQJuD3IzTORJNNGpBtOAwkoo7RNwmE82Eu7lk6bw3Eh56b3uxgJz1IA3yZE4++H
-Z3u9AehurKMs4Ij4x99CVe7FAf8rqOEwhTRS2S7w1EDQPPdxrVJH6a4ZYlHb9Jpu
-ZqSkIWdF5KxKbFYcAuu0DLsNGSX6nlmJQatBhoplES2v8DyGXvpV1xVU8XJ6Ce6T
-bXFLFSF2jiLxaCLR+tMQ
-=flyg
------END PGP SIGNATURE-----
-
---rqzD5py0kzyFAOWN--
+diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+index cd432e7..b05dc84 100644
+--- a/include/exec/ram_addr.h
++++ b/include/exec/ram_addr.h
+@@ -355,7 +355,8 @@ static inline void cpu_physical_memory_clear_dirty_range(ram_addr_t start,
+ static inline
+ uint64_t cpu_physical_memory_sync_dirty_bitmap(unsigned long *dest,
+                                                ram_addr_t start,
+-                                               ram_addr_t length)
++                                               ram_addr_t length,
++                                               int64_t *real_dirty_pages)
+ {
+     ram_addr_t addr;
+     unsigned long page = BIT_WORD(start >> TARGET_PAGE_BITS);
+@@ -379,6 +380,7 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(unsigned long *dest,
+             if (src[idx][offset]) {
+                 unsigned long bits = atomic_xchg(&src[idx][offset], 0);
+                 unsigned long new_dirty;
++                *real_dirty_pages += ctpopl(bits);
+                 new_dirty = ~dest[k];
+                 dest[k] |= bits;
+                 new_dirty &= bits;
+@@ -398,6 +400,7 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(unsigned long *dest,
+                         start + addr,
+                         TARGET_PAGE_SIZE,
+                         DIRTY_MEMORY_MIGRATION)) {
++                *real_dirty_pages += 1;
+                 long k = (start + addr) >> TARGET_PAGE_BITS;
+                 if (!test_and_set_bit(k, dest)) {
+                     num_dirty++;
+diff --git a/migration/ram.c b/migration/ram.c
+index 719425b..fdf9a85 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -576,18 +576,18 @@ static inline bool migration_bitmap_clear_dirty(ram_addr_t addr)
+     return ret;
+ }
+ 
++static int64_t num_dirty_pages_period;
+ static void migration_bitmap_sync_range(ram_addr_t start, ram_addr_t length)
+ {
+     unsigned long *bitmap;
+     bitmap = atomic_rcu_read(&migration_bitmap_rcu)->bmap;
+-    migration_dirty_pages +=
+-        cpu_physical_memory_sync_dirty_bitmap(bitmap, start, length);
++    migration_dirty_pages += cpu_physical_memory_sync_dirty_bitmap(bitmap,
++                             start, length, &num_dirty_pages_period);
+ }
+ 
+ /* Fix me: there are too many global variables used in migration process. */
+ static int64_t start_time;
+ static int64_t bytes_xfer_prev;
+-static int64_t num_dirty_pages_period;
+ static uint64_t xbzrle_cache_miss_prev;
+ static uint64_t iterations_prev;
+ 
+@@ -648,7 +648,6 @@ static void migration_bitmap_sync(void)
+ 
+     trace_migration_bitmap_sync_end(migration_dirty_pages
+                                     - num_dirty_pages_init);
+-    num_dirty_pages_period += migration_dirty_pages - num_dirty_pages_init;
+     end_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+ 
+     /* more than 1 second = 1000 millisecons */
+-- 
+2.9.3
