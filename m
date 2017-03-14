@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55599)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55696)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cnq2w-0004Ax-9a
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:15:43 -0400
+	(envelope-from <eblake@redhat.com>) id 1cnq3P-0004c2-TZ
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:16:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cnq2r-00021E-Bv
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:15:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53184)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cnq2r-00020n-5Y
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:15:37 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cnq2q-0005Zl-6Y
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 17:15:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2CA212E80AD
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 17:15:36 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1cnq3L-00028Y-HA
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:16:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53522)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cnq3K-00027x-Q7
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:16:07 -0400
+References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
+	<1489385927-6735-16-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <da1f22b3-3a21-3ee7-25bf-3c9216cd2317@redhat.com>
+Date: Tue, 14 Mar 2017 12:16:04 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 14 Mar 2017 17:03:27 -0000
-From: Thomas Huth <1217339@bugs.launchpad.net>
-Reply-To: Bug 1217339 <1217339@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20130827122907.17435.24292.malonedeb@gac.canonical.com>
-Message-Id: <20170314170328.32360.53597.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1217339] Re: SIGQUIT to send ACPI-shutdown to
- Guest
+In-Reply-To: <1489385927-6735-16-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="qfAc5dWwneNnBslIopOb7wpp4IwP97kdC"
+Subject: Re: [Qemu-devel] [PATCH for-2.9 15/47] qapi: Conjure up
+ QAPIDoc.ArgSection for undocumented members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,39 +29,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-Please do not add patches to the bugtracker. Post them to the mailing
-list instead. See http://wiki.qemu-project.org/Contribute/SubmitAPatch
-for information how to contribute a patch.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--qfAc5dWwneNnBslIopOb7wpp4IwP97kdC
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Message-ID: <da1f22b3-3a21-3ee7-25bf-3c9216cd2317@redhat.com>
+Subject: Re: [PATCH for-2.9 15/47] qapi: Conjure up QAPIDoc.ArgSection for
+ undocumented members
+References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
+ <1489385927-6735-16-git-send-email-armbru@redhat.com>
+In-Reply-To: <1489385927-6735-16-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-(and I am also not sure whether SIGHUP is the right signal for this job
-- the original request was also about SIGQUIT instead)
+On 03/13/2017 01:18 AM, Markus Armbruster wrote:
+> qapi2texi.py already conjures up ArgSections for undocumented
+> enumeration values, in texi_enum).  Drop that, and conjure them up for
 
--- =
+Missing '('?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1217339
+> all kinds of "arguments" (enumeration values, object and alternate
+> type members) in qapi.py instead.
+>=20
+> Take care to keep generated documentation exactly the same for now.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  scripts/qapi.py      |  5 ++---
+>  scripts/qapi2texi.py | 31 ++++++++++++++++---------------
+>  2 files changed, 18 insertions(+), 18 deletions(-)
+>=20
 
-Title:
-  SIGQUIT to send ACPI-shutdown to Guest
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Status in QEMU:
-  New
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-Bug description:
-  When qemu receives SIGQUIT, it should first try to run
-  system_powerdown (giving the guest an ACPI signal to begin the
-  shutdown process), before ending the whole qemu process.
 
-  At this point there is no way to do a graceful shutdown if you do not
-  have access to the monitor and you do not use any wrapper like
-  libvirt.
+--qfAc5dWwneNnBslIopOb7wpp4IwP97kdC
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  If, for some reason SIGQUIT would not be accepted as the signal, take
-  any free to use signal, like SIGUSR1. There should be a way to get
-  ACPI shutdown sent to the guest.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1217339/+subscriptions
+iQEcBAEBCAAGBQJYyCVUAAoJEKeha0olJ0NqVKAIAKo/UQxYToJb4hAIrTkp0maS
+Dvjl17HPtL7XVfw7+KKbepAt+yk95gY++6byzatCEP0y9cYYkKdFs07pzVYCEXDI
+/nIPcBoAHEVFCpz+6ehNEevi17/8UgD+JKJbpFCQINqD62tyQ5wwZlRx2eCpcE/H
++1XLEqiY/IChkuBwFZZIHE+UlNF0WYBtIVNlKM/p1gLAVzTc3WvHUrwSxGlY0kdH
+9jgtQPOg+gX0piXsqcH0AU6fw0UdDkxDpXnkKdfeQEkJU+0tCVx3cGkLjmjc3OsZ
+sr5/NeT8868xzqu8fxa80CxwI0abV/5Q0IZ1wkmd2IIckRSF/jJGg54tym4ND+c=
+=9aFn
+-----END PGP SIGNATURE-----
+
+--qfAc5dWwneNnBslIopOb7wpp4IwP97kdC--
