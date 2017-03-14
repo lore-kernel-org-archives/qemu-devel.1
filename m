@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53287)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cniEF-0007W1-UQ
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:54:52 -0400
+	(envelope-from <quintela@redhat.com>) id 1cniIX-0000K6-OI
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:59:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cniEC-0004mG-UZ
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:54:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49292)
+	(envelope-from <quintela@redhat.com>) id 1cniIU-0006rW-NS
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:59:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60748)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cniEC-0004m2-OM
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:54:48 -0400
-References: <1489416892-2719-1-git-send-email-yongbok.kim@imgtec.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <15665355-4ee1-6f2c-f645-a9a2b2d836e1@redhat.com>
-Date: Tue, 14 Mar 2017 09:54:42 +0100
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cniIU-0006rA-HL
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:59:14 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <CAFEAcA9F2BPexRieaEhu+UpJxoOdEfw8eggW8b2SjuoMMTNgog@mail.gmail.com>
+	(Peter Maydell's message of "Tue, 14 Mar 2017 09:37:24 +0100")
+References: <87tw6y8bs8.fsf@secure.mitica>
+	<CAFEAcA978SJemCfYJPa8jwtuhhi6JGh9pEDGYNJ1npJA3nvEQA@mail.gmail.com>
+	<20170314081312.GB13140@stefanha-x1.localdomain>
+	<CAFEAcA9F2BPexRieaEhu+UpJxoOdEfw8eggW8b2SjuoMMTNgog@mail.gmail.com>
+Reply-To: quintela@redhat.com
+Date: Tue, 14 Mar 2017 09:59:12 +0100
+Message-ID: <87wpbstesf.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <1489416892-2719-1-git-send-email-yongbok.kim@imgtec.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: update for MIPS devices
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] KVM call for 2017-03-14
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,54 +30,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yongbok Kim <yongbok.kim@imgtec.com>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: Paul Burton <paul.burton@imgtec.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developer <qemu-devel@nongnu.org>, KVM devel mailing list <kvm@vger.kernel.org>
 
-On 13.03.2017 15:54, Yongbok Kim wrote:
-> Add myself to MIPSSIM and new entry for Fulong 2E.
-> Add an entry for Boston machine (Paul Burton).
-> 
-> Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
-> cc: Paul Burton <Paul.Burton@imgtec.com>
-> ---
->  MAINTAINERS | 15 +++++++++++++--
->  1 file changed, 13 insertions(+), 2 deletions(-)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index e3edd04..d196f19 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -600,15 +600,26 @@ S: Maintained
->  F: hw/mips/mips_malta.c
->  
->  Mipssim
-> -L: qemu-devel@nongnu.org
-> -S: Orphan
-> +M: Yongbok Kim <yongbok.kim@imgtec.com>
-> +S: Odd Fixes
->  F: hw/mips/mips_mipssim.c
-> +F: hw/net/mipsnet.c
->  
->  R4000
->  M: Aurelien Jarno <aurelien@aurel32.net>
->  S: Maintained
->  F: hw/mips/mips_r4k.c
->  
-> +Fulong 2E
-> +M: Yongbok Kim <yongbok.kim@imgtec.com>
-> +S: Odd Fixes
-> +F: hw/mips/mips_fulong2e.c
-> +
-> +Boston
-> +M: Paul Burton <Paul.Burton@imgtec.com>
-> +S: Maintained
-> +F: hw/mips/boston.c
-> +
->  OpenRISC Machines
->  -----------------
->  or1k-sim
-> 
+Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 14 March 2017 at 09:13, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>> On Mon, Mar 13, 2017 at 11:02:01AM +0100, Peter Maydell wrote:
+>> The minimum requirements for the new language:
+>> 1. Does it support the host operating systems that QEMU runs on?
+>> 2. Does it support the host architectures that QEMU runs on?
+>
+> Speaking of this, I was thinking that we should introduce
+> a rule that for any host OS/arch we support we must have
+> a build machine so we can at least do a compile test.
+> For instance if you believe configure we support Solaris
+> and AIX, but I bet they're bit-rotting. The ia64 backend
+> has to be a strong candidate for being dumped too.
+> Demanding "system we can test on or we drop support"
+> would let us more clearly see what we're actually running
+> on and avoid unnecessarily ruling things out because they
+> don't support Itanium or AIX...
 
-Thanks for the update!
+YES, YES and YES.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+I demand an osX build machine NOW!!!!  Remote access is ok.
+
+Now more seriously, I can (relatively easy) compile test my pull
+requests with:
+- linux x86 (latest fedora, but I can get an older one if needed)
+- linux x86_64 (latest fedor,, but the same)
+- mingw64 32bit (latest fedora, but here I have the problem that Peter
+  uses a different crosscompiler than me)
+- mingw64 32bit (the same)
+
+But for the rest, I need to wait that somebody told me that it breaks
+the build.  Normally it is things like size_t is 32bit instead of 64bit
+or some stupid things like that, that are trivial to fix if I can
+compile there before doing the pull submission.
+
+Later, Juan.
