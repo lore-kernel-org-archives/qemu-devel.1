@@ -1,26 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cnhEc-0000aW-Iu
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 03:51:12 -0400
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cnhHN-0001AV-Nh
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 03:54:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cnhEX-0007Ey-OM
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 03:51:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55810)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cnhEX-0007EJ-BI
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 03:51:05 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
-	<1489385927-6735-7-git-send-email-armbru@redhat.com>
-	<4329f1e3-1f8e-7194-3bf6-55ae0d0aae82@redhat.com>
-Date: Tue, 14 Mar 2017 08:51:02 +0100
-In-Reply-To: <4329f1e3-1f8e-7194-3bf6-55ae0d0aae82@redhat.com> (Eric Blake's
-	message of "Mon, 13 Mar 2017 17:46:03 -0500")
-Message-ID: <87lgs8pa8p.fsf@dusky.pond.sub.org>
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cnhHK-0008OS-KY
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 03:54:01 -0400
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Date: Tue, 14 Mar 2017 15:52:32 +0800
+Message-ID: <1489477952-6901-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-2.9 06/47] qapi: Have each QAPI schema
- declare its name rule violations
+Subject: [Qemu-devel] [PATCH] hw/net/virtio-net.c: Follow CODING_STYLE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,89 +19,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>, Laurent Vivier <laurent@vivier.eu>
+Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, QEMU Trivial <qemu-trivial@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
+Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+---
+ hw/net/virtio-net.c | 53 +++++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 33 insertions(+), 20 deletions(-)
 
-> On 03/13/2017 01:18 AM, Markus Armbruster wrote:
->> qapi.py has a hardcoded white-list of type names that may violate the
->> rule on use of upper and lower case.  Add a new pragma directive
->> 'name-case-whitelist', and use it to replace the hard-coded
->> white-list.
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  docs/qapi-code-gen.txt                  |  6 ++++++
->>  qapi-schema.json                        | 11 ++++++++++-
->>  scripts/qapi.py                         | 22 ++++++++++------------
->>  tests/qapi-schema/enum-member-case.err  |  2 +-
->>  tests/qapi-schema/enum-member-case.json |  1 +
->>  5 files changed, 28 insertions(+), 14 deletions(-)
->> 
->
->> +++ b/qapi-schema.json
->> @@ -61,7 +61,16 @@
->>          'query-migrate-cache-size',
->>          'query-tpm-models',
->>          'query-tpm-types',
->> -        'ringbuf-read' ] } }
->> +        'ringbuf-read' ],
->> +    'name-case-whitelist': [
->> +        'ACPISlotType',         # DIMM, visible through query-acpi-ospm-status
->> +        'CpuInfoMIPS',          # PC, visible through query-cpu
->> +        'CpuInfoTricore',       # PC, visible through query-cpu
->> +        'QapiErrorClass',       # all members, visible through errors
->> +        'UuidInfo',             # UUID, visible through query-uuid
->> +        'X86CPURegister32',     # all members, visible indirectly through qom-get
->> +        'q_obj_CpuInfo-base'    # CPU, visible through query-cpu
->> +    ] } }
->
-> Interesting - here you bunch up 2 of the 3 pragmas into one dict, while
-> still leaving the third related to documentation in its own dict.
->
-> That 'q_obj_CpuInfo-base' is ugly, and I had a patch around previously
-> that used a saner name rather than making callers reverse-engineer the
-> implicit naming rules.  Related to my work on anonymous bases to flat
-> unions, so I'll get to rebase that work and post it on top of yours.
-> But not a show-stopper for this patch, where it is just moving the location.
-
-... to a more visible place :)
-
-Regarding flat unions: what I really want is unifying struct and both
-kinds of unions into a single object type.  Something like
-
-    { 'object': STRING,        # type name
-      '*base': STRING-OR-DICT, # base type
-      '*data': DICT,           # common members
-      '*tag': STRING,          # tag name, must be in base or common
-      '*variant': DICT }       # map tag value -> variant members
-
-Introspection already works that way.
-
-Note no sugar for "simple" unions.  They become syntactically
-non-simple.  Feature.
-
-Flat unions become syntactically non-horrible.
-
->> @@ -311,6 +302,13 @@ class QAPISchemaParser(object):
->>                                     "Pragma returns-whitelist must be"
->>                                     " a list of strings")
->>              returns_whitelist = value
->> +        elif name == 'name-case-whitelist':
->> +            if (not isinstance(value, list)
->> +                    or any([not isinstance(elt, str) for elt in value])):
->> +                raise QAPISemError(info,
->> +                                   "Pragma name-case-whitelist must be"
->> +                                   " a list of strings")
->> +            name_case_whitelist = value
->
-> Same comments as before - new error message with no testsuite coverage,
-> and no checking for duplicate assignment where last one silently wins;
-> but where I'm okay with deferring if you don't want to delay 2.9 for a
-> v2 respin.
->
-> So if you use it unchanged,
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Thanks!
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index c321680..ede618e 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -273,7 +273,7 @@ static void virtio_net_set_status(struct VirtIODevice *vdev, uint8_t status)
+         if (queue_started) {
+             if (q->tx_timer) {
+                 timer_mod(q->tx_timer,
+-                               qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + n->tx_timeout);
++                         qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + n->tx_timeout);
+             } else {
+                 qemu_bh_schedule(q->tx_bh);
+             }
+@@ -301,13 +301,15 @@ static void virtio_net_set_link_status(NetClientState *nc)
+     VirtIODevice *vdev = VIRTIO_DEVICE(n);
+     uint16_t old_status = n->status;
+ 
+-    if (nc->link_down)
++    if (nc->link_down) {
+         n->status &= ~VIRTIO_NET_S_LINK_UP;
+-    else
++    } else {
+         n->status |= VIRTIO_NET_S_LINK_UP;
++    }
+ 
+-    if (n->status != old_status)
++    if (n->status != old_status) {
+         virtio_notify_config(vdev);
++    }
+ 
+     virtio_net_set_status(vdev, vdev->status);
+ }
+@@ -319,7 +321,8 @@ static void rxfilter_notify(NetClientState *nc)
+     if (nc->rxfilter_notify_enabled) {
+         gchar *path = object_get_canonical_path(OBJECT(n->qdev));
+         qapi_event_send_nic_rx_filter_changed(!!n->netclient_name,
+-                                              n->netclient_name, path, &error_abort);
++                                              n->netclient_name,
++                                              path, &error_abort);
+         g_free(path);
+ 
+         /* disable event notification to avoid events flooding */
+@@ -459,8 +462,9 @@ static int peer_has_vnet_hdr(VirtIONet *n)
+ 
+ static int peer_has_ufo(VirtIONet *n)
+ {
+-    if (!peer_has_vnet_hdr(n))
++    if (!peer_has_vnet_hdr(n)) {
+         return 0;
++    }
+ 
+     n->has_ufo = qemu_has_ufo(qemu_get_queue(n->nic)->peer);
+ 
+@@ -847,15 +851,17 @@ static int virtio_net_handle_vlan_table(VirtIONet *n, uint8_t cmd,
+         return VIRTIO_NET_ERR;
+     }
+ 
+-    if (vid >= MAX_VLAN)
++    if (vid >= MAX_VLAN) {
+         return VIRTIO_NET_ERR;
++    }
+ 
+-    if (cmd == VIRTIO_NET_CTRL_VLAN_ADD)
++    if (cmd == VIRTIO_NET_CTRL_VLAN_ADD) {
+         n->vlans[vid >> 5] |= (1U << (vid & 0x1f));
+-    else if (cmd == VIRTIO_NET_CTRL_VLAN_DEL)
++    } else if (cmd == VIRTIO_NET_CTRL_VLAN_DEL) {
+         n->vlans[vid >> 5] &= ~(1U << (vid & 0x1f));
+-    else
++    } else {
+         return VIRTIO_NET_ERR;
++    }
+ 
+     rxfilter_notify(nc);
+ 
+@@ -938,7 +944,8 @@ static void virtio_net_handle_ctrl(VirtIODevice *vdev, VirtQueue *vq)
+         }
+ 
+         iov_cnt = elem->out_num;
+-        iov2 = iov = g_memdup(elem->out_sg, sizeof(struct iovec) * elem->out_num);
++        iov2 = iov = g_memdup(elem->out_sg,
++                              sizeof(struct iovec) * elem->out_num);
+         s = iov_to_buf(iov, iov_cnt, 0, &ctrl, sizeof(ctrl));
+         iov_discard_front(&iov, &iov_cnt, sizeof(ctrl));
+         if (s != sizeof(ctrl)) {
+@@ -1086,18 +1093,21 @@ static int receive_filter(VirtIONet *n, const uint8_t *buf, int size)
+     uint8_t *ptr = (uint8_t *)buf;
+     int i;
+ 
+-    if (n->promisc)
++    if (n->promisc) {
+         return 1;
++    }
+ 
+     ptr += n->host_hdr_len;
+ 
+     if (!memcmp(&ptr[12], vlan, sizeof(vlan))) {
+         int vid = lduw_be_p(ptr + 14) & 0xfff;
+-        if (!(n->vlans[vid >> 5] & (1U << (vid & 0x1f))))
++        if (!(n->vlans[vid >> 5] & (1U << (vid & 0x1f)))) {
+             return 0;
++        }
+     }
+ 
+-    if (ptr[0] & 1) { // multicast
++    if (ptr[0] & 1) {
++        /* multicast */
+         if (!memcmp(ptr, bcast, sizeof(bcast))) {
+             return !n->nobcast;
+         } else if (n->nomulti) {
+@@ -1111,7 +1121,8 @@ static int receive_filter(VirtIONet *n, const uint8_t *buf, int size)
+                 return 1;
+             }
+         }
+-    } else { // unicast
++    } else {
++        /* unicast */
+         if (n->nouni) {
+             return 0;
+         } else if (n->alluni || n->mac_table.uni_overflow) {
+@@ -1150,8 +1161,9 @@ static ssize_t virtio_net_receive_rcu(NetClientState *nc, const uint8_t *buf,
+         return 0;
+     }
+ 
+-    if (!receive_filter(n, buf, size))
++    if (!receive_filter(n, buf, size)) {
+         return size;
++    }
+ 
+     offset = i = 0;
+ 
+@@ -1283,7 +1295,8 @@ static int32_t virtio_net_flush_tx(VirtIONetQueue *q)
+     for (;;) {
+         ssize_t ret;
+         unsigned int out_num;
+-        struct iovec sg[VIRTQUEUE_MAX_SIZE], sg2[VIRTQUEUE_MAX_SIZE + 1], *out_sg;
++        struct iovec sg[VIRTQUEUE_MAX_SIZE], sg2[VIRTQUEUE_MAX_SIZE + 1],
++               *out_sg;
+         struct virtio_net_hdr_mrg_rxbuf mhdr;
+ 
+         elem = virtqueue_pop(q->tx_vq, sizeof(VirtQueueElement));
+@@ -1317,10 +1330,10 @@ static int32_t virtio_net_flush_tx(VirtIONetQueue *q)
+                                    n->guest_hdr_len, -1);
+                 if (out_num == VIRTQUEUE_MAX_SIZE) {
+                     goto drop;
+-		}
++                }
+                 out_num += 1;
+                 out_sg = sg2;
+-	    }
++            }
+         }
+         /*
+          * If host wants to see the guest header as is, we can
+@@ -1384,7 +1397,7 @@ static void virtio_net_handle_tx_timer(VirtIODevice *vdev, VirtQueue *vq)
+         }
+     } else {
+         timer_mod(q->tx_timer,
+-                       qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + n->tx_timeout);
++                  qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + n->tx_timeout);
+         q->tx_waiting = 1;
+         virtio_queue_set_notification(vq, 0);
+     }
+-- 
+2.7.4
