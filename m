@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44835)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eduardo.otubo@profitbricks.com>) id 1cnlmV-0001Ix-4Q
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:42:28 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cnlmx-0001bh-8g
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:42:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eduardo.otubo@profitbricks.com>) id 1cnlmS-0000ub-0Q
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:42:27 -0400
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:34013)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cnlmv-00013H-QT
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:42:55 -0400
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:34146)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <eduardo.otubo@profitbricks.com>)
-	id 1cnlmR-0000uJ-NV
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:42:23 -0400
-Received: by mail-wr0-x22c.google.com with SMTP id l37so123284902wrc.1
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 05:42:23 -0700 (PDT)
-Date: Tue, 14 Mar 2017 13:42:20 +0100
-From: Eduardo Otubo <eduardo.otubo@profitbricks.com>
-Message-ID: <20170314124220.GC21475@vader>
-References: <20170314113209.12025-1-eduardo.otubo@profitbricks.com>
-	<20170314113209.12025-4-eduardo.otubo@profitbricks.com>
-	<e9b2bd2a-8409-7470-76bb-32f15fe6ce0e@redhat.com>
-	<20170314115253.GL2652@redhat.com>
-	<d8825eda-6613-71c9-9dd7-9239325e296b@redhat.com>
-	<20170314122455.GM2652@redhat.com>
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1cnlmv-00012t-EQ
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:42:53 -0400
+Received: by mail-lf0-x244.google.com with SMTP id y193so14000505lfd.1
+	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 05:42:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170314122455.GM2652@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/5] seccomp: add elevateprivileges
- argument to command line
+References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
+	<1489385927-6735-26-git-send-email-armbru@redhat.com>
+In-Reply-To: <1489385927-6735-26-git-send-email-armbru@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 14 Mar 2017 12:42:40 +0000
+Message-ID: <CAJ+F1CK+i0HTNU83ftuc9zBcNFm2NSxecajt97QvDZGfj9on8w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.9 25/47] qapi2texi: Include member
+ type in generated documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,85 +31,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, thuth@redhat.com, Andy Lutomirski <luto@amacapital.net>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com
 
-On Tue, Mar 14, 2017 at 12=24=55PM +0000, Daniel P. Berrange wrote:
-> On Tue, Mar 14, 2017 at 01:13:15PM +0100, Paolo Bonzini wrote:
-> > 
-> > 
-> > On 14/03/2017 12:52, Daniel P. Berrange wrote:
-> > >>>  DEF("sandbox", HAS_ARG, QEMU_OPTION_sandbox, \
-> > >>> -    "-sandbox on[,obsolete=allow]  Enable seccomp mode 2 system call filter (default 'off').\n" \
-> > >>> -    "                              obsolete: Allow obsolete system calls",
-> > >>> +    "-sandbox on[,obsolete=allow][,elevateprivileges=deny]\n" \
-> > >>> +    "                               Enable seccomp mode 2 system call filter (default 'off').\n" \
-> > >>> +    "                               obsolete: Allow obsolete system calls\n" \
-> > >>> +    "                               elevateprivileges: avoids Qemu process to elevate its privileges by blacklisting all set*uid|gid system calls",
-> > >> Why allow these by default?
-> > > The goal is that '-sandbox on' should not break *any* QEMU feature. It
-> > > needs to be a safe thing that people can unconditionally turn on without
-> > > thinking about it.
-> > 
-> > Sure, but what advantages would it provide if the default blacklist does
-> > not block anything meaningful?  At the very least, spawn=deny should
-> > default elevateprivileges to deny too.
-> 
-> Yep, having spawn=deny imply elevateprivileges=deny is reasonable IMHO.
-> 
-> > I think there should be a list (as small as possible) of features that
-> > are sacrificed by "-sandbox on".
-> 
-> That breaks the key goal that '-sandbox on' should never break a valid
-> QEMU configuration, no matter how obscure, and would thus continue to
-> discourage people from turning it on by default.
-> 
-> Yes, a bare '-sandbox on' is very loose, but think of it as just being
-> a building block. 90% of the time the user or mgmt app would want to
-> turn on extra flags to lock it down more meaningfully, by explicitly
-> blocking ability to use feature they know won't be needed. 
-> 
-> > > The QEMU bridge helper  requires setuid privs, hence
-> > > elevated privileges needs to be permitted by default.
-> > 
-> > QEMU itself should not be getting additional privileges, only the helper
-> > and in turn the helper or ifup scripts can be limited through MAC.  The
-> > issue is that seccomp persists across execve.
-> 
-> That's true.
-> 
-> > Currently, unprivileged users are only allowed to install seccomp
-> > filters if no_new_privs is set.  Would it make sense if seccomp filters
-> > without no_new_privs succeeded, except that the filter would not persist
-> > across execve of binaries with setuid, setgid or file capabilities?
-> > 
-> > Then the spawn option could be a tri-state with the choice of allow,
-> > deny and no_new_privs:
-> > 
-> > - elevateprivileges=allow,spawn=allow: legacy for old kernels
-> > - elevateprivileges=deny,spawn=allow: can run privileged helpers
-> > - elevateprivileges=deny,spawn=deny: cannot run helpers at all
-> > - elevateprivileges=deny,spawn=no_new_privs: can run unprivileged
-> > helpers only
-> 
-> That could work, but I think that syntax is making it uneccessarily
-> complex to understand. I don't like how it introduces a semantic
-> dependancy between the elevateprivileges & spawn flags i.e. the
-> interpretation of elevateprivileges=deny, varies according to what
-> you set for spawn= option.
-> 
-> I'd be more inclined to make elevateprivileges be a tri-state instead
-> e.g.
-> 
->   elevateprivileges=allow|deny|children
-> 
+Hi
 
-Still weird but better than the combination of elevateprivileges and
-spawn. Perhaps this has a better semantics?
+On Mon, Mar 13, 2017 at 10:31 AM Markus Armbruster <armbru@redhat.com>
+wrote:
 
-    elevateprivileges=allow|deny|no_new_privs
+> The recent merge of docs/qmp-commands.txt and docs/qmp-events.txt into
+> the schema lost type information.  Fix this documentation regression.
+>
+> Example change (qemu-qmp-ref.txt):
+>
+>   -- Struct: InputKeyEvent
+>
+>       Keyboard input event.
+>
+>       Members:
+> -     'button'
+> +     'button: InputButton'
+>            Which button this event is for.
+> -     'down'
+> +     'down: boolean'
+>            True for key-down and false for key-up events.
+>
+>       Since: 2.0
+>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  scripts/qapi.py      | 14 ++++++++++++++
+>  scripts/qapi2texi.py |  8 ++++++--
+>  2 files changed, 20 insertions(+), 2 deletions(-)
+>
+> diff --git a/scripts/qapi.py b/scripts/qapi.py
+> index 9430493..b82a2a6 100644
+> --- a/scripts/qapi.py
+> +++ b/scripts/qapi.py
+> @@ -1101,6 +1101,11 @@ class QAPISchemaType(QAPISchemaEntity):
+>          }
+>          return json2qtype.get(self.json_type())
+>
+> +    def doc_type(self):
+> +        if self.is_implicit():
+> +            return None
+> +        return self.name
+> +
+>
+>  class QAPISchemaBuiltinType(QAPISchemaType):
+>      def __init__(self, name, json_type, c_type):
+> @@ -1125,6 +1130,9 @@ class QAPISchemaBuiltinType(QAPISchemaType):
+>      def json_type(self):
+>          return self._json_type_name
+>
+> +    def doc_type(self):
+> +        return self.json_type()
+> +
+>      def visit(self, visitor):
+>          visitor.visit_builtin_type(self.name, self.info,
+> self.json_type())
+>
+> @@ -1184,6 +1192,12 @@ class QAPISchemaArrayType(QAPISchemaType):
+>      def json_type(self):
+>          return 'array'
+>
+> +    def doc_type(self):
+> +        elt_doc_type =3D self.element_type.doc_type()
+> +        if not elt_doc_type:
+> +            return None
+>
+
+In which case is this expected to happen? place an assert here instead?
 
 
--- 
-Eduardo Otubo
-ProfitBricks GmbH
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+
+
+
+> +        return 'array of ' + elt_doc_type
+> +
+>      def visit(self, visitor):
+>          visitor.visit_array_type(self.name, self.info, self.element_type=
+)
+>
+> diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
+> index 3dd0146..993b652 100755
+> --- a/scripts/qapi2texi.py
+> +++ b/scripts/qapi2texi.py
+> @@ -135,8 +135,12 @@ def texi_enum_value(value):
+>
+>  def texi_member(member):
+>      """Format a table of members item for an object type member"""
+> -    return '@item @code{%s}%s\n' % (
+> -        member.name, ' (optional)' if member.optional else '')
+> +    typ =3D member.type.doc_type()
+> +    return '@item @code{%s%s%s}%s\n' % (
+> +        member.name,
+> +        ': ' if typ else '',
+> +        typ if typ else '',
+> +        ' (optional)' if member.optional else '')
+>
+>
+>  def texi_members(doc, what, member_func):
+> --
+> 2.7.4
+>
+>
+> --
+Marc-Andr=C3=A9 Lureau
