@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cniCs-0006yA-3l
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:53:27 -0400
+	(envelope-from <thuth@redhat.com>) id 1cniEF-0007W1-UQ
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:54:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cniCm-00044a-48
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:53:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59998)
+	(envelope-from <thuth@redhat.com>) id 1cniEC-0004mG-UZ
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:54:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49292)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cniCl-00044L-UP
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:53:20 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170314081312.GB13140@stefanha-x1.localdomain> (Stefan
-	Hajnoczi's message of "Tue, 14 Mar 2017 16:13:12 +0800")
-References: <87tw6y8bs8.fsf@secure.mitica>
-	<CAFEAcA978SJemCfYJPa8jwtuhhi6JGh9pEDGYNJ1npJA3nvEQA@mail.gmail.com>
-	<20170314081312.GB13140@stefanha-x1.localdomain>
-Reply-To: quintela@redhat.com
-Date: Tue, 14 Mar 2017 09:53:17 +0100
-Message-ID: <871su0utmq.fsf@secure.mitica>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cniEC-0004m2-OM
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:54:48 -0400
+References: <1489416892-2719-1-git-send-email-yongbok.kim@imgtec.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <15665355-4ee1-6f2c-f645-a9a2b2d836e1@redhat.com>
+Date: Tue, 14 Mar 2017 09:54:42 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] KVM call for 2017-03-14
+In-Reply-To: <1489416892-2719-1-git-send-email-yongbok.kim@imgtec.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: update for MIPS devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +26,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developer <qemu-devel@nongnu.org>, KVM devel mailing list <kvm@vger.kernel.org>
+To: Yongbok Kim <yongbok.kim@imgtec.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Paul Burton <paul.burton@imgtec.com>
 
-Stefan Hajnoczi <stefanha@gmail.com> wrote:
+On 13.03.2017 15:54, Yongbok Kim wrote:
+> Add myself to MIPSSIM and new entry for Fulong 2E.
+> Add an entry for Boston machine (Paul Burton).
+> 
+> Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
+> cc: Paul Burton <Paul.Burton@imgtec.com>
+> ---
+>  MAINTAINERS | 15 +++++++++++++--
+>  1 file changed, 13 insertions(+), 2 deletions(-)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index e3edd04..d196f19 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -600,15 +600,26 @@ S: Maintained
+>  F: hw/mips/mips_malta.c
+>  
+>  Mipssim
+> -L: qemu-devel@nongnu.org
+> -S: Orphan
+> +M: Yongbok Kim <yongbok.kim@imgtec.com>
+> +S: Odd Fixes
+>  F: hw/mips/mips_mipssim.c
+> +F: hw/net/mipsnet.c
+>  
+>  R4000
+>  M: Aurelien Jarno <aurelien@aurel32.net>
+>  S: Maintained
+>  F: hw/mips/mips_r4k.c
+>  
+> +Fulong 2E
+> +M: Yongbok Kim <yongbok.kim@imgtec.com>
+> +S: Odd Fixes
+> +F: hw/mips/mips_fulong2e.c
+> +
+> +Boston
+> +M: Paul Burton <Paul.Burton@imgtec.com>
+> +S: Maintained
+> +F: hw/mips/boston.c
+> +
+>  OpenRISC Machines
+>  -----------------
+>  or1k-sim
+> 
 
->>   - on the "VM support" side, QEMU is more used because it's the only
->>     production-quality option in this space, rather than because its
->>     users love it. (cf the Google choice to replace it.) It's also got
->>     a pretty poor security record. It wouldn't be too surprising if
->>     some time in the next five years somebody writes a replacement in
->>     a safer language (perhaps also targeting only the VM support role)
->>     and it got enough mindshare and takeup to eclipse QEMU.
->>     [Is it too early/daft to think about prototyping being able to
->>      write QEMU device emulation in Rust ?]
->
-> We can move to a safer language starting with the device emulation
-> layer.  Keep the rest in C for now.  Use a language that has good C
-> interoperability or a convenient foreign function interface.
->
-> Start writing new device models in the new language.  Convert existing
-> devices if they are good candidates, like the e1000 NIC emulation.
->
-> The minimum requirements for the new language:
-> 1. Does it support the host operating systems that QEMU runs on?
-> 2. Does it support the host architectures that QEMU runs on?
-> 3. Is it safer than C even when writing code to operate on guest RAM
->    (i.e. it's no good if you must use unsafe primitives to do the
->    systems programming tasks that QEMU requires)?
-> 4. Is C interoperability convenient and high performance?
+Thanks for the update!
 
-That is one approach.  Other is to move to a "safer" language the parts
-that are not performance sensitive.  Our command line parsing and device
-object done is C just make things much, much worse for no gain.  A
-language better for dealing with strings and things like that?
-
-Later, Juan.
-
-PD.  And before anyone asked, a language that is not able to get right:
-   a = "hello"
-   b = "world"
-   c = a + " " + b
-
-   (put any syntax you like) without having to wonder about memory
-   allocation, sizes, etc is not really valid to work with strings IMHO.
-   
+Reviewed-by: Thomas Huth <thuth@redhat.com>
