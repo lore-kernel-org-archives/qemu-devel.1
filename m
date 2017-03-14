@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cni6X-0004Ux-4U
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:46:54 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cni9h-0005tB-SU
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:50:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cni6V-00013G-Pd
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:46:53 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:36608)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cni9g-0002EL-Pq
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:50:09 -0400
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:35275)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1cni6V-000135-Cz
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:46:51 -0400
-Received: by mail-lf0-x243.google.com with SMTP id g70so13536650lfh.3
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 01:46:51 -0700 (PDT)
+	id 1cni9g-0002CF-Ed
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:50:08 -0400
+Received: by mail-lf0-x244.google.com with SMTP id v2so13588406lfi.2
+	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 01:50:08 -0700 (PDT)
 MIME-Version: 1.0
 References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
-	<1489385927-6735-12-git-send-email-armbru@redhat.com>
-In-Reply-To: <1489385927-6735-12-git-send-email-armbru@redhat.com>
+	<1489385927-6735-13-git-send-email-armbru@redhat.com>
+In-Reply-To: <1489385927-6735-13-git-send-email-armbru@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 14 Mar 2017 08:46:39 +0000
-Message-ID: <CAJ+F1CKbJWGsZzD=kJh8aN2E3fi1atgLV4A+FmhOO9F=t-z0+A@mail.gmail.com>
+Date: Tue, 14 Mar 2017 08:49:56 +0000
+Message-ID: <CAJ+F1CLqk7-wWrAJRoZZ1da_53XrtAAPz-A+T_9x+1U2ANZptg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.9 11/47] qapi: Avoid unwanted blank
- lines in QAPIDoc
+Subject: Re: [Qemu-devel] [PATCH for-2.9 12/47] qapi/rocker: Fix up doc
+ comment notes on optional members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,85 +36,86 @@ Cc: mdroth@linux.vnet.ibm.com
 
 Hi
 
-On Mon, Mar 13, 2017 at 10:25 AM Markus Armbruster <armbru@redhat.com>
+On Mon, Mar 13, 2017 at 10:31 AM Markus Armbruster <armbru@redhat.com>
 wrote:
 
-> We silently fix missing #optional tags for QAPIDoc by appending a line
-> "#optional" to the section's .content.  However, this interferes with
-> .__repr__ stripping trailing blank lines from .content.
+> Talking about #optional like this
 >
-> Use new ArgSection instance variable .optional instead, and leave
-> .content alone.
+>     # Note: fields are marked #optional to indicate that they may or may
+>     # not appear ...
 >
-> To permit testing .optional in texi_body(), clean up texi_enum()'s
-> hack to add empty documentation for undocumented enum values: add an
-> ArgSection instead of ''.
+> doesn't work so well in generated documentation, because the #optional
+> tag is not visible there.  Replace by
+>
+>     # Note: optional members may or may not appear ...
 >
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 >
 
+indeed,
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 
 > ---
->  scripts/qapi.py      | 5 +++--
->  scripts/qapi2texi.py | 4 ++--
->  2 files changed, 5 insertions(+), 4 deletions(-)
+>  qapi/rocker.json | 18 ++++++++++--------
+>  1 file changed, 10 insertions(+), 8 deletions(-)
 >
-> diff --git a/scripts/qapi.py b/scripts/qapi.py
-> index eec7bfb..e6d023f 100644
-> --- a/scripts/qapi.py
-> +++ b/scripts/qapi.py
-> @@ -107,6 +107,7 @@ class QAPIDoc(object):
->              self.name =3D name
->              # the list of lines for this section
->              self.content =3D []
-> +            self.optional =3D False
->
->          def append(self, line):
->              self.content.append(line)
-> @@ -978,15 +979,15 @@ def check_definition_doc(doc, expr, info):
->              desc =3D doc.args.get(arg)
->          if not desc:
->              continue
-> +        desc.optional =3D opt
->          desc_opt =3D "#optional" in str(desc)
->          if desc_opt and not opt:
->              raise QAPISemError(info, "Description has #optional, "
->                                 "but the declaration doesn't")
->          if not desc_opt and opt:
-> -            # silently fix the doc
->              # TODO either fix the schema and make this an error,
->              # or drop #optional entirely
-> -            desc.append("#optional")
-> +            pass
->
->      doc_args =3D set(doc.args.keys())
->      args =3D set([name.strip('*') for name in args])
-> diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-> index 0f3e573..0aaf45c 100755
-> --- a/scripts/qapi2texi.py
-> +++ b/scripts/qapi2texi.py
-> @@ -136,7 +136,7 @@ def texi_body(doc):
->          for arg, section in doc.args.iteritems():
->              desc =3D str(section)
->              opt =3D ''
-> -            if "#optional" in desc:
-> +            if section.optional:
->                  desc =3D re.sub(r'^ *#optional *\n?|\n? *#optional
-> *$|#optional',
->                                '', desc)
->                  opt =3D ' (optional)'
-> @@ -185,7 +185,7 @@ def texi_enum(expr, doc):
->      """Format an enum to texi"""
->      for i in expr['data']:
->          if i not in doc.args:
-> -            doc.args[i] =3D ''
-> +            doc.args[i] =3D qapi.QAPIDoc.ArgSection(i)
-
-     body =3D texi_body(doc)
->      return TYPE_FMT(type=3D"Enum",
->                      name=3Ddoc.symbol,
+> diff --git a/qapi/rocker.json b/qapi/rocker.json
+> index 97e2b83..f374038 100644
+> --- a/qapi/rocker.json
+> +++ b/qapi/rocker.json
+> @@ -1,3 +1,5 @@
+> +# -*- Mode: Python -*-
+> +
+>  ##
+>  # =3D Rocker switch device
+>  ##
+> @@ -137,8 +139,8 @@
+>  #
+>  # @ip-dst: #optional IP header destination address
+>  #
+> -# Note: fields are marked #optional to indicate that they may or may not
+> -# appear in the flow key depending if they're relevant to the flow key.
+> +# Note: optional members may or may not appear in the flow key
+> +# depending if they're relevant to the flow key.
+>  #
+>  # Since: 2.4
+>  ##
+> @@ -167,8 +169,8 @@
+>  #
+>  # @ip-tos: #optional IP header TOS field
+>  #
+> -# Note: fields are marked #optional to indicate that they may or may not
+> -# appear in the flow mask depending if they're relevant to the flow mask=
+.
+> +# Note: optional members may or may not appear in the flow mask
+> +# depending if they're relevant to the flow mask.
+>  #
+>  # Since: 2.4
+>  ##
+> @@ -194,8 +196,8 @@
+>  #
+>  # @out-pport: #optional physical output port
+>  #
+> -# Note: fields are marked #optional to indicate that they may or may not
+> -# appear in the flow action depending if they're relevant to the flow
+> action.
+> +# Note: optional members may or may not appear in the flow action
+> +# depending if they're relevant to the flow action.
+>  #
+>  # Since: 2.4
+>  ##
+> @@ -288,8 +290,8 @@
+>  #
+>  # @ttl-check: #optional perform TTL check
+>  #
+> -# Note: fields are marked #optional to indicate that they may or may not
+> -# appear in the group depending if they're relevant to the group type.
+> +# Note: optional members may or may not appear in the group depending
+> +# if they're relevant to the group type.
+>  #
+>  # Since: 2.4
+>  ##
 > --
 > 2.7.4
 >
