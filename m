@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cnlhr-00070v-2b
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:37:40 -0400
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cnljV-0008Ho-UN
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:39:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cnlhn-0007Tt-FQ
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:37:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53430)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cnlhn-0007T9-9y
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:37:35 -0400
-Date: Tue, 14 Mar 2017 12:37:30 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170314123730.GO2652@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170314102747.31395-1-fanc.fnst@cn.fujitsu.com>
-	<87o9x4t51k.fsf@secure.mitica>
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cnljS-00082F-Ra
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:39:22 -0400
+Received: from [59.151.112.132] (port=20553 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cnljS-00081S-FG
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:39:18 -0400
+From: Chao Fan <fanc.fnst@cn.fujitsu.com>
+Date: Tue, 14 Mar 2017 20:38:41 +0800
+Message-ID: <20170314123841.2415-1-fanc.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87o9x4t51k.fsf@secure.mitica>
-Subject: Re: [Qemu-devel] [PATCH] Output dirty-bytes-rate instead of
- dirty-pages-rate
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] Add dirty-bytes-rate to output in 'info
+ migrate'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +24,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: Chao Fan <fanc.fnst@cn.fujitsu.com>, eblake@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org, caoj.fnst@cn.fujitsu.com, douly.fnst@cn.fujitsu.com, maozy.fnst@cn.fujitsu.com, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: eblake@redhat.com, quintela@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org, berrange@redhat.com
+Cc: caoj.fnst@cn.fujitsu.com, douly.fnst@cn.fujitsu.com, maozy.fnst@cn.fujitsu.com, Chao Fan <fanc.fnst@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-On Tue, Mar 14, 2017 at 01:29:43PM +0100, Juan Quintela wrote:
-> Chao Fan <fanc.fnst@cn.fujitsu.com> wrote:
-> > In hmp, dirty-bytes-rate is more friendly than dirty-pages-rate.
-> > It's also better for other tools to determine the cpu throttle
-> > value in different architecture.
-> >
-> > Signed-off-by: Chao Fan <fanc.fnst@cn.fujitsu.com>
-> > Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-> 
-> I agree with Daniel here, you can't change the meaning of a field.  Look
-> at skipped pages.  It is zero know because it is not used anymore, but
-> we can't drop it.
-> 
-> I think it is better to expose page_size.  We have now
-> 
-> trasferred: bytes
-> total: bytes
-> duplicate: number of zero pages
-> skipped: always zero.
-> normal: number of normal pages
-> normal_bytes: the same  in bytes
-> mbps: megabytes per second?  I can't even remember this one
-> dirty_sync_count: number of times we have go through the whole memory
-> postcopy_requests = number of pages asked by postcopy faults?
-> dirty_pages_rate = pages by some kind of unit
-> 
-> And we haven't yet started with compression or xbzrle.  I think that the
-> best approach at this point is putting everything in pages except the
-> things that don't make sense.
-> 
-> We can put everything on bytes, but then everything is HUGE.
-> 
-> Anyways, what do libvirt/management apps preffer?
+Because 'dirty-bytes-rate' is in 'bytes/s', so it's better for other
+tools to determine the cpu throttle value in different architecture.
 
-Since we have many fields already which are reported as page counts, I
-think just adding page size would be preferrable to having twice as many
-fields reported duplicating bytes + pages.
+Signed-off-by: Chao Fan <fanc.fnst@cn.fujitsu.com>
+Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+---
+ hmp.c                 | 6 +++++-
+ migration/migration.c | 1 +
+ qapi-schema.json      | 5 ++++-
+ 3 files changed, 10 insertions(+), 2 deletions(-)
 
-The only reason to favour duplicating all fields to report bytes, is if
-we needed to vary page size to deal with huge pages (eg if some reported
-pages were 4kb and other reported pages with 2MB). You can easily just
-scale huge pages counts to be "normal"  pages for purpose of reporting
-though.
-Regards,
-Daniel
+diff --git a/hmp.c b/hmp.c
+index 261843f..c50d7aa 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -216,9 +216,13 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+         monitor_printf(mon, "dirty sync count: %" PRIu64 "\n",
+                        info->ram->dirty_sync_count);
+         if (info->ram->dirty_pages_rate) {
+-            monitor_printf(mon, "dirty pages rate: %" PRIu64 " pages\n",
++            monitor_printf(mon, "dirty pages rate: %" PRIu64 " pages/s\n",
+                            info->ram->dirty_pages_rate);
+         }
++        if (info->ram->dirty_bytes_rate) {
++            monitor_printf(mon, "dirty bytes rate: %" PRIu64 " bytes/s\n",
++                           info->ram->dirty_bytes_rate);
++        }
+         if (info->ram->postcopy_requests) {
+             monitor_printf(mon, "postcopy request count: %" PRIu64 "\n",
+                            info->ram->postcopy_requests);
+diff --git a/migration/migration.c b/migration/migration.c
+index 3dab684..27f13c7 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -649,6 +649,7 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
+     if (s->state != MIGRATION_STATUS_COMPLETED) {
+         info->ram->remaining = ram_bytes_remaining();
+         info->ram->dirty_pages_rate = s->dirty_pages_rate;
++        info->ram->dirty_bytes_rate = s->dirty_bytes_rate;
+     }
+ }
+ 
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 32b4a4b..0d5ec8e 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -575,6 +575,9 @@
+ # @postcopy-requests: The number of page requests received from the destination
+ #        (since 2.7)
+ #
++# @dirty-bytes-rate: how many bytes dirtied by second by the
++#        guest (since 2.9)
++#
+ # Since: 0.14.0
+ ##
+ { 'struct': 'MigrationStats',
+@@ -582,7 +585,7 @@
+            'duplicate': 'int', 'skipped': 'int', 'normal': 'int',
+            'normal-bytes': 'int', 'dirty-pages-rate' : 'int',
+            'mbps' : 'number', 'dirty-sync-count' : 'int',
+-           'postcopy-requests' : 'int' } }
++           'postcopy-requests' : 'int', 'dirty-bytes-rate' : 'int' } }
+ 
+ ##
+ # @XBZRLECacheStats:
 -- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+2.9.3
