@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46875)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47015)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cnpis-0001um-F8
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:54:59 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1cnpjF-0002Fj-O4
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:55:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cnpip-0000Vp-8X
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:54:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46206)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cnpio-0000Vd-Vu
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:54:55 -0400
-References: <87tw6y8bs8.fsf@secure.mitica>
-	<CAFEAcA978SJemCfYJPa8jwtuhhi6JGh9pEDGYNJ1npJA3nvEQA@mail.gmail.com>
-	<20170314081312.GB13140@stefanha-x1.localdomain>
-	<CAFEAcA9F2BPexRieaEhu+UpJxoOdEfw8eggW8b2SjuoMMTNgog@mail.gmail.com>
-	<87wpbstesf.fsf@secure.mitica> <20170314160113.GM2445@work-vm>
-	<20170314162020.GT2652@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <d9497461-e7c5-b914-362d-16b0cdea9fba@redhat.com>
-Date: Tue, 14 Mar 2017 17:54:43 +0100
+	(envelope-from <alex.bennee@linaro.org>) id 1cnpjC-0000gW-Mw
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:55:21 -0400
+Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:34917)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cnpjC-0000fT-G5
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:55:18 -0400
+Received: by mail-wr0-x235.google.com with SMTP id g10so128205671wrg.2
+	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 09:55:18 -0700 (PDT)
+References: <20170313180432.7067-1-krzk@kernel.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170313180432.7067-1-krzk@kernel.org>
+Date: Tue, 14 Mar 2017 16:55:34 +0000
+Message-ID: <87mvcnpzll.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170314162020.GT2652@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] Obsolete QEMU host environments (was: Re: KVM call for
- 2017-03-14)
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 0/5] hw: arm: exynos: Bring
+ up secondary CPU + CPUIDLE issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,60 +30,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developer <qemu-devel@nongnu.org>, KVM devel mailing list <kvm@vger.kernel.org>, Stefan Hajnoczi <stefanha@gmail.com>, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, Igor Mitsyanko <i.mitsyanko@gmail.com>
 
-On 14.03.2017 17:20, Daniel P. Berrange wrote:
-> On Tue, Mar 14, 2017 at 04:01:14PM +0000, Dr. David Alan Gilbert wrote:
->> * Juan Quintela (quintela@redhat.com) wrote:
->>> Peter Maydell <peter.maydell@linaro.org> wrote:
->>>> On 14 March 2017 at 09:13, Stefan Hajnoczi <stefanha@gmail.com> wrote:
->>>>> On Mon, Mar 13, 2017 at 11:02:01AM +0100, Peter Maydell wrote:
->>>>> The minimum requirements for the new language:
->>>>> 1. Does it support the host operating systems that QEMU runs on?
->>>>> 2. Does it support the host architectures that QEMU runs on?
->>>>
->>>> Speaking of this, I was thinking that we should introduce
->>>> a rule that for any host OS/arch we support we must have
->>>> a build machine so we can at least do a compile test.
->>>> For instance if you believe configure we support Solaris
->>>> and AIX, but I bet they're bit-rotting. The ia64 backend
->>>> has to be a strong candidate for being dumped too.
->>>> Demanding "system we can test on or we drop support"
->>>> would let us more clearly see what we're actually running
->>>> on and avoid unnecessarily ruling things out because they
->>>> don't support Itanium or AIX...
->>>
->>> YES, YES and YES.
->>>
->>> I demand an osX build machine NOW!!!!  Remote access is ok.
->>>
->>> Now more seriously, I can (relatively easy) compile test my pull
->>> requests with:
->>> - linux x86 (latest fedora, but I can get an older one if needed)
->>> - linux x86_64 (latest fedor,, but the same)
->>> - mingw64 32bit (latest fedora, but here I have the problem that Peter
->>>   uses a different crosscompiler than me)
->>> - mingw64 32bit (the same)
->>>
->>> But for the rest, I need to wait that somebody told me that it breaks
->>> the build.  Normally it is things like size_t is 32bit instead of 64bit
->>> or some stupid things like that, that are trivial to fix if I can
->>> compile there before doing the pull submission.
->>
->> I also do a FreeBSD VM, and grab an aarch64 and/or PPC bigendian host
->> to test on.
->>
->> (I could grab an ia64 host, but I don't think I could find anything
->> to install on it that would be new enough for the rest of our build
->> requirements).
-> 
-> Indeed, ia64 is a fully dead as a host architecture at this point, only
-> interesting as a historical curiosity. Paolo already killed ia64 KVM
-> host support in Linux git back in 2014.
 
-Our ia64 host backend in QEMU (tcg/ia64) is still marked as maintained
-... so it's maybe not as dead as you think? Or should we rather get rid
-of that soon, too?
+Krzysztof Kozlowski <krzk@kernel.org> writes:
 
- Thomas
+> Hi,
+>
+<snip>
+>
+> Overview of the problem
+> =======================
+> On Exynos4210, by default Linux kernel uses cpuidle driver which tries
+> to enter low power mode, called AFTR (Arm Off, Top Running).  On real
+> hardware this brings some power savings.  This AFTR mode requires second
+> CPU to be off, so the driver (coupled cpuidle driver) when system is idle:
+> 1. Turns off second CPU,
+> 2. Enters AFTR on CPU0.
+>
+> However the QEMU system is then totally unresponsive (e.g. on serial console)
+> and RCU stalls appear from time to time.  I spent some time on it and did not
+> find the real cause behind the lag.  Maybe it is because the second CPU
+> does not really power down itself and system just burns the cycles under spin
+> locks?
+
+Was this tested post the MTTCG merge? Maybe there is an interaction
+between power saving/halting the vCPU?
+
+I mention this because I already made some minor tweaks for handing the
+WFI instruction in MTTCG. See commit c22edfebff. You can test this by
+forcing the original behaviour by adding:
+
+  -accel tcg,thread=single
+
+to your command line.
+
+>
+> Looking at recent stable kernels:
+>  - 3.10, 3.16 - works fine with two CPUs (no CPUIDLE driver),
+>  - 4.1 and newer - stalls and are unresponsive due to CPUIDLE being enabled.
+>
+> The cpuidle driver is not relying on DTS. It is just enabled in exynos_defconfig
+> and works.
+>
+> Workarounds
+> ===========
+> 1. Boot with only 1 cpu
+> 2. Build a kernel with disabled CONFIG_CPU_IDLE
+>
+>
+>
+> Best regards,
+> Krzysztof
+>
+> Krzysztof Kozlowski (5):
+>   hw/intc/exynos4210_gic: Fix GIC memory mappings for secondary CPU
+>   hw/intc/exynos4210_gic: Use more meaningful name for local variable
+>   hw/timer/exynos4210_mct: Fix checkpatch style errors
+>   hw/timer/exynos4210_mct: Cleanup indentation and empty new lines
+>   hw/timer/exynos4210_mct: Remove unused defines
+>
+>  hw/intc/exynos4210_gic.c  | 33 +++++++++++++++++++------------
+>  hw/timer/exynos4210_mct.c | 50 ++++++++++++++++++++---------------------------
+>  2 files changed, 41 insertions(+), 42 deletions(-)
+
+
+--
+Alex Bennée
