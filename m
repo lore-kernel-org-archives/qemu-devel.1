@@ -1,17 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48949)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cne2f-0007S3-7O
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 00:26:38 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1cne4M-0000aZ-Ez
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 00:28:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cne2c-00079u-4v
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 00:26:37 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1cne4L-000860-Il
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 00:28:22 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:48395)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1cne4L-00084R-5E
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 00:28:21 -0400
+Date: Tue, 14 Mar 2017 15:28:13 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 14 Mar 2017 15:26:25 +1100
-Message-Id: <20170314042626.20020-4-david@gibson.dropbear.id.au>
-In-Reply-To: <20170314042626.20020-1-david@gibson.dropbear.id.au>
-References: <20170314042626.20020-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 3/4] pseries: Don't expose PCIe extended config
- space on older machine types
+Message-ID: <20170314042813.GF12564@umbus.fritz.box>
+References: <20170308124955.35623-1-aik@ozlabs.ru>
+	<CAFEAcA_pq6cUVVqzg0in-QTKngsf2cSpzpaGnP=gH5X2GnzOQQ@mail.gmail.com>
+	<4c8ab05b-9e6d-10db-6480-e6b58d3ca390@ozlabs.ru>
+	<20170309013150.GK19967@umbus.fritz.box>
+	<CAFEAcA9QzBASyBELx7fxp1pexVaZfLRP6fKaZX63LTOzV=hZjQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="eNMatiwYGLtwo1cJ"
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA9QzBASyBELx7fxp1pexVaZfLRP6fKaZX63LTOzV=hZjQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [RFC PATCH qemu] dtc: Allow compiling with old gcc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,80 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, mdroth@linux.vnet.ibm.com, pbonzini@redhat.com, aik@ozlabs.ru, David Gibson <david@gibson.dropbear.id.au>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-bb9986452 "spapr_pci: Advertise access to PCIe extended config space"
-allowed guests to access the extended config space of PCI Express devices
-via the PAPR interfaces, even though the paravirtualized bus mostly acts
-like plain PCI.
 
-However, that patch enabled access unconditionally, including for existing
-machine types, which is an unwise change in behaviour.  This patch limits
-the change to pseries-2.9 (and later) machine types.
+--eNMatiwYGLtwo1cJ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Suggested-by: Andrea Bolognani <abologna@redhat.com>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/spapr.c              | 9 +++++++--
- hw/ppc/spapr_pci.c          | 4 +++-
- include/hw/pci-host/spapr.h | 2 ++
- 3 files changed, 12 insertions(+), 3 deletions(-)
+On Thu, Mar 09, 2017 at 07:43:07AM +0100, Peter Maydell wrote:
+> On 9 March 2017 at 02:31, David Gibson <david@gibson.dropbear.id.au> wrot=
+e:
+> > Yes.  I've now fixed this in upstream libfdt, at Paolo's suggestion.
+> > Unfortunately, it came just after the 1.4.3 release.  I was just leery
+> > about making a new release and qemu pull so soon after the last one.
+> > Should I do that anyway?
+>=20
+> Yes, I would go ahead and do that.
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index c3bb991..6ee566d 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3163,8 +3163,13 @@ DEFINE_SPAPR_MACHINE(2_9, "2.9", true);
- /*
-  * pseries-2.8
-  */
--#define SPAPR_COMPAT_2_8                            \
--    HW_COMPAT_2_8
-+#define SPAPR_COMPAT_2_8                                        \
-+    HW_COMPAT_2_8                                               \
-+    {                                                           \
-+        .driver   = TYPE_SPAPR_PCI_HOST_BRIDGE,                 \
-+        .property = "pcie-extended-configuration-space",        \
-+        .value    = "off",                                      \
-+    },
- 
- static void spapr_machine_2_8_instance_options(MachineState *machine)
- {
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 919d3c2..98c52e4 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1321,7 +1321,7 @@ static int spapr_populate_pci_child_dt(PCIDevice *dev, void *fdt, int offset,
-     _FDT(fdt_setprop(fdt, offset, "assigned-addresses",
-                      (uint8_t *)rp.assigned, rp.assigned_len));
- 
--    if (pci_is_express(dev)) {
-+    if (sphb->pcie_ecs && pci_is_express(dev)) {
-         _FDT(fdt_setprop_cell(fdt, offset, "ibm,pci-config-space-type", 0x1));
-     }
- 
-@@ -1858,6 +1858,8 @@ static Property spapr_phb_properties[] = {
-     DEFINE_PROP_UINT32("numa_node", sPAPRPHBState, numa_node, -1),
-     DEFINE_PROP_BOOL("pre-2.8-migration", sPAPRPHBState,
-                      pre_2_8_migration, false),
-+    DEFINE_PROP_BOOL("pcie-extended-configuration-space", sPAPRPHBState,
-+                     pcie_ecs, true),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
-index dfa7614..1c2e970 100644
---- a/include/hw/pci-host/spapr.h
-+++ b/include/hw/pci-host/spapr.h
-@@ -80,6 +80,8 @@ struct sPAPRPHBState {
- 
-     uint32_t numa_node;
- 
-+    bool pcie_ecs; /* Allow access to PCIe extended config space? */
-+
-     /* Fields for migration compatibility hacks */
-     bool pre_2_8_migration;
-     uint32_t mig_liobn;
--- 
-2.9.3
+Ok, done.  The submodule update is in the ppc pull request I sent a
+few minutes ago.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--eNMatiwYGLtwo1cJ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYx3FbAAoJEGw4ysog2bOS+UoP/3SJZ9DAUtVkD0o36wyyYAP1
+ADU3yEq2YCOA+wWpLh/crSUjiFQxdrD/0yowmFaHTnurhb6l+fbcn4FjhFemOOS2
+s1Irl9q9IQ2/fqgAyR3qh5d1BzDN6XobtGuryjxZXAaM8qMCC03Z39mmXKiF6yz1
+LkEYCEQMUf72Rb/BEFJXU8cL7iOkIZWxuzRRe4n/zGUHlkdkafleR35pOWL7BqfV
+n3Ow8GBDn1jUiKRYSByV2fTSn+y0q4BiLTkpJB3g9Bvg1AaPZ2L3J0CJZZpeKsqE
+muUKTE18m4/BHvi6mp3D/DEzvROi138ejrfU35JEtK1zgTBCChLSBtPUKqQKq5eF
+fETV88uD7vhwEcuSs1F1cVNGZNXX4w7KK4U/OyRsymBg5cxLTw92dkgtTHgpsgXV
+7WTYTANCXUreO0PeDhUde3aylg20E9dLyIygJdB3E3v0hPonJkwI78nqsmI834M/
+hIt2FXGSKNXrkH7GH7O3t5+mg4AiOr9cwgM47/1FL0VHc5703BIS4AmWBslu9Wmf
+EbR0p6lEFRhLqkbJ4oNqabVrexDl2MSr1MBEplbp9fqV09Mt9KvDOBBQEYsaB6S7
+YvPYiFrjp8WoZu1X0zzuWQU4esvhOCsvV508mzB5CcPy/9XojDr5jPHbcVQXb+RA
+q/Cit9ZkrsmYU6slgoBY
+=3IBp
+-----END PGP SIGNATURE-----
+
+--eNMatiwYGLtwo1cJ--
