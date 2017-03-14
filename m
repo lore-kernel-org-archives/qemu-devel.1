@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55404)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cnmMP-0000Ht-OR
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:19:34 -0400
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cnmNv-0001Ov-LG
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:21:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cnmML-00083D-UH
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:19:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41516)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cnmML-00082v-Lk
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:19:29 -0400
-Date: Tue, 14 Mar 2017 13:19:24 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170314131924.GQ2652@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170314113209.12025-1-eduardo.otubo@profitbricks.com>
-	<20170314113209.12025-4-eduardo.otubo@profitbricks.com>
-	<e9b2bd2a-8409-7470-76bb-32f15fe6ce0e@redhat.com>
-	<20170314115253.GL2652@redhat.com>
-	<d8825eda-6613-71c9-9dd7-9239325e296b@redhat.com>
-	<20170314123254.GB21475@vader>
-	<b27ec1df-6c32-0084-1991-283cb2b8f689@redhat.com>
-	<20170314130213.GP2652@redhat.com>
-	<ca220108-b75c-c3a1-8288-317095bb3dab@redhat.com>
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cnmNr-0000ix-U2
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:21:07 -0400
+Received: from [59.151.112.132] (port=23903 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cnmNr-0000eI-IH
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:21:03 -0400
+Date: Tue, 14 Mar 2017 21:20:25 +0800
+From: Chao Fan <fanc.fnst@cn.fujitsu.com>
+Message-ID: <20170314132025.GB2473@localhost.localdomain>
+References: <20170314102747.31395-1-fanc.fnst@cn.fujitsu.com>
+	<87o9x4t51k.fsf@secure.mitica> <20170314123730.GO2652@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <ca220108-b75c-c3a1-8288-317095bb3dab@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/5] seccomp: add elevateprivileges
- argument to command line
+In-Reply-To: <20170314123730.GO2652@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] Output dirty-bytes-rate instead of
+ dirty-pages-rate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,58 +28,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, thuth@redhat.com, Andy Lutomirski <luto@amacapital.net>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, eblake@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org, caoj.fnst@cn.fujitsu.com, douly.fnst@cn.fujitsu.com, maozy.fnst@cn.fujitsu.com, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-On Tue, Mar 14, 2017 at 02:05:32PM +0100, Paolo Bonzini wrote:
-> 
-> 
-> On 14/03/2017 14:02, Daniel P. Berrange wrote:
-> >>> Can you give an example of such a list?
-> >> 
-> >> Well, anything that makes "-sandbox on" more than security theater...  I
-> >> would consider it a necessary evil, not a good thing to have such a list.
-> >> 
-> >> Due to NO_NEW_PRIVS, I think non-migration fork/exec should be on the
-> >> list, but hopefully nothing else.
-> >
-> > The current semantics of '-sandbox on' are that it is documented to not
-> > break any valid QEMU features. By blocking fork/exec, we make a semantic
-> > change to the existing behaviour of '-sandbox on'.
-> 
-> I don't propose to block fork/exec.  I propose not to whitelist setuid,
-> as is the case now too.  It wouldn't be backwards-incompatible.
+On Tue, Mar 14, 2017 at 12:37:30PM +0000, Daniel P. Berrange wrote:
+>On Tue, Mar 14, 2017 at 01:29:43PM +0100, Juan Quintela wrote:
+>> Chao Fan <fanc.fnst@cn.fujitsu.com> wrote:
+>> > In hmp, dirty-bytes-rate is more friendly than dirty-pages-rate.
+>> > It's also better for other tools to determine the cpu throttle
+>> > value in different architecture.
+>> >
+>> > Signed-off-by: Chao Fan <fanc.fnst@cn.fujitsu.com>
+>> > Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+>> 
+>> I agree with Daniel here, you can't change the meaning of a field.  Look
+>> at skipped pages.  It is zero know because it is not used anymore, but
+>> we can't drop it.
+>> 
+>> I think it is better to expose page_size.  We have now
+>> 
+>> trasferred: bytes
+>> total: bytes
+>> duplicate: number of zero pages
+>> skipped: always zero.
+>> normal: number of normal pages
+>> normal_bytes: the same  in bytes
+>> mbps: megabytes per second?  I can't even remember this one
+>> dirty_sync_count: number of times we have go through the whole memory
+>> postcopy_requests = number of pages asked by postcopy faults?
+>> dirty_pages_rate = pages by some kind of unit
+>> 
+>> And we haven't yet started with compression or xbzrle.  I think that the
+>> best approach at this point is putting everything in pages except the
+>> things that don't make sense.
+>> 
+>> We can put everything on bytes, but then everything is HUGE.
+>> 
+>> Anyways, what do libvirt/management apps preffer?
+>
+>Since we have many fields already which are reported as page counts, I
+>think just adding page size would be preferrable to having twice as many
+>fields reported duplicating bytes + pages.
+OK.
 
-That we don't whitelist setuid is a bug in the current impl vs the intended
-semantics of '-sandbox on', where we are denying valid features. 
+>
+>The only reason to favour duplicating all fields to report bytes, is if
+>we needed to vary page size to deal with huge pages (eg if some reported
+>pages were 4kb and other reported pages with 2MB). You can easily just
+>scale huge pages counts to be "normal"  pages for purpose of reporting
 
-> > So any application
-> > which has been using '-sandbox on' historically, is at risk of being
-> > broken when upgrading to QEMU 2.10. It would force the application to
-> > generate a different CLI for new QEMU - ie to avoid being broken they
-> > would have to now  add elevateprivs=allow, spawn=allow. I think we have
-> > to maintain semantic compat with existing usage, which means that
-> > '-sandbox on' has to remain security theatre.
-> > 
-> > So if we want a default config to be more restrictive, then I think you
-> > realistically have to turn the default parameter into a tri-state
-> > instead of bool, ie allow '-sandbox default' as an alternative to
-> > '-sandbox on' that was slightly stronger by blocking fork/exec.
-> 
-> Or just print a warning that "-sandbox on" is useless.  I guess that
-> would be okay too if we want to be "stronger" than backwards-compatible.
+Thank you very much for your help!
 
-It isn't totally useless - it is blocking access to a number of system
-calls that QEMU should never use. eg things like reboot, load_module,
-etc. In the absence of other security protections it is useless, but
-if you combine with other mechanisms like DAC or LSM, then the default
-seccomp rules offer some extra protection. Admittedly not alot, but
-it is non-zero. The extra opt-in protecton flags then increase the
-value at cost of killing some features.
-
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+Thanks,
+Chao Fan
+>though.
+>Regards,
+>Daniel
+>-- 
+>|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+>|: http://libvirt.org              -o-             http://virt-manager.org :|
+>|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+>
+>
