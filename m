@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34016)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <k.kozlowski.k@gmail.com>) id 1cnqM0-0006gK-DY
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:35:25 -0400
+	(envelope-from <eblake@redhat.com>) id 1cnqUM-0000fh-J3
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:44:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <k.kozlowski.k@gmail.com>) id 1cnqLz-0003Et-Fl
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:35:24 -0400
-Date: Tue, 14 Mar 2017 19:35:13 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Message-ID: <20170314173513.wruppu4js7ikaxu2@kozik-lap>
-References: <20170313180432.7067-1-krzk@kernel.org> <87mvcnpzll.fsf@linaro.org>
+	(envelope-from <eblake@redhat.com>) id 1cnqUJ-0008AR-IU
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:44:02 -0400
+References: <20170314165953.18506-1-andreas@grapentin.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ddea3a8a-715e-c24d-e434-3fa55f5d81b2@redhat.com>
+Date: Tue, 14 Mar 2017 12:43:56 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <87mvcnpzll.fsf@linaro.org>
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 0/5] hw: arm: exynos: Bring
- up secondary CPU + CPUIDLE issue
+In-Reply-To: <20170314165953.18506-1-andreas@grapentin.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="B1Fs9ph5tptvXwmKHoei2nsCKHsc8XJGA"
+Subject: Re: [Qemu-devel] [PATCH v2] use _Static_assert in QEMU_BUILD_BUG_ON
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,62 +23,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, Igor Mitsyanko <i.mitsyanko@gmail.com>
+To: Andreas Grapentin <andreas@grapentin.org>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org
 
-On Tue, Mar 14, 2017 at 04:55:34PM +0000, Alex Benn=C3=A9e wrote:
->=20
-> Krzysztof Kozlowski <krzk@kernel.org> writes:
->=20
-> > Hi,
-> >
-> <snip>
-> >
-> > Overview of the problem
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > On Exynos4210, by default Linux kernel uses cpuidle driver which tries
-> > to enter low power mode, called AFTR (Arm Off, Top Running).  On real
-> > hardware this brings some power savings.  This AFTR mode requires second
-> > CPU to be off, so the driver (coupled cpuidle driver) when system is id=
-le:
-> > 1. Turns off second CPU,
-> > 2. Enters AFTR on CPU0.
-> >
-> > However the QEMU system is then totally unresponsive (e.g. on serial co=
-nsole)
-> > and RCU stalls appear from time to time.  I spent some time on it and d=
-id not
-> > find the real cause behind the lag.  Maybe it is because the second CPU
-> > does not really power down itself and system just burns the cycles unde=
-r spin
-> > locks?
->=20
-> Was this tested post the MTTCG merge? Maybe there is an interaction
-> between power saving/halting the vCPU?
->=20
-> I mention this because I already made some minor tweaks for handing the
-> WFI instruction in MTTCG. See commit c22edfebff. You can test this by
-> forcing the original behaviour by adding:
->=20
->   -accel tcg,thread=3Dsingle
->=20
-> to your command line.
->
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--B1Fs9ph5tptvXwmKHoei2nsCKHsc8XJGA
+From: Eric Blake <eblake@redhat.com>
+To: Andreas Grapentin <andreas@grapentin.org>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org
+Message-ID: <ddea3a8a-715e-c24d-e434-3fa55f5d81b2@redhat.com>
+Subject: Re: [PATCH v2] use _Static_assert in QEMU_BUILD_BUG_ON
+References: <20170314165953.18506-1-andreas@grapentin.org>
+In-Reply-To: <20170314165953.18506-1-andreas@grapentin.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I am testing it on v2.8.0-2005-g17783ac828ad. Without any -accel, the
-system boots but responsiveness of serial console is bad. Bad but at
-least it is responding still a little bit.
+On 03/14/2017 11:59 AM, Andreas Grapentin wrote:
+> QEMU_BUILD_BUG_ON should use C11's _Static_assert, if the compiler supp=
+orts it,
+> to provide more readable messages on failure.
 
-With the -accel you mentioned, system does not even reach user-space
-(initramfs).
+>=20
+> with _Static_assert:
+>=20
+>> In file included from /qemu/include/qemu/osdep.h:36:0,
+>>                  from /qemu/qga/commands.c:13:
+>> /qemu/qga/commands.c: In function =E2=80=98qmp_guest_exec_status=E2=80=
+=99:
+>> /qemu/include/qemu/compiler.h:94:30: error: static assertion failed: "=
+not expecting: sizeof(*&gei->finished) > sizeof(void *)"
+>>  #define QEMU_BUILD_BUG_ON(x) _Static_assert((x), #x)
 
-I tried rebasing on newer (e.g. v2.8.0-2182-g5e2fb7c598c6) but
-compilation fails all the time on:
-/home/dev/qemu/qemu/vl.c: In function =E2=80=98main=E2=80=99:
-/home/dev/qemu/qemu/vl.c:3131:18: error: =E2=80=98QEMU_OPTION_blockdev=E2=
-=80=99 undeclared (first use in this function)
-             case QEMU_OPTION_blockdev:
+Manual copy-and-paste? Because this is missing the ! present in the
+actual definition...
+
+>>                               ^
+>> /qemu/include/qemu/atomic.h:146:5: note: in expansion of macro =E2=80=98=
+QEMU_BUILD_BUG_ON=E2=80=99
+>>      QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *));   \
+>>      ^~~~~~~~~~~~~~~~~
+>> /qemu/include/qemu/atomic.h:417:5: note: in expansion of macro =E2=80=98=
+atomic_load_acquire=E2=80=99
+>>      atomic_load_acquire(ptr)
+>>      ^~~~~~~~~~~~~~~~~~~
+>> /qemu/qga/commands.c:160:21: note: in expansion of macro =E2=80=98atom=
+ic_mb_read=E2=80=99
+>>      bool finished =3D atomic_mb_read(&gei->finished);
+>>                      ^~~~~~~~~~~~~~
+>=20
+> Signed-off-by: Andreas Grapentin <andreas@grapentin.org>
+> ---
+
+> +++ b/include/qemu/compiler.h
+> @@ -90,7 +90,9 @@
+>          int:(x) ? -1 : 1; \
+>      }
+> =20
+> -#ifdef __COUNTER__
+> +#if defined(CONFIG_STATIC_ASSERT)
+> +#define QEMU_BUILD_BUG_ON(x) _Static_assert(!(x), "not expecting: " #x=
+)
+
+=2E..here.
+
+But that's trivial, if the maintainer would like to correct the commit
+message.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 
-Best regards,
-Krzysztof
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--B1Fs9ph5tptvXwmKHoei2nsCKHsc8XJGA
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYyCvcAAoJEKeha0olJ0Nqh7gIAI5G2pOR6l50FZhm6zlN2JVX
+9m4MjgZvekmbpy2SZPFvTUbPmuln5swuassj/9wy5M+W/00ZJsdyNMmH8AKFuUeu
+4za/PCT8g0CxWybaRLhB4aLGXaGErqx/VEXC9ITzR/1rErx3+mWks/I0IjTh+8Ig
+Jd+RZ5vMGSmY1RXxi65DEG0TRPRafovVWNlXwFuy9i4EDlXQLBykSTpwzujQjaSb
+tgALEHQ7QYdY07NdzTiZBm0WLxdmexRUljHCGyGjZRqEfYk2dtY07eMduTE2tm5S
+VJvMKLoTiNAFMzaHkvipDDTRZUWv6PJvTfQSwwppmISCdvgAoMfzNJ3FLuOrolk=
+=/QZm
+-----END PGP SIGNATURE-----
+
+--B1Fs9ph5tptvXwmKHoei2nsCKHsc8XJGA--
