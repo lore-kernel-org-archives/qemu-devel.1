@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cnjaF-0003Yx-NV
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 06:21:40 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1cnjaS-0003iO-K9
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 06:21:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cnjaB-0005UR-Oa
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 06:21:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53274)
+	(envelope-from <dgilbert@redhat.com>) id 1cnjaO-0005aH-Ij
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 06:21:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41608)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cnjaB-0005Ty-IX
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 06:21:35 -0400
-References: <20170314100838.12647-1-roman.penyaev@profitbricks.com>
-	<20170314100838.12647-2-roman.penyaev@profitbricks.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f191552b-88c8-e5d4-b7b7-953a201971b4@redhat.com>
-Date: Tue, 14 Mar 2017 11:21:32 +0100
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cnjaO-0005Zi-A0
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 06:21:48 -0400
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 76C5B4621C
+	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 10:21:48 +0000 (UTC)
+Date: Tue, 14 Mar 2017 10:21:43 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170314102142.GC2445@work-vm>
+References: <20170313124434.1043-1-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170314100838.12647-2-roman.penyaev@profitbricks.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] scripts/qemugdb/coroutine.py: get
- pthread pointer from '(gdb) thread info $id' output
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170313124434.1043-1-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 00/16] Multifd v4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +32,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Pen <roman.penyaev@profitbricks.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+* Juan Quintela (quintela@redhat.com) wrote:
+> Hi
+> 
+> This is the 4th version of multifd. Changes:
+> - XBZRLE don't need to be checked for
+> - Documentation and defaults are consistent
+> - split socketArgs
+> - use iovec instead of creating something similar.
+> - We use now the exported size of target page (another HACK removal)
+> - created qio_chanel_{wirtev,readv}_all functions.  the _full() name
+>   was already taken.
+>   What they do is the same that the without _all() function, but if it
+>   returns due to blocking it redo the call.
+> - it is checkpatch.pl clean now.
+> 
+> Please comment, Juan.
 
+High level things,
+  a) I think you probably need to do some bandwidth measurements to show
+    that multifd is managing to have some benefit - it would be good
+    for the cover letter.
+  b) By my count I think this is actually v5 (And I think you're missing
+     the -v to git)
 
-On 14/03/2017 11:08, Roman Pen wrote:
-> For sure under corefile debugging it is not possible to invoke
-> any syscalls, like arch_prctl(), so avoid doing that.  That will
-> simplify the script.
-
-Is the issue that start_thread only works in the main thread stack (i.e.
-not on coroutines)?
-
-> +    num = gdb.selected_thread().num
-> +    thr = gdb.execute('info thread %d' % num, to_string=True)
-
-What versions of gdb support gdb.execute?  Also, what happens if
-localization is in effect?
-
-Paolo
-
-> +    thr = thr.split('\n')[1]
->      try:
-> -        return f.read_var("arg")
-> -    except ValueError:
-> -        return get_fs_base()
-> +        return re.search('Thread ([0-9a-zx]+)', thr).group(1)
-> +    except:
-> +        raise ValueError("Unable to find pthread address in 'info thread %d' output.\n"
-> +                         "Probably version mismatch of libthread_db.so library?" %
-> +                         num)
+Dave
+    
+> 
+> 
+> 
+> [v3]
+> 
+> - comments for previous verion addressed
+> - lots of bugs fixed
+> - remove DPRINTF from ram.c
+> 
+> - add multifd-group parameter, it gives how many pages we sent each
+>   time to the worker threads.  I am open to better names.
+> - Better flush support.
+> - with migration_set_speed 2G it is able to migrate "stress -vm 2
+>   -vm-bytes 512M" over loopback.
+> 
+> Please review.
+> 
+> Thanks, Juan.
+> 
+> [v2]
+> 
+> This is a version against current code.  It is based on top of QIO
+> work. It improves the thread synchronization and fixes the problem
+> when we could have two threads handing the same page.
+> 
+> Please comment, Juan.
+> 
+> 
+> Juan Quintela (16):
+>   qio: create new qio_channel_write_all
+>   qio: create new qio_channel_read_all
+>   migration: Test for disabled features on reception
+>   migration: Don't create decompression threads if not enabled
+>   migration: Add multifd capability
+>   migration: Create x-multifd-threads parameter
+>   migration: Create x-multifd-group parameter
+>   migration: Create multifd migration threads
+>   migration: Start of multiple fd work
+>   migration: Create ram_multifd_page
+>   migration: Really use multiple pages at a time
+>   migration: Send the fd number which we are going to use for this page
+>   migration: Create thread infrastructure for multifd recv side
+>   migration: Test new fd infrastructure
+>   migration: Transfer pages over new channels
+>   migration: Flush receive queue
+> 
+>  hmp.c                         |  18 ++
+>  include/io/channel.h          |  46 ++++
+>  include/migration/migration.h |  17 ++
+>  io/channel.c                  |  76 ++++++
+>  migration/migration.c         |  85 ++++++-
+>  migration/qemu-file-channel.c |  29 +--
+>  migration/ram.c               | 522 +++++++++++++++++++++++++++++++++++++++++-
+>  migration/socket.c            |  67 +++++-
+>  qapi-schema.json              |  30 ++-
+>  9 files changed, 848 insertions(+), 42 deletions(-)
+> 
+> -- 
+> 2.9.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
