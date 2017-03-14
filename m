@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48072)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48332)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cnsjA-0007np-5d
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 16:07:29 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1cnsja-00085b-O0
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 16:07:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cnsj6-0005fZ-4v
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 16:07:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35360)
+	(envelope-from <sstabellini@kernel.org>) id 1cnsjW-00065w-0D
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 16:07:54 -0400
+Received: from mail.kernel.org ([198.145.29.136]:55510)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cnsj5-0005f4-So
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 16:07:24 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Tue, 14 Mar 2017 17:06:41 -0300
-Message-Id: <20170314200641.2958-2-ehabkost@redhat.com>
-In-Reply-To: <20170314200641.2958-1-ehabkost@redhat.com>
-References: <20170314200641.2958-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 1/1] machine: Convert abstract typename on
- compat_props to subclass names
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1cnsjV-00065G-Mi
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 16:07:49 -0400
+Date: Tue, 14 Mar 2017 13:07:44 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <1404f716-826a-1fe0-abe1-2be00dbba256@suse.com>
+Message-ID: <alpine.DEB.2.10.1703141307120.4807@sstabellini-ThinkPad-X260>
+References: <alpine.DEB.2.10.1703131650550.21520@sstabellini-ThinkPad-X260>
+	<1489449360-14411-1-git-send-email-sstabellini@kernel.org>
+	<1489449360-14411-4-git-send-email-sstabellini@kernel.org>
+	<1404f716-826a-1fe0-abe1-2be00dbba256@suse.com>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v2 4/9] xen/9pfs: introduce Xen 9pfs backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,112 +29,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Juergen Gross <jgross@suse.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, anthony.perard@citrix.com, groug@kaod.org, Stefano Stabellini <stefano@aporeto.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
 
-Original problem description by Greg Kurz:
+On Tue, 14 Mar 2017, Juergen Gross wrote:
+> On 14/03/17 00:55, Stefano Stabellini wrote:
+> > Introduce the Xen 9pfs backend: add struct XenDevOps to register as a
+> > Xen backend and add struct V9fsTransport to register as v9fs transport.
+> > 
+> > All functions are empty stubs for now.
+> > 
+> > Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
+> > Reviewed-by: Greg Kurz <groug@kaod.org>
+> > CC: anthony.perard@citrix.com
+> > CC: jgross@suse.com
+> > CC: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
+> > CC: Greg Kurz <groug@kaod.org>
+> > ---
+> >  hw/9pfs/xen-9p-backend.c | 96 ++++++++++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 96 insertions(+)
+> >  create mode 100644 hw/9pfs/xen-9p-backend.c
+> > 
+> > diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
+> > new file mode 100644
+> > index 0000000..35032d3
+> > --- /dev/null
+> > +++ b/hw/9pfs/xen-9p-backend.c
+> > @@ -0,0 +1,96 @@
+> > +/*
+> > + * Xen 9p backend
+> > + *
+> > + * Copyright Aporeto 2017
+> > + *
+> > + * Authors:
+> > + *  Stefano Stabellini <stefano@aporeto.com>
+> > + *
+> > + */
+> > +
+> > +#include "qemu/osdep.h"
+> > +
+> > +#include "hw/hw.h"
+> > +#include "hw/9pfs/9p.h"
+> > +#include "hw/xen/xen_backend.h"
+> > +#include "xen_9pfs.h"
+> > +#include "qemu/config-file.h"
+> > +#include "fsdev/qemu-fsdev.h"
+> > +
+> > +typedef struct Xen9pfsDev {
+> > +    struct XenDevice xendev;  /* must be first */
+> > +} Xen9pfsDev;
+> > +
+> > +static ssize_t xen_9pfs_pdu_vmarshal(V9fsPDU *pdu,
+> > +                                     size_t offset,
+> > +                                     const char *fmt,
+> > +                                     va_list ap)
+> > +{
+> > +    return 0;
+> > +}
+> > +
+> > +static ssize_t xen_9pfs_pdu_vunmarshal(V9fsPDU *pdu,
+> > +                                       size_t offset,
+> > +                                       const char *fmt,
+> > +                                       va_list ap)
+> > +{
+> > +    return 0;
+> > +}
+> > +
+> > +static void xen_9pfs_init_out_iov_from_pdu(V9fsPDU *pdu,
+> > +                                           struct iovec **piov,
+> > +                                           unsigned int *pniov)
+> > +{
+> > +}
+> > +
+> > +static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pdu,
+> > +                                          struct iovec **piov,
+> > +                                          unsigned int *pniov,
+> > +                                          size_t size)
+> > +{
+> > +}
+> > +
+> > +static void xen_9pfs_push_and_notify(V9fsPDU *pdu)
+> > +{
+> > +}
+> > +
+> > +static const struct V9fsTransport xen_9p_transport = {
+> > +    .pdu_vmarshal = xen_9pfs_pdu_vmarshal,
+> > +    .pdu_vunmarshal = xen_9pfs_pdu_vunmarshal,
+> > +    .init_in_iov_from_pdu = xen_9pfs_init_in_iov_from_pdu,
+> > +    .init_out_iov_from_pdu = xen_9pfs_init_out_iov_from_pdu,
+> > +    .push_and_notify = xen_9pfs_push_and_notify,
+> > +};
+> > +
+> > +static int xen_9pfs_init(struct XenDevice *xendev)
+> > +{
+> > +    return 0;
+> > +}
+> > +
+> > +static int xen_9pfs_free(struct XenDevice *xendev)
+> > +{
+> > +    return -1;
+> > +}
+> > +
+> > +static int xen_9pfs_connect(struct XenDevice *xendev)
+> > +{
+> > +    return 0;
+> > +}
+> > +
+> > +static void xen_9pfs_alloc(struct XenDevice *xendev)
+> > +{
+> > +}
+> > +
+> > +static void xen_9pfs_disconnect(struct XenDevice *xendev)
+> > +{
+> > +}
+> > +
+> > +struct XenDevOps xen_9pfs_ops = {
+> > +    .size       = sizeof(Xen9pfsDev),
+> > +    .flags      = DEVOPS_FLAG_NEED_GNTDEV,
+> > +    .alloc      = xen_9pfs_alloc,
+> > +    .init       = xen_9pfs_init,
+> > +    .initialise    = xen_9pfs_connect,
+> 
+> Alignment?
 
-> Since commit "9a4c0e220d8a hw/virtio-pci: fix virtio
-> behaviour", passing -device virtio-blk-pci.disable-modern=off
-> has no effect on 2.6 machine types because the internal
-> virtio-pci.disable-modern=on compat property always prevail.
+I'll fix, thanks
 
-The same bug also affects other abstract type names mentioned on
-compat_props by machine-types: apic-common, i386-cpu, pci-device,
-powerpc64-cpu, s390-skeys, spapr-pci-host-bridge, usb-device,
-virtio-pci, x86_64-cpu.
 
-The right fix for this problem is to make sure compat_props and
--global options are always applied in the order they are
-registered, instead of reordering them based on the type
-hierarchy. But changing the ordering rules of -global is risky
-and might break existing configurations, so we shouldn't do that
-on a stable branch.
-
-This is a temporary hack that will work around the bug when
-registering compat_props properties: if we find an abstract class
-on compat_props, register properties for all its non-abstract
-subtypes instead. This will make sure -global won't be overridden
-by compat_props, while keeping the existing ordering rules on
--global options.
-
-Note that there's one case that won't be fixed by this hack:
-"-global spapr-pci-vfio-host-bridge.<option>=<value>" won't be
-able to override compat_props, because spapr-pci-host-bridge is
-not an abstract class.
-
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <1481575745-26120-1-git-send-email-ehabkost@redhat.com>
-Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
-Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Tested-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- hw/core/machine.c | 39 ++++++++++++++++++++++++++++++++++++---
- 1 file changed, 36 insertions(+), 3 deletions(-)
-
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 0699750336..0d92672203 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -585,11 +585,31 @@ static void machine_class_finalize(ObjectClass *klass, void *data)
-     g_free(mc->name);
- }
- 
-+static void register_compat_prop(const char *driver,
-+                                 const char *property,
-+                                 const char *value)
-+{
-+    GlobalProperty *p = g_new0(GlobalProperty, 1);
-+    /* Machine compat_props must never cause errors: */
-+    p->errp = &error_abort;
-+    p->driver = driver;
-+    p->property = property;
-+    p->value = value;
-+    qdev_prop_register_global(p);
-+}
-+
-+static void machine_register_compat_for_subclass(ObjectClass *oc, void *opaque)
-+{
-+    GlobalProperty *p = opaque;
-+    register_compat_prop(object_class_get_name(oc), p->property, p->value);
-+}
-+
- void machine_register_compat_props(MachineState *machine)
- {
-     MachineClass *mc = MACHINE_GET_CLASS(machine);
-     int i;
-     GlobalProperty *p;
-+    ObjectClass *oc;
- 
-     if (!mc->compat_props) {
-         return;
-@@ -597,9 +617,22 @@ void machine_register_compat_props(MachineState *machine)
- 
-     for (i = 0; i < mc->compat_props->len; i++) {
-         p = g_array_index(mc->compat_props, GlobalProperty *, i);
--        /* Machine compat_props must never cause errors: */
--        p->errp = &error_abort;
--        qdev_prop_register_global(p);
-+        oc = object_class_by_name(p->driver);
-+        if (oc && object_class_is_abstract(oc)) {
-+            /* temporary hack to make sure we do not override
-+             * globals set explicitly on -global: if an abstract class
-+             * is on compat_props, register globals for all its
-+             * non-abstract subtypes instead.
-+             *
-+             * This doesn't solve the problem for cases where
-+             * a non-abstract typename mentioned on compat_props
-+             * has subclasses, like spapr-pci-host-bridge.
-+             */
-+            object_class_foreach(machine_register_compat_for_subclass,
-+                                 p->driver, false, p);
-+        } else {
-+            register_compat_prop(p->driver, p->property, p->value);
-+        }
-     }
- }
- 
--- 
-2.11.0.259.g40922b1
+> > +    .disconnect = xen_9pfs_disconnect,
+> > +    .free       = xen_9pfs_free,
+> > +};
+> > 
