@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36201)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cnipa-0001ne-U1
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 05:33:27 -0400
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cnisT-0002gV-Bp
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 05:36:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cnipW-0006X6-Vq
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 05:33:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41082)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cnipW-0006Wo-Pz
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 05:33:22 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <87tw6y8bs8.fsf@secure.mitica>
-	<CAFEAcA978SJemCfYJPa8jwtuhhi6JGh9pEDGYNJ1npJA3nvEQA@mail.gmail.com>
-	<20170314081312.GB13140@stefanha-x1.localdomain>
-	<CAFEAcA9F2BPexRieaEhu+UpJxoOdEfw8eggW8b2SjuoMMTNgog@mail.gmail.com>
-Date: Tue, 14 Mar 2017 10:33:19 +0100
-In-Reply-To: <CAFEAcA9F2BPexRieaEhu+UpJxoOdEfw8eggW8b2SjuoMMTNgog@mail.gmail.com>
-	(Peter Maydell's message of "Tue, 14 Mar 2017 09:37:24 +0100")
-Message-ID: <87efy0mcdc.fsf@dusky.pond.sub.org>
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cnisP-0000E2-E1
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 05:36:25 -0400
+Received: from [59.151.112.132] (port=35094 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cnisP-00009e-2b
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 05:36:21 -0400
+Date: Tue, 14 Mar 2017 17:35:34 +0800
+From: Chao Fan <fanc.fnst@cn.fujitsu.com>
+Message-ID: <20170314093534.GA13034@localhost.localdomain>
+References: <20170314015507.13350-1-fanc.fnst@cn.fujitsu.com>
+	<8760jcuuax.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] KVM call for 2017-03-14
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <8760jcuuax.fsf@secure.mitica>
+Subject: Re: [Qemu-devel] [PATCH v2] Change the method to calculate
+ dirty-pages-rate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,26 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developer <qemu-devel@nongnu.org>, KVM devel mailing list <kvm@vger.kernel.org>, Juan Quintela <quintela@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: pbonzini@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org, berrange@redhat.com, caoj.fnst@cn.fujitsu.com, douly.fnst@cn.fujitsu.com, maozy.fnst@cn.fujitsu.com, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> On 14 March 2017 at 09:13, Stefan Hajnoczi <stefanha@gmail.com> wrote:
->> On Mon, Mar 13, 2017 at 11:02:01AM +0100, Peter Maydell wrote:
->> The minimum requirements for the new language:
->> 1. Does it support the host operating systems that QEMU runs on?
->> 2. Does it support the host architectures that QEMU runs on?
+On Tue, Mar 14, 2017 at 09:38:46AM +0100, Juan Quintela wrote:
+>Chao Fan <fanc.fnst@cn.fujitsu.com> wrote:
+>> In function cpu_physical_memory_sync_dirty_bitmap, file
+>> include/exec/ram_addr.h:
+>>
+>> if (src[idx][offset]) {
+>>     unsigned long bits = atomic_xchg(&src[idx][offset], 0);
+>>     unsigned long new_dirty;
+>>     new_dirty = ~dest[k];
+>>     dest[k] |= bits;
+>>     new_dirty &= bits;
+>>     num_dirty += ctpopl(new_dirty);
+>> }
+>>
+>> After these codes executed, only the pages not dirtied in bitmap(dest),
+>> but dirtied in dirty_memory[DIRTY_MEMORY_MIGRATION] will be calculated.
+>> For example:
+>> When ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION] = 0b00001111,
+>> and atomic_rcu_read(&migration_bitmap_rcu)->bmap = 0b00000011,
+>> the new_dirty will be 0b00001100, and this function will return 2 but not
+>> 4 which is expected.
+>> the dirty pages in dirty_memory[DIRTY_MEMORY_MIGRATION] are all new,
+>> so these should be calculated also.
+>#
+>> Signed-off-by: Chao Fan <fanc.fnst@cn.fujitsu.com>
+>> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+>>
+>> ---
+>> v2: Remove the parameter 'num_dirty_pages_init'
+>>     Fix incoming parameters of trace_migration_bitmap_sync_end
 >
-> Speaking of this, I was thinking that we should introduce
-> a rule that for any host OS/arch we support we must have
-> a build machine so we can at least do a compile test.
-> For instance if you believe configure we support Solaris
-> and AIX, but I bet they're bit-rotting. The ia64 backend
-> has to be a strong candidate for being dumped too.
-> Demanding "system we can test on or we drop support"
-> would let us more clearly see what we're actually running
-> on and avoid unnecessarily ruling things out because they
-> don't support Itanium or AIX...
+>Reviewed-by: Juan Quintela <quintela@redhat.com>
+Hi Juan,
 
-Yes, please.
+Thank you for your review!
+
+>
+>Just curious, does this change show any difference in any load?
+I think this method can show the new dirty pages more precisely than
+before, so it's helpful to determine the cpu throttle value.
+
+You can see this mail:
+https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg03479.html
+
+And according to Daniel's suggestion, 'inst-dirty-pages-rate' in my
+old patch isn't needed anymore after this patch:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg436183.html
+
+Thanks,
+Chao Fan
+>
+>Later, Juan.
+>
+>
