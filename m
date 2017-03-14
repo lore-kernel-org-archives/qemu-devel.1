@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cnkv5-00017C-E8
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:47:16 -0400
+	(envelope-from <lvivier@redhat.com>) id 1cnkvF-0001FH-Rg
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:47:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cnkv4-0008E4-Bb
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:47:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59846)
+	(envelope-from <lvivier@redhat.com>) id 1cnkvC-0008GQ-ML
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:47:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59882)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cnkv4-0008DT-2L
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:47:14 -0400
-References: <20170314113209.12025-1-eduardo.otubo@profitbricks.com>
-	<20170314113209.12025-4-eduardo.otubo@profitbricks.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e9b2bd2a-8409-7470-76bb-32f15fe6ce0e@redhat.com>
-Date: Tue, 14 Mar 2017 12:47:10 +0100
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1cnkvC-0008G2-CR
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:47:22 -0400
+References: <1488777954-4578-1-git-send-email-jasowang@redhat.com>
+	<1488777954-4578-13-git-send-email-jasowang@redhat.com>
+	<b3d2249e-9eb9-8621-e4c7-c77ac0962615@redhat.com>
+	<20170314111614.GD2445@work-vm>
+	<0f4c58f4-01a4-53d3-fb9e-6409d120827c@redhat.com>
+	<20170314113804.GF2445@work-vm>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <f38153ed-9a1c-4970-ac2a-610802857eb7@redhat.com>
+Date: Tue, 14 Mar 2017 12:47:19 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170314113209.12025-4-eduardo.otubo@profitbricks.com>
+In-Reply-To: <20170314113804.GF2445@work-vm>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/5] seccomp: add elevateprivileges
- argument to command line
+Subject: Re: [Qemu-devel] [PULL RESEND 12/19] vmxnet3: Convert ring values
+ to uint32_t's
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,140 +32,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Otubo <eduardo.otubo@profitbricks.com>, qemu-devel@nongnu.org
-Cc: thuth@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-
-
-On 14/03/2017 12:32, Eduardo Otubo wrote:
-> This patch introduces the new argument [,elevateprivileges=deny] to the
-> `-sandbox on'. It avoids Qemu process to elevate its privileges by
-> blacklisting all set*uid|gid system calls
+On 14/03/2017 12:38, Dr. David Alan Gilbert wrote:
+> * Laurent Vivier (lvivier@redhat.com) wrote:
+>> On 14/03/2017 12:16, Dr. David Alan Gilbert wrote:
+>>> * Laurent Vivier (lvivier@redhat.com) wrote:
+>>>> On 06/03/2017 06:25, Jason Wang wrote:
+>>>>> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>>>>>
+>>>>> The index's in the Vmxnet3Ring were migrated as 32bit ints
+>>>>> yet are declared as size_t's.  They appear to be derived
+>>>>> from 32bit values loaded from guest memory, so actually
+>>>>> store them as that.
+>>>>>
+>>>>> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>>>> Acked-by: Dmitry Fleytman <dmitry@daynix.com>
+>>>>> Signed-off-by: Jason Wang <jasowang@redhat.com>
+>>>>> ---
+>>>>>  hw/net/vmxnet3.c | 12 ++++++------
+>>>>>  1 file changed, 6 insertions(+), 6 deletions(-)
+>>>>>
+>>>>> diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
+>>>>> index e13a798..224c109 100644
+>>>>> --- a/hw/net/vmxnet3.c
+>>>>> +++ b/hw/net/vmxnet3.c
+>>>>> @@ -141,17 +141,17 @@ typedef struct VMXNET3Class {
+>>>>>  /* Cyclic ring abstraction */
+>>>>>  typedef struct {
+>>>>>      hwaddr pa;
+>>>>> -    size_t size;
+>>>>> -    size_t cell_size;
+>>>>> -    size_t next;
+>>>>> +    uint32_t size;
+>>>>> +    uint32_t cell_size;
+>>>>> +    uint32_t next;
+>>>>>      uint8_t gen;
+>>>>>  } Vmxnet3Ring;
+>>>>>  
+>>>>>  static inline void vmxnet3_ring_init(PCIDevice *d,
+>>>>>  				     Vmxnet3Ring *ring,
+>>>>>                                       hwaddr pa,
+>>>>> -                                     size_t size,
+>>>>> -                                     size_t cell_size,
+>>>>> +                                     uint32_t size,
+>>>>> +                                     uint32_t cell_size,
+>>>>>                                       bool zero_region)
+>>>>>  {
+>>>>>      ring->pa = pa;
+>>>>> @@ -166,7 +166,7 @@ static inline void vmxnet3_ring_init(PCIDevice *d,
+>>>>>  }
+>>>>>  
+>>>>>  #define VMXNET3_RING_DUMP(macro, ring_name, ridx, r)                         \
+>>>>> -    macro("%s#%d: base %" PRIx64 " size %zu cell_size %zu gen %d next %zu",  \
+>>>>> +    macro("%s#%d: base %" PRIx64 " size %u cell_size %u gen %d next %u",  \
+>>>>>            (ring_name), (ridx),                                               \
+>>>>>            (r)->pa, (r)->size, (r)->cell_size, (r)->gen, (r)->next)
+>>>>>  
+>>>>>
+>>>>
+>>>>
+>>>> David, with '-dump-vmstate' with 2.8 machine type and with v2.8 and
+>>>> master I can see the size of "txq_descr" and "rxq_descr" changes because
+>>>> of "sizeof(Vmxnet3TxqDescr)" and "sizeof(Vmxnet3RxqDescr)". This changes
+>>>> because the size of Vmxnet3Ring has changed with the s/size_t/uint32_t/":
+>>>>
+>>>>         {
+>>>>           "field": "txq_descr",
+>>>>           "version_id": 0,
+>>>>           "field_exists": false,
+>>>>           "size": 176
+>>>>         },
+>>>>         {
+>>>>           "field": "rxq_descr",
+>>>>           "version_id": 0,
+>>>>           "field_exists": false,
+>>>>           "size": 216
+>>>>         },
+>>>>
+>>>> becomes:
+>>>>
+>>>>         {
+>>>>           "field": "txq_descr",
+>>>>           "version_id": 0,
+>>>>           "field_exists": false,
+>>>>           "size": 144
+>>>>         },
+>>>>         {
+>>>>           "field": "rxq_descr",
+>>>>           "version_id": 0,
+>>>>           "field_exists": false,
+>>>>           "size": 168
+>>>>         },
+>>>
+>>> But the old migration code used to write these fields using qemu_put_be32
+>>> (from a11f5cb005f9854f0d78da97fc23adf5bc8c83f3)
+>>>
+>>> -static void vmxnet3_put_ring_to_file(QEMUFile *f, Vmxnet3Ring *r)
+>>> -{
+>>> -    qemu_put_be64(f, r->pa);
+>>> -    qemu_put_be32(f, r->size);
+>>> -    qemu_put_be32(f, r->cell_size);
+>>> -    qemu_put_be32(f, r->next);
+>>> -    qemu_put_byte(f, r->gen);
+>>> -}
+>>>
+>>> +static const VMStateDescription vmstate_vmxnet3_ring = {
+>>> +    .name = "vmxnet3-ring",
+>>> +    .version_id = 0,
+>>> +    .fields = (VMStateField[]) {
+>>> +        VMSTATE_UINT64(pa, Vmxnet3Ring),
+>>> +        VMSTATE_UINT32(size, Vmxnet3Ring),
+>>> +        VMSTATE_UINT32(cell_size, Vmxnet3Ring),
+>>> +        VMSTATE_UINT32(next, Vmxnet3Ring),
+>>> +        VMSTATE_UINT8(gen, Vmxnet3Ring),
+>>> +        VMSTATE_END_OF_LIST()
+>>> +    }
+>>>  };
+>>>
+>>> so they used to be size_t's written with be32 and now they're uint32_t's
+>>> written as 32bit - so that should be the same.
+>>> I'm not sure i understand where the old txq_descr sizes come from - what
+>>> managed to print the 176 number before it was converted to VMState?
+>>
+>> I think it comes from the sizeof() in VMSTATE_STRUCT(Vmxnet3TxqDescr):
+>>
+>> static const VMStateDescription vmstate_vmxnet3_txq_descr = {
+>>     .name = "vmxnet3-txq-descr",
+>>     .version_id = 0,
+>>     .fields = (VMStateField[]) {
+>>         VMSTATE_STRUCT(tx_ring, Vmxnet3TxqDescr, 0, vmstate_vmxnet3_ring,
+>>                        Vmxnet3Ring),
+>>         VMSTATE_STRUCT(comp_ring, Vmxnet3TxqDescr, 0, vmstate_vmxnet3_ring,
+>>                        Vmxnet3Ring),
+>>         VMSTATE_UINT8(intr_idx, Vmxnet3TxqDescr),
+>>         VMSTATE_UINT64(tx_stats_pa, Vmxnet3TxqDescr),
+>>         VMSTATE_STRUCT(txq_stats, Vmxnet3TxqDescr, 0,
+>> vmstate_vmxnet3_tx_stats,
+>>                        struct UPT1_TxStats),
+>>         VMSTATE_END_OF_LIST()
+>>     }
+>> };
+>>
+>> I will check the '-dump-vmstate' code to see if it's relevant.
 > 
-> Signed-off-by: Eduardo Otubo <eduardo.otubo@profitbricks.com>
-> ---
->  include/sysemu/seccomp.h |  1 +
->  qemu-options.hx          |  8 ++++++--
->  qemu-seccomp.c           | 28 ++++++++++++++++++++++++++++
->  vl.c                     | 11 +++++++++++
->  4 files changed, 46 insertions(+), 2 deletions(-)
+> OK, but that sizeof() should never make it onto the wire; all that
+> teh VMSTATE_STRUCT should do is execute the vmstate_vmxnet3_ring on
+> that data.
+> (And again I'm curious what happened in the version before I committed
+> that change).
 > 
-> diff --git a/include/sysemu/seccomp.h b/include/sysemu/seccomp.h
-> index 7a7bde246b..e6e78d85ce 100644
-> --- a/include/sysemu/seccomp.h
-> +++ b/include/sysemu/seccomp.h
-> @@ -16,6 +16,7 @@
->  #define QEMU_SECCOMP_H
->  
->  #define OBSOLETE    0x0001
-> +#define PRIVILEGED  0x0010
->  
->  #include <seccomp.h>
->  
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 1403d0c85f..47018db5aa 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -3732,8 +3732,10 @@ Old param mode (ARM only).
->  ETEXI
->  
->  DEF("sandbox", HAS_ARG, QEMU_OPTION_sandbox, \
-> -    "-sandbox on[,obsolete=allow]  Enable seccomp mode 2 system call filter (default 'off').\n" \
-> -    "                              obsolete: Allow obsolete system calls",
-> +    "-sandbox on[,obsolete=allow][,elevateprivileges=deny]\n" \
-> +    "                               Enable seccomp mode 2 system call filter (default 'off').\n" \
-> +    "                               obsolete: Allow obsolete system calls\n" \
-> +    "                               elevateprivileges: avoids Qemu process to elevate its privileges by blacklisting all set*uid|gid system calls",
-
-Why allow these by default?
-
-Paolo
-
->      QEMU_ARCH_ALL)
->  STEXI
->  @item -sandbox @var{arg}[,obsolete=@var{string}]
-> @@ -3743,6 +3745,8 @@ disable it.  The default is 'off'.
->  @table @option
->  @item obsolete=@var{string}
->  Enable Obsolete system calls
-> +@item elevateprivileges=@var{string}
-> +Disable set*uid|gid systema calls
->  @end table
->  ETEXI
->  
-> diff --git a/qemu-seccomp.c b/qemu-seccomp.c
-> index 5ef36890da..5aa6590386 100644
-> --- a/qemu-seccomp.c
-> +++ b/qemu-seccomp.c
-> @@ -31,6 +31,19 @@ struct QemuSeccompSyscall {
->      uint8_t priority;
->  };
->  
-> +static const struct QemuSeccompSyscall privileged_syscalls[] = {
-> +    { SCMP_SYS(setuid), 255 },
-> +    { SCMP_SYS(setgid), 255 },
-> +    { SCMP_SYS(setpgid), 255 },
-> +    { SCMP_SYS(setsid), 255 },
-> +    { SCMP_SYS(setreuid), 255 },
-> +    { SCMP_SYS(setregid), 255 },
-> +    { SCMP_SYS(setresuid), 255 },
-> +    { SCMP_SYS(setresgid), 255 },
-> +    { SCMP_SYS(setfsuid), 255 },
-> +    { SCMP_SYS(setfsgid), 255 },
-> +};
-> +
->  static const struct QemuSeccompSyscall obsolete[] = {
->      { SCMP_SYS(readdir), 255 },
->      { SCMP_SYS(_sysctl), 255 },
-> @@ -125,6 +138,21 @@ int seccomp_start(uint8_t seccomp_opts)
->          }
->      }
->  
-> +    if (seccomp_opts & PRIVILEGED) {
-> +        for (i = 0; i < ARRAY_SIZE(privileged_syscalls); i++) {
-> +            rc = seccomp_rule_add(ctx, SCMP_ACT_KILL, privileged_syscalls[i].num, 0);
-> +            if (rc < 0) {
-> +                goto seccomp_return;
-> +            }
-> +            rc = seccomp_syscall_priority(ctx, privileged_syscalls[i].num,
-> +                    privileged_syscalls[i].priority);
-> +            if (rc < 0) {
-> +                goto seccomp_return;
-> +            }
-> +        }
-> +    }
-> +
-> +
->      rc = seccomp_load(ctx);
->  
->    seccomp_return:
-> diff --git a/vl.c b/vl.c
-> index 7b08b3383b..d071e240b0 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -273,6 +273,10 @@ static QemuOptsList qemu_sandbox_opts = {
->              .name = "obsolete",
->              .type = QEMU_OPT_STRING,
->          },
-> +        {
-> +            .name = "elevateprivileges",
-> +            .type = QEMU_OPT_STRING,
-> +        },
->          { /* end of list */ }
->      },
->  };
-> @@ -1045,6 +1049,13 @@ static int parse_sandbox(void *opaque, QemuOpts *opts, Error **errp)
->              }
->          }
->  
-> +        value = qemu_opt_get(opts,"elevateprivileges");
-> +        if (value) {
-> +            if (strcmp(value, "deny") == 0) {
-> +                seccomp_opts |= PRIVILEGED;
-> +            }
-> +        }
-> +
->          if (seccomp_start(seccomp_opts) < 0) {
->              error_report("failed to install seccomp syscall filter "
->                           "in the kernel");
+>>>
+>>>> And if I try a migration, I have:
+>>>>
+>>>> qemu/migration/vmstate.c:112: vmstate_load_state: Assertion `first_elem
+>>>> || !n_elems' failed.
+>>>
+>>> Interesting; that's Halil's new assert; I need to look.
+>>
+>> Can't it be related to the size problem?
 > 
+> It could, I need to see exactly how it's failing; what was the full
+> command line you used, and with what guest?
+
+Tested with pseries machine type on ppc64le host, no guest started.
+
+qemu-system-ppc64 -M pseries-2.8 -S -serial mon:stdio -vnc :0 -device
+vmxnet3
+
+Laurent
