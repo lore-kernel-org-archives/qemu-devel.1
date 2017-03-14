@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cnlDT-0008IS-Jl
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:06:16 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1cnlHV-0001oi-FH
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:10:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cnlDQ-0007Vq-Fh
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:06:15 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47019)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cnlDQ-0007VF-9I
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:06:12 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cnlDN-0002BI-Kh
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 12:06:09 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9A5DC2E807D
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 12:06:09 +0000 (UTC)
+	(envelope-from <dovgaluk@ispras.ru>) id 1cnlHQ-0000Yl-I8
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:10:25 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:51744)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1cnlHQ-0000YX-AP
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:10:20 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <a7977444b25641cc86352a6818a4df3a@EXCHCS32.ornl.gov>
+	<000601d29710$edf987b0$c9ec9710$@ru> <874lyxqpl4.fsf@linaro.org>
+In-Reply-To: <874lyxqpl4.fsf@linaro.org>
+Date: Tue, 14 Mar 2017 15:10:19 +0300
+Message-ID: <000001d29cbb$f396a800$dac3f800$@ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain;
+	charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 14 Mar 2017 11:51:00 -0000
-From: Kirill Tkhai <tkhai@yandex.ru>
-Reply-To: Bug 1131757 <1131757@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20130222143343.3624.57532.malonedeb@soybean.canonical.com>
-Message-Id: <1149481353.20170314145100@yandex.ru>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1131757] pleasant news
+Content-Language: ru
+Subject: Re: [Qemu-devel] -rtc clock=vm with -icount 1,
+ sleep=off introduces unexpected delays in device interactions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,57 +30,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>
+Cc: "'Nutaro, James J.'" <nutarojj@ornl.gov>, mttcg@listserver.greensocs.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 
-Hey!
+> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
+> > I also encountered icount problems with new MTTCG patches.
+> >
+> > Record/replay now cannot work, because iothread requests timers
+> > without kicking the CPU. And cpu thread updates icount (that
+> > are used for the clock).
+>=20
+> The interaction of kicking the vCPU while grabbing the BQL was a
+> side-effect. This is now done explicitly for single-threaded emulation
+> by (6546706d28):
+>=20
+>   tcg: add kick timer for single-threaded vCPU emulation
 
-I've just read the latest news and I was pleasantly surprised, please
-read it here http://ideal.fatitalianchef.com/5657
+This is not the same.
+BQL helped in making execution deterministic - no io and timer
+callbacks were performed while CPU is executing.
+Now iothread and CPU thread work simultaneously and timers can't
+query virtual time correctly, because (if we could query number of =
+executed
+instructions) it may have different values on different runs.
+
+I guess you'll have to bring kicking CPU back on iothread invocation
+to make execution deterministic in icount mode.
+
+>=20
+> > Therefore invocation of iothread uses incorrect clock and
+> > all virtual timers behave incorrectly.
+> >
+> > Record/replay is also broken because current icount is requested
+> > from iothread where current_cpu (and icount progress stored in =
+icount_extra)
+> > is unavailable.
+>=20
+> I'm working through Paolo's series now but I don't see it as
+> insurmountable. The aim of keeping current_cpu set only during the
+> cpu-exec loop was intentional because the system as a whole can't make
+> assumptions about it always being valid.
 
 
-Yours truly, tkhai
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1131757
-
-Title:
-  QEMU 1.4.0 fails to boot sparc64 linux image
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  Hi!
-
-  I tried to boot sparc64 linux image
-  (http://packages.debian.org/sid/sparc64/linux-
-  image-2.6-sparc64-smp/download) with qemu and received the  error.
-
-  host:~$qemu-system-sparc64 -nographic -kernel vmlinuz-3.2.0-4-sparc64-smp
-  OpenBIOS for Sparc64
-  Configuration device id QEMU version tion device id QEMUkernel addr n dev=
-ice id QEMUkernel cmdline =
-
-  CPUs:  cmdline =
-
-   x SUNW,UltraSPARC-IIi
-  UUID: 00UltraSPARC-IIi
-  Welcome to OpenBIOS v1.0 built on Aug 19 2012 13:06
-    Type 'help' for detailed information
-  [sparc64] Kernel already loaded
-  Unhandled Exception 0x0000000000000020
-  PC =3D 0x0000000000404000 NPC =3D 0x0000000000404004
-  Stopping execution
-
-  Also, I tried to follow instruction from Artyom Tarasenko blog
-  (http://tyom.blogspot.ru/2012/05/booting-linuxsparc64-on-todays-
-  openbios.html), but it's still impossible to boot linux.
-
-  Regards,
-  Kirill
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1131757/+subscriptions
+Pavel Dovgalyuk
