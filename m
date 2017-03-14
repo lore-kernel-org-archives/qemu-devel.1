@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cnlaH-00010v-T8
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:29:51 -0400
+	(envelope-from <quintela@redhat.com>) id 1cnlce-0002mm-Rb
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:32:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cnlaD-0000IZ-Vz
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:29:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41006)
+	(envelope-from <quintela@redhat.com>) id 1cnlca-0001S9-VI
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:32:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49024)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cnlaD-0000IM-NP
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:29:45 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cnlca-0001Qi-Mx
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:32:12 -0400
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B01C7C05AA63
+	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 12:32:12 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170314102747.31395-1-fanc.fnst@cn.fujitsu.com> (Chao Fan's
-	message of "Tue, 14 Mar 2017 18:27:47 +0800")
-References: <20170314102747.31395-1-fanc.fnst@cn.fujitsu.com>
+In-Reply-To: <20170314103428.GD2652@redhat.com> (Daniel P. Berrange's message
+	of "Tue, 14 Mar 2017 10:34:28 +0000")
+References: <20170313124434.1043-1-quintela@redhat.com>
+	<20170313124434.1043-10-quintela@redhat.com>
+	<20170313164134.GM4799@redhat.com> <87fuihuna9.fsf@secure.mitica>
+	<20170314103428.GD2652@redhat.com>
 Reply-To: quintela@redhat.com
-Date: Tue, 14 Mar 2017 13:29:43 +0100
-Message-ID: <87o9x4t51k.fsf@secure.mitica>
+Date: Tue, 14 Mar 2017 13:32:10 +0100
+Message-ID: <87k27st4xh.fsf@secure.mitica>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] Output dirty-bytes-rate instead of
- dirty-pages-rate
+Subject: Re: [Qemu-devel] [PATCH 09/16] migration: Start of multiple fd work
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,108 +36,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Chao Fan <fanc.fnst@cn.fujitsu.com>
-Cc: eblake@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org, berrange@redhat.com, caoj.fnst@cn.fujitsu.com, douly.fnst@cn.fujitsu.com, maozy.fnst@cn.fujitsu.com, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, amit.shah@redhat.com, dgilbert@redhat.com
 
-Chao Fan <fanc.fnst@cn.fujitsu.com> wrote:
-> In hmp, dirty-bytes-rate is more friendly than dirty-pages-rate.
-> It's also better for other tools to determine the cpu throttle
-> value in different architecture.
+"Daniel P. Berrange" <berrange@redhat.com> wrote:
+> On Mon, Mar 13, 2017 at 05:58:06PM +0100, Juan Quintela wrote:
+>> "Daniel P. Berrange" <berrange@redhat.com> wrote:
+>> > On Mon, Mar 13, 2017 at 01:44:27PM +0100, Juan Quintela wrote:
+>> >
+>> > I still don't really like any of the changes in this file. We've now got
+>> > two sets of methods which connect to a remote host and two sets of methods
+>> > which accept incoming clients. I've got to think there's a better way to
+>> > refactor the existing code, such that we don't need two sets of methods
+>> > for the same actions
+>> 
+>> I am open to suggestions, basically we want to be able to:
+>> - open one + n channels
+>> - be sure that we got the same id on both sides of the connection.
+>> 
+>> You suggested on the previous iteration that I changed the FALSE in
+>> *HERE* for TRUE, but I was not able to:
+>> - make sure that we have opened n sockets before we continue with
+>>   migration
+>> - making sure that we got same id numbers in both sides, that is doable,
+>>   just add a new id field
+>> - right now I open a channel, and wait for the other side to open it
+>>   before open the following one.  I can do things in parallel, but
+>>   locking is going to be "interesting".
+>> 
+>> So, as said, I don't really care how we open the channels, I am totally
+>> open to suggestions.  Looking at the current code, this is the best way
+>> that I have been able to think of.
 >
-> Signed-off-by: Chao Fan <fanc.fnst@cn.fujitsu.com>
-> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+> I think the key problem in the current design is that you delay the opening
+> of the extra socket channels. To be able to remove most of this duplication,
+> I think you need to open all the channels at once right at the start.
+>
+>
+> IOW, in qmp_migrate() instead of calling tcp_start_outgoing_migration()
+> just once, use a loop to call it N times (where N == number of threads).
+>
+> Now this method is asynchronous, and eventually triggers a call to
+> migration_channel_connect() when the connection actually succeeds.
+> You will need to change migration_channel_connect() so that it can be
+> called multiple times. migration_channel_connect() should count how
+> many channels have been opened, and only start the migration once all
+> of them are open.
+>
+> The incoming side is a little different - in qemu_start_incoming_migration()
+> you only need call tcp_start_incoming_migration() once. In the
+> socket_accept_incoming_migration() method though, you need to change the
+> 'return FALSE' to 'return TRUE', so that it continues to accept multiple
+> incoming clients. The socket_start_outgoing_migration()method needs to again
+> count the number of channels that have been opened so far, and only start
+> the actual migration once the right number are open.
+>
+>
+> By doing all this opening of channels upfront, you'll also make it much
+> easier to support the other migration protocols - in particular 'fd'
+> protocol needs to be extended so that libvirt can pass in multiple FDs
+> in the monitor command at once. The 'exec' protocol should also be
+> able to trivially support this by simply launching the command multiple
+> times.
 
-I agree with Daniel here, you can't change the meaning of a field.  Look
-at skipped pages.  It is zero know because it is not used anymore, but
-we can't drop it.
-
-I think it is better to expose page_size.  We have now
-
-trasferred: bytes
-total: bytes
-duplicate: number of zero pages
-skipped: always zero.
-normal: number of normal pages
-normal_bytes: the same  in bytes
-mbps: megabytes per second?  I can't even remember this one
-dirty_sync_count: number of times we have go through the whole memory
-postcopy_requests = number of pages asked by postcopy faults?
-dirty_pages_rate = pages by some kind of unit
-
-And we haven't yet started with compression or xbzrle.  I think that the
-best approach at this point is putting everything in pages except the
-things that don't make sense.
-
-We can put everything on bytes, but then everything is HUGE.
-
-Anyways, what do libvirt/management apps preffer?
+Ok. Thanks.  Will look into this.
 
 Later, Juan.
-
-
-> ---
->  hmp.c                 | 6 +++---
->  migration/migration.c | 2 +-
->  qapi-schema.json      | 8 ++++----
->  3 files changed, 8 insertions(+), 8 deletions(-)
->
-> diff --git a/hmp.c b/hmp.c
-> index 261843f..7334bc5 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -215,9 +215,9 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
->                         info->ram->normal_bytes >> 10);
->          monitor_printf(mon, "dirty sync count: %" PRIu64 "\n",
->                         info->ram->dirty_sync_count);
-> -        if (info->ram->dirty_pages_rate) {
-> -            monitor_printf(mon, "dirty pages rate: %" PRIu64 " pages\n",
-> -                           info->ram->dirty_pages_rate);
-> +        if (info->ram->dirty_bytes_rate) {
-> +            monitor_printf(mon, "dirty bytes rate: %" PRIu64 " bytes/s\n",
-> +                           info->ram->dirty_bytes_rate);
->          }
->          if (info->ram->postcopy_requests) {
->              monitor_printf(mon, "postcopy request count: %" PRIu64 "\n",
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 3dab684..7e7b62c 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -648,7 +648,7 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
->  
->      if (s->state != MIGRATION_STATUS_COMPLETED) {
->          info->ram->remaining = ram_bytes_remaining();
-> -        info->ram->dirty_pages_rate = s->dirty_pages_rate;
-> +        info->ram->dirty_bytes_rate = s->dirty_bytes_rate;
->      }
->  }
->  
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 32b4a4b..83a45f8 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -565,9 +565,6 @@
->  #
->  # @normal-bytes: number of normal bytes sent (since 1.2)
->  #
-> -# @dirty-pages-rate: number of pages dirtied by second by the
-> -#        guest (since 1.3)
-> -#
->  # @mbps: throughput in megabits/sec. (since 1.6)
->  #
->  # @dirty-sync-count: number of times that dirty ram was synchronized (since 2.1)
-> @@ -575,12 +572,15 @@
->  # @postcopy-requests: The number of page requests received from the destination
->  #        (since 2.7)
->  #
-> +# @dirty-bytes-rate: how many bytes  dirtied by second by the
-> +#        guest (since 2.9)
-> +#
->  # Since: 0.14.0
->  ##
->  { 'struct': 'MigrationStats',
->    'data': {'transferred': 'int', 'remaining': 'int', 'total': 'int' ,
->             'duplicate': 'int', 'skipped': 'int', 'normal': 'int',
-> -           'normal-bytes': 'int', 'dirty-pages-rate' : 'int',
-> +           'normal-bytes': 'int', 'dirty-bytes-rate' : 'int',
->             'mbps' : 'number', 'dirty-sync-count' : 'int',
->             'postcopy-requests' : 'int' } }
