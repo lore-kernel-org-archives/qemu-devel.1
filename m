@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cnpC4-0005fo-Rz
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:21:08 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1cnpET-00080b-N5
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:23:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cnpBz-0007wW-0J
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:21:04 -0400
-References: <20170314161205.19415-1-famz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <66715588-a25e-3028-d008-8fd285edb755@redhat.com>
-Date: Tue, 14 Mar 2017 11:20:51 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cnpEP-0001pE-7b
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:23:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47800)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cnpEP-0001ns-1g
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:23:29 -0400
+References: <20170303131113.25898-1-pbonzini@redhat.com>
+	<20170303131113.25898-6-pbonzini@redhat.com>
+	<871su1qfsu.fsf@linaro.org>
+	<834de521-e5cc-8857-afeb-8734037f95f3@redhat.com>
+	<87y3w9oxff.fsf@linaro.org>
+	<2d503aaa-4853-a325-bc13-983528d02e09@redhat.com>
+	<bb926742-7dbe-1147-4629-da565146a450@redhat.com>
+	<87r31zq2xa.fsf@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <328f4f7d-0b24-b673-eea1-0fe251851581@redhat.com>
+Date: Tue, 14 Mar 2017 17:23:26 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170314161205.19415-1-famz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="xISfubWLiNR3tLDq1jbMr5INUpc4l9bFJ"
-Subject: Re: [Qemu-devel] [PATCH v2] file-posix: Don't leak fd in
- hdev_get_max_segments
+In-Reply-To: <87r31zq2xa.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 5/5] icount: process QEMU_CLOCK_VIRTUAL
+ timers in vCPU thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,72 +34,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---xISfubWLiNR3tLDq1jbMr5INUpc4l9bFJ
-From: Eric Blake <eblake@redhat.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
-Message-ID: <66715588-a25e-3028-d008-8fd285edb755@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] file-posix: Don't leak fd in
- hdev_get_max_segments
-References: <20170314161205.19415-1-famz@redhat.com>
-In-Reply-To: <20170314161205.19415-1-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 03/14/2017 11:12 AM, Fam Zheng wrote:
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  block/file-posix.c | 3 +++
->  1 file changed, 3 insertions(+)
+
+On 14/03/2017 16:43, Alex Benn=C3=A9e wrote:
+>>
+>> I tried "-kernel /path/to/bzImage -icount 3,rr=3Drecord,rrfile=3Drepla=
+y.bin
+>> -net none".  record works, replay hangs.  The hang is at a "pause"
+>> instruction.  With "-d in_asm" it still hangs, but a bit later (still =
+in
+>> the firmware).
+> I'm happy to keep digging.
 >=20
-> diff --git a/block/file-posix.c b/block/file-posix.c
-> index c4c0663..d670be3 100644
-> --- a/block/file-posix.c
-> +++ b/block/file-posix.c
-> @@ -703,6 +703,9 @@ static int hdev_get_max_segments(const struct stat =
-*st)
->      }
-> =20
->  out:
-> +    if (fd !=3D -1) {
-> +        close(fd);
-> +    }
+> So to be clear when you do the record step how do you save your state
+> before you replay?
 
-Mails crossed - I see I asked about this in reply to v1 after you
-already sent v2 minutes earlier.
+Here it hangs on the replay way before the end of the record, so it
+wasn't an issue.
 
-I still think it might be nice to mention a commit id that you are
-fixing (one of my reply-to-self on your v1), but either way,
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---xISfubWLiNR3tLDq1jbMr5INUpc4l9bFJ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYyBhkAAoJEKeha0olJ0NqzoYH/2SKah2FH9q3SJSpjVFWN8W+
-b+ok/nn3KtXjR2vJQ4A4rA/yHZBytDLc5imX4UHqm/nckYYQMdT4Kd0HOTBhN/eL
-FPtZATeQbqGvLdLaVopyApjwpGD/Tq3kAU6bSnP9P68ty+Jcjv708OKtIDmD1k4J
-Pb3KHZJGeU6yyGffirZNwheSBhv+KhgUhx1i4l6VWggjI8nX2RacZheZbVGlkjmP
-7RoakjA6/ibjX2OsKpsGsAXuBfPtz2xManTlLWuPU4pGZZ4B/9Q48q1Y+/KZlpaY
-3d1TLatLf9TE90SKLQuMQV/dLYtNNSjkMkuBQh+rbzLbqA4msEuD7EpyVceNBns=
-=Q5Sh
------END PGP SIGNATURE-----
-
---xISfubWLiNR3tLDq1jbMr5INUpc4l9bFJ--
+Paolo
