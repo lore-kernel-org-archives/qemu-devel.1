@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cnph2-0000t1-HG
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:53:05 -0400
+	(envelope-from <thuth@redhat.com>) id 1cnpis-0001um-F8
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:54:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cnph1-0008L2-Gq
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:53:04 -0400
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:36384)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cnph1-0008KT-9o
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:53:03 -0400
-Received: by mail-wm0-x232.google.com with SMTP id n11so68795962wma.1
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 09:53:03 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1cnpip-0000Vp-8X
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:54:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46206)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cnpio-0000Vd-Vu
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:54:55 -0400
+References: <87tw6y8bs8.fsf@secure.mitica>
+	<CAFEAcA978SJemCfYJPa8jwtuhhi6JGh9pEDGYNJ1npJA3nvEQA@mail.gmail.com>
+	<20170314081312.GB13140@stefanha-x1.localdomain>
+	<CAFEAcA9F2BPexRieaEhu+UpJxoOdEfw8eggW8b2SjuoMMTNgog@mail.gmail.com>
+	<87wpbstesf.fsf@secure.mitica> <20170314160113.GM2445@work-vm>
+	<20170314162020.GT2652@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <d9497461-e7c5-b914-362d-16b0cdea9fba@redhat.com>
+Date: Tue, 14 Mar 2017 17:54:43 +0100
 MIME-Version: 1.0
-In-Reply-To: <87pohjq1lp.fsf@linaro.org>
-References: <1488542374-1256-1-git-send-email-peter.maydell@linaro.org>
-	<87pohjq1lp.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 14 Mar 2017 17:52:41 +0100
-Message-ID: <CAFEAcA_dwsj=Ck9xOj-ONbLqedwn7ejj5=cPXiiLdS37iB90hA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.9] hw/misc/imx6_src: Don't crash
- trying to reset missing CPUs
+In-Reply-To: <20170314162020.GT2652@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] Obsolete QEMU host environments (was: Re: KVM call for
+ 2017-03-14)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,66 +32,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Peter Chubb <peter.chubb@nicta.com.au>, Jean-Christophe DUBOIS <jcd@tribudubois.net>
+To: "Daniel P. Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developer <qemu-devel@nongnu.org>, KVM devel mailing list <kvm@vger.kernel.org>, Stefan Hajnoczi <stefanha@gmail.com>, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>
 
-On 14 March 2017 at 17:12, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
->
-> Peter Maydell <peter.maydell@linaro.org> writes:
->
->> Commit 4881658a4b introduced a call to arm_get_cpu_by_id(),
->> and Coverity noticed that we weren't checking that it didn't
->> return NULL (CID 1371652).
+On 14.03.2017 17:20, Daniel P. Berrange wrote:
+> On Tue, Mar 14, 2017 at 04:01:14PM +0000, Dr. David Alan Gilbert wrote:
+>> * Juan Quintela (quintela@redhat.com) wrote:
+>>> Peter Maydell <peter.maydell@linaro.org> wrote:
+>>>> On 14 March 2017 at 09:13, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>>>>> On Mon, Mar 13, 2017 at 11:02:01AM +0100, Peter Maydell wrote:
+>>>>> The minimum requirements for the new language:
+>>>>> 1. Does it support the host operating systems that QEMU runs on?
+>>>>> 2. Does it support the host architectures that QEMU runs on?
+>>>>
+>>>> Speaking of this, I was thinking that we should introduce
+>>>> a rule that for any host OS/arch we support we must have
+>>>> a build machine so we can at least do a compile test.
+>>>> For instance if you believe configure we support Solaris
+>>>> and AIX, but I bet they're bit-rotting. The ia64 backend
+>>>> has to be a strong candidate for being dumped too.
+>>>> Demanding "system we can test on or we drop support"
+>>>> would let us more clearly see what we're actually running
+>>>> on and avoid unnecessarily ruling things out because they
+>>>> don't support Itanium or AIX...
+>>>
+>>> YES, YES and YES.
+>>>
+>>> I demand an osX build machine NOW!!!!  Remote access is ok.
+>>>
+>>> Now more seriously, I can (relatively easy) compile test my pull
+>>> requests with:
+>>> - linux x86 (latest fedora, but I can get an older one if needed)
+>>> - linux x86_64 (latest fedor,, but the same)
+>>> - mingw64 32bit (latest fedora, but here I have the problem that Peter
+>>>   uses a different crosscompiler than me)
+>>> - mingw64 32bit (the same)
+>>>
+>>> But for the rest, I need to wait that somebody told me that it breaks
+>>> the build.  Normally it is things like size_t is 32bit instead of 64bit
+>>> or some stupid things like that, that are trivial to fix if I can
+>>> compile there before doing the pull submission.
 >>
->> Normally this won't happen (because all 4 CPUs are expected
->> to exist), but it's possible the user requested fewer CPUs
->> on the command line. Handle this possibility by silently
->> doing nothing, which is the same behaviour as before commit
->> 4881658a4b and also how we handle the other CPU operations
->> (since we ignore the INVALID_PARAM returns from arm_set_cpu_on()
->> and friends).
+>> I also do a FreeBSD VM, and grab an aarch64 and/or PPC bigendian host
+>> to test on.
 >>
->> There is a slight behavioural difference to the pre-4881658a4b
->> situation: the "reset this core" bit will remain set rather
->> than not being permitted to be set. The imx6 datasheet is
->> unclear about the behaviour in this odd corner case, so we
->> opt for the simpler code rather than complicated logic to
->> maintain identical behaviour.
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->> I couldn't actually get this to crash even with -smp 1 with
->> my test image, but we should fix it anyhow.
->>
->>  hw/misc/imx6_src.c | 8 ++++++--
->>  1 file changed, 6 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/misc/imx6_src.c b/hw/misc/imx6_src.c
->> index edbb756..cfb0871 100644
->> --- a/hw/misc/imx6_src.c
->> +++ b/hw/misc/imx6_src.c
->> @@ -143,13 +143,17 @@ static void imx6_defer_clear_reset_bit(int cpuid,
->>                                         unsigned long reset_shift)
->>  {
->>      struct SRCSCRResetInfo *ri;
->> +    CPUState *cpu =3D arm_get_cpu_by_id(cpuid);
->> +
->> +    if (!cpu) {
->> +        return;
->> +    }
->>
->>      ri =3D g_malloc(sizeof(struct SRCSCRResetInfo));
->>      ri->s =3D s;
->>      ri->reset_bit =3D reset_shift;
->>
->> -    async_run_on_cpu(arm_get_cpu_by_id(cpuid), imx6_clear_reset_bit,
->> -                     RUN_ON_CPU_HOST_PTR(ri));
->> +    async_run_on_cpu(cpu, imx6_clear_reset_bit, RUN_ON_CPU_HOST_PTR(ri)=
-);
->>  }
->
-> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> (I could grab an ia64 host, but I don't think I could find anything
+>> to install on it that would be new enough for the rest of our build
+>> requirements).
+> 
+> Indeed, ia64 is a fully dead as a host architecture at this point, only
+> interesting as a historical curiosity. Paolo already killed ia64 KVM
+> host support in Linux git back in 2014.
 
-Thanks; applied to master.
+Our ia64 host backend in QEMU (tcg/ia64) is still marked as maintained
+... so it's maybe not as dead as you think? Or should we rather get rid
+of that soon, too?
 
--- PMM
+ Thomas
