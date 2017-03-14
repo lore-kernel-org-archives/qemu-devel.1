@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cnbnl-0002WP-1d
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 22:03:06 -0400
+	(envelope-from <jasowang@redhat.com>) id 1cnby6-0005Y9-6D
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 22:13:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cnbng-0002jG-5t
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 22:03:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55648)
+	(envelope-from <jasowang@redhat.com>) id 1cnby3-0006Q3-2b
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 22:13:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34392)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cnbnf-0002ib-U8
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 22:03:00 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cnby2-0006PF-TL
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 22:13:43 -0400
 References: <1489386583-11564-1-git-send-email-jasowang@redhat.com>
-	<20170313105515.75981fb9.cornelia.huck@de.ibm.com>
+	<1489386583-11564-2-git-send-email-jasowang@redhat.com>
+	<20170313110523.549e4a99.cornelia.huck@de.ibm.com>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <99e8bc56-f679-778c-8ff9-f2be84c62618@redhat.com>
-Date: Tue, 14 Mar 2017 10:02:53 +0800
+Message-ID: <0c1a620f-90e2-1f2b-8615-ed17b88b1272@redhat.com>
+Date: Tue, 14 Mar 2017 10:13:37 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170313105515.75981fb9.cornelia.huck@de.ibm.com>
+In-Reply-To: <20170313110523.549e4a99.cornelia.huck@de.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V2 1/3] virtio: guard against NULL pfn
+Subject: Re: [Qemu-devel] [PATCH V2 2/3] virtio: destroy region cache during
+ reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,97 +34,74 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com
 
 
 
-On 2017=E5=B9=B403=E6=9C=8813=E6=97=A5 17:55, Cornelia Huck wrote:
-> On Mon, 13 Mar 2017 14:29:41 +0800
+On 2017=E5=B9=B403=E6=9C=8813=E6=97=A5 18:05, Cornelia Huck wrote:
+> On Mon, 13 Mar 2017 14:29:42 +0800
 > Jason Wang <jasowang@redhat.com> wrote:
 >
->> To avoid access stale memory region cache after reset, this patch
->> check the existence of virtqueue pfn for all exported virtqueue access
->> helpers before trying to use them.
+>> We don't destroy region cache during reset which can make the maps
+>> of previous driver leaked to a buggy or malicious driver that don't
+>> set vring address before starting to use the device. Fix this by
+>> destroy the region cache during reset and validate it before trying to
+>> see them.
 >>
 >> Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
 >> Cc: Paolo Bonzini <pbonzini@redhat.com>
 >> Signed-off-by: Jason Wang <jasowang@redhat.com>
 >> ---
->>   hw/virtio/virtio.c | 21 +++++++++++++++++++++
->>   1 file changed, 21 insertions(+)
+>> Changes from v1:
+>> - switch to use rcu in virtio_virtqueue_region_cache()
+>> - use unlikely() when needed
+>> ---
+>>   hw/virtio/virtio.c | 60 ++++++++++++++++++++++++++++++++++++++++++++=
++++-------
+>>   1 file changed, 53 insertions(+), 7 deletions(-)
 >>
 >> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
->> index efce4b3..76cc81b 100644
+>> index 76cc81b..f086452 100644
 >> --- a/hw/virtio/virtio.c
 >> +++ b/hw/virtio/virtio.c
->> @@ -322,6 +322,10 @@ static int virtio_queue_empty_rcu(VirtQueue *vq)
->>           return 0;
->>       }
->>
->> +    if (unlikely(!vq->vring.avail)) {
+>> @@ -190,6 +190,10 @@ static inline uint16_t vring_avail_flags(VirtQueu=
+e *vq)
+>>   {
+>>       VRingMemoryRegionCaches *caches =3D atomic_rcu_read(&vq->vring.c=
+aches);
+>>       hwaddr pa =3D offsetof(VRingAvail, flags);
+>> +    if (unlikely(!caches)) {
+>> +        virtio_error(vq->vdev, "Cannot map avail flags");
 >> +        return 0;
-> Shouldn't that rather return !0 (denoting a non-existing queue as
-> empty)?
+> I'm still not 100% convinced of those checks; but they don't do any
+> harm.
 
-Yes.
+Right, consider we've already had patch 1, I think it should be fine to=20
+use assert here.
 
 >
 >> +    }
->> +
->>       return vring_avail_idx(vq) =3D=3D vq->last_avail_idx;
+>>       return virtio_lduw_phys_cached(vq->vdev, &caches->avail, pa);
 >>   }
 >>
->> @@ -333,6 +337,10 @@ int virtio_queue_empty(VirtQueue *vq)
->>           return 0;
->>       }
->>
->> +    if (unlikely(!vq->vring.avail)) {
->> +        return 0;
-> Likewise.
+> (...)
 >
->> +    }
+>> +static void virtio_virtqueue_reset_region_cache(struct VirtQueue *vq)
+>> +{
+>> +    VRingMemoryRegionCaches *caches;
 >> +
->>       rcu_read_lock();
->>       empty =3D vring_avail_idx(vq) =3D=3D vq->last_avail_idx;
->>       rcu_read_unlock();
->> @@ -431,6 +439,10 @@ void virtqueue_fill(VirtQueue *vq, const VirtQueu=
-eElement *elem,
->>           return;
->>       }
->>
->> +    if (unlikely(!vq->vring.used)) {
->> +        return;
->> +    }
->> +
->>       idx =3D (idx + vq->used_idx) % vq->vring.num;
->>
->>       uelem.id =3D elem->index;
->> @@ -448,6 +460,10 @@ void virtqueue_flush(VirtQueue *vq, unsigned int =
-count)
->>           return;
->>       }
->>
->> +    if (unlikely(!vq->vring.used)) {
->> +        return;
->> +    }
->> +
->>       /* Make sure buffer is written before we update index. */
->>       smp_wmb();
->>       trace_virtqueue_flush(vq, count);
->> @@ -546,6 +562,11 @@ void virtqueue_get_avail_bytes(VirtQueue *vq, uns=
-igned int *in_bytes,
->>       int64_t len =3D 0;
->>       int rc;
->>
->> +    if (unlikely(!vq->vring.desc)) {
->> +        *in_bytes =3D *out_bytes =3D 0;
-> I think you need to check for in_bytes and out_bytes being !NULL first.
+>> +    caches =3D atomic_read(&vq->vring.caches);
+>> +    atomic_set(&vq->vring.caches, NULL);
+> Needs atomic_rcu_set(), I think.
 
-Right, will fix this in v2.
+Any atomic write should be fine here, but I agree atomic_rcu_set() is=20
+better. Will use it in next version.
 
 Thanks
 
 >
->> +        return;
+>> +    if (caches) {
+>> +        call_rcu(caches, virtio_free_region_cache, rcu);
 >> +    }
+>> +}
 >> +
->>       rcu_read_lock();
->>       idx =3D vq->last_avail_idx;
->>       total_bufs =3D in_total =3D out_total =3D 0;
+>>   void virtio_reset(void *opaque)
+>>   {
+>>       VirtIODevice *vdev =3D opaque;
 >
