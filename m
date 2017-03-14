@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37499)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cnlMs-0004na-L3
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:15:59 -0400
+	(envelope-from <kwolf@redhat.com>) id 1cnlOM-0000TX-Hr
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:17:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cnlMn-0003Ig-Ow
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:15:58 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:52430)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cnlMn-0003Ga-Dp
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:15:53 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20170307155054.5833-1-alex.bennee@linaro.org>
-	<001801d29bf5$dcba37d0$962ea770$@ru> <8760jdqpv2.fsf@linaro.org>
-In-Reply-To: <8760jdqpv2.fsf@linaro.org>
-Date: Tue, 14 Mar 2017 15:15:51 +0300
-Message-ID: <000101d29cbc$b8df1ca0$2a9d55e0$@ru>
+	(envelope-from <kwolf@redhat.com>) id 1cnlOL-0003aF-J4
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:17:30 -0400
+Date: Tue, 14 Mar 2017 13:17:20 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170314121720.GG3952@noname.str.redhat.com>
+References: <1489492012-8002-1-git-send-email-xiecl.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH v3 00/11] MTTCG fix-ups for 2.9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1489492012-8002-1-git-send-email-xiecl.fnst@cn.fujitsu.com>
+Subject: Re: [Qemu-devel] [PATCH V1] replication: clarify permissions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +22,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>
-Cc: peter.maydell@linaro.org, rth@twiddle.net, pbonzini@redhat.com, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com
+To: Changlong Xie <xiecl.fnst@cn.fujitsu.com>
+Cc: qemu devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Wen Congyang <wencongyang2@huawei.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 
-> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
-> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
-> >> From: mttcg-request@listserver.greensocs.com [mailto:mttcg-
-> request@listserver.greensocs.com]
-> >>
-> >> The next thing on my list it to look at the icount problems and =
-review
-> >> Paolo's fixes for it. However those fixes should go in a separate
-> >> series and I assume via Paolo's tree.
-> >
-> > Do you mean those problems that completely broke icount?
->=20
-> Completely broke is a bit strong. Certainly I tested icount on my
-> patches but I missed the pathological failure mode that led to the
-> interaction between the BQL lock breaking patch and running a real
-> guest. It didn't break icount so much as slow down guests so much they
-> never got round to finishing their IRQ handling.
+Am 14.03.2017 um 12:46 hat Changlong Xie geschrieben:
+> Even if hidden_disk, secondary_disk are backing files, they all need
+> write permissions in replication scenario. Otherwise we will encouter
+> below exceptions on secondary side during adding nbd server:
+> 
+> {'execute': 'nbd-server-add', 'arguments': {'device': 'colo-disk', 'writable': true } }
+> {"error": {"class": "GenericError", "desc": "Conflicts with use by hidden-qcow2-driver as 'backing', which does not allow 'write' on sec-qcow2-driver-for-nbd"}}
+> 
+> CC: Zhang Hailiang <zhang.zhanghailiang@huawei.com>
+> CC: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+> CC: Wen Congyang <wencongyang2@huawei.com>
+> Signed-off-by: Changlong Xie <xiecl.fnst@cn.fujitsu.com>
 
-That might look as slowing down in regular icount mode.
-But it becomes non-deterministic in record/replay mode.
-Therefore none of the recorded scenarios may be replayed.
+Thanks, applied to the block branch.
 
-I tried the simplest command lines:
-
-qemu-system-i386.exe -icount shift=3D7,rr=3Drecord,rrfile=3Dreplay.bin =
--net none=20
-
-qemu-system-i386.exe -icount shift=3D7,rr=3Dreplay,rrfile=3Dreplay.bin =
--net none
-
-First one was used to record execution until BIOS will print its startup =
-info.
-The second one is for replay, but it can replay about 200000 =
-instructions
-until the problems with icount manifest itself - the execution does not =
-proceed.
-
-> That certainly seems to be fixed by Paolo's patches.
->=20
-> > Are you going to fix it?
->=20
-> Yes. It is certainly not intentional to regress icount and it needs to
-> be fixed before we release 2.9.
->=20
-> If you can point me towards the record/replay test cases I'll make =
-sure
-> I run them on the updated series.
-
-
-Pavel Dovgalyuk
+Kevin
