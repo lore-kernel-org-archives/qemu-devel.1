@@ -1,16 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57269)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xiecl.fnst@cn.fujitsu.com>) id 1cnksN-0008LB-8o
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:44:28 -0400
+	(envelope-from <berrange@redhat.com>) id 1cnkt6-0000O2-3Z
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:45:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xiecl.fnst@cn.fujitsu.com>) id 1cnksM-0006u0-E3
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:44:27 -0400
-From: Changlong Xie <xiecl.fnst@cn.fujitsu.com>
-Date: Tue, 14 Mar 2017 19:46:52 +0800
-Message-ID: <1489492012-8002-1-git-send-email-xiecl.fnst@cn.fujitsu.com>
+	(envelope-from <berrange@redhat.com>) id 1cnkt2-00079m-Ux
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:45:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58694)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cnkt2-00079R-PV
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:45:08 -0400
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CE52F8123A
+	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 11:45:08 +0000 (UTC)
+Date: Tue, 14 Mar 2017 11:45:04 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170314114504.GI2652@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170313124434.1043-1-quintela@redhat.com>
+	<20170314102142.GC2445@work-vm> <20170314102652.GC2652@redhat.com>
+	<20170314114019.GG2445@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH V1] replication: clarify permissions
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170314114019.GG2445@work-vm>
+Subject: Re: [Qemu-devel] [PATCH 00/16] Multifd v4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,55 +35,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: Wen Congyang <wencongyang2@huawei.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Changlong Xie <xiecl.fnst@cn.fujitsu.com>, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
 
-Even if hidden_disk, secondary_disk are backing files, they all need
-write permissions in replication scenario. Otherwise we will encouter
-below exceptions on secondary side during adding nbd server:
+On Tue, Mar 14, 2017 at 11:40:20AM +0000, Dr. David Alan Gilbert wrote:
+> * Daniel P. Berrange (berrange@redhat.com) wrote:
+> > On Tue, Mar 14, 2017 at 10:21:43AM +0000, Dr. David Alan Gilbert wrote:
+> > > * Juan Quintela (quintela@redhat.com) wrote:
+> > > > Hi
+> > > > 
+> > > > This is the 4th version of multifd. Changes:
+> > > > - XBZRLE don't need to be checked for
+> > > > - Documentation and defaults are consistent
+> > > > - split socketArgs
+> > > > - use iovec instead of creating something similar.
+> > > > - We use now the exported size of target page (another HACK removal)
+> > > > - created qio_chanel_{wirtev,readv}_all functions.  the _full() name
+> > > >   was already taken.
+> > > >   What they do is the same that the without _all() function, but if it
+> > > >   returns due to blocking it redo the call.
+> > > > - it is checkpatch.pl clean now.
+> > > > 
+> > > > Please comment, Juan.
+> > > 
+> > > High level things,
+> > >   a) I think you probably need to do some bandwidth measurements to show
+> > >     that multifd is managing to have some benefit - it would be good
+> > >     for the cover letter.
+> > 
+> > multi-fd will certainly benefit encrypted migration, since we'll be able
+> > to burn multiple CPUs for AES instead of bottlenecking on one CPU, and
+> > thus able to take greater advantage of networks with > 1-GigE bandwidth.
+> 
+> Yes, that's one I really want to see.  It might be odd using lots of fd's
+> just to do that, but probably the easiest way.
 
-{'execute': 'nbd-server-add', 'arguments': {'device': 'colo-disk', 'writable': true } }
-{"error": {"class": "GenericError", "desc": "Conflicts with use by hidden-qcow2-driver as 'backing', which does not allow 'write' on sec-qcow2-driver-for-nbd"}}
+In theory you could have multiple threads doing encryption, all writing to
+a single FD, but the AFAICT the GNUTLS library doesn't make this possible
+as it encapsulates both encryption + i/o behind a single API call. Even if
+we called the same API call from multiple threads, I'm pretty sure it will
+serialize the encryption with internal locking, so you would not gain
+anything. So using multiple distinct TLS connections is the only viable
+option.
 
-CC: Zhang Hailiang <zhang.zhanghailiang@huawei.com>
-CC: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-CC: Wen Congyang <wencongyang2@huawei.com>
-Signed-off-by: Changlong Xie <xiecl.fnst@cn.fujitsu.com>
----
- block/replication.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
-
-diff --git a/block/replication.c b/block/replication.c
-index 22f170f..bf3c395 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -155,6 +155,18 @@ static void replication_close(BlockDriverState *bs)
-     replication_remove(s->rs);
- }
- 
-+static void replication_child_perm(BlockDriverState *bs, BdrvChild *c,
-+                                   const BdrvChildRole *role,
-+                                   uint64_t perm, uint64_t shared,
-+                                   uint64_t *nperm, uint64_t *nshared)
-+{
-+    *nperm = *nshared = BLK_PERM_CONSISTENT_READ \
-+                        | BLK_PERM_WRITE \
-+                        | BLK_PERM_WRITE_UNCHANGED;
-+
-+    return;
-+}
-+
- static int64_t replication_getlength(BlockDriverState *bs)
- {
-     return bdrv_getlength(bs->file->bs);
-@@ -660,7 +672,7 @@ BlockDriver bdrv_replication = {
- 
-     .bdrv_open                  = replication_open,
-     .bdrv_close                 = replication_close,
--    .bdrv_child_perm            = bdrv_filter_default_perms,
-+    .bdrv_child_perm            = replication_child_perm,
- 
-     .bdrv_getlength             = replication_getlength,
-     .bdrv_co_readv              = replication_co_readv,
+Regards,
+Daniel
 -- 
-1.9.3
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
