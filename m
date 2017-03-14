@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34707)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cnilx-0007y4-5M
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 05:29:42 -0400
+	(envelope-from <armbru@redhat.com>) id 1cnipa-0001ne-U1
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 05:33:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cnilw-0004Tb-5F
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 05:29:41 -0400
-Date: Tue, 14 Mar 2017 10:29:31 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170314092931.GB3952@noname.str.redhat.com>
-References: <1489416908-3771-1-git-send-email-kwolf@redhat.com>
-	<CAFEAcA9JoOLtUJAVhXijjDVZ4iTH_kYc3r03zmq7R58BesO1Jg@mail.gmail.com>
+	(envelope-from <armbru@redhat.com>) id 1cnipW-0006X6-Vq
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 05:33:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41082)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cnipW-0006Wo-Pz
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 05:33:22 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <87tw6y8bs8.fsf@secure.mitica>
+	<CAFEAcA978SJemCfYJPa8jwtuhhi6JGh9pEDGYNJ1npJA3nvEQA@mail.gmail.com>
+	<20170314081312.GB13140@stefanha-x1.localdomain>
+	<CAFEAcA9F2BPexRieaEhu+UpJxoOdEfw8eggW8b2SjuoMMTNgog@mail.gmail.com>
+Date: Tue, 14 Mar 2017 10:33:19 +0100
+In-Reply-To: <CAFEAcA9F2BPexRieaEhu+UpJxoOdEfw8eggW8b2SjuoMMTNgog@mail.gmail.com>
+	(Peter Maydell's message of "Tue, 14 Mar 2017 09:37:24 +0100")
+Message-ID: <87efy0mcdc.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9JoOLtUJAVhXijjDVZ4iTH_kYc3r03zmq7R58BesO1Jg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 00/12] Block layer fixes for 2.9.0-rc1
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] KVM call for 2017-03-14
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,29 +30,25 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developer <qemu-devel@nongnu.org>, KVM devel mailing list <kvm@vger.kernel.org>, Juan Quintela <quintela@redhat.com>
 
-Am 13.03.2017 um 19:05 hat Peter Maydell geschrieben:
-> On 13 March 2017 at 15:54, Kevin Wolf <kwolf@redhat.com> wrote:
-> > The following changes since commit dd4d2578215cd380f40a38028a9904e15b135ef3:
-> >
-> >   Merge remote-tracking branch 'remotes/kraxel/tags/pull-fixes-20170309-1' into staging (2017-03-09 13:16:05 +0000)
-> >
-> > are available in the git repository at:
-> >
-> >
-> >   git://repo.or.cz/qemu/kevin.git tags/for-upstream
-> >
-> > for you to fetch changes up to dcbf37ce41a52698550f8f8b2f14b5e6fee22d2d:
-> >
-> >   commit: Implement .bdrv_refresh_filename (2017-03-13 12:49:33 +0100)
-> >
-> > ----------------------------------------------------------------
-> > Block layer fixes for 2.9.0-rc1
-> 
-> We haven't had rc0 yet :-)
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-I was assuming that we'd just skip -rc0 then. Are we instead shifting
-the release by a week or two?
+> On 14 March 2017 at 09:13, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>> On Mon, Mar 13, 2017 at 11:02:01AM +0100, Peter Maydell wrote:
+>> The minimum requirements for the new language:
+>> 1. Does it support the host operating systems that QEMU runs on?
+>> 2. Does it support the host architectures that QEMU runs on?
+>
+> Speaking of this, I was thinking that we should introduce
+> a rule that for any host OS/arch we support we must have
+> a build machine so we can at least do a compile test.
+> For instance if you believe configure we support Solaris
+> and AIX, but I bet they're bit-rotting. The ia64 backend
+> has to be a strong candidate for being dumped too.
+> Demanding "system we can test on or we drop support"
+> would let us more clearly see what we're actually running
+> on and avoid unnecessarily ruling things out because they
+> don't support Itanium or AIX...
 
-Kevin
+Yes, please.
