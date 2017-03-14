@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37217)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1cnhLD-0002Y9-0I
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 03:57:59 -0400
+	(envelope-from <jasowang@redhat.com>) id 1cnhPk-00045c-Lt
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:02:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1cnhLC-0003uK-BH
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 03:57:59 -0400
-From: jemmy858585@gmail.com
-Date: Tue, 14 Mar 2017 15:57:23 +0800
-Message-Id: <1489478243-10366-1-git-send-email-jemmy858585@gmail.com>
-Subject: [Qemu-devel] [PATCH] migration/block: Avoid involve into blk_drain
- too frequently
+	(envelope-from <jasowang@redhat.com>) id 1cnhPj-0006km-Or
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:02:40 -0400
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 14 Mar 2017 16:02:28 +0800
+Message-Id: <1489478550-19431-2-git-send-email-jasowang@redhat.com>
+In-Reply-To: <1489478550-19431-1-git-send-email-jasowang@redhat.com>
+References: <1489478550-19431-1-git-send-email-jasowang@redhat.com>
+Subject: [Qemu-devel] [PULL 1/3] e1000e: correctly tear down MSI-X memory
+ regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,30 +20,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: stefanha@redhat.com, famz@redhat.com, quintela@redhat.com, dgilbert@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Lidong Chen <jemmy858585@gmail.com>
+To: peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-stable@nongnu.org
 
-From: Lidong Chen <jemmy858585@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-Increase bmds->cur_dirty after submit io, so reduce the frequency involve into blk_drain, and improve the performance obviously when block migration.
+MSI-X has been disabled by the time the e1000e device is unrealized, hence
+msix_uninit is never called.  This causes the object to be leaked, which
+shows up as a RAMBlock with empty name when attempting migration.
 
-Signed-off-by: Lidong Chen <jemmy858585@gmail.com>
+Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Tested-by: Laurent Vivier <lvivier@redhat.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- migration/block.c | 2 ++
- 1 file changed, 2 insertions(+)
+ hw/net/e1000e.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/migration/block.c b/migration/block.c
-index 6741228..f059cca 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -576,6 +576,8 @@ static int mig_save_device_dirty(QEMUFile *f, BlkMigDevState *bmds,
-             }
- 
-             bdrv_reset_dirty_bitmap(bmds->dirty_bitmap, sector, nr_sectors);
-+            sector += nr_sectors;
-+            bmds->cur_dirty = sector;
-             break;
-         }
-         sector += BDRV_SECTORS_PER_DIRTY_CHUNK;
+diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
+index b0f429b..6e23493 100644
+--- a/hw/net/e1000e.c
++++ b/hw/net/e1000e.c
+@@ -306,7 +306,7 @@ e1000e_init_msix(E1000EState *s)
+ static void
+ e1000e_cleanup_msix(E1000EState *s)
+ {
+-    if (msix_enabled(PCI_DEVICE(s))) {
++    if (msix_present(PCI_DEVICE(s))) {
+         e1000e_unuse_msix_vectors(s, E1000E_MSIX_VEC_NUM);
+         msix_uninit(PCI_DEVICE(s), &s->msix, &s->msix);
+     }
 -- 
-1.8.3.1
+2.7.4
