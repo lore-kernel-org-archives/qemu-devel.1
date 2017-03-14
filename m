@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cns85-0005m7-MM
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 15:29:11 -0400
+	(envelope-from <mst@redhat.com>) id 1cns91-0006Gv-Jk
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 15:30:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cns82-0001d3-Hv
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 15:29:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48154)
+	(envelope-from <mst@redhat.com>) id 1cns8y-0002Ew-DY
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 15:30:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34160)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cns82-0001cO-8i
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 15:29:06 -0400
-References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
-	<1489385927-6735-27-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c75316de-3aa7-c6d5-a626-fd407a31789c@redhat.com>
-Date: Tue, 14 Mar 2017 14:29:01 -0500
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cns8y-0002Dm-4f
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 15:30:04 -0400
+Date: Tue, 14 Mar 2017 21:29:59 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170314192959.GA8685@redhat.com>
+References: <1489298291-25154-1-git-send-email-phil@philjordan.eu>
+	<148929878187.33.7584245811453618697@6c512846dbc7>
 MIME-Version: 1.0
-In-Reply-To: <1489385927-6735-27-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="7oTWORJvu9itWOkct0eAtBIECavmodwcL"
-Subject: Re: [Qemu-devel] [PATCH for-2.9 26/47] qapi2texi: Generate
- reference to base type members
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <148929878187.33.7584245811453618697@6c512846dbc7>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] hw/i386: Update FADT to Revision 3
+ (ACPI 2.0)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,116 +29,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
+Cc: phil@philjordan.eu, famz@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, lersek@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7oTWORJvu9itWOkct0eAtBIECavmodwcL
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
-Message-ID: <c75316de-3aa7-c6d5-a626-fd407a31789c@redhat.com>
-Subject: Re: [PATCH for-2.9 26/47] qapi2texi: Generate reference to base type
- members
-References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
- <1489385927-6735-27-git-send-email-armbru@redhat.com>
-In-Reply-To: <1489385927-6735-27-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Sat, Mar 11, 2017 at 10:06:22PM -0800, no-reply@patchew.org wrote:
+> Hi,
+>=20
+> This series failed automatic build test. Please find the testing comman=
+ds and
+> their output below. If you have docker installed, you can probably repr=
+oduce it
+> locally.
+>=20
+> Type: series
+> Subject: [Qemu-devel] [PATCH v2 0/2] hw/i386: Update FADT to Revision 3=
+ (ACPI 2.0)
+> Message-id: 1489298291-25154-1-git-send-email-phil@philjordan.eu
+>   LINK    tests/check-qlist
+> /tmp/qemu-test/src/tests/bios-tables-test.c: In function =E2=80=98test_=
+acpi_fadt_table=E2=80=99:
+> /tmp/qemu-test/src/tests/bios-tables-test.c:171: error: =E2=80=98AcpiFa=
+dtDescriptorRev3=E2=80=99 has no member named =E2=80=98reserved4=E2=80=99
+> /tmp/qemu-test/src/tests/bios-tables-test.c:171: error: =E2=80=98AcpiFa=
+dtDescriptorRev3=E2=80=99 has no member named =E2=80=98reserved4=E2=80=99
+> /tmp/qemu-test/src/tests/bios-tables-test.c:171: error: =E2=80=98AcpiFa=
+dtDescriptorRev3=E2=80=99 has no member named =E2=80=98reserved4=E2=80=99
+> /tmp/qemu-test/src/tests/bios-tables-test.c:171: error: =E2=80=98AcpiFa=
+dtDescriptorRev3=E2=80=99 has no member named =E2=80=98reserved4=E2=80=99
+> /tmp/qemu-test/src/tests/bios-tables-test.c:171: error: =E2=80=98AcpiFa=
+dtDescriptorRev3=E2=80=99 has no member named =E2=80=98reserved4=E2=80=99
+> /tmp/qemu-test/src/tests/bios-tables-test.c:171: error: =E2=80=98AcpiFa=
+dtDescriptorRev3=E2=80=99 has no member named =E2=80=98reserved4=E2=80=99
+> /tmp/qemu-test/src/tests/bios-tables-test.c:172: error: =E2=80=98AcpiFa=
+dtDescriptorRev3=E2=80=99 has no member named =E2=80=98reserved4a=E2=80=99
+> /tmp/qemu-test/src/tests/bios-tables-test.c:172: error: =E2=80=98AcpiFa=
+dtDescriptorRev3=E2=80=99 has no member named =E2=80=98reserved4a=E2=80=99
+> /tmp/qemu-test/src/tests/bios-tables-test.c:172: error: =E2=80=98AcpiFa=
+dtDescriptorRev3=E2=80=99 has no member named =E2=80=98reserved4a=E2=80=99
+> /tmp/qemu-test/src/tests/bios-tables-test.c:172: error: =E2=80=98AcpiFa=
+dtDescriptorRev3=E2=80=99 has no member named =E2=80=98reserved4a=E2=80=99
+> /tmp/qemu-test/src/tests/bios-tables-test.c:172: error: =E2=80=98AcpiFa=
+dtDescriptorRev3=E2=80=99 has no member named =E2=80=98reserved4a=E2=80=99
+> /tmp/qemu-test/src/tests/bios-tables-test.c:172: error: =E2=80=98AcpiFa=
+dtDescriptorRev3=E2=80=99 has no member named =E2=80=98reserved4a=E2=80=99
+> /tmp/qemu-test/src/tests/bios-tables-test.c:173: error: =E2=80=98AcpiFa=
+dtDescriptorRev3=E2=80=99 has no member named =E2=80=98reserved4b=E2=80=99
+> /tmp/qemu-test/src/tests/bios-tables-test.c:173: error: =E2=80=98AcpiFa=
+dtDescriptorRev3=E2=80=99 has no member named =E2=80=98reserved4b=E2=80=99
+> /tmp/qemu-test/src/tests/bios-tables-test.c:173: error: =E2=80=98AcpiFa=
+dtDescriptorRev3=E2=80=99 has no member named =E2=80=98reserved4b=E2=80=99
+> /tmp/qemu-test/src/tests/bios-tables-test.c:173: error: =E2=80=98AcpiFa=
+dtDescriptorRev3=E2=80=99 has no member named =E2=80=98reserved4b=E2=80=99
+> /tmp/qemu-test/src/tests/bios-tables-test.c:173: error: =E2=80=98AcpiFa=
+dtDescriptorRev3=E2=80=99 has no member named =E2=80=98reserved4b=E2=80=99
+> /tmp/qemu-test/src/tests/bios-tables-test.c:173: error: =E2=80=98AcpiFa=
+dtDescriptorRev3=E2=80=99 has no member named =E2=80=98reserved4b=E2=80=99
+> make: *** [tests/bios-tables-test.o] Error 1
+> make: *** Waiting for unfinished jobs....
+> make: *** wait: No child processes.  Stop.
+> make[1]: *** [docker-run] Error 2
+> make[1]: Leaving directory `/var/tmp/patchew-tester-tmp-c8855z5b/src'
+> make: *** [docker-run-test-quick@centos6] Error 2
+> =3D=3D=3D OUTPUT END =3D=3D=3D
 
-On 03/13/2017 01:18 AM, Markus Armbruster wrote:
-> The generated documentation doesn't mention object type members
-> inherited from a base type.  Fix that.
->=20
-> Example change (qemu-qmp-ref.txt):
->=20
->   -- Struct: VncServerInfo
->=20
->       The network connection information for server
->=20
->       Members:
->       'auth' (optional)
-> 	   authentication method used for the plain (non-websocket) VNC
-> 	   server
-> +     The members of 'VncBasicInfo'
->=20
-
-Again, will be more useful later in the series when you add hyperlinking.=
+Hi Phil, did you run make check? Please make sure it isn't
+broken by any of your patches.
 
 
->       Since: 2.1
+> Test command exited with code: 2
 >=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>=20
 > ---
->  scripts/qapi2texi.py | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
->=20
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-> diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-> index 993b652..7083d0c 100755
-> --- a/scripts/qapi2texi.py
-> +++ b/scripts/qapi2texi.py
-> @@ -143,7 +143,7 @@ def texi_member(member):
->          ' (optional)' if member.optional else '')
-> =20
-> =20
-> -def texi_members(doc, what, member_func):
-> +def texi_members(doc, what, base, member_func):
->      """Format the table of members"""
->      items =3D ''
->      for section in doc.args.itervalues():
-> @@ -152,6 +152,8 @@ def texi_members(doc, what, member_func):
->          else:
->              desc =3D 'Not documented'
->          items +=3D member_func(section.member) + texi_format(desc) + '=
-\n'
-> +    if base:
-> +        items +=3D '@item The members of @code{%s}\n' % base.doc_type(=
-)
-
-Will this still work for implicit bases?
-
-> =20
-> @@ -205,11 +207,13 @@ class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisi=
-tor):
->              typ =3D 'Flat Union'
->          else:
->              typ =3D 'Simple Union'
-> +        if base and base.is_implicit():
-> +            base =3D None
-
-Hmm - you just ignore those, such as the anonymous base in CpuInfo.  On
-the other hand, CpuInfo documents its base fields explicitly.  Are we at
-risk of double-documenting a base member, both explicitly and via its
-named base type?
-
-At any rate, this patch is an incremental improvement, so:
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---7oTWORJvu9itWOkct0eAtBIECavmodwcL
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYyER9AAoJEKeha0olJ0Nq5NoIAJLzofBDjDjG/letK3Ni++RB
-MFpREkDZxKme4oT6ciWKyebfgG5PEh5ZVwzyn3h3q/ox+14sFKAORVg9WH95GGAe
-n0qxY+gWbd45a9+eZf4HDsfwjRKFsgjWBAyu9tglzR6D9iac2JfkKYs/1f9IuOGL
-Sv3NT571CDD3O0ibb4FBOsZ90k0oicjpa0TlLEJb4V88KcqwljT+rweJt88iLmg2
-mFCJDFzMtOUmHjjI4hUFr2SiSncO6nB/+n7AuWXPOlJazznDhEKqbsMsZof4erk3
-dFeeVaL0wNHCNRasUdUayVF48vPBc6dk29UiCAEmYd6jvi6bmYh/Y6JkEjNNXn4=
-=JchW
------END PGP SIGNATURE-----
-
---7oTWORJvu9itWOkct0eAtBIECavmodwcL--
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@freelists.org
