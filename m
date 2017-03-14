@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cnoAy-0001EH-6q
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:15:53 -0400
+	(envelope-from <armbru@redhat.com>) id 1cnoBT-0001ai-Jy
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:16:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cnoAx-0007Lw-A7
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:15:52 -0400
-References: <1489478243-10366-1-git-send-email-jemmy858585@gmail.com>
-	<420d9095-bde2-6573-e883-ab6b57d4a860@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <12d49a77-0a1d-6488-5652-2c09643a7b05@redhat.com>
-Date: Tue, 14 Mar 2017 10:15:36 -0500
+	(envelope-from <armbru@redhat.com>) id 1cnoBP-0007y4-L7
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:16:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57452)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cnoBP-0007xd-Ca
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:16:19 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
+	<1489385927-6735-26-git-send-email-armbru@redhat.com>
+	<CAJ+F1CK+i0HTNU83ftuc9zBcNFm2NSxecajt97QvDZGfj9on8w@mail.gmail.com>
+Date: Tue, 14 Mar 2017 16:16:16 +0100
+In-Reply-To: <CAJ+F1CK+i0HTNU83ftuc9zBcNFm2NSxecajt97QvDZGfj9on8w@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 14 Mar 2017
+	12:42:40 +0000")
+Message-ID: <87shmfyjlr.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <420d9095-bde2-6573-e883-ab6b57d4a860@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="hd6D4XoQEmlQNxHJ7jDJcAHbH07pf4hLO"
-Subject: Re: [Qemu-devel] [PATCH] migration/block: Avoid involve into
- blk_drain too frequently
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.9 25/47] qapi2texi: Include member
+ type in generated documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,62 +31,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jemmy858585@gmail.com, stefanha@redhat.com, famz@redhat.com, quintela@redhat.com, dgilbert@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---hd6D4XoQEmlQNxHJ7jDJcAHbH07pf4hLO
-From: Eric Blake <eblake@redhat.com>
-To: jemmy858585@gmail.com, stefanha@redhat.com, famz@redhat.com,
- quintela@redhat.com, dgilbert@redhat.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
-Message-ID: <12d49a77-0a1d-6488-5652-2c09643a7b05@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] migration/block: Avoid involve into
- blk_drain too frequently
-References: <1489478243-10366-1-git-send-email-jemmy858585@gmail.com>
- <420d9095-bde2-6573-e883-ab6b57d4a860@redhat.com>
-In-Reply-To: <420d9095-bde2-6573-e883-ab6b57d4a860@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
-On 03/14/2017 10:12 AM, Eric Blake wrote:
-> On 03/14/2017 02:57 AM, jemmy858585@gmail.com wrote:
->> From: Lidong Chen <jemmy858585@gmail.com>
+> Hi
+>
+> On Mon, Mar 13, 2017 at 10:31 AM Markus Armbruster <armbru@redhat.com>
+> wrote:
+>
+>> The recent merge of docs/qmp-commands.txt and docs/qmp-events.txt into
+>> the schema lost type information.  Fix this documentation regression.
 >>
->> Increase bmds->cur_dirty after submit io, so reduce the frequency invo=
-lve into blk_drain, and improve the performance obviously when block migr=
-ation.
->=20
-> Long line; please wrap your commit messages, preferably around 70 bytes=
+>> Example change (qemu-qmp-ref.txt):
+>>
+>>   -- Struct: InputKeyEvent
+>>
+>>       Keyboard input event.
+>>
+>>       Members:
+>> -     'button'
+>> +     'button: InputButton'
+>>            Which button this event is for.
+>> -     'down'
+>> +     'down: boolean'
+>>            True for key-down and false for key-up events.
+>>
+>>       Since: 2.0
+>>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  scripts/qapi.py      | 14 ++++++++++++++
+>>  scripts/qapi2texi.py |  8 ++++++--
+>>  2 files changed, 20 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/scripts/qapi.py b/scripts/qapi.py
+>> index 9430493..b82a2a6 100644
+>> --- a/scripts/qapi.py
+>> +++ b/scripts/qapi.py
+>> @@ -1101,6 +1101,11 @@ class QAPISchemaType(QAPISchemaEntity):
+>>          }
+>>          return json2qtype.get(self.json_type())
+>>
+>> +    def doc_type(self):
+>> +        if self.is_implicit():
+>> +            return None
+>> +        return self.name
+>> +
+>>
+>>  class QAPISchemaBuiltinType(QAPISchemaType):
+>>      def __init__(self, name, json_type, c_type):
+>> @@ -1125,6 +1130,9 @@ class QAPISchemaBuiltinType(QAPISchemaType):
+>>      def json_type(self):
+>>          return self._json_type_name
+>>
+>> +    def doc_type(self):
+>> +        return self.json_type()
+>> +
+>>      def visit(self, visitor):
+>>          visitor.visit_builtin_type(self.name, self.info,
+>> self.json_type())
+>>
+>> @@ -1184,6 +1192,12 @@ class QAPISchemaArrayType(QAPISchemaType):
+>>      def json_type(self):
+>>          return 'array'
+>>
+>> +    def doc_type(self):
+>> +        elt_doc_type =3D self.element_type.doc_type()
+>> +        if not elt_doc_type:
+>> +            return None
+>>
+>
+> In which case is this expected to happen? place an assert here instead?
 
-> since 'git log' displays them indented, and it is still nice to read
-> them in an 80-column window.
+I think assert should work now, the argument is a bit longwinded, and it
+won't let us simplify code.
 
-Also, in the subject:
+First the argument.
 
-s/involve into/invoking/
+T.doc_type() returns None for a non-array type T when T.is_implicit()
+and T isn't a built-in type, because:
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+* QAPISchemaType.doc_type() returns None when self.is_implicit(), but
 
+* QAPISchemaBuiltinType().doc_type() overrides, and never returns None.
 
---hd6D4XoQEmlQNxHJ7jDJcAHbH07pf4hLO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+T.is_implicit() is true for the following non-array, non-builtin T:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+* the implicitly defined enumeration type of a simple union's tag
 
-iQEcBAEBCAAGBQJYyAkYAAoJEKeha0olJ0NqRYsH+wcMPfzFSHrBE4COUOw62vCv
-uSyFIrngw76UNtGU/S6+NLarqPNGrn0rCA2VFmGi6KYOx2ZYm72sI7JaWHnMzgKb
-OBMDfij0BEXbqKyAIxed0jzVZeqAnyeOY94lI8+4S2zF15C9KpZKG7an9gC19Y+y
-vYTca+Khn4kYQsLfaDS9mEa47VMkYknVI7n4vZyknMhaBr1Pz1d1blU1qChvk9un
-ca4tkCv+v5zhUWqEAgxOTKdUKEUcLP71jjJEI3Piisaf3OWJEpQJ1499nbDCwTC2
-9h1t4CDAQobxsPMsgQ9xaDPKR4GO7oEoirKeJjZp7TtzLRVrJypI9FinqWCN8oo=
-=0i+F
------END PGP SIGNATURE-----
+* the implicitly defined variant type of a simple union
 
---hd6D4XoQEmlQNxHJ7jDJcAHbH07pf4hLO--
+* an implicitly defined base type of a union
+
+* an implicitly defined argument type of a command or event
+
+We can't actually make arrays of these.
+
+Now let's see whether we can use it to simplify code.
+
+There are four calls of .doc_type() besides the one shown above:
+
+* texi_member() calls it for types of
+
+  - the (common) members of object types (including command and event
+    arguments) and members of alternate types.  None happens for the
+    implicitly defined tag member of simple unions.  The easiest way to
+    cope with it is to cope with None for any member.
+
+  - the members of variant members of simple unions.  It doesn't bother
+    to handle None, because a member type can only be a built-in or
+    explictly defined type, or an array thereof.
+
+* texi_members() calls it and checks for None to help identify
+  undocumented members where we can do better than say "Not documented".
+
+* texi_members() calls it for the base type, except when it's implicitly
+  defined.  It doesn't bother to handle None, because it can only be an
+  explictly defined struct type.
+
+* texi_members() calls it for the types of variant members of flat
+  unions.  It doesn't bother to handle None, because a member type can
+  only be a built-in or explictly defined type.
+
+Adding the assertion makes no case of None go away.
+
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+Thanks!
