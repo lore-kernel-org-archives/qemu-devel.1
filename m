@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cnljV-0008Ho-UN
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:39:22 -0400
+	(envelope-from <eduardo.otubo@profitbricks.com>) id 1cnlmV-0001Ix-4Q
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:42:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cnljS-00082F-Ra
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:39:22 -0400
-Received: from [59.151.112.132] (port=20553 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cnljS-00081S-FG
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:39:18 -0400
-From: Chao Fan <fanc.fnst@cn.fujitsu.com>
-Date: Tue, 14 Mar 2017 20:38:41 +0800
-Message-ID: <20170314123841.2415-1-fanc.fnst@cn.fujitsu.com>
+	(envelope-from <eduardo.otubo@profitbricks.com>) id 1cnlmS-0000ub-0Q
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:42:27 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:34013)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <eduardo.otubo@profitbricks.com>)
+	id 1cnlmR-0000uJ-NV
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:42:23 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id l37so123284902wrc.1
+	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 05:42:23 -0700 (PDT)
+Date: Tue, 14 Mar 2017 13:42:20 +0100
+From: Eduardo Otubo <eduardo.otubo@profitbricks.com>
+Message-ID: <20170314124220.GC21475@vader>
+References: <20170314113209.12025-1-eduardo.otubo@profitbricks.com>
+	<20170314113209.12025-4-eduardo.otubo@profitbricks.com>
+	<e9b2bd2a-8409-7470-76bb-32f15fe6ce0e@redhat.com>
+	<20170314115253.GL2652@redhat.com>
+	<d8825eda-6613-71c9-9dd7-9239325e296b@redhat.com>
+	<20170314122455.GM2652@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] Add dirty-bytes-rate to output in 'info
- migrate'
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170314122455.GM2652@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/5] seccomp: add elevateprivileges
+ argument to command line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,73 +35,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eblake@redhat.com, quintela@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org, berrange@redhat.com
-Cc: caoj.fnst@cn.fujitsu.com, douly.fnst@cn.fujitsu.com, maozy.fnst@cn.fujitsu.com, Chao Fan <fanc.fnst@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, thuth@redhat.com, Andy Lutomirski <luto@amacapital.net>
 
-Because 'dirty-bytes-rate' is in 'bytes/s', so it's better for other
-tools to determine the cpu throttle value in different architecture.
+On Tue, Mar 14, 2017 at 12=24=55PM +0000, Daniel P. Berrange wrote:
+> On Tue, Mar 14, 2017 at 01:13:15PM +0100, Paolo Bonzini wrote:
+> > 
+> > 
+> > On 14/03/2017 12:52, Daniel P. Berrange wrote:
+> > >>>  DEF("sandbox", HAS_ARG, QEMU_OPTION_sandbox, \
+> > >>> -    "-sandbox on[,obsolete=allow]  Enable seccomp mode 2 system call filter (default 'off').\n" \
+> > >>> -    "                              obsolete: Allow obsolete system calls",
+> > >>> +    "-sandbox on[,obsolete=allow][,elevateprivileges=deny]\n" \
+> > >>> +    "                               Enable seccomp mode 2 system call filter (default 'off').\n" \
+> > >>> +    "                               obsolete: Allow obsolete system calls\n" \
+> > >>> +    "                               elevateprivileges: avoids Qemu process to elevate its privileges by blacklisting all set*uid|gid system calls",
+> > >> Why allow these by default?
+> > > The goal is that '-sandbox on' should not break *any* QEMU feature. It
+> > > needs to be a safe thing that people can unconditionally turn on without
+> > > thinking about it.
+> > 
+> > Sure, but what advantages would it provide if the default blacklist does
+> > not block anything meaningful?  At the very least, spawn=deny should
+> > default elevateprivileges to deny too.
+> 
+> Yep, having spawn=deny imply elevateprivileges=deny is reasonable IMHO.
+> 
+> > I think there should be a list (as small as possible) of features that
+> > are sacrificed by "-sandbox on".
+> 
+> That breaks the key goal that '-sandbox on' should never break a valid
+> QEMU configuration, no matter how obscure, and would thus continue to
+> discourage people from turning it on by default.
+> 
+> Yes, a bare '-sandbox on' is very loose, but think of it as just being
+> a building block. 90% of the time the user or mgmt app would want to
+> turn on extra flags to lock it down more meaningfully, by explicitly
+> blocking ability to use feature they know won't be needed. 
+> 
+> > > The QEMU bridge helper  requires setuid privs, hence
+> > > elevated privileges needs to be permitted by default.
+> > 
+> > QEMU itself should not be getting additional privileges, only the helper
+> > and in turn the helper or ifup scripts can be limited through MAC.  The
+> > issue is that seccomp persists across execve.
+> 
+> That's true.
+> 
+> > Currently, unprivileged users are only allowed to install seccomp
+> > filters if no_new_privs is set.  Would it make sense if seccomp filters
+> > without no_new_privs succeeded, except that the filter would not persist
+> > across execve of binaries with setuid, setgid or file capabilities?
+> > 
+> > Then the spawn option could be a tri-state with the choice of allow,
+> > deny and no_new_privs:
+> > 
+> > - elevateprivileges=allow,spawn=allow: legacy for old kernels
+> > - elevateprivileges=deny,spawn=allow: can run privileged helpers
+> > - elevateprivileges=deny,spawn=deny: cannot run helpers at all
+> > - elevateprivileges=deny,spawn=no_new_privs: can run unprivileged
+> > helpers only
+> 
+> That could work, but I think that syntax is making it uneccessarily
+> complex to understand. I don't like how it introduces a semantic
+> dependancy between the elevateprivileges & spawn flags i.e. the
+> interpretation of elevateprivileges=deny, varies according to what
+> you set for spawn= option.
+> 
+> I'd be more inclined to make elevateprivileges be a tri-state instead
+> e.g.
+> 
+>   elevateprivileges=allow|deny|children
+> 
 
-Signed-off-by: Chao Fan <fanc.fnst@cn.fujitsu.com>
-Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
----
- hmp.c                 | 6 +++++-
- migration/migration.c | 1 +
- qapi-schema.json      | 5 ++++-
- 3 files changed, 10 insertions(+), 2 deletions(-)
+Still weird but better than the combination of elevateprivileges and
+spawn. Perhaps this has a better semantics?
 
-diff --git a/hmp.c b/hmp.c
-index 261843f..c50d7aa 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -216,9 +216,13 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
-         monitor_printf(mon, "dirty sync count: %" PRIu64 "\n",
-                        info->ram->dirty_sync_count);
-         if (info->ram->dirty_pages_rate) {
--            monitor_printf(mon, "dirty pages rate: %" PRIu64 " pages\n",
-+            monitor_printf(mon, "dirty pages rate: %" PRIu64 " pages/s\n",
-                            info->ram->dirty_pages_rate);
-         }
-+        if (info->ram->dirty_bytes_rate) {
-+            monitor_printf(mon, "dirty bytes rate: %" PRIu64 " bytes/s\n",
-+                           info->ram->dirty_bytes_rate);
-+        }
-         if (info->ram->postcopy_requests) {
-             monitor_printf(mon, "postcopy request count: %" PRIu64 "\n",
-                            info->ram->postcopy_requests);
-diff --git a/migration/migration.c b/migration/migration.c
-index 3dab684..27f13c7 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -649,6 +649,7 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
-     if (s->state != MIGRATION_STATUS_COMPLETED) {
-         info->ram->remaining = ram_bytes_remaining();
-         info->ram->dirty_pages_rate = s->dirty_pages_rate;
-+        info->ram->dirty_bytes_rate = s->dirty_bytes_rate;
-     }
- }
- 
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 32b4a4b..0d5ec8e 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -575,6 +575,9 @@
- # @postcopy-requests: The number of page requests received from the destination
- #        (since 2.7)
- #
-+# @dirty-bytes-rate: how many bytes dirtied by second by the
-+#        guest (since 2.9)
-+#
- # Since: 0.14.0
- ##
- { 'struct': 'MigrationStats',
-@@ -582,7 +585,7 @@
-            'duplicate': 'int', 'skipped': 'int', 'normal': 'int',
-            'normal-bytes': 'int', 'dirty-pages-rate' : 'int',
-            'mbps' : 'number', 'dirty-sync-count' : 'int',
--           'postcopy-requests' : 'int' } }
-+           'postcopy-requests' : 'int', 'dirty-bytes-rate' : 'int' } }
- 
- ##
- # @XBZRLECacheStats:
+    elevateprivileges=allow|deny|no_new_privs
+
+
 -- 
-2.9.3
+Eduardo Otubo
+ProfitBricks GmbH
