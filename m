@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36626)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cnp9c-0003RF-QS
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cnp9Z-0003OI-Ad
 	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:18:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cnp9b-0006as-UA
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:18:32 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36130)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cnp9X-0006We-4i
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:18:29 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:35924)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cnp9b-0006Zp-Nx
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:18:31 -0400
-Received: by mail-wm0-x242.google.com with SMTP id v190so583018wme.3
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 09:18:31 -0700 (PDT)
+	id 1cnp9W-0006WE-Ug
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:18:27 -0400
+Received: by mail-wr0-x242.google.com with SMTP id l37so24466327wrc.3
+	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 09:18:26 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 14 Mar 2017 17:18:08 +0100
-Message-Id: <1489508300-48184-7-git-send-email-pbonzini@redhat.com>
+Date: Tue, 14 Mar 2017 17:18:03 +0100
+Message-Id: <1489508300-48184-2-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1489508300-48184-1-git-send-email-pbonzini@redhat.com>
 References: <1489508300-48184-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 06/18] kvmclock: Don't crash QEMU if KVM is
- disabled
+Subject: [Qemu-devel] [PULL 01/18] memory_region: Fix name comments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,52 +28,85 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-From: Eduardo Habkost <ehabkost@redhat.com>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Most machines don't allow sysbus devices like "kvmclock" to be
-created from the command-line, but some of them do (the ones with
-has_dynamic_sysbus=true). In those cases, it's possible to
-manually create a kvmclock device without KVM being enabled,
-making QEMU crash:
+The 'name' parameter to memory_region_init_* had been marked as debug
+only, however vmstate_region_ram uses it as a parameter to
+qemu_ram_set_idstr to set RAMBlock names and these form part of the
+migration stream.
 
-  $ qemu-system-x86_64 -machine q35,accel=tcg -device kvmclock
-  Segmentation fault (core dumped)
-
-This changes kvmclock's realize method to return an error if KVM
-is disabled, to ensure it won't crash QEMU.
-
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20170309185046.17555-1-ehabkost@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Message-Id: <20170309152708.30635-1-dgilbert@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/i386/kvm/clock.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ include/exec/memory.h | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
 
-diff --git a/hw/i386/kvm/clock.c b/hw/i386/kvm/clock.c
-index ef9d560..13eca37 100644
---- a/hw/i386/kvm/clock.c
-+++ b/hw/i386/kvm/clock.c
-@@ -22,6 +22,7 @@
- #include "kvm_i386.h"
- #include "hw/sysbus.h"
- #include "hw/kvm/clock.h"
-+#include "qapi/error.h"
- 
- #include <linux/kvm.h>
- #include <linux/kvm_para.h>
-@@ -208,6 +209,11 @@ static void kvmclock_realize(DeviceState *dev, Error **errp)
- {
-     KVMClockState *s = KVM_CLOCK(dev);
- 
-+    if (!kvm_enabled()) {
-+        error_setg(errp, "kvmclock device requires KVM");
-+        return;
-+    }
-+
-     kvm_update_clock(s);
- 
-     qemu_add_vm_change_state_handler(kvmclock_vm_state_change, s);
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 6911023..e39256a 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -371,7 +371,8 @@ void memory_region_init_io(MemoryRegion *mr,
+  *
+  * @mr: the #MemoryRegion to be initialized.
+  * @owner: the object that tracks the region's reference count
+- * @name: the name of the region.
++ * @name: Region name, becomes part of RAMBlock name used in migration stream
++ *        must be unique within any device
+  * @size: size of the region.
+  * @errp: pointer to Error*, to store an error if it happens.
+  */
+@@ -390,7 +391,8 @@ void memory_region_init_ram(MemoryRegion *mr,
+  *
+  * @mr: the #MemoryRegion to be initialized.
+  * @owner: the object that tracks the region's reference count
+- * @name: the name of the region.
++ * @name: Region name, becomes part of RAMBlock name used in migration stream
++ *        must be unique within any device
+  * @size: used size of the region.
+  * @max_size: max size of the region.
+  * @resized: callback to notify owner about used size change.
+@@ -412,7 +414,8 @@ void memory_region_init_resizeable_ram(MemoryRegion *mr,
+  *
+  * @mr: the #MemoryRegion to be initialized.
+  * @owner: the object that tracks the region's reference count
+- * @name: the name of the region.
++ * @name: Region name, becomes part of RAMBlock name used in migration stream
++ *        must be unique within any device
+  * @size: size of the region.
+  * @share: %true if memory must be mmaped with the MAP_SHARED flag
+  * @path: the path in which to allocate the RAM.
+@@ -434,7 +437,8 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
+  *
+  * @mr: the #MemoryRegion to be initialized.
+  * @owner: the object that tracks the region's reference count
+- * @name: the name of the region.
++ * @name: Region name, becomes part of RAMBlock name used in migration stream
++ *        must be unique within any device
+  * @size: size of the region.
+  * @ptr: memory to be mapped; must contain at least @size bytes.
+  */
+@@ -496,7 +500,8 @@ void memory_region_init_alias(MemoryRegion *mr,
+  *
+  * @mr: the #MemoryRegion to be initialized.
+  * @owner: the object that tracks the region's reference count
+- * @name: the name of the region.
++ * @name: Region name, becomes part of RAMBlock name used in migration stream
++ *        must be unique within any device
+  * @size: size of the region.
+  * @errp: pointer to Error*, to store an error if it happens.
+  */
+@@ -513,7 +518,8 @@ void memory_region_init_rom(MemoryRegion *mr,
+  * @mr: the #MemoryRegion to be initialized.
+  * @owner: the object that tracks the region's reference count
+  * @ops: callbacks for write access handling (must not be NULL).
+- * @name: the name of the region.
++ * @name: Region name, becomes part of RAMBlock name used in migration stream
++ *        must be unique within any device
+  * @size: size of the region.
+  * @errp: pointer to Error*, to store an error if it happens.
+  */
 -- 
 1.8.3.1
