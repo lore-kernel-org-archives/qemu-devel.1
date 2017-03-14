@@ -1,16 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cncNM-0002Uz-AN
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 22:39:53 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1cncP6-00041B-2Y
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 22:41:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cncNL-0008GC-7v
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 22:39:52 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Tue, 14 Mar 2017 10:39:33 +0800
-Message-Id: <20170314023933.12118-4-famz@redhat.com>
-In-Reply-To: <20170314023933.12118-1-famz@redhat.com>
-References: <20170314023933.12118-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC 3/3] qemu-io: Add --unsafe-read option
+	(envelope-from <liq3ea@gmail.com>) id 1cncP5-0001MZ-3j
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 22:41:40 -0400
+Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:34983)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1cncP4-0001M6-US
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 22:41:39 -0400
+Received: by mail-it0-x241.google.com with SMTP id f203so7954341itf.2
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 19:41:38 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <76f31bd5-4453-563a-9658-9374e68934b6@redhat.com>
+References: <1488449293-80280-1-git-send-email-liqiang6-s@360.cn>
+	<76f31bd5-4453-563a-9658-9374e68934b6@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Tue, 14 Mar 2017 10:41:37 +0800
+Message-ID: <CAKXe6SJN7QKjL85hj9FpMxGpUc8H6ybFXz9rbTicuiZBSk7TDw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH 0/3] ide: ahci: fix memory leak in device
+ unit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,131 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: John Snow <jsnow@redhat.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, pbonzini@redhat.com, Li Qiang <liqiang6-s@360.cn>, P J P <ppandit@redhat.com>
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- qemu-io.c | 28 +++++++++++++++++++++-------
- 1 file changed, 21 insertions(+), 7 deletions(-)
+Hello John,
 
-diff --git a/qemu-io.c b/qemu-io.c
-index 427cbae..f3616ee 100644
---- a/qemu-io.c
-+++ b/qemu-io.c
-@@ -53,7 +53,8 @@ static const cmdinfo_t close_cmd = {
-     .oneline    = "close the current open file",
- };
- 
--static int openfile(char *name, int flags, bool writethrough, QDict *opts)
-+static int openfile(char *name, int flags, bool writethrough, bool unsafe_read,
-+                    QDict *opts)
- {
-     Error *local_err = NULL;
-     BlockDriverState *bs;
-@@ -64,6 +65,9 @@ static int openfile(char *name, int flags, bool writethrough, QDict *opts)
-         return 1;
-     }
- 
-+    if (unsafe_read) {
-+        flags |= BDRV_O_UNSAFE_READ;
-+    }
-     qemuio_blk = blk_new_open(name, NULL, opts, flags, &local_err);
-     if (!qemuio_blk) {
-         error_reportf_err(local_err, "can't open%s%s: ",
-@@ -108,6 +112,7 @@ static void open_help(void)
- " -r, -- open file read-only\n"
- " -s, -- use snapshot file\n"
- " -n, -- disable host cache, short for -t none\n"
-+" -U, -- accept unsafe opening of the image even if it's in use by another process\n"
- " -k, -- use kernel AIO implementation (on Linux only)\n"
- " -t, -- use the given cache mode for the image\n"
- " -d, -- use the given discard mode for the image\n"
-@@ -124,7 +129,7 @@ static const cmdinfo_t open_cmd = {
-     .argmin     = 1,
-     .argmax     = -1,
-     .flags      = CMD_NOFILE_OK,
--    .args       = "[-rsnk] [-t cache] [-d discard] [-o options] [path]",
-+    .args       = "[-rsnkU] [-t cache] [-d discard] [-o options] [path]",
-     .oneline    = "open the file specified by path",
-     .help       = open_help,
- };
-@@ -147,8 +152,9 @@ static int open_f(BlockBackend *blk, int argc, char **argv)
-     int c;
-     QemuOpts *qopts;
-     QDict *opts;
-+    bool unsafe_read = false;
- 
--    while ((c = getopt(argc, argv, "snro:kt:d:")) != -1) {
-+    while ((c = getopt(argc, argv, "snro:kt:d:U")) != -1) {
-         switch (c) {
-         case 's':
-             flags |= BDRV_O_SNAPSHOT;
-@@ -188,6 +194,9 @@ static int open_f(BlockBackend *blk, int argc, char **argv)
-                 return 0;
-             }
-             break;
-+        case 'U':
-+            unsafe_read = true;
-+            break;
-         default:
-             qemu_opts_reset(&empty_opts);
-             return qemuio_command_usage(&open_cmd);
-@@ -211,9 +220,9 @@ static int open_f(BlockBackend *blk, int argc, char **argv)
-     qemu_opts_reset(&empty_opts);
- 
-     if (optind == argc - 1) {
--        return openfile(argv[optind], flags, writethrough, opts);
-+        return openfile(argv[optind], flags, writethrough, unsafe_read, opts);
-     } else if (optind == argc) {
--        return openfile(NULL, flags, writethrough, opts);
-+        return openfile(NULL, flags, writethrough, unsafe_read, opts);
-     } else {
-         QDECREF(opts);
-         return qemuio_command_usage(&open_cmd);
-@@ -452,6 +461,7 @@ int main(int argc, char **argv)
-         { "trace", required_argument, NULL, 'T' },
-         { "object", required_argument, NULL, OPTION_OBJECT },
-         { "image-opts", no_argument, NULL, OPTION_IMAGE_OPTS },
-+        { "unsafe-read", no_argument, 0, 'U'},
-         { NULL, 0, NULL, 0 }
-     };
-     int c;
-@@ -462,6 +472,7 @@ int main(int argc, char **argv)
-     QDict *opts = NULL;
-     const char *format = NULL;
-     char *trace_file = NULL;
-+    bool unsafe_read = false;
- 
- #ifdef CONFIG_POSIX
-     signal(SIGPIPE, SIG_IGN);
-@@ -524,6 +535,9 @@ int main(int argc, char **argv)
-         case 'h':
-             usage(progname);
-             exit(0);
-+        case 'U':
-+            unsafe_read = true;
-+            break;
-         case OPTION_OBJECT: {
-             QemuOpts *qopts;
-             qopts = qemu_opts_parse_noisily(&qemu_object_opts,
-@@ -595,7 +609,7 @@ int main(int argc, char **argv)
-                 exit(1);
-             }
-             opts = qemu_opts_to_qdict(qopts, NULL);
--            if (openfile(NULL, flags, writethrough, opts)) {
-+            if (openfile(NULL, flags, writethrough, unsafe_read, opts)) {
-                 exit(1);
-             }
-         } else {
-@@ -603,7 +617,7 @@ int main(int argc, char **argv)
-                 opts = qdict_new();
-                 qdict_put(opts, "driver", qstring_from_str(format));
-             }
--            if (openfile(argv[optind], flags, writethrough, opts)) {
-+            if (openfile(argv[optind], flags, writethrough, unsafe_read, opts)) {
-                 exit(1);
-             }
-         }
--- 
-2.9.3
+Does this patch go to upstream?
+
+Thanks.
+
+2017-03-04 6:48 GMT+08:00 John Snow <jsnow@redhat.com>:
+
+>
+>
+> On 03/02/2017 05:08 AM, Li Qiang wrote:
+> > As the pci ahci can be hotplug and unplug, in the ahci unrealize
+> > function it should free all the resource once allocated in the
+> > realized function. This patchset first add cleanup function in
+> > core layer and then call it in the ahci unit.
+> >
+> > Li Qiang (3):
+> >   ide: qdev: register ide bus unrealize function
+> >   ide: core: add cleanup function
+> >   ide: ahci: call cleanup function in ahci unit
+> >
+> >  hw/ide/ahci.c             | 12 ++++++++++++
+> >  hw/ide/core.c             |  8 ++++++++
+> >  hw/ide/qdev.c             | 12 ++++++------
+> >  include/hw/ide/internal.h |  1 +
+> >  4 files changed, 27 insertions(+), 6 deletions(-)
+> >
+>
+> Thanks, applied to my IDE tree:
+>
+> https://github.com/jnsnow/qemu/commits/ide
+> https://github.com/jnsnow/qemu.git
+>
+> --js
+>
