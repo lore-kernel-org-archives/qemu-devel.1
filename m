@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cnpgf-0000eB-Jm
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:52:42 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cnph2-0000t1-HG
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:53:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cnpgb-0008BM-Ne
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:52:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35408)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cnpgb-0008B0-ID
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:52:37 -0400
-References: <a7977444b25641cc86352a6818a4df3a@EXCHCS32.ornl.gov>
-	<000601d29710$edf987b0$c9ec9710$@ru> <874lyxqpl4.fsf@linaro.org>
-	<000001d29cbb$f396a800$dac3f800$@ru>
-	<be7ee11c-4c10-cee8-a35e-7905e0c44881@redhat.com>
-	<000801d29cbd$12ab64a0$38022de0$@ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ff7cbd70-e284-a823-f4d0-99595a73f5b8@redhat.com>
-Date: Tue, 14 Mar 2017 17:52:34 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1cnph1-0008L2-Gq
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:53:04 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:36384)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cnph1-0008KT-9o
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:53:03 -0400
+Received: by mail-wm0-x232.google.com with SMTP id n11so68795962wma.1
+	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 09:53:03 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <000801d29cbd$12ab64a0$38022de0$@ru>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] -rtc clock=vm with -icount 1,
- sleep=off introduces unexpected delays in device interactions
+In-Reply-To: <87pohjq1lp.fsf@linaro.org>
+References: <1488542374-1256-1-git-send-email-peter.maydell@linaro.org>
+	<87pohjq1lp.fsf@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 14 Mar 2017 17:52:41 +0100
+Message-ID: <CAFEAcA_dwsj=Ck9xOj-ONbLqedwn7ejj5=cPXiiLdS37iB90hA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.9] hw/misc/imx6_src: Don't crash
+ trying to reset missing CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,31 +31,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, =?UTF-8?Q?'Alex_Benn=c3=a9e'?= <alex.bennee@linaro.org>
-Cc: "'Nutaro, James J.'" <nutarojj@ornl.gov>, mttcg@greensocs.com, qemu-devel@nongnu.org
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Peter Chubb <peter.chubb@nicta.com.au>, Jean-Christophe DUBOIS <jcd@tribudubois.net>
 
-
-
-On 14/03/2017 13:18, Pavel Dovgalyuk wrote:
->> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
->> On 14/03/2017 13:10, Pavel Dovgalyuk wrote:
->>> This is not the same.
->>> BQL helped in making execution deterministic - no io and timer
->>> callbacks were performed while CPU is executing.
->>> Now iothread and CPU thread work simultaneously and timers can't
->>> query virtual time correctly, because (if we could query number of executed
->>> instructions) it may have different values on different runs.
->>>
->>> I guess you'll have to bring kicking CPU back on iothread invocation
->>> to make execution deterministic in icount mode.
+On 14 March 2017 at 17:12, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+>
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>
+>> Commit 4881658a4b introduced a call to arm_get_cpu_by_id(),
+>> and Coverity noticed that we weren't checking that it didn't
+>> return NULL (CID 1371652).
 >>
->> Timers are fixed by my patch.  I/O should also work if its effects are
->> only apparent at given QEMU_CLOCK_VIRTUAL values.
-> 
-> Can you point me on that patch?
+>> Normally this won't happen (because all 4 CPUs are expected
+>> to exist), but it's possible the user requested fewer CPUs
+>> on the command line. Handle this possibility by silently
+>> doing nothing, which is the same behaviour as before commit
+>> 4881658a4b and also how we handle the other CPU operations
+>> (since we ignore the INVALID_PARAM returns from arm_set_cpu_on()
+>> and friends).
+>>
+>> There is a slight behavioural difference to the pre-4881658a4b
+>> situation: the "reset this core" bit will remain set rather
+>> than not being permitted to be set. The imx6 datasheet is
+>> unclear about the behaviour in this odd corner case, so we
+>> opt for the simpler code rather than complicated logic to
+>> maintain identical behaviour.
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>> I couldn't actually get this to crash even with -smp 1 with
+>> my test image, but we should fix it anyhow.
+>>
+>>  hw/misc/imx6_src.c | 8 ++++++--
+>>  1 file changed, 6 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/misc/imx6_src.c b/hw/misc/imx6_src.c
+>> index edbb756..cfb0871 100644
+>> --- a/hw/misc/imx6_src.c
+>> +++ b/hw/misc/imx6_src.c
+>> @@ -143,13 +143,17 @@ static void imx6_defer_clear_reset_bit(int cpuid,
+>>                                         unsigned long reset_shift)
+>>  {
+>>      struct SRCSCRResetInfo *ri;
+>> +    CPUState *cpu =3D arm_get_cpu_by_id(cpuid);
+>> +
+>> +    if (!cpu) {
+>> +        return;
+>> +    }
+>>
+>>      ri =3D g_malloc(sizeof(struct SRCSCRResetInfo));
+>>      ri->s =3D s;
+>>      ri->reset_bit =3D reset_shift;
+>>
+>> -    async_run_on_cpu(arm_get_cpu_by_id(cpuid), imx6_clear_reset_bit,
+>> -                     RUN_ON_CPU_HOST_PTR(ri));
+>> +    async_run_on_cpu(cpu, imx6_clear_reset_bit, RUN_ON_CPU_HOST_PTR(ri)=
+);
+>>  }
+>
+> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-I sent a pull request now, but it doesn't fix record/replay.
+Thanks; applied to master.
 
-https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg02621.html
-
-Paolo
+-- PMM
