@@ -1,31 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36731)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cnp9i-0003XW-RP
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:18:40 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cnp9i-0003XX-Rf
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:18:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cnp9g-0006en-Jq
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cnp9f-0006e0-L1
 	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:18:38 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:34819)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cnp9g-0006eC-Cs
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:18:36 -0400
-Received: by mail-wr0-x242.google.com with SMTP id u108so24540470wrb.2
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 09:18:36 -0700 (PDT)
-Received: from 640k.lan (94-39-132-181.adsl-ull.clienti.tiscali.it.
-	[94.39.132.181])
-	by smtp.gmail.com with ESMTPSA id k195sm408197wmd.7.2017.03.14.09.18.34
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 14 Mar 2017 09:18:34 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 14 Mar 2017 17:18:13 +0100
-Message-Id: <1489508300-48184-12-git-send-email-pbonzini@redhat.com>
+Date: Tue, 14 Mar 2017 17:18:12 +0100
+Message-Id: <1489508300-48184-11-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1489508300-48184-1-git-send-email-pbonzini@redhat.com>
 References: <1489508300-48184-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 11/18] target/nios2: take BQL around interrupt
- check
+Subject: [Qemu-devel] [PULL 10/18] scsi: mptsas: fix the wrong reading size
+ in fetch request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,35 +22,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Li Qiang <liq3ea@gmail.com>, Li Qiang <liqiang6-s@360.cn>, qemu-stable@nongnu.org
 
-The interrupt controller does not have its own locking.
+From: Li Qiang <liq3ea@gmail.com>
 
+When fetching request, it should read sizeof(*hdr), not the
+pointer hdr.
+
+Signed-off-by: Li Qiang <liqiang6-s@360.cn>
+Message-Id: <1489488980-130668-1-git-send-email-liqiang6-s@360.cn>
+Cc: qemu-stable@nongnu.org
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/nios2/op_helper.c | 3 +++
- 1 file changed, 3 insertions(+)
+ hw/scsi/mptsas.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/target/nios2/op_helper.c b/target/nios2/op_helper.c
-index 538853c..efb1c48 100644
---- a/target/nios2/op_helper.c
-+++ b/target/nios2/op_helper.c
-@@ -21,6 +21,7 @@
- #include "cpu.h"
- #include "exec/helper-proto.h"
- #include "exec/cpu_ldst.h"
-+#include "qemu/main-loop.h"
+diff --git a/hw/scsi/mptsas.c b/hw/scsi/mptsas.c
+index 2e091c0..765ab53 100644
+--- a/hw/scsi/mptsas.c
++++ b/hw/scsi/mptsas.c
+@@ -756,7 +756,7 @@ static void mptsas_fetch_request(MPTSASState *s)
  
- #if !defined(CONFIG_USER_ONLY)
- void helper_mmu_read_debug(CPUNios2State *env, uint32_t rn)
-@@ -35,7 +36,9 @@ void helper_mmu_write(CPUNios2State *env, uint32_t rn, uint32_t v)
+     /* Read the message header from the guest first. */
+     addr = s->host_mfa_high_addr | MPTSAS_FIFO_GET(s, request_post);
+-    pci_dma_read(pci, addr, req, sizeof(hdr));
++    pci_dma_read(pci, addr, req, sizeof(*hdr));
  
- void helper_check_interrupts(CPUNios2State *env)
- {
-+    qemu_mutex_lock_iothread();
-     nios2_check_interrupts(env);
-+    qemu_mutex_unlock_iothread();
- }
- #endif /* !CONFIG_USER_ONLY */
+     if (hdr->Function < ARRAY_SIZE(mpi_request_sizes) &&
+         mpi_request_sizes[hdr->Function]) {
+@@ -766,8 +766,8 @@ static void mptsas_fetch_request(MPTSASState *s)
+          */
+         size = mpi_request_sizes[hdr->Function];
+         assert(size <= MPTSAS_MAX_REQUEST_SIZE);
+-        pci_dma_read(pci, addr + sizeof(hdr), &req[sizeof(hdr)],
+-                     size - sizeof(hdr));
++        pci_dma_read(pci, addr + sizeof(*hdr), &req[sizeof(*hdr)],
++                     size - sizeof(*hdr));
+     }
  
+     if (hdr->Function == MPI_FUNCTION_SCSI_IO_REQUEST) {
 -- 
 1.8.3.1
