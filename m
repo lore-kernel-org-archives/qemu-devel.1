@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35133)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cnp60-0000hN-BW
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:14:49 -0400
+	(envelope-from <eblake@redhat.com>) id 1cnp7r-00028s-DG
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:16:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cnp5z-0004pV-3O
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:14:48 -0400
+	(envelope-from <eblake@redhat.com>) id 1cnp7p-0005g2-SW
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:16:43 -0400
 References: <20170314154315.17869-1-famz@redhat.com>
 	<bcb24567-c232-803d-a316-c9f285494583@redhat.com>
+	<e2b629be-1d0f-5fda-54a9-b3bce4e21416@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <e2b629be-1d0f-5fda-54a9-b3bce4e21416@redhat.com>
-Date: Tue, 14 Mar 2017 11:14:39 -0500
+Message-ID: <0d9cfbc1-ef11-7bbb-d7e5-dd0280076a28@redhat.com>
+Date: Tue, 14 Mar 2017 11:16:34 -0500
 MIME-Version: 1.0
-In-Reply-To: <bcb24567-c232-803d-a316-c9f285494583@redhat.com>
+In-Reply-To: <e2b629be-1d0f-5fda-54a9-b3bce4e21416@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="C5mUwurIipqsQBCWCK7AoJi8lmvE6tftF"
+	boundary="7KtVgW658oVrBbX80WP7m0vtrLbNiXUmu"
 Subject: Re: [Qemu-devel] [PATCH] file-posix: Don't leak fd in
  hdev_get_max_segments
 List-Id: <qemu-devel.nongnu.org>
@@ -29,50 +30,70 @@ To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---C5mUwurIipqsQBCWCK7AoJi8lmvE6tftF
+--7KtVgW658oVrBbX80WP7m0vtrLbNiXUmu
 From: Eric Blake <eblake@redhat.com>
 To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
  qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
-Message-ID: <e2b629be-1d0f-5fda-54a9-b3bce4e21416@redhat.com>
+Message-ID: <0d9cfbc1-ef11-7bbb-d7e5-dd0280076a28@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH] file-posix: Don't leak fd in
  hdev_get_max_segments
 References: <20170314154315.17869-1-famz@redhat.com>
  <bcb24567-c232-803d-a316-c9f285494583@redhat.com>
-In-Reply-To: <bcb24567-c232-803d-a316-c9f285494583@redhat.com>
+ <e2b629be-1d0f-5fda-54a9-b3bce4e21416@redhat.com>
+In-Reply-To: <e2b629be-1d0f-5fda-54a9-b3bce4e21416@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 03/14/2017 11:11 AM, Eric Blake wrote:
-> On 03/14/2017 10:43 AM, Fam Zheng wrote:
->> Signed-off-by: Fam Zheng <famz@redhat.com>
->> ---
->>  block/file-posix.c | 1 +
->>  1 file changed, 1 insertion(+)
+On 03/14/2017 11:14 AM, Eric Blake wrote:
+> On 03/14/2017 11:11 AM, Eric Blake wrote:
+>> On 03/14/2017 10:43 AM, Fam Zheng wrote:
+>>> Signed-off-by: Fam Zheng <famz@redhat.com>
+>>> ---
+>>>  block/file-posix.c | 1 +
+>>>  1 file changed, 1 insertion(+)
+>>>
+>>> diff --git a/block/file-posix.c b/block/file-posix.c
+>>> index c4c0663..e6170f4 100644
+>>> --- a/block/file-posix.c
+>>> +++ b/block/file-posix.c
+>>> @@ -703,6 +703,7 @@ static int hdev_get_max_segments(const struct sta=
+t *st)
 >>
->> diff --git a/block/file-posix.c b/block/file-posix.c
->> index c4c0663..e6170f4 100644
->> --- a/block/file-posix.c
->> +++ b/block/file-posix.c
->> @@ -703,6 +703,7 @@ static int hdev_get_max_segments(const struct stat=
- *st)
+>> hdev_get_max_segments() is not part of master yet; should this just be=
+
+>> treated as a fixup! to a pending patch?
 >=20
-> hdev_get_max_segments() is not part of master yet; should this just be
-> treated as a fixup! to a pending patch?
+> Scratch that - I forgot to 'git pull' on my end.
+>=20
+> Commit message could usefully be improved by mentioning commit 9103f1ce=
 
-Scratch that - I forgot to 'git pull' on my end.
+> as the spot the problem was introduced.
+>=20
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
 
-Commit message could usefully be improved by mentioning commit 9103f1ce
-as the spot the problem was introduced.
+Question: does valgrind or any other tool complain about:
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
++    if (fd =3D=3D -1) {
++        ret =3D -errno;
++        goto out;
++    }
+=2E..
++out:
++    close(fd);
++    g_free(sysfspath);
++    return ret;
+
+this being a useless syscall to close(-1) ?  If so, you need to wrap in
+an 'if (fd !=3D -1)'
 
 --=20
 Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---C5mUwurIipqsQBCWCK7AoJi8lmvE6tftF
+--7KtVgW658oVrBbX80WP7m0vtrLbNiXUmu
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -82,13 +103,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYyBbvAAoJEKeha0olJ0NqsDsH/jl++oI/AF9cXsb1O/QPEAf6
-uKpxcp7rVTtYCuJrZ4qvAW/DmZLGBmuS+mhwo+wwbHLtWV3bDTYSan09hHsyrdH/
-pWLQgIWiUzsWmPFVe+E4UOqxvweo03lJCN9sz66lc1/AFq8YCdkL+PEsM2k7RilI
-EMvI2b6x1SFQ9g+gqoXShGw1j7NPFrwzUJ4rQigsowbTFRJhpwJcjenG0ntsCUd0
-HD3lVwmXrqMkGRX2R5MHzvl3ag/1HCJN2zEWhchTaTC6FuIPeZ27DuNiaVvX18/n
-tMsYXVi98W/0I3JbN+q2hnRBK5vGrxQZ8HkxvXlPLdypEKSwf0JHOj6qyV2pK34=
-=WIja
+iQEcBAEBCAAGBQJYyBdiAAoJEKeha0olJ0NqG50H/AzYVyavz5vlrh+riNox31mz
+3B9Mp3+Q1Bg6/KZJ46fgmO+9Ie14qXXwQcUey5niw+PjBqXKp+9SK5Zh0SZo+gQW
+ZhhCoB0oyGR8pHY+mlIXHexnOInRfe2Bl+IX+R+nbSpJEBQ9xM8hPVP8xQgWwYeh
+76LHipngFvvWyqmHcm2VP9zjCFBDPXONMHzy1D9tihGrGvWkvgOmpXihI+RhXsR6
+65dqraxzEWrtERRCB1sEfKm//BC7p4fdodDbO0xdzUep8sbBOwaRQp4fH80qrWHq
+nhRe+IZc7lJuCIewAgu34Af2/0aWucsEbQOrYMaoqWOv+EiqG9gNOL67m+9aIqc=
+=gsM2
 -----END PGP SIGNATURE-----
 
---C5mUwurIipqsQBCWCK7AoJi8lmvE6tftF--
+--7KtVgW658oVrBbX80WP7m0vtrLbNiXUmu--
