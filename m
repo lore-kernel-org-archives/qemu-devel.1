@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cnpuc-00076w-N3
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:07:08 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cnpv3-0007JV-PW
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:07:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cnpuZ-0007EG-H3
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:07:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46862)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cnpuZ-0007Dl-92
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:07:03 -0400
-Date: Tue, 14 Mar 2017 17:06:57 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170314170656.GO2445@work-vm>
-References: <20170310012339.GA7400@flamenco> <20170310114531.GB2480@work-vm>
-	<20170311021851.GA26530@flamenco>
+	(envelope-from <peter.maydell@linaro.org>) id 1cnpv3-0007ZG-1h
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:07:33 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:35392)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cnpv2-0007Y9-Rz
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:07:32 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id g10so128433260wrg.2
+	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 10:07:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170311021851.GA26530@flamenco>
-Subject: Re: [Qemu-devel] Benchmarking linux-user performance
+In-Reply-To: <d9497461-e7c5-b914-362d-16b0cdea9fba@redhat.com>
+References: <87tw6y8bs8.fsf@secure.mitica>
+	<CAFEAcA978SJemCfYJPa8jwtuhhi6JGh9pEDGYNJ1npJA3nvEQA@mail.gmail.com>
+	<20170314081312.GB13140@stefanha-x1.localdomain>
+	<CAFEAcA9F2BPexRieaEhu+UpJxoOdEfw8eggW8b2SjuoMMTNgog@mail.gmail.com>
+	<87wpbstesf.fsf@secure.mitica> <20170314160113.GM2445@work-vm>
+	<20170314162020.GT2652@redhat.com>
+	<d9497461-e7c5-b914-362d-16b0cdea9fba@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 14 Mar 2017 18:07:11 +0100
+Message-ID: <CAFEAcA-Y=KNBTj32_C1HOuRcEL9vxMimxjPpwrQpG9apGqBjSQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] Obsolete QEMU host environments (was: Re: KVM call
+ for 2017-03-14)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,132 +35,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Alex =?utf-8?B?QmVubu+/vWU=?= <alex.bennee@linaro.org>, qemu-devel <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, QEMU Developer <qemu-devel@nongnu.org>, KVM devel mailing list <kvm@vger.kernel.org>, Stefan Hajnoczi <stefanha@gmail.com>, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>
 
-* Emilio G. Cota (cota@braap.org) wrote:
-> On Fri, Mar 10, 2017 at 11:45:33 +0000, Dr. David Alan Gilbert wrote:
-> > * Emilio G. Cota (cota@braap.org) wrote:
-> > >   https://github.com/cota/dbt-bench
-> > > I'm using NBench because (1) it's just a few files and they take
-> > > very little time to run (~5min per QEMU version, if performance
-> > > on the host machine is stable), (2) AFAICT its sources are in the
-> > > public domain (whereas SPEC's sources cannot be redistributed),
-> > > and (3) with NBench I get results similar to SPEC's.
-> > 
-> > Does NBench include anything with lots of small processes, or a large
-> > chunk of code.  Using benchmarks with small code tends to skew DBT optimisations
-> > towards very heavy block optimisation that dont work in real applications where
-> > the cost of translation can hurt if it's too high.
-> 
-> Yes this is a valid point.
-> 
-> I haven't looked at the NBench code in detail, but I'd expect all programs
-> in the suite to be small and have hotspots (this is consistent with
-> the fact that performance doesn't change even if the TB hash table
-> isn't used, i.e. the loops are small enough to remain in tb_jmp_cache.)
-> IOW, we'd be mostly measuring the quality of the translated code,
-> not the translation overhead.
-> 
-> It seems that a good benchmark to take translation overhead into account
-> would be gcc/perlbench from SPEC (see [1]; ~20% of exec time is spent
-> on translation). Unfortunately, none of them can be redistributed.
-> 
-> I'll consider other options. For instance, I looked today at using golang's
-> compilation tests, but they crash under qemu-user. I'll keep looking
-> at other options -- the requirement is to have something that is easy
-> to build (i.e. gcc is not an option) and that it runs fast.
+On 14 March 2017 at 17:54, Thomas Huth <thuth@redhat.com> wrote:
+> Our ia64 host backend in QEMU (tcg/ia64) is still marked as maintained
+> ... so it's maybe not as dead as you think? Or should we rather get rid
+> of that soon, too?
 
-Yes, needs to be self contained but large enough to be interesting.
-Isn't SPECs perlbench just a variant of a standard free benchmark
-that can be used?
-(Select alternative preferred language).
+I don't actually mind whether we keep tcg/ia64 or drop it.
+But if we keep it then we must have a machine we can test
+it on -- that means one I have access to (and which we
+can otherwise use for central testing), not just one the
+maintainer might happen to have.
 
-> A hack that one can do to measure code translation as opposed to execution
-> is to disable caching with a 2-liner to avoid insertions to the TB hash
-> table and tb_jmp_cache. The problem is that then we basically just
-> measure code translation performance, which isn't really realistic
-> either.
-> 
-> In any case, note that most efforts I've seen to compile very good code
-> (with QEMU or other cross-ISA DBT), do some sort of profiling so that
-> only hot blocks are optimized -- see for example [1] and [2].
+Also, that MAINTAINERS entry was added in 2011, so it's
+probably about as out of date as the code :-)
 
-Right, and often there's a trade off between an interpret step, and one or
-more translate/optimisation steps and have to pick thresholds etc.
-
-Dave
-
-> [1] "Characterization of Dynamic Binary Translation Overhead".
->     Edson Borin and Youfeng Wu. IISWC 2009.
->     http://amas-bt.cs.virginia.edu/2008proceedings/AmasBT2008.pdf#page=4
-> 
-> [2] "HQEMU: a multi-threaded and retargetable dynamic binary translator
->     on multicores".
->     Ding-Yong Hong, Chun-Chen Hsu, Pen-Chung Yew, Jan-Jan Wu, Wei-Chung Hsu
->     Pangfeng Liu, Chien-Min Wang and Yeh-Ching Chung. CGO 2012.
->     http://www.iis.sinica.edu.tw/papers/dyhong/18239-F.pdf
-> 
-> 
-> > > Here are linux-user performance numbers from v1.0 to v2.8 (higher
-> > > is better):
-> > > 
-> > >                         x86_64 NBench Integer Performance
-> > >                  Host: Intel(R) Xeon(R) CPU E5-2690 0 @ 2.90GHz                
-> > >                                                                                
-> > >   36 +-+-+---+---+---+--+---+---+---+---+---+---+---+---+--+---+---+---+-+-+   
-> > >      |   +   +   +   +  +   +   +   +   +   +   +   +   +  +   +   +  ***  |   
-> > >   34 +-+                                                             #*A*+-+   
-> > >      |                                                            *A*      |   
-> > >   32 +-+                                                          #      +-+   
-> > >   30 +-+                                                          #      +-+   
-> > >      |                                                           #         |   
-> > >   28 +-+                                                        #        +-+   
-> > >      |                                 *A*#*A*#*A*#*A*#*A*#     #          |   
-> > >   26 +-+                   *A*#*A*#***#    ***         ******#*A*        +-+   
-> > >      |                     #       *A*                    *A* ***          |   
-> > >   24 +-+                  #                                              +-+   
-> > >   22 +-+                 #                                               +-+   
-> > >      |             #*A**A*                                                 |   
-> > >   20 +-+       #*A*                                                      +-+   
-> > >      |  *A*#*A*  +   +  +   +   +   +   +   +   +   +   +  +   +   +   +   |   
-> > >   18 +-+-+---+---+---+--+---+---+---+---+---+---+---+---+--+---+---+---+-+-+   
-> > >        v1.v1.1v1.2v1.v1.4v1.5v1.6v1.7v2.0v2.1v2.2v2.3v2.v2.5v2.6v2.7v2.8.0     
-> > >                                   QEMU version                                 
-> > 
-> > Nice, there was someone on list complaining about 2.6 being slower for them.
-> > 
-> > >                      x86_64 NBench Floating Point Performance                  
-> > >                   Host: Intel(R) Xeon(R) CPU E5-2690 0 @ 2.90GHz               
-> > >                                                                                
-> > >   1.88 +-+-+---+--+---+---+---+--+---+---+---+---+--+---+---+---+--+---+-+-+   
-> > >        |   +   +  +  *A*#*A*  +  +   +   +   +   +  +   +   +   +  +   +   |   
-> > >   1.86 +-+           *** ***                                             +-+   
-> > >        |            #       #   *A*#***                                    |   
-> > >        |      *A*# #         # ##   *A*                                    |   
-> > >   1.84 +-+    #  *A*         *A*      #                                  +-+   
-> > >        |      #                        #                              *A*  |   
-> > >   1.82 +-+   #                          #                            ##  +-+   
-> > >        |     #                          *A*#                        #      |   
-> > >    1.8 +-+  #                               #  #*A*               *A*    +-+   
-> > >        |    #                               *A*   #                #       |   
-> > >   1.78 +-+*A*                                      #       *A*    #      +-+   
-> > >        |                                           #   ***#  #    #        |   
-> > >        |                                           *A*#*A*    #  #         |   
-> > >   1.76 +-+                                         ***         # #       +-+   
-> > >        |   +   +  +   +   +   +  +   +   +   +   +  +   +   +  *A* +   +   |   
-> > >   1.74 +-+-+---+--+---+---+---+--+---+---+---+---+--+---+---+---+--+---+-+-+   
-> > >          v1.v1.v1.2v1.3v1.4v1.v1.6v1.7v2.0v2.1v2.v2.3v2.4v2.5v2.v2.7v2.8.0     
-> > >                                    QEMU version                                
-> > 
-> > I'm assuming the dips are where QEMU fixed something and cared about corner
-> > cases/accuracy?
-> 
-> It'd be hard to say why the numbers vary across versions without running
-> a profiler and git bisect. I only know the reason for v2.7, where most if not all
-> of the improvement is due to the removal of tb_lock() when executing
-> code in qemu-user thanks to the QHT work.
-> 
-> 		E.
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+thanks
+-- PMM
