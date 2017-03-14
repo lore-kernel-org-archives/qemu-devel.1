@@ -1,15 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47988)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cnkN7-0005sJ-Rf
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:12:13 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cnkO8-0006w1-Tc
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:13:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cnkN2-0005e5-0h
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:12:09 -0400
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 14 Mar 2017 12:11:57 +0100
-Message-Id: <20170314111157.14464-2-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH] block: quiesce AioContext when detaching from
- it
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cnkO7-0006LS-NV
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:13:12 -0400
+References: <36e41adf-b0b3-3efa-51c4-f1a70cd05b98@ilande.co.uk>
+	<87wpbsp49a.fsf@linaro.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <6491a446-bf23-5ab9-3431-c67efaf83f71@ilande.co.uk>
+Date: Tue, 14 Mar 2017 11:12:42 +0000
+MIME-Version: 1.0
+In-Reply-To: <87wpbsp49a.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] qemu-system-ppc video artifacts since "tcg: drop
+ global lock during TCG code execution"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,69 +24,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-block@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: jan.kiszka@siemens.com, fred.konrad@greensocs.com, cota@braap.org, rth@twiddle.net, bobby.prani@gmail.com, qemu-devel <qemu-devel@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>
 
-While it is true that bdrv_set_aio_context only works on a single
-BlockDriverState subtree (see commit message for 53ec73e, "block: Use
-bdrv_drain to replace uncessary bdrv_drain_all", 2015-07-07), it works
-at the AioContext level rather than the BlockDriverState level.
+On 14/03/17 10:00, Alex Bennée wrote:
 
-Therefore, it is also necessary to trigger pending bottom halves too,
-even if no requests are pending.
+> Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
+> 
+>> I've recently noticed some video artifacts appearing in the form of
+>> horizontal lines whilst testing OpenBIOS boot on some qemu-system-ppc
+>> images (see https://www.ilande.co.uk/tmp/qemu/macos9-stripe.png for an
+>> example) which I've finally bisected down to this commit.
+> 
+> Interesting. Is the video hardware in this case a simple framebuffer or
+> is there some sort of GPU involved?
 
-For NBD this ensures that the aio_co_schedule of a previous call to
-nbd_attach_aio_context is completed before detaching from the old
-AioContext; it fixes qemu-iotest 094.  Another similar bug happens
-when the VM is stopped and the virtio-blk dataplane irqfd is torn down.
-In this case it's possible that guest I/O gets stuck if notify_guest_bh
-was scheduled but doesn't run.
+For the mac99 machine it's just the normal QEMU PCI std-vga card, so
+nothing special. Having run tests across SPARC which uses its own
+framebuffer, there have been no obvious artifacts that I've spotted
+there to date.
 
-Calling aio_poll from another AioContext is safe if non-blocking; races
-such as the one mentioned in the commit message for c9d1a56 ("block:
-only call aio_poll on the current thread's AioContext", 2016-10-28)
-are a concern for blocking calls.
+>> The horizontal lines tend to appear at different positions with
+>> different lengths, although it seems to be more common that a complete
+>> scanline is affected. Reproducing the issue is fairly easy with a MacOS
+>> 9.2.1 ISO and the command line below:
+>>
+>> ./qemu-system-ppc -cdrom MacOS921.iso -boot d -m 512 -M mac99
+>>
+>> Could it be that this patch is still missing a lock somewhere which
+>> causes these artifacts to appear?
+> 
+> It depends. If the hardware is accessed via MMIO then the BQL is taken
+> automatically (unless the area is explicitly marked as doing its own
+> locking see: mr->global_locking).
+> 
+> Is the artefact temporary or permanent? Could it be a change in
+> synchronisation between the emulator updating the framebuffer and
+> whatever backend updating its display?
 
-I considered other options, including:
+AFAICT they are temporary in that they appear randomly on the display,
+but the next time that particular area of the display is updated by the
+guest then they tend to either change/disappear.
 
-- moving the bs->wakeup mechanism to AioContext, and letting the caller
-check.  This might work for virtio which has a clear place to wakeup
-(notify_place_bh) and check the condition (virtio_blk_data_plane_stop).
-For aio_co_schedule I couldn't find a clear place to check the condition.
+MacOS 9 is interesting in that it's effectively an emulator within an
+emulator, i.e. 68K code running on a PPC emulator and so does tend to
+stress QEMU in interesting places. Given that I've also seen the
+occasional issue with Darwin/OS X it seems the problem isn't just
+constrained to OS 9, however it seems to occur a lot more often there.
 
-- adding a dummy oneshot bottom half and waiting for it to trigger.
-This has the complication that bottom half list is LIFO for historical
-reasons.  There were performance issues caused by bottom half ordering
-in the past, so I decided against it for 2.9.
 
-Fixes: 99723548561978da8ef44cf804fb7912698f5d88
-Reported-by: Max Reitz <mreitz@redhat.com>
-Reported-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-Tested-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- block.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ATB,
 
-diff --git a/block.c b/block.c
-index f293ccb..e159251 100644
---- a/block.c
-+++ b/block.c
-@@ -4272,8 +4272,15 @@ void bdrv_attach_aio_context(BlockDriverState *bs,
- 
- void bdrv_set_aio_context(BlockDriverState *bs, AioContext *new_context)
- {
-+    AioContext *ctx;
-+
-     bdrv_drain(bs); /* ensure there are no in-flight requests */
- 
-+    ctx = bdrv_get_aio_context(bs);
-+    while (aio_poll(ctx, false)) {
-+        /* wait for all bottom halves to execute */
-+    }
-+
-     bdrv_detach_aio_context(bs);
- 
-     /* This function executes in the old AioContext so acquire the new one in
--- 
-2.9.3
+Mark.
