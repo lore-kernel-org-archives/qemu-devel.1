@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57140)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cnq5z-0006dk-1J
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:18:54 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cnq7y-00087k-Gv
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:20:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cnq5y-0002qp-4r
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:18:51 -0400
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:37601)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cnq7t-0003fA-IS
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:20:54 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:33143)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cnq5x-0002qf-UW
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:18:50 -0400
-Received: by mail-wm0-x235.google.com with SMTP id n11so4563202wma.0
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 10:18:49 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170314160113.GM2445@work-vm>
-References: <87tw6y8bs8.fsf@secure.mitica>
-	<CAFEAcA978SJemCfYJPa8jwtuhhi6JGh9pEDGYNJ1npJA3nvEQA@mail.gmail.com>
-	<20170314081312.GB13140@stefanha-x1.localdomain>
-	<CAFEAcA9F2BPexRieaEhu+UpJxoOdEfw8eggW8b2SjuoMMTNgog@mail.gmail.com>
-	<87wpbstesf.fsf@secure.mitica> <20170314160113.GM2445@work-vm>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 14 Mar 2017 18:18:28 +0100
-Message-ID: <CAFEAcA9Ogy_XnpaaGWHsuAQC=CYNQsT0ESCZ68tn4bg4GFi7LQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] KVM call for 2017-03-14
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cnq7t-0003eY-9O
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:20:49 -0400
+Received: by mail-wm0-x244.google.com with SMTP id n11so887130wma.0
+	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 10:20:48 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 14 Mar 2017 18:20:45 +0100
+Message-Id: <1489512045-49206-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH for 2.9?] hmp: gpa2hva and gpa2hpa hostaddr
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,14 +26,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developer <qemu-devel@nongnu.org>, KVM devel mailing list <kvm@vger.kernel.org>
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, armbru@redhat.com
 
-On 14 March 2017 at 17:01, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
-> I also do a FreeBSD VM
+These commands are useful when testing machine-check passthrough.
+gpa2hva is useful to inject a MADV_HWPOISON madvise from gdb, while
+gpa2hpa is useful to inject an error with the mce-inject kernel
+module.
 
-Do you have repro instructions for how to conveniently set
-this up?
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+	Technically a feature, but on the other hand it is pretty
+	much impossible to test without it, and the people testing
+	the feature are using it as an out-of-tree patch.  Opinions?
 
-thanks
--- PMM
+ hmp-commands.hx |  32 ++++++++++++++++++
+ monitor.c       | 103 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 135 insertions(+)
+
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 8819281..0aca984 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -526,6 +526,38 @@ Dump 80 16 bit values at the start of the video memory.
+ ETEXI
+ 
+     {
++        .name       = "gpa2hva",
++        .args_type  = "addr:l",
++        .params     = "addr",
++        .help       = "print the host virtual address corresponding to a guest physical address",
++        .cmd        = hmp_gpa2hva,
++    },
++
++STEXI
++@item gpa2hva @var{addr}
++@findex gpa2hva
++Print the host virtual address at which the guest's physical address @var{addr}
++is mapped.
++ETEXI
++
++#ifdef CONFIG_LINUX
++    {
++        .name       = "gpa2hpa",
++        .args_type  = "addr:l",
++        .params     = "addr",
++        .help       = "print the host physical address corresponding to a guest physical address",
++        .cmd        = hmp_gpa2hpa,
++    },
++#endif
++
++STEXI
++@item gpa2hpa @var{addr}
++@findex gpa2hpa
++Print the host physical address at which the guest's physical address @var{addr}
++is mapped.
++ETEXI
++
++    {
+         .name       = "p|print",
+         .args_type  = "fmt:/,val:l",
+         .params     = "/fmt expr",
+diff --git a/monitor.c b/monitor.c
+index be282ec..1ac8c5f 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -1421,6 +1421,109 @@ static void hmp_physical_memory_dump(Monitor *mon, const QDict *qdict)
+     memory_dump(mon, count, format, size, addr, 1);
+ }
+ 
++static void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, Error **errp)
++{
++    MemoryRegionSection mrs = memory_region_find(get_system_memory(),
++                                                 addr, 1);
++
++    if (!mrs.mr) {
++        error_setg(errp, "No memory is mapped at address 0x%" HWADDR_PRIx, addr);
++        return NULL;
++    }
++
++    if (!memory_region_is_ram(mrs.mr) && !memory_region_is_romd(mrs.mr)) {
++        error_setg(errp, "Memory at address 0x%" HWADDR_PRIx "is not RAM", addr);
++        memory_region_unref(mrs.mr);
++        return NULL;
++    }
++
++    *p_mr = mrs.mr;
++    return qemu_map_ram_ptr(mrs.mr->ram_block, mrs.offset_within_region);
++}
++
++static void hmp_gpa2hva(Monitor *mon, const QDict *qdict)
++{
++    hwaddr addr = qdict_get_int(qdict, "addr");
++    Error *local_err = NULL;
++    MemoryRegion *mr;
++    void *ptr;
++
++    ptr = gpa2hva(&mr, addr, &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++        return;
++    }
++
++    monitor_printf(mon, "Host virtual address for 0x%" HWADDR_PRIx
++                   " (%s) is %p\n",
++                   addr, mr->name, ptr);
++
++    memory_region_unref(mr);
++}
++
++#ifdef CONFIG_LINUX
++static uint64_t vtop(void *ptr, Error **errp)
++{
++    uint64_t pinfo;
++    uint64_t ret = -1;
++    uintptr_t addr = (uintptr_t) ptr;
++    uintptr_t pagesize = getpagesize();
++    off_t offset = addr / pagesize * sizeof (pinfo);
++    char pagemapname[64];
++    int fd;
++
++    sprintf(pagemapname, "/proc/%d/pagemap", getpid());
++    fd = open(pagemapname, O_RDONLY);
++    if (fd == -1) {
++        error_setg_errno(errp, errno, "Cannot open %s", pagemapname);
++        return -1;
++    }
++
++    /* Force copy-on-write if necessary.  */
++    atomic_add((uint8_t *)ptr, 0);
++
++    if (pread(fd, &pinfo, sizeof(pinfo), offset) != sizeof(pinfo)) {
++        error_setg_errno(errp, errno, "Cannot read from %s", pagemapname);
++        goto out;
++    }
++    if ((pinfo & (1ull << 63)) == 0) {
++        error_setg(errp, "Page not present");
++        goto out;
++    }
++    ret = ((pinfo & 0x007fffffffffffffull) << 12) | (addr & (pagesize - 1));
++
++out:
++    close(fd);
++    return ret;
++}
++
++static void hmp_gpa2hpa(Monitor *mon, const QDict *qdict)
++{
++    hwaddr addr = qdict_get_int(qdict, "addr");
++    Error *local_err = NULL;
++    MemoryRegion *mr;
++    void *ptr;
++    uint64_t physaddr;
++
++    ptr = gpa2hva(&mr, addr, &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++        return;
++    }
++
++    physaddr = vtop(ptr, &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++    } else {
++        monitor_printf(mon, "Host physical address for 0x%" HWADDR_PRIx
++                       " (%s) is 0x%" PRIx64 "\n",
++                       addr, mr->name, (uint64_t) physaddr);
++    }
++
++    memory_region_unref(mr);
++}
++#endif
++
+ static void do_print(Monitor *mon, const QDict *qdict)
+ {
+     int format = qdict_get_int(qdict, "format");
+-- 
+1.8.3.1
