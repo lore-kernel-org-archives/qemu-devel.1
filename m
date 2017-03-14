@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cnebk-0005pa-AS
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 01:02:53 -0400
+	(envelope-from <anthony.xu@intel.com>) id 1cnenN-0007Il-Pq
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 01:14:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cnebj-0006dW-2T
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 01:02:52 -0400
-Date: Tue, 14 Mar 2017 16:02:36 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170314050236.GG12564@umbus.fritz.box>
-References: <20170310011328.30719-1-david@gibson.dropbear.id.au>
-	<20170310011328.30719-3-david@gibson.dropbear.id.au>
-	<CAGZKiBpsD56N2o2xD8dpuuxp+isKF-2L0EtioVuo+sCJsxT4tQ@mail.gmail.com>
+	(envelope-from <anthony.xu@intel.com>) id 1cnenI-0001bI-Qm
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 01:14:53 -0400
+Received: from mga09.intel.com ([134.134.136.24]:40606)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
+	id 1cnenI-0001b0-EX
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 01:14:48 -0400
+From: "Xu, Anthony" <anthony.xu@intel.com>
+Date: Tue, 14 Mar 2017 05:14:44 +0000
+Message-ID: <4712D8F4B26E034E80552F30A67BE0B1A13045@ORSMSX112.amr.corp.intel.com>
+References: <1489158897-9206-1-git-send-email-yang.zhong@intel.com>
+	<1489158897-9206-2-git-send-email-yang.zhong@intel.com>
+	<53522014-8f70-9358-7d60-8b6c491c9611@redhat.com>
+	<4712D8F4B26E034E80552F30A67BE0B1A0F91A@ORSMSX112.amr.corp.intel.com>
+	<920352018.1797331.1489251855464.JavaMail.zimbra@redhat.com>
+In-Reply-To: <920352018.1797331.1489251855464.JavaMail.zimbra@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="+1TulI7fc0PCHNy3"
-Content-Disposition: inline
-In-Reply-To: <CAGZKiBpsD56N2o2xD8dpuuxp+isKF-2L0EtioVuo+sCJsxT4tQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 2/5] pseries: Implement HPT
- resizing
+Subject: Re: [Qemu-devel] [PATCH v1 2/2] reduce qemu's heap Rss size from
+ 12252kB to 2752KB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,241 +33,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bharata B Rao <bharata.rao@gmail.com>
-Cc: "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Sam Bobroff <sam.bobroff@au1.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, sjitindarsingh@gmail.com, Alexander Graf <agraf@suse.de>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Zhong, Yang" <yang.zhong@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Peng, Chao P" <chao.p.peng@intel.com>
 
-
---+1TulI7fc0PCHNy3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Mar 10, 2017 at 03:37:16PM +0530, Bharata B Rao wrote:
-> On Fri, Mar 10, 2017 at 6:43 AM, David Gibson <david@gibson.dropbear.id.a=
-u>
-> wrote:
->=20
-> > This patch implements hypercalls allowing a PAPR guest to resize its own
-> > hash page table.  This will eventually allow for more flexible memory
-> > hotplug.
-> >
-> > The implementation is partially asynchronous, handled in a special thre=
-ad
-> > running the hpt_prepare_thread() function.  The state of a pending resi=
-ze
-> > is stored in SPAPR_MACHINE->pending_hpt.
-> >
-> > The H_RESIZE_HPT_PREPARE hypercall will kick off creation of a new HPT,=
- or,
-> > if one is already in progress, monitor it for completion.  If there is =
-an
-> > existing HPT resize in progress that doesn't match the size specified in
-> > the call, it will cancel it, replacing it with a new one matching the
-> > given size.
-> >
-> > The H_RESIZE_HPT_COMMIT completes transition to a resized HPT, and can =
-only
-> > be called successfully once H_RESIZE_HPT_PREPARE has successfully
-> > completed initialization of a new HPT.  The guest must ensure that there
-> > are no concurrent accesses to the existing HPT while this is called (th=
-is
-> > effectively means stop_machine() for Linux guests).
-> >
-> > For now H_RESIZE_HPT_COMMIT goes through the whole old HPT, rehashing e=
-ach
-> > HPTE into the new HPT.  This can have quite high latency, but it seems =
-to
-> > be of the order of typical migration downtime latencies for HPTs of size
-> > up to ~2GiB (which would be used in a 256GiB guest).
-> >
-> > In future we probably want to move more of the rehashing to the "prepar=
-e"
-> > phase, by having H_ENTER and other hcalls update both current and
-> > pending HPTs.  That's a project for another day, but should be possible
-> > without any changes to the guest interface.
-> >
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
-> >  hw/ppc/spapr.c          |   4 +-
-> >  hw/ppc/spapr_hcall.c    | 338 ++++++++++++++++++++++++++++++
-> > +++++++++++++++++-
-> >  include/hw/ppc/spapr.h  |   6 +
-> >  target/ppc/mmu-hash64.h |   4 +
-> >  4 files changed, 346 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 06b436d..bf6ba64 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -94,8 +94,6 @@
-> >
-> >  #define PHANDLE_XICP            0x00001111
-> >
-> > -#define HTAB_SIZE(spapr)        (1ULL << ((spapr)->htab_shift))
-> > -
-> >  static int try_create_xics(sPAPRMachineState *spapr, const char
-> > *type_ics,
-> >                             const char *type_icp, int nr_servers,
-> >                             int nr_irqs, Error **errp)
-> > @@ -1169,7 +1167,7 @@ static void spapr_store_hpte(PPCVirtualHypervisor
-> > *vhyp, hwaddr ptex,
-> >      }
-> >  }
-> >
-> > -static int spapr_hpt_shift_for_ramsize(uint64_t ramsize)
-> > +int spapr_hpt_shift_for_ramsize(uint64_t ramsize)
-> >  {
-> >      int shift;
-> >
-> > diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> > index 9f88960..4c0b0fb 100644
-> > --- a/hw/ppc/spapr_hcall.c
-> > +++ b/hw/ppc/spapr_hcall.c
-> > @@ -3,6 +3,7 @@
-> >  #include "sysemu/hw_accel.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "qemu/log.h"
-> > +#include "qemu/error-report.h"
-> >  #include "cpu.h"
-> >  #include "exec/exec-all.h"
-> >  #include "helper_regs.h"
-> > @@ -352,20 +353,316 @@ static target_ulong h_read(PowerPCCPU *cpu,
-> > sPAPRMachineState *spapr,
-> >      return H_SUCCESS;
-> >  }
-> >
-> > +struct sPAPRPendingHPT {
-> > +    /* These fields are read-only after initialization */
-> > +    int shift;
-> > +    QemuThread thread;
-> > +
-> > +    /* These fields are protected by the BQL */
-> > +    bool complete;
-> > +
-> > +    /* These fields are private to the preparation thread if
-> > +     * !complete, otherwise protected by the BQL */
-> > +    int ret;
-> > +    void *hpt;
-> > +};
-> > +
-> > +static void free_pending_hpt(sPAPRPendingHPT *pending)
-> > +{
-> > +    if (pending->hpt) {
-> > +        qemu_vfree(pending->hpt);
-> > +    }
-> > +
-> > +    g_free(pending);
-> > +}
-> > +
-> > +static void *hpt_prepare_thread(void *opaque)
-> > +{
-> > +    sPAPRPendingHPT *pending =3D opaque;
-> > +    size_t size =3D 1ULL << pending->shift;
-> > +
-> > +    pending->hpt =3D qemu_memalign(size, size);
-> > +    if (pending->hpt) {
-> > +        memset(pending->hpt, 0, size);
-> > +        pending->ret =3D H_SUCCESS;
-> > +    } else {
-> > +        pending->ret =3D H_NO_MEM;
-> > +    }
-> > +
-> > +    qemu_mutex_lock_iothread();
-> > +
-> > +    if (SPAPR_MACHINE(qdev_get_machine())->pending_hpt =3D=3D pending)=
- {
-> > +        /* Ready to go */
-> > +        pending->complete =3D true;
-> > +    } else {
-> > +        /* We've been cancelled, clean ourselves up */
-> > +        free_pending_hpt(pending);
-> > +    }
-> > +
-> > +    qemu_mutex_unlock_iothread();
-> > +    return NULL;
-> > +}
-> > +
-> > +/* Must be called with BQL held */
-> > +static void cancel_hpt_prepare(sPAPRMachineState *spapr)
-> > +{
-> > +    sPAPRPendingHPT *pending =3D spapr->pending_hpt;
-> > +
-> > +    /* Let the thread know it's cancelled */
-> > +    spapr->pending_hpt =3D NULL;
-> > +
-> > +    if (!pending) {
-> > +        /* Nothing to do */
-> > +        return;
-> > +    }
-> > +
-> > +    if (!pending->complete) {
-> > +        /* thread will clean itself up */
-> > +        return;
-> > +    }
-> > +
-> > +    free_pending_hpt(pending);
-> > +}
-> > +
-> > +static int build_dimm_list(Object *obj, void *opaque)
-> > +{
-> > +    GSList **list =3D opaque;
-> > +
-> > +    if (object_dynamic_cast(obj, TYPE_PC_DIMM)) {
-> > +        DeviceState *dev =3D DEVICE(obj);
-> > +        if (dev->realized) { /* only realized DIMMs matter */
-> > +            *list =3D g_slist_prepend(*list, dev);
-> > +        }
-> > +    }
-> > +
-> > +    object_child_foreach(obj, build_dimm_list, opaque);
-> > +    return 0;
-> > +}
-> > +
-> > +static ram_addr_t get_current_ram_size(void)
-> > +{
-> > +    GSList *list =3D NULL, *item;
-> > +    ram_addr_t size =3D ram_size;
-> > +
-> > +    build_dimm_list(qdev_get_machine(), &list);
-> > +    for (item =3D list; item; item =3D g_slist_next(item)) {
-> > +        Object *obj =3D OBJECT(item->data);
-> > +        if (!strcmp(object_get_typename(obj), TYPE_PC_DIMM)) {
-> > +            size +=3D object_property_get_int(obj, PC_DIMM_SIZE_PROP,
-> > +                                            &error_abort);
-> > +        }
-> > +    }
-> >
->=20
-> You could use the existing API pc_existing_dimms_capacity() for the
-> above.
-
-Good idea, thanks.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---+1TulI7fc0PCHNy3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJYx3lqAAoJEGw4ysog2bOS6HwQALcg6wGnbQJ3DpmjoPISGHBw
-UZud0acCo0/b15SVxMBCciMAPOmHGJFvbn5Lgrnok8+E9O+BA62W86/7P34Q35qh
-QvVcsngolcPp2WLWbThvH6FBt9OhLTssq7Res79CqyD/K/ztr/QGNoiScImON7ne
-X/Qq6dbxUA2wkp6PQahMjB9M3x5FK1kOfXcUK3DAAuILOUl6b2PYa6TnlJqz8IX1
-xYByMTS3oW5hnoqR6cXuMTRtAcTpvNDJ1GQwTg+ncVeSlOddWfxnY/WbP4cDGiNT
-SUJ+fRKuCECnd9LixZ/dAHkujepmvSUbhM4VXm92qyosW11Lo8nXaB5h11OnaU6B
-6oOgtVrc6xoN/zVUGuffIN8HnkcM9ay7UenvrV/hkC54J8cwA3Y3CfdvPQ6ywvlE
-nLaHISAAI7Mm4Z2TUC3C/sefzvt5Fp6hhzBomsasgqNt7LmKxeyU05E6F56iEnlX
-kXoaqj3RyI+yIq8gmEthwAYU4nZowyUcHtkRL1y50VpmOlQjCY2bt1uPOe3RjH82
-RkPRrQEi9IRfcDx8TklLdkbc+4+6Dp9B99ys5ddEr+U/TeVVlXBJDU3dVNQR+jls
-z62+5THIDx6aW4yjLpF9ihDtzyE7CbZno2U3gzTW35taLj9opxK+5kwAkJ0uW9/B
-q3FP3DstmysiTeAgkogV
-=umzW
------END PGP SIGNATURE-----
-
---+1TulI7fc0PCHNy3--
+PiA+ID4gU3VicGFnZXMgbmV2ZXIgaGF2ZSBzdWJyZWdpb25zLCBzbyB0aGUgbG9vcCBuZXZlciBy
+dW5zLiAgVGhlDQo+IGJlZ2luL2NvbW1pdA0KPiA+ID4gcGFpciB0aGVuIGJlY29tZXM6DQo+ID4g
+Pg0KPiA+ID4gICAgICsrbWVtb3J5X3JlZ2lvbl90cmFuc2FjdGlvbl9kZXB0aDsNCj4gPiA+ICAg
+ICAtLW1lbW9yeV9yZWdpb25fdHJhbnNhY3Rpb25fZGVwdGg7DQo+ID4gPiAgICAgaWYgKCFtZW1v
+cnlfcmVnaW9uX3RyYW5zYWN0aW9uX2RlcHRoKSB7DQo+ID4gPiAgICAgICAgIGlmIChtZW1vcnlf
+cmVnaW9uX3VwZGF0ZV9wZW5kaW5nKSB7DQo+ID4gPiAgICAgICAgICAgICAuLi4NCj4gPiA+ICAg
+ICAgICAgfSBlbHNlIGlmIChpb2V2ZW50ZmRfdXBkYXRlX3BlbmRpbmcpIHsNCj4gPiA+ICAgICAg
+ICAgICAgIC4uLg0KPiA+ID4gICAgICAgICB9DQo+ID4gPiAgICAgICAgIC8vIG1lbW9yeV9yZWdp
+b25fY2xlYXJfcGVuZGluZygpDQo+ID4gPiAgICAgICAgIG1lbW9yeV9yZWdpb25fdXBkYXRlX3Bl
+bmRpbmcgPSBmYWxzZTsNCj4gPiA+ICAgICAgICAgaW9ldmVudGZkX3VwZGF0ZV9wZW5kaW5nID0g
+ZmFsc2U7DQo+ID4gPiAgICB9DQo+ID4gPg0KPiA+ID4gSWYgbWVtb3J5X3JlZ2lvbl90cmFuc2Fj
+dGlvbl9kZXB0aCBpcyA+IDAgdGhlIGJlZ2luL2NvbW1pdCBwYWlyIGRvZXMNCj4gPiA+IG5vdGhp
+bmcuDQo+ID4gPg0KPiA+ID4gQnV0IGlmIG1lbW9yeV9yZWdpb25fdHJhbnNhY3Rpb25fZGVwdGgg
+aXMgPT0gMCwgdGhlcmUgc2hvdWxkIGJlIG5vDQo+IHVwZGF0ZQ0KPiA+ID4gcGVuZGluZyBiZWNh
+dXNlIHRoZSBsb29wIGhhcyBuZXZlciBydW4uICBTbyBJIGRvbid0IHNlZSB3aGF0IHlvdXIgcGF0
+Y2gNCj4gY2FuDQo+ID4gPiBjaGFuZ2UuDQo+ID4NCj4gPiBBcyBJIG1lbnRpb25lZCBpbiBQQVRD
+SDEsIHRoaXMgcGF0Y2ggaXMgdXNlZCB0byBmaXggYW4gaXNzdWUgYWZ0ZXIgd2UNCj4gcmVtb3Zl
+DQo+ID4gdGhlIGdsb2JhbCBsb2NrIGluIFJDVSBjYWxsYmFjay4gQWZ0ZXIgZ2xvYmFsIGxvY2sg
+aXMgcmVtb3ZlZCwgb3RoZXIgdGhyZWFkDQo+ID4gbWF5IHNldCB1cCB1cGRhdGUgcGVuZGluZywg
+c28gbWVtb3J5X3JlZ2lvbl90cmFuc2FjdGlvbl9jb21taXQNCj4gPiBtYXkgdHJ5IHRvIHJlYnVp
+bGQgUGh5c1BhZ2VNYXAgZXZlbiB0aGUgbG9vcCBkb2VzbuKAmXQgcnVuLCBvdGhlciB0aHJlYWQN
+Cj4gbWF5DQo+ID4gdHJ5IHRvIHJlYnVpbGQgUGh5c1BhZ2VNYXAgYXQgdGhlIHNhbWUgdGltZSwg
+aXQgaXMgYSByYWNlIGNvbmRpdGlvbi4NCj4gPiBzdWJwYWdlIE1lbW9yeVJlZ2lvbiBpcyBhIHNw
+ZWNpZmljIE1lbW9yeVJlZ2lvbiwgaXQgZG9lc24ndCBiZWxvbmcgdG8NCj4gYW55DQo+ID4gYWRk
+cmVzcyBzcGFjZSwgaXQgaXMgb25seSB1c2VkIHRvIGhhbmRsZSBzdWJwYWdlLiBXZSBtYXkgdXNl
+IGEgbmV3DQo+IHN0cnVjdHVyZQ0KPiA+IG90aGVyIHRoYW4gTWVtb3J5UmVnaW9uIHRvIGhhbmRs
+ZSBzdWJwYWdlIHRvIG1ha2UgdGhlIGxvZ2ljIG1vcmUNCj4gY2xlYXJlci4gQWZ0ZXINCj4gPiB0
+aGUgY2hhbmdlLCBSQ1UgY2FsbGJhY2sgd2lsbCBub3QgZnJlZSBhbnkgTWVtb3J5UmVnaW9uLg0K
+PiANCj4gVGhpcyBpcyBub3QgdHJ1ZS4gIFRyeSBob3QtdW5wbHVnZ2luZyBhIGRldmljZS4NCg0K
+WW91IGFyZSByaWdodCwgaG90LXVucGx1Z2dpbmcgZG9lcyBjYXVzZSBtZW1vcnkgcmVnaW9uKG5v
+dCBmb3Igc3VicGFnZSkgZnJlZWQgaW4gUkNVIHRocmVhZC4NCg0KSSB0cmllZCBwY2kgZGV2aWNl
+IGhvdCBwbHVnL3VucGx1ZywNCldoZW4gcGx1ZyBhIGRldmljZSwNCmhhbmRsZV9obXBfY29tbWFu
+ZC0+cW1wX2RldmljZV9hZGQtPnFkZXZfZGV2aWNlX2FkZC0+DQp2aXJ0aW9fcGNpX2RjX3JlYWxp
+emUtPnBjaV9xZGV2X3JlYWxpemUtPnZpcnRpb19wY2lfcmVhbGl6ZS0+DQp2aXJ0aW9fZGV2aWNl
+X3JlYWxpemUtPnZpcnRpb19idXNfZGV2aWNlX3BsdWdnZWQtPnZpcnRpb19wY2lfZGV2aWNlX3Bs
+dWdnZWQgDQphcmUgY2FsbGVkLg0Kd2hlbiB1bnBsdWcgYSBkZXZpY2UsDQprdm1fY3B1X2V4ZWMt
+Pm1lbW9yeV9yZWdpb25fd3JpdGVfYWNjZXNzb3ItPnBjaV93cml0ZS0+DQp2aXJ0aW9fZGV2aWNl
+X3VucmVhbGl6ZS0+dmlydGlvX3BjaV9kZXZpY2VfdW5wbHVnZ2VkIA0KYXJlIGNhbGxlZC4NCg0K
+bWVtb3J5IHJlZ2lvbiBhZGRpdGlvbiBhbmQgcmVtb3ZlIGhhcHBlbiBpbiB2aXJ0aW9fcGNpX2Rl
+dmljZV9wbHVnZ2VkIA0KYW5kIHZpcnRpb19wY2lfZGV2aWNlX3VucGx1Z2dlZCByZXNwZWN0aXZl
+bHksIG1lbW9yeSByZWdpb24gb3BlcmF0aW9uIG5lZWRzDQogdG8gYWNxdWlyZSB0aGUgZ2xvYmFs
+IGxvY2ssIGJ1dCBub25lIG9mIHRoZW0gaGFwcGVucyBpbiBSQ1UgdGhyZWFkLg0KDQpXaGVuIG1l
+bW9yeV9yZWdpb25fZmluYWxpemUgaXMgY2FsbGVkLCB0aGUgbWVtb3J5IHJlZ2lvbiBoYXMgYmVl
+biByZW1vdmVkIA0KZnJvbSB0aGUgYWRkcmVzcyBzcGFjZSAocmVtb3ZlZCBpbiB2aXJ0aW9fcGNp
+X2RldmljZV91bnBsdWdnZWQpLCBib3RoIG1yLT5zdWJyZWdpb25zIA0KYW5kIG1yLT5jb2FsZXNj
+ZWQgYXJlIGVtcHR5LiBJdCBtYWtlcyBzZW5zZSB0byBtZSwgd2hlbiBtZW1vcnlfcmVnaW9uX2Zp
+bmFsaXplIGlzIGNhbGxlZCwgDQptZWFucyB0aGlzIG1lbW9yeSByZWdpb24gaXMgbm90IHVzZWQg
+YW55IG1vcmUuDQpQbGVhc2UgY29ycmVjdCBtZSBpZiBJJ20gd3JvbmcgaGVyZSwgSSBvbmx5IHRy
+aWVkIHBjaSBkZXZpY2UgaG90IHBsdWcvdW5wbHVnLg0KDQpJZiBhYm92ZSBhc3N1bXB0aW9uIGlz
+IGNvcnJlY3QsIHNlZW1zIHdlIGRvbid0IG5lZWQgdGhlIGdsb2JhbCBsb2NrIGZvciBtZW1vcnkg
+cmVnaW9uICANCnJlY2xhbWF0aW9uIGluIFJDVSB0aHJlYWQuIFBsZWFzZSBsZXQgbWUga25vdyBp
+ZiBvdGhlciAgbWVtb3J5IHJlY2xhbWF0aW9uIGluIFJDVSB0aHJlYWQgDQpuZWVkIHRoZSBnbG9i
+YWwgbG9jay4NCg0KVW5kZXIgdGhlIGFzc3VtcHRpb24sIEkgaGF2ZSBiZWxvdyBwYXRjaCB0byBy
+ZW1vdmUgdGhlIGdsb2JhbCBsb2NrIGluIFJDVSB0aHJlYWQsIA0KSSB0ZXN0ZWQgdm0gYm9vdCAs
+cmVib290LCBzaHV0ZG93biBhbmQgcGNpIGRldmljZSBob3QgcGx1Zy91bnBsdWcuDQpQbGVhc2Ug
+cmV2aWV3IHRoZSBwYXRjaCwgDQpJZiBubyBmdXJ0aGVyIGlzc3VlLCBJIHdpbGwgc2VuZCBvdXQg
+YW4gb2ZmaWNpYWwgcGF0Y2ggbGF0ZXIuDQoNClRoYW5rcywNCkFudGhvbnkNCg0KDQpkaWZmIC0t
+Z2l0IGEvbWVtb3J5LmMgYi9tZW1vcnkuYw0KaW5kZXggNmM1ODM3My4uNDNlMDZlOSAxMDA2NDQN
+Ci0tLSBhL21lbW9yeS5jDQorKysgYi9tZW1vcnkuYw0KQEAgLTE1MDMsMTUgKzE1MDMsOSBAQCBz
+dGF0aWMgdm9pZCBtZW1vcnlfcmVnaW9uX2ZpbmFsaXplKE9iamVjdCAqb2JqKQ0KICAgICAgKiBh
+bmQgY2F1c2UgYW4gaW5maW5pdGUgbG9vcC4NCiAgICAgICovDQogICAgIG1yLT5lbmFibGVkID0g
+ZmFsc2U7DQotICAgIG1lbW9yeV9yZWdpb25fdHJhbnNhY3Rpb25fYmVnaW4oKTsNCi0gICAgd2hp
+bGUgKCFRVEFJTFFfRU1QVFkoJm1yLT5zdWJyZWdpb25zKSkgew0KLSAgICAgICAgTWVtb3J5UmVn
+aW9uICpzdWJyZWdpb24gPSBRVEFJTFFfRklSU1QoJm1yLT5zdWJyZWdpb25zKTsNCi0gICAgICAg
+IG1lbW9yeV9yZWdpb25fZGVsX3N1YnJlZ2lvbihtciwgc3VicmVnaW9uKTsNCi0gICAgfQ0KLSAg
+ICBtZW1vcnlfcmVnaW9uX3RyYW5zYWN0aW9uX2NvbW1pdCgpOw0KLQ0KKyAgICBhc3NlcnQoUVRB
+SUxRX0VNUFRZKCZtci0+c3VicmVnaW9ucykpOw0KICAgICBtci0+ZGVzdHJ1Y3Rvcihtcik7DQot
+ICAgIG1lbW9yeV9yZWdpb25fY2xlYXJfY29hbGVzY2luZyhtcik7DQorICAgIGFzc2VydChRVEFJ
+TFFfRU1QVFkoJm1yLT5jb2FsZXNjZWQpKTsNCiAgICAgZ19mcmVlKChjaGFyICopbXItPm5hbWUp
+Ow0KICAgICBnX2ZyZWUobXItPmlvZXZlbnRmZHMpOw0KIH0NCmRpZmYgLS1naXQgYS91dGlsL3Jj
+dS5jIGIvdXRpbC9yY3UuYw0KaW5kZXggOWFkYzVlNC4uNTFlMDI0OCAxMDA2NDQNCi0tLSBhL3V0
+aWwvcmN1LmMNCisrKyBiL3V0aWwvcmN1LmMNCkBAIC0yNTQsMjQgKzI1NCwyMCBAQCBzdGF0aWMg
+dm9pZCAqY2FsbF9yY3VfdGhyZWFkKHZvaWQgKm9wYXF1ZSkNCg0KICAgICAgICAgYXRvbWljX3N1
+YigmcmN1X2NhbGxfY291bnQsIG4pOw0KICAgICAgICAgc3luY2hyb25pemVfcmN1KCk7DQotICAg
+ICAgICBxZW11X211dGV4X2xvY2tfaW90aHJlYWQoKTsNCiAgICAgICAgIHdoaWxlIChuID4gMCkg
+ew0KICAgICAgICAgICAgIG5vZGUgPSB0cnlfZGVxdWV1ZSgpOw0KICAgICAgICAgICAgIHdoaWxl
+ICghbm9kZSkgew0KLSAgICAgICAgICAgICAgICBxZW11X211dGV4X3VubG9ja19pb3RocmVhZCgp
+Ow0KICAgICAgICAgICAgICAgICBxZW11X2V2ZW50X3Jlc2V0KCZyY3VfY2FsbF9yZWFkeV9ldmVu
+dCk7DQogICAgICAgICAgICAgICAgIG5vZGUgPSB0cnlfZGVxdWV1ZSgpOw0KICAgICAgICAgICAg
+ICAgICBpZiAoIW5vZGUpIHsNCiAgICAgICAgICAgICAgICAgICAgIHFlbXVfZXZlbnRfd2FpdCgm
+cmN1X2NhbGxfcmVhZHlfZXZlbnQpOw0KICAgICAgICAgICAgICAgICAgICAgbm9kZSA9IHRyeV9k
+ZXF1ZXVlKCk7DQogICAgICAgICAgICAgICAgIH0NCi0gICAgICAgICAgICAgICAgcWVtdV9tdXRl
+eF9sb2NrX2lvdGhyZWFkKCk7DQogICAgICAgICAgICAgfQ0KDQogICAgICAgICAgICAgbi0tOw0K
+ICAgICAgICAgICAgIG5vZGUtPmZ1bmMobm9kZSk7DQogICAgICAgICB9DQotICAgICAgICBxZW11
+X211dGV4X3VubG9ja19pb3RocmVhZCgpOw0KICAgICB9DQogICAgIGFib3J0KCk7DQogfQ0KDQoN
+Cg0KDQoNCj4gDQo+IEknbSBhbGwgZm9yIHJlZHVjaW5nIHRoZSBzY29wZSBvZiB0aGUgZ2xvYmFs
+IFFFTVUgbG9jaywgDQpUaGFua3MsDQoNCg0KPmJ1dCB0aGlzIG5lZWRzIGEgcGxhbg0KPiBhbmQg
+YSBjYXJlZnVsIGFuYWx5c2lzIG9mIHRoZSBpbnZvbHZlZCBkYXRhIHN0cnVjdHVyZXMgYWNyb3Nz
+IF9hbGxfDQo+IGluc3RhbmNlX2ZpbmFsaXplDQo+IGltcGxlbWVudGF0aW9ucy4NCkFncmVlZCwN
+Cg0KQmVsb3cgZnVuY3Rpb25zIGFyZSByZWdpc3RlcmVkIGluIFJDVSB0aHJlYWQNCmFkZHJlc3Nf
+c3BhY2VfZGlzcGF0Y2hfZnJlZSwNCmRvX2FkZHJlc3Nfc3BhY2VfZGVzdHJveQ0KZmxhdHZpZXdf
+dW5yZWYNCnJlY2xhaW1fcmFtYmxvY2ssDQpxaHRfbWFwX2Rlc3Ryb3ksDQptaWdyYXRpb25fYml0
+bWFwX2ZyZWUNCg0KZmlyc3QgdGhyZWUgYXJlIGFkZHJlc3Mgc3BhY2UgcmVsYXRlZCwgc2hvdWxk
+IHdvcmsgd2l0aG91dCBnbG9iYWwgbG9jayBwZXIgYWJvdmUgYW5hbHlzaXMuDQpUaGUgcmVzdCBh
+cmUgdmVyeSBzaW1wbGUsIHNlZW1zIGRvZXNuJ3QgbmVlZCBnbG9iYWwgbG9jay4NCg0KDQoNCg0K
+PiANCj4gUGFvbG8NCg==
