@@ -1,44 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cnd3U-0003je-UN
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 23:23:25 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1cnd47-00042x-BB
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 23:24:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cnd3Q-0003ns-TH
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 23:23:24 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38317
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1cnd3Q-0003nR-Mm
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 23:23:20 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2E3ERSv100371
-	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 23:23:19 -0400
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 295vx6pshn-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 23:23:18 -0400
-Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Mon, 13 Mar 2017 23:23:18 -0400
-Date: Tue, 14 Mar 2017 11:23:12 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20170308021533.78292-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170308021533.78292-2-bjsdjshi@linux.vnet.ibm.com>
-	<20170308091346.GB5211@noname.redhat.com>
-	<20170308093105.GC7563@bjsdjshi@linux.vnet.ibm.com>
-	<20170313033105.GA6756@bjsdjshi@linux.vnet.ibm.com>
-	<20170313101522.GA5545@noname.redhat.com>
-MIME-Version: 1.0
+	(envelope-from <programmingkidx@gmail.com>) id 1cnd43-0003uy-Bf
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 23:24:03 -0400
+Received: from mail-it0-x22b.google.com ([2607:f8b0:4001:c0b::22b]:38421)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1cnd43-0003uo-6z
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 23:23:59 -0400
+Received: by mail-it0-x22b.google.com with SMTP id m27so43969507iti.1
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 20:23:59 -0700 (PDT)
+Mime-Version: 1.0 (Apple Message framework v1084)
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170313101522.GA5545@noname.redhat.com>
-Message-Id: <20170314032312.GF6756@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH RFC 1/1] block: Handle NULL options
- correctly in raw_open
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <mailman.57839.1489090092.22737.qemu-devel@nongnu.org>
+Date: Mon, 13 Mar 2017 23:23:56 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <8C652FA5-CADE-432E-BA79-979CDD7261EE@gmail.com>
+References: <mailman.57839.1489090092.22737.qemu-devel@nongnu.org>
+Subject: [Qemu-devel]  [PATCH Risu v2 0/3] PPC64 Improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,93 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-block@nongnu.org, mreitz@redhat.com, qemu-devel@nongnu.org, cornelia.huck@de.ibm.com, pasic@linux.vnet.ibm.com
+To: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-* Kevin Wolf <kwolf@redhat.com> [2017-03-13 11:15:22 +0100]:
 
-> Am 13.03.2017 um 04:31 hat Dong Jia Shi geschrieben:
-> > * Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> [2017-03-08 17:31:05 +0800]:
-> > 
-> > > * Kevin Wolf <kwolf@redhat.com> [2017-03-08 10:13:46 +0100]:
-> > > 
-> > > > Am 08.03.2017 um 03:15 hat Dong Jia Shi geschrieben:
-> > > > > A normal call for raw_open should always pass in a non-NULL @options,
-> > > > > but for some certain cases (e.g. trying to applying snapshot on a RBD
-> > > > > image), they call raw_open with a NULL @options right after the calling
-> > > > > for raw_close.
-> > > > > 
-> > > > > Let's take the NULL @options as a sign of trying to do raw_open again,
-> > > > > and just simply return a success code.
-> > > > > 
-> > > > > Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-> > > > 
-> > > > I think we rather need to fix bdrv_snapshot_goto() so that it doesn't
-> > > > pass NULL, but the actual options that were given for the node (i.e.
-> > > > bs->options).
-> > > I've tried that before the current try. bs->options does not have the
-> > > "file" key-value pair, so that leads to a fail too. Should we put "file"
-> > > in to the options manually? I noticed that it was removed from
-> > > bs->options during the calling of bdrv_open_inherit.
-> > > 
-> > Hi Kevin,
-> > 
-> > After thinking for quite some time, I still don't think we need to fix
-> > the caller. The reason is that raw_close always does nothing, so no
-> > matter what the caller passing in, raw_open should do nothing but just
-> > return 0.
-> 
-> raw is not the only format driver in qemu.
-> 
-Hi Kevin,
+On Mar 9, 2017, at 3:08 PM, qemu-devel-request@nongnu.org wrote:
 
-Before this I assumed that the long existing code in bdrv_snapshot_goto
-which passes in a NULL options to raw_open is on purpose, and that
-implies to me raw_open (and any other .bdrv_open callback) takes the
-responsibility to handle NULL options well. So at a first glance, I read
-your above comment as:
-"You should also fix .bdrv_open callback for every other formats to
-handle NULL options as well."
+> v2:
+> - applied code review
+>=20
+> This patchset include initial support to PPC64 (Big-Endian), that is =
+pretty=20
+> much the same: only some fixes in configure and risugen.
+> Also, it adds a better random initialization of VSX registers.
+>=20
+> Jose Ricardo Ziviani (3):
+>  risugen_ppc64: Load random 128-bit data to VSX registers
+>  configure: Add initial support to PPC64 (big endian)
+>  risugen,risugen_ppc64.pm: Add support ppc64 (big-endian)
+>=20
+> configure        |  9 ++++-----
+> risugen          |  6 +++++-
+> risugen_ppc64.pm | 44 +++++++++++++++++++++++++++++++++-----------
+> 3 files changed, 42 insertions(+), 17 deletions(-)
+>=20
+> --=20
+> 2.7.4
 
-But after staring it for a while, I read it from another point around:
-"You should fix the caller."
-If this is what you actually meant to tell, I have the following
-proposal then:
-diff --git a/block/snapshot.c b/block/snapshot.c
-index bf5c2ca..dfec139 100644
---- a/block/snapshot.c
-+++ b/block/snapshot.c
-@@ -27,6 +27,7 @@
- #include "block/block_int.h"
- #include "qapi/error.h"
- #include "qapi/qmp/qerror.h"
-+#include "qapi/qmp/qstring.h"
- 
- QemuOptsList internal_snapshot_opts = {
-     .name = "snapshot",
-@@ -189,9 +190,14 @@ int bdrv_snapshot_goto(BlockDriverState *bs,
-     }
- 
-     if (bs->file) {
-+        QDict *options = qdict_clone_shallow(bs->options);
-+        qdict_put(options, "file",
-+                  qstring_from_str(bdrv_get_node_name(bs->file->bs)));
-+
-         drv->bdrv_close(bs);
-         ret = bdrv_snapshot_goto(bs->file->bs, snapshot_id);
--        open_ret = drv->bdrv_open(bs, NULL, bs->open_flags, NULL);
-+        open_ret = drv->bdrv_open(bs, options, bs->open_flags, NULL);
-+        QDECREF(options);
-         if (open_ret < 0) {
-             bdrv_unref(bs->file->bs);
-             bs->drv = NULL;
-
-I know I'm a little wordy, but that's because I want to make things
-clear. Anyway, I have to rely on your advice on this, since you are the
-expert.
-
-> Kevin
-> 
-
--- 
-Dong Jia
+Are there plans on adding 32 bit PowerPC support to Risu?=
