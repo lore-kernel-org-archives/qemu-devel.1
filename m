@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hangaohuai@huawei.com>) id 1cng86-00007u-2f
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 02:40:23 -0400
+	(envelope-from <hare@suse.de>) id 1cngHD-0001zE-AB
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 02:49:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hangaohuai@huawei.com>) id 1cng82-0000Of-UV
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 02:40:22 -0400
-Received: from [45.249.212.187] (port=2999 helo=dggrg01-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <hangaohuai@huawei.com>) id 1cng81-0000Mi-LK
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 02:40:18 -0400
-From: hangaohuai <hangaohuai@huawei.com>
-Date: Tue, 14 Mar 2017 14:39:19 +0800
-Message-ID: <20170314063919.16200-1-hangaohuai@huawei.com>
+	(envelope-from <hare@suse.de>) id 1cngHC-0004h6-DQ
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 02:49:47 -0400
+References: <20170313195547.21466-1-eblake@redhat.com>
+	<20170313195547.21466-3-eblake@redhat.com>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <b2c75809-d339-4821-d28b-27504ff640b7@suse.de>
+Date: Tue, 14 Mar 2017 07:49:38 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH for-2.9 v2] fix :cirrus_vga fix OOB read case
- qemu Segmentation fault
+In-Reply-To: <20170313195547.21466-3-eblake@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 02/30] trace: Fix incorrect megasas
+ trace parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,52 +24,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com, arei.gonglei@huawei.com, hangaohuai@huawei.com, fangying1@huawei.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, "open list:megasas" <qemu-block@nongnu.org>
 
-check the validity of parameters in cirrus_bitblt_rop_fwd_transp_xxx
-and cirrus_bitblt_rop_fwd_xxx to avoid the OOB read which causes qemu Segmentation fault.
+On 03/13/2017 08:55 PM, Eric Blake wrote:
+> hw/scsi/trace-events lists cmd as the first parameter for both
+> megasas_iovec_overflow and megasas_iovec_underflow, but the caller
+> was mistakenly passing cmd->iov_size twice instead of the command
+> index.  Also, trace_megasas_abort_invalid is called with parameters
+> in the wrong order.  Broken since its introduction in commit
+> e8f943c3.
+>=20
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  hw/scsi/megasas.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+> index e3d59b7..84b8caf 100644
+> --- a/hw/scsi/megasas.c
+> +++ b/hw/scsi/megasas.c
+> @@ -291,7 +291,7 @@ static int megasas_map_sgl(MegasasState *s, Megasas=
+Cmd *cmd, union mfi_sgl *sgl)
+>      if (cmd->iov_size > iov_size) {
+>          trace_megasas_iovec_overflow(cmd->index, iov_size, cmd->iov_si=
+ze);
+>      } else if (cmd->iov_size < iov_size) {
+> -        trace_megasas_iovec_underflow(cmd->iov_size, iov_size, cmd->io=
+v_size);
+> +        trace_megasas_iovec_underflow(cmd->index, iov_size, cmd->iov_s=
+ize);
+>      }
+>      cmd->iov_offset =3D 0;
+>      return 0;
+> @@ -1924,8 +1924,8 @@ static int megasas_handle_abort(MegasasState *s, =
+MegasasCmd *cmd)
+>          abort_ctx &=3D (uint64_t)0xFFFFFFFF;
+>      }
+>      if (abort_cmd->context !=3D abort_ctx) {
+> -        trace_megasas_abort_invalid_context(cmd->index, abort_cmd->ind=
+ex,
+> -                                            abort_cmd->context);
+> +        trace_megasas_abort_invalid_context(cmd->index, abort_cmd->con=
+text,
+> +                                            abort_cmd->index);
+>          s->event_count++;
+>          return MFI_STAT_ABORT_NOT_POSSIBLE;
+>      }
+>=20
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-After the fix, we will touch the assert in
-cirrus_invalidate_region:
-assert(off_cur_end >= off_cur);
+Cheers,
 
-Signed-off-by: fangying <fangying1@huawei.com>
-Signed-off-by: hangaohuai <hangaohuai@huawei.com>
----
-Changes from v1:
- - Add bltheight check. [Gerd Hoffmann]
-
- hw/display/cirrus_vga_rop.h | 10 ++++++++++
- 1 file changed, 10 insertions(+)
-
-diff --git a/hw/display/cirrus_vga_rop.h b/hw/display/cirrus_vga_rop.h
-index 0925a00..b7447f8 100644
---- a/hw/display/cirrus_vga_rop.h
-+++ b/hw/display/cirrus_vga_rop.h
-@@ -97,6 +97,11 @@ glue(glue(cirrus_bitblt_rop_fwd_transp_, ROP_NAME),_8)(CirrusVGAState *s,
-     uint8_t p;
-     dstpitch -= bltwidth;
-     srcpitch -= bltwidth;
-+
-+    if (bltheight > 1 && (dstpitch < 0 || srcpitch < 0)) {
-+        return;
-+    }
-+
-     for (y = 0; y < bltheight; y++) {
-         for (x = 0; x < bltwidth; x++) {
- 	    p = *dst;
-@@ -143,6 +148,11 @@ glue(glue(cirrus_bitblt_rop_fwd_transp_, ROP_NAME),_16)(CirrusVGAState *s,
-     uint8_t p1, p2;
-     dstpitch -= bltwidth;
-     srcpitch -= bltwidth;
-+
-+    if (bltheight > 1 && (dstpitch < 0 || srcpitch < 0)) {
-+        return;
-+    }
-+
-     for (y = 0; y < bltheight; y++) {
-         for (x = 0; x < bltwidth; x+=2) {
- 	    p1 = *dst;
--- 
-1.8.3.1
+Hannes
+--=20
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=FCrnberg
+GF: F. Imend=F6rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG N=FCrnberg)
