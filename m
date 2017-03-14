@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cnlXg-0007Qe-2E
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:27:09 -0400
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cnlXl-0007Ve-FX
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:27:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cnlXc-0007F5-2P
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:27:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44682)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cnlXb-0007EU-PG
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:27:03 -0400
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F39DC3D940
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 12:27:03 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 14 Mar 2017 13:26:59 +0100
-Message-Id: <1489494419-14340-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH] cirrus/vnc: zap bitblit support from console
- code.
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cnlXh-0007JC-DW
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:27:13 -0400
+Received: from [45.249.212.188] (port=2956 helo=dggrg02-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cnlXh-0007DY-1a
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:27:09 -0400
+References: <1488770972-322500-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<20170307200136.GJ25129@grmbl.mre>
+From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Message-ID: <58C7E185.4020303@huawei.com>
+Date: Tue, 14 Mar 2017 20:26:45 +0800
+MIME-Version: 1.0
+In-Reply-To: <20170307200136.GJ25129@grmbl.mre>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] virtio-serial-bus: Delete timer from list
+ before free it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,271 +28,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: Amit Shah <amit@kernel.org>, mst@redhat.com
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org
 
-There is a special code path (dpy_gfx_copy) to allow graphic emulation
-notify user interface code about bitblit operations carryed out by
-guests.  It is supported by cirrus and vnc server.  The intended purpose
-is to optimize display scrolls and just send over the scroll op instead
-of a full display update.
+ping... ?
 
-This is rarely used these days though because modern guests simply don't
-use the cirrus blitter any more.  Any linux guest using the cirrus drm
-driver doesn't.  Any windows guest newer than winxp doesn't ship with a
-cirrus driver any more and thus uses the cirrus as simple framebuffer.
-
-So this code tends to bitrot and bugs can go unnoticed for a long time.
-See for example commit "3e10c3e vnc: fix qemu crash because of SIGSEGV"
-which fixes a bug lingering in the code for almost a year, added by
-commit "c7628bf vnc: only alloc server surface with clients connected".
-
-Also the vnc server will throttle the frame rate in case it figures the
-network can't keep up (send buffers are full).  This doesn't work with
-dpy_gfx_copy, for any copy operation sent to the vnc client we have to
-send all outstanding updates beforehand, otherwise the vnc client might
-run the client side blit on outdated data and thereby corrupt the
-display.  So this dpy_gfx_copy "optimization" might even make things
-worse on slow network links.
-
-Lets kill it once for all.
-
-Oh, and one more reason: Turns out (after writing the patch) we have a
-security bug in that code path ...
-
-Fixes: CVE-2016-9603
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/display/cirrus_vga.c |  12 ++----
- include/ui/console.h    |   7 ----
- ui/console.c            |  28 --------------
- ui/vnc.c                | 100 ------------------------------------------------
- 4 files changed, 3 insertions(+), 144 deletions(-)
-
-diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
-index b9e7cb1..c90a4a3 100644
---- a/hw/display/cirrus_vga.c
-+++ b/hw/display/cirrus_vga.c
-@@ -796,21 +796,15 @@ static int cirrus_do_copy(CirrusVGAState *s, int dst, int src, int w, int h)
-         }
-     }
- 
--    /* we have to flush all pending changes so that the copy
--       is generated at the appropriate moment in time */
--    if (notify)
--        graphic_hw_update(s->vga.con);
--
-     (*s->cirrus_rop) (s, s->vga.vram_ptr + s->cirrus_blt_dstaddr,
-                       s->vga.vram_ptr + s->cirrus_blt_srcaddr,
- 		      s->cirrus_blt_dstpitch, s->cirrus_blt_srcpitch,
- 		      s->cirrus_blt_width, s->cirrus_blt_height);
- 
-     if (notify) {
--        qemu_console_copy(s->vga.con,
--			  sx, sy, dx, dy,
--			  s->cirrus_blt_width / depth,
--			  s->cirrus_blt_height);
-+        dpy_gfx_update(s->vga.con, dx, dy,
-+                       s->cirrus_blt_width / depth,
-+                       s->cirrus_blt_height);
-     }
- 
-     /* we don't have to notify the display that this portion has
-diff --git a/include/ui/console.h b/include/ui/console.h
-index ac2895c..d759338 100644
---- a/include/ui/console.h
-+++ b/include/ui/console.h
-@@ -189,9 +189,6 @@ typedef struct DisplayChangeListenerOps {
-                            int x, int y, int w, int h);
-     void (*dpy_gfx_switch)(DisplayChangeListener *dcl,
-                            struct DisplaySurface *new_surface);
--    void (*dpy_gfx_copy)(DisplayChangeListener *dcl,
--                         int src_x, int src_y,
--                         int dst_x, int dst_y, int w, int h);
-     bool (*dpy_gfx_check_format)(DisplayChangeListener *dcl,
-                                  pixman_format_code_t format);
- 
-@@ -277,8 +274,6 @@ int dpy_set_ui_info(QemuConsole *con, QemuUIInfo *info);
- void dpy_gfx_update(QemuConsole *con, int x, int y, int w, int h);
- void dpy_gfx_replace_surface(QemuConsole *con,
-                              DisplaySurface *surface);
--void dpy_gfx_copy(QemuConsole *con, int src_x, int src_y,
--                  int dst_x, int dst_y, int w, int h);
- void dpy_text_cursor(QemuConsole *con, int x, int y);
- void dpy_text_update(QemuConsole *con, int x, int y, int w, int h);
- void dpy_text_resize(QemuConsole *con, int w, int h);
-@@ -411,8 +406,6 @@ void qemu_console_set_window_id(QemuConsole *con, int window_id);
- 
- void console_select(unsigned int index);
- void qemu_console_resize(QemuConsole *con, int width, int height);
--void qemu_console_copy(QemuConsole *con, int src_x, int src_y,
--                       int dst_x, int dst_y, int w, int h);
- DisplaySurface *qemu_console_surface(QemuConsole *con);
- 
- /* console-gl.c */
-diff --git a/ui/console.c b/ui/console.c
-index d1ff750..4c70d8b 100644
---- a/ui/console.c
-+++ b/ui/console.c
-@@ -1586,27 +1586,6 @@ static void dpy_refresh(DisplayState *s)
-     }
- }
- 
--void dpy_gfx_copy(QemuConsole *con, int src_x, int src_y,
--                  int dst_x, int dst_y, int w, int h)
--{
--    DisplayState *s = con->ds;
--    DisplayChangeListener *dcl;
--
--    if (!qemu_console_is_visible(con)) {
--        return;
--    }
--    QLIST_FOREACH(dcl, &s->listeners, next) {
--        if (con != (dcl->con ? dcl->con : active_console)) {
--            continue;
--        }
--        if (dcl->ops->dpy_gfx_copy) {
--            dcl->ops->dpy_gfx_copy(dcl, src_x, src_y, dst_x, dst_y, w, h);
--        } else { /* TODO */
--            dcl->ops->dpy_gfx_update(dcl, dst_x, dst_y, w, h);
--        }
--    }
--}
--
- void dpy_text_cursor(QemuConsole *con, int x, int y)
- {
-     DisplayState *s = con->ds;
-@@ -2138,13 +2117,6 @@ void qemu_console_resize(QemuConsole *s, int width, int height)
-     dpy_gfx_replace_surface(s, surface);
- }
- 
--void qemu_console_copy(QemuConsole *con, int src_x, int src_y,
--                       int dst_x, int dst_y, int w, int h)
--{
--    assert(con->console_type == GRAPHIC_CONSOLE);
--    dpy_gfx_copy(con, src_x, src_y, dst_x, dst_y, w, h);
--}
--
- DisplaySurface *qemu_console_surface(QemuConsole *console)
- {
-     return console->surface;
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 51f4b30..8bfb1e0 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -894,105 +894,6 @@ int vnc_send_framebuffer_update(VncState *vs, int x, int y, int w, int h)
-     return n;
- }
- 
--static void vnc_copy(VncState *vs, int src_x, int src_y, int dst_x, int dst_y, int w, int h)
--{
--    /* send bitblit op to the vnc client */
--    vnc_lock_output(vs);
--    vnc_write_u8(vs, VNC_MSG_SERVER_FRAMEBUFFER_UPDATE);
--    vnc_write_u8(vs, 0);
--    vnc_write_u16(vs, 1); /* number of rects */
--    vnc_framebuffer_update(vs, dst_x, dst_y, w, h, VNC_ENCODING_COPYRECT);
--    vnc_write_u16(vs, src_x);
--    vnc_write_u16(vs, src_y);
--    vnc_unlock_output(vs);
--    vnc_flush(vs);
--}
--
--static void vnc_dpy_copy(DisplayChangeListener *dcl,
--                         int src_x, int src_y,
--                         int dst_x, int dst_y, int w, int h)
--{
--    VncDisplay *vd = container_of(dcl, VncDisplay, dcl);
--    VncState *vs, *vn;
--    uint8_t *src_row;
--    uint8_t *dst_row;
--    int i, x, y, pitch, inc, w_lim, s;
--    int cmp_bytes;
--
--    if (!vd->server) {
--        /* no client connected */
--        return;
--    }
--
--    vnc_refresh_server_surface(vd);
--    QTAILQ_FOREACH_SAFE(vs, &vd->clients, next, vn) {
--        if (vnc_has_feature(vs, VNC_FEATURE_COPYRECT)) {
--            vs->force_update = 1;
--            vnc_update_client(vs, 1, true);
--            /* vs might be free()ed here */
--        }
--    }
--
--    if (!vd->server) {
--        /* no client connected */
--        return;
--    }
--    /* do bitblit op on the local surface too */
--    pitch = vnc_server_fb_stride(vd);
--    src_row = vnc_server_fb_ptr(vd, src_x, src_y);
--    dst_row = vnc_server_fb_ptr(vd, dst_x, dst_y);
--    y = dst_y;
--    inc = 1;
--    if (dst_y > src_y) {
--        /* copy backwards */
--        src_row += pitch * (h-1);
--        dst_row += pitch * (h-1);
--        pitch = -pitch;
--        y = dst_y + h - 1;
--        inc = -1;
--    }
--    w_lim = w - (VNC_DIRTY_PIXELS_PER_BIT - (dst_x % VNC_DIRTY_PIXELS_PER_BIT));
--    if (w_lim < 0) {
--        w_lim = w;
--    } else {
--        w_lim = w - (w_lim % VNC_DIRTY_PIXELS_PER_BIT);
--    }
--    for (i = 0; i < h; i++) {
--        for (x = 0; x <= w_lim;
--                x += s, src_row += cmp_bytes, dst_row += cmp_bytes) {
--            if (x == w_lim) {
--                if ((s = w - w_lim) == 0)
--                    break;
--            } else if (!x) {
--                s = (VNC_DIRTY_PIXELS_PER_BIT -
--                    (dst_x % VNC_DIRTY_PIXELS_PER_BIT));
--                s = MIN(s, w_lim);
--            } else {
--                s = VNC_DIRTY_PIXELS_PER_BIT;
--            }
--            cmp_bytes = s * VNC_SERVER_FB_BYTES;
--            if (memcmp(src_row, dst_row, cmp_bytes) == 0)
--                continue;
--            memmove(dst_row, src_row, cmp_bytes);
--            QTAILQ_FOREACH(vs, &vd->clients, next) {
--                if (!vnc_has_feature(vs, VNC_FEATURE_COPYRECT)) {
--                    set_bit(((x + dst_x) / VNC_DIRTY_PIXELS_PER_BIT),
--                            vs->dirty[y]);
--                }
--            }
--        }
--        src_row += pitch - w * VNC_SERVER_FB_BYTES;
--        dst_row += pitch - w * VNC_SERVER_FB_BYTES;
--        y += inc;
--    }
--
--    QTAILQ_FOREACH(vs, &vd->clients, next) {
--        if (vnc_has_feature(vs, VNC_FEATURE_COPYRECT)) {
--            vnc_copy(vs, src_x, src_y, dst_x, dst_y, w, h);
--        }
--    }
--}
--
- static void vnc_mouse_set(DisplayChangeListener *dcl,
-                           int x, int y, int visible)
- {
-@@ -3120,7 +3021,6 @@ static gboolean vnc_listen_io(QIOChannel *ioc,
- static const DisplayChangeListenerOps dcl_ops = {
-     .dpy_name             = "vnc",
-     .dpy_refresh          = vnc_refresh,
--    .dpy_gfx_copy         = vnc_dpy_copy,
-     .dpy_gfx_update       = vnc_dpy_update,
-     .dpy_gfx_switch       = vnc_dpy_switch,
-     .dpy_gfx_check_format = qemu_pixman_check_format,
--- 
-1.8.3.1
+On 2017/3/8 4:01, Amit Shah wrote:
+> On (Mon) 06 Mar 2017 [11:29:31], zhanghailiang wrote:
+>> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+>
+> Reviewed-by: Amit Shah <amit@kernel.org>
+>
+> Michael, please pick this up.
+>
+> 		Amit
+>
