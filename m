@@ -1,27 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53287)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cniIX-0000K6-OI
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:59:18 -0400
+	(envelope-from <stefanha@redhat.com>) id 1cniSV-0003dR-HB
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 05:09:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cniIU-0006rW-NS
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:59:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60748)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cniIU-0006rA-HL
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:59:14 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <CAFEAcA9F2BPexRieaEhu+UpJxoOdEfw8eggW8b2SjuoMMTNgog@mail.gmail.com>
-	(Peter Maydell's message of "Tue, 14 Mar 2017 09:37:24 +0100")
-References: <87tw6y8bs8.fsf@secure.mitica>
-	<CAFEAcA978SJemCfYJPa8jwtuhhi6JGh9pEDGYNJ1npJA3nvEQA@mail.gmail.com>
-	<20170314081312.GB13140@stefanha-x1.localdomain>
-	<CAFEAcA9F2BPexRieaEhu+UpJxoOdEfw8eggW8b2SjuoMMTNgog@mail.gmail.com>
-Reply-To: quintela@redhat.com
-Date: Tue, 14 Mar 2017 09:59:12 +0100
-Message-ID: <87wpbstesf.fsf@secure.mitica>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] KVM call for 2017-03-14
+	(envelope-from <stefanha@redhat.com>) id 1cniSU-0002Ar-MI
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 05:09:35 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Tue, 14 Mar 2017 17:09:22 +0800
+Message-Id: <20170314090922.28083-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH] file-posix: clean up max_segments buffer
+ termination
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +18,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developer <qemu-devel@nongnu.org>, KVM devel mailing list <kvm@vger.kernel.org>
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 14 March 2017 at 09:13, Stefan Hajnoczi <stefanha@gmail.com> wrote:
->> On Mon, Mar 13, 2017 at 11:02:01AM +0100, Peter Maydell wrote:
->> The minimum requirements for the new language:
->> 1. Does it support the host operating systems that QEMU runs on?
->> 2. Does it support the host architectures that QEMU runs on?
->
-> Speaking of this, I was thinking that we should introduce
-> a rule that for any host OS/arch we support we must have
-> a build machine so we can at least do a compile test.
-> For instance if you believe configure we support Solaris
-> and AIX, but I bet they're bit-rotting. The ia64 backend
-> has to be a strong candidate for being dumped too.
-> Demanding "system we can test on or we drop support"
-> would let us more clearly see what we're actually running
-> on and avoid unnecessarily ruling things out because they
-> don't support Itanium or AIX...
+The following pattern is unsafe:
 
-YES, YES and YES.
+  char buf[32];
+  ret = read(fd, buf, sizeof(buf));
+  ...
+  buf[ret] = 0;
 
-I demand an osX build machine NOW!!!!  Remote access is ok.
+If read(2) returns 32 then a byte beyond the end of the buffer is
+zeroed.
 
-Now more seriously, I can (relatively easy) compile test my pull
-requests with:
-- linux x86 (latest fedora, but I can get an older one if needed)
-- linux x86_64 (latest fedor,, but the same)
-- mingw64 32bit (latest fedora, but here I have the problem that Peter
-  uses a different crosscompiler than me)
-- mingw64 32bit (the same)
+In practice this buffer overflow does not occur because the sysfs
+max_segments file only contains an unsigned short + '\n'.  The string is
+always shorter than 32 bytes.
 
-But for the rest, I need to wait that somebody told me that it breaks
-the build.  Normally it is things like size_t is 32bit instead of 64bit
-or some stupid things like that, that are trivial to fix if I can
-compile there before doing the pull submission.
+Regardless, avoid this pattern because static analysis tools might
+complain and it could lead to real buffer overflows if copy-pasted
+elsewhere in the codebase.
 
-Later, Juan.
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ block/file-posix.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/file-posix.c b/block/file-posix.c
+index c4c0663..ac6bd9f 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -686,7 +686,7 @@ static int hdev_get_max_segments(const struct stat *st)
+         goto out;
+     }
+     do {
+-        ret = read(fd, buf, sizeof(buf));
++        ret = read(fd, buf, sizeof(buf) - 1);
+     } while (ret == -1 && errno == EINTR);
+     if (ret < 0) {
+         ret = -errno;
+-- 
+2.9.3
