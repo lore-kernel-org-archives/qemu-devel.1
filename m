@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51775)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cnsqW-00023Z-8F
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 16:15:05 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1cnsqq-0002NY-6P
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 16:15:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cnsqS-0003G6-95
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 16:15:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36362)
+	(envelope-from <ehabkost@redhat.com>) id 1cnsqm-0003S9-51
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 16:15:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40534)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cnsqS-0003Fp-0X
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 16:15:00 -0400
-References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
-	<1489385927-6735-18-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1bc48113-aed0-5a5e-0818-f842c984ac64@redhat.com>
-Date: Tue, 14 Mar 2017 15:14:57 -0500
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cnsql-0003Rj-Sl
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 16:15:20 -0400
+Date: Tue, 14 Mar 2017 17:15:16 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170314201516.GA3086@thinpad.lan.raisama.net>
+References: <20170314140807.6061-1-git@kirschju.re>
+	<20170314140807.6061-2-git@kirschju.re>
+	<20170314171632.GS4694@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-In-Reply-To: <1489385927-6735-18-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="RVhcl9CLbFxmLNwo2cdefnXp1uR05LEhD"
-Subject: Re: [Qemu-devel] [PATCH for-2.9 17/47] qapi: The #optional tag is
- redundant, drop
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170314171632.GS4694@thinpad.lan.raisama.net>
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] X86: Move rdmsr/wrmsr functionality
+ to standalone functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,90 +29,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: Julian Kirsch <git@kirschju.re>
+Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---RVhcl9CLbFxmLNwo2cdefnXp1uR05LEhD
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
-Message-ID: <1bc48113-aed0-5a5e-0818-f842c984ac64@redhat.com>
-Subject: Re: [PATCH for-2.9 17/47] qapi: The #optional tag is redundant, drop
-References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
- <1489385927-6735-18-git-send-email-armbru@redhat.com>
-In-Reply-To: <1489385927-6735-18-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Mar 14, 2017 at 02:16:32PM -0300, Eduardo Habkost wrote:
+> On Tue, Mar 14, 2017 at 03:08:06PM +0100, Julian Kirsch wrote:
+> > Add two new functions to provide read/write access to model specific registers
+> > (MSRs) on x86. Move original functionality to new functions
+> > x86_cpu_[rd|wr]msr and make list of available MSRs consistent with KVM.
+> 
+> I would prefer to see code movement and other changes (like
+> reordering) in separate patches, to make it easier to review.
+> 
+> To help reviewers, below is the diff between the old functions in
+> misc_helper.c and new functions in helper.c:
+> 
+> --- /tmp/msrfuncs-old.c	2017-03-14 14:12:04.739686970 -0300
+> +++ /tmp/msrfuncs-new.c	2017-03-14 14:11:50.108486602 -0300
+> @@ -1,10 +1,10 @@
+> -void helper_rdmsr(CPUX86State *env)
+> +uint64_t x86_cpu_rdmsr(CPUX86State *env, uint32_t idx, bool *valid)
+>  {
+>      uint64_t val;
+> +    *valid = true;
+>  
+> -    cpu_svm_check_intercept_param(env, SVM_EXIT_MSR, 0, GETPC());
+> -
+> -    switch ((uint32_t)env->regs[R_ECX]) {
+> +    /* MSR list loosely following the order in kvm.c */
+> +    switch (idx) {
+>      case MSR_IA32_SYSENTER_CS:
+>          val = env->sysenter_cs;
+>          break;
+[...]
+> +#ifdef CONFIG_KVM
+> +    /* Export kvm specific pseudo MSRs using their new ordinals only */
 
-On 03/13/2017 01:18 AM, Markus Armbruster wrote:
-> We traditionally mark optional members #optional in the doc comment.
-> Before commit 3313b61, this was entirely manual.
->=20
-> Commit 3313b61 added some automation because its qapi2texi.py relied
-> on #optional to determine whether a member is optional.  This is no
-> longer the case since the previous commit: the only thing qapi2texi.py
-> still does with #optional is stripping it out.  We still reject bogus
-> qapi-schema.json and six places for qga/qapi-schema.json.
->=20
-> Thus, you can't actually rely on #optional to see whether something is
-> optional.  Yet we still make people add it manually.  That's just
-> busy-work.
->=20
-> Drop the code to check, fix up and strip out #optional, along with all
-> instances of #optional.  To keep it out, add code to reject it, to be
-> dropped again once the dust settles.
->=20
-> No change to generated documentation.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  docs/qapi-code-gen.txt              |  16 +-
->  docs/writing-qmp-commands.txt       |   4 +-
->  qapi-schema.json                    | 378 ++++++++++++++++------------=
-----
->  qapi/block-core.json                | 418 ++++++++++++++++++----------=
---------
+I suggest including KVM-specific code in a separate patch.
 
-You'll have to rebase this on master, due to ...
+Also, why are you adding only MSR_KVM_SYSTEM_TIME to wrmsr, and
+only MSR_KVM_SYSTEM_TIME_NEW to rdmsr? Shouldn't we include both
+addresses on both helper functions?
 
+> +    case MSR_KVM_SYSTEM_TIME_NEW:
+> +        val = env->system_time_msr;
+> +        break;
+> +    case MSR_KVM_WALL_CLOCK_NEW:
+> +        val = env->wall_clock_msr;
+>          break;
+> -    case MSR_TSC_AUX:
+> -        val = env->tsc_aux;
+> +    case MSR_KVM_ASYNC_PF_EN:
+> +        val = env->async_pf_en_msr;
+> +        break;
+> +    case MSR_KVM_PV_EOI_EN:
+> +        val = env->pv_eoi_en_msr;
+> +        break;
+> +    case MSR_KVM_STEAL_TIME:
+> +        val = env->steal_time_msr;
+>          break;
+>  #endif
+[...]
+>  
+> -void helper_wrmsr(CPUX86State *env)
+> +void x86_cpu_wrmsr(CPUX86State *env, uint32_t idx, uint64_t val, bool *valid)
+>  {
+> -    uint64_t val;
+> -
+> -    cpu_svm_check_intercept_param(env, SVM_EXIT_MSR, 1, GETPC());
+> -
+> -    val = ((uint32_t)env->regs[R_EAX]) |
+> -        ((uint64_t)((uint32_t)env->regs[R_EDX]) << 32);
+> +    *valid = true;
+> +    /* FIXME: With KVM nabled, only report success if we are sure the new value
+> +     * will actually be written back by the KVM subsystem later. */
+>  
+> -    switch ((uint32_t)env->regs[R_ECX]) {
+> +    switch (idx) {
+>      case MSR_IA32_SYSENTER_CS:
+>          env->sysenter_cs = val & 0xffff;
+>          break;
+[...]
+> +#ifdef CONFIG_KVM
+> +    case MSR_KVM_SYSTEM_TIME:
+> +        env->system_time_msr = val;
+> +        break;
+> +    case MSR_KVM_WALL_CLOCK:
+> +        env->wall_clock_msr = val;
+> +        break;
+> +    case MSR_KVM_ASYNC_PF_EN:
+> +        if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_ASYNC_PF)) {
+> +            env->async_pf_en_msr = val;
+> +        } else {
+> +            *valid = false;
+> +        }
+> +    case MSR_KVM_PV_EOI_EN:
+> +        if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_PV_EOI)) {
+> +            env->pv_eoi_en_msr = val;
+> +        } else {
+> +            *valid = false;
+> +        }
+> +
+> +#endif
+[...]
 
-> @@ -2349,17 +2349,17 @@
->  #
->  # @volume:              Name of the Archipelago volume image
->  #
-> -# @mport:               #optional The port number on which mapperd is
-> +# @mport:               The port number on which mapperd is
->  #                       listening. This is optional
->  #                       and if not specified, QEMU will make Archipela=
-go
->  #                       use the default port (1001).
->  #
-
-=2E..commit e32ccbc killing broken archipelago
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---RVhcl9CLbFxmLNwo2cdefnXp1uR05LEhD
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYyE9BAAoJEKeha0olJ0Nq2agH/0Ca+YlwLySTeb0VC1sapOuI
-PVBb0JTS6F6oYe42zJUzyl3lIhAD3aq1k8mezUxBaE7mKGLeouFRsjTfOnLpEIHs
-Pfh49TZtW1xjdNT2AQkQn+5PzyT+H2jTSJhKZhHDttFgX4lkJUQzy02CRcfevdXf
-WNJ4dBVt8R3BvIfNdDvMeGz7f0pTNnrnZpTlkTwXPqvStNnqlmFL4Bd1bosDMYW4
-lnxqAnJLenexjLh7ugETl0wEyBCAyItdlqmVQ7cw2SNBSrZ7Yl03Kx5Dgs5U+RkW
-P/8FkZVZy1TjhYcSrQ1CFzEOCDuMV2PaIgrs1CdHZEJnlJwIjT5/1NsEjvcIj3Q=
-=PqEQ
------END PGP SIGNATURE-----
-
---RVhcl9CLbFxmLNwo2cdefnXp1uR05LEhD--
+-- 
+Eduardo
