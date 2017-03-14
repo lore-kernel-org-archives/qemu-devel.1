@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60094)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cnsEc-0007ih-V5
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 15:35:55 -0400
+	(envelope-from <eblake@redhat.com>) id 1cnsF3-0007ue-Fb
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 15:36:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cnsEc-0006oV-43
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 15:35:55 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:35743)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cnsEb-0006nn-EG
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 15:35:53 -0400
-Received: by mail-wr0-x231.google.com with SMTP id g10so130856382wrg.2
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 12:35:53 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1cnsF0-00075W-BK
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 15:36:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48184)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cnsF0-00073R-3N
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 15:36:18 -0400
+References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
+	<1489385927-6735-28-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <370b0db7-c576-265e-c4ab-aad5c0146d3d@redhat.com>
+Date: Tue, 14 Mar 2017 14:36:15 -0500
 MIME-Version: 1.0
-In-Reply-To: <c3cddc59-619f-90bd-5521-fd139c865680@redhat.com>
-References: <1476275861-27613-1-git-send-email-ppandit@redhat.com>
-	<33183CC9F5247A488A2544077AF19020B0429759@SZXEMA503-MBS.china.huawei.com>
-	<9d8d6a84-1220-2e61-dbdc-b86d5e348bef@redhat.com>
-	<292d3a97-4dc9-6678-6a4f-acb5856e91f7@reactos.org>
-	<c3cddc59-619f-90bd-5521-fd139c865680@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 14 Mar 2017 19:35:31 +0000
-Message-ID: <CAFEAcA9DSeCmymAYeJE4RbdtBwGp_DVQGDHS+Cn16bOSKYX+yQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] dma: rc4030: limit interval timer reload
- value
+In-Reply-To: <1489385927-6735-28-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="CNbJjvv1TTDNjRgm2UfphIqDwb6AD13Cf"
+Subject: Re: [Qemu-devel] [PATCH for-2.9 27/47] qapi2texi: Generate
+ documentation for variant members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,23 +29,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cole Robinson <crobinso@redhat.com>
-Cc: =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>, Paolo Bonzini <pbonzini@redhat.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, P J P <ppandit@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Huawei PSIRT <PSIRT@huawei.com>, Prasad J Pandit <pjp@fedoraproject.org>, Aurelien Jarno <aurelien@aurel32.net>, "Michael S. Tsirkin" <mst@redhat.com>, Yongbok Kim <yongbok.kim@imgtec.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-On 14 March 2017 at 19:17, Cole Robinson <crobinso@redhat.com> wrote:
-> I'm coming to this thread from the Fedora bug for this CVE,
-> https://bugzilla.redhat.com/show_bug.cgi?id=1384876
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--CNbJjvv1TTDNjRgm2UfphIqDwb6AD13Cf
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Message-ID: <370b0db7-c576-265e-c4ab-aad5c0146d3d@redhat.com>
+Subject: Re: [PATCH for-2.9 27/47] qapi2texi: Generate documentation for
+ variant members
+References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
+ <1489385927-6735-28-git-send-email-armbru@redhat.com>
+In-Reply-To: <1489385927-6735-28-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-FWIW this isn't a CVE issue from the point of view of upstream
-QEMU, because it only affects the MIPS Jazz board, which
-(if I'm reading the source correctly) you can't use with KVM.
+On 03/13/2017 01:18 AM, Markus Armbruster wrote:
+> A flat union's branch brings in the members of another type.  Generate
+> a suitable reference to that type.
+>=20
+> Example change (qemu-qmp-ref.txt):
+>=20
+>   -- Flat Union: QCryptoBlockOpenOptions
+>=20
+>       The options that are available for all encryption formats when
+>       opening an existing volume
+>=20
+>       Members:
+>       The members of 'QCryptoBlockOptionsBase'
+> +     The members of 'QCryptoBlockOptionsQCow' when 'format' is "qcow"
 
-Still, we should fix the bug...
+Relies on the implied knowledge that 'format' is a member of
+'QCryptoBlockOptionsBase'. Does that mean references to another type
+might usefully want to do a list of member names, to avoid having to
+follow the hyperlink, while still leaving the hyperlink when searching
+for full details on that member?  As in:
 
-> I don't see this patch in qemu.git yet, can someone pick it up
-> for a pull request?
+Members:
+The members of 'QCryptoBlockOptionsBase' ('format')
+The members of 'QCryptoBlockOptionsQCow' when 'format' is "qcow"
+('key-secret')
 
-Ccing the MIPS maintainer may help in achieving this :-)
+But it could get noisy (the example here only adds one member; other
+unions add lots of members), and I'm also okay if you don't like the
+idea or would rather do it as a followup.
 
-thanks
--- PMM
+> +     The members of 'QCryptoBlockOptionsLUKS' when 'format' is "luks"
+>=20
+>       Since: 2.6
+>=20
+> A simple union's branch adds a member 'data' of some other type.
+> Generate documentation for that member.
+>=20
+> Example change (qemu-qmp-ref.txt):
+>=20
+>   -- Simple Union: SocketAddress
+>=20
+>       Captures the address of a socket, which could also be a named fil=
+e
+>       descriptor
+>=20
+>       Members:
+>       'type'
+> 	   Not documented
+> +     'data: InetSocketAddress' when 'type' is "inet"
+> +     'data: UnixSocketAddress' when 'type' is "unix"
+> +     'data: VsockSocketAddress' when 'type' is "vsock"
+> +     'data: String' when 'type' is "fd"
+
+Looks reasonable.
+
+>=20
+>       Since: 1.3
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  scripts/qapi2texi.py | 27 ++++++++++++++++++++-------
+>  1 file changed, 20 insertions(+), 7 deletions(-)
+>=20
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--CNbJjvv1TTDNjRgm2UfphIqDwb6AD13Cf
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYyEYvAAoJEKeha0olJ0Nq1JAIAKp2QG+P1eeC2V52vPXEEQ+6
+uxnmXYpIV4g0BXhRtqXR1JRd3a5jIFbKcWiZqvHxRmNoY2GmMEWn9ro+o6xnin1u
+VZJiIpsDT2+THSozKRkGENJLJ4yPPcp0MfH6N8HYat8+VnuTSA56YHTIr7Kdvt7I
+/6bTrtuKI3XDDNiB7YfEBKpZAND+XU3mAstZcsuBhf3j6N/WVKIfD1bkrz2dHOeI
++XUVnqMoe7FiK1aAoswvwultx37Ji6dTUqfL3W7o4IsoX8KdSfxq2CE/o7AsP8/I
+F3jJVyffgcPPc5JXM6MZykaCMKodbdx1OIl57tzRUQwEAJ8yrKxagylyWJpD6jw=
+=rBpc
+-----END PGP SIGNATURE-----
+
+--CNbJjvv1TTDNjRgm2UfphIqDwb6AD13Cf--
