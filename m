@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44295)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cnbgk-0007hu-S9
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 21:55:51 -0400
+	(envelope-from <jasowang@redhat.com>) id 1cnbnl-0002WP-1d
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 22:03:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cnbgg-000811-Ao
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 21:55:50 -0400
-Received: from [59.151.112.132] (port=54519 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cnbgf-0007xV-G9
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 21:55:46 -0400
-From: Chao Fan <fanc.fnst@cn.fujitsu.com>
-Date: Tue, 14 Mar 2017 09:55:07 +0800
-Message-ID: <20170314015507.13350-1-fanc.fnst@cn.fujitsu.com>
+	(envelope-from <jasowang@redhat.com>) id 1cnbng-0002jG-5t
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 22:03:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55648)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cnbnf-0002ib-U8
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 22:03:00 -0400
+References: <1489386583-11564-1-git-send-email-jasowang@redhat.com>
+	<20170313105515.75981fb9.cornelia.huck@de.ibm.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <99e8bc56-f679-778c-8ff9-f2be84c62618@redhat.com>
+Date: Tue, 14 Mar 2017 10:02:53 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2] Change the method to calculate
- dirty-pages-rate
+In-Reply-To: <20170313105515.75981fb9.cornelia.huck@de.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH V2 1/3] virtio: guard against NULL pfn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,117 +27,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, quintela@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org, berrange@redhat.com
-Cc: caoj.fnst@cn.fujitsu.com, douly.fnst@cn.fujitsu.com, maozy.fnst@cn.fujitsu.com, Chao Fan <fanc.fnst@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com
 
-In function cpu_physical_memory_sync_dirty_bitmap, file
-include/exec/ram_addr.h:
 
-if (src[idx][offset]) {
-    unsigned long bits = atomic_xchg(&src[idx][offset], 0);
-    unsigned long new_dirty;
-    new_dirty = ~dest[k];
-    dest[k] |= bits;
-    new_dirty &= bits;
-    num_dirty += ctpopl(new_dirty);
-}
 
-After these codes executed, only the pages not dirtied in bitmap(dest),
-but dirtied in dirty_memory[DIRTY_MEMORY_MIGRATION] will be calculated.
-For example:
-When ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION] = 0b00001111,
-and atomic_rcu_read(&migration_bitmap_rcu)->bmap = 0b00000011,
-the new_dirty will be 0b00001100, and this function will return 2 but not
-4 which is expected.
-the dirty pages in dirty_memory[DIRTY_MEMORY_MIGRATION] are all new,
-so these should be calculated also.
+On 2017=E5=B9=B403=E6=9C=8813=E6=97=A5 17:55, Cornelia Huck wrote:
+> On Mon, 13 Mar 2017 14:29:41 +0800
+> Jason Wang <jasowang@redhat.com> wrote:
+>
+>> To avoid access stale memory region cache after reset, this patch
+>> check the existence of virtqueue pfn for all exported virtqueue access
+>> helpers before trying to use them.
+>>
+>> Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Signed-off-by: Jason Wang <jasowang@redhat.com>
+>> ---
+>>   hw/virtio/virtio.c | 21 +++++++++++++++++++++
+>>   1 file changed, 21 insertions(+)
+>>
+>> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+>> index efce4b3..76cc81b 100644
+>> --- a/hw/virtio/virtio.c
+>> +++ b/hw/virtio/virtio.c
+>> @@ -322,6 +322,10 @@ static int virtio_queue_empty_rcu(VirtQueue *vq)
+>>           return 0;
+>>       }
+>>
+>> +    if (unlikely(!vq->vring.avail)) {
+>> +        return 0;
+> Shouldn't that rather return !0 (denoting a non-existing queue as
+> empty)?
 
-Signed-off-by: Chao Fan <fanc.fnst@cn.fujitsu.com>
-Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+Yes.
 
----
-v2: Remove the parameter 'num_dirty_pages_init'
-    Fix incoming parameters of trace_migration_bitmap_sync_end
----
- include/exec/ram_addr.h |  5 ++++-
- migration/ram.c         | 12 +++++-------
- 2 files changed, 9 insertions(+), 8 deletions(-)
+>
+>> +    }
+>> +
+>>       return vring_avail_idx(vq) =3D=3D vq->last_avail_idx;
+>>   }
+>>
+>> @@ -333,6 +337,10 @@ int virtio_queue_empty(VirtQueue *vq)
+>>           return 0;
+>>       }
+>>
+>> +    if (unlikely(!vq->vring.avail)) {
+>> +        return 0;
+> Likewise.
+>
+>> +    }
+>> +
+>>       rcu_read_lock();
+>>       empty =3D vring_avail_idx(vq) =3D=3D vq->last_avail_idx;
+>>       rcu_read_unlock();
+>> @@ -431,6 +439,10 @@ void virtqueue_fill(VirtQueue *vq, const VirtQueu=
+eElement *elem,
+>>           return;
+>>       }
+>>
+>> +    if (unlikely(!vq->vring.used)) {
+>> +        return;
+>> +    }
+>> +
+>>       idx =3D (idx + vq->used_idx) % vq->vring.num;
+>>
+>>       uelem.id =3D elem->index;
+>> @@ -448,6 +460,10 @@ void virtqueue_flush(VirtQueue *vq, unsigned int =
+count)
+>>           return;
+>>       }
+>>
+>> +    if (unlikely(!vq->vring.used)) {
+>> +        return;
+>> +    }
+>> +
+>>       /* Make sure buffer is written before we update index. */
+>>       smp_wmb();
+>>       trace_virtqueue_flush(vq, count);
+>> @@ -546,6 +562,11 @@ void virtqueue_get_avail_bytes(VirtQueue *vq, uns=
+igned int *in_bytes,
+>>       int64_t len =3D 0;
+>>       int rc;
+>>
+>> +    if (unlikely(!vq->vring.desc)) {
+>> +        *in_bytes =3D *out_bytes =3D 0;
+> I think you need to check for in_bytes and out_bytes being !NULL first.
 
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index cd432e7..b05dc84 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -355,7 +355,8 @@ static inline void cpu_physical_memory_clear_dirty_range(ram_addr_t start,
- static inline
- uint64_t cpu_physical_memory_sync_dirty_bitmap(unsigned long *dest,
-                                                ram_addr_t start,
--                                               ram_addr_t length)
-+                                               ram_addr_t length,
-+                                               int64_t *real_dirty_pages)
- {
-     ram_addr_t addr;
-     unsigned long page = BIT_WORD(start >> TARGET_PAGE_BITS);
-@@ -379,6 +380,7 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(unsigned long *dest,
-             if (src[idx][offset]) {
-                 unsigned long bits = atomic_xchg(&src[idx][offset], 0);
-                 unsigned long new_dirty;
-+                *real_dirty_pages += ctpopl(bits);
-                 new_dirty = ~dest[k];
-                 dest[k] |= bits;
-                 new_dirty &= bits;
-@@ -398,6 +400,7 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(unsigned long *dest,
-                         start + addr,
-                         TARGET_PAGE_SIZE,
-                         DIRTY_MEMORY_MIGRATION)) {
-+                *real_dirty_pages += 1;
-                 long k = (start + addr) >> TARGET_PAGE_BITS;
-                 if (!test_and_set_bit(k, dest)) {
-                     num_dirty++;
-diff --git a/migration/ram.c b/migration/ram.c
-index 719425b..de1e0a3 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -576,18 +576,18 @@ static inline bool migration_bitmap_clear_dirty(ram_addr_t addr)
-     return ret;
- }
- 
-+static int64_t num_dirty_pages_period;
- static void migration_bitmap_sync_range(ram_addr_t start, ram_addr_t length)
- {
-     unsigned long *bitmap;
-     bitmap = atomic_rcu_read(&migration_bitmap_rcu)->bmap;
--    migration_dirty_pages +=
--        cpu_physical_memory_sync_dirty_bitmap(bitmap, start, length);
-+    migration_dirty_pages += cpu_physical_memory_sync_dirty_bitmap(bitmap,
-+                             start, length, &num_dirty_pages_period);
- }
- 
- /* Fix me: there are too many global variables used in migration process. */
- static int64_t start_time;
- static int64_t bytes_xfer_prev;
--static int64_t num_dirty_pages_period;
- static uint64_t xbzrle_cache_miss_prev;
- static uint64_t iterations_prev;
- 
-@@ -620,7 +620,6 @@ uint64_t ram_pagesize_summary(void)
- static void migration_bitmap_sync(void)
- {
-     RAMBlock *block;
--    uint64_t num_dirty_pages_init = migration_dirty_pages;
-     MigrationState *s = migrate_get_current();
-     int64_t end_time;
-     int64_t bytes_xfer_now;
-@@ -646,9 +645,8 @@ static void migration_bitmap_sync(void)
-     rcu_read_unlock();
-     qemu_mutex_unlock(&migration_bitmap_mutex);
- 
--    trace_migration_bitmap_sync_end(migration_dirty_pages
--                                    - num_dirty_pages_init);
--    num_dirty_pages_period += migration_dirty_pages - num_dirty_pages_init;
-+    trace_migration_bitmap_sync_end(num_dirty_pages_period);
-+
-     end_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
- 
-     /* more than 1 second = 1000 millisecons */
--- 
-2.9.3
+Right, will fix this in v2.
+
+Thanks
+
+>
+>> +        return;
+>> +    }
+>> +
+>>       rcu_read_lock();
+>>       idx =3D vq->last_avail_idx;
+>>       total_bufs =3D in_total =3D out_total =3D 0;
+>
