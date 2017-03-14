@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1cnd47-00042x-BB
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 23:24:04 -0400
+	(envelope-from <sam.bobroff@au1.ibm.com>) id 1cndBL-0005Y2-In
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 23:31:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1cnd43-0003uy-Bf
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 23:24:03 -0400
-Received: from mail-it0-x22b.google.com ([2607:f8b0:4001:c0b::22b]:38421)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1cnd43-0003uo-6z
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 23:23:59 -0400
-Received: by mail-it0-x22b.google.com with SMTP id m27so43969507iti.1
-	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 20:23:59 -0700 (PDT)
-Mime-Version: 1.0 (Apple Message framework v1084)
-Content-Type: text/plain; charset=us-ascii
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <mailman.57839.1489090092.22737.qemu-devel@nongnu.org>
-Date: Mon, 13 Mar 2017 23:23:56 -0400
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <8C652FA5-CADE-432E-BA79-979CDD7261EE@gmail.com>
-References: <mailman.57839.1489090092.22737.qemu-devel@nongnu.org>
-Subject: [Qemu-devel]  [PATCH Risu v2 0/3] PPC64 Improvements
+	(envelope-from <sam.bobroff@au1.ibm.com>) id 1cndBH-0005TF-Hf
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 23:31:31 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53011)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sam.bobroff@au1.ibm.com>)
+	id 1cndBH-0005SE-8u
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 23:31:27 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2E3SZtL007464
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 23:31:25 -0400
+Received: from e23smtp07.au.ibm.com (e23smtp07.au.ibm.com [202.81.31.140])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 295w08y22p-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 23:31:24 -0400
+Received: from localhost
+	by e23smtp07.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <sam.bobroff@au1.ibm.com>;
+	Tue, 14 Mar 2017 13:31:22 +1000
+From: Sam Bobroff <sam.bobroff@au1.ibm.com>
+Date: Tue, 14 Mar 2017 14:30:21 +1100
+Message-Id: <cover.1489462214.git.sam.bobroff@au1.ibm.com>
+Subject: [Qemu-devel] [PATCH for-2.10 0/1] scripts/update-linux-headers.sh:
+ refactor extra files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +36,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: david@gibson.dropbear.id.au
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, sjitindarsingh@gmail.com, paulus@ozlabs.org, peter.maydell@linaro.org, pbonzini@redhat.com
 
 
-On Mar 9, 2017, at 3:08 PM, qemu-devel-request@nongnu.org wrote:
+Hi QEMU devs,
 
-> v2:
-> - applied code review
->=20
-> This patchset include initial support to PPC64 (Big-Endian), that is =
-pretty=20
-> much the same: only some fixes in configure and risugen.
-> Also, it adds a better random initialization of VSX registers.
->=20
-> Jose Ricardo Ziviani (3):
->  risugen_ppc64: Load random 128-bit data to VSX registers
->  configure: Add initial support to PPC64 (big endian)
->  risugen,risugen_ppc64.pm: Add support ppc64 (big-endian)
->=20
-> configure        |  9 ++++-----
-> risugen          |  6 +++++-
-> risugen_ppc64.pm | 44 +++++++++++++++++++++++++++++++++-----------
-> 3 files changed, 42 insertions(+), 17 deletions(-)
->=20
-> --=20
-> 2.7.4
+While doing some other work, I needed to update the update-linux-headers.sh
+script to handle some new files and it seemed like it was getting big enough to
+need a little refactoring. The actual files have already been added (on master)
+but here's the refactoring because it might still be useful. There is no
+functional change, this is maintenance only.
 
-Are there plans on adding 32 bit PowerPC support to Risu?=
+Cheers,
+Sam.
+
+
+Sam Bobroff (1):
+  scripts/update-linux-headers.sh: refactor extra files
+
+ scripts/update-linux-headers.sh | 44 ++++++++++++++++++++++-------------------
+ 1 file changed, 24 insertions(+), 20 deletions(-)
+
+-- 
+2.11.0
