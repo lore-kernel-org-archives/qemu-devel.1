@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eduardo.otubo@profitbricks.com>) id 1cnkga-0000iA-A7
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:32:22 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1cnkh0-00012Z-IF
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:32:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eduardo.otubo@profitbricks.com>) id 1cnkgZ-00086u-6z
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:32:16 -0400
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:38094)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <eduardo.otubo@profitbricks.com>)
-	id 1cnkgZ-00084b-14
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:32:15 -0400
-Received: by mail-wm0-x235.google.com with SMTP id t189so61367152wmt.1
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 04:32:14 -0700 (PDT)
-From: Eduardo Otubo <eduardo.otubo@profitbricks.com>
-Date: Tue, 14 Mar 2017 12:32:08 +0100
-Message-Id: <20170314113209.12025-5-eduardo.otubo@profitbricks.com>
-In-Reply-To: <20170314113209.12025-1-eduardo.otubo@profitbricks.com>
-References: <20170314113209.12025-1-eduardo.otubo@profitbricks.com>
-Subject: [Qemu-devel] [PATCH 4/5] seccomp: add spawn argument to command line
+	(envelope-from <dgilbert@redhat.com>) id 1cnkgx-0000AN-QM
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:32:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37410)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cnkgx-00009P-Jr
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:32:39 -0400
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C3AF080461
+	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 11:32:39 +0000 (UTC)
+Date: Tue, 14 Mar 2017 11:32:35 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170314113234.GE2445@work-vm>
+References: <20170313195547.21466-1-eblake@redhat.com>
+	<20170313195547.21466-7-eblake@redhat.com>
+	<20170313200752.GG5512@work-vm>
+	<89b9b8e6-b5ca-8056-783b-598e07bf5da0@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <89b9b8e6-b5ca-8056-783b-598e07bf5da0@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 06/30] trace: Fix parameter types in
+ migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,124 +36,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, thuth@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, Juan Quintela <quintela@redhat.com>
 
-This patch adds [,spawn=deny] argument to `-sandbox on' option. It
-blacklists fork and execve syste calls, avoiding Qemu to spawn new
-threads or processes.
+* Eric Blake (eblake@redhat.com) wrote:
+> On 03/13/2017 03:07 PM, Dr. David Alan Gilbert wrote:
+> > * Eric Blake (eblake@redhat.com) wrote:
+> >> An upcoming patch will let the compiler warn us when we are silently
+> >> losing precision in traces; update the trace definitions to pass
+> >> through the full value at the callsite.
+> >>
+> >> Signed-off-by: Eric Blake <eblake@redhat.com>
+> >> ---
+> >>  migration/trace-events | 4 ++--
+> >>  1 file changed, 2 insertions(+), 2 deletions(-)
+> >>
+> 
+> >> -postcopy_ram_fault_thread_request(uint64_t hostaddr, const char *ramblock, size_t offset) "Request for HVA=%" PRIx64 " rb=%s offset=%zx"
+> >> +postcopy_ram_fault_thread_request(unsigned long long hostaddr, const char *ramblock, size_t offset) "Request for HVA=%llx rb=%s offset=%zx"
+> > 
+> > Hmm - why?
+> > That's called as:
+> >         trace_postcopy_ram_fault_thread_request(msg.arg.pagefault.address,
+> >                                                 qemu_ram_get_idstr(rb),
+> >                                                 rb_offset);
+> >     struct uffd_msg msg;
+> > struct uffd_msg {
+> > ..
+> >         union {
+> >                 struct {
+> >                         __u64   flags;
+> >                         __u64   address;
+> >                 } pagefault;
+> > ..
+> >         } arg;
+> > }
+> > 
+> > So why is a PRIx64 not the right way to print a __u64 ?
+> 
+> Because __u64 is not the same type as uint64_t.  On 64-bit Linux, __u64
+> is 'unsigned long long', while uint64_t is 'unsigned long'.
+> 
+> > (I prefer %llx to the horrid PRIx64 syntax, but it still seems weird in this case)
+> 
+> As it is, I'm not sure if __u64 is always 'unsigned long long' in ALL
+> Linux clients; an even-more-conservative patch would be to switch all
+> callers to use explicit casts to something (like uint64_t or unsigned
+> long long) that we have full control over, rather than passing __u64
+> where we have no control over what type it ultimately resolves to.
 
-Signed-off-by: Eduardo Otubo <eduardo.otubo@profitbricks.com>
----
- include/sysemu/seccomp.h |  1 +
- qemu-options.hx          |  7 +++++--
- qemu-seccomp.c           | 18 ++++++++++++++++++
- vl.c                     | 11 +++++++++++
- 4 files changed, 35 insertions(+), 2 deletions(-)
+That would be my preference - casting to (uint64_t) at the caller and
+keep this as PRIx64.  We know it's a 64bit value so we should never
+use unsigned long long anywhere for it.
 
-diff --git a/include/sysemu/seccomp.h b/include/sysemu/seccomp.h
-index e6e78d85ce..f1614d6514 100644
---- a/include/sysemu/seccomp.h
-+++ b/include/sysemu/seccomp.h
-@@ -17,6 +17,7 @@
- 
- #define OBSOLETE    0x0001
- #define PRIVILEGED  0x0010
-+#define SPAWN       0x0100
- 
- #include <seccomp.h>
- 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 47018db5aa..53f4f8cfd2 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3732,10 +3732,11 @@ Old param mode (ARM only).
- ETEXI
- 
- DEF("sandbox", HAS_ARG, QEMU_OPTION_sandbox, \
--    "-sandbox on[,obsolete=allow][,elevateprivileges=deny]\n" \
-+    "-sandbox on[,obsolete=allow][,elevateprivileges=deny][,spawn=deny]" \
-     "                               Enable seccomp mode 2 system call filter (default 'off').\n" \
-     "                               obsolete: Allow obsolete system calls\n" \
--    "                               elevateprivileges: avoids Qemu process to elevate its privileges by blacklisting all set*uid|gid system calls",
-+    "                               elevateprivileges: avoids Qemu process to elevate its privileges by blacklisting all set*uid|gid system calls\n" \
-+    "                               spawn: avoids Qemu to spawn new threads or processes by blacklisting *fork and execve\n"
-     QEMU_ARCH_ALL)
- STEXI
- @item -sandbox @var{arg}[,obsolete=@var{string}]
-@@ -3747,6 +3748,8 @@ disable it.  The default is 'off'.
- Enable Obsolete system calls
- @item elevateprivileges=@var{string}
- Disable set*uid|gid systema calls
-+@item spawn=@var{string}
-+Disable *fork and execve
- @end table
- ETEXI
- 
-diff --git a/qemu-seccomp.c b/qemu-seccomp.c
-index 5aa6590386..4c1f7b41ba 100644
---- a/qemu-seccomp.c
-+++ b/qemu-seccomp.c
-@@ -31,6 +31,12 @@ struct QemuSeccompSyscall {
-     uint8_t priority;
- };
- 
-+static const struct QemuSeccompSyscall spawn_syscalls[] = {
-+    { SCMP_SYS(fork), 255 },
-+    { SCMP_SYS(vfork), 255 },
-+    { SCMP_SYS(execve), 255 },
-+};
-+
- static const struct QemuSeccompSyscall privileged_syscalls[] = {
-     { SCMP_SYS(setuid), 255 },
-     { SCMP_SYS(setgid), 255 },
-@@ -152,6 +158,18 @@ int seccomp_start(uint8_t seccomp_opts)
-         }
-     }
- 
-+    if (seccomp_opts & SPAWN) {
-+        for (i = 0; i < ARRAY_SIZE(spawn_syscalls); i++) {
-+            rc = seccomp_rule_add(ctx, SCMP_ACT_KILL, spawn_syscalls[i].num, 0);
-+            if (rc < 0) {
-+                goto seccomp_return;
-+            }
-+            rc = seccomp_syscall_priority(ctx, spawn_syscalls[i].num, spawn_syscalls[i].priority);
-+            if (rc < 0) {
-+                goto seccomp_return;
-+            }
-+        }
-+    }
- 
-     rc = seccomp_load(ctx);
- 
-diff --git a/vl.c b/vl.c
-index d071e240b0..6a6e9a69bf 100644
---- a/vl.c
-+++ b/vl.c
-@@ -277,6 +277,10 @@ static QemuOptsList qemu_sandbox_opts = {
-             .name = "elevateprivileges",
-             .type = QEMU_OPT_STRING,
-         },
-+        {
-+            .name = "spawn",
-+            .type = QEMU_OPT_STRING,
-+        },
-         { /* end of list */ }
-     },
- };
-@@ -1056,6 +1060,13 @@ static int parse_sandbox(void *opaque, QemuOpts *opts, Error **errp)
-             }
-         }
- 
-+        value = qemu_opt_get(opts,"spawn");
-+        if (value) {
-+            if (strcmp(value, "deny") == 0) {
-+                seccomp_opts |= SPAWN;
-+            }
-+        }
-+
-         if (seccomp_start(seccomp_opts) < 0) {
-             error_report("failed to install seccomp syscall filter "
-                          "in the kernel");
--- 
-2.11.0
+Dave
+
+> 
+> -- 
+> Eric Blake   eblake redhat com    +1-919-301-3266
+> Libvirt virtualization library http://libvirt.org
+> 
+
+
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
