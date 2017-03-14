@@ -1,14 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cnkN3-0005pH-0t
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:12:09 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1cnkN7-0005sJ-Rf
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:12:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cnkN1-0005dy-UL
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:12:04 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1cnkN2-0005e5-0h
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:12:09 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 14 Mar 2017 12:11:56 +0100
-Message-Id: <20170314111157.14464-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH] nbd-client: fix handling of hungup connections
+Date: Tue, 14 Mar 2017 12:11:57 +0100
+Message-Id: <20170314111157.14464-2-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH] block: quiesce AioContext when detaching from
+ it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,90 +19,68 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-block@nongnu.org
 
-After the switch to reading replies in a coroutine, nothing is
-reentering pending receive coroutines if the connection hangs.
-Move nbd_recv_coroutines_enter_all to the reply read coroutine,
-which is the place where hangups are detected.  nbd_teardown_connection
-can simply wait for the reply read coroutine to detect the hangup
-and clean up after itself.
+While it is true that bdrv_set_aio_context only works on a single
+BlockDriverState subtree (see commit message for 53ec73e, "block: Use
+bdrv_drain to replace uncessary bdrv_drain_all", 2015-07-07), it works
+at the AioContext level rather than the BlockDriverState level.
 
-This wouldn't be enough though because nbd_receive_reply returns 0
-(rather than -EPIPE or similar) when reading from a hung connection.
-Fix the return value check in nbd_read_reply_entry.
+Therefore, it is also necessary to trigger pending bottom halves too,
+even if no requests are pending.
 
-This fixes qemu-iotests 083.
+For NBD this ensures that the aio_co_schedule of a previous call to
+nbd_attach_aio_context is completed before detaching from the old
+AioContext; it fixes qemu-iotest 094.  Another similar bug happens
+when the VM is stopped and the virtio-blk dataplane irqfd is torn down.
+In this case it's possible that guest I/O gets stuck if notify_guest_bh
+was scheduled but doesn't run.
 
+Calling aio_poll from another AioContext is safe if non-blocking; races
+such as the one mentioned in the commit message for c9d1a56 ("block:
+only call aio_poll on the current thread's AioContext", 2016-10-28)
+are a concern for blocking calls.
+
+I considered other options, including:
+
+- moving the bs->wakeup mechanism to AioContext, and letting the caller
+check.  This might work for virtio which has a clear place to wakeup
+(notify_place_bh) and check the condition (virtio_blk_data_plane_stop).
+For aio_co_schedule I couldn't find a clear place to check the condition.
+
+- adding a dummy oneshot bottom half and waiting for it to trigger.
+This has the complication that bottom half list is LIFO for historical
+reasons.  There were performance issues caused by bottom half ordering
+in the past, so I decided against it for 2.9.
+
+Fixes: 99723548561978da8ef44cf804fb7912698f5d88
 Reported-by: Max Reitz <mreitz@redhat.com>
+Reported-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+Tested-by: Halil Pasic <pasic@linux.vnet.ibm.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- block/nbd-client.c | 12 ++++++------
- nbd/client.c       |  2 +-
- 2 files changed, 7 insertions(+), 7 deletions(-)
+ block.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index 0dc12c2..1e2952f 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -33,17 +33,15 @@
- #define HANDLE_TO_INDEX(bs, handle) ((handle) ^ ((uint64_t)(intptr_t)bs))
- #define INDEX_TO_HANDLE(bs, index)  ((index)  ^ ((uint64_t)(intptr_t)bs))
+diff --git a/block.c b/block.c
+index f293ccb..e159251 100644
+--- a/block.c
++++ b/block.c
+@@ -4272,8 +4272,15 @@ void bdrv_attach_aio_context(BlockDriverState *bs,
  
--static void nbd_recv_coroutines_enter_all(BlockDriverState *bs)
-+static void nbd_recv_coroutines_enter_all(NBDClientSession *s)
+ void bdrv_set_aio_context(BlockDriverState *bs, AioContext *new_context)
  {
--    NBDClientSession *s = nbd_get_client_session(bs);
-     int i;
- 
-     for (i = 0; i < MAX_NBD_REQUESTS; i++) {
-         if (s->recv_coroutine[i]) {
--            qemu_coroutine_enter(s->recv_coroutine[i]);
-+            aio_co_wake(s->recv_coroutine[i]);
-         }
-     }
--    BDRV_POLL_WHILE(bs, s->read_reply_co);
- }
- 
- static void nbd_teardown_connection(BlockDriverState *bs)
-@@ -58,7 +56,7 @@ static void nbd_teardown_connection(BlockDriverState *bs)
-     qio_channel_shutdown(client->ioc,
-                          QIO_CHANNEL_SHUTDOWN_BOTH,
-                          NULL);
--    nbd_recv_coroutines_enter_all(bs);
-+    BDRV_POLL_WHILE(bs, client->read_reply_co);
- 
-     nbd_client_detach_aio_context(bs);
-     object_unref(OBJECT(client->sioc));
-@@ -76,7 +74,7 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
-     for (;;) {
-         assert(s->reply.handle == 0);
-         ret = nbd_receive_reply(s->ioc, &s->reply);
--        if (ret < 0) {
-+        if (ret <= 0) {
-             break;
-         }
- 
-@@ -103,6 +101,8 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
-         aio_co_wake(s->recv_coroutine[i]);
-         qemu_coroutine_yield();
-     }
++    AioContext *ctx;
 +
-+    nbd_recv_coroutines_enter_all(s);
-     s->read_reply_co = NULL;
- }
+     bdrv_drain(bs); /* ensure there are no in-flight requests */
  
-diff --git a/nbd/client.c b/nbd/client.c
-index 5c9dee3..746e9a7 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -812,6 +812,6 @@ ssize_t nbd_receive_reply(QIOChannel *ioc, NBDReply *reply)
-         LOG("invalid magic (got 0x%" PRIx32 ")", magic);
-         return -EINVAL;
-     }
--    return 0;
-+    return sizeof(buf);
- }
++    ctx = bdrv_get_aio_context(bs);
++    while (aio_poll(ctx, false)) {
++        /* wait for all bottom halves to execute */
++    }
++
+     bdrv_detach_aio_context(bs);
  
+     /* This function executes in the old AioContext so acquire the new one in
 -- 
 2.9.3
