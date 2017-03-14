@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cnolH-00036U-PE
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:53:25 -0400
+	(envelope-from <eblake@redhat.com>) id 1cnonB-0004IZ-Hv
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:55:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cnolG-0000sf-J4
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:53:23 -0400
-References: <36e41adf-b0b3-3efa-51c4-f1a70cd05b98@ilande.co.uk>
-	<87wpbsp49a.fsf@linaro.org>
-	<6491a446-bf23-5ab9-3431-c67efaf83f71@ilande.co.uk>
-	<alpine.BSF.2.20.1703141450560.82811@zero.eik.bme.hu>
-	<87shmfq31b.fsf@linaro.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <b9006aa4-b606-61d5-6896-8c76a6a6f8f3@ilande.co.uk>
-Date: Tue, 14 Mar 2017 15:52:42 +0000
+	(envelope-from <eblake@redhat.com>) id 1cnon7-0001xu-M2
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:55:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:25086)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cnon7-0001xh-Dn
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:55:17 -0400
+References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
+	<1489385927-6735-8-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1617dab3-b1cd-c24b-5084-e39af4683ed8@redhat.com>
+Date: Tue, 14 Mar 2017 10:55:14 -0500
 MIME-Version: 1.0
-In-Reply-To: <87shmfq31b.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] qemu-system-ppc video artifacts since
- "tcg: drop global lock during TCG code execution"
+In-Reply-To: <1489385927-6735-8-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="sDfiH9Nh7xPAFKd9bRSfIGTCvXFhG9D3I"
+Subject: Re: [Qemu-devel] [PATCH for-2.9 07/47] qapi: Clean up build of
+ generated documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,80 +29,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, BALATON Zoltan <balaton@eik.bme.hu>
-Cc: jan.kiszka@siemens.com, qemu-devel <qemu-devel@nongnu.org>, cota@braap.org, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, bobby.prani@gmail.com, fred.konrad@greensocs.com, rth@twiddle.net
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-On 14/03/17 15:41, Alex Bennée wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--sDfiH9Nh7xPAFKd9bRSfIGTCvXFhG9D3I
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Message-ID: <1617dab3-b1cd-c24b-5084-e39af4683ed8@redhat.com>
+Subject: Re: [PATCH for-2.9 07/47] qapi: Clean up build of generated
+ documentation
+References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
+ <1489385927-6735-8-git-send-email-armbru@redhat.com>
+In-Reply-To: <1489385927-6735-8-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> BALATON Zoltan <balaton@eik.bme.hu> writes:
-> 
->> On Tue, 14 Mar 2017, Mark Cave-Ayland wrote:
->>> On 14/03/17 10:00, Alex Bennée wrote:
->>>> Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
->>>>
->>>>> I've recently noticed some video artifacts appearing in the form of
->>>>> horizontal lines whilst testing OpenBIOS boot on some qemu-system-ppc
->>>>> images (see https://www.ilande.co.uk/tmp/qemu/macos9-stripe.png for an
->>>>> example) which I've finally bisected down to this commit.
->>>>
->>>> Interesting. Is the video hardware in this case a simple framebuffer or
->>>> is there some sort of GPU involved?
->>>
->>> For the mac99 machine it's just the normal QEMU PCI std-vga card, so
->>> nothing special. Having run tests across SPARC which uses its own
->>> framebuffer, there have been no obvious artifacts that I've spotted
->>> there to date.
->>>
->>>>> The horizontal lines tend to appear at different positions with
->>>>> different lengths, although it seems to be more common that a complete
->>>>> scanline is affected. Reproducing the issue is fairly easy with a MacOS
->>>>> 9.2.1 ISO and the command line below:
->>>>>
->>>>> ./qemu-system-ppc -cdrom MacOS921.iso -boot d -m 512 -M mac99
->>>>>
->>>>> Could it be that this patch is still missing a lock somewhere which
->>>>> causes these artifacts to appear?
->>>>
->>>> It depends. If the hardware is accessed via MMIO then the BQL is taken
->>>> automatically (unless the area is explicitly marked as doing its own
->>>> locking see: mr->global_locking).
->>>>
->>>> Is the artefact temporary or permanent? Could it be a change in
->>>> synchronisation between the emulator updating the framebuffer and
->>>> whatever backend updating its display?
->>>
->>> AFAICT they are temporary in that they appear randomly on the display,
->>> but the next time that particular area of the display is updated by the
->>> guest then they tend to either change/disappear.
->>
->> I've also noticed artifacts when testing the SM501 changes with
->> MorphOS on recent QEMU so it may not be related to just the std vga.
->> It's shown as bands (larger number of adjacent scanlines) not updating
->> when the client first wrote to the framebuffer but then they
->> disappeared during the next refresh. I'm guessing it may be related to
->> dirty checking of the framebuffer memory which is used to decide when
->> a scan line needs update?
-> 
-> Interesting. I guess if the corrupted scan lines are in blocks of
-> PAGE_SIZE that might make sense.
-> 
-> Commit (b0706b716769494f321a0d2bfd9fa9893992f995) made
-> tlb_reset_dirty_range update the SoftMMU addr_write entry atomically.
-> Now I don't see how that could race in single threaded TCG mode but it
-> could explain things.
-> 
-> I notice that tlb_set_dirty/tlb_set_dirty1 should maybe do the same. The
-> currently assume they are only called from the CPU's context. If you
-> enable #define DEBUG_TLB in cputlb.c does the assert fire?
+On 03/13/2017 01:18 AM, Markus Armbruster wrote:
+> Rename intermediate qemu-qapi.texi to qemu-qmp-qapi.texi to match its
+> user qemu-qmp-ref.texi, just like qemu-ga-qapi.texi matches
+> qemu-ga-ref.texi.
+>=20
+> Build the intermediate .texi next to the sources and the final output
+> in docs/ instead of dumping them into the build root.
+>=20
+> Fix version.texi dependencies so that only the targets that actually
+> need it depend on it.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  .gitignore             | 10 +++++-----
+>  Makefile               | 27 +++++++++++++++------------
+>  docs/qemu-qmp-ref.texi |  2 +-
+>  rules.mak              |  2 +-
+>  4 files changed, 22 insertions(+), 19 deletions(-)
+>=20
+> diff --git a/.gitignore b/.gitignore
+> index 2849d75..0e99e6a 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -103,11 +103,11 @@
+>  /docs/qemu-ga-ref.txt
 
-Not in a quick local test here. However this does ring a bell - one of
-Ben's PPC optimisations was to batch TLB flushes so they only occur at
-certain times - see commit cd0c6f473532bfaf20a095bc90a18e45162981b5 for
-more detail.
+[1]
 
-Could it be that these underlying assumptions have now changed?
+>  /docs/qemu-qmp-ref.html
+>  /docs/qemu-qmp-ref.txt
+> -docs/qemu-ga-ref.info*
+> -docs/qemu-qmp-ref.info*
+> -/qemu-ga-qapi.texi
+> -/qemu-qapi.texi
+> -/version.texi
+> +/docs/qemu-ga-ref.info*
+
+worth sorting this line up by [1]?
+
+> +/docs/qemu-qmp-ref.info*
+> +/docs/qemu-ga-qapi.texi
+> +/docs/qemu-qmp-qapi.texi
+> +/docs/version.texi
+>  *.tps
+>  .stgit-*
+>  cscope.*
+> @@ -663,25 +663,28 @@ ui/console-gl.o: $(SRC_PATH)/ui/console-gl.c \
+> =20
+>  # documentation
+>  MAKEINFO=3Dmakeinfo
+> -MAKEINFOFLAGS=3D--no-split --number-sections
+> +MAKEINFOFLAGS=3D--no-split --number-sections -I docs
+
+Will this cause grief on any older makinfo versions (such as RHEL 6)?  I
+didn't test myself on those setups.  I guess if a buildbot doesn't flag
+you, it's okay.
+
+The sorting issue is worth fixing, but trivial, so you can add:
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
 
-ATB,
+--sDfiH9Nh7xPAFKd9bRSfIGTCvXFhG9D3I
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Mark.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYyBJiAAoJEKeha0olJ0NqYWwH/3B2uSaegVzftzPLCebZbeen
+zYXKVTngCEwvV2aOPXk5OvJkq2k8d3TIUgkYalAQ/wU/heJEyw2LUyE1HCgDKble
+tr4Qd6HhBPr0YT7/CTISpvciWeiWDSOXbMySOTc0ozmFmXpQO0vSiXbnHibh3/uh
+6ty6QIlciv8kkXIZycKrk/sZ193e4M8vdnHZLV9mqfTikbm6J3Qmd/jid5VUcQtf
+sXPa8GSpG3YJMNZG7FZ9aT5yJW4oO5MoJLvGjxpS56mk4GLSd8pT/XeGUYvYhane
+zsYwU50Y41fY+eXAFpptKFHdzBYGjxI+JfCV9SVBmRmz9YCb7Mv4YoZKbzBiSxw=
+=U72J
+-----END PGP SIGNATURE-----
+
+--sDfiH9Nh7xPAFKd9bRSfIGTCvXFhG9D3I--
