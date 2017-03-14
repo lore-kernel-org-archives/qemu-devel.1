@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47584)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cnqsM-00016N-Qc
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 14:08:54 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1cnr7c-0004pn-Te
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 14:24:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cnqsI-0006Qr-5I
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 14:08:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55238)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cnqsH-0006QR-SU
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 14:08:46 -0400
-References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
-	<1489385927-6735-22-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5fbb0052-f0b1-3bd0-3731-68660a088f72@redhat.com>
-Date: Tue, 14 Mar 2017 13:08:43 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cnr7b-0000ag-QU
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 14:24:36 -0400
+Received: from mail-lf0-x232.google.com ([2a00:1450:4010:c07::232]:35317)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cnr7b-0000aB-EO
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 14:24:35 -0400
+Received: by mail-lf0-x232.google.com with SMTP id j90so80099710lfk.2
+	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 11:24:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1489385927-6735-22-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="o0VaqcTKoROT7sm9cjULDmbjFPSQ86O1W"
-Subject: Re: [Qemu-devel] [PATCH for-2.9 21/47] qapi2texi: Present the table
- of members more clearly
+In-Reply-To: <20170314173513.wruppu4js7ikaxu2@kozik-lap>
+References: <20170313180432.7067-1-krzk@kernel.org> <87mvcnpzll.fsf@linaro.org>
+	<20170314173513.wruppu4js7ikaxu2@kozik-lap>
+From: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Date: Tue, 14 Mar 2017 18:24:33 +0000
+Message-ID: <CAHDbmO1apk81csbC7BJK2JFK23fvVBLb-wA5z7_y29T=ueFPyg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 0/5] hw: arm: exynos: Bring
+ up secondary CPU + CPUIDLE issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +31,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---o0VaqcTKoROT7sm9cjULDmbjFPSQ86O1W
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
-Message-ID: <5fbb0052-f0b1-3bd0-3731-68660a088f72@redhat.com>
-Subject: Re: [PATCH for-2.9 21/47] qapi2texi: Present the table of members
- more clearly
-References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
- <1489385927-6735-22-git-send-email-armbru@redhat.com>
-In-Reply-To: <1489385927-6735-22-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+That means you're on a pre-mttcg tree so that's not the reason.
 
-On 03/13/2017 01:18 AM, Markus Armbruster wrote:
-> The table of members follows the main descriptive text immediately.
-> Makes it hard to see what it is about.  Start a new paragraph, and
-> lead with a line "Members:" for object and alternate types, "Values:"
-> for enumeration types, and "Arguments:" for commands and events.
->=20
-> Example change (qemu-qmp-ref.txt):
->=20
->   -- Command: set_link
->=20
->       Sets the link status of a virtual network adapter.
-> +
-> +     Arguments:
->       'name'
->            the device name of the virtual network adapter
->       'up'
->            true to set the link status to be up
->=20
->       Returns: Nothing on success If 'name' is not a valid network
->       device, DeviceNotFound
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  scripts/qapi2texi.py | 19 ++++++++++---------
->  1 file changed, 10 insertions(+), 9 deletions(-)
->=20
+On 14 Mar 2017 5:35 pm, "Krzysztof Kozlowski" <krzk@kernel.org> wrote:
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---o0VaqcTKoROT7sm9cjULDmbjFPSQ86O1W
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYyDGrAAoJEKeha0olJ0Nqfz0H/jjuAyn0BEfmA7B5RKishPdE
-rJozH2GXE1y2wlL/62V+9uUPs0Of91LJEsDxb44LMN7tJWj3ia+DYWQIW51vGUWV
-3HjtRhuhsy5ln0mkjYDlEWNU5LZRkDtmeGwHZjScIinzsy/71r+0M1L/NQLNJXS1
-01mP2zpT170sKbc/L4JyCnCSYcu9o3ToSbqYBXpatAVRYFhWeMyAw5lwGTZuNmnL
-bbRyHRk9e9KbWw3A/0BkBfIZI8cJeaqd/C4loh7JU1cWhkCJKXoZmLHB8jx9Kavq
-BgNgRAXpJtgEGIIraur75h1bC4cob+74DZtiCBSXNU438bFWiI20cpf+pnZXx0c=
-=h4kH
------END PGP SIGNATURE-----
-
---o0VaqcTKoROT7sm9cjULDmbjFPSQ86O1W--
+> On Tue, Mar 14, 2017 at 04:55:34PM +0000, Alex Benn=C3=A9e wrote:
+> >
+> > Krzysztof Kozlowski <krzk@kernel.org> writes:
+> >
+> > > Hi,
+> > >
+> > <snip>
+> > >
+> > > Overview of the problem
+> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > On Exynos4210, by default Linux kernel uses cpuidle driver which trie=
+s
+> > > to enter low power mode, called AFTR (Arm Off, Top Running).  On real
+> > > hardware this brings some power savings.  This AFTR mode requires
+> second
+> > > CPU to be off, so the driver (coupled cpuidle driver) when system is
+> idle:
+> > > 1. Turns off second CPU,
+> > > 2. Enters AFTR on CPU0.
+> > >
+> > > However the QEMU system is then totally unresponsive (e.g. on serial
+> console)
+> > > and RCU stalls appear from time to time.  I spent some time on it and
+> did not
+> > > find the real cause behind the lag.  Maybe it is because the second C=
+PU
+> > > does not really power down itself and system just burns the cycles
+> under spin
+> > > locks?
+> >
+> > Was this tested post the MTTCG merge? Maybe there is an interaction
+> > between power saving/halting the vCPU?
+> >
+> > I mention this because I already made some minor tweaks for handing the
+> > WFI instruction in MTTCG. See commit c22edfebff. You can test this by
+> > forcing the original behaviour by adding:
+> >
+> >   -accel tcg,thread=3Dsingle
+> >
+> > to your command line.
+> >
+>
+> I am testing it on v2.8.0-2005-g17783ac828ad. Without any -accel, the
+> system boots but responsiveness of serial console is bad. Bad but at
+> least it is responding still a little bit.
+>
+> With the -accel you mentioned, system does not even reach user-space
+> (initramfs).
+>
+> I tried rebasing on newer (e.g. v2.8.0-2182-g5e2fb7c598c6) but
+> compilation fails all the time on:
+> /home/dev/qemu/qemu/vl.c: In function =E2=80=98main=E2=80=99:
+> /home/dev/qemu/qemu/vl.c:3131:18: error: =E2=80=98QEMU_OPTION_blockdev=E2=
+=80=99
+> undeclared (first use in this function)
+>              case QEMU_OPTION_blockdev:
+>
+>
+> Best regards,
+> Krzysztof
+>
+>
