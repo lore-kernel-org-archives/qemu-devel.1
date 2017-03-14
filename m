@@ -1,26 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cnv0L-00062G-C3
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 18:33:22 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cnw0x-00067b-Dv
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 19:38:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cnv0I-0003z3-6p
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 18:33:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40694)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cnv0I-0003yk-1C
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 18:33:18 -0400
-Date: Tue, 14 Mar 2017 19:33:14 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170314223314.GB3086@thinpad.lan.raisama.net>
-References: <20170314140807.6061-1-git@kirschju.re>
-	<20170314140807.6061-2-git@kirschju.re>
-	<20170314171632.GS4694@thinpad.lan.raisama.net>
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cnw0t-00040Z-HM
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 19:38:03 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42354
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1cnw0t-0003yy-Aj
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 19:37:59 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2ENXeMA006537
+	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 19:37:57 -0400
+Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 296nfxc5j7-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 19:37:57 -0400
+Received: from localhost
+	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Tue, 14 Mar 2017 19:37:56 -0400
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170314171632.GS4694@thinpad.lan.raisama.net>
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] X86: Move rdmsr/wrmsr functionality
- to standalone functions
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+Date: Tue, 14 Mar 2017 18:37:47 -0500
+Message-Id: <148953466730.19276.1541285718972438692@loki>
+Subject: [Qemu-devel] [ANNOUNCE] QEMU 2.9.0-rc0 is now available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,66 +39,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julian Kirsch <git@kirschju.re>
-Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-Found something else that confused me:
+Hello,
 
-On Tue, Mar 14, 2017 at 02:16:32PM -0300, Eduardo Habkost wrote:
-[...]
-> +#if defined CONFIG_KVM && defined TARGET_X86_64
+On behalf of the QEMU Team, I'd like to announce the availability of the
+first release candidate for the QEMU 2.9 release.  This release is meant
+for testing purposes and should not be used in a production environment.
 
-Why exactly are you making the hyperv MSRs x86_64-specific? I
-don't see anything at the QEMU code or kernel-side KVM code that
-makes it x86_64-specific.
+  http://download.qemu-project.org/qemu-2.9.0-rc0.tar.xz
+  http://download.qemu-project.org/qemu-2.9.0-rc0.tar.xz.sig
 
-> +    case HV_X64_MSR_HYPERCALL:
-> +        val = env->msr_hv_hypercall;
-> +        break;
-> +    case HV_X64_MSR_GUEST_OS_ID:
-> +        val = env->msr_hv_guest_os_id;
-> +        break;
-> +    case HV_X64_MSR_APIC_ASSIST_PAGE:
-> +        val = env->msr_hv_vapic;
-> +        break;
-> +    case HV_X64_MSR_REFERENCE_TSC:
-> +        val = env->msr_hv_tsc;
-> +        break;
-> +    case HV_X64_MSR_CRASH_P0 ... HV_X64_MSR_CRASH_P4:
-> +        val = env->msr_hv_crash_params[idx - HV_X64_MSR_CRASH_P0];
-> +        break;
-> +    case HV_X64_MSR_VP_RUNTIME:
-> +        val = env->msr_hv_runtime;
-> +        break;
-> +    case HV_X64_MSR_SCONTROL:
-> +        val = env->msr_hv_synic_control;
-> +        break;
-> +    case HV_X64_MSR_SVERSION:
-> +        val = env->msr_hv_synic_version;
-> +        break;
-> +    case HV_X64_MSR_SIEFP:
-> +        val = env->msr_hv_synic_evt_page;
-> +        break;
-> +    case HV_X64_MSR_SIMP:
-> +        val = env->msr_hv_synic_msg_page;
-> +        break;
-> +    case HV_X64_MSR_SINT0 ... HV_X64_MSR_SINT15:
-> +        val = env->msr_hv_synic_sint[idx - HV_X64_MSR_SINT0];
-> +        break;
-> +    case HV_X64_MSR_STIMER0_CONFIG:
-> +    case HV_X64_MSR_STIMER1_CONFIG:
-> +    case HV_X64_MSR_STIMER2_CONFIG:
-> +    case HV_X64_MSR_STIMER3_CONFIG:
-> +        val = env->msr_hv_stimer_config[(idx - HV_X64_MSR_STIMER0_CONFIG) / 2];
-> +        break;
-> +    case HV_X64_MSR_STIMER0_COUNT:
-> +    case HV_X64_MSR_STIMER1_COUNT:
-> +    case HV_X64_MSR_STIMER2_COUNT:
-> +    case HV_X64_MSR_STIMER3_COUNT:
-> +        val = env->msr_hv_stimer_count[(idx - HV_X64_MSR_STIMER0_COUNT) / 2];
-> +        break;
-> +#endif
-[...]
+You can help improve the quality of the QEMU 2.9 release by testing this
+release and reporting bugs on Launchpad:
 
--- 
-Eduardo
+  https://bugs.launchpad.net/qemu/
+
+The release plan, as well a documented known issues for release
+candidates, are available at:
+
+  http://wiki.qemu.org/Planning/2.9
+
+The dates have all been pushed back a week due to delays with the
+initial RC.
+
+Please add entries to the ChangeLog for the 2.9 release below:
+
+  http://wiki.qemu.org/ChangeLog/2.9
