@@ -1,15 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52970)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andreas@grapentin.org>) id 1cnjYV-00027q-DY
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 06:19:52 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1cnjaF-0003Yx-NV
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 06:21:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andreas@grapentin.org>) id 1cnjYU-0004dz-Nh
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 06:19:51 -0400
-From: Andreas Grapentin <andreas@grapentin.org>
-Date: Tue, 14 Mar 2017 11:19:24 +0100
-Message-Id: <20170314101925.16792-1-andreas@grapentin.org>
-Subject: [Qemu-devel] [PATCH 0/1] major / minor macros are to be included
- from <sys/sysmacros.h>
+	(envelope-from <pbonzini@redhat.com>) id 1cnjaB-0005UR-Oa
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 06:21:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53274)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cnjaB-0005Ty-IX
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 06:21:35 -0400
+References: <20170314100838.12647-1-roman.penyaev@profitbricks.com>
+	<20170314100838.12647-2-roman.penyaev@profitbricks.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f191552b-88c8-e5d4-b7b7-953a201971b4@redhat.com>
+Date: Tue, 14 Mar 2017 11:21:32 +0100
+MIME-Version: 1.0
+In-Reply-To: <20170314100838.12647-2-roman.penyaev@profitbricks.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/1] scripts/qemugdb/coroutine.py: get
+ pthread pointer from '(gdb) thread info $id' output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,29 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Andreas Grapentin <andreas@grapentin.org>
-
-Building qemu fails with glibc-2.25 and gcc-6.3.1:
-
-> qemu/qga/commands-posix.c:656:13: error: In the GNU C Library, "major" is defined
->  by <sys/sysmacros.h>. For historical compatibility, it is
->  currently defined by <sys/types.h> as well, but we plan to
->  remove this soon. To use "major", include <sys/sysmacros.h>
->  directly. If you did not intend to use a system-defined macro
->  "major", you should undefine it after including <sys/types.h>. [-Werror]
->          *devmajor = major(st.st_rdev);
->              ^~~~~~~~~~~~~~~~~~~~~~~~~~
-
-A trivial fix is to #include <sys/sysmacros.h> in the respective files.
+To: Roman Pen <roman.penyaev@profitbricks.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 
 
-Andreas Grapentin (1):
-  major / minor macros are to be included from <sys/sysmacros.h>
 
- hw/9pfs/9p.c         | 1 +
- qga/commands-posix.c | 1 +
- 2 files changed, 2 insertions(+)
+On 14/03/2017 11:08, Roman Pen wrote:
+> For sure under corefile debugging it is not possible to invoke
+> any syscalls, like arch_prctl(), so avoid doing that.  That will
+> simplify the script.
 
--- 
-2.12.0
+Is the issue that start_thread only works in the main thread stack (i.e.
+not on coroutines)?
+
+> +    num = gdb.selected_thread().num
+> +    thr = gdb.execute('info thread %d' % num, to_string=True)
+
+What versions of gdb support gdb.execute?  Also, what happens if
+localization is in effect?
+
+Paolo
+
+> +    thr = thr.split('\n')[1]
+>      try:
+> -        return f.read_var("arg")
+> -    except ValueError:
+> -        return get_fs_base()
+> +        return re.search('Thread ([0-9a-zx]+)', thr).group(1)
+> +    except:
+> +        raise ValueError("Unable to find pthread address in 'info thread %d' output.\n"
+> +                         "Probably version mismatch of libthread_db.so library?" %
+> +                         num)
