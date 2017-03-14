@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cnq7y-00087k-Gv
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:20:56 -0400
+	(envelope-from <janne.huttunen@nokia.com>) id 1cnqCe-00035V-VN
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:25:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cnq7t-0003fA-IS
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:20:54 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:33143)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cnq7t-0003eY-9O
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:20:49 -0400
-Received: by mail-wm0-x244.google.com with SMTP id n11so887130wma.0
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 10:20:48 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 14 Mar 2017 18:20:45 +0100
-Message-Id: <1489512045-49206-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH for 2.9?] hmp: gpa2hva and gpa2hpa hostaddr
- command
+	(envelope-from <janne.huttunen@nokia.com>) id 1cnqCb-0006OO-1l
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:25:45 -0400
+Received: from mail-he1eur01on0131.outbound.protection.outlook.com
+	([104.47.0.131]:23108
+	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <janne.huttunen@nokia.com>)
+	id 1cnqCa-0006MT-DC
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:25:40 -0400
+From: Janne Huttunen <janne.huttunen@nokia.com>
+Date: Tue, 14 Mar 2017 14:50:09 +0200
+Message-ID: <b2cf1008ef518efeecd539d2481d1a255b27c7d5.1489494746.git.janne.huttunen@nokia.com>
+In-Reply-To: <cover.1489494746.git.janne.huttunen@nokia.com>
+References: <cover.1489494746.git.janne.huttunen@nokia.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [RFC][PATCH 2/6] Re-factor bootdevice list handling,
+ pt2.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,179 +30,100 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, armbru@redhat.com
+Cc: janne.huttunen@nokia.com
 
-These commands are useful when testing machine-check passthrough.
-gpa2hva is useful to inject a MADV_HWPOISON madvise from gdb, while
-gpa2hpa is useful to inject an error with the mce-inject kernel
-module.
+Store the list head into the property structure. This allows the callback
+functions to access the correct list even when there are multiple lists.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Janne Huttunen <janne.huttunen@nokia.com>
 ---
-	Technically a feature, but on the other hand it is pretty
-	much impossible to test without it, and the people testing
-	the feature are using it as an out-of-tree patch.  Opinions?
+ bootdevice.c | 36 ++++++++++++++++++++++++------------
+ 1 file changed, 24 insertions(+), 12 deletions(-)
 
- hmp-commands.hx |  32 ++++++++++++++++++
- monitor.c       | 103 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 135 insertions(+)
-
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 8819281..0aca984 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -526,6 +526,38 @@ Dump 80 16 bit values at the start of the video memory.
- ETEXI
+diff --git a/bootdevice.c b/bootdevice.c
+index a29d43b..30e98ae 100644
+--- a/bootdevice.c
++++ b/bootdevice.c
+@@ -33,6 +33,13 @@
+ typedef struct FWBootEntry FWBootEntry;
+ typedef QTAILQ_HEAD(, FWBootEntry) FWBootList;
  
-     {
-+        .name       = "gpa2hva",
-+        .args_type  = "addr:l",
-+        .params     = "addr",
-+        .help       = "print the host virtual address corresponding to a guest physical address",
-+        .cmd        = hmp_gpa2hva,
-+    },
++typedef struct {
++    FWBootList *bootlist;
++    int32_t *bootindex;
++    const char *suffix;
++    DeviceState *dev;
++} BootIndexProperty;
 +
-+STEXI
-+@item gpa2hva @var{addr}
-+@findex gpa2hva
-+Print the host virtual address at which the guest's physical address @var{addr}
-+is mapped.
-+ETEXI
-+
-+#ifdef CONFIG_LINUX
-+    {
-+        .name       = "gpa2hpa",
-+        .args_type  = "addr:l",
-+        .params     = "addr",
-+        .help       = "print the host physical address corresponding to a guest physical address",
-+        .cmd        = hmp_gpa2hpa,
-+    },
-+#endif
-+
-+STEXI
-+@item gpa2hpa @var{addr}
-+@findex gpa2hpa
-+Print the host physical address at which the guest's physical address @var{addr}
-+is mapped.
-+ETEXI
-+
-+    {
-         .name       = "p|print",
-         .args_type  = "fmt:/,val:l",
-         .params     = "/fmt expr",
-diff --git a/monitor.c b/monitor.c
-index be282ec..1ac8c5f 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -1421,6 +1421,109 @@ static void hmp_physical_memory_dump(Monitor *mon, const QDict *qdict)
-     memory_dump(mon, count, format, size, addr, 1);
+ struct FWBootEntry {
+     QTAILQ_ENTRY(FWBootEntry) link;
+     int32_t bootindex;
+@@ -288,12 +295,6 @@ char *get_boot_devices_list(size_t *size, bool ignore_suffixes)
+     return list;
  }
  
-+static void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, Error **errp)
-+{
-+    MemoryRegionSection mrs = memory_region_find(get_system_memory(),
-+                                                 addr, 1);
-+
-+    if (!mrs.mr) {
-+        error_setg(errp, "No memory is mapped at address 0x%" HWADDR_PRIx, addr);
-+        return NULL;
-+    }
-+
-+    if (!memory_region_is_ram(mrs.mr) && !memory_region_is_romd(mrs.mr)) {
-+        error_setg(errp, "Memory at address 0x%" HWADDR_PRIx "is not RAM", addr);
-+        memory_region_unref(mrs.mr);
-+        return NULL;
-+    }
-+
-+    *p_mr = mrs.mr;
-+    return qemu_map_ram_ptr(mrs.mr->ram_block, mrs.offset_within_region);
-+}
-+
-+static void hmp_gpa2hva(Monitor *mon, const QDict *qdict)
-+{
-+    hwaddr addr = qdict_get_int(qdict, "addr");
-+    Error *local_err = NULL;
-+    MemoryRegion *mr;
-+    void *ptr;
-+
-+    ptr = gpa2hva(&mr, addr, &local_err);
-+    if (local_err) {
-+        error_report_err(local_err);
-+        return;
-+    }
-+
-+    monitor_printf(mon, "Host virtual address for 0x%" HWADDR_PRIx
-+                   " (%s) is %p\n",
-+                   addr, mr->name, ptr);
-+
-+    memory_region_unref(mr);
-+}
-+
-+#ifdef CONFIG_LINUX
-+static uint64_t vtop(void *ptr, Error **errp)
-+{
-+    uint64_t pinfo;
-+    uint64_t ret = -1;
-+    uintptr_t addr = (uintptr_t) ptr;
-+    uintptr_t pagesize = getpagesize();
-+    off_t offset = addr / pagesize * sizeof (pinfo);
-+    char pagemapname[64];
-+    int fd;
-+
-+    sprintf(pagemapname, "/proc/%d/pagemap", getpid());
-+    fd = open(pagemapname, O_RDONLY);
-+    if (fd == -1) {
-+        error_setg_errno(errp, errno, "Cannot open %s", pagemapname);
-+        return -1;
-+    }
-+
-+    /* Force copy-on-write if necessary.  */
-+    atomic_add((uint8_t *)ptr, 0);
-+
-+    if (pread(fd, &pinfo, sizeof(pinfo), offset) != sizeof(pinfo)) {
-+        error_setg_errno(errp, errno, "Cannot read from %s", pagemapname);
-+        goto out;
-+    }
-+    if ((pinfo & (1ull << 63)) == 0) {
-+        error_setg(errp, "Page not present");
-+        goto out;
-+    }
-+    ret = ((pinfo & 0x007fffffffffffffull) << 12) | (addr & (pagesize - 1));
-+
-+out:
-+    close(fd);
-+    return ret;
-+}
-+
-+static void hmp_gpa2hpa(Monitor *mon, const QDict *qdict)
-+{
-+    hwaddr addr = qdict_get_int(qdict, "addr");
-+    Error *local_err = NULL;
-+    MemoryRegion *mr;
-+    void *ptr;
-+    uint64_t physaddr;
-+
-+    ptr = gpa2hva(&mr, addr, &local_err);
-+    if (local_err) {
-+        error_report_err(local_err);
-+        return;
-+    }
-+
-+    physaddr = vtop(ptr, &local_err);
-+    if (local_err) {
-+        error_report_err(local_err);
-+    } else {
-+        monitor_printf(mon, "Host physical address for 0x%" HWADDR_PRIx
-+                       " (%s) is 0x%" PRIx64 "\n",
-+                       addr, mr->name, (uint64_t) physaddr);
-+    }
-+
-+    memory_region_unref(mr);
-+}
-+#endif
-+
- static void do_print(Monitor *mon, const QDict *qdict)
+-typedef struct {
+-    int32_t *bootindex;
+-    const char *suffix;
+-    DeviceState *dev;
+-} BootIndexProperty;
+-
+ static void device_get_bootindex(Object *obj, Visitor *v, const char *name,
+                                  void *opaque, Error **errp)
  {
-     int format = qdict_get_int(qdict, "format");
+@@ -313,14 +314,15 @@ static void device_set_bootindex(Object *obj, Visitor *v, const char *name,
+         goto out;
+     }
+     /* check whether bootindex is present in fw_boot_order list  */
+-    check_boot_index(boot_index, &local_err);
++    do_check_boot_index(prop->bootlist, boot_index, &local_err);
+     if (local_err) {
+         goto out;
+     }
+     /* change bootindex to a new one */
+     *prop->bootindex = boot_index;
+ 
+-    add_boot_device_path(*prop->bootindex, prop->dev, prop->suffix);
++    do_add_boot_device_path(prop->bootlist, *prop->bootindex,
++                            prop->dev, prop->suffix);
+ 
+ out:
+     error_propagate(errp, local_err);
+@@ -332,17 +334,19 @@ static void property_release_bootindex(Object *obj, const char *name,
+ {
+     BootIndexProperty *prop = opaque;
+ 
+-    del_boot_device_path(prop->dev, prop->suffix);
++    do_del_boot_device_path(prop->bootlist, prop->dev, prop->suffix);
+     g_free(prop);
+ }
+ 
+-void device_add_bootindex_property(Object *obj, int32_t *bootindex,
+-                                   const char *name, const char *suffix,
+-                                   DeviceState *dev, Error **errp)
++static void do_add_bootindex_prop(FWBootList *bootlist,
++                                  Object *obj, int32_t *bootindex,
++                                  const char *name, const char *suffix,
++                                  DeviceState *dev, Error **errp)
+ {
+     Error *local_err = NULL;
+     BootIndexProperty *prop = g_malloc0(sizeof(*prop));
+ 
++    prop->bootlist = bootlist;
+     prop->bootindex = bootindex;
+     prop->suffix = suffix;
+     prop->dev = dev;
+@@ -361,3 +365,11 @@ void device_add_bootindex_property(Object *obj, int32_t *bootindex,
+     /* initialize devices' bootindex property to -1 */
+     object_property_set_int(obj, -1, name, NULL);
+ }
++
++void device_add_bootindex_property(Object *obj, int32_t *bootindex,
++                                   const char *name, const char *suffix,
++                                   DeviceState *dev, Error **errp)
++{
++    do_add_bootindex_prop(&fw_boot_order, obj, bootindex,
++                          name, suffix, dev, errp);
++}
 -- 
-1.8.3.1
+2.7.4
