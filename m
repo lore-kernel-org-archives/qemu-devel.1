@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58134)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cnkv1-00016C-Lr
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:47:12 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1cnkv5-00017C-E8
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:47:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cnkuy-0008A4-H0
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:47:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52940)
+	(envelope-from <pbonzini@redhat.com>) id 1cnkv4-0008E4-Bb
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:47:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59846)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cnkuy-00089r-C6
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:47:08 -0400
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 711325145F
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 11:47:08 +0000 (UTC)
-Date: Tue, 14 Mar 2017 11:47:04 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170314114704.GJ2652@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170313124434.1043-1-quintela@redhat.com>
-	<20170314102142.GC2445@work-vm>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cnkv4-0008DT-2L
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:47:14 -0400
+References: <20170314113209.12025-1-eduardo.otubo@profitbricks.com>
+	<20170314113209.12025-4-eduardo.otubo@profitbricks.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e9b2bd2a-8409-7470-76bb-32f15fe6ce0e@redhat.com>
+Date: Tue, 14 Mar 2017 12:47:10 +0100
 MIME-Version: 1.0
+In-Reply-To: <20170314113209.12025-4-eduardo.otubo@profitbricks.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170314102142.GC2445@work-vm>
-Subject: Re: [Qemu-devel] [PATCH 00/16] Multifd v4
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/5] seccomp: add elevateprivileges
+ argument to command line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,39 +28,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+To: Eduardo Otubo <eduardo.otubo@profitbricks.com>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com
 
-On Tue, Mar 14, 2017 at 10:21:43AM +0000, Dr. David Alan Gilbert wrote:
-> * Juan Quintela (quintela@redhat.com) wrote:
-> > Hi
-> > 
-> > This is the 4th version of multifd. Changes:
-> > - XBZRLE don't need to be checked for
-> > - Documentation and defaults are consistent
-> > - split socketArgs
-> > - use iovec instead of creating something similar.
-> > - We use now the exported size of target page (another HACK removal)
-> > - created qio_chanel_{wirtev,readv}_all functions.  the _full() name
-> >   was already taken.
-> >   What they do is the same that the without _all() function, but if it
-> >   returns due to blocking it redo the call.
-> > - it is checkpatch.pl clean now.
-> > 
-> > Please comment, Juan.
+
+
+On 14/03/2017 12:32, Eduardo Otubo wrote:
+> This patch introduces the new argument [,elevateprivileges=deny] to the
+> `-sandbox on'. It avoids Qemu process to elevate its privileges by
+> blacklisting all set*uid|gid system calls
 > 
-> High level things,
->   a) I think you probably need to do some bandwidth measurements to show
->     that multifd is managing to have some benefit - it would be good
->     for the cover letter.
+> Signed-off-by: Eduardo Otubo <eduardo.otubo@profitbricks.com>
+> ---
+>  include/sysemu/seccomp.h |  1 +
+>  qemu-options.hx          |  8 ++++++--
+>  qemu-seccomp.c           | 28 ++++++++++++++++++++++++++++
+>  vl.c                     | 11 +++++++++++
+>  4 files changed, 46 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/sysemu/seccomp.h b/include/sysemu/seccomp.h
+> index 7a7bde246b..e6e78d85ce 100644
+> --- a/include/sysemu/seccomp.h
+> +++ b/include/sysemu/seccomp.h
+> @@ -16,6 +16,7 @@
+>  #define QEMU_SECCOMP_H
+>  
+>  #define OBSOLETE    0x0001
+> +#define PRIVILEGED  0x0010
+>  
+>  #include <seccomp.h>
+>  
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 1403d0c85f..47018db5aa 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -3732,8 +3732,10 @@ Old param mode (ARM only).
+>  ETEXI
+>  
+>  DEF("sandbox", HAS_ARG, QEMU_OPTION_sandbox, \
+> -    "-sandbox on[,obsolete=allow]  Enable seccomp mode 2 system call filter (default 'off').\n" \
+> -    "                              obsolete: Allow obsolete system calls",
+> +    "-sandbox on[,obsolete=allow][,elevateprivileges=deny]\n" \
+> +    "                               Enable seccomp mode 2 system call filter (default 'off').\n" \
+> +    "                               obsolete: Allow obsolete system calls\n" \
+> +    "                               elevateprivileges: avoids Qemu process to elevate its privileges by blacklisting all set*uid|gid system calls",
 
-Presumably this would be a building block to solving the latency problems
-with post-copy, by reserving one channel for use transferring out of band
-pages required by target host page faults.
+Why allow these by default?
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+Paolo
+
+>      QEMU_ARCH_ALL)
+>  STEXI
+>  @item -sandbox @var{arg}[,obsolete=@var{string}]
+> @@ -3743,6 +3745,8 @@ disable it.  The default is 'off'.
+>  @table @option
+>  @item obsolete=@var{string}
+>  Enable Obsolete system calls
+> +@item elevateprivileges=@var{string}
+> +Disable set*uid|gid systema calls
+>  @end table
+>  ETEXI
+>  
+> diff --git a/qemu-seccomp.c b/qemu-seccomp.c
+> index 5ef36890da..5aa6590386 100644
+> --- a/qemu-seccomp.c
+> +++ b/qemu-seccomp.c
+> @@ -31,6 +31,19 @@ struct QemuSeccompSyscall {
+>      uint8_t priority;
+>  };
+>  
+> +static const struct QemuSeccompSyscall privileged_syscalls[] = {
+> +    { SCMP_SYS(setuid), 255 },
+> +    { SCMP_SYS(setgid), 255 },
+> +    { SCMP_SYS(setpgid), 255 },
+> +    { SCMP_SYS(setsid), 255 },
+> +    { SCMP_SYS(setreuid), 255 },
+> +    { SCMP_SYS(setregid), 255 },
+> +    { SCMP_SYS(setresuid), 255 },
+> +    { SCMP_SYS(setresgid), 255 },
+> +    { SCMP_SYS(setfsuid), 255 },
+> +    { SCMP_SYS(setfsgid), 255 },
+> +};
+> +
+>  static const struct QemuSeccompSyscall obsolete[] = {
+>      { SCMP_SYS(readdir), 255 },
+>      { SCMP_SYS(_sysctl), 255 },
+> @@ -125,6 +138,21 @@ int seccomp_start(uint8_t seccomp_opts)
+>          }
+>      }
+>  
+> +    if (seccomp_opts & PRIVILEGED) {
+> +        for (i = 0; i < ARRAY_SIZE(privileged_syscalls); i++) {
+> +            rc = seccomp_rule_add(ctx, SCMP_ACT_KILL, privileged_syscalls[i].num, 0);
+> +            if (rc < 0) {
+> +                goto seccomp_return;
+> +            }
+> +            rc = seccomp_syscall_priority(ctx, privileged_syscalls[i].num,
+> +                    privileged_syscalls[i].priority);
+> +            if (rc < 0) {
+> +                goto seccomp_return;
+> +            }
+> +        }
+> +    }
+> +
+> +
+>      rc = seccomp_load(ctx);
+>  
+>    seccomp_return:
+> diff --git a/vl.c b/vl.c
+> index 7b08b3383b..d071e240b0 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -273,6 +273,10 @@ static QemuOptsList qemu_sandbox_opts = {
+>              .name = "obsolete",
+>              .type = QEMU_OPT_STRING,
+>          },
+> +        {
+> +            .name = "elevateprivileges",
+> +            .type = QEMU_OPT_STRING,
+> +        },
+>          { /* end of list */ }
+>      },
+>  };
+> @@ -1045,6 +1049,13 @@ static int parse_sandbox(void *opaque, QemuOpts *opts, Error **errp)
+>              }
+>          }
+>  
+> +        value = qemu_opt_get(opts,"elevateprivileges");
+> +        if (value) {
+> +            if (strcmp(value, "deny") == 0) {
+> +                seccomp_opts |= PRIVILEGED;
+> +            }
+> +        }
+> +
+>          if (seccomp_start(seccomp_opts) < 0) {
+>              error_report("failed to install seccomp syscall filter "
+>                           "in the kernel");
+> 
