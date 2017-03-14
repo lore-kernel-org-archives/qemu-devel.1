@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cnoV5-0000bq-P6
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:36:41 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1cnoZU-0003vv-Gb
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:41:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cnoV1-0001TD-Fv
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:36:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40000)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cnoV1-0001Sl-7U
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:36:35 -0400
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 58040128D
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 15:36:35 +0000 (UTC)
-From: Fam Zheng <famz@redhat.com>
-Date: Tue, 14 Mar 2017 23:36:26 +0800
-Message-Id: <20170314153626.16989-3-famz@redhat.com>
-In-Reply-To: <20170314153626.16989-1-famz@redhat.com>
-References: <20170314153626.16989-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/2] virtio-scsi: Fix acquire/release in
- dataplane handlers
+	(envelope-from <alex.bennee@linaro.org>) id 1cnoZO-0003i5-B3
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:41:12 -0400
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:35506)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cnoZN-0003h7-U6
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:41:06 -0400
+Received: by mail-wm0-x22f.google.com with SMTP id v186so67170397wmd.0
+	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 08:41:05 -0700 (PDT)
+References: <36e41adf-b0b3-3efa-51c4-f1a70cd05b98@ilande.co.uk>
+	<87wpbsp49a.fsf@linaro.org>
+	<6491a446-bf23-5ab9-3431-c67efaf83f71@ilande.co.uk>
+	<alpine.BSF.2.20.1703141450560.82811@zero.eik.bme.hu>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <alpine.BSF.2.20.1703141450560.82811@zero.eik.bme.hu>
+Date: Tue, 14 Mar 2017 15:41:20 +0000
+Message-ID: <87shmfq31b.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] qemu-system-ppc video artifacts since
+ "tcg: drop global lock during TCG code execution"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,224 +33,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, jan.kiszka@siemens.com, qemu-devel <qemu-devel@nongnu.org>, cota@braap.org, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, bobby.prani@gmail.com, fred.konrad@greensocs.com, rth@twiddle.net
 
-After the AioContext lock push down, there is a race between
-virtio_scsi_dataplane_start and those "assert(s->ctx &&
-s->dataplane_started)", because the latter doesn't isn't wrapped in
-aio_context_acquire.
 
-Reproducer is simply booting a Fedora guest with an empty
-virtio-scsi-dataplane controller:
+BALATON Zoltan <balaton@eik.bme.hu> writes:
 
-    qemu-system-x86_64 \
-      -drive if=none,id=root,format=raw,file=Fedora-Cloud-Base-25-1.3.x86_64.raw \
-      -device virtio-scsi \
-      -device scsi-disk,drive=root,bootindex=1 \
-      -object iothread,id=io \
-      -device virtio-scsi-pci,iothread=io \
-      -net user,hostfwd=tcp::10022-:22 -net nic,model=virtio -m 2048 \
-      --enable-kvm
+> On Tue, 14 Mar 2017, Mark Cave-Ayland wrote:
+>> On 14/03/17 10:00, Alex Bennée wrote:
+>>> Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
+>>>
+>>>> I've recently noticed some video artifacts appearing in the form of
+>>>> horizontal lines whilst testing OpenBIOS boot on some qemu-system-ppc
+>>>> images (see https://www.ilande.co.uk/tmp/qemu/macos9-stripe.png for an
+>>>> example) which I've finally bisected down to this commit.
+>>>
+>>> Interesting. Is the video hardware in this case a simple framebuffer or
+>>> is there some sort of GPU involved?
+>>
+>> For the mac99 machine it's just the normal QEMU PCI std-vga card, so
+>> nothing special. Having run tests across SPARC which uses its own
+>> framebuffer, there have been no obvious artifacts that I've spotted
+>> there to date.
+>>
+>>>> The horizontal lines tend to appear at different positions with
+>>>> different lengths, although it seems to be more common that a complete
+>>>> scanline is affected. Reproducing the issue is fairly easy with a MacOS
+>>>> 9.2.1 ISO and the command line below:
+>>>>
+>>>> ./qemu-system-ppc -cdrom MacOS921.iso -boot d -m 512 -M mac99
+>>>>
+>>>> Could it be that this patch is still missing a lock somewhere which
+>>>> causes these artifacts to appear?
+>>>
+>>> It depends. If the hardware is accessed via MMIO then the BQL is taken
+>>> automatically (unless the area is explicitly marked as doing its own
+>>> locking see: mr->global_locking).
+>>>
+>>> Is the artefact temporary or permanent? Could it be a change in
+>>> synchronisation between the emulator updating the framebuffer and
+>>> whatever backend updating its display?
+>>
+>> AFAICT they are temporary in that they appear randomly on the display,
+>> but the next time that particular area of the display is updated by the
+>> guest then they tend to either change/disappear.
+>
+> I've also noticed artifacts when testing the SM501 changes with
+> MorphOS on recent QEMU so it may not be related to just the std vga.
+> It's shown as bands (larger number of adjacent scanlines) not updating
+> when the client first wrote to the framebuffer but then they
+> disappeared during the next refresh. I'm guessing it may be related to
+> dirty checking of the framebuffer memory which is used to decide when
+> a scan line needs update?
 
-Fix this by moving acquire/release pairs from virtio_scsi_handle_*_vq to
-their callers - and wrap the broken assertions in.
+Interesting. I guess if the corrupted scan lines are in blocks of
+PAGE_SIZE that might make sense.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- hw/scsi/virtio-scsi-dataplane.c | 20 ++++++++++++++++----
- hw/scsi/virtio-scsi.c           | 26 ++++++++++++++------------
- 2 files changed, 30 insertions(+), 16 deletions(-)
+Commit (b0706b716769494f321a0d2bfd9fa9893992f995) made
+tlb_reset_dirty_range update the SoftMMU addr_write entry atomically.
+Now I don't see how that could race in single threaded TCG mode but it
+could explain things.
 
-diff --git a/hw/scsi/virtio-scsi-dataplane.c b/hw/scsi/virtio-scsi-dataplane.c
-index 74c95e0..944ea4e 100644
---- a/hw/scsi/virtio-scsi-dataplane.c
-+++ b/hw/scsi/virtio-scsi-dataplane.c
-@@ -52,28 +52,40 @@ void virtio_scsi_dataplane_setup(VirtIOSCSI *s, Error **errp)
- static bool virtio_scsi_data_plane_handle_cmd(VirtIODevice *vdev,
-                                               VirtQueue *vq)
- {
--    VirtIOSCSI *s = (VirtIOSCSI *)vdev;
-+    bool progress;
-+    VirtIOSCSI *s = VIRTIO_SCSI(vdev);
- 
-+    virtio_scsi_acquire(s);
-     assert(s->ctx && s->dataplane_started);
--    return virtio_scsi_handle_cmd_vq(s, vq);
-+    progress = virtio_scsi_handle_cmd_vq(s, vq);
-+    virtio_scsi_release(s);
-+    return progress;
- }
- 
- static bool virtio_scsi_data_plane_handle_ctrl(VirtIODevice *vdev,
-                                                VirtQueue *vq)
- {
-+    bool progress;
-     VirtIOSCSI *s = VIRTIO_SCSI(vdev);
- 
-+    virtio_scsi_acquire(s);
-     assert(s->ctx && s->dataplane_started);
--    return virtio_scsi_handle_ctrl_vq(s, vq);
-+    progress = virtio_scsi_handle_ctrl_vq(s, vq);
-+    virtio_scsi_release(s);
-+    return progress;
- }
- 
- static bool virtio_scsi_data_plane_handle_event(VirtIODevice *vdev,
-                                                 VirtQueue *vq)
- {
-+    bool progress;
-     VirtIOSCSI *s = VIRTIO_SCSI(vdev);
- 
-+    virtio_scsi_acquire(s);
-     assert(s->ctx && s->dataplane_started);
--    return virtio_scsi_handle_event_vq(s, vq);
-+    progress = virtio_scsi_handle_event_vq(s, vq);
-+    virtio_scsi_release(s);
-+    return progress;
- }
- 
- static int virtio_scsi_vring_init(VirtIOSCSI *s, VirtQueue *vq, int n,
-diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-index e7466d3..4939f1f 100644
---- a/hw/scsi/virtio-scsi.c
-+++ b/hw/scsi/virtio-scsi.c
-@@ -427,12 +427,10 @@ bool virtio_scsi_handle_ctrl_vq(VirtIOSCSI *s, VirtQueue *vq)
-     VirtIOSCSIReq *req;
-     bool progress = false;
- 
--    virtio_scsi_acquire(s);
-     while ((req = virtio_scsi_pop_req(s, vq))) {
-         progress = true;
-         virtio_scsi_handle_ctrl_req(s, req);
-     }
--    virtio_scsi_release(s);
-     return progress;
- }
- 
-@@ -446,7 +444,9 @@ static void virtio_scsi_handle_ctrl(VirtIODevice *vdev, VirtQueue *vq)
-             return;
-         }
-     }
-+    virtio_scsi_acquire(s);
-     virtio_scsi_handle_ctrl_vq(s, vq);
-+    virtio_scsi_release(s);
- }
- 
- static void virtio_scsi_complete_cmd_req(VirtIOSCSIReq *req)
-@@ -590,7 +590,6 @@ bool virtio_scsi_handle_cmd_vq(VirtIOSCSI *s, VirtQueue *vq)
- 
-     QTAILQ_HEAD(, VirtIOSCSIReq) reqs = QTAILQ_HEAD_INITIALIZER(reqs);
- 
--    virtio_scsi_acquire(s);
-     do {
-         virtio_queue_set_notification(vq, 0);
- 
-@@ -618,7 +617,6 @@ bool virtio_scsi_handle_cmd_vq(VirtIOSCSI *s, VirtQueue *vq)
-     QTAILQ_FOREACH_SAFE(req, &reqs, next, next) {
-         virtio_scsi_handle_cmd_req_submit(s, req);
-     }
--    virtio_scsi_release(s);
-     return progress;
- }
- 
-@@ -633,7 +631,9 @@ static void virtio_scsi_handle_cmd(VirtIODevice *vdev, VirtQueue *vq)
-             return;
-         }
-     }
-+    virtio_scsi_acquire(s);
-     virtio_scsi_handle_cmd_vq(s, vq);
-+    virtio_scsi_release(s);
- }
- 
- static void virtio_scsi_get_config(VirtIODevice *vdev,
-@@ -709,12 +709,10 @@ void virtio_scsi_push_event(VirtIOSCSI *s, SCSIDevice *dev,
-         return;
-     }
- 
--    virtio_scsi_acquire(s);
--
-     req = virtio_scsi_pop_req(s, vs->event_vq);
-     if (!req) {
-         s->events_dropped = true;
--        goto out;
-+        return;
-     }
- 
-     if (s->events_dropped) {
-@@ -724,7 +722,7 @@ void virtio_scsi_push_event(VirtIOSCSI *s, SCSIDevice *dev,
- 
-     if (virtio_scsi_parse_req(req, 0, sizeof(VirtIOSCSIEvent))) {
-         virtio_scsi_bad_req(req);
--        goto out;
-+        return;
-     }
- 
-     evt = &req->resp.event;
-@@ -744,19 +742,15 @@ void virtio_scsi_push_event(VirtIOSCSI *s, SCSIDevice *dev,
-         evt->lun[3] = dev->lun & 0xFF;
-     }
-     virtio_scsi_complete_req(req);
--out:
--    virtio_scsi_release(s);
- }
- 
- bool virtio_scsi_handle_event_vq(VirtIOSCSI *s, VirtQueue *vq)
- {
--    virtio_scsi_acquire(s);
-     if (s->events_dropped) {
-         virtio_scsi_push_event(s, NULL, VIRTIO_SCSI_T_NO_EVENT, 0);
-         virtio_scsi_release(s);
-         return true;
-     }
--    virtio_scsi_release(s);
-     return false;
- }
- 
-@@ -770,7 +764,9 @@ static void virtio_scsi_handle_event(VirtIODevice *vdev, VirtQueue *vq)
-             return;
-         }
-     }
-+    virtio_scsi_acquire(s);
-     virtio_scsi_handle_event_vq(s, vq);
-+    virtio_scsi_release(s);
- }
- 
- static void virtio_scsi_change(SCSIBus *bus, SCSIDevice *dev, SCSISense sense)
-@@ -780,8 +776,10 @@ static void virtio_scsi_change(SCSIBus *bus, SCSIDevice *dev, SCSISense sense)
- 
-     if (virtio_vdev_has_feature(vdev, VIRTIO_SCSI_F_CHANGE) &&
-         dev->type != TYPE_ROM) {
-+        virtio_scsi_acquire(s);
-         virtio_scsi_push_event(s, dev, VIRTIO_SCSI_T_PARAM_CHANGE,
-                                sense.asc | (sense.ascq << 8));
-+        virtio_scsi_release(s);
-     }
- }
- 
-@@ -803,9 +801,11 @@ static void virtio_scsi_hotplug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     }
- 
-     if (virtio_vdev_has_feature(vdev, VIRTIO_SCSI_F_HOTPLUG)) {
-+        virtio_scsi_acquire(s);
-         virtio_scsi_push_event(s, sd,
-                                VIRTIO_SCSI_T_TRANSPORT_RESET,
-                                VIRTIO_SCSI_EVT_RESET_RESCAN);
-+        virtio_scsi_release(s);
-     }
- }
- 
-@@ -817,9 +817,11 @@ static void virtio_scsi_hotunplug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     SCSIDevice *sd = SCSI_DEVICE(dev);
- 
-     if (virtio_vdev_has_feature(vdev, VIRTIO_SCSI_F_HOTPLUG)) {
-+        virtio_scsi_acquire(s);
-         virtio_scsi_push_event(s, sd,
-                                VIRTIO_SCSI_T_TRANSPORT_RESET,
-                                VIRTIO_SCSI_EVT_RESET_REMOVED);
-+        virtio_scsi_release(s);
-     }
- 
-     qdev_simple_device_unplug_cb(hotplug_dev, dev, errp);
--- 
-2.9.3
+I notice that tlb_set_dirty/tlb_set_dirty1 should maybe do the same. The
+currently assume they are only called from the CPU's context. If you
+enable #define DEBUG_TLB in cputlb.c does the assert fire?
+
+>
+> Regards,
+> BALATON Zoltan
+
+
+--
+Alex Bennée
