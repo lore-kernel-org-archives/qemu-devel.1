@@ -1,21 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cncik-0007U3-3l
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 23:02:02 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cnd3U-0003je-UN
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 23:23:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cncij-0002Wj-Cq
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 23:01:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54904)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cncij-0002W8-6r
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 23:01:57 -0400
-From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 14 Mar 2017 11:01:42 +0800
-Message-Id: <1489460502-6686-4-git-send-email-jasowang@redhat.com>
-In-Reply-To: <1489460502-6686-1-git-send-email-jasowang@redhat.com>
-References: <1489460502-6686-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PATCH V3 3/3] virtio: validate address space cache
- during init
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cnd3Q-0003ns-TH
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 23:23:24 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38317
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1cnd3Q-0003nR-Mm
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 23:23:20 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2E3ERSv100371
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 23:23:19 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 295vx6pshn-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 13 Mar 2017 23:23:18 -0400
+Received: from localhost
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Mon, 13 Mar 2017 23:23:18 -0400
+Date: Tue, 14 Mar 2017 11:23:12 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20170308021533.78292-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170308021533.78292-2-bjsdjshi@linux.vnet.ibm.com>
+	<20170308091346.GB5211@noname.redhat.com>
+	<20170308093105.GC7563@bjsdjshi@linux.vnet.ibm.com>
+	<20170313033105.GA6756@bjsdjshi@linux.vnet.ibm.com>
+	<20170313101522.GA5545@noname.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170313101522.GA5545@noname.redhat.com>
+Message-Id: <20170314032312.GF6756@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 1/1] block: Handle NULL options
+ correctly in raw_open
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,81 +47,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, qemu-devel@nongnu.org
-Cc: Jason Wang <jasowang@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-block@nongnu.org, mreitz@redhat.com, qemu-devel@nongnu.org, cornelia.huck@de.ibm.com, pasic@linux.vnet.ibm.com
 
-We don't check the return value of address_space_cache_init(), this
-may lead buggy driver use incorrect region caches. Instead of
-triggering an assert, catch and warn this early in
-virtio_init_region_cache().
+* Kevin Wolf <kwolf@redhat.com> [2017-03-13 11:15:22 +0100]:
 
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- hw/virtio/virtio.c | 33 +++++++++++++++++++++++++++------
- 1 file changed, 27 insertions(+), 6 deletions(-)
+> Am 13.03.2017 um 04:31 hat Dong Jia Shi geschrieben:
+> > * Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> [2017-03-08 17:31:05 +0800]:
+> > 
+> > > * Kevin Wolf <kwolf@redhat.com> [2017-03-08 10:13:46 +0100]:
+> > > 
+> > > > Am 08.03.2017 um 03:15 hat Dong Jia Shi geschrieben:
+> > > > > A normal call for raw_open should always pass in a non-NULL @options,
+> > > > > but for some certain cases (e.g. trying to applying snapshot on a RBD
+> > > > > image), they call raw_open with a NULL @options right after the calling
+> > > > > for raw_close.
+> > > > > 
+> > > > > Let's take the NULL @options as a sign of trying to do raw_open again,
+> > > > > and just simply return a success code.
+> > > > > 
+> > > > > Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> > > > 
+> > > > I think we rather need to fix bdrv_snapshot_goto() so that it doesn't
+> > > > pass NULL, but the actual options that were given for the node (i.e.
+> > > > bs->options).
+> > > I've tried that before the current try. bs->options does not have the
+> > > "file" key-value pair, so that leads to a fail too. Should we put "file"
+> > > in to the options manually? I noticed that it was removed from
+> > > bs->options during the calling of bdrv_open_inherit.
+> > > 
+> > Hi Kevin,
+> > 
+> > After thinking for quite some time, I still don't think we need to fix
+> > the caller. The reason is that raw_close always does nothing, so no
+> > matter what the caller passing in, raw_open should do nothing but just
+> > return 0.
+> 
+> raw is not the only format driver in qemu.
+> 
+Hi Kevin,
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index f607a09..7714688 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -131,6 +131,7 @@ static void virtio_init_region_cache(VirtIODevice *vdev, int n)
-     VRingMemoryRegionCaches *new;
-     hwaddr addr, size;
-     int event_size;
-+    int64_t len;
+Before this I assumed that the long existing code in bdrv_snapshot_goto
+which passes in a NULL options to raw_open is on purpose, and that
+implies to me raw_open (and any other .bdrv_open callback) takes the
+responsibility to handle NULL options well. So at a first glance, I read
+your above comment as:
+"You should also fix .bdrv_open callback for every other formats to
+handle NULL options as well."
+
+But after staring it for a while, I read it from another point around:
+"You should fix the caller."
+If this is what you actually meant to tell, I have the following
+proposal then:
+diff --git a/block/snapshot.c b/block/snapshot.c
+index bf5c2ca..dfec139 100644
+--- a/block/snapshot.c
++++ b/block/snapshot.c
+@@ -27,6 +27,7 @@
+ #include "block/block_int.h"
+ #include "qapi/error.h"
+ #include "qapi/qmp/qerror.h"
++#include "qapi/qmp/qstring.h"
  
-     event_size = virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX) ? 2 : 0;
- 
-@@ -140,21 +141,41 @@ static void virtio_init_region_cache(VirtIODevice *vdev, int n)
+ QemuOptsList internal_snapshot_opts = {
+     .name = "snapshot",
+@@ -189,9 +190,14 @@ int bdrv_snapshot_goto(BlockDriverState *bs,
      }
-     new = g_new0(VRingMemoryRegionCaches, 1);
-     size = virtio_queue_get_desc_size(vdev, n);
--    address_space_cache_init(&new->desc, vdev->dma_as,
--                             addr, size, false);
-+    len = address_space_cache_init(&new->desc, vdev->dma_as,
-+                                   addr, size, false);
-+    if (len < size) {
-+        virtio_error(vdev, "Cannot map desc");
-+        goto err_desc;
-+    }
  
-     size = virtio_queue_get_used_size(vdev, n) + event_size;
--    address_space_cache_init(&new->used, vdev->dma_as,
--                             vq->vring.used, size, true);
-+    len = address_space_cache_init(&new->used, vdev->dma_as,
-+                                   vq->vring.used, size, true);
-+    if (len < size) {
-+        virtio_error(vdev, "Cannot map used");
-+        goto err_used;
-+    }
- 
-     size = virtio_queue_get_avail_size(vdev, n) + event_size;
--    address_space_cache_init(&new->avail, vdev->dma_as,
--                             vq->vring.avail, size, false);
-+    len = address_space_cache_init(&new->avail, vdev->dma_as,
-+                                   vq->vring.avail, size, false);
-+    if (len < size) {
-+        virtio_error(vdev, "Cannot map avail");
-+        goto err_avail;
-+    }
- 
-     atomic_rcu_set(&vq->vring.caches, new);
-     if (old) {
-         call_rcu(old, virtio_free_region_cache, rcu);
-     }
-+    return;
+     if (bs->file) {
++        QDict *options = qdict_clone_shallow(bs->options);
++        qdict_put(options, "file",
++                  qstring_from_str(bdrv_get_node_name(bs->file->bs)));
 +
-+err_avail:
-+    address_space_cache_destroy(&new->used);
-+err_used:
-+    address_space_cache_destroy(&new->desc);
-+err_desc:
-+    g_free(new);
- }
- 
- /* virt queue functions */
+         drv->bdrv_close(bs);
+         ret = bdrv_snapshot_goto(bs->file->bs, snapshot_id);
+-        open_ret = drv->bdrv_open(bs, NULL, bs->open_flags, NULL);
++        open_ret = drv->bdrv_open(bs, options, bs->open_flags, NULL);
++        QDECREF(options);
+         if (open_ret < 0) {
+             bdrv_unref(bs->file->bs);
+             bs->drv = NULL;
+
+I know I'm a little wordy, but that's because I want to make things
+clear. Anyway, I have to rely on your advice on this, since you are the
+expert.
+
+> Kevin
+> 
+
 -- 
-2.7.4
+Dong Jia
