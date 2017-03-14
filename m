@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cnlmx-0001bh-8g
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:42:56 -0400
+	(envelope-from <lvivier@redhat.com>) id 1cnln1-0001fY-Sz
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:43:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cnlmv-00013H-QT
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:42:55 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:34146)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1cnlmv-00012t-EQ
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:42:53 -0400
-Received: by mail-lf0-x244.google.com with SMTP id y193so14000505lfd.1
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 05:42:52 -0700 (PDT)
+	(envelope-from <lvivier@redhat.com>) id 1cnlmy-00013z-P1
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:43:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54538)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1cnlmy-00013m-FW
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:42:56 -0400
+References: <1488777954-4578-1-git-send-email-jasowang@redhat.com>
+	<1488777954-4578-13-git-send-email-jasowang@redhat.com>
+	<b3d2249e-9eb9-8621-e4c7-c77ac0962615@redhat.com>
+	<20170314111614.GD2445@work-vm>
+	<0f4c58f4-01a4-53d3-fb9e-6409d120827c@redhat.com>
+	<20170314113804.GF2445@work-vm>
+	<f38153ed-9a1c-4970-ac2a-610802857eb7@redhat.com>
+	<20170314123229.GI2445@work-vm>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <e55591b3-b12f-7777-b06e-640680000c3f@redhat.com>
+Date: Tue, 14 Mar 2017 13:42:53 +0100
 MIME-Version: 1.0
-References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
-	<1489385927-6735-26-git-send-email-armbru@redhat.com>
-In-Reply-To: <1489385927-6735-26-git-send-email-armbru@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 14 Mar 2017 12:42:40 +0000
-Message-ID: <CAJ+F1CK+i0HTNU83ftuc9zBcNFm2NSxecajt97QvDZGfj9on8w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.9 25/47] qapi2texi: Include member
- type in generated documentation
+In-Reply-To: <20170314123229.GI2445@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL RESEND 12/19] vmxnet3: Convert ring values
+ to uint32_t's
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,112 +34,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-Hi
+On 14/03/2017 13:32, Dr. David Alan Gilbert wrote:
+> * Laurent Vivier (lvivier@redhat.com) wrote:
+>> On 14/03/2017 12:38, Dr. David Alan Gilbert wrote:
+>>> * Laurent Vivier (lvivier@redhat.com) wrote:
+>>>> On 14/03/2017 12:16, Dr. David Alan Gilbert wrote:
+>>>>> * Laurent Vivier (lvivier@redhat.com) wrote:
+>>>>>> On 06/03/2017 06:25, Jason Wang wrote:
+>>>>>>> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>>>>>>>
+>>>>>>> The index's in the Vmxnet3Ring were migrated as 32bit ints
+>>>>>>> yet are declared as size_t's.  They appear to be derived
+>>>>>>> from 32bit values loaded from guest memory, so actually
+>>>>>>> store them as that.
+>>>>>>>
+>>>>>>> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>>>>>> Acked-by: Dmitry Fleytman <dmitry@daynix.com>
+>>>>>>> Signed-off-by: Jason Wang <jasowang@redhat.com>
+>>>>>>> ---
+>>>>>>>  hw/net/vmxnet3.c | 12 ++++++------
+>>>>>>>  1 file changed, 6 insertions(+), 6 deletions(-)
+>>>>>>>
+>>>>>>> diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
+>>>>>>> index e13a798..224c109 100644
+>>>>>>> --- a/hw/net/vmxnet3.c
+>>>>>>> +++ b/hw/net/vmxnet3.c
+>>>>>>> @@ -141,17 +141,17 @@ typedef struct VMXNET3Class {
+>>>>>>>  /* Cyclic ring abstraction */
+>>>>>>>  typedef struct {
+>>>>>>>      hwaddr pa;
+>>>>>>> -    size_t size;
+>>>>>>> -    size_t cell_size;
+>>>>>>> -    size_t next;
+>>>>>>> +    uint32_t size;
+>>>>>>> +    uint32_t cell_size;
+>>>>>>> +    uint32_t next;
+>>>>>>>      uint8_t gen;
+>>>>>>>  } Vmxnet3Ring;
+>>>>>>>  
+>>>>>>>  static inline void vmxnet3_ring_init(PCIDevice *d,
+>>>>>>>  				     Vmxnet3Ring *ring,
+>>>>>>>                                       hwaddr pa,
+>>>>>>> -                                     size_t size,
+>>>>>>> -                                     size_t cell_size,
+>>>>>>> +                                     uint32_t size,
+>>>>>>> +                                     uint32_t cell_size,
+>>>>>>>                                       bool zero_region)
+>>>>>>>  {
+>>>>>>>      ring->pa = pa;
+>>>>>>> @@ -166,7 +166,7 @@ static inline void vmxnet3_ring_init(PCIDevice *d,
+>>>>>>>  }
+>>>>>>>  
+>>>>>>>  #define VMXNET3_RING_DUMP(macro, ring_name, ridx, r)                         \
+>>>>>>> -    macro("%s#%d: base %" PRIx64 " size %zu cell_size %zu gen %d next %zu",  \
+>>>>>>> +    macro("%s#%d: base %" PRIx64 " size %u cell_size %u gen %d next %u",  \
+>>>>>>>            (ring_name), (ridx),                                               \
+>>>>>>>            (r)->pa, (r)->size, (r)->cell_size, (r)->gen, (r)->next)
+>>>>>>>  
+>>>>>>>
+>>>>>>
+>>>>>>
+>>>>>> David, with '-dump-vmstate' with 2.8 machine type and with v2.8 and
+>>>>>> master I can see the size of "txq_descr" and "rxq_descr" changes because
+>>>>>> of "sizeof(Vmxnet3TxqDescr)" and "sizeof(Vmxnet3RxqDescr)". This changes
+>>>>>> because the size of Vmxnet3Ring has changed with the s/size_t/uint32_t/":
+>>>>>>
+>>>>>>         {
+>>>>>>           "field": "txq_descr",
+>>>>>>           "version_id": 0,
+>>>>>>           "field_exists": false,
+>>>>>>           "size": 176
+>>>>>>         },
+>>>>>>         {
+>>>>>>           "field": "rxq_descr",
+>>>>>>           "version_id": 0,
+>>>>>>           "field_exists": false,
+>>>>>>           "size": 216
+>>>>>>         },
+>>>>>>
+>>>>>> becomes:
+>>>>>>
+>>>>>>         {
+>>>>>>           "field": "txq_descr",
+>>>>>>           "version_id": 0,
+>>>>>>           "field_exists": false,
+>>>>>>           "size": 144
+>>>>>>         },
+>>>>>>         {
+>>>>>>           "field": "rxq_descr",
+>>>>>>           "version_id": 0,
+>>>>>>           "field_exists": false,
+>>>>>>           "size": 168
+>>>>>>         },
+>>>>>
+>>>>> But the old migration code used to write these fields using qemu_put_be32
+>>>>> (from a11f5cb005f9854f0d78da97fc23adf5bc8c83f3)
+>>>>>
+>>>>> -static void vmxnet3_put_ring_to_file(QEMUFile *f, Vmxnet3Ring *r)
+>>>>> -{
+>>>>> -    qemu_put_be64(f, r->pa);
+>>>>> -    qemu_put_be32(f, r->size);
+>>>>> -    qemu_put_be32(f, r->cell_size);
+>>>>> -    qemu_put_be32(f, r->next);
+>>>>> -    qemu_put_byte(f, r->gen);
+>>>>> -}
+>>>>>
+>>>>> +static const VMStateDescription vmstate_vmxnet3_ring = {
+>>>>> +    .name = "vmxnet3-ring",
+>>>>> +    .version_id = 0,
+>>>>> +    .fields = (VMStateField[]) {
+>>>>> +        VMSTATE_UINT64(pa, Vmxnet3Ring),
+>>>>> +        VMSTATE_UINT32(size, Vmxnet3Ring),
+>>>>> +        VMSTATE_UINT32(cell_size, Vmxnet3Ring),
+>>>>> +        VMSTATE_UINT32(next, Vmxnet3Ring),
+>>>>> +        VMSTATE_UINT8(gen, Vmxnet3Ring),
+>>>>> +        VMSTATE_END_OF_LIST()
+>>>>> +    }
+>>>>>  };
+>>>>>
+>>>>> so they used to be size_t's written with be32 and now they're uint32_t's
+>>>>> written as 32bit - so that should be the same.
+>>>>> I'm not sure i understand where the old txq_descr sizes come from - what
+>>>>> managed to print the 176 number before it was converted to VMState?
+>>>>
+>>>> I think it comes from the sizeof() in VMSTATE_STRUCT(Vmxnet3TxqDescr):
+>>>>
+>>>> static const VMStateDescription vmstate_vmxnet3_txq_descr = {
+>>>>     .name = "vmxnet3-txq-descr",
+>>>>     .version_id = 0,
+>>>>     .fields = (VMStateField[]) {
+>>>>         VMSTATE_STRUCT(tx_ring, Vmxnet3TxqDescr, 0, vmstate_vmxnet3_ring,
+>>>>                        Vmxnet3Ring),
+>>>>         VMSTATE_STRUCT(comp_ring, Vmxnet3TxqDescr, 0, vmstate_vmxnet3_ring,
+>>>>                        Vmxnet3Ring),
+>>>>         VMSTATE_UINT8(intr_idx, Vmxnet3TxqDescr),
+>>>>         VMSTATE_UINT64(tx_stats_pa, Vmxnet3TxqDescr),
+>>>>         VMSTATE_STRUCT(txq_stats, Vmxnet3TxqDescr, 0,
+>>>> vmstate_vmxnet3_tx_stats,
+>>>>                        struct UPT1_TxStats),
+>>>>         VMSTATE_END_OF_LIST()
+>>>>     }
+>>>> };
+>>>>
+>>>> I will check the '-dump-vmstate' code to see if it's relevant.
+>>>
+>>> OK, but that sizeof() should never make it onto the wire; all that
+>>> teh VMSTATE_STRUCT should do is execute the vmstate_vmxnet3_ring on
+>>> that data.
+>>> (And again I'm curious what happened in the version before I committed
+>>> that change).
+>>>
+>>>>>
+>>>>>> And if I try a migration, I have:
+>>>>>>
+>>>>>> qemu/migration/vmstate.c:112: vmstate_load_state: Assertion `first_elem
+>>>>>> || !n_elems' failed.
+>>>>>
+>>>>> Interesting; that's Halil's new assert; I need to look.
+>>>>
+>>>> Can't it be related to the size problem?
+>>>
+>>> It could, I need to see exactly how it's failing; what was the full
+>>> command line you used, and with what guest?
+>>
+>> Tested with pseries machine type on ppc64le host, no guest started.
+>>
+>> qemu-system-ppc64 -M pseries-2.8 -S -serial mon:stdio -vnc :0 -device
+>> vmxnet3
+> 
+> OK, I can trigger this on x86 on outgoing migration - the same assert
+> but in the vmstate_save_state side;  for me it's in the older vmxstate_vmxnet3_mcast_list
+> can you confirm that it's the same structure you're hitting on the load side?
 
-On Mon, Mar 13, 2017 at 10:31 AM Markus Armbruster <armbru@redhat.com>
-wrote:
+It always happens on the master branch side (load or save):
 
-> The recent merge of docs/qmp-commands.txt and docs/qmp-events.txt into
-> the schema lost type information.  Fix this documentation regression.
->
-> Example change (qemu-qmp-ref.txt):
->
->   -- Struct: InputKeyEvent
->
->       Keyboard input event.
->
->       Members:
-> -     'button'
-> +     'button: InputButton'
->            Which button this event is for.
-> -     'down'
-> +     'down: boolean'
->            True for key-down and false for key-up events.
->
->       Since: 2.0
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  scripts/qapi.py      | 14 ++++++++++++++
->  scripts/qapi2texi.py |  8 ++++++--
->  2 files changed, 20 insertions(+), 2 deletions(-)
->
-> diff --git a/scripts/qapi.py b/scripts/qapi.py
-> index 9430493..b82a2a6 100644
-> --- a/scripts/qapi.py
-> +++ b/scripts/qapi.py
-> @@ -1101,6 +1101,11 @@ class QAPISchemaType(QAPISchemaEntity):
->          }
->          return json2qtype.get(self.json_type())
->
-> +    def doc_type(self):
-> +        if self.is_implicit():
-> +            return None
-> +        return self.name
-> +
->
->  class QAPISchemaBuiltinType(QAPISchemaType):
->      def __init__(self, name, json_type, c_type):
-> @@ -1125,6 +1130,9 @@ class QAPISchemaBuiltinType(QAPISchemaType):
->      def json_type(self):
->          return self._json_type_name
->
-> +    def doc_type(self):
-> +        return self.json_type()
-> +
->      def visit(self, visitor):
->          visitor.visit_builtin_type(self.name, self.info,
-> self.json_type())
->
-> @@ -1184,6 +1192,12 @@ class QAPISchemaArrayType(QAPISchemaType):
->      def json_type(self):
->          return 'array'
->
-> +    def doc_type(self):
-> +        elt_doc_type =3D self.element_type.doc_type()
-> +        if not elt_doc_type:
-> +            return None
->
+if master is on the destination side:
 
-In which case is this expected to happen? place an assert here instead?
+#4  0x00000000277fb9e8 in vmstate_load_state (f=0x2b9a2000,
+    vmsd=0x27d37c08 <vmxstate_vmxnet3_mcast_list>, opaque=0x28a9c000,
+    version_id=<optimized out>)
+    at /home/lvivier/Projects/qemu/migration/vmstate.c:112
 
+if master is on the source side:
+#4  0x000000002e2bcbb8 in vmstate_save_state (f=0x32462000,
+    vmsd=0x2e7f7c08 <vmxstate_vmxnet3_mcast_list>, opaque=0x2f55c000,
+    vmdesc=0x32259ef0) at
+/home/lvivier/Projects/qemu/migration/vmstate.c:328
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-
-
-
-> +        return 'array of ' + elt_doc_type
-> +
->      def visit(self, visitor):
->          visitor.visit_array_type(self.name, self.info, self.element_type=
-)
->
-> diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-> index 3dd0146..993b652 100755
-> --- a/scripts/qapi2texi.py
-> +++ b/scripts/qapi2texi.py
-> @@ -135,8 +135,12 @@ def texi_enum_value(value):
->
->  def texi_member(member):
->      """Format a table of members item for an object type member"""
-> -    return '@item @code{%s}%s\n' % (
-> -        member.name, ' (optional)' if member.optional else '')
-> +    typ =3D member.type.doc_type()
-> +    return '@item @code{%s%s%s}%s\n' % (
-> +        member.name,
-> +        ': ' if typ else '',
-> +        typ if typ else '',
-> +        ' (optional)' if member.optional else '')
->
->
->  def texi_members(doc, what, member_func):
-> --
-> 2.7.4
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+Laurent
