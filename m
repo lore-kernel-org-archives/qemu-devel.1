@@ -1,25 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56691)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57269)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cnkos-00075v-DP
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:40:51 -0400
+	(envelope-from <xiecl.fnst@cn.fujitsu.com>) id 1cnksN-0008LB-8o
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:44:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cnkop-0005wX-7c
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:40:50 -0400
-Resent-Message-Id: <E1cnkop-0005wX-7c@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21322)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cnkop-0005wG-0g
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:40:47 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148949162892.33.7488423206378691305@6c512846dbc7>
-In-Reply-To: <20170314113209.12025-1-eduardo.otubo@profitbricks.com>
+	(envelope-from <xiecl.fnst@cn.fujitsu.com>) id 1cnksM-0006u0-E3
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:44:27 -0400
+From: Changlong Xie <xiecl.fnst@cn.fujitsu.com>
+Date: Tue, 14 Mar 2017 19:46:52 +0800
+Message-ID: <1489492012-8002-1-git-send-email-xiecl.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 14 Mar 2017 04:40:29 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/5] seccomp: feature refactoring
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH V1] replication: clarify permissions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,81 +19,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eduardo.otubo@profitbricks.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, thuth@redhat.com
+To: qemu devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: Wen Congyang <wencongyang2@huawei.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Changlong Xie <xiecl.fnst@cn.fujitsu.com>, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC81XSBzZWNjb21wOiBmZWF0dXJlIHJlZmFjdG9y
-aW5nCk1lc3NhZ2UtaWQ6IDIwMTcwMzE0MTEzMjA5LjEyMDI1LTEtZWR1YXJkby5vdHVib0Bwcm9m
-aXRicmlja3MuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNF
-PWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWls
-ZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1l
-bGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQo
-Z2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRz
-OyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAt
-LWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwg
-Li9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVk
-PTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQK
-PT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFk
-ZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0
-L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8xNDg5NDkxMTI1LTIzNjQ4LTEtZ2l0
-LXNlbmQtZW1haWwtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMTQ4OTQ5MTEy
-NS0yMzY0OC0xLWdpdC1zZW5kLWVtYWlsLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwogKiBbbmV3
-IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTcwMzE0MTEzMjA5LjEyMDI1LTEtZWR1YXJkby5vdHVi
-b0Bwcm9maXRicmlja3MuY29tIC0+IHBhdGNoZXcvMjAxNzAzMTQxMTMyMDkuMTIwMjUtMS1lZHVh
-cmRvLm90dWJvQHByb2ZpdGJyaWNrcy5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0
-JwozZjQ5OWJmIHNlY2NvbXA6IGFkZCByZXNvdXJjZWNvbnRyb2wgYXJndW1lbnQgdG8gY29tbWFu
-ZCBsaW5lCjNmZmJhNmYgc2VjY29tcDogYWRkIHNwYXduIGFyZ3VtZW50IHRvIGNvbW1hbmQgbGlu
-ZQphODMwZmRkIHNlY2NvbXA6IGFkZCBlbGV2YXRlcHJpdmlsZWdlcyBhcmd1bWVudCB0byBjb21t
-YW5kIGxpbmUKNTRjNjM5MCBzZWNjb21wOiBhZGQgb2Jzb2xldGUgYXJndW1lbnQgdG8gY29tbWFu
-ZCBsaW5lCjc3NTkyODYgc2VjY29tcDogY2hhbmdpbmcgZnJvbSB3aGl0ZWxpc3QgdG8gYmxhY2ts
-aXN0Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzU6IHNlY2NvbXA6IGNo
-YW5naW5nIGZyb20gd2hpdGVsaXN0IHRvIGJsYWNrbGlzdC4uLgpDaGVja2luZyBQQVRDSCAyLzU6
-IHNlY2NvbXA6IGFkZCBvYnNvbGV0ZSBhcmd1bWVudCB0byBjb21tYW5kIGxpbmUuLi4KRVJST1I6
-ICJmb28gKiBiYXIiIHNob3VsZCBiZSAiZm9vICpiYXIiCiMxNDY6IEZJTEU6IHZsLmM6MTAzOToK
-KyAgICAgICAgY29uc3QgY2hhciAqIHZhbHVlID0gTlVMTDsKCkVSUk9SOiBzcGFjZSByZXF1aXJl
-ZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzE0ODogRklMRTogdmwuYzoxMDQxOgorICAgICAg
-ICB2YWx1ZSA9IHFlbXVfb3B0X2dldChvcHRzLCJvYnNvbGV0ZSIpOwogICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMjMgbGlu
-ZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tp
-bmcgUEFUQ0ggMy81OiBzZWNjb21wOiBhZGQgZWxldmF0ZXByaXZpbGVnZXMgYXJndW1lbnQgdG8g
-Y29tbWFuZCBsaW5lLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM4MTogRklM
-RTogcWVtdS1zZWNjb21wLmM6MTQzOgorICAgICAgICAgICAgcmMgPSBzZWNjb21wX3J1bGVfYWRk
-KGN0eCwgU0NNUF9BQ1RfS0lMTCwgcHJpdmlsZWdlZF9zeXNjYWxsc1tpXS5udW0sIDApOwoKRVJS
-T1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQojMTE2OiBGSUxFOiB2
-bC5jOjEwNTI6CisgICAgICAgIHZhbHVlID0gcWVtdV9vcHRfZ2V0KG9wdHMsImVsZXZhdGVwcml2
-aWxlZ2VzIik7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMSBl
-cnJvcnMsIDEgd2FybmluZ3MsIDkwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxl
-IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
-c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
-SCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDQvNTogc2VjY29tcDogYWRkIHNwYXdu
-IGFyZ3VtZW50IHRvIGNvbW1hbmQgbGluZS4uLgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3Rl
-cnMKIzc5OiBGSUxFOiBxZW11LXNlY2NvbXAuYzoxNjc6CisgICAgICAgICAgICByYyA9IHNlY2Nv
-bXBfc3lzY2FsbF9wcmlvcml0eShjdHgsIHNwYXduX3N5c2NhbGxzW2ldLm51bSwgc3Bhd25fc3lz
-Y2FsbHNbaV0ucHJpb3JpdHkpOwoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywn
-IChjdHg6VnhWKQojMTA3OiBGSUxFOiB2bC5jOjEwNjM6CisgICAgICAgIHZhbHVlID0gcWVtdV9v
-cHRfZ2V0KG9wdHMsInNwYXduIik7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBe
-Cgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDgxIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0
-Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDUvNTogc2VjY29t
-cDogYWRkIHJlc291cmNlY29udHJvbCBhcmd1bWVudCB0byBjb21tYW5kIGxpbmUuLi4KV0FSTklO
-RzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzgyOiBGSUxFOiBxZW11LXNlY2NvbXAuYzoxODk6
-CisgICAgICAgICAgICByYyA9IHNlY2NvbXBfcnVsZV9hZGQoY3R4LCBTQ01QX0FDVF9LSUxMLCBy
-ZXNvdXJjZWNvbnRyb2xfc3lzY2FsbHNbaV0ubnVtLCAwKTsKCkVSUk9SOiBsaW5lIG92ZXIgOTAg
-Y2hhcmFjdGVycwojODY6IEZJTEU6IHFlbXUtc2VjY29tcC5jOjE5MzoKKyAgICAgICAgICAgIHJj
-ID0gc2VjY29tcF9zeXNjYWxsX3ByaW9yaXR5KGN0eCwgcmVzb3VyY2Vjb250cm9sX3N5c2NhbGxz
-W2ldLm51bSwgcmVzb3VyY2Vjb250cm9sX3N5c2NhbGxzW2ldLnByaW9yaXR5KTsKCkVSUk9SOiBz
-cGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzExNTogRklMRTogdmwuYzox
-MDc0OgorICAgICAgICB2YWx1ZSA9IHFlbXVfb3B0X2dldChvcHRzLCJyZXNvdXJjZWNvbnRyb2wi
-KTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAyIGVycm9ycywg
-MSB3YXJuaW5ncywgODkgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxl
-bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
-dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
-SU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
-Y29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
-dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
-LWRldmVsQGZyZWVsaXN0cy5vcmc=
+Even if hidden_disk, secondary_disk are backing files, they all need
+write permissions in replication scenario. Otherwise we will encouter
+below exceptions on secondary side during adding nbd server:
+
+{'execute': 'nbd-server-add', 'arguments': {'device': 'colo-disk', 'writable': true } }
+{"error": {"class": "GenericError", "desc": "Conflicts with use by hidden-qcow2-driver as 'backing', which does not allow 'write' on sec-qcow2-driver-for-nbd"}}
+
+CC: Zhang Hailiang <zhang.zhanghailiang@huawei.com>
+CC: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+CC: Wen Congyang <wencongyang2@huawei.com>
+Signed-off-by: Changlong Xie <xiecl.fnst@cn.fujitsu.com>
+---
+ block/replication.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/block/replication.c b/block/replication.c
+index 22f170f..bf3c395 100644
+--- a/block/replication.c
++++ b/block/replication.c
+@@ -155,6 +155,18 @@ static void replication_close(BlockDriverState *bs)
+     replication_remove(s->rs);
+ }
+ 
++static void replication_child_perm(BlockDriverState *bs, BdrvChild *c,
++                                   const BdrvChildRole *role,
++                                   uint64_t perm, uint64_t shared,
++                                   uint64_t *nperm, uint64_t *nshared)
++{
++    *nperm = *nshared = BLK_PERM_CONSISTENT_READ \
++                        | BLK_PERM_WRITE \
++                        | BLK_PERM_WRITE_UNCHANGED;
++
++    return;
++}
++
+ static int64_t replication_getlength(BlockDriverState *bs)
+ {
+     return bdrv_getlength(bs->file->bs);
+@@ -660,7 +672,7 @@ BlockDriver bdrv_replication = {
+ 
+     .bdrv_open                  = replication_open,
+     .bdrv_close                 = replication_close,
+-    .bdrv_child_perm            = bdrv_filter_default_perms,
++    .bdrv_child_perm            = replication_child_perm,
+ 
+     .bdrv_getlength             = replication_getlength,
+     .bdrv_co_readv              = replication_co_readv,
+-- 
+1.9.3
