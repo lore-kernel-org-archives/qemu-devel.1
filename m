@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cntWq-0005QL-0I
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 16:58:48 -0400
+	(envelope-from <eblake@redhat.com>) id 1cntYd-00069Y-16
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 17:00:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cntWm-0005No-4N
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 16:58:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35532)
+	(envelope-from <eblake@redhat.com>) id 1cntYU-0006Ia-PR
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 17:00:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35722)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cntWl-0005NY-SU
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 16:58:44 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cntYU-0006IB-JU
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 17:00:30 -0400
 References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
-	<1489385927-6735-38-git-send-email-armbru@redhat.com>
+	<1489385927-6735-39-git-send-email-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <bc3be621-32d3-3c3f-2c9e-28de700742e3@redhat.com>
-Date: Tue, 14 Mar 2017 15:58:41 -0500
+Message-ID: <e4c730d6-9841-2802-7226-f3b65496f411@redhat.com>
+Date: Tue, 14 Mar 2017 16:00:28 -0500
 MIME-Version: 1.0
-In-Reply-To: <1489385927-6735-38-git-send-email-armbru@redhat.com>
+In-Reply-To: <1489385927-6735-39-git-send-email-armbru@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="eRf38igEJsCV2Pl7IdA5xluPuTH1Iv98x"
-Subject: Re: [Qemu-devel] [PATCH for-2.9 37/47] qapi: Fix detection of bogus
- member documentation
+	boundary="pH4KSKswO4uksSOolmLoA4q6OwIJcObP8"
+Subject: Re: [Qemu-devel] [PATCH for-2.9 38/47] qapi: Eliminate check_docs()
+ and drop QAPIDoc.expr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,47 +33,30 @@ To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---eRf38igEJsCV2Pl7IdA5xluPuTH1Iv98x
+--pH4KSKswO4uksSOolmLoA4q6OwIJcObP8
 From: Eric Blake <eblake@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
-Message-ID: <bc3be621-32d3-3c3f-2c9e-28de700742e3@redhat.com>
-Subject: Re: [PATCH for-2.9 37/47] qapi: Fix detection of bogus member
- documentation
+Message-ID: <e4c730d6-9841-2802-7226-f3b65496f411@redhat.com>
+Subject: Re: [PATCH for-2.9 38/47] qapi: Eliminate check_docs() and drop
+ QAPIDoc.expr
 References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
- <1489385927-6735-38-git-send-email-armbru@redhat.com>
-In-Reply-To: <1489385927-6735-38-git-send-email-armbru@redhat.com>
+ <1489385927-6735-39-git-send-email-armbru@redhat.com>
+In-Reply-To: <1489385927-6735-39-git-send-email-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 03/13/2017 01:18 AM, Markus Armbruster wrote:
-> check_definition_doc() checks for member documentation without a
-> matching member.  It laboriously second-guesses what members
-> QAPISchema._def_exprs() will create.  That's a stupid game.
+> Move what's left in check_docs() to check_expr().  Delegate the actual
+> checking to new QAPIDoc.check_expr().
 >=20
-> Move the check into QAPISchema.check(), where the members are known.
-> Delegate the actual checking to new QAPIDoc.check().
+> QAPIDoc.expr is now unused; drop it.
 >=20
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  scripts/qapi.py                             | 38 ++++++++++-----------=
---------
->  tests/qapi-schema/doc-bad-union-member.err  |  1 +
->  tests/qapi-schema/doc-bad-union-member.exit |  2 +-
->  tests/qapi-schema/doc-bad-union-member.out  | 11 ---------
->  4 files changed, 15 insertions(+), 37 deletions(-)
-
-Nice diffstat.
-
-
-> +++ b/tests/qapi-schema/doc-bad-union-member.err
-> @@ -0,0 +1 @@
-> +tests/qapi-schema/doc-bad-union-member.json:3: The following documente=
-d members are not in the declaration: a, b
-
-Nice that you're able to report all problems within the doc, rather than
-stopping at the first.  (Wish we could do the same about the overall
-=2Ejson file, but that's harder, and out of scope for this series)
+>  scripts/qapi.py | 27 ++++++++++-----------------
+>  1 file changed, 10 insertions(+), 17 deletions(-)
+>=20
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -82,7 +65,7 @@ Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---eRf38igEJsCV2Pl7IdA5xluPuTH1Iv98x
+--pH4KSKswO4uksSOolmLoA4q6OwIJcObP8
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -92,13 +75,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYyFmBAAoJEKeha0olJ0NqY28H/3BjrkYOh6Y4yLJ8XVPYME9X
-3WGBlI8X2+s0fnEHHWT0/pA4grdTfqbQtr5Di1iS3QGIM4HkMqYKBjGT2uT4u0cl
-wiIxtuvFX3/JE+TKvKaFax+wLkuwPzsOKiZO/5EQGroKhVj5aGBPS8UMNX+XOyGL
-uXJrn7YC3IhKCtaZ55ZP7Zt06II1ESD95Ky2K8RTdc3nK7tmsDlgHx9HkccGS2f+
-g3FjhSTwOOfb5IilUY8eXiO8ptGYf5m2/+rfBraCqiTR4inZY/5QuzoJOzFwWU7V
-6Zb8MuhLoijJdB7PQ81Hv8AxQ3agysd1XpgvoRCWTIkkKjhItLvKqyLB5fbEjWg=
-=ZU8j
+iQEcBAEBCAAGBQJYyFnsAAoJEKeha0olJ0NqtvoH/RK1KEDEVm/uIzxcNUk6MbKG
+MyMuthqvBu5V1ezQ4ia9cIhtiupuKDDle5c1oL3dV67s4+q3RNNjt/r6lJ72lDPM
+MKmYYHOmfdSXsUSn6HFWOBCyymZ5+ig3qtR8QM1mzO9aNbsXp4hh4qPodpsqh5Fc
+NFi44JvYFWfmiJQkRbR4BYUghb/OJGfB6qWA5b5zDMMlOCRJCQhI/smtC6ppfEvp
+BWjSHSCaHb0CbmO+LNtwQ3v4vaPGKWj0vcYT/4+bJTaQV3qfSr50uFlo7giU66Xu
+CtwznSJZy8XLtK9urXke1vrjtPsVmYluRsFtGbaNOzjg+PiCc/NP2W/a8AN3Drw=
+=12fm
 -----END PGP SIGNATURE-----
 
---eRf38igEJsCV2Pl7IdA5xluPuTH1Iv98x--
+--pH4KSKswO4uksSOolmLoA4q6OwIJcObP8--
