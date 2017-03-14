@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cnkQb-0004mR-1j
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:15:45 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1cnkRE-0005ZD-33
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:16:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cnkQa-0007fX-6O
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:15:44 -0400
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:35722)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cnkQa-0007ez-13
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:15:44 -0400
-Received: by mail-wr0-x22e.google.com with SMTP id g10so121736530wrg.2
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 04:15:43 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1cnkRA-00086j-LA
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:16:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43948)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cnkRA-00084i-CZ
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:16:20 -0400
+Date: Tue, 14 Mar 2017 11:16:15 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170314111614.GD2445@work-vm>
+References: <1488777954-4578-1-git-send-email-jasowang@redhat.com>
+	<1488777954-4578-13-git-send-email-jasowang@redhat.com>
+	<b3d2249e-9eb9-8621-e4c7-c77ac0962615@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170314042626.20020-1-david@gibson.dropbear.id.au>
-References: <20170314042626.20020-1-david@gibson.dropbear.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 14 Mar 2017 12:15:22 +0100
-Message-ID: <CAFEAcA_oS+b8dNbP62EUDTizP+NErtWEA+akKy3xjGbC2-b-=g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 0/4] ppc-for-2.9 queue 20170314
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b3d2249e-9eb9-8621-e4c7-c77ac0962615@redhat.com>
+Subject: Re: [Qemu-devel] [PULL RESEND 12/19] vmxnet3: Convert ring values
+ to uint32_t's
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +29,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-On 14 March 2017 at 05:26, David Gibson <david@gibson.dropbear.id.au> wrote:
-> The following changes since commit 5bac3c39c82e149515c10643acafd1d292433775:
->
->   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2017-03-13 15:08:01 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/dgibson/qemu.git tags/ppc-for-2.9-20170314
->
-> for you to fetch changes up to 28df75d8d1aebdb09a2cc511c0b97690eac0b7a7:
->
->   dtc: Update submodule to avoid build errors (2017-03-14 12:24:29 +1100)
->
-> ----------------------------------------------------------------
-> ppc patch queue for 2017-03-14
->
-> This set has a handful og bugfixes to go into qemu-2.9.  This includes
-> an update to the dtc/libfdt submodule which will fix the build errors
-> seen on some distributions.
->
-> ----------------------------------------------------------------
+* Laurent Vivier (lvivier@redhat.com) wrote:
+> On 06/03/2017 06:25, Jason Wang wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > The index's in the Vmxnet3Ring were migrated as 32bit ints
+> > yet are declared as size_t's.  They appear to be derived
+> > from 32bit values loaded from guest memory, so actually
+> > store them as that.
+> > 
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > Acked-by: Dmitry Fleytman <dmitry@daynix.com>
+> > Signed-off-by: Jason Wang <jasowang@redhat.com>
+> > ---
+> >  hw/net/vmxnet3.c | 12 ++++++------
+> >  1 file changed, 6 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
+> > index e13a798..224c109 100644
+> > --- a/hw/net/vmxnet3.c
+> > +++ b/hw/net/vmxnet3.c
+> > @@ -141,17 +141,17 @@ typedef struct VMXNET3Class {
+> >  /* Cyclic ring abstraction */
+> >  typedef struct {
+> >      hwaddr pa;
+> > -    size_t size;
+> > -    size_t cell_size;
+> > -    size_t next;
+> > +    uint32_t size;
+> > +    uint32_t cell_size;
+> > +    uint32_t next;
+> >      uint8_t gen;
+> >  } Vmxnet3Ring;
+> >  
+> >  static inline void vmxnet3_ring_init(PCIDevice *d,
+> >  				     Vmxnet3Ring *ring,
+> >                                       hwaddr pa,
+> > -                                     size_t size,
+> > -                                     size_t cell_size,
+> > +                                     uint32_t size,
+> > +                                     uint32_t cell_size,
+> >                                       bool zero_region)
+> >  {
+> >      ring->pa = pa;
+> > @@ -166,7 +166,7 @@ static inline void vmxnet3_ring_init(PCIDevice *d,
+> >  }
+> >  
+> >  #define VMXNET3_RING_DUMP(macro, ring_name, ridx, r)                         \
+> > -    macro("%s#%d: base %" PRIx64 " size %zu cell_size %zu gen %d next %zu",  \
+> > +    macro("%s#%d: base %" PRIx64 " size %u cell_size %u gen %d next %u",  \
+> >            (ring_name), (ridx),                                               \
+> >            (r)->pa, (r)->size, (r)->cell_size, (r)->gen, (r)->next)
+> >  
+> > 
+> 
+> 
+> David, with '-dump-vmstate' with 2.8 machine type and with v2.8 and
+> master I can see the size of "txq_descr" and "rxq_descr" changes because
+> of "sizeof(Vmxnet3TxqDescr)" and "sizeof(Vmxnet3RxqDescr)". This changes
+> because the size of Vmxnet3Ring has changed with the s/size_t/uint32_t/":
+> 
+>         {
+>           "field": "txq_descr",
+>           "version_id": 0,
+>           "field_exists": false,
+>           "size": 176
+>         },
+>         {
+>           "field": "rxq_descr",
+>           "version_id": 0,
+>           "field_exists": false,
+>           "size": 216
+>         },
+> 
+> becomes:
+> 
+>         {
+>           "field": "txq_descr",
+>           "version_id": 0,
+>           "field_exists": false,
+>           "size": 144
+>         },
+>         {
+>           "field": "rxq_descr",
+>           "version_id": 0,
+>           "field_exists": false,
+>           "size": 168
+>         },
 
-Applied, thanks.
+But the old migration code used to write these fields using qemu_put_be32
+(from a11f5cb005f9854f0d78da97fc23adf5bc8c83f3)
 
--- PMM
+-static void vmxnet3_put_ring_to_file(QEMUFile *f, Vmxnet3Ring *r)
+-{
+-    qemu_put_be64(f, r->pa);
+-    qemu_put_be32(f, r->size);
+-    qemu_put_be32(f, r->cell_size);
+-    qemu_put_be32(f, r->next);
+-    qemu_put_byte(f, r->gen);
+-}
+
++static const VMStateDescription vmstate_vmxnet3_ring = {
++    .name = "vmxnet3-ring",
++    .version_id = 0,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT64(pa, Vmxnet3Ring),
++        VMSTATE_UINT32(size, Vmxnet3Ring),
++        VMSTATE_UINT32(cell_size, Vmxnet3Ring),
++        VMSTATE_UINT32(next, Vmxnet3Ring),
++        VMSTATE_UINT8(gen, Vmxnet3Ring),
++        VMSTATE_END_OF_LIST()
++    }
+ };
+
+so they used to be size_t's written with be32 and now they're uint32_t's
+written as 32bit - so that should be the same.
+I'm not sure i understand where the old txq_descr sizes come from - what
+managed to print the 176 number before it was converted to VMState?
+
+> And if I try a migration, I have:
+> 
+> qemu/migration/vmstate.c:112: vmstate_load_state: Assertion `first_elem
+> || !n_elems' failed.
+
+Interesting; that's Halil's new assert; I need to look.
+
+Dave
+
+> Laurent
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
