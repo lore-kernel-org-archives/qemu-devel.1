@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cnlMK-0004PS-Dj
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:15:28 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1cnlMs-0004na-L3
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:15:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cnlMF-0002x1-HC
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:15:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39854)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cnlMF-0002wd-Ay
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:15:19 -0400
-References: <a7977444b25641cc86352a6818a4df3a@EXCHCS32.ornl.gov>
-	<000601d29710$edf987b0$c9ec9710$@ru> <874lyxqpl4.fsf@linaro.org>
-	<000001d29cbb$f396a800$dac3f800$@ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <be7ee11c-4c10-cee8-a35e-7905e0c44881@redhat.com>
-Date: Tue, 14 Mar 2017 13:15:16 +0100
+	(envelope-from <dovgaluk@ispras.ru>) id 1cnlMn-0003Ig-Ow
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:15:58 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:52430)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1cnlMn-0003Ga-Dp
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:15:53 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20170307155054.5833-1-alex.bennee@linaro.org>
+	<001801d29bf5$dcba37d0$962ea770$@ru> <8760jdqpv2.fsf@linaro.org>
+In-Reply-To: <8760jdqpv2.fsf@linaro.org>
+Date: Tue, 14 Mar 2017 15:15:51 +0300
+Message-ID: <000101d29cbc$b8df1ca0$2a9d55e0$@ru>
 MIME-Version: 1.0
-In-Reply-To: <000001d29cbb$f396a800$dac3f800$@ru>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] -rtc clock=vm with -icount 1,
- sleep=off introduces unexpected delays in device interactions
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v3 00/11] MTTCG fix-ups for 2.9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,23 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>, =?UTF-8?Q?'Alex_Benn=c3=a9e'?= <alex.bennee@linaro.org>
-Cc: "'Nutaro, James J.'" <nutarojj@ornl.gov>, mttcg@greensocs.com, qemu-devel@nongnu.org
+To: =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>
+Cc: peter.maydell@linaro.org, rth@twiddle.net, pbonzini@redhat.com, qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com
+
+> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
+> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
+> >> From: mttcg-request@listserver.greensocs.com [mailto:mttcg-
+> request@listserver.greensocs.com]
+> >>
+> >> The next thing on my list it to look at the icount problems and =
+review
+> >> Paolo's fixes for it. However those fixes should go in a separate
+> >> series and I assume via Paolo's tree.
+> >
+> > Do you mean those problems that completely broke icount?
+>=20
+> Completely broke is a bit strong. Certainly I tested icount on my
+> patches but I missed the pathological failure mode that led to the
+> interaction between the BQL lock breaking patch and running a real
+> guest. It didn't break icount so much as slow down guests so much they
+> never got round to finishing their IRQ handling.
+
+That might look as slowing down in regular icount mode.
+But it becomes non-deterministic in record/replay mode.
+Therefore none of the recorded scenarios may be replayed.
+
+I tried the simplest command lines:
+
+qemu-system-i386.exe -icount shift=3D7,rr=3Drecord,rrfile=3Dreplay.bin =
+-net none=20
+
+qemu-system-i386.exe -icount shift=3D7,rr=3Dreplay,rrfile=3Dreplay.bin =
+-net none
+
+First one was used to record execution until BIOS will print its startup =
+info.
+The second one is for replay, but it can replay about 200000 =
+instructions
+until the problems with icount manifest itself - the execution does not =
+proceed.
+
+> That certainly seems to be fixed by Paolo's patches.
+>=20
+> > Are you going to fix it?
+>=20
+> Yes. It is certainly not intentional to regress icount and it needs to
+> be fixed before we release 2.9.
+>=20
+> If you can point me towards the record/replay test cases I'll make =
+sure
+> I run them on the updated series.
 
 
-
-On 14/03/2017 13:10, Pavel Dovgalyuk wrote:
-> This is not the same.
-> BQL helped in making execution deterministic - no io and timer
-> callbacks were performed while CPU is executing.
-> Now iothread and CPU thread work simultaneously and timers can't
-> query virtual time correctly, because (if we could query number of executed
-> instructions) it may have different values on different runs.
-> 
-> I guess you'll have to bring kicking CPU back on iothread invocation
-> to make execution deterministic in icount mode.
-
-Timers are fixed by my patch.  I/O should also work if its effects are
-only apparent at given QEMU_CLOCK_VIRTUAL values.
-
-Paolo
+Pavel Dovgalyuk
