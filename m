@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60985)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cnmdu-0000Fv-Jz
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:37:39 -0400
+	(envelope-from <lvivier@redhat.com>) id 1cnmig-00024h-0l
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:42:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cnmdr-0000wK-CM
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:37:38 -0400
-References: <20170314101925.16792-1-andreas@grapentin.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <cb635189-1c52-8b30-d33d-e593febc2a2e@redhat.com>
-Date: Tue, 14 Mar 2017 08:37:31 -0500
+	(envelope-from <lvivier@redhat.com>) id 1cnmie-000210-2l
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:42:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46004)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1cnmid-00020o-Pv
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:42:31 -0400
+References: <1488777954-4578-1-git-send-email-jasowang@redhat.com>
+	<1488777954-4578-13-git-send-email-jasowang@redhat.com>
+	<b3d2249e-9eb9-8621-e4c7-c77ac0962615@redhat.com>
+	<20170314111614.GD2445@work-vm>
+	<0f4c58f4-01a4-53d3-fb9e-6409d120827c@redhat.com>
+	<20170314113804.GF2445@work-vm>
+	<f38153ed-9a1c-4970-ac2a-610802857eb7@redhat.com>
+	<20170314133126.GA7576@work-vm>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <722a877a-075b-56b1-72a0-05f80c9a6647@redhat.com>
+Date: Tue, 14 Mar 2017 14:42:28 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170314101925.16792-1-andreas@grapentin.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="LcqFluUf1l1xxq7eNlK2rsqRe2XXiSaIE"
-Subject: Re: [Qemu-devel] [PATCH 0/1] major / minor macros are to be
- included from <sys/sysmacros.h>
+In-Reply-To: <20170314133126.GA7576@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL RESEND 12/19] vmxnet3: Convert ring values
+ to uint32_t's
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,69 +34,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andreas Grapentin <andreas@grapentin.org>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, peter.maydell@linaro.org, qemu-devel@nongnu.org, haoqf@linux.vnet.ibm.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---LcqFluUf1l1xxq7eNlK2rsqRe2XXiSaIE
-From: Eric Blake <eblake@redhat.com>
-To: Andreas Grapentin <andreas@grapentin.org>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org
-Message-ID: <cb635189-1c52-8b30-d33d-e593febc2a2e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/1] major / minor macros are to be included
- from <sys/sysmacros.h>
-References: <20170314101925.16792-1-andreas@grapentin.org>
-In-Reply-To: <20170314101925.16792-1-andreas@grapentin.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 14/03/2017 14:31, Dr. David Alan Gilbert wrote:
+> * Laurent Vivier (lvivier@redhat.com) wrote:
+>> On 14/03/2017 12:38, Dr. David Alan Gilbert wrote:
+>>> * Laurent Vivier (lvivier@redhat.com) wrote:
+>>>> On 14/03/2017 12:16, Dr. David Alan Gilbert wrote:
+>>>>> * Laurent Vivier (lvivier@redhat.com) wrote:
+>>>>>> On 06/03/2017 06:25, Jason Wang wrote:
+>>>>>>> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>>>>>>>
+>>>>>>> The index's in the Vmxnet3Ring were migrated as 32bit ints
+>>>>>>> yet are declared as size_t's.  They appear to be derived
+>>>>>>> from 32bit values loaded from guest memory, so actually
+>>>>>>> store them as that.
+>>>>>>>
+>>>>>>> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>>>>>> Acked-by: Dmitry Fleytman <dmitry@daynix.com>
+>>>>>>> Signed-off-by: Jason Wang <jasowang@redhat.com>
+>>>>>>> ---
+>>>>>>>  hw/net/vmxnet3.c | 12 ++++++------
+>>>>>>>  1 file changed, 6 insertions(+), 6 deletions(-)
+>>>>>>>
+>>>>>>> diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
+>>>>>>> index e13a798..224c109 100644
+>>>>>>> --- a/hw/net/vmxnet3.c
+>>>>>>> +++ b/hw/net/vmxnet3.c
+>>>>>>> @@ -141,17 +141,17 @@ typedef struct VMXNET3Class {
+>>>>>>>  /* Cyclic ring abstraction */
+>>>>>>>  typedef struct {
+>>>>>>>      hwaddr pa;
+>>>>>>> -    size_t size;
+>>>>>>> -    size_t cell_size;
+>>>>>>> -    size_t next;
+>>>>>>> +    uint32_t size;
+>>>>>>> +    uint32_t cell_size;
+>>>>>>> +    uint32_t next;
+>>>>>>>      uint8_t gen;
+>>>>>>>  } Vmxnet3Ring;
+>>>>>>>  
+>>>>>>>  static inline void vmxnet3_ring_init(PCIDevice *d,
+>>>>>>>  				     Vmxnet3Ring *ring,
+>>>>>>>                                       hwaddr pa,
+>>>>>>> -                                     size_t size,
+>>>>>>> -                                     size_t cell_size,
+>>>>>>> +                                     uint32_t size,
+>>>>>>> +                                     uint32_t cell_size,
+>>>>>>>                                       bool zero_region)
+>>>>>>>  {
+>>>>>>>      ring->pa = pa;
+>>>>>>> @@ -166,7 +166,7 @@ static inline void vmxnet3_ring_init(PCIDevice *d,
+>>>>>>>  }
+>>>>>>>  
+>>>>>>>  #define VMXNET3_RING_DUMP(macro, ring_name, ridx, r)                         \
+>>>>>>> -    macro("%s#%d: base %" PRIx64 " size %zu cell_size %zu gen %d next %zu",  \
+>>>>>>> +    macro("%s#%d: base %" PRIx64 " size %u cell_size %u gen %d next %u",  \
+>>>>>>>            (ring_name), (ridx),                                               \
+>>>>>>>            (r)->pa, (r)->size, (r)->cell_size, (r)->gen, (r)->next)
+>>>>>>>  
+>>>>>>>
+>>>>>>
+>>>>>>
+>>>>>> David, with '-dump-vmstate' with 2.8 machine type and with v2.8 and
+>>>>>> master I can see the size of "txq_descr" and "rxq_descr" changes because
+>>>>>> of "sizeof(Vmxnet3TxqDescr)" and "sizeof(Vmxnet3RxqDescr)". This changes
+>>>>>> because the size of Vmxnet3Ring has changed with the s/size_t/uint32_t/":
+>>>>>>
+>>>>>>         {
+>>>>>>           "field": "txq_descr",
+>>>>>>           "version_id": 0,
+>>>>>>           "field_exists": false,
+>>>>>>           "size": 176
+>>>>>>         },
+>>>>>>         {
+>>>>>>           "field": "rxq_descr",
+>>>>>>           "version_id": 0,
+>>>>>>           "field_exists": false,
+>>>>>>           "size": 216
+>>>>>>         },
+>>>>>>
+>>>>>> becomes:
+>>>>>>
+>>>>>>         {
+>>>>>>           "field": "txq_descr",
+>>>>>>           "version_id": 0,
+>>>>>>           "field_exists": false,
+>>>>>>           "size": 144
+>>>>>>         },
+>>>>>>         {
+>>>>>>           "field": "rxq_descr",
+>>>>>>           "version_id": 0,
+>>>>>>           "field_exists": false,
+>>>>>>           "size": 168
+>>>>>>         },
+>>>>>
+>>>>> But the old migration code used to write these fields using qemu_put_be32
+>>>>> (from a11f5cb005f9854f0d78da97fc23adf5bc8c83f3)
+>>>>>
+>>>>> -static void vmxnet3_put_ring_to_file(QEMUFile *f, Vmxnet3Ring *r)
+>>>>> -{
+>>>>> -    qemu_put_be64(f, r->pa);
+>>>>> -    qemu_put_be32(f, r->size);
+>>>>> -    qemu_put_be32(f, r->cell_size);
+>>>>> -    qemu_put_be32(f, r->next);
+>>>>> -    qemu_put_byte(f, r->gen);
+>>>>> -}
+>>>>>
+>>>>> +static const VMStateDescription vmstate_vmxnet3_ring = {
+>>>>> +    .name = "vmxnet3-ring",
+>>>>> +    .version_id = 0,
+>>>>> +    .fields = (VMStateField[]) {
+>>>>> +        VMSTATE_UINT64(pa, Vmxnet3Ring),
+>>>>> +        VMSTATE_UINT32(size, Vmxnet3Ring),
+>>>>> +        VMSTATE_UINT32(cell_size, Vmxnet3Ring),
+>>>>> +        VMSTATE_UINT32(next, Vmxnet3Ring),
+>>>>> +        VMSTATE_UINT8(gen, Vmxnet3Ring),
+>>>>> +        VMSTATE_END_OF_LIST()
+>>>>> +    }
+>>>>>  };
+>>>>>
+>>>>> so they used to be size_t's written with be32 and now they're uint32_t's
+>>>>> written as 32bit - so that should be the same.
+>>>>> I'm not sure i understand where the old txq_descr sizes come from - what
+>>>>> managed to print the 176 number before it was converted to VMState?
+>>>>
+>>>> I think it comes from the sizeof() in VMSTATE_STRUCT(Vmxnet3TxqDescr):
+>>>>
+>>>> static const VMStateDescription vmstate_vmxnet3_txq_descr = {
+>>>>     .name = "vmxnet3-txq-descr",
+>>>>     .version_id = 0,
+>>>>     .fields = (VMStateField[]) {
+>>>>         VMSTATE_STRUCT(tx_ring, Vmxnet3TxqDescr, 0, vmstate_vmxnet3_ring,
+>>>>                        Vmxnet3Ring),
+>>>>         VMSTATE_STRUCT(comp_ring, Vmxnet3TxqDescr, 0, vmstate_vmxnet3_ring,
+>>>>                        Vmxnet3Ring),
+>>>>         VMSTATE_UINT8(intr_idx, Vmxnet3TxqDescr),
+>>>>         VMSTATE_UINT64(tx_stats_pa, Vmxnet3TxqDescr),
+>>>>         VMSTATE_STRUCT(txq_stats, Vmxnet3TxqDescr, 0,
+>>>> vmstate_vmxnet3_tx_stats,
+>>>>                        struct UPT1_TxStats),
+>>>>         VMSTATE_END_OF_LIST()
+>>>>     }
+>>>> };
+>>>>
+>>>> I will check the '-dump-vmstate' code to see if it's relevant.
+>>>
+>>> OK, but that sizeof() should never make it onto the wire; all that
+>>> teh VMSTATE_STRUCT should do is execute the vmstate_vmxnet3_ring on
+>>> that data.
+>>> (And again I'm curious what happened in the version before I committed
+>>> that change).
+>>>
+>>>>>
+>>>>>> And if I try a migration, I have:
+>>>>>>
+>>>>>> qemu/migration/vmstate.c:112: vmstate_load_state: Assertion `first_elem
+>>>>>> || !n_elems' failed.
+>>>>>
+>>>>> Interesting; that's Halil's new assert; I need to look.
+>>>>
+>>>> Can't it be related to the size problem?
+>>>
+>>> It could, I need to see exactly how it's failing; what was the full
+>>> command line you used, and with what guest?
+>>
+>> Tested with pseries machine type on ppc64le host, no guest started.
+>>
+>> qemu-system-ppc64 -M pseries-2.8 -S -serial mon:stdio -vnc :0 -device
+>> vmxnet3
+> 
+> QingFeng Hao's <haoqf@linux.vnet.ibm.com> patch:
+>   'vmstate: fix failed iotests case 68 and 91'
+> seems to fix that for me.
 
-On 03/14/2017 05:19 AM, Andreas Grapentin wrote:
-> Building qemu fails with glibc-2.25 and gcc-6.3.1:
->=20
->> qemu/qga/commands-posix.c:656:13: error: In the GNU C Library, "major"=
- is defined
->>  by <sys/sysmacros.h>. For historical compatibility, it is
->>  currently defined by <sys/types.h> as well, but we plan to
->>  remove this soon. To use "major", include <sys/sysmacros.h>
->>  directly. If you did not intend to use a system-defined macro
->>  "major", you should undefine it after including <sys/types.h>. [-Werr=
-or]
->>          *devmajor =3D major(st.st_rdev);
->>              ^~~~~~~~~~~~~~~~~~~~~~~~~~
->=20
-> A trivial fix is to #include <sys/sysmacros.h> in the respective files.=
+For me too.
 
->=20
->=20
-> Andreas Grapentin (1):
->   major / minor macros are to be included from <sys/sysmacros.h>
-
-NACK. <sys/sysmacros.h> is not a universal file, so you can't blindly
-include it without first checking that it exists. We already fixed the
-problem correctly in commit 4d04351, which just landed today.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---LcqFluUf1l1xxq7eNlK2rsqRe2XXiSaIE
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYx/IbAAoJEKeha0olJ0NqIM0IAKQWOvZ6oXfnY2eF2rOJiodF
-qF1mnHliRNZNcrT4EH8vSSGAh9KzsQrB9FxfJEMk4a/DCvkr0+379FnvMR3JuwW4
-jgs4cSjEbqIhBZRde1VukJXw5w7UdT3i35PEJ2jNFQvowTiMoj8fScdhsUSe7KoN
-J0pRttEN1If3+YHVLSojFX1sJuVC74eUP3YRQfqFKeAv6ud89YTLcOGgMnVHcUO8
-Qat1mfuAU7QXz85pOYPUvbc3SMi0mLY7+I2wO+iY+5uZK0EzTsqoGJXUGFP2jGr7
-sH104Zw8Znw0Y2IVjpUa9e+pepERVURta4jlPm3SrRa6gO3TM//iXcPWxGjH8kY=
-=gUMB
------END PGP SIGNATURE-----
-
---LcqFluUf1l1xxq7eNlK2rsqRe2XXiSaIE--
+Thanks,
+Laurent
