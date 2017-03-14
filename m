@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cnqnf-0007AW-Qj
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 14:04:01 -0400
+	(envelope-from <eblake@redhat.com>) id 1cnqpA-0007mJ-5y
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 14:05:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cnqnZ-0003Lo-LK
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 14:03:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41952)
+	(envelope-from <eblake@redhat.com>) id 1cnqp6-0004Yj-5r
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 14:05:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42782)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cnqnZ-0003L0-D2
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 14:03:53 -0400
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8B01B8FCF4
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 18:03:53 +0000 (UTC)
-References: <1489512045-49206-1-git-send-email-pbonzini@redhat.com>
-	<20170314175704.GQ2445@work-vm>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1cbce8c6-b79b-1c0d-46f8-23838418adb0@redhat.com>
-Date: Tue, 14 Mar 2017 19:03:51 +0100
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cnqp5-0004YC-T9
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 14:05:28 -0400
+References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
+	<1489385927-6735-20-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e65f7e31-86dc-69b6-3e2e-9d1fa540c3a5@redhat.com>
+Date: Tue, 14 Mar 2017 13:05:25 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170314175704.GQ2445@work-vm>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for 2.9?] hmp: gpa2hva and gpa2hpa hostaddr
- command
+In-Reply-To: <1489385927-6735-20-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="BvpEcPgEgNRGO3oeWkEb2r9TCgKuRM576"
+Subject: Re: [Qemu-devel] [PATCH for-2.9 19/47] qapi: Prefer single-quoted
+ strings more consistently
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,166 +29,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--BvpEcPgEgNRGO3oeWkEb2r9TCgKuRM576
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Message-ID: <e65f7e31-86dc-69b6-3e2e-9d1fa540c3a5@redhat.com>
+Subject: Re: [PATCH for-2.9 19/47] qapi: Prefer single-quoted strings more
+ consistently
+References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
+ <1489385927-6735-20-git-send-email-armbru@redhat.com>
+In-Reply-To: <1489385927-6735-20-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 03/13/2017 01:18 AM, Markus Armbruster wrote:
+> PEP 8 advises:
+>=20
+>     In Python, single-quoted strings and double-quoted strings are the
+>     same.  This PEP does not make a recommendation for this.  Pick a
+>     rule and stick to it.  When a string contains single or double
+>     quote characters, however, use the other one to avoid backslashes
+>     in the string.  It improves readability.
+>=20
+> The QAPI generators succeed at picking a rule, but fail at sticking to
+> it.  Convert a bunch of double-quoted strings to single-quoted ones.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  scripts/qapi-event.py      |  2 +-
+>  scripts/qapi-introspect.py |  4 +-
+>  scripts/qapi-types.py      |  4 +-
+>  scripts/qapi-visit.py      |  4 +-
+>  scripts/qapi.py            | 96 +++++++++++++++++++++++---------------=
+--------
+>  scripts/qapi2texi.py       | 46 +++++++++++-----------
+>  6 files changed, 78 insertions(+), 78 deletions(-)
+>=20
+
+Purely stylistic, so I wouldn't do it as a lone patch. But as part of a
+larger series, I think you're fine.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
 
+--BvpEcPgEgNRGO3oeWkEb2r9TCgKuRM576
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 14/03/2017 18:57, Dr. David Alan Gilbert wrote:
-> * Paolo Bonzini (pbonzini@redhat.com) wrote:
->> These commands are useful when testing machine-check passthrough.
->> gpa2hva is useful to inject a MADV_HWPOISON madvise from gdb, while
->> gpa2hpa is useful to inject an error with the mce-inject kernel
->> module.
->>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->> 	Technically a feature, but on the other hand it is pretty
->> 	much impossible to test without it, and the people testing
->> 	the feature are using it as an out-of-tree patch.  Opinions?
-> 
-> I've no real objection except for the freeze; they're reasonable
-> debug commands.
-> 
->>  hmp-commands.hx |  32 ++++++++++++++++++
->>  monitor.c       | 103 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>  2 files changed, 135 insertions(+)
->>
->> diff --git a/hmp-commands.hx b/hmp-commands.hx
->> index 8819281..0aca984 100644
->> --- a/hmp-commands.hx
->> +++ b/hmp-commands.hx
->> @@ -526,6 +526,38 @@ Dump 80 16 bit values at the start of the video memory.
->>  ETEXI
->>  
->>      {
->> +        .name       = "gpa2hva",
->> +        .args_type  = "addr:l",
->> +        .params     = "addr",
->> +        .help       = "print the host virtual address corresponding to a guest physical address",
->> +        .cmd        = hmp_gpa2hva,
->> +    },
->> +
->> +STEXI
->> +@item gpa2hva @var{addr}
->> +@findex gpa2hva
->> +Print the host virtual address at which the guest's physical address @var{addr}
->> +is mapped.
->> +ETEXI
->> +
->> +#ifdef CONFIG_LINUX
->> +    {
->> +        .name       = "gpa2hpa",
->> +        .args_type  = "addr:l",
->> +        .params     = "addr",
->> +        .help       = "print the host physical address corresponding to a guest physical address",
->> +        .cmd        = hmp_gpa2hpa,
->> +    },
->> +#endif
->> +
->> +STEXI
->> +@item gpa2hpa @var{addr}
->> +@findex gpa2hpa
->> +Print the host physical address at which the guest's physical address @var{addr}
->> +is mapped.
->> +ETEXI
->> +
->> +    {
->>          .name       = "p|print",
->>          .args_type  = "fmt:/,val:l",
->>          .params     = "/fmt expr",
->> diff --git a/monitor.c b/monitor.c
->> index be282ec..1ac8c5f 100644
->> --- a/monitor.c
->> +++ b/monitor.c
->> @@ -1421,6 +1421,109 @@ static void hmp_physical_memory_dump(Monitor *mon, const QDict *qdict)
->>      memory_dump(mon, count, format, size, addr, 1);
->>  }
->>  
->> +static void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, Error **errp)
->> +{
->> +    MemoryRegionSection mrs = memory_region_find(get_system_memory(),
->> +                                                 addr, 1);
->> +
->> +    if (!mrs.mr) {
->> +        error_setg(errp, "No memory is mapped at address 0x%" HWADDR_PRIx, addr);
->> +        return NULL;
->> +    }
->> +
->> +    if (!memory_region_is_ram(mrs.mr) && !memory_region_is_romd(mrs.mr)) {
->> +        error_setg(errp, "Memory at address 0x%" HWADDR_PRIx "is not RAM", addr);
->> +        memory_region_unref(mrs.mr);
->> +        return NULL;
->> +    }
->> +
->> +    *p_mr = mrs.mr;
->> +    return qemu_map_ram_ptr(mrs.mr->ram_block, mrs.offset_within_region);
->> +}
->> +
->> +static void hmp_gpa2hva(Monitor *mon, const QDict *qdict)
->> +{
->> +    hwaddr addr = qdict_get_int(qdict, "addr");
->> +    Error *local_err = NULL;
->> +    MemoryRegion *mr;
->> +    void *ptr;
->> +
->> +    ptr = gpa2hva(&mr, addr, &local_err);
->> +    if (local_err) {
->> +        error_report_err(local_err);
->> +        return;
->> +    }
->> +
->> +    monitor_printf(mon, "Host virtual address for 0x%" HWADDR_PRIx
->> +                   " (%s) is %p\n",
->> +                   addr, mr->name, ptr);
->> +
->> +    memory_region_unref(mr);
->> +}
->> +
->> +#ifdef CONFIG_LINUX
->> +static uint64_t vtop(void *ptr, Error **errp)
->> +{
->> +    uint64_t pinfo;
->> +    uint64_t ret = -1;
-> 
-> An odd value for a uint.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-Call it an invalid physical address. :)
+iQEcBAEBCAAGBQJYyDDlAAoJEKeha0olJ0Nqb1MH/RKzZxNh22hBiX5hcOxPC/7q
+Uzqy/EiZP6rK/DgHbIprl9ng0T1p3gO11MfJ4v5jzdWYXm7NaSg1fmXJd6dgIeT4
+7R/0Ov2ufSYJASd3cIJJ0bICO1IbLCjgeMeNEu71iESf6aebABE68krHx6byyAg0
+eb8T4C70gAHQI+Z8SkOswMcaZ5j7sapCHB29Llm5opr4AvJDAfi3hQ1ERXUiSG6E
+hCOubOqVPamLxsSHYnLHqZtwZ/J4VT81QONVjNP6kss/YYHjd40UdAsdQvahBWcu
+DWY7QmHYbiiSkA5FEq/vBThWM8+iIqW0RQMn0HAxI4iYdp/Mz4eBvXPurnkUkv8=
+=4oH2
+-----END PGP SIGNATURE-----
 
->> +    uintptr_t addr = (uintptr_t) ptr;
->> +    uintptr_t pagesize = getpagesize();
->> +    off_t offset = addr / pagesize * sizeof (pinfo);
->> +    char pagemapname[64];
->> +    int fd;
->> +
->> +    sprintf(pagemapname, "/proc/%d/pagemap", getpid());
->> +    fd = open(pagemapname, O_RDONLY);
-> 
-> /proc/self/pagemap would seem easier.
-
-Ok.
-
->> +    if (fd == -1) {
->> +        error_setg_errno(errp, errno, "Cannot open %s", pagemapname);
->> +        return -1;
->> +    }
->> +
->> +    /* Force copy-on-write if necessary.  */
->> +    atomic_add((uint8_t *)ptr, 0);
->> +
->> +    if (pread(fd, &pinfo, sizeof(pinfo), offset) != sizeof(pinfo)) {
->> +        error_setg_errno(errp, errno, "Cannot read from %s", pagemapname);
->> +        goto out;
->> +    }
->> +    if ((pinfo & (1ull << 63)) == 0) {
->> +        error_setg(errp, "Page not present");
->> +        goto out;
->> +    }
->> +    ret = ((pinfo & 0x007fffffffffffffull) << 12) | (addr & (pagesize - 1));
-> 
-> Is that an x86 magic 12 ?
-> (life would seem to get messy if pagesize != 1<<12 for that line)
-
-Yes, it is.
-
-Paolo
+--BvpEcPgEgNRGO3oeWkEb2r9TCgKuRM576--
