@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58986)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cnmY5-0006ji-UB
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:31:39 -0400
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cnmaF-0007zu-Bf
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:33:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cnmXz-0007jV-SJ
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:31:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38930)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cnmXz-0007jL-K5
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:31:31 -0400
-Date: Tue, 14 Mar 2017 13:31:26 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170314133126.GA7576@work-vm>
-References: <1488777954-4578-1-git-send-email-jasowang@redhat.com>
-	<1488777954-4578-13-git-send-email-jasowang@redhat.com>
-	<b3d2249e-9eb9-8621-e4c7-c77ac0962615@redhat.com>
-	<20170314111614.GD2445@work-vm>
-	<0f4c58f4-01a4-53d3-fb9e-6409d120827c@redhat.com>
-	<20170314113804.GF2445@work-vm>
-	<f38153ed-9a1c-4970-ac2a-610802857eb7@redhat.com>
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cnmaC-0008K7-38
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:33:51 -0400
+Received: from [59.151.112.132] (port=42365 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cnmaB-0008JY-4X
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:33:48 -0400
+Date: Tue, 14 Mar 2017 21:33:13 +0800
+From: Chao Fan <fanc.fnst@cn.fujitsu.com>
+Message-ID: <20170314133313.GC2473@localhost.localdomain>
+References: <20170314102747.31395-1-fanc.fnst@cn.fujitsu.com>
+	<87o9x4t51k.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <f38153ed-9a1c-4970-ac2a-610802857eb7@redhat.com>
-Subject: Re: [Qemu-devel] [PULL RESEND 12/19] vmxnet3: Convert ring values
- to uint32_t's
+In-Reply-To: <87o9x4t51k.fsf@secure.mitica>
+Subject: Re: [Qemu-devel] [PATCH] Output dirty-bytes-rate instead of
+ dirty-pages-rate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,184 +28,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, peter.maydell@linaro.org, qemu-devel@nongnu.org, haoqf@linux.vnet.ibm.com
+To: Juan Quintela <quintela@redhat.com>
+Cc: eblake@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org, berrange@redhat.com, caoj.fnst@cn.fujitsu.com, douly.fnst@cn.fujitsu.com, maozy.fnst@cn.fujitsu.com, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-* Laurent Vivier (lvivier@redhat.com) wrote:
-> On 14/03/2017 12:38, Dr. David Alan Gilbert wrote:
-> > * Laurent Vivier (lvivier@redhat.com) wrote:
-> >> On 14/03/2017 12:16, Dr. David Alan Gilbert wrote:
-> >>> * Laurent Vivier (lvivier@redhat.com) wrote:
-> >>>> On 06/03/2017 06:25, Jason Wang wrote:
-> >>>>> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> >>>>>
-> >>>>> The index's in the Vmxnet3Ring were migrated as 32bit ints
-> >>>>> yet are declared as size_t's.  They appear to be derived
-> >>>>> from 32bit values loaded from guest memory, so actually
-> >>>>> store them as that.
-> >>>>>
-> >>>>> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> >>>>> Acked-by: Dmitry Fleytman <dmitry@daynix.com>
-> >>>>> Signed-off-by: Jason Wang <jasowang@redhat.com>
-> >>>>> ---
-> >>>>>  hw/net/vmxnet3.c | 12 ++++++------
-> >>>>>  1 file changed, 6 insertions(+), 6 deletions(-)
-> >>>>>
-> >>>>> diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
-> >>>>> index e13a798..224c109 100644
-> >>>>> --- a/hw/net/vmxnet3.c
-> >>>>> +++ b/hw/net/vmxnet3.c
-> >>>>> @@ -141,17 +141,17 @@ typedef struct VMXNET3Class {
-> >>>>>  /* Cyclic ring abstraction */
-> >>>>>  typedef struct {
-> >>>>>      hwaddr pa;
-> >>>>> -    size_t size;
-> >>>>> -    size_t cell_size;
-> >>>>> -    size_t next;
-> >>>>> +    uint32_t size;
-> >>>>> +    uint32_t cell_size;
-> >>>>> +    uint32_t next;
-> >>>>>      uint8_t gen;
-> >>>>>  } Vmxnet3Ring;
-> >>>>>  
-> >>>>>  static inline void vmxnet3_ring_init(PCIDevice *d,
-> >>>>>  				     Vmxnet3Ring *ring,
-> >>>>>                                       hwaddr pa,
-> >>>>> -                                     size_t size,
-> >>>>> -                                     size_t cell_size,
-> >>>>> +                                     uint32_t size,
-> >>>>> +                                     uint32_t cell_size,
-> >>>>>                                       bool zero_region)
-> >>>>>  {
-> >>>>>      ring->pa = pa;
-> >>>>> @@ -166,7 +166,7 @@ static inline void vmxnet3_ring_init(PCIDevice *d,
-> >>>>>  }
-> >>>>>  
-> >>>>>  #define VMXNET3_RING_DUMP(macro, ring_name, ridx, r)                         \
-> >>>>> -    macro("%s#%d: base %" PRIx64 " size %zu cell_size %zu gen %d next %zu",  \
-> >>>>> +    macro("%s#%d: base %" PRIx64 " size %u cell_size %u gen %d next %u",  \
-> >>>>>            (ring_name), (ridx),                                               \
-> >>>>>            (r)->pa, (r)->size, (r)->cell_size, (r)->gen, (r)->next)
-> >>>>>  
-> >>>>>
-> >>>>
-> >>>>
-> >>>> David, with '-dump-vmstate' with 2.8 machine type and with v2.8 and
-> >>>> master I can see the size of "txq_descr" and "rxq_descr" changes because
-> >>>> of "sizeof(Vmxnet3TxqDescr)" and "sizeof(Vmxnet3RxqDescr)". This changes
-> >>>> because the size of Vmxnet3Ring has changed with the s/size_t/uint32_t/":
-> >>>>
-> >>>>         {
-> >>>>           "field": "txq_descr",
-> >>>>           "version_id": 0,
-> >>>>           "field_exists": false,
-> >>>>           "size": 176
-> >>>>         },
-> >>>>         {
-> >>>>           "field": "rxq_descr",
-> >>>>           "version_id": 0,
-> >>>>           "field_exists": false,
-> >>>>           "size": 216
-> >>>>         },
-> >>>>
-> >>>> becomes:
-> >>>>
-> >>>>         {
-> >>>>           "field": "txq_descr",
-> >>>>           "version_id": 0,
-> >>>>           "field_exists": false,
-> >>>>           "size": 144
-> >>>>         },
-> >>>>         {
-> >>>>           "field": "rxq_descr",
-> >>>>           "version_id": 0,
-> >>>>           "field_exists": false,
-> >>>>           "size": 168
-> >>>>         },
-> >>>
-> >>> But the old migration code used to write these fields using qemu_put_be32
-> >>> (from a11f5cb005f9854f0d78da97fc23adf5bc8c83f3)
-> >>>
-> >>> -static void vmxnet3_put_ring_to_file(QEMUFile *f, Vmxnet3Ring *r)
-> >>> -{
-> >>> -    qemu_put_be64(f, r->pa);
-> >>> -    qemu_put_be32(f, r->size);
-> >>> -    qemu_put_be32(f, r->cell_size);
-> >>> -    qemu_put_be32(f, r->next);
-> >>> -    qemu_put_byte(f, r->gen);
-> >>> -}
-> >>>
-> >>> +static const VMStateDescription vmstate_vmxnet3_ring = {
-> >>> +    .name = "vmxnet3-ring",
-> >>> +    .version_id = 0,
-> >>> +    .fields = (VMStateField[]) {
-> >>> +        VMSTATE_UINT64(pa, Vmxnet3Ring),
-> >>> +        VMSTATE_UINT32(size, Vmxnet3Ring),
-> >>> +        VMSTATE_UINT32(cell_size, Vmxnet3Ring),
-> >>> +        VMSTATE_UINT32(next, Vmxnet3Ring),
-> >>> +        VMSTATE_UINT8(gen, Vmxnet3Ring),
-> >>> +        VMSTATE_END_OF_LIST()
-> >>> +    }
-> >>>  };
-> >>>
-> >>> so they used to be size_t's written with be32 and now they're uint32_t's
-> >>> written as 32bit - so that should be the same.
-> >>> I'm not sure i understand where the old txq_descr sizes come from - what
-> >>> managed to print the 176 number before it was converted to VMState?
-> >>
-> >> I think it comes from the sizeof() in VMSTATE_STRUCT(Vmxnet3TxqDescr):
-> >>
-> >> static const VMStateDescription vmstate_vmxnet3_txq_descr = {
-> >>     .name = "vmxnet3-txq-descr",
-> >>     .version_id = 0,
-> >>     .fields = (VMStateField[]) {
-> >>         VMSTATE_STRUCT(tx_ring, Vmxnet3TxqDescr, 0, vmstate_vmxnet3_ring,
-> >>                        Vmxnet3Ring),
-> >>         VMSTATE_STRUCT(comp_ring, Vmxnet3TxqDescr, 0, vmstate_vmxnet3_ring,
-> >>                        Vmxnet3Ring),
-> >>         VMSTATE_UINT8(intr_idx, Vmxnet3TxqDescr),
-> >>         VMSTATE_UINT64(tx_stats_pa, Vmxnet3TxqDescr),
-> >>         VMSTATE_STRUCT(txq_stats, Vmxnet3TxqDescr, 0,
-> >> vmstate_vmxnet3_tx_stats,
-> >>                        struct UPT1_TxStats),
-> >>         VMSTATE_END_OF_LIST()
-> >>     }
-> >> };
-> >>
-> >> I will check the '-dump-vmstate' code to see if it's relevant.
-> > 
-> > OK, but that sizeof() should never make it onto the wire; all that
-> > teh VMSTATE_STRUCT should do is execute the vmstate_vmxnet3_ring on
-> > that data.
-> > (And again I'm curious what happened in the version before I committed
-> > that change).
-> > 
-> >>>
-> >>>> And if I try a migration, I have:
-> >>>>
-> >>>> qemu/migration/vmstate.c:112: vmstate_load_state: Assertion `first_elem
-> >>>> || !n_elems' failed.
-> >>>
-> >>> Interesting; that's Halil's new assert; I need to look.
-> >>
-> >> Can't it be related to the size problem?
-> > 
-> > It could, I need to see exactly how it's failing; what was the full
-> > command line you used, and with what guest?
-> 
-> Tested with pseries machine type on ppc64le host, no guest started.
-> 
-> qemu-system-ppc64 -M pseries-2.8 -S -serial mon:stdio -vnc :0 -device
-> vmxnet3
+On Tue, Mar 14, 2017 at 01:29:43PM +0100, Juan Quintela wrote:
+>Chao Fan <fanc.fnst@cn.fujitsu.com> wrote:
+>> In hmp, dirty-bytes-rate is more friendly than dirty-pages-rate.
+>> It's also better for other tools to determine the cpu throttle
+>> value in different architecture.
+>>
+>> Signed-off-by: Chao Fan <fanc.fnst@cn.fujitsu.com>
+>> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+>
+>I agree with Daniel here, you can't change the meaning of a field.  Look
+>at skipped pages.  It is zero know because it is not used anymore, but
+>we can't drop it.
 
-QingFeng Hao's <haoqf@linux.vnet.ibm.com> patch:
-  'vmstate: fix failed iotests case 68 and 91'
-seems to fix that for me.
+OK, I see.
+Thank you very much.
 
-Dave
+>
+>I think it is better to expose page_size.  We have now
+>
+>trasferred: bytes
+>total: bytes
+>duplicate: number of zero pages
+>skipped: always zero.
+>normal: number of normal pages
+>normal_bytes: the same  in bytes
+>mbps: megabytes per second?  I can't even remember this one
+>dirty_sync_count: number of times we have go through the whole memory
+>postcopy_requests = number of pages asked by postcopy faults?
+>dirty_pages_rate = pages by some kind of unit
+>
+>And we haven't yet started with compression or xbzrle.  I think that the
+>best approach at this point is putting everything in pages except the
+>things that don't make sense.
+>
+>We can put everything on bytes, but then everything is HUGE.
 
-> Laurent
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Yes, it is.
+
+>
+>Anyways, what do libvirt/management apps preffer?
+
+I think maybe both are OK.
+About this issue, I will change my method to get the bytes.
+
+Many thanks for your reply.
+
+Thanks,
+Chao Fan
+>
+>Later, Juan.
+>
+>
+>> ---
+>>  hmp.c                 | 6 +++---
+>>  migration/migration.c | 2 +-
+>>  qapi-schema.json      | 8 ++++----
+>>  3 files changed, 8 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/hmp.c b/hmp.c
+>> index 261843f..7334bc5 100644
+>> --- a/hmp.c
+>> +++ b/hmp.c
+>> @@ -215,9 +215,9 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+>>                         info->ram->normal_bytes >> 10);
+>>          monitor_printf(mon, "dirty sync count: %" PRIu64 "\n",
+>>                         info->ram->dirty_sync_count);
+>> -        if (info->ram->dirty_pages_rate) {
+>> -            monitor_printf(mon, "dirty pages rate: %" PRIu64 " pages\n",
+>> -                           info->ram->dirty_pages_rate);
+>> +        if (info->ram->dirty_bytes_rate) {
+>> +            monitor_printf(mon, "dirty bytes rate: %" PRIu64 " bytes/s\n",
+>> +                           info->ram->dirty_bytes_rate);
+>>          }
+>>          if (info->ram->postcopy_requests) {
+>>              monitor_printf(mon, "postcopy request count: %" PRIu64 "\n",
+>> diff --git a/migration/migration.c b/migration/migration.c
+>> index 3dab684..7e7b62c 100644
+>> --- a/migration/migration.c
+>> +++ b/migration/migration.c
+>> @@ -648,7 +648,7 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
+>>  
+>>      if (s->state != MIGRATION_STATUS_COMPLETED) {
+>>          info->ram->remaining = ram_bytes_remaining();
+>> -        info->ram->dirty_pages_rate = s->dirty_pages_rate;
+>> +        info->ram->dirty_bytes_rate = s->dirty_bytes_rate;
+>>      }
+>>  }
+>>  
+>> diff --git a/qapi-schema.json b/qapi-schema.json
+>> index 32b4a4b..83a45f8 100644
+>> --- a/qapi-schema.json
+>> +++ b/qapi-schema.json
+>> @@ -565,9 +565,6 @@
+>>  #
+>>  # @normal-bytes: number of normal bytes sent (since 1.2)
+>>  #
+>> -# @dirty-pages-rate: number of pages dirtied by second by the
+>> -#        guest (since 1.3)
+>> -#
+>>  # @mbps: throughput in megabits/sec. (since 1.6)
+>>  #
+>>  # @dirty-sync-count: number of times that dirty ram was synchronized (since 2.1)
+>> @@ -575,12 +572,15 @@
+>>  # @postcopy-requests: The number of page requests received from the destination
+>>  #        (since 2.7)
+>>  #
+>> +# @dirty-bytes-rate: how many bytes  dirtied by second by the
+>> +#        guest (since 2.9)
+>> +#
+>>  # Since: 0.14.0
+>>  ##
+>>  { 'struct': 'MigrationStats',
+>>    'data': {'transferred': 'int', 'remaining': 'int', 'total': 'int' ,
+>>             'duplicate': 'int', 'skipped': 'int', 'normal': 'int',
+>> -           'normal-bytes': 'int', 'dirty-pages-rate' : 'int',
+>> +           'normal-bytes': 'int', 'dirty-bytes-rate' : 'int',
+>>             'mbps' : 'number', 'dirty-sync-count' : 'int',
+>>             'postcopy-requests' : 'int' } }
+>
+>
