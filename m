@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cnhPn-00046K-Cy
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:02:45 -0400
+	(envelope-from <jasowang@redhat.com>) id 1cnhPq-00048d-MB
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:02:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cnhPm-0006lp-Dp
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:02:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49060)
+	(envelope-from <jasowang@redhat.com>) id 1cnhPp-0006mh-7Y
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:02:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35326)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cnhPm-0006lR-7c
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:02:42 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cnhPo-0006mS-VR
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:02:45 -0400
 From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 14 Mar 2017 16:02:29 +0800
-Message-Id: <1489478550-19431-3-git-send-email-jasowang@redhat.com>
+Date: Tue, 14 Mar 2017 16:02:30 +0800
+Message-Id: <1489478550-19431-4-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1489478550-19431-1-git-send-email-jasowang@redhat.com>
 References: <1489478550-19431-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL 2/3] COLO-compare: Fix trace_event print bug
+Subject: [Qemu-devel] [PULL 3/3] hw/net: implement MIB counters in mcf_fec
+ driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,69 +25,216 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>
+Cc: Greg Ungerer <gerg@uclinux.org>, Jason Wang <jasowang@redhat.com>
 
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+From: Greg Ungerer <gerg@uclinux.org>
 
-Because of inet_ntoa() return a statically allocated buffer,
-subsequent calls will overwrite, So we fix this bug.
+The FEC ethernet hardware module used on ColdFire SoC parts contains a
+block of RAM used to maintain hardware counters. This block is accessible
+via the usual FEC register address space. There is currently no support
+for this in the QEMU mcf_fec driver.
 
-Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Add support for storing a MIB RAM block, and provide register level
+access to it. Also implement a basic set of stats collection functions
+to populate MIB data fields.
+
+This support tested running a Linux target and using the net-tools
+"ethtool -S" option. As of linux-4.9 the kernels FEC driver makes
+accesses to the MIB counters during its initialization (which it never
+did before), and so this version of Linux will now fail with the QEMU
+error:
+
+    qemu: hardware error: mcf_fec_read: Bad address 0x200
+
+This MIB counter support fixes this problem.
+
+Signed-off-by: Greg Ungerer <gerg@uclinux.org>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- net/colo-compare.c | 33 +++++++++++++++++++++++++--------
- 1 file changed, 25 insertions(+), 8 deletions(-)
+ hw/net/mcf_fec.c | 115 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 115 insertions(+)
 
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index 282727b..54e6d40 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -182,10 +182,18 @@ static int packet_enqueue(CompareState *s, int mode)
-  */
- static int colo_packet_compare_common(Packet *ppkt, Packet *spkt, int offset)
- {
--    trace_colo_compare_ip_info(ppkt->size, inet_ntoa(ppkt->ip->ip_src),
--                               inet_ntoa(ppkt->ip->ip_dst), spkt->size,
--                               inet_ntoa(spkt->ip->ip_src),
--                               inet_ntoa(spkt->ip->ip_dst));
-+    if (trace_event_get_state(TRACE_COLO_COMPARE_MISCOMPARE)) {
-+        char pri_ip_src[20], pri_ip_dst[20], sec_ip_src[20], sec_ip_dst[20];
-+
-+        strcpy(pri_ip_src, inet_ntoa(ppkt->ip->ip_src));
-+        strcpy(pri_ip_dst, inet_ntoa(ppkt->ip->ip_dst));
-+        strcpy(sec_ip_src, inet_ntoa(spkt->ip->ip_src));
-+        strcpy(sec_ip_dst, inet_ntoa(spkt->ip->ip_dst));
-+
-+        trace_colo_compare_ip_info(ppkt->size, pri_ip_src,
-+                                   pri_ip_dst, spkt->size,
-+                                   sec_ip_src, sec_ip_dst);
-+    }
+diff --git a/hw/net/mcf_fec.c b/hw/net/mcf_fec.c
+index a3eca7e..bfa6b4b 100644
+--- a/hw/net/mcf_fec.c
++++ b/hw/net/mcf_fec.c
+@@ -27,6 +27,7 @@ do { printf("mcf_fec: " fmt , ## __VA_ARGS__); } while (0)
  
-     if (ppkt->size == spkt->size) {
-         return memcmp(ppkt->data + offset, spkt->data + offset,
-@@ -336,10 +344,19 @@ static int colo_packet_compare_icmp(Packet *spkt, Packet *ppkt)
- static int colo_packet_compare_other(Packet *spkt, Packet *ppkt)
+ #define FEC_MAX_DESC 1024
+ #define FEC_MAX_FRAME_SIZE 2032
++#define FEC_MIB_SIZE 64
+ 
+ typedef struct {
+     SysBusDevice parent_obj;
+@@ -51,6 +52,7 @@ typedef struct {
+     uint32_t erdsr;
+     uint32_t etdsr;
+     uint32_t emrbr;
++    uint32_t mib[FEC_MIB_SIZE];
+ } mcf_fec_state;
+ 
+ #define FEC_INT_HB   0x80000000
+@@ -111,6 +113,63 @@ typedef struct {
+ #define FEC_BD_OV   0x0002
+ #define FEC_BD_TR   0x0001
+ 
++#define MIB_RMON_T_DROP         0
++#define MIB_RMON_T_PACKETS      1
++#define MIB_RMON_T_BC_PKT       2
++#define MIB_RMON_T_MC_PKT       3
++#define MIB_RMON_T_CRC_ALIGN    4
++#define MIB_RMON_T_UNDERSIZE    5
++#define MIB_RMON_T_OVERSIZE     6
++#define MIB_RMON_T_FRAG         7
++#define MIB_RMON_T_JAB          8
++#define MIB_RMON_T_COL          9
++#define MIB_RMON_T_P64          10
++#define MIB_RMON_T_P65TO127     11
++#define MIB_RMON_T_P128TO255    12
++#define MIB_RMON_T_P256TO511    13
++#define MIB_RMON_T_P512TO1023   14
++#define MIB_RMON_T_P1024TO2047  15
++#define MIB_RMON_T_P_GTE2048    16
++#define MIB_RMON_T_OCTETS       17
++#define MIB_IEEE_T_DROP         18
++#define MIB_IEEE_T_FRAME_OK     19
++#define MIB_IEEE_T_1COL         20
++#define MIB_IEEE_T_MCOL         21
++#define MIB_IEEE_T_DEF          22
++#define MIB_IEEE_T_LCOL         23
++#define MIB_IEEE_T_EXCOL        24
++#define MIB_IEEE_T_MACERR       25
++#define MIB_IEEE_T_CSERR        26
++#define MIB_IEEE_T_SQE          27
++#define MIB_IEEE_T_FDXFC        28
++#define MIB_IEEE_T_OCTETS_OK    29
++
++#define MIB_RMON_R_DROP         32
++#define MIB_RMON_R_PACKETS      33
++#define MIB_RMON_R_BC_PKT       34
++#define MIB_RMON_R_MC_PKT       35
++#define MIB_RMON_R_CRC_ALIGN    36
++#define MIB_RMON_R_UNDERSIZE    37
++#define MIB_RMON_R_OVERSIZE     38
++#define MIB_RMON_R_FRAG         39
++#define MIB_RMON_R_JAB          40
++#define MIB_RMON_R_RESVD_0      41
++#define MIB_RMON_R_P64          42
++#define MIB_RMON_R_P65TO127     43
++#define MIB_RMON_R_P128TO255    44
++#define MIB_RMON_R_P256TO511    45
++#define MIB_RMON_R_P512TO1023   46
++#define MIB_RMON_R_P1024TO2047  47
++#define MIB_RMON_R_P_GTE2048    48
++#define MIB_RMON_R_OCTETS       49
++#define MIB_IEEE_R_DROP         50
++#define MIB_IEEE_R_FRAME_OK     51
++#define MIB_IEEE_R_CRC          52
++#define MIB_IEEE_R_ALIGN        53
++#define MIB_IEEE_R_MACERR       54
++#define MIB_IEEE_R_FDXFC        55
++#define MIB_IEEE_R_OCTETS_OK    56
++
+ static void mcf_fec_read_bd(mcf_fec_bd *bd, uint32_t addr)
  {
-     trace_colo_compare_main("compare other");
--    trace_colo_compare_ip_info(ppkt->size, inet_ntoa(ppkt->ip->ip_src),
--                               inet_ntoa(ppkt->ip->ip_dst), spkt->size,
--                               inet_ntoa(spkt->ip->ip_src),
--                               inet_ntoa(spkt->ip->ip_dst));
-+    if (trace_event_get_state(TRACE_COLO_COMPARE_MISCOMPARE)) {
-+        char pri_ip_src[20], pri_ip_dst[20], sec_ip_src[20], sec_ip_dst[20];
-+
-+        strcpy(pri_ip_src, inet_ntoa(ppkt->ip->ip_src));
-+        strcpy(pri_ip_dst, inet_ntoa(ppkt->ip->ip_dst));
-+        strcpy(sec_ip_src, inet_ntoa(spkt->ip->ip_src));
-+        strcpy(sec_ip_dst, inet_ntoa(spkt->ip->ip_dst));
-+
-+        trace_colo_compare_ip_info(ppkt->size, pri_ip_src,
-+                                   pri_ip_dst, spkt->size,
-+                                   sec_ip_src, sec_ip_dst);
-+    }
-+
-     return colo_packet_compare_common(ppkt, spkt, 0);
+     cpu_physical_memory_read(addr, bd, sizeof(*bd));
+@@ -147,6 +206,31 @@ static void mcf_fec_update(mcf_fec_state *s)
+     s->irq_state = active;
  }
  
++static void mcf_fec_tx_stats(mcf_fec_state *s, int size)
++{
++    s->mib[MIB_RMON_T_PACKETS]++;
++    s->mib[MIB_RMON_T_OCTETS] += size;
++    if (size < 64) {
++        s->mib[MIB_RMON_T_FRAG]++;
++    } else if (size == 64) {
++        s->mib[MIB_RMON_T_P64]++;
++    } else if (size < 128) {
++        s->mib[MIB_RMON_T_P65TO127]++;
++    } else if (size < 256) {
++        s->mib[MIB_RMON_T_P128TO255]++;
++    } else if (size < 512) {
++        s->mib[MIB_RMON_T_P256TO511]++;
++    } else if (size < 1024) {
++        s->mib[MIB_RMON_T_P512TO1023]++;
++    } else if (size < 2048) {
++        s->mib[MIB_RMON_T_P1024TO2047]++;
++    } else {
++        s->mib[MIB_RMON_T_P_GTE2048]++;
++    }
++    s->mib[MIB_IEEE_T_FRAME_OK]++;
++    s->mib[MIB_IEEE_T_OCTETS_OK] += size;
++}
++
+ static void mcf_fec_do_tx(mcf_fec_state *s)
+ {
+     uint32_t addr;
+@@ -180,6 +264,7 @@ static void mcf_fec_do_tx(mcf_fec_state *s)
+             /* Last buffer in frame.  */
+             DPRINTF("Sending packet\n");
+             qemu_send_packet(qemu_get_queue(s->nic), frame, frame_size);
++            mcf_fec_tx_stats(s, frame_size);
+             ptr = frame;
+             frame_size = 0;
+             s->eir |= FEC_INT_TXF;
+@@ -302,6 +387,7 @@ static uint64_t mcf_fec_read(void *opaque, hwaddr addr,
+     case 0x180: return s->erdsr;
+     case 0x184: return s->etdsr;
+     case 0x188: return s->emrbr;
++    case 0x200 ... 0x2e0: return s->mib[(addr & 0x1ff) / 4];
+     default:
+         hw_error("mcf_fec_read: Bad address 0x%x\n", (int)addr);
+         return 0;
+@@ -399,12 +485,40 @@ static void mcf_fec_write(void *opaque, hwaddr addr,
+     case 0x188:
+         s->emrbr = value > 0 ? value & 0x7F0 : 0x7F0;
+         break;
++    case 0x200 ... 0x2e0:
++        s->mib[(addr & 0x1ff) / 4] = value;
++        break;
+     default:
+         hw_error("mcf_fec_write Bad address 0x%x\n", (int)addr);
+     }
+     mcf_fec_update(s);
+ }
+ 
++static void mcf_fec_rx_stats(mcf_fec_state *s, int size)
++{
++    s->mib[MIB_RMON_R_PACKETS]++;
++    s->mib[MIB_RMON_R_OCTETS] += size;
++    if (size < 64) {
++        s->mib[MIB_RMON_R_FRAG]++;
++    } else if (size == 64) {
++        s->mib[MIB_RMON_R_P64]++;
++    } else if (size < 128) {
++        s->mib[MIB_RMON_R_P65TO127]++;
++    } else if (size < 256) {
++        s->mib[MIB_RMON_R_P128TO255]++;
++    } else if (size < 512) {
++        s->mib[MIB_RMON_R_P256TO511]++;
++    } else if (size < 1024) {
++        s->mib[MIB_RMON_R_P512TO1023]++;
++    } else if (size < 2048) {
++        s->mib[MIB_RMON_R_P1024TO2047]++;
++    } else {
++        s->mib[MIB_RMON_R_P_GTE2048]++;
++    }
++    s->mib[MIB_IEEE_R_FRAME_OK]++;
++    s->mib[MIB_IEEE_R_OCTETS_OK] += size;
++}
++
+ static int mcf_fec_have_receive_space(mcf_fec_state *s, size_t want)
+ {
+     mcf_fec_bd bd;
+@@ -500,6 +614,7 @@ static ssize_t mcf_fec_receive(NetClientState *nc, const uint8_t *buf, size_t si
+         }
+     }
+     s->rx_descriptor = addr;
++    mcf_fec_rx_stats(s, retsize);
+     mcf_fec_enable_rx(s);
+     mcf_fec_update(s);
+     return retsize;
 -- 
 2.7.4
