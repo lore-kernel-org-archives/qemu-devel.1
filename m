@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andreas@grapentin.org>) id 1cnrLH-0000IC-MJ
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 14:38:44 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1cnrMB-0000jI-Ce
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 14:39:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andreas@grapentin.org>) id 1cnrLG-00010u-LH
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 14:38:43 -0400
-Date: Tue, 14 Mar 2017 19:38:34 +0100
-From: Andreas Grapentin <andreas@grapentin.org>
-Message-ID: <20170314183834.GA23093@parabola-pocket>
-References: <20170314165953.18506-1-andreas@grapentin.org>
-	<ddea3a8a-715e-c24d-e434-3fa55f5d81b2@redhat.com>
+	(envelope-from <sstabellini@kernel.org>) id 1cnrM8-0001W0-6V
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 14:39:39 -0400
+Received: from mail.kernel.org ([198.145.29.136]:43810)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1cnrM7-0001VU-SX
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 14:39:36 -0400
+Date: Tue, 14 Mar 2017 11:39:23 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <1489509310-24166-1-git-send-email-igor.druzhinin@citrix.com>
+Message-ID: <alpine.DEB.2.10.1703141133100.4807@sstabellini-ThinkPad-X260>
+References: <1489509310-24166-1-git-send-email-igor.druzhinin@citrix.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="OXfL5xGRrasGEqWY"
-Content-Disposition: inline
-In-Reply-To: <ddea3a8a-715e-c24d-e434-3fa55f5d81b2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] use _Static_assert in QEMU_BUILD_BUG_ON
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v4] xen: don't save/restore the physmap on
+ VM save/restore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,109 +27,259 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Igor Druzhinin <igor.druzhinin@citrix.com>
+Cc: sstabellini@kernel.org, anthony.perard@citrix.com, paul.durrant@citrix.com, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net
+
+On Tue, 14 Mar 2017, Igor Druzhinin wrote:
+> Saving/restoring the physmap to/from xenstore was introduced to
+> QEMU majorly in order to cover up the VRAM region restore issue.
+> The sequence of restore operations implies that we should know
+> the effective guest VRAM address *before* we have the VRAM region
+> restored (which happens later). Unfortunately, in Xen environment
+> VRAM memory does actually belong to a guest - not QEMU itself -
+> which means the position of this region is unknown beforehand and
+> can't be mapped into QEMU address space immediately.
+> 
+> Previously, recreating xenstore keys, holding the physmap, by the
+> toolstack helped to get this information in place at the right
+> moment ready to be consumed by QEMU to map the region properly.
+> 
+> The extraneous complexity of having those keys transferred by the
+> toolstack and unnecessary redundancy prompted us to propose a
+> solution which doesn't require any extra data in xenstore. The idea
+> is to defer the VRAM region mapping till the point we actually know
+> the effective address and able to map it. To that end, we initially
+> just skip the mapping request for the framebuffer if we unable to
+> map it now. Then, after the memory region restore phase, we perform
+> the mapping again, this time successfully, and update the VRAM region
+> metadata accordingly.
+> 
+> Signed-off-by: Igor Druzhinin <igor.druzhinin@citrix.com>
+> ---
+> v4:
+> * Use VGA post_load handler for vram_ptr update
+> 
+> v3:
+> * Modify qemu_ram_ptr_length similarly with qemu_map_ram_ptr
+> * Add a comment explaining qemu_map_ram_ptr and qemu_ram_ptr_length 
+>   semantic change for Xen
+> * Dropped some redundant changes
+> 
+> v2:
+> * Fix some building and coding style issues
+> ---
+>  exec.c           |  16 +++++++++
+>  hw/display/vga.c |   5 +++
+>  xen-hvm.c        | 104 ++++++++++---------------------------------------------
+>  3 files changed, 40 insertions(+), 85 deletions(-)
+> 
+> diff --git a/exec.c b/exec.c
+> index aabb035..a1ac8cd 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -2008,6 +2008,14 @@ void *qemu_map_ram_ptr(RAMBlock *ram_block, ram_addr_t addr)
+>          }
+>  
+>          block->host = xen_map_cache(block->offset, block->max_length, 1);
+> +        if (block->host == NULL) {
+> +            /* In case we cannot establish the mapping right away we might
+> +             * still be able to do it later e.g. on a later stage of restore.
+> +             * We don't touch the block and return NULL here to indicate
+> +             * that intention.
+> +             */
+> +            return NULL;
+> +        }
+>      }
+>      return ramblock_ptr(block, addr);
+>  }
+> @@ -2041,6 +2049,14 @@ static void *qemu_ram_ptr_length(RAMBlock *ram_block, ram_addr_t addr,
+>          }
+>  
+>          block->host = xen_map_cache(block->offset, block->max_length, 1);
+> +        if (block->host == NULL) {
+> +            /* In case we cannot establish the mapping right away we might
+> +             * still be able to do it later e.g. on a later stage of restore.
+> +             * We don't touch the block and return NULL here to indicate
+> +             * that intention.
+> +             */
+> +            return NULL;
+> +        }
+>      }
+>  
+>      return ramblock_ptr(block, addr);
+> diff --git a/hw/display/vga.c b/hw/display/vga.c
+> index 69c3e1d..f8aebe3 100644
+> --- a/hw/display/vga.c
+> +++ b/hw/display/vga.c
+> @@ -2035,6 +2035,11 @@ static int vga_common_post_load(void *opaque, int version_id)
+>  {
+>      VGACommonState *s = opaque;
+>  
+> +    if (xen_enabled() && !s->vram_ptr) {
+> +        /* update VRAM region pointer in case we've failed
+> +         * the last time during init phase */
+> +        s->vram_ptr = memory_region_get_ram_ptr(&s->vram);
+> +    }
+
+Please add a similar in-code comment at the point where we try to set
+vram_ptr the first time. It might be suitable to add a debug printf if
+vram_ptr is NULL then.
 
 
---OXfL5xGRrasGEqWY
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-
-The missing ! is because I generated the error messages by inverting the
-condition and then forgot to change it back. I can send a v3 if you
-like.
-
-Thanks for being patient with me.
-
--A
-
-
-On Tue, Mar 14, 2017 at 12:43:56PM -0500, Eric Blake wrote:
-> On 03/14/2017 11:59 AM, Andreas Grapentin wrote:
-> > QEMU_BUILD_BUG_ON should use C11's _Static_assert, if the compiler supp=
-orts it,
-> > to provide more readable messages on failure.
->=20
-> >=20
-> > with _Static_assert:
-> >=20
-> >> In file included from /qemu/include/qemu/osdep.h:36:0,
-> >>                  from /qemu/qga/commands.c:13:
-> >> /qemu/qga/commands.c: In function =E2=80=98qmp_guest_exec_status=E2=80=
-=99:
-> >> /qemu/include/qemu/compiler.h:94:30: error: static assertion failed: "=
-not expecting: sizeof(*&gei->finished) > sizeof(void *)"
-> >>  #define QEMU_BUILD_BUG_ON(x) _Static_assert((x), #x)
->=20
-> Manual copy-and-paste? Because this is missing the ! present in the
-> actual definition...
->=20
-> >>                               ^
-> >> /qemu/include/qemu/atomic.h:146:5: note: in expansion of macro =E2=80=
-=98QEMU_BUILD_BUG_ON=E2=80=99
-> >>      QEMU_BUILD_BUG_ON(sizeof(*ptr) > sizeof(void *));   \
-> >>      ^~~~~~~~~~~~~~~~~
-> >> /qemu/include/qemu/atomic.h:417:5: note: in expansion of macro =E2=80=
-=98atomic_load_acquire=E2=80=99
-> >>      atomic_load_acquire(ptr)
-> >>      ^~~~~~~~~~~~~~~~~~~
-> >> /qemu/qga/commands.c:160:21: note: in expansion of macro =E2=80=98atom=
-ic_mb_read=E2=80=99
-> >>      bool finished =3D atomic_mb_read(&gei->finished);
-> >>                      ^~~~~~~~~~~~~~
-> >=20
-> > Signed-off-by: Andreas Grapentin <andreas@grapentin.org>
-> > ---
->=20
-> > +++ b/include/qemu/compiler.h
-> > @@ -90,7 +90,9 @@
-> >          int:(x) ? -1 : 1; \
-> >      }
-> > =20
-> > -#ifdef __COUNTER__
-> > +#if defined(CONFIG_STATIC_ASSERT)
-> > +#define QEMU_BUILD_BUG_ON(x) _Static_assert(!(x), "not expecting: " #x)
->=20
-> ...here.
->=20
-> But that's trivial, if the maintainer would like to correct the commit
-> message.
->=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->=20
->=20
-> --=20
-> Eric Blake   eblake redhat com    +1-919-301-3266
-> Libvirt virtualization library http://libvirt.org
->=20
-
-
-
-
---=20
-
----------------------------------------------------------------------------=
----
-my GPG Public Key:                 https://files.grapentin.org/.gpg/public.=
-key
----------------------------------------------------------------------------=
----
-
---OXfL5xGRrasGEqWY
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEv6gAioJlZ3BjsRv0cXGYbkt0VTYFAljIOKgACgkQcXGYbkt0
-VTZlegf+LGR+KOHWD5Rg8q8N1eQFZXgVeigpLJdN18HU8aJfuos1AFFpp+mv+lRE
-Otm57KyPui3/qKa21Z9fx5m22ClgU+9vOfkBtCVE7/FaicQwOr6Fc9VuZVMli3S4
-Gw43jqXwgJvSELklHrzWfiqsey+NvYtqqTMZavB6Py9U1aRJYlmJuh11lxgmIaJX
-hYPLeobNfH/M4Y/1BcBM79otd3P7lsugPpdZZKsQ9+hIinFzegd4KFkZJcjKvQi/
-sacmpxqXyTzhTjWObMwtHd091sdHU2YOb9zOOAN8jhpJwBxu6aBTT9vO+y4Vu46a
-W+wglylLL33tjahB1IpK0I1l9YJjSw==
-=w2Bj
------END PGP SIGNATURE-----
-
---OXfL5xGRrasGEqWY--
+>      /* force refresh */
+>      s->graphic_mode = -1;
+>      vbe_update_vgaregs(s);
+> diff --git a/xen-hvm.c b/xen-hvm.c
+> index 5043beb..8bedd9b 100644
+> --- a/xen-hvm.c
+> +++ b/xen-hvm.c
+> @@ -317,7 +317,6 @@ static int xen_add_to_physmap(XenIOState *state,
+>      XenPhysmap *physmap = NULL;
+>      hwaddr pfn, start_gpfn;
+>      hwaddr phys_offset = memory_region_get_ram_addr(mr);
+> -    char path[80], value[17];
+>      const char *mr_name;
+>  
+>      if (get_physmapping(state, start_addr, size)) {
+> @@ -340,6 +339,22 @@ go_physmap:
+>      DPRINTF("mapping vram to %"HWADDR_PRIx" - %"HWADDR_PRIx"\n",
+>              start_addr, start_addr + size);
+>  
+> +    mr_name = memory_region_name(mr);
+> +
+> +    physmap = g_malloc(sizeof(XenPhysmap));
+> +
+> +    physmap->start_addr = start_addr;
+> +    physmap->size = size;
+> +    physmap->name = mr_name;
+> +    physmap->phys_offset = phys_offset;
+> +
+> +    QLIST_INSERT_HEAD(&state->physmap, physmap, list);
+> +
+> +    if (runstate_check(RUN_STATE_INMIGRATE)) {
+> +        /* If we are migrating the region has been already mapped */
+> +        return 0;
+> +    }
+> +
+>      pfn = phys_offset >> TARGET_PAGE_BITS;
+>      start_gpfn = start_addr >> TARGET_PAGE_BITS;
+>      for (i = 0; i < size >> TARGET_PAGE_BITS; i++) {
+> @@ -350,49 +365,17 @@ go_physmap:
+>          if (rc) {
+>              DPRINTF("add_to_physmap MFN %"PRI_xen_pfn" to PFN %"
+>                      PRI_xen_pfn" failed: %d (errno: %d)\n", idx, gpfn, rc, errno);
+> +
+> +            QLIST_REMOVE(physmap, list);
+> +            g_free(physmap);
+>              return -rc;
+>          }
+>      }
+>  
+> -    mr_name = memory_region_name(mr);
+> -
+> -    physmap = g_malloc(sizeof (XenPhysmap));
+> -
+> -    physmap->start_addr = start_addr;
+> -    physmap->size = size;
+> -    physmap->name = mr_name;
+> -    physmap->phys_offset = phys_offset;
+> -
+> -    QLIST_INSERT_HEAD(&state->physmap, physmap, list);
+> -
+>      xc_domain_pin_memory_cacheattr(xen_xc, xen_domid,
+>                                     start_addr >> TARGET_PAGE_BITS,
+>                                     (start_addr + size - 1) >> TARGET_PAGE_BITS,
+>                                     XEN_DOMCTL_MEM_CACHEATTR_WB);
+> -
+> -    snprintf(path, sizeof(path),
+> -            "/local/domain/0/device-model/%d/physmap/%"PRIx64"/start_addr",
+> -            xen_domid, (uint64_t)phys_offset);
+> -    snprintf(value, sizeof(value), "%"PRIx64, (uint64_t)start_addr);
+> -    if (!xs_write(state->xenstore, 0, path, value, strlen(value))) {
+> -        return -1;
+> -    }
+> -    snprintf(path, sizeof(path),
+> -            "/local/domain/0/device-model/%d/physmap/%"PRIx64"/size",
+> -            xen_domid, (uint64_t)phys_offset);
+> -    snprintf(value, sizeof(value), "%"PRIx64, (uint64_t)size);
+> -    if (!xs_write(state->xenstore, 0, path, value, strlen(value))) {
+> -        return -1;
+> -    }
+> -    if (mr_name) {
+> -        snprintf(path, sizeof(path),
+> -                "/local/domain/0/device-model/%d/physmap/%"PRIx64"/name",
+> -                xen_domid, (uint64_t)phys_offset);
+> -        if (!xs_write(state->xenstore, 0, path, mr_name, strlen(mr_name))) {
+> -            return -1;
+> -        }
+> -    }
+> -
+>      return 0;
+>  }
+>  
+> @@ -1152,54 +1135,6 @@ static void xen_exit_notifier(Notifier *n, void *data)
+>      xs_daemon_close(state->xenstore);
+>  }
+>  
+> -static void xen_read_physmap(XenIOState *state)
+> -{
+> -    XenPhysmap *physmap = NULL;
+> -    unsigned int len, num, i;
+> -    char path[80], *value = NULL;
+> -    char **entries = NULL;
+> -
+> -    snprintf(path, sizeof(path),
+> -            "/local/domain/0/device-model/%d/physmap", xen_domid);
+> -    entries = xs_directory(state->xenstore, 0, path, &num);
+> -    if (entries == NULL)
+> -        return;
+> -
+> -    for (i = 0; i < num; i++) {
+> -        physmap = g_malloc(sizeof (XenPhysmap));
+> -        physmap->phys_offset = strtoull(entries[i], NULL, 16);
+> -        snprintf(path, sizeof(path),
+> -                "/local/domain/0/device-model/%d/physmap/%s/start_addr",
+> -                xen_domid, entries[i]);
+> -        value = xs_read(state->xenstore, 0, path, &len);
+> -        if (value == NULL) {
+> -            g_free(physmap);
+> -            continue;
+> -        }
+> -        physmap->start_addr = strtoull(value, NULL, 16);
+> -        free(value);
+> -
+> -        snprintf(path, sizeof(path),
+> -                "/local/domain/0/device-model/%d/physmap/%s/size",
+> -                xen_domid, entries[i]);
+> -        value = xs_read(state->xenstore, 0, path, &len);
+> -        if (value == NULL) {
+> -            g_free(physmap);
+> -            continue;
+> -        }
+> -        physmap->size = strtoull(value, NULL, 16);
+> -        free(value);
+> -
+> -        snprintf(path, sizeof(path),
+> -                "/local/domain/0/device-model/%d/physmap/%s/name",
+> -                xen_domid, entries[i]);
+> -        physmap->name = xs_read(state->xenstore, 0, path, &len);
+> -
+> -        QLIST_INSERT_HEAD(&state->physmap, physmap, list);
+> -    }
+> -    free(entries);
+> -}
+> -
+>  static void xen_wakeup_notifier(Notifier *notifier, void *data)
+>  {
+>      xc_set_hvm_param(xen_xc, xen_domid, HVM_PARAM_ACPI_S_STATE, 0);
+> @@ -1339,7 +1274,6 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
+>          goto err;
+>      }
+>      xen_be_register_common();
+> -    xen_read_physmap(state);
+>  
+>      /* Disable ACPI build because Xen handles it */
+>      pcms->acpi_build_enabled = false;
+> -- 
+> 2.7.4
+> 
