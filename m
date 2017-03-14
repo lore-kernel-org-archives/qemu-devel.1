@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cnqIl-0005cd-LZ
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:32:05 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1cnqLW-0006Kx-Ue
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:34:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cnqIh-00020X-M9
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:32:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35216)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cnqIh-00020D-DX
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:31:59 -0400
-References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
-	<1489385927-6735-17-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b2d0adab-3200-c74a-4c1e-d4b5bbae7b6e@redhat.com>
-Date: Tue, 14 Mar 2017 12:31:56 -0500
+	(envelope-from <balaton@eik.bme.hu>) id 1cnqLS-0002xg-UT
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 13:34:55 -0400
+Date: Tue, 14 Mar 2017 18:34:48 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <87o9x3pzxe.fsf@linaro.org>
+Message-ID: <alpine.BSF.2.20.1703141829440.39248@zero.eik.bme.hu>
+References: <36e41adf-b0b3-3efa-51c4-f1a70cd05b98@ilande.co.uk>
+	<87wpbsp49a.fsf@linaro.org>
+	<6491a446-bf23-5ab9-3431-c67efaf83f71@ilande.co.uk>
+	<alpine.BSF.2.20.1703141450560.82811@zero.eik.bme.hu>
+	<87shmfq31b.fsf@linaro.org>
+	<b9006aa4-b606-61d5-6896-8c76a6a6f8f3@ilande.co.uk>
+	<87o9x3pzxe.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1489385927-6735-17-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="tk4qKrl8QuoqKBO3Lgwb3RMtrSm9wK1xL"
-Subject: Re: [Qemu-devel] [PATCH for-2.9 16/47] qapi2texi: Convert to
- QAPISchemaVisitor
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] qemu-system-ppc video artifacts since
+ "tcg: drop global lock during TCG code execution"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,82 +29,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: =?ISO-8859-15?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, jan.kiszka@siemens.com, qemu-devel <qemu-devel@nongnu.org>, cota@braap.org, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, bobby.prani@gmail.com, fred.konrad@greensocs.com, rth@twiddle.net
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---tk4qKrl8QuoqKBO3Lgwb3RMtrSm9wK1xL
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
-Message-ID: <b2d0adab-3200-c74a-4c1e-d4b5bbae7b6e@redhat.com>
-Subject: Re: [PATCH for-2.9 16/47] qapi2texi: Convert to QAPISchemaVisitor
-References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
- <1489385927-6735-17-git-send-email-armbru@redhat.com>
-In-Reply-To: <1489385927-6735-17-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, 14 Mar 2017, Alex Benn=C3=A9e wrote:
+> So from a single-threaded -smp guest case there should be no difference
+> in behaviour. However cross-vCPU flushes are queued up using the async
+> work queue and are dealt with in the target vCPU context. In the single
+> threaded case it shouldn't matter as this work will get executed as soo=
+n
+> as round-robin scheduler gets to it:
+>
+> cpus.c/qemu_tcg_rr_cpu_thread_fn:
+>  while (cpu && !cpu->queued_work_first && !cpu->exit_request) {
+>
+> When converting a target to MTTCG its certainly something that has to
+> have attention paid to it. For example some cross-vCPU tlb flushes need
+> to be complete from the source vCPU point of view. In this case you cal=
+l
+> the tlb_flush_*_synced() variants and exit the execution loop. This
+> ensures all vCPUs have completed flushes before we continue. See
+> a67cf2772733e for what I did on ARM. However this shouldn't affect
+> anything in the single-threaded world.
 
-On 03/13/2017 01:18 AM, Markus Armbruster wrote:
-> qapi2texi works with schema expression trees.  Such a tight coupling
-> to schema language syntax is not a good idea.  Convert it to the visito=
-r
-> interface the other generators use.
->=20
-> No change to generated documentation.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  scripts/qapi2texi.py | 228 ++++++++++++++++++++++++++-----------------=
---------
->  1 file changed, 118 insertions(+), 110 deletions(-)
->=20
+I think we have a single CPU and thread for these ppc machines here so I'=
+m=20
+not sure how this could be relevant.
 
-> +    def visit_object_type(self, name, info, base, members, variants):
-> +        doc =3D self.cur_doc
-> +        if not variants:
-> +            typ =3D 'Struct'
-> +        elif variants._tag_name:        # TODO unclean member access
-> +            typ =3D 'Flat Union'
-> +        else:
-> +            typ =3D 'Simple Union'
+> However delaying tlb_flushes() could certainly expose/hide stuff that i=
+s
+> accessing the dirty mechanism. tlb_flush itself now takes the tb_lock()=
+ to
+> avoid racing with the TB invalidation logic. The act of the flush will
+> certainly wipe all existing SoftMMU entries and force a re-load on each
+> memory access.
+>
+> So is the dirty status of memory being read from outside a vCPU
+> execution context?
 
-Do we even want to document this distinction to the end user?
-Introspection managed to hide the difference by introducing the
-appropriate generated wrapper types that demonstrate the additional {}
-nesting in a way compatible with rewriting simple unions into flat
-unions.  If we don't explain the difference here, we can get rid of the
-unclean member access, but then again risk documentation that is not
-clear whether {} nesting is needed.
+Like from the display controller models that use memory_region_get_dirty(=
+)=20
+to check if the frambuffer needs to be updated? But all display adaptors=20
+seem to do this and the problem was only seem on ppc so it may be related=
+=20
+to something ppc specific.
 
-I guess there's also the fact that for this patch, you intentionally
-tried to make no difference to the generated docs (good); so any tweaks
-to union output should be later patches anyways.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---tk4qKrl8QuoqKBO3Lgwb3RMtrSm9wK1xL
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYyCkMAAoJEKeha0olJ0NqGAcH/A/XP4MT/DB4IRh6rUYSF8id
-J89ok8EPLDEPD+pNrXP3vOd36kWUnQ1Q2utIZBptWmV89Ohqvo/YlZETm3UJRXr9
-blmyWWvpzEJ3IDWrb0aBqcNgWCA/3xmWfoqvu3va6Y1TSscy6lQRSIklA5aRFll8
-p7taK+wt5gts25VlCfM4OsKwIF5b8+BO86JlZVZxK7r93emqxu5c9F/kS/3MZXAq
-QFVrW2Ubov6bl+/itn2mQbgTqlX6PSZy5eAUxaEwk/Ob2WCgBE8zoANMLw4ru1BH
-niBuZgEZpnddHvZSf/TnUZB87rc1KIbLKiVEJwWWQi/nSo1ZEd5oid9TcfEBvkE=
-=136U
------END PGP SIGNATURE-----
-
---tk4qKrl8QuoqKBO3Lgwb3RMtrSm9wK1xL--
+Regards,
+BALATON Zoltan
