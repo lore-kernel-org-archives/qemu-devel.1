@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47872)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cnhxj-0000PW-G9
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:37:48 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cnhy5-0000eL-PO
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:38:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cnhxi-0005OY-Mu
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:37:47 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:38273)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cnhy4-0005hJ-HT
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:38:09 -0400
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:35360)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cnhxi-0005O1-G7
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:37:46 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id t189so57788022wmt.1
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 01:37:46 -0700 (PDT)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1cnhy4-0005fd-5o
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 04:38:08 -0400
+Received: by mail-lf0-x244.google.com with SMTP id v2so13567257lfi.2
+	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 01:38:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170314081312.GB13140@stefanha-x1.localdomain>
-References: <87tw6y8bs8.fsf@secure.mitica>
-	<CAFEAcA978SJemCfYJPa8jwtuhhi6JGh9pEDGYNJ1npJA3nvEQA@mail.gmail.com>
-	<20170314081312.GB13140@stefanha-x1.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 14 Mar 2017 09:37:24 +0100
-Message-ID: <CAFEAcA9F2BPexRieaEhu+UpJxoOdEfw8eggW8b2SjuoMMTNgog@mail.gmail.com>
+References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
+	<1489385927-6735-11-git-send-email-armbru@redhat.com>
+In-Reply-To: <1489385927-6735-11-git-send-email-armbru@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 14 Mar 2017 08:37:56 +0000
+Message-ID: <CAJ+F1CKiostFih6p_7Msm33SjxuV9YNFOvcYkKiZqqLdM2q8jQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] KVM call for 2017-03-14
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.9 10/47] qapi2texi: Fix up output
+ around #optional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,25 +31,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Juan Quintela <quintela@redhat.com>, QEMU Developer <qemu-devel@nongnu.org>, KVM devel mailing list <kvm@vger.kernel.org>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com
 
-On 14 March 2017 at 09:13, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> On Mon, Mar 13, 2017 at 11:02:01AM +0100, Peter Maydell wrote:
-> The minimum requirements for the new language:
-> 1. Does it support the host operating systems that QEMU runs on?
-> 2. Does it support the host architectures that QEMU runs on?
+On Mon, Mar 13, 2017 at 10:23 AM Markus Armbruster <armbru@redhat.com>
+wrote:
 
-Speaking of this, I was thinking that we should introduce
-a rule that for any host OS/arch we support we must have
-a build machine so we can at least do a compile test.
-For instance if you believe configure we support Solaris
-and AIX, but I bet they're bit-rotting. The ia64 backend
-has to be a strong candidate for being dumped too.
-Demanding "system we can test on or we drop support"
-would let us more clearly see what we're actually running
-on and avoid unnecessarily ruling things out because they
-don't support Itanium or AIX...
+> We use tag #optional to mark optional members, like this:
+>
+>     # @name: #optional The name of the guest
+>
+> texi_body() strips #optional, but not whitespace around it.  For the
+> above, we get in qemu-qmp-qapi.texi
+>
+>     @item @code{'name'} (optional)
+>      The name of the guest
+>     @end table
+>
+> The extra space can lead to artifacts in output, e.g in
+> qemu-qmp-ref.7.pod
+>
+>     =3Ditem C<'name'> (optional)
+>
+>      The name of the guest
+>
+> and then in qemu-qmp-ref.7
+>
+>     .IX Item "name (optional)"
+>     .Vb 1
+>     \& The name of the guest
+>     .Ve
+>
+> instead of intended plain
+>
+>     .IX Item "name (optional)"
+>     The name of the guest
+>
+> Get rid of these artifacts by removing whitespace around #optional
+> along with it.
+>
+> This turns three minus signs in qapi-schema.json into markup, because
+> they're now at the beginning of the line.  Drop them, they're unwanted
+> there.
+>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>
 
-thanks
--- PMM
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+
+> ---
+>  qapi-schema.json     | 6 +++---
+>  scripts/qapi2texi.py | 3 ++-
+>  2 files changed, 5 insertions(+), 4 deletions(-)
+>
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 17c766e..52141cd 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -3779,11 +3779,11 @@
+>  #
+>  # @dstport: #optional destination port - mandatory for udp, optional for
+> ip
+>  #
+> -# @ipv6: #optional - force the use of ipv6
+> +# @ipv6: #optional force the use of ipv6
+>  #
+> -# @udp: #optional - use the udp version of l2tpv3 encapsulation
+> +# @udp: #optional use the udp version of l2tpv3 encapsulation
+>  #
+> -# @cookie64: #optional - use 64 bit coookies
+> +# @cookie64: #optional use 64 bit coookies
+>  #
+>  # @counter: #optional have sequence counter
+>  #
+> diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
+> index 06d6abf..0f3e573 100755
+> --- a/scripts/qapi2texi.py
+> +++ b/scripts/qapi2texi.py
+> @@ -137,7 +137,8 @@ def texi_body(doc):
+>              desc =3D str(section)
+>              opt =3D ''
+>              if "#optional" in desc:
+> -                desc =3D desc.replace("#optional", "")
+> +                desc =3D re.sub(r'^ *#optional *\n?|\n? *#optional
+> *$|#optional',
+> +                              '', desc)
+>                  opt =3D ' (optional)'
+>              body +=3D "@item @code{'%s'}%s\n%s\n" % (arg, opt,
+>                                                     texi_format(desc))
+> --
+> 2.7.4
+>
+>
+> --
+Marc-Andr=C3=A9 Lureau
