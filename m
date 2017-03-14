@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hare@suse.de>) id 1cngIA-0002bW-RA
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 02:50:47 -0400
+	(envelope-from <jgross@suse.com>) id 1cngcb-0007mN-7r
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 03:11:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hare@suse.de>) id 1cngIA-0006Rl-1c
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 02:50:46 -0400
-References: <20170313195547.21466-1-eblake@redhat.com>
-	<20170313195547.21466-26-eblake@redhat.com>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <3acf032a-18e5-b043-3863-b29efd47f048@suse.de>
-Date: Tue, 14 Mar 2017 07:50:39 +0100
+	(envelope-from <jgross@suse.com>) id 1cngcX-0004FC-Qz
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 03:11:53 -0400
+Received: from mx2.suse.de ([195.135.220.15]:41139)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jgross@suse.com>) id 1cngcX-0004Eg-H7
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 03:11:49 -0400
+References: <alpine.DEB.2.10.1703131650550.21520@sstabellini-ThinkPad-X260>
+	<1489449360-14411-1-git-send-email-sstabellini@kernel.org>
+	<1489449360-14411-4-git-send-email-sstabellini@kernel.org>
+From: Juergen Gross <jgross@suse.com>
+Message-ID: <1404f716-826a-1fe0-abe1-2be00dbba256@suse.com>
+Date: Tue, 14 Mar 2017 08:11:45 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170313195547.21466-26-eblake@redhat.com>
+In-Reply-To: <1489449360-14411-4-git-send-email-sstabellini@kernel.org>
 Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 25/30] trace: Fix parameter types in
- hw/scsi
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 4/9] xen/9pfs: introduce Xen 9pfs backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,32 +28,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, "open list:megasas" <qemu-block@nongnu.org>
+To: Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org
+Cc: xen-devel@lists.xenproject.org, anthony.perard@citrix.com, groug@kaod.org, Stefano Stabellini <stefano@aporeto.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
 
-On 03/13/2017 08:55 PM, Eric Blake wrote:
-> An upcoming patch will let the compiler warn us when we are silently
-> losing precision in traces; update the trace definitions to pass
-> through the full value at the callsite.  Also update some callers
-> to avoid variable-sized dma_addr_t (which cannot be easily used in
-> trace headers) and needless casts for values used in tracing.
->=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+On 14/03/17 00:55, Stefano Stabellini wrote:
+> Introduce the Xen 9pfs backend: add struct XenDevOps to register as a
+> Xen backend and add struct V9fsTransport to register as v9fs transport.
+> 
+> All functions are empty stubs for now.
+> 
+> Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+> CC: anthony.perard@citrix.com
+> CC: jgross@suse.com
+> CC: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
+> CC: Greg Kurz <groug@kaod.org>
 > ---
->  hw/scsi/esp-pci.c    |   2 +-
->  hw/scsi/megasas.c    |   8 ++--
->  hw/scsi/trace-events | 114 +++++++++++++++++++++++++------------------=
---------
->  3 files changed, 63 insertions(+), 61 deletions(-)
->=20
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+>  hw/9pfs/xen-9p-backend.c | 96 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 96 insertions(+)
+>  create mode 100644 hw/9pfs/xen-9p-backend.c
+> 
+> diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
+> new file mode 100644
+> index 0000000..35032d3
+> --- /dev/null
+> +++ b/hw/9pfs/xen-9p-backend.c
+> @@ -0,0 +1,96 @@
+> +/*
+> + * Xen 9p backend
+> + *
+> + * Copyright Aporeto 2017
+> + *
+> + * Authors:
+> + *  Stefano Stabellini <stefano@aporeto.com>
+> + *
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +
+> +#include "hw/hw.h"
+> +#include "hw/9pfs/9p.h"
+> +#include "hw/xen/xen_backend.h"
+> +#include "xen_9pfs.h"
+> +#include "qemu/config-file.h"
+> +#include "fsdev/qemu-fsdev.h"
+> +
+> +typedef struct Xen9pfsDev {
+> +    struct XenDevice xendev;  /* must be first */
+> +} Xen9pfsDev;
+> +
+> +static ssize_t xen_9pfs_pdu_vmarshal(V9fsPDU *pdu,
+> +                                     size_t offset,
+> +                                     const char *fmt,
+> +                                     va_list ap)
+> +{
+> +    return 0;
+> +}
+> +
+> +static ssize_t xen_9pfs_pdu_vunmarshal(V9fsPDU *pdu,
+> +                                       size_t offset,
+> +                                       const char *fmt,
+> +                                       va_list ap)
+> +{
+> +    return 0;
+> +}
+> +
+> +static void xen_9pfs_init_out_iov_from_pdu(V9fsPDU *pdu,
+> +                                           struct iovec **piov,
+> +                                           unsigned int *pniov)
+> +{
+> +}
+> +
+> +static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pdu,
+> +                                          struct iovec **piov,
+> +                                          unsigned int *pniov,
+> +                                          size_t size)
+> +{
+> +}
+> +
+> +static void xen_9pfs_push_and_notify(V9fsPDU *pdu)
+> +{
+> +}
+> +
+> +static const struct V9fsTransport xen_9p_transport = {
+> +    .pdu_vmarshal = xen_9pfs_pdu_vmarshal,
+> +    .pdu_vunmarshal = xen_9pfs_pdu_vunmarshal,
+> +    .init_in_iov_from_pdu = xen_9pfs_init_in_iov_from_pdu,
+> +    .init_out_iov_from_pdu = xen_9pfs_init_out_iov_from_pdu,
+> +    .push_and_notify = xen_9pfs_push_and_notify,
+> +};
+> +
+> +static int xen_9pfs_init(struct XenDevice *xendev)
+> +{
+> +    return 0;
+> +}
+> +
+> +static int xen_9pfs_free(struct XenDevice *xendev)
+> +{
+> +    return -1;
+> +}
+> +
+> +static int xen_9pfs_connect(struct XenDevice *xendev)
+> +{
+> +    return 0;
+> +}
+> +
+> +static void xen_9pfs_alloc(struct XenDevice *xendev)
+> +{
+> +}
+> +
+> +static void xen_9pfs_disconnect(struct XenDevice *xendev)
+> +{
+> +}
+> +
+> +struct XenDevOps xen_9pfs_ops = {
+> +    .size       = sizeof(Xen9pfsDev),
+> +    .flags      = DEVOPS_FLAG_NEED_GNTDEV,
+> +    .alloc      = xen_9pfs_alloc,
+> +    .init       = xen_9pfs_init,
+> +    .initialise    = xen_9pfs_connect,
 
-Cheers,
+Alignment?
 
-Hannes
---=20
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=FCrnberg
-GF: F. Imend=F6rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG N=FCrnberg)
+> +    .disconnect = xen_9pfs_disconnect,
+> +    .free       = xen_9pfs_free,
+> +};
+> 
+
+Juergen
