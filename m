@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cnnuw-0000oR-Ag
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 10:59:22 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cnnvy-0001Yz-3o
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:00:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cnnuv-0000cZ-1e
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 10:59:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45400)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cnnuu-0000cD-PE
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 10:59:16 -0400
-Date: Tue, 14 Mar 2017 16:59:10 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170314165824-mutt-send-email-mst@kernel.org>
-References: <1489496187-624-1-git-send-email-peterx@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cnnvs-0001Bh-GY
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:00:22 -0400
+Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:34353)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cnnvs-0001Ad-Ao
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:00:16 -0400
+Received: by mail-wr0-x230.google.com with SMTP id l37so126000751wrc.1
+	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 08:00:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1489496187-624-1-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] memory: info mtree check mr range overflow
+In-Reply-To: <1489491125-23648-1-git-send-email-peter.maydell@linaro.org>
+References: <1489491125-23648-1-git-send-email-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 14 Mar 2017 15:59:54 +0100
+Message-ID: <CAFEAcA-iRi7NcVKdGy-EgLJ4H1JB1d2iZ-22EHcOppbEqCDR=Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 0/2] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,87 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, mark.cave-ayland@ilande.co.uk, Peter Maydell <peter.maydell@linaro.org>
+To: QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, Mar 14, 2017 at 08:56:27PM +0800, Peter Xu wrote:
-> The address of memory regions might overflow when something wrong
-> happened, like reported in:
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg02043.html
-> 
-> For easier debugging, let's try to detect it.
-> 
-> Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+On 14 March 2017 at 12:32, Peter Maydell <peter.maydell@linaro.org> wrote:
+> Couple of minor patches to sneak in before rc0. The PSCI return
+> values fix is the most important one.
+>
+> -- PMM
+>
+> The following changes since commit 94b5d57d2f5a3c849cecd65e424bb6f50b998df9:
+>
+>   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-2.9-20170314' into staging (2017-03-14 10:13:19 +0000)
+>
+> are available in the git repository at:
+>
+>   git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20170314
+>
+> for you to fetch changes up to d5affb0d8677e1a8a8fe03fa25005b669e7cdc02:
+>
+>   target/arm/arm-powerctl: Fix psci info return values (2017-03-14 11:28:54 +0000)
+>
+> ----------------------------------------------------------------
+> target-arm queue:
+>  * arm-powerctl: Fix psci info return values
+>  * implement armv8 PMUSERENR (user-mode enable bits)
+>
+> ----------------------------------------------------------------
+> Andrew Baumann (1):
+>       target/arm: implement armv8 PMUSERENR (user-mode enable bits)
+>
+> Andrew Jones (1):
+>       target/arm/arm-powerctl: Fix psci info return values
+>
+>  target/arm/cpu.h    |  4 +--
+>  target/arm/helper.c | 79 +++++++++++++++++++++++++++++++++++++++++++++++------
+>  2 files changed, 73 insertions(+), 10 deletions(-)
+>
 
-I think I already commented on this.
-Please use Int128 math instead of hacks around 64 bit math.
 
+Applied, thanks.
 
-> ---
->  memory.c | 21 ++++++++++++++++-----
->  1 file changed, 16 insertions(+), 5 deletions(-)
-> 
-> diff --git a/memory.c b/memory.c
-> index 284894b..64b0a60 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -2494,6 +2494,7 @@ static void mtree_print_mr(fprintf_function mon_printf, void *f,
->      MemoryRegionListHead submr_print_queue;
->      const MemoryRegion *submr;
->      unsigned int i;
-> +    hwaddr cur_start, cur_end;
->  
->      if (!mr) {
->          return;
-> @@ -2503,6 +2504,18 @@ static void mtree_print_mr(fprintf_function mon_printf, void *f,
->          mon_printf(f, MTREE_INDENT);
->      }
->  
-> +    cur_start = base + mr->addr;
-> +    cur_end = cur_start + MR_SIZE(mr->size);
-> +
-> +    /*
-> +     * Try to detect overflow of memory region. This should never
-> +     * happen normally. When it happens, we dump something to warn the
-> +     * user who is observing this.
-> +     */
-> +    if (cur_start < base || cur_end < cur_start) {
-> +        mon_printf(f, "[DETECTED OVERFLOW!] ");
-> +    }
-> +
->      if (mr->alias) {
->          MemoryRegionList *ml;
->          bool found = false;
-> @@ -2522,8 +2535,7 @@ static void mtree_print_mr(fprintf_function mon_printf, void *f,
->          mon_printf(f, TARGET_FMT_plx "-" TARGET_FMT_plx
->                     " (prio %d, %s): alias %s @%s " TARGET_FMT_plx
->                     "-" TARGET_FMT_plx "%s\n",
-> -                   base + mr->addr,
-> -                   base + mr->addr + MR_SIZE(mr->size),
-> +                   cur_start, cur_end,
->                     mr->priority,
->                     memory_region_type((MemoryRegion *)mr),
->                     memory_region_name(mr),
-> @@ -2534,8 +2546,7 @@ static void mtree_print_mr(fprintf_function mon_printf, void *f,
->      } else {
->          mon_printf(f,
->                     TARGET_FMT_plx "-" TARGET_FMT_plx " (prio %d, %s): %s%s\n",
-> -                   base + mr->addr,
-> -                   base + mr->addr + MR_SIZE(mr->size),
-> +                   cur_start, cur_end,
->                     mr->priority,
->                     memory_region_type((MemoryRegion *)mr),
->                     memory_region_name(mr),
-> @@ -2562,7 +2573,7 @@ static void mtree_print_mr(fprintf_function mon_printf, void *f,
->      }
->  
->      QTAILQ_FOREACH(ml, &submr_print_queue, queue) {
-> -        mtree_print_mr(mon_printf, f, ml->mr, level + 1, base + mr->addr,
-> +        mtree_print_mr(mon_printf, f, ml->mr, level + 1, cur_start,
->                         alias_print_queue);
->      }
->  
-> -- 
-> 2.7.4
+-- PMM
