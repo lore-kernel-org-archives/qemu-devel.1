@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57181)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cnoqK-0005yh-C6
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:58:37 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1cnot1-0008BV-9Y
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:01:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cnoqG-0004Or-F0
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:58:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55770)
+	(envelope-from <dgilbert@redhat.com>) id 1cnosx-0006CD-7w
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:01:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55742)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cnoqG-0004Oa-5i
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 11:58:32 -0400
-References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
-	<1489385927-6735-10-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7c64dd61-f62c-caaf-66ae-1c5c53ae5c26@redhat.com>
-Date: Tue, 14 Mar 2017 10:58:29 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cnosx-0006C3-1U
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 12:01:19 -0400
+Date: Tue, 14 Mar 2017 16:01:14 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170314160113.GM2445@work-vm>
+References: <87tw6y8bs8.fsf@secure.mitica>
+	<CAFEAcA978SJemCfYJPa8jwtuhhi6JGh9pEDGYNJ1npJA3nvEQA@mail.gmail.com>
+	<20170314081312.GB13140@stefanha-x1.localdomain>
+	<CAFEAcA9F2BPexRieaEhu+UpJxoOdEfw8eggW8b2SjuoMMTNgog@mail.gmail.com>
+	<87wpbstesf.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <1489385927-6735-10-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="iLSKATNpk8Gp3NQVLEsRHNAPk7NRknGkb"
-Subject: Re: [Qemu-devel] [PATCH for-2.9 09/47] qapi: Fix to reject empty
- union base gracefully
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87wpbstesf.fsf@secure.mitica>
+Subject: Re: [Qemu-devel] KVM call for 2017-03-14
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +30,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: Juan Quintela <quintela@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developer <qemu-devel@nongnu.org>, KVM devel mailing list <kvm@vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---iLSKATNpk8Gp3NQVLEsRHNAPk7NRknGkb
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
-Message-ID: <7c64dd61-f62c-caaf-66ae-1c5c53ae5c26@redhat.com>
-Subject: Re: [PATCH for-2.9 09/47] qapi: Fix to reject empty union base
- gracefully
-References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
- <1489385927-6735-10-git-send-email-armbru@redhat.com>
-In-Reply-To: <1489385927-6735-10-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+* Juan Quintela (quintela@redhat.com) wrote:
+> Peter Maydell <peter.maydell@linaro.org> wrote:
+> > On 14 March 2017 at 09:13, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> >> On Mon, Mar 13, 2017 at 11:02:01AM +0100, Peter Maydell wrote:
+> >> The minimum requirements for the new language:
+> >> 1. Does it support the host operating systems that QEMU runs on?
+> >> 2. Does it support the host architectures that QEMU runs on?
+> >
+> > Speaking of this, I was thinking that we should introduce
+> > a rule that for any host OS/arch we support we must have
+> > a build machine so we can at least do a compile test.
+> > For instance if you believe configure we support Solaris
+> > and AIX, but I bet they're bit-rotting. The ia64 backend
+> > has to be a strong candidate for being dumped too.
+> > Demanding "system we can test on or we drop support"
+> > would let us more clearly see what we're actually running
+> > on and avoid unnecessarily ruling things out because they
+> > don't support Itanium or AIX...
+> 
+> YES, YES and YES.
+> 
+> I demand an osX build machine NOW!!!!  Remote access is ok.
+> 
+> Now more seriously, I can (relatively easy) compile test my pull
+> requests with:
+> - linux x86 (latest fedora, but I can get an older one if needed)
+> - linux x86_64 (latest fedor,, but the same)
+> - mingw64 32bit (latest fedora, but here I have the problem that Peter
+>   uses a different crosscompiler than me)
+> - mingw64 32bit (the same)
+> 
+> But for the rest, I need to wait that somebody told me that it breaks
+> the build.  Normally it is things like size_t is 32bit instead of 64bit
+> or some stupid things like that, that are trivial to fix if I can
+> compile there before doing the pull submission.
 
-On 03/13/2017 01:18 AM, Markus Armbruster wrote:
-> Common Python pitfall: 'assert base_members' fires on [] in addition
-> to None.  Correct to 'assert base_members is not None'.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  scripts/qapi.py                        |  2 +-
->  tests/qapi-schema/union-base-empty.err | 11 +----------
->  2 files changed, 2 insertions(+), 11 deletions(-)
->=20
+I also do a FreeBSD VM, and grab an aarch64 and/or PPC bigendian host
+to test on.
 
-> +++ b/tests/qapi-schema/union-base-empty.err
-> @@ -1,10 +1 @@
-> -Traceback (most recent call last):
-> -  File "tests/qapi-schema/test-qapi.py", line 56, in <module>
-> -    schema =3D QAPISchema(sys.argv[1])
-> -  File "scripts/qapi.py", line 1483, in __init__
-> -    self.exprs =3D check_exprs(parser.exprs)
-> -  File "scripts/qapi.py", line 917, in check_exprs
-> -    check_union(expr, info)
-> -  File "scripts/qapi.py", line 734, in check_union
-> -    assert base_members
-> -AssertionError
-> +tests/qapi-schema/union-base-empty.json:5: Discriminator 'type' is not=
- a member of base struct 'Empty'
+(I could grab an ia64 host, but I don't think I could find anything
+to install on it that would be new enough for the rest of our build
+requirements).
 
-Much nicer message.
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Dave
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---iLSKATNpk8Gp3NQVLEsRHNAPk7NRknGkb
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYyBMlAAoJEKeha0olJ0NqRpwH/A1GdexHacK1VVkGKpw/Euqa
-0PEe/tKvsC2uPxHSo6FykrdCWeBSs2/3rLp8ECWQon/cQ0H5KP6yC5eqc3MzZ+Iu
-pnnf/w7riha1KpELdtXjXqPx9bXBcIvCrjhcS4haEz4mwdQKJHZdFfFYar4dGLMM
-5rf3i+I6XnTpP9wyaMIrcNX6EphkwOWGZMXLBJYloHMIX/q64fTDfmRD7hYQ9WAc
-Vr/VvCspkNpZnzHNsc8hFZSYAFc8p3yKr5ZpilJZXIfe7TgqRLBhSvlXjGK5mEgy
-CdXWtT3SmeWPQenhwvGLtoBI5QyP4DNYwdwIHUjRGviiiQ7xwCW/CK1zQwwVaBU=
-=LkHO
------END PGP SIGNATURE-----
-
---iLSKATNpk8Gp3NQVLEsRHNAPk7NRknGkb--
+> Later, Juan.
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
