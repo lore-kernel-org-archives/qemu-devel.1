@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42629)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cnlce-0002mm-Rb
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:32:17 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1cnld1-00033a-95
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:32:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cnlca-0001S9-VI
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:32:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49024)
+	(envelope-from <dgilbert@redhat.com>) id 1cnlcx-0001c3-5g
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:32:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56774)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cnlca-0001Qi-Mx
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:32:12 -0400
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B01C7C05AA63
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 12:32:12 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170314103428.GD2652@redhat.com> (Daniel P. Berrange's message
-	of "Tue, 14 Mar 2017 10:34:28 +0000")
-References: <20170313124434.1043-1-quintela@redhat.com>
-	<20170313124434.1043-10-quintela@redhat.com>
-	<20170313164134.GM4799@redhat.com> <87fuihuna9.fsf@secure.mitica>
-	<20170314103428.GD2652@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Tue, 14 Mar 2017 13:32:10 +0100
-Message-ID: <87k27st4xh.fsf@secure.mitica>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cnlcw-0001bT-TS
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 08:32:35 -0400
+Date: Tue, 14 Mar 2017 12:32:30 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170314123229.GI2445@work-vm>
+References: <1488777954-4578-1-git-send-email-jasowang@redhat.com>
+	<1488777954-4578-13-git-send-email-jasowang@redhat.com>
+	<b3d2249e-9eb9-8621-e4c7-c77ac0962615@redhat.com>
+	<20170314111614.GD2445@work-vm>
+	<0f4c58f4-01a4-53d3-fb9e-6409d120827c@redhat.com>
+	<20170314113804.GF2445@work-vm>
+	<f38153ed-9a1c-4970-ac2a-610802857eb7@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 09/16] migration: Start of multiple fd work
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f38153ed-9a1c-4970-ac2a-610802857eb7@redhat.com>
+Subject: Re: [Qemu-devel] [PULL RESEND 12/19] vmxnet3: Convert ring values
+ to uint32_t's
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,69 +33,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, amit.shah@redhat.com, dgilbert@redhat.com
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-"Daniel P. Berrange" <berrange@redhat.com> wrote:
-> On Mon, Mar 13, 2017 at 05:58:06PM +0100, Juan Quintela wrote:
->> "Daniel P. Berrange" <berrange@redhat.com> wrote:
->> > On Mon, Mar 13, 2017 at 01:44:27PM +0100, Juan Quintela wrote:
->> >
->> > I still don't really like any of the changes in this file. We've now got
->> > two sets of methods which connect to a remote host and two sets of methods
->> > which accept incoming clients. I've got to think there's a better way to
->> > refactor the existing code, such that we don't need two sets of methods
->> > for the same actions
->> 
->> I am open to suggestions, basically we want to be able to:
->> - open one + n channels
->> - be sure that we got the same id on both sides of the connection.
->> 
->> You suggested on the previous iteration that I changed the FALSE in
->> *HERE* for TRUE, but I was not able to:
->> - make sure that we have opened n sockets before we continue with
->>   migration
->> - making sure that we got same id numbers in both sides, that is doable,
->>   just add a new id field
->> - right now I open a channel, and wait for the other side to open it
->>   before open the following one.  I can do things in parallel, but
->>   locking is going to be "interesting".
->> 
->> So, as said, I don't really care how we open the channels, I am totally
->> open to suggestions.  Looking at the current code, this is the best way
->> that I have been able to think of.
->
-> I think the key problem in the current design is that you delay the opening
-> of the extra socket channels. To be able to remove most of this duplication,
-> I think you need to open all the channels at once right at the start.
->
->
-> IOW, in qmp_migrate() instead of calling tcp_start_outgoing_migration()
-> just once, use a loop to call it N times (where N == number of threads).
->
-> Now this method is asynchronous, and eventually triggers a call to
-> migration_channel_connect() when the connection actually succeeds.
-> You will need to change migration_channel_connect() so that it can be
-> called multiple times. migration_channel_connect() should count how
-> many channels have been opened, and only start the migration once all
-> of them are open.
->
-> The incoming side is a little different - in qemu_start_incoming_migration()
-> you only need call tcp_start_incoming_migration() once. In the
-> socket_accept_incoming_migration() method though, you need to change the
-> 'return FALSE' to 'return TRUE', so that it continues to accept multiple
-> incoming clients. The socket_start_outgoing_migration()method needs to again
-> count the number of channels that have been opened so far, and only start
-> the actual migration once the right number are open.
->
->
-> By doing all this opening of channels upfront, you'll also make it much
-> easier to support the other migration protocols - in particular 'fd'
-> protocol needs to be extended so that libvirt can pass in multiple FDs
-> in the monitor command at once. The 'exec' protocol should also be
-> able to trivially support this by simply launching the command multiple
-> times.
+* Laurent Vivier (lvivier@redhat.com) wrote:
+> On 14/03/2017 12:38, Dr. David Alan Gilbert wrote:
+> > * Laurent Vivier (lvivier@redhat.com) wrote:
+> >> On 14/03/2017 12:16, Dr. David Alan Gilbert wrote:
+> >>> * Laurent Vivier (lvivier@redhat.com) wrote:
+> >>>> On 06/03/2017 06:25, Jason Wang wrote:
+> >>>>> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> >>>>>
+> >>>>> The index's in the Vmxnet3Ring were migrated as 32bit ints
+> >>>>> yet are declared as size_t's.  They appear to be derived
+> >>>>> from 32bit values loaded from guest memory, so actually
+> >>>>> store them as that.
+> >>>>>
+> >>>>> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> >>>>> Acked-by: Dmitry Fleytman <dmitry@daynix.com>
+> >>>>> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> >>>>> ---
+> >>>>>  hw/net/vmxnet3.c | 12 ++++++------
+> >>>>>  1 file changed, 6 insertions(+), 6 deletions(-)
+> >>>>>
+> >>>>> diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
+> >>>>> index e13a798..224c109 100644
+> >>>>> --- a/hw/net/vmxnet3.c
+> >>>>> +++ b/hw/net/vmxnet3.c
+> >>>>> @@ -141,17 +141,17 @@ typedef struct VMXNET3Class {
+> >>>>>  /* Cyclic ring abstraction */
+> >>>>>  typedef struct {
+> >>>>>      hwaddr pa;
+> >>>>> -    size_t size;
+> >>>>> -    size_t cell_size;
+> >>>>> -    size_t next;
+> >>>>> +    uint32_t size;
+> >>>>> +    uint32_t cell_size;
+> >>>>> +    uint32_t next;
+> >>>>>      uint8_t gen;
+> >>>>>  } Vmxnet3Ring;
+> >>>>>  
+> >>>>>  static inline void vmxnet3_ring_init(PCIDevice *d,
+> >>>>>  				     Vmxnet3Ring *ring,
+> >>>>>                                       hwaddr pa,
+> >>>>> -                                     size_t size,
+> >>>>> -                                     size_t cell_size,
+> >>>>> +                                     uint32_t size,
+> >>>>> +                                     uint32_t cell_size,
+> >>>>>                                       bool zero_region)
+> >>>>>  {
+> >>>>>      ring->pa = pa;
+> >>>>> @@ -166,7 +166,7 @@ static inline void vmxnet3_ring_init(PCIDevice *d,
+> >>>>>  }
+> >>>>>  
+> >>>>>  #define VMXNET3_RING_DUMP(macro, ring_name, ridx, r)                         \
+> >>>>> -    macro("%s#%d: base %" PRIx64 " size %zu cell_size %zu gen %d next %zu",  \
+> >>>>> +    macro("%s#%d: base %" PRIx64 " size %u cell_size %u gen %d next %u",  \
+> >>>>>            (ring_name), (ridx),                                               \
+> >>>>>            (r)->pa, (r)->size, (r)->cell_size, (r)->gen, (r)->next)
+> >>>>>  
+> >>>>>
+> >>>>
+> >>>>
+> >>>> David, with '-dump-vmstate' with 2.8 machine type and with v2.8 and
+> >>>> master I can see the size of "txq_descr" and "rxq_descr" changes because
+> >>>> of "sizeof(Vmxnet3TxqDescr)" and "sizeof(Vmxnet3RxqDescr)". This changes
+> >>>> because the size of Vmxnet3Ring has changed with the s/size_t/uint32_t/":
+> >>>>
+> >>>>         {
+> >>>>           "field": "txq_descr",
+> >>>>           "version_id": 0,
+> >>>>           "field_exists": false,
+> >>>>           "size": 176
+> >>>>         },
+> >>>>         {
+> >>>>           "field": "rxq_descr",
+> >>>>           "version_id": 0,
+> >>>>           "field_exists": false,
+> >>>>           "size": 216
+> >>>>         },
+> >>>>
+> >>>> becomes:
+> >>>>
+> >>>>         {
+> >>>>           "field": "txq_descr",
+> >>>>           "version_id": 0,
+> >>>>           "field_exists": false,
+> >>>>           "size": 144
+> >>>>         },
+> >>>>         {
+> >>>>           "field": "rxq_descr",
+> >>>>           "version_id": 0,
+> >>>>           "field_exists": false,
+> >>>>           "size": 168
+> >>>>         },
+> >>>
+> >>> But the old migration code used to write these fields using qemu_put_be32
+> >>> (from a11f5cb005f9854f0d78da97fc23adf5bc8c83f3)
+> >>>
+> >>> -static void vmxnet3_put_ring_to_file(QEMUFile *f, Vmxnet3Ring *r)
+> >>> -{
+> >>> -    qemu_put_be64(f, r->pa);
+> >>> -    qemu_put_be32(f, r->size);
+> >>> -    qemu_put_be32(f, r->cell_size);
+> >>> -    qemu_put_be32(f, r->next);
+> >>> -    qemu_put_byte(f, r->gen);
+> >>> -}
+> >>>
+> >>> +static const VMStateDescription vmstate_vmxnet3_ring = {
+> >>> +    .name = "vmxnet3-ring",
+> >>> +    .version_id = 0,
+> >>> +    .fields = (VMStateField[]) {
+> >>> +        VMSTATE_UINT64(pa, Vmxnet3Ring),
+> >>> +        VMSTATE_UINT32(size, Vmxnet3Ring),
+> >>> +        VMSTATE_UINT32(cell_size, Vmxnet3Ring),
+> >>> +        VMSTATE_UINT32(next, Vmxnet3Ring),
+> >>> +        VMSTATE_UINT8(gen, Vmxnet3Ring),
+> >>> +        VMSTATE_END_OF_LIST()
+> >>> +    }
+> >>>  };
+> >>>
+> >>> so they used to be size_t's written with be32 and now they're uint32_t's
+> >>> written as 32bit - so that should be the same.
+> >>> I'm not sure i understand where the old txq_descr sizes come from - what
+> >>> managed to print the 176 number before it was converted to VMState?
+> >>
+> >> I think it comes from the sizeof() in VMSTATE_STRUCT(Vmxnet3TxqDescr):
+> >>
+> >> static const VMStateDescription vmstate_vmxnet3_txq_descr = {
+> >>     .name = "vmxnet3-txq-descr",
+> >>     .version_id = 0,
+> >>     .fields = (VMStateField[]) {
+> >>         VMSTATE_STRUCT(tx_ring, Vmxnet3TxqDescr, 0, vmstate_vmxnet3_ring,
+> >>                        Vmxnet3Ring),
+> >>         VMSTATE_STRUCT(comp_ring, Vmxnet3TxqDescr, 0, vmstate_vmxnet3_ring,
+> >>                        Vmxnet3Ring),
+> >>         VMSTATE_UINT8(intr_idx, Vmxnet3TxqDescr),
+> >>         VMSTATE_UINT64(tx_stats_pa, Vmxnet3TxqDescr),
+> >>         VMSTATE_STRUCT(txq_stats, Vmxnet3TxqDescr, 0,
+> >> vmstate_vmxnet3_tx_stats,
+> >>                        struct UPT1_TxStats),
+> >>         VMSTATE_END_OF_LIST()
+> >>     }
+> >> };
+> >>
+> >> I will check the '-dump-vmstate' code to see if it's relevant.
+> > 
+> > OK, but that sizeof() should never make it onto the wire; all that
+> > teh VMSTATE_STRUCT should do is execute the vmstate_vmxnet3_ring on
+> > that data.
+> > (And again I'm curious what happened in the version before I committed
+> > that change).
+> > 
+> >>>
+> >>>> And if I try a migration, I have:
+> >>>>
+> >>>> qemu/migration/vmstate.c:112: vmstate_load_state: Assertion `first_elem
+> >>>> || !n_elems' failed.
+> >>>
+> >>> Interesting; that's Halil's new assert; I need to look.
+> >>
+> >> Can't it be related to the size problem?
+> > 
+> > It could, I need to see exactly how it's failing; what was the full
+> > command line you used, and with what guest?
+> 
+> Tested with pseries machine type on ppc64le host, no guest started.
+> 
+> qemu-system-ppc64 -M pseries-2.8 -S -serial mon:stdio -vnc :0 -device
+> vmxnet3
 
-Ok. Thanks.  Will look into this.
+OK, I can trigger this on x86 on outgoing migration - the same assert
+but in the vmstate_save_state side;  for me it's in the older vmxstate_vmxnet3_mcast_list
+can you confirm that it's the same structure you're hitting on the load side?
 
-Later, Juan.
+Dave
+
+> Laurent
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
