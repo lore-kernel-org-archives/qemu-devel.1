@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cncih-0007Sr-WD
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 23:01:57 -0400
+	(envelope-from <jasowang@redhat.com>) id 1cncik-0007U3-3l
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 23:02:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cncig-0002VU-M2
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 23:01:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57320)
+	(envelope-from <jasowang@redhat.com>) id 1cncij-0002Wj-Cq
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 23:01:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54904)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cncig-0002VJ-EK
-	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 23:01:54 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cncij-0002W8-6r
+	for qemu-devel@nongnu.org; Mon, 13 Mar 2017 23:01:57 -0400
 From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 14 Mar 2017 11:01:41 +0800
-Message-Id: <1489460502-6686-3-git-send-email-jasowang@redhat.com>
+Date: Tue, 14 Mar 2017 11:01:42 +0800
+Message-Id: <1489460502-6686-4-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1489460502-6686-1-git-send-email-jasowang@redhat.com>
 References: <1489460502-6686-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PATCH V3 2/3] virtio: destroy region cache during
- reset
+Subject: [Qemu-devel] [PATCH V3 3/3] virtio: validate address space cache
+ during init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,181 +27,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mst@redhat.com, qemu-devel@nongnu.org
 Cc: Jason Wang <jasowang@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-We don't destroy region cache during reset which can make the maps
-of previous driver leaked to a buggy or malicious driver that don't
-set vring address before starting to use the device. Fix this by
-destroy the region cache during reset and validate it before trying to
-see them.
+We don't check the return value of address_space_cache_init(), this
+may lead buggy driver use incorrect region caches. Instead of
+triggering an assert, catch and warn this early in
+virtio_init_region_cache().
 
 Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
-Changes from V2:
-- introduce a helper and assert caches != NULL
-Changes from v1:
-- switch to use rcu in virtio_virtqueue_region_cache()
-- use unlikely() when needed
----
- hw/virtio/virtio.c | 46 ++++++++++++++++++++++++++++++----------------
- 1 file changed, 30 insertions(+), 16 deletions(-)
+ hw/virtio/virtio.c | 33 +++++++++++++++++++++++++++------
+ 1 file changed, 27 insertions(+), 6 deletions(-)
 
 diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 9164579..f607a09 100644
+index f607a09..7714688 100644
 --- a/hw/virtio/virtio.c
 +++ b/hw/virtio/virtio.c
-@@ -185,10 +185,16 @@ static void vring_desc_read(VirtIODevice *vdev, VRingDesc *desc,
-     virtio_tswap16s(vdev, &desc->next);
- }
+@@ -131,6 +131,7 @@ static void virtio_init_region_cache(VirtIODevice *vdev, int n)
+     VRingMemoryRegionCaches *new;
+     hwaddr addr, size;
+     int event_size;
++    int64_t len;
  
-+static VRingMemoryRegionCaches *vring_get_region_caches(struct VirtQueue *vq)
-+{
-+    VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
-+    assert(caches != NULL);
-+    return caches;
-+}
- /* Called within rcu_read_lock().  */
- static inline uint16_t vring_avail_flags(VirtQueue *vq)
- {
--    VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
-+    VRingMemoryRegionCaches *caches = vring_get_region_caches(vq);
-     hwaddr pa = offsetof(VRingAvail, flags);
-     return virtio_lduw_phys_cached(vq->vdev, &caches->avail, pa);
- }
-@@ -196,7 +202,7 @@ static inline uint16_t vring_avail_flags(VirtQueue *vq)
- /* Called within rcu_read_lock().  */
- static inline uint16_t vring_avail_idx(VirtQueue *vq)
- {
--    VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
-+    VRingMemoryRegionCaches *caches = vring_get_region_caches(vq);
-     hwaddr pa = offsetof(VRingAvail, idx);
-     vq->shadow_avail_idx = virtio_lduw_phys_cached(vq->vdev, &caches->avail, pa);
-     return vq->shadow_avail_idx;
-@@ -205,7 +211,7 @@ static inline uint16_t vring_avail_idx(VirtQueue *vq)
- /* Called within rcu_read_lock().  */
- static inline uint16_t vring_avail_ring(VirtQueue *vq, int i)
- {
--    VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
-+    VRingMemoryRegionCaches *caches = vring_get_region_caches(vq);
-     hwaddr pa = offsetof(VRingAvail, ring[i]);
-     return virtio_lduw_phys_cached(vq->vdev, &caches->avail, pa);
- }
-@@ -220,7 +226,7 @@ static inline uint16_t vring_get_used_event(VirtQueue *vq)
- static inline void vring_used_write(VirtQueue *vq, VRingUsedElem *uelem,
-                                     int i)
- {
--    VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
-+    VRingMemoryRegionCaches *caches = vring_get_region_caches(vq);
-     hwaddr pa = offsetof(VRingUsed, ring[i]);
-     virtio_tswap32s(vq->vdev, &uelem->id);
-     virtio_tswap32s(vq->vdev, &uelem->len);
-@@ -231,7 +237,7 @@ static inline void vring_used_write(VirtQueue *vq, VRingUsedElem *uelem,
- /* Called within rcu_read_lock().  */
- static uint16_t vring_used_idx(VirtQueue *vq)
- {
--    VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
-+    VRingMemoryRegionCaches *caches = vring_get_region_caches(vq);
-     hwaddr pa = offsetof(VRingUsed, idx);
-     return virtio_lduw_phys_cached(vq->vdev, &caches->used, pa);
- }
-@@ -239,7 +245,7 @@ static uint16_t vring_used_idx(VirtQueue *vq)
- /* Called within rcu_read_lock().  */
- static inline void vring_used_idx_set(VirtQueue *vq, uint16_t val)
- {
--    VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
-+    VRingMemoryRegionCaches *caches = vring_get_region_caches(vq);
-     hwaddr pa = offsetof(VRingUsed, idx);
-     virtio_stw_phys_cached(vq->vdev, &caches->used, pa, val);
-     address_space_cache_invalidate(&caches->used, pa, sizeof(val));
-@@ -249,11 +255,10 @@ static inline void vring_used_idx_set(VirtQueue *vq, uint16_t val)
- /* Called within rcu_read_lock().  */
- static inline void vring_used_flags_set_bit(VirtQueue *vq, int mask)
- {
--    VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
-+    VRingMemoryRegionCaches *caches = vring_get_region_caches(vq);
-     VirtIODevice *vdev = vq->vdev;
-     hwaddr pa = offsetof(VRingUsed, flags);
-     uint16_t flags = virtio_lduw_phys_cached(vq->vdev, &caches->used, pa);
--
-     virtio_stw_phys_cached(vdev, &caches->used, pa, flags | mask);
-     address_space_cache_invalidate(&caches->used, pa, sizeof(flags));
- }
-@@ -261,7 +266,7 @@ static inline void vring_used_flags_set_bit(VirtQueue *vq, int mask)
- /* Called within rcu_read_lock().  */
- static inline void vring_used_flags_unset_bit(VirtQueue *vq, int mask)
- {
--    VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
-+    VRingMemoryRegionCaches *caches = vring_get_region_caches(vq);
-     VirtIODevice *vdev = vq->vdev;
-     hwaddr pa = offsetof(VRingUsed, flags);
-     uint16_t flags = virtio_lduw_phys_cached(vq->vdev, &caches->used, pa);
-@@ -279,7 +284,7 @@ static inline void vring_set_avail_event(VirtQueue *vq, uint16_t val)
-         return;
+     event_size = virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX) ? 2 : 0;
+ 
+@@ -140,21 +141,41 @@ static void virtio_init_region_cache(VirtIODevice *vdev, int n)
      }
- 
--    caches = atomic_rcu_read(&vq->vring.caches);
-+    caches = vring_get_region_caches(vq);
-     pa = offsetof(VRingUsed, ring[vq->vring.num]);
-     virtio_stw_phys_cached(vq->vdev, &caches->used, pa, val);
-     address_space_cache_invalidate(&caches->used, pa, sizeof(val));
-@@ -577,7 +582,7 @@ void virtqueue_get_avail_bytes(VirtQueue *vq, unsigned int *in_bytes,
-     total_bufs = in_total = out_total = 0;
- 
-     max = vq->vring.num;
--    caches = atomic_rcu_read(&vq->vring.caches);
-+    caches = vring_get_region_caches(vq);
-     if (caches->desc.len < max * sizeof(VRingDesc)) {
-         virtio_error(vdev, "Cannot map descriptor ring");
-         goto err;
-@@ -844,7 +849,7 @@ void *virtqueue_pop(VirtQueue *vq, size_t sz)
- 
-     i = head;
- 
--    caches = atomic_rcu_read(&vq->vring.caches);
-+    caches = vring_get_region_caches(vq);
-     if (caches->desc.len < max * sizeof(VRingDesc)) {
-         virtio_error(vdev, "Cannot map descriptor ring");
-         goto done;
-@@ -1143,6 +1148,17 @@ static enum virtio_device_endian virtio_current_cpu_endian(void)
-     }
- }
- 
-+static void virtio_virtqueue_reset_region_cache(struct VirtQueue *vq)
-+{
-+    VRingMemoryRegionCaches *caches;
-+
-+    caches = atomic_read(&vq->vring.caches);
-+    atomic_rcu_set(&vq->vring.caches, NULL);
-+    if (caches) {
-+        call_rcu(caches, virtio_free_region_cache, rcu);
+     new = g_new0(VRingMemoryRegionCaches, 1);
+     size = virtio_queue_get_desc_size(vdev, n);
+-    address_space_cache_init(&new->desc, vdev->dma_as,
+-                             addr, size, false);
++    len = address_space_cache_init(&new->desc, vdev->dma_as,
++                                   addr, size, false);
++    if (len < size) {
++        virtio_error(vdev, "Cannot map desc");
++        goto err_desc;
 +    }
-+}
+ 
+     size = virtio_queue_get_used_size(vdev, n) + event_size;
+-    address_space_cache_init(&new->used, vdev->dma_as,
+-                             vq->vring.used, size, true);
++    len = address_space_cache_init(&new->used, vdev->dma_as,
++                                   vq->vring.used, size, true);
++    if (len < size) {
++        virtio_error(vdev, "Cannot map used");
++        goto err_used;
++    }
+ 
+     size = virtio_queue_get_avail_size(vdev, n) + event_size;
+-    address_space_cache_init(&new->avail, vdev->dma_as,
+-                             vq->vring.avail, size, false);
++    len = address_space_cache_init(&new->avail, vdev->dma_as,
++                                   vq->vring.avail, size, false);
++    if (len < size) {
++        virtio_error(vdev, "Cannot map avail");
++        goto err_avail;
++    }
+ 
+     atomic_rcu_set(&vq->vring.caches, new);
+     if (old) {
+         call_rcu(old, virtio_free_region_cache, rcu);
+     }
++    return;
 +
- void virtio_reset(void *opaque)
- {
-     VirtIODevice *vdev = opaque;
-@@ -1183,6 +1199,7 @@ void virtio_reset(void *opaque)
-         vdev->vq[i].notification = true;
-         vdev->vq[i].vring.num = vdev->vq[i].vring.num_default;
-         vdev->vq[i].inuse = 0;
-+        virtio_virtqueue_reset_region_cache(&vdev->vq[i]);
-     }
++err_avail:
++    address_space_cache_destroy(&new->used);
++err_used:
++    address_space_cache_destroy(&new->desc);
++err_desc:
++    g_free(new);
  }
  
-@@ -2477,13 +2494,10 @@ static void virtio_device_free_virtqueues(VirtIODevice *vdev)
-     }
- 
-     for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
--        VRingMemoryRegionCaches *caches;
-         if (vdev->vq[i].vring.num == 0) {
-             break;
-         }
--        caches = atomic_read(&vdev->vq[i].vring.caches);
--        atomic_set(&vdev->vq[i].vring.caches, NULL);
--        virtio_free_region_cache(caches);
-+        virtio_virtqueue_reset_region_cache(&vdev->vq[i]);
-     }
-     g_free(vdev->vq);
- }
+ /* virt queue functions */
 -- 
 2.7.4
