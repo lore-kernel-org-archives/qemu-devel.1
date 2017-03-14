@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38162)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tklauser@sym2.noone.org>) id 1cnmvw-0004rR-Qe
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:56:17 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1cnnDF-0008Lc-Ba
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 10:14:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tklauser@sym2.noone.org>) id 1cnmvs-0000qb-OH
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:56:16 -0400
-Received: from sym2.noone.org ([178.63.92.236]:52594)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tklauser@sym2.noone.org>)
-	id 1cnmvs-0000pY-IJ
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 09:56:12 -0400
-Date: Tue, 14 Mar 2017 14:56:05 +0100
-From: Tobias Klauser <tklauser@distanz.ch>
-Message-ID: <20170314135605.GG4142@distanz.ch>
-References: <1486947403-22548-1-git-send-email-juro.bystricky@intel.com>
+	(envelope-from <dgilbert@redhat.com>) id 1cnnDE-0002Is-9p
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 10:14:09 -0400
+Date: Tue, 14 Mar 2017 14:13:57 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170314141356.GK2445@work-vm>
+References: <20170310044402.38880-1-haoqf@linux.vnet.ibm.com>
+	<20170310044402.38880-2-haoqf@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1486947403-22548-1-git-send-email-juro.bystricky@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v6] nios2: Add Altera JTAG UART emulation
+In-Reply-To: <20170310044402.38880-2-haoqf@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] vmstate: fix failed iotests case 68
+ and 91
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,45 +24,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juro Bystricky <juro.bystricky@intel.com>
-Cc: qemu-devel@nongnu.org, marex@denx.de, crwulff@gmail.com, jurobystricky@hotmail.com, fred.konrad@greensocs.com
+To: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com, pasic@linux.vnet.ibm.com, liujbjl@linux.vnet.ibm.com, kwolf@redhat.com, famz@redhat.com, mreitz@redhat.com, quintela@redhat.com
 
-On 2017-02-13 at 01:56:43 +0100, Juro Bystricky <juro.bystricky@intel.com> wrote:
-> Add the Altera JTAG UART model.
+* QingFeng Hao (haoqf@linux.vnet.ibm.com) wrote:
+> This problem affects s390x only if we are running without KVM.
+> Basically, S390CPU.irqstate is unused if we do not use KVM,
+> and thus no buffer is allocated.
+> This causes size=0, first_elem=NULL and n_elems=1 in
+> vmstate_load_state and vmstate_save_state. And the assert fails.
+> With this fix we can go back to the old behavior and support
+> VMS_VBUFFER with size 0 and nullptr.
 > 
-> Hardware emulation based on:
-> https://www.altera.com/en_US/pdfs/literature/ug/ug_embedded_ip.pdf
-> (Please see "Register Map" on page 65)
+> Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+
+Thanks, and fixes problem with vmxnet3 migration.
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+Dave
+
+> ---
+>  migration/vmstate.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 > 
-> Signed-off-by: Juro Bystricky <juro.bystricky@intel.com>
-
-After instantiating an Altera UART in nios2_10m50_ghrd_init
-(hw/nios2/10m50_devboard.c) using the following:
-
-    altera_juart_create(1, 0xf8001530, irq[7], 64);
-
-and adjusting the use of VMSTATE_VBUFFER_UINT32() to omit the _start argument
-(see below), I was able to successfully boot Linux with console on Altera JTAG
-UART with "qemu-system-nios2 -M 10m50-ghrd" using this patch.
-
-Feel free to add my
-
-Tested-by: Tobias Klauser <tklauser@distanz.ch>
-
-> diff --git a/hw/char/altera_juart.c b/hw/char/altera_juart.c
-[...]
-> +static const VMStateDescription vmstate_altera_juart = {
-> +    .name = "altera-juart" ,
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINT32(jdata, AlteraJUARTState),
-> +        VMSTATE_UINT32(jcontrol, AlteraJUARTState),
-> +        VMSTATE_VBUFFER_UINT32(rx_fifo, AlteraJUARTState, 1, NULL, 0, rx_fifo_size),
-
-This should now be
-
-        VMSTATE_VBUFFER_UINT32(rx_fifo, AlteraJUARTState, 1, NULL, rx_fifo_size),
-
-due to commit 59046ec29ad4 ("migration: consolidate VMStateField.start")
-getting rid of the _start macro argument.
+> diff --git a/migration/vmstate.c b/migration/vmstate.c
+> index 78b3cd4..7b4a607 100644
+> --- a/migration/vmstate.c
+> +++ b/migration/vmstate.c
+> @@ -109,7 +109,7 @@ int vmstate_load_state(QEMUFile *f, const VMStateDescription *vmsd,
+>              vmstate_handle_alloc(first_elem, field, opaque);
+>              if (field->flags & VMS_POINTER) {
+>                  first_elem = *(void **)first_elem;
+> -                assert(first_elem  || !n_elems);
+> +                assert(first_elem || !n_elems || !size);
+>              }
+>              for (i = 0; i < n_elems; i++) {
+>                  void *curr_elem = first_elem + size * i;
+> @@ -117,7 +117,7 @@ int vmstate_load_state(QEMUFile *f, const VMStateDescription *vmsd,
+>                  if (field->flags & VMS_ARRAY_OF_POINTER) {
+>                      curr_elem = *(void **)curr_elem;
+>                  }
+> -                if (!curr_elem) {
+> +                if (!curr_elem && size) {
+>                      /* if null pointer check placeholder and do not follow */
+>                      assert(field->flags & VMS_ARRAY_OF_POINTER);
+>                      ret = vmstate_info_nullptr.get(f, curr_elem, size, NULL);
+> @@ -325,7 +325,7 @@ void vmstate_save_state(QEMUFile *f, const VMStateDescription *vmsd,
+>              trace_vmstate_save_state_loop(vmsd->name, field->name, n_elems);
+>              if (field->flags & VMS_POINTER) {
+>                  first_elem = *(void **)first_elem;
+> -                assert(first_elem  || !n_elems);
+> +                assert(first_elem || !n_elems || !size);
+>              }
+>              for (i = 0; i < n_elems; i++) {
+>                  void *curr_elem = first_elem + size * i;
+> @@ -336,7 +336,7 @@ void vmstate_save_state(QEMUFile *f, const VMStateDescription *vmsd,
+>                      assert(curr_elem);
+>                      curr_elem = *(void **)curr_elem;
+>                  }
+> -                if (!curr_elem) {
+> +                if (!curr_elem && size) {
+>                      /* if null pointer write placeholder and do not follow */
+>                      assert(field->flags & VMS_ARRAY_OF_POINTER);
+>                      vmstate_info_nullptr.put(f, curr_elem, size, NULL, NULL);
+> -- 
+> 1.8.3.1
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
