@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59355)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cnl0f-0004Eo-9M
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:53:02 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cnl0r-0004Mg-Hz
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:53:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cnl0c-0001UE-3B
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:53:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52928)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cnl0b-0001U5-R5
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:52:58 -0400
-Date: Tue, 14 Mar 2017 11:52:53 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170314115253.GL2652@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170314113209.12025-1-eduardo.otubo@profitbricks.com>
-	<20170314113209.12025-4-eduardo.otubo@profitbricks.com>
-	<e9b2bd2a-8409-7470-76bb-32f15fe6ce0e@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cnl0q-0001Wo-Oz
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:53:13 -0400
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:35531)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cnl0q-0001WF-Ii
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 07:53:12 -0400
+Received: by mail-wm0-x235.google.com with SMTP id v186so61921938wmd.0
+	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 04:53:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <e9b2bd2a-8409-7470-76bb-32f15fe6ce0e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/5] seccomp: add elevateprivileges
- argument to command line
+In-Reply-To: <1487616072-9226-1-git-send-email-peter.maydell@linaro.org>
+References: <1487616072-9226-1-git-send-email-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 14 Mar 2017 12:52:50 +0100
+Message-ID: <CAFEAcA-j1NSm=_H=V5xJNx=Hv3_P7M+UdVB6gMpL-dS+5NXL1Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/4] arm: Fix M profile MSR/MRS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,64 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Eduardo Otubo <eduardo.otubo@profitbricks.com>, qemu-devel@nongnu.org, thuth@redhat.com
+To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Michael Davidsaver <mdavidsaver@gmail.com>, "patches@linaro.org" <patches@linaro.org>
 
-On Tue, Mar 14, 2017 at 12:47:10PM +0100, Paolo Bonzini wrote:
-> 
-> 
-> On 14/03/2017 12:32, Eduardo Otubo wrote:
-> > This patch introduces the new argument [,elevateprivileges=deny] to the
-> > `-sandbox on'. It avoids Qemu process to elevate its privileges by
-> > blacklisting all set*uid|gid system calls
-> > 
-> > Signed-off-by: Eduardo Otubo <eduardo.otubo@profitbricks.com>
-> > ---
-> >  include/sysemu/seccomp.h |  1 +
-> >  qemu-options.hx          |  8 ++++++--
-> >  qemu-seccomp.c           | 28 ++++++++++++++++++++++++++++
-> >  vl.c                     | 11 +++++++++++
-> >  4 files changed, 46 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/include/sysemu/seccomp.h b/include/sysemu/seccomp.h
-> > index 7a7bde246b..e6e78d85ce 100644
-> > --- a/include/sysemu/seccomp.h
-> > +++ b/include/sysemu/seccomp.h
-> > @@ -16,6 +16,7 @@
-> >  #define QEMU_SECCOMP_H
-> >  
-> >  #define OBSOLETE    0x0001
-> > +#define PRIVILEGED  0x0010
-> >  
-> >  #include <seccomp.h>
-> >  
-> > diff --git a/qemu-options.hx b/qemu-options.hx
-> > index 1403d0c85f..47018db5aa 100644
-> > --- a/qemu-options.hx
-> > +++ b/qemu-options.hx
-> > @@ -3732,8 +3732,10 @@ Old param mode (ARM only).
-> >  ETEXI
-> >  
-> >  DEF("sandbox", HAS_ARG, QEMU_OPTION_sandbox, \
-> > -    "-sandbox on[,obsolete=allow]  Enable seccomp mode 2 system call filter (default 'off').\n" \
-> > -    "                              obsolete: Allow obsolete system calls",
-> > +    "-sandbox on[,obsolete=allow][,elevateprivileges=deny]\n" \
-> > +    "                               Enable seccomp mode 2 system call filter (default 'off').\n" \
-> > +    "                               obsolete: Allow obsolete system calls\n" \
-> > +    "                               elevateprivileges: avoids Qemu process to elevate its privileges by blacklisting all set*uid|gid system calls",
-> 
-> Why allow these by default?
+Ping for review -- since this is a bugfix it should go
+into 2.9.
 
-The goal is that '-sandbox on' should not break *any* QEMU feature. It
-needs to be a safe thing that people can unconditionally turn on without
-thinking about it.  The QEMU bridge helper  requires setuid privs, hence
-elevated privileges needs to be permitted by default. Similarly I could
-see the qemu ifup  scripts, or migrate 'exec' command wanting to elevate
-privs via setuid binaries if QEMU was running unprivileged.
+thanks
+-- PMM
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+On 20 February 2017 at 19:41, Peter Maydell <peter.maydell@linaro.org> wrote:
+> This patchseries fixes up some deficiencies and one nasty
+> bug in the M profile MSR/MRS handling.
+>
+> The first three patches are just cleaning up the decode
+> so that we UNDEF where we should in the MRS/MSR space
+> for M profile -- this won't have caused any problems in
+> practice since real world code doesn't generally execute
+> UNDEFfing instructions on purpose.
+>
+> The fourth patch fixes a nasty bug that I introduced in
+> commit 58117c9bb429cd which broke APSR writes via MSR,
+> and brings them into line with the pseudocode by allowing
+> writes to the APSR GE[3:0] bits when the CPU implements
+> the DSP extensions.
+>
+> Alex -- I should have paid closer attention to your review
+> comments on the patch that became commit 58117c9bb429cd;
+> sorry about that. I knew we didn't get the GE[3:0] stuff
+> right yet but I didn't spot that we'd managed to invert
+> the sense of the SYSm bit 2 test in that patch :-(
+>
+> thanks
+> -- PMM
+>
+> Peter Maydell (4):
+>   arm: HVC and SMC encodings don't exist for M profile
+>   arm: Don't decode MRS(banked) or MSR(banked) for M profile
+>   arm: Enforce should-be-1 bits in MRS decoding
+>   arm: Fix APSR writes via M profile MSR
+>
+>  target/arm/helper.c    | 26 ++++++++++++++++++++++----
+>  target/arm/translate.c | 26 +++++++++++++++++++++++---
+>  2 files changed, 45 insertions(+), 7 deletions(-)
