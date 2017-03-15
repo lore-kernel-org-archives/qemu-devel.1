@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56675)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1coAht-0005Df-U1
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 11:19:27 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1coAq6-0007cJ-W1
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 11:27:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1coAhp-0001x8-0u
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 11:19:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50342)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1coAho-0001w3-Ov
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 11:19:16 -0400
-References: <1489582656-31133-1-git-send-email-armbru@redhat.com>
-	<1489582656-31133-3-git-send-email-armbru@redhat.com>
-	<3a9be3bd-4634-8ce8-8d95-04b4efa645d0@redhat.com>
-	<87vara8tes.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1e7fece0-7f01-947f-8562-4096cad4f861@redhat.com>
-Date: Wed, 15 Mar 2017 10:19:14 -0500
-MIME-Version: 1.0
-In-Reply-To: <87vara8tes.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="PwgscOUnDcQWKEiNBNIERnpdksU9k9nVI"
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.9 02/47] qapi: Make doc comments
- optional where we don't need them
+	(envelope-from <programmingkidx@gmail.com>) id 1coAq2-0006s8-4T
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 11:27:51 -0400
+Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:36181)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1coAq2-0006s2-02
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 11:27:46 -0400
+Received: by mail-it0-x242.google.com with SMTP id u69so3418390ita.3
+	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 08:27:45 -0700 (PDT)
+In-Reply-To: <mailman.59002.1489587913.22740.qemu-devel@nongnu.org>
+References: <mailman.59002.1489587913.22740.qemu-devel@nongnu.org>
+Mime-Version: 1.0 (Apple Message framework v753.1)
+Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
+Message-Id: <BAC71F10-E3E4-4983-A4A9-2BB3B563B636@gmail.com>
+Content-Transfer-Encoding: 7bit
+From: G 3 <programmingkidx@gmail.com>
+Date: Wed, 15 Mar 2017 11:27:42 -0400
+Subject: Re: [Qemu-devel] [PATCH v3 0/2] hw/i386: Update FADT to Revision 3
+ (ACPI 2.0)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,78 +30,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: Phil Dennis-Jordan <phil@philjordan.eu>
+Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PwgscOUnDcQWKEiNBNIERnpdksU9k9nVI
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com,
- mdroth@linux.vnet.ibm.com
-Message-ID: <1e7fece0-7f01-947f-8562-4096cad4f861@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.9 02/47] qapi: Make doc comments
- optional where we don't need them
-References: <1489582656-31133-1-git-send-email-armbru@redhat.com>
- <1489582656-31133-3-git-send-email-armbru@redhat.com>
- <3a9be3bd-4634-8ce8-8d95-04b4efa645d0@redhat.com>
- <87vara8tes.fsf@dusky.pond.sub.org>
-In-Reply-To: <87vara8tes.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 03/15/2017 10:13 AM, Markus Armbruster wrote:
-
->>> +Pragma's scope is currently the complete schema.  Setting it to
+On Mar 15, 2017, at 10:25 AM, qemu-devel-request@nongnu.org wrote:
+>
+> On Wed, Mar 15, 2017 at 07:20:25PM +1300, Phil Dennis-Jordan wrote:
+>> This updates the FADT generated for x86/64 machine types from  
+>> Revision 1 to 3. (Based on ACPI standard 2.0 instead of 1.0) As  
+>> previously, the goal is to make running macOS/OS X guests  
+>> smoother. With a Rev1 FADT, rebooting such a guest doesn't work,  
+>> as the OS uses the reset register information from the FADT.  
+>> Switching to a Rev3 (ACPI 2.0) FADT solves this problem.
 >>
->> You can do:
+>> The previous discussion of this raised a bunch of points, which  
+>> I'll address/clarify here as well:
 >>
->> { 'pragma': { 'doc-required': true } }
->> { 'pragma': { 'whitelist': [...] } }
+>>  1. No runtime option. The preference was expressed that we try to  
+>> stay backwards-compatible with legacy guests as opposed to adding  
+>> a runtime option for different APCI versions. ACPI 2.0/FADT Rev3  
+>> is the minimum version required for exposing the reset register,  
+>> and it is also backwards-compatible with 1.0/Rev1, so that seemed  
+>> a good version to target.
 >>
->> what you can't do is:
->>
->> { 'pragma': { 'doc-required': true } }
->> { 'pragma': { 'doc-required': false } }
->>
->> Maybe s/Setting it/Setting a given pragma name/
->=20
-> Yes, that's better.  Perhaps "Setting the same pragma to ..."
+>>  2. Legacy guest testing. I've tested this successfully (no  
+>> apparent regressions) with:
+>>    * Windows XP x86 (both "pc" and "q35" machine types, the latter  
+>> using -device piix4-ide)
+>>    * Windows 7, both 32-bit and 64-bit editions
+>>    * Windows 10 x64
+>>    * Fedora 7 x86 Live image
+>>    * Fedora 25 x86_64 Live image
+>>    * Ubuntu 10.04.4 AMD64 Live image
+>> Any other specific OSes and versions I should check?
 
-Works for me.
-
->=20
->>> +different values in parts of the schema doesn't work.
->=20
-> I considered rejecting all but the first pragma for any given pragma,
-> but decided just add this note for now.
-
-Yeah, I noticed. Coding up rejection is harder than just documenting
-that repetition is undefined.  And it's not like we're adding new pragma
-usages into our *.json files on a daily basis ;)
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---PwgscOUnDcQWKEiNBNIERnpdksU9k9nVI
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYyVtyAAoJEKeha0olJ0NqnOkH/34w0kbx931K0ec3MQBRJsay
-Oue+qlDPraId26DpztzW8I7FVQLTtYg5hr6x0WNGS4h5GSmmFeneij7EY4L9F/Fd
-Gc5LXdhTXzMFOdatcN08eoRgv8oSFRXhLh0Ijo84m9T/c3YTivxSGR8e4MLLGHTE
-ucgKK9YOEGM8cb5Tc7TbSfJsKwXHcPDx3wqXKdLLC97IJfX5B+P/3DXk0XmJ699E
-EAKLvfk/i+MuuYzZWGTJlW2fm0Dz5Y08uE5q/qF0ubbcLXUJ3rWhFcyYGk2b2/qw
-+0noNbBQidFcpaJOwr5hy9ts2bQY8873BvONBh3MRhnarUjogVD/Tgmey6HpedA=
-=tvTG
------END PGP SIGNATURE-----
-
---PwgscOUnDcQWKEiNBNIERnpdksU9k9nVI--
+Windows 2000
