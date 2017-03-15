@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41126)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41490)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1co6BN-0001Xm-G4
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:29:35 -0400
+	(envelope-from <armbru@redhat.com>) id 1co6CG-0002Gf-5G
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:30:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1co6BK-0002dB-BR
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:29:29 -0400
-Received: from 8.mo68.mail-out.ovh.net ([46.105.74.219]:45212)
+	(envelope-from <armbru@redhat.com>) id 1co6CC-0003R1-7a
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:30:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37428)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1co6BK-0002cK-4k
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:29:26 -0400
-Received: from player763.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 828BA4614B
-	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 11:29:24 +0100 (CET)
-Date: Wed, 15 Mar 2017 11:29:17 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170315112917.7dddc8a4@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <CAFEAcA9nZszkmH7-P9jkxoGxLYHKspDiS-PFUyVZrrtDfgPNMA@mail.gmail.com>
-References: <87tw6y8bs8.fsf@secure.mitica>
-	<CAFEAcA978SJemCfYJPa8jwtuhhi6JGh9pEDGYNJ1npJA3nvEQA@mail.gmail.com>
-	<20170314081312.GB13140@stefanha-x1.localdomain>
-	<CAFEAcA9F2BPexRieaEhu+UpJxoOdEfw8eggW8b2SjuoMMTNgog@mail.gmail.com>
-	<87wpbstesf.fsf@secure.mitica>
-	<CAFEAcA9nZszkmH7-P9jkxoGxLYHKspDiS-PFUyVZrrtDfgPNMA@mail.gmail.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1co6CC-0003Qf-2H
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:30:20 -0400
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0E43DC057FA6
+	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 10:30:20 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170301123223.12489-1-berrange@redhat.com>
+	<a08dc58b-a169-cb17-2187-1b66c6878a39@redhat.com>
+	<20170302123300.GJ29835@redhat.com>
+	<87d1dys9mr.fsf@dusky.pond.sub.org> <20170314184909.GC7576@work-vm>
+	<87bmt3t5r0.fsf@dusky.pond.sub.org> <20170315093226.GB2430@work-vm>
+Date: Wed, 15 Mar 2017 11:30:17 +0100
+In-Reply-To: <20170315093226.GB2430@work-vm> (David Alan Gilbert's message of
+	"Wed, 15 Mar 2017 09:32:26 +0000")
+Message-ID: <87h92ultmu.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/iQ4=7Yz5Va9YCup=rV7rXAq";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] KVM call for 2017-03-14
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] migration: allow clearing migration string
+ parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,79 +37,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Juan Quintela <quintela@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developer <qemu-devel@nongnu.org>, KVM devel mailing list <kvm@vger.kernel.org>, Laurent Vivier <laurent@vivier.eu>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
---Sig_/iQ4=7Yz5Va9YCup=rV7rXAq
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
 
-On Tue, 14 Mar 2017 11:56:36 +0100
-Peter Maydell <peter.maydell@linaro.org> wrote:
+> * Markus Armbruster (armbru@redhat.com) wrote:
+>> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+[...]
+>> > I'm confused why we need a 'reset to default' - all we need is the ability
+>> > to change each parameter, and for the new value of that parameter
+>> > to be an empty string.
+>> 
+>> You argue syntax, I'm arguing semantics.
+>> 
+>> The command means "set parameter P to value V".  *Except* when V is "",
+>> it means something else, namely "reset parameter P to its default,
+>> whatever that may be".
+>> 
+>> This is (a) not general, because it won't do for cases where "" may
+>> occur as value, and (b) ugly.
+>> 
+>> Ugliness is the eye of the beholder.  Lack of generality isn't.
+>
+> No, I'm questioning why it's defined as 'reset parameter P to its default';
+> why do we need a way to do that?
 
-> On 14 March 2017 at 09:59, Juan Quintela <quintela@redhat.com> wrote:
-> > Peter Maydell <peter.maydell@linaro.org> wrote: =20
-> >> On 14 March 2017 at 09:13, Stefan Hajnoczi <stefanha@gmail.com> wrote:=
- =20
-> >>> On Mon, Mar 13, 2017 at 11:02:01AM +0100, Peter Maydell wrote:
-> >>> The minimum requirements for the new language:
-> >>> 1. Does it support the host operating systems that QEMU runs on?
-> >>> 2. Does it support the host architectures that QEMU runs on? =20
-> >>
-> >> Speaking of this, I was thinking that we should introduce
-> >> a rule that for any host OS/arch we support we must have
-> >> a build machine so we can at least do a compile test.
-> >> For instance if you believe configure we support Solaris
-> >> and AIX, but I bet they're bit-rotting. The ia64 backend
-> >> has to be a strong candidate for being dumped too.
-> >> Demanding "system we can test on or we drop support"
-> >> would let us more clearly see what we're actually running
-> >> on and avoid unnecessarily ruling things out because they
-> >> don't support Itanium or AIX... =20
-> >
-> > YES, YES and YES.
-> >
-> > I demand an osX build machine NOW!!!!  Remote access is ok. =20
->=20
-> OSX is actually in the set that's OK because I have a
-> machine I can test on. The ones that are problems are
-> all the BSDs, AIX, Solaris, Haiku, and architectures
+Dan's commit message explains:
 
-The most relevant links I could find about AIX hosts only mention=20
-QEMU 0.9.1:
+    Some of the migration parameters are strings, which default to NULL,
+    eg tls_hostname and tls_creds.
 
-http://www.perzl.org/aix/index.php?n=3DMain.Qemu
-http://www.vivier.eu/Qemu/
+    The mgmt app will set the tls_creds parameter on both source and target
+    QEMU instances, in order to trigger use of TLS for migration.
 
-I'm not aware of any effort within IBM to support newer versions
-of QEMU on an AIX host (Cc'ing Laurent in case he would be aware
-of a non-IBM initiative).
+    After performing a TLS encrypted migration though, migration might be
+    used for other reasons - for example, to save the QEMU state to a file.
+    We need TLS turned off when doing this, but the migrate-set-parameters
+    QAPI command does not provide any facility to clear/reset parameters
+    to their default state.
 
-I can maybe try to grab an AIX system and see what happens. I'm
-okay to run the deprecation process if we choose to go that way.
-
-Cheers.
-
---
-Greg
-
-> sparc, mips, ia64, s390.
->=20
-> thanks
-> -- PMM
->=20
-
-
---Sig_/iQ4=7Yz5Va9YCup=rV7rXAq
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAljJF30ACgkQAvw66wEB28Il3wCbBJBVec/d9Y2xOnrjrQ9RhsJx
-FkwAn2PzRYOo/wmcxLMlALq3/Ho8vPpm
-=CflD
------END PGP SIGNATURE-----
-
---Sig_/iQ4=7Yz5Va9YCup=rV7rXAq--
+    If you simply ommit the tls_creds parameter in migrate-set-parameters,
+    then 'has_tls_creds' will be false and so no action will be taken. The
+    only option that works with migrate-set-parameters is to treat "" on
+    the wire as equivalent to requesting NULL. Failing that we would have
+    to create a new 'migrate-reset-parameters' method to explicitly put
+    a parameter back to its default value.
