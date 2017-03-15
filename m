@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1co690-0000jP-9F
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:27:03 -0400
+	(envelope-from <groug@kaod.org>) id 1co6BN-0001Xm-G4
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:29:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1co68z-0000PW-55
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:27:02 -0400
-Date: Wed, 15 Mar 2017 10:26:44 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170315102644.GF7770@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170310031521.630-1-eblake@redhat.com>
-	<033881fe-b3d3-2c3a-48fc-c08691f2c9cb@redhat.com>
-	<19efa7dc-fa97-410f-df4d-3962453dcd8e@redhat.com>
-	<20170315101835.GF8147@stefanha-x1.localdomain>
+	(envelope-from <groug@kaod.org>) id 1co6BK-0002dB-BR
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:29:29 -0400
+Received: from 8.mo68.mail-out.ovh.net ([46.105.74.219]:45212)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1co6BK-0002cK-4k
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:29:26 -0400
+Received: from player763.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 828BA4614B
+	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 11:29:24 +0100 (CET)
+Date: Wed, 15 Mar 2017 11:29:17 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170315112917.7dddc8a4@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <CAFEAcA9nZszkmH7-P9jkxoGxLYHKspDiS-PFUyVZrrtDfgPNMA@mail.gmail.com>
+References: <87tw6y8bs8.fsf@secure.mitica>
+	<CAFEAcA978SJemCfYJPa8jwtuhhi6JGh9pEDGYNJ1npJA3nvEQA@mail.gmail.com>
+	<20170314081312.GB13140@stefanha-x1.localdomain>
+	<CAFEAcA9F2BPexRieaEhu+UpJxoOdEfw8eggW8b2SjuoMMTNgog@mail.gmail.com>
+	<87wpbstesf.fsf@secure.mitica>
+	<CAFEAcA9nZszkmH7-P9jkxoGxLYHKspDiS-PFUyVZrrtDfgPNMA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170315101835.GF8147@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH for-2.9] mirror: Fix backwards mirror_yield
- parameters
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/iQ4=7Yz5Va9YCup=rV7rXAq";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] KVM call for 2017-03-14
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,45 +35,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, Jeff Cody <jcody@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Juan Quintela <quintela@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developer <qemu-devel@nongnu.org>, KVM devel mailing list <kvm@vger.kernel.org>, Laurent Vivier <laurent@vivier.eu>
 
-On Wed, Mar 15, 2017 at 06:18:35PM +0800, Stefan Hajnoczi wrote:
-> On Fri, Mar 10, 2017 at 02:49:22PM -0600, Eric Blake wrote:
-> > And here's where I'm stuck: the makefiles are broken.  Touching
-> > scripts/tracetool/format/h.py does NOT cause tracetool to be re-run by a
-> > mere 'make'; I've had to resort to 'make -B block/trace.h-timestamp' to
-> > get things to rebuild.  And this is in spite of the fact that h.py
-> > _should_ be getting listed in $(tracetool-y) by trace/Makefile.objs, and
-> > $(tracetool-y) is listed as a dependency of %/trace.h-timestamp in the
-> > top-level Makefile.  I would appreciate anyone with advice or an idea on
-> > how to patch Makefile to get the dependency working without me having to
-> > manually kick it.
-> 
-> Also CCing Daniel Berrange.  He recently touched the tracing Makefiles
-> and may have ideas.
+--Sig_/iQ4=7Yz5Va9YCup=rV7rXAq
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-I've been looking at this and I'm damned if I understand what's broken.
-All the required dependancies look to be expressed in the Makefile
+On Tue, 14 Mar 2017 11:56:36 +0100
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
-  %/trace.h: %/trace.h-timestamp
-  %/trace.h-timestamp: $(SRC_PATH)/%/trace-events $(tracetool-y)
+> On 14 March 2017 at 09:59, Juan Quintela <quintela@redhat.com> wrote:
+> > Peter Maydell <peter.maydell@linaro.org> wrote: =20
+> >> On 14 March 2017 at 09:13, Stefan Hajnoczi <stefanha@gmail.com> wrote:=
+ =20
+> >>> On Mon, Mar 13, 2017 at 11:02:01AM +0100, Peter Maydell wrote:
+> >>> The minimum requirements for the new language:
+> >>> 1. Does it support the host operating systems that QEMU runs on?
+> >>> 2. Does it support the host architectures that QEMU runs on? =20
+> >>
+> >> Speaking of this, I was thinking that we should introduce
+> >> a rule that for any host OS/arch we support we must have
+> >> a build machine so we can at least do a compile test.
+> >> For instance if you believe configure we support Solaris
+> >> and AIX, but I bet they're bit-rotting. The ia64 backend
+> >> has to be a strong candidate for being dumped too.
+> >> Demanding "system we can test on or we drop support"
+> >> would let us more clearly see what we're actually running
+> >> on and avoid unnecessarily ruling things out because they
+> >> don't support Itanium or AIX... =20
+> >
+> > YES, YES and YES.
+> >
+> > I demand an osX build machine NOW!!!!  Remote access is ok. =20
+>=20
+> OSX is actually in the set that's OK because I have a
+> machine I can test on. The ones that are problems are
+> all the BSDs, AIX, Solaris, Haiku, and architectures
 
-and $(tracetool-y) expands to the list of source files
+The most relevant links I could find about AIX hosts only mention=20
+QEMU 0.9.1:
 
-  tracetool-y = $(SRC_PATH)/scripts/tracetool.py
-  tracetool-y += $(shell find $(SRC_PATH)/scripts/tracetool -name "*.py")
+http://www.perzl.org/aix/index.php?n=3DMain.Qemu
+http://www.vivier.eu/Qemu/
+
+I'm not aware of any effort within IBM to support newer versions
+of QEMU on an AIX host (Cc'ing Laurent in case he would be aware
+of a non-IBM initiative).
+
+I can maybe try to grab an AIX system and see what happens. I'm
+okay to run the deprecation process if we choose to go that way.
+
+Cheers.
+
+--
+Greg
+
+> sparc, mips, ia64, s390.
+>=20
+> thanks
+> -- PMM
+>=20
 
 
-If I do 'touch hw/net/trace-events', then hw/net/trace.h gets rebuilt,
-but if do 'touch scripts/tracetool.py' it doesn't get built. So somehow
-make seems to be dropping the $(tracetool-y) deps despite being listed
-against the %/trace-h-timestamp file, and despite earlier deps on
-trace-events being honoured
+--Sig_/iQ4=7Yz5Va9YCup=rV7rXAq
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAljJF30ACgkQAvw66wEB28Il3wCbBJBVec/d9Y2xOnrjrQ9RhsJx
+FkwAn2PzRYOo/wmcxLMlALq3/Ho8vPpm
+=CflD
+-----END PGP SIGNATURE-----
+
+--Sig_/iQ4=7Yz5Va9YCup=rV7rXAq--
