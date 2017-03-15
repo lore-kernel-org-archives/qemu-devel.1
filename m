@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cnzPu-0002bT-Rh
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 23:16:03 -0400
+	(envelope-from <mst@redhat.com>) id 1cnzR8-00037f-Ju
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 23:17:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cnzPq-0000zF-Aa
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 23:16:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57096)
+	(envelope-from <mst@redhat.com>) id 1cnzR3-0001n9-Ml
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 23:17:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49752)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cnzPq-0000yn-0S
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 23:15:58 -0400
-Date: Wed, 15 Mar 2017 11:15:50 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170315031550.GG12964@pxdev.xzpeter.org>
-References: <1489496187-624-1-git-send-email-peterx@redhat.com>
-	<20170315032001-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cnzR3-0001mm-GM
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 23:17:13 -0400
+Date: Wed, 15 Mar 2017 05:17:08 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170315051636-mutt-send-email-mst@kernel.org>
+References: <1489460502-6686-1-git-send-email-jasowang@redhat.com>
+	<1489460502-6686-3-git-send-email-jasowang@redhat.com>
+	<20170314102918.3dce0075.cornelia.huck@de.ibm.com>
+	<fc240730-be1d-4b95-0106-48caf5ebc533@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170315032001-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH] memory: info mtree check mr range overflow
+In-Reply-To: <fc240730-be1d-4b95-0106-48caf5ebc533@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH V3 2/3] virtio: destroy region cache during
+ reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,44 +31,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, mark.cave-ayland@ilande.co.uk, Peter Maydell <peter.maydell@linaro.org>
+To: Jason Wang <jasowang@redhat.com>
+Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On Wed, Mar 15, 2017 at 03:24:04AM +0200, Michael S. Tsirkin wrote:
-> On Tue, Mar 14, 2017 at 08:56:27PM +0800, Peter Xu wrote:
-> > The address of memory regions might overflow when something wrong
-> > happened, like reported in:
-> > 
-> > https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg02043.html
-> > 
-> > For easier debugging, let's try to detect it.
-> > 
-> > Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> 
-> 
-> After a chat with Paolo, I think the following is a more general fix
-> 
-> - fix info mtree to do 128 bit math and display more than
->   16 digits if necessary
+On Wed, Mar 15, 2017 at 10:14:48AM +0800, Jason Wang wrote:
+>=20
+>=20
+> On 2017=E5=B9=B403=E6=9C=8814=E6=97=A5 17:29, Cornelia Huck wrote:
+> > On Tue, 14 Mar 2017 11:01:41 +0800
+> > Jason Wang <jasowang@redhat.com> wrote:
+> >=20
+> > > We don't destroy region cache during reset which can make the maps
+> > > of previous driver leaked to a buggy or malicious driver that don't
+> > > set vring address before starting to use the device. Fix this by
+> > > destroy the region cache during reset and validate it before trying=
+ to
+> > > see them.
+> > >=20
+> > > Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
+> > > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > > Signed-off-by: Jason Wang <jasowang@redhat.com>
+> > > ---
+> > > Changes from V2:
+> > > - introduce a helper and assert caches !=3D NULL
+> > > Changes from v1:
+> > > - switch to use rcu in virtio_virtqueue_region_cache()
+> > > - use unlikely() when needed
+> > > ---
+> > >   hw/virtio/virtio.c | 46 ++++++++++++++++++++++++++++++-----------=
+-----
+> > >   1 file changed, 30 insertions(+), 16 deletions(-)
+> > >=20
+> > > @@ -249,11 +255,10 @@ static inline void vring_used_idx_set(VirtQue=
+ue *vq, uint16_t val)
+> > >   /* Called within rcu_read_lock().  */
+> > >   static inline void vring_used_flags_set_bit(VirtQueue *vq, int ma=
+sk)
+> > >   {
+> > > -    VRingMemoryRegionCaches *caches =3D atomic_rcu_read(&vq->vring=
+.caches);
+> > > +    VRingMemoryRegionCaches *caches =3D vring_get_region_caches(vq=
+);
+> > >       VirtIODevice *vdev =3D vq->vdev;
+> > >       hwaddr pa =3D offsetof(VRingUsed, flags);
+> > >       uint16_t flags =3D virtio_lduw_phys_cached(vq->vdev, &caches-=
+>used, pa);
+> > > -
+> > Unrelated whitespace change.
+>=20
+> Right. If no more comments from any others. I think Michael can probabl=
+y fix
+> this during merge.
+>=20
+> Thanks
 
-Could you help elaborate in what case will we really need that 128 bit
-address?
+I'd rather get patches that apply cleanly. Minor changes mean you
+can keep reviewed-by tags.
 
-Btw, thanks for pointing out in the other thread that your patch
-wasn't printing 128 bits but 64 bits, actually I didn't notice that
-before... but even with that, I would still slightly prefer this one
-though considering readability and simplicity.
-
-> - add info about region visibility
->   how much info is appropriate is arguable - after all we already have info mtree -f
->   we probably should report if region is not visible at all,
->   how about partially occluded ones? listing all windows is probably not
->   needed - we have the -f flag for that.
-
-For me, "info mtree" and its "-f" form work good enough. So I'll leave
-the discussion on this one to people who know better than me...
-
-Thanks,
-
--- peterx
+> >=20
+> > >       virtio_stw_phys_cached(vdev, &caches->used, pa, flags | mask)=
+;
+> > >       address_space_cache_invalidate(&caches->used, pa, sizeof(flag=
+s));
+> > >   }
+> > Other than that:
+> >=20
+> > Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+> >=20
+> >=20
