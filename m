@@ -1,37 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1coHTk-0002Sx-41
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 18:33:16 -0400
+	(envelope-from <mreitz@redhat.com>) id 1coIam-0008VU-Al
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 19:44:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1coHTg-0001CH-4L
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 18:33:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57712)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1coHTf-0001C9-SB
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 18:33:08 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C083C3B731
-	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 22:33:07 +0000 (UTC)
-References: <20170313195547.21466-1-eblake@redhat.com>
-	<20170313195547.21466-7-eblake@redhat.com>
-	<20170313200752.GG5512@work-vm>
-	<89b9b8e6-b5ca-8056-783b-598e07bf5da0@redhat.com>
-	<20170314113234.GE2445@work-vm>
-	<8f837495-f773-9cad-004b-1f1f592c4244@redhat.com>
-	<9199bbb8-a6c5-be00-3bba-be128d68dd9f@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <36931d24-36ac-ee87-8314-b7ad3f09544a@redhat.com>
-Date: Wed, 15 Mar 2017 17:33:03 -0500
+	(envelope-from <mreitz@redhat.com>) id 1coIal-0000KM-Et
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 19:44:32 -0400
+References: <20170314111157.14464-2-pbonzini@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <79fadf20-791f-e30b-36e0-e5151a92a42f@redhat.com>
+Date: Thu, 16 Mar 2017 00:44:16 +0100
 MIME-Version: 1.0
-In-Reply-To: <9199bbb8-a6c5-be00-3bba-be128d68dd9f@redhat.com>
+In-Reply-To: <20170314111157.14464-2-pbonzini@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="n9vneP0nPRbLEs78vjH7llMcN2J7I320N"
-Subject: Re: [Qemu-devel] [PATCH v2 06/30] trace: Fix parameter types in
- migration
+	boundary="3QQARU7TK4TmWqIJTD1pjlETkIoa2kONX"
+Subject: Re: [Qemu-devel] [PATCH] block: quiesce AioContext when detaching
+ from it
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,64 +24,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, Juan Quintela <quintela@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-block@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---n9vneP0nPRbLEs78vjH7llMcN2J7I320N
-From: Eric Blake <eblake@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com,
- Juan Quintela <quintela@redhat.com>
-Message-ID: <36931d24-36ac-ee87-8314-b7ad3f09544a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 06/30] trace: Fix parameter types in
- migration
-References: <20170313195547.21466-1-eblake@redhat.com>
- <20170313195547.21466-7-eblake@redhat.com> <20170313200752.GG5512@work-vm>
- <89b9b8e6-b5ca-8056-783b-598e07bf5da0@redhat.com>
- <20170314113234.GE2445@work-vm>
- <8f837495-f773-9cad-004b-1f1f592c4244@redhat.com>
- <9199bbb8-a6c5-be00-3bba-be128d68dd9f@redhat.com>
-In-Reply-To: <9199bbb8-a6c5-be00-3bba-be128d68dd9f@redhat.com>
-Content-Type: text/plain; charset=utf-8
+--3QQARU7TK4TmWqIJTD1pjlETkIoa2kONX
+From: Max Reitz <mreitz@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>,
+ Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-block@nongnu.org
+Message-ID: <79fadf20-791f-e30b-36e0-e5151a92a42f@redhat.com>
+Subject: Re: [PATCH] block: quiesce AioContext when detaching from it
+References: <20170314111157.14464-2-pbonzini@redhat.com>
+In-Reply-To: <20170314111157.14464-2-pbonzini@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15
 Content-Transfer-Encoding: quoted-printable
 
-On 03/15/2017 02:55 PM, Eric Blake wrote:
-
->> Okay, my next version will insert an explicit cast in any caller that =
-is
->> otherwise passing a __u64 (since we can't guarantee what type __u64
->> resolves to, and therefore what format string is appropriate for it).
+On 14.03.2017 12:11, Paolo Bonzini wrote:
+> While it is true that bdrv_set_aio_context only works on a single
+> BlockDriverState subtree (see commit message for 53ec73e, "block: Use
+> bdrv_drain to replace uncessary bdrv_drain_all", 2015-07-07), it works
+> at the AioContext level rather than the BlockDriverState level.
 >=20
-> Or maybe I will just omit those changes from my next version, in lieu o=
-f
-> a gcc bug report.
+> Therefore, it is also necessary to trigger pending bottom halves too,
+> even if no requests are pending.
+>=20
+> For NBD this ensures that the aio_co_schedule of a previous call to
+> nbd_attach_aio_context is completed before detaching from the old
+> AioContext; it fixes qemu-iotest 094.  Another similar bug happens
+> when the VM is stopped and the virtio-blk dataplane irqfd is torn down.=
 
-https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D80060 if you are intereste=
-d
+> In this case it's possible that guest I/O gets stuck if notify_guest_bh=
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+> was scheduled but doesn't run.
+>=20
+> Calling aio_poll from another AioContext is safe if non-blocking; races=
+
+> such as the one mentioned in the commit message for c9d1a56 ("block:
+> only call aio_poll on the current thread's AioContext", 2016-10-28)
+> are a concern for blocking calls.
+>=20
+> I considered other options, including:
+>=20
+> - moving the bs->wakeup mechanism to AioContext, and letting the caller=
+
+> check.  This might work for virtio which has a clear place to wakeup
+> (notify_place_bh) and check the condition (virtio_blk_data_plane_stop).=
+
+> For aio_co_schedule I couldn't find a clear place to check the conditio=
+n.
+>=20
+> - adding a dummy oneshot bottom half and waiting for it to trigger.
+> This has the complication that bottom half list is LIFO for historical
+> reasons.  There were performance issues caused by bottom half ordering
+> in the past, so I decided against it for 2.9.
+>=20
+> Fixes: 99723548561978da8ef44cf804fb7912698f5d88
+> Reported-by: Max Reitz <mreitz@redhat.com>
+> Reported-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> Tested-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  block.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+
+Thanks, applied to my block branch:
+
+https://github.com/XanClic/qemu/commits/block
+
+Max
 
 
---n9vneP0nPRbLEs78vjH7llMcN2J7I320N
+--3QQARU7TK4TmWqIJTD1pjlETkIoa2kONX
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYycEfAAoJEKeha0olJ0NqNU8H/14LKdlOaUE2BRz22o05hSUu
-gallVYJ41VYXYDdtWmE4CD8VeaDOYgDSST4o1ZimjbDEO4e4KEZ73N3D2Ij1E/vI
-2TULvCeATxnH2JKpquJgal6tt6C/0DEmS+LRfspDmVePdrTZa2nhTTxHuUNpc+dX
-5hCtZ4zDsRT8Wbv4xvZEO7XxU44lvxYpfaENUY6Ji6dmTxuQcuSFCBi5cdf5nyPI
-TxXyMcdqGux5c8LqJpdgoEQSvsk1tKuzv1zP53VEqv2sJgT4xDJPtlDWpmxt2OMY
-etZfT9oICB1Ot6XMnr0OPNLISeQCPVZfjFI1BoZpnWdPCCDaoJhLQ9Yv5VAwPxk=
-=nJPI
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljJ0dASHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AXL4H/0ODHxC4iWUacgZ/t6Wy4P4IIQXcO5t3
+zEE5RuSv/XO15l1tguWySEwfJV1a/C6mJ3atJtx+gWvqIIN/v1XLBc9KYmVhd8GL
+lMTMhaNV01+PF3Nua+jDYCeaONpkHhbrHMx59M17GMeNXVc6vYP8fgG8SBPHslsS
+z0d7jLDyaULBkex+ZAq0lSgD9oB7oaDfov/18uoGyGdQc8el8PqmofT4evU66Whq
+OEg6BIyAcq6SI/RsjxZzqCDgXtXK/3NXGYSsutDBZqDne0pQsgvEinM4lbdzZ+Yh
+rC9rI1t9D5nK42Q4PHY23E0miY03KbYmqbU3US5oxfgnlQThicCKcyg=
+=19g1
 -----END PGP SIGNATURE-----
 
---n9vneP0nPRbLEs78vjH7llMcN2J7I320N--
+--3QQARU7TK4TmWqIJTD1pjlETkIoa2kONX--
