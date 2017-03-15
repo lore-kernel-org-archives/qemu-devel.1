@@ -1,36 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57115)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cnw0x-00067b-Dv
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 19:38:04 -0400
+	(envelope-from <eblake@redhat.com>) id 1cnwtQ-0005Ex-39
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 20:34:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cnw0t-00040Z-HM
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 19:38:03 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42354
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cnw0t-0003yy-Aj
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 19:37:59 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2ENXeMA006537
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 19:37:57 -0400
-Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 296nfxc5j7-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 19:37:57 -0400
-Received: from localhost
-	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 14 Mar 2017 19:37:56 -0400
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <eblake@redhat.com>) id 1cnwtM-0004fg-Vv
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 20:34:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44120)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cnwtM-0004ef-Ph
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 20:34:16 -0400
+References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
+	<1489385927-6735-41-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4e4521b3-aff9-94fa-297f-96d69169c631@redhat.com>
+Date: Tue, 14 Mar 2017 19:34:14 -0500
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 14 Mar 2017 18:37:47 -0500
-Message-Id: <148953466730.19276.1541285718972438692@loki>
-Subject: [Qemu-devel] [ANNOUNCE] QEMU 2.9.0-rc0 is now available
+In-Reply-To: <1489385927-6735-41-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="9shRHtJ82Vx78JE7Gc4NBha0TvJMAXcL1"
+Subject: Re: [Qemu-devel] [PATCH for-2.9 40/47] qapi: Simplify what gets
+ stored in enum_types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,31 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-Hello,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--9shRHtJ82Vx78JE7Gc4NBha0TvJMAXcL1
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Message-ID: <4e4521b3-aff9-94fa-297f-96d69169c631@redhat.com>
+Subject: Re: [PATCH for-2.9 40/47] qapi: Simplify what gets stored in
+ enum_types
+References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
+ <1489385927-6735-41-git-send-email-armbru@redhat.com>
+In-Reply-To: <1489385927-6735-41-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On behalf of the QEMU Team, I'd like to announce the availability of the
-first release candidate for the QEMU 2.9 release.  This release is meant
-for testing purposes and should not be used in a production environment.
+On 03/13/2017 01:18 AM, Markus Armbruster wrote:
+> Don't invent a new dictionary structure just for enum_types, simply
+> store the defining expression, like we do for struct_types and
+> union_types.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  scripts/qapi.py | 29 +++++++++++++++--------------
+>  1 file changed, 15 insertions(+), 14 deletions(-)
+>=20
 
-  http://download.qemu-project.org/qemu-2.9.0-rc0.tar.xz
-  http://download.qemu-project.org/qemu-2.9.0-rc0.tar.xz.sig
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-You can help improve the quality of the QEMU 2.9 release by testing this
-release and reporting bugs on Launchpad:
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-  https://bugs.launchpad.net/qemu/
 
-The release plan, as well a documented known issues for release
-candidates, are available at:
+--9shRHtJ82Vx78JE7Gc4NBha0TvJMAXcL1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  http://wiki.qemu.org/Planning/2.9
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-The dates have all been pushed back a week due to delays with the
-initial RC.
+iQEcBAEBCAAGBQJYyIwGAAoJEKeha0olJ0Nq1rgH/3MHhhJSc+rkK6lW4BjGYDGB
+NHb6fGLfPM3/kqNMsNoUOdyt1ahUjTKolQUKxDOT+H7Wr8064JW6rTOgjh+bvslW
+/FWHtbVJIuCIMAlgzznmt0SYgauygkpZZ4J6me+2hb7qIv9Rop5yHOVa+Gg2dJT9
+Y07IPnf7AN8qYXOQv0K8taBsPjDDwKlXSF8UbqZ6Umvc+zKEtvkz14bEsfgjbX3T
+hnMIbyJs0eUodLqK9NuQRySG7FXecYkvGUc7cQS6QzcdKFCuDIOHwVabPfubbFUG
+k2pddMslbFMBvo3I/9UeJUBJHx5xUhfahi5y3L+N8hgo4ez5T5MTE7nS0hcq6i0=
+=vZca
+-----END PGP SIGNATURE-----
 
-Please add entries to the ChangeLog for the 2.9 release below:
-
-  http://wiki.qemu.org/ChangeLog/2.9
+--9shRHtJ82Vx78JE7Gc4NBha0TvJMAXcL1--
