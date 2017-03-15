@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <phil@philjordan.eu>) id 1co2Iq-0006Tj-5H
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 02:20:57 -0400
+	(envelope-from <phil@philjordan.eu>) id 1co2Iw-0006WY-NK
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 02:21:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <phil@philjordan.eu>) id 1co2Im-0000UW-SG
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 02:20:56 -0400
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:35981)
+	(envelope-from <phil@philjordan.eu>) id 1co2Iu-0000Yv-Rd
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 02:21:02 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:35996)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <phil@philjordan.eu>) id 1co2Im-0000Tp-H3
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 02:20:52 -0400
-Received: by mail-pg0-x243.google.com with SMTP id m5so1133200pgk.3
-	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 23:20:52 -0700 (PDT)
+	(Exim 4.71) (envelope-from <phil@philjordan.eu>) id 1co2Iu-0000YL-Fg
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 02:21:00 -0400
+Received: by mail-pg0-x242.google.com with SMTP id m5so1133682pgk.3
+	for <qemu-devel@nongnu.org>; Tue, 14 Mar 2017 23:21:00 -0700 (PDT)
 From: Phil Dennis-Jordan <phil@philjordan.eu>
-Date: Wed, 15 Mar 2017 19:20:25 +1300
-Message-Id: <1489558827-28971-1-git-send-email-phil@philjordan.eu>
-Subject: [Qemu-devel] [PATCH v3 0/2] hw/i386: Update FADT to Revision 3
- (ACPI 2.0)
+Date: Wed, 15 Mar 2017 19:20:26 +1300
+Message-Id: <1489558827-28971-2-git-send-email-phil@philjordan.eu>
+In-Reply-To: <1489558827-28971-1-git-send-email-phil@philjordan.eu>
+References: <1489558827-28971-1-git-send-email-phil@philjordan.eu>
+Subject: [Qemu-devel] [PATCH v3 1/2] hw/i386: Use Rev3 FADT (ACPI 2.0)
+ instead of Rev1 to improve guest OS support.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,62 +29,254 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>
 Cc: Phil Dennis-Jordan <phil@philjordan.eu>
 
-This updates the FADT generated for x86/64 machine types from Revision 1 to 3. (Based on ACPI standard 2.0 instead of 1.0) As previously, the goal is to make running macOS/OS X guests smoother. With a Rev1 FADT, rebooting such a guest doesn't work, as the OS uses the reset register information from the FADT. Switching to a Rev3 (ACPI 2.0) FADT solves this problem.
+This updates the FADT generated for x86/64 machine types from Revision 1 to 3. (Based on ACPI standard 2.0 instead of 1.0) The intention is to expose the reset register information to guest operating systems which require it, specifically OS X/macOS. Revision 1 FADTs do not contain the fields relating to the reset register.
 
-The previous discussion of this raised a bunch of points, which I'll address/clarify here as well:
+The new layout and contents remains backwards-compatible with operating systems which only support ACPI 1.0, as the existing fields are not modified by this change, as the 64-bit and 32-bit variants are allowed to co-exist according to the ACPI 2.0 standard. No regressions became apparent in tests with a range of Windows (XP-10) and Linux versions.
 
- 1. No runtime option. The preference was expressed that we try to stay backwards-compatible with legacy guests as opposed to adding a runtime option for different APCI versions. ACPI 2.0/FADT Rev3 is the minimum version required for exposing the reset register, and it is also backwards-compatible with 1.0/Rev1, so that seemed a good version to target.
+The BIOS tables test suite's FADT checksum test has also been updated to reflect the new FADT layout and content.
 
- 2. Legacy guest testing. I've tested this successfully (no apparent regressions) with:
-   * Windows XP x86 (both "pc" and "q35" machine types, the latter using -device piix4-ide)
-   * Windows 7, both 32-bit and 64-bit editions
-   * Windows 10 x64
-   * Fedora 7 x86 Live image
-   * Fedora 25 x86_64 Live image
-   * Ubuntu 10.04.4 AMD64 Live image
-Any other specific OSes and versions I should check?
-
-
- 3. 64-bit and 32-bit pointer fields.
-
-Only very recent versions of the ACPI spec (6.1 and various errata of 5.1 and 6.0) are clear about mutual exclusion of the FADT's 32-bit and 64-bit variants of pointers to tables and registers. The 2.0 version simply states "This is a required field" for both PM1a_EVT_BLK and X_PM1a_EVT_BLK, for example, although it does also state for the former that "This field is superseded in ACPI 2.0 by the X_PM1a_EVT_BLK field." No requirement is specified explicitly for the DSDT and X_DSDT fields.
-
-In practice, I have found that Windows 10 will fail to boot with a Rev3 FADT unless BOTH the 32-bit and 64-bit variants are filled. The exception is X_FIRMWARE_CTRL, which is the first to be explicitly marked as mutually exclusive with FIRMWARE_CTRL in an ACPI spec - with a preference for FIRMWARE_CTRL if the pointer fits in a 32-bit field. Satisfying Windows 10 in this way does not contradict the 2.0 specification, and it also complies with the 1.0 standard for the fields which Rev1 of the FADT already has, so that's what I've gone with in the implementation.
-
-The only problem is that upstream OVMF cannot deal with multiple pointers to the same table in the linker commands. This turns out to be a bug in OVMF/EDK2[1], and I am submitting a separate patch to EDK2 to fix that problem. The fix for a second issue where OVMF would rewrite the FADT so the DSDT is erroneously set to 0 has already been upstreamed.[2] I don't see a workaround to this other than fixing the OVMF code.
-
- 4. i440FX vs Q35
-
-Both machine types have the reset register, and it's at the same I/O port. To illustrate/document this, the second patch in the series adds a build-time assertion that this is indeed so.
-
-Changelog
-=========
-
-v2 -> v3:
- * I actually completed the changes to the BIOS tables test which were required as a result of the FADT struct change.
-
-v1 -> v2:
- * v1 Thread was "[PATCH RFC] acpi: add reset register to fadt"
- * Instead of just adding the reset register, set up a fully standards compliant Rev3 FADT. (ACPI 2.0)
- * A compile-time assertion has been added for the PC/Q35 reset register equivalence.
-
-
-[1]: https://bugzilla.tianocore.org/show_bug.cgi?id=368
-[2]: EDK2 commit range e0e1cfcbbb24..198a46d768fb
-
-Phil Dennis-Jordan (2):
-  hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest OS
-    support.
-  hw/i386: Build-time assertion on pc/q35 reset register being
-    identical.
-
- hw/i386/acpi-build.c        | 35 +++++++++++++++++++--
- hw/pci-host/piix.c          |  6 ----
+Signed-off-by: Phil Dennis-Jordan <phil@philjordan.eu>
+---
+ hw/i386/acpi-build.c        | 32 +++++++++++++++++--
  include/hw/acpi/acpi-defs.h | 77 +++++++++++++++++++++------------------------
- include/hw/i386/pc.h        |  6 ++++
  tests/acpi-utils.h          | 10 ++++++
  tests/bios-tables-test.c    | 23 +++++++++++---
- 6 files changed, 102 insertions(+), 55 deletions(-)
+ 4 files changed, 93 insertions(+), 49 deletions(-)
 
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 2073108..7997f06 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -272,7 +272,7 @@ build_facs(GArray *table_data, BIOSLinker *linker)
+ }
+ 
+ /* Load chipset information in FADT */
+-static void fadt_setup(AcpiFadtDescriptorRev1 *fadt, AcpiPmInfo *pm)
++static void fadt_setup(AcpiFadtDescriptorRev3 *fadt, AcpiPmInfo *pm)
+ {
+     fadt->model = 1;
+     fadt->reserved1 = 0;
+@@ -304,6 +304,28 @@ static void fadt_setup(AcpiFadtDescriptorRev1 *fadt, AcpiPmInfo *pm)
+         fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_FORCE_APIC_CLUSTER_MODEL);
+     }
+     fadt->century = RTC_CENTURY;
++
++    fadt->flags |= cpu_to_le32(1 << ACPI_FADT_F_RESET_REG_SUP);
++    fadt->reset_value = 0xf;
++    fadt->reset_register.space_id = AML_SYSTEM_IO;
++    fadt->reset_register.bit_width = 8;
++    fadt->reset_register.address = cpu_to_le64(ICH9_RST_CNT_IOPORT);
++
++    fadt->xpm1a_event_block.space_id = AML_SYSTEM_IO;
++    fadt->xpm1a_event_block.bit_width = fadt->pm1_evt_len * 8;
++    fadt->xpm1a_event_block.address = cpu_to_le64(pm->io_base);
++
++    fadt->xpm1a_control_block.space_id = AML_SYSTEM_IO;
++    fadt->xpm1a_control_block.bit_width = fadt->pm1_cnt_len * 8;
++    fadt->xpm1a_control_block.address = cpu_to_le64(pm->io_base + 0x4);
++
++    fadt->xpm_timer_block.space_id = AML_SYSTEM_IO;
++    fadt->xpm_timer_block.bit_width = fadt->pm_tmr_len * 8;
++    fadt->xpm_timer_block.address = cpu_to_le64(pm->io_base + 0x8);
++
++    fadt->xgpe0_block.space_id = AML_SYSTEM_IO;
++    fadt->xgpe0_block.bit_width = pm->gpe0_blk_len * 8;
++    fadt->xgpe0_block.address = cpu_to_le64(pm->gpe0_blk);
+ }
+ 
+ 
+@@ -313,9 +335,10 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
+            unsigned facs_tbl_offset, unsigned dsdt_tbl_offset,
+            const char *oem_id, const char *oem_table_id)
+ {
+-    AcpiFadtDescriptorRev1 *fadt = acpi_data_push(table_data, sizeof(*fadt));
++    AcpiFadtDescriptorRev3 *fadt = acpi_data_push(table_data, sizeof(*fadt));
+     unsigned fw_ctrl_offset = (char *)&fadt->firmware_ctrl - table_data->data;
+     unsigned dsdt_entry_offset = (char *)&fadt->dsdt - table_data->data;
++    unsigned xdsdt_entry_offset = (char *)&fadt->Xdsdt - table_data->data;
+ 
+     /* FACS address to be filled by Guest linker */
+     bios_linker_loader_add_pointer(linker,
+@@ -327,9 +350,12 @@ build_fadt(GArray *table_data, BIOSLinker *linker, AcpiPmInfo *pm,
+     bios_linker_loader_add_pointer(linker,
+         ACPI_BUILD_TABLE_FILE, dsdt_entry_offset, sizeof(fadt->dsdt),
+         ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
++    bios_linker_loader_add_pointer(linker,
++        ACPI_BUILD_TABLE_FILE, xdsdt_entry_offset, sizeof(fadt->Xdsdt),
++        ACPI_BUILD_TABLE_FILE, dsdt_tbl_offset);
+ 
+     build_header(linker, table_data,
+-                 (void *)fadt, "FACP", sizeof(*fadt), 1, oem_id, oem_table_id);
++                 (void *)fadt, "FACP", sizeof(*fadt), 3, oem_id, oem_table_id);
+ }
+ 
+ void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
+diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+index 4cc3630..293ee45 100644
+--- a/include/hw/acpi/acpi-defs.h
++++ b/include/hw/acpi/acpi-defs.h
+@@ -131,17 +131,37 @@ typedef struct AcpiTableHeader AcpiTableHeader;
+     uint8_t  duty_width;   /* Bit width of duty cycle field in p_cnt reg */ \
+     uint8_t  day_alrm;     /* Index to day-of-month alarm in RTC CMOS RAM */ \
+     uint8_t  mon_alrm;     /* Index to month-of-year alarm in RTC CMOS RAM */ \
+-    uint8_t  century;      /* Index to century in RTC CMOS RAM */
+-
+-struct AcpiFadtDescriptorRev1
+-{
+-    ACPI_FADT_COMMON_DEF
+-    uint8_t  reserved4;              /* Reserved */
+-    uint8_t  reserved4a;             /* Reserved */
+-    uint8_t  reserved4b;             /* Reserved */
+-    uint32_t flags;
+-} QEMU_PACKED;
+-typedef struct AcpiFadtDescriptorRev1 AcpiFadtDescriptorRev1;
++    uint8_t  century;      /* Index to century in RTC CMOS RAM */ \
++    /* IA-PC Boot Architecture Flags (see below for individual flags) */ \
++    uint16_t boot_flags; \
++    uint8_t reserved;    /* Reserved, must be zero */ \
++    /* Miscellaneous flag bits (see below for individual flags) */ \
++    uint32_t flags; \
++    /* 64-bit address of the Reset register */ \
++    struct AcpiGenericAddress reset_register; \
++    /* Value to write to the reset_register port to reset the system */ \
++    uint8_t reset_value; \
++    /* ARM-Specific Boot Flags (see below for individual flags) (ACPI 5.1) */ \
++    uint16_t arm_boot_flags; \
++    uint8_t minor_revision;  /* FADT Minor Revision (ACPI 5.1) */ \
++    uint64_t Xfacs;          /* 64-bit physical address of FACS */ \
++    uint64_t Xdsdt;          /* 64-bit physical address of DSDT */ \
++    /* 64-bit Extended Power Mgt 1a Event Reg Blk address */ \
++    struct AcpiGenericAddress xpm1a_event_block; \
++    /* 64-bit Extended Power Mgt 1b Event Reg Blk address */ \
++    struct AcpiGenericAddress xpm1b_event_block; \
++    /* 64-bit Extended Power Mgt 1a Control Reg Blk address */ \
++    struct AcpiGenericAddress xpm1a_control_block; \
++    /* 64-bit Extended Power Mgt 1b Control Reg Blk address */ \
++    struct AcpiGenericAddress xpm1b_control_block; \
++    /* 64-bit Extended Power Mgt 2 Control Reg Blk address */ \
++    struct AcpiGenericAddress xpm2_control_block; \
++    /* 64-bit Extended Power Mgt Timer Ctrl Reg Blk address */ \
++    struct AcpiGenericAddress xpm_timer_block; \
++    /* 64-bit Extended General Purpose Event 0 Reg Blk address */ \
++    struct AcpiGenericAddress xgpe0_block; \
++    /* 64-bit Extended General Purpose Event 1 Reg Blk address */ \
++    struct AcpiGenericAddress xgpe1_block; \
+ 
+ struct AcpiGenericAddress {
+     uint8_t space_id;        /* Address space where struct or register exists */
+@@ -151,38 +171,13 @@ struct AcpiGenericAddress {
+     uint64_t address;        /* 64-bit address of struct or register */
+ } QEMU_PACKED;
+ 
++struct AcpiFadtDescriptorRev3 {
++    ACPI_FADT_COMMON_DEF
++} QEMU_PACKED;
++typedef struct AcpiFadtDescriptorRev3 AcpiFadtDescriptorRev3;
++
+ struct AcpiFadtDescriptorRev5_1 {
+     ACPI_FADT_COMMON_DEF
+-    /* IA-PC Boot Architecture Flags (see below for individual flags) */
+-    uint16_t boot_flags;
+-    uint8_t reserved;    /* Reserved, must be zero */
+-    /* Miscellaneous flag bits (see below for individual flags) */
+-    uint32_t flags;
+-    /* 64-bit address of the Reset register */
+-    struct AcpiGenericAddress reset_register;
+-    /* Value to write to the reset_register port to reset the system */
+-    uint8_t reset_value;
+-    /* ARM-Specific Boot Flags (see below for individual flags) (ACPI 5.1) */
+-    uint16_t arm_boot_flags;
+-    uint8_t minor_revision;  /* FADT Minor Revision (ACPI 5.1) */
+-    uint64_t Xfacs;          /* 64-bit physical address of FACS */
+-    uint64_t Xdsdt;          /* 64-bit physical address of DSDT */
+-    /* 64-bit Extended Power Mgt 1a Event Reg Blk address */
+-    struct AcpiGenericAddress xpm1a_event_block;
+-    /* 64-bit Extended Power Mgt 1b Event Reg Blk address */
+-    struct AcpiGenericAddress xpm1b_event_block;
+-    /* 64-bit Extended Power Mgt 1a Control Reg Blk address */
+-    struct AcpiGenericAddress xpm1a_control_block;
+-    /* 64-bit Extended Power Mgt 1b Control Reg Blk address */
+-    struct AcpiGenericAddress xpm1b_control_block;
+-    /* 64-bit Extended Power Mgt 2 Control Reg Blk address */
+-    struct AcpiGenericAddress xpm2_control_block;
+-    /* 64-bit Extended Power Mgt Timer Ctrl Reg Blk address */
+-    struct AcpiGenericAddress xpm_timer_block;
+-    /* 64-bit Extended General Purpose Event 0 Reg Blk address */
+-    struct AcpiGenericAddress xgpe0_block;
+-    /* 64-bit Extended General Purpose Event 1 Reg Blk address */
+-    struct AcpiGenericAddress xgpe1_block;
+     /* 64-bit Sleep Control register (ACPI 5.0) */
+     struct AcpiGenericAddress sleep_control;
+     /* 64-bit Sleep Status register (ACPI 5.0) */
+diff --git a/tests/acpi-utils.h b/tests/acpi-utils.h
+index 9f9a2d5..59bf978 100644
+--- a/tests/acpi-utils.h
++++ b/tests/acpi-utils.h
+@@ -87,6 +87,16 @@ typedef struct {
+     g_assert_cmpstr(ACPI_ASSERT_CMP_str, ==, expected); \
+ } while (0)
+ 
++#define ACPI_READ_GENERIC_ADDRESS(field, addr)       \
++    do {                                             \
++        ACPI_READ_FIELD((field).space_id, addr);     \
++        ACPI_READ_FIELD((field).bit_width, addr);    \
++        ACPI_READ_FIELD((field).bit_offset, addr);   \
++        ACPI_READ_FIELD((field).access_width, addr); \
++        ACPI_READ_FIELD((field).address, addr);      \
++    } while (0);
++
++
+ uint8_t acpi_calc_checksum(const uint8_t *data, int len);
+ uint32_t acpi_find_rsdp_address(void);
+ void acpi_parse_rsdp_table(uint32_t addr, AcpiRsdpDescriptor *rsdp_table);
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index 88dbf97..9c96a67 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -29,7 +29,7 @@ typedef struct {
+     uint32_t rsdp_addr;
+     AcpiRsdpDescriptor rsdp_table;
+     AcpiRsdtDescriptorRev1 rsdt_table;
+-    AcpiFadtDescriptorRev1 fadt_table;
++    AcpiFadtDescriptorRev3 fadt_table;
+     AcpiFacsDescriptorRev1 facs_table;
+     uint32_t *rsdt_tables_addr;
+     int rsdt_tables_nr;
+@@ -126,7 +126,7 @@ static void test_acpi_rsdt_table(test_data *data)
+ 
+ static void test_acpi_fadt_table(test_data *data)
+ {
+-    AcpiFadtDescriptorRev1 *fadt_table = &data->fadt_table;
++    AcpiFadtDescriptorRev3 *fadt_table = &data->fadt_table;
+     uint32_t addr;
+ 
+     /* FADT table comes first */
+@@ -168,10 +168,23 @@ static void test_acpi_fadt_table(test_data *data)
+     ACPI_READ_FIELD(fadt_table->day_alrm, addr);
+     ACPI_READ_FIELD(fadt_table->mon_alrm, addr);
+     ACPI_READ_FIELD(fadt_table->century, addr);
+-    ACPI_READ_FIELD(fadt_table->reserved4, addr);
+-    ACPI_READ_FIELD(fadt_table->reserved4a, addr);
+-    ACPI_READ_FIELD(fadt_table->reserved4b, addr);
++    ACPI_READ_FIELD(fadt_table->boot_flags, addr);
++    ACPI_READ_FIELD(fadt_table->reserved, addr);
+     ACPI_READ_FIELD(fadt_table->flags, addr);
++    ACPI_READ_GENERIC_ADDRESS(fadt_table->reset_register, addr);
++    ACPI_READ_FIELD(fadt_table->reset_value, addr);
++    ACPI_READ_FIELD(fadt_table->arm_boot_flags, addr);
++    ACPI_READ_FIELD(fadt_table->minor_revision, addr);
++    ACPI_READ_FIELD(fadt_table->Xfacs, addr);
++    ACPI_READ_FIELD(fadt_table->Xdsdt, addr);
++    ACPI_READ_GENERIC_ADDRESS(fadt_table->xpm1a_event_block, addr);
++    ACPI_READ_GENERIC_ADDRESS(fadt_table->xpm1b_event_block, addr);
++    ACPI_READ_GENERIC_ADDRESS(fadt_table->xpm1a_control_block, addr);
++    ACPI_READ_GENERIC_ADDRESS(fadt_table->xpm1b_control_block, addr);
++    ACPI_READ_GENERIC_ADDRESS(fadt_table->xpm2_control_block, addr);
++    ACPI_READ_GENERIC_ADDRESS(fadt_table->xpm_timer_block, addr);
++    ACPI_READ_GENERIC_ADDRESS(fadt_table->xgpe0_block, addr);
++    ACPI_READ_GENERIC_ADDRESS(fadt_table->xgpe1_block, addr);
+ 
+     ACPI_ASSERT_CMP(fadt_table->signature, "FACP");
+     g_assert(!acpi_calc_checksum((uint8_t *)fadt_table, fadt_table->length));
 -- 
 2.3.2 (Apple Git-55)
