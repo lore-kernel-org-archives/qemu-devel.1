@@ -1,25 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1co6TO-0007RT-1T
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:48:08 -0400
+	(envelope-from <berrange@redhat.com>) id 1co6Ut-0007xE-7c
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:49:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1co6TI-000215-VD
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:48:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43100)
+	(envelope-from <berrange@redhat.com>) id 1co6Up-0002U6-G5
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:49:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44216)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1co6TI-00020K-ND
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:48:00 -0400
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1co6Up-0002Tp-7G
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:49:35 -0400
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DA18D64DA0
-	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 10:47:59 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 15 Mar 2017 11:47:52 +0100
-Message-Id: <1489574872-8679-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH] cirrus: stop passing around dst pointers in
- the blitter
+	by mx1.redhat.com (Postfix) with ESMTPS id 352EC4E03F
+	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 10:49:35 +0000 (UTC)
+Date: Wed, 15 Mar 2017 10:49:29 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170315104929.GG7770@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170301123223.12489-1-berrange@redhat.com>
+	<a08dc58b-a169-cb17-2187-1b66c6878a39@redhat.com>
+	<20170302123300.GJ29835@redhat.com>
+	<87d1dys9mr.fsf@dusky.pond.sub.org> <20170314184909.GC7576@work-vm>
+	<87bmt3t5r0.fsf@dusky.pond.sub.org> <20170315093226.GB2430@work-vm>
+	<87h92ultmu.fsf@dusky.pond.sub.org> <20170315103634.GC2430@work-vm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170315103634.GC2430@work-vm>
+Subject: Re: [Qemu-devel] [PATCH] migration: allow clearing migration string
+ parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,612 +39,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
-Instead pass around the address (aka offset into vga memory).  Calculate
-the pointer in the rop_* functions, after applying the mask to the
-address, to make sure the address stays within the valid range.
+On Wed, Mar 15, 2017 at 10:36:35AM +0000, Dr. David Alan Gilbert wrote:
+> * Markus Armbruster (armbru@redhat.com) wrote:
+> > "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+> > 
+> > > * Markus Armbruster (armbru@redhat.com) wrote:
+> > >> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+> > [...]
+> > >> > I'm confused why we need a 'reset to default' - all we need is the ability
+> > >> > to change each parameter, and for the new value of that parameter
+> > >> > to be an empty string.
+> > >> 
+> > >> You argue syntax, I'm arguing semantics.
+> > >> 
+> > >> The command means "set parameter P to value V".  *Except* when V is "",
+> > >> it means something else, namely "reset parameter P to its default,
+> > >> whatever that may be".
+> > >> 
+> > >> This is (a) not general, because it won't do for cases where "" may
+> > >> occur as value, and (b) ugly.
+> > >> 
+> > >> Ugliness is the eye of the beholder.  Lack of generality isn't.
+> > >
+> > > No, I'm questioning why it's defined as 'reset parameter P to its default';
+> > > why do we need a way to do that?
+> > 
+> > Dan's commit message explains:
+> > 
+> >     Some of the migration parameters are strings, which default to NULL,
+> >     eg tls_hostname and tls_creds.
+> > 
+> >     The mgmt app will set the tls_creds parameter on both source and target
+> >     QEMU instances, in order to trigger use of TLS for migration.
+> > 
+> >     After performing a TLS encrypted migration though, migration might be
+> >     used for other reasons - for example, to save the QEMU state to a file.
+> >     We need TLS turned off when doing this, but the migrate-set-parameters
+> >     QAPI command does not provide any facility to clear/reset parameters
+> >     to their default state.
+> > 
+> >     If you simply ommit the tls_creds parameter in migrate-set-parameters,
+> >     then 'has_tls_creds' will be false and so no action will be taken. The
+> >     only option that works with migrate-set-parameters is to treat "" on
+> >     the wire as equivalent to requesting NULL. Failing that we would have
+> >     to create a new 'migrate-reset-parameters' method to explicitly put
+> >     a parameter back to its default value.
+> 
+> OK, I thought the default was empty string.
+> IMHO the problem here is we're just being too clever; lets just make
+> the default "" rather than NULL, and make that parameter always be
+> a string.
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/display/cirrus_vga.c      |  20 +++---
- hw/display/cirrus_vga_rop.h  | 161 +++++++++++++++++++++++++------------------
- hw/display/cirrus_vga_rop2.h |  97 +++++++++++++-------------
- 3 files changed, 153 insertions(+), 125 deletions(-)
+>From an internal migration code POV I think NULL is right, but none the
+less I'll create a patch showing what using "" internally would look
+like so we can compare
 
-diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
-index b9e7cb1..f7fb41f 100644
---- a/hw/display/cirrus_vga.c
-+++ b/hw/display/cirrus_vga.c
-@@ -178,11 +178,12 @@
- 
- struct CirrusVGAState;
- typedef void (*cirrus_bitblt_rop_t) (struct CirrusVGAState *s,
--                                     uint8_t * dst, const uint8_t * src,
-+                                     uint32_t dstaddr, const uint8_t *src,
- 				     int dstpitch, int srcpitch,
- 				     int bltwidth, int bltheight);
- typedef void (*cirrus_fill_t)(struct CirrusVGAState *s,
--                              uint8_t *dst, int dst_pitch, int width, int height);
-+                              uint32_t dstaddr, int dst_pitch,
-+                              int width, int height);
- 
- typedef struct CirrusVGAState {
-     VGACommonState vga;
-@@ -320,14 +321,14 @@ static bool blit_is_unsafe(struct CirrusVGAState *s, bool dst_only)
- }
- 
- static void cirrus_bitblt_rop_nop(CirrusVGAState *s,
--                                  uint8_t *dst,const uint8_t *src,
-+                                  uint32_t dstaddr, const uint8_t *src,
-                                   int dstpitch,int srcpitch,
-                                   int bltwidth,int bltheight)
- {
- }
- 
- static void cirrus_bitblt_fill_nop(CirrusVGAState *s,
--                                   uint8_t *dst,
-+                                   uint32_t dstaddr,
-                                    int dstpitch, int bltwidth,int bltheight)
- {
- }
-@@ -677,11 +678,8 @@ static void cirrus_invalidate_region(CirrusVGAState * s, int off_begin,
- static int cirrus_bitblt_common_patterncopy(CirrusVGAState *s, bool videosrc)
- {
-     uint32_t patternsize;
--    uint8_t *dst;
-     uint8_t *src;
- 
--    dst = s->vga.vram_ptr + s->cirrus_blt_dstaddr;
--
-     if (videosrc) {
-         switch (s->vga.get_bpp(&s->vga)) {
-         case 8:
-@@ -710,7 +708,7 @@ static int cirrus_bitblt_common_patterncopy(CirrusVGAState *s, bool videosrc)
-         return 0;
-     }
- 
--    (*s->cirrus_rop) (s, dst, src,
-+    (*s->cirrus_rop) (s, s->cirrus_blt_dstaddr, src,
-                       s->cirrus_blt_dstpitch, 0,
-                       s->cirrus_blt_width, s->cirrus_blt_height);
-     cirrus_invalidate_region(s, s->cirrus_blt_dstaddr,
-@@ -729,7 +727,7 @@ static int cirrus_bitblt_solidfill(CirrusVGAState *s, int blt_rop)
-         return 0;
-     }
-     rop_func = cirrus_fill[rop_to_index[blt_rop]][s->cirrus_blt_pixelwidth - 1];
--    rop_func(s, s->vga.vram_ptr + s->cirrus_blt_dstaddr,
-+    rop_func(s, s->cirrus_blt_dstaddr,
-              s->cirrus_blt_dstpitch,
-              s->cirrus_blt_width, s->cirrus_blt_height);
-     cirrus_invalidate_region(s, s->cirrus_blt_dstaddr,
-@@ -801,7 +799,7 @@ static int cirrus_do_copy(CirrusVGAState *s, int dst, int src, int w, int h)
-     if (notify)
-         graphic_hw_update(s->vga.con);
- 
--    (*s->cirrus_rop) (s, s->vga.vram_ptr + s->cirrus_blt_dstaddr,
-+    (*s->cirrus_rop) (s, s->cirrus_blt_dstaddr,
-                       s->vga.vram_ptr + s->cirrus_blt_srcaddr,
- 		      s->cirrus_blt_dstpitch, s->cirrus_blt_srcpitch,
- 		      s->cirrus_blt_width, s->cirrus_blt_height);
-@@ -853,7 +851,7 @@ static void cirrus_bitblt_cputovideo_next(CirrusVGAState * s)
-         } else {
-             /* at least one scan line */
-             do {
--                (*s->cirrus_rop)(s, s->vga.vram_ptr + s->cirrus_blt_dstaddr,
-+                (*s->cirrus_rop)(s, s->cirrus_blt_dstaddr,
-                                   s->cirrus_bltbuf, 0, 0, s->cirrus_blt_width, 1);
-                 cirrus_invalidate_region(s, s->cirrus_blt_dstaddr, 0,
-                                          s->cirrus_blt_width, 1);
-diff --git a/hw/display/cirrus_vga_rop.h b/hw/display/cirrus_vga_rop.h
-index 0925a00..433f831 100644
---- a/hw/display/cirrus_vga_rop.h
-+++ b/hw/display/cirrus_vga_rop.h
-@@ -22,31 +22,65 @@
-  * THE SOFTWARE.
-  */
- 
--static inline void glue(rop_8_,ROP_NAME)(uint8_t *dst, uint8_t src)
-+static inline void glue(rop_8_, ROP_NAME)(CirrusVGAState *s,
-+                                          uint32_t dstaddr, uint8_t src)
- {
-+    uint8_t *dst = &s->vga.vram_ptr[dstaddr & s->cirrus_addr_mask];
-     *dst = ROP_FN(*dst, src);
- }
- 
--static inline void glue(rop_16_,ROP_NAME)(uint16_t *dst, uint16_t src)
-+static inline void glue(rop_tr_8_, ROP_NAME)(CirrusVGAState *s,
-+                                             uint32_t dstaddr, uint8_t src,
-+                                             uint8_t transp)
- {
-+    uint8_t *dst = &s->vga.vram_ptr[dstaddr & s->cirrus_addr_mask];
-+    uint8_t pixel = ROP_FN(*dst, src);
-+    if (pixel != transp) {
-+        *dst = pixel;
-+    }
-+}
-+
-+static inline void glue(rop_16_, ROP_NAME)(CirrusVGAState *s,
-+                                           uint32_t dstaddr, uint16_t src)
-+{
-+    uint16_t *dst = (uint16_t *)
-+        (&s->vga.vram_ptr[dstaddr & s->cirrus_addr_mask & ~1]);
-     *dst = ROP_FN(*dst, src);
- }
- 
--static inline void glue(rop_32_,ROP_NAME)(uint32_t *dst, uint32_t src)
-+static inline void glue(rop_tr_16_, ROP_NAME)(CirrusVGAState *s,
-+                                              uint32_t dstaddr, uint16_t src,
-+                                              uint16_t transp)
-+{
-+    uint16_t *dst = (uint16_t *)
-+        (&s->vga.vram_ptr[dstaddr & s->cirrus_addr_mask & ~1]);
-+    uint16_t pixel = ROP_FN(*dst, src);
-+    if (pixel != transp) {
-+        *dst = pixel;
-+    }
-+}
-+
-+static inline void glue(rop_32_, ROP_NAME)(CirrusVGAState *s,
-+                                           uint32_t dstaddr, uint32_t src)
- {
-+    uint32_t *dst = (uint32_t *)
-+        (&s->vga.vram_ptr[dstaddr & s->cirrus_addr_mask & ~3]);
-     *dst = ROP_FN(*dst, src);
- }
- 
--#define ROP_OP(d, s) glue(rop_8_,ROP_NAME)(d, s)
--#define ROP_OP_16(d, s) glue(rop_16_,ROP_NAME)(d, s)
--#define ROP_OP_32(d, s) glue(rop_32_,ROP_NAME)(d, s)
-+#define ROP_OP(st, d, s)           glue(rop_8_, ROP_NAME)(st, d, s)
-+#define ROP_OP_TR(st, d, s, t)     glue(rop_tr_8_, ROP_NAME)(st, d, s, t)
-+#define ROP_OP_16(st, d, s)        glue(rop_16_, ROP_NAME)(st, d, s)
-+#define ROP_OP_TR_16(st, d, s, t)  glue(rop_tr_16_, ROP_NAME)(st, d, s, t)
-+#define ROP_OP_32(st, d, s)        glue(rop_32_, ROP_NAME)(st, d, s)
- #undef ROP_FN
- 
- static void
- glue(cirrus_bitblt_rop_fwd_, ROP_NAME)(CirrusVGAState *s,
--                             uint8_t *dst,const uint8_t *src,
--                             int dstpitch,int srcpitch,
--                             int bltwidth,int bltheight)
-+                                       uint32_t dstaddr,
-+                                       const uint8_t *src,
-+                                       int dstpitch, int srcpitch,
-+                                       int bltwidth, int bltheight)
- {
-     int x,y;
-     dstpitch -= bltwidth;
-@@ -58,133 +92,128 @@ glue(cirrus_bitblt_rop_fwd_, ROP_NAME)(CirrusVGAState *s,
- 
-     for (y = 0; y < bltheight; y++) {
-         for (x = 0; x < bltwidth; x++) {
--            ROP_OP(dst, *src);
--            dst++;
-+            ROP_OP(s, dstaddr, *src);
-+            dstaddr++;
-             src++;
-         }
--        dst += dstpitch;
-+        dstaddr += dstpitch;
-         src += srcpitch;
-     }
- }
- 
- static void
- glue(cirrus_bitblt_rop_bkwd_, ROP_NAME)(CirrusVGAState *s,
--                                        uint8_t *dst,const uint8_t *src,
--                                        int dstpitch,int srcpitch,
--                                        int bltwidth,int bltheight)
-+                                        uint32_t dstaddr,
-+                                        const uint8_t *src,
-+                                        int dstpitch, int srcpitch,
-+                                        int bltwidth, int bltheight)
- {
-     int x,y;
-     dstpitch += bltwidth;
-     srcpitch += bltwidth;
-     for (y = 0; y < bltheight; y++) {
-         for (x = 0; x < bltwidth; x++) {
--            ROP_OP(dst, *src);
--            dst--;
-+            ROP_OP(s, dstaddr, *src);
-+            dstaddr--;
-             src--;
-         }
--        dst += dstpitch;
-+        dstaddr += dstpitch;
-         src += srcpitch;
-     }
- }
- 
- static void
- glue(glue(cirrus_bitblt_rop_fwd_transp_, ROP_NAME),_8)(CirrusVGAState *s,
--						       uint8_t *dst,const uint8_t *src,
--						       int dstpitch,int srcpitch,
--						       int bltwidth,int bltheight)
-+                                                       uint32_t dstaddr,
-+                                                       const uint8_t *src,
-+                                                       int dstpitch,
-+                                                       int srcpitch,
-+                                                       int bltwidth,
-+                                                       int bltheight)
- {
-     int x,y;
--    uint8_t p;
-+    uint8_t transp = s->vga.gr[0x34];
-     dstpitch -= bltwidth;
-     srcpitch -= bltwidth;
-     for (y = 0; y < bltheight; y++) {
-         for (x = 0; x < bltwidth; x++) {
--	    p = *dst;
--            ROP_OP(&p, *src);
--	    if (p != s->vga.gr[0x34]) *dst = p;
--            dst++;
-+            ROP_OP_TR(s, dstaddr, *src, transp);
-+            dstaddr++;
-             src++;
-         }
--        dst += dstpitch;
-+        dstaddr += dstpitch;
-         src += srcpitch;
-     }
- }
- 
- static void
- glue(glue(cirrus_bitblt_rop_bkwd_transp_, ROP_NAME),_8)(CirrusVGAState *s,
--							uint8_t *dst,const uint8_t *src,
--							int dstpitch,int srcpitch,
--							int bltwidth,int bltheight)
-+                                                        uint32_t dstaddr,
-+                                                        const uint8_t *src,
-+                                                        int dstpitch,
-+                                                        int srcpitch,
-+                                                        int bltwidth,
-+                                                        int bltheight)
- {
-     int x,y;
--    uint8_t p;
-+    uint8_t transp = s->vga.gr[0x34];
-     dstpitch += bltwidth;
-     srcpitch += bltwidth;
-     for (y = 0; y < bltheight; y++) {
-         for (x = 0; x < bltwidth; x++) {
--	    p = *dst;
--            ROP_OP(&p, *src);
--	    if (p != s->vga.gr[0x34]) *dst = p;
--            dst--;
-+            ROP_OP_TR(s, dstaddr, *src, transp);
-+            dstaddr--;
-             src--;
-         }
--        dst += dstpitch;
-+        dstaddr += dstpitch;
-         src += srcpitch;
-     }
- }
- 
- static void
- glue(glue(cirrus_bitblt_rop_fwd_transp_, ROP_NAME),_16)(CirrusVGAState *s,
--							uint8_t *dst,const uint8_t *src,
--							int dstpitch,int srcpitch,
--							int bltwidth,int bltheight)
-+                                                        uint32_t dstaddr,
-+                                                        const uint8_t *src,
-+                                                        int dstpitch,
-+                                                        int srcpitch,
-+                                                        int bltwidth,
-+                                                        int bltheight)
- {
-     int x,y;
--    uint8_t p1, p2;
-+    uint16_t transp = s->vga.gr[0x34] | (uint16_t)s->vga.gr[0x35] << 8;
-     dstpitch -= bltwidth;
-     srcpitch -= bltwidth;
-     for (y = 0; y < bltheight; y++) {
-         for (x = 0; x < bltwidth; x+=2) {
--	    p1 = *dst;
--	    p2 = *(dst+1);
--            ROP_OP(&p1, *src);
--            ROP_OP(&p2, *(src + 1));
--	    if ((p1 != s->vga.gr[0x34]) || (p2 != s->vga.gr[0x35])) {
--		*dst = p1;
--		*(dst+1) = p2;
--	    }
--            dst+=2;
--            src+=2;
-+            ROP_OP_TR_16(s, dstaddr, *(uint16_t *)src, transp);
-+            dstaddr += 2;
-+            src += 2;
-         }
--        dst += dstpitch;
-+        dstaddr += dstpitch;
-         src += srcpitch;
-     }
- }
- 
- static void
- glue(glue(cirrus_bitblt_rop_bkwd_transp_, ROP_NAME),_16)(CirrusVGAState *s,
--							 uint8_t *dst,const uint8_t *src,
--							 int dstpitch,int srcpitch,
--							 int bltwidth,int bltheight)
-+                                                         uint32_t dstaddr,
-+                                                         const uint8_t *src,
-+                                                         int dstpitch,
-+                                                         int srcpitch,
-+                                                         int bltwidth,
-+                                                         int bltheight)
- {
-     int x,y;
--    uint8_t p1, p2;
-+    uint16_t transp = s->vga.gr[0x34] | (uint16_t)s->vga.gr[0x35] << 8;
-     dstpitch += bltwidth;
-     srcpitch += bltwidth;
-     for (y = 0; y < bltheight; y++) {
-         for (x = 0; x < bltwidth; x+=2) {
--	    p1 = *(dst-1);
--	    p2 = *dst;
--            ROP_OP(&p1, *(src - 1));
--            ROP_OP(&p2, *src);
--	    if ((p1 != s->vga.gr[0x34]) || (p2 != s->vga.gr[0x35])) {
--		*(dst-1) = p1;
--		*dst = p2;
--	    }
--            dst-=2;
--            src-=2;
-+            ROP_OP_TR_16(s, dstaddr, *(uint16_t *)src, transp);
-+            dstaddr -= 2;
-+            src -= 2;
-         }
--        dst += dstpitch;
-+        dstaddr += dstpitch;
-         src += srcpitch;
-     }
- }
-diff --git a/hw/display/cirrus_vga_rop2.h b/hw/display/cirrus_vga_rop2.h
-index d28bcc6..bc92f0e 100644
---- a/hw/display/cirrus_vga_rop2.h
-+++ b/hw/display/cirrus_vga_rop2.h
-@@ -23,27 +23,29 @@
-  */
- 
- #if DEPTH == 8
--#define PUTPIXEL()    ROP_OP(&d[0], col)
-+#define PUTPIXEL(s, a, c)    ROP_OP(s, a, c)
- #elif DEPTH == 16
--#define PUTPIXEL()    ROP_OP_16((uint16_t *)&d[0], col)
-+#define PUTPIXEL(s, a, c)    ROP_OP_16(s, a, c)
- #elif DEPTH == 24
--#define PUTPIXEL()    ROP_OP(&d[0], col);        \
--                      ROP_OP(&d[1], (col >> 8)); \
--                      ROP_OP(&d[2], (col >> 16))
-+#define PUTPIXEL(s, a, c)    do {          \
-+        ROP_OP(s, a,     c);               \
-+        ROP_OP(s, a + 1, (col >> 8));      \
-+        ROP_OP(s, a + 2, (col >> 16));     \
-+    } while (0)
- #elif DEPTH == 32
--#define PUTPIXEL()    ROP_OP_32(((uint32_t *)&d[0]), col)
-+#define PUTPIXEL(s, a, c)    ROP_OP_32(s, a, c)
- #else
- #error unsupported DEPTH
- #endif
- 
- static void
- glue(glue(glue(cirrus_patternfill_, ROP_NAME), _),DEPTH)
--     (CirrusVGAState * s, uint8_t * dst,
--      const uint8_t * src,
-+     (CirrusVGAState *s, uint32_t dstaddr,
-+      const uint8_t *src,
-       int dstpitch, int srcpitch,
-       int bltwidth, int bltheight)
- {
--    uint8_t *d;
-+    uint32_t addr;
-     int x, y, pattern_y, pattern_pitch, pattern_x;
-     unsigned int col;
-     const uint8_t *src1;
-@@ -63,7 +65,7 @@ glue(glue(glue(cirrus_patternfill_, ROP_NAME), _),DEPTH)
-     pattern_y = s->cirrus_blt_srcaddr & 7;
-     for(y = 0; y < bltheight; y++) {
-         pattern_x = skipleft;
--        d = dst + skipleft;
-+        addr = dstaddr + skipleft;
-         src1 = src + pattern_y * pattern_pitch;
-         for (x = skipleft; x < bltwidth; x += (DEPTH / 8)) {
- #if DEPTH == 8
-@@ -82,23 +84,23 @@ glue(glue(glue(cirrus_patternfill_, ROP_NAME), _),DEPTH)
-             col = ((uint32_t *)(src1 + pattern_x))[0];
-             pattern_x = (pattern_x + 4) & 31;
- #endif
--            PUTPIXEL();
--            d += (DEPTH / 8);
-+            PUTPIXEL(s, addr, col);
-+            addr += (DEPTH / 8);
-         }
-         pattern_y = (pattern_y + 1) & 7;
--        dst += dstpitch;
-+        dstaddr += dstpitch;
-     }
- }
- 
- /* NOTE: srcpitch is ignored */
- static void
- glue(glue(glue(cirrus_colorexpand_transp_, ROP_NAME), _),DEPTH)
--     (CirrusVGAState * s, uint8_t * dst,
--      const uint8_t * src,
-+     (CirrusVGAState *s, uint32_t dstaddr,
-+      const uint8_t *src,
-       int dstpitch, int srcpitch,
-       int bltwidth, int bltheight)
- {
--    uint8_t *d;
-+    uint32_t addr;
-     int x, y;
-     unsigned bits, bits_xor;
-     unsigned int col;
-@@ -123,7 +125,7 @@ glue(glue(glue(cirrus_colorexpand_transp_, ROP_NAME), _),DEPTH)
-     for(y = 0; y < bltheight; y++) {
-         bitmask = 0x80 >> srcskipleft;
-         bits = *src++ ^ bits_xor;
--        d = dst + dstskipleft;
-+        addr = dstaddr + dstskipleft;
-         for (x = dstskipleft; x < bltwidth; x += (DEPTH / 8)) {
-             if ((bitmask & 0xff) == 0) {
-                 bitmask = 0x80;
-@@ -131,24 +133,24 @@ glue(glue(glue(cirrus_colorexpand_transp_, ROP_NAME), _),DEPTH)
-             }
-             index = (bits & bitmask);
-             if (index) {
--                PUTPIXEL();
-+                PUTPIXEL(s, addr, col);
-             }
--            d += (DEPTH / 8);
-+            addr += (DEPTH / 8);
-             bitmask >>= 1;
-         }
--        dst += dstpitch;
-+        dstaddr += dstpitch;
-     }
- }
- 
- static void
- glue(glue(glue(cirrus_colorexpand_, ROP_NAME), _),DEPTH)
--     (CirrusVGAState * s, uint8_t * dst,
--      const uint8_t * src,
-+     (CirrusVGAState *s, uint32_t dstaddr,
-+      const uint8_t *src,
-       int dstpitch, int srcpitch,
-       int bltwidth, int bltheight)
- {
-     uint32_t colors[2];
--    uint8_t *d;
-+    uint32_t addr;
-     int x, y;
-     unsigned bits;
-     unsigned int col;
-@@ -161,29 +163,29 @@ glue(glue(glue(cirrus_colorexpand_, ROP_NAME), _),DEPTH)
-     for(y = 0; y < bltheight; y++) {
-         bitmask = 0x80 >> srcskipleft;
-         bits = *src++;
--        d = dst + dstskipleft;
-+        addr = dstaddr + dstskipleft;
-         for (x = dstskipleft; x < bltwidth; x += (DEPTH / 8)) {
-             if ((bitmask & 0xff) == 0) {
-                 bitmask = 0x80;
-                 bits = *src++;
-             }
-             col = colors[!!(bits & bitmask)];
--            PUTPIXEL();
--            d += (DEPTH / 8);
-+            PUTPIXEL(s, addr, col);
-+            addr += (DEPTH / 8);
-             bitmask >>= 1;
-         }
--        dst += dstpitch;
-+        dstaddr += dstpitch;
-     }
- }
- 
- static void
- glue(glue(glue(cirrus_colorexpand_pattern_transp_, ROP_NAME), _),DEPTH)
--     (CirrusVGAState * s, uint8_t * dst,
--      const uint8_t * src,
-+     (CirrusVGAState *s, uint32_t dstaddr,
-+      const uint8_t *src,
-       int dstpitch, int srcpitch,
-       int bltwidth, int bltheight)
- {
--    uint8_t *d;
-+    uint32_t addr;
-     int x, y, bitpos, pattern_y;
-     unsigned int bits, bits_xor;
-     unsigned int col;
-@@ -207,28 +209,28 @@ glue(glue(glue(cirrus_colorexpand_pattern_transp_, ROP_NAME), _),DEPTH)
-     for(y = 0; y < bltheight; y++) {
-         bits = src[pattern_y] ^ bits_xor;
-         bitpos = 7 - srcskipleft;
--        d = dst + dstskipleft;
-+        addr = dstaddr + dstskipleft;
-         for (x = dstskipleft; x < bltwidth; x += (DEPTH / 8)) {
-             if ((bits >> bitpos) & 1) {
--                PUTPIXEL();
-+                PUTPIXEL(s, addr, col);
-             }
--            d += (DEPTH / 8);
-+            addr += (DEPTH / 8);
-             bitpos = (bitpos - 1) & 7;
-         }
-         pattern_y = (pattern_y + 1) & 7;
--        dst += dstpitch;
-+        dstaddr += dstpitch;
-     }
- }
- 
- static void
- glue(glue(glue(cirrus_colorexpand_pattern_, ROP_NAME), _),DEPTH)
--     (CirrusVGAState * s, uint8_t * dst,
--      const uint8_t * src,
-+     (CirrusVGAState *s, uint32_t dstaddr,
-+      const uint8_t *src,
-       int dstpitch, int srcpitch,
-       int bltwidth, int bltheight)
- {
-     uint32_t colors[2];
--    uint8_t *d;
-+    uint32_t addr;
-     int x, y, bitpos, pattern_y;
-     unsigned int bits;
-     unsigned int col;
-@@ -242,38 +244,37 @@ glue(glue(glue(cirrus_colorexpand_pattern_, ROP_NAME), _),DEPTH)
-     for(y = 0; y < bltheight; y++) {
-         bits = src[pattern_y];
-         bitpos = 7 - srcskipleft;
--        d = dst + dstskipleft;
-+        addr = dstaddr + dstskipleft;
-         for (x = dstskipleft; x < bltwidth; x += (DEPTH / 8)) {
-             col = colors[(bits >> bitpos) & 1];
--            PUTPIXEL();
--            d += (DEPTH / 8);
-+            PUTPIXEL(s, addr, col);
-+            addr += (DEPTH / 8);
-             bitpos = (bitpos - 1) & 7;
-         }
-         pattern_y = (pattern_y + 1) & 7;
--        dst += dstpitch;
-+        dstaddr += dstpitch;
-     }
- }
- 
- static void
- glue(glue(glue(cirrus_fill_, ROP_NAME), _),DEPTH)
-      (CirrusVGAState *s,
--      uint8_t *dst, int dst_pitch,
-+      uint32_t dstaddr, int dst_pitch,
-       int width, int height)
- {
--    uint8_t *d, *d1;
-+    uint32_t addr;
-     uint32_t col;
-     int x, y;
- 
-     col = s->cirrus_blt_fgcol;
- 
--    d1 = dst;
-     for(y = 0; y < height; y++) {
--        d = d1;
-+        addr = dstaddr;
-         for(x = 0; x < width; x += (DEPTH / 8)) {
--            PUTPIXEL();
--            d += (DEPTH / 8);
-+            PUTPIXEL(s, addr, col);
-+            addr += (DEPTH / 8);
-         }
--        d1 += dst_pitch;
-+        dstaddr += dst_pitch;
-     }
- }
- 
+Regards,
+Daniel
 -- 
-1.8.3.1
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
