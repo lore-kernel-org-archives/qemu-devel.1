@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44711)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1co7he-0006HR-UM
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 08:06:55 -0400
+	(envelope-from <kwolf@redhat.com>) id 1co7hp-0006Se-K4
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 08:07:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1co7hb-00047X-Q4
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 08:06:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57996)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1co7hb-00047R-J6
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 08:06:51 -0400
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7A5C064F4
-	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 12:06:51 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 15 Mar 2017 13:06:46 +0100
-Message-Id: <1489579606-26020-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH] cirrus: fix cirrus_invalidate_region
+	(envelope-from <kwolf@redhat.com>) id 1co7ho-0004CK-J1
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 08:07:05 -0400
+Date: Wed, 15 Mar 2017 13:06:56 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170315120656.GI4030@noname.str.redhat.com>
+References: <20170314171120.80741-1-vsementsov@virtuozzo.com>
+	<20170315110351.GG4030@noname.str.redhat.com>
+	<20170315111445.GE3088@lemon.lan>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170315111445.GE3088@lemon.lan>
+Subject: Re: [Qemu-devel] [PATCH] blk: fix aio context loss on media change
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,39 +24,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org, jsnow@redhat.com
 
-off_cur_end is exclusive, so off_cur_end == cirrus_addr_mask is valid.
-Fix calculation to make sure to allow that, otherwise the assert added
-by commit f153b563f8cf121aebf5a2fff5f0110faf58ccb3 can trigger for valid
-blits.
+Am 15.03.2017 um 12:14 hat Fam Zheng geschrieben:
+> On Wed, 03/15 12:03, Kevin Wolf wrote:
+> > Am 14.03.2017 um 18:11 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> > > If we have separate iothread for cdrom, we lose connection to it on
+> > > qmp_blockdev_change_medium, as aio_context is on bds which is dropped
+> > > and switched with new one.
+> > > 
+> > > As an example result, after such media change we have crash on
+> > > virtio_scsi_ctx_check: Assertion `blk_get_aio_context(d->conf.blk) == s->ctx' failed.
+> > > 
+> > > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> > > ---
+> > > 
+> > > Hi all!
+> > > 
+> > > We've faced into this assert, and there some kind of fix. I don't sure that
+> > > such fix doesn't break some conceptions, in this case, I hope, someone will
+> > > propose a true-way solution.
+> > 
+> > The "true way" would be proper AioContext management in the sense that
+> > all users of a BDS can specify a specific AioContext that they need and
+> > if they all agree, callbacks are invoked to change everyone to that
+> > AioContext. If they conflict, attaching the new user would have to error
+> > out.
+> > 
+> > But we discussed this earlier, and while I'm not completely sure any
+> > more about the details, I seem to remeber that Paolo said something
+> > along the lines that AioContext is going away anyway and building the
+> > code for proper management would be wasted time.
+> 
+> Matches my impression.
+> 
+> > 
+> > Stefan, Paolo, do you remember the details why we didn't even do a
+> > simple fix like the one below? I think there were some patches on the
+> > list, no?
+> 
+> ISTM the concern was mostly "what about other BB in the graph?"
+> 
+> Should the new op blocker API be used in this one (a new type of perm)?
 
-Test case: boot windows nt 4.0
+If we know what operation to block, that's an option. Would "change the
+node's AioContext" work for it?
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/display/cirrus_vga.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+I think it would effectively mean that you need to attach the device
+first and then jobs etc. respect the AioContext, whereas the opposite
+order breaks because they don't have callbacks to adjust the AioContext
+after the fact.
 
-diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
-index b9e7cb1..cdbe9a6 100644
---- a/hw/display/cirrus_vga.c
-+++ b/hw/display/cirrus_vga.c
-@@ -666,11 +666,11 @@ static void cirrus_invalidate_region(CirrusVGAState * s, int off_begin,
-     }
- 
-     for (y = 0; y < lines; y++) {
--	off_cur = off_begin;
--	off_cur_end = (off_cur + bytesperline) & s->cirrus_addr_mask;
-+        off_cur = off_begin;
-+        off_cur_end = ((off_cur + bytesperline - 1) & s->cirrus_addr_mask) + 1;
-         assert(off_cur_end >= off_cur);
-         memory_region_set_dirty(&s->vga.vram, off_cur, off_cur_end - off_cur);
--	off_begin += off_pitch;
-+        off_begin += off_pitch;
-     }
- }
- 
--- 
-1.8.3.1
+This seems to match what's actually safe, so it might really be as easy
+as this.
+
+Kevin
