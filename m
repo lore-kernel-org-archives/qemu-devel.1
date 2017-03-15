@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1co8Uv-0001YT-Bp
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 08:57:55 -0400
+	(envelope-from <eblake@redhat.com>) id 1co8WT-00031M-DG
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 08:59:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1co8Uq-0000Li-Sz
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 08:57:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51650)
+	(envelope-from <eblake@redhat.com>) id 1co8WL-00010g-BL
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 08:59:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57320)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1co8Uq-0000JQ-HS
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 08:57:44 -0400
-From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 15 Mar 2017 13:57:19 +0100
-Message-Id: <1489582656-31133-31-git-send-email-armbru@redhat.com>
-In-Reply-To: <1489582656-31133-1-git-send-email-armbru@redhat.com>
-References: <1489582656-31133-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 for-2.9 30/47] tests/qapi-schema: Improve
- doc / expression mismatch coverage
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1co8WL-0000zP-2q
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 08:59:17 -0400
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D49CC2570
+	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 12:59:14 +0000 (UTC)
+References: <20170315123421.28815-1-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1cd7fccc-62ad-84d4-6745-aa7ad4e7c7ca@redhat.com>
+Date: Wed, 15 Mar 2017 07:59:11 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170315123421.28815-1-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Hl2ACaUKf5GtgggSplQsFARtBB7grdMUA"
+Subject: Re: [Qemu-devel] [PATCH v2] trace: ensure $(tracetool-y) is defined
+ in top level makefile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,161 +34,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, eblake@redhat.com, mdroth@linux.vnet.ibm.com
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
 
-New tests doc-before-include.json and doc-before-pragma.json show we
-fail to reject a misplaced expression comment.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Hl2ACaUKf5GtgggSplQsFARtBB7grdMUA
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <1cd7fccc-62ad-84d4-6745-aa7ad4e7c7ca@redhat.com>
+Subject: Re: [PATCH v2] trace: ensure $(tracetool-y) is defined in top level
+ makefile
+References: <20170315123421.28815-1-berrange@redhat.com>
+In-Reply-To: <20170315123421.28815-1-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-New test doc-no-symbol.json shows a bad error message.
+On 03/15/2017 07:34 AM, Daniel P. Berrange wrote:
+> The build rules for trace files have a dependancy on $(tracetool-y).
+> This variable populated in the trace/Makefile.objs file and thus its
+> definition gets pulled into the top level makefile. This happens too
+> late in the process though, so by the time $(tracetool-y) is defined,
+> make has already evaluated $(tracetool-y) in the dependancies and
+> found it to be empty. The result is that when the tracetool source
+> is changed, the generated files are not rebuilt. The solution is to
+> define the variable in the top level makefile too
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  Makefile            | 3 +++
+>  trace/Makefile.objs | 8 --------
+>  2 files changed, 3 insertions(+), 8 deletions(-)
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- tests/Makefile.include                    | 3 +++
- tests/qapi-schema/doc-before-include.err  | 0
- tests/qapi-schema/doc-before-include.exit | 1 +
- tests/qapi-schema/doc-before-include.json | 8 ++++++++
- tests/qapi-schema/doc-before-include.out  | 4 ++++
- tests/qapi-schema/doc-before-pragma.err   | 0
- tests/qapi-schema/doc-before-pragma.exit  | 1 +
- tests/qapi-schema/doc-before-pragma.json  | 8 ++++++++
- tests/qapi-schema/doc-before-pragma.out   | 4 ++++
- tests/qapi-schema/doc-no-symbol.err       | 1 +
- tests/qapi-schema/doc-no-symbol.exit      | 1 +
- tests/qapi-schema/doc-no-symbol.json      | 7 +++++++
- tests/qapi-schema/doc-no-symbol.out       | 0
- 13 files changed, 38 insertions(+)
- create mode 100644 tests/qapi-schema/doc-before-include.err
- create mode 100644 tests/qapi-schema/doc-before-include.exit
- create mode 100644 tests/qapi-schema/doc-before-include.json
- create mode 100644 tests/qapi-schema/doc-before-include.out
- create mode 100644 tests/qapi-schema/doc-before-pragma.err
- create mode 100644 tests/qapi-schema/doc-before-pragma.exit
- create mode 100644 tests/qapi-schema/doc-before-pragma.json
- create mode 100644 tests/qapi-schema/doc-before-pragma.out
- create mode 100644 tests/qapi-schema/doc-no-symbol.err
- create mode 100644 tests/qapi-schema/doc-no-symbol.exit
- create mode 100644 tests/qapi-schema/doc-no-symbol.json
- create mode 100644 tests/qapi-schema/doc-no-symbol.out
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Tested-by: Eric Blake <eblake@redhat.com>
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 00b02fd..505f918 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -369,6 +369,8 @@ qapi-schema += command-int.json
- qapi-schema += comments.json
- qapi-schema += doc-bad-args.json
- qapi-schema += doc-bad-symbol.json
-+qapi-schema += doc-before-include.json
-+qapi-schema += doc-before-pragma.json
- qapi-schema += doc-duplicated-arg.json
- qapi-schema += doc-duplicated-return.json
- qapi-schema += doc-duplicated-since.json
-@@ -385,6 +387,7 @@ qapi-schema += doc-missing.json
- qapi-schema += doc-missing-colon.json
- qapi-schema += doc-missing-expr.json
- qapi-schema += doc-missing-space.json
-+qapi-schema += doc-no-symbol.json
- qapi-schema += double-data.json
- qapi-schema += double-type.json
- qapi-schema += duplicate-key.json
-diff --git a/tests/qapi-schema/doc-before-include.err b/tests/qapi-schema/doc-before-include.err
-new file mode 100644
-index 0000000..e69de29
-diff --git a/tests/qapi-schema/doc-before-include.exit b/tests/qapi-schema/doc-before-include.exit
-new file mode 100644
-index 0000000..573541a
---- /dev/null
-+++ b/tests/qapi-schema/doc-before-include.exit
-@@ -0,0 +1 @@
-+0
-diff --git a/tests/qapi-schema/doc-before-include.json b/tests/qapi-schema/doc-before-include.json
-new file mode 100644
-index 0000000..ec1fbf2
---- /dev/null
-+++ b/tests/qapi-schema/doc-before-include.json
-@@ -0,0 +1,8 @@
-+# Doc comment separated from defining expression by non-defining expression
-+# BUG: not rejected
-+
-+##
-+# @foo:
-+##
-+{ 'include': 'empty.json' }
-+{ 'struct': 'foo', 'data': {} }
-diff --git a/tests/qapi-schema/doc-before-include.out b/tests/qapi-schema/doc-before-include.out
-new file mode 100644
-index 0000000..236a849
---- /dev/null
-+++ b/tests/qapi-schema/doc-before-include.out
-@@ -0,0 +1,4 @@
-+enum QType ['none', 'qnull', 'qint', 'qstring', 'qdict', 'qlist', 'qfloat', 'qbool']
-+    prefix QTYPE
-+object foo
-+object q_empty
-diff --git a/tests/qapi-schema/doc-before-pragma.err b/tests/qapi-schema/doc-before-pragma.err
-new file mode 100644
-index 0000000..e69de29
-diff --git a/tests/qapi-schema/doc-before-pragma.exit b/tests/qapi-schema/doc-before-pragma.exit
-new file mode 100644
-index 0000000..573541a
---- /dev/null
-+++ b/tests/qapi-schema/doc-before-pragma.exit
-@@ -0,0 +1 @@
-+0
-diff --git a/tests/qapi-schema/doc-before-pragma.json b/tests/qapi-schema/doc-before-pragma.json
-new file mode 100644
-index 0000000..fb2ec8e
---- /dev/null
-+++ b/tests/qapi-schema/doc-before-pragma.json
-@@ -0,0 +1,8 @@
-+# Doc comment separated from defining expression by non-defining expression
-+# BUG: not rejected
-+
-+##
-+# @foo:
-+##
-+{ 'pragma': {} }
-+{ 'struct': 'foo', 'data': {} }
-diff --git a/tests/qapi-schema/doc-before-pragma.out b/tests/qapi-schema/doc-before-pragma.out
-new file mode 100644
-index 0000000..236a849
---- /dev/null
-+++ b/tests/qapi-schema/doc-before-pragma.out
-@@ -0,0 +1,4 @@
-+enum QType ['none', 'qnull', 'qint', 'qstring', 'qdict', 'qlist', 'qfloat', 'qbool']
-+    prefix QTYPE
-+object foo
-+object q_empty
-diff --git a/tests/qapi-schema/doc-no-symbol.err b/tests/qapi-schema/doc-no-symbol.err
-new file mode 100644
-index 0000000..727966c
---- /dev/null
-+++ b/tests/qapi-schema/doc-no-symbol.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/doc-no-symbol.json:4: Definition of 'foo' follows documentation for 'None'
-diff --git a/tests/qapi-schema/doc-no-symbol.exit b/tests/qapi-schema/doc-no-symbol.exit
-new file mode 100644
-index 0000000..d00491f
---- /dev/null
-+++ b/tests/qapi-schema/doc-no-symbol.exit
-@@ -0,0 +1 @@
-+1
-diff --git a/tests/qapi-schema/doc-no-symbol.json b/tests/qapi-schema/doc-no-symbol.json
-new file mode 100644
-index 0000000..ee86ca1
---- /dev/null
-+++ b/tests/qapi-schema/doc-no-symbol.json
-@@ -0,0 +1,7 @@
-+# Documentation for expression lacks symbol
-+# BUG: Error message claims it has symbol 'None'
-+
-+##
-+# foo:
-+##
-+{ 'command': 'foo', 'data': {'a': 'int'} }
-diff --git a/tests/qapi-schema/doc-no-symbol.out b/tests/qapi-schema/doc-no-symbol.out
-new file mode 100644
-index 0000000..e69de29
--- 
-2.7.4
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--Hl2ACaUKf5GtgggSplQsFARtBB7grdMUA
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYyTqfAAoJEKeha0olJ0NqdX8IAJXflLroinLBeCcOSzpuZmol
+jCehMCwypRTYvd+acUQR4iUBcYW+kuFszxxO8h9DrXvWAgewRrKbWGzl0X3eGD3f
+z2piRCUWgWeQRxgOwTjRTnvdrObM/ZH/ip06bjE/gUU3yyOE4PpB01sgkIkM78Xs
+WrhqJR/8VLIWL6o2EVoWB2J7sDommPYNh1Lw9tiWd6ajIwgof7+UG1mkDTMwKHev
+Nnp/OwIublGFMJ3lAzx+V7mS9k5dKnYxUQ6fKuCdCxqCNWzMtGj0RjXNY9oZOmVw
+fL2dMvOMAyEqEBreNSV7s7/aJmLcyAhHV6Vo8A/t7hlQ0ugjt8n3aevcs5w76io=
+=kfVJ
+-----END PGP SIGNATURE-----
+
+--Hl2ACaUKf5GtgggSplQsFARtBB7grdMUA--
