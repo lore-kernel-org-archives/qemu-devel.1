@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36445)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1co7Nx-0005Ww-Gd
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 07:46:34 -0400
+	(envelope-from <eblake@redhat.com>) id 1co7PS-0006IZ-AT
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 07:48:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1co7Nt-000336-RD
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 07:46:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38556)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1co7Nt-00032r-Lg
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 07:46:29 -0400
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 824B480F63
-	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 11:46:29 +0000 (UTC)
-Date: Wed, 15 Mar 2017 11:46:23 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170315114623.GI7770@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170315105646.32355-1-berrange@redhat.com>
-	<de695865-d569-916d-218e-1faff31d6f4b@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1co7PR-0003Yj-JA
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 07:48:06 -0400
+References: <20170314023050.32756-1-famz@redhat.com>
+	<02221132-c55f-e7af-67f2-5f7da67f30a0@redhat.com>
+	<20170315030604.GB3088@lemon.lan>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4e3b593d-1827-3535-66b9-fa474a8c53f1@redhat.com>
+Date: Wed, 15 Mar 2017 06:47:57 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <de695865-d569-916d-218e-1faff31d6f4b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] trace: ensure $(tracetool-y) is defined in
- top level makefile
+In-Reply-To: <20170315030604.GB3088@lemon.lan>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="pTMhoAFE6g7JEHMgmA68mOcN8rMRv5hcX"
+Subject: Re: [Qemu-devel] [PATCH] block: Always call bdrv_child_check_perm
+ first
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,59 +26,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Wed, Mar 15, 2017 at 06:44:25AM -0500, Eric Blake wrote:
-> On 03/15/2017 05:56 AM, Daniel P. Berrange wrote:
-> > The build rules for trace files have a dependancy on $(tracetool-y).
-> > This variable populated in the trace/Makefile.objs file and thus its
-> > definition gets pulled into the top level makefile. This happens too
-> > late in the process though, so by the time $(tracetool-y) is defined,
-> > make has already evaluated $(tracetool-y) in the dependancies and
-> > found it to be empty. The result is that when the tracetool source
-> > is changed, the generated files are not rebuilt. The solution is to
-> > define the variable in the top level makefile too
-> > 
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> > ---
-> >  Makefile | 3 +++
-> >  1 file changed, 3 insertions(+)
-> 
-> Does this mean the definitions in trace/Makefile.objs are now redundant
-> and can be omitted?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--pTMhoAFE6g7JEHMgmA68mOcN8rMRv5hcX
+From: Eric Blake <eblake@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Message-ID: <4e3b593d-1827-3535-66b9-fa474a8c53f1@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] block: Always call bdrv_child_check_perm
+ first
+References: <20170314023050.32756-1-famz@redhat.com>
+ <02221132-c55f-e7af-67f2-5f7da67f30a0@redhat.com>
+ <20170315030604.GB3088@lemon.lan>
+In-Reply-To: <20170315030604.GB3088@lemon.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hmm, I'm not sure, but quite possibly true.
+On 03/14/2017 10:06 PM, Fam Zheng wrote:
 
-> 
-> > 
-> > diff --git a/Makefile b/Makefile
-> > index 1c4c04f..dffc74b 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -85,6 +85,9 @@ GENERATED_SOURCES += $(TRACE_SOURCES)
-> >  
-> >  trace-group-name = $(shell dirname $1 | sed -e 's/[^a-zA-Z0-9]/_/g')
-> >  
-> > +tracetool-y = $(SRC_PATH)/scripts/tracetool.py
-> > +tracetool-y += $(shell find $(SRC_PATH)/scripts/tracetool -name "*.py")
-> 
-> Should this also include the comment currently in trace/Makefile.objs:
-> 
-> ######################################################################
-> # tracetool source files
-> # Every rule that invokes tracetool must depend on this so code is
-> regenerated
-> # if tracetool itself changes.
-> 
-> But it certainly looks like you're on the right track for fixing the
-> issue I ran into.
+>>> +static int bdrv_child_check_perm(BdrvChild *c, uint64_t perm, uint64=
+_t shared,
+>>> +                                 GSList *ignore_children, Error **er=
+rp);
+>>> +static void bdrv_child_abort_perm_update(BdrvChild *c);
+>>> +static void bdrv_child_set_perm(BdrvChild *c, uint64_t perm, uint64_=
+t shared);
+>>> +
+>>
+>> Now that you have static prototypes, is it worth rearranging the file
+>> (in a followup) to sort the function implementations into topological
+>> order so that a prototype is not necessary?  [In general, I try to cod=
+e
+>> so that static prototypes are only necessary if I am implementing
+>> mutually-referencing recursive code. But it's not a strict requirement=
+]
+>=20
+> Yes, thanks for pointing out, but it does have a recursion here:
+>=20
+> bdrv_check_update_perm
+>     -> bdrv_check_perm
+>         -> bdrv_child_check_perm
+>             -> bdrv_check_update_perm
+>=20
 
-IMHO such comments are pointless - they're just stating the obvious.
+So you're right, topological sorting is not possible.  Carry on, nothing
+to see here :)
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--pTMhoAFE6g7JEHMgmA68mOcN8rMRv5hcX
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYySntAAoJEKeha0olJ0Nqn/wH/1UewBL74qt6gm739RBdsw2N
+xjTpl/SaF3jSgsvxnKDqnbmFV9ukF8GOLlyj8V3EAT+aDRILUQEBoO+vI18IcCS7
+V0BKmEsZZsKSAmMb1ACLDYIiLl5mlrVaNPZRfHAi7yZHaNL7WnjyK7cL6S9LeBPH
+s2wtsDf46NLwT/cwQAOfW8B+R4hhYyKeksneUxLHhzca6J1aoOtZMMmhniQNsRNs
+DhF+lJ7ZdHBEudsZz8Hr5VJQlIenyrFg3sPRdApjIybzPkf7w/Li9LUQJK9l9TG0
+1w8UOIySeE2ujBiNHifkKMFkcWrtIng2LZgUnh2A2tm5kpfyn+NJj73WmdFUAEM=
+=bPgN
+-----END PGP SIGNATURE-----
+
+--pTMhoAFE6g7JEHMgmA68mOcN8rMRv5hcX--
