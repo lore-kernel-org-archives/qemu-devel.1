@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1co99Y-0003Rb-6f
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:39:49 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1co9G4-0005CU-2x
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:46:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1co99X-0006oz-AQ
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:39:48 -0400
-References: <20170314171120.80741-1-vsementsov@virtuozzo.com>
-	<20170315110351.GG4030@noname.str.redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9a68a30f-8765-ca91-572f-ed8d7083b202@redhat.com>
-Date: Wed, 15 Mar 2017 14:39:37 +0100
+	(envelope-from <ehabkost@redhat.com>) id 1co9Fz-0001VU-8N
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:46:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34908)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1co9Fy-0001VD-Vn
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:46:27 -0400
+Date: Wed, 15 Mar 2017 10:46:22 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170315134622.GV4694@thinpad.lan.raisama.net>
+References: <20170314140807.6061-1-git@kirschju.re>
+	<20170314140807.6061-2-git@kirschju.re>
+	<20170314171632.GS4694@thinpad.lan.raisama.net>
+	<20170314223314.GB3086@thinpad.lan.raisama.net>
+	<c687a959-3aee-16aa-1213-93dee5752188@kirschju.re>
 MIME-Version: 1.0
-In-Reply-To: <20170315110351.GG4030@noname.str.redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] blk: fix aio context loss on media change
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c687a959-3aee-16aa-1213-93dee5752188@kirschju.re>
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] X86: Move rdmsr/wrmsr functionality
+ to standalone functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,87 +31,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com
+To: Julian Kirsch <git@kirschju.re>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-
-
-On 15/03/2017 12:03, Kevin Wolf wrote:
-> But we discussed this earlier, and while I'm not completely sure any
-> more about the details, I seem to remeber that Paolo said something
-> along the lines that AioContext is going away anyway and building the
-> code for proper management would be wasted time.
-
-AioContext is going to stay, but everybody will be able to send
-operations to a BB/BDS from any AioContext.  The BDS AioContext will
-only matter for network devices, since they have to attach the file
-descriptor handlers somewhere.  For files it won't matter at all because
-you can use multiple Linux AIO context or thread pools at the same time.
-
-There should be a policy on which BB sets AioContext on the BDS (e.g.
-only the device does it), but apart from that, it should not be an issue.
-
-Paolo
-
-> Stefan, Paolo, do you remember the details why we didn't even do a
-> simple fix like the one below? I think there were some patches on the
-> list, no?
+On Wed, Mar 15, 2017 at 01:59:20PM +0100, Julian Kirsch wrote:
+> Hi Eduardo,
 > 
-> Kevin
+> thanks for taking the time to look through the patch series. To recapitulate for
+> the next iteration:
 > 
->> ======
->> Also, on master branch I can't reproduce it as vm crashed earlier, without any
->> eject/change, on assert(s->ctx && s->dataplane_started) in
->> virtio_scsi_data_plane_handle_ctrl(). It looks like race with
->> virtio_scsi_dataplane_start(), and for test (to reproduce assert described above),
->> I've "fixed" it with just:
->>
->> @@ -63,6 +63,7 @@ static bool virtio_scsi_data_plane_handle_ctrl(VirtIODevice *vdev,
->>  {
->>      VirtIOSCSI *s = VIRTIO_SCSI(vdev);
->>  
->> +    sleep(10);
->>      assert(s->ctx && s->dataplane_started);
->>      return virtio_scsi_handle_ctrl_vq(s, vq);
->>  }
->>
->> This race is not reproduced for me in our 2.6 based branch.
->>
->>  block/block-backend.c | 7 +++++++
->>  1 file changed, 7 insertions(+)
->>
->> diff --git a/block/block-backend.c b/block/block-backend.c
->> index 5742c09c2c..6d5044228e 100644
->> --- a/block/block-backend.c
->> +++ b/block/block-backend.c
->> @@ -65,6 +65,8 @@ struct BlockBackend {
->>      bool allow_write_beyond_eof;
->>  
->>      NotifierList remove_bs_notifiers, insert_bs_notifiers;
->> +
->> +    AioContext *aio_context;
->>  };
->>  
->>  typedef struct BlockBackendAIOCB {
->> @@ -559,6 +561,10 @@ int blk_insert_bs(BlockBackend *blk, BlockDriverState *bs, Error **errp)
->>      }
->>      bdrv_ref(bs);
->>  
->> +    if (blk->aio_context != NULL) {
->> +        bdrv_set_aio_context(bs, blk->aio_context);
->> +    }
->> +
->>      notifier_list_notify(&blk->insert_bs_notifiers, blk);
->>      if (blk->public.throttle_state) {
->>          throttle_timers_attach_aio_context(
->> @@ -1607,6 +1613,7 @@ void blk_set_aio_context(BlockBackend *blk, AioContext *new_context)
->>  {
->>      BlockDriverState *bs = blk_bs(blk);
->>  
->> +    blk->aio_context = new_context;
->>      if (bs) {
->>          if (blk->public.throttle_state) {
->>              throttle_timers_detach_aio_context(&blk->public.throttle_timers);
->> -- 
->> 2.11.1
->>
+> 1.) Let the rd/wrmsr functions set the valid variable in case of
+>     CONFIG_USER_ONLY being set.
+> 2.) Split up patch into code movement followed by reordering
+
+After the code movement, I would also separate simple code
+reordering from the addition of new MSRs.
+
+> 3.) I included only MSR_KVM_SYSTEM_TIME_NEW because exposing MSR_KVM_SYSTEM_TIME
+>     to users will hardcode its presence forever, and from the comments next
+>     to the macro definitions I figured MSR_KVM_SYSTEM_TIME should not be used
+>     anymore.
+
+New guest code shouldn't use it, but we do implement them, and
+being able to look at it using the new helpers would still be
+useful. The existing kvm_put_msrs()/kvm_get_msrs() code still
+references MSR_KVM_SYSTEM_TIME, for example, and I am looking for
+ways to make it reuse x86_cpu_rdmsr()/x86_cpu_wrmsr().
+
+> 4.) HyperV MSRs were assumed to be x86_64 specific because they have X64
+>     in their names, but it seems I was wrong on this one. Sorry for being
+>     lured simply due to the naming convention.
+
+I was confused, too. I had to double-check the KVM kernel code to
+be sure it was really supported on i386.
+
+> 
+> Best,
+> Julian
+> 
+> On 14.03.2017 23:33, Eduardo Habkost wrote:
+> > Found something else that confused me:
+> > 
+> > On Tue, Mar 14, 2017 at 02:16:32PM -0300, Eduardo Habkost wrote:
+> > [...]
+> >> +#if defined CONFIG_KVM && defined TARGET_X86_64
+> > 
+> > Why exactly are you making the hyperv MSRs x86_64-specific? I
+> > don't see anything at the QEMU code or kernel-side KVM code that
+> > makes it x86_64-specific.
+> > 
+> >> +    case HV_X64_MSR_HYPERCALL:
+> >> +        val = env->msr_hv_hypercall;
+> >> +        break;
+> >> +    case HV_X64_MSR_GUEST_OS_ID:
+> >> +        val = env->msr_hv_guest_os_id;
+> >> +        break;
+> >> +    case HV_X64_MSR_APIC_ASSIST_PAGE:
+> >> +        val = env->msr_hv_vapic;
+> >> +        break;
+> >> +    case HV_X64_MSR_REFERENCE_TSC:
+> >> +        val = env->msr_hv_tsc;
+> >> +        break;
+> >> +    case HV_X64_MSR_CRASH_P0 ... HV_X64_MSR_CRASH_P4:
+> >> +        val = env->msr_hv_crash_params[idx - HV_X64_MSR_CRASH_P0];
+> >> +        break;
+> >> +    case HV_X64_MSR_VP_RUNTIME:
+> >> +        val = env->msr_hv_runtime;
+> >> +        break;
+> >> +    case HV_X64_MSR_SCONTROL:
+> >> +        val = env->msr_hv_synic_control;
+> >> +        break;
+> >> +    case HV_X64_MSR_SVERSION:
+> >> +        val = env->msr_hv_synic_version;
+> >> +        break;
+> >> +    case HV_X64_MSR_SIEFP:
+> >> +        val = env->msr_hv_synic_evt_page;
+> >> +        break;
+> >> +    case HV_X64_MSR_SIMP:
+> >> +        val = env->msr_hv_synic_msg_page;
+> >> +        break;
+> >> +    case HV_X64_MSR_SINT0 ... HV_X64_MSR_SINT15:
+> >> +        val = env->msr_hv_synic_sint[idx - HV_X64_MSR_SINT0];
+> >> +        break;
+> >> +    case HV_X64_MSR_STIMER0_CONFIG:
+> >> +    case HV_X64_MSR_STIMER1_CONFIG:
+> >> +    case HV_X64_MSR_STIMER2_CONFIG:
+> >> +    case HV_X64_MSR_STIMER3_CONFIG:
+> >> +        val = env->msr_hv_stimer_config[(idx - HV_X64_MSR_STIMER0_CONFIG) / 2];
+> >> +        break;
+> >> +    case HV_X64_MSR_STIMER0_COUNT:
+> >> +    case HV_X64_MSR_STIMER1_COUNT:
+> >> +    case HV_X64_MSR_STIMER2_COUNT:
+> >> +    case HV_X64_MSR_STIMER3_COUNT:
+> >> +        val = env->msr_hv_stimer_count[(idx - HV_X64_MSR_STIMER0_COUNT) / 2];
+> >> +        break;
+> >> +#endif
+> > [...]
+> > 
+> 
+
+-- 
+Eduardo
