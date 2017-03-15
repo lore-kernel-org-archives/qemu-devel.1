@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46193)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52402)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anthony.xu@intel.com>) id 1coEFH-00035K-1U
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 15:06:04 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1coEms-0004pl-Gz
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 15:40:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anthony.xu@intel.com>) id 1coEFC-0001ey-Ru
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 15:06:02 -0400
-Received: from mga11.intel.com ([192.55.52.93]:33560)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
-	id 1coEFC-0001du-GA
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 15:05:58 -0400
-From: "Xu, Anthony" <anthony.xu@intel.com>
-Date: Wed, 15 Mar 2017 19:05:48 +0000
-Message-ID: <4712D8F4B26E034E80552F30A67BE0B1A16F14@ORSMSX112.amr.corp.intel.com>
-References: <1489158897-9206-1-git-send-email-yang.zhong@intel.com>
-	<1489158897-9206-2-git-send-email-yang.zhong@intel.com>
-	<53522014-8f70-9358-7d60-8b6c491c9611@redhat.com>
-	<4712D8F4B26E034E80552F30A67BE0B1A0F91A@ORSMSX112.amr.corp.intel.com>
-	<920352018.1797331.1489251855464.JavaMail.zimbra@redhat.com>
-	<4712D8F4B26E034E80552F30A67BE0B1A13045@ORSMSX112.amr.corp.intel.com>
-	<991a0f3d-5e1f-d17c-a8f3-a42c02ac2f17@redhat.com>
-	<4712D8F4B26E034E80552F30A67BE0B1A1561C@ORSMSX112.amr.corp.intel.com>
-	<f05fe113-c286-19b0-f5bc-ee2c1ea05568@redhat.com>
-In-Reply-To: <f05fe113-c286-19b0-f5bc-ee2c1ea05568@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <peter.maydell@linaro.org>) id 1coEmr-0006KZ-J7
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 15:40:46 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:35852)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1coEmr-0006K7-Bl
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 15:40:45 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id u108so18035175wrb.3
+	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 12:40:45 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] reduce qemu's heap Rss size from
- 12252kB to 2752KB
+In-Reply-To: <1489600837-11541-1-git-send-email-mst@redhat.com>
+References: <1489600837-11541-1-git-send-email-mst@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 15 Mar 2017 19:40:23 +0000
+Message-ID: <CAFEAcA-t65L=PiLffoFw_MPqaTJRm5Zq4TdQO88rjcWb0P-M4A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 0/7] virtio, pc: fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,105 +28,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Zhong, Yang" <yang.zhong@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Peng, Chao P" <chao.p.peng@intel.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-PiBUaGUgZmlyc3QgdW5yZWYgaXMgZG9uZSBhZnRlciBhcy0+Y3VycmVudF9tYXAgaXMgb3Zlcndy
-aXR0ZW4uDQo+IGFzLT5jdXJyZW50X21hcCBpcyBhY2Nlc3NlZCB1bmRlciBSQ1UsIHNvIGl0IG5l
-ZWRzIGNhbGxfcmN1LiAgSXQNCj4gYmFsYW5jZXMgdGhlIGluaXRpYWwgcmVmZXJlbmNlIHRoYXQg
-aXMgcHJlc2VudCBzaW5jZSBmbGF0dmlld19pbml0Lg0KDQpHb3QgaXQsIHRoYW5rcyBmb3IgZXhw
-bGFuYXRpb24uDQoNCj4gPiBidXQgaXQgaXMgbm90IGNsZWFyIHRvIG1lLCBpcyB0aGlzIGEgYnVn
-IG9yIGJ5IGRlc2lnbj8gSXMgZmxhdHZpZXdfZGVzdHJveSBjYWxsZWQNCj4gaW4gY3VycmVudCB0
-aHJlYWQNCj4gPiBvciBSQ1UgdGhyZWFkPw0KPiANCj4gWW91IGNhbm5vdCBrbm93LCBiZWNhdXNl
-IHRoZXJlIGFyZSBhbHNvIG90aGVyIGNhbGxlcnMgb2YNCj4gYWRkcmVzc19zcGFjZV9nZXRfZmxh
-dHZpZXcuICBVc3VhbGx5IGl0J3MgZnJvbSB0aGUgUkNVIHRocmVhZC4NCg0KSWYgaXQgaXMgZnJv
-bSBjdXJyZW50IHRocmVhZCwgZG8gd2UgbmVlZCB0byBjaGVjayBpZiB0aGUgZ2xvYmFsIGxvY2sg
-aXMgYWNxdWlyZWQ/DQpBcyB5b3UgbWVudGlvbmVkIGZsYXR2aWV3X3VucmVmIG1heSBjYWxsIG1l
-bW9yeV9yZWdpb25fdW5yZWYuDQoNCg0KPiAtIGxldCBtZW1vcnlfcmVnaW9uX2ZpbmFsaXplIHJl
-bW92ZSBzdWJyZWdpb25zIChjb21taXQgMmUyYjhlYiwNCj4gIm1lbW9yeToNCj4gYWxsb3cgZGVz
-dHJveWluZyBhIG5vbi1lbXB0eSBNZW1vcnlSZWdpb24iLCAyMDE1LTEwLTA5KQ0KPiANCj4gLSBs
-ZXQgbWVtb3J5X3JlZ2lvbl9maW5hbGl6ZSBkaXNhYmxlIGNvYWxlc2NlZCBJL08gKGluIGZhY3Qg
-dGhlcmUgYXJlIG5vDQo+IGNhbGxlcnMgb2YgbWVtb3J5X3JlZ2lvbl9jbGVhcl9jb2FsZXNjaW5n
-IG91dHNpZGUgbWVtb3J5LmMpDQoNCk9rYXksIEl0IG1heSBoYXZlIHN1YiByZWdpb25zLA0KDQpJ
-biB0aGUgY29tbWVudHMgb2YgbWVtb3J5X3JlZ2lvbl9maW5hbGl6ZQ0KIiAgIC8qIFdlIGtub3cg
-dGhlIHJlZ2lvbiBpcyBub3QgdmlzaWJsZSBpbiBhbnkgYWRkcmVzcyBzcGFjZSAoaXQNCiAgICAg
-KiBkb2VzIG5vdCBoYXZlIGEgY29udGFpbmVyIGFuZCBjYW5ub3QgYmUgYSByb290IGVpdGhlciBi
-ZWNhdXNlDQogICAgICogaXQgaGFzIG5vIHJlZmVyZW5jZXMsDQoiDQoNCldlIGtub3cgdGhlIG1l
-bW9yeSByZWdpb24gaXMgbm90IGEgcm9vdCByZWdpb24sIGFuZCB0aGUgbWVtb3J5IHJlZ2lvbiBo
-YXMgDQphbHJlYWR5IGJlZW4gcmVtb3ZlZCBmcm9tIGFkZHJlc3Mgc3BhY2UgZXZlbiBpdCBoYXMg
-c3ViIHJlZ2lvbnMuDQptZW1vcnlfcmVnaW9uX3RyYW5zYWN0aW9uX2NvbW1pdCBzaG91bGQgYmUg
-Y2FsbGVkIHdoZW4gdGhlIA0KbWVtb3J5IHJlZ2lvbiBpcyByZW1vdmVkIGZyb20gYWRkcmVzcyBz
-cGFjZS4NCm1lbW9yeV9yZWdpb25fdHJhbnNhY3Rpb25fY29tbWl0IHNlZW1zIG5vdCBiZSBuZWVk
-ZWQgaW4gbWVtb3J5X3JlZ2lvbl9maW5hbGl6ZS4NCkxldCBtZSBrbm93IGlmIHlvdSB0aGluayBv
-dGhlcndpc2UuDQoNCg0KPiA+IEhvdyBhYm91dCBmYWxsIGJhY2sgdG8gc3luY2hyb25pemVfcmN1
-Pw0KPiANCj4gSSdtIGFmcmFpZCBpdCB3b3VsZCBiZSB0b28gc2xvdywgYnV0IHlvdSBjYW4gdGVz
-dC4NCg0KSXQgaXMgbm90IHNsb3csIHRoZSBjb250ZW50aW9uIGlzIG5vdCBoaWdoLiBZZXMgd2Ug
-Y2FuIHRlc3QuDQoNCg0KPiBOb3BlLiAgVGhlIFJDVSByZWFkIGxvY2sgcHJvdGVjdHMgYWxsIE1l
-bW9yeVJlZ2lvbnMgdGhyb3VnaA0KPiBmbGF0dmlld191bnJlZjogUkNVIGtlZXBzIHRoZSBGbGF0
-VmlldyBhbGl2ZSwgYW5kIHRoZSBGbGF0VmlldyBrZWVwcw0KPiBNZW1vcnlSZWdpb25zIGFsaXZl
-Lg0KDQpJIHNlZSwgUkNVIG5lZWRzIHRvIHByb3RlY3QgTWVtb3J5UmVnaW9ucyBhcyB3ZWxsLg0K
-DQoNCg0KUGxlYXNlIHJldmlldyBiZWxvdyBwYXRjaCwgTWVtb3J5UmVnaW9uIGlzIHByb3RlY3Rl
-ZCBieSBSQ1UuDQoNClRoYW5rcywNCkFudGhvbnkNCg0KDQoNCmRpZmYgLS1naXQgYS9leGVjLmMg
-Yi9leGVjLmMNCmluZGV4IGEyMmY1YTAuLjY2MzE2NjggMTAwNjQ0DQotLS0gYS9leGVjLmMNCisr
-KyBiL2V4ZWMuYw0KQEAgLTI1MjEsNyArMjUyMSw4IEBAIHN0YXRpYyB2b2lkIG1lbV9jb21taXQo
-TWVtb3J5TGlzdGVuZXIgKmxpc3RlbmVyKQ0KDQogICAgIGF0b21pY19yY3Vfc2V0KCZhcy0+ZGlz
-cGF0Y2gsIG5leHQpOw0KICAgICBpZiAoY3VyKSB7DQotICAgICAgICBjYWxsX3JjdShjdXIsIGFk
-ZHJlc3Nfc3BhY2VfZGlzcGF0Y2hfZnJlZSwgcmN1KTsNCisgICAgICAgIHN5bmNocm9uaXplX3Jj
-dSgpOw0KKyAgICAgICAgYWRkcmVzc19zcGFjZV9kaXNwYXRjaF9mcmVlKGN1cik7DQogICAgIH0N
-CiB9DQoNCkBAIC0yNTY3LDcgKzI1NjgsOCBAQCB2b2lkIGFkZHJlc3Nfc3BhY2VfZGVzdHJveV9k
-aXNwYXRjaChBZGRyZXNzU3BhY2UgKmFzKQ0KDQogICAgIGF0b21pY19yY3Vfc2V0KCZhcy0+ZGlz
-cGF0Y2gsIE5VTEwpOw0KICAgICBpZiAoZCkgew0KLSAgICAgICAgY2FsbF9yY3UoZCwgYWRkcmVz
-c19zcGFjZV9kaXNwYXRjaF9mcmVlLCByY3UpOw0KKyAgICAgICAgc3luY2hyb25pemVfcmN1KCk7
-DQorICAgICAgICBhZGRyZXNzX3NwYWNlX2Rpc3BhdGNoX2ZyZWUoZCk7DQogICAgIH0NCiB9DQoN
-CkBAIC0yNzEyLDE5ICsyNzE0LDIyIEBAIHN0YXRpYyBib29sIHByZXBhcmVfbW1pb19hY2Nlc3Mo
-TWVtb3J5UmVnaW9uICptcikNCiAgICAgcmV0dXJuIHJlbGVhc2VfbG9jazsNCiB9DQoNCi0vKiBD
-YWxsZWQgd2l0aGluIFJDVSBjcml0aWNhbCBzZWN0aW9uLiAgKi8NCi1zdGF0aWMgTWVtVHhSZXN1
-bHQgYWRkcmVzc19zcGFjZV93cml0ZV9jb250aW51ZShBZGRyZXNzU3BhY2UgKmFzLCBod2FkZHIg
-YWRkciwNCi0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBN
-ZW1UeEF0dHJzIGF0dHJzLA0KLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIGNvbnN0IHVpbnQ4X3QgKmJ1ZiwNCi0gICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBpbnQgbGVuLCBod2FkZHIgYWRkcjEsDQotICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaHdhZGRyIGwsIE1lbW9yeVJl
-Z2lvbiAqbXIpDQorTWVtVHhSZXN1bHQgYWRkcmVzc19zcGFjZV93cml0ZShBZGRyZXNzU3BhY2Ug
-KmFzLCBod2FkZHIgYWRkciwNCisgICAgICAgICAgICAgICAgICBNZW1UeEF0dHJzIGF0dHJzLCBj
-b25zdCB1aW50OF90ICpidWYsIGludCBsZW4pDQogew0KICAgICB1aW50OF90ICpwdHI7DQogICAg
-IHVpbnQ2NF90IHZhbDsNCisgICAgaHdhZGRyIGw9bGVuOw0KKyAgICBod2FkZHIgYWRkcjE7DQor
-ICAgIE1lbW9yeVJlZ2lvbiAqbXI7DQogICAgIE1lbVR4UmVzdWx0IHJlc3VsdCA9IE1FTVRYX09L
-Ow0KICAgICBib29sIHJlbGVhc2VfbG9jayA9IGZhbHNlOw0KDQogICAgIGZvciAoOzspIHsNCisg
-ICAgICAgIHJjdV9yZWFkX2xvY2soKTsNCisgICAgICAgIG1yID0gYWRkcmVzc19zcGFjZV90cmFu
-c2xhdGUoYXMsIGFkZHIsICZhZGRyMSwgJmwsIHRydWUpOw0KKyAgICAgICAgbWVtb3J5X3JlZ2lv
-bl9yZWYobXIpOw0KKyAgICAgICAgcmN1X3JlYWRfdW5sb2NrKCk7DQogICAgICAgICBpZiAoIW1l
-bW9yeV9hY2Nlc3NfaXNfZGlyZWN0KG1yLCB0cnVlKSkgew0KICAgICAgICAgICAgIHJlbGVhc2Vf
-bG9jayB8PSBwcmVwYXJlX21taW9fYWNjZXNzKG1yKTsNCiAgICAgICAgICAgICBsID0gbWVtb3J5
-X2FjY2Vzc19zaXplKG1yLCBsLCBhZGRyMSk7DQpAQCAtMjc2NCw3ICsyNzY5LDcgQEAgc3RhdGlj
-IE1lbVR4UmVzdWx0IGFkZHJlc3Nfc3BhY2Vfd3JpdGVfY29udGludWUoQWRkcmVzc1NwYWNlICph
-cywgaHdhZGRyIGFkZHIsDQogICAgICAgICAgICAgbWVtY3B5KHB0ciwgYnVmLCBsKTsNCiAgICAg
-ICAgICAgICBpbnZhbGlkYXRlX2FuZF9zZXRfZGlydHkobXIsIGFkZHIxLCBsKTsNCiAgICAgICAg
-IH0NCi0NCisgICAgICAgIG1lbW9yeV9yZWdpb25fdW5yZWYobXIpOw0KICAgICAgICAgaWYgKHJl
-bGVhc2VfbG9jaykgew0KICAgICAgICAgICAgIHFlbXVfbXV0ZXhfdW5sb2NrX2lvdGhyZWFkKCk7
-DQogICAgICAgICAgICAgcmVsZWFzZV9sb2NrID0gZmFsc2U7DQpAQCAtMjc3OSwyNyArMjc4NCw2
-IEBAIHN0YXRpYyBNZW1UeFJlc3VsdCBhZGRyZXNzX3NwYWNlX3dyaXRlX2NvbnRpbnVlKEFkZHJl
-c3NTcGFjZSAqYXMsIGh3YWRkciBhZGRyLA0KICAgICAgICAgfQ0KDQogICAgICAgICBsID0gbGVu
-Ow0KLSAgICAgICAgbXIgPSBhZGRyZXNzX3NwYWNlX3RyYW5zbGF0ZShhcywgYWRkciwgJmFkZHIx
-LCAmbCwgdHJ1ZSk7DQotICAgIH0NCi0NCi0gICAgcmV0dXJuIHJlc3VsdDsNCi19DQotDQotTWVt
-VHhSZXN1bHQgYWRkcmVzc19zcGFjZV93cml0ZShBZGRyZXNzU3BhY2UgKmFzLCBod2FkZHIgYWRk
-ciwgTWVtVHhBdHRycyBhdHRycywNCi0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNv
-bnN0IHVpbnQ4X3QgKmJ1ZiwgaW50IGxlbikNCi17DQotICAgIGh3YWRkciBsOw0KLSAgICBod2Fk
-ZHIgYWRkcjE7DQotICAgIE1lbW9yeVJlZ2lvbiAqbXI7DQotICAgIE1lbVR4UmVzdWx0IHJlc3Vs
-dCA9IE1FTVRYX09LOw0KLQ0KLSAgICBpZiAobGVuID4gMCkgew0KLSAgICAgICAgcmN1X3JlYWRf
-bG9jaygpOw0KLSAgICAgICAgbCA9IGxlbjsNCi0gICAgICAgIG1yID0gYWRkcmVzc19zcGFjZV90
-cmFuc2xhdGUoYXMsIGFkZHIsICZhZGRyMSwgJmwsIHRydWUpOw0KLSAgICAgICAgcmVzdWx0ID0g
-YWRkcmVzc19zcGFjZV93cml0ZV9jb250aW51ZShhcywgYWRkciwgYXR0cnMsIGJ1ZiwgbGVuLA0K
-LSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBhZGRyMSwgbCwg
-bXIpOw0KLSAgICAgICAgcmN1X3JlYWRfdW5sb2NrKCk7DQogICAgIH0NCg0KICAgICByZXR1cm4g
-cmVzdWx0Ow0KZGlmZiAtLWdpdCBhL21lbW9yeS5jIGIvbWVtb3J5LmMNCmluZGV4IDY0YjBhNjAu
-LmQxMjQzN2MgMTAwNjQ0DQotLS0gYS9tZW1vcnkuYw0KKysrIGIvbWVtb3J5LmMNCkBAIC0xNTA1
-LDEzICsxNTA1LDEwIEBAIHN0YXRpYyB2b2lkIG1lbW9yeV9yZWdpb25fZmluYWxpemUoT2JqZWN0
-ICpvYmopDQogICAgICAqIGFuZCBjYXVzZSBhbiBpbmZpbml0ZSBsb29wLg0KICAgICAgKi8NCiAg
-ICAgbXItPmVuYWJsZWQgPSBmYWxzZTsNCi0gICAgbWVtb3J5X3JlZ2lvbl90cmFuc2FjdGlvbl9i
-ZWdpbigpOw0KICAgICB3aGlsZSAoIVFUQUlMUV9FTVBUWSgmbXItPnN1YnJlZ2lvbnMpKSB7DQog
-ICAgICAgICBNZW1vcnlSZWdpb24gKnN1YnJlZ2lvbiA9IFFUQUlMUV9GSVJTVCgmbXItPnN1YnJl
-Z2lvbnMpOw0KICAgICAgICAgbWVtb3J5X3JlZ2lvbl9kZWxfc3VicmVnaW9uKG1yLCBzdWJyZWdp
-b24pOw0KICAgICB9DQotICAgIG1lbW9yeV9yZWdpb25fdHJhbnNhY3Rpb25fY29tbWl0KCk7DQot
-DQogICAgIG1yLT5kZXN0cnVjdG9yKG1yKTsNCiAgICAgbWVtb3J5X3JlZ2lvbl9jbGVhcl9jb2Fs
-ZXNjaW5nKG1yKTsNCiAgICAgZ19mcmVlKChjaGFyICopbXItPm5hbWUpOw0KDQoNCg==
+On 15 March 2017 at 18:01, Michael S. Tsirkin <mst@redhat.com> wrote:
+> The following changes since commit d84f714eafedd8bb9d4aaec8b76417bef8e3535e:
+>
+>   Update version for v2.9.0-rc0 release (2017-03-14 19:18:23 +0000)
+>
+> are available in the git repository at:
+>
+>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+>
+> for you to fetch changes up to 60a8d8023473dd24957b3a66824f66cd35b80d64:
+>
+>   virtio-pci: reset modern vq meta data (2017-03-15 19:59:18 +0200)
+>
+> ----------------------------------------------------------------
+> virtio, pc: fixes
+>
+> Some fixes to fallback from using virtio caching,
+> pls a minor vm gen id fix.
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>
+> ----------------------------------------------------------------
+> Ben Warren (1):
+>       Bugfix: Handle error if VM Generation ID device not present
+>
+> Jason Wang (6):
+>       virtio: guard against NULL pfn
+>       virtio: destroy region cache during reset
+>       virtio: validate address space cache during init
+>       pci: introduce a bus master container
+>       Revert "virtio: unbreak virtio-pci with IOMMU after caching ring translations"
+>       virtio-pci: reset modern vq meta data
+
+Applied, thanks.
+
+-- PMM
