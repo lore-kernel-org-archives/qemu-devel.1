@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38357)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1co7V7-00019l-Be
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 07:53:58 -0400
+	(envelope-from <eblake@redhat.com>) id 1co7Wl-0002Ph-GS
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 07:55:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1co7V3-00061r-C8
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 07:53:57 -0400
-Received: from 3.mo68.mail-out.ovh.net ([46.105.58.60]:48068)
+	(envelope-from <eblake@redhat.com>) id 1co7Wh-0006kP-IH
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 07:55:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58080)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1co7V3-00061Z-5S
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 07:53:53 -0400
-Received: from player763.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 913234509C
-	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 12:53:51 +0100 (CET)
-Date: Wed, 15 Mar 2017 12:53:41 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170315125341.09f9c53e@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <1489449360-14411-6-git-send-email-sstabellini@kernel.org>
-References: <alpine.DEB.2.10.1703131650550.21520@sstabellini-ThinkPad-X260>
-	<1489449360-14411-1-git-send-email-sstabellini@kernel.org>
-	<1489449360-14411-6-git-send-email-sstabellini@kernel.org>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1co7Wh-0006jx-9X
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 07:55:35 -0400
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E6E7019C336
+	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 11:55:34 +0000 (UTC)
+References: <20170315081641.20588-1-pbonzini@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7d1e7414-1194-2d81-1058-62b6313b625e@redhat.com>
+Date: Wed, 15 Mar 2017 06:55:32 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/rl17adYDwk2V3yW/Q0ZhpfW";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v2 6/9] xen/9pfs: receive requests from the
- frontend
+In-Reply-To: <20170315081641.20588-1-pbonzini@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="mQo3CwnHfxhDe2NtOF69HXHp5I3QMIMr7"
+Subject: Re: [Qemu-devel] [PATCH v2] coverity-model: model
+ address_space_read/write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,124 +34,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, anthony.perard@citrix.com, Stefano Stabellini <stefano@aporeto.com>, jgross@suse.com, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com
 
---Sig_/rl17adYDwk2V3yW/Q0ZhpfW
-Content-Type: text/plain; charset=US-ASCII
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--mQo3CwnHfxhDe2NtOF69HXHp5I3QMIMr7
+From: Eric Blake <eblake@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com
+Message-ID: <7d1e7414-1194-2d81-1058-62b6313b625e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] coverity-model: model
+ address_space_read/write
+References: <20170315081641.20588-1-pbonzini@redhat.com>
+In-Reply-To: <20170315081641.20588-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 13 Mar 2017 16:55:57 -0700
-Stefano Stabellini <sstabellini@kernel.org> wrote:
-
-> Upon receiving an event channel notification from the frontend, schedule
-> the bottom half. From the bottom half, read one request from the ring,
-> create a pdu and call pdu_submit to handle it.
+On 03/15/2017 03:16 AM, Paolo Bonzini wrote:
+> Commit eb7eeb8 ("memory: split address_space_read and
+> address_space_write", 2015-12-17) made address_space_rw
+> dispatch to one of address_space_read or address_space_write,
+> rather than vice versa.
 >=20
-> For now, only handle one request per ring at a time.
+> For callers of address_space_read and address_space_write this
+> causes false positive defects when Coverity sees a length-8 write in
+> address_space_read and a length-4 (e.g. int*) buffer to read into.
+> As long as the size of the buffer is okay, this is a false positive.
 >=20
-> Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
-> CC: anthony.perard@citrix.com
-> CC: jgross@suse.com
-> CC: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
-> CC: Greg Kurz <groug@kaod.org>
+> Reflect the code change into the model.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
+>  scripts/coverity-model.c | 17 +++++++++++++----
+>  1 file changed, 13 insertions(+), 4 deletions(-)
 
-Oops, one more remark I forgot in my the previous mail. See below.
+> -MemTxResult address_space_rw(AddressSpace *as, hwaddr addr, MemTxAttrs=
+ attrs,
+> -                             uint8_t *buf, int len, bool is_write)
+> +MemTxResult address_space_read(AddressSpace *as, hwaddr addr,
+> +                               MemTxAttrs attrs,
+> +                               uint8_t *buf, int len)
+>  {
+>      MemTxResult result;
+> -
+>      // TODO: investigate impact of treating reads as producing
+>      // tainted data, with __coverity_tainted_data_argument__(buf).
+> -    if (is_write) __bufread(buf, len); else __bufwrite(buf, len);
 
->  hw/9pfs/xen-9p-backend.c | 47 ++++++++++++++++++++++++++++++++++++++++++=
-+++++
->  1 file changed, 47 insertions(+)
->=20
-> diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
-> index 0e4a133..741dd31 100644
-> --- a/hw/9pfs/xen-9p-backend.c
-> +++ b/hw/9pfs/xen-9p-backend.c
-> @@ -94,12 +94,59 @@ static int xen_9pfs_init(struct XenDevice *xendev)
->      return 0;
->  }
-> =20
-> +static int xen_9pfs_receive(struct Xen9pfsRing *ring)
-> +{
-> +    struct xen_9pfs_header h;
-> +    RING_IDX cons, prod, masked_prod, masked_cons;
-> +    V9fsPDU *pdu;
-> +
-> +    if (ring->inprogress) {
-> +        return 0;
-> +    }
-> +
-> +    cons =3D ring->intf->out_cons;
-> +    prod =3D ring->intf->out_prod;
-> +    xen_rmb();
-> +
-> +    if (xen_9pfs_queued(prod, cons, XEN_9PFS_RING_SIZE) < sizeof(h)) {
-> +        return 0;
-> +    }
-> +    ring->inprogress =3D true;
-> +
-> +    masked_prod =3D xen_9pfs_mask(prod, XEN_9PFS_RING_SIZE);
-> +    masked_cons =3D xen_9pfs_mask(cons, XEN_9PFS_RING_SIZE);
-> +
-> +    xen_9pfs_read_packet(ring->ring.out, masked_prod, &masked_cons,
-> +                         XEN_9PFS_RING_SIZE, (uint8_t*) &h, sizeof(h));
-> +
-> +    pdu =3D pdu_alloc(&ring->priv->state);
-> +    pdu->size =3D h.size;
+Old code did __bufread for reads,
 
-9P uses little-endian, so this should be:
+> +    __bufwrite(buf, len);
 
-    pdu->size =3D le32_to_cpu(h.size);
+but the new does __bufwrite.
 
-> +    pdu->id =3D h.id;
-> +    pdu->tag =3D h.tag;
-
-and:
-
-    pdu->tag =3D le16_to_cpu(h.tag);
-
-> +    ring->out_size =3D h.size;
-> +    ring->out_cons =3D cons + h.size;
-
-Same here.
-
-> +
-> +    qemu_co_queue_init(&pdu->complete);
-> +    pdu_submit(pdu);
-> +
-> +    return 0;
+> +    return result;
 > +}
-> +
->  static void xen_9pfs_bh(void *opaque)
->  {
-> +    struct Xen9pfsRing *ring =3D opaque;
-> +    xen_9pfs_receive(ring);
+> =20
+> +MemTxResult address_space_write(AddressSpace *as, hwaddr addr,
+> +                                MemTxAttrs attrs,
+> +                                const uint8_t *buf, int len)
+> +{
+> +    MemTxResult result;
+> +    __bufread(buf, len);
+
+And __bufread for writes.  Did you get this backwards?
+
+>      return result;
 >  }
 > =20
->  static void xen_9pfs_evtchn_event(void *opaque)
->  {
-> +    struct Xen9pfsRing *ring =3D opaque;
-> +    evtchn_port_t port;
 > +
-> +    port =3D xenevtchn_pending(ring->evtchndev);
-> +    xenevtchn_unmask(ring->evtchndev, port);
-> +
-> +    qemu_bh_schedule(ring->bh);
->  }
+>  /* Tainting */
 > =20
->  static int xen_9pfs_free(struct XenDevice *xendev)
+>  typedef struct {} name2keysym_t;
+>=20
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
 
---Sig_/rl17adYDwk2V3yW/Q0ZhpfW
-Content-Type: application/pgp-signature
+--mQo3CwnHfxhDe2NtOF69HXHp5I3QMIMr7
+Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iEYEARECAAYFAljJK0YACgkQAvw66wEB28LGrQCfViOLbbpo8xwXK9ECzkQk1njd
-3DAAn0HGwyYuuVpyrtZpbo6cbLzaHWxO
-=J2bg
+iQEcBAEBCAAGBQJYySu0AAoJEKeha0olJ0NqQvEIAIYtS7FUMSTJu0uWZElxhhe6
+QrQXhO3zDT2TuzcHQJ0AQdz9nz/7iAeDBgoIpxNiuZtqvuPBtQTvYdOAw6UQtXmU
+RcIg6+GnlFWvtYYEl8KkN83GL9lqazQ1HXy045OLe3Fz7Jh5zsoiYskMiILAYTjF
+pQ2cRoBQQFUKWbZ48ahX94oGBA5HE8y3ncXmlCgyrgmdd505Qfl5f9q8u9U6p2Bv
+1E4tl5GsgdtH3ZfRh+KVQXef1xznqUGsJ2HQp7baqKhFEKSOHdxbtAagJnri11fh
+AVyzSCxKfG3UCKsADgtjD/p9B3j4ZFdOipmedJCKun0foaYggJ18L2BwXqwJ4Gk=
+=M73S
 -----END PGP SIGNATURE-----
 
---Sig_/rl17adYDwk2V3yW/Q0ZhpfW--
+--mQo3CwnHfxhDe2NtOF69HXHp5I3QMIMr7--
