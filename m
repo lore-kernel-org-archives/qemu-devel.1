@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1coAQl-0000H9-Mr
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 11:01:40 -0400
+	(envelope-from <kwolf@redhat.com>) id 1coARX-0000jM-US
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 11:02:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1coAQg-0002Zu-6q
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 11:01:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60958)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1coAQf-0002Yv-Tc
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 11:01:34 -0400
-References: <1489582656-31133-1-git-send-email-armbru@redhat.com>
-	<1489582656-31133-32-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <dd8a4c15-1cc9-5326-27e9-462f05410e10@redhat.com>
-Date: Wed, 15 Mar 2017 10:01:30 -0500
+	(envelope-from <kwolf@redhat.com>) id 1coART-0002z4-SZ
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 11:02:28 -0400
+Date: Wed, 15 Mar 2017 16:02:10 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170315150210.GL4030@noname.str.redhat.com>
+References: <20170314171120.80741-1-vsementsov@virtuozzo.com>
+	<20170315110351.GG4030@noname.str.redhat.com>
+	<9a68a30f-8765-ca91-572f-ed8d7083b202@redhat.com>
+	<20170315143032.GK4030@noname.str.redhat.com>
+	<87bb192d-b910-5ac2-886b-fefeb4a2ec4d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1489582656-31133-32-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="SW8WxA2IvQmplWf4MBe0QoNE6SxNwSEhk"
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.9 31/47] qapi: Fix detection of
- doc / expression mismatch
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87bb192d-b910-5ac2-886b-fefeb4a2ec4d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] blk: fix aio context loss on media change
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +26,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SW8WxA2IvQmplWf4MBe0QoNE6SxNwSEhk
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
-Message-ID: <dd8a4c15-1cc9-5326-27e9-462f05410e10@redhat.com>
-Subject: Re: [PATCH v2 for-2.9 31/47] qapi: Fix detection of doc / expression
- mismatch
-References: <1489582656-31133-1-git-send-email-armbru@redhat.com>
- <1489582656-31133-32-git-send-email-armbru@redhat.com>
-In-Reply-To: <1489582656-31133-32-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Am 15.03.2017 um 15:43 hat Paolo Bonzini geschrieben:
+> On 15/03/2017 15:30, Kevin Wolf wrote:
+> > Am 15.03.2017 um 14:39 hat Paolo Bonzini geschrieben:
+> >> On 15/03/2017 12:03, Kevin Wolf wrote:
+> >>> But we discussed this earlier, and while I'm not completely sure any
+> >>> more about the details, I seem to remeber that Paolo said something
+> >>> along the lines that AioContext is going away anyway and building the
+> >>> code for proper management would be wasted time.
+> >>
+> >> AioContext is going to stay, but everybody will be able to send
+> >> operations to a BB/BDS from any AioContext.  The BDS AioContext will
+> >> only matter for network devices, since they have to attach the file
+> >> descriptor handlers somewhere.  For files it won't matter at all because
+> >> you can use multiple Linux AIO context or thread pools at the same time.
+> > 
+> > Should the iothread option then become a -blockdev option rather than a
+> > -device one?
+> 
+> Well, both.  The device also needs an I/O thread to attach its ioeventfd
+> handler.  And it makes sense to use the -device I/O thread if -blockdev
+> specified none.
 
-On 03/15/2017 07:57 AM, Markus Armbruster wrote:
-> This fixes the errors uncovered by the previous commit.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> ---
+Right, that makes sense. I just wasn't aware until now that we would get
+a per-node option, so that's good to know.
 
->  def check_freeform_doc(doc):
-> -    if doc.symbol:
-> -        raise QAPISemError(doc.info,
-> -                           "Documention for '%s' is not followed"
-> -                           " by the definition" % doc.symbol)
+> >> There should be a policy on which BB sets AioContext on the BDS (e.g.
+> >> only the device does it), but apart from that, it should not be an issue.
+> > 
+> > We don't know which BBs are going to be attached. We don't necessarily
+> > have a device at all, or we could have two of them.
+> 
+> Wow, can we really have two? :-O
 
-> +++ b/tests/qapi-schema/doc-missing-expr.err
-> @@ -1 +1 @@
-> -tests/qapi-schema/doc-missing-expr.json:3: Documention for 'bar' is no=
-t followed by the definition
-> +tests/qapi-schema/doc-missing-expr.json:3: Documentation for 'bar' is =
-not followed by the definition
+What would prevent you from doing this? The whole blockdev work was
+about making the block layer more flexible, so now we have this
+flexibility of attaching more or less anything to anything (unless op
+blockers prevent it, which is why they are important for actually
+supporting blockdev).
 
-I didn't even catch that you were also fixing the typo, on my last round
-of reviews :)
+> > Though maybe we should try to keep a BDS and its children in the same
+> > AioContext anyway if that's possible? Will it make a difference?
+> 
+> Everything can make sense---but yes, keeping the whole hierarchy in the
+> same AioContext makes sense more often.
 
-R-b stands.
+So I take this to mean that it does make a difference. :-)
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+If we want to keep users and their child nodes in the same AioContext by
+default, we'll probably still need to implement all of the callbacks
+that we would need for proper AioContext management today.
 
-
---SW8WxA2IvQmplWf4MBe0QoNE6SxNwSEhk
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYyVdKAAoJEKeha0olJ0NqLUEH/15SiaFe2s97BgTKNMd8Scjb
-YxKBWRqTWnaGqlwliOYrqaDOM2eqGooFEPukGXAYaSyA90nhsYp9MxdOzl5Cmx23
-W2GkxegFA1vXKo1YDmEQigdIS3O9xXXiixBgUmxZ7j/c9H85ctbiZ4O8v0G4lOjw
-CSjj4gy+PczN6/2JY3CRUwR8tY9StVUm6ZN7VjDlUfbMPKKBc7FKZ+84PBFIclKI
-TZQzKsfUKlCgj++0pXItWDNCRHnEBREmMpytCOlKpQoSRbD69EAc0HJ2aNLriB6s
-mJqDJwpxIP/01zFJQVpgn/M78QOKyBJIULETwthowhiKNps53ZbedehCDDJlUH0=
-=UFmH
------END PGP SIGNATURE-----
-
---SW8WxA2IvQmplWf4MBe0QoNE6SxNwSEhk--
+Kevin
