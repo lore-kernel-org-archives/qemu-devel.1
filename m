@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1coBbH-0000Ji-BC
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 12:16:37 -0400
+	(envelope-from <bounces@canonical.com>) id 1coBbH-0000Jf-Aj
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 12:16:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1coBbD-0004yB-Gt
+	(envelope-from <bounces@canonical.com>) id 1coBbD-0004yK-KB
 	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 12:16:35 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34624)
+Received: from indium.canonical.com ([91.189.90.7]:34631)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1coBbD-0004xn-8M
+	id 1coBbD-0004xp-9s
 	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 12:16:31 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1coBbB-00017h-HD
-	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 16:16:29 +0000
+	id 1coBbB-00017z-Uh
+	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 16:16:30 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4B0372E80C8
+	by loganberry.canonical.com (Postfix) with ESMTP id E653D2E80CA
 	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 16:16:29 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 15 Mar 2017 16:05:25 -0000
+Date: Wed, 15 Mar 2017 16:08:26 -0000
 From: Mohammed Gamal <m.gamal005@gmail.com>
 Reply-To: Bug 1673130 <1673130@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20170315160255.23768.27906.malonedeb@gac.canonical.com>
-Message-Id: <20170315160525.23946.25713.malone@gac.canonical.com>
+Message-Id: <20170315160826.23332.31258.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1673130] Re: qemu 2.7.0 receives SIGABRT in
  qemu_coroutine_enter()
@@ -39,138 +39,242 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Another stack trace:
+Third stack trace:
 
 --------------------------------------------------------------------------
-(gdb) bt
-#0  0x00007f2f34690067 in __GI_raise (sig=3Dsig@entry=3D6) at ../nptl/sysde=
-ps/unix/sysv/linux/raise.c:56
-#1  0x00007f2f34691448 in __GI_abort () at abort.c:89
-#2  0x00005629b8260b6c in qemu_coroutine_enter (co=3D0x7f2cd6a00940) at /bu=
+#0  0x00007f4d5ad6a067 in raise () from /lib/x86_64-linux-gnu/libc.so.6
+#1  0x00007f4d5ad6b448 in abort () from /lib/x86_64-linux-gnu/libc.so.6
+#2  0x0000562a4c582b6c in qemu_coroutine_enter (co=3D0x7f4b1bf0a900) at /bu=
 ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:113
-#3  0x00005629b8260e74 in qemu_co_queue_run_restart (co=3D0x7f2cd6a00880) a=
+#3  0x0000562a4c582e55 in qemu_co_queue_run_restart (co=3D0x7f4b1bf0a830) a=
 t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#4  0x00005629b82609a9 in qemu_coroutine_enter (co=3D0x7f2cd6a00880) at /bu=
+#4  0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b1bf0a830) at /bu=
 ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#5  0x00005629b8260e74 in qemu_co_queue_run_restart (co=3D0x7f2cee202b00) a=
+#5  0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b1bf0f4c0) a=
 t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#6  0x00005629b82609a9 in qemu_coroutine_enter (co=3D0x7f2cee202b00) at /bu=
+#6  0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b1bf0f4c0) at /bu=
 ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#7  0x00005629b8260e74 in qemu_co_queue_run_restart (co=3D0x7f2cee2141d0) a=
+#7  0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b17e07c40) a=
 t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#8  0x00005629b82609a9 in qemu_coroutine_enter (co=3D0x7f2cee2141d0) at /bu=
+#8  0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b17e07c40) at /bu=
 ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#9  0x00005629b8260e74 in qemu_co_queue_run_restart (co=3D0x7f2cf300b370) a=
+#9  0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b17e11420) a=
 t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#10 0x00005629b82609a9 in qemu_coroutine_enter (co=3D0x7f2cf300b370) at /bu=
+#10 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b17e11420) at /bu=
 ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#11 0x00005629b8260e74 in qemu_co_queue_run_restart (co=3D0x7f2cf1a03560) a=
+#11 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b17e18c30) a=
 t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#12 0x00005629b82609a9 in qemu_coroutine_enter (co=3D0x7f2cf1a03560) at /bu=
+#12 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b17e18c30) at /bu=
 ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#13 0x00005629b8260e74 in qemu_co_queue_run_restart (co=3D0x7f2cf3e15ba0) a=
+#13 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b1bf07ea0) a=
 t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#14 0x00005629b82609a9 in qemu_coroutine_enter (co=3D0x7f2cf3e15ba0) at /bu=
+#14 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b1bf07ea0) at /bu=
 ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#15 0x00005629b8260e74 in qemu_co_queue_run_restart (co=3D0x7f2ce80087f0) a=
+#15 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b1000c0c0) a=
 t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#16 0x00005629b82609a9 in qemu_coroutine_enter (co=3D0x7f2ce80087f0) at /bu=
+#16 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b1000c0c0) at /bu=
 ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#17 0x00005629b8260e74 in qemu_co_queue_run_restart (co=3D0x7f2cee20d9c0) a=
+#17 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b17e11b10) a=
 t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#18 0x00005629b82609a9 in qemu_coroutine_enter (co=3D0x7f2cee20d9c0) at /bu=
+#18 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b17e11b10) at /bu=
 ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#19 0x00005629b8260e74 in qemu_co_queue_run_restart (co=3D0x7f2ceff04850) a=
+#19 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b17e10500) a=
 t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#20 0x00005629b82609a9 in qemu_coroutine_enter (co=3D0x7f2ceff04850) at /bu=
+#20 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b17e10500) at /bu=
 ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#21 0x00005629b8260e74 in qemu_co_queue_run_restart (co=3D0x7f2cf21061c0) a=
+#21 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b1bf0a610) a=
 t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#22 0x00005629b82609a9 in qemu_coroutine_enter (co=3D0x7f2cf21061c0) at /bu=
+#22 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b1bf0a610) at /bu=
 ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#23 0x00005629b8260e74 in qemu_co_queue_run_restart (co=3D0x7f2cf2105c00) a=
+#23 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b17e12820) a=
 t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#24 0x00005629b82609a9 in qemu_coroutine_enter (co=3D0x7f2cf2105c00) at /bu=
+#24 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b17e12820) at /bu=
 ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#25 0x00005629b8260e74 in qemu_co_queue_run_restart (co=3D0x7f2cf3e1d590) a=
+#25 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b10002b10) a=
 t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#26 0x00005629b82609a9 in qemu_coroutine_enter (co=3D0x7f2cf3e1d590) at /bu=
+#26 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b10002b10) at /bu=
 ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#27 0x00005629b8260e74 in qemu_co_queue_run_restart (co=3D0x7f2cf3e16a00) a=
+#27 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b1000bfb0) a=
 t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#28 0x00005629b82609a9 in qemu_coroutine_enter (co=3D0x7f2cf3e16a00) at /bu=
+#28 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b1000bfb0) at /bu=
 ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#29 0x00005629b8260e74 in qemu_co_queue_run_restart (co=3D0x7f2ce8004da0) a=
+#29 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b17e103f0) a=
 t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#30 0x00005629b82609a9 in qemu_coroutine_enter (co=3D0x7f2ce8004da0) at /bu=
+#30 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b17e103f0) at /bu=
 ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#31 0x00005629b8260e74 in qemu_co_queue_run_restart (co=3D0x7f2cf3e15dc0) a=
+#31 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b17e078b0) a=
 t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#32 0x00005629b82609a9 in qemu_coroutine_enter (co=3D0x7f2cf3e15dc0) at /bu=
+#32 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b17e078b0) at /bu=
 ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#33 0x00005629b8260e74 in qemu_co_queue_run_restart (co=3D0x7f2ccff00420) a=
+#33 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4adfe02b00) a=
 t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#34 0x00005629b82609a9 in qemu_coroutine_enter (co=3D0x7f2ccff00420) at /bu=
+#34 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4adfe02b00) at /bu=
 ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#35 0x00005629b8260e74 in qemu_co_queue_run_restart (co=3D0x7f2cf1e04900) a=
+#35 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b15701ae0) a=
 t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
-#36 0x00005629b82609a9 in qemu_coroutine_enter (co=3D0x7f2cf1e04900) at /bu=
+#36 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b15701ae0) at /bu=
 ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
-#37 0x00005629b8260fa0 in qemu_co_enter_next (queue=3Dqueue@entry=3D0x5629b=
-a5e35e0) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:=
+#37 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b17e162f0) a=
+t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+#38 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b17e162f0) at /bu=
+ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+#39 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b10009fe0) a=
+t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+#40 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b10009fe0) at /bu=
+ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+#41 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b17e0b860) a=
+t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+#42 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b17e0b860) at /bu=
+ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+#43 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b23f035c0) a=
+t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+#44 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b23f035c0) at /bu=
+ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+#45 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b19e030c0) a=
+t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+#46 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b19e030c0) at /bu=
+ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+#47 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b100051b0) a=
+t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+#48 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b100051b0) at /bu=
+ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+#49 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4adfe03970) a=
+t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+#50 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4adfe03970) at /bu=
+ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+#51 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b17e11a00) a=
+t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+#52 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b17e11a00) at /bu=
+ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+#53 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b17e0e0a0) a=
+t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+#54 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b17e0e0a0) at /bu=
+ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+#55 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b17e0ede0) a=
+t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+#56 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b17e0ede0) at /bu=
+ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+#57 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4aeff00860) a=
+t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+#58 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4aeff00860) at /bu=
+ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+---Type <return> to continue, or q <return> to quit---
+#59 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b17e0d6f0) a=
+t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+#60 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b17e0d6f0) at /bu=
+ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+#61 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b17e0e490) a=
+t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+#62 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b17e0e490) at /bu=
+ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+#63 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b17e17370) a=
+t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+#64 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b17e17370) at /bu=
+ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+#65 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b17e15c40) a=
+t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+#66 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b17e15c40) at /bu=
+ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+#67 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b07f00a80) a=
+t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+#68 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b07f00a80) at /bu=
+ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+#69 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b15703250) a=
+t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+#70 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b15703250) at /bu=
+ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+#71 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b17e17870) a=
+t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+#72 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b17e17870) at /bu=
+ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+#73 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b15703140) a=
+t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+#74 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b15703140) at /bu=
+ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+#75 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b17e0c210) a=
+t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+#76 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b17e0c210) at /bu=
+ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+#77 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b17e08650) a=
+t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+#78 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b17e08650) at /bu=
+ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+#79 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b17e07470) a=
+t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+#80 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b17e07470) at /bu=
+ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+#81 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b15e03a10) a=
+t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+#82 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b15e03a10) at /bu=
+ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+#83 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b17e11d90) a=
+t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+#84 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b17e11d90) at /bu=
+ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+#85 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4b17e13d00) a=
+t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+#86 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b17e13d00) at /bu=
+ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+#87 0x0000562a4c582e74 in qemu_co_queue_run_restart (co=3D0x7f4afbe02b00) a=
+t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:60
+#88 0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4afbe02b00) at /bu=
+ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
+#89 0x0000562a4c582fa0 in qemu_co_enter_next (queue=3Dqueue@entry=3D0x562a4=
+d8e65e0) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine-lock.c:=
 106
-#38 0x00005629b81ff060 in timer_cb (blk=3D0x5629ba5e3590, is_write=3D<optim=
+#90 0x0000562a4c521060 in timer_cb (blk=3D0x562a4d8e6590, is_write=3D<optim=
 ized out>) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/block/throttle-groups.c:4=
 00
-#39 0x00005629b81bc615 in timerlist_run_timers (timer_list=3D0x5629ba64fd40=
+#91 0x0000562a4c4de615 in timerlist_run_timers (timer_list=3D0x562a4d952d40=
 ) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/qemu-timer.c:528
-#40 0x00005629b81bc679 in timerlistgroup_run_timers (tlg=3Dtlg@entry=3D0x56=
-29bb9cd758) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/qemu-timer.c:564
-#41 0x00005629b81bcf47 in aio_dispatch (ctx=3Dctx@entry=3D0x5629bb9cd610) a=
+#92 0x0000562a4c4de679 in timerlistgroup_run_timers (tlg=3Dtlg@entry=3D0x56=
+2a4ecd0758) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/qemu-timer.c:564
+#93 0x0000562a4c4def47 in aio_dispatch (ctx=3Dctx@entry=3D0x562a4ecd0610) a=
 t /build/pb-qemu-pssKUp/pb-qemu-2.7.0/aio-posix.c:357
-#42 0x00005629b81bd0e8 in aio_poll (ctx=3D0x5629bb9cd610, blocking=3D<optim=
+#94 0x0000562a4c4df0e8 in aio_poll (ctx=3D0x562a4ecd0610, blocking=3D<optim=
 ized out>) at /build/pb-qemu-pssKUp/pb-qemu-2.7.0/aio-posix.c:479
-#43 0x00005629b801ec79 in iothread_run (opaque=3D0x5629bb9cd3c0) at /build/=
+#95 0x0000562a4c340c79 in iothread_run (opaque=3D0x562a4ecd03c0) at /build/=
 pb-qemu-pssKUp/pb-qemu-2.7.0/iothread.c:46
-#44 0x00007f2f34a0e0a4 in start_thread (arg=3D0x7f2f12fff700) at pthread_cr=
-eate.c:403
-#45 0x00007f2f3474362d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clo=
-ne.S:111
+#96 0x00007f4d5b0e80a4 in start_thread () from /lib/x86_64-linux-gnu/libpth=
+read.so.0
+#97 0x00007f4d5ae1d62d in clone () from /lib/x86_64-linux-gnu/libc.so.6
 --------------------------------------------------------------------------
 
 Looking at the data:
 --------------------------------------------------------------------------
 (gdb) frame 2
-#2  0x00005629b8260b6c in qemu_coroutine_enter (co=3D0x7f2cd6a00940) at /bu=
+#2  0x0000562a4c582b6c in qemu_coroutine_enter (co=3D0x7f4b1bf0a900) at /bu=
 ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:113
 113    /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c: No such f=
 ile or directory.
 (gdb) print *co
-$1 =3D {entry =3D 0x7f2efbfbc4d8, entry_arg =3D 0x1, caller =3D 0x7f2efbfbc=
-4b8, pool_next =3D {sle_next =3D 0x10}, co_queue_wakeup =3D {sqh_first =3D =
-0x7f2d217e2000, sqh_last =3D 0x1000}, co_queue_next =3D {sqe_next =3D 0x0}}
+$1 =3D {entry =3D 0x7f4d23f20198, entry_arg =3D 0x1, caller =3D 0x7f4d23f20=
+178, pool_next =3D {sle_next =3D 0x10}, co_queue_wakeup =3D {sqh_first =3D =
+0x7f4c605fb000, sqh_last =3D 0x1000}, co_queue_next =3D {
+    sqe_next =3D 0x7f4c584f5000}}
 (gdb) print *co->caller
-$2 =3D {entry =3D 0x1, entry_arg =3D 0xc21a480, caller =3D 0x0, pool_next =
-=3D {sle_next =3D 0x0}, co_queue_wakeup =3D {sqh_first =3D 0x0, sqh_last =
-=3D 0xffffea0000567882}, co_queue_next =3D {sqe_next =3D 0x100000000000}}
+$2 =3D {entry =3D 0x400400000001, entry_arg =3D 0x5000ac0, caller =3D 0x0, =
+pool_next =3D {sle_next =3D 0x0}, co_queue_wakeup =3D {sqh_first =3D 0x0, s=
+qh_last =3D 0xffffea0005b1fec0}, co_queue_next =3D {sqe_next =3D 0x10000000=
+0000}}
 (gdb) frame 4
-#4  0x00005629b82609a9 in qemu_coroutine_enter (co=3D0x7f2cd6a00880) at /bu=
+#4  0x0000562a4c5829a9 in qemu_coroutine_enter (co=3D0x7f4b1bf0a830) at /bu=
 ild/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c:119
 119    in /build/pb-qemu-pssKUp/pb-qemu-2.7.0/util/qemu-coroutine.c
 (gdb) print *co
-$3 =3D {entry =3D 0x200000046, entry_arg =3D 0x7f2c00000001, caller =3D 0x7=
-f2cd6a00928, pool_next =3D {sle_next =3D 0x7f2cd6a00930}, co_queue_wakeup =
-=3D {sqh_first =3D 0x0, sqh_last =3D 0x7f2cd6a008a0}, co_queue_next =3D {
-    sqe_next =3D 0xc21a480}}
+$5 =3D {entry =3D 0x7f4b180001d8, entry_arg =3D 0x7f4b180001d8, caller =3D =
+0x7f4b1bf0a8d8, pool_next =3D {sle_next =3D 0x7f4b1bf0a8e0}, co_queue_wakeu=
+p =3D {sqh_first =3D 0x7f4c584f5000, sqh_last =3D 0x7f4b1bf0a910}, =
+
+  co_queue_next =3D {sqe_next =3D 0x5000ac0}}
 (gdb) print *co->caller
-$4 =3D {entry =3D 0x2301bc4d8, entry_arg =3D 0x2301bc4b8, caller =3D 0x159e=
-2000, pool_next =3D {sle_next =3D 0x7f2efbfbc4d8}, co_queue_wakeup =3D {sqh=
-_first =3D 0x1, sqh_last =3D 0x7f2efbfbc4b8}, co_queue_next =3D {
-    sqe_next =3D 0x10}}
+$6 =3D {entry =3D 0x230120198, entry_arg =3D 0x230120178, caller =3D 0x16c7=
+fb000, pool_next =3D {sle_next =3D 0x1646f5000}, co_queue_wakeup =3D {sqh_f=
+irst =3D 0x1718c2000, sqh_last =3D 0x7f4d23f20198}, co_queue_next =3D {
+    sqe_next =3D 0x1}}
 --------------------------------------------------------------------------
 
-Same as above. If co->caller is not NULL in earlier calls, why have they
-succeeded?
+Same thing.
 
 -- =
 
