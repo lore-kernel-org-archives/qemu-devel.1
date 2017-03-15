@@ -1,20 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55071)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1co6p4-0006ol-Q9
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 07:10:31 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1co6t8-0007x7-L9
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 07:14:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1co6p3-0004wA-VE
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 07:10:30 -0400
-Date: Wed, 15 Mar 2017 19:10:21 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170315111021.GD3088@lemon.lan>
-References: <1489549053-31728-1-git-send-email-jemmy858585@gmail.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1co6t2-0006qQ-Pt
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 07:14:42 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:36339)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1co6t2-0006pz-JE
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 07:14:36 -0400
+Received: by mail-wm0-x232.google.com with SMTP id n11so84806357wma.1
+	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 04:14:36 -0700 (PDT)
+References: <36e41adf-b0b3-3efa-51c4-f1a70cd05b98@ilande.co.uk>
+	<87wpbsp49a.fsf@linaro.org>
+	<6491a446-bf23-5ab9-3431-c67efaf83f71@ilande.co.uk>
+	<alpine.BSF.2.20.1703141450560.82811@zero.eik.bme.hu>
+	<87shmfq31b.fsf@linaro.org>
+	<b9006aa4-b606-61d5-6896-8c76a6a6f8f3@ilande.co.uk>
+	<87o9x3pzxe.fsf@linaro.org>
+	<alpine.BSF.2.20.1703141829440.39248@zero.eik.bme.hu>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <alpine.BSF.2.20.1703141829440.39248@zero.eik.bme.hu>
+Date: Wed, 15 Mar 2017 11:14:52 +0000
+Message-ID: <87h92upz9v.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1489549053-31728-1-git-send-email-jemmy858585@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2] migration/block: Avoid invoking
- blk_drain too frequently
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] qemu-system-ppc video artifacts since
+ "tcg: drop global lock during TCG code execution"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,43 +37,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lidong Chen <jemmy858585@gmail.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, quintela@redhat.com, dgilbert@redhat.com, qemu-block@nongnu.org
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, jan.kiszka@siemens.com, qemu-devel <qemu-devel@nongnu.org>, cota@braap.org, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, bobby.prani@gmail.com, fred.konrad@greensocs.com, rth@twiddle.net
 
-On Wed, 03/15 11:37, Lidong Chen wrote:
-> Increase bmds->cur_dirty after submit io, so reduce the frequency
-> involve into blk_drain, and improve the performance obviously
-> when block migration.
-> 
-> The performance test result of this patch:
-> 
-> During the block dirty save phase, this patch improve guest os IOPS
-> from 4.0K to 9.5K. and improve the migration speed from
-> 505856 rsec/s to 855756 rsec/s.
-> 
-> Signed-off-by: Lidong Chen <jemmy858585@gmail.com>
-> ---
->  migration/block.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/migration/block.c b/migration/block.c
-> index 6741228..7734ff7 100644
-> --- a/migration/block.c
-> +++ b/migration/block.c
-> @@ -576,6 +576,9 @@ static int mig_save_device_dirty(QEMUFile *f, BlkMigDevState *bmds,
->              }
->  
->              bdrv_reset_dirty_bitmap(bmds->dirty_bitmap, sector, nr_sectors);
-> +            sector += nr_sectors;
-> +            bmds->cur_dirty = sector;
-> +
->              break;
->          }
->          sector += BDRV_SECTORS_PER_DIRTY_CHUNK;
-> -- 
-> 1.8.3.1
-> 
 
-Nice catch above all, thank you!
+BALATON Zoltan <balaton@eik.bme.hu> writes:
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+> On Tue, 14 Mar 2017, Alex Bennée wrote:
+>> So from a single-threaded -smp guest case there should be no difference
+>> in behaviour.
+<snip>
+>>However this shouldn't affect
+>> anything in the single-threaded world.
+>
+> I think we have a single CPU and thread for these ppc machines here so
+> I'm not sure how this could be relevant.
+>
+>> However delaying tlb_flushes() could certainly expose/hide stuff that is
+>> accessing the dirty mechanism. tlb_flush itself now takes the tb_lock() to
+>> avoid racing with the TB invalidation logic. The act of the flush will
+>> certainly wipe all existing SoftMMU entries and force a re-load on each
+>> memory access.
+>>
+>> So is the dirty status of memory being read from outside a vCPU
+>> execution context?
+>
+> Like from the display controller models that use
+> memory_region_get_dirty() to check if the frambuffer needs to be
+> updated? But all display adaptors seem to do this and the problem was
+> only seem on ppc so it may be related to something ppc specific.
+
+So this accesses the memory_region API which is under RCU control.
+AFAIUI this should mean the dirty status may be read late (e.g. next
+update) but should never be incorrect (e.g. miss a dirtying operation).
+
+--
+Alex Bennée
