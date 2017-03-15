@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1coC2h-00007O-G6
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 12:44:56 -0400
+	(envelope-from <k.kozlowski.k@gmail.com>) id 1coC5G-00017G-KV
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 12:47:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1coC2e-0000uo-CF
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 12:44:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43205)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1coC2e-0000u1-2Z
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 12:44:52 -0400
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2D713636E5
-	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 16:44:51 +0000 (UTC)
-Date: Wed, 15 Mar 2017 16:44:46 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170315164445.GA2701@work-vm>
-References: <20170315161603.30135-1-berrange@redhat.com>
+	(envelope-from <k.kozlowski.k@gmail.com>) id 1coC5F-000266-ML
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 12:47:34 -0400
+Date: Wed, 15 Mar 2017 18:47:24 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Message-ID: <20170315164724.37z6yeapl3wujgh4@kozik-lap>
+References: <20170313180432.7067-1-krzk@kernel.org> <87mvcnpzll.fsf@linaro.org>
+	<20170314173513.wruppu4js7ikaxu2@kozik-lap>
+	<CAHDbmO1apk81csbC7BJK2JFK23fvVBLb-wA5z7_y29T=ueFPyg@mail.gmail.com>
+	<20170314185632.kzbccv2y7ah3nhqd@kozik-lap>
+	<87k27rotgb.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170315161603.30135-1-berrange@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for 2.9] migration: use "" as the default
- for tls-creds/hostname
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <87k27rotgb.fsf@linaro.org>
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 0/5] hw: arm: exynos: Bring
+ up secondary CPU + CPUIDLE issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,114 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-* Daniel P. Berrange (berrange@redhat.com) wrote:
-> The tls-creds parameter has a default value of NULL indicating
-> that TLS should not be used. Setting it to non-NULL enables
-> use of TLS. Once tls-creds are set to a non-NULL value via the
-> monitor, it isn't possible to set them back to NULL again, due
-> to current implementation limitations. The empty string is not
-> a valid QObject identifier, so this switches to use "" as the
-> default, indicating that TLS will not be used
-> 
-> The tls-hostname parameter has a default value of NULL indicating
-> the the hostname from the migrate connection URI should be used.
-> Again, once tls-hostname is set non-NULL, to override the default
-> hostname for x509 cert validation, it isn't possible to reset it
-> back to NULL via the monitor. The empty string is not a valid
-> hostname, so this switches to use "" as the default, indicating
-> that the migrate URI hostname should be used.
-> 
-> Using "" as the default for both, also means that the monitor
-> commands "info migrate_parameters" / "query-migrate-parameters"
-> will report existance of tls-creds/tls-parameters even when set
-> to their default values.
-> 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+On Wed, Mar 15, 2017 at 08:05:56AM +0000, Alex Benn=C3=A9e wrote:
+>=20
+> Krzysztof Kozlowski <krzk@kernel.org> writes:
+>=20
+> > On Tue, Mar 14, 2017 at 06:24:33PM +0000, Alex Benn=C3=A9e wrote:
+> >> That means you're on a pre-mttcg tree so that's not the reason.
+> >
+> > I managed to build it on current master (v2.8.0-2182-g5e2fb7c598c6). It
+> > behaves the same (with "-accel tcg,thread=3Dsingle": cannot reach
+> > switching to init).
+>=20
+> Interesting. Can you post your exact qemu command line and I'll have a
+> go at reproducing.
 
-Yes, simple enough.
+I build usually with:
+=2E./qemu/configure --cc=3D"ccache cc" --cxx=3D"ccache c++" --enable-debug =
+--enable-fdt \
+	--enable-kvm --enable-libusb --enable-libssh2 --enable-lzo \
+	--enable-bzip2 --enable-curses --enable-gtk  --enable-cap-ng
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Running with command:
+arm-softmmu/qemu-system-arm -m 1024 -M smdkc210 -smp 2 -append \
+	'console=3DttySAC0,115200n8 console=3DttyS0 earlyprintk' -d guest_errors \
+	-serial stdio -D ..//log-smdkc210.log -kernel ../cur-linux/zImage
+	-dtb ../cur-linux/dts/exynos4210-smdkv310.dtb
+	-initrd ../armv7-odroidu3-exynos-v4.10-initramfs.cpio.gz
 
-Markus, Eric - are you OK with that?
+Plus the -accel line, depending on the needs.
 
-Dave
+The initramfs is a simple one from Arch Arm.
+
+>=20
+> In the meantime you can always --enable-debug-tcg your build and see if
+> any of the asserts fire.
+
+enable-debug-tcg did not change much - no asserts. The last dmesg is:
+[   72.616013] Registering SWP/SWPB emulation handler
+[   74.484873] s3c64xx-spi 13940000.spi: spi bus clock parent not specified=
+, using clock at index 0 as parent
+[   74.485994] s3c64xx-spi 13940000.spi: number of chip select lines not sp=
+ecified, assuming 1 chip select line
+[   74.493249] s3c64xx-spi 13940000.spi: Failed to get RX DMA channel
+[   74.503885] hctosys: unable to open rtc device (rtc0)
+[   74.523004] ALSA device list:
+[   74.523711]   No soundcards found.
+[   74.542278] samsung-uart 13800000.serial: DMA request failed, DMA will n=
+ot be used
 
 
-> ---
->  migration/migration.c | 4 ++++
->  migration/tls.c       | 2 +-
->  qapi-schema.json      | 4 ++++
->  3 files changed, 9 insertions(+), 1 deletion(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 3dab684..54060f7 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -110,6 +110,8 @@ MigrationState *migrate_get_current(void)
->  
->      if (!once) {
->          qemu_mutex_init(&current_migration.src_page_req_mutex);
-> +        current_migration.parameters.tls_creds = g_strdup("");
-> +        current_migration.parameters.tls_hostname = g_strdup("");
->          once = true;
->      }
->      return &current_migration;
-> @@ -458,6 +460,7 @@ void migration_channel_process_incoming(MigrationState *s,
->          ioc, object_get_typename(OBJECT(ioc)));
->  
->      if (s->parameters.tls_creds &&
-> +        *s->parameters.tls_creds &&
->          !object_dynamic_cast(OBJECT(ioc),
->                               TYPE_QIO_CHANNEL_TLS)) {
->          Error *local_err = NULL;
-> @@ -480,6 +483,7 @@ void migration_channel_connect(MigrationState *s,
->          ioc, object_get_typename(OBJECT(ioc)), hostname);
->  
->      if (s->parameters.tls_creds &&
-> +        *s->parameters.tls_creds &&
->          !object_dynamic_cast(OBJECT(ioc),
->                               TYPE_QIO_CHANNEL_TLS)) {
->          Error *local_err = NULL;
-> diff --git a/migration/tls.c b/migration/tls.c
-> index 203c11d..45bec44 100644
-> --- a/migration/tls.c
-> +++ b/migration/tls.c
-> @@ -141,7 +141,7 @@ void migration_tls_channel_connect(MigrationState *s,
->          return;
->      }
->  
-> -    if (s->parameters.tls_hostname) {
-> +    if (s->parameters.tls_hostname && *s->parameters.tls_hostname) {
->          hostname = s->parameters.tls_hostname;
->      }
->      if (!hostname) {
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 32b4a4b..eb9bf67 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -1036,6 +1036,8 @@
->  #             credentials must be for a 'server' endpoint. Setting this
->  #             will enable TLS for all migrations. The default is unset,
->  #             resulting in unsecured migration at the QEMU level. (Since 2.7)
-> +#             An empty string means that QEMU will use plain text mode for
-> +#             migration, rather than TLS (Since 2.9)
->  #
->  # @tls-hostname: #optional hostname of the target host for the migration. This
->  #                is required when using x509 based TLS credentials and the
-> @@ -1043,6 +1045,8 @@
->  #                example if using fd: or exec: based migration, the
->  #                hostname must be provided so that the server's x509
->  #                certificate identity can be validated. (Since 2.7)
-> +#                An empty string means that QEMU will use the hostname
-> +#                associated with the migration URI, if any. (Since 2.9)
->  #
->  # @max-bandwidth: to set maximum speed for migration. maximum speed in
->  #                 bytes per second. (Since 2.8)
-> -- 
-> 2.9.3
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Best regards,
+Krzysztof
