@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <oussemakeder@yahoo.fr>) id 1co4DH-0003D1-DM
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 04:23:20 -0400
+	(envelope-from <bounces@canonical.com>) id 1co4FS-0003sD-Q6
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 04:25:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <oussemakeder@yahoo.fr>) id 1co4DD-0006li-CS
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 04:23:19 -0400
-Received: from nm12-vm7.bullet.mail.ir2.yahoo.com ([212.82.96.177]:59059)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <oussemakeder@yahoo.fr>) id 1co4DD-0006lV-2n
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 04:23:15 -0400
-Date: Wed, 15 Mar 2017 08:23:12 +0000 (UTC)
-From: oussema ben khedher <oussemakeder@yahoo.fr>
-Reply-To: oussema ben khedher <oussemakeder@yahoo.fr>
-Message-ID: <1204883637.539550.1489566192901@mail.yahoo.com>
+	(envelope-from <bounces@canonical.com>) id 1co4FO-0007Mq-Pr
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 04:25:34 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45196)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1co4FO-0007Mj-Ju
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 04:25:30 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1co4FN-0003fK-65
+	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 08:25:29 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 453E22E80D3
+	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 08:25:26 +0000 (UTC)
 MIME-Version: 1.0
-References: <1204883637.539550.1489566192901.ref@mail.yahoo.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] about trace Translation blocks
+Date: Wed, 15 Mar 2017 08:08:12 -0000
+From: Thomas Huth <720657@bugs.launchpad.net>
+Reply-To: Bug 720657 <720657@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20110217115121.6900.44475.malonedeb@wampee.canonical.com>
+Message-Id: <20170315080813.15736.92770.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 720657] Re: SVM intercept for VINTR exits too
+ early
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,13 +37,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-hi=C2=A0
-im trying to trace Translation bloks and i guess that this function its the=
- responsible for print the trace informations=C2=A0
-qemu_log_mask_and_addr(CPU_LOG_EXEC, itb->pc, "Trace %p [%d: " TARGET_FMT_l=
-x "] %s\n", itb->tc_ptr, cpu->cpu_index, itb->pc, lookup_symbol(itb->pc));
-but really i didn't understand it can someone guide me to modify this funct=
-ion to have a trace in a file.txt or something else=C2=A0
-thanks
+Triaging old bug tickets ... can you still reproduce this problem with
+the latest version of QEMU?
+
+** Changed in: qemu
+       Status: New =3D> Incomplete
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/720657
+
+Title:
+  SVM intercept for VINTR exits too early
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  The following happens with QEMU-0.14-rc2. QEMU-0.13 did not have this
+  problem.
+
+  A guest operating system running inside an SVM VM contains the following =
+code sequence:
+  c000002b:       fb                      sti    =
+
+  c000002c:       0f 35                   sysexit =
+
+
+  The following is a list of exits that occur at guest RIP 0xc000002c
+  (other exits omitted for clarity):
+
+  exit=3D0x60 int_shadow=3D0x1 int_control=3D0x1000000 inj=3D0x600000000 ri=
+p=3D0xc000002c
+  entry: int_shadow=3D0x1 int_control=3D0x1000000 inj=3D0x600000000
+
+  (exit due to physical interrupt, correctly reports STI blocking, entry
+  does not inject anything)
+
+  exit=3D0x60 int_shadow=3D0x1 int_control=3D0x1000000 inj=3D0x600000000 ri=
+p=3D0xc000002c
+  entry: int_shadow=3D0x1 int_control=3D0x1100100 inj=3D0x600000000
+
+  (exit due to physical interrupt, correctly reports STI blocking, entry
+  pends a VINTR to cause a VM exit when interrupt window opens. VINTR is
+  being intercepted by the hypervisor.)
+
+  exit=3D0x64 int_shadow=3D0x0 int_control=3D0x1100100 inj=3D0x600000000 ri=
+p=3D0xc000002c
+  entry: int_shadow=3D0x0 int_control=3D0x1000000 inj=3D0x6800000a0
+
+  (exit due to VINTR. At this point STI blocking is still effective -
+  though not reported. Actually, the VINTR exit should occur AFTER the
+  SYSEXIT instruction, not after STI. Due to this bug, the hypervisor
+  injects vector 0xa0 into an interrupt shadow, and things break).
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/720657/+subscriptions
