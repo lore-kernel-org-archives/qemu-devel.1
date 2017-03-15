@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43133)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1coA8t-0000hX-GF
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 10:43:12 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1coA9R-0001BM-Kr
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 10:43:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1coA8s-00026j-JW
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 10:43:11 -0400
-Date: Wed, 15 Mar 2017 22:42:59 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170315144259.GG3088@lemon.lan>
+	(envelope-from <pbonzini@redhat.com>) id 1coA9Q-0002TJ-LX
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 10:43:45 -0400
 References: <20170314171120.80741-1-vsementsov@virtuozzo.com>
 	<20170315110351.GG4030@noname.str.redhat.com>
-	<20170315111445.GE3088@lemon.lan>
-	<20170315120656.GI4030@noname.str.redhat.com>
-	<20170315131343.GF3088@lemon.lan>
-	<735f5ad8-7a2a-8dcf-b806-fd17d00afac2@virtuozzo.com>
+	<9a68a30f-8765-ca91-572f-ed8d7083b202@redhat.com>
+	<20170315143032.GK4030@noname.str.redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <87bb192d-b910-5ac2-886b-fefeb4a2ec4d@redhat.com>
+Date: Wed, 15 Mar 2017 15:43:38 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <735f5ad8-7a2a-8dcf-b806-fd17d00afac2@virtuozzo.com>
+In-Reply-To: <20170315143032.GK4030@noname.str.redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH] blk: fix aio context loss on media change
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -27,48 +25,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com, jsnow@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com
 
-On Wed, 03/15 17:04, Vladimir Sementsov-Ogievskiy wrote:
-> 15.03.2017 16:13, Fam Zheng wrote:
-> > On Wed, 03/15 13:06, Kevin Wolf wrote:
-> > > > > Stefan, Paolo, do you remember the details why we didn't even do a
-> > > > > simple fix like the one below? I think there were some patches on the
-> > > > > list, no?
-> > > > ISTM the concern was mostly "what about other BB in the graph?"
-> > > > 
-> > > > Should the new op blocker API be used in this one (a new type of perm)?
-> > > If we know what operation to block, that's an option. Would "change the
-> > > node's AioContext" work for it?
+
+
+On 15/03/2017 15:30, Kevin Wolf wrote:
+> Am 15.03.2017 um 14:39 hat Paolo Bonzini geschrieben:
+>> On 15/03/2017 12:03, Kevin Wolf wrote:
+>>> But we discussed this earlier, and while I'm not completely sure any
+>>> more about the details, I seem to remeber that Paolo said something
+>>> along the lines that AioContext is going away anyway and building the
+>>> code for proper management would be wasted time.
+>>
+>> AioContext is going to stay, but everybody will be able to send
+>> operations to a BB/BDS from any AioContext.  The BDS AioContext will
+>> only matter for network devices, since they have to attach the file
+>> descriptor handlers somewhere.  For files it won't matter at all because
+>> you can use multiple Linux AIO context or thread pools at the same time.
 > 
-> we can start with empty cdrom, so there is no context at start
+> Should the iothread option then become a -blockdev option rather than a
+> -device one?
 
-Practically, I agree this patch is fine for now because callers don't
-arbitrarily move BDS from one context to another, only a small set of operations
-exists - start/stop data plane, block job callbacks. The problem is that new
-code in the future can cause trouble if different BBs in the same graph don't
-agree on what context they can run on, especially with dynamical
-reconfiguration. So the previous discussions were more about an API that works
-generally.
+Well, both.  The device also needs an I/O thread to attach its ioeventfd
+handler.  And it makes sense to use the -device I/O thread if -blockdev
+specified none.
 
+>> There should be a policy on which BB sets AioContext on the BDS (e.g.
+>> only the device does it), but apart from that, it should not be an issue.
 > 
-> > > 
-> > > I think it would effectively mean that you need to attach the device
-> > > first and then jobs etc. respect the AioContext, whereas the opposite
-> > > order breaks because they don't have callbacks to adjust the AioContext
-> > > after the fact.
-> > > 
-> > > This seems to match what's actually safe, so it might really be as easy
-> > > as this.
-> > Yes, this sounds good to me.
-> > 
-> > Vladimir, would you like to implement this? It would be good to have this fixed
-> > in 2.9.
-> 
-> I don't sure about how to do it, so, I don't mind someone else to implement
-> this..
+> We don't know which BBs are going to be attached. We don't necessarily
+> have a device at all, or we could have two of them.
 
-OK, I can take a look at this tomorrow.
+Wow, can we really have two? :-O
 
-Fam
+> Though maybe we should try to keep a BDS and its children in the same
+> AioContext anyway if that's possible? Will it make a difference?
+
+Everything can make sense---but yes, keeping the whole hierarchy in the
+same AioContext makes sense more often.
+
+Paolo
