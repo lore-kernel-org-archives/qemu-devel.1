@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1co9G4-0005CU-2x
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:46:33 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1co9H6-0005pX-5z
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:47:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1co9Fz-0001VU-8N
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:46:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34908)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1co9Fy-0001VD-Vn
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:46:27 -0400
-Date: Wed, 15 Mar 2017 10:46:22 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170315134622.GV4694@thinpad.lan.raisama.net>
-References: <20170314140807.6061-1-git@kirschju.re>
-	<20170314140807.6061-2-git@kirschju.re>
-	<20170314171632.GS4694@thinpad.lan.raisama.net>
-	<20170314223314.GB3086@thinpad.lan.raisama.net>
-	<c687a959-3aee-16aa-1213-93dee5752188@kirschju.re>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c687a959-3aee-16aa-1213-93dee5752188@kirschju.re>
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] X86: Move rdmsr/wrmsr functionality
- to standalone functions
+	(envelope-from <a.perevalov@samsung.com>) id 1co9H1-00024V-9K
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:47:36 -0400
+Received: from mailout3.w1.samsung.com ([210.118.77.13]:61710)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1co9H0-000235-VM
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:47:31 -0400
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout3.w1.samsung.com
+	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
+	2014)) with ESMTP id <0OMU00G9AZMZCP40@mailout3.w1.samsung.com> for
+	qemu-devel@nongnu.org; Wed, 15 Mar 2017 13:47:23 +0000 (GMT)
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Message-id: <8d9cb1a5-3961-dde3-cf4c-f013f7c92620@samsung.com>
+Date: Wed, 15 Mar 2017 16:47:21 +0300
+MIME-version: 1.0
+In-reply-to: <20170313214636.GK27056@redhat.com>
+Content-type: text/plain; charset=windows-1252; format=flowed
+Content-transfer-encoding: 7bit
+References: <CGME20170310140816eucas1p2bd85d3759739d64bb184ce0fbd74f90d@eucas1p2.samsung.com>
+	<20170310140806.GA11225@aperevalov-ubuntu>
+	<20170313105338.GA2626@work-vm> <20170313214636.GK27056@redhat.com>
+Subject: Re: [Qemu-devel] Dual userfaultfd behavior
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,104 +34,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julian Kirsch <git@kirschju.re>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: Andrea Arcangeli <aarcange@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Mike Kravetz <mike.kravetz@oracle.com>
 
-On Wed, Mar 15, 2017 at 01:59:20PM +0100, Julian Kirsch wrote:
-> Hi Eduardo,
-> 
-> thanks for taking the time to look through the patch series. To recapitulate for
-> the next iteration:
-> 
-> 1.) Let the rd/wrmsr functions set the valid variable in case of
->     CONFIG_USER_ONLY being set.
-> 2.) Split up patch into code movement followed by reordering
+Hi Andrea,
 
-After the code movement, I would also separate simple code
-reordering from the addition of new MSRs.
+thank you for so perfect design description,
 
-> 3.) I included only MSR_KVM_SYSTEM_TIME_NEW because exposing MSR_KVM_SYSTEM_TIME
->     to users will hardcode its presence forever, and from the comments next
->     to the macro definitions I figured MSR_KVM_SYSTEM_TIME should not be used
->     anymore.
+the main question who will do RFC patches,
+you or Mike or if you not against I could try.
 
-New guest code shouldn't use it, but we do implement them, and
-being able to look at it using the new helpers would still be
-useful. The existing kvm_put_msrs()/kvm_get_msrs() code still
-references MSR_KVM_SYSTEM_TIME, for example, and I am looking for
-ways to make it reuse x86_cpu_rdmsr()/x86_cpu_wrmsr().
+On 03/14/2017 12:46 AM, Andrea Arcangeli wrote:
+> Hello,
+>
+> On Mon, Mar 13, 2017 at 10:53:39AM +0000, Dr. David Alan Gilbert wrote:
+>> * Alexey Perevalov (a.perevalov@samsung.com) wrote:
+>>> Hi, David, Andrea and Mike
+>> Hi Alexey,
+>>
+>>> The problem I want to discuss it's 1G hugepage based VM and post copy live
+>>> migration.
+>>>
+>>> I would like to know your opinion on following approach of avoiding such
+>>> problem:
+>>> Once we have mmap'ed area through 1G hugetlbfs, remap physical pages
+>>> with /dev/mem. It will be 2 types of vmas mapped to the same PFN.
+>>> Register userfaultfd for newly obtained virtual
+>>> addresses, it could reduce granularity of pages and reduce downtime per
+>>> one 1G page. So registering userfaultfd for 2Mb, when the real hugepage
+>>> was 1G, I think, could help.
+>>>
+>>> Current postcopy implementation in QEMU allows to make live migration
+>>> from 1G based hugepage VM to 2Mb based hugepages VM (sanity checks prevent
+>>> it).
+>>>
+>>> Also I checked, it's possible to remap through /dev/mem and get PFN
+>>> based vmas, register userfaultfd (with allowance in vma_can_userfault)
+>>> and finally make UFFDIO_COPY with allowing PFN based vmas in __mcopy_atomic.
+>>>
+>>> But there are a lot of drawback of such approach:
+>>> First of all it's /dev/mem interface. Need to provide full access
+>>> (kernel w/o CONFIG_STRICT_DEVMEM) and need to disable PAT.
+>>> The second drawback, maybe I just didn't find possibility to remap
+>>> hugepages again, but mmap of /dev/mem character driver maps 4Kb pages.
+>>> I don't know how THP could help here, but madvise with MADV_HUGEPAGE
+>>> didn't. So 4Kb is not exactly what needed, due to overhead of
+>>> encapsulation summary downtime is worse than in other cases.
+>>> It would be great to have interface to obtain new virtual address based
+>>> on existing PFN, but for hugepages.
+>> Yes, and I think as well on some architectures there can be cache problems
+>> from mapping the same page in two addresses unless we're careful.
+>>
+>> I think to do this we'd basically need the kernel to set up something
+>> similar to what you're saying, but without the mess of having to
+>> go via /dev/mem.  Ideally it would all happen magically when I mark
+> /dev/mem is problematic also if the hugetlbfs page is being migrated
+> for example (the virtual2physical mapping that may change and be
+> directed to a different physical page with no notification to userland).
+>
+>> a hugetlb page as userfault and start UFFDIO_COPYing in 4kb pages;
+>> but I can imagine perhaps some more syscalls needed to tell it to do it.
+> I think what is needed is an extension to UFFDIO_COPY so that it will
+> not fail if used with lower granularity than the hugetlbfs page
+> size. Then a special feature flag should be set in the
+> uffdio_api.features to tell userland it can use a lower granularity
+> than the hugetlbfs page size.
+>
+> UFFDIO_COPY will still allocate a 1GB page, but it will copy only part
+> of and then map only the copied part with a pte of 4k granularity (or
+> 2MB granularity if the uffdio_copy.dst/len parameters allows for
+> hugepmds). This way if there's a missing fault in the part that is not
+> copied yet, it'll still trigger a page fault and we'll call
+> handle_userfault from hugetlb_no_page, which will trigger a new
+> UFFDIO_COPY and map another fragment of the 1GB page.
+> The same code than should allow us to map a 2MB hugetlbfs page with 4k
+> granularity in UFFDIO_COPY so then userland can choose if to do
+> postcopy live migration on hugetlbfs with 2MB or 4kb granularity (on
+> very slow network 4kb would be preferable for example for the latency).
+>
+> Mapping a 1GB page without a hugepud or mapping a 2MB page without a
+> hugepmd breaks all sort of invariants into the hugetlbfs code, page
+> migration wouldn't be able to cope with it either. Solving the fallout
+> from such breakage is what is required to implement this basically.
+>
+> Ideally this could be a UFFDIO_COPY-only feature, simply every other
+> part of hugetlbfs should be able to cope with whatever UFFDIO_COPY has
+> generated in terms of pagetables mapping those hugepages.
+>
+> The only thing that will change from hugetlbfs point of view is that a
+> pte or hugepmd could be mapping a 1GB page, that couldn't be the case
+> before it.
+>
+> Once the entirety of the hugepage has been mapped or when the
+> UFFDIO_UNREGISTER is called on the 1GB range, all those hugepmds
+> and/or ptes should be dropped and the hugepud would then point
+> directly to the 1GB page restoring the current behavior (which is
+> required to get a 1GB large TLB and top performance, i.e. immediately
+> after the live migration completed).
+>
+> This is very different concept than THP that in fact never requires to
+> allocate hugepages. THP nowadays also allows to map a THP page using
+> ptes, instead of hugepmds, just for a different reason (i.e. to allow
+> split_huge_page to fail and be deferred, so get/put_page are
+> simplified, while still guaranteeing that split_huge_page_pmd cannot
+> fail). So we're already doing something like the above with THP but we
+> only cover ptes vs hugepmd. The codebase however is different,
+> hugetlbfs doesn't interact much with the main VM, so there's likely
+> nothing to share with THP, but the concept of mapping an hugepage with
+> ptes is somewhat similar.
+>
+> THP fundamentally always allows fallback, in the UFFDIO_COPY on
+> hugetlbfs instead the idea would be to never allow fallback on the
+> physical side, but to allow partial mapping so that the UFFDIO_COPY
+> granularity can be reduced, despite the physical granularity remains
+> native. This also means the collapse after live migration will be
+> zerocopy: the collapse would be of the virtual kind for hugetlbfs
+> (khugepaged as opposed has to copy the actual data because the
+> physical pages were not huge to begin with, to allow the fallback).
+>
+> When UFFDIO_COPY is called again on the same 1GB range, it would need
+> to notice that the pud is not null but is not huge (new case
+> introduced), and then keep going in the pagetables lookup until it
+> finds the copied range is not mapped, skip the 1GB allocation in such
+> case and copy into the pre-existing 1GB page. If instead it finds the
+> dst range is already mapped by a pte or a hugepmd, it'll instead
+> return -EEXIST as usual.
+>
+> Thanks,
+> Andrea
+>
+>
+>
 
-> 4.) HyperV MSRs were assumed to be x86_64 specific because they have X64
->     in their names, but it seems I was wrong on this one. Sorry for being
->     lured simply due to the naming convention.
-
-I was confused, too. I had to double-check the KVM kernel code to
-be sure it was really supported on i386.
-
-> 
-> Best,
-> Julian
-> 
-> On 14.03.2017 23:33, Eduardo Habkost wrote:
-> > Found something else that confused me:
-> > 
-> > On Tue, Mar 14, 2017 at 02:16:32PM -0300, Eduardo Habkost wrote:
-> > [...]
-> >> +#if defined CONFIG_KVM && defined TARGET_X86_64
-> > 
-> > Why exactly are you making the hyperv MSRs x86_64-specific? I
-> > don't see anything at the QEMU code or kernel-side KVM code that
-> > makes it x86_64-specific.
-> > 
-> >> +    case HV_X64_MSR_HYPERCALL:
-> >> +        val = env->msr_hv_hypercall;
-> >> +        break;
-> >> +    case HV_X64_MSR_GUEST_OS_ID:
-> >> +        val = env->msr_hv_guest_os_id;
-> >> +        break;
-> >> +    case HV_X64_MSR_APIC_ASSIST_PAGE:
-> >> +        val = env->msr_hv_vapic;
-> >> +        break;
-> >> +    case HV_X64_MSR_REFERENCE_TSC:
-> >> +        val = env->msr_hv_tsc;
-> >> +        break;
-> >> +    case HV_X64_MSR_CRASH_P0 ... HV_X64_MSR_CRASH_P4:
-> >> +        val = env->msr_hv_crash_params[idx - HV_X64_MSR_CRASH_P0];
-> >> +        break;
-> >> +    case HV_X64_MSR_VP_RUNTIME:
-> >> +        val = env->msr_hv_runtime;
-> >> +        break;
-> >> +    case HV_X64_MSR_SCONTROL:
-> >> +        val = env->msr_hv_synic_control;
-> >> +        break;
-> >> +    case HV_X64_MSR_SVERSION:
-> >> +        val = env->msr_hv_synic_version;
-> >> +        break;
-> >> +    case HV_X64_MSR_SIEFP:
-> >> +        val = env->msr_hv_synic_evt_page;
-> >> +        break;
-> >> +    case HV_X64_MSR_SIMP:
-> >> +        val = env->msr_hv_synic_msg_page;
-> >> +        break;
-> >> +    case HV_X64_MSR_SINT0 ... HV_X64_MSR_SINT15:
-> >> +        val = env->msr_hv_synic_sint[idx - HV_X64_MSR_SINT0];
-> >> +        break;
-> >> +    case HV_X64_MSR_STIMER0_CONFIG:
-> >> +    case HV_X64_MSR_STIMER1_CONFIG:
-> >> +    case HV_X64_MSR_STIMER2_CONFIG:
-> >> +    case HV_X64_MSR_STIMER3_CONFIG:
-> >> +        val = env->msr_hv_stimer_config[(idx - HV_X64_MSR_STIMER0_CONFIG) / 2];
-> >> +        break;
-> >> +    case HV_X64_MSR_STIMER0_COUNT:
-> >> +    case HV_X64_MSR_STIMER1_COUNT:
-> >> +    case HV_X64_MSR_STIMER2_COUNT:
-> >> +    case HV_X64_MSR_STIMER3_COUNT:
-> >> +        val = env->msr_hv_stimer_count[(idx - HV_X64_MSR_STIMER0_COUNT) / 2];
-> >> +        break;
-> >> +#endif
-> > [...]
-> > 
-> 
 
 -- 
-Eduardo
+Best regards,
+Alexey Perevalov
