@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1co5QY-0007Sk-Ag
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 05:41:07 -0400
+	(envelope-from <berrange@redhat.com>) id 1co5Rh-0007yc-5t
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 05:42:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1co5QV-0005FW-7j
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 05:41:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35450)
+	(envelope-from <berrange@redhat.com>) id 1co5Re-0005Xn-4P
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 05:42:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33602)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1co5QV-0005FD-0l
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 05:41:03 -0400
-Date: Wed, 15 Mar 2017 09:40:55 +0000
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1co5Rd-0005Xb-SZ
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 05:42:14 -0400
+Date: Wed, 15 Mar 2017 09:42:07 +0000
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170315094055.GC7770@redhat.com>
+Message-ID: <20170315094207.GD7770@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <87tw6y8bs8.fsf@secure.mitica>
-	<CAFEAcA978SJemCfYJPa8jwtuhhi6JGh9pEDGYNJ1npJA3nvEQA@mail.gmail.com>
-	<20170314081312.GB13140@stefanha-x1.localdomain>
-	<CAFEAcA9F2BPexRieaEhu+UpJxoOdEfw8eggW8b2SjuoMMTNgog@mail.gmail.com>
-	<87wpbstesf.fsf@secure.mitica> <20170314160113.GM2445@work-vm>
-	<20170314162020.GT2652@redhat.com>
-	<d9497461-e7c5-b914-362d-16b0cdea9fba@redhat.com>
-	<CAFEAcA-Y=KNBTj32_C1HOuRcEL9vxMimxjPpwrQpG9apGqBjSQ@mail.gmail.com>
-	<5a03eebc-669c-c67b-d857-f4d1bbbeff36@twiddle.net>
+References: <20170314102747.31395-1-fanc.fnst@cn.fujitsu.com>
+	<87o9x4t51k.fsf@secure.mitica> <20170314123730.GO2652@redhat.com>
+	<20170315041358.GA2818@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <5a03eebc-669c-c67b-d857-f4d1bbbeff36@twiddle.net>
-Subject: Re: [Qemu-devel] Obsolete QEMU host environments
+In-Reply-To: <20170315041358.GA2818@localhost.localdomain>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] Output dirty-bytes-rate instead of
+ dirty-pages-rate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,36 +31,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, QEMU Developer <qemu-devel@nongnu.org>, KVM devel mailing list <kvm@vger.kernel.org>, Stefan Hajnoczi <stefanha@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>
+To: Chao Fan <fanc.fnst@cn.fujitsu.com>
+Cc: Juan Quintela <quintela@redhat.com>, eblake@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org, caoj.fnst@cn.fujitsu.com, douly.fnst@cn.fujitsu.com, maozy.fnst@cn.fujitsu.com, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-On Wed, Mar 15, 2017 at 07:09:55AM +1000, Richard Henderson wrote:
-> On 03/15/2017 03:07 AM, Peter Maydell wrote:
-> > On 14 March 2017 at 17:54, Thomas Huth <thuth@redhat.com> wrote:
-> > > Our ia64 host backend in QEMU (tcg/ia64) is still marked as maintained
-> > > ... so it's maybe not as dead as you think? Or should we rather get rid
-> > > of that soon, too?
-> > 
-> > I don't actually mind whether we keep tcg/ia64 or drop it.
-> > But if we keep it then we must have a machine we can test
-> > it on -- that means one I have access to (and which we
-> > can otherwise use for central testing), not just one the
-> > maintainer might happen to have.
-> > 
-> > Also, that MAINTAINERS entry was added in 2011, so it's
-> > probably about as out of date as the code :-)
-> 
-> Red Hat's last ia64 machine died a few years ago, so I haven't
-> been able to test it for quite some time.
+On Wed, Mar 15, 2017 at 12:13:58PM +0800, Chao Fan wrote:
+> On Tue, Mar 14, 2017 at 12:37:30PM +0000, Daniel P. Berrange wrote:
+> >On Tue, Mar 14, 2017 at 01:29:43PM +0100, Juan Quintela wrote:
+> >> Chao Fan <fanc.fnst@cn.fujitsu.com> wrote:
+> >> > In hmp, dirty-bytes-rate is more friendly than dirty-pages-rate.
+> >> > It's also better for other tools to determine the cpu throttle
+> >> > value in different architecture.
+> >> >
+> >> > Signed-off-by: Chao Fan <fanc.fnst@cn.fujitsu.com>
+> >> > Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+> >>=20
+> >> I agree with Daniel here, you can't change the meaning of a field.  =
+Look
+> >> at skipped pages.  It is zero know because it is not used anymore, b=
+ut
+> >> we can't drop it.
+> >>=20
+> >> I think it is better to expose page_size.  We have now
+> >>=20
+> >> trasferred: bytes
+> >> total: bytes
+> >> duplicate: number of zero pages
+> >> skipped: always zero.
+> >> normal: number of normal pages
+> >> normal_bytes: the same  in bytes
+> >> mbps: megabytes per second?  I can't even remember this one
+> >> dirty_sync_count: number of times we have go through the whole memor=
+y
+> >> postcopy_requests =3D number of pages asked by postcopy faults?
+> >> dirty_pages_rate =3D pages by some kind of unit
+> >>=20
+> >> And we haven't yet started with compression or xbzrle.  I think that=
+ the
+> >> best approach at this point is putting everything in pages except th=
+e
+> >> things that don't make sense.
+> >>=20
+> >> We can put everything on bytes, but then everything is HUGE.
+> >>=20
+> >> Anyways, what do libvirt/management apps preffer?
+> >
+> >Since we have many fields already which are reported as page counts, I
+> >think just adding page size would be preferrable to having twice as ma=
+ny
+> >fields reported duplicating bytes + pages.
+> >
+> >The only reason to favour duplicating all fields to report bytes, is i=
+f
+> >we needed to vary page size to deal with huge pages (eg if some report=
+ed
+> >pages were 4kb and other reported pages with 2MB). You can easily just
+> >scale huge pages counts to be "normal"  pages for purpose of reporting
+> >though.
+>=20
+> I am wondering if it's OK to expose page_size in qmp or hmp, just like
+> a new command 'info page_size'.
+> If confirmed=EF=BC=8CI will make the new patch.
 
-AFAIK, HP are the only major vendor who still sell new ia64 machines and
-that's high end stuff costing many $$$$$. Even they are pushing people to
-x86_64 unless they need ia64 for legacy reasons. Otherwise ebay and other
-secondhand marketplaces are the only way to get hold of ia64.
+I'd suggest having it as a field of "info migrate"
 
 Regards,
 Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+--=20
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange=
+/ :|
+|: http://libvirt.org              -o-             http://virt-manager.or=
+g :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr=
+/ :|
