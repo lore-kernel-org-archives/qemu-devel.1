@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1co8Ux-0001av-8k
+	(envelope-from <armbru@redhat.com>) id 1co8Ux-0001b0-9c
 	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 08:57:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1co8Ur-0000N7-K6
+	(envelope-from <armbru@redhat.com>) id 1co8Ur-0000NT-Mj
 	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 08:57:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40336)
+Received: from mx1.redhat.com ([209.132.183.28]:36680)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1co8Ur-0000KO-5C
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1co8Ur-0000KQ-56
 	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 08:57:45 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 15 Mar 2017 13:57:20 +0100
-Message-Id: <1489582656-31133-32-git-send-email-armbru@redhat.com>
+Date: Wed, 15 Mar 2017 13:57:27 +0100
+Message-Id: <1489582656-31133-39-git-send-email-armbru@redhat.com>
 In-Reply-To: <1489582656-31133-1-git-send-email-armbru@redhat.com>
 References: <1489582656-31133-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 for-2.9 31/47] qapi: Fix detection of doc /
- expression mismatch
+Subject: [Qemu-devel] [PATCH v2 for-2.9 38/47] qapi: Eliminate check_docs()
+ and drop QAPIDoc.expr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,190 +27,92 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, eblake@redhat.com, mdroth@linux.vnet.ibm.com
 
-This fixes the errors uncovered by the previous commit.
+Move what's left in check_docs() to check_expr().  Delegate the actual
+checking to new QAPIDoc.check_expr().
+
+QAPIDoc.expr is now unused; drop it.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- scripts/qapi.py                           | 35 +++++++++++++++++++------------
- tests/qapi-schema/doc-before-include.err  |  1 +
- tests/qapi-schema/doc-before-include.exit |  2 +-
- tests/qapi-schema/doc-before-include.json |  1 -
- tests/qapi-schema/doc-before-include.out  |  4 ----
- tests/qapi-schema/doc-before-pragma.err   |  1 +
- tests/qapi-schema/doc-before-pragma.exit  |  2 +-
- tests/qapi-schema/doc-before-pragma.json  |  1 -
- tests/qapi-schema/doc-before-pragma.out   |  4 ----
- tests/qapi-schema/doc-missing-expr.err    |  2 +-
- tests/qapi-schema/doc-no-symbol.err       |  2 +-
- tests/qapi-schema/doc-no-symbol.json      |  1 -
- 12 files changed, 28 insertions(+), 28 deletions(-)
+ scripts/qapi.py | 27 ++++++++++-----------------
+ 1 file changed, 10 insertions(+), 17 deletions(-)
 
 diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 21a1591..37f2814 100644
+index ca9926b..1aaae8e 100644
 --- a/scripts/qapi.py
 +++ b/scripts/qapi.py
-@@ -248,18 +248,21 @@ class QAPISchemaParser(object):
-         self.line_pos = 0
-         self.exprs = []
-         self.docs = []
-+        self.cur_doc = None
-         self.accept()
+@@ -138,8 +138,6 @@ class QAPIDoc(object):
+         self.sections = []
+         # the current section
+         self.section = self.body
+-        # associated expression (to be set by expression parser)
+-        self.expr = None
  
-         while self.tok is not None:
-             info = {'file': fname, 'line': self.line,
-                     'parent': self.incl_info}
-             if self.tok == '#':
--                doc = self.get_doc(info)
--                self.docs.append(doc)
-+                self.reject_expr_doc()
-+                self.cur_doc = self.get_doc(info)
-+                self.docs.append(self.cur_doc)
-                 continue
+     def has_section(self, name):
+         """Return True if we have a section with this name."""
+@@ -249,6 +247,11 @@ class QAPIDoc(object):
+             self.args[member.name] = QAPIDoc.ArgSection(member.name)
+         self.args[member.name].connect(member)
  
-             expr = self.get_expr(False)
-             if 'include' in expr:
-+                self.reject_expr_doc()
-                 if len(expr) != 1:
-                     raise QAPISemError(info, "Invalid 'include' directive")
-                 include = expr['include']
-@@ -269,6 +272,7 @@ class QAPISchemaParser(object):
-                 self._include(include, info, os.path.dirname(abs_fname),
-                               previously_included)
-             elif "pragma" in expr:
-+                self.reject_expr_doc()
-                 if len(expr) != 1:
-                     raise QAPISemError(info, "Invalid 'pragma' directive")
-                 pragma = expr['pragma']
-@@ -280,13 +284,23 @@ class QAPISchemaParser(object):
-             else:
-                 expr_elem = {'expr': expr,
-                              'info': info}
--                if (self.docs
--                        and self.docs[-1].info['file'] == fname
--                        and not self.docs[-1].expr):
--                    self.docs[-1].expr = expr
--                    expr_elem['doc'] = self.docs[-1]
--
-+                if self.cur_doc:
-+                    if not self.cur_doc.symbol:
-+                        raise QAPISemError(
-+                            self.cur_doc.info,
-+                            "Expression documentation required")
-+                    self.cur_doc.expr = expr
-+                    expr_elem['doc'] = self.cur_doc
-                 self.exprs.append(expr_elem)
-+            self.cur_doc = None
-+        self.reject_expr_doc()
++    def check_expr(self, expr):
++        if self.has_section('Returns') and 'command' not in expr:
++            raise QAPISemError(self.info,
++                               "'Returns:' is only valid for commands")
 +
-+    def reject_expr_doc(self):
-+        if self.cur_doc and self.cur_doc.symbol:
-+            raise QAPISemError(
-+                self.cur_doc.info,
-+                "Documentation for '%s' is not followed by the definition"
-+                % self.cur_doc.symbol)
+     def check(self):
+         bogus = [name for name, section in self.args.iteritems()
+                  if not section.member]
+@@ -316,7 +319,6 @@ class QAPISchemaParser(object):
+                         raise QAPISemError(
+                             self.cur_doc.info,
+                             "Expression documentation required")
+-                    self.cur_doc.expr = expr
+                     expr_elem['doc'] = self.cur_doc
+                 self.exprs.append(expr_elem)
+             self.cur_doc = None
+@@ -984,6 +986,7 @@ def check_exprs(exprs):
+     for expr_elem in exprs:
+         expr = expr_elem['expr']
+         info = expr_elem['info']
++        doc = expr_elem.get('doc')
  
-     def _include(self, include, info, base_dir, previously_included):
-         incl_abs_fname = os.path.join(base_dir, include)
-@@ -950,11 +964,6 @@ def check_exprs(exprs):
+         if 'enum' in expr:
+             check_enum(expr, info)
+@@ -1000,22 +1003,12 @@ def check_exprs(exprs):
+         else:
+             assert False, 'unexpected meta type'
+ 
++        if doc:
++            doc.check_expr(expr)
++
+     return exprs
  
  
- def check_freeform_doc(doc):
--    if doc.symbol:
--        raise QAPISemError(doc.info,
--                           "Documention for '%s' is not followed"
--                           " by the definition" % doc.symbol)
+-def check_definition_doc(doc, expr, info):
+-    if doc.has_section('Returns') and 'command' not in expr:
+-        raise QAPISemError(info, "'Returns:' is only valid for commands")
 -
-     body = str(doc.body)
-     if re.search(r'@\S+:', body, re.MULTILINE):
-         raise QAPISemError(doc.info,
-diff --git a/tests/qapi-schema/doc-before-include.err b/tests/qapi-schema/doc-before-include.err
-index e69de29..a649d38 100644
---- a/tests/qapi-schema/doc-before-include.err
-+++ b/tests/qapi-schema/doc-before-include.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/doc-before-include.json:3: Documentation for 'foo' is not followed by the definition
-diff --git a/tests/qapi-schema/doc-before-include.exit b/tests/qapi-schema/doc-before-include.exit
-index 573541a..d00491f 100644
---- a/tests/qapi-schema/doc-before-include.exit
-+++ b/tests/qapi-schema/doc-before-include.exit
-@@ -1 +1 @@
--0
-+1
-diff --git a/tests/qapi-schema/doc-before-include.json b/tests/qapi-schema/doc-before-include.json
-index ec1fbf2..0caa0ae 100644
---- a/tests/qapi-schema/doc-before-include.json
-+++ b/tests/qapi-schema/doc-before-include.json
-@@ -1,5 +1,4 @@
- # Doc comment separated from defining expression by non-defining expression
--# BUG: not rejected
- 
- ##
- # @foo:
-diff --git a/tests/qapi-schema/doc-before-include.out b/tests/qapi-schema/doc-before-include.out
-index 236a849..e69de29 100644
---- a/tests/qapi-schema/doc-before-include.out
-+++ b/tests/qapi-schema/doc-before-include.out
-@@ -1,4 +0,0 @@
--enum QType ['none', 'qnull', 'qint', 'qstring', 'qdict', 'qlist', 'qfloat', 'qbool']
--    prefix QTYPE
--object foo
--object q_empty
-diff --git a/tests/qapi-schema/doc-before-pragma.err b/tests/qapi-schema/doc-before-pragma.err
-index e69de29..c0fb066 100644
---- a/tests/qapi-schema/doc-before-pragma.err
-+++ b/tests/qapi-schema/doc-before-pragma.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/doc-before-pragma.json:3: Documentation for 'foo' is not followed by the definition
-diff --git a/tests/qapi-schema/doc-before-pragma.exit b/tests/qapi-schema/doc-before-pragma.exit
-index 573541a..d00491f 100644
---- a/tests/qapi-schema/doc-before-pragma.exit
-+++ b/tests/qapi-schema/doc-before-pragma.exit
-@@ -1 +1 @@
--0
-+1
-diff --git a/tests/qapi-schema/doc-before-pragma.json b/tests/qapi-schema/doc-before-pragma.json
-index fb2ec8e..a6e090e 100644
---- a/tests/qapi-schema/doc-before-pragma.json
-+++ b/tests/qapi-schema/doc-before-pragma.json
-@@ -1,5 +1,4 @@
- # Doc comment separated from defining expression by non-defining expression
--# BUG: not rejected
- 
- ##
- # @foo:
-diff --git a/tests/qapi-schema/doc-before-pragma.out b/tests/qapi-schema/doc-before-pragma.out
-index 236a849..e69de29 100644
---- a/tests/qapi-schema/doc-before-pragma.out
-+++ b/tests/qapi-schema/doc-before-pragma.out
-@@ -1,4 +0,0 @@
--enum QType ['none', 'qnull', 'qint', 'qstring', 'qdict', 'qlist', 'qfloat', 'qbool']
--    prefix QTYPE
--object foo
--object q_empty
-diff --git a/tests/qapi-schema/doc-missing-expr.err b/tests/qapi-schema/doc-missing-expr.err
-index c0e687c..c909e26 100644
---- a/tests/qapi-schema/doc-missing-expr.err
-+++ b/tests/qapi-schema/doc-missing-expr.err
-@@ -1 +1 @@
--tests/qapi-schema/doc-missing-expr.json:3: Documention for 'bar' is not followed by the definition
-+tests/qapi-schema/doc-missing-expr.json:3: Documentation for 'bar' is not followed by the definition
-diff --git a/tests/qapi-schema/doc-no-symbol.err b/tests/qapi-schema/doc-no-symbol.err
-index 727966c..75f032a 100644
---- a/tests/qapi-schema/doc-no-symbol.err
-+++ b/tests/qapi-schema/doc-no-symbol.err
-@@ -1 +1 @@
--tests/qapi-schema/doc-no-symbol.json:4: Definition of 'foo' follows documentation for 'None'
-+tests/qapi-schema/doc-no-symbol.json:3: Expression documentation required
-diff --git a/tests/qapi-schema/doc-no-symbol.json b/tests/qapi-schema/doc-no-symbol.json
-index ee86ca1..98605ba 100644
---- a/tests/qapi-schema/doc-no-symbol.json
-+++ b/tests/qapi-schema/doc-no-symbol.json
-@@ -1,5 +1,4 @@
- # Documentation for expression lacks symbol
--# BUG: Error message claims it has symbol 'None'
- 
- ##
- # foo:
+-
+-def check_docs(docs):
+-    for doc in docs:
+-        if doc.expr:
+-            check_definition_doc(doc, doc.expr, doc.info)
+-
+-    return docs
+-
+-
+ #
+ # Schema compiler frontend
+ #
+@@ -1511,7 +1504,7 @@ class QAPISchema(object):
+         try:
+             parser = QAPISchemaParser(open(fname, 'r'))
+             self.exprs = check_exprs(parser.exprs)
+-            self.docs = check_docs(parser.docs)
++            self.docs = parser.docs
+             self._entity_dict = {}
+             self._predefining = True
+             self._def_predefineds()
 -- 
 2.7.4
