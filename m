@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56263)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1co6t8-0007x7-L9
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 07:14:43 -0400
+	(envelope-from <famz@redhat.com>) id 1co6tL-00085h-F7
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 07:14:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1co6t2-0006qQ-Pt
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 07:14:42 -0400
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:36339)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1co6t2-0006pz-JE
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 07:14:36 -0400
-Received: by mail-wm0-x232.google.com with SMTP id n11so84806357wma.1
-	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 04:14:36 -0700 (PDT)
-References: <36e41adf-b0b3-3efa-51c4-f1a70cd05b98@ilande.co.uk>
-	<87wpbsp49a.fsf@linaro.org>
-	<6491a446-bf23-5ab9-3431-c67efaf83f71@ilande.co.uk>
-	<alpine.BSF.2.20.1703141450560.82811@zero.eik.bme.hu>
-	<87shmfq31b.fsf@linaro.org>
-	<b9006aa4-b606-61d5-6896-8c76a6a6f8f3@ilande.co.uk>
-	<87o9x3pzxe.fsf@linaro.org>
-	<alpine.BSF.2.20.1703141829440.39248@zero.eik.bme.hu>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <alpine.BSF.2.20.1703141829440.39248@zero.eik.bme.hu>
-Date: Wed, 15 Mar 2017 11:14:52 +0000
-Message-ID: <87h92upz9v.fsf@linaro.org>
+	(envelope-from <famz@redhat.com>) id 1co6tJ-0006ts-OZ
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 07:14:54 -0400
+Date: Wed, 15 Mar 2017 19:14:45 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170315111445.GE3088@lemon.lan>
+References: <20170314171120.80741-1-vsementsov@virtuozzo.com>
+	<20170315110351.GG4030@noname.str.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] qemu-system-ppc video artifacts since
- "tcg: drop global lock during TCG code execution"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170315110351.GG4030@noname.str.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] blk: fix aio context loss on media change
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,39 +23,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, jan.kiszka@siemens.com, qemu-devel <qemu-devel@nongnu.org>, cota@braap.org, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, bobby.prani@gmail.com, fred.konrad@greensocs.com, rth@twiddle.net
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org, jsnow@redhat.com
 
+On Wed, 03/15 12:03, Kevin Wolf wrote:
+> Am 14.03.2017 um 18:11 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> > If we have separate iothread for cdrom, we lose connection to it on
+> > qmp_blockdev_change_medium, as aio_context is on bds which is dropped
+> > and switched with new one.
+> > 
+> > As an example result, after such media change we have crash on
+> > virtio_scsi_ctx_check: Assertion `blk_get_aio_context(d->conf.blk) == s->ctx' failed.
+> > 
+> > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> > ---
+> > 
+> > Hi all!
+> > 
+> > We've faced into this assert, and there some kind of fix. I don't sure that
+> > such fix doesn't break some conceptions, in this case, I hope, someone will
+> > propose a true-way solution.
+> 
+> The "true way" would be proper AioContext management in the sense that
+> all users of a BDS can specify a specific AioContext that they need and
+> if they all agree, callbacks are invoked to change everyone to that
+> AioContext. If they conflict, attaching the new user would have to error
+> out.
+> 
+> But we discussed this earlier, and while I'm not completely sure any
+> more about the details, I seem to remeber that Paolo said something
+> along the lines that AioContext is going away anyway and building the
+> code for proper management would be wasted time.
 
-BALATON Zoltan <balaton@eik.bme.hu> writes:
+Matches my impression.
 
-> On Tue, 14 Mar 2017, Alex Bennée wrote:
->> So from a single-threaded -smp guest case there should be no difference
->> in behaviour.
-<snip>
->>However this shouldn't affect
->> anything in the single-threaded world.
->
-> I think we have a single CPU and thread for these ppc machines here so
-> I'm not sure how this could be relevant.
->
->> However delaying tlb_flushes() could certainly expose/hide stuff that is
->> accessing the dirty mechanism. tlb_flush itself now takes the tb_lock() to
->> avoid racing with the TB invalidation logic. The act of the flush will
->> certainly wipe all existing SoftMMU entries and force a re-load on each
->> memory access.
->>
->> So is the dirty status of memory being read from outside a vCPU
->> execution context?
->
-> Like from the display controller models that use
-> memory_region_get_dirty() to check if the frambuffer needs to be
-> updated? But all display adaptors seem to do this and the problem was
-> only seem on ppc so it may be related to something ppc specific.
+> 
+> Stefan, Paolo, do you remember the details why we didn't even do a
+> simple fix like the one below? I think there were some patches on the
+> list, no?
 
-So this accesses the memory_region API which is under RCU control.
-AFAIUI this should mean the dirty status may be read late (e.g. next
-update) but should never be incorrect (e.g. miss a dirtying operation).
+ISTM the concern was mostly "what about other BB in the graph?"
 
---
-Alex Bennée
+Should the new op blocker API be used in this one (a new type of perm)?
+
+> 
+> Kevin
+> 
+> > ======
+> > Also, on master branch I can't reproduce it as vm crashed earlier, without any
+> > eject/change, on assert(s->ctx && s->dataplane_started) in
+> > virtio_scsi_data_plane_handle_ctrl(). It looks like race with
+> > virtio_scsi_dataplane_start(), and for test (to reproduce assert described above),
+> > I've "fixed" it with just:
+> > 
+> > @@ -63,6 +63,7 @@ static bool virtio_scsi_data_plane_handle_ctrl(VirtIODevice *vdev,
+> >  {
+> >      VirtIOSCSI *s = VIRTIO_SCSI(vdev);
+> >  
+> > +    sleep(10);
+
+This will be fixed by 
+
+https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg02659.html
+
+Fam
