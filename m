@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42469)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1coA7J-0007bN-7Y
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 10:41:34 -0400
+	(envelope-from <famz@redhat.com>) id 1coA8t-0000hX-GF
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 10:43:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1coA7F-0001P1-GB
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 10:41:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57186)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1coA7F-0001Ny-7D
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 10:41:29 -0400
-Date: Wed, 15 Mar 2017 14:41:24 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170315144124.GP7770@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <11569d75b61122820f186a32cdd20689@whitewinterwolf.com>
+	(envelope-from <famz@redhat.com>) id 1coA8s-00026j-JW
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 10:43:11 -0400
+Date: Wed, 15 Mar 2017 22:42:59 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170315144259.GG3088@lemon.lan>
+References: <20170314171120.80741-1-vsementsov@virtuozzo.com>
+	<20170315110351.GG4030@noname.str.redhat.com>
+	<20170315111445.GE3088@lemon.lan>
+	<20170315120656.GI4030@noname.str.redhat.com>
+	<20170315131343.GF3088@lemon.lan>
+	<735f5ad8-7a2a-8dcf-b806-fd17d00afac2@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <11569d75b61122820f186a32cdd20689@whitewinterwolf.com>
-Subject: Re: [Qemu-devel] [Bug 1217339] [PATCH] Unix signal to send
- ACPI-shutdown to Guest
+In-Reply-To: <735f5ad8-7a2a-8dcf-b806-fd17d00afac2@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH] blk: fix aio context loss on media change
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,86 +27,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Simon <qemu.bugs@whitewinterwolf.com>
-Cc: qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com, jsnow@redhat.com
 
-On Wed, Mar 15, 2017 at 02:45:57PM +0100, Simon wrote:
-> Hello,
+On Wed, 03/15 17:04, Vladimir Sementsov-Ogievskiy wrote:
+> 15.03.2017 16:13, Fam Zheng wrote:
+> > On Wed, 03/15 13:06, Kevin Wolf wrote:
+> > > > > Stefan, Paolo, do you remember the details why we didn't even do a
+> > > > > simple fix like the one below? I think there were some patches on the
+> > > > > list, no?
+> > > > ISTM the concern was mostly "what about other BB in the graph?"
+> > > > 
+> > > > Should the new op blocker API be used in this one (a new type of perm)?
+> > > If we know what operation to block, that's an option. Would "change the
+> > > node's AioContext" work for it?
 > 
-> Here is a short patch answering to Qemu wish-list issue 1217339.
-> <https://bugs.launchpad.net/qemu/+bug/1217339>
-> It makes Qemu to cleanly power off the guest when receiving a SIGHUP
-> signal, thus without requiring any monitor access which is currently
-> impossible (AFAIK).
-> 
-> The original issue mentions using SIGQUIT in its title, however as
-> Laszlo explained in the bug thread SIGQUIT is designed for debugging
-> purposes and is less about quitting than generating a core file. The
-> original request also explicitly mentioned that:
-> 
-> > If, for some reason SIGQUIT would not be accepted as the signal, take
-> > any free to use signal, like USR1.
-> 
-> Qemu currently maps SIGTERM, SIGINT and SIGHUP to a brutal shutdown of
-> the guest. This patch does not alter Qemu behavior for SIGTERM and
-> SIGQUIT, and maps SIGHUP to the clean power off of the guest.
-> 
-> IMHO SIGTERM and SIGINT behavior should not be altered:
-> 
-> - SIGTERM is the preferred alternative to a SIGKILL to shutdown a stuck
->   guest.
-> - SIGINT is mostly a matter of user expectation as it handles the Ctrl-C
->   sequence, I suppose that most users expect a brutal shutdown as it is
->   now but this is just a random guess.
-> 
-> SIGHUP is a more versatile signal, also used for instance to tell a
-> daemon to reload its configuration files. From a functional point-of-
-> view, for me it makes sense to use a "hang-up" signal to power off a
-> guest, more than an impersonal USR1 signal, but this remains easily
-> changeable would SIGHUP not be suitable for this purpose.
-> 
-> With this patch applied, it becomes possible to easily and cleanly shut-
-> down Qemu virtual machines system-wide without involving any monitor:
-> 
-> 1. Send SIGHUP to all Qemu processes so the guests power off cleanly.
-> 2. After a few time send SIGTERM to the remaining Qemu processes to
->    forcefully close stuck guests.
-> 3. After a few time send SIGKILL to the remaining Qemu processes to
->    forcefully close stuck Qemu hypervisor processes.
-> 
-> I find this more convenient than having to tinker with Qemu monitor to
-> implement step 1 as it must currently be done.
-> 
-> Signed-off-by: Simon Geusebroek <qemu.bugs@whitewinterwolf.com>
-> ---
-> diff -ur a/vl.c b/vl.c
-> --- a/vl.c	2016-12-20 21:16:54.000000000 +0100
-> +++ b/vl.c	2017-03-14 16:02:51.959911847 +0100
-> @@ -1871,7 +1871,11 @@
->      /* Cannot call qemu_system_shutdown_request directly because
->       * we are in a signal handler.
->       */
-> -    shutdown_requested = 1;
-> +    if (signal == SIGHUP) {
-> +        powerdown_requested = 1;
-> +    } else {
-> +        shutdown_requested = 1;
-> +    }
->      qemu_notify_event();
->  }
+> we can start with empty cdrom, so there is no context at start
 
-While I understand your motivation this creates a semantic change for
-existing users of QEMU. IOW anyone who is currently relying on use
-of SIGHUP will experiance a regression when upgrading QEMU.
+Practically, I agree this patch is fine for now because callers don't
+arbitrarily move BDS from one context to another, only a small set of operations
+exists - start/stop data plane, block job callbacks. The problem is that new
+code in the future can cause trouble if different BBs in the same graph don't
+agree on what context they can run on, especially with dynamical
+reconfiguration. So the previous discussions were more about an API that works
+generally.
 
-So if we want to signal to generate a clean shutdown, we need to pick
-one that QEMU hasn't already set a specific behaviour for.
+> 
+> > > 
+> > > I think it would effectively mean that you need to attach the device
+> > > first and then jobs etc. respect the AioContext, whereas the opposite
+> > > order breaks because they don't have callbacks to adjust the AioContext
+> > > after the fact.
+> > > 
+> > > This seems to match what's actually safe, so it might really be as easy
+> > > as this.
+> > Yes, this sounds good to me.
+> > 
+> > Vladimir, would you like to implement this? It would be good to have this fixed
+> > in 2.9.
+> 
+> I don't sure about how to do it, so, I don't mind someone else to implement
+> this..
 
-SIGQUIT could be a valid option, or the super generic SIGUSR1
+OK, I can take a look at this tomorrow.
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+Fam
