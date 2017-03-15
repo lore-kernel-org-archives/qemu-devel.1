@@ -1,30 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1co6ei-0003Bj-Lm
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:59:49 -0400
+	(envelope-from <kwolf@redhat.com>) id 1co6io-0004tG-48
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 07:04:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1co6ee-0005Y9-PM
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:59:48 -0400
-Received: from mo68.mail-out.ovh.net ([178.32.228.68]:33421)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1co6ee-0005Xf-IL
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:59:44 -0400
-Received: from player763.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id DE03E461F9
-	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 11:59:42 +0100 (CET)
-Date: Wed, 15 Mar 2017 11:59:35 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170315115935.5fab47c7@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <1489449360-14411-8-git-send-email-sstabellini@kernel.org>
-References: <alpine.DEB.2.10.1703131650550.21520@sstabellini-ThinkPad-X260>
-	<1489449360-14411-1-git-send-email-sstabellini@kernel.org>
-	<1489449360-14411-8-git-send-email-sstabellini@kernel.org>
+	(envelope-from <kwolf@redhat.com>) id 1co6im-0007I4-VC
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 07:04:02 -0400
+Date: Wed, 15 Mar 2017 12:03:51 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170315110351.GG4030@noname.str.redhat.com>
+References: <20170314171120.80741-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/+dFVkcGJYTB0qo7iNllCFF9";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v2 8/9] xen/9pfs: send responses back to
- the frontend
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170314171120.80741-1-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH] blk: fix aio context loss on media change
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,78 +22,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, anthony.perard@citrix.com, Stefano Stabellini <stefano@aporeto.com>, jgross@suse.com, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
---Sig_/+dFVkcGJYTB0qo7iNllCFF9
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, 13 Mar 2017 16:55:59 -0700
-Stefano Stabellini <sstabellini@kernel.org> wrote:
-
-> Once a request is completed, xen_9pfs_push_and_notify gets called. In
-> xen_9pfs_push_and_notify, update the indexes (data has already been
-> copied to the sg by the common code) and send a notification to the
-> frontend.
->=20
-> Schedule the bottom-half to check if we already have any other requests
-> pending.
->=20
-> Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
-> CC: anthony.perard@citrix.com
-> CC: jgross@suse.com
-> CC: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
-> CC: Greg Kurz <groug@kaod.org>
+Am 14.03.2017 um 18:11 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> If we have separate iothread for cdrom, we lose connection to it on
+> qmp_blockdev_change_medium, as aio_context is on bds which is dropped
+> and switched with new one.
+> 
+> As an example result, after such media change we have crash on
+> virtio_scsi_ctx_check: Assertion `blk_get_aio_context(d->conf.blk) == s->ctx' failed.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  hw/9pfs/xen-9p-backend.c | 16 ++++++++++++++++
->  1 file changed, 16 insertions(+)
->=20
-> diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
-> index d72a749..fed369f 100644
-> --- a/hw/9pfs/xen-9p-backend.c
-> +++ b/hw/9pfs/xen-9p-backend.c
-> @@ -166,6 +166,22 @@ static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *p=
-du,
-> =20
->  static void xen_9pfs_push_and_notify(V9fsPDU *pdu)
+> 
+> Hi all!
+> 
+> We've faced into this assert, and there some kind of fix. I don't sure that
+> such fix doesn't break some conceptions, in this case, I hope, someone will
+> propose a true-way solution.
+
+The "true way" would be proper AioContext management in the sense that
+all users of a BDS can specify a specific AioContext that they need and
+if they all agree, callbacks are invoked to change everyone to that
+AioContext. If they conflict, attaching the new user would have to error
+out.
+
+But we discussed this earlier, and while I'm not completely sure any
+more about the details, I seem to remeber that Paolo said something
+along the lines that AioContext is going away anyway and building the
+code for proper management would be wasted time.
+
+Stefan, Paolo, do you remember the details why we didn't even do a
+simple fix like the one below? I think there were some patches on the
+list, no?
+
+Kevin
+
+> ======
+> Also, on master branch I can't reproduce it as vm crashed earlier, without any
+> eject/change, on assert(s->ctx && s->dataplane_started) in
+> virtio_scsi_data_plane_handle_ctrl(). It looks like race with
+> virtio_scsi_dataplane_start(), and for test (to reproduce assert described above),
+> I've "fixed" it with just:
+> 
+> @@ -63,6 +63,7 @@ static bool virtio_scsi_data_plane_handle_ctrl(VirtIODevice *vdev,
 >  {
-> +    RING_IDX prod;
-> +    struct Xen9pfsDev *priv =3D container_of(pdu->s, struct Xen9pfsDev, =
-state);
-> +    struct Xen9pfsRing *ring =3D &priv->rings[pdu->tag % priv->num_rings=
-];
-> +
-
-Coding style for structured types.
-
-> +    ring->intf->out_cons =3D ring->out_cons;
-> +    xen_wmb();
-> +
-> +    prod =3D ring->intf->in_prod;
-> +    xen_rmb();
-> +    ring->intf->in_prod =3D prod + pdu->size;
-> +    xen_wmb();
-> +
-> +    ring->inprogress =3D false;
-> +    xenevtchn_notify(ring->evtchndev, ring->local_port);
-> +
-> +    qemu_bh_schedule(ring->bh);
+>      VirtIOSCSI *s = VIRTIO_SCSI(vdev);
+>  
+> +    sleep(10);
+>      assert(s->ctx && s->dataplane_started);
+>      return virtio_scsi_handle_ctrl_vq(s, vq);
 >  }
-> =20
->  static const struct V9fsTransport xen_9p_transport =3D {
-
-
---Sig_/+dFVkcGJYTB0qo7iNllCFF9
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAljJHpcACgkQAvw66wEB28KoggCeMo+xve/8KoG4KxRsTfmLFhPn
-DxIAn2uNwM5YmFQA8h4i3KgOTLjeq3XZ
-=rbpD
------END PGP SIGNATURE-----
-
---Sig_/+dFVkcGJYTB0qo7iNllCFF9--
+> 
+> This race is not reproduced for me in our 2.6 based branch.
+> 
+>  block/block-backend.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/block/block-backend.c b/block/block-backend.c
+> index 5742c09c2c..6d5044228e 100644
+> --- a/block/block-backend.c
+> +++ b/block/block-backend.c
+> @@ -65,6 +65,8 @@ struct BlockBackend {
+>      bool allow_write_beyond_eof;
+>  
+>      NotifierList remove_bs_notifiers, insert_bs_notifiers;
+> +
+> +    AioContext *aio_context;
+>  };
+>  
+>  typedef struct BlockBackendAIOCB {
+> @@ -559,6 +561,10 @@ int blk_insert_bs(BlockBackend *blk, BlockDriverState *bs, Error **errp)
+>      }
+>      bdrv_ref(bs);
+>  
+> +    if (blk->aio_context != NULL) {
+> +        bdrv_set_aio_context(bs, blk->aio_context);
+> +    }
+> +
+>      notifier_list_notify(&blk->insert_bs_notifiers, blk);
+>      if (blk->public.throttle_state) {
+>          throttle_timers_attach_aio_context(
+> @@ -1607,6 +1613,7 @@ void blk_set_aio_context(BlockBackend *blk, AioContext *new_context)
+>  {
+>      BlockDriverState *bs = blk_bs(blk);
+>  
+> +    blk->aio_context = new_context;
+>      if (bs) {
+>          if (blk->public.throttle_state) {
+>              throttle_timers_detach_aio_context(&blk->public.throttle_timers);
+> -- 
+> 2.11.1
+> 
