@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1co8Us-0001VP-2m
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 08:57:52 -0400
+	(envelope-from <armbru@redhat.com>) id 1co8Uv-0001Y9-2Q
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 08:57:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1co8Up-0000Je-VH
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 08:57:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50454)
+	(envelope-from <armbru@redhat.com>) id 1co8Ur-0000MV-BB
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 08:57:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55820)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1co8Up-0000I2-MR
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 08:57:43 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1co8Uq-0000Ju-W4
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 08:57:45 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 15 Mar 2017 13:57:11 +0100
-Message-Id: <1489582656-31133-23-git-send-email-armbru@redhat.com>
+Date: Wed, 15 Mar 2017 13:57:23 +0100
+Message-Id: <1489582656-31133-35-git-send-email-armbru@redhat.com>
 In-Reply-To: <1489582656-31133-1-git-send-email-armbru@redhat.com>
 References: <1489582656-31133-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 for-2.9 22/47] qapi2texi: Explain enum value
- undocumentedness more clearly
+Subject: [Qemu-devel] [PATCH v2 for-2.9 34/47] qapi: Move empty doc section
+ checking to doc parser
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,44 +27,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcandre.lureau@redhat.com, eblake@redhat.com, mdroth@linux.vnet.ibm.com
 
-Instead of not saying anything when we have no documentation, say "Not
-documented".
-
-Example change (qemu-qmp-ref.txt):
-
-  -- Enum: GuestPanicAction
-
-      An enumeration of the actions taken when guest OS panic is detected
-
-      Values:
-      'pause'
-           system pauses
-      'poweroff'
-+          Not documented
-
-      Since: 2.1 (poweroff since 2.8)
+Results in a more precise error location, but the real reason is
+emptying out check_docs() step by step.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- scripts/qapi2texi.py | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ scripts/qapi.py                         | 20 ++++++++++++++------
+ tests/qapi-schema/doc-empty-section.err |  2 +-
+ 2 files changed, 15 insertions(+), 7 deletions(-)
 
-diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-index 35e182d..1f01817 100755
---- a/scripts/qapi2texi.py
-+++ b/scripts/qapi2texi.py
-@@ -145,7 +145,10 @@ def texi_members(doc, what, member_func, show_undocumented):
-     for section in doc.args.itervalues():
-         if not section.content and not show_undocumented:
-             continue          # Undocumented TODO require doc and drop
--        desc = str(section)
-+        if section.content:
-+            desc = str(section)
-+        else:
-+            desc = 'Not documented'
-         items += member_func(section.member) + texi_format(desc) + '\n'
-     if not items:
-         return ''
+diff --git a/scripts/qapi.py b/scripts/qapi.py
+index 4edcea1..648355e 100644
+--- a/scripts/qapi.py
++++ b/scripts/qapi.py
+@@ -173,6 +173,9 @@ class QAPIDoc(object):
+         else:
+             self._append_freeform(line)
+ 
++    def end_comment(self):
++        self._end_section()
++
+     def _append_symbol_line(self, line):
+         name = line.split(' ', 1)[0]
+ 
+@@ -200,6 +203,7 @@ class QAPIDoc(object):
+             raise QAPIParseError(self.parser,
+                                  "'@%s:' can't follow '%s' section"
+                                  % (name, self.sections[0].name))
++        self._end_section()
+         self.section = QAPIDoc.ArgSection(name)
+         self.args[name] = self.section
+ 
+@@ -207,9 +211,18 @@ class QAPIDoc(object):
+         if name in ('Returns', 'Since') and self.has_section(name):
+             raise QAPIParseError(self.parser,
+                                  "Duplicated '%s' section" % name)
++        self._end_section()
+         self.section = QAPIDoc.Section(name)
+         self.sections.append(self.section)
+ 
++    def _end_section(self):
++        if self.section:
++            contents = str(self.section)
++            if self.section.name and (not contents or contents.isspace()):
++                raise QAPIParseError(self.parser, "Empty doc section '%s'"
++                                     % self.section.name)
++            self.section = None
++
+     def _append_freeform(self, line):
+         in_arg = isinstance(self.section, QAPIDoc.ArgSection)
+         if (in_arg and self.section.content
+@@ -512,6 +525,7 @@ class QAPISchemaParser(object):
+                 if self.val != '##':
+                     raise QAPIParseError(self, "Junk after '##' at end of "
+                                          "documentation comment")
++                doc.end_comment()
+                 self.accept()
+                 return doc
+             else:
+@@ -1012,12 +1026,6 @@ def check_definition_doc(doc, expr, info):
+ 
+ def check_docs(docs):
+     for doc in docs:
+-        for section in doc.args.values() + doc.sections:
+-            content = str(section)
+-            if not content or content.isspace():
+-                raise QAPISemError(doc.info,
+-                                   "Empty doc section '%s'" % section.name)
+-
+         if doc.expr:
+             check_definition_doc(doc, doc.expr, doc.info)
+ 
+diff --git a/tests/qapi-schema/doc-empty-section.err b/tests/qapi-schema/doc-empty-section.err
+index 00ad625..b61e4a7 100644
+--- a/tests/qapi-schema/doc-empty-section.err
++++ b/tests/qapi-schema/doc-empty-section.err
+@@ -1 +1 @@
+-tests/qapi-schema/doc-empty-section.json:3: Empty doc section 'Note'
++tests/qapi-schema/doc-empty-section.json:7:1: Empty doc section 'Note'
 -- 
 2.7.4
