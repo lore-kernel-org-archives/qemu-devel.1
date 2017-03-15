@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1co6eX-00032Z-Ij
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:59:39 -0400
+	(envelope-from <groug@kaod.org>) id 1co6ei-0003Bj-Lm
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:59:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1co6eW-0005WU-Ie
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:59:37 -0400
-Date: Wed, 15 Mar 2017 10:59:24 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170315105924.GH7770@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170310031521.630-1-eblake@redhat.com>
-	<033881fe-b3d3-2c3a-48fc-c08691f2c9cb@redhat.com>
-	<19efa7dc-fa97-410f-df4d-3962453dcd8e@redhat.com>
-	<20170315101835.GF8147@stefanha-x1.localdomain>
-	<20170315102644.GF7770@redhat.com>
+	(envelope-from <groug@kaod.org>) id 1co6ee-0005Y9-PM
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:59:48 -0400
+Received: from mo68.mail-out.ovh.net ([178.32.228.68]:33421)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1co6ee-0005Xf-IL
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:59:44 -0400
+Received: from player763.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id DE03E461F9
+	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 11:59:42 +0100 (CET)
+Date: Wed, 15 Mar 2017 11:59:35 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170315115935.5fab47c7@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <1489449360-14411-8-git-send-email-sstabellini@kernel.org>
+References: <alpine.DEB.2.10.1703131650550.21520@sstabellini-ThinkPad-X260>
+	<1489449360-14411-1-git-send-email-sstabellini@kernel.org>
+	<1489449360-14411-8-git-send-email-sstabellini@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170315102644.GF7770@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9] mirror: Fix backwards mirror_yield
- parameters
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/+dFVkcGJYTB0qo7iNllCFF9";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v2 8/9] xen/9pfs: send responses back to
+ the frontend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +33,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Stefano Stabellini <sstabellini@kernel.org>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, anthony.perard@citrix.com, Stefano Stabellini <stefano@aporeto.com>, jgross@suse.com, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
 
-On Wed, Mar 15, 2017 at 10:26:44AM +0000, Daniel P. Berrange wrote:
-> On Wed, Mar 15, 2017 at 06:18:35PM +0800, Stefan Hajnoczi wrote:
-> > On Fri, Mar 10, 2017 at 02:49:22PM -0600, Eric Blake wrote:
-> > > And here's where I'm stuck: the makefiles are broken.  Touching
-> > > scripts/tracetool/format/h.py does NOT cause tracetool to be re-run by a
-> > > mere 'make'; I've had to resort to 'make -B block/trace.h-timestamp' to
-> > > get things to rebuild.  And this is in spite of the fact that h.py
-> > > _should_ be getting listed in $(tracetool-y) by trace/Makefile.objs, and
-> > > $(tracetool-y) is listed as a dependency of %/trace.h-timestamp in the
-> > > top-level Makefile.  I would appreciate anyone with advice or an idea on
-> > > how to patch Makefile to get the dependency working without me having to
-> > > manually kick it.
-> > 
-> > Also CCing Daniel Berrange.  He recently touched the tracing Makefiles
-> > and may have ideas.
-> 
-> I've been looking at this and I'm damned if I understand what's broken.
-> All the required dependancies look to be expressed in the Makefile
-> 
->   %/trace.h: %/trace.h-timestamp
->   %/trace.h-timestamp: $(SRC_PATH)/%/trace-events $(tracetool-y)
-> 
-> and $(tracetool-y) expands to the list of source files
-> 
->   tracetool-y = $(SRC_PATH)/scripts/tracetool.py
->   tracetool-y += $(shell find $(SRC_PATH)/scripts/tracetool -name "*.py")
-> 
-> 
-> If I do 'touch hw/net/trace-events', then hw/net/trace.h gets rebuilt,
-> but if do 'touch scripts/tracetool.py' it doesn't get built. So somehow
-> make seems to be dropping the $(tracetool-y) deps despite being listed
-> against the %/trace-h-timestamp file, and despite earlier deps on
-> trace-events being honoured
+--Sig_/+dFVkcGJYTB0qo7iNllCFF9
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Oh this is a fun one.  While the $(tracetool-y) variable *is* defined at
-the time the build rules execute, it is *not* defined at the time make
-evaluates dependancies, so it expanded to be empty ! I copied you on
-the easy fix
+On Mon, 13 Mar 2017 16:55:59 -0700
+Stefano Stabellini <sstabellini@kernel.org> wrote:
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+> Once a request is completed, xen_9pfs_push_and_notify gets called. In
+> xen_9pfs_push_and_notify, update the indexes (data has already been
+> copied to the sg by the common code) and send a notification to the
+> frontend.
+>=20
+> Schedule the bottom-half to check if we already have any other requests
+> pending.
+>=20
+> Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
+> CC: anthony.perard@citrix.com
+> CC: jgross@suse.com
+> CC: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
+> CC: Greg Kurz <groug@kaod.org>
+> ---
+>  hw/9pfs/xen-9p-backend.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+>=20
+> diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
+> index d72a749..fed369f 100644
+> --- a/hw/9pfs/xen-9p-backend.c
+> +++ b/hw/9pfs/xen-9p-backend.c
+> @@ -166,6 +166,22 @@ static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *p=
+du,
+> =20
+>  static void xen_9pfs_push_and_notify(V9fsPDU *pdu)
+>  {
+> +    RING_IDX prod;
+> +    struct Xen9pfsDev *priv =3D container_of(pdu->s, struct Xen9pfsDev, =
+state);
+> +    struct Xen9pfsRing *ring =3D &priv->rings[pdu->tag % priv->num_rings=
+];
+> +
+
+Coding style for structured types.
+
+> +    ring->intf->out_cons =3D ring->out_cons;
+> +    xen_wmb();
+> +
+> +    prod =3D ring->intf->in_prod;
+> +    xen_rmb();
+> +    ring->intf->in_prod =3D prod + pdu->size;
+> +    xen_wmb();
+> +
+> +    ring->inprogress =3D false;
+> +    xenevtchn_notify(ring->evtchndev, ring->local_port);
+> +
+> +    qemu_bh_schedule(ring->bh);
+>  }
+> =20
+>  static const struct V9fsTransport xen_9p_transport =3D {
+
+
+--Sig_/+dFVkcGJYTB0qo7iNllCFF9
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAljJHpcACgkQAvw66wEB28KoggCeMo+xve/8KoG4KxRsTfmLFhPn
+DxIAn2uNwM5YmFQA8h4i3KgOTLjeq3XZ
+=rbpD
+-----END PGP SIGNATURE-----
+
+--Sig_/+dFVkcGJYTB0qo7iNllCFF9--
