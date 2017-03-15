@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36972)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1co9rS-0007lP-HV
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 10:25:12 -0400
+	(envelope-from <eblake@redhat.com>) id 1co9s1-0008Fj-IO
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 10:25:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1co9rP-0001De-Bb
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 10:25:10 -0400
-Resent-Message-Id: <E1co9rP-0001De-Bb@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21449)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1co9rP-0001Bj-4R
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 10:25:07 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148958790096.90.12193033088395766031@6c512846dbc7>
-In-Reply-To: <20170315135021.6978-1-quintela@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1co9ry-0001cG-DC
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 10:25:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41934)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1co9ry-0001bc-4Q
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 10:25:42 -0400
+References: <1489582656-31133-1-git-send-email-armbru@redhat.com>
+	<1489582656-31133-3-git-send-email-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3a9be3bd-4634-8ce8-8d95-04b4efa645d0@redhat.com>
+Date: Wed, 15 Mar 2017 09:25:38 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 15 Mar 2017 07:25:01 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 00/31] Creating RAMState for migration
+In-Reply-To: <1489582656-31133-3-git-send-email-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="AQBVwLWDhAHCg2dWJhme1uRL1OnwWKDIC"
+Subject: Re: [Qemu-devel] [PATCH v2 for-2.9 02/47] qapi: Make doc comments
+ optional where we don't need them
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,152 +29,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, amit.shah@redhat.com, dgilbert@redhat.com
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcwMzE1MTM1MDIxLjY5NzgtMS1xdWludGVsYUByZWRoYXQuY29tClN1Ympl
-Y3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMDAvMzFdIENyZWF0aW5nIFJBTVN0YXRlIGZvciBtaWdy
-YXRpb24KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpu
-PTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgoj
-IFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAw
-CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9n
-IC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAg
-ICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0
-PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Njcmlw
-dHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAg
-ICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVT
-VCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRi
-ZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQog
-KiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTcwMzE1MTM1MDIxLjY5NzgtMS1xdWludGVs
-YUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxNzAzMTUxMzUwMjEuNjk3OC0xLXF1aW50ZWxhQHJl
-ZGhhdC5jb20KICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDE3MDMxNTE0MjAzMi42Nzg4
-LTEtc2hvcm5lQGdtYWlsLmNvbSAtPiBwYXRjaGV3LzIwMTcwMzE1MTQyMDMyLjY3ODgtMS1zaG9y
-bmVAZ21haWwuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNmZlNTc3ZSByYW06
-IG1vdmUgcG9zdGNvcHlfcmVxdWVzdHMgaW50byBSQU1TdGF0ZQpmNTNlMzg5IHJhbTogbW92ZSBk
-aXJ0eV9wYWdlc19yYXRlIHRvIFJBTVN0YXRlCjM0ODQ3NzkgcmFtOiBSZW1vdmUgZGlydHlfYnl0
-ZXNfcmF0ZQoxZDlmMGMyIHJhbTogQ3JlYXRlIHJhbV9kaXJ0eV9zeW5jX2NvdW50KCkKYWZhMzBh
-NyByYW06IE1vdmUgbGFzdF9yZXFfcmIgdG8gUkFNU3RhdGUKYjZjMjc0ZCByYW06IFJlbW92ZSBy
-YW1fc2F2ZV9yZW1haW5pbmcKNDBhYTdkMSByYW06IFVzZSB0aGUgUkFNU3RhdGUgYnl0ZXNfdHJh
-bnNmZXJyZWQgcGFyYW1ldGVyCmMxNjBiYWYgcmFtOiBNb3ZlIGJ5dGVzX3RyYW5zZmVycmVkIGlu
-dG8gUkFNU3RhdGUKZDQ1MDdiNyByYW06IE1vdmUgbWlncmF0aW9uX2JpdG1hcF9yY3UgaW50byBS
-QU1TdGF0ZQowNmU0ZDc4IHJhbTogbW92ZSBtaWdyYXRpb25fYml0bWFwX211dGV4IGludG8gUkFN
-U3RhdGUKYTk3MDgxZSByYW06IEV2ZXJ5dGhpbmcgd2FzIGluaXQgdG8gemVybywgc28gdXNlIG1l
-bXNldApmMDU3NWE3IHJhbTogbW92ZSBtaWdyYXRpb25fZGlydHlfcGFnZXMgdG8gUkFNU3RhdGUK
-MmQzNTA2MCByYW06IG1vdmUgeGJ6cmxlX292ZXJmbG93cyBpbnRvIFJBTVN0YXRlCjhiOWM0NTkg
-cmFtOiBtb3ZlIHhienJsZV9jYWNoZV9taXNzX3JhdGUgaW50byBSQU1TdGF0ZQphNjk2NDNhIHJh
-bTogTW92ZSB4YnpybGVfY2FjaGVfbWlzcyBpbnRvIFJBTVN0YXRlCmI1NmY1NGIgcmFtOiBNb3Zl
-IHhienJsZV9wYWdlcyBpbnRvIFJBTVN0YXRlCjY3NzE1MzQgcmFtOiBNb3ZlIHhienJsZV9ieXRl
-cyBpbnRvIFJBTVN0YXRlCmQ5MjE4NzYgcmFtOiBNb3ZlIGl0ZXJhdGlvbnMgaW50byBSQU1TdGF0
-ZQoxNzRmOTI1IHJhbTogUmVtb3ZlIG5vcm1fbWlnX2J5dGVzX3RyYW5zZmVycmVkCjU1MjM1MDkg
-cmFtOiBNb3ZlIG5vcm1fcGFnZXMgdG8gUkFNU3RhdGUKYWJmODUxNiByYW06IFJlbW92ZSB1bnVz
-ZWQgcGFnZXNfc2tpcGVkIHZhcmlhYmxlCmZhZDQyNjkgcmFtOiBSZW1vdmUgdW51c2VkIGR1bXBf
-bWlnX2RieXRlc190cmFuc2ZlcnJlZCgpCmIxZDQ0YWQgcmFtOiBNb3ZlIGR1cF9wYWdlcyBpbnRv
-IFJBTVN0YXRlCmJiZTdkNzUgcmFtOiBNb3ZlIGl0ZXJhdGlvbnNfcHJldiBpbnRvIFJBTVN0YXRl
-CjlkNGM1YzQgcmFtOiBNb3ZlIHhienJsZV9jYWNoZV9taXNzX3ByZXYgaW50byBSQU1TdGF0ZQpk
-ZTRmOTEwIHJhbTogTW92ZSBudW1fZGlydHlfcGFnZXNfcGVyaW9kIGludG8gUkFNU3RhdGUKYzk0
-ZTljNCByYW06IE1vdmUgYnl0ZXNfeGZlcl9wcmV2IGludG8gUkFNU3RhdGUKODRlZjU5MiByYW06
-IE1vdmUgc3RhcnQgdGltZSBpbnRvIFJBTVN0YXRlCmU5NjdhYjUgcmFtOiBtb3ZlIGJpdG1hcF9z
-eW5jX2NvdW50IGludG8gUkFNU3RhdGUKYTliNTlhYyByYW06IEFkZCBkaXJ0eV9yYXRlX2hpZ2hf
-Y250IHRvIFJBTVN0YXRlCjYyMGU5ZTYgcmFtOiBtb3ZlIG1vcmUgZmllbGRzIGludG8gUkFNU3Rh
-dGUKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMzE6IHJhbTogbW92ZSBt
-b3JlIGZpZWxkcyBpbnRvIFJBTVN0YXRlLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
-ZXJzCiMyMDE6IEZJTEU6IG1pZ3JhdGlvbi9yYW0uYzoxMTIxOgorc3RhdGljIGJvb2wgZ2V0X3F1
-ZXVlZF9wYWdlKFJBTVN0YXRlICpycywgTWlncmF0aW9uU3RhdGUgKm1zLCBQYWdlU2VhcmNoU3Rh
-dHVzICpwc3MsCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojNDMzOiBGSUxFOiBtaWdyYXRp
-b24vcmFtLmM6MjEyMDoKKyAgICAkCgp0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDQwMCBs
-aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
-dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
-bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVj
-a2luZyBQQVRDSCAyLzMxOiByYW06IEFkZCBkaXJ0eV9yYXRlX2hpZ2hfY250IHRvIFJBTVN0YXRl
-Li4uCkNoZWNraW5nIFBBVENIIDMvMzE6IHJhbTogbW92ZSBiaXRtYXBfc3luY19jb3VudCBpbnRv
-IFJBTVN0YXRlLi4uCkNoZWNraW5nIFBBVENIIDQvMzE6IHJhbTogTW92ZSBzdGFydCB0aW1lIGlu
-dG8gUkFNU3RhdGUuLi4KQ2hlY2tpbmcgUEFUQ0ggNS8zMTogcmFtOiBNb3ZlIGJ5dGVzX3hmZXJf
-cHJldiBpbnRvIFJBTVN0YXRlLi4uCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQg
-Jy8nIChjdHg6VnhWKQojNTU6IEZJTEU6IG1pZ3JhdGlvbi9yYW0uYzo2Nzg6CisgICAgICAgICAg
-ICAgICAgICAgKGJ5dGVzX3hmZXJfbm93IC0gcnMtPmJ5dGVzX3hmZXJfcHJldikvMikgJiYKICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4K
-CnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNDggbGluZXMgY2hlY2tlZAoKWW91ciBwYXRj
-aCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNi8zMTogcmFtOiBN
-b3ZlIG51bV9kaXJ0eV9wYWdlc19wZXJpb2QgaW50byBSQU1TdGF0ZS4uLgpDaGVja2luZyBQQVRD
-SCA3LzMxOiByYW06IE1vdmUgeGJ6cmxlX2NhY2hlX21pc3NfcHJldiBpbnRvIFJBTVN0YXRlLi4u
-CkNoZWNraW5nIFBBVENIIDgvMzE6IHJhbTogTW92ZSBpdGVyYXRpb25zX3ByZXYgaW50byBSQU1T
-dGF0ZS4uLgpDaGVja2luZyBQQVRDSCA5LzMxOiByYW06IE1vdmUgZHVwX3BhZ2VzIGludG8gUkFN
-U3RhdGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMzE6IHJhbTogUmVtb3ZlIHVudXNlZCBkdW1wX21p
-Z19kYnl0ZXNfdHJhbnNmZXJyZWQoKS4uLgpDaGVja2luZyBQQVRDSCAxMS8zMTogcmFtOiBSZW1v
-dmUgdW51c2VkIHBhZ2VzX3NraXBlZCB2YXJpYWJsZS4uLgpDaGVja2luZyBQQVRDSCAxMi8zMTog
-cmFtOiBNb3ZlIG5vcm1fcGFnZXMgdG8gUkFNU3RhdGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvMzE6
-IHJhbTogUmVtb3ZlIG5vcm1fbWlnX2J5dGVzX3RyYW5zZmVycmVkLi4uCkNoZWNraW5nIFBBVENI
-IDE0LzMxOiByYW06IE1vdmUgaXRlcmF0aW9ucyBpbnRvIFJBTVN0YXRlLi4uCkNoZWNraW5nIFBB
-VENIIDE1LzMxOiByYW06IE1vdmUgeGJ6cmxlX2J5dGVzIGludG8gUkFNU3RhdGUuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMTYvMzE6IHJhbTogTW92ZSB4YnpybGVfcGFnZXMgaW50byBSQU1TdGF0ZS4uLgpD
-aGVja2luZyBQQVRDSCAxNy8zMTogcmFtOiBNb3ZlIHhienJsZV9jYWNoZV9taXNzIGludG8gUkFN
-U3RhdGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTgvMzE6IHJhbTogbW92ZSB4YnpybGVfY2FjaGVfbWlz
-c19yYXRlIGludG8gUkFNU3RhdGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTkvMzE6IHJhbTogbW92ZSB4
-YnpybGVfb3ZlcmZsb3dzIGludG8gUkFNU3RhdGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMjAvMzE6IHJh
-bTogbW92ZSBtaWdyYXRpb25fZGlydHlfcGFnZXMgdG8gUkFNU3RhdGUuLi4KRVJST1I6IHNwYWNl
-cyBwcm9oaWJpdGVkIGFyb3VuZCB0aGF0ICctPicgKGN0eDpWeFcpCiM2MjogRklMRTogbWlncmF0
-aW9uL3JhbS5jOjU4NzoKKyAgICBycy0+IG1pZ3JhdGlvbl9kaXJ0eV9wYWdlcyArPQogICAgICAg
-XgoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzg5OiBGSUxFOiBtaWdyYXRpb24v
-cmFtLmM6NjQ4OgorICAgIHJzLT5udW1fZGlydHlfcGFnZXNfcGVyaW9kICs9IHJzLT5taWdyYXRp
-b25fZGlydHlfcGFnZXMgLSBudW1fZGlydHlfcGFnZXNfaW5pdDsKCldBUk5JTkc6IGxpbmUgb3Zl
-ciA4MCBjaGFyYWN0ZXJzCiMxMjg6IEZJTEU6IG1pZ3JhdGlvbi9yYW0uYzoxNzc2OgorICAgICAg
-ICAgICAgICAgIHJhbV9zdGF0ZS5taWdyYXRpb25fZGlydHlfcGFnZXMgKz0gIXRlc3RfYW5kX3Nl
-dF9iaXQocGFnZSwgYml0bWFwKTsKCnRvdGFsOiAxIGVycm9ycywgMiB3YXJuaW5ncywgMTE3IGxp
-bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNr
-aW5nIFBBVENIIDIxLzMxOiByYW06IEV2ZXJ5dGhpbmcgd2FzIGluaXQgdG8gemVybywgc28gdXNl
-IG1lbXNldC4uLgpDaGVja2luZyBQQVRDSCAyMi8zMTogcmFtOiBtb3ZlIG1pZ3JhdGlvbl9iaXRt
-YXBfbXV0ZXggaW50byBSQU1TdGF0ZS4uLgpDaGVja2luZyBQQVRDSCAyMy8zMTogcmFtOiBNb3Zl
-IG1pZ3JhdGlvbl9iaXRtYXBfcmN1IGludG8gUkFNU3RhdGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMjQv
-MzE6IHJhbTogTW92ZSBieXRlc190cmFuc2ZlcnJlZCBpbnRvIFJBTVN0YXRlLi4uCkNoZWNraW5n
-IFBBVENIIDI1LzMxOiByYW06IFVzZSB0aGUgUkFNU3RhdGUgYnl0ZXNfdHJhbnNmZXJyZWQgcGFy
-YW1ldGVyLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM1NjogRklMRTogbWln
-cmF0aW9uL3JhbS5jOjcxMToKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgb2Zmc2V0IHwgUkFNX1NBVkVfRkxBR19DT01QUkVTUyk7CgpXQVJOSU5HOiBs
-aW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjQ0OiBGSUxFOiBtaWdyYXRpb24vcmFtLmM6MTMxNjoK
-KyAgICAgICAgdG1wcGFnZXMgPSByYW1fc2F2ZV90YXJnZXRfcGFnZShycywgbXMsIGYsIHBzcywg
-bGFzdF9zdGFnZSwgZGlydHlfcmFtX2Ficyk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
-dGVycwojMjcxOiBGSUxFOiBtaWdyYXRpb24vcmFtLmM6MTM3OToKKyAgICAgICAgICAgIHBhZ2Vz
-ID0gcmFtX3NhdmVfaG9zdF9wYWdlKHJzLCBtcywgZiwgJnBzcywgbGFzdF9zdGFnZSwgZGlydHlf
-cmFtX2Ficyk7Cgp0b3RhbDogMCBlcnJvcnMsIDMgd2FybmluZ3MsIDI1NSBsaW5lcyBjaGVja2Vk
-CgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
-ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
-bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDI2
-LzMxOiByYW06IFJlbW92ZSByYW1fc2F2ZV9yZW1haW5pbmcuLi4KQ2hlY2tpbmcgUEFUQ0ggMjcv
-MzE6IHJhbTogTW92ZSBsYXN0X3JlcV9yYiB0byBSQU1TdGF0ZS4uLgpDaGVja2luZyBQQVRDSCAy
-OC8zMTogcmFtOiBDcmVhdGUgcmFtX2RpcnR5X3N5bmNfY291bnQoKS4uLgpDaGVja2luZyBQQVRD
-SCAyOS8zMTogcmFtOiBSZW1vdmUgZGlydHlfYnl0ZXNfcmF0ZS4uLgpFUlJPUjogbGluZSBvdmVy
-IDkwIGNoYXJhY3RlcnMKIzQyOiBGSUxFOiBtaWdyYXRpb24vbWlncmF0aW9uLmM6MjAwMjoKKyAg
-ICAgICAgICAgICAgICBzLT5leHBlY3RlZF9kb3dudGltZSA9IHMtPmRpcnR5X3BhZ2VzX3JhdGUg
-KiAoMXVsIDw8IHFlbXVfdGFyZ2V0X3BhZ2VfYml0cygpKS8gYmFuZHdpZHRoOwoKRVJST1I6IHNw
-YWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnLycgKGN0eDpWeFcpCiM0MjogRklMRTogbWlncmF0
-aW9uL21pZ3JhdGlvbi5jOjIwMDI6CisgICAgICAgICAgICAgICAgcy0+ZXhwZWN0ZWRfZG93bnRp
-bWUgPSBzLT5kaXJ0eV9wYWdlc19yYXRlICogKDF1bCA8PCBxZW11X3RhcmdldF9wYWdlX2JpdHMo
-KSkvIGJhbmR3aWR0aDsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRv
-dGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMzEgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMzAvMzE6IHJhbTogbW92
-ZSBkaXJ0eV9wYWdlc19yYXRlIHRvIFJBTVN0YXRlLi4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hh
-cmFjdGVycwojNjE6IEZJTEU6IG1pZ3JhdGlvbi9taWdyYXRpb24uYzoyMDAxOgorICAgICAgICAg
-ICAgICAgIHMtPmV4cGVjdGVkX2Rvd250aW1lID0gcmFtX2RpcnR5X3BhZ2VzX3JhdGUoKSAqICgx
-dWwgPDwgcWVtdV90YXJnZXRfcGFnZV9iaXRzKCkpLyBiYW5kd2lkdGg7CgpFUlJPUjogc3BhY2Vz
-IHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcvJyAoY3R4OlZ4VykKIzYxOiBGSUxFOiBtaWdyYXRpb24v
-bWlncmF0aW9uLmM6MjAwMToKKyAgICAgICAgICAgICAgICBzLT5leHBlY3RlZF9kb3dudGltZSA9
-IHJhbV9kaXJ0eV9wYWdlc19yYXRlKCkgKiAoMXVsIDw8IHFlbXVfdGFyZ2V0X3BhZ2VfYml0cygp
-KS8gYmFuZHdpZHRoOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoK
-dG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCA4MSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAzMS8zMTogcmFtOiBt
-b3ZlIHBvc3Rjb3B5X3JlcXVlc3RzIGludG8gUkFNU3RhdGUuLi4KPT09IE9VVFBVVCBFTkQgPT09
-CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQg
-YXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNl
-bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--AQBVwLWDhAHCg2dWJhme1uRL1OnwWKDIC
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+Message-ID: <3a9be3bd-4634-8ce8-8d95-04b4efa645d0@redhat.com>
+Subject: Re: [PATCH v2 for-2.9 02/47] qapi: Make doc comments optional where
+ we don't need them
+References: <1489582656-31133-1-git-send-email-armbru@redhat.com>
+ <1489582656-31133-3-git-send-email-armbru@redhat.com>
+In-Reply-To: <1489582656-31133-3-git-send-email-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 03/15/2017 07:56 AM, Markus Armbruster wrote:
+> Since we added the documentation generator in commit 3313b61, doc
+> comments are mandatory.  That's a very good idea for a schema that
+> needs to be documented, but has proven to be annoying for testing.
+>=20
+> Make doc comments optional again, but add a new directive
+>=20
+>     { 'pragma': { 'doc-required': true } }
+>=20
+> to let a QAPI schema require them.
+>=20
+> Add test cases for the new pragma directive.  While there, plug a
+> minor hole in includ directive test coverage.
+
+s/includ/include/
+
+>=20
+> Require documentation in the schemas we actually want documented:
+> qapi-schema.json and qga/qapi-schema.json.
+>=20
+> We could probably make qapi2texi.py cope with incomplete
+> documentation, but for now, simply make it refuse to run unless the
+> schema has 'doc-required': true.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+
+> +=3D=3D=3D Pragma directives =3D=3D=3D
+> +
+> +Usage: { 'pragma': DICT }
+> +
+> +The pragma directive lets you control optional generator behavior.
+> +The dictionary's entries are pragma names and values.
+> +
+> +Pragma's scope is currently the complete schema.  Setting it to
+
+You can do:
+
+{ 'pragma': { 'doc-required': true } }
+{ 'pragma': { 'whitelist': [...] } }
+
+what you can't do is:
+
+{ 'pragma': { 'doc-required': true } }
+{ 'pragma': { 'doc-required': false } }
+
+Maybe s/Setting it/Setting a given pragma name/
+
+> +different values in parts of the schema doesn't work.
+> +
+> +Pragma 'doc-required' takes a boolean value.  If true, documentation
+> +is required.  Default is false.
+> +
+> +
+
+The new tests are nice; thanks.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--AQBVwLWDhAHCg2dWJhme1uRL1OnwWKDIC
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYyU7iAAoJEKeha0olJ0Nq0xEH/21UzrFe+momMfr9n8W2BuZO
+c1339UIxId2SjJCMI4/tCbjdXmTmJU/Cs00XJlcbJdbM7uChjdY2BCGvbcx3zj9+
+mQ2/mLqL80iTLsCY/sSRFjLalBNELE5phVFgUNLpTpJLofP4ossT2jD7yJu9yiOY
+gMeA01hb7g43wFSqStoknWF6bWPWIZ2xQtrkPZqR4A1ayLI0pKNHGw3TdtYaL7Nz
+8t8UmlP2PXiczUQWUaLKvEDWB4UV49OAEr+GtcsCPIWvAa6RBjFzYM4WBqsIm38Y
+yFOY+/QNtPB0UU/F/nHPqQNaJPcIvPYEApEr7/8X5HmDsDUgeHLl7nrcQRfEU3c=
+=Pfpy
+-----END PGP SIGNATURE-----
+
+--AQBVwLWDhAHCg2dWJhme1uRL1OnwWKDIC--
