@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1coB8b-00054U-Pv
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 11:47:00 -0400
+	(envelope-from <prvs=24043a7f8=igor.druzhinin@citrix.com>)
+	id 1coBNU-0002jD-Eh
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 12:02:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aurelien@aurel32.net>) id 1coB8a-0007xh-C2
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 11:46:57 -0400
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:47486)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aurelien@aurel32.net>)
-	id 1coB8a-0007lj-6c
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 11:46:56 -0400
-Date: Wed, 15 Mar 2017 16:46:38 +0100
-From: Aurelien Jarno <aurelien@aurel32.net>
-Message-ID: <20170315154638.2cofbirjrohz26ia@aurel32.net>
-References: <87tw6y8bs8.fsf@secure.mitica>
-	<CAFEAcA978SJemCfYJPa8jwtuhhi6JGh9pEDGYNJ1npJA3nvEQA@mail.gmail.com>
-	<20170314081312.GB13140@stefanha-x1.localdomain>
-	<CAFEAcA9F2BPexRieaEhu+UpJxoOdEfw8eggW8b2SjuoMMTNgog@mail.gmail.com>
-	<87wpbstesf.fsf@secure.mitica> <20170314160113.GM2445@work-vm>
-	<20170314162020.GT2652@redhat.com>
-	<d9497461-e7c5-b914-362d-16b0cdea9fba@redhat.com>
-	<CAFEAcA-Y=KNBTj32_C1HOuRcEL9vxMimxjPpwrQpG9apGqBjSQ@mail.gmail.com>
-	<5a03eebc-669c-c67b-d857-f4d1bbbeff36@twiddle.net>
+	(envelope-from <prvs=24043a7f8=igor.druzhinin@citrix.com>)
+	id 1coBNO-00069y-0L
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 12:02:20 -0400
+Received: from smtp.eu.citrix.com ([185.25.65.24]:1103)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=24043a7f8=igor.druzhinin@citrix.com>)
+	id 1coBNN-00067P-2X
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 12:02:13 -0400
+From: Igor Druzhinin <igor.druzhinin@citrix.com>
+Date: Wed, 15 Mar 2017 16:01:19 +0000
+Message-ID: <1489593679-31468-1-git-send-email-igor.druzhinin@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5a03eebc-669c-c67b-d857-f4d1bbbeff36@twiddle.net>
-Subject: Re: [Qemu-devel] Obsolete QEMU host environments
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v5] xen: don't save/restore the physmap on VM
+ save/restore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,37 +27,267 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, QEMU Developer <qemu-devel@nongnu.org>, KVM devel mailing list <kvm@vger.kernel.org>, Stefan Hajnoczi <stefanha@gmail.com>
+To: sstabellini@kernel.org, anthony.perard@citrix.com
+Cc: paul.durrant@citrix.com, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, Igor Druzhinin <igor.druzhinin@citrix.com>
 
-On 2017-03-15 07:09, Richard Henderson wrote:
-> On 03/15/2017 03:07 AM, Peter Maydell wrote:
-> > On 14 March 2017 at 17:54, Thomas Huth <thuth@redhat.com> wrote:
-> > > Our ia64 host backend in QEMU (tcg/ia64) is still marked as maintained
-> > > ... so it's maybe not as dead as you think? Or should we rather get rid
-> > > of that soon, too?
-> > 
-> > I don't actually mind whether we keep tcg/ia64 or drop it.
-> > But if we keep it then we must have a machine we can test
-> > it on -- that means one I have access to (and which we
-> > can otherwise use for central testing), not just one the
-> > maintainer might happen to have.
-> > 
-> > Also, that MAINTAINERS entry was added in 2011, so it's
-> > probably about as out of date as the code :-)
-> 
-> Red Hat's last ia64 machine died a few years ago, so I haven't
-> been able to test it for quite some time.
-> 
-> I don't know if Aurelien can still test on ia64 or not.
+Saving/restoring the physmap to/from xenstore was introduced to
+QEMU majorly in order to cover up the VRAM region restore issue.
+The sequence of restore operations implies that we should know
+the effective guest VRAM address *before* we have the VRAM region
+restored (which happens later). Unfortunately, in Xen environment
+VRAM memory does actually belong to a guest - not QEMU itself -
+which means the position of this region is unknown beforehand and
+can't be mapped into QEMU address space immediately.
 
-I have the same issue, the last QEMU test I have been able to do on an
-ia64 machine dates from last summer, so something like 9 months ago. I
-don't think anybody has a lot of interest in ia64 anymore, so I guess
-it's time to just remove the ia64 host backend.
+Previously, recreating xenstore keys, holding the physmap, by the
+toolstack helped to get this information in place at the right
+moment ready to be consumed by QEMU to map the region properly.
 
-Aurelien
+The extraneous complexity of having those keys transferred by the
+toolstack and unnecessary redundancy prompted us to propose a
+solution which doesn't require any extra data in xenstore. The idea
+is to defer the VRAM region mapping till the point we actually know
+the effective address and able to map it. To that end, we initially
+just skip the mapping request for the framebuffer if we unable to
+map it now. Then, after the memory region restore phase, we perform
+the mapping again, this time successfully, and update the VRAM region
+metadata accordingly.
 
+Signed-off-by: Igor Druzhinin <igor.druzhinin@citrix.com>
+---
+v5:
+* Add an assertion and debug printf
+
+v4:
+* Use VGA post_load handler for vram_ptr update
+
+v3:
+* Modify qemu_ram_ptr_length similarly with qemu_map_ram_ptr
+* Add a comment explaining qemu_map_ram_ptr and qemu_ram_ptr_length
+  semantic change for Xen
+* Dropped some redundant changes
+
+v2:
+* Fix some building and coding style issues
+---
+ exec.c           |  16 +++++++++
+ hw/display/vga.c |  11 ++++++
+ xen-hvm.c        | 104 ++++++++++---------------------------------------------
+ 3 files changed, 46 insertions(+), 85 deletions(-)
+
+diff --git a/exec.c b/exec.c
+index aabb035..a1ac8cd 100644
+--- a/exec.c
++++ b/exec.c
+@@ -2008,6 +2008,14 @@ void *qemu_map_ram_ptr(RAMBlock *ram_block, ram_addr_t addr)
+         }
+ 
+         block->host = xen_map_cache(block->offset, block->max_length, 1);
++        if (block->host == NULL) {
++            /* In case we cannot establish the mapping right away we might
++             * still be able to do it later e.g. on a later stage of restore.
++             * We don't touch the block and return NULL here to indicate
++             * that intention.
++             */
++            return NULL;
++        }
+     }
+     return ramblock_ptr(block, addr);
+ }
+@@ -2041,6 +2049,14 @@ static void *qemu_ram_ptr_length(RAMBlock *ram_block, ram_addr_t addr,
+         }
+ 
+         block->host = xen_map_cache(block->offset, block->max_length, 1);
++        if (block->host == NULL) {
++            /* In case we cannot establish the mapping right away we might
++             * still be able to do it later e.g. on a later stage of restore.
++             * We don't touch the block and return NULL here to indicate
++             * that intention.
++             */
++            return NULL;
++        }
+     }
+ 
+     return ramblock_ptr(block, addr);
+diff --git a/hw/display/vga.c b/hw/display/vga.c
+index 69c3e1d..7d85fd8 100644
+--- a/hw/display/vga.c
++++ b/hw/display/vga.c
+@@ -2035,6 +2035,12 @@ static int vga_common_post_load(void *opaque, int version_id)
+ {
+     VGACommonState *s = opaque;
+ 
++    if (xen_enabled() && !s->vram_ptr) {
++        /* update VRAM region pointer in case we've failed
++         * the last time during init phase */
++        s->vram_ptr = memory_region_get_ram_ptr(&s->vram);
++        assert(s->vram_ptr);
++    }
+     /* force refresh */
+     s->graphic_mode = -1;
+     vbe_update_vgaregs(s);
+@@ -2165,6 +2171,11 @@ void vga_common_init(VGACommonState *s, Object *obj, bool global_vmstate)
+     vmstate_register_ram(&s->vram, global_vmstate ? NULL : DEVICE(obj));
+     xen_register_framebuffer(&s->vram);
+     s->vram_ptr = memory_region_get_ram_ptr(&s->vram);
++    /* VRAM pointer might still be NULL here if we are restoring on Xen.
++       We try to get it again later at post-load phase. */
++#ifdef DEBUG_VGA_MEM
++    printf("vga: vram ptr: %p\n", s->vram_ptr);
++#endif
+     s->get_bpp = vga_get_bpp;
+     s->get_offsets = vga_get_offsets;
+     s->get_resolution = vga_get_resolution;
+diff --git a/xen-hvm.c b/xen-hvm.c
+index 5043beb..8bedd9b 100644
+--- a/xen-hvm.c
++++ b/xen-hvm.c
+@@ -317,7 +317,6 @@ static int xen_add_to_physmap(XenIOState *state,
+     XenPhysmap *physmap = NULL;
+     hwaddr pfn, start_gpfn;
+     hwaddr phys_offset = memory_region_get_ram_addr(mr);
+-    char path[80], value[17];
+     const char *mr_name;
+ 
+     if (get_physmapping(state, start_addr, size)) {
+@@ -340,6 +339,22 @@ go_physmap:
+     DPRINTF("mapping vram to %"HWADDR_PRIx" - %"HWADDR_PRIx"\n",
+             start_addr, start_addr + size);
+ 
++    mr_name = memory_region_name(mr);
++
++    physmap = g_malloc(sizeof(XenPhysmap));
++
++    physmap->start_addr = start_addr;
++    physmap->size = size;
++    physmap->name = mr_name;
++    physmap->phys_offset = phys_offset;
++
++    QLIST_INSERT_HEAD(&state->physmap, physmap, list);
++
++    if (runstate_check(RUN_STATE_INMIGRATE)) {
++        /* If we are migrating the region has been already mapped */
++        return 0;
++    }
++
+     pfn = phys_offset >> TARGET_PAGE_BITS;
+     start_gpfn = start_addr >> TARGET_PAGE_BITS;
+     for (i = 0; i < size >> TARGET_PAGE_BITS; i++) {
+@@ -350,49 +365,17 @@ go_physmap:
+         if (rc) {
+             DPRINTF("add_to_physmap MFN %"PRI_xen_pfn" to PFN %"
+                     PRI_xen_pfn" failed: %d (errno: %d)\n", idx, gpfn, rc, errno);
++
++            QLIST_REMOVE(physmap, list);
++            g_free(physmap);
+             return -rc;
+         }
+     }
+ 
+-    mr_name = memory_region_name(mr);
+-
+-    physmap = g_malloc(sizeof (XenPhysmap));
+-
+-    physmap->start_addr = start_addr;
+-    physmap->size = size;
+-    physmap->name = mr_name;
+-    physmap->phys_offset = phys_offset;
+-
+-    QLIST_INSERT_HEAD(&state->physmap, physmap, list);
+-
+     xc_domain_pin_memory_cacheattr(xen_xc, xen_domid,
+                                    start_addr >> TARGET_PAGE_BITS,
+                                    (start_addr + size - 1) >> TARGET_PAGE_BITS,
+                                    XEN_DOMCTL_MEM_CACHEATTR_WB);
+-
+-    snprintf(path, sizeof(path),
+-            "/local/domain/0/device-model/%d/physmap/%"PRIx64"/start_addr",
+-            xen_domid, (uint64_t)phys_offset);
+-    snprintf(value, sizeof(value), "%"PRIx64, (uint64_t)start_addr);
+-    if (!xs_write(state->xenstore, 0, path, value, strlen(value))) {
+-        return -1;
+-    }
+-    snprintf(path, sizeof(path),
+-            "/local/domain/0/device-model/%d/physmap/%"PRIx64"/size",
+-            xen_domid, (uint64_t)phys_offset);
+-    snprintf(value, sizeof(value), "%"PRIx64, (uint64_t)size);
+-    if (!xs_write(state->xenstore, 0, path, value, strlen(value))) {
+-        return -1;
+-    }
+-    if (mr_name) {
+-        snprintf(path, sizeof(path),
+-                "/local/domain/0/device-model/%d/physmap/%"PRIx64"/name",
+-                xen_domid, (uint64_t)phys_offset);
+-        if (!xs_write(state->xenstore, 0, path, mr_name, strlen(mr_name))) {
+-            return -1;
+-        }
+-    }
+-
+     return 0;
+ }
+ 
+@@ -1152,54 +1135,6 @@ static void xen_exit_notifier(Notifier *n, void *data)
+     xs_daemon_close(state->xenstore);
+ }
+ 
+-static void xen_read_physmap(XenIOState *state)
+-{
+-    XenPhysmap *physmap = NULL;
+-    unsigned int len, num, i;
+-    char path[80], *value = NULL;
+-    char **entries = NULL;
+-
+-    snprintf(path, sizeof(path),
+-            "/local/domain/0/device-model/%d/physmap", xen_domid);
+-    entries = xs_directory(state->xenstore, 0, path, &num);
+-    if (entries == NULL)
+-        return;
+-
+-    for (i = 0; i < num; i++) {
+-        physmap = g_malloc(sizeof (XenPhysmap));
+-        physmap->phys_offset = strtoull(entries[i], NULL, 16);
+-        snprintf(path, sizeof(path),
+-                "/local/domain/0/device-model/%d/physmap/%s/start_addr",
+-                xen_domid, entries[i]);
+-        value = xs_read(state->xenstore, 0, path, &len);
+-        if (value == NULL) {
+-            g_free(physmap);
+-            continue;
+-        }
+-        physmap->start_addr = strtoull(value, NULL, 16);
+-        free(value);
+-
+-        snprintf(path, sizeof(path),
+-                "/local/domain/0/device-model/%d/physmap/%s/size",
+-                xen_domid, entries[i]);
+-        value = xs_read(state->xenstore, 0, path, &len);
+-        if (value == NULL) {
+-            g_free(physmap);
+-            continue;
+-        }
+-        physmap->size = strtoull(value, NULL, 16);
+-        free(value);
+-
+-        snprintf(path, sizeof(path),
+-                "/local/domain/0/device-model/%d/physmap/%s/name",
+-                xen_domid, entries[i]);
+-        physmap->name = xs_read(state->xenstore, 0, path, &len);
+-
+-        QLIST_INSERT_HEAD(&state->physmap, physmap, list);
+-    }
+-    free(entries);
+-}
+-
+ static void xen_wakeup_notifier(Notifier *notifier, void *data)
+ {
+     xc_set_hvm_param(xen_xc, xen_domid, HVM_PARAM_ACPI_S_STATE, 0);
+@@ -1339,7 +1274,6 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
+         goto err;
+     }
+     xen_be_register_common();
+-    xen_read_physmap(state);
+ 
+     /* Disable ACPI build because Xen handles it */
+     pcms->acpi_build_enabled = false;
 -- 
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+2.7.4
