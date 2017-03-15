@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cnySm-0000lJ-ND
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 22:14:57 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1cnyg9-0002Zz-JV
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 22:28:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cnySj-0005qJ-G7
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 22:14:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46310)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cnySj-0005po-9y
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 22:14:53 -0400
-References: <1489460502-6686-1-git-send-email-jasowang@redhat.com>
-	<1489460502-6686-3-git-send-email-jasowang@redhat.com>
-	<20170314102918.3dce0075.cornelia.huck@de.ibm.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <fc240730-be1d-4b95-0106-48caf5ebc533@redhat.com>
-Date: Wed, 15 Mar 2017 10:14:48 +0800
+	(envelope-from <jemmy858585@gmail.com>) id 1cnyg8-0005iS-FK
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 22:28:45 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170314102918.3dce0075.cornelia.huck@de.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V3 2/3] virtio: destroy region cache during
- reset
+In-Reply-To: <420d9095-bde2-6573-e883-ab6b57d4a860@redhat.com>
+References: <1489478243-10366-1-git-send-email-jemmy858585@gmail.com>
+	<420d9095-bde2-6573-e883-ab6b57d4a860@redhat.com>
+From: 858585 jemmy <jemmy858585@gmail.com>
+Date: Wed, 15 Mar 2017 10:28:40 +0800
+Message-ID: <CAOGPPbcD67Xt1qkCD070QZxf5hp-jVtL9agN=DLLsOP4itgkhg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] migration/block: Avoid involve into
+ blk_drain too frequently
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +23,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: stefanha@redhat.com, famz@redhat.com, quintela@redhat.com, dgilbert@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-
-
-On 2017=E5=B9=B403=E6=9C=8814=E6=97=A5 17:29, Cornelia Huck wrote:
-> On Tue, 14 Mar 2017 11:01:41 +0800
-> Jason Wang <jasowang@redhat.com> wrote:
->
->> We don't destroy region cache during reset which can make the maps
->> of previous driver leaked to a buggy or malicious driver that don't
->> set vring address before starting to use the device. Fix this by
->> destroy the region cache during reset and validate it before trying to
->> see them.
+On Tue, Mar 14, 2017 at 11:12 PM, Eric Blake <eblake@redhat.com> wrote:
+> On 03/14/2017 02:57 AM, jemmy858585@gmail.com wrote:
+>> From: Lidong Chen <jemmy858585@gmail.com>
 >>
->> Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Signed-off-by: Jason Wang <jasowang@redhat.com>
->> ---
->> Changes from V2:
->> - introduce a helper and assert caches !=3D NULL
->> Changes from v1:
->> - switch to use rcu in virtio_virtqueue_region_cache()
->> - use unlikely() when needed
->> ---
->>   hw/virtio/virtio.c | 46 ++++++++++++++++++++++++++++++--------------=
---
->>   1 file changed, 30 insertions(+), 16 deletions(-)
+>> Increase bmds->cur_dirty after submit io, so reduce the frequency involve into blk_drain, and improve the performance obviously when block migration.
+>
+> Long line; please wrap your commit messages, preferably around 70 bytes
+> since 'git log' displays them indented, and it is still nice to read
+> them in an 80-column window.
+>
+> Do you have benchmark numbers to prove the impact of this patch, or even
+> a formula for reproducing the benchmark testing?
+>
+
+the test result is base on current git master version.
+
+the xml of guest os:
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2' cache='none'/>
+      <source file='/instanceimage/ab3ba978-c7a3-463d-a1d0-48649fb7df00/ab3ba978-c7a3-463d-a1d0-48649fb7df00_vda.qcow2'/>
+      <target dev='vda' bus='virtio'/>
+      <alias name='virtio-disk0'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x04'
+function='0x0'/>
+    </disk>
+    <disk type='block' device='disk'>
+      <driver name='qemu' type='raw' cache='none' io='native'/>
+      <source dev='/dev/domu/ab3ba978-c7a3-463d-a1d0-48649fb7df00_vdb'/>
+      <target dev='vdb' bus='virtio'/>
+      <alias name='virtio-disk1'/>
+      <address type='pci' domain='0x0000' bus='0x00' slot='0x05'
+function='0x0'/>
+    </disk>
+
+i used fio running in guest os.  and the context of  fio configuration is below:
+[randwrite]
+ioengine=libaio
+iodepth=128
+bs=512
+filename=/dev/vdb
+rw=randwrite
+direct=1
+
+when the vm is not durning migrate, the iops is about 10.7K.
+
+then i used this command to start migrate virtual machine.
+
+virsh migrate-setspeed ab3ba978-c7a3-463d-a1d0-48649fb7df00 1000
+virsh migrate --live ab3ba978-c7a3-463d-a1d0-48649fb7df00
+--copy-storage-inc qemu+ssh://10.59.163.38/system
+
+before apply this patch, during the block dirty save phase, the iops
+in guest os is  only 4.0K, the migrate speed is about 505856 rsec/s.
+after apply this patch, during the block dirty save phase, the iops in
+guest os is is 9.5K. the migrate speed is about 855756 rsec/s.
+
+with old version qemu(1.2.0), call bdrv_drain_all function to wait aio
+complete, before apply this patch, the result is worse.
+because the main thread is block by bdrv_drain_all for a long time,
+the vnc is becoming response very slowly.
+this bug is only obvious when set the migrate speed with a big number.
+
 >>
->> @@ -249,11 +255,10 @@ static inline void vring_used_idx_set(VirtQueue =
-*vq, uint16_t val)
->>   /* Called within rcu_read_lock().  */
->>   static inline void vring_used_flags_set_bit(VirtQueue *vq, int mask)
->>   {
->> -    VRingMemoryRegionCaches *caches =3D atomic_rcu_read(&vq->vring.ca=
-ches);
->> +    VRingMemoryRegionCaches *caches =3D vring_get_region_caches(vq);
->>       VirtIODevice *vdev =3D vq->vdev;
->>       hwaddr pa =3D offsetof(VRingUsed, flags);
->>       uint16_t flags =3D virtio_lduw_phys_cached(vq->vdev, &caches->us=
-ed, pa);
->> -
-> Unrelated whitespace change.
-
-Right. If no more comments from any others. I think Michael can probably=20
-fix this during merge.
-
-Thanks
-
+>> Signed-off-by: Lidong Chen <jemmy858585@gmail.com>
+>> ---
+>>  migration/block.c | 2 ++
+>>  1 file changed, 2 insertions(+)
+>>
+>> diff --git a/migration/block.c b/migration/block.c
+>> index 6741228..f059cca 100644
+>> --- a/migration/block.c
+>> +++ b/migration/block.c
+>> @@ -576,6 +576,8 @@ static int mig_save_device_dirty(QEMUFile *f, BlkMigDevState *bmds,
+>>              }
+>>
+>>              bdrv_reset_dirty_bitmap(bmds->dirty_bitmap, sector, nr_sectors);
+>> +            sector += nr_sectors;
+>> +            bmds->cur_dirty = sector;
+>>              break;
+>>          }
+>>          sector += BDRV_SECTORS_PER_DIRTY_CHUNK;
+>>
 >
->>       virtio_stw_phys_cached(vdev, &caches->used, pa, flags | mask);
->>       address_space_cache_invalidate(&caches->used, pa, sizeof(flags))=
-;
->>   }
-> Other than that:
->
-> Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
->
+> --
+> Eric Blake   eblake redhat com    +1-919-301-3266
+> Libvirt virtualization library http://libvirt.org
 >
