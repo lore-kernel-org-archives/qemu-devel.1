@@ -1,26 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37208)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1co9s1-0008Fj-IO
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 10:25:46 -0400
+	(envelope-from <qemu.bugs@whitewinterwolf.com>) id 1co9Ff-00058p-7b
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:46:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1co9ry-0001cG-DC
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 10:25:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41934)
+	(envelope-from <qemu.bugs@whitewinterwolf.com>) id 1co9Fa-0001GV-Bh
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:46:07 -0400
+Received: from relay6-d.mail.gandi.net ([217.70.183.198]:36967)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1co9ry-0001bc-4Q
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 10:25:42 -0400
-References: <1489582656-31133-1-git-send-email-armbru@redhat.com>
-	<1489582656-31133-3-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3a9be3bd-4634-8ce8-8d95-04b4efa645d0@redhat.com>
-Date: Wed, 15 Mar 2017 09:25:38 -0500
+	(Exim 4.71) (envelope-from <qemu.bugs@whitewinterwolf.com>)
+	id 1co9Fa-0001Ec-3n
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:46:02 -0400
+Received: from mfilter49-d.gandi.net (mfilter49-d.gandi.net [217.70.178.180])
+	by relay6-d.mail.gandi.net (Postfix) with ESMTP id 180C1FB882
+	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 14:45:59 +0100 (CET)
+Received: from relay6-d.mail.gandi.net ([IPv6:::ffff:217.70.183.198])
+	by mfilter49-d.gandi.net (mfilter49-d.gandi.net [::ffff:10.0.15.180])
+	(amavisd-new, port 10024)
+	with ESMTP id 3JW_rLvvvIRW for <qemu-devel@nongnu.org>;
+	Wed, 15 Mar 2017 14:45:57 +0100 (CET)
+Received: from webmail.eu.com (webmail5-d.mgt.gandi.net [10.58.1.145])
+	(Authenticated sender: lists@whitewinterwolf.com)
+	by relay6-d.mail.gandi.net (Postfix) with ESMTPA id A8323FB8A3
+	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 14:45:57 +0100 (CET)
 MIME-Version: 1.0
-In-Reply-To: <1489582656-31133-3-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="AQBVwLWDhAHCg2dWJhme1uRL1OnwWKDIC"
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.9 02/47] qapi: Make doc comments
- optional where we don't need them
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Wed, 15 Mar 2017 14:45:57 +0100
+From: Simon <qemu.bugs@whitewinterwolf.com>
+Message-ID: <11569d75b61122820f186a32cdd20689@whitewinterwolf.com>
+Subject: [Qemu-devel] [Bug 1217339] [PATCH] Unix signal to send
+ ACPI-shutdown to Guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,104 +39,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---AQBVwLWDhAHCg2dWJhme1uRL1OnwWKDIC
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
-Message-ID: <3a9be3bd-4634-8ce8-8d95-04b4efa645d0@redhat.com>
-Subject: Re: [PATCH v2 for-2.9 02/47] qapi: Make doc comments optional where
- we don't need them
-References: <1489582656-31133-1-git-send-email-armbru@redhat.com>
- <1489582656-31133-3-git-send-email-armbru@redhat.com>
-In-Reply-To: <1489582656-31133-3-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hello,
 
-On 03/15/2017 07:56 AM, Markus Armbruster wrote:
-> Since we added the documentation generator in commit 3313b61, doc
-> comments are mandatory.  That's a very good idea for a schema that
-> needs to be documented, but has proven to be annoying for testing.
->=20
-> Make doc comments optional again, but add a new directive
->=20
->     { 'pragma': { 'doc-required': true } }
->=20
-> to let a QAPI schema require them.
->=20
-> Add test cases for the new pragma directive.  While there, plug a
-> minor hole in includ directive test coverage.
+Here is a short patch answering to Qemu wish-list issue 1217339.
+<https://bugs.launchpad.net/qemu/+bug/1217339>
+It makes Qemu to cleanly power off the guest when receiving a SIGHUP
+signal, thus without requiring any monitor access which is currently
+impossible (AFAIK).
 
-s/includ/include/
+The original issue mentions using SIGQUIT in its title, however as
+Laszlo explained in the bug thread SIGQUIT is designed for debugging
+purposes and is less about quitting than generating a core file. The
+original request also explicitly mentioned that:
 
->=20
-> Require documentation in the schemas we actually want documented:
-> qapi-schema.json and qga/qapi-schema.json.
->=20
-> We could probably make qapi2texi.py cope with incomplete
-> documentation, but for now, simply make it refuse to run unless the
-> schema has 'doc-required': true.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
+> If, for some reason SIGQUIT would not be accepted as the signal, take
+> any free to use signal, like USR1.
 
-> +=3D=3D=3D Pragma directives =3D=3D=3D
-> +
-> +Usage: { 'pragma': DICT }
-> +
-> +The pragma directive lets you control optional generator behavior.
-> +The dictionary's entries are pragma names and values.
-> +
-> +Pragma's scope is currently the complete schema.  Setting it to
+Qemu currently maps SIGTERM, SIGINT and SIGHUP to a brutal shutdown of
+the guest. This patch does not alter Qemu behavior for SIGTERM and
+SIGQUIT, and maps SIGHUP to the clean power off of the guest.
 
-You can do:
+IMHO SIGTERM and SIGINT behavior should not be altered:
 
-{ 'pragma': { 'doc-required': true } }
-{ 'pragma': { 'whitelist': [...] } }
+- SIGTERM is the preferred alternative to a SIGKILL to shutdown a stuck
+   guest.
+- SIGINT is mostly a matter of user expectation as it handles the Ctrl-C
+   sequence, I suppose that most users expect a brutal shutdown as it is
+   now but this is just a random guess.
 
-what you can't do is:
+SIGHUP is a more versatile signal, also used for instance to tell a
+daemon to reload its configuration files. From a functional point-of-
+view, for me it makes sense to use a "hang-up" signal to power off a
+guest, more than an impersonal USR1 signal, but this remains easily
+changeable would SIGHUP not be suitable for this purpose.
 
-{ 'pragma': { 'doc-required': true } }
-{ 'pragma': { 'doc-required': false } }
+With this patch applied, it becomes possible to easily and cleanly shut-
+down Qemu virtual machines system-wide without involving any monitor:
 
-Maybe s/Setting it/Setting a given pragma name/
+1. Send SIGHUP to all Qemu processes so the guests power off cleanly.
+2. After a few time send SIGTERM to the remaining Qemu processes to
+    forcefully close stuck guests.
+3. After a few time send SIGKILL to the remaining Qemu processes to
+    forcefully close stuck Qemu hypervisor processes.
 
-> +different values in parts of the schema doesn't work.
-> +
-> +Pragma 'doc-required' takes a boolean value.  If true, documentation
-> +is required.  Default is false.
-> +
-> +
+I find this more convenient than having to tinker with Qemu monitor to
+implement step 1 as it must currently be done.
 
-The new tests are nice; thanks.
+Signed-off-by: Simon Geusebroek <qemu.bugs@whitewinterwolf.com>
+---
+diff -ur a/vl.c b/vl.c
+--- a/vl.c	2016-12-20 21:16:54.000000000 +0100
++++ b/vl.c	2017-03-14 16:02:51.959911847 +0100
+@@ -1871,7 +1871,11 @@
+      /* Cannot call qemu_system_shutdown_request directly because
+       * we are in a signal handler.
+       */
+-    shutdown_requested = 1;
++    if (signal == SIGHUP) {
++        powerdown_requested = 1;
++    } else {
++        shutdown_requested = 1;
++    }
+      qemu_notify_event();
+  }
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---AQBVwLWDhAHCg2dWJhme1uRL1OnwWKDIC
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYyU7iAAoJEKeha0olJ0Nq0xEH/21UzrFe+momMfr9n8W2BuZO
-c1339UIxId2SjJCMI4/tCbjdXmTmJU/Cs00XJlcbJdbM7uChjdY2BCGvbcx3zj9+
-mQ2/mLqL80iTLsCY/sSRFjLalBNELE5phVFgUNLpTpJLofP4ossT2jD7yJu9yiOY
-gMeA01hb7g43wFSqStoknWF6bWPWIZ2xQtrkPZqR4A1ayLI0pKNHGw3TdtYaL7Nz
-8t8UmlP2PXiczUQWUaLKvEDWB4UV49OAEr+GtcsCPIWvAa6RBjFzYM4WBqsIm38Y
-yFOY+/QNtPB0UU/F/nHPqQNaJPcIvPYEApEr7/8X5HmDsDUgeHLl7nrcQRfEU3c=
-=Pfpy
------END PGP SIGNATURE-----
-
---AQBVwLWDhAHCg2dWJhme1uRL1OnwWKDIC--
+--
