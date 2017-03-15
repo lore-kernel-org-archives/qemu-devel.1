@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44353)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1co6Nr-0005YU-0y
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:42:23 -0400
+	(envelope-from <kwolf@redhat.com>) id 1co6QC-0006Vu-E8
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:44:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1co6Nq-0008WS-2E
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:42:23 -0400
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:36335)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1co6Np-0008Vx-QT
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:42:21 -0400
-Received: by mail-wm0-x236.google.com with SMTP id n11so84138945wma.1
-	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 03:42:21 -0700 (PDT)
+	(envelope-from <kwolf@redhat.com>) id 1co6Q7-0000rJ-IU
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:44:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47110)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1co6Q7-0000qr-D6
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:44:43 -0400
+Date: Wed, 15 Mar 2017 11:44:40 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170315104440.GE4030@noname.str.redhat.com>
+References: <20170314095016.GA9580@parabola-pocket>
 MIME-Version: 1.0
-In-Reply-To: <f421ff1e-b6a3-e271-57c1-2b8b5fba6d4b@redhat.com>
-References: <1489585188-14504-1-git-send-email-yang.zhong@intel.com>
-	<f421ff1e-b6a3-e271-57c1-2b8b5fba6d4b@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 15 Mar 2017 10:41:59 +0000
-Message-ID: <CAFEAcA8D+WwHkzdPVizMo9BZk1wjE7O6uCz7HVY=-KYinohUvA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v3] memory: reduce heap Rss size around 3M
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="UlVJffcvxoiEqYs2"
+Content-Disposition: inline
+In-Reply-To: <20170314095016.GA9580@parabola-pocket>
+Subject: Re: [Qemu-devel] Requesting Edit Access to the wiki
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +27,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Yang Zhong <yang.zhong@intel.com>, QEMU Developers <qemu-devel@nongnu.org>, anthony.xu@intel.com
+To: Andreas Grapentin <andreas@grapentin.org>
+Cc: qemu-devel@nongnu.org
 
-On 15 March 2017 at 08:12, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
->
-> On 15/03/2017 14:39, Yang Zhong wrote:
->> Since cpu-memory and memory have same address space,one malloced
->> memory is enough. This patch will skip memory malloc for memory
->> address space,which will reduce around 3M physical memory in heap.
->>
->> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
->> ---
->>  memory.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/memory.c b/memory.c
->> index 64b0a60..0003b1e 100644
->> --- a/memory.c
->> +++ b/memory.c
->> @@ -2422,7 +2422,7 @@ AddressSpace *address_space_init_shareable(MemoryRegion *root, const char *name)
->>      AddressSpace *as;
->>
->>      QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
->> -        if (root == as->root && as->malloced) {
->> +        if (root == as->root && as == &address_space_memory) {
->
-> Of course you need to keep the as->malloced check, don't you?
->
->>              as->ref_count++;
->>              return as;
->>          }
->>
->
-> This is not really beautiful, but compared to v1 and v2 it has the
-> advantage that it works (with the as->malloced check reintroduced).
-> Peter, you introduced address_space_init_shareable, what do you think?
 
-It looks wrong to me. address_space_memory is not allocated
-via address_space_init_shareable(), so it's not correct
-to treat it that way (we're implicitly relying on it never
-being destroyed). It works by accident, not by design.
+--UlVJffcvxoiEqYs2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-If we want to support sharing of address spaces which are
-constant and exist for the lifetime of QEMU then we should
-probably do it with a new function something like
-    address_space_init_static_shareable()
-which marks the AS as being (1) shareable and (2) invalid
-to ever try to destroy. Then you could use that for both
-address_space_memory and address_space_io.
+Hi Andreas,
 
-thanks
--- PMM
+Am 14.03.2017 um 10:50 hat Andreas Grapentin geschrieben:
+> The wiki sais to ask on the mailing list for write access to the wiki,
+> so here I am :)
+
+please send me a private email with your preferred username and an
+initial password (that you'll obviously change immediately) and I can
+create an account for you.
+
+Kevin
+
+--UlVJffcvxoiEqYs2
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBAgAGBQJYyRsYAAoJEH8JsnLIjy/W8zkP/0AiMMViKAphmgj12njcVmvW
+tATGMNvtzuBB+gOma1QDVB9i+gE2DpYyfXJcXnGYCyMBtwNEghfZEyz4qyDfbSHb
+wJUk7ZfmPr6a2ed26m5JUa5Qfr7Gt7/Zn5Ty/VeBQqHHln0C34zuk5ZAAsWG2fce
+MHn7X4BfmP09FbN0h7RzP4fZ7SvmgaTew2GzxCsKWyuYZyMG++z3h1dXYqPwXr6C
+NOBajJYEB3yfQniU8kyxqlH52tnMRvbeHoAaQ5rYuA2E0KDljLYMogFkCff0MEaK
+4LVwaecvOcBZqYq4ryIBNSZuFyK7UO4Q5BVyZz2mC0RBZa/O9uyihCv2DAlod2Dg
+o+VErJIp0p+zgUouepIB8g7f9UgTj55V0SiHmqAHoPRXbissn6k/MU7h3ELzXmV1
+SIiGWca1CMa8qYkTO9vCIVzZyxcqZbEOxwUHOVdQ2CW0Jh2KvbnCNmHTyH6RvhcR
+7vMiEzfrv7lXV1p0kgNkCa3WvwLYxo63hkiVDutBslwbmdX3b2MPcdqOyoocdne+
+OMEwIMlKPLJcsavqcatrjP7QgTB3UjpWq81KbY+YxFaTcvf4iNFvLXUDgrzEPsWE
+92gb4S+qsSGPRir9Olh6dY+/mojzWfjVOqpyAi0TLJCw6o6Bu2jCS9KunjK0Jl+s
+2DBbOx4rFCiWCJnMHICS
+=XRYM
+-----END PGP SIGNATURE-----
+
+--UlVJffcvxoiEqYs2--
