@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53926)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1co9KU-0007cm-2Z
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:51:07 -0400
+	(envelope-from <quintela@redhat.com>) id 1co9KV-0007e0-Cl
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:51:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1co9KT-0003rO-1D
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:51:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47704)
+	(envelope-from <quintela@redhat.com>) id 1co9KU-0003uD-Ko
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:51:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53036)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1co9KS-0003pu-Sd
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:51:04 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1co9KU-0003sg-Ft
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:51:06 -0400
 Received: from int-mx14.intmail.prod.int.phx2.redhat.com
 	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CCC764E4CA
-	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 13:51:04 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 74FB6C05AA63
+	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 13:51:06 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 15 Mar 2017 14:50:16 +0100
-Message-Id: <20170315135021.6978-27-quintela@redhat.com>
+Date: Wed, 15 Mar 2017 14:50:17 +0100
+Message-Id: <20170315135021.6978-28-quintela@redhat.com>
 In-Reply-To: <20170315135021.6978-1-quintela@redhat.com>
 References: <20170315135021.6978-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH 26/31] ram: Remove ram_save_remaining
+Subject: [Qemu-devel] [PATCH 27/31] ram: Move last_req_rb to RAMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,69 +32,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: amit.shah@redhat.com, dgilbert@redhat.com
 
-Just unfold it.  Move ram_bytes_remaining() with the rest of exported
-functions.
+It was on MigrationState when it is only used inside ram.c for
+postcopy.  Problem is that we need to access it without being able to
+pass it RAMState directly.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/ram.c | 19 +++++++------------
- 1 file changed, 7 insertions(+), 12 deletions(-)
+ include/migration/migration.h | 2 --
+ migration/migration.c         | 1 -
+ migration/ram.c               | 6 ++++--
+ 3 files changed, 4 insertions(+), 5 deletions(-)
 
+diff --git a/include/migration/migration.h b/include/migration/migration.h
+index 84cef4b..e032fb0 100644
+--- a/include/migration/migration.h
++++ b/include/migration/migration.h
+@@ -189,8 +189,6 @@ struct MigrationState
+     /* Queue of outstanding page requests from the destination */
+     QemuMutex src_page_req_mutex;
+     QSIMPLEQ_HEAD(src_page_requests, MigrationSrcPageRequest) src_page_requests;
+-    /* The RAMBlock used in the last src_page_request */
+-    RAMBlock *last_req_rb;
+     /* The semaphore is used to notify COLO thread that failover is finished */
+     QemuSemaphore colo_exit_sem;
+ 
+diff --git a/migration/migration.c b/migration/migration.c
+index 46645b6..4f19382 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1114,7 +1114,6 @@ MigrationState *migrate_init(const MigrationParams *params)
+     s->postcopy_after_devices = false;
+     s->postcopy_requests = 0;
+     s->migration_thread_running = false;
+-    s->last_req_rb = NULL;
+     error_free(s->error);
+     s->error = NULL;
+ 
 diff --git a/migration/ram.c b/migration/ram.c
-index 9c9533d..e7db39c 100644
+index e7db39c..50ca1da 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -237,16 +237,16 @@ uint64_t xbzrle_mig_pages_overflow(void)
-     return ram_state.xbzrle_overflows;
- }
+@@ -197,6 +197,8 @@ struct RAMState {
+     QemuMutex bitmap_mutex;
+     /* Ram Bitmap protected by RCU */
+     RAMBitmap *ram_bitmap;
++    /* The RAMBlock used in the last src_page_request */
++    RAMBlock *last_req_rb;
+ };
+ typedef struct RAMState RAMState;
  
--static ram_addr_t ram_save_remaining(void)
--{
--    return ram_state.migration_dirty_pages;
--}
--
- uint64_t ram_bytes_transferred(void)
- {
-     return ram_state.bytes_transferred;
- }
+@@ -1190,7 +1192,7 @@ int ram_save_queue_pages(MigrationState *ms, const char *rbname,
+     rcu_read_lock();
+     if (!rbname) {
+         /* Reuse last RAMBlock */
+-        ramblock = ms->last_req_rb;
++        ramblock = ram_state.last_req_rb;
  
-+uint64_t ram_bytes_remaining(void)
-+{
-+    return ram_state.migration_dirty_pages * TARGET_PAGE_SIZE;
-+}
-+
- /* used by the search for pages to send */
- struct PageSearchStatus {
-     /* Current block being searched */
-@@ -1398,11 +1398,6 @@ void acct_update_position(QEMUFile *f, size_t size, bool zero)
+         if (!ramblock) {
+             /*
+@@ -1208,7 +1210,7 @@ int ram_save_queue_pages(MigrationState *ms, const char *rbname,
+             error_report("ram_save_queue_pages no block '%s'", rbname);
+             goto err;
+         }
+-        ms->last_req_rb = ramblock;
++        ram_state.last_req_rb = ramblock;
      }
- }
- 
--uint64_t ram_bytes_remaining(void)
--{
--    return ram_save_remaining() * TARGET_PAGE_SIZE;
--}
--
- uint64_t ram_bytes_total(void)
- {
-     RAMBlock *block;
-@@ -2109,7 +2104,7 @@ static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
-     RAMState *rs = opaque;
-     uint64_t remaining_size;
- 
--    remaining_size = ram_save_remaining() * TARGET_PAGE_SIZE;
-+    remaining_size = rs->migration_dirty_pages * TARGET_PAGE_SIZE;
- 
-     if (!migration_in_postcopy(migrate_get_current()) &&
-         remaining_size < max_size) {
-@@ -2118,7 +2113,7 @@ static void ram_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
-         migration_bitmap_sync(rs);
-         rcu_read_unlock();
-         qemu_mutex_unlock_iothread();
--        remaining_size = ram_save_remaining() * TARGET_PAGE_SIZE;
-+        remaining_size = rs->migration_dirty_pages * TARGET_PAGE_SIZE;
-     }
- 
-     /* We can do postcopy, and all the data is postcopiable */
+     trace_ram_save_queue_pages(ramblock->idstr, start, len);
+     if (start+len > ramblock->used_length) {
 -- 
 2.9.3
