@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1co0Ax-0002Ot-0j
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 00:04:40 -0400
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1co0Ki-0003yn-Im
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 00:14:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1co0At-0006Fj-0S
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 00:04:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56084)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1co0As-0006EZ-OR
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 00:04:34 -0400
-Date: Wed, 15 Mar 2017 12:04:27 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170315040427.GH12964@pxdev.xzpeter.org>
-References: <1489496187-624-1-git-send-email-peterx@redhat.com>
-	<20170315032001-mutt-send-email-mst@kernel.org>
-	<20170315031550.GG12964@pxdev.xzpeter.org>
-	<20170315052418-mutt-send-email-mst@kernel.org>
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1co0Kf-0004bH-BS
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 00:14:44 -0400
+Received: from [59.151.112.132] (port=59882 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1co0Ke-0004Ym-Vn
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 00:14:41 -0400
+Date: Wed, 15 Mar 2017 12:13:58 +0800
+From: Chao Fan <fanc.fnst@cn.fujitsu.com>
+Message-ID: <20170315041358.GA2818@localhost.localdomain>
+References: <20170314102747.31395-1-fanc.fnst@cn.fujitsu.com>
+	<87o9x4t51k.fsf@secure.mitica> <20170314123730.GO2652@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Disposition: inline
-In-Reply-To: <20170315052418-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH] memory: info mtree check mr range overflow
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20170314123730.GO2652@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] Output dirty-bytes-rate instead of
+ dirty-pages-rate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +29,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, mark.cave-ayland@ilande.co.uk, Peter Maydell <peter.maydell@linaro.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, eblake@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org, caoj.fnst@cn.fujitsu.com, douly.fnst@cn.fujitsu.com, maozy.fnst@cn.fujitsu.com, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-On Wed, Mar 15, 2017 at 05:30:56AM +0200, Michael S. Tsirkin wrote:
-> On Wed, Mar 15, 2017 at 11:15:50AM +0800, Peter Xu wrote:
-> > On Wed, Mar 15, 2017 at 03:24:04AM +0200, Michael S. Tsirkin wrote:
-> > > On Tue, Mar 14, 2017 at 08:56:27PM +0800, Peter Xu wrote:
-> > > > The address of memory regions might overflow when something wrong
-> > > > happened, like reported in:
-> > > > 
-> > > > https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg02043.html
-> > > > 
-> > > > For easier debugging, let's try to detect it.
-> > > > 
-> > > > Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> > > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > 
-> > > 
-> > > After a chat with Paolo, I think the following is a more general fix
-> > > 
-> > > - fix info mtree to do 128 bit math and display more than
-> > >   16 digits if necessary
-> > 
-> > Could you help elaborate in what case will we really need that 128 bit
-> > address?
-> 
-> This is how memory API works. It uses 128 bit addresses (in reality
-> it typically only needs 64 bit addresses but 128 means it can do
-> math without worrying about it too much).
+On Tue, Mar 14, 2017 at 12:37:30PM +0000, Daniel P. Berrange wrote:
+>On Tue, Mar 14, 2017 at 01:29:43PM +0100, Juan Quintela wrote:
+>> Chao Fan <fanc.fnst@cn.fujitsu.com> wrote:
+>> > In hmp, dirty-bytes-rate is more friendly than dirty-pages-rate.
+>> > It's also better for other tools to determine the cpu throttle
+>> > value in different architecture.
+>> >
+>> > Signed-off-by: Chao Fan <fanc.fnst@cn.fujitsu.com>
+>> > Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+>> 
+>> I agree with Daniel here, you can't change the meaning of a field.  Look
+>> at skipped pages.  It is zero know because it is not used anymore, but
+>> we can't drop it.
+>> 
+>> I think it is better to expose page_size.  We have now
+>> 
+>> trasferred: bytes
+>> total: bytes
+>> duplicate: number of zero pages
+>> skipped: always zero.
+>> normal: number of normal pages
+>> normal_bytes: the same  in bytes
+>> mbps: megabytes per second?  I can't even remember this one
+>> dirty_sync_count: number of times we have go through the whole memory
+>> postcopy_requests = number of pages asked by postcopy faults?
+>> dirty_pages_rate = pages by some kind of unit
+>> 
+>> And we haven't yet started with compression or xbzrle.  I think that the
+>> best approach at this point is putting everything in pages except the
+>> things that don't make sense.
+>> 
+>> We can put everything on bytes, but then everything is HUGE.
+>> 
+>> Anyways, what do libvirt/management apps preffer?
+>
+>Since we have many fields already which are reported as page counts, I
+>think just adding page size would be preferrable to having twice as many
+>fields reported duplicating bytes + pages.
+>
+>The only reason to favour duplicating all fields to report bytes, is if
+>we needed to vary page size to deal with huge pages (eg if some reported
+>pages were 4kb and other reported pages with 2MB). You can easily just
+>scale huge pages counts to be "normal"  pages for purpose of reporting
+>though.
+>Regards,
+>Daniel
 
-Yes. To be more specific, could I ask why do we need 128 bits here
-when doing "info mtree"?
+Hi Juan and Daniel,
 
-> Thus a region at offset 0xf << 60 in parent with address 0x1 << 60
-> and size 0x1 << 20 is not "overflowing" it is simply at and address
-> 0x1 << 64 which is outside the range of parent so not visible
-> in the flat view.
-> But same can be said for region at offset 0x1 << 60 in same parent
-> and your patch does nothing to help detect it.
+I am wondering if it's OK to expose page_size in qmp or hmp, just like
+a new command 'info page_size'.
+If confirmed，I will make the new patch.
 
-Not sure I fully understand the case mentioned above... I believe for
-above example, current patch (either with, or without) will print:
+Thanks,
+Chao Fan
 
-    0x2000000000000000
-
-And even with the patch "memory: use 128 bit in info mtree", it should
-print the same. IIUC this is what we want, no? Did I miss anything?
-
-> 
-> > Btw, thanks for pointing out in the other thread that your patch
-> > wasn't printing 128 bits but 64 bits, actually I didn't notice that
-> > before... but even with that, I would still slightly prefer this one
-> > though considering readability and simplicity.
-> 
-> Right but it's just trying to address the specific problem with
-> the given device. Which is unlikely to trigger again exactly
-> in the same way. The general issue is that the child region
-> address is outside the range of the parent.
-
-Hmm... frankly speaking I don't know whether current memory API would
-allow this happen. I just see no danger if that happens, as long as we
-will make sure those outranged regions will never be used during
-rendering.
-
-Anyway, IMHO that's another topic. This patch should be solely solving
-the issue that was reported. Thanks,
-
--- peterx
+>-- 
+>|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+>|: http://libvirt.org              -o-             http://virt-manager.org :|
+>|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+>
+>
