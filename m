@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1co88N-00058y-Qh
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 08:34:32 -0400
+	(envelope-from <yang.zhong@intel.com>) id 1co8T4-0000XL-6X
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 08:55:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1co88J-0007Ri-Qs
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 08:34:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33432)
+	(envelope-from <yang.zhong@intel.com>) id 1co8T1-0008Ak-2m
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 08:55:54 -0400
+Received: from mga14.intel.com ([192.55.52.115]:41326)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1co88J-0007RQ-Ln
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 08:34:27 -0400
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 728487E9C4
-	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 12:34:27 +0000 (UTC)
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Wed, 15 Mar 2017 12:34:21 +0000
-Message-Id: <20170315123421.28815-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] trace: ensure $(tracetool-y) is defined in
- top level makefile
+	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+	id 1co8T0-0008AN-Md
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 08:55:51 -0400
+From: "Zhong, Yang" <yang.zhong@intel.com>
+Date: Wed, 15 Mar 2017 12:49:09 +0000
+Message-ID: <7A85DF989CAE8F42902CF7B31A7D94A139557B8F@shsmsx102.ccr.corp.intel.com>
+References: <1489585188-14504-1-git-send-email-yang.zhong@intel.com>
+	<f421ff1e-b6a3-e271-57c1-2b8b5fba6d4b@redhat.com>
+	<CAFEAcA8D+WwHkzdPVizMo9BZk1wjE7O6uCz7HVY=-KYinohUvA@mail.gmail.com>
+In-Reply-To: <CAFEAcA8D+WwHkzdPVizMo9BZk1wjE7O6uCz7HVY=-KYinohUvA@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v3] memory: reduce heap Rss size around 3M
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +30,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Xu, Anthony" <anthony.xu@intel.com>
 
-The build rules for trace files have a dependancy on $(tracetool-y).
-This variable populated in the trace/Makefile.objs file and thus its
-definition gets pulled into the top level makefile. This happens too
-late in the process though, so by the time $(tracetool-y) is defined,
-make has already evaluated $(tracetool-y) in the dependancies and
-found it to be empty. The result is that when the tracetool source
-is changed, the generated files are not rebuilt. The solution is to
-define the variable in the top level makefile too
-
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- Makefile            | 3 +++
- trace/Makefile.objs | 8 --------
- 2 files changed, 3 insertions(+), 8 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 1c4c04f..dffc74b 100644
---- a/Makefile
-+++ b/Makefile
-@@ -85,6 +85,9 @@ GENERATED_SOURCES += $(TRACE_SOURCES)
- 
- trace-group-name = $(shell dirname $1 | sed -e 's/[^a-zA-Z0-9]/_/g')
- 
-+tracetool-y = $(SRC_PATH)/scripts/tracetool.py
-+tracetool-y += $(shell find $(SRC_PATH)/scripts/tracetool -name "*.py")
-+
- %/trace.h: %/trace.h-timestamp
- 	@cmp $< $@ >/dev/null 2>&1 || cp $< $@
- %/trace.h-timestamp: $(SRC_PATH)/%/trace-events $(tracetool-y)
-diff --git a/trace/Makefile.objs b/trace/Makefile.objs
-index 7de840a..1b8eb4a 100644
---- a/trace/Makefile.objs
-+++ b/trace/Makefile.objs
-@@ -1,13 +1,5 @@
- # -*- mode: makefile -*-
- 
--######################################################################
--# tracetool source files
--# Every rule that invokes tracetool must depend on this so code is regenerated
--# if tracetool itself changes.
--
--tracetool-y = $(SRC_PATH)/scripts/tracetool.py
--tracetool-y += $(shell find $(SRC_PATH)/scripts/tracetool -name "*.py")
--
- $(BUILD_DIR)/trace-events-all: $(trace-events-files)
- 	$(call quiet-command,cat $^ > $@)
- 
--- 
-2.9.3
+SGVsbG8gUGV0ZXIsDQoNClRoZSBjcHUtbWVtb3J5IGFuZCBtZW1vcnkgaGF2ZSBzYW1lIGFkZHJl
+c3Mgc3BhY2UgdGhyb3VnaCBpbmZvIG10cmVlIHRvb2wuDQoNCmFkZHJlc3Mtc3BhY2U6IG1lbW9y
+eQ0KICAwMDAwMDAwMDAwMDAwMDAwLWZmZmZmZmZmZmZmZmZmZmYgKHByaW8gMCwgaS9vKTogc3lz
+dGVtDQogICAgMDAwMDAwMDAwMDAwMDAwMC0wMDAwMDAwMDdmZmZmZmZmIChwcmlvIDAsIGkvbyk6
+IGFsaWFzIHJhbS1iZWxvdy00ZyBAcGMucmFtIDAwMDAwMDAwMDAwMDAwMDAtMDAwMDAwMDA3ZmZm
+ZmZmZg0KICAgIDAwMDAwMDAwMDAwMDAwMDAtZmZmZmZmZmZmZmZmZmZmZiAocHJpbyAtMSwgaS9v
+KTogcGNpDQogICAgICAwMDAwMDAwMDAwMGMwMDAwLTAwMDAwMDAwMDAwZGZmZmYgKHByaW8gMSwg
+cmFtKTogcGMucm9tDQogICAgICAwMDAwMDAwMDAwMGUwMDAwLTAwMDAwMDAwMDAwZmZmZmYgKHBy
+aW8gMSwgaS9vKTogYWxpYXMgaXNhLWJpb3MgQHBjLmJpb3MgMDAwMDAwMDAwMDAyMDAwMC0wMDAw
+MDAwMDAwMDNmZmZmDQogICAgICAwMDAwMDAwMGZmZmMwMDAwLTAwMDAwMDAwZmZmZmZmZmYgKHBy
+aW8gMCwgcm9tKTogcGMuYmlvcw0KDQphZGRyZXNzLXNwYWNlOiBjcHUtbWVtb3J5DQogIDAwMDAw
+MDAwMDAwMDAwMDAtZmZmZmZmZmZmZmZmZmZmZiAocHJpbyAwLCBpL28pOiBzeXN0ZW0NCiAgICAw
+MDAwMDAwMDAwMDAwMDAwLTAwMDAwMDAwN2ZmZmZmZmYgKHByaW8gMCwgaS9vKTogYWxpYXMgcmFt
+LWJlbG93LTRnIEBwYy5yYW0gMDAwMDAwMDAwMDAwMDAwMC0wMDAwMDAwMDdmZmZmZmZmDQogICAg
+MDAwMDAwMDAwMDAwMDAwMC1mZmZmZmZmZmZmZmZmZmZmIChwcmlvIC0xLCBpL28pOiBwY2kNCiAg
+ICAgIDAwMDAwMDAwMDAwYzAwMDAtMDAwMDAwMDAwMDBkZmZmZiAocHJpbyAxLCByYW0pOiBwYy5y
+b20NCiAgICAgIDAwMDAwMDAwMDAwZTAwMDAtMDAwMDAwMDAwMDBmZmZmZiAocHJpbyAxLCBpL28p
+OiBhbGlhcyBpc2EtYmlvcyBAcGMuYmlvcyAwMDAwMDAwMDAwMDIwMDAwLTAwMDAwMDAwMDAwM2Zm
+ZmYNCiAgICAgIDAwMDAwMDAwZmZmYzAwMDAtMDAwMDAwMDBmZmZmZmZmZiAocHJpbyAwLCByb20p
+OiBwYy5iaW9zDQoNClNvIHdlIGNhbiBvbWl0IHRoZSBjcHUtbWVtb3J5IGFkZHJlc3Mgc3BhY2Ug
+YWxsb2NhdGVkIGluIHRoZSBhZGRyZXNzX3NwYWNlX2luaXRfc2hhcmVhYmxlKCksIHdoaWNoIHdp
+bGwgc2FtZSBhcm91bmQgM00gcGh5c2ljYWwgbWVtb3J5Lg0KDQpNYXliZSB0aGUgYmVsb3cgcGF0
+Y2ggaXMgbXVjaCBiZXR0ZXIsIHBsZWFzZSBoZWxwIHJldmlldywgdGhhbmtzIQ0KDQpkaWZmIC0t
+Z2l0IGEvbWVtb3J5LmMgYi9tZW1vcnkuYw0KaW5kZXggNjRiMGE2MC4uMjMwZjJjYiAxMDA2NDQN
+Ci0tLSBhL21lbW9yeS5jDQorKysgYi9tZW1vcnkuYw0KQEAgLTI0MjIsNyArMjQyMiw3IEBAIEFk
+ZHJlc3NTcGFjZSAqYWRkcmVzc19zcGFjZV9pbml0X3NoYXJlYWJsZShNZW1vcnlSZWdpb24gKnJv
+b3QsIGNvbnN0IGNoYXIgKm5hbWUpDQogICAgIEFkZHJlc3NTcGFjZSAqYXM7DQoNCiAgICAgUVRB
+SUxRX0ZPUkVBQ0goYXMsICZhZGRyZXNzX3NwYWNlcywgYWRkcmVzc19zcGFjZXNfbGluaykgew0K
+LSAgICAgICAgaWYgKHJvb3QgPT0gYXMtPnJvb3QgJiYgYXMtPm1hbGxvY2VkKSB7DQorICAgICAg
+ICBpZiAocm9vdCA9PSBhcy0+cm9vdCAmJiAoYXMtPm1hbGxvY2VkIHx8IGFzID09ICZhZGRyZXNz
+X3NwYWNlX21lbW9yeSkpIHsNCiAgICAgICAgICAgICBhcy0+cmVmX2NvdW50Kys7DQogICAgICAg
+ICAgICAgcmV0dXJuIGFzOw0KICAgICAgICAgfSANCg0KDQpSZWdhcmRzLA0KDQpaaG9uZ1lhbmcN
+Cg0KDQoNCg0KZGlmZiAtLWdpdCBhL21lbW9yeS5jIGIvbWVtb3J5LmMNCmluZGV4IDY0YjBhNjAu
+LjIzMGYyY2IgMTAwNjQ0DQotLS0gYS9tZW1vcnkuYw0KKysrIGIvbWVtb3J5LmMNCkBAIC0yNDIy
+LDcgKzI0MjIsNyBAQCBBZGRyZXNzU3BhY2UgKmFkZHJlc3Nfc3BhY2VfaW5pdF9zaGFyZWFibGUo
+TWVtb3J5UmVnaW9uICpyb290LCBjb25zdCBjaGFyICpuYW1lKQ0KICAgICBBZGRyZXNzU3BhY2Ug
+KmFzOw0KDQogICAgIFFUQUlMUV9GT1JFQUNIKGFzLCAmYWRkcmVzc19zcGFjZXMsIGFkZHJlc3Nf
+c3BhY2VzX2xpbmspIHsNCi0gICAgICAgIGlmIChyb290ID09IGFzLT5yb290ICYmIGFzLT5tYWxs
+b2NlZCkgew0KKyAgICAgICAgaWYgKHJvb3QgPT0gYXMtPnJvb3QgJiYgKGFzLT5tYWxsb2NlZCB8
+fCBhcyA9PSAmYWRkcmVzc19zcGFjZV9tZW1vcnkpKSB7DQogICAgICAgICAgICAgYXMtPnJlZl9j
+b3VudCsrOw0KICAgICAgICAgICAgIHJldHVybiBhczsNCiAgICAgICAgIH0NCg0KDQoNCg0KLS0t
+LS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IFBldGVyIE1heWRlbGwgW21haWx0bzpwZXRl
+ci5tYXlkZWxsQGxpbmFyby5vcmddIA0KU2VudDogV2VkbmVzZGF5LCBNYXJjaCAxNSwgMjAxNyA2
+OjQyIFBNDQpUbzogUGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT4NCkNjOiBaaG9u
+ZywgWWFuZyA8eWFuZy56aG9uZ0BpbnRlbC5jb20+OyBRRU1VIERldmVsb3BlcnMgPHFlbXUtZGV2
+ZWxAbm9uZ251Lm9yZz47IFh1LCBBbnRob255IDxhbnRob255Lnh1QGludGVsLmNvbT4NClN1Ympl
+Y3Q6IFJlOiBbUEFUQ0ggdjNdIG1lbW9yeTogcmVkdWNlIGhlYXAgUnNzIHNpemUgYXJvdW5kIDNN
+DQoNCk9uIDE1IE1hcmNoIDIwMTcgYXQgMDg6MTIsIFBhb2xvIEJvbnppbmkgPHBib256aW5pQHJl
+ZGhhdC5jb20+IHdyb3RlOg0KPg0KPg0KPiBPbiAxNS8wMy8yMDE3IDE0OjM5LCBZYW5nIFpob25n
+IHdyb3RlOg0KPj4gU2luY2UgY3B1LW1lbW9yeSBhbmQgbWVtb3J5IGhhdmUgc2FtZSBhZGRyZXNz
+IHNwYWNlLG9uZSBtYWxsb2NlZCANCj4+IG1lbW9yeSBpcyBlbm91Z2guIFRoaXMgcGF0Y2ggd2ls
+bCBza2lwIG1lbW9yeSBtYWxsb2MgZm9yIG1lbW9yeSANCj4+IGFkZHJlc3Mgc3BhY2Usd2hpY2gg
+d2lsbCByZWR1Y2UgYXJvdW5kIDNNIHBoeXNpY2FsIG1lbW9yeSBpbiBoZWFwLg0KPj4NCj4+IFNp
+Z25lZC1vZmYtYnk6IFlhbmcgWmhvbmcgPHlhbmcuemhvbmdAaW50ZWwuY29tPg0KPj4gLS0tDQo+
+PiAgbWVtb3J5LmMgfCAyICstDQo+PiAgMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAx
+IGRlbGV0aW9uKC0pDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL21lbW9yeS5jIGIvbWVtb3J5LmMNCj4+
+IGluZGV4IDY0YjBhNjAuLjAwMDNiMWUgMTAwNjQ0DQo+PiAtLS0gYS9tZW1vcnkuYw0KPj4gKysr
+IGIvbWVtb3J5LmMNCj4+IEBAIC0yNDIyLDcgKzI0MjIsNyBAQCBBZGRyZXNzU3BhY2UgKmFkZHJl
+c3Nfc3BhY2VfaW5pdF9zaGFyZWFibGUoTWVtb3J5UmVnaW9uICpyb290LCBjb25zdCBjaGFyICpu
+YW1lKQ0KPj4gICAgICBBZGRyZXNzU3BhY2UgKmFzOw0KPj4NCj4+ICAgICAgUVRBSUxRX0ZPUkVB
+Q0goYXMsICZhZGRyZXNzX3NwYWNlcywgYWRkcmVzc19zcGFjZXNfbGluaykgew0KPj4gLSAgICAg
+ICAgaWYgKHJvb3QgPT0gYXMtPnJvb3QgJiYgYXMtPm1hbGxvY2VkKSB7DQo+PiArICAgICAgICBp
+ZiAocm9vdCA9PSBhcy0+cm9vdCAmJiBhcyA9PSAmYWRkcmVzc19zcGFjZV9tZW1vcnkpIHsNCj4N
+Cj4gT2YgY291cnNlIHlvdSBuZWVkIHRvIGtlZXAgdGhlIGFzLT5tYWxsb2NlZCBjaGVjaywgZG9u
+J3QgeW91Pw0KPg0KPj4gICAgICAgICAgICAgIGFzLT5yZWZfY291bnQrKzsNCj4+ICAgICAgICAg
+ICAgICByZXR1cm4gYXM7DQo+PiAgICAgICAgICB9DQo+Pg0KPg0KPiBUaGlzIGlzIG5vdCByZWFs
+bHkgYmVhdXRpZnVsLCBidXQgY29tcGFyZWQgdG8gdjEgYW5kIHYyIGl0IGhhcyB0aGUgDQo+IGFk
+dmFudGFnZSB0aGF0IGl0IHdvcmtzICh3aXRoIHRoZSBhcy0+bWFsbG9jZWQgY2hlY2sgcmVpbnRy
+b2R1Y2VkKS4NCj4gUGV0ZXIsIHlvdSBpbnRyb2R1Y2VkIGFkZHJlc3Nfc3BhY2VfaW5pdF9zaGFy
+ZWFibGUsIHdoYXQgZG8geW91IHRoaW5rPw0KDQpJdCBsb29rcyB3cm9uZyB0byBtZS4gYWRkcmVz
+c19zcGFjZV9tZW1vcnkgaXMgbm90IGFsbG9jYXRlZCB2aWEgYWRkcmVzc19zcGFjZV9pbml0X3No
+YXJlYWJsZSgpLCBzbyBpdCdzIG5vdCBjb3JyZWN0IHRvIHRyZWF0IGl0IHRoYXQgd2F5ICh3ZSdy
+ZSBpbXBsaWNpdGx5IHJlbHlpbmcgb24gaXQgbmV2ZXIgYmVpbmcgZGVzdHJveWVkKS4gSXQgd29y
+a3MgYnkgYWNjaWRlbnQsIG5vdCBieSBkZXNpZ24uDQoNCklmIHdlIHdhbnQgdG8gc3VwcG9ydCBz
+aGFyaW5nIG9mIGFkZHJlc3Mgc3BhY2VzIHdoaWNoIGFyZSBjb25zdGFudCBhbmQgZXhpc3QgZm9y
+IHRoZSBsaWZldGltZSBvZiBRRU1VIHRoZW4gd2Ugc2hvdWxkIHByb2JhYmx5IGRvIGl0IHdpdGgg
+YSBuZXcgZnVuY3Rpb24gc29tZXRoaW5nIGxpa2UNCiAgICBhZGRyZXNzX3NwYWNlX2luaXRfc3Rh
+dGljX3NoYXJlYWJsZSgpDQp3aGljaCBtYXJrcyB0aGUgQVMgYXMgYmVpbmcgKDEpIHNoYXJlYWJs
+ZSBhbmQgKDIpIGludmFsaWQgdG8gZXZlciB0cnkgdG8gZGVzdHJveS4gVGhlbiB5b3UgY291bGQg
+dXNlIHRoYXQgZm9yIGJvdGggYWRkcmVzc19zcGFjZV9tZW1vcnkgYW5kIGFkZHJlc3Nfc3BhY2Vf
+aW8uDQoNCnRoYW5rcw0KLS0gUE1NDQo=
