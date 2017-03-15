@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43197)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eswierk@skyportsystems.com>) id 1coCgb-0003EF-Is
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 13:26:10 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1coClb-00052F-B6
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 13:31:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eswierk@skyportsystems.com>) id 1coCga-0001yi-KK
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 13:26:09 -0400
-Received: from mail-ua0-x22b.google.com ([2607:f8b0:400c:c08::22b]:34731)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <eswierk@skyportsystems.com>)
-	id 1coCga-0001xR-Ac
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 13:26:08 -0400
-Received: by mail-ua0-x22b.google.com with SMTP id f54so13272165uaa.1
-	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 10:26:08 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1coCla-0003ep-F0
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 13:31:19 -0400
+Date: Wed, 15 Mar 2017 17:31:09 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170315173108.GB2701@work-vm>
+References: <1489549053-31728-1-git-send-email-jemmy858585@gmail.com>
+	<20170315111021.GD3088@lemon.lan>
 MIME-Version: 1.0
-In-Reply-To: <20170314153626.16989-3-famz@redhat.com>
-References: <20170314153626.16989-1-famz@redhat.com>
-	<20170314153626.16989-3-famz@redhat.com>
-From: Ed Swierk <eswierk@skyportsystems.com>
-Date: Wed, 15 Mar 2017 10:25:26 -0700
-Message-ID: <CAO_EM_=7u2L=HO+ipbyqeTOPAbfEa0+Xa9SpW+OSTMF+dJ3c6A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] virtio-scsi: Fix acquire/release in
- dataplane handlers
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170315111021.GD3088@lemon.lan>
+Subject: Re: [Qemu-devel] [PATCH v2] migration/block: Avoid invoking
+ blk_drain too frequently
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,31 +25,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Lidong Chen <jemmy858585@gmail.com>, qemu-devel@nongnu.org, stefanha@redhat.com, quintela@redhat.com, qemu-block@nongnu.org
 
-On Tue, Mar 14, 2017 at 8:36 AM, Fam Zheng <famz@redhat.com> wrote:
-> After the AioContext lock push down, there is a race between
-> virtio_scsi_dataplane_start and those "assert(s->ctx &&
-> s->dataplane_started)", because the latter doesn't isn't wrapped in
-> aio_context_acquire.
->
-> Reproducer is simply booting a Fedora guest with an empty
-> virtio-scsi-dataplane controller:
->
->     qemu-system-x86_64 \
->       -drive if=none,id=root,format=raw,file=Fedora-Cloud-Base-25-1.3.x86_64.raw \
->       -device virtio-scsi \
->       -device scsi-disk,drive=root,bootindex=1 \
->       -object iothread,id=io \
->       -device virtio-scsi-pci,iothread=io \
->       -net user,hostfwd=tcp::10022-:22 -net nic,model=virtio -m 2048 \
->       --enable-kvm
->
-> Fix this by moving acquire/release pairs from virtio_scsi_handle_*_vq to
-> their callers - and wrap the broken assertions in.
->
-> Signed-off-by: Fam Zheng <famz@redhat.com>
+* Fam Zheng (famz@redhat.com) wrote:
+> On Wed, 03/15 11:37, Lidong Chen wrote:
+> > Increase bmds->cur_dirty after submit io, so reduce the frequency
+> > involve into blk_drain, and improve the performance obviously
+> > when block migration.
+> > 
+> > The performance test result of this patch:
+> > 
+> > During the block dirty save phase, this patch improve guest os IOPS
+> > from 4.0K to 9.5K. and improve the migration speed from
+> > 505856 rsec/s to 855756 rsec/s.
+> > 
+> > Signed-off-by: Lidong Chen <jemmy858585@gmail.com>
+> > ---
+> >  migration/block.c | 3 +++
+> >  1 file changed, 3 insertions(+)
+> > 
+> > diff --git a/migration/block.c b/migration/block.c
+> > index 6741228..7734ff7 100644
+> > --- a/migration/block.c
+> > +++ b/migration/block.c
+> > @@ -576,6 +576,9 @@ static int mig_save_device_dirty(QEMUFile *f, BlkMigDevState *bmds,
+> >              }
+> >  
+> >              bdrv_reset_dirty_bitmap(bmds->dirty_bitmap, sector, nr_sectors);
+> > +            sector += nr_sectors;
+> > +            bmds->cur_dirty = sector;
+> > +
+> >              break;
+> >          }
+> >          sector += BDRV_SECTORS_PER_DIRTY_CHUNK;
+> > -- 
+> > 1.8.3.1
+> > 
+> 
+> Nice catch above all, thank you!
+> 
+> Reviewed-by: Fam Zheng <famz@redhat.com>
 
-Verified this fixes the assertion failure on 2.9.0-rc0.
+Are you taking that via a block pull?
 
-Tested-by: Ed Swierk <eswierk@skyportsystems.com>
+Dave
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
