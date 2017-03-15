@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <SRS0=cU38=2Y=redhat.com=mst@kernel.org>)
-	id 1coDF7-0003LP-B8
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 14:01:50 -0400
+	(envelope-from <berrange@redhat.com>) id 1coDLd-0000CV-6U
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 14:08:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <SRS0=cU38=2Y=redhat.com=mst@kernel.org>)
-	id 1coDF6-0006yy-NQ
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 14:01:49 -0400
-Date: Wed, 15 Mar 2017 20:01:44 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1489600837-11541-8-git-send-email-mst@redhat.com>
-References: <1489600837-11541-1-git-send-email-mst@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1coDLZ-0002yu-G2
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 14:08:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36236)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1coDLZ-0002yK-7j
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 14:08:29 -0400
+Date: Wed, 15 Mar 2017 18:08:22 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170315180822.GU7770@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <11569d75b61122820f186a32cdd20689@whitewinterwolf.com>
+	<20170315144124.GP7770@redhat.com>
+	<23d89ab3bd16ebf7a864ab75c300de7b@whitewinterwolf.com>
+	<CAFEAcA-9GXiS+ByQgo+=tQ-_ZGR5egDcZMurEyfiA9vPkE9O9w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1489600837-11541-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 7/7] virtio-pci: reset modern vq meta data
+In-Reply-To: <CAFEAcA-9GXiS+ByQgo+=tQ-_ZGR5egDcZMurEyfiA9vPkE9O9w@mail.gmail.com>
+Subject: Re: [Qemu-devel] [Bug 1217339] [PATCH] Unix signal to send
+ ACPI-shutdown to Guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,38 +31,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, qemu-stable@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Simon <qemu.bugs@whitewinterwolf.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-From: Jason Wang <jasowang@redhat.com>
+On Wed, Mar 15, 2017 at 06:00:40PM +0000, Peter Maydell wrote:
+> On 15 March 2017 at 17:46, Simon <qemu.bugs@whitewinterwolf.com> wrote:
+> > OK for not using SIGHUP and keep SIGTERM, SIGINT and SIGHUP to have the
+> > same behavior.
+> >
+> > SIGQUIT is reserved for core files generation.
+> >
+> > SIGUSR1 is already used in 'util/qemu-progress.c' to trigger a report
+> > on ongoing jobs, so it does not seem usable.
+> >
+> > SIGUSR2 is temporarily used in 'util/coroutine-sigaltstack.c' which
+> > takes care however to preserve the original handler. I did not saw
+> > any other place where it is used, so it seems to be a better candidate.
+> 
+> I don't think we can use SIGUSR2 here -- as you say, it's used
+> in the sigaltstack version of coroutines, and so there would
+> be races if the user tried to use SIGUSR2 to power down the
+> machine while we happened to be starting a new coroutine.
+> 
+> SIGUSR1 is also no good, as it is used by main-loop.c as
+> the SIG_IPI.
 
-We don't reset proxy->vqs[].{num|desc[]|avail[]|used[]}. This means if
-a driver enable the vq without setting vq address after reset. The old
-addresses were leaked. Fixing this by resetting modern vq meta data
-during device reset.
+Which means we'd be into the realm of having to pick  SIGRTMIN + N for
+some arbitrary N >= 0
 
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Jason Wang <jasowang@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- hw/virtio/virtio-pci.c | 4 ++++
- 1 file changed, 4 insertions(+)
 
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 5ce42af..69cc471 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -1857,6 +1857,10 @@ static void virtio_pci_reset(DeviceState *qdev)
- 
-     for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
-         proxy->vqs[i].enabled = 0;
-+        proxy->vqs[i].num = 0;
-+        proxy->vqs[i].desc[0] = proxy->vqs[i].desc[1] = 0;
-+        proxy->vqs[i].avail[0] = proxy->vqs[i].avail[1] = 0;
-+        proxy->vqs[i].used[0] = proxy->vqs[i].used[1] = 0;
-     }
- }
- 
+Regards,
+Daniel
 -- 
-MST
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
