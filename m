@@ -1,36 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1co6Ut-0007xE-7c
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:49:40 -0400
+	(envelope-from <groug@kaod.org>) id 1co6X5-0000du-GM
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:51:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1co6Up-0002U6-G5
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:49:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44216)
+	(envelope-from <groug@kaod.org>) id 1co6X0-0003LT-KL
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:51:55 -0400
+Received: from 8.mo68.mail-out.ovh.net ([46.105.74.219]:46112)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1co6Up-0002Tp-7G
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:49:35 -0400
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 352EC4E03F
-	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 10:49:35 +0000 (UTC)
-Date: Wed, 15 Mar 2017 10:49:29 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170315104929.GG7770@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170301123223.12489-1-berrange@redhat.com>
-	<a08dc58b-a169-cb17-2187-1b66c6878a39@redhat.com>
-	<20170302123300.GJ29835@redhat.com>
-	<87d1dys9mr.fsf@dusky.pond.sub.org> <20170314184909.GC7576@work-vm>
-	<87bmt3t5r0.fsf@dusky.pond.sub.org> <20170315093226.GB2430@work-vm>
-	<87h92ultmu.fsf@dusky.pond.sub.org> <20170315103634.GC2430@work-vm>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1co6X0-0003LK-Dz
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:51:50 -0400
+Received: from player763.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id A5CEE41D8B
+	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 11:51:48 +0100 (CET)
+Date: Wed, 15 Mar 2017 11:51:40 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170315115140.21e746d3@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <1489449360-14411-6-git-send-email-sstabellini@kernel.org>
+References: <alpine.DEB.2.10.1703131650550.21520@sstabellini-ThinkPad-X260>
+	<1489449360-14411-1-git-send-email-sstabellini@kernel.org>
+	<1489449360-14411-6-git-send-email-sstabellini@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170315103634.GC2430@work-vm>
-Subject: Re: [Qemu-devel] [PATCH] migration: allow clearing migration string
- parameters
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/gd5X2ldQ6Wiq9J63FjhgzUf";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v2 6/9] xen/9pfs: receive requests from the
+ frontend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,67 +33,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: Stefano Stabellini <sstabellini@kernel.org>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, anthony.perard@citrix.com, Stefano Stabellini <stefano@aporeto.com>, jgross@suse.com, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
 
-On Wed, Mar 15, 2017 at 10:36:35AM +0000, Dr. David Alan Gilbert wrote:
-> * Markus Armbruster (armbru@redhat.com) wrote:
-> > "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
-> > 
-> > > * Markus Armbruster (armbru@redhat.com) wrote:
-> > >> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
-> > [...]
-> > >> > I'm confused why we need a 'reset to default' - all we need is the ability
-> > >> > to change each parameter, and for the new value of that parameter
-> > >> > to be an empty string.
-> > >> 
-> > >> You argue syntax, I'm arguing semantics.
-> > >> 
-> > >> The command means "set parameter P to value V".  *Except* when V is "",
-> > >> it means something else, namely "reset parameter P to its default,
-> > >> whatever that may be".
-> > >> 
-> > >> This is (a) not general, because it won't do for cases where "" may
-> > >> occur as value, and (b) ugly.
-> > >> 
-> > >> Ugliness is the eye of the beholder.  Lack of generality isn't.
-> > >
-> > > No, I'm questioning why it's defined as 'reset parameter P to its default';
-> > > why do we need a way to do that?
-> > 
-> > Dan's commit message explains:
-> > 
-> >     Some of the migration parameters are strings, which default to NULL,
-> >     eg tls_hostname and tls_creds.
-> > 
-> >     The mgmt app will set the tls_creds parameter on both source and target
-> >     QEMU instances, in order to trigger use of TLS for migration.
-> > 
-> >     After performing a TLS encrypted migration though, migration might be
-> >     used for other reasons - for example, to save the QEMU state to a file.
-> >     We need TLS turned off when doing this, but the migrate-set-parameters
-> >     QAPI command does not provide any facility to clear/reset parameters
-> >     to their default state.
-> > 
-> >     If you simply ommit the tls_creds parameter in migrate-set-parameters,
-> >     then 'has_tls_creds' will be false and so no action will be taken. The
-> >     only option that works with migrate-set-parameters is to treat "" on
-> >     the wire as equivalent to requesting NULL. Failing that we would have
-> >     to create a new 'migrate-reset-parameters' method to explicitly put
-> >     a parameter back to its default value.
-> 
-> OK, I thought the default was empty string.
-> IMHO the problem here is we're just being too clever; lets just make
-> the default "" rather than NULL, and make that parameter always be
-> a string.
+--Sig_/gd5X2ldQ6Wiq9J63FjhgzUf
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
->From an internal migration code POV I think NULL is right, but none the
-less I'll create a patch showing what using "" internally would look
-like so we can compare
+On Mon, 13 Mar 2017 16:55:57 -0700
+Stefano Stabellini <sstabellini@kernel.org> wrote:
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+> Upon receiving an event channel notification from the frontend, schedule
+> the bottom half. From the bottom half, read one request from the ring,
+> create a pdu and call pdu_submit to handle it.
+>=20
+> For now, only handle one request per ring at a time.
+>=20
+> Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
+> CC: anthony.perard@citrix.com
+> CC: jgross@suse.com
+> CC: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
+> CC: Greg Kurz <groug@kaod.org>
+> ---
+>  hw/9pfs/xen-9p-backend.c | 47 ++++++++++++++++++++++++++++++++++++++++++=
++++++
+>  1 file changed, 47 insertions(+)
+>=20
+> diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
+> index 0e4a133..741dd31 100644
+> --- a/hw/9pfs/xen-9p-backend.c
+> +++ b/hw/9pfs/xen-9p-backend.c
+> @@ -94,12 +94,59 @@ static int xen_9pfs_init(struct XenDevice *xendev)
+>      return 0;
+>  }
+> =20
+> +static int xen_9pfs_receive(struct Xen9pfsRing *ring)
+
+Coding style for structured types.
+
+> +{
+> +    struct xen_9pfs_header h;
+> +    RING_IDX cons, prod, masked_prod, masked_cons;
+> +    V9fsPDU *pdu;
+> +
+> +    if (ring->inprogress) {
+> +        return 0;
+> +    }
+> +
+> +    cons =3D ring->intf->out_cons;
+> +    prod =3D ring->intf->out_prod;
+> +    xen_rmb();
+> +
+> +    if (xen_9pfs_queued(prod, cons, XEN_9PFS_RING_SIZE) < sizeof(h)) {
+> +        return 0;
+> +    }
+> +    ring->inprogress =3D true;
+> +
+> +    masked_prod =3D xen_9pfs_mask(prod, XEN_9PFS_RING_SIZE);
+> +    masked_cons =3D xen_9pfs_mask(cons, XEN_9PFS_RING_SIZE);
+> +
+> +    xen_9pfs_read_packet(ring->ring.out, masked_prod, &masked_cons,
+> +                         XEN_9PFS_RING_SIZE, (uint8_t*) &h, sizeof(h));
+> +
+> +    pdu =3D pdu_alloc(&ring->priv->state);
+
+pdu_alloc() can theoretically return NULL. Maybe add a comment to
+indicate this won't happen because "for now [we] only handle one
+request per ring at a time".
+
+> +    pdu->size =3D h.size;
+> +    pdu->id =3D h.id;
+> +    pdu->tag =3D h.tag;
+> +    ring->out_size =3D h.size;
+> +    ring->out_cons =3D cons + h.size;
+> +
+> +    qemu_co_queue_init(&pdu->complete);
+> +    pdu_submit(pdu);
+> +
+> +    return 0;
+> +}
+> +
+>  static void xen_9pfs_bh(void *opaque)
+>  {
+> +    struct Xen9pfsRing *ring =3D opaque;
+
+Coding style for structured types.
+
+> +    xen_9pfs_receive(ring);
+>  }
+> =20
+>  static void xen_9pfs_evtchn_event(void *opaque)
+>  {
+> +    struct Xen9pfsRing *ring =3D opaque;
+
+Coding style for structured types.
+
+> +    evtchn_port_t port;
+> +
+> +    port =3D xenevtchn_pending(ring->evtchndev);
+> +    xenevtchn_unmask(ring->evtchndev, port);
+> +
+> +    qemu_bh_schedule(ring->bh);
+>  }
+> =20
+>  static int xen_9pfs_free(struct XenDevice *xendev)
+
+
+--Sig_/gd5X2ldQ6Wiq9J63FjhgzUf
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAljJHLwACgkQAvw66wEB28JArQCfTbVpYNLyzb1fIw6OJ76CNYEW
+0x4AoJ5gom2oEohJj3PZahGJcH9fs/e4
+=DpHv
+-----END PGP SIGNATURE-----
+
+--Sig_/gd5X2ldQ6Wiq9J63FjhgzUf--
