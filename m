@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1co0Ti-0005Nt-Ln
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 00:24:04 -0400
+	(envelope-from <bounces@canonical.com>) id 1co0ZV-0006Bm-23
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 00:30:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1co0Tf-0008Fi-ED
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 00:24:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46934)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1co0Tf-0008Eb-5V
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 00:23:59 -0400
-Date: Wed, 15 Mar 2017 06:23:56 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170315061900-mutt-send-email-mst@kernel.org>
-References: <1489496187-624-1-git-send-email-peterx@redhat.com>
-	<20170315032001-mutt-send-email-mst@kernel.org>
-	<20170315031550.GG12964@pxdev.xzpeter.org>
-	<20170315052418-mutt-send-email-mst@kernel.org>
-	<20170315040427.GH12964@pxdev.xzpeter.org>
+	(envelope-from <bounces@canonical.com>) id 1co0ZR-000454-Ri
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 00:30:00 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34377)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1co0ZR-00044f-MF
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 00:29:57 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1co0ZO-0007Ik-Rq
+	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 04:29:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B3BAA2E8088
+	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 04:29:54 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170315040427.GH12964@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH] memory: info mtree check mr range overflow
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 15 Mar 2017 04:17:20 -0000
+From: Launchpad Bug Tracker <893068@bugs.launchpad.net>
+Reply-To: Bug 893068 <893068@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20111121114443.4682.78512.malonedeb@soybean.canonical.com>
+Message-Id: <20170315041720.21061.72466.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 893068] Re: Spanish keys { and [ did not work
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,92 +36,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, mark.cave-ayland@ilande.co.uk, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
 
-On Wed, Mar 15, 2017 at 12:04:27PM +0800, Peter Xu wrote:
-> On Wed, Mar 15, 2017 at 05:30:56AM +0200, Michael S. Tsirkin wrote:
-> > On Wed, Mar 15, 2017 at 11:15:50AM +0800, Peter Xu wrote:
-> > > On Wed, Mar 15, 2017 at 03:24:04AM +0200, Michael S. Tsirkin wrote:
-> > > > On Tue, Mar 14, 2017 at 08:56:27PM +0800, Peter Xu wrote:
-> > > > > The address of memory regions might overflow when something wrong
-> > > > > happened, like reported in:
-> > > > > 
-> > > > > https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg02043.html
-> > > > > 
-> > > > > For easier debugging, let's try to detect it.
-> > > > > 
-> > > > > Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> > > > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > > 
-> > > > 
-> > > > After a chat with Paolo, I think the following is a more general fix
-> > > > 
-> > > > - fix info mtree to do 128 bit math and display more than
-> > > >   16 digits if necessary
-> > > 
-> > > Could you help elaborate in what case will we really need that 128 bit
-> > > address?
-> > 
-> > This is how memory API works. It uses 128 bit addresses (in reality
-> > it typically only needs 64 bit addresses but 128 means it can do
-> > math without worrying about it too much).
-> 
-> Yes. To be more specific, could I ask why do we need 128 bits here
-> when doing "info mtree"?
+[Expired for QEMU because there has been no activity for 60 days.]
 
-Because when you add two 64 bit addresses you sometimes get a 67
-bit one. info mtree shows some fictitious data: base/end addresses
-that region would have had if it was fully visible in a flatview.
-67 bit addresses are never visible there, that is true,
-but that is not the only kind of address that is not visible
-in flatview yet shown by info mtree.
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-> > Thus a region at offset 0xf << 60 in parent with address 0x1 << 60
-> > and size 0x1 << 20 is not "overflowing" it is simply at and address
-> > 0x1 << 64 which is outside the range of parent so not visible
-> > in the flat view.
-> > But same can be said for region at offset 0x1 << 60 in same parent
-> > and your patch does nothing to help detect it.
-> 
-> Not sure I fully understand the case mentioned above... I believe for
-> above example, current patch (either with, or without) will print:
-> 
->     0x2000000000000000
-> 
-> And even with the patch "memory: use 128 bit in info mtree", it should
-> print the same. IIUC this is what we want, no? Did I miss anything?
+-- =
 
-What are you trying to achieve though? The issue that started
-it all is an openbios bug which did not init 64 bit bars
-correctly. As a result the bar was not visible to guest
-in the flatview and device did not work.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/893068
 
+Title:
+  Spanish keys { and [ did not work
 
-> > 
-> > > Btw, thanks for pointing out in the other thread that your patch
-> > > wasn't printing 128 bits but 64 bits, actually I didn't notice that
-> > > before... but even with that, I would still slightly prefer this one
-> > > though considering readability and simplicity.
-> > 
-> > Right but it's just trying to address the specific problem with
-> > the given device. Which is unlikely to trigger again exactly
-> > in the same way. The general issue is that the child region
-> > address is outside the range of the parent.
-> 
-> Hmm... frankly speaking I don't know whether current memory API would
-> allow this happen. I just see no danger if that happens, as long as we
-> will make sure those outranged regions will never be used during
-> rendering.
-> 
-> Anyway, IMHO that's another topic. This patch should be solely solving
-> the issue that was reported. Thanks,
-> 
-> -- peterx
+Status in QEMU:
+  Expired
 
+Bug description:
+  The keys { and [ did not work inside the virtualized enviorment
+  (widnows 7).  The problems happens ussing aqemu as a front end as well
+  as invoking qemu-kvm from command line:
 
-I think we need to address the root issue which is 64 bit math
-which is the wrong thing to do within memory core.
+  qemu-kvm -m 8096 eclipse.img -smp cores=3D4,threads=3D2 -hdb ander.img -k
+  es
 
--- 
-MST
+  We have also notices this warning in the console:
+
+  Warning: no scancode found for keysym 314
+
+  The host system is gentoo stable with some exceptions (mainly qemu-
+  kvm-0.15.1-r1, gcc-4.6.2 and kernel-3.2_rc2)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/893068/+subscriptions
