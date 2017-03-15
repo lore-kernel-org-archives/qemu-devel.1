@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1co8du-0000yP-Oo
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:07:07 -0400
+	(envelope-from <famz@redhat.com>) id 1co8kQ-00079v-44
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:13:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1co8dp-0006Tf-Rl
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:07:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51480)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1co8dp-0006S1-MK
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:07:01 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1489385927-6735-1-git-send-email-armbru@redhat.com>
-	<CAJ+F1CK1=b5sbTiu06cQyvV_ROaONPv5DUF366xRnmmi13=gHA@mail.gmail.com>
-Date: Wed, 15 Mar 2017 14:06:58 +0100
-In-Reply-To: <CAJ+F1CK1=b5sbTiu06cQyvV_ROaONPv5DUF366xRnmmi13=gHA@mail.gmail.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 14 Mar 2017
-	13:24:26 +0000")
-Message-ID: <87tw6uit8t.fsf@dusky.pond.sub.org>
+	(envelope-from <famz@redhat.com>) id 1co8kP-0001up-0c
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:13:50 -0400
+Date: Wed, 15 Mar 2017 21:13:43 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170315131343.GF3088@lemon.lan>
+References: <20170314171120.80741-1-vsementsov@virtuozzo.com>
+	<20170315110351.GG4030@noname.str.redhat.com>
+	<20170315111445.GE3088@lemon.lan>
+	<20170315120656.GI4030@noname.str.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.9 00/47] qapi: Put type information
- back into QMP documentation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170315120656.GI4030@noname.str.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] blk: fix aio context loss on media change
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,25 +25,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, pbonzini@redhat.com, jsnow@redhat.com
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+On Wed, 03/15 13:06, Kevin Wolf wrote:
+> > > 
+> > > Stefan, Paolo, do you remember the details why we didn't even do a
+> > > simple fix like the one below? I think there were some patches on the
+> > > list, no?
+> > 
+> > ISTM the concern was mostly "what about other BB in the graph?"
+> > 
+> > Should the new op blocker API be used in this one (a new type of perm)?
+> 
+> If we know what operation to block, that's an option. Would "change the
+> node's AioContext" work for it?
+> 
+> I think it would effectively mean that you need to attach the device
+> first and then jobs etc. respect the AioContext, whereas the opposite
+> order breaks because they don't have callbacks to adjust the AioContext
+> after the fact.
+> 
+> This seems to match what's actually safe, so it might really be as easy
+> as this.
 
-> Hi
->
-> On Mon, Mar 13, 2017 at 10:23 AM Markus Armbruster <armbru@redhat.com>
-> wrote:
->
->> I'm proposing this is 2.9 because it fixes a documentation regression.
->> It affects only documentation; generated C code is unchanged except
->> for the removal of trailing space in PATCH 46.
-[...]
-> Except the few comments and questions I left, the series looks good to me.
-> I don't think we need to rush it in the 2.9 release though, but I will let
-> the maintainers decide how to deal with the planning and rules.
+Yes, this sounds good to me.
 
-Letting documentation quality regress in 2.9 wouldn't be the end of the
-world, but this series is as safe as they get, despite its size.
+Vladimir, would you like to implement this? It would be good to have this fixed
+in 2.9.
 
-Thanks for your review!
+Fam
