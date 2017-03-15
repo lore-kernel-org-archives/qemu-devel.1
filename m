@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60508)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1co4FS-0003sD-Q6
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 04:25:35 -0400
+	(envelope-from <kraxel@redhat.com>) id 1co4K7-0005le-1j
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 04:30:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1co4FO-0007Mq-Pr
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 04:25:34 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45196)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1co4FO-0007Mj-Ju
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 04:25:30 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1co4FN-0003fK-65
-	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 08:25:29 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 453E22E80D3
-	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 08:25:26 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <kraxel@redhat.com>) id 1co4K3-0008QN-Ug
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 04:30:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40790)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1co4K3-0008Pv-OO
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 04:30:19 -0400
+Message-ID: <1489566616.15659.29.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 15 Mar 2017 09:30:16 +0100
+In-Reply-To: <20170314172947.GP2445@work-vm>
+References: <87tw6y8bs8.fsf@secure.mitica>
+	<CAFEAcA978SJemCfYJPa8jwtuhhi6JGh9pEDGYNJ1npJA3nvEQA@mail.gmail.com>
+	<20170314081312.GB13140@stefanha-x1.localdomain>
+	<CAFEAcA9F2BPexRieaEhu+UpJxoOdEfw8eggW8b2SjuoMMTNgog@mail.gmail.com>
+	<87wpbstesf.fsf@secure.mitica> <20170314160113.GM2445@work-vm>
+	<CAFEAcA9Ogy_XnpaaGWHsuAQC=CYNQsT0ESCZ68tn4bg4GFi7LQ@mail.gmail.com>
+	<20170314172947.GP2445@work-vm>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 15 Mar 2017 08:08:12 -0000
-From: Thomas Huth <720657@bugs.launchpad.net>
-Reply-To: Bug 720657 <720657@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20110217115121.6900.44475.malonedeb@wampee.canonical.com>
-Message-Id: <20170315080813.15736.92770.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 720657] Re: SVM intercept for VINTR exits too
- early
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] KVM call for 2017-03-14
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,63 +32,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Juan Quintela <quintela@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, QEMU Developer <qemu-devel@nongnu.org>, KVM devel mailing list <kvm@vger.kernel.org>
 
-Triaging old bug tickets ... can you still reproduce this problem with
-the latest version of QEMU?
+On Di, 2017-03-14 at 17:29 +0000, Dr. David Alan Gilbert wrote:
+> * Peter Maydell (peter.maydell@linaro.org) wrote:
+> > On 14 March 2017 at 17:01, Dr. David Alan Gilbert <dgilbert@redhat.com>=
+ wrote:
+> > > I also do a FreeBSD VM
+> >=20
+> > Do you have repro instructions for how to conveniently set
+> > this up?
+>=20
+> No, but given that it's the first time I've set up a BSD in ~20 years
+> it can't have been that hard.
+> It's just a guest with IDE disk, rtl8139 ether.
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+freebsd ships at least virtio-blk and virtio-net drivers too (not sure
+about virtio-scsi), so no need to go with emulated devices.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/720657
-
-Title:
-  SVM intercept for VINTR exits too early
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  The following happens with QEMU-0.14-rc2. QEMU-0.13 did not have this
-  problem.
-
-  A guest operating system running inside an SVM VM contains the following =
-code sequence:
-  c000002b:       fb                      sti    =
-
-  c000002c:       0f 35                   sysexit =
-
-
-  The following is a list of exits that occur at guest RIP 0xc000002c
-  (other exits omitted for clarity):
-
-  exit=3D0x60 int_shadow=3D0x1 int_control=3D0x1000000 inj=3D0x600000000 ri=
-p=3D0xc000002c
-  entry: int_shadow=3D0x1 int_control=3D0x1000000 inj=3D0x600000000
-
-  (exit due to physical interrupt, correctly reports STI blocking, entry
-  does not inject anything)
-
-  exit=3D0x60 int_shadow=3D0x1 int_control=3D0x1000000 inj=3D0x600000000 ri=
-p=3D0xc000002c
-  entry: int_shadow=3D0x1 int_control=3D0x1100100 inj=3D0x600000000
-
-  (exit due to physical interrupt, correctly reports STI blocking, entry
-  pends a VINTR to cause a VM exit when interrupt window opens. VINTR is
-  being intercepted by the hypervisor.)
-
-  exit=3D0x64 int_shadow=3D0x0 int_control=3D0x1100100 inj=3D0x600000000 ri=
-p=3D0xc000002c
-  entry: int_shadow=3D0x0 int_control=3D0x1000000 inj=3D0x6800000a0
-
-  (exit due to VINTR. At this point STI blocking is still effective -
-  though not reported. Actually, the VINTR exit should occur AFTER the
-  SYSEXIT instruction, not after STI. Due to this bug, the hypervisor
-  injects vector 0xa0 into an interrupt shadow, and things break).
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/720657/+subscriptions
+cheers,
+  Gerd
