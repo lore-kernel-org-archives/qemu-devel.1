@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50644)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <SRS0=cU38=2Y=redhat.com=mst@kernel.org>)
-	id 1coDEl-00033z-6c
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 14:01:28 -0400
+	id 1coDEk-00033K-5M
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 14:01:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <SRS0=cU38=2Y=redhat.com=mst@kernel.org>)
-	id 1coDEk-0006l4-Cb
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 14:01:27 -0400
-Received: from mail.kernel.org ([198.145.29.136]:59036)
+	id 1coDEi-0006k5-R2
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 14:01:26 -0400
+Received: from mail.kernel.org ([198.145.29.136]:59012)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <SRS0=cU38=2Y=redhat.com=mst@kernel.org>)
-	id 1coDEk-0006kY-6X
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 14:01:26 -0400
-Date: Wed, 15 Mar 2017 20:01:21 +0200
+	id 1coDEi-0006il-K3
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 14:01:24 -0400
+Date: Wed, 15 Mar 2017 20:01:19 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1489600837-11541-3-git-send-email-mst@redhat.com>
+Message-ID: <1489600837-11541-2-git-send-email-mst@redhat.com>
 References: <1489600837-11541-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1489600837-11541-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 2/7] virtio: guard against NULL pfn
+Subject: [Qemu-devel] [PULL 1/7] Bugfix: Handle error if VM Generation ID
+ device not present
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,88 +31,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Ben Warren <ben@skyportsystems.com>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-From: Jason Wang <jasowang@redhat.com>
+From: Ben Warren <ben@skyportsystems.com>
 
-To avoid access stale memory region cache after reset, this patch
-check the existence of virtqueue pfn for all exported virtqueue access
-helpers before trying to use them.
+This was crashing due to NULL-pointer dereference
 
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
+QMP Test case:
+==============
+
+(QEMU) query-vm-generation-id
+{"error": {"class": "GenericError", "desc": "VM Generation ID device not
+found"}}
+
+HMP Test case:
+==============
+virsh # qemu-monitor-command --hmp 3 info vm-generation-id
+VM Generation ID device not found
+
+Signed-off-by: Ben Warren <ben@skyportsystems.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- hw/virtio/virtio.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ hmp.c             | 4 +++-
+ hw/acpi/vmgenid.c | 1 +
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index efce4b3..9164579 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -318,6 +318,10 @@ int virtio_queue_ready(VirtQueue *vq)
-  * Called within rcu_read_lock().  */
- static int virtio_queue_empty_rcu(VirtQueue *vq)
+diff --git a/hmp.c b/hmp.c
+index 261843f..edb8970 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -2608,9 +2608,11 @@ void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict)
+ 
+ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict)
  {
-+    if (unlikely(!vq->vring.avail)) {
-+        return 1;
-+    }
-+
-     if (vq->shadow_avail_idx != vq->last_avail_idx) {
-         return 0;
+-    GuidInfo *info = qmp_query_vm_generation_id(NULL);
++    Error *err = NULL;
++    GuidInfo *info = qmp_query_vm_generation_id(&err);
+     if (info) {
+         monitor_printf(mon, "%s\n", info->guid);
      }
-@@ -329,6 +333,10 @@ int virtio_queue_empty(VirtQueue *vq)
- {
-     bool empty;
++    hmp_handle_error(mon, &err);
+     qapi_free_GuidInfo(info);
+ }
+diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+index 744f284..7a3ad17 100644
+--- a/hw/acpi/vmgenid.c
++++ b/hw/acpi/vmgenid.c
+@@ -248,6 +248,7 @@ GuidInfo *qmp_query_vm_generation_id(Error **errp)
+     Object *obj = find_vmgenid_dev();
  
-+    if (unlikely(!vq->vring.avail)) {
-+        return 1;
-+    }
-+
-     if (vq->shadow_avail_idx != vq->last_avail_idx) {
-         return 0;
+     if (!obj) {
++        error_setg(errp, "VM Generation ID device not found");
+         return NULL;
      }
-@@ -431,6 +439,10 @@ void virtqueue_fill(VirtQueue *vq, const VirtQueueElement *elem,
-         return;
-     }
- 
-+    if (unlikely(!vq->vring.used)) {
-+        return;
-+    }
-+
-     idx = (idx + vq->used_idx) % vq->vring.num;
- 
-     uelem.id = elem->index;
-@@ -448,6 +460,10 @@ void virtqueue_flush(VirtQueue *vq, unsigned int count)
-         return;
-     }
- 
-+    if (unlikely(!vq->vring.used)) {
-+        return;
-+    }
-+
-     /* Make sure buffer is written before we update index. */
-     smp_wmb();
-     trace_virtqueue_flush(vq, count);
-@@ -546,6 +562,16 @@ void virtqueue_get_avail_bytes(VirtQueue *vq, unsigned int *in_bytes,
-     int64_t len = 0;
-     int rc;
- 
-+    if (unlikely(!vq->vring.desc)) {
-+        if (in_bytes) {
-+            *in_bytes = 0;
-+        }
-+        if (out_bytes) {
-+            *out_bytes = 0;
-+        }
-+        return;
-+    }
-+
-     rcu_read_lock();
-     idx = vq->last_avail_idx;
-     total_bufs = in_total = out_total = 0;
+     vms = VMGENID(obj);
 -- 
 MST
