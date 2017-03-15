@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1co9H6-0005pX-5z
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:47:38 -0400
+	(envelope-from <quintela@redhat.com>) id 1co9Jx-00079A-6X
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:50:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1co9H1-00024V-9K
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:47:36 -0400
-Received: from mailout3.w1.samsung.com ([210.118.77.13]:61710)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1co9H0-000235-VM
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:47:31 -0400
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout3.w1.samsung.com
-	(Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5
-	2014)) with ESMTP id <0OMU00G9AZMZCP40@mailout3.w1.samsung.com> for
-	qemu-devel@nongnu.org; Wed, 15 Mar 2017 13:47:23 +0000 (GMT)
-From: Alexey Perevalov <a.perevalov@samsung.com>
-Message-id: <8d9cb1a5-3961-dde3-cf4c-f013f7c92620@samsung.com>
-Date: Wed, 15 Mar 2017 16:47:21 +0300
-MIME-version: 1.0
-In-reply-to: <20170313214636.GK27056@redhat.com>
-Content-type: text/plain; charset=windows-1252; format=flowed
-Content-transfer-encoding: 7bit
-References: <CGME20170310140816eucas1p2bd85d3759739d64bb184ce0fbd74f90d@eucas1p2.samsung.com>
-	<20170310140806.GA11225@aperevalov-ubuntu>
-	<20170313105338.GA2626@work-vm> <20170313214636.GK27056@redhat.com>
-Subject: Re: [Qemu-devel] Dual userfaultfd behavior
+	(envelope-from <quintela@redhat.com>) id 1co9Ju-0003DU-2N
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:50:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57044)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1co9Jt-0003DI-R5
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 09:50:30 -0400
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C79B23B731
+	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 13:50:29 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Wed, 15 Mar 2017 14:49:53 +0100
+Message-Id: <20170315135021.6978-4-quintela@redhat.com>
+In-Reply-To: <20170315135021.6978-1-quintela@redhat.com>
+References: <20170315135021.6978-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH 03/31] ram: move bitmap_sync_count into RAMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,139 +29,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Arcangeli <aarcange@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Mike Kravetz <mike.kravetz@oracle.com>
+To: qemu-devel@nongnu.org
+Cc: amit.shah@redhat.com, dgilbert@redhat.com
 
-Hi Andrea,
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+---
+ migration/ram.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-thank you for so perfect design description,
-
-the main question who will do RFC patches,
-you or Mike or if you not against I could try.
-
-On 03/14/2017 12:46 AM, Andrea Arcangeli wrote:
-> Hello,
->
-> On Mon, Mar 13, 2017 at 10:53:39AM +0000, Dr. David Alan Gilbert wrote:
->> * Alexey Perevalov (a.perevalov@samsung.com) wrote:
->>> Hi, David, Andrea and Mike
->> Hi Alexey,
->>
->>> The problem I want to discuss it's 1G hugepage based VM and post copy live
->>> migration.
->>>
->>> I would like to know your opinion on following approach of avoiding such
->>> problem:
->>> Once we have mmap'ed area through 1G hugetlbfs, remap physical pages
->>> with /dev/mem. It will be 2 types of vmas mapped to the same PFN.
->>> Register userfaultfd for newly obtained virtual
->>> addresses, it could reduce granularity of pages and reduce downtime per
->>> one 1G page. So registering userfaultfd for 2Mb, when the real hugepage
->>> was 1G, I think, could help.
->>>
->>> Current postcopy implementation in QEMU allows to make live migration
->>> from 1G based hugepage VM to 2Mb based hugepages VM (sanity checks prevent
->>> it).
->>>
->>> Also I checked, it's possible to remap through /dev/mem and get PFN
->>> based vmas, register userfaultfd (with allowance in vma_can_userfault)
->>> and finally make UFFDIO_COPY with allowing PFN based vmas in __mcopy_atomic.
->>>
->>> But there are a lot of drawback of such approach:
->>> First of all it's /dev/mem interface. Need to provide full access
->>> (kernel w/o CONFIG_STRICT_DEVMEM) and need to disable PAT.
->>> The second drawback, maybe I just didn't find possibility to remap
->>> hugepages again, but mmap of /dev/mem character driver maps 4Kb pages.
->>> I don't know how THP could help here, but madvise with MADV_HUGEPAGE
->>> didn't. So 4Kb is not exactly what needed, due to overhead of
->>> encapsulation summary downtime is worse than in other cases.
->>> It would be great to have interface to obtain new virtual address based
->>> on existing PFN, but for hugepages.
->> Yes, and I think as well on some architectures there can be cache problems
->> from mapping the same page in two addresses unless we're careful.
->>
->> I think to do this we'd basically need the kernel to set up something
->> similar to what you're saying, but without the mess of having to
->> go via /dev/mem.  Ideally it would all happen magically when I mark
-> /dev/mem is problematic also if the hugetlbfs page is being migrated
-> for example (the virtual2physical mapping that may change and be
-> directed to a different physical page with no notification to userland).
->
->> a hugetlb page as userfault and start UFFDIO_COPYing in 4kb pages;
->> but I can imagine perhaps some more syscalls needed to tell it to do it.
-> I think what is needed is an extension to UFFDIO_COPY so that it will
-> not fail if used with lower granularity than the hugetlbfs page
-> size. Then a special feature flag should be set in the
-> uffdio_api.features to tell userland it can use a lower granularity
-> than the hugetlbfs page size.
->
-> UFFDIO_COPY will still allocate a 1GB page, but it will copy only part
-> of and then map only the copied part with a pte of 4k granularity (or
-> 2MB granularity if the uffdio_copy.dst/len parameters allows for
-> hugepmds). This way if there's a missing fault in the part that is not
-> copied yet, it'll still trigger a page fault and we'll call
-> handle_userfault from hugetlb_no_page, which will trigger a new
-> UFFDIO_COPY and map another fragment of the 1GB page.
-> The same code than should allow us to map a 2MB hugetlbfs page with 4k
-> granularity in UFFDIO_COPY so then userland can choose if to do
-> postcopy live migration on hugetlbfs with 2MB or 4kb granularity (on
-> very slow network 4kb would be preferable for example for the latency).
->
-> Mapping a 1GB page without a hugepud or mapping a 2MB page without a
-> hugepmd breaks all sort of invariants into the hugetlbfs code, page
-> migration wouldn't be able to cope with it either. Solving the fallout
-> from such breakage is what is required to implement this basically.
->
-> Ideally this could be a UFFDIO_COPY-only feature, simply every other
-> part of hugetlbfs should be able to cope with whatever UFFDIO_COPY has
-> generated in terms of pagetables mapping those hugepages.
->
-> The only thing that will change from hugetlbfs point of view is that a
-> pte or hugepmd could be mapping a 1GB page, that couldn't be the case
-> before it.
->
-> Once the entirety of the hugepage has been mapped or when the
-> UFFDIO_UNREGISTER is called on the 1GB range, all those hugepmds
-> and/or ptes should be dropped and the hugepud would then point
-> directly to the 1GB page restoring the current behavior (which is
-> required to get a 1GB large TLB and top performance, i.e. immediately
-> after the live migration completed).
->
-> This is very different concept than THP that in fact never requires to
-> allocate hugepages. THP nowadays also allows to map a THP page using
-> ptes, instead of hugepmds, just for a different reason (i.e. to allow
-> split_huge_page to fail and be deferred, so get/put_page are
-> simplified, while still guaranteeing that split_huge_page_pmd cannot
-> fail). So we're already doing something like the above with THP but we
-> only cover ptes vs hugepmd. The codebase however is different,
-> hugetlbfs doesn't interact much with the main VM, so there's likely
-> nothing to share with THP, but the concept of mapping an hugepage with
-> ptes is somewhat similar.
->
-> THP fundamentally always allows fallback, in the UFFDIO_COPY on
-> hugetlbfs instead the idea would be to never allow fallback on the
-> physical side, but to allow partial mapping so that the UFFDIO_COPY
-> granularity can be reduced, despite the physical granularity remains
-> native. This also means the collapse after live migration will be
-> zerocopy: the collapse would be of the virtual kind for hugetlbfs
-> (khugepaged as opposed has to copy the actual data because the
-> physical pages were not huge to begin with, to allow the fallback).
->
-> When UFFDIO_COPY is called again on the same 1GB range, it would need
-> to notice that the pud is not null but is not huge (new case
-> introduced), and then keep going in the pagetables lookup until it
-> finds the copied range is not mapped, skip the 1GB allocation in such
-> case and copy into the pre-existing 1GB page. If instead it finds the
-> dst range is already mapped by a pte or a hugepmd, it'll instead
-> return -EEXIST as usual.
->
-> Thanks,
-> Andrea
->
->
->
-
-
+diff --git a/migration/ram.c b/migration/ram.c
+index 9120755..c0bee94 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -45,8 +45,6 @@
+ #include "qemu/rcu_queue.h"
+ #include "migration/colo.h"
+ 
+-static uint64_t bitmap_sync_count;
+-
+ /***********************************************************/
+ /* ram save/restore */
+ 
+@@ -148,6 +146,8 @@ struct RAMState {
+     bool ram_bulk_stage;
+     /* How many times we have dirty too many pages */
+     int dirty_rate_high_cnt;
++    /* How many times we have synchronized the bitmap */
++    uint64_t bitmap_sync_count;
+ };
+ typedef struct RAMState RAMState;
+ 
+@@ -455,7 +455,7 @@ static void xbzrle_cache_zero_page(RAMState *rs, ram_addr_t current_addr)
+     /* We don't care if this fails to allocate a new cache page
+      * as long as it updated an old one */
+     cache_insert(XBZRLE.cache, current_addr, ZERO_TARGET_PAGE,
+-                 bitmap_sync_count);
++                 rs->bitmap_sync_count);
+ }
+ 
+ #define ENCODING_FLAG_XBZRLE 0x1
+@@ -475,7 +475,7 @@ static void xbzrle_cache_zero_page(RAMState *rs, ram_addr_t current_addr)
+  * @last_stage: if we are at the completion stage
+  * @bytes_transferred: increase it with the number of transferred bytes
+  */
+-static int save_xbzrle_page(QEMUFile *f, uint8_t **current_data,
++static int save_xbzrle_page(QEMUFile *f, RAMState *rs, uint8_t **current_data,
+                             ram_addr_t current_addr, RAMBlock *block,
+                             ram_addr_t offset, bool last_stage,
+                             uint64_t *bytes_transferred)
+@@ -483,11 +483,11 @@ static int save_xbzrle_page(QEMUFile *f, uint8_t **current_data,
+     int encoded_len = 0, bytes_xbzrle;
+     uint8_t *prev_cached_page;
+ 
+-    if (!cache_is_cached(XBZRLE.cache, current_addr, bitmap_sync_count)) {
++    if (!cache_is_cached(XBZRLE.cache, current_addr, rs->bitmap_sync_count)) {
+         acct_info.xbzrle_cache_miss++;
+         if (!last_stage) {
+             if (cache_insert(XBZRLE.cache, current_addr, *current_data,
+-                             bitmap_sync_count) == -1) {
++                             rs->bitmap_sync_count) == -1) {
+                 return -1;
+             } else {
+                 /* update *current_data when the page has been
+@@ -634,7 +634,7 @@ static void migration_bitmap_sync(RAMState *rs)
+     int64_t end_time;
+     int64_t bytes_xfer_now;
+ 
+-    bitmap_sync_count++;
++    rs->bitmap_sync_count++;
+ 
+     if (!bytes_xfer_prev) {
+         bytes_xfer_prev = ram_bytes_transferred();
+@@ -697,9 +697,9 @@ static void migration_bitmap_sync(RAMState *rs)
+         start_time = end_time;
+         num_dirty_pages_period = 0;
+     }
+-    s->dirty_sync_count = bitmap_sync_count;
++    s->dirty_sync_count = rs->bitmap_sync_count;
+     if (migrate_use_events()) {
+-        qapi_event_send_migration_pass(bitmap_sync_count, NULL);
++        qapi_event_send_migration_pass(rs->bitmap_sync_count, NULL);
+     }
+ }
+ 
+@@ -806,7 +806,7 @@ static int ram_save_page(RAMState *rs, MigrationState *ms, QEMUFile *f,
+             ram_release_pages(ms, block->idstr, pss->offset, pages);
+         } else if (!rs->ram_bulk_stage &&
+                    !migration_in_postcopy(ms) && migrate_use_xbzrle()) {
+-            pages = save_xbzrle_page(f, &p, current_addr, block,
++            pages = save_xbzrle_page(f, rs, &p, current_addr, block,
+                                      offset, last_stage, bytes_transferred);
+             if (!last_stage) {
+                 /* Can't send this cached data async, since the cache page
+@@ -1936,7 +1936,7 @@ static int ram_save_init_globals(RAMState *rs)
+     int64_t ram_bitmap_pages; /* Size of bitmap in pages, including gaps */
+ 
+     rs->dirty_rate_high_cnt = 0;
+-    bitmap_sync_count = 0;
++    rs->bitmap_sync_count = 0;
+     migration_bitmap_sync_init();
+     qemu_mutex_init(&migration_bitmap_mutex);
+ 
 -- 
-Best regards,
-Alexey Perevalov
+2.9.3
