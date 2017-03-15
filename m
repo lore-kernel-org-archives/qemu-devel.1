@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.guang55@zte.com.cn>) id 1co4t2-0003zO-Ry
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 05:06:31 -0400
+	(envelope-from <groug@kaod.org>) id 1co4tp-0004ba-IC
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 05:07:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wang.guang55@zte.com.cn>) id 1co4sz-0007W7-N2
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 05:06:28 -0400
-Received: from mbob.nabble.com ([162.253.133.15]:62443)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.guang55@zte.com.cn>) id 1co4sz-0007Ul-HO
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 05:06:25 -0400
-Received: from mtom.nabble.com (unknown [162.253.133.81])
-	by mbob.nabble.com (Postfix) with ESMTP id 5FAF43ED4727
-	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 01:42:10 -0700 (PDT)
-Date: Wed, 15 Mar 2017 02:06:19 -0700 (MST)
-From: wangguang <wang.guang55@zte.com.cn>
-Message-ID: <1489568779098-473250.post@n7.nabble.com>
+	(envelope-from <groug@kaod.org>) id 1co4ta-0008AQ-HG
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 05:07:17 -0400
+Received: from 8.mo68.mail-out.ovh.net ([46.105.74.219]:51033)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1co4ta-00088K-8t
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 05:07:02 -0400
+Received: from player763.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 6D39E43294
+	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 10:07:00 +0100 (CET)
+Date: Wed, 15 Mar 2017 10:06:53 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170315100653.6702d52f@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <1489449360-14411-3-git-send-email-sstabellini@kernel.org>
+References: <alpine.DEB.2.10.1703131650550.21520@sstabellini-ThinkPad-X260>
+	<1489449360-14411-1-git-send-email-sstabellini@kernel.org>
+	<1489449360-14411-3-git-send-email-sstabellini@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] COLO failover hang
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/kXEtlW=czLmEPd42YkCFCIH";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v2 3/9] xen: introduce the header file for
+ the Xen 9pfs transport protocol
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,57 +33,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefano Stabellini <sstabellini@kernel.org>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, anthony.perard@citrix.com, Stefano Stabellini <stefano@aporeto.com>, jgross@suse.com
 
- am testing QEMU COLO feature described here [QEMU
-Wiki](http://wiki.qemu-project.org/Features/COLO). 
+--Sig_/kXEtlW=czLmEPd42YkCFCIH
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-When the Primary Node panic,the Secondary Node qemu hang. 
-hang at recvmsg in qio_channel_socket_readv. 
-And  I run  { 'execute': 'nbd-server-stop' } and { "execute":
-"x-colo-lost-heartbeat" } in Secondary VM's 
-monitor,the  Secondary Node qemu still hang at recvmsg . 
+On Mon, 13 Mar 2017 16:55:54 -0700
+Stefano Stabellini <sstabellini@kernel.org> wrote:
 
-I found that the colo in qemu is not complete yet.
-Do the colo have any plan for development?
-Has anyone ever run it successfully? Any help is appreciated! 
+> It uses the new ring.h macros to declare rings and interfaces.
+>=20
+> Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
+> CC: anthony.perard@citrix.com
+> CC: jgross@suse.com
+> ---
+>  hw/9pfs/xen_9pfs.h | 20 ++++++++++++++++++++
+>  1 file changed, 20 insertions(+)
+>  create mode 100644 hw/9pfs/xen_9pfs.h
+>=20
+
+This header file has only one user: please move its content to
+hw/9pfs/xen-9p-backend.c (except the 9P header structure, see
+below).
+
+> diff --git a/hw/9pfs/xen_9pfs.h b/hw/9pfs/xen_9pfs.h
+> new file mode 100644
+> index 0000000..c4e8901
+> --- /dev/null
+> +++ b/hw/9pfs/xen_9pfs.h
+> @@ -0,0 +1,20 @@
+> +#ifndef XEN_9PFS_H
+> +#define XEN_9PFS_H
+> +
+> +#include "hw/xen/io/ring.h"
+> +#include <xen/io/protocols.h>
+> +
+> +struct xen_9pfs_header {
+> +	uint32_t size;
+> +	uint8_t id;
+> +	uint16_t tag;
+> +
+> +	/* uint8_t sdata[]; */
+
+This doesn't seem useful.
+
+> +} __attribute__((packed));
+> +
+
+A few remarks:
+- this is a 9P message header actually, which is also used with virtio,
+- QEMU coding style requires a typedef in CamelCase,
+- the 9P protocol explicitely uses little-endian ordering. Since we
+  don't have endian-specific types, it makes sense to indicate that
+  when naming the fields.
+- we have a QEMU_PACKED macro which seems to be used a lot more than
+  the gcc syntax
+
+Please define a new type in hw/9pfs/9p.h and use it in both transports.
+Something like:
+
+typedef struct {
+    uint32_t size_le;
+    uint8_t id;
+    uint16_t tag_le;
+} QEMU_PACKED P9MsgHeader;
+
+> +#define PAGE_SHIFT XC_PAGE_SHIFT
+
+I don't see any user for this in hw/9pfs/xen-9p-backend.c
+
+> +#define XEN_9PFS_RING_ORDER 6
+> +#define XEN_9PFS_RING_SIZE  XEN_FLEX_RING_SIZE(XEN_9PFS_RING_ORDER)
+> +DEFINE_XEN_FLEX_RING_AND_INTF(xen_9pfs);
+> +
+> +#endif
 
 
+--Sig_/kXEtlW=czLmEPd42YkCFCIH
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-centos7.2+qemu2.7.50 
-(gdb) bt 
-#0  0x00007f3e00cc86ad in recvmsg () from /lib64/libpthread.so.0 
-#1  0x00007f3e0332b738 in qio_channel_socket_readv (ioc=<optimized out>,
-iov=<optimized out>, niov=<optimized out>, fds=0x0, nfds=0x0, errp=0x0) at
-io/channel-socket.c:497 
-#2  0x00007f3e03329472 in qio_channel_read (ioc=ioc@entry=0x7f3e05110e40,
-buf=buf@entry=0x7f3e05910f38 "", buflen=buflen@entry=32768,
-errp=errp@entry=0x0) at io/channel.c:97 
-#3  0x00007f3e032750e0 in channel_get_buffer (opaque=<optimized out>,
-buf=0x7f3e05910f38 "", pos=<optimized out>, size=32768) at
-migration/qemu-file-channel.c:78 
-#4  0x00007f3e0327412c in qemu_fill_buffer (f=0x7f3e05910f00) at
-migration/qemu-file.c:257 
-#5  0x00007f3e03274a41 in qemu_peek_byte (f=f@entry=0x7f3e05910f00,
-offset=offset@entry=0) at migration/qemu-file.c:510 
-#6  0x00007f3e03274aab in qemu_get_byte (f=f@entry=0x7f3e05910f00) at
-migration/qemu-file.c:523 
-#7  0x00007f3e03274cb2 in qemu_get_be32 (f=f@entry=0x7f3e05910f00) at
-migration/qemu-file.c:603 
-#8  0x00007f3e03271735 in colo_receive_message (f=0x7f3e05910f00,
-errp=errp@entry=0x7f3d62bfaa50) at migration/colo.c:215 
-#9  0x00007f3e0327250d in colo_wait_handle_message (errp=0x7f3d62bfaa48,
-checkpoint_request=<synthetic pointer>, f=<optimized out>) at
-migration/colo.c:546 
-#10 colo_process_incoming_thread (opaque=0x7f3e067245e0) at
-migration/colo.c:649 
-#11 0x00007f3e00cc1df3 in start_thread () from /lib64/libpthread.so.0 
-#12 0x00007f3dfc9c03ed in clone () from /lib64/libc.so.6  
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
+iEYEARECAAYFAljJBC0ACgkQAvw66wEB28JW3wCglKiiXZlwmMpQRLrcUdKT5SKV
+vIMAnjn0k+03WRDZWwrI0fTBdY0UybS/
+=eQdW
+-----END PGP SIGNATURE-----
 
-
-
-
---
-View this message in context: http://qemu.11.n7.nabble.com/COLO-failover-hang-tp473250.html
-Sent from the Developer mailing list archive at Nabble.com.
+--Sig_/kXEtlW=czLmEPd42YkCFCIH--
