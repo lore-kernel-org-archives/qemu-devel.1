@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44013)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cnzeS-0005bu-OD
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 23:31:05 -0400
+	(envelope-from <stefanha@redhat.com>) id 1cnzfa-0006Lc-PD
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 23:32:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cnzeP-0003nl-KM
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 23:31:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51180)
+	(envelope-from <stefanha@redhat.com>) id 1cnzfX-0004Px-MG
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 23:32:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45068)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cnzeP-0003nM-EJ
-	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 23:31:01 -0400
-Date: Wed, 15 Mar 2017 05:30:56 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170315052418-mutt-send-email-mst@kernel.org>
-References: <1489496187-624-1-git-send-email-peterx@redhat.com>
-	<20170315032001-mutt-send-email-mst@kernel.org>
-	<20170315031550.GG12964@pxdev.xzpeter.org>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cnzfX-0004PY-Fv
+	for qemu-devel@nongnu.org; Tue, 14 Mar 2017 23:32:11 -0400
+Date: Wed, 15 Mar 2017 11:32:06 +0800
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170315033206.GL13140@stefanha-x1.localdomain>
+References: <1488800630-32054-1-git-send-email-nanjekyejoannah@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="iAzLNm1y1mIRgolD"
 Content-Disposition: inline
-In-Reply-To: <20170315031550.GG12964@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH] memory: info mtree check mr range overflow
+In-Reply-To: <1488800630-32054-1-git-send-email-nanjekyejoannah@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v1] Provided python3 support for qmp.py
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +27,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, mark.cave-ayland@ilande.co.uk, Peter Maydell <peter.maydell@linaro.org>
+To: Joannah Nanjekye <nanjekyejoannah@gmail.com>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com
 
-On Wed, Mar 15, 2017 at 11:15:50AM +0800, Peter Xu wrote:
-> On Wed, Mar 15, 2017 at 03:24:04AM +0200, Michael S. Tsirkin wrote:
-> > On Tue, Mar 14, 2017 at 08:56:27PM +0800, Peter Xu wrote:
-> > > The address of memory regions might overflow when something wrong
-> > > happened, like reported in:
-> > > 
-> > > https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg02043.html
-> > > 
-> > > For easier debugging, let's try to detect it.
-> > > 
-> > > Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > 
-> > 
-> > After a chat with Paolo, I think the following is a more general fix
-> > 
-> > - fix info mtree to do 128 bit math and display more than
-> >   16 digits if necessary
-> 
-> Could you help elaborate in what case will we really need that 128 bit
-> address?
 
-This is how memory API works. It uses 128 bit addresses (in reality
-it typically only needs 64 bit addresses but 128 means it can do
-math without worrying about it too much).
-Thus a region at offset 0xf << 60 in parent with address 0x1 << 60
-and size 0x1 << 20 is not "overflowing" it is simply at and address
-0x1 << 64 which is outside the range of parent so not visible
-in the flat view.
-But same can be said for region at offset 0x1 << 60 in same parent
-and your patch does nothing to help detect it.
+--iAzLNm1y1mIRgolD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Btw, thanks for pointing out in the other thread that your patch
-> wasn't printing 128 bits but 64 bits, actually I didn't notice that
-> before... but even with that, I would still slightly prefer this one
-> though considering readability and simplicity.
+On Mon, Mar 06, 2017 at 02:43:50PM +0300, Joannah Nanjekye wrote:
+> From: Joannah Najekye <nanjekyejoannah@gmail.com>
+>=20
+> Signed-off-by: Joannah Nanjekye <nanjekyejoannah@gmail.com>
+> ---
+>=20
+> The patch provides python 3 support for one of the scripts  in scripts/qm=
+p that is to say qmp.py. This is not a port to python 3 but rather the patc=
+h ensures that the script runs fine for both python 2 and 3.=20
+>=20
+> Minimum Python Versions supported:
+>=20
+> Python 2 : python 2.6 +
+> Python 3 : python 3.3 +
+>=20
+> The two new imports future and builtins introduced refer to the future=20
+> pip-installable package on PyPI.
+>=20
+>  scripts/qmp/qmp.py | 22 ++++++++++++----------
+>  1 file changed, 12 insertions(+), 10 deletions(-)
 
-Right but it's just trying to address the specific problem with
-the given device. Which is unlikely to trigger again exactly
-in the same way. The general issue is that the child region
-address is outside the range of the parent.
+Did you test your patch with Python 3?  Launch QEMU like this:
 
-> > - add info about region visibility
-> >   how much info is appropriate is arguable - after all we already have info mtree -f
-> >   we probably should report if region is not visible at all,
-> >   how about partially occluded ones? listing all windows is probably not
-> >   needed - we have the -f flag for that.
-> 
-> For me, "info mtree" and its "-f" form work good enough. So I'll leave
-> the discussion on this one to people who know better than me...
-> 
-> Thanks,
-> 
-> -- peterx
+  $ qemu-system-x86_64 -qmp unix:/tmp/foo.sock,server
+
+In another terminal you can launch Python and interactively test the
+module like I did above.
+
+I still get the following Python 3 exception with your patch:
+
+$ python3
+Python 3.5.2 (default, Sep 14 2016, 11:28:32)
+[GCC 6.2.1 20160901 (Red Hat 6.2.1-1)] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import qmp
+>>> q =3D qmp.QEMUMonitorProtocol('/tmp/foo.sock')
+>>> q.connect()
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "qemu/scripts/qmp/qmp.py", line 135, in connect
+    return self.__negotiate_capabilities()
+  File "qemu/scripts/qmp/qmp.py", line 61, in __negotiate_capabilities
+    if greeting is None or not greeting.has_key('QMP'):
+AttributeError: 'dict' object has no attribute 'has_key'
+
+In Python 3 the dict object lacks the has_key() method.  Please convert
+the code to use 'key' in dict instead of dict.has_key('key').
+
+--iAzLNm1y1mIRgolD
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYyLW2AAoJEJykq7OBq3PI04UH/22TnsroE01/5UlgSgD4ImEZ
+FlR3pfEcyZ180x2d06Cew9/PYsSGsIvUvcBx6JPmfqcPLGWzmA5QcAd8obPcybpC
+uv+XxXj2p/++QlHooTxaZ4icG/Zr9N0383z6WuaxLxTvoJcC9t0RlU3GcmIZf05u
+mpv5PFdGcF9VEj7rG3zuGhtNQ9L3IZYbsDO0SypIgzaoxXbEaUtVVH+XmsEdNxnQ
+Vsx6qypuYCfMJs0bW8bH25qd2XxH+DbI1T1JYSS1uhk/0kEIYMi/e0pdPdDEheDZ
+oc+tvMQxN6R3tqxvzr2HHn1xokwCzdgvlYWR1PyrqkmL7sNoWWNO/d3WMaHfRbQ=
+=JT66
+-----END PGP SIGNATURE-----
+
+--iAzLNm1y1mIRgolD--
