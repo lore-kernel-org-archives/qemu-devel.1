@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55071)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1co6o4-00064H-94
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 07:09:32 -0400
+	(envelope-from <famz@redhat.com>) id 1co6p4-0006ol-Q9
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 07:10:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1co6o3-00047D-Ej
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 07:09:28 -0400
-Date: Wed, 15 Mar 2017 19:09:15 +0800
+	(envelope-from <famz@redhat.com>) id 1co6p3-0004wA-VE
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 07:10:30 -0400
+Date: Wed, 15 Mar 2017 19:10:21 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170315110915.GC3088@lemon.lan>
-References: <20170314023050.32756-1-famz@redhat.com>
-	<20170315105248.GF4030@noname.str.redhat.com>
+Message-ID: <20170315111021.GD3088@lemon.lan>
+References: <1489549053-31728-1-git-send-email-jemmy858585@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170315105248.GF4030@noname.str.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] block: Always call bdrv_child_check_perm
- first
+In-Reply-To: <1489549053-31728-1-git-send-email-jemmy858585@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2] migration/block: Avoid invoking
+ blk_drain too frequently
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,36 +23,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Lidong Chen <jemmy858585@gmail.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, quintela@redhat.com, dgilbert@redhat.com, qemu-block@nongnu.org
 
-On Wed, 03/15 11:52, Kevin Wolf wrote:
-> Am 14.03.2017 um 03:30 hat Fam Zheng geschrieben:
-> > bdrv_child_set_perm alone is not very usable because the caller must
-> > call bdrv_child_check_perm first.
+On Wed, 03/15 11:37, Lidong Chen wrote:
+> Increase bmds->cur_dirty after submit io, so reduce the frequency
+> involve into blk_drain, and improve the performance obviously
+> when block migration.
 > 
-> Well, you can imagine use cases where you want to check multiple
-> children first and then set or abort all of them, but apparently we
-> haven't found such a case yet, so I'm fine with making the functions
-> private for now.  If we ever need it, making them public again is
-> trivial.
-
-Yes, no problem with that use case but by then I suppose we should also add an
-assertion about the calling sequence: e.g. in image locking, raw_set_perm goes
-nut if not preceded by `raw_check_perm.
-
+> The performance test result of this patch:
 > 
-> > This is already encapsulated
-> > conveniently in bdrv_child_try_set_perm, so remove the other prototypes
-> > from the header and fix the one wrong caller, block/mirror.c.
-> > 
-> > Signed-off-by: Fam Zheng <famz@redhat.com>
+> During the block dirty save phase, this patch improve guest os IOPS
+> from 4.0K to 9.5K. and improve the migration speed from
+> 505856 rsec/s to 855756 rsec/s.
 > 
-> Thanks, applied to the block branch.
-
-Thanks!
-
-Fam
-
+> Signed-off-by: Lidong Chen <jemmy858585@gmail.com>
+> ---
+>  migration/block.c | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-> Kevin
+> diff --git a/migration/block.c b/migration/block.c
+> index 6741228..7734ff7 100644
+> --- a/migration/block.c
+> +++ b/migration/block.c
+> @@ -576,6 +576,9 @@ static int mig_save_device_dirty(QEMUFile *f, BlkMigDevState *bmds,
+>              }
+>  
+>              bdrv_reset_dirty_bitmap(bmds->dirty_bitmap, sector, nr_sectors);
+> +            sector += nr_sectors;
+> +            bmds->cur_dirty = sector;
+> +
+>              break;
+>          }
+>          sector += BDRV_SECTORS_PER_DIRTY_CHUNK;
+> -- 
+> 1.8.3.1
+> 
+
+Nice catch above all, thank you!
+
+Reviewed-by: Fam Zheng <famz@redhat.com>
