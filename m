@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1co9kS-00040s-89
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 10:17:57 -0400
+	(envelope-from <mst@redhat.com>) id 1co9kT-00041S-8Y
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 10:18:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1co9kP-0006y7-2k
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 10:17:56 -0400
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:33584)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1co9kO-0006xp-Tc
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 10:17:53 -0400
-Received: by mail-pf0-x242.google.com with SMTP id v190so2351901pfb.0
-	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 07:17:52 -0700 (PDT)
-Date: Wed, 15 Mar 2017 23:17:47 +0900
-From: Stafford Horne <shorne@gmail.com>
-Message-ID: <20170315141747.GJ2418@lianli.shorne-pla.net>
-References: <20170315140816.6604-1-shorne@gmail.com>
-	<20170315141527.GN7770@redhat.com>
+	(envelope-from <mst@redhat.com>) id 1co9kR-00071W-PN
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 10:17:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44778)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1co9kR-00070Q-GR
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 10:17:55 -0400
+Date: Wed, 15 Mar 2017 16:17:47 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170315141747.GA7113@redhat.com>
+References: <1489558827-28971-1-git-send-email-phil@philjordan.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170315141527.GN7770@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Add myself as openrisc
- maintainer
+In-Reply-To: <1489558827-28971-1-git-send-email-phil@philjordan.eu>
+Subject: Re: [Qemu-devel] [PATCH v3 0/2] hw/i386: Update FADT to Revision 3
+ (ACPI 2.0)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +27,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Phil Dennis-Jordan <phil@philjordan.eu>
+Cc: Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Laszlo Ersek <lersek@redhat.com>
 
-On Wed, Mar 15, 2017 at 02:15:27PM +0000, Daniel P. Berrange wrote:
-> On Wed, Mar 15, 2017 at 11:08:16PM +0900, Stafford Horne wrote:
-> > Jia has claimed he is no longer able to maintain.  I have fixing bugs here
-> > and there and getting familiar with the code base. Orignal thread from Jia:
-> > 
-> >  https://lists.librecores.org/pipermail/openrisc/2017-January/000321.html
-> > 
-> > Signed-off-by: Stafford Horne <shorne@gmail.com>
-> > ---
-> >  MAINTAINERS | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index 4714df8..a39a4e7 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -196,8 +196,8 @@ F: hw/nios2/
-> >  F: disas/nios2.c
-> >  
-> >  OpenRISC
-> > -M: Jia Liu <proljc@gmail.com>
-> > -S: Maintained
-> > +M: Stafford Horne <shorne@gmail.com>
-> > +S: Off Fixes
+On Wed, Mar 15, 2017 at 07:20:25PM +1300, Phil Dennis-Jordan wrote:
+> This updates the FADT generated for x86/64 machine types from Revision 1 to 3. (Based on ACPI standard 2.0 instead of 1.0) As previously, the goal is to make running macOS/OS X guests smoother. With a Rev1 FADT, rebooting such a guest doesn't work, as the OS uses the reset register information from the FADT. Switching to a Rev3 (ACPI 2.0) FADT solves this problem.
 > 
-> Just small typo - s/Off/Odd/
-
-Thanks, its getting late here.  Ill send a v2.
-
-> Regards,
-> Daniel
+> The previous discussion of this raised a bunch of points, which I'll address/clarify here as well:
+> 
+>  1. No runtime option. The preference was expressed that we try to stay backwards-compatible with legacy guests as opposed to adding a runtime option for different APCI versions. ACPI 2.0/FADT Rev3 is the minimum version required for exposing the reset register, and it is also backwards-compatible with 1.0/Rev1, so that seemed a good version to target.
+> 
+>  2. Legacy guest testing. I've tested this successfully (no apparent regressions) with:
+>    * Windows XP x86 (both "pc" and "q35" machine types, the latter using -device piix4-ide)
+>    * Windows 7, both 32-bit and 64-bit editions
+>    * Windows 10 x64
+>    * Fedora 7 x86 Live image
+>    * Fedora 25 x86_64 Live image
+>    * Ubuntu 10.04.4 AMD64 Live image
+> Any other specific OSes and versions I should check?
+> 
+> 
+>  3. 64-bit and 32-bit pointer fields.
+> 
+> Only very recent versions of the ACPI spec (6.1 and various errata of 5.1 and 6.0) are clear about mutual exclusion of the FADT's 32-bit and 64-bit variants of pointers to tables and registers. The 2.0 version simply states "This is a required field" for both PM1a_EVT_BLK and X_PM1a_EVT_BLK, for example, although it does also state for the former that "This field is superseded in ACPI 2.0 by the X_PM1a_EVT_BLK field." No requirement is specified explicitly for the DSDT and X_DSDT fields.
+> 
+> In practice, I have found that Windows 10 will fail to boot with a Rev3 FADT unless BOTH the 32-bit and 64-bit variants are filled. The exception is X_FIRMWARE_CTRL, which is the first to be explicitly marked as mutually exclusive with FIRMWARE_CTRL in an ACPI spec - with a preference for FIRMWARE_CTRL if the pointer fits in a 32-bit field. Satisfying Windows 10 in this way does not contradict the 2.0 specification, and it also complies with the 1.0 standard for the fields which Rev1 of the FADT already has, so that's what I've gone with in the implementation.
+> 
+> The only problem is that upstream OVMF cannot deal with multiple pointers to the same table in the linker commands. This turns out to be a bug in OVMF/EDK2[1], and I am submitting a separate patch to EDK2 to fix that problem. The fix for a second issue where OVMF would rewrite the FADT so the DSDT is erroneously set to 0 has already been upstreamed.[2] I don't see a workaround to this other than fixing the OVMF code.
+> 
+>  4. i440FX vs Q35
+> 
+> Both machine types have the reset register, and it's at the same I/O port. To illustrate/document this, the second patch in the series adds a build-time assertion that this is indeed so.
+> 
+> Changelog
+> =========
+> 
+> v2 -> v3:
+>  * I actually completed the changes to the BIOS tables test which were required as a result of the FADT struct change.
+> 
+> v1 -> v2:
+>  * v1 Thread was "[PATCH RFC] acpi: add reset register to fadt"
+>  * Instead of just adding the reset register, set up a fully standards compliant Rev3 FADT. (ACPI 2.0)
+>  * A compile-time assertion has been added for the PC/Q35 reset register equivalence.
+> 
+> 
+> [1]: https://bugzilla.tianocore.org/show_bug.cgi?id=368
+> [2]: EDK2 commit range e0e1cfcbbb24..198a46d768fb
+> 
+> Phil Dennis-Jordan (2):
+>   hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest OS
+>     support.
+>   hw/i386: Build-time assertion on pc/q35 reset register being
+>     identical.
+> 
+>  hw/i386/acpi-build.c        | 35 +++++++++++++++++++--
+>  hw/pci-host/piix.c          |  6 ----
+>  include/hw/acpi/acpi-defs.h | 77 +++++++++++++++++++++------------------------
+>  include/hw/i386/pc.h        |  6 ++++
+>  tests/acpi-utils.h          | 10 ++++++
+>  tests/bios-tables-test.c    | 23 +++++++++++---
+>  6 files changed, 102 insertions(+), 55 deletions(-)
+> 
 > -- 
-> |: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-> |: http://libvirt.org              -o-             http://virt-manager.org :|
-> |: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+> 2.3.2 (Apple Git-55)
+
+
+Looks good to me now. Pls remember to re-post after release
+so I can merge.
+
+-- 
+MST
