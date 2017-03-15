@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55935)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1coBzD-0007hA-LX
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 12:41:20 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1coC2h-00007O-G6
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 12:44:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1coBzA-0008NR-If
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 12:41:19 -0400
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:34197)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1coBzA-0008NI-A5
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 12:41:16 -0400
-Received: by mail-wr0-x22b.google.com with SMTP id l37so14902700wrc.1
-	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 09:41:15 -0700 (PDT)
-References: <20170315142032.6788-1-shorne@gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170315142032.6788-1-shorne@gmail.com>
-Date: Wed, 15 Mar 2017 16:41:32 +0000
-Message-ID: <87a88mpk5f.fsf@linaro.org>
+	(envelope-from <dgilbert@redhat.com>) id 1coC2e-0000uo-CF
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 12:44:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43205)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1coC2e-0000u1-2Z
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 12:44:52 -0400
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2D713636E5
+	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 16:44:51 +0000 (UTC)
+Date: Wed, 15 Mar 2017 16:44:46 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170315164445.GA2701@work-vm>
+References: <20170315161603.30135-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] MAINTAINERS: Add myself as openrisc
- maintainer
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170315161603.30135-1-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for 2.9] migration: use "" as the default
+ for tls-creds/hostname
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +33,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stafford Horne <shorne@gmail.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
+* Daniel P. Berrange (berrange@redhat.com) wrote:
+> The tls-creds parameter has a default value of NULL indicating
+> that TLS should not be used. Setting it to non-NULL enables
+> use of TLS. Once tls-creds are set to a non-NULL value via the
+> monitor, it isn't possible to set them back to NULL again, due
+> to current implementation limitations. The empty string is not
+> a valid QObject identifier, so this switches to use "" as the
+> default, indicating that TLS will not be used
+> 
+> The tls-hostname parameter has a default value of NULL indicating
+> the the hostname from the migrate connection URI should be used.
+> Again, once tls-hostname is set non-NULL, to override the default
+> hostname for x509 cert validation, it isn't possible to reset it
+> back to NULL via the monitor. The empty string is not a valid
+> hostname, so this switches to use "" as the default, indicating
+> that the migrate URI hostname should be used.
+> 
+> Using "" as the default for both, also means that the monitor
+> commands "info migrate_parameters" / "query-migrate-parameters"
+> will report existance of tls-creds/tls-parameters even when set
+> to their default values.
+> 
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 
-Stafford Horne <shorne@gmail.com> writes:
+Yes, simple enough.
 
-> Jia has claimed he is no longer able to maintain.  I have fixing bugs here
-> and there and getting familiar with the code base. Orignal thread from Jia:
->
->  https://lists.librecores.org/pipermail/openrisc/2017-January/000321.html
->
-> Signed-off-by: Stafford Horne <shorne@gmail.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Markus, Eric - are you OK with that?
+
+Dave
+
 
 > ---
-> Changes in v2
->  - fix typo Off/Odd
->
->  MAINTAINERS | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 4714df8..b359089 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -196,8 +196,8 @@ F: hw/nios2/
->  F: disas/nios2.c
->
->  OpenRISC
-> -M: Jia Liu <proljc@gmail.com>
-> -S: Maintained
-> +M: Stafford Horne <shorne@gmail.com>
-> +S: Odd Fixes
->  F: target/openrisc/
->  F: hw/openrisc/
->  F: tests/tcg/openrisc/
-
-
+>  migration/migration.c | 4 ++++
+>  migration/tls.c       | 2 +-
+>  qapi-schema.json      | 4 ++++
+>  3 files changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 3dab684..54060f7 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -110,6 +110,8 @@ MigrationState *migrate_get_current(void)
+>  
+>      if (!once) {
+>          qemu_mutex_init(&current_migration.src_page_req_mutex);
+> +        current_migration.parameters.tls_creds = g_strdup("");
+> +        current_migration.parameters.tls_hostname = g_strdup("");
+>          once = true;
+>      }
+>      return &current_migration;
+> @@ -458,6 +460,7 @@ void migration_channel_process_incoming(MigrationState *s,
+>          ioc, object_get_typename(OBJECT(ioc)));
+>  
+>      if (s->parameters.tls_creds &&
+> +        *s->parameters.tls_creds &&
+>          !object_dynamic_cast(OBJECT(ioc),
+>                               TYPE_QIO_CHANNEL_TLS)) {
+>          Error *local_err = NULL;
+> @@ -480,6 +483,7 @@ void migration_channel_connect(MigrationState *s,
+>          ioc, object_get_typename(OBJECT(ioc)), hostname);
+>  
+>      if (s->parameters.tls_creds &&
+> +        *s->parameters.tls_creds &&
+>          !object_dynamic_cast(OBJECT(ioc),
+>                               TYPE_QIO_CHANNEL_TLS)) {
+>          Error *local_err = NULL;
+> diff --git a/migration/tls.c b/migration/tls.c
+> index 203c11d..45bec44 100644
+> --- a/migration/tls.c
+> +++ b/migration/tls.c
+> @@ -141,7 +141,7 @@ void migration_tls_channel_connect(MigrationState *s,
+>          return;
+>      }
+>  
+> -    if (s->parameters.tls_hostname) {
+> +    if (s->parameters.tls_hostname && *s->parameters.tls_hostname) {
+>          hostname = s->parameters.tls_hostname;
+>      }
+>      if (!hostname) {
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 32b4a4b..eb9bf67 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -1036,6 +1036,8 @@
+>  #             credentials must be for a 'server' endpoint. Setting this
+>  #             will enable TLS for all migrations. The default is unset,
+>  #             resulting in unsecured migration at the QEMU level. (Since 2.7)
+> +#             An empty string means that QEMU will use plain text mode for
+> +#             migration, rather than TLS (Since 2.9)
+>  #
+>  # @tls-hostname: #optional hostname of the target host for the migration. This
+>  #                is required when using x509 based TLS credentials and the
+> @@ -1043,6 +1045,8 @@
+>  #                example if using fd: or exec: based migration, the
+>  #                hostname must be provided so that the server's x509
+>  #                certificate identity can be validated. (Since 2.7)
+> +#                An empty string means that QEMU will use the hostname
+> +#                associated with the migration URI, if any. (Since 2.9)
+>  #
+>  # @max-bandwidth: to set maximum speed for migration. maximum speed in
+>  #                 bytes per second. (Since 2.8)
+> -- 
+> 2.9.3
+> 
 --
-Alex Bennée
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
