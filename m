@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1co6by-0001xU-To
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:56:59 -0400
+	(envelope-from <groug@kaod.org>) id 1co6dr-0002ii-CP
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:58:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1co6bt-0004qV-4m
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:56:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58102)
+	(envelope-from <groug@kaod.org>) id 1co6dn-0005L8-Eb
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:58:55 -0400
+Received: from 7.mo68.mail-out.ovh.net ([46.105.63.230]:60014)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1co6bt-0004q7-03
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:56:53 -0400
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D153FC05AA5B
-	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 10:56:52 +0000 (UTC)
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Wed, 15 Mar 2017 10:56:46 +0000
-Message-Id: <20170315105646.32355-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH] trace: ensure $(tracetool-y) is defined in top
- level makefile
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1co6dn-0005Ki-5B
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 06:58:51 -0400
+Received: from player763.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 8009E45197
+	for <qemu-devel@nongnu.org>; Wed, 15 Mar 2017 11:58:49 +0100 (CET)
+Date: Wed, 15 Mar 2017 11:58:41 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170315115841.0b5e2a1c@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <1489449360-14411-7-git-send-email-sstabellini@kernel.org>
+References: <alpine.DEB.2.10.1703131650550.21520@sstabellini-ThinkPad-X260>
+	<1489449360-14411-1-git-send-email-sstabellini@kernel.org>
+	<1489449360-14411-7-git-send-email-sstabellini@kernel.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/kg1ljAEe6UqpySjQR2GfiiQ";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v2 7/9] xen/9pfs: implement
+ in/out_iov_from_pdu and vmarshal/vunmarshal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +33,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Stefano Stabellini <sstabellini@kernel.org>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, anthony.perard@citrix.com, Stefano Stabellini <stefano@aporeto.com>, jgross@suse.com, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
 
-The build rules for trace files have a dependancy on $(tracetool-y).
-This variable populated in the trace/Makefile.objs file and thus its
-definition gets pulled into the top level makefile. This happens too
-late in the process though, so by the time $(tracetool-y) is defined,
-make has already evaluated $(tracetool-y) in the dependancies and
-found it to be empty. The result is that when the tracetool source
-is changed, the generated files are not rebuilt. The solution is to
-define the variable in the top level makefile too
+--Sig_/kg1ljAEe6UqpySjQR2GfiiQ
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- Makefile | 3 +++
- 1 file changed, 3 insertions(+)
+On Mon, 13 Mar 2017 16:55:58 -0700
+Stefano Stabellini <sstabellini@kernel.org> wrote:
 
-diff --git a/Makefile b/Makefile
-index 1c4c04f..dffc74b 100644
---- a/Makefile
-+++ b/Makefile
-@@ -85,6 +85,9 @@ GENERATED_SOURCES += $(TRACE_SOURCES)
- 
- trace-group-name = $(shell dirname $1 | sed -e 's/[^a-zA-Z0-9]/_/g')
- 
-+tracetool-y = $(SRC_PATH)/scripts/tracetool.py
-+tracetool-y += $(shell find $(SRC_PATH)/scripts/tracetool -name "*.py")
-+
- %/trace.h: %/trace.h-timestamp
- 	@cmp $< $@ >/dev/null 2>&1 || cp $< $@
- %/trace.h-timestamp: $(SRC_PATH)/%/trace-events $(tracetool-y)
--- 
-2.9.3
+> Implement xen_9pfs_init_in/out_iov_from_pdu and
+> xen_9pfs_pdu_vmarshal/vunmarshall by creating new sg pointing to the
+> data on the ring.
+>=20
+> This is safe as we only handle one request per ring at any given time.
+>=20
+> Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
+> CC: anthony.perard@citrix.com
+> CC: jgross@suse.com
+> CC: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
+> CC: Greg Kurz <groug@kaod.org>
+> ---
+>  hw/9pfs/xen-9p-backend.c | 91 ++++++++++++++++++++++++++++++++++++++++++=
+++++--
+>  1 file changed, 89 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
+> index 741dd31..d72a749 100644
+> --- a/hw/9pfs/xen-9p-backend.c
+> +++ b/hw/9pfs/xen-9p-backend.c
+> @@ -48,12 +48,77 @@ typedef struct Xen9pfsDev {
+>      struct Xen9pfsRing *rings;
+>  } Xen9pfsDev;
+> =20
+> +static void xen_9pfs_in_sg(struct Xen9pfsRing *ring,
+
+Coding style for structured types.
+
+> +                           struct iovec *in_sg,
+> +                           int *num,
+> +                           uint32_t idx,
+> +                           uint32_t size)
+> +{
+> +    RING_IDX cons, prod, masked_prod, masked_cons;
+> +
+> +    cons =3D ring->intf->in_cons;
+> +    prod =3D ring->intf->in_prod;
+> +    xen_rmb();
+> +    masked_prod =3D xen_9pfs_mask(prod, XEN_9PFS_RING_SIZE);
+> +    masked_cons =3D xen_9pfs_mask(cons, XEN_9PFS_RING_SIZE);
+> +
+> +    if (masked_prod < masked_cons) {
+> +        in_sg[0].iov_base =3D ring->ring.in + masked_prod;
+> +        in_sg[0].iov_len =3D masked_cons - masked_prod;
+> +        *num =3D 1;
+> +    } else {
+> +        in_sg[0].iov_base =3D ring->ring.in + masked_prod;
+> +        in_sg[0].iov_len =3D XEN_9PFS_RING_SIZE - masked_prod;
+> +        in_sg[1].iov_base =3D ring->ring.in;
+> +        in_sg[1].iov_len =3D masked_cons;
+> +        *num =3D 2;
+> +    }
+> +}
+> +
+> +static void xen_9pfs_out_sg(struct Xen9pfsRing *ring,
+
+Coding style for structured types.
+
+> +                            struct iovec *out_sg,
+> +                            int *num,
+> +                            uint32_t idx)
+> +{
+> +    RING_IDX cons, prod, masked_prod, masked_cons;
+> +
+> +    cons =3D ring->intf->out_cons;
+> +    prod =3D ring->intf->out_prod;
+> +    xen_rmb();
+> +    masked_prod =3D xen_9pfs_mask(prod, XEN_9PFS_RING_SIZE);
+> +    masked_cons =3D xen_9pfs_mask(cons, XEN_9PFS_RING_SIZE);
+> +
+> +    if (masked_cons < masked_prod) {
+> +        out_sg[0].iov_base =3D ring->ring.out + masked_cons;
+> +        out_sg[0].iov_len =3D ring->out_size;
+> +        *num =3D 1;
+> +    } else {
+> +        if (ring->out_size > (XEN_9PFS_RING_SIZE - masked_cons)) {
+> +            out_sg[0].iov_base =3D ring->ring.out + masked_cons;
+> +            out_sg[0].iov_len =3D XEN_9PFS_RING_SIZE - masked_cons;
+> +            out_sg[1].iov_base =3D ring->ring.out;
+> +            out_sg[1].iov_len =3D ring->out_size - (XEN_9PFS_RING_SIZE -=
+ masked_cons);
+> +            *num =3D 2;
+> +        } else {
+> +            out_sg[0].iov_base =3D ring->ring.out + masked_cons;
+> +            out_sg[0].iov_len =3D ring->out_size;
+> +            *num =3D 1;
+> +        }
+> +    }
+> +}
+> +
+>  static ssize_t xen_9pfs_pdu_vmarshal(V9fsPDU *pdu,
+>                                       size_t offset,
+>                                       const char *fmt,
+>                                       va_list ap)
+>  {
+> -    return 0;
+> +    struct Xen9pfsDev *xen_9pfs =3D container_of(pdu->s, struct Xen9pfsD=
+ev, state);
+
+Coding style for structured types.
+
+> +    struct iovec in_sg[2];
+> +    int num;
+> +
+> +    xen_9pfs_in_sg(&xen_9pfs->rings[pdu->tag % xen_9pfs->num_rings],
+> +                   in_sg, &num, pdu->idx, ROUND_UP(offset + 128, 512));
+> +    return v9fs_iov_vmarshal(in_sg, num, offset, 0, fmt, ap);
+>  }
+> =20
+>  static ssize_t xen_9pfs_pdu_vunmarshal(V9fsPDU *pdu,
+> @@ -61,13 +126,27 @@ static ssize_t xen_9pfs_pdu_vunmarshal(V9fsPDU *pdu,
+>                                         const char *fmt,
+>                                         va_list ap)
+>  {
+> -    return 0;
+> +    struct Xen9pfsDev *xen_9pfs =3D container_of(pdu->s, struct Xen9pfsD=
+ev, state);
+
+Coding style for structured types.
+
+> +    struct iovec out_sg[2];
+> +    int num;
+> +
+> +    xen_9pfs_out_sg(&xen_9pfs->rings[pdu->tag % xen_9pfs->num_rings],
+> +                    out_sg, &num, pdu->idx);
+> +    return v9fs_iov_vunmarshal(out_sg, num, offset, 0, fmt, ap);
+>  }
+> =20
+>  static void xen_9pfs_init_out_iov_from_pdu(V9fsPDU *pdu,
+>                                             struct iovec **piov,
+>                                             unsigned int *pniov)
+>  {
+> +    struct Xen9pfsDev *xen_9pfs =3D container_of(pdu->s, struct Xen9pfsD=
+ev, state);
+> +    struct Xen9pfsRing *ring =3D &xen_9pfs->rings[pdu->tag % xen_9pfs->n=
+um_rings];
+
+Coding style for structured types.
+
+> +    struct iovec *sg =3D g_malloc0(sizeof(*sg)*2);
+> +    int num;
+> +
+> +    xen_9pfs_out_sg(ring, sg, &num, pdu->idx);
+> +    *piov =3D sg;
+> +    *pniov =3D num;
+>  }
+> =20
+>  static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pdu,
+> @@ -75,6 +154,14 @@ static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pd=
+u,
+>                                            unsigned int *pniov,
+>                                            size_t size)
+>  {
+> +    struct Xen9pfsDev *xen_9pfs =3D container_of(pdu->s, struct Xen9pfsD=
+ev, state);
+> +    struct Xen9pfsRing *ring =3D &xen_9pfs->rings[pdu->tag % xen_9pfs->n=
+um_rings];
+
+Coding style for structured types.
+
+> +    struct iovec *sg =3D g_malloc0(sizeof(*sg)*2);
+> +    int num;
+> +
+> +    xen_9pfs_in_sg(ring, sg, &num, pdu->idx, size);
+> +    *piov =3D sg;
+> +    *pniov =3D num;
+>  }
+> =20
+>  static void xen_9pfs_push_and_notify(V9fsPDU *pdu)
+
+
+--Sig_/kg1ljAEe6UqpySjQR2GfiiQ
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAljJHmEACgkQAvw66wEB28LKPgCdGRwsi7iU7fWJjkE1oGCC1CvV
+IVAAn24hIZBi+qvnLUtNbT/xHEubnC2B
+=f+6s
+-----END PGP SIGNATURE-----
+
+--Sig_/kg1ljAEe6UqpySjQR2GfiiQ--
