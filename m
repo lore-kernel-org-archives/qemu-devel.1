@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56015)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1coWIB-00041F-PQ
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 10:22:16 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1coWJ8-0004gc-9F
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 10:23:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1coWI8-0000xQ-IF
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 10:22:15 -0400
-References: <36e41adf-b0b3-3efa-51c4-f1a70cd05b98@ilande.co.uk>
-	<87wpbsp49a.fsf@linaro.org>
-	<6491a446-bf23-5ab9-3431-c67efaf83f71@ilande.co.uk>
-	<alpine.BSF.2.20.1703141450560.82811@zero.eik.bme.hu>
-	<87shmfq31b.fsf@linaro.org>
-	<b9006aa4-b606-61d5-6896-8c76a6a6f8f3@ilande.co.uk>
-	<87efxypqug.fsf@linaro.org> <1489591539.15659.60.camel@redhat.com>
-	<87bmt2pl47.fsf@linaro.org> <1489649706.15659.72.camel@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <48551ece-baee-21a5-1dc9-5eb0e5a36049@redhat.com>
-Date: Thu, 16 Mar 2017 15:22:05 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1coWJ7-0001FY-BD
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 10:23:14 -0400
+Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:34103)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1coWJ7-0001FH-4L
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 10:23:13 -0400
+Received: by mail-wr0-x233.google.com with SMTP id l37so33229753wrc.1
+	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 07:23:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1489649706.15659.72.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] qemu-system-ppc video artifacts since
- "tcg: drop global lock during TCG code execution"
+In-Reply-To: <1489645685-4750-1-git-send-email-armbru@redhat.com>
+References: <1489645685-4750-1-git-send-email-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 16 Mar 2017 14:22:51 +0000
+Message-ID: <CAFEAcA-aArdebeGpNJDjm9DMcAe4AT7uYvSCSvgA9K=p+6d3qw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL for 2.9 00/49] QAPI patches for 2017-03-16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: jan.kiszka@siemens.com, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel <qemu-devel@nongnu.org>, cota@braap.org, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, bobby.prani@gmail.com, rth@twiddle.net, fred.konrad@greensocs.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
+On 16 March 2017 at 06:27, Markus Armbruster <armbru@redhat.com> wrote:
+> Significant improvements to QMP documentation, fixing its regression.
+>
+> Note: only QAPI *generator* code changes, except for trailing space
+> removal in generated qmp-marshal.c and doc comments in QAPI schemas.
+>
+> The following changes since commit 1883ff34b540daacae948f493b0ba525edf5f642:
+>
+>   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2017-03-15 18:44:05 +0000)
+>
+> are available in the git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2017-03-16
+>
+> for you to fetch changes up to 012b126de2ded4e93b5ed069be5544ad8a2e6c15:
+>
+>   qapi: Fix a misleading parser error message (2017-03-16 07:13:04 +0100)
+>
+> ----------------------------------------------------------------
+> QAPI patches for 2017-03-16
+>
+> ----------------------------------------------------------------
 
+Applied, thanks.
 
-On 16/03/2017 08:35, Gerd Hoffmann wrote:
->   Hi,
-> 
->>>> Note that KVM has some similar hacks to avoid trapping all writes to
->>>> video memory with its coalesced mmio mechanism however I'm not familiar
->>>> with all the details.
->>>
->>> Normal linear framebuffer access doesn't use this.
->>
->> Ahh OK - as I said I wasn't super familiar with what coalesced mmio was
->> trying to achieve. I assume it is trying to avoid trapping on every
->> single MMIO access?
-> 
-> You can't avoid the trap, but you can avoid notifying userspace about
-> each and every single trap and batch things.
-> 
-> But vga framebuffer is normal ram in most video modes, it doesn't trap
-> (except on first access with dirty bit clear, for dirty bit tracking).  
-> 
-> IIRC some of the historic video modes which are pretty much unused these
-> days (planar 4bit) trap on each access and perform better with coalesced
-> mmio.  Also nics which use mmio instead of dma for package xfer.
-> 
->>> I suspect the memory_region_sync_dirty_bitmap call on tcg should reset
->>> the fast path optimization, so the slow path can update the dirty bits
->>> correctly.
->>
->> Sure. And for the low level cputlb implementation we can clear those
->> bits atomically. However when the memory region is synced we also need
->> to flush any entries in the TLB that have already been hit and cleared
->> TLB_NOTDIRTY to we can trigger the slow path again. This is tricky from
->> outside of a vCPU context because we can't just queue the work and exit
->> the vCPU run loop to reach a known CPU state.
-> 
-> Hmm, ok.
-> 
->> The RFC PATCH I sent earlier solves this by ensuring the update runs in
->> a quiescent period (i.e. when the vCPUs are not running) but it is
->> sub-optimal as it means the display code has to have a basic knowledge
->> of vCPUs and when they run.
-> 
-> Still the best option for 2.9 I guess ...
-
-For both VGA and SM501, it should be the issue I pointed out in
-https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg03197.html.
-The dirty bitmap has been thread-safe for a long time now.
-
-Paolo
+-- PMM
