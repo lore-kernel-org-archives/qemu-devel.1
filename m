@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33272)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1coXrw-00016a-Ga
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 12:03:17 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35090)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <peter.maydell@linaro.org>) id 1coXva-0003Iw-Hh
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 12:07:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1coXrs-0000CH-MY
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 12:03:16 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:40046 helo=mx01.kamp.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1coXrs-0000AQ-Dy
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 12:03:12 -0400
-From: Peter Lieven <pl@kamp.de>
-Date: Thu, 16 Mar 2017 17:02:49 +0100
-Message-Id: <1489680169-7638-1-git-send-email-pl@kamp.de>
-Subject: [Qemu-devel] [PATCH for-2.9] thread-pool: add missing
- qemu_bh_cancel in completion function
+	(envelope-from <peter.maydell@linaro.org>) id 1coXvV-0001RK-29
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 12:07:02 -0400
+Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:33839)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1coXvU-0001QL-RX
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 12:06:56 -0400
+Received: by mail-wr0-x22b.google.com with SMTP id l37so35394854wrc.1
+	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 09:06:56 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20170316160012.GX15193@redhat.com>
+References: <CAFEAcA9pqDoCWrPAJ+KVxLC_eRy-xRg36oYuARYg2YP8VpGpBg@mail.gmail.com>
+	<20170316154643.GT15193@redhat.com>
+	<CAFEAcA9WdjkAr0eWNApWQGZAw4_67sci3LtY8=9pzYDcDXiLmg@mail.gmail.com>
+	<20170316160012.GX15193@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 16 Mar 2017 16:06:35 +0000
+Message-ID: <CAFEAcA8Mo2PAE2QE8bd0mNTkjRHjpS9BcRj1kk1wwDXYJ2-4nQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] Proposal for deprecating unsupported host OSes &
+ architecutures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,42 +32,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, stefanha@gmail.com, pbonzini@redhat.com, berrange@redhat.com, Peter Lieven <pl@kamp.de>, qemu-stable@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-commit 3c80ca15 fixed a deadlock scenarion with nested aio_poll invocations.
+On 16 March 2017 at 16:00, Daniel P. Berrange <berrange@redhat.com> wrote:
+> I'm just pretty wary of gratuitously deleting stuff that still
+> has a reasonable chance of being functional, simply because
+> we lack CI testing.
 
-However, the rescheduling of the completion BH introcuded unnecessary spinning
-in the main-loop. On very fast file backends this can even lead to the
-"WARNING: I/O thread spun for 1000 iterations" message popping up.
+Well, me too, but I think that if nobody turns up to help us
+or donate a test machine despite configure yelling at them
+for a release cycle or two then it's not all that gratuitous.
 
-Callgrind reports about 3-4% less instructions with this patch running
-qemu-img bench on a ramdisk based VMDK file.
+(Just for instance there's some grotty code in configure that
+looks at 'uname -m' to guess what host OS it is, which is
+really not the right way to do it. But I've never been able
+to clean that up because maybe it might break something
+semi obscure in the process.)
 
-Fixes: 3c80ca158c96ff902a30883a8933e755988948b1
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Peter Lieven <pl@kamp.de>
----
- util/thread-pool.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/util/thread-pool.c b/util/thread-pool.c
-index ce6cd30..610646d 100644
---- a/util/thread-pool.c
-+++ b/util/thread-pool.c
-@@ -188,6 +188,13 @@ restart:
-             aio_context_release(pool->ctx);
-             elem->common.cb(elem->common.opaque, elem->ret);
-             aio_context_acquire(pool->ctx);
-+
-+            /* We can safely cancel the completion_bh here regardless of someone
-+             * else having scheduled it meanwhile because we reenter the
-+             * completion function anyway (goto restart).
-+             */
-+            qemu_bh_cancel(pool->completion_bh);
-+
-             qemu_aio_unref(elem);
-             goto restart;
-         } else {
--- 
-1.9.1
+thanks
+-- PMM
