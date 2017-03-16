@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54795)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1coOtU-00067p-7A
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 02:28:22 -0400
+	(envelope-from <armbru@redhat.com>) id 1coOtV-00067u-7t
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 02:28:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1coOtQ-00075M-Fa
+	(envelope-from <armbru@redhat.com>) id 1coOtQ-00075j-GP
 	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 02:28:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50412)
+Received: from mx1.redhat.com ([209.132.183.28]:60348)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1coOtQ-00071w-0a
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1coOtQ-000722-4Q
 	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 02:28:12 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1B04D76E6
+	by mx1.redhat.com (Postfix) with ESMTPS id 2E3CA437F70
 	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 06:28:12 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-26.ams2.redhat.com
 	[10.36.116.26])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id DA86A60319
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id EC14B5DC1D
 	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 06:28:11 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 16 Mar 2017 07:27:33 +0100
-Message-Id: <1489645685-4750-18-git-send-email-armbru@redhat.com>
+Date: Thu, 16 Mar 2017 07:27:42 +0100
+Message-Id: <1489645685-4750-27-git-send-email-armbru@redhat.com>
 In-Reply-To: <1489645685-4750-1-git-send-email-armbru@redhat.com>
 References: <1489645685-4750-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL for 2.9 17/49] qapi: Conjure up
- QAPIDoc.ArgSection for undocumented members
+Subject: [Qemu-devel] [PULL for 2.9 26/49] qapi2texi: Implement boxed
+ argument documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,93 +36,101 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-qapi2texi.py already conjures up ArgSections for undocumented
-enumeration values, in texi_enum.  Drop that, and conjure them up for
-all kinds of "arguments" (enumeration values, object and alternate
-type members) in qapi.py instead.
-
-Take care to keep generated documentation exactly the same for now.
+This replaces manual references like "For the arguments, see the
+documentation of ..." by a generated reference "Arguments: the members
+of ...".
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <1489582656-31133-16-git-send-email-armbru@redhat.com>
+Message-Id: <1489582656-31133-25-git-send-email-armbru@redhat.com>
 ---
- scripts/qapi.py      |  5 ++---
- scripts/qapi2texi.py | 31 ++++++++++++++++---------------
- 2 files changed, 18 insertions(+), 18 deletions(-)
+ qapi-schema.json     |  2 +-
+ qapi/block-core.json | 10 ----------
+ scripts/qapi2texi.py |  8 +++++++-
+ 3 files changed, 8 insertions(+), 12 deletions(-)
 
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index c1e0bed..f4c8eac 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -224,9 +224,8 @@ class QAPIDoc(object):
-     def connect_member(self, member):
-         if member.name not in self.args:
-             # Undocumented TODO outlaw
--            pass
--        else:
--            self.args[member.name].connect(member)
-+            self.args[member.name] = QAPIDoc.ArgSection(member.name)
-+        self.args[member.name].connect(member)
- 
- 
- class QAPISchemaParser(object):
+diff --git a/qapi-schema.json b/qapi-schema.json
+index d693033..1d7b1cd 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -1017,7 +1017,7 @@
+ ##
+ # @migrate-set-parameters:
+ #
+-# Set various migration parameters.  See MigrationParameters for details.
++# Set various migration parameters.
+ #
+ # Since: 2.4
+ #
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 1be1ec5..0f132fc 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -1341,8 +1341,6 @@
+ # The operation can be stopped before it has completed using the
+ # block-job-cancel command.
+ #
+-# For the arguments, see the documentation of DriveBackup.
+-#
+ # Returns: nothing on success
+ #          If @device is not a valid block device, GenericError
+ #
+@@ -1369,8 +1367,6 @@
+ # The operation can be stopped before it has completed using the
+ # block-job-cancel command.
+ #
+-# For the arguments, see the documentation of BlockdevBackup.
+-#
+ # Returns: nothing on success
+ #          If @device is not a valid block device, DeviceNotFound
+ #
+@@ -1458,8 +1454,6 @@
+ # format of the mirror image, default is to probe if mode='existing',
+ # else the format of the source.
+ #
+-# See DriveMirror for parameter descriptions
+-#
+ # Returns: nothing on success
+ #          If @device is not a valid block device, GenericError
+ #
+@@ -1731,8 +1725,6 @@
+ # the device will be removed from its group and the rest of its
+ # members will not be affected. The 'group' parameter is ignored.
+ #
+-# See BlockIOThrottle for parameter descriptions.
+-#
+ # Returns: Nothing on success
+ #          If @device is not a valid block device, DeviceNotFound
+ #
+@@ -2915,8 +2907,6 @@
+ # BlockBackend will be created; otherwise, @node-name is mandatory at the top
+ # level and no BlockBackend will be created.
+ #
+-# For the arguments, see the documentation of BlockdevOptions.
+-#
+ # Note: This command is still a work in progress.  It doesn't support all
+ # block drivers among other things.  Stay away from it unless you want
+ # to help with its development.
 diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-index 0aaf45c..299dcf9 100755
+index df87441..3dd0146 100755
 --- a/scripts/qapi2texi.py
 +++ b/scripts/qapi2texi.py
-@@ -123,7 +123,7 @@ def texi_format(doc):
-     return "\n".join(lines)
+@@ -220,9 +220,15 @@ class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisitor):
+         doc = self.cur_doc
+         if self.out:
+             self.out += '\n'
++        if boxed:
++            body = texi_body(doc)
++            body += '\n@b{Arguments:} the members of @code{%s}' % arg_type.name
++            body += texi_sections(doc)
++        else:
++            body = texi_entity(doc, 'Arguments')
+         self.out += MSG_FMT(type='Command',
+                             name=doc.symbol,
+-                            body=texi_entity(doc, 'Arguments'))
++                            body=body)
  
- 
--def texi_body(doc):
-+def texi_body(doc, only_documented=False):
-     """
-     Format the body of a symbol documentation:
-     - main body
-@@ -131,17 +131,21 @@ def texi_body(doc):
-     - followed by "Returns/Notes/Since/Example" sections
-     """
-     body = texi_format(str(doc.body)) + "\n"
--    if doc.args:
-+
-+    args = ''
-+    for name, section in doc.args.iteritems():
-+        if not section.content and not only_documented:
-+            continue        # Undocumented TODO require doc and drop
-+        desc = str(section)
-+        opt = ''
-+        if section.optional:
-+            desc = re.sub(r'^ *#optional *\n?|\n? *#optional *$|#optional',
-+                          '', desc)
-+            opt = ' (optional)'
-+        args += "@item @code{'%s'}%s\n%s\n" % (name, opt, texi_format(desc))
-+    if args:
-         body += "@table @asis\n"
--        for arg, section in doc.args.iteritems():
--            desc = str(section)
--            opt = ''
--            if section.optional:
--                desc = re.sub(r'^ *#optional *\n?|\n? *#optional *$|#optional',
--                              '', desc)
--                opt = ' (optional)'
--            body += "@item @code{'%s'}%s\n%s\n" % (arg, opt,
--                                                   texi_format(desc))
-+        body += args
-         body += "@end table\n"
- 
-     for section in doc.sections:
-@@ -183,10 +187,7 @@ def texi_union(expr, doc):
- 
- def texi_enum(expr, doc):
-     """Format an enum to texi"""
--    for i in expr['data']:
--        if i not in doc.args:
--            doc.args[i] = qapi.QAPIDoc.ArgSection(i)
--    body = texi_body(doc)
-+    body = texi_body(doc, True)
-     return TYPE_FMT(type="Enum",
-                     name=doc.symbol,
-                     body=body)
+     def visit_event(self, name, info, arg_type, boxed):
+         doc = self.cur_doc
 -- 
 2.7.4
