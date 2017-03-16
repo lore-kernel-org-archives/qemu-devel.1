@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1coRbA-0003xC-9S
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:21:36 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1coRbE-0003y6-Mp
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:21:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1coRb5-00009y-Gn
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:21:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53628)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1coRbD-0000Bt-JO
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:21:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44480)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1coRb5-00009r-B2
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:21:27 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	id 1coRbD-0000Bc-Ay
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:21:35 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CA8E164D8A
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 09:21:26 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5EB9580B56
+	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 09:21:35 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 16 Mar 2017 13:21:00 +0400
-Message-Id: <20170316092121.25672-1-marcandre.lureau@redhat.com>
+Date: Thu, 16 Mar 2017 13:21:02 +0400
+Message-Id: <20170316092121.25672-3-marcandre.lureau@redhat.com>
+In-Reply-To: <20170316092121.25672-1-marcandre.lureau@redhat.com>
+References: <20170316092121.25672-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 00/21] chardev clean-ups & tests (after 2.9)
+Subject: [Qemu-devel] [PATCH v3 02/21] mux: simplfy muxes_realize_done
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,71 +36,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, eblake@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Hi,
+mux_chr_event() already send events to all backends, rename it,
+export it, and use it from muxes_realize_done. This should help abstract
+away mux implementation.
 
-The following series contains various patches:
-- replace "chardevs" list for a /chardevs container object
-- add a few read-only socket properties mainly useful for testing
-- some chardev related clean-ups
-- add various chardev tests
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ chardev/char-mux.h |  2 +-
+ chardev/char-mux.c | 11 ++++++++---
+ chardev/char.c     |  9 ++-------
+ 3 files changed, 11 insertions(+), 11 deletions(-)
 
-This series is part of a larger refactoring series that I try to keep
-up to date here: https://github.com/elmarco/qemu/commits/chrfe
-
-v3:
-- open code object_new_with_props() as suggest by Paolo
-- added some r-b tags
-- rebased
-
-v2:
-- replaced root container unref with a TODO
-- call object_unparent() directly instead of qemu_chr_delete()
-- remove bad qcow2 NULL check removal
-- rebased
-
-Marc-Andr=C3=A9 Lureau (21):
-  char: remove qemu_chr_be_generic_open
-  mux: simplfy muxes_realize_done
-  xen: use a better chardev type check
-  container: don't leak container reference
-  char: add a /chardevs container
-  vl: add todo note about root container cleanup
-  char: use /chardevs container instead of chardevs list
-  char: remove qemu_chardev_add
-  char: remove chardevs list
-  char: useless NULL check
-  char-socket: introduce update_disconnected_filename()
-  char-socket: update local address after listen
-  char-socket: add 'addr' property
-  char-socket: add 'connected' property
-  char-udp: flush as much buffer as possible
-  tests: add alias check in /char/ringbuf
-  tests: add /char/pipe test
-  tests: add /char/file test
-  tests: add /char/socket test
-  tests: add /char/udp test
-  tests: add /char/console test
-
- chardev/char-mux.h          |   2 +-
- include/sysemu/char.h       |  10 --
- chardev/char-mux.c          |  11 +-
- chardev/char-pty.c          |   2 +-
- chardev/char-socket.c       |  46 +++++-
- chardev/char-udp.c          |  26 ++--
- chardev/char.c              | 148 ++++++++----------
- gdbstub.c                   |   4 +-
- hw/usb/ccid-card-passthru.c |   2 +-
- hw/usb/redirect.c           |   2 +-
- net/vhost-user.c            |   2 +-
- qom/container.c             |   1 +
- tests/test-char.c           | 366 ++++++++++++++++++++++++++++++++++++++=
-+++++-
- tests/vhost-user-test.c     |   2 +-
- ui/console.c                |   2 +-
- ui/gtk.c                    |   2 +-
- vl.c                        |   1 +
- xen-common.c                |   2 +-
- 18 files changed, 504 insertions(+), 127 deletions(-)
-
+diff --git a/chardev/char-mux.h b/chardev/char-mux.h
+index 9a2fffce91..3f41dfcfd2 100644
+--- a/chardev/char-mux.h
++++ b/chardev/char-mux.h
+@@ -58,6 +58,6 @@ typedef struct MuxChardev {
+=20
+ void mux_chr_set_handlers(Chardev *chr, GMainContext *context);
+ void mux_set_focus(Chardev *chr, int focus);
+-void mux_chr_send_event(MuxChardev *d, int mux_nr, int event);
++void mux_chr_send_all_event(Chardev *chr, int event);
+=20
+ #endif /* CHAR_MUX_H */
+diff --git a/chardev/char-mux.c b/chardev/char-mux.c
+index 5547a36a0a..37d42c65c6 100644
+--- a/chardev/char-mux.c
++++ b/chardev/char-mux.c
+@@ -114,7 +114,7 @@ static void mux_print_help(Chardev *chr)
+     }
+ }
+=20
+-void mux_chr_send_event(MuxChardev *d, int mux_nr, int event)
++static void mux_chr_send_event(MuxChardev *d, int mux_nr, int event)
+ {
+     CharBackend *be =3D d->backends[mux_nr];
+=20
+@@ -222,9 +222,9 @@ static void mux_chr_read(void *opaque, const uint8_t =
+*buf, int size)
+=20
+ bool muxes_realized;
+=20
+-static void mux_chr_event(void *opaque, int event)
++void mux_chr_send_all_event(Chardev *chr, int event)
+ {
+-    MuxChardev *d =3D MUX_CHARDEV(opaque);
++    MuxChardev *d =3D MUX_CHARDEV(chr);
+     int i;
+=20
+     if (!muxes_realized) {
+@@ -237,6 +237,11 @@ static void mux_chr_event(void *opaque, int event)
+     }
+ }
+=20
++static void mux_chr_event(void *opaque, int event)
++{
++    mux_chr_send_all_event(CHARDEV(opaque), event);
++}
++
+ static GSource *mux_chr_add_watch(Chardev *s, GIOCondition cond)
+ {
+     MuxChardev *d =3D MUX_CHARDEV(s);
+diff --git a/chardev/char.c b/chardev/char.c
+index aad639b620..674c097fbe 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -451,22 +451,17 @@ static void muxes_realize_done(Notifier *notifier, =
+void *unused)
+ {
+     Chardev *chr;
+=20
++    muxes_realized =3D true;
+     QTAILQ_FOREACH(chr, &chardevs, next) {
+         if (CHARDEV_IS_MUX(chr)) {
+-            MuxChardev *d =3D MUX_CHARDEV(chr);
+-            int i;
+-
+             /* send OPENED to all already-attached FEs */
+-            for (i =3D 0; i < d->mux_cnt; i++) {
+-                mux_chr_send_event(d, i, CHR_EVENT_OPENED);
+-            }
++            mux_chr_send_all_event(CHARDEV(chr), CHR_EVENT_OPENED);
+             /* mark mux as OPENED so any new FEs will immediately receiv=
+e
+              * OPENED event
+              */
+             qemu_chr_be_event(chr, CHR_EVENT_OPENED);
+         }
+     }
+-    muxes_realized =3D true;
+ }
+=20
+ static Notifier muxes_realize_notify =3D {
 --=20
 2.12.0.191.gc5d8de91d
