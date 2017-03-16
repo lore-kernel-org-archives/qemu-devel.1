@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49134)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1coboZ-0003om-OJ
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 16:16:04 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1cobsP-0005XZ-5A
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 16:20:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1coboU-0000Ft-Ec
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 16:16:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56188)
+	(envelope-from <sstabellini@kernel.org>) id 1cobsL-0001Xt-4K
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 16:20:01 -0400
+Received: from mail.kernel.org ([198.145.29.136]:48224)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1coboU-0000EY-7p
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 16:15:58 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2D86E5380
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 20:15:58 +0000 (UTC)
-Date: Thu, 16 Mar 2017 20:15:53 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170316201553.GR2567@work-vm>
-References: <20170315135021.6978-1-quintela@redhat.com>
-	<20170315135021.6978-22-quintela@redhat.com>
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1cobsK-0001Xl-QM
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 16:19:57 -0400
+Date: Thu, 16 Mar 2017 13:19:51 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <20170316141953.16161-2-jgross@suse.com>
+Message-ID: <alpine.DEB.2.10.1703161312390.15430@sstabellini-ThinkPad-X260>
+References: <20170316141953.16161-1-jgross@suse.com>
+	<20170316141953.16161-2-jgross@suse.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170315135021.6978-22-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 21/31] ram: Everything was init to zero,
- so use memset
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH 1/2] xen: use 5 digit xen versions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,75 +27,220 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Juergen Gross <jgross@suse.com>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, anthony.perard@citrix.com, kraxel@redhat.com, sstabellini@kernel.org, paul.durrant@citrix.com
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> And then init only things that are not zero by default.
+On Thu, 16 Mar 2017, Juergen Gross wrote:
+> Today qemu is using e.g. the value 480 for Xen version 4.8.0. As some
+> Xen version tests are using ">" relations this scheme will lead to
+> problems when Xen version 4.10.0 is being reached.
 > 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> Instead of the 3 digit schem use a 5 digit scheme (e.g. 40800 for
+> version 4.8.0).
+> 
+> Signed-off-by: Juergen Gross <jgross@suse.com>
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+
 
 > ---
->  migration/ram.c | 25 +++----------------------
->  1 file changed, 3 insertions(+), 22 deletions(-)
+>  configure                   | 16 ++++++++--------
+>  hw/block/xen_disk.c         |  2 +-
+>  include/hw/xen/xen_common.h | 22 +++++++++++-----------
+>  3 files changed, 20 insertions(+), 20 deletions(-)
 > 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 606e836..7f56b5f 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -588,15 +588,6 @@ static void migration_bitmap_sync_range(RAMState *rs, ram_addr_t start,
->          cpu_physical_memory_sync_dirty_bitmap(bitmap, start, length);
+> diff --git a/configure b/configure
+> index b187222..aabf098 100755
+> --- a/configure
+> +++ b/configure
+> @@ -2001,7 +2001,7 @@ EOF
+>        compile_prog "" "$xen_libs $xen_stable_libs -lxendevicemodel"
+>      then
+>      xen_stable_libs="$xen_stable_libs -lxendevicemodel"
+> -    xen_ctrl_version=490
+> +    xen_ctrl_version=40900
+>      xen=yes
+>    elif
+>        cat > $TMPC <<EOF &&
+> @@ -2056,7 +2056,7 @@ int main(void) {
+>  EOF
+>        compile_prog "" "$xen_libs $xen_stable_libs"
+>      then
+> -    xen_ctrl_version=480
+> +    xen_ctrl_version=40800
+>      xen=yes
+>    elif
+>        cat > $TMPC <<EOF &&
+> @@ -2107,7 +2107,7 @@ int main(void) {
+>  EOF
+>        compile_prog "" "$xen_libs $xen_stable_libs"
+>      then
+> -    xen_ctrl_version=471
+> +    xen_ctrl_version=40701
+>      xen=yes
+>    elif
+>        cat > $TMPC <<EOF &&
+> @@ -2122,7 +2122,7 @@ int main(void) {
+>  EOF
+>        compile_prog "" "$xen_libs"
+>      then
+> -    xen_ctrl_version=470
+> +    xen_ctrl_version=40700
+>      xen=yes
+>  
+>    # Xen 4.6
+> @@ -2150,7 +2150,7 @@ int main(void) {
+>  EOF
+>        compile_prog "" "$xen_libs"
+>      then
+> -    xen_ctrl_version=460
+> +    xen_ctrl_version=40600
+>      xen=yes
+>  
+>    # Xen 4.5
+> @@ -2177,7 +2177,7 @@ int main(void) {
+>  EOF
+>        compile_prog "" "$xen_libs"
+>      then
+> -    xen_ctrl_version=450
+> +    xen_ctrl_version=40500
+>      xen=yes
+>  
+>    elif
+> @@ -2202,7 +2202,7 @@ int main(void) {
+>  EOF
+>        compile_prog "" "$xen_libs"
+>      then
+> -    xen_ctrl_version=420
+> +    xen_ctrl_version=40200
+>      xen=yes
+>  
+>    else
+> @@ -2214,7 +2214,7 @@ EOF
+>    fi
+>  
+>    if test "$xen" = yes; then
+> -    if test $xen_ctrl_version -ge 471  ; then
+> +    if test $xen_ctrl_version -ge 40701  ; then
+>        libs_softmmu="$xen_stable_libs $libs_softmmu"
+>      fi
+>      libs_softmmu="$xen_libs $libs_softmmu"
+> diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
+> index 456a2d5..27df048 100644
+> --- a/hw/block/xen_disk.c
+> +++ b/hw/block/xen_disk.c
+> @@ -492,7 +492,7 @@ static int ioreq_map(struct ioreq *ioreq)
+>      return 0;
 >  }
 >  
-> -static void migration_bitmap_sync_init(RAMState *rs)
-> -{
-> -    rs->start_time = 0;
-> -    rs->bytes_xfer_prev = 0;
-> -    rs->num_dirty_pages_period = 0;
-> -    rs->xbzrle_cache_miss_prev = 0;
-> -    rs->iterations_prev = 0;
-> -}
-> -
->  /* Returns a summary bitmap of the page sizes of all RAMBlocks;
->   * for VMs with just normal pages this is equivalent to the
->   * host page size.  If it's got some huge pages then it's the OR
-> @@ -1915,21 +1906,11 @@ err:
->      return ret;
->  }
+> -#if CONFIG_XEN_CTRL_INTERFACE_VERSION >= 480
+> +#if CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40800
 >  
-> -static int ram_save_init_globals(RAMState *rs)
-> +static int ram_state_init(RAMState *rs)
+>  static void ioreq_free_copy_buffers(struct ioreq *ioreq)
 >  {
->      int64_t ram_bitmap_pages; /* Size of bitmap in pages, including gaps */
+> diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
+> index 274accc..df098c7 100644
+> --- a/include/hw/xen/xen_common.h
+> +++ b/include/hw/xen/xen_common.h
+> @@ -27,7 +27,7 @@ extern xc_interface *xen_xc;
+>   * We don't support Xen prior to 4.2.0.
+>   */
 >  
-> -    rs->dirty_rate_high_cnt = 0;
-> -    rs->bitmap_sync_count = 0;
-> -    rs->zero_pages = 0;
-> -    rs->norm_pages = 0;
-> -    rs->iterations = 0;
-> -    rs->xbzrle_bytes = 0;
-> -    rs->xbzrle_pages = 0;
-> -    rs->xbzrle_cache_miss = 0;
-> -    rs->xbzrle_cache_miss_rate = 0;
-> -    rs->xbzrle_overflows = 0;
-> -    migration_bitmap_sync_init(rs);
-> +    memset(rs, 0, sizeof(*rs));
->      qemu_mutex_init(&migration_bitmap_mutex);
+> -#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 490
+> +#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40900
 >  
->      if (migrate_use_xbzrle()) {
-> @@ -2010,7 +1991,7 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
+>  typedef xc_interface xendevicemodel_handle;
 >  
->      /* migration has already setup the bitmap, reuse it. */
->      if (!migration_in_colo_state()) {
-> -        if (ram_save_init_globals(rs) < 0) {
-> +        if (ram_state_init(rs) < 0) {
->              return -1;
->           }
->      }
+> @@ -37,7 +37,7 @@ static inline xendevicemodel_handle *xendevicemodel_open(
+>      return xen_xc;
+>  }
+>  
+> -#if CONFIG_XEN_CTRL_INTERFACE_VERSION >= 450
+> +#if CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40500
+>  
+>  static inline int xendevicemodel_create_ioreq_server(
+>      xendevicemodel_handle *dmod, domid_t domid, int handle_bufioreq,
+> @@ -100,7 +100,7 @@ static inline int xendevicemodel_set_ioreq_server_state(
+>      return xc_hvm_set_ioreq_server_state(dmod, domid, id, enabled);
+>  }
+>  
+> -#endif /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 450 */
+> +#endif /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40500 */
+>  
+>  static inline int xendevicemodel_set_pci_intx_level(
+>      xendevicemodel_handle *dmod, domid_t domid, uint16_t segment,
+> @@ -152,7 +152,7 @@ static inline int xendevicemodel_set_mem_type(
+>      return xc_hvm_set_mem_type(dmod, domid, mem_type, first_pfn, nr);
+>  }
+>  
+> -#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 490 */
+> +#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
+>  
+>  #include <xendevicemodel.h>
+>  
+> @@ -207,7 +207,7 @@ static inline int xen_modified_memory(domid_t domid, uint64_t first_pfn,
+>  }
+>  
+>  /* Xen 4.2 through 4.6 */
+> -#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 471
+> +#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40701
+>  
+>  typedef xc_interface xenforeignmemory_handle;
+>  typedef xc_evtchn xenevtchn_handle;
+> @@ -248,7 +248,7 @@ static inline void *xenforeignmemory_map(xc_interface *h, uint32_t dom,
+>  
+>  #define xenforeignmemory_unmap(h, p, s) munmap(p, s * XC_PAGE_SIZE)
+>  
+> -#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 471 */
+> +#else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40701 */
+>  
+>  #include <xenevtchn.h>
+>  #include <xengnttab.h>
+> @@ -284,7 +284,7 @@ static inline int xen_get_vmport_regs_pfn(xc_interface *xc, domid_t dom,
+>  #endif
+>  
+>  /* Xen before 4.6 */
+> -#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 460
+> +#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40600
+>  
+>  #ifndef HVM_IOREQSRV_BUFIOREQ_ATOMIC
+>  #define HVM_IOREQSRV_BUFIOREQ_ATOMIC 2
+> @@ -330,7 +330,7 @@ static inline int xen_get_default_ioreq_server_info(domid_t dom,
+>  }
+>  
+>  /* Xen before 4.5 */
+> -#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 450
+> +#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40500
+>  
+>  #ifndef HVM_PARAM_BUFIOREQ_EVTCHN
+>  #define HVM_PARAM_BUFIOREQ_EVTCHN 26
+> @@ -569,7 +569,7 @@ static inline int xen_set_ioreq_server_state(domid_t dom,
+>  
+>  #endif
+>  
+> -#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 460
+> +#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40600
+>  static inline int xen_xc_domain_add_to_physmap(xc_interface *xch, uint32_t domid,
+>                                                 unsigned int space,
+>                                                 unsigned long idx,
+> @@ -592,7 +592,7 @@ static inline int xen_xc_domain_add_to_physmap(xc_interface *xch, uint32_t domid
+>  #endif
+>  
+>  #ifdef CONFIG_XEN_PV_DOMAIN_BUILD
+> -#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 470
+> +#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40700
+>  static inline int xen_domain_create(xc_interface *xc, uint32_t ssidref,
+>                                      xen_domain_handle_t handle, uint32_t flags,
+>                                      uint32_t *pdomid)
+> @@ -611,7 +611,7 @@ static inline int xen_domain_create(xc_interface *xc, uint32_t ssidref,
+>  
+>  /* Xen before 4.8 */
+>  
+> -#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 480
+> +#if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40800
+>  
+>  
+>  typedef void *xengnttab_grant_copy_segment_t;
 > -- 
-> 2.9.3
+> 2.10.2
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
