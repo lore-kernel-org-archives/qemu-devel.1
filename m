@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1coKZZ-0000Qe-Lx
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 21:51:26 -0400
+	(envelope-from <mreitz@redhat.com>) id 1coKfN-0001lZ-IF
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 21:57:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1coKZW-0000pZ-J3
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 21:51:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48102)
+	(envelope-from <mreitz@redhat.com>) id 1coKfK-0002hH-Fs
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 21:57:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51622)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1coKZW-0000pV-9v
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 21:51:22 -0400
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1coKfK-0002gu-6X
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 21:57:22 -0400
 References: <20170315092940.1367-1-stefanha@redhat.com>
-	<20170315092940.1367-8-stefanha@redhat.com>
+	<20170315092940.1367-6-stefanha@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <ed926593-88de-90ec-4133-c02d9f1a3766@redhat.com>
-Date: Thu, 16 Mar 2017 02:51:14 +0100
+Message-ID: <4db9211c-4136-335c-8d97-c0ec13da2aa3@redhat.com>
+Date: Thu, 16 Mar 2017 02:57:13 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170315092940.1367-8-stefanha@redhat.com>
+In-Reply-To: <20170315092940.1367-6-stefanha@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="3n8pVO7Ug82UAHqv6RHJEc1ddLQFWbgxm"
-Subject: Re: [Qemu-devel] [RFC v2 7/8] qemu-iotests: support per-format
- golden output files
+	boundary="QpwAO3FvVcIcGIrTcDOxenvcpPOekGKeh"
+Subject: Re: [Qemu-devel] [RFC v2 5/8] qcow2: add bdrv_measure() support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,98 +32,137 @@ To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Nir Soffer <nsoffer@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, Alberto Garcia <berto@igalia.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3n8pVO7Ug82UAHqv6RHJEc1ddLQFWbgxm
+--QpwAO3FvVcIcGIrTcDOxenvcpPOekGKeh
 From: Max Reitz <mreitz@redhat.com>
 To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
  Nir Soffer <nsoffer@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>,
  Alberto Garcia <berto@igalia.com>
-Message-ID: <ed926593-88de-90ec-4133-c02d9f1a3766@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v2 7/8] qemu-iotests: support per-format golden
- output files
+Message-ID: <4db9211c-4136-335c-8d97-c0ec13da2aa3@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v2 5/8] qcow2: add bdrv_measure() support
 References: <20170315092940.1367-1-stefanha@redhat.com>
- <20170315092940.1367-8-stefanha@redhat.com>
-In-Reply-To: <20170315092940.1367-8-stefanha@redhat.com>
+ <20170315092940.1367-6-stefanha@redhat.com>
+In-Reply-To: <20170315092940.1367-6-stefanha@redhat.com>
 Content-Type: text/plain; charset=iso-8859-15
 Content-Transfer-Encoding: quoted-printable
 
 On 15.03.2017 10:29, Stefan Hajnoczi wrote:
-> Some tests produce format-dependent output.  Either the difference is
-> filtered out and ignored, or the test case is format-specific so we
-> don't need to worry about per-format output differences.
+> Use qcow2_calc_prealloc_size() to get the required file size.
 >=20
-> There is a third case: the test script is the same for all image format=
-s
-> and the format-dependent output is relevant.  An ugly workaround is to
-> copy-paste the test into multiple per-format test cases.  This
-> duplicates code and is not maintainable.
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+> TODO:
+>  * Query block status and only count allocated clusters if in_bs !=3D N=
+ULL
+>  * Exclude backing file clusters if in_bs !=3D NULL and -o backing_file=
+=3D
+>    is given
+> ---
+>  block/qcow2.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++=
+++
+>  1 file changed, 53 insertions(+)
 >=20
-> This patch allows test cases to add per-format golden output files so a=
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 19be468..a4caf97 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -2940,6 +2940,58 @@ static coroutine_fn int qcow2_co_flush_to_os(Blo=
+ckDriverState *bs)
+>      return 0;
+>  }
+> =20
+> +static void qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
+> +                          BlockMeasureInfo *info, Error **errp)
+> +{
+> +    Error *local_err =3D NULL;
+> +    uint64_t allocated_bytes =3D 0;
+> +    uint64_t prealloc_size;
+> +    uint64_t size;
+> +    uint64_t refcount_bits;
+> +    size_t cluster_size;
+> +    int version;
+> +
+> +    size =3D ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+> +                    BDRV_SECTOR_SIZE);
+> +
+> +    cluster_size =3D qcow2_opt_get_cluster_size_del(opts, &local_err);=
 
-> single test case can work correctly when format-dependent output must b=
-e
-> checked:
->=20
->   123.out.qcow2
->   123.out.raw
->   123.out.vmdk
->   ...
->=20
-> This naming scheme is not composable with 123.out.nocache or 123.pc.out=
-,
-> two other scenarios where output files are split.  I don't think it
-> matters since few test cases need these features.
+> +    if (local_err) {
+> +        goto err;
+> +    }
+> +
+> +    version =3D qcow2_opt_get_version_del(opts, &local_err);
+> +    if (local_err) {
+> +        goto err;
+> +    }
+> +
+> +    refcount_bits =3D qcow2_opt_get_refcount_bits_del(opts, version, &=
+local_err);
+> +    if (local_err) {
+> +        goto err;
+> +    }
+> +
+> +    if (in_bs) {
+> +        int64_t ssize =3D bdrv_getlength(in_bs);
+> +        if (ssize < 0) {
+> +            error_setg_errno(errp, -ssize, "Unable to get image size")=
+;
+> +            return;
+> +        }
+> +
+> +        size =3D ssize;
+> +
+> +        /* TODO How many clusters are allocated modulo backing file in=
+ opts? */
+> +    }
+> +
+> +    prealloc_size =3D qcow2_calc_prealloc_size(size, cluster_size,
+> +                                             ctz32(refcount_bits));
+> +    info->required_bytes =3D prealloc_size - (align_offset(size, clust=
+er_size) -
+> +                                            allocated_bytes);
 
-Well, it would be pretty simple to implement by just always using
-reference_x=3D"$reference.$NEW_EXTENSION" instead of rebuilding the path
-from screatch, but the number of combinations would blow up so much it
-may be better to leave that out anyway.
-
-(No R-b because I like to save my precious R-bs for non-RFCs)
+But what if @opts contains a preallocation option?
 
 Max
 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  tests/qemu-iotests/check | 5 +++++
->  1 file changed, 5 insertions(+)
->=20
-> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-> index 4b1c674..29553cf 100755
-> --- a/tests/qemu-iotests/check
-> +++ b/tests/qemu-iotests/check
-> @@ -338,6 +338,11 @@ do
->                  reference=3D"$reference_machine"
->              fi
-> =20
-> +            reference_format=3D"$source_iotests/$seq.out.$IMGFMT"
-> +            if [ -f "$reference_format" ]; then
-> +                reference=3D"$reference_format"
-> +            fi
+> +    info->fully_allocated_bytes =3D prealloc_size;
+> +    return;
 > +
->              if [ "$CACHEMODE" =3D "none" ]; then
->                  [ -f "$source_iotests/$seq.out.nocache" ] && reference=
-=3D"$source_iotests/$seq.out.nocache"
->              fi
+> +err:
+> +    error_propagate(errp, local_err);
+> +}
+> +
+>  static int qcow2_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
+>  {
+>      BDRVQcow2State *s =3D bs->opaque;
+> @@ -3487,6 +3539,7 @@ BlockDriver bdrv_qcow2 =3D {
+>      .bdrv_snapshot_delete   =3D qcow2_snapshot_delete,
+>      .bdrv_snapshot_list     =3D qcow2_snapshot_list,
+>      .bdrv_snapshot_load_tmp =3D qcow2_snapshot_load_tmp,
+> +    .bdrv_measure           =3D qcow2_measure,
+>      .bdrv_get_info          =3D qcow2_get_info,
+>      .bdrv_get_specific_info =3D qcow2_get_specific_info,
+> =20
 >=20
 
 
 
---3n8pVO7Ug82UAHqv6RHJEc1ddLQFWbgxm
+--QpwAO3FvVcIcGIrTcDOxenvcpPOekGKeh
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljJ75ISHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ALGUIAKMJtBoESozb5r/aeG3Qy/XWxNhONXIf
-YX04FfqGY8qHp4wmv8vyi/jaDyfbej7lsral0tvKHmfEb08hMEjKjY+aJmSdRHoI
-ZGKK4vb0pTiICzYAWrkHhHPMWxx7k6wd5szTukd4zFOOccQ+kzFK+55g5TmTyKfv
-123/dT3POQCu5pjjetIj9BX/a2nm1pnAMZl5fBAq/l4PED0OSuSfaKmxV34mejmn
-hvXT9Qfxw/icqSbJ0F+ozD5W6U8aTlq/XxTr9oLWfKuJgifvMQKGltiSbj2rVZWH
-fmFTZliwwvisLnKQxJWedO556VrSXNDLb1gxcr1cZo6glF2jrTfQDLI=
-=V6M+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljJ8PkSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ATlMIAL4W8OaTTlkUdOOJLwCVuM4kVbFO2/lv
+Z5wZsophv1S35mpbS44eTPjaZVBYB0XWYoanVk3ZZWhmHYzrv15KSqwyAahZOl3D
+SayxiSrj8zVfhukWSukdxGlaq6BuZAvq7ZJ++bXq0aGTatj1TnTG5HRqbI2zOUKK
+0+q6x53JHaEPXbELdwzpSb3oD0mKCiMk6O3afvIPZhQeSyC0DTRZYQpogd+A0aKu
+9UlWHj7HUQaG2q5Zy3XtdEqOlA9p79WD6gmn4wxBnzAbDijXYqhejYtN3mm2cOI9
+E23pHDHvjx1w4FJ0OtOknkiPFT582cpcD+k1QjSNwPmH94WIqr3b6vY=
+=O4E1
 -----END PGP SIGNATURE-----
 
---3n8pVO7Ug82UAHqv6RHJEc1ddLQFWbgxm--
+--QpwAO3FvVcIcGIrTcDOxenvcpPOekGKeh--
