@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cobaf-0001IT-LP
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 16:01:43 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1cobbD-0001qj-1G
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 16:02:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cobac-0002i7-Fh
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 16:01:41 -0400
-Received: from mail.kernel.org ([198.145.29.136]:45720)
+	(envelope-from <sstabellini@kernel.org>) id 1cobb9-0003BG-HS
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 16:02:15 -0400
+Received: from mail.kernel.org ([198.145.29.136]:45840)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1cobac-0002gA-8R
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 16:01:38 -0400
-Date: Thu, 16 Mar 2017 13:00:40 -0700 (PDT)
+	id 1cobb9-00038s-Ar
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 16:02:11 -0400
 From: Stefano Stabellini <sstabellini@kernel.org>
-Message-ID: <alpine.DEB.2.10.1703161241220.14378@sstabellini-ThinkPad-X260>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Qemu-devel] [PATCH v3 0/9] xen/9pfs: introduce the Xen 9pfs backend
+Date: Thu, 16 Mar 2017 13:01:52 -0700
+Message-Id: <1489694518-16978-3-git-send-email-sstabellini@kernel.org>
+In-Reply-To: <1489694518-16978-1-git-send-email-sstabellini@kernel.org>
+References: <alpine.DEB.2.10.1703161241220.14378@sstabellini-ThinkPad-X260>
+	<1489694518-16978-1-git-send-email-sstabellini@kernel.org>
+Subject: [Qemu-devel] [PATCH v3 3/9] 9p: introduce a type for the 9p header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,70 +26,53 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: xen-devel@lists.xenproject.org, sstabellini@kernel.org, anthony.perard@citrix.com, jgross@suse.com, aneesh.kumar@linux.vnet.ibm.com, groug@kaod.org
+Cc: xen-devel@lists.xenproject.org, sstabellini@kernel.org, jgross@suse.com, groug@kaod.org, Stefano Stabellini <stefano@aporeto.com>, anthony.perard@citrix.com, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
 
-Hi all,
+Use the new type in virtio-9p-device.
 
-This patch series implements a new transport for 9pfs, aimed at Xen
-systems.
+Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
+CC: anthony.perard@citrix.com
+CC: jgross@suse.com
+CC: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
+CC: Greg Kurz <groug@kaod.org>
+---
+ hw/9pfs/9p.h               | 6 ++++++
+ hw/9pfs/virtio-9p-device.c | 6 +-----
+ 2 files changed, 7 insertions(+), 5 deletions(-)
 
-The transport is based on a traditional Xen frontend and backend drivers
-pair. This patch series implements the backend, which typically runs in
-Dom0. I sent another series to implement the frontend in Linux
-(http://marc.info/?l=linux-kernel&m=148883047125960&w=2).
-
-The backend complies to the Xen transport for 9pfs specification
-version 1, available here:
-
-http://xenbits.xen.org/gitweb/?p=xen.git;a=blob_plain;f=docs/misc/9pfs.markdown;hb=HEAD
-
-
-Changes in v3:
-- do not build backends for targets that do not support xen
-- remove xen_9pfs.h, merge its content into xen-9p-backend.c
-- remove xen_9pfs_header, introduce P9MsgHeader
-- use le32_to_cpu to access P9MsgHeader fields
-- many coding style fixes
-- run checkpatch on all patches
-- add check if num_rings < 1
-- use g_strdup_printf
-- free fsdev_id in xen_9pfs_free
-- add comments
-
-Changes in v2:
-- fix coding style
-- compile xen-9p-backend.c if CONFIG_XEN_BACKEND
-- add patch to set CONFIG_XEN_BACKEND only for the right targets
-- add review-bys
-
-
-Stefano Stabellini (9):
-      xen: do not build backends for targets that do not support xen
-      xen: import ring.h from xen
-      9p: introduce a type for the 9p header
-      xen/9pfs: introduce Xen 9pfs backend
-      xen/9pfs: connect to the frontend
-      xen/9pfs: receive requests from the frontend
-      xen/9pfs: implement in/out_iov_from_pdu and vmarshal/vunmarshal
-      xen/9pfs: send responses back to the frontend
-      xen/9pfs: build and register Xen 9pfs backend
-
- Makefile                     |   1 +
- hw/9pfs/9p.h                 |   6 +
- hw/9pfs/Makefile.objs        |   1 +
- hw/9pfs/virtio-9p-device.c   |   6 +-
- hw/9pfs/xen-9p-backend.c     | 434 +++++++++++++++++++++++++++++++++++++++++
- hw/block/Makefile.objs       |   2 +-
- hw/block/xen_blkif.h         |   2 +-
- hw/char/Makefile.objs        |   2 +-
- hw/display/Makefile.objs     |   2 +-
- hw/net/Makefile.objs         |   2 +-
- hw/usb/Makefile.objs         |   2 +-
- hw/usb/xen-usb.c             |   2 +-
- hw/xen/Makefile.objs         |   2 +-
- hw/xen/xen_backend.c         |   3 +
- include/hw/xen/io/ring.h     | 455 +++++++++++++++++++++++++++++++++++++++++++
- include/hw/xen/xen_backend.h |   3 +
- 16 files changed, 912 insertions(+), 13 deletions(-)
- create mode 100644 hw/9pfs/xen-9p-backend.c
- create mode 100644 include/hw/xen/io/ring.h
+diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
+index b7e8362..5312d8a 100644
+--- a/hw/9pfs/9p.h
++++ b/hw/9pfs/9p.h
+@@ -119,6 +119,12 @@ static inline char *rpath(FsContext *ctx, const char *path)
+ typedef struct V9fsPDU V9fsPDU;
+ struct V9fsState;
+ 
++typedef struct {
++    uint32_t size_le;
++    uint8_t id;
++    uint16_t tag_le;
++} QEMU_PACKED P9MsgHeader;
++
+ struct V9fsPDU
+ {
+     uint32_t size;
+diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
+index 27a4a32..3782f43 100644
+--- a/hw/9pfs/virtio-9p-device.c
++++ b/hw/9pfs/virtio-9p-device.c
+@@ -46,11 +46,7 @@ static void handle_9p_output(VirtIODevice *vdev, VirtQueue *vq)
+     VirtQueueElement *elem;
+ 
+     while ((pdu = pdu_alloc(s))) {
+-        struct {
+-            uint32_t size_le;
+-            uint8_t id;
+-            uint16_t tag_le;
+-        } QEMU_PACKED out;
++        P9MsgHeader out;
+ 
+         elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
+         if (!elem) {
+-- 
+1.9.1
