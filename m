@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45027)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anthony.xu@intel.com>) id 1cobbi-0002bM-Oe
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 16:02:47 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1cobds-0004Vd-UV
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 16:05:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anthony.xu@intel.com>) id 1cobbd-0003WM-R6
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 16:02:46 -0400
-Received: from mga11.intel.com ([192.55.52.93]:5143)
+	(envelope-from <dgilbert@redhat.com>) id 1cobdn-0004DP-W1
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 16:05:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44614)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
-	id 1cobbd-0003Vq-Gp
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 16:02:41 -0400
-From: "Xu, Anthony" <anthony.xu@intel.com>
-Date: Thu, 16 Mar 2017 20:02:28 +0000
-Message-ID: <4712D8F4B26E034E80552F30A67BE0B1A19A11@ORSMSX112.amr.corp.intel.com>
-References: <1489158897-9206-1-git-send-email-yang.zhong@intel.com>
-	<4712D8F4B26E034E80552F30A67BE0B1A0F91A@ORSMSX112.amr.corp.intel.com>
-	<920352018.1797331.1489251855464.JavaMail.zimbra@redhat.com>
-	<4712D8F4B26E034E80552F30A67BE0B1A13045@ORSMSX112.amr.corp.intel.com>
-	<991a0f3d-5e1f-d17c-a8f3-a42c02ac2f17@redhat.com>
-	<4712D8F4B26E034E80552F30A67BE0B1A1561C@ORSMSX112.amr.corp.intel.com>
-	<f05fe113-c286-19b0-f5bc-ee2c1ea05568@redhat.com>
-	<4712D8F4B26E034E80552F30A67BE0B1A16F14@ORSMSX112.amr.corp.intel.com>
-	<1466597512.4602267.1489609298091.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1466597512.4602267.1489609298091.JavaMail.zimbra@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cobdn-0004DC-O4
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 16:04:55 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 97D4A342C7C
+	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 20:04:55 +0000 (UTC)
+Date: Thu, 16 Mar 2017 20:04:51 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170316200450.GP2567@work-vm>
+References: <20170315135021.6978-1-quintela@redhat.com>
+	<20170315135021.6978-15-quintela@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] reduce qemu's heap Rss size from
- 12252kB to 2752KB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170315135021.6978-15-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 14/31] ram: Move iterations into RAMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,85 +33,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: "Zhong, Yang" <yang.zhong@intel.com>, "Peng, Chao P" <chao.p.peng@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-PiA+IG1lbW9yeV9yZWdpb25fZmluYWxpemUuDQo+ID4gTGV0IG1lIGtub3cgaWYgeW91IHRoaW5r
-IG90aGVyd2lzZS4NCj4gDQo+IFllcywgeW91IGNhbiByZXBsYWNlIG1lbW9yeV9yZWdpb25fZGVs
-X3N1YnJlZ2lvbiBpbg0KPiBtZW1vcnlfcmVnaW9uX2ZpbmFsaXplDQo+IHdpdGggc3BlY2lhbCBj
-b2RlIHRoYXQgZG9lcw0KPiANCj4gICAgIGFzc2VydCghbXItPmVuYWJsZWQpOw0KPiAgICAgYXNz
-ZXJ0KHN1YnJlZ2lvbi0+Y29udGFpbmVyID09IG1yKTsNCj4gICAgIHN1YnJlZ2lvbi0+Y29udGFp
-bmVyID0gTlVMTDsNCj4gICAgIFFUQUlMUV9SRU1PVkUoJm1yLT5zdWJyZWdpb25zLCBzdWJyZWdp
-b24sIHN1YnJlZ2lvbnNfbGluayk7DQo+ICAgICBtZW1vcnlfcmVnaW9uX3VucmVmKHN1YnJlZ2lv
-bik7DQo+IA0KPiBUaGUgbGFzdCBmb3VyIGxpbmVzIGFyZSBzaGFyZWQgd2l0aCBtZW1vcnlfcmVn
-aW9uX2RlbF9zdWJyZWdpb24sIHNvIHBsZWFzZQ0KPiBmYWN0b3IgdGhlbSBpbiBhIG5ldyBmdW5j
-dGlvbiwgZm9yIGV4YW1wbGUNCj4gbWVtb3J5X3JlZ2lvbl9kZWxfc3VicmVnaW9uX2ludGVybmFs
-Lg0KDQoNCkFmdGVyIGFkZGluZyBzeW5jaHJvbml6ZV9yY3UsIEkgc2F3IGFuIGluZmluaXRlIHJl
-Y3Vyc2l2ZSBjYWxsLA0KICBtZW1fY29tbWl0LT4gbWVtb3J5X3JlZ2lvbl9maW5hbGl6ZS0+IG1l
-bV9jb21taXQtPg0KbWVtb3J5X3JlZ2lvbl9maW5hbGl6ZS0+IC4uLi4uLg0KaXQgY2F1c2VkIGEg
-c2VnbWVudCBmYXVsdCwgYmVjYXVzZSA4TSBzdGFjayBzcGFjZSBpcyB1c2VkIHVwLCBhbmQgZm91
-bmQgd2hlbiANCm1lbW9yeV9yZWdpb25fZmluYWxpemUgaXMgY2FsbGVkLCBtZW1vcnlfcmVnaW9u
-X3RyYW5zYWN0aW9uX2RlcHRoIGlzIDAgYW5kIA0KbWVtb3J5X3JlZ2lvbl91cGRhdGVfcGVuZGlu
-ZyBpcyB0cnVlLiBUaGF0J3Mgbm90IG5vcm1hbCENCg0KQXMgeW91IG1lbnRpb25lZCBpbiB5b3Vy
-IHByZXZpb3VzIGVtYWlsLCB0aGF0IHNob3VsZCAgbm90IGhhcHBlbi4NCj4iIEJ1dCBpZiBtZW1v
-cnlfcmVnaW9uX3RyYW5zYWN0aW9uX2RlcHRoIGlzID09IDAsIHRoZXJlIHNob3VsZCBiZSBubw0K
-PnVwZGF0ZSBwZW5kaW5nIGJlY2F1c2UgdGhlIGxvb3AgaGFzIG5ldmVyIHJ1biINCg0KVGhlIHJv
-b3QgY2F1c2UgaXMsDQpNRU1PUllfTElTVEVORVJfQ0FMTF9HTE9CQUwoY29tbWl0LCBGb3J3YXJk
-KSBpcyBjYWxsZWQgYmVmb3JlIA0KbWVtb3J5X3JlZ2lvbl9jbGVhcl9wZW5kaW5nKCkgaW4gbWVt
-b3J5X3JlZ2lvbl90cmFuc2FjdGlvbl9jb21taXQuDQpzbyB3aGVuIE1FTU9SWV9MSVNURU5FUl9D
-QUxMX0dMT0JBTChjb21taXQsIEZvcndhcmQpIGlzIGNhbGxlZCwNCm1lbW9yeV9yZWdpb25fdHJh
-bnNhY3Rpb25fZGVwdGggaXMgMCBhbmQgbWVtb3J5X3JlZ2lvbl91cGRhdGVfcGVuZGluZyBpcyB0
-cnVlLg0KbWVtX2NvbW1pdCBtYXkgY2FsbCBtZW1vcnlfcmVnaW9uX2ZpbmFsaXplLCBpdCBjYXVz
-ZXMgaW5maW5pdGUgcmVjdXJzaXZlIGNhbGwuDQoNCm15IHByZXZpb3VzIGZpeCBmb3IgdGhpcyBp
-cyBub3QgY29tcGxldGUuDQpXZSBtYXkgY2xlYXIgbWVtb3J5X3JlZ2lvbl91cGRhdGVfcGVuZGlu
-ZyBiZWZvcmUgY2FsbGluZyANCk1FTU9SWV9MSVNURU5FUl9DQUxMX0dMT0JBTChjb21taXQsIEZv
-cndhcmQpDQoNClBsZWFzZSByZXZpZXcgYmVsb3cgcGF0Y2gNCg0KZGlmZiAtLWdpdCBhL21lbW9y
-eS5jIGIvbWVtb3J5LmMNCmluZGV4IDY0YjBhNjAuLjRjOTVhYWYgMTAwNjQ0DQotLS0gYS9tZW1v
-cnkuYw0KKysrIGIvbWVtb3J5LmMNCkBAIC05MDYsMTIgKzkwNiw2IEBAIHZvaWQgbWVtb3J5X3Jl
-Z2lvbl90cmFuc2FjdGlvbl9iZWdpbih2b2lkKQ0KICAgICArK21lbW9yeV9yZWdpb25fdHJhbnNh
-Y3Rpb25fZGVwdGg7DQogfQ0KDQotc3RhdGljIHZvaWQgbWVtb3J5X3JlZ2lvbl9jbGVhcl9wZW5k
-aW5nKHZvaWQpDQotew0KLSAgICBtZW1vcnlfcmVnaW9uX3VwZGF0ZV9wZW5kaW5nID0gZmFsc2U7
-DQotICAgIGlvZXZlbnRmZF91cGRhdGVfcGVuZGluZyA9IGZhbHNlOw0KLX0NCi0NCiB2b2lkIG1l
-bW9yeV9yZWdpb25fdHJhbnNhY3Rpb25fY29tbWl0KHZvaWQpDQogew0KICAgICBBZGRyZXNzU3Bh
-Y2UgKmFzOw0KQEAgLTkyNywxNCArOTIxLDE0IEBAIHZvaWQgbWVtb3J5X3JlZ2lvbl90cmFuc2Fj
-dGlvbl9jb21taXQodm9pZCkNCiAgICAgICAgICAgICBRVEFJTFFfRk9SRUFDSChhcywgJmFkZHJl
-c3Nfc3BhY2VzLCBhZGRyZXNzX3NwYWNlc19saW5rKSB7DQogICAgICAgICAgICAgICAgIGFkZHJl
-c3Nfc3BhY2VfdXBkYXRlX3RvcG9sb2d5KGFzKTsNCiAgICAgICAgICAgICB9DQotDQorICAgICAg
-ICAgICAgbWVtb3J5X3JlZ2lvbl91cGRhdGVfcGVuZGluZyA9IGZhbHNlOw0KICAgICAgICAgICAg
-IE1FTU9SWV9MSVNURU5FUl9DQUxMX0dMT0JBTChjb21taXQsIEZvcndhcmQpOw0KICAgICAgICAg
-fSBlbHNlIGlmIChpb2V2ZW50ZmRfdXBkYXRlX3BlbmRpbmcpIHsNCiAgICAgICAgICAgICBRVEFJ
-TFFfRk9SRUFDSChhcywgJmFkZHJlc3Nfc3BhY2VzLCBhZGRyZXNzX3NwYWNlc19saW5rKSB7DQog
-ICAgICAgICAgICAgICAgIGFkZHJlc3Nfc3BhY2VfdXBkYXRlX2lvZXZlbnRmZHMoYXMpOw0KICAg
-ICAgICAgICAgIH0NCisgICAgICAgICAgICBpb2V2ZW50ZmRfdXBkYXRlX3BlbmRpbmcgPSBmYWxz
-ZTsNCiAgICAgICAgIH0NCi0gICAgICAgIG1lbW9yeV9yZWdpb25fY2xlYXJfcGVuZGluZygpOw0K
-ICAgIH0NCiB9DQoNCg0KDQoNCj4gPiBJdCBpcyBub3Qgc2xvdywgdGhlIGNvbnRlbnRpb24gaXMg
-bm90IGhpZ2guIFllcyB3ZSBjYW4gdGVzdC4NCj4gDQo+IEl0J3Mgbm90IGEgbWF0dGVyIG9mIGNv
-bnRlbnRpb24uICBJdCdzIGEgbWF0dGVyIG9mIGhvdyBsb25nIGFuIFJDVQ0KPiBjcml0aWNhbCBz
-ZWN0aW9uIGNhbiBiZS0tLW5vdCBqdXN0IGF0IHN0YXJ0dXAsIGJ1dCBhdCBhbnkgcG9pbnQNCj4g
-ZHVyaW5nIFFFTVUgZXhlY3V0aW9uLg0KVGhlIHRoaW5nIGlzLCBzZWVtcyBib3RoIGFkZHJlc3Nf
-c3BhY2VfdHJhbnNsYXRlIGFuZCBhZGRyZXNzX3NwYWNlX2Rpc3BhdGNoX2ZyZWUgDQphcmUgY2Fs
-bGVkIHVuZGVyIHRoZSBnbG9iYWwgbG9jay4gV2hlbiBzeW5jaHJvbml6ZV9yY3UgaXMgY2FsbGVk
-LCBubyBvdGhlciB0aHJlYWRzIA0KYXJlIGluIFJDVSBjcml0aWNhbCBzZWN0aW9uLg0KDQpTZWVt
-cyBSQ1UgaXMgbm90IHRoYXQgdXNlZnVsIGZvciBhZGRyZXNzIHNwYWNlLg0KDQoNCj4gDQo+IEhh
-dmUgeW91IHRyaWVkIHRjbWFsbG9jIG9yIGplbWFsbG9jPyAgVGhleSB1c2UgdGhlIGJyayByZWdp
-b24NCj4gbGVzcyBhbmQgc29tZXRpbWVzIGFyZSBtb3JlIGFnZ3Jlc3NpdmUgaW4gcmVsZWFzaW5n
-IG1tYXAtZWQgbWVtb3J5DQo+IGFyZWFzLg0KDQpUaGV5IG1heSBiZSBhZ2dyZXNzaXZlLiBCdXQg
-aWYgbWVtb3J5IGFyZSBmcmVlZCBhZnRlcndhcmQsIGl0IG1heSBub3QgaGVscCBpbiBzb21lIGNh
-c2VzLA0KZm9yIGV4YW1wbGUsIHN0YXJ0aW5nIGEgbG90IG9mIFZNcyBhdCB0aGUgc2FtZSB0aW1l
-Lg0KDQoNCj4gDQo+ID4gUGxlYXNlIHJldmlldyBiZWxvdyBwYXRjaCwgTWVtb3J5UmVnaW9uIGlz
-IHByb3RlY3RlZCBieSBSQ1UuDQo+IA0KPiBSZW1vdmluZyB0cmFuc2FjdGlvbiBiZWdpbi9jb21t
-aXQgaW4gbWVtb3J5X3JlZ2lvbl9maW5hbGl6ZSBtYWtlcw0KPiBsaXR0bGUgc2Vuc2UgYmVjYXVz
-ZSBtZW1vcnlfcmVnaW9uX2RlbF9zdWJyZWdpb24gY2FsbHMgdGhvc2UgdHdvDQo+IGZ1bmN0aW9u
-cyBhZ2Fpbi4gIFNlZSBhYm92ZSBmb3IgYW4gYWx0ZXJuYXRpdmUuICBBcGFydCBmcm9tIHRoaXMs
-DQo+IHRoZSBwYXRjaCBpcyBhdCBsZWFzdCBjb3JyZWN0LCB0aG91Z2ggSSdtIG5vdCBzdXJlIGl0
-J3MgYSBnb29kDQo+IGlkZWEgKHN5bmNocm9uaXplX3JjdSBuZWVkcyB0ZXN0aW5nKS4gDQo+IEkn
-bSBub3Qgc3VyZSBJIHVuZGVyc3RhbmQgdGhlDQo+IGFkZHJlc3Nfc3BhY2Vfd3JpdGUgY2hhbmdl
-KS4NCg0KQWZ0ZXIgYWRkaW5nIHN5bmNocm9uaXplX3JjdSwgd2Ugbm90aWNlZCBhIFJDVSBkZWFk
-IGxvb3AuICBzeW5jaHJvbml6ZV9yY3UgaXMgY2FsbGVkIA0KaW5zaWRlIFJDVSBjcml0aWNhbCBz
-ZWN0aW9uLiBJdCBoYXBwZW5lZCB3aGVuIGd1ZXN0IE9TIHByb2dyYW1tZWQgdGhlIFBDSSBiYXIu
-DQpUaGUgY2FsbCB0cmFjZSBpcyBsaWtlLA0KYWRkcmVzc19zcGFjZV93cml0ZS0+IHBjaV9ob3N0
-X2NvbmZpZ193cml0ZV9jb21tb24gLT4gDQptZW1vcnlfcmVnaW9uX3RyYW5zYWN0aW9uX2NvbW1p
-dCAtPm1lbV9jb21taXQtPiBzeW5jaHJvbml6ZV9yY3UNCnBjaV9ob3N0X2NvbmZpZ193cml0ZV9j
-b21tb24gaXMgY2FsbGVkIGluc2lkZSBSQ1UgY3JpdGljYWwgc2VjdGlvbi4NCg0KVGhlIGFkZHJl
-c3Nfc3BhY2Vfd3JpdGUgY2hhbmdlIGZpeGVkIHRoaXMgaXNzdWUuDQoNCg0KVGhhbmtzLA0KQW50
-aG9ueQ0K
+* Juan Quintela (quintela@redhat.com) wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  migration/ram.c | 12 +++++++-----
+>  1 file changed, 7 insertions(+), 5 deletions(-)
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 8caeb4f..234bdba 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -164,6 +164,8 @@ struct RAMState {
+>      uint64_t zero_pages;
+>      /* number of normal transferred pages */
+>      uint64_t norm_pages;
+> +    /* Iterations since start */
+> +    uint64_t iterations;
+>  };
+>  typedef struct RAMState RAMState;
+>  
+> @@ -171,7 +173,6 @@ static RAMState ram_state;
+>  
+>  /* accounting for migration statistics */
+>  typedef struct AccountingInfo {
+> -    uint64_t iterations;
+>      uint64_t xbzrle_bytes;
+>      uint64_t xbzrle_pages;
+>      uint64_t xbzrle_cache_miss;
+> @@ -668,13 +669,13 @@ static void migration_bitmap_sync(RAMState *rs)
+>          }
+>  
+>          if (migrate_use_xbzrle()) {
+> -            if (rs->iterations_prev != acct_info.iterations) {
+> +            if (rs->iterations_prev != rs->iterations) {
+>                  acct_info.xbzrle_cache_miss_rate =
+>                     (double)(acct_info.xbzrle_cache_miss -
+>                              rs->xbzrle_cache_miss_prev) /
+> -                   (acct_info.iterations - rs->iterations_prev);
+> +                   (rs->iterations - rs->iterations_prev);
+>              }
+> -            rs->iterations_prev = acct_info.iterations;
+> +            rs->iterations_prev = rs->iterations;
+>              rs->xbzrle_cache_miss_prev = acct_info.xbzrle_cache_miss;
+>          }
+>          s->dirty_pages_rate = rs->num_dirty_pages_period * 1000
+> @@ -1926,6 +1927,7 @@ static int ram_save_init_globals(RAMState *rs)
+>      rs->bitmap_sync_count = 0;
+>      rs->zero_pages = 0;
+>      rs->norm_pages = 0;
+> +    rs->iterations = 0;
+>      migration_bitmap_sync_init(rs);
+>      qemu_mutex_init(&migration_bitmap_mutex);
+>  
+> @@ -2066,7 +2068,7 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
+>              done = 1;
+>              break;
+>          }
+> -        acct_info.iterations++;
+> +        rs->iterations++;
+>  
+>          /* we want to check in the 1st loop, just in case it was the 1st time
+>             and we had to sync the dirty bitmap.
+> -- 
+> 2.9.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
