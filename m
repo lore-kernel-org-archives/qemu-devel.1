@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1coK7W-0003Xn-Bc
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 21:22:27 -0400
+	(envelope-from <famz@redhat.com>) id 1coKHv-0005Ez-T0
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 21:33:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1coK7S-0000aR-D7
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 21:22:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38120)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1coK7S-0000a8-7A
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 21:22:22 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 51F1A883B1
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 01:22:22 +0000 (UTC)
-Date: Thu, 16 Mar 2017 09:22:19 +0800
+	(envelope-from <famz@redhat.com>) id 1coKHv-0000iG-17
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 21:33:11 -0400
+Date: Thu, 16 Mar 2017 09:33:01 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170316012219.GA21865@lemon.lan>
-References: <20170314153626.16989-1-famz@redhat.com>
-	<20170314153626.16989-3-famz@redhat.com>
+Message-ID: <20170316013301.GB21865@lemon.lan>
+References: <1489549053-31728-1-git-send-email-jemmy858585@gmail.com>
+	<20170315111021.GD3088@lemon.lan> <20170315173108.GB2701@work-vm>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170314153626.16989-3-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] virtio-scsi: Fix acquire/release in
- dataplane handlers
+In-Reply-To: <20170315173108.GB2701@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v2] migration/block: Avoid invoking
+ blk_drain too frequently
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,14 +24,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Lidong Chen <jemmy858585@gmail.com>, qemu-devel@nongnu.org, stefanha@redhat.com, quintela@redhat.com, qemu-block@nongnu.org
 
-On Tue, 03/14 23:36, Fam Zheng wrote:
-> After the AioContext lock push down, there is a race between
-> virtio_scsi_dataplane_start and those "assert(s->ctx &&
-> s->dataplane_started)", because the latter doesn't isn't wrapped in
+On Wed, 03/15 17:31, Dr. David Alan Gilbert wrote:
+> * Fam Zheng (famz@redhat.com) wrote:
+> > On Wed, 03/15 11:37, Lidong Chen wrote:
+> > > Increase bmds->cur_dirty after submit io, so reduce the frequency
+> > > involve into blk_drain, and improve the performance obviously
+> > > when block migration.
+> > > 
+> > > The performance test result of this patch:
+> > > 
+> > > During the block dirty save phase, this patch improve guest os IOPS
+> > > from 4.0K to 9.5K. and improve the migration speed from
+> > > 505856 rsec/s to 855756 rsec/s.
+> > > 
+> > > Signed-off-by: Lidong Chen <jemmy858585@gmail.com>
+> > > ---
+> > >  migration/block.c | 3 +++
+> > >  1 file changed, 3 insertions(+)
+> > > 
+> > > diff --git a/migration/block.c b/migration/block.c
+> > > index 6741228..7734ff7 100644
+> > > --- a/migration/block.c
+> > > +++ b/migration/block.c
+> > > @@ -576,6 +576,9 @@ static int mig_save_device_dirty(QEMUFile *f, BlkMigDevState *bmds,
+> > >              }
+> > >  
+> > >              bdrv_reset_dirty_bitmap(bmds->dirty_bitmap, sector, nr_sectors);
+> > > +            sector += nr_sectors;
+> > > +            bmds->cur_dirty = sector;
+> > > +
+> > >              break;
+> > >          }
+> > >          sector += BDRV_SECTORS_PER_DIRTY_CHUNK;
+> > > -- 
+> > > 1.8.3.1
+> > > 
+> > 
+> > Nice catch above all, thank you!
+> > 
+> > Reviewed-by: Fam Zheng <famz@redhat.com>
+> 
+> Are you taking that via a block pull?
 
-s/doesn't//
+I can do that, but I'm not sure whether it should go to 2.9. This is a
+performance improvement, which usually doesn't qualify as bug fixes. But this
+also looks like a mistake in original code.
 
-> aio_context_acquire.
+Fam
