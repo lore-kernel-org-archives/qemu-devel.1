@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1coQJc-0003xo-R2
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 03:59:21 -0400
+	(envelope-from <quintela@redhat.com>) id 1coQLl-0004zB-3S
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 04:01:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1coQJb-0000ej-Ue
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 03:59:20 -0400
+	(envelope-from <quintela@redhat.com>) id 1coQLk-0001cM-Ge
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 04:01:33 -0400
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170316013301.GB21865@lemon.lan> (Fam Zheng's message of "Thu,
-	16 Mar 2017 09:33:01 +0800")
-References: <1489549053-31728-1-git-send-email-jemmy858585@gmail.com>
-	<20170315111021.GD3088@lemon.lan> <20170315173108.GB2701@work-vm>
-	<20170316013301.GB21865@lemon.lan>
+In-Reply-To: <20170310044402.38880-2-haoqf@linux.vnet.ibm.com> (QingFeng Hao's
+	message of "Fri, 10 Mar 2017 05:44:02 +0100")
+References: <20170310044402.38880-1-haoqf@linux.vnet.ibm.com>
+	<20170310044402.38880-2-haoqf@linux.vnet.ibm.com>
 Reply-To: quintela@redhat.com
-Date: Thu, 16 Mar 2017 08:59:11 +0100
-Message-ID: <87inn9y7n4.fsf@secure.mitica>
+Date: Thu, 16 Mar 2017 09:01:22 +0100
+Message-ID: <87efxxy7jh.fsf@secure.mitica>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2] migration/block: Avoid invoking
- blk_drain too frequently
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] vmstate: fix failed iotests case 68
+ and 91
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,56 +25,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Lidong Chen <jemmy858585@gmail.com>, qemu-devel@nongnu.org, stefanha@redhat.com, qemu-block@nongnu.org
+To: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com, pasic@linux.vnet.ibm.com, liujbjl@linux.vnet.ibm.com, kwolf@redhat.com, famz@redhat.com, mreitz@redhat.com, dgilbert@redhat.com
 
-Fam Zheng <famz@redhat.com> wrote:
-> On Wed, 03/15 17:31, Dr. David Alan Gilbert wrote:
->> * Fam Zheng (famz@redhat.com) wrote:
->> > On Wed, 03/15 11:37, Lidong Chen wrote:
->> > > Increase bmds->cur_dirty after submit io, so reduce the frequency
->> > > involve into blk_drain, and improve the performance obviously
->> > > when block migration.
->> > > 
->> > > The performance test result of this patch:
->> > > 
->> > > During the block dirty save phase, this patch improve guest os IOPS
->> > > from 4.0K to 9.5K. and improve the migration speed from
->> > > 505856 rsec/s to 855756 rsec/s.
->> > > 
->> > > Signed-off-by: Lidong Chen <jemmy858585@gmail.com>
->> > > ---
->> > >  migration/block.c | 3 +++
->> > >  1 file changed, 3 insertions(+)
->> > > 
->> > > diff --git a/migration/block.c b/migration/block.c
->> > > index 6741228..7734ff7 100644
->> > > --- a/migration/block.c
->> > > +++ b/migration/block.c
->> > > @@ -576,6 +576,9 @@ static int mig_save_device_dirty(QEMUFile *f, BlkMigDevState *bmds,
->> > >              }
->> > >  
->> > >              bdrv_reset_dirty_bitmap(bmds->dirty_bitmap, sector, nr_sectors);
->> > > +            sector += nr_sectors;
->> > > +            bmds->cur_dirty = sector;
->> > > +
->> > >              break;
->> > >          }
->> > >          sector += BDRV_SECTORS_PER_DIRTY_CHUNK;
->> > > -- 
->> > > 1.8.3.1
->> > > 
->> > 
->> > Nice catch above all, thank you!
->> > 
->> > Reviewed-by: Fam Zheng <famz@redhat.com>
->> 
->> Are you taking that via a block pull?
+QingFeng Hao <haoqf@linux.vnet.ibm.com> wrote:
+> This problem affects s390x only if we are running without KVM.
+> Basically, S390CPU.irqstate is unused if we do not use KVM,
+> and thus no buffer is allocated.
+> This causes size=0, first_elem=NULL and n_elems=1 in
+> vmstate_load_state and vmstate_save_state. And the assert fails.
+> With this fix we can go back to the old behavior and support
+> VMS_VBUFFER with size 0 and nullptr.
 >
-> I can do that, but I'm not sure whether it should go to 2.9. This is a
-> performance improvement, which usually doesn't qualify as bug fixes. But this
-> also looks like a mistake in original code.
->
-> Fam
+> Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
 
-I am taking it through migration and push it.  I agree with your description.
+queued
