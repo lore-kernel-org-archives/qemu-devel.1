@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42777)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1coWwC-00053x-It
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 11:03:37 -0400
+	(envelope-from <prvs=241876a3f=anthony.perard@citrix.com>)
+	id 1coWwj-0005LV-Vf
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 11:04:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1coWwB-0002Vi-G8
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 11:03:36 -0400
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:38217)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1coWwB-0002VU-9u
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 11:03:35 -0400
-Received: by mail-wm0-x22c.google.com with SMTP id t189so50319549wmt.1
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 08:03:35 -0700 (PDT)
+	(envelope-from <prvs=241876a3f=anthony.perard@citrix.com>)
+	id 1coWwe-0002bt-7G
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 11:04:10 -0400
+Received: from smtp.citrix.com ([66.165.176.89]:4042)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=241876a3f=anthony.perard@citrix.com>)
+	id 1coWwe-0002ba-2I
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 11:04:04 -0400
+Date: Thu, 16 Mar 2017 15:03:24 +0000
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20170316150324.GE1882@perard.uk.xensource.com>
+References: <1489593679-31468-1-git-send-email-igor.druzhinin@citrix.com>
+	<20170316122644.GC1882@perard.uk.xensource.com>
+	<bfadc05e-4298-744b-a364-1ec75b7e5b0c@citrix.com>
+	<383dc5c1-f8f6-d4f2-d548-96ff2712140b@citrix.com>
+	<20170316144656.GD1882@perard.uk.xensource.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_G=KNQSitea9sE1pfDDZA7tR9zqFKbm-0KASaT6v6kag@mail.gmail.com>
-References: <1487722868-9111-1-git-send-email-yongbok.kim@imgtec.com>
-	<CAFEAcA_G=KNQSitea9sE1pfDDZA7tR9zqFKbm-0KASaT6v6kag@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Mar 2017 15:03:13 +0000
-Message-ID: <CAFEAcA_NEg7cCQvut7eBTp=mBMdM_7q9mB2K=mH6SmC9ODodQg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL v2 0/8] target-mips queue
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20170316144656.GD1882@perard.uk.xensource.com>
+Subject: Re: [Qemu-devel] [Xen-devel] [PATCH v5] xen: don't save/restore the
+ physmap on VM save/restore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,22 +34,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yongbok Kim <yongbok.kim@imgtec.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Igor Druzhinin <igor.druzhinin@citrix.com>
+Cc: sstabellini@kernel.org, crosthwaite.peter@gmail.com, qemu-devel@nongnu.org, paul.durrant@citrix.com, pbonzini@redhat.com, xen-devel@lists.xenproject.org, rth@twiddle.net
 
-On 23 February 2017 at 12:46, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 22 February 2017 at 00:21, Yongbok Kim <yongbok.kim@imgtec.com> wrote:
->> This is the v2 of the pull-req for target-mips.
->> The warning treated as error has been fixed and the file is now isolated for mips64el only.
->> Boston has further update to have default -drive to if=ide.
+On Thu, Mar 16, 2017 at 02:46:56PM +0000, Anthony PERARD wrote:
+> On Thu, Mar 16, 2017 at 02:06:21PM +0000, Igor Druzhinin wrote:
+> > On 16/03/17 12:54, Igor Druzhinin wrote:
+> > > On 16/03/17 12:26, Anthony PERARD wrote:
+> > >> I've tried to migrate a guest with this patch, but once migrated, the
+> > >> screen is black (via VNC, keyboard is working fine).
+> > >>
+> > > Hmm. It works for me - I've tried to migrate between identical QEMUs
+> > > with this patch on localhost. Save/restore also works fine.
+> > > 
+> > Ok. I could track down the issue - starting from v4 the patch doesn't
+> > work for cirrus. The reason is that post_load handler is different for
+> > cirrus and doesn't call the parent handler from common vga code.
+> > 
+> > I manage to fix it by updating the corresponding handler by duplicating
+> > the code. But is it a good solution? Would it be better to have the
+> > common handler called in this function instead?
+> 
+> :(, vga_common_post_load have a misleading name. Yes, I think it would
+> be better to have a common post_load been called by every vga cards.
 
-> Please make sure you update the 'Build dependencies' section of
-> http://wiki.qemu-project.org/ChangeLog/2.9
-> to flag up the new libfdt version dependency to users
+The issue is probably more complicated than I thought, as
+vga_common_post_load is probably not called because cirrus does not use
+vmstate_vga_common struct.
 
-Reminder: please update
-http://wiki.qemu-project.org/ChangeLog/2.9#Build_dependencies
-to mention the new libfdt version dependency.
-
-thanks
--- PMM
+-- 
+Anthony PERARD
