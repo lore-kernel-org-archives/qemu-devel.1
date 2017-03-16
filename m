@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1coafU-0002XQ-PB
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 15:02:37 -0400
+	(envelope-from <jsnow@redhat.com>) id 1cobXk-0000Fh-Q8
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 15:58:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1coafQ-0000TE-PH
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 15:02:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47620)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1coafQ-0000T7-JW
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 15:02:32 -0400
-Date: Thu, 16 Mar 2017 19:02:28 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170316190227.GO2567@work-vm>
-References: <8fb8ed45-6de3-2b74-f5ea-44b374cabcbd@gmail.com>
-	<87ziglnof9.fsf@linaro.org>
+	(envelope-from <jsnow@redhat.com>) id 1cobXj-0001FI-NV
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 15:58:40 -0400
+References: <20170316004603.20609-1-jsnow@redhat.com>
+	<20170316004603.20609-3-jsnow@redhat.com>
+	<20170316172525.GI4995@noname.redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <a1193efa-e565-0b9b-0b89-1a9721051c46@redhat.com>
+Date: Thu, 16 Mar 2017 15:58:33 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <87ziglnof9.fsf@linaro.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Make qemu_thread_create return a flag to indicate
- if it succeeded
+In-Reply-To: <20170316172525.GI4995@noname.redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC patch 2/3] block-backend: add drained_begin /
+ drained_end ops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +25,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: Achilles Benetopoulos <abenetopoulos@gmail.com>, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-* Alex Benn=E9e (alex.bennee@linaro.org) wrote:
->=20
-> Achilles Benetopoulos <abenetopoulos@gmail.com> writes:
->=20
-> > I am interested in working on the BiteSized Task mentioned in the
-> > subject line. However, I have a question: Since the current behaviour
-> > of qemu_thread_create is to fail in the case of an error, then it
-> > seems logical to make the caller exit (in the patched version) if the
-> > return value of the call to qemu_thread_create indicates an error. Is
-> > this desirable? If so, how detailed should the error messages reporte=
-d
-> > be? If not, then I'm guessing that the desired behaviour is a more
-> > graceful handling of the error on a case-by-case basis?
->=20
-> It will depend on a case-by-case basis. For example failing to create
-> threads for a TCG vCPU don't really leave much for you to do expect
-> complain loudly and exit. I assume the more graceful handling is for
-> things like thread-pools where you can continue to run even without a
-> fully populated pool.
 
-Or on migration we can fail the migration but still leave the guest
-running in no worse state than it was before.
 
-Dave
+On 03/16/2017 01:25 PM, Kevin Wolf wrote:
+> Am 16.03.2017 um 01:46 hat John Snow geschrieben:
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>
+>> ---
+>>
+>> RFC questions:
+>>
+>> - Does the presence of blk->quiesce_counter relieve the burden of needing
+>>   blk->public.io_limits_disabled? I could probably eliminate this counter
+>>   entirely and just spy on the root node's quiescent state at key moments
+>>   instead. I am confident I'm traipsing on delicate drain semantics.
+> 
+> Not for 2.9 anyway. :-)
+> 
+>> - Should I treat the separation of a quisced BDS/BB as a drained_end request
+>>   as an analogue to how blk_insert_bs (in this patch) handles this?
+> 
+> It's already taken care of, you don't need to add anything for that
+> (see below).
+> 
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  block/block-backend.c          | 25 +++++++++++++++++++++++++
+>>  include/sysemu/block-backend.h |  8 ++++++++
+>>  2 files changed, 33 insertions(+)
+>>
+>> diff --git a/block/block-backend.c b/block/block-backend.c
+>> index 5742c09..eb85e8b 100644
+>> --- a/block/block-backend.c
+>> +++ b/block/block-backend.c
+>> @@ -65,6 +65,8 @@ struct BlockBackend {
+>>      bool allow_write_beyond_eof;
+>>  
+>>      NotifierList remove_bs_notifiers, insert_bs_notifiers;
+>> +
+>> +    int quiesce_counter;
+>>  };
+>>  
+>>  typedef struct BlockBackendAIOCB {
+>> @@ -559,6 +561,11 @@ int blk_insert_bs(BlockBackend *blk, BlockDriverState *bs, Error **errp)
+>>      }
+>>      bdrv_ref(bs);
+>>  
+>> +    /* The new BDS may be quiescent, we should attempt to match */
+>> +    if (bs->quiesce_counter) {
+>> +        blk_root_drained_begin(blk->root);
+>> +    }
+> 
+> Do you really need this hunk? BB and BDS should already be kept in sync,
+> it's just the BB and its user that aren't. This is the call chain that
+> already leads to blk_root_drained_begin():
+> 
 
-> --
-> Alex Benn=E9e
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Oh, good call..!
+
+> blk_insert_bs
+>     bdrv_root_attach_child
+>         bdrv_replace_child
+>             bdrv_replace_child_noperm
+>                 child->role->drained_begin(child)
+> 
+> Did you check whether blk->public.io_limits_disabled ever goes back to 0
+> with your patch? I think it's increased twice and decreased only once.
+> 
+
+I didn't, but with your change above, it works out just fine.
+
+> To answer your RFC question, bdrv_replace_child_noperm() also takes care
+> of calling drained_end() when the BDS is detached from the BB.
+> 
+
+Excellent.
+
+>>      notifier_list_notify(&blk->insert_bs_notifiers, blk);
+>>      if (blk->public.throttle_state) {
+>>          throttle_timers_attach_aio_context(
+>> @@ -705,6 +712,11 @@ void blk_set_dev_ops(BlockBackend *blk, const BlockDevOps *ops,
+>>  
+>>      blk->dev_ops = ops;
+>>      blk->dev_opaque = opaque;
+>> +
+>> +    /* Are we currently quiesced? Should we enforce this right now? */
+>> +    if (blk->quiesce_counter && ops->drained_begin) {
+>> +        ops->drained_begin(opaque);
+>> +    }
+>>  }
+>>  
+>>  /*
+>> @@ -1870,9 +1882,15 @@ static void blk_root_drained_begin(BdrvChild *child)
+>>  {
+>>      BlockBackend *blk = child->opaque;
+>>  
+>> +    blk->quiesce_counter++;
+>> +
+>>      /* Note that blk->root may not be accessible here yet if we are just
+>>       * attaching to a BlockDriverState that is drained. Use child instead. */
+>>  
+>> +    if (blk->dev_ops && blk->dev_ops->drained_begin) {
+>> +        blk->dev_ops->drained_begin(blk->dev_opaque);
+>> +    }
+> 
+> Should we do this only if blk->quiesce_counter was 0? (And
+> dev_ops->drained_end() when it reaches 0 again.)
+> 
+
+Ah yes, actually, that led to the question about .io_limits_disabled,
+because I could have both begin/end only operate on the edge between 0/1.
+
+> The difference is that the implementation of the callback would have to
+> have its own counter as it is in this patch. Not really that bad, but at
+> the moment I don't see a reason why we would need to support nested
+> drained sections for dev_ops.
+> 
+
+Coincidentally, block_job_pause already supports counters! Entirely by
+accident this worked.
+
+>> +
+>>      if (blk->public.io_limits_disabled++ == 0) {
+>>          throttle_group_restart_blk(blk);
+>>      }
+>> @@ -1882,6 +1900,13 @@ static void blk_root_drained_end(BdrvChild *child)
+>>  {
+>>      BlockBackend *blk = child->opaque;
+>>  
+>> +    assert(blk->quiesce_counter);
+>> +    blk->quiesce_counter--;
+>> +
+>>      assert(blk->public.io_limits_disabled);
+>>      --blk->public.io_limits_disabled;
+>> +
+>> +    if (blk->dev_ops && blk->dev_ops->drained_end) {
+>> +        blk->dev_ops->drained_end(blk->dev_opaque);
+>> +    }
+> 
+> The basic idea looks good to me.
+> 
+> Kevin
+> 
+
+I'll send a v2 shortly, ever-so-slightly touched up.
+
+--js
