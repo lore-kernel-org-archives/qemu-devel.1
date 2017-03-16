@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33201)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1coWX8-0002qb-KX
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 10:37:43 -0400
+	(envelope-from <clg@kaod.org>) id 1coWXA-0002rU-BG
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 10:37:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1coWX3-0006nz-Lo
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 10:37:42 -0400
-Received: from 5.mo1.mail-out.ovh.net ([178.33.45.107]:47122)
+	(envelope-from <clg@kaod.org>) id 1coWX5-0006op-ST
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 10:37:44 -0400
+Received: from 9.mo1.mail-out.ovh.net ([178.32.108.172]:48937)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1coWX3-0006mz-Fw
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 10:37:37 -0400
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1coWX5-0006oZ-IW
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 10:37:39 -0400
 Received: from player756.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id CE47E6255C
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 15:37:33 +0100 (CET)
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id BD29F6255C
+	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 15:37:37 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu, 16 Mar 2017 15:35:04 +0100
-Message-Id: <1489674912-21942-1-git-send-email-clg@kaod.org>
+Date: Thu, 16 Mar 2017 15:35:05 +0100
+Message-Id: <1489674912-21942-2-git-send-email-clg@kaod.org>
+In-Reply-To: <1489674912-21942-1-git-send-email-clg@kaod.org>
+References: <1489674912-21942-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 0/8] ppc/pnv: interrupt controller (POWER8)
+Subject: [Qemu-devel] [PATCH v2 1/8] ppc/xics: introduce an ICPState
+ backlink under PowerPCCPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,66 +33,165 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Hello,
+Today, the ICPState array of the sPAPR machine is indexed with
+'cpu_index' of the CPUState. This numbering of CPUs is internal to
+QEMU and the guest only knows about what is exposed in the device
+tree, that is the 'cpu_dt_id'. This is why sPAPR uses the helper
+xics_get_cpu_index_by_dt_id() to do the mapping in a couple of places.
 
-Here is a series adding support for the interrupt controller as found
-on a POWER8 system. POWER9 uses a different interrupt controller
-called XIVE, still to be worked on.
+To provide a more generic XICS layer, we need to abstract the IRQ
+'server' number and remove any assumption made on its nature. It
+should not be used as a 'cpu_index' for lookups like xics_cpu_setup()
+and xics_cpu_destroy() do.
 
-The initial patches are more cleanups of the XICS layer which move the
-IRQ 'server' number mapping under the machine handlers. The PowerNV
-machine is then extended with the Interrupt Source Control (ICS), the
-Interrupt Control Presenter (ICP) objects and the Interrupt Management
-area.
+To reach that goal, we choose to introduce an ICPState backlink under
+PowerPCCPU, and let the machine core init routine do the ICPState
+lookup. The resulting object is stored under PowerPCCPU which is
+passed on to xics_cpu_setup(). The IRQ 'server' number in XICS is now
+generic. sPAPR uses 'cpu_dt_id' and PowerNV will use 'PIR' number.
 
-To test, grab a kernel and a rootfs image here :
+This also has the benefit of simplifying the sPAPR hcall routines
+which do not need to do any ICPState lookups anymore.
 
-  https://openpower.xyz/job/openpower-op-build/distro=3Dubuntu,target=3Dp=
-almetto/lastSuccessfulBuild/artifact/images/zImage.epapr
-  https://openpower.xyz/job/openpower-op-build/distro=3Dubuntu,target=3Dp=
-almetto/lastSuccessfulBuild/artifact/images/rootfs.cpio.xz
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ hw/intc/xics.c          |  4 ++--
+ hw/intc/xics_spapr.c    | 20 +++++---------------
+ hw/ppc/spapr_cpu_core.c |  4 +++-
+ target/ppc/cpu.h        |  2 ++
+ 4 files changed, 12 insertions(+), 18 deletions(-)
 
-The full patchset is available here :
-
-   https://github.com/legoater/qemu/commits/powernv-ipmi-2.9
-
-Thanks,
-
-C.
-
-Changes since v1:
-
- - introduced PnvICPState to hold the ICP memory region
- - handled pir-to-cpu_index mapping under the machine icp_get handler
- - added multichip support
- - removed ics_eoi handler (came from a bug in PHB3_MSI)
- - kept PSI and OCC model for later, when this part is done.
-
-C=C3=A9dric Le Goater (8):
-  ppc/xics: introduce an ICPState backlink under PowerPCCPU
-  spapr: move the IRQ server number mapping under the machine
-  ppc/xics: add a realize() handler to ICPStateClass
-  ppc/pnv: add a PnvICPState object
-  ppc/pnv: create the ICP and ICS objects under the machine
-  ppc/pnv: add a helper to calculate MMIO addresses registers
-  ppc/pnv: link the CPUs to the machine XICSFabric
-  ppc/pnv: add memory regions for the ICP registers
-
- hw/intc/Makefile.objs   |   1 +
- hw/intc/xics.c          |   9 ++-
- hw/intc/xics_pnv.c      | 180 ++++++++++++++++++++++++++++++++++++++++++=
-++++
- hw/intc/xics_spapr.c    |  25 ++-----
- hw/ppc/pnv.c            | 185 ++++++++++++++++++++++++++++++++++++++++++=
-++++++
- hw/ppc/pnv_core.c       |  20 ++++--
- hw/ppc/spapr.c          |   3 +-
- hw/ppc/spapr_cpu_core.c |   4 +-
- include/hw/ppc/pnv.h    |  35 ++++++++-
- include/hw/ppc/xics.h   |  14 ++++
- target/ppc/cpu.h        |   2 +
- 11 files changed, 451 insertions(+), 27 deletions(-)
- create mode 100644 hw/intc/xics_pnv.c
-
+diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+index e740989a1162..5cde86ceb3bc 100644
+--- a/hw/intc/xics.c
++++ b/hw/intc/xics.c
+@@ -52,7 +52,7 @@ int xics_get_cpu_index_by_dt_id(int cpu_dt_id)
+ void xics_cpu_destroy(XICSFabric *xi, PowerPCCPU *cpu)
+ {
+     CPUState *cs =3D CPU(cpu);
+-    ICPState *icp =3D xics_icp_get(xi, cs->cpu_index);
++    ICPState *icp =3D cpu->icp;
+=20
+     assert(icp);
+     assert(cs =3D=3D icp->cs);
+@@ -65,7 +65,7 @@ void xics_cpu_setup(XICSFabric *xi, PowerPCCPU *cpu)
+ {
+     CPUState *cs =3D CPU(cpu);
+     CPUPPCState *env =3D &cpu->env;
+-    ICPState *icp =3D xics_icp_get(xi, cs->cpu_index);
++    ICPState *icp =3D cpu->icp;
+     ICPStateClass *icpc;
+=20
+     assert(icp);
+diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
+index 84d24b2837a7..178b3adc8af7 100644
+--- a/hw/intc/xics_spapr.c
++++ b/hw/intc/xics_spapr.c
+@@ -43,11 +43,9 @@
+ static target_ulong h_cppr(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+                            target_ulong opcode, target_ulong *args)
+ {
+-    CPUState *cs =3D CPU(cpu);
+-    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
+     target_ulong cppr =3D args[0];
+=20
+-    icp_set_cppr(icp, cppr);
++    icp_set_cppr(cpu->icp, cppr);
+     return H_SUCCESS;
+ }
+=20
+@@ -69,9 +67,7 @@ static target_ulong h_ipi(PowerPCCPU *cpu, sPAPRMachine=
+State *spapr,
+ static target_ulong h_xirr(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+                            target_ulong opcode, target_ulong *args)
+ {
+-    CPUState *cs =3D CPU(cpu);
+-    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
+-    uint32_t xirr =3D icp_accept(icp);
++    uint32_t xirr =3D icp_accept(cpu->icp);
+=20
+     args[0] =3D xirr;
+     return H_SUCCESS;
+@@ -80,9 +76,7 @@ static target_ulong h_xirr(PowerPCCPU *cpu, sPAPRMachin=
+eState *spapr,
+ static target_ulong h_xirr_x(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+                              target_ulong opcode, target_ulong *args)
+ {
+-    CPUState *cs =3D CPU(cpu);
+-    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
+-    uint32_t xirr =3D icp_accept(icp);
++    uint32_t xirr =3D icp_accept(cpu->icp);
+=20
+     args[0] =3D xirr;
+     args[1] =3D cpu_get_host_ticks();
+@@ -92,21 +86,17 @@ static target_ulong h_xirr_x(PowerPCCPU *cpu, sPAPRMa=
+chineState *spapr,
+ static target_ulong h_eoi(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+                           target_ulong opcode, target_ulong *args)
+ {
+-    CPUState *cs =3D CPU(cpu);
+-    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
+     target_ulong xirr =3D args[0];
+=20
+-    icp_eoi(icp, xirr);
++    icp_eoi(cpu->icp, xirr);
+     return H_SUCCESS;
+ }
+=20
+ static target_ulong h_ipoll(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+                             target_ulong opcode, target_ulong *args)
+ {
+-    CPUState *cs =3D CPU(cpu);
+-    ICPState *icp =3D xics_icp_get(XICS_FABRIC(spapr), cs->cpu_index);
+     uint32_t mfrr;
+-    uint32_t xirr =3D icp_ipoll(icp, &mfrr);
++    uint32_t xirr =3D icp_ipoll(cpu->icp, &mfrr);
+=20
+     args[0] =3D xirr;
+     args[1] =3D mfrr;
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index 6883f0991ae9..59f1cba6fba5 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -63,6 +63,7 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, Po=
+werPCCPU *cpu,
+                            Error **errp)
+ {
+     CPUPPCState *env =3D &cpu->env;
++    XICSFabric *xi =3D XICS_FABRIC(spapr);
+=20
+     /* Set time-base frequency to 512 MHz */
+     cpu_ppc_tb_init(env, SPAPR_TIMEBASE_FREQ);
+@@ -80,7 +81,8 @@ static void spapr_cpu_init(sPAPRMachineState *spapr, Po=
+werPCCPU *cpu,
+         }
+     }
+=20
+-    xics_cpu_setup(XICS_FABRIC(spapr), cpu);
++    cpu->icp =3D xics_icp_get(xi, CPU(cpu)->cpu_index);
++    xics_cpu_setup(xi, cpu);
+=20
+     qemu_register_reset(spapr_cpu_reset, cpu);
+     spapr_cpu_reset(cpu);
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 5ee33b3fd315..b1626d0a6607 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1176,6 +1176,7 @@ do {                                            \
+=20
+ typedef struct PPCVirtualHypervisor PPCVirtualHypervisor;
+ typedef struct PPCVirtualHypervisorClass PPCVirtualHypervisorClass;
++typedef struct ICPState ICPState;
+=20
+ /**
+  * PowerPCCPU:
+@@ -1196,6 +1197,7 @@ struct PowerPCCPU {
+     uint32_t max_compat;
+     uint32_t compat_pvr;
+     PPCVirtualHypervisor *vhyp;
++    ICPState *icp;
+=20
+     /* Fields related to migration compatibility hacks */
+     bool pre_2_8_migration;
 --=20
 2.7.4
