@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1coOtV-000687-Ht
+	(envelope-from <armbru@redhat.com>) id 1coOtW-00068X-5I
 	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 02:28:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1coOtR-00078Y-R4
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 02:28:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41848)
+	(envelope-from <armbru@redhat.com>) id 1coOtS-00078q-0N
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 02:28:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37628)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1coOtR-00076i-Fk
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1coOtR-00077A-My
 	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 02:28:13 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 61E77C04B30E
+	by mx1.redhat.com (Postfix) with ESMTPS id 8F3BB64478
 	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 06:28:13 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-26.ams2.redhat.com
 	[10.36.116.26])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2E57553CC1
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5D98D5C3FA
 	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 06:28:13 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 16 Mar 2017 07:27:47 +0100
-Message-Id: <1489645685-4750-32-git-send-email-armbru@redhat.com>
+Date: Thu, 16 Mar 2017 07:27:51 +0100
+Message-Id: <1489645685-4750-36-git-send-email-armbru@redhat.com>
 In-Reply-To: <1489645685-4750-1-git-send-email-armbru@redhat.com>
 References: <1489645685-4750-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL for 2.9 31/49] qapi2texi: Use category "Object"
- for all object types
+Subject: [Qemu-devel] [PULL for 2.9 35/49] qapi: Improve error message on
+ @NAME: in free-form doc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,52 +36,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-At the protocol level, the distinction between struct, flat union and
-simple union is meaningless, they are all JSON objects.  Document them
-that way.
-
-Example change (qemu-qmp-ref.txt):
-
-- -- Simple Union: InputEvent
-+ -- Object: InputEvent
-
-      Input event union.
-
-This also fixes the completely broken headings for flat and simple
-unions in qemu-qmp-ref.7 and qemu-ga-ref.7, by sidestepping a bug in
-texi2pod.pl.  For instance, it mistranslates "@deftp {Simple Union}
-InputEvent" to "B<Union> (Simple)", but translates "@deftp Object
-InputEvent" to "B<SocketAddress> (Object)".
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <1489582656-31133-30-git-send-email-armbru@redhat.com>
+Message-Id: <1489582656-31133-34-git-send-email-armbru@redhat.com>
 ---
- scripts/qapi2texi.py | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+ scripts/qapi.py                           | 17 ++++++-----------
+ tests/qapi-schema/doc-invalid-section.err |  2 +-
+ 2 files changed, 7 insertions(+), 12 deletions(-)
 
-diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-index 282adf4..8eed11a 100755
---- a/scripts/qapi2texi.py
-+++ b/scripts/qapi2texi.py
-@@ -219,17 +219,11 @@ class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisitor):
+diff --git a/scripts/qapi.py b/scripts/qapi.py
+index 9a1d830..4edcea1 100644
+--- a/scripts/qapi.py
++++ b/scripts/qapi.py
+@@ -219,6 +219,11 @@ class QAPIDoc(object):
+         if (in_arg or not self.section.name
+                 or not self.section.name.startswith('Example')):
+             line = line.strip()
++        match = re.match(r'(@\S+:)', line)
++        if match:
++            raise QAPIParseError(self.parser,
++                                 "'%s' not allowed in free-form documentation"
++                                 % match.group(1))
+         # TODO Drop this once the dust has settled
+         if (isinstance(self.section, QAPIDoc.ArgSection)
+                 and '#optional' in line):
+@@ -975,14 +980,6 @@ def check_exprs(exprs):
+     return exprs
  
-     def visit_object_type(self, name, info, base, members, variants):
-         doc = self.cur_doc
--        if not variants:
--            typ = 'Struct'
--        elif variants._tag_name:        # TODO unclean member access
--            typ = 'Flat Union'
+ 
+-def check_freeform_doc(doc):
+-    body = str(doc.body)
+-    if re.search(r'@\S+:', body, re.MULTILINE):
+-        raise QAPISemError(doc.info,
+-                           "Free-form documentation block must not contain"
+-                           " @NAME: sections")
+-
+-
+ def check_definition_doc(doc, expr, info):
+     for i in ('enum', 'union', 'alternate', 'struct', 'command', 'event'):
+         if i in expr:
+@@ -1021,9 +1018,7 @@ def check_docs(docs):
+                 raise QAPISemError(doc.info,
+                                    "Empty doc section '%s'" % section.name)
+ 
+-        if not doc.expr:
+-            check_freeform_doc(doc)
 -        else:
--            typ = 'Simple Union'
-         if base and base.is_implicit():
-             base = None
-         if self.out:
-             self.out += '\n'
--        self.out += TYPE_FMT(type=typ,
-+        self.out += TYPE_FMT(type='Object',
-                              name=doc.symbol,
-                              body=texi_entity(doc, 'Members', base, variants))
++        if doc.expr:
+             check_definition_doc(doc, doc.expr, doc.info)
  
+     return docs
+diff --git a/tests/qapi-schema/doc-invalid-section.err b/tests/qapi-schema/doc-invalid-section.err
+index 85bb67b..bda93b4 100644
+--- a/tests/qapi-schema/doc-invalid-section.err
++++ b/tests/qapi-schema/doc-invalid-section.err
+@@ -1 +1 @@
+-tests/qapi-schema/doc-invalid-section.json:3: Free-form documentation block must not contain @NAME: sections
++tests/qapi-schema/doc-invalid-section.json:5:1: '@note:' not allowed in free-form documentation
 -- 
 2.7.4
