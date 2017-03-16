@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cocsL-0005B9-RT
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 17:24:02 -0400
+	(envelope-from <jsnow@redhat.com>) id 1cocsM-0005Bk-9D
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 17:24:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cocsL-0002as-0K
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 17:24:01 -0400
+	(envelope-from <jsnow@redhat.com>) id 1cocsK-0002an-U5
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 17:24:02 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Thu, 16 Mar 2017 17:23:48 -0400
-Message-Id: <20170316212351.13797-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/3] block: pause block jobs for
- bdrv_drain_begin/end
+Date: Thu, 16 Mar 2017 17:23:50 -0400
+Message-Id: <20170316212351.13797-3-jsnow@redhat.com>
+In-Reply-To: <20170316212351.13797-1-jsnow@redhat.com>
+References: <20170316212351.13797-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 2/3] block-backend: add drained_begin /
+ drained_end ops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,22 +23,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, pbonzini@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 
-Reference: https://bugzilla.redhat.com/show_bug.cgi?id=1367369#c8
+Allow block backends to forward drain requests to their devices/users.
+The initial intended purpose for this patch is to allow BBs to forward
+requests along to BlockJobs, which will want to pause if their associated
+BB has entered a drained region.
 
-It's possible to wedge QEMU if the guest tries to reset a virtio-pci
-device as QEMU is also using the drive for a blockjob. This patchset
-aims to allow us to safely pause/resume jobs attached to individual
-nodes in a manner similar to how bdrv_drain_all_begin/end do.
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ block/block-backend.c          | 24 ++++++++++++++++++++++--
+ include/sysemu/block-backend.h |  8 ++++++++
+ 2 files changed, 30 insertions(+), 2 deletions(-)
 
-John Snow (3):
-  blockjob: add block_job_start_shim
-  block-backend: add drained_begin / drained_end ops
-  blockjob: add devops to blockjob backends
-
- block/block-backend.c          | 24 ++++++++++++++++--
- blockjob.c                     | 55 +++++++++++++++++++++++++++++++++---------
- include/sysemu/block-backend.h |  8 ++++++
- 3 files changed, 73 insertions(+), 14 deletions(-)
-
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 5742c09..dec4a1c 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -65,6 +65,8 @@ struct BlockBackend {
+     bool allow_write_beyond_eof;
+ 
+     NotifierList remove_bs_notifiers, insert_bs_notifiers;
++
++    int quiesce_counter;
+ };
+ 
+ typedef struct BlockBackendAIOCB {
+@@ -699,12 +701,17 @@ void blk_set_dev_ops(BlockBackend *blk, const BlockDevOps *ops,
+                      void *opaque)
+ {
+     /* All drivers that use blk_set_dev_ops() are qdevified and we want to keep
+-     * it that way, so we can assume blk->dev is a DeviceState if blk->dev_ops
+-     * is set. */
++     * it that way, so we can assume blk->dev, if present, is a DeviceState if
++     * blk->dev_ops is set. Non-device users may use dev_ops without device. */
+     assert(!blk->legacy_dev);
+ 
+     blk->dev_ops = ops;
+     blk->dev_opaque = opaque;
++
++    /* Are we currently quiesced? Should we enforce this right now? */
++    if (blk->quiesce_counter && ops->drained_begin) {
++        ops->drained_begin(opaque);
++    }
+ }
+ 
+ /*
+@@ -1870,6 +1877,12 @@ static void blk_root_drained_begin(BdrvChild *child)
+ {
+     BlockBackend *blk = child->opaque;
+ 
++    if (++blk->quiesce_counter == 1) {
++        if (blk->dev_ops && blk->dev_ops->drained_begin) {
++            blk->dev_ops->drained_begin(blk->dev_opaque);
++        }
++    }
++
+     /* Note that blk->root may not be accessible here yet if we are just
+      * attaching to a BlockDriverState that is drained. Use child instead. */
+ 
+@@ -1881,7 +1894,14 @@ static void blk_root_drained_begin(BdrvChild *child)
+ static void blk_root_drained_end(BdrvChild *child)
+ {
+     BlockBackend *blk = child->opaque;
++    assert(blk->quiesce_counter);
+ 
+     assert(blk->public.io_limits_disabled);
+     --blk->public.io_limits_disabled;
++
++    if (--blk->quiesce_counter == 0) {
++        if (blk->dev_ops && blk->dev_ops->drained_end) {
++              blk->dev_ops->drained_end(blk->dev_opaque);
++        }
++    }
+ }
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
+index 096c17f..7462228 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -58,6 +58,14 @@ typedef struct BlockDevOps {
+      * Runs when the size changed (e.g. monitor command block_resize)
+      */
+     void (*resize_cb)(void *opaque);
++    /*
++     * Runs when the backend receives a drain request.
++     */
++    void (*drained_begin)(void *opaque);
++    /*
++     * Runs when the backend's last drain request ends.
++     */
++    void (*drained_end)(void *opaque);
+ } BlockDevOps;
+ 
+ /* This struct is embedded in (the private) BlockBackend struct and contains
 -- 
 2.9.3
