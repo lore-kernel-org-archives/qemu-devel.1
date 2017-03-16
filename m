@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1coRI9-0003Ox-TW
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:01:55 -0400
+	(envelope-from <quintela@redhat.com>) id 1coRIB-0003P0-Mp
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:01:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1coRI9-00009A-6B
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:01:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50752)
+	(envelope-from <quintela@redhat.com>) id 1coRI6-00007m-7d
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:01:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53662)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1coRI9-00008c-11
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:01:53 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F375A7E9DA
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 09:01:52 +0000 (UTC)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1coRI6-00007S-2F
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:01:50 -0400
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu, 16 Mar 2017 10:01:40 +0100
-Message-Id: <20170316090141.13421-6-quintela@redhat.com>
+Date: Thu, 16 Mar 2017 10:01:38 +0100
+Message-Id: <20170316090141.13421-4-quintela@redhat.com>
 In-Reply-To: <20170316090141.13421-1-quintela@redhat.com>
 References: <20170316090141.13421-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 5/6] RAMBlocks: qemu_ram_is_shared
+Subject: [Qemu-devel] [PULL 3/6] migration/block: Avoid invoking blk_drain
+ too frequently
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,48 +25,40 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com
+Cc: dgilbert@redhat.com, Lidong Chen <jemmy858585@gmail.com>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Lidong Chen <jemmy858585@gmail.com>
 
-Provide a helper to say whether a RAMBlock was created as a
-shared mapping.
+Increase bmds->cur_dirty after submit io, so reduce the frequency
+involve into blk_drain, and improve the performance obviously
+when block migration.
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+The performance test result of this patch:
+
+During the block dirty save phase, this patch improve guest os IOPS
+from 4.0K to 9.5K. and improve the migration speed from
+505856 rsec/s to 855756 rsec/s.
+
+Signed-off-by: Lidong Chen <jemmy858585@gmail.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- exec.c                    | 5 +++++
- include/exec/cpu-common.h | 1 +
- 2 files changed, 6 insertions(+)
+ migration/block.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/exec.c b/exec.c
-index a22f5a0..e57a8a2 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1561,6 +1561,11 @@ const char *qemu_ram_get_idstr(RAMBlock *rb)
-     return rb->idstr;
- }
+diff --git a/migration/block.c b/migration/block.c
+index 6741228..7734ff7 100644
+--- a/migration/block.c
++++ b/migration/block.c
+@@ -576,6 +576,9 @@ static int mig_save_device_dirty(QEMUFile *f, BlkMigDevState *bmds,
+             }
  
-+bool qemu_ram_is_shared(RAMBlock *rb)
-+{
-+    return rb->flags & RAM_SHARED;
-+}
+             bdrv_reset_dirty_bitmap(bmds->dirty_bitmap, sector, nr_sectors);
++            sector += nr_sectors;
++            bmds->cur_dirty = sector;
 +
- /* Called with iothread lock held.  */
- void qemu_ram_set_idstr(RAMBlock *new_block, const char *name, DeviceState *dev)
- {
-diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-index b62f0d8..4d45a72 100644
---- a/include/exec/cpu-common.h
-+++ b/include/exec/cpu-common.h
-@@ -69,6 +69,7 @@ RAMBlock *qemu_ram_block_from_host(void *ptr, bool round_offset,
- void qemu_ram_set_idstr(RAMBlock *block, const char *name, DeviceState *dev);
- void qemu_ram_unset_idstr(RAMBlock *block);
- const char *qemu_ram_get_idstr(RAMBlock *rb);
-+bool qemu_ram_is_shared(RAMBlock *rb);
- size_t qemu_ram_pagesize(RAMBlock *block);
- size_t qemu_ram_pagesize_largest(void);
- 
+             break;
+         }
+         sector += BDRV_SECTORS_PER_DIRTY_CHUNK;
 -- 
 2.9.3
