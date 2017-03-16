@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53750)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rimjhim0107@gmail.com>) id 1coTK1-0007Ck-LY
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 07:11:58 -0400
+	(envelope-from <berrange@redhat.com>) id 1coTSE-0000tY-AL
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 07:20:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rimjhim0107@gmail.com>) id 1coTJy-0002fb-IN
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 07:11:57 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:36333)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rimjhim0107@gmail.com>)
-	id 1coTJy-0002fE-C7
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 07:11:54 -0400
-Received: by mail-pf0-x243.google.com with SMTP id r137so1632089pfr.3
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 04:11:54 -0700 (PDT)
-From: Anishka0107 <rimjhim0107@gmail.com>
-Date: Thu, 16 Mar 2017 11:11:33 +0530
-Message-Id: <1489642893-4504-1-git-send-email-rimjhim0107@gmail.com>
-Subject: [Qemu-devel] [PATCH v2] puv3: always compile-check debug printf
+	(envelope-from <berrange@redhat.com>) id 1coTSB-0006PN-73
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 07:20:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55360)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1coTSB-0006PD-0b
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 07:20:23 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D91693DBEF
+	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 11:20:22 +0000 (UTC)
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Thu, 16 Mar 2017 11:20:16 +0000
+Message-Id: <20170316112016.26450-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH] List SASL config file under the cryptography
+ maintainer's realm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,30 +29,28 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: jsnow@redhat.com, stefanha@redhat.com, Anishka0107 <rimjhim0107@gmail.com>
 
-     To prevent bitrot of the format string of the debug statement, files with
-     conditional debug statements should ensure that printf is compiled always,
-     and enclosed within if(0) statements and not in #ifdef.
+No one is listed as maintainer for qemu.sasl. It is used by the
+VNC server for SASL auth, but since it is cryptography related,
+list it under the crytography maintainer's realm, rather than
+under the UI maintainer.
 
-Signed-off-by: Anishka Gupta <rimjhim0107@gmail.com>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- include/hw/unicore32/puv3.h | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/hw/unicore32/puv3.h b/include/hw/unicore32/puv3.h
-index e268484..9fdf0a1 100644
---- a/include/hw/unicore32/puv3.h
-+++ b/include/hw/unicore32/puv3.h
-@@ -46,8 +46,7 @@
- #define DPRINTF(fmt, ...)
-     if (DEBUG_PUV3) {
-         fprintf(stderr, "%s: " fmt , __func__, ## __VA_ARGS__)
--    }
--    else {
-+    } else {
-         do {} while (0)
-     }
+diff --git a/MAINTAINERS b/MAINTAINERS
+index bf1aafb..ecf8273 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1462,6 +1462,7 @@ S: Maintained
+ F: crypto/
+ F: include/crypto/
+ F: tests/test-crypto-*
++F: qemu.sasl
  
+ Coroutines
+ M: Stefan Hajnoczi <stefanha@redhat.com>
 -- 
-2.5.0
+2.9.3
