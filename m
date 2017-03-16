@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1coY7G-0000mW-Pv
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 12:19:08 -0400
+	(envelope-from <drjones@redhat.com>) id 1coY7p-00013G-3W
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 12:19:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1coY7C-00070U-Ov
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 12:19:06 -0400
-Resent-Message-Id: <E1coY7C-00070U-Ov@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21320)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1coY7C-00070J-II
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 12:19:02 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148968113091.96.7887502680069151120@6c512846dbc7>
-In-Reply-To: <20170316161535.22157-1-pbonzini@redhat.com>
+	(envelope-from <drjones@redhat.com>) id 1coY7l-00079Q-1g
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 12:19:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50238)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1coY7k-00079F-PC
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 12:19:36 -0400
+Date: Thu, 16 Mar 2017 17:19:30 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20170316161929.bn4kdlfz4om7vs34@hawk.localdomain>
+References: <1489653504-25229-1-git-send-email-he.chen@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 16 Mar 2017 09:18:51 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] qemu-ga: obey LISTEN_PID when using
- systemd socket activation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1489653504-25229-1-git-send-email-he.chen@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v2] x86: Allow to set NUMA distance for
+ different NUMA nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +27,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, rjones@redhat.com, stefanha@redhat.com
+To: He Chen <he.chen@linux.intel.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIHFlbXUtZ2E6IG9iZXkgTElTVEVOX1BJRCB3aGVu
-IHVzaW5nIHN5c3RlbWQgc29ja2V0IGFjdGl2YXRpb24KTWVzc2FnZS1pZDogMjAxNzAzMTYxNjE1
-MzUuMjIxNTctMS1wYm9uemluaUByZWRoYXQuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
-CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJB
-U0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAt
-LWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVz
-IFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLiki
-CmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFs
-OiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRj
-IC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0
-aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpk
-b25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNm
-NWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5j
-b20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDE3
-MDMxNTEzNTAyMS42OTc4LTEtcXVpbnRlbGFAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTcwMzE1
-MTM1MDIxLjY5NzgtMS1xdWludGVsYUByZWRoYXQuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgIHBh
-dGNoZXcvMjAxNzAzMTYxNjE1MzUuMjIxNTctMS1wYm9uemluaUByZWRoYXQuY29tIC0+IHBhdGNo
-ZXcvMjAxNzAzMTYxNjE1MzUuMjIxNTctMS1wYm9uemluaUByZWRoYXQuY29tClN3aXRjaGVkIHRv
-IGEgbmV3IGJyYW5jaCAndGVzdCcKMjU5M2M0MyBxZW11LWdhOiBvYmV5IExJU1RFTl9QSUQgd2hl
-biB1c2luZyBzeXN0ZW1kIHNvY2tldCBhY3RpdmF0aW9uCgo9PT0gT1VUUFVUIEJFR0lOID09PQpD
-aGVja2luZyBQQVRDSCAxLzE6IHFlbXUtZ2E6IG9iZXkgTElTVEVOX1BJRCB3aGVuIHVzaW5nIHN5
-c3RlbWQgc29ja2V0IGFjdGl2YXRpb24uLi4KRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZl
-ciB1c2UgdGFicwojMTczOiBGSUxFOiBxZW11LW5iZC5jOjgwNToKK15JLyogcWVtdS1uYmQgY2Fu
-IG9ubHkgbGlzdGVuIG9uIGEgc2luZ2xlIHNvY2tldC4gICovJAoKRVJST1I6IGNvZGUgaW5kZW50
-IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTc0OiBGSUxFOiBxZW11LW5iZC5jOjgwNjoKK15JaWYg
-KHNvY2tldF9hY3RpdmF0aW9uID4gMSkgeyQKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
-ZXJzCiMxNzU6IEZJTEU6IHFlbXUtbmJkLmM6ODA3OgorICAgICAgICAgICAgZXJyb3JfcmVwb3J0
-KCJxZW11LW5iZCBkb2VzIG5vdCBzdXBwb3J0IHNvY2tldCBhY3RpdmF0aW9uIHdpdGggJXMgPiAx
-IiwKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzE3ODogRklMRTog
-cWVtdS1uYmQuYzo4MTA6CiteSX0kCgp0b3RhbDogMyBlcnJvcnMsIDEgd2FybmluZ3MsIDMyNCBs
-aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
-dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
-bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0g
-T1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVt
-YWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9y
-Zy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3Rz
-Lm9yZw==
+On Thu, Mar 16, 2017 at 04:38:24PM +0800, He Chen wrote:
+> Current, QEMU does not provide a clear command to set vNUMA distance for
+> guest although we already have `-numa` command to set vNUMA nodes.
+> 
+> vNUMA distance makes sense in certain scenario.
+> But now, if we create a guest that has 4 vNUMA nodes, when we check NUMA
+> info via `numactl -H`, we will see:
+> 
+> node distance:
+> node    0    1    2    3
+>   0:   10   20   20   20
+>   1:   20   10   20   20
+>   2:   20   20   10   20
+>   3:   20   20   20   10
+> 
+> Guest kernel regards all local node as distance 10, and all remote node
+> as distance 20 when there is no SLIT table since QEMU doesn't build it.
+> It looks like a little strange when you have seen the distance in an
+> actual physical machine that contains 4 NUMA nodes. My machine shows:
+> 
+> node distance:
+> node    0    1    2    3
+>   0:   10   21   31   41
+>   1:   21   10   21   31
+>   2:   31   21   10   21
+>   3:   41   31   21   10
+> 
+> To set vNUMA distance, guest should see a complete SLIT table.
+> I found QEMU has provide `-acpitable` command that allows users to add
+> a ACPI table into guest, but it requires users building ACPI table by
+> themselves first. Using `-acpitable` to add a SLIT table may be not so
+> straightforward or flexible, imagine that when the vNUMA configuration
+> is changes and we need to generate another SLIT table manually. It may
+> not be friendly to users or upper software like libvirt.
+> 
+> This patch is going to add SLIT table support in QEMU, and provides
+> additional option `dist` for command `-numa` to allow user set vNUMA
+> distance by QEMU command.
+> 
+> With this patch, when a user wants to create a guest that contains
+> several vNUMA nodes and also wants to set distance among those nodes,
+> the QEMU command would like:
+> 
+> ```
+> -object memory-backend-ram,size=1G,prealloc=yes,host-nodes=0,policy=bind,id=node0 \
+> -numa node,nodeid=0,cpus=0,memdev=node0 \
+> -object memory-backend-ram,size=1G,prealloc=yes,host-nodes=1,policy=bind,id=node1 \
+> -numa node,nodeid=1,cpus=1,memdev=node1 \
+> -object memory-backend-ram,size=1G,prealloc=yes,host-nodes=2,policy=bind,id=node2 \
+> -numa node,nodeid=2,cpus=2,memdev=node2 \
+> -object memory-backend-ram,size=1G,prealloc=yes,host-nodes=3,policy=bind,id=node3 \
+> -numa node,nodeid=3,cpus=3,memdev=node3 \
+> -numa dist,src=0,dst=1,val=21 \
+> -numa dist,src=0,dst=2,val=31 \
+> -numa dist,src=0,dst=3,val=41 \
+> -numa dist,src=1,dst=0,val=21 \
+> ...
+> ```
+> 
+> Signed-off-by: He Chen <he.chen@linux.intel.com>
+> ---
+>  hw/i386/acpi-build.c    | 27 +++++++++++++++++++++++++++
+>  include/sysemu/numa.h   |  1 +
+>  include/sysemu/sysemu.h |  3 +++
+>  numa.c                  | 44 ++++++++++++++++++++++++++++++++++++++++++++
+>  qapi-schema.json        | 24 ++++++++++++++++++++++--
+>  qemu-options.hx         | 12 +++++++++++-
+>  6 files changed, 108 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 2073108..50906b9 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -2395,6 +2395,31 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+>                   table_data->len - srat_start, 1, NULL, NULL);
+>  }
+>  
+> +/*
+> + * ACPI spec 5.2.17 System Locality Distance Information Table
+> + * (Revision 2.0 or later)
+> + */
+> +static void
+> +build_slit(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+> +{
+> +    int slit_start, i, j;
+> +    slit_start = table_data->len;
+> +
+> +    acpi_data_push(table_data, sizeof(AcpiTableHeader));
+> +
+> +    build_append_int_noprefix(table_data, nb_numa_nodes, 8);
+> +    for (i = 0; i < nb_numa_nodes; i++) {
+> +        for (j = 0; j < nb_numa_nodes; j++) {
+> +            build_append_int_noprefix(table_data, numa_info[i].distance[j], 1);
+> +        }
+> +    }
+> +
+> +    build_header(linker, table_data,
+> +                 (void *)(table_data->data + slit_start),
+> +                 "SLIT",
+> +                 table_data->len - slit_start, 1, NULL, NULL);
+> +}
+> +
+
+There's no reason to put build_slit() in the x86-specific acpi code.
+It can go in hw/acpi/aml-build.c, and then we can also use it for
+ARM ACPI tables too.
+
+Thanks,
+drew
