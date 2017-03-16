@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cocsL-0005Ay-HT
+	(envelope-from <jsnow@redhat.com>) id 1cocsL-0005BD-SN
 	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 17:24:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cocsK-0002aY-Ir
+	(envelope-from <jsnow@redhat.com>) id 1cocsK-0002ah-Sh
 	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 17:24:01 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Thu, 16 Mar 2017 17:23:49 -0400
-Message-Id: <20170316212351.13797-2-jsnow@redhat.com>
+Date: Thu, 16 Mar 2017 17:23:51 -0400
+Message-Id: <20170316212351.13797-4-jsnow@redhat.com>
 In-Reply-To: <20170316212351.13797-1-jsnow@redhat.com>
 References: <20170316212351.13797-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/3] blockjob: add block_job_start_shim
+Subject: [Qemu-devel] [PATCH v2 3/3] blockjob: add devops to blockjob
+ backends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,73 +23,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, pbonzini@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 
-The purpose of this shim is to allow us to pause pre-started jobs.
-The purpose of *that* is to allow us to buffer a pause request that
-will be able to take effect before the job ever does any work, allowing
-us to create jobs during a quiescent state (under which they will be
-automatically paused), then resuming the jobs after the critical section
-in any order, either:
+This lets us hook into drained_begin and drained_end requests from the
+backend level, which is particularly useful for making sure that all
+jobs associated with a particular node (whether the source or the target)
+receive a drain request.
 
-(1) -block_job_start
-    -block_job_resume (via e.g. drained_end)
-
-(2) -block_job_resume (via e.g. drained_end)
-    -block_job_start
-
-The problem that requires a startup wrapper is the idea that a job must
-start in the busy=true state only its first time-- all subsequent entries
-require busy to be false, and the toggling of this state is otherwise
-handled during existing pause and yield points.
-
-The wrapper simply allows us to mandate that a job can "start," set busy
-to true, then immediately pause only if necessary. We could avoid
-requiring a wrapper, but all jobs would need to do it, so it's been
-factored out here.
-
+Suggested-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- blockjob.c | 26 +++++++++++++++++++-------
- 1 file changed, 19 insertions(+), 7 deletions(-)
+ blockjob.c | 29 ++++++++++++++++++++++++-----
+ 1 file changed, 24 insertions(+), 5 deletions(-)
 
 diff --git a/blockjob.c b/blockjob.c
-index 69126af..69b4ec6 100644
+index 69b4ec6..a11d5ce 100644
 --- a/blockjob.c
 +++ b/blockjob.c
-@@ -250,16 +250,28 @@ static bool block_job_started(BlockJob *job)
-     return job->co;
- }
+@@ -68,6 +68,23 @@ static const BdrvChildRole child_job = {
+     .stay_at_node       = true,
+ };
  
-+/**
-+ * All jobs must allow a pause point before entering their job proper. This
-+ * ensures that jobs can be paused prior to being started, then resumed later.
-+ */
-+static void coroutine_fn block_job_co_entry(void *opaque)
++static void block_job_drained_begin(void *opaque)
 +{
 +    BlockJob *job = opaque;
-+
-+    assert(job && job->driver && job->driver->start);
-+    block_job_pause_point(job);
-+    job->driver->start(job);
++    block_job_pause(job);
 +}
 +
- void block_job_start(BlockJob *job)
++static void block_job_drained_end(void *opaque)
++{
++    BlockJob *job = opaque;
++    block_job_resume(job);
++}
++
++static const BlockDevOps block_job_dev_ops = {
++    .drained_begin = block_job_drained_begin,
++    .drained_end = block_job_drained_end,
++};
++
+ BlockJob *block_job_next(BlockJob *job)
  {
-     assert(job && !block_job_started(job) && job->paused &&
--           !job->busy && job->driver->start);
--    job->co = qemu_coroutine_create(job->driver->start, job);
--    if (--job->pause_count == 0) {
--        job->paused = false;
--        job->busy = true;
--        qemu_coroutine_enter(job->co);
--    }
-+           job->driver && job->driver->start);
-+    job->co = qemu_coroutine_create(block_job_co_entry, job);
-+    job->pause_count--;
-+    job->busy = true;
-+    job->paused = false;
-+    qemu_coroutine_enter(job->co);
- }
+     if (!job) {
+@@ -205,11 +222,6 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+     }
  
- void block_job_ref(BlockJob *job)
+     job = g_malloc0(driver->instance_size);
+-    error_setg(&job->blocker, "block device is in use by block job: %s",
+-               BlockJobType_lookup[driver->job_type]);
+-    block_job_add_bdrv(job, "main node", bs, 0, BLK_PERM_ALL, &error_abort);
+-    bdrv_op_unblock(bs, BLOCK_OP_TYPE_DATAPLANE, job->blocker);
+-
+     job->driver        = driver;
+     job->id            = g_strdup(job_id);
+     job->blk           = blk;
+@@ -219,8 +231,15 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+     job->paused        = true;
+     job->pause_count   = 1;
+     job->refcnt        = 1;
++
++    error_setg(&job->blocker, "block device is in use by block job: %s",
++               BlockJobType_lookup[driver->job_type]);
++    block_job_add_bdrv(job, "main node", bs, 0, BLK_PERM_ALL, &error_abort);
+     bs->job = job;
+ 
++    blk_set_dev_ops(blk, &block_job_dev_ops, job);
++    bdrv_op_unblock(bs, BLOCK_OP_TYPE_DATAPLANE, job->blocker);
++
+     QLIST_INSERT_HEAD(&block_jobs, job, job_list);
+ 
+     blk_add_aio_context_notifier(blk, block_job_attached_aio_context,
 -- 
 2.9.3
