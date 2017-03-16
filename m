@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47496)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1coRcU-0005BO-4L
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:22:55 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1coRcX-0005EP-6U
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:22:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1coRcS-0000mI-QH
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:22:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40046)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1coRcW-0000nU-7p
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:22:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49368)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1coRcS-0000m4-Hn
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:22:52 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	id 1coRcW-0000nA-1v
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:22:56 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A2C24804E4
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 09:22:52 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 22DC09D4E9
+	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 09:22:56 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 16 Mar 2017 13:21:19 +0400
-Message-Id: <20170316092121.25672-20-marcandre.lureau@redhat.com>
+Date: Thu, 16 Mar 2017 13:21:20 +0400
+Message-Id: <20170316092121.25672-21-marcandre.lureau@redhat.com>
 In-Reply-To: <20170316092121.25672-1-marcandre.lureau@redhat.com>
 References: <20170316092121.25672-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 19/21] tests: add /char/socket test
+Subject: [Qemu-devel] [PATCH v3 20/21] tests: add /char/udp test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,175 +38,71 @@ Cc: pbonzini@redhat.com, eblake@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?=
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- tests/test-char.c | 114 ++++++++++++++++++++++++++++++++++++++++++++++++=
-+++++-
- 1 file changed, 112 insertions(+), 2 deletions(-)
+ tests/test-char.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
 
 diff --git a/tests/test-char.c b/tests/test-char.c
-index 87a4e2986d..9971498391 100644
+index 9971498391..19707bfcda 100644
 --- a/tests/test-char.c
 +++ b/tests/test-char.c
-@@ -3,9 +3,11 @@
-=20
- #include "qemu-common.h"
- #include "qemu/config-file.h"
-+#include "qemu/sockets.h"
- #include "sysemu/char.h"
- #include "sysemu/sysemu.h"
- #include "qapi/error.h"
-+#include "qom/qom-qobject.h"
- #include "qmp-commands.h"
-=20
- static bool quit;
-@@ -16,7 +18,6 @@ typedef struct FeHandler {
-     char read_buf[128];
- } FeHandler;
-=20
--#ifndef _WIN32
- static void main_loop(void)
- {
-     bool nonblocking;
-@@ -28,7 +29,6 @@ static void main_loop(void)
-         last_io =3D main_loop_wait(nonblocking);
-     } while (!quit);
+@@ -385,6 +385,51 @@ static void char_pipe_test(void)
  }
--#endif
+ #endif
 =20
- static int fe_can_read(void *opaque)
- {
-@@ -211,6 +211,114 @@ static void char_mux_test(void)
-     object_unparent(OBJECT(chr));
- }
-=20
-+typedef struct SocketIdleData {
-+    GMainLoop *loop;
++static void char_udp_test(void)
++{
++    struct sockaddr_in addr =3D { 0, }, other;
++    SocketIdleData d =3D { 0, };
 +    Chardev *chr;
-+    bool conn_expected;
-+    CharBackend *be;
-+    CharBackend *client_be;
-+} SocketIdleData;
-+
-+static gboolean char_socket_test_idle(gpointer user_data)
-+{
-+    SocketIdleData *data =3D user_data;
-+
-+    if (object_property_get_bool(OBJECT(data->chr), "connected", NULL)
-+        =3D=3D data->conn_expected) {
-+        quit =3D true;
-+        return FALSE;
-+    }
-+
-+    return TRUE;
-+}
-+
-+static void socket_read(void *opaque, const uint8_t *buf, int size)
-+{
-+    SocketIdleData *data =3D opaque;
-+
-+    g_assert_cmpint(size, =3D=3D, 1);
-+    g_assert_cmpint(*buf, =3D=3D, 'Z');
-+
-+    size =3D qemu_chr_fe_write(data->be, (const uint8_t *)"hello", 5);
-+    g_assert_cmpint(size, =3D=3D, 5);
-+}
-+
-+static int socket_can_read(void *opaque)
-+{
-+    return 10;
-+}
-+
-+static void socket_read_hello(void *opaque, const uint8_t *buf, int size=
-)
-+{
-+    g_assert_cmpint(size, =3D=3D, 5);
-+    g_assert(strncmp((char *)buf, "hello", 5) =3D=3D 0);
-+
-+    quit =3D true;
-+}
-+
-+static int socket_can_read_hello(void *opaque)
-+{
-+    return 10;
-+}
-+
-+static void char_socket_test(void)
-+{
-+    Chardev *chr =3D qemu_chr_new("server", "tcp:127.0.0.1:0,server,nowa=
-it");
-+    Chardev *chr_client;
-+    QObject *addr;
-+    QDict *qdict, *data;
-+    const char *port;
-+    SocketIdleData d =3D { .chr =3D chr };
 +    CharBackend be;
-+    CharBackend client_be;
++    socklen_t alen =3D sizeof(addr);
++    int ret, sock =3D qemu_socket(PF_INET, SOCK_DGRAM, 0);
++    char buf[10];
 +    char *tmp;
 +
-+    d.be =3D &be;
-+    d.client_be =3D &be;
++    g_assert_cmpint(sock, >, 0);
++    addr.sin_family =3D AF_INET ;
++    addr.sin_addr.s_addr =3D htonl(INADDR_ANY);
++    addr.sin_port =3D 0;
++    ret =3D bind(sock, (struct sockaddr *)&addr, sizeof(addr));
++    g_assert_cmpint(ret, =3D=3D, 0);
++    ret =3D getsockname(sock, (struct sockaddr *)&addr, &alen);
++    g_assert_cmpint(ret, =3D=3D, 0);
 +
++    tmp =3D g_strdup_printf("udp:127.0.0.1:%d",
++                          ntohs(addr.sin_port));
++    chr =3D qemu_chr_new("client", tmp);
 +    g_assert_nonnull(chr);
-+    g_assert(!object_property_get_bool(OBJECT(chr), "connected", &error_=
-abort));
 +
-+    addr =3D object_property_get_qobject(OBJECT(chr), "addr", &error_abo=
-rt);
-+    qdict =3D qobject_to_qdict(addr);
-+    data =3D qdict_get_qdict(qdict, "data");
-+    port =3D qdict_get_str(data, "port");
-+    tmp =3D g_strdup_printf("tcp:127.0.0.1:%s", port);
-+    QDECREF(qdict);
-+
++    d.chr =3D chr;
 +    qemu_chr_fe_init(&be, chr, &error_abort);
-+    qemu_chr_fe_set_handlers(&be, socket_can_read, socket_read,
++    qemu_chr_fe_set_handlers(&be, socket_can_read_hello, socket_read_hel=
+lo,
 +                             NULL, &d, NULL, true);
++    ret =3D qemu_chr_write_all(chr, (uint8_t *)"hello", 5);
++    g_assert_cmpint(ret, =3D=3D, 5);
 +
-+    chr_client =3D qemu_chr_new("client", tmp);
-+    qemu_chr_fe_init(&client_be, chr_client, &error_abort);
-+    qemu_chr_fe_set_handlers(&client_be, socket_can_read_hello,
-+                             socket_read_hello,
-+                             NULL, &d, NULL, true);
++    alen =3D sizeof(addr);
++    ret =3D recvfrom(sock, buf, sizeof(buf), 0,
++                   (struct sockaddr *)&other, &alen);
++    g_assert_cmpint(ret, =3D=3D, 5);
++    ret =3D sendto(sock, buf, 5, 0, (struct sockaddr *)&other, alen);
++    g_assert_cmpint(ret, =3D=3D, 5);
++
++    main_loop();
++
++    close(sock);
 +    g_free(tmp);
-+
-+    d.conn_expected =3D true;
-+    guint id =3D g_idle_add(char_socket_test_idle, &d);
-+    g_source_set_name_by_id(id, "test-idle");
-+    g_assert_cmpint(id, >, 0);
-+    main_loop();
-+
-+    g_assert(object_property_get_bool(OBJECT(chr), "connected", &error_a=
-bort));
-+    g_assert(object_property_get_bool(OBJECT(chr_client),
-+                                      "connected", &error_abort));
-+
-+    qemu_chr_write_all(chr_client, (const uint8_t *)"Z", 1);
-+    main_loop();
-+
-+    object_unparent(OBJECT(chr_client));
-+
-+    d.conn_expected =3D false;
-+    g_idle_add(char_socket_test_idle, &d);
-+    main_loop();
-+
-+    object_unparent(OBJECT(chr));
 +}
 +
- #ifndef _WIN32
- static void char_pipe_test(void)
+ static void char_file_test(void)
  {
-@@ -401,6 +509,7 @@ static void char_invalid_test(void)
- int main(int argc, char **argv)
- {
-     qemu_init_main_loop(&error_abort);
-+    socket_init();
-=20
-     g_test_init(&argc, &argv, NULL);
-=20
-@@ -419,6 +528,7 @@ int main(int argc, char **argv)
-     g_test_add_func("/char/pipe", char_pipe_test);
+     char *tmp_path =3D g_dir_make_tmp("qemu-test-char.XXXXXX", NULL);
+@@ -529,6 +574,7 @@ int main(int argc, char **argv)
  #endif
      g_test_add_func("/char/file", char_file_test);
-+    g_test_add_func("/char/socket", char_socket_test);
+     g_test_add_func("/char/socket", char_socket_test);
++    g_test_add_func("/char/udp", char_udp_test);
 =20
      return g_test_run();
  }
