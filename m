@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40935)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cocsL-0005BD-SN
+	(envelope-from <jsnow@redhat.com>) id 1cocsL-0005B9-RT
 	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 17:24:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cocsK-0002ah-Sh
+	(envelope-from <jsnow@redhat.com>) id 1cocsL-0002as-0K
 	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 17:24:01 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Thu, 16 Mar 2017 17:23:51 -0400
-Message-Id: <20170316212351.13797-4-jsnow@redhat.com>
-In-Reply-To: <20170316212351.13797-1-jsnow@redhat.com>
-References: <20170316212351.13797-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/3] blockjob: add devops to blockjob
- backends
+Date: Thu, 16 Mar 2017 17:23:48 -0400
+Message-Id: <20170316212351.13797-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/3] block: pause block jobs for
+ bdrv_drain_begin/end
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,72 +21,22 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, pbonzini@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 
-This lets us hook into drained_begin and drained_end requests from the
-backend level, which is particularly useful for making sure that all
-jobs associated with a particular node (whether the source or the target)
-receive a drain request.
+Reference: https://bugzilla.redhat.com/show_bug.cgi?id=1367369#c8
 
-Suggested-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- blockjob.c | 29 ++++++++++++++++++++++++-----
- 1 file changed, 24 insertions(+), 5 deletions(-)
+It's possible to wedge QEMU if the guest tries to reset a virtio-pci
+device as QEMU is also using the drive for a blockjob. This patchset
+aims to allow us to safely pause/resume jobs attached to individual
+nodes in a manner similar to how bdrv_drain_all_begin/end do.
 
-diff --git a/blockjob.c b/blockjob.c
-index 69b4ec6..a11d5ce 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -68,6 +68,23 @@ static const BdrvChildRole child_job = {
-     .stay_at_node       = true,
- };
- 
-+static void block_job_drained_begin(void *opaque)
-+{
-+    BlockJob *job = opaque;
-+    block_job_pause(job);
-+}
-+
-+static void block_job_drained_end(void *opaque)
-+{
-+    BlockJob *job = opaque;
-+    block_job_resume(job);
-+}
-+
-+static const BlockDevOps block_job_dev_ops = {
-+    .drained_begin = block_job_drained_begin,
-+    .drained_end = block_job_drained_end,
-+};
-+
- BlockJob *block_job_next(BlockJob *job)
- {
-     if (!job) {
-@@ -205,11 +222,6 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-     }
- 
-     job = g_malloc0(driver->instance_size);
--    error_setg(&job->blocker, "block device is in use by block job: %s",
--               BlockJobType_lookup[driver->job_type]);
--    block_job_add_bdrv(job, "main node", bs, 0, BLK_PERM_ALL, &error_abort);
--    bdrv_op_unblock(bs, BLOCK_OP_TYPE_DATAPLANE, job->blocker);
--
-     job->driver        = driver;
-     job->id            = g_strdup(job_id);
-     job->blk           = blk;
-@@ -219,8 +231,15 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-     job->paused        = true;
-     job->pause_count   = 1;
-     job->refcnt        = 1;
-+
-+    error_setg(&job->blocker, "block device is in use by block job: %s",
-+               BlockJobType_lookup[driver->job_type]);
-+    block_job_add_bdrv(job, "main node", bs, 0, BLK_PERM_ALL, &error_abort);
-     bs->job = job;
- 
-+    blk_set_dev_ops(blk, &block_job_dev_ops, job);
-+    bdrv_op_unblock(bs, BLOCK_OP_TYPE_DATAPLANE, job->blocker);
-+
-     QLIST_INSERT_HEAD(&block_jobs, job, job_list);
- 
-     blk_add_aio_context_notifier(blk, block_job_attached_aio_context,
+John Snow (3):
+  blockjob: add block_job_start_shim
+  block-backend: add drained_begin / drained_end ops
+  blockjob: add devops to blockjob backends
+
+ block/block-backend.c          | 24 ++++++++++++++++--
+ blockjob.c                     | 55 +++++++++++++++++++++++++++++++++---------
+ include/sysemu/block-backend.h |  8 ++++++
+ 3 files changed, 73 insertions(+), 14 deletions(-)
+
 -- 
 2.9.3
