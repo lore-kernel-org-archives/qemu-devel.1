@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44815)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44898)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cobbE-0001u9-FF
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 16:02:18 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1cobbO-0002Bh-RA
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 16:02:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cobbD-0003GW-3v
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 16:02:16 -0400
-Received: from mail.kernel.org ([198.145.29.136]:45890)
+	(envelope-from <sstabellini@kernel.org>) id 1cobbK-0003JZ-NH
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 16:02:26 -0400
+Received: from mail.kernel.org ([198.145.29.136]:46010)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1cobbC-0003Es-P2
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 16:02:15 -0400
+	id 1cobbK-0003JK-Ds
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 16:02:22 -0400
 From: Stefano Stabellini <sstabellini@kernel.org>
-Date: Thu, 16 Mar 2017 13:01:54 -0700
-Message-Id: <1489694518-16978-5-git-send-email-sstabellini@kernel.org>
+Date: Thu, 16 Mar 2017 13:01:56 -0700
+Message-Id: <1489694518-16978-7-git-send-email-sstabellini@kernel.org>
 In-Reply-To: <1489694518-16978-1-git-send-email-sstabellini@kernel.org>
 References: <alpine.DEB.2.10.1703161241220.14378@sstabellini-ThinkPad-X260>
 	<1489694518-16978-1-git-send-email-sstabellini@kernel.org>
-Subject: [Qemu-devel] [PATCH v3 5/9] xen/9pfs: connect to the frontend
+Subject: [Qemu-devel] [PATCH v3 7/9] xen/9pfs: implement in/out_iov_from_pdu
+ and vmarshal/vunmarshal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,12 +29,11 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: xen-devel@lists.xenproject.org, sstabellini@kernel.org, jgross@suse.com, groug@kaod.org, Stefano Stabellini <stefano@aporeto.com>, anthony.perard@citrix.com, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
 
-Write the limits of the backend to xenstore. Connect to the frontend.
-Upon connection, allocate the rings according to the protocol
-specification.
+Implement xen_9pfs_init_in/out_iov_from_pdu and
+xen_9pfs_pdu_vmarshal/vunmarshall by creating new sg pointing to the
+data on the ring.
 
-Initialize a QEMUBH to schedule work upon receiving an event channel
-notification from the frontend.
+This is safe as we only handle one request per ring at any given time.
 
 Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
 CC: anthony.perard@citrix.com
@@ -41,225 +41,136 @@ CC: jgross@suse.com
 CC: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
 CC: Greg Kurz <groug@kaod.org>
 ---
- hw/9pfs/xen-9p-backend.c | 182 ++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 181 insertions(+), 1 deletion(-)
+ hw/9pfs/xen-9p-backend.c | 92 ++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 90 insertions(+), 2 deletions(-)
 
 diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
-index 92bb805..3fd20ff 100644
+index f757591..0a1eb34 100644
 --- a/hw/9pfs/xen-9p-backend.c
 +++ b/hw/9pfs/xen-9p-backend.c
-@@ -23,8 +23,39 @@
- #define XEN_9PFS_RING_SIZE  XEN_FLEX_RING_SIZE(XEN_9PFS_RING_ORDER)
- DEFINE_XEN_FLEX_RING_AND_INTF(xen_9pfs);
- 
-+#define VERSIONS "1"
-+#define MAX_RINGS 8
-+#define MAX_RING_ORDER 8
-+
-+typedef struct Xen9pfsRing {
-+    struct Xen9pfsDev *priv;
-+
-+    int ref;
-+    xenevtchn_handle   *evtchndev;
-+    int evtchn;
-+    int local_port;
-+    struct xen_9pfs_data_intf *intf;
-+    unsigned char *data;
-+    struct xen_9pfs_data ring;
-+
-+    QEMUBH *bh;
-+
-+    /* local copies, so that we can read/write PDU data directly from
-+     * the ring */
-+    RING_IDX out_cons, out_size, in_cons;
-+    bool inprogress;
-+} Xen9pfsRing;
-+
- typedef struct Xen9pfsDev {
-     struct XenDevice xendev;  /* must be first */
-+    V9fsState state;
-+    char *path;
-+    char *security_model;
-+    char *tag;
-+    char *id;
-+
-+    int num_rings;
-+    Xen9pfsRing *rings;
+@@ -58,12 +58,78 @@ typedef struct Xen9pfsDev {
+     Xen9pfsRing *rings;
  } Xen9pfsDev;
  
++static void xen_9pfs_in_sg(Xen9pfsRing *ring,
++                           struct iovec *in_sg,
++                           int *num,
++                           uint32_t idx,
++                           uint32_t size)
++{
++    RING_IDX cons, prod, masked_prod, masked_cons;
++
++    cons = ring->intf->in_cons;
++    prod = ring->intf->in_prod;
++    xen_rmb();
++    masked_prod = xen_9pfs_mask(prod, XEN_9PFS_RING_SIZE);
++    masked_cons = xen_9pfs_mask(cons, XEN_9PFS_RING_SIZE);
++
++    if (masked_prod < masked_cons) {
++        in_sg[0].iov_base = ring->ring.in + masked_prod;
++        in_sg[0].iov_len = masked_cons - masked_prod;
++        *num = 1;
++    } else {
++        in_sg[0].iov_base = ring->ring.in + masked_prod;
++        in_sg[0].iov_len = XEN_9PFS_RING_SIZE - masked_prod;
++        in_sg[1].iov_base = ring->ring.in;
++        in_sg[1].iov_len = masked_cons;
++        *num = 2;
++    }
++}
++
++static void xen_9pfs_out_sg(Xen9pfsRing *ring,
++                            struct iovec *out_sg,
++                            int *num,
++                            uint32_t idx)
++{
++    RING_IDX cons, prod, masked_prod, masked_cons;
++
++    cons = ring->intf->out_cons;
++    prod = ring->intf->out_prod;
++    xen_rmb();
++    masked_prod = xen_9pfs_mask(prod, XEN_9PFS_RING_SIZE);
++    masked_cons = xen_9pfs_mask(cons, XEN_9PFS_RING_SIZE);
++
++    if (masked_cons < masked_prod) {
++        out_sg[0].iov_base = ring->ring.out + masked_cons;
++        out_sg[0].iov_len = ring->out_size;
++        *num = 1;
++    } else {
++        if (ring->out_size > (XEN_9PFS_RING_SIZE - masked_cons)) {
++            out_sg[0].iov_base = ring->ring.out + masked_cons;
++            out_sg[0].iov_len = XEN_9PFS_RING_SIZE - masked_cons;
++            out_sg[1].iov_base = ring->ring.out;
++            out_sg[1].iov_len = ring->out_size -
++                                (XEN_9PFS_RING_SIZE - masked_cons);
++            *num = 2;
++        } else {
++            out_sg[0].iov_base = ring->ring.out + masked_cons;
++            out_sg[0].iov_len = ring->out_size;
++            *num = 1;
++        }
++    }
++}
++
  static ssize_t xen_9pfs_pdu_vmarshal(V9fsPDU *pdu,
-@@ -73,22 +104,171 @@ static int xen_9pfs_init(struct XenDevice *xendev)
-     return 0;
- }
- 
-+static void xen_9pfs_bh(void *opaque)
-+{
-+}
-+
-+static void xen_9pfs_evtchn_event(void *opaque)
-+{
-+}
-+
- static int xen_9pfs_free(struct XenDevice *xendev)
+                                      size_t offset,
+                                      const char *fmt,
+                                      va_list ap)
  {
--    return -1;
-+    int i;
-+    Xen9pfsDev *xen_9pdev = container_of(xendev, Xen9pfsDev, xendev);
+-    return 0;
++    Xen9pfsDev *xen_9pfs = container_of(pdu->s, Xen9pfsDev, state);
++    struct iovec in_sg[2];
++    int num;
 +
-+    if (xen_9pdev->id != NULL) {
-+        g_free(xen_9pdev->id);
-+    }
-+    if (xen_9pdev->tag != NULL) {
-+        g_free(xen_9pdev->tag);
-+    }
-+    if (xen_9pdev->path != NULL) {
-+        g_free(xen_9pdev->path);
-+    }
-+    if (xen_9pdev->security_model != NULL) {
-+        g_free(xen_9pdev->security_model);
-+    }
-+
-+    for (i = 0; i < xen_9pdev->num_rings; i++) {
-+        if (xen_9pdev->rings[i].data != NULL) {
-+            xengnttab_unmap(xen_9pdev->xendev.gnttabdev,
-+                    xen_9pdev->rings[i].data,
-+                    (1 << XEN_9PFS_RING_ORDER));
-+        }
-+        if (xen_9pdev->rings[i].intf != NULL) {
-+            xengnttab_unmap(xen_9pdev->xendev.gnttabdev,
-+                    xen_9pdev->rings[i].intf,
-+                    1);
-+        }
-+        if (xen_9pdev->rings[i].evtchndev > 0) {
-+            qemu_set_fd_handler(xenevtchn_fd(xen_9pdev->rings[i].evtchndev),
-+                    NULL, NULL, NULL);
-+            xenevtchn_unbind(xen_9pdev->rings[i].evtchndev,
-+                             xen_9pdev->rings[i].local_port);
-+        }
-+        if (xen_9pdev->rings[i].bh != NULL) {
-+            qemu_bh_delete(xen_9pdev->rings[i].bh);
-+        }
-+    }
-+    g_free(xen_9pdev->rings);
-+    return 0;
++    xen_9pfs_in_sg(&xen_9pfs->rings[pdu->tag % xen_9pfs->num_rings],
++                   in_sg, &num, pdu->idx, ROUND_UP(offset + 128, 512));
++    return v9fs_iov_vmarshal(in_sg, num, offset, 0, fmt, ap);
  }
  
- static int xen_9pfs_connect(struct XenDevice *xendev)
+ static ssize_t xen_9pfs_pdu_vunmarshal(V9fsPDU *pdu,
+@@ -71,13 +137,27 @@ static ssize_t xen_9pfs_pdu_vunmarshal(V9fsPDU *pdu,
+                                        const char *fmt,
+                                        va_list ap)
  {
-+    int i;
-+    Xen9pfsDev *xen_9pdev = container_of(xendev, Xen9pfsDev, xendev);
-+    V9fsState *s = &xen_9pdev->state;
-+    QemuOpts *fsdev;
+-    return 0;
++    Xen9pfsDev *xen_9pfs = container_of(pdu->s, Xen9pfsDev, state);
++    struct iovec out_sg[2];
++    int num;
 +
-+    if (xenstore_read_fe_int(&xen_9pdev->xendev, "num-rings",
-+                             &xen_9pdev->num_rings) == -1 ||
-+        xen_9pdev->num_rings > MAX_RINGS || xen_9pdev->num_rings < 1) {
-+        return -1;
-+    }
-+
-+    xen_9pdev->rings = g_malloc0(xen_9pdev->num_rings * sizeof(Xen9pfsRing));
-+    for (i = 0; i < xen_9pdev->num_rings; i++) {
-+        char *str;
-+
-+        xen_9pdev->rings[i].priv = xen_9pdev;
-+        xen_9pdev->rings[i].evtchn = -1;
-+        xen_9pdev->rings[i].local_port = -1;
-+
-+        str = g_strdup_printf("ring-ref%u", i);
-+        if (xenstore_read_fe_int(&xen_9pdev->xendev, str,
-+                                 &xen_9pdev->rings[i].ref) == -1) {
-+            goto out;
-+        }
-+        g_free(str);
-+        str = g_strdup_printf("event-channel-%u", i);
-+        if (xenstore_read_fe_int(&xen_9pdev->xendev, str,
-+                                 &xen_9pdev->rings[i].evtchn) == -1) {
-+            goto out;
-+        }
-+        g_free(str);
-+
-+        xen_9pdev->rings[i].intf =  xengnttab_map_grant_ref(
-+                xen_9pdev->xendev.gnttabdev,
-+                xen_9pdev->xendev.dom,
-+                xen_9pdev->rings[i].ref,
-+                PROT_READ | PROT_WRITE);
-+        if (!xen_9pdev->rings[i].intf) {
-+            goto out;
-+        }
-+        xen_9pdev->rings[i].data = xengnttab_map_domain_grant_refs(
-+                xen_9pdev->xendev.gnttabdev,
-+                (1 << XEN_9PFS_RING_ORDER),
-+                xen_9pdev->xendev.dom,
-+                xen_9pdev->rings[i].intf->ref,
-+                PROT_READ | PROT_WRITE);
-+        if (!xen_9pdev->rings[i].data) {
-+            goto out;
-+        }
-+        xen_9pdev->rings[i].ring.in = xen_9pdev->rings[i].data;
-+        xen_9pdev->rings[i].ring.out = xen_9pdev->rings[i].data +
-+                                       XEN_9PFS_RING_SIZE;
-+
-+        xen_9pdev->rings[i].bh = qemu_bh_new(xen_9pfs_bh, &xen_9pdev->rings[i]);
-+        xen_9pdev->rings[i].out_cons = 0;
-+        xen_9pdev->rings[i].out_size = 0;
-+        xen_9pdev->rings[i].inprogress = false;
-+
-+
-+        xen_9pdev->rings[i].evtchndev = xenevtchn_open(NULL, 0);
-+        if (xen_9pdev->rings[i].evtchndev == NULL) {
-+            goto out;
-+        }
-+        fcntl(xenevtchn_fd(xen_9pdev->rings[i].evtchndev), F_SETFD, FD_CLOEXEC);
-+        xen_9pdev->rings[i].local_port = xenevtchn_bind_interdomain
-+                                            (xen_9pdev->rings[i].evtchndev,
-+                                             xendev->dom,
-+                                             xen_9pdev->rings[i].evtchn);
-+        if (xen_9pdev->rings[i].local_port == -1) {
-+            xen_pv_printf(xendev, 0,
-+                          "xenevtchn_bind_interdomain failed port=%d\n",
-+                          xen_9pdev->rings[i].evtchn);
-+            goto out;
-+        }
-+        xen_pv_printf(xendev, 2, "bind evtchn port %d\n", xendev->local_port);
-+        qemu_set_fd_handler(xenevtchn_fd(xen_9pdev->rings[i].evtchndev),
-+                xen_9pfs_evtchn_event, NULL, &xen_9pdev->rings[i]);
-+    }
-+
-+    xen_9pdev->security_model = xenstore_read_be_str(xendev, "security_model");
-+    xen_9pdev->path = xenstore_read_be_str(xendev, "path");
-+    xen_9pdev->id = s->fsconf.fsdev_id =
-+        g_strdup_printf("xen9p%d", xendev->dev);
-+    xen_9pdev->tag = s->fsconf.tag = xenstore_read_fe_str(xendev, "tag");
-+    v9fs_register_transport(s, &xen_9p_transport);
-+    fsdev = qemu_opts_create(qemu_find_opts("fsdev"),
-+            s->fsconf.tag,
-+            1, NULL);
-+    qemu_opt_set(fsdev, "fsdriver", "local", NULL);
-+    qemu_opt_set(fsdev, "path", xen_9pdev->path, NULL);
-+    qemu_opt_set(fsdev, "security_model", xen_9pdev->security_model, NULL);
-+    qemu_opts_set_id(fsdev, s->fsconf.fsdev_id);
-+    qemu_fsdev_add(fsdev);
-+    v9fs_device_realize_common(s, NULL);
-+
-     return 0;
-+
-+out:
-+    xen_9pfs_free(xendev);
-+    return -1;
++    xen_9pfs_out_sg(&xen_9pfs->rings[pdu->tag % xen_9pfs->num_rings],
++                    out_sg, &num, pdu->idx);
++    return v9fs_iov_vunmarshal(out_sg, num, offset, 0, fmt, ap);
  }
  
- static void xen_9pfs_alloc(struct XenDevice *xendev)
+ static void xen_9pfs_init_out_iov_from_pdu(V9fsPDU *pdu,
+                                            struct iovec **piov,
+                                            unsigned int *pniov)
  {
-+    xenstore_write_be_str(xendev, "versions", VERSIONS);
-+    xenstore_write_be_int(xendev, "max-rings", MAX_RINGS);
-+    xenstore_write_be_int(xendev, "max-ring-page-order", MAX_RING_ORDER);
++    Xen9pfsDev *xen_9pfs = container_of(pdu->s, Xen9pfsDev, state);
++    Xen9pfsRing *ring = &xen_9pfs->rings[pdu->tag % xen_9pfs->num_rings];
++    struct iovec *sg = g_malloc0(sizeof(*sg) * 2);
++    int num;
++
++    xen_9pfs_out_sg(ring, sg, &num, pdu->idx);
++    *piov = sg;
++    *pniov = num;
  }
  
- static void xen_9pfs_disconnect(struct XenDevice *xendev)
+ static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pdu,
+@@ -85,6 +165,14 @@ static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pdu,
+                                           unsigned int *pniov,
+                                           size_t size)
  {
-+    /* Dynamic hotplug of PV filesystems at runtime is not supported. */
++    Xen9pfsDev *xen_9pfs = container_of(pdu->s, Xen9pfsDev, state);
++    Xen9pfsRing *ring = &xen_9pfs->rings[pdu->tag % xen_9pfs->num_rings];
++    struct iovec *sg = g_malloc0(sizeof(*sg) * 2);
++    int num;
++
++    xen_9pfs_in_sg(ring, sg, &num, pdu->idx, size);
++    *piov = sg;
++    *pniov = num;
  }
  
- struct XenDevOps xen_9pfs_ops = {
+ static void xen_9pfs_push_and_notify(V9fsPDU *pdu)
 -- 
 1.9.1
