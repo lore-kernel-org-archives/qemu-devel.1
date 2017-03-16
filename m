@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1coRIF-0003Rn-4Z
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:02:02 -0400
+	(envelope-from <armbru@redhat.com>) id 1coROd-0008GZ-82
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:08:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1coRIA-00009m-Ey
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:01:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53714)
+	(envelope-from <armbru@redhat.com>) id 1coROc-0002Vw-F1
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:08:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36206)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1coRIA-00009J-9N
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:01:54 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 47E963DBE9
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 09:01:54 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Thu, 16 Mar 2017 10:01:41 +0100
-Message-Id: <20170316090141.13421-7-quintela@redhat.com>
-In-Reply-To: <20170316090141.13421-1-quintela@redhat.com>
-References: <20170316090141.13421-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 6/6] postcopy: Check for shared memory
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1coROc-0002VU-9l
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:08:34 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170316070427.17120-1-stefanha@redhat.com>
+	<20170316070427.17120-2-stefanha@redhat.com>
+Date: Thu, 16 Mar 2017 10:08:29 +0100
+In-Reply-To: <20170316070427.17120-2-stefanha@redhat.com> (Stefan Hajnoczi's
+	message of "Thu, 16 Mar 2017 15:04:25 +0800")
+Message-ID: <87fuidzj02.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PULL 1/3] makefile: merge GENERATED_HEADERS &
+ GENERATED_SOURCES variables
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Sorry for chiming in late, I had missed this change.
 
-Postcopy doesn't support migration of RAM shared with another process
-yet (we've got a bunch of things to understand).
-Check for the case and don't allow postcopy to be enabled.
+Stefan Hajnoczi <stefanha@redhat.com> writes:
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- migration/postcopy-ram.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+> From: "Daniel P. Berrange" <berrange@redhat.com>
+>
+> The only functional difference between the GENERATED_HEADERS
+> and GENERATED_SOURCES variables is that 'Makefile' has a
+> dependancy on GENERATED_HEADERS, causing generated header files
+> to be created immediatey at the start of the build process.
+> There is no reason why this early creation should be restricted
+> to the .h files, and not include .c files too.
 
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index effbeb6..dc80dbb 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -95,6 +95,19 @@ static bool ufd_version_check(int ufd)
-     return true;
- }
- 
-+/* Callback from postcopy_ram_supported_by_host block iterator.
-+ */
-+static int test_range_shared(const char *block_name, void *host_addr,
-+                             ram_addr_t offset, ram_addr_t length, void *opaque)
-+{
-+    if (qemu_ram_is_shared(qemu_ram_block_by_name(block_name))) {
-+        error_report("Postcopy on shared RAM (%s) is not yet supported",
-+                     block_name);
-+        return 1;
-+    }
-+    return 0;
-+}
-+
- /*
-  * Note: This has the side effect of munlock'ing all of RAM, that's
-  * normally fine since if the postcopy succeeds it gets turned back on at the
-@@ -127,6 +140,11 @@ bool postcopy_ram_supported_by_host(void)
-         goto out;
-     }
- 
-+    /* We don't support postcopy with shared RAM yet */
-+    if (qemu_ram_foreach_block(test_range_shared, NULL)) {
-+        goto out;
-+    }
-+
-     /*
-      * userfault and mlock don't go together; we'll put it back later if
-      * it was enabled.
--- 
-2.9.3
+Actually, there is.
+
+Any prerequisites of Makefile are made even by make -n.  Restricting
+them to the ones make -n absolutely needs is good practice.
+
+Generated headers must be prerequisites of Makefile, because automatic
+dependency generation may fail without them.
+
+There is no such reason for generated non-headers.
+
+>                                                Merge both of
+> the variables into a single GENERATED_FILES variable to make
+> it clear it is for any type of generated file.
+
+I don't hate this quite enough for an outright NAK at this late stage.
+I do hate it enough to ask you to think about it once more.
