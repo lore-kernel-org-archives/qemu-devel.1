@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36220)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1coSGy-0007Ol-Rb
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 06:04:45 -0400
+	(envelope-from <qemu.bugs@whitewinterwolf.com>) id 1coSap-0003k8-Mr
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 06:25:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1coSGx-0002OL-6E
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 06:04:44 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:35295)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1coSGw-0002Nm-W5
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 06:04:43 -0400
-Received: by mail-wr0-x231.google.com with SMTP id g10so28203323wrg.2
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 03:04:42 -0700 (PDT)
+	(envelope-from <qemu.bugs@whitewinterwolf.com>) id 1coSam-00031g-IQ
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 06:25:15 -0400
+Received: from relay2-d.mail.gandi.net ([217.70.183.194]:59511)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <qemu.bugs@whitewinterwolf.com>)
+	id 1coSam-00031F-BM
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 06:25:12 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170315210714.GB26201@kentang.lan>
-References: <20170315210714.GB26201@kentang.lan>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 16 Mar 2017 10:04:21 +0000
-Message-ID: <CAFEAcA-TM7hdCPxTXhm09S+6qq62ZCp9shMFwin8BvEa7eUcXg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL for-2.9] Update OpenBIOS images
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Thu, 16 Mar 2017 11:25:04 +0100
+From: Simon <qemu.bugs@whitewinterwolf.com>
+In-Reply-To: <CAFEAcA-WzT80S_NJb8rSALspBZcCQbT7eounFn9HusjtLWoi_Q@mail.gmail.com>
+References: <11569d75b61122820f186a32cdd20689@whitewinterwolf.com>
+	<20170315144124.GP7770@redhat.com>
+	<23d89ab3bd16ebf7a864ab75c300de7b@whitewinterwolf.com>
+	<CAFEAcA-9GXiS+ByQgo+=tQ-_ZGR5egDcZMurEyfiA9vPkE9O9w@mail.gmail.com>
+	<20170315180822.GU7770@redhat.com>
+	<CAFEAcA-WzT80S_NJb8rSALspBZcCQbT7eounFn9HusjtLWoi_Q@mail.gmail.com>
+Message-ID: <c3873903f70d3f7c2b4a4d5a8820d8a9@whitewinterwolf.com>
+Subject: Re: [Qemu-devel] [Bug 1217339] [PATCH] Unix signal to send
+ ACPI-shutdown to Guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +34,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 15 March 2017 at 21:07, Mark Cave-Ayland
-<mark.cave-ayland@ilande.co.uk> wrote:
-> Hi Peter,
->
-> This update contains just the 64-bit PCI BAR fix which enables virtio modern devices to
-> work once again. Please pull.
->
->
-> ATB,
->
-> Mark.
->
->
-> The following changes since commit 1883ff34b540daacae948f493b0ba525edf5f642:
->
->   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2017-03-15 18:44:05 +0000)
->
-> are available in the git repository at:
->
->
->   https://github.com/mcayland/qemu.git tags/qemu-openbios-signed
->
-> for you to fetch changes up to 111308e789b7a3e2771a61f68bd057f8f8b1bc22:
->
->   Update OpenBIOS images to f233c3f built from submodule. (2017-03-15 19:42:08 +0000)
->
-> ----------------------------------------------------------------
-> Update OpenBIOS images
->
-> ----------------------------------------------------------------
-> Mark Cave-Ayland (1):
->       Update OpenBIOS images to f233c3f built from submodule.
->
->  pc-bios/openbios-ppc     |  Bin 750840 -> 750840 bytes
->  pc-bios/openbios-sparc32 |  Bin 382048 -> 382048 bytes
->  pc-bios/openbios-sparc64 |  Bin 1593408 -> 1593408 bytes
->  roms/openbios            |    2 +-
->  4 files changed, 1 insertion(+), 1 deletion(-)
+Hi Peter,
 
+> Why can't we use SIGHUP, again?
 
-Applied, thanks.
+I suppose for all those people who use non ACPI-aware guests in non
+daemonized Qemu instances and usually close their terminal without
+stopping Qemu first on the assumption that Qemu will stop itself
+automatically: this wouldn't work anymore...
 
--- PMM
+More seriously, Qemu is a very versatile piece of software. I can only
+rely on the word of experienced Qemu maintainers who have a better view
+than me on the general Qemu user-base to determine whether a change of
+SIGHUP handling will have a negative effect or not.
+
+Using SIGHUP was my initial proposition and is the easy way to go.
+
+In case it is determined that this would have too much side effects and
+that no other signal is usable, the only other way I see is to add a new
+command-line option to let users select Qemu behavior.
+
+Regards,
+Simon.
