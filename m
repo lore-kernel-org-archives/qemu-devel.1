@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1coWXV-0003A1-5G
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 10:38:05 -0400
+	(envelope-from <clg@kaod.org>) id 1coWXZ-0003EV-Gd
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 10:38:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1coWXQ-0006uN-O0
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 10:38:05 -0400
-Received: from 7.mo1.mail-out.ovh.net ([87.98.158.110]:38536)
+	(envelope-from <clg@kaod.org>) id 1coWXV-0006vp-24
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 10:38:09 -0400
+Received: from 3.mo1.mail-out.ovh.net ([46.105.60.232]:51569)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1coWXQ-0006u6-Hr
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 10:38:00 -0400
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1coWXU-0006vK-Qp
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 10:38:04 -0400
 Received: from player756.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 02F64625A7
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 15:37:59 +0100 (CET)
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 355D9625D8
+	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 15:38:03 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu, 16 Mar 2017 15:35:10 +0100
-Message-Id: <1489674912-21942-7-git-send-email-clg@kaod.org>
+Date: Thu, 16 Mar 2017 15:35:11 +0100
+Message-Id: <1489674912-21942-8-git-send-email-clg@kaod.org>
 In-Reply-To: <1489674912-21942-1-git-send-email-clg@kaod.org>
 References: <1489674912-21942-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 6/8] ppc/pnv: add a helper to calculate MMIO
- addresses registers
+Subject: [Qemu-devel] [PATCH v2 7/8] ppc/pnv: link the CPUs to the machine
+ XICSFabric
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,43 +33,108 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Some controllers (ICP, PSI) have a base register address which is
-calculated using the chip id.
+This assigns the ICPState object to the CPU using the PIR number for
+lookups before calling the XICS layer to finish the job.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- include/hw/ppc/pnv.h | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ hw/ppc/pnv.c      |  2 ++
+ hw/ppc/pnv_core.c | 20 ++++++++++++++++----
+ 2 files changed, 18 insertions(+), 4 deletions(-)
 
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index d6ef04771aff..cfd059fc49db 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -92,14 +92,24 @@ typedef struct PnvChipClass {
-     OBJECT_CHECK(PnvChip, (obj), TYPE_PNV_CHIP_POWER9)
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 6ff01c3b84d5..9c239932fb3a 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -714,6 +714,8 @@ static void pnv_chip_realize(DeviceState *dev, Error =
+**errp)
+         object_property_set_int(OBJECT(pnv_core),
+                                 pcc->core_pir(chip, core_hwid),
+                                 "pir", &error_fatal);
++        object_property_add_const_link(OBJECT(pnv_core), "xics",
++                                       qdev_get_machine(), &error_fatal)=
+;
+         object_property_set_bool(OBJECT(pnv_core), true, "realized",
+                                  &error_fatal);
+         object_unref(OBJECT(pnv_core));
+diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+index d79d530b4881..6ec1c9c0a831 100644
+--- a/hw/ppc/pnv_core.c
++++ b/hw/ppc/pnv_core.c
+@@ -25,6 +25,7 @@
+ #include "hw/ppc/pnv.h"
+ #include "hw/ppc/pnv_core.h"
+ #include "hw/ppc/pnv_xscom.h"
++#include "hw/ppc/xics.h"
+=20
+ static void powernv_cpu_reset(void *opaque)
+ {
+@@ -43,7 +44,7 @@ static void powernv_cpu_reset(void *opaque)
+     env->msr |=3D MSR_HVB; /* Hypervisor mode */
+ }
+=20
+-static void powernv_cpu_init(PowerPCCPU *cpu, Error **errp)
++static void powernv_cpu_init(PowerPCCPU *cpu, XICSFabric *xi, Error **er=
+rp)
+ {
+     CPUPPCState *env =3D &cpu->env;
+     int core_pir;
+@@ -63,6 +64,9 @@ static void powernv_cpu_init(PowerPCCPU *cpu, Error **e=
+rrp)
+     cpu_ppc_tb_init(env, PNV_TIMEBASE_FREQ);
+=20
+     qemu_register_reset(powernv_cpu_reset, cpu);
++
++    cpu->icp =3D xics_icp_get(xi, pir->default_value);
++    xics_cpu_setup(xi, cpu);
+ }
 =20
  /*
-- * This generates a HW chip id depending on an index:
-+ * This generates a HW chip id depending on an index, as found on a
-+ * two socket system with dual chip modules :
-  *
-  *    0x0, 0x1, 0x10, 0x11
-  *
-  * 4 chips should be the maximum
-+ *
-+ * TODO: use a machine property to define the chip ids
-  */
- #define PNV_CHIP_HWID(i) ((((i) & 0x3e) << 3) | ((i) & 0x1))
+@@ -110,7 +114,7 @@ static const MemoryRegionOps pnv_core_xscom_ops =3D {
+     .endianness =3D DEVICE_BIG_ENDIAN,
+ };
 =20
-+/*
-+ * Converts back a HW chip id to an index. This is useful to calculate
-+ * the MMIO addresses of some controllers which depend on the chip id.
-+ */
-+#define PNV_CHIP_INDEX(chip)                                    \
-+    (((chip)->chip_id >> 2) * 2 + ((chip)->chip_id & 0x3))
+-static void pnv_core_realize_child(Object *child, Error **errp)
++static void pnv_core_realize_child(Object *child, XICSFabric *xi, Error =
+**errp)
+ {
+     Error *local_err =3D NULL;
+     CPUState *cs =3D CPU(child);
+@@ -122,7 +126,7 @@ static void pnv_core_realize_child(Object *child, Err=
+or **errp)
+         return;
+     }
+=20
+-    powernv_cpu_init(cpu, &local_err);
++    powernv_cpu_init(cpu, xi, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+@@ -140,6 +144,14 @@ static void pnv_core_realize(DeviceState *dev, Error=
+ **errp)
+     void *obj;
+     int i, j;
+     char name[32];
++    Object *xi;
 +
- #define TYPE_POWERNV_MACHINE       MACHINE_TYPE_NAME("powernv")
- #define POWERNV_MACHINE(obj) \
-     OBJECT_CHECK(PnvMachineState, (obj), TYPE_POWERNV_MACHINE)
++    xi =3D object_property_get_link(OBJECT(dev), "xics", &local_err);
++    if (!xi) {
++        error_setg(errp, "%s: required link 'xics' not found: %s",
++                   __func__, error_get_pretty(local_err));
++        return;
++    }
+=20
+     pc->threads =3D g_malloc0(size * cc->nr_threads);
+     for (i =3D 0; i < cc->nr_threads; i++) {
+@@ -160,7 +172,7 @@ static void pnv_core_realize(DeviceState *dev, Error =
+**errp)
+     for (j =3D 0; j < cc->nr_threads; j++) {
+         obj =3D pc->threads + j * size;
+=20
+-        pnv_core_realize_child(obj, &local_err);
++        pnv_core_realize_child(obj, XICS_FABRIC(xi), &local_err);
+         if (local_err) {
+             goto err;
+         }
 --=20
 2.7.4
