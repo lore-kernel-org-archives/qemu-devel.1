@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <janne.huttunen@nokia.com>) id 1coS0H-0007h8-UU
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:47:30 -0400
+	(envelope-from <liqiang6-s@360.cn>) id 1coS4P-000067-1T
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:51:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <janne.huttunen@nokia.com>) id 1coS0E-0003O3-RT
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:47:29 -0400
-Received: from mail-he1eur01on0104.outbound.protection.outlook.com
-	([104.47.0.104]:18560
-	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <janne.huttunen@nokia.com>)
-	id 1coS0E-0003NT-B4
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:47:26 -0400
-Message-ID: <1489657576.561.24.camel@nokia.com>
-From: Janne Huttunen <janne.huttunen@nokia.com>
-Date: Thu, 16 Mar 2017 11:46:16 +0200
-In-Reply-To: <1489562641.15659.16.camel@redhat.com>
-References: <cover.1489494746.git.janne.huttunen@nokia.com>
-	<1489510640.8844.18.camel@redhat.com>
-	<1489561105.24841.25.camel@nokia.com>
-	<1489562641.15659.16.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+	(envelope-from <liqiang6-s@360.cn>) id 1coS4L-0004v0-Vb
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:51:45 -0400
+Received: from mtabjsc2.360.cn ([123.125.82.7]:47790)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liqiang6-s@360.cn>) id 1coS4L-0004pk-6V
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:51:41 -0400
+From: =?gb2312?B?wO7Hvw==?= <liqiang6-s@360.cn>
+Date: Thu, 16 Mar 2017 09:51:28 +0000
+Message-ID: <143C0AFC63FC204CB0C55BB88F3A8ABB3336BB2E@EX02.corp.qihoo.net>
+References: <1489656642-12925-1-git-send-email-kraxel@redhat.com>
+	<1489656642-12925-5-git-send-email-kraxel@redhat.com>
+In-Reply-To: <1489656642-12925-5-git-send-email-kraxel@redhat.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC][PATCH 0/6] "bootonceindex" property
+Subject: Re: [Qemu-devel] [PULL for-2.9 4/7] cirrus: add option to disable
+ blitter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,29 +30,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Wed, 2017-03-15 at 08:24 +0100, Gerd Hoffmann wrote:
-> >
-> > The short answer: emulating real hardware.
->=20
-> Ok, that is reason enough.
->=20
-> Adding bootonceindex everywhere doesn't look like the best plan to me
-> though.=C2=A0=C2=A0Possibly we can pimp up bootindex in a backward-compat=
-ible
-> way?
-> Something like bootindex=3D<normal>[.<once>] ?
-
-That would (likely) avoid modifying all devices, but wouldn't
-that make the 'bootindex' property a string (now: 'int32')
-and thus change the QOM API?
-
-I did consider making device_add_bootindex_property() to
-automatically add the new property too, but since that API
-is currently such that the _caller_ provides the name of the
-added property, it would mean that the function would need
-to generate the second name using some magic mangling rule
-and that didn't seem very nice to me. Of course the API could
-be modified so that the caller provides two names, but then
-we are already back to modifying all relevant devices.
+SGVsbG8gR2VyZCwNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBRZW11
+LWRldmVsDQo+IFttYWlsdG86cWVtdS1kZXZlbC1ib3VuY2VzK2xpcWlhbmc2LXM9MzYwLmNuQG5v
+bmdudS5vcmddIE9uIEJlaGFsZiBPZg0KPiBHZXJkIEhvZmZtYW5uDQo+IFNlbnQ6IFRodXJzZGF5
+LCBNYXJjaCAxNiwgMjAxNyA1OjMxIFBNDQo+IFRvOiBxZW11LWRldmVsQG5vbmdudS5vcmcNCj4g
+Q2M6IEdlcmQgSG9mZm1hbm4NCj4gU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQVUxMIGZvci0yLjkg
+NC83XSBjaXJydXM6IGFkZCBvcHRpb24gdG8gZGlzYWJsZSBibGl0dGVyDQo+IA0KPiBPaywgd2Ug
+aGF2ZSB0aGlzIGJlYXN0IGluIHRoZSBjaXJydXMgY29kZSB3aGljaCBpcyBub3QgdXNlZCBhdCBh
+bGwgYnkgbW9kZXJuDQo+IGd1ZXN0cywgZXhjZXB0IHdoZW4geW91IHRyeSB0byBmaW5kIHNlY3Vy
+aXR5IGhvbGVzIGluIHFlbXUuICBTbywgYWRkIGFuIG9wdGlvbg0KPiB0byBkaXNhYmxlIGJsaXR0
+ZXIgYWx0b2dldGhlci4gIEd1ZXN0cyByZWxlYXNlZCB3aXRoaW4gdGhlIGxhc3QgdGVuIHllYXJz
+IHNob3VsZA0KPiBub3Qgc2hvdyBhbnkgcmVuZGVyaW5nIGlzc3VlcyBpZiB5b3UgdHVybiBvZmYg
+YmxpdHRlciBzdXBwb3J0Lg0KPiANCj4gVGhlcmUgYXJlIG5vIGtub3duIGJ1Z3MgaW4gdGhlIGNp
+cnJ1cyBibGl0dGVyIGNvZGUuICBCdXQgaW4gdGhlIHBhc3Qgd2UgaG9wZWQgYQ0KPiBmZXcgdGlt
+ZXMgYWxyZWFkeSB0aGF0IHdlJ3ZlIGZpbmFsbHkgbmFpbGVkIHRoZSBsYXN0IGlzc3VlLiAgU28g
+aGF2aW5nIHNvbWUgZWFzeQ0KPiB3YXkgdG8gbWl0aWdhdGUgaW4gY2FzZSB5ZXQgYW5vdGhlciBi
+bGl0dGVyIGlzc3VlIHNob3dzIHVwIGNlcnRhaW5seSBtYWtlcyBtZQ0KPiBzbGVlcCBhIGJpdCBi
+ZXR0ZXIgYXQgbmlnaHQuDQo+IA0KPiBGb3IgY29tcGxldGVuZXNzOiAgVGhlIGJ5IGZhciBiZXR0
+ZXIgd2F5IHRvIG1pdGlnYXRlIGlzIHRvIHN3aXRjaCBhd2F5IGZyb20NCj4gY2lycnVzIGFuZCB1
+c2Ugc3RkdmdhIGluc3RlYWQuICBPciBzb21ldGhpbmcgbW9yZSBtb2Rlcm4gbGlrZSB2aXJ0aW8t
+dmdhIGluDQo+IGNhc2UgeW91ciBndWVzdCBoYXMgc3VwcG9ydCBmb3IgaXQuDQo+IA0KPiBTaWdu
+ZWQtb2ZmLWJ5OiBHZXJkIEhvZmZtYW5uIDxrcmF4ZWxAcmVkaGF0LmNvbT4NCj4gTWVzc2FnZS1p
+ZDogMTQ4OTQ5NDU0MC0xNTc0NS0xLWdpdC1zZW5kLWVtYWlsLWtyYXhlbEByZWRoYXQuY29tDQo+
+IC0tLQ0KPiAgaHcvZGlzcGxheS9jaXJydXNfdmdhLmMgfCA5ICsrKysrKysrKw0KPiAgMSBmaWxl
+IGNoYW5nZWQsIDkgaW5zZXJ0aW9ucygrKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2h3L2Rpc3BsYXkv
+Y2lycnVzX3ZnYS5jIGIvaHcvZGlzcGxheS9jaXJydXNfdmdhLmMgaW5kZXgNCj4gNmZmZTY0Zi4u
+MzI2ZDUxMSAxMDA2NDQNCj4gLS0tIGEvaHcvZGlzcGxheS9jaXJydXNfdmdhLmMNCj4gKysrIGIv
+aHcvZGlzcGxheS9jaXJydXNfdmdhLmMNCj4gQEAgLTIwNSw2ICsyMDUsNyBAQCB0eXBlZGVmIHN0
+cnVjdCBDaXJydXNWR0FTdGF0ZSB7DQo+ICAgICAgdWludDMyX3QgY2lycnVzX2JhbmtfYmFzZVsy
+XTsNCj4gICAgICB1aW50MzJfdCBjaXJydXNfYmFua19saW1pdFsyXTsNCj4gICAgICB1aW50OF90
+IGNpcnJ1c19oaWRkZW5fcGFsZXR0ZVs0OF07DQo+ICsgICAgYm9vbCBlbmFibGVfYmxpdHRlcjsN
+Cj4gICAgICBpbnQgY2lycnVzX2JsdF9waXhlbHdpZHRoOw0KPiAgICAgIGludCBjaXJydXNfYmx0
+X3dpZHRoOw0KPiAgICAgIGludCBjaXJydXNfYmx0X2hlaWdodDsNCj4gQEAgLTk2MCw2ICs5NjEs
+MTAgQEAgc3RhdGljIHZvaWQgY2lycnVzX2JpdGJsdF9zdGFydChDaXJydXNWR0FTdGF0ZSAqIHMp
+ICB7DQo+ICAgICAgdWludDhfdCBibHRfcm9wOw0KPiANCj4gKyAgICBpZiAoIXMtPmVuYWJsZV9i
+bGl0dGVyKSB7DQo+ICsgICAgICAgIGdvdG8gYml0Ymx0X2lnbm9yZTsNCj4gKyAgICB9DQo+ICsN
+Cj4gICAgICBzLT52Z2EuZ3JbMHgzMV0gfD0gQ0lSUlVTX0JMVF9CVVNZOw0KPiANCj4gICAgICBz
+LT5jaXJydXNfYmx0X3dpZHRoID0gKHMtPnZnYS5nclsweDIwXSB8IChzLT52Z2EuZ3JbMHgyMV0g
+PDwgOCkpICsgMTsgQEANCj4gLTMwMjQsNiArMzAyOSw4IEBAIHN0YXRpYyB2b2lkIGlzYV9jaXJy
+dXNfdmdhX3JlYWxpemVmbihEZXZpY2VTdGF0ZSAqZGV2LA0KPiBFcnJvciAqKmVycnApICBzdGF0
+aWMgUHJvcGVydHkgaXNhX2NpcnJ1c192Z2FfcHJvcGVydGllc1tdID0gew0KPiAgICAgIERFRklO
+RV9QUk9QX1VJTlQzMigidmdhbWVtX21iIiwgc3RydWN0IElTQUNpcnJ1c1ZHQVN0YXRlLA0KPiAg
+ICAgICAgICAgICAgICAgICAgICAgICBjaXJydXNfdmdhLnZnYS52cmFtX3NpemVfbWIsIDQpLA0K
+PiArICAgIERFRklORV9QUk9QX0JPT0woImJsaXR0ZXIiLCBzdHJ1Y3QgSVNBQ2lycnVzVkdBU3Rh
+dGUsDQo+ICsgICAgICAgICAgICAgICAgICAgICAgIGNpcnJ1c192Z2EuZW5hYmxlX2JsaXR0ZXIs
+IHRydWUpLA0KPiAgICAgIERFRklORV9QUk9QX0VORF9PRl9MSVNUKCksDQo+ICB9Ow0KPiANCj4g
+QEAgLTMwOTMsNiArMzEwMCw4IEBAIHN0YXRpYyB2b2lkIHBjaV9jaXJydXNfdmdhX3JlYWxpemUo
+UENJRGV2aWNlICpkZXYsDQo+IEVycm9yICoqZXJycCkgIHN0YXRpYyBQcm9wZXJ0eSBwY2lfdmdh
+X2NpcnJ1c19wcm9wZXJ0aWVzW10gPSB7DQo+ICAgICAgREVGSU5FX1BST1BfVUlOVDMyKCJ2Z2Ft
+ZW1fbWIiLCBzdHJ1Y3QgUENJQ2lycnVzVkdBU3RhdGUsDQo+ICAgICAgICAgICAgICAgICAgICAg
+ICAgIGNpcnJ1c192Z2EudmdhLnZyYW1fc2l6ZV9tYiwgNCksDQo+ICsgICAgREVGSU5FX1BST1Bf
+Qk9PTCgiYmxpdHRlciIsIHN0cnVjdCBQQ0lDaXJydXNWR0FTdGF0ZSwNCj4gKyAgICAgICAgICAg
+ICAgICAgICAgIGNpcnJ1c192Z2EuZW5hYmxlX2JsaXR0ZXIsIHRydWUpLA0KDQpUaGUgZGVmYXVs
+dCBpcyAnRU5BQkxFJz8gSSB0aGluayB0aGVyZSBzaG91bGQgYmUgJ2ZhbHNlJy4NCg0KDQpUaGFu
+a3MuDQoNClFpYW5nDQoNCj4gICAgICBERUZJTkVfUFJPUF9FTkRfT0ZfTElTVCgpLA0KPiAgfTsN
+Cj4gDQo+IC0tDQo+IDEuOC4zLjENCj4gDQoNCg==
