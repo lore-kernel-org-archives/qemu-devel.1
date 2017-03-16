@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1coRcX-0005EP-6U
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:22:58 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1coRcg-0005M8-FK
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:23:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1coRcW-0000nU-7p
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:22:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49368)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1coRcb-0000p8-EQ
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:23:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54580)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1coRcW-0000nA-1v
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:22:56 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	id 1coRcb-0000or-8W
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:23:01 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 22DC09D4E9
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 09:22:56 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 57FCB64D8A
+	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 09:23:01 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 16 Mar 2017 13:21:20 +0400
-Message-Id: <20170316092121.25672-21-marcandre.lureau@redhat.com>
+Date: Thu, 16 Mar 2017 13:21:21 +0400
+Message-Id: <20170316092121.25672-22-marcandre.lureau@redhat.com>
 In-Reply-To: <20170316092121.25672-1-marcandre.lureau@redhat.com>
 References: <20170316092121.25672-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 20/21] tests: add /char/udp test
+Subject: [Qemu-devel] [PATCH v3 21/21] tests: add /char/console test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,73 +38,67 @@ Cc: pbonzini@redhat.com, eblake@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?=
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- tests/test-char.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+ tests/test-char.c | 31 ++++++++++++++++++++++++++++++-
+ 1 file changed, 30 insertions(+), 1 deletion(-)
 
 diff --git a/tests/test-char.c b/tests/test-char.c
-index 9971498391..19707bfcda 100644
+index 19707bfcda..773a1c36ba 100644
 --- a/tests/test-char.c
 +++ b/tests/test-char.c
-@@ -385,6 +385,51 @@ static void char_pipe_test(void)
+@@ -57,6 +57,32 @@ static void fe_event(void *opaque, int event)
  }
- #endif
 =20
-+static void char_udp_test(void)
+ #ifdef CONFIG_HAS_GLIB_SUBPROCESS_TESTS
++#ifdef _WIN32
++static void char_console_test_subprocess(void)
 +{
-+    struct sockaddr_in addr =3D { 0, }, other;
-+    SocketIdleData d =3D { 0, };
++    QemuOpts *opts;
 +    Chardev *chr;
-+    CharBackend be;
-+    socklen_t alen =3D sizeof(addr);
-+    int ret, sock =3D qemu_socket(PF_INET, SOCK_DGRAM, 0);
-+    char buf[10];
-+    char *tmp;
 +
-+    g_assert_cmpint(sock, >, 0);
-+    addr.sin_family =3D AF_INET ;
-+    addr.sin_addr.s_addr =3D htonl(INADDR_ANY);
-+    addr.sin_port =3D 0;
-+    ret =3D bind(sock, (struct sockaddr *)&addr, sizeof(addr));
-+    g_assert_cmpint(ret, =3D=3D, 0);
-+    ret =3D getsockname(sock, (struct sockaddr *)&addr, &alen);
-+    g_assert_cmpint(ret, =3D=3D, 0);
++    opts =3D qemu_opts_create(qemu_find_opts("chardev"), "console-label"=
+,
++                            1, &error_abort);
++    qemu_opt_set(opts, "backend", "console", &error_abort);
 +
-+    tmp =3D g_strdup_printf("udp:127.0.0.1:%d",
-+                          ntohs(addr.sin_port));
-+    chr =3D qemu_chr_new("client", tmp);
++    chr =3D qemu_chr_new_from_opts(opts, NULL);
 +    g_assert_nonnull(chr);
 +
-+    d.chr =3D chr;
-+    qemu_chr_fe_init(&be, chr, &error_abort);
-+    qemu_chr_fe_set_handlers(&be, socket_can_read_hello, socket_read_hel=
-lo,
-+                             NULL, &d, NULL, true);
-+    ret =3D qemu_chr_write_all(chr, (uint8_t *)"hello", 5);
-+    g_assert_cmpint(ret, =3D=3D, 5);
++    qemu_chr_write_all(chr, (const uint8_t *)"CONSOLE", 7);
 +
-+    alen =3D sizeof(addr);
-+    ret =3D recvfrom(sock, buf, sizeof(buf), 0,
-+                   (struct sockaddr *)&other, &alen);
-+    g_assert_cmpint(ret, =3D=3D, 5);
-+    ret =3D sendto(sock, buf, 5, 0, (struct sockaddr *)&other, alen);
-+    g_assert_cmpint(ret, =3D=3D, 5);
-+
-+    main_loop();
-+
-+    close(sock);
-+    g_free(tmp);
++    qemu_opts_del(opts);
++    object_unparent(OBJECT(chr));
 +}
 +
- static void char_file_test(void)
++static void char_console_test(void)
++{
++    g_test_trap_subprocess("/char/console/subprocess", 0, 0);
++    g_test_trap_assert_passed();
++    g_test_trap_assert_stdout("CONSOLE");
++}
++#endif
+ static void char_stdio_test_subprocess(void)
  {
-     char *tmp_path =3D g_dir_make_tmp("qemu-test-char.XXXXXX", NULL);
-@@ -529,6 +574,7 @@ int main(int argc, char **argv)
- #endif
-     g_test_add_func("/char/file", char_file_test);
-     g_test_add_func("/char/socket", char_socket_test);
-+    g_test_add_func("/char/udp", char_udp_test);
-=20
-     return g_test_run();
+     Chardev *chr;
+@@ -83,7 +109,6 @@ static void char_stdio_test(void)
  }
+ #endif
+=20
+-
+ static void char_ringbuf_test(void)
+ {
+     QemuOpts *opts;
+@@ -566,6 +591,10 @@ int main(int argc, char **argv)
+     g_test_add_func("/char/ringbuf", char_ringbuf_test);
+     g_test_add_func("/char/mux", char_mux_test);
+ #ifdef CONFIG_HAS_GLIB_SUBPROCESS_TESTS
++#ifdef _WIN32
++    g_test_add_func("/char/console/subprocess", char_console_test_subpro=
+cess);
++    g_test_add_func("/char/console", char_console_test);
++#endif
+     g_test_add_func("/char/stdio/subprocess", char_stdio_test_subprocess=
+);
+     g_test_add_func("/char/stdio", char_stdio_test);
+ #endif
 --=20
 2.12.0.191.gc5d8de91d
