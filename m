@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1coY5C-0007x2-Rm
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 12:16:59 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1coY6g-0000RL-PY
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 12:18:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1coY59-0006Bj-2a
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 12:16:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35062)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1coY58-0006BT-Sv
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 12:16:54 -0400
-Date: Thu, 16 Mar 2017 16:16:49 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170316161649.GZ15193@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <CAFEAcA9pqDoCWrPAJ+KVxLC_eRy-xRg36oYuARYg2YP8VpGpBg@mail.gmail.com>
+	(envelope-from <pbonzini@redhat.com>) id 1coY6f-0006qg-UA
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 12:18:30 -0400
+References: <1489680169-7638-1-git-send-email-pl@kamp.de>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <94b6f30b-4e91-1336-bad4-d5de16131407@redhat.com>
+Date: Thu, 16 Mar 2017 17:18:16 +0100
 MIME-Version: 1.0
+In-Reply-To: <1489680169-7638-1-git-send-email-pl@kamp.de>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9pqDoCWrPAJ+KVxLC_eRy-xRg36oYuARYg2YP8VpGpBg@mail.gmail.com>
-Subject: Re: [Qemu-devel] Proposal for deprecating unsupported host OSes &
- architecutures
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.9] thread-pool: add missing
+ qemu_bh_cancel in completion function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +23,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, stefanha@gmail.com, berrange@redhat.com, qemu-stable@nongnu.org
 
-On Thu, Mar 16, 2017 at 03:23:45PM +0000, Peter Maydell wrote:
-> OK, here's a concrete proposal for deprecating/dropping out of
-> date host OS and architecture support.
-> 
-> We'll put this in the ChangeLog 'Future incompatible changes'
-> section:
-> -----
-> * Removal of support for untested host OS and architectures:
-> 
-> The QEMU Project intends to drop support in a future release for any
-> host OS or architecture which we do not have access to a build and test
-> machine for. This affects the following host OSes:
->  * Native CYGWIN building
->  * GNU/kFreeBSD
->  * FreeBSD
->  * DragonFly BSD
->  * NetBSD
->  * OpenBSD
->  * Solaris
->  * AIX
->  * Haiku
-> and the following host CPU architectures:
->  * ia64
->  * sparc
-> 
-> Specifically, if we do not have a build and test system available
-> to us by the time we release QEMU 2.10, we will remove support in the
-> release that follows 2.10.
 
-BTW, by "build & test system available", presumably you mean a system
-that someone has committed to actively maintaining, not merely donation
-of (or access to) hardware on which to install & run VMs ?
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+On 16/03/2017 17:02, Peter Lieven wrote:
+> commit 3c80ca15 fixed a deadlock scenarion with nested aio_poll invocations.
+> 
+> However, the rescheduling of the completion BH introcuded unnecessary spinning
+> in the main-loop. On very fast file backends this can even lead to the
+> "WARNING: I/O thread spun for 1000 iterations" message popping up.
+> 
+> Callgrind reports about 3-4% less instructions with this patch running
+> qemu-img bench on a ramdisk based VMDK file.
+> 
+> Fixes: 3c80ca158c96ff902a30883a8933e755988948b1
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Peter Lieven <pl@kamp.de>
+> ---
+>  util/thread-pool.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/util/thread-pool.c b/util/thread-pool.c
+> index ce6cd30..610646d 100644
+> --- a/util/thread-pool.c
+> +++ b/util/thread-pool.c
+> @@ -188,6 +188,13 @@ restart:
+>              aio_context_release(pool->ctx);
+>              elem->common.cb(elem->common.opaque, elem->ret);
+>              aio_context_acquire(pool->ctx);
+> +
+> +            /* We can safely cancel the completion_bh here regardless of someone
+> +             * else having scheduled it meanwhile because we reenter the
+> +             * completion function anyway (goto restart).
+> +             */
+> +            qemu_bh_cancel(pool->completion_bh);
+> +
+>              qemu_aio_unref(elem);
+>              goto restart;
+>          } else {
+> 
+
+Right, this is the same thing that block/linux-aio.c does.
+
+Paolo
