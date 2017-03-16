@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1coZEl-00031I-RU
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 13:30:57 -0400
+	(envelope-from <kwolf@redhat.com>) id 1coZKD-0004S3-3Z
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 13:36:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1coZEi-0003I4-AB
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 13:30:55 -0400
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:36924)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1coZEi-0003Hr-2M
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 13:30:52 -0400
-Received: by mail-wm0-x230.google.com with SMTP id n11so53912334wma.0
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 10:30:51 -0700 (PDT)
-References: <20170224112109.3147-1-alex.bennee@linaro.org>
-	<20170224112109.3147-12-alex.bennee@linaro.org>
-	<f7a4cba9-12da-fbb3-684f-68b4a11fbe97@vivier.eu>
-	<87y3wr8zs2.fsf@linaro.org>
-	<e3f645d0-ea92-b28d-bb2b-9c831dd8b264@vivier.eu>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <e3f645d0-ea92-b28d-bb2b-9c831dd8b264@vivier.eu>
-Date: Thu, 16 Mar 2017 17:31:10 +0000
-Message-ID: <87wpbpnn6p.fsf@linaro.org>
+	(envelope-from <kwolf@redhat.com>) id 1coZKC-0006Bf-6L
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 13:36:33 -0400
+Date: Thu, 16 Mar 2017 18:36:08 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170316173608.GJ4995@noname.redhat.com>
+References: <20170316004603.20609-1-jsnow@redhat.com>
+	<20170316004603.20609-4-jsnow@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 11/24] tcg: enable thread-per-vCPU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170316004603.20609-4-jsnow@redhat.com>
+Subject: Re: [Qemu-devel] [RFC patch 3/3] blockjob: add devops to blockjob
+ backends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,106 +24,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: peter.maydell@linaro.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, KONRAD Frederic <fred.konrad@greensocs.com>, Richard Henderson <rth@twiddle.net>
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-block@nongnu.org, pbonzini@redhat.com, qemu-devel@nongnu.org
 
+Am 16.03.2017 um 01:46 hat John Snow geschrieben:
+> This lets us hook into drained_begin and drained_end requests from the
+> backend level, which is particularly useful for making sure that all
+> jobs associated with a particular node (whether the source or the target)
+> receive a drain request.
+> 
+> Suggested-by: Kevin Wolf <kwolf@redhat.com>
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> 
+> --
+> 
+> RFC topics:
+> 
+> - BlkDevOps is traditionally only for Qdev devices, and a BlockJob is not
+>   currently a 'device'... Do we want to loosen this restriction, find another
+>   way to deliver callbacks to BlockJobs attached to BlkBackends, or do something
+>   crazy like make a BlockJob device object?
+> 
+>   struct JobDevice {
+>     DeviceState parent_obj;
+>     BlockJob *job;
+>   } ...??
 
-Laurent Vivier <laurent@vivier.eu> writes:
+We should probably rename BlkDevOps to something that works not only for
+devices, but for any user of a BlockBackend. I don't think the
+implementation has to be changed, it's just a struct of callbacks and an
+opaque pointer that is actually properly treated as opaque.
 
-> Le 27/02/2017 à 15:38, Alex Bennée a écrit :
->>
->> Laurent Vivier <laurent@vivier.eu> writes:
->>
->>> Le 24/02/2017 à 12:20, Alex Bennée a écrit :
->>>> There are a couple of changes that occur at the same time here:
->>>>
->>>>   - introduce a single vCPU qemu_tcg_cpu_thread_fn
->>>>
->>>>   One of these is spawned per vCPU with its own Thread and Condition
->>>>   variables. qemu_tcg_rr_cpu_thread_fn is the new name for the old
->>>>   single threaded function.
->>>>
->>>>   - the TLS current_cpu variable is now live for the lifetime of MTTCG
->>>>     vCPU threads. This is for future work where async jobs need to know
->>>>     the vCPU context they are operating in.
->>>>
->>>> The user to switch on multi-thread behaviour and spawn a thread
->>>> per-vCPU. For a simple test kvm-unit-test like:
->>>>
->>>>   ./arm/run ./arm/locking-test.flat -smp 4 -accel tcg,thread=multi
->>>>
->>>> Will now use 4 vCPU threads and have an expected FAIL (instead of the
->>>> unexpected PASS) as the default mode of the test has no protection when
->>>> incrementing a shared variable.
->>>>
->>>> We enable the parallel_cpus flag to ensure we generate correct barrier
->>>> and atomic code if supported by the front and backends. This doesn't
->>>> automatically enable MTTCG until default_mttcg_enabled() is updated to
->>>> check the configuration is supported.
->>>
->>> This commit breaks linux-user mode:
->>>
->>> debian-8 with qemu-ppc on x86_64 with ltp-full-20170116
->>>
->>> cd /opt/ltp
->>> ./runltp -p -l "qemu-$(date +%FT%T).log" -f /opt/ltp/runtest/syscalls -s
->>> setgroups03
->>>
->>> setgroups03    1  TPASS  :  setgroups(65537) fails, Size is >
->>> sysconf(_SC_NGROUPS_MAX), errno=22
->>> qemu-ppc: /home/laurent/Projects/qemu/include/qemu/rcu.h:89:
->>> rcu_read_unlock: Assertion `p_rcu_reader->depth != 0' failed.
->>> qemu-ppc: /home/laurent/Projects/qemu/include/qemu/rcu.h:89:
->>> rcu_read_unlock: Assertion `p_rcu_reader->depth != 0' failed.
->>> qemu-ppc: /home/laurent/Projects/qemu/include/qemu/rcu.h:89:
->>> rcu_read_unlock: Assertion `p_rcu_reader->depth != 0' failed.
->>> ...
->>
->> Interesting. I can only think the current_cpu change has broken it
->> because most of the changes in this commit affect softmmu targets only
->> (linux-user has its own run loop).
->>
->> Thanks for the report - I'll look into it.
->
-> After:
->
->      95b0eca Merge remote-tracking branch
-> 'remotes/stsquad/tags/pull-mttcg-fixups-090317-1' into staging
->
-> [Tested with my HEAD on:
-> b1616fe Merge remote-tracking branch
-> 'remotes/famz/tags/docker-pull-request' into staging]
->
-> I have now:
->
-> <<<test_start>>>
-> tag=setgroups03 stime=1489413401
-> cmdline="setgroups03"
-> contacts=""
-> analysis=exit
-> <<<test_output>>>
-> **
-> ERROR:/home/laurent/Projects/qemu/cpu-exec.c:656:cpu_exec: assertion
-> failed: (cpu == current_cpu)
-> **
+BlockBackend also has a dev field, which is indeed supposed to be a
+DeviceState and is sometimes casted to one (if we can assert
+!blk->legacy_dev), but it's a concept completely separate from
+BlkDevOps. So we just need to be sure not to call blk_attach_dev() or
+blk_attach_dev_legacy().
 
-Sorry about the delay. After lengthy fighting to get LTP on PowerPC
-built I got this behaviour:
-
-  17:26 alex@zen taken:41, git:mttcg/more-fixes-for-rc1, [/home/alex/lsrc/qemu/qemu.git]> sudo ./ppc-linux-user/qemu-ppc ./ppc-linux-user/setgroups03
-  setgroups03    1  TPASS  :  setgroups(65537) fails, Size is > sysconf(_SC_NGROUPS_MAX), errno=22
-  setgroups03    2  TBROK  :  tst_sig.c:233: unexpected signal SIGSEGV(11) received (pid = 22137).
-  setgroups03    3  TBROK  :  tst_sig.c:233: Remaining cases broken
-
-I'm afraid I can't compare the result to real hardware so maybe my LTP
-build is broken. But the main thing is I can't seem to reproduce it
-here.
-
-Could you ping me your LTP binary so I can have a look?
-
-The other thing to note is the assert you now see firing is a guard for
-buggy compilers. What version are you building with and can you try any
-other versions?
-
---
-Alex Bennée
+Kevin
