@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1coQLl-0004zB-3S
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 04:01:38 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1coQe7-0008GR-5D
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 04:20:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1coQLk-0001cM-Ge
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 04:01:33 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170310044402.38880-2-haoqf@linux.vnet.ibm.com> (QingFeng Hao's
-	message of "Fri, 10 Mar 2017 05:44:02 +0100")
-References: <20170310044402.38880-1-haoqf@linux.vnet.ibm.com>
-	<20170310044402.38880-2-haoqf@linux.vnet.ibm.com>
-Reply-To: quintela@redhat.com
-Date: Thu, 16 Mar 2017 09:01:22 +0100
-Message-ID: <87efxxy7jh.fsf@secure.mitica>
+	(envelope-from <pbonzini@redhat.com>) id 1coQe6-0000fX-Cv
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 04:20:31 -0400
+References: <20170316004603.20609-1-jsnow@redhat.com>
+	<20170316004603.20609-2-jsnow@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <142fa112-2295-3bd8-f430-e45ae804936e@redhat.com>
+Date: Thu, 16 Mar 2017 09:20:20 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] vmstate: fix failed iotests case 68
- and 91
+In-Reply-To: <20170316004603.20609-2-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC patch 1/3] blockjob: add block_job_start_shim
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,19 +23,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com, pasic@linux.vnet.ibm.com, liujbjl@linux.vnet.ibm.com, kwolf@redhat.com, famz@redhat.com, mreitz@redhat.com, dgilbert@redhat.com
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-QingFeng Hao <haoqf@linux.vnet.ibm.com> wrote:
-> This problem affects s390x only if we are running without KVM.
-> Basically, S390CPU.irqstate is unused if we do not use KVM,
-> and thus no buffer is allocated.
-> This causes size=0, first_elem=NULL and n_elems=1 in
-> vmstate_load_state and vmstate_save_state. And the assert fails.
-> With this fix we can go back to the old behavior and support
-> VMS_VBUFFER with size 0 and nullptr.
->
-> Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
 
-queued
+
+On 16/03/2017 01:46, John Snow wrote:
+> +/**
+> + * This code must run after the job's coroutine has been entered,
+> + * but not before.
+> + */
+> +static void coroutine_fn block_job_start_shim(void *opaque)
+> +{
+> +    BlockJob *job = opaque;
+> +
+> +    assert(job && job->driver && job->driver->start);
+> +    block_job_pause_point(job);
+> +    job->driver->start(job);
+> +}
+
+Poor function, don't call it a shim :)  Let's just call it
+block_job_co_entry.
+
+Paolo
+
+>  void block_job_start(BlockJob *job)
+>  {
+>      assert(job && !block_job_started(job) && job->paused &&
+> -           !job->busy && job->driver->start);
+> -    job->co = qemu_coroutine_create(job->driver->start, job);
+> -    if (--job->pause_count == 0) {
+> -        job->paused = false;
+> -        job->busy = true;
+> -        qemu_coroutine_enter(job->co);
+> -    }
+> +           job->driver && job->driver->start);
+> +    job->co = qemu_coroutine_create(block_job_start_shim, job);
+> +    job->pause_count--;
+> +    job->busy = true;
+> +    job->paused = false;
+> +    qemu_coroutine_enter(job->co);
+>  }
+>  
+>  void block_job_ref(BlockJob *job)
