@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1coPxe-0003zR-I4
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 03:36:39 -0400
+	(envelope-from <stefanha@redhat.com>) id 1coPxh-00042b-8R
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 03:36:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1coPxd-0000tu-IU
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 03:36:38 -0400
-Date: Thu, 16 Mar 2017 15:36:25 +0800
+	(envelope-from <stefanha@redhat.com>) id 1coPxg-0000up-DI
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 03:36:41 -0400
+Date: Thu, 16 Mar 2017 15:36:33 +0800
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170316073625.GC17296@stefanha-x1.localdomain>
+Message-ID: <20170316073633.GD17296@stefanha-x1.localdomain>
 References: <20170313195547.21466-1-eblake@redhat.com>
-	<20170313195547.21466-2-eblake@redhat.com>
+	<20170313195547.21466-3-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="qjNfmADvan18RZcF"
+	protocol="application/pgp-signature"; boundary="Km1U/tdNT/EmXiR1"
 Content-Disposition: inline
-In-Reply-To: <20170313195547.21466-2-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 01/30] trace: Fix backwards mirror_yield
- parameters
+In-Reply-To: <20170313195547.21466-3-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 02/30] trace: Fix incorrect megasas
+ trace parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,49 +26,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block Jobs" <qemu-block@nongnu.org>
+Cc: qemu-devel@nongnu.org, Hannes Reinecke <hare@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, "open list:megasas" <qemu-block@nongnu.org>
 
 
---qjNfmADvan18RZcF
+--Km1U/tdNT/EmXiR1
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 13, 2017 at 02:55:18PM -0500, Eric Blake wrote:
-> block/trace-events lists the parameters for mirror_yield
-> consistently with other mirror events (cnt just after s, like in
-> mirror_before_sleep; in_flight last, like in mirror_yield_in_flight).
-> But the callers were passing parameters in the wrong order, leading
-> to poor trace messages, including type truncation when there are
-> more than 4G dirty sectors involved.  Broken since its introduction
-> in commit bd48bde.
->=20
-> While touching this, ensure that all callers use the same type
-> (uint64_t) for cnt, as a later patch will enable the compiler to do
-> stricter type-checking.
+On Mon, Mar 13, 2017 at 02:55:19PM -0500, Eric Blake wrote:
+> hw/scsi/trace-events lists cmd as the first parameter for both
+> megasas_iovec_overflow and megasas_iovec_underflow, but the caller
+> was mistakenly passing cmd->iov_size twice instead of the command
+> index.  Also, trace_megasas_abort_invalid is called with parameters
+> in the wrong order.  Broken since its introduction in commit
+> e8f943c3.
 >=20
 > Signed-off-by: Eric Blake <eblake@redhat.com>
 > ---
->  block/mirror.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+>  hw/scsi/megasas.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 
 Thanks, applied to my tracing-next tree:
 https://github.com/stefanha/qemu/commits/tracing-next
 
 Stefan
 
---qjNfmADvan18RZcF
+--Km1U/tdNT/EmXiR1
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJYykB5AAoJEJykq7OBq3PIOkkH/ROZsLk1zor7sIRw+rkhQ9QS
-YeubEkZqomzlmzb6kHn7dkkmUTQJcHiGd8TS8RRlqwbHsUnZ7nXB8lbIXapVMPdF
-GNRpSYqS1LVpp2LIxAGz2OJHVHQ86R3yMA1cPMHqxVQtTtPWIl8J3qVc4dXZqi7D
-JjjacKn3ceDhmm3DYGRtJev56tCbBjuzfy0FXzSAR4F5Vd1FU/O45+iUaYC2ubzu
-A7k395icQ9W7NdUjarFZQvYEUMg+cloolxTj1UjGaTEKbeLShS4s6rKMYJR78/NW
-PX6VwOYI6Gjhy6w3q/lKibY0wC3YeZ2v5Cg+Cz3Dsn5lgVkf4f2TYuHeBeNPvKg=
-=62T1
+iQEcBAEBAgAGBQJYykCBAAoJEJykq7OBq3PI4kkIALa1tEKPHmVemyBPT2qMoTv5
+vM5nwMqpIBMGSIdQO3Pbj2jrMpvhIw/lZZ/fP4lVW42bG8A/0PbGlrbW6kj7QL8q
+gb20x7ro3wf3o39uAPw8AyNXM81znbpGSb8D87uRrDndFEBxklBvn8UOxeVTpN/8
+XwzwcHkDJkAGzoDccbBVQ52O+olDANS1tr41gis3i4JdO7wIRigRhwWhVj32vxo+
+BOww7rV3FAVG1Pe/b3RQXaZ37MvA2edMU0w1uKjguwyr4A69eR7R0xfFQO+sETtN
+oInjeeqQmMQKAEVy3qoSoa6oHnqeprQR80LB0xKrb6MIigSC/Ta8AYetJx16JQ4=
+=cDJf
 -----END PGP SIGNATURE-----
 
---qjNfmADvan18RZcF--
+--Km1U/tdNT/EmXiR1--
