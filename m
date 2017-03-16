@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52297)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1coLS6-00054O-9j
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 22:47:47 -0400
+	(envelope-from <stefanha@redhat.com>) id 1coMFc-0005ph-Hu
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 23:38:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yang.zhong@intel.com>) id 1coLS3-0000CW-5d
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 22:47:46 -0400
-Received: from mga09.intel.com ([134.134.136.24]:2044)
+	(envelope-from <stefanha@redhat.com>) id 1coMFY-00028M-Jj
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 23:38:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35358)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yang.zhong@intel.com>)
-	id 1coLS2-0000C3-Oo
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 22:47:43 -0400
-From: "Zhong, Yang" <yang.zhong@intel.com>
-Date: Thu, 16 Mar 2017 02:47:37 +0000
-Message-ID: <7A85DF989CAE8F42902CF7B31A7D94A139557C1D@shsmsx102.ccr.corp.intel.com>
-References: <1489158897-9206-1-git-send-email-yang.zhong@intel.com>
-	<4712D8F4B26E034E80552F30A67BE0B1A0F91A@ORSMSX112.amr.corp.intel.com>
-	<920352018.1797331.1489251855464.JavaMail.zimbra@redhat.com>
-	<4712D8F4B26E034E80552F30A67BE0B1A13045@ORSMSX112.amr.corp.intel.com>
-	<991a0f3d-5e1f-d17c-a8f3-a42c02ac2f17@redhat.com>
-	<4712D8F4B26E034E80552F30A67BE0B1A1561C@ORSMSX112.amr.corp.intel.com>
-	<f05fe113-c286-19b0-f5bc-ee2c1ea05568@redhat.com>
-	<4712D8F4B26E034E80552F30A67BE0B1A16F14@ORSMSX112.amr.corp.intel.com>
-	<1466597512.4602267.1489609298091.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1466597512.4602267.1489609298091.JavaMail.zimbra@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1coMFY-000287-AQ
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 23:38:52 -0400
+Date: Thu, 16 Mar 2017 11:38:44 +0800
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170316033844.GI11074@stefanha-x1.localdomain>
+References: <20170315092940.1367-1-stefanha@redhat.com>
+	<20170315092940.1367-2-stefanha@redhat.com>
+	<5251b9a6-9e00-d11e-ac23-304accfda59a@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] reduce qemu's heap Rss size from
- 12252kB to 2752KB
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="pe+tqlI1iYzVj1X/"
+Content-Disposition: inline
+In-Reply-To: <5251b9a6-9e00-d11e-ac23-304accfda59a@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v2 1/8] block: add bdrv_measure() API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,156 +29,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "Xu, Anthony" <anthony.xu@intel.com>
-Cc: "Peng, Chao P" <chao.p.peng@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Nir Soffer <nsoffer@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-SGVsbG8gUGFvbG8sDQoNCkFzIGZvciB5b3VyIHNhaWQgdGNtYWxsb2Mgb3IgamVtYWxsb2MgZm9y
-IG9wdGltaXphdGlvbiBtZW1vcnkgYWxsb2NhdGlvbiwgd2UgYWxzbyB0cmllZCB0aGUgbWFsbG9j
-X3RyaW0oKSBpbiBnbGliYywgd2hpY2ggY2FuIGdldCB0aGUgc2FtZSBtZW1vcnkgb3B0aW1pemF0
-aW9uLg0KDQpkaWZmIC0tZ2l0IGEvdXRpbC9yY3UuYyBiL3V0aWwvcmN1LmMNCmluZGV4IDlhZGM1
-ZTQuLjM2NDNlNDMgMTAwNjQ0DQotLS0gYS91dGlsL3JjdS5jDQorKysgYi91dGlsL3JjdS5jDQpA
-QCAtMzIsNyArMzIsNyBAQA0KI2luY2x1ZGUgInFlbXUvYXRvbWljLmgiDQojaW5jbHVkZSAicWVt
-dS90aHJlYWQuaCINCiNpbmNsdWRlICJxZW11L21haW4tbG9vcC5oIg0KLQ0KKyNpbmNsdWRlICJt
-YWxsb2MuaCINCi8qDQogICogR2xvYmFsIGdyYWNlIHBlcmlvZCBjb3VudGVyLiAgQml0IDAgaXMg
-YWx3YXlzIG9uZSBpbiByY3VfZ3BfY3RyLg0KICAqIEJpdHMgMSBhbmQgYWJvdmUgYXJlIGRlZmlu
-ZWQgaW4gc3luY2hyb25pemVfcmN1Lg0KQEAgLTI3MSw2ICsyNzEsNyBAQCBzdGF0aWMgdm9pZCAq
-Y2FsbF9yY3VfdGhyZWFkKHZvaWQgKm9wYXF1ZSkNCiAgICAgICAgICAgICBuLS07DQogICAgICAg
-ICAgICAgbm9kZS0+ZnVuYyhub2RlKTsNCiAgICAgICAgIH0NCisgICAgICAgIG1hbGxvY190cmlt
-KDApOw0KICAgICAgICAgcWVtdV9tdXRleF91bmxvY2tfaW90aHJlYWQoKTsNCiAgICAgfQ0KICAg
-ICBhYm9ydCgpOw0KDQpUaGUgbWFuIGluZm8gaW4gbWFsbG9jX3RyaW0gIGlzIG9ubHkgcmVsZWFz
-ZSBmcmVlIG1lbW9yeSBmcm9tIHRoZSB0b3Agb2YgdGhlIGhlYXAsIGluIGZhY3QsIHdlIGZvdW5k
-IHRoaXMgZnVuY3Rpb24gYWxzbyByZWxlYXNlIGhvbGUgbWVtb3J5IGJlbG93IHRvcCBvZiBoZWFw
-Lg0KDQpUaGFua3MhDQoNClpob25nWWFuZw0KDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0t
-DQpGcm9tOiBQYW9sbyBCb256aW5pIFttYWlsdG86cGJvbnppbmlAcmVkaGF0LmNvbV0gDQpTZW50
-OiBUaHVyc2RheSwgTWFyY2ggMTYsIDIwMTcgNDoyMiBBTQ0KVG86IFh1LCBBbnRob255IDxhbnRo
-b255Lnh1QGludGVsLmNvbT4NCkNjOiBaaG9uZywgWWFuZyA8eWFuZy56aG9uZ0BpbnRlbC5jb20+
-OyBQZW5nLCBDaGFvIFAgPGNoYW8ucC5wZW5nQGludGVsLmNvbT47IHFlbXUtZGV2ZWxAbm9uZ251
-Lm9yZw0KU3ViamVjdDogUmU6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjEgMi8yXSByZWR1Y2UgcWVt
-dSdzIGhlYXAgUnNzIHNpemUgZnJvbSAxMjI1MmtCIHRvIDI3NTJLQg0KDQoNCg0KLS0tLS0gT3Jp
-Z2luYWwgTWVzc2FnZSAtLS0tLQ0KPiBGcm9tOiAiQW50aG9ueSBYdSIgPGFudGhvbnkueHVAaW50
-ZWwuY29tPg0KPiBUbzogIlBhb2xvIEJvbnppbmkiIDxwYm9uemluaUByZWRoYXQuY29tPg0KPiBD
-YzogIllhbmcgWmhvbmciIDx5YW5nLnpob25nQGludGVsLmNvbT4sICJDaGFvIFAgUGVuZyIgDQo+
-IDxjaGFvLnAucGVuZ0BpbnRlbC5jb20+LCBxZW11LWRldmVsQG5vbmdudS5vcmcNCj4gU2VudDog
-V2VkbmVzZGF5LCBNYXJjaCAxNSwgMjAxNyA4OjA1OjQ4IFBNDQo+IFN1YmplY3Q6IFJlOiBbUWVt
-dS1kZXZlbF0gW1BBVENIIHYxIDIvMl0gcmVkdWNlIHFlbXUncyBoZWFwIFJzcyBzaXplIA0KPiBm
-cm9tIDEyMjUya0IgdG8gMjc1MktCDQo+IA0KPiA+IFRoZSBmaXJzdCB1bnJlZiBpcyBkb25lIGFm
-dGVyIGFzLT5jdXJyZW50X21hcCBpcyBvdmVyd3JpdHRlbi4NCj4gPiBhcy0+Y3VycmVudF9tYXAg
-aXMgYWNjZXNzZWQgdW5kZXIgUkNVLCBzbyBpdCBuZWVkcyBjYWxsX3JjdS4gIEl0DQo+ID4gYmFs
-YW5jZXMgdGhlIGluaXRpYWwgcmVmZXJlbmNlIHRoYXQgaXMgcHJlc2VudCBzaW5jZSBmbGF0dmll
-d19pbml0Lg0KPiANCj4gR290IGl0LCB0aGFua3MgZm9yIGV4cGxhbmF0aW9uLg0KPiANCj4gPiA+
-IGJ1dCBpdCBpcyBub3QgY2xlYXIgdG8gbWUsIGlzIHRoaXMgYSBidWcgb3IgYnkgZGVzaWduPyBJ
-cyANCj4gPiA+IGZsYXR2aWV3X2Rlc3Ryb3kgY2FsbGVkDQo+ID4gaW4gY3VycmVudCB0aHJlYWQN
-Cj4gPiA+IG9yIFJDVSB0aHJlYWQ/DQo+ID4gDQo+ID4gWW91IGNhbm5vdCBrbm93LCBiZWNhdXNl
-IHRoZXJlIGFyZSBhbHNvIG90aGVyIGNhbGxlcnMgb2YgDQo+ID4gYWRkcmVzc19zcGFjZV9nZXRf
-ZmxhdHZpZXcuICBVc3VhbGx5IGl0J3MgZnJvbSB0aGUgUkNVIHRocmVhZC4NCj4gDQo+IElmIGl0
-IGlzIGZyb20gY3VycmVudCB0aHJlYWQsIGRvIHdlIG5lZWQgdG8gY2hlY2sgaWYgdGhlIGdsb2Jh
-bCBsb2NrIA0KPiBpcyBhY3F1aXJlZD8NCj4gQXMgeW91IG1lbnRpb25lZCBmbGF0dmlld191bnJl
-ZiBtYXkgY2FsbCBtZW1vcnlfcmVnaW9uX3VucmVmLg0KDQpObywgeW91IGRvbid0IG5lZWQgdG8g
-Y2hlY2sgaXQuICBNb3N0IGZ1bmN0aW9ucyAoaW4gdGhpcyBjYXNlLA0KbWVtb3J5X3JlZ2lvbl90
-cmFuc2FjdGlvbl9jb21taXQpIGNhbiBvbmx5IGJlIGNhbGxlZCB1bmRlciB0aGUgZ2xvYmFsIGxv
-Y2suDQpJbiBmYWN0LCBvbmx5IGFkZHJlc3Nfc3BhY2VfcmVhZC93cml0ZS9sZCovc3QqLCBwbHVz
-IG1lbW9yeV9yZWdpb25fZmluZCBjYW4gYmUgY2FsbGVkIHdpdGhvdXQgdGhlIGdsb2JhbCBsb2Nr
-Lg0KDQo+IEluIHRoZSBjb21tZW50cyBvZiBtZW1vcnlfcmVnaW9uX2ZpbmFsaXplDQo+ICIgICAv
-KiBXZSBrbm93IHRoZSByZWdpb24gaXMgbm90IHZpc2libGUgaW4gYW55IGFkZHJlc3Mgc3BhY2Ug
-KGl0DQo+ICAgICAgKiBkb2VzIG5vdCBoYXZlIGEgY29udGFpbmVyIGFuZCBjYW5ub3QgYmUgYSBy
-b290IGVpdGhlciBiZWNhdXNlDQo+ICAgICAgKiBpdCBoYXMgbm8gcmVmZXJlbmNlcywNCj4gIg0K
-PiANCj4gV2Uga25vdyB0aGUgbWVtb3J5IHJlZ2lvbiBpcyBub3QgYSByb290IHJlZ2lvbiwgYW5k
-IHRoZSBtZW1vcnkgcmVnaW9uIA0KPiBoYXMgYWxyZWFkeSBiZWVuIHJlbW92ZWQgZnJvbSBhZGRy
-ZXNzIHNwYWNlIGV2ZW4gaXQgaGFzIHN1YiByZWdpb25zLg0KPiBtZW1vcnlfcmVnaW9uX3RyYW5z
-YWN0aW9uX2NvbW1pdCBzaG91bGQgYmUgY2FsbGVkIHdoZW4gdGhlIG1lbW9yeSANCj4gcmVnaW9u
-IGlzIHJlbW92ZWQgZnJvbSBhZGRyZXNzIHNwYWNlLg0KPiBtZW1vcnlfcmVnaW9uX3RyYW5zYWN0
-aW9uX2NvbW1pdCBzZWVtcyBub3QgYmUgbmVlZGVkIGluIA0KPiBtZW1vcnlfcmVnaW9uX2ZpbmFs
-aXplLg0KPiBMZXQgbWUga25vdyBpZiB5b3UgdGhpbmsgb3RoZXJ3aXNlLg0KDQpZZXMsIHlvdSBj
-YW4gcmVwbGFjZSBtZW1vcnlfcmVnaW9uX2RlbF9zdWJyZWdpb24gaW4gbWVtb3J5X3JlZ2lvbl9m
-aW5hbGl6ZSB3aXRoIHNwZWNpYWwgY29kZSB0aGF0IGRvZXMNCg0KICAgIGFzc2VydCghbXItPmVu
-YWJsZWQpOw0KICAgIGFzc2VydChzdWJyZWdpb24tPmNvbnRhaW5lciA9PSBtcik7DQogICAgc3Vi
-cmVnaW9uLT5jb250YWluZXIgPSBOVUxMOw0KICAgIFFUQUlMUV9SRU1PVkUoJm1yLT5zdWJyZWdp
-b25zLCBzdWJyZWdpb24sIHN1YnJlZ2lvbnNfbGluayk7DQogICAgbWVtb3J5X3JlZ2lvbl91bnJl
-ZihzdWJyZWdpb24pOw0KDQpUaGUgbGFzdCBmb3VyIGxpbmVzIGFyZSBzaGFyZWQgd2l0aCBtZW1v
-cnlfcmVnaW9uX2RlbF9zdWJyZWdpb24sIHNvIHBsZWFzZSBmYWN0b3IgdGhlbSBpbiBhIG5ldyBm
-dW5jdGlvbiwgZm9yIGV4YW1wbGUgbWVtb3J5X3JlZ2lvbl9kZWxfc3VicmVnaW9uX2ludGVybmFs
-Lg0KDQo+ID4gPiBIb3cgYWJvdXQgZmFsbCBiYWNrIHRvIHN5bmNocm9uaXplX3JjdT8NCj4gPiAN
-Cj4gPiBJJ20gYWZyYWlkIGl0IHdvdWxkIGJlIHRvbyBzbG93LCBidXQgeW91IGNhbiB0ZXN0Lg0K
-PiANCj4gSXQgaXMgbm90IHNsb3csIHRoZSBjb250ZW50aW9uIGlzIG5vdCBoaWdoLiBZZXMgd2Ug
-Y2FuIHRlc3QuDQoNCkl0J3Mgbm90IGEgbWF0dGVyIG9mIGNvbnRlbnRpb24uICBJdCdzIGEgbWF0
-dGVyIG9mIGhvdyBsb25nIGFuIFJDVSBjcml0aWNhbCBzZWN0aW9uIGNhbiBiZS0tLW5vdCBqdXN0
-IGF0IHN0YXJ0dXAsIGJ1dCBhdCBhbnkgcG9pbnQgZHVyaW5nIFFFTVUgZXhlY3V0aW9uLg0KDQpI
-YXZlIHlvdSB0cmllZCB0Y21hbGxvYyBvciBqZW1hbGxvYz8gIFRoZXkgdXNlIHRoZSBicmsgcmVn
-aW9uIGxlc3MgYW5kIHNvbWV0aW1lcyBhcmUgbW9yZSBhZ2dyZXNzaXZlIGluIHJlbGVhc2luZyBt
-bWFwLWVkIG1lbW9yeSBhcmVhcy4NCg0KPiBQbGVhc2UgcmV2aWV3IGJlbG93IHBhdGNoLCBNZW1v
-cnlSZWdpb24gaXMgcHJvdGVjdGVkIGJ5IFJDVS4NCg0KUmVtb3ZpbmcgdHJhbnNhY3Rpb24gYmVn
-aW4vY29tbWl0IGluIG1lbW9yeV9yZWdpb25fZmluYWxpemUgbWFrZXMgbGl0dGxlIHNlbnNlIGJl
-Y2F1c2UgbWVtb3J5X3JlZ2lvbl9kZWxfc3VicmVnaW9uIGNhbGxzIHRob3NlIHR3byBmdW5jdGlv
-bnMgYWdhaW4uICBTZWUgYWJvdmUgZm9yIGFuIGFsdGVybmF0aXZlLiAgQXBhcnQgZnJvbSB0aGlz
-LCB0aGUgcGF0Y2ggaXMgYXQgbGVhc3QgY29ycmVjdCwgdGhvdWdoIEknbSBub3Qgc3VyZSBpdCdz
-IGEgZ29vZCBpZGVhIChzeW5jaHJvbml6ZV9yY3UgbmVlZHMgdGVzdGluZykuICBJJ20gbm90IHN1
-cmUgSSB1bmRlcnN0YW5kIHRoZSBhZGRyZXNzX3NwYWNlX3dyaXRlIGNoYW5nZSkuDQoNClBhb2xv
-DQoNCj4gVGhhbmtzLA0KPiBBbnRob255DQo+IA0KPiANCj4gDQo+IGRpZmYgLS1naXQgYS9leGVj
-LmMgYi9leGVjLmMNCj4gaW5kZXggYTIyZjVhMC4uNjYzMTY2OCAxMDA2NDQNCj4gLS0tIGEvZXhl
-Yy5jDQo+ICsrKyBiL2V4ZWMuYw0KPiBAQCAtMjUyMSw3ICsyNTIxLDggQEAgc3RhdGljIHZvaWQg
-bWVtX2NvbW1pdChNZW1vcnlMaXN0ZW5lciAqbGlzdGVuZXIpDQo+IA0KPiAgICAgIGF0b21pY19y
-Y3Vfc2V0KCZhcy0+ZGlzcGF0Y2gsIG5leHQpOw0KPiAgICAgIGlmIChjdXIpIHsNCj4gLSAgICAg
-ICAgY2FsbF9yY3UoY3VyLCBhZGRyZXNzX3NwYWNlX2Rpc3BhdGNoX2ZyZWUsIHJjdSk7DQo+ICsg
-ICAgICAgIHN5bmNocm9uaXplX3JjdSgpOw0KPiArICAgICAgICBhZGRyZXNzX3NwYWNlX2Rpc3Bh
-dGNoX2ZyZWUoY3VyKTsNCj4gICAgICB9DQo+ICB9DQo+IA0KPiBAQCAtMjU2Nyw3ICsyNTY4LDgg
-QEAgdm9pZCBhZGRyZXNzX3NwYWNlX2Rlc3Ryb3lfZGlzcGF0Y2goQWRkcmVzc1NwYWNlIA0KPiAq
-YXMpDQo+IA0KPiAgICAgIGF0b21pY19yY3Vfc2V0KCZhcy0+ZGlzcGF0Y2gsIE5VTEwpOw0KPiAg
-ICAgIGlmIChkKSB7DQo+IC0gICAgICAgIGNhbGxfcmN1KGQsIGFkZHJlc3Nfc3BhY2VfZGlzcGF0
-Y2hfZnJlZSwgcmN1KTsNCj4gKyAgICAgICAgc3luY2hyb25pemVfcmN1KCk7DQo+ICsgICAgICAg
-IGFkZHJlc3Nfc3BhY2VfZGlzcGF0Y2hfZnJlZShkKTsNCj4gICAgICB9DQo+ICB9DQo+IA0KPiBA
-QCAtMjcxMiwxOSArMjcxNCwyMiBAQCBzdGF0aWMgYm9vbCBwcmVwYXJlX21taW9fYWNjZXNzKE1l
-bW9yeVJlZ2lvbiAqbXIpDQo+ICAgICAgcmV0dXJuIHJlbGVhc2VfbG9jazsNCj4gIH0NCj4gDQo+
-IC0vKiBDYWxsZWQgd2l0aGluIFJDVSBjcml0aWNhbCBzZWN0aW9uLiAgKi8gLXN0YXRpYyBNZW1U
-eFJlc3VsdCANCj4gYWRkcmVzc19zcGFjZV93cml0ZV9jb250aW51ZShBZGRyZXNzU3BhY2UgKmFz
-LCBod2FkZHIgYWRkciwNCj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIE1lbVR4QXR0cnMgYXR0cnMsDQo+IC0gICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBjb25zdCB1aW50OF90ICpidWYsDQo+IC0gICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBpbnQgbGVuLCBod2FkZHIgYWRk
-cjEsDQo+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBo
-d2FkZHIgbCwgTWVtb3J5UmVnaW9uICptcikNCj4gK01lbVR4UmVzdWx0IGFkZHJlc3Nfc3BhY2Vf
-d3JpdGUoQWRkcmVzc1NwYWNlICphcywgaHdhZGRyIGFkZHIsDQo+ICsgICAgICAgICAgICAgICAg
-ICBNZW1UeEF0dHJzIGF0dHJzLCBjb25zdCB1aW50OF90ICpidWYsIGludCBsZW4pDQo+ICB7DQo+
-ICAgICAgdWludDhfdCAqcHRyOw0KPiAgICAgIHVpbnQ2NF90IHZhbDsNCj4gKyAgICBod2FkZHIg
-bD1sZW47DQo+ICsgICAgaHdhZGRyIGFkZHIxOw0KPiArICAgIE1lbW9yeVJlZ2lvbiAqbXI7DQo+
-ICAgICAgTWVtVHhSZXN1bHQgcmVzdWx0ID0gTUVNVFhfT0s7DQo+ICAgICAgYm9vbCByZWxlYXNl
-X2xvY2sgPSBmYWxzZTsNCj4gDQo+ICAgICAgZm9yICg7Oykgew0KPiArICAgICAgICByY3VfcmVh
-ZF9sb2NrKCk7DQo+ICsgICAgICAgIG1yID0gYWRkcmVzc19zcGFjZV90cmFuc2xhdGUoYXMsIGFk
-ZHIsICZhZGRyMSwgJmwsIHRydWUpOw0KPiArICAgICAgICBtZW1vcnlfcmVnaW9uX3JlZihtcik7
-DQo+ICsgICAgICAgIHJjdV9yZWFkX3VubG9jaygpOw0KPiAgICAgICAgICBpZiAoIW1lbW9yeV9h
-Y2Nlc3NfaXNfZGlyZWN0KG1yLCB0cnVlKSkgew0KPiAgICAgICAgICAgICAgcmVsZWFzZV9sb2Nr
-IHw9IHByZXBhcmVfbW1pb19hY2Nlc3MobXIpOw0KPiAgICAgICAgICAgICAgbCA9IG1lbW9yeV9h
-Y2Nlc3Nfc2l6ZShtciwgbCwgYWRkcjEpOyBAQCAtMjc2NCw3ICsyNzY5LDcgDQo+IEBAIHN0YXRp
-YyBNZW1UeFJlc3VsdCBhZGRyZXNzX3NwYWNlX3dyaXRlX2NvbnRpbnVlKEFkZHJlc3NTcGFjZSAq
-YXMsIA0KPiBod2FkZHIgYWRkciwNCj4gICAgICAgICAgICAgIG1lbWNweShwdHIsIGJ1ZiwgbCk7
-DQo+ICAgICAgICAgICAgICBpbnZhbGlkYXRlX2FuZF9zZXRfZGlydHkobXIsIGFkZHIxLCBsKTsN
-Cj4gICAgICAgICAgfQ0KPiAtDQo+ICsgICAgICAgIG1lbW9yeV9yZWdpb25fdW5yZWYobXIpOw0K
-PiAgICAgICAgICBpZiAocmVsZWFzZV9sb2NrKSB7DQo+ICAgICAgICAgICAgICBxZW11X211dGV4
-X3VubG9ja19pb3RocmVhZCgpOw0KPiAgICAgICAgICAgICAgcmVsZWFzZV9sb2NrID0gZmFsc2U7
-DQo+IEBAIC0yNzc5LDI3ICsyNzg0LDYgQEAgc3RhdGljIE1lbVR4UmVzdWx0IA0KPiBhZGRyZXNz
-X3NwYWNlX3dyaXRlX2NvbnRpbnVlKEFkZHJlc3NTcGFjZSAqYXMsIGh3YWRkciBhZGRyLA0KPiAg
-ICAgICAgICB9DQo+IA0KPiAgICAgICAgICBsID0gbGVuOw0KPiAtICAgICAgICBtciA9IGFkZHJl
-c3Nfc3BhY2VfdHJhbnNsYXRlKGFzLCBhZGRyLCAmYWRkcjEsICZsLCB0cnVlKTsNCj4gLSAgICB9
-DQo+IC0NCj4gLSAgICByZXR1cm4gcmVzdWx0Ow0KPiAtfQ0KPiAtDQo+IC1NZW1UeFJlc3VsdCBh
-ZGRyZXNzX3NwYWNlX3dyaXRlKEFkZHJlc3NTcGFjZSAqYXMsIGh3YWRkciBhZGRyLCANCj4gTWVt
-VHhBdHRycyBhdHRycywNCj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY29uc3Qg
-dWludDhfdCAqYnVmLCBpbnQgbGVuKQ0KPiAtew0KPiAtICAgIGh3YWRkciBsOw0KPiAtICAgIGh3
-YWRkciBhZGRyMTsNCj4gLSAgICBNZW1vcnlSZWdpb24gKm1yOw0KPiAtICAgIE1lbVR4UmVzdWx0
-IHJlc3VsdCA9IE1FTVRYX09LOw0KPiAtDQo+IC0gICAgaWYgKGxlbiA+IDApIHsNCj4gLSAgICAg
-ICAgcmN1X3JlYWRfbG9jaygpOw0KPiAtICAgICAgICBsID0gbGVuOw0KPiAtICAgICAgICBtciA9
-IGFkZHJlc3Nfc3BhY2VfdHJhbnNsYXRlKGFzLCBhZGRyLCAmYWRkcjEsICZsLCB0cnVlKTsNCj4g
-LSAgICAgICAgcmVzdWx0ID0gYWRkcmVzc19zcGFjZV93cml0ZV9jb250aW51ZShhcywgYWRkciwg
-YXR0cnMsIGJ1ZiwgbGVuLA0KPiAtICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIGFkZHIxLCBsLCBtcik7DQo+IC0gICAgICAgIHJjdV9yZWFkX3VubG9jaygpOw0K
-PiAgICAgIH0NCj4gDQo+ICAgICAgcmV0dXJuIHJlc3VsdDsNCj4gZGlmZiAtLWdpdCBhL21lbW9y
-eS5jIGIvbWVtb3J5LmMNCj4gaW5kZXggNjRiMGE2MC4uZDEyNDM3YyAxMDA2NDQNCj4gLS0tIGEv
-bWVtb3J5LmMNCj4gKysrIGIvbWVtb3J5LmMNCj4gQEAgLTE1MDUsMTMgKzE1MDUsMTAgQEAgc3Rh
-dGljIHZvaWQgbWVtb3J5X3JlZ2lvbl9maW5hbGl6ZShPYmplY3QgKm9iaikNCj4gICAgICAgKiBh
-bmQgY2F1c2UgYW4gaW5maW5pdGUgbG9vcC4NCj4gICAgICAgKi8NCj4gICAgICBtci0+ZW5hYmxl
-ZCA9IGZhbHNlOw0KPiAtICAgIG1lbW9yeV9yZWdpb25fdHJhbnNhY3Rpb25fYmVnaW4oKTsNCj4g
-ICAgICB3aGlsZSAoIVFUQUlMUV9FTVBUWSgmbXItPnN1YnJlZ2lvbnMpKSB7DQo+ICAgICAgICAg
-IE1lbW9yeVJlZ2lvbiAqc3VicmVnaW9uID0gUVRBSUxRX0ZJUlNUKCZtci0+c3VicmVnaW9ucyk7
-DQo+ICAgICAgICAgIG1lbW9yeV9yZWdpb25fZGVsX3N1YnJlZ2lvbihtciwgc3VicmVnaW9uKTsN
-Cj4gICAgICB9DQo+IC0gICAgbWVtb3J5X3JlZ2lvbl90cmFuc2FjdGlvbl9jb21taXQoKTsNCj4g
-LQ0KPiAgICAgIG1yLT5kZXN0cnVjdG9yKG1yKTsNCj4gICAgICBtZW1vcnlfcmVnaW9uX2NsZWFy
-X2NvYWxlc2NpbmcobXIpOw0KPiAgICAgIGdfZnJlZSgoY2hhciAqKW1yLT5uYW1lKTsNCj4gDQo+
-IA0KPiANCg==
+
+--pe+tqlI1iYzVj1X/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Mar 16, 2017 at 02:01:03AM +0100, Max Reitz wrote:
+> On 15.03.2017 10:29, Stefan Hajnoczi wrote:
+> > bdrv_measure() provides a conservative maximum for the size of a new
+> > image.  This information is handy if storage needs to be allocated (e.g.
+> > a SAN or an LVM volume) ahead of time.
+> >=20
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > ---
+> >  qapi/block-core.json      | 19 +++++++++++++++++++
+> >  include/block/block.h     |  4 ++++
+> >  include/block/block_int.h |  2 ++
+> >  block.c                   | 33 +++++++++++++++++++++++++++++++++
+> >  4 files changed, 58 insertions(+)
+> >=20
+> > diff --git a/qapi/block-core.json b/qapi/block-core.json
+> > index 786b39e..673569d 100644
+> > --- a/qapi/block-core.json
+> > +++ b/qapi/block-core.json
+> > @@ -463,6 +463,25 @@
+> >             '*dirty-bitmaps': ['BlockDirtyInfo'] } }
+> > =20
+> >  ##
+> > +# @BlockMeasureInfo:
+> > +#
+> > +# Image size calculation information.  This structure describes the si=
+ze
+> > +# requirements for creating a new image.
+> > +#
+> > +# @required-bytes: Amount of space required for image creation.  This =
+value is
+> > +#                  the host file size including sparse file regions.  =
+A new 5
+> > +#                  GB raw file therefore has a required size of 5 GB, =
+not 0
+> > +#                  bytes.
+>=20
+> This should probably note that it's a conservative estimation (and I
+> agree that it should be). It's nice to have it in the commit message but
+> few people are going to run git blame on the QAPI documentation to find
+> out the rest of its story. :-)
+
+Will fix.
+
+> > +#
+> > +# @fully-allocated-bytes: Space required once data has been written to=
+ all
+> > +#                         sectors
+> > +#
+> > +# Since: 2.10
+> > +##
+> > +{ 'struct': 'BlockMeasureInfo',
+> > +  'data': {'required-bytes': 'int', 'fully-allocated-bytes': 'int'} }
+> > +
+> > +##
+> >  # @query-block:
+> >  #
+> >  # Get a list of BlockInfo for all virtual block devices.
+> > diff --git a/include/block/block.h b/include/block/block.h
+> > index 5149260..43c789f 100644
+> > --- a/include/block/block.h
+> > +++ b/include/block/block.h
+> > @@ -298,6 +298,10 @@ int bdrv_truncate(BdrvChild *child, int64_t offset=
+);
+> >  int64_t bdrv_nb_sectors(BlockDriverState *bs);
+> >  int64_t bdrv_getlength(BlockDriverState *bs);
+> >  int64_t bdrv_get_allocated_file_size(BlockDriverState *bs);
+> > +void bdrv_measure(BlockDriver *drv, QemuOpts *opts,
+> > +                  BlockDriverState *in_bs,
+> > +                  BlockMeasureInfo *info,
+> > +                  Error **errp);
+> >  void bdrv_get_geometry(BlockDriverState *bs, uint64_t *nb_sectors_ptr);
+> >  void bdrv_refresh_limits(BlockDriverState *bs, Error **errp);
+> >  int bdrv_commit(BlockDriverState *bs);
+> > diff --git a/include/block/block_int.h b/include/block/block_int.h
+> > index 6c699ac..45a7fbe 100644
+> > --- a/include/block/block_int.h
+> > +++ b/include/block/block_int.h
+> > @@ -201,6 +201,8 @@ struct BlockDriver {
+> >      int64_t (*bdrv_getlength)(BlockDriverState *bs);
+> >      bool has_variable_length;
+> >      int64_t (*bdrv_get_allocated_file_size)(BlockDriverState *bs);
+> > +    void (*bdrv_measure)(QemuOpts *opts, BlockDriverState *in_bs,
+> > +                         BlockMeasureInfo *info, Error **errp);
+> > =20
+> >      int coroutine_fn (*bdrv_co_pwritev_compressed)(BlockDriverState *b=
+s,
+> >          uint64_t offset, uint64_t bytes, QEMUIOVector *qiov);
+> > diff --git a/block.c b/block.c
+> > index cb57370..532a4d1 100644
+> > --- a/block.c
+> > +++ b/block.c
+> > @@ -3260,6 +3260,39 @@ int64_t bdrv_get_allocated_file_size(BlockDriver=
+State *bs)
+> >      return -ENOTSUP;
+> >  }
+> > =20
+> > +/*
+> > + * bdrv_measure:
+> > + * @drv: Format driver
+> > + * @opts: Creation options
+> > + * @in_bs: Existing image containing data for new image (may be NULL)
+> > + * @info: Result object
+> > + * @errp: Error object
+> > + *
+> > + * Calculate file size required to create a new image.
+> > + *
+> > + * If @in_bs is given then space for allocated clusters and zero clust=
+ers
+> > + * from that image are included in the calculation.  If @opts contains=
+ a
+> > + * backing file that is shared by @in_bs then backing clusters are omi=
+tted
+> > + * from the calculation.
+>=20
+> This seems to run a bit contrary to the documentation of
+> BlockMeasureInfo.required-bytes, and I don't fully understand it either.
+>=20
+> What does "space for zero clusters" mean? Do zero clusters take space?
+> Does it depend on the image format? (i.e. would they take space for raw
+> but not for qcow2?)
+
+Yes, zero clusters are an image format-specific feature.  A contrived
+example:
+
+  in_bs: qcow2 version=3D3 with zero clusters
+  Output format: qcow2 version=3D2 (zero clusters not supported!)
+  Image creation options: backing file given
+
+We must take care to allocate clusters in the new image for zero
+clusters in in_bs.  We cannot simply skip allocating those zero clusters
+since there is a backing file and the contents of the backing file
+must not be visible where there is a zero cluster.
+
+This is a scenario where zero clusters must be included in the
+size calculation.
+
+Perhaps this is an internal detail and it shouldn't be mentioned in the
+doc comment?
+
+> And is space for unallocated clusters included or not? Do unallocated
+> clusters without a backing image count as zero clusters?
+
+This depends on the output image format.  The raw format requires space
+even for unallocated regions.  The qcow2 format is compact and only
+requires space for allocated clusters.
+
+> If that space is not included, then it would run contrary to the QAPI
+> documentation which states that it should be included.
+
+Sorry, the raw format example in the QAPI doc is misleading without a
+qcow2 example.  The point of the raw format example was not to state
+that unallocated regions are included for *all* image formats.  It was
+just to show how the raw format behaves.
+
+I'll reword things in the next revision.
+
+> Finally, how are you supposed to check whether the backing file in @opts
+> is shared by @in_bs?
+
+qemu-img convert -B <base> and -o backing_file=3D<base> simply do not
+check.  They rely on good old-fashioned^W^W^Wthe bad practice of
+trusting the user to provide valid input.
+
+qemu-img measure will work like this:
+1. If the new image has a backing file, use has_zero_init=3Dfalse
+   semantics.
+2. Do *not* rely on bdrv_get_block_status_above() because it's hard to
+   check how the backing chains of in_bs and the new image compare.
+
+This means the result will be conservative - perhaps clusters could have
+been shared with the backing file.
+
+> > + *
+> > + * If @in_bs is NULL then the calculation includes no allocated cluste=
+rs
+> > + * unless a preallocation option is given in @opts.
+>=20
+> But the BlockMeasureInfo.required-bytes documentation states that a new
+> 5 GB raw image should still report 5 GB of required space.
+
+Even with 0 allocated clusters, the raw format always reports the
+virtual disk size (5 GB).  There is no contradiction here.
+
+Stefan
+
+--pe+tqlI1iYzVj1X/
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYygjEAAoJEJykq7OBq3PIb78IAIPYLrm1xbDTsIJABGAzpzXJ
+7xgyNb5rvDS1/UF15Hyy0QVHZjPmiZlraLEqqvHjmiMpiGo9WcH+zllT4/ne6OaZ
+GD+f9ThBOE1tMO+eJ+DLDKq15eHxwXjqdXX5dA8rwF0CEpasx6bOJeIufsb56mxJ
+wPnHfKGu+1YRnVCwUZcyieMl1U7hW3PxFHdlnCNde6xCUSUgKdV4eqLUzTp2eoEK
+PeTDgLKdHvab9me9aMG9IR6cElXSNotxTWrf4qAOZC5JY6yVARcR46/c+rzVcIM9
+ijQ1YMGgqRESUoR1OAaQxsubcHx6MHyuJZhMHhKk0hLde5EhU6KjMkqKThvR9Zs=
+=y1gB
+-----END PGP SIGNATURE-----
+
+--pe+tqlI1iYzVj1X/--
