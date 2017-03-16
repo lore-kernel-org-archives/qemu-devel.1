@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1coOtT-00067n-Vg
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 02:28:22 -0400
+	(envelope-from <armbru@redhat.com>) id 1coOtV-000684-FL
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 02:28:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1coOtQ-00075e-GK
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 02:28:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38284)
+	(envelope-from <armbru@redhat.com>) id 1coOtQ-00076p-PF
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 02:28:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35100)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1coOtQ-00071z-4N
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1coOtQ-00073G-J1
 	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 02:28:12 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2D84380F97
+	by mx1.redhat.com (Postfix) with ESMTPS id 8260A8124A
 	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 06:28:12 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-26.ams2.redhat.com
 	[10.36.116.26])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id EA7891754C
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 06:28:11 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4E5E953CC1
+	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 06:28:12 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 16 Mar 2017 07:27:41 +0100
-Message-Id: <1489645685-4750-26-git-send-email-armbru@redhat.com>
+Date: Thu, 16 Mar 2017 07:27:46 +0100
+Message-Id: <1489645685-4750-31-git-send-email-armbru@redhat.com>
 In-Reply-To: <1489645685-4750-1-git-send-email-armbru@redhat.com>
 References: <1489645685-4750-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL for 2.9 25/49] qapi2texi: Don't hide
- undocumented members and arguments
+Subject: [Qemu-devel] [PULL for 2.9 30/49] qapi2texi: Generate descriptions
+ for simple union tags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,68 +36,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Show undocumented object, alternate type members and command, event
-arguments exactly like undocumented enumeration type values.
+Simple union tags carry no type information, because their type is
+implicit.  Their description should make up for it, but many have
+none.  Generate one automatically then.
 
 Example change (qemu-qmp-ref.txt):
 
-  -- Command: query-rocker
+  -- Simple Union: ImageInfoSpecific
 
-      Return rocker switch information.
+      A discriminated record of image format specific information
+      structures.
 
-+     Arguments:
-+     'name'
-+          Not documented
-+
-      Returns: 'Rocker' information
+      Members:
+      'type'
+-          Not documented
++          One of "qcow2", "vmdk", "luks"
+      'data: ImageInfoSpecificQCow2' when 'type' is "qcow2"
+      'data: ImageInfoSpecificVmdk' when 'type' is "vmdk"
+      'data: QCryptoBlockInfoLUKS' when 'type' is "luks"
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <1489582656-31133-24-git-send-email-armbru@redhat.com>
+Message-Id: <1489582656-31133-29-git-send-email-armbru@redhat.com>
 ---
- scripts/qapi2texi.py | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+ scripts/qapi2texi.py | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-index 1f01817..df87441 100755
+index ab6b6cd..282adf4 100755
 --- a/scripts/qapi2texi.py
 +++ b/scripts/qapi2texi.py
-@@ -139,12 +139,10 @@ def texi_member(member):
-         member.name, ' (optional)' if member.optional else '')
- 
- 
--def texi_members(doc, what, member_func, show_undocumented):
-+def texi_members(doc, what, member_func):
+@@ -148,11 +148,16 @@ def texi_members(doc, what, base, variants, member_func):
      """Format the table of members"""
      items = ''
      for section in doc.args.itervalues():
--        if not section.content and not show_undocumented:
--            continue          # Undocumented TODO require doc and drop
++        # TODO Drop fallbacks when undocumented members are outlawed
          if section.content:
-             desc = str(section)
+-            desc = str(section)
++            desc = texi_format(str(section))
++        elif (variants and variants.tag_member == section.member
++              and not section.member.type.doc_type()):
++            values = section.member.type.member_names()
++            desc = 'One of ' + ', '.join(['@t{"%s"}' % v for v in values])
          else:
-@@ -172,10 +170,9 @@ def texi_sections(doc):
-     return body
- 
- 
--def texi_entity(doc, what, member_func=texi_member,
--                show_undocumented=False):
-+def texi_entity(doc, what, member_func=texi_member):
-     return (texi_body(doc)
--            + texi_members(doc, what, member_func, show_undocumented)
-+            + texi_members(doc, what, member_func)
-             + texi_sections(doc))
- 
- 
-@@ -194,8 +191,7 @@ class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisitor):
-         self.out += TYPE_FMT(type='Enum',
-                              name=doc.symbol,
-                              body=texi_entity(doc, 'Values',
--                                              member_func=texi_enum_value,
--                                              show_undocumented=True))
-+                                              member_func=texi_enum_value))
- 
-     def visit_object_type(self, name, info, base, members, variants):
-         doc = self.cur_doc
+             desc = 'Not documented'
+-        items += member_func(section.member) + texi_format(desc) + '\n'
++        items += member_func(section.member) + desc + '\n'
+     if base:
+         items += '@item The members of @code{%s}\n' % base.doc_type()
+     if variants:
 -- 
 2.7.4
