@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42718)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1coYKz-0007UX-SM
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 12:33:19 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1coYMJ-00087E-Ps
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 12:34:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1coYKw-00044L-FN
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 12:33:17 -0400
-Received: from 6.mo69.mail-out.ovh.net ([46.105.50.107]:43012)
+	(envelope-from <pbonzini@redhat.com>) id 1coYMG-0004a9-J6
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 12:34:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55268)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1coYKw-00041v-8W
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 12:33:14 -0400
-Received: from player738.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id D3C2C1DC2C
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 17:33:11 +0100 (CET)
-From: Greg Kurz <groug@kaod.org>
-Date: Thu, 16 Mar 2017 17:33:05 +0100
-Message-ID: <148968198512.5555.1880820193606077571.stgit@bahia>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1coYMG-0004a1-Ck
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 12:34:36 -0400
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6C914437F4C
+	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 16:34:36 +0000 (UTC)
+References: <20170316161535.22157-1-pbonzini@redhat.com>
+	<20170316161946.GA15193@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <82215544-b63e-65f8-dfe5-337b6ceef253@redhat.com>
+Date: Thu, 16 Mar 2017 17:34:30 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] 9pfs: don't try to flush self and avoid QEMU
- hang on reset
+In-Reply-To: <20170316161946.GA15193@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] qemu-ga: obey LISTEN_PID when using
+ systemd socket activation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +34,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, qemu-stable@nongnu.org, Greg Kurz <groug@kaod.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, "Richard W.M. Jones" <rjones@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-According to the 9P spec [*], when a client wants to cancel a pending I/O
-request identified by a given tag (uint16), it must send a Tflush message
-and wait for the server to respond with a Rflush message before reusing this
-tag for another I/O. The server may still send a completion message for the
-I/O if it wasn't actually cancelled but the Rflush message must arrive after
-that.
 
-QEMU hence waits for the flushed PDU to complete before sending the Rflush
-message back to the client.
 
-If a client sends 'Tflush tag oldtag' and tag == oldtag, QEMU will then
-allocate a PDU identified by tag, find it in the PDU list and wait for
-this same PDU to complete... i.e. wait for a completion that will never
-happen. This causes a tag and ring slot leak in the guest, and a PDU
-leak in QEMU, all of them limited by the maximal number of PDUs (128).
-But, worse, this causes QEMU to hang on device reset since v9fs_reset()
-wants to drain all pending I/O.
+On 16/03/2017 17:19, Daniel P. Berrange wrote:
+> On Thu, Mar 16, 2017 at 05:15:35PM +0100, Paolo Bonzini wrote:
+>> qemu-ga's socket activation support was not obeying the LISTEN_PID
+>> environment variable, which avoids that a process uses a socket-activa=
+tion
+>> file descriptor meant for its parent.
+>>
+>> Mess can for example ensue if a process forks a children before consum=
+ing
+>> the socket-activation file descriptor and therefore setting O_CLOEXEC
+>> on it.
+>>
+>> Luckily, qemu-nbd also got socket activation code, and its copy does
+>> support LISTEN_PID.  Some extra fixups are needed to ensure that the
+>> code can be used for both, but that's what this patch does.  The
+>> main change is to replace get_listen_fds's "consume" argument with
+>> the FIRST_SOCKET_ACTIVATION_FD macro from the qemu-nbd code.
+>>
+>> Cc: "Richard W.M. Jones" <rjones@redhat.com>
+>> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>>  include/qemu/systemd.h |  26 +++++++++++++
+>>  qemu-nbd.c             | 100 ++++------------------------------------=
+---------
+>>  qga/main.c             |  51 +++++++------------------
+>>  util/Makefile.objs     |   1 +
+>>  util/systemd.c         |  77 +++++++++++++++++++++++++++++++++++++
+>=20
+> A MAINTAINERS file entry for these new files ?
 
-This insane behavior is likely to denote a bug in the client, and it would
-deserve an Rerror message to be sent back. Unfortunately, the protocol
-allows it and requires all flush requests to suceed (only a Tflush response
-is expected).
+No idea of who would be a candidate.
 
-The only option is to detect when we have to handle a self-referencing
-flush request and report success to the client right away.
+Thanks for the fast review!
 
-[*] http://man.cat-v.org/plan_9/5/flush
+Paolo
 
-Reported-by: Al Viro <viro@ZenIV.linux.org.uk>
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/9pfs/9p.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index 76c9247c777d..e20417fbb0db 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -2369,7 +2369,7 @@ static void coroutine_fn v9fs_flush(void *opaque)
-             break;
-         }
-     }
--    if (cancel_pdu) {
-+    if (cancel_pdu && cancel_pdu != pdu) {
-         cancel_pdu->cancelled = 1;
-         /*
-          * Wait for pdu to complete.
+>>  5 files changed, 125 insertions(+), 130 deletions(-)
+>>  create mode 100644 include/qemu/systemd.h
+>>  create mode 100644 util/systemd.c
+>=20
+> Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+>=20
+>=20
+> Regards,
+> Daniel
+>=20
