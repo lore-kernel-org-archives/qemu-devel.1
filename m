@@ -1,21 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1coIyM-0004XJ-EJ
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 20:08:55 -0400
+	(envelope-from <jsnow@redhat.com>) id 1coJYS-0002zS-Pi
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 20:46:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1coIyL-0000AS-Gh
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 20:08:54 -0400
-References: <20170314111157.14464-1-pbonzini@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <e0d2aab2-d29f-09a7-4028-51c6df9f8978@redhat.com>
-Date: Thu, 16 Mar 2017 01:08:44 +0100
-MIME-Version: 1.0
-In-Reply-To: <20170314111157.14464-1-pbonzini@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="FCR7CnQrx5IWVqfxx2JAFOxltxFMtK52J"
-Subject: Re: [Qemu-devel] [PATCH] nbd-client: fix handling of hungup
- connections
+	(envelope-from <jsnow@redhat.com>) id 1coJYR-0004Vv-Np
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 20:46:12 -0400
+From: John Snow <jsnow@redhat.com>
+Date: Wed, 15 Mar 2017 20:46:02 -0400
+Message-Id: <20170316004603.20609-3-jsnow@redhat.com>
+In-Reply-To: <20170316004603.20609-1-jsnow@redhat.com>
+References: <20170316004603.20609-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [RFC patch 2/3] block-backend: add drained_begin /
+ drained_end ops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,146 +20,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---FCR7CnQrx5IWVqfxx2JAFOxltxFMtK52J
-From: Max Reitz <mreitz@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org
-Message-ID: <e0d2aab2-d29f-09a7-4028-51c6df9f8978@redhat.com>
-Subject: Re: [PATCH] nbd-client: fix handling of hungup connections
-References: <20170314111157.14464-1-pbonzini@redhat.com>
-In-Reply-To: <20170314111157.14464-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: John Snow <jsnow@redhat.com>
 
-On 14.03.2017 12:11, Paolo Bonzini wrote:
-> After the switch to reading replies in a coroutine, nothing is
-> reentering pending receive coroutines if the connection hangs.
-> Move nbd_recv_coroutines_enter_all to the reply read coroutine,
-> which is the place where hangups are detected.  nbd_teardown_connection=
+---
 
-> can simply wait for the reply read coroutine to detect the hangup
-> and clean up after itself.
->=20
-> This wouldn't be enough though because nbd_receive_reply returns 0
-> (rather than -EPIPE or similar) when reading from a hung connection.
-> Fix the return value check in nbd_read_reply_entry.
->=20
-> This fixes qemu-iotests 083.
->=20
-> Reported-by: Max Reitz <mreitz@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  block/nbd-client.c | 12 ++++++------
->  nbd/client.c       |  2 +-
->  2 files changed, 7 insertions(+), 7 deletions(-)
->=20
-> diff --git a/block/nbd-client.c b/block/nbd-client.c
-> index 0dc12c2..1e2952f 100644
-> --- a/block/nbd-client.c
-> +++ b/block/nbd-client.c
-> @@ -33,17 +33,15 @@
->  #define HANDLE_TO_INDEX(bs, handle) ((handle) ^ ((uint64_t)(intptr_t)b=
-s))
->  #define INDEX_TO_HANDLE(bs, index)  ((index)  ^ ((uint64_t)(intptr_t)b=
-s))
-> =20
-> -static void nbd_recv_coroutines_enter_all(BlockDriverState *bs)
-> +static void nbd_recv_coroutines_enter_all(NBDClientSession *s)
->  {
-> -    NBDClientSession *s =3D nbd_get_client_session(bs);
->      int i;
-> =20
->      for (i =3D 0; i < MAX_NBD_REQUESTS; i++) {
->          if (s->recv_coroutine[i]) {
-> -            qemu_coroutine_enter(s->recv_coroutine[i]);
-> +            aio_co_wake(s->recv_coroutine[i]);
->          }
->      }
-> -    BDRV_POLL_WHILE(bs, s->read_reply_co);
->  }
-> =20
->  static void nbd_teardown_connection(BlockDriverState *bs)
-> @@ -58,7 +56,7 @@ static void nbd_teardown_connection(BlockDriverState =
-*bs)
->      qio_channel_shutdown(client->ioc,
->                           QIO_CHANNEL_SHUTDOWN_BOTH,
->                           NULL);
-> -    nbd_recv_coroutines_enter_all(bs);
-> +    BDRV_POLL_WHILE(bs, client->read_reply_co);
-> =20
->      nbd_client_detach_aio_context(bs);
->      object_unref(OBJECT(client->sioc));
-> @@ -76,7 +74,7 @@ static coroutine_fn void nbd_read_reply_entry(void *o=
-paque)
->      for (;;) {
->          assert(s->reply.handle =3D=3D 0);
->          ret =3D nbd_receive_reply(s->ioc, &s->reply);
-> -        if (ret < 0) {
-> +        if (ret <=3D 0) {
->              break;
->          }
-> =20
-> @@ -103,6 +101,8 @@ static coroutine_fn void nbd_read_reply_entry(void =
-*opaque)
->          aio_co_wake(s->recv_coroutine[i]);
->          qemu_coroutine_yield();
->      }
-> +
-> +    nbd_recv_coroutines_enter_all(s);
->      s->read_reply_co =3D NULL;
->  }
-> =20
-> diff --git a/nbd/client.c b/nbd/client.c
-> index 5c9dee3..746e9a7 100644
-> --- a/nbd/client.c
-> +++ b/nbd/client.c
-> @@ -812,6 +812,6 @@ ssize_t nbd_receive_reply(QIOChannel *ioc, NBDReply=
- *reply)
->          LOG("invalid magic (got 0x%" PRIx32 ")", magic);
->          return -EINVAL;
->      }
-> -    return 0;
-> +    return sizeof(buf);
+RFC questions:
 
-I'd (weakly) prefer for this function to instead return an error value
-(e.g. -EPIPE as the commit message says) if read_sync() returned 0. This
-is because a return value of 0 is often used to signify success and it's
-always a bit weird if functions to not adhere to this convention. Just a
-rather weak preference, though.
+- Does the presence of blk->quiesce_counter relieve the burden of needing
+  blk->public.io_limits_disabled? I could probably eliminate this counter
+  entirely and just spy on the root node's quiescent state at key moments
+  instead. I am confident I'm traipsing on delicate drain semantics.
 
-So:
+- Should I treat the separation of a quisced BDS/BB as a drained_end request
+  as an analogue to how blk_insert_bs (in this patch) handles this?
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ block/block-backend.c          | 25 +++++++++++++++++++++++++
+ include/sysemu/block-backend.h |  8 ++++++++
+ 2 files changed, 33 insertions(+)
 
-And generously leaving it to you (whether) to apply the patch. O:-)
-
-Max
-
->  }
-> =20
->=20
-
-
-
---FCR7CnQrx5IWVqfxx2JAFOxltxFMtK52J
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljJ14wSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AxhkIAIpJItvfS5ktmY2yTolv8oysO9AB4A2C
-iB38Mzhx4HPObj6e5+yZjupne1Z3jHHAmkHT2vqOCmYAbhSK5VWa7peL5/qSkVz7
-aqhsOrom1FRX0aR+gwxZlLBPeiINYctL+ssuMj1s173bkaAV/VrpseBnLzvJPIAn
-VF5dkrN8ewYOpYUAVWtD12VmFkm/Dn8laQ3+aFDlwUdXliyQK6Hu7V9LJ2BtzCNi
-btiN/7fv7+WhXGT32L77Y/3ZOcQBNDSjTQjWyrdeKJcCzvrL4ODiVx1ZHugn2CBQ
-4WBtHENvswJfoXPswFjH4aqk6JUftpC9/HPJNdJeNNBExGSm4a4ttnA=
-=hkkv
------END PGP SIGNATURE-----
-
---FCR7CnQrx5IWVqfxx2JAFOxltxFMtK52J--
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 5742c09..eb85e8b 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -65,6 +65,8 @@ struct BlockBackend {
+     bool allow_write_beyond_eof;
+ 
+     NotifierList remove_bs_notifiers, insert_bs_notifiers;
++
++    int quiesce_counter;
+ };
+ 
+ typedef struct BlockBackendAIOCB {
+@@ -559,6 +561,11 @@ int blk_insert_bs(BlockBackend *blk, BlockDriverState *bs, Error **errp)
+     }
+     bdrv_ref(bs);
+ 
++    /* The new BDS may be quiescent, we should attempt to match */
++    if (bs->quiesce_counter) {
++        blk_root_drained_begin(blk->root);
++    }
++
+     notifier_list_notify(&blk->insert_bs_notifiers, blk);
+     if (blk->public.throttle_state) {
+         throttle_timers_attach_aio_context(
+@@ -705,6 +712,11 @@ void blk_set_dev_ops(BlockBackend *blk, const BlockDevOps *ops,
+ 
+     blk->dev_ops = ops;
+     blk->dev_opaque = opaque;
++
++    /* Are we currently quiesced? Should we enforce this right now? */
++    if (blk->quiesce_counter && ops->drained_begin) {
++        ops->drained_begin(opaque);
++    }
+ }
+ 
+ /*
+@@ -1870,9 +1882,15 @@ static void blk_root_drained_begin(BdrvChild *child)
+ {
+     BlockBackend *blk = child->opaque;
+ 
++    blk->quiesce_counter++;
++
+     /* Note that blk->root may not be accessible here yet if we are just
+      * attaching to a BlockDriverState that is drained. Use child instead. */
+ 
++    if (blk->dev_ops && blk->dev_ops->drained_begin) {
++        blk->dev_ops->drained_begin(blk->dev_opaque);
++    }
++
+     if (blk->public.io_limits_disabled++ == 0) {
+         throttle_group_restart_blk(blk);
+     }
+@@ -1882,6 +1900,13 @@ static void blk_root_drained_end(BdrvChild *child)
+ {
+     BlockBackend *blk = child->opaque;
+ 
++    assert(blk->quiesce_counter);
++    blk->quiesce_counter--;
++
+     assert(blk->public.io_limits_disabled);
+     --blk->public.io_limits_disabled;
++
++    if (blk->dev_ops && blk->dev_ops->drained_end) {
++        blk->dev_ops->drained_end(blk->dev_opaque);
++    }
+ }
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
+index 096c17f..c6f4408 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -58,6 +58,14 @@ typedef struct BlockDevOps {
+      * Runs when the size changed (e.g. monitor command block_resize)
+      */
+     void (*resize_cb)(void *opaque);
++    /*
++     * Runs when the backend receives a drain request.
++     */
++    void (*drained_begin)(void *opaque);
++    /*
++     * Runs when the backend's drain request ends.
++     */
++    void (*drained_end)(void *opaque);
+ } BlockDevOps;
+ 
+ /* This struct is embedded in (the private) BlockBackend struct and contains
+-- 
+2.9.3
