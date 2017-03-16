@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1coRkM-0004CO-Gx
+	(envelope-from <kraxel@redhat.com>) id 1coRkM-0004CP-H0
 	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:31:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1coRkI-0003kp-3K
+	(envelope-from <kraxel@redhat.com>) id 1coRkI-0003ki-2E
 	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:31:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40792)
+Received: from mx1.redhat.com ([209.132.183.28]:55440)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1coRkH-0003jm-KE
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1coRkH-0003jk-IN
 	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:30:57 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A78507F0A3
+	by mx1.redhat.com (Postfix) with ESMTPS id 986499D4F2
 	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 09:30:57 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 16 Mar 2017 10:30:42 +0100
-Message-Id: <1489656642-12925-8-git-send-email-kraxel@redhat.com>
+Date: Thu, 16 Mar 2017 10:30:37 +0100
+Message-Id: <1489656642-12925-3-git-send-email-kraxel@redhat.com>
 In-Reply-To: <1489656642-12925-1-git-send-email-kraxel@redhat.com>
 References: <1489656642-12925-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL for-2.9 7/7] cirrus: stop passing around src
- pointers in the blitter
+Subject: [Qemu-devel] [PULL for-2.9 2/7] cirrus/vnc: zap bitblit support
+ from console code.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,441 +33,269 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Does basically the same as "cirrus: stop passing around dst pointers in
-the blitter", just for the src pointer instead of the dst pointer.
+There is a special code path (dpy_gfx_copy) to allow graphic emulation
+notify user interface code about bitblit operations carryed out by
+guests.  It is supported by cirrus and vnc server.  The intended purpose
+is to optimize display scrolls and just send over the scroll op instead
+of a full display update.
 
-For the src we have to care about cputovideo blits though and fetch the
-data from s->cirrus_bltbuf instead of vga memory.  The cirrus_src*()
-helper functions handle that.
+This is rarely used these days though because modern guests simply don't
+use the cirrus blitter any more.  Any linux guest using the cirrus drm
+driver doesn't.  Any windows guest newer than winxp doesn't ship with a
+cirrus driver any more and thus uses the cirrus as simple framebuffer.
 
+So this code tends to bitrot and bugs can go unnoticed for a long time.
+See for example commit "3e10c3e vnc: fix qemu crash because of SIGSEGV"
+which fixes a bug lingering in the code for almost a year, added by
+commit "c7628bf vnc: only alloc server surface with clients connected".
+
+Also the vnc server will throttle the frame rate in case it figures the
+network can't keep up (send buffers are full).  This doesn't work with
+dpy_gfx_copy, for any copy operation sent to the vnc client we have to
+send all outstanding updates beforehand, otherwise the vnc client might
+run the client side blit on outdated data and thereby corrupt the
+display.  So this dpy_gfx_copy "optimization" might even make things
+worse on slow network links.
+
+Lets kill it once for all.
+
+Oh, and one more reason: Turns out (after writing the patch) we have a
+security bug in that code path ...
+
+Fixes: CVE-2016-9603
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 1489584487-3489-1-git-send-email-kraxel@redhat.com
+Message-id: 1489494419-14340-1-git-send-email-kraxel@redhat.com
 ---
- hw/display/cirrus_vga.c      | 61 +++++++++++++++++++++++++++++++++++---------
- hw/display/cirrus_vga_rop.h  | 48 +++++++++++++++++-----------------
- hw/display/cirrus_vga_rop2.h | 38 ++++++++++++++-------------
- 3 files changed, 93 insertions(+), 54 deletions(-)
+ hw/display/cirrus_vga.c |  12 ++----
+ include/ui/console.h    |   7 ----
+ ui/console.c            |  28 --------------
+ ui/vnc.c                | 100 ------------------------------------------------
+ 4 files changed, 3 insertions(+), 144 deletions(-)
 
 diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
-index 9ae1d4b..afc290a 100644
+index b9e7cb1..c90a4a3 100644
 --- a/hw/display/cirrus_vga.c
 +++ b/hw/display/cirrus_vga.c
-@@ -178,7 +178,7 @@
- 
- struct CirrusVGAState;
- typedef void (*cirrus_bitblt_rop_t) (struct CirrusVGAState *s,
--                                     uint32_t dstaddr, const uint8_t *src,
-+                                     uint32_t dstaddr, uint32_t srcaddr,
- 				     int dstpitch, int srcpitch,
- 				     int bltwidth, int bltheight);
- typedef void (*cirrus_fill_t)(struct CirrusVGAState *s,
-@@ -322,7 +322,7 @@ static bool blit_is_unsafe(struct CirrusVGAState *s, bool dst_only)
- }
- 
- static void cirrus_bitblt_rop_nop(CirrusVGAState *s,
--                                  uint32_t dstaddr, const uint8_t *src,
-+                                  uint32_t dstaddr, uint32_t srcaddr,
-                                   int dstpitch,int srcpitch,
-                                   int bltwidth,int bltheight)
- {
-@@ -334,6 +334,45 @@ static void cirrus_bitblt_fill_nop(CirrusVGAState *s,
- {
- }
- 
-+static inline uint8_t cirrus_src(CirrusVGAState *s, uint32_t srcaddr)
-+{
-+    if (s->cirrus_srccounter) {
-+        /* cputovideo */
-+        return s->cirrus_bltbuf[srcaddr & (CIRRUS_BLTBUFSIZE - 1)];
-+    } else {
-+        /* videotovideo */
-+        return s->vga.vram_ptr[srcaddr & s->cirrus_addr_mask];
-+    }
-+}
-+
-+static inline uint16_t cirrus_src16(CirrusVGAState *s, uint32_t srcaddr)
-+{
-+    uint16_t *src;
-+
-+    if (s->cirrus_srccounter) {
-+        /* cputovideo */
-+        src = (void *)&s->cirrus_bltbuf[srcaddr & (CIRRUS_BLTBUFSIZE - 1) & ~1];
-+    } else {
-+        /* videotovideo */
-+        src = (void *)&s->vga.vram_ptr[srcaddr & s->cirrus_addr_mask & ~1];
-+    }
-+    return *src;
-+}
-+
-+static inline uint32_t cirrus_src32(CirrusVGAState *s, uint32_t srcaddr)
-+{
-+    uint32_t *src;
-+
-+    if (s->cirrus_srccounter) {
-+        /* cputovideo */
-+        src = (void *)&s->cirrus_bltbuf[srcaddr & (CIRRUS_BLTBUFSIZE - 1) & ~3];
-+    } else {
-+        /* videotovideo */
-+        src = (void *)&s->vga.vram_ptr[srcaddr & s->cirrus_addr_mask & ~3];
-+    }
-+    return *src;
-+}
-+
- #define ROP_NAME 0
- #define ROP_FN(d, s) 0
- #include "cirrus_vga_rop.h"
-@@ -676,10 +715,10 @@ static void cirrus_invalidate_region(CirrusVGAState * s, int off_begin,
-     }
- }
- 
--static int cirrus_bitblt_common_patterncopy(CirrusVGAState *s, bool videosrc)
-+static int cirrus_bitblt_common_patterncopy(CirrusVGAState *s)
- {
-     uint32_t patternsize;
--    uint8_t *src;
-+    bool videosrc = !s->cirrus_srccounter;
- 
-     if (videosrc) {
-         switch (s->vga.get_bpp(&s->vga)) {
-@@ -700,16 +739,14 @@ static int cirrus_bitblt_common_patterncopy(CirrusVGAState *s, bool videosrc)
-         if (s->cirrus_blt_srcaddr + patternsize > s->vga.vram_size) {
-             return 0;
+@@ -796,21 +796,15 @@ static int cirrus_do_copy(CirrusVGAState *s, int dst, int src, int w, int h)
          }
--        src = s->vga.vram_ptr + s->cirrus_blt_srcaddr;
--    } else {
--        src = s->cirrus_bltbuf;
      }
  
-     if (blit_is_unsafe(s, true)) {
-         return 0;
-     }
- 
--    (*s->cirrus_rop) (s, s->cirrus_blt_dstaddr, src,
-+    (*s->cirrus_rop) (s, s->cirrus_blt_dstaddr,
-+                      videosrc ? s->cirrus_blt_srcaddr : 0,
-                       s->cirrus_blt_dstpitch, 0,
-                       s->cirrus_blt_width, s->cirrus_blt_height);
-     cirrus_invalidate_region(s, s->cirrus_blt_dstaddr,
-@@ -746,7 +783,7 @@ static int cirrus_bitblt_solidfill(CirrusVGAState *s, int blt_rop)
- 
- static int cirrus_bitblt_videotovideo_patterncopy(CirrusVGAState * s)
- {
--    return cirrus_bitblt_common_patterncopy(s, true);
-+    return cirrus_bitblt_common_patterncopy(s);
- }
- 
- static int cirrus_do_copy(CirrusVGAState *s, int dst, int src, int w, int h)
-@@ -796,7 +833,7 @@ static int cirrus_do_copy(CirrusVGAState *s, int dst, int src, int w, int h)
-     }
- 
-     (*s->cirrus_rop) (s, s->cirrus_blt_dstaddr,
--                      s->vga.vram_ptr + s->cirrus_blt_srcaddr,
-+                      s->cirrus_blt_srcaddr,
+-    /* we have to flush all pending changes so that the copy
+-       is generated at the appropriate moment in time */
+-    if (notify)
+-        graphic_hw_update(s->vga.con);
+-
+     (*s->cirrus_rop) (s, s->vga.vram_ptr + s->cirrus_blt_dstaddr,
+                       s->vga.vram_ptr + s->cirrus_blt_srcaddr,
  		      s->cirrus_blt_dstpitch, s->cirrus_blt_srcpitch,
  		      s->cirrus_blt_width, s->cirrus_blt_height);
  
-@@ -839,7 +876,7 @@ static void cirrus_bitblt_cputovideo_next(CirrusVGAState * s)
+     if (notify) {
+-        qemu_console_copy(s->vga.con,
+-			  sx, sy, dx, dy,
+-			  s->cirrus_blt_width / depth,
+-			  s->cirrus_blt_height);
++        dpy_gfx_update(s->vga.con, dx, dy,
++                       s->cirrus_blt_width / depth,
++                       s->cirrus_blt_height);
+     }
  
-     if (s->cirrus_srccounter > 0) {
-         if (s->cirrus_blt_mode & CIRRUS_BLTMODE_PATTERNCOPY) {
--            cirrus_bitblt_common_patterncopy(s, false);
-+            cirrus_bitblt_common_patterncopy(s);
-         the_end:
-             s->cirrus_srccounter = 0;
-             cirrus_bitblt_reset(s);
-@@ -847,7 +884,7 @@ static void cirrus_bitblt_cputovideo_next(CirrusVGAState * s)
-             /* at least one scan line */
-             do {
-                 (*s->cirrus_rop)(s, s->cirrus_blt_dstaddr,
--                                  s->cirrus_bltbuf, 0, 0, s->cirrus_blt_width, 1);
-+                                 0, 0, 0, s->cirrus_blt_width, 1);
-                 cirrus_invalidate_region(s, s->cirrus_blt_dstaddr, 0,
-                                          s->cirrus_blt_width, 1);
-                 s->cirrus_blt_dstaddr += s->cirrus_blt_dstpitch;
-diff --git a/hw/display/cirrus_vga_rop.h b/hw/display/cirrus_vga_rop.h
-index 1aa778d..c61a677 100644
---- a/hw/display/cirrus_vga_rop.h
-+++ b/hw/display/cirrus_vga_rop.h
-@@ -78,7 +78,7 @@ static inline void glue(rop_32_, ROP_NAME)(CirrusVGAState *s,
- static void
- glue(cirrus_bitblt_rop_fwd_, ROP_NAME)(CirrusVGAState *s,
-                                        uint32_t dstaddr,
--                                       const uint8_t *src,
-+                                       uint32_t srcaddr,
-                                        int dstpitch, int srcpitch,
-                                        int bltwidth, int bltheight)
- {
-@@ -92,19 +92,19 @@ glue(cirrus_bitblt_rop_fwd_, ROP_NAME)(CirrusVGAState *s,
+     /* we don't have to notify the display that this portion has
+diff --git a/include/ui/console.h b/include/ui/console.h
+index ac2895c..d759338 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -189,9 +189,6 @@ typedef struct DisplayChangeListenerOps {
+                            int x, int y, int w, int h);
+     void (*dpy_gfx_switch)(DisplayChangeListener *dcl,
+                            struct DisplaySurface *new_surface);
+-    void (*dpy_gfx_copy)(DisplayChangeListener *dcl,
+-                         int src_x, int src_y,
+-                         int dst_x, int dst_y, int w, int h);
+     bool (*dpy_gfx_check_format)(DisplayChangeListener *dcl,
+                                  pixman_format_code_t format);
  
-     for (y = 0; y < bltheight; y++) {
-         for (x = 0; x < bltwidth; x++) {
--            ROP_OP(s, dstaddr, *src);
-+            ROP_OP(s, dstaddr, cirrus_src(s, srcaddr));
-             dstaddr++;
--            src++;
-+            srcaddr++;
-         }
-         dstaddr += dstpitch;
--        src += srcpitch;
-+        srcaddr += srcpitch;
+@@ -277,8 +274,6 @@ int dpy_set_ui_info(QemuConsole *con, QemuUIInfo *info);
+ void dpy_gfx_update(QemuConsole *con, int x, int y, int w, int h);
+ void dpy_gfx_replace_surface(QemuConsole *con,
+                              DisplaySurface *surface);
+-void dpy_gfx_copy(QemuConsole *con, int src_x, int src_y,
+-                  int dst_x, int dst_y, int w, int h);
+ void dpy_text_cursor(QemuConsole *con, int x, int y);
+ void dpy_text_update(QemuConsole *con, int x, int y, int w, int h);
+ void dpy_text_resize(QemuConsole *con, int w, int h);
+@@ -411,8 +406,6 @@ void qemu_console_set_window_id(QemuConsole *con, int window_id);
+ 
+ void console_select(unsigned int index);
+ void qemu_console_resize(QemuConsole *con, int width, int height);
+-void qemu_console_copy(QemuConsole *con, int src_x, int src_y,
+-                       int dst_x, int dst_y, int w, int h);
+ DisplaySurface *qemu_console_surface(QemuConsole *con);
+ 
+ /* console-gl.c */
+diff --git a/ui/console.c b/ui/console.c
+index d1ff750..4c70d8b 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -1586,27 +1586,6 @@ static void dpy_refresh(DisplayState *s)
      }
  }
  
- static void
- glue(cirrus_bitblt_rop_bkwd_, ROP_NAME)(CirrusVGAState *s,
-                                         uint32_t dstaddr,
--                                        const uint8_t *src,
-+                                        uint32_t srcaddr,
-                                         int dstpitch, int srcpitch,
-                                         int bltwidth, int bltheight)
+-void dpy_gfx_copy(QemuConsole *con, int src_x, int src_y,
+-                  int dst_x, int dst_y, int w, int h)
+-{
+-    DisplayState *s = con->ds;
+-    DisplayChangeListener *dcl;
+-
+-    if (!qemu_console_is_visible(con)) {
+-        return;
+-    }
+-    QLIST_FOREACH(dcl, &s->listeners, next) {
+-        if (con != (dcl->con ? dcl->con : active_console)) {
+-            continue;
+-        }
+-        if (dcl->ops->dpy_gfx_copy) {
+-            dcl->ops->dpy_gfx_copy(dcl, src_x, src_y, dst_x, dst_y, w, h);
+-        } else { /* TODO */
+-            dcl->ops->dpy_gfx_update(dcl, dst_x, dst_y, w, h);
+-        }
+-    }
+-}
+-
+ void dpy_text_cursor(QemuConsole *con, int x, int y)
  {
-@@ -113,19 +113,19 @@ glue(cirrus_bitblt_rop_bkwd_, ROP_NAME)(CirrusVGAState *s,
-     srcpitch += bltwidth;
-     for (y = 0; y < bltheight; y++) {
-         for (x = 0; x < bltwidth; x++) {
--            ROP_OP(s, dstaddr, *src);
-+            ROP_OP(s, dstaddr, cirrus_src(s, srcaddr));
-             dstaddr--;
--            src--;
-+            srcaddr--;
-         }
-         dstaddr += dstpitch;
--        src += srcpitch;
-+        srcaddr += srcpitch;
-     }
+     DisplayState *s = con->ds;
+@@ -2138,13 +2117,6 @@ void qemu_console_resize(QemuConsole *s, int width, int height)
+     dpy_gfx_replace_surface(s, surface);
  }
  
- static void
- glue(glue(cirrus_bitblt_rop_fwd_transp_, ROP_NAME),_8)(CirrusVGAState *s,
-                                                        uint32_t dstaddr,
--                                                       const uint8_t *src,
-+                                                       uint32_t srcaddr,
-                                                        int dstpitch,
-                                                        int srcpitch,
-                                                        int bltwidth,
-@@ -142,19 +142,19 @@ glue(glue(cirrus_bitblt_rop_fwd_transp_, ROP_NAME),_8)(CirrusVGAState *s,
- 
-     for (y = 0; y < bltheight; y++) {
-         for (x = 0; x < bltwidth; x++) {
--            ROP_OP_TR(s, dstaddr, *src, transp);
-+            ROP_OP_TR(s, dstaddr, cirrus_src(s, srcaddr), transp);
-             dstaddr++;
--            src++;
-+            srcaddr++;
-         }
-         dstaddr += dstpitch;
--        src += srcpitch;
-+        srcaddr += srcpitch;
-     }
+-void qemu_console_copy(QemuConsole *con, int src_x, int src_y,
+-                       int dst_x, int dst_y, int w, int h)
+-{
+-    assert(con->console_type == GRAPHIC_CONSOLE);
+-    dpy_gfx_copy(con, src_x, src_y, dst_x, dst_y, w, h);
+-}
+-
+ DisplaySurface *qemu_console_surface(QemuConsole *console)
+ {
+     return console->surface;
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 51f4b30..8bfb1e0 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -894,105 +894,6 @@ int vnc_send_framebuffer_update(VncState *vs, int x, int y, int w, int h)
+     return n;
  }
  
- static void
- glue(glue(cirrus_bitblt_rop_bkwd_transp_, ROP_NAME),_8)(CirrusVGAState *s,
-                                                         uint32_t dstaddr,
--                                                        const uint8_t *src,
-+                                                        uint32_t srcaddr,
-                                                         int dstpitch,
-                                                         int srcpitch,
-                                                         int bltwidth,
-@@ -166,19 +166,19 @@ glue(glue(cirrus_bitblt_rop_bkwd_transp_, ROP_NAME),_8)(CirrusVGAState *s,
-     srcpitch += bltwidth;
-     for (y = 0; y < bltheight; y++) {
-         for (x = 0; x < bltwidth; x++) {
--            ROP_OP_TR(s, dstaddr, *src, transp);
-+            ROP_OP_TR(s, dstaddr, cirrus_src(s, srcaddr), transp);
-             dstaddr--;
--            src--;
-+            srcaddr--;
-         }
-         dstaddr += dstpitch;
--        src += srcpitch;
-+        srcaddr += srcpitch;
-     }
- }
- 
- static void
- glue(glue(cirrus_bitblt_rop_fwd_transp_, ROP_NAME),_16)(CirrusVGAState *s,
-                                                         uint32_t dstaddr,
--                                                        const uint8_t *src,
-+                                                        uint32_t srcaddr,
-                                                         int dstpitch,
-                                                         int srcpitch,
-                                                         int bltwidth,
-@@ -195,19 +195,19 @@ glue(glue(cirrus_bitblt_rop_fwd_transp_, ROP_NAME),_16)(CirrusVGAState *s,
- 
-     for (y = 0; y < bltheight; y++) {
-         for (x = 0; x < bltwidth; x+=2) {
--            ROP_OP_TR_16(s, dstaddr, *(uint16_t *)src, transp);
-+            ROP_OP_TR_16(s, dstaddr, cirrus_src16(s, srcaddr), transp);
-             dstaddr += 2;
--            src += 2;
-+            srcaddr += 2;
-         }
-         dstaddr += dstpitch;
--        src += srcpitch;
-+        srcaddr += srcpitch;
-     }
- }
- 
- static void
- glue(glue(cirrus_bitblt_rop_bkwd_transp_, ROP_NAME),_16)(CirrusVGAState *s,
-                                                          uint32_t dstaddr,
--                                                         const uint8_t *src,
-+                                                         uint32_t srcaddr,
-                                                          int dstpitch,
-                                                          int srcpitch,
-                                                          int bltwidth,
-@@ -219,12 +219,12 @@ glue(glue(cirrus_bitblt_rop_bkwd_transp_, ROP_NAME),_16)(CirrusVGAState *s,
-     srcpitch += bltwidth;
-     for (y = 0; y < bltheight; y++) {
-         for (x = 0; x < bltwidth; x+=2) {
--            ROP_OP_TR_16(s, dstaddr, *(uint16_t *)src, transp);
-+            ROP_OP_TR_16(s, dstaddr, cirrus_src16(s, srcaddr), transp);
-             dstaddr -= 2;
--            src -= 2;
-+            srcaddr -= 2;
-         }
-         dstaddr += dstpitch;
--        src += srcpitch;
-+        srcaddr += srcpitch;
-     }
- }
- 
-diff --git a/hw/display/cirrus_vga_rop2.h b/hw/display/cirrus_vga_rop2.h
-index bc92f0e..b86bcd6 100644
---- a/hw/display/cirrus_vga_rop2.h
-+++ b/hw/display/cirrus_vga_rop2.h
-@@ -41,14 +41,14 @@
- static void
- glue(glue(glue(cirrus_patternfill_, ROP_NAME), _),DEPTH)
-      (CirrusVGAState *s, uint32_t dstaddr,
--      const uint8_t *src,
-+      uint32_t srcaddr,
-       int dstpitch, int srcpitch,
-       int bltwidth, int bltheight)
+-static void vnc_copy(VncState *vs, int src_x, int src_y, int dst_x, int dst_y, int w, int h)
+-{
+-    /* send bitblit op to the vnc client */
+-    vnc_lock_output(vs);
+-    vnc_write_u8(vs, VNC_MSG_SERVER_FRAMEBUFFER_UPDATE);
+-    vnc_write_u8(vs, 0);
+-    vnc_write_u16(vs, 1); /* number of rects */
+-    vnc_framebuffer_update(vs, dst_x, dst_y, w, h, VNC_ENCODING_COPYRECT);
+-    vnc_write_u16(vs, src_x);
+-    vnc_write_u16(vs, src_y);
+-    vnc_unlock_output(vs);
+-    vnc_flush(vs);
+-}
+-
+-static void vnc_dpy_copy(DisplayChangeListener *dcl,
+-                         int src_x, int src_y,
+-                         int dst_x, int dst_y, int w, int h)
+-{
+-    VncDisplay *vd = container_of(dcl, VncDisplay, dcl);
+-    VncState *vs, *vn;
+-    uint8_t *src_row;
+-    uint8_t *dst_row;
+-    int i, x, y, pitch, inc, w_lim, s;
+-    int cmp_bytes;
+-
+-    if (!vd->server) {
+-        /* no client connected */
+-        return;
+-    }
+-
+-    vnc_refresh_server_surface(vd);
+-    QTAILQ_FOREACH_SAFE(vs, &vd->clients, next, vn) {
+-        if (vnc_has_feature(vs, VNC_FEATURE_COPYRECT)) {
+-            vs->force_update = 1;
+-            vnc_update_client(vs, 1, true);
+-            /* vs might be free()ed here */
+-        }
+-    }
+-
+-    if (!vd->server) {
+-        /* no client connected */
+-        return;
+-    }
+-    /* do bitblit op on the local surface too */
+-    pitch = vnc_server_fb_stride(vd);
+-    src_row = vnc_server_fb_ptr(vd, src_x, src_y);
+-    dst_row = vnc_server_fb_ptr(vd, dst_x, dst_y);
+-    y = dst_y;
+-    inc = 1;
+-    if (dst_y > src_y) {
+-        /* copy backwards */
+-        src_row += pitch * (h-1);
+-        dst_row += pitch * (h-1);
+-        pitch = -pitch;
+-        y = dst_y + h - 1;
+-        inc = -1;
+-    }
+-    w_lim = w - (VNC_DIRTY_PIXELS_PER_BIT - (dst_x % VNC_DIRTY_PIXELS_PER_BIT));
+-    if (w_lim < 0) {
+-        w_lim = w;
+-    } else {
+-        w_lim = w - (w_lim % VNC_DIRTY_PIXELS_PER_BIT);
+-    }
+-    for (i = 0; i < h; i++) {
+-        for (x = 0; x <= w_lim;
+-                x += s, src_row += cmp_bytes, dst_row += cmp_bytes) {
+-            if (x == w_lim) {
+-                if ((s = w - w_lim) == 0)
+-                    break;
+-            } else if (!x) {
+-                s = (VNC_DIRTY_PIXELS_PER_BIT -
+-                    (dst_x % VNC_DIRTY_PIXELS_PER_BIT));
+-                s = MIN(s, w_lim);
+-            } else {
+-                s = VNC_DIRTY_PIXELS_PER_BIT;
+-            }
+-            cmp_bytes = s * VNC_SERVER_FB_BYTES;
+-            if (memcmp(src_row, dst_row, cmp_bytes) == 0)
+-                continue;
+-            memmove(dst_row, src_row, cmp_bytes);
+-            QTAILQ_FOREACH(vs, &vd->clients, next) {
+-                if (!vnc_has_feature(vs, VNC_FEATURE_COPYRECT)) {
+-                    set_bit(((x + dst_x) / VNC_DIRTY_PIXELS_PER_BIT),
+-                            vs->dirty[y]);
+-                }
+-            }
+-        }
+-        src_row += pitch - w * VNC_SERVER_FB_BYTES;
+-        dst_row += pitch - w * VNC_SERVER_FB_BYTES;
+-        y += inc;
+-    }
+-
+-    QTAILQ_FOREACH(vs, &vd->clients, next) {
+-        if (vnc_has_feature(vs, VNC_FEATURE_COPYRECT)) {
+-            vnc_copy(vs, src_x, src_y, dst_x, dst_y, w, h);
+-        }
+-    }
+-}
+-
+ static void vnc_mouse_set(DisplayChangeListener *dcl,
+                           int x, int y, int visible)
  {
-     uint32_t addr;
-     int x, y, pattern_y, pattern_pitch, pattern_x;
-     unsigned int col;
--    const uint8_t *src1;
-+    uint32_t src1addr;
- #if DEPTH == 24
-     int skipleft = s->vga.gr[0x2f] & 0x1f;
- #else
-@@ -66,22 +66,24 @@ glue(glue(glue(cirrus_patternfill_, ROP_NAME), _),DEPTH)
-     for(y = 0; y < bltheight; y++) {
-         pattern_x = skipleft;
-         addr = dstaddr + skipleft;
--        src1 = src + pattern_y * pattern_pitch;
-+        src1addr = srcaddr + pattern_y * pattern_pitch;
-         for (x = skipleft; x < bltwidth; x += (DEPTH / 8)) {
- #if DEPTH == 8
--            col = src1[pattern_x];
-+            col = cirrus_src(s, src1addr + pattern_x);
-             pattern_x = (pattern_x + 1) & 7;
- #elif DEPTH == 16
--            col = ((uint16_t *)(src1 + pattern_x))[0];
-+            col = cirrus_src16(s, src1addr + pattern_x);
-             pattern_x = (pattern_x + 2) & 15;
- #elif DEPTH == 24
-             {
--                const uint8_t *src2 = src1 + pattern_x * 3;
--                col = src2[0] | (src2[1] << 8) | (src2[2] << 16);
-+                uint32_t src2addr = src1addr + pattern_x * 3;
-+                col = cirrus_src(s, src2addr) |
-+                    (cirrus_src(s, src2addr + 1) << 8) |
-+                    (cirrus_src(s, src2addr + 2) << 16);
-                 pattern_x = (pattern_x + 1) & 7;
-             }
- #else
--            col = ((uint32_t *)(src1 + pattern_x))[0];
-+            col = cirrus_src32(s, src1addr + pattern_x);
-             pattern_x = (pattern_x + 4) & 31;
- #endif
-             PUTPIXEL(s, addr, col);
-@@ -96,7 +98,7 @@ glue(glue(glue(cirrus_patternfill_, ROP_NAME), _),DEPTH)
- static void
- glue(glue(glue(cirrus_colorexpand_transp_, ROP_NAME), _),DEPTH)
-      (CirrusVGAState *s, uint32_t dstaddr,
--      const uint8_t *src,
-+      uint32_t srcaddr,
-       int dstpitch, int srcpitch,
-       int bltwidth, int bltheight)
- {
-@@ -124,12 +126,12 @@ glue(glue(glue(cirrus_colorexpand_transp_, ROP_NAME), _),DEPTH)
- 
-     for(y = 0; y < bltheight; y++) {
-         bitmask = 0x80 >> srcskipleft;
--        bits = *src++ ^ bits_xor;
-+        bits = cirrus_src(s, srcaddr++) ^ bits_xor;
-         addr = dstaddr + dstskipleft;
-         for (x = dstskipleft; x < bltwidth; x += (DEPTH / 8)) {
-             if ((bitmask & 0xff) == 0) {
-                 bitmask = 0x80;
--                bits = *src++ ^ bits_xor;
-+                bits = cirrus_src(s, srcaddr++) ^ bits_xor;
-             }
-             index = (bits & bitmask);
-             if (index) {
-@@ -145,7 +147,7 @@ glue(glue(glue(cirrus_colorexpand_transp_, ROP_NAME), _),DEPTH)
- static void
- glue(glue(glue(cirrus_colorexpand_, ROP_NAME), _),DEPTH)
-      (CirrusVGAState *s, uint32_t dstaddr,
--      const uint8_t *src,
-+      uint32_t srcaddr,
-       int dstpitch, int srcpitch,
-       int bltwidth, int bltheight)
- {
-@@ -162,12 +164,12 @@ glue(glue(glue(cirrus_colorexpand_, ROP_NAME), _),DEPTH)
-     colors[1] = s->cirrus_blt_fgcol;
-     for(y = 0; y < bltheight; y++) {
-         bitmask = 0x80 >> srcskipleft;
--        bits = *src++;
-+        bits = cirrus_src(s, srcaddr++);
-         addr = dstaddr + dstskipleft;
-         for (x = dstskipleft; x < bltwidth; x += (DEPTH / 8)) {
-             if ((bitmask & 0xff) == 0) {
-                 bitmask = 0x80;
--                bits = *src++;
-+                bits = cirrus_src(s, srcaddr++);
-             }
-             col = colors[!!(bits & bitmask)];
-             PUTPIXEL(s, addr, col);
-@@ -181,7 +183,7 @@ glue(glue(glue(cirrus_colorexpand_, ROP_NAME), _),DEPTH)
- static void
- glue(glue(glue(cirrus_colorexpand_pattern_transp_, ROP_NAME), _),DEPTH)
-      (CirrusVGAState *s, uint32_t dstaddr,
--      const uint8_t *src,
-+      uint32_t srcaddr,
-       int dstpitch, int srcpitch,
-       int bltwidth, int bltheight)
- {
-@@ -207,7 +209,7 @@ glue(glue(glue(cirrus_colorexpand_pattern_transp_, ROP_NAME), _),DEPTH)
-     pattern_y = s->cirrus_blt_srcaddr & 7;
- 
-     for(y = 0; y < bltheight; y++) {
--        bits = src[pattern_y] ^ bits_xor;
-+        bits = cirrus_src(s, srcaddr + pattern_y) ^ bits_xor;
-         bitpos = 7 - srcskipleft;
-         addr = dstaddr + dstskipleft;
-         for (x = dstskipleft; x < bltwidth; x += (DEPTH / 8)) {
-@@ -225,7 +227,7 @@ glue(glue(glue(cirrus_colorexpand_pattern_transp_, ROP_NAME), _),DEPTH)
- static void
- glue(glue(glue(cirrus_colorexpand_pattern_, ROP_NAME), _),DEPTH)
-      (CirrusVGAState *s, uint32_t dstaddr,
--      const uint8_t *src,
-+      uint32_t srcaddr,
-       int dstpitch, int srcpitch,
-       int bltwidth, int bltheight)
- {
-@@ -242,7 +244,7 @@ glue(glue(glue(cirrus_colorexpand_pattern_, ROP_NAME), _),DEPTH)
-     pattern_y = s->cirrus_blt_srcaddr & 7;
- 
-     for(y = 0; y < bltheight; y++) {
--        bits = src[pattern_y];
-+        bits = cirrus_src(s, srcaddr + pattern_y);
-         bitpos = 7 - srcskipleft;
-         addr = dstaddr + dstskipleft;
-         for (x = dstskipleft; x < bltwidth; x += (DEPTH / 8)) {
+@@ -3120,7 +3021,6 @@ static gboolean vnc_listen_io(QIOChannel *ioc,
+ static const DisplayChangeListenerOps dcl_ops = {
+     .dpy_name             = "vnc",
+     .dpy_refresh          = vnc_refresh,
+-    .dpy_gfx_copy         = vnc_dpy_copy,
+     .dpy_gfx_update       = vnc_dpy_update,
+     .dpy_gfx_switch       = vnc_dpy_switch,
+     .dpy_gfx_check_format = qemu_pixman_check_format,
 -- 
 1.8.3.1
