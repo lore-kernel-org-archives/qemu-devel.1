@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1coTSE-0000tY-AL
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 07:20:27 -0400
+	(envelope-from <iwona260909@gmail.com>) id 1coU4g-0000do-Pl
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 08:00:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1coTSB-0006PN-73
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 07:20:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55360)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1coTSB-0006PD-0b
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 07:20:23 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D91693DBEF
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 11:20:22 +0000 (UTC)
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Thu, 16 Mar 2017 11:20:16 +0000
-Message-Id: <20170316112016.26450-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH] List SASL config file under the cryptography
- maintainer's realm
+	(envelope-from <iwona260909@gmail.com>) id 1coU4d-0003vF-Ip
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 08:00:10 -0400
+Received: from mail-lf0-x22c.google.com ([2a00:1450:4010:c07::22c]:35438)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <iwona260909@gmail.com>)
+	id 1coU4d-0003tk-BF
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 08:00:07 -0400
+Received: by mail-lf0-x22c.google.com with SMTP id j90so19171429lfk.2
+	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 05:00:07 -0700 (PDT)
+Received: from localhost.localdomain (89-77-183-36.dynamic.chello.pl.
+	[89.77.183.36])
+	by smtp.gmail.com with ESMTPSA id l23sm882684lfk.27.2017.03.16.05.00.04
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 16 Mar 2017 05:00:04 -0700 (PDT)
+From: iwona260909@gmail.com
+Date: Thu, 16 Mar 2017 12:59:30 +0100
+Message-Id: <20170316115931.11615-1-iwona260909@gmail.com>
+Subject: [Qemu-devel] Dead code removal: removing code for unsupported DEPTH.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,29 +30,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org
 
-No one is listed as maintainer for qemu.sasl. It is used by the
-VNC server for SASL auth, but since it is cryptography related,
-list it under the crytography maintainer's realm, rather than
-under the UI maintainer.
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index bf1aafb..ecf8273 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1462,6 +1462,7 @@ S: Maintained
- F: crypto/
- F: include/crypto/
- F: tests/test-crypto-*
-+F: qemu.sasl
- 
- Coroutines
- M: Stefan Hajnoczi <stefanha@redhat.com>
--- 
-2.9.3
+This time I looked for it in the mailing list archives, so I hope it wasn't done. It is removing code for DEPTH != 32, one of Bite Sized Tasks.
