@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1coRc9-0004pZ-7T
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:22:34 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1coRc3-0000Zb-EI
+	(envelope-from <marcandre.lureau@redhat.com>) id 1coRc8-0004og-C4
 	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:22:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44326)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1coRc7-0000b4-2B
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:22:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43810)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1coRc3-0000ZI-84
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:22:27 -0400
+	id 1coRc6-0000ah-Rr
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 05:22:30 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 49B5F15561
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 09:22:27 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id DD382C04BD53
+	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 09:22:30 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu, 16 Mar 2017 13:21:14 +0400
-Message-Id: <20170316092121.25672-15-marcandre.lureau@redhat.com>
+Date: Thu, 16 Mar 2017 13:21:15 +0400
+Message-Id: <20170316092121.25672-16-marcandre.lureau@redhat.com>
 In-Reply-To: <20170316092121.25672-1-marcandre.lureau@redhat.com>
 References: <20170316092121.25672-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 14/21] char-socket: add 'connected' property
+Subject: [Qemu-devel] [PATCH v3 15/21] char-udp: flush as much buffer as
+ possible
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,42 +37,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, eblake@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- chardev/char-socket.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+Instead of flushing the buffer byte by byte, call qemu_chr_be_write()
+with as much byte possible accepted by the front-end.
 
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index 81021c5863..06389393fa 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -1015,6 +1015,14 @@ char_socket_get_addr(Object *obj, Visitor *v, cons=
-t char *name,
-     visit_type_SocketAddress(v, name, &s->addr, errp);
+Factor out buffer flushing in a common function udp_chr_flush_buffer().
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+---
+ chardev/char-udp.c | 26 +++++++++++++++-----------
+ 1 file changed, 15 insertions(+), 11 deletions(-)
+
+diff --git a/chardev/char-udp.c b/chardev/char-udp.c
+index 804bd22efa..1958c36de4 100644
+--- a/chardev/char-udp.c
++++ b/chardev/char-udp.c
+@@ -51,6 +51,18 @@ static int udp_chr_write(Chardev *chr, const uint8_t *=
+buf, int len)
+         s->ioc, (const char *)buf, len, NULL);
  }
 =20
-+static bool
-+char_socket_get_connected(Object *obj, Error **errp)
++static void udp_chr_flush_buffer(UdpChardev *s)
 +{
-+    SocketChardev *s =3D SOCKET_CHARDEV(obj);
++    Chardev *chr =3D CHARDEV(s);
 +
-+    return s->connected;
++    while (s->max_size > 0 && s->bufptr < s->bufcnt) {
++        int n =3D MIN(s->max_size, s->bufcnt - s->bufptr);
++        qemu_chr_be_write(chr, &s->buf[s->bufptr], n);
++        s->bufptr +=3D n;
++        s->max_size =3D qemu_chr_be_can_write(chr);
++    }
 +}
 +
- static void char_socket_class_init(ObjectClass *oc, void *data)
+ static int udp_chr_read_poll(void *opaque)
  {
-     ChardevClass *cc =3D CHARDEV_CLASS(oc);
-@@ -1034,6 +1042,9 @@ static void char_socket_class_init(ObjectClass *oc,=
- void *data)
-     object_class_property_add(oc, "addr", "SocketAddress",
-                               char_socket_get_addr, NULL,
-                               NULL, NULL, &error_abort);
+     Chardev *chr =3D CHARDEV(opaque);
+@@ -61,11 +73,8 @@ static int udp_chr_read_poll(void *opaque)
+     /* If there were any stray characters in the queue process them
+      * first
+      */
+-    while (s->max_size > 0 && s->bufptr < s->bufcnt) {
+-        qemu_chr_be_write(chr, &s->buf[s->bufptr], 1);
+-        s->bufptr++;
+-        s->max_size =3D qemu_chr_be_can_write(chr);
+-    }
++    udp_chr_flush_buffer(s);
 +
-+    object_class_property_add_bool(oc, "connected", char_socket_get_conn=
-ected,
-+                                   NULL, &error_abort);
+     return s->max_size;
  }
 =20
- static const TypeInfo char_socket_type_info =3D {
+@@ -85,13 +94,8 @@ static gboolean udp_chr_read(QIOChannel *chan, GIOCond=
+ition cond, void *opaque)
+         return FALSE;
+     }
+     s->bufcnt =3D ret;
+-
+     s->bufptr =3D 0;
+-    while (s->max_size > 0 && s->bufptr < s->bufcnt) {
+-        qemu_chr_be_write(chr, &s->buf[s->bufptr], 1);
+-        s->bufptr++;
+-        s->max_size =3D qemu_chr_be_can_write(chr);
+-    }
++    udp_chr_flush_buffer(s);
+=20
+     return TRUE;
+ }
 --=20
 2.12.0.191.gc5d8de91d
