@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1coL30-0006B7-U4
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 22:21:51 -0400
+	(envelope-from <SRS0=4WEX=2Z=redhat.com=mst@kernel.org>)
+	id 1coLFq-0000AY-7i
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 22:35:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1coL2z-0005yD-Uh
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 22:21:50 -0400
-Date: Thu, 16 Mar 2017 10:21:39 +0800
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170316022139.GC11074@stefanha-x1.localdomain>
-References: <20170310031521.630-1-eblake@redhat.com>
-	<033881fe-b3d3-2c3a-48fc-c08691f2c9cb@redhat.com>
-	<19efa7dc-fa97-410f-df4d-3962453dcd8e@redhat.com>
-	<20170315101835.GF8147@stefanha-x1.localdomain>
-	<20170315102644.GF7770@redhat.com>
-	<20170315105924.GH7770@redhat.com>
+	(envelope-from <SRS0=4WEX=2Z=redhat.com=mst@kernel.org>)
+	id 1coLFn-00010C-4z
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 22:35:06 -0400
+Received: from mail.kernel.org ([198.145.29.136]:60934)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <SRS0=4WEX=2Z=redhat.com=mst@kernel.org>)
+	id 1coLFm-0000ye-Ul
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 22:35:03 -0400
+Date: Thu, 16 Mar 2017 04:34:57 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <1489631689-6382-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="raC6veAxrt5nqIoY"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170315105924.GH7770@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9] mirror: Fix backwards mirror_yield
- parameters
+Subject: [Qemu-devel] [PULL 0/5] virtio, pci: fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,78 +27,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
+The following changes since commit 1883ff34b540daacae948f493b0ba525edf5f642:
 
---raC6veAxrt5nqIoY
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+  Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2017-03-15 18:44:05 +0000)
 
-On Wed, Mar 15, 2017 at 10:59:24AM +0000, Daniel P. Berrange wrote:
-> On Wed, Mar 15, 2017 at 10:26:44AM +0000, Daniel P. Berrange wrote:
-> > On Wed, Mar 15, 2017 at 06:18:35PM +0800, Stefan Hajnoczi wrote:
-> > > On Fri, Mar 10, 2017 at 02:49:22PM -0600, Eric Blake wrote:
-> > > > And here's where I'm stuck: the makefiles are broken.  Touching
-> > > > scripts/tracetool/format/h.py does NOT cause tracetool to be re-run=
- by a
-> > > > mere 'make'; I've had to resort to 'make -B block/trace.h-timestamp=
-' to
-> > > > get things to rebuild.  And this is in spite of the fact that h.py
-> > > > _should_ be getting listed in $(tracetool-y) by trace/Makefile.objs=
-, and
-> > > > $(tracetool-y) is listed as a dependency of %/trace.h-timestamp in =
-the
-> > > > top-level Makefile.  I would appreciate anyone with advice or an id=
-ea on
-> > > > how to patch Makefile to get the dependency working without me havi=
-ng to
-> > > > manually kick it.
-> > >=20
-> > > Also CCing Daniel Berrange.  He recently touched the tracing Makefiles
-> > > and may have ideas.
-> >=20
-> > I've been looking at this and I'm damned if I understand what's broken.
-> > All the required dependancies look to be expressed in the Makefile
-> >=20
-> >   %/trace.h: %/trace.h-timestamp
-> >   %/trace.h-timestamp: $(SRC_PATH)/%/trace-events $(tracetool-y)
-> >=20
-> > and $(tracetool-y) expands to the list of source files
-> >=20
-> >   tracetool-y =3D $(SRC_PATH)/scripts/tracetool.py
-> >   tracetool-y +=3D $(shell find $(SRC_PATH)/scripts/tracetool -name "*.=
-py")
-> >=20
-> >=20
-> > If I do 'touch hw/net/trace-events', then hw/net/trace.h gets rebuilt,
-> > but if do 'touch scripts/tracetool.py' it doesn't get built. So somehow
-> > make seems to be dropping the $(tracetool-y) deps despite being listed
-> > against the %/trace-h-timestamp file, and despite earlier deps on
-> > trace-events being honoured
->=20
-> Oh this is a fun one.  While the $(tracetool-y) variable *is* defined at
-> the time the build rules execute, it is *not* defined at the time make
-> evaluates dependancies, so it expanded to be empty ! I copied you on
-> the easy fix
+are available in the git repository at:
 
-Nice find, thanks for the help!
+  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
 
-Stefan
+for you to fetch changes up to bdf4c4ec53f293ea1baa7ce7c31fe0301887b513:
 
---raC6veAxrt5nqIoY
-Content-Type: application/pgp-signature; name="signature.asc"
+  virtio-serial-bus: Delete timer from list before free it (2017-03-16 01:46:42 +0200)
 
------BEGIN PGP SIGNATURE-----
+----------------------------------------------------------------
+virtio, pci: fixes
 
-iQEcBAEBAgAGBQJYyfazAAoJEJykq7OBq3PI3bsH/2J8YFYJZ4UXoy5ad2ay3TW2
-q3mB35XwBC5ftl8HiZ580lsO8SzWf841CsrkGVdJLUdRaixQKJqyDBWmnUuctCU9
-ap0wcDbTPfdrfGf2+slUl4SVEb+EcXDZ7PpRfy1PMJMhtUFy+/Dv+WkNkZlqLW9t
-zzZEVuxxPpUC7pNEbHDJfATBzWnfqqb/eM5E5r746vYf9GjyWUnrsLxMvP0Acz9r
-GX/cje0tHnf8n8F0GiBeD1xedB0HTvK+b0QqFIKGnl7I/2RFOGiTsoW4CHqSF706
-M5fpOi+/TjJ1qd5ukZqYQAFRBPCKv0nSv2G9FdN9KzcBelBrVVlxlrBxQoKT8zY=
-=S/6h
------END PGP SIGNATURE-----
+More fixes missed in the previous pull request.
 
---raC6veAxrt5nqIoY--
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Marcel Apfelbaum (4):
+      hw/pcie: fix Extended Configuration Space for devices with no Extended Capabilities
+      hw/virtio: fix error enabling flags in Device Control register
+      hw/virtio: fix Link Control Register for PCI Express virtio devices
+      hw/virtio: fix Power Management Control Register for PCI Express virtio devices
+
+zhanghailiang (1):
+      virtio-serial-bus: Delete timer from list before free it
+
+ hw/virtio/virtio-pci.h      | 12 ++++++++++++
+ include/hw/compat.h         | 16 ++++++++++++++++
+ include/hw/pci/pci.h        |  2 ++
+ include/hw/pci/pcie.h       |  5 +++++
+ hw/char/virtio-serial-bus.c |  1 +
+ hw/pci/pci.c                |  2 ++
+ hw/pci/pcie.c               | 20 ++++++++++++++++++++
+ hw/virtio/virtio-pci.c      | 31 +++++++++++++++++++++++++++++++
+ dtc                         |  2 +-
+ 9 files changed, 90 insertions(+), 1 deletion(-)
