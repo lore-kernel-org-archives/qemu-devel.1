@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1coOtW-00068T-2q
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 02:28:24 -0400
+	(envelope-from <armbru@redhat.com>) id 1coOtW-00068o-Fd
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 02:28:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1coOtR-00077W-36
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 02:28:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43058)
+	(envelope-from <armbru@redhat.com>) id 1coOtQ-00076H-LP
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 02:28:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54906)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1coOtQ-00073X-Nf
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1coOtQ-00072j-C3
 	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 02:28:12 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B011180467
+	by mx1.redhat.com (Postfix) with ESMTPS id 54C0FC054918
 	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 06:28:12 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-26.ams2.redhat.com
 	[10.36.116.26])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4E82D19E04
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 06:28:12 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id E899960A99
+	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 06:28:11 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 16 Mar 2017 07:27:45 +0100
-Message-Id: <1489645685-4750-30-git-send-email-armbru@redhat.com>
+Date: Thu, 16 Mar 2017 07:27:34 +0100
+Message-Id: <1489645685-4750-19-git-send-email-armbru@redhat.com>
 In-Reply-To: <1489645685-4750-1-git-send-email-armbru@redhat.com>
 References: <1489645685-4750-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL for 2.9 29/49] qapi2texi: Generate documentation
- for variant members
+Subject: [Qemu-devel] [PULL for 2.9 18/49] qapi2texi: Convert to
+ QAPISchemaVisitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,116 +36,275 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-A flat union's branch brings in the members of another type.  Generate
-a suitable reference to that type.
+qapi2texi works with schema expression trees.  Such a tight coupling
+to schema language syntax is not a good idea.  Convert it to the visitor
+interface the other generators use.
 
-Example change (qemu-qmp-ref.txt):
-
-  -- Flat Union: QCryptoBlockOpenOptions
-
-      The options that are available for all encryption formats when
-      opening an existing volume
-
-      Members:
-      The members of 'QCryptoBlockOptionsBase'
-+     The members of 'QCryptoBlockOptionsQCow' when 'format' is "qcow"
-+     The members of 'QCryptoBlockOptionsLUKS' when 'format' is "luks"
-
-      Since: 2.6
-
-A simple union's branch adds a member 'data' of some other type.
-Generate documentation for that member.
-
-Example change (qemu-qmp-ref.txt):
-
-  -- Simple Union: SocketAddress
-
-      Captures the address of a socket, which could also be a named file
-      descriptor
-
-      Members:
-      'type'
-	   Not documented
-+     'data: InetSocketAddress' when 'type' is "inet"
-+     'data: UnixSocketAddress' when 'type' is "unix"
-+     'data: VsockSocketAddress' when 'type' is "vsock"
-+     'data: String' when 'type' is "fd"
-
-      Since: 1.3
+No change to generated documentation.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <1489582656-31133-28-git-send-email-armbru@redhat.com>
+Message-Id: <1489582656-31133-17-git-send-email-armbru@redhat.com>
 ---
- scripts/qapi2texi.py | 27 ++++++++++++++++++++-------
- 1 file changed, 20 insertions(+), 7 deletions(-)
+ scripts/qapi2texi.py | 228 ++++++++++++++++++++++++++-------------------------
+ 1 file changed, 118 insertions(+), 110 deletions(-)
 
 diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-index 7083d0c..ab6b6cd 100755
+index 299dcf9..6d4e757 100755
 --- a/scripts/qapi2texi.py
 +++ b/scripts/qapi2texi.py
-@@ -133,17 +133,18 @@ def texi_enum_value(value):
-     return '@item @code{%s}\n' % value.name
+@@ -123,31 +123,39 @@ def texi_format(doc):
+     return "\n".join(lines)
  
  
--def texi_member(member):
-+def texi_member(member, suffix=''):
-     """Format a table of members item for an object type member"""
-     typ = member.type.doc_type()
--    return '@item @code{%s%s%s}%s\n' % (
-+    return '@item @code{%s%s%s}%s%s\n' % (
-         member.name,
-         ': ' if typ else '',
-         typ if typ else '',
--        ' (optional)' if member.optional else '')
-+        ' (optional)' if member.optional else '',
-+        suffix)
+-def texi_body(doc, only_documented=False):
+-    """
+-    Format the body of a symbol documentation:
+-    - main body
+-    - table of arguments
+-    - followed by "Returns/Notes/Since/Example" sections
+-    """
+-    body = texi_format(str(doc.body)) + "\n"
+-
+-    args = ''
+-    for name, section in doc.args.iteritems():
+-        if not section.content and not only_documented:
+-            continue        # Undocumented TODO require doc and drop
+-        desc = str(section)
+-        opt = ''
+-        if section.optional:
+-            desc = re.sub(r'^ *#optional *\n?|\n? *#optional *$|#optional',
+-                          '', desc)
+-            opt = ' (optional)'
+-        args += "@item @code{'%s'}%s\n%s\n" % (name, opt, texi_format(desc))
+-    if args:
+-        body += "@table @asis\n"
+-        body += args
+-        body += "@end table\n"
++def texi_body(doc):
++    """Format the main documentation body"""
++    return texi_format(str(doc.body)) + '\n'
  
++
++def texi_enum_value(value):
++    """Format a table of members item for an enumeration value"""
++    return "@item @code{'%s'}\n" % value.name
++
++
++def texi_member(member):
++    """Format a table of members item for an object type member"""
++    return "@item @code{'%s'}%s\n" % (
++        member.name, ' (optional)' if member.optional else '')
++
++
++def texi_members(doc, member_func, show_undocumented):
++    """Format the table of members"""
++    items = ''
++    for section in doc.args.itervalues():
++        if not section.content and not show_undocumented:
++            continue          # Undocumented TODO require doc and drop
++        desc = re.sub(r'^ *#optional *\n?|\n? *#optional *$|#optional',
++                      '', str(section))
++        items += member_func(section.member) + texi_format(desc) + '\n'
++    if not items:
++        return ''
++    return '@table @asis\n' + items + '@end table\n'
++
++
++def texi_sections(doc):
++    """Format additional sections following arguments"""
++    body = ''
+     for section in doc.sections:
+         name, doc = (section.name, str(section))
+         func = texi_format
+@@ -159,94 +167,94 @@ def texi_body(doc, only_documented=False):
+             body += "\n\n@b{%s:}\n" % name
  
--def texi_members(doc, what, base, member_func):
-+def texi_members(doc, what, base, variants, member_func):
-     """Format the table of members"""
-     items = ''
-     for section in doc.args.itervalues():
-@@ -154,6 +155,17 @@ def texi_members(doc, what, base, member_func):
-         items += member_func(section.member) + texi_format(desc) + '\n'
-     if base:
-         items += '@item The members of @code{%s}\n' % base.doc_type()
-+    if variants:
-+        for v in variants.variants:
-+            when = ' when @code{%s} is @t{"%s"}' % (
-+                variants.tag_member.name, v.name)
-+            if v.type.is_implicit():
-+                assert not v.type.base and not v.type.variants
-+                for m in v.type.local_members:
-+                    items += member_func(m, when)
-+            else:
-+                items += '@item The members of @code{%s}%s\n' % (
-+                    v.type.doc_type(), when)
-     if not items:
-         return ''
-     return '\n@b{%s:}\n@table @asis\n%s@end table\n' % (what, items)
-@@ -176,9 +188,10 @@ def texi_sections(doc):
+         body += func(doc)
+-
      return body
  
  
--def texi_entity(doc, what, base=None, member_func=texi_member):
-+def texi_entity(doc, what, base=None, variants=None,
-+                member_func=texi_member):
-     return (texi_body(doc)
--            + texi_members(doc, what, base, member_func)
-+            + texi_members(doc, what, base, variants, member_func)
-             + texi_sections(doc))
+-def texi_alternate(expr, doc):
+-    """Format an alternate to texi"""
+-    body = texi_body(doc)
+-    return TYPE_FMT(type="Alternate",
+-                    name=doc.symbol,
+-                    body=body)
+-
+-
+-def texi_union(expr, doc):
+-    """Format a union to texi"""
+-    discriminator = expr.get("discriminator")
+-    if discriminator:
+-        union = "Flat Union"
+-    else:
+-        union = "Simple Union"
+-
+-    body = texi_body(doc)
+-    return TYPE_FMT(type=union,
+-                    name=doc.symbol,
+-                    body=body)
+-
+-
+-def texi_enum(expr, doc):
+-    """Format an enum to texi"""
+-    body = texi_body(doc, True)
+-    return TYPE_FMT(type="Enum",
+-                    name=doc.symbol,
+-                    body=body)
+-
+-
+-def texi_struct(expr, doc):
+-    """Format a struct to texi"""
+-    body = texi_body(doc)
+-    return TYPE_FMT(type="Struct",
+-                    name=doc.symbol,
+-                    body=body)
+-
+-
+-def texi_command(expr, doc):
+-    """Format a command to texi"""
+-    body = texi_body(doc)
+-    return MSG_FMT(type="Command",
+-                   name=doc.symbol,
+-                   body=body)
+-
+-
+-def texi_event(expr, doc):
+-    """Format an event to texi"""
+-    body = texi_body(doc)
+-    return MSG_FMT(type="Event",
+-                   name=doc.symbol,
+-                   body=body)
+-
+-
+-def texi_expr(expr, doc):
+-    """Format an expr to texi"""
+-    (kind, _) = expr.items()[0]
+-
+-    fmt = {"command": texi_command,
+-           "struct": texi_struct,
+-           "enum": texi_enum,
+-           "union": texi_union,
+-           "alternate": texi_alternate,
+-           "event": texi_event}[kind]
+-
+-    return fmt(expr, doc)
+-
+-
+-def texi(docs):
+-    """Convert QAPI schema expressions to texi documentation"""
+-    res = []
+-    for doc in docs:
+-        expr = doc.expr
+-        if not expr:
+-            res.append(texi_body(doc))
+-            continue
+-        try:
+-            doc = texi_expr(expr, doc)
+-            res.append(doc)
+-        except:
+-            print >>sys.stderr, "error at @%s" % doc.info
+-            raise
+-
+-    return '\n'.join(res)
++def texi_entity(doc, member_func=texi_member, show_undocumented=False):
++    return (texi_body(doc)
++            + texi_members(doc, member_func, show_undocumented)
++            + texi_sections(doc))
++
++
++class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisitor):
++    def __init__(self):
++        self.out = None
++        self.cur_doc = None
++
++    def visit_begin(self, schema):
++        self.out = ''
++
++    def visit_enum_type(self, name, info, values, prefix):
++        doc = self.cur_doc
++        if self.out:
++            self.out += '\n'
++        self.out += TYPE_FMT(type='Enum',
++                             name=doc.symbol,
++                             body=texi_entity(doc,
++                                              member_func=texi_enum_value,
++                                              show_undocumented=True))
++
++    def visit_object_type(self, name, info, base, members, variants):
++        doc = self.cur_doc
++        if not variants:
++            typ = 'Struct'
++        elif variants._tag_name:        # TODO unclean member access
++            typ = 'Flat Union'
++        else:
++            typ = 'Simple Union'
++        if self.out:
++            self.out += '\n'
++        self.out += TYPE_FMT(type=typ,
++                             name=doc.symbol,
++                             body=texi_entity(doc))
++
++    def visit_alternate_type(self, name, info, variants):
++        doc = self.cur_doc
++        if self.out:
++            self.out += '\n'
++        self.out += TYPE_FMT(type='Alternate',
++                             name=doc.symbol,
++                             body=texi_entity(doc))
++
++    def visit_command(self, name, info, arg_type, ret_type,
++                      gen, success_response, boxed):
++        doc = self.cur_doc
++        if self.out:
++            self.out += '\n'
++        self.out += MSG_FMT(type='Command',
++                            name=doc.symbol,
++                            body=texi_entity(doc))
++
++    def visit_event(self, name, info, arg_type, boxed):
++        doc = self.cur_doc
++        if self.out:
++            self.out += '\n'
++        self.out += MSG_FMT(type='Event',
++                            name=doc.symbol,
++                            body=texi_entity(doc))
++
++    def symbol(self, doc, entity):
++        self.cur_doc = doc
++        entity.visit(self)
++        self.cur_doc = None
++
++    def freeform(self, doc):
++        assert not doc.args
++        if self.out:
++            self.out += '\n'
++        self.out += texi_body(doc) + texi_sections(doc)
++
++
++def texi_schema(schema):
++    """Convert QAPI schema documentation to Texinfo"""
++    gen = QAPISchemaGenDocVisitor()
++    gen.visit_begin(schema)
++    for doc in schema.docs:
++        if doc.symbol:
++            gen.symbol(doc, schema.lookup_entity(doc.symbol))
++        else:
++            gen.freeform(doc)
++    return gen.out
  
  
-@@ -213,7 +226,7 @@ class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisitor):
-             self.out += '\n'
-         self.out += TYPE_FMT(type=typ,
-                              name=doc.symbol,
--                             body=texi_entity(doc, 'Members', base))
-+                             body=texi_entity(doc, 'Members', base, variants))
+ def main(argv):
+@@ -259,7 +267,7 @@ def main(argv):
+     if not qapi.doc_required:
+         print >>sys.stderr, ("%s: need pragma 'doc-required' "
+                              "to generate documentation" % argv[0])
+-    print texi(schema.docs)
++    print texi_schema(schema)
  
-     def visit_alternate_type(self, name, info, variants):
-         doc = self.cur_doc
+ 
+ if __name__ == "__main__":
 -- 
 2.7.4
