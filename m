@@ -1,17 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40949)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cocsM-0005Bk-9D
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 17:24:04 -0400
+	(envelope-from <akpm@linux-foundation.org>) id 1cocwz-00007S-Ui
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 17:28:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cocsK-0002an-U5
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 17:24:02 -0400
-From: John Snow <jsnow@redhat.com>
-Date: Thu, 16 Mar 2017 17:23:50 -0400
-Message-Id: <20170316212351.13797-3-jsnow@redhat.com>
-In-Reply-To: <20170316212351.13797-1-jsnow@redhat.com>
-References: <20170316212351.13797-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/3] block-backend: add drained_begin /
- drained_end ops
+	(envelope-from <akpm@linux-foundation.org>) id 1cocww-0004Yt-0s
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 17:28:49 -0400
+Received: from mail.linuxfoundation.org ([140.211.169.12]:43558)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <akpm@linux-foundation.org>)
+	id 1cocwv-0004XY-Np
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 17:28:45 -0400
+Date: Thu, 16 Mar 2017 14:28:42 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+Message-Id: <20170316142842.69770813b98df70277431b1e@linux-foundation.org>
+In-Reply-To: <1489648127-37282-4-git-send-email-wei.w.wang@intel.com>
+References: <1489648127-37282-1-git-send-email-wei.w.wang@intel.com>
+	<1489648127-37282-4-git-send-email-wei.w.wang@intel.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH kernel v8 3/4] mm: add inerface to offer
+ info about unused pages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,99 +29,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, pbonzini@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, david@redhat.com, dave.hansen@intel.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com
 
-Allow block backends to forward drain requests to their devices/users.
-The initial intended purpose for this patch is to allow BBs to forward
-requests along to BlockJobs, which will want to pause if their associated
-BB has entered a drained region.
+On Thu, 16 Mar 2017 15:08:46 +0800 Wei Wang <wei.w.wang@intel.com> wrote:
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- block/block-backend.c          | 24 ++++++++++++++++++++++--
- include/sysemu/block-backend.h |  8 ++++++++
- 2 files changed, 30 insertions(+), 2 deletions(-)
+> From: Liang Li <liang.z.li@intel.com>
+> 
+> This patch adds a function to provides a snapshot of the present system
+> unused pages. An important usage of this function is to provide the
+> unsused pages to the Live migration thread, which skips the transfer of
+> thoses unused pages. Newly used pages can be re-tracked by the dirty
+> page logging mechanisms.
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 5742c09..dec4a1c 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -65,6 +65,8 @@ struct BlockBackend {
-     bool allow_write_beyond_eof;
- 
-     NotifierList remove_bs_notifiers, insert_bs_notifiers;
-+
-+    int quiesce_counter;
- };
- 
- typedef struct BlockBackendAIOCB {
-@@ -699,12 +701,17 @@ void blk_set_dev_ops(BlockBackend *blk, const BlockDevOps *ops,
-                      void *opaque)
- {
-     /* All drivers that use blk_set_dev_ops() are qdevified and we want to keep
--     * it that way, so we can assume blk->dev is a DeviceState if blk->dev_ops
--     * is set. */
-+     * it that way, so we can assume blk->dev, if present, is a DeviceState if
-+     * blk->dev_ops is set. Non-device users may use dev_ops without device. */
-     assert(!blk->legacy_dev);
- 
-     blk->dev_ops = ops;
-     blk->dev_opaque = opaque;
-+
-+    /* Are we currently quiesced? Should we enforce this right now? */
-+    if (blk->quiesce_counter && ops->drained_begin) {
-+        ops->drained_begin(opaque);
-+    }
- }
- 
- /*
-@@ -1870,6 +1877,12 @@ static void blk_root_drained_begin(BdrvChild *child)
- {
-     BlockBackend *blk = child->opaque;
- 
-+    if (++blk->quiesce_counter == 1) {
-+        if (blk->dev_ops && blk->dev_ops->drained_begin) {
-+            blk->dev_ops->drained_begin(blk->dev_opaque);
-+        }
-+    }
-+
-     /* Note that blk->root may not be accessible here yet if we are just
-      * attaching to a BlockDriverState that is drained. Use child instead. */
- 
-@@ -1881,7 +1894,14 @@ static void blk_root_drained_begin(BdrvChild *child)
- static void blk_root_drained_end(BdrvChild *child)
- {
-     BlockBackend *blk = child->opaque;
-+    assert(blk->quiesce_counter);
- 
-     assert(blk->public.io_limits_disabled);
-     --blk->public.io_limits_disabled;
-+
-+    if (--blk->quiesce_counter == 0) {
-+        if (blk->dev_ops && blk->dev_ops->drained_end) {
-+              blk->dev_ops->drained_end(blk->dev_opaque);
-+        }
-+    }
- }
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
-index 096c17f..7462228 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -58,6 +58,14 @@ typedef struct BlockDevOps {
-      * Runs when the size changed (e.g. monitor command block_resize)
-      */
-     void (*resize_cb)(void *opaque);
-+    /*
-+     * Runs when the backend receives a drain request.
-+     */
-+    void (*drained_begin)(void *opaque);
-+    /*
-+     * Runs when the backend's last drain request ends.
-+     */
-+    void (*drained_end)(void *opaque);
- } BlockDevOps;
- 
- /* This struct is embedded in (the private) BlockBackend struct and contains
--- 
-2.9.3
+I don't think this will be useful for anything other than
+virtio-balloon.  I guess it would be better to keep this code in the
+virtio-balloon driver if possible, even though that's rather a layering
+violation :( What would have to be done to make that possible?  Perhaps
+we can put some *small* helpers into page_alloc.c to prevent things
+from becoming too ugly.
+
+> --- a/mm/page_alloc.c
+> +++ b/mm/page_alloc.c
+> @@ -4498,6 +4498,120 @@ void show_free_areas(unsigned int filter)
+>  	show_swap_cache_info();
+>  }
+>  
+> +static int __record_unused_pages(struct zone *zone, int order,
+> +				 __le64 *buf, unsigned int size,
+> +				 unsigned int *offset, bool part_fill)
+> +{
+> +	unsigned long pfn, flags;
+> +	int t, ret = 0;
+> +	struct list_head *curr;
+> +	__le64 *chunk;
+> +
+> +	if (zone_is_empty(zone))
+> +		return 0;
+> +
+> +	spin_lock_irqsave(&zone->lock, flags);
+> +
+> +	if (*offset + zone->free_area[order].nr_free > size && !part_fill) {
+> +		ret = -ENOSPC;
+> +		goto out;
+> +	}
+> +	for (t = 0; t < MIGRATE_TYPES; t++) {
+> +		list_for_each(curr, &zone->free_area[order].free_list[t]) {
+> +			pfn = page_to_pfn(list_entry(curr, struct page, lru));
+> +			chunk = buf + *offset;
+> +			if (*offset + 2 > size) {
+> +				ret = -ENOSPC;
+> +				goto out;
+> +			}
+> +			/* Align to the chunk format used in virtio-balloon */
+> +			*chunk = cpu_to_le64(pfn << 12);
+> +			*(chunk + 1) = cpu_to_le64((1 << order) << 12);
+> +			*offset += 2;
+> +		}
+> +	}
+> +
+> +out:
+> +	spin_unlock_irqrestore(&zone->lock, flags);
+> +
+> +	return ret;
+> +}
+
+This looks like it could disable interrupts for a long time.  Too long?
+
+> +/*
+> + * The record_unused_pages() function is used to record the system unused
+> + * pages. The unused pages can be skipped to transfer during live migration.
+> + * Though the unused pages are dynamically changing, dirty page logging
+> + * mechanisms are able to capture the newly used pages though they were
+> + * recorded as unused pages via this function.
+> + *
+> + * This function scans the free page list of the specified order to record
+> + * the unused pages, and chunks those continuous pages following the chunk
+> + * format below:
+> + * --------------------------------------
+> + * |	Base (52-bit)	| Rsvd (12-bit) |
+> + * --------------------------------------
+> + * --------------------------------------
+> + * |	Size (52-bit)	| Rsvd (12-bit) |
+> + * --------------------------------------
+> + *
+> + * @start_zone: zone to start the record operation.
+> + * @order: order of the free page list to record.
+> + * @buf: buffer to record the unused page info in chunks.
+> + * @size: size of the buffer in __le64 to record
+> + * @offset: offset in the buffer to record.
+> + * @part_fill: indicate if partial fill is used.
+> + *
+> + * return -EINVAL if parameter is invalid
+> + * return -ENOSPC when the buffer is too small to record all the unsed pages
+> + * return 0 when sccess
+> + */
+
+It's a strange thing - it returns information which will instantly
+become incorrect.
+
+> +int record_unused_pages(struct zone **start_zone, int order,
+> +			__le64 *buf, unsigned int size,
+> +			unsigned int *offset, bool part_fill)
+> +{
+> +	struct zone *zone;
+> +	int ret = 0;
+> +	bool skip_check = false;
+> +
+> +	/* Make sure all the parameters are valid */
+> +	if (buf == NULL || offset == NULL || order >= MAX_ORDER)
+> +		return -EINVAL;
+> +
+> +	if (*start_zone != NULL) {
+> +		bool found = false;
+> +
+> +		for_each_populated_zone(zone) {
+> +			if (zone != *start_zone)
+> +				continue;
+> +			found = true;
+> +			break;
+> +		}
+> +		if (!found)
+> +			return -EINVAL;
+> +	} else
+> +		skip_check = true;
+> +
+> +	for_each_populated_zone(zone) {
+> +		/* Start from *start_zone if it's not NULL */
+> +		if (!skip_check) {
+> +			if (*start_zone != zone)
+> +				continue;
+> +			else
+> +				skip_check = true;
+> +		}
+> +		ret = __record_unused_pages(zone, order, buf, size,
+> +					    offset, part_fill);
+> +		if (ret < 0) {
+> +			/* record the failed zone */
+> +			*start_zone = zone;
+> +			break;
+> +		}
+> +	}
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL(record_unused_pages);
