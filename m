@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=241876a3f=anthony.perard@citrix.com>)
-	id 1coWwj-0005LV-Vf
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 11:04:14 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1coXG4-0001SX-4T
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 11:24:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=241876a3f=anthony.perard@citrix.com>)
-	id 1coWwe-0002bt-7G
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 11:04:10 -0400
-Received: from smtp.citrix.com ([66.165.176.89]:4042)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=241876a3f=anthony.perard@citrix.com>)
-	id 1coWwe-0002ba-2I
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 11:04:04 -0400
-Date: Thu, 16 Mar 2017 15:03:24 +0000
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20170316150324.GE1882@perard.uk.xensource.com>
-References: <1489593679-31468-1-git-send-email-igor.druzhinin@citrix.com>
-	<20170316122644.GC1882@perard.uk.xensource.com>
-	<bfadc05e-4298-744b-a364-1ec75b7e5b0c@citrix.com>
-	<383dc5c1-f8f6-d4f2-d548-96ff2712140b@citrix.com>
-	<20170316144656.GD1882@perard.uk.xensource.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1coXG3-0000cI-A1
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 11:24:08 -0400
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:36644)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1coXG3-0000bT-3s
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 11:24:07 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id u108so34405318wrb.3
+	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 08:24:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20170316144656.GD1882@perard.uk.xensource.com>
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH v5] xen: don't save/restore the
- physmap on VM save/restore
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 16 Mar 2017 15:23:45 +0000
+Message-ID: <CAFEAcA9pqDoCWrPAJ+KVxLC_eRy-xRg36oYuARYg2YP8VpGpBg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: [Qemu-devel] Proposal for deprecating unsupported host OSes &
+ architecutures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,33 +27,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Druzhinin <igor.druzhinin@citrix.com>
-Cc: sstabellini@kernel.org, crosthwaite.peter@gmail.com, qemu-devel@nongnu.org, paul.durrant@citrix.com, pbonzini@redhat.com, xen-devel@lists.xenproject.org, rth@twiddle.net
+To: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Mar 16, 2017 at 02:46:56PM +0000, Anthony PERARD wrote:
-> On Thu, Mar 16, 2017 at 02:06:21PM +0000, Igor Druzhinin wrote:
-> > On 16/03/17 12:54, Igor Druzhinin wrote:
-> > > On 16/03/17 12:26, Anthony PERARD wrote:
-> > >> I've tried to migrate a guest with this patch, but once migrated, the
-> > >> screen is black (via VNC, keyboard is working fine).
-> > >>
-> > > Hmm. It works for me - I've tried to migrate between identical QEMUs
-> > > with this patch on localhost. Save/restore also works fine.
-> > > 
-> > Ok. I could track down the issue - starting from v4 the patch doesn't
-> > work for cirrus. The reason is that post_load handler is different for
-> > cirrus and doesn't call the parent handler from common vga code.
-> > 
-> > I manage to fix it by updating the corresponding handler by duplicating
-> > the code. But is it a good solution? Would it be better to have the
-> > common handler called in this function instead?
-> 
-> :(, vga_common_post_load have a misleading name. Yes, I think it would
-> be better to have a common post_load been called by every vga cards.
+OK, here's a concrete proposal for deprecating/dropping out of
+date host OS and architecture support.
 
-The issue is probably more complicated than I thought, as
-vga_common_post_load is probably not called because cirrus does not use
-vmstate_vga_common struct.
+We'll put this in the ChangeLog 'Future incompatible changes'
+section:
+-----
+* Removal of support for untested host OS and architectures:
 
--- 
-Anthony PERARD
+The QEMU Project intends to drop support in a future release for any
+host OS or architecture which we do not have access to a build and test
+machine for. This affects the following host OSes:
+ * Native CYGWIN building
+ * GNU/kFreeBSD
+ * FreeBSD
+ * DragonFly BSD
+ * NetBSD
+ * OpenBSD
+ * Solaris
+ * AIX
+ * Haiku
+and the following host CPU architectures:
+ * ia64
+ * sparc
+
+Specifically, if we do not have a build and test system available
+to us by the time we release QEMU 2.10, we will remove support in the
+release that follows 2.10.
+-----
+
+I'm not sure here if we want to just have this as a bald list,
+or to have some kind of two tier setup with OSes we expect to
+dump in one tier and OSes where we're really trolling for a build
+machine in the other tier (the "unlikely to dump" category would
+get most of the BSD variants in it). Putting out a changelog
+that says "we're gonna drop all the BSDs" seems like it might
+produce a lot of yelling?
+
+Should "native CYGWIN" be in the drop list? I only test
+mingw cross compile, but configure has a separate section for
+CYGWIN in its $targetos case statement.
+
+It would also not be too difficult to make configure warn when it
+is run on the deprecated OS or architecture, so we should probably
+sneak that into 2.9.
+
+(Technically right this instant 'mips' and 's390' would be in the
+'dump' list, since I don't personally have access yet. But we have
+a plan for s390, and it turns out there is a mips machine in the
+gcc compile farm which I'm just checking out.)
+
+thanks
+-- PMM
