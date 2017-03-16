@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54900)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1coOtX-00069m-8B
+	(envelope-from <armbru@redhat.com>) id 1coOtX-00069j-5y
 	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 02:28:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1coOtS-00079s-CA
+	(envelope-from <armbru@redhat.com>) id 1coOtS-00079Z-9L
 	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 02:28:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38314)
+Received: from mx1.redhat.com ([209.132.183.28]:32878)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1coOtR-00077n-Uc
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1coOtR-000777-Nr
 	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 02:28:14 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CBAB980F95
+	by mx1.redhat.com (Postfix) with ESMTPS id 8ACD07E9D8
 	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 06:28:13 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-26.ams2.redhat.com
 	[10.36.116.26])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9889C17D2C
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2E7785DC1D
 	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 06:28:13 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 16 Mar 2017 07:27:58 +0100
-Message-Id: <1489645685-4750-43-git-send-email-armbru@redhat.com>
+Date: Thu, 16 Mar 2017 07:27:50 +0100
+Message-Id: <1489645685-4750-35-git-send-email-armbru@redhat.com>
 In-Reply-To: <1489645685-4750-1-git-send-email-armbru@redhat.com>
 References: <1489645685-4750-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL for 2.9 42/49] qapi: Simplify what gets stored
- in enum_types
+Subject: [Qemu-devel] [PULL for 2.9 34/49] qapi: Move detection of doc /
+ expression name mismatch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,90 +36,101 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Don't invent a new dictionary structure just for enum_types, simply
-store the defining expression, like we do for struct_types and
-union_types.
+Move the check whether the doc matches the expression name from
+check_definition_doc() to check_exprs().  This changes the error
+location from the comment to the expression.  Makes sense as the
+message talks about the expression: "Definition of '%s' follows
+documentation for '%s'".  It's also a step towards getting rid of
+check_docs().
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <1489582656-31133-41-git-send-email-armbru@redhat.com>
+Message-Id: <1489582656-31133-33-git-send-email-armbru@redhat.com>
 ---
- scripts/qapi.py | 29 +++++++++++++++--------------
- 1 file changed, 15 insertions(+), 14 deletions(-)
+ scripts/qapi.py                      | 28 ++++++++++++++++++----------
+ tests/qapi-schema/doc-bad-symbol.err |  2 +-
+ 2 files changed, 19 insertions(+), 11 deletions(-)
 
 diff --git a/scripts/qapi.py b/scripts/qapi.py
-index d5a113c..3c6e137 100644
+index 37f2814..9a1d830 100644
 --- a/scripts/qapi.py
 +++ b/scripts/qapi.py
-@@ -668,16 +668,17 @@ def find_union(name):
-     return None
+@@ -894,40 +894,52 @@ def check_keys(expr_elem, meta, required, optional=[]):
+ def check_exprs(exprs):
+     global all_names
  
- 
--def add_enum(name, info, enum_values=None, implicit=False):
-+def add_enum(definition, info):
-     global enum_types
--    add_name(name, info, 'enum', implicit)
--    enum_types.append({'enum_name': name, 'enum_values': enum_values})
-+    name = definition['enum']
-+    add_name(name, info, 'enum', 'data' not in definition)
-+    enum_types.append(definition)
- 
- 
- def find_enum(name):
-     global enum_types
-     for enum in enum_types:
--        if enum['enum_name'] == name:
-+        if enum['enum'] == name:
-             return enum
-     return None
- 
-@@ -825,15 +826,15 @@ def check_union(expr, info):
-         # If the discriminator names an enum type, then all members
-         # of 'data' must also be members of the enum type.
-         if enum_define:
--            if key not in enum_define['enum_values']:
-+            if key not in enum_define['data']:
-                 raise QAPISemError(info,
-                                    "Discriminator value '%s' is not found in "
-                                    "enum '%s'"
--                                   % (key, enum_define['enum_name']))
-+                                   % (key, enum_define['enum']))
- 
-     # If discriminator is user-defined, ensure all values are covered
-     if enum_define:
--        for value in enum_define['enum_values']:
-+        for value in enum_define['data']:
-             if value not in members.keys():
-                 raise QAPISemError(info, "Union '%s' data missing '%s' branch"
-                                    % (name, value))
-@@ -938,7 +939,7 @@ def check_exprs(exprs):
-         if 'enum' in expr:
-             name = expr['enum']
-             check_keys(expr_elem, 'enum', ['data'], ['prefix'])
--            add_enum(name, info, expr['data'])
-+            add_enum(expr, info)
-         elif 'union' in expr:
-             name = expr['union']
-             check_keys(expr_elem, 'union', ['data'],
-@@ -971,13 +972,13 @@ def check_exprs(exprs):
-     # Try again for hidden UnionKind enum
+-    # Learn the types and check for valid expression keys
++    # Populate name table with names of built-in types
+     for builtin in builtin_types.keys():
+         all_names[builtin] = 'built-in'
++
++    # Learn the types and check for valid expression keys
      for expr_elem in exprs:
          expr = expr_elem['expr']
--        if 'union' in expr:
--            if not discriminator_find_enum_define(expr):
--                add_enum('%sKind' % expr['union'], expr_elem['info'],
--                         implicit=True)
-+        if 'union' in expr and not discriminator_find_enum_define(expr):
-+            name = '%sKind' % expr['union']
-         elif 'alternate' in expr:
--            add_enum('%sKind' % expr['alternate'], expr_elem['info'],
--                     implicit=True)
-+            name = '%sKind' % expr['alternate']
-+        else:
-+            continue
-+        add_enum({ 'enum': name }, expr_elem['info'])
+         info = expr_elem['info']
++        doc = expr_elem.get('doc')
  
-     # Validate that exprs make sense
+-        if 'doc' not in expr_elem and doc_required:
++        if not doc and doc_required:
+             raise QAPISemError(info,
+                                "Expression missing documentation comment")
+ 
+         if 'enum' in expr:
++            name = expr['enum']
+             check_keys(expr_elem, 'enum', ['data'], ['prefix'])
+-            add_enum(expr['enum'], info, expr['data'])
++            add_enum(name, info, expr['data'])
+         elif 'union' in expr:
++            name = expr['union']
+             check_keys(expr_elem, 'union', ['data'],
+                        ['base', 'discriminator'])
+             add_union(expr, info)
+         elif 'alternate' in expr:
++            name = expr['alternate']
+             check_keys(expr_elem, 'alternate', ['data'])
+-            add_name(expr['alternate'], info, 'alternate')
++            add_name(name, info, 'alternate')
+         elif 'struct' in expr:
++            name = expr['struct']
+             check_keys(expr_elem, 'struct', ['data'], ['base'])
+             add_struct(expr, info)
+         elif 'command' in expr:
++            name = expr['command']
+             check_keys(expr_elem, 'command', [],
+                        ['data', 'returns', 'gen', 'success-response', 'boxed'])
+-            add_name(expr['command'], info, 'command')
++            add_name(name, info, 'command')
+         elif 'event' in expr:
++            name = expr['event']
+             check_keys(expr_elem, 'event', [], ['data', 'boxed'])
+-            add_name(expr['event'], info, 'event')
++            add_name(name, info, 'event')
+         else:
+             raise QAPISemError(expr_elem['info'],
+                                "Expression is missing metatype")
++        if doc and doc.symbol != name:
++            raise QAPISemError(info, "Definition of '%s' follows documentation"
++                               " for '%s'" % (name, doc.symbol))
+ 
+     # Try again for hidden UnionKind enum
      for expr_elem in exprs:
+@@ -977,10 +989,6 @@ def check_definition_doc(doc, expr, info):
+             meta = i
+             break
+ 
+-    name = expr[meta]
+-    if doc.symbol != name:
+-        raise QAPISemError(info, "Definition of '%s' follows documentation"
+-                           " for '%s'" % (name, doc.symbol))
+     if doc.has_section('Returns') and 'command' not in expr:
+         raise QAPISemError(info, "'Returns:' is only valid for commands")
+ 
+diff --git a/tests/qapi-schema/doc-bad-symbol.err b/tests/qapi-schema/doc-bad-symbol.err
+index ac4e566..8472030 100644
+--- a/tests/qapi-schema/doc-bad-symbol.err
++++ b/tests/qapi-schema/doc-bad-symbol.err
+@@ -1 +1 @@
+-tests/qapi-schema/doc-bad-symbol.json:3: Definition of 'foo' follows documentation for 'food'
++tests/qapi-schema/doc-bad-symbol.json:6: Definition of 'foo' follows documentation for 'food'
 -- 
 2.7.4
