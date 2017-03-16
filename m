@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1coU8k-0003jG-8B
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 08:04:23 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1coU9V-0004NE-Fv
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 08:05:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1coU8f-00069u-B1
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 08:04:22 -0400
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:37937)
+	(envelope-from <peter.maydell@linaro.org>) id 1coU9U-0006aG-BE
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 08:05:09 -0400
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:38234)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1coU8f-00068Z-4C
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 08:04:17 -0400
-Received: by mail-wm0-x229.google.com with SMTP id t189so45862051wmt.1
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 05:04:16 -0700 (PDT)
-References: <1489638621-31978-1-git-send-email-rimjhim0107@gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1489638621-31978-1-git-send-email-rimjhim0107@gmail.com>
-Date: Thu, 16 Mar 2017 12:04:34 +0000
-Message-ID: <874lytpgvh.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1coU9U-0006Ya-4l
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 08:05:08 -0400
+Received: by mail-wm0-x22e.google.com with SMTP id t189so45880878wmt.1
+	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 05:05:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] puv3: always compile-check debug printf
+In-Reply-To: <1489631689-6382-1-git-send-email-mst@redhat.com>
+References: <1489631689-6382-1-git-send-email-mst@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 16 Mar 2017 12:04:46 +0000
+Message-ID: <CAFEAcA9zHXENN6uvuDwfwo9WCsvCzji92h8u7YMA7TwOv7M0=A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 0/5] virtio, pci: fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anishka0107 <rimjhim0107@gmail.com>
-Cc: jsnow@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-
-Anishka0107 <rimjhim0107@gmail.com> writes:
-
->     To prevent bitrot of the format string of the debug statement, files with
->   conditional debug statements should ensure that printf is compiled always,
->   and enclosed within if(0) statements and not in #ifdef.
+On 16 March 2017 at 02:34, Michael S. Tsirkin <mst@redhat.com> wrote:
+> The following changes since commit 1883ff34b540daacae948f493b0ba525edf5f642:
 >
-> Signed-off-by: Anishka Gupta <rimjhim0107@gmail.com>
-> ---
->  include/hw/unicore32/puv3.h | 14 +++++++++-----
->  1 file changed, 9 insertions(+), 5 deletions(-)
+>   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2017-03-15 18:44:05 +0000)
 >
-> diff --git a/include/hw/unicore32/puv3.h b/include/hw/unicore32/puv3.h
-> index 5a4839f..e268484 100644
-> --- a/include/hw/unicore32/puv3.h
-> +++ b/include/hw/unicore32/puv3.h
-> @@ -41,10 +41,14 @@
->  #define PUV3_IRQS_OST0          (26)
+> are available in the git repository at:
 >
->  /* All puv3_*.c use DPRINTF for debug. */
-> -#ifdef DEBUG_PUV3
-> -#define DPRINTF(fmt, ...) printf("%s: " fmt , __func__, ## __VA_ARGS__)
-> -#else
-> -#define DPRINTF(fmt, ...) do {} while (0)
-> -#endif
-> +#define DEBUG_PUV3 0
-> +
-> +#define DPRINTF(fmt, ...)
-> +    if (DEBUG_PUV3) {
-> +        fprintf(stderr, "%s: " fmt , __func__, ## __VA_ARGS__)
-> +    }
-> +    else {
-> +        do {} while (0)
-> +    }
-
-This is incorrect. It's fine not to have an else leg as the compiler
-will dead-code away the if (0) part. However you still need to wrap in a
-do {} while to avoid problems with trailing ;'s. Also you need line
-continuations for defining macros.
-
-Did you actually compile test this patch? I suspect it wouldn't build
-due to the missing ;s for your fprintf and do while.
-
-See hw/misc/imx6_src.c for a debug printf I recently converted.
-
+>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
 >
->  #endif /* QEMU_HW_PUV3_H */
+> for you to fetch changes up to bdf4c4ec53f293ea1baa7ce7c31fe0301887b513:
+>
+>   virtio-serial-bus: Delete timer from list before free it (2017-03-16 01:46:42 +0200)
+>
+> ----------------------------------------------------------------
+> virtio, pci: fixes
+>
+> More fixes missed in the previous pull request.
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>
+> ----------------------------------------------------------------
+> Marcel Apfelbaum (4):
+>       hw/pcie: fix Extended Configuration Space for devices with no Extended Capabilities
+>       hw/virtio: fix error enabling flags in Device Control register
+>       hw/virtio: fix Link Control Register for PCI Express virtio devices
+>       hw/virtio: fix Power Management Control Register for PCI Express virtio devices
+>
+> zhanghailiang (1):
+>       virtio-serial-bus: Delete timer from list before free it
 
+Applied, thanks.
 
---
-Alex Bennée
+-- PMM
