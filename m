@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41928)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1coPb6-0005lf-TU
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 03:13:24 -0400
+	(envelope-from <stefanha@redhat.com>) id 1coPpU-0002Kt-Q0
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 03:28:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1coPb4-0001GH-Qp
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 03:13:20 -0400
-Received: from mga04.intel.com ([192.55.52.120]:55976)
+	(envelope-from <stefanha@redhat.com>) id 1coPpR-0005vP-Ld
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 03:28:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43720)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1coPb4-0001Ei-Eg
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 03:13:18 -0400
-From: Wei Wang <wei.w.wang@intel.com>
-Date: Thu, 16 Mar 2017 15:08:47 +0800
-Message-Id: <1489648127-37282-5-git-send-email-wei.w.wang@intel.com>
-In-Reply-To: <1489648127-37282-1-git-send-email-wei.w.wang@intel.com>
-References: <1489648127-37282-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH kernel v8 4/4] virtio-balloon:
- VIRTIO_BALLOON_F_HOST_REQ_VQ
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1coPpR-0005uv-FF
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 03:28:09 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 42CB3C04B945
+	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 07:28:09 +0000 (UTC)
+Date: Thu, 16 Mar 2017 15:28:03 +0800
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170316072803.GB17296@stefanha-x1.localdomain>
+References: <20170313195547.21466-1-eblake@redhat.com>
+	<20170313195547.21466-31-eblake@redhat.com>
+	<dbffcbd2-e614-884f-9a8f-77bf198d9d58@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="yEPQxsgoJgBvi8ip"
+Content-Disposition: inline
+In-Reply-To: <dbffcbd2-e614-884f-9a8f-77bf198d9d58@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 30/30] trace: Force compiler
+ warnings on trace parameter type mismatches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,275 +36,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, david@redhat.com, dave.hansen@intel.com, cornelia.huck@de.ibm.com, akpm@linux-foundation.org, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, wei.w.wang@intel.com, liliang.opensource@gmail.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 
-From: Liang Li <liang.z.li@intel.com>
 
-Add a new vq, host request vq. The host uses the vq to send
-requests to the guest. Upon getting a request, the guest responds
-what the host needs via this vq.
+--yEPQxsgoJgBvi8ip
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The patch implements the request of getting the unsed pages from the guest.
-The unused guest pages are avoided to migrate in live migration. For an
-idle guest with 8GB RAM, this optimization shorterns the total migration
-time to 1/4.
+On Wed, Mar 15, 2017 at 02:59:55PM -0500, Eric Blake wrote:
+> On 03/13/2017 02:55 PM, Eric Blake wrote:
+> > 2. there are still failures under 'make docker-test-mingw@fedora'
+> > due to more type mismatches that still need to be squashed. I'm
+> > still working on fixing those, but wanted to at least post this
+> > series for initial review, especially so the maintainer can weigh
+> > in on how much (or little) belongs in 2.9
+>=20
+> mingw is a nightmare.  Things like ntohl() having non-standard behavior
+> on 32-bit mingw can only be worked around by hairy redefinitions in
+> osdep.h or by casts at the callsites. See the conversation in 6/30, but
+> I'm hoping gcc will give us a new knob to tone down the level of
+> -Wformat warnings for two types that have different rank but the same
+> width; if gcc gives us that, then we'd add a configure test, and
+> conditionally generate the type-mismatch checking code ONLY when gcc is
+> smart enough to not care about rank mismatch.  Until then, this RFC
+> 30/30 proved useful for flushing out the earlier cleanups (many of which
+> you can/should still accept), but should NOT be incorporated as-is, not
+> even when 2.10 opens.
 
-Furthermore, it's also possible to drop the guest's page cache before
-live migration. This optimization will be implemented on top of this
-new feature in the future.
+QEMU 2.9 regression fixes are appropriate at this stage in the release
+process.
 
-Signed-off-by: Liang Li <liang.z.li@intel.com>
-Signed-off-by: Wei Wang <wei.w.wang@intel.com>
----
- drivers/virtio/virtio_balloon.c     | 140 ++++++++++++++++++++++++++++++++++--
- include/uapi/linux/virtio_balloon.h |  22 ++++++
- 2 files changed, 157 insertions(+), 5 deletions(-)
+Fixes for bugs already in 2.8 are less likely to be merged as we head
+towards -rc2/-rc3.
 
-diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
-index 3f4a161..bcf2baa 100644
---- a/drivers/virtio/virtio_balloon.c
-+++ b/drivers/virtio/virtio_balloon.c
-@@ -64,7 +64,7 @@ struct balloon_page_chunk {
- typedef __le64 resp_data_t;
- struct virtio_balloon {
- 	struct virtio_device *vdev;
--	struct virtqueue *inflate_vq, *deflate_vq, *stats_vq;
-+	struct virtqueue *inflate_vq, *deflate_vq, *stats_vq, *host_req_vq;
- 
- 	/* The balloon servicing is delegated to a freezable workqueue. */
- 	struct work_struct update_balloon_stats_work;
-@@ -104,6 +104,8 @@ struct virtio_balloon {
- 	 * pfn_start & pfn_stop: records the start and stop pfn in each cover
- 	 */
- 	unsigned long pfn_min, pfn_max, pfn_start, pfn_stop;
-+	/* Request header */
-+	struct virtio_balloon_req_hdr req_hdr;
- 	/*
- 	 * The pages we've told the Host we're not using are enqueued
- 	 * at vb_dev_info->pages list.
-@@ -568,6 +570,81 @@ static void stats_handle_request(struct virtio_balloon *vb)
- 	virtqueue_kick(vq);
- }
- 
-+static void __send_unused_pages(struct virtio_balloon *vb,
-+				unsigned long req_id, unsigned int pos,
-+				bool done)
-+{
-+	struct virtio_balloon_resp_hdr *hdr = vb->resp_hdr;
-+	struct virtqueue *vq = vb->host_req_vq;
-+
-+	vb->resp_pos = pos;
-+	hdr->cmd = BALLOON_GET_UNUSED_PAGES;
-+	hdr->id = cpu_to_le16(req_id);
-+	if (!done)
-+		hdr->flag = BALLOON_FLAG_CONT;
-+	else
-+		hdr->flag = BALLOON_FLAG_DONE;
-+
-+	if (pos > 0 || done)
-+		send_resp_data(vb, vq, true);
-+
-+}
-+
-+static void send_unused_pages(struct virtio_balloon *vb,
-+			      unsigned long req_id)
-+{
-+	struct scatterlist sg_in;
-+	unsigned int pos = 0;
-+	struct virtqueue *vq = vb->host_req_vq;
-+	int ret, order;
-+	struct zone *zone = NULL;
-+	bool part_fill = false;
-+
-+	mutex_lock(&vb->balloon_lock);
-+
-+	for (order = MAX_ORDER - 1; order >= 0; order--) {
-+		ret = record_unused_pages(&zone, order, vb->resp_data,
-+					  vb->resp_buf_size / sizeof(__le64),
-+					  &pos, part_fill);
-+		if (ret == -ENOSPC) {
-+			if (pos == 0) {
-+				void *new_resp_data;
-+
-+				new_resp_data = kmalloc(2 * vb->resp_buf_size,
-+							GFP_KERNEL);
-+				if (new_resp_data) {
-+					kfree(vb->resp_data);
-+					vb->resp_data = new_resp_data;
-+					vb->resp_buf_size *= 2;
-+				} else {
-+					part_fill = true;
-+					dev_warn(&vb->vdev->dev,
-+						 "%s: part fill order: %d\n",
-+						 __func__, order);
-+				}
-+			} else {
-+				__send_unused_pages(vb, req_id, pos, false);
-+				pos = 0;
-+			}
-+
-+			if (!part_fill) {
-+				order++;
-+				continue;
-+			}
-+		} else
-+			zone = NULL;
-+
-+		if (order == 0)
-+			__send_unused_pages(vb, req_id, pos, true);
-+
-+	}
-+
-+	mutex_unlock(&vb->balloon_lock);
-+	sg_init_one(&sg_in, &vb->req_hdr, sizeof(vb->req_hdr));
-+	virtqueue_add_inbuf(vq, &sg_in, 1, &vb->req_hdr, GFP_KERNEL);
-+	virtqueue_kick(vq);
-+}
-+
- static void virtballoon_changed(struct virtio_device *vdev)
- {
- 	struct virtio_balloon *vb = vdev->priv;
-@@ -667,18 +744,53 @@ static void update_balloon_size_func(struct work_struct *work)
- 		queue_work(system_freezable_wq, work);
- }
- 
-+static void handle_host_request(struct virtqueue *vq)
-+{
-+	struct virtio_balloon *vb = vq->vdev->priv;
-+	struct virtio_balloon_req_hdr *hdr;
-+	unsigned long req_id;
-+	unsigned int len;
-+
-+	hdr = virtqueue_get_buf(vb->host_req_vq, &len);
-+	if (!hdr || len != sizeof(vb->req_hdr))
-+		return;
-+
-+	switch (hdr->cmd) {
-+	case BALLOON_GET_UNUSED_PAGES:
-+		req_id = le64_to_cpu(hdr->param);
-+		send_unused_pages(vb, req_id);
-+		break;
-+	default:
-+		dev_warn(&vb->vdev->dev, "%s: host request %d not supported\n",
-+			 __func__, hdr->cmd);
-+	}
-+}
-+
- static int init_vqs(struct virtio_balloon *vb)
- {
--	struct virtqueue *vqs[3];
--	vq_callback_t *callbacks[] = { balloon_ack, balloon_ack, stats_request };
--	static const char * const names[] = { "inflate", "deflate", "stats" };
-+	struct virtqueue *vqs[4];
-+	vq_callback_t *callbacks[] = { balloon_ack, balloon_ack,
-+				       stats_request, handle_host_request };
-+	static const char * const names[] = { "inflate", "deflate",
-+					      "stats", "host_request" };
- 	int err, nvqs;
- 
- 	/*
- 	 * We expect two virtqueues: inflate and deflate, and
- 	 * optionally stat.
- 	 */
--	nvqs = virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ) ? 3 : 2;
-+	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_HOST_REQ_VQ))
-+		nvqs = 4;
-+	else if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ))
-+		nvqs = 3;
-+	else
-+		nvqs = 2;
-+
-+	if (!virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ)) {
-+		__virtio_clear_bit(vb->vdev, VIRTIO_BALLOON_F_CHUNK_TRANSFER);
-+		__virtio_clear_bit(vb->vdev, VIRTIO_BALLOON_F_HOST_REQ_VQ);
-+	}
-+
- 	err = vb->vdev->config->find_vqs(vb->vdev, nvqs, vqs, callbacks, names);
- 	if (err)
- 		return err;
-@@ -699,6 +811,20 @@ static int init_vqs(struct virtio_balloon *vb)
- 			BUG();
- 		virtqueue_kick(vb->stats_vq);
- 	}
-+
-+	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_HOST_REQ_VQ)) {
-+		struct scatterlist sg_in;
-+
-+		vb->host_req_vq = vqs[3];
-+		sg_init_one(&sg_in, &vb->req_hdr, sizeof(vb->req_hdr));
-+		if (virtqueue_add_inbuf(vb->host_req_vq, &sg_in, 1,
-+					&vb->req_hdr, GFP_KERNEL) < 0)
-+			__virtio_clear_bit(vb->vdev,
-+					   VIRTIO_BALLOON_F_HOST_REQ_VQ);
-+		else
-+			virtqueue_kick(vb->host_req_vq);
-+	}
-+
- 	return 0;
- }
- 
-@@ -829,6 +955,7 @@ static int virtballoon_probe(struct virtio_device *vdev)
- 	vb->page_bmap[0] = kmalloc(PAGE_BMAP_SIZE, GFP_KERNEL);
- 	if (!vb->page_bmap[0]) {
- 		__virtio_clear_bit(vdev, VIRTIO_BALLOON_F_CHUNK_TRANSFER);
-+		__virtio_clear_bit(vdev, VIRTIO_BALLOON_F_HOST_REQ_VQ);
- 	} else {
- 		vb->page_bmaps = 1;
- 		vb->resp_hdr =
-@@ -837,6 +964,8 @@ static int virtballoon_probe(struct virtio_device *vdev)
- 		if (!vb->resp_hdr) {
- 			__virtio_clear_bit(vdev,
- 					   VIRTIO_BALLOON_F_CHUNK_TRANSFER);
-+			__virtio_clear_bit(vdev,
-+					   VIRTIO_BALLOON_F_HOST_REQ_VQ);
- 			kfree(vb->page_bmap[0]);
- 		} else {
- 			vb->resp_data = (void *)vb->resp_hdr +
-@@ -966,6 +1095,7 @@ static unsigned int features[] = {
- 	VIRTIO_BALLOON_F_STATS_VQ,
- 	VIRTIO_BALLOON_F_DEFLATE_ON_OOM,
- 	VIRTIO_BALLOON_F_CHUNK_TRANSFER,
-+	VIRTIO_BALLOON_F_HOST_REQ_VQ,
- };
- 
- static struct virtio_driver virtio_balloon_driver = {
-diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/virtio_balloon.h
-index aa0e5f0..1f75bee 100644
---- a/include/uapi/linux/virtio_balloon.h
-+++ b/include/uapi/linux/virtio_balloon.h
-@@ -35,6 +35,7 @@
- #define VIRTIO_BALLOON_F_STATS_VQ	1 /* Memory Stats virtqueue */
- #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM	2 /* Deflate balloon on OOM */
- #define VIRTIO_BALLOON_F_CHUNK_TRANSFER	3 /* Transfer pages in chunks */
-+#define VIRTIO_BALLOON_F_HOST_REQ_VQ	4 /* Host request virtqueue */
- 
- /* Size of a PFN in the balloon interface. */
- #define VIRTIO_BALLOON_PFN_SHIFT 12
-@@ -91,4 +92,25 @@ struct virtio_balloon_resp_hdr {
- 	__le32 data_len; /* Payload len in bytes */
- };
- 
-+enum virtio_balloon_req_id {
-+	/* Get unused page information */
-+	BALLOON_GET_UNUSED_PAGES,
-+};
-+
-+enum virtio_balloon_flag {
-+	/* Have more data for a request */
-+	BALLOON_FLAG_CONT,
-+	/* No more data for a request */
-+	BALLOON_FLAG_DONE,
-+};
-+
-+struct virtio_balloon_req_hdr {
-+	/* Used to distinguish different requests */
-+	__le16 cmd;
-+	/* Reserved */
-+	__le16 reserved[3];
-+	/* Request parameter */
-+	__le64 param;
-+};
-+
- #endif /* _LINUX_VIRTIO_BALLOON_H */
--- 
-2.7.4
+Stefan
+
+--yEPQxsgoJgBvi8ip
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYyj6DAAoJEJykq7OBq3PI59EH/A5m3TieLqlGW4VwKgYtX7o8
+wweMcx9XZ1HGFlx3798YJWsPXvWqjC7xII/jQ25qJePe8IFJiN2A+B6FOhB97E+4
+2tLzdcn+UmULmM0aK2RdEAeU6DTLUk3Q7dunMaMnjHCnLvnvAfy57ihQkvNfSGTj
+H7kmZxk1vrAl1HRi6JjeOvA4BriF3Grjde2hu3fDKa/aNSNomSKmIDHKi/UXXYcE
+Glap/7CHgmsxrP49eqS8Xwx5QFILUHqfqpriwFw4GsRzBaRY6IGzXNlx3mLcfMmy
+JlEP2+5DxpUi28aKQYg3DEHHmIZZS2uEJNPMzDj8Sa+ol2oUWjgTC7n923Jkc70=
+=g+n5
+-----END PGP SIGNATURE-----
+
+--yEPQxsgoJgBvi8ip--
