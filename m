@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1coUU5-0007nK-5q
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 08:26:26 -0400
+	(envelope-from <prvs=241876a3f=anthony.perard@citrix.com>)
+	id 1coUUV-000865-RF
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 08:26:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1coUU1-0006Cq-7q
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 08:26:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38634)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1coUU1-0006CP-1i
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 08:26:21 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1B2327E9E6
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 12:26:21 +0000 (UTC)
-Date: Thu, 16 Mar 2017 12:26:16 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170316122616.GH2567@work-vm>
-References: <20170315135021.6978-1-quintela@redhat.com>
-	<20170315135021.6978-9-quintela@redhat.com>
+	(envelope-from <prvs=241876a3f=anthony.perard@citrix.com>)
+	id 1coUUR-0006Pk-S1
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 08:26:51 -0400
+Received: from smtp02.citrix.com ([66.165.176.63]:4980)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=241876a3f=anthony.perard@citrix.com>)
+	id 1coUUR-0006PM-LW
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 08:26:47 -0400
+Date: Thu, 16 Mar 2017 12:26:44 +0000
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20170316122644.GC1882@perard.uk.xensource.com>
+References: <1489593679-31468-1-git-send-email-igor.druzhinin@citrix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20170315135021.6978-9-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 08/31] ram: Move iterations_prev into
- RAMState
+In-Reply-To: <1489593679-31468-1-git-send-email-igor.druzhinin@citrix.com>
+Subject: Re: [Qemu-devel] [PATCH v5] xen: don't save/restore the physmap on
+ VM save/restore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,71 +30,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Igor Druzhinin <igor.druzhinin@citrix.com>
+Cc: sstabellini@kernel.org, paul.durrant@citrix.com, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  migration/ram.c | 13 ++++++-------
->  1 file changed, 6 insertions(+), 7 deletions(-)
+On Wed, Mar 15, 2017 at 04:01:19PM +0000, Igor Druzhinin wrote:
+> Saving/restoring the physmap to/from xenstore was introduced to
+> QEMU majorly in order to cover up the VRAM region restore issue.
+> The sequence of restore operations implies that we should know
+> the effective guest VRAM address *before* we have the VRAM region
+> restored (which happens later). Unfortunately, in Xen environment
+> VRAM memory does actually belong to a guest - not QEMU itself -
+> which means the position of this region is unknown beforehand and
+> can't be mapped into QEMU address space immediately.
 > 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index ae077c5..6cdad06 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -157,6 +157,8 @@ struct RAMState {
->      int64_t num_dirty_pages_period;
->      /* xbzrle misses since the beggining of the period */
->      uint64_t xbzrle_cache_miss_prev;
-> +    /* number of iterations at the beggining of period */
-                                         ^  ^ 
-                                         One extra g, one missing n
-
-Other than that,
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> +    uint64_t iterations_prev;
->  };
->  typedef struct RAMState RAMState;
->  
-> @@ -602,16 +604,13 @@ static void migration_bitmap_sync_range(ram_addr_t start, ram_addr_t length)
->          cpu_physical_memory_sync_dirty_bitmap(bitmap, start, length);
->  }
->  
-> -/* Fix me: there are too many global variables used in migration process. */
-> -static uint64_t iterations_prev;
-> -
->  static void migration_bitmap_sync_init(RAMState *rs)
->  {
->      rs->start_time = 0;
->      rs->bytes_xfer_prev = 0;
->      rs->num_dirty_pages_period = 0;
->      rs->xbzrle_cache_miss_prev = 0;
-> -    iterations_prev = 0;
-> +    rs->iterations_prev = 0;
->  }
->  
->  /* Returns a summary bitmap of the page sizes of all RAMBlocks;
-> @@ -687,13 +686,13 @@ static void migration_bitmap_sync(RAMState *rs)
->          }
->  
->          if (migrate_use_xbzrle()) {
-> -            if (iterations_prev != acct_info.iterations) {
-> +            if (rs->iterations_prev != acct_info.iterations) {
->                  acct_info.xbzrle_cache_miss_rate =
->                     (double)(acct_info.xbzrle_cache_miss -
->                              rs->xbzrle_cache_miss_prev) /
-> -                   (acct_info.iterations - iterations_prev);
-> +                   (acct_info.iterations - rs->iterations_prev);
->              }
-> -            iterations_prev = acct_info.iterations;
-> +            rs->iterations_prev = acct_info.iterations;
->              rs->xbzrle_cache_miss_prev = acct_info.xbzrle_cache_miss;
->          }
->          s->dirty_pages_rate = rs->num_dirty_pages_period * 1000
-> -- 
-> 2.9.3
+> Previously, recreating xenstore keys, holding the physmap, by the
+> toolstack helped to get this information in place at the right
+> moment ready to be consumed by QEMU to map the region properly.
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> The extraneous complexity of having those keys transferred by the
+> toolstack and unnecessary redundancy prompted us to propose a
+> solution which doesn't require any extra data in xenstore. The idea
+> is to defer the VRAM region mapping till the point we actually know
+> the effective address and able to map it. To that end, we initially
+> just skip the mapping request for the framebuffer if we unable to
+> map it now. Then, after the memory region restore phase, we perform
+> the mapping again, this time successfully, and update the VRAM region
+> metadata accordingly.
+> 
+> Signed-off-by: Igor Druzhinin <igor.druzhinin@citrix.com>
+
+I've tried to migrate a guest with this patch, but once migrated, the
+screen is black (via VNC, keyboard is working fine).
+
+I haven't try to migrate a guest from QEMU without this patch to a QEMU
+with it.
+
+-- 
+Anthony PERARD
