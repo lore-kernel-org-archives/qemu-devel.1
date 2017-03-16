@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47287)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1coPpU-0002Kt-Q0
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 03:28:13 -0400
+	(envelope-from <kraxel@redhat.com>) id 1coPwK-0003Le-8q
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 03:35:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1coPpR-0005vP-Ld
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 03:28:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43720)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1coPpR-0005uv-FF
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 03:28:09 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 42CB3C04B945
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 07:28:09 +0000 (UTC)
-Date: Thu, 16 Mar 2017 15:28:03 +0800
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170316072803.GB17296@stefanha-x1.localdomain>
-References: <20170313195547.21466-1-eblake@redhat.com>
-	<20170313195547.21466-31-eblake@redhat.com>
-	<dbffcbd2-e614-884f-9a8f-77bf198d9d58@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="yEPQxsgoJgBvi8ip"
-Content-Disposition: inline
-In-Reply-To: <dbffcbd2-e614-884f-9a8f-77bf198d9d58@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 30/30] trace: Force compiler
- warnings on trace parameter type mismatches
+	(envelope-from <kraxel@redhat.com>) id 1coPwF-0000SC-B8
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 03:35:16 -0400
+Message-ID: <1489649706.15659.72.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 16 Mar 2017 08:35:06 +0100
+In-Reply-To: <87bmt2pl47.fsf@linaro.org>
+References: <36e41adf-b0b3-3efa-51c4-f1a70cd05b98@ilande.co.uk>
+	<87wpbsp49a.fsf@linaro.org>
+	<6491a446-bf23-5ab9-3431-c67efaf83f71@ilande.co.uk>
+	<alpine.BSF.2.20.1703141450560.82811@zero.eik.bme.hu>
+	<87shmfq31b.fsf@linaro.org>
+	<b9006aa4-b606-61d5-6896-8c76a6a6f8f3@ilande.co.uk>
+	<87efxypqug.fsf@linaro.org> <1489591539.15659.60.camel@redhat.com>
+	<87bmt2pl47.fsf@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [Qemu-ppc] qemu-system-ppc video artifacts since
+ "tcg: drop global lock during TCG code execution"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,55 +30,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, BALATON Zoltan <balaton@eik.bme.hu>, jan.kiszka@siemens.com, qemu-devel <qemu-devel@nongnu.org>, cota@braap.org, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, bobby.prani@gmail.com, fred.konrad@greensocs.com, rth@twiddle.net
 
+  Hi,
 
---yEPQxsgoJgBvi8ip
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Mar 15, 2017 at 02:59:55PM -0500, Eric Blake wrote:
-> On 03/13/2017 02:55 PM, Eric Blake wrote:
-> > 2. there are still failures under 'make docker-test-mingw@fedora'
-> > due to more type mismatches that still need to be squashed. I'm
-> > still working on fixing those, but wanted to at least post this
-> > series for initial review, especially so the maintainer can weigh
-> > in on how much (or little) belongs in 2.9
+> >> Note that KVM has some similar hacks to avoid trapping all writes to
+> >> video memory with its coalesced mmio mechanism however I'm not familia=
+r
+> >> with all the details.
+> >
+> > Normal linear framebuffer access doesn't use this.
 >=20
-> mingw is a nightmare.  Things like ntohl() having non-standard behavior
-> on 32-bit mingw can only be worked around by hairy redefinitions in
-> osdep.h or by casts at the callsites. See the conversation in 6/30, but
-> I'm hoping gcc will give us a new knob to tone down the level of
-> -Wformat warnings for two types that have different rank but the same
-> width; if gcc gives us that, then we'd add a configure test, and
-> conditionally generate the type-mismatch checking code ONLY when gcc is
-> smart enough to not care about rank mismatch.  Until then, this RFC
-> 30/30 proved useful for flushing out the earlier cleanups (many of which
-> you can/should still accept), but should NOT be incorporated as-is, not
-> even when 2.10 opens.
+> Ahh OK - as I said I wasn't super familiar with what coalesced mmio was
+> trying to achieve. I assume it is trying to avoid trapping on every
+> single MMIO access?
 
-QEMU 2.9 regression fixes are appropriate at this stage in the release
-process.
+You can't avoid the trap, but you can avoid notifying userspace about
+each and every single trap and batch things.
 
-Fixes for bugs already in 2.8 are less likely to be merged as we head
-towards -rc2/-rc3.
+But vga framebuffer is normal ram in most video modes, it doesn't trap
+(except on first access with dirty bit clear, for dirty bit tracking). =20
 
-Stefan
+IIRC some of the historic video modes which are pretty much unused these
+days (planar 4bit) trap on each access and perform better with coalesced
+mmio.  Also nics which use mmio instead of dma for package xfer.
 
---yEPQxsgoJgBvi8ip
-Content-Type: application/pgp-signature; name="signature.asc"
+> > I suspect the memory_region_sync_dirty_bitmap call on tcg should reset
+> > the fast path optimization, so the slow path can update the dirty bits
+> > correctly.
+>=20
+> Sure. And for the low level cputlb implementation we can clear those
+> bits atomically. However when the memory region is synced we also need
+> to flush any entries in the TLB that have already been hit and cleared
+> TLB_NOTDIRTY to we can trigger the slow path again. This is tricky from
+> outside of a vCPU context because we can't just queue the work and exit
+> the vCPU run loop to reach a known CPU state.
 
------BEGIN PGP SIGNATURE-----
+Hmm, ok.
 
-iQEcBAEBAgAGBQJYyj6DAAoJEJykq7OBq3PI59EH/A5m3TieLqlGW4VwKgYtX7o8
-wweMcx9XZ1HGFlx3798YJWsPXvWqjC7xII/jQ25qJePe8IFJiN2A+B6FOhB97E+4
-2tLzdcn+UmULmM0aK2RdEAeU6DTLUk3Q7dunMaMnjHCnLvnvAfy57ihQkvNfSGTj
-H7kmZxk1vrAl1HRi6JjeOvA4BriF3Grjde2hu3fDKa/aNSNomSKmIDHKi/UXXYcE
-Glap/7CHgmsxrP49eqS8Xwx5QFILUHqfqpriwFw4GsRzBaRY6IGzXNlx3mLcfMmy
-JlEP2+5DxpUi28aKQYg3DEHHmIZZS2uEJNPMzDj8Sa+ol2oUWjgTC7n923Jkc70=
-=g+n5
------END PGP SIGNATURE-----
+> The RFC PATCH I sent earlier solves this by ensuring the update runs in
+> a quiescent period (i.e. when the vCPUs are not running) but it is
+> sub-optimal as it means the display code has to have a basic knowledge
+> of vCPUs and when they run.
 
---yEPQxsgoJgBvi8ip--
+Still the best option for 2.9 I guess ...
+
+cheers,
+  Gerd
