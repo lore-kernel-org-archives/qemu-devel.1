@@ -1,21 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56966)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58220)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1coKHv-0005Ez-T0
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 21:33:12 -0400
+	(envelope-from <kai.huang@linux.intel.com>) id 1coKPR-0006jz-CO
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 21:40:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1coKHv-0000iG-17
-	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 21:33:11 -0400
-Date: Thu, 16 Mar 2017 09:33:01 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170316013301.GB21865@lemon.lan>
-References: <1489549053-31728-1-git-send-email-jemmy858585@gmail.com>
-	<20170315111021.GD3088@lemon.lan> <20170315173108.GB2701@work-vm>
+	(envelope-from <kai.huang@linux.intel.com>) id 1coKPN-00050D-Su
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 21:40:57 -0400
+Received: from mga05.intel.com ([192.55.52.43]:31400)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kai.huang@linux.intel.com>)
+	id 1coKPN-0004pK-F0
+	for qemu-devel@nongnu.org; Wed, 15 Mar 2017 21:40:53 -0400
+References: <589C7E96.9060905@huawei.com> <589D83CE.1090803@huawei.com>
+	<589DDC05.9010807@windriver.com> <58AA51D6.6020508@huawei.com>
+	<1487565495.3740.27.camel@intel.com> <58AD0094.90304@windriver.com>
+	<4dd92012-626a-2d80-9adb-0be398f73eb1@redhat.com>
+	<58AD92AE.6040502@windriver.com>
+	<6c5567f4-192d-aefd-90e4-89f53479c24e@redhat.com>
+	<58AF9921.6060201@huawei.com> <58B04CD3.7010304@windriver.com>
+	<7fdf2551-3d55-1bd9-2848-720a880cc93e@redhat.com>
+	<58B0E191.6040108@huawei.com>
+	<50916996-297e-a794-38e8-5c7ca9389419@linux.intel.com>
+	<a865b1b0-558f-900f-06d7-ceace1c46afb@huawei.com>
+	<d6172fb7-ab1c-0faf-ed71-18fd74781671@redhat.com>
+From: "Huang, Kai" <kai.huang@linux.intel.com>
+Message-ID: <84e697fb-0309-faa9-9f10-90235f839db6@linux.intel.com>
+Date: Thu, 16 Mar 2017 14:40:20 +1300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170315173108.GB2701@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v2] migration/block: Avoid invoking
- blk_drain too frequently
+In-Reply-To: <d6172fb7-ab1c-0faf-ed71-18fd74781671@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] kvm bug in __rmap_clear_dirty during live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,53 +38,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Lidong Chen <jemmy858585@gmail.com>, qemu-devel@nongnu.org, stefanha@redhat.com, quintela@redhat.com, qemu-block@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, fangying <fangying1@huawei.com>, "Herongguang (Stephen)" <herongguang.he@huawei.com>, Chris Friesen <chris.friesen@windriver.com>, "Han, Huaitong" <huaitong.han@intel.com>, "hangaohuai@huawei.com" <hangaohuai@huawei.com>, stable@vger.kernel.org
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "xudong.hao@linux.intel.com" <xudong.hao@linux.intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "wangxinxin.wang@huawei.com" <wangxinxin.wang@huawei.com>, "rkrcmar@redhat.com" <rkrcmar@redhat.com>, "guangrong.xiao@linux.intel.com" <guangrong.xiao@linux.intel.com>, linux-kernel@vger.kernel.org
 
-On Wed, 03/15 17:31, Dr. David Alan Gilbert wrote:
-> * Fam Zheng (famz@redhat.com) wrote:
-> > On Wed, 03/15 11:37, Lidong Chen wrote:
-> > > Increase bmds->cur_dirty after submit io, so reduce the frequency
-> > > involve into blk_drain, and improve the performance obviously
-> > > when block migration.
-> > > 
-> > > The performance test result of this patch:
-> > > 
-> > > During the block dirty save phase, this patch improve guest os IOPS
-> > > from 4.0K to 9.5K. and improve the migration speed from
-> > > 505856 rsec/s to 855756 rsec/s.
-> > > 
-> > > Signed-off-by: Lidong Chen <jemmy858585@gmail.com>
-> > > ---
-> > >  migration/block.c | 3 +++
-> > >  1 file changed, 3 insertions(+)
-> > > 
-> > > diff --git a/migration/block.c b/migration/block.c
-> > > index 6741228..7734ff7 100644
-> > > --- a/migration/block.c
-> > > +++ b/migration/block.c
-> > > @@ -576,6 +576,9 @@ static int mig_save_device_dirty(QEMUFile *f, BlkMigDevState *bmds,
-> > >              }
-> > >  
-> > >              bdrv_reset_dirty_bitmap(bmds->dirty_bitmap, sector, nr_sectors);
-> > > +            sector += nr_sectors;
-> > > +            bmds->cur_dirty = sector;
-> > > +
-> > >              break;
-> > >          }
-> > >          sector += BDRV_SECTORS_PER_DIRTY_CHUNK;
-> > > -- 
-> > > 1.8.3.1
-> > > 
-> > 
-> > Nice catch above all, thank you!
-> > 
-> > Reviewed-by: Fam Zheng <famz@redhat.com>
-> 
-> Are you taking that via a block pull?
+Thanks!
 
-I can do that, but I'm not sure whether it should go to 2.9. This is a
-performance improvement, which usually doesn't qualify as bug fixes. But this
-also looks like a mistake in original code.
+Thanks,
+-Kai
 
-Fam
+On 3/14/2017 5:57 AM, Paolo Bonzini wrote:
+>
+>
+> On 13/03/2017 15:58, fangying wrote:
+>> Hi, Huang Kai
+>>
+>> After weeks of intensive testing, we think the problem is solved and
+>> this issue can be closed.
+>
+> Thanks for the update.  We got to the same conclusion.
+>
+> Paolo
+>
