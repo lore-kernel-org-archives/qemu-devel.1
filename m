@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47287)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1coPwK-0003Le-8q
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 03:35:17 -0400
+	(envelope-from <stefanha@redhat.com>) id 1coPxe-0003zR-I4
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 03:36:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1coPwF-0000SC-B8
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 03:35:16 -0400
-Message-ID: <1489649706.15659.72.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 16 Mar 2017 08:35:06 +0100
-In-Reply-To: <87bmt2pl47.fsf@linaro.org>
-References: <36e41adf-b0b3-3efa-51c4-f1a70cd05b98@ilande.co.uk>
-	<87wpbsp49a.fsf@linaro.org>
-	<6491a446-bf23-5ab9-3431-c67efaf83f71@ilande.co.uk>
-	<alpine.BSF.2.20.1703141450560.82811@zero.eik.bme.hu>
-	<87shmfq31b.fsf@linaro.org>
-	<b9006aa4-b606-61d5-6896-8c76a6a6f8f3@ilande.co.uk>
-	<87efxypqug.fsf@linaro.org> <1489591539.15659.60.camel@redhat.com>
-	<87bmt2pl47.fsf@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [Qemu-ppc] qemu-system-ppc video artifacts since
- "tcg: drop global lock during TCG code execution"
+	(envelope-from <stefanha@redhat.com>) id 1coPxd-0000tu-IU
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 03:36:38 -0400
+Date: Thu, 16 Mar 2017 15:36:25 +0800
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170316073625.GC17296@stefanha-x1.localdomain>
+References: <20170313195547.21466-1-eblake@redhat.com>
+	<20170313195547.21466-2-eblake@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="qjNfmADvan18RZcF"
+Content-Disposition: inline
+In-Reply-To: <20170313195547.21466-2-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 01/30] trace: Fix backwards mirror_yield
+ parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +25,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, BALATON Zoltan <balaton@eik.bme.hu>, jan.kiszka@siemens.com, qemu-devel <qemu-devel@nongnu.org>, cota@braap.org, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, bobby.prani@gmail.com, fred.konrad@greensocs.com, rth@twiddle.net
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block Jobs" <qemu-block@nongnu.org>
 
-  Hi,
 
-> >> Note that KVM has some similar hacks to avoid trapping all writes to
-> >> video memory with its coalesced mmio mechanism however I'm not familia=
-r
-> >> with all the details.
-> >
-> > Normal linear framebuffer access doesn't use this.
+--qjNfmADvan18RZcF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Mar 13, 2017 at 02:55:18PM -0500, Eric Blake wrote:
+> block/trace-events lists the parameters for mirror_yield
+> consistently with other mirror events (cnt just after s, like in
+> mirror_before_sleep; in_flight last, like in mirror_yield_in_flight).
+> But the callers were passing parameters in the wrong order, leading
+> to poor trace messages, including type truncation when there are
+> more than 4G dirty sectors involved.  Broken since its introduction
+> in commit bd48bde.
 >=20
-> Ahh OK - as I said I wasn't super familiar with what coalesced mmio was
-> trying to achieve. I assume it is trying to avoid trapping on every
-> single MMIO access?
-
-You can't avoid the trap, but you can avoid notifying userspace about
-each and every single trap and batch things.
-
-But vga framebuffer is normal ram in most video modes, it doesn't trap
-(except on first access with dirty bit clear, for dirty bit tracking). =20
-
-IIRC some of the historic video modes which are pretty much unused these
-days (planar 4bit) trap on each access and perform better with coalesced
-mmio.  Also nics which use mmio instead of dma for package xfer.
-
-> > I suspect the memory_region_sync_dirty_bitmap call on tcg should reset
-> > the fast path optimization, so the slow path can update the dirty bits
-> > correctly.
+> While touching this, ensure that all callers use the same type
+> (uint64_t) for cnt, as a later patch will enable the compiler to do
+> stricter type-checking.
 >=20
-> Sure. And for the low level cputlb implementation we can clear those
-> bits atomically. However when the memory region is synced we also need
-> to flush any entries in the TLB that have already been hit and cleared
-> TLB_NOTDIRTY to we can trigger the slow path again. This is tricky from
-> outside of a vCPU context because we can't just queue the work and exit
-> the vCPU run loop to reach a known CPU state.
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  block/mirror.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 
-Hmm, ok.
+Thanks, applied to my tracing-next tree:
+https://github.com/stefanha/qemu/commits/tracing-next
 
-> The RFC PATCH I sent earlier solves this by ensuring the update runs in
-> a quiescent period (i.e. when the vCPUs are not running) but it is
-> sub-optimal as it means the display code has to have a basic knowledge
-> of vCPUs and when they run.
+Stefan
 
-Still the best option for 2.9 I guess ...
+--qjNfmADvan18RZcF
+Content-Type: application/pgp-signature; name="signature.asc"
 
-cheers,
-  Gerd
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYykB5AAoJEJykq7OBq3PIOkkH/ROZsLk1zor7sIRw+rkhQ9QS
+YeubEkZqomzlmzb6kHn7dkkmUTQJcHiGd8TS8RRlqwbHsUnZ7nXB8lbIXapVMPdF
+GNRpSYqS1LVpp2LIxAGz2OJHVHQ86R3yMA1cPMHqxVQtTtPWIl8J3qVc4dXZqi7D
+JjjacKn3ceDhmm3DYGRtJev56tCbBjuzfy0FXzSAR4F5Vd1FU/O45+iUaYC2ubzu
+A7k395icQ9W7NdUjarFZQvYEUMg+cloolxTj1UjGaTEKbeLShS4s6rKMYJR78/NW
+PX6VwOYI6Gjhy6w3q/lKibY0wC3YeZ2v5Cg+Cz3Dsn5lgVkf4f2TYuHeBeNPvKg=
+=62T1
+-----END PGP SIGNATURE-----
+
+--qjNfmADvan18RZcF--
