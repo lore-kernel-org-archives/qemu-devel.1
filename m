@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1coOtW-00068o-Fd
+	(envelope-from <armbru@redhat.com>) id 1coOtZ-0006CS-Ih
 	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 02:28:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1coOtQ-00076H-LP
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 02:28:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54906)
+	(envelope-from <armbru@redhat.com>) id 1coOtS-0007Ay-MZ
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 02:28:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41872)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1coOtQ-00072j-C3
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 02:28:12 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1coOtS-00078E-7U
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 02:28:14 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 54C0FC054918
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 06:28:12 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 15E17C04BD3E
+	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 06:28:14 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-26.ams2.redhat.com
 	[10.36.116.26])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E899960A99
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 06:28:11 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id D6C85176A4
+	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 06:28:13 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 16 Mar 2017 07:27:34 +0100
-Message-Id: <1489645685-4750-19-git-send-email-armbru@redhat.com>
+Date: Thu, 16 Mar 2017 07:28:04 +0100
+Message-Id: <1489645685-4750-49-git-send-email-armbru@redhat.com>
 In-Reply-To: <1489645685-4750-1-git-send-email-armbru@redhat.com>
 References: <1489645685-4750-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL for 2.9 18/49] qapi2texi: Convert to
- QAPISchemaVisitor
+Subject: [Qemu-devel] [PULL for 2.9 48/49] qapi: Make pylint a bit happier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,275 +35,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-qapi2texi works with schema expression trees.  Such a tight coupling
-to schema language syntax is not a good idea.  Convert it to the visitor
-interface the other generators use.
-
-No change to generated documentation.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <1489582656-31133-17-git-send-email-armbru@redhat.com>
+Message-Id: <1489582656-31133-47-git-send-email-armbru@redhat.com>
 ---
- scripts/qapi2texi.py | 228 ++++++++++++++++++++++++++-------------------------
- 1 file changed, 118 insertions(+), 110 deletions(-)
+ scripts/qapi-commands.py | 6 +++---
+ scripts/qapi-visit.py    | 1 -
+ scripts/qapi.py          | 8 ++++----
+ 3 files changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-index 299dcf9..6d4e757 100755
---- a/scripts/qapi2texi.py
-+++ b/scripts/qapi2texi.py
-@@ -123,31 +123,39 @@ def texi_format(doc):
-     return "\n".join(lines)
+diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
+index 0c05449..1943de4 100644
+--- a/scripts/qapi-commands.py
++++ b/scripts/qapi-commands.py
+@@ -13,7 +13,6 @@
+ # See the COPYING file in the top-level directory.
+ 
+ from qapi import *
+-import re
  
  
--def texi_body(doc, only_documented=False):
--    """
--    Format the body of a symbol documentation:
--    - main body
--    - table of arguments
--    - followed by "Returns/Notes/Since/Example" sections
--    """
--    body = texi_format(str(doc.body)) + "\n"
--
--    args = ''
--    for name, section in doc.args.iteritems():
--        if not section.content and not only_documented:
--            continue        # Undocumented TODO require doc and drop
--        desc = str(section)
--        opt = ''
--        if section.optional:
--            desc = re.sub(r'^ *#optional *\n?|\n? *#optional *$|#optional',
--                          '', desc)
--            opt = ' (optional)'
--        args += "@item @code{'%s'}%s\n%s\n" % (name, opt, texi_format(desc))
--    if args:
--        body += "@table @asis\n"
--        body += args
--        body += "@end table\n"
-+def texi_body(doc):
-+    """Format the main documentation body"""
-+    return texi_format(str(doc.body)) + '\n'
- 
-+
-+def texi_enum_value(value):
-+    """Format a table of members item for an enumeration value"""
-+    return "@item @code{'%s'}\n" % value.name
-+
-+
-+def texi_member(member):
-+    """Format a table of members item for an object type member"""
-+    return "@item @code{'%s'}%s\n" % (
-+        member.name, ' (optional)' if member.optional else '')
-+
-+
-+def texi_members(doc, member_func, show_undocumented):
-+    """Format the table of members"""
-+    items = ''
-+    for section in doc.args.itervalues():
-+        if not section.content and not show_undocumented:
-+            continue          # Undocumented TODO require doc and drop
-+        desc = re.sub(r'^ *#optional *\n?|\n? *#optional *$|#optional',
-+                      '', str(section))
-+        items += member_func(section.member) + texi_format(desc) + '\n'
-+    if not items:
-+        return ''
-+    return '@table @asis\n' + items + '@end table\n'
-+
-+
-+def texi_sections(doc):
-+    """Format additional sections following arguments"""
-+    body = ''
-     for section in doc.sections:
-         name, doc = (section.name, str(section))
-         func = texi_format
-@@ -159,94 +167,94 @@ def texi_body(doc, only_documented=False):
-             body += "\n\n@b{%s:}\n" % name
- 
-         body += func(doc)
--
-     return body
+ def gen_command_decl(name, arg_type, boxed, ret_type):
+@@ -84,7 +83,8 @@ static void qmp_marshal_output_%(c_name)s(%(c_type)s ret_in, QObject **ret_out,
  
  
--def texi_alternate(expr, doc):
--    """Format an alternate to texi"""
--    body = texi_body(doc)
--    return TYPE_FMT(type="Alternate",
--                    name=doc.symbol,
--                    body=body)
--
--
--def texi_union(expr, doc):
--    """Format a union to texi"""
--    discriminator = expr.get("discriminator")
--    if discriminator:
--        union = "Flat Union"
--    else:
--        union = "Simple Union"
--
--    body = texi_body(doc)
--    return TYPE_FMT(type=union,
--                    name=doc.symbol,
--                    body=body)
--
--
--def texi_enum(expr, doc):
--    """Format an enum to texi"""
--    body = texi_body(doc, True)
--    return TYPE_FMT(type="Enum",
--                    name=doc.symbol,
--                    body=body)
--
--
--def texi_struct(expr, doc):
--    """Format a struct to texi"""
--    body = texi_body(doc)
--    return TYPE_FMT(type="Struct",
--                    name=doc.symbol,
--                    body=body)
--
--
--def texi_command(expr, doc):
--    """Format a command to texi"""
--    body = texi_body(doc)
--    return MSG_FMT(type="Command",
--                   name=doc.symbol,
--                   body=body)
--
--
--def texi_event(expr, doc):
--    """Format an event to texi"""
--    body = texi_body(doc)
--    return MSG_FMT(type="Event",
--                   name=doc.symbol,
--                   body=body)
--
--
--def texi_expr(expr, doc):
--    """Format an expr to texi"""
--    (kind, _) = expr.items()[0]
--
--    fmt = {"command": texi_command,
--           "struct": texi_struct,
--           "enum": texi_enum,
--           "union": texi_union,
--           "alternate": texi_alternate,
--           "event": texi_event}[kind]
--
--    return fmt(expr, doc)
--
--
--def texi(docs):
--    """Convert QAPI schema expressions to texi documentation"""
--    res = []
--    for doc in docs:
--        expr = doc.expr
--        if not expr:
--            res.append(texi_body(doc))
--            continue
--        try:
--            doc = texi_expr(expr, doc)
--            res.append(doc)
--        except:
--            print >>sys.stderr, "error at @%s" % doc.info
--            raise
--
--    return '\n'.join(res)
-+def texi_entity(doc, member_func=texi_member, show_undocumented=False):
-+    return (texi_body(doc)
-+            + texi_members(doc, member_func, show_undocumented)
-+            + texi_sections(doc))
-+
-+
-+class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisitor):
-+    def __init__(self):
-+        self.out = None
-+        self.cur_doc = None
-+
-+    def visit_begin(self, schema):
-+        self.out = ''
-+
-+    def visit_enum_type(self, name, info, values, prefix):
-+        doc = self.cur_doc
-+        if self.out:
-+            self.out += '\n'
-+        self.out += TYPE_FMT(type='Enum',
-+                             name=doc.symbol,
-+                             body=texi_entity(doc,
-+                                              member_func=texi_enum_value,
-+                                              show_undocumented=True))
-+
-+    def visit_object_type(self, name, info, base, members, variants):
-+        doc = self.cur_doc
-+        if not variants:
-+            typ = 'Struct'
-+        elif variants._tag_name:        # TODO unclean member access
-+            typ = 'Flat Union'
-+        else:
-+            typ = 'Simple Union'
-+        if self.out:
-+            self.out += '\n'
-+        self.out += TYPE_FMT(type=typ,
-+                             name=doc.symbol,
-+                             body=texi_entity(doc))
-+
-+    def visit_alternate_type(self, name, info, variants):
-+        doc = self.cur_doc
-+        if self.out:
-+            self.out += '\n'
-+        self.out += TYPE_FMT(type='Alternate',
-+                             name=doc.symbol,
-+                             body=texi_entity(doc))
-+
-+    def visit_command(self, name, info, arg_type, ret_type,
-+                      gen, success_response, boxed):
-+        doc = self.cur_doc
-+        if self.out:
-+            self.out += '\n'
-+        self.out += MSG_FMT(type='Command',
-+                            name=doc.symbol,
-+                            body=texi_entity(doc))
-+
-+    def visit_event(self, name, info, arg_type, boxed):
-+        doc = self.cur_doc
-+        if self.out:
-+            self.out += '\n'
-+        self.out += MSG_FMT(type='Event',
-+                            name=doc.symbol,
-+                            body=texi_entity(doc))
-+
-+    def symbol(self, doc, entity):
-+        self.cur_doc = doc
-+        entity.visit(self)
-+        self.cur_doc = None
-+
-+    def freeform(self, doc):
-+        assert not doc.args
-+        if self.out:
-+            self.out += '\n'
-+        self.out += texi_body(doc) + texi_sections(doc)
-+
-+
-+def texi_schema(schema):
-+    """Convert QAPI schema documentation to Texinfo"""
-+    gen = QAPISchemaGenDocVisitor()
-+    gen.visit_begin(schema)
-+    for doc in schema.docs:
-+        if doc.symbol:
-+            gen.symbol(doc, schema.lookup_entity(doc.symbol))
-+        else:
-+            gen.freeform(doc)
-+    return gen.out
+ def gen_marshal_proto(name):
+-    return 'void qmp_marshal_%s(QDict *args, QObject **ret, Error **errp)' % c_name(name)
++    return ('void qmp_marshal_%s(QDict *args, QObject **ret, Error **errp)'
++            % c_name(name))
  
  
- def main(argv):
-@@ -259,7 +267,7 @@ def main(argv):
-     if not qapi.doc_required:
-         print >>sys.stderr, ("%s: need pragma 'doc-required' "
-                              "to generate documentation" % argv[0])
--    print texi(schema.docs)
-+    print texi_schema(schema)
+ def gen_marshal_decl(name):
+@@ -198,7 +198,7 @@ def gen_register_command(name, success_response):
+         options = 'QCO_NO_SUCCESS_RESP'
+ 
+     ret = mcgen('''
+-    qmp_register_command(cmds, "%(name)s", 
++    qmp_register_command(cmds, "%(name)s",
+                          qmp_marshal_%(c_name)s, %(opts)s);
+ ''',
+                 name=name, c_name=c_name(name),
+diff --git a/scripts/qapi-visit.py b/scripts/qapi-visit.py
+index 3d3936e..5737aef 100644
+--- a/scripts/qapi-visit.py
++++ b/scripts/qapi-visit.py
+@@ -13,7 +13,6 @@
+ # See the COPYING file in the top-level directory.
+ 
+ from qapi import *
+-import re
  
  
- if __name__ == "__main__":
+ def gen_visit_decl(name, scalar=False):
+diff --git a/scripts/qapi.py b/scripts/qapi.py
+index b798ae4..d19300d 100644
+--- a/scripts/qapi.py
++++ b/scripts/qapi.py
+@@ -11,13 +11,13 @@
+ # This work is licensed under the terms of the GNU GPL, version 2.
+ # See the COPYING file in the top-level directory.
+ 
+-import re
+-from ordereddict import OrderedDict
+ import errno
+ import getopt
+ import os
+-import sys
++import re
+ import string
++import sys
++from ordereddict import OrderedDict
+ 
+ builtin_types = {
+     'str':      'QTYPE_QSTRING',
+@@ -1587,7 +1587,7 @@ class QAPISchema(object):
+         tag_member = None
+         if isinstance(base, dict):
+             base = (self._make_implicit_object_type(
+-                    name, info, doc, 'base', self._make_members(base, info)))
++                name, info, doc, 'base', self._make_members(base, info)))
+         if tag_name:
+             variants = [self._make_variant(key, value)
+                         for (key, value) in data.iteritems()]
 -- 
 2.7.4
