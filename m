@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50063)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1coXKd-0003rK-ID
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 11:28:52 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1coXNt-0005OT-Cf
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 11:32:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1coXKc-0003Fd-9k
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 11:28:51 -0400
-References: <1488800894-22421-1-git-send-email-eric.auger@redhat.com>
-	<1488800894-22421-4-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA97hCS-bbKDV+w2G3yRunUm=QpsA+8Bqp9YNaa_VtMP-w@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <884feb25-e918-1cc6-10d5-ea37387bceb7@redhat.com>
-Date: Thu, 16 Mar 2017 16:28:36 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1coXNs-0004VF-ID
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 11:32:13 -0400
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:35291)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1coXNs-0004Uq-A7
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 11:32:12 -0400
+Received: by mail-wr0-x232.google.com with SMTP id g10so34590683wrg.2
+	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 08:32:12 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA97hCS-bbKDV+w2G3yRunUm=QpsA+8Bqp9YNaa_VtMP-w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 3/3] hw/intc/arm_gicv3_its: Allow
- save/restore
+In-Reply-To: <20170316070427.17120-1-stefanha@redhat.com>
+References: <20170316070427.17120-1-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 16 Mar 2017 15:31:50 +0000
+Message-ID: <CAFEAcA86DYrQ8XU_+xm_qshYgjnAQyAtRDo7XEnTzxSdTDBANQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 0/3] Tracing patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,146 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Vijay Kilari <vijay.kilari@gmail.com>, "Kumar, Vijaya" <Vijaya.Kumar@cavium.com>, Andrew Jones <drjones@redhat.com>, Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Hi Peter,
+On 16 March 2017 at 07:04, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> The following changes since commit 1883ff34b540daacae948f493b0ba525edf5f642:
+>
+>   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2017-03-15 18:44:05 +0000)
+>
+> are available in the git repository at:
+>
+>   git://github.com/stefanha/qemu.git tags/tracing-pull-request
+>
+> for you to fetch changes up to 8755b4afbdcf1c274cab7545a9f76d3d6c7f5c29:
+>
+>   trace: ensure $(tracetool-y) is defined in top level makefile (2017-03-16 11:51:26 +0800)
+>
+> ----------------------------------------------------------------
+> Pull request
+>
+> Tracing makefile fixes for QEMU 2.9.
+>
+> ----------------------------------------------------------------
+>
+> Daniel P. Berrange (3):
+>   makefile: merge GENERATED_HEADERS & GENERATED_SOURCES variables
+>   makefile: generate trace-events-all upfront
+>   trace: ensure $(tracetool-y) is defined in top level makefile
+>
+>  Makefile                   | 42 ++++++++++++++++++++++--------------------
+>  Makefile.target            |  6 +++---
+>  target/s390x/Makefile.objs |  2 +-
+>  tests/Makefile.include     |  2 +-
+>  trace/Makefile.objs        |  8 --------
+>  5 files changed, 27 insertions(+), 33 deletions(-)
 
-On 13/03/2017 19:03, Peter Maydell wrote:
-> On 6 March 2017 at 12:48, Eric Auger <eric.auger@redhat.com> wrote:
->> We change the restoration priority of both the GICv3 and ITS. The
->> GICv3 must be restored before the ITS and the ITS needs to be restored
->> before PCIe devices since it translates their MSI transactions.
-> 
->> We typically observe the virtio-pci-net device sending MSI transactions
->> very early (even before the first vcpu run) which looks weird. It
->> appears that not servicing those transactions cause the virtio-pci-net
->> to stall.
-> 
-> This does seem rather weird and worth closer investigation.
-> A stopped VM ought IMHO to be completely stopped, not still
-> doing things...
-Yes I will take time to investigate what does happen.
+Applied, thanks.
 
-> 
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->>
->> v1 -> v2:
->> - handle case where migrate_add_blocker fails
->> - add comments along with ITS and GICv3 migration priorities
->> ---
->>  hw/intc/arm_gicv3_common.c     |  1 +
->>  hw/intc/arm_gicv3_its_common.c |  3 ++-
->>  hw/intc/arm_gicv3_its_kvm.c    | 23 +++++++++++------------
->>  include/migration/vmstate.h    |  2 ++
->>  4 files changed, 16 insertions(+), 13 deletions(-)
->>
->> diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
->> index c6493d6..4228b7c 100644
->> --- a/hw/intc/arm_gicv3_common.c
->> +++ b/hw/intc/arm_gicv3_common.c
->> @@ -145,6 +145,7 @@ static const VMStateDescription vmstate_gicv3 = {
->>      .minimum_version_id = 1,
->>      .pre_save = gicv3_pre_save,
->>      .post_load = gicv3_post_load,
->> +    .priority = MIG_PRI_GICV3,
->>      .fields = (VMStateField[]) {
->>          VMSTATE_UINT32(gicd_ctlr, GICv3State),
->>          VMSTATE_UINT32_ARRAY(gicd_statusr, GICv3State, 2),
->> diff --git a/hw/intc/arm_gicv3_its_common.c b/hw/intc/arm_gicv3_its_common.c
->> index 75b9f04..854709f 100644
->> --- a/hw/intc/arm_gicv3_its_common.c
->> +++ b/hw/intc/arm_gicv3_its_common.c
->> @@ -48,7 +48,8 @@ static const VMStateDescription vmstate_its = {
->>      .name = "arm_gicv3_its",
->>      .pre_save = gicv3_its_pre_save,
->>      .post_load = gicv3_its_post_load,
->> -    .unmigratable = true,
->> +    .unmigratable = false,
-> 
-> unmigratable = false is the default, so we can just delete the line.
-OK thanks
-> 
->> +    .priority = MIG_PRI_GICV3_ITS,
->>      .fields = (VMStateField[]) {
->>          VMSTATE_UINT32(ctlr, GICv3ITSState),
->>          VMSTATE_UINT64(cbaser, GICv3ITSState),
->> diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
->> index 45e57d6..3bd2873 100644
->> --- a/hw/intc/arm_gicv3_its_kvm.c
->> +++ b/hw/intc/arm_gicv3_its_kvm.c
->> @@ -76,18 +76,6 @@ static void kvm_arm_its_realize(DeviceState *dev, Error **errp)
->>      GICv3ITSState *s = ARM_GICV3_ITS_COMMON(dev);
->>      Error *local_err = NULL;
->>
->> -    /*
->> -     * Block migration of a KVM GICv3 ITS device: the API for saving and
->> -     * restoring the state in the kernel is not yet available
->> -     */
->> -    error_setg(&s->migration_blocker, "vITS migration is not implemented");
->> -    migrate_add_blocker(s->migration_blocker, &local_err);
->> -    if (local_err) {
->> -        error_propagate(errp, local_err);
->> -        error_free(s->migration_blocker);
->> -        return;
->> -    }
->> -
->>      s->dev_fd = kvm_create_device(kvm_state, KVM_DEV_TYPE_ARM_VGIC_ITS, false);
->>      if (s->dev_fd < 0) {
->>          error_setg_errno(errp, -s->dev_fd, "error creating in-kernel ITS");
->> @@ -104,6 +92,17 @@ static void kvm_arm_its_realize(DeviceState *dev, Error **errp)
->>
->>      gicv3_its_init_mmio(s, NULL);
->>
->> +    if (!kvm_device_check_attr(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ITS_REGS,
->> +        GITS_CTLR)) {
->> +        error_setg(&s->migration_blocker, "vITS migration is not implemented");
-> 
-> I think we should specifically say that it's the host kernel
-> that doesn't support ITS migration (ie not QEMU that's missing
-> support).
-> 
-> The GICv3 uses the message
->  "This operating system kernel does not support vGICv3 migration"
-> which is slightly odd phrasing but I guess we should follow that.
-Sure I will use that message.
-
-Thank you for the review
-
-Best Regards
-
-Eric
-> 
->> +        migrate_add_blocker(s->migration_blocker, &local_err);
->> +        if (local_err) {
->> +            error_propagate(errp, local_err);
->> +            error_free(s->migration_blocker);
->> +            return;
->> +        }
->> +    }
->> +
->>      kvm_msi_use_devid = true;
->>      kvm_gsi_direct_mapping = false;
->>      kvm_msi_via_irqfd_allowed = kvm_irqfds_enabled();
->> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
->> index f2dbf84..8dab9c7 100644
->> --- a/include/migration/vmstate.h
->> +++ b/include/migration/vmstate.h
->> @@ -198,6 +198,8 @@ enum VMStateFlags {
->>  typedef enum {
->>      MIG_PRI_DEFAULT = 0,
->>      MIG_PRI_IOMMU,              /* Must happen before PCI devices */
->> +    MIG_PRI_GICV3_ITS,          /* Must happen before PCI devices */
->> +    MIG_PRI_GICV3,              /* Must happen before the ITS */
->>      MIG_PRI_MAX,
->>  } MigrationPriority;
->>
->> --
->> 2.5.5
->>
-> 
-> thanks
-> -- PMM
-> 
+-- PMM
