@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42675)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <akpm@linux-foundation.org>) id 1cocwz-00007S-Ui
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 17:28:51 -0400
+	(envelope-from <no-reply@patchew.org>) id 1cocx9-0000Ap-6J
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 17:29:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <akpm@linux-foundation.org>) id 1cocww-0004Yt-0s
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 17:28:49 -0400
-Received: from mail.linuxfoundation.org ([140.211.169.12]:43558)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <akpm@linux-foundation.org>)
-	id 1cocwv-0004XY-Np
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 17:28:45 -0400
-Date: Thu, 16 Mar 2017 14:28:42 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-Message-Id: <20170316142842.69770813b98df70277431b1e@linux-foundation.org>
-In-Reply-To: <1489648127-37282-4-git-send-email-wei.w.wang@intel.com>
-References: <1489648127-37282-1-git-send-email-wei.w.wang@intel.com>
-	<1489648127-37282-4-git-send-email-wei.w.wang@intel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH kernel v8 3/4] mm: add inerface to offer
- info about unused pages
+	(envelope-from <no-reply@patchew.org>) id 1cocx5-0004c7-8t
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 17:28:59 -0400
+Resent-Message-Id: <E1cocx5-0004c7-8t@eggs.gnu.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148969972666.96.6167903765236289989@6c512846dbc7>
+In-Reply-To: <20170316212351.13797-1-jsnow@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 16 Mar 2017 14:28:47 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] block: pause block jobs for
+ bdrv_drain_begin/end
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,148 +24,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, david@redhat.com, dave.hansen@intel.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com
+To: jsnow@redhat.com
+Cc: famz@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com, pbonzini@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-On Thu, 16 Mar 2017 15:08:46 +0800 Wei Wang <wei.w.wang@intel.com> wrote:
-
-> From: Liang Li <liang.z.li@intel.com>
-> 
-> This patch adds a function to provides a snapshot of the present system
-> unused pages. An important usage of this function is to provide the
-> unsused pages to the Live migration thread, which skips the transfer of
-> thoses unused pages. Newly used pages can be re-tracked by the dirty
-> page logging mechanisms.
-
-I don't think this will be useful for anything other than
-virtio-balloon.  I guess it would be better to keep this code in the
-virtio-balloon driver if possible, even though that's rather a layering
-violation :( What would have to be done to make that possible?  Perhaps
-we can put some *small* helpers into page_alloc.c to prevent things
-from becoming too ugly.
-
-> --- a/mm/page_alloc.c
-> +++ b/mm/page_alloc.c
-> @@ -4498,6 +4498,120 @@ void show_free_areas(unsigned int filter)
->  	show_swap_cache_info();
->  }
->  
-> +static int __record_unused_pages(struct zone *zone, int order,
-> +				 __le64 *buf, unsigned int size,
-> +				 unsigned int *offset, bool part_fill)
-> +{
-> +	unsigned long pfn, flags;
-> +	int t, ret = 0;
-> +	struct list_head *curr;
-> +	__le64 *chunk;
-> +
-> +	if (zone_is_empty(zone))
-> +		return 0;
-> +
-> +	spin_lock_irqsave(&zone->lock, flags);
-> +
-> +	if (*offset + zone->free_area[order].nr_free > size && !part_fill) {
-> +		ret = -ENOSPC;
-> +		goto out;
-> +	}
-> +	for (t = 0; t < MIGRATE_TYPES; t++) {
-> +		list_for_each(curr, &zone->free_area[order].free_list[t]) {
-> +			pfn = page_to_pfn(list_entry(curr, struct page, lru));
-> +			chunk = buf + *offset;
-> +			if (*offset + 2 > size) {
-> +				ret = -ENOSPC;
-> +				goto out;
-> +			}
-> +			/* Align to the chunk format used in virtio-balloon */
-> +			*chunk = cpu_to_le64(pfn << 12);
-> +			*(chunk + 1) = cpu_to_le64((1 << order) << 12);
-> +			*offset += 2;
-> +		}
-> +	}
-> +
-> +out:
-> +	spin_unlock_irqrestore(&zone->lock, flags);
-> +
-> +	return ret;
-> +}
-
-This looks like it could disable interrupts for a long time.  Too long?
-
-> +/*
-> + * The record_unused_pages() function is used to record the system unused
-> + * pages. The unused pages can be skipped to transfer during live migration.
-> + * Though the unused pages are dynamically changing, dirty page logging
-> + * mechanisms are able to capture the newly used pages though they were
-> + * recorded as unused pages via this function.
-> + *
-> + * This function scans the free page list of the specified order to record
-> + * the unused pages, and chunks those continuous pages following the chunk
-> + * format below:
-> + * --------------------------------------
-> + * |	Base (52-bit)	| Rsvd (12-bit) |
-> + * --------------------------------------
-> + * --------------------------------------
-> + * |	Size (52-bit)	| Rsvd (12-bit) |
-> + * --------------------------------------
-> + *
-> + * @start_zone: zone to start the record operation.
-> + * @order: order of the free page list to record.
-> + * @buf: buffer to record the unused page info in chunks.
-> + * @size: size of the buffer in __le64 to record
-> + * @offset: offset in the buffer to record.
-> + * @part_fill: indicate if partial fill is used.
-> + *
-> + * return -EINVAL if parameter is invalid
-> + * return -ENOSPC when the buffer is too small to record all the unsed pages
-> + * return 0 when sccess
-> + */
-
-It's a strange thing - it returns information which will instantly
-become incorrect.
-
-> +int record_unused_pages(struct zone **start_zone, int order,
-> +			__le64 *buf, unsigned int size,
-> +			unsigned int *offset, bool part_fill)
-> +{
-> +	struct zone *zone;
-> +	int ret = 0;
-> +	bool skip_check = false;
-> +
-> +	/* Make sure all the parameters are valid */
-> +	if (buf == NULL || offset == NULL || order >= MAX_ORDER)
-> +		return -EINVAL;
-> +
-> +	if (*start_zone != NULL) {
-> +		bool found = false;
-> +
-> +		for_each_populated_zone(zone) {
-> +			if (zone != *start_zone)
-> +				continue;
-> +			found = true;
-> +			break;
-> +		}
-> +		if (!found)
-> +			return -EINVAL;
-> +	} else
-> +		skip_check = true;
-> +
-> +	for_each_populated_zone(zone) {
-> +		/* Start from *start_zone if it's not NULL */
-> +		if (!skip_check) {
-> +			if (*start_zone != zone)
-> +				continue;
-> +			else
-> +				skip_check = true;
-> +		}
-> +		ret = __record_unused_pages(zone, order, buf, size,
-> +					    offset, part_fill);
-> +		if (ret < 0) {
-> +			/* record the failed zone */
-> +			*start_zone = zone;
-> +			break;
-> +		}
-> +	}
-> +
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL(record_unused_pages);
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC8zXSBibG9jazogcGF1c2UgYmxvY2sgam9i
+cyBmb3IgYmRydl9kcmFpbl9iZWdpbi9lbmQKTWVzc2FnZS1pZDogMjAxNzAzMTYyMTIzNTEuMTM3
+OTctMS1qc25vd0ByZWRoYXQuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
+YXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdj
+IC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNv
+bW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGlu
+ICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBs
+b2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0
+PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAg
+ICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0
+ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4
+NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hl
+dy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDE3MDMxNjIxMjM1
+MS4xMzc5Ny0xLWpzbm93QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE3MDMxNjIxMjM1MS4xMzc5
+Ny0xLWpzbm93QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoxY2Nh
+NmYzIGJsb2Nram9iOiBhZGQgZGV2b3BzIHRvIGJsb2Nram9iIGJhY2tlbmRzCjg2NGQ5MDYgYmxv
+Y2stYmFja2VuZDogYWRkIGRyYWluZWRfYmVnaW4gLyBkcmFpbmVkX2VuZCBvcHMKNWU0ZjIyZCBi
+bG9ja2pvYjogYWRkIGJsb2NrX2pvYl9zdGFydF9zaGltCgo9PT0gT1VUUFVUIEJFR0lOID09PQpD
+aGVja2luZyBQQVRDSCAxLzM6IGJsb2Nram9iOiBhZGQgYmxvY2tfam9iX3N0YXJ0X3NoaW0uLi4K
+Q2hlY2tpbmcgUEFUQ0ggMi8zOiBibG9jay1iYWNrZW5kOiBhZGQgZHJhaW5lZF9iZWdpbiAvIGRy
+YWluZWRfZW5kIG9wcy4uLgpFUlJPUjogc3VzcGVjdCBjb2RlIGluZGVudCBmb3IgY29uZGl0aW9u
+YWwgc3RhdGVtZW50cyAoOCwgMTQpCiM3MDogRklMRTogYmxvY2svYmxvY2stYmFja2VuZC5jOjE5
+MDM6CisgICAgICAgIGlmIChibGstPmRldl9vcHMgJiYgYmxrLT5kZXZfb3BzLT5kcmFpbmVkX2Vu
+ZCkgeworICAgICAgICAgICAgICBibGstPmRldl9vcHMtPmRyYWluZWRfZW5kKGJsay0+ZGV2X29w
+YXF1ZSk7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDY3IGxpbmVzIGNoZWNrZWQKCllv
+dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDMvMzog
+YmxvY2tqb2I6IGFkZCBkZXZvcHMgdG8gYmxvY2tqb2IgYmFja2VuZHMuLi4KPT09IE9VVFBVVCBF
+TkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5l
+cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxl
+YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
