@@ -1,31 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1copZp-0007TP-0x
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 06:57:46 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1copbQ-00086e-TA
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 06:59:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1copZl-0003zw-SW
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 06:57:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50702)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1copZl-0003zr-MS
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 06:57:41 -0400
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 55A7B342C58
-	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 10:57:41 +0000 (UTC)
-References: <20170316163640.5597-1-pbonzini@redhat.com>
-	<20170317094102.GB11116@stefanha-x1.localdomain>
+	(envelope-from <pbonzini@redhat.com>) id 1copbQ-0004Oj-4b
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 06:59:24 -0400
+References: <bd7cb196-0779-42ad-ce9c-5871d307adce@kamp.de>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ab488c57-5006-e5db-145b-5b0cba1d3ead@redhat.com>
-Date: Fri, 17 Mar 2017 11:57:38 +0100
+Message-ID: <82d604c8-068a-aff4-6037-e3cd247b3588@redhat.com>
+Date: Fri, 17 Mar 2017 11:59:16 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170317094102.GB11116@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] qemu-ga: obey LISTEN_PID when using
- systemd socket activation
+In-Reply-To: <bd7cb196-0779-42ad-ce9c-5871d307adce@kamp.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] callout to *file in bdrv_co_get_block_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,33 +22,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, "Richard W.M. Jones" <rjones@redhat.com>
+To: Peter Lieven <pl@kamp.de>, qemu block <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Fam Zheng <famz@redhat.com>
 
 
 
-On 17/03/2017 10:41, Stefan Hajnoczi wrote:
->> Luckily, qemu-nbd also got socket activation code, and its copy does
->> support LISTEN_PID.  Some extra fixups are needed to ensure that the
->> code can be used for both, but that's what this patch does.  The
->> main change is to replace get_listen_fds's "consume" argument with
->> the FIRST_SOCKET_ACTIVATION_FD macro from the qemu-nbd code.
->=20
-> I intentionally wrote qga socket activation this way.  It allows socket
-> activation to work together with daemonization.  That combination is
-> probably not very useful so it's fine to get rid of it.
+On 17/03/2017 11:45, Peter Lieven wrote:
+> Hi,
+> 
+> 
+> I tried to debug why qemu-img convert with a VMDK source laying on a tmpfs is horrible slow.
+> 
+> For some reason a lseek on a tmpfs is slow. Strictly speaking the lseek in find_allocation in file-posix.c
+> 
+> is slow.
+> 
+> 
+> When qemu-img convert iterates over all sectors of a VMDK file to check their allocation status it ends
+> 
+> up checking allocation status of all allocated sectors due to the following condition in bdrv_co_get_block_status:
+> 
+> 
+>     if (*file && *file != bs &&
+>         (ret & BDRV_BLOCK_DATA) && !(ret & BDRV_BLOCK_ZERO) &&
+>         (ret & BDRV_BLOCK_OFFSET_VALID)) {
+>         BlockDriverState *file2;
+>         int file_pnum;
+>         ret2 = bdrv_co_get_block_status(*file, ret >> BDRV_SECTOR_BITS,
+>                                         *pnum, &file_pnum, &file2);
+>         if (ret2 >= 0) {
+>             /* Ignore errors.  This is just providing extra information, it
+>              * is useful but not necessary.
+>              */
+>             if (!file_pnum) {
+>                 /* !file_pnum indicates an offset at or beyond the EOF; it is
+>                  * perfectly valid for the format block driver to point to such
+>                  * offsets, so catch it and mark everything as zero */
+>                 ret |= BDRV_BLOCK_ZERO;
+>             } else {
+>                 /* Limit request to the range reported by the protocol driver */
+>                 *pnum = file_pnum;
+>                 ret |= (ret2 & BDRV_BLOCK_ZERO);
+>             }
+>         }
+>     }
+> 
+> 
+> Does anybody remember for what circumstances this case this was added? In case of an container format
+> 
+> like VMDK or QCOW2 shouldn't we trust the information from the l2 tables in the VMDK or QCOW2?
 
-This works with my patch (and I've tested it now), because it looks up
-LISTEN_FDS only once, way before daemonization.
-
-The run_agent function grew a parameter that tells it to use
-FIRST_SOCKET_ACTIVATION_FD as the file descriptor, without requiring
-another look at the environment.  (And because daemonization forks but
-doesn't exec, setting the cloexec flag doesn't get in the way either).
-
-Thanks,
+It provides additional information, for example it works better with
+prealloc=metadata.
 
 Paolo
-
-> Please add an error message in qga/main.c if socket activation is used
-> in combination with the -d/--daemonize flag.
