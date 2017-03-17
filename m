@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1covNV-0001te-T4
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 13:09:27 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1covPi-0002ah-4t
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 13:11:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1covNS-0003c5-OK
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 13:09:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35550)
+	(envelope-from <pbonzini@redhat.com>) id 1covPf-0004d5-0T
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 13:11:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42718)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1covNS-0003bk-F9
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 13:09:22 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170227193857.9368-1-marex@denx.de>
-Date: Fri, 17 Mar 2017 18:09:19 +0100
-In-Reply-To: <20170227193857.9368-1-marex@denx.de> (Marek Vasut's message of
-	"Mon, 27 Feb 2017 20:38:57 +0100")
-Message-ID: <87fuibygn4.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1covPe-0004cN-Mo
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 13:11:38 -0400
+References: <CAO_EM_kn4QEw=+j23F7e+LzLW2_TPwNENoopqyBb-hdKYAow9w@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f8f478b3-70a0-b67b-c4df-3f68ac66308a@redhat.com>
+Date: Fri, 17 Mar 2017 18:11:35 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH V2] nios2: iic: Convert CPU prop to qom link
+In-Reply-To: <CAO_EM_kn4QEw=+j23F7e+LzLW2_TPwNENoopqyBb-hdKYAow9w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Assertion failure taking external snapshot with
+ virtio drive + iothread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,90 +27,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marek Vasut <marex@denx.de>
-Cc: qemu-devel@nongnu.org, Jeff Da Silva <jdasilva@altera.com>, Chris Wulff <crwulff@gmail.com>, Alexander Graf <agraf@suse.de>, Sandra Loosemore <sandra@codesourcery.com>, Ley Foon Tan <lftan@altera.com>, Yves Vandervennet <yvanderv@altera.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Ed Swierk <eswierk@skyportsystems.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Marek Vasut <marex@denx.de> writes:
 
-> Add a const qom link between the CPU and the IIC instead
-> of passing the CPU link through a qom property.
->
-> Signed-off-by: Marek Vasut <marex@denx.de>
-> Cc: Alexander Graf <agraf@suse.de>
-> Cc: Chris Wulff <crwulff@gmail.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: Jeff Da Silva <jdasilva@altera.com>
-> Cc: Ley Foon Tan <lftan@altera.com>
-> Cc: Markus Armbruster <armbru@redhat.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Sandra Loosemore <sandra@codesourcery.com>
-> Cc: Yves Vandervennet <yvanderv@altera.com>
-> ---
-> V2: Retain dc->cannot_instantiate_with_device_add_yet = true
->     in altera_iic_class_init() since the device is still not
->     device_add() creatable.
-> ---
->  hw/intc/nios2_iic.c       | 12 ++++--------
->  hw/nios2/10m50_devboard.c |  3 ++-
->  2 files changed, 6 insertions(+), 9 deletions(-)
->
-> diff --git a/hw/intc/nios2_iic.c b/hw/intc/nios2_iic.c
-> index 818ab1b315..fe15621202 100644
-> --- a/hw/intc/nios2_iic.c
-> +++ b/hw/intc/nios2_iic.c
-> @@ -62,17 +62,15 @@ static void altera_iic_init(Object *obj)
->      sysbus_init_irq(SYS_BUS_DEVICE(obj), &pv->parent_irq);
->  }
->  
-> -static Property altera_iic_properties[] = {
-> -    DEFINE_PROP_PTR("cpu", AlteraIIC, cpu),
-> -    DEFINE_PROP_END_OF_LIST(),
-> -};
-> -
->  static void altera_iic_realize(DeviceState *dev, Error **errp)
->  {
->      struct AlteraIIC *pv = ALTERA_IIC(dev);
-> +    Error *err = NULL;
->  
-> +    pv->cpu = object_property_get_link(OBJECT(dev), "cpu", &err);
->      if (!pv->cpu) {
-> -        error_setg(errp, "altera,iic: CPU not connected");
-> +        error_setg(errp, "altera,iic: CPU link not found: %s",
-> +                   error_get_pretty(err));
->          return;
->      }
->  }
-> @@ -81,8 +79,6 @@ static void altera_iic_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc = DEVICE_CLASS(klass);
->  
-> -    dc->props = altera_iic_properties;
-> -    /* Reason: pointer property "cpu" */
 
-You need to update, not delete this comment.  I think
+On 17/03/2017 17:55, Ed Swierk wrote:
+> I'm running into the same problem taking an external snapshot with a
+> virtio-blk drive with iothread, so it's not specific to virtio-scsi.
+> Run a Linux guest on qemu master
+> 
+>   qemu-system-x86_64 -nographic -enable-kvm -monitor
+> telnet:0.0.0.0:1234,server,nowait -m 1024 -object
+> iothread,id=iothread1 -drive file=/x/drive.qcow2,if=none,id=drive0
+> -device virtio-blk-pci,iothread=iothread1,drive=drive0
+> 
+> Then in the monitor
+> 
+>   snapshot_blkdev drive0 /x/snap1.qcow2
+> 
+> qemu bombs with
+> 
+>   qemu-system-x86_64: /x/qemu/include/block/aio.h:457:
+> aio_enable_external: Assertion `ctx->external_disable_cnt > 0' failed.
+> 
+> whereas without the iothread the assertion failure does not occur.
 
-       /* Reason: needs to be wired up, e.g. by nios2_10m50_ghrd_init() */
+Please try this patch:
 
-would do.
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 5742c09..1d95879 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -1876,6 +1876,7 @@ static void blk_root_drained_begin(BdrvChild *child)
+     if (blk->public.io_limits_disabled++ == 0) {
+         throttle_group_restart_blk(blk);
+     }
++    aio_disable_external(bdrv_get_aio_context(bs));
+ }
+ 
+ static void blk_root_drained_end(BdrvChild *child)
+@@ -1883,5 +1884,6 @@ static void blk_root_drained_end(BdrvChild *child)
+     BlockBackend *blk = child->opaque;
+ 
+     assert(blk->public.io_limits_disabled);
++    aio_enable_external(bdrv_get_aio_context(bs));
+     --blk->public.io_limits_disabled;
+ }
+diff --git a/block/io.c b/block/io.c
+index 2709a70..a6dcef5 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -224,7 +224,6 @@ void bdrv_drained_begin(BlockDriverState *bs)
+     }
+ 
+     if (!bs->quiesce_counter++) {
+-        aio_disable_external(bdrv_get_aio_context(bs));
+         bdrv_parent_drained_begin(bs);
+     }
+ 
+@@ -239,7 +238,6 @@ void bdrv_drained_end(BlockDriverState *bs)
+     }
+ 
+     bdrv_parent_drained_end(bs);
+-    aio_enable_external(bdrv_get_aio_context(bs));
+ }
+ 
+ /*
 
->      dc->cannot_instantiate_with_device_add_yet = true;
->      dc->realize = altera_iic_realize;
->  }
-> diff --git a/hw/nios2/10m50_devboard.c b/hw/nios2/10m50_devboard.c
-> index 0d8b9aa58f..c18e0b2a17 100644
-> --- a/hw/nios2/10m50_devboard.c
-> +++ b/hw/nios2/10m50_devboard.c
-> @@ -83,7 +83,8 @@ static void nios2_10m50_ghrd_init(MachineState *machine)
->  
->      /* Register: Internal Interrupt Controller (IIC) */
->      dev = qdev_create(NULL, "altera,iic");
-> -    qdev_prop_set_ptr(dev, "cpu", cpu);
-> +    object_property_add_const_link(OBJECT(dev), "cpu", OBJECT(cpu),
-> +                                   &error_abort);
->      qdev_init_nofail(dev);
->      sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, cpu_irq[0]);
->      for (i = 0; i < 32; i++) {
+This is not a proper fix, the right one would move the calls into
+virtio-blk and virtio-scsi, but it might be a start.  I think the
+issue is that you have one call to aio_disable_external for drive.qcow2
+before the snapshot, and two calls to aio_enable_external (one for
+drive.qcow2 and one for snap1.qcow2) after.
 
-With a suitable comment next to
-dc->cannot_instantiate_with_device_add_yet = true:
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Paolo
