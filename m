@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cosUA-0005et-GI
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 10:04:12 -0400
+	(envelope-from <bounces@canonical.com>) id 1coobx-0002pk-8S
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 05:55:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cosU9-0001v3-M5
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 10:04:06 -0400
-Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:34227)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cosU9-0001uJ-GG
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 10:04:05 -0400
-Received: by mail-wr0-x232.google.com with SMTP id l37so52816040wrc.1
-	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 07:04:05 -0700 (PDT)
+	(envelope-from <bounces@canonical.com>) id 1coobt-0006YV-DY
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 05:55:53 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48012)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1coobt-0006YH-7e
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 05:55:49 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1coobr-0004EJ-1B
+	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 09:55:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 023792E80C8
+	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 09:55:47 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1489756546-27142-1-git-send-email-kwolf@redhat.com>
-References: <1489756546-27142-1-git-send-email-kwolf@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 17 Mar 2017 14:03:43 +0000
-Message-ID: <CAFEAcA-iZG-F5S62wphMgqqVkTUi_ZCw-pL5Cmf_Hzpmk9y_ig@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 0/8] Block layer fixes for 2.9.0-rc1
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 17 Mar 2017 09:47:14 -0000
+From: Julien Duponchelle <noplay@noplay.net>
+Reply-To: Bug 1673722 <1673722@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170317094714.32220.9387.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1673722] [NEW] Reading register at offset. It is
+ not fully implemented warning make VM impossible to use
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,29 +36,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 17 March 2017 at 13:15, Kevin Wolf <kwolf@redhat.com> wrote:
-> The following changes since commit 272d7dee5951f926fad1911f2f072e5915cdcba0:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/pull-cirrus-20170316-1' into staging (2017-03-16 16:40:44 +0000)
->
-> are available in the git repository at:
->
->
->   git://repo.or.cz/qemu/kevin.git tags/for-upstream
->
-> for you to fetch changes up to 11f0f5e553cff93d5fc77d67b98c40adba12b729:
->
->   Merge remote-tracking branch 'mreitz/tags/pull-block-2017-03-17' into queue-block (2017-03-17 13:03:44 +0100)
->
-> ----------------------------------------------------------------
->
-> Block layer fixes for 2.9.0-rc1
->
-> ----------------------------------------------------------------
+Public bug reported:
 
-Applied, thanks.
+Hi,
 
--- PMM
+Since this commit:
+https://github.com/qemu/qemu/commit/bc0f0674f037a01f2ce0870ad6270a356a7a8347
+
+We can no longer use the IOSvL2 image from Cisco. The problem is we got a l=
+ot of warning message saying:
+e1000: Reading register at offset: 0x00002410. It is not fully implemented. =
+
+
+User got so much of this warning that they can't use the VM.
+
+Thanks for the help
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: e1000
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1673722
+
+Title:
+  Reading register at offset. It is not fully implemented warning make
+  VM impossible to use
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi,
+
+  Since this commit:
+  https://github.com/qemu/qemu/commit/bc0f0674f037a01f2ce0870ad6270a356a7a8=
+347
+
+  We can no longer use the IOSvL2 image from Cisco. The problem is we got a=
+ lot of warning message saying:
+  e1000: Reading register at offset: 0x00002410. It is not fully implemente=
+d. =
+
+
+  User got so much of this warning that they can't use the VM.
+
+  Thanks for the help
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1673722/+subscriptions
