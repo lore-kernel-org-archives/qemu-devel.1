@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1corjq-0004hh-T2
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 09:16:15 -0400
+	(envelope-from <kwolf@redhat.com>) id 1corjo-0004g5-Mc
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 09:16:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1corjp-0000qM-OZ
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 09:16:14 -0400
+	(envelope-from <kwolf@redhat.com>) id 1corjk-0000oz-8u
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 09:16:12 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 17 Mar 2017 14:15:46 +0100
-Message-Id: <1489756546-27142-9-git-send-email-kwolf@redhat.com>
+Date: Fri, 17 Mar 2017 14:15:42 +0100
+Message-Id: <1489756546-27142-5-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1489756546-27142-1-git-send-email-kwolf@redhat.com>
 References: <1489756546-27142-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 8/8] block: quiesce AioContext when detaching
- from it
+Subject: [Qemu-devel] [PULL 4/8] block: Always call bdrv_child_check_perm
+ first
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,71 +23,105 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+From: Fam Zheng <famz@redhat.com>
 
-While it is true that bdrv_set_aio_context only works on a single
-BlockDriverState subtree (see commit message for 53ec73e, "block: Use
-bdrv_drain to replace uncessary bdrv_drain_all", 2015-07-07), it works
-at the AioContext level rather than the BlockDriverState level.
+bdrv_child_set_perm alone is not very usable because the caller must
+call bdrv_child_check_perm first. This is already encapsulated
+conveniently in bdrv_child_try_set_perm, so remove the other prototypes
+from the header and fix the one wrong caller, block/mirror.c.
 
-Therefore, it is also necessary to trigger pending bottom halves too,
-even if no requests are pending.
-
-For NBD this ensures that the aio_co_schedule of a previous call to
-nbd_attach_aio_context is completed before detaching from the old
-AioContext; it fixes qemu-iotest 094.  Another similar bug happens
-when the VM is stopped and the virtio-blk dataplane irqfd is torn down.
-In this case it's possible that guest I/O gets stuck if notify_guest_bh
-was scheduled but doesn't run.
-
-Calling aio_poll from another AioContext is safe if non-blocking; races
-such as the one mentioned in the commit message for c9d1a56 ("block:
-only call aio_poll on the current thread's AioContext", 2016-10-28)
-are a concern for blocking calls.
-
-I considered other options, including:
-
-- moving the bs->wakeup mechanism to AioContext, and letting the caller
-check.  This might work for virtio which has a clear place to wakeup
-(notify_place_bh) and check the condition (virtio_blk_data_plane_stop).
-For aio_co_schedule I couldn't find a clear place to check the condition.
-
-- adding a dummy oneshot bottom half and waiting for it to trigger.
-This has the complication that bottom half list is LIFO for historical
-reasons.  There were performance issues caused by bottom half ordering
-in the past, so I decided against it for 2.9.
-
-Fixes: 99723548561978da8ef44cf804fb7912698f5d88
-Reported-by: Max Reitz <mreitz@redhat.com>
-Reported-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-Tested-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-id: 20170314111157.14464-2-pbonzini@redhat.com
+Signed-off-by: Fam Zheng <famz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ block.c                   | 13 +++++++++----
+ block/mirror.c            |  6 ++++--
+ include/block/block_int.h |  4 ----
+ 3 files changed, 13 insertions(+), 10 deletions(-)
 
 diff --git a/block.c b/block.c
-index e538084..6e906ec 100644
+index cb57370..a77e8a0 100644
 --- a/block.c
 +++ b/block.c
-@@ -4350,8 +4350,15 @@ void bdrv_attach_aio_context(BlockDriverState *bs,
+@@ -1393,6 +1393,11 @@ static int bdrv_fill_options(QDict **options, const char *filename,
+     return 0;
+ }
  
- void bdrv_set_aio_context(BlockDriverState *bs, AioContext *new_context)
++static int bdrv_child_check_perm(BdrvChild *c, uint64_t perm, uint64_t shared,
++                                 GSList *ignore_children, Error **errp);
++static void bdrv_child_abort_perm_update(BdrvChild *c);
++static void bdrv_child_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared);
++
+ /*
+  * Check whether permissions on this node can be changed in a way that
+  * @cumulative_perms and @cumulative_shared_perms are the new cumulative
+@@ -1615,8 +1620,8 @@ static int bdrv_check_update_perm(BlockDriverState *bs, uint64_t new_used_perm,
+ 
+ /* Needs to be followed by a call to either bdrv_child_set_perm() or
+  * bdrv_child_abort_perm_update(). */
+-int bdrv_child_check_perm(BdrvChild *c, uint64_t perm, uint64_t shared,
+-                          GSList *ignore_children, Error **errp)
++static int bdrv_child_check_perm(BdrvChild *c, uint64_t perm, uint64_t shared,
++                                 GSList *ignore_children, Error **errp)
  {
-+    AioContext *ctx;
-+
-     bdrv_drain(bs); /* ensure there are no in-flight requests */
+     int ret;
  
-+    ctx = bdrv_get_aio_context(bs);
-+    while (aio_poll(ctx, false)) {
-+        /* wait for all bottom halves to execute */
-+    }
-+
-     bdrv_detach_aio_context(bs);
+@@ -1627,7 +1632,7 @@ int bdrv_child_check_perm(BdrvChild *c, uint64_t perm, uint64_t shared,
+     return ret;
+ }
  
-     /* This function executes in the old AioContext so acquire the new one in
+-void bdrv_child_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared)
++static void bdrv_child_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared)
+ {
+     uint64_t cumulative_perms, cumulative_shared_perms;
+ 
+@@ -1639,7 +1644,7 @@ void bdrv_child_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared)
+     bdrv_set_perm(c->bs, cumulative_perms, cumulative_shared_perms);
+ }
+ 
+-void bdrv_child_abort_perm_update(BdrvChild *c)
++static void bdrv_child_abort_perm_update(BdrvChild *c)
+ {
+     bdrv_abort_perm_update(c->bs);
+ }
+diff --git a/block/mirror.c b/block/mirror.c
+index 4f3a5cb..ca4baa5 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -574,7 +574,8 @@ static void mirror_exit(BlockJob *job, void *opaque)
+      * valid. Also give up permissions on mirror_top_bs->backing, which might
+      * block the removal. */
+     block_job_remove_all_bdrv(job);
+-    bdrv_child_set_perm(mirror_top_bs->backing, 0, BLK_PERM_ALL);
++    bdrv_child_try_set_perm(mirror_top_bs->backing, 0, BLK_PERM_ALL,
++                            &error_abort);
+     bdrv_replace_node(mirror_top_bs, backing_bs(mirror_top_bs), &error_abort);
+ 
+     /* We just changed the BDS the job BB refers to (with either or both of the
+@@ -1245,7 +1246,8 @@ fail:
+         block_job_unref(&s->common);
+     }
+ 
+-    bdrv_child_set_perm(mirror_top_bs->backing, 0, BLK_PERM_ALL);
++    bdrv_child_try_set_perm(mirror_top_bs->backing, 0, BLK_PERM_ALL,
++                            &error_abort);
+     bdrv_replace_node(mirror_top_bs, backing_bs(mirror_top_bs), &error_abort);
+ }
+ 
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 6c699ac..59400bd 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -889,10 +889,6 @@ BdrvChild *bdrv_root_attach_child(BlockDriverState *child_bs,
+                                   void *opaque, Error **errp);
+ void bdrv_root_unref_child(BdrvChild *child);
+ 
+-int bdrv_child_check_perm(BdrvChild *c, uint64_t perm, uint64_t shared,
+-                          GSList *ignore_children, Error **errp);
+-void bdrv_child_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared);
+-void bdrv_child_abort_perm_update(BdrvChild *c);
+ int bdrv_child_try_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared,
+                             Error **errp);
+ 
 -- 
 1.8.3.1
