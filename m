@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52815)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52822)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1corjg-0004YO-5j
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 09:16:04 -0400
+	(envelope-from <kwolf@redhat.com>) id 1corjg-0004Z3-Oo
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 09:16:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1corjf-0000mL-5I
+	(envelope-from <kwolf@redhat.com>) id 1corjf-0000mV-IO
 	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 09:16:04 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 17 Mar 2017 14:15:43 +0100
-Message-Id: <1489756546-27142-6-git-send-email-kwolf@redhat.com>
+Date: Fri, 17 Mar 2017 14:15:41 +0100
+Message-Id: <1489756546-27142-4-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1489756546-27142-1-git-send-email-kwolf@redhat.com>
 References: <1489756546-27142-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 5/8] blockdev: fix bitmap clear undo
+Subject: [Qemu-devel] [PULL 3/8] file-posix: Don't leak fd in
+ hdev_get_max_segments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,31 +23,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: John Snow <jsnow@redhat.com>
+From: Fam Zheng <famz@redhat.com>
 
-Only undo the action if we actually prepared the action.
+This fixes a leaked fd introduced in commit 9103f1ce.
 
-Signed-off-by: John Snow <jsnow@redhat.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- blockdev.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ block/file-posix.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/blockdev.c b/blockdev.c
-index f1f49bd..c5b2c2c 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2047,7 +2047,9 @@ static void block_dirty_bitmap_clear_abort(BlkActionState *common)
-     BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
-                                              common, common);
+diff --git a/block/file-posix.c b/block/file-posix.c
+index ac6bd9f..53febd3 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -703,6 +703,9 @@ static int hdev_get_max_segments(const struct stat *st)
+     }
  
--    bdrv_undo_clear_dirty_bitmap(state->bitmap, state->backup);
-+    if (state->backup) {
-+        bdrv_undo_clear_dirty_bitmap(state->bitmap, state->backup);
+ out:
++    if (fd != -1) {
++        close(fd);
 +    }
- }
- 
- static void block_dirty_bitmap_clear_commit(BlkActionState *common)
+     g_free(sysfspath);
+     return ret;
+ #else
 -- 
 1.8.3.1
