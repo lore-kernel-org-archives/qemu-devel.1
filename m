@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marex@denx.de>) id 1coz5n-0005PF-43
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 17:07:24 -0400
+	(envelope-from <marex@denx.de>) id 1coz5q-0005Rq-Vk
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 17:07:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marex@denx.de>) id 1coz5i-0007Xu-L2
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 17:07:23 -0400
-Received: from mail-out.m-online.net ([212.18.0.9]:53805)
+	(envelope-from <marex@denx.de>) id 1coz5n-0007Yd-56
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 17:07:26 -0400
+Received: from mail-out.m-online.net ([212.18.0.10]:60228)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marex@denx.de>) id 1coz5i-0007Xi-B7
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 17:07:18 -0400
+	(Exim 4.71) (envelope-from <marex@denx.de>) id 1coz5m-0007YX-RD
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 17:07:23 -0400
 References: <20170227193857.9368-1-marex@denx.de>
-	<87fuibygn4.fsf@dusky.pond.sub.org>
+	<CAFEAcA-LRRd9Fu0+Dr6JcRBFEwnnX9HX-1O4gPsqVe8eWZVs_Q@mail.gmail.com>
 From: Marek Vasut <marex@denx.de>
-Message-ID: <847d1b26-88c1-6664-0b36-0153f7d39a3f@denx.de>
-Date: Fri, 17 Mar 2017 22:01:07 +0100
+Message-ID: <8ac9381c-4d71-f43b-4c1e-bfa3bf687e1c@denx.de>
+Date: Fri, 17 Mar 2017 22:01:32 +0100
 MIME-Version: 1.0
-In-Reply-To: <87fuibygn4.fsf@dusky.pond.sub.org>
+In-Reply-To: <CAFEAcA-LRRd9Fu0+Dr6JcRBFEwnnX9HX-1O4gPsqVe8eWZVs_Q@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH V2] nios2: iic: Convert CPU prop to qom link
@@ -27,12 +27,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Jeff Da Silva <jdasilva@altera.com>, Chris Wulff <crwulff@gmail.com>, Alexander Graf <agraf@suse.de>, Sandra Loosemore <sandra@codesourcery.com>, Ley Foon Tan <lftan@altera.com>, Yves Vandervennet <yvanderv@altera.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Jeff Da Silva <jdasilva@altera.com>, Chris Wulff <crwulff@gmail.com>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, Sandra Loosemore <sandra@codesourcery.com>, Ley Foon Tan <lftan@altera.com>, Yves Vandervennet <yvanderv@altera.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 03/17/2017 06:09 PM, Markus Armbruster wrote:
-> Marek Vasut <marex@denx.de> writes:
-> 
+On 03/17/2017 05:51 PM, Peter Maydell wrote:
+> On 27 February 2017 at 19:38, Marek Vasut <marex@denx.de> wrote:
 >> Add a const qom link between the CPU and the IIC instead
 >> of passing the CPU link through a qom property.
 >>
@@ -62,7 +61,7 @@ On 03/17/2017 06:09 PM, Markus Armbruster wrote:
 >> @@ -62,17 +62,15 @@ static void altera_iic_init(Object *obj)
 >>      sysbus_init_irq(SYS_BUS_DEVICE(obj), &pv->parent_irq);
 >>  }
->>  
+>>
 >> -static Property altera_iic_properties[] = {
 >> -    DEFINE_PROP_PTR("cpu", AlteraIIC, cpu),
 >> -    DEFINE_PROP_END_OF_LIST(),
@@ -72,7 +71,7 @@ On 03/17/2017 06:09 PM, Markus Armbruster wrote:
 >>  {
 >>      struct AlteraIIC *pv = ALTERA_IIC(dev);
 >> +    Error *err = NULL;
->>  
+>>
 >> +    pv->cpu = object_property_get_link(OBJECT(dev), "cpu", &err);
 >>      if (!pv->cpu) {
 >> -        error_setg(errp, "altera,iic: CPU not connected");
@@ -84,17 +83,23 @@ On 03/17/2017 06:09 PM, Markus Armbruster wrote:
 >> @@ -81,8 +79,6 @@ static void altera_iic_class_init(ObjectClass *klass, void *data)
 >>  {
 >>      DeviceClass *dc = DEVICE_CLASS(klass);
->>  
+>>
 >> -    dc->props = altera_iic_properties;
 >> -    /* Reason: pointer property "cpu" */
 > 
-> You need to update, not delete this comment.  I think
-> 
->        /* Reason: needs to be wired up, e.g. by nios2_10m50_ghrd_init() */
-> 
-> would do.
+> This comment goes with the line below it:
 > 
 >>      dc->cannot_instantiate_with_device_add_yet = true;
+> 
+> as it's explaining why we cannot instantiate with device add.
+> 
+> Either the cannot_instantiate assignment should go,
+> or the comment needs to be updated to explain why we
+> cannot-instantiate (since it's no longer because of a
+> pointer property).
+
+Fixed, will send V3 shortly, thanks.
+
 >>      dc->realize = altera_iic_realize;
 >>  }
 >> diff --git a/hw/nios2/10m50_devboard.c b/hw/nios2/10m50_devboard.c
@@ -102,7 +107,7 @@ On 03/17/2017 06:09 PM, Markus Armbruster wrote:
 >> --- a/hw/nios2/10m50_devboard.c
 >> +++ b/hw/nios2/10m50_devboard.c
 >> @@ -83,7 +83,8 @@ static void nios2_10m50_ghrd_init(MachineState *machine)
->>  
+>>
 >>      /* Register: Internal Interrupt Controller (IIC) */
 >>      dev = qdev_create(NULL, "altera,iic");
 >> -    qdev_prop_set_ptr(dev, "cpu", cpu);
@@ -111,12 +116,13 @@ On 03/17/2017 06:09 PM, Markus Armbruster wrote:
 >>      qdev_init_nofail(dev);
 >>      sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, cpu_irq[0]);
 >>      for (i = 0; i < 32; i++) {
+>> --
+>> 2.11.0
 > 
-> With a suitable comment next to
-> dc->cannot_instantiate_with_device_add_yet = true:
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> thanks
+> -- PMM
 > 
-OK, done and added the R-B , thanks
+
 
 -- 
 Best regards,
