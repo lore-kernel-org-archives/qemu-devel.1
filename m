@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1covdz-0006Je-6K
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 13:26:28 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cozJL-0002nC-Ix
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 17:21:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1covdw-0002U0-3B
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 13:26:27 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34606)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1covdv-0002Ta-Tg
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 13:26:24 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1covdu-00049j-Kk
-	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 17:26:22 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7B7932E8088
-	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 17:26:22 +0000 (UTC)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cozJH-00045S-H0
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 17:21:23 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:34329)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cozJH-00045J-BN
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 17:21:19 -0400
+Received: by mail-qk0-x244.google.com with SMTP id v127so11346279qkb.1
+	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 14:21:19 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1489757419-8179-1-git-send-email-paul.durrant@citrix.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <f8f4b60f-8407-7e56-4fac-70704f3b4c87@amsat.org>
+Date: Fri, 17 Mar 2017 18:21:14 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 17 Mar 2017 17:11:02 -0000
-From: Nelson Chan <nelson_bigmouth@yahoo.com>
-Reply-To: Bug 1615823 <1615823@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160822203622.9253.10775.malonedeb@wampee.canonical.com>
-Message-Id: <20170317171102.18396.19191.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1615823] Re: Windows 10 reports no compatible TPM
- found yet device manager shows it?
+In-Reply-To: <1489757419-8179-1-git-send-email-paul.durrant@citrix.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] xen: use libxendevice model to restrict
+ operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,73 +34,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paul Durrant <paul.durrant@citrix.com>, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
+Cc: Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
 
-I can get the TPM device working in Windows 10 after I upgrade Windows
-to version 1607. My qemu is still 2.6.1 from ubuntu 16.10.
+Hi Paul,
 
--- =
+On 03/17/2017 10:30 AM, Paul Durrant wrote:
+> This patch adds a command-line option (-xen-domid-restrict) which will
+> use the new libxendevicemodel API to restrict devicemodel operations to
+> the specified domid.
+>
+> This patch also adds a tracepoint to allow successful enabling of the
+> restriction to be monitored.
+>
+> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> ---
+> Cc: Stefano Stabellini <sstabellini@kernel.org>
+> Cc: Anthony Perard <anthony.perard@citrix.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>
+> NOTE: This is already re-based on Juergen Gross's patch "xen: use 5 digit
+>       xen versions" and so should not be applied until after that patch
+>       has been applied.
+> ---
+>  hw/xen/trace-events         |  1 +
+>  include/hw/xen/xen.h        |  1 +
+>  include/hw/xen/xen_common.h | 23 +++++++++++++++++++++++
+>  qemu-options.hx             |  6 ++++++
+>  vl.c                        |  8 ++++++++
+>  xen-hvm.c                   |  8 ++++++++
+>  6 files changed, 47 insertions(+)
+>
+> diff --git a/hw/xen/trace-events b/hw/xen/trace-events
+> index c4fb6f1..a5b5e8b 100644
+> --- a/hw/xen/trace-events
+> +++ b/hw/xen/trace-events
+> @@ -11,3 +11,4 @@ xen_map_portio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %
+>  xen_unmap_portio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %u start: %#"PRIx64" end: %#"PRIx64
+>  xen_map_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
+>  xen_unmap_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
+> +xen_domid_restrict(void) ""
+> diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
+> index 2b1733b..7efcdaa 100644
+> --- a/include/hw/xen/xen.h
+> +++ b/include/hw/xen/xen.h
+> @@ -21,6 +21,7 @@ enum xen_mode {
+>
+>  extern uint32_t xen_domid;
+>  extern enum xen_mode xen_mode;
+> +extern bool xen_domid_restrict;
+>
+>  extern bool xen_allowed;
+>
+> diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
+> index df098c7..5962bc4 100644
+> --- a/include/hw/xen/xen_common.h
+> +++ b/include/hw/xen/xen_common.h
+> @@ -152,6 +152,13 @@ static inline int xendevicemodel_set_mem_type(
+>      return xc_hvm_set_mem_type(dmod, domid, mem_type, first_pfn, nr);
+>  }
+>
+> +static inline int xendevicemodel_restrict(
+> +    xendevicemodel_handle *dmod, domid_t domid)
+> +{
+> +    errno = ENOTTY;
+> +    return -1;
+> +}
+> +
+>  #else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
+>
+>  #include <xendevicemodel.h>
+> @@ -206,6 +213,22 @@ static inline int xen_modified_memory(domid_t domid, uint64_t first_pfn,
+>      return xendevicemodel_modified_memory(xen_dmod, domid, first_pfn, nr);
+>  }
+>
+> +static inline int xen_restrict(domid_t domid)
+> +{
+> +    int rc = xendevicemodel_restrict(xen_dmod, domid);
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1615823
+might it be more useful to log the retcode?
 
-Title:
-  Windows 10 reports no compatible TPM found yet device manager shows
-  it?
+        trace_xen_domid_restrict(rc);
 
-Status in QEMU:
-  New
+> +
+> +    if (rc == 0) {
+> +        trace_xen_domid_restrict();
 
-Bug description:
-  Ubuntu 16.04 with stock kvm, libvirt, ovmf
-  Qemu 2.5 installed from stock ubuntu ppa
-  Qemu 2.6.1 built from tarball.
-  Qemu 2.7.0-rc4 built from tarball.
+and drop the previous line.
 
-  Windows 10 guest reports a TPM device is installed and the driver
-  functional under Device Manager-->Security Devices.  TPM Administrator
-  however advises no compatible TPM chip can be found.
-
-  Qemu 2.5 is buggy and prevents the guest loading the TPM driver, this
-  was addressed by
-  http://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D2b1c2e8e5f1990f0a201a8cb=
-f9d366fca60f4aa8
-
-  Have tested the below cmd out on both qemu-2.6.1 and qemu-2.7.0-rc4,
-  both suffer the same problem.  My TPM is most certainly compatible as
-  installing Win10Pro onto the same host as bare metal provides me the
-  desired and expected functionality aka Bitlocker and TPM Administrator
-  work.
-
-  sudo ./qemu-system-x86_64 \
-  -enable-kvm \
-  -machine q35 \
-  -cpu host \
-  -m 4096 \
-  -smp 4,sockets=3D1,cores=3D2,threads=3D2 \
-  -device i82801b11-bridge,id=3Dpci.1,bus=3Dpcie.0,addr=3D0x1e \
-  -device pci-bridge,chassis_nr=3D2,id=3Dpci.2,bus=3Dpci.1,addr=3D0x1 \
-  -device qxl-vga,id=3Dvideo0,ram_size=3D67108864,vram_size=3D67108864,vgam=
-em_mb=3D16,bus=3Dpcie.0,addr=3D0x2 \
-  -drive file=3D/usr/share/qemu/OVMF.fd,if=3Dpflash,format=3Draw,unit=3D0,r=
-eadonly=3Don \
-  -drive file=3D/mnt/120GB_SSD/wintpm_VARS.fd,if=3Dpflash,format=3Draw,unit=
-=3D1 \
-  -drive file=3D/mnt/120GB_SSD/wintpm.qcow2,format=3Dqcow2,if=3Dnone,id=3Dd=
-rive-virtio-disk0 \
-  -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.2,addr=3D0x3,drive=3Ddrive-vi=
-rtio-disk0,id=3Dvirtio-disk0,bootindex=3D2 \
-  -drive file=3D"/mnt/share/Filestorage/Images/Microsoft Windows 10 Pro x64=
-.iso",format=3Draw,if=3Dnone,media=3Dcdrom,id=3Ddrive-sata0-0-0,readonly=3D=
-on \
-  -device ide-cd,bus=3Dide.0,drive=3Ddrive-sata0-0-0,id=3Dsata0-0-0 \
-  -drive file=3D/mnt/share/Filestorage/Images/virtio-win-0.1.117.iso,format=
-=3Draw,if=3Dnone,media=3Dcdrom,id=3Ddrive-sata0-0-1,readonly=3Don \
-  -device ide-cd,bus=3Dide.1,drive=3Ddrive-sata0-0-1,id=3Dsata0-0-1 \
-  -tpmdev passthrough,id=3Dtpm-tpm0,path=3D/dev/tpm0,cancel-path=3D/sys/cla=
-ss/tpm/tpm0/device/cancel \
-  -device tpm-tis,tpmdev=3Dtpm-tpm0,id=3Dtpm0
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1615823/+subscriptions
+> +        return 0;
+> +    }
+> +
+> +    if (errno == ENOTTY) {
+> +        return 0;
+> +    }
+> +
+> +    return rc;
+> +}
+> +
+>  /* Xen 4.2 through 4.6 */
+>  #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40701
+>
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 99af8ed..4aab077 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -3354,6 +3354,10 @@ DEF("xen-attach", 0, QEMU_OPTION_xen_attach,
+>      "-xen-attach     attach to existing xen domain\n"
+>      "                xend will use this when starting QEMU\n",
+>      QEMU_ARCH_ALL)
+> +DEF("xen-domid-restrict", 0, QEMU_OPTION_xen_domid_restrict,
+> +    "-xen-domid-restrict     restrict set of available xen operations\n"
+> +    "                        to specified domain id\n",
+> +    QEMU_ARCH_ALL)
+>  STEXI
+>  @item -xen-domid @var{id}
+>  @findex -xen-domid
+> @@ -3366,6 +3370,8 @@ Warning: should not be used when xend is in use (XEN only).
+>  @findex -xen-attach
+>  Attach to existing xen domain.
+>  xend will use this when starting QEMU (XEN only).
+> +@findex -xen-domid-restrict
+> +Restrict set of available xen operations to specified domain id (XEN only).
+>  ETEXI
+>
+>  DEF("no-reboot", 0, QEMU_OPTION_no_reboot, \
+> diff --git a/vl.c b/vl.c
+> index 0b4ed52..f46e070 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -205,6 +205,7 @@ static NotifierList machine_init_done_notifiers =
+>  bool xen_allowed;
+>  uint32_t xen_domid;
+>  enum xen_mode xen_mode = XEN_EMULATE;
+> +bool xen_domid_restrict;
+>
+>  static int has_defaults = 1;
+>  static int default_serial = 1;
+> @@ -3933,6 +3934,13 @@ int main(int argc, char **argv, char **envp)
+>                  }
+>                  xen_mode = XEN_ATTACH;
+>                  break;
+> +            case QEMU_OPTION_xen_domid_restrict:
+> +                if (!(xen_available())) {
+> +                    error_report("Option not supported for this target");
+> +                    exit(1);
+> +                }
+> +                xen_domid_restrict = true;
+> +                break;
+>              case QEMU_OPTION_trace:
+>                  g_free(trace_file);
+>                  trace_file = trace_opt_parse(optarg);
+> diff --git a/xen-hvm.c b/xen-hvm.c
+> index 4b928cf..335e263 100644
+> --- a/xen-hvm.c
+> +++ b/xen-hvm.c
+> @@ -1226,6 +1226,14 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
+>          goto err;
+>      }
+>
+> +    if (xen_domid_restrict) {
+> +        rc = xen_restrict(xen_domid);
+> +        if (rc < 0) {
+> +            error_report("failed to restrict: error %d", errno);
+> +            goto err;
+> +        }
+> +    }
+> +
+>      xen_create_ioreq_server(xen_domid, &state->ioservid);
+>
+>      state->exit.notify = xen_exit_notifier;
+>
