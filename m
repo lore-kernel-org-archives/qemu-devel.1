@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1copkH-0001LD-UL
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:08:35 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1copmZ-000303-32
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:10:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1copkG-00087f-LG
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:08:33 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48853)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1copkG-000854-E5
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:08:32 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 17 Mar 2017 11:08:22 +0000
-Message-Id: <1489748902-21765-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH] configure: Warn about deprecated hosts
+	(envelope-from <pbonzini@redhat.com>) id 1copmW-00010C-DZ
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:10:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55416)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1copmW-0000zl-4u
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:10:52 -0400
+References: <alpine.DEB.2.10.1703161241220.14378@sstabellini-ThinkPad-X260>
+	<1489694518-16978-1-git-send-email-sstabellini@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <90dea027-0cd8-f9bd-0265-b184f1e0e37a@redhat.com>
+Date: Fri, 17 Mar 2017 12:10:46 +0100
+MIME-Version: 1.0
+In-Reply-To: <1489694518-16978-1-git-send-email-sstabellini@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/9] xen: do not build backends for
+ targets that do not support xen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,162 +28,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org
+Cc: xen-devel@lists.xenproject.org, jgross@suse.com, groug@kaod.org, Stefano Stabellini <stefano@aporeto.com>, peter.maydell@linaro.org, rth@twiddle.net, stefanha@redhat.com
 
-We plan to drop support in a future QEMU release for host OSes
-and host architectures for which we have no test machine where
-we can build and run tests. For the 2.9 release, make configure
-print a warning if it is run on such a host, so that the user
-has some warning of the plans and can volunteer to help us
-maintain the port if they need it to continue to function.
 
-This commit flags up as deprecated the CPU architectures:
- * ia64
- * sparc
- * anything which we don't have a TCG port for
-   (and which was presumably using TCI)
-and the OSes:
- * Cygwin
- * GNU/kFreeBSD
- * FreeBSD
- * DragonFly BSD
- * NetBSD
- * OpenBSD
- * Solaris
- * AIX
- * Haiku
 
-It also makes entirely unrecognized host OS strings be
-rejected rather than treated as if they were Linux (which
-likely never worked).
+On 16/03/2017 21:01, Stefano Stabellini wrote:
+> Change Makefile.objs to use CONFIG_XEN instead of CONFIG_XEN_BACKEND, so
+> that the Xen backends are only built for targets that support Xen.
+> 
+> Set CONFIG_XEN in the toplevel Makefile to ensure that files that are
+> built only once pick up Xen support properly.
+> 
+> Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
+> CC: groug@kaod.org
+> CC: pbonzini@redhat.com
+> CC: peter.maydell@linaro.org
+> CC: rth@twiddle.net
+> CC: stefanha@redhat.com
+> ---
+>  Makefile                 | 1 +
+>  hw/block/Makefile.objs   | 2 +-
+>  hw/char/Makefile.objs    | 2 +-
+>  hw/display/Makefile.objs | 2 +-
+>  hw/net/Makefile.objs     | 2 +-
+>  hw/usb/Makefile.objs     | 2 +-
+>  hw/xen/Makefile.objs     | 2 +-
+>  7 files changed, 7 insertions(+), 6 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index 1c4c04f..b246138 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -26,6 +26,7 @@ endif
+>  
+>  CONFIG_SOFTMMU := $(if $(filter %-softmmu,$(TARGET_DIRS)),y)
+>  CONFIG_USER_ONLY := $(if $(filter %-user,$(TARGET_DIRS)),y)
+> +CONFIG_XEN := $(CONFIG_XEN_BACKEND)
+>  CONFIG_ALL=y
+>  -include config-all-devices.mak
+>  -include config-all-disas.mak
+> diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
+> index d4c3ab7..e0ed980 100644
+> --- a/hw/block/Makefile.objs
+> +++ b/hw/block/Makefile.objs
+> @@ -4,7 +4,7 @@ common-obj-$(CONFIG_SSI_M25P80) += m25p80.o
+>  common-obj-$(CONFIG_NAND) += nand.o
+>  common-obj-$(CONFIG_PFLASH_CFI01) += pflash_cfi01.o
+>  common-obj-$(CONFIG_PFLASH_CFI02) += pflash_cfi02.o
+> -common-obj-$(CONFIG_XEN_BACKEND) += xen_disk.o
+> +common-obj-$(CONFIG_XEN) += xen_disk.o
+>  common-obj-$(CONFIG_ECC) += ecc.o
+>  common-obj-$(CONFIG_ONENAND) += onenand.o
+>  common-obj-$(CONFIG_NVME_PCI) += nvme.o
+> diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
+> index 6ea76fe..725fdc4 100644
+> --- a/hw/char/Makefile.objs
+> +++ b/hw/char/Makefile.objs
+> @@ -7,7 +7,7 @@ common-obj-$(CONFIG_SERIAL_ISA) += serial-isa.o
+>  common-obj-$(CONFIG_SERIAL_PCI) += serial-pci.o
+>  common-obj-$(CONFIG_VIRTIO) += virtio-console.o
+>  common-obj-$(CONFIG_XILINX) += xilinx_uartlite.o
+> -common-obj-$(CONFIG_XEN_BACKEND) += xen_console.o
+> +common-obj-$(CONFIG_XEN) += xen_console.o
+>  common-obj-$(CONFIG_CADENCE) += cadence_uart.o
+>  
+>  obj-$(CONFIG_EXYNOS4) += exynos4210_uart.o
+> diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
+> index 063889b..3d02e8b 100644
+> --- a/hw/display/Makefile.objs
+> +++ b/hw/display/Makefile.objs
+> @@ -5,7 +5,7 @@ common-obj-$(CONFIG_JAZZ_LED) += jazz_led.o
+>  common-obj-$(CONFIG_PL110) += pl110.o
+>  common-obj-$(CONFIG_SSD0303) += ssd0303.o
+>  common-obj-$(CONFIG_SSD0323) += ssd0323.o
+> -common-obj-$(CONFIG_XEN_BACKEND) += xenfb.o
+> +common-obj-$(CONFIG_XEN) += xenfb.o
+>  
+>  common-obj-$(CONFIG_VGA_PCI) += vga-pci.o
+>  common-obj-$(CONFIG_VGA_ISA) += vga-isa.o
+> diff --git a/hw/net/Makefile.objs b/hw/net/Makefile.objs
+> index 610ed3e..6a95d92 100644
+> --- a/hw/net/Makefile.objs
+> +++ b/hw/net/Makefile.objs
+> @@ -1,5 +1,5 @@
+>  common-obj-$(CONFIG_DP8393X) += dp8393x.o
+> -common-obj-$(CONFIG_XEN_BACKEND) += xen_nic.o
+> +common-obj-$(CONFIG_XEN) += xen_nic.o
+>  
+>  # PCI network cards
+>  common-obj-$(CONFIG_NE2000_PCI) += ne2000.o
+> diff --git a/hw/usb/Makefile.objs b/hw/usb/Makefile.objs
+> index 98b5c9d..5958be8 100644
+> --- a/hw/usb/Makefile.objs
+> +++ b/hw/usb/Makefile.objs
+> @@ -40,5 +40,5 @@ common-obj-$(CONFIG_USB_REDIR) += redirect.o quirks.o
+>  common-obj-y += $(patsubst %,host-%.o,$(HOST_USB))
+>  
+>  ifeq ($(CONFIG_USB_LIBUSB),y)
+> -common-obj-$(CONFIG_XEN_BACKEND) += xen-usb.o
+> +common-obj-$(CONFIG_XEN) += xen-usb.o
+>  endif
+> diff --git a/hw/xen/Makefile.objs b/hw/xen/Makefile.objs
+> index 591cdc2..4be3ec9 100644
+> --- a/hw/xen/Makefile.objs
+> +++ b/hw/xen/Makefile.objs
+> @@ -1,5 +1,5 @@
+>  # xen backend driver support
+> -common-obj-$(CONFIG_XEN_BACKEND) += xen_backend.o xen_devconfig.o xen_pvdev.o
+> +common-obj-$(CONFIG_XEN) += xen_backend.o xen_devconfig.o xen_pvdev.o
+>  
+>  obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen-host-pci-device.o
+>  obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen_pt.o xen_pt_config_init.o xen_pt_graphics.o xen_pt_msi.o
+> 
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-This list is definitely too all-encompassing, and we should
-move at least some of the BSDs into "not-deprecated".
-I'm posting the patch for the moment for code review on the
-logic and as a placeholder.
----
- configure | 48 ++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 46 insertions(+), 2 deletions(-)
+I'm queuing this for 2.9 as a bugfix, adding Xen things to various
+softcore emulators makes no sense.
 
-diff --git a/configure b/configure
-index 75c7c35..5ddc985 100755
---- a/configure
-+++ b/configure
-@@ -321,6 +321,9 @@ tcmalloc="no"
- jemalloc="no"
- replication="yes"
- 
-+supported_cpu="no"
-+supported_os="no"
-+
- # parse CC options first
- for opt do
-   optarg=$(expr "x$opt" : 'x[^=]*=\(.*\)')
-@@ -517,23 +520,32 @@ ARCH=
- # Normalise host CPU name and set ARCH.
- # Note that this case should only have supported host CPUs, not guests.
- case "$cpu" in
--  ia64|ppc|ppc64|s390|s390x|sparc64|x32)
-+  ppc|ppc64|s390|s390x|x32)
-+    cpu="$cpu"
-+    supported_cpu="yes"
-+  ;;
-+  ia64|sparc64)
-     cpu="$cpu"
-   ;;
-   i386|i486|i586|i686|i86pc|BePC)
-     cpu="i386"
-+    supported_cpu="yes"
-   ;;
-   x86_64|amd64)
-     cpu="x86_64"
-+    supported_cpu="yes"
-   ;;
-   armv*b|armv*l|arm)
-     cpu="arm"
-+    supported_cpu="yes"
-   ;;
-   aarch64)
-     cpu="aarch64"
-+    supported_cpu="yes"
-   ;;
-   mips*)
-     cpu="mips"
-+    supported_cpu="yes"
-   ;;
-   sparc|sun4[cdmuv])
-     cpu="sparc"
-@@ -568,6 +580,7 @@ MINGW32*)
-   else
-     audio_drv_list=""
-   fi
-+  supported_os="yes"
- ;;
- GNU/kFreeBSD)
-   bsd="yes"
-@@ -626,6 +639,7 @@ Darwin)
-   # won't work when we're compiling with gcc as a C compiler.
-   QEMU_CFLAGS="-DOS_OBJECT_USE_OBJC=0 $QEMU_CFLAGS"
-   HOST_VARIANT_DIR="darwin"
-+  supported_os="yes"
- ;;
- SunOS)
-   solaris="yes"
-@@ -672,7 +686,7 @@ Haiku)
-   QEMU_CFLAGS="-DB_USE_POSITIVE_POSIX_ERRORS $QEMU_CFLAGS"
-   LIBS="-lposix_error_mapper -lnetwork $LIBS"
- ;;
--*)
-+Linux)
-   audio_drv_list="oss"
-   audio_possible_drivers="oss alsa sdl pa"
-   linux="yes"
-@@ -682,6 +696,10 @@ Haiku)
-   vhost_scsi="yes"
-   vhost_vsock="yes"
-   QEMU_INCLUDES="-I\$(SRC_PATH)/linux-headers -I$(pwd)/linux-headers $QEMU_INCLUDES"
-+  supported_os="yes"
-+;;
-+*)
-+  error_exit "Unsupported host OS $targetos"
- ;;
- esac
- 
-@@ -5095,6 +5113,32 @@ if test "$sdl_too_old" = "yes"; then
- echo "-> Your SDL version is too old - please upgrade to have SDL support"
- fi
- 
-+if test "$supported_cpu" = "no"; then
-+    echo
-+    echo "WARNING: SUPPORT FOR THIS HOST CPU WILL GO AWAY IN FUTURE RELEASES!"
-+    echo
-+    echo "CPU host architecture $cpu support is not currently maintained."
-+    echo "The QEMU project intends to remove support for this host CPU in"
-+    echo "a future release if nobody volunteers to maintain it and to"
-+    echo "provide a build host for our continuous integration setup."
-+    echo "configure has succeeded and you can continue to build, but"
-+    echo "if you care about QEMU on this platform you should contact"
-+    echo "us upstream at qemu-devel@nongnu.org."
-+fi
-+
-+if test "$supported_os" = "no"; then
-+    echo
-+    echo "WARNING: SUPPORT FOR THIS HOST OS WILL GO AWAY IN FUTURE RELEASES!"
-+    echo
-+    echo "CPU host OS $targetos support is not currently maintained."
-+    echo "The QEMU project intends to remove support for this host CPU in"
-+    echo "a future release if nobody volunteers to maintain it and to"
-+    echo "provide a build host for our continuous integration setup."
-+    echo "configure has succeeded and you can continue to build, but"
-+    echo "if you care about QEMU on this platform you should contact"
-+    echo "us upstream at qemu-devel@nongnu.org."
-+fi
-+
- config_host_mak="config-host.mak"
- 
- echo "# Automatically generated by configure - do not modify" >config-all-disas.mak
--- 
-2.7.4
+Paolo
