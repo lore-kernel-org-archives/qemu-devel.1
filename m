@@ -1,27 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1conta-0005TR-AV
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 05:10:06 -0400
+	(envelope-from <sebott@linux.vnet.ibm.com>) id 1cooA2-0001ik-MA
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 05:27:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1contW-0004jj-7k
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 05:10:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54548)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1contW-0004jR-06
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 05:09:58 -0400
-References: <CAFEAcA9pqDoCWrPAJ+KVxLC_eRy-xRg36oYuARYg2YP8VpGpBg@mail.gmail.com>
-	<20170316154643.GT15193@redhat.com>
-	<CAFEAcA9WdjkAr0eWNApWQGZAw4_67sci3LtY8=9pzYDcDXiLmg@mail.gmail.com>
-	<0f504dd2-235b-7ada-98b2-e0ccbd376fa7@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <7e86352b-add7-7b73-4e6b-08016b3e7a5d@redhat.com>
-Date: Fri, 17 Mar 2017 10:09:51 +0100
+	(envelope-from <sebott@linux.vnet.ibm.com>) id 1coo9z-0002nO-HU
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 05:27:02 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32835
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sebott@linux.vnet.ibm.com>)
+	id 1coo9z-0002mU-BQ
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 05:26:59 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2H9IjKu035192
+	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 05:26:58 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 297nkpd482-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 05:26:57 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <sebott@linux.vnet.ibm.com>;
+	Fri, 17 Mar 2017 09:26:56 -0000
+Date: Fri, 17 Mar 2017 10:26:51 +0100 (CET)
+From: Sebastian Ott <sebott@linux.vnet.ibm.com>
+In-Reply-To: <20170317031743.40128-2-bjsdjshi@linux.vnet.ibm.com>
+References: <20170317031743.40128-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170317031743.40128-2-bjsdjshi@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <0f504dd2-235b-7ada-98b2-e0ccbd376fa7@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Proposal for deprecating unsupported host OSes &
- architecutures
+Content-Type: text/plain; charset=US-ASCII
+Message-Id: <alpine.LFD.2.20.1703171023360.3003@schleppi>
+Subject: Re: [Qemu-devel] [PATCH v4 01/16] s390: cio: introduce
+ cio_cancel_halt_clear
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,60 +42,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, Cornelia Huck <cornelia.huck@de.ibm.com>, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, Peter Oberparleiter <oberpar@linux.vnet.ibm.com>
 
-On 16.03.2017 17:52, Paolo Bonzini wrote:
->=20
->=20
-> On 16/03/2017 16:55, Peter Maydell wrote:
->>> IOW, I think there is a reasonable 3 tier set here
->>>
->>>  1. Stuff we actively test builds & thus guarantee will work for
->>>     any QEMU release going forward.
->>>
->>>  2. Stuff we don't actively test, but generally assume is mostly
->>>     working, and likely to be fixed if & when problems are found
->>>
->>>  3. Stuff we don't actively test,  assume is probably broken
->>>     and unlikely to be fixed if reported
->>>
->>> Stuff in tier 3 should be candidate for deletion. Stuff in tier
->>> 2 shouldn't be removed, but it might drop into tier 3 at some
->>> point if people stop caring about fixing problems when found.
->>> Conversely tier 2 might rise to tier 1 if CI turns up.
->>
->> I don't really want a tier 2. Either we support it enough
->> to at least be able to run "make && make check" on some
->> representative system, or we don't support it at all.
->> Code which we have but are really reluctant to touch because
->> we don't even test it builds (like bsd-user/) is really bad
->> for preventing cleanups.
->=20
-> I think we should further differentiate between bsd-user/ and softmmu.
-> System emulation is just another program where we mostly compile to C
-> standard + POSIX or C standard + Win32.  There are certainly places
-> where we use Linux-specific extensions but it's not that special.
-> Neither BSD nor Solaris are particularly hard to support there.
->=20
-> On the other hand, bsd-user is extremely BSD specific, and ought to hav=
-e
-> CI.  I think there should be a tier 2 for system emulation (which
-> doesn't mean that anything there shouldn't be moved to tier 3 and
-> eventually removed), but there shouldn't be a tier 2 for user-mode
-> emulation.
->=20
-> In particular, I believe that we should remove bsd-user from 2.10 unles=
-s
-> the downstream BSD port is merged back (and CI is provided).  There is
-> no point in keeping the current half-baked code without thread support.
+On Fri, 17 Mar 2017, Dong Jia Shi wrote:
+> For future code reuse purpose, this decouples the cio code with
+> the ccw device specific parts from ccw_device_cancel_halt_clear,
+> and makes a new common I/O interface named cio_cancel_halt_clear.
 
-I think you made a good point here.
-So "+1" from my side to remove "bsd-user" and "tcg/ia64" in QEMU 2.10
-or 2.11 (unless someone speaks up and provides maintainence, of course).
+What would the user of cio_cancel_halt_clear be?
 
-... and I think we should add a message to the configure script for 2.9
-when somebody tries to use these subsystems, so that the removal does
-not happen without warning first?
-
- Thomas
+Sebastian
