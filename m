@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56759)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1corvI-0004wl-6F
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 09:28:05 -0400
+	(envelope-from <prvs=242126e8b=Paul.Durrant@citrix.com>)
+	id 1corxe-00061J-EO
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 09:30:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1corvE-0005Ey-0r
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 09:28:04 -0400
-Received: from 3.mo69.mail-out.ovh.net ([188.165.52.203]:35400)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1corvD-0005Eq-N5
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 09:27:59 -0400
-Received: from player738.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 49FA41DEF1
-	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 14:27:58 +0100 (CET)
-Date: Fri, 17 Mar 2017 14:27:50 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170317142750.5cb5e1c7@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <1489694518-16978-7-git-send-email-sstabellini@kernel.org>
-References: <alpine.DEB.2.10.1703161241220.14378@sstabellini-ThinkPad-X260>
-	<1489694518-16978-1-git-send-email-sstabellini@kernel.org>
-	<1489694518-16978-7-git-send-email-sstabellini@kernel.org>
+	(envelope-from <prvs=242126e8b=Paul.Durrant@citrix.com>)
+	id 1corxa-0006aY-6Q
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 09:30:30 -0400
+Received: from smtp.citrix.com ([66.165.176.89]:38084)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=242126e8b=Paul.Durrant@citrix.com>)
+	id 1corxZ-0006aB-Vv
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 09:30:26 -0400
+From: Paul Durrant <paul.durrant@citrix.com>
+Date: Fri, 17 Mar 2017 13:30:19 +0000
+Message-ID: <1489757419-8179-1-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/F6m=5pM=I_noKIH=oDFtoR/";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v3 7/9] xen/9pfs: implement
- in/out_iov_from_pdu and vmarshal/vunmarshal
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] xen: use libxendevice model to restrict
+ operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,181 +27,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, jgross@suse.com, Stefano Stabellini <stefano@aporeto.com>, anthony.perard@citrix.com, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
+Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>
 
---Sig_/F6m=5pM=I_noKIH=oDFtoR/
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+This patch adds a command-line option (-xen-domid-restrict) which will
+use the new libxendevicemodel API to restrict devicemodel operations to
+the specified domid.
 
-On Thu, 16 Mar 2017 13:01:56 -0700
-Stefano Stabellini <sstabellini@kernel.org> wrote:
+This patch also adds a tracepoint to allow successful enabling of the
+restriction to be monitored.
 
-> Implement xen_9pfs_init_in/out_iov_from_pdu and
-> xen_9pfs_pdu_vmarshal/vunmarshall by creating new sg pointing to the
-> data on the ring.
->=20
-> This is safe as we only handle one request per ring at any given time.
->=20
-> Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
-> CC: anthony.perard@citrix.com
-> CC: jgross@suse.com
-> CC: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
-> CC: Greg Kurz <groug@kaod.org>
-> ---
->  hw/9pfs/xen-9p-backend.c | 92 ++++++++++++++++++++++++++++++++++++++++++=
-++++--
->  1 file changed, 90 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
-> index f757591..0a1eb34 100644
-> --- a/hw/9pfs/xen-9p-backend.c
-> +++ b/hw/9pfs/xen-9p-backend.c
-> @@ -58,12 +58,78 @@ typedef struct Xen9pfsDev {
->      Xen9pfsRing *rings;
->  } Xen9pfsDev;
-> =20
-> +static void xen_9pfs_in_sg(Xen9pfsRing *ring,
-> +                           struct iovec *in_sg,
-> +                           int *num,
-> +                           uint32_t idx,
-> +                           uint32_t size)
-> +{
-> +    RING_IDX cons, prod, masked_prod, masked_cons;
-> +
-> +    cons =3D ring->intf->in_cons;
-> +    prod =3D ring->intf->in_prod;
-> +    xen_rmb();
-> +    masked_prod =3D xen_9pfs_mask(prod, XEN_9PFS_RING_SIZE);
-> +    masked_cons =3D xen_9pfs_mask(cons, XEN_9PFS_RING_SIZE);
-> +
-> +    if (masked_prod < masked_cons) {
-> +        in_sg[0].iov_base =3D ring->ring.in + masked_prod;
-> +        in_sg[0].iov_len =3D masked_cons - masked_prod;
-> +        *num =3D 1;
-> +    } else {
-> +        in_sg[0].iov_base =3D ring->ring.in + masked_prod;
-> +        in_sg[0].iov_len =3D XEN_9PFS_RING_SIZE - masked_prod;
-> +        in_sg[1].iov_base =3D ring->ring.in;
-> +        in_sg[1].iov_len =3D masked_cons;
-> +        *num =3D 2;
-> +    }
-> +}
-> +
-> +static void xen_9pfs_out_sg(Xen9pfsRing *ring,
-> +                            struct iovec *out_sg,
-> +                            int *num,
-> +                            uint32_t idx)
-> +{
-> +    RING_IDX cons, prod, masked_prod, masked_cons;
-> +
-> +    cons =3D ring->intf->out_cons;
-> +    prod =3D ring->intf->out_prod;
-> +    xen_rmb();
-> +    masked_prod =3D xen_9pfs_mask(prod, XEN_9PFS_RING_SIZE);
-> +    masked_cons =3D xen_9pfs_mask(cons, XEN_9PFS_RING_SIZE);
-> +
-> +    if (masked_cons < masked_prod) {
-> +        out_sg[0].iov_base =3D ring->ring.out + masked_cons;
-> +        out_sg[0].iov_len =3D ring->out_size;
-> +        *num =3D 1;
-> +    } else {
-> +        if (ring->out_size > (XEN_9PFS_RING_SIZE - masked_cons)) {
-> +            out_sg[0].iov_base =3D ring->ring.out + masked_cons;
-> +            out_sg[0].iov_len =3D XEN_9PFS_RING_SIZE - masked_cons;
-> +            out_sg[1].iov_base =3D ring->ring.out;
-> +            out_sg[1].iov_len =3D ring->out_size -
-> +                                (XEN_9PFS_RING_SIZE - masked_cons);
-> +            *num =3D 2;
-> +        } else {
-> +            out_sg[0].iov_base =3D ring->ring.out + masked_cons;
-> +            out_sg[0].iov_len =3D ring->out_size;
-> +            *num =3D 1;
-> +        }
-> +    }
-> +}
-> +
->  static ssize_t xen_9pfs_pdu_vmarshal(V9fsPDU *pdu,
->                                       size_t offset,
->                                       const char *fmt,
->                                       va_list ap)
->  {
-> -    return 0;
-> +    Xen9pfsDev *xen_9pfs =3D container_of(pdu->s, Xen9pfsDev, state);
-> +    struct iovec in_sg[2];
-> +    int num;
-> +
-> +    xen_9pfs_in_sg(&xen_9pfs->rings[pdu->tag % xen_9pfs->num_rings],
-> +                   in_sg, &num, pdu->idx, ROUND_UP(offset + 128, 512));
-> +    return v9fs_iov_vmarshal(in_sg, num, offset, 0, fmt, ap);
->  }
-> =20
->  static ssize_t xen_9pfs_pdu_vunmarshal(V9fsPDU *pdu,
-> @@ -71,13 +137,27 @@ static ssize_t xen_9pfs_pdu_vunmarshal(V9fsPDU *pdu,
->                                         const char *fmt,
->                                         va_list ap)
->  {
-> -    return 0;
-> +    Xen9pfsDev *xen_9pfs =3D container_of(pdu->s, Xen9pfsDev, state);
-> +    struct iovec out_sg[2];
-> +    int num;
-> +
-> +    xen_9pfs_out_sg(&xen_9pfs->rings[pdu->tag % xen_9pfs->num_rings],
-> +                    out_sg, &num, pdu->idx);
-> +    return v9fs_iov_vunmarshal(out_sg, num, offset, 0, fmt, ap);
->  }
-> =20
->  static void xen_9pfs_init_out_iov_from_pdu(V9fsPDU *pdu,
->                                             struct iovec **piov,
->                                             unsigned int *pniov)
->  {
-> +    Xen9pfsDev *xen_9pfs =3D container_of(pdu->s, Xen9pfsDev, state);
-> +    Xen9pfsRing *ring =3D &xen_9pfs->rings[pdu->tag % xen_9pfs->num_ring=
-s];
-> +    struct iovec *sg =3D g_malloc0(sizeof(*sg) * 2);
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+---
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
-I had overlooked in v2, sorry for that. Where does *sg gets freed ?
+NOTE: This is already re-based on Juergen Gross's patch "xen: use 5 digit
+      xen versions" and so should not be applied until after that patch
+      has been applied.
+---
+ hw/xen/trace-events         |  1 +
+ include/hw/xen/xen.h        |  1 +
+ include/hw/xen/xen_common.h | 23 +++++++++++++++++++++++
+ qemu-options.hx             |  6 ++++++
+ vl.c                        |  8 ++++++++
+ xen-hvm.c                   |  8 ++++++++
+ 6 files changed, 47 insertions(+)
 
-> +    int num;
-> +
-> +    xen_9pfs_out_sg(ring, sg, &num, pdu->idx);
-> +    *piov =3D sg;
-> +    *pniov =3D num;
->  }
-> =20
->  static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pdu,
-> @@ -85,6 +165,14 @@ static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pd=
-u,
->                                            unsigned int *pniov,
->                                            size_t size)
->  {
-> +    Xen9pfsDev *xen_9pfs =3D container_of(pdu->s, Xen9pfsDev, state);
-> +    Xen9pfsRing *ring =3D &xen_9pfs->rings[pdu->tag % xen_9pfs->num_ring=
-s];
-> +    struct iovec *sg =3D g_malloc0(sizeof(*sg) * 2);
-
-Same here.
-
-> +    int num;
-> +
-> +    xen_9pfs_in_sg(ring, sg, &num, pdu->idx, size);
-> +    *piov =3D sg;
-> +    *pniov =3D num;
->  }
-> =20
->  static void xen_9pfs_push_and_notify(V9fsPDU *pdu)
-
-
---Sig_/F6m=5pM=I_noKIH=oDFtoR/
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAljL5FYACgkQAvw66wEB28LjNgCfZgwnmfHe8blXM8kxGoEmomGe
-edsAnjgPaFx9eVI+hib/ayt17rVz7mkK
-=tzlV
------END PGP SIGNATURE-----
-
---Sig_/F6m=5pM=I_noKIH=oDFtoR/--
+diff --git a/hw/xen/trace-events b/hw/xen/trace-events
+index c4fb6f1..a5b5e8b 100644
+--- a/hw/xen/trace-events
++++ b/hw/xen/trace-events
+@@ -11,3 +11,4 @@ xen_map_portio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %
+ xen_unmap_portio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %u start: %#"PRIx64" end: %#"PRIx64
+ xen_map_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
+ xen_unmap_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
++xen_domid_restrict(void) ""
+diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
+index 2b1733b..7efcdaa 100644
+--- a/include/hw/xen/xen.h
++++ b/include/hw/xen/xen.h
+@@ -21,6 +21,7 @@ enum xen_mode {
+ 
+ extern uint32_t xen_domid;
+ extern enum xen_mode xen_mode;
++extern bool xen_domid_restrict;
+ 
+ extern bool xen_allowed;
+ 
+diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
+index df098c7..5962bc4 100644
+--- a/include/hw/xen/xen_common.h
++++ b/include/hw/xen/xen_common.h
+@@ -152,6 +152,13 @@ static inline int xendevicemodel_set_mem_type(
+     return xc_hvm_set_mem_type(dmod, domid, mem_type, first_pfn, nr);
+ }
+ 
++static inline int xendevicemodel_restrict(
++    xendevicemodel_handle *dmod, domid_t domid)
++{
++    errno = ENOTTY;
++    return -1;
++}
++
+ #else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
+ 
+ #include <xendevicemodel.h>
+@@ -206,6 +213,22 @@ static inline int xen_modified_memory(domid_t domid, uint64_t first_pfn,
+     return xendevicemodel_modified_memory(xen_dmod, domid, first_pfn, nr);
+ }
+ 
++static inline int xen_restrict(domid_t domid)
++{
++    int rc = xendevicemodel_restrict(xen_dmod, domid);
++
++    if (rc == 0) {
++        trace_xen_domid_restrict();
++        return 0;
++    }
++
++    if (errno == ENOTTY) {
++        return 0;
++    }
++
++    return rc;
++}
++
+ /* Xen 4.2 through 4.6 */
+ #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40701
+ 
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 99af8ed..4aab077 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3354,6 +3354,10 @@ DEF("xen-attach", 0, QEMU_OPTION_xen_attach,
+     "-xen-attach     attach to existing xen domain\n"
+     "                xend will use this when starting QEMU\n",
+     QEMU_ARCH_ALL)
++DEF("xen-domid-restrict", 0, QEMU_OPTION_xen_domid_restrict,
++    "-xen-domid-restrict     restrict set of available xen operations\n"
++    "                        to specified domain id\n",
++    QEMU_ARCH_ALL)
+ STEXI
+ @item -xen-domid @var{id}
+ @findex -xen-domid
+@@ -3366,6 +3370,8 @@ Warning: should not be used when xend is in use (XEN only).
+ @findex -xen-attach
+ Attach to existing xen domain.
+ xend will use this when starting QEMU (XEN only).
++@findex -xen-domid-restrict
++Restrict set of available xen operations to specified domain id (XEN only).
+ ETEXI
+ 
+ DEF("no-reboot", 0, QEMU_OPTION_no_reboot, \
+diff --git a/vl.c b/vl.c
+index 0b4ed52..f46e070 100644
+--- a/vl.c
++++ b/vl.c
+@@ -205,6 +205,7 @@ static NotifierList machine_init_done_notifiers =
+ bool xen_allowed;
+ uint32_t xen_domid;
+ enum xen_mode xen_mode = XEN_EMULATE;
++bool xen_domid_restrict;
+ 
+ static int has_defaults = 1;
+ static int default_serial = 1;
+@@ -3933,6 +3934,13 @@ int main(int argc, char **argv, char **envp)
+                 }
+                 xen_mode = XEN_ATTACH;
+                 break;
++            case QEMU_OPTION_xen_domid_restrict:
++                if (!(xen_available())) {
++                    error_report("Option not supported for this target");
++                    exit(1);
++                }
++                xen_domid_restrict = true;
++                break;
+             case QEMU_OPTION_trace:
+                 g_free(trace_file);
+                 trace_file = trace_opt_parse(optarg);
+diff --git a/xen-hvm.c b/xen-hvm.c
+index 4b928cf..335e263 100644
+--- a/xen-hvm.c
++++ b/xen-hvm.c
+@@ -1226,6 +1226,14 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
+         goto err;
+     }
+ 
++    if (xen_domid_restrict) {
++        rc = xen_restrict(xen_domid);
++        if (rc < 0) {
++            error_report("failed to restrict: error %d", errno);
++            goto err;
++        }
++    }
++
+     xen_create_ioreq_server(xen_domid, &state->ioservid);
+ 
+     state->exit.notify = xen_exit_notifier;
+-- 
+2.1.4
