@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50675)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51515)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cotBf-0005To-7j
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 10:49:04 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cotDj-0006i8-HA
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 10:51:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cotBb-0001Fv-BT
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 10:49:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34098)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cotBb-0001Fl-5G
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 10:48:59 -0400
-References: <1489750157-17401-1-git-send-email-tianyu.lan@intel.com>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cotDi-00027C-Oz
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 10:51:11 -0400
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <bd7cb196-0779-42ad-ce9c-5871d307adce@kamp.de>
+	<82d604c8-068a-aff4-6037-e3cd247b3588@redhat.com>
+	<819af057-3777-dffc-4670-895b8265fd01@kamp.de>
+	<d41d1428-4c8b-7e2f-b197-8d45b834776d@redhat.com>
+	<20170317112446.GH13125@lemon.lan>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1e1d1637-1cf8-2ad4-36e2-342aa21b100d@redhat.com>
-Date: Fri, 17 Mar 2017 15:48:53 +0100
+Message-ID: <d60bca20-c76b-696f-06d6-766d2d42ed77@redhat.com>
+Date: Fri, 17 Mar 2017 15:51:01 +0100
 MIME-Version: 1.0
-In-Reply-To: <1489750157-17401-1-git-send-email-tianyu.lan@intel.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170317112446.GH13125@lemon.lan>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 0/4] Qemu: Add Xen vIOMMU support
+Subject: Re: [Qemu-devel] callout to *file in bdrv_co_get_block_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,28 +27,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lan Tianyu <tianyu.lan@intel.com>, qemu-devel@nongnu.org, xen-devel@lists.xensource.com
-Cc: chao.gao@intel.com, kevin.tian@intel.com, anthony.perard@citrix.com, ehabkost@redhat.com, marcel@redhat.com, mst@redhat.com, rth@twiddle.net, sstabellini@kernel.org
+To: Fam Zheng <famz@redhat.com>
+Cc: Peter Lieven <pl@kamp.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
 
 
 
-On 17/03/2017 12:29, Lan Tianyu wrote:
-> This patchset is to add Xen vIOMMU device model and handle
-> irq remapping stuffs. Xen vIOMMU emulation is in the Xen hypervisor
-> and the new device module in Qemu works as hypercall wrappers to
-> create and destroy vIOMMU in hypervisor.
+On 17/03/2017 12:24, Fam Zheng wrote:
+> On Fri, 03/17 12:16, Paolo Bonzini wrote:
+>>
+>>
+>> On 17/03/2017 12:11, Peter Lieven wrote:
+>>>>> like VMDK or QCOW2 shouldn't we trust the information from the l2 tables in the VMDK or QCOW2?
+>>>> It provides additional information, for example it works better with
+>>>> prealloc=metadata.
+>>> Okay, understood. Can you imagine of a away to conditionally avoid this second callout? In my case we have an additional
+>>> lseek for each cluster. For a 20GB file this are approx. 327k calls to lseek. And if the file has no preallocated metadata
+>>> it will likely not improve anything. And even if the metadata is prealloced what is the allocation status of the clusters?
+>>
+>> If the metadata is preallocated, cluster will (or should) show up as
+>> zero, speeding up the copy.
 > 
-> Xen only supports emulated I440 and so we enable vIOMMU with emulated
-> I440 chipset. This works on Linux and Windows guest.
+> I think from qemu-img convert's perspective, it doesn't care about the *file
+> status if the metadata already speaks, because, like you said, the data shows up
+> as zeroes.
 
-Any plans to change this?  Why is Xen not able to use Q35 with Intel
-IOMMU, with only special hooks for interrupt remapping?
+That's already the case: *file is only examined if the metadata  says
+BDRV_BLOCK_DATA=1, BDRV_BLOCK_ZERO=0.
 
 Paolo
-
-> Chao Gao (4):
->   I440: Allow adding sysbus devices with -device on I440
->   Xen: add a dummy vIOMMU to create/destroy vIOMMU in Xen
->   xen-pt: bind/unbind interrupt remapping format MSI
->   msi: taking interrupt format into consideration during judging a pirq
->     is binded with a event channel
