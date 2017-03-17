@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33042)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liqiang6-s@360.cn>) id 1conIS-0003ft-8N
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 04:31:41 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1condc-0001ng-UI
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 04:53:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liqiang6-s@360.cn>) id 1conIO-0005lD-AS
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 04:31:40 -0400
-Received: from mtabjsc2.360.cn ([123.125.82.7]:49954)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liqiang6-s@360.cn>) id 1conIN-0005k9-Lz
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 04:31:36 -0400
-From: =?utf-8?B?5p2O5by6?= <liqiang6-s@360.cn>
-Date: Fri, 17 Mar 2017 08:31:28 +0000
-Message-ID: <143C0AFC63FC204CB0C55BB88F3A8ABB3336D644@EX02.corp.qihoo.net>
-References: <1489735296-19047-1-git-send-email-kraxel@redhat.com>
-In-Reply-To: <1489735296-19047-1-git-send-email-kraxel@redhat.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <marcandre.lureau@gmail.com>) id 1condb-0006yx-MD
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 04:53:33 -0400
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:33389)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1condb-0006yB-AJ
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 04:53:31 -0400
+Received: by mail-lf0-x241.google.com with SMTP id r36so5041908lfi.0
+	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 01:53:30 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] cirrus: fix off-by-one in
- cirrus_bitblt_rop_bkwd_transp_*_16
+References: <1489738282-28383-1-git-send-email-kraxel@redhat.com>
+In-Reply-To: <1489738282-28383-1-git-send-email-kraxel@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 17 Mar 2017 08:53:18 +0000
+Message-ID: <CAJ+F1CLfeZUjUUqiaeXZpUsQBcsX1Cips=HQj=5MMKbD+UxboA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] ui/egl-helpers: fix egl 1.5 display init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +29,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: hdegoede@redhat.com, Frediano Ziglio <fziglio@redhat.com>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUWVtdS1kZXZlbA0KPiBb
-bWFpbHRvOnFlbXUtZGV2ZWwtYm91bmNlcytsaXFpYW5nNi1zPTM2MC5jbkBub25nbnUub3JnXSBP
-biBCZWhhbGYgT2YNCj4gR2VyZCBIb2ZmbWFubg0KPiBTZW50OiBGcmlkYXksIE1hcmNoIDE3LCAy
-MDE3IDM6MjIgUE0NCj4gVG86IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiBDYzogR2VyZCBIb2Zm
-bWFubg0KPiBTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBjaXJydXM6IGZpeCBvZmYtYnkt
-b25lIGluDQo+IGNpcnJ1c19iaXRibHRfcm9wX2Jrd2RfdHJhbnNwXypfMTYNCj4gDQo+IFRoZSBz
-d2l0Y2ggZnJvbSBwb2ludGVycyB0byBhZGRyZXNzZXMgKGNvbW1pdA0KPiAwMjZhZWZmY2I0NzUy
-MDU0ODMwYmEyMDMwMjBlZDZlYjA1YmNhYmE4IGFuZA0KPiBmZmFmODU3Nzc4Mjg2Y2E1NGUzODA0
-NDMyYTIzNjlhMjc5ZTczYWE3KSBhZGRlZCBhIG9mZi1ieS1vbmUgYnVnIHRvDQo+IDE2Yml0IGJh
-Y2t3YXJkIGJsaXRzLiAgRml4Lg0KPiANCj4gUmVwb3J0ZWQtYnk6IOadjuW8uiA8bGlxaWFuZzYt
-c0AzNjAuY24+DQo+IFNpZ25lZC1vZmYtYnk6IEdlcmQgSG9mZm1hbm4gPGtyYXhlbEByZWRoYXQu
-Y29tPg0KDQpSZXZpZXdlZC1ieTogTGkgUWlhbmcgPGxpcWlhbmc2LXNAMzYwLmNuPg0KDQo+IC0t
-LQ0KPiAgaHcvZGlzcGxheS9jaXJydXNfdmdhX3JvcC5oIHwgMiArLQ0KPiAgMSBmaWxlIGNoYW5n
-ZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9uKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvaHcv
-ZGlzcGxheS9jaXJydXNfdmdhX3JvcC5oIGIvaHcvZGlzcGxheS9jaXJydXNfdmdhX3JvcC5oIGlu
-ZGV4DQo+IGM2MWE2NzcuLjA4NDFiOWUgMTAwNjQ0DQo+IC0tLSBhL2h3L2Rpc3BsYXkvY2lycnVz
-X3ZnYV9yb3AuaA0KPiArKysgYi9ody9kaXNwbGF5L2NpcnJ1c192Z2Ffcm9wLmgNCj4gQEAgLTIx
-OSw3ICsyMTksNyBAQCBnbHVlKGdsdWUoY2lycnVzX2JpdGJsdF9yb3BfYmt3ZF90cmFuc3BfLA0K
-PiBST1BfTkFNRSksXzE2KShDaXJydXNWR0FTdGF0ZSAqcywNCj4gICAgICBzcmNwaXRjaCArPSBi
-bHR3aWR0aDsNCj4gICAgICBmb3IgKHkgPSAwOyB5IDwgYmx0aGVpZ2h0OyB5KyspIHsNCj4gICAg
-ICAgICAgZm9yICh4ID0gMDsgeCA8IGJsdHdpZHRoOyB4Kz0yKSB7DQo+IC0gICAgICAgICAgICBS
-T1BfT1BfVFJfMTYocywgZHN0YWRkciwgY2lycnVzX3NyYzE2KHMsIHNyY2FkZHIpLCB0cmFuc3Ap
-Ow0KPiArICAgICAgICAgICAgUk9QX09QX1RSXzE2KHMsIGRzdGFkZHIgLSAxLCBjaXJydXNfc3Jj
-MTYocywgc3JjYWRkciAtIDEpLA0KPiArIHRyYW5zcCk7DQo+ICAgICAgICAgICAgICBkc3RhZGRy
-IC09IDI7DQo+ICAgICAgICAgICAgICBzcmNhZGRyIC09IDI7DQo+ICAgICAgICAgIH0NCj4gLS0N
-Cj4gMS44LjMuMQ0KPiANCg0K
+On Fri, Mar 17, 2017 at 12:12 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
+
+> Unfortunaly switching to getPlatformDisplayEXT isn't as easy as
+> implemented by 0ea1523fb6703aa0dcd65e66b59e96fec028e60a.  See the
+> longish comment for the complete story.
+>
+> Cc: Frediano Ziglio <fziglio@redhat.com>
+> Suggested-by: Hans de Goede <hdegoede@redhat.com>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+
+
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+
+
+>  ui/egl-helpers.c | 53
+> +++++++++++++++++++++++++++++++++++++++++++++++------
+>  1 file changed, 47 insertions(+), 6 deletions(-)
+>
+> diff --git a/ui/egl-helpers.c b/ui/egl-helpers.c
+> index 584dd1b..48686cf 100644
+> --- a/ui/egl-helpers.c
+> +++ b/ui/egl-helpers.c
+> @@ -192,6 +192,51 @@ EGLSurface qemu_egl_init_surface_x11(EGLContext ectx=
+,
+> Window win)
+>
+>  /* ---------------------------------------------------------------------=
+-
+> */
+>
+> +/*
+> + * Taken from glamor_egl.h from the Xorg xserver, which is MIT licensed
+> + *
+> + * Create an EGLDisplay from a native display type. This is a little
+> quirky
+> + * for a few reasons.
+> + *
+> + * 1: GetPlatformDisplayEXT and GetPlatformDisplay are the API you want =
+to
+> + * use, but have different function signatures in the third argument; th=
+is
+> + * happens not to matter for us, at the moment, but it means epoxy won't
+> alias
+> + * them together.
+> + *
+> + * 2: epoxy 1.3 and earlier don't understand EGL client extensions, whic=
+h
+> + * means you can't call "eglGetPlatformDisplayEXT" directly, as the
+> resolver
+> + * will crash.
+> + *
+> + * 3: You can't tell whether you have EGL 1.5 at this point, because
+> + * eglQueryString(EGL_VERSION) is a property of the display, which we
+> don't
+> + * have yet. So you have to query for extensions no matter what.
+> Fortunately
+> + * epoxy_has_egl_extension _does_ let you query for client extensions, s=
+o
+> + * we don't have to write our own extension string parsing.
+> + *
+> + * 4. There is no EGL_KHR_platform_base to complement the EXT one, thus
+> one
+> + * needs to know EGL 1.5 is supported in order to use the
+> eglGetPlatformDisplay
+> + * function pointer.
+> + * We can workaround this (circular dependency) by probing for the EGL 1=
+.5
+> + * platform extensions (EGL_KHR_platform_gbm and friends) yet it doesn't
+> seem
+> + * like mesa will be able to adverise these (even though it can do EGL
+> 1.5).
+> + */
+> +static EGLDisplay qemu_egl_get_display(void *native)
+> +{
+> +#ifdef EGL_PLATFORM_GBM_MESA
+> +    /* In practise any EGL 1.5 implementation would support the EXT
+> extension */
+> +    if (epoxy_has_egl_extension(NULL, "EGL_EXT_platform_base")) {
+> +        PFNEGLGETPLATFORMDISPLAYEXTPROC getPlatformDisplayEXT =3D
+> +            (void *) eglGetProcAddress("eglGetPlatformDisplayEXT");
+> +        if (getPlatformDisplayEXT) {
+> +            return getPlatformDisplayEXT(EGL_PLATFORM_GBM_MESA, native,
+> NULL);
+> +        }
+> +    }
+> +#endif
+> +
+> +    /* fallback */
+> +    return eglGetDisplay(native);
+> +}
+> +
+>  int qemu_egl_init_dpy(EGLNativeDisplayType dpy, bool gles, bool debug)
+>  {
+>      static const EGLint conf_att_gl[] =3D {
+> @@ -222,12 +267,8 @@ int qemu_egl_init_dpy(EGLNativeDisplayType dpy, bool
+> gles, bool debug)
+>          setenv("LIBGL_DEBUG", "verbose", true);
+>      }
+>
+> -    egl_dbg("eglGetDisplay (dpy %p) ...\n", dpy);
+> -#ifdef EGL_MESA_platform_gbm
+> -    qemu_egl_display =3D eglGetPlatformDisplayEXT(EGL_PLATFORM_GBM_MESA,
+> dpy, NULL);
+> -#else
+> -    qemu_egl_display =3D eglGetDisplay(dpy);
+> -#endif
+> +    egl_dbg("qemu_egl_get_display (dpy %p) ...\n", dpy);
+> +    qemu_egl_display =3D qemu_egl_get_display(dpy);
+>      if (qemu_egl_display =3D=3D EGL_NO_DISPLAY) {
+>          error_report("egl: eglGetDisplay failed");
+>          return -1;
+> --
+> 1.8.3.1
+>
+>
+> --
+Marc-Andr=C3=A9 Lureau
