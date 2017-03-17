@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52712)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1corjY-0004S9-2K
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 09:15:57 -0400
+	(envelope-from <kwolf@redhat.com>) id 1corjX-0004RM-1a
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 09:15:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1corjX-0000eP-1I
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 09:15:55 -0400
+	(envelope-from <kwolf@redhat.com>) id 1corjV-0000dM-Q5
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 09:15:54 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 17 Mar 2017 14:15:39 +0100
-Message-Id: <1489756546-27142-2-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1489756546-27142-1-git-send-email-kwolf@redhat.com>
-References: <1489756546-27142-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 1/8] file-posix: clean up max_segments buffer
- termination
+Date: Fri, 17 Mar 2017 14:15:38 +0100
+Message-Id: <1489756546-27142-1-git-send-email-kwolf@redhat.com>
+Subject: [Qemu-devel] [PULL 0/8] Block layer fixes for 2.9.0-rc1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,44 +20,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+The following changes since commit 272d7dee5951f926fad1911f2f072e5915cdcba0:
 
-The following pattern is unsafe:
+  Merge remote-tracking branch 'remotes/kraxel/tags/pull-cirrus-20170316-1' into staging (2017-03-16 16:40:44 +0000)
 
-  char buf[32];
-  ret = read(fd, buf, sizeof(buf));
-  ...
-  buf[ret] = 0;
+are available in the git repository at:
 
-If read(2) returns 32 then a byte beyond the end of the buffer is
-zeroed.
 
-In practice this buffer overflow does not occur because the sysfs
-max_segments file only contains an unsigned short + '\n'.  The string is
-always shorter than 32 bytes.
+  git://repo.or.cz/qemu/kevin.git tags/for-upstream
 
-Regardless, avoid this pattern because static analysis tools might
-complain and it could lead to real buffer overflows if copy-pasted
-elsewhere in the codebase.
+for you to fetch changes up to 11f0f5e553cff93d5fc77d67b98c40adba12b729:
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block/file-posix.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+  Merge remote-tracking branch 'mreitz/tags/pull-block-2017-03-17' into queue-block (2017-03-17 13:03:44 +0100)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index c4c0663..ac6bd9f 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -686,7 +686,7 @@ static int hdev_get_max_segments(const struct stat *st)
-         goto out;
-     }
-     do {
--        ret = read(fd, buf, sizeof(buf));
-+        ret = read(fd, buf, sizeof(buf) - 1);
-     } while (ret == -1 && errno == EINTR);
-     if (ret < 0) {
-         ret = -errno;
--- 
-1.8.3.1
+----------------------------------------------------------------
+
+Block layer fixes for 2.9.0-rc1
+
+----------------------------------------------------------------
+Changlong Xie (1):
+      replication: clarify permissions
+
+Fam Zheng (3):
+      file-posix: Don't leak fd in hdev_get_max_segments
+      block: Always call bdrv_child_check_perm first
+      block: Propagate error in bdrv_open_backing_file
+
+John Snow (1):
+      blockdev: fix bitmap clear undo
+
+Kevin Wolf (1):
+      Merge remote-tracking branch 'mreitz/tags/pull-block-2017-03-17' into queue-block
+
+Paolo Bonzini (1):
+      block: quiesce AioContext when detaching from it
+
+Peter Lieven (1):
+      thread-pool: add missing qemu_bh_cancel in completion function
+
+Stefan Hajnoczi (1):
+      file-posix: clean up max_segments buffer termination
+
+ block.c                   | 21 +++++++++++++++++----
+ block/file-posix.c        |  5 ++++-
+ block/mirror.c            |  6 ++++--
+ block/replication.c       | 14 +++++++++++++-
+ blockdev.c                |  4 +++-
+ include/block/block_int.h |  4 ----
+ util/thread-pool.c        |  7 +++++++
+ 7 files changed, 48 insertions(+), 13 deletions(-)
