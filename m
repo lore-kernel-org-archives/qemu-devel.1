@@ -1,39 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1coqTa-0002AE-AW
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:55:23 -0400
+	(envelope-from <berrange@redhat.com>) id 1coqUp-0002ro-JV
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:56:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1coqTW-00058d-Dp
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:55:22 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54808
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1coqTW-00058O-7M
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:55:18 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2HBmiI4104138
-	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 07:55:16 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 297seuy68r-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 07:55:16 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Fri, 17 Mar 2017 11:55:14 -0000
-Date: Fri, 17 Mar 2017 12:55:10 +0100
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <20170317113353.26297-1-famz@redhat.com>
-References: <20170317113353.26297-1-famz@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1coqUl-0005ax-Sc
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:56:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48364)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1coqUl-0005aS-JY
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:56:35 -0400
+Date: Fri, 17 Mar 2017 11:56:31 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170317115631.GG8050@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1489748902-21765-1-git-send-email-peter.maydell@linaro.org>
+	<20170317114953.GF8050@redhat.com>
+	<CAFEAcA8Sky0cX+7U257AdG=imYYcdqRgL--o=86xCHMY6Kr3zw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170317125510.75b4c92c.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9] virtio: Fix error handling in
- virtio_bus_device_plugged
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8Sky0cX+7U257AdG=imYYcdqRgL--o=86xCHMY6Kr3zw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] configure: Warn about deprecated hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,21 +29,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, drjones@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>
 
-On Fri, 17 Mar 2017 19:33:53 +0800
-Fam Zheng <famz@redhat.com> wrote:
-
-> For one thing we shouldn't continue if an error happened, for the other
-> two steps failing can cause an abort() in error_setg because we reuse
-> the same errp blindly.
+On Fri, Mar 17, 2017 at 11:52:01AM +0000, Peter Maydell wrote:
+> On 17 March 2017 at 11:49, Daniel P. Berrange <berrange@redhat.com> wrote:
+> > On Fri, Mar 17, 2017 at 11:08:22AM +0000, Peter Maydell wrote:
+> >> We plan to drop support in a future QEMU release for host OSes
+> >> and host architectures for which we have no test machine where
+> >> we can build and run tests. For the 2.9 release, make configure
+> >> print a warning if it is run on such a host, so that the user
+> >> has some warning of the plans and can volunteer to help us
+> >> maintain the port if they need it to continue to function.
+> >>
+> >> This commit flags up as deprecated the CPU architectures:
+> >>  * ia64
+> >>  * sparc
+> >>  * anything which we don't have a TCG port for
+> >>    (and which was presumably using TCI)
+> >
+> > This seems to imply that if we remove supported for these architectures,
+> > then TCI is no longer required either, or would there be other reasons
+> > to want to keep TCI around, even when all host archs have a TCG port ?
 > 
-> Add error handling checks to fix both issues.
+> I've never really seen the point in TCI, but others do, which
+> is why it's in the tree.
 > 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  hw/virtio/virtio-bus.c | 18 ++++++++++++++++--
->  1 file changed, 16 insertions(+), 2 deletions(-)
+> >> This list is definitely too all-encompassing, and we should
+> >> move at least some of the BSDs into "not-deprecated".
+> >> I'm posting the patch for the moment for code review on the
+> >> logic and as a placeholder.
+> >
+> > FreeBSD is the one where I most frequently see developers engaging across
+> > the overall virt tools stack (QEMU/libvirt/virt-manager/OpenStack).
+> > GNU/kFreeBSD has come up a few times in libvirt, and I don't recall seeing
+> > anyone mentioning the remaining BSDs - though perhaps thats because the
+> > FreeBSD port fixes are enough to also make other BSDs work.
+> 
+> Yeah. I'm just struggling with setting up a FreeBSD VM so we
+> can compile test that. Interesting that GNU/kFreeBSD has users.
 
-Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+I wouldn't go so far as to say GNU/kFreeBSD has users. It had a few people
+who have noticed bits of libvirt didn't compile at times, but I'm not sure
+if they actually used the result, or were just building libvirt for sake of
+having full platform coverage in Debian packages.
+
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
