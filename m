@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mike.kravetz@oracle.com>) id 1cp07k-00075w-86
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 18:13:29 -0400
+	(envelope-from <benh@kernel.crashing.org>) id 1cp09w-0007pJ-M0
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 18:15:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mike.kravetz@oracle.com>) id 1cp07f-0006G1-7t
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 18:13:28 -0400
-Received: from userp1040.oracle.com ([156.151.31.81]:26882)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mike.kravetz@oracle.com>)
-	id 1cp07e-0006El-VG
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 18:13:23 -0400
-References: <cad15568-221e-82b7-a387-f23567a0bc76@oracle.com>
-	<e09c529d-50e7-e6f2-8054-a34f22b5835a@oracle.com>
-	<20170314183706.GO27056@redhat.com>
-From: Mike Kravetz <mike.kravetz@oracle.com>
-Message-ID: <f78063aa-ac16-dd0a-d664-ea6e4aff6b9f@oracle.com>
-Date: Fri, 17 Mar 2017 15:13:11 -0700
-MIME-Version: 1.0
-In-Reply-To: <20170314183706.GO27056@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [LSF/MM TOPIC][LSF/MM, ATTEND] shared TLB,
- hugetlb reservations
+	(envelope-from <benh@kernel.crashing.org>) id 1cp09r-00070l-NE
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 18:15:44 -0400
+Message-ID: <1489788924.2504.15.camel@kernel.crashing.org>
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Date: Sat, 18 Mar 2017 09:15:24 +1100
+In-Reply-To: <22f93cf3-faa4-f912-2d98-41d7f149029b@kaod.org>
+References: <1447201710-10229-1-git-send-email-benh@kernel.crashing.org>
+	<1447201710-10229-49-git-send-email-benh@kernel.crashing.org>
+	<22f93cf3-faa4-f912-2d98-41d7f149029b@kaod.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 48/77] ppc/pnv: Add model for
+ Power8 PHB3 PCIe Host bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,118 +25,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Arcangeli <aarcange@redhat.com>
-Cc: lsf-pc@lists.linux-foundation.org, linux-mm@kvack.org, linux-kernel <linux-kernel@vger.kernel.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Mike Rapoport <rppt@linux.vnet.ibm.com>
+To: =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org
 
-On 03/14/2017 11:37 AM, Andrea Arcangeli wrote:
-> Hello,
-> 
-> On Wed, Mar 08, 2017 at 05:30:55PM -0800, Mike Kravetz wrote:
->> On 01/10/2017 03:02 PM, Mike Kravetz wrote:
->>> Another more concrete topic is hugetlb reservations.  Michal Hocko
->>> proposed the topic "mm patches review bandwidth", and brought up the
->>> related subject of areas in need of attention from an architectural
->>> POV.  I suggested that hugetlb reservations was one such area.  I'm
->>> guessing it was introduced to solve a rather concrete problem.  However,
->>> over time additional hugetlb functionality was added and the
->>> capabilities of the reservation code was stretched to accommodate.
->>> It would be good to step back and take a look at the design of this
->>> code to determine if a rewrite/redesign is necessary.  Michal suggested
->>> documenting the current design/code as a first step.  If people think
->>> this is worth discussion at the summit, I could put together such a
->>> design before the gathering.
->>
->> I attempted to put together a design/overview of how hugetlb reservations
->> currently work.  Hopefully, this will be useful.
-> 
-> Another area of hugetlbfs that is not clear is the status of
-> MADV_REMOVE and the behavior of fallocate punch hole that deviates
-> from more standard shmem semantics. That might also be a topic of
-> interest related to your hugetlbfs topic and marginally related to
-> userfaultfd.
+On Fri, 2017-03-17 at 09:24 +0100, C=C3=A9dric Le Goater wrote:
+> I changed that to :
+>=20
+> =C2=A0=C2=A0=C2=A0 pnv_phb3_msi_update_config(phb->msis, comp, count - =
+PHB_NUM_LSI);
+>=20
+> else the IRQ numbers overlap with the LSI and I think this why we
+> were=C2=A0
+> uselessly looping on the EOI.
+>=20
+> Correct ?=C2=A0
 
-Thanks Andrea,
+Quite possibly though to be honest, I have swapped out a lot of that
+out of my brain :-)
 
-I was not aware qemu was carrying all this information.
-
-> The current status for anon, shmem and hugetlbfs like this:
-> 
-> MADV_DONTNEED works: anon, !VM_SHARED shmem
-> MADV_DONTNEED doesn't work: hugetlbfs VM_SHARED, hugetlbfs !VM_SHARED
-> MADV_DONTNEED works but not guaranteed to fault: shmem VM_SHARED
-> 
-> MADV_REMOVE works: shmem VM_SHARED, hugetlbfs VM_SHARED
-> MADV_REMOVE doesn't work: anon, shmem !VM_SHARED, hugetlbfs !VM_SHARED
-> 
-> fallocate punch hole works: hugetlbfs VM_SHARED, hugetlbfs !VM_SHARED,
-> 	  	     	    shmem VM_SHARED
-> fallocate punch hole doesn't work: anon, shmem !VM_SHARED
-> 
-> So what happens in qemu is:
-> 
-> anon			-> MADV_DONTNEED
-> 
-> shmem !VM_SHARED	-> MADV_DONTNEED (fallocate punch hole wouldn't zap
-> 			   private pages, but it does on hugetlbfs)
-> 
-> shmem VM_SHARED		-> fallocate punch hole (MADV_REMOVE would
->       			   work too)
-> 
-> hugetlbfs !VM_SHARED	-> fallocate punch hole (works for hugetlbfs
-> 			   but not for shmem !VM_SHARED)
-> 
-> hugetlbfs VM_SHARED	-> fallocate punch hole (MADV_REMOVE would work too)
-> 
-> This means qemu has to carry around information on the type of memory
-> it got from the initial memblock setup, so at live migration time it
-> can zap the memory with the right call. (NOTE: such memory is not
-> generated by userfaultfd UFFDIO_COPY, but it was allocated and mapped
-> and it must be zapped well before calling userfaultfd the first time).
-> 
-> To do this qemu uses fstatfs and finds out which kind of memory it's
-> dealing with to use the right call depending on which memory.
-> 
-> In short it'd be better to have something like a generic MADV_REMOVE
-> that guarantees a non-present fault after it succeeds, no matter what
-> kind of memory is mapped in the virtual range that has to be
-> zapped. The above is far from ideal from a userland developer
-> prospective.
-
-I think we will need to have a new generic MADV_REMOVE type of call
-as you suggest.  Based on existing documentation for MADV_DONTNEED,
-MADV_REMOVE and fallocate hole punch they each are designed not to
-work on at least one of the desired memory mapping types.
-
-> Overall fallocate punch hole covers the most cases so to keep the code
-> simpler ironically MADV_REMOVE ends up being never used despite it
-> provides a more friendly API than fallocate to qemu. The files are
-> always mapped and the older code only dealt with virtual addresses
-> (before hugetlbfs and shmem entered thee equation). Ideally qemu wants
-> to call the same madvise regardles if the memory is anon shmem or
-> hugetlbfs without having to carry around file descriptor, file offsets
-> and superblock types.
-> 
-> It's also not clear why MADV_DONTNEED doesn't work for hugetlbfs
-> !VM_SHARED mappings and why fallocate punch hole is also zapping
-> private cow-like pages from !VM_SHARED mappings (although if it
-> didn't, it would be impossible to zap those... so it's good luck it
-> does).
-
-Yes, it is more like good luck than design.  fallocate hole punch for
-hugetlbfs VM_SHARED was the original use case/design.  MADV_REMOVE was
-added just because it could without additional effort.
-
-Thanks for bringing this up.  We should definitely discuss within the
-scope of hugetlbfs and/or userfaultfd.
-
--- 
-Mike Kravetz
-
-> 
-> Thanks,
-> Andrea
-> 
-> PS. CC'ed also qemu-devel in case it may help clarify why things are
-> implemented they way they are in the postcopy live migration
-> hugetlbfs/shmem support and in the future patches for shmem/hugetlbfs
-> share=on.
+Cheers,
+Ben.
