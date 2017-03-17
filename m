@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eswierk@skyportsystems.com>) id 1covkn-0007cU-Le
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 13:33:30 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1covlx-0008FY-6u
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 13:34:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eswierk@skyportsystems.com>) id 1covkm-0005Mr-JW
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 13:33:29 -0400
-Received: from mail-vk0-x234.google.com ([2607:f8b0:400c:c05::234]:35004)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <eswierk@skyportsystems.com>)
-	id 1covkm-0005MZ-Dg
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 13:33:28 -0400
-Received: by mail-vk0-x234.google.com with SMTP id x75so44628041vke.2
-	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 10:33:28 -0700 (PDT)
+	(envelope-from <sstabellini@kernel.org>) id 1covls-0005X7-HH
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 13:34:41 -0400
+Received: from mail.kernel.org ([198.145.29.136]:52448)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1covls-0005X0-6X
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 13:34:36 -0400
+Date: Fri, 17 Mar 2017 10:34:17 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <90dea027-0cd8-f9bd-0265-b184f1e0e37a@redhat.com>
+Message-ID: <alpine.DEB.2.10.1703171034001.22036@sstabellini-ThinkPad-X260>
+References: <alpine.DEB.2.10.1703161241220.14378@sstabellini-ThinkPad-X260>
+	<1489694518-16978-1-git-send-email-sstabellini@kernel.org>
+	<90dea027-0cd8-f9bd-0265-b184f1e0e37a@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <d54e7c6e-d261-dff0-9038-8f62283c91a4@redhat.com>
-References: <CAO_EM_kn4QEw=+j23F7e+LzLW2_TPwNENoopqyBb-hdKYAow9w@mail.gmail.com>
-	<f8f478b3-70a0-b67b-c4df-3f68ac66308a@redhat.com>
-	<d54e7c6e-d261-dff0-9038-8f62283c91a4@redhat.com>
-From: Ed Swierk <eswierk@skyportsystems.com>
-Date: Fri, 17 Mar 2017 10:32:47 -0700
-Message-ID: <CAO_EM_=8-nnrz+BygPUnhkgrrRzYiPwE=ji7ncUXyHwZxVkAkw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] Assertion failure taking external snapshot with
- virtio drive + iothread
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v3 1/9] xen: do not build backends for
+ targets that do not support xen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,41 +30,119 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, jgross@suse.com, groug@kaod.org, Stefano Stabellini <stefano@aporeto.com>, peter.maydell@linaro.org, rth@twiddle.net, stefanha@redhat.com
 
-On Fri, Mar 17, 2017 at 10:15 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
->
-> On 17/03/2017 18:11, Paolo Bonzini wrote:
->>
->>
->> On 17/03/2017 17:55, Ed Swierk wrote:
->>> I'm running into the same problem taking an external snapshot with a
->>> virtio-blk drive with iothread, so it's not specific to virtio-scsi.
->>> Run a Linux guest on qemu master
->>>
->>>   qemu-system-x86_64 -nographic -enable-kvm -monitor
->>> telnet:0.0.0.0:1234,server,nowait -m 1024 -object
->>> iothread,id=iothread1 -drive file=/x/drive.qcow2,if=none,id=drive0
->>> -device virtio-blk-pci,iothread=iothread1,drive=drive0
->>>
->>> Then in the monitor
->>>
->>>   snapshot_blkdev drive0 /x/snap1.qcow2
->>>
->>> qemu bombs with
->>>
->>>   qemu-system-x86_64: /x/qemu/include/block/aio.h:457:
->>> aio_enable_external: Assertion `ctx->external_disable_cnt > 0' failed.
->>>
->>> whereas without the iothread the assertion failure does not occur.
->>
->> Please try this patch:
->
-> Hmm, no.  I'll post the full fix on top of John Snow's patches.
+On Fri, 17 Mar 2017, Paolo Bonzini wrote:
+> On 16/03/2017 21:01, Stefano Stabellini wrote:
+> > Change Makefile.objs to use CONFIG_XEN instead of CONFIG_XEN_BACKEND, so
+> > that the Xen backends are only built for targets that support Xen.
+> > 
+> > Set CONFIG_XEN in the toplevel Makefile to ensure that files that are
+> > built only once pick up Xen support properly.
+> > 
+> > Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
+> > CC: groug@kaod.org
+> > CC: pbonzini@redhat.com
+> > CC: peter.maydell@linaro.org
+> > CC: rth@twiddle.net
+> > CC: stefanha@redhat.com
+> > ---
+> >  Makefile                 | 1 +
+> >  hw/block/Makefile.objs   | 2 +-
+> >  hw/char/Makefile.objs    | 2 +-
+> >  hw/display/Makefile.objs | 2 +-
+> >  hw/net/Makefile.objs     | 2 +-
+> >  hw/usb/Makefile.objs     | 2 +-
+> >  hw/xen/Makefile.objs     | 2 +-
+> >  7 files changed, 7 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/Makefile b/Makefile
+> > index 1c4c04f..b246138 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -26,6 +26,7 @@ endif
+> >  
+> >  CONFIG_SOFTMMU := $(if $(filter %-softmmu,$(TARGET_DIRS)),y)
+> >  CONFIG_USER_ONLY := $(if $(filter %-user,$(TARGET_DIRS)),y)
+> > +CONFIG_XEN := $(CONFIG_XEN_BACKEND)
+> >  CONFIG_ALL=y
+> >  -include config-all-devices.mak
+> >  -include config-all-disas.mak
+> > diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
+> > index d4c3ab7..e0ed980 100644
+> > --- a/hw/block/Makefile.objs
+> > +++ b/hw/block/Makefile.objs
+> > @@ -4,7 +4,7 @@ common-obj-$(CONFIG_SSI_M25P80) += m25p80.o
+> >  common-obj-$(CONFIG_NAND) += nand.o
+> >  common-obj-$(CONFIG_PFLASH_CFI01) += pflash_cfi01.o
+> >  common-obj-$(CONFIG_PFLASH_CFI02) += pflash_cfi02.o
+> > -common-obj-$(CONFIG_XEN_BACKEND) += xen_disk.o
+> > +common-obj-$(CONFIG_XEN) += xen_disk.o
+> >  common-obj-$(CONFIG_ECC) += ecc.o
+> >  common-obj-$(CONFIG_ONENAND) += onenand.o
+> >  common-obj-$(CONFIG_NVME_PCI) += nvme.o
+> > diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
+> > index 6ea76fe..725fdc4 100644
+> > --- a/hw/char/Makefile.objs
+> > +++ b/hw/char/Makefile.objs
+> > @@ -7,7 +7,7 @@ common-obj-$(CONFIG_SERIAL_ISA) += serial-isa.o
+> >  common-obj-$(CONFIG_SERIAL_PCI) += serial-pci.o
+> >  common-obj-$(CONFIG_VIRTIO) += virtio-console.o
+> >  common-obj-$(CONFIG_XILINX) += xilinx_uartlite.o
+> > -common-obj-$(CONFIG_XEN_BACKEND) += xen_console.o
+> > +common-obj-$(CONFIG_XEN) += xen_console.o
+> >  common-obj-$(CONFIG_CADENCE) += cadence_uart.o
+> >  
+> >  obj-$(CONFIG_EXYNOS4) += exynos4210_uart.o
+> > diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
+> > index 063889b..3d02e8b 100644
+> > --- a/hw/display/Makefile.objs
+> > +++ b/hw/display/Makefile.objs
+> > @@ -5,7 +5,7 @@ common-obj-$(CONFIG_JAZZ_LED) += jazz_led.o
+> >  common-obj-$(CONFIG_PL110) += pl110.o
+> >  common-obj-$(CONFIG_SSD0303) += ssd0303.o
+> >  common-obj-$(CONFIG_SSD0323) += ssd0323.o
+> > -common-obj-$(CONFIG_XEN_BACKEND) += xenfb.o
+> > +common-obj-$(CONFIG_XEN) += xenfb.o
+> >  
+> >  common-obj-$(CONFIG_VGA_PCI) += vga-pci.o
+> >  common-obj-$(CONFIG_VGA_ISA) += vga-isa.o
+> > diff --git a/hw/net/Makefile.objs b/hw/net/Makefile.objs
+> > index 610ed3e..6a95d92 100644
+> > --- a/hw/net/Makefile.objs
+> > +++ b/hw/net/Makefile.objs
+> > @@ -1,5 +1,5 @@
+> >  common-obj-$(CONFIG_DP8393X) += dp8393x.o
+> > -common-obj-$(CONFIG_XEN_BACKEND) += xen_nic.o
+> > +common-obj-$(CONFIG_XEN) += xen_nic.o
+> >  
+> >  # PCI network cards
+> >  common-obj-$(CONFIG_NE2000_PCI) += ne2000.o
+> > diff --git a/hw/usb/Makefile.objs b/hw/usb/Makefile.objs
+> > index 98b5c9d..5958be8 100644
+> > --- a/hw/usb/Makefile.objs
+> > +++ b/hw/usb/Makefile.objs
+> > @@ -40,5 +40,5 @@ common-obj-$(CONFIG_USB_REDIR) += redirect.o quirks.o
+> >  common-obj-y += $(patsubst %,host-%.o,$(HOST_USB))
+> >  
+> >  ifeq ($(CONFIG_USB_LIBUSB),y)
+> > -common-obj-$(CONFIG_XEN_BACKEND) += xen-usb.o
+> > +common-obj-$(CONFIG_XEN) += xen-usb.o
+> >  endif
+> > diff --git a/hw/xen/Makefile.objs b/hw/xen/Makefile.objs
+> > index 591cdc2..4be3ec9 100644
+> > --- a/hw/xen/Makefile.objs
+> > +++ b/hw/xen/Makefile.objs
+> > @@ -1,5 +1,5 @@
+> >  # xen backend driver support
+> > -common-obj-$(CONFIG_XEN_BACKEND) += xen_backend.o xen_devconfig.o xen_pvdev.o
+> > +common-obj-$(CONFIG_XEN) += xen_backend.o xen_devconfig.o xen_pvdev.o
+> >  
+> >  obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen-host-pci-device.o
+> >  obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen_pt.o xen_pt_config_init.o xen_pt_graphics.o xen_pt_msi.o
+> > 
+> 
+> I'm queuing this for 2.9 as a bugfix, adding Xen things to various
+> softcore emulators makes no sense.
 
-OK. Incidentally, testing with virtio-blk I bisected the assertion
-failure to b2c2832c6140cfe3ddc0de2d77eeb0b77dea8fd3 ("block: Add Error
-parameter to bdrv_append()").
-
---Ed
+Thank you, and I agree!
