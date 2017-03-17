@@ -1,35 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1coiPH-0006XG-Rf
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 23:18:29 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1coiPN-0006bI-VZ
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 23:18:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1coiPD-0000NO-DD
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 23:18:23 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42584
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1coiPJ-0000Q1-2P
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 23:18:29 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52388
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1coiPD-0000NA-7O
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 23:18:19 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	id 1coiPI-0000Pf-So
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 23:18:25 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2H3Dv97059151
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 23:18:18 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 297w4aa1md-1
+	v2H3DsAa005103
+	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 23:18:24 -0400
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 297nkp1x2p-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 23:18:18 -0400
+	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 23:18:24 -0400
 Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Thu, 16 Mar 2017 21:18:17 -0600
+	Thu, 16 Mar 2017 21:18:23 -0600
 From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Date: Fri, 17 Mar 2017 04:17:34 +0100
+Date: Fri, 17 Mar 2017 04:17:36 +0100
 In-Reply-To: <20170317031743.40128-1-bjsdjshi@linux.vnet.ibm.com>
 References: <20170317031743.40128-1-bjsdjshi@linux.vnet.ibm.com>
-Message-Id: <20170317031743.40128-8-bjsdjshi@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v4 07/16] vfio: ccw: introduce ccw_io_region
+Message-Id: <20170317031743.40128-10-bjsdjshi@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v4 09/16] vfio: ccw: realize
+ VFIO_DEVICE_GET_REGION_INFO ioctl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,150 +42,140 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org
 Cc: bjsdjshi@linux.vnet.ibm.com, renxiaof@linux.vnet.ibm.com, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
 
-To provide user-space a set of interfaces to:
-1. pass in a ccw program to perform an I/O operation.
-2. read back I/O results of the completed I/O operations.
-We introduce an MMIO region for the vfio-ccw device here.
-
-This region is defined to content:
-1. areas to store arguments that an ssch required.
-2. areas to store the I/O results.
-
-Using pwrite/pread to the device on this region, a user-space program
-could write/read data to/from the vfio-ccw device.
+Introduce device information about vfio-ccw: VFIO_DEVICE_FLAGS_CCW.
+Realize VFIO_DEVICE_GET_REGION_INFO ioctl for vfio-ccw.
 
 Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
 Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 ---
- drivers/s390/cio/vfio_ccw_ops.c     | 47 +++++++++++++++++++++++++++++++++++++
- drivers/s390/cio/vfio_ccw_private.h |  4 ++++
- include/uapi/linux/vfio_ccw.h       | 24 +++++++++++++++++++
- 3 files changed, 75 insertions(+)
- create mode 100644 include/uapi/linux/vfio_ccw.h
+ drivers/s390/cio/vfio_ccw_ops.c | 78 +++++++++++++++++++++++++++++++++++++++++
+ include/uapi/linux/vfio.h       | 11 ++++++
+ 2 files changed, 89 insertions(+)
 
 diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_ccw_ops.c
-index b8a2fed..6c06805 100644
+index 878c882..f3300dd 100644
 --- a/drivers/s390/cio/vfio_ccw_ops.c
 +++ b/drivers/s390/cio/vfio_ccw_ops.c
-@@ -127,6 +127,51 @@ void vfio_ccw_mdev_release(struct mdev_device *mdev)
- 				 &private->nb);
+@@ -188,6 +188,83 @@ static ssize_t vfio_ccw_mdev_write(struct mdev_device *mdev,
+ 	return count;
  }
  
-+static ssize_t vfio_ccw_mdev_read(struct mdev_device *mdev,
-+				  char __user *buf,
-+				  size_t count,
-+				  loff_t *ppos)
++static int vfio_ccw_mdev_get_device_info(struct vfio_device_info *info)
 +{
-+	struct vfio_ccw_private *private;
-+	struct ccw_io_region *region;
++	info->flags = VFIO_DEVICE_FLAGS_CCW;
++	info->num_regions = VFIO_CCW_NUM_REGIONS;
++	info->num_irqs = 0;
 +
-+	if (*ppos + count > sizeof(*region))
-+		return -EINVAL;
-+
-+	private = dev_get_drvdata(mdev_parent_dev(mdev));
-+	if (!private)
-+		return -ENODEV;
-+
-+	region = &private->io_region;
-+	if (copy_to_user(buf, (void *)region + *ppos, count))
-+		return -EFAULT;
-+
-+	return count;
++	return 0;
 +}
 +
-+static ssize_t vfio_ccw_mdev_write(struct mdev_device *mdev,
-+				   const char __user *buf,
-+				   size_t count,
-+				   loff_t *ppos)
++static int vfio_ccw_mdev_get_region_info(struct vfio_region_info *info,
++					 u16 *cap_type_id,
++					 void **cap_type)
 +{
-+	struct vfio_ccw_private *private;
-+	struct ccw_io_region *region;
-+
-+	if (*ppos + count > sizeof(*region))
++	switch (info->index) {
++	case VFIO_CCW_CONFIG_REGION_INDEX:
++		info->offset = 0;
++		info->size = sizeof(struct ccw_io_region);
++		info->flags = VFIO_REGION_INFO_FLAG_READ
++			      | VFIO_REGION_INFO_FLAG_WRITE;
++		return 0;
++	default:
 +		return -EINVAL;
++	}
++}
 +
-+	private = dev_get_drvdata(mdev_parent_dev(mdev));
-+	if (!private)
-+		return -ENODEV;
++static ssize_t vfio_ccw_mdev_ioctl(struct mdev_device *mdev,
++				   unsigned int cmd,
++				   unsigned long arg)
++{
++	int ret = 0;
++	unsigned long minsz;
 +
-+	region = &private->io_region;
-+	if (copy_from_user((void *)region + *ppos, buf, count))
-+		return -EFAULT;
-+	region->ret_code = 0;
++	switch (cmd) {
++	case VFIO_DEVICE_GET_INFO:
++	{
++		struct vfio_device_info info;
 +
-+	return count;
++		minsz = offsetofend(struct vfio_device_info, num_irqs);
++
++		if (copy_from_user(&info, (void __user *)arg, minsz))
++			return -EFAULT;
++
++		if (info.argsz < minsz)
++			return -EINVAL;
++
++		ret = vfio_ccw_mdev_get_device_info(&info);
++		if (ret)
++			return ret;
++
++		return copy_to_user((void __user *)arg, &info, minsz);
++	}
++	case VFIO_DEVICE_GET_REGION_INFO:
++	{
++		struct vfio_region_info info;
++		u16 cap_type_id = 0;
++		void *cap_type = NULL;
++
++		minsz = offsetofend(struct vfio_region_info, offset);
++
++		if (copy_from_user(&info, (void __user *)arg, minsz))
++			return -EFAULT;
++
++		if (info.argsz < minsz)
++			return -EINVAL;
++
++		ret = vfio_ccw_mdev_get_region_info(&info, &cap_type_id,
++						    &cap_type);
++		if (ret)
++			return ret;
++
++		return copy_to_user((void __user *)arg, &info, minsz);
++	}
++	default:
++		return -ENOTTY;
++	}
 +}
 +
  static const struct mdev_parent_ops vfio_ccw_mdev_ops = {
  	.owner			= THIS_MODULE,
  	.supported_type_groups  = mdev_type_groups,
-@@ -134,6 +179,8 @@ static const struct mdev_parent_ops vfio_ccw_mdev_ops = {
- 	.remove			= vfio_ccw_mdev_remove,
- 	.open			= vfio_ccw_mdev_open,
+@@ -197,6 +274,7 @@ static const struct mdev_parent_ops vfio_ccw_mdev_ops = {
  	.release		= vfio_ccw_mdev_release,
-+	.read			= vfio_ccw_mdev_read,
-+	.write			= vfio_ccw_mdev_write,
+ 	.read			= vfio_ccw_mdev_read,
+ 	.write			= vfio_ccw_mdev_write,
++	.ioctl			= vfio_ccw_mdev_ioctl,
  };
  
  int vfio_ccw_mdev_reg(struct subchannel *sch)
-diff --git a/drivers/s390/cio/vfio_ccw_private.h b/drivers/s390/cio/vfio_ccw_private.h
-index 5afb3ba..359e96b 100644
---- a/drivers/s390/cio/vfio_ccw_private.h
-+++ b/drivers/s390/cio/vfio_ccw_private.h
-@@ -10,6 +10,8 @@
- #ifndef _VFIO_CCW_PRIVATE_H_
- #define _VFIO_CCW_PRIVATE_H_
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index 6183789..3fd70ff 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -198,6 +198,7 @@ struct vfio_device_info {
+ #define VFIO_DEVICE_FLAGS_PCI	(1 << 1)	/* vfio-pci device */
+ #define VFIO_DEVICE_FLAGS_PLATFORM (1 << 2)	/* vfio-platform device */
+ #define VFIO_DEVICE_FLAGS_AMBA  (1 << 3)	/* vfio-amba device */
++#define VFIO_DEVICE_FLAGS_CCW	(1 << 4)	/* vfio-ccw device */
+ 	__u32	num_regions;	/* Max region index + 1 */
+ 	__u32	num_irqs;	/* Max IRQ index + 1 */
+ };
+@@ -447,6 +448,16 @@ enum {
+ 	VFIO_PCI_NUM_IRQS
+ };
  
-+#include <linux/vfio_ccw.h>
-+
- #include "css.h"
- 
- /**
-@@ -19,6 +21,7 @@
-  * @avail: available for creating a mediated device
-  * @mdev: pointer to the mediated device
-  * @nb: notifier for vfio events
-+ * @io_region: MMIO region to input/output I/O arguments/results
-  */
- struct vfio_ccw_private {
- 	struct subchannel	*sch;
-@@ -26,6 +29,7 @@ struct vfio_ccw_private {
- 	atomic_t		avail;
- 	struct mdev_device	*mdev;
- 	struct notifier_block	nb;
-+	struct ccw_io_region	io_region;
- } __aligned(8);
- 
- extern int vfio_ccw_mdev_reg(struct subchannel *sch);
-diff --git a/include/uapi/linux/vfio_ccw.h b/include/uapi/linux/vfio_ccw.h
-new file mode 100644
-index 0000000..34a7f6f
---- /dev/null
-+++ b/include/uapi/linux/vfio_ccw.h
-@@ -0,0 +1,24 @@
 +/*
-+ * Interfaces for vfio-ccw
-+ *
-+ * Copyright IBM Corp. 2017
-+ *
-+ * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
++ * The vfio-ccw bus driver makes use of the following fixed region.
++ * Unimplemented regions return a size of zero.
 + */
 +
-+#ifndef _VFIO_CCW_H_
-+#define _VFIO_CCW_H_
++enum {
++	VFIO_CCW_CONFIG_REGION_INDEX,
++	VFIO_CCW_NUM_REGIONS
++};
 +
-+#include <linux/types.h>
-+
-+struct ccw_io_region {
-+#define ORB_AREA_SIZE 12
-+	__u8	orb_area[ORB_AREA_SIZE];
-+#define SCSW_AREA_SIZE 12
-+	__u8	scsw_area[SCSW_AREA_SIZE];
-+#define IRB_AREA_SIZE 96
-+	__u8	irb_area[IRB_AREA_SIZE];
-+	__u32	ret_code;
-+} __packed;
-+
-+#endif
+ /**
+  * VFIO_DEVICE_GET_PCI_HOT_RESET_INFO - _IORW(VFIO_TYPE, VFIO_BASE + 12,
+  *					      struct vfio_pci_hot_reset_info)
 -- 
 2.8.4
