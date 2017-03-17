@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59967)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1coqL9-0007mu-WE
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:46:41 -0400
+	(envelope-from <berrange@redhat.com>) id 1coqOR-0008W0-9A
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:50:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1coqL5-0002Sl-Hx
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:46:39 -0400
-Resent-Message-Id: <E1coqL5-0002Sl-Hx@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21426)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1coqL5-0002Rw-AV
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:46:35 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148975117171.99.89031755055197830@6c512846dbc7>
-In-Reply-To: <1489750157-17401-1-git-send-email-tianyu.lan@intel.com>
+	(envelope-from <berrange@redhat.com>) id 1coqON-0003OA-La
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:50:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38388)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1coqON-0003Np-Cv
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:49:59 -0400
+Date: Fri, 17 Mar 2017 11:49:53 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170317114953.GF8050@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1489748902-21765-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 17 Mar 2017 04:46:12 -0700 (PDT)
-Subject: Re: [Qemu-devel] [RFC PATCH 0/4] Qemu: Add Xen vIOMMU support
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1489748902-21765-1-git-send-email-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH] configure: Warn about deprecated hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,82 +27,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: tianyu.lan@intel.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, xen-devel@lists.xensource.com, kevin.tian@intel.com, sstabellini@kernel.org, ehabkost@redhat.com, mst@redhat.com, marcel@redhat.com, anthony.perard@citrix.com, pbonzini@redhat.com, rth@twiddle.net, chao.gao@intel.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, patches@linaro.org, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ4
-OTc1MDE1Ny0xNzQwMS0xLWdpdC1zZW5kLWVtYWlsLXRpYW55dS5sYW5AaW50ZWwuY29tClN1Ympl
-Y3Q6IFtRZW11LWRldmVsXSBbUkZDIFBBVENIIDAvNF0gUWVtdTogQWRkIFhlbiB2SU9NTVUgc3Vw
-cG9ydApUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gK
-CkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwp
-CmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
-ZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0
-cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNv
-bW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAt
-biAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1h
-aWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBm
-YWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZh
-aWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIx
-NjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXBy
-b2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzE0ODk3NTAxNTctMTc0MDEt
-MS1naXQtc2VuZC1lbWFpbC10aWFueXUubGFuQGludGVsLmNvbSAtPiBwYXRjaGV3LzE0ODk3NTAx
-NTctMTc0MDEtMS1naXQtc2VuZC1lbWFpbC10aWFueXUubGFuQGludGVsLmNvbQpTd2l0Y2hlZCB0
-byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjBmMTYwMjIgbXNpOiB0YWtpbmcgaW50ZXJydXB0IGZvcm1h
-dCBpbnRvIGNvbnNpZGVyYXRpb24gZHVyaW5nIGp1ZGdpbmcgYSBwaXJxIGlzIGJpbmRlZCB3aXRo
-IGEgZXZlbnQgY2hhbm5lbAo2MmI2MzUzIHhlbi1wdDogYmluZC91bmJpbmQgaW50ZXJydXB0IHJl
-bWFwcGluZyBmb3JtYXQgTVNJCjA5MDBmMmIgWGVuOiBhZGQgYSBkdW1teSB2SU9NTVUgdG8gY3Jl
-YXRlL2Rlc3Ryb3kgdklPTU1VIGluIFhlbgo3Y2IzZTA2IEk0NDA6IEFsbG93IGFkZGluZyBzeXNi
-dXMgZGV2aWNlcyB3aXRoIC1kZXZpY2Ugb24gSTQ0MAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hl
-Y2tpbmcgUEFUQ0ggMS80OiBJNDQwOiBBbGxvdyBhZGRpbmcgc3lzYnVzIGRldmljZXMgd2l0aCAt
-ZGV2aWNlIG9uIEk0NDAuLi4KQ2hlY2tpbmcgUEFUQ0ggMi80OiBYZW46IGFkZCBhIGR1bW15IHZJ
-T01NVSB0byBjcmVhdGUvZGVzdHJveSB2SU9NTVUgaW4gWGVuLi4uCkVSUk9SOiB0cmFpbGluZyB3
-aGl0ZXNwYWNlCiM3NTogRklMRTogaHcveGVuL3hlbl92aW9tbXUuYzo0ODoKKyAgICAkCgpFUlJP
-UjogdHJhaWxpbmcgd2hpdGVzcGFjZQojNzk6IEZJTEU6IGh3L3hlbi94ZW5fdmlvbW11LmM6NTI6
-CisgICAgcmMgPSB4ZW5zdG9yZV9yZWFkX3VpbnQ2NCh2aW9tbXVfcGF0aCwgImJhc2VfYWRkciIs
-ICZzLT5iYXNlX2FkZHIpOyAgJAoKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzExNjogRklM
-RTogaHcveGVuL3hlbl92aW9tbXUuYzo4OToKKyAgICAgICAgcmMgPSB4Y192aW9tbXVfZGVzdHJv
-eSh4ZW5feGMsIHhlbl9kb21pZCwgcy0+aWQpOyAkCgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFj
-ZQojMTQwOiBGSUxFOiBody94ZW4veGVuX3Zpb21tdS5jOjExMzoKKyAgICB0eXBlX3JlZ2lzdGVy
-X3N0YXRpYygmeGVuX3Zpb21tdV9pbmZvKTsgJAoKdG90YWw6IDQgZXJyb3JzLCAwIHdhcm5pbmdz
-LCAxMjAgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-LgoKQ2hlY2tpbmcgUEFUQ0ggMy80OiB4ZW4tcHQ6IGJpbmQvdW5iaW5kIGludGVycnVwdCByZW1h
-cHBpbmcgZm9ybWF0IE1TSS4uLgpFUlJPUjogZWxzZSBzaG91bGQgZm9sbG93IGNsb3NlIGJyYWNl
-ICd9JwojMzY6IEZJTEU6IGh3L3hlbi94ZW5fcHRfbXNpLmM6MTc5OgorICAgIH0KKyAgICBlbHNl
-IHsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRoYXQgb3BlbiBwYXJlbnRoZXNpcyAn
-KCcKIzU0OiBGSUxFOiBody94ZW4veGVuX3B0X21zaS5jOjIxNDoKKyAgICAgICAgaWYgKCBhZGRy
-ICYgTVNJX0FERFJfSU1fTUFTSyApIHsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSB0
-aGF0IGNsb3NlIHBhcmVudGhlc2lzICcpJwojNTQ6IEZJTEU6IGh3L3hlbi94ZW5fcHRfbXNpLmM6
-MjE0OgorICAgICAgICBpZiAoIGFkZHIgJiBNU0lfQUREUl9JTV9NQVNLICkgewoKV0FSTklORzog
-bGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzU1OiBGSUxFOiBody94ZW4veGVuX3B0X21zaS5jOjIx
-NToKKyAgICAgICAgICAgIFhFTl9QVF9MT0coZCwgIlVuYmluZGluZyBvZiBNU0klcyAuICggcGly
-cTogJWQsIGRhdGE6ICV4LCBhZGRyOiAlbHgpXG4iLAoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFy
-YWN0ZXJzCiM2MDogRklMRTogaHcveGVuL3hlbl9wdF9tc2kuYzoyMjA6CisgICAgICAgICAgICAg
-ICAgWEVOX1BUX0VSUihkLCAiVW5iaW5kaW5nIG9mIE1TSSVzIC4gKGVycm9yOiAlZCwgcGlycTog
-JWQsIGRhdGE6ICV4LCBhZGRyOiAlbHgpXG4iLAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJh
-Y3RlcnMKIzY4OiBGSUxFOiBody94ZW4veGVuX3B0X21zaS5jOjIyODoKKyAgICAgICAgICAgIHJj
-ID0geGNfZG9tYWluX3VuYmluZF9tc2lfaXJxKHhlbl94YywgeGVuX2RvbWlkLCBndmVjLCBwaXJx
-LCBnZmxhZ3MpOwoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM3MDogRklMRTogaHcv
-eGVuL3hlbl9wdF9tc2kuYzoyMzA6CisgICAgICAgICAgICAgICAgWEVOX1BUX0VSUihkLCAiVW5i
-aW5kaW5nIG9mIE1TSSVzIGZhaWxlZC4gKGVycjogJWQsIHBpcnE6ICVkLCBndmVjOiAlI3gpXG4i
-LAoKdG90YWw6IDUgZXJyb3JzLCAyIHdhcm5pbmdzLCA2MSBsaW5lcyBjaGVja2VkCgpZb3VyIHBh
-dGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA0LzQ6IG1zaTog
-dGFraW5nIGludGVycnVwdCBmb3JtYXQgaW50byBjb25zaWRlcmF0aW9uIGR1cmluZyBqdWRnaW5n
-IGEgcGlycSBpcyBiaW5kZWQgd2l0aCBhIGV2ZW50IGNoYW5uZWwuLi4KRVJST1I6IHNwYWNlIHBy
-b2hpYml0ZWQgYWZ0ZXIgdGhhdCBvcGVuIHBhcmVudGhlc2lzICcoJwojMTExOiBGSUxFOiB4ZW4t
-aHZtLmM6MTU0OgorICAgIGlmICggbXNpX2FkZHJfbG8gJiAweDEwICkKCkVSUk9SOiBzcGFjZSBw
-cm9oaWJpdGVkIGJlZm9yZSB0aGF0IGNsb3NlIHBhcmVudGhlc2lzICcpJwojMTExOiBGSUxFOiB4
-ZW4taHZtLmM6MTU0OgorICAgIGlmICggbXNpX2FkZHJfbG8gJiAweDEwICkKCkVSUk9SOiBicmFj
-ZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzExMTog
-RklMRTogeGVuLWh2bS5jOjE1NDoKKyAgICBpZiAoIG1zaV9hZGRyX2xvICYgMHgxMCApClsuLi5d
-Cgp0b3RhbDogMyBlcnJvcnMsIDAgd2FybmluZ3MsIDY3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0
-Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBj
-b21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
-Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
-ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On Fri, Mar 17, 2017 at 11:08:22AM +0000, Peter Maydell wrote:
+> We plan to drop support in a future QEMU release for host OSes
+> and host architectures for which we have no test machine where
+> we can build and run tests. For the 2.9 release, make configure
+> print a warning if it is run on such a host, so that the user
+> has some warning of the plans and can volunteer to help us
+> maintain the port if they need it to continue to function.
+> 
+> This commit flags up as deprecated the CPU architectures:
+>  * ia64
+>  * sparc
+>  * anything which we don't have a TCG port for
+>    (and which was presumably using TCI)
+
+This seems to imply that if we remove supported for these architectures,
+then TCI is no longer required either, or would there be other reasons
+to want to keep TCI around, even when all host archs have a TCG port ? 
+
+> and the OSes:
+>  * Cygwin
+>  * GNU/kFreeBSD
+>  * FreeBSD
+>  * DragonFly BSD
+>  * NetBSD
+>  * OpenBSD
+>  * Solaris
+>  * AIX
+>  * Haiku
+> 
+> It also makes entirely unrecognized host OS strings be
+> rejected rather than treated as if they were Linux (which
+> likely never worked).
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> This list is definitely too all-encompassing, and we should
+> move at least some of the BSDs into "not-deprecated".
+> I'm posting the patch for the moment for code review on the
+> logic and as a placeholder.
+
+FreeBSD is the one where I most frequently see developers engaging across
+the overall virt tools stack (QEMU/libvirt/virt-manager/OpenStack).
+GNU/kFreeBSD has come up a few times in libvirt, and I don't recall seeing
+anyone mentioning the remaining BSDs - though perhaps thats because the
+FreeBSD port fixes are enough to also make other BSDs work.
+
+> diff --git a/configure b/configure
+> index 75c7c35..5ddc985 100755
+> --- a/configure
+> +++ b/configure
+> @@ -321,6 +321,9 @@ tcmalloc="no"
+>  jemalloc="no"
+>  replication="yes"
+>  
+> +supported_cpu="no"
+> +supported_os="no"
+> +
+>  # parse CC options first
+>  for opt do
+>    optarg=$(expr "x$opt" : 'x[^=]*=\(.*\)')
+> @@ -517,23 +520,32 @@ ARCH=
+>  # Normalise host CPU name and set ARCH.
+>  # Note that this case should only have supported host CPUs, not guests.
+>  case "$cpu" in
+> -  ia64|ppc|ppc64|s390|s390x|sparc64|x32)
+> +  ppc|ppc64|s390|s390x|x32)
+> +    cpu="$cpu"
+> +    supported_cpu="yes"
+> +  ;;
+> +  ia64|sparc64)
+>      cpu="$cpu"
+>    ;;
+>    i386|i486|i586|i686|i86pc|BePC)
+>      cpu="i386"
+> +    supported_cpu="yes"
+>    ;;
+>    x86_64|amd64)
+>      cpu="x86_64"
+> +    supported_cpu="yes"
+>    ;;
+>    armv*b|armv*l|arm)
+>      cpu="arm"
+> +    supported_cpu="yes"
+>    ;;
+>    aarch64)
+>      cpu="aarch64"
+> +    supported_cpu="yes"
+>    ;;
+>    mips*)
+>      cpu="mips"
+> +    supported_cpu="yes"
+>    ;;
+>    sparc|sun4[cdmuv])
+>      cpu="sparc"
+> @@ -568,6 +580,7 @@ MINGW32*)
+>    else
+>      audio_drv_list=""
+>    fi
+> +  supported_os="yes"
+>  ;;
+>  GNU/kFreeBSD)
+>    bsd="yes"
+> @@ -626,6 +639,7 @@ Darwin)
+>    # won't work when we're compiling with gcc as a C compiler.
+>    QEMU_CFLAGS="-DOS_OBJECT_USE_OBJC=0 $QEMU_CFLAGS"
+>    HOST_VARIANT_DIR="darwin"
+> +  supported_os="yes"
+>  ;;
+>  SunOS)
+>    solaris="yes"
+> @@ -672,7 +686,7 @@ Haiku)
+>    QEMU_CFLAGS="-DB_USE_POSITIVE_POSIX_ERRORS $QEMU_CFLAGS"
+>    LIBS="-lposix_error_mapper -lnetwork $LIBS"
+>  ;;
+> -*)
+> +Linux)
+>    audio_drv_list="oss"
+>    audio_possible_drivers="oss alsa sdl pa"
+>    linux="yes"
+> @@ -682,6 +696,10 @@ Haiku)
+>    vhost_scsi="yes"
+>    vhost_vsock="yes"
+>    QEMU_INCLUDES="-I\$(SRC_PATH)/linux-headers -I$(pwd)/linux-headers $QEMU_INCLUDES"
+> +  supported_os="yes"
+> +;;
+> +*)
+> +  error_exit "Unsupported host OS $targetos"
+>  ;;
+>  esac
+>  
+> @@ -5095,6 +5113,32 @@ if test "$sdl_too_old" = "yes"; then
+>  echo "-> Your SDL version is too old - please upgrade to have SDL support"
+>  fi
+>  
+> +if test "$supported_cpu" = "no"; then
+> +    echo
+> +    echo "WARNING: SUPPORT FOR THIS HOST CPU WILL GO AWAY IN FUTURE RELEASES!"
+> +    echo
+> +    echo "CPU host architecture $cpu support is not currently maintained."
+> +    echo "The QEMU project intends to remove support for this host CPU in"
+> +    echo "a future release if nobody volunteers to maintain it and to"
+> +    echo "provide a build host for our continuous integration setup."
+> +    echo "configure has succeeded and you can continue to build, but"
+> +    echo "if you care about QEMU on this platform you should contact"
+> +    echo "us upstream at qemu-devel@nongnu.org."
+> +fi
+> +
+> +if test "$supported_os" = "no"; then
+> +    echo
+> +    echo "WARNING: SUPPORT FOR THIS HOST OS WILL GO AWAY IN FUTURE RELEASES!"
+> +    echo
+> +    echo "CPU host OS $targetos support is not currently maintained."
+> +    echo "The QEMU project intends to remove support for this host CPU in"
+> +    echo "a future release if nobody volunteers to maintain it and to"
+> +    echo "provide a build host for our continuous integration setup."
+> +    echo "configure has succeeded and you can continue to build, but"
+> +    echo "if you care about QEMU on this platform you should contact"
+> +    echo "us upstream at qemu-devel@nongnu.org."
+> +fi
+> +
+>  config_host_mak="config-host.mak"
+>  
+>  echo "# Automatically generated by configure - do not modify" >config-all-disas.mak
+
+The approach here all looks sane.
+
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
