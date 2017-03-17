@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56833)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1coovr-0008OC-TQ
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 06:16:31 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1cop0R-0001YW-JD
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 06:21:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1coovq-0004Ug-Hj
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 06:16:27 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52546)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1coovq-0004Tk-C7
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 06:16:26 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1coovp-0007rF-G1
-	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 10:16:25 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 630202E80C8
-	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 10:16:25 +0000 (UTC)
+	(envelope-from <dgilbert@redhat.com>) id 1cop0M-0006E0-II
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 06:21:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37884)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cop0M-0006Dn-9y
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 06:21:06 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4CE75804FE
+	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 10:21:06 +0000 (UTC)
+Date: Fri, 17 Mar 2017 10:21:02 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170317102101.GD2396@work-vm>
+References: <20170315135021.6978-1-quintela@redhat.com>
+	<20170315135021.6978-30-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 17 Mar 2017 10:07:00 -0000
-From: Leo Gaspard <1672365@bugs.launchpad.net>
-Reply-To: Bug 1672365 <1672365@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170313123815.23571.92915.malonedeb@gac.canonical.com>
-Message-Id: <20170317100700.31950.4879.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1672365] Re: nested 9pfs read fail
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170315135021.6978-30-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 29/31] ram: Remove dirty_bytes_rate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,97 +33,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Hmm, actually it looks like a kernel in kernel panic always takes 100%
-CPU (just got another unrelated one), so I=C2=A0guess it's not necessarily a
-qemu bug but can arise from anywhere in the stack. I'm marking the bug
-as invalid as a consequence.
+* Juan Quintela (quintela@redhat.com) wrote:
+> It can be recalculated from dirty_pages_rate.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  include/migration/migration.h | 1 -
+>  migration/migration.c         | 5 ++---
+>  migration/ram.c               | 1 -
+>  3 files changed, 2 insertions(+), 5 deletions(-)
+> 
+> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> index 54a1a4f..42b9edf 100644
+> --- a/include/migration/migration.h
+> +++ b/include/migration/migration.h
+> @@ -167,7 +167,6 @@ struct MigrationState
+>      int64_t downtime;
+>      int64_t expected_downtime;
+>      int64_t dirty_pages_rate;
+> -    int64_t dirty_bytes_rate;
+>      bool enabled_capabilities[MIGRATION_CAPABILITY__MAX];
+>      int64_t xbzrle_cache_size;
+>      int64_t setup_time;
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 09d02be..2f8c440 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1107,7 +1107,6 @@ MigrationState *migrate_init(const MigrationParams *params)
+>      s->downtime = 0;
+>      s->expected_downtime = 0;
+>      s->dirty_pages_rate = 0;
+> -    s->dirty_bytes_rate = 0;
+>      s->setup_time = 0;
+>      s->start_postcopy = false;
+>      s->postcopy_after_devices = false;
+> @@ -1999,8 +1998,8 @@ static void *migration_thread(void *opaque)
+>                                        bandwidth, max_size);
+>              /* if we haven't sent anything, we don't want to recalculate
+>                 10000 is a small enough number for our purposes */
+> -            if (s->dirty_bytes_rate && transferred_bytes > 10000) {
+> -                s->expected_downtime = s->dirty_bytes_rate / bandwidth;
+> +            if (s->dirty_pages_rate && transferred_bytes > 10000) {
+> +                s->expected_downtime = s->dirty_pages_rate * (1ul << qemu_target_page_bits())/ bandwidth;
 
-** Changed in: qemu
-       Status: New =3D> Invalid
+The line got a bit long, please wrap.
 
--- =
+Other than that,
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1672365
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Title:
-  nested 9pfs read fail
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  tl;dr: A virtfs read fails. The init being on this virtfs (mounted by
-  the initrd), the linux kernel guest is unable to boot, and kernel
-  panics. The fact that qemu still takes 100%cpu after the kernel panic
-  makes me think it's a qemu bug.
-
-  Here is the setup (some hashes replaced with "..."):
-   * A (NixOS) host system, with /nix/store as a btrfs on lvm on cryptsetup
-   * Running a qemu-kvm NixOS guest, with /nix/.ro-store as a virtfs mappin=
-g to host /nix/store:
-  ```
-  exec /nix/store/...-qemu-x86-only-for-vm-tests-2.8.0/bin/qemu-kvm \
-      -name test \
-      -m 8192 \
-      -cpu kvm64 \
-      -net nic,vlan=3D0,model=3Dvirtio -net user,vlan=3D0 \
-      -virtfs local,path=3D/nix/store,security_model=3Dnone,mount_tag=3Dsto=
-re \
-      -virtfs local,path=3D/tmp/nix-vm..../xchg,security_model=3Dnone,mount=
-_tag=3Dxchg \
-      -virtfs local,path=3D/tmp/nix-vm..../xchg,security_model=3Dnone,mount=
-_tag=3Dshared \
-      -drive index=3D0,id=3Ddrive1,file=3D/home/ekleog/nixos/test.qcow2,if=
-=3Dvirtio,cache=3Dwriteback,werror=3Dreport \
-  -kernel /nix/store/...-nixos-system-test-17.09.git.deee8da/kernel \
-  -initrd /nix/store/...-nixos-system-test-17.09.git.deee8da/initrd \
-  -append "$(cat /nix/store/...-nixos-system-test-17.09.git.deee8da/kernel-=
-params) init=3D/nix/store/...-nixos-system-test-17.09.git.deee8da/init regI=
-nfo=3D/nix/store/...-reginfo" \
-      -vga std -usbdevice tablet
-  ```
-   * With /nix/store as an overlayfs between /nix/.ro-store and /nix/.rw-st=
-ore
-   * Running a qemu-kvm NixOS guest, with /nix/.ro-store as a virtfs mappin=
-g to host /nix/store/...-vm-nginx-store:
-  ```
-  /nix/store/...-qemu-2.8.0/bin/qemu-kvm \
-    -name nginx -m 128 -smp 2 -cpu kvm64 \
-    -nographic -serial unix:"/var/lib/vm/consoles/nginx/socket.unix",server=
-,nowait \
-    -drive file=3D"/var/lib/vm/images/nginx.img",if=3Dvirtio,media=3Ddisk \
-    -virtfs local,path=3D"/nix/store/...-vm-nginx-store",security_model=3Dn=
-one,mount_tag=3Dstore \
-    -netdev type=3Dtap,id=3Dnet0,ifname=3Dvm-nginx,script=3Dno,dscript=3Dno=
- -device virtio-net-pci,netdev=3Dnet0,mac=3D56:00:00:00:00:01 \
-    -kernel /nix/store/...-nixos-system-nginx-17.09.git.deee8da/kernel \
-    -initrd /nix/store/...-nixos-system-nginx-17.09.git.deee8da/initrd \
-    -append "$(cat /nix/store/...-nixos-system-nginx-17.09.git.deee8da/kern=
-el-params) init=3D/nix/store/...-nixos-system-nginx-17.09.git.deee8da/init =
-console=3DttyS0 boot.shell_on_fail" \
-    -virtfs local,path=3D"/var/lib/vm/persist/nginx/home",security_model=3D=
-mapped-xattr,mount_tag=3D"shared1" \
-    -virtfs local,path=3D"/var/lib",security_model=3Dmapped-xattr,mount_tag=
-=3D"shared2" \
-    -virtfs local,path=3D"/tmp",security_model=3Dmapped-xattr,mount_tag=3D"=
-shared3"
-  ```
-   * With /nix/store as an overlayfs between /nix/.ro-store and /nix/.rw-st=
-ore
-   * With init in /nix/store
-
-  What happens is that at boot time the inner VM doesn't manage to read
-  the init script after the initrd has mounted the 9pfs and overlayfs.
-
-  What makes me think it's a qemu bug is that htop in the outer VM shows
-  the inner VM's qemu as using 100% cpu, despite the fact the kernel
-  it's running is under kernel panic, thus doing nothing.
-
-  What do you think about this?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1672365/+subscriptions
+>              }
+>  
+>              qemu_file_reset_rate_limit(s->to_dst_file);
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 4563e3d..1006e60 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -687,7 +687,6 @@ static void migration_bitmap_sync(RAMState *rs)
+>          }
+>          s->dirty_pages_rate = rs->num_dirty_pages_period * 1000
+>              / (end_time - rs->start_time);
+> -        s->dirty_bytes_rate = s->dirty_pages_rate * TARGET_PAGE_SIZE;
+>          rs->start_time = end_time;
+>          rs->num_dirty_pages_period = 0;
+>      }
+> -- 
+> 2.9.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
