@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1comDq-0003an-7a
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 03:22:51 -0400
+	(envelope-from <kraxel@redhat.com>) id 1comz8-0006aI-RE
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 04:11:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1comDn-0006EM-Jr
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 03:22:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34644)
+	(envelope-from <kraxel@redhat.com>) id 1comz3-0007KJ-Sl
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 04:11:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59914)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1comDn-0006EA-E6
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 03:22:47 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1comz3-0007JP-KE
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 04:11:37 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 83A4D8051A
-	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 07:22:47 +0000 (UTC)
-Message-ID: <1489735363.854.0.camel@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id D49A961B8C
+	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 08:11:36 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 17 Mar 2017 08:22:43 +0100
-In-Reply-To: <1489734595-14749-1-git-send-email-kraxel@redhat.com>
-References: <1489734595-14749-1-git-send-email-kraxel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 1/2] ich9: add tco reset
+Date: Fri, 17 Mar 2017 09:11:22 +0100
+Message-Id: <1489738282-28383-1-git-send-email-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] ui/egl-helpers: fix egl 1.5 display init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,18 +28,89 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: hdegoede@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, Frediano Ziglio <fziglio@redhat.com>
 
-On Fr, 2017-03-17 at 08:09 +0100, Gerd Hoffmann wrote:
-> Without that the nmi watchdog fires after reboot and the
-> linux kernel is confused where the nmi comes from:
->=20
->    Uhhuh. NMI received for unknown reason 20 on CPU 0.
->    Do you have a strange power saving mode enabled?
->    Dazed and confused, but trying to continue
+Unfortunaly switching to getPlatformDisplayEXT isn't as easy as
+implemented by 0ea1523fb6703aa0dcd65e66b59e96fec028e60a.  See the
+longish comment for the complete story.
 
-Oops scratch that.  Patch not working, must be something else, didn't
-manage to root-cause this one yet ...
+Cc: Frediano Ziglio <fziglio@redhat.com>
+Suggested-by: Hans de Goede <hdegoede@redhat.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ ui/egl-helpers.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 47 insertions(+), 6 deletions(-)
 
-cheers,
-  Gerd
+diff --git a/ui/egl-helpers.c b/ui/egl-helpers.c
+index 584dd1b..48686cf 100644
+--- a/ui/egl-helpers.c
++++ b/ui/egl-helpers.c
+@@ -192,6 +192,51 @@ EGLSurface qemu_egl_init_surface_x11(EGLContext ectx, Window win)
+ 
+ /* ---------------------------------------------------------------------- */
+ 
++/*
++ * Taken from glamor_egl.h from the Xorg xserver, which is MIT licensed
++ *
++ * Create an EGLDisplay from a native display type. This is a little quirky
++ * for a few reasons.
++ *
++ * 1: GetPlatformDisplayEXT and GetPlatformDisplay are the API you want to
++ * use, but have different function signatures in the third argument; this
++ * happens not to matter for us, at the moment, but it means epoxy won't alias
++ * them together.
++ *
++ * 2: epoxy 1.3 and earlier don't understand EGL client extensions, which
++ * means you can't call "eglGetPlatformDisplayEXT" directly, as the resolver
++ * will crash.
++ *
++ * 3: You can't tell whether you have EGL 1.5 at this point, because
++ * eglQueryString(EGL_VERSION) is a property of the display, which we don't
++ * have yet. So you have to query for extensions no matter what. Fortunately
++ * epoxy_has_egl_extension _does_ let you query for client extensions, so
++ * we don't have to write our own extension string parsing.
++ *
++ * 4. There is no EGL_KHR_platform_base to complement the EXT one, thus one
++ * needs to know EGL 1.5 is supported in order to use the eglGetPlatformDisplay
++ * function pointer.
++ * We can workaround this (circular dependency) by probing for the EGL 1.5
++ * platform extensions (EGL_KHR_platform_gbm and friends) yet it doesn't seem
++ * like mesa will be able to adverise these (even though it can do EGL 1.5).
++ */
++static EGLDisplay qemu_egl_get_display(void *native)
++{
++#ifdef EGL_PLATFORM_GBM_MESA
++    /* In practise any EGL 1.5 implementation would support the EXT extension */
++    if (epoxy_has_egl_extension(NULL, "EGL_EXT_platform_base")) {
++        PFNEGLGETPLATFORMDISPLAYEXTPROC getPlatformDisplayEXT =
++            (void *) eglGetProcAddress("eglGetPlatformDisplayEXT");
++        if (getPlatformDisplayEXT) {
++            return getPlatformDisplayEXT(EGL_PLATFORM_GBM_MESA, native, NULL);
++        }
++    }
++#endif
++
++    /* fallback */
++    return eglGetDisplay(native);
++}
++
+ int qemu_egl_init_dpy(EGLNativeDisplayType dpy, bool gles, bool debug)
+ {
+     static const EGLint conf_att_gl[] = {
+@@ -222,12 +267,8 @@ int qemu_egl_init_dpy(EGLNativeDisplayType dpy, bool gles, bool debug)
+         setenv("LIBGL_DEBUG", "verbose", true);
+     }
+ 
+-    egl_dbg("eglGetDisplay (dpy %p) ...\n", dpy);
+-#ifdef EGL_MESA_platform_gbm
+-    qemu_egl_display = eglGetPlatformDisplayEXT(EGL_PLATFORM_GBM_MESA, dpy, NULL);
+-#else
+-    qemu_egl_display = eglGetDisplay(dpy);
+-#endif
++    egl_dbg("qemu_egl_get_display (dpy %p) ...\n", dpy);
++    qemu_egl_display = qemu_egl_get_display(dpy);
+     if (qemu_egl_display == EGL_NO_DISPLAY) {
+         error_report("egl: eglGetDisplay failed");
+         return -1;
+-- 
+1.8.3.1
