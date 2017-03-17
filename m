@@ -1,19 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cooEZ-0003Na-Vz
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 05:31:48 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cooMi-0006JJ-IX
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 05:40:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cooEW-0005pY-SN
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 05:31:44 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20170317015630.30396-1-famz@redhat.com>
-References: <20170317015630.30396-1-famz@redhat.com>
-Date: Fri, 17 Mar 2017 10:31:37 +0100
-Message-ID: <w51d1dg45c6.fsf@maestria.local.igalia.com>
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cooMd-00015d-MN
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 05:40:08 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52295
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1cooMd-00014g-Fv
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 05:40:03 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2H9d0ip084950
+	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 05:40:01 -0400
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 297nkpdm8v-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 05:40:01 -0400
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Fri, 17 Mar 2017 03:40:00 -0600
+Date: Fri, 17 Mar 2017 17:39:53 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20170317031743.40128-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170317031743.40128-2-bjsdjshi@linux.vnet.ibm.com>
+	<alpine.LFD.2.20.1703171023360.3003@schleppi>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.9] block: Propagate
- error in bdrv_open_backing_file
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.LFD.2.20.1703171023360.3003@schleppi>
+Message-Id: <20170317093953.GP6839@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v4 01/16] s390: cio: introduce
+ cio_cancel_halt_clear
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,28 +44,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Sebastian Ott <sebott@linux.vnet.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, Cornelia Huck <cornelia.huck@de.ibm.com>, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, Peter Oberparleiter <oberpar@linux.vnet.ibm.com>
 
-On Fri 17 Mar 2017 02:56:30 AM CET, Fam Zheng wrote:
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  block.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/block.c b/block.c
-> index cb57370..6621167 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -2025,6 +2025,7 @@ int bdrv_open_backing_file(BlockDriverState *bs, QDict *parent_options,
->      bdrv_set_backing_hd(bs, backing_hd, &local_err);
->      bdrv_unref(backing_hd);
->      if (local_err) {
-> +        error_propagate(errp, local_err);
->          ret = -EINVAL;
->          goto free_exit;
->      }
+* Sebastian Ott <sebott@linux.vnet.ibm.com> [2017-03-17 10:26:51 +0100]:
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+> On Fri, 17 Mar 2017, Dong Jia Shi wrote:
+> > For future code reuse purpose, this decouples the cio code with
+> > the ccw device specific parts from ccw_device_cancel_halt_clear,
+> > and makes a new common I/O interface named cio_cancel_halt_clear.
+> 
+> What would the user of cio_cancel_halt_clear be?
+Hi Sebastian,
 
-Berto
+We are trying to introduce a new I/O subchannel driver to enable usage
+of I/O subchannels via VFIO-CCW, so we can passthru a subchannel to a
+KVM guest. And that new vfio-ccw subchannel driver is the user. :>
+
+> 
+> Sebastian
+
+-- 
+Dong Jia
