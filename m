@@ -1,34 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1coiQj-0007nt-3W
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 23:19:57 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1coiQm-0007rA-L0
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 23:20:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1coiQe-0000lG-KR
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 23:19:53 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55858)
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1coiQi-0000m4-6Z
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 23:19:56 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51268
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1coiQe-0000l1-AE
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 23:19:48 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	id 1coiQh-0000lw-Vw
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 23:19:52 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2H3JBRt085206
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 23:19:47 -0400
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 297mmyd3q5-1
+	v2H3JGbn055799
+	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 23:19:51 -0400
+Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2981f9wdb9-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 23:19:47 -0400
+	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 23:19:51 -0400
 Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Thu, 16 Mar 2017 21:19:46 -0600
+	Thu, 16 Mar 2017 21:19:49 -0600
 From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Date: Fri, 17 Mar 2017 04:19:20 +0100
+Date: Fri, 17 Mar 2017 04:19:21 +0100
 In-Reply-To: <20170317031928.40189-1-bjsdjshi@linux.vnet.ibm.com>
 References: <20170317031928.40189-1-bjsdjshi@linux.vnet.ibm.com>
-Message-Id: <20170317031928.40189-4-bjsdjshi@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v4 03/11] s390x/css: realize css_sch_build_schib
+Message-Id: <20170317031928.40189-5-bjsdjshi@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v4 04/11] s390x/css: realize css_create_sch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,273 +41,209 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org
 Cc: bjsdjshi@linux.vnet.ibm.com, renxiaof@linux.vnet.ibm.com, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
 
-From: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
-
-The S390 virtual css support already has a mechanism to build virtual
-Sub-Channel Information Block and provide virtual subchannels to the
-guest. However, to pass-through subchannels to a guest, we need to
-introduce a new mechanism to build its schib according to the real
-device information. Thus we realize a new css_sch_build_schib function
-to extract the path_masks, chpids, chpid type from sysfs. To reuse
-the existing code, we refactor css_add_virtual_chpid to css_add_chpid.
+The S390 virtual css support already has a mechanism to create a
+virtual subchannel and provide it to the guest. However, to
+pass-through subchannels to a guest, we need to introduce a new
+mechanism to create the subchannel according to the real device
+information. Thus we reconstruct css_create_virtual_sch to a new
+css_create_sch function to handl all these cases and do allocation
+and initialization of the subchannel according to the device type
+and machine configuration.
 
 Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Signed-off-by: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
 Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
 ---
- hw/s390x/css.c         | 153 ++++++++++++++++++++++++++++++++++++++++++++++++-
- include/hw/s390x/css.h |  36 ++++++------
- 2 files changed, 169 insertions(+), 20 deletions(-)
+ hw/s390x/css-bridge.c         |  2 ++
+ hw/s390x/css.c                | 45 ++++++++++++++++++++++++++++++++++++-------
+ hw/s390x/s390-virtio-ccw.c    | 12 +++++++++---
+ hw/s390x/virtio-ccw.c         |  6 +++++-
+ include/hw/s390x/css-bridge.h |  1 +
+ include/hw/s390x/css.h        | 25 ++++++++++++++++--------
+ 6 files changed, 72 insertions(+), 19 deletions(-)
 
+diff --git a/hw/s390x/css-bridge.c b/hw/s390x/css-bridge.c
+index 9a7f7ee..14d3af4 100644
+--- a/hw/s390x/css-bridge.c
++++ b/hw/s390x/css-bridge.c
+@@ -17,6 +17,7 @@
+ #include "hw/s390x/css.h"
+ #include "ccw-device.h"
+ #include "hw/s390x/css-bridge.h"
++#include "cpu.h"
+ 
+ /*
+  * Invoke device-specific unplug handler, disable the subchannel
+@@ -103,6 +104,7 @@ VirtualCssBus *virtual_css_bus_init(void)
+     /* Create bus on bridge device */
+     bus = qbus_create(TYPE_VIRTUAL_CSS_BUS, dev, "virtual-css");
+     cbus = VIRTUAL_CSS_BUS(bus);
++    cbus->squash_mcss = s390_get_squash_mcss();
+ 
+     /* Enable hotplugging */
+     qbus_set_hotplug_handler(bus, dev, &error_abort);
 diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-index e32b2a4..a550cf7 100644
+index a550cf7..01e88e1 100644
 --- a/hw/s390x/css.c
 +++ b/hw/s390x/css.c
-@@ -13,6 +13,7 @@
- #include "qapi/error.h"
- #include "qapi/visitor.h"
- #include "hw/qdev.h"
-+#include "qemu/error-report.h"
- #include "qemu/bitops.h"
- #include "exec/address-spaces.h"
- #include "cpu.h"
-@@ -1281,7 +1282,8 @@ bool css_schid_final(int m, uint8_t cssid, uint8_t ssid, uint16_t schid)
-                                  (MAX_SCHID + 1) / sizeof(unsigned long));
- }
- 
--static int css_add_virtual_chpid(uint8_t cssid, uint8_t chpid, uint8_t type)
-+static int css_add_chpid(uint8_t cssid, uint8_t chpid, uint8_t type,
-+                         bool is_virt)
- {
-     CssImage *css;
- 
-@@ -1295,7 +1297,7 @@ static int css_add_virtual_chpid(uint8_t cssid, uint8_t chpid, uint8_t type)
-     }
-     css->chpids[chpid].in_use = 1;
-     css->chpids[chpid].type = type;
--    css->chpids[chpid].is_virtual = 1;
-+    css->chpids[chpid].is_virtual = is_virt;
- 
-     css_generate_chp_crws(cssid, chpid);
- 
-@@ -1319,7 +1321,7 @@ void css_sch_build_virtual_schib(SubchDev *sch, uint8_t chpid, uint8_t type)
-     p->pam = 0x80;
-     p->chpid[0] = chpid;
-     if (!css->chpids[chpid].in_use) {
--        css_add_virtual_chpid(sch->cssid, chpid, type);
-+        css_add_chpid(sch->cssid, chpid, type, true);
-     }
- 
-     memset(s, 0, sizeof(SCSW));
-@@ -1911,3 +1913,148 @@ SubchDev *css_create_virtual_sch(CssDevId bus_id, Error **errp)
-     css_subch_assign(sch->cssid, sch->ssid, schid, sch->devno, sch);
-     return sch;
- }
-+
-+static int css_sch_get_chpids(SubchDev *sch, CssDevId *dev_id)
-+{
-+    char *fid_path;
-+    FILE *fd;
-+    uint32_t chpid[8];
-+    int i;
-+    PMCW *p = &sch->curr_status.pmcw;
-+
-+    fid_path = g_strdup_printf("/sys/bus/css/devices/%x.%x.%04x/chpids",
-+                               dev_id->cssid, dev_id->ssid, dev_id->devid);
-+    fd = fopen(fid_path, "r");
-+    if (fd == NULL) {
-+        error_report("%s: open %s failed", __func__, fid_path);
-+        g_free(fid_path);
-+        return -EINVAL;
-+    }
-+
-+    if (fscanf(fd, "%x %x %x %x %x %x %x %x",
-+        &chpid[0], &chpid[1], &chpid[2], &chpid[3],
-+        &chpid[4], &chpid[5], &chpid[6], &chpid[7]) != 8) {
-+        fclose(fd);
-+        g_free(fid_path);
-+        return -EINVAL;
-+    }
-+
-+    for (i = 0; i < ARRAY_SIZE(p->chpid); i++) {
-+        p->chpid[i] = chpid[i];
-+    }
-+
-+    fclose(fd);
-+    g_free(fid_path);
-+
-+    return 0;
-+}
-+
-+static int css_sch_get_path_masks(SubchDev *sch, CssDevId *dev_id)
-+{
-+    char *fid_path;
-+    FILE *fd;
-+    uint32_t pim, pam, pom;
-+    PMCW *p = &sch->curr_status.pmcw;
-+
-+    fid_path = g_strdup_printf("/sys/bus/css/devices/%x.%x.%04x/pimpampom",
-+                               dev_id->cssid, dev_id->ssid, dev_id->devid);
-+    fd = fopen(fid_path, "r");
-+    if (fd == NULL) {
-+        error_report("%s: open %s failed", __func__, fid_path);
-+        g_free(fid_path);
-+        return -EINVAL;
-+    }
-+
-+    if (fscanf(fd, "%x %x %x", &pim, &pam, &pom) != 3) {
-+        fclose(fd);
-+        g_free(fid_path);
-+        return -EINVAL;
-+    }
-+
-+    p->pim = pim;
-+    p->pam = pam;
-+    p->pom = pom;
-+    fclose(fd);
-+    g_free(fid_path);
-+
-+    return 0;
-+}
-+
-+static int css_sch_get_chpid_type(uint8_t chpid, uint32_t *type,
-+                                  CssDevId *dev_id)
-+{
-+    char *fid_path;
-+    FILE *fd;
-+
-+    fid_path = g_strdup_printf("/sys/devices/css%x/chp0.%02x/type",
-+                               dev_id->cssid, chpid);
-+    fd = fopen(fid_path, "r");
-+    if (fd == NULL) {
-+        error_report("%s: open %s failed", __func__, fid_path);
-+        g_free(fid_path);
-+        return -EINVAL;
-+    }
-+
-+    if (fscanf(fd, "%x", type) != 1) {
-+        fclose(fd);
-+        g_free(fid_path);
-+        return -EINVAL;
-+    }
-+
-+    fclose(fd);
-+    g_free(fid_path);
-+
-+    return 0;
-+}
-+
-+/*
-+ * We currently retrieve the real device information from sysfs to build the
-+ * guest subchannel information block without considering the migration feature.
-+ * If migrate, it won't be sure to use the real device information directly,
-+ * this point will be handled in the future.
-+ */
-+int css_sch_build_schib(SubchDev *sch, CssDevId *dev_id)
-+{
-+    CssImage *css = channel_subsys.css[sch->cssid];
-+    PMCW *p = &sch->curr_status.pmcw;
-+    SCSW *s = &sch->curr_status.scsw;
-+    uint32_t type;
-+    int i, ret;
-+
-+    /* We are dealing with I/O subchannels only. */
-+    assert(css != NULL);
-+    memset(p, 0, sizeof(PMCW));
-+    p->flags |= PMCW_FLAGS_MASK_DNV;
-+    p->devno = sch->devno;
-+
-+    /* Grab path mask from sysfs. */
-+    ret = css_sch_get_path_masks(sch, dev_id);
-+    if (ret) {
-+        return ret;
-+    }
-+
-+    /* Grab chpids from sysfs. */
-+    ret = css_sch_get_chpids(sch, dev_id);
-+    if (ret) {
-+        return ret;
-+    }
-+
-+   /* Build chpid type. */
-+    for (i = 0; i < ARRAY_SIZE(p->chpid); i++) {
-+        if (p->chpid[i] && !css->chpids[p->chpid[i]].in_use) {
-+            ret = css_sch_get_chpid_type(p->chpid[i], &type, dev_id);
-+            if (ret) {
-+                return ret;
-+            }
-+            css_add_chpid(sch->cssid, p->chpid[i], type, false);
-+        }
-+    }
-+
-+    memset(s, 0, sizeof(SCSW));
-+    sch->curr_status.mba = 0;
-+    for (i = 0; i < ARRAY_SIZE(sch->curr_status.mda); i++) {
-+        sch->curr_status.mda[i] = 0;
-+    }
-+
-+    return 0;
-+}
-diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
-index c96c862..648ea2f 100644
---- a/include/hw/s390x/css.h
-+++ b/include/hw/s390x/css.h
-@@ -92,6 +92,24 @@ struct SubchDev {
-     void *driver_data;
+@@ -1881,28 +1881,59 @@ PropertyInfo css_devid_propinfo = {
+     .set = set_css_devid,
  };
  
-+/*
-+ * Identify a device within the channel subsystem.
-+ * Note that this can be used to identify either the subchannel or
-+ * the attached I/O device, as there's always one I/O device per
-+ * subchannel.
-+ */
-+typedef struct CssDevId {
-+    uint8_t cssid;
-+    uint8_t ssid;
-+    uint16_t devid;
-+    bool valid;
-+} CssDevId;
-+
-+extern PropertyInfo css_devid_propinfo;
-+
-+#define DEFINE_PROP_CSS_DEV_ID(_n, _s, _f) \
-+    DEFINE_PROP(_n, _s, _f, css_devid_propinfo, CssDevId)
-+
- typedef struct IndAddr {
-     hwaddr addr;
-     uint64_t map;
-@@ -113,6 +131,7 @@ bool css_devno_used(uint8_t cssid, uint8_t ssid, uint16_t devno);
- void css_subch_assign(uint8_t cssid, uint8_t ssid, uint16_t schid,
-                       uint16_t devno, SubchDev *sch);
- void css_sch_build_virtual_schib(SubchDev *sch, uint8_t chpid, uint8_t type);
-+int css_sch_build_schib(SubchDev *sch, CssDevId *dev_id);
- uint16_t css_build_subchannel_id(SubchDev *sch);
- void css_reset(void);
- void css_reset_sch(SubchDev *sch);
-@@ -154,23 +173,6 @@ int css_do_rsch(SubchDev *sch);
- int css_do_rchp(uint8_t cssid, uint8_t chpid);
- bool css_present(uint8_t cssid);
- #endif
--/*
-- * Identify a device within the channel subsystem.
-- * Note that this can be used to identify either the subchannel or
-- * the attached I/O device, as there's always one I/O device per
-- * subchannel.
-- */
--typedef struct CssDevId {
--    uint8_t cssid;
--    uint8_t ssid;
--    uint16_t devid;
--    bool valid;
--} CssDevId;
--
--extern PropertyInfo css_devid_propinfo;
--
--#define DEFINE_PROP_CSS_DEV_ID(_n, _s, _f) \
--    DEFINE_PROP(_n, _s, _f, css_devid_propinfo, CssDevId)
+-SubchDev *css_create_virtual_sch(CssDevId bus_id, Error **errp)
++SubchDev *css_create_sch(CssDevId bus_id, bool is_virtio, bool squash_mcss,
++                         Error **errp)
+ {
+     uint16_t schid = 0;
+     SubchDev *sch;
  
+     if (bus_id.valid) {
+-        /* Enforce use of virtual cssid. */
+-        if (bus_id.cssid != VIRTUAL_CSSID) {
+-            error_setg(errp, "cssid %hhx not valid for virtual devices",
+-                       bus_id.cssid);
++        if (is_virtio != (bus_id.cssid == VIRTUAL_CSSID)) {
++            error_setg(errp, "cssid %hhx not valid for %s devices",
++                       bus_id.cssid,
++                       (is_virtio ? "virtio" : "non-virtio"));
+             return NULL;
+         }
++    }
++
++    if (bus_id.valid) {
++        if (squash_mcss) {
++            bus_id.cssid = channel_subsys.default_cssid;
++        } else if (!channel_subsys.css[bus_id.cssid]) {
++            css_create_css_image(bus_id.cssid, false);
++        }
++
+         if (!css_find_free_subch_for_devno(bus_id.cssid, bus_id.ssid,
+                                            bus_id.devid, &schid, errp)) {
+             return NULL;
+         }
+-    } else {
+-        bus_id.cssid = VIRTUAL_CSSID;
++    } else if (squash_mcss || is_virtio) {
++        bus_id.cssid = channel_subsys.default_cssid;
++
+         if (!css_find_free_subch_and_devno(bus_id.cssid, &bus_id.ssid,
+                                            &bus_id.devid, &schid, errp)) {
+             return NULL;
+         }
++    } else {
++        for (bus_id.cssid = 0; bus_id.cssid < MAX_CSSID; ++bus_id.cssid) {
++            if (bus_id.cssid == VIRTUAL_CSSID) {
++                continue;
++            }
++
++            if (!channel_subsys.css[bus_id.cssid]) {
++                css_create_css_image(bus_id.cssid, false);
++            }
++
++            if   (css_find_free_subch_and_devno(bus_id.cssid, &bus_id.ssid,
++                                                &bus_id.devid, &schid,
++                                                NULL)) {
++                break  ;
++            }
++            if (bus_id.cssid == MAX_CSSID) {
++                error_setg(errp, "Virtual channel subsystem is full!");
++                return NULL;
++            }
++        }
+     }
+ 
+     sch = g_malloc0(sizeof(*sch));
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index a51f578..d9f0911 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -135,10 +135,16 @@ static void ccw_init(MachineState *machine)
+         kvm_s390_enable_css_support(s390_cpu_addr2state(0));
+     }
+     /*
+-     * Create virtual css and set it as default so that non mcss-e
+-     * enabled guests only see virtio devices.
++     * Non mcss-e enabled guests only see the devices from the default
++     * css, which is determined by the value of the squash_mcss property.
++     * Note: we must not squash non virtio devices to css 0xFE, since
++     * it's reserved for virtio devices only.
+      */
+-    ret = css_create_css_image(VIRTUAL_CSSID, true);
++    if (css_bus->squash_mcss) {
++        ret = css_create_css_image(0, true);
++    } else {
++        ret = css_create_css_image(VIRTUAL_CSSID, true);
++    }
+     assert(ret == 0);
+ 
+     /* Create VirtIO network adapters */
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index 00b3bde..c6ba8d1 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -680,9 +680,13 @@ static void virtio_ccw_device_realize(VirtioCcwDevice *dev, Error **errp)
+ {
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_GET_CLASS(dev);
+     CcwDevice *ccw_dev = CCW_DEVICE(dev);
+-    SubchDev *sch = css_create_virtual_sch(ccw_dev->bus_id, errp);
++    DeviceState *parent = DEVICE(ccw_dev);
++    BusState *qbus = qdev_get_parent_bus(parent);
++    VirtualCssBus *cbus = VIRTUAL_CSS_BUS(qbus);
++    SubchDev *sch;
+     Error *err = NULL;
+ 
++    sch = css_create_sch(ccw_dev->bus_id, true, cbus->squash_mcss, errp);
+     if (!sch) {
+         return;
+     }
+diff --git a/include/hw/s390x/css-bridge.h b/include/hw/s390x/css-bridge.h
+index 5a0203b..cf08604 100644
+--- a/include/hw/s390x/css-bridge.h
++++ b/include/hw/s390x/css-bridge.h
+@@ -28,6 +28,7 @@ typedef struct VirtualCssBridge {
+ /* virtual css bus type */
+ typedef struct VirtualCssBus {
+     BusState parent_obj;
++    bool squash_mcss;
+ } VirtualCssBus;
+ 
+ #define TYPE_VIRTUAL_CSS_BUS "virtual-css-bus"
+diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+index 648ea2f..2170d11 100644
+--- a/include/hw/s390x/css.h
++++ b/include/hw/s390x/css.h
+@@ -177,16 +177,25 @@ bool css_present(uint8_t cssid);
  /**
   * Create a subchannel for the given bus id.
+  *
+- * If @p bus_id is valid, verify that it uses the virtual channel
+- * subsystem id and is not already in use, and find a free subchannel
+- * id for it. If @p bus_id is not valid, find a free subchannel id and
+- * device number across all subchannel sets. If either of the former
+- * actions succeed, allocate a subchannel structure, initialise it
+- * with the bus id, subchannel id and device number, register it with
+- * the CSS and return it. Otherwise return NULL.
++ * If @p bus_id is valid, and @p squash_mcss is true, verify that it is
++ * not already in use in the default css, and find a free devno from the
++ * default css image for it.
++ * If @p bus_id is valid, and @p squash_mcss is false, verify that it is
++ * not already in use, and find a free devno for it.
++ * If @p bus_id is not valid, and if either @p squash_mcss or @p is_virtio
++ * is true, find a free subchannel id and device number across all
++ * subchannel sets from the default css image.
++ * If @p bus_id is not valid, and if both @p squash_mcss and @p is_virtio
++ * are false, find a non-full css image and find a free subchannel id and
++ * device number across all subchannel sets from it.
++ *
++ * If either of the former actions succeed, allocate a subchannel structure,
++ * initialise it with the bus id, subchannel id and device number, register
++ * it with the CSS and return it. Otherwise return NULL.
+  *
+  * The caller becomes owner of the returned subchannel structure and
+  * is responsible for unregistering and freeing it.
+  */
+-SubchDev *css_create_virtual_sch(CssDevId bus_id, Error **errp);
++SubchDev *css_create_sch(CssDevId bus_id, bool is_virtio, bool squash_mcss,
++                         Error **errp);
+ #endif
 -- 
 2.8.4
