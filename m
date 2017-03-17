@@ -1,24 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.guang55@zte.com.cn>) id 1cohP3-0003X3-2z
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 22:14:06 -0400
+	(envelope-from <famz@redhat.com>) id 1cohSe-0004U1-Ce
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 22:17:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wang.guang55@zte.com.cn>) id 1cohOz-0002Zg-Kw
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 22:14:05 -0400
-Received: from mx7.zte.com.cn ([202.103.147.169]:47693)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.guang55@zte.com.cn>) id 1cohOx-0002Wy-8S
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 22:14:01 -0400
-Date: Fri, 17 Mar 2017 10:13:36 +0800 (CST)
-Message-ID: <201703171013368212160@zte.com.cn>
-References: 970232783.129315.1489561241041.JavaMail.administrator@mtom.nabble.com,
-	58C9E909.30404@huawei.com
-Mime-Version: 1.0
-From: <wang.guang55@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: [Qemu-devel] =?utf-8?q?colo_doc_problem?=
+	(envelope-from <famz@redhat.com>) id 1cohSb-0004Pi-3z
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 22:17:48 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Fri, 17 Mar 2017 10:17:39 +0800
+Message-Id: <20170317021739.16877-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH] block: Make 'replication_state' an enum
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,76 +17,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhang.zhanghailiang@huawei.com
-Cc: xuquan8@huawei.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org
 
-aGkNCg0KDQpodHRwOi8vZ2l0LnFlbXUtcHJvamVjdC5vcmcvP3A9cWVtdS5naXRhPWJsb2JmPWRv
-Y3MvQ09MTy1GVC50eHRoPWUyODliZTJmNDE5NTc4NjQ1NDc1YjM2ODYxZTQzMDNmZjYyNGNiMGZo
-Yj1IRUFEDQoNCg0KDQoNCmRvY3MvQ09MTy1GVA0KDQoNCg0KDQogMTM4IHsnZXhlY3V0ZSc6J3Ft
-cF9jYXBhYmlsaXRpZXMnfQ0KDQogMTM5IHsgJ2V4ZWN1dGUnOiAnbmJkLXNlcnZlci1zdGFydCcs
-DQoNCiAxNDAgICAnYXJndW1lbnRzJzogeydhZGRyJzogeyd0eXBlJzogJ2luZXQnLCAnZGF0YSc6
-IHsnaG9zdCc6ICd4eC54eC54eC54eCcsICdwb3J0JzogJzg4ODknfSB9IH0NCg0KIDE0MSB9DQoN
-CiAxNDIgeydleGVjdXRlJzogJ25iZC1zZXJ2ZXItYWRkJywgJ2FyZ3VtZW50cyc6IHsnZGV2aWNl
-JzogJ3NlY29uZGVhcnktZGlzazAnLCAnd3JpdGFibGUnOiB0cnVlIH0gfQ0KDQpzZWNvbmRlYXJ5
-LWRpc2swIHNob3VsZCBiZSBzZWNvbmRhcnktZGlzazAgLg0KDQoNCg0KDQoNCg0KDQp0aGFuayB5
-b3UuDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQrljp/lp4vpgq7ku7YNCg0KDQoNCuWP
-keS7tuS6uu+8miDvvJx6aGFuZy56aGFuZ2hhaWxpYW5nQGh1YXdlaS5jb23vvJ4NCuaUtuS7tuS6
-uu+8mueOi+W5vzEwMTY1OTkyDQrmioTpgIHkurrvvJog77yceHVxdWFuOEBodWF3ZWkuY29t77ye
-DQrml6Ug5pyfIO+8mjIwMTflubQwM+aciDE25pelIDA5OjI0DQrkuLsg6aKYIO+8mlJlOiBhYm91
-dCBjb2xvIGRldmVsb3BtZW50DQoNCg0KDQoNCg0KSGksDQoNCk9uIDIwMTcvMy8xNSAxNTowMSwg
-d2FuZy5ndWFuZzU1QHp0ZS5jb20uY24gd3JvdGU6DQrvvJ4gaGk6DQrvvJ4gSSBhbSB0ZXN0aW5n
-IFFFTVUgQ09MTyBmZWF0dXJlIGRlc2NyaWJlZCBoZXJlIFtRRU1VIFdpa2ldKGh0dHA6Ly93aWtp
-LnFlbXUtcHJvamVjdC5vcmcvRmVhdHVyZXMvQ09MTykuDQrvvJ4NCu+8niBJIGZvdW5kIHRoYXQg
-Y29sbyBpbiBxZW11IGhhdmUgbm90IGJlZW4gY29tcGxldGXjgIINCg0KWWVzLCB5b3UgYXJlIHJp
-Z2h0LCB0aGVyZSBhcmUgc3RpbGwgbG90cyBvZiB3b3JrIG5lZWQgdG8gYmUgZG9uZSB0byBwZXJm
-ZWN0IGl0Lg0KDQrvvJ4gRG8gdGhlIGhhdmUgYW55IHBsYW4gZm9yIGRldmVsb3BpbmcgY29sb++8
-nw0KDQpTdXJlLCBJIGhhdmUgcG9zdGVkICJbUEFUQ0ggMDAvMTVdIENPTE86IGludGVncmF0ZSBj
-b2xvIGZyYW1lIHdpdGggYmxvY2sgcmVwbGljYXRpb24gYW5kIG5ldCBjb21wYXJlIg0Kc2VyaWVz
-LCBhbmQgaXQgaXMgcGxhbm5lZCB0byBiZSBtZXJnZWQgaW4gbmV4dCB2ZXJzaW9uIG9mIFFFTVUu
-IEJlc2lkZXMgdGhpcywgdGhlcmUgYXJlIHNvbWUgb3RoZXINCnNlcmllcyBhcmUgb24gdGhlIHJv
-YWQuDQoNCu+8niBIb3cgbG9uZyB0aGUgY29sbyB3aWxsIGJlIGNvbXBsZXRlIGZvciB1c2XvvJ8N
-Cg0KSXQgYWxsIGRlcGVuZHMgb24gdGhlIHJldmlld2luZyBzcGVlZC4NCg0K77yeIHBsZWFzZSBy
-ZXBsYXnvvIx0aGFuayB5b3UuDQrvvJ4NCu+8ng0K77yeDQrvvJ4NCu+8ng0K77yeDQrvvJ4NCu+8
-niBXaGVuIHRoZSBQcmltYXJ5IE5vZGUgcGFuaWMsdGhlIFNlY29uZGFyeSBOb2RlIHFlbXUgaGFu
-Zy4NCu+8niBoYW5nIGF0IHJlY3Ztc2cgaW4gcWlvX2NoYW5uZWxfc29ja2V0X3JlYWR2Lg0K77ye
-IEFuZCAgSSBydW4gIHsgJ2V4ZWN1dGUnOiAnbmJkLXNlcnZlci1zdG9wJyB9IGFuZCB7ICJleGVj
-dXRlIjogIngtY29sby1sb3N0LWhlYXJ0YmVhdCIgfSBpbiBTZWNvbmRhcnkgVk0ncw0K77yeIG1v
-bml0b3IsdGhlICBTZWNvbmRhcnkgTm9kZSBxZW11IHN0aWxsIGhhbmcgYXQgcmVjdm1zZyAuDQrv
-vJ4NCu+8niBEaWQgdGhlIHJlY3Ztc2cgc2hvdWxkIGJlIGludGVycnVwdCBhZnRlciBmYWlsb3Zl
-cj8/DQrvvJ4gSGFzIGFueW9uZSBldmVyIHJ1biBpdCBzdWNjZXNzZnVsbHk/IEFueSBoZWxwIGlz
-IGFwcHJlY2lhdGVkIQ0K77yeDQoNCldlIHdpbGwgc2h1dGRvd24gdGhlIHJlbGF0ZWQgZmQgc28g
-dGhhdCBpdCB3aWxsIG5vdCBiZSBibG9ja2VkIGluIHJlYWQvd3JpdGUuDQogRnJvbSB5b3VyIGJh
-Y2t0cmFjZSwgaXQgc2VlbXMgdGhhdCwgaXQgZGlkbid0IGdvIHRoZSBwbGFjZSBjYWxsIHNodXRk
-b3duKGZkKS4NCg0KTWF5YmUgeW91IG5lZWQgdG8gZGVidWcgdGhlIHByb2Nlc3Mgb2YgJ3gtY29s
-by1sb3N0LWhlYXJ0YmVhdCcgdG8gZmlndXJlIG91dCB3aGF0IGhhcHBlbnMuDQoNClRoYW5rcywN
-CkhhaWxpYW5nDQoNCu+8ng0K77yeDQrvvJ4gY2VudG9zNy4yK3FlbXUyLjcuNTANCu+8niAoZ2Ri
-KSBidA0K77yeICMwICAweDAwMDA3ZjNlMDBjYzg2YWQgaW4gcmVjdm1zZyAoKSBmcm9tIC9saWI2
-NC9saWJwdGhyZWFkLnNvLjANCu+8niAjMSAgMHgwMDAwN2YzZTAzMzJiNzM4IGluIHFpb19jaGFu
-bmVsX3NvY2tldF9yZWFkdiAoaW9jPe+8nG9wdGltaXplZCBvdXTvvJ4sIGlvdj3vvJxvcHRpbWl6
-ZWQgb3V077yeLCBuaW92Pe+8nG9wdGltaXplZCBvdXTvvJ4sIGZkcz0weDAsIG5mZHM9MHgwLCBl
-cnJwPTB4MCkgYXQgaW8vY2hhbm5lbC1zb2NrZXQuYzo0OTcNCu+8niAjMiAgMHgwMDAwN2YzZTAz
-MzI5NDcyIGluIHFpb19jaGFubmVsX3JlYWQgKGlvYz1pb2NAZW50cnk9MHg3ZjNlMDUxMTBlNDAs
-IGJ1Zj1idWZAZW50cnk9MHg3ZjNlMDU5MTBmMzggIiIsIGJ1Zmxlbj1idWZsZW5AZW50cnk9MzI3
-NjgsIGVycnA9ZXJycEBlbnRyeT0weDApIGF0IGlvL2NoYW5uZWwuYzo5Nw0K77yeICMzICAweDAw
-MDA3ZjNlMDMyNzUwZTAgaW4gY2hhbm5lbF9nZXRfYnVmZmVyIChvcGFxdWU977ycb3B0aW1pemVk
-IG91dO+8niwgYnVmPTB4N2YzZTA1OTEwZjM4ICIiLCBwb3M977ycb3B0aW1pemVkIG91dO+8niwg
-c2l6ZT0zMjc2OCkgYXQgbWlncmF0aW9uL3FlbXUtZmlsZS1jaGFubmVsLmM6NzgNCu+8niAjNCAg
-MHgwMDAwN2YzZTAzMjc0MTJjIGluIHFlbXVfZmlsbF9idWZmZXIgKGY9MHg3ZjNlMDU5MTBmMDAp
-IGF0IG1pZ3JhdGlvbi9xZW11LWZpbGUuYzoyNTcNCu+8niAjNSAgMHgwMDAwN2YzZTAzMjc0YTQx
-IGluIHFlbXVfcGVla19ieXRlIChmPWZAZW50cnk9MHg3ZjNlMDU5MTBmMDAsIG9mZnNldD1vZmZz
-ZXRAZW50cnk9MCkgYXQgbWlncmF0aW9uL3FlbXUtZmlsZS5jOjUxMA0K77yeICM2ICAweDAwMDA3
-ZjNlMDMyNzRhYWIgaW4gcWVtdV9nZXRfYnl0ZSAoZj1mQGVudHJ5PTB4N2YzZTA1OTEwZjAwKSBh
-dCBtaWdyYXRpb24vcWVtdS1maWxlLmM6NTIzDQrvvJ4gIzcgIDB4MDAwMDdmM2UwMzI3NGNiMiBp
-biBxZW11X2dldF9iZTMyIChmPWZAZW50cnk9MHg3ZjNlMDU5MTBmMDApIGF0IG1pZ3JhdGlvbi9x
-ZW11LWZpbGUuYzo2MDMNCu+8niAjOCAgMHgwMDAwN2YzZTAzMjcxNzM1IGluIGNvbG9fcmVjZWl2
-ZV9tZXNzYWdlIChmPTB4N2YzZTA1OTEwZjAwLCBlcnJwPWVycnBAZW50cnk9MHg3ZjNkNjJiZmFh
-NTApIGF0IG1pZ3JhdGlvbi9jb2xvLmM6MjE1DQrvvJ4gIzkgIDB4MDAwMDdmM2UwMzI3MjUwZCBp
-biBjb2xvX3dhaXRfaGFuZGxlX21lc3NhZ2UgKGVycnA9MHg3ZjNkNjJiZmFhNDgsIGNoZWNrcG9p
-bnRfcmVxdWVzdD3vvJxzeW50aGV0aWMgcG9pbnRlcu+8niwgZj3vvJxvcHRpbWl6ZWQgb3V077ye
-KSBhdCBtaWdyYXRpb24vY29sby5jOjU0Ng0K77yeICMxMCBjb2xvX3Byb2Nlc3NfaW5jb21pbmdf
-dGhyZWFkIChvcGFxdWU9MHg3ZjNlMDY3MjQ1ZTApIGF0IG1pZ3JhdGlvbi9jb2xvLmM6NjQ5DQrv
-vJ4gIzExIDB4MDAwMDdmM2UwMGNjMWRmMyBpbiBzdGFydF90aHJlYWQgKCkgZnJvbSAvbGliNjQv
-bGlicHRocmVhZC5zby4wDQrvvJ4gIzEyIDB4MDAwMDdmM2RmYzljMDNlZCBpbiBjbG9uZSAoKSBm
-cm9tIC9saWI2NC9saWJjLnNvLjYNCu+8ng0K77yeIF9fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX18NCu+8niBTZW50IGZyb20gaHR0cDovL3FlbXUuMTEubjcubmFiYmxlLmNvbQ0K
-77yeDQrvvJ4NCu+8niAuDQrvvJ4=
+BDRVReplicationState.replication_state is a name with a bit of
+duplication, plus it could be an enum like BDRVReplicationState.mode,
+which is be more readable and also more straightforward in a debuuger.
+
+Rename it, and improve the type while at it.
+
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ block/replication.c | 44 ++++++++++++++++++++++----------------------
+ 1 file changed, 22 insertions(+), 22 deletions(-)
+
+diff --git a/block/replication.c b/block/replication.c
+index bf3c395..a5475f7 100644
+--- a/block/replication.c
++++ b/block/replication.c
+@@ -22,9 +22,17 @@
+ #include "qapi/error.h"
+ #include "replication.h"
+ 
++typedef enum {
++    BLOCK_REPLICATION_NONE,             /* block replication is not started */
++    BLOCK_REPLICATION_RUNNING,          /* block replication is running */
++    BLOCK_REPLICATION_FAILOVER,         /* failover is running in background */
++    BLOCK_REPLICATION_FAILOVER_FAILED,  /* failover failed */
++    BLOCK_REPLICATION_DONE,             /* block replication is done */
++} ReplicationStage;
++
+ typedef struct BDRVReplicationState {
+     ReplicationMode mode;
+-    int replication_state;
++    ReplicationStage stage;
+     BdrvChild *active_disk;
+     BdrvChild *hidden_disk;
+     BdrvChild *secondary_disk;
+@@ -36,14 +44,6 @@ typedef struct BDRVReplicationState {
+     int error;
+ } BDRVReplicationState;
+ 
+-enum {
+-    BLOCK_REPLICATION_NONE,             /* block replication is not started */
+-    BLOCK_REPLICATION_RUNNING,          /* block replication is running */
+-    BLOCK_REPLICATION_FAILOVER,         /* failover is running in background */
+-    BLOCK_REPLICATION_FAILOVER_FAILED,  /* failover failed */
+-    BLOCK_REPLICATION_DONE,             /* block replication is done */
+-};
+-
+ static void replication_start(ReplicationState *rs, ReplicationMode mode,
+                               Error **errp);
+ static void replication_do_checkpoint(ReplicationState *rs, Error **errp);
+@@ -141,10 +141,10 @@ static void replication_close(BlockDriverState *bs)
+ {
+     BDRVReplicationState *s = bs->opaque;
+ 
+-    if (s->replication_state == BLOCK_REPLICATION_RUNNING) {
++    if (s->stage == BLOCK_REPLICATION_RUNNING) {
+         replication_stop(s->rs, false, NULL);
+     }
+-    if (s->replication_state == BLOCK_REPLICATION_FAILOVER) {
++    if (s->stage == BLOCK_REPLICATION_FAILOVER) {
+         block_job_cancel_sync(s->active_disk->bs->job);
+     }
+ 
+@@ -174,7 +174,7 @@ static int64_t replication_getlength(BlockDriverState *bs)
+ 
+ static int replication_get_io_status(BDRVReplicationState *s)
+ {
+-    switch (s->replication_state) {
++    switch (s->stage) {
+     case BLOCK_REPLICATION_NONE:
+         return -EIO;
+     case BLOCK_REPLICATION_RUNNING:
+@@ -403,7 +403,7 @@ static void backup_job_completed(void *opaque, int ret)
+     BlockDriverState *bs = opaque;
+     BDRVReplicationState *s = bs->opaque;
+ 
+-    if (s->replication_state != BLOCK_REPLICATION_FAILOVER) {
++    if (s->stage != BLOCK_REPLICATION_FAILOVER) {
+         /* The backup job is cancelled unexpectedly */
+         s->error = -EIO;
+     }
+@@ -445,7 +445,7 @@ static void replication_start(ReplicationState *rs, ReplicationMode mode,
+     aio_context_acquire(aio_context);
+     s = bs->opaque;
+ 
+-    if (s->replication_state != BLOCK_REPLICATION_NONE) {
++    if (s->stage != BLOCK_REPLICATION_NONE) {
+         error_setg(errp, "Block replication is running or done");
+         aio_context_release(aio_context);
+         return;
+@@ -545,7 +545,7 @@ static void replication_start(ReplicationState *rs, ReplicationMode mode,
+         abort();
+     }
+ 
+-    s->replication_state = BLOCK_REPLICATION_RUNNING;
++    s->stage = BLOCK_REPLICATION_RUNNING;
+ 
+     if (s->mode == REPLICATION_MODE_SECONDARY) {
+         secondary_do_checkpoint(s, errp);
+@@ -581,7 +581,7 @@ static void replication_get_error(ReplicationState *rs, Error **errp)
+     aio_context_acquire(aio_context);
+     s = bs->opaque;
+ 
+-    if (s->replication_state != BLOCK_REPLICATION_RUNNING) {
++    if (s->stage != BLOCK_REPLICATION_RUNNING) {
+         error_setg(errp, "Block replication is not running");
+         aio_context_release(aio_context);
+         return;
+@@ -601,7 +601,7 @@ static void replication_done(void *opaque, int ret)
+     BDRVReplicationState *s = bs->opaque;
+ 
+     if (ret == 0) {
+-        s->replication_state = BLOCK_REPLICATION_DONE;
++        s->stage = BLOCK_REPLICATION_DONE;
+ 
+         /* refresh top bs's filename */
+         bdrv_refresh_filename(bs);
+@@ -610,7 +610,7 @@ static void replication_done(void *opaque, int ret)
+         s->hidden_disk = NULL;
+         s->error = 0;
+     } else {
+-        s->replication_state = BLOCK_REPLICATION_FAILOVER_FAILED;
++        s->stage = BLOCK_REPLICATION_FAILOVER_FAILED;
+         s->error = -EIO;
+     }
+ }
+@@ -625,7 +625,7 @@ static void replication_stop(ReplicationState *rs, bool failover, Error **errp)
+     aio_context_acquire(aio_context);
+     s = bs->opaque;
+ 
+-    if (s->replication_state != BLOCK_REPLICATION_RUNNING) {
++    if (s->stage != BLOCK_REPLICATION_RUNNING) {
+         error_setg(errp, "Block replication is not running");
+         aio_context_release(aio_context);
+         return;
+@@ -633,7 +633,7 @@ static void replication_stop(ReplicationState *rs, bool failover, Error **errp)
+ 
+     switch (s->mode) {
+     case REPLICATION_MODE_PRIMARY:
+-        s->replication_state = BLOCK_REPLICATION_DONE;
++        s->stage = BLOCK_REPLICATION_DONE;
+         s->error = 0;
+         break;
+     case REPLICATION_MODE_SECONDARY:
+@@ -648,12 +648,12 @@ static void replication_stop(ReplicationState *rs, bool failover, Error **errp)
+ 
+         if (!failover) {
+             secondary_do_checkpoint(s, errp);
+-            s->replication_state = BLOCK_REPLICATION_DONE;
++            s->stage = BLOCK_REPLICATION_DONE;
+             aio_context_release(aio_context);
+             return;
+         }
+ 
+-        s->replication_state = BLOCK_REPLICATION_FAILOVER;
++        s->stage = BLOCK_REPLICATION_FAILOVER;
+         commit_active_start(NULL, s->active_disk->bs, s->secondary_disk->bs,
+                             BLOCK_JOB_INTERNAL, 0, BLOCKDEV_ON_ERROR_REPORT,
+                             NULL, replication_done, bs, errp, true);
+-- 
+2.9.3
