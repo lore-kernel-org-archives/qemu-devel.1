@@ -1,24 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cotju-0007Bt-Hx
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 11:24:27 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1cotsv-0001CL-93
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 11:33:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cotjt-0006V1-JB
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 11:24:26 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:35922)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cotjt-0006Us-Cd
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 11:24:25 -0400
-Received: by mail-wr0-x231.google.com with SMTP id u108so54179847wrb.3
-	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 08:24:25 -0700 (PDT)
-MIME-Version: 1.0
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 17 Mar 2017 15:24:03 +0000
-Message-ID: <CAFEAcA-hKsoJy6_JJU7UJVTDVJwAvO-AusKUBaMYsRvOOwnhLw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: [Qemu-devel] ui/console.h does #include <epoxy/gl.h> but it is used
- from files which don't build with OPENGL_CFLAGS
+	(envelope-from <pbonzini@redhat.com>) id 1cotsq-0001Rt-Br
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 11:33:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36064)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cotsq-0001Ro-5B
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 11:33:40 -0400
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 17 Mar 2017 16:33:37 +0100
+Message-Id: <20170317153337.19532-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH for 2.9] configure: remove Cygwin
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,23 +21,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: thuth@redhat.com, peter.maydell@linaro.org
 
-Our header include/ui/console.h will #include <epoxy/gl.h>.
-Unfortunately that header isn't guaranteed to be on the include
-path, because configure puts the CFLAGS that ensure it is (ie
-the output of pkg-config --cflags epoxy) into OPENGL_CFLAGS, and
-we only build certain object files with it. So a file like vl.c
-which includes ui/console.h will fail to build if epoxy is present
-but not in a directory which ends up on our include path anyway.
+The Cygwin target is really compiling for native Win32 with -mno-cygwin.
+Except, GCC 4.7.0 has finally removed the long deprecated -mno-cygwin
+option, and that happened about five years ago.
 
-In particular on OpenBSD the header is in /usr/include/X11R6/epoxy/gl.h
-and so compilation fails.
+Let it rest in peace.
 
-We should either just make sure we use the OPENGL_CFLAGS
-and OPENGL_LIBS more widely, or be more careful about what
-console.h is doing.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ bsd-user/mmap.c | 5 -----
+ configure       | 8 +-------
+ 2 files changed, 1 insertion(+), 12 deletions(-)
 
-thanks
--- PMM
+diff --git a/bsd-user/mmap.c b/bsd-user/mmap.c
+index ee59073..1ad018a 100644
+--- a/bsd-user/mmap.c
++++ b/bsd-user/mmap.c
+@@ -199,12 +199,7 @@ static int mmap_frag(abi_ulong real_start,
+     return 0;
+ }
+ 
+-#if defined(__CYGWIN__)
+-/* Cygwin doesn't have a whole lot of address space.  */
+-static abi_ulong mmap_next_start = 0x18000000;
+-#else
+ static abi_ulong mmap_next_start = 0x40000000;
+-#endif
+ 
+ unsigned long last_brk;
+ 
+diff --git a/configure b/configure
+index 0b74d18..963d171 100755
+--- a/configure
++++ b/configure
+@@ -553,12 +553,6 @@ fi
+ HOST_VARIANT_DIR=""
+ 
+ case $targetos in
+-CYGWIN*)
+-  mingw32="yes"
+-  QEMU_CFLAGS="-mno-cygwin $QEMU_CFLAGS"
+-  audio_possible_drivers="sdl"
+-  audio_drv_list=""
+-;;
+ MINGW32*)
+   mingw32="yes"
+   hax="yes"
+@@ -5234,7 +5228,7 @@ if test "$cap_ng" = "yes" ; then
+ fi
+ echo "CONFIG_AUDIO_DRIVERS=$audio_drv_list" >> $config_host_mak
+ for drv in $audio_drv_list; do
+-    def=CONFIG_$(echo $drv | LC_ALL=C tr '[a-z]' '[A-Z]')
++    def=CONFIG_AUDIO_$(echo $drv | LC_ALL=C tr '[a-z]' '[A-Z]')
+     echo "$def=y" >> $config_host_mak
+ done
+ if test "$audio_pt_int" = "yes" ; then
+-- 
+2.9.3
