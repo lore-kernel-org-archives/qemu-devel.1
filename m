@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1coxgH-0003Y4-6B
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 15:36:58 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1coyiJ-0007KW-Kl
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 16:43:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1coxgE-0007cy-4C
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 15:36:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37188)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1coxgD-0007cu-U0
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 15:36:54 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4160F3DBC7
-	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 19:36:53 +0000 (UTC)
-Date: Fri, 17 Mar 2017 19:36:48 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170317193648.GC3061@work-vm>
-References: <20170313124434.1043-1-quintela@redhat.com>
-	<20170313124434.1043-14-quintela@redhat.com>
-	<b1d7d458-d3d3-a396-a048-21eea329a05c@redhat.com>
-	<20170317130212.GK2396@work-vm>
-	<4e9d3f9a-7e40-7ad6-90cd-63e7befcfe23@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1coyiF-0005pR-MT
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 16:43:07 -0400
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:36813)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1coyiF-0005p2-Cv
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 16:43:03 -0400
+Received: by mail-wm0-x230.google.com with SMTP id n11so24211903wma.1
+	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 13:43:02 -0700 (PDT)
+References: <20170224112109.3147-1-alex.bennee@linaro.org>
+	<20170224112109.3147-12-alex.bennee@linaro.org>
+	<f7a4cba9-12da-fbb3-684f-68b4a11fbe97@vivier.eu>
+	<87y3wr8zs2.fsf@linaro.org>
+	<e3f645d0-ea92-b28d-bb2b-9c831dd8b264@vivier.eu>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <e3f645d0-ea92-b28d-bb2b-9c831dd8b264@vivier.eu>
+Date: Fri, 17 Mar 2017 20:43:22 +0000
+Message-ID: <87var7ocr9.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4e9d3f9a-7e40-7ad6-90cd-63e7befcfe23@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 13/16] migration: Create thread
- infrastructure for multifd recv side
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL 11/24] tcg: enable thread-per-vCPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,65 +33,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: peter.maydell@linaro.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, KONRAD Frederic <fred.konrad@greensocs.com>, Richard Henderson <rth@twiddle.net>
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> 
-> 
-> On 17/03/2017 14:02, Dr. David Alan Gilbert wrote:
-> >>>          case RAM_SAVE_FLAG_MULTIFD_PAGE:
-> >>>              fd_num = qemu_get_be16(f);
-> >>> -            if (fd_num != 0) {
-> >>> -                /* this is yet an unused variable, changed later */
-> >>> -                fd_num = fd_num;
-> >>> -            }
-> >>> +            multifd_recv_page(host, fd_num);
-> >>>              qemu_get_buffer(f, host, TARGET_PAGE_SIZE);
-> >>>              break;
-> >> I still believe this design is a mistake.
-> > Is it a use of a separate FD carrying all of the flags/addresses that
-> > you object to?
-> 
-> Yes, it introduces a serialization point unnecessarily, and I don't
-> believe the rationale that Juan offered was strong enough.
-> 
-> This is certainly true on the receive side, but serialization is not
-> even necessary on the send side.
 
-Is there an easy way to benchmark it (without writing both) to figure
-out if sending (word) (page) on one fd is less efficient than sending
-two fd's with the pages and words separate?
+Laurent Vivier <laurent@vivier.eu> writes:
 
-> Multiple threads can efficiently split
-> the work among themselves and visit the dirty bitmap without a central
-> distributor.
+> Le 27/02/2017 à 15:38, Alex Bennée a écrit :
+>>
+>> Laurent Vivier <laurent@vivier.eu> writes:
+>>
+>>> Le 24/02/2017 à 12:20, Alex Bennée a écrit :
+>>>> There are a couple of changes that occur at the same time here:
+>>>>
+>>>>   - introduce a single vCPU qemu_tcg_cpu_thread_fn
+>>>>
+>>>>   One of these is spawned per vCPU with its own Thread and Condition
+>>>>   variables. qemu_tcg_rr_cpu_thread_fn is the new name for the old
+>>>>   single threaded function.
+>>>>
+>>>>   - the TLS current_cpu variable is now live for the lifetime of MTTCG
+>>>>     vCPU threads. This is for future work where async jobs need to know
+>>>>     the vCPU context they are operating in.
+>>>>
+>>>> The user to switch on multi-thread behaviour and spawn a thread
+>>>> per-vCPU. For a simple test kvm-unit-test like:
+>>>>
+>>>>   ./arm/run ./arm/locking-test.flat -smp 4 -accel tcg,thread=multi
+>>>>
+>>>> Will now use 4 vCPU threads and have an expected FAIL (instead of the
+>>>> unexpected PASS) as the default mode of the test has no protection when
+>>>> incrementing a shared variable.
+>>>>
+>>>> We enable the parallel_cpus flag to ensure we generate correct barrier
+>>>> and atomic code if supported by the front and backends. This doesn't
+>>>> automatically enable MTTCG until default_mttcg_enabled() is updated to
+>>>> check the configuration is supported.
+>>>
+>>> This commit breaks linux-user mode:
+>>>
+>>> debian-8 with qemu-ppc on x86_64 with ltp-full-20170116
+>>>
+>>> cd /opt/ltp
+>>> ./runltp -p -l "qemu-$(date +%FT%T).log" -f /opt/ltp/runtest/syscalls -s
+>>> setgroups03
+>>>
+>>> setgroups03    1  TPASS  :  setgroups(65537) fails, Size is >
+>>> sysconf(_SC_NGROUPS_MAX), errno=22
+>>> qemu-ppc: /home/laurent/Projects/qemu/include/qemu/rcu.h:89:
+>>> rcu_read_unlock: Assertion `p_rcu_reader->depth != 0' failed.
+>>> qemu-ppc: /home/laurent/Projects/qemu/include/qemu/rcu.h:89:
+>>> rcu_read_unlock: Assertion `p_rcu_reader->depth != 0' failed.
+>>> qemu-ppc: /home/laurent/Projects/qemu/include/qemu/rcu.h:89:
+>>> rcu_read_unlock: Assertion `p_rcu_reader->depth != 0' failed.
+>>> ...
+>>
+>> Interesting. I can only think the current_cpu change has broken it
+>> because most of the changes in this commit affect softmmu targets only
+>> (linux-user has its own run loop).
+>>
+>> Thanks for the report - I'll look into it.
+>
+> After:
+>
+>      95b0eca Merge remote-tracking branch
+> 'remotes/stsquad/tags/pull-mttcg-fixups-090317-1' into staging
+>
+> [Tested with my HEAD on:
+> b1616fe Merge remote-tracking branch
+> 'remotes/famz/tags/docker-pull-request' into staging]
+>
+> I have now:
+>
+> <<<test_start>>>
+> tag=setgroups03 stime=1489413401
+> cmdline="setgroups03"
+> contacts=""
+> analysis=exit
+> <<<test_output>>>
+> **
+> ERROR:/home/laurent/Projects/qemu/cpu-exec.c:656:cpu_exec: assertion
+> failed: (cpu == current_cpu)
+> **
 
-I mostly agree; I kind of fancy the idea of having one per NUMA node;
-but a central distributor might be a good idea anyway in the cases
-where you find the heavy-writer all happens to be in the same area.
+OK we now understand what's happening:
 
-> 
-> I need to study the code more to understand another issue.  Say you have
-> a page that is sent to two different threads in two different
-> iterations, like
-> 
->     thread 1
->       iteration 1: pages 3, 7
->     thread 2
->       iteration 1: page 3
->       iteration 2: page 7
-> 
-> Does the code ensure that all threads wait at the end of an iteration?
-> Otherwise, thread 2 could process page 7 from iteration 2 before or
-> while thread 1 processes the same page from iteration 1.
+ - setgroups calls __nptl_setxid_error, triggers abort()
+   - this sends sig_num 6, then 11
+ - host_signal_handler tries to handle 11
+ - -> handle_cpu_signal
 
-I think there's a sync at the end of each iteration on Juan's current code
-that stops that.
+Pre: tcg: enable thread-per-vCPU caused this problem:
 
-Dave
+ - current_cpu was reset to NULL on the way out of the loop
+ - therefore handle_cpu_signal went boom because
+     cpu = current_cpu;
+     cc = CPU_GET_CLASS(cpu);
 
-> 
-> Paolo
+Post: tcg: enable thread-per-vCPU caused this problem:
+
+ - current_cpu is now live outside cpu_exec_loop
+   - this is mainly so async_work functions can assert (cpu == current_cpu)
+ - hence handle_cpu_signal gets further and calls
+    cpu_loop_exit(cpu);
+ - hilarity ensues as we siglongjmp into a stale context
+
+Obviously we shouldn't try to siglongjmp. But we also shouldn't rely on
+current_cpu as a proxy to crash early when outside of the loop. There is
+a slight wrinkle that we also have funny handling of segs during
+translation if a guest jumps to code in an as-yet un-mapped region of
+memory.
+
+There is currently cpu->running which is set/cleared by
+cpu_exec_start/end. Although if we crash between cpu_exec_start and
+sigsetjmp the same sort of brokenness might happen.
+
+Anyway understood now. If anyone has any suggestions for neater stuff
+over the weekend please shout, otherwise I'll probably just hack
+handle_cpu_signal to do:
+
+   cpu = current_cpu;
+   if (!cpu->running) {
+      /* we weren't running or translating JIT code when the signal came */
+      return 1;
+   }
+
+
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Alex Bennée
