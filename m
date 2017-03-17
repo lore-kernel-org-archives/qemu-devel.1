@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37491)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cp1Ah-0003gx-KD
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 19:20:36 -0400
+	(envelope-from <mike.kravetz@oracle.com>) id 1cp1Hk-0005Bz-Em
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 19:27:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cp1Ac-0004pn-KG
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 19:20:35 -0400
-Received: from 10.mo69.mail-out.ovh.net ([46.105.73.241]:48694)
+	(envelope-from <mike.kravetz@oracle.com>) id 1cp1Hg-0007Ss-Fh
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 19:27:52 -0400
+Received: from aserp1040.oracle.com ([141.146.126.69]:18469)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cp1Ac-0004pd-DN
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 19:20:30 -0400
-Received: from player738.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 874171C870
-	for <qemu-devel@nongnu.org>; Sat, 18 Mar 2017 00:20:27 +0100 (CET)
-From: Greg Kurz <groug@kaod.org>
-Date: Sat, 18 Mar 2017 00:20:19 +0100
-Message-ID: <148979281961.4342.6047114276763582872.stgit@bahia.lan>
+	(Exim 4.71) (envelope-from <mike.kravetz@oracle.com>)
+	id 1cp1Hg-0007Sj-6D
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 19:27:48 -0400
+References: <CGME20170310140816eucas1p2bd85d3759739d64bb184ce0fbd74f90d@eucas1p2.samsung.com>
+	<20170310140806.GA11225@aperevalov-ubuntu>
+	<20170313105338.GA2626@work-vm> <20170313214636.GK27056@redhat.com>
+	<8d9cb1a5-3961-dde3-cf4c-f013f7c92620@samsung.com>
+From: Mike Kravetz <mike.kravetz@oracle.com>
+Message-ID: <f768dcd7-a57b-03bf-b697-dd6cabac2574@oracle.com>
+Date: Fri, 17 Mar 2017 16:27:41 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <8d9cb1a5-3961-dde3-cf4c-f013f7c92620@samsung.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v3] 9pfs: proxy: assert if unmarshal fails
+Subject: Re: [Qemu-devel] Dual userfaultfd behavior
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,104 +30,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>, Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Alexey Perevalov <a.perevalov@samsung.com>, Andrea Arcangeli <aarcange@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
 
-Replies from the virtfs proxy are made up of a fixed-size header (8 bytes)
-and a payload of variable size (maximum 64kb). When receiving a reply,
-the proxy backend first reads the whole header and then unmarshals it.
-If the header is okay, it then does the same operation with the payload.
+On 03/15/2017 06:47 AM, Alexey Perevalov wrote:
+> Hi Andrea,
+> 
+> thank you for so perfect design description,
+> 
+> the main question who will do RFC patches,
+> you or Mike or if you not against I could try.
 
-Since the proxy backend uses a pre-allocated buffer which has enough room
-for a header and the maximum payload size, marshalling should never fail
-with fixed size arguments. Any error here is likely to result from a more
-serious corruption in QEMU and we'd better dump core right away.
+Sorry for not replying sooner, I have been away from e-mail.
 
-This patch adds error checks where they are missing and converts the
-associated error paths into assertions.
+I have some other projects which require attention before I could start
+any in depth work on this issue. 
 
-This should also address Coverity's complaints CID 1348519 and CID 1348520,
-about not always checking the return value of proxy_unmarshal().
+> On 03/14/2017 12:46 AM, Andrea Arcangeli wrote:
+>> I think what is needed is an extension to UFFDIO_COPY so that it will
+>> not fail if used with lower granularity than the hugetlbfs page
+>> size. Then a special feature flag should be set in the
+>> uffdio_api.features to tell userland it can use a lower granularity
+>> than the hugetlbfs page size.
+>>
+>> UFFDIO_COPY will still allocate a 1GB page, but it will copy only part
+>> of and then map only the copied part with a pte of 4k granularity (or
+>> 2MB granularity if the uffdio_copy.dst/len parameters allows for
+>> hugepmds). This way if there's a missing fault in the part that is not
+>> copied yet, it'll still trigger a page fault and we'll call
+>> handle_userfault from hugetlb_no_page, which will trigger a new
+>> UFFDIO_COPY and map another fragment of the 1GB page.
+>> The same code than should allow us to map a 2MB hugetlbfs page with 4k
+>> granularity in UFFDIO_COPY so then userland can choose if to do
+>> postcopy live migration on hugetlbfs with 2MB or 4kb granularity (on
+>> very slow network 4kb would be preferable for example for the latency).
+>>
+>> Mapping a 1GB page without a hugepud or mapping a 2MB page without a
+>> hugepmd breaks all sort of invariants into the hugetlbfs code, page
+>> migration wouldn't be able to cope with it either. Solving the fallout
+>> from such breakage is what is required to implement this basically.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
-v3: - completely get rid of sizeof() and QEMU_BUILD_BUG_ON() as it was
-      confusing. Only use literal values in checks finally.
----
- hw/9pfs/9p-proxy.c |   22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+Agree!
 
-diff --git a/hw/9pfs/9p-proxy.c b/hw/9pfs/9p-proxy.c
-index f4aa7a9d70f8..28b20a7c3dfa 100644
---- a/hw/9pfs/9p-proxy.c
-+++ b/hw/9pfs/9p-proxy.c
-@@ -165,7 +165,8 @@ static int v9fs_receive_response(V9fsProxy *proxy, int type,
-         return retval;
-     }
-     reply->iov_len = PROXY_HDR_SZ;
--    proxy_unmarshal(reply, 0, "dd", &header.type, &header.size);
-+    retval = proxy_unmarshal(reply, 0, "dd", &header.type, &header.size);
-+    assert(retval == 4 * 2);
-     /*
-      * if response size > PROXY_MAX_IO_SZ, read the response but ignore it and
-      * return -ENOBUFS
-@@ -194,9 +195,7 @@ static int v9fs_receive_response(V9fsProxy *proxy, int type,
-     if (header.type == T_ERROR) {
-         int ret;
-         ret = proxy_unmarshal(reply, PROXY_HDR_SZ, "d", status);
--        if (ret < 0) {
--            *status = ret;
--        }
-+        assert(ret == 4);
-         return 0;
-     }
- 
-@@ -213,6 +212,7 @@ static int v9fs_receive_response(V9fsProxy *proxy, int type,
-                                  &prstat.st_atim_sec, &prstat.st_atim_nsec,
-                                  &prstat.st_mtim_sec, &prstat.st_mtim_nsec,
-                                  &prstat.st_ctim_sec, &prstat.st_ctim_nsec);
-+        assert(retval == 8 * 3 + 4 * 3 + 8 * 10);
-         prstat_to_stat(response, &prstat);
-         break;
-     }
-@@ -225,6 +225,7 @@ static int v9fs_receive_response(V9fsProxy *proxy, int type,
-                                  &prstfs.f_files, &prstfs.f_ffree,
-                                  &prstfs.f_fsid[0], &prstfs.f_fsid[1],
-                                  &prstfs.f_namelen, &prstfs.f_frsize);
-+        assert(retval == 8 * 11);
-         prstatfs_to_statfs(response, &prstfs);
-         break;
-     }
-@@ -246,7 +247,8 @@ static int v9fs_receive_response(V9fsProxy *proxy, int type,
-         break;
-     }
-     case T_GETVERSION:
--        proxy_unmarshal(reply, PROXY_HDR_SZ, "q", response);
-+        retval = proxy_unmarshal(reply, PROXY_HDR_SZ, "q", response);
-+        assert(retval == 8);
-         break;
-     default:
-         return -1;
-@@ -274,18 +276,16 @@ static int v9fs_receive_status(V9fsProxy *proxy,
-         return retval;
-     }
-     reply->iov_len = PROXY_HDR_SZ;
--    proxy_unmarshal(reply, 0, "dd", &header.type, &header.size);
--    if (header.size != sizeof(int)) {
--        *status = -ENOBUFS;
--        return 0;
--    }
-+    retval = proxy_unmarshal(reply, 0, "dd", &header.type, &header.size);
-+    assert(retval == 4 * 2);
-     retval = socket_read(proxy->sockfd,
-                          reply->iov_base + PROXY_HDR_SZ, header.size);
-     if (retval < 0) {
-         return retval;
-     }
-     reply->iov_len += header.size;
--    proxy_unmarshal(reply, PROXY_HDR_SZ, "d", status);
-+    retval = proxy_unmarshal(reply, PROXY_HDR_SZ, "d", status);
-+    assert(retval == 4);
-     return 0;
- }
- 
+I was wondering if it might be easier or more straight forward to split
+the target vma.  You would then create a new vma of the copy page size
+to be used during the copy.  In this way the the mappings and page table
+entries remain as expected.
+
+Of course, you would still want to allocate a huge page of the original
+target vma size and map that as smaller page sizes are copied.  I don't
+think there is anything that does something similar today.
+
+When the copy is done (or aborted) we then create/convert a new vma for
+the huge page and merge it into the target vma(s).
+
+Not sure if that would be any easier.  It was just the first thing that
+popped into my head.
+
+-- 
+Mike Kravetz
