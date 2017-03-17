@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cozJL-0002nC-Ix
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 17:21:25 -0400
+	(envelope-from <James.Hogan@imgtec.com>) id 1cozsN-00047W-2l
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 17:57:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cozJH-00045S-H0
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 17:21:23 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:34329)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cozJH-00045J-BN
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 17:21:19 -0400
-Received: by mail-qk0-x244.google.com with SMTP id v127so11346279qkb.1
-	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 14:21:19 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1489757419-8179-1-git-send-email-paul.durrant@citrix.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f8f4b60f-8407-7e56-4fac-70704f3b4c87@amsat.org>
-Date: Fri, 17 Mar 2017 18:21:14 -0300
+	(envelope-from <James.Hogan@imgtec.com>) id 1cozsJ-0000Wd-QE
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 17:57:34 -0400
+Received: from mailapp01.imgtec.com ([195.59.15.196]:17869
+	helo=imgpgp01.kl.imgtec.org)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <James.Hogan@imgtec.com>)
+	id 1cozsJ-0000Vi-H0
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 17:57:31 -0400
+Date: Fri, 17 Mar 2017 21:57:25 +0000
+From: James Hogan <james.hogan@imgtec.com>
+Message-ID: <20170317215725.GJ996@jhogan-linux.le.imgtec.org>
 MIME-Version: 1.0
-In-Reply-To: <1489757419-8179-1-git-send-email-paul.durrant@citrix.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] xen: use libxendevice model to restrict
- operations
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="b2kq0H0UHH9HR3v2"
+Content-Disposition: inline
+Subject: [Qemu-devel] [BUG] virtio-net linux driver fails to probe on MIPS
+ Malta since 'hw/virtio-pci: fix virtio behaviour'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,174 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <paul.durrant@citrix.com>, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
+To: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Jason Wang <jasowang@redhat.com>, virtualization@lists.linux-foundation.org
 
-Hi Paul,
+--b2kq0H0UHH9HR3v2
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 
-On 03/17/2017 10:30 AM, Paul Durrant wrote:
-> This patch adds a command-line option (-xen-domid-restrict) which will
-> use the new libxendevicemodel API to restrict devicemodel operations to
-> the specified domid.
->
-> This patch also adds a tracepoint to allow successful enabling of the
-> restriction to be monitored.
->
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-> ---
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
->
-> NOTE: This is already re-based on Juergen Gross's patch "xen: use 5 digit
->       xen versions" and so should not be applied until after that patch
->       has been applied.
-> ---
->  hw/xen/trace-events         |  1 +
->  include/hw/xen/xen.h        |  1 +
->  include/hw/xen/xen_common.h | 23 +++++++++++++++++++++++
->  qemu-options.hx             |  6 ++++++
->  vl.c                        |  8 ++++++++
->  xen-hvm.c                   |  8 ++++++++
->  6 files changed, 47 insertions(+)
->
-> diff --git a/hw/xen/trace-events b/hw/xen/trace-events
-> index c4fb6f1..a5b5e8b 100644
-> --- a/hw/xen/trace-events
-> +++ b/hw/xen/trace-events
-> @@ -11,3 +11,4 @@ xen_map_portio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %
->  xen_unmap_portio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %u start: %#"PRIx64" end: %#"PRIx64
->  xen_map_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
->  xen_unmap_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
-> +xen_domid_restrict(void) ""
-> diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
-> index 2b1733b..7efcdaa 100644
-> --- a/include/hw/xen/xen.h
-> +++ b/include/hw/xen/xen.h
-> @@ -21,6 +21,7 @@ enum xen_mode {
->
->  extern uint32_t xen_domid;
->  extern enum xen_mode xen_mode;
-> +extern bool xen_domid_restrict;
->
->  extern bool xen_allowed;
->
-> diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
-> index df098c7..5962bc4 100644
-> --- a/include/hw/xen/xen_common.h
-> +++ b/include/hw/xen/xen_common.h
-> @@ -152,6 +152,13 @@ static inline int xendevicemodel_set_mem_type(
->      return xc_hvm_set_mem_type(dmod, domid, mem_type, first_pfn, nr);
->  }
->
-> +static inline int xendevicemodel_restrict(
-> +    xendevicemodel_handle *dmod, domid_t domid)
-> +{
-> +    errno = ENOTTY;
-> +    return -1;
-> +}
-> +
->  #else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
->
->  #include <xendevicemodel.h>
-> @@ -206,6 +213,22 @@ static inline int xen_modified_memory(domid_t domid, uint64_t first_pfn,
->      return xendevicemodel_modified_memory(xen_dmod, domid, first_pfn, nr);
->  }
->
-> +static inline int xen_restrict(domid_t domid)
-> +{
-> +    int rc = xendevicemodel_restrict(xen_dmod, domid);
+Hi,
 
-might it be more useful to log the retcode?
+I've bisected the following failure of the virtio_net linux v4.10 driver
+to probe in QEMU v2.9.0-rc1 emulating a MIPS Malta machine:
 
-        trace_xen_domid_restrict(rc);
+virtio_net virtio0: virtio: device uses modern interface but does not have VIRTIO_F_VERSION_1
+virtio_net: probe of virtio0 failed with error -22
 
-> +
-> +    if (rc == 0) {
-> +        trace_xen_domid_restrict();
+To QEMU commit 9a4c0e220d8a ("hw/virtio-pci: fix virtio behaviour").
 
-and drop the previous line.
+It appears that adding ",disable-modern=on,disable-legacy=off" to the
+virtio-net -device makes it work again.
 
-> +        return 0;
-> +    }
-> +
-> +    if (errno == ENOTTY) {
-> +        return 0;
-> +    }
-> +
-> +    return rc;
-> +}
-> +
->  /* Xen 4.2 through 4.6 */
->  #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40701
->
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 99af8ed..4aab077 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -3354,6 +3354,10 @@ DEF("xen-attach", 0, QEMU_OPTION_xen_attach,
->      "-xen-attach     attach to existing xen domain\n"
->      "                xend will use this when starting QEMU\n",
->      QEMU_ARCH_ALL)
-> +DEF("xen-domid-restrict", 0, QEMU_OPTION_xen_domid_restrict,
-> +    "-xen-domid-restrict     restrict set of available xen operations\n"
-> +    "                        to specified domain id\n",
-> +    QEMU_ARCH_ALL)
->  STEXI
->  @item -xen-domid @var{id}
->  @findex -xen-domid
-> @@ -3366,6 +3370,8 @@ Warning: should not be used when xend is in use (XEN only).
->  @findex -xen-attach
->  Attach to existing xen domain.
->  xend will use this when starting QEMU (XEN only).
-> +@findex -xen-domid-restrict
-> +Restrict set of available xen operations to specified domain id (XEN only).
->  ETEXI
->
->  DEF("no-reboot", 0, QEMU_OPTION_no_reboot, \
-> diff --git a/vl.c b/vl.c
-> index 0b4ed52..f46e070 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -205,6 +205,7 @@ static NotifierList machine_init_done_notifiers =
->  bool xen_allowed;
->  uint32_t xen_domid;
->  enum xen_mode xen_mode = XEN_EMULATE;
-> +bool xen_domid_restrict;
->
->  static int has_defaults = 1;
->  static int default_serial = 1;
-> @@ -3933,6 +3934,13 @@ int main(int argc, char **argv, char **envp)
->                  }
->                  xen_mode = XEN_ATTACH;
->                  break;
-> +            case QEMU_OPTION_xen_domid_restrict:
-> +                if (!(xen_available())) {
-> +                    error_report("Option not supported for this target");
-> +                    exit(1);
-> +                }
-> +                xen_domid_restrict = true;
-> +                break;
->              case QEMU_OPTION_trace:
->                  g_free(trace_file);
->                  trace_file = trace_opt_parse(optarg);
-> diff --git a/xen-hvm.c b/xen-hvm.c
-> index 4b928cf..335e263 100644
-> --- a/xen-hvm.c
-> +++ b/xen-hvm.c
-> @@ -1226,6 +1226,14 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
->          goto err;
->      }
->
-> +    if (xen_domid_restrict) {
-> +        rc = xen_restrict(xen_domid);
-> +        if (rc < 0) {
-> +            error_report("failed to restrict: error %d", errno);
-> +            goto err;
-> +        }
-> +    }
-> +
->      xen_create_ioreq_server(xen_domid, &state->ioservid);
->
->      state->exit.notify = xen_exit_notifier;
->
+I presume this should really just work out of the box. Any ideas why it
+isn't?
+
+Cheers
+James
+
+--b2kq0H0UHH9HR3v2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBCAAGBQJYzFu+AAoJEGwLaZPeOHZ6IWIQAK3U2bObQkB4OIciXq5H0esi
+bewn7ECE2gsVk0VLmbw612zQAwwjwj2frU43+nz2W3tQ8LDyDeCyfz1f4PqQawt6
+e0WiqOcPwjF7N8nw790AsRc0xK/N2Kjkg+aoipq9hNTJxETaChTso5KeilWHKxM6
+/RWXcyCy7sA2gYK2brnxmqMoJNY1+x4Fko3qMveSaWBm1t7Ia60c3p8AUuscU/H+
+Av9WIzurEkaN6RMaas014osea290fC169JzUAUMwzlfibxy5FmA4J/8lSDMeB/F3
+hp8XhV2OAgWqzSXSdB2n2SIwUJgBju6qTZQmjiWw+vOUIXGNO24OrsBm0pKiVHfX
+VJzCyeaTg6I0Pjs0GD6WUJJFf8IEP+e4WHOlBsbPtkPBDt8CXoKnXxdnPiQVK/11
+dom9ihXN4bGOlJBenrVhfydVe2kdIL0X9HPny9CXVdljjKm6JmzjAqXqou9NqK1J
+XikEUZTgzGw8THkTzyktKYwctl1++7W9oJsVdRGNR+v+XVkEsKNx+dIPwToPRnTU
+0PSF+TRAAOqDgVu9Jd8ZVBr/3N1bg/VataPWuKOeGuOIuaB+HRb9YxydjtBFqoeX
+AquU+PHVBaB9Nt1OzhYkuTXfXIgD5URp8dWUiNPOTgXQhzpFLTbRWokazHWw1E/H
+r8kZB0+T9RewbIOTvAOg
+=bkeO
+-----END PGP SIGNATURE-----
+
+--b2kq0H0UHH9HR3v2--
