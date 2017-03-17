@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cop0u-0001nf-Fq
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 06:21:41 -0400
+	(envelope-from <thuth@redhat.com>) id 1cop9t-0003oF-Sf
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 06:30:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cop0t-0006MJ-PI
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 06:21:40 -0400
-Date: Fri, 17 Mar 2017 11:21:28 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170317102128.GA5072@noname.redhat.com>
-References: <20170317015630.30396-1-famz@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1cop9p-0001WV-29
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 06:30:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51260)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cop9o-0001Va-S0
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 06:30:52 -0400
+References: <CAFEAcA9pqDoCWrPAJ+KVxLC_eRy-xRg36oYuARYg2YP8VpGpBg@mail.gmail.com>
+	<20170316154643.GT15193@redhat.com>
+	<CAFEAcA9WdjkAr0eWNApWQGZAw4_67sci3LtY8=9pzYDcDXiLmg@mail.gmail.com>
+	<0f504dd2-235b-7ada-98b2-e0ccbd376fa7@redhat.com>
+	<7e86352b-add7-7b73-4e6b-08016b3e7a5d@redhat.com>
+	<20170317101257.GB8050@redhat.com>
+	<CAFEAcA9vYs2aCaDON6FDBzG9P8Vo73e3o1NfC=W4FbGQPSVapg@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <73b74fc6-033d-de06-5e00-50868f6862a6@redhat.com>
+Date: Fri, 17 Mar 2017 11:30:46 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170317015630.30396-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9] block: Propagate error in
- bdrv_open_backing_file
+In-Reply-To: <CAFEAcA9vYs2aCaDON6FDBzG9P8Vo73e3o1NfC=W4FbGQPSVapg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Proposal for deprecating unsupported host OSes &
+ architecutures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,12 +33,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Sean Bruno <sbruno@freebsd.org>
 
-Am 17.03.2017 um 02:56 hat Fam Zheng geschrieben:
-> Signed-off-by: Fam Zheng <famz@redhat.com>
+On 17.03.2017 11:15, Peter Maydell wrote:
+> On 17 March 2017 at 10:12, Daniel P. Berrange <berrange@redhat.com> wrote:
+>> In the mail thread two months back Sean Bruno did suggest he might like
+>> to just start over with bsd-user:
+>>
+>>   https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg00171.html
+>>
+>> So perhaps someone should just ping him to see if he objects to us
+>> deleting bsd-usr now (on off chance he's got patches nearly ready to
+>> fix it)
+> 
+> It's because Sean is (on-and-off) still around that I'm not
+> very inclined to delete bsd-user. We actually have somebody
+> who cares about the code, which means we should move it into
+> tier 1, not dump it into tier 3 and delete.
 
-Thanks, applied to the block branch.
+OK, fair, but even Sean was suggesting to purge the old code first ...
+so maybe we should just do so and start with a new bsd-user folder when
+he is ready?
 
-Kevin
+ Thomas
