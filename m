@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1comz8-0006aI-RE
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 04:11:44 -0400
+	(envelope-from <clg@kaod.org>) id 1conC9-0000i3-Kf
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 04:25:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1comz3-0007KJ-Sl
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 04:11:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59914)
+	(envelope-from <clg@kaod.org>) id 1conC5-0003gA-Lb
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 04:25:09 -0400
+Received: from 4.mo1.mail-out.ovh.net ([46.105.76.26]:45778)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1comz3-0007JP-KE
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 04:11:37 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D49A961B8C
-	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 08:11:36 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 17 Mar 2017 09:11:22 +0100
-Message-Id: <1489738282-28383-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH] ui/egl-helpers: fix egl 1.5 display init
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1conC5-0003fT-G8
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 04:25:05 -0400
+Received: from player756.ha.ovh.net (b7.ovh.net [213.186.33.57])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id F100F5A71C
+	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 09:25:00 +0100 (CET)
+References: <1447201710-10229-1-git-send-email-benh@kernel.crashing.org>
+	<1447201710-10229-49-git-send-email-benh@kernel.crashing.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <22f93cf3-faa4-f912-2d98-41d7f149029b@kaod.org>
+Date: Fri, 17 Mar 2017 09:24:58 +0100
+MIME-Version: 1.0
+In-Reply-To: <1447201710-10229-49-git-send-email-benh@kernel.crashing.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 48/77] ppc/pnv: Add model for
+ Power8 PHB3 PCIe Host bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,90 +31,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: hdegoede@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, Frediano Ziglio <fziglio@redhat.com>
+To: Benjamin Herrenschmidt <benh@kernel.crashing.org>, qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org
 
-Unfortunaly switching to getPlatformDisplayEXT isn't as easy as
-implemented by 0ea1523fb6703aa0dcd65e66b59e96fec028e60a.  See the
-longish comment for the complete story.
+Ben,
 
-Cc: Frediano Ziglio <fziglio@redhat.com>
-Suggested-by: Hans de Goede <hdegoede@redhat.com>
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- ui/egl-helpers.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 47 insertions(+), 6 deletions(-)
+Quick question,
 
-diff --git a/ui/egl-helpers.c b/ui/egl-helpers.c
-index 584dd1b..48686cf 100644
---- a/ui/egl-helpers.c
-+++ b/ui/egl-helpers.c
-@@ -192,6 +192,51 @@ EGLSurface qemu_egl_init_surface_x11(EGLContext ectx, Window win)
+> +/* This is called whenever the PHB LSI, MSI source ID register or
+> + * the PBCQ irq filters are written.
+> + */
+> +void pnv_phb3_remap_irqs(PnvPhb3State *phb)
+> +{
+> +    uint32_t local, global, count, mask, comp;
+> +    uint64_t baren;
+> +
+> +    /* First check if we are enabled. Unlike real HW we don't separate TX and RX
+> +     * so we enable if both are set
+> +     */
+> +    baren = phb->pbcq->nest_regs[PBCQ_NEST_BAR_EN];
+> +    if (!(baren & PBCQ_NEST_BAR_EN_IRSN_RX) ||
+> +        !(baren & PBCQ_NEST_BAR_EN_IRSN_TX)) {
+> +        phb->lsi_ics->offset = 0;
+> +        return;
+> +    }
+> +
+> +    /* Grab local LSI source ID */
+> +    local = GETFIELD(PHB_LSI_SRC_ID, phb->regs[PHB_LSI_SOURCE_ID >> 3]) << 3;
+> +
+> +    /* Grab global one and compare */
+> +    global = GETFIELD(PBCQ_NEST_LSI_SRC,
+> +                      phb->pbcq->nest_regs[PBCQ_NEST_LSI_SRC_ID]) << 3;
+> +    if (global != local) {
+> +        /* This happens during initialization, let's come back when we
+> +         * are properly configured
+> +         */
+> +        phb->lsi_ics->offset = 0;
+> +        return;
+> +    }
+> +
+> +    /* Get the base on the powerbus */
+> +    comp = GETFIELD(PBCQ_NEST_IRSN_COMP,
+> +                    phb->pbcq->nest_regs[PBCQ_NEST_IRSN_COMPARE]);
+> +    mask = GETFIELD(PBCQ_NEST_IRSN_COMP,
+> +                    phb->pbcq->nest_regs[PBCQ_NEST_IRSN_MASK]);
+> +    count = ((~mask) + 1) & 0x7ffff;
+> +    phb->total_irq = count;
+> +
+> +    /* Sanity checks */
+> +    if ((global + 8) > count) {
+> +        DBG_MAP(phb, "LSIs out of reach: LSI base=%d total irq=%d",
+> +                global, count);
+> +    }
+> +    if (count > 2048) {
+> +        DBG_MAP(phb, "More interrupts than supported: %d", count);
+> +    }
+> +    if ((comp & mask) != comp) {
+> +        DBG_MAP(phb, "IRQ compare bits not in mask: comp=0x%x mask=0x%x",
+> +                comp, mask);
+> +        comp &= mask;
+> +    }
+> +    /* Setup LSI offset */
+> +    phb->lsi_ics->offset = comp + global;
+> +
+> +    /* Setup MSI offset */
+> +    pnv_phb3_msi_update_config(phb->msis, comp, count);
+
+I changed that to :
+
+    pnv_phb3_msi_update_config(phb->msis, comp, count - PHB_NUM_LSI);
+
+else the IRQ numbers overlap with the LSI and I think this why we were 
+uselessly looping on the EOI.
+
+Correct ? 
+
+C.
  
- /* ---------------------------------------------------------------------- */
- 
-+/*
-+ * Taken from glamor_egl.h from the Xorg xserver, which is MIT licensed
-+ *
-+ * Create an EGLDisplay from a native display type. This is a little quirky
-+ * for a few reasons.
-+ *
-+ * 1: GetPlatformDisplayEXT and GetPlatformDisplay are the API you want to
-+ * use, but have different function signatures in the third argument; this
-+ * happens not to matter for us, at the moment, but it means epoxy won't alias
-+ * them together.
-+ *
-+ * 2: epoxy 1.3 and earlier don't understand EGL client extensions, which
-+ * means you can't call "eglGetPlatformDisplayEXT" directly, as the resolver
-+ * will crash.
-+ *
-+ * 3: You can't tell whether you have EGL 1.5 at this point, because
-+ * eglQueryString(EGL_VERSION) is a property of the display, which we don't
-+ * have yet. So you have to query for extensions no matter what. Fortunately
-+ * epoxy_has_egl_extension _does_ let you query for client extensions, so
-+ * we don't have to write our own extension string parsing.
-+ *
-+ * 4. There is no EGL_KHR_platform_base to complement the EXT one, thus one
-+ * needs to know EGL 1.5 is supported in order to use the eglGetPlatformDisplay
-+ * function pointer.
-+ * We can workaround this (circular dependency) by probing for the EGL 1.5
-+ * platform extensions (EGL_KHR_platform_gbm and friends) yet it doesn't seem
-+ * like mesa will be able to adverise these (even though it can do EGL 1.5).
-+ */
-+static EGLDisplay qemu_egl_get_display(void *native)
-+{
-+#ifdef EGL_PLATFORM_GBM_MESA
-+    /* In practise any EGL 1.5 implementation would support the EXT extension */
-+    if (epoxy_has_egl_extension(NULL, "EGL_EXT_platform_base")) {
-+        PFNEGLGETPLATFORMDISPLAYEXTPROC getPlatformDisplayEXT =
-+            (void *) eglGetProcAddress("eglGetPlatformDisplayEXT");
-+        if (getPlatformDisplayEXT) {
-+            return getPlatformDisplayEXT(EGL_PLATFORM_GBM_MESA, native, NULL);
-+        }
-+    }
-+#endif
-+
-+    /* fallback */
-+    return eglGetDisplay(native);
-+}
-+
- int qemu_egl_init_dpy(EGLNativeDisplayType dpy, bool gles, bool debug)
- {
-     static const EGLint conf_att_gl[] = {
-@@ -222,12 +267,8 @@ int qemu_egl_init_dpy(EGLNativeDisplayType dpy, bool gles, bool debug)
-         setenv("LIBGL_DEBUG", "verbose", true);
-     }
- 
--    egl_dbg("eglGetDisplay (dpy %p) ...\n", dpy);
--#ifdef EGL_MESA_platform_gbm
--    qemu_egl_display = eglGetPlatformDisplayEXT(EGL_PLATFORM_GBM_MESA, dpy, NULL);
--#else
--    qemu_egl_display = eglGetDisplay(dpy);
--#endif
-+    egl_dbg("qemu_egl_get_display (dpy %p) ...\n", dpy);
-+    qemu_egl_display = qemu_egl_get_display(dpy);
-     if (qemu_egl_display == EGL_NO_DISPLAY) {
-         error_report("egl: eglGetDisplay failed");
-         return -1;
--- 
-1.8.3.1
+> +
+> +    DBG_MAP(phb, "Initialized for %d interrupts @0x%x, LSI off=%d",
+> +            count, comp, global);
+> +}
+> +
