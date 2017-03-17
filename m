@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tianyu.lan@intel.com>) id 1coqBs-0003nq-Ul
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:37:06 -0400
+	(envelope-from <tianyu.lan@intel.com>) id 1coqBy-0003uM-Sh
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:37:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tianyu.lan@intel.com>) id 1coqBo-00079R-HI
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:37:04 -0400
-Received: from mga03.intel.com ([134.134.136.65]:56985)
+	(envelope-from <tianyu.lan@intel.com>) id 1coqBt-0007GD-W9
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:37:10 -0400
+Received: from mga02.intel.com ([134.134.136.20]:17799)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <tianyu.lan@intel.com>)
-	id 1coqBo-00076s-5s
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:37:00 -0400
+	id 1coqBt-0007E2-Jy
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:37:05 -0400
 From: Lan Tianyu <tianyu.lan@intel.com>
-Date: Fri, 17 Mar 2017 19:29:15 +0800
-Message-Id: <1489750157-17401-3-git-send-email-tianyu.lan@intel.com>
+Date: Fri, 17 Mar 2017 19:29:17 +0800
+Message-Id: <1489750157-17401-5-git-send-email-tianyu.lan@intel.com>
 In-Reply-To: <1489750157-17401-1-git-send-email-tianyu.lan@intel.com>
 References: <1489750157-17401-1-git-send-email-tianyu.lan@intel.com>
-Subject: [Qemu-devel] [RFC PATCH 2/4] Xen: add a dummy vIOMMU to
- create/destroy vIOMMU in Xen
+Subject: [Qemu-devel] [RFC PATCH 4/4] msi: taking interrupt format into
+ consideration during judging a pirq is binded with a event channel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,152 +25,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: xen-devel@lists.xensource.com, qemu-devel@nongnu.org
-Cc: chao.gao@intel.com, kevin.tian@intel.com, sstabellini@kernel.org, anthony.perard@citrix.com, Lan Tianyu <tianyu.lan@intel.com>
+To: qemu-devel@nongnu.org, xen-devel@lists.xensource.com
+Cc: chao.gao@intel.com, kevin.tian@intel.com, mst@redhat.com, marcel@redhat.com, sstabellini@kernel.org, anthony.perard@citrix.com, Lan Tianyu <tianyu.lan@intel.com>
 
 From: Chao Gao <chao.gao@intel.com>
 
-Since adding a dynamic sysbus device is forbidden, so choose TYPE_DEVICE
-as parent class.
+As remapping format interrupt has been introduced, the vector in msi remapping
+format can also be 0, same as a interrupt is binded with a event channel.
+So we can't just use whether vector is 0 or not to judge a msi is binded
+to a event channel or not.
+
+This patch takes the msi interrupt format into consideration.
 
 Signed-off-by: Chao Gao <chao.gao@intel.com>
 Signed-off-by: Lan Tianyu <tianyu.lan@intel.com>
 ---
- hw/xen/Makefile.objs |   1 +
- hw/xen/xen_viommu.c  | 116 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 117 insertions(+)
- create mode 100644 hw/xen/xen_viommu.c
+ hw/pci/msi.c         | 5 +++--
+ hw/pci/msix.c        | 4 +++-
+ hw/xen/xen_pt_msi.c  | 2 +-
+ include/hw/xen/xen.h | 2 +-
+ xen-hvm-stub.c       | 2 +-
+ xen-hvm.c            | 7 ++++++-
+ 6 files changed, 15 insertions(+), 7 deletions(-)
 
-diff --git a/hw/xen/Makefile.objs b/hw/xen/Makefile.objs
-index d367094..e37d808 100644
---- a/hw/xen/Makefile.objs
-+++ b/hw/xen/Makefile.objs
-@@ -3,3 +3,4 @@ common-obj-$(CONFIG_XEN_BACKEND) += xen_backend.o xen_devconfig.o
+diff --git a/hw/pci/msi.c b/hw/pci/msi.c
+index a87b227..8d1ac9e 100644
+--- a/hw/pci/msi.c
++++ b/hw/pci/msi.c
+@@ -289,7 +289,7 @@ void msi_reset(PCIDevice *dev)
+ static bool msi_is_masked(const PCIDevice *dev, unsigned int vector)
+ {
+     uint16_t flags = pci_get_word(dev->config + msi_flags_off(dev));
+-    uint32_t mask, data;
++    uint32_t mask, data, addr_lo;
+     bool msi64bit = flags & PCI_MSI_FLAGS_64BIT;
+     assert(vector < PCI_MSI_VECTORS_MAX);
  
- obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen-host-pci-device.o
- obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen_pt.o xen_pt_config_init.o xen_pt_graphics.o xen_pt_msi.o
-+obj-$(CONFIG_XEN) += xen_viommu.o
-diff --git a/hw/xen/xen_viommu.c b/hw/xen/xen_viommu.c
-new file mode 100644
-index 0000000..9bf9158
---- /dev/null
-+++ b/hw/xen/xen_viommu.c
-@@ -0,0 +1,116 @@
-+/*
-+ * Xen virtual IOMMU (virtual VT-D)
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/error-report.h"
-+
-+#include "hw/qdev-core.h"
-+#include "hw/sysbus.h"
-+#include "hw/xen/xen.h"
-+#include "hw/xen/xen_backend.h"
-+
-+#define TYPE_XEN_VIOMMU_DEVICE "xen_viommu"
-+#define  XEN_VIOMMU_DEVICE(obj) \
-+    OBJECT_CHECK(XenVIOMMUState, (obj), TYPE_XEN_VIOMMU_DEVICE)
-+
-+typedef struct XenVIOMMUState XenVIOMMUState;
-+
-+struct XenVIOMMUState {
-+    DeviceState dev;
-+    uint32_t id;
-+    uint64_t cap;
-+    uint64_t base_addr;
-+};
-+
-+static void xen_viommu_realize(DeviceState *dev, Error **errp)
-+{
-+    int rc;
-+    uint64_t cap;
-+    char *dom;
-+    char viommu_path[1024];
-+    XenVIOMMUState *s = XEN_VIOMMU_DEVICE(dev);
-+
-+    s->id = -1;
-+    
-+    /* Read vIOMMU attributes from Xenstore. */
-+    dom = xs_get_domain_path(xenstore, xen_domid);
-+    snprintf(viommu_path, sizeof(viommu_path), "%s/viommu", dom);
-+    rc = xenstore_read_uint64(viommu_path, "base_addr", &s->base_addr);  
-+    if (rc) {
-+        error_report("Can't get base address of vIOMMU");
-+        exit(1);
-+    }
-+
-+    rc = xenstore_read_uint64(viommu_path, "cap", &s->cap);
-+    if (rc) {
-+        error_report("Can't get capabilities of vIOMMU");
-+        exit(1);
-+    }
-+
-+    rc = xc_viommu_query_cap(xen_xc, xen_domid, &cap);
-+    if (rc) {
-+        exit(1);
-+    }
-+
-+
-+    if ((cap & s->cap) != cap) {
-+        error_report("xen: Unsupported capability %lx", s->cap);
-+        exit(1);
-+    }
-+
-+    rc = xc_viommu_create(xen_xc, xen_domid, s->base_addr, s->cap, &s->id);
-+    if (rc) {
-+        s->id = -1;
-+        error_report("xen: failed(%d) to create viommu ", rc);
-+        exit(1);
-+    }
-+}
-+
-+static void xen_viommu_instance_finalize(Object *o)
-+{
-+    int rc;
-+    XenVIOMMUState *s = XEN_VIOMMU_DEVICE(o);
-+
-+    if (s->id != -1) {
-+        rc = xc_viommu_destroy(xen_xc, xen_domid, s->id); 
-+        if (rc) {
-+            error_report("xen: failed(%d) to destroy viommu ", rc);
-+        }
-+    }
-+}
-+
-+static void xen_viommu_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    dc->hotpluggable = false;
-+    dc->realize = xen_viommu_realize;
-+}
-+
-+static const TypeInfo xen_viommu_info = {
-+    .name              = TYPE_XEN_VIOMMU_DEVICE,
-+    .parent            = TYPE_SYS_BUS_DEVICE,
-+    .instance_size     = sizeof(XenVIOMMUState),
-+    .instance_finalize = xen_viommu_instance_finalize,
-+    .class_init        = xen_viommu_class_init,
-+};
-+
-+static void xen_viommu_register_types(void)
-+{
-+    type_register_static(&xen_viommu_info); 
-+}
-+
-+type_init(xen_viommu_register_types);
+@@ -298,7 +298,8 @@ static bool msi_is_masked(const PCIDevice *dev, unsigned int vector)
+     }
+ 
+     data = pci_get_word(dev->config + msi_data_off(dev, msi64bit));
+-    if (xen_is_pirq_msi(data)) {
++    addr_lo = pci_get_word(dev->config + msi_address_lo_off(dev));
++    if (xen_is_pirq_msi(data, addr_lo)) {
+         return false;
+     }
+ 
+diff --git a/hw/pci/msix.c b/hw/pci/msix.c
+index 0ec1cb1..6b8045a 100644
+--- a/hw/pci/msix.c
++++ b/hw/pci/msix.c
+@@ -81,9 +81,11 @@ static bool msix_vector_masked(PCIDevice *dev, unsigned int vector, bool fmask)
+ {
+     unsigned offset = vector * PCI_MSIX_ENTRY_SIZE;
+     uint8_t *data = &dev->msix_table[offset + PCI_MSIX_ENTRY_DATA];
++    uint8_t *addr_lo = &dev->msix_table[offset + PCI_MSIX_ENTRY_LOWER_ADDR];
+     /* MSIs on Xen can be remapped into pirqs. In those cases, masking
+      * and unmasking go through the PV evtchn path. */
+-    if (xen_enabled() && xen_is_pirq_msi(pci_get_long(data))) {
++    if (xen_enabled() && xen_is_pirq_msi(pci_get_long(data),
++                                         pci_get_long(addr_lo))) {
+         return false;
+     }
+     return fmask || dev->msix_table[offset + PCI_MSIX_ENTRY_VECTOR_CTRL] &
+diff --git a/hw/xen/xen_pt_msi.c b/hw/xen/xen_pt_msi.c
+index 8b0d7fc..f799fed 100644
+--- a/hw/xen/xen_pt_msi.c
++++ b/hw/xen/xen_pt_msi.c
+@@ -114,7 +114,7 @@ static int msi_msix_setup(XenPCIPassthroughState *s,
+ 
+     assert((!is_msix && msix_entry == 0) || is_msix);
+ 
+-    if (xen_is_pirq_msi(data)) {
++    if (xen_is_pirq_msi(data, (uint32_t)(addr & 0xffffffff))) {
+         *ppirq = msi_ext_dest_id(addr >> 32) | msi_dest_id(addr);
+         if (!*ppirq) {
+             /* this probably identifies an misconfiguration of the guest,
+diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
+index a8f3afb..c15beb5 100644
+--- a/include/hw/xen/xen.h
++++ b/include/hw/xen/xen.h
+@@ -33,7 +33,7 @@ int xen_pci_slot_get_pirq(PCIDevice *pci_dev, int irq_num);
+ void xen_piix3_set_irq(void *opaque, int irq_num, int level);
+ void xen_piix_pci_write_config_client(uint32_t address, uint32_t val, int len);
+ void xen_hvm_inject_msi(uint64_t addr, uint32_t data);
+-int xen_is_pirq_msi(uint32_t msi_data);
++int xen_is_pirq_msi(uint32_t msi_data, uint32_t msi_addr_lo);
+ 
+ qemu_irq *xen_interrupt_controller_init(void);
+ 
+diff --git a/xen-hvm-stub.c b/xen-hvm-stub.c
+index c500325..dae421c 100644
+--- a/xen-hvm-stub.c
++++ b/xen-hvm-stub.c
+@@ -31,7 +31,7 @@ void xen_hvm_inject_msi(uint64_t addr, uint32_t data)
+ {
+ }
+ 
+-int xen_is_pirq_msi(uint32_t msi_data)
++int xen_is_pirq_msi(uint32_t msi_data, uint32_t msi_addr_lo)
+ {
+     return 0;
+ }
+diff --git a/xen-hvm.c b/xen-hvm.c
+index 2f348ed..9e78b23 100644
+--- a/xen-hvm.c
++++ b/xen-hvm.c
+@@ -146,8 +146,13 @@ void xen_piix_pci_write_config_client(uint32_t address, uint32_t val, int len)
+     }
+ }
+ 
+-int xen_is_pirq_msi(uint32_t msi_data)
++int xen_is_pirq_msi(uint32_t msi_data, uint32_t msi_addr_lo)
+ {
++    /* If msi address is configurate to remapping format, the msi will not
++     * remapped into a pirq.
++     */
++    if ( msi_addr_lo & 0x10 )
++        return 0;
+     /* If vector is 0, the msi is remapped into a pirq, passed as
+      * dest_id.
+      */
 -- 
 1.8.3.1
