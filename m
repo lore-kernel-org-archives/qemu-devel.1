@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1coreg-0003O4-D6
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 09:10:55 -0400
+	(envelope-from <kwolf@redhat.com>) id 1corjY-0004S9-2K
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 09:15:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1coreb-0007Vn-E1
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 09:10:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34092)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <abologna@redhat.com>) id 1coreb-0007Uv-8j
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 09:10:49 -0400
-Message-ID: <1489756242.4270.6.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Fri, 17 Mar 2017 14:10:42 +0100
-In-Reply-To: <20170317115631.GG8050@redhat.com>
-References: <1489748902-21765-1-git-send-email-peter.maydell@linaro.org>
-	<20170317114953.GF8050@redhat.com>
-	<CAFEAcA8Sky0cX+7U257AdG=imYYcdqRgL--o=86xCHMY6Kr3zw@mail.gmail.com>
-	<20170317115631.GG8050@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] configure: Warn about deprecated hosts
+	(envelope-from <kwolf@redhat.com>) id 1corjX-0000eP-1I
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 09:15:55 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Fri, 17 Mar 2017 14:15:39 +0100
+Message-Id: <1489756546-27142-2-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1489756546-27142-1-git-send-email-kwolf@redhat.com>
+References: <1489756546-27142-1-git-send-email-kwolf@redhat.com>
+Subject: [Qemu-devel] [PULL 1/8] file-posix: clean up max_segments buffer
+ termination
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,23 +20,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Thomas Huth <thuth@redhat.com>, "patches@linaro.org" <patches@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-On Fri, 2017-03-17 at 11:56 +0000, Daniel P. Berrange wrote:
-> > Yeah. I'm just struggling with setting up a FreeBSD VM so we
-> > can compile test that. Interesting that GNU/kFreeBSD has users.
->=C2=A0
-> I wouldn't go so far as to say GNU/kFreeBSD has users. It had a few peo=
-ple
-> who have noticed bits of libvirt didn't compile at times, but I'm not s=
-ure
-> if they actually used the result, or were just building libvirt for sak=
-e of
-> having full platform coverage in Debian packages.
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-GNU/kFreeBSD is no longer a release architecture as of
-Debian 8.
+The following pattern is unsafe:
 
---=C2=A0
-Andrea Bolognani / Red Hat / Virtualization
+  char buf[32];
+  ret = read(fd, buf, sizeof(buf));
+  ...
+  buf[ret] = 0;
+
+If read(2) returns 32 then a byte beyond the end of the buffer is
+zeroed.
+
+In practice this buffer overflow does not occur because the sysfs
+max_segments file only contains an unsigned short + '\n'.  The string is
+always shorter than 32 bytes.
+
+Regardless, avoid this pattern because static analysis tools might
+complain and it could lead to real buffer overflows if copy-pasted
+elsewhere in the codebase.
+
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block/file-posix.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/file-posix.c b/block/file-posix.c
+index c4c0663..ac6bd9f 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -686,7 +686,7 @@ static int hdev_get_max_segments(const struct stat *st)
+         goto out;
+     }
+     do {
+-        ret = read(fd, buf, sizeof(buf));
++        ret = read(fd, buf, sizeof(buf) - 1);
+     } while (ret == -1 && errno == EINTR);
+     if (ret < 0) {
+         ret = -errno;
+-- 
+1.8.3.1
