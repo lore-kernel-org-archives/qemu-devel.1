@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1copOj-00013m-TJ
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 06:46:18 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1copRH-0003JL-Tk
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 06:48:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1copOf-0000bH-TH
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 06:46:17 -0400
-Resent-Message-Id: <E1copOf-0000bH-TH@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21317)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1copOf-0000Yt-LS
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 06:46:13 -0400
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148974755554.99.94270344831504864@6c512846dbc7>
-In-Reply-To: <148974701986.29545.5414999102981738774.stgit@bahia>
+	(envelope-from <peter.maydell@linaro.org>) id 1copRG-0001QQ-Oh
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 06:48:55 -0400
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:37800)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1copRG-0001QH-IX
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 06:48:54 -0400
+Received: by mail-wm0-x22c.google.com with SMTP id n11so12590414wma.0
+	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 03:48:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 17 Mar 2017 03:45:56 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] checkpatch: allow longer lines for logging
- functions
+In-Reply-To: <73b74fc6-033d-de06-5e00-50868f6862a6@redhat.com>
+References: <CAFEAcA9pqDoCWrPAJ+KVxLC_eRy-xRg36oYuARYg2YP8VpGpBg@mail.gmail.com>
+	<20170316154643.GT15193@redhat.com>
+	<CAFEAcA9WdjkAr0eWNApWQGZAw4_67sci3LtY8=9pzYDcDXiLmg@mail.gmail.com>
+	<0f504dd2-235b-7ada-98b2-e0ccbd376fa7@redhat.com>
+	<7e86352b-add7-7b73-4e6b-08016b3e7a5d@redhat.com>
+	<20170317101257.GB8050@redhat.com>
+	<CAFEAcA9vYs2aCaDON6FDBzG9P8Vo73e3o1NfC=W4FbGQPSVapg@mail.gmail.com>
+	<73b74fc6-033d-de06-5e00-50868f6862a6@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 17 Mar 2017 10:48:32 +0000
+Message-ID: <CAFEAcA8Ho-9Kah7xb36E7TtKdmZ=_UZtDG5xYTXJ-ZMW=U_ABw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] Proposal for deprecating unsupported host OSes &
+ architecutures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +36,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: groug@kaod.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Sean Bruno <sbruno@freebsd.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ4
-OTc0NzAxOTg2LjI5NTQ1LjU0MTQ5OTkxMDI5ODE3Mzg3NzQuc3RnaXRAYmFoaWEKU3ViamVjdDog
-W1FlbXUtZGV2ZWxdIFtQQVRDSF0gY2hlY2twYXRjaDogYWxsb3cgbG9uZ2VyIGxpbmVzIGZvciBs
-b2dnaW5nIGZ1bmN0aW9ucwpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
-IyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFT
-RS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMg
-VHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIK
-Zm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6
-ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMg
-LS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRo
-ZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRv
-bmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1
-YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNv
-bS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzE0ODk3
-NDcwMTk4Ni4yOTU0NS41NDE0OTk5MTAyOTgxNzM4Nzc0LnN0Z2l0QGJhaGlhIC0+IHBhdGNoZXcv
-MTQ4OTc0NzAxOTg2LjI5NTQ1LjU0MTQ5OTkxMDI5ODE3Mzg3NzQuc3RnaXRAYmFoaWEKICogW25l
-dyB0YWddICAgICAgICAgcGF0Y2hldy8xNDg5NzQ3NDQyODEuMzA2MzYuMTc5NzMyNjQwMDgyODU0
-MTU1OTIuc3RnaXRAYmFoaWEgLT4gcGF0Y2hldy8xNDg5NzQ3NDQyODEuMzA2MzYuMTc5NzMyNjQw
-MDgyODU0MTU1OTIuc3RnaXRAYmFoaWEKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwoz
-OTBkN2M0IGNoZWNrcGF0Y2g6IGFsbG93IGxvbmdlciBsaW5lcyBmb3IgbG9nZ2luZyBmdW5jdGlv
-bnMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogY2hlY2twYXRjaDog
-YWxsb3cgbG9uZ2VyIGxpbmVzIGZvciBsb2dnaW5nIGZ1bmN0aW9ucy4uLgpFUlJPUjogbGluZSBv
-dmVyIDkwIGNoYXJhY3RlcnMKIzM4OiBGSUxFOiBzY3JpcHRzL2NoZWNrcGF0Y2gucGw6MTM0OToK
-KwkJICAgICEoJGxpbmUgPX4gL15cK1xzKiRsb2dGdW5jdGlvbnNccypcKFxzKig/OihbXiJdKikp
-PyJbWFx0XSoiXHMqKD86LHxcKVxzKjspXHMqJC8gfHwKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJu
-aW5ncywgMjAgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
-ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
-cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
-RVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTog
-MQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8v
-cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
-QGZyZWVsaXN0cy5vcmc=
+On 17 March 2017 at 10:30, Thomas Huth <thuth@redhat.com> wrote:
+> On 17.03.2017 11:15, Peter Maydell wrote:
+>> On 17 March 2017 at 10:12, Daniel P. Berrange <berrange@redhat.com> wrote:
+>>> In the mail thread two months back Sean Bruno did suggest he might like
+>>> to just start over with bsd-user:
+>>>
+>>>   https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg00171.html
+>>>
+>>> So perhaps someone should just ping him to see if he objects to us
+>>> deleting bsd-usr now (on off chance he's got patches nearly ready to
+>>> fix it)
+>>
+>> It's because Sean is (on-and-off) still around that I'm not
+>> very inclined to delete bsd-user. We actually have somebody
+>> who cares about the code, which means we should move it into
+>> tier 1, not dump it into tier 3 and delete.
+>
+> OK, fair, but even Sean was suggesting to purge the old code first ...
+> so maybe we should just do so and start with a new bsd-user folder when
+> he is ready?
+
+That's not so great for the other BSDs, and I'm not convinced that
+"here's a huge pile of code" is going to be easier to review than
+the incremental changes.
+
+(It's the "what's easiest to review" part I think is most important.)
+
+thanks
+-- PMM
