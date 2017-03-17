@@ -1,17 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1copOd-0000zU-8C
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 06:46:12 -0400
+	(envelope-from <no-reply@patchew.org>) id 1copOj-00013m-TJ
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 06:46:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1copOZ-0000T8-6e
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 06:46:11 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri, 17 Mar 2017 18:45:41 +0800
-Message-Id: <20170317104541.28979-4-stefanha@redhat.com>
-In-Reply-To: <20170317104541.28979-1-stefanha@redhat.com>
-References: <20170317104541.28979-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/3] qemu-img: print short help on getopt
- failure
+	(envelope-from <no-reply@patchew.org>) id 1copOf-0000bH-TH
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 06:46:17 -0400
+Resent-Message-Id: <E1copOf-0000bH-TH@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21317)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1copOf-0000Yt-LS
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 06:46:13 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148974755554.99.94270344831504864@6c512846dbc7>
+In-Reply-To: <148974701986.29545.5414999102981738774.stgit@bahia>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 17 Mar 2017 03:45:56 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] checkpatch: allow longer lines for logging
+ functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,341 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, mreitz@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
+To: groug@kaod.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com
 
-Printing the full help output obscures the error message for an invalid
-command-line option or missing argument.
-
-Before this patch:
-
-  $ ./qemu-img --foo
-  ...pages of output...
-
-After this patch:
-
-  $ ./qemu-img --foo
-  qemu-img: unrecognized option '--foo'
-  Try 'qemu-img --help' for more information
-
-This patch adds the getopt ':' character so that it can distinguish
-between missing arguments and unrecognized options.  This helps provide
-more detailed error messages.
-
-Suggested-by: Max Reitz <mreitz@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- qemu-img.c | 117 ++++++++++++++++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 97 insertions(+), 20 deletions(-)
-
-diff --git a/qemu-img.c b/qemu-img.c
-index c7ffabb..b220cf7 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -88,6 +88,16 @@ static void QEMU_NORETURN GCC_FMT_ATTR(1, 2) error_exit(const char *fmt, ...)
-     exit(EXIT_FAILURE);
- }
- 
-+static void QEMU_NORETURN missing_argument(const char *option)
-+{
-+    error_exit("missing argument for option '%s'", option);
-+}
-+
-+static void QEMU_NORETURN unrecognized_option(const char *option)
-+{
-+    error_exit("unrecognized option '%s'", option);
-+}
-+
- /* Please keep in synch with qemu-img.texi */
- static void QEMU_NORETURN help(void)
- {
-@@ -406,13 +416,18 @@ static int img_create(int argc, char **argv)
-             {"object", required_argument, 0, OPTION_OBJECT},
-             {0, 0, 0, 0}
-         };
--        c = getopt_long(argc, argv, "F:b:f:he6o:q",
-+        c = getopt_long(argc, argv, ":F:b:f:he6o:q",
-                         long_options, NULL);
-         if (c == -1) {
-             break;
-         }
-         switch(c) {
-+        case ':':
-+            missing_argument(argv[optind - 1]);
-+            break;
-         case '?':
-+            unrecognized_option(argv[optind - 1]);
-+            break;
-         case 'h':
-             help();
-             break;
-@@ -651,13 +666,18 @@ static int img_check(int argc, char **argv)
-             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-             {0, 0, 0, 0}
-         };
--        c = getopt_long(argc, argv, "hf:r:T:q",
-+        c = getopt_long(argc, argv, ":hf:r:T:q",
-                         long_options, &option_index);
-         if (c == -1) {
-             break;
-         }
-         switch(c) {
-+        case ':':
-+            missing_argument(argv[optind - 1]);
-+            break;
-         case '?':
-+            unrecognized_option(argv[optind - 1]);
-+            break;
-         case 'h':
-             help();
-             break;
-@@ -855,13 +875,18 @@ static int img_commit(int argc, char **argv)
-             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-             {0, 0, 0, 0}
-         };
--        c = getopt_long(argc, argv, "f:ht:b:dpq",
-+        c = getopt_long(argc, argv, ":f:ht:b:dpq",
-                         long_options, NULL);
-         if (c == -1) {
-             break;
-         }
-         switch(c) {
-+        case ':':
-+            missing_argument(argv[optind - 1]);
-+            break;
-         case '?':
-+            unrecognized_option(argv[optind - 1]);
-+            break;
-         case 'h':
-             help();
-             break;
-@@ -1190,13 +1215,18 @@ static int img_compare(int argc, char **argv)
-             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-             {0, 0, 0, 0}
-         };
--        c = getopt_long(argc, argv, "hf:F:T:pqs",
-+        c = getopt_long(argc, argv, ":hf:F:T:pqs",
-                         long_options, NULL);
-         if (c == -1) {
-             break;
-         }
-         switch (c) {
-+        case ':':
-+            missing_argument(argv[optind - 1]);
-+            break;
-         case '?':
-+            unrecognized_option(argv[optind - 1]);
-+            break;
-         case 'h':
-             help();
-             break;
-@@ -1926,13 +1956,18 @@ static int img_convert(int argc, char **argv)
-             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-             {0, 0, 0, 0}
-         };
--        c = getopt_long(argc, argv, "hf:O:B:ce6o:s:l:S:pt:T:qnm:W",
-+        c = getopt_long(argc, argv, ":hf:O:B:ce6o:s:l:S:pt:T:qnm:W",
-                         long_options, NULL);
-         if (c == -1) {
-             break;
-         }
-         switch(c) {
-+        case ':':
-+            missing_argument(argv[optind - 1]);
-+            break;
-         case '?':
-+            unrecognized_option(argv[optind - 1]);
-+            break;
-         case 'h':
-             help();
-             break;
-@@ -2502,13 +2537,18 @@ static int img_info(int argc, char **argv)
-             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-             {0, 0, 0, 0}
-         };
--        c = getopt_long(argc, argv, "f:h",
-+        c = getopt_long(argc, argv, ":f:h",
-                         long_options, &option_index);
-         if (c == -1) {
-             break;
-         }
-         switch(c) {
-+        case ':':
-+            missing_argument(argv[optind - 1]);
-+            break;
-         case '?':
-+            unrecognized_option(argv[optind - 1]);
-+            break;
-         case 'h':
-             help();
-             break;
-@@ -2713,13 +2753,18 @@ static int img_map(int argc, char **argv)
-             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-             {0, 0, 0, 0}
-         };
--        c = getopt_long(argc, argv, "f:h",
-+        c = getopt_long(argc, argv, ":f:h",
-                         long_options, &option_index);
-         if (c == -1) {
-             break;
-         }
-         switch (c) {
-+        case ':':
-+            missing_argument(argv[optind - 1]);
-+            break;
-         case '?':
-+            unrecognized_option(argv[optind - 1]);
-+            break;
-         case 'h':
-             help();
-             break;
-@@ -2835,13 +2880,18 @@ static int img_snapshot(int argc, char **argv)
-             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-             {0, 0, 0, 0}
-         };
--        c = getopt_long(argc, argv, "la:c:d:hq",
-+        c = getopt_long(argc, argv, ":la:c:d:hq",
-                         long_options, NULL);
-         if (c == -1) {
-             break;
-         }
-         switch(c) {
-+        case ':':
-+            missing_argument(argv[optind - 1]);
-+            break;
-         case '?':
-+            unrecognized_option(argv[optind - 1]);
-+            break;
-         case 'h':
-             help();
-             return 0;
-@@ -2988,13 +3038,18 @@ static int img_rebase(int argc, char **argv)
-             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-             {0, 0, 0, 0}
-         };
--        c = getopt_long(argc, argv, "hf:F:b:upt:T:q",
-+        c = getopt_long(argc, argv, ":hf:F:b:upt:T:q",
-                         long_options, NULL);
-         if (c == -1) {
-             break;
-         }
-         switch(c) {
-+        case ':':
-+            missing_argument(argv[optind - 1]);
-+            break;
-         case '?':
-+            unrecognized_option(argv[optind - 1]);
-+            break;
-         case 'h':
-             help();
-             return 0;
-@@ -3355,13 +3410,18 @@ static int img_resize(int argc, char **argv)
-             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-             {0, 0, 0, 0}
-         };
--        c = getopt_long(argc, argv, "f:hq",
-+        c = getopt_long(argc, argv, ":f:hq",
-                         long_options, NULL);
-         if (c == -1) {
-             break;
-         }
-         switch(c) {
-+        case ':':
-+            missing_argument(argv[optind - 1]);
-+            break;
-         case '?':
-+            unrecognized_option(argv[optind - 1]);
-+            break;
-         case 'h':
-             help();
-             break;
-@@ -3493,15 +3553,20 @@ static int img_amend(int argc, char **argv)
-             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-             {0, 0, 0, 0}
-         };
--        c = getopt_long(argc, argv, "ho:f:t:pq",
-+        c = getopt_long(argc, argv, ":ho:f:t:pq",
-                         long_options, NULL);
-         if (c == -1) {
-             break;
-         }
- 
-         switch (c) {
--        case 'h':
-+        case ':':
-+            missing_argument(argv[optind - 1]);
-+            break;
-         case '?':
-+            unrecognized_option(argv[optind - 1]);
-+            break;
-+        case 'h':
-             help();
-             break;
-         case 'o':
-@@ -3759,14 +3824,19 @@ static int img_bench(int argc, char **argv)
-             {"no-drain", no_argument, 0, OPTION_NO_DRAIN},
-             {0, 0, 0, 0}
-         };
--        c = getopt_long(argc, argv, "hc:d:f:no:qs:S:t:w", long_options, NULL);
-+        c = getopt_long(argc, argv, ":hc:d:f:no:qs:S:t:w", long_options, NULL);
-         if (c == -1) {
-             break;
-         }
- 
-         switch (c) {
--        case 'h':
-+        case ':':
-+            missing_argument(argv[optind - 1]);
-+            break;
-         case '?':
-+            unrecognized_option(argv[optind - 1]);
-+            break;
-+        case 'h':
-             help();
-             break;
-         case 'c':
-@@ -4093,7 +4163,7 @@ static int img_dd(int argc, char **argv)
-         { 0, 0, 0, 0 }
-     };
- 
--    while ((c = getopt_long(argc, argv, "hf:O:", long_options, NULL))) {
-+    while ((c = getopt_long(argc, argv, ":hf:O:", long_options, NULL))) {
-         if (c == EOF) {
-             break;
-         }
-@@ -4104,10 +4174,12 @@ static int img_dd(int argc, char **argv)
-         case 'f':
-             fmt = optarg;
-             break;
-+        case ':':
-+            missing_argument(argv[optind - 1]);
-+            break;
-         case '?':
--            error_report("Try 'qemu-img --help' for more information.");
--            ret = -1;
--            goto out;
-+            unrecognized_option(argv[optind - 1]);
-+            break;
-         case 'h':
-             help();
-             break;
-@@ -4336,10 +4408,15 @@ int main(int argc, char **argv)
-     qemu_add_opts(&qemu_source_opts);
-     qemu_add_opts(&qemu_trace_opts);
- 
--    while ((c = getopt_long(argc, argv, "+hVT:", long_options, NULL)) != -1) {
-+    while ((c = getopt_long(argc, argv, "+:hVT:", long_options, NULL)) != -1) {
-         switch (c) {
--        case 'h':
-+        case ':':
-+            missing_argument(argv[optind - 1]);
-+            return 0;
-         case '?':
-+            unrecognized_option(argv[optind - 1]);
-+            return 0;
-+        case 'h':
-             help();
-             return 0;
-         case 'V':
--- 
-2.9.3
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ4
+OTc0NzAxOTg2LjI5NTQ1LjU0MTQ5OTkxMDI5ODE3Mzg3NzQuc3RnaXRAYmFoaWEKU3ViamVjdDog
+W1FlbXUtZGV2ZWxdIFtQQVRDSF0gY2hlY2twYXRjaDogYWxsb3cgbG9uZ2VyIGxpbmVzIGZvciBs
+b2dnaW5nIGZ1bmN0aW9ucwpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
+IyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFT
+RS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMg
+VHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIK
+Zm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6
+ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMg
+LS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRo
+ZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRv
+bmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1
+YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNv
+bS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzE0ODk3
+NDcwMTk4Ni4yOTU0NS41NDE0OTk5MTAyOTgxNzM4Nzc0LnN0Z2l0QGJhaGlhIC0+IHBhdGNoZXcv
+MTQ4OTc0NzAxOTg2LjI5NTQ1LjU0MTQ5OTkxMDI5ODE3Mzg3NzQuc3RnaXRAYmFoaWEKICogW25l
+dyB0YWddICAgICAgICAgcGF0Y2hldy8xNDg5NzQ3NDQyODEuMzA2MzYuMTc5NzMyNjQwMDgyODU0
+MTU1OTIuc3RnaXRAYmFoaWEgLT4gcGF0Y2hldy8xNDg5NzQ3NDQyODEuMzA2MzYuMTc5NzMyNjQw
+MDgyODU0MTU1OTIuc3RnaXRAYmFoaWEKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwoz
+OTBkN2M0IGNoZWNrcGF0Y2g6IGFsbG93IGxvbmdlciBsaW5lcyBmb3IgbG9nZ2luZyBmdW5jdGlv
+bnMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogY2hlY2twYXRjaDog
+YWxsb3cgbG9uZ2VyIGxpbmVzIGZvciBsb2dnaW5nIGZ1bmN0aW9ucy4uLgpFUlJPUjogbGluZSBv
+dmVyIDkwIGNoYXJhY3RlcnMKIzM4OiBGSUxFOiBzY3JpcHRzL2NoZWNrcGF0Y2gucGw6MTM0OToK
+KwkJICAgICEoJGxpbmUgPX4gL15cK1xzKiRsb2dGdW5jdGlvbnNccypcKFxzKig/OihbXiJdKikp
+PyJbWFx0XSoiXHMqKD86LHxcKVxzKjspXHMqJC8gfHwKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJu
+aW5ncywgMjAgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
+ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
+cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
+RVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTog
+MQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8v
+cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
+QGZyZWVsaXN0cy5vcmc=
