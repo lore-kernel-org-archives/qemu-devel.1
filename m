@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1cozsN-00047W-2l
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 17:57:35 -0400
+	(envelope-from <mike.kravetz@oracle.com>) id 1cp07k-00075w-86
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 18:13:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1cozsJ-0000Wd-QE
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 17:57:34 -0400
-Received: from mailapp01.imgtec.com ([195.59.15.196]:17869
-	helo=imgpgp01.kl.imgtec.org)
+	(envelope-from <mike.kravetz@oracle.com>) id 1cp07f-0006G1-7t
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 18:13:28 -0400
+Received: from userp1040.oracle.com ([156.151.31.81]:26882)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <James.Hogan@imgtec.com>)
-	id 1cozsJ-0000Vi-H0
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 17:57:31 -0400
-Date: Fri, 17 Mar 2017 21:57:25 +0000
-From: James Hogan <james.hogan@imgtec.com>
-Message-ID: <20170317215725.GJ996@jhogan-linux.le.imgtec.org>
+	(Exim 4.71) (envelope-from <mike.kravetz@oracle.com>)
+	id 1cp07e-0006El-VG
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 18:13:23 -0400
+References: <cad15568-221e-82b7-a387-f23567a0bc76@oracle.com>
+	<e09c529d-50e7-e6f2-8054-a34f22b5835a@oracle.com>
+	<20170314183706.GO27056@redhat.com>
+From: Mike Kravetz <mike.kravetz@oracle.com>
+Message-ID: <f78063aa-ac16-dd0a-d664-ea6e4aff6b9f@oracle.com>
+Date: Fri, 17 Mar 2017 15:13:11 -0700
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="b2kq0H0UHH9HR3v2"
-Content-Disposition: inline
-Subject: [Qemu-devel] [BUG] virtio-net linux driver fails to probe on MIPS
- Malta since 'hw/virtio-pci: fix virtio behaviour'
+In-Reply-To: <20170314183706.GO27056@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [LSF/MM TOPIC][LSF/MM, ATTEND] shared TLB,
+ hugetlb reservations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +30,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Jason Wang <jasowang@redhat.com>, virtualization@lists.linux-foundation.org
+To: Andrea Arcangeli <aarcange@redhat.com>
+Cc: lsf-pc@lists.linux-foundation.org, linux-mm@kvack.org, linux-kernel <linux-kernel@vger.kernel.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, Mike Rapoport <rppt@linux.vnet.ibm.com>
 
---b2kq0H0UHH9HR3v2
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+On 03/14/2017 11:37 AM, Andrea Arcangeli wrote:
+> Hello,
+> 
+> On Wed, Mar 08, 2017 at 05:30:55PM -0800, Mike Kravetz wrote:
+>> On 01/10/2017 03:02 PM, Mike Kravetz wrote:
+>>> Another more concrete topic is hugetlb reservations.  Michal Hocko
+>>> proposed the topic "mm patches review bandwidth", and brought up the
+>>> related subject of areas in need of attention from an architectural
+>>> POV.  I suggested that hugetlb reservations was one such area.  I'm
+>>> guessing it was introduced to solve a rather concrete problem.  However,
+>>> over time additional hugetlb functionality was added and the
+>>> capabilities of the reservation code was stretched to accommodate.
+>>> It would be good to step back and take a look at the design of this
+>>> code to determine if a rewrite/redesign is necessary.  Michal suggested
+>>> documenting the current design/code as a first step.  If people think
+>>> this is worth discussion at the summit, I could put together such a
+>>> design before the gathering.
+>>
+>> I attempted to put together a design/overview of how hugetlb reservations
+>> currently work.  Hopefully, this will be useful.
+> 
+> Another area of hugetlbfs that is not clear is the status of
+> MADV_REMOVE and the behavior of fallocate punch hole that deviates
+> from more standard shmem semantics. That might also be a topic of
+> interest related to your hugetlbfs topic and marginally related to
+> userfaultfd.
 
-Hi,
+Thanks Andrea,
 
-I've bisected the following failure of the virtio_net linux v4.10 driver
-to probe in QEMU v2.9.0-rc1 emulating a MIPS Malta machine:
+I was not aware qemu was carrying all this information.
 
-virtio_net virtio0: virtio: device uses modern interface but does not have VIRTIO_F_VERSION_1
-virtio_net: probe of virtio0 failed with error -22
+> The current status for anon, shmem and hugetlbfs like this:
+> 
+> MADV_DONTNEED works: anon, !VM_SHARED shmem
+> MADV_DONTNEED doesn't work: hugetlbfs VM_SHARED, hugetlbfs !VM_SHARED
+> MADV_DONTNEED works but not guaranteed to fault: shmem VM_SHARED
+> 
+> MADV_REMOVE works: shmem VM_SHARED, hugetlbfs VM_SHARED
+> MADV_REMOVE doesn't work: anon, shmem !VM_SHARED, hugetlbfs !VM_SHARED
+> 
+> fallocate punch hole works: hugetlbfs VM_SHARED, hugetlbfs !VM_SHARED,
+> 	  	     	    shmem VM_SHARED
+> fallocate punch hole doesn't work: anon, shmem !VM_SHARED
+> 
+> So what happens in qemu is:
+> 
+> anon			-> MADV_DONTNEED
+> 
+> shmem !VM_SHARED	-> MADV_DONTNEED (fallocate punch hole wouldn't zap
+> 			   private pages, but it does on hugetlbfs)
+> 
+> shmem VM_SHARED		-> fallocate punch hole (MADV_REMOVE would
+>       			   work too)
+> 
+> hugetlbfs !VM_SHARED	-> fallocate punch hole (works for hugetlbfs
+> 			   but not for shmem !VM_SHARED)
+> 
+> hugetlbfs VM_SHARED	-> fallocate punch hole (MADV_REMOVE would work too)
+> 
+> This means qemu has to carry around information on the type of memory
+> it got from the initial memblock setup, so at live migration time it
+> can zap the memory with the right call. (NOTE: such memory is not
+> generated by userfaultfd UFFDIO_COPY, but it was allocated and mapped
+> and it must be zapped well before calling userfaultfd the first time).
+> 
+> To do this qemu uses fstatfs and finds out which kind of memory it's
+> dealing with to use the right call depending on which memory.
+> 
+> In short it'd be better to have something like a generic MADV_REMOVE
+> that guarantees a non-present fault after it succeeds, no matter what
+> kind of memory is mapped in the virtual range that has to be
+> zapped. The above is far from ideal from a userland developer
+> prospective.
 
-To QEMU commit 9a4c0e220d8a ("hw/virtio-pci: fix virtio behaviour").
+I think we will need to have a new generic MADV_REMOVE type of call
+as you suggest.  Based on existing documentation for MADV_DONTNEED,
+MADV_REMOVE and fallocate hole punch they each are designed not to
+work on at least one of the desired memory mapping types.
 
-It appears that adding ",disable-modern=on,disable-legacy=off" to the
-virtio-net -device makes it work again.
+> Overall fallocate punch hole covers the most cases so to keep the code
+> simpler ironically MADV_REMOVE ends up being never used despite it
+> provides a more friendly API than fallocate to qemu. The files are
+> always mapped and the older code only dealt with virtual addresses
+> (before hugetlbfs and shmem entered thee equation). Ideally qemu wants
+> to call the same madvise regardles if the memory is anon shmem or
+> hugetlbfs without having to carry around file descriptor, file offsets
+> and superblock types.
+> 
+> It's also not clear why MADV_DONTNEED doesn't work for hugetlbfs
+> !VM_SHARED mappings and why fallocate punch hole is also zapping
+> private cow-like pages from !VM_SHARED mappings (although if it
+> didn't, it would be impossible to zap those... so it's good luck it
+> does).
 
-I presume this should really just work out of the box. Any ideas why it
-isn't?
+Yes, it is more like good luck than design.  fallocate hole punch for
+hugetlbfs VM_SHARED was the original use case/design.  MADV_REMOVE was
+added just because it could without additional effort.
 
-Cheers
-James
+Thanks for bringing this up.  We should definitely discuss within the
+scope of hugetlbfs and/or userfaultfd.
 
---b2kq0H0UHH9HR3v2
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
+-- 
+Mike Kravetz
 
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBCAAGBQJYzFu+AAoJEGwLaZPeOHZ6IWIQAK3U2bObQkB4OIciXq5H0esi
-bewn7ECE2gsVk0VLmbw612zQAwwjwj2frU43+nz2W3tQ8LDyDeCyfz1f4PqQawt6
-e0WiqOcPwjF7N8nw790AsRc0xK/N2Kjkg+aoipq9hNTJxETaChTso5KeilWHKxM6
-/RWXcyCy7sA2gYK2brnxmqMoJNY1+x4Fko3qMveSaWBm1t7Ia60c3p8AUuscU/H+
-Av9WIzurEkaN6RMaas014osea290fC169JzUAUMwzlfibxy5FmA4J/8lSDMeB/F3
-hp8XhV2OAgWqzSXSdB2n2SIwUJgBju6qTZQmjiWw+vOUIXGNO24OrsBm0pKiVHfX
-VJzCyeaTg6I0Pjs0GD6WUJJFf8IEP+e4WHOlBsbPtkPBDt8CXoKnXxdnPiQVK/11
-dom9ihXN4bGOlJBenrVhfydVe2kdIL0X9HPny9CXVdljjKm6JmzjAqXqou9NqK1J
-XikEUZTgzGw8THkTzyktKYwctl1++7W9oJsVdRGNR+v+XVkEsKNx+dIPwToPRnTU
-0PSF+TRAAOqDgVu9Jd8ZVBr/3N1bg/VataPWuKOeGuOIuaB+HRb9YxydjtBFqoeX
-AquU+PHVBaB9Nt1OzhYkuTXfXIgD5URp8dWUiNPOTgXQhzpFLTbRWokazHWw1E/H
-r8kZB0+T9RewbIOTvAOg
-=bkeO
------END PGP SIGNATURE-----
-
---b2kq0H0UHH9HR3v2--
+> 
+> Thanks,
+> Andrea
+> 
+> PS. CC'ed also qemu-devel in case it may help clarify why things are
+> implemented they way they are in the postcopy live migration
+> hugetlbfs/shmem support and in the future patches for shmem/hugetlbfs
+> share=on.
