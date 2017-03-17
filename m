@@ -1,39 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sebott@linux.vnet.ibm.com>) id 1cooA2-0001ik-MA
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 05:27:06 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cooBF-0002FA-UF
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 05:28:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sebott@linux.vnet.ibm.com>) id 1coo9z-0002nO-HU
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 05:27:02 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32835
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sebott@linux.vnet.ibm.com>)
-	id 1coo9z-0002mU-BQ
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 05:26:59 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2H9IjKu035192
-	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 05:26:58 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 297nkpd482-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 05:26:57 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <sebott@linux.vnet.ibm.com>;
-	Fri, 17 Mar 2017 09:26:56 -0000
-Date: Fri, 17 Mar 2017 10:26:51 +0100 (CET)
-From: Sebastian Ott <sebott@linux.vnet.ibm.com>
-In-Reply-To: <20170317031743.40128-2-bjsdjshi@linux.vnet.ibm.com>
-References: <20170317031743.40128-1-bjsdjshi@linux.vnet.ibm.com>
-	<20170317031743.40128-2-bjsdjshi@linux.vnet.ibm.com>
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cooBC-0003Mh-Ro
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 05:28:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44734)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1cooBC-0003M0-M4
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 05:28:14 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C9637437F72
+	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 09:28:13 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Fri, 17 Mar 2017 13:28:02 +0400
+Message-Id: <20170317092802.17973-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Message-Id: <alpine.LFD.2.20.1703171023360.3003@schleppi>
-Subject: Re: [Qemu-devel] [PATCH v4 01/16] s390: cio: introduce
- cio_cancel_halt_clear
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] vnc: fix a qio-channel leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,14 +31,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, Cornelia Huck <cornelia.huck@de.ibm.com>, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, Peter Oberparleiter <oberpar@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com, berrange@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On Fri, 17 Mar 2017, Dong Jia Shi wrote:
-> For future code reuse purpose, this decouples the cio code with
-> the ccw device specific parts from ccw_device_cancel_halt_clear,
-> and makes a new common I/O interface named cio_cancel_halt_clear.
+Spotted by ASAN.
 
-What would the user of cio_cancel_halt_clear be?
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ ui/vnc.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Sebastian
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 8bfb1e0685..6e93b883b5 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -3677,6 +3677,7 @@ static int vnc_display_listen_addr(VncDisplay *vd,
+         qio_channel_set_name(QIO_CHANNEL(sioc), name);
+         if (qio_channel_socket_listen_sync(
+                 sioc, rawaddrs[i], listenerr =3D=3D NULL ? &listenerr : =
+NULL) < 0) {
++            object_unref(OBJECT(sioc));
+             continue;
+         }
+         listening =3D true;
+--=20
+2.12.0.191.gc5d8de91d
