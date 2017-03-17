@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57673)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cov6Q-0005yj-FC
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 12:51:47 -0400
+	(envelope-from <eswierk@skyportsystems.com>) id 1covAM-00077p-1A
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 12:55:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cov6P-00062v-BH
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 12:51:46 -0400
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:36281)
+	(envelope-from <eswierk@skyportsystems.com>) id 1covAK-0007IY-Kt
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 12:55:50 -0400
+Received: from mail-vk0-x22a.google.com ([2607:f8b0:400c:c05::22a]:34876)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cov6P-00062j-4Q
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 12:51:45 -0400
-Received: by mail-wr0-x230.google.com with SMTP id u108so55726120wrb.3
-	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 09:51:44 -0700 (PDT)
+	(Exim 4.71) (envelope-from <eswierk@skyportsystems.com>)
+	id 1covAK-0007IQ-EU
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 12:55:48 -0400
+Received: by mail-vk0-x22a.google.com with SMTP id x75so44056481vke.2
+	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 09:55:48 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170227193857.9368-1-marex@denx.de>
-References: <20170227193857.9368-1-marex@denx.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 17 Mar 2017 16:51:23 +0000
-Message-ID: <CAFEAcA-LRRd9Fu0+Dr6JcRBFEwnnX9HX-1O4gPsqVe8eWZVs_Q@mail.gmail.com>
+From: Ed Swierk <eswierk@skyportsystems.com>
+Date: Fri, 17 Mar 2017 09:55:06 -0700
+Message-ID: <CAO_EM_kn4QEw=+j23F7e+LzLW2_TPwNENoopqyBb-hdKYAow9w@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH V2] nios2: iic: Convert CPU prop to qom link
+Subject: [Qemu-devel] Assertion failure taking external snapshot with virtio
+ drive + iothread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,94 +27,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marek Vasut <marex@denx.de>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Jeff Da Silva <jdasilva@altera.com>, Chris Wulff <crwulff@gmail.com>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, Sandra Loosemore <sandra@codesourcery.com>, Ley Foon Tan <lftan@altera.com>, Yves Vandervennet <yvanderv@altera.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-On 27 February 2017 at 19:38, Marek Vasut <marex@denx.de> wrote:
-> Add a const qom link between the CPU and the IIC instead
-> of passing the CPU link through a qom property.
+I'm running into the same problem taking an external snapshot with a
+virtio-blk drive with iothread, so it's not specific to virtio-scsi.
+Run a Linux guest on qemu master
+
+  qemu-system-x86_64 -nographic -enable-kvm -monitor
+telnet:0.0.0.0:1234,server,nowait -m 1024 -object
+iothread,id=iothread1 -drive file=/x/drive.qcow2,if=none,id=drive0
+-device virtio-blk-pci,iothread=iothread1,drive=drive0
+
+Then in the monitor
+
+  snapshot_blkdev drive0 /x/snap1.qcow2
+
+qemu bombs with
+
+  qemu-system-x86_64: /x/qemu/include/block/aio.h:457:
+aio_enable_external: Assertion `ctx->external_disable_cnt > 0' failed.
+
+whereas without the iothread the assertion failure does not occur.
+
+--Ed
+
+On Thu, Mar 16, 2017 at 5:26 PM, Ed Swierk <eswierk@skyportsystems.com> wrote:
+> With this change on top of 2.9.0-rc0, I am able to boot a Linux guest
+> from a virtio-scsi drive with an iothread, e.g.
 >
-> Signed-off-by: Marek Vasut <marex@denx.de>
-> Cc: Alexander Graf <agraf@suse.de>
-> Cc: Chris Wulff <crwulff@gmail.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: Jeff Da Silva <jdasilva@altera.com>
-> Cc: Ley Foon Tan <lftan@altera.com>
-> Cc: Markus Armbruster <armbru@redhat.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Sandra Loosemore <sandra@codesourcery.com>
-> Cc: Yves Vandervennet <yvanderv@altera.com>
-> ---
-> V2: Retain dc->cannot_instantiate_with_device_add_yet = true
->     in altera_iic_class_init() since the device is still not
->     device_add() creatable.
-> ---
->  hw/intc/nios2_iic.c       | 12 ++++--------
->  hw/nios2/10m50_devboard.c |  3 ++-
->  2 files changed, 6 insertions(+), 9 deletions(-)
+>   qemu-system-x86_64 -nographic -enable-kvm -monitor
+> telnet:0.0.0.0:1234,server,nowait -m 1024 -object
+> iothread,id=iothread1 -device
+> virtio-scsi-pci,iothread=iothread1,id=scsi0 -drive
+> file=/x/drive.qcow2,format=qcow2,if=none,id=drive0,cache=directsync,aio=native
+> -device scsi-hd,drive=drive0,bootindex=1
 >
-> diff --git a/hw/intc/nios2_iic.c b/hw/intc/nios2_iic.c
-> index 818ab1b315..fe15621202 100644
-> --- a/hw/intc/nios2_iic.c
-> +++ b/hw/intc/nios2_iic.c
-> @@ -62,17 +62,15 @@ static void altera_iic_init(Object *obj)
->      sysbus_init_irq(SYS_BUS_DEVICE(obj), &pv->parent_irq);
->  }
+> But when I try to take a snapshot by running this in the monitor
 >
-> -static Property altera_iic_properties[] = {
-> -    DEFINE_PROP_PTR("cpu", AlteraIIC, cpu),
-> -    DEFINE_PROP_END_OF_LIST(),
-> -};
-> -
->  static void altera_iic_realize(DeviceState *dev, Error **errp)
->  {
->      struct AlteraIIC *pv = ALTERA_IIC(dev);
-> +    Error *err = NULL;
+>   snapshot_blkdev drive0 /x/snap1.qcow2
 >
-> +    pv->cpu = object_property_get_link(OBJECT(dev), "cpu", &err);
->      if (!pv->cpu) {
-> -        error_setg(errp, "altera,iic: CPU not connected");
-> +        error_setg(errp, "altera,iic: CPU link not found: %s",
-> +                   error_get_pretty(err));
->          return;
->      }
->  }
-> @@ -81,8 +79,6 @@ static void altera_iic_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc = DEVICE_CLASS(klass);
+> qemu bombs with
 >
-> -    dc->props = altera_iic_properties;
-> -    /* Reason: pointer property "cpu" */
-
-This comment goes with the line below it:
-
->      dc->cannot_instantiate_with_device_add_yet = true;
-
-as it's explaining why we cannot instantiate with device add.
-
-Either the cannot_instantiate assignment should go,
-or the comment needs to be updated to explain why we
-cannot-instantiate (since it's no longer because of a
-pointer property).
-
->      dc->realize = altera_iic_realize;
->  }
-> diff --git a/hw/nios2/10m50_devboard.c b/hw/nios2/10m50_devboard.c
-> index 0d8b9aa58f..c18e0b2a17 100644
-> --- a/hw/nios2/10m50_devboard.c
-> +++ b/hw/nios2/10m50_devboard.c
-> @@ -83,7 +83,8 @@ static void nios2_10m50_ghrd_init(MachineState *machine)
+>   qemu-system-x86_64: /x/qemu/include/block/aio.h:457:
+> aio_enable_external: Assertion `ctx->external_disable_cnt > 0' failed.
 >
->      /* Register: Internal Interrupt Controller (IIC) */
->      dev = qdev_create(NULL, "altera,iic");
-> -    qdev_prop_set_ptr(dev, "cpu", cpu);
-> +    object_property_add_const_link(OBJECT(dev), "cpu", OBJECT(cpu),
-> +                                   &error_abort);
->      qdev_init_nofail(dev);
->      sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, cpu_irq[0]);
->      for (i = 0; i < 32; i++) {
-> --
-> 2.11.0
-
-thanks
--- PMM
+> This does not occur if I don't use the iothread.
+>
+> I instrumented the code a bit, printing the value of bs,
+> bdrv_get_aio_context(bs), and
+> bdrv_get_aio_context(bs)->external_disable_cnt before and after
+> aio_{disable,enable}_external() in bdrv_drained_{begin,end}().
+>
+> Without the iothread, nested calls to these functions cause the
+> counter to increase and decrease as you'd expect, and the context is
+> the same in each call.
+>
+> bdrv_drained_begin 0 bs=0x7fe9f5ad65a0 ctx=0x7fe9f5abc7b0 cnt=0
+> bdrv_drained_begin 1 bs=0x7fe9f5ad65a0 ctx=0x7fe9f5abc7b0 cnt=1
+> bdrv_drained_begin 0 bs=0x7fe9f5d12a00 ctx=0x7fe9f5abc7b0 cnt=1
+> bdrv_drained_begin 1 bs=0x7fe9f5d12a00 ctx=0x7fe9f5abc7b0 cnt=2
+> bdrv_drained_end 0 bs=0x7fe9f5d12a00 ctx=0x7fe9f5abc7b0 cnt=2
+> bdrv_drained_end 1 bs=0x7fe9f5d12a00 ctx=0x7fe9f5abc7b0 cnt=1
+> bdrv_drained_begin 0 bs=0x7fe9f5d12a00 ctx=0x7fe9f5abc7b0 cnt=1
+> bdrv_drained_begin 1 bs=0x7fe9f5d12a00 ctx=0x7fe9f5abc7b0 cnt=2
+> bdrv_drained_begin 0 bs=0x7fe9f67cfde0 ctx=0x7fe9f5abc7b0 cnt=2
+> bdrv_drained_begin 1 bs=0x7fe9f67cfde0 ctx=0x7fe9f5abc7b0 cnt=3
+> bdrv_drained_end 0 bs=0x7fe9f67cfde0 ctx=0x7fe9f5abc7b0 cnt=3
+> bdrv_drained_end 1 bs=0x7fe9f67cfde0 ctx=0x7fe9f5abc7b0 cnt=2
+> bdrv_drained_end 0 bs=0x7fe9f5d12a00 ctx=0x7fe9f5abc7b0 cnt=2
+> bdrv_drained_end 1 bs=0x7fe9f5d12a00 ctx=0x7fe9f5abc7b0 cnt=1
+> bdrv_drained_begin 0 bs=0x7fe9f5d12a00 ctx=0x7fe9f5abc7b0 cnt=1
+> bdrv_drained_begin 1 bs=0x7fe9f5d12a00 ctx=0x7fe9f5abc7b0 cnt=2
+> bdrv_drained_begin 0 bs=0x7fe9f67cfde0 ctx=0x7fe9f5abc7b0 cnt=2
+> bdrv_drained_begin 1 bs=0x7fe9f67cfde0 ctx=0x7fe9f5abc7b0 cnt=3
+> bdrv_drained_end 0 bs=0x7fe9f67cfde0 ctx=0x7fe9f5abc7b0 cnt=3
+> bdrv_drained_end 1 bs=0x7fe9f67cfde0 ctx=0x7fe9f5abc7b0 cnt=2
+> bdrv_drained_end 0 bs=0x7fe9f5d12a00 ctx=0x7fe9f5abc7b0 cnt=2
+> bdrv_drained_end 1 bs=0x7fe9f5d12a00 ctx=0x7fe9f5abc7b0 cnt=1
+> bdrv_drained_begin 0 bs=0x7fe9f5d12a00 ctx=0x7fe9f5abc7b0 cnt=1
+> bdrv_drained_begin 1 bs=0x7fe9f5d12a00 ctx=0x7fe9f5abc7b0 cnt=2
+> bdrv_drained_end 0 bs=0x7fe9f5d12a00 ctx=0x7fe9f5abc7b0 cnt=2
+> bdrv_drained_end 1 bs=0x7fe9f5d12a00 ctx=0x7fe9f5abc7b0 cnt=1
+> bdrv_drained_end 0 bs=0x7fe9f5ad65a0 ctx=0x7fe9f5abc7b0 cnt=1
+> bdrv_drained_end 1 bs=0x7fe9f5ad65a0 ctx=0x7fe9f5abc7b0 cnt=0
+>
+> But with the iothread, there are at least two different context
+> pointers, and there is one extra call to bdrv_drained_end() without a
+> matching bdrv_drained_begin(). That last call comes from
+> external_snapshot_clean().
+>
+> bdrv_drained_begin 0 bs=0x7fe4437545c0 ctx=0x7fe443749a00 cnt=0
+> bdrv_drained_begin 1 bs=0x7fe4437545c0 ctx=0x7fe443749a00 cnt=1
+> bdrv_drained_begin 0 bs=0x7fe443990a00 ctx=0x7fe44373a7b0 cnt=0
+> bdrv_drained_begin 1 bs=0x7fe443990a00 ctx=0x7fe44373a7b0 cnt=1
+> bdrv_drained_end 0 bs=0x7fe443990a00 ctx=0x7fe44373a7b0 cnt=1
+> bdrv_drained_end 1 bs=0x7fe443990a00 ctx=0x7fe44373a7b0 cnt=0
+> bdrv_drained_begin 0 bs=0x7fe443990a00 ctx=0x7fe44373a7b0 cnt=0
+> bdrv_drained_begin 1 bs=0x7fe443990a00 ctx=0x7fe44373a7b0 cnt=1
+> bdrv_drained_begin 0 bs=0x7fe44444de20 ctx=0x7fe44373a7b0 cnt=1
+> bdrv_drained_begin 1 bs=0x7fe44444de20 ctx=0x7fe44373a7b0 cnt=2
+> bdrv_drained_end 0 bs=0x7fe44444de20 ctx=0x7fe44373a7b0 cnt=2
+> bdrv_drained_end 1 bs=0x7fe44444de20 ctx=0x7fe44373a7b0 cnt=1
+> bdrv_drained_end 0 bs=0x7fe443990a00 ctx=0x7fe44373a7b0 cnt=1
+> bdrv_drained_end 1 bs=0x7fe443990a00 ctx=0x7fe44373a7b0 cnt=0
+> bdrv_drained_begin 0 bs=0x7fe443990a00 ctx=0x7fe44373a7b0 cnt=0
+> bdrv_drained_begin 1 bs=0x7fe443990a00 ctx=0x7fe44373a7b0 cnt=1
+> bdrv_drained_begin 0 bs=0x7fe44444de20 ctx=0x7fe44373a7b0 cnt=1
+> bdrv_drained_begin 1 bs=0x7fe44444de20 ctx=0x7fe44373a7b0 cnt=2
+> bdrv_drained_end 0 bs=0x7fe44444de20 ctx=0x7fe44373a7b0 cnt=2
+> bdrv_drained_end 1 bs=0x7fe44444de20 ctx=0x7fe44373a7b0 cnt=1
+> bdrv_drained_end 0 bs=0x7fe443990a00 ctx=0x7fe44373a7b0 cnt=1
+> bdrv_drained_end 1 bs=0x7fe443990a00 ctx=0x7fe44373a7b0 cnt=0
+> bdrv_drained_begin 0 bs=0x7fe443990a00 ctx=0x7fe44373a7b0 cnt=0
+> bdrv_drained_begin 1 bs=0x7fe443990a00 ctx=0x7fe44373a7b0 cnt=1
+> bdrv_drained_end 0 bs=0x7fe443990a00 ctx=0x7fe443749a00 cnt=1
+> bdrv_drained_end 1 bs=0x7fe443990a00 ctx=0x7fe443749a00 cnt=0
+> bdrv_drained_end 0 bs=0x7fe4437545c0 ctx=0x7fe443749a00 cnt=0
+> qemu-system-x86_64: /x/qemu/include/block/aio.h:457:
+> aio_enable_external: Assertion `ctx->external_disable_cnt > 0' failed.
+>
+> I didn't have much luck bisecting the bug, since about 200 commits
+> prior to 2.9.0-rc0 qemu bombs immediately on boot, and after that I
+> get the assertion addressed by your patch. I have to go farther back
+> to find a working version.
+>
+> Any help would be appreciated.
+>
+> --Ed
