@@ -1,41 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1cohhC-0007Rq-J3
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 22:32:51 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1coiOx-0006Eb-HW
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 23:18:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1cohh7-0000st-I6
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 22:32:50 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59073
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1coiOu-0000HR-C6
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 23:18:03 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36637
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haoqf@linux.vnet.ibm.com>)
-	id 1cohh7-0000pE-BY
-	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 22:32:45 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1coiOu-0000HG-5P
+	for qemu-devel@nongnu.org; Thu, 16 Mar 2017 23:18:00 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2H2TGWw104262
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 22:32:42 -0400
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 297pv3n17f-1
+	v2H3DsC0191768
+	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 23:17:58 -0400
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 297wd0h1pb-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 22:32:42 -0400
+	for <qemu-devel@nongnu.org>; Thu, 16 Mar 2017 23:17:57 -0400
 Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <haoqf@linux.vnet.ibm.com>;
-	Thu, 16 Mar 2017 22:32:41 -0400
-References: <20170310044402.38880-1-haoqf@linux.vnet.ibm.com>
-	<20170310044402.38880-2-haoqf@linux.vnet.ibm.com>
-	<87efxxy7jh.fsf@secure.mitica>
-From: QingFeng Hao <haoqf@linux.vnet.ibm.com>
-Date: Fri, 17 Mar 2017 10:32:30 +0800
-MIME-Version: 1.0
-In-Reply-To: <87efxxy7jh.fsf@secure.mitica>
-Content-Type: text/plain; charset=gbk; format=flowed
-Message-Id: <45c27b68-e5f1-bf94-fca2-ed862b026344@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] vmstate: fix failed iotests case 68
- and 91
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Thu, 16 Mar 2017 21:17:57 -0600
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Date: Fri, 17 Mar 2017 04:17:28 +0100
+In-Reply-To: <20170317031743.40128-1-bjsdjshi@linux.vnet.ibm.com>
+References: <20170317031743.40128-1-bjsdjshi@linux.vnet.ibm.com>
+Message-Id: <20170317031743.40128-2-bjsdjshi@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v4 01/16] s390: cio: introduce
+ cio_cancel_halt_clear
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,26 +39,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com, pasic@linux.vnet.ibm.com, liujbjl@linux.vnet.ibm.com, kwolf@redhat.com, famz@redhat.com, mreitz@redhat.com, dgilbert@redhat.com
+To: kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org
+Cc: bjsdjshi@linux.vnet.ibm.com, renxiaof@linux.vnet.ibm.com, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, alex.williamson@redhat.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, Sebastian Ott <sebott@linux.vnet.ibm.com>, Peter Oberparleiter <oberpar@linux.vnet.ibm.com>
 
+For future code reuse purpose, this decouples the cio code with
+the ccw device specific parts from ccw_device_cancel_halt_clear,
+and makes a new common I/O interface named cio_cancel_halt_clear.
 
+Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Signed-off-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: Sebastian Ott <sebott@linux.vnet.ibm.com>
+Cc: Peter Oberparleiter <oberpar@linux.vnet.ibm.com>
+---
+ drivers/s390/cio/cio.c        | 59 +++++++++++++++++++++++++++++++++++++++++++
+ drivers/s390/cio/cio.h        |  1 +
+ drivers/s390/cio/device_fsm.c | 54 ++++++---------------------------------
+ 3 files changed, 68 insertions(+), 46 deletions(-)
 
-=D4=DA 2017/3/16 16:01, Juan Quintela =D0=B4=B5=C0:
-> QingFeng Hao <haoqf@linux.vnet.ibm.com> wrote:
->> This problem affects s390x only if we are running without KVM.
->> Basically, S390CPU.irqstate is unused if we do not use KVM,
->> and thus no buffer is allocated.
->> This causes size=3D0, first_elem=3DNULL and n_elems=3D1 in
->> vmstate_load_state and vmstate_save_state. And the assert fails.
->> With this fix we can go back to the old behavior and support
->> VMS_VBUFFER with size 0 and nullptr.
->>
->> Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
->> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> queued
-Thanks!
-
---=20
-Regards
-QingFeng Hao
+diff --git a/drivers/s390/cio/cio.c b/drivers/s390/cio/cio.c
+index 1b35066..5711e28 100644
+--- a/drivers/s390/cio/cio.c
++++ b/drivers/s390/cio/cio.c
+@@ -309,6 +309,65 @@ cio_cancel (struct subchannel *sch)
+ 	}
+ }
+ 
++/**
++ * cio_cancel_halt_clear - Cancel running I/O by performing cancel, halt
++ * and clear ordinally if subchannel is valid.
++ * @sch: subchannel on which to perform the cancel_halt_clear operation
++ * @iretry: the number of the times remained to retry the next operation
++ *
++ * This should be called repeatedly since halt/clear are asynchronous
++ * operations. We do one try with cio_cancel, two tries with cio_halt,
++ * 255 tries with cio_clear. The caller should initialize @iretry with
++ * the value 255 for its first call to this, and keep using the same
++ * @iretry in the subsequent calls until it gets a non -EBUSY return.
++ *
++ * Returns 0 if device now idle, -ENODEV for device not operational,
++ * -EBUSY if an interrupt is expected (either from halt/clear or from a
++ * status pending), and -EIO if out of retries.
++ */
++int cio_cancel_halt_clear(struct subchannel *sch, int *iretry)
++{
++	int ret;
++
++	if (cio_update_schib(sch))
++		return -ENODEV;
++	if (!sch->schib.pmcw.ena)
++		/* Not operational -> done. */
++		return 0;
++	/* Stage 1: cancel io. */
++	if (!(scsw_actl(&sch->schib.scsw) & SCSW_ACTL_HALT_PEND) &&
++	    !(scsw_actl(&sch->schib.scsw) & SCSW_ACTL_CLEAR_PEND)) {
++		if (!scsw_is_tm(&sch->schib.scsw)) {
++			ret = cio_cancel(sch);
++			if (ret != -EINVAL)
++				return ret;
++		}
++		/*
++		 * Cancel io unsuccessful or not applicable (transport mode).
++		 * Continue with asynchronous instructions.
++		 */
++		*iretry = 3;	/* 3 halt retries. */
++	}
++	/* Stage 2: halt io. */
++	if (!(scsw_actl(&sch->schib.scsw) & SCSW_ACTL_CLEAR_PEND)) {
++		if (*iretry) {
++			*iretry -= 1;
++			ret = cio_halt(sch);
++			if (ret != -EBUSY)
++				return (ret == 0) ? -EBUSY : ret;
++		}
++		/* Halt io unsuccessful. */
++		*iretry = 255;	/* 255 clear retries. */
++	}
++	/* Stage 3: clear io. */
++	if (*iretry) {
++		*iretry -= 1;
++		ret = cio_clear(sch);
++		return (ret == 0) ? -EBUSY : ret;
++	}
++	/* Function was unsuccessful */
++	return -EIO;
++}
+ 
+ static void cio_apply_config(struct subchannel *sch, struct schib *schib)
+ {
+diff --git a/drivers/s390/cio/cio.h b/drivers/s390/cio/cio.h
+index f0e57ae..939596d 100644
+--- a/drivers/s390/cio/cio.h
++++ b/drivers/s390/cio/cio.h
+@@ -123,6 +123,7 @@ extern int cio_enable_subchannel(struct subchannel *, u32);
+ extern int cio_disable_subchannel (struct subchannel *);
+ extern int cio_cancel (struct subchannel *);
+ extern int cio_clear (struct subchannel *);
++extern int cio_cancel_halt_clear(struct subchannel *, int *);
+ extern int cio_resume (struct subchannel *);
+ extern int cio_halt (struct subchannel *);
+ extern int cio_start (struct subchannel *, struct ccw1 *, __u8);
+diff --git a/drivers/s390/cio/device_fsm.c b/drivers/s390/cio/device_fsm.c
+index 9afb5ce..12016e3 100644
+--- a/drivers/s390/cio/device_fsm.c
++++ b/drivers/s390/cio/device_fsm.c
+@@ -124,14 +124,6 @@ ccw_device_set_timeout(struct ccw_device *cdev, int expires)
+ 	add_timer(&cdev->private->timer);
+ }
+ 
+-/*
+- * Cancel running i/o. This is called repeatedly since halt/clear are
+- * asynchronous operations. We do one try with cio_cancel, two tries
+- * with cio_halt, 255 tries with cio_clear. If everythings fails panic.
+- * Returns 0 if device now idle, -ENODEV for device not operational and
+- * -EBUSY if an interrupt is expected (either from halt/clear or from a
+- * status pending).
+- */
+ int
+ ccw_device_cancel_halt_clear(struct ccw_device *cdev)
+ {
+@@ -139,44 +131,14 @@ ccw_device_cancel_halt_clear(struct ccw_device *cdev)
+ 	int ret;
+ 
+ 	sch = to_subchannel(cdev->dev.parent);
+-	if (cio_update_schib(sch))
+-		return -ENODEV; 
+-	if (!sch->schib.pmcw.ena)
+-		/* Not operational -> done. */
+-		return 0;
+-	/* Stage 1: cancel io. */
+-	if (!(scsw_actl(&sch->schib.scsw) & SCSW_ACTL_HALT_PEND) &&
+-	    !(scsw_actl(&sch->schib.scsw) & SCSW_ACTL_CLEAR_PEND)) {
+-		if (!scsw_is_tm(&sch->schib.scsw)) {
+-			ret = cio_cancel(sch);
+-			if (ret != -EINVAL)
+-				return ret;
+-		}
+-		/* cancel io unsuccessful or not applicable (transport mode).
+-		 * Continue with asynchronous instructions. */
+-		cdev->private->iretry = 3;	/* 3 halt retries. */
+-	}
+-	if (!(scsw_actl(&sch->schib.scsw) & SCSW_ACTL_CLEAR_PEND)) {
+-		/* Stage 2: halt io. */
+-		if (cdev->private->iretry) {
+-			cdev->private->iretry--;
+-			ret = cio_halt(sch);
+-			if (ret != -EBUSY)
+-				return (ret == 0) ? -EBUSY : ret;
+-		}
+-		/* halt io unsuccessful. */
+-		cdev->private->iretry = 255;	/* 255 clear retries. */
+-	}
+-	/* Stage 3: clear io. */
+-	if (cdev->private->iretry) {
+-		cdev->private->iretry--;
+-		ret = cio_clear (sch);
+-		return (ret == 0) ? -EBUSY : ret;
+-	}
+-	/* Function was unsuccessful */
+-	CIO_MSG_EVENT(0, "0.%x.%04x: could not stop I/O\n",
+-		      cdev->private->dev_id.ssid, cdev->private->dev_id.devno);
+-	return -EIO;
++	ret = cio_cancel_halt_clear(sch, &cdev->private->iretry);
++
++	if (ret == -EIO)
++		CIO_MSG_EVENT(0, "0.%x.%04x: could not stop I/O\n",
++			      cdev->private->dev_id.ssid,
++			      cdev->private->dev_id.devno);
++
++	return ret;
+ }
+ 
+ void ccw_device_update_sense_data(struct ccw_device *cdev)
+-- 
+2.8.4
