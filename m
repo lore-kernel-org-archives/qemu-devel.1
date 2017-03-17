@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1corrD-0002Iz-Uk
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 09:23:52 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1corsy-0003YB-B0
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 09:25:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1corrC-0003eb-TM
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 09:23:51 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170317104541.28979-1-stefanha@redhat.com>
-	<20170317104541.28979-3-stefanha@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <5bb5dee0-a9e8-e31b-3abd-b310ac946a66@amsat.org>
-Date: Fri, 17 Mar 2017 10:23:41 -0300
+	(envelope-from <peter.maydell@linaro.org>) id 1corsx-0004JA-EC
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 09:25:40 -0400
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:38089)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1corsx-0004IP-72
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 09:25:39 -0400
+Received: by mail-wm0-x235.google.com with SMTP id t189so15893836wmt.1
+	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 06:25:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170317104541.28979-3-stefanha@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] qemu-img: fix switch indentation in
- img_amend()
+In-Reply-To: <95e695ba-3ecc-5254-721e-b35ed08b8074@redhat.com>
+References: <1489748902-21765-1-git-send-email-peter.maydell@linaro.org>
+	<20170317114953.GF8050@redhat.com>
+	<CAFEAcA8Sky0cX+7U257AdG=imYYcdqRgL--o=86xCHMY6Kr3zw@mail.gmail.com>
+	<95e695ba-3ecc-5254-721e-b35ed08b8074@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 17 Mar 2017 13:25:17 +0000
+Message-ID: <CAFEAcA8R1bf6kRB6L=uyQAoQJBPaDxK7pG2C-9ApW9BLdR_oiw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] configure: Warn about deprecated hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,118 +31,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, mreitz@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>
 
-On 03/17/2017 07:45 AM, Stefan Hajnoczi wrote:
-> QEMU coding style indents 'case' to the same level as the 'switch'
-> statement:
->
->   switch (foo) {
->   case 1:
->
-> Fix this coding style violation so checkpatch.pl doesn't complain about
-> the next patch.
->
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+On 17 March 2017 at 13:19, Thomas Huth <thuth@redhat.com> wrote:
+> So could you maybe change your patch that it does not warn when the user
+> has run configure with the "--enable-tcg-interpreter" option?
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Nope. I specifically don't want to enable support for TCI on random
+who-knows-what-this-is architectures. It eats up too much time
+causing people to worry about "what if this is some weird thing"
+when they're trying to refactor code, when in practice nobody
+is really using QEMU on oddball host CPUs.
 
-> ---
->  qemu-img.c | 82 +++++++++++++++++++++++++++++++-------------------------------
->  1 file changed, 41 insertions(+), 41 deletions(-)
->
-> diff --git a/qemu-img.c b/qemu-img.c
-> index ce293a4..c7ffabb 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -3500,47 +3500,47 @@ static int img_amend(int argc, char **argv)
->          }
->
->          switch (c) {
-> -            case 'h':
-> -            case '?':
-> -                help();
-> -                break;
-> -            case 'o':
-> -                if (!is_valid_option_list(optarg)) {
-> -                    error_report("Invalid option list: %s", optarg);
-> -                    ret = -1;
-> -                    goto out_no_progress;
-> -                }
-> -                if (!options) {
-> -                    options = g_strdup(optarg);
-> -                } else {
-> -                    char *old_options = options;
-> -                    options = g_strdup_printf("%s,%s", options, optarg);
-> -                    g_free(old_options);
-> -                }
-> -                break;
-> -            case 'f':
-> -                fmt = optarg;
-> -                break;
-> -            case 't':
-> -                cache = optarg;
-> -                break;
-> -            case 'p':
-> -                progress = true;
-> -                break;
-> -            case 'q':
-> -                quiet = true;
-> -                break;
-> -            case OPTION_OBJECT:
-> -                opts = qemu_opts_parse_noisily(&qemu_object_opts,
-> -                                               optarg, true);
-> -                if (!opts) {
-> -                    ret = -1;
-> -                    goto out_no_progress;
-> -                }
-> -                break;
-> -            case OPTION_IMAGE_OPTS:
-> -                image_opts = true;
-> -                break;
-> +        case 'h':
-> +        case '?':
-> +            help();
-> +            break;
-> +        case 'o':
-> +            if (!is_valid_option_list(optarg)) {
-> +                error_report("Invalid option list: %s", optarg);
-> +                ret = -1;
-> +                goto out_no_progress;
-> +            }
-> +            if (!options) {
-> +                options = g_strdup(optarg);
-> +            } else {
-> +                char *old_options = options;
-> +                options = g_strdup_printf("%s,%s", options, optarg);
-> +                g_free(old_options);
-> +            }
-> +            break;
-> +        case 'f':
-> +            fmt = optarg;
-> +            break;
-> +        case 't':
-> +            cache = optarg;
-> +            break;
-> +        case 'p':
-> +            progress = true;
-> +            break;
-> +        case 'q':
-> +            quiet = true;
-> +            break;
-> +        case OPTION_OBJECT:
-> +            opts = qemu_opts_parse_noisily(&qemu_object_opts,
-> +                                           optarg, true);
-> +            if (!opts) {
-> +                ret = -1;
-> +                goto out_no_progress;
-> +            }
-> +            break;
-> +        case OPTION_IMAGE_OPTS:
-> +            image_opts = true;
-> +            break;
->          }
->      }
->
->
+If somebody wants to support QEMU as a TCI-only setup on a
+new host architecture, they can submit a patch to configure
+that specifically recognizes the host architecture (even
+if we don't have a tcg backend for it).
+
+thanks
+-- PMM
