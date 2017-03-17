@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46087)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1copsA-0005PJ-BX
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:16:43 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46713)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1copvm-0006y6-2t
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:20:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cops7-0003r6-MO
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:16:42 -0400
-Received: from 8.mo69.mail-out.ovh.net ([46.105.56.233]:37527)
+	(envelope-from <pl@kamp.de>) id 1copvi-0005r4-Uj
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:20:26 -0400
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:42575 helo=mx01.kamp.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cops7-0003qW-FF
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:16:39 -0400
-Received: from player738.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 3D8911BAEB
-	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 12:16:38 +0100 (CET)
-Date: Fri, 17 Mar 2017 12:16:30 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170317121630.503719ec@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <1489694518-16978-3-git-send-email-sstabellini@kernel.org>
-References: <alpine.DEB.2.10.1703161241220.14378@sstabellini-ThinkPad-X260>
-	<1489694518-16978-1-git-send-email-sstabellini@kernel.org>
-	<1489694518-16978-3-git-send-email-sstabellini@kernel.org>
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1copvi-0005qV-KU
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 07:20:22 -0400
+References: <bd7cb196-0779-42ad-ce9c-5871d307adce@kamp.de>
+	<82d604c8-068a-aff4-6037-e3cd247b3588@redhat.com>
+	<819af057-3777-dffc-4670-895b8265fd01@kamp.de>
+	<d41d1428-4c8b-7e2f-b197-8d45b834776d@redhat.com>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <32e1e781-f0b0-ac67-a5ce-74ccc64071a0@kamp.de>
+Date: Fri, 17 Mar 2017 12:20:18 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_//m_V3EkTwWpOrSsbmFvHM30";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v3 3/9] 9p: introduce a type for the 9p
- header
+In-Reply-To: <d41d1428-4c8b-7e2f-b197-8d45b834776d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] callout to *file in bdrv_co_get_block_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,79 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, jgross@suse.com, Stefano Stabellini <stefano@aporeto.com>, anthony.perard@citrix.com, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu block <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Fam Zheng <famz@redhat.com>
 
---Sig_//m_V3EkTwWpOrSsbmFvHM30
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Am 17.03.2017 um 12:16 schrieb Paolo Bonzini:
+>
+> On 17/03/2017 12:11, Peter Lieven wrote:
+>>>> like VMDK or QCOW2 shouldn't we trust the information from the l2 tables in the VMDK or QCOW2?
+>>> It provides additional information, for example it works better with
+>>> prealloc=metadata.
+>> Okay, understood. Can you imagine of a away to conditionally avoid this second callout? In my case we have an additional
+>> lseek for each cluster. For a 20GB file this are approx. 327k calls to lseek. And if the file has no preallocated metadata
+>> it will likely not improve anything. And even if the metadata is prealloced what is the allocation status of the clusters?
+> If the metadata is preallocated, cluster will (or should) show up as
+> zero, speeding up the copy.
 
-On Thu, 16 Mar 2017 13:01:52 -0700
-Stefano Stabellini <sstabellini@kernel.org> wrote:
+Okay, in this case the second call out to *file will not happen. It only happens if the metadata says it contains data.
+So where does it actually help?
 
-> Use the new type in virtio-9p-device.
->=20
-> Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
-> CC: anthony.perard@citrix.com
-> CC: jgross@suse.com
-> CC: Aneesh Kumar K.V <aneesh.kumar@linux.vnet.ibm.com>
-> CC: Greg Kurz <groug@kaod.org>
-> ---
+The condition is: (ret & BDRV_BLOCK_DATA) && !(ret & BDRV_BLOCK_ZERO) && (ret & BDRV_BLOCK_OFFSET_VALID))
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+So from my view it can only have any effect if the metadata returns BDRV_BLOCK_DATA, but the protocol driver returns
+BDRV_BLOCK_ZERO.
 
->  hw/9pfs/9p.h               | 6 ++++++
->  hw/9pfs/virtio-9p-device.c | 6 +-----
->  2 files changed, 7 insertions(+), 5 deletions(-)
->=20
-> diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
-> index b7e8362..5312d8a 100644
-> --- a/hw/9pfs/9p.h
-> +++ b/hw/9pfs/9p.h
-> @@ -119,6 +119,12 @@ static inline char *rpath(FsContext *ctx, const char=
- *path)
->  typedef struct V9fsPDU V9fsPDU;
->  struct V9fsState;
-> =20
-> +typedef struct {
-> +    uint32_t size_le;
-> +    uint8_t id;
-> +    uint16_t tag_le;
-> +} QEMU_PACKED P9MsgHeader;
-> +
->  struct V9fsPDU
->  {
->      uint32_t size;
-> diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
-> index 27a4a32..3782f43 100644
-> --- a/hw/9pfs/virtio-9p-device.c
-> +++ b/hw/9pfs/virtio-9p-device.c
-> @@ -46,11 +46,7 @@ static void handle_9p_output(VirtIODevice *vdev, VirtQ=
-ueue *vq)
->      VirtQueueElement *elem;
-> =20
->      while ((pdu =3D pdu_alloc(s))) {
-> -        struct {
-> -            uint32_t size_le;
-> -            uint8_t id;
-> -            uint16_t tag_le;
-> -        } QEMU_PACKED out;
-> +        P9MsgHeader out;
-> =20
->          elem =3D virtqueue_pop(vq, sizeof(VirtQueueElement));
->          if (!elem) {
+This can only happen if I partially write to a cluster, or am I wrong here?
 
-
---Sig_//m_V3EkTwWpOrSsbmFvHM30
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAljLxY4ACgkQAvw66wEB28KyPgCdHpLkKdwftqamgtzuP7g+N0RZ
-n30AoKE9+Xev+r4X8sMqEpVeJsZYg21e
-=6QYN
------END PGP SIGNATURE-----
-
---Sig_//m_V3EkTwWpOrSsbmFvHM30--
+Peter
