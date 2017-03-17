@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1coyiJ-0007KW-Kl
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 16:43:08 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1coywF-0002QJ-2q
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 16:57:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1coyiF-0005pR-MT
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 16:43:07 -0400
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:36813)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1coyiF-0005p2-Cv
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 16:43:03 -0400
-Received: by mail-wm0-x230.google.com with SMTP id n11so24211903wma.1
-	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 13:43:02 -0700 (PDT)
-References: <20170224112109.3147-1-alex.bennee@linaro.org>
-	<20170224112109.3147-12-alex.bennee@linaro.org>
-	<f7a4cba9-12da-fbb3-684f-68b4a11fbe97@vivier.eu>
-	<87y3wr8zs2.fsf@linaro.org>
-	<e3f645d0-ea92-b28d-bb2b-9c831dd8b264@vivier.eu>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <e3f645d0-ea92-b28d-bb2b-9c831dd8b264@vivier.eu>
-Date: Fri, 17 Mar 2017 20:43:22 +0000
-Message-ID: <87var7ocr9.fsf@linaro.org>
+	(envelope-from <sstabellini@kernel.org>) id 1coywB-0003vz-W6
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 16:57:31 -0400
+Received: from mail.kernel.org ([198.145.29.136]:50228)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1coywB-0003vN-Q1
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 16:57:27 -0400
+Date: Fri, 17 Mar 2017 13:57:22 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <1e1d1637-1cf8-2ad4-36e2-342aa21b100d@redhat.com>
+Message-ID: <alpine.DEB.2.10.1703171356520.22036@sstabellini-ThinkPad-X260>
+References: <1489750157-17401-1-git-send-email-tianyu.lan@intel.com>
+	<1e1d1637-1cf8-2ad4-36e2-342aa21b100d@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 11/24] tcg: enable thread-per-vCPU
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [RFC PATCH 0/4] Qemu: Add Xen vIOMMU support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,131 +27,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: peter.maydell@linaro.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, KONRAD Frederic <fred.konrad@greensocs.com>, Richard Henderson <rth@twiddle.net>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Lan Tianyu <tianyu.lan@intel.com>, qemu-devel@nongnu.org, xen-devel@lists.xensource.com, chao.gao@intel.com, kevin.tian@intel.com, anthony.perard@citrix.com, ehabkost@redhat.com, marcel@redhat.com, mst@redhat.com, rth@twiddle.net, sstabellini@kernel.organthony.perard@citrix.com
+
+On Fri, 17 Mar 2017, Paolo Bonzini wrote:
+> On 17/03/2017 12:29, Lan Tianyu wrote:
+> > This patchset is to add Xen vIOMMU device model and handle
+> > irq remapping stuffs. Xen vIOMMU emulation is in the Xen hypervisor
+> > and the new device module in Qemu works as hypercall wrappers to
+> > create and destroy vIOMMU in hypervisor.
+> > 
+> > Xen only supports emulated I440 and so we enable vIOMMU with emulated
+> > I440 chipset. This works on Linux and Windows guest.
+> 
+> Any plans to change this?  Why is Xen not able to use Q35 with Intel
+> IOMMU, with only special hooks for interrupt remapping?
+
+CC'ing Anthony that worked on it in the past
 
 
-Laurent Vivier <laurent@vivier.eu> writes:
-
-> Le 27/02/2017 à 15:38, Alex Bennée a écrit :
->>
->> Laurent Vivier <laurent@vivier.eu> writes:
->>
->>> Le 24/02/2017 à 12:20, Alex Bennée a écrit :
->>>> There are a couple of changes that occur at the same time here:
->>>>
->>>>   - introduce a single vCPU qemu_tcg_cpu_thread_fn
->>>>
->>>>   One of these is spawned per vCPU with its own Thread and Condition
->>>>   variables. qemu_tcg_rr_cpu_thread_fn is the new name for the old
->>>>   single threaded function.
->>>>
->>>>   - the TLS current_cpu variable is now live for the lifetime of MTTCG
->>>>     vCPU threads. This is for future work where async jobs need to know
->>>>     the vCPU context they are operating in.
->>>>
->>>> The user to switch on multi-thread behaviour and spawn a thread
->>>> per-vCPU. For a simple test kvm-unit-test like:
->>>>
->>>>   ./arm/run ./arm/locking-test.flat -smp 4 -accel tcg,thread=multi
->>>>
->>>> Will now use 4 vCPU threads and have an expected FAIL (instead of the
->>>> unexpected PASS) as the default mode of the test has no protection when
->>>> incrementing a shared variable.
->>>>
->>>> We enable the parallel_cpus flag to ensure we generate correct barrier
->>>> and atomic code if supported by the front and backends. This doesn't
->>>> automatically enable MTTCG until default_mttcg_enabled() is updated to
->>>> check the configuration is supported.
->>>
->>> This commit breaks linux-user mode:
->>>
->>> debian-8 with qemu-ppc on x86_64 with ltp-full-20170116
->>>
->>> cd /opt/ltp
->>> ./runltp -p -l "qemu-$(date +%FT%T).log" -f /opt/ltp/runtest/syscalls -s
->>> setgroups03
->>>
->>> setgroups03    1  TPASS  :  setgroups(65537) fails, Size is >
->>> sysconf(_SC_NGROUPS_MAX), errno=22
->>> qemu-ppc: /home/laurent/Projects/qemu/include/qemu/rcu.h:89:
->>> rcu_read_unlock: Assertion `p_rcu_reader->depth != 0' failed.
->>> qemu-ppc: /home/laurent/Projects/qemu/include/qemu/rcu.h:89:
->>> rcu_read_unlock: Assertion `p_rcu_reader->depth != 0' failed.
->>> qemu-ppc: /home/laurent/Projects/qemu/include/qemu/rcu.h:89:
->>> rcu_read_unlock: Assertion `p_rcu_reader->depth != 0' failed.
->>> ...
->>
->> Interesting. I can only think the current_cpu change has broken it
->> because most of the changes in this commit affect softmmu targets only
->> (linux-user has its own run loop).
->>
->> Thanks for the report - I'll look into it.
->
-> After:
->
->      95b0eca Merge remote-tracking branch
-> 'remotes/stsquad/tags/pull-mttcg-fixups-090317-1' into staging
->
-> [Tested with my HEAD on:
-> b1616fe Merge remote-tracking branch
-> 'remotes/famz/tags/docker-pull-request' into staging]
->
-> I have now:
->
-> <<<test_start>>>
-> tag=setgroups03 stime=1489413401
-> cmdline="setgroups03"
-> contacts=""
-> analysis=exit
-> <<<test_output>>>
-> **
-> ERROR:/home/laurent/Projects/qemu/cpu-exec.c:656:cpu_exec: assertion
-> failed: (cpu == current_cpu)
-> **
-
-OK we now understand what's happening:
-
- - setgroups calls __nptl_setxid_error, triggers abort()
-   - this sends sig_num 6, then 11
- - host_signal_handler tries to handle 11
- - -> handle_cpu_signal
-
-Pre: tcg: enable thread-per-vCPU caused this problem:
-
- - current_cpu was reset to NULL on the way out of the loop
- - therefore handle_cpu_signal went boom because
-     cpu = current_cpu;
-     cc = CPU_GET_CLASS(cpu);
-
-Post: tcg: enable thread-per-vCPU caused this problem:
-
- - current_cpu is now live outside cpu_exec_loop
-   - this is mainly so async_work functions can assert (cpu == current_cpu)
- - hence handle_cpu_signal gets further and calls
-    cpu_loop_exit(cpu);
- - hilarity ensues as we siglongjmp into a stale context
-
-Obviously we shouldn't try to siglongjmp. But we also shouldn't rely on
-current_cpu as a proxy to crash early when outside of the loop. There is
-a slight wrinkle that we also have funny handling of segs during
-translation if a guest jumps to code in an as-yet un-mapped region of
-memory.
-
-There is currently cpu->running which is set/cleared by
-cpu_exec_start/end. Although if we crash between cpu_exec_start and
-sigsetjmp the same sort of brokenness might happen.
-
-Anyway understood now. If anyone has any suggestions for neater stuff
-over the weekend please shout, otherwise I'll probably just hack
-handle_cpu_signal to do:
-
-   cpu = current_cpu;
-   if (!cpu->running) {
-      /* we weren't running or translating JIT code when the signal came */
-      return 1;
-   }
-
-
---
-Alex Bennée
+> > Chao Gao (4):
+> >   I440: Allow adding sysbus devices with -device on I440
+> >   Xen: add a dummy vIOMMU to create/destroy vIOMMU in Xen
+> >   xen-pt: bind/unbind interrupt remapping format MSI
+> >   msi: taking interrupt format into consideration during judging a pirq
+> >     is binded with a event channel
+> 
