@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44691)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1cpH20-0005dU-Nk
-	for qemu-devel@nongnu.org; Sat, 18 Mar 2017 12:16:41 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47341)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <no-reply@patchew.org>) id 1cpHFj-0008Ib-7v
+	for qemu-devel@nongnu.org; Sat, 18 Mar 2017 12:30:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1cpH1v-0007pK-PA
-	for qemu-devel@nongnu.org; Sat, 18 Mar 2017 12:16:40 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:39275 helo=mx01.kamp.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1cpH1v-0007og-Fb
-	for qemu-devel@nongnu.org; Sat, 18 Mar 2017 12:16:35 -0400
-References: <bd7cb196-0779-42ad-ce9c-5871d307adce@kamp.de>
-	<82d604c8-068a-aff4-6037-e3cd247b3588@redhat.com>
-	<819af057-3777-dffc-4670-895b8265fd01@kamp.de>
-	<d41d1428-4c8b-7e2f-b197-8d45b834776d@redhat.com>
-	<20170317112446.GH13125@lemon.lan>
-	<d60bca20-c76b-696f-06d6-766d2d42ed77@redhat.com>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <1a6e1309-7824-c57f-54ce-be9e9466df10@kamp.de>
-Date: Sat, 18 Mar 2017 17:16:30 +0100
+	(envelope-from <no-reply@patchew.org>) id 1cpHFg-0003R5-2g
+	for qemu-devel@nongnu.org; Sat, 18 Mar 2017 12:30:51 -0400
+Resent-Message-Id: <E1cpHFg-0003R5-2g@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21436)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cpHFf-0003Qj-SP
+	for qemu-devel@nongnu.org; Sat, 18 Mar 2017 12:30:47 -0400
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148985028177.102.8104975429999198546@6c512846dbc7>
+In-Reply-To: <1489850003-5652-1-git-send-email-a.perevalov@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <d60bca20-c76b-696f-06d6-766d2d42ed77@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] callout to *file in bdrv_co_get_block_status
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sat, 18 Mar 2017 08:18:02 -0700 (PDT)
+Subject: Re: [Qemu-devel] [RFC PATCH 0/2] Calcuate downtime for postcopy
+ live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,35 +29,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+To: a.perevalov@samsung.com
+Cc: famz@redhat.com, dgilbert@redhat.com, qemu-devel@nongnu.org, i.maximets@samsung.com
 
-Am 17.03.2017 um 15:51 schrieb Paolo Bonzini:
->
-> On 17/03/2017 12:24, Fam Zheng wrote:
->> On Fri, 03/17 12:16, Paolo Bonzini wrote:
->>>
->>> On 17/03/2017 12:11, Peter Lieven wrote:
->>>>>> like VMDK or QCOW2 shouldn't we trust the information from the l2 tables in the VMDK or QCOW2?
->>>>> It provides additional information, for example it works better with
->>>>> prealloc=metadata.
->>>> Okay, understood. Can you imagine of a away to conditionally avoid this second callout? In my case we have an additional
->>>> lseek for each cluster. For a 20GB file this are approx. 327k calls to lseek. And if the file has no preallocated metadata
->>>> it will likely not improve anything. And even if the metadata is prealloced what is the allocation status of the clusters?
->>> If the metadata is preallocated, cluster will (or should) show up as
->>> zero, speeding up the copy.
->> I think from qemu-img convert's perspective, it doesn't care about the *file
->> status if the metadata already speaks, because, like you said, the data shows up
->> as zeroes.
-> That's already the case: *file is only examined if the metadata  says
-> BDRV_BLOCK_DATA=1, BDRV_BLOCK_ZERO=0.
-
-Maybe Fam meant in qemu-img this info is not that necessary because it will skip zeroes inside
-a datablock anyway. I don't know why the lseek is soo slow, but the optimization could be to identify
-the case where this extra info of the *file containing zeroes is really useful and then only call out for
-it in those cases.
-
-Peter
-
->
-> Paolo
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ4
+OTg1MDAwMy01NjUyLTEtZ2l0LXNlbmQtZW1haWwtYS5wZXJldmFsb3ZAc2Ftc3VuZy5jb20KU3Vi
+amVjdDogW1FlbXUtZGV2ZWxdIFtSRkMgUEFUQ0ggMC8yXSBDYWxjdWF0ZSBkb3dudGltZSBmb3Ig
+cG9zdGNvcHkgbGl2ZSBtaWdyYXRpb24KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVH
+SU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxp
+bmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNv
+bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
+ZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJB
+U0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4v
+JHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBz
+aG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFj
+ayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChu
+KzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5n
+IDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dp
+dGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hl
+dy8xNDg5ODUwMDAzLTU2NTItMS1naXQtc2VuZC1lbWFpbC1hLnBlcmV2YWxvdkBzYW1zdW5nLmNv
+bSAtPiBwYXRjaGV3LzE0ODk4NTAwMDMtNTY1Mi0xLWdpdC1zZW5kLWVtYWlsLWEucGVyZXZhbG92
+QHNhbXN1bmcuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMmJiNGYwYiBtaWdy
+YXRpb246IGNhbGN1bGF0ZSBkb3dudGltZSBvbiBkc3Qgc2lkZQpmMzk4MzViIHVzZXJmYXVsdDog
+YWRkIHBpZCBpbnRvIHVmZmRfbXNnCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRD
+SCAxLzI6IHVzZXJmYXVsdDogYWRkIHBpZCBpbnRvIHVmZmRfbXNnLi4uCkNoZWNraW5nIFBBVENI
+IDIvMjogbWlncmF0aW9uOiBjYWxjdWxhdGUgZG93bnRpbWUgb24gZHN0IHNpZGUuLi4KQXJndW1l
+bnQgIm0iIGlzbid0IG51bWVyaWMgaW4gbnVtZXJpYyBlcSAoPT0pIGF0IC4vc2NyaXB0cy9jaGVj
+a3BhdGNoLnBsIGxpbmUgMjQ1OS4KQXJndW1lbnQgIm0iIGlzbid0IG51bWVyaWMgaW4gbnVtZXJp
+YyBlcSAoPT0pIGF0IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIGxpbmUgMjQ1OS4KVXNlIG9mIHVu
+aW5pdGlhbGl6ZWQgdmFsdWUgJDEgaW4gY29uY2F0ZW5hdGlvbiAoLikgb3Igc3RyaW5nIGF0IC4v
+c2NyaXB0cy9jaGVja3BhdGNoLnBsIGxpbmUgMjQ2MC4KRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVj
+ZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNjg6IEZJTEU6IG1pZ3JhdGlv
+bi9taWdyYXRpb24uYzoxMjk6CisgICAgaWYgKGEgPT0gYikKWy4uLl0KKyAgICBlbHNlIGlmIChh
+ID4gYikKWy4uLl0KCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMg
+b2YgdGhpcyBzdGF0ZW1lbnQKIzcwOiBGSUxFOiBtaWdyYXRpb24vbWlncmF0aW9uLmM6MTMxOgor
+ICAgIGVsc2UgaWYgKGEgPiBiKQpbLi4uXQoKRVJST1I6IHVubmVjZXNzYXJ5IGNhc3QgbWF5IGhp
+ZGUgYnVncywgdXNlIGdfbmV3MCBpbnN0ZWFkCiMxMzE6IEZJTEU6IG1pZ3JhdGlvbi9taWdyYXRp
+b24uYzoyMTQ5OgorICAgICAgICBkZCA9IChEb3dudGltZUR1cmF0aW9uICopZ19tYWxsb2MwKHNp
+emVvZihEb3dudGltZUR1cmF0aW9uKSk7CgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3Nhcnkg
+Zm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMxMzU6IEZJTEU6IG1pZ3JhdGlvbi9taWdy
+YXRpb24uYzoyMTUzOgorICAgIGlmIChjcHUgPCAwKQpbLi4uXQorICAgIGVsc2UKWy4uLl0KCldB
+Uk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxNjA6IEZJTEU6IG1pZ3JhdGlvbi9taWdy
+YXRpb24uYzoyMTc4OgorICAgICAgICAvKiBlcnJvcl9yZXBvcnQoIkNvdWxkIG5vdCBwb3B1bGF0
+ZSBkb3dudGltZSBkdXJhdGlvbiBjb21wbGV0aW9uIHRpbWUgXG5cCgpFUlJPUjogdW5uZWNlc3Nh
+cnkgd2hpdGVzcGFjZSBiZWZvcmUgYSBxdW90ZWQgbmV3bGluZQojMTYwOiBGSUxFOiBtaWdyYXRp
+b24vbWlncmF0aW9uLmM6MjE3ODoKKyAgICAgICAgLyogZXJyb3JfcmVwb3J0KCJDb3VsZCBub3Qg
+cG9wdWxhdGUgZG93bnRpbWUgZHVyYXRpb24gY29tcGxldGlvbiB0aW1lIFxuXAoKRVJST1I6IEVy
+cm9yIG1lc3NhZ2VzIHNob3VsZCBub3QgY29udGFpbiBuZXdsaW5lcwojMTYwOiBGSUxFOiBtaWdy
+YXRpb24vbWlncmF0aW9uLmM6MjE3ODoKKyAgICAgICAgLyogZXJyb3JfcmVwb3J0KCJDb3VsZCBu
+b3QgcG9wdWxhdGUgZG93bnRpbWUgZHVyYXRpb24gY29tcGxldGlvbiB0aW1lIFxuXAoKRVJST1I6
+IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAoj
+MTkzOiBGSUxFOiBtaWdyYXRpb24vbWlncmF0aW9uLmM6MjIxMToKKyAgICBpZiAoZGQtPmVuZCAm
+JiBkZC0+YmVnaW4pClsuLi5dCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTk0
+OiBGSUxFOiBtaWdyYXRpb24vbWlncmF0aW9uLmM6MjIxMjoKKyAgICAgICAgdHJhY2Vfc3VtdXBf
+ZG93bnRpbWVfZHVyYXRpb24oZGQtPmVuZCAtIGRkLT5iZWdpbiwgKHVpbnQ2NF90KWtleSwgZGQt
+PmNwdXMpOwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0
+aGlzIHN0YXRlbWVudAojMjA1OiBGSUxFOiBtaWdyYXRpb24vbWlncmF0aW9uLmM6MjIyMzoKKyAg
+ICAgICAgaWYgKHRlc3RfYml0KGNwdV9pdGVyLCAmZGQtPmNwdXMpICYmIGRkLT5lbmQgJiYgZGQt
+PmJlZ2luKQpbLi4uXQoKRVJST1I6IHRoYXQgb3BlbiBicmFjZSB7IHNob3VsZCBiZSBvbiB0aGUg
+cHJldmlvdXMgbGluZQojMjIyOiBGSUxFOiBtaWdyYXRpb24vbWlncmF0aW9uLmM6MjI0MDoKKyAg
+ICBmb3IgKGkgPSAwOyBpIDwgc21wX2NwdXM7IGkrKykKKyAgICB7CgpFUlJPUjogYnJhY2VzIHt9
+IGFyZSBuZWNlc3NhcnkgZXZlbiBmb3Igc2luZ2xlIHN0YXRlbWVudCBibG9ja3MKIzIyMjogRklM
+RTogbWlncmF0aW9uL21pZ3JhdGlvbi5jOjIyNDA6CisgICAgZm9yIChpID0gMDsgaSA8IHNtcF9j
+cHVzOyBpKyspCisgICAgeworCXNldF9iaXQoaSwgJnN1ZmZpY2llbnRfY3B1cyk7CisgICAgfQoK
+RVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjI0OiBGSUxFOiBtaWdy
+YXRpb24vbWlncmF0aW9uLmM6MjI0MjoKK15Jc2V0X2JpdChpLCAmc3VmZmljaWVudF9jcHVzKTsk
+CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjYyOiBGSUxFOiBtaWdyYXRpb24v
+bWlncmF0aW9uLmM6MjI4MDoKKyAqIFMyLEUxIC0gZG9lc24ndCBtYXRjaCBjb25kaXRpb24gZHVl
+IHRvIHNlcXVlbmNlIFMxLFMyLEUxIGRvZXNuJ3QgaW5jbHVkZSBDUFUzLAoKRVJST1I6IHRoYXQg
+b3BlbiBicmFjZSB7IHNob3VsZCBiZSBvbiB0aGUgcHJldmlvdXMgbGluZQojMjg4OiBGSUxFOiBt
+aWdyYXRpb24vbWlncmF0aW9uLmM6MjMwNjoKKyAgICBmb3IgKHBvaW50X2l0ZXIgPSAwOyBwb2lu
+dF9pdGVyIDwgc21wX2NwdXM7IHBvaW50X2l0ZXIrKykKKyAgICB7CgpFUlJPUjogYnJhY2VzIHt9
+IGFyZSBuZWNlc3NhcnkgZXZlbiBmb3Igc2luZ2xlIHN0YXRlbWVudCBibG9ja3MKIzI4ODogRklM
+RTogbWlncmF0aW9uL21pZ3JhdGlvbi5jOjIzMDY6CisgICAgZm9yIChwb2ludF9pdGVyID0gMDsg
+cG9pbnRfaXRlciA8IHNtcF9jcHVzOyBwb2ludF9pdGVyKyspCisgICAgeworICAgICAgICB0cmFj
+ZV9kb3dudGltZV9wZXJfY3B1KHBvaW50X2l0ZXIsIGRvd250aW1lX2NwdVtwb2ludF9pdGVyXSk7
+CisgICAgfQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0
+aGlzIHN0YXRlbWVudAojMzAyOiBGSUxFOiBtaWdyYXRpb24vbWlncmF0aW9uLmM6MjMyMDoKKyAg
+ICAgICAgaWYgKCFvZC0+aXNfZW5kIHx8IHByZXZfb2QtPmlzX2VuZCkKWy4uLl0KCkVSUk9SOiBi
+cmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzMx
+MTogRklMRTogbWlncmF0aW9uL21pZ3JhdGlvbi5jOjIzMjk6CisgICAgICAgICAgICBpZiAodF9v
+ZC0+aXNfZW5kKQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwg
+YXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMzY3OiBGSUxFOiBtaWdyYXRpb24vcG9zdGNvcHktcmFt
+LmM6NDMxOgorICAgICAgICBpZiAoc3Ryc3RyKGxpbmUsICJOYW1lIikpClsuLi5dCgpFUlJPUjog
+YnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMz
+Njk6IEZJTEU6IG1pZ3JhdGlvbi9wb3N0Y29weS1yYW0uYzo0MzM6CisgICAgICAgIGlmIChzdHJz
+dHIobGluZSwgIlN0YXRlIikpClsuLi5dCgpFUlJPUjogc3VzcGVjdCBjb2RlIGluZGVudCBmb3Ig
+Y29uZGl0aW9uYWwgc3RhdGVtZW50cyAoOCwgMTEpCiMzODI6IEZJTEU6IG1pZ3JhdGlvbi9wb3N0
+Y29weS1yYW0uYzo0NDY6CisgICAgICAgIGlmIChjcHVfaXRlci0+dGhyZWFkX2lkID09IHBpZCkK
+KyAgICAgICAgICAgcmV0dXJuIGNwdV9pdGVyLT5jcHVfaW5kZXg7CgpFUlJPUjogYnJhY2VzIHt9
+IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMzODI6IEZJTEU6
+IG1pZ3JhdGlvbi9wb3N0Y29weS1yYW0uYzo0NDY6CisgICAgICAgIGlmIChjcHVfaXRlci0+dGhy
+ZWFkX2lkID09IHBpZCkKWy4uLl0KCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0
+MTQ6IEZJTEU6IG1pZ3JhdGlvbi9wb3N0Y29weS1yYW0uYzo1NDA6CisgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICByYl9vZmZzZXQsIG1zZy5hcmcucGFnZWZh
+dWx0LnBpZCk7CgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM0MTY6
+IEZJTEU6IG1pZ3JhdGlvbi9wb3N0Y29weS1yYW0uYzo1NDI6CiteSW1hcmtfcG9zdGNvcHlfZG93
+bnRpbWVfYmVnaW4obXNnLmFyZy5wYWdlZmF1bHQuYWRkcmVzcywkCgpFUlJPUjogY29kZSBpbmRl
+bnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM0MTc6IEZJTEU6IG1pZ3JhdGlvbi9wb3N0Y29weS1y
+YW0uYzo1NDM6CiteSV5JZGVmaW5lZF9tZW1fZmF1bHRfY3B1X2luZGV4KG1zZy5hcmcucGFnZWZh
+dWx0LnBpZCkpOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQz
+NzogRklMRTogbWlncmF0aW9uL3NhdmV2bS5jOjE2MzM6CiteSXRyYWNlX2xvYWR2bV9wb3N0Y29w
+eV92bV9zdGFydChnZXRfcG9zdGNvcHlfdG90YWxfZG93bnRpbWUoKSk7JAoKdG90YWw6IDIyIGVy
+cm9ycywgNCB3YXJuaW5ncywgNDM1IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxl
+IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
+c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
+SCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
+ZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
+Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
+cGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
