@@ -1,25 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58984)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nsoffer@redhat.com>) id 1cp3AJ-0001N6-Sl
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 21:28:21 -0400
+	(envelope-from <ashmit602@gmail.com>) id 1cp3QS-0003cM-KW
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 21:45:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nsoffer@redhat.com>) id 1cp3AG-0008Hu-N1
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 21:28:19 -0400
-Received: from mail-vk0-f41.google.com ([209.85.213.41]:36566)
+	(envelope-from <ashmit602@gmail.com>) id 1cp3QR-0005Gc-Bd
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 21:45:00 -0400
+Received: from mail-it0-x22d.google.com ([2607:f8b0:4001:c0b::22d]:37996)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <nsoffer@redhat.com>) id 1cp3AG-0008Gj-HT
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 21:28:16 -0400
-Received: by mail-vk0-f41.google.com with SMTP id j64so34641813vkg.3
-	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 18:28:16 -0700 (PDT)
+	(Exim 4.71) (envelope-from <ashmit602@gmail.com>) id 1cp3QR-0005GE-5p
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 21:44:59 -0400
+Received: by mail-it0-x22d.google.com with SMTP id m27so46983650iti.1
+	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 18:44:58 -0700 (PDT)
 MIME-Version: 1.0
-References: <20170315092940.1367-1-stefanha@redhat.com>
-	<20170315092940.1367-2-stefanha@redhat.com>
-In-Reply-To: <20170315092940.1367-2-stefanha@redhat.com>
-From: Nir Soffer <nsoffer@redhat.com>
-Date: Sat, 18 Mar 2017 01:28:04 +0000
-Message-ID: <CAMRbyyt8DHj_-7MapWVC9G7+yOGtDra4gRiJDui68mqT9PanpQ@mail.gmail.com>
+In-Reply-To: <CAAo6VWPd0NrvzxAsYrnRrOhs8+31RYCLFvXG6ak-b3uVZFKxyg@mail.gmail.com>
+References: <20170222144407.GS19045@localhost.localdomain>
+	<CAAo6VWPWjRTE3t9myt7Q6gTnZcvP72ypTE03PCFfJkvb2UWLTA@mail.gmail.com>
+	<20170224091916.GD3702@redhat.com>
+	<CAAo6VWPyQrjSp2qjvxqXRPS8=5N85i0-DJdkWhiGaXmND_8+qA@mail.gmail.com>
+	<20170227092207.GA18219@redhat.com>
+	<CAAo6VWO6zAijMMjHOkefO22wh+6dXigZ6a+g-pMNBcM0MN1HHw@mail.gmail.com>
+	<20170301091851.GD17125@redhat.com>
+	<CAAo6VWNRhK6zvc+CferSd9wYQZNNoXDqCEW_G62crqsamyEC9Q@mail.gmail.com>
+	<20170306092305.GA9866@redhat.com>
+	<CAAo6VWMo-wYwkOAENk4swYk3dkbxaJObXrj85yDRLAUofK2qtw@mail.gmail.com>
+	<20170313095723.GC4799@redhat.com>
+	<CAAo6VWPd0NrvzxAsYrnRrOhs8+31RYCLFvXG6ak-b3uVZFKxyg@mail.gmail.com>
+From: ashish mittal <ashmit602@gmail.com>
+Date: Fri, 17 Mar 2017 18:44:56 -0700
+Message-ID: <CAAo6VWO7rpDPwP_iFGHNTo3zJqoZZXHAnfPbtkq+FZSSAWAjHw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [RFC v2 1/8] block: add bdrv_measure() API
+Subject: Re: [Qemu-devel] [PATCH v8 1/2] block/vxhs.c: Add support for a new
+ block device type called "vxhs"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,137 +39,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, John Ferlan <jferlan@redhat.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, Suraj Singh <Suraj.Singh@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Peter Maydell <peter.maydell@linaro.org>, Abhijit Dey <Abhijit.Dey@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
 
-On Wed, Mar 15, 2017 at 11:29 AM Stefan Hajnoczi <stefanha@redhat.com>
-wrote:
+On Thu, Mar 16, 2017 at 5:29 PM, ashish mittal <ashmit602@gmail.com> wrote:
+> On Mon, Mar 13, 2017 at 2:57 AM, Daniel P. Berrange <berrange@redhat.com> wrote:
+>> On Tue, Mar 07, 2017 at 05:27:55PM -0800, ashish mittal wrote:
+>>> Thanks! There is one more input I need some help with!
+>>>
+>>> VxHS network library opens a fixed number of connection channels to a
+>>> given host, and all the vdisks (that connect to the same host) share
+>>> these connection channels.
+>>>
+>>> Therefore, we need to open secure channels to a specific target host
+>>> only once for the first vdisk that connects to that host. All the
+>>> other vdisks that connect to the same target host will share the same
+>>> set of secure communication channels.
+>>>
+>>> I hope the above scheme is acceptable?
+>>>
+>>> If yes, then we have a couple of options to implement this:
+>>>
+>>> (1) Accept the TLS credentials per vdisk using the previously
+>>> discussed --object tls-creds-x509 mechanism. In this case, if more
+>>> than one vdisk have the same host info, then we will use only the
+>>> first one's creds to set up the secure connection, and ignore the
+>>> others. vdisks that connect to different target hosts will use their
+>>> individual tls-creds-x509 to set up the secure channels. This is, of
+>>> course, not relevant for qemu-img/qemu-io as they can open only one
+>>> vdisk at a time.
+>>
+>> It looks like option 1 here is the way to go. Just report an error if
+>> there are multiple creds provided for the same host and they don't
+>> match.
+>>
+>
+> I have made changes to implement option 1 in the library (branch
+> per_channel_ssl).
+> Can you please help review it?
+> https://github.com/VeritasHyperScale/libqnio/compare/per_channel_ssl
+>
+> Here's the changelog:
+> (1) Changed code to not use instance UUID for setting up SSL context.
+> (2) User is supposed to pass the cacert, client_key and client_cert
+>     files to iio_open(). These will be used to set up a per-channel secure SSL
+>     connection to the server. All three values are needed to set up a
+>     secure connection.
+> (3) If the secure channel to a particular host is already open, other
+>     block device connections to the same host will have to provide
+>     TLS/SSL credentials that match the original one.
+> (4) Set default locations for trusted client CA certificates
+>      based on user specified cacert file.
+>
+> NB - I have given steps to test SSL communication (using the supplied
+> test client/server programs) in the commit log. I have not tested
+> using qemu binary yet. Will run more tests in the days to come.
+>
+> qemu vxhs patch changes should be pretty straightforward, given that
+> we have already discussed how to implement passing --object
+> tls-creds-x509 per block device.
+>
+> Thanks!
+>
 
-> bdrv_measure() provides a conservative maximum for the size of a new
-> image.  This information is handy if storage needs to be allocated (e.g.
-> a SAN or an LVM volume) ahead of time.
->
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  qapi/block-core.json      | 19 +++++++++++++++++++
->  include/block/block.h     |  4 ++++
->  include/block/block_int.h |  2 ++
->  block.c                   | 33 +++++++++++++++++++++++++++++++++
->  4 files changed, 58 insertions(+)
->
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 786b39e..673569d 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -463,6 +463,25 @@
->             '*dirty-bitmaps': ['BlockDirtyInfo'] } }
->
->  ##
-> +# @BlockMeasureInfo:
-> +#
-> +# Image size calculation information.  This structure describes the size
-> +# requirements for creating a new image.
-> +#
-> +# @required-bytes: Amount of space required for image creation.  This
-> value is
-> +#                  the host file size including sparse file regions.  A
-> new 5
-> +#                  GB raw file therefore has a required size of 5 GB, not
-> 0
-> +#                  bytes.
-> +#
-> +# @fully-allocated-bytes: Space required once data has been written to all
-> +#                         sectors
-> +#
-> +# Since: 2.10
-> +##
-> +{ 'struct': 'BlockMeasureInfo',
-> +  'data': {'required-bytes': 'int', 'fully-allocated-bytes': 'int'} }
-> +
-> +##
->  # @query-block:
->  #
->  # Get a list of BlockInfo for all virtual block devices.
-> diff --git a/include/block/block.h b/include/block/block.h
-> index 5149260..43c789f 100644
-> --- a/include/block/block.h
-> +++ b/include/block/block.h
-> @@ -298,6 +298,10 @@ int bdrv_truncate(BdrvChild *child, int64_t offset);
->  int64_t bdrv_nb_sectors(BlockDriverState *bs);
->  int64_t bdrv_getlength(BlockDriverState *bs);
->  int64_t bdrv_get_allocated_file_size(BlockDriverState *bs);
-> +void bdrv_measure(BlockDriver *drv, QemuOpts *opts,
-> +                  BlockDriverState *in_bs,
-> +                  BlockMeasureInfo *info,
->
+Update -
+(1) Successfully tested SSL communication using qemu-io and the test server.
+(2) Minor changes to per_channel_ssl branch.
+(3) Created a pull request.
 
-The struct declaration is missing in this patch, right?
+Please review per convenience. Thanks!
 
-
-> +                  Error **errp);
->  void bdrv_get_geometry(BlockDriverState *bs, uint64_t *nb_sectors_ptr);
->  void bdrv_refresh_limits(BlockDriverState *bs, Error **errp);
->  int bdrv_commit(BlockDriverState *bs);
-> diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index 6c699ac..45a7fbe 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -201,6 +201,8 @@ struct BlockDriver {
->      int64_t (*bdrv_getlength)(BlockDriverState *bs);
->      bool has_variable_length;
->      int64_t (*bdrv_get_allocated_file_size)(BlockDriverState *bs);
-> +    void (*bdrv_measure)(QemuOpts *opts, BlockDriverState *in_bs,
-> +                         BlockMeasureInfo *info, Error **errp);
->
->      int coroutine_fn (*bdrv_co_pwritev_compressed)(BlockDriverState *bs,
->          uint64_t offset, uint64_t bytes, QEMUIOVector *qiov);
-> diff --git a/block.c b/block.c
-> index cb57370..532a4d1 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -3260,6 +3260,39 @@ int64_t
-> bdrv_get_allocated_file_size(BlockDriverState *bs)
->      return -ENOTSUP;
->  }
->
-> +/*
-> + * bdrv_measure:
-> + * @drv: Format driver
-> + * @opts: Creation options
-> + * @in_bs: Existing image containing data for new image (may be NULL)
-> + * @info: Result object
-> + * @errp: Error object
-> + *
-> + * Calculate file size required to create a new image.
-> + *
-> + * If @in_bs is given then space for allocated clusters and zero clusters
-> + * from that image are included in the calculation.  If @opts contains a
-> + * backing file that is shared by @in_bs then backing clusters are omitted
-> + * from the calculation.
-> + *
-> + * If @in_bs is NULL then the calculation includes no allocated clusters
-> + * unless a preallocation option is given in @opts.
-> + *
-> + * Note that @in_bs may use a different BlockDriver from @drv.
-> + */
-> +void bdrv_measure(BlockDriver *drv, QemuOpts *opts,
-> +                  BlockDriverState *in_bs, BlockMeasureInfo *info,
-> +                  Error **errp)
-> +{
-> +    if (!drv->bdrv_measure) {
-> +        error_setg(errp, "Block driver '%s' does not support size
-> measurement",
-> +                   drv->format_name);
-> +        return;
-> +    }
-> +
-> +    drv->bdrv_measure(opts, in_bs, info, errp);
-> +}
-> +
->  /**
->   * Return number of sectors on success, -errno on error.
->   */
-> --
-> 2.9.3
->
->
+>>>
+>>> (2) Instead of having a per-vdisk --object tls-creds-x509, have a
+>>> single such argument on the command line for vxhs block device code to
+>>> consume - if that is possible! One way to achieve this could be the
+>>> user/password authentication we discussed earlier, which we could use
+>>> to pass the directory where cert/keys are kept.
+>>>
+>>> (3) Use the instance UUID, when available, to lookup the cert files
+>>> per instance (i.e. for qemu-kvm), and use the --object tls-creds-x509
+>>> mechanism, when instance UUID is NULL (i.e. qemu-io, qemu-img etc).
+>>> The cert/key files are anyway protected by file permissions in either
+>>> case, so I guess there is no additional security provided by either
+>>> method.
+>>
+>> Regards,
+>> Daniel
+>> --
+>> |: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+>> |: http://libvirt.org              -o-             http://virt-manager.org :|
+>> |: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
