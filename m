@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46781)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cp4bi-0006Rp-2j
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 23:00:42 -0400
+	(envelope-from <bounces@canonical.com>) id 1cp60V-0008CK-3p
+	for qemu-devel@nongnu.org; Sat, 18 Mar 2017 00:30:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cp4bh-00019c-9m
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 23:00:42 -0400
-References: <20170317104541.28979-1-stefanha@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <b6725a55-9279-6385-6720-f40d9f52863e@redhat.com>
-Date: Sat, 18 Mar 2017 04:00:30 +0100
+	(envelope-from <bounces@canonical.com>) id 1cp60R-0001n1-V3
+	for qemu-devel@nongnu.org; Sat, 18 Mar 2017 00:30:23 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52714)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cp60R-0001mr-Oe
+	for qemu-devel@nongnu.org; Sat, 18 Mar 2017 00:30:19 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cp60P-0008Sp-N3
+	for <qemu-devel@nongnu.org>; Sat, 18 Mar 2017 04:30:17 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A4BA12E80C8
+	for <qemu-devel@nongnu.org>; Sat, 18 Mar 2017 04:30:17 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170317104541.28979-1-stefanha@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="nscdVPX1l9KKQot4VECRi1GhQoT4fXvKv"
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] qemu-img: improve qemu-img getopt
- error messages
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 18 Mar 2017 04:17:27 -0000
+From: Launchpad Bug Tracker <1194954@bugs.launchpad.net>
+Reply-To: Bug 1194954 <1194954@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130626165108.26069.67113.malonedeb@soybean.canonical.com>
+Message-Id: <20170318041727.12150.26282.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1194954] Re: Windows 95 guest reboots itself on
+ qemu 1.5.0 & 1.5.50 (GIT)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,64 +37,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nscdVPX1l9KKQot4VECRi1GhQoT4fXvKv
-From: Max Reitz <mreitz@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <b6725a55-9279-6385-6720-f40d9f52863e@redhat.com>
-Subject: Re: [PATCH v2 0/3] qemu-img: improve qemu-img getopt error messages
-References: <20170317104541.28979-1-stefanha@redhat.com>
-In-Reply-To: <20170317104541.28979-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
+[Expired for QEMU because there has been no activity for 60 days.]
 
-On 17.03.2017 11:45, Stefan Hajnoczi wrote:
-> v2:
->  * Print short help to avoid obscuring error messages [Max]
->=20
-> This series improves getopt error messages.  Unrecognized global option=
-s were
-> skipped rather than causing qemu-img to exit as expected.  Also avoid p=
-rinting
-> the full help text because it obscures the actual error message.
->=20
-> Stefan Hajnoczi (3):
->   qemu-img: show help for invalid global options
->   qemu-img: fix switch indentation in img_amend()
->   qemu-img: print short help on getopt failure
->=20
->  qemu-img.c | 196 ++++++++++++++++++++++++++++++++++++++++++-----------=
---------
->  1 file changed, 137 insertions(+), 59 deletions(-)
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-Thanks, applied to my block branch:
+-- =
 
-https://github.com/XanClic/qemu/commits/block
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1194954
 
-(Assuming that patches 2 and 3 will be fine even for rc2...)
+Title:
+  Windows 95 guest reboots itself on qemu 1.5.0 & 1.5.50 (GIT)
 
-Max
+Status in QEMU:
+  Expired
 
+Bug description:
+  When I begin to run a Windows 95 guest on these releases of qemu, it
+  reboots itself more times without my permission (eg. without shutting
+  it down properly), and when I'm installing Netscape 4.08 at, for
+  example, 46% or 75%, it still reboots itself without completing the
+  installation of the web browser. Is this an issue of main-loop.c?
 
---nscdVPX1l9KKQot4VECRi1GhQoT4fXvKv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljMos4SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AHbQH/09chubB7xuT2+CYszyVppjafJF0IN2l
-8HmY7lSfnh69X85ONMBKCj+jYO4zi14tuCDEx3KStpT6uhyz9CiINmZDwQiPGiNd
-6rMt2xtDSkO/zPDMJ3omeTKFHi65GiNbjG8YaHbIMnd7EH2FPfxQseqHGU+R2KRL
-EFoUUq5EpPyEs2EGPhK6lXFBlYQMQmgfoIle8MbcBMYecgQqa/Xd4Yl8rGJ94mZO
-yZkZDhOlys8YVJGtu8KrZBRNvRXlIA4TbsTjWNFFkmWKHSv89X5EUcBgQrkvsH2g
-vStOEFlxmun+2/fMDvTa97maKiRIDuSZyX3LtOu0mz9OVhDaLaHr46Y=
-=LZq9
------END PGP SIGNATURE-----
-
---nscdVPX1l9KKQot4VECRi1GhQoT4fXvKv--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1194954/+subscriptions
