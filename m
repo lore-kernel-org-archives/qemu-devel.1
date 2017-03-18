@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cp4Xn-0005SL-RG
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 22:56:41 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cp4bi-0006Rp-2j
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 23:00:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cp4Xm-0008TC-V1
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 22:56:39 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cp4bh-00019c-9m
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 23:00:42 -0400
 References: <20170317104541.28979-1-stefanha@redhat.com>
-	<20170317104541.28979-4-stefanha@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <aa011644-070f-356b-1156-de9a3793444b@redhat.com>
-Date: Sat, 18 Mar 2017 03:56:27 +0100
+Message-ID: <b6725a55-9279-6385-6720-f40d9f52863e@redhat.com>
+Date: Sat, 18 Mar 2017 04:00:30 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170317104541.28979-4-stefanha@redhat.com>
+In-Reply-To: <20170317104541.28979-1-stefanha@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="O2qgxd3qLBsqHaGJ3g3kwPKfcFK5aHNTc"
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] qemu-img: print short help on
- getopt failure
+	boundary="nscdVPX1l9KKQot4VECRi1GhQoT4fXvKv"
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] qemu-img: improve qemu-img getopt
+ error messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +28,60 @@ To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---O2qgxd3qLBsqHaGJ3g3kwPKfcFK5aHNTc
+--nscdVPX1l9KKQot4VECRi1GhQoT4fXvKv
 From: Max Reitz <mreitz@redhat.com>
 To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <aa011644-070f-356b-1156-de9a3793444b@redhat.com>
-Subject: Re: [PATCH v2 3/3] qemu-img: print short help on getopt failure
+Message-ID: <b6725a55-9279-6385-6720-f40d9f52863e@redhat.com>
+Subject: Re: [PATCH v2 0/3] qemu-img: improve qemu-img getopt error messages
 References: <20170317104541.28979-1-stefanha@redhat.com>
- <20170317104541.28979-4-stefanha@redhat.com>
-In-Reply-To: <20170317104541.28979-4-stefanha@redhat.com>
+In-Reply-To: <20170317104541.28979-1-stefanha@redhat.com>
 Content-Type: text/plain; charset=iso-8859-15
 Content-Transfer-Encoding: quoted-printable
 
 On 17.03.2017 11:45, Stefan Hajnoczi wrote:
-> Printing the full help output obscures the error message for an invalid=
-
-> command-line option or missing argument.
+> v2:
+>  * Print short help to avoid obscuring error messages [Max]
 >=20
-> Before this patch:
+> This series improves getopt error messages.  Unrecognized global option=
+s were
+> skipped rather than causing qemu-img to exit as expected.  Also avoid p=
+rinting
+> the full help text because it obscures the actual error message.
 >=20
->   $ ./qemu-img --foo
->   ...pages of output...
+> Stefan Hajnoczi (3):
+>   qemu-img: show help for invalid global options
+>   qemu-img: fix switch indentation in img_amend()
+>   qemu-img: print short help on getopt failure
 >=20
-> After this patch:
->=20
->   $ ./qemu-img --foo
->   qemu-img: unrecognized option '--foo'
->   Try 'qemu-img --help' for more information
->=20
-> This patch adds the getopt ':' character so that it can distinguish
-> between missing arguments and unrecognized options.  This helps provide=
-
-> more detailed error messages.
->=20
-> Suggested-by: Max Reitz <mreitz@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  qemu-img.c | 117 ++++++++++++++++++++++++++++++++++++++++++++++++++---=
+>  qemu-img.c | 196 ++++++++++++++++++++++++++++++++++++++++++-----------=
 --------
->  1 file changed, 97 insertions(+), 20 deletions(-)
+>  1 file changed, 137 insertions(+), 59 deletions(-)
 
-Uh, right, this was pretty much pre-existing. Then even more so thanks
-for this patch. :-)
+Thanks, applied to my block branch:
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+https://github.com/XanClic/qemu/commits/block
+
+(Assuming that patches 2 and 3 will be fine even for rc2...)
+
+Max
 
 
---O2qgxd3qLBsqHaGJ3g3kwPKfcFK5aHNTc
+--nscdVPX1l9KKQot4VECRi1GhQoT4fXvKv
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljModsSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AckAIAMQmd+7bL/kUJKdZW5KpDfCvIkPcHBSS
-BKUeK5dOGwmht43fz30Si1RC/EpUi3Qb7322ZOjQcxC4SMRajCYvnHz83rTyKV6Q
-/OWU1DWgE+lhqqBE6UDOkMRbh0L/mVsamaDxBYEOR5+wvKPXk60JmTJa9pxCZLfM
-5kyAJhjCWyMh37VF4eHenY8jkQNFHLLbG5gdZhC4uRNESDk8TcPS1zGyi4JPlbWU
-/5xaZkt2fu4fUb5DreCQrmo56e/ZhIv6EGpxn0XCzv5lipYl8/06jkLPzmtGenVx
-e+cuB2Z10s4IWuRIQsP46RmmysFXd2hOIGmKCDdkG2XeSYLpc67kjcU=
-=5KL2
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljMos4SHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AHbQH/09chubB7xuT2+CYszyVppjafJF0IN2l
+8HmY7lSfnh69X85ONMBKCj+jYO4zi14tuCDEx3KStpT6uhyz9CiINmZDwQiPGiNd
+6rMt2xtDSkO/zPDMJ3omeTKFHi65GiNbjG8YaHbIMnd7EH2FPfxQseqHGU+R2KRL
+EFoUUq5EpPyEs2EGPhK6lXFBlYQMQmgfoIle8MbcBMYecgQqa/Xd4Yl8rGJ94mZO
+yZkZDhOlys8YVJGtu8KrZBRNvRXlIA4TbsTjWNFFkmWKHSv89X5EUcBgQrkvsH2g
+vStOEFlxmun+2/fMDvTa97maKiRIDuSZyX3LtOu0mz9OVhDaLaHr46Y=
+=LZq9
 -----END PGP SIGNATURE-----
 
---O2qgxd3qLBsqHaGJ3g3kwPKfcFK5aHNTc--
+--nscdVPX1l9KKQot4VECRi1GhQoT4fXvKv--
