@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cp4CH-0002ZF-1g
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 22:34:26 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cp4Xn-0005SL-RG
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 22:56:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cp4CF-0007GZ-Rw
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 22:34:25 -0400
-References: <20170207235757.2026-1-mreitz@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1cp4Xm-0008TC-V1
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 22:56:39 -0400
+References: <20170317104541.28979-1-stefanha@redhat.com>
+	<20170317104541.28979-4-stefanha@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <9aace1af-8673-9829-116d-8deebd908cc5@redhat.com>
-Date: Sat, 18 Mar 2017 03:34:15 +0100
+Message-ID: <aa011644-070f-356b-1156-de9a3793444b@redhat.com>
+Date: Sat, 18 Mar 2017 03:56:27 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170207235757.2026-1-mreitz@redhat.com>
+In-Reply-To: <20170317104541.28979-4-stefanha@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="Io3ij4xjKLFcd0A5ocnRx61stQtv32P0b"
-Subject: Re: [Qemu-devel] [PATCH] progress: Show current progress on SIGINFO
+	boundary="O2qgxd3qLBsqHaGJ3g3kwPKfcFK5aHNTc"
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] qemu-img: print short help on
+ getopt failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,54 +25,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Io3ij4xjKLFcd0A5ocnRx61stQtv32P0b
+--O2qgxd3qLBsqHaGJ3g3kwPKfcFK5aHNTc
 From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <9aace1af-8673-9829-116d-8deebd908cc5@redhat.com>
-Subject: Re: [PATCH] progress: Show current progress on SIGINFO
-References: <20170207235757.2026-1-mreitz@redhat.com>
-In-Reply-To: <20170207235757.2026-1-mreitz@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <aa011644-070f-356b-1156-de9a3793444b@redhat.com>
+Subject: Re: [PATCH v2 3/3] qemu-img: print short help on getopt failure
+References: <20170317104541.28979-1-stefanha@redhat.com>
+ <20170317104541.28979-4-stefanha@redhat.com>
+In-Reply-To: <20170317104541.28979-4-stefanha@redhat.com>
 Content-Type: text/plain; charset=iso-8859-15
 Content-Transfer-Encoding: quoted-printable
 
-On 08.02.2017 00:57, Max Reitz wrote:
-> Currently we only print progress information on retrieval of SIGUSR1.
-> Some systems have a dedicated SIGINFO for this, however, so it should b=
-e
-> handled appropriately if it is available.
+On 17.03.2017 11:45, Stefan Hajnoczi wrote:
+> Printing the full help output obscures the error message for an invalid=
+
+> command-line option or missing argument.
 >=20
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1662468
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> Before this patch:
+>=20
+>   $ ./qemu-img --foo
+>   ...pages of output...
+>=20
+> After this patch:
+>=20
+>   $ ./qemu-img --foo
+>   qemu-img: unrecognized option '--foo'
+>   Try 'qemu-img --help' for more information
+>=20
+> This patch adds the getopt ':' character so that it can distinguish
+> between missing arguments and unrecognized options.  This helps provide=
+
+> more detailed error messages.
+>=20
+> Suggested-by: Max Reitz <mreitz@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
-> Can anyone test this on a BSD system? O:-)
-> ---
->  util/qemu-progress.c | 3 +++
->  qemu-img.texi        | 3 ++-
->  2 files changed, 5 insertions(+), 1 deletion(-)
+>  qemu-img.c | 117 ++++++++++++++++++++++++++++++++++++++++++++++++++---=
+--------
+>  1 file changed, 97 insertions(+), 20 deletions(-)
 
-Ping
+Uh, right, this was pretty much pre-existing. Then even more so thanks
+for this patch. :-)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---Io3ij4xjKLFcd0A5ocnRx61stQtv32P0b
+--O2qgxd3qLBsqHaGJ3g3kwPKfcFK5aHNTc
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljMnKcSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A/SUH/j9DaZiYbPg3Mf+xQvwAAv2oPWH62/Cb
-fXo1KsbHYsxTUO98oPoCzfT0skQGsm7H6Mli2pw+J/8enZwoJML/qsYb5Ji+V8K0
-g2mCIftPWebRtrCmIONwG/6vT7eLJ43r3cWaHrgkGZSvqS48aTTDRla8Zpb2e/1M
-qXB2t99sgjKzXVwztbG9Xef+24Rk73IKwI0B8Z2z7Dt78fY3xwK6zZpWUqL3e1ET
-dwhrZTlAwXqsiWdAYyA39KntKz3r+x7Xd0xXYNNSHoubVsY4EMdy7WtIc28X5CA3
-I1OJGPRkpB92QJt98cRNSDn5U9MZvdMqcAhl0qufTuW1/gEXE/Lht3g=
-=TTch
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljModsSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AckAIAMQmd+7bL/kUJKdZW5KpDfCvIkPcHBSS
+BKUeK5dOGwmht43fz30Si1RC/EpUi3Qb7322ZOjQcxC4SMRajCYvnHz83rTyKV6Q
+/OWU1DWgE+lhqqBE6UDOkMRbh0L/mVsamaDxBYEOR5+wvKPXk60JmTJa9pxCZLfM
+5kyAJhjCWyMh37VF4eHenY8jkQNFHLLbG5gdZhC4uRNESDk8TcPS1zGyi4JPlbWU
+/5xaZkt2fu4fUb5DreCQrmo56e/ZhIv6EGpxn0XCzv5lipYl8/06jkLPzmtGenVx
+e+cuB2Z10s4IWuRIQsP46RmmysFXd2hOIGmKCDdkG2XeSYLpc67kjcU=
+=5KL2
 -----END PGP SIGNATURE-----
 
---Io3ij4xjKLFcd0A5ocnRx61stQtv32P0b--
+--O2qgxd3qLBsqHaGJ3g3kwPKfcFK5aHNTc--
