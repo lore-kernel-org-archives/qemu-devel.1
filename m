@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cp1v9-0004Yd-Nh
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 20:08:37 -0400
+	(envelope-from <nsoffer@redhat.com>) id 1cp2au-0002rJ-D8
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 20:51:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cp1v6-0006AM-Gv
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 20:08:35 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:36412)
+	(envelope-from <nsoffer@redhat.com>) id 1cp2ar-0004FU-8l
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 20:51:44 -0400
+Received: from mail-vk0-f43.google.com ([209.85.213.43]:36012)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cp1v6-0006AI-B6
-	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 20:08:32 -0400
-Received: by mail-qt0-x241.google.com with SMTP id n37so11341638qtb.3
-	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 17:08:32 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <148979281961.4342.6047114276763582872.stgit@bahia.lan>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <711ffa31-bc39-e549-d39f-2f5bf7a36c62@amsat.org>
-Date: Fri, 17 Mar 2017 21:08:28 -0300
+	(Exim 4.71) (envelope-from <nsoffer@redhat.com>) id 1cp2ar-0004FP-32
+	for qemu-devel@nongnu.org; Fri, 17 Mar 2017 20:51:41 -0400
+Received: by mail-vk0-f43.google.com with SMTP id j64so34448145vkg.3
+	for <qemu-devel@nongnu.org>; Fri, 17 Mar 2017 17:51:40 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <148979281961.4342.6047114276763582872.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3] 9pfs: proxy: assert if unmarshal fails
+References: <20170315092940.1367-1-stefanha@redhat.com>
+	<20170315092940.1367-2-stefanha@redhat.com>
+In-Reply-To: <20170315092940.1367-2-stefanha@redhat.com>
+From: Nir Soffer <nsoffer@redhat.com>
+Date: Sat, 18 Mar 2017 00:51:29 +0000
+Message-ID: <CAMRbyysBvGhV6cqN8qX+dL3f3Y8QOCtn+jhOKunDHFrTZEwyoQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [RFC v2 1/8] block: add bdrv_measure() API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,108 +28,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>
 
-On 03/17/2017 08:20 PM, Greg Kurz wrote:
-> Replies from the virtfs proxy are made up of a fixed-size header (8 bytes)
-> and a payload of variable size (maximum 64kb). When receiving a reply,
-> the proxy backend first reads the whole header and then unmarshals it.
-> If the header is okay, it then does the same operation with the payload.
->
-> Since the proxy backend uses a pre-allocated buffer which has enough room
-> for a header and the maximum payload size, marshalling should never fail
-> with fixed size arguments. Any error here is likely to result from a more
-> serious corruption in QEMU and we'd better dump core right away.
->
-> This patch adds error checks where they are missing and converts the
-> associated error paths into assertions.
->
-> This should also address Coverity's complaints CID 1348519 and CID 1348520,
-> about not always checking the return value of proxy_unmarshal().
->
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+On Wed, Mar 15, 2017 at 11:29 AM Stefan Hajnoczi <stefanha@redhat.com>
+wrote:
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
+> bdrv_measure() provides a conservative maximum for the size of a new
+> image.  This information is handy if storage needs to be allocated (e.g.
+> a SAN or an LVM volume) ahead of time.
+>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
-> v3: - completely get rid of sizeof() and QEMU_BUILD_BUG_ON() as it was
->       confusing. Only use literal values in checks finally.
-> ---
->  hw/9pfs/9p-proxy.c |   22 +++++++++++-----------
->  1 file changed, 11 insertions(+), 11 deletions(-)
+>  qapi/block-core.json      | 19 +++++++++++++++++++
+>  include/block/block.h     |  4 ++++
+>  include/block/block_int.h |  2 ++
+>  block.c                   | 33 +++++++++++++++++++++++++++++++++
+>  4 files changed, 58 insertions(+)
 >
-> diff --git a/hw/9pfs/9p-proxy.c b/hw/9pfs/9p-proxy.c
-> index f4aa7a9d70f8..28b20a7c3dfa 100644
-> --- a/hw/9pfs/9p-proxy.c
-> +++ b/hw/9pfs/9p-proxy.c
-> @@ -165,7 +165,8 @@ static int v9fs_receive_response(V9fsProxy *proxy, int type,
->          return retval;
->      }
->      reply->iov_len = PROXY_HDR_SZ;
-> -    proxy_unmarshal(reply, 0, "dd", &header.type, &header.size);
-> +    retval = proxy_unmarshal(reply, 0, "dd", &header.type, &header.size);
-> +    assert(retval == 4 * 2);
->      /*
->       * if response size > PROXY_MAX_IO_SZ, read the response but ignore it and
->       * return -ENOBUFS
-> @@ -194,9 +195,7 @@ static int v9fs_receive_response(V9fsProxy *proxy, int type,
->      if (header.type == T_ERROR) {
->          int ret;
->          ret = proxy_unmarshal(reply, PROXY_HDR_SZ, "d", status);
-> -        if (ret < 0) {
-> -            *status = ret;
-> -        }
-> +        assert(ret == 4);
->          return 0;
->      }
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 786b39e..673569d 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -463,6 +463,25 @@
+>             '*dirty-bitmaps': ['BlockDirtyInfo'] } }
 >
-> @@ -213,6 +212,7 @@ static int v9fs_receive_response(V9fsProxy *proxy, int type,
->                                   &prstat.st_atim_sec, &prstat.st_atim_nsec,
->                                   &prstat.st_mtim_sec, &prstat.st_mtim_nsec,
->                                   &prstat.st_ctim_sec, &prstat.st_ctim_nsec);
-> +        assert(retval == 8 * 3 + 4 * 3 + 8 * 10);
->          prstat_to_stat(response, &prstat);
->          break;
->      }
-> @@ -225,6 +225,7 @@ static int v9fs_receive_response(V9fsProxy *proxy, int type,
->                                   &prstfs.f_files, &prstfs.f_ffree,
->                                   &prstfs.f_fsid[0], &prstfs.f_fsid[1],
->                                   &prstfs.f_namelen, &prstfs.f_frsize);
-> +        assert(retval == 8 * 11);
->          prstatfs_to_statfs(response, &prstfs);
->          break;
->      }
-> @@ -246,7 +247,8 @@ static int v9fs_receive_response(V9fsProxy *proxy, int type,
->          break;
->      }
->      case T_GETVERSION:
-> -        proxy_unmarshal(reply, PROXY_HDR_SZ, "q", response);
-> +        retval = proxy_unmarshal(reply, PROXY_HDR_SZ, "q", response);
-> +        assert(retval == 8);
->          break;
->      default:
->          return -1;
-> @@ -274,18 +276,16 @@ static int v9fs_receive_status(V9fsProxy *proxy,
->          return retval;
->      }
->      reply->iov_len = PROXY_HDR_SZ;
-> -    proxy_unmarshal(reply, 0, "dd", &header.type, &header.size);
-> -    if (header.size != sizeof(int)) {
-> -        *status = -ENOBUFS;
-> -        return 0;
-> -    }
-> +    retval = proxy_unmarshal(reply, 0, "dd", &header.type, &header.size);
-> +    assert(retval == 4 * 2);
->      retval = socket_read(proxy->sockfd,
->                           reply->iov_base + PROXY_HDR_SZ, header.size);
->      if (retval < 0) {
->          return retval;
->      }
->      reply->iov_len += header.size;
-> -    proxy_unmarshal(reply, PROXY_HDR_SZ, "d", status);
-> +    retval = proxy_unmarshal(reply, PROXY_HDR_SZ, "d", status);
-> +    assert(retval == 4);
->      return 0;
+>  ##
+> +# @BlockMeasureInfo:
+> +#
+> +# Image size calculation information.  This structure describes the size
+> +# requirements for creating a new image.
+
++#
+> +# @required-bytes: Amount of space required for image creation.  This
+> value is
+> +#                  the host file size including sparse file regions.  A
+> new 5
+> +#                  GB raw file therefore has a required size of 5 GB, not
+> 0
+> +#                  bytes.
+> +#
+> +# @fully-allocated-bytes: Space required once data has been written to all
+> +#                         sectors
+
++#
+> +# Since: 2.10
+> +##
+> +{ 'struct': 'BlockMeasureInfo',
+> +  'data': {'required-bytes': 'int', 'fully-allocated-bytes': 'int'} }
+> +
+> +##
+>  # @query-block:
+>  #
+>  # Get a list of BlockInfo for all virtual block devices.
+> diff --git a/include/block/block.h b/include/block/block.h
+> index 5149260..43c789f 100644
+> --- a/include/block/block.h
+> +++ b/include/block/block.h
+> @@ -298,6 +298,10 @@ int bdrv_truncate(BdrvChild *child, int64_t offset);
+>  int64_t bdrv_nb_sectors(BlockDriverState *bs);
+>  int64_t bdrv_getlength(BlockDriverState *bs);
+>  int64_t bdrv_get_allocated_file_size(BlockDriverState *bs);
+> +void bdrv_measure(BlockDriver *drv, QemuOpts *opts,
+> +                  BlockDriverState *in_bs,
+> +                  BlockMeasureInfo *info,
+> +                  Error **errp);
+>  void bdrv_get_geometry(BlockDriverState *bs, uint64_t *nb_sectors_ptr);
+>  void bdrv_refresh_limits(BlockDriverState *bs, Error **errp);
+>  int bdrv_commit(BlockDriverState *bs);
+> diff --git a/include/block/block_int.h b/include/block/block_int.h
+> index 6c699ac..45a7fbe 100644
+> --- a/include/block/block_int.h
+> +++ b/include/block/block_int.h
+> @@ -201,6 +201,8 @@ struct BlockDriver {
+>      int64_t (*bdrv_getlength)(BlockDriverState *bs);
+>      bool has_variable_length;
+>      int64_t (*bdrv_get_allocated_file_size)(BlockDriverState *bs);
+> +    void (*bdrv_measure)(QemuOpts *opts, BlockDriverState *in_bs,
+> +                         BlockMeasureInfo *info, Error **errp);
+>
+>      int coroutine_fn (*bdrv_co_pwritev_compressed)(BlockDriverState *bs,
+>          uint64_t offset, uint64_t bytes, QEMUIOVector *qiov);
+> diff --git a/block.c b/block.c
+> index cb57370..532a4d1 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -3260,6 +3260,39 @@ int64_t
+> bdrv_get_allocated_file_size(BlockDriverState *bs)
+>      return -ENOTSUP;
 >  }
+>
+> +/*
+> + * bdrv_measure:
+> + * @drv: Format driver
+> + * @opts: Creation options
+>
+
+Isn't this Measure options?
+
+
+> + * @in_bs: Existing image containing data for new image (may be NULL)
+> + * @info: Result object
+> + * @errp: Error object
+> + *
+> + * Calculate file size required to create a new image.
+> + *
+> + * If @in_bs is given then space for allocated clusters and zero clusters
+> + * from that image are included in the calculation.  If @opts contains a
+> + * backing file that is shared by @in_bs then backing clusters are omitted
+> + * from the calculation.
+> + *
+> + * If @in_bs is NULL then the calculation includes no allocated clusters
+> + * unless a preallocation option is given in @opts.
+> + *
+> + * Note that @in_bs may use a different BlockDriver from @drv.
+>
+
+Maybe a note about error handling? the only way is to check for non-null
+errp, right?
+
+
+> + */
+> +void bdrv_measure(BlockDriver *drv, QemuOpts *opts,
+> +                  BlockDriverState *in_bs, BlockMeasureInfo *info,
+> +                  Error **errp)
+
++{
+> +    if (!drv->bdrv_measure) {
+> +        error_setg(errp, "Block driver '%s' does not support size
+> measurement",
+> +                   drv->format_name);
+> +        return;
+> +    }
+> +
+> +    drv->bdrv_measure(opts, in_bs, info, errp);
+> +}
+> +
+>  /**
+>   * Return number of sectors on success, -errno on error.
+>   */
+> --
+> 2.9.3
 >
 >
