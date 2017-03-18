@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34220)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nsoffer@redhat.com>) id 1cpLXG-00068d-8B
-	for qemu-devel@nongnu.org; Sat, 18 Mar 2017 17:05:16 -0400
+	(envelope-from <marc@brightwise.de>) id 1cpLgw-0007ZQ-2D
+	for qemu-devel@nongnu.org; Sat, 18 Mar 2017 17:15:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nsoffer@redhat.com>) id 1cpLXC-0003SG-VO
-	for qemu-devel@nongnu.org; Sat, 18 Mar 2017 17:05:14 -0400
-Received: from mail-ua0-f179.google.com ([209.85.217.179]:33126)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <nsoffer@redhat.com>) id 1cpLXC-0003Ru-Ns
-	for qemu-devel@nongnu.org; Sat, 18 Mar 2017 17:05:10 -0400
-Received: by mail-ua0-f179.google.com with SMTP id u30so60252598uau.0
-	for <qemu-devel@nongnu.org>; Sat, 18 Mar 2017 14:05:10 -0700 (PDT)
+	(envelope-from <marc@brightwise.de>) id 1cpLgs-0006DF-Sp
+	for qemu-devel@nongnu.org; Sat, 18 Mar 2017 17:15:14 -0400
+Received: from mo6-p00-ob.smtp.rzone.de ([2a01:238:20a:202:5300::7]:17182)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marc@brightwise.de>) id 1cpLgs-0006Ar-GV
+	for qemu-devel@nongnu.org; Sat, 18 Mar 2017 17:15:10 -0400
+Received: from oxapp01-01.back.ox.d0m.de (com4.strato.de [81.169.145.237])
+	by smtp-ox.front (RZmta 40.1 AUTH) with ESMTPSA id x0bc30t2ILF7DC9
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA (curve X9_62_prime256v1
+	with 256 ECDH bits, eq. 3072 bits RSA))
+	(Client did not present a certificate) for <qemu-devel@nongnu.org>;
+	Sat, 18 Mar 2017 22:15:07 +0100 (CET)
+Date: Sat, 18 Mar 2017 22:15:07 +0100 (CET)
+From: Marc Bommert <marc@brightwise.de>
+Message-ID: <741795585.70221.1489871707491@communicator.strato.de>
+In-Reply-To: <5909E3D6-85D8-4B21-9442-CCD312A4717B@inbox.ru>
+References: <5909E3D6-85D8-4B21-9442-CCD312A4717B@inbox.ru>
 MIME-Version: 1.0
-References: <20170315092940.1367-1-stefanha@redhat.com>
-	<20170315092940.1367-9-stefanha@redhat.com>
-In-Reply-To: <20170315092940.1367-9-stefanha@redhat.com>
-From: Nir Soffer <nsoffer@redhat.com>
-Date: Sat, 18 Mar 2017 21:04:59 +0000
-Message-ID: <CAMRbyyvW+MVg2EAMPrNDne5Ykp6RmXNO6Qew32sd67K__5nU7g@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [RFC v2 8/8] iotests: add test 178 for qemu-img
- measure
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] Strange behaviour in network device initialization.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,223 +32,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Wed, Mar 15, 2017 at 11:30 AM Stefan Hajnoczi <stefanha@redhat.com>
-wrote:
+Hello development,
 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  tests/qemu-iotests/178           | 75
-> ++++++++++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/178.out.qcow2 | 33 ++++++++++++++++++
->  tests/qemu-iotests/178.out.raw   | 33 ++++++++++++++++++
->  tests/qemu-iotests/group         |  1 +
->  4 files changed, 142 insertions(+)
->  create mode 100755 tests/qemu-iotests/178
->  create mode 100644 tests/qemu-iotests/178.out.qcow2
->  create mode 100644 tests/qemu-iotests/178.out.raw
->
-> diff --git a/tests/qemu-iotests/178 b/tests/qemu-iotests/178
-> new file mode 100755
-> index 0000000..8db1241
-> --- /dev/null
-> +++ b/tests/qemu-iotests/178
-> @@ -0,0 +1,75 @@
-> +#!/bin/bash
-> +#
-> +# qemu-img measure sub-command tests
-> +#
-> +# Copyright (C) 2017 Red Hat, Inc.
-> +#
-> +# This program is free software; you can redistribute it and/or modify
-> +# it under the terms of the GNU General Public License as published by
-> +# the Free Software Foundation; either version 2 of the License, or
-> +# (at your option) any later version.
-> +#
-> +# This program is distributed in the hope that it will be useful,
-> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
-> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> +# GNU General Public License for more details.
-> +#
-> +# You should have received a copy of the GNU General Public License
-> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> +#
-> +
-> +# creator
-> +owner=stefanha@redhat.com
-> +
-> +seq=`basename $0`
-> +echo "QA output created by $seq"
-> +
-> +here=`pwd`
-> +status=1    # failure is the default!
-> +
-> +_cleanup()
-> +{
-> +    _cleanup_test_img
-> +}
-> +trap "_cleanup; exit \$status" 0 1 2 3 15
-> +
-> +# get standard environment, filters and checks
-> +. ./common.rc
-> +. ./common.filter
-> +. ./common.pattern
-> +
-> +_supported_fmt raw qcow2
-> +_supported_proto file
-> +_supported_os Linux
-> +
-> +echo "Input validation"
->
+I ran into some behaviour I don't understand and which may be a qemu problem but which may also be my fault, since I haven't investigated much on QOM so far.
+I am currently writing a NIC sysbus device based on the structure of hw/net/smc91c111.c
 
-Maybe:
+qemu is invoked as:
 
-echo "== Input validation =="
-
-for nicer output?
+  $ qemu-system-arm -M mymachine -m 8 -kernel kernel.elf -nographic -net nic,id=myid -netdev tap,ifname=tap0,id=myid,script=no,downscript=no -device mydevice,netdev=myid
 
 
-> +echo
-> +
-> +_make_test_img 1G
-> +
-> +$QEMU_IMG measure # missing arguments
-> +$QEMU_IMG measure --size 2G "$TEST_IMG" # only one allowed
-> +$QEMU_IMG measure "$TEST_IMG" a # only one filename allowed
-> +$QEMU_IMG measure --object secret,id=sec0,data=MTIzNDU2,format=base64 #
-> missing filename
-> +$QEMU_IMG measure --image-opts # missing filename
-> +$QEMU_IMG measure -f qcow2 # missing filename
-> +$QEMU_IMG measure -l snap1 # missing filename
-> +$QEMU_IMG measure -o , # invalid option list
-> +$QEMU_IMG measure -l snapshot.foo # invalid snapshot option
-> +$QEMU_IMG measure --output foo # invalid output format
-> +$QEMU_IMG measure --size -1 # invalid image size
-> +$QEMU_IMG measure -O foo "$TEST_IMG" # unknown image file format
-> +
-> +echo
-> +echo "Size calculation"
-> +echo
-> +
-> +for ofmt in human json; do
-> +    $QEMU_IMG measure --output=$ofmt -O "$IMGFMT" --size 2G
->
+The initialization structure is a little special here. A "legacy helper" initialization function is called from the board module mymachine.c:
 
---size 0 may be interesting test
+   for(n = 0; n < nb_nics; n++) {
+        nd = &nd_table[n];
+        
+        if (!nd->model || strcmp(nd->model, "mydevice") == 0) {
+            mydevice_init(nd, MYDEVICE_BASE, pic[17]);
+            break;
+        } else {
+        /* We don't know this NIC model */
+        }
+    }
+    
+The init function is provided by the device module mydevice.c:
+
+    /* Legacy helper function.  Should go away when machine config files are implemented.  */
+    void mydevice_init(NICInfo *nd, uint32_t base, qemu_irq irq)
+    {
+        DeviceState *dev;
+        SysBusDevice *s;
+    
+        qemu_check_nic_model(nd, "mydevice");
+        dev = qdev_create(NULL, TYPE_MYDEVICE);
+        s = SYS_BUS_DEVICE(dev);
+        mydevice_state *state = MY_DEVICE(dev);
+        
+        qdev_set_nic_properties(dev, nd);
+        qdev_init_nofail(dev);
+        sysbus_mmio_map(s, 0, base);
+        sysbus_connect_irq(s, 0, irq);
+    }
+    
+and the actual class/instance initializers are:
+
+    static int mydevice_init1(Object *obj)
+    {
+        DeviceState *dev = DEVICE(obj);
+        mydevice_state *s = MY_DEVICE(dev);
+        SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+        
+        memory_region_init_io(&s->mmio, OBJECT(s), &mydevice_mem_ops, s,
+                            "mydevice-mmio", 0x40000);
+        sysbus_init_mmio(sbd, &s->mmio);
+        sysbus_init_irq(sbd, &s->irq);
+        
+        qemu_macaddr_default_if_unset(&s->conf.macaddr);
+        s->nic = qemu_new_nic(&net_mydevice_info, &s->conf,
+                            object_get_typename(OBJECT(dev)), dev->id, s);
+        qemu_format_nic_info_str(qemu_get_queue(s->nic), s->conf.macaddr.a);
+        mydevice_reset(s);
+        return 0;
+    }
+
+    static void mydevice_class_init(ObjectClass *klass, void *data)
+    {
+        DeviceClass *dc = DEVICE_CLASS(klass);
+        SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
+
+        k->init = mydevice_init1;
+        dc->reset = mydevice_reset;
+        dc->vmsd = &vmstate_mydevice;
+        dc->props = mydevice_properties;
+    }
+
+    static const TypeInfo mydevice_info = {
+        .name          = TYPE_MYDEVICE,
+        .parent        = TYPE_SYS_BUS_DEVICE,
+        .instance_size = sizeof(mydevice_state),
+        .class_init    = mydevice_class_init,
+    };
+    
+    
+Now, the actual problem is that mydevice_init1() is called twice and the device state is also instantiated twice. Thus, s->irq is initialized twice, but only the first one gets connected. During runtime, the second state instance is passed with a NULL s->irq in the device state to the memops. The IRQ never fires.
+
+Here are the stack traces of the both initialization calls:
+
+#0  mydevice_init1 (obj=0x5555573bb010) at /home/brightwise/qemu-2.8.0/hw/mymachine/mydevice.c:700
+#1  0x0000555555a020f5 in sysbus_device_init (dev=0x5555573bb010) at hw/core/sysbus.c:211
+#2  0x00005555559fae58 in device_realize (dev=0x5555573bb010, errp=0x7fffffffdbd0) at hw/core/qdev.c:213
+#3  0x00005555559fc96f in device_set_realized (obj=0x5555573bb010, value=true, errp=0x7fffffffdd70) at hw/core/qdev.c:918
+#4  0x0000555555bd733c in property_set_bool (obj=0x5555573bb010, v=0x5555573bdb20, name=0x5555560bd162 "realized", opaque=0x55555738eca0, errp=0x7fffffffdd70) at qom/object.c:1854
+#5  0x0000555555bd5847 in object_property_set (obj=0x5555573bb010, v=0x5555573bdb20, name=0x5555560bd162 "realized", errp=0x7fffffffdd70) at qom/object.c:1088
+#6  0x0000555555bd866f in object_property_set_qobject (obj=0x5555573bb010, value=0x5555573bda90, name=0x5555560bd162 "realized", errp=0x7fffffffdd70) at qom/qom-qobject.c:27
+#7  0x0000555555bd5aea in object_property_set_bool (obj=0x5555573bbst ask on the mailing list for someone else to do it on your behalf (self-creation is prohibited to cut down on spam accounts).
+Start with reading the QEMU wiki.
+Contribute to the QEMU wiki by adding new topics or im010, value=true, name=0x5555560bd162 "realized", errp=0x7fffffffdd70) at qom/object.c:1157
+#8  0x00005555559fb423 in qdev_init_nofail (dev=0x5555573bb010) at hw/core/qdev.c:358
+#9  0x000055555585705e in mydevice_init (nd=0x555556b40280 <nd_table>, base=1310720, irq=0x555557334550) at /home/brightwise/qemu-2.8.0/hw/mymachine/mydevice.c:776
+#10 0x000055555585459a in mymachine_init (machine=0x555557038dc0, board_id=256) at /home/brightwise/qemu-2.8.0/hw/mymachine/mymachine.c:341
+#11 0x00005555558546ad in _machine_init (machine=0x555557038dc0) at /home/brightwise/qemu-2.8.0/hw/mymachine/mymachine.c:377
+#12 0x000055555596ec3d in main (argc=14, argv=0x7fffffffe358, envp=0x7fffffffe3d0) at vl.c:4548
+
+and 
+
+#0  mydevice_init1 (obj=0x5555573eaea0) at /home/brightwise/qemu-2.8.0/hw/mymachine/mydevice.c:700
+#1  0x0000555555a020f5 in sysbus_device_init (dev=0x5555573eaea0) at hw/core/sysbus.c:211
+#2  0x00005555559fae58 in device_realize (dev=0x5555573eaea0, errp=0x7fffffffdcf0) at hw/core/qdev.c:213
+#3  0x00005555559fc96f in device_set_realized (obj=0x5555573eaea0, value=true, errp=0x7fffffffdea0) at hw/core/qdev.c:918
+#4  0x0000555555bd733c in property_set_bool (obj=0x5555573eaea0, v=0x5555573eda40, name=0x55555607cce6 "realized", opaque=0x5555573bef50, errp=0x7fffffffdea0) at qom/object.c:1854
+#5  0x0000555555bd5847 in object_property_set (obj=0x5555573eaea0, v=0x5555573eda40, name=0x55555607cce6 "realized", errp=0x7fffffffdea0) at qom/object.c:1088
+#6  0x0000555555bd866f in object_property_set_qobject (obj=0x5555573eaea0, value=0x5555573ed930, name=0x55555607cce6 "realized", errp=0x7fffffffdea0) at qom/qom-qobject.c:27
+#7  0x0000555555bd5aea in object_property_set_bool (obj=0x5555573eaea0, value=true, name=0x55555607cce6 "realized", errp=0x7fffffffdea0) at qom/object.c:1157
+#8  0x0000555555957364 in qdev_device_add (opts=0x555556fdbc90, errp=0x7fffffffdf18) at qdev-monitor.c:623
+#9  0x0000555555969a13 in device_init_func (opaque=0x0, opts=0x555556fdbc90, errp=0x0) at vl.c:2373
+#10 0x0000555555cc801b in qemu_opts_foreach (list=0x55555659e120 <qemu_device_opts>, func=0x5555559699d5 <device_init_func>, opaque=0x0, errp=0x0) at util/qemu-option.c:1116
+#11 0x000055555596ecf0 in main (argc=14, argv=0x7fffffffe358, envp=0x7fffffffe3d0) at vl.c:4574
 
 
-> +    $QEMU_IMG measure --output=$ofmt -f "$IMGFMT" -O "$IMGFMT" "$TEST_IMG"
->
+Any help on this is greatly appreciated. Questions are:
 
-This measure converting raw to raw or qcow2 to qcow2, not sure it is very
-interesting, since in raw we don't need to measure, the size is always
-the virtual size, and for converting qcow2 to qcow2 can use use the
-source size.
+- Is this a specific problem of the network device smc91c111.c (and maybe others, too) in the first place and I've cloned that issue when copying the structure of that device module? I haven't tested smc91c111.c. Should I? I guess this stuff is widely used and should work?
 
-The most interesting case is converting raw to qcow2, and we want to test:
-- empty file
-- file with some clusters allocated
-- file with all clusters allocated
+- If not, what is the problem here? I would guess it is related to the "realized" property which is not set with the first initialization and eventually, the device is initialized a second time.
 
+Sorry, if this turn out the be a noobish question. I've got it running in a hacked version, but I wanted to figure out what the exact problem is. Any ideas?
 
-> +done
-> +
-> +# success, all done
-> +echo "*** done"
-> +rm -f $seq.full
-> +status=0
-> diff --git a/tests/qemu-iotests/178.out.qcow2
-> b/tests/qemu-iotests/178.out.qcow2
-> new file mode 100644
-> index 0000000..3fe3f5f
-> --- /dev/null
-> +++ b/tests/qemu-iotests/178.out.qcow2
-> @@ -0,0 +1,33 @@
-> +QA output created by 178
-> +Input validation
-> +
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
-> +qemu-img: Either --size N or one filename must be specified.
-> +qemu-img: --size N cannot be used together with a filename.
-> +qemu-img: At most one filename argument is allowed.
-> +qemu-img: --object, --image-opts, -f, and -l require a filename argument.
-> +qemu-img: --object, --image-opts, -f, and -l require a filename argument.
-> +qemu-img: --object, --image-opts, -f, and -l require a filename argument.
-> +qemu-img: --object, --image-opts, -f, and -l require a filename argument.
-> +qemu-img: Invalid option list: ,
-> +qemu-img: Invalid parameter 'snapshot.foo'
-> +qemu-img: Failed in parsing snapshot param 'snapshot.foo'
-> +qemu-img: --output must be used with human or json as argument.
-> +qemu-img: Image size must be less than 8 EiB!
-> +qemu-img: Unknown file format 'foo'
-> +
-> +Size calculation
-> +
-> +required bytes: 589824
-> +fully allocated bytes: 2148073472 <(214)%20807-3472>
-> +required bytes: 327680
-> +fully allocated bytes: 1074069504
-> +{
-> +    "required-bytes": 589824,
-> +    "fully-allocated-bytes": 2148073472 <(214)%20807-3472>
-> +}
-> +{
-> +    "required-bytes": 327680,
-> +    "fully-allocated-bytes": 1074069504
-> +}
-> +*** done
-> diff --git a/tests/qemu-iotests/178.out.raw
-> b/tests/qemu-iotests/178.out.raw
-> new file mode 100644
-> index 0000000..4b89dd0
-> --- /dev/null
-> +++ b/tests/qemu-iotests/178.out.raw
-> @@ -0,0 +1,33 @@
-> +QA output created by 178
-> +Input validation
-> +
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
-> +qemu-img: Either --size N or one filename must be specified.
-> +qemu-img: --size N cannot be used together with a filename.
-> +qemu-img: At most one filename argument is allowed.
-> +qemu-img: --object, --image-opts, -f, and -l require a filename argument.
-> +qemu-img: --object, --image-opts, -f, and -l require a filename argument.
-> +qemu-img: --object, --image-opts, -f, and -l require a filename argument.
-> +qemu-img: --object, --image-opts, -f, and -l require a filename argument.
-> +qemu-img: Invalid option list: ,
-> +qemu-img: Invalid parameter 'snapshot.foo'
-> +qemu-img: Failed in parsing snapshot param 'snapshot.foo'
-> +qemu-img: --output must be used with human or json as argument.
-> +qemu-img: Image size must be less than 8 EiB!
-> +qemu-img: Unknown file format 'foo'
-> +
-> +Size calculation
-> +
-> +required bytes: 2147483648 <(214)%20748-3648>
-> +fully allocated bytes: 2147483648 <(214)%20748-3648>
-> +required bytes: 1073741824
-> +fully allocated bytes: 1073741824
-> +{
-> +    "required-bytes": 2147483648 <(214)%20748-3648>,
-> +    "fully-allocated-bytes": 2147483648 <(214)%20748-3648>
-> +}
-> +{
-> +    "required-bytes": 1073741824,
-> +    "fully-allocated-bytes": 1073741824
-> +}
-> +*** done
-> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-> index 1f4bf03..846f962 100644
-> --- a/tests/qemu-iotests/group
-> +++ b/tests/qemu-iotests/group
-> @@ -168,3 +168,4 @@
->  173 rw auto
->  174 auto
->  175 auto quick
-> +178 auto quick
-> --
-> 2.9.3
->
->
+TIA
+Marc
