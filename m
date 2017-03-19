@@ -1,35 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1cpjik-0000n1-M6
-	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 18:54:45 -0400
+	(envelope-from <bounces@canonical.com>) id 1cpjjn-0001Xz-Eg
+	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 18:55:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nirsof@gmail.com>) id 1cpjii-0000mV-OU
-	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 18:54:42 -0400
-Received: from mail-ot0-x236.google.com ([2607:f8b0:4003:c0f::236]:33068)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <nirsof@gmail.com>) id 1cpjii-0000mG-Fx
-	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 18:54:40 -0400
-Received: by mail-ot0-x236.google.com with SMTP id a12so53220866ota.0
-	for <qemu-devel@nongnu.org>; Sun, 19 Mar 2017 15:54:40 -0700 (PDT)
+	(envelope-from <bounces@canonical.com>) id 1cpjjj-00017B-Iu
+	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 18:55:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48809)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cpjjj-00016l-Cz
+	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 18:55:43 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cpjjg-0008KI-Bb
+	for <qemu-devel@nongnu.org>; Sun, 19 Mar 2017 22:55:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 569E72E806C
+	for <qemu-devel@nongnu.org>; Sun, 19 Mar 2017 22:55:40 +0000 (UTC)
 MIME-Version: 1.0
-References: <20170303185427.32681-1-jsnow@redhat.com>
-	<CAMr-obuiwE_ef6OPSJbBtmZYsaqo_mzU9E6q8zhbrviZ6_=krQ@mail.gmail.com>
-	<5303cac4-a8d8-bf89-b525-3b0fb1b19127@redhat.com>
-	<CAMr-obsrUqvqbLabYgKgv1J+ztn5XCwto6LowoN=S0ZWuFLZMA@mail.gmail.com>
-	<871sua4y3u.fsf@dusky.pond.sub.org>
-	<3fbdfabf-82b4-d774-d5f4-2c50a6d740dc@redhat.com>
-	<87efy9ijrf.fsf@dusky.pond.sub.org>
-	<c9905f84-846a-4656-14cd-a8bd7628ea08@redhat.com>
-	<878tog1dtc.fsf@dusky.pond.sub.org>
-	<CAMr-obtywhYemkHd8=mjXFHT=NZM4uAFC-H8ftJbPjTtciU__g@mail.gmail.com>
-	<87fuihn24y.fsf@dusky.pond.sub.org>
-In-Reply-To: <87fuihn24y.fsf@dusky.pond.sub.org>
-From: Nir Soffer <nirsof@gmail.com>
-Date: Sun, 19 Mar 2017 22:54:28 +0000
-Message-ID: <CAMr-obtJuFNx+e1iJT=8MNuc3s4e1s2_ekwrsaV5=22virEjjg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2] qmp-shell: add persistent command
- history
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 19 Mar 2017 22:47:21 -0000
+From: Mario <1674114@bugs.launchpad.net>
+Reply-To: Bug 1674114 <1674114@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170319155854.19555.99549.malonedeb@soybean.canonical.com>
+Message-Id: <20170319224721.22178.31733.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1674114] Re: Bad sectors when using MS-DOS 6.22
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,207 +36,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Mon, Mar 13, 2017 at 8:04 AM Markus Armbruster <armbru@redhat.com> wrote:
+It is working now without the parameters "-machine isapc" and "-cpu
+486".
 
-> Nir Soffer <nirsof@gmail.com> writes:
->
-> > On Wed, Mar 8, 2017 at 8:29 AM, Markus Armbruster <armbru@redhat.com>
-> wrote:
-> >> John Snow <jsnow@redhat.com> writes:
-> >>
-> >>> On 03/07/2017 03:16 AM, Markus Armbruster wrote:
-> >>>> John Snow <jsnow@redhat.com> writes:
-> >>>>
-> >>>>> On 03/06/2017 03:18 AM, Markus Armbruster wrote:
-> >>>>>> Nir Soffer <nirsof@gmail.com> writes:
-> >>>>>>
-> >>>>>>> On Fri, Mar 3, 2017 at 9:29 PM, John Snow <jsnow@redhat.com>
-> wrote:
-> >>>>>>>>
-> >>>>>>>>
-> >>>>>>>> On 03/03/2017 02:26 PM, Nir Soffer wrote:
-> >>>>>>>>> On Fri, Mar 3, 2017 at 8:54 PM, John Snow <jsnow@redhat.com>
-> wrote:
-> >>>>>>>>>> Use the existing readline history function we are utilizing
-> >>>>>>>>>> to provide persistent command history across instances of
-> qmp-shell.
-> >>>>>>>>>>
-> >>>>>>>>>> This assists entering debug commands across sessions that may be
-> >>>>>>>>>> interrupted by QEMU sessions terminating, where the qmp-shell
-> has
-> >>>>>>>>>> to be relaunched.
-> >>>>>>>>>>
-> >>>>>>>>>> Signed-off-by: John Snow <jsnow@redhat.com>
-> >>>>>>>>>> ---
-> >>>>>>>>>>
-> >>>>>>>>>> v2: Adjusted the errors to whine about non-ENOENT errors, but
-> still
-> >>>>>>>>>>     intercept all errors as non-fatal.
-> >>>>>>>>>>     Save history atexit() to match bash standard behavior
-> >>>>>>>>>>
-> >>>>>>>>>>  scripts/qmp/qmp-shell | 19 +++++++++++++++++++
-> >>>>>>>>>>  1 file changed, 19 insertions(+)
-> >>>>>>>>>>
-> >>>>>>>>>> diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
-> >>>>>>>>>> index 0373b24..55a8285 100755
-> >>>>>>>>>> --- a/scripts/qmp/qmp-shell
-> >>>>>>>>>> +++ b/scripts/qmp/qmp-shell
-> >>>>>>>>>> @@ -70,6 +70,9 @@ import json
-> >>>>>>>>>>  import ast
-> >>>>>>>>>>  import readline
-> >>>>>>>>>>  import sys
-> >>>>>>>>>> +import os
-> >>>>>>>>>> +import errno
-> >>>>>>>>>> +import atexit
-> >>>>>>>>>>
-> >>>>>>>>>>  class QMPCompleter(list):
-> >>>>>>>>>>      def complete(self, text, state):
-> >>>>>>>>>> @@ -109,6 +112,7 @@ class QMPShell(qmp.QEMUMonitorProtocol):
-> >>>>>>>>>>          self._pretty = pretty
-> >>>>>>>>>>          self._transmode = False
-> >>>>>>>>>>          self._actions = list()
-> >>>>>>>>>> +        self._histfile = os.path.join(os.path.expanduser('~'),
-> '.qmp_history')
-> >>>>>>
-> >>>>>> I selfishly object to this filename, because I'm using it with
-> >>>>>>
-> >>>>>>     $ socat UNIX:/work/armbru/images/test-qmp
-> READLINE,history=$HOME/.qmp_history,prompt='QMP> '
-> >>>>>>
-> >>>>>> Just kidding.  But seriously, shouldn't this be named after the
-> >>>>>> *application* (qmp-shell) rather than the protocol (qmp)?
-> >>>>>>
-> >>>>>
-> >>>>> Seeing as the history itself is the qmp-shell syntax, you are
-> correct.
-> >>>>>
-> >>>>> (Hey, it would be interesting to store the generated QMP into the
-> >>>>> qmp_history, though...!)
-> >>>>
-> >>>> Hah!  Saving it would be easy enough, but reloading it...  okay, call
-> it
-> >>>> a "backup" and declare victory when saving works.
-> >>>>
-> >>>>>>>>>>
-> >>>>>>>>>>      def __get_address(self, arg):
-> >>>>>>>>>>          """
-> >>>>>>>>>> @@ -137,6 +141,21 @@ class QMPShell(qmp.QEMUMonitorProtocol):
-> >>>>>>>>>>          # XXX: default delimiters conflict with some command
-> names (eg. query-),
-> >>>>>>>>>>          # clearing everything as it doesn't seem to matter
-> >>>>>>>>>>          readline.set_completer_delims('')
-> >>>>>>>>>> +        try:
-> >>>>>>>>>> +            readline.read_history_file(self._histfile)
-> >>>>>>>>>> +        except Exception as e:
-> >>>>>>>>>> +            if isinstance(e, IOError) and e.errno ==
-> errno.ENOENT:
-> >>>>>>>>>> +                # File not found. No problem.
-> >>>>>>>>>> +                pass
-> >>>>>>>>>> +            else:
-> >>>>>>>>>> +                print "Failed to read history '%s'; %s" %
-> (self._histfile, e)
-> >>>>>>>>>
-> >>>>>>>>> I would handle only IOError, since any other error means a bug
-> in this code
-> >>>>>>>>> or in the underlying readline library, and the best way to
-> handle this is to
-> >>>>>>>>> let it fail loudly.
-> >>>>>>>>>
-> >>>>>>>>
-> >>>>>>>> Disagree. No reason to stop the shell from working because a QOL
-> feature
-> >>>>>>>> didn't initialize correctly.
-> >>>>>>>>
-> >>>>>>>> The warning will be enough to solicit reports and fixes if
-> necessary.
-> >>>>>>>
-> >>>>>>> I agree, the current solution is good tradeoff.
-> >>>>>>
-> >>>>>> For what it's worth, bash seems to silently ignore a history file it
-> >>>>>> can't read.  Tested by running "HISTFILE=xxx bash", then chmod 0
-> xxx, da
-> >>>>>> capo.
-> >>>>>>
-> >>>>>
-> >>>>> Right, done by example.
-> >>>>>
-> >>>>>>> One thing missing, is a call to readline.set_history_length,
-> without
-> >>>>>>> it the history
-> >>>>>>> will grow without limit, see:
-> >>>>>>>
-> https://docs.python.org/2/library/readline.html#readline.set_history_length
-> >>>>>>
-> >>>>>> Should this be addressed for 2.9?
-> >>>>>>
-> >>>>>
-> >>>>> You can add a limit if you want to; I don't have suggestions for
-> which
-> >>>>> completely arbitrary limit makes sense, so I left it blank
-> intentionally.
-> >>>>
-> >>>> For what it's worth, bash defaults HISTSIZE to 500.
-> >>>>
-> >>>> GNU Readline lets users configure it in ~/.inputrc.  Conditional
-> >>>> configuration is possible, i.e. something like
-> >>>>
-> >>>>     $if Qmp-shell
-> >>>>     set history-size 5000
-> >>>>     $endif
-> >>>>
-> >>>> should work, provided qmp-shell sets rl_readline_name as it should.
-> >>>>
-> >>>
-> >>> Spoke too soon. I don't see a way to control this in python's readline
-> >>> library... I'm not very familiar with readline, is there some
-> >>> environment variable or something perhaps?
-> >>> (It looks like python's code just hard-sets it to "python" ...)
-> >>
-> >> How sad.  If https://bugs.python.org/ didn't require a login, I
-> would've
-> >> filed a bug already.
-> >>
-> >> I'm afraid all I can offer meanwhile is INPUTRC:
-> >>
-> >>     Any user can customize programs that use Readline by putting
-> >>     commands in an "inputrc" file, conventionally in his home directory.
-> >>     The name of this file is taken from the value of the environment
-> >>     variable `INPUTRC'.  If that variable is unset, the default is
-> >>     `~/.inputrc'.  If that file does not exist or cannot be read, the
-> >>     ultimate default is `/etc/inputrc'.
-> >>
-> >
-> > Having a way to limit history globally looks good enough.
->
-> Certainly good enough for merging qmp-shell patches.
->
-> > Note that python readline does not report the readline
-> > limit correctly (get_history_length() returns -1), but saving
-> > history uses the limit defined  in .inputrc.
-> >
-> > Playing with this, I found a nice bug - if you set history
-> > size to N, and your history file contains 2 * N items or more,
-> > python segfaults when entering the first input line.
-> >
-> > I'll file a python bug later.
->
-> Please do.
->
+-- =
 
-Reported here:
-http://bugs.python.org/issue29854
-https://github.com/python/cpython/pull/728
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1674114
 
-If you could throw in a (separate) request for letting us set
-> rl_readline_name, that would be great.
->
+Title:
+  Bad sectors when using MS-DOS 6.22
 
-Will do.
+Status in QEMU:
+  New
 
+Bug description:
+  When I try to install DOS 6.22 in QEMU, I get many disk errors when
+  the virtual disk is beeing partionized and formatted. When I later do
+  a SCANDISK, I can see many bad sectors and file errors.
 
->
-> [...]
->
+  I have tested this with the following disk formats: qcow2, vmdk, raw.
+
+  I tested this on Windows 7 with the following command line and QEMU versi=
+on:
+  qemu-system-i386 -name "Windows 3.11 WfW" -machine isapc -cpu 486 -boot o=
+rder=3Dadc -m 32 -soundhw sb16 -hda disk1.qcow2 -vga cirrus
+
+  qemu-system-i386 --version
+  QEMU emulator version 2.8.50 (v2.8.0-12557-g0bd1f6b1b2-dirty)
+  Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
+
+  I then did a test with the linux version of qemu, which gave me the same =
+results.
+  Command line: qemu-system-i386 -name "Windows 3.11 WfW" -machine isapc -c=
+pu 486 -boot order=3Dadc -m 32 -soundhw sb16 -hda disk1.qcow2 -vga cirrus -=
+monitor stdout
+  Version: qemu-system-i386 --version
+  QEMU emulator version 2.1.2 (Debian 1:2.1+dfsg-12+deb8u6), Copyright (c) =
+2003-2008 Fabrice Bellard
+
+  I also checked the disk image with qemu-img, with no results:
+
+  No errors were found on the image.
+  7986/8000 =3D 99.83% allocated, 0.20% fragmented, 0.00% compressed cluste=
+rs
+  Image end offset: 523698176
+
+  Because I got the error with two different versions of QEMU, I think
+  this is a general problem and not related to a specific distribution.
+
+  I have attached a zip file with screenshots of SCANDISK, which shows
+  the disk errors.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1674114/+subscriptions
