@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bd.aviv@gmail.com>) id 1cpcr8-0001jM-KS
-	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 11:34:55 -0400
+	(envelope-from <bounces@canonical.com>) id 1cpdKz-0008Cd-1B
+	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 12:05:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bd.aviv@gmail.com>) id 1cpcr7-0003YK-8h
-	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 11:34:54 -0400
-Received: from mail-pf0-x234.google.com ([2607:f8b0:400e:c00::234]:33171)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bd.aviv@gmail.com>) id 1cpcr6-0003Y7-W6
-	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 11:34:53 -0400
-Received: by mail-pf0-x234.google.com with SMTP id e129so16899946pfh.0
-	for <qemu-devel@nongnu.org>; Sun, 19 Mar 2017 08:34:52 -0700 (PDT)
+	(envelope-from <bounces@canonical.com>) id 1cpdKv-000601-1S
+	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 12:05:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47588)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cpdKu-0005zH-RR
+	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 12:05:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cpdKs-0001pl-Lk
+	for <qemu-devel@nongnu.org>; Sun, 19 Mar 2017 16:05:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9D9922E8043
+	for <qemu-devel@nongnu.org>; Sun, 19 Mar 2017 16:05:38 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170316040526.GJ5971@pxdev.xzpeter.org>
-References: <1486456099-7345-1-git-send-email-peterx@redhat.com>
-	<1486456099-7345-18-git-send-email-peterx@redhat.com>
-	<20170316040526.GJ5971@pxdev.xzpeter.org>
-From: "Aviv B.D." <bd.aviv@gmail.com>
-Date: Sun, 19 Mar 2017 17:34:31 +0200
-Message-ID: <CAM3WwMiuSG3KGEg7WnN7fhxi-0Yswtsk1Wnh_uVSeuN1HZSLaQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v7 17/17] intel_iommu: enable vfio devices
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 19 Mar 2017 15:58:54 -0000
+From: Mario <1674114@bugs.launchpad.net>
+Reply-To: Bug 1674114 <1674114@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170319155854.19555.99549.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1674114] [NEW] Bad sectors when using MS-DOS 6.22
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,62 +35,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, tianyu.lan@intel.com, kevin.tian@intel.com, Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>
+To: qemu-devel@nongnu.org
 
-Hi Peter,
-Thanks, I think that I should receive credit for this patch.
+Public bug reported:
 
-Please attribute it under my technion mail: bdaviv@cs.technion.ac.il.
+When I try to install DOS 6.22 in QEMU, I get many disk errors when the
+virtual disk is beeing partionized and formatted. When I later do a
+SCANDISK, I can see many bad sectors and file errors.
 
-The signed-off line should be:
+I have tested this with the following disk formats: qcow2, vmdk, raw.
 
-Signed-off-by: Aviv Ben-David <bdaviv@cs.technion.ac.il>
+I tested this on Windows 7 with the following command line and QEMU version:
+qemu-system-i386 -name "Windows 3.11 WfW" -machine isapc -cpu 486 -boot ord=
+er=3Dadc -m 32 -soundhw sb16 -hda disk1.qcow2 -vga cirrus
 
-Thanks,
-Aviv.
+qemu-system-i386 --version
+QEMU emulator version 2.8.50 (v2.8.0-12557-g0bd1f6b1b2-dirty)
+Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
 
-On Thu, Mar 16, 2017 at 6:05 AM, Peter Xu <peterx@redhat.com> wrote:
+I then did a test with the linux version of qemu, which gave me the same re=
+sults.
+Command line: qemu-system-i386 -name "Windows 3.11 WfW" -machine isapc -cpu=
+ 486 -boot order=3Dadc -m 32 -soundhw sb16 -hda disk1.qcow2 -vga cirrus -mo=
+nitor stdout
+Version: qemu-system-i386 --version
+QEMU emulator version 2.1.2 (Debian 1:2.1+dfsg-12+deb8u6), Copyright (c) 20=
+03-2008 Fabrice Bellard
 
-> On Tue, Feb 07, 2017 at 04:28:19PM +0800, Peter Xu wrote:
-> > This patch is based on Aviv Ben-David (<bd.aviv@gmail.com>)'s patch
-> > upstream:
-> >
-> >   "IOMMU: enable intel_iommu map and unmap notifiers"
-> >   https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg01453.html
-> >
-> > However I removed/fixed some content, and added my own codes.
-> >
-> > Instead of translate() every page for iotlb invalidations (which is
-> > slower), we walk the pages when needed and notify in a hook function.
-> >
-> > This patch enables vfio devices for VT-d emulation.
-> >
-> > And, since we already have vhost DMAR support via device-iotlb, a
-> > natural benefit that this patch brings is that vt-d enabled vhost can
-> > live even without ATS capability now. Though more tests are needed.
-> >
->
-> Hi, Michael,
->
-> If there is any possiblility that this version be merged in the future
-> at any point, would you please help add Aviv's sign-off into this
-> patch as well right here (I think it should be before Jason's r-b):
->
-> Signed-off-by: Aviv Ben-David <bd.aviv@gmail.com>
->
-> Since I think we should definitely give Aviv more credit since he's
-> done a great work before (and devoted lots of time).
->
-> (Aviv, please reply if you have other opinions, or I'll just make
->  myself bold)
->
-> Thanks,
->
-> > Reviewed-by: Jason Wang <jasowang@redhat.com>
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
->
-> [...]
->
-> -- peterx
->
+I also checked the disk image with qemu-img, with no results:
+
+No errors were found on the image.
+7986/8000 =3D 99.83% allocated, 0.20% fragmented, 0.00% compressed clusters
+Image end offset: 523698176
+
+Because I got the error with two different versions of QEMU, I think
+this is a general problem and not related to a specific distribution.
+
+I have attached a zip file with screenshots of SCANDISK, which shows the
+disk errors.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: bad disk image sector
+
+** Attachment added: "Screenshots of various disk read errors"
+   https://bugs.launchpad.net/bugs/1674114/+attachment/4840441/+files/failu=
+re.zip
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1674114
+
+Title:
+  Bad sectors when using MS-DOS 6.22
+
+Status in QEMU:
+  New
+
+Bug description:
+  When I try to install DOS 6.22 in QEMU, I get many disk errors when
+  the virtual disk is beeing partionized and formatted. When I later do
+  a SCANDISK, I can see many bad sectors and file errors.
+
+  I have tested this with the following disk formats: qcow2, vmdk, raw.
+
+  I tested this on Windows 7 with the following command line and QEMU versi=
+on:
+  qemu-system-i386 -name "Windows 3.11 WfW" -machine isapc -cpu 486 -boot o=
+rder=3Dadc -m 32 -soundhw sb16 -hda disk1.qcow2 -vga cirrus
+
+  qemu-system-i386 --version
+  QEMU emulator version 2.8.50 (v2.8.0-12557-g0bd1f6b1b2-dirty)
+  Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
+
+  I then did a test with the linux version of qemu, which gave me the same =
+results.
+  Command line: qemu-system-i386 -name "Windows 3.11 WfW" -machine isapc -c=
+pu 486 -boot order=3Dadc -m 32 -soundhw sb16 -hda disk1.qcow2 -vga cirrus -=
+monitor stdout
+  Version: qemu-system-i386 --version
+  QEMU emulator version 2.1.2 (Debian 1:2.1+dfsg-12+deb8u6), Copyright (c) =
+2003-2008 Fabrice Bellard
+
+  I also checked the disk image with qemu-img, with no results:
+
+  No errors were found on the image.
+  7986/8000 =3D 99.83% allocated, 0.20% fragmented, 0.00% compressed cluste=
+rs
+  Image end offset: 523698176
+
+  Because I got the error with two different versions of QEMU, I think
+  this is a general problem and not related to a specific distribution.
+
+  I have attached a zip file with screenshots of SCANDISK, which shows
+  the disk errors.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1674114/+subscriptions
