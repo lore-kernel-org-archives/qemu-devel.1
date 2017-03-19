@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cpSTh-0007Zu-Pk
-	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 00:30:03 -0400
+	(envelope-from <bounces@canonical.com>) id 1cpSTh-0007Zw-QA
+	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 00:30:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cpSTe-0004Zk-Np
+	(envelope-from <bounces@canonical.com>) id 1cpSTe-0004ZR-1J
 	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 00:30:01 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53957)
+Received: from indium.canonical.com ([91.189.90.7]:53917)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cpSTe-0004ZG-F6
-	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 00:29:58 -0400
+	id 1cpSTd-0004YI-Ro
+	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 00:29:57 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cpSTd-0004p5-H7
-	for <qemu-devel@nongnu.org>; Sun, 19 Mar 2017 04:29:57 +0000
+	id 1cpSTc-0004p8-Cc
+	for <qemu-devel@nongnu.org>; Sun, 19 Mar 2017 04:29:56 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7AEF32E80C8
-	for <qemu-devel@nongnu.org>; Sun, 19 Mar 2017 04:29:57 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 35C922E80CC
+	for <qemu-devel@nongnu.org>; Sun, 19 Mar 2017 04:29:56 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 19 Mar 2017 04:17:53 -0000
-From: Launchpad Bug Tracker <638806@bugs.launchpad.net>
-Reply-To: Bug 638806 <638806@bugs.launchpad.net>
+Date: Sun, 19 Mar 2017 04:17:52 -0000
+From: Launchpad Bug Tracker <747583@bugs.launchpad.net>
+Reply-To: Bug 747583 <747583@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20100915095407.8638.3288.malonedeb@wampee.canonical.com>
-Message-Id: <20170319041754.14588.34724.malone@loganberry.canonical.com>
+References: <20110401175509.1231.27239.malonedeb@palladium.canonical.com>
+Message-Id: <20170319041752.14588.32929.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 638806] Re: Crashes with kfreebsd guest when
- using KVM
+Subject: [Qemu-devel] [Bug 747583] Re: Windows 2008 Time Zone Change Even
+ When Using -locatime
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,178 +48,55 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/638806
+https://bugs.launchpad.net/bugs/747583
 
 Title:
-  Crashes with kfreebsd guest when using KVM
+  Windows 2008 Time Zone Change Even When Using -locatime
 
 Status in QEMU:
   Expired
 
 Bug description:
-  commit 46411f863c26ff85c48b97939502007610c95398
+  * What cpu model : Intel(R) Xeon(R) CPU E5620  @ 2.40GHz
+  * What kvm version you are using. : qemu-kvm-0.12.3
+  * The host kernel version : 2.6.32-30-server
+  * What host kernel arch you are using (i386 or x86_64) : x86_64
+  * What guest you are using, including OS type: Windows 2008 Enterprise x8=
+6_64
+  * The qemu command line you are using to start the guest : /usr/bin/kvm -=
+S -M pc-0.12 -enable-kvm -m 1024 -smp 1 -name 2-6176 -uuid 4d1d56b1-d0b7-50=
+6b-31a5-a87c8cb0560b -chardev socket,id=3Dmonitor,path=3D/var/lib/libvirt/q=
+emu/2-6176.monitor,server,nowait -monitor chardev:monitor -localtime -boot =
+c -drive file=3D/dev/disk/by-id/scsi-3600144f05c11090000004d9602950073,if=
+=3Dvirtio,index=3D0,boot=3Don,format=3Draw -drive file=3D/dev/disk/by-id/sc=
+si-3600144f0eae8810000004c7bb0920037,if=3Dide,media=3Dcdrom,index=3D2,forma=
+t=3Draw -net nic,macaddr=3D00:00:d1:d0:3f:5e,vlan=3D0,name=3Dnic.1 -net tap=
+,fd=3D212,vlan=3D0,name=3Dtap.1 -net nic,macaddr=3D00:00:0a:d0:3f:5e,vlan=
+=3D1,name=3Dnic.1 -net tap,fd=3D213,vlan=3D1,name=3Dtap.1 -chardev pty,id=
+=3Dserial0 -serial chardev:serial0 -parallel none -usb -usbdevice tablet -v=
+nc 0.0.0.0:394,password -k en-us -vga cirrus
+  * Whether the problem goes away if using the -no-kvm-irqchip or -no-kvm-p=
+it switch. : Unable to test
+  * Whether the problem also appears with the -no-kvm switch. : Unable to t=
+est
 
-  Linux host
-  Kfreebsd guest
-  qemu -boot c -hda qemu_kfreebsd_i386.img -enable-kvm
+  Host time zone: EDT Guest time zone: PDT
 
-  QEMU crashes with free on invalid pointer:
+  Steps to reproduce:
+  1) Set time zone to (GMT-08:00) Pacific Time (US & Canada) on guest
+  2) Power off Windows 2008 Enterprise x86_64 guest completely. Ensure the =
+kvm process exits.
+  3) Power on Windows 2008 Enterprise x86_64 guest using virsh start <domai=
+n>
+  4) Server will show EDT time but have the time zone still set to (GMT-08:=
+00) Pacific Time (US & Canada).
 
-  *** glibc detected *** qemu: free(): invalid pointer: 0x000000000253cf60 =
-***
-  =3D=3D=3D=3D=3D=3D=3D Backtrace: =3D=3D=3D=3D=3D=3D=3D=3D=3D
-  /lib/libc.so.6(+0x71ad6)[0x7f0844fa5ad6]
-  qemu[0x494283]
-  qemu[0x4951ca]
-  qemu[0x49aa01]
-  qemu[0x495d15]
-  qemu[0x5197f4]
-  qemu[0x51a297]
-  /lib/libc.so.6(__libc_start_main+0xfd)[0x7f0844f52c4d]
-  qemu[0x408799]
-  =3D=3D=3D=3D=3D=3D=3D Memory map: =3D=3D=3D=3D=3D=3D=3D=3D
-  00400000-00625000 r-xp 00000000 08:06 4186599                            =
-/usr/local/bin/qemu
-  00825000-00847000 rw-p 00225000 08:06 4186599                            =
-/usr/local/bin/qemu
-  00847000-00fed000 rw-p 00000000 00:00 0 =
+  Syncing the time after stopping and starting the kvm process using
+  Windows "Internet Time" ntp time sync will sync the time to the
+  correct PDT time.
 
-  00fed000-00fee000 rwxp 00000000 00:00 0 =
-
-  00fee000-0104b000 rw-p 00000000 00:00 0 =
-
-  022fe000-023ff000 rw-p 00000000 00:00 0 =
-
-  023ff000-0240f000 rw-p 00000000 00:00 0 =
-
-  0240f000-0255d000 rw-p 00000000 00:00 0 =
-
-  41cd2000-43cd2000 rwxp 00000000 00:00 0 =
-
-  7f0835c22000-7f0835c38000 r-xp 00000000 08:06 3407959                    =
-/lib/libgcc_s.so.1
-  7f0835c38000-7f0835e37000 ---p 00016000 08:06 3407959                    =
-/lib/libgcc_s.so.1
-  7f0835e37000-7f0835e38000 rw-p 00015000 08:06 3407959                    =
-/lib/libgcc_s.so.1
-  7f0835e38000-7f0835e3d000 r-xp 00000000 08:06 4185228                    =
-/usr/lib/libXfixes.so.3.1.0
-  7f0835e3d000-7f083603c000 ---p 00005000 08:06 4185228                    =
-/usr/lib/libXfixes.so.3.1.0
-  7f083603c000-7f083603d000 rw-p 00004000 08:06 4185228                    =
-/usr/lib/libXfixes.so.3.1.0
-  7f083603d000-7f0836046000 r-xp 00000000 08:06 4178659                    =
-/usr/lib/libXcursor.so.1.0.2
-  7f0836046000-7f0836246000 ---p 00009000 08:06 4178659                    =
-/usr/lib/libXcursor.so.1.0.2
-  7f0836246000-7f0836247000 rw-p 00009000 08:06 4178659                    =
-/usr/lib/libXcursor.so.1.0.2
-  7f0836247000-7f0836294000 rw-p 00000000 00:00 0 =
-
-  7f083631c000-7f0836491000 r--p 00000000 08:06 3670017                    =
-/usr/lib/locale/locale-archive
-  7f0836491000-7f0836499000 r-xp 00000000 08:06 516333                     =
-/usr/lib/libXrandr.so.2.2.0
-  7f0836499000-7f0836698000 ---p 00008000 08:06 516333                     =
-/usr/lib/libXrandr.so.2.2.0
-  7f0836698000-7f0836699000 rw-p 00007000 08:06 516333                     =
-/usr/lib/libXrandr.so.2.2.0
-  7f0836699000-7f08366a2000 r-xp 00000000 08:06 4180666                    =
-/usr/lib/libXrender.so.1.3.0
-  7f08366a2000-7f08368a2000 ---p 00009000 08:06 4180666                    =
-/usr/lib/libXrender.so.1.3.0
-  7f08368a2000-7f08368a3000 rw-p 00009000 08:06 4180666                    =
-/usr/lib/libXrender.so.1.3.0
-  7f08368a3000-7f08368b4000 r-xp 00000000 08:06 4181769                    =
-/usr/lib/libXext.so.6.4.0
-  7f08368b4000-7f0836ab4000 ---p 00011000 08:06 4181769                    =
-/usr/lib/libXext.so.6.4.0
-  7f0836ab4000-7f0836ab5000 rw-p 00011000 08:06 4181769                    =
-/usr/lib/libXext.so.6.4.0
-  7f0836ad6000-7f0836ad7000 ---p 00000000 00:00 0 =
-
-  7f0836ad7000-7f0836f5b000 rw-p 00000000 00:00 0 =
-
-  7f0836f6e000-7f0837088000 rw-s 00000000 00:04 1900557                    =
-/SYSV00000000 (deleted)
-  7f0837088000-7f0837089000 rw-p 00000000 00:00 0 =
-
-  7f0837089000-7f0837889000 rw-p 00000000 00:00 0 =
-
-  7f0837889000-7f083788b000 rw-p 00000000 00:00 0 =
-
-  7f083788b000-7f083f88b000 rw-p 00000000 00:00 0 =
-
-  7f083f88b000-7f083f88c000 rw-p 00000000 00:00 0 =
-
-  7f083f88c000-7f083f88d000 ---p 00000000 00:00 0 =
-
-  7f083f88d000-7f0841a8f000 rw-p 00000000 00:00 0 =
-
-  7f0841a8f000-7f0841a94000 r-xp 00000000 08:06 4183916                    =
-/usr/lib/libXdmcp.so.6.0.0
-  7f0841a94000-7f0841c93000 ---p 00005000 08:06 4183916                    =
-/usr/lib/libXdmcp.so.6.0.0
-  7f0841c93000-7f0841c94000 rw-p 00004000 08:06 4183916                    =
-/usr/lib/libXdmcp.so.6.0.0
-  7f0841c94000-7f0841c96000 r-xp 00000000 08:06 4183879                    =
-/usr/lib/libXau.so.6.0.0
-  7f0841c96000-7f0841e96000 ---p 00002000 08:06 4183879                    =
-/usr/lib/libXau.so.6.0.0
-  7f0841e96000-7f0841e97000 rw-p 00002000 08:06 4183879                    =
-/usr/lib/libXau.so.6.0.0
-  7f0841e97000-7f0841eb6000 r-xp 00000000 08:06 3407929                    =
-/lib/libx86.so.1
-  7f0841eb6000-7f08420b6000 ---p 0001f000 08:06 3407929                    =
-/lib/libx86.so.1
-  7f08420b6000-7f08420b8000 rw-p 0001f000 08:06 3407929                    =
-/lib/libx86.so.1
-  7f08420b8000-7f08420b9000 rw-p 00000000 00:00 0 =
-
-  7f08420b9000-7f08420bc000 r-xp 00000000 08:06 4181768                    =
-/usr/lib/libgpg-error.so.0.4.0
-  7f08420bc000-7f08422bb000 ---p 00003000 08:06 4181768                    =
-/usr/lib/libgpg-error.so.0.4.0
-  7f08422bb000-7f08422bc000 rw-p 00002000 08:06 4181768                    =
-/usr/lib/libgpg-error.so.0.4.0
-  7f08422bc000-7f08422be000 r-xp 00000000 08:06 3407931                    =
-/lib/libkeyutils.so.1.3
-  7f08422be000-7f08424bd000 ---p 00002000 08:06 3407931                    =
-/lib/libkeyutils.so.1.3
-  7f08424bd000-7f08424be000 rw-p 00001000 08:06 3407931                    =
-/lib/libkeyutils.so.1.3
-  7f08424be000-7f08424c5000 r-xp 00000000 08:06 516340                     =
-/usr/lib/libkrb5support.so.0.1
-  7f08424c5000-7f08426c5000 ---p 00007000 08:06 516340                     =
-/usr/lib/libkrb5support.so.0.1
-  7f08426c5000-7f08426c6000 rw-p 00007000 08:06 516340                     =
-/usr/lib/libkrb5support.so.0.1
-  7f08426c6000-7f08426c9000 r-xp 00000000 08:06 3407916                    =
-/lib/libcom_err.so.2.1
-  7f08426c9000-7f08428c8000 ---p 00003000 08:06 3407916                    =
-/lib/libcom_err.so.2.1
-  7f08428c8000-7f08428c9000 rw-p 00002000 08:06 3407916                    =
-/lib/libcom_err.so.2.1
-  7f08428c9000-7f08428ee000 r-xp 00000000 08:06 4178134                    =
-/usr/lib/libk5crypto.so.3.1
-  7f08428ee000-7f0842aed000 ---p 00025000 08:06 4178134                    =
-/usr/lib/libk5crypto.so.3.1
-  7f0842aed000-7f0842aef000 rw-p 00024000 08:06 4178134                    =
-/usr/lib/libk5crypto.so.3.1
-  7f0842aef000-7f0842bad000 r-xp 00000000 08:06 516332                     =
-/usr/lib/libkrb5.so.3.3
-  7f0842bad000-7f0842dac000 ---p 000be000 08:06 516332                     =
-/usr/lib/libkrb5.so.3.3
-  7f0842dac000-7f0842db7000 rw-p 000bd000 08:06 516332                     =
-/usr/lib/libkrb5.so.3.3
-  7f0842db7000-7f0842dd0000 r-xp 00000000 08:06 516360                     =
-/usr/lib/libsasl2.so.2.0.23
-  7f0842dd0000-7f0842fcf000 ---p 00019000 08:06 516360                     =
-/usr/lib/libsasl2.so.2.0.23
-  7f0842fcf000-7f0842fd0000 rw-p 00018000 08:06 516360                     =
-/usr/lib/libsasl2.so.2.0.23
-  7f0842fd0000-7f0842fe3000 r-xp 00000000 08:06 3408041                    =
-/lib/libresolv-2.11.2.so
+  Doing a reboot from within the guest's operating system where kvm does
+  not exit will not cause the timezone shift to happen.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/638806/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/747583/+subscriptions
