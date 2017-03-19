@@ -1,32 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55208)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58810)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cpdKz-0008Cd-1B
-	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 12:05:46 -0400
+	(envelope-from <sauravsachidanand@gmail.com>) id 1cpdgK-0002aF-EA
+	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 12:27:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cpdKv-000601-1S
-	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 12:05:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47588)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cpdKu-0005zH-RR
-	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 12:05:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cpdKs-0001pl-Lk
-	for <qemu-devel@nongnu.org>; Sun, 19 Mar 2017 16:05:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9D9922E8043
-	for <qemu-devel@nongnu.org>; Sun, 19 Mar 2017 16:05:38 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 19 Mar 2017 15:58:54 -0000
-From: Mario <1674114@bugs.launchpad.net>
-Reply-To: Bug 1674114 <1674114@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20170319155854.19555.99549.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1674114] [NEW] Bad sectors when using MS-DOS 6.22
+	(envelope-from <sauravsachidanand@gmail.com>) id 1cpdgH-0004gN-0g
+	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 12:27:48 -0400
+From: Saurav Sachidanand <sauravsachidanand@gmail.com>
+Date: Sun, 19 Mar 2017 16:27:15 +0000
+Message-Id: <20170319162715.2260-1-sauravsachidanand@gmail.com>
+Subject: [Qemu-devel] [Qemu-trivial] [PATCH v3] util: Use g_malloc/g_free in
+ envlist.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,104 +19,219 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, stefanha@gmail.com, laurent@vivier.eu, Saurav Sachidanand <sauravsachidanand@gmail.com>
 
-Public bug reported:
+Change malloc/strdup/free to g_malloc/g_strdup/g_free in
+util/envlist.c.
 
-When I try to install DOS 6.22 in QEMU, I get many disk errors when the
-virtual disk is beeing partionized and formatted. When I later do a
-SCANDISK, I can see many bad sectors and file errors.
+Remove NULL checks for pointers returned from g_malloc and g_strdup
+as they exit in case of failure. Also, update calls to envlist_create
+to reflect this.
 
-I have tested this with the following disk formats: qcow2, vmdk, raw.
+Free array and array contents returned by envlist_to_environ using
+g_free in bsd-user/main.c and linux-user/main.c.
 
-I tested this on Windows 7 with the following command line and QEMU version:
-qemu-system-i386 -name "Windows 3.11 WfW" -machine isapc -cpu 486 -boot ord=
-er=3Dadc -m 32 -soundhw sb16 -hda disk1.qcow2 -vga cirrus
+Update comments to reflect change in semantics.
 
-qemu-system-i386 --version
-QEMU emulator version 2.8.50 (v2.8.0-12557-g0bd1f6b1b2-dirty)
-Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
+Signed-off-by: Saurav Sachidanand <sauravsachidanand@gmail.com>
+---
+ bsd-user/main.c   | 14 ++++----------
+ linux-user/main.c |  9 +++------
+ util/envlist.c    | 47 +++++++++++++++++++----------------------------
+ 3 files changed, 26 insertions(+), 44 deletions(-)
 
-I then did a test with the linux version of qemu, which gave me the same re=
-sults.
-Command line: qemu-system-i386 -name "Windows 3.11 WfW" -machine isapc -cpu=
- 486 -boot order=3Dadc -m 32 -soundhw sb16 -hda disk1.qcow2 -vga cirrus -mo=
-nitor stdout
-Version: qemu-system-i386 --version
-QEMU emulator version 2.1.2 (Debian 1:2.1+dfsg-12+deb8u6), Copyright (c) 20=
-03-2008 Fabrice Bellard
-
-I also checked the disk image with qemu-img, with no results:
-
-No errors were found on the image.
-7986/8000 =3D 99.83% allocated, 0.20% fragmented, 0.00% compressed clusters
-Image end offset: 523698176
-
-Because I got the error with two different versions of QEMU, I think
-this is a general problem and not related to a specific distribution.
-
-I have attached a zip file with screenshots of SCANDISK, which shows the
-disk errors.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: bad disk image sector
-
-** Attachment added: "Screenshots of various disk read errors"
-   https://bugs.launchpad.net/bugs/1674114/+attachment/4840441/+files/failu=
-re.zip
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1674114
-
-Title:
-  Bad sectors when using MS-DOS 6.22
-
-Status in QEMU:
-  New
-
-Bug description:
-  When I try to install DOS 6.22 in QEMU, I get many disk errors when
-  the virtual disk is beeing partionized and formatted. When I later do
-  a SCANDISK, I can see many bad sectors and file errors.
-
-  I have tested this with the following disk formats: qcow2, vmdk, raw.
-
-  I tested this on Windows 7 with the following command line and QEMU versi=
-on:
-  qemu-system-i386 -name "Windows 3.11 WfW" -machine isapc -cpu 486 -boot o=
-rder=3Dadc -m 32 -soundhw sb16 -hda disk1.qcow2 -vga cirrus
-
-  qemu-system-i386 --version
-  QEMU emulator version 2.8.50 (v2.8.0-12557-g0bd1f6b1b2-dirty)
-  Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
-
-  I then did a test with the linux version of qemu, which gave me the same =
-results.
-  Command line: qemu-system-i386 -name "Windows 3.11 WfW" -machine isapc -c=
-pu 486 -boot order=3Dadc -m 32 -soundhw sb16 -hda disk1.qcow2 -vga cirrus -=
-monitor stdout
-  Version: qemu-system-i386 --version
-  QEMU emulator version 2.1.2 (Debian 1:2.1+dfsg-12+deb8u6), Copyright (c) =
-2003-2008 Fabrice Bellard
-
-  I also checked the disk image with qemu-img, with no results:
-
-  No errors were found on the image.
-  7986/8000 =3D 99.83% allocated, 0.20% fragmented, 0.00% compressed cluste=
-rs
-  Image end offset: 523698176
-
-  Because I got the error with two different versions of QEMU, I think
-  this is a general problem and not related to a specific distribution.
-
-  I have attached a zip file with screenshots of SCANDISK, which shows
-  the disk errors.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1674114/+subscriptions
+diff --git a/bsd-user/main.c b/bsd-user/main.c
+index 714a692e6f..04f95ddd54 100644
+--- a/bsd-user/main.c
++++ b/bsd-user/main.c
+@@ -744,10 +744,7 @@ int main(int argc, char **argv)
+     qemu_init_cpu_list();
+     module_call_init(MODULE_INIT_QOM);
+ 
+-    if ((envlist = envlist_create()) == NULL) {
+-        (void) fprintf(stderr, "Unable to allocate envlist\n");
+-        exit(1);
+-    }
++    envlist = envlist_create();
+ 
+     /* add current environment into the list */
+     for (wrk = environ; *wrk != NULL; wrk++) {
+@@ -785,10 +782,7 @@ int main(int argc, char **argv)
+                 usage();
+         } else if (!strcmp(r, "ignore-environment")) {
+             envlist_free(envlist);
+-            if ((envlist = envlist_create()) == NULL) {
+-                (void) fprintf(stderr, "Unable to allocate envlist\n");
+-                exit(1);
+-            }
++            envlist = envlist_create();
+         } else if (!strcmp(r, "U")) {
+             r = argv[optind++];
+             if (envlist_unsetenv(envlist, r) != 0)
+@@ -956,10 +950,10 @@ int main(int argc, char **argv)
+     }
+ 
+     for (wrk = target_environ; *wrk; wrk++) {
+-        free(*wrk);
++        g_free(*wrk);
+     }
+ 
+-    free(target_environ);
++    g_free(target_environ);
+ 
+     if (qemu_loglevel_mask(CPU_LOG_PAGE)) {
+         qemu_log("guest_base  0x%lx\n", guest_base);
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 10a3bb3a12..5f20769cb9 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -4229,10 +4229,7 @@ int main(int argc, char **argv, char **envp)
+     qemu_init_cpu_list();
+     module_call_init(MODULE_INIT_QOM);
+ 
+-    if ((envlist = envlist_create()) == NULL) {
+-        (void) fprintf(stderr, "Unable to allocate envlist\n");
+-        exit(EXIT_FAILURE);
+-    }
++    envlist = envlist_create();
+ 
+     /* add current environment into the list */
+     for (wrk = environ; *wrk != NULL; wrk++) {
+@@ -4429,10 +4426,10 @@ int main(int argc, char **argv, char **envp)
+     }
+ 
+     for (wrk = target_environ; *wrk; wrk++) {
+-        free(*wrk);
++        g_free(*wrk);
+     }
+ 
+-    free(target_environ);
++    g_free(target_environ);
+ 
+     if (qemu_loglevel_mask(CPU_LOG_PAGE)) {
+         qemu_log("guest_base  0x%lx\n", guest_base);
+diff --git a/util/envlist.c b/util/envlist.c
+index e86857e70a..cf129340cb 100644
+--- a/util/envlist.c
++++ b/util/envlist.c
+@@ -17,16 +17,14 @@ static int envlist_parse(envlist_t *envlist,
+     const char *env, int (*)(envlist_t *, const char *));
+ 
+ /*
+- * Allocates new envlist and returns pointer to that or
+- * NULL in case of error.
++ * Allocates new envlist and returns pointer to it.
+  */
+ envlist_t *
+ envlist_create(void)
+ {
+ 	envlist_t *envlist;
+ 
+-	if ((envlist = malloc(sizeof (*envlist))) == NULL)
+-		return (NULL);
++	envlist = g_malloc(sizeof(*envlist));
+ 
+ 	QLIST_INIT(&envlist->el_entries);
+ 	envlist->el_count = 0;
+@@ -48,10 +46,10 @@ envlist_free(envlist_t *envlist)
+ 		entry = envlist->el_entries.lh_first;
+ 		QLIST_REMOVE(entry, ev_link);
+ 
+-		free((char *)entry->ev_var);
+-		free(entry);
++		g_free(entry->ev_var);
++		g_free(entry);
+ 	}
+-	free(envlist);
++	g_free(envlist);
+ }
+ 
+ /*
+@@ -101,8 +99,7 @@ envlist_parse(envlist_t *envlist, const char *env,
+ 	if ((envlist == NULL) || (env == NULL))
+ 		return (EINVAL);
+ 
+-	if ((tmpenv = strdup(env)) == NULL)
+-		return (errno);
++	tmpenv = g_strdup(env);
+     envsave = tmpenv;
+ 
+     do {
+@@ -117,7 +114,7 @@ envlist_parse(envlist_t *envlist, const char *env,
+         tmpenv = envvar + 1;
+     } while (envvar != NULL);
+ 
+-    free(envsave);
++    g_free(envsave);
+     return ret;
+ }
+ 
+@@ -155,18 +152,14 @@ envlist_setenv(envlist_t *envlist, const char *env)
+ 
+ 	if (entry != NULL) {
+ 		QLIST_REMOVE(entry, ev_link);
+-		free((char *)entry->ev_var);
+-		free(entry);
++		g_free(entry->ev_var);
++		g_free(entry);
+ 	} else {
+ 		envlist->el_count++;
+ 	}
+ 
+-	if ((entry = malloc(sizeof (*entry))) == NULL)
+-		return (errno);
+-	if ((entry->ev_var = strdup(env)) == NULL) {
+-		free(entry);
+-		return (errno);
+-	}
++	entry = g_malloc(sizeof(*entry));
++	entry->ev_var = g_strdup(env);
+ 	QLIST_INSERT_HEAD(&envlist->el_entries, entry, ev_link);
+ 
+ 	return (0);
+@@ -201,8 +194,8 @@ envlist_unsetenv(envlist_t *envlist, const char *env)
+ 	}
+ 	if (entry != NULL) {
+ 		QLIST_REMOVE(entry, ev_link);
+-		free((char *)entry->ev_var);
+-		free(entry);
++		g_free(entry->ev_var);
++		g_free(entry);
+ 
+ 		envlist->el_count--;
+ 	}
+@@ -212,12 +205,12 @@ envlist_unsetenv(envlist_t *envlist, const char *env)
+ /*
+  * Returns given envlist as array of strings (in same form that
+  * global variable environ is).  Caller must free returned memory
+- * by calling free(3) for each element and for the array.  Returned
+- * array and given envlist are not related (no common references).
++ * by calling g_free for each element and the array.
++ * Returned array and given envlist are not related (no common
++ * references).
+  *
+  * If caller provides count pointer, number of items in array is
+- * stored there.  In case of error, NULL is returned and no memory
+- * is allocated.
++ * stored there.
+  */
+ char **
+ envlist_to_environ(const envlist_t *envlist, size_t *count)
+@@ -225,13 +218,11 @@ envlist_to_environ(const envlist_t *envlist, size_t *count)
+ 	struct envlist_entry *entry;
+ 	char **env, **penv;
+ 
+-	penv = env = malloc((envlist->el_count + 1) * sizeof (char *));
+-	if (env == NULL)
+-		return (NULL);
++	penv = env = g_malloc((envlist->el_count + 1) * sizeof(char *));
+ 
+ 	for (entry = envlist->el_entries.lh_first; entry != NULL;
+ 	    entry = entry->ev_link.le_next) {
+-		*(penv++) = strdup(entry->ev_var);
++		*(penv++) = g_strdup(entry->ev_var);
+ 	}
+ 	*penv = NULL; /* NULL terminate the list */
+ 
+-- 
+2.12.0
