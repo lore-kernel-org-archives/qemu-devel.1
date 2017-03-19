@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cpjjn-0001Xz-Eg
-	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 18:55:48 -0400
+	(envelope-from <bounces@canonical.com>) id 1cpkav-0001KG-8W
+	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 19:50:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cpjjj-00017B-Iu
-	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 18:55:47 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48809)
+	(envelope-from <bounces@canonical.com>) id 1cpkaq-0007Rc-C3
+	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 19:50:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52228)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cpjjj-00016l-Cz
-	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 18:55:43 -0400
+	id 1cpkaq-0007Qe-5s
+	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 19:50:36 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cpjjg-0008KI-Bb
-	for <qemu-devel@nongnu.org>; Sun, 19 Mar 2017 22:55:40 +0000
+	id 1cpkap-0001Dw-2o
+	for <qemu-devel@nongnu.org>; Sun, 19 Mar 2017 23:50:35 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 569E72E806C
-	for <qemu-devel@nongnu.org>; Sun, 19 Mar 2017 22:55:40 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id F12BE2E80C1
+	for <qemu-devel@nongnu.org>; Sun, 19 Mar 2017 23:50:34 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 19 Mar 2017 22:47:21 -0000
-From: Mario <1674114@bugs.launchpad.net>
-Reply-To: Bug 1674114 <1674114@bugs.launchpad.net>
+Date: Sun, 19 Mar 2017 23:41:03 -0000
+From: James Clarke <jrtc27@jrtc27.com>
+Reply-To: Bug 1643619 <1643619@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20170319155854.19555.99549.malonedeb@soybean.canonical.com>
-Message-Id: <20170319224721.22178.31733.malone@chaenomeles.canonical.com>
+References: <20161121164013.8062.14361.malonedeb@soybean.canonical.com>
+Message-Id: <20170319234103.18157.22597.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1674114] Re: Bad sectors when using MS-DOS 6.22
+Subject: [Qemu-devel] [Bug 1643619] Re: netlink broken on big-endian mips
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,58 +38,68 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-It is working now without the parameters "-machine isapc" and "-cpu
-486".
+This has been fixed by 40493c5f2b0f124c9b2581e539bba14522e51269, which
+is exactly the same diff as given here.
+
+** Changed in: qemu
+       Status: New =3D> Fix Committed
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1674114
+https://bugs.launchpad.net/bugs/1643619
 
 Title:
-  Bad sectors when using MS-DOS 6.22
+  netlink broken on big-endian mips
 
 Status in QEMU:
-  New
+  Fix Committed
 
 Bug description:
-  When I try to install DOS 6.22 in QEMU, I get many disk errors when
-  the virtual disk is beeing partionized and formatted. When I later do
-  a SCANDISK, I can see many bad sectors and file errors.
+  Debian QEMU version 2.7.0, but the bug also appears in current git
+  master (commit c36ed06e9159)
 
-  I have tested this with the following disk formats: qcow2, vmdk, raw.
+  As the summary says, netlink is completely broken on big-endian mips
+  running qemu-user.
 
-  I tested this on Windows 7 with the following command line and QEMU versi=
-on:
-  qemu-system-i386 -name "Windows 3.11 WfW" -machine isapc -cpu 486 -boot o=
-rder=3Dadc -m 32 -soundhw sb16 -hda disk1.qcow2 -vga cirrus
+  Running 'ip route' from within a Debian chroot with QEMU simply hangs.
+  Running amd64 strace on qemu-mips-static shows that it's waiting for a
+  netlink response from the kernel which never comes.
 
-  qemu-system-i386 --version
-  QEMU emulator version 2.8.50 (v2.8.0-12557-g0bd1f6b1b2-dirty)
-  Copyright (c) 2003-2016 Fabrice Bellard and the QEMU Project developers
+  [...]
+  [pid 11249] socket(AF_NETLINK, SOCK_RAW|SOCK_CLOEXEC, NETLINK_ROUTE) =3D 3
+  [pid 11249] setsockopt(3, SOL_SOCKET, SO_SNDBUF, [32768], 4) =3D 0
+  [pid 11249] setsockopt(3, SOL_SOCKET, SO_RCVBUF, [1048576], 4) =3D 0
+  [pid 11249] bind(3, {sa_family=3DAF_NETLINK, nl_pid=3D0, nl_groups=3D0000=
+0000}, 12) =3D 0
+  [pid 11249] getsockname(3, {sa_family=3DAF_NETLINK, nl_pid=3D11249, nl_gr=
+oups=3D00000000}, [12]) =3D 0
+  [pid 11249] time([1479745823])          =3D 1479745823
+  [pid 11249] sendto(3, {{len=3D671088640, type=3D0x1a00 /* NLMSG_??? */, f=
+lags=3DNLM_F_REQUEST|NLM_F_MULTI|0x100, seq=3D539046744, pid=3D0}, "\2\0\0\=
+0\0\0\0\0\0\0\0\0\0\0\0\0\0\10\0\35\0\0\0\1"}, 40, 0, NULL, 0) =3D 40
+  [pid 11249] recvmsg(3,
 
-  I then did a test with the linux version of qemu, which gave me the same =
-results.
-  Command line: qemu-system-i386 -name "Windows 3.11 WfW" -machine isapc -c=
-pu 486 -boot order=3Dadc -m 32 -soundhw sb16 -hda disk1.qcow2 -vga cirrus -=
-monitor stdout
-  Version: qemu-system-i386 --version
-  QEMU emulator version 2.1.2 (Debian 1:2.1+dfsg-12+deb8u6), Copyright (c) =
-2003-2008 Fabrice Bellard
+  Notice the len in the buffer passed to the kernel is 0x28000000 which
+  looks byteswapped.
 
-  I also checked the disk image with qemu-img, with no results:
+  Removing the call to fd_trans_unregister in the NR_socket syscall in
+  do_syscall fixes this for me, but I don't understand why the fd
+  translation was immediately unregistered after being registered just
+  before in do_socket - presumably it was added for a reason.
 
-  No errors were found on the image.
-  7986/8000 =3D 99.83% allocated, 0.20% fragmented, 0.00% compressed cluste=
-rs
-  Image end offset: 523698176
-
-  Because I got the error with two different versions of QEMU, I think
-  this is a general problem and not related to a specific distribution.
-
-  I have attached a zip file with screenshots of SCANDISK, which shows
-  the disk errors.
+  --- a/linux-user/syscall.c
+  +++ b/linux-user/syscall.c
+  @@ -9331,7 +9331,6 @@ abi_long do_syscall(void *cpu_env, int num, abi_lon=
+g arg1,
+   #ifdef TARGET_NR_socket
+       case TARGET_NR_socket:
+           ret =3D do_socket(arg1, arg2, arg3);
+  -        fd_trans_unregister(ret);
+           break;
+   #endif
+   #ifdef TARGET_NR_socketpair
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1674114/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1643619/+subscriptions
