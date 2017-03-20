@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cq0l7-0000MY-PD
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 13:06:22 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cq0nQ-0001zi-KF
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 13:08:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cq0l1-0006hl-RV
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 13:06:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41644)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cq0l1-0006hV-MD
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 13:06:11 -0400
-From: Laszlo Ersek <lersek@redhat.com>
-Date: Mon, 20 Mar 2017 18:05:57 +0100
-Message-Id: <20170320170557.15645-3-lersek@redhat.com>
-In-Reply-To: <20170320170557.15645-1-lersek@redhat.com>
-References: <20170320170557.15645-1-lersek@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/2] hw/acpi/vmgenid: prevent more than one
- vmgenid device
+	(envelope-from <peter.maydell@linaro.org>) id 1cq0nP-00080i-LK
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 13:08:40 -0400
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:36578)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cq0nP-000801-FI
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 13:08:39 -0400
+Received: by mail-wm0-x22a.google.com with SMTP id n11so68846114wma.1
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 10:08:39 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20170320160446.14643-1-pbonzini@redhat.com>
+References: <20170320160446.14643-1-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 20 Mar 2017 17:08:17 +0000
+Message-ID: <CAFEAcA996Oefsr0s4e1dKk_=96eNAFWYY+HNpiWtm8fZLCWMYg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 0/4] Misc fixes for 2.9.0-rc1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,60 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu devel list <qemu-devel@nongnu.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Ben Warren <ben@skyportsystems.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-A system with multiple VMGENID devices is undefined in the VMGENID spec by
-omission.
+On 20 March 2017 at 16:04, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> The following changes since commit ebedf0f9cd46b617df331eecc857c379d574ac62:
+>
+>   nios2: iic: Convert CPU prop to qom link (2017-03-18 18:22:54 +0000)
+>
+> are available in the git repository at:
+>
+>   git://github.com/bonzini/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to b3d3a426da9b067366bc132d53a6fa6b72675b55:
+>
+>   hax: fix breakage in locking (2017-03-20 12:24:43 +0100)
+>
+> ----------------------------------------------------------------
+> fixes for 2.9-rc1, plus removal of -mno-cygwin references
+>
+> ----------------------------------------------------------------
+> Paolo Bonzini (2):
+>       qemu-ga: obey LISTEN_PID when using systemd socket activation
+>       configure: remove Cygwin
+>
+> Stefano Stabellini (1):
+>       xen: do not build backends for targets that do not support xen
+>
+> Vincent Palatin (1):
+>       hax: fix breakage in locking
 
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Ben Warren <ben@skyportsystems.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Laszlo Ersek <lersek@redhat.com>
----
+Applied, thanks.
 
-Notes:
-    v2:
-    - use find_vmgenid_dev() rather than open-code
-      object_resolve_path_type() [Michael]
-    - add comments to both the definition of find_vmgenid_dev() and its call
-      site in vmgenid_realize() [Michael]
-
- include/hw/acpi/vmgenid.h | 1 +
- hw/acpi/vmgenid.c         | 8 ++++++++
- 2 files changed, 9 insertions(+)
-
-diff --git a/include/hw/acpi/vmgenid.h b/include/hw/acpi/vmgenid.h
-index 8578476baebe..7beb9592fb01 100644
---- a/include/hw/acpi/vmgenid.h
-+++ b/include/hw/acpi/vmgenid.h
-@@ -24,6 +24,7 @@ typedef struct VmGenIdState {
-     bool write_pointer_available;
- } VmGenIdState;
- 
-+/* returns NULL unless there is exactly one device */
- static inline Object *find_vmgenid_dev(void)
- {
-     return object_resolve_path_type("", VMGENID_DEVICE, NULL);
-diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
-index c3ddcc8e7cb0..a32b847fe0df 100644
---- a/hw/acpi/vmgenid.c
-+++ b/hw/acpi/vmgenid.c
-@@ -221,6 +221,14 @@ static void vmgenid_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
-+    /* Given that this function is executing, there is at least one VMGENID
-+     * device. Check if there are several.
-+     */
-+    if (!find_vmgenid_dev()) {
-+        error_setg(errp, "at most one %s device is permitted", VMGENID_DEVICE);
-+        return;
-+    }
-+
-     qemu_register_reset(vmgenid_handle_reset, vms);
- }
- 
--- 
-2.9.3
+-- PMM
