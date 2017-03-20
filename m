@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cpyu7-0002K0-7g
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:07:28 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cpyuV-0002WC-8S
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:07:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cpyu6-0004ZU-03
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:07:27 -0400
+	(envelope-from <mreitz@redhat.com>) id 1cpyuU-0004h0-AD
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:07:51 -0400
 References: <20170313214001.26339-1-mreitz@redhat.com>
-	<20170313214001.26339-2-mreitz@redhat.com>
-	<20170320101828.GC17887@stefanha-x1.localdomain>
+	<20170313214045.26857-2-mreitz@redhat.com>
+	<20170320104743.GE17887@stefanha-x1.localdomain>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <56ea38e1-61fa-9339-741a-dbe8ceed8816@redhat.com>
-Date: Mon, 20 Mar 2017 16:07:16 +0100
+Message-ID: <fd8c2121-d83e-364e-e084-5934b521fc50@redhat.com>
+Date: Mon, 20 Mar 2017 16:07:44 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170320101828.GC17887@stefanha-x1.localdomain>
+In-Reply-To: <20170320104743.GE17887@stefanha-x1.localdomain>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="F5gpWU9rvKTGRseo4QNEG3ILNNfBJeoPX"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.10 01/16] block: Add
- PreallocMode to BD.bdrv_truncate()
+	boundary="VNAhFTlQRxJWqWC8jwDf1IOSHkHts4tll"
+Subject: Re: [Qemu-devel] [PATCH for-2.10 04/16] qemu-img: Expose
+ PreallocMode for resizing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,81 +30,53 @@ To: Stefan Hajnoczi <stefanha@gmail.com>
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---F5gpWU9rvKTGRseo4QNEG3ILNNfBJeoPX
+--VNAhFTlQRxJWqWC8jwDf1IOSHkHts4tll
 From: Max Reitz <mreitz@redhat.com>
 To: Stefan Hajnoczi <stefanha@gmail.com>
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
  qemu-devel@nongnu.org
-Message-ID: <56ea38e1-61fa-9339-741a-dbe8ceed8816@redhat.com>
-Subject: Re: [Qemu-block] [PATCH for-2.10 01/16] block: Add PreallocMode to
- BD.bdrv_truncate()
+Message-ID: <fd8c2121-d83e-364e-e084-5934b521fc50@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 04/16] qemu-img: Expose PreallocMode
+ for resizing
 References: <20170313214001.26339-1-mreitz@redhat.com>
- <20170313214001.26339-2-mreitz@redhat.com>
- <20170320101828.GC17887@stefanha-x1.localdomain>
-In-Reply-To: <20170320101828.GC17887@stefanha-x1.localdomain>
+ <20170313214045.26857-2-mreitz@redhat.com>
+ <20170320104743.GE17887@stefanha-x1.localdomain>
+In-Reply-To: <20170320104743.GE17887@stefanha-x1.localdomain>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: quoted-printable
 
-On 20.03.2017 11:18, Stefan Hajnoczi wrote:
-> On Mon, Mar 13, 2017 at 10:39:46PM +0100, Max Reitz wrote:
->> diff --git a/block/iscsi.c b/block/iscsi.c
->> index ab559a6f71..5d6265c4a6 100644
->> --- a/block/iscsi.c
->> +++ b/block/iscsi.c
->> @@ -2060,11 +2060,16 @@ static void iscsi_reopen_commit(BDRVReopenStat=
-e *reopen_state)
+On 20.03.2017 11:47, Stefan Hajnoczi wrote:
+> On Mon, Mar 13, 2017 at 10:40:33PM +0100, Max Reitz wrote:
+>> @@ -3429,8 +3442,16 @@ static int img_resize(int argc, char **argv)
+>>          goto out;
 >>      }
->>  }
 >> =20
->> -static int iscsi_truncate(BlockDriverState *bs, int64_t offset, Error=
- **errp)
->> +static int iscsi_truncate(BlockDriverState *bs, int64_t offset,
->> +                          PreallocMode prealloc, Error **errp)
->>  {
->>      IscsiLun *iscsilun =3D bs->opaque;
->>      Error *local_err =3D NULL;
->> =20
->> +    if (prealloc !=3D PREALLOC_MODE_OFF) {
->> +        return -ENOTSUP;
->> +    }
->> +
->>      if (iscsilun->type !=3D TYPE_DISK) {
->>          return -ENOTSUP;
->>      }
+>> +    current_size =3D blk_getlength(blk);
+>> +    if (current_size < 0) {
+>> +        error_report("Failed to inquire current image length: %s\n",
 >=20
-> Nevermind what I said about adding a BiteSizedTasks entry:
->=20
-> The missing errp usage is not in qemu.git/master yet.  Please fix up
-> your bdrv_truncate() errp patch to use errp in all cases, e.g.
-> error_setg("Unable to truncate non-disk LUN").
+> Spurious newline, error_report() doesn't need it.
 
-The thing is that I wasn't comfortable doing that for all block drivers.
-I mean, I can take another look but I'd rather have vague error messages
-("truncation failed: #{strerror}") than outright wrong ones because I
-didn't know what error message to use.
-
-Of course you could argue that this may probably come out during review
-but that implies that every submaintainer for every block driver would
-actually come out for review...
+Oops, will fix.
 
 Max
 
 
---F5gpWU9rvKTGRseo4QNEG3ILNNfBJeoPX
+--VNAhFTlQRxJWqWC8jwDf1IOSHkHts4tll
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljP8CQSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9An18IALFOVp6BGZaO/ms0TErNh0r+5Yp+ohQc
-6HQItwc0SaumxEICNJKny76d9ZBS8kwdXsPA6yHanAmUR2NveJapS37h+ATnijq1
-bXiJVRX3bIgThcweXo19RAXcgRzW1AcCwB86aLAI7p36AdR7F6K+4i9X1m3I/WkZ
-A4yLSqJKLIEADPHFONf1BHpqRlls61SmIBekV55BiTFmGvD1rpyGfpt96Esg9Ejz
-MdfUQT9M5BcA+rzRRRN+f3pvBrGXQniq8f7npmzIOoEz4G173hpyO6q0BbMLI2w/
-udgQN7D6e2uWZM6qXsCyk2rXkqZ2IsAVaB7QvyPwTXLesuv4+psWfqA=
-=Wze6
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljP8EASHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A4FIH/0wrbgcAxGHYv4V0yMnCMbSeMrCSJyOE
+vGHhV2nriereGj1rfndPQQgD5hLBl94sp6/deHgpFpMFzeQHJ/gu28IN+8pdkh5z
+w/Ibw2V4/sRrJ1sJnmmw3omdCbDcWZftHGVSkkT7GZZG/odDLFEAQ75mHtNBcupG
+AdGmKm9sVHNhH8U8Xi3RCzQ1bLXL1AQ4sTGZ9RpT79G8D026Fl4J7tD1jgsE0kQT
+K3zPK9lBqEev9XDlEaIc91n4xSmYBY98udE7qxjnnBY/vcJIgZgCp0rBj086XY1j
+qbNVJdN0fvX3cr47fk3tAfybQYidoTui2/pzQQ9YNv2Q+NH6ICbOLcQ=
+=APdg
 -----END PGP SIGNATURE-----
 
---F5gpWU9rvKTGRseo4QNEG3ILNNfBJeoPX--
+--VNAhFTlQRxJWqWC8jwDf1IOSHkHts4tll--
