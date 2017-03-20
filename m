@@ -1,33 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cq1S4-0007ZX-Ir
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 13:50:42 -0400
+	(envelope-from <arvolkov@inbox.ru>) id 1cq1bg-0000qC-Mf
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 14:00:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cq1S1-0005D9-GY
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 13:50:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53175)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cq1S1-0005Cm-7f
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 13:50:37 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cq1Rz-0000q6-WB
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 17:50:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id EC4B52E80C1
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 17:50:35 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 20 Mar 2017 17:38:53 -0000
-From: 3vIL_VIrUs <hansp.schulz@gmail.com>
-Reply-To: Bug 1674117 <1674117@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170319163002.19988.72829.malonedeb@soybean.canonical.com>
-Message-Id: <20170320173853.18157.85984.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1674117] Re: Qemu VM start kills Pulseaudio
+	(envelope-from <arvolkov@inbox.ru>) id 1cq1bd-0008IY-Im
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 14:00:36 -0400
+Received: from smtp59.i.mail.ru ([217.69.128.39]:49004)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <arvolkov@inbox.ru>) id 1cq1bd-0008Hf-3P
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 14:00:33 -0400
+From: Anton Volkov <arvolkov@inbox.ru>
+Date: Mon, 20 Mar 2017 21:00:24 +0300
+Message-Id: <20170320180024.23432-1-arvolkov@inbox.ru>
+Subject: [Qemu-devel] [PATCH] hw: dead code removal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,125 +22,243 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com, agraf@suse.de, borntraeger@de.ibm.com
 
-I stumbled across this bug: https://bugs.launchpad.net/ubuntu/+source/linux=
--rt/+bug/367671
-Im not sure if that bug relates to this one, but after disabling realtime s=
-cheduling, pulseaudio does not crash anymore.
-However, the lag when starting the VM got significantly worse, the system i=
-s pretty much unusable the first ~20-30 seconds.
+Made functions *_exit in hw/ return void instead of int (they returned 0 all the time)
+and removed related return value checks
 
--- =
+Signed-off-by: Anton Volkov <arvolkov@inbox.ru>
+---
+ hw/audio/hda-codec.c              | 3 +--
+ hw/audio/intel-hda.c              | 3 +--
+ hw/audio/intel-hda.h              | 2 +-
+ hw/char/sclpconsole-lm.c          | 4 ++--
+ hw/char/sclpconsole.c             | 4 ++--
+ hw/core/qdev.c                    | 6 +-----
+ hw/s390x/event-facility.c         | 6 +-----
+ hw/s390x/virtio-ccw.c             | 7 +++----
+ hw/s390x/virtio-ccw.h             | 2 +-
+ hw/usb/dev-smartcard-reader.c     | 3 +--
+ include/hw/qdev-core.h            | 2 +-
+ include/hw/s390x/event-facility.h | 2 +-
+ 12 files changed, 16 insertions(+), 28 deletions(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1674117
-
-Title:
-  Qemu VM start kills Pulseaudio
-
-Status in QEMU:
-  New
-
-Bug description:
-  When I start a VM (start command below) in Qemu version >2.5, it kills Pu=
-lseaudio (paired with a huge lagspike) in ~4/5 cases. Using version 2.5 bui=
-ld from GIT, it works fine. This also happens when building from the curren=
-t GIT master (ebedf0f).
-  Host:
-    Freshly installed Antergos Arch Linux 4.10.3-1-ARCH
-    Intel I7-5930K
-    ASUS X99 Deluxe II latest UEFI
-    GTX 770
-
-  Guest:
-    Windows 10 x64
-    AMD RX480 via VFIO
-
-  This also happened on my last install (Ubuntu GNOME 16.10).
-
-  Start command:
-    QEMU_AUDIO_DRV=3Dpa \
-    QEMU_PA_SAMPLES=3D4096 \
-    qemu-system-x86_64 \
-      -serial none \
-      -parallel none \
-      -nodefconfig \
-      -nodefaults \
-      -name win10 \
-      -enable-kvm \
-      -cpu host,check,kvm=3Doff \
-      -smp 12,sockets=3D1,cores=3D6,threads=3D2 \
-      -m 16G \
-      -mem-prealloc \
-      -device nec-usb-xhci,id=3Dxhci \
-      -device usb-host,vendorid=3D0x05ac,productid=3D0x0205,bus=3Dxhci.0 \
-      -net nic,vlan=3D0,model=3Dvirtio \
-      -net bridge,vlan=3D0,br=3Dbridge0 \
-      -object iothread,id=3Diothread0 \
-      -device virtio-blk-pci,iothread=3Diothread0,drive=3Ddrive0 \
-      -drive file=3D"$DISK",format=3Draw,if=3Dnone,cache=3Dnone,aio=3Dnativ=
-e,id=3Ddrive0 \
-      -boot order=3Dc,menu=3Don \
-      -rtc base=3Dutc \
-      -nographic \
-      -k de \
-      -monitor stdio \
-      -soundhw hda \
-      -device vfio-pci,host=3D02:00.0,addr=3D09.0,multifunction=3Don,x-vga=
-=3Don \
-      -device vfio-pci,host=3D02:00.1,addr=3D09.1 \
-      -device vfio-pci,host=3D04:00.0,addr=3D07.0,multifunction=3Don,id=3Du=
-sbcontroller
-
-  When it kills Pulseaudio, I see these errors in the Qemu console:
-    pulseaudio: set_sink_input_volume() failed
-    pulseaudio: Reason: Bad state
-    pulseaudio: set_sink_input_mute() failed
-    pulseaudio: Reason: Bad state
-    pulseaudio: set_source_output_volume() failed
-    ... many more of these ...
-
-  The journal shows that PulseAudio is killed:
-    M=C3=A4r 19 13:12:42 hp-desktop systemd[530]: pulseaudio.service: Main =
-process exited, code=3Dkilled, status=3D9/KILL
-    M=C3=A4r 19 13:12:42 hp-desktop systemd[530]: pulseaudio.service: Unit =
-entered failed state.
-    M=C3=A4r 19 13:12:42 hp-desktop systemd[530]: pulseaudio.service: Faile=
-d with result 'signal'.
-    M=C3=A4r 19 13:12:42 hp-desktop systemd[530]: pulseaudio.service: Servi=
-ce hold-off time over, scheduling restart.
-    M=C3=A4r 19 13:12:42 hp-desktop systemd[530]: Stopped Sound Service.
-    M=C3=A4r 19 13:12:42 hp-desktop systemd[530]: Starting Sound Service...
-
-  I've also captured a PulseAudio debug log when this happens, but it
-  does not contain anything interesting (no warnings or errors), which
-  makes sense in case of SIGKILL.
-
-  In DMESG I get some errors too, but they seem to be just symptoms (but Im=
- just guessing...); 00:14.0 is the USB controller my DAC is connected to:
-    [ 4372.389051] usb 3-9.4: current rate 4500480 is different from the ru=
-ntime rate 44100
-    [ 4372.509163] usb 3-9.4: current rate 4500480 is different from the ru=
-ntime rate 44100
-    [ 4372.559104] usb 3-9.4: current rate 4500480 is different from the ru=
-ntime rate 44100
-    [ 4373.652557] xhci_hcd 0000:00:14.0: ERROR unknown event type 37
-    [ 4373.712382] xhci_hcd 0000:00:14.0: ERROR Transfer event TRB DMA ptr =
-not part of current TD ep_index 1 comp_code 36
-    [ 4373.715714] xhci_hcd 0000:00:14.0: Looking for event-dma 0000000745d=
-a7f00 trb-start 0000000745da7f10 trb-end 0000000745da7f10 seg-start 0000000=
-745da7000 seg-end 0000000745da7ff0
-    [ 4373.719055] xhci_hcd 0000:00:14.0: ERROR Transfer event TRB DMA ptr =
-not part of current TD ep_index 1 comp_code 1
-    [ 4373.722381] xhci_hcd 0000:00:14.0: Looking for event-dma 0000000745d=
-a7f00 trb-start 0000000745da7f10 trb-end 0000000745da7f10 seg-start 0000000=
-745da7000 seg-end 0000000745da7ff0
-    [ 4373.725753] xhci_hcd 0000:00:14.0: ERROR Transfer event TRB DMA ptr =
-not part of current TD ep_index 4 comp_code 13
-    [ 4373.725759] xhci_hcd 0000:00:14.0: Looking for event-dma 000000073c5=
-a51a0 trb-start 000000073c5a51b0 trb-end 000000073c5a51b0 seg-start 0000000=
-73c5a5000 seg-end 000000073c5a5ff0
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1674117/+subscriptions
+diff --git a/hw/audio/hda-codec.c b/hw/audio/hda-codec.c
+index 52d4640..5402cd1 100644
+--- a/hw/audio/hda-codec.c
++++ b/hw/audio/hda-codec.c
+@@ -520,7 +520,7 @@ static int hda_audio_init(HDACodecDevice *hda, const struct desc_codec *desc)
+     return 0;
+ }
+ 
+-static int hda_audio_exit(HDACodecDevice *hda)
++static void hda_audio_exit(HDACodecDevice *hda)
+ {
+     HDAAudioState *a = HDA_AUDIO(hda);
+     HDAAudioStream *st;
+@@ -539,7 +539,6 @@ static int hda_audio_exit(HDACodecDevice *hda)
+         }
+     }
+     AUD_remove_card(&a->card);
+-    return 0;
+ }
+ 
+ static int hda_audio_post_load(void *opaque, int version)
+diff --git a/hw/audio/intel-hda.c b/hw/audio/intel-hda.c
+index 537face..991c704 100644
+--- a/hw/audio/intel-hda.c
++++ b/hw/audio/intel-hda.c
+@@ -70,7 +70,7 @@ static void hda_codec_dev_realize(DeviceState *qdev, Error **errp)
+     }
+ }
+ 
+-static int hda_codec_dev_exit(DeviceState *qdev)
++static void hda_codec_dev_exit(DeviceState *qdev)
+ {
+     HDACodecDevice *dev = HDA_CODEC_DEVICE(qdev);
+     HDACodecDeviceClass *cdc = HDA_CODEC_DEVICE_GET_CLASS(dev);
+@@ -78,7 +78,6 @@ static int hda_codec_dev_exit(DeviceState *qdev)
+     if (cdc->exit) {
+         cdc->exit(dev);
+     }
+-    return 0;
+ }
+ 
+ HDACodecDevice *hda_codec_find(HDACodecBus *bus, uint32_t cad)
+diff --git a/hw/audio/intel-hda.h b/hw/audio/intel-hda.h
+index d784bcf..53b78da 100644
+--- a/hw/audio/intel-hda.h
++++ b/hw/audio/intel-hda.h
+@@ -38,7 +38,7 @@ typedef struct HDACodecDeviceClass
+     DeviceClass parent_class;
+ 
+     int (*init)(HDACodecDevice *dev);
+-    int (*exit)(HDACodecDevice *dev);
++    void (*exit)(HDACodecDevice *dev);
+     void (*command)(HDACodecDevice *dev, uint32_t nid, uint32_t data);
+     void (*stream)(HDACodecDevice *dev, uint32_t stnr, bool running, bool output);
+ } HDACodecDeviceClass;
+diff --git a/hw/char/sclpconsole-lm.c b/hw/char/sclpconsole-lm.c
+index 07d6ebd..fbe5b42 100644
+--- a/hw/char/sclpconsole-lm.c
++++ b/hw/char/sclpconsole-lm.c
+@@ -318,9 +318,9 @@ static int console_init(SCLPEvent *event)
+     return 0;
+ }
+ 
+-static int console_exit(SCLPEvent *event)
++static void console_exit(SCLPEvent *event)
+ {
+-    return 0;
++    return;
+ }
+ 
+ static void console_reset(DeviceState *dev)
+diff --git a/hw/char/sclpconsole.c b/hw/char/sclpconsole.c
+index b78f240..644f7cd 100644
+--- a/hw/char/sclpconsole.c
++++ b/hw/char/sclpconsole.c
+@@ -246,9 +246,9 @@ static void console_reset(DeviceState *dev)
+    scon->notify = false;
+ }
+ 
+-static int console_exit(SCLPEvent *event)
++static void console_exit(SCLPEvent *event)
+ {
+-    return 0;
++    return;
+ }
+ 
+ static Property console_properties[] = {
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 1e7fb33..5415843 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -238,11 +238,7 @@ static void device_unrealize(DeviceState *dev, Error **errp)
+     DeviceClass *dc = DEVICE_GET_CLASS(dev);
+ 
+     if (dc->exit) {
+-        int rc = dc->exit(dev);
+-        if (rc < 0) {
+-            error_setg(errp, "Device exit failed.");
+-            return;
+-        }
++        dc->exit(dev);
+     }
+ }
+ 
+diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+index 34b2faf..f7c509c 100644
+--- a/hw/s390x/event-facility.c
++++ b/hw/s390x/event-facility.c
+@@ -413,11 +413,7 @@ static void event_unrealize(DeviceState *qdev, Error **errp)
+     SCLPEvent *event = SCLP_EVENT(qdev);
+     SCLPEventClass *child = SCLP_EVENT_GET_CLASS(event);
+     if (child->exit) {
+-        int rc = child->exit(event);
+-        if (rc < 0) {
+-            error_setg(errp, "SCLP event exit failed.");
+-            return;
+-        }
++        child->exit(event);
+     }
+ }
+ 
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index 00b3bde..d1c4ff6 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -722,7 +722,7 @@ static void virtio_ccw_device_realize(VirtioCcwDevice *dev, Error **errp)
+     }
+ }
+ 
+-static int virtio_ccw_exit(VirtioCcwDevice *dev)
++static void virtio_ccw_exit(VirtioCcwDevice *dev)
+ {
+     CcwDevice *ccw_dev = CCW_DEVICE(dev);
+     SubchDev *sch = ccw_dev->sch;
+@@ -735,7 +735,6 @@ static int virtio_ccw_exit(VirtioCcwDevice *dev)
+         release_indicator(&dev->routes.adapter, dev->indicators);
+         dev->indicators = NULL;
+     }
+-    return 0;
+ }
+ 
+ static void virtio_ccw_net_realize(VirtioCcwDevice *ccw_dev, Error **errp)
+@@ -1616,12 +1615,12 @@ static void virtio_ccw_busdev_realize(DeviceState *dev, Error **errp)
+     virtio_ccw_device_realize(_dev, errp);
+ }
+ 
+-static int virtio_ccw_busdev_exit(DeviceState *dev)
++static void virtio_ccw_busdev_exit(DeviceState *dev)
+ {
+     VirtioCcwDevice *_dev = (VirtioCcwDevice *)dev;
+     VirtIOCCWDeviceClass *_info = VIRTIO_CCW_DEVICE_GET_CLASS(dev);
+ 
+-    return _info->exit(_dev);
++    _info->exit(_dev);
+ }
+ 
+ static void virtio_ccw_busdev_unplug(HotplugHandler *hotplug_dev,
+diff --git a/hw/s390x/virtio-ccw.h b/hw/s390x/virtio-ccw.h
+index 41d4010..ce8baa3 100644
+--- a/hw/s390x/virtio-ccw.h
++++ b/hw/s390x/virtio-ccw.h
+@@ -74,7 +74,7 @@ typedef struct VirtioCcwDevice VirtioCcwDevice;
+ typedef struct VirtIOCCWDeviceClass {
+     CCWDeviceClass parent_class;
+     void (*realize)(VirtioCcwDevice *dev, Error **errp);
+-    int (*exit)(VirtioCcwDevice *dev);
++    void (*exit)(VirtioCcwDevice *dev);
+ } VirtIOCCWDeviceClass;
+ 
+ /* Performance improves when virtqueue kick processing is decoupled from the
+diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-reader.c
+index 757b8b3..71e3667 100644
+--- a/hw/usb/dev-smartcard-reader.c
++++ b/hw/usb/dev-smartcard-reader.c
+@@ -1289,7 +1289,7 @@ void ccid_card_card_inserted(CCIDCardState *card)
+     ccid_on_slot_change(s, true);
+ }
+ 
+-static int ccid_card_exit(DeviceState *qdev)
++static void ccid_card_exit(DeviceState *qdev)
+ {
+     CCIDCardState *card = CCID_CARD(qdev);
+     USBDevice *dev = USB_DEVICE(qdev->parent_bus->parent);
+@@ -1300,7 +1300,6 @@ static int ccid_card_exit(DeviceState *qdev)
+     }
+     ccid_card_exitfn(card);
+     s->card = NULL;
+-    return 0;
+ }
+ 
+ static int ccid_card_init(DeviceState *qdev)
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index b44b476..0efd9e9 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -31,7 +31,7 @@ typedef enum DeviceCategory {
+ } DeviceCategory;
+ 
+ typedef int (*qdev_initfn)(DeviceState *dev);
+-typedef int (*qdev_event)(DeviceState *dev);
++typedef void (*qdev_event)(DeviceState *dev);
+ typedef void (*qdev_resetfn)(DeviceState *dev);
+ typedef void (*DeviceRealize)(DeviceState *dev, Error **errp);
+ typedef void (*DeviceUnrealize)(DeviceState *dev, Error **errp);
+diff --git a/include/hw/s390x/event-facility.h b/include/hw/s390x/event-facility.h
+index def1bb0..1a32f3a 100644
+--- a/include/hw/s390x/event-facility.h
++++ b/include/hw/s390x/event-facility.h
+@@ -162,7 +162,7 @@ typedef struct SCLPEvent {
+ typedef struct SCLPEventClass {
+     DeviceClass parent_class;
+     int (*init)(SCLPEvent *event);
+-    int (*exit)(SCLPEvent *event);
++    void (*exit)(SCLPEvent *event);
+ 
+     /* get SCLP's send mask */
+     unsigned int (*get_send_mask)(void);
+-- 
+2.10.1 (Apple Git-78)
