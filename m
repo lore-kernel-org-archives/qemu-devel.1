@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cpzKA-0003tv-9q
+	(envelope-from <alex.bennee@linaro.org>) id 1cpzKA-0003tu-2h
 	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:34:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cpzK9-0005pq-E4
+	(envelope-from <alex.bennee@linaro.org>) id 1cpzK8-0005nh-HI
 	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:34:22 -0400
-Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:33563)
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:35508)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cpzK9-0005nr-8S
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:34:21 -0400
-Received: by mail-wr0-x229.google.com with SMTP id u48so94964172wrc.0
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 08:34:21 -0700 (PDT)
+	id 1cpzK8-0005mW-Ar
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:34:20 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id g10so94999566wrg.2
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 08:34:20 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 20 Mar 2017 15:34:41 +0000
-Message-Id: <20170320153441.2181-4-alex.bennee@linaro.org>
+Date: Mon, 20 Mar 2017 15:34:40 +0000
+Message-Id: <20170320153441.2181-3-alex.bennee@linaro.org>
 In-Reply-To: <20170320153441.2181-1-alex.bennee@linaro.org>
 References: <20170320153441.2181-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 3/3] bsd-user: align use of mmap_lock to
- that of linux-user
+Subject: [Qemu-devel] [PATCH v1 2/3] user-exec: handle synchronous signals
+ from QEMU gracefully
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,68 +31,74 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, rth@twiddle.net, pbonzini@redhat.com
-Cc: qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Riku Voipio <riku.voipio@iki.fi>
 
-The introduction of stricter mmap_lock checking in translate-all broke
-the BSD user build. The working mmap_lock functions were hidden behind
-CONFIG_USE_NPTL which is never defined. This patch brings them inline
-with linux-user.
+When "tcg: enable thread-per-vCPU" (commit 3725794) was merged the
+lifetime of current_cpu was changed. Previously a broken linux-user
+call might abort() which can eventually escalate into a SIGSEGV which
+would then crash qemu as it attempted to deref a NULL current_cpu.
+After commit 3725794 it would attempt to fixup state and re-start the
+run-loop and much hilarity (i.e. a looping lockup) would ensue from
+jumping into a stale jmp_env.
 
-Despite the disapearence of the comment "We aren't threadsafe to start
-with..." this doesn't make bsd-user so. It will still need the rest of
-the fixes that have been done in linux-user ported over.
+As we can actually tell if we are in the run-loop from looking at the
+cpu->running flag we should catch this badness first and abort()
+cleanly rather than try to soldier on. There is a theoretical race
+between the flag being set and sigsetjmp refreshing the jump buffer
+but we can try really hard to not introduce crashes into that code.
 
+[LV: setgroups03 fails on powerpc LTP]
+Reported-by: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- bsd-user/mmap.c | 13 +------------
- bsd-user/qemu.h |  2 --
- 2 files changed, 1 insertion(+), 14 deletions(-)
+ user-exec.c | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
 
-diff --git a/bsd-user/mmap.c b/bsd-user/mmap.c
-index ee5907330f..9182a8ef39 100644
---- a/bsd-user/mmap.c
-+++ b/bsd-user/mmap.c
-@@ -24,8 +24,7 @@
+diff --git a/user-exec.c b/user-exec.c
+index 6db075884d..a8f95fa1e1 100644
+--- a/user-exec.c
++++ b/user-exec.c
+@@ -57,10 +57,23 @@ static void cpu_exit_tb_from_sighandler(CPUState *cpu, sigset_t *old_set)
+ static inline int handle_cpu_signal(uintptr_t pc, unsigned long address,
+                                     int is_write, sigset_t *old_set)
+ {
+-    CPUState *cpu;
++    CPUState *cpu = current_cpu;
+     CPUClass *cc;
+     int ret;
  
- //#define DEBUG_MMAP
++    /* For synchronous signals we expect to be coming from the vCPU
++     * thread (so current_cpu should be valid) and either from running
++     * code or during translation which can fault as we cross pages.
++     *
++     * If neither is true then something has gone wrong and we should
++     * abort rather than try and restart the vCPU execution.
++     */
++    if (!cpu || !cpu->running) {
++        printf("qemu:%s received signal outside vCPU context @ pc=0x%"
++               PRIxPTR "\n",  __func__, pc);
++        abort();
++    }
++
+ #if defined(DEBUG_SIGNAL)
+     printf("qemu: SIGSEGV pc=0x%08lx address=%08lx w=%d oldset=0x%08lx\n",
+            pc, address, is_write, *(unsigned long *)old_set);
+@@ -83,7 +96,7 @@ static inline int handle_cpu_signal(uintptr_t pc, unsigned long address,
+              * currently executing TB was modified and must be exited
+              * immediately.
+              */
+-            cpu_exit_tb_from_sighandler(current_cpu, old_set);
++            cpu_exit_tb_from_sighandler(cpu, old_set);
+             g_assert_not_reached();
+         default:
+             g_assert_not_reached();
+@@ -94,7 +107,6 @@ static inline int handle_cpu_signal(uintptr_t pc, unsigned long address,
+        are still valid segv ones */
+     address = h2g_nocheck(address);
  
--#if defined(CONFIG_USE_NPTL)
--pthread_mutex_t mmap_mutex;
-+static pthread_mutex_t mmap_mutex = PTHREAD_MUTEX_INITIALIZER;
- static int __thread mmap_lock_count;
- 
- void mmap_lock(void)
-@@ -62,16 +61,6 @@ void mmap_fork_end(int child)
-     else
-         pthread_mutex_unlock(&mmap_mutex);
- }
--#else
--/* We aren't threadsafe to start with, so no need to worry about locking.  */
--void mmap_lock(void)
--{
--}
--
--void mmap_unlock(void)
--{
--}
--#endif
- 
- /* NOTE: all the constants are the HOST ones, but addresses are target. */
- int target_mprotect(abi_ulong start, abi_ulong len, int prot)
-diff --git a/bsd-user/qemu.h b/bsd-user/qemu.h
-index 2b2b9184e0..b550cee0cb 100644
---- a/bsd-user/qemu.h
-+++ b/bsd-user/qemu.h
-@@ -209,10 +209,8 @@ abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
-                        abi_ulong new_addr);
- int target_msync(abi_ulong start, abi_ulong len, int flags);
- extern unsigned long last_brk;
--#if defined(CONFIG_USE_NPTL)
- void mmap_fork_start(void);
- void mmap_fork_end(int child);
--#endif
- 
- /* main.c */
- extern unsigned long x86_stack_size;
+-    cpu = current_cpu;
+     cc = CPU_GET_CLASS(cpu);
+     /* see if it is an MMU fault */
+     g_assert(cc->handle_mmu_fault);
 -- 
 2.11.0
