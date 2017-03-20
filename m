@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cpyTL-0001te-9t
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 10:39:48 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cpyZS-0003Y0-Sc
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 10:46:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cpyTI-0004gf-5B
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 10:39:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54740)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cpyTH-0004gT-Sy
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 10:39:44 -0400
-References: <20170320115951.25345-1-lersek@redhat.com>
-	<20170320115951.25345-2-lersek@redhat.com>
-	<20170320161756-mutt-send-email-mst@kernel.org>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cpyZP-0006fJ-L8
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 10:46:06 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36797)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cpyZP-0006eu-7r
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 10:46:03 -0400
+Received: by mail-wm0-x243.google.com with SMTP id x124so15010012wmf.3
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 07:46:02 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <97c77b4b-61d3-1527-43c1-89d52dcf08f4@redhat.com>
-Date: Mon, 20 Mar 2017 15:39:40 +0100
-MIME-Version: 1.0
-In-Reply-To: <20170320161756-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] hw/acpi/vmgenid: prevent device
- realization on pre-2.9 machine types
+Date: Mon, 20 Mar 2017 15:45:58 +0100
+Message-Id: <1490021158-4469-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] hmp: gpa2hva and gpa2hpa hostaddr command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,101 +25,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu devel list <qemu-devel@nongnu.org>, Ben Warren <ben@skyportsystems.com>
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, armbru@redhat.com
 
+These commands are useful when testing machine-check passthrough.
+gpa2hva is useful to inject a MADV_HWPOISON madvise from gdb, while
+gpa2hpa is useful to inject an error with the mce-inject kernel
+module.
 
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hmp-commands.hx |  32 ++++++++++++++++++
+ monitor.c       | 101 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 133 insertions(+)
 
-On 20/03/2017 15:19, Michael S. Tsirkin wrote:
-> On Mon, Mar 20, 2017 at 12:59:50PM +0100, Laszlo Ersek wrote:
->> The WRITE_POINTER linker/loader command that underlies VMGENID depends on
->> commit baf2d5bfbac0 ("fw-cfg: support writeable blobs", 2017-01-12). That
->> commit is not available in 2.8.
->>
->> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->> Cc: Ben Warren <ben@skyportsystems.com>
->> Cc: Igor Mammedov <imammedo@redhat.com>
->> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
-> 
-> I don't understand why do we want to add code to break this
-> intentionally. What issue does this fix?
-
-Agreed.  If vmgenid can work with old machine types and new QEMU, it
-should.  For example, when using libvirt machine types identify the
-machine type where the VM was _created_ (unless someone changes it), not
-necessarily the minimal QEMU version that can run it.
-
-Paolo
-
->> ---
->>  include/hw/acpi/vmgenid.h |  1 +
->>  include/hw/compat.h       |  4 ++++
->>  hw/acpi/vmgenid.c         | 14 ++++++++++++++
->>  3 files changed, 19 insertions(+)
->>
->> diff --git a/include/hw/acpi/vmgenid.h b/include/hw/acpi/vmgenid.h
->> index db7fa0e63303..8578476baebe 100644
->> --- a/include/hw/acpi/vmgenid.h
->> +++ b/include/hw/acpi/vmgenid.h
->> @@ -21,6 +21,7 @@ typedef struct VmGenIdState {
->>      DeviceClass parent_obj;
->>      QemuUUID guid;                /* The 128-bit GUID seen by the guest */
->>      uint8_t vmgenid_addr_le[8];   /* Address of the GUID (little-endian) */
->> +    bool write_pointer_available;
->>  } VmGenIdState;
->>  
->>  static inline Object *find_vmgenid_dev(void)
->> diff --git a/include/hw/compat.h b/include/hw/compat.h
->> index fc8c3e060007..c9caa8cd1bdd 100644
->> --- a/include/hw/compat.h
->> +++ b/include/hw/compat.h
->> @@ -42,6 +42,10 @@
->>          .driver   = "isa-cirrus-vga",\
->>          .property = "vgamem_mb",\
->>          .value    = "8",\
->> +    },{\
->> +        .driver   = "vmgenid",\
->> +        .property = "x-write-pointer-available",\
->> +        .value    = "off",\
->>      },
->>  
->>  #define HW_COMPAT_2_7 \
->> diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
->> index 7a3ad17d66ef..c3ddcc8e7cb0 100644
->> --- a/hw/acpi/vmgenid.c
->> +++ b/hw/acpi/vmgenid.c
->> @@ -205,9 +205,22 @@ static void vmgenid_handle_reset(void *opaque)
->>      memset(vms->vmgenid_addr_le, 0, ARRAY_SIZE(vms->vmgenid_addr_le));
->>  }
->>  
->> +static Property vmgenid_properties[] = {
->> +    DEFINE_PROP_BOOL("x-write-pointer-available", VmGenIdState,
->> +                     write_pointer_available, true),
->> +    DEFINE_PROP_END_OF_LIST(),
->> +};
->> +
->>  static void vmgenid_realize(DeviceState *dev, Error **errp)
->>  {
->>      VmGenIdState *vms = VMGENID(dev);
->> +
->> +    if (!vms->write_pointer_available) {
->> +        error_setg(errp, "%s requires DMA write support in fw_cfg, "
->> +                   "which this machine type does not provide", VMGENID_DEVICE);
->> +        return;
->> +    }
->> +
->>      qemu_register_reset(vmgenid_handle_reset, vms);
->>  }
->>  
->> @@ -218,6 +231,7 @@ static void vmgenid_device_class_init(ObjectClass *klass, void *data)
->>      dc->vmsd = &vmstate_vmgenid;
->>      dc->realize = vmgenid_realize;
->>      dc->hotpluggable = false;
->> +    dc->props = vmgenid_properties;
->>  
->>      object_class_property_add_str(klass, VMGENID_GUID, NULL,
->>                                    vmgenid_set_guid, NULL);
->> -- 
->> 2.9.3
->>
-> 
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 8819281..0aca984 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -526,6 +526,38 @@ Dump 80 16 bit values at the start of the video memory.
+ ETEXI
+ 
+     {
++        .name       = "gpa2hva",
++        .args_type  = "addr:l",
++        .params     = "addr",
++        .help       = "print the host virtual address corresponding to a guest physical address",
++        .cmd        = hmp_gpa2hva,
++    },
++
++STEXI
++@item gpa2hva @var{addr}
++@findex gpa2hva
++Print the host virtual address at which the guest's physical address @var{addr}
++is mapped.
++ETEXI
++
++#ifdef CONFIG_LINUX
++    {
++        .name       = "gpa2hpa",
++        .args_type  = "addr:l",
++        .params     = "addr",
++        .help       = "print the host physical address corresponding to a guest physical address",
++        .cmd        = hmp_gpa2hpa,
++    },
++#endif
++
++STEXI
++@item gpa2hpa @var{addr}
++@findex gpa2hpa
++Print the host physical address at which the guest's physical address @var{addr}
++is mapped.
++ETEXI
++
++    {
+         .name       = "p|print",
+         .args_type  = "fmt:/,val:l",
+         .params     = "/fmt expr",
+diff --git a/monitor.c b/monitor.c
+index be282ec..216a97a 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -1421,6 +1421,107 @@ static void hmp_physical_memory_dump(Monitor *mon, const QDict *qdict)
+     memory_dump(mon, count, format, size, addr, 1);
+ }
+ 
++static void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, Error **errp)
++{
++    MemoryRegionSection mrs = memory_region_find(get_system_memory(),
++                                                 addr, 1);
++
++    if (!mrs.mr) {
++        error_setg(errp, "No memory is mapped at address 0x%" HWADDR_PRIx, addr);
++        return NULL;
++    }
++
++    if (!memory_region_is_ram(mrs.mr) && !memory_region_is_romd(mrs.mr)) {
++        error_setg(errp, "Memory at address 0x%" HWADDR_PRIx "is not RAM", addr);
++        memory_region_unref(mrs.mr);
++        return NULL;
++    }
++
++    *p_mr = mrs.mr;
++    return qemu_map_ram_ptr(mrs.mr->ram_block, mrs.offset_within_region);
++}
++
++static void hmp_gpa2hva(Monitor *mon, const QDict *qdict)
++{
++    hwaddr addr = qdict_get_int(qdict, "addr");
++    Error *local_err = NULL;
++    MemoryRegion *mr;
++    void *ptr;
++
++    ptr = gpa2hva(&mr, addr, &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++        return;
++    }
++
++    monitor_printf(mon, "Host virtual address for 0x%" HWADDR_PRIx
++                   " (%s) is %p\n",
++                   addr, mr->name, ptr);
++
++    memory_region_unref(mr);
++}
++
++#ifdef CONFIG_LINUX
++static uint64_t vtop(void *ptr, Error **errp)
++{
++    uint64_t pinfo;
++    uint64_t ret = -1;
++    uintptr_t addr = (uintptr_t) ptr;
++    uintptr_t pagesize = getpagesize();
++    off_t offset = addr / pagesize * sizeof(pinfo);
++    int fd;
++
++    fd = open("/proc/self/pagemap", O_RDONLY);
++    if (fd == -1) {
++        error_setg_errno(errp, errno, "Cannot open /proc/self/pagemap");
++        return -1;
++    }
++
++    /* Force copy-on-write if necessary.  */
++    atomic_add((uint8_t *)ptr, 0);
++
++    if (pread(fd, &pinfo, sizeof(pinfo), offset) != sizeof(pinfo)) {
++        error_setg_errno(errp, errno, "Cannot read pagemap");
++        goto out;
++    }
++    if ((pinfo & (1ull << 63)) == 0) {
++        error_setg(errp, "Page not present");
++        goto out;
++    }
++    ret = ((pinfo & 0x007fffffffffffffull) * pagesize) | (addr & (pagesize - 1));
++
++out:
++    close(fd);
++    return ret;
++}
++
++static void hmp_gpa2hpa(Monitor *mon, const QDict *qdict)
++{
++    hwaddr addr = qdict_get_int(qdict, "addr");
++    Error *local_err = NULL;
++    MemoryRegion *mr;
++    void *ptr;
++    uint64_t physaddr;
++
++    ptr = gpa2hva(&mr, addr, &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++        return;
++    }
++
++    physaddr = vtop(ptr, &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++    } else {
++        monitor_printf(mon, "Host physical address for 0x%" HWADDR_PRIx
++                       " (%s) is 0x%" PRIx64 "\n",
++                       addr, mr->name, (uint64_t) physaddr);
++    }
++
++    memory_region_unref(mr);
++}
++#endif
++
+ static void do_print(Monitor *mon, const QDict *qdict)
+ {
+     int format = qdict_get_int(qdict, "format");
+-- 
+1.8.3.1
