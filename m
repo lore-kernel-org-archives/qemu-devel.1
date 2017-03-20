@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33967)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cq3CA-0003gT-Gk
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 15:42:23 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1cq3JZ-0005J6-0X
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 15:50:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cq3C7-0002vv-Ax
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 15:42:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49980)
+	(envelope-from <ehabkost@redhat.com>) id 1cq3JV-0006dp-U4
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 15:50:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59224)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cq3C7-0002vD-0e
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 15:42:19 -0400
-References: <1490026424-11330-1-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <53330549-71ad-4e85-c1f6-5795a288ac97@redhat.com>
-Date: Mon, 20 Mar 2017 14:42:15 -0500
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cq3JV-0006db-NE
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 15:49:57 -0400
+Date: Mon, 20 Mar 2017 16:49:53 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170320194953.GF2811@thinpad.lan.raisama.net>
+References: <1489750157-17401-1-git-send-email-tianyu.lan@intel.com>
+	<1489750157-17401-2-git-send-email-tianyu.lan@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1490026424-11330-1-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="4Jr3ntrCOQOpvFhk6Lcc9R3sNthvWH7JS"
-Subject: Re: [Qemu-devel] [PATCH for-2.9 0/2] Fix string input visitor and
- "info memdev" regression
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1489750157-17401-2-git-send-email-tianyu.lan@intel.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 1/4] I440: Allow adding sysbus devices
+ with -device on I440
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,58 +28,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, imammedo@redhat.com, mdroth@linux.vnet.ibm.com
+To: Lan Tianyu <tianyu.lan@intel.com>
+Cc: qemu-devel@nongnu.org, chao.gao@intel.com, kevin.tian@intel.com, pbonzini@redhat.com, rth@twiddle.net, mst@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---4Jr3ntrCOQOpvFhk6Lcc9R3sNthvWH7JS
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, imammedo@redhat.com, mdroth@linux.vnet.ibm.com
-Message-ID: <53330549-71ad-4e85-c1f6-5795a288ac97@redhat.com>
-Subject: Re: [PATCH for-2.9 0/2] Fix string input visitor and "info memdev"
- regression
-References: <1490026424-11330-1-git-send-email-armbru@redhat.com>
-In-Reply-To: <1490026424-11330-1-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Mar 17, 2017 at 07:29:14PM +0800, Lan Tianyu wrote:
+> From: Chao Gao <chao.gao@intel.com>
+> 
+> xen-viommu will be a sysbus device and the device model will
+> be enabled via "-device" parameter.
+> 
+> Signed-off-by: Chao Gao <chao.gao@intel.com>
+> Signed-off-by: Lan Tianyu <tianyu.lan@intel.com>
 
-On 03/20/2017 11:13 AM, Markus Armbruster wrote:
-> Markus Armbruster (2):
->   qapi: Fix string input visitor regression for empty lists
->   Revert "hostmem: fix QEMU crash by 'info memdev'"
+I'm worried about the bugs we may expose by accepting all the
+other sysbus devices in the command-line in addition to
+xen-viommu.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+I am working on a RFC to replace "has_dynamic_sysbus" with a
+whitelist of sysbus device classes. This way we could enable only
+xen-viommu on i440fx, instead of suddenly enabling all sysbus
+devices just because of xen-viommu.
 
->=20
->  backends/hostmem.c                | 22 ++++++++--------------
->  qapi/string-input-visitor.c       |  4 ++++
->  tests/test-string-input-visitor.c | 11 ++++++++---
->  3 files changed, 20 insertions(+), 17 deletions(-)
->=20
+> ---
+>  hw/i386/pc_piix.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index a07dc81..3289593 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -436,6 +436,7 @@ static void pc_i440fx_machine_options(MachineClass *m)
+>      m->hot_add_cpu = pc_hot_add_cpu;
+>      m->default_machine_opts = "firmware=bios-256k.bin";
+>      m->default_display = "std";
+> +    m->has_dynamic_sysbus = true;
+>  }
+>  
+>  static void pc_i440fx_2_7_machine_options(MachineClass *m)
+> -- 
+> 1.8.3.1
+> 
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---4Jr3ntrCOQOpvFhk6Lcc9R3sNthvWH7JS
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY0DCXAAoJEKeha0olJ0Nq6vQH/3gKIo5HkFiI34X3FFsKCImF
-DQTUJAmPWRAUmMerlDSmPgPKpQ44hJC1q7Mf8Ukf8+dXOviCRIyb1uyN5i2VZfKW
-SHiX9+YG7BdOEjW/8u8iyhBIonL3qYjLBiDslH5xb7BIa7tL829nT7c7ixZLj0yB
-3lFeAwlFd+CkmFU1FGJefLvivc9vHcIgiuB4Uq1V4cRJ8D5uLLs8ECthPciepKHT
-gFUDcSN+GumsapdxhksCDzAUlwLRmodX4IO026HvOxXd4iqxk0fO8SQY7Za9NiVu
-pdl5twAqGsbOOTh/U8/A1cTKGOI77iezsyJyY2cOkE+2b3wc56u7BABu4DjuoGo=
-=XuU/
------END PGP SIGNATURE-----
-
---4Jr3ntrCOQOpvFhk6Lcc9R3sNthvWH7JS--
+-- 
+Eduardo
