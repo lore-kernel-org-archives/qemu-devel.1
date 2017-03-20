@@ -1,22 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cq3Ws-00016P-HA
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 16:03:47 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq3Zx-0001m1-0l
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 16:06:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cq3Wr-0004oo-Ci
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 16:03:46 -0400
-References: <1490014548-15083-1-git-send-email-armbru@redhat.com>
-	<1490014548-15083-6-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c2110a8d-b4f8-3781-469c-59b99a062d6a@redhat.com>
-Date: Mon, 20 Mar 2017 15:03:37 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq3Zt-0006bX-PH
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 16:06:56 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40162
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1cq3Zt-0006az-It
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 16:06:53 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2KK3Y2O000604
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 16:06:51 -0400
+Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 29amb2435b-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 16:06:50 -0400
+Received: from localhost
+	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Mon, 20 Mar 2017 16:06:50 -0400
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1490014548-15083-6-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="JpsBTp8a5VXR2wb8R2tmpSVWFk4KIMJGQ"
-Subject: Re: [Qemu-devel] [PATCH for-2.9 5/5] MAINTAINERS: Add myself for
- files I touched recently
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20170228132132.20231-1-pbonzini@redhat.com>
+References: <20170228132132.20231-1-pbonzini@redhat.com>
+Date: Mon, 20 Mar 2017 15:06:42 -0500
+Message-Id: <149004040262.20793.7017812881877388006@loki>
+Subject: Re: [Qemu-devel] [Qemu-stable] [PATCH] virtio: always use
+ handle_aio_output if registered
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,56 +42,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, kraxel@redhat.com, mst@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JpsBTp8a5VXR2wb8R2tmpSVWFk4KIMJGQ
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com
-Message-ID: <c2110a8d-b4f8-3781-469c-59b99a062d6a@redhat.com>
-Subject: Re: [PATCH for-2.9 5/5] MAINTAINERS: Add myself for files I touched
- recently
-References: <1490014548-15083-1-git-send-email-armbru@redhat.com>
- <1490014548-15083-6-git-send-email-armbru@redhat.com>
-In-Reply-To: <1490014548-15083-6-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Quoting Paolo Bonzini (2017-02-28 07:21:32)
+> Commit ad07cd6 ("virtio-scsi: always use dataplane path if ioeventfd is
+> active", 2016-10-30) and 9ffe337 ("virtio-blk: always use dataplane
+> path if ioeventfd is active", 2016-10-30) broke the virtio 1.0
+> indirect access registers.
+> =
 
-On 03/20/2017 07:55 AM, Markus Armbruster wrote:
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> The indirect access registers bypass the ioeventfd, so that virtio-blk
+> and virtio-scsi now repeatedly try to initialize dataplane instead of
+> triggering the guest->host EventNotifier.  Detect the situation by
+> checking vq->handle_aio_output; if it is not NULL, trigger the
+> EventNotifier, which is how the device expects to get notifications
+> and in fact the only thread-safe manner to deliver them.
+> =
+
+> Fixes: ad07cd6
+> Fixes: 9ffe337
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Ping for 2.9 / 2.8.1
+
 > ---
->  MAINTAINERS | 11 +++++++++++
->  1 file changed, 11 insertions(+)
+>  hw/virtio/virtio.c | 13 ++++++++++++-
+>  1 file changed, 12 insertions(+), 1 deletion(-)
+> =
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index 23483c7..1206f6c 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -1458,7 +1458,18 @@ static void virtio_queue_notify_vq(VirtQueue *vq)
+> =
 
-By the way, where do we stand on the idea of having checkpatch.pl reject
-patches that introduce new files without mentioning a maintainer?
+>  void virtio_queue_notify(VirtIODevice *vdev, int n)
+>  {
+> -    virtio_queue_notify_vq(&vdev->vq[n]);
+> +    VirtQueue *vq =3D &vdev->vq[n];
+> +
+> +    if (unlikely(!vq->vring.desc || vdev->broken)) {
+> +        return;
+> +    }
+> +
+> +    trace_virtio_queue_notify(vdev, vq - vdev->vq, vq);
+> +    if (vq->handle_aio_output) {
+> +        event_notifier_set(&vq->host_notifier);
+> +    } else if (vq->handle_output) {
+> +        vq->handle_output(vdev, vq);
+> +    }
+>  }
+> =
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+>  uint16_t virtio_queue_vector(VirtIODevice *vdev, int n)
+> -- =
 
+> 2.9.3
+> =
 
---JpsBTp8a5VXR2wb8R2tmpSVWFk4KIMJGQ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY0DWZAAoJEKeha0olJ0NqXmoIAIsTEXPGo61O6e7cDkxz7Yl4
-7z0GtTV5m4YlE5u4ellgKX2KF07SlhhLwDCdZZrcrZzzF4V9J0+JCTOlsuasEITu
-pJouq8vMz1dixKaH34Gv6zxdO08aVE75ODUHFXr2/PIfICeC0y9FZFm9jBmILqVq
-c7ji1AwdcSukrlipSs5rKHR12g1tHeZ4SjXz0GTndvMsP8v9LrGabtYA3+3Nzret
-KPyegpcOjMeEzwgxrzLMI1Qo459xuR1agCnkl5RFpwvUF3HHBSrDetrrvl09amWQ
-6MB+rgUUiZDAZU93sttxHZeHKLvC8FjB7IHaKrwuuCgBFbbUlt4wuPVnLqN6Bio=
-=NF6a
------END PGP SIGNATURE-----
-
---JpsBTp8a5VXR2wb8R2tmpSVWFk4KIMJGQ--
+>=20
