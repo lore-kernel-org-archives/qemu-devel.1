@@ -1,36 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6Qm-0001kA-2R
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:44 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6Qh-0001dy-5u
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6Qg-0004z6-EC
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:40 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41636
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6Qb-0004tB-U1
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:34 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38968)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cq6Qg-0004xw-79
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:34 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	id 1cq6Qb-0004rw-Le
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:29 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2KN8Zo5074937
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:33 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29aj6q9hws-1
+	v2KN8ViH025387
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:28 -0400
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 29ak1xpm8d-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:33 -0400
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:28 -0400
 Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 20 Mar 2017 19:09:32 -0400
+	Mon, 20 Mar 2017 19:09:27 -0400
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 20 Mar 2017 18:08:06 -0500
+Date: Mon, 20 Mar 2017 18:07:54 -0500
 In-Reply-To: <1490051325-3770-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1490051325-3770-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1490051325-3770-43-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 42/81] scsi-block: fix direction of BYTCHK test
- for VERIFY commands
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <1490051325-3770-31-git-send-email-mdroth@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 30/81] 9pfs: fix fd leak in local_opendir()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,35 +41,33 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-stable@nongnu.org, Greg Kurz <groug@kaod.org>, Greg Kurz <gkurz@linux.vnet.ibm.com>
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+From: Greg Kurz <groug@kaod.org>
 
-The direction is wrong; scsi_block_is_passthrough returns
-false for commands that *can* use sglists.
+Coverity issue CID1371731
 
-Reported-by: Zhang Qian <zhangqian@sangfor.com.cn>
-Fixes: 8fdc7839e40f43a426bc7e858cf1dbfe315a3804
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-(cherry picked from commit 1f8af0d186abf9ef775a74d41bf2852ed8d59b63)
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+(cherry picked from commit faab207f115cf9738f110cb088ab35a4b7aef73a)
+Signed-off-by: Greg Kurz <gkurz@linux.vnet.ibm.com>
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/scsi/scsi-disk.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/9pfs/9p-local.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index a963191..5796226 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -2694,7 +2694,7 @@ static bool scsi_block_is_passthrough(SCSIDiskState *s, uint8_t *buf)
-          * for the number of logical blocks specified in the length
-          * field).  For other modes, do not use scatter/gather operation.
-          */
--        if ((buf[1] & 6) != 2) {
-+        if ((buf[1] & 6) == 2) {
-             return false;
-         }
-         break;
--- 
+diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+index a50a01f..c5f7dcd 100644
+--- a/hw/9pfs/9p-local.c
++++ b/hw/9pfs/9p-local.c
+@@ -435,6 +435,7 @@ static int local_opendir(FsContext *ctx,
+=20
+     stream =3D fdopendir(dirfd);
+     if (!stream) {
++        close(dirfd);
+         return -1;
+     }
+     fs->dir.stream =3D stream;
+--=20
 2.7.4
