@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cpzoH-00034h-6e
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 12:05:43 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1cpzoD-00030k-HW
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 12:05:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cpznf-0000QR-Mk
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 12:05:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:61178)
+	(envelope-from <pbonzini@redhat.com>) id 1cpznb-0000PY-Uc
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 12:05:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54090)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cpznf-0000QB-CB
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 12:04:51 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cpznb-0000PQ-Mb
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 12:04:47 -0400
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9043C804E0
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 16:04:47 +0000 (UTC)
+Received: from donizetti.redhat.com (ovpn-117-118.ams2.redhat.com
+	[10.36.117.118])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id F0FC12D5C1
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 16:04:46 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 20 Mar 2017 17:04:44 +0100
-Message-Id: <20170320160446.14643-3-pbonzini@redhat.com>
-In-Reply-To: <20170320160446.14643-1-pbonzini@redhat.com>
-References: <20170320160446.14643-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 2/4] xen: do not build backends for targets that
- do not support xen
+Date: Mon, 20 Mar 2017 17:04:42 +0100
+Message-Id: <20170320160446.14643-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 0/4] Misc fixes for 2.9.0-rc1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,118 +32,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefano Stabellini <sstabellini@kernel.org>, Stefano Stabellini <stefano@aporeto.com>, pbonzini@redhat.com, peter.maydell@linaro.org, rth@twiddle.net, stefanha@redhat.com
 
-From: Stefano Stabellini <sstabellini@kernel.org>
+The following changes since commit ebedf0f9cd46b617df331eecc857c379d574ac62:
 
-Change Makefile.objs to use CONFIG_XEN instead of CONFIG_XEN_BACKEND, so
-that the Xen backends are only built for targets that support Xen.
+  nios2: iic: Convert CPU prop to qom link (2017-03-18 18:22:54 +0000)
 
-Set CONFIG_XEN in the toplevel Makefile to ensure that files that are
-built only once pick up Xen support properly.
+are available in the git repository at:
 
-Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
-Tested-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-CC: pbonzini@redhat.com
-CC: peter.maydell@linaro.org
-CC: rth@twiddle.net
-CC: stefanha@redhat.com
-Message-Id: <1489694518-16978-1-git-send-email-sstabellini@kernel.org>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- Makefile                 | 1 +
- hw/block/Makefile.objs   | 2 +-
- hw/char/Makefile.objs    | 2 +-
- hw/display/Makefile.objs | 2 +-
- hw/net/Makefile.objs     | 2 +-
- hw/usb/Makefile.objs     | 2 +-
- hw/xen/Makefile.objs     | 2 +-
- 7 files changed, 7 insertions(+), 6 deletions(-)
+  git://github.com/bonzini/qemu.git tags/for-upstream
 
-diff --git a/Makefile b/Makefile
-index 73e0c12..f4f90df 100644
---- a/Makefile
-+++ b/Makefile
-@@ -26,6 +26,7 @@ endif
- 
- CONFIG_SOFTMMU := $(if $(filter %-softmmu,$(TARGET_DIRS)),y)
- CONFIG_USER_ONLY := $(if $(filter %-user,$(TARGET_DIRS)),y)
-+CONFIG_XEN := $(CONFIG_XEN_BACKEND)
- CONFIG_ALL=y
- -include config-all-devices.mak
- -include config-all-disas.mak
-diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
-index d4c3ab7..e0ed980 100644
---- a/hw/block/Makefile.objs
-+++ b/hw/block/Makefile.objs
-@@ -4,7 +4,7 @@ common-obj-$(CONFIG_SSI_M25P80) += m25p80.o
- common-obj-$(CONFIG_NAND) += nand.o
- common-obj-$(CONFIG_PFLASH_CFI01) += pflash_cfi01.o
- common-obj-$(CONFIG_PFLASH_CFI02) += pflash_cfi02.o
--common-obj-$(CONFIG_XEN_BACKEND) += xen_disk.o
-+common-obj-$(CONFIG_XEN) += xen_disk.o
- common-obj-$(CONFIG_ECC) += ecc.o
- common-obj-$(CONFIG_ONENAND) += onenand.o
- common-obj-$(CONFIG_NVME_PCI) += nvme.o
-diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
-index 6ea76fe..725fdc4 100644
---- a/hw/char/Makefile.objs
-+++ b/hw/char/Makefile.objs
-@@ -7,7 +7,7 @@ common-obj-$(CONFIG_SERIAL_ISA) += serial-isa.o
- common-obj-$(CONFIG_SERIAL_PCI) += serial-pci.o
- common-obj-$(CONFIG_VIRTIO) += virtio-console.o
- common-obj-$(CONFIG_XILINX) += xilinx_uartlite.o
--common-obj-$(CONFIG_XEN_BACKEND) += xen_console.o
-+common-obj-$(CONFIG_XEN) += xen_console.o
- common-obj-$(CONFIG_CADENCE) += cadence_uart.o
- 
- obj-$(CONFIG_EXYNOS4) += exynos4210_uart.o
-diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
-index 063889b..3d02e8b 100644
---- a/hw/display/Makefile.objs
-+++ b/hw/display/Makefile.objs
-@@ -5,7 +5,7 @@ common-obj-$(CONFIG_JAZZ_LED) += jazz_led.o
- common-obj-$(CONFIG_PL110) += pl110.o
- common-obj-$(CONFIG_SSD0303) += ssd0303.o
- common-obj-$(CONFIG_SSD0323) += ssd0323.o
--common-obj-$(CONFIG_XEN_BACKEND) += xenfb.o
-+common-obj-$(CONFIG_XEN) += xenfb.o
- 
- common-obj-$(CONFIG_VGA_PCI) += vga-pci.o
- common-obj-$(CONFIG_VGA_ISA) += vga-isa.o
-diff --git a/hw/net/Makefile.objs b/hw/net/Makefile.objs
-index 610ed3e..6a95d92 100644
---- a/hw/net/Makefile.objs
-+++ b/hw/net/Makefile.objs
-@@ -1,5 +1,5 @@
- common-obj-$(CONFIG_DP8393X) += dp8393x.o
--common-obj-$(CONFIG_XEN_BACKEND) += xen_nic.o
-+common-obj-$(CONFIG_XEN) += xen_nic.o
- 
- # PCI network cards
- common-obj-$(CONFIG_NE2000_PCI) += ne2000.o
-diff --git a/hw/usb/Makefile.objs b/hw/usb/Makefile.objs
-index 98b5c9d..5958be8 100644
---- a/hw/usb/Makefile.objs
-+++ b/hw/usb/Makefile.objs
-@@ -40,5 +40,5 @@ common-obj-$(CONFIG_USB_REDIR) += redirect.o quirks.o
- common-obj-y += $(patsubst %,host-%.o,$(HOST_USB))
- 
- ifeq ($(CONFIG_USB_LIBUSB),y)
--common-obj-$(CONFIG_XEN_BACKEND) += xen-usb.o
-+common-obj-$(CONFIG_XEN) += xen-usb.o
- endif
-diff --git a/hw/xen/Makefile.objs b/hw/xen/Makefile.objs
-index 591cdc2..4be3ec9 100644
---- a/hw/xen/Makefile.objs
-+++ b/hw/xen/Makefile.objs
-@@ -1,5 +1,5 @@
- # xen backend driver support
--common-obj-$(CONFIG_XEN_BACKEND) += xen_backend.o xen_devconfig.o xen_pvdev.o
-+common-obj-$(CONFIG_XEN) += xen_backend.o xen_devconfig.o xen_pvdev.o
- 
- obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen-host-pci-device.o
- obj-$(CONFIG_XEN_PCI_PASSTHROUGH) += xen_pt.o xen_pt_config_init.o xen_pt_graphics.o xen_pt_msi.o
+for you to fetch changes up to b3d3a426da9b067366bc132d53a6fa6b72675b55:
+
+  hax: fix breakage in locking (2017-03-20 12:24:43 +0100)
+
+----------------------------------------------------------------
+fixes for 2.9-rc1, plus removal of -mno-cygwin references
+
+----------------------------------------------------------------
+Paolo Bonzini (2):
+      qemu-ga: obey LISTEN_PID when using systemd socket activation
+      configure: remove Cygwin
+
+Stefano Stabellini (1):
+      xen: do not build backends for targets that do not support xen
+
+Vincent Palatin (1):
+      hax: fix breakage in locking
+
+ Makefile                 |   1 +
+ bsd-user/mmap.c          |   5 ---
+ configure                |   6 ---
+ cpus.c                   |   3 +-
+ hw/block/Makefile.objs   |   2 +-
+ hw/char/Makefile.objs    |   2 +-
+ hw/display/Makefile.objs |   2 +-
+ hw/net/Makefile.objs     |   2 +-
+ hw/usb/Makefile.objs     |   2 +-
+ hw/xen/Makefile.objs     |   2 +-
+ include/qemu/systemd.h   |  26 ++++++++++++
+ qemu-nbd.c               | 100 ++++-------------------------------------------
+ qga/main.c               |  51 ++++++------------------
+ util/Makefile.objs       |   1 +
+ util/systemd.c           |  77 ++++++++++++++++++++++++++++++++++++
+ 15 files changed, 134 insertions(+), 148 deletions(-)
+ create mode 100644 include/qemu/systemd.h
+ create mode 100644 util/systemd.c
 -- 
 2.9.3
