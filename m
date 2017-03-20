@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cpzMz-0006AI-5X
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:37:18 -0400
+	(envelope-from <stefanha@redhat.com>) id 1cpzQ5-0007dk-Ea
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:40:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cpzMu-0007fx-9h
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:37:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44330)
+	(envelope-from <stefanha@redhat.com>) id 1cpzQ2-0000P1-Kv
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:40:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:64949)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cpzMu-0007fa-35
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:37:12 -0400
-Date: Mon, 20 Mar 2017 15:37:07 +0000
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cpzQ2-0000OT-Ed
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:40:26 -0400
+Date: Mon, 20 Mar 2017 15:40:15 +0000
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170320153707.GB7320@stefanha-x1.localdomain>
+Message-ID: <20170320154015.GC7320@stefanha-x1.localdomain>
 References: <20170315092940.1367-1-stefanha@redhat.com>
-	<20170315092940.1367-2-stefanha@redhat.com>
-	<CAMRbyysBvGhV6cqN8qX+dL3f3Y8QOCtn+jhOKunDHFrTZEwyoQ@mail.gmail.com>
+	<20170315092940.1367-5-stefanha@redhat.com>
+	<CAMRbyytgis39Ayj2Hd3_sqa2EBOov9oo0Ne0d+=CdehfgEynog@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="5I6of5zJg18YgZEa"
+	protocol="application/pgp-signature"; boundary="RIYY1s2vRbPFwWeW"
 Content-Disposition: inline
-In-Reply-To: <CAMRbyysBvGhV6cqN8qX+dL3f3Y8QOCtn+jhOKunDHFrTZEwyoQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [RFC v2 1/8] block: add bdrv_measure() API
+In-Reply-To: <CAMRbyytgis39Ayj2Hd3_sqa2EBOov9oo0Ne0d+=CdehfgEynog@mail.gmail.com>
+Subject: Re: [Qemu-devel] [RFC v2 4/8] qcow2: extract image creation option
+ parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,55 +34,42 @@ To: Nir Soffer <nsoffer@redhat.com>
 Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>
 
 
---5I6of5zJg18YgZEa
+--RIYY1s2vRbPFwWeW
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Mar 18, 2017 at 12:51:29AM +0000, Nir Soffer wrote:
-> On Wed, Mar 15, 2017 at 11:29 AM Stefan Hajnoczi <stefanha@redhat.com>
-> wrote:
-> > diff --git a/block.c b/block.c
-> > index cb57370..532a4d1 100644
-> > --- a/block.c
-> > +++ b/block.c
-> > @@ -3260,6 +3260,39 @@ int64_t
-> > bdrv_get_allocated_file_size(BlockDriverState *bs)
-> >      return -ENOTSUP;
-> >  }
-> >
-> > +/*
-> > + * bdrv_measure:
-> > + * @drv: Format driver
-> > + * @opts: Creation options
+On Sat, Mar 18, 2017 at 08:14:45PM +0000, Nir Soffer wrote:
+> > @@ -2235,7 +2284,7 @@ static int qcow2_create2(const char *filename,
+> > int64_t total_size,
+> >      *header =3D (QCowHeader) {
+> >          .magic                      =3D cpu_to_be32(QCOW_MAGIC),
+> >          .version                    =3D cpu_to_be32(version),
+> > -        .cluster_bits               =3D cpu_to_be32(cluster_bits),
+> > +        .cluster_bits               =3D cpu_to_be32(ctz32(cluster_size=
+)),
 > >
 >=20
-> Isn't this Measure options?
+> Is this related?
 
-No, these are the block driver .bdrv_create() options.  They are exactly
-the same as qemu-img create -o.
+Yes, the main cluster_bits code was extracted into
+qcow2_opt_get_cluster_size_del() above.
 
-qemu-img measure must know the creation options of the new image file
-(such as preallocation or the qcow2 image format version) because they
-affect the file size.
+This is now the only place in qcow2_create2() the needs this value so I
+inlined the expression and dropped the variable.
 
-> Maybe a note about error handling? the only way is to check for non-null
-> errp, right?
-
-Yes, errp must be checked.  I'll update the doc comment.
-
---5I6of5zJg18YgZEa
+--RIYY1s2vRbPFwWeW
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJYz/cjAAoJEJykq7OBq3PIz84H/3n4vrwqwgnE7GcdlfZ1aCs3
-6QQfdIm8DJzNyMzyAHu2fEt1l8bbftBNK3j/go5NJA4GVzkSVq0amlWf2JYUUxKT
-cL77MVzxB3iIaoKLanzfCVraA2F3Ns42v18s5uaBkCGmOREsJL5BT0M9c77qQhwH
-A3rn9wbt8K6ua8CXl8pgzPDewecQbZykB2PcqwhoITeODtoFhlXzuA5OcaaXWTrs
-Slw1M472VyqBSTcFwYZI2x2sHyhDHeWRCiNinjfNSB576xX6k58utEV49divVfn6
-NOfqvpS9Fujxkq9bPtzV3pQq2roXF3hBzPJZ6qJ3PiqcGTstke39mBMWz6tkbBE=
-=FFt3
+iQEcBAEBAgAGBQJYz/ffAAoJEJykq7OBq3PId4AH/jgGhHA38w6wVPLvXCI7EcKJ
+89a1o9CAlSOXyBb3195xc7IgVv2Q388x6EJdbn6dsxeC21UTAFpC0pMGp+JTbZco
+jlWeDT7kKRC97J4Xpz8fHBL3uZFA+VSWHVxfdWLMDxO+ldyUBw6u/0E/7C0JYNSr
+N/SqM1o9Ix91WzzN73Lm6evEhBT050ST6UQXuhT5sc4W5ysdA1Guxh3bhATXXrnw
+QLb92Bmh4sHe9ADpsGn267TJp0HbbFBkQlAeuQR489Y7Abh8EadEFVjcgu8Gmyjr
+ljHg3uj1vlB7YxUXfJn5idk1Ep+3K2ayBu1w0GnsK99FA3oyryGdGI6MdJXSbiw=
+=F3wX
 -----END PGP SIGNATURE-----
 
---5I6of5zJg18YgZEa--
+--RIYY1s2vRbPFwWeW--
