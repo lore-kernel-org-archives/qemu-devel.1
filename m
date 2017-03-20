@@ -1,36 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6QW-0001Qu-DL
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:26 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6QX-0001Rd-4w
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6QS-0004h4-3A
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:23 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39730
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6QV-0004n1-O7
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:25 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46866
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cq6QR-0004fl-SP
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:20 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	id 1cq6QV-0004lP-HQ
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:23 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2KN8WHT028678
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:19 -0400
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 29amb5t731-1
+	v2KN8VEl084330
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:23 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 29amb2ab11-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:19 -0400
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:22 -0400
 Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 20 Mar 2017 17:09:18 -0600
+	Mon, 20 Mar 2017 19:09:22 -0400
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 20 Mar 2017 18:07:40 -0500
+Date: Mon, 20 Mar 2017 18:07:45 -0500
 In-Reply-To: <1490051325-3770-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1490051325-3770-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1490051325-3770-17-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 16/81] 9pfs: local: readlink: don't follow
- symlinks
+Message-Id: <1490051325-3770-22-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 21/81] 9pfs: local: link: don't follow symlinks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,76 +43,142 @@ Cc: qemu-stable@nongnu.org, Greg Kurz <groug@kaod.org>, Greg Kurz <gkurz@linux.v
 
 From: Greg Kurz <groug@kaod.org>
 
-The local_readlink() callback is vulnerable to symlink attacks because it
-calls:
+The local_link() callback is vulnerable to symlink attacks because it calls:
 
-(1) open(O_NOFOLLOW) which follows symbolic links for all path elements but
-    the rightmost one
-(2) readlink() which follows symbolic links for all path elements but the
+(1) link() which follows symbolic links for all path elements but the
     rightmost one
+(2) local_create_mapped_attr_dir()->mkdir() which follows symbolic links
+    for all path elements but the rightmost one
 
-This patch converts local_readlink() to rely on open_nofollow() to fix (1)
-and opendir_nofollow(), readlinkat() to fix (2).
+This patch converts local_link() to rely on opendir_nofollow() and linkat()
+to fix (1), mkdirat() to fix (2).
 
 This partly fixes CVE-2016-9602.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-(cherry picked from commit bec1e9546e03b9e7f5152cf3e8c95cf8acff5e12)
+(cherry picked from commit ad0b46e6ac769b187cb4dcf0065675ef8a198a5e)
 Signed-off-by: Greg Kurz <gkurz@linux.vnet.ibm.com>
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/9pfs/9p-local.c | 26 +++++++++++++++++---------
- 1 file changed, 17 insertions(+), 9 deletions(-)
+ hw/9pfs/9p-local.c | 84 +++++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 55 insertions(+), 29 deletions(-)
 
 diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index 5e206e1..c290b6c 100644
+index b2eaf88..6a52ee6 100644
 --- a/hw/9pfs/9p-local.c
 +++ b/hw/9pfs/9p-local.c
-@@ -340,27 +340,35 @@ static ssize_t local_readlink(FsContext *fs_ctx, V9fsPath *fs_path,
-                               char *buf, size_t bufsz)
- {
-     ssize_t tsize = -1;
--    char *buffer;
--    char *path = fs_path->data;
+@@ -75,6 +75,13 @@ static void renameat_preserve_errno(int odirfd, const char *opath, int ndirfd,
+     errno = serrno;
+ }
  
-     if ((fs_ctx->export_flags & V9FS_SM_MAPPED) ||
-         (fs_ctx->export_flags & V9FS_SM_MAPPED_FILE)) {
-         int fd;
--        buffer = rpath(fs_ctx, path);
--        fd = open(buffer, O_RDONLY | O_NOFOLLOW);
--        g_free(buffer);
++static void unlinkat_preserve_errno(int dirfd, const char *path, int flags)
++{
++    int serrno = errno;
++    unlinkat(dirfd, path, flags);
++    errno = serrno;
++}
 +
-+        fd = local_open_nofollow(fs_ctx, fs_path->data, O_RDONLY, 0);
-         if (fd == -1) {
-             return -1;
+ #define VIRTFS_META_DIR ".virtfs_metadata"
+ 
+ static char *local_mapped_attr_path(FsContext *ctx, const char *path)
+@@ -918,49 +925,68 @@ out:
+ static int local_link(FsContext *ctx, V9fsPath *oldpath,
+                       V9fsPath *dirpath, const char *name)
+ {
+-    int ret;
+-    V9fsString newpath;
+-    char *buffer, *buffer1;
+-    int serrno;
++    char *odirpath = g_path_get_dirname(oldpath->data);
++    char *oname = g_path_get_basename(oldpath->data);
++    int ret = -1;
++    int odirfd, ndirfd;
+ 
+-    v9fs_string_init(&newpath);
+-    v9fs_string_sprintf(&newpath, "%s/%s", dirpath->data, name);
++    odirfd = local_opendir_nofollow(ctx, odirpath);
++    if (odirfd == -1) {
++        goto out;
++    }
+ 
+-    buffer = rpath(ctx, oldpath->data);
+-    buffer1 = rpath(ctx, newpath.data);
+-    ret = link(buffer, buffer1);
+-    g_free(buffer);
+-    if (ret < 0) {
++    ndirfd = local_opendir_nofollow(ctx, dirpath->data);
++    if (ndirfd == -1) {
++        close_preserve_errno(odirfd);
+         goto out;
+     }
+ 
++    ret = linkat(odirfd, oname, ndirfd, name, 0);
++    if (ret < 0) {
++        goto out_close;
++    }
++
+     /* now link the virtfs_metadata files */
+     if (ctx->export_flags & V9FS_SM_MAPPED_FILE) {
+-        char *vbuffer, *vbuffer1;
++        int omap_dirfd, nmap_dirfd;
+ 
+-        /* Link the .virtfs_metadata files. Create the metada directory */
+-        ret = local_create_mapped_attr_dir(ctx, newpath.data);
+-        if (ret < 0) {
+-            goto err_out;
++        ret = mkdirat(ndirfd, VIRTFS_META_DIR, 0700);
++        if (ret < 0 && errno != EEXIST) {
++            goto err_undo_link;
          }
-         do {
-             tsize = read(fd, (void *)buf, bufsz);
-         } while (tsize == -1 && errno == EINTR);
--        close(fd);
-+        close_preserve_errno(fd);
-     } else if ((fs_ctx->export_flags & V9FS_SM_PASSTHROUGH) ||
-                (fs_ctx->export_flags & V9FS_SM_NONE)) {
--        buffer = rpath(fs_ctx, path);
--        tsize = readlink(buffer, buf, bufsz);
--        g_free(buffer);
-+        char *dirpath = g_path_get_dirname(fs_path->data);
-+        char *name = g_path_get_basename(fs_path->data);
-+        int dirfd;
+-        vbuffer = local_mapped_attr_path(ctx, oldpath->data);
+-        vbuffer1 = local_mapped_attr_path(ctx, newpath.data);
+-        ret = link(vbuffer, vbuffer1);
+-        g_free(vbuffer);
+-        g_free(vbuffer1);
 +
-+        dirfd = local_opendir_nofollow(fs_ctx, dirpath);
-+        if (dirfd == -1) {
-+            goto out;
++        omap_dirfd = openat_dir(odirfd, VIRTFS_META_DIR);
++        if (omap_dirfd == -1) {
++            goto err;
 +        }
 +
-+        tsize = readlinkat(dirfd, name, buf, bufsz);
-+        close_preserve_errno(dirfd);
-+    out:
-+        g_free(name);
-+        g_free(dirpath);
++        nmap_dirfd = openat_dir(ndirfd, VIRTFS_META_DIR);
++        if (nmap_dirfd == -1) {
++            close_preserve_errno(omap_dirfd);
++            goto err;
++        }
++
++        ret = linkat(omap_dirfd, oname, nmap_dirfd, name, 0);
++        close_preserve_errno(nmap_dirfd);
++        close_preserve_errno(omap_dirfd);
+         if (ret < 0 && errno != ENOENT) {
+-            goto err_out;
++            goto err_undo_link;
+         }
++
++        ret = 0;
      }
-     return tsize;
+-    goto out;
++    goto out_close;
+ 
+-err_out:
+-    serrno = errno;
+-    remove(buffer1);
+-    errno = serrno;
++err:
++    ret = -1;
++err_undo_link:
++    unlinkat_preserve_errno(ndirfd, name, 0);
++out_close:
++    close_preserve_errno(ndirfd);
++    close_preserve_errno(odirfd);
+ out:
+-    g_free(buffer1);
+-    v9fs_string_free(&newpath);
++    g_free(oname);
++    g_free(odirpath);
+     return ret;
  }
+ 
 -- 
 2.7.4
