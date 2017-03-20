@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40687)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cq3dP-0002co-Ag
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 16:10:32 -0400
+	(envelope-from <quintela@redhat.com>) id 1cq3gV-00040h-M6
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 16:13:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cq3dK-0007mB-B3
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 16:10:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55282)
+	(envelope-from <quintela@redhat.com>) id 1cq3gQ-0001Ap-Nh
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 16:13:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55034)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cq3dK-0007lo-5h
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 16:10:26 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cq3gQ-0001AY-I1
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 16:13:38 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E8AF8811D8
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 20:10:25 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A6F163B721
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 20:13:38 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170317095149.GA2396@work-vm> (David Alan Gilbert's message of
-	"Fri, 17 Mar 2017 09:51:49 +0000")
+In-Reply-To: <20170317101424.GC2396@work-vm> (David Alan Gilbert's message of
+	"Fri, 17 Mar 2017 10:14:24 +0000")
 References: <20170315135021.6978-1-quintela@redhat.com>
-	<20170315135021.6978-24-quintela@redhat.com>
-	<20170317095149.GA2396@work-vm>
+	<20170315135021.6978-28-quintela@redhat.com>
+	<20170317101424.GC2396@work-vm>
 Reply-To: quintela@redhat.com
-Date: Mon, 20 Mar 2017 21:10:23 +0100
-Message-ID: <877f3jaevk.fsf@secure.mitica>
+Date: Mon, 20 Mar 2017 21:13:35 +0100
+Message-ID: <8737e7aeq8.fsf@secure.mitica>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 23/31] ram: Move migration_bitmap_rcu into
- RAMState
+Subject: Re: [Qemu-devel] [PATCH 27/31] ram: Move last_req_rb to RAMState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,45 +40,34 @@ Cc: qemu-devel@nongnu.org
 
 "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 > * Juan Quintela (quintela@redhat.com) wrote:
->> Once there, rename the type to be shorter.
+>> It was on MigrationState when it is only used inside ram.c for
+>> postcopy.  Problem is that we need to access it without being able to
+>> pass it RAMState directly.
 >> 
 >> Signed-off-by: Juan Quintela <quintela@redhat.com>
 >> ---
->>  migration/ram.c | 79 ++++++++++++++++++++++++++++++---------------------------
->>  1 file changed, 42 insertions(+), 37 deletions(-)
+>>  include/migration/migration.h | 2 --
+>>  migration/migration.c         | 1 -
+>>  migration/ram.c               | 6 ++++--
+>>  3 files changed, 4 insertions(+), 5 deletions(-)
 >> 
->> diff --git a/migration/ram.c b/migration/ram.c
->> index c14293c..d39d185 100644
->> --- a/migration/ram.c
->> +++ b/migration/ram.c
->> @@ -132,6 +132,19 @@ out:
->>      return ret;
->>  }
->>  
->> +struct RAMBitmap {
->> +    struct rcu_head rcu;
->> +    /* Main migration bitmap */
->> +    unsigned long *bmap;
->> +    /* bitmap of pages that haven't been sent even once
->> +     * only maintained and used in postcopy at the moment
->> +     * where it's used to send the dirtymap at the start
->> +     * of the postcopy phase
->> +     */
->> +    unsigned long *unsentmap;
->> +};
->> +typedef struct RAMBitmap RAMBitmap;
->> +
+>> diff --git a/include/migration/migration.h b/include/migration/migration.h
+>> index 84cef4b..e032fb0 100644
+>> --- a/include/migration/migration.h
+>> +++ b/include/migration/migration.h
+>> @@ -189,8 +189,6 @@ struct MigrationState
+>>      /* Queue of outstanding page requests from the destination */
+>>      QemuMutex src_page_req_mutex;
+>>      QSIMPLEQ_HEAD(src_page_requests, MigrationSrcPageRequest) src_page_requests;
+>> -    /* The RAMBlock used in the last src_page_request */
+>> -    RAMBlock *last_req_rb;
 >
-> I'm OK with this; although I can see the idea of naming it BitmapRcu,
-> given that the actual bmap is inside that and most of the rest of the type
-> is just the rcu wrapper.
+> Should this be kept together with src_page_req_mutex and src_page_requests?
 
-It is the type, and now it also has the unsentmap.
+Yes.
 
-  atomic_rcu_read(&ram_state.bitmap_rcu)->bmap)
+But I still have to use the global variable.
 
-ends  getting really long quite fast "p"
-
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Will do for next version.
 
 Thanks, Juan.
