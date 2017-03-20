@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cq5gJ-0001pn-W0
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 18:21:41 -0400
+	(envelope-from <bounces@canonical.com>) id 1cq68q-0006Yh-0e
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 18:51:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cq5gF-0001An-Qx
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 18:21:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47560)
+	(envelope-from <bounces@canonical.com>) id 1cq68k-0007lv-Rv
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 18:51:08 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52587)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cq5gF-0001Ah-L7
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 18:21:35 -0400
+	id 1cq68k-0007kx-Jj
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 18:51:02 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cq5gC-0003eM-P7
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 22:21:32 +0000
+	id 1cq68h-0003Z2-Cm
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 22:50:59 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7D9922E80DA
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 22:21:29 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id DD1712E8219
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 22:50:51 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 20 Mar 2017 22:14:35 -0000
+Date: Mon, 20 Mar 2017 22:37:53 -0000
 From: Yongbok Kim <yongbok.kim@imgtec.com>
 Reply-To: Bug 1663287 <1663287@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20170209154937.3933.99004.malonedeb@chaenomeles.canonical.com>
-Message-Id: <20170320221436.22101.88249.launchpad@chaenomeles.canonical.com>
+Message-Id: <20170320223753.19794.50237.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1663287] Re: Illegal delay slot code causes abort
  on mips64
@@ -39,8 +39,18 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Changed in: qemu
-       Status: New =3D> Fix Committed
+Thanks for reporting this issue. =
+
+In fact, branches in a delay slot is "undefined" in the pre-Release 6 archi=
+tecture.
+MIPS architectre release 6 defines to signal Reserved Instruction exception=
+s for such cases.
+However as it was undefined, it is better to signal RI and carry on rather =
+than stopping simulation.
+Hence I've made a patch for the msa case. =
+
+I will have a look into the other case. (sorry I've missed in the first pla=
+ce.)
 
 -- =
 
