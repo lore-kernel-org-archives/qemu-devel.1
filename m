@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cpud8-0006qV-Fe
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 06:33:39 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1cpuqw-0001kK-It
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 06:47:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cpud3-0003ns-83
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 06:33:36 -0400
-Date: Mon, 20 Mar 2017 10:33:20 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170320103320.GD17887@stefanha-x1.localdomain>
-References: <20170313214001.26339-1-mreitz@redhat.com>
-	<20170313214045.26857-1-mreitz@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1cpuqr-000862-O4
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 06:47:54 -0400
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:36599)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cpuqr-00085o-Gw
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 06:47:49 -0400
+Received: by mail-wm0-x236.google.com with SMTP id n11so59879703wma.1
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 03:47:49 -0700 (PDT)
+References: <1487616072-9226-1-git-send-email-peter.maydell@linaro.org>
+	<1487616072-9226-2-git-send-email-peter.maydell@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1487616072-9226-2-git-send-email-peter.maydell@linaro.org>
+Date: Mon, 20 Mar 2017 10:48:12 +0000
+Message-ID: <87r31sns0j.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="XvKFcGCOAo53UbWW"
-Content-Disposition: inline
-In-Reply-To: <20170313214045.26857-1-mreitz@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.10 03/16] block: Add
- PreallocMode to blk_truncate()
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/4] arm: HVC and SMC encodings don't exist
+ for M profile
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,53 +31,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Michael Davidsaver <mdavidsaver@gmail.com>
 
 
---XvKFcGCOAo53UbWW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-On Mon, Mar 13, 2017 at 10:40:32PM +0100, Max Reitz wrote:
-> blk_truncate() itself will pass that value to bdrv_truncate(), and all
-> callers of blk_truncate() just set the parameter to PREALLOC_MODE_OFF
-> for now.
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> M profile doesn't have the HVC or SMC encodings, so make them always
+> UNDEF rather than generating calls to helper functions that assume
+> A/R profile.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+
 > ---
->  include/sysemu/block-backend.h | 3 ++-
->  block/block-backend.c          | 5 +++--
->  block/commit.c                 | 4 ++--
->  block/mirror.c                 | 3 ++-
->  block/parallels.c              | 2 +-
->  block/qcow.c                   | 2 +-
->  block/qcow2.c                  | 4 ++--
->  block/qed.c                    | 2 +-
->  block/vdi.c                    | 3 ++-
->  block/vhdx.c                   | 5 +++--
->  block/vmdk.c                   | 7 ++++---
->  block/vpc.c                    | 2 +-
->  blockdev.c                     | 2 +-
->  qemu-img.c                     | 2 +-
->  qemu-io-cmds.c                 | 2 +-
->  15 files changed, 27 insertions(+), 21 deletions(-)
+>  target/arm/translate.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index 9fded03..895b399 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -10365,6 +10365,9 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
+>                      goto illegal_op;
+>
+>                  if (insn & (1 << 26)) {
+> +                    if (arm_dc_feature(s, ARM_FEATURE_M)) {
+> +                        goto illegal_op;
+> +                    }
+>                      if (!(insn & (1 << 20))) {
+>                          /* Hypervisor call (v7) */
+>                          int imm16 = extract32(insn, 16, 4) << 12
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---XvKFcGCOAo53UbWW
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYz6/wAAoJEJykq7OBq3PI0kEH/34C2vYrJ26xsmchiK82S0gT
-CNoNXxbyi4nazs5tdOcp5UAN0Nlyl7HMlowxZvXEDZiUg0baZSTLcOhh+L9d/vup
-lKGq6xHLYFt13zupDjfSRLZerUjXGOTTAPH19tLtsjaQX/xEFmJEYBLOnYC6lGTs
-IG1Svlhdr1OCRDxBBTGU71lUSRvJxDnSGqoPA68RteadwmkIUaym+ikNZ+77CbUo
-22ayuL7pydgFfw1ZrnWOYfkuFKdWlEV8Amfe5gJwXd4EVBHoX2o6P5F+FqOwTB81
-c99kNA9Ss3nkcp7SjAru5GGNeXbExrMOHabNYeXA2DxWlw5TR5BZLqCrpRnUIas=
-=L5dN
------END PGP SIGNATURE-----
-
---XvKFcGCOAo53UbWW--
+--
+Alex Bennée
