@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40606)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cpwdq-00051V-5A
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 08:42:31 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42207)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1cpwiq-0006Jm-Hi
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 08:47:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cpwdl-0006GH-Jj
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 08:42:30 -0400
-Received: from [59.151.112.132] (port=6526 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cpwdj-00069v-Us
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 08:42:25 -0400
-References: <1488180523-18137-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-	<20170313160619.28622002@t450s.home>
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Message-ID: <58CFD01F.1060508@cn.fujitsu.com>
-Date: Mon, 20 Mar 2017 20:50:39 +0800
+	(envelope-from <pl@kamp.de>) id 1cpwil-0000dY-Mf
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 08:47:40 -0400
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:58648 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1cpwil-0000cR-DC
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 08:47:35 -0400
+References: <bd7cb196-0779-42ad-ce9c-5871d307adce@kamp.de>
+	<82d604c8-068a-aff4-6037-e3cd247b3588@redhat.com>
+	<819af057-3777-dffc-4670-895b8265fd01@kamp.de>
+	<d41d1428-4c8b-7e2f-b197-8d45b834776d@redhat.com>
+	<32e1e781-f0b0-ac67-a5ce-74ccc64071a0@kamp.de>
+	<20170320024649.GA18938@lemon.lan>
+	<37879546-cf6e-01fa-adc6-c777e14eab0e@redhat.com>
+	<20170320114926.GB17020@lemon.lan>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <b3bf1d26-7caa-1d0d-c8a1-02f4c80e51e4@kamp.de>
+Date: Mon, 20 Mar 2017 13:47:31 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170313160619.28622002@t450s.home>
-Content-Type: text/plain; charset="windows-1252"
+In-Reply-To: <20170320114926.GB17020@lemon.lan>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] vfio pci: kernel support of error recovery
- only for non fatal error
+Subject: Re: [Qemu-devel] callout to *file in bdrv_co_get_block_status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,166 +33,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, mst@redhat.com, izumi.taku@jp.fujitsu.com
+To: Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
 
-Sorry for late.
+Am 20.03.2017 um 12:49 schrieb Fam Zheng:
+> On Mon, 03/20 12:21, Paolo Bonzini wrote:
+>>
+>> On 20/03/2017 03:46, Fam Zheng wrote:
+>>> On Fri, 03/17 12:20, Peter Lieven wrote:
+>>>> Am 17.03.2017 um 12:16 schrieb Paolo Bonzini:
+>>>>> On 17/03/2017 12:11, Peter Lieven wrote:
+>>>>>>>> like VMDK or QCOW2 shouldn't we trust the information from the l2 tables in the VMDK or QCOW2?
+>>>>>>> It provides additional information, for example it works better with
+>>>>>>> prealloc=metadata.
+>>>>>> Okay, understood. Can you imagine of a away to conditionally avoid this second callout? In my case we have an additional
+>>>>>> lseek for each cluster. For a 20GB file this are approx. 327k calls to lseek. And if the file has no preallocated metadata
+>>>>>> it will likely not improve anything. And even if the metadata is prealloced what is the allocation status of the clusters?
+>>>>> If the metadata is preallocated, cluster will (or should) show up as
+>>>>> zero, speeding up the copy.
+>>>> Okay, in this case the second call out to *file will not happen. It only happens if the metadata says it contains data.
+>>>> So where does it actually help?
+>>>>
+>>>> The condition is: (ret & BDRV_BLOCK_DATA) && !(ret & BDRV_BLOCK_ZERO) && (ret & BDRV_BLOCK_OFFSET_VALID))
+>>>>
+>>>> So from my view it can only have any effect if the metadata returns BDRV_BLOCK_DATA, but the protocol driver returns
+>>>> BDRV_BLOCK_ZERO.
+>>>>
+>>>> This can only happen if I partially write to a cluster, or am I wrong here?
+>>> I think you have a point. The metadata should have said BDRV_BLOCK_ZERO if
+>>> protocol would say BDRV_BLOCK_ZERO - there is no reason the format driver cannot
+>>> know.
+>> That's true of qcow2, but many formats (including raw :)) don't know
+>> about BDRV_BLOCK_ZERO.
+> Raw is a little special, it could have forwarded the call to *file in its
+> BlockDriver callback. Most formats with metadata stores zero/nonzero information
+> in L1/L2 tables. For qcow2 and VMDK I think it's okay to just trust meta data on
+> zero/nonzero.
+>
+> Fam
 
-On 03/14/2017 06:06 AM, Alex Williamson wrote:
-> On Mon, 27 Feb 2017 15:28:43 +0800
-> Cao jin <caoj.fnst@cn.fujitsu.com> wrote:
-> 
->> 0. What happens now (PCIE AER only)
->>    Fatal errors cause a link reset.
->>    Non fatal errors don't.
->>    All errors stop the VM eventually, but not immediately
->>    because it's detected and reported asynchronously.
->>    Interrupts are forwarded as usual.
->>    Correctable errors are not reported to guest at all.
->>    Note: PPC EEH is different. This focuses on AER.
-> 
-> Perhaps you're only focusing on AER, but don't the error handlers we're
-> using support both AER and EEH generically?  I don't think we can
-> completely disregard how this affects EEH behavior, if at all.
-> 
 
-After taking a rough look at the EEH,  find that EEH always feed
-error_detected with pci_channel_io_frozen, from perspective of
-error_detected, EEH is not affected.  
+BTW, the extra check was added in
 
-I am not sure about a question: when assign devices in spapr host,
-should all functions/devices in a PE be bound to vfio? I am kind of
-confused about the relationship between a PE & a tce iommu group
 
->>
->> 1. Correctable errors
->>    There is no need to report these to guest. So let's not.
-> 
-> What does this patch change to make this happen?  I don't see
-> anything.  Was this always the case?  No change?
-> 
+commit 5daa74a6ebce7543aaad178c4061dc087bb4c705
+Author: Paolo Bonzini <pbonzini@redhat.com>
+Date:   Wed Sep 4 19:00:38 2013 +0200
 
-yes, no change on correctable error.
+    block: look for zero blocks in bs->file
+   
+    Reviewed-by: Eric Blake <eblake@redhat.com>
+    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+    Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
->>
->> 2. Fatal errors
->>    It's not easy to handle them gracefully since link reset
->>    is needed. As a first step, let's use the existing mechanism
->>    in that case.
-> 
-> Ok, so no change here either.
-> 
->> 2. Non-fatal errors
->>    Here we could make progress by reporting them to guest
->>    and have guest handle them.
-> 
-> In practice, what actual errors do we expect userspace to see as
-> non-fatal errors? It would be useful for the commit log to describe
-> the actual benefit we're going to see by splitting out non-fatal errors
-> for the user (not always a guest) to see separately.  Justify that this
-> is actually useful.
-> 
->>
->>    Issues:
->>    a. this behaviour should only be enabled with new userspace,
->>       old userspace should work without changes.
->>
->>       Suggestion: One way to address this would be to add a new eventfd
->>       non_fatal_err_trigger. If not set, invoke err_trigger.
-> 
-> This outline format was really more useful for Michael to try to
-> generate discussion, for a commit log, I'd much rather see a definitive
-> statement such as:
-> 
->  "To maintain backwards compatibility with userspace, non-fatal errors
->  will continue to trigger via the existing error interrupt index if a
->  non-fatal signaling mechanism has not been registered."
-> 
->>    b. drivers are supposed to stop MMIO when error is reported,
->>       if vm keeps going, we will keep doing MMIO/config.
->>
->>       Suggestion 1: ignore this. vm stop happens much later when
->>       userspace runs anyway, so we are not making things much worse.
->>
->>       Suggestion 2: try to stop MMIO/config, resume on resume call
->>
->>       Patch below implements Suggestion 1.
->>
->>       Note that although this is really against the documentation, which
->>       states error_detected() is the point at which the driver should quiesce
->>       the device and not touch it further (until diagnostic poking at
->>       mmio_enabled or full access at resume callback).
->>
->>       Fixing this won't be easy. However, this is not a regression.
->>
->>       Also note this does nothing about interrupts, documentation
->>       suggests returning IRQ_NONE until reset.
->>       Again, not a regression.
-> 
-> So again, no change here.  I'm not sure what this adds to the commit
-> log, perhaps we can reference this as a link to Michael's original
-> proposal.
->  
->>    c. PF driver might detect that function is completely broken,
->>       if vm keeps going, we will keep doing MMIO/config.
->>
->>       Suggestion 1: ignore this. vm stop happens much later when
->>       userspace runs anyway, so we are not making things much worse.
->>
->>       Suggestion 2: detect this and invoke err_trigger to stop VM.
->>
->>       Patch below implements Suggestion 2.
-> 
-> This needs more description and seems a bit misleading.  This patch
-> adds a slot_reset handler, such that if the slot is reset, we notify
-> the user, essentially promoting the non-fatal error to fatal.  But what
-> condition gets us to this point?  AIUI, AER is a voting scheme and if
-> any driver affected says they need a reset, everyone gets a reset.  So
-> the PF driver we're talking about here is not vfio-pci and it's not the
-> user, the user has no way to signal that the device is completely
-> broken, this only handles the case of other collateral devices with
-> native host drivers that might signal this, right?
-> 
 
-Yes, same understanding as you, if I don't miss something from michael.
+It was introduced while introducing bdv_get_block_status. I don't know what the real
 
-> It seems like this is where this patch has the greatest exposure to
-> regressions.  If we take the VM use case, previously we could have a
-> non-AER aware guest and the hypervisor could stop the VM on all
-> errors.  Now the hypervisor might support the distinction between fatal
-> and non-fatal, but the guest may still not have AER support.  That
-> doesn't imply a problem with this approach, the user (hypervisor) would
-> be at fault for any difference in handling in that case.
-> 
+issue was that was addressed with this patch?
 
->>  
->> +static pci_ers_result_t vfio_pci_aer_slot_reset(struct pci_dev *pdev)
->> +{
->> +	struct vfio_pci_device *vdev;
->> +	struct vfio_device *device;
->> +	static pci_ers_result_t err = PCI_ERS_RESULT_NONE;
->> +
->> +	device = vfio_device_get_from_dev(&pdev->dev);
->> +	if (!device)
->> +		goto err_dev;
->> +
->> +	vdev = vfio_device_data(device);
->> +	if (!vdev)
->> +		goto err_data;
->> +
->> +	mutex_lock(&vdev->igate);
->> +
->> +	if (vdev->err_trigger)
->> +		eventfd_signal(vdev->err_trigger, 1);
-> 
-> What about the case where the user has not registered for receiving
-> non-fatal errors, now we send an error signal on both error_detected
-> and slot_reset.  Is that useful/desirable?
-> 
 
-Not desirable, but seems not harmful, guest user will stop anyway. How
-to avoid this case gracefully seems not easy.
-
--- 
-Sincerely,
-Cao jin
+Peter
