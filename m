@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cpvod-0000zm-Vj
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:49:36 -0400
+	(envelope-from <lvivier@redhat.com>) id 1cpvvD-0002EP-3S
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:56:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cpvod-0002uw-3I
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:49:36 -0400
-Date: Mon, 20 Mar 2017 19:49:26 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170320114926.GB17020@lemon.lan>
-References: <bd7cb196-0779-42ad-ce9c-5871d307adce@kamp.de>
-	<82d604c8-068a-aff4-6037-e3cd247b3588@redhat.com>
-	<819af057-3777-dffc-4670-895b8265fd01@kamp.de>
-	<d41d1428-4c8b-7e2f-b197-8d45b834776d@redhat.com>
-	<32e1e781-f0b0-ac67-a5ce-74ccc64071a0@kamp.de>
-	<20170320024649.GA18938@lemon.lan>
-	<37879546-cf6e-01fa-adc6-c777e14eab0e@redhat.com>
+	(envelope-from <lvivier@redhat.com>) id 1cpvvA-0006wB-2G
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:56:23 -0400
+References: <20170320112426.4030-1-lvivier@redhat.com>
+	<ff39e579-d77b-c538-ffee-837abdf6cc68@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <fdc71bd9-fdff-8d71-0038-1348e54b4837@redhat.com>
+Date: Mon, 20 Mar 2017 12:56:16 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <37879546-cf6e-01fa-adc6-c777e14eab0e@redhat.com>
-Subject: Re: [Qemu-devel] callout to *file in bdrv_co_get_block_status
+In-Reply-To: <ff39e579-d77b-c538-ffee-837abdf6cc68@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] numa,
+ spapr: align default numa node memory size to 256MB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +24,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Lieven <pl@kamp.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Mon, 03/20 12:21, Paolo Bonzini wrote:
+On 20/03/2017 12:31, Thomas Huth wrote:
+> On 20.03.2017 12:24, Laurent Vivier wrote:
+>> Since commit 224245b ("spapr: Add LMB DR connectors"), NUMA node
+>> memory size must be aligned to 256MB (SPAPR_MEMORY_BLOCK_SIZE).
+>>
+>> But when "-numa" option is provided without "mem" parameter,
+>> the memory is equally divided between nodes, but 8MB aligned.
+>> This can be not valid for pseries.
+>>
+>> In that case we can have:
+>> $ ./ppc64-softmmu/qemu-system-ppc64 -m 4G -numa node -numa node -numa node
+>> qemu-system-ppc64: Node 0 memory size 0x55000000 is not aligned to 256 MiB
+>>
+>> With this patch, we have:
+>> (qemu) info numa
+>> 3 nodes
+>> node 0 cpus: 0
+>> node 0 size: 1280 MB
+>> node 1 cpus:
+>> node 1 size: 1280 MB
+>> node 2 cpus:
+>> node 2 size: 1536 MB
+>>
+>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+>> ---
+>>  dtc    |  2 +-
+>>  numa.c | 14 +++++++++-----
+>>  2 files changed, 10 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/dtc b/dtc
+>> index 558cd81..fa8bc7f 160000
+>> --- a/dtc
+>> +++ b/dtc
+>> @@ -1 +1 @@
+>> -Subproject commit 558cd81bdd432769b59bff01240c44f82cfb1a9d
+>> +Subproject commit fa8bc7f928ac25f23532afc8beb2073efc8fb063
 > 
+> Accidential change?
 > 
-> On 20/03/2017 03:46, Fam Zheng wrote:
-> > On Fri, 03/17 12:20, Peter Lieven wrote:
-> >> Am 17.03.2017 um 12:16 schrieb Paolo Bonzini:
-> >>>
-> >>> On 17/03/2017 12:11, Peter Lieven wrote:
-> >>>>>> like VMDK or QCOW2 shouldn't we trust the information from the l2 tables in the VMDK or QCOW2?
-> >>>>> It provides additional information, for example it works better with
-> >>>>> prealloc=metadata.
-> >>>> Okay, understood. Can you imagine of a away to conditionally avoid this second callout? In my case we have an additional
-> >>>> lseek for each cluster. For a 20GB file this are approx. 327k calls to lseek. And if the file has no preallocated metadata
-> >>>> it will likely not improve anything. And even if the metadata is prealloced what is the allocation status of the clusters?
-> >>> If the metadata is preallocated, cluster will (or should) show up as
-> >>> zero, speeding up the copy.
-> >>
-> >> Okay, in this case the second call out to *file will not happen. It only happens if the metadata says it contains data.
-> >> So where does it actually help?
-> >>
-> >> The condition is: (ret & BDRV_BLOCK_DATA) && !(ret & BDRV_BLOCK_ZERO) && (ret & BDRV_BLOCK_OFFSET_VALID))
-> >>
-> >> So from my view it can only have any effect if the metadata returns BDRV_BLOCK_DATA, but the protocol driver returns
-> >> BDRV_BLOCK_ZERO.
-> >>
-> >> This can only happen if I partially write to a cluster, or am I wrong here?
-> > 
-> > I think you have a point. The metadata should have said BDRV_BLOCK_ZERO if
-> > protocol would say BDRV_BLOCK_ZERO - there is no reason the format driver cannot
-> > know.
+>> diff --git a/numa.c b/numa.c
+>> index e01cb54..a911284 100644
+>> --- a/numa.c
+>> +++ b/numa.c
+>> @@ -337,15 +337,19 @@ void parse_numa_opts(MachineClass *mc)
+>>          }
+>>          if (i == nb_numa_nodes) {
+>>              uint64_t usedmem = 0;
+>> -
+>> -            /* On Linux, each node's border has to be 8MB aligned,
+>> -             * the final node gets the rest.
+>> -             */
+>> +#if defined(TARGET_PPC64)
+>> +            /* pseries requests each node's border has to be 256 MB aligned */
+>> +            const uint64_t numa_mem_align_mask = ~((1 << 28UL) - 1);
+>> +#else
+>> +            /* On Linux, each node's border has to be 8MB aligned */
+>> +            const uint64_t numa_mem_align_mask = ~((1 << 23UL)  - 1);
+>> +#endif
 > 
-> That's true of qcow2, but many formats (including raw :)) don't know
-> about BDRV_BLOCK_ZERO.
+> With that #if, you enable this for all ppc machines, not just for the
+> pseries machine. So it might be cleaner to add a setting to the
+> MachineClass instead...?
+> 
 
-Raw is a little special, it could have forwarded the call to *file in its
-BlockDriver callback. Most formats with metadata stores zero/nonzero information
-in L1/L2 tables. For qcow2 and VMDK I think it's okay to just trust meta data on
-zero/nonzero.
+I will rework that. But I thought the only PPC64 machine able to boot
+with "-numa"  is pseries.
 
-Fam
+Thanks,
+Laurent
