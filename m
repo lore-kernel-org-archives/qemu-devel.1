@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36020)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cpzKC-0003vB-S3
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:34:28 -0400
+	(envelope-from <stefanha@redhat.com>) id 1cpzKI-0003yC-Gf
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:34:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cpzK6-0005lr-UW
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:34:24 -0400
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:36507)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cpzK6-0005jd-O4
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:34:18 -0400
-Received: by mail-wm0-x234.google.com with SMTP id n11so66666767wma.1
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 08:34:18 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 20 Mar 2017 15:34:38 +0000
-Message-Id: <20170320153441.2181-1-alex.bennee@linaro.org>
+	(envelope-from <stefanha@redhat.com>) id 1cpzKF-0005wq-DG
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:34:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56662)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cpzKF-0005w1-6V
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:34:27 -0400
+Date: Mon, 20 Mar 2017 15:34:21 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170320153421.GA7320@stefanha-x1.localdomain>
+References: <20170315092940.1367-1-stefanha@redhat.com>
+	<20170315092940.1367-2-stefanha@redhat.com>
+	<CAMRbyyt8DHj_-7MapWVC9G7+yOGtDra4gRiJDui68mqT9PanpQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 0/3] MTTCG regression fixes for 2.9-rc1
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="DocE+STaALJfprDB"
+Content-Disposition: inline
+In-Reply-To: <CAMRbyyt8DHj_-7MapWVC9G7+yOGtDra4gRiJDui68mqT9PanpQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [RFC v2 1/8] block: add bdrv_measure() API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,45 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, rth@twiddle.net, pbonzini@redhat.com
-Cc: qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Nir Soffer <nsoffer@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>
 
-Hi,
 
-Here are a few more fixes for regressions caused by the MTTCG merge.
-There is still one regression I'm aware of left to fix (record/replay
-breakage) but I thought it would be worth getting these posted now for
-review.
+--DocE+STaALJfprDB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Another fix for graphic artefacts has already been merged via Gerd's
-graphics tree.
+On Sat, Mar 18, 2017 at 01:28:04AM +0000, Nir Soffer wrote:
+> On Wed, Mar 15, 2017 at 11:29 AM Stefan Hajnoczi <stefanha@redhat.com>
+> wrote:
+> > diff --git a/include/block/block.h b/include/block/block.h
+> > index 5149260..43c789f 100644
+> > --- a/include/block/block.h
+> > +++ b/include/block/block.h
+> > @@ -298,6 +298,10 @@ int bdrv_truncate(BdrvChild *child, int64_t offset=
+);
+> >  int64_t bdrv_nb_sectors(BlockDriverState *bs);
+> >  int64_t bdrv_getlength(BlockDriverState *bs);
+> >  int64_t bdrv_get_allocated_file_size(BlockDriverState *bs);
+> > +void bdrv_measure(BlockDriver *drv, QemuOpts *opts,
+> > +                  BlockDriverState *in_bs,
+> > +                  BlockMeasureInfo *info,
+> >
+>=20
+> The struct declaration is missing in this patch, right?
 
-The first fix is really just for completeness. It wasn't spotted in
-the original work and while I'm not aware of a regression attached to
-it I fixed it while investigating the other bits.
+BlockMeasureInfo is generated from qapi-schema.json during the build.
 
-The user-exec fix solves the looping assert Laurent found with running
-LTP tests.
+--DocE+STaALJfprDB
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Finally the bsd-user fix is a compile tested only fix to ensure
-mmap_lock and friends do actually work. I wasn't able to complete
-building on my set-up due to an unrelated optionrom problem but I'm
-confident the MTTCG regression is addressed.
+-----BEGIN PGP SIGNATURE-----
 
-Regards,
+iQEcBAEBAgAGBQJYz/Z9AAoJEJykq7OBq3PIroYH/0MwLvvL70EldsWa9PG7Iwiq
+eIr8BqUNw4SS/g7QTf1PN70ZiJ9iOjh6UjcdBODSFJm0qEB1F8Xw7q7itAd+6S7B
+Z9Jg4upAW0wzn27ZT38xWhBgdPY/YaYX6wybsg6YgCmwm2zN/jIaiap1xgwZ7uVv
+JCwLcTQhA562Bm8LlsNK7Z0MQVKVO7/fdoV8QI4Zh7H7IJkv+GLccIGgNL+HdtAY
+prtZyY5Am5+3SQmY/Q9ZahMZn4ah3ICB6JN2yLUDBqQXYbBBHq/B7AVs3PrnJpIl
+9EThk3vV35CZKlu9Om4KWqJ/TQSF327quPB7KVDowO1PCM5Z2Mx5Klb74C84ZKU=
+=X64P
+-----END PGP SIGNATURE-----
 
-Alex.
-
-Alex Bennée (3):
-  cputlb: ensure tbl_set_dirty1 updates addr_write atomically
-  user-exec: handle synchronous signals from QEMU gracefully
-  bsd-user: align use of mmap_lock to that of linux-user
-
- bsd-user/mmap.c | 13 +------------
- bsd-user/qemu.h |  2 --
- cputlb.c        |  8 ++++++++
- user-exec.c     | 18 +++++++++++++++---
- 4 files changed, 24 insertions(+), 17 deletions(-)
-
--- 
-2.11.0
+--DocE+STaALJfprDB--
