@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cpxw5-0001CW-Bb
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 10:05:31 -0400
+	(envelope-from <stefanha@gmail.com>) id 1cpy1T-0002n1-I6
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 10:11:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cpxw4-0006m0-C5
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 10:05:25 -0400
-References: <bd7cb196-0779-42ad-ce9c-5871d307adce@kamp.de>
-	<82d604c8-068a-aff4-6037-e3cd247b3588@redhat.com>
-	<819af057-3777-dffc-4670-895b8265fd01@kamp.de>
-	<d41d1428-4c8b-7e2f-b197-8d45b834776d@redhat.com>
-	<32e1e781-f0b0-ac67-a5ce-74ccc64071a0@kamp.de>
-	<20170320024649.GA18938@lemon.lan>
-	<37879546-cf6e-01fa-adc6-c777e14eab0e@redhat.com>
-	<20170320114926.GB17020@lemon.lan>
-	<b3bf1d26-7caa-1d0d-c8a1-02f4c80e51e4@kamp.de>
-	<fc755658-8d1d-db71-1f4d-2e18f5c3c4b2@kamp.de>
-	<ff4b36e6-cf69-5b32-77b7-285adf4aaca0@redhat.com>
-	<4aa3e0fc-1176-af7d-bef9-2b881a984605@kamp.de>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f0e9decf-7b92-9218-a43f-d7d6eee10208@redhat.com>
-Date: Mon, 20 Mar 2017 15:05:17 +0100
+	(envelope-from <stefanha@gmail.com>) id 1cpy1O-0000u6-D6
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 10:10:59 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:35977)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cpy1O-0000tm-0f
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 10:10:54 -0400
+Received: by mail-wm0-x229.google.com with SMTP id n11so64575602wma.1
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 07:10:53 -0700 (PDT)
+Date: Mon, 20 Mar 2017 14:10:50 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170320141050.GX17887@stefanha-x1.localdomain>
+References: <CAKkuVugZBgy4duTUep5y6rH4qEkt7QLTQDrUOEW=MX9J=aXBrQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <4aa3e0fc-1176-af7d-bef9-2b881a984605@kamp.de>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] callout to *file in bdrv_co_get_block_status
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="b/3kIrr+SWblMf9a"
+Content-Disposition: inline
+In-Reply-To: <CAKkuVugZBgy4duTUep5y6rH4qEkt7QLTQDrUOEW=MX9J=aXBrQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] Adding our own nic model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,41 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>, Fam Zheng <famz@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+To: Shirley Kotian <shirley.kotian@gmail.com>
+Cc: qemu-devel@nongnu.org
 
 
+--b/3kIrr+SWblMf9a
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 20/03/2017 14:35, Peter Lieven wrote:
-> Am 20.03.2017 um 14:23 schrieb Paolo Bonzini:
->> On 20/03/2017 14:13, Peter Lieven wrote:
->>> Am 20.03.2017 um 13:47 schrieb Peter Lieven:
->>>> commit 5daa74a6ebce7543aaad178c4061dc087bb4c705
->>>> Author: Paolo Bonzini <pbonzini@redhat.com>
->>>> Date:   Wed Sep 4 19:00:38 2013 +0200
->>>>
->>>>     block: look for zero blocks in bs->file
->>>>    
->>>>     Reviewed-by: Eric Blake <eblake@redhat.com>
->>>>     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->>>>     Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
->>>>
->>>>
->>>> It was introduced while introducing bdv_get_block_status. I don't know what the real
->>>>
->>>> issue was that was addressed with this patch?
->>> Is it possible that this optimization was added especially for RAW? I was believing that
->>> raw would forward the get_block_status call to bs->file, but it looks it doesn't.
->>> If this one here was for RAW would it be an option to move this callout to the raw-format driver
->>> and remove it from the generic code?
->> It was meant for both raw and qcow2.
-> 
-> Okay, but as Fam mentioned qcow2 Metadata should know that a cluster is zero. Do you remember
-> what the issue was?
+On Thu, Mar 16, 2017 at 05:46:03PM +0530, Shirley Kotian wrote:
+> We are working on a project in QEMU wherein we want to add our own nic
+> model userio. Can you please tell us how to go about it.
 
-I said that already---preallocated metadata.  Also, at the time
-pre-qcow2v3 was more important.
+It's hard to answer the question without more details.
 
-Are you using libiscsi, block devices or files?
+If you want to connect a software switch to QEMU then the vhost-user
+virtio-net interface is a better choice than trying to add a new NIC
+model.
 
-Paolo
+Stefan
+
+--b/3kIrr+SWblMf9a
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYz+LqAAoJEJykq7OBq3PIHlkIAKSzNJmTruA92vsTd3hJ8ecR
+ygnjZC7jeDJenZyC8fAQxlh0K0Z+KdQLSjQTefhViiTrUN/+3YqIbL9HkLxJaGFl
+gwR9dy9Nvx74dNqW0iM2LruCZ0I0hda0erf68oOPhwT9kg+IO6zSWvAtlQW1OZEC
+w2qst4bwD8Zy5p6EdEueCiQNYt2CAYY172dYddnhRZtmntWWp1ge83/jJfZ4F30x
+5QJTIhIMA2ZPOd91FTbgNemwqIBUzH7ZY+kQg/fzvcjv3SWSVwnqwiux6v21R6GN
+VP9/iFLlfa8zS1S1j7ES4F6NESHDR/1krBGpArE/c4h4ldY/9ScRxj2xOIRSOTI=
+=mA6c
+-----END PGP SIGNATURE-----
+
+--b/3kIrr+SWblMf9a--
