@@ -1,36 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6Qb-0001YO-Io
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:35 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6Qh-0001dt-5W
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6QX-0004p2-9G
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:29 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39616
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6Qb-0004s8-7f
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:33 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39881
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cq6QX-0004oC-0c
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:25 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	id 1cq6Qb-0004rf-0l
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:29 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2KN8akD119426
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:24 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 29ajfe8njr-1
+	v2KN8Wi1028710
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:28 -0400
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 29amb5t77d-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:24 -0400
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:28 -0400
 Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 20 Mar 2017 19:09:23 -0400
+	Mon, 20 Mar 2017 17:09:27 -0600
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 20 Mar 2017 18:07:48 -0500
+Date: Mon, 20 Mar 2017 18:07:26 -0500
 In-Reply-To: <1490051325-3770-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1490051325-3770-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1490051325-3770-25-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 24/81] 9pfs: local: symlink: don't follow
- symlinks
+Message-Id: <1490051325-3770-3-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 02/81] 9pfs: remove side-effects in local_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,166 +43,73 @@ Cc: qemu-stable@nongnu.org, Greg Kurz <groug@kaod.org>, Greg Kurz <gkurz@linux.v
 
 From: Greg Kurz <groug@kaod.org>
 
-The local_symlink() callback is vulnerable to symlink attacks because it
-calls:
-
-(1) symlink() which follows symbolic links for all path elements but the
-    rightmost one
-(2) open(O_NOFOLLOW) which follows symbolic links for all path elements but
-    the rightmost one
-(3) local_set_xattr()->setxattr() which follows symbolic links for all
-    path elements
-(4) local_set_mapped_file_attr() which calls in turn local_fopen() and
-    mkdir(), both functions following symbolic links for all path
-    elements but the rightmost one
-
-This patch converts local_symlink() to rely on opendir_nofollow() and
-symlinkat() to fix (1), openat(O_NOFOLLOW) to fix (2), as well as
-local_set_xattrat() and local_set_mapped_file_attrat() to fix (3) and
-(4) respectively.
-
-This partly fixes CVE-2016-9602.
+If this function fails, it should not modify *ctx.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-(cherry picked from commit 38771613ea6759f499645afd709aa422161eb27e)
+(cherry picked from commit 00c90bd1c2ff6aabb9ca948a254ba044a403e399)
 Signed-off-by: Greg Kurz <gkurz@linux.vnet.ibm.com>
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/9pfs/9p-local.c | 81 +++++++++++++++++-------------------------------------
- 1 file changed, 25 insertions(+), 56 deletions(-)
+ hw/9pfs/9p-local.c | 37 +++++++++++++++++++------------------
+ 1 file changed, 19 insertions(+), 18 deletions(-)
 
 diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index 8a97fe9..2bb77e2 100644
+index 845675e..c88158f 100644
 --- a/hw/9pfs/9p-local.c
 +++ b/hw/9pfs/9p-local.c
-@@ -979,23 +979,22 @@ static int local_symlink(FsContext *fs_ctx, const char *oldpath,
-                          V9fsPath *dir_path, const char *name, FsCred *credp)
- {
-     int err = -1;
--    int serrno = 0;
--    char *newpath;
--    V9fsString fullname;
--    char *buffer = NULL;
-+    int dirfd;
+@@ -1169,9 +1169,25 @@ static int local_ioc_getversion(FsContext *ctx, V9fsPath *path,
  
--    v9fs_string_init(&fullname);
--    v9fs_string_sprintf(&fullname, "%s/%s", dir_path->data, name);
--    newpath = fullname.data;
-+    dirfd = local_opendir_nofollow(fs_ctx, dir_path->data);
-+    if (dirfd == -1) {
+ static int local_init(FsContext *ctx)
+ {
+-    int err = 0;
+     struct statfs stbuf;
+ 
++#ifdef FS_IOC_GETVERSION
++    /*
++     * use ioc_getversion only if the ioctl is definied
++     */
++    if (statfs(ctx->fs_root, &stbuf) < 0) {
 +        return -1;
 +    }
- 
-     /* Determine the security model */
--    if (fs_ctx->export_flags & V9FS_SM_MAPPED) {
-+    if (fs_ctx->export_flags & V9FS_SM_MAPPED ||
-+        fs_ctx->export_flags & V9FS_SM_MAPPED_FILE) {
-         int fd;
-         ssize_t oldpath_size, write_size;
--        buffer = rpath(fs_ctx, newpath);
--        fd = open(buffer, O_CREAT|O_EXCL|O_RDWR|O_NOFOLLOW, SM_LOCAL_MODE_BITS);
++    switch (stbuf.f_type) {
++    case EXT2_SUPER_MAGIC:
++    case BTRFS_SUPER_MAGIC:
++    case REISERFS_SUPER_MAGIC:
++    case XFS_SUPER_MAGIC:
++        ctx->exops.get_st_gen = local_ioc_getversion;
++        break;
++    }
++#endif
 +
-+        fd = openat_file(dirfd, name, O_CREAT | O_EXCL | O_RDWR,
-+                         SM_LOCAL_MODE_BITS);
-         if (fd == -1) {
--            err = fd;
-             goto out;
-         }
-         /* Write the oldpath (target) to the file. */
-@@ -1003,78 +1002,48 @@ static int local_symlink(FsContext *fs_ctx, const char *oldpath,
-         do {
-             write_size = write(fd, (void *)oldpath, oldpath_size);
-         } while (write_size == -1 && errno == EINTR);
-+        close_preserve_errno(fd);
- 
-         if (write_size != oldpath_size) {
--            serrno = errno;
--            close(fd);
--            err = -1;
-             goto err_end;
-         }
--        close(fd);
-         /* Set cleint credentials in symlink's xattr */
--        credp->fc_mode = credp->fc_mode|S_IFLNK;
--        err = local_set_xattr(buffer, credp);
--        if (err == -1) {
--            serrno = errno;
--            goto err_end;
--        }
--    } else if (fs_ctx->export_flags & V9FS_SM_MAPPED_FILE) {
--        int fd;
--        ssize_t oldpath_size, write_size;
--        buffer = rpath(fs_ctx, newpath);
--        fd = open(buffer, O_CREAT|O_EXCL|O_RDWR|O_NOFOLLOW, SM_LOCAL_MODE_BITS);
--        if (fd == -1) {
--            err = fd;
--            goto out;
--        }
--        /* Write the oldpath (target) to the file. */
--        oldpath_size = strlen(oldpath);
--        do {
--            write_size = write(fd, (void *)oldpath, oldpath_size);
--        } while (write_size == -1 && errno == EINTR);
-+        credp->fc_mode = credp->fc_mode | S_IFLNK;
- 
--        if (write_size != oldpath_size) {
--            serrno = errno;
--            close(fd);
--            err = -1;
--            goto err_end;
-+        if (fs_ctx->export_flags & V9FS_SM_MAPPED) {
-+            err = local_set_xattrat(dirfd, name, credp);
-+        } else {
-+            err = local_set_mapped_file_attrat(dirfd, name, credp);
-         }
--        close(fd);
--        /* Set cleint credentials in symlink's xattr */
--        credp->fc_mode = credp->fc_mode|S_IFLNK;
--        err = local_set_mapped_file_attr(fs_ctx, newpath, credp);
-         if (err == -1) {
--            serrno = errno;
-             goto err_end;
-         }
--    } else if ((fs_ctx->export_flags & V9FS_SM_PASSTHROUGH) ||
--               (fs_ctx->export_flags & V9FS_SM_NONE)) {
--        buffer = rpath(fs_ctx, newpath);
--        err = symlink(oldpath, buffer);
-+    } else if (fs_ctx->export_flags & V9FS_SM_PASSTHROUGH ||
-+               fs_ctx->export_flags & V9FS_SM_NONE) {
-+        err = symlinkat(oldpath, dirfd, name);
-         if (err) {
-             goto out;
-         }
--        err = lchown(buffer, credp->fc_uid, credp->fc_gid);
-+        err = fchownat(dirfd, name, credp->fc_uid, credp->fc_gid,
-+                       AT_SYMLINK_NOFOLLOW);
-         if (err == -1) {
-             /*
-              * If we fail to change ownership and if we are
-              * using security model none. Ignore the error
-              */
-             if ((fs_ctx->export_flags & V9FS_SEC_MASK) != V9FS_SM_NONE) {
--                serrno = errno;
-                 goto err_end;
--            } else
-+            } else {
-                 err = 0;
-+            }
-         }
+     if (ctx->export_flags & V9FS_SM_PASSTHROUGH) {
+         ctx->xops = passthrough_xattr_ops;
+     } else if (ctx->export_flags & V9FS_SM_MAPPED) {
+@@ -1186,23 +1202,8 @@ static int local_init(FsContext *ctx)
+         ctx->xops = passthrough_xattr_ops;
      }
-     goto out;
- 
- err_end:
--    remove(buffer);
--    errno = serrno;
-+    unlinkat_preserve_errno(dirfd, name, 0);
- out:
--    g_free(buffer);
--    v9fs_string_free(&fullname);
-+    close_preserve_errno(dirfd);
-     return err;
+     ctx->export_flags |= V9FS_PATHNAME_FSCONTEXT;
+-#ifdef FS_IOC_GETVERSION
+-    /*
+-     * use ioc_getversion only if the iocl is definied
+-     */
+-    err = statfs(ctx->fs_root, &stbuf);
+-    if (!err) {
+-        switch (stbuf.f_type) {
+-        case EXT2_SUPER_MAGIC:
+-        case BTRFS_SUPER_MAGIC:
+-        case REISERFS_SUPER_MAGIC:
+-        case XFS_SUPER_MAGIC:
+-            ctx->exops.get_st_gen = local_ioc_getversion;
+-            break;
+-        }
+-    }
+-#endif
+-    return err;
++
++    return 0;
  }
  
+ static int local_parse_opts(QemuOpts *opts, struct FsDriverEntry *fse)
 -- 
 2.7.4
