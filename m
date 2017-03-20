@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cpwqs-00005d-Kl
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 08:55:59 -0400
+	(envelope-from <armbru@redhat.com>) id 1cpwqs-00005s-TI
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 08:56:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cpwqr-0005Lp-Bm
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 08:55:58 -0400
+	(envelope-from <armbru@redhat.com>) id 1cpwqr-0005Mb-MM
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 08:55:59 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 20 Mar 2017 13:55:46 +0100
-Message-Id: <1490014548-15083-4-git-send-email-armbru@redhat.com>
+Date: Mon, 20 Mar 2017 13:55:45 +0100
+Message-Id: <1490014548-15083-3-git-send-email-armbru@redhat.com>
 In-Reply-To: <1490014548-15083-1-git-send-email-armbru@redhat.com>
 References: <1490014548-15083-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.9 3/5] test-keyval: Cover alternate and
- 'any' type
+Subject: [Qemu-devel] [PATCH for-2.9 2/5] keyval: Improve some comments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,100 +24,83 @@ Cc: qemu-block@nongnu.org, kwolf@redhat.com, eblake@redhat.com
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/Makefile.include |  2 +-
- tests/test-keyval.c    | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 54 insertions(+), 1 deletion(-)
+ util/keyval.c | 47 +++++++++++++++++++++++++++++++----------------
+ 1 file changed, 31 insertions(+), 16 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 402e71c..86f9490 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -736,7 +736,7 @@ tests/vhost-user-test$(EXESUF): tests/vhost-user-test.o $(test-util-obj-y) \
- 	$(chardev-obj-y)
- tests/qemu-iotests/socket_scm_helper$(EXESUF): tests/qemu-iotests/socket_scm_helper.o
- tests/test-qemu-opts$(EXESUF): tests/test-qemu-opts.o $(test-util-obj-y)
--tests/test-keyval$(EXESUF): tests/test-keyval.o $(test-util-obj-y)
-+tests/test-keyval$(EXESUF): tests/test-keyval.o $(test-util-obj-y) $(test-qapi-obj-y)
- tests/test-write-threshold$(EXESUF): tests/test-write-threshold.o $(test-block-obj-y)
- tests/test-netfilter$(EXESUF): tests/test-netfilter.o $(qtest-obj-y)
- tests/test-filter-mirror$(EXESUF): tests/test-filter-mirror.o $(qtest-obj-y)
-diff --git a/tests/test-keyval.c b/tests/test-keyval.c
-index e97f6d5..ba19560 100644
---- a/tests/test-keyval.c
-+++ b/tests/test-keyval.c
-@@ -14,6 +14,7 @@
- #include "qapi/error.h"
- #include "qapi/qmp/qstring.h"
- #include "qapi/qobject-input-visitor.h"
-+#include "test-qapi-visit.h"
- #include "qemu/cutils.h"
- #include "qemu/option.h"
+diff --git a/util/keyval.c b/util/keyval.c
+index f646b36..46cd540 100644
+--- a/util/keyval.c
++++ b/util/keyval.c
+@@ -21,22 +21,36 @@
+  *
+  * Semantics defined by reduction to JSON:
+  *
+- *   key-vals is a tree of objects and arrays rooted at object R
+- *   where for each key-val = key-fragment . ... = val in key-vals
+- *       R op key-fragment op ... = val'
+- *       where (left-associative) op is
+- *                 array subscript L[key-fragment] for numeric key-fragment
+- *                 member reference L.key-fragment otherwise
+- *             val' is val with ',,' replaced by ','
+- *   and only R may be empty.
++ *   key-vals specifies a JSON object, i.e. a tree whose root is an
++ *   object, inner nodes other than the root are objects or arrays,
++ *   and leaves are strings.
+  *
+- *   Duplicate keys are permitted; all but the last one are ignored.
++ *   Each key-val = key-fragment '.' ... '=' val specifies a path from
++ *   root to a leaf (left of '='), and the leaf's value (right of
++ *   '=').
+  *
+- *   The equations must have a solution.  Counter-example: a.b=1,a=2
+- *   doesn't have one, because R.a must be an object to satisfy a.b=1
+- *   and a string to satisfy a=2.
++ *   A path from the root is defined recursively:
++ *       L '.' key-fragment is a child of the node denoted by path L
++ *       key-fragment is a child of the tree root
++ *   If key-fragment is numeric, the parent is an array and the child
++ *   is its key-fragment-th member, counting from zero.
++ *   Else, the parent is an object, and the child is its member named
++ *   key-fragment.
+  *
+- * Key-fragments must be valid QAPI names or consist only of digits.
++ *   This constrains inner nodes to be either array or object.  The
++ *   constraints must be satisfiable.  Counter-example: a.b=1,a=2 is
++ *   not, because root.a must be an object to satisfy a.b=1 and a
++ *   string to satisfy a=2.
++ *
++ *   Array subscripts can occur in any order, but the set of
++ *   subscripts must not have gaps.  For instance, a.1=v is not okay,
++ *   because root.a[0] is missing.
++ *
++ *   If multiple key-val denote the same leaf, the last one determines
++ *   the value.
++ *
++ * Key-fragments must be valid QAPI names or consist only of decimal
++ * digits.
+  *
+  * The length of any key-fragment must be between 1 and 127.
+  *
+@@ -64,8 +78,8 @@
  
-@@ -608,6 +609,56 @@ static void test_keyval_visit_optional(void)
-     visit_free(v);
- }
+ /*
+  * Convert @key to a list index.
+- * Convert all leading digits to a (non-negative) number, capped at
+- * INT_MAX.
++ * Convert all leading decimal digits to a (non-negative) number,
++ * capped at INT_MAX.
+  * If @end is non-null, assign a pointer to the first character after
+  * the number to *@end.
+  * Else, fail if any characters follow.
+@@ -337,7 +351,8 @@ static QObject *keyval_listify(QDict *cur, GSList *key_of_cur, Error **errp)
+     }
  
-+static void test_keyval_visit_alternate(void)
-+{
-+    Error *err = NULL;
-+    Visitor *v;
-+    QDict *qdict;
-+    AltNumStr *ans;
-+    AltNumInt *ani;
-+
-+    /*
-+     * Can't do scalar alternate variants other than string.  You get
-+     * the string variant if there is one, else an error.
-+     */
-+    qdict = keyval_parse("a=1,b=2", NULL, &error_abort);
-+    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    QDECREF(qdict);
-+    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-+    visit_type_AltNumStr(v, "a", &ans, &error_abort);
-+    g_assert_cmpint(ans->type, ==, QTYPE_QSTRING);
-+    g_assert_cmpstr(ans->u.s, ==, "1");
-+    visit_type_AltNumInt(v, "a", &ani, &err);
-+    error_free_or_abort(&err);
-+    visit_end_struct(v, NULL);
-+    visit_free(v);
-+}
-+
-+static void test_keyval_visit_any(void)
-+{
-+    Visitor *v;
-+    QDict *qdict;
-+    QObject *any;
-+    QList *qlist;
-+    QString *qstr;
-+
-+    qdict = keyval_parse("a.0=null,a.1=1", NULL, &error_abort);
-+    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    QDECREF(qdict);
-+    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-+    visit_type_any(v, "a", &any, &error_abort);
-+    qlist = qobject_to_qlist(any);
-+    g_assert(qlist);
-+    qstr = qobject_to_qstring(qlist_pop(qlist));
-+    g_assert_cmpstr(qstring_get_str(qstr), ==, "null");
-+    qstr = qobject_to_qstring(qlist_pop(qlist));
-+    g_assert_cmpstr(qstring_get_str(qstr), ==, "1");
-+    g_assert(qlist_empty(qlist));
-+    visit_check_struct(v, &error_abort);
-+    visit_end_struct(v, NULL);
-+    visit_free(v);
-+}
-+
- int main(int argc, char *argv[])
- {
-     g_test_init(&argc, &argv, NULL);
-@@ -619,6 +670,8 @@ int main(int argc, char *argv[])
-     g_test_add_func("/keyval/visit/dict", test_keyval_visit_dict);
-     g_test_add_func("/keyval/visit/list", test_keyval_visit_list);
-     g_test_add_func("/keyval/visit/optional", test_keyval_visit_optional);
-+    g_test_add_func("/keyval/visit/alternate", test_keyval_visit_alternate);
-+    g_test_add_func("/keyval/visit/any", test_keyval_visit_any);
-     g_test_run();
-     return 0;
- }
+     /*
+-     * Make a list from @elt[], reporting any missing elements.
++     * Make a list from @elt[], reporting the first missing element,
++     * if any.
+      * If we dropped an index >= nelt in the previous loop, this loop
+      * will run into the sentinel and report index @nelt missing.
+      */
 -- 
 2.7.4
