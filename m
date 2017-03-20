@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cpkav-0001KG-8W
-	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 19:50:42 -0400
+	(envelope-from <haozhong.zhang@intel.com>) id 1cpkwb-000519-Rm
+	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 20:13:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cpkaq-0007Rc-C3
-	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 19:50:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52228)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cpkaq-0007Qe-5s
-	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 19:50:36 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cpkap-0001Dw-2o
-	for <qemu-devel@nongnu.org>; Sun, 19 Mar 2017 23:50:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F12BE2E80C1
-	for <qemu-devel@nongnu.org>; Sun, 19 Mar 2017 23:50:34 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 19 Mar 2017 23:41:03 -0000
-From: James Clarke <jrtc27@jrtc27.com>
-Reply-To: Bug 1643619 <1643619@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20161121164013.8062.14361.malonedeb@soybean.canonical.com>
-Message-Id: <20170319234103.18157.22597.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1643619] Re: netlink broken on big-endian mips
+	(envelope-from <haozhong.zhang@intel.com>) id 1cpkwY-0004uO-Mx
+	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 20:13:05 -0400
+Received: from mga02.intel.com ([134.134.136.20]:9278)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
+	id 1cpkwY-0004u9-CO
+	for qemu-devel@nongnu.org; Sun, 19 Mar 2017 20:13:02 -0400
+From: Haozhong Zhang <haozhong.zhang@intel.com>
+Date: Mon, 20 Mar 2017 08:12:39 +0800
+Message-Id: <20170320001249.25521-1-haozhong.zhang@intel.com>
+Subject: [Qemu-devel] [RFC QEMU PATCH v2 00/10] Implement vNVDIMM for Xen
+ HVM guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,70 +23,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, xen-devel@lists.xen.org
+Cc: Konrad Rzeszutek Wilk <konrad@darnok.org>, Dan Williams <dan.j.williams@intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Xiao Guangrong <guangrong.xiao@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-This has been fixed by 40493c5f2b0f124c9b2581e539bba14522e51269, which
-is exactly the same diff as given here.
+This is the QEMU patch of v2 RFC patch series to enable vNVDIMM
+support for Xen HVM guest. v1 can be found at
+https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg01678.html.
 
-** Changed in: qemu
-       Status: New =3D> Fix Committed
+The corresponding Xen patch series is sent in another thread
+"[RFC XEN PATCH v2 00/15] Add vNVDIMM support to HVM domains".
 
--- =
+All patch series can be found at
+  Xen:  https://github.com/hzzhan9/xen.git nvdimm-rfc-v2
+  Qemu: https://github.com/hzzhan9/qemu.git xen-nvdimm-rfc-v2
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1643619
 
-Title:
-  netlink broken on big-endian mips
+Patch 1 is to avoid dereferencing the NULL pointer to non-existing
+label data, as the Xen side support for labels is not implemented yet.
 
-Status in QEMU:
-  Fix Committed
+Patch 2 - 7 build and cooy NFIT from QEMU to Xen guest, when QEMU is
+used as the Xen device model.
 
-Bug description:
-  Debian QEMU version 2.7.0, but the bug also appears in current git
-  master (commit c36ed06e9159)
+Patch 8 & 9 add a memory backend dedicated for Xen usage and a hotplug
+memory region for Xen guest, in order to make the existing nvdimm
+device plugging path work on Xen.
 
-  As the summary says, netlink is completely broken on big-endian mips
-  running qemu-user.
+Patch 10 extends the the existing qmp command "query-memory-device" to
+return information of NVDIMM devices required by Xen.
 
-  Running 'ip route' from within a Debian chroot with QEMU simply hangs.
-  Running amd64 strace on qemu-mips-static shows that it's waiting for a
-  netlink response from the kernel which never comes.
+Haozhong Zhang (10):
+  01/10 nvdimm xen: disable label support on Xen
+  02/10 xen-hvm: initialize DM ACPI
+  03/10 xen-hvm: support copying ACPI to guest memory
+  04/10 nvdimm acpi: do not use fw_cfg on Xen
+  05/10 nvdimm acpi: copy NFIT to Xen guest
+  06/10 nvdimm acpi: build and copy NVDIMM namespace devices to guest on Xen
+  07/10 xen-hvm: enable building DM ACPI on i386 machine
+  08/10 hostmem: add a host memory backend for Xen
+  09/10 xen-hvm: create hotplug memory region on Xen
+  10/10 qapi: extend 'query-memory-devices' to list devices of specified type
 
-  [...]
-  [pid 11249] socket(AF_NETLINK, SOCK_RAW|SOCK_CLOEXEC, NETLINK_ROUTE) =3D 3
-  [pid 11249] setsockopt(3, SOL_SOCKET, SO_SNDBUF, [32768], 4) =3D 0
-  [pid 11249] setsockopt(3, SOL_SOCKET, SO_RCVBUF, [1048576], 4) =3D 0
-  [pid 11249] bind(3, {sa_family=3DAF_NETLINK, nl_pid=3D0, nl_groups=3D0000=
-0000}, 12) =3D 0
-  [pid 11249] getsockname(3, {sa_family=3DAF_NETLINK, nl_pid=3D11249, nl_gr=
-oups=3D00000000}, [12]) =3D 0
-  [pid 11249] time([1479745823])          =3D 1479745823
-  [pid 11249] sendto(3, {{len=3D671088640, type=3D0x1a00 /* NLMSG_??? */, f=
-lags=3DNLM_F_REQUEST|NLM_F_MULTI|0x100, seq=3D539046744, pid=3D0}, "\2\0\0\=
-0\0\0\0\0\0\0\0\0\0\0\0\0\0\10\0\35\0\0\0\1"}, 40, 0, NULL, 0) =3D 40
-  [pid 11249] recvmsg(3,
+ backends/Makefile.objs   |   1 +
+ backends/hostmem-xen.c   | 121 ++++++++++++++++++++++++++++
+ backends/hostmem.c       |   8 ++
+ hmp.c                    |   3 +-
+ hw/acpi/aml-build.c      |   9 ++-
+ hw/acpi/nvdimm.c         |  67 +++++++++++-----
+ hw/i386/pc.c             |  98 ++++++++++++-----------
+ hw/mem/nvdimm.c          |  44 ++++++++++-
+ hw/mem/pc-dimm.c         |  76 +++++++++++-------
+ include/hw/i386/pc.h     |   1 +
+ include/hw/mem/nvdimm.h  |   2 +
+ include/hw/mem/pc-dimm.h |   1 +
+ include/hw/xen/xen.h     |  20 +++++
+ qapi-schema.json         |  48 ++++++++++-
+ qmp.c                    |  13 ++-
+ xen-hvm-stub.c           |  10 +++
+ xen-hvm.c                | 202 +++++++++++++++++++++++++++++++++++++++++++++++
+ 17 files changed, 620 insertions(+), 104 deletions(-)
+ create mode 100644 backends/hostmem-xen.c
 
-  Notice the len in the buffer passed to the kernel is 0x28000000 which
-  looks byteswapped.
-
-  Removing the call to fd_trans_unregister in the NR_socket syscall in
-  do_syscall fixes this for me, but I don't understand why the fd
-  translation was immediately unregistered after being registered just
-  before in do_socket - presumably it was added for a reason.
-
-  --- a/linux-user/syscall.c
-  +++ b/linux-user/syscall.c
-  @@ -9331,7 +9331,6 @@ abi_long do_syscall(void *cpu_env, int num, abi_lon=
-g arg1,
-   #ifdef TARGET_NR_socket
-       case TARGET_NR_socket:
-           ret =3D do_socket(arg1, arg2, arg3);
-  -        fd_trans_unregister(ret);
-           break;
-   #endif
-   #ifdef TARGET_NR_socketpair
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1643619/+subscriptions
+-- 
+2.12.0
