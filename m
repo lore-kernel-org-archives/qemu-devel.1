@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cpv2F-0005ry-0F
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 06:59:35 -0400
+	(envelope-from <stefanha@gmail.com>) id 1cpv3I-0006W3-1P
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:00:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cpv2B-00041x-Vx
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 06:59:35 -0400
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:36429)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cpv2B-00041V-Ph
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 06:59:31 -0400
-Received: by mail-wm0-x22e.google.com with SMTP id n11so60121066wma.1
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 03:59:31 -0700 (PDT)
-References: <1487616072-9226-1-git-send-email-peter.maydell@linaro.org>
-	<1487616072-9226-4-git-send-email-peter.maydell@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1487616072-9226-4-git-send-email-peter.maydell@linaro.org>
-Date: Mon, 20 Mar 2017 10:59:54 +0000
-Message-ID: <87o9wwnrh1.fsf@linaro.org>
+	(envelope-from <stefanha@gmail.com>) id 1cpv3F-0004ul-0a
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:00:40 -0400
+Date: Mon, 20 Mar 2017 11:00:23 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170320110023.GH17887@stefanha-x1.localdomain>
+References: <20170313214001.26339-1-mreitz@redhat.com>
+	<20170313214045.26857-5-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 3/4] arm: Enforce should-be-1 bits in MRS
- decoding
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="LZFKeWUZP29EKQNE"
+Content-Disposition: inline
+In-Reply-To: <20170313214045.26857-5-mreitz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 07/16] block/file-posix:
+ Generalize raw_regular_truncate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,62 +25,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Michael Davidsaver <mdavidsaver@gmail.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+--LZFKeWUZP29EKQNE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> The MRS instruction requires that bits [19..16] are all 1s, and for
-> A/R profile also that bits [7..0] are all 0s.  At this point in the
-> decode tree we have checked all of the rest of the instruction but
-> were allowing these to be any value.  If these bits are not set then
-> the result is architecturally UNPREDICTABLE, but choosing to UNDEF is
-> more helpful to the user and avoids unexpected odd behaviour if the
-> encodings are used for some purpose in future architecture versions.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-
-
+On Mon, Mar 13, 2017 at 10:40:36PM +0100, Max Reitz wrote:
+> Currently, raw_regular_truncate() is intended for setting the size of a
+> newly created file. However, we also want to use it for truncating an
+> existing file in which case only the newly added space (when growing)
+> should be preallocated.
+>=20
+> This also means that if resizing failed, we should try to restore the
+> original file size. This is important when using preallocation.
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  target/arm/translate.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
->
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index 0f8548f..9090356 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -10498,6 +10498,14 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
->                              break;
->                          }
->
-> +                        if (extract32(insn, 16, 4) != 0xf) {
-> +                            goto illegal_op;
-> +                        }
-> +                        if (!arm_dc_feature(s, ARM_FEATURE_M) &&
-> +                            extract32(insn, 0, 8) != 0) {
-> +                            goto illegal_op;
-> +                        }
-> +
->                          /* mrs cpsr */
->                          tmp = tcg_temp_new_i32();
->                          if (arm_dc_feature(s, ARM_FEATURE_M)) {
-> @@ -10525,6 +10533,12 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
->                          if (IS_USER(s) || arm_dc_feature(s, ARM_FEATURE_M)) {
->                              goto illegal_op;
->                          }
-> +
-> +                        if (extract32(insn, 16, 4) != 0xf ||
-> +                            extract32(insn, 0, 8) != 0) {
-> +                            goto illegal_op;
-> +                        }
-> +
->                          tmp = load_cpu_field(spsr);
->                          store_reg(s, rd, tmp);
->                          break;
+>  block/file-posix.c | 73 ++++++++++++++++++++++++++++++++++++++++++++----=
+------
+>  1 file changed, 60 insertions(+), 13 deletions(-)
+>=20
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 35a9e43f3e..cd229324ba 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -1384,11 +1384,39 @@ static void raw_close(BlockDriverState *bs)
+>      }
+>  }
+> =20
+> -static int raw_regular_truncate(int fd, int64_t offset, PreallocMode pre=
+alloc,
+> +/**
+> + * Truncates the given regular file @fd to @offset and, when growing, fi=
+lls the
+> + * new space according to @prealloc.
+> + *
+> + * @create must be true iff the file is new. In that case, @bs is ignore=
+d. If
+> + * @create is false, @bs must be valid and correspond to the same file a=
+s @fd.
 
+Returns: 0 on success, -errno on failure.
 
---
-Alex Bennée
+> + */
+> +static int raw_regular_truncate(int fd, BlockDriverState *bs, int64_t of=
+fset,
+
+The presence of both a file descriptor and a BlockDriverState (actually
+it must be a BDRVRawState) arguments is unusual.  It seems bs is needed
+for bdrv_getlength().
+
+How about using fstat(fd, &st) and then dropping bs and create?
+
+> +                                PreallocMode prealloc, bool create,
+>                                  Error **errp)
+>  {
+>      int result =3D 0;
+> -    char *buf;
+> +    int64_t current_length =3D 0;
+> +    char *buf =3D NULL;
+> +
+> +    assert(create || bs);
+> +    if (!create) {
+> +        BDRVRawState *s =3D bs->opaque;
+> +        assert(s->fd =3D=3D fd);
+> +    }
+> +
+> +    if (!create) {
+> +        current_length =3D bdrv_getlength(bs);
+> +        if (current_length < 0) {
+> +            error_setg_errno(errp, -current_length,
+> +                             "Could not inquire current length");
+> +            return -current_length;
+> +        }
+> +
+> +        if (current_length > offset && prealloc !=3D PREALLOC_MODE_OFF) {
+> +            return -ENOTSUP;
+> +        }
+
+Missing error_setg().
+
+--LZFKeWUZP29EKQNE
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYz7ZHAAoJEJykq7OBq3PITDkIAMD8VnbSSSXOaEciALHPk9TO
+p1gftaqE7Ny5OXVFK4oMg1bngGjcdnggAqB9riQVqIUDkPF4xWtNi5HEzCyQ6aYj
+iER/eFXvbD5XC5Bo0ycGVcz0rkHSJqpgiy/Hy4jhexq6kw6oA6I1XfpzwboZuU7+
+/qkUoy/frjdRwPLv+yCHFKeod2Io+GyTWrHwlLCKtdmh5cRq7lk04o+e+gMMx7MB
+GKDtjYBWGTEhoiKiEKZv/PeDyn5qRWF3BZ1n+q0k2lhm+NRV7KiZB1c1ZVEQ+DdE
+lWh3oXfEiVwXQm0HoiI5xUdULQf+2z93rHD4uMIjeCYcyLfm+h49p24MZHkPuYw=
+=j+ft
+-----END PGP SIGNATURE-----
+
+--LZFKeWUZP29EKQNE--
