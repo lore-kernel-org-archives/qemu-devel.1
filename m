@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6Qr-0001qT-IZ
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:54 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6Qh-0001dw-5s
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6Qm-00054p-IV
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:45 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45262
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6Qc-0004tO-8k
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:34 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34947)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cq6Qm-00054T-AL
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:40 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2KN8pVa008175
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:39 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 29afu7a87k-1
+	id 1cq6Qb-0004sC-VL
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:30 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2KN8lol025636
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:29 -0400
+Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 29ae098ud1-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:39 -0400
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:28 -0400
 Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 20 Mar 2017 19:09:39 -0400
+	Mon, 20 Mar 2017 17:09:28 -0600
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 20 Mar 2017 18:08:17 -0500
+Date: Mon, 20 Mar 2017 18:07:59 -0500
 In-Reply-To: <1490051325-3770-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1490051325-3770-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1490051325-3770-54-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 53/81] virtio: fix up max size checks
+Message-Id: <1490051325-3770-36-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 35/81] machine: Convert abstract typename on
+ compat_props to subclass names
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,89 +39,115 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-stable@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 
-From: "Michael S. Tsirkin" <mst@redhat.com>
+From: Eduardo Habkost <ehabkost@redhat.com>
 
-Coverity reports that ARRAY_SIZE(elem->out_sg) (and all the others too)
-is wrong because elem->out_sg is a pointer.
+Original problem description by Greg Kurz:
 
-However, the check is not in the right place and the max_size argument
-of virtqueue_map_iovec can be removed.  The check on in_num/out_num
-should be moved to qemu_get_virtqueue_element instead, before the call
-to virtqueue_alloc_element.
+> Since commit "9a4c0e220d8a hw/virtio-pci: fix virtio
+> behaviour", passing -device virtio-blk-pci.disable-modern=off
+> has no effect on 2.6 machine types because the internal
+> virtio-pci.disable-modern=on compat property always prevail.
 
-Cc: qemu-stable@nongnu.org
-Reported-by: Paolo Bonzini <pbonzini@redhat.com>
-Fixes: 3724650db07057333879484c8bc7d900b5c1bf8e ("virtio: introduce virtqueue_alloc_element")
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+The same bug also affects other abstract type names mentioned on
+compat_props by machine-types: apic-common, i386-cpu, pci-device,
+powerpc64-cpu, s390-skeys, spapr-pci-host-bridge, usb-device,
+virtio-pci, x86_64-cpu.
+
+The right fix for this problem is to make sure compat_props and
+-global options are always applied in the order they are
+registered, instead of reordering them based on the type
+hierarchy. But changing the ordering rules of -global is risky
+and might break existing configurations, so we shouldn't do that
+on a stable branch.
+
+This is a temporary hack that will work around the bug when
+registering compat_props properties: if we find an abstract class
+on compat_props, register properties for all its non-abstract
+subtypes instead. This will make sure -global won't be overridden
+by compat_props, while keeping the existing ordering rules on
+-global options.
+
+Note that there's one case that won't be fixed by this hack:
+"-global spapr-pci-vfio-host-bridge.<option>=<value>" won't be
+able to override compat_props, because spapr-pci-host-bridge is
+not an abstract class.
+
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <1481575745-26120-1-git-send-email-ehabkost@redhat.com>
 Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
-(cherry picked from commit 6bdc21c050a2a7b92cbbd0b2a1f8934e9b5f896f)
-* dropped context dep on 8607f5c30
+Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Tested-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+(cherry picked from commit 0bcba41fe379e4c6834adcf1456d9099db31a5b2)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/virtio/virtio.c | 30 +++++++++++++-----------------
- 1 file changed, 13 insertions(+), 17 deletions(-)
+ hw/core/machine.c | 39 ++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 36 insertions(+), 3 deletions(-)
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index e37641a..6dfc92f 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -592,24 +592,12 @@ static void virtqueue_undo_map_desc(unsigned int out_num, unsigned int in_num,
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index b0fd91f..213e8e0 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -554,11 +554,31 @@ static void machine_class_finalize(ObjectClass *klass, void *data)
+     g_free(mc->name);
  }
  
- static void virtqueue_map_iovec(struct iovec *sg, hwaddr *addr,
--                                unsigned int *num_sg, unsigned int max_size,
-+                                unsigned int *num_sg,
-                                 int is_write)
- {
-     unsigned int i;
-     hwaddr len;
- 
--    /* Note: this function MUST validate input, some callers
--     * are passing in num_sg values received over the network.
--     */
--    /* TODO: teach all callers that this can fail, and return failure instead
--     * of asserting here.
--     * When we do, we might be able to re-enable NDEBUG below.
--     */
--#ifdef NDEBUG
--#error building with NDEBUG is not supported
--#endif
--    assert(*num_sg <= max_size);
--
-     for (i = 0; i < *num_sg; i++) {
-         len = sg[i].iov_len;
-         sg[i].iov_base = cpu_physical_memory_map(addr[i], &len, is_write);
-@@ -626,10 +614,8 @@ static void virtqueue_map_iovec(struct iovec *sg, hwaddr *addr,
- 
- void virtqueue_map(VirtQueueElement *elem)
- {
--    virtqueue_map_iovec(elem->in_sg, elem->in_addr, &elem->in_num,
--                        VIRTQUEUE_MAX_SIZE, 1);
--    virtqueue_map_iovec(elem->out_sg, elem->out_addr, &elem->out_num,
--                        VIRTQUEUE_MAX_SIZE, 0);
-+    virtqueue_map_iovec(elem->in_sg, elem->in_addr, &elem->in_num, 1);
-+    virtqueue_map_iovec(elem->out_sg, elem->out_addr, &elem->out_num, 0);
- }
- 
- static void *virtqueue_alloc_element(size_t sz, unsigned out_num, unsigned in_num)
-@@ -790,6 +776,16 @@ void *qemu_get_virtqueue_element(QEMUFile *f, size_t sz)
- 
-     qemu_get_buffer(f, (uint8_t *)&data, sizeof(VirtQueueElementOld));
- 
-+    /* TODO: teach all callers that this can fail, and return failure instead
-+     * of asserting here.
-+     * When we do, we might be able to re-enable NDEBUG below.
-+     */
-+#ifdef NDEBUG
-+#error building with NDEBUG is not supported
-+#endif
-+    assert(ARRAY_SIZE(data.in_addr) >= data.in_num);
-+    assert(ARRAY_SIZE(data.out_addr) >= data.out_num);
++static void register_compat_prop(const char *driver,
++                                 const char *property,
++                                 const char *value)
++{
++    GlobalProperty *p = g_new0(GlobalProperty, 1);
++    /* Machine compat_props must never cause errors: */
++    p->errp = &error_abort;
++    p->driver = driver;
++    p->property = property;
++    p->value = value;
++    qdev_prop_register_global(p);
++}
 +
-     elem = virtqueue_alloc_element(sz, data.out_num, data.in_num);
-     elem->index = data.index;
++static void machine_register_compat_for_subclass(ObjectClass *oc, void *opaque)
++{
++    GlobalProperty *p = opaque;
++    register_compat_prop(object_class_get_name(oc), p->property, p->value);
++}
++
+ void machine_register_compat_props(MachineState *machine)
+ {
+     MachineClass *mc = MACHINE_GET_CLASS(machine);
+     int i;
+     GlobalProperty *p;
++    ObjectClass *oc;
+ 
+     if (!mc->compat_props) {
+         return;
+@@ -566,9 +586,22 @@ void machine_register_compat_props(MachineState *machine)
+ 
+     for (i = 0; i < mc->compat_props->len; i++) {
+         p = g_array_index(mc->compat_props, GlobalProperty *, i);
+-        /* Machine compat_props must never cause errors: */
+-        p->errp = &error_abort;
+-        qdev_prop_register_global(p);
++        oc = object_class_by_name(p->driver);
++        if (oc && object_class_is_abstract(oc)) {
++            /* temporary hack to make sure we do not override
++             * globals set explicitly on -global: if an abstract class
++             * is on compat_props, register globals for all its
++             * non-abstract subtypes instead.
++             *
++             * This doesn't solve the problem for cases where
++             * a non-abstract typename mentioned on compat_props
++             * has subclasses, like spapr-pci-host-bridge.
++             */
++            object_class_foreach(machine_register_compat_for_subclass,
++                                 p->driver, false, p);
++        } else {
++            register_compat_prop(p->driver, p->property, p->value);
++        }
+     }
+ }
  
 -- 
 2.7.4
