@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cpv8A-0000kY-OQ
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:05:43 -0400
+	(envelope-from <stefanha@gmail.com>) id 1cpv8P-0000si-2w
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:06:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cpv89-0002PT-Sz
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:05:42 -0400
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:34839)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cpv89-0002OS-NF
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:05:41 -0400
-Received: by mail-wm0-x234.google.com with SMTP id u132so60274059wmg.0
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 04:05:41 -0700 (PDT)
+	(envelope-from <stefanha@gmail.com>) id 1cpv8N-0002n4-NI
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:05:56 -0400
+Date: Mon, 20 Mar 2017 11:05:47 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170320110547.GK17887@stefanha-x1.localdomain>
+References: <20170313214001.26339-1-mreitz@redhat.com>
+	<20170313214117.27350-1-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87pohcnrlu.fsf@linaro.org>
-References: <1487616072-9226-1-git-send-email-peter.maydell@linaro.org>
-	<1487616072-9226-3-git-send-email-peter.maydell@linaro.org>
-	<87pohcnrlu.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Mar 2017 11:05:20 +0000
-Message-ID: <CAFEAcA967QpqPygNGO7977=uj1xz9hG4-_FhuRY89HHksCu_6A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/4] arm: Don't decode MRS(banked) or
- MSR(banked) for M profile
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Ah40dssYA/cDqAW1"
+Content-Disposition: inline
+In-Reply-To: <20170313214117.27350-1-mreitz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 10/16] block/qcow2: Lock s->lock
+ in preallocate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,35 +25,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Michael Davidsaver <mdavidsaver@gmail.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
-On 20 March 2017 at 10:57, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
->
-> Peter Maydell <peter.maydell@linaro.org> writes:
->
->> M profile doesn't have the MSR(banked) and MRS(banked) instructions
->> and uses the encodings for different kinds of M-profile MRS/MSR.
->> Guard the relevant bits of the decode logic to make sure we don't
->> accidentally fall into them by accident on M-profile.
->
-> The ARMv7-A documentation talks about banked registers being a feature
-> of application processors with Virtualisation Extensions which make the
-> sense of the test a bit weird. But I guess they are functionally
-> equivalent. Are there in practice any -A cores without virt?
 
-You can have an A profile core without EL2 implemented, yes.
-In particular in ARMv8 this encoding is legal (and has defined
-effects) even if EL2 is not implemented. It's introduced in
-ARMv7VE, and there's an argument for allowing it even if we
-don't implement EL2 for those CPUs which in real hardware do
-implement it, because system software might assume it can use
-these encodings.
+--Ah40dssYA/cDqAW1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-We should probably UNDEF it for pre-v7VE cores though. For
-this patchset what I really wanted was to avoid the different
-decode used by M profile getting mixed up with the A profile
-decode path.
+On Mon, Mar 13, 2017 at 10:41:11PM +0100, Max Reitz wrote:
+> preallocate() is and will be called only from places that do not lock
+> s->lock: Currently that is qcow2_create2(), as of a future patch it will
+> be called from qcow2_truncate(), too.
+>=20
+> It therefore makes sense to move locking that mutex into preallocate()
+> itself.
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  block/qcow2.c | 18 +++++++++++-------
+>  1 file changed, 11 insertions(+), 7 deletions(-)
 
-thanks
--- PMM
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--Ah40dssYA/cDqAW1
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYz7eLAAoJEJykq7OBq3PIft0H/19xwPHs0QoT+K6QPxb5CLNQ
+aTd4k55x1S83A7ni/6kbeF89pWA6u38QddwZ5JkyvxVATzoX9JSQbA+0HOoTRffe
+mhCW5uVJK4NIABxLxN9qXnxvMnN0/Q04lqVeG3uz0ZOHJNsK0ssQEKWpVfdegYkA
+MrvUTvfA7wdR1infZjkn6dtpPskVbqOxdKSljG211HtjLAPgFwHuh1YDd/h3yTMH
+kO7Gc5Q0ewwyy+V1EQawe42lvdij/7h8tnbgVAcnjCil+zs9c+RKdmwjzIM1cJcR
+w7Pt/UKIS3VD+dCMFupcoAgqTIanikbZ3avXhyUeWe19jn+AqysyhghYWAZM+PQ=
+=nxGu
+-----END PGP SIGNATURE-----
+
+--Ah40dssYA/cDqAW1--
