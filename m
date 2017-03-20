@@ -1,35 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40423)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6QX-0001Rd-4w
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6QW-0001Rb-PU
 	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6QV-0004n1-O7
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:25 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46866
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6QT-0004in-41
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:24 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44925
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cq6QV-0004lP-HQ
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:23 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	id 1cq6QS-0004iO-U0
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:21 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2KN8VEl084330
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:23 -0400
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 29amb2ab11-1
+	v2KN8ptT008189
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:20 -0400
+Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 29afu7a7vy-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:22 -0400
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:20 -0400
 Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 20 Mar 2017 19:09:22 -0400
+	Mon, 20 Mar 2017 19:09:19 -0400
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 20 Mar 2017 18:07:45 -0500
+Date: Mon, 20 Mar 2017 18:07:42 -0500
 In-Reply-To: <1490051325-3770-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1490051325-3770-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1490051325-3770-22-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 21/81] 9pfs: local: link: don't follow symlinks
+Message-Id: <1490051325-3770-19-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 18/81] 9pfs: local: renameat: don't follow
+ symlinks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,140 +44,122 @@ Cc: qemu-stable@nongnu.org, Greg Kurz <groug@kaod.org>, Greg Kurz <gkurz@linux.v
 
 From: Greg Kurz <groug@kaod.org>
 
-The local_link() callback is vulnerable to symlink attacks because it calls:
+The local_renameat() callback is currently a wrapper around local_rename()
+which is vulnerable to symlink attacks.
 
-(1) link() which follows symbolic links for all path elements but the
-    rightmost one
-(2) local_create_mapped_attr_dir()->mkdir() which follows symbolic links
-    for all path elements but the rightmost one
-
-This patch converts local_link() to rely on opendir_nofollow() and linkat()
-to fix (1), mkdirat() to fix (2).
+This patch rewrites local_renameat() to have its own implementation, based
+on local_opendir_nofollow() and renameat().
 
 This partly fixes CVE-2016-9602.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-(cherry picked from commit ad0b46e6ac769b187cb4dcf0065675ef8a198a5e)
+(cherry picked from commit 99f2cf4b2dad7b37c69759deb0d0b19d3ec1a24a)
 Signed-off-by: Greg Kurz <gkurz@linux.vnet.ibm.com>
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/9pfs/9p-local.c | 84 +++++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 55 insertions(+), 29 deletions(-)
+ hw/9pfs/9p-local.c | 74 ++++++++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 64 insertions(+), 10 deletions(-)
 
 diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index b2eaf88..6a52ee6 100644
+index 547baa4..f2adf25 100644
 --- a/hw/9pfs/9p-local.c
 +++ b/hw/9pfs/9p-local.c
-@@ -75,6 +75,13 @@ static void renameat_preserve_errno(int odirfd, const char *opath, int ndirfd,
-     errno = serrno;
+@@ -67,6 +67,14 @@ int local_opendir_nofollow(FsContext *fs_ctx, const char *path)
+     return local_open_nofollow(fs_ctx, path, O_DIRECTORY | O_RDONLY, 0);
  }
  
-+static void unlinkat_preserve_errno(int dirfd, const char *path, int flags)
++static void renameat_preserve_errno(int odirfd, const char *opath, int ndirfd,
++                                    const char *npath)
 +{
 +    int serrno = errno;
-+    unlinkat(dirfd, path, flags);
++    renameat(odirfd, opath, ndirfd, npath);
 +    errno = serrno;
 +}
 +
  #define VIRTFS_META_DIR ".virtfs_metadata"
  
  static char *local_mapped_attr_path(FsContext *ctx, const char *path)
-@@ -918,49 +925,68 @@ out:
- static int local_link(FsContext *ctx, V9fsPath *oldpath,
-                       V9fsPath *dirpath, const char *name)
- {
--    int ret;
--    V9fsString newpath;
--    char *buffer, *buffer1;
--    int serrno;
-+    char *odirpath = g_path_get_dirname(oldpath->data);
-+    char *oname = g_path_get_basename(oldpath->data);
-+    int ret = -1;
-+    int odirfd, ndirfd;
+@@ -146,8 +154,7 @@ static void local_mapped_file_attr(int dirfd, const char *name,
+     char buf[ATTR_MAX];
+     int map_dirfd;
  
--    v9fs_string_init(&newpath);
--    v9fs_string_sprintf(&newpath, "%s/%s", dirpath->data, name);
-+    odirfd = local_opendir_nofollow(ctx, odirpath);
+-    map_dirfd = openat(dirfd, VIRTFS_META_DIR,
+-                       O_RDONLY | O_DIRECTORY | O_NOFOLLOW);
++    map_dirfd = openat_dir(dirfd, VIRTFS_META_DIR);
+     if (map_dirfd == -1) {
+         return;
+     }
+@@ -1187,17 +1194,64 @@ static int local_renameat(FsContext *ctx, V9fsPath *olddir,
+                           const char *new_name)
+ {
+     int ret;
+-    V9fsString old_full_name, new_full_name;
++    int odirfd, ndirfd;
++
++    odirfd = local_opendir_nofollow(ctx, olddir->data);
 +    if (odirfd == -1) {
++        return -1;
++    }
++
++    ndirfd = local_opendir_nofollow(ctx, newdir->data);
++    if (ndirfd == -1) {
++        close_preserve_errno(odirfd);
++        return -1;
++    }
++
++    ret = renameat(odirfd, old_name, ndirfd, new_name);
++    if (ret < 0) {
 +        goto out;
 +    }
  
--    buffer = rpath(ctx, oldpath->data);
--    buffer1 = rpath(ctx, newpath.data);
--    ret = link(buffer, buffer1);
--    g_free(buffer);
--    if (ret < 0) {
-+    ndirfd = local_opendir_nofollow(ctx, dirpath->data);
-+    if (ndirfd == -1) {
-+        close_preserve_errno(odirfd);
-         goto out;
-     }
- 
-+    ret = linkat(odirfd, oname, ndirfd, name, 0);
-+    if (ret < 0) {
-+        goto out_close;
-+    }
-+
-     /* now link the virtfs_metadata files */
-     if (ctx->export_flags & V9FS_SM_MAPPED_FILE) {
--        char *vbuffer, *vbuffer1;
+-    v9fs_string_init(&old_full_name);
+-    v9fs_string_init(&new_full_name);
++    if (ctx->export_flags & V9FS_SM_MAPPED_FILE) {
 +        int omap_dirfd, nmap_dirfd;
  
--        /* Link the .virtfs_metadata files. Create the metada directory */
--        ret = local_create_mapped_attr_dir(ctx, newpath.data);
--        if (ret < 0) {
--            goto err_out;
+-    v9fs_string_sprintf(&old_full_name, "%s/%s", olddir->data, old_name);
+-    v9fs_string_sprintf(&new_full_name, "%s/%s", newdir->data, new_name);
 +        ret = mkdirat(ndirfd, VIRTFS_META_DIR, 0700);
 +        if (ret < 0 && errno != EEXIST) {
-+            goto err_undo_link;
-         }
--        vbuffer = local_mapped_attr_path(ctx, oldpath->data);
--        vbuffer1 = local_mapped_attr_path(ctx, newpath.data);
--        ret = link(vbuffer, vbuffer1);
--        g_free(vbuffer);
--        g_free(vbuffer1);
-+
-+        omap_dirfd = openat_dir(odirfd, VIRTFS_META_DIR);
++            goto err_undo_rename;
++        }
+ 
+-    ret = local_rename(ctx, old_full_name.data, new_full_name.data);
+-    v9fs_string_free(&old_full_name);
+-    v9fs_string_free(&new_full_name);
++        omap_dirfd = openat(odirfd, VIRTFS_META_DIR,
++                            O_RDONLY | O_DIRECTORY | O_NOFOLLOW);
 +        if (omap_dirfd == -1) {
 +            goto err;
 +        }
 +
-+        nmap_dirfd = openat_dir(ndirfd, VIRTFS_META_DIR);
++        nmap_dirfd = openat(ndirfd, VIRTFS_META_DIR,
++                            O_RDONLY | O_DIRECTORY | O_NOFOLLOW);
 +        if (nmap_dirfd == -1) {
 +            close_preserve_errno(omap_dirfd);
 +            goto err;
 +        }
 +
-+        ret = linkat(omap_dirfd, oname, nmap_dirfd, name, 0);
++        /* rename the .virtfs_metadata files */
++        ret = renameat(omap_dirfd, old_name, nmap_dirfd, new_name);
 +        close_preserve_errno(nmap_dirfd);
 +        close_preserve_errno(omap_dirfd);
-         if (ret < 0 && errno != ENOENT) {
--            goto err_out;
-+            goto err_undo_link;
-         }
++        if (ret < 0 && errno != ENOENT) {
++            goto err_undo_rename;
++        }
 +
 +        ret = 0;
-     }
--    goto out;
-+    goto out_close;
- 
--err_out:
--    serrno = errno;
--    remove(buffer1);
--    errno = serrno;
++    }
++    goto out;
++
 +err:
 +    ret = -1;
-+err_undo_link:
-+    unlinkat_preserve_errno(ndirfd, name, 0);
-+out_close:
++err_undo_rename:
++    renameat_preserve_errno(ndirfd, new_name, odirfd, old_name);
++out:
 +    close_preserve_errno(ndirfd);
 +    close_preserve_errno(odirfd);
- out:
--    g_free(buffer1);
--    v9fs_string_free(&newpath);
-+    g_free(oname);
-+    g_free(odirpath);
      return ret;
  }
  
