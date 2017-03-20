@@ -1,36 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41558)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6Qy-0001zS-3Q
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:10:02 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6R1-00023y-GZ
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:10:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6Qq-00059N-NL
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:52 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47232
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6Qr-0005BE-Q4
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:55 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41689)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cq6Qq-00058Z-F4
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:44 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2KN8Vkg084319
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:43 -0400
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 29amb2abaa-1
+	id 1cq6Qr-00059Z-Ga
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:45 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2KN8WXB128005
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:44 -0400
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 29ambn29c7-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:43 -0400
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:44 -0400
 Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 20 Mar 2017 17:09:43 -0600
+	Mon, 20 Mar 2017 19:09:43 -0400
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 20 Mar 2017 18:08:25 -0500
+Date: Mon, 20 Mar 2017 18:07:29 -0500
 In-Reply-To: <1490051325-3770-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1490051325-3770-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1490051325-3770-62-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 61/81] block/nfs: fix NULL pointer dereference
- in URI parsing
+Message-Id: <1490051325-3770-6-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 05/81] 9pfs: local: keep a file descriptor on
+ the shared folder
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,43 +39,96 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Peter Lieven <pl@kamp.de>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-stable@nongnu.org, Greg Kurz <groug@kaod.org>, Greg Kurz <gkurz@linux.vnet.ibm.com>
 
-From: Peter Lieven <pl@kamp.de>
+From: Greg Kurz <groug@kaod.org>
 
-parse_uint_full wants to put the parsed value into the
-variable passed via its second argument which is NULL.
+This patch opens the shared folder and caches the file descriptor, so that
+it can be used to do symlink-safe path walk.
 
-Fixes: 94d6a7a76e9df9919629428f6c598e2b97d9426c
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Peter Lieven <pl@kamp.de>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-id: 1485942829-10756-2-git-send-email-pl@kamp.de
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-(cherry picked from commit 8d20abe87afa735cd0ae6688bd105c7a27390343)
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+(cherry picked from commit 0e35a3782948c6154d7fafe9a02a86bc130199c7)
+Signed-off-by: Greg Kurz <gkurz@linux.vnet.ibm.com>
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- block/nfs.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ hw/9pfs/9p-local.c | 30 ++++++++++++++++++++++++++++--
+ 1 file changed, 28 insertions(+), 2 deletions(-)
 
-diff --git a/block/nfs.c b/block/nfs.c
-index a490660..dd376db 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -108,12 +108,13 @@ static int nfs_parse_uri(const char *filename, QDict *options, Error **errp)
-     qdict_put(options, "path", qstring_from_str(uri->path));
+diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+index 5bb65eb..12fc4fc 100644
+--- a/hw/9pfs/9p-local.c
++++ b/hw/9pfs/9p-local.c
+@@ -14,6 +14,7 @@
+ #include "qemu/osdep.h"
+ #include "9p.h"
+ #include "9p-xattr.h"
++#include "9p-util.h"
+ #include "fsdev/qemu-fsdev.h"   /* local_ops */
+ #include <arpa/inet.h>
+ #include <pwd.h>
+@@ -43,6 +44,10 @@
+ #define BTRFS_SUPER_MAGIC 0x9123683E
+ #endif
  
-     for (i = 0; i < qp->n; i++) {
-+        unsigned long long val;
-         if (!qp->p[i].value) {
-             error_setg(errp, "Value for NFS parameter expected: %s",
-                        qp->p[i].name);
-             goto out;
-         }
--        if (parse_uint_full(qp->p[i].value, NULL, 0)) {
-+        if (parse_uint_full(qp->p[i].value, &val, 0)) {
-             error_setg(errp, "Illegal value for NFS parameter: %s",
-                        qp->p[i].name);
-             goto out;
++typedef struct {
++    int mountfd;
++} LocalData;
++
+ #define VIRTFS_META_DIR ".virtfs_metadata"
+ 
+ static char *local_mapped_attr_path(FsContext *ctx, const char *path)
+@@ -1177,13 +1182,20 @@ static int local_ioc_getversion(FsContext *ctx, V9fsPath *path,
+ static int local_init(FsContext *ctx)
+ {
+     struct statfs stbuf;
++    LocalData *data = g_malloc(sizeof(*data));
++
++    data->mountfd = open(ctx->fs_root, O_DIRECTORY | O_RDONLY);
++    if (data->mountfd == -1) {
++        goto err;
++    }
+ 
+ #ifdef FS_IOC_GETVERSION
+     /*
+      * use ioc_getversion only if the ioctl is definied
+      */
+-    if (statfs(ctx->fs_root, &stbuf) < 0) {
+-        return -1;
++    if (fstatfs(data->mountfd, &stbuf) < 0) {
++        close_preserve_errno(data->mountfd);
++        goto err;
+     }
+     switch (stbuf.f_type) {
+     case EXT2_SUPER_MAGIC:
+@@ -1210,7 +1222,20 @@ static int local_init(FsContext *ctx)
+     }
+     ctx->export_flags |= V9FS_PATHNAME_FSCONTEXT;
+ 
++    ctx->private = data;
+     return 0;
++
++err:
++    g_free(data);
++    return -1;
++}
++
++static void local_cleanup(FsContext *ctx)
++{
++    LocalData *data = ctx->private;
++
++    close(data->mountfd);
++    g_free(data);
+ }
+ 
+ static int local_parse_opts(QemuOpts *opts, struct FsDriverEntry *fse)
+@@ -1253,6 +1278,7 @@ static int local_parse_opts(QemuOpts *opts, struct FsDriverEntry *fse)
+ FileOperations local_ops = {
+     .parse_opts = local_parse_opts,
+     .init  = local_init,
++    .cleanup = local_cleanup,
+     .lstat = local_lstat,
+     .readlink = local_readlink,
+     .close = local_close,
 -- 
 2.7.4
