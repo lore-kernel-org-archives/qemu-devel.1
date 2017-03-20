@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1cpz7l-0001w6-9W
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:21:34 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1cpzKA-0003tt-2e
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:34:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1cpz7h-0001tU-7k
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:21:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53622)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1cpz7h-0001tA-1v
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:21:29 -0400
-References: <20170317215725.GJ996@jhogan-linux.le.imgtec.org>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <6b3ec98b-55e2-ecc8-d962-dc9d13866319@redhat.com>
-Date: Mon, 20 Mar 2017 17:21:22 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1cpzK7-0005mR-Fj
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:34:22 -0400
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:33551)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cpzK7-0005l9-9w
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:34:19 -0400
+Received: by mail-wr0-x236.google.com with SMTP id u48so94963518wrc.0
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 08:34:19 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Mon, 20 Mar 2017 15:34:39 +0000
+Message-Id: <20170320153441.2181-2-alex.bennee@linaro.org>
+In-Reply-To: <20170320153441.2181-1-alex.bennee@linaro.org>
+References: <20170320153441.2181-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170317215725.GJ996@jhogan-linux.le.imgtec.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [BUG] virtio-net linux driver fails to probe on
- MIPS Malta since 'hw/virtio-pci: fix virtio behaviour'
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v1 1/3] cputlb: ensure tbl_set_dirty1 updates
+ addr_write atomically
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,39 +30,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: James Hogan <james.hogan@imgtec.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, virtualization@lists.linux-foundation.org
+To: peter.maydell@linaro.org, rth@twiddle.net, pbonzini@redhat.com
+Cc: qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-On 03/17/2017 11:57 PM, James Hogan wrote:
-> Hi,
->
-> I've bisected the following failure of the virtio_net linux v4.10 driver
-> to probe in QEMU v2.9.0-rc1 emulating a MIPS Malta machine:
->
-> virtio_net virtio0: virtio: device uses modern interface but does not have VIRTIO_F_VERSION_1
-> virtio_net: probe of virtio0 failed with error -22
->
-> To QEMU commit 9a4c0e220d8a ("hw/virtio-pci: fix virtio behaviour").
->
-> It appears that adding ",disable-modern=on,disable-legacy=off" to the
-> virtio-net -device makes it work again.
->
-> I presume this should really just work out of the box. Any ideas why it
-> isn't?
->
+This was an oversight when the rest of cputlb was being updated. As
+before it falls back to the non-atomic version when the host can't
+support wider-than-bus atomics.
 
-Hi,
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ cputlb.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-
-This is strange. This commit changes virtio devices from legacy to virtio "transitional".
-(your command line changes it to legacy)
-Linux 4.10 supports virtio modern/transitional (as far as I know) and on QEMU side
-there is nothing new.
-
-Michael, do you have any idea?
-
-Thanks,
-Marcel
-
-> Cheers
-> James
->
+diff --git a/cputlb.c b/cputlb.c
+index f5d056cc08..0d52e45dfd 100644
+--- a/cputlb.c
++++ b/cputlb.c
+@@ -540,9 +540,17 @@ void tlb_reset_dirty(CPUState *cpu, ram_addr_t start1, ram_addr_t length)
+ 
+ static inline void tlb_set_dirty1(CPUTLBEntry *tlb_entry, target_ulong vaddr)
+ {
++#if TCG_OVERSIZED_GUEST
+     if (tlb_entry->addr_write == (vaddr | TLB_NOTDIRTY)) {
+         tlb_entry->addr_write = vaddr;
+     }
++#else
++    uintptr_t orig_addr = atomic_mb_read(&tlb_entry->addr_write);
++
++    if (orig_addr == (vaddr | TLB_NOTDIRTY)) {
++        atomic_cmpxchg(&tlb_entry->addr_write, orig_addr, vaddr);
++    }
++#endif
+ }
+ 
+ /* update the TLB corresponding to virtual page vaddr
+-- 
+2.11.0
