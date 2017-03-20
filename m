@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49757)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1cpx7h-0004mm-M3
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 09:13:22 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51098)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <berrange@redhat.com>) id 1cpxBT-0007sO-Ex
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 09:17:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1cpx7e-00031T-FD
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 09:13:21 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:38393 helo=mx01.kamp.de)
+	(envelope-from <berrange@redhat.com>) id 1cpxBQ-0004je-86
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 09:17:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54804)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1cpx7e-00030u-5h
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 09:13:18 -0400
-References: <bd7cb196-0779-42ad-ce9c-5871d307adce@kamp.de>
-	<82d604c8-068a-aff4-6037-e3cd247b3588@redhat.com>
-	<819af057-3777-dffc-4670-895b8265fd01@kamp.de>
-	<d41d1428-4c8b-7e2f-b197-8d45b834776d@redhat.com>
-	<32e1e781-f0b0-ac67-a5ce-74ccc64071a0@kamp.de>
-	<20170320024649.GA18938@lemon.lan>
-	<37879546-cf6e-01fa-adc6-c777e14eab0e@redhat.com>
-	<20170320114926.GB17020@lemon.lan>
-	<b3bf1d26-7caa-1d0d-c8a1-02f4c80e51e4@kamp.de>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <fc755658-8d1d-db71-1f4d-2e18f5c3c4b2@kamp.de>
-Date: Mon, 20 Mar 2017 14:13:13 +0100
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cpxBP-0004j8-VC
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 09:17:12 -0400
+Date: Mon, 20 Mar 2017 13:17:03 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170320131703.GN3792@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1490015240-49118-1-git-send-email-pradeep.jagadeesh@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <b3bf1d26-7caa-1d0d-c8a1-02f4c80e51e4@kamp.de>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] callout to *file in bdrv_co_get_block_status
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1490015240-49118-1-git-send-email-pradeep.jagadeesh@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v0] fsdev: QMP interface for throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,66 +27,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
+Cc: Eric Blake <eblake@redhat.com>, Greg Kurz <groug@kaod.org>, Jani Kokkonen <jani.kokkonen@huawei.com>, Alberto Garcia <berto@igalia.com>, Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, qemu-devel@nongnu.org
 
-Am 20.03.2017 um 13:47 schrieb Peter Lieven:
-> Am 20.03.2017 um 12:49 schrieb Fam Zheng:
->> On Mon, 03/20 12:21, Paolo Bonzini wrote:
->>> On 20/03/2017 03:46, Fam Zheng wrote:
->>>> On Fri, 03/17 12:20, Peter Lieven wrote:
->>>>> Am 17.03.2017 um 12:16 schrieb Paolo Bonzini:
->>>>>> On 17/03/2017 12:11, Peter Lieven wrote:
->>>>>>>>> like VMDK or QCOW2 shouldn't we trust the information from the l2 tables in the VMDK or QCOW2?
->>>>>>>> It provides additional information, for example it works better with
->>>>>>>> prealloc=metadata.
->>>>>>> Okay, understood. Can you imagine of a away to conditionally avoid this second callout? In my case we have an additional
->>>>>>> lseek for each cluster. For a 20GB file this are approx. 327k calls to lseek. And if the file has no preallocated metadata
->>>>>>> it will likely not improve anything. And even if the metadata is prealloced what is the allocation status of the clusters?
->>>>>> If the metadata is preallocated, cluster will (or should) show up as
->>>>>> zero, speeding up the copy.
->>>>> Okay, in this case the second call out to *file will not happen. It only happens if the metadata says it contains data.
->>>>> So where does it actually help?
->>>>>
->>>>> The condition is: (ret & BDRV_BLOCK_DATA) && !(ret & BDRV_BLOCK_ZERO) && (ret & BDRV_BLOCK_OFFSET_VALID))
->>>>>
->>>>> So from my view it can only have any effect if the metadata returns BDRV_BLOCK_DATA, but the protocol driver returns
->>>>> BDRV_BLOCK_ZERO.
->>>>>
->>>>> This can only happen if I partially write to a cluster, or am I wrong here?
->>>> I think you have a point. The metadata should have said BDRV_BLOCK_ZERO if
->>>> protocol would say BDRV_BLOCK_ZERO - there is no reason the format driver cannot
->>>> know.
->>> That's true of qcow2, but many formats (including raw :)) don't know
->>> about BDRV_BLOCK_ZERO.
->> Raw is a little special, it could have forwarded the call to *file in its
->> BlockDriver callback. Most formats with metadata stores zero/nonzero information
->> in L1/L2 tables. For qcow2 and VMDK I think it's okay to just trust meta data on
->> zero/nonzero.
->>
->> Fam
->
-> BTW, the extra check was added in
->
->
-> commit 5daa74a6ebce7543aaad178c4061dc087bb4c705
-> Author: Paolo Bonzini <pbonzini@redhat.com>
-> Date:   Wed Sep 4 19:00:38 2013 +0200
->
->     block: look for zero blocks in bs->file
->    
->     Reviewed-by: Eric Blake <eblake@redhat.com>
->     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->     Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
->
->
-> It was introduced while introducing bdv_get_block_status. I don't know what the real
->
-> issue was that was addressed with this patch?
+On Mon, Mar 20, 2017 at 09:07:20AM -0400, Pradeep Jagadeesh wrote:
 
-Is it possible that this optimization was added especially for RAW? I was believing that
-raw would forward the get_block_status call to bs->file, but it looks it doesn't.
-If this one here was for RAW would it be an option to move this callout to the raw-format driver
-and remove it from the generic code?
+> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> index 8819281..e4e3478 100644
+> --- a/hmp-commands.hx
+> +++ b/hmp-commands.hx
+> @@ -1637,6 +1637,34 @@ ETEXI
+>      },
+>  
+>  STEXI
+> +@item 9p_passwd @var{device} @var{password}
+> +@findex 9p_passwd
+> +Set the encrypted device @var{device} password to @var{password}
+> +ETEXI
+> +
+> +    {
+> +        .name       = "fs9p_set_io_throttle",
+> +        .args_type  = "device:B,bps:l,bps_rd:l,bps_wr:l,iops:l,iops_rd:l,iops_wr:l",
+> +        .params     = "device bps bps_rd bps_wr iops iops_rd iops_wr",
+> +        .help       = "change I/O throttle limits for a block drive",
+> +        .cmd        = hmp_9pfs_set_io_throttle,
+> +    },
+> +
+> +STEXI
+> +@item fs9p_set_io_throttle @var{device} @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
+> +@findex 9pfs_set_io_throttle
+> +Change I/O throttle limits for a block drive to @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
+> +ETEXI
+> +
+> +    {
+> +        .name       = "set_password",
+> +        .args_type  = "protocol:s,password:s,connected:s?",
+> +        .params     = "protocol password action-if-connected",
+> +        .help       = "set spice/vnc password",
+> +        .cmd        = hmp_set_password,
+> +    },
+> +
+> +STEXI
 
-Peter
+This looks all mangled wrt password related stuff
+
+
+> diff --git a/qapi/9pfs.json b/qapi/9pfs.json
+> new file mode 100644
+> index 0000000..c068474
+> --- /dev/null
+> +++ b/qapi/9pfs.json
+> @@ -0,0 +1,169 @@
+> +# -*- Mode: Python -*-
+> +
+> +##
+> +# == QAPI 9p definitions
+> +##
+> +
+> +# QAPI common definitions
+> +{ 'include': 'common.json' }
+> +
+> +##
+> +# @fs9p_set_io_throttle:
+> +#
+> +# Change I/O limits for a 9p/fsdev device.
+> +#
+> +# Since QEMU 2.9, I/0 limits can be enabled on each  fsdev(9pfs) device
+
+Is this supposed to be generic for any fsdev impl, or specific to the
+9p impl only ? Without knowing more, I'd expect us to really be designing
+something generic, and not tied to just the 9p impl. IOW,  having '9p' in
+the name of the QAPI commands feels wrong - use of 'fsdev' feels like the
+better naming. Same applies to the HMP commands.
+
+
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
