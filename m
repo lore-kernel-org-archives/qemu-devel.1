@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1cpw4B-00076s-3L
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 08:05:40 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cpw7R-0000AZ-6q
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 08:09:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1cpw47-0003tq-VI
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 08:05:39 -0400
-Received: from mail-vk0-x22a.google.com ([2607:f8b0:400c:c05::22a]:35417)
+	(envelope-from <peter.maydell@linaro.org>) id 1cpw7Q-0005hl-Ah
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 08:09:01 -0400
+Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:33793)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1cpw47-0003tS-NX
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 08:05:35 -0400
-Received: by mail-vk0-x22a.google.com with SMTP id x75so68742223vke.2
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 05:05:35 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cpw7Q-0005hP-47
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 08:09:00 -0400
+Received: by mail-wr0-x235.google.com with SMTP id l37so90921732wrc.1
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 05:09:00 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAKPgXcFwSHgb+sLimF=+En_fHM1rYnV1+jX3Tg_hP07EmzyiJg@mail.gmail.com>
-References: <CAKPgXcFwSHgb+sLimF=+En_fHM1rYnV1+jX3Tg_hP07EmzyiJg@mail.gmail.com>
-From: Sameeh Jubran <sameeh@daynix.com>
-Date: Mon, 20 Mar 2017 14:05:34 +0200
-Message-ID: <CAKPgXcG+P5MCiDyvAmAiRxPGf0XgTCvwCuC5f_DiadEZ5OgXVA@mail.gmail.com>
+In-Reply-To: <1490009093-28083-1-git-send-email-kraxel@redhat.com>
+References: <1490009093-28083-1-git-send-email-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 20 Mar 2017 12:08:38 +0000
+Message-ID: <CAFEAcA_qMwj7s2xNyW4zWBwVjQpeQYmxd33hT2SRY_T+7Zsa9A@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] qemu-ga static compilation
+Subject: Re: [Qemu-devel] [PATCH v3] console: drop epoxy/gl.h include
+ dependency
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,54 +29,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-ping.
+On 20 March 2017 at 11:24, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> Use "unsigned int" instead of GLenum and GLuint, so we don't depend on
+> these types from opengl headers.  Drop all CONFIG_OPENGL #ifdefs from
+> console.h
+>
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 
-On Tue, Mar 14, 2017 at 6:51 PM, Sameeh Jubran <sameeh@daynix.com> wrote:
+This isn't sufficient to fix the compile failure on OpenBSD,
+because there are still files which #include <epoxy/gl.h> but
+which aren't being compiled with OPENGL_CFLAGS:
 
-> Hi all,
->
-> I am trying to compile qemu-ga for Windows statically using the following
-> commands:
->
-> ./configure --disable-docs --target-list=x86_64-softmmu
-> --cross-prefix=x86_64-w64-mingw32- --static --enable-guest-agent-msi
-> --with-vss-sdk=/path/to/VSSSDK72
->
-> make -j8 qemu-ga
->
->
-> And I keep getting this error:
->
-> /home/sameeh/Builds/q/stubs/error-printf.c:7: undefined reference to
-> `__imp_g_test_config_vars'
-> collect2: error: ld returned 1 exit status
-> Makefile:444: recipe for target 'qemu-ga.exe' failed
-> make: *** [qemu-ga.exe] Error 1
->
->
-> Notes to consider:
-> * without --static I can compile it successfully
-> * Build machine is running Fedora 25
-> * I have upgraded all of the tools to their latest version
-> * If I comment out the function which is causing the issue
-> (g_test_initialized()), qemu ga compiles statically and runs successfully
-> without the need of any dlls.
->
-> Can anyone reproduce this? Do you have any idea why is this happening?
->
-> --
-> Respectfully,
-> *Sameeh Jubran*
-> *Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>*
-> *Software Engineer @ Daynix <http://www.daynix.com>.*
->
+ hw/lm32/milkymist.c (via milkymist-hw.h)
+ ui/sdl2-gl.c
+ ui/egl-context.c (via ui/egl-context.h and ui/egl-helpers.h)
+ ui/gtk.c (via ui/gtk.h and ui/egl-helpers.h)
 
+just to take the first few I found via grep. (The OpenBSD
+build fails on egl-context.o.)
 
+Rather than trying to figure out exactly which .c files need
+to have the OPENGL_CFLAGS applied to them, I think it would
+be better if we just put them into the standard QEMU_CFLAGS
+that we use for building all objects, the same way we do
+for other library CFLAGS requirements. Or is there a reason
+we can't do that with OpenGL?
 
--- 
-Respectfully,
-*Sameeh Jubran*
-*Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>*
-*Software Engineer @ Daynix <http://www.daynix.com>.*
+thanks
+-- PMM
