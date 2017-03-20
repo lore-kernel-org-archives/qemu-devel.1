@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57985)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cpyzf-00069f-Gs
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:13:12 -0400
+	(envelope-from <lersek@redhat.com>) id 1cpz0G-0006UJ-W8
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:13:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cpyze-0006zo-H5
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:13:11 -0400
-References: <20170313214001.26339-1-mreitz@redhat.com>
-	<20170313214045.26857-7-mreitz@redhat.com>
-	<20170320110404.GJ17887@stefanha-x1.localdomain>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <c3909a14-2a06-74d9-8238-f1855e070932@redhat.com>
-Date: Mon, 20 Mar 2017 16:13:01 +0100
+	(envelope-from <lersek@redhat.com>) id 1cpz0F-000798-V5
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:13:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53256)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cpz0F-00078z-MB
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:13:47 -0400
+References: <20170320115951.25345-1-lersek@redhat.com>
+	<20170320115951.25345-3-lersek@redhat.com>
+	<20170320161539-mutt-send-email-mst@kernel.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <783bd4f6-faf9-1562-99f6-36556ed3d0cb@redhat.com>
+Date: Mon, 20 Mar 2017 16:13:42 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170320110404.GJ17887@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="XK1csOQfP02NOtL0mJVEgdPq9f9Qb9MtG"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.10 09/16] block/qcow2:
- Generalize preallocate()
+In-Reply-To: <20170320161539-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] hw/acpi/vmgenid: prevent more than one
+ vmgenid device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,71 +29,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu devel list <qemu-devel@nongnu.org>, Ben Warren <ben@skyportsystems.com>, Igor Mammedov <imammedo@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XK1csOQfP02NOtL0mJVEgdPq9f9Qb9MtG
-From: Max Reitz <mreitz@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- qemu-devel@nongnu.org
-Message-ID: <c3909a14-2a06-74d9-8238-f1855e070932@redhat.com>
-Subject: Re: [Qemu-block] [PATCH for-2.10 09/16] block/qcow2: Generalize
- preallocate()
-References: <20170313214001.26339-1-mreitz@redhat.com>
- <20170313214045.26857-7-mreitz@redhat.com>
- <20170320110404.GJ17887@stefanha-x1.localdomain>
-In-Reply-To: <20170320110404.GJ17887@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-
-On 20.03.2017 12:04, Stefan Hajnoczi wrote:
-> On Mon, Mar 13, 2017 at 10:40:38PM +0100, Max Reitz wrote:
->> This patch adds two new parameters to the preallocate() function so we=
-
->> will be able to use it not just for preallocating a new image but also=
-
->> for preallocated image growth.
+On 03/20/17 15:16, Michael S. Tsirkin wrote:
+> On Mon, Mar 20, 2017 at 12:59:51PM +0100, Laszlo Ersek wrote:
+>> Multiple instances make no sense.
 >>
->> The offset parameter allows the caller to specify a virtual offset fro=
-m
->> which to start preallocating. For newly created images this is always =
-0,
->> but for preallocating growth this will be the old image length.
+>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>> Cc: Ben Warren <ben@skyportsystems.com>
+>> Cc: Igor Mammedov <imammedo@redhat.com>
+>> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+> 
+> find_vmgenid_dev would be a better place for this.
+> This is where the single instance assumption comes from ATM.
+
+object_resolve_path_type() -- used internally in find_vmgenid_dev() --
+returns NULL in either of two cases: there is no such device, or there
+are multiple devices. You can tell them apart by looking at the last
+parameter (called "ambiguous"), but find_vmgenid_dev() doesn't use that
+parameter.
+
+By the time we are in the vmgenid_realize() function, at least one
+vmgenid device is guaranteed to exist (the one which we are realizing).
+Therefore, this patch could be simplified as:
+
+if (find_vmgenid_dev() == NULL) {
+  error_setg(errp, "at most one %s device is permitted", VMGENID_DEVICE);
+  return;
+}
+
+I found that confusing, and wanted to spell out "ambiguous" with the
+assert(). If you prefer the above simpler (but harder to understand)
+check, I can do that too.
+
+Thanks
+Laszlo
+
+> 
+> 
+>> ---
+>>  hw/acpi/vmgenid.c | 10 ++++++++++
+>>  1 file changed, 10 insertions(+)
 >>
->> The new_length parameter specifies the supposed new length of the imag=
-e
->> (basically the "end offset" for preallocation). During image truncatio=
-n,
->> bdrv_getlength() will return the old image length so we cannot rely on=
-
->> its return value then.
->=20
-> You documented the arguments in the commit description.  Please move
-> them into doc comments.
-
-Yeah, right, new_length is not really a super self-explaining name...
-I'll add a comment.
-
-Max
-
-
---XK1csOQfP02NOtL0mJVEgdPq9f9Qb9MtG
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljP8X0SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AR60H/2CX+v/ph+yCFQiZy52Vsb4ceUDBhzX7
-jmjh+yFg4rLlACDO9SXtAaiU/AQFiePl6ayWGkNFkLyiETWKA/XMtbZ9tCU1RfE6
-CKY1YMPAZOSKUhT4X/BkNdHfYNLZ56xxYYz6504c+VdQCTfCx70d3tOvAD2U8CA0
-um1HUbwy1DcwYCOOP5EHUV8nGh/F5o5UWnHVs3EnjAMa2+ErD9X4oqpVwAVIiYHw
-Jn3DKszEWa0qunHNhS4ux9E7nvRn92D6FkbeFrUMFWnAt/OCchO0eDtz83sRgWM+
-yQ1PFCuuKRp3Otw1VRTQNDKbs830JCLN1JqOf19OdvYBuS9pVh5ites=
-=lNQR
------END PGP SIGNATURE-----
-
---XK1csOQfP02NOtL0mJVEgdPq9f9Qb9MtG--
+>> diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+>> index c3ddcc8e7cb0..b5c0dfcf19e1 100644
+>> --- a/hw/acpi/vmgenid.c
+>> +++ b/hw/acpi/vmgenid.c
+>> @@ -214,6 +214,8 @@ static Property vmgenid_properties[] = {
+>>  static void vmgenid_realize(DeviceState *dev, Error **errp)
+>>  {
+>>      VmGenIdState *vms = VMGENID(dev);
+>> +    Object *one_vmgenid;
+>> +    bool ambiguous;
+>>  
+>>      if (!vms->write_pointer_available) {
+>>          error_setg(errp, "%s requires DMA write support in fw_cfg, "
+>> @@ -221,6 +223,14 @@ static void vmgenid_realize(DeviceState *dev, Error **errp)
+>>          return;
+>>      }
+>>  
+>> +    one_vmgenid = object_resolve_path_type("", VMGENID_DEVICE, &ambiguous);
+>> +    if (one_vmgenid == NULL) {
+>> +        assert(ambiguous);
+>> +        error_setg(errp, "at most one %s device is permitted", VMGENID_DEVICE);
+>> +        return;
+>> +    }
+>> +    assert(one_vmgenid == OBJECT(vms));
+>> +
+>>      qemu_register_reset(vmgenid_handle_reset, vms);
+>>  }
+>>  
+>> -- 
+>> 2.9.3
