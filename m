@@ -1,40 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56256)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq4U9-0004Nn-G8
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 17:05:02 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq4a5-0005Z4-UD
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 17:11:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq4U5-0005ea-Ha
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 17:05:01 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55178
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq4a2-0008OW-Ly
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 17:11:09 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40393
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cq4U5-0005eL-BK
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 17:04:57 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2KKwYiN165726
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 17:04:56 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 29amb5p4hv-1
+	id 1cq4a2-0008Nj-FE
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 17:11:06 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2KL8iiR138994
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 17:11:05 -0400
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 29aj6q5rr2-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 17:04:56 -0400
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 17:11:05 -0400
 Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 20 Mar 2017 15:04:55 -0600
+	Mon, 20 Mar 2017 17:11:04 -0400
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <1490026424-11330-2-git-send-email-armbru@redhat.com>
+In-Reply-To: <1490026424-11330-3-git-send-email-armbru@redhat.com>
 References: <1490026424-11330-1-git-send-email-armbru@redhat.com>
-	<1490026424-11330-2-git-send-email-armbru@redhat.com>
-Date: Mon, 20 Mar 2017 16:04:44 -0500
-Message-Id: <149004388488.3910.16144904386783855924@loki>
-Subject: Re: [Qemu-devel] [PATCH for-2.9 1/2] qapi: Fix string input visitor
- regression for empty lists
+	<1490026424-11330-3-git-send-email-armbru@redhat.com>
+Date: Mon, 20 Mar 2017 16:10:54 -0500
+Message-Id: <149004425464.3910.12993880446909288314@loki>
+Subject: Re: [Qemu-devel] [PATCH for-2.9 2/2] Revert "hostmem: fix QEMU
+ crash by 'info memdev'"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,81 +44,143 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, imammedo@redhat.com, eblake@redhat.com
+Cc: ehabkost@redhat.com, imammedo@redhat.com, eblake@redhat.com, Xiao Guangrong <guangrong.xiao@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Quoting Markus Armbruster (2017-03-20 11:13:43)
-> Visiting a list when input is the empty string should result in an
-> empty list, not an error.  Noticed when commit 3d089ce belatedly added
-> tests, but simply accepted as weird then.  It's actually a regression:
-> broken in commit 74f24cb, v2.7.0.  Fix it, and throw in another test
-> case for empty string.
+Quoting Markus Armbruster (2017-03-20 11:13:44)
+> This reverts commit 1454d33f0507cb54d62ed80f494884157c9e7130.
 > =
 
+> The string input visitor regression fixed in the previous commit made
+> visit_type_uint16List() fail on empty input.  query_memdev() calls it
+> via object_property_get_uint16List().  Because it doesn't expect it to
+> fail, it passes &error_abort, and duly crashes.
+> =
+
+> Commit 1454d33 "fixes" this crash by making
+> host_memory_backend_get_host_nodes() return a list containing just
+> MAX_NODES instead of the empty list.  Papers over the regression, and
+> leads to bogus "info memdev" output, as shown below; revert.
+> =
+
+> I suspect that if we had bisected the crash back then, we would have
+> found and fixed the actual bug instead of papering over it.
+> =
+
+> To reproduce, run HMP command "info memdev" with
+> =
+
+>     $ qemu-system-x86_64 --nodefaults -S -display none -monitor stdio -ob=
+ject memory-backend-ram,id=3Dmem1,size=3D4k
+> =
+
+> With this commit, "info memdev" prints
+> =
+
+>     memory backend: mem1
+>       size:  4096
+>       merge: true
+>       dump: true
+>       prealloc: false
+>       policy: default
+>       host nodes:
+> =
+
+> exactly like before commit 74f24cb.
+> =
+
+> Between commit 1454d33 and this commit, it prints
+> =
+
+>     memory backend: mem1
+>       size:  4096
+>       merge: true
+>       dump: true
+>       prealloc: false
+>       policy: default
+>       host nodes: 128
+> =
+
+> The last line is bogus.
+> =
+
+> Between commit 74f24cb and 1454d33, it crashes like this:
+> =
+
+>     Unexpected error in parse_str() at /work/armbru/tmp/qemu/qapi/string-=
+input-visitor.c:126:
+>     Parameter 'null' expects an int64 value or range
+>     Aborted (core dumped)
+> =
+
+> Cc: Xiao Guangrong <guangrong.xiao@linux.intel.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
 Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 
 > ---
->  qapi/string-input-visitor.c       |  4 ++++
->  tests/test-string-input-visitor.c | 11 ++++++++---
->  2 files changed, 12 insertions(+), 3 deletions(-)
+>  backends/hostmem.c | 22 ++++++++--------------
+>  1 file changed, 8 insertions(+), 14 deletions(-)
 > =
 
-> diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.c
-> index 806b01ae..c089491 100644
-> --- a/qapi/string-input-visitor.c
-> +++ b/qapi/string-input-visitor.c
-> @@ -54,6 +54,10 @@ static int parse_str(StringInputVisitor *siv, const ch=
-ar *name, Error **errp)
->          return 0;
->      }
-> =
-
-> +    if (!*str) {
-> +        return 0;
-> +    }
-> +
->      do {
->          errno =3D 0;
->          start =3D strtoll(str, &endptr, 0);
-> diff --git a/tests/test-string-input-visitor.c b/tests/test-string-input-=
-visitor.c
-> index 6db850b..79313a7 100644
-> --- a/tests/test-string-input-visitor.c
-> +++ b/tests/test-string-input-visitor.c
-> @@ -63,6 +63,11 @@ static void test_visitor_in_int(TestInputVisitorData *=
-data,
-> =
-
->      visit_type_int(v, NULL, &res, &err);
->      error_free_or_abort(&err);
-> +
-> +    v =3D visitor_input_test_init(data, "");
-> +
-> +    visit_type_int(v, NULL, &res, &err);
-> +    error_free_or_abort(&err);
+> diff --git a/backends/hostmem.c b/backends/hostmem.c
+> index 162c218..89feb9e 100644
+> --- a/backends/hostmem.c
+> +++ b/backends/hostmem.c
+> @@ -64,14 +64,6 @@ out:
+>      error_propagate(errp, local_err);
 >  }
 > =
 
->  static void check_ilist(Visitor *v, int64_t *expected, size_t n)
-> @@ -140,11 +145,11 @@ static void test_visitor_in_intList(TestInputVisito=
-rData *data,
->      v =3D visitor_input_test_init(data, "18446744073709551615");
->      check_ulist(v, expect4, ARRAY_SIZE(expect4));
+> -static uint16List **host_memory_append_node(uint16List **node,
+> -                                            unsigned long value)
+> -{
+> -     *node =3D g_malloc0(sizeof(**node));
+> -     (*node)->value =3D value;
+> -     return &(*node)->next;
+> -}
+> -
+>  static void
+>  host_memory_backend_get_host_nodes(Object *obj, Visitor *v, const char *=
+name,
+>                                     void *opaque, Error **errp)
+> @@ -82,23 +74,25 @@ host_memory_backend_get_host_nodes(Object *obj, Visit=
+or *v, const char *name,
+>      unsigned long value;
 > =
 
-> -    /* Empty list is invalid (weird) */
-> +    /* Empty list */
+>      value =3D find_first_bit(backend->host_nodes, MAX_NODES);
+> -
+> -    node =3D host_memory_append_node(node, value);
+> -
+>      if (value =3D=3D MAX_NODES) {
+> -        goto out;
+> +        return;
+>      }
 > =
 
->      v =3D visitor_input_test_init(data, "");
-> -    visit_type_int64List(v, NULL, &res, &err);
-> -    error_free_or_abort(&err);
-> +    visit_type_int64List(v, NULL, &res, &error_abort);
-> +    g_assert(!res);
+> +    *node =3D g_malloc0(sizeof(**node));
+> +    (*node)->value =3D value;
+> +    node =3D &(*node)->next;
+> +
+>      do {
+>          value =3D find_next_bit(backend->host_nodes, MAX_NODES, value + =
+1);
+>          if (value =3D=3D MAX_NODES) {
+>              break;
+>          }
 > =
 
->      /* Not a list */
+> -        node =3D host_memory_append_node(node, value);
+> +        *node =3D g_malloc0(sizeof(**node));
+> +        (*node)->value =3D value;
+> +        node =3D &(*node)->next;
+>      } while (true);
+> =
+
+> -out:
+>      visit_type_uint16List(v, name, &host_nodes, errp);
+>  }
 > =
 
 > -- =
