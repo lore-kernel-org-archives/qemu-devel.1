@@ -1,15 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cpvQR-0007IB-NT
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:24:36 -0400
+	(envelope-from <kraxel@redhat.com>) id 1cpvQt-0007cP-0t
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:25:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cpvQN-00020t-Oh
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:24:35 -0400
-From: Laurent Vivier <lvivier@redhat.com>
-Date: Mon, 20 Mar 2017 12:24:26 +0100
-Message-Id: <20170320112426.4030-1-lvivier@redhat.com>
-Subject: [Qemu-devel] [PATCH] numa,
- spapr: align default numa node memory size to 256MB
+	(envelope-from <kraxel@redhat.com>) id 1cpvQp-00025j-2b
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:25:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48114)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cpvQo-00025Y-Sw
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:24:59 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EAF2C6AAE5
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 11:24:58 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 20 Mar 2017 12:24:53 +0100
+Message-Id: <1490009093-28083-1-git-send-email-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH v3] console: drop epoxy/gl.h include dependency
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,71 +27,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Since commit 224245b ("spapr: Add LMB DR connectors"), NUMA node
-memory size must be aligned to 256MB (SPAPR_MEMORY_BLOCK_SIZE).
+Use "unsigned int" instead of GLenum and GLuint, so we don't depend on
+these types from opengl headers.  Drop all CONFIG_OPENGL #ifdefs from
+console.h
 
-But when "-numa" option is provided without "mem" parameter,
-the memory is equally divided between nodes, but 8MB aligned.
-This can be not valid for pseries.
-
-In that case we can have:
-$ ./ppc64-softmmu/qemu-system-ppc64 -m 4G -numa node -numa node -numa node
-qemu-system-ppc64: Node 0 memory size 0x55000000 is not aligned to 256 MiB
-
-With this patch, we have:
-(qemu) info numa
-3 nodes
-node 0 cpus: 0
-node 0 size: 1280 MB
-node 1 cpus:
-node 1 size: 1280 MB
-node 2 cpus:
-node 2 size: 1536 MB
-
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- dtc    |  2 +-
- numa.c | 14 +++++++++-----
- 2 files changed, 10 insertions(+), 6 deletions(-)
+ include/ui/console.h | 14 +++-----------
+ include/ui/sdl2.h    |  4 ++++
+ ui/sdl2-gl.c         |  2 +-
+ 3 files changed, 8 insertions(+), 12 deletions(-)
 
-diff --git a/dtc b/dtc
-index 558cd81..fa8bc7f 160000
---- a/dtc
-+++ b/dtc
-@@ -1 +1 @@
--Subproject commit 558cd81bdd432769b59bff01240c44f82cfb1a9d
-+Subproject commit fa8bc7f928ac25f23532afc8beb2073efc8fb063
-diff --git a/numa.c b/numa.c
-index e01cb54..a911284 100644
---- a/numa.c
-+++ b/numa.c
-@@ -337,15 +337,19 @@ void parse_numa_opts(MachineClass *mc)
-         }
-         if (i == nb_numa_nodes) {
-             uint64_t usedmem = 0;
--
--            /* On Linux, each node's border has to be 8MB aligned,
--             * the final node gets the rest.
--             */
-+#if defined(TARGET_PPC64)
-+            /* pseries requests each node's border has to be 256 MB aligned */
-+            const uint64_t numa_mem_align_mask = ~((1 << 28UL) - 1);
-+#else
-+            /* On Linux, each node's border has to be 8MB aligned */
-+            const uint64_t numa_mem_align_mask = ~((1 << 23UL)  - 1);
-+#endif
-             for (i = 0; i < nb_numa_nodes - 1; i++) {
-                 numa_info[i].node_mem = (ram_size / nb_numa_nodes) &
--                                        ~((1 << 23UL) - 1);
-+                                        numa_mem_align_mask;
-                 usedmem += numa_info[i].node_mem;
-             }
-+            /* the final node gets the rest. */
-             numa_info[i].node_mem = ram_size - usedmem;
-         }
+diff --git a/include/ui/console.h b/include/ui/console.h
+index d759338..2f4aae2 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -9,10 +9,6 @@
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
  
+-#ifdef CONFIG_OPENGL
+-# include <epoxy/gl.h>
+-#endif
+-
+ /* keyboard/mouse support */
+ 
+ #define MOUSE_EVENT_LBUTTON 0x01
+@@ -136,11 +132,9 @@ struct DisplaySurface {
+     pixman_format_code_t format;
+     pixman_image_t *image;
+     uint8_t flags;
+-#ifdef CONFIG_OPENGL
+-    GLenum glformat;
+-    GLenum gltype;
+-    GLuint texture;
+-#endif
++    unsigned int glformat;
++    unsigned int gltype;
++    unsigned int texture;
+ };
+ 
+ typedef struct QemuUIInfo {
+@@ -410,7 +404,6 @@ DisplaySurface *qemu_console_surface(QemuConsole *con);
+ 
+ /* console-gl.c */
+ typedef struct ConsoleGLState ConsoleGLState;
+-#ifdef CONFIG_OPENGL
+ ConsoleGLState *console_gl_init_context(void);
+ void console_gl_fini_context(ConsoleGLState *gls);
+ bool console_gl_check_format(DisplayChangeListener *dcl,
+@@ -427,7 +420,6 @@ void surface_gl_destroy_texture(ConsoleGLState *gls,
+ void surface_gl_setup_viewport(ConsoleGLState *gls,
+                                DisplaySurface *surface,
+                                int ww, int wh);
+-#endif
+ 
+ /* sdl.c */
+ #ifdef CONFIG_SDL
+diff --git a/include/ui/sdl2.h b/include/ui/sdl2.h
+index aaf226c..af86dfe 100644
+--- a/include/ui/sdl2.h
++++ b/include/ui/sdl2.h
+@@ -7,6 +7,10 @@
+ #include <SDL.h>
+ #include <SDL_syswm.h>
+ 
++#ifdef CONFIG_OPENGL
++# include <SDL_opengl.h>
++#endif
++
+ struct sdl2_console {
+     DisplayChangeListener dcl;
+     DisplaySurface *surface;
+diff --git a/ui/sdl2-gl.c b/ui/sdl2-gl.c
+index 1cd77e2..5bccdc9 100644
+--- a/ui/sdl2-gl.c
++++ b/ui/sdl2-gl.c
+@@ -29,10 +29,10 @@
+ #include "qemu-common.h"
+ #include "ui/console.h"
+ #include "ui/input.h"
+-#include "ui/sdl2.h"
+ #include "sysemu/sysemu.h"
+ 
+ #include <epoxy/gl.h>
++#include "ui/sdl2.h"
+ 
+ static void sdl2_set_scanout_mode(struct sdl2_console *scon, bool scanout)
+ {
 -- 
-2.9.3
+1.8.3.1
