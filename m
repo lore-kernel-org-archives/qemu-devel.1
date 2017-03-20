@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48197)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cq5La-0006jc-GW
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 18:00:15 -0400
+	(envelope-from <bounces@canonical.com>) id 1cq5gJ-0001pn-W0
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 18:21:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cq5LW-0000yb-Ee
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 18:00:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47048)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cq5LW-0000xu-7I
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 18:00:10 -0400
-References: <20170316084229.32497-1-fanc.fnst@cn.fujitsu.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f3c810e0-10b7-08a3-59c3-5ceb469442a4@redhat.com>
-Date: Mon, 20 Mar 2017 17:00:04 -0500
+	(envelope-from <bounces@canonical.com>) id 1cq5gF-0001An-Qx
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 18:21:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47560)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cq5gF-0001Ah-L7
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 18:21:35 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cq5gC-0003eM-P7
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 22:21:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 7D9922E80DA
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 22:21:29 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170316084229.32497-1-fanc.fnst@cn.fujitsu.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Cve3Txcjmdg6acX0Thuract2F5EsH8VwW"
-Subject: Re: [Qemu-devel] [PATCH] Add page-size to output in 'info migrate'
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 20 Mar 2017 22:14:35 -0000
+From: Yongbok Kim <yongbok.kim@imgtec.com>
+Reply-To: Bug 1663287 <1663287@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170209154937.3933.99004.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170320221436.22101.88249.launchpad@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1663287] Re: Illegal delay slot code causes abort
+ on mips64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,71 +37,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Chao Fan <fanc.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com, armbru@redhat.com, berrange@redhat.com
-Cc: caoj.fnst@cn.fujitsu.com, douly.fnst@cn.fujitsu.com, maozy.fnst@cn.fujitsu.com, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Cve3Txcjmdg6acX0Thuract2F5EsH8VwW
-From: Eric Blake <eblake@redhat.com>
-To: Chao Fan <fanc.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org,
- dgilbert@redhat.com, quintela@redhat.com, armbru@redhat.com,
- berrange@redhat.com
-Cc: caoj.fnst@cn.fujitsu.com, douly.fnst@cn.fujitsu.com,
- maozy.fnst@cn.fujitsu.com, Li Zhijian <lizhijian@cn.fujitsu.com>
-Message-ID: <f3c810e0-10b7-08a3-59c3-5ceb469442a4@redhat.com>
-Subject: Re: [PATCH] Add page-size to output in 'info migrate'
-References: <20170316084229.32497-1-fanc.fnst@cn.fujitsu.com>
-In-Reply-To: <20170316084229.32497-1-fanc.fnst@cn.fujitsu.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+** Changed in: qemu
+       Status: New =3D> Fix Committed
 
-On 03/16/2017 03:42 AM, Chao Fan wrote:
-> The number of dirty pages outputed in 'pages' in the command
-> 'info migrate', so add page-size to calculate the number of dirty
-> pages in bytes.
->=20
-> Signed-off-by: Chao Fan <fanc.fnst@cn.fujitsu.com>
-> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-> ---
+-- =
 
-> +++ b/qapi-schema.json
-> @@ -575,6 +575,9 @@
->  # @postcopy-requests: The number of page requests received from the de=
-stination
->  #        (since 2.7)
->  #
-> +# @page-size: The number of bytes in page of this gutst.
-> +#        (since 2.10)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1663287
 
-s/gutst/guest/
+Title:
+  Illegal delay slot code causes abort on mips64
 
-Grammar is awkward; better might be:
+Status in QEMU:
+  Fix Committed
 
-@page-size: The number of bytes per page for the various page-based
-statistics (since 2.10)
+Bug description:
+  During some randomised testing of an experimental MIPS implementation
+  I found an instruction sequence that also causes aborts on mainline
+  qemu's MIPS support.  The problem is triggered by an MSA branch
+  instruction appearing in a delay slot when emulating a processor
+  without MSA support.
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+  For example, with the current repository HEAD
+  (f073cd3a2bf1054135271b837c58a7da650dd84b) configured for
+  mips64-softmmu, if I run the attached binary using
 
+      mips64-softmmu/qemu-system-mips64 -bios ../abort2.bin -machine
+  mipssim -nographic
 
---Cve3Txcjmdg6acX0Thuract2F5EsH8VwW
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  it will report
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+      unknown branch 0x13000
+      Aborted (core dumped)
 
-iQEcBAEBCAAGBQJY0FDkAAoJEKeha0olJ0Nqe3EH/A2IzljnImrhBdpQy/mUgZYa
-llmpaQkHIUVpnZdCUQS7cEUdD9qlWg0SYmuIuixKeIwDO6NtsUX6zVwDUQpQiWag
-Sa6yySrcXz1RU+VkB3HlkXrBJGojQ3xkZxHEZeLMPQI24ofcJcsMbk+BUyUh0AYy
-9d8FE0W0+3Qq16pRzSXGotI3vDLsQf5TmaRvRBbftS9BGsZ/ESANz0X9lJvutZqD
-vvaEsW2zHn8FgEwQwq4LdB0seDaVwWZxR65xaHUd8tFeju3U2ZRbHd6KYtmFyabt
-TteSsSRtqYLELNHvw3okwPdsF/uiooGEk2M+/pZpM0pglpzM7u+3g5BjRaxxsfM=
-=igwO
------END PGP SIGNATURE-----
+  The binary contains the following two instructions:
 
---Cve3Txcjmdg6acX0Thuract2F5EsH8VwW--
+      00200008 jr at
+      47081e61 bz.b       w8,0xffffffffbfc0798c
+
+  The jr sets up a jump, and hflags is set accordingly in
+  gen_compute_branch (in target/mips/translate.c).  When processing the
+  bz.b, check_insn generates an exception because the instruction isn't
+  support, but gen_msa_branch skips the usual delay slot check for the
+  same reason, and sets more bits in hflags, leading to an abort in
+  gen_branch because the hflags are now invalid.
+
+  I suspect the best fix is to remove the instruction set condition from
+  the delay slot check in gen_msa_branch.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1663287/+subscriptions
