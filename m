@@ -1,36 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6Qy-0001zY-58
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:10:03 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6R0-00022T-EL
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:10:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6Qq-00059e-R9
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:52 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38839
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6Qr-0005B7-Ot
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:54 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41853
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cq6Qq-00058s-JB
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:44 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2KN8eWs014518
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:44 -0400
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 29af6evvwk-1
+	id 1cq6Qr-0005AA-Ic
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:45 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2KN8aNZ074951
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:45 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 29aj6q9j37-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:43 -0400
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:44 -0400
 Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 20 Mar 2017 17:09:43 -0600
+	Mon, 20 Mar 2017 19:09:44 -0400
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 20 Mar 2017 18:08:29 -0500
+Date: Mon, 20 Mar 2017 18:08:31 -0500
 In-Reply-To: <1490051325-3770-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1490051325-3770-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1490051325-3770-66-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 65/81] target-ppc,
- tcg: fix usermode segfault with pthread_create()
+Message-Id: <1490051325-3770-68-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 67/81] target/sparc: Restore ldstub of odd asis
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,52 +39,59 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Sam Bobroff <sam.bobroff@au1.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-stable@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-From: Sam Bobroff <sam.bobroff@au1.ibm.com>
+From: Richard Henderson <rth@twiddle.net>
 
-Programs run under qemu-ppc64 on an x86_64 host currently segfault
-if they use pthread_create() due to the adjustment made to the NIP in
-commit bd6fefe71cec5a0c7d2be4ac96307f25db56abf9.
+Fixes the booting of ss20 roms.
 
-This patch changes cpu_loop() to set the NIP back to the
-pre-incremented value before calling do_syscall(), which causes the
-correct address to be used for the new thread and corrects the fault.
-
-Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-(cherry picked from commit 2635531f2006bfb0f943ad25b41e176709b79b37)
+Cc: qemu-stable@nongnu.org
+Reported-by: Michael Russo <mike@papersolve.com>
+Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Signed-off-by: Richard Henderson <rth@twiddle.net>
+(cherry picked from commit 3db010c3398d03646d74f2d36a68e62539342e6c)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- linux-user/main.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ target-sparc/translate.c | 27 +++++++++++++++++++++++++--
+ 1 file changed, 25 insertions(+), 2 deletions(-)
 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index cc77ec4..65a769c 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -1708,10 +1708,12 @@ void cpu_loop(CPUPPCState *env)
-              * in syscalls.
-              */
-             env->crf[0] &= ~0x1;
-+            env->nip += 4;
-             ret = do_syscall(env, env->gpr[0], env->gpr[3], env->gpr[4],
-                              env->gpr[5], env->gpr[6], env->gpr[7],
-                              env->gpr[8], 0, 0);
-             if (ret == -TARGET_ERESTARTSYS) {
-+                env->nip -= 4;
-                 break;
-             }
-             if (ret == (target_ulong)(-TARGET_QEMU_ESIGRETURN)) {
-@@ -1719,7 +1721,6 @@ void cpu_loop(CPUPPCState *env)
-                    Avoid corrupting register state.  */
-                 break;
-             }
--            env->nip += 4;
-             if (ret > (target_ulong)(-515)) {
-                 env->crf[0] |= 0x1;
-                 ret = -ret;
+diff --git a/target-sparc/translate.c b/target-sparc/translate.c
+index 2205f89..7245c09 100644
+--- a/target-sparc/translate.c
++++ b/target-sparc/translate.c
+@@ -2425,8 +2425,31 @@ static void gen_ldstub_asi(DisasContext *dc, TCGv dst, TCGv addr, int insn)
+         gen_ldstub(dc, dst, addr, da.mem_idx);
+         break;
+     default:
+-        /* ??? Should be DAE_invalid_asi.  */
+-        gen_exception(dc, TT_DATA_ACCESS);
++        /* ??? In theory, this should be raise DAE_invalid_asi.
++           But the SS-20 roms do ldstuba [%l0] #ASI_M_CTL, %o1.  */
++        if (parallel_cpus) {
++            gen_helper_exit_atomic(cpu_env);
++        } else {
++            TCGv_i32 r_asi = tcg_const_i32(da.asi);
++            TCGv_i32 r_mop = tcg_const_i32(MO_UB);
++            TCGv_i64 s64, t64;
++
++            save_state(dc);
++            t64 = tcg_temp_new_i64();
++            gen_helper_ld_asi(t64, cpu_env, addr, r_asi, r_mop);
++
++            s64 = tcg_const_i64(0xff);
++            gen_helper_st_asi(cpu_env, addr, s64, r_asi, r_mop);
++            tcg_temp_free_i64(s64);
++            tcg_temp_free_i32(r_mop);
++            tcg_temp_free_i32(r_asi);
++
++            tcg_gen_trunc_i64_tl(dst, t64);
++            tcg_temp_free_i64(t64);
++
++            /* End the TB.  */
++            dc->npc = DYNAMIC_PC;
++        }
+         break;
+     }
+ }
 -- 
 2.7.4
