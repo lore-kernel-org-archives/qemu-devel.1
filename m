@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cpv4C-0006yZ-Eq
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:01:40 -0400
+	(envelope-from <stefanha@gmail.com>) id 1cpv4g-0007KB-N4
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:02:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cpv48-0005zR-DI
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:01:36 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:38856)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cpv48-0005yQ-7X
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:01:32 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id t189so61027151wmt.1
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 04:01:32 -0700 (PDT)
-References: <1487616072-9226-1-git-send-email-peter.maydell@linaro.org>
-	<1487616072-9226-5-git-send-email-peter.maydell@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1487616072-9226-5-git-send-email-peter.maydell@linaro.org>
-Date: Mon, 20 Mar 2017 11:01:54 +0000
-Message-ID: <87mvcgnrdp.fsf@linaro.org>
+	(envelope-from <stefanha@gmail.com>) id 1cpv4f-0006c8-UP
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:02:06 -0400
+Date: Mon, 20 Mar 2017 11:01:56 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170320110156.GI17887@stefanha-x1.localdomain>
+References: <20170313214001.26339-1-mreitz@redhat.com>
+	<20170313214045.26857-6-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 4/4] arm: Fix APSR writes via M profile MSR
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="2xeD/fx0+7k8I/QN"
+Content-Disposition: inline
+In-Reply-To: <20170313214045.26857-6-mreitz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10 08/16] block/file-posix:
+ Preallocation for truncate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,101 +25,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Michael Davidsaver <mdavidsaver@gmail.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+--2xeD/fx0+7k8I/QN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Our implementation of writes to the APSR for M-profile via the MSR
-> instruction was badly broken.
->
-> First and worst, we had the sense wrong on the test of bit 2 of the
-> SYSm field -- this is supposed to request an APSR write if bit 2 is 0
-> but we were doing it if bit 2 was 1.  This bug was introduced in
-> commit 58117c9bb429cd, so hasn't been in a QEMU release.
->
-> Secondly, the choice of exactly which parts of APSR should be written
-> is defined by bits in the 'mask' field.  We were not passing these
-> through from instruction decode, making it impossible to check them
-> in the helper.
->
-> Pass the mask bits through from the instruction decode to the helper
-> function and process them appropriately; fix the wrong sense of the
-> SYSm bit 2 check.
->
-> Invalid mask values and invalid combinations of mask and register
-> number are UNPREDICTABLE; we choose to treat them as if the mask
-> values were valid.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-
+On Mon, Mar 13, 2017 at 10:40:37PM +0100, Max Reitz wrote:
+> By using raw_regular_truncate() in raw_truncate(), we can now easily
+> support preallocation.
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  target/arm/helper.c    | 26 ++++++++++++++++++++++----
->  target/arm/translate.c |  3 ++-
->  2 files changed, 24 insertions(+), 5 deletions(-)
->
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 948aba2..8349e1f 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -8478,8 +8478,18 @@ uint32_t HELPER(v7m_mrs)(CPUARMState *env, uint32_t reg)
->      }
->  }
->
-> -void HELPER(v7m_msr)(CPUARMState *env, uint32_t reg, uint32_t val)
-> -{
-> +void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
-> +{
-> +    /* We're passed bits [11..0] of the instruction; extract
-> +     * SYSm and the mask bits.
-> +     * Invalid combinations of SYSm and mask are UNPREDICTABLE;
-> +     * we choose to treat them as if the mask bits were valid.
-> +     * NB that the pseudocode 'mask' variable is bits [11..10],
-> +     * whereas ours is [11..8].
-> +     */
-> +    uint32_t mask = extract32(maskreg, 8, 4);
-> +    uint32_t reg = extract32(maskreg, 0, 8);
-> +
->      if (arm_current_el(env) == 0 && reg > 7) {
->          /* only xPSR sub-fields may be written by unprivileged */
->          return;
-> @@ -8488,8 +8498,16 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t reg, uint32_t val)
->      switch (reg) {
->      case 0 ... 7: /* xPSR sub-fields */
->          /* only APSR is actually writable */
-> -        if (reg & 4) {
-> -            xpsr_write(env, val, 0xf8000000); /* APSR */
-> +        if (!(reg & 4)) {
-> +            uint32_t apsrmask = 0;
-> +
-> +            if (mask & 8) {
-> +                apsrmask |= 0xf8000000; /* APSR NZCVQ */
-> +            }
-> +            if ((mask & 4) && arm_feature(env, ARM_FEATURE_THUMB_DSP)) {
-> +                apsrmask |= 0x000f0000; /* APSR GE[3:0] */
-> +            }
-> +            xpsr_write(env, val, apsrmask);
->          }
->          break;
->      case 8: /* MSP */
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index 9090356..ce7f19f 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -10391,7 +10391,8 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
->                      case 0: /* msr cpsr.  */
->                          if (arm_dc_feature(s, ARM_FEATURE_M)) {
->                              tmp = load_reg(s, rn);
-> -                            addr = tcg_const_i32(insn & 0xff);
-> +                            /* the constant is the mask and SYSm fields */
-> +                            addr = tcg_const_i32(insn & 0xfff);
->                              gen_helper_v7m_msr(cpu_env, addr, tmp);
->                              tcg_temp_free_i32(addr);
->                              tcg_temp_free_i32(tmp);
+>  block/file-posix.c | 22 ++++++++++------------
+>  1 file changed, 10 insertions(+), 12 deletions(-)
 
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---
-Alex Bennée
+--2xeD/fx0+7k8I/QN
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYz7akAAoJEJykq7OBq3PIF7sH/j0tPg7phldSzOa7qNh2Qbl1
+hRMkFpoYsijbz9bvV/PFx1LLQmLntw5/LU5Kuv5iL81GSQiQ5GWVL1+X+OkEbQJP
+Wmf4Rlkd9TpSbRssh1h5PIa7grWjDvHekOgnZnU3P09ks6zlIQt6DdHTskVP8/FO
+oMEcNNYm39PHQm9hLPdAupAAvFqeN/aZJW6RPsGXBr7qmx5rw8yGKZsErIQarJU8
+XXgGrfakcAwNGNdhiGek51niOsEOQc56y/J57tHtz7SETjIgi5vfKuYBCmGOzQJc
+viHJZzw5/Hlv46OYo4PkAIXPXF+BhFLmYVJIFkcRr2O0kiVkeNO67G7miabk8Oc=
+=u+UG
+-----END PGP SIGNATURE-----
+
+--2xeD/fx0+7k8I/QN--
