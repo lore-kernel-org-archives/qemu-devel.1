@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1cpvHQ-00034V-Hc
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:15:17 -0400
+	(envelope-from <quintela@redhat.com>) id 1cpvHc-0003Bk-3O
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:15:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ard.biesheuvel@linaro.org>) id 1cpvHM-0007lw-JY
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:15:16 -0400
-Received: from mail-it0-x235.google.com ([2607:f8b0:4001:c0b::235]:35911)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
-	id 1cpvHM-0007le-Ey
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:15:12 -0400
-Received: by mail-it0-x235.google.com with SMTP id w124so84519555itb.1
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 04:15:12 -0700 (PDT)
+	(envelope-from <quintela@redhat.com>) id 1cpvHW-0007op-CW
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:15:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:7403)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cpvHW-0007oZ-6Q
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:15:22 -0400
+From: Juan Quintela <quintela@redhat.com>
+Message-ID: <8760jbu434.fsf@secure.mitica>
+Reply-To: quintela@redhat.com
+Date: Mon, 20 Mar 2017 12:15:18 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8o15m5PgRPdGtHRgP=t4EZf5EPZKnJ7J=G0dosBHZXBA@mail.gmail.com>
-References: <1489414630-21609-1-git-send-email-ard.biesheuvel@linaro.org>
-	<CAFEAcA8o15m5PgRPdGtHRgP=t4EZf5EPZKnJ7J=G0dosBHZXBA@mail.gmail.com>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Mon, 20 Mar 2017 11:15:11 +0000
-Message-ID: <CAKv+Gu_vD43=3JEcEuB2iqw8q58F5GkT=tdak5JaB88RDaQJ6w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2] hw/arm/boot: take Linux/arm64
- TEXT_OFFSET header field into account
+Content-Type: text/plain
+Subject: [Qemu-devel] KVM call minutes for 2017-03-14
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +24,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Mark Rutland <mark.rutland@arm.com>
+To: QEMU Developer <qemu-devel@nongnu.org>, KVM devel mailing list <kvm@vger.kernel.org>
 
-On 20 March 2017 at 11:13, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 13 March 2017 at 14:17, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->> The arm64 boot protocol stipulates that the kernel must be loaded
->> TEXT_OFFSET bytes beyond a 2 MB aligned base address, where TEXT_OFFSET
->> could be any 4 KB multiple between 0 and 2 MB, and whose value can be
->> found in the header of the Image file.
->>
->> So after attempts to load the arm64 kernel image as an ELF file or as a
->> U-Boot image have failed (both of which have their own way of specifying
->> the load offset), try to determine the TEXT_OFFSET from the image after
->> loading it but before mapping it as a ROM mapping into the guest address
->> space.
->>
->> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
->> ---
->> v2: split off AArch64 specific loader logic regarding gzipped/raw and variable
->>     load offset into a separate helper function, which removes the need for
->>     loading the image twice
->
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
->
 
-Thanks
+Hi
 
-> Since we're due to tag rc1 tomorrow and this is kind of on the
-> border between bugfix and new feature, I think I'd rather
-> defer it to 2.10, unless you have a strong view that it should
-> go into 2.9.
->
+After a long while, we have had a kvm call.
 
-I will leave that to you to decide, I don't feel strongly either way
+See the thread for the agenda for things that were discussed.  My notes
+are a bit clear because I was also partipating.
+
+Please, reply with more things.
+
+- What to do with qemu to evolve?
+  Making it more modular (seems to be a good idea)
+  more configurable (decide what we compile in or not)
+  * xen and kvm can already be compiled out
+  * there are patches posted for tcg, but not upstream
+
+- how widely use is kvmtool?
+
+- Change to a different language?
+  * what we want to achieve wit that?
+    Better support to detect "errors"
+    Less boilerplate code to have to write
+    Easier language for writing emulation code
+
+- Can we do anything better than more documentation for people that want
+  to write a driver?
+
+- Should we use more upstream libraries?  Should we develop more inside
+  qemu?
+
+- Object model?
+  * Was QOM a good decision?  Better to move to glib model?
+
+- Documentation?  What format are we going to use
+  There are patches to be integrated.
+
+
+- What can we do to help device model writers?
+
+Thanks, Juan.
