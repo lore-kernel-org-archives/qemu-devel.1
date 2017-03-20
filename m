@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36900)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cpzMS-0005mI-C7
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:36:45 -0400
+	(envelope-from <stefanha@redhat.com>) id 1cpzMz-0006AI-5X
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:37:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cpzMR-0007Tk-Gt
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:36:44 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:38676)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cpzMR-0007TB-B0
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:36:43 -0400
-Received: by mail-wm0-x231.google.com with SMTP id t189so67801860wmt.1
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 08:36:43 -0700 (PDT)
+	(envelope-from <stefanha@redhat.com>) id 1cpzMu-0007fx-9h
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:37:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44330)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cpzMu-0007fa-35
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:37:12 -0400
+Date: Mon, 20 Mar 2017 15:37:07 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170320153707.GB7320@stefanha-x1.localdomain>
+References: <20170315092940.1367-1-stefanha@redhat.com>
+	<20170315092940.1367-2-stefanha@redhat.com>
+	<CAMRbyysBvGhV6cqN8qX+dL3f3Y8QOCtn+jhOKunDHFrTZEwyoQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1490018607-11838-1-git-send-email-kraxel@redhat.com>
-References: <1490018607-11838-1-git-send-email-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 20 Mar 2017 15:36:21 +0000
-Message-ID: <CAFEAcA_nzcDmykyXXO3ybK6290Kx0HOwGyxsxvwVPJY8M2d-_Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] add opengl_cflags to QEMU_CFLAGS
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="5I6of5zJg18YgZEa"
+Content-Disposition: inline
+In-Reply-To: <CAMRbyysBvGhV6cqN8qX+dL3f3Y8QOCtn+jhOKunDHFrTZEwyoQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [RFC v2 1/8] block: add bdrv_measure() API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +29,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Nir Soffer <nsoffer@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>
 
-On 20 March 2017 at 14:03, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  configure        | 2 +-
->  ui/Makefile.objs | 7 ++-----
->  2 files changed, 3 insertions(+), 6 deletions(-)
 
-Tested-by: Peter Maydell <peter.maydell@linaro.org>
+--5I6of5zJg18YgZEa
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This does fix the compile issue on OpenBSD.
+On Sat, Mar 18, 2017 at 12:51:29AM +0000, Nir Soffer wrote:
+> On Wed, Mar 15, 2017 at 11:29 AM Stefan Hajnoczi <stefanha@redhat.com>
+> wrote:
+> > diff --git a/block.c b/block.c
+> > index cb57370..532a4d1 100644
+> > --- a/block.c
+> > +++ b/block.c
+> > @@ -3260,6 +3260,39 @@ int64_t
+> > bdrv_get_allocated_file_size(BlockDriverState *bs)
+> >      return -ENOTSUP;
+> >  }
+> >
+> > +/*
+> > + * bdrv_measure:
+> > + * @drv: Format driver
+> > + * @opts: Creation options
+> >
+>=20
+> Isn't this Measure options?
 
-> diff --git a/configure b/configure
-> index 99d8bec..89f29c1 100755
-> --- a/configure
-> +++ b/configure
-> @@ -3449,6 +3449,7 @@ if test "$opengl" != "no" ; then
->      if test "$gtk" = "yes" && $pkg_config --exists "$gtkpackage >= 3.16"; then
->          gtk_gl="yes"
->      fi
-> +    QEMU_CFLAGS="$QEMU_CFLAGS $opengl_cflags"
->    else
->      if test "$opengl" = "yes" ; then
->        feature_not_found "opengl" "Please install opengl (mesa) devel pkgs: $opengl_pkgs"
-> @@ -5503,7 +5504,6 @@ fi
->
->  if test "$opengl" = "yes" ; then
->    echo "CONFIG_OPENGL=y" >> $config_host_mak
-> -  echo "OPENGL_CFLAGS=$opengl_cflags" >> $config_host_mak
->    echo "OPENGL_LIBS=$opengl_libs" >> $config_host_mak
->    if test "$opengl_dmabuf" = "yes" ; then
->      echo "CONFIG_OPENGL_DMABUF=y" >> $config_host_mak
-> diff --git a/ui/Makefile.objs b/ui/Makefile.objs
-> index dc936f1..27566b3 100644
-> --- a/ui/Makefile.objs
-> +++ b/ui/Makefile.objs
-> @@ -41,11 +41,8 @@ endif
->  endif
->
->  gtk.o-cflags := $(GTK_CFLAGS) $(VTE_CFLAGS)
-> -gtk-egl.o-cflags := $(GTK_CFLAGS) $(VTE_CFLAGS) $(OPENGL_CFLAGS)
-> -gtk-gl-area.o-cflags := $(GTK_CFLAGS) $(VTE_CFLAGS) $(OPENGL_CFLAGS)
-> -shader.o-cflags += $(OPENGL_CFLAGS)
-> -console-gl.o-cflags += $(OPENGL_CFLAGS)
-> -egl-helpers.o-cflags += $(OPENGL_CFLAGS)
-> +gtk-egl.o-cflags := $(GTK_CFLAGS) $(VTE_CFLAGS)
-> +gtk-gl-area.o-cflags := $(GTK_CFLAGS) $(VTE_CFLAGS)
->
->  gtk-egl.o-libs += $(OPENGL_LIBS)
->  shader.o-libs += $(OPENGL_LIBS)
+No, these are the block driver .bdrv_create() options.  They are exactly
+the same as qemu-img create -o.
 
-This isn't the only makefile that adds OPENGL_CFLAGS to things.
-Shouldn't we also remove the reference in hw/display/Makefile.objs ?
+qemu-img measure must know the creation options of the new image file
+(such as preallocation or the qcow2 image format version) because they
+affect the file size.
 
-thanks
--- PMM
+> Maybe a note about error handling? the only way is to check for non-null
+> errp, right?
+
+Yes, errp must be checked.  I'll update the doc comment.
+
+--5I6of5zJg18YgZEa
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYz/cjAAoJEJykq7OBq3PIz84H/3n4vrwqwgnE7GcdlfZ1aCs3
+6QQfdIm8DJzNyMzyAHu2fEt1l8bbftBNK3j/go5NJA4GVzkSVq0amlWf2JYUUxKT
+cL77MVzxB3iIaoKLanzfCVraA2F3Ns42v18s5uaBkCGmOREsJL5BT0M9c77qQhwH
+A3rn9wbt8K6ua8CXl8pgzPDewecQbZykB2PcqwhoITeODtoFhlXzuA5OcaaXWTrs
+Slw1M472VyqBSTcFwYZI2x2sHyhDHeWRCiNinjfNSB576xX6k58utEV49divVfn6
+NOfqvpS9Fujxkq9bPtzV3pQq2roXF3hBzPJZ6qJ3PiqcGTstke39mBMWz6tkbBE=
+=FFt3
+-----END PGP SIGNATURE-----
+
+--5I6of5zJg18YgZEa--
