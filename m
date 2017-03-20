@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45835)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cpvNd-0005xt-IE
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:21:42 -0400
+	(envelope-from <stefanha@gmail.com>) id 1cpvPF-0006cK-2U
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:23:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cpvNc-0001b7-PH
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:21:41 -0400
-References: <bd7cb196-0779-42ad-ce9c-5871d307adce@kamp.de>
-	<82d604c8-068a-aff4-6037-e3cd247b3588@redhat.com>
-	<819af057-3777-dffc-4670-895b8265fd01@kamp.de>
-	<d41d1428-4c8b-7e2f-b197-8d45b834776d@redhat.com>
-	<32e1e781-f0b0-ac67-a5ce-74ccc64071a0@kamp.de>
-	<20170320024649.GA18938@lemon.lan>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <37879546-cf6e-01fa-adc6-c777e14eab0e@redhat.com>
-Date: Mon, 20 Mar 2017 12:21:32 +0100
+	(envelope-from <stefanha@gmail.com>) id 1cpvPE-0001pH-9u
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:23:21 -0400
+Date: Mon, 20 Mar 2017 11:23:11 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170320112311.GL17887@stefanha-x1.localdomain>
+References: <20170313214001.26339-1-mreitz@redhat.com>
+	<20170313214117.27350-2-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170320024649.GA18938@lemon.lan>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] callout to *file in bdrv_co_get_block_status
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Mit9XoPEfICDqq/V"
+Content-Disposition: inline
+In-Reply-To: <20170313214117.27350-2-mreitz@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.10 11/16] block/qcow2:
+ Metadata preallocation for truncate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,40 +25,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, Peter Lieven <pl@kamp.de>
-Cc: qemu block <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
 
+--Mit9XoPEfICDqq/V
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 20/03/2017 03:46, Fam Zheng wrote:
-> On Fri, 03/17 12:20, Peter Lieven wrote:
->> Am 17.03.2017 um 12:16 schrieb Paolo Bonzini:
->>>
->>> On 17/03/2017 12:11, Peter Lieven wrote:
->>>>>> like VMDK or QCOW2 shouldn't we trust the information from the l2 tables in the VMDK or QCOW2?
->>>>> It provides additional information, for example it works better with
->>>>> prealloc=metadata.
->>>> Okay, understood. Can you imagine of a away to conditionally avoid this second callout? In my case we have an additional
->>>> lseek for each cluster. For a 20GB file this are approx. 327k calls to lseek. And if the file has no preallocated metadata
->>>> it will likely not improve anything. And even if the metadata is prealloced what is the allocation status of the clusters?
->>> If the metadata is preallocated, cluster will (or should) show up as
->>> zero, speeding up the copy.
->>
->> Okay, in this case the second call out to *file will not happen. It only happens if the metadata says it contains data.
->> So where does it actually help?
->>
->> The condition is: (ret & BDRV_BLOCK_DATA) && !(ret & BDRV_BLOCK_ZERO) && (ret & BDRV_BLOCK_OFFSET_VALID))
->>
->> So from my view it can only have any effect if the metadata returns BDRV_BLOCK_DATA, but the protocol driver returns
->> BDRV_BLOCK_ZERO.
->>
->> This can only happen if I partially write to a cluster, or am I wrong here?
-> 
-> I think you have a point. The metadata should have said BDRV_BLOCK_ZERO if
-> protocol would say BDRV_BLOCK_ZERO - there is no reason the format driver cannot
-> know.
+On Mon, Mar 13, 2017 at 10:41:12PM +0100, Max Reitz wrote:
+> We can support PREALLOC_MODE_METADATA by invoking preallocate() in
+> qcow2_truncate().
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  block/qcow2.c | 24 ++++++++++++++++++++++--
+>  1 file changed, 22 insertions(+), 2 deletions(-)
 
-That's true of qcow2, but many formats (including raw :)) don't know
-about BDRV_BLOCK_ZERO.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Paolo
+--Mit9XoPEfICDqq/V
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYz7ufAAoJEJykq7OBq3PI9+YH/1vxBHEsje8NF25nnjqHtf2P
+eNo6ksaE0Wg8Skv7N4IeqRKPGa2jb+kg3OtmUd+Q91XTpqdl6rhSIu+PlN60JMUb
+WoX9GeXPJleOf18P+6L+/xYnBMpk21P+ZupfZ1z+pL7i81ZVolpNMbos82PZmnvO
+VoWV/5H3DtiFAX3OblE7YgZ3veypsW2fjgCNq0SaQQmn2H8hx/CFTmRxjGm7qave
+m8u9t2E2Z06IJIx0azsePKyIBdTQc0LL0UhRX1VB49IS1NqM0uzpJmf0VF62xDjC
+Oef2eJ1VKqDUqy36JZO38KDy7yI0/F1sN4CGTtp69uFOObYudXPjv0aNIzqUU0g=
+=psoh
+-----END PGP SIGNATURE-----
+
+--Mit9XoPEfICDqq/V--
