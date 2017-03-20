@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cpv3I-0006W3-1P
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:00:46 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1cpv4C-0006yZ-Eq
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:01:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cpv3F-0004ul-0a
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:00:40 -0400
-Date: Mon, 20 Mar 2017 11:00:23 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170320110023.GH17887@stefanha-x1.localdomain>
-References: <20170313214001.26339-1-mreitz@redhat.com>
-	<20170313214045.26857-5-mreitz@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1cpv48-0005zR-DI
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:01:36 -0400
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:38856)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cpv48-0005yQ-7X
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 07:01:32 -0400
+Received: by mail-wm0-x22b.google.com with SMTP id t189so61027151wmt.1
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 04:01:32 -0700 (PDT)
+References: <1487616072-9226-1-git-send-email-peter.maydell@linaro.org>
+	<1487616072-9226-5-git-send-email-peter.maydell@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1487616072-9226-5-git-send-email-peter.maydell@linaro.org>
+Date: Mon, 20 Mar 2017 11:01:54 +0000
+Message-ID: <87mvcgnrdp.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="LZFKeWUZP29EKQNE"
-Content-Disposition: inline
-In-Reply-To: <20170313214045.26857-5-mreitz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 07/16] block/file-posix:
- Generalize raw_regular_truncate
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 4/4] arm: Fix APSR writes via M profile MSR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,102 +30,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Michael Davidsaver <mdavidsaver@gmail.com>
 
 
---LZFKeWUZP29EKQNE
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-On Mon, Mar 13, 2017 at 10:40:36PM +0100, Max Reitz wrote:
-> Currently, raw_regular_truncate() is intended for setting the size of a
-> newly created file. However, we also want to use it for truncating an
-> existing file in which case only the newly added space (when growing)
-> should be preallocated.
->=20
-> This also means that if resizing failed, we should try to restore the
-> original file size. This is important when using preallocation.
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> Our implementation of writes to the APSR for M-profile via the MSR
+> instruction was badly broken.
+>
+> First and worst, we had the sense wrong on the test of bit 2 of the
+> SYSm field -- this is supposed to request an APSR write if bit 2 is 0
+> but we were doing it if bit 2 was 1.  This bug was introduced in
+> commit 58117c9bb429cd, so hasn't been in a QEMU release.
+>
+> Secondly, the choice of exactly which parts of APSR should be written
+> is defined by bits in the 'mask' field.  We were not passing these
+> through from instruction decode, making it impossible to check them
+> in the helper.
+>
+> Pass the mask bits through from the instruction decode to the helper
+> function and process them appropriately; fix the wrong sense of the
+> SYSm bit 2 check.
+>
+> Invalid mask values and invalid combinations of mask and register
+> number are UNPREDICTABLE; we choose to treat them as if the mask
+> values were valid.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+
 > ---
->  block/file-posix.c | 73 ++++++++++++++++++++++++++++++++++++++++++++----=
-------
->  1 file changed, 60 insertions(+), 13 deletions(-)
->=20
-> diff --git a/block/file-posix.c b/block/file-posix.c
-> index 35a9e43f3e..cd229324ba 100644
-> --- a/block/file-posix.c
-> +++ b/block/file-posix.c
-> @@ -1384,11 +1384,39 @@ static void raw_close(BlockDriverState *bs)
+>  target/arm/helper.c    | 26 ++++++++++++++++++++++----
+>  target/arm/translate.c |  3 ++-
+>  2 files changed, 24 insertions(+), 5 deletions(-)
+>
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 948aba2..8349e1f 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -8478,8 +8478,18 @@ uint32_t HELPER(v7m_mrs)(CPUARMState *env, uint32_t reg)
 >      }
 >  }
-> =20
-> -static int raw_regular_truncate(int fd, int64_t offset, PreallocMode pre=
-alloc,
-> +/**
-> + * Truncates the given regular file @fd to @offset and, when growing, fi=
-lls the
-> + * new space according to @prealloc.
-> + *
-> + * @create must be true iff the file is new. In that case, @bs is ignore=
-d. If
-> + * @create is false, @bs must be valid and correspond to the same file a=
-s @fd.
-
-Returns: 0 on success, -errno on failure.
-
-> + */
-> +static int raw_regular_truncate(int fd, BlockDriverState *bs, int64_t of=
-fset,
-
-The presence of both a file descriptor and a BlockDriverState (actually
-it must be a BDRVRawState) arguments is unusual.  It seems bs is needed
-for bdrv_getlength().
-
-How about using fstat(fd, &st) and then dropping bs and create?
-
-> +                                PreallocMode prealloc, bool create,
->                                  Error **errp)
->  {
->      int result =3D 0;
-> -    char *buf;
-> +    int64_t current_length =3D 0;
-> +    char *buf =3D NULL;
+>
+> -void HELPER(v7m_msr)(CPUARMState *env, uint32_t reg, uint32_t val)
+> -{
+> +void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
+> +{
+> +    /* We're passed bits [11..0] of the instruction; extract
+> +     * SYSm and the mask bits.
+> +     * Invalid combinations of SYSm and mask are UNPREDICTABLE;
+> +     * we choose to treat them as if the mask bits were valid.
+> +     * NB that the pseudocode 'mask' variable is bits [11..10],
+> +     * whereas ours is [11..8].
+> +     */
+> +    uint32_t mask = extract32(maskreg, 8, 4);
+> +    uint32_t reg = extract32(maskreg, 0, 8);
 > +
-> +    assert(create || bs);
-> +    if (!create) {
-> +        BDRVRawState *s =3D bs->opaque;
-> +        assert(s->fd =3D=3D fd);
-> +    }
+>      if (arm_current_el(env) == 0 && reg > 7) {
+>          /* only xPSR sub-fields may be written by unprivileged */
+>          return;
+> @@ -8488,8 +8498,16 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t reg, uint32_t val)
+>      switch (reg) {
+>      case 0 ... 7: /* xPSR sub-fields */
+>          /* only APSR is actually writable */
+> -        if (reg & 4) {
+> -            xpsr_write(env, val, 0xf8000000); /* APSR */
+> +        if (!(reg & 4)) {
+> +            uint32_t apsrmask = 0;
 > +
-> +    if (!create) {
-> +        current_length =3D bdrv_getlength(bs);
-> +        if (current_length < 0) {
-> +            error_setg_errno(errp, -current_length,
-> +                             "Could not inquire current length");
-> +            return -current_length;
-> +        }
-> +
-> +        if (current_length > offset && prealloc !=3D PREALLOC_MODE_OFF) {
-> +            return -ENOTSUP;
-> +        }
+> +            if (mask & 8) {
+> +                apsrmask |= 0xf8000000; /* APSR NZCVQ */
+> +            }
+> +            if ((mask & 4) && arm_feature(env, ARM_FEATURE_THUMB_DSP)) {
+> +                apsrmask |= 0x000f0000; /* APSR GE[3:0] */
+> +            }
+> +            xpsr_write(env, val, apsrmask);
+>          }
+>          break;
+>      case 8: /* MSP */
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index 9090356..ce7f19f 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -10391,7 +10391,8 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
+>                      case 0: /* msr cpsr.  */
+>                          if (arm_dc_feature(s, ARM_FEATURE_M)) {
+>                              tmp = load_reg(s, rn);
+> -                            addr = tcg_const_i32(insn & 0xff);
+> +                            /* the constant is the mask and SYSm fields */
+> +                            addr = tcg_const_i32(insn & 0xfff);
+>                              gen_helper_v7m_msr(cpu_env, addr, tmp);
+>                              tcg_temp_free_i32(addr);
+>                              tcg_temp_free_i32(tmp);
 
-Missing error_setg().
 
---LZFKeWUZP29EKQNE
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYz7ZHAAoJEJykq7OBq3PITDkIAMD8VnbSSSXOaEciALHPk9TO
-p1gftaqE7Ny5OXVFK4oMg1bngGjcdnggAqB9riQVqIUDkPF4xWtNi5HEzCyQ6aYj
-iER/eFXvbD5XC5Bo0ycGVcz0rkHSJqpgiy/Hy4jhexq6kw6oA6I1XfpzwboZuU7+
-/qkUoy/frjdRwPLv+yCHFKeod2Io+GyTWrHwlLCKtdmh5cRq7lk04o+e+gMMx7MB
-GKDtjYBWGTEhoiKiEKZv/PeDyn5qRWF3BZ1n+q0k2lhm+NRV7KiZB1c1ZVEQ+DdE
-lWh3oXfEiVwXQm0HoiI5xUdULQf+2z93rHD4uMIjeCYcyLfm+h49p24MZHkPuYw=
-=j+ft
------END PGP SIGNATURE-----
-
---LZFKeWUZP29EKQNE--
+--
+Alex Bennée
