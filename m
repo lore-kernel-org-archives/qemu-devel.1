@@ -1,15 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sauravsachidanand@gmail.com>) id 1cq1GV-00038c-L9
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 13:38:45 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1cq1Gb-0003Ak-GT
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 13:38:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sauravsachidanand@gmail.com>) id 1cq1GP-00017S-Iy
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 13:38:43 -0400
-From: Saurav Sachidanand <sauravsachidanand@gmail.com>
-Date: Mon, 20 Mar 2017 17:38:28 +0000
-Message-Id: <20170320173828.3874-1-sauravsachidanand@gmail.com>
-Subject: [Qemu-devel] [Qemu-trivial] [PATCH v5] util: Use g_malloc/g_free in
- envlist.c
+	(envelope-from <dgilbert@redhat.com>) id 1cq1GZ-0001AE-TE
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 13:38:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46722)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cq1GZ-00019w-K6
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 13:38:47 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A8220C05683F
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 17:38:47 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Mon, 20 Mar 2017 17:38:40 +0000
+Message-Id: <20170320173840.3626-3-dgilbert@redhat.com>
+In-Reply-To: <20170320173840.3626-1-dgilbert@redhat.com>
+References: <20170320173840.3626-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/2] wavcapture: Convert to error_report
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,220 +29,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, stefanha@gmail.com, laurent@vivier.eu, Saurav Sachidanand <sauravsachidanand@gmail.com>
+To: qemu-devel@nongnu.org, armbru@redhat.com
+Cc: kraxel@redhat.com, quintela@redhat.com
 
-Change malloc/strdup/free to g_malloc/g_strdup/g_free in
-util/envlist.c.
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Remove NULL checks for pointers returned from g_malloc and g_strdup
-as they exit in case of failure. Also, update calls to envlist_create
-to reflect this.
+Kill off a pile of monitor_printf's and cur_mon usage.
+The only one left in wavcapture.c is the info case.
 
-Free array and array contents returned by envlist_to_environ using
-g_free in bsd-user/main.c and linux-user/main.c.
-
-Update comments to reflect change in semantics.
-
-Signed-off-by: Saurav Sachidanand <sauravsachidanand@gmail.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- bsd-user/main.c   | 14 ++++----------
- linux-user/main.c |  9 +++------
- util/envlist.c    | 47 +++++++++++++++++++----------------------------
- 3 files changed, 26 insertions(+), 44 deletions(-)
+ audio/wavcapture.c | 39 +++++++++++++++++----------------------
+ 1 file changed, 17 insertions(+), 22 deletions(-)
 
-diff --git a/bsd-user/main.c b/bsd-user/main.c
-index 714a692e6f..04f95ddd54 100644
---- a/bsd-user/main.c
-+++ b/bsd-user/main.c
-@@ -744,10 +744,7 @@ int main(int argc, char **argv)
-     qemu_init_cpu_list();
-     module_call_init(MODULE_INIT_QOM);
+diff --git a/audio/wavcapture.c b/audio/wavcapture.c
+index 8bfb9e7..79ccebe 100644
+--- a/audio/wavcapture.c
++++ b/audio/wavcapture.c
+@@ -37,30 +37,29 @@ static void wav_destroy (void *opaque)
+     uint8_t dlen[4];
+     uint32_t datalen = wav->bytes;
+     uint32_t rifflen = datalen + 36;
+-    Monitor *mon = cur_mon;
  
--    if ((envlist = envlist_create()) == NULL) {
--        (void) fprintf(stderr, "Unable to allocate envlist\n");
--        exit(1);
--    }
-+    envlist = envlist_create();
+     if (wav->f) {
+         le_store (rlen, rifflen, 4);
+         le_store (dlen, datalen, 4);
  
-     /* add current environment into the list */
-     for (wrk = environ; *wrk != NULL; wrk++) {
-@@ -785,10 +782,7 @@ int main(int argc, char **argv)
-                 usage();
-         } else if (!strcmp(r, "ignore-environment")) {
-             envlist_free(envlist);
--            if ((envlist = envlist_create()) == NULL) {
--                (void) fprintf(stderr, "Unable to allocate envlist\n");
--                exit(1);
--            }
-+            envlist = envlist_create();
-         } else if (!strcmp(r, "U")) {
-             r = argv[optind++];
-             if (envlist_unsetenv(envlist, r) != 0)
-@@ -956,10 +950,10 @@ int main(int argc, char **argv)
+         if (fseek (wav->f, 4, SEEK_SET)) {
+-            monitor_printf (mon, "wav_destroy: rlen fseek failed\nReason: %s\n",
+-                            strerror (errno));
++            error_report("wav_destroy: rlen fseek failed: %s",
++                         strerror(errno));
+             goto doclose;
+         }
+         if (fwrite (rlen, 4, 1, wav->f) != 1) {
+-            monitor_printf (mon, "wav_destroy: rlen fwrite failed\nReason %s\n",
+-                            strerror (errno));
++            error_report("wav_destroy: rlen fwrite failed: %s",
++                         strerror(errno));
+             goto doclose;
+         }
+         if (fseek (wav->f, 32, SEEK_CUR)) {
+-            monitor_printf (mon, "wav_destroy: dlen fseek failed\nReason %s\n",
+-                            strerror (errno));
++            error_report("wav_destroy: dlen fseek failed: %s",
++                         strerror(errno));
+             goto doclose;
+         }
+         if (fwrite (dlen, 1, 4, wav->f) != 4) {
+-            monitor_printf (mon, "wav_destroy: dlen fwrite failed\nReason %s\n",
+-                            strerror (errno));
++            error_report("wav_destroy: dlen fwrite failed: %s",
++                         strerror(errno));
+             goto doclose;
+         }
+     doclose:
+@@ -77,8 +76,7 @@ static void wav_capture (void *opaque, void *buf, int size)
+     WAVState *wav = opaque;
+ 
+     if (fwrite (buf, size, 1, wav->f) != 1) {
+-        monitor_printf (cur_mon, "wav_capture: fwrite error\nReason: %s",
+-                        strerror (errno));
++        error_report("wav_capture: fwrite error: %s", strerror(errno));
      }
- 
-     for (wrk = target_environ; *wrk; wrk++) {
--        free(*wrk);
-+        g_free(*wrk);
-     }
- 
--    free(target_environ);
-+    g_free(target_environ);
- 
-     if (qemu_loglevel_mask(CPU_LOG_PAGE)) {
-         qemu_log("guest_base  0x%lx\n", guest_base);
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 10a3bb3a12..5f20769cb9 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -4229,10 +4229,7 @@ int main(int argc, char **argv, char **envp)
-     qemu_init_cpu_list();
-     module_call_init(MODULE_INIT_QOM);
- 
--    if ((envlist = envlist_create()) == NULL) {
--        (void) fprintf(stderr, "Unable to allocate envlist\n");
--        exit(EXIT_FAILURE);
--    }
-+    envlist = envlist_create();
- 
-     /* add current environment into the list */
-     for (wrk = environ; *wrk != NULL; wrk++) {
-@@ -4429,10 +4426,10 @@ int main(int argc, char **argv, char **envp)
-     }
- 
-     for (wrk = target_environ; *wrk; wrk++) {
--        free(*wrk);
-+        g_free(*wrk);
-     }
- 
--    free(target_environ);
-+    g_free(target_environ);
- 
-     if (qemu_loglevel_mask(CPU_LOG_PAGE)) {
-         qemu_log("guest_base  0x%lx\n", guest_base);
-diff --git a/util/envlist.c b/util/envlist.c
-index e86857e70a..1eeb7fca87 100644
---- a/util/envlist.c
-+++ b/util/envlist.c
-@@ -17,16 +17,14 @@ static int envlist_parse(envlist_t *envlist,
-     const char *env, int (*)(envlist_t *, const char *));
- 
- /*
-- * Allocates new envlist and returns pointer to that or
-- * NULL in case of error.
-+ * Allocates new envlist and returns pointer to it.
-  */
- envlist_t *
- envlist_create(void)
+     wav->bytes += size;
+ }
+@@ -108,7 +106,6 @@ static struct capture_ops wav_capture_ops = {
+ int wav_start_capture (CaptureState *s, const char *path, int freq,
+                        int bits, int nchannels)
  {
- 	envlist_t *envlist;
+-    Monitor *mon = cur_mon;
+     WAVState *wav;
+     uint8_t hdr[] = {
+         0x52, 0x49, 0x46, 0x46, 0x00, 0x00, 0x00, 0x00, 0x57, 0x41, 0x56,
+@@ -122,13 +119,13 @@ int wav_start_capture (CaptureState *s, const char *path, int freq,
+     CaptureVoiceOut *cap;
  
--	if ((envlist = malloc(sizeof (*envlist))) == NULL)
--		return (NULL);
-+	envlist = g_malloc(sizeof(*envlist));
+     if (bits != 8 && bits != 16) {
+-        monitor_printf (mon, "incorrect bit count %d, must be 8 or 16\n", bits);
++        error_report("incorrect bit count %d, must be 8 or 16", bits);
+         return -1;
+     }
  
- 	QLIST_INIT(&envlist->el_entries);
- 	envlist->el_count = 0;
-@@ -48,10 +46,10 @@ envlist_free(envlist_t *envlist)
- 		entry = envlist->el_entries.lh_first;
- 		QLIST_REMOVE(entry, ev_link);
+     if (nchannels != 1 && nchannels != 2) {
+-        monitor_printf (mon, "incorrect channel count %d, must be 1 or 2\n",
+-                        nchannels);
++        error_report("incorrect channel count %d, must be 1 or 2",
++                     nchannels);
+         return -1;
+     }
  
--		free((char *)entry->ev_var);
--		free(entry);
-+		g_free((char *)entry->ev_var);
-+		g_free(entry);
- 	}
--	free(envlist);
-+	g_free(envlist);
- }
+@@ -156,8 +153,8 @@ int wav_start_capture (CaptureState *s, const char *path, int freq,
  
- /*
-@@ -101,8 +99,7 @@ envlist_parse(envlist_t *envlist, const char *env,
- 	if ((envlist == NULL) || (env == NULL))
- 		return (EINVAL);
+     wav->f = fopen (path, "wb");
+     if (!wav->f) {
+-        monitor_printf (mon, "Failed to open wave file `%s'\nReason: %s\n",
+-                        path, strerror (errno));
++        error_report("Failed to open wave file `%s': %s",
++                     path, strerror(errno));
+         g_free (wav);
+         return -1;
+     }
+@@ -168,14 +165,13 @@ int wav_start_capture (CaptureState *s, const char *path, int freq,
+     wav->freq = freq;
  
--	if ((tmpenv = strdup(env)) == NULL)
--		return (errno);
-+	tmpenv = g_strdup(env);
-     envsave = tmpenv;
+     if (fwrite (hdr, sizeof (hdr), 1, wav->f) != 1) {
+-        monitor_printf (mon, "Failed to write header\nReason: %s\n",
+-                        strerror (errno));
++        error_report("Failed to write header: %s", strerror(errno));
+         goto error_free;
+     }
  
-     do {
-@@ -117,7 +114,7 @@ envlist_parse(envlist_t *envlist, const char *env,
-         tmpenv = envvar + 1;
-     } while (envvar != NULL);
+     cap = AUD_add_capture (&as, &ops, wav);
+     if (!cap) {
+-        monitor_printf (mon, "Failed to add audio capture\n");
++        error_report("Failed to add audio capture");
+         goto error_free;
+     }
  
--    free(envsave);
-+    g_free(envsave);
-     return ret;
- }
- 
-@@ -155,18 +152,14 @@ envlist_setenv(envlist_t *envlist, const char *env)
- 
- 	if (entry != NULL) {
- 		QLIST_REMOVE(entry, ev_link);
--		free((char *)entry->ev_var);
--		free(entry);
-+		g_free((char *)entry->ev_var);
-+		g_free(entry);
- 	} else {
- 		envlist->el_count++;
- 	}
- 
--	if ((entry = malloc(sizeof (*entry))) == NULL)
--		return (errno);
--	if ((entry->ev_var = strdup(env)) == NULL) {
--		free(entry);
--		return (errno);
--	}
-+	entry = g_malloc(sizeof(*entry));
-+	entry->ev_var = g_strdup(env);
- 	QLIST_INSERT_HEAD(&envlist->el_entries, entry, ev_link);
- 
- 	return (0);
-@@ -201,8 +194,8 @@ envlist_unsetenv(envlist_t *envlist, const char *env)
- 	}
- 	if (entry != NULL) {
- 		QLIST_REMOVE(entry, ev_link);
--		free((char *)entry->ev_var);
--		free(entry);
-+		g_free((char *)entry->ev_var);
-+		g_free(entry);
- 
- 		envlist->el_count--;
- 	}
-@@ -212,12 +205,12 @@ envlist_unsetenv(envlist_t *envlist, const char *env)
- /*
-  * Returns given envlist as array of strings (in same form that
-  * global variable environ is).  Caller must free returned memory
-- * by calling free(3) for each element and for the array.  Returned
-- * array and given envlist are not related (no common references).
-+ * by calling g_free for each element and the array.
-+ * Returned array and given envlist are not related (no common
-+ * references).
-  *
-  * If caller provides count pointer, number of items in array is
-- * stored there.  In case of error, NULL is returned and no memory
-- * is allocated.
-+ * stored there.
-  */
- char **
- envlist_to_environ(const envlist_t *envlist, size_t *count)
-@@ -225,13 +218,11 @@ envlist_to_environ(const envlist_t *envlist, size_t *count)
- 	struct envlist_entry *entry;
- 	char **env, **penv;
- 
--	penv = env = malloc((envlist->el_count + 1) * sizeof (char *));
--	if (env == NULL)
--		return (NULL);
-+	penv = env = g_malloc((envlist->el_count + 1) * sizeof(char *));
- 
- 	for (entry = envlist->el_entries.lh_first; entry != NULL;
- 	    entry = entry->ev_link.le_next) {
--		*(penv++) = strdup(entry->ev_var);
-+		*(penv++) = g_strdup(entry->ev_var);
- 	}
- 	*penv = NULL; /* NULL terminate the list */
- 
+@@ -187,8 +183,7 @@ int wav_start_capture (CaptureState *s, const char *path, int freq,
+ error_free:
+     g_free (wav->path);
+     if (fclose (wav->f)) {
+-        monitor_printf (mon, "Failed to close wave file\nReason: %s\n",
+-                        strerror (errno));
++        error_report("Failed to close wave file: %s", strerror(errno));
+     }
+     g_free (wav);
+     return -1;
 -- 
-2.12.0
+2.9.3
