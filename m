@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cq1gT-0001oq-Jf
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 14:05:34 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1cq1tg-0006Qj-Kn
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 14:19:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cq1gQ-0001fl-G4
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 14:05:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47632)
+	(envelope-from <sstabellini@kernel.org>) id 1cq1tc-0007ff-B2
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 14:19:12 -0400
+Received: from mail.kernel.org ([198.145.29.136]:45846)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cq1gQ-0001fV-9s
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 14:05:30 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 256147E9C9
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 18:05:30 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170320173840.3626-2-dgilbert@redhat.com> (David Alan Gilbert's
-	message of "Mon, 20 Mar 2017 17:38:39 +0000")
-References: <20170320173840.3626-1-dgilbert@redhat.com>
-	<20170320173840.3626-2-dgilbert@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Mon, 20 Mar 2017 19:05:26 +0100
-Message-ID: <87d1dbj02h.fsf@secure.mitica>
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1cq1tc-0007f3-4W
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 14:19:08 -0400
+Date: Mon, 20 Mar 2017 11:18:46 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+Message-ID: <alpine.DEB.2.10.1703201117560.23684@sstabellini-ThinkPad-X260>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/2] save_vmstate: Convert to Error** from
- Monitor *
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Qemu-devel] [PATCH v4 0/8] xen/9pfs: introduce the Xen 9pfs backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,30 +24,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, kraxel@redhat.com
+To: qemu-devel@nongnu.org
+Cc: xen-devel@lists.xenproject.org, sstabellini@kernel.org, anthony.perard@citrix.com, jgross@suse.com, aneesh.kumar@linux.vnet.ibm.com, groug@kaod.org
 
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> A bit more consistent and it removes one of the less necessary uses
-> of cur_mon.
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Hi all,
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+This patch series implements a new transport for 9pfs, aimed at Xen
+systems.
+
+The transport is based on a traditional Xen frontend and backend drivers
+pair. This patch series implements the backend, which typically runs in
+Dom0. I sent another series to implement the frontend in Linux
+(http://marc.info/?l=linux-kernel&m=148883047125960&w=2).
+
+The backend complies to the Xen transport for 9pfs specification
+version 1, available here:
+
+https://xenbits.xen.org/docs/unstable/misc/9pfs.html
 
 
-> @@ -2094,16 +2094,17 @@ int save_vmstate(Monitor *mon, const char *name)
->      if (name) {
->          ret = bdrv_all_delete_snapshot(name, &bs1, &local_err);
->          if (ret < 0) {
-> -            error_reportf_err(local_err,
-> -                              "Error while deleting snapshot on device '%s': ",
-> -                              bdrv_get_device_name(bs1));
-> +            error_propagate(errp, local_err);
-> +            error_prepend(errp,
-> +                          "Error while deleting snapshot on device '%s': ",
-> +                          bdrv_get_device_name(bs1));
+Changes in v4:
+- add reviewed-bys
+- remove useless if(NULL) checks around g_free
+- g_free g_malloc'ed sgs
+- remove XEN_9PFS_RING_ORDER, make the ring order dynamic per ring,
+  reading the ring_order field in xen_9pfs_data_intf
+- remove patch not to build Xen backends on non-Xen capable targets
+  because it is already upstream
 
-This is just magic O:-)
+Changes in v3:
+- do not build backends for targets that do not support xen
+- remove xen_9pfs.h, merge its content into xen-9p-backend.c
+- remove xen_9pfs_header, introduce P9MsgHeader
+- use le32_to_cpu to access P9MsgHeader fields
+- many coding style fixes
+- run checkpatch on all patches
+- add check if num_rings < 1
+- use g_strdup_printf
+- free fsdev_id in xen_9pfs_free
+- add comments
+
+Changes in v2:
+- fix coding style
+- compile xen-9p-backend.c if CONFIG_XEN_BACKEND
+- add patch to set CONFIG_XEN_BACKEND only for the right targets
+- add review-bys
+
+
+Stefano Stabellini (8):
+      xen: import ring.h from xen
+      9p: introduce a type for the 9p header
+      xen/9pfs: introduce Xen 9pfs backend
+      xen/9pfs: connect to the frontend
+      xen/9pfs: receive requests from the frontend
+      xen/9pfs: implement in/out_iov_from_pdu and vmarshal/vunmarshal
+      xen/9pfs: send responses back to the frontend
+      xen/9pfs: build and register Xen 9pfs backend
+
+ hw/9pfs/9p.h                 |   6 +
+ hw/9pfs/Makefile.objs        |   1 +
+ hw/9pfs/virtio-9p-device.c   |   6 +-
+ hw/9pfs/xen-9p-backend.c     | 444 +++++++++++++++++++++++++++++++++++++++++
+ hw/block/xen_blkif.h         |   2 +-
+ hw/usb/xen-usb.c             |   2 +-
+ hw/xen/xen_backend.c         |   3 +
+ include/hw/xen/io/ring.h     | 455 +++++++++++++++++++++++++++++++++++++++++++
+ include/hw/xen/xen_backend.h |   3 +
+ 9 files changed, 915 insertions(+), 7 deletions(-)
+ create mode 100644 hw/9pfs/xen-9p-backend.c
+ create mode 100644 include/hw/xen/io/ring.h
