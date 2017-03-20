@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37288)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cpusL-0002hl-W0
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 06:49:23 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cpuuR-0004F3-Kt
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 06:51:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cpusL-00008i-98
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 06:49:22 -0400
-Date: Mon, 20 Mar 2017 10:49:14 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170320104914.GG17887@stefanha-x1.localdomain>
-References: <20170313214001.26339-1-mreitz@redhat.com>
-	<20170313214045.26857-4-mreitz@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cpuuQ-00017S-KL
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 06:51:31 -0400
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:34979)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cpuuQ-00016z-Ea
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 06:51:30 -0400
+Received: by mail-wm0-x233.google.com with SMTP id u132so59964854wmg.0
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 03:51:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="JbKQpFqZXJ2T76Sg"
-Content-Disposition: inline
-In-Reply-To: <20170313214045.26857-4-mreitz@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.10 06/16]
- block/file-posix: Extract raw_regular_truncate()
+In-Reply-To: <1490000078-31202-1-git-send-email-kraxel@redhat.com>
+References: <1490000078-31202-1-git-send-email-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 20 Mar 2017 10:51:08 +0000
+Message-ID: <CAFEAcA8PdEG-dNitq-c8gPsEQXCA=MfWfLHCsjOiVgO6-Jcixw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL for-2.9 0/3] fixes: vnc, cirrus,
+ tcg display updates.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,39 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
+On 20 March 2017 at 08:54, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>   Hi,
+>
+> Misc bugfixes for the next -rc.
+>
+> please pull,
+>   Gerd
+>
+> The following changes since commit 272d7dee5951f926fad1911f2f072e5915cdcb=
+a0:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/pull-cirrus-20170316-=
+1' into staging (2017-03-16 16:40:44 +0000)
+>
+> are available in the git repository at:
+>
+>
+>   git://git.kraxel.org/qemu tags/pull-fixes-20170320-1
+>
+> for you to fetch changes up to 7bc4f0846f5e15dad5a54490290241243b5a4416:
+>
+>   vnc: fix a qio-channel leak (2017-03-20 09:07:34 +0100)
+>
+> ----------------------------------------------------------------
+> fixes for 2.9: vnc, cirrus, tcg display updates.
+>
+> ----------------------------------------------------------------
+> Alex Benn=C3=A9e (1):
+>       ui/console: ensure graphic updates don't race with TCG vCPUs
+>
+> Gerd Hoffmann (1):
+>       cirrus: fix off-by-one in cirrus_bitblt_rop_bkwd_transp_*_16
+>
+> Marc-Andr=C3=A9 Lureau (1):
+>       vnc: fix a qio-channel leak
 
---JbKQpFqZXJ2T76Sg
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Applied, thanks.
 
-On Mon, Mar 13, 2017 at 10:40:35PM +0100, Max Reitz wrote:
-> This functionality is part of raw_create() which we will be able to
-> reuse nicely in raw_truncate().
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  block/file-posix.c | 144 +++++++++++++++++++++++++++++------------------=
-------
->  1 file changed, 78 insertions(+), 66 deletions(-)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---JbKQpFqZXJ2T76Sg
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYz7OqAAoJEJykq7OBq3PI+ucH/1yU/B5ohtokLaXqdFCYGlyz
-JS2e8OSQyL8T4CKPz8ko/c2J918YnvMQdOVKMwc8CVGPVze5p/OPe3BmOmgxMq+b
-KnulWWM2JqxbARzGfaSjdmCnxtgtXNsyISg87iDt6dCN1SweIiu/3Xhlfl+fkIZ8
-T/G2F6RJrF+YWrELD2Ph7Y8neGcMX2/H5ZXZ/vqTPCAFG2nZntCAigV9Z88K17bW
-Hy+O3sVLA/U7XeR4fOo/tvCnPYuGyaq2HimYzpnR7T4o65nyu2p6g6hAspzMdfnb
-ObeupgZMaQrIQuXvmGoOvKLXzjTdX5QSdMozozdMheXDVHtSUj+ua4dY1o+KVl8=
-=Sxc3
------END PGP SIGNATURE-----
-
---JbKQpFqZXJ2T76Sg--
+-- PMM
