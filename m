@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <den@openvz.org>) id 1cptaq-0002r4-B9
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 05:27:13 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cptrs-0005cP-HU
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 05:44:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <den@openvz.org>) id 1cptan-0001nI-6k
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 05:27:12 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:32103 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <den@openvz.org>) id 1cptam-0001mE-Rq
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 05:27:09 -0400
-From: "Denis V. Lunev" <den@openvz.org>
-Date: Mon, 20 Mar 2017 12:27:02 +0300
-Message-Id: <1490002022-22653-1-git-send-email-den@openvz.org>
-Subject: [Qemu-devel] [PATCH 1/1] parallels: fix default options parsing
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cptrr-0006Za-HZ
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 05:44:48 -0400
+References: <20170225193155.447462-1-vsementsov@virtuozzo.com>
+	<0ebee96b-163e-16f1-d442-071020037005@openvz.org>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <335ba7e2-14cc-7f66-300e-afb2cb962747@virtuozzo.com>
+Date: Mon, 20 Mar 2017 12:44:30 +0300
+MIME-Version: 1.0
+In-Reply-To: <0ebee96b-163e-16f1-d442-071020037005@openvz.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] ping Re: [PATCH 0/4] some migration bugs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,45 +23,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: stefanha@redhat.com
-Cc: qemu-devel@nongnu.org, Edgar Kaziahmedov <edos@virtuozzo.mipt.ru>, "Denis V . Lunev" <den@openvz.org>, Markus Armbruster <armbru@redhat.com>
+To: "Denis V. Lunev" <den@openvz.org>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, armbru@redhat.com, eblake@redhat.com, famz@redhat.com, stefanha@redhat.com, amit.shah@redhat.com, quintela@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, dgilbert@redhat.com, jsnow@redhat.com, lirans@il.ibm.com
 
-From: Edgar Kaziahmedov <edos@virtuozzo.mipt.ru>
+06.03.2017 17:23, Denis V. Lunev wrote:
+> On 02/25/2017 10:31 PM, Vladimir Sementsov-Ogievskiy wrote:
+>> Hi all!
+>>
+>> Here are some migration related bugs, two about INACTIVE bdses and one
+>> use-after-free.
+>>
+>> I'm absolutely not sure, that these bugs should be fixed like I'm fixing,
+>> but problem definitely exists.
+>>
+>> Reset in stopped state is strange case, may be such usage should be
+>> restricted.
+>> About INACTIVE - looks like it should be a separate run-state, not only
+>> bdrv-flag.
+>> Situation with migration state, which is global, but is set/reset/changed
+>> in not controlled manner is not very good too..
+>>
+>> Vladimir Sementsov-Ogievskiy (4):
+>>    iotests: add migration corner cases test
+>>    qmp-cont: invalidate on RUN_STATE_PRELAUNCH
+>>    savevm: fix savevm after migration
+>>    migration: fix use-after-free of to_dst_file
+>>
+>>   block/snapshot.c           |  3 +-
+>>   migration/savevm.c         | 16 +++++++++++
+>>   qmp.c                      |  3 +-
+>>   tests/qemu-iotests/175     | 71 ++++++++++++++++++++++++++++++++++++++++++++++
+>>   tests/qemu-iotests/175.out |  5 ++++
+>>   tests/qemu-iotests/group   |  1 +
+>>   6 files changed, 97 insertions(+), 2 deletions(-)
+>>   create mode 100644 tests/qemu-iotests/175
+>>   create mode 100644 tests/qemu-iotests/175.out
+>>
+> guys, what about patches 1-3?
+>
+> Den
 
-parallels block driver is completely broken since commit
-    commit 75cdcd1553e74b5edc58aed23e3b2da8dabb1876
-    Author: Markus Armbruster <armbru@redhat.com>
-    Date:   Tue Feb 21 21:14:08 2017 +0100
-    option: Fix checking of sizes for overflow and trailing crap
-Right now even simple
-    qemu-io -c "read 512 64k" 1.hds
-ends up with
-    Unexpected error in parse_option_size() at util/qemu-option.c:188:
-    Parameter 'prealloc-size' expects a non-negative number below 2^64
-    Aborted (core dumped)
-The cure is simple - we should use 'M' as a suffix in default option value
-instead of 'MiB'.
+At least, with 2 and 3, fixing an assert? Do someone going to work with 
+adding a runstate?
 
-Signed-off-by: Edgar Kaziahmedov <edos@virtuozzo.mipt.ru>
-Signed-off-by: Denis V. Lunev <den@openvz.org>
-CC: Markus Armbruster <armbru@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>
----
- block/parallels.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/parallels.c b/block/parallels.c
-index 19935e2..6bf9375 100644
---- a/block/parallels.c
-+++ b/block/parallels.c
-@@ -114,7 +114,7 @@ static QemuOptsList parallels_runtime_opts = {
-             .name = PARALLELS_OPT_PREALLOC_SIZE,
-             .type = QEMU_OPT_SIZE,
-             .help = "Preallocation size on image expansion",
--            .def_value_str = "128MiB",
-+            .def_value_str = "128M",
-         },
-         {
-             .name = PARALLELS_OPT_PREALLOC_MODE,
 -- 
-2.7.4
+Best regards,
+Vladimir
