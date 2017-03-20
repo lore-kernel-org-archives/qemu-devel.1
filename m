@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47082)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cq1Gb-0003Ak-GT
+	(envelope-from <dgilbert@redhat.com>) id 1cq1Gb-0003Ai-Fn
 	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 13:38:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cq1GZ-0001AE-TE
+	(envelope-from <dgilbert@redhat.com>) id 1cq1GY-00019n-Hv
 	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 13:38:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46722)
+Received: from mx1.redhat.com ([209.132.183.28]:40296)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cq1GZ-00019w-K6
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 13:38:47 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cq1GY-000199-Ab
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 13:38:46 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A8220C05683F
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 17:38:47 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5CB424E048
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 17:38:46 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Mon, 20 Mar 2017 17:38:40 +0000
-Message-Id: <20170320173840.3626-3-dgilbert@redhat.com>
+Date: Mon, 20 Mar 2017 17:38:39 +0000
+Message-Id: <20170320173840.3626-2-dgilbert@redhat.com>
 In-Reply-To: <20170320173840.3626-1-dgilbert@redhat.com>
 References: <20170320173840.3626-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/2] wavcapture: Convert to error_report
+Subject: [Qemu-devel] [PATCH 1/2] save_vmstate: Convert to Error** from
+ Monitor *
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,129 +35,139 @@ Cc: kraxel@redhat.com, quintela@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Kill off a pile of monitor_printf's and cur_mon usage.
-The only one left in wavcapture.c is the info case.
+A bit more consistent and it removes one of the less necessary uses
+of cur_mon.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- audio/wavcapture.c | 39 +++++++++++++++++----------------------
- 1 file changed, 17 insertions(+), 22 deletions(-)
+ include/sysemu/sysemu.h  |  2 +-
+ migration/savevm.c       | 31 ++++++++++++++++++-------------
+ replay/replay-snapshot.c |  6 ++++--
+ 3 files changed, 23 insertions(+), 16 deletions(-)
 
-diff --git a/audio/wavcapture.c b/audio/wavcapture.c
-index 8bfb9e7..79ccebe 100644
---- a/audio/wavcapture.c
-+++ b/audio/wavcapture.c
-@@ -37,30 +37,29 @@ static void wav_destroy (void *opaque)
-     uint8_t dlen[4];
-     uint32_t datalen = wav->bytes;
-     uint32_t rifflen = datalen + 36;
--    Monitor *mon = cur_mon;
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 576c7ce..26e1a7e 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -76,7 +76,7 @@ void qemu_add_machine_init_done_notifier(Notifier *notify);
+ void qemu_remove_machine_init_done_notifier(Notifier *notify);
  
-     if (wav->f) {
-         le_store (rlen, rifflen, 4);
-         le_store (dlen, datalen, 4);
- 
-         if (fseek (wav->f, 4, SEEK_SET)) {
--            monitor_printf (mon, "wav_destroy: rlen fseek failed\nReason: %s\n",
--                            strerror (errno));
-+            error_report("wav_destroy: rlen fseek failed: %s",
-+                         strerror(errno));
-             goto doclose;
-         }
-         if (fwrite (rlen, 4, 1, wav->f) != 1) {
--            monitor_printf (mon, "wav_destroy: rlen fwrite failed\nReason %s\n",
--                            strerror (errno));
-+            error_report("wav_destroy: rlen fwrite failed: %s",
-+                         strerror(errno));
-             goto doclose;
-         }
-         if (fseek (wav->f, 32, SEEK_CUR)) {
--            monitor_printf (mon, "wav_destroy: dlen fseek failed\nReason %s\n",
--                            strerror (errno));
-+            error_report("wav_destroy: dlen fseek failed: %s",
-+                         strerror(errno));
-             goto doclose;
-         }
-         if (fwrite (dlen, 1, 4, wav->f) != 4) {
--            monitor_printf (mon, "wav_destroy: dlen fwrite failed\nReason %s\n",
--                            strerror (errno));
-+            error_report("wav_destroy: dlen fwrite failed: %s",
-+                         strerror(errno));
-             goto doclose;
-         }
-     doclose:
-@@ -77,8 +76,7 @@ static void wav_capture (void *opaque, void *buf, int size)
-     WAVState *wav = opaque;
- 
-     if (fwrite (buf, size, 1, wav->f) != 1) {
--        monitor_printf (cur_mon, "wav_capture: fwrite error\nReason: %s",
--                        strerror (errno));
-+        error_report("wav_capture: fwrite error: %s", strerror(errno));
-     }
-     wav->bytes += size;
+ void hmp_savevm(Monitor *mon, const QDict *qdict);
+-int save_vmstate(Monitor *mon, const char *name);
++int save_vmstate(const char *name, Error **errp);
+ int load_vmstate(const char *name);
+ void hmp_delvm(Monitor *mon, const QDict *qdict);
+ void hmp_info_snapshots(Monitor *mon, const QDict *qdict);
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 3b19a4a..361a926 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2071,7 +2071,7 @@ int qemu_loadvm_state(QEMUFile *f)
+     return ret;
  }
-@@ -108,7 +106,6 @@ static struct capture_ops wav_capture_ops = {
- int wav_start_capture (CaptureState *s, const char *path, int freq,
-                        int bits, int nchannels)
+ 
+-int save_vmstate(Monitor *mon, const char *name)
++int save_vmstate(const char *name, Error **errp)
  {
--    Monitor *mon = cur_mon;
-     WAVState *wav;
-     uint8_t hdr[] = {
-         0x52, 0x49, 0x46, 0x46, 0x00, 0x00, 0x00, 0x00, 0x57, 0x41, 0x56,
-@@ -122,13 +119,13 @@ int wav_start_capture (CaptureState *s, const char *path, int freq,
-     CaptureVoiceOut *cap;
+     BlockDriverState *bs, *bs1;
+     QEMUSnapshotInfo sn1, *sn = &sn1, old_sn1, *old_sn = &old_sn1;
+@@ -2085,8 +2085,8 @@ int save_vmstate(Monitor *mon, const char *name)
+     AioContext *aio_context;
  
-     if (bits != 8 && bits != 16) {
--        monitor_printf (mon, "incorrect bit count %d, must be 8 or 16\n", bits);
-+        error_report("incorrect bit count %d, must be 8 or 16", bits);
-         return -1;
+     if (!bdrv_all_can_snapshot(&bs)) {
+-        monitor_printf(mon, "Device '%s' is writable but does not "
+-                       "support snapshots.\n", bdrv_get_device_name(bs));
++        error_setg(errp, "Device '%s' is writable but does not "
++                   "support snapshots", bdrv_get_device_name(bs));
+         return ret;
      }
  
-     if (nchannels != 1 && nchannels != 2) {
--        monitor_printf (mon, "incorrect channel count %d, must be 1 or 2\n",
--                        nchannels);
-+        error_report("incorrect channel count %d, must be 1 or 2",
-+                     nchannels);
-         return -1;
+@@ -2094,16 +2094,17 @@ int save_vmstate(Monitor *mon, const char *name)
+     if (name) {
+         ret = bdrv_all_delete_snapshot(name, &bs1, &local_err);
+         if (ret < 0) {
+-            error_reportf_err(local_err,
+-                              "Error while deleting snapshot on device '%s': ",
+-                              bdrv_get_device_name(bs1));
++            error_propagate(errp, local_err);
++            error_prepend(errp,
++                          "Error while deleting snapshot on device '%s': ",
++                          bdrv_get_device_name(bs1));
+             return ret;
+         }
      }
  
-@@ -156,8 +153,8 @@ int wav_start_capture (CaptureState *s, const char *path, int freq,
- 
-     wav->f = fopen (path, "wb");
-     if (!wav->f) {
--        monitor_printf (mon, "Failed to open wave file `%s'\nReason: %s\n",
--                        path, strerror (errno));
-+        error_report("Failed to open wave file `%s': %s",
-+                     path, strerror(errno));
-         g_free (wav);
-         return -1;
+     bs = bdrv_all_find_vmstate_bs();
+     if (bs == NULL) {
+-        monitor_printf(mon, "No block device can accept snapshots\n");
++        error_setg(errp, "No block device can accept snapshots");
+         return ret;
      }
-@@ -168,14 +165,13 @@ int wav_start_capture (CaptureState *s, const char *path, int freq,
-     wav->freq = freq;
+     aio_context = bdrv_get_aio_context(bs);
+@@ -2112,7 +2113,7 @@ int save_vmstate(Monitor *mon, const char *name)
  
-     if (fwrite (hdr, sizeof (hdr), 1, wav->f) != 1) {
--        monitor_printf (mon, "Failed to write header\nReason: %s\n",
--                        strerror (errno));
-+        error_report("Failed to write header: %s", strerror(errno));
-         goto error_free;
+     ret = global_state_store();
+     if (ret) {
+-        monitor_printf(mon, "Error saving global state\n");
++        error_setg(errp, "Error saving global state");
+         return ret;
+     }
+     vm_stop(RUN_STATE_SAVE_VM);
+@@ -2144,21 +2145,21 @@ int save_vmstate(Monitor *mon, const char *name)
+     /* save the VM state */
+     f = qemu_fopen_bdrv(bs, 1);
+     if (!f) {
+-        monitor_printf(mon, "Could not open VM state file\n");
++        error_setg(errp, "Could not open VM state file");
+         goto the_end;
+     }
+     ret = qemu_savevm_state(f, &local_err);
+     vm_state_size = qemu_ftell(f);
+     qemu_fclose(f);
+     if (ret < 0) {
+-        error_report_err(local_err);
++        error_propagate(errp, local_err);
+         goto the_end;
      }
  
-     cap = AUD_add_capture (&as, &ops, wav);
-     if (!cap) {
--        monitor_printf (mon, "Failed to add audio capture\n");
-+        error_report("Failed to add audio capture");
-         goto error_free;
+     ret = bdrv_all_create_snapshot(sn, bs, vm_state_size, &bs);
+     if (ret < 0) {
+-        monitor_printf(mon, "Error while creating snapshot on '%s'\n",
+-                       bdrv_get_device_name(bs));
++        error_setg(errp, "Error while creating snapshot on '%s'",
++                   bdrv_get_device_name(bs));
+         goto the_end;
      }
  
-@@ -187,8 +183,7 @@ int wav_start_capture (CaptureState *s, const char *path, int freq,
- error_free:
-     g_free (wav->path);
-     if (fclose (wav->f)) {
--        monitor_printf (mon, "Failed to close wave file\nReason: %s\n",
--                        strerror (errno));
-+        error_report("Failed to close wave file: %s", strerror(errno));
-     }
-     g_free (wav);
-     return -1;
+@@ -2174,7 +2175,11 @@ int save_vmstate(Monitor *mon, const char *name)
+ 
+ void hmp_savevm(Monitor *mon, const QDict *qdict)
+ {
+-    save_vmstate(mon, qdict_get_try_str(qdict, "name"));
++    Error *local_err = NULL;
++    save_vmstate(qdict_get_try_str(qdict, "name"), &local_err);
++    if (local_err) {
++        error_report_err(local_err);
++    }
+ }
+ 
+ void qmp_xen_save_devices_state(const char *filename, Error **errp)
+diff --git a/replay/replay-snapshot.c b/replay/replay-snapshot.c
+index 65e2d37..49b21f0 100644
+--- a/replay/replay-snapshot.c
++++ b/replay/replay-snapshot.c
+@@ -64,8 +64,10 @@ void replay_vmstate_init(void)
+ {
+     if (replay_snapshot) {
+         if (replay_mode == REPLAY_MODE_RECORD) {
+-            if (save_vmstate(cur_mon, replay_snapshot) != 0) {
+-                error_report("Could not create snapshot for icount record");
++            Error *local_err = NULL;
++            if (save_vmstate(replay_snapshot, &local_err) != 0) {
++                error_reportf_err(local_err,
++                              "Could not create snapshot for icount record: ");
+                 exit(1);
+             }
+         } else if (replay_mode == REPLAY_MODE_PLAY) {
 -- 
 2.9.3
