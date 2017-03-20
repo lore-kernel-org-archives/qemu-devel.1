@@ -1,37 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6Qh-0001dy-5u
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:39 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6Qh-0001dq-5U
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6Qb-0004tB-U1
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:34 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38968)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6Qb-0004sY-EM
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:33 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50265)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cq6Qb-0004rw-Le
+	id 1cq6Qb-0004ra-5H
 	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:29 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2KN8ViH025387
+	v2KN8Wkv125171
 	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:28 -0400
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29ak1xpm8d-1
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 29ajjr0e3g-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:28 -0400
 Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 20 Mar 2017 19:09:27 -0400
+	Mon, 20 Mar 2017 17:09:27 -0600
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 20 Mar 2017 18:07:54 -0500
+Date: Mon, 20 Mar 2017 18:07:57 -0500
 In-Reply-To: <1490051325-3770-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1490051325-3770-1-git-send-email-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <1490051325-3770-31-git-send-email-mdroth@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 30/81] 9pfs: fix fd leak in local_opendir()
+Message-Id: <1490051325-3770-34-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 33/81] 9pfs: fix O_PATH build break with older
+ glibc versions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,29 +43,49 @@ Cc: qemu-stable@nongnu.org, Greg Kurz <groug@kaod.org>, Greg Kurz <gkurz@linux.v
 
 From: Greg Kurz <groug@kaod.org>
 
-Coverity issue CID1371731
+When O_PATH is used with O_DIRECTORY, it only acts as an optimization: the
+openat() syscall simply finds the name in the VFS, and doesn't trigger the
+underlying filesystem.
+
+On systems that don't define O_PATH, because they have glibc version 2.13
+or older for example, we can safely omit it. We don't want to deactivate
+O_PATH globally though, in case it is used without O_DIRECTORY. The is done
+with a dedicated macro.
+
+Systems without O_PATH may thus fail to resolve names that involve
+unreadable directories, compared to newer systems succeeding, but such
+corner case failure is our only option on those older systems to avoid
+the security hole of chasing symlinks inappropriately.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-(cherry picked from commit faab207f115cf9738f110cb088ab35a4b7aef73a)
+Reviewed-by: Eric Blake <eblake@redhat.com>
+(added last paragraph to changelog as suggested by Eric Blake)
+Signed-off-by: Greg Kurz <groug@kaod.org>
+
+(cherry picked from commit 918112c02aff2bac4cb72dc2feba0cb05305813e)
 Signed-off-by: Greg Kurz <gkurz@linux.vnet.ibm.com>
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/9pfs/9p-local.c | 1 +
- 1 file changed, 1 insertion(+)
+ hw/9pfs/9p-util.h | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index a50a01f..c5f7dcd 100644
---- a/hw/9pfs/9p-local.c
-+++ b/hw/9pfs/9p-local.c
-@@ -435,6 +435,7 @@ static int local_opendir(FsContext *ctx,
-=20
-     stream =3D fdopendir(dirfd);
-     if (!stream) {
-+        close(dirfd);
-         return -1;
-     }
-     fs->dir.stream =3D stream;
---=20
+diff --git a/hw/9pfs/9p-util.h b/hw/9pfs/9p-util.h
+index 091f3ce..cb7b207 100644
+--- a/hw/9pfs/9p-util.h
++++ b/hw/9pfs/9p-util.h
+@@ -22,7 +22,12 @@ static inline void close_preserve_errno(int fd)
+ 
+ static inline int openat_dir(int dirfd, const char *name)
+ {
+-    return openat(dirfd, name, O_DIRECTORY | O_RDONLY | O_PATH);
++#ifdef O_PATH
++#define OPENAT_DIR_O_PATH O_PATH
++#else
++#define OPENAT_DIR_O_PATH 0
++#endif
++    return openat(dirfd, name, O_DIRECTORY | O_RDONLY | OPENAT_DIR_O_PATH);
+ }
+ 
+ static inline int openat_file(int dirfd, const char *name, int flags,
+-- 
 2.7.4
