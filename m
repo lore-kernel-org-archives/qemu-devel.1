@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44476)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cpwqs-00004v-2c
+	(envelope-from <armbru@redhat.com>) id 1cpwqs-00005C-Ak
 	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 08:55:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cpwqr-0005L5-4e
+	(envelope-from <armbru@redhat.com>) id 1cpwqr-0005MF-Hf
 	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 08:55:58 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 20 Mar 2017 13:55:44 +0100
-Message-Id: <1490014548-15083-2-git-send-email-armbru@redhat.com>
+Date: Mon, 20 Mar 2017 13:55:48 +0100
+Message-Id: <1490014548-15083-6-git-send-email-armbru@redhat.com>
 In-Reply-To: <1490014548-15083-1-git-send-email-armbru@redhat.com>
 References: <1490014548-15083-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.9 1/5] test-keyval: Tweaks to improve
- list coverage
+Subject: [Qemu-devel] [PATCH for-2.9 5/5] MAINTAINERS: Add myself for files
+ I touched recently
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,47 +23,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, eblake@redhat.com
 
-We have a negative test case for a list index with leading zero.  Add
-positive ones.
-
-Tweak the test case for list index greater or equal the number of
-elements: test "equal" instead of "greater" to guard against
-off-by-one mistakes.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/test-keyval.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ MAINTAINERS | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/tests/test-keyval.c b/tests/test-keyval.c
-index 71288b0..e97f6d5 100644
---- a/tests/test-keyval.c
-+++ b/tests/test-keyval.c
-@@ -218,14 +218,14 @@ static void test_keyval_parse_list(void)
-     QDECREF(qdict);
+diff --git a/MAINTAINERS b/MAINTAINERS
+index bf1aafb..3f20288 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1218,6 +1218,15 @@ M: Samuel Thibault <samuel.thibault@ens-lyon.org>
+ S: Maintained
+ F: backends/baum.c
  
-     /* Multiple indexes, last one wins */
--    qdict = keyval_parse("list.1=goner,list.0=null,list.1=eins,list.2=zwei",
-+    qdict = keyval_parse("list.1=goner,list.0=null,list.01=eins,list.2=zwei",
-                          NULL, &error_abort);
-     g_assert_cmpint(qdict_size(qdict), ==, 1);
-     check_list012(qdict_get_qlist(qdict, "list"));
-     QDECREF(qdict);
- 
-     /* List at deeper nesting */
--    qdict = keyval_parse("a.list.1=eins,a.list.0=null,a.list.2=zwei",
-+    qdict = keyval_parse("a.list.1=eins,a.list.00=null,a.list.2=zwei",
-                          NULL, &error_abort);
-     g_assert_cmpint(qdict_size(qdict), ==, 1);
-     sub_qdict = qdict_get_qdict(qdict, "a");
-@@ -242,7 +242,7 @@ static void test_keyval_parse_list(void)
-     g_assert(!qdict);
- 
-     /* Missing list indexes */
--    qdict = keyval_parse("list.2=lonely", NULL, &err);
-+    qdict = keyval_parse("list.1=lonely", NULL, &err);
-     error_free_or_abort(&err);
-     g_assert(!qdict);
-     qdict = keyval_parse("list.0=null,list.2=eins,list.02=zwei", NULL, &err);
++Command line option argument parsing
++M: Markus Armbruster <armbru@redhat.com>
++S: Supported
++F: include/qemu/option.h
++F: tests/test-keyval.c
++F: tests/test-qemu-opts.c
++F: util/keyval.c
++F: util/qemu-option.c
++
+ Coverity model
+ M: Markus Armbruster <armbru@redhat.com>
+ S: Supported
+@@ -1352,7 +1361,9 @@ X: include/qapi/qmp/
+ F: include/qapi/qmp/dispatch.h
+ F: tests/qapi-schema/
+ F: tests/test-*-visitor.c
++F: tests/test-qapi-*.c
+ F: tests/test-qmp-*.c
++F: tests/test-visitor-serialization.c
+ F: scripts/qapi*
+ F: docs/qapi*
+ T: git git://repo.or.cz/qemu/armbru.git qapi-next
 -- 
 2.7.4
