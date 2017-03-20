@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45622)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cq6Ww-0007M1-S3
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:16:03 -0400
+	(envelope-from <mtosatti@redhat.com>) id 1cq6bh-0002uV-Kr
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:20:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cq6Wt-000125-Jd
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:16:02 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56836)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cq6Wt-00011k-8j
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:15:59 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cq6Wr-0000zp-Jy
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 23:15:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AA4CE2E80CD
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 23:15:56 +0000 (UTC)
+	(envelope-from <mtosatti@redhat.com>) id 1cq6be-0003iO-EE
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:20:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56974)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mtosatti@redhat.com>) id 1cq6be-0003g8-8S
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:20:54 -0400
+Date: Mon, 20 Mar 2017 20:20:32 -0300
+From: Marcelo Tosatti <mtosatti@redhat.com>
+Message-ID: <20170320232032.GA28018@amt.cnet>
+References: <cover.1352938305.git.mtosatti@redhat.com>
+	<b0b873a07872f7ab7f66f259c73fb9dd42aa66a9.1352938305.git.mtosatti@redhat.com>
+	<f8f0ebb7-0c79-8570-3210-dc45c3effda8@univention.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 20 Mar 2017 23:00:07 -0000
-From: Thomas Huth <888150@bugs.launchpad.net>
-Reply-To: Bug 888150 <888150@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20111109163052.7143.14547.malonedeb@gac.canonical.com>
-Message-Id: <20170320230007.19872.87075.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 888150] Re: qemu and qemu.git -> Migration + disk
- stress introduces qcow2 corruptions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f8f0ebb7-0c79-8570-3210-dc45c3effda8@univention.de>
+Subject: Re: [Qemu-devel] [PATCH 1/2] acpi_piix4: fix migration of gpe fields
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,47 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Philipp Hahn <hahn@univention.de>
+Cc: Anthony Liguori <aliguori@us.ibm.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org
 
-The URL that you've mentioned in the description is not valid anymore
-... can you still reproduce this problem with the latest version of
-QEMU, or can we close this ticket nowadays?
+On Mon, Mar 20, 2017 at 01:02:10PM +0100, Philipp Hahn wrote:
+> Hello Marcelo, cc:qemu,
+> 
+> Sorry for re-using this old thread, but I have a problem loading some
+> saved state from qemu-kvm-1.1.2, which fails for piix4_pm.
+> 
+> You following patch was committed as
+> <http://git.qemu-project.org/?p=qemu.git;a=commitdiff;h=b0b873a07872f7ab7f66f259c73fb9dd42aa66a9>:
+> 
+> Am 15.11.2012 um 01:11 schrieb Marcelo Tosatti:
+> > Migrate 16 bytes for en/sts fields (which is the correct size),
+> > increase version to 3, and document how to support incoming
+> > migration from qemu-kvm 1.2.
+> 
+> I my case qemu-kvm-1.1.2/hw/acpi_piix4.c:284
+> | VMSTATE_STRUCT(ar.gpe, PIIX4PMState, 2, vmstate_gpe, ACPIGPE),
+> only saves 4 bytes, not 16 bytes.
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Hi Philipp,
 
--- =
+IIRC qemu-1.1.2 saved 16 bytes, which is the correct size, not 4 bytes.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/888150
+So while merging from qemu-kvm -> qemu, it was decided to maintain
+backwards compability with qemu, and not qemu-kvm.
 
-Title:
-  qemu and qemu.git -> Migration + disk stress introduces qcow2
-  corruptions
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  Hi guys, here I am, reporting yet another issue with qemu. This time,
-  it's something that was first reported in January, and Juan proposed a
-  patch for it:
-
-  http://comments.gmane.org/gmane.comp.emulators.qemu/89009
-
-  [PATCH 4/5] Reopen files after migration
-
-  The symptom is, when running disk stress or any intense IO operation
-  in guest while migrating it causes a qcow2 corruption. We've seen this
-  consistently on the daily test jobs, both for qemu and qemu-kvm. The
-  test that triggers it is autotest stress test running on a VM with
-  ping-pong background migration.
-
-  The fix proposed by Juan is on our RHEL branch and such a problem does
-  not happen on the RHEL branch. So, what about re-considering Juan's
-  patch, or maybe work out a solution that is satisfactory for the
-  upstream maintainers?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/888150/+subscriptions
+Is there any way to differentiate between the two (qemu vs qemu-kvm, 
+perhaps via some other field not in the VMState of ACPI PIIX4), so
+your patch can be integrated upstream?
