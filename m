@@ -1,35 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6R5-00026L-U2
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:10:10 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6RC-0002Dw-CH
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:10:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6Qv-0005Gu-GH
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:59 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50580)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cq6R0-0005Mb-0L
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:10:06 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40305
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cq6Qv-0005EL-16
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:49 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2KN8VVv125121
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:48 -0400
+	id 1cq6Qz-0005LZ-Nd
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 19:09:53 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2KN8YoP028796
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:53 -0400
 Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29ajjr0eca-1
+	by mx0b-001b2d01.pphosted.com with ESMTP id 29amb5t7kb-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:47 -0400
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:09:53 -0400
 Received: from localhost
 	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Mon, 20 Mar 2017 19:09:46 -0400
+	Mon, 20 Mar 2017 19:09:52 -0400
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 20 Mar 2017 18:08:33 -0500
+Date: Mon, 20 Mar 2017 18:07:32 -0500
 In-Reply-To: <1490051325-3770-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1490051325-3770-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1490051325-3770-70-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 69/81] target-i386: correctly propagate retaddr
- into SVM helpers
+Message-Id: <1490051325-3770-9-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 08/81] 9pfs: local: llistxattr: don't follow
+ symlinks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,471 +40,95 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-stable@nongnu.org, Greg Kurz <groug@kaod.org>, Greg Kurz <gkurz@linux.vnet.ibm.com>
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+From: Greg Kurz <groug@kaod.org>
 
-Commit 2afbdf8 ("target-i386: exception handling for memory helpers",
-2015-09-15) changed tlb_fill's cpu_restore_state+raise_exception_err
-to raise_exception_err_ra.  After this change, the cpu_restore_state
-and raise_exception_err's cpu_loop_exit are merged into
-raise_exception_err_ra's cpu_loop_exit_restore.
+The local_llistxattr() callback is vulnerable to symlink attacks because
+it calls llistxattr() which follows symbolic links in all path elements but
+the rightmost one.
 
-This actually fixed some bugs, but when SVM is enabled there is a
-second path from raise_exception_err_ra to cpu_loop_exit.  This is
-the VMEXIT path, and now cpu_vmexit is called without a
-cpu_restore_state before.
+This patch introduces a helper to emulate the non-existing flistxattrat()
+function: it is implemented with /proc/self/fd which provides a trusted
+path that can be safely passed to llistxattr().
 
-The fix is to pass the retaddr to cpu_vmexit (via
-cpu_svm_check_intercept_param).  All helpers can now use GETPC() to pass
-the correct retaddr, too.
+local_llistxattr() is converted to use this helper and opendir_nofollow().
 
-Cc: qemu-stable@nongnu.org
-Fixes: 2afbdf84807d673eb682cb78158e11cdacbf4673
-Reported-by: Alexander Boettcher <alexander.boettcher@genode-labs.com>
-Tested-by: Alexander Boettcher <alexander.boettcher@genode-labs.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-(cherry picked from commit 65c9d60a3ad3249784348824eca69acac455bc02)
+This partly fixes CVE-2016-9602.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+(cherry picked from commit 5507904e362df252f6065cb27d1ff98372db6abc)
+Signed-off-by: Greg Kurz <gkurz@linux.vnet.ibm.com>
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- cpu-exec.c                |  2 +-
- target-i386/cpu.h         |  5 ++--
- target-i386/excp_helper.c | 11 ++++----
- target-i386/helper.h      |  1 -
- target-i386/misc_helper.c | 24 ++++++++---------
- target-i386/seg_helper.c  |  6 ++---
- target-i386/svm_helper.c  | 65 ++++++++++++++++++++++-------------------------
- 7 files changed, 56 insertions(+), 58 deletions(-)
+ hw/9pfs/9p-xattr.c | 35 +++++++++++++++++++++++++++++------
+ 1 file changed, 29 insertions(+), 6 deletions(-)
 
-diff --git a/cpu-exec.c b/cpu-exec.c
-index c081a7a..964eb01 100644
---- a/cpu-exec.c
-+++ b/cpu-exec.c
-@@ -491,7 +491,7 @@ static inline void cpu_handle_interrupt(CPUState *cpu,
-             X86CPU *x86_cpu = X86_CPU(cpu);
-             CPUArchState *env = &x86_cpu->env;
-             replay_interrupt();
--            cpu_svm_check_intercept_param(env, SVM_EXIT_INIT, 0);
-+            cpu_svm_check_intercept_param(env, SVM_EXIT_INIT, 0, 0);
-             do_cpu_init(x86_cpu);
-             cpu->exception_index = EXCP_HALTED;
-             cpu_loop_exit(cpu);
-diff --git a/target-i386/cpu.h b/target-i386/cpu.h
-index c605724..c1d2c5b 100644
---- a/target-i386/cpu.h
-+++ b/target-i386/cpu.h
-@@ -1610,8 +1610,9 @@ void helper_lock_init(void);
- 
- /* svm_helper.c */
- void cpu_svm_check_intercept_param(CPUX86State *env1, uint32_t type,
--                                   uint64_t param);
--void cpu_vmexit(CPUX86State *nenv, uint32_t exit_code, uint64_t exit_info_1);
-+                                   uint64_t param, uintptr_t retaddr);
-+void cpu_vmexit(CPUX86State *nenv, uint32_t exit_code, uint64_t exit_info_1,
-+                uintptr_t retaddr);
- 
- /* seg_helper.c */
- void do_interrupt_x86_hardirq(CPUX86State *env, int intno, int is_hw);
-diff --git a/target-i386/excp_helper.c b/target-i386/excp_helper.c
-index f0dc499..ee596c6 100644
---- a/target-i386/excp_helper.c
-+++ b/target-i386/excp_helper.c
-@@ -39,7 +39,8 @@ void helper_raise_exception(CPUX86State *env, int exception_index)
-  * needed. It should only be called, if this is not an interrupt.
-  * Returns the new exception number.
-  */
--static int check_exception(CPUX86State *env, int intno, int *error_code)
-+static int check_exception(CPUX86State *env, int intno, int *error_code,
-+                           uintptr_t retaddr)
- {
-     int first_contributory = env->old_exception == 0 ||
-                               (env->old_exception >= 10 &&
-@@ -53,7 +54,7 @@ static int check_exception(CPUX86State *env, int intno, int *error_code)
- #if !defined(CONFIG_USER_ONLY)
-     if (env->old_exception == EXCP08_DBLE) {
-         if (env->hflags & HF_SVMI_MASK) {
--            cpu_vmexit(env, SVM_EXIT_SHUTDOWN, 0); /* does not return */
-+            cpu_vmexit(env, SVM_EXIT_SHUTDOWN, 0, retaddr); /* does not return */
-         }
- 
-         qemu_log_mask(CPU_LOG_RESET, "Triple fault\n");
-@@ -93,10 +94,10 @@ static void QEMU_NORETURN raise_interrupt2(CPUX86State *env, int intno,
- 
-     if (!is_int) {
-         cpu_svm_check_intercept_param(env, SVM_EXIT_EXCP_BASE + intno,
--                                      error_code);
--        intno = check_exception(env, intno, &error_code);
-+                                      error_code, retaddr);
-+        intno = check_exception(env, intno, &error_code, retaddr);
-     } else {
--        cpu_svm_check_intercept_param(env, SVM_EXIT_SWINT, 0);
-+        cpu_svm_check_intercept_param(env, SVM_EXIT_SWINT, 0, retaddr);
-     }
- 
-     cs->exception_index = intno;
-diff --git a/target-i386/helper.h b/target-i386/helper.h
-index 4e859eb..b360c03 100644
---- a/target-i386/helper.h
-+++ b/target-i386/helper.h
-@@ -98,7 +98,6 @@ DEF_HELPER_2(inl, tl, env, i32)
- DEF_HELPER_FLAGS_4(bpt_io, TCG_CALL_NO_WG, void, env, i32, i32, tl)
- 
- DEF_HELPER_3(svm_check_intercept_param, void, env, i32, i64)
--DEF_HELPER_3(vmexit, void, env, i32, i64)
- DEF_HELPER_4(svm_check_io, void, env, i32, i32, i32)
- DEF_HELPER_3(vmrun, void, env, int, int)
- DEF_HELPER_1(vmmcall, void, env)
-diff --git a/target-i386/misc_helper.c b/target-i386/misc_helper.c
-index 3f666b4..e145a2e 100644
---- a/target-i386/misc_helper.c
-+++ b/target-i386/misc_helper.c
-@@ -101,7 +101,7 @@ void helper_cpuid(CPUX86State *env)
- {
-     uint32_t eax, ebx, ecx, edx;
- 
--    cpu_svm_check_intercept_param(env, SVM_EXIT_CPUID, 0);
-+    cpu_svm_check_intercept_param(env, SVM_EXIT_CPUID, 0, GETPC());
- 
-     cpu_x86_cpuid(env, (uint32_t)env->regs[R_EAX], (uint32_t)env->regs[R_ECX],
-                   &eax, &ebx, &ecx, &edx);
-@@ -125,7 +125,7 @@ target_ulong helper_read_crN(CPUX86State *env, int reg)
- {
-     target_ulong val;
- 
--    cpu_svm_check_intercept_param(env, SVM_EXIT_READ_CR0 + reg, 0);
-+    cpu_svm_check_intercept_param(env, SVM_EXIT_READ_CR0 + reg, 0, GETPC());
-     switch (reg) {
-     default:
-         val = env->cr[reg];
-@@ -143,7 +143,7 @@ target_ulong helper_read_crN(CPUX86State *env, int reg)
- 
- void helper_write_crN(CPUX86State *env, int reg, target_ulong t0)
- {
--    cpu_svm_check_intercept_param(env, SVM_EXIT_WRITE_CR0 + reg, 0);
-+    cpu_svm_check_intercept_param(env, SVM_EXIT_WRITE_CR0 + reg, 0, GETPC());
-     switch (reg) {
-     case 0:
-         cpu_x86_update_cr0(env, t0);
-@@ -179,7 +179,7 @@ void helper_invlpg(CPUX86State *env, target_ulong addr)
- {
-     X86CPU *cpu = x86_env_get_cpu(env);
- 
--    cpu_svm_check_intercept_param(env, SVM_EXIT_INVLPG, 0);
-+    cpu_svm_check_intercept_param(env, SVM_EXIT_INVLPG, 0, GETPC());
-     tlb_flush_page(CPU(cpu), addr);
+diff --git a/hw/9pfs/9p-xattr.c b/hw/9pfs/9p-xattr.c
+index aa4391e..54193c6 100644
+--- a/hw/9pfs/9p-xattr.c
++++ b/hw/9pfs/9p-xattr.c
+@@ -60,6 +60,16 @@ ssize_t pt_listxattr(FsContext *ctx, const char *path,
+     return name_size;
  }
  
-@@ -190,7 +190,7 @@ void helper_rdtsc(CPUX86State *env)
-     if ((env->cr[4] & CR4_TSD_MASK) && ((env->hflags & HF_CPL_MASK) != 0)) {
-         raise_exception_ra(env, EXCP0D_GPF, GETPC());
-     }
--    cpu_svm_check_intercept_param(env, SVM_EXIT_RDTSC, 0);
-+    cpu_svm_check_intercept_param(env, SVM_EXIT_RDTSC, 0, GETPC());
++static ssize_t flistxattrat_nofollow(int dirfd, const char *filename,
++                                     char *list, size_t size)
++{
++    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
++    int ret;
++
++    ret = llistxattr(proc_path, list, size);
++    g_free(proc_path);
++    return ret;
++}
  
-     val = cpu_get_tsc(env) + env->tsc_offset;
-     env->regs[R_EAX] = (uint32_t)(val);
-@@ -208,7 +208,7 @@ void helper_rdpmc(CPUX86State *env)
-     if ((env->cr[4] & CR4_PCE_MASK) && ((env->hflags & HF_CPL_MASK) != 0)) {
-         raise_exception_ra(env, EXCP0D_GPF, GETPC());
-     }
--    cpu_svm_check_intercept_param(env, SVM_EXIT_RDPMC, 0);
-+    cpu_svm_check_intercept_param(env, SVM_EXIT_RDPMC, 0, GETPC());
- 
-     /* currently unimplemented */
-     qemu_log_mask(LOG_UNIMP, "x86: unimplemented rdpmc\n");
-@@ -228,7 +228,7 @@ void helper_wrmsr(CPUX86State *env)
+ /*
+  * Get the list and pass to each layer to find out whether
+@@ -69,24 +79,37 @@ ssize_t v9fs_list_xattr(FsContext *ctx, const char *path,
+                         void *value, size_t vsize)
  {
-     uint64_t val;
+     ssize_t size = 0;
+-    char *buffer;
+     void *ovalue = value;
+     XattrOperations *xops;
+     char *orig_value, *orig_value_start;
+     ssize_t xattr_len, parsed_len = 0, attr_len;
++    char *dirpath, *name;
++    int dirfd;
  
--    cpu_svm_check_intercept_param(env, SVM_EXIT_MSR, 1);
-+    cpu_svm_check_intercept_param(env, SVM_EXIT_MSR, 1, GETPC());
- 
-     val = ((uint32_t)env->regs[R_EAX]) |
-         ((uint64_t)((uint32_t)env->regs[R_EDX]) << 32);
-@@ -388,7 +388,7 @@ void helper_rdmsr(CPUX86State *env)
- {
-     uint64_t val;
- 
--    cpu_svm_check_intercept_param(env, SVM_EXIT_MSR, 0);
-+    cpu_svm_check_intercept_param(env, SVM_EXIT_MSR, 0, GETPC());
- 
-     switch ((uint32_t)env->regs[R_ECX]) {
-     case MSR_IA32_SYSENTER_CS:
-@@ -557,7 +557,7 @@ void helper_hlt(CPUX86State *env, int next_eip_addend)
- {
-     X86CPU *cpu = x86_env_get_cpu(env);
- 
--    cpu_svm_check_intercept_param(env, SVM_EXIT_HLT, 0);
-+    cpu_svm_check_intercept_param(env, SVM_EXIT_HLT, 0, GETPC());
-     env->eip += next_eip_addend;
- 
-     do_hlt(cpu);
-@@ -569,7 +569,7 @@ void helper_monitor(CPUX86State *env, target_ulong ptr)
-         raise_exception_ra(env, EXCP0D_GPF, GETPC());
-     }
-     /* XXX: store address? */
--    cpu_svm_check_intercept_param(env, SVM_EXIT_MONITOR, 0);
-+    cpu_svm_check_intercept_param(env, SVM_EXIT_MONITOR, 0, GETPC());
- }
- 
- void helper_mwait(CPUX86State *env, int next_eip_addend)
-@@ -580,7 +580,7 @@ void helper_mwait(CPUX86State *env, int next_eip_addend)
-     if ((uint32_t)env->regs[R_ECX] != 0) {
-         raise_exception_ra(env, EXCP0D_GPF, GETPC());
-     }
--    cpu_svm_check_intercept_param(env, SVM_EXIT_MWAIT, 0);
-+    cpu_svm_check_intercept_param(env, SVM_EXIT_MWAIT, 0, GETPC());
-     env->eip += next_eip_addend;
- 
-     cpu = x86_env_get_cpu(env);
-@@ -597,7 +597,7 @@ void helper_pause(CPUX86State *env, int next_eip_addend)
- {
-     X86CPU *cpu = x86_env_get_cpu(env);
- 
--    cpu_svm_check_intercept_param(env, SVM_EXIT_PAUSE, 0);
-+    cpu_svm_check_intercept_param(env, SVM_EXIT_PAUSE, 0, GETPC());
-     env->eip += next_eip_addend;
- 
-     do_pause(cpu);
-diff --git a/target-i386/seg_helper.c b/target-i386/seg_helper.c
-index fb79f31..ce8f4d7 100644
---- a/target-i386/seg_helper.c
-+++ b/target-i386/seg_helper.c
-@@ -1334,7 +1334,7 @@ bool x86_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-     } else if (env->hflags2 & HF2_GIF_MASK) {
-         if ((interrupt_request & CPU_INTERRUPT_SMI) &&
-             !(env->hflags & HF_SMM_MASK)) {
--            cpu_svm_check_intercept_param(env, SVM_EXIT_SMI, 0);
-+            cpu_svm_check_intercept_param(env, SVM_EXIT_SMI, 0, 0);
-             cs->interrupt_request &= ~CPU_INTERRUPT_SMI;
-             do_smm_enter(cpu);
-             ret = true;
-@@ -1355,7 +1355,7 @@ bool x86_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-                      (env->eflags & IF_MASK &&
-                       !(env->hflags & HF_INHIBIT_IRQ_MASK))))) {
-             int intno;
--            cpu_svm_check_intercept_param(env, SVM_EXIT_INTR, 0);
-+            cpu_svm_check_intercept_param(env, SVM_EXIT_INTR, 0, 0);
-             cs->interrupt_request &= ~(CPU_INTERRUPT_HARD |
-                                        CPU_INTERRUPT_VIRQ);
-             intno = cpu_get_pic_interrupt(env);
-@@ -1371,7 +1371,7 @@ bool x86_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-                    !(env->hflags & HF_INHIBIT_IRQ_MASK)) {
-             int intno;
-             /* FIXME: this should respect TPR */
--            cpu_svm_check_intercept_param(env, SVM_EXIT_VINTR, 0);
-+            cpu_svm_check_intercept_param(env, SVM_EXIT_VINTR, 0, 0);
-             intno = x86_ldl_phys(cs, env->vm_vmcb
-                              + offsetof(struct vmcb, control.int_vector));
-             qemu_log_mask(CPU_LOG_TB_IN_ASM,
-diff --git a/target-i386/svm_helper.c b/target-i386/svm_helper.c
-index 782b3f1..7c94be4 100644
---- a/target-i386/svm_helper.c
-+++ b/target-i386/svm_helper.c
-@@ -60,11 +60,8 @@ void helper_invlpga(CPUX86State *env, int aflag)
- {
- }
- 
--void helper_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1)
--{
--}
--
--void cpu_vmexit(CPUX86State *nenv, uint32_t exit_code, uint64_t exit_info_1)
-+void cpu_vmexit(CPUX86State *nenv, uint32_t exit_code, uint64_t exit_info_1,
-+                uintptr_t retaddr)
- {
- }
- 
-@@ -74,7 +71,7 @@ void helper_svm_check_intercept_param(CPUX86State *env, uint32_t type,
- }
- 
- void cpu_svm_check_intercept_param(CPUX86State *env, uint32_t type,
--                                   uint64_t param)
-+                                   uint64_t param, uintptr_t retaddr)
- {
- }
- 
-@@ -130,7 +127,7 @@ void helper_vmrun(CPUX86State *env, int aflag, int next_eip_addend)
-     uint32_t event_inj;
-     uint32_t int_ctl;
- 
--    cpu_svm_check_intercept_param(env, SVM_EXIT_VMRUN, 0);
-+    cpu_svm_check_intercept_param(env, SVM_EXIT_VMRUN, 0, GETPC());
- 
-     if (aflag == 2) {
-         addr = env->regs[R_EAX];
-@@ -355,7 +352,7 @@ void helper_vmrun(CPUX86State *env, int aflag, int next_eip_addend)
- 
- void helper_vmmcall(CPUX86State *env)
- {
--    cpu_svm_check_intercept_param(env, SVM_EXIT_VMMCALL, 0);
-+    cpu_svm_check_intercept_param(env, SVM_EXIT_VMMCALL, 0, GETPC());
-     raise_exception(env, EXCP06_ILLOP);
- }
- 
-@@ -364,7 +361,7 @@ void helper_vmload(CPUX86State *env, int aflag)
-     CPUState *cs = CPU(x86_env_get_cpu(env));
-     target_ulong addr;
- 
--    cpu_svm_check_intercept_param(env, SVM_EXIT_VMLOAD, 0);
-+    cpu_svm_check_intercept_param(env, SVM_EXIT_VMLOAD, 0, GETPC());
- 
-     if (aflag == 2) {
-         addr = env->regs[R_EAX];
-@@ -404,7 +401,7 @@ void helper_vmsave(CPUX86State *env, int aflag)
-     CPUState *cs = CPU(x86_env_get_cpu(env));
-     target_ulong addr;
- 
--    cpu_svm_check_intercept_param(env, SVM_EXIT_VMSAVE, 0);
-+    cpu_svm_check_intercept_param(env, SVM_EXIT_VMSAVE, 0, GETPC());
- 
-     if (aflag == 2) {
-         addr = env->regs[R_EAX];
-@@ -445,19 +442,19 @@ void helper_vmsave(CPUX86State *env, int aflag)
- 
- void helper_stgi(CPUX86State *env)
- {
--    cpu_svm_check_intercept_param(env, SVM_EXIT_STGI, 0);
-+    cpu_svm_check_intercept_param(env, SVM_EXIT_STGI, 0, GETPC());
-     env->hflags2 |= HF2_GIF_MASK;
- }
- 
- void helper_clgi(CPUX86State *env)
- {
--    cpu_svm_check_intercept_param(env, SVM_EXIT_CLGI, 0);
-+    cpu_svm_check_intercept_param(env, SVM_EXIT_CLGI, 0, GETPC());
-     env->hflags2 &= ~HF2_GIF_MASK;
- }
- 
- void helper_skinit(CPUX86State *env)
- {
--    cpu_svm_check_intercept_param(env, SVM_EXIT_SKINIT, 0);
-+    cpu_svm_check_intercept_param(env, SVM_EXIT_SKINIT, 0, GETPC());
-     /* XXX: not implemented */
-     raise_exception(env, EXCP06_ILLOP);
- }
-@@ -467,7 +464,7 @@ void helper_invlpga(CPUX86State *env, int aflag)
-     X86CPU *cpu = x86_env_get_cpu(env);
-     target_ulong addr;
- 
--    cpu_svm_check_intercept_param(env, SVM_EXIT_INVLPGA, 0);
-+    cpu_svm_check_intercept_param(env, SVM_EXIT_INVLPGA, 0, GETPC());
- 
-     if (aflag == 2) {
-         addr = env->regs[R_EAX];
-@@ -480,8 +477,8 @@ void helper_invlpga(CPUX86State *env, int aflag)
-     tlb_flush_page(CPU(cpu), addr);
- }
- 
--void helper_svm_check_intercept_param(CPUX86State *env, uint32_t type,
--                                      uint64_t param)
-+void cpu_svm_check_intercept_param(CPUX86State *env, uint32_t type,
-+                                   uint64_t param, uintptr_t retaddr)
- {
-     CPUState *cs = CPU(x86_env_get_cpu(env));
- 
-@@ -491,27 +488,27 @@ void helper_svm_check_intercept_param(CPUX86State *env, uint32_t type,
-     switch (type) {
-     case SVM_EXIT_READ_CR0 ... SVM_EXIT_READ_CR0 + 8:
-         if (env->intercept_cr_read & (1 << (type - SVM_EXIT_READ_CR0))) {
--            helper_vmexit(env, type, param);
-+            cpu_vmexit(env, type, param, retaddr);
-         }
-         break;
-     case SVM_EXIT_WRITE_CR0 ... SVM_EXIT_WRITE_CR0 + 8:
-         if (env->intercept_cr_write & (1 << (type - SVM_EXIT_WRITE_CR0))) {
--            helper_vmexit(env, type, param);
-+            cpu_vmexit(env, type, param, retaddr);
-         }
-         break;
-     case SVM_EXIT_READ_DR0 ... SVM_EXIT_READ_DR0 + 7:
-         if (env->intercept_dr_read & (1 << (type - SVM_EXIT_READ_DR0))) {
--            helper_vmexit(env, type, param);
-+            cpu_vmexit(env, type, param, retaddr);
-         }
-         break;
-     case SVM_EXIT_WRITE_DR0 ... SVM_EXIT_WRITE_DR0 + 7:
-         if (env->intercept_dr_write & (1 << (type - SVM_EXIT_WRITE_DR0))) {
--            helper_vmexit(env, type, param);
-+            cpu_vmexit(env, type, param, retaddr);
-         }
-         break;
-     case SVM_EXIT_EXCP_BASE ... SVM_EXIT_EXCP_BASE + 31:
-         if (env->intercept_exceptions & (1 << (type - SVM_EXIT_EXCP_BASE))) {
--            helper_vmexit(env, type, param);
-+            cpu_vmexit(env, type, param, retaddr);
-         }
-         break;
-     case SVM_EXIT_MSR:
-@@ -538,28 +535,28 @@ void helper_svm_check_intercept_param(CPUX86State *env, uint32_t type,
-                 t0 %= 8;
-                 break;
-             default:
--                helper_vmexit(env, type, param);
-+                cpu_vmexit(env, type, param, retaddr);
-                 t0 = 0;
-                 t1 = 0;
-                 break;
-             }
-             if (x86_ldub_phys(cs, addr + t1) & ((1 << param) << t0)) {
--                helper_vmexit(env, type, param);
-+                cpu_vmexit(env, type, param, retaddr);
-             }
-         }
-         break;
-     default:
-         if (env->intercept & (1ULL << (type - SVM_EXIT_INTR))) {
--            helper_vmexit(env, type, param);
-+            cpu_vmexit(env, type, param, retaddr);
-         }
-         break;
-     }
- }
- 
--void cpu_svm_check_intercept_param(CPUX86State *env, uint32_t type,
--                                   uint64_t param)
-+void helper_svm_check_intercept_param(CPUX86State *env, uint32_t type,
-+                                      uint64_t param)
- {
--    helper_svm_check_intercept_param(env, type, param);
-+    cpu_svm_check_intercept_param(env, type, param, GETPC());
- }
- 
- void helper_svm_check_io(CPUX86State *env, uint32_t port, uint32_t param,
-@@ -578,17 +575,22 @@ void helper_svm_check_io(CPUX86State *env, uint32_t port, uint32_t param,
-             x86_stq_phys(cs,
-                      env->vm_vmcb + offsetof(struct vmcb, control.exit_info_2),
-                      env->eip + next_eip_addend);
--            helper_vmexit(env, SVM_EXIT_IOIO, param | (port << 16));
-+            cpu_vmexit(env, SVM_EXIT_IOIO, param | (port << 16), GETPC());
-         }
-     }
- }
- 
- /* Note: currently only 32 bits of exit_code are used */
--void helper_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1)
-+void cpu_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1,
-+                uintptr_t retaddr)
- {
-     CPUState *cs = CPU(x86_env_get_cpu(env));
-     uint32_t int_ctl;
- 
-+    if (retaddr) {
-+        cpu_restore_state(cs, retaddr);
+     /* Get the actual len */
+-    buffer = rpath(ctx, path);
+-    xattr_len = llistxattr(buffer, value, 0);
++    dirpath = g_path_get_dirname(path);
++    dirfd = local_opendir_nofollow(ctx, dirpath);
++    g_free(dirpath);
++    if (dirfd == -1) {
++        return -1;
 +    }
 +
-     qemu_log_mask(CPU_LOG_TB_IN_ASM, "vmexit(%08x, %016" PRIx64 ", %016"
-                   PRIx64 ", " TARGET_FMT_lx ")!\n",
-                   exit_code, exit_info_1,
-@@ -766,9 +768,4 @@ void helper_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1)
-     cpu_loop_exit(cs);
- }
++    name = g_path_get_basename(path);
++    xattr_len = flistxattrat_nofollow(dirfd, name, value, 0);
+     if (xattr_len <= 0) {
+-        g_free(buffer);
++        g_free(name);
++        close_preserve_errno(dirfd);
+         return xattr_len;
+     }
  
--void cpu_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1)
--{
--    helper_vmexit(env, exit_code, exit_info_1);
--}
--
- #endif
+     /* Now fetch the xattr and find the actual size */
+     orig_value = g_malloc(xattr_len);
+-    xattr_len = llistxattr(buffer, orig_value, xattr_len);
+-    g_free(buffer);
++    xattr_len = flistxattrat_nofollow(dirfd, name, orig_value, xattr_len);
++    g_free(name);
++    close_preserve_errno(dirfd);
++    if (xattr_len < 0) {
++        return -1;
++    }
+ 
+     /* store the orig pointer */
+     orig_value_start = orig_value;
 -- 
 2.7.4
