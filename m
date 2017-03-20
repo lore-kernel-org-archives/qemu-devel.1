@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1cpxIn-0003M1-A7
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 09:24:50 -0400
+	(envelope-from <mlureau@redhat.com>) id 1cpxLN-0004gn-HC
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 09:27:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1cpxIi-00073L-AC
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 09:24:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37386)
+	(envelope-from <mlureau@redhat.com>) id 1cpxLI-0008NZ-Ex
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 09:27:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59994)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1cpxIi-000737-4g
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 09:24:44 -0400
-Date: Mon, 20 Mar 2017 09:24:42 -0400 (EDT)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1cpxLI-0008NI-7s
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 09:27:24 -0400
+Date: Mon, 20 Mar 2017 09:27:20 -0400 (EDT)
 From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>
-Message-ID: <476095945.9831617.1490016282082.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1490015515-25851-4-git-send-email-armbru@redhat.com>
+Message-ID: <1268717042.9839783.1490016440609.JavaMail.zimbra@redhat.com>
+In-Reply-To: <1490015515-25851-5-git-send-email-armbru@redhat.com>
 References: <1490015515-25851-1-git-send-email-armbru@redhat.com>
-	<1490015515-25851-4-git-send-email-armbru@redhat.com>
+	<1490015515-25851-5-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.9 3/6] qapi: Drop unused QAPIDoc
- member optional
+Subject: Re: [Qemu-devel] [PATCH for-2.9 4/6] tests/qapi-schema: Make
+ test-qapi.py print docs again
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,28 +34,44 @@ Cc: qemu-devel@nongnu.org, marcandre lureau <marcandre.lureau@redhat.com>, eblak
 
 
 ----- Original Message -----
-> Unused since commit aa964b7 "qapi2texi: Convert to QAPISchemaVisitor"
+> test-qapi.py used to print the internal representation of doc comments
+> (commit 3313b61).  This went away when we dropped the doc comments in
+> positive tests (commit 87c16dc).  Bring it back, because I'm going to
+> add real positive doc comment tests.
+
+Yup, as I pointed out in the previous series, but since you biring it back =
+modified:
+
+
 >=20
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 > ---
->  scripts/qapi.py | 1 -
->  1 file changed, 1 deletion(-)
+>  tests/qapi-schema/test-qapi.py | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
 >=20
-> diff --git a/scripts/qapi.py b/scripts/qapi.py
-> index e88c047..6c4d554 100644
-> --- a/scripts/qapi.py
-> +++ b/scripts/qapi.py
-> @@ -106,7 +106,6 @@ class QAPIDoc(object):
->              self.name =3D name
->              # the list of lines for this section
->              self.content =3D []
-> -            self.optional =3D False
+> diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
+.py
+> index ef74e2c..c7724d3 100644
+> --- a/tests/qapi-schema/test-qapi.py
+> +++ b/tests/qapi-schema/test-qapi.py
+> @@ -55,3 +55,14 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
 > =20
->          def append(self, line):
->              self.content.append(line)
+>  schema =3D QAPISchema(sys.argv[1])
+>  schema.visit(QAPISchemaTestVisitor())
+> +
+> +for doc in schema.docs:
+> +    if doc.symbol:
+> +        print 'doc symbol=3D%s' % doc.symbol
+> +    else:
+> +        print 'doc freeform'
+> +    print '    body=3D\n%s' % doc.body
+> +    for arg, section in doc.args.iteritems():
+> +        print '    arg=3D%s\n%s' % (arg, section)
+> +    for section in doc.sections:
+> +        print '    section=3D%s\n%s' % (section.name, section)
 > --
 > 2.7.4
 >=20
