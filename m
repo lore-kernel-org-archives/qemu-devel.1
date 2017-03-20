@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56326)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cpyuV-0002WC-8S
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:07:51 -0400
+	(envelope-from <lersek@redhat.com>) id 1cpyur-0002jJ-ID
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:08:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cpyuU-0004h0-AD
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:07:51 -0400
-References: <20170313214001.26339-1-mreitz@redhat.com>
-	<20170313214045.26857-2-mreitz@redhat.com>
-	<20170320104743.GE17887@stefanha-x1.localdomain>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <fd8c2121-d83e-364e-e084-5934b521fc50@redhat.com>
-Date: Mon, 20 Mar 2017 16:07:44 +0100
+	(envelope-from <lersek@redhat.com>) id 1cpyuq-0004on-BV
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:08:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46434)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cpyuq-0004oQ-30
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:08:12 -0400
+References: <20170320115951.25345-1-lersek@redhat.com>
+	<20170320115951.25345-2-lersek@redhat.com>
+	<20170320161756-mutt-send-email-mst@kernel.org>
+	<97c77b4b-61d3-1527-43c1-89d52dcf08f4@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <88fd49e5-1a89-0a35-3d1a-04b3a582168a@redhat.com>
+Date: Mon, 20 Mar 2017 16:08:06 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170320104743.GE17887@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="VNAhFTlQRxJWqWC8jwDf1IOSHkHts4tll"
-Subject: Re: [Qemu-devel] [PATCH for-2.10 04/16] qemu-img: Expose
- PreallocMode for resizing
+In-Reply-To: <97c77b4b-61d3-1527-43c1-89d52dcf08f4@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] hw/acpi/vmgenid: prevent device
+ realization on pre-2.9 machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,57 +30,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu devel list <qemu-devel@nongnu.org>, Ben Warren <ben@skyportsystems.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---VNAhFTlQRxJWqWC8jwDf1IOSHkHts4tll
-From: Max Reitz <mreitz@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- qemu-devel@nongnu.org
-Message-ID: <fd8c2121-d83e-364e-e084-5934b521fc50@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 04/16] qemu-img: Expose PreallocMode
- for resizing
-References: <20170313214001.26339-1-mreitz@redhat.com>
- <20170313214045.26857-2-mreitz@redhat.com>
- <20170320104743.GE17887@stefanha-x1.localdomain>
-In-Reply-To: <20170320104743.GE17887@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+On 03/20/17 15:39, Paolo Bonzini wrote:
+> 
+> 
+> On 20/03/2017 15:19, Michael S. Tsirkin wrote:
+>> On Mon, Mar 20, 2017 at 12:59:50PM +0100, Laszlo Ersek wrote:
+>>> The WRITE_POINTER linker/loader command that underlies VMGENID depends on
+>>> commit baf2d5bfbac0 ("fw-cfg: support writeable blobs", 2017-01-12). That
+>>> commit is not available in 2.8.
+>>>
+>>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>>> Cc: Ben Warren <ben@skyportsystems.com>
+>>> Cc: Igor Mammedov <imammedo@redhat.com>
+>>> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+>>
+>> I don't understand why do we want to add code to break this
+>> intentionally. What issue does this fix?
+> 
+> Agreed.  If vmgenid can work with old machine types and new QEMU, it
+> should.  For example, when using libvirt machine types identify the
+> machine type where the VM was _created_ (unless someone changes it), not
+> necessarily the minimal QEMU version that can run it.
 
-On 20.03.2017 11:47, Stefan Hajnoczi wrote:
-> On Mon, Mar 13, 2017 at 10:40:33PM +0100, Max Reitz wrote:
->> @@ -3429,8 +3442,16 @@ static int img_resize(int argc, char **argv)
->>          goto out;
->>      }
->> =20
->> +    current_size =3D blk_getlength(blk);
->> +    if (current_size < 0) {
->> +        error_report("Failed to inquire current image length: %s\n",
->=20
-> Spurious newline, error_report() doesn't need it.
+Yes, I understand that.
 
-Oops, will fix.
+The problem is this:
 
-Max
+(1) machine types up to and including 2.4 do not enable DMA for fw_cfg.
+Without DMA, the WRITE_POINTER linker/loader commands have no chance of
+working in the firmware.
+
+(2) ... the other part of the problem was actually in my thinking, sorry
+about that. I forgot that that "-device vmgenid" itself is not available
+in QEMU releases prior to 2.9. So we shouldn't worry about the case
+where write support is missing from fw_cfg, although DMA is available.
+
+In this patch I tried to address (non-)problem (2), thereby covering
+(real) problem (1). I now see that (2) doesn't actually exist. (1) does
+have to be addressed however.
+
+If you agree, I'll respin this patch.
+
+Thanks
+Laszlo
 
 
---VNAhFTlQRxJWqWC8jwDf1IOSHkHts4tll
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljP8EASHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A4FIH/0wrbgcAxGHYv4V0yMnCMbSeMrCSJyOE
-vGHhV2nriereGj1rfndPQQgD5hLBl94sp6/deHgpFpMFzeQHJ/gu28IN+8pdkh5z
-w/Ibw2V4/sRrJ1sJnmmw3omdCbDcWZftHGVSkkT7GZZG/odDLFEAQ75mHtNBcupG
-AdGmKm9sVHNhH8U8Xi3RCzQ1bLXL1AQ4sTGZ9RpT79G8D026Fl4J7tD1jgsE0kQT
-K3zPK9lBqEev9XDlEaIc91n4xSmYBY98udE7qxjnnBY/vcJIgZgCp0rBj086XY1j
-qbNVJdN0fvX3cr47fk3tAfybQYidoTui2/pzQQ9YNv2Q+NH6ICbOLcQ=
-=APdg
------END PGP SIGNATURE-----
-
---VNAhFTlQRxJWqWC8jwDf1IOSHkHts4tll--
+> 
+> Paolo
+> 
+>>> ---
+>>>  include/hw/acpi/vmgenid.h |  1 +
+>>>  include/hw/compat.h       |  4 ++++
+>>>  hw/acpi/vmgenid.c         | 14 ++++++++++++++
+>>>  3 files changed, 19 insertions(+)
+>>>
+>>> diff --git a/include/hw/acpi/vmgenid.h b/include/hw/acpi/vmgenid.h
+>>> index db7fa0e63303..8578476baebe 100644
+>>> --- a/include/hw/acpi/vmgenid.h
+>>> +++ b/include/hw/acpi/vmgenid.h
+>>> @@ -21,6 +21,7 @@ typedef struct VmGenIdState {
+>>>      DeviceClass parent_obj;
+>>>      QemuUUID guid;                /* The 128-bit GUID seen by the guest */
+>>>      uint8_t vmgenid_addr_le[8];   /* Address of the GUID (little-endian) */
+>>> +    bool write_pointer_available;
+>>>  } VmGenIdState;
+>>>  
+>>>  static inline Object *find_vmgenid_dev(void)
+>>> diff --git a/include/hw/compat.h b/include/hw/compat.h
+>>> index fc8c3e060007..c9caa8cd1bdd 100644
+>>> --- a/include/hw/compat.h
+>>> +++ b/include/hw/compat.h
+>>> @@ -42,6 +42,10 @@
+>>>          .driver   = "isa-cirrus-vga",\
+>>>          .property = "vgamem_mb",\
+>>>          .value    = "8",\
+>>> +    },{\
+>>> +        .driver   = "vmgenid",\
+>>> +        .property = "x-write-pointer-available",\
+>>> +        .value    = "off",\
+>>>      },
+>>>  
+>>>  #define HW_COMPAT_2_7 \
+>>> diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+>>> index 7a3ad17d66ef..c3ddcc8e7cb0 100644
+>>> --- a/hw/acpi/vmgenid.c
+>>> +++ b/hw/acpi/vmgenid.c
+>>> @@ -205,9 +205,22 @@ static void vmgenid_handle_reset(void *opaque)
+>>>      memset(vms->vmgenid_addr_le, 0, ARRAY_SIZE(vms->vmgenid_addr_le));
+>>>  }
+>>>  
+>>> +static Property vmgenid_properties[] = {
+>>> +    DEFINE_PROP_BOOL("x-write-pointer-available", VmGenIdState,
+>>> +                     write_pointer_available, true),
+>>> +    DEFINE_PROP_END_OF_LIST(),
+>>> +};
+>>> +
+>>>  static void vmgenid_realize(DeviceState *dev, Error **errp)
+>>>  {
+>>>      VmGenIdState *vms = VMGENID(dev);
+>>> +
+>>> +    if (!vms->write_pointer_available) {
+>>> +        error_setg(errp, "%s requires DMA write support in fw_cfg, "
+>>> +                   "which this machine type does not provide", VMGENID_DEVICE);
+>>> +        return;
+>>> +    }
+>>> +
+>>>      qemu_register_reset(vmgenid_handle_reset, vms);
+>>>  }
+>>>  
+>>> @@ -218,6 +231,7 @@ static void vmgenid_device_class_init(ObjectClass *klass, void *data)
+>>>      dc->vmsd = &vmstate_vmgenid;
+>>>      dc->realize = vmgenid_realize;
+>>>      dc->hotpluggable = false;
+>>> +    dc->props = vmgenid_properties;
+>>>  
+>>>      object_class_property_add_str(klass, VMGENID_GUID, NULL,
+>>>                                    vmgenid_set_guid, NULL);
+>>> -- 
+>>> 2.9.3
+>>>
+>>
