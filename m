@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cpyKw-0004bj-QU
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 10:31:08 -0400
+	(envelope-from <stefanha@gmail.com>) id 1cpyLN-0004rW-OY
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 10:31:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cpyKs-0001k9-JZ
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 10:31:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60248)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1cpyKs-0001hc-Aw
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 10:31:02 -0400
-Date: Mon, 20 Mar 2017 08:30:56 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170320083056.3f2a5603@t450s.home>
-In-Reply-To: <58CFD01F.1060508@cn.fujitsu.com>
-References: <1488180523-18137-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-	<20170313160619.28622002@t450s.home>
-	<58CFD01F.1060508@cn.fujitsu.com>
+	(envelope-from <stefanha@gmail.com>) id 1cpyLJ-00023K-Rl
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 10:31:33 -0400
+Date: Mon, 20 Mar 2017 14:31:25 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170320143125.GB17887@stefanha-x1.localdomain>
+References: <20170319162715.2260-1-sauravsachidanand@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] vfio pci: kernel support of error recovery
- only for non fatal error
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="OJWLbGElk4npXSe3"
+Content-Disposition: inline
+In-Reply-To: <20170319162715.2260-1-sauravsachidanand@gmail.com>
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v3] util: Use
+ g_malloc/g_free in envlist.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,176 +24,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cao jin <caoj.fnst@cn.fujitsu.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, mst@redhat.com, izumi.taku@jp.fujitsu.com
+To: Saurav Sachidanand <sauravsachidanand@gmail.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, laurent@vivier.eu
 
-On Mon, 20 Mar 2017 20:50:39 +0800
-Cao jin <caoj.fnst@cn.fujitsu.com> wrote:
 
-> Sorry for late.
-> 
-> On 03/14/2017 06:06 AM, Alex Williamson wrote:
-> > On Mon, 27 Feb 2017 15:28:43 +0800
-> > Cao jin <caoj.fnst@cn.fujitsu.com> wrote:
-> >   
-> >> 0. What happens now (PCIE AER only)
-> >>    Fatal errors cause a link reset.
-> >>    Non fatal errors don't.
-> >>    All errors stop the VM eventually, but not immediately
-> >>    because it's detected and reported asynchronously.
-> >>    Interrupts are forwarded as usual.
-> >>    Correctable errors are not reported to guest at all.
-> >>    Note: PPC EEH is different. This focuses on AER.  
-> > 
-> > Perhaps you're only focusing on AER, but don't the error handlers we're
-> > using support both AER and EEH generically?  I don't think we can
-> > completely disregard how this affects EEH behavior, if at all.
-> >   
-> 
-> After taking a rough look at the EEH,  find that EEH always feed
-> error_detected with pci_channel_io_frozen, from perspective of
-> error_detected, EEH is not affected.  
-> 
-> I am not sure about a question: when assign devices in spapr host,
-> should all functions/devices in a PE be bound to vfio? I am kind of
-> confused about the relationship between a PE & a tce iommu group
+--OJWLbGElk4npXSe3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-AIUI, yes all devices within the PE are part of the same IOMMU group
-and therefore all endpoints must be bound to vfio or pci-stub.
+On Sun, Mar 19, 2017 at 04:27:15PM +0000, Saurav Sachidanand wrote:
+> @@ -48,10 +46,10 @@ envlist_free(envlist_t *envlist)
+>  		entry =3D envlist->el_entries.lh_first;
+>  		QLIST_REMOVE(entry, ev_link);
+> =20
+> -		free((char *)entry->ev_var);
+> +		g_free(entry->ev_var);
 
-> >>
-> >> 1. Correctable errors
-> >>    There is no need to report these to guest. So let's not.  
-> > 
-> > What does this patch change to make this happen?  I don't see
-> > anything.  Was this always the case?  No change?
-> >   
-> 
-> yes, no change on correctable error.
-> 
-> >>
-> >> 2. Fatal errors
-> >>    It's not easy to handle them gracefully since link reset
-> >>    is needed. As a first step, let's use the existing mechanism
-> >>    in that case.  
-> > 
-> > Ok, so no change here either.
-> >   
-> >> 2. Non-fatal errors
-> >>    Here we could make progress by reporting them to guest
-> >>    and have guest handle them.  
-> > 
-> > In practice, what actual errors do we expect userspace to see as
-> > non-fatal errors? It would be useful for the commit log to describe
-> > the actual benefit we're going to see by splitting out non-fatal errors
-> > for the user (not always a guest) to see separately.  Justify that this
-> > is actually useful.
-> >   
-> >>
-> >>    Issues:
-> >>    a. this behaviour should only be enabled with new userspace,
-> >>       old userspace should work without changes.
-> >>
-> >>       Suggestion: One way to address this would be to add a new eventfd
-> >>       non_fatal_err_trigger. If not set, invoke err_trigger.  
-> > 
-> > This outline format was really more useful for Michael to try to
-> > generate discussion, for a commit log, I'd much rather see a definitive
-> > statement such as:
-> > 
-> >  "To maintain backwards compatibility with userspace, non-fatal errors
-> >  will continue to trigger via the existing error interrupt index if a
-> >  non-fatal signaling mechanism has not been registered."
-> >   
-> >>    b. drivers are supposed to stop MMIO when error is reported,
-> >>       if vm keeps going, we will keep doing MMIO/config.
-> >>
-> >>       Suggestion 1: ignore this. vm stop happens much later when
-> >>       userspace runs anyway, so we are not making things much worse.
-> >>
-> >>       Suggestion 2: try to stop MMIO/config, resume on resume call
-> >>
-> >>       Patch below implements Suggestion 1.
-> >>
-> >>       Note that although this is really against the documentation, which
-> >>       states error_detected() is the point at which the driver should quiesce
-> >>       the device and not touch it further (until diagnostic poking at
-> >>       mmio_enabled or full access at resume callback).
-> >>
-> >>       Fixing this won't be easy. However, this is not a regression.
-> >>
-> >>       Also note this does nothing about interrupts, documentation
-> >>       suggests returning IRQ_NONE until reset.
-> >>       Again, not a regression.  
-> > 
-> > So again, no change here.  I'm not sure what this adds to the commit
-> > log, perhaps we can reference this as a link to Michael's original
-> > proposal.
-> >    
-> >>    c. PF driver might detect that function is completely broken,
-> >>       if vm keeps going, we will keep doing MMIO/config.
-> >>
-> >>       Suggestion 1: ignore this. vm stop happens much later when
-> >>       userspace runs anyway, so we are not making things much worse.
-> >>
-> >>       Suggestion 2: detect this and invoke err_trigger to stop VM.
-> >>
-> >>       Patch below implements Suggestion 2.  
-> > 
-> > This needs more description and seems a bit misleading.  This patch
-> > adds a slot_reset handler, such that if the slot is reset, we notify
-> > the user, essentially promoting the non-fatal error to fatal.  But what
-> > condition gets us to this point?  AIUI, AER is a voting scheme and if
-> > any driver affected says they need a reset, everyone gets a reset.  So
-> > the PF driver we're talking about here is not vfio-pci and it's not the
-> > user, the user has no way to signal that the device is completely
-> > broken, this only handles the case of other collateral devices with
-> > native host drivers that might signal this, right?
-> >   
-> 
-> Yes, same understanding as you, if I don't miss something from michael.
-> 
-> > It seems like this is where this patch has the greatest exposure to
-> > regressions.  If we take the VM use case, previously we could have a
-> > non-AER aware guest and the hypervisor could stop the VM on all
-> > errors.  Now the hypervisor might support the distinction between fatal
-> > and non-fatal, but the guest may still not have AER support.  That
-> > doesn't imply a problem with this approach, the user (hypervisor) would
-> > be at fault for any difference in handling in that case.
-> >   
-> 
-> >>  
-> >> +static pci_ers_result_t vfio_pci_aer_slot_reset(struct pci_dev *pdev)
-> >> +{
-> >> +	struct vfio_pci_device *vdev;
-> >> +	struct vfio_device *device;
-> >> +	static pci_ers_result_t err = PCI_ERS_RESULT_NONE;
-> >> +
-> >> +	device = vfio_device_get_from_dev(&pdev->dev);
-> >> +	if (!device)
-> >> +		goto err_dev;
-> >> +
-> >> +	vdev = vfio_device_data(device);
-> >> +	if (!vdev)
-> >> +		goto err_data;
-> >> +
-> >> +	mutex_lock(&vdev->igate);
-> >> +
-> >> +	if (vdev->err_trigger)
-> >> +		eventfd_signal(vdev->err_trigger, 1);  
-> > 
-> > What about the case where the user has not registered for receiving
-> > non-fatal errors, now we send an error signal on both error_detected
-> > and slot_reset.  Is that useful/desirable?
-> >   
-> 
-> Not desirable, but seems not harmful, guest user will stop anyway. How
-> to avoid this case gracefully seems not easy.
+You need to keep the const casts to silence the compiler.  Here, ...
 
-"Not harmful" is presuming the behavior of the user.  QEMU might not be
-the only consumer of these events.  Is it possible to receive a
-slot_reset without first receiving an error_detected?  If not then we
-can easily track our action for one to decide on the behavior for the
-other.  Thanks,
+> @@ -155,18 +152,14 @@ envlist_setenv(envlist_t *envlist, const char *env)
+> =20
+>  	if (entry !=3D NULL) {
+>  		QLIST_REMOVE(entry, ev_link);
+> -		free((char *)entry->ev_var);
+> +		g_free(entry->ev_var);
 
-Alex
+here, ...
+
+> @@ -201,8 +194,8 @@ envlist_unsetenv(envlist_t *envlist, const char *env)
+>  	}
+>  	if (entry !=3D NULL) {
+>  		QLIST_REMOVE(entry, ev_link);
+> -		free((char *)entry->ev_var);
+> +		g_free(entry->ev_var);
+
+and here.
+
+The problem is that const char * is not supposed to be freed.  The type
+would need to be non-const.  Most of the code does treat the string as
+const, so it's nice to have it except for the final free().
+
+--OJWLbGElk4npXSe3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYz+e9AAoJEJykq7OBq3PIqjkH+wZ8LbauT/uFs5gEgvRezIOi
+WNilawJjEJW0j4GqLhZ+brL0qypAx7ZKH8u8ca2rdQWUMhpBdod++Zd+E31l3bR3
+0xfdmc65Sx66vzf0HxbePPXSGcYO7/M5zGv1UqZ6kahO0JQZXIjKKW1UiMtakSKU
+f/xc29YVkVDMqvVrSd6pVWO5ibqHlVXr1U0q6vrfFL695kNUUvPP7QOCronLYqQI
+TEGMdVR1Mn8Jo4V3aii+0W+du59bDh1drjUBb9f4ToR73o1h49DsPTa7kzXyHQNS
+wl2aa3Tl5gSm3PDcr42FSph43mtDVYbA3vxuZllChETawEL4c3lPFXSg3LTviy4=
+=Exep
+-----END PGP SIGNATURE-----
+
+--OJWLbGElk4npXSe3--
