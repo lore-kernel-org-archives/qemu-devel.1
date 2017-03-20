@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cpzSO-0000eE-6I
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:42:56 -0400
+	(envelope-from <mst@redhat.com>) id 1cpzSi-0000nN-CI
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:43:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cpzSM-0001MR-T2
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:42:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42790)
+	(envelope-from <mst@redhat.com>) id 1cpzSd-0001S0-FX
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:43:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50498)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cpzSM-0001Lu-LX
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:42:50 -0400
-Date: Mon, 20 Mar 2017 15:42:46 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170320154245.GD2401@work-vm>
-References: <1490011066479-474158.post@n7.nabble.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cpzSd-0001RX-9X
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 11:43:07 -0400
+Date: Mon, 20 Mar 2017 17:43:00 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170320174101-mutt-send-email-mst@kernel.org>
+References: <20170317215725.GJ996@jhogan-linux.le.imgtec.org>
+	<6b3ec98b-55e2-ecc8-d962-dc9d13866319@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1490011066479-474158.post@n7.nabble.com>
-Subject: Re: [Qemu-devel] [PATCH v3]COLO:Fix Colo doc,
- secondeary should be secondary
+In-Reply-To: <6b3ec98b-55e2-ecc8-d962-dc9d13866319@redhat.com>
+Subject: Re: [Qemu-devel] [BUG] virtio-net linux driver fails to probe on
+ MIPS Malta since 'hw/virtio-pci: fix virtio behaviour'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,53 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: wangguang <wang.guang55@zte.com.cn>
-Cc: qemu-devel@nongnu.org
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: James Hogan <james.hogan@imgtec.com>, qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, virtualization@lists.linux-foundation.org
 
-* wangguang (wang.guang55@zte.com.cn) wrote:
-> Subject: [PATCH] Fix Colo doc secondeary should be secondary 
-> This is an error in COLO-FT.txt. 
-> secondeary-disk0 should be secondary-disk0. 
+On Mon, Mar 20, 2017 at 05:21:22PM +0200, Marcel Apfelbaum wrote:
+> On 03/17/2017 11:57 PM, James Hogan wrote:
+> > Hi,
+> > 
+> > I've bisected the following failure of the virtio_net linux v4.10 driver
+> > to probe in QEMU v2.9.0-rc1 emulating a MIPS Malta machine:
+> > 
+> > virtio_net virtio0: virtio: device uses modern interface but does not have VIRTIO_F_VERSION_1
+> > virtio_net: probe of virtio0 failed with error -22
+> > 
+> > To QEMU commit 9a4c0e220d8a ("hw/virtio-pci: fix virtio behaviour").
+> > 
+> > It appears that adding ",disable-modern=on,disable-legacy=off" to the
+> > virtio-net -device makes it work again.
+> > 
+> > I presume this should really just work out of the box. Any ideas why it
+> > isn't?
+> > 
 > 
-> Signed-off-by: Guang Wang <wang.guang55@zte.com.cn>
-> --- 
->  docs/COLO-FT.txt | 2 +- 
->  1 file changed, 1 insertion(+), 1 deletion(-) 
+> Hi,
 > 
-> diff --git a/docs/COLO-FT.txt b/docs/COLO-FT.txt 
-> index e289be2..bec7547 100644 
-> --- a/docs/COLO-FT.txt 
-> +++ b/docs/COLO-FT.txt 
-> @@ -139,7 +139,7 @@ Secondary: 
->  { 'execute': 'nbd-server-start', 
->    'arguments': {'addr': {'type': 'inet', 'data': {'host': 'xx.xx.xx.xx',
-> 'port': '8889'} } } 
->  } 
-> -{'execute': 'nbd-server-add', 'arguments': {'device': 'secondeary-disk0',
-> 'writable': true } } 
-> +{'execute': 'nbd-server-add', 'arguments': {'device': 'Secondary-disk0',
-> 'writable': true } } 
+> 
+> This is strange. This commit changes virtio devices from legacy to virtio "transitional".
+> (your command line changes it to legacy)
+> Linux 4.10 supports virtio modern/transitional (as far as I know) and on QEMU side
+> there is nothing new.
+> 
+> Michael, do you have any idea?
+> 
+> Thanks,
+> Marcel
 
-That should be 's' not 'S' shouldn't it, to match the other uses in the same
-doc?
+My guess would be firmware mishandling 64 bit BARs - we saw such
+a case on sparc previously. As a result you are probably reading
+all zeroes from features register or something like that.
+Marcel, could you send a patch making the bar 32 bit?
+If that helps we know what the issue is.
 
-Dave
-
->   
->  Note: 
->    a. The qmp command nbd-server-start and nbd-server-add must be run 
-> -- 
-> 2.9.3 
-> 
->  
-> 
-> 
-> 
-> 
-> 
-> --
-> View this message in context: http://qemu.11.n7.nabble.com/PATCH-v3-COLO-Fix-Colo-doc-secondeary-should-be-secondary-tp474158.html
-> Sent from the Developer mailing list archive at Nabble.com.
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > Cheers
+> > James
+> > 
