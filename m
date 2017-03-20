@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1cpxBs-0008FW-6Z
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 09:17:41 -0400
+	(envelope-from <mlureau@redhat.com>) id 1cpxCH-00006V-8V
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 09:18:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1cpxBo-0004rt-Uv
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 09:17:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34206)
+	(envelope-from <mlureau@redhat.com>) id 1cpxCE-00057T-0q
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 09:18:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46078)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1cpxBo-0004qe-OU
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 09:17:36 -0400
-Date: Mon, 20 Mar 2017 09:17:31 -0400 (EDT)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1cpxCD-000573-RM
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 09:18:01 -0400
+Date: Mon, 20 Mar 2017 09:18:00 -0400 (EDT)
 From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>
-Message-ID: <466178818.9811389.1490015851375.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1490015515-25851-2-git-send-email-armbru@redhat.com>
+Message-ID: <1732861283.9812678.1490015880135.JavaMail.zimbra@redhat.com>
+In-Reply-To: <1490015515-25851-3-git-send-email-armbru@redhat.com>
 References: <1490015515-25851-1-git-send-email-armbru@redhat.com>
-	<1490015515-25851-2-git-send-email-armbru@redhat.com>
+	<1490015515-25851-3-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.9 1/6] qapi: Drop excessive Make
- dependencies on qapi2texi.py
+Subject: Re: [Qemu-devel] [PATCH for-2.9 2/6] qapi2texi: Fix to actually
+ fail when 'doc-required' is false
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,55 +34,28 @@ Cc: qemu-devel@nongnu.org, marcandre lureau <marcandre.lureau@redhat.com>, eblak
 
 
 ----- Original Message -----
-> When qapi2texi.py changes, we regenerate everything QAPI.  Screwed up
-> in commit 56e8bdd.
+> Messed up in commit bc52d03.
 >=20
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 > ---
->  Makefile | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+>  scripts/qapi2texi.py | 1 +
+>  1 file changed, 1 insertion(+)
 >=20
-> diff --git a/Makefile b/Makefile
-> index 73e0c12..14d3e55 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -391,7 +391,6 @@ qemu-ga$(EXESUF): QEMU_CFLAGS +=3D -I qga/qapi-genera=
-ted
->  gen-out-type =3D $(subst .,-,$(suffix $@))
+> diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
+> index 8eed11a..5c4db78 100755
+> --- a/scripts/qapi2texi.py
+> +++ b/scripts/qapi2texi.py
+> @@ -292,6 +292,7 @@ def main(argv):
+>      if not qapi.doc_required:
+>          print >>sys.stderr, ("%s: need pragma 'doc-required' "
+>                               "to generate documentation" % argv[0])
+> +        sys.exit(1)
+>      print texi_schema(schema)
 > =20
->  qapi-py =3D $(SRC_PATH)/scripts/qapi.py $(SRC_PATH)/scripts/ordereddict.=
-py
-> -qapi-py +=3D $(SRC_PATH)/scripts/qapi2texi.py
 > =20
->  qga/qapi-generated/qga-qapi-types.c qga/qapi-generated/qga-qapi-types.h =
-:\
->  $(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-types.py
->  $(qapi-py)
-> @@ -700,10 +699,12 @@ qemu-monitor-info.texi:
-> $(SRC_PATH)/hmp-commands-info.hx $(SRC_PATH)/scripts/hxt
->  qemu-img-cmds.texi: $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/scripts/hxt=
-ool
->  =09$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -t < $< > $@,"GEN"=
-,"$@")
-> =20
-> -docs/qemu-qmp-qapi.texi: $(qapi-modules) $(qapi-py)
-> +docs/qemu-qmp-qapi.texi docs/qemu-ga-qapi.texi:
-> $(SRC_PATH)/scripts/qapi2texi.py $(qapi-py)
-> +
-> +docs/qemu-qmp-qapi.texi: $(qapi-modules)
->  =09$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi2texi.py $< >
->  =09$@,"GEN","$@")
-> =20
-> -docs/qemu-ga-qapi.texi: $(SRC_PATH)/qga/qapi-schema.json $(qapi-py)
-> +docs/qemu-ga-qapi.texi: $(SRC_PATH)/qga/qapi-schema.json
->  =09$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi2texi.py $< >
->  =09$@,"GEN","$@")
-> =20
->  qemu.1: qemu-doc.texi qemu-options.texi qemu-monitor.texi
->  qemu-monitor-info.texi
 > --
 > 2.7.4
 >=20
