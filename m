@@ -1,16 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39444)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cqAIJ-0001UJ-JN
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:17:12 -0400
+	(envelope-from <eblake@redhat.com>) id 1cqAIN-0001XQ-AC
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:17:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cqAII-0000P5-RT
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:17:11 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Tue, 21 Mar 2017 11:16:21 +0800
-Message-Id: <20170321031635.22123-3-famz@redhat.com>
-In-Reply-To: <20170321031635.22123-1-famz@redhat.com>
-References: <20170321031635.22123-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC 02/16] block-backend: Add blk_request_perm
+	(envelope-from <eblake@redhat.com>) id 1cqAIM-0000QX-Ie
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:17:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55830)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cqAIM-0000QA-DV
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:17:14 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Mon, 20 Mar 2017 22:17:04 -0500
+Message-Id: <20170321031705.22291-2-eblake@redhat.com>
+In-Reply-To: <20170321031705.22291-1-eblake@redhat.com>
+References: <20170321031705.22291-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/2] tests: Expose regression in QemuOpts
+ visitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,51 +25,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: armbru@redhat.com, lvivier@redhat.com, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-This function tries to request, if not granted yet, for the given
-permissions.
+Commit 15c2f669e broke the ability of the QemuOpts visitor to
+flag extra input parameters, but the regression went unnoticed
+because of missing testsuite coverage.  Add a test to cover this.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- block/block-backend.c          | 12 ++++++++++++
- include/sysemu/block-backend.h |  1 +
- 2 files changed, 13 insertions(+)
+ tests/test-opts-visitor.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 5742c09..5d17404 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -595,6 +595,18 @@ void blk_get_perm(BlockBackend *blk, uint64_t *perm, uint64_t *shared_perm)
-     *shared_perm = blk->shared_perm;
+diff --git a/tests/test-opts-visitor.c b/tests/test-opts-visitor.c
+index 2238f8e..a47c344 100644
+--- a/tests/test-opts-visitor.c
++++ b/tests/test-opts-visitor.c
+@@ -247,6 +247,24 @@ test_opts_range_beyond(void)
+     qemu_opts_del(opts);
  }
- 
-+int blk_request_perm(BlockBackend *blk, uint64_t perm, Error **errp)
+
++static void
++test_opts_dict_unvisited(void)
 +{
-+    uint64_t blk_perm, shared_perm;
++    QemuOpts *opts;
++    Visitor *v;
++    UserDefOptions *userdef;
 +
-+    blk_get_perm(blk, &blk_perm, &shared_perm);
-+    if ((blk_perm & perm) == perm) {
-+        return 0;
-+    }
-+    blk_perm |= perm;
-+    return blk_set_perm(blk, blk_perm, shared_perm, errp);
++    opts = qemu_opts_parse(qemu_find_opts("userdef"), "i64x=0,bogus=1", false,
++                           &error_abort);
++
++    v = opts_visitor_new(opts);
++    /* FIXME: bogus should be diagnosed */
++    visit_type_UserDefOptions(v, NULL, &userdef, &error_abort);
++    visit_free(v);
++    qemu_opts_del(opts);
++    qapi_free_UserDefOptions(userdef);
 +}
 +
- static int blk_do_attach_dev(BlockBackend *blk, void *dev)
+ int
+ main(int argc, char **argv)
  {
-     if (blk->dev) {
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
-index 096c17f..016632e 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -108,6 +108,7 @@ bool bdrv_is_root_node(BlockDriverState *bs);
- int blk_set_perm(BlockBackend *blk, uint64_t perm, uint64_t shared_perm,
-                  Error **errp);
- void blk_get_perm(BlockBackend *blk, uint64_t *perm, uint64_t *shared_perm);
-+int blk_request_perm(BlockBackend *blk, uint64_t perm, Error **errp);
- 
- void blk_set_allow_write_beyond_eof(BlockBackend *blk, bool allow);
- void blk_iostatus_enable(BlockBackend *blk);
+@@ -343,6 +361,8 @@ main(int argc, char **argv)
+     g_test_add_func("/visitor/opts/range/beyond",
+                     test_opts_range_beyond);
+
++    g_test_add_func("/visitor/opts/dict/unvisited", test_opts_dict_unvisited);
++
+     g_test_run();
+     return 0;
+ }
 -- 
 2.9.3
