@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41092)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cqGGI-0003fS-Lr
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 05:39:32 -0400
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1cqGNc-0005cT-QT
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 05:47:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cqGGF-0006CR-FK
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 05:39:30 -0400
-Received: from [45.249.212.188] (port=2965 helo=dggrg02-dlp.huawei.com)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1cqGNX-0003Hs-Ch
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 05:47:04 -0400
+Received: from lhrrgout.huawei.com ([194.213.3.17]:8509)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cqGGE-0006AM-C5
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 05:39:27 -0400
-References: <201703211610470826648@zte.com.cn>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <58D0F498.3020105@huawei.com>
-Date: Tue, 21 Mar 2017 17:38:32 +0800
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1cqGNW-0003EE-PF
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 05:46:59 -0400
+References: <1490015240-49118-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<a08674d1-0f08-b8fb-aa11-c971042ac58a@redhat.com>
+From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+Message-ID: <d149478f-fb4e-6699-5508-570a5bf27869@huawei.com>
+Date: Tue, 21 Mar 2017 10:44:32 +0100
 MIME-Version: 1.0
-In-Reply-To: <201703211610470826648@zte.com.cn>
+In-Reply-To: <a08674d1-0f08-b8fb-aa11-c971042ac58a@redhat.com>
 Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel]
- =?utf-8?b?562U5aSNOiBSZTogIOetlOWkjTogUmU6IFtCVUdd?=
- =?utf-8?q?COLO_failover_hang?=
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v0] fsdev: QMP interface for throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,342 +27,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: wang.guang55@zte.com.cn, zhangchen.fnst@cn.fujitsu.com
-Cc: dgilbert@redhat.com, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, Greg Kurz <groug@kaod.org>
+Cc: Alberto Garcia <berto@igalia.com>, Jani Kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-Hi,
 
-Thanks for reporting this, and i confirmed it in my test, and it is a bug.
+Hi Eric,
 
-Though we tried to call qemu_file_shutdown() to shutdown the related fd, in
-case COLO thread/incoming thread is stuck in read/write() while do failover,
-but it didn't take effect, because all the fd used by COLO (also migration)
-has been wrapped by qio channel, and it will not call the shutdown API if
-we didn't qio_channel_set_feature(QIO_CHANNEL(sioc), QIO_CHANNEL_FEATURE_SHUTDOWN).
+Thanks for having a look at the patch. My answers are inline.
 
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> On 03/20/2017 08:07 AM, Pradeep Jagadeesh wrote:
+>> This patchset enables qmp interfaces for the 9pfs
+>> devices (fsdev).This provides two interfaces one
+>
+> Space between English sentences, after '.'
+OK
+>
+>> for querying all the 9pfs devices info. The second one
+>> to set the IO limits for the required 9pfs device.
+>>
+>> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+>> ---
+>
+>> +++ b/qapi-schema.json
+>> @@ -81,6 +81,9 @@
+>>  # QAPI block definitions
+>>  { 'include': 'qapi/block.json' }
+>>
+>> +# QAPI 9pfs definitions
+>> +{ 'include': 'qapi/9pfs.json' }
+>> +
+>>  # QAPI event definitions
+>>  { 'include': 'qapi/event.json' }
+>>
+>> diff --git a/qapi/9pfs.json b/qapi/9pfs.json
+>> new file mode 100644
+>> index 0000000..c068474
+>> --- /dev/null
+>> +++ b/qapi/9pfs.json
+>> @@ -0,0 +1,169 @@
+>> +# -*- Mode: Python -*-
+>> +
+>> +##
+>> +# == QAPI 9p definitions
+>> +##
+>> +
+>> +# QAPI common definitions
+>> +{ 'include': 'common.json' }
+>> +
+>> +##
+>> +# @fs9p_set_io_throttle:
+>> +#
+>> +# Change I/O limits for a 9p/fsdev device.
+>> +#
+>> +# Since QEMU 2.9, I/0 limits can be enabled on each  fsdev(9pfs) device
+>
+> This says 2.9...
+I meant that, the qemu cli io throttle facility for 9p/fsdev is enabled 
+in 2.9.But the qmp interfaces are from 2.10.
+>
+>> +#
+>> +# I/O limits can be disabled by setting all of them to 0.
+>> +#
+>> +# Returns: Nothing on success
+>> +#          If @device is not a valid 9p device, DeviceNotFound
+>> +#
+>> +# Since: 2:10
+>
+> ...but this says 2:10 (typo, should be 2.10).  No need to mention the
+> version twice, especially if one of them is wrong (keep the Since: line).
+OK, mentioned above.
+>
+>> +#
+>> +# Example:
+>> +#
+>> +# -> { "execute": "fs9p_set_io_throttle",
+>> +#      "arguments": { "device": "ide0-1-0",
+>> +#                     "bps": 1000000,
+>> +#                     "bps_rd": 0,
+>> +#                     "bps_wr": 0,
+>> +#                     "iops": 0,
+>> +#                     "iops_rd": 0,
+>> +#                     "iops_wr": 0,
+>> +#                     "bps_max": 8000000,
+>> +#                     "bps_rd_max": 0,
+>> +#                     "bps_wr_max": 0,
+>> +#                     "iops_max": 0,
+>> +#                     "iops_rd_max": 0,
+>> +#                     "iops_wr_max": 0,
+>> +#                     "bps_max_length": 60,
+>> +#                     "iops_size": 0 } }
+>> +# <- { "returns": {} }
+>> +##
+>> +{ 'command': 'fs9p_set_io_throttle', 'boxed': true,
+>> +  'data': 'FS9PIOThrottle' }
+>
+> New commands and members should be named with '-' rather than '_' as the
+> word separator, so this should be 'fs9p-set-io-throttle', 'bps-rd', etc.
+OK, I will change.
 
-I doubted migration cancel has the same problem, it may be stuck in write()
-if we tried to cancel migration.
-
-void fd_start_outgoing_migration(MigrationState *s, const char *fdname, Error **errp)
-{
-     qio_channel_set_name(QIO_CHANNEL(ioc), "migration-fd-outgoing");
-     migration_channel_connect(s, ioc, NULL);
-     ... ...
-We didn't call qio_channel_set_feature(QIO_CHANNEL(sioc), QIO_CHANNEL_FEATURE_SHUTDOWN) above,
-and the
-migrate_fd_cancel()
-{
-  ... ...
-     if (s->state == MIGRATION_STATUS_CANCELLING && f) {
-         qemu_file_shutdown(f);  --> This will not take effect. No ?
-     }
-}
-
-Thanks,
-Hailiang
-
-On 2017/3/21 16:10, wang.guang55@zte.com.cn wrote:
-> Thank you。
->
-> I have test aready。
->
-> When the Primary Node panic,the Secondary Node qemu hang at the same place。
->
-> Incorrding http://wiki.qemu-project.org/Features/COLO ，kill Primary Node qemu will not produce the problem,but Primary Node panic can。
->
-> I think due to the feature of channel does not support QIO_CHANNEL_FEATURE_SHUTDOWN.
->
->
-> when failover,channel_shutdown could not shut down the channel.
->
->
-> so the colo_process_incoming_thread will hang at recvmsg.
->
->
-> I test a patch:
->
->
-> diff --git a/migration/socket.c b/migration/socket.c
->
->
-> index 13966f1..d65a0ea 100644
->
->
-> --- a/migration/socket.c
->
->
-> +++ b/migration/socket.c
->
->
-> @@ -147,8 +147,9 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
->
->
->       }
->
->
->
->
->
->       trace_migration_socket_incoming_accepted()
->
->
->
->
->
->       qio_channel_set_name(QIO_CHANNEL(sioc), "migration-socket-incoming")
->
->
-> +    qio_channel_set_feature(QIO_CHANNEL(sioc), QIO_CHANNEL_FEATURE_SHUTDOWN)
->
->
->       migration_channel_process_incoming(migrate_get_current(),
->
->
->                                          QIO_CHANNEL(sioc))
->
->
->       object_unref(OBJECT(sioc))
->
->
->
->
-> My test will not hang any more.
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
-> 原始邮件
->
->
->
-> 发件人： ＜zhangchen.fnst@cn.fujitsu.com＞
-> 收件人：王广10165992 ＜zhang.zhanghailiang@huawei.com＞
-> 抄送人： ＜qemu-devel@nongnu.org＞ ＜zhangchen.fnst@cn.fujitsu.com＞
-> 日 期 ：2017年03月21日 15:58
-> 主 题 ：Re: [Qemu-devel]  答复: Re:  [BUG]COLO failover hang
->
->
->
->
->
-> Hi,Wang.
->
-> You can test this branch:
->
-> https://github.com/coloft/qemu/tree/colo-v5.1-developing-COLO-frame-v21-with-shared-disk
->
-> and please follow wiki ensure your own configuration correctly.
->
-> http://wiki.qemu-project.org/Features/COLO
->
->
-> Thanks
->
-> Zhang Chen
->
->
-> On 03/21/2017 03:27 PM, wang.guang55@zte.com.cn wrote:
-> ＞
-> ＞ hi.
-> ＞
-> ＞ I test the git qemu master have the same problem.
-> ＞
-> ＞ (gdb) bt
-> ＞
-> ＞ #0  qio_channel_socket_readv (ioc=0x7f65911b4e50, iov=0x7f64ef3fd880,
-> ＞ niov=1, fds=0x0, nfds=0x0, errp=0x0) at io/channel-socket.c:461
-> ＞
-> ＞ #1  0x00007f658e4aa0c2 in qio_channel_read
-> ＞ (ioc=ioc@entry=0x7f65911b4e50, buf=buf@entry=0x7f65907cb838 "",
-> ＞ buflen=buflen@entry=32768, errp=errp@entry=0x0) at io/channel.c:114
-> ＞
-> ＞ #2  0x00007f658e3ea990 in channel_get_buffer (opaque=＜optimized out＞,
-> ＞ buf=0x7f65907cb838 "", pos=＜optimized out＞, size=32768) at
-> ＞ migration/qemu-file-channel.c:78
-> ＞
-> ＞ #3  0x00007f658e3e97fc in qemu_fill_buffer (f=0x7f65907cb800) at
-> ＞ migration/qemu-file.c:295
-> ＞
-> ＞ #4  0x00007f658e3ea2e1 in qemu_peek_byte (f=f@entry=0x7f65907cb800,
-> ＞ offset=offset@entry=0) at migration/qemu-file.c:555
-> ＞
-> ＞ #5  0x00007f658e3ea34b in qemu_get_byte (f=f@entry=0x7f65907cb800) at
-> ＞ migration/qemu-file.c:568
-> ＞
-> ＞ #6  0x00007f658e3ea552 in qemu_get_be32 (f=f@entry=0x7f65907cb800) at
-> ＞ migration/qemu-file.c:648
-> ＞
-> ＞ #7  0x00007f658e3e66e5 in colo_receive_message (f=0x7f65907cb800,
-> ＞ errp=errp@entry=0x7f64ef3fd9b0) at migration/colo.c:244
-> ＞
-> ＞ #8  0x00007f658e3e681e in colo_receive_check_message (f=＜optimized
-> ＞ out＞, expect_msg=expect_msg@entry=COLO_MESSAGE_VMSTATE_SEND,
-> ＞ errp=errp@entry=0x7f64ef3fda08)
-> ＞
-> ＞     at migration/colo.c:264
-> ＞
-> ＞ #9  0x00007f658e3e740e in colo_process_incoming_thread
-> ＞ (opaque=0x7f658eb30360 ＜mis_current.31286＞) at migration/colo.c:577
-> ＞
-> ＞ #10 0x00007f658be09df3 in start_thread () from /lib64/libpthread.so.0
-> ＞
-> ＞ #11 0x00007f65881983ed in clone () from /lib64/libc.so.6
-> ＞
-> ＞ (gdb) p ioc-＞name
-> ＞
-> ＞ $2 = 0x7f658ff7d5c0 "migration-socket-incoming"
-> ＞
-> ＞ (gdb) p ioc-＞features        Do not support QIO_CHANNEL_FEATURE_SHUTDOWN
-> ＞
-> ＞ $3 = 0
-> ＞
-> ＞
-> ＞ (gdb) bt
-> ＞
-> ＞ #0  socket_accept_incoming_migration (ioc=0x7fdcceeafa90,
-> ＞ condition=G_IO_IN, opaque=0x7fdcceeafa90) at migration/socket.c:137
-> ＞
-> ＞ #1  0x00007fdcc6966350 in g_main_dispatch (context=＜optimized out＞) at
-> ＞ gmain.c:3054
-> ＞
-> ＞ #2  g_main_context_dispatch (context=＜optimized out＞,
-> ＞ context@entry=0x7fdccce9f590) at gmain.c:3630
-> ＞
-> ＞ #3  0x00007fdccb8a6dcc in glib_pollfds_poll () at util/main-loop.c:213
-> ＞
-> ＞ #4  os_host_main_loop_wait (timeout=＜optimized out＞) at
-> ＞ util/main-loop.c:258
-> ＞
-> ＞ #5  main_loop_wait (nonblocking=nonblocking@entry=0) at
-> ＞ util/main-loop.c:506
-> ＞
-> ＞ #6  0x00007fdccb526187 in main_loop () at vl.c:1898
-> ＞
-> ＞ #7  main (argc=＜optimized out＞, argv=＜optimized out＞, envp=＜optimized
-> ＞ out＞) at vl.c:4709
-> ＞
-> ＞ (gdb) p ioc-＞features
-> ＞
-> ＞ $1 = 6
-> ＞
-> ＞ (gdb) p ioc-＞name
-> ＞
-> ＞ $2 = 0x7fdcce1b1ab0 "migration-socket-listener"
-> ＞
-> ＞
-> ＞ May be socket_accept_incoming_migration should
-> ＞ call qio_channel_set_feature(ioc, QIO_CHANNEL_FEATURE_SHUTDOWN)??
-> ＞
-> ＞
-> ＞ thank you.
-> ＞
-> ＞
-> ＞
-> ＞
-> ＞
-> ＞ 原始邮件
-> ＞ *发件人：*＜zhangchen.fnst@cn.fujitsu.com＞
-> ＞ *收件人：*王广10165992＜qemu-devel@nongnu.org＞
-> ＞ *抄送人：*＜zhangchen.fnst@cn.fujitsu.com＞＜zhang.zhanghailiang@huawei.com＞
-> ＞ *日 期 ：*2017年03月16日 14:46
-> ＞ *主 题 ：**Re: [Qemu-devel] COLO failover hang*
-> ＞
-> ＞
-> ＞
-> ＞
-> ＞ On 03/15/2017 05:06 PM, wangguang wrote:
-> ＞ ＞   am testing QEMU COLO feature described here [QEMU
-> ＞ ＞ Wiki](http://wiki.qemu-project.org/Features/COLO).
-> ＞ ＞
-> ＞ ＞ When the Primary Node panic,the Secondary Node qemu hang.
-> ＞ ＞ hang at recvmsg in qio_channel_socket_readv.
-> ＞ ＞ And  I run  { 'execute': 'nbd-server-stop' } and { "execute":
-> ＞ ＞ "x-colo-lost-heartbeat" } in Secondary VM's
-> ＞ ＞ monitor,the  Secondary Node qemu still hang at recvmsg .
-> ＞ ＞
-> ＞ ＞ I found that the colo in qemu is not complete yet.
-> ＞ ＞ Do the colo have any plan for development?
-> ＞
-> ＞ Yes, We are developing. You can see some of patch we pushing.
-> ＞
-> ＞ ＞ Has anyone ever run it successfully? Any help is appreciated!
-> ＞
-> ＞ In our internal version can run it successfully,
-> ＞ The failover detail you can ask Zhanghailiang for help.
-> ＞ Next time if you have some question about COLO,
-> ＞ please cc me and zhanghailiang ＜zhang.zhanghailiang@huawei.com＞.
-> ＞
-> ＞
-> ＞ Thanks
-> ＞ Zhang Chen
-> ＞
-> ＞
-> ＞ ＞
-> ＞ ＞
-> ＞ ＞
-> ＞ ＞ centos7.2+qemu2.7.50
-> ＞ ＞ (gdb) bt
-> ＞ ＞ #0  0x00007f3e00cc86ad in recvmsg () from /lib64/libpthread.so.0
-> ＞ ＞ #1  0x00007f3e0332b738 in qio_channel_socket_readv (ioc=＜optimized out＞,
-> ＞ ＞ iov=＜optimized out＞, niov=＜optimized out＞, fds=0x0, nfds=0x0, errp=0x0) at
-> ＞ ＞ io/channel-socket.c:497
-> ＞ ＞ #2  0x00007f3e03329472 in qio_channel_read (ioc=ioc@entry=0x7f3e05110e40,
-> ＞ ＞ buf=buf@entry=0x7f3e05910f38 "", buflen=buflen@entry=32768,
-> ＞ ＞ errp=errp@entry=0x0) at io/channel.c:97
-> ＞ ＞ #3  0x00007f3e032750e0 in channel_get_buffer (opaque=＜optimized out＞,
-> ＞ ＞ buf=0x7f3e05910f38 "", pos=＜optimized out＞, size=32768) at
-> ＞ ＞ migration/qemu-file-channel.c:78
-> ＞ ＞ #4  0x00007f3e0327412c in qemu_fill_buffer (f=0x7f3e05910f00) at
-> ＞ ＞ migration/qemu-file.c:257
-> ＞ ＞ #5  0x00007f3e03274a41 in qemu_peek_byte (f=f@entry=0x7f3e05910f00,
-> ＞ ＞ offset=offset@entry=0) at migration/qemu-file.c:510
-> ＞ ＞ #6  0x00007f3e03274aab in qemu_get_byte (f=f@entry=0x7f3e05910f00) at
-> ＞ ＞ migration/qemu-file.c:523
-> ＞ ＞ #7  0x00007f3e03274cb2 in qemu_get_be32 (f=f@entry=0x7f3e05910f00) at
-> ＞ ＞ migration/qemu-file.c:603
-> ＞ ＞ #8  0x00007f3e03271735 in colo_receive_message (f=0x7f3e05910f00,
-> ＞ ＞ errp=errp@entry=0x7f3d62bfaa50) at migration/colo.c:215
-> ＞ ＞ #9  0x00007f3e0327250d in colo_wait_handle_message (errp=0x7f3d62bfaa48,
-> ＞ ＞ checkpoint_request=＜synthetic pointer＞, f=＜optimized out＞) at
-> ＞ ＞ migration/colo.c:546
-> ＞ ＞ #10 colo_process_incoming_thread (opaque=0x7f3e067245e0) at
-> ＞ ＞ migration/colo.c:649
-> ＞ ＞ #11 0x00007f3e00cc1df3 in start_thread () from /lib64/libpthread.so.0
-> ＞ ＞ #12 0x00007f3dfc9c03ed in clone () from /lib64/libc.so.6
-> ＞ ＞
-> ＞ ＞
-> ＞ ＞
-> ＞ ＞
-> ＞ ＞
-> ＞ ＞ --
-> ＞ ＞ View this message in context: http://qemu.11.n7.nabble.com/COLO-failover-hang-tp473250.html
-> ＞ ＞ Sent from the Developer mailing list archive at Nabble.com.
-> ＞ ＞
-> ＞ ＞
-> ＞ ＞
-> ＞ ＞
-> ＞
-> ＞ --
-> ＞ Thanks
-> ＞ Zhang Chen
-> ＞
-> ＞
-> ＞
-> ＞
-> ＞
+>> +##
+>> +# @FS9PIOThrottle:
+>> +#
+>> +# A set of parameters describing block
+>> +#
+>> +# @device: Block device name
+>> +#
+>> +# @bps: total throughput limit in bytes per second
+>> +#
+>> +# @bps_rd: read throughput limit in bytes per second
+>> +#
+>> +# @bps_wr: write throughput limit in bytes per second
+>> +#
+>> +# @iops: total I/O operations per second
+>> +#
+>> +# @iops_rd: read I/O operations per second
+>> +#
+>> +# @iops_wr: write I/O operations per second
+>> +#
+>> +# @bps_max: total throughput limit during bursts,
+>> +#                     in bytes (Since 1.7)
+>
+> You're introducing this struct in 2.10, so this member is not since 1.7.
+>  Either that, or you're copying-and-pasting when you should be sharing
+> code and reusing an existing struct.
+Hmm..copied the block devices code, I will correct it.
+I thought of reusing the code, but the whole struct from block devices 
+can not be used, as there is one member called "group" that is not used 
+in case of 9p. Also this needs lot of changes even in case of block 
+devices. Because I may need to rename the structure as IOThrottle or 
+something like that.
+Shall I reuse the code and avoid setting the group member in case of 9p?
+What do you think?
+>
+>
+>> +#
+>> +# Since: 2.10
+>> +##
+>> +{ 'struct': 'FS9PIOThrottle',
+>> +  'data': { '*device': 'str', 'bps': 'int', 'bps_rd': 'int',
+>> +            'bps_wr': 'int', 'iops': 'int', 'iops_rd': 'int', 'iops_wr': 'int',
+>> +            '*bps_max': 'int', '*bps_rd_max': 'int',
+>> +            '*bps_wr_max': 'int', '*iops_max': 'int',
+>> +            '*iops_rd_max': 'int', '*iops_wr_max': 'int',
+>> +            '*bps_max_length': 'int', '*bps_rd_max_length': 'int',
+>> +            '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
+>> +            '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
+>> +            '*iops_size': 'int' } }
+>
+> If you reuse an existing struct that uses _ instead of -, then that
+> explains your naming.  But in that case, why do you need to declare a
+> new (copied) struct, instead of just reusing the existing one?
+>
+Explained in above comment.
+>> +
+>> +##
+>> +# @query-9pfs-io-throttle:
+>> +#
+>> +# Return a list of information about each iothread
+>> +#
+>> +# Returns: @FS9PIOIOThrottle
+>> +#
+>> +# Since: 2.10
+>> +#
+>> +# Example:
+>> +#
+>> +# -> { "Execute": "query-9pfs-io-throttle" }
+>> +# <- { "returns" : [
+>> +#          {
+>> +#             "device": "ide0-hd0",
+>> +#              "bps":1000000,
+>> +#              "bps_rd":0,
+>> +#              "bps_wr":0,
+>> +#              "iops":1000000,
+>> +#              "iops_rd":0,
+>> +#              "iops_wr":0,
+>> +#              "bps_max": 8000000,
+>> +#              "bps_rd_max": 0,
+>> +#              "bps_wr_max": 0,
+>
+> You are not consistent on whether to include a space after ':'.  The
+> easiest way to get this right is to paste actual output from pretty qmp
+> mode.
+I will fix this.
+>
+>> +#              "iops_max": 0,
+>> +#              "iops_rd_max": 0,
+>> +#              "iops_wr_max": 0,
+>> +#              "bps_max_length": 0,
+>> +#              "bps_rd_max_length": 0,
+>> +#              "bps_wr_max_length": 0,
+>> +#              "iops_max_length": 0,
+>> +#              "iops_rd_max_length": 0,
+>> +#              "iops_wr_max_length": 0,
+>> +#              "iops_size": 0,
+>> +#            }
+>
+> This is not valid JSON. No trailing commas.
+Will fix
+>
+>> +#          ]
+>> +#      }
+>> +#
+>> +##
+>> +{ 'command': 'query-9pfs-io-throttle', 'returns': [ 'FS9PIOThrottle' ] }
+>> +
+>>
 >
