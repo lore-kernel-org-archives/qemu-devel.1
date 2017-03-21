@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cqF4E-0001fp-0T
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:22:59 -0400
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cqF7a-0002cW-Iw
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:26:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1cqF4A-0001AU-Rj
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:22:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33828)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cqF4A-00019L-JX
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:22:54 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170321022243.29453-1-fanc.fnst@cn.fujitsu.com> (Chao Fan's
-	message of "Tue, 21 Mar 2017 10:22:43 +0800")
-References: <20170321022243.29453-1-fanc.fnst@cn.fujitsu.com>
-Reply-To: quintela@redhat.com
-Date: Tue, 21 Mar 2017 09:22:52 +0100
-Message-ID: <87y3vz82eb.fsf@secure.mitica>
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cqF7W-0003TF-Th
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:26:26 -0400
+Received: from [45.249.212.188] (port=2964 helo=dggrg02-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cqF7V-0003N1-7Z
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:26:22 -0400
+References: <201703211610470826648@zte.com.cn>
+From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Message-ID: <58D0E38E.1080109@huawei.com>
+Date: Tue, 21 Mar 2017 16:25:50 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2] Add page-size to output in 'info
- migrate'
+In-Reply-To: <201703211610470826648@zte.com.cn>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel]
+ =?utf-8?b?562U5aSNOiBSZTogIOetlOWkjTogUmU6IFtCVUdd?=
+ =?utf-8?q?COLO_failover_hang?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,93 +28,321 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Chao Fan <fanc.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, eblake@redhat.com, armbru@redhat.com, berrange@redhat.com, caoj.fnst@cn.fujitsu.com, douly.fnst@cn.fujitsu.com, maozy.fnst@cn.fujitsu.com, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: wang.guang55@zte.com.cn, zhangchen.fnst@cn.fujitsu.com
+Cc: xuquan8@huawei.com, qemu-devel@nongnu.org
 
-Chao Fan <fanc.fnst@cn.fujitsu.com> wrote:
-> The number of dirty pages outputed in 'pages' in the command
-> 'info migrate', so add page-size to calculate the number of dirty
-> pages in bytes.
+Hi,
+
+On 2017/3/21 16:10, wang.guang55@zte.com.cn wrote:
+> Thank you。
 >
-> Signed-off-by: Chao Fan <fanc.fnst@cn.fujitsu.com>
-> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+> I have test aready。
 >
-> ---
-> v2: fix the grammar in qapi-schema.json [Eric Blake]
+> When the Primary Node panic,the Secondary Node qemu hang at the same place。
+>
+> Incorrding http://wiki.qemu-project.org/Features/COLO ，kill Primary Node qemu will not produce the problem,but Primary Node panic can。
+>
+> I think due to the feature of channel does not support QIO_CHANNEL_FEATURE_SHUTDOWN.
+>
+>
 
-Hi
+Yes, you are right, when we do failover for primary/secondary VM, we will shutdown the related
+fd in case it is stuck in the read/write fd.
 
-If you see my RAMState series, you can see that things have moved a lot
-here,  I added this to my current series:
+It seems that you didn't follow the above introduction exactly to do the test. Could you
+share your test procedures ? Especially the commands used in the test.
 
-(there is a rename of qemu_target_page_bits() to qemu_target_page_size()
-in the series).
+Thanks,
+Hailiang
 
-If you like it, I can leave it that way there.
-
-Thanks, Juan.
-
-
-commit 1944568bd8cdf912b3bf231bbc3c66071fde9f58
-Author: Chao Fan <fanc.fnst@cn.fujitsu.com>
-Date:   Tue Mar 21 10:22:43 2017 +0800
-
-    Add page-size to output in 'info migrate'
-    
-    The number of dirty pages outputed in 'pages' in the command
-    'info migrate', so add page-size to calculate the number of dirty
-    pages in bytes.
-    
-    Signed-off-by: Chao Fan <fanc.fnst@cn.fujitsu.com>
-    Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-    Signed-off-by: Juan Quintela <quintela@redhat.com>
-
-diff --git a/hmp.c b/hmp.c
-index edb8970..be75e71 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -215,6 +215,9 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
-                        info->ram->normal_bytes >> 10);
-         monitor_printf(mon, "dirty sync count: %" PRIu64 "\n",
-                        info->ram->dirty_sync_count);
-+        monitor_printf(mon, "page size: %" PRIu64 " kbytes\n",
-+                       info->ram->page_size >> 10);
-+
-         if (info->ram->dirty_pages_rate) {
-             monitor_printf(mon, "dirty pages rate: %" PRIu64 " pages\n",
-                            info->ram->dirty_pages_rate);
-diff --git a/migration/migration.c b/migration/migration.c
-index 92c3c6b..fc19ba7 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -650,6 +650,7 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
-     info->ram->mbps = s->mbps;
-     info->ram->dirty_sync_count = ram_dirty_sync_count();
-     info->ram->postcopy_requests = ram_postcopy_requests();
-+    info->ram->page_size = qemu_target_page_size();
- 
-     if (s->state != MIGRATION_STATUS_COMPLETED) {
-         info->ram->remaining = ram_bytes_remaining();
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 68a4327..c7ec62c 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -598,6 +598,9 @@
- # @postcopy-requests: The number of page requests received from the destination
- #        (since 2.7)
- #
-+# @page-size: The number of bytes per page for the various page-based
-+#        statistics (since 2.10)
-+#
- # Since: 0.14.0
- ##
- { 'struct': 'MigrationStats',
-@@ -605,7 +608,7 @@
-            'duplicate': 'int', 'skipped': 'int', 'normal': 'int',
-            'normal-bytes': 'int', 'dirty-pages-rate' : 'int',
-            'mbps' : 'number', 'dirty-sync-count' : 'int',
--           'postcopy-requests' : 'int' } }
-+           'postcopy-requests' : 'int', 'page-size' : 'int' } }
- 
- ##
- # @XBZRLECacheStats:
+> when failover,channel_shutdown could not shut down the channel.
+>
+>
+> so the colo_process_incoming_thread will hang at recvmsg.
+>
+>
+> I test a patch:
+>
+>
+> diff --git a/migration/socket.c b/migration/socket.c
+>
+>
+> index 13966f1..d65a0ea 100644
+>
+>
+> --- a/migration/socket.c
+>
+>
+> +++ b/migration/socket.c
+>
+>
+> @@ -147,8 +147,9 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
+>
+>
+>       }
+>
+>
+>
+>
+>
+>       trace_migration_socket_incoming_accepted()
+>
+>
+>
+>
+>
+>       qio_channel_set_name(QIO_CHANNEL(sioc), "migration-socket-incoming")
+>
+>
+> +    qio_channel_set_feature(QIO_CHANNEL(sioc), QIO_CHANNEL_FEATURE_SHUTDOWN)
+>
+>
+>       migration_channel_process_incoming(migrate_get_current(),
+>
+>
+>                                          QIO_CHANNEL(sioc))
+>
+>
+>       object_unref(OBJECT(sioc))
+>
+>
+>
+>
+> My test will not hang any more.
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+> 原始邮件
+>
+>
+>
+> 发件人： ＜zhangchen.fnst@cn.fujitsu.com＞
+> 收件人：王广10165992 ＜zhang.zhanghailiang@huawei.com＞
+> 抄送人： ＜qemu-devel@nongnu.org＞ ＜zhangchen.fnst@cn.fujitsu.com＞
+> 日 期 ：2017年03月21日 15:58
+> 主 题 ：Re: [Qemu-devel]  答复: Re:  [BUG]COLO failover hang
+>
+>
+>
+>
+>
+> Hi,Wang.
+>
+> You can test this branch:
+>
+> https://github.com/coloft/qemu/tree/colo-v5.1-developing-COLO-frame-v21-with-shared-disk
+>
+> and please follow wiki ensure your own configuration correctly.
+>
+> http://wiki.qemu-project.org/Features/COLO
+>
+>
+> Thanks
+>
+> Zhang Chen
+>
+>
+> On 03/21/2017 03:27 PM, wang.guang55@zte.com.cn wrote:
+> ＞
+> ＞ hi.
+> ＞
+> ＞ I test the git qemu master have the same problem.
+> ＞
+> ＞ (gdb) bt
+> ＞
+> ＞ #0  qio_channel_socket_readv (ioc=0x7f65911b4e50, iov=0x7f64ef3fd880,
+> ＞ niov=1, fds=0x0, nfds=0x0, errp=0x0) at io/channel-socket.c:461
+> ＞
+> ＞ #1  0x00007f658e4aa0c2 in qio_channel_read
+> ＞ (ioc=ioc@entry=0x7f65911b4e50, buf=buf@entry=0x7f65907cb838 "",
+> ＞ buflen=buflen@entry=32768, errp=errp@entry=0x0) at io/channel.c:114
+> ＞
+> ＞ #2  0x00007f658e3ea990 in channel_get_buffer (opaque=＜optimized out＞,
+> ＞ buf=0x7f65907cb838 "", pos=＜optimized out＞, size=32768) at
+> ＞ migration/qemu-file-channel.c:78
+> ＞
+> ＞ #3  0x00007f658e3e97fc in qemu_fill_buffer (f=0x7f65907cb800) at
+> ＞ migration/qemu-file.c:295
+> ＞
+> ＞ #4  0x00007f658e3ea2e1 in qemu_peek_byte (f=f@entry=0x7f65907cb800,
+> ＞ offset=offset@entry=0) at migration/qemu-file.c:555
+> ＞
+> ＞ #5  0x00007f658e3ea34b in qemu_get_byte (f=f@entry=0x7f65907cb800) at
+> ＞ migration/qemu-file.c:568
+> ＞
+> ＞ #6  0x00007f658e3ea552 in qemu_get_be32 (f=f@entry=0x7f65907cb800) at
+> ＞ migration/qemu-file.c:648
+> ＞
+> ＞ #7  0x00007f658e3e66e5 in colo_receive_message (f=0x7f65907cb800,
+> ＞ errp=errp@entry=0x7f64ef3fd9b0) at migration/colo.c:244
+> ＞
+> ＞ #8  0x00007f658e3e681e in colo_receive_check_message (f=＜optimized
+> ＞ out＞, expect_msg=expect_msg@entry=COLO_MESSAGE_VMSTATE_SEND,
+> ＞ errp=errp@entry=0x7f64ef3fda08)
+> ＞
+> ＞     at migration/colo.c:264
+> ＞
+> ＞ #9  0x00007f658e3e740e in colo_process_incoming_thread
+> ＞ (opaque=0x7f658eb30360 ＜mis_current.31286＞) at migration/colo.c:577
+> ＞
+> ＞ #10 0x00007f658be09df3 in start_thread () from /lib64/libpthread.so.0
+> ＞
+> ＞ #11 0x00007f65881983ed in clone () from /lib64/libc.so.6
+> ＞
+> ＞ (gdb) p ioc-＞name
+> ＞
+> ＞ $2 = 0x7f658ff7d5c0 "migration-socket-incoming"
+> ＞
+> ＞ (gdb) p ioc-＞features        Do not support QIO_CHANNEL_FEATURE_SHUTDOWN
+> ＞
+> ＞ $3 = 0
+> ＞
+> ＞
+> ＞ (gdb) bt
+> ＞
+> ＞ #0  socket_accept_incoming_migration (ioc=0x7fdcceeafa90,
+> ＞ condition=G_IO_IN, opaque=0x7fdcceeafa90) at migration/socket.c:137
+> ＞
+> ＞ #1  0x00007fdcc6966350 in g_main_dispatch (context=＜optimized out＞) at
+> ＞ gmain.c:3054
+> ＞
+> ＞ #2  g_main_context_dispatch (context=＜optimized out＞,
+> ＞ context@entry=0x7fdccce9f590) at gmain.c:3630
+> ＞
+> ＞ #3  0x00007fdccb8a6dcc in glib_pollfds_poll () at util/main-loop.c:213
+> ＞
+> ＞ #4  os_host_main_loop_wait (timeout=＜optimized out＞) at
+> ＞ util/main-loop.c:258
+> ＞
+> ＞ #5  main_loop_wait (nonblocking=nonblocking@entry=0) at
+> ＞ util/main-loop.c:506
+> ＞
+> ＞ #6  0x00007fdccb526187 in main_loop () at vl.c:1898
+> ＞
+> ＞ #7  main (argc=＜optimized out＞, argv=＜optimized out＞, envp=＜optimized
+> ＞ out＞) at vl.c:4709
+> ＞
+> ＞ (gdb) p ioc-＞features
+> ＞
+> ＞ $1 = 6
+> ＞
+> ＞ (gdb) p ioc-＞name
+> ＞
+> ＞ $2 = 0x7fdcce1b1ab0 "migration-socket-listener"
+> ＞
+> ＞
+> ＞ May be socket_accept_incoming_migration should
+> ＞ call qio_channel_set_feature(ioc, QIO_CHANNEL_FEATURE_SHUTDOWN)??
+> ＞
+> ＞
+> ＞ thank you.
+> ＞
+> ＞
+> ＞
+> ＞
+> ＞
+> ＞ 原始邮件
+> ＞ *发件人：*＜zhangchen.fnst@cn.fujitsu.com＞
+> ＞ *收件人：*王广10165992＜qemu-devel@nongnu.org＞
+> ＞ *抄送人：*＜zhangchen.fnst@cn.fujitsu.com＞＜zhang.zhanghailiang@huawei.com＞
+> ＞ *日 期 ：*2017年03月16日 14:46
+> ＞ *主 题 ：**Re: [Qemu-devel] COLO failover hang*
+> ＞
+> ＞
+> ＞
+> ＞
+> ＞ On 03/15/2017 05:06 PM, wangguang wrote:
+> ＞ ＞   am testing QEMU COLO feature described here [QEMU
+> ＞ ＞ Wiki](http://wiki.qemu-project.org/Features/COLO).
+> ＞ ＞
+> ＞ ＞ When the Primary Node panic,the Secondary Node qemu hang.
+> ＞ ＞ hang at recvmsg in qio_channel_socket_readv.
+> ＞ ＞ And  I run  { 'execute': 'nbd-server-stop' } and { "execute":
+> ＞ ＞ "x-colo-lost-heartbeat" } in Secondary VM's
+> ＞ ＞ monitor,the  Secondary Node qemu still hang at recvmsg .
+> ＞ ＞
+> ＞ ＞ I found that the colo in qemu is not complete yet.
+> ＞ ＞ Do the colo have any plan for development?
+> ＞
+> ＞ Yes, We are developing. You can see some of patch we pushing.
+> ＞
+> ＞ ＞ Has anyone ever run it successfully? Any help is appreciated!
+> ＞
+> ＞ In our internal version can run it successfully,
+> ＞ The failover detail you can ask Zhanghailiang for help.
+> ＞ Next time if you have some question about COLO,
+> ＞ please cc me and zhanghailiang ＜zhang.zhanghailiang@huawei.com＞.
+> ＞
+> ＞
+> ＞ Thanks
+> ＞ Zhang Chen
+> ＞
+> ＞
+> ＞ ＞
+> ＞ ＞
+> ＞ ＞
+> ＞ ＞ centos7.2+qemu2.7.50
+> ＞ ＞ (gdb) bt
+> ＞ ＞ #0  0x00007f3e00cc86ad in recvmsg () from /lib64/libpthread.so.0
+> ＞ ＞ #1  0x00007f3e0332b738 in qio_channel_socket_readv (ioc=＜optimized out＞,
+> ＞ ＞ iov=＜optimized out＞, niov=＜optimized out＞, fds=0x0, nfds=0x0, errp=0x0) at
+> ＞ ＞ io/channel-socket.c:497
+> ＞ ＞ #2  0x00007f3e03329472 in qio_channel_read (ioc=ioc@entry=0x7f3e05110e40,
+> ＞ ＞ buf=buf@entry=0x7f3e05910f38 "", buflen=buflen@entry=32768,
+> ＞ ＞ errp=errp@entry=0x0) at io/channel.c:97
+> ＞ ＞ #3  0x00007f3e032750e0 in channel_get_buffer (opaque=＜optimized out＞,
+> ＞ ＞ buf=0x7f3e05910f38 "", pos=＜optimized out＞, size=32768) at
+> ＞ ＞ migration/qemu-file-channel.c:78
+> ＞ ＞ #4  0x00007f3e0327412c in qemu_fill_buffer (f=0x7f3e05910f00) at
+> ＞ ＞ migration/qemu-file.c:257
+> ＞ ＞ #5  0x00007f3e03274a41 in qemu_peek_byte (f=f@entry=0x7f3e05910f00,
+> ＞ ＞ offset=offset@entry=0) at migration/qemu-file.c:510
+> ＞ ＞ #6  0x00007f3e03274aab in qemu_get_byte (f=f@entry=0x7f3e05910f00) at
+> ＞ ＞ migration/qemu-file.c:523
+> ＞ ＞ #7  0x00007f3e03274cb2 in qemu_get_be32 (f=f@entry=0x7f3e05910f00) at
+> ＞ ＞ migration/qemu-file.c:603
+> ＞ ＞ #8  0x00007f3e03271735 in colo_receive_message (f=0x7f3e05910f00,
+> ＞ ＞ errp=errp@entry=0x7f3d62bfaa50) at migration/colo.c:215
+> ＞ ＞ #9  0x00007f3e0327250d in colo_wait_handle_message (errp=0x7f3d62bfaa48,
+> ＞ ＞ checkpoint_request=＜synthetic pointer＞, f=＜optimized out＞) at
+> ＞ ＞ migration/colo.c:546
+> ＞ ＞ #10 colo_process_incoming_thread (opaque=0x7f3e067245e0) at
+> ＞ ＞ migration/colo.c:649
+> ＞ ＞ #11 0x00007f3e00cc1df3 in start_thread () from /lib64/libpthread.so.0
+> ＞ ＞ #12 0x00007f3dfc9c03ed in clone () from /lib64/libc.so.6
+> ＞ ＞
+> ＞ ＞
+> ＞ ＞
+> ＞ ＞
+> ＞ ＞
+> ＞ ＞ --
+> ＞ ＞ View this message in context: http://qemu.11.n7.nabble.com/COLO-failover-hang-tp473250.html
+> ＞ ＞ Sent from the Developer mailing list archive at Nabble.com.
+> ＞ ＞
+> ＞ ＞
+> ＞ ＞
+> ＞ ＞
+> ＞
+> ＞ --
+> ＞ Thanks
+> ＞ Zhang Chen
+> ＞
+> ＞
+> ＞
+> ＞
+> ＞
+>
