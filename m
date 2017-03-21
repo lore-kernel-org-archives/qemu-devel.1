@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33964)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cqFsw-0004oI-UN
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 05:15:24 -0400
+	(envelope-from <sameeh@daynix.com>) id 1cqG12-0007AG-Cn
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 05:23:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cqFst-0003Ci-Qo
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 05:15:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37396)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cqFst-0003Bq-In
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 05:15:19 -0400
-References: <1489657928-14919-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<22303218-697c-7166-406b-050888efdfd5@redhat.com>
-	<cc051a40-9142-9364-8bc8-de8ec453ebe2@cn.fujitsu.com>
-	<8901e058-dcda-5c4a-e43a-38fca5814eb5@redhat.com>
-	<ff751bdb-95bf-4c76-b782-d2bc47746c02@cn.fujitsu.com>
-	<2875d736-61ae-b8f6-bb79-40aaddf3cb9b@redhat.com>
-	<af721967-8c73-1747-1428-adc390732cd1@cn.fujitsu.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <15aa7299-d364-cb03-f07f-778dfbb1f8a4@redhat.com>
-Date: Tue, 21 Mar 2017 17:15:10 +0800
+	(envelope-from <sameeh@daynix.com>) id 1cqG0z-0002Pp-7W
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 05:23:44 -0400
+Received: from mail-vk0-x244.google.com ([2607:f8b0:400c:c05::244]:34771)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1cqG0y-0002PI-Vz
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 05:23:41 -0400
+Received: by mail-vk0-x244.google.com with SMTP id y16so5259565vky.1
+	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 02:23:40 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <af721967-8c73-1747-1428-adc390732cd1@cn.fujitsu.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/3] Add COLO-proxy virtio-net support
+In-Reply-To: <CAKPgXcGRS1BGfjFf2LbHgMRHB-6P9E5i717miuwtT9c1gw9eAw@mail.gmail.com>
+References: <CAKPgXcFwSHgb+sLimF=+En_fHM1rYnV1+jX3Tg_hP07EmzyiJg@mail.gmail.com>
+	<20170320135708.GV17887@stefanha-x1.localdomain>
+	<CAKPgXcGRS1BGfjFf2LbHgMRHB-6P9E5i717miuwtT9c1gw9eAw@mail.gmail.com>
+From: Sameeh Jubran <sameeh@daynix.com>
+Date: Tue, 21 Mar 2017 11:23:39 +0200
+Message-ID: <CAKPgXcG92+2v3pJEGhNYwjPB5+TNJcR=E3FqXnegGjeBkp3d1Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] qemu-ga static compilation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,109 +29,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>
-Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
+Just to make it clear,
 
+Stefan you are going to send a patch right?
 
-On 2017=E5=B9=B403=E6=9C=8821=E6=97=A5 15:08, Zhang Chen wrote:
+On Mon, Mar 20, 2017 at 5:44 PM, Sameeh Jubran <sameeh@daynix.com> wrote:
+
 >
 >
-> On 03/21/2017 02:30 PM, Jason Wang wrote:
+> On Mon, Mar 20, 2017 at 3:57 PM, Stefan Hajnoczi <stefanha@gmail.com>
+> wrote:
+>
+>> On Tue, Mar 14, 2017 at 06:51:37PM +0200, Sameeh Jubran wrote:
+>> > I am trying to compile qemu-ga for Windows statically using the
+>> following
+>> > commands:
+>> >
+>> > ./configure --disable-docs --target-list=x86_64-softmmu
+>> > --cross-prefix=x86_64-w64-mingw32- --static --enable-guest-agent-msi
+>> > --with-vss-sdk=/path/to/VSSSDK72
+>> >
+>> > make -j8 qemu-ga
+>> >
+>> >
+>> > And I keep getting this error:
+>> >
+>> > /home/sameeh/Builds/q/stubs/error-printf.c:7: undefined reference to
+>> > `__imp_g_test_config_vars'
+>> > collect2: error: ld returned 1 exit status
+>> > Makefile:444: recipe for target 'qemu-ga.exe' failed
+>> > make: *** [qemu-ga.exe] Error 1
+>> >
+>> >
+>> > Notes to consider:
+>> > * without --static I can compile it successfully
+>> > * Build machine is running Fedora 25
+>> > * I have upgraded all of the tools to their latest version
+>> > * If I comment out the function which is causing the issue
+>> > (g_test_initialized()), qemu ga compiles statically and runs
+>> successfully
+>> > without the need of any dlls.
+>> >
+>> > Can anyone reproduce this? Do you have any idea why is this happening?
 >>
+>> I guess GLIB_STATIC_COMPILATION is not defined in your build (see the
+>> definition of GLIB_VAR in the glib headers).
 >>
->> On 2017=E5=B9=B403=E6=9C=8821=E6=97=A5 14:16, Zhang Chen wrote:
->>>
->>>
->>> On 03/21/2017 02:10 PM, Jason Wang wrote:
->>>>
->>>>
->>>> On 2017=E5=B9=B403=E6=9C=8821=E6=97=A5 13:47, Zhang Chen wrote:
->>>>>
->>>>>
->>>>> On 03/21/2017 11:39 AM, Jason Wang wrote:
->>>>>>
->>>>>>
->>>>>> On 2017=E5=B9=B403=E6=9C=8816=E6=97=A5 17:52, Zhang Chen wrote:
->>>>>>> If user use -device virtio-net-pci, virtio-net driver will add a=20
->>>>>>> header
->>>>>>> to raw net packet that colo-proxy can't handle it. COLO-proxy jus=
-t
->>>>>>> focus on the packet payload, so we skip the virtio-net header to=20
->>>>>>> compare
->>>>>>> the sent packet that primary guest's to secondary guest's.
->>>>>>>
->>>>>>>
->>>>>>> Zhang Chen (3):
->>>>>>>    COLO-proxy: Add virtio-net packet parse function
->>>>>>>    COLO-proxy: Add a tag to mark virtio-net packet
->>>>>>>    COLO-compare: Add virtio-net packet compare support
->>>>>>>
->>>>>>>   net/colo-compare.c    | 42=20
->>>>>>> +++++++++++++++++++++++++++++++++---------
->>>>>>>   net/colo.c            | 14 ++++++++++----
->>>>>>>   net/colo.h            |  7 ++++++-
->>>>>>>   net/filter-rewriter.c | 15 ++++++++++-----
->>>>>>>   4 files changed, 59 insertions(+), 19 deletions(-)
->>>>>>>
->>>>>>
->>>>>> Hi:
->>>>>>
->>>>>> Git grep told us virtio-net is not the only user for vnet header.=20
->>>>>> E1000e and vmxnet3 uses it too.
->>>>>>
->>>>>> So we need solve them all instead of being virtio-net specific.
->>>>>>
->>>>>
->>>>> Yes, In this series I just try to parse vnet header, if failed I=20
->>>>> will try to parse normal net packet.
->>>>> So, I just focus on vnet header rather than virtio-net driver.
->>>>> But the patch comments really make people confused , Should I fix=20
->>>>> all the comments send the V2 ?
->>>>
->>>> Yes, please. Beside this, instead of using fixed vnet header len=20
->>>> macro, you should query the backend for the length of vnet header.
->>>
->>> I want query the backend too, but colo-compare is not a netfilter=20
->>> means it no need attach any netdev.
->>> How can we query the backend for the length of vnet header?
+>> The pkg-config file for glib doesn't define GLIB_STATIC_COMPILATION for
+>> pkg-config --static.  I guess we must add it manually.
 >>
->> Filters can know this, then how about let filters add the vnet header=20
->> length before the real packet and send it to colo-compare?
+>> Does this work?
+>>
+>> diff --git a/configure b/configure
+>> index 99d8bec..10f23b7 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -3047,6 +3047,10 @@ if test "$modules" = yes; then
+>>      glib_modules="$glib_modules gmodule-2.0"
+>>  fi
+>>
+>> +if test "$static" = yes; then
+>> +    QEMU_CFLAGS="-DGLIB_STATIC_COMPILATION $QEMU_CFLAGS"
+>> +fi
+>> +
+>>
+> Yes! this works thank you =)
+>
+>>  for i in $glib_modules; do
+>>      if $pkg_config --atleast-version=$glib_req_ver $i; then
+>>          glib_cflags=$($pkg_config --cflags $i)
 >>
 >
-> I don't know whether I understand your comments...
-> Do you means filter send a vnet header length firstly(independent=20
-> length packet), then send the real packet?
-
-This requires too much changes and may break the compatibility of socket=20
-net backend.
-
-> If yes, I think it so expensive, in colo we use filter mirror or=20
-> redirect packet between primary and secondary
-> that no need to know the vnet header length.
-> Or do you means add a fake vnet header to real packet in same one packe=
-t?
-
-Kind of, see below.
-
-> If yes, filter-mirror and filter-redirector must touch the packet do=20
-> some job like colo-compare.
-> We initial design split colo-proxy to 4 modules have make=20
-> filter-mirror and filter-redirector not to touch
-> the packet content, colo-compare and filter-rewriter do the packet=20
-> data related job.
-> Or you have other way to tell colo-compare the length?
 >
-> Thanks
-> Zhang Chen
+>
+> --
+> Respectfully,
+> *Sameeh Jubran*
+> *Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>*
+> *Software Engineer @ Daynix <http://www.daynix.com>.*
+>
 
-I mean e.g: We send a packet like struct {int size; const uint8_t=20
-buf[];} currently. We can try to add vnet header information like {int=20
-size; int vnet_hdr_len; const uint8_t buf[];}. Or even just pack the=20
-vnet_hdr_len information to the higher bits of size. Then we just need=20
-some encoding and decoding and the changes were limited.
 
-Does this make sense?
 
-Thanks
+-- 
+Respectfully,
+*Sameeh Jubran*
+*Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>*
+*Software Engineer @ Daynix <http://www.daynix.com>.*
