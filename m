@@ -1,25 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cqAIH-0001Sy-SB
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:17:10 -0400
+	(envelope-from <famz@redhat.com>) id 1cqAIJ-0001UJ-JN
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:17:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cqAIG-0000Nu-0Z
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:17:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55770)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cqAIF-0000MK-RW
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:17:07 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F0DB27E9F0
-	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 03:17:07 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-Date: Mon, 20 Mar 2017 22:17:03 -0500
-Message-Id: <20170321031705.22291-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.9 0/2] Fix QemuOpts regression on bogus
- keys
+	(envelope-from <famz@redhat.com>) id 1cqAII-0000P5-RT
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:17:11 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Tue, 21 Mar 2017 11:16:21 +0800
+Message-Id: <20170321031635.22123-3-famz@redhat.com>
+In-Reply-To: <20170321031635.22123-1-famz@redhat.com>
+References: <20170321031635.22123-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH RFC 02/16] block-backend: Add blk_request_perm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,23 +20,51 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, lvivier@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-Reported to me off-list by Laurent Vivier, who found the
-problem while working on https://bugzilla.redhat.com/1433193
-Broken since 2.7, but the fix is a one-liner (pointing out my
-embarrassing mistake of mis-converting a pre-decrement operator);
-as a bug fix, it still qualifies for 2.9 in spite of hard freeze,
-on the other hand, as the regression was not introduced in 2.9,
-I also understand if it is postponed.
+This function tries to request, if not granted yet, for the given
+permissions.
 
-Eric Blake (2):
-  tests: Expose regression in QemuOpts visitor
-  qapi: Fix QemuOpts visitor regression on unvisited input
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ block/block-backend.c          | 12 ++++++++++++
+ include/sysemu/block-backend.h |  1 +
+ 2 files changed, 13 insertions(+)
 
- qapi/opts-visitor.c       |  6 +++---
- tests/test-opts-visitor.c | 29 ++++++++++++++++++++++++++---
- 2 files changed, 29 insertions(+), 6 deletions(-)
-
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 5742c09..5d17404 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -595,6 +595,18 @@ void blk_get_perm(BlockBackend *blk, uint64_t *perm, uint64_t *shared_perm)
+     *shared_perm = blk->shared_perm;
+ }
+ 
++int blk_request_perm(BlockBackend *blk, uint64_t perm, Error **errp)
++{
++    uint64_t blk_perm, shared_perm;
++
++    blk_get_perm(blk, &blk_perm, &shared_perm);
++    if ((blk_perm & perm) == perm) {
++        return 0;
++    }
++    blk_perm |= perm;
++    return blk_set_perm(blk, blk_perm, shared_perm, errp);
++}
++
+ static int blk_do_attach_dev(BlockBackend *blk, void *dev)
+ {
+     if (blk->dev) {
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
+index 096c17f..016632e 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -108,6 +108,7 @@ bool bdrv_is_root_node(BlockDriverState *bs);
+ int blk_set_perm(BlockBackend *blk, uint64_t perm, uint64_t shared_perm,
+                  Error **errp);
+ void blk_get_perm(BlockBackend *blk, uint64_t *perm, uint64_t *shared_perm);
++int blk_request_perm(BlockBackend *blk, uint64_t perm, Error **errp);
+ 
+ void blk_set_allow_write_beyond_eof(BlockBackend *blk, bool allow);
+ void blk_iostatus_enable(BlockBackend *blk);
 -- 
 2.9.3
