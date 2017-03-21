@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43765)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cqCJC-0002wp-F6
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 01:26:15 -0400
+	(envelope-from <jgross@suse.com>) id 1cqCRn-0004gB-8X
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 01:35:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cqCJ7-0002Ia-JD
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 01:26:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34302)
+	(envelope-from <jgross@suse.com>) id 1cqCRi-0007Rv-DZ
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 01:35:07 -0400
+Received: from mx2.suse.de ([195.135.220.15]:36419)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cqCJ7-0002I9-Dt
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 01:26:09 -0400
-Date: Tue, 21 Mar 2017 13:26:02 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170321052602.GA2785@lemon>
-References: <CAO_EM_kn4QEw=+j23F7e+LzLW2_TPwNENoopqyBb-hdKYAow9w@mail.gmail.com>
+	(Exim 4.71) (envelope-from <jgross@suse.com>) id 1cqCRi-0007PK-0O
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 01:35:02 -0400
+References: <20170316141953.16161-1-jgross@suse.com>
+	<20170316141953.16161-3-jgross@suse.com>
+	<alpine.DEB.2.10.1703161306380.15430@sstabellini-ThinkPad-X260>
+	<214bc24d-1c0c-16d6-9c33-e20962b150d2@suse.com>
+	<alpine.DEB.2.10.1703171123520.22036@sstabellini-ThinkPad-X260>
+From: Juergen Gross <jgross@suse.com>
+Message-ID: <da852b5f-2490-c483-984d-c7be4f83b9a7@suse.com>
+Date: Tue, 21 Mar 2017 06:34:56 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAO_EM_kn4QEw=+j23F7e+LzLW2_TPwNENoopqyBb-hdKYAow9w@mail.gmail.com>
-Subject: Re: [Qemu-devel] Assertion failure taking external snapshot with
- virtio drive + iothread
+In-Reply-To: <alpine.DEB.2.10.1703171123520.22036@sstabellini-ThinkPad-X260>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] configure: use pkg-config for
+ obtaining xen version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +31,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ed Swierk <eswierk@skyportsystems.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Stefano Stabellini <sstabellini@kernel.org>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, anthony.perard@citrix.com, kraxel@redhat.com, paul.durrant@citrix.com
 
-On Fri, 03/17 09:55, Ed Swierk wrote:
-> I'm running into the same problem taking an external snapshot with a
-> virtio-blk drive with iothread, so it's not specific to virtio-scsi.
-> Run a Linux guest on qemu master
+On 17/03/17 19:33, Stefano Stabellini wrote:
+> On Fri, 17 Mar 2017, Juergen Gross wrote:
+>> On 16/03/17 21:20, Stefano Stabellini wrote:
+>>> On Thu, 16 Mar 2017, Juergen Gross wrote:
+>>>> Instead of trying to guess the Xen version to use by compiling various
+>>>> test programs first just ask the system via pkg-config. Only if it
+>>>> can't return the version fall back to the test program scheme.
+>>>
+>>> That's OK, but why did you remove the Xen unstable test?
+>>
+>> >From Xen 4.9 on pkg-config will return the needed information. There is
+>> no longer a need for a test program to determine the Xen version. After
+>> all this was the main objective of my series adding the pkg-config
+>> files to Xen.
 > 
->   qemu-system-x86_64 -nographic -enable-kvm -monitor
-> telnet:0.0.0.0:1234,server,nowait -m 1024 -object
-> iothread,id=iothread1 -drive file=/x/drive.qcow2,if=none,id=drive0
-> -device virtio-blk-pci,iothread=iothread1,drive=drive0
+> I was going to say something like "yeah, but is pkg-config always
+> available?" In reality, QEMU already has pkg-config as build
+> dependency, so I guess there is no problem with that.
 > 
-> Then in the monitor
+> Please add a note about this to the commit message.
 > 
->   snapshot_blkdev drive0 /x/snap1.qcow2
-> 
-> qemu bombs with
-> 
->   qemu-system-x86_64: /x/qemu/include/block/aio.h:457:
-> aio_enable_external: Assertion `ctx->external_disable_cnt > 0' failed.
-> 
-> whereas without the iothread the assertion failure does not occur.
 
-
-Can you test this one?
-
----
+Okay.
 
 
-diff --git a/blockdev.c b/blockdev.c
-index c5b2c2c..4c217d5 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -1772,6 +1772,8 @@ static void external_snapshot_prepare(BlkActionState *common,
-         return;
-     }
- 
-+    bdrv_set_aio_context(state->new_bs, state->aio_context);
-+
-     /* This removes our old bs and adds the new bs. This is an operation that
-      * can fail, so we need to do it in .prepare; undoing it for abort is
-      * always possible. */
-@@ -1789,8 +1791,6 @@ static void external_snapshot_commit(BlkActionState *common)
-     ExternalSnapshotState *state =
-                              DO_UPCAST(ExternalSnapshotState, common, common);
- 
--    bdrv_set_aio_context(state->new_bs, state->aio_context);
--
-     /* We don't need (or want) to use the transactional
-      * bdrv_reopen_multiple() across all the entries at once, because we
-      * don't want to abort all of them if one of them fails the reopen */
+Juergen
