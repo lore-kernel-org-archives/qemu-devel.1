@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cqGgM-0003Mi-EM
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 06:06:27 -0400
+	(envelope-from <prvs=246d8669f=Paul.Durrant@citrix.com>)
+	id 1cqGnf-00052d-JE
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 06:14:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cqGgI-0001fG-GZ
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 06:06:26 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47068)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cqGgI-0001e6-B0
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 06:06:22 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cqGgF-0003Wx-Fz
-	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 10:06:19 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 58ED52E80C2
-	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 10:06:19 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <prvs=246d8669f=Paul.Durrant@citrix.com>)
+	id 1cqGnc-0005O8-9K
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 06:13:59 -0400
+Received: from smtp.eu.citrix.com ([185.25.65.24]:19219)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=246d8669f=Paul.Durrant@citrix.com>)
+	id 1cqGnb-0005Nq-U4
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 06:13:56 -0400
+From: Paul Durrant <Paul.Durrant@citrix.com>
+Date: Tue, 21 Mar 2017 10:13:53 +0000
+Message-ID: <072db16bacfd432b8eb7df09cb1eab7d@AMSPEX02CL03.citrite.net>
+References: <1490028748-3780-1-git-send-email-paul.durrant@citrix.com>
+	<alpine.DEB.2.10.1703201501320.11533@sstabellini-ThinkPad-X260>
+In-Reply-To: <alpine.DEB.2.10.1703201501320.11533@sstabellini-ThinkPad-X260>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 21 Mar 2017 09:54:54 -0000
-From: Thomas Huth <877498@bugs.launchpad.net>
-Reply-To: Bug 877498 <877498@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20111018150547.17888.51364.malonedeb@soybean.canonical.com>
-Message-Id: <20170321095454.30084.95973.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 877498] Re: qemu does not pass sector size from
- physical devices to virtual devices
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v2] xen: use libxendevice model to restrict
+ operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,34 +32,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: 'Stefano Stabellini' <sstabellini@kernel.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>, Ian Jackson <Ian.Jackson@citrix.com>
 
-QEMU 2.1 is also not supported anymore. Please test with the latest
-upstream QEMU version (2.8 ... or the latest 2.9 release candidate) - or
-otherwise report the bug in the bug tracker of your distribution
-instead.
+Fixing list address...
 
--- =
+> -----Original Message-----
+> From: Stefano Stabellini [mailto:sstabellini@kernel.org]
+> Sent: 20 March 2017 22:05
+> To: Paul Durrant <Paul.Durrant@citrix.com>
+> Cc: qemu-devel@lists.xenproject.org; Stefano Stabellini
+> <sstabellini@kernel.org>; Anthony Perard <anthony.perard@citrix.com>;
+> Paolo Bonzini <pbonzini@redhat.com>
+> Subject: Re: [PATCH v2] xen: use libxendevice model to restrict operation=
+s
+>=20
+> On Mon, 20 Mar 2017, Paul Durrant wrote:
+> > This patch adds a command-line option (-xen-domid-restrict) which will
+> > use the new libxendevicemodel API to restrict devicemodel operations to
+> > the specified domid.
+> >
+> > This patch also adds a tracepoint to allow successful enabling of the
+> > restriction to be monitored.
+> >
+> > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> > ---
+> > Cc: Stefano Stabellini <sstabellini@kernel.org>
+> > Cc: Anthony Perard <anthony.perard@citrix.com>
+> > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> >
+> > NOTE: This is already re-based on Juergen Gross's patch "xen: use 5 dig=
+it
+> >       xen versions" and so should not be applied until after that patch
+> >       has been applied.
+> >
+> > v2:
+> >  - Log errno in tracepoint
+> > ---
+> >  hw/xen/trace-events         |  1 +
+> >  include/hw/xen/xen.h        |  1 +
+> >  include/hw/xen/xen_common.h | 20 ++++++++++++++++++++
+> >  qemu-options.hx             |  6 ++++++
+> >  vl.c                        |  8 ++++++++
+> >  xen-hvm.c                   |  8 ++++++++
+> >  6 files changed, 44 insertions(+)
+> >
+> > diff --git a/hw/xen/trace-events b/hw/xen/trace-events
+> > index c4fb6f1..5615dce 100644
+> > --- a/hw/xen/trace-events
+> > +++ b/hw/xen/trace-events
+> > @@ -11,3 +11,4 @@ xen_map_portio_range(uint32_t id, uint64_t
+> start_addr, uint64_t end_addr) "id: %
+> >  xen_unmap_portio_range(uint32_t id, uint64_t start_addr, uint64_t
+> end_addr) "id: %u start: %#"PRIx64" end: %#"PRIx64
+> >  xen_map_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "i=
+d:
+> %u bdf: %02x.%02x.%02x"
+> >  xen_unmap_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) =
+"id:
+> %u bdf: %02x.%02x.%02x"
+> > +xen_domid_restrict(int err) "err: %u"
+> > diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
+> > index 2b1733b..7efcdaa 100644
+> > --- a/include/hw/xen/xen.h
+> > +++ b/include/hw/xen/xen.h
+> > @@ -21,6 +21,7 @@ enum xen_mode {
+> >
+> >  extern uint32_t xen_domid;
+> >  extern enum xen_mode xen_mode;
+> > +extern bool xen_domid_restrict;
+> >
+> >  extern bool xen_allowed;
+> >
+> > diff --git a/include/hw/xen/xen_common.h
+> b/include/hw/xen/xen_common.h
+> > index df098c7..4f3bd35 100644
+> > --- a/include/hw/xen/xen_common.h
+> > +++ b/include/hw/xen/xen_common.h
+> > @@ -152,6 +152,13 @@ static inline int xendevicemodel_set_mem_type(
+> >      return xc_hvm_set_mem_type(dmod, domid, mem_type, first_pfn, nr);
+> >  }
+> >
+> > +static inline int xendevicemodel_restrict(
+> > +    xendevicemodel_handle *dmod, domid_t domid)
+> > +{
+> > +    errno =3D ENOTTY;
+> > +    return -1;
+> > +}
+> > +
+> >  #else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >=3D 40900 */
+> >
+> >  #include <xendevicemodel.h>
+> > @@ -206,6 +213,19 @@ static inline int xen_modified_memory(domid_t
+> domid, uint64_t first_pfn,
+> >      return xendevicemodel_modified_memory(xen_dmod, domid,
+> first_pfn, nr);
+> >  }
+> >
+> > +static inline int xen_restrict(domid_t domid)
+> > +{
+> > +    int rc =3D xendevicemodel_restrict(xen_dmod, domid);
+> > +
+> > +    trace_xen_domid_restrict(errno);
+> > +
+> > +    if (errno =3D=3D ENOTTY) {
+> > +        return 0;
+> > +    }
+> > +
+> > +    return rc;
+> > +}
+> > +
+> >  /* Xen 4.2 through 4.6 */
+> >  #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40701
+> >
+> > diff --git a/qemu-options.hx b/qemu-options.hx
+> > index 99af8ed..4aab077 100644
+> > --- a/qemu-options.hx
+> > +++ b/qemu-options.hx
+> > @@ -3354,6 +3354,10 @@ DEF("xen-attach", 0,
+> QEMU_OPTION_xen_attach,
+> >      "-xen-attach     attach to existing xen domain\n"
+> >      "                xend will use this when starting QEMU\n",
+> >      QEMU_ARCH_ALL)
+> > +DEF("xen-domid-restrict", 0, QEMU_OPTION_xen_domid_restrict,
+> > +    "-xen-domid-restrict     restrict set of available xen operations\=
+n"
+> > +    "                        to specified domain id\n",
+> > +    QEMU_ARCH_ALL)
+>=20
+> Please make a note that the QEMU xenpv machine (backend provider for PV
+> guests) is completely unaffected.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/877498
+Sure.
 
-Title:
-  qemu does not pass sector size from physical devices to virtual
-  devices
+>=20
+> Also, does this xendevicemodel_restrict operation restrict any of the
+> xenstore accesses?
+>=20
 
-Status in QEMU:
-  Incomplete
+Not yet. The intention is that it will (which is why I am not specific in t=
+he usage comment) but that facility is not available as yet. The other rest=
+riction that is also not yet implemented is foreign memory mapping, which w=
+ill require a new call to be added to libxenforeignmemory.
 
-Bug description:
-  When passing a physical disk (i.e. a multipathed fcal volume in my
-  case) with a 4k sector size as raw image to qemu (-drive
-  file=3D/dev/mapper/hartebeest-sys,if=3Dnone,id=3Ddrive-virtio-
-  disk0,boot=3Don,format=3Draw), the resulting virtual device has a sector
-  size of 512b, rendering the partition table unusable.
+  Paul
 
-  Versions used: QEMU 0.12.5 (qemu-kvm-0.12.5) from debian unstable
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/877498/+subscriptions
+>=20
+> >  STEXI
+> >  @item -xen-domid @var{id}
+> >  @findex -xen-domid
+> > @@ -3366,6 +3370,8 @@ Warning: should not be used when xend is in use
+> (XEN only).
+> >  @findex -xen-attach
+> >  Attach to existing xen domain.
+> >  xend will use this when starting QEMU (XEN only).
+> > +@findex -xen-domid-restrict
+> > +Restrict set of available xen operations to specified domain id (XEN o=
+nly).
+> >  ETEXI
+> >  DEF("no-reboot", 0, QEMU_OPTION_no_reboot, \
+> > diff --git a/vl.c b/vl.c
+> > index 0b4ed52..f46e070 100644
+> > --- a/vl.c
+> > +++ b/vl.c
+> > @@ -205,6 +205,7 @@ static NotifierList machine_init_done_notifiers =3D
+> >  bool xen_allowed;
+> >  uint32_t xen_domid;
+> >  enum xen_mode xen_mode =3D XEN_EMULATE;
+> > +bool xen_domid_restrict;
+> >
+> >  static int has_defaults =3D 1;
+> >  static int default_serial =3D 1;
+> > @@ -3933,6 +3934,13 @@ int main(int argc, char **argv, char **envp)
+> >                  }
+> >                  xen_mode =3D XEN_ATTACH;
+> >                  break;
+> > +            case QEMU_OPTION_xen_domid_restrict:
+> > +                if (!(xen_available())) {
+> > +                    error_report("Option not supported for this target=
+");
+> > +                    exit(1);
+> > +                }
+> > +                xen_domid_restrict =3D true;
+> > +                break;
+> >              case QEMU_OPTION_trace:
+> >                  g_free(trace_file);
+> >                  trace_file =3D trace_opt_parse(optarg);
+> > diff --git a/xen-hvm.c b/xen-hvm.c
+> > index 4b928cf..335e263 100644
+> > --- a/xen-hvm.c
+> > +++ b/xen-hvm.c
+> > @@ -1226,6 +1226,14 @@ void xen_hvm_init(PCMachineState *pcms,
+> MemoryRegion **ram_memory)
+> >          goto err;
+> >      }
+> >
+> > +    if (xen_domid_restrict) {
+> > +        rc =3D xen_restrict(xen_domid);
+> > +        if (rc < 0) {
+> > +            error_report("failed to restrict: error %d", errno);
+> > +            goto err;
+> > +        }
+> > +    }
+> > +
+> >      xen_create_ioreq_server(xen_domid, &state->ioservid);
+> >
+> >      state->exit.notify =3D xen_exit_notifier;
+> > --
+> > 2.1.4
+> >
