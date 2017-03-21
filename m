@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cqIbP-0007UG-Az
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:09:28 -0400
+	(envelope-from <imammedo@redhat.com>) id 1cqIf7-0008PM-P0
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:13:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cqIbM-0006Zd-Hm
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:09:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47020)
+	(envelope-from <imammedo@redhat.com>) id 1cqIf3-0007JE-G9
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:13:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45114)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cqIbM-0006ZO-BS
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:09:24 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1A395C05490A
-	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 12:09:24 +0000 (UTC)
-References: <20170319094631.17298-1-pbonzini@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <f025cddc-b73a-ba88-c4ea-b262ddb043d9@redhat.com>
-Date: Tue, 21 Mar 2017 13:09:19 +0100
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cqIf3-0007IY-6u
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:13:13 -0400
+Date: Tue, 21 Mar 2017 13:13:06 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170321131306.332253d2@nial.brq.redhat.com>
+In-Reply-To: <20170320170557.15645-2-lersek@redhat.com>
+References: <20170320170557.15645-1-lersek@redhat.com>
+	<20170320170557.15645-2-lersek@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170319094631.17298-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-web PATCH] New blog post: "QEMU in the
- blogs: February 2017"
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] hw/acpi/vmgenid: prevent device
+ realization on pre-2.5 machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,13 +28,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu devel list <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Michael S.
+	Tsirkin" <mst@redhat.com>
 
-On 19.03.2017 10:46, Paolo Bonzini wrote:
-> Just an idea... If this is useful, we can do it every month.  It only
-> takes ten minutes to skim planet.virt-tools.org and compile the list.
+On Mon, 20 Mar 2017 18:05:56 +0100
+Laszlo Ersek <lersek@redhat.com> wrote:
 
-Is it worth the effort? People can also quickly read through the planet
-blogs directly to get the same information...
+> The WRITE_POINTER linker/loader command that underlies VMGENID depends on
+> commit baf2d5bfbac0 ("fw-cfg: support writeable blobs", 2017-01-12), which
+> in turn depends on fw_cfg DMA.
+> 
+> DMA for fw_cfg is enabled in 2.5+ machine types only (see commit
+> e6915b5f3a87, "fw_cfg: unbreak migration compatibility for 2.4 and earlier
+> machines", 2016-02-18).
+> 
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Ben Warren <ben@skyportsystems.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
- Thomas
+> ---
+> 
+> Notes:
+>     v2:
+>     - disable/enable vmgenid exactly in parallel with DMA support for fw_cfg
+>       [Michael, Paolo]
+> 
+>  include/hw/acpi/vmgenid.h |  1 +
+>  include/hw/compat.h       |  4 ++++
+>  hw/acpi/vmgenid.c         | 14 ++++++++++++++
+>  3 files changed, 19 insertions(+)
+> 
+> diff --git a/include/hw/acpi/vmgenid.h b/include/hw/acpi/vmgenid.h
+> index db7fa0e63303..8578476baebe 100644
+> --- a/include/hw/acpi/vmgenid.h
+> +++ b/include/hw/acpi/vmgenid.h
+> @@ -21,6 +21,7 @@ typedef struct VmGenIdState {
+>      DeviceClass parent_obj;
+>      QemuUUID guid;                /* The 128-bit GUID seen by the guest */
+>      uint8_t vmgenid_addr_le[8];   /* Address of the GUID (little-endian) */
+> +    bool write_pointer_available;
+>  } VmGenIdState;
+>  
+>  static inline Object *find_vmgenid_dev(void)
+> diff --git a/include/hw/compat.h b/include/hw/compat.h
+> index fc8c3e060007..5d5be91daf59 100644
+> --- a/include/hw/compat.h
+> +++ b/include/hw/compat.h
+> @@ -131,6 +131,10 @@
+>          .driver   = "fw_cfg_io",\
+>          .property = "dma_enabled",\
+>          .value    = "off",\
+> +    },{\
+> +        .driver   = "vmgenid",\
+> +        .property = "x-write-pointer-available",\
+> +        .value    = "off",\
+>      },
+>  
+>  #define HW_COMPAT_2_3 \
+> diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+> index 7a3ad17d66ef..c3ddcc8e7cb0 100644
+> --- a/hw/acpi/vmgenid.c
+> +++ b/hw/acpi/vmgenid.c
+> @@ -205,9 +205,22 @@ static void vmgenid_handle_reset(void *opaque)
+>      memset(vms->vmgenid_addr_le, 0, ARRAY_SIZE(vms->vmgenid_addr_le));
+>  }
+>  
+> +static Property vmgenid_properties[] = {
+> +    DEFINE_PROP_BOOL("x-write-pointer-available", VmGenIdState,
+> +                     write_pointer_available, true),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+>  static void vmgenid_realize(DeviceState *dev, Error **errp)
+>  {
+>      VmGenIdState *vms = VMGENID(dev);
+> +
+> +    if (!vms->write_pointer_available) {
+> +        error_setg(errp, "%s requires DMA write support in fw_cfg, "
+> +                   "which this machine type does not provide", VMGENID_DEVICE);
+> +        return;
+> +    }
+> +
+>      qemu_register_reset(vmgenid_handle_reset, vms);
+>  }
+>  
+> @@ -218,6 +231,7 @@ static void vmgenid_device_class_init(ObjectClass *klass, void *data)
+>      dc->vmsd = &vmstate_vmgenid;
+>      dc->realize = vmgenid_realize;
+>      dc->hotpluggable = false;
+> +    dc->props = vmgenid_properties;
+>  
+>      object_class_property_add_str(klass, VMGENID_GUID, NULL,
+>                                    vmgenid_set_guid, NULL);
