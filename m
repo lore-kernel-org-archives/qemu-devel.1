@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cqIf7-0008PM-P0
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:13:19 -0400
+	(envelope-from <imammedo@redhat.com>) id 1cqIgD-0000Xm-J3
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:14:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cqIf3-0007JE-G9
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:13:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45114)
+	(envelope-from <imammedo@redhat.com>) id 1cqIg9-0007YN-Af
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:14:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51186)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cqIf3-0007IY-6u
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:13:13 -0400
-Date: Tue, 21 Mar 2017 13:13:06 +0100
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cqIg9-0007Xd-59
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:14:21 -0400
+Date: Tue, 21 Mar 2017 13:14:14 +0100
 From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170321131306.332253d2@nial.brq.redhat.com>
-In-Reply-To: <20170320170557.15645-2-lersek@redhat.com>
+Message-ID: <20170321131414.08cc6bfa@nial.brq.redhat.com>
+In-Reply-To: <20170320170557.15645-3-lersek@redhat.com>
 References: <20170320170557.15645-1-lersek@redhat.com>
-	<20170320170557.15645-2-lersek@redhat.com>
+	<20170320170557.15645-3-lersek@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] hw/acpi/vmgenid: prevent device
- realization on pre-2.5 machine types
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/acpi/vmgenid: prevent more than
+ one vmgenid device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,19 +29,13 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu devel list <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Ben Warren <ben@skyportsystems.com>, "Michael S.
-	Tsirkin" <mst@redhat.com>
+Cc: qemu devel list <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Ben Warren <ben@skyportsystems.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon, 20 Mar 2017 18:05:56 +0100
+On Mon, 20 Mar 2017 18:05:57 +0100
 Laszlo Ersek <lersek@redhat.com> wrote:
 
-> The WRITE_POINTER linker/loader command that underlies VMGENID depends on
-> commit baf2d5bfbac0 ("fw-cfg: support writeable blobs", 2017-01-12), which
-> in turn depends on fw_cfg DMA.
-> 
-> DMA for fw_cfg is enabled in 2.5+ machine types only (see commit
-> e6915b5f3a87, "fw_cfg: unbreak migration compatibility for 2.4 and earlier
-> machines", 2016-02-18).
+> A system with multiple VMGENID devices is undefined in the VMGENID spec by
+> omission.
 > 
 > Cc: "Michael S. Tsirkin" <mst@redhat.com>
 > Cc: Ben Warren <ben@skyportsystems.com>
@@ -54,73 +48,43 @@ Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 > 
 > Notes:
 >     v2:
->     - disable/enable vmgenid exactly in parallel with DMA support for fw_cfg
->       [Michael, Paolo]
+>     - use find_vmgenid_dev() rather than open-code
+>       object_resolve_path_type() [Michael]
+>     - add comments to both the definition of find_vmgenid_dev() and its call
+>       site in vmgenid_realize() [Michael]
 > 
->  include/hw/acpi/vmgenid.h |  1 +
->  include/hw/compat.h       |  4 ++++
->  hw/acpi/vmgenid.c         | 14 ++++++++++++++
->  3 files changed, 19 insertions(+)
+>  include/hw/acpi/vmgenid.h | 1 +
+>  hw/acpi/vmgenid.c         | 8 ++++++++
+>  2 files changed, 9 insertions(+)
 > 
 > diff --git a/include/hw/acpi/vmgenid.h b/include/hw/acpi/vmgenid.h
-> index db7fa0e63303..8578476baebe 100644
+> index 8578476baebe..7beb9592fb01 100644
 > --- a/include/hw/acpi/vmgenid.h
 > +++ b/include/hw/acpi/vmgenid.h
-> @@ -21,6 +21,7 @@ typedef struct VmGenIdState {
->      DeviceClass parent_obj;
->      QemuUUID guid;                /* The 128-bit GUID seen by the guest */
->      uint8_t vmgenid_addr_le[8];   /* Address of the GUID (little-endian) */
-> +    bool write_pointer_available;
+> @@ -24,6 +24,7 @@ typedef struct VmGenIdState {
+>      bool write_pointer_available;
 >  } VmGenIdState;
 >  
+> +/* returns NULL unless there is exactly one device */
 >  static inline Object *find_vmgenid_dev(void)
-> diff --git a/include/hw/compat.h b/include/hw/compat.h
-> index fc8c3e060007..5d5be91daf59 100644
-> --- a/include/hw/compat.h
-> +++ b/include/hw/compat.h
-> @@ -131,6 +131,10 @@
->          .driver   = "fw_cfg_io",\
->          .property = "dma_enabled",\
->          .value    = "off",\
-> +    },{\
-> +        .driver   = "vmgenid",\
-> +        .property = "x-write-pointer-available",\
-> +        .value    = "off",\
->      },
->  
->  #define HW_COMPAT_2_3 \
+>  {
+>      return object_resolve_path_type("", VMGENID_DEVICE, NULL);
 > diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
-> index 7a3ad17d66ef..c3ddcc8e7cb0 100644
+> index c3ddcc8e7cb0..a32b847fe0df 100644
 > --- a/hw/acpi/vmgenid.c
 > +++ b/hw/acpi/vmgenid.c
-> @@ -205,9 +205,22 @@ static void vmgenid_handle_reset(void *opaque)
->      memset(vms->vmgenid_addr_le, 0, ARRAY_SIZE(vms->vmgenid_addr_le));
->  }
+> @@ -221,6 +221,14 @@ static void vmgenid_realize(DeviceState *dev, Error **errp)
+>          return;
+>      }
 >  
-> +static Property vmgenid_properties[] = {
-> +    DEFINE_PROP_BOOL("x-write-pointer-available", VmGenIdState,
-> +                     write_pointer_available, true),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
->  static void vmgenid_realize(DeviceState *dev, Error **errp)
->  {
->      VmGenIdState *vms = VMGENID(dev);
-> +
-> +    if (!vms->write_pointer_available) {
-> +        error_setg(errp, "%s requires DMA write support in fw_cfg, "
-> +                   "which this machine type does not provide", VMGENID_DEVICE);
+> +    /* Given that this function is executing, there is at least one VMGENID
+> +     * device. Check if there are several.
+> +     */
+> +    if (!find_vmgenid_dev()) {
+> +        error_setg(errp, "at most one %s device is permitted", VMGENID_DEVICE);
 > +        return;
 > +    }
 > +
 >      qemu_register_reset(vmgenid_handle_reset, vms);
 >  }
 >  
-> @@ -218,6 +231,7 @@ static void vmgenid_device_class_init(ObjectClass *klass, void *data)
->      dc->vmsd = &vmstate_vmgenid;
->      dc->realize = vmgenid_realize;
->      dc->hotpluggable = false;
-> +    dc->props = vmgenid_properties;
->  
->      object_class_property_add_str(klass, VMGENID_GUID, NULL,
->                                    vmgenid_set_guid, NULL);
