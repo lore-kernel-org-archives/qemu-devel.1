@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60475)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cqKf5-0005Qx-SP
+	(envelope-from <bounces@canonical.com>) id 1cqKf5-0005R1-Sq
 	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 10:21:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cqKf1-0005S5-TC
+	(envelope-from <bounces@canonical.com>) id 1cqKf1-0005SC-VI
 	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 10:21:23 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49348)
+Received: from indium.canonical.com ([91.189.90.7]:49349)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cqKf1-0005RI-N0
+	id 1cqKf1-0005RJ-P3
 	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 10:21:19 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cqKey-0003fL-2r
-	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 14:21:16 +0000
+	id 1cqKex-0003fS-GG
+	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 14:21:15 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 415EE2E82B8
-	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 14:21:00 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id DEB712E82B0
+	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 14:20:59 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 21 Mar 2017 14:11:56 -0000
+Date: Tue, 21 Mar 2017 14:11:15 -0000
 From: Michal Nowak <michal.nowak@resist.ca>
 Reply-To: Bug 1670170 <1670170@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20170305181803.7371.53021.malonedeb@chaenomeles.canonical.com>
-Message-Id: <20170321141156.19872.93132.malone@soybean.canonical.com>
+Message-Id: <20170321141115.18085.77318.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1670170] Re: `qemu-system-sparc64 -M Niagara`
  Aborted (core dumped)
@@ -39,10 +39,22 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Fixed in version 2.8.90.
+Retested with QEMU 2.8.90:
 
-** Changed in: qemu
-       Status: New =3D> Fix Committed
+15:03 $ qemu-system-sparc64 -M Niagara
+qemu-system-sparc64: -M Niagara: unsupported machine type
+Use -machine help to list supported machines
+
+15:03 $ qemu-system-sparc64 -M help
+Supported machines are:
+niagara              Sun4v platform, Niagara
+none                 empty machine
+sun4u                Sun4u platform (default)
+sun4v                Sun4v platform
+
+15:03 $ qemu-system-sparc64 -M niagara
+Could not open option rom 'nvram1': No such file or directory
+qemu-system-sparc64: Unable to load a firmware for -M niagara
 
 -- =
 
