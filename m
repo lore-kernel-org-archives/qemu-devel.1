@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cqAKn-0003Q4-Gr
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:19:46 -0400
+	(envelope-from <famz@redhat.com>) id 1cqAL0-0003cR-Rw
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:19:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cqAKm-0001Ss-Mu
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:19:45 -0400
+	(envelope-from <famz@redhat.com>) id 1cqAKz-0001YG-RR
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:19:58 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Tue, 21 Mar 2017 11:16:32 +0800
-Message-Id: <20170321031635.22123-14-famz@redhat.com>
+Date: Tue, 21 Mar 2017 11:16:33 +0800
+Message-Id: <20170321031635.22123-15-famz@redhat.com>
 In-Reply-To: <20170321031635.22123-1-famz@redhat.com>
 References: <20170321031635.22123-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC 13/16] nbd: Allow
- BLK_PERM_AIO_CONTEXT_CHANGE on BB
+Subject: [Qemu-devel] [PATCH RFC 14/16] block: Add perm assertion on
+ blk_set_aio_context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,30 +23,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-This is safe because of the aio context notifier we'll register on this
-node. So allow it.
+Now that all BB users comply with the BLK_PERM_AIO_CONTEXT_CHANGE
+rule, we can assert it.
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- nbd/server.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ block/block-backend.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/nbd/server.c b/nbd/server.c
-index 924a1fe..a8f58fb 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -900,8 +900,10 @@ NBDExport *nbd_export_new(BlockDriverState *bs, off_t dev_offset, off_t size,
-     if ((nbdflags & NBD_FLAG_READ_ONLY) == 0) {
-         perm |= BLK_PERM_WRITE;
-     }
--    blk = blk_new(perm, BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
--                        BLK_PERM_WRITE | BLK_PERM_GRAPH_MOD);
-+    blk = blk_new(perm,
-+                  BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
-+                  BLK_PERM_WRITE | BLK_PERM_GRAPH_MOD |
-+                  BLK_PERM_AIO_CONTEXT_CHANGE);
-     ret = blk_insert_bs(blk, bs, errp);
-     if (ret < 0) {
-         goto fail;
+diff --git a/block/block-backend.c b/block/block-backend.c
+index ec8747f..8284b83 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -1623,8 +1623,12 @@ static AioContext *blk_aiocb_get_aio_context(BlockAIOCB *acb)
+ 
+ void blk_set_aio_context(BlockBackend *blk, AioContext *new_context)
+ {
++    uint64_t perm, shared_perm;
+     BlockDriverState *bs = blk_bs(blk);
+ 
++    blk_get_perm(blk, &perm, &shared_perm);
++    assert(perm & BLK_PERM_AIO_CONTEXT_CHANGE);
++
+     blk->aio_context = new_context;
+     if (bs) {
+         if (blk->public.throttle_state) {
 -- 
 2.9.3
