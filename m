@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cqAeX-0005mC-JJ
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:40:10 -0400
+	(envelope-from <bounces@canonical.com>) id 1cqBSP-0003H8-U4
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 00:31:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cqAeS-0003H3-OF
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:40:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37216)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cqAeS-0003GY-Id
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:40:04 -0400
-References: <1489657928-14919-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <22303218-697c-7166-406b-050888efdfd5@redhat.com>
-Date: Tue, 21 Mar 2017 11:39:56 +0800
+	(envelope-from <bounces@canonical.com>) id 1cqBSK-0001Jx-UE
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 00:31:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46482)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cqBSK-0001Gw-PE
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 00:31:36 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cqBSI-0003js-Jb
+	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 04:31:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id EE2E32E81A0
+	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 04:31:28 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1489657928-14919-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/3] Add COLO-proxy virtio-net support
+Date: Tue, 21 Mar 2017 04:17:27 -0000
+From: Launchpad Bug Tracker <665743@bugs.launchpad.net>
+Reply-To: Bug 665743 <665743@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20101023233336.5102.72622.malonedeb@palladium.canonical.com>
+Message-Id: <20170321041727.27578.87250.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 665743] Re: Cocoa video corruption when guest
+ uses RGB565 mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,36 +37,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>
-Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, bian naimeng <biannm@cn.fujitsu.com>, "eddie . dong" <eddie.dong@intel.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
+To: qemu-devel@nongnu.org
 
+[Expired for QEMU because there has been no activity for 60 days.]
 
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-On 2017=E5=B9=B403=E6=9C=8816=E6=97=A5 17:52, Zhang Chen wrote:
-> If user use -device virtio-net-pci, virtio-net driver will add a header
-> to raw net packet that colo-proxy can't handle it. COLO-proxy just
-> focus on the packet payload, so we skip the virtio-net header to compar=
-e
-> the sent packet that primary guest's to secondary guest's.
->
->
-> Zhang Chen (3):
->    COLO-proxy: Add virtio-net packet parse function
->    COLO-proxy: Add a tag to mark virtio-net packet
->    COLO-compare: Add virtio-net packet compare support
->
->   net/colo-compare.c    | 42 +++++++++++++++++++++++++++++++++---------
->   net/colo.c            | 14 ++++++++++----
->   net/colo.h            |  7 ++++++-
->   net/filter-rewriter.c | 15 ++++++++++-----
->   4 files changed, 59 insertions(+), 19 deletions(-)
->
+-- =
 
-Hi:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/665743
 
-Git grep told us virtio-net is not the only user for vnet header. E1000e=20
-and vmxnet3 uses it too.
+Title:
+  Cocoa video corruption when guest uses RGB565 mode
 
-So we need solve them all instead of being virtio-net specific.
+Status in QEMU:
+  Expired
 
-Thanks
+Bug description:
+  The cocoa video driver doesn't currently support when the guest uses
+  RGB565 or HighColor mode resulting in corrupted video.  The initial
+  graphics screen of recent Ubuntu installs is an example.  The attached
+  patch against 0.13.0-release seems to fix the problem by introducing
+  an indirect data provider that translates from RGB565 to RGB888, a
+  mode that core graphics supports.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/665743/+subscriptions
