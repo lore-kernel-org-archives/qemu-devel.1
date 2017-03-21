@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cqKI4-0002FE-H1
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 09:57:37 -0400
+	(envelope-from <sameeh@daynix.com>) id 1cqKJm-0002mJ-T1
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 09:59:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cqKHz-0005PG-PK
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 09:57:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39474)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cqKHz-0005Ot-Gy
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 09:57:31 -0400
-References: <1489653504-25229-1-git-send-email-he.chen@linux.intel.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a10f2054-de74-b1ce-61f4-dd4516f0d42a@redhat.com>
-Date: Tue, 21 Mar 2017 08:57:24 -0500
-MIME-Version: 1.0
-In-Reply-To: <1489653504-25229-1-git-send-email-he.chen@linux.intel.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="vqIgKAfpdv94gIeifTHhLxHgaRAJkliTV"
-Subject: Re: [Qemu-devel] [PATCH v2] x86: Allow to set NUMA distance for
- different NUMA nodes
+	(envelope-from <sameeh@daynix.com>) id 1cqKJi-0005mQ-AK
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 09:59:23 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:32970)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1cqKJi-0005mI-2J
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 09:59:18 -0400
+Received: by mail-wr0-x243.google.com with SMTP id g10so22582429wrg.0
+	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 06:59:17 -0700 (PDT)
+From: Sameeh Jubran <sameeh@daynix.com>
+Date: Tue, 21 Mar 2017 15:59:11 +0200
+Message-Id: <20170321135911.22731-1-sameeh@daynix.com>
+Subject: [Qemu-devel] [PATCH qemu-ga] Fix a bug where qemu-ga service is
+ stuck during stop operation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,98 +24,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: He Chen <he.chen@linux.intel.com>, qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Yan Vugenfirer <yan@daynix.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---vqIgKAfpdv94gIeifTHhLxHgaRAJkliTV
-From: Eric Blake <eblake@redhat.com>
-To: He Chen <he.chen@linux.intel.com>, qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
-Message-ID: <a10f2054-de74-b1ce-61f4-dd4516f0d42a@redhat.com>
-Subject: Re: [PATCH v2] x86: Allow to set NUMA distance for different NUMA
- nodes
-References: <1489653504-25229-1-git-send-email-he.chen@linux.intel.com>
-In-Reply-To: <1489653504-25229-1-git-send-email-he.chen@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+After triggering a freeze command without any following thaw command,
+qemu-ga will not respond to stop operation. This behaviour is wanted on Linux
+as there is no time limit for a freeze command and we want to prevent
+quitting in the middle of freeze, on the other hand on Windows the time
+limit for freeze is 10 seconds, so we should wait for the timeout, thaw
+the file system and quit.
 
-On 03/16/2017 03:38 AM, He Chen wrote:
-> Current, QEMU does not provide a clear command to set vNUMA distance fo=
-r
-> guest although we already have `-numa` command to set vNUMA nodes.
+Signed-off-by: Sameeh Jubran <sameeh@daynix.com>
+---
+ qga/main.c                 | 20 ++++++++++++++++++++
+ qga/vss-win32.h            |  1 +
+ qga/vss-win32/vss-common.h |  5 +++++
+ 3 files changed, 26 insertions(+)
 
-Subject line: "Allow to $verb" is not idiomatic English.  It is either
-"Allow $subject to $verb", or the shorter "Allow ${verb}ing"; in this
-case, I'd go with "Allow setting NUMA distance...".
-
-
-> +++ b/qapi-schema.json
-> @@ -5647,7 +5647,7 @@
->  # Since: 2.1
->  ##
->  { 'enum': 'NumaOptionsType',
-> -  'data': [ 'node' ] }
-> +  'data': [ 'node', 'dist' ] }
-
-Missing documentation for dist.
-
-> =20
->  ##
-> +# @NumaDistOptions:
-> +#
-> +# Set distance between 2 NUMA nodes. (for OptsVisitor)
-
-The '(for OptsVisitor)' comment doesn't add anything useful; I'd drop it.=
-
-
-> =20
-> +@var{source} and @var{destination} are NUMA node ID.
-
-Maybe s/ID/IDs/
-
-> +@var{distance} is NUMA distance from @var{source} to @var{destination}=
-=2E
-
-s/is/is the/
-
-> +The distance from node A to node B may be different from the distance =
-from
-> +node B to node A since the distance allows to be asymmetry.
-
-s/allows to be asymmetry/can be asymmetric/
-
-> +If the distance is not set, the default distance for local NUMA node i=
-s 10,
-> +and 20 for remote node.
-
-s/for/for a/g
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---vqIgKAfpdv94gIeifTHhLxHgaRAJkliTV
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY0TFEAAoJEKeha0olJ0Nqlp4H/jhtcL42CnSM7EIb9vrhoCY0
-HR0FoiU0NudpDsdzEj/cb2Ryf9rMuZcf2vYqAP0kPVdjcRPd2eFV7Kj3iF0L4wtl
-agEfIa7ujNw8cLq0LVW4a/rNs2Z1dW+2avAnjtHxVWYSqEMW4WW9xWmfFn9KdEJn
-YFTR4BEgK5YCskXA+oTNHjgYlQ4PjGXSP9i+g4OFnh9sC+8v7PEcjvkoPDPTxqk7
-rqwKWwBnzvGGmgm1lrAvGUSEZHZFScOxZYwsEtIFpYR1Q+iK93wbWAJWwzr8ss1d
-gcvn6V8JvE6YTPVM5o4zqNL6I208LlxaFReCyUC5v8HQIMRV7j2NpIFTMkC39Uk=
-=dMvG
------END PGP SIGNATURE-----
-
---vqIgKAfpdv94gIeifTHhLxHgaRAJkliTV--
+diff --git a/qga/main.c b/qga/main.c
+index 92658bc..de37c85 100644
+--- a/qga/main.c
++++ b/qga/main.c
+@@ -130,9 +130,29 @@ static void quit_handler(int sig)
+      * unless all log/pid files are on unfreezable filesystems. there's
+      * also a very likely chance killing the agent before unfreezing
+      * the filesystems is a mistake (or will be viewed as one later).
++     * On Windows the freeze interval is limited to 10 seconds, so
++     * we should quit, but first we should wait for the timeout, thaw
++     * the filesystem and quit.
+      */
+     if (ga_is_frozen(ga_state)) {
++#ifdef _WIN32
++        int i = 0;
++        Error *err = NULL;
++        HANDLE hEventTimeout;
++
++        hEventTimeout = OpenEvent(EVENT_ALL_ACCESS, FALSE, EVENT_NAME_TIMEOUT);
++        if (hEventTimeout) {
++            WaitForSingleObject(hEventTimeout, 0);
++            CloseHandle(hEventTimeout);
++        }
++        qga_vss_fsfreeze(&i, &err, false);
++        if (err) {
++            g_debug("Error: %s", error_get_pretty(err));
++            error_free(err);
++        }
++#else
+         return;
++#endif
+     }
+     g_debug("received signal num %d, quitting", sig);
+ 
+diff --git a/qga/vss-win32.h b/qga/vss-win32.h
+index 4d1d150..5f4ea70 100644
+--- a/qga/vss-win32.h
++++ b/qga/vss-win32.h
+@@ -13,6 +13,7 @@
+ #ifndef VSS_WIN32_H
+ #define VSS_WIN32_H
+ 
++#include "qga/vss-win32/vss-common.h"
+ 
+ bool vss_init(bool init_requester);
+ void vss_deinit(bool deinit_requester);
+diff --git a/qga/vss-win32/vss-common.h b/qga/vss-win32/vss-common.h
+index c81a856..5756d00 100644
+--- a/qga/vss-win32/vss-common.h
++++ b/qga/vss-win32/vss-common.h
+@@ -12,6 +12,7 @@
+ 
+ #ifndef VSS_COMMON_H
+ #define VSS_COMMON_H
++#ifndef VSS_WIN32_H
+ 
+ #define __MIDL_user_allocate_free_DEFINED__
+ #include <windows.h>
+@@ -57,6 +58,7 @@
+ #define L(a) _L(a)
+ 
+ /* Constants for QGA VSS Provider */
++#endif
+ 
+ #define QGA_PROVIDER_NAME "QEMU Guest Agent VSS Provider"
+ #define QGA_PROVIDER_LNAME L(QGA_PROVIDER_NAME)
+@@ -66,6 +68,8 @@
+ #define EVENT_NAME_THAW    "Global\\QGAVSSEvent-thaw"
+ #define EVENT_NAME_TIMEOUT "Global\\QGAVSSEvent-timeout"
+ 
++#ifndef VSS_WIN32_H
++
+ const GUID g_gProviderId = { 0x3629d4ed, 0xee09, 0x4e0e,
+     {0x9a, 0x5c, 0x6d, 0x8b, 0xa2, 0x87, 0x2a, 0xef} };
+ const GUID g_gProviderVersion = { 0x11ef8b15, 0xcac6, 0x40d6,
+@@ -126,3 +130,4 @@ public:
+ };
+ 
+ #endif
++#endif
+-- 
+2.9.3
