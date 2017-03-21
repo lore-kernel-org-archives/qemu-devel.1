@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cqFqw-0003c1-Od
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 05:13:19 -0400
+	(envelope-from <ashijeetacharya@gmail.com>) id 1cqFs0-0004Ai-TM
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 05:14:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cqFqt-0001bj-Js
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 05:13:18 -0400
-Received: from 1.mo5.mail-out.ovh.net ([188.165.57.91]:60981)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cqFqt-0001Z7-Eo
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 05:13:15 -0400
-Received: from player695.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id BCB19E1E9F
-	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 10:13:11 +0100 (CET)
-Date: Tue, 21 Mar 2017 10:13:08 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170321101308.48b30492@bahia.lan>
-In-Reply-To: <1490051325-3770-1-git-send-email-mdroth@linux.vnet.ibm.com>
-References: <1490051325-3770-1-git-send-email-mdroth@linux.vnet.ibm.com>
+	(envelope-from <ashijeetacharya@gmail.com>) id 1cqFrz-0002Pp-OI
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 05:14:24 -0400
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/fDCucDMF+4qK+fgtj56c.bj";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [Qemu-stable] [PATCH 00/81] Patch Round-up for
- stable 2.8.1, freeze on 2017-03-27
+References: <1489233245-27057-1-git-send-email-ashijeetacharya@gmail.com>
+	<CAJSP0QXYdcBt1zOLEz1fdVBg6eo2Yg+uCA=u2nPQHBe01Bo9ow@mail.gmail.com>
+In-Reply-To: <CAJSP0QXYdcBt1zOLEz1fdVBg6eo2Yg+uCA=u2nPQHBe01Bo9ow@mail.gmail.com>
+From: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Date: Tue, 21 Mar 2017 09:14:08 +0000
+Message-ID: <CAC2QTZbOK76fi3fX_msqc_UJu_J1RMkA7dXnSn+Zs5Cxyon6jA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH 0/2] Allocate mutiple clusters for VMDK I/O
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,61 +22,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Fam Zheng <famz@redhat.com>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>
 
---Sig_/fDCucDMF+4qK+fgtj56c.bj
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Tue, 21 Mar 2017 at 13:21, Stefan Hajnoczi <stefanha@gmail.com> wrote:
 
-On Mon, 20 Mar 2017 18:07:24 -0500
-Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+> On Sat, Mar 11, 2017 at 11:54 AM, Ashijeet Acharya
+> <ashijeetacharya@gmail.com> wrote:
+> > This series optimizes the I/O performance of VMDK driver.
+> >
+> > Patch 1 makes the VMDK driver to allocate multiple clusters at once.
+> Earlier
+> > it used to allocate cluster by cluster which slowed down its performance
+> to a
+> > great extent.
+> >
+> > Patch 2 changes the metadata update code to update the L2 tables for
+> multiple
+> > clusters at once.
+>
+> This patch series is a performance optimization.  Benchmark results
+> are required to justify optimizations.  Please include performance
+> results in the next revision.
+>
+> A popular disk I/O benchmarking is fio (https://github.com/axboe/fio).
+> I suggest a write-heavy workload with a large block size:
+>
+> $ cat fio.job
+> [global]
+> direct=1
+> filename=/dev/vdb
+> ioengine=libaio
+> runtime=30
+> ramp_time=5
+>
+> [job1]
+> iodepth=4
+> rw=randwrite
+> bs=256k
+> $ for i in 1 2 3 4 5; do fio --output=fio-$i.txt fio.job; done #
+> WARNING: overwrites /dev/vdb
+>
+> It's good practice to run the benchmark several times because there is
+> usually some variation between runs.  This allows you to check that
+> the variance is within a reasonable range (5-10% on a normal machine
+> that hasn't been specially prepared for benchmarking).
 
-> Hi everyone,
->=20
-> The following new patches are queued for QEMU stable v2.8.1:
->=20
->   https://github.com/mdroth/qemu/commits/stable-2.8-staging
->=20
-> The release is planned for 2017-03-30:
->=20
->   http://wiki.qemu.org/Planning/2.8
->=20
-> Please respond here or CC qemu-stable@nongnu.org on any patches you
-> think should be included in the release.
->=20
-> Testing/feedback is greatly appreciated.
->=20
-> Thanks!
->=20
->=20
 
-Hi Michael,
+I ran a few write tests of 128M using qemu-io and the results showed the
+time to drop to almost half, will those work? Although, I will also try to
+use the tool you mentioned later today when I am free and include those
+results as well.
 
-The 9p patches look good to me. Maybe you can consider adding:
+Ashijeet
 
-0d78289c3dca 9pfs: fix off-by-one error in PDU free list
-
-I've already backported it to your stable-2.8-staging branch:
-
-https://github.com/gkurz/qemu/commit/85790d9a8b57e6710151e826053de0036ecbc3=
-b1
-
-Cheers,
-
---
-Greg
-
---Sig_/fDCucDMF+4qK+fgtj56c.bj
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAljQ7qQACgkQAvw66wEB28LxpACgiEgUGkXbz88mtFQ/jKYqyWrM
-5NYAn1F5BsY6F51epvU4SHTARAzEzotf
-=DoL5
------END PGP SIGNATURE-----
-
---Sig_/fDCucDMF+4qK+fgtj56c.bj--
+>
+>
+> Stefan
+>
