@@ -1,25 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34688)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cqF7a-0002cW-Iw
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:26:28 -0400
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cqF9m-0003Jq-4U
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:28:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cqF7W-0003TF-Th
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:26:26 -0400
-Received: from [45.249.212.188] (port=2964 helo=dggrg02-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cqF7V-0003N1-7Z
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:26:22 -0400
-References: <201703211610470826648@zte.com.cn>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <58D0E38E.1080109@huawei.com>
-Date: Tue, 21 Mar 2017 16:25:50 +0800
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cqF9h-000547-5m
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:28:42 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53818
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cqF9g-00053P-VU
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:28:37 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2L8NX0u037026
+	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 04:28:36 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 29amb2xuuu-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 04:28:35 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Tue, 21 Mar 2017 08:28:32 -0000
+Date: Tue, 21 Mar 2017 09:28:27 +0100
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <20170320180024.23432-1-arvolkov@inbox.ru>
+References: <20170320180024.23432-1-arvolkov@inbox.ru>
 MIME-Version: 1.0
-In-Reply-To: <201703211610470826648@zte.com.cn>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel]
- =?utf-8?b?562U5aSNOiBSZTogIOetlOWkjTogUmU6IFtCVUdd?=
- =?utf-8?q?COLO_failover_hang?=
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20170321092827.20bca461.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] hw: dead code removal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,321 +41,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: wang.guang55@zte.com.cn, zhangchen.fnst@cn.fujitsu.com
-Cc: xuquan8@huawei.com, qemu-devel@nongnu.org
+To: Anton Volkov <arvolkov@inbox.ru>
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, kraxel@redhat.com, agraf@suse.de
 
-Hi,
+On Mon, 20 Mar 2017 21:00:24 +0300
+Anton Volkov <arvolkov@inbox.ru> wrote:
 
-On 2017/3/21 16:10, wang.guang55@zte.com.cn wrote:
-> Thank you。
->
-> I have test aready。
->
-> When the Primary Node panic,the Secondary Node qemu hang at the same place。
->
-> Incorrding http://wiki.qemu-project.org/Features/COLO ，kill Primary Node qemu will not produce the problem,but Primary Node panic can。
->
-> I think due to the feature of channel does not support QIO_CHANNEL_FEATURE_SHUTDOWN.
->
->
+> Made functions *_exit in hw/ return void instead of int (they returned 0 all the time)
+> and removed related return value checks
 
-Yes, you are right, when we do failover for primary/secondary VM, we will shutdown the related
-fd in case it is stuck in the read/write fd.
+Makes sense, I guess. Better make the title "hw: make exit callbacks
+void" or so, though.
 
-It seems that you didn't follow the above introduction exactly to do the test. Could you
-share your test procedures ? Especially the commands used in the test.
+> 
+> Signed-off-by: Anton Volkov <arvolkov@inbox.ru>
+> ---
+>  hw/audio/hda-codec.c              | 3 +--
+>  hw/audio/intel-hda.c              | 3 +--
+>  hw/audio/intel-hda.h              | 2 +-
+>  hw/char/sclpconsole-lm.c          | 4 ++--
+>  hw/char/sclpconsole.c             | 4 ++--
+>  hw/core/qdev.c                    | 6 +-----
+>  hw/s390x/event-facility.c         | 6 +-----
+>  hw/s390x/virtio-ccw.c             | 7 +++----
+>  hw/s390x/virtio-ccw.h             | 2 +-
+>  hw/usb/dev-smartcard-reader.c     | 3 +--
+>  include/hw/qdev-core.h            | 2 +-
+>  include/hw/s390x/event-facility.h | 2 +-
+>  12 files changed, 16 insertions(+), 28 deletions(-)
+> 
 
-Thanks,
-Hailiang
+> diff --git a/hw/char/sclpconsole-lm.c b/hw/char/sclpconsole-lm.c
+> index 07d6ebd..fbe5b42 100644
+> --- a/hw/char/sclpconsole-lm.c
+> +++ b/hw/char/sclpconsole-lm.c
+> @@ -318,9 +318,9 @@ static int console_init(SCLPEvent *event)
+>      return 0;
+>  }
+>  
+> -static int console_exit(SCLPEvent *event)
+> +static void console_exit(SCLPEvent *event)
+>  {
+> -    return 0;
+> +    return;
+>  }
+>  
+>  static void console_reset(DeviceState *dev)
+> diff --git a/hw/char/sclpconsole.c b/hw/char/sclpconsole.c
+> index b78f240..644f7cd 100644
+> --- a/hw/char/sclpconsole.c
+> +++ b/hw/char/sclpconsole.c
+> @@ -246,9 +246,9 @@ static void console_reset(DeviceState *dev)
+>     scon->notify = false;
+>  }
+>  
+> -static int console_exit(SCLPEvent *event)
+> +static void console_exit(SCLPEvent *event)
+>  {
+> -    return 0;
+> +    return;
+>  }
+>  
 
-> when failover,channel_shutdown could not shut down the channel.
->
->
-> so the colo_process_incoming_thread will hang at recvmsg.
->
->
-> I test a patch:
->
->
-> diff --git a/migration/socket.c b/migration/socket.c
->
->
-> index 13966f1..d65a0ea 100644
->
->
-> --- a/migration/socket.c
->
->
-> +++ b/migration/socket.c
->
->
-> @@ -147,8 +147,9 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
->
->
->       }
->
->
->
->
->
->       trace_migration_socket_incoming_accepted()
->
->
->
->
->
->       qio_channel_set_name(QIO_CHANNEL(sioc), "migration-socket-incoming")
->
->
-> +    qio_channel_set_feature(QIO_CHANNEL(sioc), QIO_CHANNEL_FEATURE_SHUTDOWN)
->
->
->       migration_channel_process_incoming(migrate_get_current(),
->
->
->                                          QIO_CHANNEL(sioc))
->
->
->       object_unref(OBJECT(sioc))
->
->
->
->
-> My test will not hang any more.
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
-> 原始邮件
->
->
->
-> 发件人： ＜zhangchen.fnst@cn.fujitsu.com＞
-> 收件人：王广10165992 ＜zhang.zhanghailiang@huawei.com＞
-> 抄送人： ＜qemu-devel@nongnu.org＞ ＜zhangchen.fnst@cn.fujitsu.com＞
-> 日 期 ：2017年03月21日 15:58
-> 主 题 ：Re: [Qemu-devel]  答复: Re:  [BUG]COLO failover hang
->
->
->
->
->
-> Hi,Wang.
->
-> You can test this branch:
->
-> https://github.com/coloft/qemu/tree/colo-v5.1-developing-COLO-frame-v21-with-shared-disk
->
-> and please follow wiki ensure your own configuration correctly.
->
-> http://wiki.qemu-project.org/Features/COLO
->
->
-> Thanks
->
-> Zhang Chen
->
->
-> On 03/21/2017 03:27 PM, wang.guang55@zte.com.cn wrote:
-> ＞
-> ＞ hi.
-> ＞
-> ＞ I test the git qemu master have the same problem.
-> ＞
-> ＞ (gdb) bt
-> ＞
-> ＞ #0  qio_channel_socket_readv (ioc=0x7f65911b4e50, iov=0x7f64ef3fd880,
-> ＞ niov=1, fds=0x0, nfds=0x0, errp=0x0) at io/channel-socket.c:461
-> ＞
-> ＞ #1  0x00007f658e4aa0c2 in qio_channel_read
-> ＞ (ioc=ioc@entry=0x7f65911b4e50, buf=buf@entry=0x7f65907cb838 "",
-> ＞ buflen=buflen@entry=32768, errp=errp@entry=0x0) at io/channel.c:114
-> ＞
-> ＞ #2  0x00007f658e3ea990 in channel_get_buffer (opaque=＜optimized out＞,
-> ＞ buf=0x7f65907cb838 "", pos=＜optimized out＞, size=32768) at
-> ＞ migration/qemu-file-channel.c:78
-> ＞
-> ＞ #3  0x00007f658e3e97fc in qemu_fill_buffer (f=0x7f65907cb800) at
-> ＞ migration/qemu-file.c:295
-> ＞
-> ＞ #4  0x00007f658e3ea2e1 in qemu_peek_byte (f=f@entry=0x7f65907cb800,
-> ＞ offset=offset@entry=0) at migration/qemu-file.c:555
-> ＞
-> ＞ #5  0x00007f658e3ea34b in qemu_get_byte (f=f@entry=0x7f65907cb800) at
-> ＞ migration/qemu-file.c:568
-> ＞
-> ＞ #6  0x00007f658e3ea552 in qemu_get_be32 (f=f@entry=0x7f65907cb800) at
-> ＞ migration/qemu-file.c:648
-> ＞
-> ＞ #7  0x00007f658e3e66e5 in colo_receive_message (f=0x7f65907cb800,
-> ＞ errp=errp@entry=0x7f64ef3fd9b0) at migration/colo.c:244
-> ＞
-> ＞ #8  0x00007f658e3e681e in colo_receive_check_message (f=＜optimized
-> ＞ out＞, expect_msg=expect_msg@entry=COLO_MESSAGE_VMSTATE_SEND,
-> ＞ errp=errp@entry=0x7f64ef3fda08)
-> ＞
-> ＞     at migration/colo.c:264
-> ＞
-> ＞ #9  0x00007f658e3e740e in colo_process_incoming_thread
-> ＞ (opaque=0x7f658eb30360 ＜mis_current.31286＞) at migration/colo.c:577
-> ＞
-> ＞ #10 0x00007f658be09df3 in start_thread () from /lib64/libpthread.so.0
-> ＞
-> ＞ #11 0x00007f65881983ed in clone () from /lib64/libc.so.6
-> ＞
-> ＞ (gdb) p ioc-＞name
-> ＞
-> ＞ $2 = 0x7f658ff7d5c0 "migration-socket-incoming"
-> ＞
-> ＞ (gdb) p ioc-＞features        Do not support QIO_CHANNEL_FEATURE_SHUTDOWN
-> ＞
-> ＞ $3 = 0
-> ＞
-> ＞
-> ＞ (gdb) bt
-> ＞
-> ＞ #0  socket_accept_incoming_migration (ioc=0x7fdcceeafa90,
-> ＞ condition=G_IO_IN, opaque=0x7fdcceeafa90) at migration/socket.c:137
-> ＞
-> ＞ #1  0x00007fdcc6966350 in g_main_dispatch (context=＜optimized out＞) at
-> ＞ gmain.c:3054
-> ＞
-> ＞ #2  g_main_context_dispatch (context=＜optimized out＞,
-> ＞ context@entry=0x7fdccce9f590) at gmain.c:3630
-> ＞
-> ＞ #3  0x00007fdccb8a6dcc in glib_pollfds_poll () at util/main-loop.c:213
-> ＞
-> ＞ #4  os_host_main_loop_wait (timeout=＜optimized out＞) at
-> ＞ util/main-loop.c:258
-> ＞
-> ＞ #5  main_loop_wait (nonblocking=nonblocking@entry=0) at
-> ＞ util/main-loop.c:506
-> ＞
-> ＞ #6  0x00007fdccb526187 in main_loop () at vl.c:1898
-> ＞
-> ＞ #7  main (argc=＜optimized out＞, argv=＜optimized out＞, envp=＜optimized
-> ＞ out＞) at vl.c:4709
-> ＞
-> ＞ (gdb) p ioc-＞features
-> ＞
-> ＞ $1 = 6
-> ＞
-> ＞ (gdb) p ioc-＞name
-> ＞
-> ＞ $2 = 0x7fdcce1b1ab0 "migration-socket-listener"
-> ＞
-> ＞
-> ＞ May be socket_accept_incoming_migration should
-> ＞ call qio_channel_set_feature(ioc, QIO_CHANNEL_FEATURE_SHUTDOWN)??
-> ＞
-> ＞
-> ＞ thank you.
-> ＞
-> ＞
-> ＞
-> ＞
-> ＞
-> ＞ 原始邮件
-> ＞ *发件人：*＜zhangchen.fnst@cn.fujitsu.com＞
-> ＞ *收件人：*王广10165992＜qemu-devel@nongnu.org＞
-> ＞ *抄送人：*＜zhangchen.fnst@cn.fujitsu.com＞＜zhang.zhanghailiang@huawei.com＞
-> ＞ *日 期 ：*2017年03月16日 14:46
-> ＞ *主 题 ：**Re: [Qemu-devel] COLO failover hang*
-> ＞
-> ＞
-> ＞
-> ＞
-> ＞ On 03/15/2017 05:06 PM, wangguang wrote:
-> ＞ ＞   am testing QEMU COLO feature described here [QEMU
-> ＞ ＞ Wiki](http://wiki.qemu-project.org/Features/COLO).
-> ＞ ＞
-> ＞ ＞ When the Primary Node panic,the Secondary Node qemu hang.
-> ＞ ＞ hang at recvmsg in qio_channel_socket_readv.
-> ＞ ＞ And  I run  { 'execute': 'nbd-server-stop' } and { "execute":
-> ＞ ＞ "x-colo-lost-heartbeat" } in Secondary VM's
-> ＞ ＞ monitor,the  Secondary Node qemu still hang at recvmsg .
-> ＞ ＞
-> ＞ ＞ I found that the colo in qemu is not complete yet.
-> ＞ ＞ Do the colo have any plan for development?
-> ＞
-> ＞ Yes, We are developing. You can see some of patch we pushing.
-> ＞
-> ＞ ＞ Has anyone ever run it successfully? Any help is appreciated!
-> ＞
-> ＞ In our internal version can run it successfully,
-> ＞ The failover detail you can ask Zhanghailiang for help.
-> ＞ Next time if you have some question about COLO,
-> ＞ please cc me and zhanghailiang ＜zhang.zhanghailiang@huawei.com＞.
-> ＞
-> ＞
-> ＞ Thanks
-> ＞ Zhang Chen
-> ＞
-> ＞
-> ＞ ＞
-> ＞ ＞
-> ＞ ＞
-> ＞ ＞ centos7.2+qemu2.7.50
-> ＞ ＞ (gdb) bt
-> ＞ ＞ #0  0x00007f3e00cc86ad in recvmsg () from /lib64/libpthread.so.0
-> ＞ ＞ #1  0x00007f3e0332b738 in qio_channel_socket_readv (ioc=＜optimized out＞,
-> ＞ ＞ iov=＜optimized out＞, niov=＜optimized out＞, fds=0x0, nfds=0x0, errp=0x0) at
-> ＞ ＞ io/channel-socket.c:497
-> ＞ ＞ #2  0x00007f3e03329472 in qio_channel_read (ioc=ioc@entry=0x7f3e05110e40,
-> ＞ ＞ buf=buf@entry=0x7f3e05910f38 "", buflen=buflen@entry=32768,
-> ＞ ＞ errp=errp@entry=0x0) at io/channel.c:97
-> ＞ ＞ #3  0x00007f3e032750e0 in channel_get_buffer (opaque=＜optimized out＞,
-> ＞ ＞ buf=0x7f3e05910f38 "", pos=＜optimized out＞, size=32768) at
-> ＞ ＞ migration/qemu-file-channel.c:78
-> ＞ ＞ #4  0x00007f3e0327412c in qemu_fill_buffer (f=0x7f3e05910f00) at
-> ＞ ＞ migration/qemu-file.c:257
-> ＞ ＞ #5  0x00007f3e03274a41 in qemu_peek_byte (f=f@entry=0x7f3e05910f00,
-> ＞ ＞ offset=offset@entry=0) at migration/qemu-file.c:510
-> ＞ ＞ #6  0x00007f3e03274aab in qemu_get_byte (f=f@entry=0x7f3e05910f00) at
-> ＞ ＞ migration/qemu-file.c:523
-> ＞ ＞ #7  0x00007f3e03274cb2 in qemu_get_be32 (f=f@entry=0x7f3e05910f00) at
-> ＞ ＞ migration/qemu-file.c:603
-> ＞ ＞ #8  0x00007f3e03271735 in colo_receive_message (f=0x7f3e05910f00,
-> ＞ ＞ errp=errp@entry=0x7f3d62bfaa50) at migration/colo.c:215
-> ＞ ＞ #9  0x00007f3e0327250d in colo_wait_handle_message (errp=0x7f3d62bfaa48,
-> ＞ ＞ checkpoint_request=＜synthetic pointer＞, f=＜optimized out＞) at
-> ＞ ＞ migration/colo.c:546
-> ＞ ＞ #10 colo_process_incoming_thread (opaque=0x7f3e067245e0) at
-> ＞ ＞ migration/colo.c:649
-> ＞ ＞ #11 0x00007f3e00cc1df3 in start_thread () from /lib64/libpthread.so.0
-> ＞ ＞ #12 0x00007f3dfc9c03ed in clone () from /lib64/libc.so.6
-> ＞ ＞
-> ＞ ＞
-> ＞ ＞
-> ＞ ＞
-> ＞ ＞
-> ＞ ＞ --
-> ＞ ＞ View this message in context: http://qemu.11.n7.nabble.com/COLO-failover-hang-tp473250.html
-> ＞ ＞ Sent from the Developer mailing list archive at Nabble.com.
-> ＞ ＞
-> ＞ ＞
-> ＞ ＞
-> ＞ ＞
-> ＞
-> ＞ --
-> ＞ Thanks
-> ＞ Zhang Chen
-> ＞
-> ＞
-> ＞
-> ＞
-> ＞
->
+The two sclp callbacks are not very useful in any case...
+
+>  static Property console_properties[] = {
+
+> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+> index 34b2faf..f7c509c 100644
+> --- a/hw/s390x/event-facility.c
+> +++ b/hw/s390x/event-facility.c
+> @@ -413,11 +413,7 @@ static void event_unrealize(DeviceState *qdev, Error **errp)
+>      SCLPEvent *event = SCLP_EVENT(qdev);
+>      SCLPEventClass *child = SCLP_EVENT_GET_CLASS(event);
+>      if (child->exit) {
+> -        int rc = child->exit(event);
+> -        if (rc < 0) {
+> -            error_setg(errp, "SCLP event exit failed.");
+> -            return;
+> -        }
+> +        child->exit(event);
+
+...and this makes much more sense than stopping midway with an error.
+
+>      }
+>  }
+>  
+> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+> index 00b3bde..d1c4ff6 100644
+> --- a/hw/s390x/virtio-ccw.c
+> +++ b/hw/s390x/virtio-ccw.c
+> @@ -722,7 +722,7 @@ static void virtio_ccw_device_realize(VirtioCcwDevice *dev, Error **errp)
+>      }
+>  }
+>  
+> -static int virtio_ccw_exit(VirtioCcwDevice *dev)
+> +static void virtio_ccw_exit(VirtioCcwDevice *dev)
+>  {
+>      CcwDevice *ccw_dev = CCW_DEVICE(dev);
+>      SubchDev *sch = ccw_dev->sch;
+> @@ -735,7 +735,6 @@ static int virtio_ccw_exit(VirtioCcwDevice *dev)
+>          release_indicator(&dev->routes.adapter, dev->indicators);
+>          dev->indicators = NULL;
+>      }
+> -    return 0;
+>  }
+>  
+>  static void virtio_ccw_net_realize(VirtioCcwDevice *ccw_dev, Error **errp)
+> @@ -1616,12 +1615,12 @@ static void virtio_ccw_busdev_realize(DeviceState *dev, Error **errp)
+>      virtio_ccw_device_realize(_dev, errp);
+>  }
+>  
+> -static int virtio_ccw_busdev_exit(DeviceState *dev)
+> +static void virtio_ccw_busdev_exit(DeviceState *dev)
+>  {
+>      VirtioCcwDevice *_dev = (VirtioCcwDevice *)dev;
+>      VirtIOCCWDeviceClass *_info = VIRTIO_CCW_DEVICE_GET_CLASS(dev);
+>  
+> -    return _info->exit(_dev);
+> +    _info->exit(_dev);
+>  }
+>  
+>  static void virtio_ccw_busdev_unplug(HotplugHandler *hotplug_dev,
+> diff --git a/hw/s390x/virtio-ccw.h b/hw/s390x/virtio-ccw.h
+> index 41d4010..ce8baa3 100644
+> --- a/hw/s390x/virtio-ccw.h
+> +++ b/hw/s390x/virtio-ccw.h
+> @@ -74,7 +74,7 @@ typedef struct VirtioCcwDevice VirtioCcwDevice;
+>  typedef struct VirtIOCCWDeviceClass {
+>      CCWDeviceClass parent_class;
+>      void (*realize)(VirtioCcwDevice *dev, Error **errp);
+> -    int (*exit)(VirtioCcwDevice *dev);
+> +    void (*exit)(VirtioCcwDevice *dev);
+>  } VirtIOCCWDeviceClass;
+>  
+>  /* Performance improves when virtqueue kick processing is decoupled from the
+
+> diff --git a/include/hw/s390x/event-facility.h b/include/hw/s390x/event-facility.h
+> index def1bb0..1a32f3a 100644
+> --- a/include/hw/s390x/event-facility.h
+> +++ b/include/hw/s390x/event-facility.h
+> @@ -162,7 +162,7 @@ typedef struct SCLPEvent {
+>  typedef struct SCLPEventClass {
+>      DeviceClass parent_class;
+>      int (*init)(SCLPEvent *event);
+> -    int (*exit)(SCLPEvent *event);
+> +    void (*exit)(SCLPEvent *event);
+>  
+>      /* get SCLP's send mask */
+>      unsigned int (*get_send_mask)(void);
+
+I'd take a factored-out s390x patch through my tree. In any case,
+
+Acked-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+
+for the s390x parts.
