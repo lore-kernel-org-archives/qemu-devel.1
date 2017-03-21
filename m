@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cqF1N-0000bw-El
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:20:07 -0400
+	(envelope-from <quintela@redhat.com>) id 1cqF4E-0001fp-0T
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:22:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cqF1K-000745-9r
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:20:01 -0400
-References: <20170321031705.22291-1-eblake@redhat.com>
-	<20170321031705.22291-3-eblake@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <2d8ee0ac-2a02-18fa-c3b3-6339cdfa2e41@redhat.com>
-Date: Tue, 21 Mar 2017 09:19:52 +0100
+	(envelope-from <quintela@redhat.com>) id 1cqF4A-0001AU-Rj
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:22:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33828)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1cqF4A-00019L-JX
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:22:54 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170321022243.29453-1-fanc.fnst@cn.fujitsu.com> (Chao Fan's
+	message of "Tue, 21 Mar 2017 10:22:43 +0800")
+References: <20170321022243.29453-1-fanc.fnst@cn.fujitsu.com>
+Reply-To: quintela@redhat.com
+Date: Tue, 21 Mar 2017 09:22:52 +0100
+Message-ID: <87y3vz82eb.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <20170321031705.22291-3-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] qapi: Fix QemuOpts visitor regression
- on unvisited input
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2] Add page-size to output in 'info
+ migrate'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,115 +28,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, qemu-stable@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Chao Fan <fanc.fnst@cn.fujitsu.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, eblake@redhat.com, armbru@redhat.com, berrange@redhat.com, caoj.fnst@cn.fujitsu.com, douly.fnst@cn.fujitsu.com, maozy.fnst@cn.fujitsu.com, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-On 21/03/2017 04:17, Eric Blake wrote:
-> An off-by-one in commit 15c2f669e meant that we were failing to
-> check for unparsed input in all QemuOpts visitors.  Recent testsuite
-> additions show that fixing the obvious bug with bogus fields will
-> also fix the case of an incomplete list visit; update the tests to
-> match the new behavior.
-> 
-> Simple testcase:
-> 
-> ./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic -qmp stdio -numa node,size=1g
-> 
-> failed to diagnose that 'size' is not a valid argument to -numa, and
-> now once again reports:
-> 
-> qemu-system-x86_64: -numa node,size=1g: Invalid parameter 'size'
-> 
-> CC: qemu-stable@nongnu.org
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-
-Tested-by: Laurent Vivier <lvivier@redhat.com>
-
+Chao Fan <fanc.fnst@cn.fujitsu.com> wrote:
+> The number of dirty pages outputed in 'pages' in the command
+> 'info migrate', so add page-size to calculate the number of dirty
+> pages in bytes.
+>
+> Signed-off-by: Chao Fan <fanc.fnst@cn.fujitsu.com>
+> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+>
 > ---
->  qapi/opts-visitor.c       |  6 +++---
->  tests/test-opts-visitor.c | 15 +++++++++------
->  2 files changed, 12 insertions(+), 9 deletions(-)
-> 
-> diff --git a/qapi/opts-visitor.c b/qapi/opts-visitor.c
-> index 026d25b..b54da81 100644
-> --- a/qapi/opts-visitor.c
-> +++ b/qapi/opts-visitor.c
-> @@ -164,7 +164,7 @@ opts_check_struct(Visitor *v, Error **errp)
->      GHashTableIter iter;
->      GQueue *any;
-> 
-> -    if (ov->depth > 0) {
-> +    if (ov->depth > 1) {
->          return;
->      }
-> 
-> @@ -276,8 +276,8 @@ static void
->  opts_check_list(Visitor *v, Error **errp)
->  {
->      /*
-> -     * FIXME should set error when unvisited elements remain.  Mostly
-> -     * harmless, as the generated visits always visit all elements.
-> +     * Unvisited list elements will be reported later when checking if
-> +     * unvisited struct members remain.
->       */
->  }
-> 
-> diff --git a/tests/test-opts-visitor.c b/tests/test-opts-visitor.c
-> index a47c344..1766919 100644
-> --- a/tests/test-opts-visitor.c
-> +++ b/tests/test-opts-visitor.c
-> @@ -175,6 +175,7 @@ expect_u64_max(OptsVisitorFixture *f, gconstpointer test_data)
->  static void
->  test_opts_range_unvisited(void)
->  {
-> +    Error *err = NULL;
->      intList *list = NULL;
->      intList *tail;
->      QemuOpts *opts;
-> @@ -199,10 +200,11 @@ test_opts_range_unvisited(void)
->      g_assert_cmpint(tail->value, ==, 1);
->      tail = (intList *)visit_next_list(v, (GenericList *)tail, sizeof(*list));
->      g_assert(tail);
-> -    visit_check_list(v, &error_abort); /* BUG: unvisited tail not reported */
-> +    visit_check_list(v, &error_abort); /* unvisited tail ignored until... */
->      visit_end_list(v, (void **)&list);
-> 
-> -    visit_check_struct(v, &error_abort);
-> +    visit_check_struct(v, &err); /* ...here */
-> +    error_free_or_abort(&err);
->      visit_end_struct(v, NULL);
-> 
->      qapi_free_intList(list);
-> @@ -239,7 +241,7 @@ test_opts_range_beyond(void)
->      error_free_or_abort(&err);
->      visit_end_list(v, (void **)&list);
-> 
-> -    visit_check_struct(v, &error_abort);
-> +    visit_check_struct(v, &err);
->      visit_end_struct(v, NULL);
-> 
->      qapi_free_intList(list);
-> @@ -250,6 +252,7 @@ test_opts_range_beyond(void)
->  static void
->  test_opts_dict_unvisited(void)
->  {
-> +    Error *err = NULL;
->      QemuOpts *opts;
->      Visitor *v;
->      UserDefOptions *userdef;
-> @@ -258,11 +261,11 @@ test_opts_dict_unvisited(void)
->                             &error_abort);
-> 
->      v = opts_visitor_new(opts);
-> -    /* FIXME: bogus should be diagnosed */
-> -    visit_type_UserDefOptions(v, NULL, &userdef, &error_abort);
-> +    visit_type_UserDefOptions(v, NULL, &userdef, &err);
-> +    error_free_or_abort(&err);
->      visit_free(v);
->      qemu_opts_del(opts);
-> -    qapi_free_UserDefOptions(userdef);
-> +    g_assert(!userdef);
->  }
-> 
->  int
-> 
+> v2: fix the grammar in qapi-schema.json [Eric Blake]
+
+Hi
+
+If you see my RAMState series, you can see that things have moved a lot
+here,  I added this to my current series:
+
+(there is a rename of qemu_target_page_bits() to qemu_target_page_size()
+in the series).
+
+If you like it, I can leave it that way there.
+
+Thanks, Juan.
+
+
+commit 1944568bd8cdf912b3bf231bbc3c66071fde9f58
+Author: Chao Fan <fanc.fnst@cn.fujitsu.com>
+Date:   Tue Mar 21 10:22:43 2017 +0800
+
+    Add page-size to output in 'info migrate'
+    
+    The number of dirty pages outputed in 'pages' in the command
+    'info migrate', so add page-size to calculate the number of dirty
+    pages in bytes.
+    
+    Signed-off-by: Chao Fan <fanc.fnst@cn.fujitsu.com>
+    Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+    Signed-off-by: Juan Quintela <quintela@redhat.com>
+
+diff --git a/hmp.c b/hmp.c
+index edb8970..be75e71 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -215,6 +215,9 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+                        info->ram->normal_bytes >> 10);
+         monitor_printf(mon, "dirty sync count: %" PRIu64 "\n",
+                        info->ram->dirty_sync_count);
++        monitor_printf(mon, "page size: %" PRIu64 " kbytes\n",
++                       info->ram->page_size >> 10);
++
+         if (info->ram->dirty_pages_rate) {
+             monitor_printf(mon, "dirty pages rate: %" PRIu64 " pages\n",
+                            info->ram->dirty_pages_rate);
+diff --git a/migration/migration.c b/migration/migration.c
+index 92c3c6b..fc19ba7 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -650,6 +650,7 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
+     info->ram->mbps = s->mbps;
+     info->ram->dirty_sync_count = ram_dirty_sync_count();
+     info->ram->postcopy_requests = ram_postcopy_requests();
++    info->ram->page_size = qemu_target_page_size();
+ 
+     if (s->state != MIGRATION_STATUS_COMPLETED) {
+         info->ram->remaining = ram_bytes_remaining();
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 68a4327..c7ec62c 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -598,6 +598,9 @@
+ # @postcopy-requests: The number of page requests received from the destination
+ #        (since 2.7)
+ #
++# @page-size: The number of bytes per page for the various page-based
++#        statistics (since 2.10)
++#
+ # Since: 0.14.0
+ ##
+ { 'struct': 'MigrationStats',
+@@ -605,7 +608,7 @@
+            'duplicate': 'int', 'skipped': 'int', 'normal': 'int',
+            'normal-bytes': 'int', 'dirty-pages-rate' : 'int',
+            'mbps' : 'number', 'dirty-sync-count' : 'int',
+-           'postcopy-requests' : 'int' } }
++           'postcopy-requests' : 'int', 'page-size' : 'int' } }
+ 
+ ##
+ # @XBZRLECacheStats:
