@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cqHNQ-0005yW-TA
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 06:50:57 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1cqHrf-0003Lo-ER
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 07:22:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cqHNQ-0000kc-3K
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 06:50:56 -0400
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:33289)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cqHNP-0000jG-FV
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 06:50:55 -0400
-Received: by mail-wm0-x235.google.com with SMTP id v203so2075425wmg.0
-	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 03:50:55 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1cqHrc-0001vX-Rw
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 07:22:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54674)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cqHrc-0001v1-Lr
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 07:22:08 -0400
+References: <20170320180024.23432-1-arvolkov@inbox.ru>
+	<87o9wvrmwa.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <73e35c44-eda8-318c-77a3-0a7d42704dba@redhat.com>
+Date: Tue, 21 Mar 2017 12:22:01 +0100
 MIME-Version: 1.0
-In-Reply-To: <1490091581-21912-1-git-send-email-maozy.fnst@cn.fujitsu.com>
-References: <1490091581-21912-1-git-send-email-maozy.fnst@cn.fujitsu.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 Mar 2017 10:50:33 +0000
-Message-ID: <CAFEAcA-voeh7zLHEugB8chErQ2y1OsdMZgvuAKrpb26qg8Dffw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] elfload: Replace malloc with g_malloc
+In-Reply-To: <87o9wvrmwa.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw: dead code removal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,19 +27,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, Anton Volkov <arvolkov@inbox.ru>
+Cc: borntraeger@de.ibm.com, agraf@suse.de, qemu-devel@nongnu.org, kraxel@redhat.com
 
-On 21 March 2017 at 10:19, Mao Zhongyi <maozy.fnst@cn.fujitsu.com> wrote:
-> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-> ---
->  bsd-user/elfload.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
 
-Thanks for this patch. How have you tested it? (You'd need to be
-on a BSD host system to test). I ask because bsd-user is currently
-not really maintained, and so I'm a bit reluctant to take cleanup
-patches to code we aren't building and testing.
 
-thanks
--- PMM
+On 21/03/2017 10:37, Markus Armbruster wrote:
+> Four related changes, really:
+> 
+> 1. HDACodecDeviceClass method exit()
+> 2. VirtIOCCWDeviceClass method exit()
+> 3. DeviceClass method exit()
+> 4. SCLPEventClass method exit()
+> 
+> Regarding 3: method exit() needs to go.  Your patch shows there are only
+> a few remaining users.  Please convert them to unrealize().
+
+But that should be a separate patch anyway, so this patch should be good
+as is, shouldn't it?
+
+Paolo
