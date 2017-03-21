@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cqK0K-0006Tg-4W
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 09:39:17 -0400
+	(envelope-from <eblake@redhat.com>) id 1cqK35-0007O6-KI
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 09:42:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cqK0H-000655-1e
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 09:39:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44308)
+	(envelope-from <eblake@redhat.com>) id 1cqK32-000757-JK
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 09:42:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36102)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cqK0G-00064E-Ov
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 09:39:12 -0400
-References: <20170316102351.25056-1-vfeenstr@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cqK32-00074f-9K
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 09:42:04 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 49B5331B31A
+	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 13:42:04 +0000 (UTC)
+References: <20170316112016.26450-1-berrange@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <1a5dab83-40ce-e747-6399-ca693ccf278e@redhat.com>
-Date: Tue, 21 Mar 2017 08:39:07 -0500
+Message-ID: <5aeb775b-a59e-3a0a-4c02-a5ef2a951943@redhat.com>
+Date: Tue, 21 Mar 2017 08:42:00 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170316102351.25056-1-vfeenstr@redhat.com>
+In-Reply-To: <20170316112016.26450-1-berrange@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="FVTjBToCtJfmpUnQU6DcQOS1sGq2VEJEE"
-Subject: Re: [Qemu-devel] [PATCH] qemu-ga: add guest-get-osinfo command
+	boundary="kxiIvLoKuTqo3P0FourahnW9iP9M1mb48"
+Subject: Re: [Qemu-devel] [PATCH] List SASL config file under the
+ cryptography maintainer's realm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,130 +34,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>, qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---FVTjBToCtJfmpUnQU6DcQOS1sGq2VEJEE
+--kxiIvLoKuTqo3P0FourahnW9iP9M1mb48
 From: Eric Blake <eblake@redhat.com>
-To: Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>, qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com
-Message-ID: <1a5dab83-40ce-e747-6399-ca693ccf278e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu-ga: add guest-get-osinfo command
-References: <20170316102351.25056-1-vfeenstr@redhat.com>
-In-Reply-To: <20170316102351.25056-1-vfeenstr@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <5aeb775b-a59e-3a0a-4c02-a5ef2a951943@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] List SASL config file under the cryptography
+ maintainer's realm
+References: <20170316112016.26450-1-berrange@redhat.com>
+In-Reply-To: <20170316112016.26450-1-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 03/16/2017 05:23 AM, Vinzenz 'evilissimo' Feenstra wrote:
-> From: Vinzenz Feenstra <vfeenstr@redhat.com>
+On 03/16/2017 06:20 AM, Daniel P. Berrange wrote:
+> No one is listed as maintainer for qemu.sasl. It is used by the
+> VNC server for SASL auth, but since it is cryptography related,
+> list it under the crytography maintainer's realm, rather than
+> under the UI maintainer.
 >=20
-> Add a new 'guest-get-osinfo' command for reporting basic information of=
-
-> the guest operating system (hereafter just 'OS'). This information
-> includes the type of the OS, the version, and the architecture.
-> Additionally reported would be a name, distribution type and kernel
-> version where applicable.
->=20
-> Here an example for a Fedora 25 VM:
->=20
-> $ virsh -c qemu:////system qemu-agent-command F25 \
->     '{ "execute": "guest-get-osinfo" }'
->   {"return":{"arch":"x86_64","codename":"Server Edition","version":"25"=
-,
->    "kernel":"4.8.6-300.fc25.x86_64","type":"linux","distribution":"Fedo=
-ra"}}
->=20
-> And an example for a Windows 2012 R2 VM:
->=20
-> $ virsh -c qemu:////system qemu-agent-command Win2k12R2 \
->     '{ "execute": "guest-get-osinfo" }'
->   {"return":{"arch":"x86_64","codename":"Win 2012 R2",
->    "version":"6.3","kernel":"","type":"windows","distribution":""}}
->=20
-> Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 > ---
+>  MAINTAINERS | 1 +
+>  1 file changed, 1 insertion(+)
 
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-> +static void ga_get_linux_distribution_info(GuestOSInfo *info)
-> +{
-> +    FILE *fp =3D NULL;
-> +    fp =3D fopen("/etc/os-release", "r");
-
-Rather than read random files, I'm thinking that the uname() syscall is
-a better approach.  It is portable to more guests (since uname is a
-POSIX interface), even if it is somewhat more limited on the information
-it provides.
-
-> +++ b/qga/commands-win32.c
-> @@ -1536,3 +1536,108 @@ void ga_command_state_init(GAState *s, GAComman=
-dState *cs)
->          ga_command_state_add(cs, NULL, guest_fsfreeze_cleanup);
->      }
->  }
-
-> +static char *ga_get_win_ver(void)
-> +{
-> +    OSVERSIONINFOEXW os_version;
-> +    ga_get_version(&os_version);
-> +    char buf[64] =3D {};
-> +    int major =3D (int)os_version.dwMajorVersion;
-> +    int minor =3D (int)os_version.dwMinorVersion;
-> +    sprintf(buf, "%d.%d", major, minor);
-> +    return strdup(buf);
-
-Instead of using strdup() (which uses malloc()), you should be using
-g_strdup_printf() (which uses g_malloc().  In general, we prefer
-g_malloc/g_free over raw malloc.  And once you use g_strdup_printf, you
-no longer have to worry about whether buf is allocated large enough to
-avoid overflow with sprintf.
-
-
-> +++ b/qga/qapi-schema.json
-> @@ -1042,3 +1042,43 @@
->    'data':    { 'path': 'str', '*arg': ['str'], '*env': ['str'],
->                 '*input-data': 'str', '*capture-output': 'bool' },
->    'returns': 'GuestExec' }
-> +
-> +##
-> +# @GuestOSType:
-> +#
-> +# @linux:    Indicator for linux distributions
-> +# @windows:  Indicator for windows versions
-> +# @other:    Indicator for any other operating system that is not yet
-> +#            explicitly supported
-> +#
-> +# Since: 2.8
-
-You've missed 2.8 by a long shot. In fact, you've missed hard freeze for
-2.9, so this needs to be 2.10.
-
-> +##
-> +{ 'enum': 'GuestOSType', 'data': ['linux', 'windows', 'other'] }
-> +
-> +##
-> +# @GuestOSInfo:
-> +#
-> +# @version:      OS version, e.g. 25 for FC25 etc.
-> +# @distribution: Fedora, Ubuntu, Debian, CentOS...
-> +# @codename:     Code name of the OS. e.g. Ubuntu has Xenial Xerus etc=
-=2E
-> +# @arch:         Architecture of the OS e.g. x86, x86_64, ppc64, aarch=
-64...
-> +# @type:         Specifies the type of the OS.
-> +# @kernel:       Linux kernel version (Might be used by other OS types=
- too).
-> +#                May be empty.
-
-Rather than printing an empty string, would it be better to make the
-fields optional, and omit them when there is nothing useful to supply?
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index bf1aafb..ecf8273 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1462,6 +1462,7 @@ S: Maintained
+>  F: crypto/
+>  F: include/crypto/
+>  F: tests/test-crypto-*
+> +F: qemu.sasl
+> =20
+>  Coroutines
+>  M: Stefan Hajnoczi <stefanha@redhat.com>
+>=20
 
 --=20
 Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---FVTjBToCtJfmpUnQU6DcQOS1sGq2VEJEE
+--kxiIvLoKuTqo3P0FourahnW9iP9M1mb48
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -160,13 +91,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJY0Sz7AAoJEKeha0olJ0NqbmcIAIY3/LYrHUjcUXrUNN2cjD+0
-Zl66k1efBNxzL6jlJyW3c7KAvavi5DX8PTdixewXk6QzywO92J9lYOhhkAu1Pi/V
-xikvNV2O5IKQEp1cwZqxyVSPbtja4yTMxcI95Ycx8mAsAFpK6xxwdP7Duf3lO944
-4gtwOYdC8KLocgZ+FWpntKE8SCpfTxu+JfTak2RuVufkObPmHtaqqqBfv0sjti8J
-oA8qwJRMafuUQooJsu5+KVcUFFaP3Gib3iRNnDpgh3uP4g1DCRoUPrr5s52KkDS1
-KQI6enearnwIr0gfUWe2tplWIvjxAMyxgwxucRqwqNomNRXvUgaeF5EJRro4PAU=
-=yCDi
+iQEcBAEBCAAGBQJY0S2oAAoJEKeha0olJ0NqzEcH/1R6L3NSEk3uVKF9qwCK/9hi
+RhsYde8aFR6Mypq3paRvVYxuKzPW7TGZpmO1m/ds+tQecFhAPv9/yqOyfZFwDCBm
+bAoKZL+IyfNO9XFZC8I3tQuwTVIbbU2PGalAPlvi9Ec4wFGaiyLJJFgVUxo/MwPW
+4ezdyjdZ+Q2Yxt0gC3VdJozUNjjyBQdot8nBWGF0uhX0M8OAivd/tP7pe8AF8kEd
+Io1TfrYPDfuSU3s50GfSDckLjbWx+SmxysvRWW6bfwdgKkVvhUzPocLZfKQIqQ4L
+xhFjUv3ICKMIC7MXR8CM7SIl6+vtMPiwLACFi5qw3gdtNLznSdfn09Nya0PdtHU=
+=FwJX
 -----END PGP SIGNATURE-----
 
---FVTjBToCtJfmpUnQU6DcQOS1sGq2VEJEE--
+--kxiIvLoKuTqo3P0FourahnW9iP9M1mb48--
