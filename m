@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47367)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cqIgD-0000Xm-J3
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:14:26 -0400
+	(envelope-from <armbru@redhat.com>) id 1cqIh7-00015R-Dp
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:15:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cqIg9-0007YN-Af
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:14:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51186)
+	(envelope-from <armbru@redhat.com>) id 1cqIh3-0007jo-5b
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:15:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52308)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cqIg9-0007Xd-59
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:14:21 -0400
-Date: Tue, 21 Mar 2017 13:14:14 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170321131414.08cc6bfa@nial.brq.redhat.com>
-In-Reply-To: <20170320170557.15645-3-lersek@redhat.com>
-References: <20170320170557.15645-1-lersek@redhat.com>
-	<20170320170557.15645-3-lersek@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cqIh3-0007jj-00
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:15:17 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F3FE6C05490A
+	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 12:15:16 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170320173840.3626-1-dgilbert@redhat.com>
+Date: Tue, 21 Mar 2017 13:15:12 +0100
+In-Reply-To: <20170320173840.3626-1-dgilbert@redhat.com> (David Alan Gilbert's
+	message of "Mon, 20 Mar 2017 17:38:38 +0000")
+Message-ID: <87bmsuomgf.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] hw/acpi/vmgenid: prevent more than
- one vmgenid device
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 0/2 for 2.10] Remove some monitor_printf's
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +32,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu devel list <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Ben Warren <ben@skyportsystems.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, kraxel@redhat.com, quintela@redhat.com
 
-On Mon, 20 Mar 2017 18:05:57 +0100
-Laszlo Ersek <lersek@redhat.com> wrote:
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> writes:
 
-> A system with multiple VMGENID devices is undefined in the VMGENID spec by
-> omission.
-> 
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Ben Warren <ben@skyportsystems.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> I found myself trying to understand cur_mon and found a bunch
+> of uses that could easily be replaced by error_report or Error **.
 
-> ---
-> 
-> Notes:
->     v2:
->     - use find_vmgenid_dev() rather than open-code
->       object_resolve_path_type() [Michael]
->     - add comments to both the definition of find_vmgenid_dev() and its call
->       site in vmgenid_realize() [Michael]
-> 
->  include/hw/acpi/vmgenid.h | 1 +
->  hw/acpi/vmgenid.c         | 8 ++++++++
->  2 files changed, 9 insertions(+)
-> 
-> diff --git a/include/hw/acpi/vmgenid.h b/include/hw/acpi/vmgenid.h
-> index 8578476baebe..7beb9592fb01 100644
-> --- a/include/hw/acpi/vmgenid.h
-> +++ b/include/hw/acpi/vmgenid.h
-> @@ -24,6 +24,7 @@ typedef struct VmGenIdState {
->      bool write_pointer_available;
->  } VmGenIdState;
->  
-> +/* returns NULL unless there is exactly one device */
->  static inline Object *find_vmgenid_dev(void)
->  {
->      return object_resolve_path_type("", VMGENID_DEVICE, NULL);
-> diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
-> index c3ddcc8e7cb0..a32b847fe0df 100644
-> --- a/hw/acpi/vmgenid.c
-> +++ b/hw/acpi/vmgenid.c
-> @@ -221,6 +221,14 @@ static void vmgenid_realize(DeviceState *dev, Error **errp)
->          return;
->      }
->  
-> +    /* Given that this function is executing, there is at least one VMGENID
-> +     * device. Check if there are several.
-> +     */
-> +    if (!find_vmgenid_dev()) {
-> +        error_setg(errp, "at most one %s device is permitted", VMGENID_DEVICE);
-> +        return;
-> +    }
-> +
->      qemu_register_reset(vmgenid_handle_reset, vms);
->  }
->  
+Speaking of cur_mon: a patch making it thread-local would be most
+welcome.
+
+Some of error wavcapture messages still aren't so great, but it's an
+obvious improvement, so
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
