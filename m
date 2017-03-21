@@ -1,25 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cqOFR-0008Od-95
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 14:11:10 -0400
+	(envelope-from <jiahuanzhang90@gmail.com>) id 1cqOG5-0000Ig-LY
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 14:11:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cqOFN-00026x-4H
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 14:11:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47510)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cqOFM-00025T-RE
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 14:11:05 -0400
-References: <1490118290-6133-1-git-send-email-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <37080340-bd84-ec1b-6a43-584eb1e31f76@redhat.com>
-Date: Tue, 21 Mar 2017 13:11:00 -0500
+	(envelope-from <jiahuanzhang90@gmail.com>) id 1cqOG4-0002XD-Ei
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 14:11:49 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:35343)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jiahuanzhang90@gmail.com>)
+	id 1cqOG4-0002Wy-9e
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 14:11:48 -0400
+Received: by mail-qk0-x244.google.com with SMTP id o135so23193928qke.2
+	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 11:11:48 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1490118290-6133-1-git-send-email-armbru@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Rphbs1wmEB3qgeimo8JKlsV10J9lJLOUs"
-Subject: Re: [Qemu-devel] [PATCH] test-qobject-input-visitor: Cover
- visit_type_uint64()
+In-Reply-To: <CAJy91CaCV40FgSP55qWZeZgkQ=2+E8Cr7xdbu9pn5HLEo+6JJQ@mail.gmail.com>
+References: <CAJy91CY1SOwi7D-kyU0ooe5SyhM414WaBCedXuPfXXhJpbo1fg@mail.gmail.com>
+	<CAFEAcA8HrEsuEYgpe9pJQkwSnSTU74G+3i7vWk8ka5cJ+UWFDQ@mail.gmail.com>
+	<CAJy91CZ=QbhyeakFCSq3n6+d_cGO8hpT8o8EUwUTdkX-iE1eLg@mail.gmail.com>
+	<CAFEAcA9XRwW0=UzuAXwjB-a_vWepfh+mus9bgpmdsCoQH6sDEQ@mail.gmail.com>
+	<CAJy91CbwRd0u+RJiXZZP11J6pU4Pw-FDGbf=hLSBPejNb78bDA@mail.gmail.com>
+	<CAFEAcA_etsFstPtUzs0AZjWD35MhMLhwru0ibJzS_upgE-nsng@mail.gmail.com>
+	<CAJy91CZmqEUXLKjRJ0JdUEf83E3FwE_24qmej-4C8uAGQkTPWA@mail.gmail.com>
+	<CAFEAcA-mzO7vniDEaZeueVFQ7+MVBB7pnzHhahv2Yk_f3q0mJw@mail.gmail.com>
+	<CAJy91CZ4Ed-HGHLkzEc1dqQbo32d-eTE1S1ovO_ZwkDdTpkQXQ@mail.gmail.com>
+	<CAJy91CaCV40FgSP55qWZeZgkQ=2+E8Cr7xdbu9pn5HLEo+6JJQ@mail.gmail.com>
+From: Jiahuan Zhang <jiahuanzhang90@gmail.com>
+Date: Tue, 21 Mar 2017 19:11:47 +0100
+Message-ID: <CAJy91CYEwOVT7oEdYY=21__c2kcLTyxyjAaq7Zx4VnQdeLdQQQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Guest application reading from pl011 without
+ device driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,104 +39,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Rphbs1wmEB3qgeimo8JKlsV10J9lJLOUs
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, mdroth@linux.vnet.ibm.com
-Message-ID: <37080340-bd84-ec1b-6a43-584eb1e31f76@redhat.com>
-Subject: Re: [PATCH] test-qobject-input-visitor: Cover visit_type_uint64()
-References: <1490118290-6133-1-git-send-email-armbru@redhat.com>
-In-Reply-To: <1490118290-6133-1-git-send-email-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+2017=E5=B9=B43=E6=9C=8821=E6=97=A5 18:55=EF=BC=8C"Peter Maydell" <peter.may=
+dell@linaro.org>=E5=86=99=E9=81=93=EF=BC=9A
 
-On 03/21/2017 12:44 PM, Markus Armbruster wrote:
-> The new test demonstrates known bugs: integers between INT64_MAX+1 and
-> UINT64_MAX rejected, and integers between INT64_MIN and -1 are
-> accepted modulo 2^64.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  tests/test-qobject-input-visitor.c | 30 ++++++++++++++++++++++++++++++=
+On 21 March 2017 at 17:48, Jiahuan Zhang <jiahuanzhang90@gmail.com> wrote:
+> The guest program is as follows.
+>
+> While (*UART_FR & PL011_RXFE); //wait until fifo not empty
+> for (i=3D0;i <16;i++){
+>    data [i] =3D (unsigned char) *UART_DR; //read from the data register.
+> }
 
->  1 file changed, 30 insertions(+)
->=20
-> diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-in=
-put-visitor.c
-> index 6eb48fe..f965743 100644
-> --- a/tests/test-qobject-input-visitor.c
-> +++ b/tests/test-qobject-input-visitor.c
-> @@ -116,6 +116,34 @@ static void test_visitor_in_int(TestInputVisitorDa=
-ta *data,
->      g_assert_cmpint(res, =3D=3D, value);
->  }
-> =20
-> +static void test_visitor_in_uint(TestInputVisitorData *data,
-> +                                const void *unused)
-> +{
-> +    Error *err =3D NULL;
-> +    uint64_t res =3D 0;
-> +    int value =3D 42;
-> +    Visitor *v;
-> +
-> +    v =3D visitor_input_test_init(data, "%d", value);
-
-Another place where I have to rebase my work that gets rid of the
-dynamic JSON parser, if we want to revive that patch series; but don't
-let it stop you on this patch.
-
-> +
-> +    visit_type_uint64(v, NULL, &res, &error_abort);
-> +    g_assert_cmpuint(res, =3D=3D, (uint64_t)value);
-> +
-> +    /* BUG: value between INT64_MIN and -1 accepted modulo 2^64 */
-> +
-> +    v =3D visitor_input_test_init(data, "%d", -value);
-
-Not necessarily a bug - libvirt exploits this behavior.  So even if we
-fix the real bug, namely...
-
-> +
-> +    visit_type_uint64(v, NULL, &res, &error_abort);
-> +    g_assert_cmpuint(res, =3D=3D, (uint64_t)-value);
-> +
-> +    /* BUG: value between INT64_MAX+1 and UINT64_MAX rejected */
-> +
-> +    v =3D visitor_input_test_init(data, "18446744073709551574");
-
-=2E..this, we may be stuck keeping the modulo 2^64 parsing around for
-back-compat.
-
-At any rate, your test is a welcome addition; and as it only touches the
-testsuite, it is still 2.9 material if desired.
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+This is buggy. You must check RXFE every time, because
+RXFE will be cleared as soon as even a single byte is
+in the FIFO. It does not mean "FIFO full", it just
+means "FIFO not empty".
 
 
---Rphbs1wmEB3qgeimo8JKlsV10J9lJLOUs
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Yes, here I need to make sure there are real data in the fifo, or data [i]
+will get null.
+Do you mean that I also need to make sure fifo is not full before reading?
+For example, by while(*UART_FR & RXFF); ?
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+What do you mean "RXFE will be cleared"?
+Here RXFE is
+#define PL011_RXFE   0x10
 
-iQEcBAEBCAAGBQJY0Wy0AAoJEKeha0olJ0Nq2eEIAJ8ADGp/1Lukh+3gHZAPwfgh
-PJfGqu86BXncv7+GAO+fMCiUkbsCeairUyKeVgLpZ62b56rH//U3wCdKz+4feHOr
-ss19Yi2/FbnjtgpL53pCNxDSZeC8PB9ecJVPLBsZk5pTgOljLpos7HN5/bNBBWG3
-uwEUaUrny5TM1as3MOilynLVt+6IoK7H15JOXjV15CphvWtYF6oIMJz6CzxtdJSP
-NE6aKIgPE+FGQ1DVE1uj4l1W2hjOjsz8BEtOK6UaYgCgg7umVNZd71YFmRxM+13O
-sw69aZlPTGi5A4RR4kgF0rJ/fHlVSGx1n+8SRBA/w14PjSx+o/i57yATgaQWPsc=
-=gjgb
------END PGP SIGNATURE-----
+By the way, at the beginning of the guest program, I set the line control
+register s->lcr =3D 0x70 for pl011_can_recieve.
 
---Rphbs1wmEB3qgeimo8JKlsV10J9lJLOUs--
+(You should also check that you're correctly using
+'volatile' or some other mechanism for ensuring that
+the C compiler does not decide that it can collapse
+away accesses to hardware registers because it thinks
+they're just memory and won't change value.)
+
+> But what I met is that, when the receiving data is small,
+> no data is knocking the door of the fifo by ReadFile (),
+> then pl011_read can starts.
+> When the data is large, after the fifo is full, there are still
+> data requesting to get into the fifo. Then the device is busy
+> with pl011_can_receive.
+
+Are you saying that QEMU is looping round indefinitely calling
+pl011_can_receive() and never running the guest at all?
+
+
+Yes, exactly when fifo is full, s->count =3D 16. pl011_can_recieve keeps
+returning 0.
+The guest program is blocked.
+
+That would be a QEMU bug, but it seems unlikely or we'd have
+noticed it before.
+
+What chardev backend are you connecting to the pl011 to
+feed data to it?
+
+
+I am using a windows named pipe to get the data from a window host program,
+which uses ReadFile () in char_win.c
+
+
+thanks
+-- PMM
