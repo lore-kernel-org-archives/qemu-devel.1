@@ -1,37 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cqMM5-0000ev-SN
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 12:09:55 -0400
+	(envelope-from <lvivier@redhat.com>) id 1cqMMk-0001Bm-40
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 12:10:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cqMM2-0000UC-L5
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 12:09:53 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57060)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cqMM2-0000T9-Bf
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 12:09:50 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2LG4q9q062419
-	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 12:09:48 -0400
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29b58tqnu1-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 12:09:48 -0400
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 21 Mar 2017 10:09:47 -0600
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <lvivier@redhat.com>) id 1cqMMg-0000gB-UO
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 12:10:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47198)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1cqMMg-0000ft-JW
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 12:10:30 -0400
+References: <20170321031705.22291-1-eblake@redhat.com>
+	<20170321031705.22291-2-eblake@redhat.com>
+	<fb42e59d-f196-84a3-420f-dc488ef62c53@redhat.com>
+	<6cb7d791-8cf5-3a48-572e-30370b1bf608@redhat.com>
+	<13797820-ea41-0991-7825-a8e32fa0932a@redhat.com>
+	<c2a8ff05-e4c8-48d0-63c7-572ea06c1c23@redhat.com>
+	<8760j2litm.fsf@dusky.pond.sub.org>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <390b6082-c514-be91-3d6d-9bee1bc1efa0@redhat.com>
+Date: Tue, 21 Mar 2017 17:10:27 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20170321104952.6236-1-sameeh@daynix.com>
-References: <20170321104952.6236-1-sameeh@daynix.com>
-Date: Tue, 21 Mar 2017 11:09:37 -0500
-Message-Id: <149011257708.3910.6427658788264808225@loki>
-Subject: Re: [Qemu-devel] [PATCH] Fix Event Viewer errors caused by qemu-ga
+In-Reply-To: <8760j2litm.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] tests: Expose regression in QemuOpts
+ visitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,112 +33,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sameeh Jubran <sameeh@daynix.com>, qemu-devel@nongnu.org
-Cc: Yan Vugenfirer <yan@daynix.com>
+To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Quoting Sameeh Jubran (2017-03-21 05:49:52)
-> When the command "guest-fsfreeze-freeze" is executed it causes
-> the VSS service to log the errors below in the Event Viewer.
-> =
+On 21/03/2017 17:01, Markus Armbruster wrote:
+> Eric Blake <eblake@redhat.com> writes:
+> 
+>> On 03/21/2017 08:33 AM, Laurent Vivier wrote:
+>>> On 21/03/2017 14:21, Eric Blake wrote:
+>>>> On 03/21/2017 04:01 AM, Laurent Vivier wrote:
+>>>>> On 21/03/2017 04:17, Eric Blake wrote:
+>>>>>> Commit 15c2f669e broke the ability of the QemuOpts visitor to
+>>>>>> flag extra input parameters, but the regression went unnoticed
+>>>>>> because of missing testsuite coverage.  Add a test to cover this.
+>>>>>
+>>>>> I don't know where I'm wrong, but when I run this test without the fix
+>>>>> it never fails.
+>>>>
+>>>> Intentional:
+>>>>
+>>>>
+>>>>>> +    v = opts_visitor_new(opts);
+>>>>>> +    /* FIXME: bogus should be diagnosed */
+>>>>>> +    visit_type_UserDefOptions(v, NULL, &userdef, &error_abort);
+>>>>
+>>>> The test is written with a FIXME here, then updated in the next patch to
+>>>> remove the fixme and adjust the condition to what we really want, so
+>>>> that 'make check-unit' is not broken in the meantime.
+>>>
+>>> OK.
+>>>
+>>> Why don't you reverse the patch order to have a commit to apply the fix
+>>> and a commit to apply the test (fully)?
+>>>
+>>> Like this, it easy to not apply the fix and only the test to check the
+>>> test really detects the problem and the fix really fix it (it's what
+>>> I've tried to do)... and the "make check" is never broken.
+>>
+>> Applying just the one-liner fix to qapi/opts-visitor.c in isolation
+>> already causes a 'make check' failure; a careful read of 2/2 shows that
+>> I was adjusting the expected output of two separate tests, added over
+>> two separate commits, but both with a BUG/FIXME tag.  I'm not opposed to
+>> reworking the series to apply the testsuite coverage after the bug fix,
+>> if that is deemed necessary, but would like an opinion from Markus which
+>> way he would prefer (as this is the code he maintains) before causing
+>> myself artificial churn.
+> 
+> I really, really like to start with the problem statement (test case),
+> not the solution.  I also like see the solution's effect in the update
+> to the test case.
+> 
+> Since "make check" must not fail, and our (rickety) testing framework
+> doesn't let us express "this is expected to fail", the problem statement
+> can't be a failing test case, but has to be a test case expecting the
+> broken behavior.
+> 
+> If that's not good enough to convince you that it detects the problem, I
+> recommend to git-checkout tests/ after the fix into the tree before the
+> fix.
+> 
 
-> These errors are caused by two issues in the function "CommitSnapshots" in
-> provider.cpp:
-> =
+OK. I'm convinced :)
 
-> 1. When VSS_TIMEOUT_MSEC expires the funtion returns E_ABORT. This causes
-> the error #12293.
-> =
-
-> 2. The VSS_TIMEOUT_MSEC value is too big. According to msdn the
-> "Flush & Hold" operation has 10 seconds timeout not configurable, The
-> "CommitSnapshots" is a part of the "Flush & Hold" process and thus any
-> timeout bigger than 10 seconds would cause the error #12298 and anything
-> bigger than 40 seconds causes the error #12340. All this info can be foun=
-d here:
-> https://msdn.microsoft.com/en-us/library/windows/desktop/aa384589(v=3Dvs.=
-85).aspx
-
-Not sure how best to deal with this. Technically our CommitSnapshots
-interface is driven by the backup job being run by QGA/QEMU management
-side. If that amount of time exceeds the VSS limits then I think it's
-appropriate for VSS to log the error accordingly. VSS_TIMEOUT_MSEC here
-doesn't actually have too much correlation with the VSS-set timeout,
-IIRC it's specifically picked to exceed both the 10 and 40 second
-timeouts and acts more as a fail-safe timeout.
-
-Are the event logs causing issues? FWIW, on the posix side we also opt
-for gratuitous logging to syslog and such, the idea there being that
-cooperative guests would prefer transparency on how the agent is being
-used.
-
-That said, I do think error 12293 is unecessary, since IIUC it would
-always be paired with the actual VSS-reported error. So avoiding the
-E_ABORT seems reasonable either way.
-
-> =
-
-> |event id|                           error                               |
-> * 12293  : Volume Shadow Copy Service error: Error calling a routine on a
->            Shadow Copy Provider {00000000-0000-0000-0000-000000000000}.
->        Routine details CommitSnapshots [hr =3D 0x80004004, Operation
->        aborted.
-> =
-
-> * 12340  : Volume Shadow Copy Error: VSS waited more than 40 seconds for
->            all volumes to be flushed.  This caused volume
->        \\?\Volume{62a171da-32ec-11e4-80b1-806e6f6e6963}\ to timeout
->        while waiting for the release-writes phase of shadow copy
->        creation. Trying again when disk activity is lower may solve
->        this problem.
-> =
-
-> * 12298  : Volume Shadow Copy Service error: The I/O writes cannot be held
->            during the shadow copy creation period on volume
->            \\?\Volume{62a171d9-32ec-11e4-80b1-806e6f6e6963}\. The volume
->        index in the shadow copy set is 0. Error details:
->        Open[0x00000000, The operation completed successfully. ],
->        Flush[0x00000000, The operation completed successfully.],
->        Release[0x00000000, The operation completed successfully.],
->        OnRun[0x80042314, The shadow copy provider timed out while
->        holding writes to the volume being shadow copied. This is
->        probably due to excessive activity on the volume by an
->        application or a system service. Try again later when activity
->        on the volume is reduced.
-> =
-
-> Signed-off-by: Sameeh Jubran <sameeh@daynix.com>
-> ---
->  qga/vss-win32/provider.cpp | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> =
-
-> diff --git a/qga/vss-win32/provider.cpp b/qga/vss-win32/provider.cpp
-> index ef94669..d72f4d4 100644
-> --- a/qga/vss-win32/provider.cpp
-> +++ b/qga/vss-win32/provider.cpp
-> @@ -15,7 +15,7 @@
->  #include <inc/win2003/vscoordint.h>
->  #include <inc/win2003/vsprov.h>
-> =
-
-> -#define VSS_TIMEOUT_MSEC (60*1000)
-> +#define VSS_TIMEOUT_MSEC (9 * 1000)
-> =
-
->  static long g_nComObjsInUse;
->  HINSTANCE g_hinstDll;
-> @@ -377,7 +377,6 @@ STDMETHODIMP CQGAVssProvider::CommitSnapshots(VSS_ID =
-SnapshotSetId)
->      if (WaitForSingleObject(hEventThaw, VSS_TIMEOUT_MSEC) !=3D WAIT_OBJE=
-CT_0) {
->          /* Send event to qemu-ga to notify the provider is timed out */
->          SetEvent(hEventTimeout);
-> -        hr =3D E_ABORT;
->      }
-> =
-
->      CloseHandle(hEventThaw);
-> -- =
-
-> 2.9.3
->=20
+Thanks,
+Laurent
