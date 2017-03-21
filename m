@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39355)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cqAIC-0001OR-5m
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:17:05 -0400
+	(envelope-from <eblake@redhat.com>) id 1cqAIH-0001Sy-SB
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:17:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cqAIB-0000KX-DK
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:17:04 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Tue, 21 Mar 2017 11:16:20 +0800
-Message-Id: <20170321031635.22123-2-famz@redhat.com>
-In-Reply-To: <20170321031635.22123-1-famz@redhat.com>
-References: <20170321031635.22123-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC 01/16] block: Define
- BLK_PERM_AIO_CONTEXT_CHANGE
+	(envelope-from <eblake@redhat.com>) id 1cqAIG-0000Nu-0Z
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:17:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55770)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cqAIF-0000MK-RW
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:17:07 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F0DB27E9F0
+	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 03:17:07 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+Date: Mon, 20 Mar 2017 22:17:03 -0500
+Message-Id: <20170321031705.22291-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.9 0/2] Fix QemuOpts regression on bogus
+ keys
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,44 +29,23 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: armbru@redhat.com, lvivier@redhat.com
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- block.c               | 2 ++
- include/block/block.h | 7 ++++++-
- 2 files changed, 8 insertions(+), 1 deletion(-)
+Reported to me off-list by Laurent Vivier, who found the
+problem while working on https://bugzilla.redhat.com/1433193
+Broken since 2.7, but the fix is a one-liner (pointing out my
+embarrassing mistake of mis-converting a pre-decrement operator);
+as a bug fix, it still qualifies for 2.9 in spite of hard freeze,
+on the other hand, as the regression was not introduced in 2.9,
+I also understand if it is postponed.
 
-diff --git a/block.c b/block.c
-index 6e906ec..ae9327b 100644
---- a/block.c
-+++ b/block.c
-@@ -1547,6 +1547,8 @@ static char *bdrv_perm_names(uint64_t perm)
-         { BLK_PERM_WRITE_UNCHANGED, "write unchanged" },
-         { BLK_PERM_RESIZE,          "resize" },
-         { BLK_PERM_GRAPH_MOD,       "change children" },
-+        { BLK_PERM_AIO_CONTEXT_CHANGE,
-+                                    "aio context change" },
-         { 0, NULL }
-     };
- 
-diff --git a/include/block/block.h b/include/block/block.h
-index 5149260..989bdcc 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -221,7 +221,12 @@ enum {
-      */
-     BLK_PERM_GRAPH_MOD          = 0x10,
- 
--    BLK_PERM_ALL                = 0x1f,
-+    /**
-+     * This permission is required to change the AioContext of this node.
-+     */
-+    BLK_PERM_AIO_CONTEXT_CHANGE = 0x20,
-+
-+    BLK_PERM_ALL                = 0x3f,
- };
- 
- /* disk I/O throttling */
+Eric Blake (2):
+  tests: Expose regression in QemuOpts visitor
+  qapi: Fix QemuOpts visitor regression on unvisited input
+
+ qapi/opts-visitor.c       |  6 +++---
+ tests/test-opts-visitor.c | 29 ++++++++++++++++++++++++++---
+ 2 files changed, 29 insertions(+), 6 deletions(-)
+
 -- 
 2.9.3
