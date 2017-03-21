@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59817)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.guang55@zte.com.cn>) id 1cqEt3-0007Rx-L6
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:11:28 -0400
+	(envelope-from <lvivier@redhat.com>) id 1cqF1N-0000bw-El
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:20:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wang.guang55@zte.com.cn>) id 1cqEt0-000070-9l
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:11:25 -0400
-Received: from mx7.zte.com.cn ([202.103.147.169]:58996)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.guang55@zte.com.cn>) id 1cqEsy-0008UC-UA
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:11:22 -0400
-Date: Tue, 21 Mar 2017 16:10:47 +0800 (CST)
-Message-ID: <201703211610470826648@zte.com.cn>
-References: 201703211527487634282@zte.com.cn,
-	41554edc-09a8-1c12-84d3-1aa2b090a4d2@cn.fujitsu.com
-Mime-Version: 1.0
-From: <wang.guang55@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiBSZTogICDnrZTlpI06IFJlOiAgW0JV?=
- =?utf-8?q?G=5DCOLO_failover_hang?=
+	(envelope-from <lvivier@redhat.com>) id 1cqF1K-000745-9r
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:20:01 -0400
+References: <20170321031705.22291-1-eblake@redhat.com>
+	<20170321031705.22291-3-eblake@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <2d8ee0ac-2a02-18fa-c3b3-6339cdfa2e41@redhat.com>
+Date: Tue, 21 Mar 2017 09:19:52 +0100
+MIME-Version: 1.0
+In-Reply-To: <20170321031705.22291-3-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] qapi: Fix QemuOpts visitor regression
+ on unvisited input
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,157 +24,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhangchen.fnst@cn.fujitsu.com
-Cc: zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com, qemu-stable@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-VGhhbmsgeW9144CCDQoNCkkgaGF2ZSB0ZXN0IGFyZWFkeeOAgg0KDQpXaGVuIHRoZSBQcmltYXJ5
-IE5vZGUgcGFuaWMsdGhlIFNlY29uZGFyeSBOb2RlIHFlbXUgaGFuZyBhdCB0aGUgc2FtZSBwbGFj
-ZeOAgg0KDQpJbmNvcnJkaW5nIGh0dHA6Ly93aWtpLnFlbXUtcHJvamVjdC5vcmcvRmVhdHVyZXMv
-Q09MTyDvvIxraWxsIFByaW1hcnkgTm9kZSBxZW11IHdpbGwgbm90IHByb2R1Y2UgdGhlIHByb2Js
-ZW0sYnV0IFByaW1hcnkgTm9kZSBwYW5pYyBjYW7jgIINCg0KSSB0aGluayBkdWUgdG8gdGhlIGZl
-YXR1cmUgb2YgY2hhbm5lbCBkb2VzIG5vdCBzdXBwb3J0IFFJT19DSEFOTkVMX0ZFQVRVUkVfU0hV
-VERPV04uDQoNCg0Kd2hlbiBmYWlsb3ZlcixjaGFubmVsX3NodXRkb3duIGNvdWxkIG5vdCBzaHV0
-IGRvd24gdGhlIGNoYW5uZWwuDQoNCg0Kc28gdGhlIGNvbG9fcHJvY2Vzc19pbmNvbWluZ190aHJl
-YWQgd2lsbCBoYW5nIGF0IHJlY3Ztc2cuDQoNCg0KSSB0ZXN0IGEgcGF0Y2g6DQoNCg0KZGlmZiAt
-LWdpdCBhL21pZ3JhdGlvbi9zb2NrZXQuYyBiL21pZ3JhdGlvbi9zb2NrZXQuYw0KDQoNCmluZGV4
-IDEzOTY2ZjEuLmQ2NWEwZWEgMTAwNjQ0DQoNCg0KLS0tIGEvbWlncmF0aW9uL3NvY2tldC5jDQoN
-Cg0KKysrIGIvbWlncmF0aW9uL3NvY2tldC5jDQoNCg0KQEAgLTE0Nyw4ICsxNDcsOSBAQCBzdGF0
-aWMgZ2Jvb2xlYW4gc29ja2V0X2FjY2VwdF9pbmNvbWluZ19taWdyYXRpb24oUUlPQ2hhbm5lbCAq
-aW9jLA0KDQoNCiAgICAgfQ0KDQoNCiANCg0KDQogICAgIHRyYWNlX21pZ3JhdGlvbl9zb2NrZXRf
-aW5jb21pbmdfYWNjZXB0ZWQoKQ0KDQoNCiAgICANCg0KDQogICAgIHFpb19jaGFubmVsX3NldF9u
-YW1lKFFJT19DSEFOTkVMKHNpb2MpLCAibWlncmF0aW9uLXNvY2tldC1pbmNvbWluZyIpDQoNCg0K
-KyAgICBxaW9fY2hhbm5lbF9zZXRfZmVhdHVyZShRSU9fQ0hBTk5FTChzaW9jKSwgUUlPX0NIQU5O
-RUxfRkVBVFVSRV9TSFVURE9XTikNCg0KDQogICAgIG1pZ3JhdGlvbl9jaGFubmVsX3Byb2Nlc3Nf
-aW5jb21pbmcobWlncmF0ZV9nZXRfY3VycmVudCgpLA0KDQoNCiAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBRSU9fQ0hBTk5FTChzaW9jKSkNCg0KDQogICAgIG9iamVjdF91
-bnJlZihPQkpFQ1Qoc2lvYykpDQoNCg0KDQoNCk15IHRlc3Qgd2lsbCBub3QgaGFuZyBhbnkgbW9y
-ZS4NCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQrljp/lp4vpgq7ku7YNCg0KDQoN
-CuWPkeS7tuS6uu+8miDvvJx6aGFuZ2NoZW4uZm5zdEBjbi5mdWppdHN1LmNvbe+8ng0K5pS25Lu2
-5Lq677ya546L5bm/MTAxNjU5OTIg77ycemhhbmcuemhhbmdoYWlsaWFuZ0BodWF3ZWkuY29t77ye
-DQrmioTpgIHkurrvvJog77yccWVtdS1kZXZlbEBub25nbnUub3Jn77yeIO+8nHpoYW5nY2hlbi5m
-bnN0QGNuLmZ1aml0c3UuY29t77yeDQrml6Ug5pyfIO+8mjIwMTflubQwM+aciDIx5pelIDE1OjU4
-DQrkuLsg6aKYIO+8mlJlOiBbUWVtdS1kZXZlbF0gIOetlOWkjTogUmU6ICBbQlVHXUNPTE8gZmFp
-bG92ZXIgaGFuZw0KDQoNCg0KDQoNCkhpLFdhbmcuDQoNCllvdSBjYW4gdGVzdCB0aGlzIGJyYW5j
-aDoNCg0KaHR0cHM6Ly9naXRodWIuY29tL2NvbG9mdC9xZW11L3RyZWUvY29sby12NS4xLWRldmVs
-b3BpbmctQ09MTy1mcmFtZS12MjEtd2l0aC1zaGFyZWQtZGlzaw0KDQphbmQgcGxlYXNlIGZvbGxv
-dyB3aWtpIGVuc3VyZSB5b3VyIG93biBjb25maWd1cmF0aW9uIGNvcnJlY3RseS4NCg0KaHR0cDov
-L3dpa2kucWVtdS1wcm9qZWN0Lm9yZy9GZWF0dXJlcy9DT0xPDQoNCg0KVGhhbmtzDQoNClpoYW5n
-IENoZW4NCg0KDQpPbiAwMy8yMS8yMDE3IDAzOjI3IFBNLCB3YW5nLmd1YW5nNTVAenRlLmNvbS5j
-biB3cm90ZToNCu+8ng0K77yeIGhpLg0K77yeDQrvvJ4gSSB0ZXN0IHRoZSBnaXQgcWVtdSBtYXN0
-ZXIgaGF2ZSB0aGUgc2FtZSBwcm9ibGVtLg0K77yeDQrvvJ4gKGdkYikgYnQNCu+8ng0K77yeICMw
-ICBxaW9fY2hhbm5lbF9zb2NrZXRfcmVhZHYgKGlvYz0weDdmNjU5MTFiNGU1MCwgaW92PTB4N2Y2
-NGVmM2ZkODgwLCANCu+8niBuaW92PTEsIGZkcz0weDAsIG5mZHM9MHgwLCBlcnJwPTB4MCkgYXQg
-aW8vY2hhbm5lbC1zb2NrZXQuYzo0NjENCu+8ng0K77yeICMxICAweDAwMDA3ZjY1OGU0YWEwYzIg
-aW4gcWlvX2NoYW5uZWxfcmVhZCANCu+8niAoaW9jPWlvY0BlbnRyeT0weDdmNjU5MTFiNGU1MCwg
-YnVmPWJ1ZkBlbnRyeT0weDdmNjU5MDdjYjgzOCAiIiwgDQrvvJ4gYnVmbGVuPWJ1ZmxlbkBlbnRy
-eT0zMjc2OCwgZXJycD1lcnJwQGVudHJ5PTB4MCkgYXQgaW8vY2hhbm5lbC5jOjExNA0K77yeDQrv
-vJ4gIzIgIDB4MDAwMDdmNjU4ZTNlYTk5MCBpbiBjaGFubmVsX2dldF9idWZmZXIgKG9wYXF1ZT3v
-vJxvcHRpbWl6ZWQgb3V077yeLCANCu+8niBidWY9MHg3ZjY1OTA3Y2I4MzggIiIsIHBvcz3vvJxv
-cHRpbWl6ZWQgb3V077yeLCBzaXplPTMyNzY4KSBhdCANCu+8niBtaWdyYXRpb24vcWVtdS1maWxl
-LWNoYW5uZWwuYzo3OA0K77yeDQrvvJ4gIzMgIDB4MDAwMDdmNjU4ZTNlOTdmYyBpbiBxZW11X2Zp
-bGxfYnVmZmVyIChmPTB4N2Y2NTkwN2NiODAwKSBhdCANCu+8niBtaWdyYXRpb24vcWVtdS1maWxl
-LmM6Mjk1DQrvvJ4NCu+8niAjNCAgMHgwMDAwN2Y2NThlM2VhMmUxIGluIHFlbXVfcGVla19ieXRl
-IChmPWZAZW50cnk9MHg3ZjY1OTA3Y2I4MDAsIA0K77yeIG9mZnNldD1vZmZzZXRAZW50cnk9MCkg
-YXQgbWlncmF0aW9uL3FlbXUtZmlsZS5jOjU1NQ0K77yeDQrvvJ4gIzUgIDB4MDAwMDdmNjU4ZTNl
-YTM0YiBpbiBxZW11X2dldF9ieXRlIChmPWZAZW50cnk9MHg3ZjY1OTA3Y2I4MDApIGF0IA0K77ye
-IG1pZ3JhdGlvbi9xZW11LWZpbGUuYzo1NjgNCu+8ng0K77yeICM2ICAweDAwMDA3ZjY1OGUzZWE1
-NTIgaW4gcWVtdV9nZXRfYmUzMiAoZj1mQGVudHJ5PTB4N2Y2NTkwN2NiODAwKSBhdCANCu+8niBt
-aWdyYXRpb24vcWVtdS1maWxlLmM6NjQ4DQrvvJ4NCu+8niAjNyAgMHgwMDAwN2Y2NThlM2U2NmU1
-IGluIGNvbG9fcmVjZWl2ZV9tZXNzYWdlIChmPTB4N2Y2NTkwN2NiODAwLCANCu+8niBlcnJwPWVy
-cnBAZW50cnk9MHg3ZjY0ZWYzZmQ5YjApIGF0IG1pZ3JhdGlvbi9jb2xvLmM6MjQ0DQrvvJ4NCu+8
-niAjOCAgMHgwMDAwN2Y2NThlM2U2ODFlIGluIGNvbG9fcmVjZWl2ZV9jaGVja19tZXNzYWdlIChm
-Pe+8nG9wdGltaXplZCANCu+8niBvdXTvvJ4sIGV4cGVjdF9tc2c9ZXhwZWN0X21zZ0BlbnRyeT1D
-T0xPX01FU1NBR0VfVk1TVEFURV9TRU5ELCANCu+8niBlcnJwPWVycnBAZW50cnk9MHg3ZjY0ZWYz
-ZmRhMDgpDQrvvJ4NCu+8niAgICAgYXQgbWlncmF0aW9uL2NvbG8uYzoyNjQNCu+8ng0K77yeICM5
-ICAweDAwMDA3ZjY1OGUzZTc0MGUgaW4gY29sb19wcm9jZXNzX2luY29taW5nX3RocmVhZCANCu+8
-niAob3BhcXVlPTB4N2Y2NThlYjMwMzYwIO+8nG1pc19jdXJyZW50LjMxMjg277yeKSBhdCBtaWdy
-YXRpb24vY29sby5jOjU3Nw0K77yeDQrvvJ4gIzEwIDB4MDAwMDdmNjU4YmUwOWRmMyBpbiBzdGFy
-dF90aHJlYWQgKCkgZnJvbSAvbGliNjQvbGlicHRocmVhZC5zby4wDQrvvJ4NCu+8niAjMTEgMHgw
-MDAwN2Y2NTg4MTk4M2VkIGluIGNsb25lICgpIGZyb20gL2xpYjY0L2xpYmMuc28uNg0K77yeDQrv
-vJ4gKGdkYikgcCBpb2Mt77yebmFtZQ0K77yeDQrvvJ4gJDIgPSAweDdmNjU4ZmY3ZDVjMCAibWln
-cmF0aW9uLXNvY2tldC1pbmNvbWluZyINCu+8ng0K77yeIChnZGIpIHAgaW9jLe+8nmZlYXR1cmVz
-ICAgICAgICBEbyBub3Qgc3VwcG9ydCBRSU9fQ0hBTk5FTF9GRUFUVVJFX1NIVVRET1dODQrvvJ4N
-Cu+8niAkMyA9IDANCu+8ng0K77yeDQrvvJ4gKGdkYikgYnQNCu+8ng0K77yeICMwICBzb2NrZXRf
-YWNjZXB0X2luY29taW5nX21pZ3JhdGlvbiAoaW9jPTB4N2ZkY2NlZWFmYTkwLCANCu+8niBjb25k
-aXRpb249R19JT19JTiwgb3BhcXVlPTB4N2ZkY2NlZWFmYTkwKSBhdCBtaWdyYXRpb24vc29ja2V0
-LmM6MTM3DQrvvJ4NCu+8niAjMSAgMHgwMDAwN2ZkY2M2OTY2MzUwIGluIGdfbWFpbl9kaXNwYXRj
-aCAoY29udGV4dD3vvJxvcHRpbWl6ZWQgb3V077yeKSBhdCANCu+8niBnbWFpbi5jOjMwNTQNCu+8
-ng0K77yeICMyICBnX21haW5fY29udGV4dF9kaXNwYXRjaCAoY29udGV4dD3vvJxvcHRpbWl6ZWQg
-b3V077yeLCANCu+8niBjb250ZXh0QGVudHJ5PTB4N2ZkY2NjZTlmNTkwKSBhdCBnbWFpbi5jOjM2
-MzANCu+8ng0K77yeICMzICAweDAwMDA3ZmRjY2I4YTZkY2MgaW4gZ2xpYl9wb2xsZmRzX3BvbGwg
-KCkgYXQgdXRpbC9tYWluLWxvb3AuYzoyMTMNCu+8ng0K77yeICM0ICBvc19ob3N0X21haW5fbG9v
-cF93YWl0ICh0aW1lb3V0Pe+8nG9wdGltaXplZCBvdXTvvJ4pIGF0IA0K77yeIHV0aWwvbWFpbi1s
-b29wLmM6MjU4DQrvvJ4NCu+8niAjNSAgbWFpbl9sb29wX3dhaXQgKG5vbmJsb2NraW5nPW5vbmJs
-b2NraW5nQGVudHJ5PTApIGF0IA0K77yeIHV0aWwvbWFpbi1sb29wLmM6NTA2DQrvvJ4NCu+8niAj
-NiAgMHgwMDAwN2ZkY2NiNTI2MTg3IGluIG1haW5fbG9vcCAoKSBhdCB2bC5jOjE4OTgNCu+8ng0K
-77yeICM3ICBtYWluIChhcmdjPe+8nG9wdGltaXplZCBvdXTvvJ4sIGFyZ3Y977ycb3B0aW1pemVk
-IG91dO+8niwgZW52cD3vvJxvcHRpbWl6ZWQgDQrvvJ4gb3V077yeKSBhdCB2bC5jOjQ3MDkNCu+8
-ng0K77yeIChnZGIpIHAgaW9jLe+8nmZlYXR1cmVzDQrvvJ4NCu+8niAkMSA9IDYNCu+8ng0K77ye
-IChnZGIpIHAgaW9jLe+8nm5hbWUNCu+8ng0K77yeICQyID0gMHg3ZmRjY2UxYjFhYjAgIm1pZ3Jh
-dGlvbi1zb2NrZXQtbGlzdGVuZXIiDQrvvJ4NCu+8ng0K77yeIE1heSBiZSBzb2NrZXRfYWNjZXB0
-X2luY29taW5nX21pZ3JhdGlvbiBzaG91bGQgDQrvvJ4gY2FsbCBxaW9fY2hhbm5lbF9zZXRfZmVh
-dHVyZShpb2MsIFFJT19DSEFOTkVMX0ZFQVRVUkVfU0hVVERPV04pPz8NCu+8ng0K77yeDQrvvJ4g
-dGhhbmsgeW91Lg0K77yeDQrvvJ4NCu+8ng0K77yeDQrvvJ4NCu+8niDljp/lp4vpgq7ku7YNCu+8
-niAq5Y+R5Lu25Lq677yaKu+8nHpoYW5nY2hlbi5mbnN0QGNuLmZ1aml0c3UuY29t77yeDQrvvJ4g
-KuaUtuS7tuS6uu+8mirnjovlub8xMDE2NTk5Mu+8nHFlbXUtZGV2ZWxAbm9uZ251Lm9yZ++8ng0K
-77yeICrmioTpgIHkurrvvJoq77ycemhhbmdjaGVuLmZuc3RAY24uZnVqaXRzdS5jb23vvJ7vvJx6
-aGFuZy56aGFuZ2hhaWxpYW5nQGh1YXdlaS5jb23vvJ4NCu+8niAq5pelIOacnyDvvJoqMjAxN+W5
-tDAz5pyIMTbml6UgMTQ6NDYNCu+8niAq5Li7IOmimCDvvJoqKlJlOiBbUWVtdS1kZXZlbF0gQ09M
-TyBmYWlsb3ZlciBoYW5nKg0K77yeDQrvvJ4NCu+8ng0K77yeDQrvvJ4gT24gMDMvMTUvMjAxNyAw
-NTowNiBQTSwgd2FuZ2d1YW5nIHdyb3RlOg0K77yeIO+8niAgIGFtIHRlc3RpbmcgUUVNVSBDT0xP
-IGZlYXR1cmUgZGVzY3JpYmVkIGhlcmUgW1FFTVUNCu+8niDvvJ4gV2lraV0oaHR0cDovL3dpa2ku
-cWVtdS1wcm9qZWN0Lm9yZy9GZWF0dXJlcy9DT0xPKS4NCu+8niDvvJ4NCu+8niDvvJ4gV2hlbiB0
-aGUgUHJpbWFyeSBOb2RlIHBhbmljLHRoZSBTZWNvbmRhcnkgTm9kZSBxZW11IGhhbmcuDQrvvJ4g
-77yeIGhhbmcgYXQgcmVjdm1zZyBpbiBxaW9fY2hhbm5lbF9zb2NrZXRfcmVhZHYuDQrvvJ4g77ye
-IEFuZCAgSSBydW4gIHsgJ2V4ZWN1dGUnOiAnbmJkLXNlcnZlci1zdG9wJyB9IGFuZCB7ICJleGVj
-dXRlIjoNCu+8niDvvJ4gIngtY29sby1sb3N0LWhlYXJ0YmVhdCIgfSBpbiBTZWNvbmRhcnkgVk0n
-cw0K77yeIO+8niBtb25pdG9yLHRoZSAgU2Vjb25kYXJ5IE5vZGUgcWVtdSBzdGlsbCBoYW5nIGF0
-IHJlY3Ztc2cgLg0K77yeIO+8ng0K77yeIO+8niBJIGZvdW5kIHRoYXQgdGhlIGNvbG8gaW4gcWVt
-dSBpcyBub3QgY29tcGxldGUgeWV0Lg0K77yeIO+8niBEbyB0aGUgY29sbyBoYXZlIGFueSBwbGFu
-IGZvciBkZXZlbG9wbWVudD8NCu+8ng0K77yeIFllcywgV2UgYXJlIGRldmVsb3BpbmcuIFlvdSBj
-YW4gc2VlIHNvbWUgb2YgcGF0Y2ggd2UgcHVzaGluZy4NCu+8ng0K77yeIO+8niBIYXMgYW55b25l
-IGV2ZXIgcnVuIGl0IHN1Y2Nlc3NmdWxseT8gQW55IGhlbHAgaXMgYXBwcmVjaWF0ZWQhDQrvvJ4N
-Cu+8niBJbiBvdXIgaW50ZXJuYWwgdmVyc2lvbiBjYW4gcnVuIGl0IHN1Y2Nlc3NmdWxseSwNCu+8
-niBUaGUgZmFpbG92ZXIgZGV0YWlsIHlvdSBjYW4gYXNrIFpoYW5naGFpbGlhbmcgZm9yIGhlbHAu
-DQrvvJ4gTmV4dCB0aW1lIGlmIHlvdSBoYXZlIHNvbWUgcXVlc3Rpb24gYWJvdXQgQ09MTywNCu+8
-niBwbGVhc2UgY2MgbWUgYW5kIHpoYW5naGFpbGlhbmcg77ycemhhbmcuemhhbmdoYWlsaWFuZ0Bo
-dWF3ZWkuY29t77yeLg0K77yeDQrvvJ4NCu+8niBUaGFua3MNCu+8niBaaGFuZyBDaGVuDQrvvJ4N
-Cu+8ng0K77yeIO+8ng0K77yeIO+8ng0K77yeIO+8ng0K77yeIO+8niBjZW50b3M3LjIrcWVtdTIu
-Ny41MA0K77yeIO+8niAoZ2RiKSBidA0K77yeIO+8niAjMCAgMHgwMDAwN2YzZTAwY2M4NmFkIGlu
-IHJlY3Ztc2cgKCkgZnJvbSAvbGliNjQvbGlicHRocmVhZC5zby4wDQrvvJ4g77yeICMxICAweDAw
-MDA3ZjNlMDMzMmI3MzggaW4gcWlvX2NoYW5uZWxfc29ja2V0X3JlYWR2IChpb2M977ycb3B0aW1p
-emVkIG91dO+8niwNCu+8niDvvJ4gaW92Pe+8nG9wdGltaXplZCBvdXTvvJ4sIG5pb3Y977ycb3B0
-aW1pemVkIG91dO+8niwgZmRzPTB4MCwgbmZkcz0weDAsIGVycnA9MHgwKSBhdA0K77yeIO+8niBp
-by9jaGFubmVsLXNvY2tldC5jOjQ5Nw0K77yeIO+8niAjMiAgMHgwMDAwN2YzZTAzMzI5NDcyIGlu
-IHFpb19jaGFubmVsX3JlYWQgKGlvYz1pb2NAZW50cnk9MHg3ZjNlMDUxMTBlNDAsDQrvvJ4g77ye
-IGJ1Zj1idWZAZW50cnk9MHg3ZjNlMDU5MTBmMzggIiIsIGJ1Zmxlbj1idWZsZW5AZW50cnk9MzI3
-NjgsDQrvvJ4g77yeIGVycnA9ZXJycEBlbnRyeT0weDApIGF0IGlvL2NoYW5uZWwuYzo5Nw0K77ye
-IO+8niAjMyAgMHgwMDAwN2YzZTAzMjc1MGUwIGluIGNoYW5uZWxfZ2V0X2J1ZmZlciAob3BhcXVl
-Pe+8nG9wdGltaXplZCBvdXTvvJ4sDQrvvJ4g77yeIGJ1Zj0weDdmM2UwNTkxMGYzOCAiIiwgcG9z
-Pe+8nG9wdGltaXplZCBvdXTvvJ4sIHNpemU9MzI3NjgpIGF0DQrvvJ4g77yeIG1pZ3JhdGlvbi9x
-ZW11LWZpbGUtY2hhbm5lbC5jOjc4DQrvvJ4g77yeICM0ICAweDAwMDA3ZjNlMDMyNzQxMmMgaW4g
-cWVtdV9maWxsX2J1ZmZlciAoZj0weDdmM2UwNTkxMGYwMCkgYXQNCu+8niDvvJ4gbWlncmF0aW9u
-L3FlbXUtZmlsZS5jOjI1Nw0K77yeIO+8niAjNSAgMHgwMDAwN2YzZTAzMjc0YTQxIGluIHFlbXVf
-cGVla19ieXRlIChmPWZAZW50cnk9MHg3ZjNlMDU5MTBmMDAsDQrvvJ4g77yeIG9mZnNldD1vZmZz
-ZXRAZW50cnk9MCkgYXQgbWlncmF0aW9uL3FlbXUtZmlsZS5jOjUxMA0K77yeIO+8niAjNiAgMHgw
-MDAwN2YzZTAzMjc0YWFiIGluIHFlbXVfZ2V0X2J5dGUgKGY9ZkBlbnRyeT0weDdmM2UwNTkxMGYw
-MCkgYXQNCu+8niDvvJ4gbWlncmF0aW9uL3FlbXUtZmlsZS5jOjUyMw0K77yeIO+8niAjNyAgMHgw
-MDAwN2YzZTAzMjc0Y2IyIGluIHFlbXVfZ2V0X2JlMzIgKGY9ZkBlbnRyeT0weDdmM2UwNTkxMGYw
-MCkgYXQNCu+8niDvvJ4gbWlncmF0aW9uL3FlbXUtZmlsZS5jOjYwMw0K77yeIO+8niAjOCAgMHgw
-MDAwN2YzZTAzMjcxNzM1IGluIGNvbG9fcmVjZWl2ZV9tZXNzYWdlIChmPTB4N2YzZTA1OTEwZjAw
-LA0K77yeIO+8niBlcnJwPWVycnBAZW50cnk9MHg3ZjNkNjJiZmFhNTApIGF0IG1pZ3JhdGlvbi9j
-b2xvLmM6MjE1DQrvvJ4g77yeICM5ICAweDAwMDA3ZjNlMDMyNzI1MGQgaW4gY29sb193YWl0X2hh
-bmRsZV9tZXNzYWdlIChlcnJwPTB4N2YzZDYyYmZhYTQ4LA0K77yeIO+8niBjaGVja3BvaW50X3Jl
-cXVlc3Q977ycc3ludGhldGljIHBvaW50ZXLvvJ4sIGY977ycb3B0aW1pemVkIG91dO+8nikgYXQN
-Cu+8niDvvJ4gbWlncmF0aW9uL2NvbG8uYzo1NDYNCu+8niDvvJ4gIzEwIGNvbG9fcHJvY2Vzc19p
-bmNvbWluZ190aHJlYWQgKG9wYXF1ZT0weDdmM2UwNjcyNDVlMCkgYXQNCu+8niDvvJ4gbWlncmF0
-aW9uL2NvbG8uYzo2NDkNCu+8niDvvJ4gIzExIDB4MDAwMDdmM2UwMGNjMWRmMyBpbiBzdGFydF90
-aHJlYWQgKCkgZnJvbSAvbGliNjQvbGlicHRocmVhZC5zby4wDQrvvJ4g77yeICMxMiAweDAwMDA3
-ZjNkZmM5YzAzZWQgaW4gY2xvbmUgKCkgZnJvbSAvbGliNjQvbGliYy5zby42DQrvvJ4g77yeDQrv
-vJ4g77yeDQrvvJ4g77yeDQrvvJ4g77yeDQrvvJ4g77yeDQrvvJ4g77yeIC0tDQrvvJ4g77yeIFZp
-ZXcgdGhpcyBtZXNzYWdlIGluIGNvbnRleHQ6IGh0dHA6Ly9xZW11LjExLm43Lm5hYmJsZS5jb20v
-Q09MTy1mYWlsb3Zlci1oYW5nLXRwNDczMjUwLmh0bWwNCu+8niDvvJ4gU2VudCBmcm9tIHRoZSBE
-ZXZlbG9wZXIgbWFpbGluZyBsaXN0IGFyY2hpdmUgYXQgTmFiYmxlLmNvbS4NCu+8niDvvJ4NCu+8
-niDvvJ4NCu+8niDvvJ4NCu+8niDvvJ4NCu+8ng0K77yeIC0tIA0K77yeIFRoYW5rcw0K77yeIFpo
-YW5nIENoZW4NCu+8ng0K77yeDQrvvJ4NCu+8ng0K77yeDQoNCi0tIA0KVGhhbmtzDQpaaGFuZyBD
-aGVu
+On 21/03/2017 04:17, Eric Blake wrote:
+> An off-by-one in commit 15c2f669e meant that we were failing to
+> check for unparsed input in all QemuOpts visitors.  Recent testsuite
+> additions show that fixing the obvious bug with bogus fields will
+> also fix the case of an incomplete list visit; update the tests to
+> match the new behavior.
+> 
+> Simple testcase:
+> 
+> ./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic -qmp stdio -numa node,size=1g
+> 
+> failed to diagnose that 'size' is not a valid argument to -numa, and
+> now once again reports:
+> 
+> qemu-system-x86_64: -numa node,size=1g: Invalid parameter 'size'
+> 
+> CC: qemu-stable@nongnu.org
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+
+Tested-by: Laurent Vivier <lvivier@redhat.com>
+
+> ---
+>  qapi/opts-visitor.c       |  6 +++---
+>  tests/test-opts-visitor.c | 15 +++++++++------
+>  2 files changed, 12 insertions(+), 9 deletions(-)
+> 
+> diff --git a/qapi/opts-visitor.c b/qapi/opts-visitor.c
+> index 026d25b..b54da81 100644
+> --- a/qapi/opts-visitor.c
+> +++ b/qapi/opts-visitor.c
+> @@ -164,7 +164,7 @@ opts_check_struct(Visitor *v, Error **errp)
+>      GHashTableIter iter;
+>      GQueue *any;
+> 
+> -    if (ov->depth > 0) {
+> +    if (ov->depth > 1) {
+>          return;
+>      }
+> 
+> @@ -276,8 +276,8 @@ static void
+>  opts_check_list(Visitor *v, Error **errp)
+>  {
+>      /*
+> -     * FIXME should set error when unvisited elements remain.  Mostly
+> -     * harmless, as the generated visits always visit all elements.
+> +     * Unvisited list elements will be reported later when checking if
+> +     * unvisited struct members remain.
+>       */
+>  }
+> 
+> diff --git a/tests/test-opts-visitor.c b/tests/test-opts-visitor.c
+> index a47c344..1766919 100644
+> --- a/tests/test-opts-visitor.c
+> +++ b/tests/test-opts-visitor.c
+> @@ -175,6 +175,7 @@ expect_u64_max(OptsVisitorFixture *f, gconstpointer test_data)
+>  static void
+>  test_opts_range_unvisited(void)
+>  {
+> +    Error *err = NULL;
+>      intList *list = NULL;
+>      intList *tail;
+>      QemuOpts *opts;
+> @@ -199,10 +200,11 @@ test_opts_range_unvisited(void)
+>      g_assert_cmpint(tail->value, ==, 1);
+>      tail = (intList *)visit_next_list(v, (GenericList *)tail, sizeof(*list));
+>      g_assert(tail);
+> -    visit_check_list(v, &error_abort); /* BUG: unvisited tail not reported */
+> +    visit_check_list(v, &error_abort); /* unvisited tail ignored until... */
+>      visit_end_list(v, (void **)&list);
+> 
+> -    visit_check_struct(v, &error_abort);
+> +    visit_check_struct(v, &err); /* ...here */
+> +    error_free_or_abort(&err);
+>      visit_end_struct(v, NULL);
+> 
+>      qapi_free_intList(list);
+> @@ -239,7 +241,7 @@ test_opts_range_beyond(void)
+>      error_free_or_abort(&err);
+>      visit_end_list(v, (void **)&list);
+> 
+> -    visit_check_struct(v, &error_abort);
+> +    visit_check_struct(v, &err);
+>      visit_end_struct(v, NULL);
+> 
+>      qapi_free_intList(list);
+> @@ -250,6 +252,7 @@ test_opts_range_beyond(void)
+>  static void
+>  test_opts_dict_unvisited(void)
+>  {
+> +    Error *err = NULL;
+>      QemuOpts *opts;
+>      Visitor *v;
+>      UserDefOptions *userdef;
+> @@ -258,11 +261,11 @@ test_opts_dict_unvisited(void)
+>                             &error_abort);
+> 
+>      v = opts_visitor_new(opts);
+> -    /* FIXME: bogus should be diagnosed */
+> -    visit_type_UserDefOptions(v, NULL, &userdef, &error_abort);
+> +    visit_type_UserDefOptions(v, NULL, &userdef, &err);
+> +    error_free_or_abort(&err);
+>      visit_free(v);
+>      qemu_opts_del(opts);
+> -    qapi_free_UserDefOptions(userdef);
+> +    g_assert(!userdef);
+>  }
+> 
+>  int
+> 
