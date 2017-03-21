@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58220)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eswierk@skyportsystems.com>) id 1cq8vZ-0005KA-3G
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 21:49:38 -0400
+	(envelope-from <eblake@redhat.com>) id 1cq8zR-000638-BX
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 21:53:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eswierk@skyportsystems.com>) id 1cq8vY-0001vB-8D
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 21:49:37 -0400
-Received: from mail-vk0-x234.google.com ([2607:f8b0:400c:c05::234]:36863)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <eswierk@skyportsystems.com>)
-	id 1cq8vY-0001uf-31
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 21:49:36 -0400
-Received: by mail-vk0-x234.google.com with SMTP id j64so65852218vkg.3
-	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 18:49:35 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1cq8zO-0004X4-AC
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 21:53:37 -0400
+References: <1490060356096-474442.post@n7.nabble.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <0268b783-e9fb-8c16-8198-c0bb4e6ca9d3@redhat.com>
+Date: Mon, 20 Mar 2017 20:53:30 -0500
 MIME-Version: 1.0
-In-Reply-To: <a98bb8fd-c087-5cb2-92bc-76f255330e3d@redhat.com>
-References: <CAO_EM_kn4QEw=+j23F7e+LzLW2_TPwNENoopqyBb-hdKYAow9w@mail.gmail.com>
-	<f8f478b3-70a0-b67b-c4df-3f68ac66308a@redhat.com>
-	<d54e7c6e-d261-dff0-9038-8f62283c91a4@redhat.com>
-	<CAO_EM_=8-nnrz+BygPUnhkgrrRzYiPwE=ji7ncUXyHwZxVkAkw@mail.gmail.com>
-	<a98bb8fd-c087-5cb2-92bc-76f255330e3d@redhat.com>
-From: Ed Swierk <eswierk@skyportsystems.com>
-Date: Mon, 20 Mar 2017 18:48:54 -0700
-Message-ID: <CAO_EM_=JfwBHROTZ2c3fEka1D0D0EN1BD0rrKOcNaja+drJ=mA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] Assertion failure taking external snapshot with
- virtio drive + iothread
+In-Reply-To: <1490060356096-474442.post@n7.nabble.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="UFPeqJFR6ibu3mu7duNk91M6fXVjUjx60"
+Subject: Re: [Qemu-devel] [PATCH v5]COLO:Fix spell error in Colo doc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,65 +23,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: wangguang <wang.guang55@zte.com.cn>, qemu-devel@nongnu.org, qemu-trivial <qemu-trivial@nongnu.org>
 
-On Fri, Mar 17, 2017 at 12:27 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> And this is a fix, but I have no idea why/how it works and what else it
-> may break.
->
-> Patches 1 and 2 are pretty obvious and would be the first step towards
-> eliminating aio_disable/enable_external altogether.
->
-> However I got patch 3 more or less by trial and error, and when I
-> thought I had the reasoning right I noticed this:
->
->         bdrv_drained_end(state->old_bs);
->
-> in external_snapshot_clean which makes no sense given the
->
->         bdrv_drained_begin(bs_new);
->
-> that I added to bdrv_append.  So take this with a ton of salt.
->
-> The basic idea is that calling child->role->drained_begin and
-> child->role->drained_end is not necessary and in fact actively wrong
-> when both the old and the new child should be in a drained section.
-> But maybe instead it should be asserted that they are, except for the
-> special case of adding or removing a child.  i.e. after
->
->     int drain = !!(old_bs && old_bs->quiesce_counter) - !!(new_bs && new_bs->quiesce_counter);
->
-> add
->
->     assert(!(drain && old_bs && new_bs));
->
-> Throwing this out because it's Friday evening... Maybe Fam can pick
-> it up on Monday.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--UFPeqJFR6ibu3mu7duNk91M6fXVjUjx60
+From: Eric Blake <eblake@redhat.com>
+To: wangguang <wang.guang55@zte.com.cn>, qemu-devel@nongnu.org,
+ qemu-trivial <qemu-trivial@nongnu.org>
+Message-ID: <0268b783-e9fb-8c16-8198-c0bb4e6ca9d3@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5]COLO:Fix spell error in Colo doc
+References: <1490060356096-474442.post@n7.nabble.com>
+In-Reply-To: <1490060356096-474442.post@n7.nabble.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I just tested this patch on top of today's master. It does make the
-ctx->external_disable_cnt > 0 assertion failure on snapshot_blkdev go
-away. But it seems to cause a different assertion failure when running
-without an iothread, e.g.
+On 03/20/2017 08:39 PM, wangguang wrote:
+> Subject: [PATCH]COLO:Fix spell error in Colo doc
 
-  qemu-system-x86_64 -nographic -enable-kvm -monitor
-telnet:0.0.0.0:1234,server,nowait -m 1024 -object
-iothread,id=iothread1 -drive file=/x/drive.qcow2,if=none,id=drive0
--device virtio-blk-pci,drive=drive0
+I added qemu-trivial in v4; you should keep it in the loop.
 
-and with the guest constantly writing to the disk with something like
+Still missing a space after ':' in the subject line, and still the
+awkward duplication of the subject line in the body of the commit message=
+=2E
 
-  while true; do echo 12345 >blah; done
+>=20
+> This is an error in COLO-FT.txt.=20
+> secondeary-disk0 should be secondary-disk0.=20
+>=20
+> Signed-off-by: Guang Wang <wang.guang55@zte.com.cn>
 
-Running snapshot_blkdev in the monitor repeatedly (with a new backing
-file each time) triggers the following after a few tries:
+Since I gave R-b on v4, it's worth adding it here to save time to show
+that no code has changed since that submission.  Otherwise, it's nice to
+mention (after the --- separator) what changed from the previous version
+to cause you to send the next revision.
 
-  qemu-system-x86_64: /x/qemu/block.c:2965: bdrv_replace_node:
-Assertion `!({ typedef struct { int:(sizeof(*&from->in_flight) >
-sizeof(void *)) ? -1 : 1; } qemu_build_bug_on__4
-__attribute__((unused)); __atomic_load_n(&from->in_flight, 0); })'
-failed.
+At any rate,
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-This does not occur on today's master without this patch.
+> ---=20
+>  docs/COLO-FT.txt | 2 +-=20
+>  1 file changed, 1 insertion(+), 1 deletion(-)=20
+>=20
+> diff --git a/docs/COLO-FT.txt b/docs/COLO-FT.txt=20
+> index e289be2..bec7547 100644=20
+> --- a/docs/COLO-FT.txt=20
+> +++ b/docs/COLO-FT.txt=20
+> @@ -139,7 +139,7 @@ Secondary:=20
+>  { 'execute': 'nbd-server-start',=20
+>    'arguments': {'addr': {'type': 'inet', 'data': {'host': 'xx.xx.xx.xx=
+',
+> 'port': '8889'} } }=20
+>  }=20
+> -{'execute': 'nbd-server-add', 'arguments': {'device': 'secondeary-disk=
+0',
+> 'writable': true } }=20
+> +{'execute': 'nbd-server-add', 'arguments': {'device': 'secondary-disk0=
+',
+> 'writable': true } }=20
+>  =20
+>  Note:=20
+>    a. The qmp command nbd-server-start and nbd-server-add must be run=20
+>=20
 
---Ed
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--UFPeqJFR6ibu3mu7duNk91M6fXVjUjx60
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY0IeaAAoJEKeha0olJ0NqLEAIAKapqYMiyWqGhKoJCF7B7Eav
+SLKyFd15EoSrrFMYJoqXCd+AAj5F7gAFMeee/+bfDcVTliJSGnpn77WU1CV59y0S
+srSYpiCnC+uGN0ybP4tAuBjfc6Iq/Dmm2iAGohVgycp/0qoQ3Xvay1gLIJW1NKmm
+Id11qNBwz+YIPhWz7oIZB13yxD8JqyVxnrF2T7z5zPlp5v59yzB/1avFMtOjvvd6
+HGmXKGN8N8937ioYTQLizwRmeGIbfnlq9CVwq5m8yHltmrSuSgi63bZHjr5AVDJw
+qlbZcvlnhkGgLFNjafGRRThZOVBJydBRnNNZzAUvuOli2SAHcAR0BaWXPYexnj8=
+=S0tQ
+-----END PGP SIGNATURE-----
+
+--UFPeqJFR6ibu3mu7duNk91M6fXVjUjx60--
