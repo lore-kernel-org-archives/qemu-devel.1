@@ -1,18 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cqEa7-00020H-Ea
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 03:51:52 -0400
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cqEey-0003FO-Pf
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 03:56:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cqEa6-0004Ty-Ih
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 03:51:51 -0400
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cqEev-0007a6-Re
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 03:56:52 -0400
+Received: from [59.151.112.132] (port=26472 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cqEev-0007Y0-Ew
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 03:56:49 -0400
+References: <1488180523-18137-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+	<20170313160619.28622002@t450s.home> <58CFD01F.1060508@cn.fujitsu.com>
+	<20170320083056.3f2a5603@t450s.home>
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Message-ID: <58D0DEC8.6080507@cn.fujitsu.com>
+Date: Tue, 21 Mar 2017 16:05:28 +0800
 MIME-Version: 1.0
-In-Reply-To: <1489233245-27057-1-git-send-email-ashijeetacharya@gmail.com>
-References: <1489233245-27057-1-git-send-email-ashijeetacharya@gmail.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Tue, 21 Mar 2017 07:51:46 +0000
-Message-ID: <CAJSP0QXYdcBt1zOLEz1fdVBg6eo2Yg+uCA=u2nPQHBe01Bo9ow@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 0/2] Allocate mutiple clusters for VMDK I/O
+In-Reply-To: <20170320083056.3f2a5603@t450s.home>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] vfio pci: kernel support of error recovery
+ only for non fatal error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,45 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Cc: Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, mst@redhat.com, izumi.taku@jp.fujitsu.com
 
-On Sat, Mar 11, 2017 at 11:54 AM, Ashijeet Acharya
-<ashijeetacharya@gmail.com> wrote:
-> This series optimizes the I/O performance of VMDK driver.
->
-> Patch 1 makes the VMDK driver to allocate multiple clusters at once. Earlier
-> it used to allocate cluster by cluster which slowed down its performance to a
-> great extent.
->
-> Patch 2 changes the metadata update code to update the L2 tables for multiple
-> clusters at once.
 
-This patch series is a performance optimization.  Benchmark results
-are required to justify optimizations.  Please include performance
-results in the next revision.
 
-A popular disk I/O benchmarking is fio (https://github.com/axboe/fio).
-I suggest a write-heavy workload with a large block size:
+On 03/20/2017 10:30 PM, Alex Williamson wrote:
+> On Mon, 20 Mar 2017 20:50:39 +0800
+> Cao jin <caoj.fnst@cn.fujitsu.com> wrote:
+> 
+>> Sorry for late.
+>>
+>> On 03/14/2017 06:06 AM, Alex Williamson wrote:
+>>> On Mon, 27 Feb 2017 15:28:43 +0800
+>>> Cao jin <caoj.fnst@cn.fujitsu.com> wrote:
+>>>   
+>>>> 0. What happens now (PCIE AER only)
+>>>>    Fatal errors cause a link reset.
+>>>>    Non fatal errors don't.
+>>>>    All errors stop the VM eventually, but not immediately
+>>>>    because it's detected and reported asynchronously.
+>>>>    Interrupts are forwarded as usual.
+>>>>    Correctable errors are not reported to guest at all.
+>>>>    Note: PPC EEH is different. This focuses on AER.  
+>>>
+>>> Perhaps you're only focusing on AER, but don't the error handlers we're
+>>> using support both AER and EEH generically?  I don't think we can
+>>> completely disregard how this affects EEH behavior, if at all.
+>>>   
+>>
+>> After taking a rough look at the EEH,  find that EEH always feed
+>> error_detected with pci_channel_io_frozen, from perspective of
+>> error_detected, EEH is not affected.  
+>>
+>> I am not sure about a question: when assign devices in spapr host,
+>> should all functions/devices in a PE be bound to vfio? I am kind of
+>> confused about the relationship between a PE & a tce iommu group
+> 
+> AIUI, yes all devices within the PE are part of the same IOMMU group
+> and therefore all endpoints must be bound to vfio or pci-stub.
+> 
 
-$ cat fio.job
-[global]
-direct=1
-filename=/dev/vdb
-ioengine=libaio
-runtime=30
-ramp_time=5
+Thanks. Then I think this approach won't affect EEH. I was considering
+the same issue you mentioned for slot_reset may affect EEH, but if they
+all must be bound to vfio, seems the issue won't happen to EEH.
 
-[job1]
-iodepth=4
-rw=randwrite
-bs=256k
-$ for i in 1 2 3 4 5; do fio --output=fio-$i.txt fio.job; done #
-WARNING: overwrites /dev/vdb
-
-It's good practice to run the benchmark several times because there is
-usually some variation between runs.  This allows you to check that
-the variance is within a reasonable range (5-10% on a normal machine
-that hasn't been specially prepared for benchmarking).
-
-Stefan
+-- 
+Sincerely,
+Cao jin
