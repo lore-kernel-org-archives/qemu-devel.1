@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45599)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cq9SZ-0002BN-4e
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 22:23:47 -0400
+	(envelope-from <wang.guang55@zte.com.cn>) id 1cq9r4-0004yj-Ty
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 22:49:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cq9SU-0000MC-Ip
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 22:23:43 -0400
-Received: from [59.151.112.132] (port=22630 helo=heian.cn.fujitsu.com)
+	(envelope-from <wang.guang55@zte.com.cn>) id 1cq9r1-0006id-2P
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 22:49:02 -0400
+Received: from mbob.nabble.com ([162.253.133.15]:55277)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cq9ST-0000G3-L0
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 22:23:38 -0400
-From: Chao Fan <fanc.fnst@cn.fujitsu.com>
-Date: Tue, 21 Mar 2017 10:22:43 +0800
-Message-ID: <20170321022243.29453-1-fanc.fnst@cn.fujitsu.com>
+	(envelope-from <wang.guang55@zte.com.cn>) id 1cq9r0-0006hO-S4
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 22:48:58 -0400
+Received: from mtom.nabble.com (unknown [162.253.133.81])
+	by mbob.nabble.com (Postfix) with ESMTP id 17E633F41206
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 19:24:06 -0700 (PDT)
+Date: Mon, 20 Mar 2017 19:49:01 -0700 (MST)
+From: wangguang <wang.guang55@zte.com.cn>
+Message-ID: <1490064541056-474448.post@n7.nabble.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2] Add page-size to output in 'info migrate'
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] Subject: [PATCH]COLO: Fix spell error in Colo doc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,108 +27,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com, eblake@redhat.com, armbru@redhat.com, berrange@redhat.com
-Cc: caoj.fnst@cn.fujitsu.com, douly.fnst@cn.fujitsu.com, maozy.fnst@cn.fujitsu.com, Chao Fan <fanc.fnst@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: qemu-devel@nongnu.org
 
-The number of dirty pages outputed in 'pages' in the command
-'info migrate', so add page-size to calculate the number of dirty
-pages in bytes.
+This is an error in COLO-FT.txt. 
+secondeary-disk0 should be secondary-disk0. 
 
-Signed-off-by: Chao Fan <fanc.fnst@cn.fujitsu.com>
-Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+Signed-off-by: Guang Wang <wang.guang55@zte.com.cn>
+--- 
+ docs/COLO-FT.txt | 2 +- 
+ 1 file changed, 1 insertion(+), 1 deletion(-) 
 
----
-v2: fix the grammar in qapi-schema.json [Eric Blake]
----
- hmp.c                         | 3 +++
- include/migration/migration.h | 1 +
- migration/migration.c         | 2 ++
- migration/ram.c               | 2 ++
- qapi-schema.json              | 5 ++++-
- 5 files changed, 12 insertions(+), 1 deletion(-)
-
-diff --git a/hmp.c b/hmp.c
-index edb8970..be75e71 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -215,6 +215,9 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
-                        info->ram->normal_bytes >> 10);
-         monitor_printf(mon, "dirty sync count: %" PRIu64 "\n",
-                        info->ram->dirty_sync_count);
-+        monitor_printf(mon, "page size: %" PRIu64 " kbytes\n",
-+                       info->ram->page_size >> 10);
-+
-         if (info->ram->dirty_pages_rate) {
-             monitor_printf(mon, "dirty pages rate: %" PRIu64 " pages\n",
-                            info->ram->dirty_pages_rate);
-diff --git a/include/migration/migration.h b/include/migration/migration.h
-index 5720c88..9fffe73 100644
---- a/include/migration/migration.h
-+++ b/include/migration/migration.h
-@@ -172,6 +172,7 @@ struct MigrationState
-     int64_t xbzrle_cache_size;
-     int64_t setup_time;
-     int64_t dirty_sync_count;
-+    int64_t page_size;
-     /* Count of requests incoming from destination */
-     int64_t postcopy_requests;
- 
-diff --git a/migration/migration.c b/migration/migration.c
-index 3dab684..a1cb123 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -645,6 +645,7 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
-     info->ram->mbps = s->mbps;
-     info->ram->dirty_sync_count = s->dirty_sync_count;
-     info->ram->postcopy_requests = s->postcopy_requests;
-+    info->ram->page_size = s->page_size;
- 
-     if (s->state != MIGRATION_STATUS_COMPLETED) {
-         info->ram->remaining = ram_bytes_remaining();
-@@ -1115,6 +1116,7 @@ MigrationState *migrate_init(const MigrationParams *params)
-     s->last_req_rb = NULL;
-     error_free(s->error);
-     s->error = NULL;
-+    s->page_size = 0;
- 
-     migrate_set_state(&s->state, MIGRATION_STATUS_NONE, MIGRATION_STATUS_SETUP);
- 
-diff --git a/migration/ram.c b/migration/ram.c
-index 719425b..028cc4c 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -1998,7 +1998,9 @@ static int ram_save_init_globals(void)
- static int ram_save_setup(QEMUFile *f, void *opaque)
- {
-     RAMBlock *block;
-+    MigrationState *s = migrate_get_current();
- 
-+    s->page_size = TARGET_PAGE_SIZE;
-     /* migration has already setup the bitmap, reuse it. */
-     if (!migration_in_colo_state()) {
-         if (ram_save_init_globals() < 0) {
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 32b4a4b..5a0e425 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -575,6 +575,9 @@
- # @postcopy-requests: The number of page requests received from the destination
- #        (since 2.7)
- #
-+# @page-size: The number of bytes per page for the various page-based
-+#        statistics (since 2.10)
-+#
- # Since: 0.14.0
- ##
- { 'struct': 'MigrationStats',
-@@ -582,7 +585,7 @@
-            'duplicate': 'int', 'skipped': 'int', 'normal': 'int',
-            'normal-bytes': 'int', 'dirty-pages-rate' : 'int',
-            'mbps' : 'number', 'dirty-sync-count' : 'int',
--           'postcopy-requests' : 'int' } }
-+           'postcopy-requests' : 'int', 'page-size' : 'int' } }
- 
- ##
- # @XBZRLECacheStats:
+diff --git a/docs/COLO-FT.txt b/docs/COLO-FT.txt 
+index e289be2..bec7547 100644 
+--- a/docs/COLO-FT.txt 
++++ b/docs/COLO-FT.txt 
+@@ -139,7 +139,7 @@ Secondary: 
+ { 'execute': 'nbd-server-start', 
+   'arguments': {'addr': {'type': 'inet', 'data': {'host': 'xx.xx.xx.xx',
+'port': '8889'} } } 
+ } 
+-{'execute': 'nbd-server-add', 'arguments': {'device': 'secondeary-disk0',
+'writable': true } } 
++{'execute': 'nbd-server-add', 'arguments': {'device': 'secondary-disk0',
+'writable': true } } 
+  
+ Note: 
+   a. The qmp command nbd-server-start and nbd-server-add must be run 
 -- 
-2.9.3
+2.9.3 
+
+
+
+
+
+--
+View this message in context: http://qemu.11.n7.nabble.com/Subject-PATCH-COLO-Fix-spell-error-in-Colo-doc-tp474448.html
+Sent from the Developer mailing list archive at Nabble.com.
