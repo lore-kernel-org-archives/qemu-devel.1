@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53044)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cqKMK-000414-Gy
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 10:02:06 -0400
+	(envelope-from <vfeenstr@redhat.com>) id 1cqKNu-0004vw-OH
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 10:03:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cqKME-0006Yx-G3
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 10:02:00 -0400
-References: <148968198512.5555.1880820193606077571.stgit@bahia>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2deb61ba-f800-8774-6dfa-aa4e7c605e55@redhat.com>
-Date: Tue, 21 Mar 2017 09:01:50 -0500
-MIME-Version: 1.0
-In-Reply-To: <148968198512.5555.1880820193606077571.stgit@bahia>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="vv2K1SmI9RLeW7Hi1TAS9D6CrmUd1gBI9"
-Subject: Re: [Qemu-devel] [PATCH] 9pfs: don't try to flush self and avoid
- QEMU hang on reset
+	(envelope-from <vfeenstr@redhat.com>) id 1cqKNk-00071q-JQ
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 10:03:38 -0400
+Received: from mail-wm0-f45.google.com ([74.125.82.45]:38477)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <vfeenstr@redhat.com>) id 1cqKNk-000710-5G
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 10:03:28 -0400
+Received: by mail-wm0-f45.google.com with SMTP id t189so13229766wmt.1
+	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 07:03:28 -0700 (PDT)
+From: Vinzenz Feenstra <vfeenstr@redhat.com>
+Message-Id: <0342808A-63C6-40BE-91AB-B6088AD62CD2@redhat.com>
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+Date: Tue, 21 Mar 2017 15:03:25 +0100
+In-Reply-To: <1a5dab83-40ce-e747-6399-ca693ccf278e@redhat.com>
+References: <20170316102351.25056-1-vfeenstr@redhat.com>
+	<1a5dab83-40ce-e747-6399-ca693ccf278e@redhat.com>
+Content-Type: text/plain;
+	charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] qemu-ga: add guest-get-osinfo command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,96 +30,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---vv2K1SmI9RLeW7Hi1TAS9D6CrmUd1gBI9
-From: Eric Blake <eblake@redhat.com>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org
-Message-ID: <2deb61ba-f800-8774-6dfa-aa4e7c605e55@redhat.com>
-Subject: Re: [PATCH] 9pfs: don't try to flush self and avoid QEMU hang on
- reset
-References: <148968198512.5555.1880820193606077571.stgit@bahia>
-In-Reply-To: <148968198512.5555.1880820193606077571.stgit@bahia>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 03/16/2017 11:33 AM, Greg Kurz wrote:
-> According to the 9P spec [*], when a client wants to cancel a pending I=
-/O
-> request identified by a given tag (uint16), it must send a Tflush messa=
-ge
-> and wait for the server to respond with a Rflush message before reusing=
- this
-> tag for another I/O. The server may still send a completion message for=
- the
-> I/O if it wasn't actually cancelled but the Rflush message must arrive =
-after
-> that.
+> On Mar 21, 2017, at 2:39 PM, Eric Blake <eblake@redhat.com> wrote:
 >=20
-> QEMU hence waits for the flushed PDU to complete before sending the Rfl=
-ush
-> message back to the client.
+> On 03/16/2017 05:23 AM, Vinzenz 'evilissimo' Feenstra wrote:
+>> From: Vinzenz Feenstra <vfeenstr@redhat.com>
+>>=20
+>> Add a new 'guest-get-osinfo' command for reporting basic information =
+of
+>> the guest operating system (hereafter just 'OS'). This information
+>> includes the type of the OS, the version, and the architecture.
+>> Additionally reported would be a name, distribution type and kernel
+>> version where applicable.
+>>=20
+>> Here an example for a Fedora 25 VM:
+>>=20
+>> $ virsh -c qemu:////system qemu-agent-command F25 \
+>>    '{ "execute": "guest-get-osinfo" }'
+>>  {"return":{"arch":"x86_64","codename":"Server =
+Edition","version":"25",
+>>   =
+"kernel":"4.8.6-300.fc25.x86_64","type":"linux","distribution":"Fedora"}}
+>>=20
+>> And an example for a Windows 2012 R2 VM:
+>>=20
+>> $ virsh -c qemu:////system qemu-agent-command Win2k12R2 \
+>>    '{ "execute": "guest-get-osinfo" }'
+>>  {"return":{"arch":"x86_64","codename":"Win 2012 R2",
+>>   "version":"6.3","kernel":"","type":"windows","distribution":""}}
+>>=20
+>> Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+>> ---
 >=20
-> If a client sends 'Tflush tag oldtag' and tag =3D=3D oldtag, QEMU will =
-then
-> allocate a PDU identified by tag, find it in the PDU list and wait for
-> this same PDU to complete... i.e. wait for a completion that will never=
-
-> happen. This causes a tag and ring slot leak in the guest, and a PDU
-> leak in QEMU, all of them limited by the maximal number of PDUs (128).
-> But, worse, this causes QEMU to hang on device reset since v9fs_reset()=
-
-> wants to drain all pending I/O.
 >=20
-> This insane behavior is likely to denote a bug in the client, and it wo=
-uld
-> deserve an Rerror message to be sent back. Unfortunately, the protocol
-> allows it and requires all flush requests to suceed (only a Tflush resp=
-onse
-
-s/suceed/succeed/
-
-> is expected).
+>> +static void ga_get_linux_distribution_info(GuestOSInfo *info)
+>> +{
+>> +    FILE *fp =3D NULL;
+>> +    fp =3D fopen("/etc/os-release", "r");
 >=20
-> The only option is to detect when we have to handle a self-referencing
-> flush request and report success to the client right away.
+> Rather than read random files, I'm thinking that the uname() syscall =
+is
+> a better approach.  It is portable to more guests (since uname is a
+> POSIX interface), even if it is somewhat more limited on the =
+information
+> it provides.
+
+How about using it as a fallback option only but still use the =
+information available
+on the other places. I think it=E2=80=99s useful information what can be =
+found there.
+
 >=20
-> [*] http://man.cat-v.org/plan_9/5/flush
+>> +++ b/qga/commands-win32.c
+>> @@ -1536,3 +1536,108 @@ void ga_command_state_init(GAState *s, =
+GACommandState *cs)
+>>         ga_command_state_add(cs, NULL, guest_fsfreeze_cleanup);
+>>     }
+>> }
 >=20
-> Reported-by: Al Viro <viro@ZenIV.linux.org.uk>
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  hw/9pfs/9p.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>> +static char *ga_get_win_ver(void)
+>> +{
+>> +    OSVERSIONINFOEXW os_version;
+>> +    ga_get_version(&os_version);
+>> +    char buf[64] =3D {};
+>> +    int major =3D (int)os_version.dwMajorVersion;
+>> +    int minor =3D (int)os_version.dwMinorVersion;
+>> +    sprintf(buf, "%d.%d", major, minor);
+>> +    return strdup(buf);
 >=20
+> Instead of using strdup() (which uses malloc()), you should be using
+> g_strdup_printf() (which uses g_malloc().  In general, we prefer
+> g_malloc/g_free over raw malloc.  And once you use g_strdup_printf, =
+you
+> no longer have to worry about whether buf is allocated large enough to
+> avoid overflow with sprintf.
+Will do with the next version. Thanks for that hint with sprintf I =
+didn=E2=80=99t know about that.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
+>=20
+>> +++ b/qga/qapi-schema.json
+>> @@ -1042,3 +1042,43 @@
+>>   'data':    { 'path': 'str', '*arg': ['str'], '*env': ['str'],
+>>                '*input-data': 'str', '*capture-output': 'bool' },
+>>   'returns': 'GuestExec' }
+>> +
+>> +##
+>> +# @GuestOSType:
+>> +#
+>> +# @linux:    Indicator for linux distributions
+>> +# @windows:  Indicator for windows versions
+>> +# @other:    Indicator for any other operating system that is not =
+yet
+>> +#            explicitly supported
+>> +#
+>> +# Since: 2.8
+>=20
+> You've missed 2.8 by a long shot. In fact, you've missed hard freeze =
+for
+> 2.9, so this needs to be 2.10.
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+I don=E2=80=99t even know where I was looking for finding that number.
 
+>=20
+>> +##
+>> +{ 'enum': 'GuestOSType', 'data': ['linux', 'windows', 'other'] }
+>> +
+>> +##
+>> +# @GuestOSInfo:
+>> +#
+>> +# @version:      OS version, e.g. 25 for FC25 etc.
+>> +# @distribution: Fedora, Ubuntu, Debian, CentOS...
+>> +# @codename:     Code name of the OS. e.g. Ubuntu has Xenial Xerus =
+etc.
+>> +# @arch:         Architecture of the OS e.g. x86, x86_64, ppc64, =
+aarch64...
+>> +# @type:         Specifies the type of the OS.
+>> +# @kernel:       Linux kernel version (Might be used by other OS =
+types too).
+>> +#                May be empty.
+>=20
+> Rather than printing an empty string, would it be better to make the
+> fields optional, and omit them when there is nothing useful to supply?
 
---vv2K1SmI9RLeW7Hi1TAS9D6CrmUd1gBI9
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+I tried to keep it as stable as possible, but optional would work for me =
+too, if it is preferred.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY0TJOAAoJEKeha0olJ0Nq4S0H/1/y1w1WYS5eTtmNzlq41ou9
-xtnesHFGjq2MNIDQiAAfJl+Um4tQuViaUR2K2xmdc6HZZ1yBJSvsStQZztTrWFrA
-WJ9Ygc2RjStAML9in8P/7n2MlvPRIUannU4a5msTXA3WHttIFrdBhHv0zzdsquhC
-5WRgAGLpA/JHTZniKbxt4AGl24nGo+7PlT9l/XEUf5V3L4UApk1bVWC9I1mRypsZ
-Lh5TGtaQfhGIXv8AJSh+dY5055tFj87h3S0lOwfYE+8FL4kW/GeoTdmeZ3Ujtwbk
-dtFu3zpEOuavAONK4ndPPir8LnT9jQJLt9+nz2bhbR7XOMiSs1jaBXt8+7tDEqM=
-=bmE5
------END PGP SIGNATURE-----
-
---vv2K1SmI9RLeW7Hi1TAS9D6CrmUd1gBI9--
+>=20
+> --=20
+> Eric Blake   eblake redhat com    +1-919-301-3266
+> Libvirt virtualization library http://libvirt.org =
+<http://libvirt.org/>
