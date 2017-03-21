@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47521)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cqIh7-00015R-Dp
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:15:22 -0400
+	(envelope-from <eswierk@skyportsystems.com>) id 1cqImn-00030l-1X
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:21:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cqIh3-0007jo-5b
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:15:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52308)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cqIh3-0007jj-00
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:15:17 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F3FE6C05490A
-	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 12:15:16 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170320173840.3626-1-dgilbert@redhat.com>
-Date: Tue, 21 Mar 2017 13:15:12 +0100
-In-Reply-To: <20170320173840.3626-1-dgilbert@redhat.com> (David Alan Gilbert's
-	message of "Mon, 20 Mar 2017 17:38:38 +0000")
-Message-ID: <87bmsuomgf.fsf@dusky.pond.sub.org>
+	(envelope-from <eswierk@skyportsystems.com>) id 1cqIml-0000pP-Nc
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:21:12 -0400
+Received: from mail-vk0-x233.google.com ([2607:f8b0:400c:c05::233]:33217)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <eswierk@skyportsystems.com>)
+	id 1cqIml-0000pE-II
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:21:11 -0400
+Received: by mail-vk0-x233.google.com with SMTP id d188so91772494vka.0
+	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 05:21:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 0/2 for 2.10] Remove some monitor_printf's
+In-Reply-To: <20170321052602.GA2785@lemon>
+References: <CAO_EM_kn4QEw=+j23F7e+LzLW2_TPwNENoopqyBb-hdKYAow9w@mail.gmail.com>
+	<20170321052602.GA2785@lemon>
+From: Ed Swierk <eswierk@skyportsystems.com>
+Date: Tue, 21 Mar 2017 05:20:30 -0700
+Message-ID: <CAO_EM_=RbB7FopO9z6NOGhFgLSd-hWz-oNf406fCB=sqOgP=-w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] Assertion failure taking external snapshot with
+ virtio drive + iothread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,19 +30,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, kraxel@redhat.com, quintela@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> writes:
-
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On Mon, Mar 20, 2017 at 10:26 PM, Fam Zheng <famz@redhat.com> wrote:
+> On Fri, 03/17 09:55, Ed Swierk wrote:
+>> I'm running into the same problem taking an external snapshot with a
+>> virtio-blk drive with iothread, so it's not specific to virtio-scsi.
+>> Run a Linux guest on qemu master
+>>
+>>   qemu-system-x86_64 -nographic -enable-kvm -monitor
+>> telnet:0.0.0.0:1234,server,nowait -m 1024 -object
+>> iothread,id=iothread1 -drive file=/x/drive.qcow2,if=none,id=drive0
+>> -device virtio-blk-pci,iothread=iothread1,drive=drive0
+>>
+>> Then in the monitor
+>>
+>>   snapshot_blkdev drive0 /x/snap1.qcow2
+>>
+>> qemu bombs with
+>>
+>>   qemu-system-x86_64: /x/qemu/include/block/aio.h:457:
+>> aio_enable_external: Assertion `ctx->external_disable_cnt > 0' failed.
+>>
+>> whereas without the iothread the assertion failure does not occur.
 >
-> I found myself trying to understand cur_mon and found a bunch
-> of uses that could easily be replaced by error_report or Error **.
+>
+> Can you test this one?
+>
+> ---
+>
+>
+> diff --git a/blockdev.c b/blockdev.c
+> index c5b2c2c..4c217d5 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -1772,6 +1772,8 @@ static void external_snapshot_prepare(BlkActionState *common,
+>          return;
+>      }
+>
+> +    bdrv_set_aio_context(state->new_bs, state->aio_context);
+> +
+>      /* This removes our old bs and adds the new bs. This is an operation that
+>       * can fail, so we need to do it in .prepare; undoing it for abort is
+>       * always possible. */
+> @@ -1789,8 +1791,6 @@ static void external_snapshot_commit(BlkActionState *common)
+>      ExternalSnapshotState *state =
+>                               DO_UPCAST(ExternalSnapshotState, common, common);
+>
+> -    bdrv_set_aio_context(state->new_bs, state->aio_context);
+> -
+>      /* We don't need (or want) to use the transactional
+>       * bdrv_reopen_multiple() across all the entries at once, because we
+>       * don't want to abort all of them if one of them fails the reopen */
 
-Speaking of cur_mon: a patch making it thread-local would be most
-welcome.
+With this change, a different assertion fails on running snapshot_blkdev:
 
-Some of error wavcapture messages still aren't so great, but it's an
-obvious improvement, so
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+  qemu-system-x86_64: /x/qemu/block/io.c:164: bdrv_drain_recurse:
+Assertion `qemu_get_current_aio_context() == qemu_get_aio_context()'
+failed.
+
+--Ed
