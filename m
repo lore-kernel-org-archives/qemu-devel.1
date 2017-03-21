@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cqJ0K-0007ri-TC
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:35:13 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cqJ2T-000072-6p
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:37:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cqJ0H-00043j-Nz
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:35:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59632)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cqJ0H-00043R-I0
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:35:09 -0400
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 936EC13A5D
-	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 12:35:09 +0000 (UTC)
-References: <20170319094631.17298-1-pbonzini@redhat.com>
-	<f025cddc-b73a-ba88-c4ea-b262ddb043d9@redhat.com>
-	<20170321123017.ab3lizoa2xd6jx5d@eukaryote>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <edbcad8a-f9e1-8fab-c47b-b1e899f74bfa@redhat.com>
-Date: Tue, 21 Mar 2017 13:35:02 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1cqJ2R-0005Ut-TU
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:37:25 -0400
+Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:35691)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cqJ2R-0005RP-Mm
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:37:23 -0400
+Received: by mail-wr0-x235.google.com with SMTP id g10so111121584wrg.2
+	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 05:37:23 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170321123017.ab3lizoa2xd6jx5d@eukaryote>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-web PATCH] New blog post: "QEMU in the
- blogs: February 2017"
+In-Reply-To: <20170316111416.25587-1-vfeenstr@redhat.com>
+References: <20170316111416.25587-1-vfeenstr@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 21 Mar 2017 12:37:01 +0000
+Message-ID: <CAFEAcA-bu9noosLApv83U2WAs27q4Kx2zVv_xpZtWjL=64VSdA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] checkpatch: Supress warning in function
+ pointer typedefs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,27 +29,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kashyap Chamarthy <kchamart@redhat.com>, Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
+On 16 March 2017 at 11:14, Vinzenz 'evilissimo' Feenstra
+<vfeenstr@redhat.com> wrote:
+> From: Vinzenz Feenstra <vfeenstr@redhat.com>
+>
+> When importing dynamically functions via `GetProcAddress` in windows
+> related code, it is quite common to make a typedef for the resulting
+> function pointer. When the function to be imported, has a stdcall
+> calling convention, usually the `WINAPI` macro is used. This patch adds an
+> exception in the checkpatch.pl script to allow the calling convention
+> specification in function pointer typedefs, to be `WINAPI`.
+>
+> Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
 
+Could you provide an example of the kind of source line that provokes
+the incorrect warning and the checkpatch output that results,
+please?
 
-On 21/03/2017 13:30, Kashyap Chamarthy wrote:
-> On Tue, Mar 21, 2017 at 01:09:19PM +0100, Thomas Huth wrote:
->> On 19.03.2017 10:46, Paolo Bonzini wrote:
->>> Just an idea... If this is useful, we can do it every month.  It only
->>> takes ten minutes to skim planet.virt-tools.org and compile the list.
->>
->> Is it worth the effort? People can also quickly read through the planet
->> blogs directly to get the same information...
-> 
-> While that's true, I _guess_ Paolo did that for those audience who only
-> follow the QEMU blog feed, and forget that the planet.virt-tools.org
-> exists.
-
-Yeah, it's meant to be something easy to share or tweet (and it happens
-that ~1 per month is the frequency of my visits to planet.virt-tools.org).
-
-Also, it helps keeping the QEMU blog alive. :)
-
-Paolo
+thanks
+-- PMM
