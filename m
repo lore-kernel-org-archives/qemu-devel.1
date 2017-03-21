@@ -1,38 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57017)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cqJDT-0003Xy-OO
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:48:48 -0400
+	(envelope-from <famz@redhat.com>) id 1cqJFC-0004AA-Hu
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:50:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cqJDO-0005cN-Qq
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:48:47 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56658)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cqJDO-0005cC-HU
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:48:42 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2LCcbkZ041921
-	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 08:48:40 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29awugj1nb-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 08:48:39 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Tue, 21 Mar 2017 12:48:37 -0000
-Date: Tue, 21 Mar 2017 13:48:32 +0100
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <07b024e8-fb7e-ba14-19ce-7f82c4703460@redhat.com>
-References: <20170320180024.23432-1-arvolkov@inbox.ru>
-	<07b024e8-fb7e-ba14-19ce-7f82c4703460@redhat.com>
+	(envelope-from <famz@redhat.com>) id 1cqJF7-0005yD-JW
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:50:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45160)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cqJF7-0005xY-DS
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:50:29 -0400
+Date: Tue, 21 Mar 2017 20:50:25 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170321125025.GA19060@lemon.lan>
+References: <CAO_EM_kn4QEw=+j23F7e+LzLW2_TPwNENoopqyBb-hdKYAow9w@mail.gmail.com>
+	<20170321052602.GA2785@lemon>
+	<CAO_EM_=RbB7FopO9z6NOGhFgLSd-hWz-oNf406fCB=sqOgP=-w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20170321134832.5a3f99b7.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] hw: dead code removal
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAO_EM_=RbB7FopO9z6NOGhFgLSd-hWz-oNf406fCB=sqOgP=-w@mail.gmail.com>
+Subject: Re: [Qemu-devel] Assertion failure taking external snapshot with
+ virtio drive + iothread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,67 +29,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Anton Volkov <arvolkov@inbox.ru>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, agraf@suse.de, borntraeger@de.ibm.com, kraxel@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Frederic Konrad <fred.konrad@greensocs.com>
+To: Ed Swierk <eswierk@skyportsystems.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On Tue, 21 Mar 2017 13:05:40 +0100
-Thomas Huth <thuth@redhat.com> wrote:
-
-> On 20.03.2017 19:00, Anton Volkov wrote:
-> > Made functions *_exit in hw/ return void instead of int (they returned 0 all the time)
-> > and removed related return value checks
-> > 
-> > Signed-off-by: Anton Volkov <arvolkov@inbox.ru>
+On Tue, 03/21 05:20, Ed Swierk wrote:
+> On Mon, Mar 20, 2017 at 10:26 PM, Fam Zheng <famz@redhat.com> wrote:
+> > On Fri, 03/17 09:55, Ed Swierk wrote:
+> >> I'm running into the same problem taking an external snapshot with a
+> >> virtio-blk drive with iothread, so it's not specific to virtio-scsi.
+> >> Run a Linux guest on qemu master
+> >>
+> >>   qemu-system-x86_64 -nographic -enable-kvm -monitor
+> >> telnet:0.0.0.0:1234,server,nowait -m 1024 -object
+> >> iothread,id=iothread1 -drive file=/x/drive.qcow2,if=none,id=drive0
+> >> -device virtio-blk-pci,iothread=iothread1,drive=drive0
+> >>
+> >> Then in the monitor
+> >>
+> >>   snapshot_blkdev drive0 /x/snap1.qcow2
+> >>
+> >> qemu bombs with
+> >>
+> >>   qemu-system-x86_64: /x/qemu/include/block/aio.h:457:
+> >> aio_enable_external: Assertion `ctx->external_disable_cnt > 0' failed.
+> >>
+> >> whereas without the iothread the assertion failure does not occur.
+> >
+> >
+> > Can you test this one?
+> >
 > > ---
-> >  hw/audio/hda-codec.c              | 3 +--
-> >  hw/audio/intel-hda.c              | 3 +--
-> >  hw/audio/intel-hda.h              | 2 +-
-> >  hw/char/sclpconsole-lm.c          | 4 ++--
-> >  hw/char/sclpconsole.c             | 4 ++--
-> >  hw/core/qdev.c                    | 6 +-----
-> >  hw/s390x/event-facility.c         | 6 +-----
-> >  hw/s390x/virtio-ccw.c             | 7 +++----
-> >  hw/s390x/virtio-ccw.h             | 2 +-
-> >  hw/usb/dev-smartcard-reader.c     | 3 +--
-> >  include/hw/qdev-core.h            | 2 +-
-> >  include/hw/s390x/event-facility.h | 2 +-
-> >  12 files changed, 16 insertions(+), 28 deletions(-)
-
-> > diff --git a/hw/char/sclpconsole-lm.c b/hw/char/sclpconsole-lm.c
-> > index 07d6ebd..fbe5b42 100644
-> > --- a/hw/char/sclpconsole-lm.c
-> > +++ b/hw/char/sclpconsole-lm.c
-> > @@ -318,9 +318,9 @@ static int console_init(SCLPEvent *event)
-> >      return 0;
-> >  }
-> >  
-> > -static int console_exit(SCLPEvent *event)
-> > +static void console_exit(SCLPEvent *event)
-> >  {
-> > -    return 0;
-> > +    return;
-> >  }
-> >  
-> >  static void console_reset(DeviceState *dev)
-> > diff --git a/hw/char/sclpconsole.c b/hw/char/sclpconsole.c
-> > index b78f240..644f7cd 100644
-> > --- a/hw/char/sclpconsole.c
-> > +++ b/hw/char/sclpconsole.c
-> > @@ -246,9 +246,9 @@ static void console_reset(DeviceState *dev)
-> >     scon->notify = false;
-> >  }
-> >  
-> > -static int console_exit(SCLPEvent *event)
-> > +static void console_exit(SCLPEvent *event)
-> >  {
-> > -    return 0;
-> > +    return;
-> >  }
+> >
+> >
+> > diff --git a/blockdev.c b/blockdev.c
+> > index c5b2c2c..4c217d5 100644
+> > --- a/blockdev.c
+> > +++ b/blockdev.c
+> > @@ -1772,6 +1772,8 @@ static void external_snapshot_prepare(BlkActionState *common,
+> >          return;
+> >      }
+> >
+> > +    bdrv_set_aio_context(state->new_bs, state->aio_context);
+> > +
+> >      /* This removes our old bs and adds the new bs. This is an operation that
+> >       * can fail, so we need to do it in .prepare; undoing it for abort is
+> >       * always possible. */
+> > @@ -1789,8 +1791,6 @@ static void external_snapshot_commit(BlkActionState *common)
+> >      ExternalSnapshotState *state =
+> >                               DO_UPCAST(ExternalSnapshotState, common, common);
+> >
+> > -    bdrv_set_aio_context(state->new_bs, state->aio_context);
+> > -
+> >      /* We don't need (or want) to use the transactional
+> >       * bdrv_reopen_multiple() across all the entries at once, because we
+> >       * don't want to abort all of them if one of them fails the reopen */
 > 
-> Please avoid a "return;" at the end of a void function, that's just
-> superfluous.
-> (But in this case, as it has been mentioned by others already, I'd also
-> recommend to rather remove the function completely instead of having an
-> empty function here)
+> With this change, a different assertion fails on running snapshot_blkdev:
+> 
+>   qemu-system-x86_64: /x/qemu/block/io.c:164: bdrv_drain_recurse:
+> Assertion `qemu_get_current_aio_context() == qemu_get_aio_context()'
+> failed.
 
-Yes, let's remove them.
+Is there a backtrace?
