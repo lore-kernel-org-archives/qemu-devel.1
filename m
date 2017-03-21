@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jiahuanzhang90@gmail.com>) id 1cqNtg-0006Mc-2b
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 13:48:41 -0400
+	(envelope-from <eblake@redhat.com>) id 1cqNu6-0006fA-7R
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 13:49:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jiahuanzhang90@gmail.com>) id 1cqNte-0002Bq-V6
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 13:48:40 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:34576)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jiahuanzhang90@gmail.com>)
-	id 1cqNte-0002Bb-Pb
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 13:48:38 -0400
-Received: by mail-qt0-x241.google.com with SMTP id x35so22334313qtc.1
-	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 10:48:38 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1cqNu2-0002Id-WE
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 13:49:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40228)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cqNu2-0002IH-Mv
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 13:49:02 -0400
+References: <cover.1489494746.git.janne.huttunen@nokia.com>
+	<1489510640.8844.18.camel@redhat.com>
+	<1489561105.24841.25.camel@nokia.com>
+	<1489562641.15659.16.camel@redhat.com>
+	<1489657576.561.24.camel@nokia.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <33ee8842-e57d-c637-ae26-e4b89a7c1002@redhat.com>
+Date: Tue, 21 Mar 2017 12:48:58 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_etsFstPtUzs0AZjWD35MhMLhwru0ibJzS_upgE-nsng@mail.gmail.com>
-References: <CAJy91CY1SOwi7D-kyU0ooe5SyhM414WaBCedXuPfXXhJpbo1fg@mail.gmail.com>
-	<CAFEAcA8HrEsuEYgpe9pJQkwSnSTU74G+3i7vWk8ka5cJ+UWFDQ@mail.gmail.com>
-	<CAJy91CZ=QbhyeakFCSq3n6+d_cGO8hpT8o8EUwUTdkX-iE1eLg@mail.gmail.com>
-	<CAFEAcA9XRwW0=UzuAXwjB-a_vWepfh+mus9bgpmdsCoQH6sDEQ@mail.gmail.com>
-	<CAJy91CbwRd0u+RJiXZZP11J6pU4Pw-FDGbf=hLSBPejNb78bDA@mail.gmail.com>
-	<CAFEAcA_etsFstPtUzs0AZjWD35MhMLhwru0ibJzS_upgE-nsng@mail.gmail.com>
-From: Jiahuan Zhang <jiahuanzhang90@gmail.com>
-Date: Tue, 21 Mar 2017 18:48:37 +0100
-Message-ID: <CAJy91CZmqEUXLKjRJ0JdUEf83E3FwE_24qmej-4C8uAGQkTPWA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Guest application reading from pl011 without
- device driver
+In-Reply-To: <1489657576.561.24.camel@nokia.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="oigvj8tR6a1FJxppHJ2EaKhevPgQROIpC"
+Subject: Re: [Qemu-devel] [RFC][PATCH 0/6] "bootonceindex" property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,69 +31,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Janne Huttunen <janne.huttunen@nokia.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-But what I met is that, when the receiving data is small, no data is
-knocking the door of the fifo by ReadFile (), then pl011_read can starts.
-When the data is large, after the fifo is full, there are still data
-requesting to get into the fifo. Then the device is busy with
-pl011_can_receive.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--oigvj8tR6a1FJxppHJ2EaKhevPgQROIpC
+From: Eric Blake <eblake@redhat.com>
+To: Janne Huttunen <janne.huttunen@nokia.com>,
+ Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+Message-ID: <33ee8842-e57d-c637-ae26-e4b89a7c1002@redhat.com>
+Subject: Re: [Qemu-devel] [RFC][PATCH 0/6] "bootonceindex" property
+References: <cover.1489494746.git.janne.huttunen@nokia.com>
+ <1489510640.8844.18.camel@redhat.com> <1489561105.24841.25.camel@nokia.com>
+ <1489562641.15659.16.camel@redhat.com> <1489657576.561.24.camel@nokia.com>
+In-Reply-To: <1489657576.561.24.camel@nokia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-The guest program is as follows.
+On 03/16/2017 04:46 AM, Janne Huttunen wrote:
+> On Wed, 2017-03-15 at 08:24 +0100, Gerd Hoffmann wrote:
+>>>
+>>> The short answer: emulating real hardware.
+>>
+>> Ok, that is reason enough.
+>>
+>> Adding bootonceindex everywhere doesn't look like the best plan to me
+>> though.  Possibly we can pimp up bootindex in a backward-compatible
+>> way?
+>> Something like bootindex=3D<normal>[.<once>] ?
+>=20
+> That would (likely) avoid modifying all devices, but wouldn't
+> that make the 'bootindex' property a string (now: 'int32')
+> and thus change the QOM API?
 
-While (*UART_FR & PL011_RXFE); //wait until fifo not empty
-for (i=3D0;i <16;i++){
-data [i] =3D (unsigned char) *UART_DR; //read from the data register.
-}
-
-Best,
-Huan
-
-2017=E5=B9=B43=E6=9C=8821=E6=97=A5 18:17=EF=BC=8C"Peter Maydell" <peter.may=
-dell@linaro.org>=E5=86=99=E9=81=93=EF=BC=9A
-
-On 21 March 2017 at 16:59, Jiahuan Zhang <jiahuanzhang90@gmail.com> wrote:
->
->
-> On 21 March 2017 at 17:50, Peter Maydell <peter.maydell@linaro.org> wrote=
+Is there any way to make use of an alternate that supports both int and
+string simultaneously?  But see also Markus' recent addendum on the
+difficulties of supporting multiple types on command-line vs. through QMP=
 :
->>
->> On 21 March 2017 at 16:47, Jiahuan Zhang <jiahuanzhang90@gmail.com>
-wrote:
->> > The actual situation is, pl011_can_receive is returning false, the fif=
-o
->> > is
->> > full,   pl011_read does't start.
->> > At this moment, only pl011_can_recieve is keeping returning 0.
->>
->> OK, so the incoming data has filled up the FIFO, and the UART
->> is now sitting waiting for the guest to read the data...
->
->
-> Yes. And I think the guest reading can start when the fifo is nonempty.
-> In the guest program, I first check the flag register, once the fifo is
-> nonempty,
-> then move on to read from the data register.
 
-Which flag are you testing?
+https://lists.gnu.org/archive/html/qemu-devel/2017-03/msg04125.html
 
-> What I found is pl011 expects to read all the data into fifo,
-> though pl011_can_receive returns false.
-> Only when all the data is read, pl011_read can start.
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-This doesn't make sense. If our pl011 didn't allow reads
-of data before the FIFO was full then you'd see small
-data not working, but large data working.
 
-In any case our pl011_read implementation will happily
-return you any data it has as long as the fifo is not
-completely empty, and even if the guest buggily reads
-from an empty FIFO it will return you the last character
-read (this is how the h/w works, IIRC).
+--oigvj8tR6a1FJxppHJ2EaKhevPgQROIpC
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-(This would be much easier if you actually said what your
-guest code did, rather than requiring me to guess.)
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-thanks
--- PMM
+iQEcBAEBCAAGBQJY0WeKAAoJEKeha0olJ0NqThQH/2PgcCDeUWZ03uRmxW+5xqCJ
+C+6kTzf5dV4VAxEw2ZooFW1an+RWbYEqGJ19k/9VBriXloxjqjZ0m+IJQkdq1WeC
+ZU08Qri8xj5dJb7k0xOUZMj85mxOW32hEGIC7/K+Wvm4jsiV3Zh3JyRCV9e03Aew
+Fl+apgBMZpWlsZ7ylSoErbWQsw8VYRn7ch72EY5YSXzsdjsdOq/0I0a9L9ICyTox
+xBq92sVqbEw7D+og6xTHCVi3dtC657KoWujUCZMl+0qbVHVIhtDr+KGzisqEl/yJ
+bXz3IdFW2IJ32UcoISTbrX0yQEHx+N1okzzPfIZx6V8lRGl1Ds8xnjplSFShzdA=
+=E7+Z
+-----END PGP SIGNATURE-----
+
+--oigvj8tR6a1FJxppHJ2EaKhevPgQROIpC--
