@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49640)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eswierk@skyportsystems.com>) id 1cqImn-00030l-1X
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:21:14 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1cqInu-0003kU-R7
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:22:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eswierk@skyportsystems.com>) id 1cqIml-0000pP-Nc
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:21:12 -0400
-Received: from mail-vk0-x233.google.com ([2607:f8b0:400c:c05::233]:33217)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <eswierk@skyportsystems.com>)
-	id 1cqIml-0000pE-II
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:21:11 -0400
-Received: by mail-vk0-x233.google.com with SMTP id d188so91772494vka.0
-	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 05:21:11 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1cqInq-00010D-J4
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:22:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53342)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cqInq-000108-Cv
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 08:22:18 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2CCA1635E9
+	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 12:22:18 +0000 (UTC)
+Date: Tue, 21 Mar 2017 12:22:11 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170321122211.GD3248@work-vm>
+References: <20170320173840.3626-1-dgilbert@redhat.com>
+	<87bmsuomgf.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170321052602.GA2785@lemon>
-References: <CAO_EM_kn4QEw=+j23F7e+LzLW2_TPwNENoopqyBb-hdKYAow9w@mail.gmail.com>
-	<20170321052602.GA2785@lemon>
-From: Ed Swierk <eswierk@skyportsystems.com>
-Date: Tue, 21 Mar 2017 05:20:30 -0700
-Message-ID: <CAO_EM_=RbB7FopO9z6NOGhFgLSd-hWz-oNf406fCB=sqOgP=-w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] Assertion failure taking external snapshot with
- virtio drive + iothread
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87bmsuomgf.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH 0/2 for 2.10] Remove some monitor_printf's
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,64 +33,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, kraxel@redhat.com, quintela@redhat.com
 
-On Mon, Mar 20, 2017 at 10:26 PM, Fam Zheng <famz@redhat.com> wrote:
-> On Fri, 03/17 09:55, Ed Swierk wrote:
->> I'm running into the same problem taking an external snapshot with a
->> virtio-blk drive with iothread, so it's not specific to virtio-scsi.
->> Run a Linux guest on qemu master
->>
->>   qemu-system-x86_64 -nographic -enable-kvm -monitor
->> telnet:0.0.0.0:1234,server,nowait -m 1024 -object
->> iothread,id=iothread1 -drive file=/x/drive.qcow2,if=none,id=drive0
->> -device virtio-blk-pci,iothread=iothread1,drive=drive0
->>
->> Then in the monitor
->>
->>   snapshot_blkdev drive0 /x/snap1.qcow2
->>
->> qemu bombs with
->>
->>   qemu-system-x86_64: /x/qemu/include/block/aio.h:457:
->> aio_enable_external: Assertion `ctx->external_disable_cnt > 0' failed.
->>
->> whereas without the iothread the assertion failure does not occur.
->
->
-> Can you test this one?
->
-> ---
->
->
-> diff --git a/blockdev.c b/blockdev.c
-> index c5b2c2c..4c217d5 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-> @@ -1772,6 +1772,8 @@ static void external_snapshot_prepare(BlkActionState *common,
->          return;
->      }
->
-> +    bdrv_set_aio_context(state->new_bs, state->aio_context);
-> +
->      /* This removes our old bs and adds the new bs. This is an operation that
->       * can fail, so we need to do it in .prepare; undoing it for abort is
->       * always possible. */
-> @@ -1789,8 +1791,6 @@ static void external_snapshot_commit(BlkActionState *common)
->      ExternalSnapshotState *state =
->                               DO_UPCAST(ExternalSnapshotState, common, common);
->
-> -    bdrv_set_aio_context(state->new_bs, state->aio_context);
-> -
->      /* We don't need (or want) to use the transactional
->       * bdrv_reopen_multiple() across all the entries at once, because we
->       * don't want to abort all of them if one of them fails the reopen */
+* Markus Armbruster (armbru@redhat.com) wrote:
+> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> writes:
+> 
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> >
+> > I found myself trying to understand cur_mon and found a bunch
+> > of uses that could easily be replaced by error_report or Error **.
+> 
+> Speaking of cur_mon: a patch making it thread-local would be most
+> welcome.
 
-With this change, a different assertion fails on running snapshot_blkdev:
+Yep, that's what I was thinking about while I was just working out where
+it's used.
 
-  qemu-system-x86_64: /x/qemu/block/io.c:164: bdrv_drain_recurse:
-Assertion `qemu_get_current_aio_context() == qemu_get_aio_context()'
-failed.
+> Some of error wavcapture messages still aren't so great, but it's an
+> obvious improvement, so
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
---Ed
+Thanks.
+
+Dave
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
