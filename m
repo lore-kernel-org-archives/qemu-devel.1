@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <herongguang.he@huawei.com>) id 1cqAaZ-000516-CS
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:36:04 -0400
+	(envelope-from <jasowang@redhat.com>) id 1cqAeX-0005mC-JJ
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:40:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <herongguang.he@huawei.com>) id 1cqAaV-000294-Ru
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:36:03 -0400
-Received: from [45.249.212.189] (port=2863 helo=dggrg03-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <herongguang.he@huawei.com>) id 1cqAaU-000210-Gy
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:35:59 -0400
-References: <58CFE56E.9090303@huawei.com>
-From: "Herongguang (Stephen)" <herongguang.he@huawei.com>
-Message-ID: <58D09F48.9010809@huawei.com>
-Date: Tue, 21 Mar 2017 11:34:32 +0800
+	(envelope-from <jasowang@redhat.com>) id 1cqAeS-0003H3-OF
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:40:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37216)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cqAeS-0003GY-Id
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 23:40:04 -0400
+References: <1489657928-14919-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <22303218-697c-7166-406b-050888efdfd5@redhat.com>
+Date: Tue, 21 Mar 2017 11:39:56 +0800
 MIME-Version: 1.0
-In-Reply-To: <58CFE56E.9090303@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [BUG/RFC] INIT IPI lost when VM starts
+In-Reply-To: <1489657928-14919-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/3] Add COLO-proxy virtio-net support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,51 +26,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, rkrcmar@redhat.com, afaerber@suse.de, jan.kiszka@siemens.com, qemu-devel@nongnu.org, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, wangxinxin.wang@huawei.com, "weidong.huang@huawei.com >> Huangweidong (C)" <weidong.huang@huawei.com>
-
-Let me clarify it more clearly. Time sequence is that qemu handles ‘query-cpus’ qmp command, vcpu 1 (and vcpu 0) got registers from kvm-kmod (qmp_query_cpus-> cpu_synchronize_state-> kvm_cpu_synchronize_state->
- > do_kvm_cpu_synchronize_state-> kvm_arch_get_registers), then vcpu 0 (BSP) sends INIT-SIPI to vcpu 1(AP). In kvm-kmod, vcpu 1’s pending_events’s KVM_APIC_INIT bit set.
-Then vcpu 1 continue running, vcpu1 thread in qemu calls kvm_arch_put_registers-> kvm_put_vcpu_events, so KVM_APIC_INIT bit in vcpu 1’s pending_events got cleared, i.e., lost.
-
-In kvm-kmod, except for pending_events, sipi_vector may also be overwritten., so I am not sure if there are other fields/registers in danger, i.e., those may be modified asynchronously with vcpu thread itself.
-
-BTW, using a sleep like following can reliably reproduce this problem, if VM equipped with more than 2 vcpus and starting VM using libvirtd.
-
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 55865db..5099290 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -2534,6 +2534,11 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int level)
-              KVM_VCPUEVENT_VALID_NMI_PENDING | KVM_VCPUEVENT_VALID_SIPI_VECTOR;
-      }
-
-+    if (CPU(cpu)->cpu_index == 1) {
-+        fprintf(stderr, "vcpu 1 sleep!!!!\n");
-+        sleep(10);
-+    }
-+
-      return kvm_vcpu_ioctl(CPU(cpu), KVM_SET_VCPU_EVENTS, &events);
-  }
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>
+Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, bian naimeng <biannm@cn.fujitsu.com>, "eddie . dong" <eddie.dong@intel.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
 
-On 2017/3/20 22:21, Herongguang (Stephen) wrote:
-> Hi,
-> We encountered a problem that when a domain starts, seabios failed to online a vCPU.
+
+On 2017=E5=B9=B403=E6=9C=8816=E6=97=A5 17:52, Zhang Chen wrote:
+> If user use -device virtio-net-pci, virtio-net driver will add a header
+> to raw net packet that colo-proxy can't handle it. COLO-proxy just
+> focus on the packet payload, so we skip the virtio-net header to compar=
+e
+> the sent packet that primary guest's to secondary guest's.
 >
-> After investigation, we found that the reason is in kvm-kmod, KVM_APIC_INIT bit in
-> vcpu->arch.apic->pending_events was overwritten by qemu, and thus an INIT IPI sent
-> to AP was lost. Qemu does this since libvirtd sends a ‘query-cpus’ qmp command to qemu
-> on VM start.
 >
-> In qemu, qmp_query_cpus-> cpu_synchronize_state-> kvm_cpu_synchronize_state->
-> do_kvm_cpu_synchronize_state, qemu gets registers/vcpu_events from kvm-kmod and
-> sets cpu->kvm_vcpu_dirty to true, and vcpu thread in qemu will call
-> kvm_arch_put_registers if cpu->kvm_vcpu_dirty is true, thus pending_events is
-> overwritten by qemu.
+> Zhang Chen (3):
+>    COLO-proxy: Add virtio-net packet parse function
+>    COLO-proxy: Add a tag to mark virtio-net packet
+>    COLO-compare: Add virtio-net packet compare support
 >
-> I think there is no need for qemu to set cpu->kvm_vcpu_dirty to true after ‘query-cpus’,
-> and  kvm-kmod should not clear KVM_APIC_INIT unconditionally. And I am not sure whether
-> it is OK for qemu to set cpu->kvm_vcpu_dirty in do_kvm_cpu_synchronize_state in each caller.
+>   net/colo-compare.c    | 42 +++++++++++++++++++++++++++++++++---------
+>   net/colo.c            | 14 ++++++++++----
+>   net/colo.h            |  7 ++++++-
+>   net/filter-rewriter.c | 15 ++++++++++-----
+>   4 files changed, 59 insertions(+), 19 deletions(-)
 >
-> What’s your opinion?
->
+
+Hi:
+
+Git grep told us virtio-net is not the only user for vnet header. E1000e=20
+and vmxnet3 uses it too.
+
+So we need solve them all instead of being virtio-net specific.
+
+Thanks
