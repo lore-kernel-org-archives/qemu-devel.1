@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40364)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cqLym-0007cT-Sd
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 11:45:53 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1cqM3j-00018z-33
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 11:50:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cqLyi-0007FD-QI
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 11:45:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38374)
+	(envelope-from <pbonzini@redhat.com>) id 1cqM3e-0000rs-Uy
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 11:50:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32994)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cqLyi-0007Em-K3
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 11:45:44 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cqM3e-0000rm-Op
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 11:50:50 -0400
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0A80A1E30
-	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 15:45:44 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6F00564387
+	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 15:50:50 +0000 (UTC)
 References: <20170319094631.17298-1-pbonzini@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <d97dfbf0-571e-180d-06e2-08351c97fce3@redhat.com>
-Date: Tue, 21 Mar 2017 16:45:40 +0100
+	<d97dfbf0-571e-180d-06e2-08351c97fce3@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <25750320-52f0-cfeb-8a1e-09b206e28514@redhat.com>
+Date: Tue, 21 Mar 2017 16:50:48 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170319094631.17298-1-pbonzini@redhat.com>
+In-Reply-To: <d97dfbf0-571e-180d-06e2-08351c97fce3@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [qemu-web PATCH] New blog post: "QEMU in the
@@ -33,75 +34,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
 Cc: thuth@redhat.com
 
-On 03/19/17 10:46, Paolo Bonzini wrote:
-> Just an idea... If this is useful, we can do it every month.  It only
-> takes ten minutes to skim planet.virt-tools.org and compile the list.
->=20
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  .../2017-03-19-qemu-in-the-blogs-february-2017.md  | 33 ++++++++++++++=
-++++++++
->  1 file changed, 33 insertions(+)
->  create mode 100644 _posts/2017-03-19-qemu-in-the-blogs-february-2017.m=
-d
->=20
-> diff --git a/_posts/2017-03-19-qemu-in-the-blogs-february-2017.md b/_po=
-sts/2017-03-19-qemu-in-the-blogs-february-2017.md
-> new file mode 100644
-> index 0000000..dd080f1
-> --- /dev/null
-> +++ b/_posts/2017-03-19-qemu-in-the-blogs-february-2017.md
-> @@ -0,0 +1,33 @@
-> +---
-> +layout: post
-> +title:  "QEMU in the blogs: February 2017"
-> +date:   2017-03-19 10:30:00 +0100
-> +author: Paolo Bonzini
-> +categories: blog posts
-> +---
-> +Here is a short list of articles and blog posts about QEMU
-> +and KVM, that were posted last month.
-> +
-> +* [QEMU and the qcow2 metadata
-> +  checks](https://blogs.igalia.com/berto/2017/02/08/qemu-and-the-qcow2=
--metadata-checks/)
-> +  by Alberto Garcia
-> +
-> +* [Running Hyper-V in a QEMU/KVM
-> +  Guest](https://ladipro.wordpress.com/2017/02/24/running-hyperv-in-kv=
-m-guest/)
-> +  by Ladislav Pro=C5=A1ek
-> +
-> +* [Setting up a nested KVM guest for developing & testing PCI device a=
-ssignment
-> +  with NUMA](https://www.berrange.com/posts/2017/02/16/setting-up-a-ne=
-sted-kvm-guest-for-developing-testing-pci-device-assignment-with-numa/)
-> +  by Daniel P. Berrang=C3=A9
-> +
-> +* [Testing SMM with QEMU, KVM and
-> +  libvirt](https://github.com/tianocore/tianocore.github.io/wiki/Testi=
-ng-SMM-with-QEMU,-KVM-and-libvirt)
-> +  by L=C3=A1szl=C3=B3 Er=C5=A1ek
 
-NAK, Er=C5=A1ek <-> =C3=89rsek :)
 
-(Anyway, "Laszlo Ersek" is fully fine.)
+On 21/03/2017 16:45, Laszlo Ersek wrote:
+>> +* [Testing SMM with QEMU, KVM and
+>> +  libvirt](https://github.com/tianocore/tianocore.github.io/wiki/Test=
+ing-SMM-with-QEMU,-KVM-and-libvirt)
+>> +  by L=C3=A1szl=C3=B3 Er=C5=A1ek
+>
+> NAK, Er=C5=A1ek <-> =C3=89rsek :)
 
-Thanks!
-Laszlo
+Is it at least the first time that you get _that_ misspelling? :)
+Anyway, it looked weird to me as well so I realized my mistake and fixed
+that before pushing.
 
-> +
-> +* [The surprisingly complicated world of disk image
-> +  sizes](https://www.berrange.com/posts/2017/02/10/the-surprisingly-co=
-mplicated-world-of-disk-image-sizes/)
-> +  by Daniel P. Berrang=C3=A9
-> +
-> +
-> +In other news, QEMU is now in hard freeze for release 2.9.0.  The prel=
-iminary
-> +list of features is on the [wiki](http://wiki.qemu-project.org/ChangeL=
-og/2.9).
->=20
+Paolo
+
+> (Anyway, "Laszlo Ersek" is fully fine.)
