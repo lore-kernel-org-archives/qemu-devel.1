@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.guang55@zte.com.cn>) id 1cqFRG-0006Mr-Bq
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:46:50 -0400
+	(envelope-from <fred.konrad@greensocs.com>) id 1cqFVS-0007WY-88
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:51:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wang.guang55@zte.com.cn>) id 1cqFRC-00088S-J1
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:46:46 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:55930)
+	(envelope-from <fred.konrad@greensocs.com>) id 1cqFVO-00028k-4K
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:51:06 -0400
+Received: from greensocs.com ([193.104.36.180]:44695)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.guang55@zte.com.cn>) id 1cqFRA-000858-P2
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:46:42 -0400
-Date: Tue, 21 Mar 2017 16:44:47 +0800 (CST)
-Message-ID: <201703211644476298698@zte.com.cn>
-References: 201703211610470826648@zte.com.cn,58D0E38E.1080109@huawei.com
-Mime-Version: 1.0
-From: <wang.guang55@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiBSZTogICDnrZTlpI06IFJlOiAg562U?=
- =?utf-8?b?5aSNOiBSZTogW0JVR11DT0xPIGZhaWxvdmVyIGhhbmc=?=
+	(envelope-from <fred.konrad@greensocs.com>) id 1cqFVN-00027j-BD
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:51:02 -0400
+References: <20170320180024.23432-1-arvolkov@inbox.ru>
+From: Frederic Konrad <fred.konrad@greensocs.com>
+Message-ID: <bf33ecef-2eff-d388-3000-1f2924a19b72@greensocs.com>
+Date: Tue, 21 Mar 2017 09:50:56 +0100
+MIME-Version: 1.0
+In-Reply-To: <20170320180024.23432-1-arvolkov@inbox.ru>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw: dead code removal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,257 +26,253 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhang.zhanghailiang@huawei.com
-Cc: zhangchen.fnst@cn.fujitsu.com, xuquan8@huawei.com, qemu-devel@nongnu.org
+To: Anton Volkov <arvolkov@inbox.ru>
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, kraxel@redhat.com, agraf@suse.de
 
-YW1vc3QgbGlrZSB3aWtp77yMYnV0IHBhbmljIGluIFByaW1hcnkgTm9kZS4NCg0KDQoNCg0Kc2V0
-cDoNCg0KMSANCg0KUHJpbWFyeSBOb2RlLg0KDQp4ODZfNjQtc29mdG1tdS9xZW11LXN5c3RlbS14
-ODZfNjQgLWVuYWJsZS1rdm0gLWJvb3QgYyAtbSAyMDQ4IC1zbXAgMiAtcW1wIHN0ZGlvIC12bmMg
-OjcgLW5hbWUgcHJpbWFyeSAtY3B1IHFlbXU2NCwra3ZtY2xvY2sgLWRldmljZSBwaWl4My11c2It
-dWhjaSAtdXNiIC11c2JkZXZpY2UgdGFibGV0XA0KDQogIC1kcml2ZSBpZj12aXJ0aW8saWQ9Y29s
-by1kaXNrMCxkcml2ZXI9cXVvcnVtLHJlYWQtcGF0dGVybj1maWZvLHZvdGUtdGhyZXNob2xkPTEs
-DQoNCiAgIGNoaWxkcmVuLjAuZmlsZS5maWxlbmFtZT0vbW50L3NkZC9wdXJlX0lNRy9saW51eC9y
-ZWRoYXQvcmhlbF82LjVfNjRfMlVfaWRlLGNoaWxkcmVuLjAuZHJpdmVyPXFjb3cyIC1TIFwNCg0K
-ICAtbmV0ZGV2IHRhcCxpZD1objEsdmhvc3Q9b2ZmLHNjcmlwdD0vZXRjL3FlbXUtaWZ1cDIsZG93
-bnNjcmlwdD0vZXRjL3FlbXUtaWZkb3duMiBcDQoNCiAgLWRldmljZSBlMTAwMCxpZD1lMSxuZXRk
-ZXY9aG4xLG1hYz01MjphNDowMDoxMjo3ODo2NyBcDQoNCiAgLW5ldGRldiB0YXAsaWQ9aG4wLHZo
-b3N0PW9mZixzY3JpcHQ9L2V0Yy9xZW11LWlmdXAsZG93bnNjcmlwdD0vZXRjL3FlbXUtaWZkb3du
-IFwNCg0KICAtZGV2aWNlIGUxMDAwLGlkPWUwLG5ldGRldj1objAsbWFjPTUyOmE0OjAwOjEyOjc4
-OjY2IFwNCg0KICAtY2hhcmRldiBzb2NrZXQsaWQ9bWlycm9yMCxob3N0PTkuNjEuMS44LHBvcnQ9
-OTAwMyxzZXJ2ZXIsbm93YWl0IC1jaGFyZGV2IHNvY2tldCxpZD1jb21wYXJlMSxob3N0PTkuNjEu
-MS44LHBvcnQ9OTAwNCxzZXJ2ZXIsbm93YWl0IFwNCg0KICAtY2hhcmRldiBzb2NrZXQsaWQ9Y29t
-cGFyZTAsaG9zdD05LjYxLjEuOCxwb3J0PTkwMDEsc2VydmVyLG5vd2FpdCAtY2hhcmRldiBzb2Nr
-ZXQsaWQ9Y29tcGFyZTAtMCxob3N0PTkuNjEuMS44LHBvcnQ9OTAwMSBcDQoNCiAgLWNoYXJkZXYg
-c29ja2V0LGlkPWNvbXBhcmVfb3V0LGhvc3Q9OS42MS4xLjgscG9ydD05MDA1LHNlcnZlcixub3dh
-aXQgXA0KDQogIC1jaGFyZGV2IHNvY2tldCxpZD1jb21wYXJlX291dDAsaG9zdD05LjYxLjEuOCxw
-b3J0PTkwMDUgXA0KDQogIC1vYmplY3QgZmlsdGVyLW1pcnJvcixpZD1tMCxuZXRkZXY9aG4wLHF1
-ZXVlPXR4LG91dGRldj1taXJyb3IwIFwNCg0KICAtb2JqZWN0IGZpbHRlci1yZWRpcmVjdG9yLG5l
-dGRldj1objAsaWQ9cmVkaXJlMCxxdWV1ZT1yeCxpbmRldj1jb21wYXJlX291dCAtb2JqZWN0IGZp
-bHRlci1yZWRpcmVjdG9yLG5ldGRldj1objAsaWQ9cmVkaXJlMSxxdWV1ZT1yeCxvdXRkZXY9Y29t
-cGFyZTAgXA0KDQogIC1vYmplY3QgY29sby1jb21wYXJlLGlkPWNvbXAwLHByaW1hcnlfaW49Y29t
-cGFyZTAtMCxzZWNvbmRhcnlfaW49Y29tcGFyZTEsb3V0ZGV2PWNvbXBhcmVfb3V0MA0KDQoyIFNl
-Y29uZCBub2RlOg0KDQp4ODZfNjQtc29mdG1tdS9xZW11LXN5c3RlbS14ODZfNjQgLWJvb3QgYyAt
-bSAyMDQ4IC1zbXAgMiAtcW1wIHN0ZGlvIC12bmMgOjcgLW5hbWUgc2Vjb25kYXJ5IC1lbmFibGUt
-a3ZtIC1jcHUgcWVtdTY0LCtrdm1jbG9jayAtZGV2aWNlIHBpaXgzLXVzYi11aGNpIC11c2IgLXVz
-YmRldmljZSB0YWJsZXRcDQoNCiAgLWRyaXZlIGlmPW5vbmUsaWQ9Y29sby1kaXNrMCxmaWxlLmZp
-bGVuYW1lPS9tbnQvc2RkL3B1cmVfSU1HL2xpbnV4L3JlZGhhdC9yaGVsXzYuNV82NF8yVV9pZGUs
-ZHJpdmVyPXFjb3cyLG5vZGUtbmFtZT1ub2RlMCBcDQoNCiAgLWRyaXZlIGlmPXZpcnRpbyxpZD1h
-Y3RpdmUtZGlzazAsZHJpdmVyPXJlcGxpY2F0aW9uLG1vZGU9c2Vjb25kYXJ5LGZpbGUuZHJpdmVy
-PXFjb3cyLHRvcC1pZD1hY3RpdmUtZGlzazAsZmlsZS5maWxlLmZpbGVuYW1lPS9tbnQvcmFtZnN0
-ZXN0L2FjdGl2ZV9kaXNrLmltZyxmaWxlLmJhY2tpbmcuZHJpdmVyPXFjb3cyLGZpbGUuYmFja2lu
-Zy5maWxlLmZpbGVuYW1lPS9tbnQvcmFtZnN0ZXN0L2hpZGRlbl9kaXNrLmltZyxmaWxlLmJhY2tp
-bmcuYmFja2luZz1jb2xvLWRpc2swICBcDQoNCiAgIC1uZXRkZXYgdGFwLGlkPWhuMSx2aG9zdD1v
-ZmYsc2NyaXB0PS9ldGMvcWVtdS1pZnVwMixkb3duc2NyaXB0PS9ldGMvcWVtdS1pZmRvd24yIFwN
-Cg0KICAtZGV2aWNlIGUxMDAwLGlkPWUxLG5ldGRldj1objEsbWFjPTUyOmE0OjAwOjEyOjc4OjY3
-IFwNCg0KICAtbmV0ZGV2IHRhcCxpZD1objAsdmhvc3Q9b2ZmLHNjcmlwdD0vZXRjL3FlbXUtaWZ1
-cCxkb3duc2NyaXB0PS9ldGMvcWVtdS1pZmRvd24gXA0KDQogIC1kZXZpY2UgZTEwMDAsbmV0ZGV2
-PWhuMCxtYWM9NTI6YTQ6MDA6MTI6Nzg6NjYgLWNoYXJkZXYgc29ja2V0LGlkPXJlZDAsaG9zdD05
-LjYxLjEuOCxwb3J0PTkwMDMgXA0KDQogIC1jaGFyZGV2IHNvY2tldCxpZD1yZWQxLGhvc3Q9OS42
-MS4xLjgscG9ydD05MDA0IFwNCg0KICAtb2JqZWN0IGZpbHRlci1yZWRpcmVjdG9yLGlkPWYxLG5l
-dGRldj1objAscXVldWU9dHgsaW5kZXY9cmVkMCBcDQoNCiAgLW9iamVjdCBmaWx0ZXItcmVkaXJl
-Y3RvcixpZD1mMixuZXRkZXY9aG4wLHF1ZXVlPXJ4LG91dGRldj1yZWQxIFwNCg0KICAtb2JqZWN0
-IGZpbHRlci1yZXdyaXRlcixpZD1yZXcwLG5ldGRldj1objAscXVldWU9YWxsIC1pbmNvbWluZyB0
-Y3A6MDo4ODg4DQoNCjMgIFNlY29uZGFyeSBub2RlOg0KDQp7J2V4ZWN1dGUnOidxbXBfY2FwYWJp
-bGl0aWVzJ30NCg0KeyAnZXhlY3V0ZSc6ICduYmQtc2VydmVyLXN0YXJ0JywNCg0KICAnYXJndW1l
-bnRzJzogeydhZGRyJzogeyd0eXBlJzogJ2luZXQnLCAnZGF0YSc6IHsnaG9zdCc6ICc5LjYxLjEu
-NycsICdwb3J0JzogJzg4ODknfSB9IH0NCg0KfQ0KDQp7J2V4ZWN1dGUnOiAnbmJkLXNlcnZlci1h
-ZGQnLCAnYXJndW1lbnRzJzogeydkZXZpY2UnOiAnY29sby1kaXNrMCcsICd3cml0YWJsZSc6IHRy
-dWUgfSB9DQoNCjQ6UHJpbWFyeSBOb2Rl77yaDQoNCnsnZXhlY3V0ZSc6J3FtcF9jYXBhYmlsaXRp
-ZXMnfQ0KDQoNCnsgJ2V4ZWN1dGUnOiAnaHVtYW4tbW9uaXRvci1jb21tYW5kJywNCg0KICAnYXJn
-dW1lbnRzJzogeydjb21tYW5kLWxpbmUnOiAnZHJpdmVfYWRkIC1uIGJ1ZGR5IGRyaXZlcj1yZXBs
-aWNhdGlvbixtb2RlPXByaW1hcnksZmlsZS5kcml2ZXI9bmJkLGZpbGUuaG9zdD05LjYxLjEuNyxm
-aWxlLnBvcnQ9ODg4OSxmaWxlLmV4cG9ydD1jb2xvLWRpc2swLG5vZGUtbmFtZT1ub2RlMCd9fQ0K
-DQp7ICdleGVjdXRlJzoneC1ibG9ja2Rldi1jaGFuZ2UnLCAnYXJndW1lbnRzJzp7J3BhcmVudCc6
-ICdjb2xvLWRpc2swJywgJ25vZGUnOiAnbm9kZTAnIH0gfQ0KDQp7ICdleGVjdXRlJzogJ21pZ3Jh
-dGUtc2V0LWNhcGFiaWxpdGllcycsDQoNCiAgICAgICdhcmd1bWVudHMnOiB7J2NhcGFiaWxpdGll
-cyc6IFsgeydjYXBhYmlsaXR5JzogJ3gtY29sbycsICdzdGF0ZSc6IHRydWUgfSBdIH0gfQ0KDQp7
-ICdleGVjdXRlJzogJ21pZ3JhdGUnLCAnYXJndW1lbnRzJzogeyd1cmknOiAndGNwOjkuNjEuMS43
-Ojg4ODgnIH0gfQ0KDQoNCg0KDQp0aGVuIGNhbiBzZWUgdHdvIHJ1bmluZyBWTXMsIHdoZW5ldmVy
-IHlvdSBtYWtlIGNoYW5nZXMgdG8gUFZNLCBTVk0gd2lsbCBiZSBzeW5jZWQuICANCg0KDQoNCg0K
-Ne+8mlByaW1hcnkgTm9kZe+8mg0KDQplY2hvIGMg77yeIC9wcm9jL3N5c3JxLXRyaWdnZXINCg0K
-DQoNCg0K77yW77yaU2Vjb25kYXJ5IG5vZGU6DQoNCnsgJ2V4ZWN1dGUnOiAnbmJkLXNlcnZlci1z
-dG9wJyB9DQoNCnsgImV4ZWN1dGUiOiAieC1jb2xvLWxvc3QtaGVhcnRiZWF0IiB9DQoNCg0KDQoN
-CnRoZW4gY2FuIHNlZSB0aGUgU2Vjb25kYXJ5IG5vZGUgaGFuZyBhdCByZWN2bXNnIHJlY3Ztc2cg
-Lg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0K5Y6f5aeL6YKu5Lu2DQoNCg0KDQrlj5Hku7bkurrv
-vJog77ycemhhbmcuemhhbmdoYWlsaWFuZ0BodWF3ZWkuY29t77yeDQrmlLbku7bkurrvvJrnjovl
-ub8xMDE2NTk5MiDvvJx6aGFuZ2NoZW4uZm5zdEBjbi5mdWppdHN1LmNvbe+8ng0K5oqE6YCB5Lq6
-77yaIO+8nHh1cXVhbjhAaHVhd2VpLmNvbe+8niDvvJxxZW11LWRldmVsQG5vbmdudS5vcmfvvJ4N
-CuaXpSDmnJ8g77yaMjAxN+W5tDAz5pyIMjHml6UgMTY6MjcNCuS4uyDpopgg77yaUmU6IFtRZW11
-LWRldmVsXSAg562U5aSNOiBSZTogIOetlOWkjTogUmU6IFtCVUddQ09MTyBmYWlsb3ZlciBoYW5n
-DQoNCg0KDQoNCg0KSGksDQoNCk9uIDIwMTcvMy8yMSAxNjoxMCwgd2FuZy5ndWFuZzU1QHp0ZS5j
-b20uY24gd3JvdGU6DQrvvJ4gVGhhbmsgeW9144CCDQrvvJ4NCu+8niBJIGhhdmUgdGVzdCBhcmVh
-ZHnjgIINCu+8ng0K77yeIFdoZW4gdGhlIFByaW1hcnkgTm9kZSBwYW5pYyx0aGUgU2Vjb25kYXJ5
-IE5vZGUgcWVtdSBoYW5nIGF0IHRoZSBzYW1lIHBsYWNl44CCDQrvvJ4NCu+8niBJbmNvcnJkaW5n
-IGh0dHA6Ly93aWtpLnFlbXUtcHJvamVjdC5vcmcvRmVhdHVyZXMvQ09MTyDvvIxraWxsIFByaW1h
-cnkgTm9kZSBxZW11IHdpbGwgbm90IHByb2R1Y2UgdGhlIHByb2JsZW0sYnV0IFByaW1hcnkgTm9k
-ZSBwYW5pYyBjYW7jgIINCu+8ng0K77yeIEkgdGhpbmsgZHVlIHRvIHRoZSBmZWF0dXJlIG9mIGNo
-YW5uZWwgZG9lcyBub3Qgc3VwcG9ydCBRSU9fQ0hBTk5FTF9GRUFUVVJFX1NIVVRET1dOLg0K77ye
-DQrvvJ4NCg0KWWVzLCB5b3UgYXJlIHJpZ2h0LCB3aGVuIHdlIGRvIGZhaWxvdmVyIGZvciBwcmlt
-YXJ5L3NlY29uZGFyeSBWTSwgd2Ugd2lsbCBzaHV0ZG93biB0aGUgcmVsYXRlZA0KZmQgaW4gY2Fz
-ZSBpdCBpcyBzdHVjayBpbiB0aGUgcmVhZC93cml0ZSBmZC4NCg0KSXQgc2VlbXMgdGhhdCB5b3Ug
-ZGlkbid0IGZvbGxvdyB0aGUgYWJvdmUgaW50cm9kdWN0aW9uIGV4YWN0bHkgdG8gZG8gdGhlIHRl
-c3QuIENvdWxkIHlvdQ0Kc2hhcmUgeW91ciB0ZXN0IHByb2NlZHVyZXMgPyBFc3BlY2lhbGx5IHRo
-ZSBjb21tYW5kcyB1c2VkIGluIHRoZSB0ZXN0Lg0KDQpUaGFua3MsDQpIYWlsaWFuZw0KDQrvvJ4g
-d2hlbiBmYWlsb3ZlcixjaGFubmVsX3NodXRkb3duIGNvdWxkIG5vdCBzaHV0IGRvd24gdGhlIGNo
-YW5uZWwuDQrvvJ4NCu+8ng0K77yeIHNvIHRoZSBjb2xvX3Byb2Nlc3NfaW5jb21pbmdfdGhyZWFk
-IHdpbGwgaGFuZyBhdCByZWN2bXNnLg0K77yeDQrvvJ4NCu+8niBJIHRlc3QgYSBwYXRjaDoNCu+8
-ng0K77yeDQrvvJ4gZGlmZiAtLWdpdCBhL21pZ3JhdGlvbi9zb2NrZXQuYyBiL21pZ3JhdGlvbi9z
-b2NrZXQuYw0K77yeDQrvvJ4NCu+8niBpbmRleCAxMzk2NmYxLi5kNjVhMGVhIDEwMDY0NA0K77ye
-DQrvvJ4NCu+8niAtLS0gYS9taWdyYXRpb24vc29ja2V0LmMNCu+8ng0K77yeDQrvvJ4gKysrIGIv
-bWlncmF0aW9uL3NvY2tldC5jDQrvvJ4NCu+8ng0K77yeIEBAIC0xNDcsOCArMTQ3LDkgQEAgc3Rh
-dGljIGdib29sZWFuIHNvY2tldF9hY2NlcHRfaW5jb21pbmdfbWlncmF0aW9uKFFJT0NoYW5uZWwg
-KmlvYywNCu+8ng0K77yeDQrvvJ4gICAgICAgfQ0K77yeDQrvvJ4NCu+8ng0K77yeDQrvvJ4NCu+8
-niAgICAgICB0cmFjZV9taWdyYXRpb25fc29ja2V0X2luY29taW5nX2FjY2VwdGVkKCkNCu+8ng0K
-77yeDQrvvJ4NCu+8ng0K77yeDQrvvJ4gICAgICAgcWlvX2NoYW5uZWxfc2V0X25hbWUoUUlPX0NI
-QU5ORUwoc2lvYyksICJtaWdyYXRpb24tc29ja2V0LWluY29taW5nIikNCu+8ng0K77yeDQrvvJ4g
-KyAgICBxaW9fY2hhbm5lbF9zZXRfZmVhdHVyZShRSU9fQ0hBTk5FTChzaW9jKSwgUUlPX0NIQU5O
-RUxfRkVBVFVSRV9TSFVURE9XTikNCu+8ng0K77yeDQrvvJ4gICAgICAgbWlncmF0aW9uX2NoYW5u
-ZWxfcHJvY2Vzc19pbmNvbWluZyhtaWdyYXRlX2dldF9jdXJyZW50KCksDQrvvJ4NCu+8ng0K77ye
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgUUlPX0NIQU5ORUwoc2lv
-YykpDQrvvJ4NCu+8ng0K77yeICAgICAgIG9iamVjdF91bnJlZihPQkpFQ1Qoc2lvYykpDQrvvJ4N
-Cu+8ng0K77yeDQrvvJ4NCu+8niBNeSB0ZXN0IHdpbGwgbm90IGhhbmcgYW55IG1vcmUuDQrvvJ4N
-Cu+8ng0K77yeDQrvvJ4NCu+8ng0K77yeDQrvvJ4NCu+8ng0K77yeDQrvvJ4NCu+8ng0K77yeDQrv
-vJ4NCu+8ng0K77yeDQrvvJ4NCu+8ng0K77yeIOWOn+Wni+mCruS7tg0K77yeDQrvvJ4NCu+8ng0K
-77yeIOWPkeS7tuS6uu+8miDvvJx6aGFuZ2NoZW4uZm5zdEBjbi5mdWppdHN1LmNvbe+8ng0K77ye
-IOaUtuS7tuS6uu+8mueOi+W5vzEwMTY1OTkyIO+8nHpoYW5nLnpoYW5naGFpbGlhbmdAaHVhd2Vp
-LmNvbe+8ng0K77yeIOaKhOmAgeS6uu+8miDvvJxxZW11LWRldmVsQG5vbmdudS5vcmfvvJ4g77yc
-emhhbmdjaGVuLmZuc3RAY24uZnVqaXRzdS5jb23vvJ4NCu+8niDml6Ug5pyfIO+8mjIwMTflubQw
-M+aciDIx5pelIDE1OjU4DQrvvJ4g5Li7IOmimCDvvJpSZTogW1FlbXUtZGV2ZWxdICDnrZTlpI06
-IFJlOiAgW0JVR11DT0xPIGZhaWxvdmVyIGhhbmcNCu+8ng0K77yeDQrvvJ4NCu+8ng0K77yeDQrv
-vJ4gSGksV2FuZy4NCu+8ng0K77yeIFlvdSBjYW4gdGVzdCB0aGlzIGJyYW5jaDoNCu+8ng0K77ye
-IGh0dHBzOi8vZ2l0aHViLmNvbS9jb2xvZnQvcWVtdS90cmVlL2NvbG8tdjUuMS1kZXZlbG9waW5n
-LUNPTE8tZnJhbWUtdjIxLXdpdGgtc2hhcmVkLWRpc2sNCu+8ng0K77yeIGFuZCBwbGVhc2UgZm9s
-bG93IHdpa2kgZW5zdXJlIHlvdXIgb3duIGNvbmZpZ3VyYXRpb24gY29ycmVjdGx5Lg0K77yeDQrv
-vJ4gaHR0cDovL3dpa2kucWVtdS1wcm9qZWN0Lm9yZy9GZWF0dXJlcy9DT0xPDQrvvJ4NCu+8ng0K
-77yeIFRoYW5rcw0K77yeDQrvvJ4gWmhhbmcgQ2hlbg0K77yeDQrvvJ4NCu+8niBPbiAwMy8yMS8y
-MDE3IDAzOjI3IFBNLCB3YW5nLmd1YW5nNTVAenRlLmNvbS5jbiB3cm90ZToNCu+8niDvvJ4NCu+8
-niDvvJ4gaGkuDQrvvJ4g77yeDQrvvJ4g77yeIEkgdGVzdCB0aGUgZ2l0IHFlbXUgbWFzdGVyIGhh
-dmUgdGhlIHNhbWUgcHJvYmxlbS4NCu+8niDvvJ4NCu+8niDvvJ4gKGdkYikgYnQNCu+8niDvvJ4N
-Cu+8niDvvJ4gIzAgIHFpb19jaGFubmVsX3NvY2tldF9yZWFkdiAoaW9jPTB4N2Y2NTkxMWI0ZTUw
-LCBpb3Y9MHg3ZjY0ZWYzZmQ4ODAsDQrvvJ4g77yeIG5pb3Y9MSwgZmRzPTB4MCwgbmZkcz0weDAs
-IGVycnA9MHgwKSBhdCBpby9jaGFubmVsLXNvY2tldC5jOjQ2MQ0K77yeIO+8ng0K77yeIO+8niAj
-MSAgMHgwMDAwN2Y2NThlNGFhMGMyIGluIHFpb19jaGFubmVsX3JlYWQNCu+8niDvvJ4gKGlvYz1p
-b2NAZW50cnk9MHg3ZjY1OTExYjRlNTAsIGJ1Zj1idWZAZW50cnk9MHg3ZjY1OTA3Y2I4MzggIiIs
-DQrvvJ4g77yeIGJ1Zmxlbj1idWZsZW5AZW50cnk9MzI3NjgsIGVycnA9ZXJycEBlbnRyeT0weDAp
-IGF0IGlvL2NoYW5uZWwuYzoxMTQNCu+8niDvvJ4NCu+8niDvvJ4gIzIgIDB4MDAwMDdmNjU4ZTNl
-YTk5MCBpbiBjaGFubmVsX2dldF9idWZmZXIgKG9wYXF1ZT3vvJxvcHRpbWl6ZWQgb3V077yeLA0K
-77yeIO+8niBidWY9MHg3ZjY1OTA3Y2I4MzggIiIsIHBvcz3vvJxvcHRpbWl6ZWQgb3V077yeLCBz
-aXplPTMyNzY4KSBhdA0K77yeIO+8niBtaWdyYXRpb24vcWVtdS1maWxlLWNoYW5uZWwuYzo3OA0K
-77yeIO+8ng0K77yeIO+8niAjMyAgMHgwMDAwN2Y2NThlM2U5N2ZjIGluIHFlbXVfZmlsbF9idWZm
-ZXIgKGY9MHg3ZjY1OTA3Y2I4MDApIGF0DQrvvJ4g77yeIG1pZ3JhdGlvbi9xZW11LWZpbGUuYzoy
-OTUNCu+8niDvvJ4NCu+8niDvvJ4gIzQgIDB4MDAwMDdmNjU4ZTNlYTJlMSBpbiBxZW11X3BlZWtf
-Ynl0ZSAoZj1mQGVudHJ5PTB4N2Y2NTkwN2NiODAwLA0K77yeIO+8niBvZmZzZXQ9b2Zmc2V0QGVu
-dHJ5PTApIGF0IG1pZ3JhdGlvbi9xZW11LWZpbGUuYzo1NTUNCu+8niDvvJ4NCu+8niDvvJ4gIzUg
-IDB4MDAwMDdmNjU4ZTNlYTM0YiBpbiBxZW11X2dldF9ieXRlIChmPWZAZW50cnk9MHg3ZjY1OTA3
-Y2I4MDApIGF0DQrvvJ4g77yeIG1pZ3JhdGlvbi9xZW11LWZpbGUuYzo1NjgNCu+8niDvvJ4NCu+8
-niDvvJ4gIzYgIDB4MDAwMDdmNjU4ZTNlYTU1MiBpbiBxZW11X2dldF9iZTMyIChmPWZAZW50cnk9
-MHg3ZjY1OTA3Y2I4MDApIGF0DQrvvJ4g77yeIG1pZ3JhdGlvbi9xZW11LWZpbGUuYzo2NDgNCu+8
-niDvvJ4NCu+8niDvvJ4gIzcgIDB4MDAwMDdmNjU4ZTNlNjZlNSBpbiBjb2xvX3JlY2VpdmVfbWVz
-c2FnZSAoZj0weDdmNjU5MDdjYjgwMCwNCu+8niDvvJ4gZXJycD1lcnJwQGVudHJ5PTB4N2Y2NGVm
-M2ZkOWIwKSBhdCBtaWdyYXRpb24vY29sby5jOjI0NA0K77yeIO+8ng0K77yeIO+8niAjOCAgMHgw
-MDAwN2Y2NThlM2U2ODFlIGluIGNvbG9fcmVjZWl2ZV9jaGVja19tZXNzYWdlIChmPe+8nG9wdGlt
-aXplZA0K77yeIO+8niBvdXTvvJ4sIGV4cGVjdF9tc2c9ZXhwZWN0X21zZ0BlbnRyeT1DT0xPX01F
-U1NBR0VfVk1TVEFURV9TRU5ELA0K77yeIO+8niBlcnJwPWVycnBAZW50cnk9MHg3ZjY0ZWYzZmRh
-MDgpDQrvvJ4g77yeDQrvvJ4g77yeICAgICBhdCBtaWdyYXRpb24vY29sby5jOjI2NA0K77yeIO+8
-ng0K77yeIO+8niAjOSAgMHgwMDAwN2Y2NThlM2U3NDBlIGluIGNvbG9fcHJvY2Vzc19pbmNvbWlu
-Z190aHJlYWQNCu+8niDvvJ4gKG9wYXF1ZT0weDdmNjU4ZWIzMDM2MCDvvJxtaXNfY3VycmVudC4z
-MTI4Nu+8nikgYXQgbWlncmF0aW9uL2NvbG8uYzo1NzcNCu+8niDvvJ4NCu+8niDvvJ4gIzEwIDB4
-MDAwMDdmNjU4YmUwOWRmMyBpbiBzdGFydF90aHJlYWQgKCkgZnJvbSAvbGliNjQvbGlicHRocmVh
-ZC5zby4wDQrvvJ4g77yeDQrvvJ4g77yeICMxMSAweDAwMDA3ZjY1ODgxOTgzZWQgaW4gY2xvbmUg
-KCkgZnJvbSAvbGliNjQvbGliYy5zby42DQrvvJ4g77yeDQrvvJ4g77yeIChnZGIpIHAgaW9jLe+8
-nm5hbWUNCu+8niDvvJ4NCu+8niDvvJ4gJDIgPSAweDdmNjU4ZmY3ZDVjMCAibWlncmF0aW9uLXNv
-Y2tldC1pbmNvbWluZyINCu+8niDvvJ4NCu+8niDvvJ4gKGdkYikgcCBpb2Mt77yeZmVhdHVyZXMg
-ICAgICAgIERvIG5vdCBzdXBwb3J0IFFJT19DSEFOTkVMX0ZFQVRVUkVfU0hVVERPV04NCu+8niDv
-vJ4NCu+8niDvvJ4gJDMgPSAwDQrvvJ4g77yeDQrvvJ4g77yeDQrvvJ4g77yeIChnZGIpIGJ0DQrv
-vJ4g77yeDQrvvJ4g77yeICMwICBzb2NrZXRfYWNjZXB0X2luY29taW5nX21pZ3JhdGlvbiAoaW9j
-PTB4N2ZkY2NlZWFmYTkwLA0K77yeIO+8niBjb25kaXRpb249R19JT19JTiwgb3BhcXVlPTB4N2Zk
-Y2NlZWFmYTkwKSBhdCBtaWdyYXRpb24vc29ja2V0LmM6MTM3DQrvvJ4g77yeDQrvvJ4g77yeICMx
-ICAweDAwMDA3ZmRjYzY5NjYzNTAgaW4gZ19tYWluX2Rpc3BhdGNoIChjb250ZXh0Pe+8nG9wdGlt
-aXplZCBvdXTvvJ4pIGF0DQrvvJ4g77yeIGdtYWluLmM6MzA1NA0K77yeIO+8ng0K77yeIO+8niAj
-MiAgZ19tYWluX2NvbnRleHRfZGlzcGF0Y2ggKGNvbnRleHQ977ycb3B0aW1pemVkIG91dO+8niwN
-Cu+8niDvvJ4gY29udGV4dEBlbnRyeT0weDdmZGNjY2U5ZjU5MCkgYXQgZ21haW4uYzozNjMwDQrv
-vJ4g77yeDQrvvJ4g77yeICMzICAweDAwMDA3ZmRjY2I4YTZkY2MgaW4gZ2xpYl9wb2xsZmRzX3Bv
-bGwgKCkgYXQgdXRpbC9tYWluLWxvb3AuYzoyMTMNCu+8niDvvJ4NCu+8niDvvJ4gIzQgIG9zX2hv
-c3RfbWFpbl9sb29wX3dhaXQgKHRpbWVvdXQ977ycb3B0aW1pemVkIG91dO+8nikgYXQNCu+8niDv
-vJ4gdXRpbC9tYWluLWxvb3AuYzoyNTgNCu+8niDvvJ4NCu+8niDvvJ4gIzUgIG1haW5fbG9vcF93
-YWl0IChub25ibG9ja2luZz1ub25ibG9ja2luZ0BlbnRyeT0wKSBhdA0K77yeIO+8niB1dGlsL21h
-aW4tbG9vcC5jOjUwNg0K77yeIO+8ng0K77yeIO+8niAjNiAgMHgwMDAwN2ZkY2NiNTI2MTg3IGlu
-IG1haW5fbG9vcCAoKSBhdCB2bC5jOjE4OTgNCu+8niDvvJ4NCu+8niDvvJ4gIzcgIG1haW4gKGFy
-Z2M977ycb3B0aW1pemVkIG91dO+8niwgYXJndj3vvJxvcHRpbWl6ZWQgb3V077yeLCBlbnZwPe+8
-nG9wdGltaXplZA0K77yeIO+8niBvdXTvvJ4pIGF0IHZsLmM6NDcwOQ0K77yeIO+8ng0K77yeIO+8
-niAoZ2RiKSBwIGlvYy3vvJ5mZWF0dXJlcw0K77yeIO+8ng0K77yeIO+8niAkMSA9IDYNCu+8niDv
-vJ4NCu+8niDvvJ4gKGdkYikgcCBpb2Mt77yebmFtZQ0K77yeIO+8ng0K77yeIO+8niAkMiA9IDB4
-N2ZkY2NlMWIxYWIwICJtaWdyYXRpb24tc29ja2V0LWxpc3RlbmVyIg0K77yeIO+8ng0K77yeIO+8
-ng0K77yeIO+8niBNYXkgYmUgc29ja2V0X2FjY2VwdF9pbmNvbWluZ19taWdyYXRpb24gc2hvdWxk
-DQrvvJ4g77yeIGNhbGwgcWlvX2NoYW5uZWxfc2V0X2ZlYXR1cmUoaW9jLCBRSU9fQ0hBTk5FTF9G
-RUFUVVJFX1NIVVRET1dOKT8/DQrvvJ4g77yeDQrvvJ4g77yeDQrvvJ4g77yeIHRoYW5rIHlvdS4N
-Cu+8niDvvJ4NCu+8niDvvJ4NCu+8niDvvJ4NCu+8niDvvJ4NCu+8niDvvJ4NCu+8niDvvJ4g5Y6f
-5aeL6YKu5Lu2DQrvvJ4g77yeICrlj5Hku7bkurrvvJoq77ycemhhbmdjaGVuLmZuc3RAY24uZnVq
-aXRzdS5jb23vvJ4NCu+8niDvvJ4gKuaUtuS7tuS6uu+8mirnjovlub8xMDE2NTk5Mu+8nHFlbXUt
-ZGV2ZWxAbm9uZ251Lm9yZ++8ng0K77yeIO+8niAq5oqE6YCB5Lq677yaKu+8nHpoYW5nY2hlbi5m
-bnN0QGNuLmZ1aml0c3UuY29t77ye77ycemhhbmcuemhhbmdoYWlsaWFuZ0BodWF3ZWkuY29t77ye
-DQrvvJ4g77yeICrml6Ug5pyfIO+8mioyMDE35bm0MDPmnIgxNuaXpSAxNDo0Ng0K77yeIO+8niAq
-5Li7IOmimCDvvJoqKlJlOiBbUWVtdS1kZXZlbF0gQ09MTyBmYWlsb3ZlciBoYW5nKg0K77yeIO+8
-ng0K77yeIO+8ng0K77yeIO+8ng0K77yeIO+8ng0K77yeIO+8niBPbiAwMy8xNS8yMDE3IDA1OjA2
-IFBNLCB3YW5nZ3Vhbmcgd3JvdGU6DQrvvJ4g77yeIO+8niAgIGFtIHRlc3RpbmcgUUVNVSBDT0xP
-IGZlYXR1cmUgZGVzY3JpYmVkIGhlcmUgW1FFTVUNCu+8niDvvJ4g77yeIFdpa2ldKGh0dHA6Ly93
-aWtpLnFlbXUtcHJvamVjdC5vcmcvRmVhdHVyZXMvQ09MTykuDQrvvJ4g77yeIO+8ng0K77yeIO+8
-niDvvJ4gV2hlbiB0aGUgUHJpbWFyeSBOb2RlIHBhbmljLHRoZSBTZWNvbmRhcnkgTm9kZSBxZW11
-IGhhbmcuDQrvvJ4g77yeIO+8niBoYW5nIGF0IHJlY3Ztc2cgaW4gcWlvX2NoYW5uZWxfc29ja2V0
-X3JlYWR2Lg0K77yeIO+8niDvvJ4gQW5kICBJIHJ1biAgeyAnZXhlY3V0ZSc6ICduYmQtc2VydmVy
-LXN0b3AnIH0gYW5kIHsgImV4ZWN1dGUiOg0K77yeIO+8niDvvJ4gIngtY29sby1sb3N0LWhlYXJ0
-YmVhdCIgfSBpbiBTZWNvbmRhcnkgVk0ncw0K77yeIO+8niDvvJ4gbW9uaXRvcix0aGUgIFNlY29u
-ZGFyeSBOb2RlIHFlbXUgc3RpbGwgaGFuZyBhdCByZWN2bXNnIC4NCu+8niDvvJ4g77yeDQrvvJ4g
-77yeIO+8niBJIGZvdW5kIHRoYXQgdGhlIGNvbG8gaW4gcWVtdSBpcyBub3QgY29tcGxldGUgeWV0
-Lg0K77yeIO+8niDvvJ4gRG8gdGhlIGNvbG8gaGF2ZSBhbnkgcGxhbiBmb3IgZGV2ZWxvcG1lbnQ/
-DQrvvJ4g77yeDQrvvJ4g77yeIFllcywgV2UgYXJlIGRldmVsb3BpbmcuIFlvdSBjYW4gc2VlIHNv
-bWUgb2YgcGF0Y2ggd2UgcHVzaGluZy4NCu+8niDvvJ4NCu+8niDvvJ4g77yeIEhhcyBhbnlvbmUg
-ZXZlciBydW4gaXQgc3VjY2Vzc2Z1bGx5PyBBbnkgaGVscCBpcyBhcHByZWNpYXRlZCENCu+8niDv
-vJ4NCu+8niDvvJ4gSW4gb3VyIGludGVybmFsIHZlcnNpb24gY2FuIHJ1biBpdCBzdWNjZXNzZnVs
-bHksDQrvvJ4g77yeIFRoZSBmYWlsb3ZlciBkZXRhaWwgeW91IGNhbiBhc2sgWmhhbmdoYWlsaWFu
-ZyBmb3IgaGVscC4NCu+8niDvvJ4gTmV4dCB0aW1lIGlmIHlvdSBoYXZlIHNvbWUgcXVlc3Rpb24g
-YWJvdXQgQ09MTywNCu+8niDvvJ4gcGxlYXNlIGNjIG1lIGFuZCB6aGFuZ2hhaWxpYW5nIO+8nHpo
-YW5nLnpoYW5naGFpbGlhbmdAaHVhd2VpLmNvbe+8ni4NCu+8niDvvJ4NCu+8niDvvJ4NCu+8niDv
-vJ4gVGhhbmtzDQrvvJ4g77yeIFpoYW5nIENoZW4NCu+8niDvvJ4NCu+8niDvvJ4NCu+8niDvvJ4g
-77yeDQrvvJ4g77yeIO+8ng0K77yeIO+8niDvvJ4NCu+8niDvvJ4g77yeIGNlbnRvczcuMitxZW11
-Mi43LjUwDQrvvJ4g77yeIO+8niAoZ2RiKSBidA0K77yeIO+8niDvvJ4gIzAgIDB4MDAwMDdmM2Uw
-MGNjODZhZCBpbiByZWN2bXNnICgpIGZyb20gL2xpYjY0L2xpYnB0aHJlYWQuc28uMA0K77yeIO+8
-niDvvJ4gIzEgIDB4MDAwMDdmM2UwMzMyYjczOCBpbiBxaW9fY2hhbm5lbF9zb2NrZXRfcmVhZHYg
-KGlvYz3vvJxvcHRpbWl6ZWQgb3V077yeLA0K77yeIO+8niDvvJ4gaW92Pe+8nG9wdGltaXplZCBv
-dXTvvJ4sIG5pb3Y977ycb3B0aW1pemVkIG91dO+8niwgZmRzPTB4MCwgbmZkcz0weDAsIGVycnA9
-MHgwKSBhdA0K77yeIO+8niDvvJ4gaW8vY2hhbm5lbC1zb2NrZXQuYzo0OTcNCu+8niDvvJ4g77ye
-ICMyICAweDAwMDA3ZjNlMDMzMjk0NzIgaW4gcWlvX2NoYW5uZWxfcmVhZCAoaW9jPWlvY0BlbnRy
-eT0weDdmM2UwNTExMGU0MCwNCu+8niDvvJ4g77yeIGJ1Zj1idWZAZW50cnk9MHg3ZjNlMDU5MTBm
-MzggIiIsIGJ1Zmxlbj1idWZsZW5AZW50cnk9MzI3NjgsDQrvvJ4g77yeIO+8niBlcnJwPWVycnBA
-ZW50cnk9MHgwKSBhdCBpby9jaGFubmVsLmM6OTcNCu+8niDvvJ4g77yeICMzICAweDAwMDA3ZjNl
-MDMyNzUwZTAgaW4gY2hhbm5lbF9nZXRfYnVmZmVyIChvcGFxdWU977ycb3B0aW1pemVkIG91dO+8
-niwNCu+8niDvvJ4g77yeIGJ1Zj0weDdmM2UwNTkxMGYzOCAiIiwgcG9zPe+8nG9wdGltaXplZCBv
-dXTvvJ4sIHNpemU9MzI3NjgpIGF0DQrvvJ4g77yeIO+8niBtaWdyYXRpb24vcWVtdS1maWxlLWNo
-YW5uZWwuYzo3OA0K77yeIO+8niDvvJ4gIzQgIDB4MDAwMDdmM2UwMzI3NDEyYyBpbiBxZW11X2Zp
-bGxfYnVmZmVyIChmPTB4N2YzZTA1OTEwZjAwKSBhdA0K77yeIO+8niDvvJ4gbWlncmF0aW9uL3Fl
-bXUtZmlsZS5jOjI1Nw0K77yeIO+8niDvvJ4gIzUgIDB4MDAwMDdmM2UwMzI3NGE0MSBpbiBxZW11
-X3BlZWtfYnl0ZSAoZj1mQGVudHJ5PTB4N2YzZTA1OTEwZjAwLA0K77yeIO+8niDvvJ4gb2Zmc2V0
-PW9mZnNldEBlbnRyeT0wKSBhdCBtaWdyYXRpb24vcWVtdS1maWxlLmM6NTEwDQrvvJ4g77yeIO+8
-niAjNiAgMHgwMDAwN2YzZTAzMjc0YWFiIGluIHFlbXVfZ2V0X2J5dGUgKGY9ZkBlbnRyeT0weDdm
-M2UwNTkxMGYwMCkgYXQNCu+8niDvvJ4g77yeIG1pZ3JhdGlvbi9xZW11LWZpbGUuYzo1MjMNCu+8
-niDvvJ4g77yeICM3ICAweDAwMDA3ZjNlMDMyNzRjYjIgaW4gcWVtdV9nZXRfYmUzMiAoZj1mQGVu
-dHJ5PTB4N2YzZTA1OTEwZjAwKSBhdA0K77yeIO+8niDvvJ4gbWlncmF0aW9uL3FlbXUtZmlsZS5j
-OjYwMw0K77yeIO+8niDvvJ4gIzggIDB4MDAwMDdmM2UwMzI3MTczNSBpbiBjb2xvX3JlY2VpdmVf
-bWVzc2FnZSAoZj0weDdmM2UwNTkxMGYwMCwNCu+8niDvvJ4g77yeIGVycnA9ZXJycEBlbnRyeT0w
-eDdmM2Q2MmJmYWE1MCkgYXQgbWlncmF0aW9uL2NvbG8uLmM6MjE1DQrvvJ4g77yeIO+8niAjOSAg
-MHgwMDAwN2YzZTAzMjcyNTBkIGluIGNvbG9fd2FpdF9oYW5kbGVfbWVzc2FnZSAoZXJycD0weDdm
-M2Q2MmJmYWE0OCwNCu+8niDvvJ4g77yeIGNoZWNrcG9pbnRfcmVxdWVzdD3vvJxzeW50aGV0aWMg
-cG9pbnRlcu+8niwgZj3vvJxvcHRpbWl6ZWQgb3V077yeKSBhdA0K77yeIO+8niDvvJ4gbWlncmF0
-aW9uL2NvbG8uYzo1NDYNCu+8niDvvJ4g77yeICMxMCBjb2xvX3Byb2Nlc3NfaW5jb21pbmdfdGhy
-ZWFkIChvcGFxdWU9MHg3ZjNlMDY3MjQ1ZTApIGF0DQrvvJ4g77yeIO+8niBtaWdyYXRpb24vY29s
-by5jOjY0OQ0K77yeIO+8niDvvJ4gIzExIDB4MDAwMDdmM2UwMGNjMWRmMyBpbiBzdGFydF90aHJl
-YWQgKCkgZnJvbSAvbGliNjQvbGlicHRocmVhZC5zby4wDQrvvJ4g77yeIO+8niAjMTIgMHgwMDAw
-N2YzZGZjOWMwM2VkIGluIGNsb25lICgpIGZyb20gL2xpYjY0L2xpYmMuc28uNg0K77yeIO+8niDv
-vJ4NCu+8niDvvJ4g77yeDQrvvJ4g77yeIO+8ng0K77yeIO+8niDvvJ4NCu+8niDvvJ4g77yeDQrv
-vJ4g77yeIO+8niAtLQ0K77yeIO+8niDvvJ4gVmlldyB0aGlzIG1lc3NhZ2UgaW4gY29udGV4dDog
-aHR0cDovL3FlbXUuMTEubjcubmFiYmxlLmNvbS9DT0xPLWZhaWxvdmVyLWhhbmctdHA0NzMyNTAu
-aHRtbA0K77yeIO+8niDvvJ4gU2VudCBmcm9tIHRoZSBEZXZlbG9wZXIgbWFpbGluZyBsaXN0IGFy
-Y2hpdmUgYXQgTmFiYmxlLmNvbS4NCu+8niDvvJ4g77yeDQrvvJ4g77yeIO+8ng0K77yeIO+8niDv
-vJ4NCu+8niDvvJ4g77yeDQrvvJ4g77yeDQrvvJ4g77yeIC0tDQrvvJ4g77yeIFRoYW5rcw0K77ye
-IO+8niBaaGFuZyBDaGVuDQrvvJ4g77yeDQrvvJ4g77yeDQrvvJ4g77yeDQrvvJ4g77yeDQrvvJ4g
-77yeDQrvvJ4=
+Hi,
+
+On 03/20/2017 07:00 PM, Anton Volkov wrote:
+> Made functions *_exit in hw/ return void instead of int (they returned 0 all the time)
+> and removed related return value checks
+> 
+> Signed-off-by: Anton Volkov <arvolkov@inbox.ru>
+> ---
+>  hw/audio/hda-codec.c              | 3 +--
+>  hw/audio/intel-hda.c              | 3 +--
+>  hw/audio/intel-hda.h              | 2 +-
+>  hw/char/sclpconsole-lm.c          | 4 ++--
+>  hw/char/sclpconsole.c             | 4 ++--
+>  hw/core/qdev.c                    | 6 +-----
+>  hw/s390x/event-facility.c         | 6 +-----
+>  hw/s390x/virtio-ccw.c             | 7 +++----
+>  hw/s390x/virtio-ccw.h             | 2 +-
+>  hw/usb/dev-smartcard-reader.c     | 3 +--
+>  include/hw/qdev-core.h            | 2 +-
+>  include/hw/s390x/event-facility.h | 2 +-
+>  12 files changed, 16 insertions(+), 28 deletions(-)
+> 
+> diff --git a/hw/audio/hda-codec.c b/hw/audio/hda-codec.c
+> index 52d4640..5402cd1 100644
+> --- a/hw/audio/hda-codec.c
+> +++ b/hw/audio/hda-codec.c
+> @@ -520,7 +520,7 @@ static int hda_audio_init(HDACodecDevice *hda, const struct desc_codec *desc)
+>      return 0;
+>  }
+>  
+> -static int hda_audio_exit(HDACodecDevice *hda)
+> +static void hda_audio_exit(HDACodecDevice *hda)
+>  {
+>      HDAAudioState *a = HDA_AUDIO(hda);
+>      HDAAudioStream *st;
+> @@ -539,7 +539,6 @@ static int hda_audio_exit(HDACodecDevice *hda)
+>          }
+>      }
+>      AUD_remove_card(&a->card);
+> -    return 0;
+>  }
+>  
+>  static int hda_audio_post_load(void *opaque, int version)
+> diff --git a/hw/audio/intel-hda.c b/hw/audio/intel-hda.c
+> index 537face..991c704 100644
+> --- a/hw/audio/intel-hda.c
+> +++ b/hw/audio/intel-hda.c
+> @@ -70,7 +70,7 @@ static void hda_codec_dev_realize(DeviceState *qdev, Error **errp)
+>      }
+>  }
+>  
+> -static int hda_codec_dev_exit(DeviceState *qdev)
+> +static void hda_codec_dev_exit(DeviceState *qdev)
+>  {
+>      HDACodecDevice *dev = HDA_CODEC_DEVICE(qdev);
+>      HDACodecDeviceClass *cdc = HDA_CODEC_DEVICE_GET_CLASS(dev);
+> @@ -78,7 +78,6 @@ static int hda_codec_dev_exit(DeviceState *qdev)
+>      if (cdc->exit) {
+>          cdc->exit(dev);
+>      }
+> -    return 0;
+>  }
+>  
+>  HDACodecDevice *hda_codec_find(HDACodecBus *bus, uint32_t cad)
+> diff --git a/hw/audio/intel-hda.h b/hw/audio/intel-hda.h
+> index d784bcf..53b78da 100644
+> --- a/hw/audio/intel-hda.h
+> +++ b/hw/audio/intel-hda.h
+> @@ -38,7 +38,7 @@ typedef struct HDACodecDeviceClass
+>      DeviceClass parent_class;
+>  
+>      int (*init)(HDACodecDevice *dev);
+> -    int (*exit)(HDACodecDevice *dev);
+> +    void (*exit)(HDACodecDevice *dev);
+>      void (*command)(HDACodecDevice *dev, uint32_t nid, uint32_t data);
+>      void (*stream)(HDACodecDevice *dev, uint32_t stnr, bool running, bool output);
+>  } HDACodecDeviceClass;
+> diff --git a/hw/char/sclpconsole-lm.c b/hw/char/sclpconsole-lm.c
+> index 07d6ebd..fbe5b42 100644
+> --- a/hw/char/sclpconsole-lm.c
+> +++ b/hw/char/sclpconsole-lm.c
+> @@ -318,9 +318,9 @@ static int console_init(SCLPEvent *event)
+>      return 0;
+>  }
+>  
+> -static int console_exit(SCLPEvent *event)
+> +static void console_exit(SCLPEvent *event)
+>  {
+> -    return 0;
+> +    return;
+>  }
+
+Any reason of keeping those function if they do nothing?
+There is a NULL check on the DeviceClass exit callback before it's
+called so maybe just drop this function?
+
+Fred
+
+>  
+>  static void console_reset(DeviceState *dev)
+> diff --git a/hw/char/sclpconsole.c b/hw/char/sclpconsole.c
+> index b78f240..644f7cd 100644
+> --- a/hw/char/sclpconsole.c
+> +++ b/hw/char/sclpconsole.c
+> @@ -246,9 +246,9 @@ static void console_reset(DeviceState *dev)
+>     scon->notify = false;
+>  }
+>  
+> -static int console_exit(SCLPEvent *event)
+> +static void console_exit(SCLPEvent *event)
+>  {
+> -    return 0;
+> +    return;
+>  }
+>  
+>  static Property console_properties[] = {
+> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> index 1e7fb33..5415843 100644
+> --- a/hw/core/qdev.c
+> +++ b/hw/core/qdev.c
+> @@ -238,11 +238,7 @@ static void device_unrealize(DeviceState *dev, Error **errp)
+>      DeviceClass *dc = DEVICE_GET_CLASS(dev);
+>  
+>      if (dc->exit) {
+> -        int rc = dc->exit(dev);
+> -        if (rc < 0) {
+> -            error_setg(errp, "Device exit failed.");
+> -            return;
+> -        }
+> +        dc->exit(dev);
+>      }
+>  }
+>  
+> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+> index 34b2faf..f7c509c 100644
+> --- a/hw/s390x/event-facility.c
+> +++ b/hw/s390x/event-facility.c
+> @@ -413,11 +413,7 @@ static void event_unrealize(DeviceState *qdev, Error **errp)
+>      SCLPEvent *event = SCLP_EVENT(qdev);
+>      SCLPEventClass *child = SCLP_EVENT_GET_CLASS(event);
+>      if (child->exit) {
+> -        int rc = child->exit(event);
+> -        if (rc < 0) {
+> -            error_setg(errp, "SCLP event exit failed.");
+> -            return;
+> -        }
+> +        child->exit(event);
+>      }
+>  }
+>  
+> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+> index 00b3bde..d1c4ff6 100644
+> --- a/hw/s390x/virtio-ccw.c
+> +++ b/hw/s390x/virtio-ccw.c
+> @@ -722,7 +722,7 @@ static void virtio_ccw_device_realize(VirtioCcwDevice *dev, Error **errp)
+>      }
+>  }
+>  
+> -static int virtio_ccw_exit(VirtioCcwDevice *dev)
+> +static void virtio_ccw_exit(VirtioCcwDevice *dev)
+>  {
+>      CcwDevice *ccw_dev = CCW_DEVICE(dev);
+>      SubchDev *sch = ccw_dev->sch;
+> @@ -735,7 +735,6 @@ static int virtio_ccw_exit(VirtioCcwDevice *dev)
+>          release_indicator(&dev->routes.adapter, dev->indicators);
+>          dev->indicators = NULL;
+>      }
+> -    return 0;
+>  }
+>  
+>  static void virtio_ccw_net_realize(VirtioCcwDevice *ccw_dev, Error **errp)
+> @@ -1616,12 +1615,12 @@ static void virtio_ccw_busdev_realize(DeviceState *dev, Error **errp)
+>      virtio_ccw_device_realize(_dev, errp);
+>  }
+>  
+> -static int virtio_ccw_busdev_exit(DeviceState *dev)
+> +static void virtio_ccw_busdev_exit(DeviceState *dev)
+>  {
+>      VirtioCcwDevice *_dev = (VirtioCcwDevice *)dev;
+>      VirtIOCCWDeviceClass *_info = VIRTIO_CCW_DEVICE_GET_CLASS(dev);
+>  
+> -    return _info->exit(_dev);
+> +    _info->exit(_dev);
+>  }
+>  
+>  static void virtio_ccw_busdev_unplug(HotplugHandler *hotplug_dev,
+> diff --git a/hw/s390x/virtio-ccw.h b/hw/s390x/virtio-ccw.h
+> index 41d4010..ce8baa3 100644
+> --- a/hw/s390x/virtio-ccw.h
+> +++ b/hw/s390x/virtio-ccw.h
+> @@ -74,7 +74,7 @@ typedef struct VirtioCcwDevice VirtioCcwDevice;
+>  typedef struct VirtIOCCWDeviceClass {
+>      CCWDeviceClass parent_class;
+>      void (*realize)(VirtioCcwDevice *dev, Error **errp);
+> -    int (*exit)(VirtioCcwDevice *dev);
+> +    void (*exit)(VirtioCcwDevice *dev);
+>  } VirtIOCCWDeviceClass;
+>  
+>  /* Performance improves when virtqueue kick processing is decoupled from the
+> diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-reader.c
+> index 757b8b3..71e3667 100644
+> --- a/hw/usb/dev-smartcard-reader.c
+> +++ b/hw/usb/dev-smartcard-reader.c
+> @@ -1289,7 +1289,7 @@ void ccid_card_card_inserted(CCIDCardState *card)
+>      ccid_on_slot_change(s, true);
+>  }
+>  
+> -static int ccid_card_exit(DeviceState *qdev)
+> +static void ccid_card_exit(DeviceState *qdev)
+>  {
+>      CCIDCardState *card = CCID_CARD(qdev);
+>      USBDevice *dev = USB_DEVICE(qdev->parent_bus->parent);
+> @@ -1300,7 +1300,6 @@ static int ccid_card_exit(DeviceState *qdev)
+>      }
+>      ccid_card_exitfn(card);
+>      s->card = NULL;
+> -    return 0;
+>  }
+>  
+>  static int ccid_card_init(DeviceState *qdev)
+> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+> index b44b476..0efd9e9 100644
+> --- a/include/hw/qdev-core.h
+> +++ b/include/hw/qdev-core.h
+> @@ -31,7 +31,7 @@ typedef enum DeviceCategory {
+>  } DeviceCategory;
+>  
+>  typedef int (*qdev_initfn)(DeviceState *dev);
+> -typedef int (*qdev_event)(DeviceState *dev);
+> +typedef void (*qdev_event)(DeviceState *dev);
+>  typedef void (*qdev_resetfn)(DeviceState *dev);
+>  typedef void (*DeviceRealize)(DeviceState *dev, Error **errp);
+>  typedef void (*DeviceUnrealize)(DeviceState *dev, Error **errp);
+> diff --git a/include/hw/s390x/event-facility.h b/include/hw/s390x/event-facility.h
+> index def1bb0..1a32f3a 100644
+> --- a/include/hw/s390x/event-facility.h
+> +++ b/include/hw/s390x/event-facility.h
+> @@ -162,7 +162,7 @@ typedef struct SCLPEvent {
+>  typedef struct SCLPEventClass {
+>      DeviceClass parent_class;
+>      int (*init)(SCLPEvent *event);
+> -    int (*exit)(SCLPEvent *event);
+> +    void (*exit)(SCLPEvent *event);
+>  
+>      /* get SCLP's send mask */
+>      unsigned int (*get_send_mask)(void);
+> 
