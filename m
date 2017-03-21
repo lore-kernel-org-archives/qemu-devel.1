@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cq8ds-00085R-3Z
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 21:31:21 -0400
+	(envelope-from <wang.guang55@zte.com.cn>) id 1cq8lX-00027g-S5
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 21:39:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cq8dr-0000dm-3k
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 21:31:20 -0400
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1490051325-3770-1-git-send-email-mdroth@linux.vnet.ibm.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <030b963a-df0a-9b7c-5d54-5bd5fafa5113@twiddle.net>
-Date: Tue, 21 Mar 2017 11:31:07 +1000
+	(envelope-from <wang.guang55@zte.com.cn>) id 1cq8lU-0003XA-Pb
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 21:39:15 -0400
+Received: from mbob.nabble.com ([162.253.133.15]:53594)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <wang.guang55@zte.com.cn>) id 1cq8lU-0003Ws-K3
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 21:39:12 -0400
+Received: from mtom.nabble.com (unknown [162.253.133.81])
+	by mbob.nabble.com (Postfix) with ESMTP id 742F93F408D7
+	for <qemu-devel@nongnu.org>; Mon, 20 Mar 2017 18:14:21 -0700 (PDT)
+Date: Mon, 20 Mar 2017 18:39:16 -0700 (MST)
+From: wangguang <wang.guang55@zte.com.cn>
+Message-ID: <1490060356096-474442.post@n7.nabble.com>
 MIME-Version: 1.0
-In-Reply-To: <1490051325-3770-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 00/81] Patch Round-up for stable 2.8.1,
- freeze on 2017-03-27
+Subject: [Qemu-devel] [PATCH v5]COLO:Fix spell error in Colo doc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,28 +27,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 03/21/2017 09:07 AM, Michael Roth wrote:
-> Hi everyone,
->
-> The following new patches are queued for QEMU stable v2.8.1:
->
->   https://github.com/mdroth/qemu/commits/stable-2.8-staging
->
-> The release is planned for 2017-03-30:
->
->   http://wiki.qemu.org/Planning/2.8
->
-> Please respond here or CC qemu-stable@nongnu.org on any patches you
-> think should be included in the release.
+Subject: [PATCH]COLO:Fix spell error in Colo doc
 
-Other possibilities include
+This is an error in COLO-FT.txt. 
+secondeary-disk0 should be secondary-disk0. 
 
-6cde517 linux-user: Fix s390x safe-syscall for z900
-0a97c40 target-arm: Fix aarch64 disas_ldst_single_struct
-416d72b target-arm: Fix aarch64 vec_reg_offset
+Signed-off-by: Guang Wang <wang.guang55@zte.com.cn>
+--- 
+ docs/COLO-FT.txt | 2 +- 
+ 1 file changed, 1 insertion(+), 1 deletion(-) 
+
+diff --git a/docs/COLO-FT.txt b/docs/COLO-FT.txt 
+index e289be2..bec7547 100644 
+--- a/docs/COLO-FT.txt 
++++ b/docs/COLO-FT.txt 
+@@ -139,7 +139,7 @@ Secondary: 
+ { 'execute': 'nbd-server-start', 
+   'arguments': {'addr': {'type': 'inet', 'data': {'host': 'xx.xx.xx.xx',
+'port': '8889'} } } 
+ } 
+-{'execute': 'nbd-server-add', 'arguments': {'device': 'secondeary-disk0',
+'writable': true } } 
++{'execute': 'nbd-server-add', 'arguments': {'device': 'secondary-disk0',
+'writable': true } } 
+  
+ Note: 
+   a. The qmp command nbd-server-start and nbd-server-add must be run 
+-- 
+2.9.3 
+
+ 
 
 
-r~
+
+
+
+--
+View this message in context: http://qemu.11.n7.nabble.com/PATCH-v5-COLO-Fix-spell-error-in-Colo-doc-tp474442.html
+Sent from the Developer mailing list archive at Nabble.com.
