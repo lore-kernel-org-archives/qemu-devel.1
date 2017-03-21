@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cqFVS-0007WY-88
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:51:07 -0400
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cqFXt-0008HI-Ba
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:53:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cqFVO-00028k-4K
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:51:06 -0400
-Received: from greensocs.com ([193.104.36.180]:44695)
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cqFXp-00041c-En
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:53:37 -0400
+Received: from [59.151.112.132] (port=53129 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cqFVN-00027j-BD
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:51:02 -0400
-References: <20170320180024.23432-1-arvolkov@inbox.ru>
-From: Frederic Konrad <fred.konrad@greensocs.com>
-Message-ID: <bf33ecef-2eff-d388-3000-1f2924a19b72@greensocs.com>
-Date: Tue, 21 Mar 2017 09:50:56 +0100
+	(envelope-from <fanc.fnst@cn.fujitsu.com>) id 1cqFXo-0003yG-Pw
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 04:53:33 -0400
+Date: Tue, 21 Mar 2017 16:52:47 +0800
+From: Chao Fan <fanc.fnst@cn.fujitsu.com>
+Message-ID: <20170321085247.GA18760@localhost.localdomain>
+References: <20170321022243.29453-1-fanc.fnst@cn.fujitsu.com>
+	<87y3vz82eb.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <20170320180024.23432-1-arvolkov@inbox.ru>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw: dead code removal
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <87y3vz82eb.fsf@secure.mitica>
+Subject: Re: [Qemu-devel] [PATCH v2] Add page-size to output in 'info
+ migrate'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,253 +28,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Volkov <arvolkov@inbox.ru>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, kraxel@redhat.com, agraf@suse.de
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, eblake@redhat.com, armbru@redhat.com, berrange@redhat.com, caoj.fnst@cn.fujitsu.com, douly.fnst@cn.fujitsu.com, maozy.fnst@cn.fujitsu.com, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-Hi,
+On Tue, Mar 21, 2017 at 09:22:52AM +0100, Juan Quintela wrote:
+>Chao Fan <fanc.fnst@cn.fujitsu.com> wrote:
+>> The number of dirty pages outputed in 'pages' in the command
+>> 'info migrate', so add page-size to calculate the number of dirty
+>> pages in bytes.
+>>
+>> Signed-off-by: Chao Fan <fanc.fnst@cn.fujitsu.com>
+>> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+>>
+>> ---
+>> v2: fix the grammar in qapi-schema.json [Eric Blake]
+>
+>Hi
 
-On 03/20/2017 07:00 PM, Anton Volkov wrote:
-> Made functions *_exit in hw/ return void instead of int (they returned 0 all the time)
-> and removed related return value checks
+Hi Juan,
+
+>
+>If you see my RAMState series, you can see that things have moved a lot
+>here,  I added this to my current series:
+>
+>(there is a rename of qemu_target_page_bits() to qemu_target_page_size()
+>in the series).
+>
+>If you like it, I can leave it that way there.
+
+Yes, of course. This is a better way.
+Thank you very much for your help!
+
+Thanks,
+Chao Fan
+
+>
+>Thanks, Juan.
+>
+>
+>commit 1944568bd8cdf912b3bf231bbc3c66071fde9f58
+>Author: Chao Fan <fanc.fnst@cn.fujitsu.com>
+>Date:   Tue Mar 21 10:22:43 2017 +0800
+>
+>    Add page-size to output in 'info migrate'
+>    
+>    The number of dirty pages outputed in 'pages' in the command
+>    'info migrate', so add page-size to calculate the number of dirty
+>    pages in bytes.
+>    
+>    Signed-off-by: Chao Fan <fanc.fnst@cn.fujitsu.com>
+>    Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+>    Signed-off-by: Juan Quintela <quintela@redhat.com>
+>
+>diff --git a/hmp.c b/hmp.c
+>index edb8970..be75e71 100644
+>--- a/hmp.c
+>+++ b/hmp.c
+>@@ -215,6 +215,9 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+>                        info->ram->normal_bytes >> 10);
+>         monitor_printf(mon, "dirty sync count: %" PRIu64 "\n",
+>                        info->ram->dirty_sync_count);
+>+        monitor_printf(mon, "page size: %" PRIu64 " kbytes\n",
+>+                       info->ram->page_size >> 10);
+>+
+>         if (info->ram->dirty_pages_rate) {
+>             monitor_printf(mon, "dirty pages rate: %" PRIu64 " pages\n",
+>                            info->ram->dirty_pages_rate);
+>diff --git a/migration/migration.c b/migration/migration.c
+>index 92c3c6b..fc19ba7 100644
+>--- a/migration/migration.c
+>+++ b/migration/migration.c
+>@@ -650,6 +650,7 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
+>     info->ram->mbps = s->mbps;
+>     info->ram->dirty_sync_count = ram_dirty_sync_count();
+>     info->ram->postcopy_requests = ram_postcopy_requests();
+>+    info->ram->page_size = qemu_target_page_size();
 > 
-> Signed-off-by: Anton Volkov <arvolkov@inbox.ru>
-> ---
->  hw/audio/hda-codec.c              | 3 +--
->  hw/audio/intel-hda.c              | 3 +--
->  hw/audio/intel-hda.h              | 2 +-
->  hw/char/sclpconsole-lm.c          | 4 ++--
->  hw/char/sclpconsole.c             | 4 ++--
->  hw/core/qdev.c                    | 6 +-----
->  hw/s390x/event-facility.c         | 6 +-----
->  hw/s390x/virtio-ccw.c             | 7 +++----
->  hw/s390x/virtio-ccw.h             | 2 +-
->  hw/usb/dev-smartcard-reader.c     | 3 +--
->  include/hw/qdev-core.h            | 2 +-
->  include/hw/s390x/event-facility.h | 2 +-
->  12 files changed, 16 insertions(+), 28 deletions(-)
+>     if (s->state != MIGRATION_STATUS_COMPLETED) {
+>         info->ram->remaining = ram_bytes_remaining();
+>diff --git a/qapi-schema.json b/qapi-schema.json
+>index 68a4327..c7ec62c 100644
+>--- a/qapi-schema.json
+>+++ b/qapi-schema.json
+>@@ -598,6 +598,9 @@
+> # @postcopy-requests: The number of page requests received from the destination
+> #        (since 2.7)
+> #
+>+# @page-size: The number of bytes per page for the various page-based
+>+#        statistics (since 2.10)
+>+#
+> # Since: 0.14.0
+> ##
+> { 'struct': 'MigrationStats',
+>@@ -605,7 +608,7 @@
+>            'duplicate': 'int', 'skipped': 'int', 'normal': 'int',
+>            'normal-bytes': 'int', 'dirty-pages-rate' : 'int',
+>            'mbps' : 'number', 'dirty-sync-count' : 'int',
+>-           'postcopy-requests' : 'int' } }
+>+           'postcopy-requests' : 'int', 'page-size' : 'int' } }
 > 
-> diff --git a/hw/audio/hda-codec.c b/hw/audio/hda-codec.c
-> index 52d4640..5402cd1 100644
-> --- a/hw/audio/hda-codec.c
-> +++ b/hw/audio/hda-codec.c
-> @@ -520,7 +520,7 @@ static int hda_audio_init(HDACodecDevice *hda, const struct desc_codec *desc)
->      return 0;
->  }
->  
-> -static int hda_audio_exit(HDACodecDevice *hda)
-> +static void hda_audio_exit(HDACodecDevice *hda)
->  {
->      HDAAudioState *a = HDA_AUDIO(hda);
->      HDAAudioStream *st;
-> @@ -539,7 +539,6 @@ static int hda_audio_exit(HDACodecDevice *hda)
->          }
->      }
->      AUD_remove_card(&a->card);
-> -    return 0;
->  }
->  
->  static int hda_audio_post_load(void *opaque, int version)
-> diff --git a/hw/audio/intel-hda.c b/hw/audio/intel-hda.c
-> index 537face..991c704 100644
-> --- a/hw/audio/intel-hda.c
-> +++ b/hw/audio/intel-hda.c
-> @@ -70,7 +70,7 @@ static void hda_codec_dev_realize(DeviceState *qdev, Error **errp)
->      }
->  }
->  
-> -static int hda_codec_dev_exit(DeviceState *qdev)
-> +static void hda_codec_dev_exit(DeviceState *qdev)
->  {
->      HDACodecDevice *dev = HDA_CODEC_DEVICE(qdev);
->      HDACodecDeviceClass *cdc = HDA_CODEC_DEVICE_GET_CLASS(dev);
-> @@ -78,7 +78,6 @@ static int hda_codec_dev_exit(DeviceState *qdev)
->      if (cdc->exit) {
->          cdc->exit(dev);
->      }
-> -    return 0;
->  }
->  
->  HDACodecDevice *hda_codec_find(HDACodecBus *bus, uint32_t cad)
-> diff --git a/hw/audio/intel-hda.h b/hw/audio/intel-hda.h
-> index d784bcf..53b78da 100644
-> --- a/hw/audio/intel-hda.h
-> +++ b/hw/audio/intel-hda.h
-> @@ -38,7 +38,7 @@ typedef struct HDACodecDeviceClass
->      DeviceClass parent_class;
->  
->      int (*init)(HDACodecDevice *dev);
-> -    int (*exit)(HDACodecDevice *dev);
-> +    void (*exit)(HDACodecDevice *dev);
->      void (*command)(HDACodecDevice *dev, uint32_t nid, uint32_t data);
->      void (*stream)(HDACodecDevice *dev, uint32_t stnr, bool running, bool output);
->  } HDACodecDeviceClass;
-> diff --git a/hw/char/sclpconsole-lm.c b/hw/char/sclpconsole-lm.c
-> index 07d6ebd..fbe5b42 100644
-> --- a/hw/char/sclpconsole-lm.c
-> +++ b/hw/char/sclpconsole-lm.c
-> @@ -318,9 +318,9 @@ static int console_init(SCLPEvent *event)
->      return 0;
->  }
->  
-> -static int console_exit(SCLPEvent *event)
-> +static void console_exit(SCLPEvent *event)
->  {
-> -    return 0;
-> +    return;
->  }
-
-Any reason of keeping those function if they do nothing?
-There is a NULL check on the DeviceClass exit callback before it's
-called so maybe just drop this function?
-
-Fred
-
->  
->  static void console_reset(DeviceState *dev)
-> diff --git a/hw/char/sclpconsole.c b/hw/char/sclpconsole.c
-> index b78f240..644f7cd 100644
-> --- a/hw/char/sclpconsole.c
-> +++ b/hw/char/sclpconsole.c
-> @@ -246,9 +246,9 @@ static void console_reset(DeviceState *dev)
->     scon->notify = false;
->  }
->  
-> -static int console_exit(SCLPEvent *event)
-> +static void console_exit(SCLPEvent *event)
->  {
-> -    return 0;
-> +    return;
->  }
->  
->  static Property console_properties[] = {
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 1e7fb33..5415843 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -238,11 +238,7 @@ static void device_unrealize(DeviceState *dev, Error **errp)
->      DeviceClass *dc = DEVICE_GET_CLASS(dev);
->  
->      if (dc->exit) {
-> -        int rc = dc->exit(dev);
-> -        if (rc < 0) {
-> -            error_setg(errp, "Device exit failed.");
-> -            return;
-> -        }
-> +        dc->exit(dev);
->      }
->  }
->  
-> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-> index 34b2faf..f7c509c 100644
-> --- a/hw/s390x/event-facility.c
-> +++ b/hw/s390x/event-facility.c
-> @@ -413,11 +413,7 @@ static void event_unrealize(DeviceState *qdev, Error **errp)
->      SCLPEvent *event = SCLP_EVENT(qdev);
->      SCLPEventClass *child = SCLP_EVENT_GET_CLASS(event);
->      if (child->exit) {
-> -        int rc = child->exit(event);
-> -        if (rc < 0) {
-> -            error_setg(errp, "SCLP event exit failed.");
-> -            return;
-> -        }
-> +        child->exit(event);
->      }
->  }
->  
-> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-> index 00b3bde..d1c4ff6 100644
-> --- a/hw/s390x/virtio-ccw.c
-> +++ b/hw/s390x/virtio-ccw.c
-> @@ -722,7 +722,7 @@ static void virtio_ccw_device_realize(VirtioCcwDevice *dev, Error **errp)
->      }
->  }
->  
-> -static int virtio_ccw_exit(VirtioCcwDevice *dev)
-> +static void virtio_ccw_exit(VirtioCcwDevice *dev)
->  {
->      CcwDevice *ccw_dev = CCW_DEVICE(dev);
->      SubchDev *sch = ccw_dev->sch;
-> @@ -735,7 +735,6 @@ static int virtio_ccw_exit(VirtioCcwDevice *dev)
->          release_indicator(&dev->routes.adapter, dev->indicators);
->          dev->indicators = NULL;
->      }
-> -    return 0;
->  }
->  
->  static void virtio_ccw_net_realize(VirtioCcwDevice *ccw_dev, Error **errp)
-> @@ -1616,12 +1615,12 @@ static void virtio_ccw_busdev_realize(DeviceState *dev, Error **errp)
->      virtio_ccw_device_realize(_dev, errp);
->  }
->  
-> -static int virtio_ccw_busdev_exit(DeviceState *dev)
-> +static void virtio_ccw_busdev_exit(DeviceState *dev)
->  {
->      VirtioCcwDevice *_dev = (VirtioCcwDevice *)dev;
->      VirtIOCCWDeviceClass *_info = VIRTIO_CCW_DEVICE_GET_CLASS(dev);
->  
-> -    return _info->exit(_dev);
-> +    _info->exit(_dev);
->  }
->  
->  static void virtio_ccw_busdev_unplug(HotplugHandler *hotplug_dev,
-> diff --git a/hw/s390x/virtio-ccw.h b/hw/s390x/virtio-ccw.h
-> index 41d4010..ce8baa3 100644
-> --- a/hw/s390x/virtio-ccw.h
-> +++ b/hw/s390x/virtio-ccw.h
-> @@ -74,7 +74,7 @@ typedef struct VirtioCcwDevice VirtioCcwDevice;
->  typedef struct VirtIOCCWDeviceClass {
->      CCWDeviceClass parent_class;
->      void (*realize)(VirtioCcwDevice *dev, Error **errp);
-> -    int (*exit)(VirtioCcwDevice *dev);
-> +    void (*exit)(VirtioCcwDevice *dev);
->  } VirtIOCCWDeviceClass;
->  
->  /* Performance improves when virtqueue kick processing is decoupled from the
-> diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-reader.c
-> index 757b8b3..71e3667 100644
-> --- a/hw/usb/dev-smartcard-reader.c
-> +++ b/hw/usb/dev-smartcard-reader.c
-> @@ -1289,7 +1289,7 @@ void ccid_card_card_inserted(CCIDCardState *card)
->      ccid_on_slot_change(s, true);
->  }
->  
-> -static int ccid_card_exit(DeviceState *qdev)
-> +static void ccid_card_exit(DeviceState *qdev)
->  {
->      CCIDCardState *card = CCID_CARD(qdev);
->      USBDevice *dev = USB_DEVICE(qdev->parent_bus->parent);
-> @@ -1300,7 +1300,6 @@ static int ccid_card_exit(DeviceState *qdev)
->      }
->      ccid_card_exitfn(card);
->      s->card = NULL;
-> -    return 0;
->  }
->  
->  static int ccid_card_init(DeviceState *qdev)
-> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-> index b44b476..0efd9e9 100644
-> --- a/include/hw/qdev-core.h
-> +++ b/include/hw/qdev-core.h
-> @@ -31,7 +31,7 @@ typedef enum DeviceCategory {
->  } DeviceCategory;
->  
->  typedef int (*qdev_initfn)(DeviceState *dev);
-> -typedef int (*qdev_event)(DeviceState *dev);
-> +typedef void (*qdev_event)(DeviceState *dev);
->  typedef void (*qdev_resetfn)(DeviceState *dev);
->  typedef void (*DeviceRealize)(DeviceState *dev, Error **errp);
->  typedef void (*DeviceUnrealize)(DeviceState *dev, Error **errp);
-> diff --git a/include/hw/s390x/event-facility.h b/include/hw/s390x/event-facility.h
-> index def1bb0..1a32f3a 100644
-> --- a/include/hw/s390x/event-facility.h
-> +++ b/include/hw/s390x/event-facility.h
-> @@ -162,7 +162,7 @@ typedef struct SCLPEvent {
->  typedef struct SCLPEventClass {
->      DeviceClass parent_class;
->      int (*init)(SCLPEvent *event);
-> -    int (*exit)(SCLPEvent *event);
-> +    void (*exit)(SCLPEvent *event);
->  
->      /* get SCLP's send mask */
->      unsigned int (*get_send_mask)(void);
-> 
+> ##
+> # @XBZRLECacheStats:
+>
+>
