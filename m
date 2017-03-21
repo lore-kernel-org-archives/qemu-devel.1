@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cqO3p-0004O6-Nf
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 13:59:10 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cqO68-0005sE-5H
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 14:01:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cqO3n-0005no-43
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 13:59:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52342)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cqO3m-0005nj-RQ
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 13:59:07 -0400
-References: <CAFEAcA9pqDoCWrPAJ+KVxLC_eRy-xRg36oYuARYg2YP8VpGpBg@mail.gmail.com>
-	<20170316154643.GT15193@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <bb405833-37ca-f7c0-023b-a7b81d197fc3@redhat.com>
-Date: Tue, 21 Mar 2017 12:59:04 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cqO67-0006HY-C7
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 14:01:32 -0400
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:35284)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cqO67-0006HK-51
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 14:01:31 -0400
+Received: by mail-wr0-x22d.google.com with SMTP id g10so116946301wrg.2
+	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 11:01:30 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170316154643.GT15193@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="h5xrHS3nVWGfmePm7AISmbgIx3EAkpG57"
-Subject: Re: [Qemu-devel] Proposal for deprecating unsupported host OSes &
- architecutures
+In-Reply-To: <472e433e-8cd7-4762-c102-bf7a4ca91afc@redhat.com>
+References: <1490106717-9542-1-git-send-email-peter.maydell@linaro.org>
+	<472e433e-8cd7-4762-c102-bf7a4ca91afc@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 21 Mar 2017 18:01:09 +0000
+Message-ID: <CAFEAcA_wf7Y==ADgk0bqA6O9EeOTotH_JEnhFmBs=CKdgbLPJg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2] configure: Warn about deprecated hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +29,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---h5xrHS3nVWGfmePm7AISmbgIx3EAkpG57
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
-Message-ID: <bb405833-37ca-f7c0-023b-a7b81d197fc3@redhat.com>
-Subject: Re: [Qemu-devel] Proposal for deprecating unsupported host OSes &
- architecutures
-References: <CAFEAcA9pqDoCWrPAJ+KVxLC_eRy-xRg36oYuARYg2YP8VpGpBg@mail.gmail.com>
- <20170316154643.GT15193@redhat.com>
-In-Reply-To: <20170316154643.GT15193@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 21 March 2017 at 17:55, Thomas Huth <thuth@redhat.com> wrote:
+> On 21.03.2017 15:31, Peter Maydell wrote:
+>> +if test "$supported_os" = "no"; then
+>> +    echo
+>> +    echo "WARNING: SUPPORT FOR THIS HOST OS WILL GO AWAY IN FUTURE RELEASES!"
+>> +    echo
+>> +    echo "CPU host OS $targetos support is not currently maintained."
+>
+> Maybe rather just "Host OS" instead of "CPU host OS" ?
+>
+>> +    echo "The QEMU project intends to remove support for this host CPU in"
+>
+> At least here I think you should replace "host CPU" with "host OS". With
+> that modification:
 
-On 03/16/2017 10:46 AM, Daniel P. Berrange wrote:
+Mmm, yes, those are both cut-n-paste errors from the CPU warning text.
+Unfortunately this commit is already in master because I wanted to get
+it into rc1 today. I'll send a separate patch that fixes these.
 
->=20
->> Should "native CYGWIN" be in the drop list? I only test
->> mingw cross compile, but configure has a separate section for
->> CYGWIN in its $targetos case statement.
->=20
-> Cygwin is different enough from mingw that I'd basically call
-> it a completely separate platform. IOW, successfull mingw
-> builds don't offer a strong guarantee of a succesfull cygwin
-> build.
-
-I'm late to the thread, but I'll chime in here:
-I don't think qemu has ever successfully built on native cygwin.  There
-have already been cleanup patches to the list in the meantime to rip out
-the (stunted) configure support for using cygwin as the host to do a
-cross-compilation to mingw, which as long as it was present meant that
-no one could even attempt a native cygwin build (at least not without
-jumping through some big hoops).
-
-I have a soft spot for Cygwin (after all, I still maintain several
-packages for that platform), but not enough time to even attempt a qemu
-build (to see what breaks), nor enough resources to contribute a Cygwin
-CI machine to the build-bots, so I have no heartbreak that Cygwin is
-(currently) in the list of unsupported platforms.  If someone (maybe me)
-ever cares enough to get qemu building on Cygwin, we can always amend
-the list of supported platforms at that date.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---h5xrHS3nVWGfmePm7AISmbgIx3EAkpG57
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY0WnoAAoJEKeha0olJ0Nqt7MH/js/1DOsNccSJ31aWgR77BTa
-0OptDW1Gq8sIlZ1askbelBSzrmrlC9AlYMw83VjYJiAVB4B8Fo3dqdexvPymoooO
-3DcrUZDhBmHVv/nmA9TzAzgCtOO8oKDy1pPJ5fNfYk6TJ0qlqOUjH0qQg7UkT7f3
-T2RgdlDVsbNLeNX8QhZfgDyfilnDupbihLoZhunKoqhqhDyMeJe1CbIU8npy1IPK
-f7m0sOWw+PZfPKLjcnGuYNHwz+DwGD8n7RhfHbAUYh+k93l3+xtVpGFHvTDLCv+t
-qiy4dVjFB2Ce/LL8JruhUTHzNhqB7+BcvY4b3bQO+PEJMYDf+CG9e38L9ot1DoM=
-=eRZO
------END PGP SIGNATURE-----
-
---h5xrHS3nVWGfmePm7AISmbgIx3EAkpG57--
+thanks
+-- PMM
