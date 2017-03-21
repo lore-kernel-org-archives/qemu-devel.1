@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cqKvZ-00027F-Vl
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 10:38:26 -0400
+	(envelope-from <groug@kaod.org>) id 1cqKzg-000366-4T
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 10:42:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cqKvW-0005Cu-QA
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 10:38:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49546)
+	(envelope-from <groug@kaod.org>) id 1cqKzb-0006vN-4j
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 10:42:40 -0400
+Received: from 12.mo5.mail-out.ovh.net ([46.105.39.65]:52444)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cqKvW-0005Cq-HD
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 10:38:22 -0400
-References: <1490015240-49118-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<a08674d1-0f08-b8fb-aa11-c971042ac58a@redhat.com>
-	<d149478f-fb4e-6699-5508-570a5bf27869@huawei.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d21fbdc6-1eb4-27aa-1a32-a381cd9780ae@redhat.com>
-Date: Tue, 21 Mar 2017 09:38:19 -0500
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cqKza-0006uF-U5
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 10:42:35 -0400
+Received: from player695.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 10682E0E72
+	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 15:42:33 +0100 (CET)
+Date: Tue, 21 Mar 2017 15:42:29 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170321154229.1084c0e7@bahia.lan>
+In-Reply-To: <2deb61ba-f800-8774-6dfa-aa4e7c605e55@redhat.com>
+References: <148968198512.5555.1880820193606077571.stgit@bahia>
+	<2deb61ba-f800-8774-6dfa-aa4e7c605e55@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <d149478f-fb4e-6699-5508-570a5bf27869@huawei.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="k557h2btCMB2qMF59As7qvfBTfDtcKawi"
-Subject: Re: [Qemu-devel] [PATCH v0] fsdev: QMP interface for throttling
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/98au35qj2Dsg+z8saGKYvaq";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH] 9pfs: don't try to flush self and avoid
+ QEMU hang on reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,80 +32,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, Greg Kurz <groug@kaod.org>
-Cc: Alberto Garcia <berto@igalia.com>, Jani Kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---k557h2btCMB2qMF59As7qvfBTfDtcKawi
-From: Eric Blake <eblake@redhat.com>
-To: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>,
- Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, Greg Kurz <groug@kaod.org>
-Cc: Alberto Garcia <berto@igalia.com>,
- Jani Kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
-Message-ID: <d21fbdc6-1eb4-27aa-1a32-a381cd9780ae@redhat.com>
-Subject: Re: [PATCH v0] fsdev: QMP interface for throttling
-References: <1490015240-49118-1-git-send-email-pradeep.jagadeesh@huawei.com>
- <a08674d1-0f08-b8fb-aa11-c971042ac58a@redhat.com>
- <d149478f-fb4e-6699-5508-570a5bf27869@huawei.com>
-In-Reply-To: <d149478f-fb4e-6699-5508-570a5bf27869@huawei.com>
-Content-Type: text/plain; charset=utf-8
+--Sig_/98au35qj2Dsg+z8saGKYvaq
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On 03/21/2017 04:44 AM, Pradeep Jagadeesh wrote:
+On Tue, 21 Mar 2017 09:01:50 -0500
+Eric Blake <eblake@redhat.com> wrote:
 
->>
->> You're introducing this struct in 2.10, so this member is not since 1.=
-7.
->>  Either that, or you're copying-and-pasting when you should be sharing=
+> On 03/16/2017 11:33 AM, Greg Kurz wrote:
+> > According to the 9P spec [*], when a client wants to cancel a pending I=
+/O
+> > request identified by a given tag (uint16), it must send a Tflush messa=
+ge
+> > and wait for the server to respond with a Rflush message before reusing=
+ this
+> > tag for another I/O. The server may still send a completion message for=
+ the
+> > I/O if it wasn't actually cancelled but the Rflush message must arrive =
+after
+> > that.
+> >=20
+> > QEMU hence waits for the flushed PDU to complete before sending the Rfl=
+ush
+> > message back to the client.
+> >=20
+> > If a client sends 'Tflush tag oldtag' and tag =3D=3D oldtag, QEMU will =
+then
+> > allocate a PDU identified by tag, find it in the PDU list and wait for
+> > this same PDU to complete... i.e. wait for a completion that will never
+> > happen. This causes a tag and ring slot leak in the guest, and a PDU
+> > leak in QEMU, all of them limited by the maximal number of PDUs (128).
+> > But, worse, this causes QEMU to hang on device reset since v9fs_reset()
+> > wants to drain all pending I/O.
+> >=20
+> > This insane behavior is likely to denote a bug in the client, and it wo=
+uld
+> > deserve an Rerror message to be sent back. Unfortunately, the protocol
+> > allows it and requires all flush requests to suceed (only a Tflush resp=
+onse =20
+>=20
+> s/suceed/succeed/
+>=20
+> > is expected).
+> >=20
+> > The only option is to detect when we have to handle a self-referencing
+> > flush request and report success to the client right away.
+> >=20
+> > [*] http://man.cat-v.org/plan_9/5/flush
+> >=20
+> > Reported-by: Al Viro <viro@ZenIV.linux.org.uk>
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  hw/9pfs/9p.c |    2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >  =20
+>=20
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
 
->> code and reusing an existing struct.
-> Hmm..copied the block devices code, I will correct it.
-> I thought of reusing the code, but the whole struct from block devices
-> can not be used, as there is one member called "group" that is not used=
+Oh, I've sent a v2 for this patch (error_report() a warning) and it is
+actually part of the pull request I've sent earlier today... dunno how
+to have your Reviewed-by: added there.
 
-> in case of 9p.
+Thanks.
 
-Then make a common base type with the common fields, and have the block
-devices use a subtype that reuses the base type and adds the additional
-field 'group'.
+--
+Greg
 
-> Also this needs lot of changes even in case of block
-> devices. Because I may need to rename the structure as IOThrottle or
-> something like that.
-
-Yes, type names may have a ripple effect. But when done as a series,
-separating the mechanical changes from the semantic changes, it's still
-fairly easy to review, and worth it in the long run.
-
-> Shall I reuse the code and avoid setting the group member in case of 9p=
-?
-> What do you think?
-
-Better than avoiding the group member by avoiding it is avoiding it by
-not having it in the type, by using type inheritance to your advantage.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---k557h2btCMB2qMF59As7qvfBTfDtcKawi
-Content-Type: application/pgp-signature; name="signature.asc"
+--Sig_/98au35qj2Dsg+z8saGKYvaq
+Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJY0TrbAAoJEKeha0olJ0NqEFMIAKSLC5QShKLF4lGWDbiioFyh
-KiAIq766PiN/IYqU9S1vR4QYs1AQwp8OEgUmnFbUIAdr2RGOM4Kz83xHEHy5ovV4
-ihfPlbQPLR3inWMsE7RnZWU4PJNbs4MyL4dKppq3xvy+3g4H47d7ggBMEbvdxQ4T
-Z2wyyEF2SfKclts6EPYXIwEPuTQlPCgUNYmoHdiiPyUQh+eiLBZDr9phJr8lreHC
-FimymokMUvz20TV8Gf+MPG5+A/mkcUBH38iRfYjBYYon3AKWZj9LAsIvNvWHmwtX
-SL3QI7TtbCeb0dM5SiQxfFjyRegIeHZjoBRs9Vteli5LqOfUQsOszoUrMGI6B/U=
-=qept
+iEYEARECAAYFAljRO9YACgkQAvw66wEB28JjnwCfeZSibRYgnQuZV+mhRx3hZD4w
+9k0AoKI0XKnxcjeE9lVtaTsW2FOLgYfb
+=+uKr
 -----END PGP SIGNATURE-----
 
---k557h2btCMB2qMF59As7qvfBTfDtcKawi--
+--Sig_/98au35qj2Dsg+z8saGKYvaq--
