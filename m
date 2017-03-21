@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37333)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cq8CN-0000sD-Uc
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 21:02:56 -0400
+	(envelope-from <mst@redhat.com>) id 1cq8M8-0002Ok-HS
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 21:13:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cq8CF-0000PR-Br
-	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 21:02:51 -0400
-References: <1490056074976-474433.post@n7.nabble.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <28d15bd5-1620-b39b-ed92-d8812d1549c8@redhat.com>
-Date: Mon, 20 Mar 2017 20:02:42 -0500
+	(envelope-from <mst@redhat.com>) id 1cq8M4-0004wt-J7
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 21:13:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47292)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cq8M4-0004w5-DN
+	for qemu-devel@nongnu.org; Mon, 20 Mar 2017 21:12:56 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 11DA5437F4C
+	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 01:12:56 +0000 (UTC)
+Date: Tue, 21 Mar 2017 03:12:52 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170321031220-mutt-send-email-mst@kernel.org>
+References: <1489980999-5965-1-git-send-email-jasowang@redhat.com>
+	<1489980999-5965-3-git-send-email-jasowang@redhat.com>
+	<20170320090734.GN17405@pxdev.xzpeter.org>
 MIME-Version: 1.0
-In-Reply-To: <1490056074976-474433.post@n7.nabble.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="VlKKkl6D1EwWunswkKRfMChNG2dGmjjRG"
-Subject: Re: [Qemu-devel] [PATCH v4]COLO:Fix Colo doc,
- secondeary should be secondary
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170320090734.GN17405@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [PATCH fixup 2/2] vhost: genearlize iommu memory
+ region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,86 +35,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: wangguang <wang.guang55@zte.com.cn>, qemu-devel@nongnu.org, qemu-trivial <qemu-trivial@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---VlKKkl6D1EwWunswkKRfMChNG2dGmjjRG
-From: Eric Blake <eblake@redhat.com>
-To: wangguang <wang.guang55@zte.com.cn>, qemu-devel@nongnu.org,
- qemu-trivial <qemu-trivial@nongnu.org>
-Message-ID: <28d15bd5-1620-b39b-ed92-d8812d1549c8@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4]COLO:Fix Colo doc, secondeary should be
- secondary
-References: <1490056074976-474433.post@n7.nabble.com>
-In-Reply-To: <1490056074976-474433.post@n7.nabble.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, Mar 20, 2017 at 05:07:34PM +0800, Peter Xu wrote:
+> On Mon, Mar 20, 2017 at 11:36:39AM +0800, Jason Wang wrote:
+> > We assumes the iommu_ops were attached to the root region of address
+> > space. This may not true for all kinds of IOMMU implementation. So fix
+> > this by not assume as->root has iommu_ops and:
+> > 
+> > - register a memory listener to dma_as
+> > - during region_add, if it's a region of IOMMU, register a specific
+> >   IOMMU notifier, and store all notifiers in a list
+> > - during region_del, compare and delete the IOMMU notifier
+> > 
+> > This is a must for making vhost device IOTLB works for IOMMU other
+> > than intel ones.
+> > 
+> > Signed-off-by: Jason Wang <jasowang@redhat.com>
+> 
+> [...]
+> 
+> > @@ -1454,9 +1509,8 @@ int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
+> >          goto fail_features;
+> >      }
+> >  
+> > -    if (vhost_dev_has_iommu(hdev)) {
+> > -        memory_region_register_iommu_notifier(vdev->dma_as->root,
+> > -                                              &hdev->n);
+> > +    if (true) {
+> 
+> Here the if clause can be removed. And...
+> 
+> > +        memory_listener_register(&hdev->iommu_listener, vdev->dma_as);
+> >      }
+> >  
+> >      r = hdev->vhost_ops->vhost_set_mem_table(hdev, hdev->mem);
+> > @@ -1536,10 +1590,9 @@ void vhost_dev_stop(struct vhost_dev *hdev, VirtIODevice *vdev)
+> >                               hdev->vq_index + i);
+> >      }
+> >  
+> > -    if (vhost_dev_has_iommu(hdev)) {
+> > +    if (true) {
+> 
+> ...here. Besides that:
+> 
+> Reviewed-by: Peter Xu <peterx@redhat.com>
+> 
+> Since this patchset depends on vtd vfio series and fixes its breakage
+> to vhost, I'll pick them up for consistency for next post of vtd vfio
+> series as well.
+> 
+> Thanks,
+> 
+> -- peterx
 
-[adding qemu-trivial]
+Sounds good. It's best to order patches in a way that avoids
+breakages even for people that bisect though.
+Might require some patch squashing.
 
-On 03/20/2017 07:27 PM, wangguang wrote:
-> Subject: [PATCH] Fix Colo doc secondeary should be secondary=20
-
-This line feels redundant compared to the overall mail's subject line.
-In turn, that subject could use a space after colon.
-
-> This is an error in COLO-FT.txt.=20
-> secondeary-disk0 should be secondary-disk0.=20
->=20
-> Signed-off-by: Guang Wang <wang.guang55@zte.com.cn>
-> ---=20
->  docs/COLO-FT.txt | 2 +-=20
->  1 file changed, 1 insertion(+), 1 deletion(-)=20
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-As it is doc-only, it is safe for hard freeze, but also not the end of
-the world if it doesn't go in until 2.10.
-
->=20
-> diff --git a/docs/COLO-FT.txt b/docs/COLO-FT.txt=20
-> index e289be2..bec7547 100644=20
-> --- a/docs/COLO-FT.txt=20
-> +++ b/docs/COLO-FT.txt=20
-> @@ -139,7 +139,7 @@ Secondary:=20
->  { 'execute': 'nbd-server-start',=20
->    'arguments': {'addr': {'type': 'inet', 'data': {'host': 'xx.xx.xx.xx=
-',
-> 'port': '8889'} } }=20
->  }=20
-> -{'execute': 'nbd-server-add', 'arguments': {'device': 'secondeary-disk=
-0',
-> 'writable': true } }=20
-> +{'execute': 'nbd-server-add', 'arguments': {'device': 'secondary-disk0=
-',
-> 'writable': true } }=20
->  =20
->  Note:=20
->    a. The qmp command nbd-server-start and nbd-server-add must be run=20
->=20
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---VlKKkl6D1EwWunswkKRfMChNG2dGmjjRG
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY0HuyAAoJEKeha0olJ0NqWfIIAIabVwRkkr+CqBxHlxr7jpej
-8cmBdLAis9SSkotuRaOHqMQVlHEraXhu0Fr/nTQypyxNXB2RQG3YFnjLh46i5+jn
-KRgY+ymlfZk0nzDZzzew3GSIYRZoxp31P/v+2qqKzZv3cF7769p7LSGaHiE/PF0K
-zNONat5eS9leD0z5f0vKkCCsvV5gVpWZusUtxvQ+ER9/OERimoZ8QxQGHH83+2ol
-UZitu2lEyor4OKnFKEqlFPF3bzGT9EtaAuRDpZmjFzlcN2s3ZhJwAIZ2rE8eml3p
-r1SZHuf5W7NKmAJZmBcP3LT0hgl2PG3J4FiE4JhqxCpE625k/+8DjQQK0Eu/ROI=
-=/ru0
------END PGP SIGNATURE-----
-
---VlKKkl6D1EwWunswkKRfMChNG2dGmjjRG--
+-- 
+MST
