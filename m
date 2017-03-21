@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35950)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cqKpV-0000f3-Od
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 10:32:11 -0400
+	(envelope-from <eblake@redhat.com>) id 1cqKvZ-00027F-Vl
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 10:38:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cqKpU-0002b9-J5
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 10:32:09 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48891)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cqKpU-0002W4-B5
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 10:32:08 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 Mar 2017 14:31:57 +0000
-Message-Id: <1490106717-9542-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH v2] configure: Warn about deprecated hosts
+	(envelope-from <eblake@redhat.com>) id 1cqKvW-0005Cu-QA
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 10:38:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49546)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cqKvW-0005Cq-HD
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 10:38:22 -0400
+References: <1490015240-49118-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<a08674d1-0f08-b8fb-aa11-c971042ac58a@redhat.com>
+	<d149478f-fb4e-6699-5508-570a5bf27869@huawei.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <d21fbdc6-1eb4-27aa-1a32-a381cd9780ae@redhat.com>
+Date: Tue, 21 Mar 2017 09:38:19 -0500
+MIME-Version: 1.0
+In-Reply-To: <d149478f-fb4e-6699-5508-570a5bf27869@huawei.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="k557h2btCMB2qMF59As7qvfBTfDtcKawi"
+Subject: Re: [Qemu-devel] [PATCH v0] fsdev: QMP interface for throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,168 +29,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, Greg Kurz <groug@kaod.org>
+Cc: Alberto Garcia <berto@igalia.com>, Jani Kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-We plan to drop support in a future QEMU release for host OSes
-and host architectures for which we have no test machine where
-we can build and run tests. For the 2.9 release, make configure
-print a warning if it is run on such a host, so that the user
-has some warning of the plans and can volunteer to help us
-maintain the port if they need it to continue to function.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--k557h2btCMB2qMF59As7qvfBTfDtcKawi
+From: Eric Blake <eblake@redhat.com>
+To: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>,
+ Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, Greg Kurz <groug@kaod.org>
+Cc: Alberto Garcia <berto@igalia.com>,
+ Jani Kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+Message-ID: <d21fbdc6-1eb4-27aa-1a32-a381cd9780ae@redhat.com>
+Subject: Re: [PATCH v0] fsdev: QMP interface for throttling
+References: <1490015240-49118-1-git-send-email-pradeep.jagadeesh@huawei.com>
+ <a08674d1-0f08-b8fb-aa11-c971042ac58a@redhat.com>
+ <d149478f-fb4e-6699-5508-570a5bf27869@huawei.com>
+In-Reply-To: <d149478f-fb4e-6699-5508-570a5bf27869@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This commit flags up as deprecated the CPU architectures:
- * ia64
- * sparc
- * anything which we don't have a TCG port for
-   (and which was presumably using TCI)
-and the OSes:
- * GNU/kFreeBSD
- * DragonFly BSD
- * NetBSD
- * OpenBSD
- * Solaris
- * AIX
- * Haiku
+On 03/21/2017 04:44 AM, Pradeep Jagadeesh wrote:
 
-It also makes entirely unrecognized host OS strings be
-rejected rather than treated as if they were Linux (which
-likely never worked).
+>>
+>> You're introducing this struct in 2.10, so this member is not since 1.=
+7.
+>>  Either that, or you're copying-and-pasting when you should be sharing=
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-v2: mark FreeBSD as 'supported' as I have got a
-VM config going for it for build tests.
-NetBSD doesn't boot inside KVM (!), and OpenBSD I have got
-running but "make check" hangs where we try to run guest code.
+>> code and reusing an existing struct.
+> Hmm..copied the block devices code, I will correct it.
+> I thought of reusing the code, but the whole struct from block devices
+> can not be used, as there is one member called "group" that is not used=
 
- configure | 49 +++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 47 insertions(+), 2 deletions(-)
+> in case of 9p.
 
-diff --git a/configure b/configure
-index 02e3b69..3291603 100755
---- a/configure
-+++ b/configure
-@@ -321,6 +321,9 @@ tcmalloc="no"
- jemalloc="no"
- replication="yes"
- 
-+supported_cpu="no"
-+supported_os="no"
-+
- # parse CC options first
- for opt do
-   optarg=$(expr "x$opt" : 'x[^=]*=\(.*\)')
-@@ -517,23 +520,32 @@ ARCH=
- # Normalise host CPU name and set ARCH.
- # Note that this case should only have supported host CPUs, not guests.
- case "$cpu" in
--  ia64|ppc|ppc64|s390|s390x|sparc64|x32)
-+  ppc|ppc64|s390|s390x|x32)
-+    cpu="$cpu"
-+    supported_cpu="yes"
-+  ;;
-+  ia64|sparc64)
-     cpu="$cpu"
-   ;;
-   i386|i486|i586|i686|i86pc|BePC)
-     cpu="i386"
-+    supported_cpu="yes"
-   ;;
-   x86_64|amd64)
-     cpu="x86_64"
-+    supported_cpu="yes"
-   ;;
-   armv*b|armv*l|arm)
-     cpu="arm"
-+    supported_cpu="yes"
-   ;;
-   aarch64)
-     cpu="aarch64"
-+    supported_cpu="yes"
-   ;;
-   mips*)
-     cpu="mips"
-+    supported_cpu="yes"
-   ;;
-   sparc|sun4[cdmuv])
-     cpu="sparc"
-@@ -562,6 +574,7 @@ MINGW32*)
-   else
-     audio_drv_list=""
-   fi
-+  supported_os="yes"
- ;;
- GNU/kFreeBSD)
-   bsd="yes"
-@@ -579,6 +592,7 @@ FreeBSD)
-   libs_qga="-lutil $libs_qga"
-   netmap=""  # enable netmap autodetect
-   HOST_VARIANT_DIR="freebsd"
-+  supported_os="yes"
- ;;
- DragonFly)
-   bsd="yes"
-@@ -620,6 +634,7 @@ Darwin)
-   # won't work when we're compiling with gcc as a C compiler.
-   QEMU_CFLAGS="-DOS_OBJECT_USE_OBJC=0 $QEMU_CFLAGS"
-   HOST_VARIANT_DIR="darwin"
-+  supported_os="yes"
- ;;
- SunOS)
-   solaris="yes"
-@@ -666,7 +681,7 @@ Haiku)
-   QEMU_CFLAGS="-DB_USE_POSITIVE_POSIX_ERRORS $QEMU_CFLAGS"
-   LIBS="-lposix_error_mapper -lnetwork $LIBS"
- ;;
--*)
-+Linux)
-   audio_drv_list="oss"
-   audio_possible_drivers="oss alsa sdl pa"
-   linux="yes"
-@@ -676,6 +691,10 @@ Haiku)
-   vhost_scsi="yes"
-   vhost_vsock="yes"
-   QEMU_INCLUDES="-I\$(SRC_PATH)/linux-headers -I$(pwd)/linux-headers $QEMU_INCLUDES"
-+  supported_os="yes"
-+;;
-+*)
-+  error_exit "Unsupported host OS $targetos"
- ;;
- esac
- 
-@@ -5108,6 +5127,32 @@ if test "$sdl_too_old" = "yes"; then
- echo "-> Your SDL version is too old - please upgrade to have SDL support"
- fi
- 
-+if test "$supported_cpu" = "no"; then
-+    echo
-+    echo "WARNING: SUPPORT FOR THIS HOST CPU WILL GO AWAY IN FUTURE RELEASES!"
-+    echo
-+    echo "CPU host architecture $cpu support is not currently maintained."
-+    echo "The QEMU project intends to remove support for this host CPU in"
-+    echo "a future release if nobody volunteers to maintain it and to"
-+    echo "provide a build host for our continuous integration setup."
-+    echo "configure has succeeded and you can continue to build, but"
-+    echo "if you care about QEMU on this platform you should contact"
-+    echo "us upstream at qemu-devel@nongnu.org."
-+fi
-+
-+if test "$supported_os" = "no"; then
-+    echo
-+    echo "WARNING: SUPPORT FOR THIS HOST OS WILL GO AWAY IN FUTURE RELEASES!"
-+    echo
-+    echo "CPU host OS $targetos support is not currently maintained."
-+    echo "The QEMU project intends to remove support for this host CPU in"
-+    echo "a future release if nobody volunteers to maintain it and to"
-+    echo "provide a build host for our continuous integration setup."
-+    echo "configure has succeeded and you can continue to build, but"
-+    echo "if you care about QEMU on this platform you should contact"
-+    echo "us upstream at qemu-devel@nongnu.org."
-+fi
-+
- config_host_mak="config-host.mak"
- 
- echo "# Automatically generated by configure - do not modify" >config-all-disas.mak
--- 
-2.7.4
+Then make a common base type with the common fields, and have the block
+devices use a subtype that reuses the base type and adds the additional
+field 'group'.
+
+> Also this needs lot of changes even in case of block
+> devices. Because I may need to rename the structure as IOThrottle or
+> something like that.
+
+Yes, type names may have a ripple effect. But when done as a series,
+separating the mechanical changes from the semantic changes, it's still
+fairly easy to review, and worth it in the long run.
+
+> Shall I reuse the code and avoid setting the group member in case of 9p=
+?
+> What do you think?
+
+Better than avoiding the group member by avoiding it is avoiding it by
+not having it in the type, by using type inheritance to your advantage.
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--k557h2btCMB2qMF59As7qvfBTfDtcKawi
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY0TrbAAoJEKeha0olJ0NqEFMIAKSLC5QShKLF4lGWDbiioFyh
+KiAIq766PiN/IYqU9S1vR4QYs1AQwp8OEgUmnFbUIAdr2RGOM4Kz83xHEHy5ovV4
+ihfPlbQPLR3inWMsE7RnZWU4PJNbs4MyL4dKppq3xvy+3g4H47d7ggBMEbvdxQ4T
+Z2wyyEF2SfKclts6EPYXIwEPuTQlPCgUNYmoHdiiPyUQh+eiLBZDr9phJr8lreHC
+FimymokMUvz20TV8Gf+MPG5+A/mkcUBH38iRfYjBYYon3AKWZj9LAsIvNvWHmwtX
+SL3QI7TtbCeb0dM5SiQxfFjyRegIeHZjoBRs9Vteli5LqOfUQsOszoUrMGI6B/U=
+=qept
+-----END PGP SIGNATURE-----
+
+--k557h2btCMB2qMF59As7qvfBTfDtcKawi--
