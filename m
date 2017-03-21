@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59216)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jiahuanzhang90@gmail.com>) id 1cqMwb-0004Cx-GL
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 12:47:38 -0400
+	(envelope-from <armbru@redhat.com>) id 1cqMyS-0005Mq-U7
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 12:49:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jiahuanzhang90@gmail.com>) id 1cqMwa-0001Y0-F7
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 12:47:37 -0400
-Received: from mail-qt0-x22d.google.com ([2607:f8b0:400d:c0d::22d]:36065)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jiahuanzhang90@gmail.com>)
-	id 1cqMwa-0001Xd-9m
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 12:47:36 -0400
-Received: by mail-qt0-x22d.google.com with SMTP id r45so135312144qte.3
-	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 09:47:36 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1cqMyP-00029s-0l
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 12:49:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39697)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cqMyO-00028D-OA
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 12:49:28 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170311132256.22951-1-marcandre.lureau@redhat.com>
+	<20170311132256.22951-5-marcandre.lureau@redhat.com>
+	<84148275-6410-68f7-4da0-345b635c42f3@redhat.com>
+	<87h92xk5p7.fsf@dusky.pond.sub.org>
+	<7da78125-495b-4a2b-6383-d0ae22ba282b@redhat.com>
+	<1815445054.3686730.1489411694165.JavaMail.zimbra@redhat.com>
+	<CAJ+F1CKMUGA26PhTchxL3GNBJr11JMdS-eujvhF3gSyLULjbXg@mail.gmail.com>
+Date: Tue, 21 Mar 2017 17:49:24 +0100
+In-Reply-To: <CAJ+F1CKMUGA26PhTchxL3GNBJr11JMdS-eujvhF3gSyLULjbXg@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 21 Mar 2017
+	12:41:58 +0000")
+Message-ID: <878tnyk223.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8HrEsuEYgpe9pJQkwSnSTU74G+3i7vWk8ka5cJ+UWFDQ@mail.gmail.com>
-References: <CAJy91CY1SOwi7D-kyU0ooe5SyhM414WaBCedXuPfXXhJpbo1fg@mail.gmail.com>
-	<CAFEAcA8HrEsuEYgpe9pJQkwSnSTU74G+3i7vWk8ka5cJ+UWFDQ@mail.gmail.com>
-From: Jiahuan Zhang <jiahuanzhang90@gmail.com>
-Date: Tue, 21 Mar 2017 17:47:35 +0100
-Message-ID: <CAJy91CZ=QbhyeakFCSq3n6+d_cGO8hpT8o8EUwUTdkX-iE1eLg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] Guest application reading from pl011 without
- device driver
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 04/21] qobject: add quint type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,62 +34,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Eric Blake <eblake@redhat.com>, mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org, anderson@redhat.com, pbonzini@redhat.com, lersek@redhat.com
 
-many thanks for the rapid reply!
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
-On 21 March 2017 at 17:39, Peter Maydell <peter.maydell@linaro.org> wrote:
-
-> On 21 March 2017 at 16:32, Jiahuan Zhang <jiahuanzhang90@gmail.com> wrote:
-> > I found the serial device is always trying to receive all the data when
-> > ReadFile() is running, then start reading. Even if the fifo is full, the
-> > _can_receive function still keeps polling if the data is larger than 16
-> > bytes.
+> Hi
 >
-> pl011_can_receive() is:
+> On Mon, Mar 13, 2017 at 5:29 PM Marc-Andr=C3=A9 Lureau <mlureau@redhat.co=
+m>
+> wrote:
 >
-> static int pl011_can_receive(void *opaque)
-> {
->     PL011State *s = (PL011State *)opaque;
->     int r;
+> Hi
 >
->     if (s->lcr & 0x10) {
->         r = s->read_count < 16;
->     } else {
->         r = s->read_count < 1;
->     }
->     trace_pl011_can_receive(s->lcr, s->read_count, r);
->     return r;
-> }
-
-
-> so if the FIFO fills up then it should start to return 'false',
-> as it is supposed to.
+> ----- Original Message -----
+>> On 03/13/2017 02:15 AM, Markus Armbruster wrote:
+>> > Eric Blake <eblake@redhat.com> writes:
+>> >
+>> >> On 03/11/2017 07:22 AM, Marc-Andr=C3=A9 Lureau wrote:
+>> >>> The type is not used at all yet. Add some tests to exercice it.
+>> >>
+>> >> s/exercice/exercise/
+>> >>
+>> >> I wonder if we need this patch at all.
+>> >>
+>> >> I've been thinking about a possible alternative representation, such
+>> >> that a single QInt type can cover _both_ signed and unsigned types, by
+>> >> having QInt track a sign bit bool in addition to a uint64_t value.
+>> >>
+>>
+>> > You say you've been thinking about extending QInt's range to cover
+>> > uint64_t.  I've been thinking even more radically: replace both QInt a=
+nd
+>> > QFloat by QNumber.  This is how JSON *actually* works.
+>> >
+>> > The new QNumber type provides constructors from double, int64_t and
+>> > uint64_t.  It also provides conversion functions to double, int64_t and
+>> > uint64_t.  The latter two can fail.
+>>
+>> Interesting - I like it, as it takes my idea and goes one step further.
+>> You'd want to track 64 bits of precision rather than just 53, when the
+>> input was integral, but the idea seems to have some merit (we have some
+>> special case in the testsuite for what happens in alternates with
+>> various combinations of 'number' vs. 'int' that may need tweaking when
+>> they are no longer distinguishable as QInt vs QFloat, but that's not too
+>> onerous).
+>>
 >
-> I'm not sure from your description what exactly is happening,
-> but you should probably check, for instance:
->  * whether pl011_can_receive is returning false but data
->    is still being fed to it
+> I wonder the benefits from hiding the real type behind a QNumber
+> "superclass", then having to type check at a lower level. QType is not on=
+ly
+> used for json,
+
+The less it is used for non-JSON purposes, the better.
+
+>                so I see some benefits from having a bit stricter type
+> declaration and compile-time check. But I don't have a very good idea of
+> what it would mean to have a generic QNumber type, I could try to impleme=
+nt
+> it to have a more informed opinion.
 >
-
-The actual situation is, pl011_can_receive is returning false, the fifo is
-full,
-pl011_read does't start.
-At this moment, only pl011_can_recieve is keeping returning 0.
-
-
->  * whether pl011_can_receive is returning true even with
->    16 bytes in the fifo (hard to see how, given the code)
->  * whether the fifo actually has fewer bytes in it because
->    the guest is reading them
 >
-
-No, because the guest application does't get any data.
-
-
->  * etc
+> I have looked a bit more into implementing a QNumber type.
 >
-> thanks
-> -- PMM
+> There is a bit more error handling to add everywhere for getting a value
+> (for get_int, get_uint), as some conversions will fail. The qdict getters
+> will  have to throw those errors too. Whereas the QObject type check or
+> dispatch is there, so less error handling to add.
+
+How many places convert QNumber to C integer type?
+
+How many of them have to do range checking anyway?
+
+If range checking turns out to be common, we could fuse it into the
+conversion, say return -EINVAL for qtype other than QNumber, and -ERANGE
+for a QNumber out of range, like qemu_strtol() does.
+
+> In my proposal, conversion from int to uint is done for positive values,
+> with the qdict helper (is it the only way we access json parsed values?).
+
+I doubt it.
+
+> Do we want to cast a negative int to a uint? Do we have qmp clients using
+> this representation today, and can we break this?
+
+We don't have "intepret negative as large unsigned" issues in the JSON
+parser, but we have them in the QObject input visitor:
+visit_type_uint64() rejects integers above INT64_MAX, but happily
+accepts integers between INT64_MIN and -1, and cast them to uint64_t.
+
+This makes no sense for QMP.  It crept in right at the beginning because
+visitors were added without adequate test coverage.  Eric noticed this
+problem and added the FIXME in commit f755dea, four and a half years
+later.  We still lack an adequate test case.  I'll add one.
+
+We're awfully slow learners.
+
+QMP clients that work around the "large positive integers are rejected"
+bugs by sending large negative ones instead may well exist.  Fixing the
+interface would break them.  Depressing.  Eric, could you have a peek at
+libvirt?
+
+Additionally, direct users of QObject could conceivably convert QInt to
+int64_t, then silently cast to unsigned.  Or narrower integer types;
+same bad idea, really.  The only way to find them is to review all the
+code getting integers out of QObject.
+
+> The qdev-properties will be slightly less convenient to define, but that's
+> minor since it's behind macros, ex:
+> -            .qtype     =3D QTYPE_QUINT,                                 =
+  \
+> -            .defval.u  =3D (_type)_defval,                              =
+  \
+> +            .qtype     =3D QTYPE_QNUM,                                  =
+  \
+> +            .defval.type  =3D QNUM_U64,                                 =
+  \
+> +            .defval.u.u64  =3D (_type)_defval,                          =
+  \
 >
+> The biggest issue I have is how to handle the alt visitors if all ints are
+> numbers, ex with AltIntNum:
+>
+>     switch ((*obj)->type) {
+>     case QTYPE_QNUM:
+>         visit_type_int(v, name, &(*obj)->u.i, &err);
+>         break;
+>     case QTYPE_QNUM:
+>         visit_type_number(v, name, &(*obj)->u.n, &err);
+>         break;
+>
+> Should the generator have special handling for QNUM and dispatch based on
+> underlying type?
+
+I'm afraid we'll need that for keyval anyway.
+
+I've been playing with alternates a bit.  I think
+visit_start_alternate() needs to be redone.  Need to find time to finish
+my experiments and post patches.
+
+> Overall, it seems to me that using QUINT like I proposed is more
+> straightforward and equally convenient provided we have conversion helpers
+> where needed (mostly for qdict).
+
+Contradicts my gut feeling, but my gut is anything but infallible.  I
+guess I'd like to see (sketches of) both, so we can make an informed
+decision.
+
+> thanks for your comments
