@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1cqejI-0004eR-Hn
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 07:47:05 -0400
+	(envelope-from <bounces@canonical.com>) id 1cqemv-0005vq-HP
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 07:50:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1cqejE-000885-FW
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 07:47:04 -0400
-Received: from mail-wr0-f194.google.com ([209.85.128.194]:36164)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1cqejE-00087K-8K
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 07:47:00 -0400
-Received: by mail-wr0-f194.google.com with SMTP id l37so26298920wrc.3
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 04:46:59 -0700 (PDT)
-References: <mvminn3t1fq.fsf@suse.de>
-From: Thomas Huth <huth@tuxfamily.org>
-Message-ID: <a7886994-b4fe-3c6c-40ee-213b36e1e4b4@tuxfamily.org>
-Date: Wed, 22 Mar 2017 12:46:56 +0100
+	(envelope-from <bounces@canonical.com>) id 1cqemr-0000MQ-KI
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 07:50:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51048)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cqemr-0000MG-EC
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 07:50:45 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cqemo-0002Fn-KL
+	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 11:50:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id BFED32E80CE
+	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 11:50:41 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <mvminn3t1fq.fsf@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] qemu-binfmt-conf.sh: Fix m68k_mask
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 22 Mar 2017 11:40:26 -0000
+From: luigiburdo <intermediadc@hotmail.com>
+Reply-To: Bug 1674925 <1674925@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170322092818.25605.49354.malonedeb@gac.canonical.com>
+Message-Id: <20170322114026.3264.9943.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1674925] Re: Qemu PPC64 kvm no display if
+ --device virtio-gpu-pci is selected
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +37,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andreas Schwab <schwab@suse.de>, qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
+To: qemu-devel@nongnu.org
 
-On 21.03.2017 10:38, Andreas Schwab wrote:
-> The m68k mask should not remove the low bit of the ELF version field and
-> should ignore the OS/ABI field.
+Hi Thomas, thanks for your reply i will test and report my experience
+ASAP
 
-Did you encounter a problem with a real binary here? ... then it might
-be worth to mention it in the patch description and the patch should
-likely be included into QEMU 2.9. Or is this just cosmetics? ... then it
-should rather be included in 2.10 later, I think.
+Ciao
+Luigi
 
- Thomas
+-- =
 
-> Signed-off-by: Andreas Schwab <schwab@suse.de>
-> ---
->  scripts/qemu-binfmt-conf.sh | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-> index 0f1aa63872..484bcf166e 100755
-> --- a/scripts/qemu-binfmt-conf.sh
-> +++ b/scripts/qemu-binfmt-conf.sh
-> @@ -47,7 +47,7 @@ ppc64le_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\x
->  ppc64le_family=ppcle
->  
->  m68k_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x04'
-> -m68k_mask='\xff\xff\xff\xff\xff\xff\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
-> +m68k_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
->  m68k_family=m68k
->  
->  # FIXME: We could use the other endianness on a MIPS host.
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1674925
+
+Title:
+  Qemu PPC64 kvm no display if  --device virtio-gpu-pci is selected
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi,
+  i did many tests on qemu 2.8 on my BE machines and i found an issue that =
+i think was need to be reported
+
+  Test Machines BE 970MP
+
+  if i setup qemu with
+
+  qemu-system-ppc64 -M 1024 --display sdl(or gtk),gl=3Don --device virtio-
+  gpu-pci,virgl --enable-kvm and so and so
+
+  result is doubled window one is vga other is virtio-gpu-pci without
+  any start of the VM . pratically i dont have any output of openbios
+  and on the virtual serial output
+
+  the same issue i found is if i select:
+  qemu-system-ppc64 -M 1024 --display gtk(or sdl) --device virtio-gpu-pci -=
+-enable-kvm and so and so
+
+  =
+
+  i had been try to change all the -M types of all kind of pseries without =
+any positive result.
+
+  Ciao =
+
+  Luigi
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1674925/+subscriptions
