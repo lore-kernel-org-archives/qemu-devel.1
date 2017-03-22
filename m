@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cqj9l-000317-VS
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:30:44 -0400
+	(envelope-from <mst@redhat.com>) id 1cqjAR-0003Wj-PG
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:31:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cqj9k-0005zS-Vm
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:30:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57762)
+	(envelope-from <mst@redhat.com>) id 1cqjAN-0006S0-ML
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:31:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34824)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cqj9k-0005yM-PN
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:30:40 -0400
-Date: Wed, 22 Mar 2017 18:30:38 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cqjAN-0006Rm-Gv
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:31:19 -0400
+Date: Wed, 22 Mar 2017 18:31:17 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170322183009-mutt-send-email-mst@kernel.org>
+Message-ID: <20170322183050-mutt-send-email-mst@kernel.org>
 References: <1490198476-12244-1-git-send-email-mst@redhat.com>
-	<20170322182815-mutt-send-email-mst@kernel.org>
+	<1490198476-12244-5-git-send-email-mst@redhat.com>
+	<a5f0cf7d-b0e0-10c8-3518-4c25360b724f@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170322182815-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PULL 0/4] virtio, pc: fixes
+In-Reply-To: <a5f0cf7d-b0e0-10c8-3518-4c25360b724f@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 4/4] hw/acpi/vmgenid: prevent more than one
+ vmgenid device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,51 +29,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Ben Warren <ben@skyportsystems.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Wed, Mar 22, 2017 at 06:28:49PM +0200, Michael S. Tsirkin wrote:
-> On Wed, Mar 22, 2017 at 06:01:31PM +0200, Michael S. Tsirkin wrote:
-> > The following changes since commit 55a19ad8b2d0797e3a8fe90ab99a9bb713824059:
+On Wed, Mar 22, 2017 at 05:21:32PM +0100, Laszlo Ersek wrote:
+> On 03/22/17 17:01, Michael S. Tsirkin wrote:
+> > From: Laszlo Ersek <lersek@redhat.com>
 > > 
-> >   Update version for v2.9.0-rc1 release (2017-03-21 17:13:29 +0000)
+> > A system with multiple VMGENID devices is undefined in the VMGENID spec by
+> > omission.
 > > 
-> > are available in the git repository at:
-> > 
-> >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
-> > 
-> > for you to fetch changes up to 807211b76603b094c46a0cd95a3c785f47f3ab73:
-> > 
-> >   hw/acpi/vmgenid: prevent more than one vmgenid device (2017-03-22 17:56:00 +0200)
-> 
-> I tweaked commit log on two patches at submitter's request.
-> Pushed 160f57134960e6356257e54408f6bce382aac5f6 - same tree.
-
-It's really f92063028a0ea9e15d8f962644bce76c0e8aa7d1
-sorry about the noise.
-
-> > ----------------------------------------------------------------
-> > virtio, pc: fixes
-> > 
-> > virtio and misc fixes for 2.9.
-> > 
+> > Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> > Cc: Ben Warren <ben@skyportsystems.com>
+> > Cc: Igor Mammedov <imammedo@redhat.com>
+> > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+> > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> Can you please add the feedback tags from Igor and Ben?
+> 
+> http://mid.mail-archive.com/23205322-903E-42E2-99D7-ED8351E62694@skyportsystems.com
+> http://mid.mail-archive.com/20170321131414.08cc6bfa@nial.brq.redhat.com
+> 
+> > Binary file /tmp/tmp.IaAwzHwwsQ matches
+> 
+> I'm not sure what this means.
+> 
+> Thanks,
+> Laszlo
+
+Fixed, thanks for paying attention.
+
+> > ---
+> >  include/hw/acpi/vmgenid.h | 1 +
+> >  hw/acpi/vmgenid.c         | 8 ++++++++
+> >  2 files changed, 9 insertions(+)
 > > 
-> > ----------------------------------------------------------------
-> > Fam Zheng (1):
-> >       virtio: Fix error handling in virtio_bus_device_plugged
-> > 
-> > Laszlo Ersek (2):
-> >       hw/acpi/vmgenid: prevent device realization on pre-2.5 machine types
-> >       hw/acpi/vmgenid: prevent more than one vmgenid device
-> > 
-> > Paolo Bonzini (1):
-> >       virtio: always use handle_aio_output if registered
-> > 
-> >  include/hw/acpi/vmgenid.h |  2 ++
-> >  include/hw/compat.h       |  4 ++++
-> >  hw/acpi/vmgenid.c         | 22 ++++++++++++++++++++++
-> >  hw/virtio/virtio-bus.c    | 20 +++++++++++++++++---
-> >  hw/virtio/virtio.c        | 13 ++++++++++++-
-> >  5 files changed, 57 insertions(+), 4 deletions(-)
+> > diff --git a/include/hw/acpi/vmgenid.h b/include/hw/acpi/vmgenid.h
+> > index 8578476..7beb959 100644
+> > --- a/include/hw/acpi/vmgenid.h
+> > +++ b/include/hw/acpi/vmgenid.h
+> > @@ -24,6 +24,7 @@ typedef struct VmGenIdState {
+> >      bool write_pointer_available;
+> >  } VmGenIdState;
+> >  
+> > +/* returns NULL unless there is exactly one device */
+> >  static inline Object *find_vmgenid_dev(void)
+> >  {
+> >      return object_resolve_path_type("", VMGENID_DEVICE, NULL);
+> > diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+> > index c3ddcc8..a32b847 100644
+> > --- a/hw/acpi/vmgenid.c
+> > +++ b/hw/acpi/vmgenid.c
+> > @@ -221,6 +221,14 @@ static void vmgenid_realize(DeviceState *dev, Error **errp)
+> >          return;
+> >      }
+> >  
+> > +    /* Given that this function is executing, there is at least one VMGENID
+> > +     * device. Check if there are several.
+> > +     */
+> > +    if (!find_vmgenid_dev()) {
+> > +        error_setg(errp, "at most one %s device is permitted", VMGENID_DEVICE);
+> > +        return;
+> > +    }
+> > +
+> >      qemu_register_reset(vmgenid_handle_reset, vms);
+> >  }
+> >  
 > > 
