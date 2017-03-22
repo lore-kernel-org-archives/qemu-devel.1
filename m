@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38090)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40794)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cqg4e-0008La-2L
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 09:13:13 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cqgDI-00029j-KQ
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 09:22:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cqg4a-00033d-R9
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 09:13:12 -0400
-References: <20170322023820.10772-1-eblake@redhat.com>
-	<20170322023820.10772-4-eblake@redhat.com>
-	<87a88derjc.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <fa4a97ed-cbcd-fd8a-ec3e-7ae9df1d9f66@redhat.com>
-Date: Wed, 22 Mar 2017 08:13:05 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cqgDD-0006BO-20
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 09:22:08 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:35340)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cqgDC-0006B2-Ry
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 09:22:02 -0400
+Received: by mail-wm0-x232.google.com with SMTP id u132so36593696wmg.0
+	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 06:22:02 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87a88derjc.fsf@dusky.pond.sub.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Il64NOvRIafcehvbWkqOWlD18jNUqWGGa"
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] qapi: Fix QemuOpts visitor
- regression on unvisited input
+In-Reply-To: <20170322130952.8997-1-sameeh@daynix.com>
+References: <20170322130952.8997-1-sameeh@daynix.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 22 Mar 2017 13:21:41 +0000
+Message-ID: <CAFEAcA-qDLcpTJG9yrYptJHP_p598fakaW7ufzcbih5Wo2ySog@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH qemu-ga] qga: Make qemu-ga compile
+ statically for Windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,113 +29,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-stable@nongnu.org
+To: Sameeh Jubran <sameeh@daynix.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Yan Vugenfirer <yan@daynix.com>, Stefan Hajnoczi <stefanha@gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Il64NOvRIafcehvbWkqOWlD18jNUqWGGa
-From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com,
- Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-stable@nongnu.org
-Message-ID: <fa4a97ed-cbcd-fd8a-ec3e-7ae9df1d9f66@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] qapi: Fix QemuOpts visitor regression
- on unvisited input
-References: <20170322023820.10772-1-eblake@redhat.com>
- <20170322023820.10772-4-eblake@redhat.com>
- <87a88derjc.fsf@dusky.pond.sub.org>
-In-Reply-To: <87a88derjc.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 22 March 2017 at 13:09, Sameeh Jubran <sameeh@daynix.com> wrote:
+> Attempting to compile qemu-ga statically as follows for Windows causes
+> the following error:
+>
+> Compilation:
+>     ./configure --disable-docs --target-list=x86_64-softmmu \
+>     --cross-prefix=x86_64-w64-mingw32- --static \
+>     --enable-guest-agent-msi --with-vss-sdk=/path/to/VSSSDK72
+>
+>     make -j8 qemu-ga
+>
+> Error:
+>     path/to/qemu/stubs/error-printf.c:7: undefined reference to `__imp_g_test_config_vars'
+>     collect2: error: ld returned 1 exit status
+>     Makefile:444: recipe for target 'qemu-ga.exe' failed
+>     make: *** [qemu-ga.exe] Error 1
+>
+> This is caused by a bug in the pkg-config file for glib as it doesn't define
+> GLIB_STATIC_COMPILATION for pkg-config --static.
+>
+> Signed-off-by: Stefan Hajnoczi <stefanha@gmail.com>
+> Signed-off-by: Sameeh Jubran <sameeh@daynix.com>
+> @@ -4138,7 +4138,7 @@ int main(void) { return VSS_CTX_BACKUP; }
+>  EOF
+>    if compile_prog "$vss_win32_include" "" ; then
+>      guest_agent_with_vss="yes"
+> -    QEMU_CFLAGS="$QEMU_CFLAGS $vss_win32_include"
+> +    QEMU_CFLAGS="-DGLIB_STATIC_COMPILATION $QEMU_CFLAGS $vss_win32_include"
+>      libs_qga="-lole32 -loleaut32 -lshlwapi -lstdc++ -Wl,--enable-stdcall-fixup $libs_qga"
+>      qga_vss_provider="qga/vss-win32/qga-vss.dll qga/vss-win32/qga-vss.tlb"
+>    else
 
-On 03/22/2017 01:47 AM, Markus Armbruster wrote:
-> Eric Blake <eblake@redhat.com> writes:
->=20
->> An off-by-one in commit 15c2f669e meant that we were failing to
->> check for unparsed input in all QemuOpts visitors.  Recent testsuite
->> additions show that fixing the obvious bug with bogus fields will
->> also fix the case of an incomplete list visit; update the tests to
->> match the new behavior.
->>
+If we need this for static glib compilation we should
+be adding it where we do the "test for glib and
+add glib related flags to the CFLAGS", not in the
+part of configure where we decide that we're
+compiling the guest agent.
 
->> @@ -276,8 +276,8 @@ static void
->>  opts_check_list(Visitor *v, Error **errp)
->>  {
->>      /*
->> -     * FIXME should set error when unvisited elements remain.  Mostly=
+Also, please can we have a comment that clearly states
+why we need this and that we're working around a
+packaging bug in glib for Windows, please?
 
->> -     * harmless, as the generated visits always visit all elements.
->> +     * Unvisited list elements will be reported later when checking i=
-f
->> +     * unvisited struct members remain.
->=20
-> Non-native speaker question: if or whether?
->=20
-
-Both work to my ear, but whether sounds a bit more formal. I can switch,
-since...
-
-
->> -    visit_check_list(v, &error_abort); /* BUG: unvisited tail not rep=
-orted */
->> +    visit_check_list(v, &error_abort); /* unvisited tail ignored unti=
-l... */
->>      visit_end_list(v, (void **)&list);
->>
->> -    visit_check_struct(v, &error_abort);
->> +    visit_check_struct(v, &err); /* ...here */
->> +    error_free_or_abort(&err);
->>      visit_end_struct(v, NULL);
->>
->>      qapi_free_intList(list);
->=20
-> How come unvisited tails are diagnosed late?
-
-Because opts_check_list() is still a no-op, and I didn't want to muck
-with how to make it work to catch things earlier.  The late catch is by
-virtue of the fact that we track complete coverage by whether the clone
-of the QemuOpts still has the key, and the key is not removed until the
-list is fully parsed.
-
->=20
->> @@ -239,7 +241,7 @@ test_opts_range_beyond(void)
->>      error_free_or_abort(&err);
->>      visit_end_list(v, (void **)&list);
->>
->> -    visit_check_struct(v, &error_abort);
->> +    visit_check_struct(v, &err);
->=20
-> This looks wrong.  Either you expect an error or not.  If you do,
-> error_free_or_abort() seems missing.  If you don't, the hunk needs to b=
-e
-> dropped.
->=20
-
-=2E..you are correct that this is a spurious hunk, and removing it does
-not change the testsuite. v3 coming up.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---Il64NOvRIafcehvbWkqOWlD18jNUqWGGa
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY0nhhAAoJEKeha0olJ0Nq3roH/i/zkwZeW25xlh4Udf88Pvn1
-G+sUiZLMeD9nD0MKEaQdtXxKP8Y33PquKM6Y3kHg86NxkzmqB34xT/qLectGGHnl
-0Pt0W4IbEzKKhU2IIQTitRWHj/jyemA4zAuD83GIF+im0eJECKNq1uKUe4lKsPbc
-uPjYMPCIYhHzVxkuQuOfUInM9+b3hkXE+91NoKf5DKM4h+w262385yffykwg38z+
-h6qRm/WYg5jeyiyaqZxtXxI7J9ms/Cch0Rxs4Ae9BR1BQUD3y5MsgOYe1GAX2GBe
-GliHKkZIb15iOJkGb6YCUnQuYb7RIbQCYYxgcVxpdLu8Ed7dI1MHdRD8jYG42GU=
-=pa8B
------END PGP SIGNATURE-----
-
---Il64NOvRIafcehvbWkqOWlD18jNUqWGGa--
+thanks
+-- PMM
