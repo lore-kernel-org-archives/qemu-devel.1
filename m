@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49731)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cqkEU-0003wn-3C
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 13:39:39 -0400
+	(envelope-from <armbru@redhat.com>) id 1cqkN8-0007tc-Gs
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 13:48:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cqkEQ-00076D-6n
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 13:39:38 -0400
-References: <149020412706.102.14127530188115538412@6c512846dbc7>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0feec7b2-27f5-76e5-5bf1-f6f020c574df@redhat.com>
-Date: Wed, 22 Mar 2017 12:39:29 -0500
+	(envelope-from <armbru@redhat.com>) id 1cqkN6-0001Kr-K9
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 13:48:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42904)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cqkN6-0001K8-EZ
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 13:48:32 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6CA48C05B1C7
+	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 17:48:32 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-26.ams2.redhat.com
+	[10.36.116.26])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 380DD7EFEF
+	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 17:48:32 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Wed, 22 Mar 2017 18:48:22 +0100
+Message-Id: <1490204908-26567-12-git-send-email-armbru@redhat.com>
+In-Reply-To: <1490204908-26567-1-git-send-email-armbru@redhat.com>
+References: <1490204908-26567-1-git-send-email-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <149020412706.102.14127530188115538412@6c512846dbc7>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="mGwbG3pHdF9NMnS1e9bKNtSqlU7E9Rw5U"
-Subject: Re: [Qemu-devel] [PATCH] fixup! qom: Avoid unvisited
- 'id'/'qom-type' in user_creatable_add_opts
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v2 for-2.9 11/17] qapi2texi: Fix translation of
+ *strong* and _emphasized_
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,69 +38,71 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, lvivier@redhat.com, armbru@redhat.com, afaerber@suse.de, qemu-stable@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---mGwbG3pHdF9NMnS1e9bKNtSqlU7E9Rw5U
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, lvivier@redhat.com, armbru@redhat.com, afaerber@suse.de,
- qemu-stable@nongnu.org
-Message-ID: <0feec7b2-27f5-76e5-5bf1-f6f020c574df@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] fixup! qom: Avoid unvisited 'id'/'qom-type'
- in user_creatable_add_opts
-References: <149020412706.102.14127530188115538412@6c512846dbc7>
-In-Reply-To: <149020412706.102.14127530188115538412@6c512846dbc7>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <1490015515-25851-7-git-send-email-armbru@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ scripts/qapi2texi.py            | 4 ++--
+ tests/qapi-schema/doc-good.texi | 8 ++++----
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-On 03/22/2017 12:35 PM, no-reply@patchew.org wrote:
-> Hi,
->=20
-> This series failed build test on s390x host. Please find the details be=
-low.
->=20
-> Type: series
-> Subject: [Qemu-devel] [PATCH] fixup! qom: Avoid unvisited 'id'/'qom-typ=
-e' in user_creatable_add_opts
-> Message-id: 20170322173023.22654-1-eblake@redhat.com
->=20
-
-> /var/tmp/patchew-tester-tmp-5drz5kus/src/qom/object_interfaces.c: In fu=
-nction =E2=80=98user_creatable_add_opts=E2=80=99:
-> /var/tmp/patchew-tester-tmp-5drz5kus/src/qom/object_interfaces.c:125:16=
-: error: passing argument 1 of =E2=80=98g_free=E2=80=99 discards =E2=80=98=
-const=E2=80=99 qualifier from pointer target type [-Werror=3Ddiscarded-qu=
-alifiers]
->          g_free(type);
->                 ^~~~
-
-Silly patchew. Maybe we should teach you that any patch with 'fixup!' in
-the title is _probably_ not going to compile on its own, because it is a
-fixup to be sqaushed to an (as-yet) uncommitted patch.
-
+diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
+index 5c4db78..9e01500 100755
+--- a/scripts/qapi2texi.py
++++ b/scripts/qapi2texi.py
+@@ -35,12 +35,12 @@ EXAMPLE_FMT =3D """@example
+=20
+ def subst_strong(doc):
+     """Replaces *foo* by @strong{foo}"""
+-    return re.sub(r'\*([^*\n]+)\*', r'@emph{\1}', doc)
++    return re.sub(r'\*([^*\n]+)\*', r'@strong{\1}', doc)
+=20
+=20
+ def subst_emph(doc):
+     """Replaces _foo_ by @emph{foo}"""
+-    return re.sub(r'\b_([^_\n]+)_\b', r' @emph{\1} ', doc)
++    return re.sub(r'\b_([^_\n]+)_\b', r'@emph{\1}', doc)
+=20
+=20
+ def subst_vars(doc):
+diff --git a/tests/qapi-schema/doc-good.texi b/tests/qapi-schema/doc-good=
+.texi
+index 1160aaf..c410626 100644
+--- a/tests/qapi-schema/doc-good.texi
++++ b/tests/qapi-schema/doc-good.texi
+@@ -2,7 +2,7 @@
+=20
+ @subsection Subsection
+=20
+-@emph{strong}  @emph{with emphasis}=20
++@strong{strong} @emph{with emphasis}
+ @code{var} @{in braces@}
+ @itemize @bullet
+ @item
+@@ -67,7 +67,7 @@ Example:
+ Examples:
+ @itemize @minus
+ @item
+-@emph{verbatim}
++@strong{verbatim}
+ @item
+ @{braces@}
+ @end itemize
+@@ -76,12 +76,12 @@ Examples:
+=20
+ @deftp {Enum} Enum
+=20
+-@subsection Produces @emph{invalid} texinfo
++@subsection Produces @strong{invalid} texinfo
+=20
+ @b{Values:}
+ @table @asis
+ @item @code{one}
+-The  @emph{one}  @{and only@}
++The @emph{one} @{and only@}
+ @item @code{two}
+ Not documented
+ @end table
 --=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---mGwbG3pHdF9NMnS1e9bKNtSqlU7E9Rw5U
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY0rbRAAoJEKeha0olJ0NqploIAIu4VAXql3nMJxCCRs2CDdIk
-T3qzo3H/sJuKBIXDDppYW+lvRc2wsheBw4Zl/ZLc9d8LM8srguObkRmSLCsp/MKx
-P+vedEQww7fdxG8qxEYTxzwNO0BGrx70X2N3L8pWqI40z35pE8zMVnF5z6X4tXOr
-lqpB3ixE2V7KkXOMAiE1JGBNRGo0BUWAdKvybrSyUdPxJz+JI4OHbbpJCDVb/axb
-aUTwUEsyVMdXGGeZ2in90amssPKKP13LOrqX31ScbdPWMLDjqKthihUv5tOzBxGH
-8jxI6OQ8TZb7mCrf0EmQAWgIFWRof/iEYQXMs+Yyi/LXRobweqLG8gmypDdtDoQ=
-=bDjX
------END PGP SIGNATURE-----
-
---mGwbG3pHdF9NMnS1e9bKNtSqlU7E9Rw5U--
+2.7.4
