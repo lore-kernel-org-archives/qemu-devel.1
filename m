@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cql2X-0005ro-9L
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:31:22 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1cql3e-0006Ms-RM
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:32:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cql2U-0006uk-3S
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:31:21 -0400
-Received: from 5.mo173.mail-out.ovh.net ([46.105.40.148]:33977)
+	(envelope-from <sstabellini@kernel.org>) id 1cql3b-0007DO-Kr
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:32:30 -0400
+Received: from mail.kernel.org ([198.145.29.136]:46458)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cql2T-0006uV-QT
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:31:18 -0400
-Received: from player739.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 414D32DA6E
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 19:31:16 +0100 (CET)
-References: <20170322092818.25605.49354.malonedeb@gac.canonical.com>
-	<20170322133509.30547.6423.malone@soybean.canonical.com>
-	<69a94326-4115-cac7-7f0f-1f455896fd2c@redhat.com>
-	<e7be24c8-dbc6-0e32-5b18-73cd5454fc64@kaod.org>
-	<AM5P194MB01291ABD7713F7A68E517AB6C83C0@AM5P194MB0129.EURP194.PROD.OUTLOOK.COM>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <4c420daf-83f4-8f4e-160f-a880041b2c51@kaod.org>
-Date: Wed, 22 Mar 2017 19:31:11 +0100
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1cql3b-0007DE-AT
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:32:27 -0400
+Date: Wed, 22 Mar 2017 11:32:22 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <20170322094724.5f1f5cf9@bahia.lan>
+Message-ID: <alpine.DEB.2.10.1703221131160.13499@sstabellini-ThinkPad-X260>
+References: <alpine.DEB.2.10.1703201117560.23684@sstabellini-ThinkPad-X260>
+	<20170321112000.56a9737f@bahia.lan>
+	<alpine.DEB.2.10.1703211035401.18429@sstabellini-ThinkPad-X260>
+	<20170322094724.5f1f5cf9@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <AM5P194MB01291ABD7713F7A68E517AB6C83C0@AM5P194MB0129.EURP194.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [Qemu-ppc] [Bug 1674925] Re: Qemu PPC64 kvm no
- display if --device virtio-gpu-pci is selected
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [Xen-devel] [PATCH v4 0/8] xen/9pfs: introduce the
+ Xen 9pfs backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,70 +30,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: luigi burdo <intermediadc@hotmail.com>, Thomas Huth <thuth@redhat.com>, Bug 1674925 <1674925@bugs.launchpad.net>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "qemU-ppc@nongnu.org" <qemU-ppc@nongnu.org>
+To: Greg Kurz <groug@kaod.org>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, jgross@suse.com, aneesh.kumar@linux.vnet.ibm.com, qemu-devel@nongnu.org
 
-SGVsbG8gTHVpZ2ksDQoNCk9uIDAzLzIyLzIwMTcgMDY6NDkgUE0sIGx1aWdpIGJ1cmRvIHdy
-b3RlOg0KDQo+IGkgaGF2ZSB0aGUgNC4xMXJjMSAuIG9uZmVkb3JhIDI1IHBwYyA2NCBvbiBi
-b3RoIG1hY2hpbmUgUW9yaXEgYW5kIG9uIEc1UXVhZC4NCj4gDQo+IE9uIHRoZSAyLjggdGhp
-cyBpc3N1ZSBpc250IHByZXNlbnRidXQNCj4gSSBkaWQgdGhlIHRlc3QgbyBRb3JpcSAgZTU1
-MDAgYSBib29rM2UgcHJvY2Vzc29yIGFuZCBvbiAyLjggaWYgaSBtYWRlOg0KPiANCj4gcWVt
-dS1zeXN0ZW0tcHBjNjQgLS1lbmFibGUta3ZtIHRoZSB0cnVlIHJlc3VsdCBpczoNCj4gcWVt
-dS1zeXN0ZW0tcHBjNjQ6IFVuYWJsZSB0byBmaW5kIENQVSBkZWZpbml0aW9uOiBob3N0DQo+
-IA0KPiBvbiBxZW11IDIuOSByYzENCj4gDQo+IC4vcWVtdS1zeXN0ZW0tcHBjNjQgLS1lbmFi
-bGUta3ZtIGkgaGF2ZSA6DQo+IHFlbXUtc3lzdGVtLXBwYzY0OiBLVk0gYW5kIElSUV9YSUNT
-IGNhcGFiaWxpdHkgbXVzdCBiZSBwcmVzZW50IGZvciBpbi1rZXJuZWwgWElDUw0KDQpUaGUg
-ZGVmYXVsdCBtYWNoaW5lIGZvciBxZW11LXN5c3RlbS1wcGM2NCBpcyBwc2VyaWVzLiANCg0K
-VGhlIGVycm9yIG1lc3NhZ2UgZm9yIFFFTVUgMi44IG1lYW5zIHRoYXQgaXQgZmFpbHMgdG8g
-aW5pdGlhbGl6ZSANCnRoZSBtYWNoaW5lIGluIHBwY19jcHVfcGFyc2VfZmVhdHVyZXMoKSB3
-aGljaCBpcyBhIGJpdCBsYXRlLiANCkZvciBRRU1VIDIuOSwgaXQgZmFpbHMgYXQgdGhlIHJp
-Z2h0IGJlZ2lubmluZyBpbiB4aWNzX3N5c3RlbV9pbml0KCksIA0KYmVmb3JlIHRoZSBDUFVz
-IGFyZSBpbml0aWFsaXplZCwgd2hpY2ggaXMgYmV0dGVyLCBJIHRoaW5rLg0KDQpJIGFkbWl0
-IHRoZSBtZXNzYWdlIGlzIG5vdCB2ZXJ5IGNsZWFyLCBidXQgdGhlIGhvc3Qga2VybmVsIGlz
-IA0KdXNpbmcgYSBkZXYgY29uZmlnLg0KDQo+IE9uIFFvcmlxIGlmIGkgcGFzcyB0aGUgLWNw
-dSBlNTAwIChub3JtYWwgdGhpbmcpIGFsbCBpcyB3b3JraW5nIHJpZ2h0IHFlbXUgMi45cmMx
-IA0KPiBhbGwgYm9vdCBhbmQgc28gYW5kIHNvLg0KDQpidXQgeW91IG11c3QgYmUgY2hhbmdp
-bmcgdGhlIG1hY2hpbmUgcmlnaHQgPyANCg0KPiBPbiBHNSB0aGUgLWNwdSB2YXJpYWJsZSBk
-b250IGZpeCB0aGUgaXNzdWUuDQoNCndpdGggd2hpY2ggbWFjaGluZSA/IA0KDQoNCj4gSSBj
-YW4gYnVpbGQgYSBuZXcga2VybmVsIHJlbGVhc2UgLCB1c3VhbGx5IG1pbmUgZG9udCBoYXZl
-IHhpY3MgZW5hYmxlZCBiZWNhdXNlIEc1IA0KPiBkb250IGhhdmUgdGhhdCBmZWF0dXJlLCBp
-ZiBuZWVkZWQgaSBjYW4gZW5hYmxlIGl0IGZvciB0ZXN0aW5nLioqDQoNClllcyB0aGF0IHdv
-dWxkIGJlIGludGVyZXN0aW5nLiANCg0KVGhhbmtzLA0KDQpDLiANCg0KPiANCj4gSG9wZSBt
-eSBlbmdsaXNoIGlzIHVuZGVyc3RhbmRhYmxlLg0KPiANCj4gY2lhbw0KPiANCj4gTHVpZ2kN
-Cj4gDQo+IA0KPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4gKkRhOiogUWVtdS1wcGMgPHFlbXUt
-cHBjLWJvdW5jZXMraW50ZXJtZWRpYWRjPWhvdG1haWwuY29tQG5vbmdudS5vcmc+IHBlciBj
-b250byBkaSBDw6lkcmljIExlIEdvYXRlciA8Y2xnQGthb2Qub3JnPg0KPiAqSW52aWF0bzoq
-IG1lcmNvbGVkw6wgMjIgbWFyem8gMjAxNyAxOC4yOQ0KPiAqQToqIFRob21hcyBIdXRoOyBC
-dWcgMTY3NDkyNTsgcWVtdS1kZXZlbEBub25nbnUub3JnDQo+ICpDYzoqIHFlbVUtcHBjQG5v
-bmdudS5vcmcNCj4gKk9nZ2V0dG86KiBSZTogW1FlbXUtcHBjXSBbUWVtdS1kZXZlbF0gW0J1
-ZyAxNjc0OTI1XSBSZTogUWVtdSBQUEM2NCBrdm0gbm8gZGlzcGxheSBpZiAtLWRldmljZSB2
-aXJ0aW8tZ3B1LXBjaSBpcyBzZWxlY3RlZA0KPiAgDQo+IE9uIDAzLzIyLzIwMTcgMDM6MTUg
-UE0sIFRob21hcyBIdXRoIHdyb3RlOg0KPj4gT24gMjIuMDMuMjAxNyAxNDozNSwgbHVpZ2li
-dXJkbyB3cm90ZToNCj4+PiBIaSBUaG9tYXMgd2l0aCAyLjkgcmMxIGkgaGF2ZSB0aGlzIHdp
-dGggLS1lbmFibGUta3ZtDQo+Pj4NCj4+PiBlbXUtc3lzdGVtLXBwYzY0IC0tZW5hYmxlLWt2
-bQ0KPj4+IHFlbXUtc3lzdGVtLXBwYzY0OiBLVk0gYW5kIElSUV9YSUNTIGNhcGFiaWxpdHkg
-bXVzdCBiZSBwcmVzZW50IGZvciBpbi1rZXJuZWwgWElDUw0KPj4+DQo+Pj4gYW5kIHRoZSBx
-ZW11IGRvbnQgcnVuLg0KPj4gDQo+PiBEb2VzIGl0IGV4aXQsIG9yIGp1c3QgaGFuZyBhZnRl
-cndhcmRzPyBXYXMgdGhpcyB3aXRoIG9yIHdpdGhvdXQgLS1kZXZpY2UNCj4+IHZpcnRpby1n
-cHUtcGNpIG9wdGlvbj8gRG8geW91IGdldCBhbnkgb3V0cHV0IGlmIHlvdSBydW4gUUVNVSB3
-aXRoDQo+PiAiLW5vZ3JhcGhpYyIgaW5zdGVhZD8NCj4gDQo+IEkgZ3Vlc3MgdGhpcyBpcyBh
-biBpc3N1ZSB3aXRoIHRoZSBob3N0IGtlcm5lbC4gV2hpY2ggb25lIGFyZSB5b3UgcnVubmlu
-ZyA/DQo+IA0KPiBDLg0KPiANCj4gDQoNCg==
+On Wed, 22 Mar 2017, Greg Kurz wrote:
+> On Tue, 21 Mar 2017 13:14:02 -0700 (PDT)
+> Stefano Stabellini <sstabellini@kernel.org> wrote:
+> 
+> > On Tue, 21 Mar 2017, Greg Kurz wrote:
+> > > On Mon, 20 Mar 2017 11:18:46 -0700 (PDT)
+> > > Stefano Stabellini <sstabellini@kernel.org> wrote:
+> > >   
+> > > > Hi all,
+> > > > 
+> > > > This patch series implements a new transport for 9pfs, aimed at Xen
+> > > > systems.
+> > > > 
+> > > > The transport is based on a traditional Xen frontend and backend drivers
+> > > > pair. This patch series implements the backend, which typically runs in
+> > > > Dom0. I sent another series to implement the frontend in Linux
+> > > > (http://marc.info/?l=linux-kernel&m=148883047125960&w=2).
+> > > > 
+> > > > The backend complies to the Xen transport for 9pfs specification
+> > > > version 1, available here:
+> > > > 
+> > > > https://xenbits.xen.org/docs/unstable/misc/9pfs.html
+> > > > 
+> > > > 
+> > > > Changes in v4:
+> > > > - add reviewed-bys
+> > > > - remove useless if(NULL) checks around g_free
+> > > > - g_free g_malloc'ed sgs
+> > > > - remove XEN_9PFS_RING_ORDER, make the ring order dynamic per ring,
+> > > >   reading the ring_order field in xen_9pfs_data_intf
+> > > > - remove patch not to build Xen backends on non-Xen capable targets
+> > > >   because it is already upstream
+> > > >   
+> > > 
+> > > Hi Stefano,
+> > > 
+> > > This looks good to me. Do you want these patches to go through my 9p
+> > > tree or through your xen tree ?  
+> > 
+> > Thanks Greg! It can work both ways. If you have any changes in your queue
+> > that could conflict with this, it's best to go via your tree.
+> > 
+> > Otherwise, I'll merge it in mine, so that I can keep an eye on the
+> > correspondent Xen changes to the header files and make sure they are in
+> > sync (specifically http://marc.info/?l=qemu-devel&m=149003412910278).
+> > 
+> 
+> I don't have any conflicting patches on my side. Please merge this in your
+> tree (as well as the MAINTAINERS patch).
+
+All right, thanks! I'll add a reviewed-by you on all patches if for you
+is OK.
+
+
+> > 
+> > >  Also, I guess you may want to add
+> > > F: hw/9pfs/xen-9p-backend.c to the Xen section in MAINTAINERS.  
+> > 
+> > I'll send a patch to be applied on top of the series
+> > 
+> > 
+> > > --
+> > > Greg
+> > >   
+> > > > Changes in v3:
+> > > > - do not build backends for targets that do not support xen
+> > > > - remove xen_9pfs.h, merge its content into xen-9p-backend.c
+> > > > - remove xen_9pfs_header, introduce P9MsgHeader
+> > > > - use le32_to_cpu to access P9MsgHeader fields
+> > > > - many coding style fixes
+> > > > - run checkpatch on all patches
+> > > > - add check if num_rings < 1
+> > > > - use g_strdup_printf
+> > > > - free fsdev_id in xen_9pfs_free
+> > > > - add comments
+> > > > 
+> > > > Changes in v2:
+> > > > - fix coding style
+> > > > - compile xen-9p-backend.c if CONFIG_XEN_BACKEND
+> > > > - add patch to set CONFIG_XEN_BACKEND only for the right targets
+> > > > - add review-bys
+> > > > 
+> > > > 
+> > > > Stefano Stabellini (8):
+> > > >       xen: import ring.h from xen
+> > > >       9p: introduce a type for the 9p header
+> > > >       xen/9pfs: introduce Xen 9pfs backend
+> > > >       xen/9pfs: connect to the frontend
+> > > >       xen/9pfs: receive requests from the frontend
+> > > >       xen/9pfs: implement in/out_iov_from_pdu and vmarshal/vunmarshal
+> > > >       xen/9pfs: send responses back to the frontend
+> > > >       xen/9pfs: build and register Xen 9pfs backend
+> > > > 
+> > > >  hw/9pfs/9p.h                 |   6 +
+> > > >  hw/9pfs/Makefile.objs        |   1 +
+> > > >  hw/9pfs/virtio-9p-device.c   |   6 +-
+> > > >  hw/9pfs/xen-9p-backend.c     | 444 +++++++++++++++++++++++++++++++++++++++++
+> > > >  hw/block/xen_blkif.h         |   2 +-
+> > > >  hw/usb/xen-usb.c             |   2 +-
+> > > >  hw/xen/xen_backend.c         |   3 +
+> > > >  include/hw/xen/io/ring.h     | 455 +++++++++++++++++++++++++++++++++++++++++++
+> > > >  include/hw/xen/xen_backend.h |   3 +
+> > > >  9 files changed, 915 insertions(+), 7 deletions(-)
+> > > >  create mode 100644 hw/9pfs/xen-9p-backend.c
+> > > >  create mode 100644 include/hw/xen/io/ring.h  
+> > > 
+> > >   
+> 
+> 
