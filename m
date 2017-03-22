@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41353)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cql7T-0008GY-RD
+	(envelope-from <armbru@redhat.com>) id 1cql7T-0008GU-Qj
 	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:36:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cql7R-0000Zm-VF
+	(envelope-from <armbru@redhat.com>) id 1cql7S-0000Zv-47
 	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:36:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39860)
+Received: from mx1.redhat.com ([209.132.183.28]:53254)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cql7R-0000YC-Mo
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cql7R-0000YM-SP
 	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:36:25 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AFACFC0567A2
+	by mx1.redhat.com (Postfix) with ESMTPS id D92A2C04BD4C
 	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 18:36:25 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-26.ams2.redhat.com
 	[10.36.116.26])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 78324852A1
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9F9A67F3A5
 	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 18:36:25 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 22 Mar 2017 19:36:12 +0100
-Message-Id: <1490207781-18965-9-git-send-email-armbru@redhat.com>
+Date: Wed, 22 Mar 2017 19:36:18 +0100
+Message-Id: <1490207781-18965-15-git-send-email-armbru@redhat.com>
 In-Reply-To: <1490207781-18965-1-git-send-email-armbru@redhat.com>
 References: <1490207781-18965-1-git-send-email-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v3 for-2.9 08/17] qapi: Drop unused QAPIDoc
- member optional
+Subject: [Qemu-devel] [PULL v3 for-2.9 14/17] test-qobject-input-visitor:
+ Cover visit_type_uint64()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,26 +36,64 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Unused since commit aa964b7 "qapi2texi: Convert to QAPISchemaVisitor"
+The new test demonstrates known bugs: integers between INT64_MAX+1 and
+UINT64_MAX rejected, and integers between INT64_MIN and -1 are
+accepted modulo 2^64.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1490015515-25851-4-git-send-email-armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <1490118290-6133-1-git-send-email-armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- scripts/qapi.py | 1 -
- 1 file changed, 1 deletion(-)
+ tests/test-qobject-input-visitor.c | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index e88c047..6c4d554 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -106,7 +106,6 @@ class QAPIDoc(object):
-             self.name =3D name
-             # the list of lines for this section
-             self.content =3D []
--            self.optional =3D False
-=20
-         def append(self, line):
-             self.content.append(line)
---=20
+diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-input-visitor.c
+index 6eb48fe..f965743 100644
+--- a/tests/test-qobject-input-visitor.c
++++ b/tests/test-qobject-input-visitor.c
+@@ -116,6 +116,34 @@ static void test_visitor_in_int(TestInputVisitorData *data,
+     g_assert_cmpint(res, ==, value);
+ }
+ 
++static void test_visitor_in_uint(TestInputVisitorData *data,
++                                const void *unused)
++{
++    Error *err = NULL;
++    uint64_t res = 0;
++    int value = 42;
++    Visitor *v;
++
++    v = visitor_input_test_init(data, "%d", value);
++
++    visit_type_uint64(v, NULL, &res, &error_abort);
++    g_assert_cmpuint(res, ==, (uint64_t)value);
++
++    /* BUG: value between INT64_MIN and -1 accepted modulo 2^64 */
++
++    v = visitor_input_test_init(data, "%d", -value);
++
++    visit_type_uint64(v, NULL, &res, &error_abort);
++    g_assert_cmpuint(res, ==, (uint64_t)-value);
++
++    /* BUG: value between INT64_MAX+1 and UINT64_MAX rejected */
++
++    v = visitor_input_test_init(data, "18446744073709551574");
++
++    visit_type_uint64(v, NULL, &res, &err);
++    error_free_or_abort(&err);
++}
++
+ static void test_visitor_in_int_overflow(TestInputVisitorData *data,
+                                          const void *unused)
+ {
+@@ -1225,6 +1253,8 @@ int main(int argc, char **argv)
+ 
+     input_visitor_test_add("/visitor/input/int",
+                            NULL, test_visitor_in_int);
++    input_visitor_test_add("/visitor/input/uint",
++                           NULL, test_visitor_in_uint);
+     input_visitor_test_add("/visitor/input/int_overflow",
+                            NULL, test_visitor_in_int_overflow);
+     input_visitor_test_add("/visitor/input/int_keyval",
+-- 
 2.7.4
