@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cql7T-0008GT-Q5
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:36:29 -0400
+	(envelope-from <armbru@redhat.com>) id 1cql7T-0008GP-Pk
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:36:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cql7R-0000ZR-SX
+	(envelope-from <armbru@redhat.com>) id 1cql7Q-0000Xg-J1
 	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:36:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32792)
+Received: from mx1.redhat.com ([209.132.183.28]:60978)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cql7R-0000Y8-MP
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:36:25 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cql7Q-0000WP-AN
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:36:24 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AD34F8EA48
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 18:36:25 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 250AF67BA8
+	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 18:36:24 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-26.ams2.redhat.com
 	[10.36.116.26])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 77E4518210
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 18:36:25 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id E557D80F6A
+	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 18:36:23 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 22 Mar 2017 19:36:15 +0100
-Message-Id: <1490207781-18965-12-git-send-email-armbru@redhat.com>
+Date: Wed, 22 Mar 2017 19:36:06 +0100
+Message-Id: <1490207781-18965-3-git-send-email-armbru@redhat.com>
 In-Reply-To: <1490207781-18965-1-git-send-email-armbru@redhat.com>
 References: <1490207781-18965-1-git-send-email-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v3 for-2.9 11/17] qapi2texi: Fix translation of
- *strong* and _emphasized_
+Subject: [Qemu-devel] [PULL v3 for-2.9 02/17] keyval: Improve some comments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,69 +36,86 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1490015515-25851-7-git-send-email-armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <1490014548-15083-3-git-send-email-armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- scripts/qapi2texi.py            | 4 ++--
- tests/qapi-schema/doc-good.texi | 8 ++++----
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ util/keyval.c | 47 +++++++++++++++++++++++++++++++----------------
+ 1 file changed, 31 insertions(+), 16 deletions(-)
 
-diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-index 5c4db78..9e01500 100755
---- a/scripts/qapi2texi.py
-+++ b/scripts/qapi2texi.py
-@@ -35,12 +35,12 @@ EXAMPLE_FMT =3D """@example
-=20
- def subst_strong(doc):
-     """Replaces *foo* by @strong{foo}"""
--    return re.sub(r'\*([^*\n]+)\*', r'@emph{\1}', doc)
-+    return re.sub(r'\*([^*\n]+)\*', r'@strong{\1}', doc)
-=20
-=20
- def subst_emph(doc):
-     """Replaces _foo_ by @emph{foo}"""
--    return re.sub(r'\b_([^_\n]+)_\b', r' @emph{\1} ', doc)
-+    return re.sub(r'\b_([^_\n]+)_\b', r'@emph{\1}', doc)
-=20
-=20
- def subst_vars(doc):
-diff --git a/tests/qapi-schema/doc-good.texi b/tests/qapi-schema/doc-good=
-.texi
-index 1160aaf..c410626 100644
---- a/tests/qapi-schema/doc-good.texi
-+++ b/tests/qapi-schema/doc-good.texi
-@@ -2,7 +2,7 @@
-=20
- @subsection Subsection
-=20
--@emph{strong}  @emph{with emphasis}=20
-+@strong{strong} @emph{with emphasis}
- @code{var} @{in braces@}
- @itemize @bullet
- @item
-@@ -67,7 +67,7 @@ Example:
- Examples:
- @itemize @minus
- @item
--@emph{verbatim}
-+@strong{verbatim}
- @item
- @{braces@}
- @end itemize
-@@ -76,12 +76,12 @@ Examples:
-=20
- @deftp {Enum} Enum
-=20
--@subsection Produces @emph{invalid} texinfo
-+@subsection Produces @strong{invalid} texinfo
-=20
- @b{Values:}
- @table @asis
- @item @code{one}
--The  @emph{one}  @{and only@}
-+The @emph{one} @{and only@}
- @item @code{two}
- Not documented
- @end table
---=20
+diff --git a/util/keyval.c b/util/keyval.c
+index f646b36..46cd540 100644
+--- a/util/keyval.c
++++ b/util/keyval.c
+@@ -21,22 +21,36 @@
+  *
+  * Semantics defined by reduction to JSON:
+  *
+- *   key-vals is a tree of objects and arrays rooted at object R
+- *   where for each key-val = key-fragment . ... = val in key-vals
+- *       R op key-fragment op ... = val'
+- *       where (left-associative) op is
+- *                 array subscript L[key-fragment] for numeric key-fragment
+- *                 member reference L.key-fragment otherwise
+- *             val' is val with ',,' replaced by ','
+- *   and only R may be empty.
++ *   key-vals specifies a JSON object, i.e. a tree whose root is an
++ *   object, inner nodes other than the root are objects or arrays,
++ *   and leaves are strings.
+  *
+- *   Duplicate keys are permitted; all but the last one are ignored.
++ *   Each key-val = key-fragment '.' ... '=' val specifies a path from
++ *   root to a leaf (left of '='), and the leaf's value (right of
++ *   '=').
+  *
+- *   The equations must have a solution.  Counter-example: a.b=1,a=2
+- *   doesn't have one, because R.a must be an object to satisfy a.b=1
+- *   and a string to satisfy a=2.
++ *   A path from the root is defined recursively:
++ *       L '.' key-fragment is a child of the node denoted by path L
++ *       key-fragment is a child of the tree root
++ *   If key-fragment is numeric, the parent is an array and the child
++ *   is its key-fragment-th member, counting from zero.
++ *   Else, the parent is an object, and the child is its member named
++ *   key-fragment.
+  *
+- * Key-fragments must be valid QAPI names or consist only of digits.
++ *   This constrains inner nodes to be either array or object.  The
++ *   constraints must be satisfiable.  Counter-example: a.b=1,a=2 is
++ *   not, because root.a must be an object to satisfy a.b=1 and a
++ *   string to satisfy a=2.
++ *
++ *   Array subscripts can occur in any order, but the set of
++ *   subscripts must not have gaps.  For instance, a.1=v is not okay,
++ *   because root.a[0] is missing.
++ *
++ *   If multiple key-val denote the same leaf, the last one determines
++ *   the value.
++ *
++ * Key-fragments must be valid QAPI names or consist only of decimal
++ * digits.
+  *
+  * The length of any key-fragment must be between 1 and 127.
+  *
+@@ -64,8 +78,8 @@
+ 
+ /*
+  * Convert @key to a list index.
+- * Convert all leading digits to a (non-negative) number, capped at
+- * INT_MAX.
++ * Convert all leading decimal digits to a (non-negative) number,
++ * capped at INT_MAX.
+  * If @end is non-null, assign a pointer to the first character after
+  * the number to *@end.
+  * Else, fail if any characters follow.
+@@ -337,7 +351,8 @@ static QObject *keyval_listify(QDict *cur, GSList *key_of_cur, Error **errp)
+     }
+ 
+     /*
+-     * Make a list from @elt[], reporting any missing elements.
++     * Make a list from @elt[], reporting the first missing element,
++     * if any.
+      * If we dropped an index >= nelt in the previous loop, this loop
+      * will run into the sentinel and report index @nelt missing.
+      */
+-- 
 2.7.4
