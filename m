@@ -1,24 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anthony.xu@intel.com>) id 1cqVca-0008OI-Ah
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 22:03:33 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cqVgN-0000fo-SL
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 22:07:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anthony.xu@intel.com>) id 1cqVcV-0000dU-EH
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 22:03:32 -0400
-Received: from mga05.intel.com ([192.55.52.43]:25386)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
-	id 1cqVcV-0000bp-6L
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 22:03:27 -0400
-From: "Xu, Anthony" <anthony.xu@intel.com>
-Date: Wed, 22 Mar 2017 02:03:22 +0000
-Message-ID: <4712D8F4B26E034E80552F30A67BE0B1A2D69E@ORSMSX112.amr.corp.intel.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1cqVgI-000259-Ub
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 22:07:27 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49119
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1cqVgI-00020x-OB
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 22:07:22 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2M23bUa082895
+	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 22:07:19 -0400
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 29b9vp747m-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 21 Mar 2017 22:07:19 -0400
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Tue, 21 Mar 2017 22:07:18 -0400
+Date: Wed, 22 Mar 2017 10:07:11 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20170317031743.40128-1-bjsdjshi@linux.vnet.ibm.com>
+	<20170317031743.40128-12-bjsdjshi@linux.vnet.ibm.com>
+	<20170321124724.3277f097@t450s.home>
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH] only link current target arch traces to
- qemu-system
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170321124724.3277f097@t450s.home>
+Message-Id: <20170322020711.GO10704@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v4 11/16] vfio: ccw: realize
+ VFIO_DEVICE_G(S)ET_IRQ_INFO ioctls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,80 +44,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: 'Paolo Bonzini' <pbonzini@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, renxiaof@linux.vnet.ibm.com, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.com, pmorel@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
 
-When building target x86_64-softmmu, all other architectures' trace.o are l=
-inked into=20
-x86_64-softmmu/qemu-system-x86_64, like hw/arm/trace.o, hw/mips/trace.o etc=
-.,=20
-that is not necessary.
- Same thing happens when building other targets.
+* Alex Williamson <alex.williamson@redhat.com> [2017-03-21 12:47:24 -0600]:
 
-Only current target arch traces should be linked into qemu-system.
+[...]
+> > @@ -458,6 +459,11 @@ enum {
+> >  	VFIO_CCW_NUM_REGIONS
+> >  };
+> >  
+> > +enum {
+> > +	VFIO_CCW_IO_IRQ_INDEX,
+> > +	VFIO_CCW_NUM_IRQS
+> > +};
+> > +
+> >  /**
+> >   * VFIO_DEVICE_GET_PCI_HOT_RESET_INFO - _IORW(VFIO_TYPE, VFIO_BASE + 12,
+> >   *					      struct vfio_pci_hot_reset_info)
+> 
+> 
+> Acked-by: Alex Williamson <alex.williamson@redhat.com>
+> 
+Hi Alex,
 
-Signed-off -by: Anthony Xu <anthony.xu@intel.com>
+Thanks for all the Acked-bys. :>
 
-
-
-
-diff --git a/Makefile.target b/Makefile.target
-index 7df2b8c..638e044 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -177,6 +177,41 @@ block-obj-y :=3D
- common-obj-y :=3D
- chardev-obj-y :=3D
- include $(SRC_PATH)/Makefile.objs
-+
-+# remove all arch related trace
-+trace-obj-y :=3D $(filter-out hw/alpha/trace.o hw/alpha/trace-dtrace.o,$(t=
-race-obj-y))
-+trace-obj-y :=3D $(filter-out target/alpha/trace.o target/alpha/trace-dtra=
-ce.o,$(trace-obj-y))
-+
-+trace-obj-y :=3D $(filter-out hw/arm/trace.o hw/arm/trace-dtrace.o,$(trace=
--obj-y))
-+trace-obj-y :=3D $(filter-out target/arm/trace.o target/arm/trace-dtrace.o=
-,$(trace-obj-y))
-+
-+trace-obj-y :=3D $(filter-out hw/i386/trace.o hw/i386/trace-dtrace.o,$(tra=
-ce-obj-y))
-+trace-obj-y :=3D $(filter-out target/i386/trace.o target/i386/trace-dtrace=
-.o,$(trace-obj-y))
-+
-+trace-obj-y :=3D $(filter-out hw/mips/trace.o hw/mips/trace-dtrace.o,$(tra=
-ce-obj-y))
-+trace-obj-y :=3D $(filter-out target/mips/trace.o target/mips/trace-dtrace=
-.o,$(trace-obj-y))
-+
-+trace-obj-y :=3D $(filter-out hw/sparc/trace.o hw/sparc/trace-dtrace.o,$(t=
-race-obj-y))
-+trace-obj-y :=3D $(filter-out target/sparc/trace.o target/sparc/trace-dtra=
-ce.o,$(trace-obj-y))
-+
-+trace-obj-y :=3D $(filter-out hw/s390x/trace.o hw/s390x/trace-dtrace.o,$(t=
-race-obj-y))
-+trace-obj-y :=3D $(filter-out target/s390x/trace.o target/s390x/trace-dtra=
-ce.o,$(trace-obj-y))
-+
-+trace-obj-y :=3D $(filter-out hw/ppc/trace.o hw/ppc/trace-dtrace.o,$(trace=
--obj-y))
-+trace-obj-y :=3D $(filter-out target/ppc/trace.o target/ppc/trace-dtrace.o=
-,$(trace-obj-y))
-+
-+# add current arch related trace
-+carch :=3D $(TARGET_BASE_ARCH)
-+ifneq ($(wildcard $(SRC_PATH)/hw/$(carch)/trace-events),)
-+trace-obj-y +=3D hw/$(carch)/trace.o
-+trace-obj-$(CONFIG_TRACE_DTRACE) +=3D hw/$(carch)/trace-dtrace.o
-+endif
-+
-+ifneq ($(wildcard $(SRC_PATH)/target/$(carch)/trace-events),)
-+trace-obj-y +=3D target/$(carch)/trace.o
-+trace-obj-$(CONFIG_TRACE_DTRACE) +=3D target/$(carch)/trace-dtrace.o
-+endif
-+
- dummy :=3D $(call unnest-vars,,target-obj-y)
- target-obj-y-save :=3D $(target-obj-y)
- dummy :=3D $(call unnest-vars,.., \
+-- 
+Dong Jia
