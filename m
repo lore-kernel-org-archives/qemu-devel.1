@@ -1,31 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cqilp-0006Xj-VK
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:06:03 -0400
+	(envelope-from <armbru@redhat.com>) id 1cqilt-0006ar-84
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:06:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cqilj-0001iD-SL
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:05:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:18773)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cqilj-0001hP-MF
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:05:51 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 08E847F74F
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 16:05:51 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-26.ams2.redhat.com
-	[10.36.116.26])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id C527C5DD62
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 16:05:50 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1cqilm-0001lv-TR
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:06:01 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 22 Mar 2017 17:05:32 +0100
-Message-Id: <1490198748-4753-2-git-send-email-armbru@redhat.com>
+Date: Wed, 22 Mar 2017 17:05:48 +0100
+Message-Id: <1490198748-4753-18-git-send-email-armbru@redhat.com>
 In-Reply-To: <1490198748-4753-1-git-send-email-armbru@redhat.com>
 References: <1490198748-4753-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL for-2.9 01/17] test-keyval: Tweaks to improve
- list coverage
+Subject: [Qemu-devel] [PULL for-2.9 17/17] qapi: Fix QemuOpts visitor
+ regression on unvisited input
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,50 +21,111 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, qemu-stable@nongnu.org
 
-We have a negative test case for a list index with leading zero.  Add
-positive ones.
+From: Eric Blake <eblake@redhat.com>
 
-Tweak the test case for list index greater or equal the number of
-elements: test "equal" instead of "greater" to guard against
-off-by-one mistakes.
+An off-by-one in commit 15c2f669e meant that we were failing to
+check for unparsed input in all QemuOpts visitors.  Recent testsuite
+additions show that fixing the obvious bug with bogus fields will
+also fix the case of an incomplete list visit; update the tests to
+match the new behavior.
 
+Simple testcase:
+
+./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic -qmp stdio -numa node,size=1g
+
+failed to diagnose that 'size' is not a valid argument to -numa, and
+now once again reports:
+
+qemu-system-x86_64: -numa node,size=1g: Invalid parameter 'size'
+
+See also https://bugzilla.redhat.com/show_bug.cgi?id=1434666
+
+CC: qemu-stable@nongnu.org
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Tested-by: Laurent Vivier <lvivier@redhat.com>
+Message-Id: <20170322144525.18964-4-eblake@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1490014548-15083-2-git-send-email-armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/test-keyval.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ qapi/opts-visitor.c       |  6 +++---
+ tests/test-opts-visitor.c | 13 ++++++++-----
+ 2 files changed, 11 insertions(+), 8 deletions(-)
 
-diff --git a/tests/test-keyval.c b/tests/test-keyval.c
-index 71288b0..e97f6d5 100644
---- a/tests/test-keyval.c
-+++ b/tests/test-keyval.c
-@@ -218,14 +218,14 @@ static void test_keyval_parse_list(void)
-     QDECREF(qdict);
+diff --git a/qapi/opts-visitor.c b/qapi/opts-visitor.c
+index 026d25b..324b197 100644
+--- a/qapi/opts-visitor.c
++++ b/qapi/opts-visitor.c
+@@ -164,7 +164,7 @@ opts_check_struct(Visitor *v, Error **errp)
+     GHashTableIter iter;
+     GQueue *any;
  
-     /* Multiple indexes, last one wins */
--    qdict = keyval_parse("list.1=goner,list.0=null,list.1=eins,list.2=zwei",
-+    qdict = keyval_parse("list.1=goner,list.0=null,list.01=eins,list.2=zwei",
-                          NULL, &error_abort);
-     g_assert_cmpint(qdict_size(qdict), ==, 1);
-     check_list012(qdict_get_qlist(qdict, "list"));
-     QDECREF(qdict);
+-    if (ov->depth > 0) {
++    if (ov->depth > 1) {
+         return;
+     }
  
-     /* List at deeper nesting */
--    qdict = keyval_parse("a.list.1=eins,a.list.0=null,a.list.2=zwei",
-+    qdict = keyval_parse("a.list.1=eins,a.list.00=null,a.list.2=zwei",
-                          NULL, &error_abort);
-     g_assert_cmpint(qdict_size(qdict), ==, 1);
-     sub_qdict = qdict_get_qdict(qdict, "a");
-@@ -242,7 +242,7 @@ static void test_keyval_parse_list(void)
-     g_assert(!qdict);
+@@ -276,8 +276,8 @@ static void
+ opts_check_list(Visitor *v, Error **errp)
+ {
+     /*
+-     * FIXME should set error when unvisited elements remain.  Mostly
+-     * harmless, as the generated visits always visit all elements.
++     * Unvisited list elements will be reported later when checking
++     * whether unvisited struct members remain.
+      */
+ }
  
-     /* Missing list indexes */
--    qdict = keyval_parse("list.2=lonely", NULL, &err);
-+    qdict = keyval_parse("list.1=lonely", NULL, &err);
-     error_free_or_abort(&err);
-     g_assert(!qdict);
-     qdict = keyval_parse("list.0=null,list.2=eins,list.02=zwei", NULL, &err);
+diff --git a/tests/test-opts-visitor.c b/tests/test-opts-visitor.c
+index 8e0dda5..23e8970 100644
+--- a/tests/test-opts-visitor.c
++++ b/tests/test-opts-visitor.c
+@@ -175,6 +175,7 @@ expect_u64_max(OptsVisitorFixture *f, gconstpointer test_data)
+ static void
+ test_opts_range_unvisited(void)
+ {
++    Error *err = NULL;
+     intList *list = NULL;
+     intList *tail;
+     QemuOpts *opts;
+@@ -199,10 +200,11 @@ test_opts_range_unvisited(void)
+     g_assert_cmpint(tail->value, ==, 1);
+     tail = (intList *)visit_next_list(v, (GenericList *)tail, sizeof(*list));
+     g_assert(tail);
+-    visit_check_list(v, &error_abort); /* BUG: unvisited tail not reported */
++    visit_check_list(v, &error_abort); /* unvisited tail ignored until... */
+     visit_end_list(v, (void **)&list);
+ 
+-    visit_check_struct(v, &error_abort);
++    visit_check_struct(v, &err); /* ...here */
++    error_free_or_abort(&err);
+     visit_end_struct(v, NULL);
+ 
+     qapi_free_intList(list);
+@@ -250,6 +252,7 @@ test_opts_range_beyond(void)
+ static void
+ test_opts_dict_unvisited(void)
+ {
++    Error *err = NULL;
+     QemuOpts *opts;
+     Visitor *v;
+     UserDefOptions *userdef;
+@@ -258,11 +261,11 @@ test_opts_dict_unvisited(void)
+                            &error_abort);
+ 
+     v = opts_visitor_new(opts);
+-    /* BUG: bogus should be diagnosed */
+-    visit_type_UserDefOptions(v, NULL, &userdef, &error_abort);
++    visit_type_UserDefOptions(v, NULL, &userdef, &err);
++    error_free_or_abort(&err);
+     visit_free(v);
+     qemu_opts_del(opts);
+-    qapi_free_UserDefOptions(userdef);
++    g_assert(!userdef);
+ }
+ 
+ int
 -- 
 2.7.4
