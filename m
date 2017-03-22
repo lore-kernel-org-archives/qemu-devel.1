@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cqciM-0007MH-S7
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 05:37:59 -0400
+	(envelope-from <prvs=2479a8bc7=Paul.Durrant@citrix.com>)
+	id 1cqcjs-0007t6-0m
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 05:39:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cqciH-0006Kh-Si
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 05:37:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37140)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cqciH-0006Ka-M4
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 05:37:53 -0400
-References: <CAJy91CY1SOwi7D-kyU0ooe5SyhM414WaBCedXuPfXXhJpbo1fg@mail.gmail.com>
-	<CAFEAcA_etsFstPtUzs0AZjWD35MhMLhwru0ibJzS_upgE-nsng@mail.gmail.com>
-	<CAJy91CZmqEUXLKjRJ0JdUEf83E3FwE_24qmej-4C8uAGQkTPWA@mail.gmail.com>
-	<CAFEAcA-mzO7vniDEaZeueVFQ7+MVBB7pnzHhahv2Yk_f3q0mJw@mail.gmail.com>
-	<CAJy91CZ4Ed-HGHLkzEc1dqQbo32d-eTE1S1ovO_ZwkDdTpkQXQ@mail.gmail.com>
-	<CAJy91CaCV40FgSP55qWZeZgkQ=2+E8Cr7xdbu9pn5HLEo+6JJQ@mail.gmail.com>
-	<CAJy91CYEwOVT7oEdYY=21__c2kcLTyxyjAaq7Zx4VnQdeLdQQQ@mail.gmail.com>
-	<CAFEAcA_t9iLude4Vu3Zc=_wcXMTtFb4Q4oJ8O+zLAJ9isAPqHQ@mail.gmail.com>
-	<1322109813.6444955.1490172025040.JavaMail.zimbra@redhat.com>
-	<CAJy91CaUxFHJeGLLW4DqK6sBwx2qDnE9s20ZbdT86JDn8yQoHg@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <218df442-1a31-e969-32ef-01184fae84c0@redhat.com>
-Date: Wed, 22 Mar 2017 10:37:50 +0100
+	(envelope-from <prvs=2479a8bc7=Paul.Durrant@citrix.com>)
+	id 1cqcjn-0006cD-9q
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 05:39:32 -0400
+Received: from smtp.citrix.com ([66.165.176.89]:61048)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=2479a8bc7=Paul.Durrant@citrix.com>)
+	id 1cqcjn-0006c7-2s
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 05:39:27 -0400
+From: Paul Durrant <paul.durrant@citrix.com>
+Date: Wed, 22 Mar 2017 09:39:15 +0000
+Message-ID: <1490175555-17827-1-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJy91CaUxFHJeGLLW4DqK6sBwx2qDnE9s20ZbdT86JDn8yQoHg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Guest application reading from pl011 without
- device driver
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v4] xen: use libxendevice model to restrict
+ operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,44 +27,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jiahuan Zhang <jiahuanzhang90@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
+Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>
 
+This patch adds a command-line option (-xen-domid-restrict) which will
+use the new libxendevicemodel API to restrict devicemodel [1] operations
+to the specified domid. (Such operations are not applicable to the xenpv
+machine type).
 
+This patch also adds a tracepoint to allow successful enabling of the
+restriction to be monitored.
 
-On 22/03/2017 09:48, Jiahuan Zhang wrote:
->=20
->=20
-> On 22 March 2017 at 09:40, Paolo Bonzini <pbonzini@redhat.com
-> <mailto:pbonzini@redhat.com>> wrote:
->=20
->=20
->     > > I am using a windows named pipe to get the data from a window
->     > > host program, which uses ReadFile () in char_win.c
->     >
->     > OK, bugs in the windows-specific char backend would be
->     > unsurprising.
->     >
->     > I'm not entirely sure how the chardev layer works, but
->     > at the pl011 end if we return 0 from our can_receive
->     > function then the chardev layer should decide it has
->     > nothing to do until the pl011 later calls
->     > qemu_chr_fe_accept_input(), I think.
->     >
->     > I've cc'd Paolo and Marc-Andr=C3=A9 Lureau as the chardev
->     > maintainers.
->=20
->     Windows named pipes do not support the equivalent of "select",
->     so it's possible that they cause a busy wait.  Try using a
->     TCP socket instead and see if the bug goes away.
->=20
->=20
-> Hi, I am trying to use a Windows socket for serial redirection instead
-> of Windows named pipe.
-> What do you mean "the equivalent of 'select'"?
+[1] I.e. operations issued by libxendevicemodel. Operation issued by other
+    xen libraries (e.g. libxenforeignmemory) are currently still unrestricted
+    but this will be rectified by subsequent patches.
 
-A function that lets a process sleep until data is available on the
-socket.  The solution is to rewrite Windows chardev handling in QEMU to
-use threads or overlapped I/O.
+Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+---
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
-Paolo
+NOTE: This is already re-based on Juergen Gross's patch "xen: use 5 digit
+      xen versions" and so should not be applied until after that patch
+      has been applied.
+
+v4:
+ - Added missing quote
+
+v3:
+ - Updated usage comment
+
+v2:
+ - Log errno in tracepoint
+---
+ hw/xen/trace-events         |  1 +
+ include/hw/xen/xen.h        |  1 +
+ include/hw/xen/xen_common.h | 20 ++++++++++++++++++++
+ qemu-options.hx             |  7 +++++++
+ vl.c                        |  8 ++++++++
+ xen-hvm.c                   |  8 ++++++++
+ 6 files changed, 45 insertions(+)
+
+diff --git a/hw/xen/trace-events b/hw/xen/trace-events
+index c4fb6f1..5615dce 100644
+--- a/hw/xen/trace-events
++++ b/hw/xen/trace-events
+@@ -11,3 +11,4 @@ xen_map_portio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %
+ xen_unmap_portio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %u start: %#"PRIx64" end: %#"PRIx64
+ xen_map_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
+ xen_unmap_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
++xen_domid_restrict(int err) "err: %u"
+diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
+index 2b1733b..7efcdaa 100644
+--- a/include/hw/xen/xen.h
++++ b/include/hw/xen/xen.h
+@@ -21,6 +21,7 @@ enum xen_mode {
+ 
+ extern uint32_t xen_domid;
+ extern enum xen_mode xen_mode;
++extern bool xen_domid_restrict;
+ 
+ extern bool xen_allowed;
+ 
+diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
+index df098c7..4f3bd35 100644
+--- a/include/hw/xen/xen_common.h
++++ b/include/hw/xen/xen_common.h
+@@ -152,6 +152,13 @@ static inline int xendevicemodel_set_mem_type(
+     return xc_hvm_set_mem_type(dmod, domid, mem_type, first_pfn, nr);
+ }
+ 
++static inline int xendevicemodel_restrict(
++    xendevicemodel_handle *dmod, domid_t domid)
++{
++    errno = ENOTTY;
++    return -1;
++}
++
+ #else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
+ 
+ #include <xendevicemodel.h>
+@@ -206,6 +213,19 @@ static inline int xen_modified_memory(domid_t domid, uint64_t first_pfn,
+     return xendevicemodel_modified_memory(xen_dmod, domid, first_pfn, nr);
+ }
+ 
++static inline int xen_restrict(domid_t domid)
++{
++    int rc = xendevicemodel_restrict(xen_dmod, domid);
++
++    trace_xen_domid_restrict(errno);
++
++    if (errno == ENOTTY) {
++        return 0;
++    }
++
++    return rc;
++}
++
+ /* Xen 4.2 through 4.6 */
+ #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40701
+ 
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 99af8ed..2043371 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3354,6 +3354,11 @@ DEF("xen-attach", 0, QEMU_OPTION_xen_attach,
+     "-xen-attach     attach to existing xen domain\n"
+     "                xend will use this when starting QEMU\n",
+     QEMU_ARCH_ALL)
++DEF("xen-domid-restrict", 0, QEMU_OPTION_xen_domid_restrict,
++    "-xen-domid-restrict     restrict set of available xen operations\n"
++    "                        to specified domain id. (Does not affect\n"
++    "                        xenpv machine type).\n",
++    QEMU_ARCH_ALL)
+ STEXI
+ @item -xen-domid @var{id}
+ @findex -xen-domid
+@@ -3366,6 +3371,8 @@ Warning: should not be used when xend is in use (XEN only).
+ @findex -xen-attach
+ Attach to existing xen domain.
+ xend will use this when starting QEMU (XEN only).
++@findex -xen-domid-restrict
++Restrict set of available xen operations to specified domain id (XEN only).
+ ETEXI
+ 
+ DEF("no-reboot", 0, QEMU_OPTION_no_reboot, \
+diff --git a/vl.c b/vl.c
+index 0b4ed52..f46e070 100644
+--- a/vl.c
++++ b/vl.c
+@@ -205,6 +205,7 @@ static NotifierList machine_init_done_notifiers =
+ bool xen_allowed;
+ uint32_t xen_domid;
+ enum xen_mode xen_mode = XEN_EMULATE;
++bool xen_domid_restrict;
+ 
+ static int has_defaults = 1;
+ static int default_serial = 1;
+@@ -3933,6 +3934,13 @@ int main(int argc, char **argv, char **envp)
+                 }
+                 xen_mode = XEN_ATTACH;
+                 break;
++            case QEMU_OPTION_xen_domid_restrict:
++                if (!(xen_available())) {
++                    error_report("Option not supported for this target");
++                    exit(1);
++                }
++                xen_domid_restrict = true;
++                break;
+             case QEMU_OPTION_trace:
+                 g_free(trace_file);
+                 trace_file = trace_opt_parse(optarg);
+diff --git a/xen-hvm.c b/xen-hvm.c
+index 4b928cf..335e263 100644
+--- a/xen-hvm.c
++++ b/xen-hvm.c
+@@ -1226,6 +1226,14 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
+         goto err;
+     }
+ 
++    if (xen_domid_restrict) {
++        rc = xen_restrict(xen_domid);
++        if (rc < 0) {
++            error_report("failed to restrict: error %d", errno);
++            goto err;
++        }
++    }
++
+     xen_create_ioreq_server(xen_domid, &state->ioservid);
+ 
+     state->exit.notify = xen_exit_notifier;
+-- 
+2.1.4
