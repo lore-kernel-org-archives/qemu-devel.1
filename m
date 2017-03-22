@@ -1,27 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42960)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cqgKj-0005EJ-TD
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 09:29:51 -0400
+	(envelope-from <imammedo@redhat.com>) id 1cqgNp-0006v3-DZ
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 09:33:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cqgKi-0000Bn-RY
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 09:29:49 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:35218)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1cqgKi-0000BW-IX
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 09:29:48 -0400
-Received: by mail-wm0-x243.google.com with SMTP id z133so9753274wmb.2
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 06:29:47 -0700 (PDT)
-MIME-Version: 1.0
-References: <20170322130952.8997-1-sameeh@daynix.com>
-In-Reply-To: <20170322130952.8997-1-sameeh@daynix.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 22 Mar 2017 13:29:35 +0000
-Message-ID: <CAJ+F1CJGLHMJGsYu-WBV1cWcs0J1U5_=aPw1vSnaDcPQfbBXrg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH qemu-ga] qga: Make qemu-ga compile
- statically for Windows
+	(envelope-from <imammedo@redhat.com>) id 1cqgNm-0001i9-QY
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 09:33:01 -0400
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Wed, 22 Mar 2017 14:32:26 +0100
+Message-Id: <1490189568-167621-2-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1490189568-167621-1-git-send-email-imammedo@redhat.com>
+References: <1490189568-167621-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.10 01/23] tests: add CPUs to numa node
+ mapping test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,71 +20,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sameeh Jubran <sameeh@daynix.com>, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: Yan Vugenfirer <yan@daynix.com>, Stefan Hajnoczi <stefanha@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
-Hi
-
-On Wed, Mar 22, 2017 at 5:11 PM Sameeh Jubran <sameeh@daynix.com> wrote:
-
-> Attempting to compile qemu-ga statically as follows for Windows causes
-> the following error:
->
-> Compilation:
->     ./configure --disable-docs --target-list=3Dx86_64-softmmu \
->     --cross-prefix=3Dx86_64-w64-mingw32- --static \
->     --enable-guest-agent-msi --with-vss-sdk=3D/path/to/VSSSDK72
->
->     make -j8 qemu-ga
->
-> Error:
->     path/to/qemu/stubs/error-printf.c:7: undefined reference to
-> `__imp_g_test_config_vars'
->     collect2: error: ld returned 1 exit status
->     Makefile:444: recipe for target 'qemu-ga.exe' failed
->     make: *** [qemu-ga.exe] Error 1
->
-
-weird, I don't get this error on fedora 25 (but I have no vss-sdk, is that
-related?).
-
-
->
-> This is caused by a bug in the pkg-config file for glib as it doesn't
-> define
-> GLIB_STATIC_COMPILATION for pkg-config --static.
->
-
-If that's a bug in glib, it would be nice to have a link to a bug report.
-
-
->
-> Signed-off-by: Stefan Hajnoczi <stefanha@gmail.com>
-> Signed-off-by: Sameeh Jubran <sameeh@daynix.com>
->
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
->  configure | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/configure b/configure
-> index b9a30cf..6f7b460 100755
-> --- a/configure
-> +++ b/configure
-> @@ -4138,7 +4138,7 @@ int main(void) { return VSS_CTX_BACKUP; }
->  EOF
->    if compile_prog "$vss_win32_include" "" ; then
->      guest_agent_with_vss=3D"yes"
-> -    QEMU_CFLAGS=3D"$QEMU_CFLAGS $vss_win32_include"
-> +    QEMU_CFLAGS=3D"-DGLIB_STATIC_COMPILATION $QEMU_CFLAGS
-> $vss_win32_include"
->      libs_qga=3D"-lole32 -loleaut32 -lshlwapi -lstdc++
-> -Wl,--enable-stdcall-fixup $libs_qga"
->      qga_vss_provider=3D"qga/vss-win32/qga-vss.dll qga/vss-win32/qga-vss.=
-tlb"
->    else
-> --
-> 2.9.3
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+ tests/Makefile.include |   5 +++
+ tests/numa-test.c      | 106 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 111 insertions(+)
+ create mode 100644 tests/numa-test.c
+
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 402e71c..4547b01 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -260,6 +260,7 @@ check-qtest-i386-y += tests/test-filter-mirror$(EXESUF)
+ check-qtest-i386-y += tests/test-filter-redirector$(EXESUF)
+ check-qtest-i386-y += tests/postcopy-test$(EXESUF)
+ check-qtest-i386-y += tests/test-x86-cpuid-compat$(EXESUF)
++check-qtest-i386-y += tests/numa-test$(EXESUF)
+ check-qtest-x86_64-y += $(check-qtest-i386-y)
+ gcov-files-i386-y += i386-softmmu/hw/timer/mc146818rtc.c
+ gcov-files-x86_64-y = $(subst i386-softmmu/,x86_64-softmmu/,$(gcov-files-i386-y))
+@@ -300,6 +301,7 @@ check-qtest-ppc64-y += tests/test-netfilter$(EXESUF)
+ check-qtest-ppc64-y += tests/test-filter-mirror$(EXESUF)
+ check-qtest-ppc64-y += tests/test-filter-redirector$(EXESUF)
+ check-qtest-ppc64-y += tests/display-vga-test$(EXESUF)
++check-qtest-ppc64-y += tests/numa-test$(EXESUF)
+ check-qtest-ppc64-$(CONFIG_EVENTFD) += tests/ivshmem-test$(EXESUF)
+ 
+ check-qtest-sh4-y = tests/endianness-test$(EXESUF)
+@@ -324,6 +326,8 @@ gcov-files-arm-y += arm-softmmu/hw/block/virtio-blk.c
+ check-qtest-arm-y += tests/test-arm-mptimer$(EXESUF)
+ gcov-files-arm-y += hw/timer/arm_mptimer.c
+ 
++check-qtest-aarch64-y = tests/numa-test$(EXESUF)
++
+ check-qtest-microblazeel-y = $(check-qtest-microblaze-y)
+ 
+ check-qtest-xtensaeb-y = $(check-qtest-xtensa-y)
+@@ -747,6 +751,7 @@ tests/vhost-user-bridge$(EXESUF): tests/vhost-user-bridge.o contrib/libvhost-use
+ tests/test-uuid$(EXESUF): tests/test-uuid.o $(test-util-obj-y)
+ tests/test-arm-mptimer$(EXESUF): tests/test-arm-mptimer.o
+ tests/test-qapi-util$(EXESUF): tests/test-qapi-util.o $(test-util-obj-y)
++tests/numa-test$(EXESUF): tests/numa-test.o
+ 
+ tests/migration/stress$(EXESUF): tests/migration/stress.o
+ 	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $< ,"LINK","$(TARGET_DIR)$@")
+diff --git a/tests/numa-test.c b/tests/numa-test.c
+new file mode 100644
+index 0000000..f5da0c8
+--- /dev/null
++++ b/tests/numa-test.c
+@@ -0,0 +1,106 @@
++/*
++ * NUMA configuration test cases
++ *
++ * Copyright (c) 2017 Red Hat Inc.
++ * Authors:
++ *  Igor Mammedov <imammedo@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "libqtest.h"
++
++static char *make_cli(const char *generic_cli, const char *test_cli)
++{
++    return g_strdup_printf("%s %s", generic_cli ? generic_cli : "", test_cli);
++}
++
++static char *hmp_info_numa(void)
++{
++    QDict *resp;
++    char *s;
++
++    resp = qmp("{ 'execute': 'human-monitor-command', 'arguments': "
++                      "{ 'command-line': 'info numa '} }");
++    g_assert(resp);
++    g_assert(qdict_haskey(resp, "return"));
++    s = g_strdup(qdict_get_str(resp, "return"));
++    g_assert(s);
++    QDECREF(resp);
++    return s;
++}
++
++static void test_mon_explicit(const void *data)
++{
++    char *s;
++    char *cli;
++
++    cli = make_cli(data, "-smp 8 "
++                   "-numa node,nodeid=0,cpus=0-3 "
++                   "-numa node,nodeid=1,cpus=4-7 ");
++    qtest_start(cli);
++
++    s = hmp_info_numa();
++    g_assert(strstr(s, "node 0 cpus: 0 1 2 3"));
++    g_assert(strstr(s, "node 1 cpus: 4 5 6 7"));
++    g_free(s);
++
++    qtest_end();
++    g_free(cli);
++}
++
++static void test_mon_default(const void *data)
++{
++    char *s;
++    char *cli;
++
++    cli = make_cli(data, "-smp 8 -numa node -numa node");
++    qtest_start(cli);
++
++    s = hmp_info_numa();
++    g_assert(strstr(s, "node 0 cpus: 0 2 4 6"));
++    g_assert(strstr(s, "node 1 cpus: 1 3 5 7"));
++    g_free(s);
++
++    qtest_end();
++    g_free(cli);
++}
++
++static void test_mon_partial(const void *data)
++{
++    char *s;
++    char *cli;
++
++    cli = make_cli(data, "-smp 8 "
++                   "-numa node,nodeid=0,cpus=0-1 "
++                   "-numa node,nodeid=1,cpus=4-5 ");
++    qtest_start(cli);
++
++    s = hmp_info_numa();
++    g_assert(strstr(s, "node 0 cpus: 0 1 2 3 6 7"));
++    g_assert(strstr(s, "node 1 cpus: 4 5"));
++    g_free(s);
++
++    qtest_end();
++    g_free(cli);
++}
++
++int main(int argc, char **argv)
++{
++    const char *args = NULL;
++    const char *arch = qtest_get_arch();
++
++    if (strcmp(arch, "aarch64") == 0) {
++        args = "-machine virt";
++    }
++
++    g_test_init(&argc, &argv, NULL);
++
++    qtest_add_data_func("/numa/mon/default", args, test_mon_default);
++    qtest_add_data_func("/numa/mon/cpus/explicit", args, test_mon_explicit);
++    qtest_add_data_func("/numa/mon/cpus/partial", args, test_mon_partial);
++
++    return g_test_run();
++}
+-- 
+2.7.4
