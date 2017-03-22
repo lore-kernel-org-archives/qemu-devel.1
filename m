@@ -1,37 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jiahuanzhang90@gmail.com>) id 1cqdV3-0002MU-E5
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 06:28:18 -0400
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cqdV5-0002ND-HH
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 06:28:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jiahuanzhang90@gmail.com>) id 1cqdV2-0007Ke-3N
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 06:28:17 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:35812)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jiahuanzhang90@gmail.com>)
-	id 1cqdV1-0007Ka-UJ
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 06:28:16 -0400
-Received: by mail-qt0-x242.google.com with SMTP id r5so24784348qtb.2
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 03:28:15 -0700 (PDT)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cqdV4-0007LA-Lq
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 06:28:19 -0400
+Received: from [59.151.112.132] (port=24619 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cqdV4-0007Ju-9h
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 06:28:18 -0400
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Date: Wed, 22 Mar 2017 18:36:50 +0800
+Message-ID: <1490179012-14990-2-git-send-email-caoj.fnst@cn.fujitsu.com>
+In-Reply-To: <1490179012-14990-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+References: <1490179012-14990-1-git-send-email-caoj.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <218df442-1a31-e969-32ef-01184fae84c0@redhat.com>
-References: <CAJy91CY1SOwi7D-kyU0ooe5SyhM414WaBCedXuPfXXhJpbo1fg@mail.gmail.com>
-	<CAFEAcA_etsFstPtUzs0AZjWD35MhMLhwru0ibJzS_upgE-nsng@mail.gmail.com>
-	<CAJy91CZmqEUXLKjRJ0JdUEf83E3FwE_24qmej-4C8uAGQkTPWA@mail.gmail.com>
-	<CAFEAcA-mzO7vniDEaZeueVFQ7+MVBB7pnzHhahv2Yk_f3q0mJw@mail.gmail.com>
-	<CAJy91CZ4Ed-HGHLkzEc1dqQbo32d-eTE1S1ovO_ZwkDdTpkQXQ@mail.gmail.com>
-	<CAJy91CaCV40FgSP55qWZeZgkQ=2+E8Cr7xdbu9pn5HLEo+6JJQ@mail.gmail.com>
-	<CAJy91CYEwOVT7oEdYY=21__c2kcLTyxyjAaq7Zx4VnQdeLdQQQ@mail.gmail.com>
-	<CAFEAcA_t9iLude4Vu3Zc=_wcXMTtFb4Q4oJ8O+zLAJ9isAPqHQ@mail.gmail.com>
-	<1322109813.6444955.1490172025040.JavaMail.zimbra@redhat.com>
-	<CAJy91CaUxFHJeGLLW4DqK6sBwx2qDnE9s20ZbdT86JDn8yQoHg@mail.gmail.com>
-	<218df442-1a31-e969-32ef-01184fae84c0@redhat.com>
-From: Jiahuan Zhang <jiahuanzhang90@gmail.com>
-Date: Wed, 22 Mar 2017 11:28:14 +0100
-Message-ID: <CAJy91CbBV97RRKr=Rze5-eYrYAvnwiDZQ0oQZi33aKR1v-UXKg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Guest application reading from pl011 without
- device driver
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2 1/3] pcie aer: verify if AER functionality
+ is available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,55 +26,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: izumi.taku@jp.fujitsu.com, alex.williamson@redhat.com, mst@redhat.com, Dou Liyang <douly.fnst@cn.fujitsu.com>
 
-On 22 March 2017 at 10:37, Paolo Bonzini <pbonzini@redhat.com> wrote:
+For devices which support AER function, verify it can work or not in the
+system:
+1. AER capable device is a PCIe device, it can't be plugged into PCI bus
+2. If root port doesn't support AER, then there is no need to expose the
+   AER capability
 
->
->
-> On 22/03/2017 09:48, Jiahuan Zhang wrote:
-> >
-> >
-> > On 22 March 2017 at 09:40, Paolo Bonzini <pbonzini@redhat.com
-> > <mailto:pbonzini@redhat.com>> wrote:
-> >
-> >
-> >     > > I am using a windows named pipe to get the data from a window
-> >     > > host program, which uses ReadFile () in char_win.c
-> >     >
-> >     > OK, bugs in the windows-specific char backend would be
-> >     > unsurprising.
-> >     >
-> >     > I'm not entirely sure how the chardev layer works, but
-> >     > at the pl011 end if we return 0 from our can_receive
-> >     > function then the chardev layer should decide it has
-> >     > nothing to do until the pl011 later calls
-> >     > qemu_chr_fe_accept_input(), I think.
-> >     >
-> >     > I've cc'd Paolo and Marc-Andr=C3=A9 Lureau as the chardev
-> >     > maintainers.
-> >
-> >     Windows named pipes do not support the equivalent of "select",
-> >     so it's possible that they cause a busy wait.  Try using a
-> >     TCP socket instead and see if the bug goes away.
-> >
-> >
-> > Hi, I am trying to use a Windows socket for serial redirection instead
-> > of Windows named pipe.
-> > What do you mean "the equivalent of 'select'"?
->
-> A function that lets a process sleep until data is available on the
-> socket.  The solution is to rewrite Windows chardev handling in QEMU to
-> use threads or overlapped I/O.
->
-> Yes, socket is working well. Will you add the "select" to pipe
-implementation?
-Or shall I look into it and fix? Since in my case, I prefer windows pipe to
-socket.
-But if I do, definitly, I will spend much more effort than you, the experts=
-.
+Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+---
+ hw/pci/pcie_aer.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-
-> Paolo
->
+diff --git a/hw/pci/pcie_aer.c b/hw/pci/pcie_aer.c
+index daf1f65..a2e9818 100644
+--- a/hw/pci/pcie_aer.c
++++ b/hw/pci/pcie_aer.c
+@@ -100,6 +100,34 @@ static void aer_log_clear_all_err(PCIEAERLog *aer_log)
+ int pcie_aer_init(PCIDevice *dev, uint8_t cap_ver, uint16_t offset,
+                   uint16_t size, Error **errp)
+ {
++    PCIDevice *parent_dev;
++    uint8_t type;
++    uint8_t parent_type;
++
++    /* Topology test: see if there is need to expose AER cap */
++    type = pcie_cap_get_type(dev);
++    parent_dev = pci_bridge_get_device(dev->bus);
++    while (parent_dev) {
++        parent_type = pcie_cap_get_type(parent_dev);
++
++        if (type == PCI_EXP_TYPE_ENDPOINT &&
++                (parent_type != PCI_EXP_TYPE_ROOT_PORT &&
++                 parent_type != PCI_EXP_TYPE_DOWNSTREAM)) {
++            error_setg(errp, "Parent device is not a PCIe component");
++            return -ENOTSUP;
++        }
++        
++        if (parent_type == PCI_EXP_TYPE_ROOT_PORT) {
++            if (!parent_dev->exp.aer_cap)
++            {
++                error_setg(errp, "Root port does not support AER");
++                return -ENOTSUP;
++            }
++        }
++
++        parent_dev = pci_bridge_get_device(parent_dev->bus);
++    }
++
+     pcie_add_capability(dev, PCI_EXT_CAP_ID_ERR, cap_ver,
+                         offset, size);
+     dev->exp.aer_cap = offset;
+-- 
+1.8.3.1
