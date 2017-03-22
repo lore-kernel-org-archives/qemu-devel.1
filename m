@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cqf9C-0004wa-JF
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 08:13:51 -0400
+	(envelope-from <jcody@redhat.com>) id 1cqfBK-0005wE-Uh
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 08:16:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cqf99-00083j-E6
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 08:13:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53638)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cqf99-00083d-5S
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 08:13:47 -0400
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 22 Mar 2017 13:13:44 +0100
-Message-Id: <20170322121344.5484-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH] Revert "apic: save apic_delivered flag"
+	(envelope-from <jcody@redhat.com>) id 1cqfBJ-0000MS-JN
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 08:16:02 -0400
+Date: Wed, 22 Mar 2017 08:15:47 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20170322121547.GF3411@localhost.localdomain>
+References: <1490118490-5597-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1490118490-5597-1-git-send-email-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH for-2.9] blockjob: avoid
+ recursive AioContext locking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,96 +23,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org
 
-This reverts commit 07bfa354772f2de67008dc66c201b627acff0106.
-The global variable is only read as part of a
+On Tue, Mar 21, 2017 at 06:48:10PM +0100, Paolo Bonzini wrote:
+> Streaming or any other block job hangs when performed on a block device
+> that has a non-default iothread.  This happens because the AioContext
+> is acquired twice by block_job_defer_to_main_loop_bh and then released
+> only once by BDRV_POLL_WHILE.  (Insert rants on recursive mutexes, which
+> 
+> unfortunately are a temporary but necessary evil for iothreads at the
+> moment).
+> 
+> Luckily, the reason for the double acquisition is simple; the function
+> acquires the AioContext for both the job iothread and the BDS iothread,
+> in case the BDS iothread was changed while the job was running.  It
+> is therefore enough to skip the second acquisition when the two
+> AioContexts are one and the same.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  blockjob.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/blockjob.c b/blockjob.c
+> index 69126af..2159df7 100644
+> --- a/blockjob.c
+> +++ b/blockjob.c
+> @@ -755,12 +755,16 @@ static void block_job_defer_to_main_loop_bh(void *opaque)
+>  
+>      /* Fetch BDS AioContext again, in case it has changed */
+>      aio_context = blk_get_aio_context(data->job->blk);
+> -    aio_context_acquire(aio_context);
+> +    if (aio_context != data->aio_context) {
+> +        aio_context_acquire(aio_context);
+> +    }
+>  
+>      data->job->deferred_to_main_loop = false;
+>      data->fn(data->job, data->opaque);
+>  
+> -    aio_context_release(aio_context);
+> +    if (aio_context != data->aio_context) {
+> +        aio_context_release(aio_context);
+> +    }
+>  
+>      aio_context_release(data->aio_context);
+>  
+> -- 
+> 1.8.3.1
+> 
+>
 
-            apic_reset_irq_delivered();
-            qemu_irq_raise(s->irq);
-            if (!apic_get_irq_delivered()) {
+Deleted the blank line in the commit message, and:
 
-sequence, so the value never matters at migration time.
 
-Reported-by: Dr. David Alan Gilbert <dglibert@redhat.com>
-Cc: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/intc/apic_common.c           | 33 ---------------------------------
- include/hw/i386/apic_internal.h |  2 --
- 2 files changed, 35 deletions(-)
+Thanks,
 
-diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
-index 7a6e771..c3829e3 100644
---- a/hw/intc/apic_common.c
-+++ b/hw/intc/apic_common.c
-@@ -387,25 +387,6 @@ static bool apic_common_sipi_needed(void *opaque)
-     return s->wait_for_sipi != 0;
- }
- 
--static bool apic_irq_delivered_needed(void *opaque)
--{
--    APICCommonState *s = APIC_COMMON(opaque);
--    return s->cpu == X86_CPU(first_cpu) && apic_irq_delivered != 0;
--}
--
--static void apic_irq_delivered_pre_save(void *opaque)
--{
--    APICCommonState *s = APIC_COMMON(opaque);
--    s->apic_irq_delivered = apic_irq_delivered;
--}
--
--static int apic_irq_delivered_post_load(void *opaque, int version_id)
--{
--    APICCommonState *s = APIC_COMMON(opaque);
--    apic_irq_delivered = s->apic_irq_delivered;
--    return 0;
--}
--
- static const VMStateDescription vmstate_apic_common_sipi = {
-     .name = "apic_sipi",
-     .version_id = 1,
-@@ -418,19 +399,6 @@ static const VMStateDescription vmstate_apic_common_sipi = {
-     }
- };
- 
--static const VMStateDescription vmstate_apic_irq_delivered = {
--    .name = "apic_irq_delivered",
--    .version_id = 1,
--    .minimum_version_id = 1,
--    .needed = apic_irq_delivered_needed,
--    .pre_save = apic_irq_delivered_pre_save,
--    .post_load = apic_irq_delivered_post_load,
--    .fields = (VMStateField[]) {
--        VMSTATE_INT32(apic_irq_delivered, APICCommonState),
--        VMSTATE_END_OF_LIST()
--    }
--};
--
- static const VMStateDescription vmstate_apic_common = {
-     .name = "apic",
-     .version_id = 3,
-@@ -465,7 +433,6 @@ static const VMStateDescription vmstate_apic_common = {
-     },
-     .subsections = (const VMStateDescription*[]) {
-         &vmstate_apic_common_sipi,
--        &vmstate_apic_irq_delivered,
-         NULL
-     }
- };
-diff --git a/include/hw/i386/apic_internal.h b/include/hw/i386/apic_internal.h
-index 20ad28c..1209eb4 100644
---- a/include/hw/i386/apic_internal.h
-+++ b/include/hw/i386/apic_internal.h
-@@ -189,8 +189,6 @@ struct APICCommonState {
-     DeviceState *vapic;
-     hwaddr vapic_paddr; /* note: persistence via kvmvapic */
-     bool legacy_instance_id;
--
--    int apic_irq_delivered; /* for saving static variable */
- };
- 
- typedef struct VAPICState {
--- 
-2.9.3
+Applied to my block branch:
+
+git://github.com/codyprime/qemu-kvm-jtc.git block
+
+-Jeff
