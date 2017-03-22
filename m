@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44640)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cqhoo-0000QK-Ri
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 11:05:00 -0400
+	(envelope-from <laurent.desnogues@gmail.com>) id 1cqhpx-00016s-2P
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 11:06:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cqhon-0001ef-Sn
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 11:04:58 -0400
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:35300)
+	(envelope-from <laurent.desnogues@gmail.com>) id 1cqhpv-0002F0-FM
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 11:06:09 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:35408)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cqhon-0001eA-Mo
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 11:04:57 -0400
-Received: by mail-wr0-x22d.google.com with SMTP id g10so131232169wrg.2
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 08:04:57 -0700 (PDT)
+	(Exim 4.71) (envelope-from <laurent.desnogues@gmail.com>)
+	id 1cqhpv-0002E5-AT
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 11:06:07 -0400
+Received: by mail-ot0-x241.google.com with SMTP id a12so25976461ota.2
+	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 08:06:06 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAJhHMCA=rwLqLOPq3kMOz9SpV83yrzkK_K6RfPmuyXMU1pXT7g@mail.gmail.com>
-References: <CAG48ez1tcz7GGsc5+L3EF140NsW=UyNir=0UpuZZYrBn4ZxrSA@mail.gmail.com>
-	<CAFEAcA8-GJxpmppZGF5ygSAL4Y81BdvYKqso-XhjR2pbjMLi+A@mail.gmail.com>
-	<CAJhHMCA=rwLqLOPq3kMOz9SpV83yrzkK_K6RfPmuyXMU1pXT7g@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 22 Mar 2017 15:04:35 +0000
-Message-ID: <CAFEAcA9ZtayLn-bOPL4=2=w0SS_H0-EYO0UpFzXJSvyueGOHMw@mail.gmail.com>
+In-Reply-To: <20170315144825.3108-1-alex.bennee@linaro.org>
+References: <20170315144825.3108-1-alex.bennee@linaro.org>
+From: Laurent Desnogues <laurent.desnogues@gmail.com>
+Date: Wed, 22 Mar 2017 16:06:05 +0100
+Message-ID: <CABoDooPQt2WJWJcf0FzwvJQU8Yb7OQjfAwbioY_+0ED_nVq-dw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [BUG] user-to-root privesc inside VM via bad
- translation caching
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH] ui/console: ensure graphic updates
+ don't race with TCG vCPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,53 +30,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pranith Kumar <bobby.prani+qemu@gmail.com>
-Cc: Jann Horn <jannh@google.com>, Qemu Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 22 March 2017 at 14:55, Pranith Kumar <bobby.prani+qemu@gmail.com> wrote:
-> On Mon, Mar 20, 2017 at 10:46 AM, Peter Maydell wrote:
->> On 20 March 2017 at 14:36, Jann Horn <jannh@google.com> wrote:
->>> This is an issue in QEMU's system emulation for X86 in TCG mode.
->>> The issue permits an attacker who can execute code in guest ring 3
->>> with normal user privileges to inject code into other processes that
->>> are running in guest ring 3, in particular root-owned processes.
->>
->>> I am sending this to qemu-devel because a QEMU security contact
->>> told me that QEMU does not consider privilege escalation inside a
->>> TCG VM to be a security concern.
->>
->> Correct; it's just a bug. Don't trust TCG QEMU as a security boundary.
->>
->> We should really fix the crossing-a-page-boundary code for x86.
->> I believe we do get it correct for ARM Thumb instructions.
+Hi Alex,
+
+this patch breaks:
+
+  http://wiki.qemu.org/download/arm-test-0.2.tar.gz
+
+qemu-system-arm -kernel zImage.integrator -initrd arm_root.img
+-append "console=3DttyAMA0" -machine integratorcp -serial stdio -icount
+0
+Uncompressing Linux........................................................=
+..................
+done, booting the kernel.
+qemu-system-arm: /work/qemu/qemu/memory.c:920:
+memory_region_transaction_commit: Assertion
+`qemu_mutex_iothread_locked()' failed.
+
+The backtrace looks like this:
+
+#4  0x00005555557ced26 in memory_region_transaction_commit ()
+    at /work/qemu/qemu/memory.c:920
+#5  0x0000555555959b82 in pl110_update_display (opaque=3D0x555556a839e0)
+    at hw/display/pl110.c:245
+#6  0x0000555555a60931 in sdl_refresh (dcl=3D0x555556b90d40) at ui/sdl.c:82=
+1
+#7  0x00005555558f9f91 in process_queued_cpu_work (
+    cpu=3Dcpu@entry=3D0x5555566c6810) at cpus-common.c:338
+#8  0x00005555557ba5a8 in qemu_wait_io_event_common (
+    cpu=3Dcpu@entry=3D0x5555566c6810) at /work/qemu/qemu/cpus.c:1027
+#9  0x00005555557ba9bb in qemu_tcg_wait_io_event (cpu=3Dcpu@entry=3D0x55555=
+66c6810)
+    at /work/qemu/qemu/cpus.c:1048
+#10 0x00005555557bc2bd in qemu_tcg_cpu_thread_fn (arg=3D0x5555566c6810)
+    at /work/qemu/qemu/cpus.c:1440
+#11 0x00007ffff5f4a6ba in start_thread (arg=3D0x7fffee650700)
+    at pthread_create.c:333
+#12 0x00007ffff5c8082d in clone ()
+    at ../sysdeps/unix/sysv/linux/x86_64/clone.S:109
+
+BTW is it easier if I enter such bug reports in QEMU launchpad?
+
+Thanks,
+
+Laurent
+
+On Wed, Mar 15, 2017 at 3:48 PM, Alex Benn=C3=A9e <alex.bennee@linaro.org> =
+wrote:
+> Commit 8d04fb55..
 >
-> How about doing the instruction size check as follows?
+>   tcg: drop global lock during TCG code execution
 >
-> diff --git a/target/i386/translate.c b/target/i386/translate.c
-> index 72c1b03a2a..94cf3da719 100644
-> --- a/target/i386/translate.c
-> +++ b/target/i386/translate.c
-> @@ -8235,6 +8235,10 @@ static target_ulong disas_insn(CPUX86State
-> *env, DisasContext *s,
->      default:
->          goto unknown_op;
+> ..broke the assumption that updates to the GUI couldn't happen at the
+> same time as TCG vCPUs where running. As a result the TCG vCPU could
+> still be updating a directly mapped frame-buffer while the display
+> side was updating. This would cause artefacts to appear when the
+> update code assumed that memory block hadn't changed.
+>
+> The simplest solution is to ensure the two things can't happen at the
+> same time like the old BQL locking scheme. Here we use the solution
+> introduced for MTTCG and schedule the update as async_safe_work when
+> we know no vCPUs can be running.
+>
+> Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Cc: BALATON Zoltan <balaton@eik.bme.hu>
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  ui/console.c | 18 +++++++++++++++++-
+>  1 file changed, 17 insertions(+), 1 deletion(-)
+>
+> diff --git a/ui/console.c b/ui/console.c
+> index d1ff7504ec..37a69e27de 100644
+> --- a/ui/console.c
+> +++ b/ui/console.c
+> @@ -1575,13 +1575,29 @@ bool dpy_gfx_check_format(QemuConsole *con,
+>      return true;
+>  }
+>
+> +/*
+> + * Safe DPY refresh for TCG guests. This runs when the TCG vCPUs are
+> + * quiescent so we can avoid races between dirty page tracking for
+> + * direct frame-buffer access by the guest.
+> + */
+> +static void do_safe_dpy_refresh(CPUState *cpu, run_on_cpu_data opaque)
+> +{
+> +    DisplayChangeListener *dcl =3D opaque.host_ptr;
+> +    dcl->ops->dpy_refresh(dcl);
+> +}
+> +
+>  static void dpy_refresh(DisplayState *s)
+>  {
+>      DisplayChangeListener *dcl;
+>
+>      QLIST_FOREACH(dcl, &s->listeners, next) {
+>          if (dcl->ops->dpy_refresh) {
+> -            dcl->ops->dpy_refresh(dcl);
+> +            if (tcg_enabled()) {
+> +                async_safe_run_on_cpu(first_cpu, do_safe_dpy_refresh,
+> +                                      RUN_ON_CPU_HOST_PTR(dcl));
+> +            } else {
+> +                dcl->ops->dpy_refresh(dcl);
+> +            }
+>          }
 >      }
-> +    if (s->pc - pc_start > 15) {
-> +        s->pc = pc_start;
-> +        goto illegal_op;
-> +    }
->      return s->pc;
->   illegal_op:
->      gen_illegal_opcode(s);
-
-This doesn't look right because it means we'll check
-only after we've emitted all the code to do the
-instruction operation, so the effect will be
-"execute instruction, then take illegal-opcode
-exception".
-
-We should check what the x86 architecture spec actually
-says and implement that.
-
-thanks
--- PMM
+>  }
+> --
+> 2.11.0
+>
+>
