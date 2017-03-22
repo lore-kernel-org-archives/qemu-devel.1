@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41348)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cql7T-0008GX-Qx
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:36:29 -0400
+	(envelope-from <armbru@redhat.com>) id 1cql7T-0008GV-Qz
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:36:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cql7R-0000Z6-P3
+	(envelope-from <armbru@redhat.com>) id 1cql7R-0000ZS-SX
 	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:36:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59550)
+Received: from mx1.redhat.com ([209.132.183.28]:58426)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cql7R-0000Y5-K2
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cql7R-0000YF-M5
 	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:36:25 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A505664DAC
+	by mx1.redhat.com (Postfix) with ESMTPS id B00918E670
 	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 18:36:25 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-26.ams2.redhat.com
 	[10.36.116.26])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 72FA3800F9
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 75EF9852A0
 	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 18:36:25 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 22 Mar 2017 19:36:10 +0100
-Message-Id: <1490207781-18965-7-git-send-email-armbru@redhat.com>
+Date: Wed, 22 Mar 2017 19:36:09 +0100
+Message-Id: <1490207781-18965-6-git-send-email-armbru@redhat.com>
 In-Reply-To: <1490207781-18965-1-git-send-email-armbru@redhat.com>
 References: <1490207781-18965-1-git-send-email-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v3 for-2.9 06/17] qapi: Drop excessive Make
- dependencies on qapi2texi.py
+Subject: [Qemu-devel] [PULL v3 for-2.9 05/17] MAINTAINERS: Add myself for
+ files I touched recently
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,53 +36,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-When qapi2texi.py changes, we regenerate everything QAPI.  Screwed up
-in commit 56e8bdd.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1490015515-25851-2-git-send-email-armbru@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <1490014548-15083-6-git-send-email-armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- Makefile | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ MAINTAINERS | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/Makefile b/Makefile
-index f4f90df..6c359b2 100644
---- a/Makefile
-+++ b/Makefile
-@@ -392,7 +392,6 @@ qemu-ga$(EXESUF): QEMU_CFLAGS +=3D -I qga/qapi-genera=
-ted
- gen-out-type =3D $(subst .,-,$(suffix $@))
-=20
- qapi-py =3D $(SRC_PATH)/scripts/qapi.py $(SRC_PATH)/scripts/ordereddict.=
-py
--qapi-py +=3D $(SRC_PATH)/scripts/qapi2texi.py
-=20
- qga/qapi-generated/qga-qapi-types.c qga/qapi-generated/qga-qapi-types.h =
-:\
- $(SRC_PATH)/qga/qapi-schema.json $(SRC_PATH)/scripts/qapi-types.py $(qap=
-i-py)
-@@ -701,10 +700,12 @@ qemu-monitor-info.texi: $(SRC_PATH)/hmp-commands-in=
-fo.hx $(SRC_PATH)/scripts/hxt
- qemu-img-cmds.texi: $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/scripts/hxt=
-ool
- 	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -t < $< > $@,"GEN","=
-$@")
-=20
--docs/qemu-qmp-qapi.texi: $(qapi-modules) $(qapi-py)
-+docs/qemu-qmp-qapi.texi docs/qemu-ga-qapi.texi: $(SRC_PATH)/scripts/qapi=
-2texi.py $(qapi-py)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 779c429..c60235e 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1231,6 +1231,15 @@ M: Samuel Thibault <samuel.thibault@ens-lyon.org>
+ S: Maintained
+ F: backends/baum.c
+ 
++Command line option argument parsing
++M: Markus Armbruster <armbru@redhat.com>
++S: Supported
++F: include/qemu/option.h
++F: tests/test-keyval.c
++F: tests/test-qemu-opts.c
++F: util/keyval.c
++F: util/qemu-option.c
 +
-+docs/qemu-qmp-qapi.texi: $(qapi-modules)
- 	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi2texi.py $< > $@=
-,"GEN","$@")
-=20
--docs/qemu-ga-qapi.texi: $(SRC_PATH)/qga/qapi-schema.json $(qapi-py)
-+docs/qemu-ga-qapi.texi: $(SRC_PATH)/qga/qapi-schema.json
- 	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi2texi.py $< > $@=
-,"GEN","$@")
-=20
- qemu.1: qemu-doc.texi qemu-options.texi qemu-monitor.texi qemu-monitor-i=
-nfo.texi
---=20
+ Coverity model
+ M: Markus Armbruster <armbru@redhat.com>
+ S: Supported
+@@ -1365,7 +1374,9 @@ X: include/qapi/qmp/
+ F: include/qapi/qmp/dispatch.h
+ F: tests/qapi-schema/
+ F: tests/test-*-visitor.c
++F: tests/test-qapi-*.c
+ F: tests/test-qmp-*.c
++F: tests/test-visitor-serialization.c
+ F: scripts/qapi*
+ F: docs/qapi*
+ T: git git://repo.or.cz/qemu/armbru.git qapi-next
+-- 
 2.7.4
