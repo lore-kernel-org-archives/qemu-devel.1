@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cqimS-000772-0y
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:06:41 -0400
+	(envelope-from <stefanha@gmail.com>) id 1cqimb-0007Ea-WD
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:06:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cqimN-0002Co-Ro
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:06:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42168)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cqimN-0002Bh-Lc
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:06:31 -0400
-Date: Wed, 22 Mar 2017 18:06:29 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170322180319-mutt-send-email-mst@kernel.org>
-References: <20170322155906.10679-1-rkrcmar@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1cqimX-0002IN-Rc
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:06:45 -0400
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:37905)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cqimX-0002Hk-Lr
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:06:41 -0400
+Received: by mail-wm0-x22e.google.com with SMTP id t189so42334983wmt.1
+	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 09:06:41 -0700 (PDT)
+Date: Wed, 22 Mar 2017 16:06:37 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170322160637.GB16717@stefanha-x1.localdomain>
+References: <908ba384-d589-5755-efb2-f4d2fb14ce1e@kamp.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="+pHx0qQiF2pBVqBT"
 Content-Disposition: inline
-In-Reply-To: <20170322155906.10679-1-rkrcmar@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] pc: q35: bump max_cpus to INT32_MAX
+In-Reply-To: <908ba384-d589-5755-efb2-f4d2fb14ce1e@kamp.de>
+Subject: Re: [Qemu-devel] Qemu and CPU wait time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,61 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
-
-On Wed, Mar 22, 2017 at 04:59:06PM +0100, Radim Kr=C4=8Dm=C3=A1=C5=99 wro=
-te:
-> QEMU does not allocate based on machine's max_cpus, but only uses it to
-> limit the maximum selected by user and the actual limit of VCPUs is
-> enfoced by other components:
->  - machine without vIOMMU ends at 255 VCPUs
->  - TCG currently doesn't support x2APIC, so it also ends below 256
->  - KVM with vIOMMU cannot exceed the KVM limit (currently 288)
->=20
-> Using a big value should bring no drawbacks and the benefit is that
-> components (especially out-of-tree KVM) can bump their limits without
-> touching machine's max_cpus.
->=20
-> max_cpus is unsigned, but it is treated as signed at least in printf an=
-d
-> the other two billion VCPU won't be needed for a while, so we can ignor=
-e
-> possible bugs by using signed max.
->=20
-> Signed-off-by: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
-> ---
->   Should the 2.9 machine type still have 288?
-
-It doesn't look like a bugfix to me.
-So if we can defer past 2.9 that would be best IMO.
+To: Peter Lieven <pl@kamp.de>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
 
-> ---
->  hw/i386/pc_q35.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> index dd792a8547b3..3d5710ca20e0 100644
-> --- a/hw/i386/pc_q35.c
-> +++ b/hw/i386/pc_q35.c
-> @@ -298,7 +298,7 @@ static void pc_q35_machine_options(MachineClass *m)
->      m->default_display =3D "std";
->      m->no_floppy =3D 1;
->      m->has_dynamic_sysbus =3D true;
-> -    m->max_cpus =3D 288;
-> +    m->max_cpus =3D INT32_MAX;
->  }
-> =20
->  static void pc_q35_2_9_machine_options(MachineClass *m)
-> @@ -314,6 +314,7 @@ static void pc_q35_2_8_machine_options(MachineClass=
- *m)
->  {
->      pc_q35_2_9_machine_options(m);
->      m->alias =3D NULL;
-> +    m->max_cpus =3D 288;
->      SET_MACHINE_COMPAT(m, PC_COMPAT_2_8);
->  }
-> =20
-> --=20
-> 2.12.0
+--+pHx0qQiF2pBVqBT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Mar 06, 2017 at 03:32:49PM +0100, Peter Lieven wrote:
+> is there something equivalent to "CPU ready" in VMWare or =E2=80=9EHyper-=
+V Hypervisor Virtual Processor\CPU Wait Time Per Dispatch=E2=80=9C in Hyper=
+-V in
+> KVM/Qemu?
+
+I think you can get this information from "perf sched latency" (see man
+perf-sched).  Restrict it to the vcpu threads and it shows how long a
+runnable vcpu has to wait (average and maximum).
+
+Here is an example from https://lwn.net/Articles/353295/:
+
+  perf sched record sleep 10     # record full system activity for 10 secon=
+ds
+  perf sched latency --sort max  # report latencies sorted by max
+
+  -------------------------------------------------------------------------=
+----------------
+   Task                  |   Runtime ms  | Switches | Average delay ms | Ma=
+ximum delay ms |
+  -------------------------------------------------------------------------=
+----------------
+   python:14049          |    114.694 ms |      125 | avg:    0.120 ms | ma=
+x:    5.343 ms |
+  ...
+  -------------------------------------------------------------------------=
+----------------
+   TOTAL:                |   3144.817 ms |    11654 |
+  ---------------------------------------------------
+
+More info: http://www.brendangregg.com/blog/2017-03-16/perf-sched.html
+
+Stefan
+
+--+pHx0qQiF2pBVqBT
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJY0qENAAoJEJykq7OBq3PIBpMH/RdKuLJtMfIdkEKS6ksRSzKM
+bbI4uBa1CAdXyv180PmQzh695MBmna3KTaPUMP4ClplV4p+R63bns5pMtJxhcb9c
+Q5mQv+03P62BK3a9MGgu+9faDXipv02hNRfnwoyS/CK1ouyHn92rNvGZHsRb8lF3
+uhOoFXS1KccrYcxjoHgnCQav6AltpAkhsNQjlAh3lf3mZQw32NnSxNbbaqClz9Bc
+F5smw2aK8l2YV6i2BgA/9oymSc7OLOd6Msho/nTWixbiG2e5/QmF3ppKnmqOw/Ge
+5xeMnypOJ0L/baf/rdJupL24TcKhjiAZlFytIRMkrswyW08jx4ECGavedH9NIKM=
+=Mczi
+-----END PGP SIGNATURE-----
+
+--+pHx0qQiF2pBVqBT--
