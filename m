@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vfeenstr@redhat.com>) id 1cqc1u-0005Al-0k
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 04:54:07 -0400
+	(envelope-from <janne.huttunen@nokia.com>) id 1cqc8O-0006s7-UC
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 05:00:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vfeenstr@redhat.com>) id 1cqc1s-0001Bw-EM
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 04:54:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46874)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vfeenstr@redhat.com>) id 1cqc1s-0001Bj-4u
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 04:54:04 -0400
-From: Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>
-Date: Thu, 16 Mar 2017 15:50:45 +0100
-Message-Id: <20170316145045.10840-2-vfeenstr@redhat.com>
-In-Reply-To: <20170316145045.10840-1-vfeenstr@redhat.com>
-References: <0342808A-63C6-40BE-91AB-B6088AD62CD2@redhat.com>
-	<20170316145045.10840-1-vfeenstr@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] qemu-ga: add guest-get-osinfo command
+	(envelope-from <janne.huttunen@nokia.com>) id 1cqc8J-0003Gt-E6
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 05:00:49 -0400
+Received: from mail-db5eur01on0119.outbound.protection.outlook.com
+	([104.47.2.119]:45292
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <janne.huttunen@nokia.com>)
+	id 1cqc8J-0003Ed-0N
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 05:00:43 -0400
+From: "Huttunen, Janne (Nokia - FI/Espoo)" <janne.huttunen@nokia.com>
+Date: Wed, 22 Mar 2017 09:00:40 +0000
+Message-ID: <1490173225.19055.48.camel@nokia.com>
+References: <cover.1489494746.git.janne.huttunen@nokia.com>
+	<1489510640.8844.18.camel@redhat.com>
+	<1489561105.24841.25.camel@nokia.com>
+	<11a3eab4-77f8-87ea-9558-299fbfc77a07@redhat.com>
+	<1490164614.19055.31.camel@nokia.com>
+	<1558854179.6445757.1490172190685.JavaMail.zimbra@redhat.com>
+In-Reply-To: <1558854179.6445757.1490172190685.JavaMail.zimbra@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <D1347AE54E38654181918488456F9A4A@eurprd07.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [RFC][PATCH 0/6] "bootonceindex" property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,411 +36,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com, eblake@redhat.com, Vinzenz Feenstra <vfeenstr@redhat.com>
+To: "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc: "kraxel@redhat.com" <kraxel@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-From: Vinzenz Feenstra <vfeenstr@redhat.com>
-
-Add a new 'guest-get-osinfo' command for reporting basic information of
-the guest operating system (hereafter just 'OS'). This information
-includes the type of the OS, the version, and the architecture.
-Additionally reported would be a name, distribution type and kernel
-version where applicable.
-
-Here an example for a Fedora 25 VM:
-
-$ virsh -c qemu:////system qemu-agent-command F25 \
-    '{ "execute": "guest-get-osinfo" }'
-  {"return":{"arch":"x86_64","codename":"Server Edition","version":"25",
-   "kernel":"4.8.6-300.fc25.x86_64","type":"linux","distribution":"Fedora"}}
-
-And an example for a Windows 2012 R2 VM:
-
-$ virsh -c qemu:////system qemu-agent-command Win2k12R2 \
-    '{ "execute": "guest-get-osinfo" }'
-  {"return":{"arch":"x86_64","codename":"Win 2012 R2",
-   "version":"6.3","kernel":"","type":"windows","distribution":""}}
-
-Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
----
- qga/commands-posix.c | 189 +++++++++++++++++++++++++++++++++++++++++++++++++++
- qga/commands-win32.c | 104 ++++++++++++++++++++++++++++
- qga/qapi-schema.json |  40 +++++++++++
- 3 files changed, 333 insertions(+)
-
-diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index 73d93eb..381c01a 100644
---- a/qga/commands-posix.c
-+++ b/qga/commands-posix.c
-@@ -13,6 +13,7 @@
- 
- #include "qemu/osdep.h"
- #include <sys/ioctl.h>
-+#include <sys/utsname.h>
- #include <sys/wait.h>
- #include <dirent.h>
- #include "qga/guest-agent-core.h"
-@@ -2356,6 +2357,188 @@ GuestMemoryBlockInfo *qmp_guest_get_memory_block_info(Error **errp)
-     return info;
- }
- 
-+static void ga_strip_end(char *value)
-+{
-+    size_t value_length = strlen(value);
-+    while (value_length > 0) {
-+        switch (value[value_length - 1]) {
-+        default:
-+            value_length = 0;
-+            break;
-+        case ' ': case '\n': case '\t': case '\'': case '"':
-+            value[value_length - 1] = 0;
-+            --value_length;
-+            break;
-+        }
-+    }
-+}
-+
-+static void ga_parse_version_id(char const *value, GuestOSInfo *info)
-+{
-+    if (strlen(value) < 128) {
-+        char codename[128];
-+        char version[128];
-+
-+        if (*value == '"') {
-+            ++value;
-+        }
-+
-+        if (sscanf(value, "%[^(] (%[^)])", version, codename) == 2) {
-+            /* eg. VERSION="16.04.1 LTS (Xenial Xerus)" */
-+            info->codename = g_strdup(codename);
-+            info->version = g_strdup(version);
-+        } else if (sscanf(value, "%[^,] %[^\"]\"", version, codename) == 2) {
-+            /* eg. VERSION="12.04.5 LTS, Precise Pangolin" */
-+            info->codename = g_strdup(codename);
-+            info->version = g_strdup(version);
-+        } else {
-+            /* Just use the rest */
-+            info->version = g_strdup(version);
-+        }
-+    }
-+}
-+
-+static void ga_parse_debian_version(FILE *fp, GuestOSInfo *info)
-+{
-+    char *line = NULL;
-+    size_t n = 0;
-+
-+    if (getline(&line, &n, fp) != -1) {
-+        ga_strip_end(line);
-+        info->version = g_strdup(line);
-+        info->distribution = g_strdup("Debian GNU/Linux");
-+    }
-+    free(line);
-+}
-+
-+static void ga_parse_redhat_release(FILE *fp, GuestOSInfo *info)
-+{
-+    char *line = NULL;
-+    size_t n = 0;
-+
-+    if (getline(&line, &n, fp) != -1) {
-+        char *value = strstr(line, " release ");
-+        if (value != NULL) {
-+            *value = 0;
-+            info->distribution = g_strdup(line);
-+            value += 9;
-+            ga_strip_end(value);
-+            ga_parse_version_id(value, info);
-+        }
-+    }
-+    free(line);
-+}
-+
-+static void ga_parse_os_release(FILE *fp, GuestOSInfo *info)
-+{
-+    char *line = NULL;
-+    size_t n = 0;
-+
-+    while (getline(&line, &n, fp) != -1) {
-+        char *value = strstr(line, "=");
-+        if (value != NULL) {
-+            *value = 0;
-+            ++value;
-+            ga_strip_end(value);
-+
-+            size_t len = strlen(line);
-+            if (len == 9 && strcmp(line, "VERSION_ID") == 0) {
-+                info->version = g_strdup(value);
-+            } else if (len == 7 && strcmp(line, "VERSION") == 0) {
-+                ga_parse_version_id(value, info);
-+            } else if (len == 4 && strcmp(line, "NAME") == 0) {
-+                info->distribution = g_strdup(value);
-+            }
-+        }
-+    }
-+    free(line);
-+}
-+
-+static char *ga_stripped_strdup(char const *value)
-+{
-+    char *result = NULL;
-+    while (value && *value == '"') {
-+        ++value;
-+    }
-+    result = g_strdup(value);
-+    ga_strip_end(result);
-+    return result;
-+}
-+
-+static void ga_parse_lsb_release(FILE *fp, GuestOSInfo *info)
-+{
-+    char *line = NULL;
-+    size_t n = 0;
-+
-+    while (getline(&line, &n, fp) != -1) {
-+        char *value = strstr(line, "=");
-+        if (value != NULL) {
-+            *value = 0;
-+            ++value;
-+            ga_strip_end(value);
-+
-+            size_t len = strlen(line);
-+            if (len == 15 && strcmp(line, "DISTRIB_RELEASE") == 0) {
-+                info->version = ga_stripped_strdup(value);
-+            } else if (len == 16 && strcmp(line, "DISTRIB_CODENAME") == 0) {
-+                info->codename = ga_stripped_strdup(value);
-+            } else if (len == 10 && strcmp(line, "DISTRIB_ID") == 0) {
-+                info->distribution = ga_stripped_strdup(value);
-+            }
-+        }
-+    }
-+}
-+
-+typedef struct _ga_distribution_info_t {
-+    char const *file_path;
-+    void(*implementation)(FILE *fp, GuestOSInfo *info);
-+} ga_distribution_info_t;
-+
-+static ga_distribution_info_t const GA_DISTIBUTION_INFO[] = {
-+    {"/etc/os-release", ga_parse_os_release},
-+    {"/usr/lib/os-release", ga_parse_os_release},
-+    {"/etc/lsb-release", ga_parse_lsb_release},
-+    {"/etc/redhat-release", ga_parse_redhat_release},
-+    {"/etc/gentoo-release", ga_parse_redhat_release},
-+    {"/etc/debian_version", ga_parse_debian_version},
-+    {0, 0}
-+};
-+
-+static void ga_get_linux_distribution_info(GuestOSInfo *info)
-+{
-+    FILE *fp = NULL;
-+    ga_distribution_info_t const *distrib = GA_DISTIBUTION_INFO;
-+    while (distrib->file_path) {
-+        fp = fopen(distrib->file_path, "r");
-+        if (fp != NULL) {
-+            distrib->implementation(fp, info);
-+            fclose(fp);
-+            break;
-+        }
-+        ++distrib;
-+    }
-+}
-+
-+GuestOSInfo *qmp_guest_get_osinfo(Error **errp)
-+{
-+    GuestOSInfo *info = g_new0(GuestOSInfo, 1);
-+    memset(info, 0, sizeof(GuestOSInfo));
-+    struct utsname kinfo;
-+
-+    ga_get_linux_distribution_info(info);
-+
-+    if (!info->codename || !info->distribution || !info->version) {
-+        qapi_free_GuestOSInfo(info);
-+        return NULL;
-+    }
-+    info->type = GUESTOS_TYPE_LINUX;
-+    uname(&kinfo);
-+    info->kernel = g_strdup(kinfo.release);
-+    info->arch = g_strdup(kinfo.machine);
-+
-+    return info;
-+}
-+
- #else /* defined(__linux__) */
- 
- void qmp_guest_suspend_disk(Error **errp)
-@@ -2418,6 +2601,12 @@ GuestMemoryBlockInfo *qmp_guest_get_memory_block_info(Error **errp)
-     return NULL;
- }
- 
-+GuestOSInfo *qmp_guest_get_osinfo(Error **errp)
-+{
-+    error_setg(errp, QERR_UNSUPPORTED);
-+    return NULL;
-+}
-+
- #endif
- 
- #if !defined(CONFIG_FSFREEZE)
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index 19d72b2..97bba7c 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -1536,3 +1536,107 @@ void ga_command_state_init(GAState *s, GACommandState *cs)
-         ga_command_state_add(cs, NULL, guest_fsfreeze_cleanup);
-     }
- }
-+
-+typedef struct _ga_matrix_lookup_t {
-+    int major;
-+    int minor;
-+    char const *name;
-+} ga_matrix_lookup_t;
-+
-+static ga_matrix_lookup_t const WIN_VERSION_MATRIX[2][8] = {
-+    {
-+        { 5, 0, "Win 2000"},
-+        { 5, 1, "Win XP"},
-+        { 6, 0, "Win Vista"},
-+        { 6, 1, "Win 7"},
-+
-+        { 6, 2, "Win 8"},
-+        { 6, 3, "Win 8.1"},
-+        {10, 0, "Win 10"},
-+        { 0, 0, 0}
-+    },{
-+        { 5, 2, "Win 2003"},
-+        { 6, 0, "Win 2008"},
-+        { 6, 1, "Win 2008 R2"},
-+        { 6, 2, "Win 2012"},
-+        { 6, 3, "Win 2012 R2"},
-+        {10, 0, "Win 2016"},
-+        { 0, 0, 0},
-+        { 0, 0, 0}
-+    }
-+};
-+
-+static void ga_get_version(OSVERSIONINFOEXW *info)
-+{
-+    typedef NTSTATUS(WINAPI * rtl_get_version_t)(
-+        OSVERSIONINFOEXW *os_version_info_ex);
-+    HMODULE module = GetModuleHandle("ntdll");
-+    PVOID fun = GetProcAddress(module, "RtlGetVersion");
-+    rtl_get_version_t rtl_get_version = (rtl_get_version_t)fun;
-+    rtl_get_version(info);
-+}
-+
-+static char *ga_get_win_ver(void)
-+{
-+    OSVERSIONINFOEXW os_version;
-+    ga_get_version(&os_version);
-+    int major = (int)os_version.dwMajorVersion;
-+    int minor = (int)os_version.dwMinorVersion;
-+    return g_strdup_printf("%d.%d", major, minor);
-+}
-+
-+static char *ga_get_win_name(void)
-+{
-+    OSVERSIONINFOEXW os_version;
-+    ga_get_version(&os_version);
-+    int major = (int)os_version.dwMajorVersion;
-+    int minor = (int)os_version.dwMinorVersion;
-+    int tbl_idx = (os_version.wProductType != VER_NT_WORKSTATION);
-+    ga_matrix_lookup_t const *table = WIN_VERSION_MATRIX[tbl_idx];
-+    while (table->name != NULL) {
-+        if (major == table->major && minor == table->minor) {
-+            return g_strdup(table->name);
-+        }
-+        ++table;
-+    }
-+    return NULL;
-+}
-+
-+static char *ga_get_current_arch(void)
-+{
-+    SYSTEM_INFO info;
-+    GetNativeSystemInfo(&info);
-+    char *result = NULL;
-+    switch (info.wProcessorArchitecture) {
-+    case PROCESSOR_ARCHITECTURE_AMD64:
-+        result = g_strdup("x86_64");
-+        break;
-+    case PROCESSOR_ARCHITECTURE_ARM:
-+        result = g_strdup("arm");
-+        break;
-+    case PROCESSOR_ARCHITECTURE_IA64:
-+        result = g_strdup("ia64");
-+        break;
-+    case PROCESSOR_ARCHITECTURE_INTEL:
-+        result = g_strdup("x86");
-+        break;
-+    case PROCESSOR_ARCHITECTURE_UNKNOWN:
-+    default:
-+        /* Stays NULL in unknown cases */
-+        break;
-+    }
-+    return result;
-+}
-+
-+GuestOSInfo *qmp_guest_get_osinfo(Error **errp)
-+{
-+    GuestOSInfo *info = g_new0(GuestOSInfo, 1);
-+    info->type = GUESTOS_TYPE_WINDOWS;
-+    info->version = ga_get_win_ver();
-+    info->codename = ga_get_win_name();
-+    info->arch = ga_get_current_arch();
-+    /* Not available on Windows */
-+    info->kernel = NULL;
-+    info->distribution = NULL;
-+    return info;
-+}
-diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-index a02dbf2..c5019a4 100644
---- a/qga/qapi-schema.json
-+++ b/qga/qapi-schema.json
-@@ -1042,3 +1042,43 @@
-   'data':    { 'path': 'str', '*arg': ['str'], '*env': ['str'],
-                '*input-data': 'str', '*capture-output': 'bool' },
-   'returns': 'GuestExec' }
-+
-+##
-+# @GuestOSType:
-+#
-+# @linux:    Indicator for linux distributions
-+# @windows:  Indicator for windows versions
-+# @other:    Indicator for any other operating system that is not yet
-+#            explicitly supported
-+#
-+# Since: 2.10
-+##
-+{ 'enum': 'GuestOSType', 'data': ['linux', 'windows', 'other'] }
-+
-+##
-+# @GuestOSInfo:
-+#
-+# @version:      OS version, e.g. 25 for FC25 etc.
-+# @distribution: Fedora, Ubuntu, Debian, CentOS...
-+# @codename:     Code name of the OS. e.g. Ubuntu has Xenial Xerus etc.
-+# @arch:         Architecture of the OS e.g. x86, x86_64, ppc64, aarch64...
-+# @type:         Specifies the type of the OS.
-+# @kernel:       Linux kernel version (Might be used by other OS types too).
-+#                May be empty.
-+# Since: 2.10
-+##
-+{ 'struct': 'GuestOSInfo',
-+  'data': { '*version': 'str', '*distribution': 'str', '*codename': 'str',
-+            '*arch': 'str', 'type': 'GuestOSType', '*kernel': 'str'} }
-+
-+##
-+# @guest-get-osinfo:
-+#
-+# Retrieve guest operating system information
-+#
-+# Returns: operating system information on success
-+#
-+# Since 2.10
-+##
-+{ 'command': 'guest-get-osinfo',
-+  'returns': 'GuestOSInfo' }
--- 
-2.9.3
+T24gV2VkLCAyMDE3LTAzLTIyIGF0IDA0OjQzIC0wNDAwLCBQYW9sbyBCb256aW5pIHdyb3RlOg0K
+PiANCj4gVW5kZXJzdG9vZC0tLW15IHF1ZXN0aW9uIGlzIGhvdyB5b3Ugd291bGQgc2V0IHVwIHRo
+ZSBhbHRlcm5hdGUNCj4gYm9vdCBvcmRlcjogaXMgaXQgc29tZXRoaW5nIGxpa2UgImtlZXAgYSBi
+dXR0b24gcHJlc3NlZCB3aGlsZQ0KPiB0dXJuaW5nIG9uIiwgb3Igc29tZXRoaW5nIHdyaXR0ZW4g
+aW4gTlZSQU0sIG9yIHNvbWV0aGluZyBlbHNlDQo+IHRoYXQgaXMgY29tcGxldGVseSBkaWZmZXJl
+bnQ/DQoNCkluIG15IGNhc2UgdGhlIHJlYWwgaGFyZHdhcmUgaGFzIGEgbWFuYWdlbWVudCBwcm9j
+ZXNzb3INCm9uIHRoZSBib2FyZCBhbmQgdGhlIHRlbXBvcmFyeSBib290IHNvdXJjZSAoYW5kIGFs
+c28gdGhlDQpwZXJtYW5lbnQgb25lIGZvciB0aGF0IG1hdHRlcikgZm9yIHRoZSBtYWluIHByb2Nl
+c3NvciBjYW4NCmJlIHNldCBmcm9tIHRoZXJlLiBTaW5jZSBuZWl0aGVyIHRoZSBCSU9TIG5vciB0
+aGUgbWFuYWdlbWVudA0KZmlybXdhcmUgYXJlIG9wZW4gc291cmNlLCBJIGRvbid0IGtub3cgaG93
+IGl0IHRlY2huaWNhbGx5DQp3b3JrcywgYnV0IEkgYXNzdW1lIHRoZXJlIGVpdGhlciBpcyBzb21l
+IHNoYXJlZCBtZW1vcnkNCmJldHdlZW4gdGhlIG1haW4gQklPUyBhbmQgdGhlIG1hbmFnZW1lbnQg
+cHJvY2Vzc29yIG9yDQphbHRlcm5hdGl2ZWx5IHRoZSBCSU9TIHRhbGtzIHdpdGggdGhlIG1hbmFn
+ZW1lbnQgcHJvY2Vzc29yDQp3aXRoIHNvbWUgcHJvdG9jb2wgZHVyaW5nIGJvb3QgdG8gZ2V0IHRo
+ZSBvcmRlci4NCg0K
