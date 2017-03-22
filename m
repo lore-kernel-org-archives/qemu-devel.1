@@ -1,39 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cqni7-00055W-Io
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 17:22:28 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cqopH-0003K6-4F
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 18:33:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cqni3-0001t1-Ks
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 17:22:27 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43213)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cqni3-0001sf-Bv
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 17:22:23 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
-	v2MLIWFw124361
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 17:22:21 -0400
-Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 29b9vp3nt4-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 17:22:20 -0400
-Received: from localhost
-	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 22 Mar 2017 15:22:19 -0600
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <peter.maydell@linaro.org>) id 1cqopG-0006ee-9P
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 18:33:55 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:35020)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cqopG-0006eA-2l
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 18:33:54 -0400
+Received: by mail-wm0-x234.google.com with SMTP id u132so48107729wmg.0
+	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 15:33:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20170322204844.446-4-f4bug@amsat.org>
-References: <20170322204844.446-1-f4bug@amsat.org>
-	<20170322204844.446-4-f4bug@amsat.org>
-Date: Wed, 22 Mar 2017 16:22:10 -0500
-Message-Id: <149021773050.3910.449421368071627004@loki>
-Subject: Re: [Qemu-devel] [PATCH RESEND 3/3] qga: fix compiler warnings
- (clang 5)
+In-Reply-To: <c46ff864-fc8b-aeba-30f4-4c773f879786@redhat.com>
+References: <CAFEAcA9pqDoCWrPAJ+KVxLC_eRy-xRg36oYuARYg2YP8VpGpBg@mail.gmail.com>
+	<c46ff864-fc8b-aeba-30f4-4c773f879786@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 22 Mar 2017 22:33:32 +0000
+Message-ID: <CAFEAcA_YdidZBNT79bC+NjPj1CvZBLKmCu4jF_28FipOzJuoxA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] rawhide gcc failures [was: Proposal for
+ deprecating unsupported host OSes & architecutures]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,67 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>, Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Quoting Philippe Mathieu-Daud=C3=A9 (2017-03-22 15:48:44)
-> static code analyzer complain:
-> =
+On 22 March 2017 at 19:07, Eric Blake <eblake@redhat.com> wrote:
+> Tangentially-related: do we officially support bleeding-edge OS builds?
+> For example, current rawhide has a new-enough gcc that gives some
+> (possibly-useful) new warnings (-Werror=format-truncation)
 
-> qga/commands-posix.c:2127:9: warning: Null pointer passed as an argument =
-to a 'nonnull' parameter
->         closedir(dp);
->         ^~~~~~~~~~~~
-> =
+Depends what you mean by "support". Are we testing them
+in our build/CI loop? Apparently not :-) Do we fix them?
+Yep, certainly, because bleeding-edge libraries and
+compilers will eventually be standard ones. Do we fix
+them during the release process? Yes, but maybe if
+the fix is very invasive somehow we might prefer to
+postpone to the next release. Do we consider them
+a release-critical bug that we'd spin an extra rc
+for? I don't think so, because (a) for released tarballs
+-Werror is not on by default (b) even for building from
+git you can work around this with -disable-werror
+(c) it's just an accident of timing if a new gcc drops
+3 weeks before release rather than 3 weeks after, so
+it's always possible that releases will end up being
+built on compilers that warn about things in them.
 
-> Reported-by: Clang Static Analyzer
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  qga/commands-posix.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
-> =
+More generally, I'm not going to go so far as to insist
+that we have a build machine for every flavour of every
+distro -- that would not usefully improve coverage I think.
+Also I'm happy to be ad-hoc about exactly what we test
+(my x86 Linux builds are just "the Ubuntu flavour my
+desktop box happens to be running right now") because
+being less ad-hoc feels like it would be work that
+we don't really need to engage in.
 
-> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-> index 73d93eb5ce..8028141534 100644
-> --- a/qga/commands-posix.c
-> +++ b/qga/commands-posix.c
-> @@ -2122,9 +2122,11 @@ static void transfer_memory_block(GuestMemoryBlock=
- *mem_blk, bool sys2memblk,
->           * we think this VM does not support online/offline memory block,
->           * any other solution?
->           */
-> -        if (!dp && errno =3D=3D ENOENT) {
-> -            result->response =3D
-> -                GUEST_MEMORY_BLOCK_RESPONSE_TYPE_OPERATION_NOT_SUPPORTED;
-> +        if (!dp) {
-> +            if (errno =3D=3D ENOENT) {
-> +                result->response =3D
-> +                    GUEST_MEMORY_BLOCK_RESPONSE_TYPE_OPERATION_NOT_SUPPO=
-RTED;
-> +            }
->              goto out1;
->          }
-
-I think this should be:
-
-    if (!dp) {
-        if (errno =3D=3D ENOENT) {
-            result->response =3D
-                GUEST_MEMORY_BLOCK_RESPONSE_TYPE_OPERATION_NOT_SUPPORTED;
-        } else {
-            result->response =3D
-                GUEST_MEMORY_BLOCK_RESPONSE_TYPE_OPERATION_FAILED;
-        }
-        goto out1;
-    }
-
-otherwise we might set result->error_code while still indicating
-success for the operation. That wasn't handled properly before your
-patch either, it's just more apparent now.
-
->          closedir(dp);
-> -- =
-
-> 2.11.0
->=20
+thanks
+-- PMM
