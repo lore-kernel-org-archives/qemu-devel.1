@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkrcmar@redhat.com>) id 1cqig5-0001RP-Mp
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:00:02 -0400
+	(envelope-from <eblake@redhat.com>) id 1cqih7-0002Mc-Us
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:01:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkrcmar@redhat.com>) id 1cqig4-0005u3-V7
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:00:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45810)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkrcmar@redhat.com>) id 1cqig4-0005sd-Po
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:00:00 -0400
-From: =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Date: Wed, 22 Mar 2017 16:59:06 +0100
-Message-Id: <20170322155906.10679-1-rkrcmar@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1cqih2-0006YN-2h
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:01:06 -0400
+References: <20170322154649.6947-1-vfeenstr@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6d8dfe28-5366-fe25-ff27-d79cdc0bf1f7@redhat.com>
+Date: Wed, 22 Mar 2017 11:00:55 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] pc: q35: bump max_cpus to INT32_MAX
+In-Reply-To: <20170322154649.6947-1-vfeenstr@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="DfRVoo1hsm4bjR43AquKAIOWcwMvPH4Lv"
+Subject: Re: [Qemu-devel] [PATCH] qga: Add `guest-get-timezone` command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,52 +23,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, pbonzini@redhat.com
 
-QEMU does not allocate based on machine's max_cpus, but only uses it to
-limit the maximum selected by user and the actual limit of VCPUs is
-enfoced by other components:
- - machine without vIOMMU ends at 255 VCPUs
- - TCG currently doesn't support x2APIC, so it also ends below 256
- - KVM with vIOMMU cannot exceed the KVM limit (currently 288)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--DfRVoo1hsm4bjR43AquKAIOWcwMvPH4Lv
+From: Eric Blake <eblake@redhat.com>
+To: Vinzenz 'evilissimo' Feenstra <vfeenstr@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, pbonzini@redhat.com
+Message-ID: <6d8dfe28-5366-fe25-ff27-d79cdc0bf1f7@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qga: Add `guest-get-timezone` command
+References: <20170322154649.6947-1-vfeenstr@redhat.com>
+In-Reply-To: <20170322154649.6947-1-vfeenstr@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Using a big value should bring no drawbacks and the benefit is that
-components (especially out-of-tree KVM) can bump their limits without
-touching machine's max_cpus.
+On 03/22/2017 10:46 AM, Vinzenz 'evilissimo' Feenstra wrote:
+> From: Vinzenz Feenstra <vfeenstr@redhat.com>
 
-max_cpus is unsigned, but it is treated as signed at least in printf and
-the other two billion VCPU won't be needed for a while, so we can ignore
-possible bugs by using signed max.
+This is not a trivial patch (it is adding a new feature), so including
+qemu-trivial is not necessary, and it should be merged through the qga
+maintainer.
 
-Signed-off-by: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
----
-  Should the 2.9 machine type still have 288?
----
- hw/i386/pc_q35.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> Adds a new command `guest-get-timezone` reporting the currently
+> configured timezone on the system. The information on what timezone is
+> currently is configured is useful in case of Windows VMs where the
+> offset of the hardware clock is required to have the same offset. This
+> can be used for management systems like `oVirt` to detect the timezone
+> difference and warn administrators of the misconfiguration.
+>=20
+> Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
+> ---
+>  qga/commands.c       | 19 +++++++++++++++++++
+>  qga/qapi-schema.json | 25 +++++++++++++++++++++++++
+>  2 files changed, 44 insertions(+)
+>=20
 
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index dd792a8547b3..3d5710ca20e0 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -298,7 +298,7 @@ static void pc_q35_machine_options(MachineClass *m)
-     m->default_display =3D "std";
-     m->no_floppy =3D 1;
-     m->has_dynamic_sysbus =3D true;
--    m->max_cpus =3D 288;
-+    m->max_cpus =3D INT32_MAX;
- }
-=20
- static void pc_q35_2_9_machine_options(MachineClass *m)
-@@ -314,6 +314,7 @@ static void pc_q35_2_8_machine_options(MachineClass *=
-m)
- {
-     pc_q35_2_9_machine_options(m);
-     m->alias =3D NULL;
-+    m->max_cpus =3D 288;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_8);
- }
-=20
+> +++ b/qga/qapi-schema.json
+> @@ -1042,3 +1042,28 @@
+>    'data':    { 'path': 'str', '*arg': ['str'], '*env': ['str'],
+>                 '*input-data': 'str', '*capture-output': 'bool' },
+>    'returns': 'GuestExec' }
+> +
+> +
+> +##
+> +# @GuestTimezone:
+> +#
+> +# @zone:    Timezone name
+> +# @offset:  Offset to UTC in minutes
+> +#
+
+Is it worth clarifying that negative numbers imply west of UTC? (There
+are some places that get offsets backwards from the usual POSIX
+notation, so it never hurts to be specific which direction is intended).
+
+
+> +##
+> +# @guest-get-timezone:
+> +#
+> +# Retrieves the timezone information from the guest.
+> +#
+> +# Returns: The guest timezone GuestTimezone information on success.
+
+Sounds rather repetitive; and a struct return is implicitly only
+possible on success.  Perhaps it could be shortened to:
+
+# Retrieves timezone information from the guest.
+#
+# Returns: A GuestTimezone dictionary.
+
+> +#
+> +# Since: 2.10
+> +##
+> +{ 'command': 'guest-get-timezone',
+> +  'returns': 'GuestTimezone' }
+>=20
+
+But the overall idea makes sense to me, so whether or not you wordsmith
+the documentation in the .json file,
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
 --=20
-2.12.0
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--DfRVoo1hsm4bjR43AquKAIOWcwMvPH4Lv
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJY0p+3AAoJEKeha0olJ0NqkwsH/RoUKDaK/1XRSMHF0MtRf5+D
+UpHF025PYE8KmZ25dznp2DRdoNy713fbvtoaSmBsjpB6pibo7Kh+lDSUDAdpktHj
+JHYvQLw9UWOG4USK5bHSOvMGHax3iuyMNED617FhdBNTo5tpS+SjwxYO9U47GEs3
+CZcPNlCsjMBe4RSEtPevYBfC6EkQ62UIDQFGrlW4wBVva/NTf1Sus/YpJ2pMVY1z
+FSkCbmMmkNkEr1vLrK6T/R5aZxksv11X9q6lu2SkULZCrZHtWkq0XM2VAqv8lHs7
+kHeS3ruNXTLSWZdGE0177PjWxvPQsrhJBAA06ZS1KVFO3Nw96PDqoq1AWXbf7uQ=
+=eUwk
+-----END PGP SIGNATURE-----
+
+--DfRVoo1hsm4bjR43AquKAIOWcwMvPH4Lv--
