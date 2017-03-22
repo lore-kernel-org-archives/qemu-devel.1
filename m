@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35166)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35167)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <SRS0=0SF/=27=redhat.com=mst@kernel.org>)
-	id 1cqihv-00032Q-OJ
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:01:56 -0400
+	id 1cqihv-00032R-On
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:02:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <SRS0=0SF/=27=redhat.com=mst@kernel.org>)
-	id 1cqihn-0007De-CF
+	id 1cqiho-0007EB-NJ
 	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:01:51 -0400
-Date: Wed, 22 Mar 2017 18:01:37 +0200
+Received: from mail.kernel.org ([198.145.29.136]:38824)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <SRS0=0SF/=27=redhat.com=mst@kernel.org>)
+	id 1cqiho-0007Dq-HE
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:01:48 -0400
+Date: Wed, 22 Mar 2017 18:01:43 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1490198476-12244-3-git-send-email-mst@redhat.com>
+Message-ID: <1490198476-12244-5-git-send-email-mst@redhat.com>
 References: <1490198476-12244-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1490198476-12244-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 2/4] virtio: always use handle_aio_output if
- registered
+Subject: [Qemu-devel] [PULL 4/4] hw/acpi/vmgenid: prevent more than one
+ vmgenid device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,56 +31,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>, Ben Warren <ben@skyportsystems.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
 
-Commit ad07cd6 ("virtio-scsi: always use dataplane path if ioeventfd is
-active", 2016-10-30) and 9ffe337 ("virtio-blk: always use dataplane
-path if ioeventfd is active", 2016-10-30) broke the virtio 1.0
-indirect access registers.
+A system with multiple VMGENID devices is undefined in the VMGENID spec by
+omission.
 
-The indirect access registers bypass the ioeventfd, so that virtio-blk
-and virtio-scsi now repeatedly try to initialize dataplane instead of
-triggering the guest->host EventNotifier.  Detect the situation by
-checking vq->handle_aio_output; if it is not NULL, trigger the
-EventNotifier, which is how the device expects to get notifications
-and in fact the only thread-safe manner to deliver them.
-
-Fixes: ad07cd6
-Fixes: 9ffe337
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Ben Warren <ben@skyportsystems.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Binary file /tmp/tmp.IaAwzHwwsQ matches
 ---
- hw/virtio/virtio.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ include/hw/acpi/vmgenid.h | 1 +
+ hw/acpi/vmgenid.c         | 8 ++++++++
+ 2 files changed, 9 insertions(+)
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 82b6060..03592c5 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -1528,7 +1528,18 @@ static void virtio_queue_notify_vq(VirtQueue *vq)
+diff --git a/include/hw/acpi/vmgenid.h b/include/hw/acpi/vmgenid.h
+index 8578476..7beb959 100644
+--- a/include/hw/acpi/vmgenid.h
++++ b/include/hw/acpi/vmgenid.h
+@@ -24,6 +24,7 @@ typedef struct VmGenIdState {
+     bool write_pointer_available;
+ } VmGenIdState;
  
- void virtio_queue_notify(VirtIODevice *vdev, int n)
++/* returns NULL unless there is exactly one device */
+ static inline Object *find_vmgenid_dev(void)
  {
--    virtio_queue_notify_vq(&vdev->vq[n]);
-+    VirtQueue *vq = &vdev->vq[n];
-+
-+    if (unlikely(!vq->vring.desc || vdev->broken)) {
+     return object_resolve_path_type("", VMGENID_DEVICE, NULL);
+diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+index c3ddcc8..a32b847 100644
+--- a/hw/acpi/vmgenid.c
++++ b/hw/acpi/vmgenid.c
+@@ -221,6 +221,14 @@ static void vmgenid_realize(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
++    /* Given that this function is executing, there is at least one VMGENID
++     * device. Check if there are several.
++     */
++    if (!find_vmgenid_dev()) {
++        error_setg(errp, "at most one %s device is permitted", VMGENID_DEVICE);
 +        return;
 +    }
 +
-+    trace_virtio_queue_notify(vdev, vq - vdev->vq, vq);
-+    if (vq->handle_aio_output) {
-+        event_notifier_set(&vq->host_notifier);
-+    } else if (vq->handle_output) {
-+        vq->handle_output(vdev, vq);
-+    }
+     qemu_register_reset(vmgenid_handle_reset, vms);
  }
  
- uint16_t virtio_queue_vector(VirtIODevice *vdev, int n)
 -- 
 MST
