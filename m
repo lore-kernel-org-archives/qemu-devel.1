@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37081)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cqg16-00068J-8y
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 09:09:33 -0400
+	(envelope-from <sameeh@daynix.com>) id 1cqg1b-0006Mk-6Q
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 09:10:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cqg15-0001so-AH
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 09:09:32 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:38410)
+	(envelope-from <sameeh@daynix.com>) id 1cqg1X-0001wd-Vr
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 09:10:03 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33339)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cqg15-0001sh-1c
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 09:09:31 -0400
-Received: by mail-wm0-x231.google.com with SMTP id t189so37279381wmt.1
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 06:09:30 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <87k27hxyni.fsf@linaro.org>
-References: <CAFEAcA9pqDoCWrPAJ+KVxLC_eRy-xRg36oYuARYg2YP8VpGpBg@mail.gmail.com>
-	<CAFEAcA-2mcGih5bscnMsevTNTy71g9kE7OjTy3hYJKeGoGQw-g@mail.gmail.com>
-	<87k27hxyni.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 22 Mar 2017 13:09:09 +0000
-Message-ID: <CAFEAcA-oLDW2F=L3NCdSvrLp_eh3tu9mfKR0mTfZ=3O3dpdKbQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Proposal for deprecating unsupported host OSes &
- architecutures
+	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1cqg1X-0001wW-Ot
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 09:09:59 -0400
+Received: by mail-wm0-x241.google.com with SMTP id n11so9558645wma.0
+	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 06:09:59 -0700 (PDT)
+From: Sameeh Jubran <sameeh@daynix.com>
+Date: Wed, 22 Mar 2017 15:09:52 +0200
+Message-Id: <20170322130952.8997-1-sameeh@daynix.com>
+Subject: [Qemu-devel] [PATCH qemu-ga] qga: Make qemu-ga compile statically
+ for Windows
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,30 +24,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Yan Vugenfirer <yan@daynix.com>, Stefan Hajnoczi <stefanha@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On 22 March 2017 at 12:51, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
-> Peter Maydell <peter.maydell@linaro.org> writes:
->> ...unfortunately the gcc compile farm mips board (1) is very slow
->> and (2) has very little disk space free in /tmp, which means that
->> it can't pass "make check" because for instance tests/test-replication
->> assumes it can write comparatively large test files to /tmp/...
->
-> That makes it sound like a mips cross build or mips linux-user powered
-> image would be useful then?
+Attempting to compile qemu-ga statically as follows for Windows causes
+the following error:
 
-Cross build can't actually run 'make check' and I wouldn't
-trust linux-user to run our test suite. Also, if there's
-no hardware that we can sensibly do make/make check
-on then how much can people really care about QEMU on MIPS?
-(In fact since MIPS supports KVM these days, there really
-ought to be sufficiently capable hardware to work as
-a build system.)
+Compilation:
+    ./configure --disable-docs --target-list=x86_64-softmmu \
+    --cross-prefix=x86_64-w64-mingw32- --static \
+    --enable-guest-agent-msi --with-vss-sdk=/path/to/VSSSDK72
 
-The "test uses /tmp/" stuff is a test suite bug which
-we should fix, which might make the gcc cfarm box at
-least kind of usable.
+    make -j8 qemu-ga
 
-thanks
--- PMM
+Error:
+    path/to/qemu/stubs/error-printf.c:7: undefined reference to `__imp_g_test_config_vars'
+    collect2: error: ld returned 1 exit status
+    Makefile:444: recipe for target 'qemu-ga.exe' failed
+    make: *** [qemu-ga.exe] Error 1
+
+This is caused by a bug in the pkg-config file for glib as it doesn't define
+GLIB_STATIC_COMPILATION for pkg-config --static.
+
+Signed-off-by: Stefan Hajnoczi <stefanha@gmail.com>
+Signed-off-by: Sameeh Jubran <sameeh@daynix.com>
+---
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure b/configure
+index b9a30cf..6f7b460 100755
+--- a/configure
++++ b/configure
+@@ -4138,7 +4138,7 @@ int main(void) { return VSS_CTX_BACKUP; }
+ EOF
+   if compile_prog "$vss_win32_include" "" ; then
+     guest_agent_with_vss="yes"
+-    QEMU_CFLAGS="$QEMU_CFLAGS $vss_win32_include"
++    QEMU_CFLAGS="-DGLIB_STATIC_COMPILATION $QEMU_CFLAGS $vss_win32_include"
+     libs_qga="-lole32 -loleaut32 -lshlwapi -lstdc++ -Wl,--enable-stdcall-fixup $libs_qga"
+     qga_vss_provider="qga/vss-win32/qga-vss.dll qga/vss-win32/qga-vss.tlb"
+   else
+-- 
+2.9.3
