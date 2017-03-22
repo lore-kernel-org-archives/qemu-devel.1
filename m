@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cqVQq-0005v8-PC
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 21:51:26 -0400
+	(envelope-from <anthony.xu@intel.com>) id 1cqVca-0008OI-Ah
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 22:03:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cqVQn-0005Ll-La
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 21:51:24 -0400
-Received: from [59.151.112.132] (port=57979 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cqVQm-0005Jj-NI
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 21:51:21 -0400
-References: <1489657928-14919-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<22303218-697c-7166-406b-050888efdfd5@redhat.com>
-	<cc051a40-9142-9364-8bc8-de8ec453ebe2@cn.fujitsu.com>
-	<8901e058-dcda-5c4a-e43a-38fca5814eb5@redhat.com>
-	<ff751bdb-95bf-4c76-b782-d2bc47746c02@cn.fujitsu.com>
-	<2875d736-61ae-b8f6-bb79-40aaddf3cb9b@redhat.com>
-	<af721967-8c73-1747-1428-adc390732cd1@cn.fujitsu.com>
-	<15aa7299-d364-cb03-f07f-778dfbb1f8a4@redhat.com>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <28bd303e-3b54-8465-2b23-9107d4ba18c6@cn.fujitsu.com>
-Date: Wed, 22 Mar 2017 09:50:29 +0800
+	(envelope-from <anthony.xu@intel.com>) id 1cqVcV-0000dU-EH
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 22:03:32 -0400
+Received: from mga05.intel.com ([192.55.52.43]:25386)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
+	id 1cqVcV-0000bp-6L
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 22:03:27 -0400
+From: "Xu, Anthony" <anthony.xu@intel.com>
+Date: Wed, 22 Mar 2017 02:03:22 +0000
+Message-ID: <4712D8F4B26E034E80552F30A67BE0B1A2D69E@ORSMSX112.amr.corp.intel.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <15aa7299-d364-cb03-f07f-778dfbb1f8a4@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 0/3] Add COLO-proxy virtio-net support
+Subject: [Qemu-devel] [PATCH] only link current target arch traces to
+ qemu-system
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,131 +27,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, qemu devel <qemu-devel@nongnu.org>
-Cc: zhangchen.fnst@cn.fujitsu.com, Li Zhijian <lizhijian@cn.fujitsu.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: 'Paolo Bonzini' <pbonzini@redhat.com>
+
+When building target x86_64-softmmu, all other architectures' trace.o are l=
+inked into=20
+x86_64-softmmu/qemu-system-x86_64, like hw/arm/trace.o, hw/mips/trace.o etc=
+.,=20
+that is not necessary.
+ Same thing happens when building other targets.
+
+Only current target arch traces should be linked into qemu-system.
+
+Signed-off -by: Anthony Xu <anthony.xu@intel.com>
 
 
 
-On 03/21/2017 05:15 PM, Jason Wang wrote:
->
->
-> On 2017年03月21日 15:08, Zhang Chen wrote:
->>
->>
->> On 03/21/2017 02:30 PM, Jason Wang wrote:
->>>
->>>
->>> On 2017年03月21日 14:16, Zhang Chen wrote:
->>>>
->>>>
->>>> On 03/21/2017 02:10 PM, Jason Wang wrote:
->>>>>
->>>>>
->>>>> On 2017年03月21日 13:47, Zhang Chen wrote:
->>>>>>
->>>>>>
->>>>>> On 03/21/2017 11:39 AM, Jason Wang wrote:
->>>>>>>
->>>>>>>
->>>>>>> On 2017年03月16日 17:52, Zhang Chen wrote:
->>>>>>>> If user use -device virtio-net-pci, virtio-net driver will add 
->>>>>>>> a header
->>>>>>>> to raw net packet that colo-proxy can't handle it. COLO-proxy just
->>>>>>>> focus on the packet payload, so we skip the virtio-net header 
->>>>>>>> to compare
->>>>>>>> the sent packet that primary guest's to secondary guest's.
->>>>>>>>
->>>>>>>>
->>>>>>>> Zhang Chen (3):
->>>>>>>>    COLO-proxy: Add virtio-net packet parse function
->>>>>>>>    COLO-proxy: Add a tag to mark virtio-net packet
->>>>>>>>    COLO-compare: Add virtio-net packet compare support
->>>>>>>>
->>>>>>>>   net/colo-compare.c    | 42 
->>>>>>>> +++++++++++++++++++++++++++++++++---------
->>>>>>>>   net/colo.c            | 14 ++++++++++----
->>>>>>>>   net/colo.h            |  7 ++++++-
->>>>>>>>   net/filter-rewriter.c | 15 ++++++++++-----
->>>>>>>>   4 files changed, 59 insertions(+), 19 deletions(-)
->>>>>>>>
->>>>>>>
->>>>>>> Hi:
->>>>>>>
->>>>>>> Git grep told us virtio-net is not the only user for vnet 
->>>>>>> header. E1000e and vmxnet3 uses it too.
->>>>>>>
->>>>>>> So we need solve them all instead of being virtio-net specific.
->>>>>>>
->>>>>>
->>>>>> Yes, In this series I just try to parse vnet header, if failed I 
->>>>>> will try to parse normal net packet.
->>>>>> So, I just focus on vnet header rather than virtio-net driver.
->>>>>> But the patch comments really make people confused , Should I fix 
->>>>>> all the comments send the V2 ?
->>>>>
->>>>> Yes, please. Beside this, instead of using fixed vnet header len 
->>>>> macro, you should query the backend for the length of vnet header.
->>>>
->>>> I want query the backend too, but colo-compare is not a netfilter 
->>>> means it no need attach any netdev.
->>>> How can we query the backend for the length of vnet header?
->>>
->>> Filters can know this, then how about let filters add the vnet 
->>> header length before the real packet and send it to colo-compare?
->>>
->>
->> I don't know whether I understand your comments...
->> Do you means filter send a vnet header length firstly(independent 
->> length packet), then send the real packet?
->
-> This requires too much changes and may break the compatibility of 
-> socket net backend.
->
->> If yes, I think it so expensive, in colo we use filter mirror or 
->> redirect packet between primary and secondary
->> that no need to know the vnet header length.
->> Or do you means add a fake vnet header to real packet in same one 
->> packet?
->
-> Kind of, see below.
->
->> If yes, filter-mirror and filter-redirector must touch the packet do 
->> some job like colo-compare.
->> We initial design split colo-proxy to 4 modules have make 
->> filter-mirror and filter-redirector not to touch
->> the packet content, colo-compare and filter-rewriter do the packet 
->> data related job.
->> Or you have other way to tell colo-compare the length?
->>
->> Thanks
->> Zhang Chen
->
-> I mean e.g: We send a packet like struct {int size; const uint8_t 
-> buf[];} currently. We can try to add vnet header information like {int 
-> size; int vnet_hdr_len; const uint8_t buf[];}. Or even just pack the 
-> vnet_hdr_len information to the higher bits of size. Then we just need 
-> some encoding and decoding and the changes were limited.
->
-> Does this make sense?
 
-Yes, encoding is OK in filter, but decoding we must touch the 
-"net_fill_rstate()", net/socket.c also use this
-function to receive packet, other codes try to send packet like struct 
-{int size; const uint8_t buf[];} maybe conflict with it.
-For the vnet header length do this job is acceptable? and in what 
-situation the vnet header length will be change?
-
-Thanks
-Zhang Chen
-
->
-> Thanks
->
->
->
-> .
->
-
--- 
-Thanks
-Zhang Chen
+diff --git a/Makefile.target b/Makefile.target
+index 7df2b8c..638e044 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -177,6 +177,41 @@ block-obj-y :=3D
+ common-obj-y :=3D
+ chardev-obj-y :=3D
+ include $(SRC_PATH)/Makefile.objs
++
++# remove all arch related trace
++trace-obj-y :=3D $(filter-out hw/alpha/trace.o hw/alpha/trace-dtrace.o,$(t=
+race-obj-y))
++trace-obj-y :=3D $(filter-out target/alpha/trace.o target/alpha/trace-dtra=
+ce.o,$(trace-obj-y))
++
++trace-obj-y :=3D $(filter-out hw/arm/trace.o hw/arm/trace-dtrace.o,$(trace=
+-obj-y))
++trace-obj-y :=3D $(filter-out target/arm/trace.o target/arm/trace-dtrace.o=
+,$(trace-obj-y))
++
++trace-obj-y :=3D $(filter-out hw/i386/trace.o hw/i386/trace-dtrace.o,$(tra=
+ce-obj-y))
++trace-obj-y :=3D $(filter-out target/i386/trace.o target/i386/trace-dtrace=
+.o,$(trace-obj-y))
++
++trace-obj-y :=3D $(filter-out hw/mips/trace.o hw/mips/trace-dtrace.o,$(tra=
+ce-obj-y))
++trace-obj-y :=3D $(filter-out target/mips/trace.o target/mips/trace-dtrace=
+.o,$(trace-obj-y))
++
++trace-obj-y :=3D $(filter-out hw/sparc/trace.o hw/sparc/trace-dtrace.o,$(t=
+race-obj-y))
++trace-obj-y :=3D $(filter-out target/sparc/trace.o target/sparc/trace-dtra=
+ce.o,$(trace-obj-y))
++
++trace-obj-y :=3D $(filter-out hw/s390x/trace.o hw/s390x/trace-dtrace.o,$(t=
+race-obj-y))
++trace-obj-y :=3D $(filter-out target/s390x/trace.o target/s390x/trace-dtra=
+ce.o,$(trace-obj-y))
++
++trace-obj-y :=3D $(filter-out hw/ppc/trace.o hw/ppc/trace-dtrace.o,$(trace=
+-obj-y))
++trace-obj-y :=3D $(filter-out target/ppc/trace.o target/ppc/trace-dtrace.o=
+,$(trace-obj-y))
++
++# add current arch related trace
++carch :=3D $(TARGET_BASE_ARCH)
++ifneq ($(wildcard $(SRC_PATH)/hw/$(carch)/trace-events),)
++trace-obj-y +=3D hw/$(carch)/trace.o
++trace-obj-$(CONFIG_TRACE_DTRACE) +=3D hw/$(carch)/trace-dtrace.o
++endif
++
++ifneq ($(wildcard $(SRC_PATH)/target/$(carch)/trace-events),)
++trace-obj-y +=3D target/$(carch)/trace.o
++trace-obj-$(CONFIG_TRACE_DTRACE) +=3D target/$(carch)/trace-dtrace.o
++endif
++
+ dummy :=3D $(call unnest-vars,,target-obj-y)
+ target-obj-y-save :=3D $(target-obj-y)
+ dummy :=3D $(call unnest-vars,.., \
