@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50466)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abenetopoulos@gmail.com>) id 1cqlW8-0001V8-CN
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 15:01:58 -0400
+	(envelope-from <eblake@redhat.com>) id 1cqlbC-0004qs-6C
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 15:07:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abenetopoulos@gmail.com>) id 1cqlW5-0000Wv-4f
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 15:01:56 -0400
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:36028)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <abenetopoulos@gmail.com>)
-	id 1cqlW4-0000WS-Qx
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 15:01:53 -0400
-Received: by mail-wm0-x22f.google.com with SMTP id n11so44992066wma.1
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 12:01:52 -0700 (PDT)
-References: <74f647b8-a890-6635-278a-ce55fbbb5537@gmail.com>
-	<7cfc0f3b-2cd3-32b7-0274-90b2bcfc2efa@redhat.com>
-From: Achilles Benetopoulos <abenetopoulos@gmail.com>
-Message-ID: <dfda7306-0003-7e3c-f596-9f04586b6b8c@gmail.com>
-Date: Wed, 22 Mar 2017 21:01:48 +0200
+	(envelope-from <eblake@redhat.com>) id 1cqlb9-0001wA-24
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 15:07:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38020)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cqlb8-0001w3-Pr
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 15:07:07 -0400
+References: <CAFEAcA9pqDoCWrPAJ+KVxLC_eRy-xRg36oYuARYg2YP8VpGpBg@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c46ff864-fc8b-aeba-30f4-4c773f879786@redhat.com>
+Date: Wed, 22 Mar 2017 14:07:04 -0500
 MIME-Version: 1.0
-In-Reply-To: <7cfc0f3b-2cd3-32b7-0274-90b2bcfc2efa@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] qemu/thread: Add support for error
- reporting in qemu_thread_create
+In-Reply-To: <CAFEAcA9pqDoCWrPAJ+KVxLC_eRy-xRg36oYuARYg2YP8VpGpBg@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="k26KOG4IPg934CHVt3JXKi8JGUskHhrgl"
+Subject: [Qemu-devel] rawhide gcc failures [was: Proposal for deprecating
+ unsupported host OSes & architecutures]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,120 +28,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, quintela@redhat.com, armbru@redhat.com, crosthwaite.peter@gmail.com
+To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Thank you for the detailed review. The indentation errors mentioned
-were pure carelesness on my part, sorry about that.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--k26KOG4IPg934CHVt3JXKi8JGUskHhrgl
+From: Eric Blake <eblake@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
+Message-ID: <c46ff864-fc8b-aeba-30f4-4c773f879786@redhat.com>
+Subject: rawhide gcc failures [was: Proposal for deprecating unsupported host
+ OSes & architecutures]
+References: <CAFEAcA9pqDoCWrPAJ+KVxLC_eRy-xRg36oYuARYg2YP8VpGpBg@mail.gmail.com>
+In-Reply-To: <CAFEAcA9pqDoCWrPAJ+KVxLC_eRy-xRg36oYuARYg2YP8VpGpBg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 3/22/17 2:20 PM, Eric Blake wrote:
->> @@ -342,13 +343,19 @@ static void pci_edu_realize(PCIDevice *pdev, Err=
-or **errp) >>  { >>      EduState *edu =3D DO_UPCAST(EduState, pdev, pdev=
-); >>      uint8_t *pci_conf =3D pdev->config; >> +    Error *local_err =3D=
- NULL; >> >>      timer_init_ms(&edu->dma_timer, QEMU_CLOCK_VIRTUAL, edu_=
-dma_timer, edu); >> >>      qemu_mutex_init(&edu->thr_mutex); >>      qem=
-u_cond_init(&edu->thr_cond); >>      qemu_thread_create(&edu->thread, "ed=
-u", edu_fact_thread, >> -                       edu, QEMU_THREAD_JOINABLE=
-); >> +                       edu, QEMU_THREAD_JOINABLE, &local_err); >> =
-+ >> +    if (local_err) { >> +        error_propagate(errp, local_err); =
->> +        return; >> +    } > > Looking at code like this, I wonder if =
-it would be easier to make > qemu_thread_create() return a value, rather =
-than being void.  Then you > could write: > > if (qemu_thread_create(...,=
- errp) < 0) { >     return; > } > > instead of having to futz around with=
- local_err and error_propagate(). >
+On 03/16/2017 10:23 AM, Peter Maydell wrote:
+> OK, here's a concrete proposal for deprecating/dropping out of
+> date host OS and architecture support.
+>=20
+> We'll put this in the ChangeLog 'Future incompatible changes'
+> section:
+> -----
+> * Removal of support for untested host OS and architectures:
 
-I don't know about it being easier, but it does seem like it would
-make the code at the call site cleaner, when the function calling
-qemu_thread_create was passed an error variable itself. However, in
-all but four cases there is no preexisting error variable, so the code
-would stay pretty much the same.
+Tangentially-related: do we officially support bleeding-edge OS builds?
+For example, current rawhide has a new-enough gcc that gives some
+(possibly-useful) new warnings (-Werror=3Dformat-truncation) that fire
+when formatting what can be easily proven to be larger than a
+fixed-width buffer will hold.  If rawhide is not a current target, then
+I don't need to spend any time on this (yet); but if rawhide builds ARE
+supported, then we want this patched before 2.9:
 
->> +++ b/hw/usb/ccid-card-emulated.c >> @@ -34,6 +34,7 @@ >> >>  #include=
- "qemu/thread.h" >>  #include "sysemu/char.h" >> +#include "qapi/error.h"=
- >>  #include "ccid.h" >> >>  #define DPRINTF(card, lvl, fmt, ...) \ >> @=
-@ -485,6 +486,7 @@ static int emulated_initfn(CCIDCardState *base) >>    =
-  EmulatedState *card =3D EMULATED_CCID_CARD(base); >>      VCardEmulErro=
-r ret; >>      const EnumTable *ptable; >> +    Error *err =3D NULL, *loc=
-al_err =3D NULL; > > Huh? Why do you need two local error objects? One is=
- generally sufficient. > >> >>      QSIMPLEQ_INIT(&card->event_list); >> =
-     QSIMPLEQ_INIT(&card->guest_apdu_list); >> @@ -541,9 +543,17 @@ stati=
-c int emulated_initfn(CCIDCardState *base) >>          return -1; >>     =
- } >>      qemu_thread_create(&card->event_thread_id, "ccid/event", event=
-_thread, >> -                       card, QEMU_THREAD_JOINABLE); >> +    =
-                   card, QEMU_THREAD_JOINABLE, &err); >> + >>      qemu_t=
-hread_create(&card->apdu_thread_id, "ccid/apdu", handle_apdu_thread, >>
--                       card, QEMU_THREAD_JOINABLE); >> +                =
-       card, QEMU_THREAD_JOINABLE, &local_err); >> +    error_propagate(&=
-err, local_err); >> + >> +    if (err) { >> +        error_report_err(err=
-); >> +        return -1; >> +    } > > > If you used the return value, y=
-ou could write: > > if (qemu_thread_create(..., &err) < 0 || >     qemu_t=
-hread_create(..., &err) < 0) { >     error_report_err(err); >     return =
--1; > } > > without needing the second object.
 
-Well, I wrote it this way because of a recommendation in the error.h
-header, but yes, if we were to change the return type of
-qemu_thread_create, then this would make sense.
+  CC      block/blkdebug.o
+block/blkdebug.c: In function =E2=80=98blkdebug_refresh_filename=E2=80=99=
+:
+block/blkdebug.c:693:31: error: =E2=80=98%s=E2=80=99 directive output may=
+ be truncated
+writing up to 4095 bytes into a region of size 4086
+[-Werror=3Dformat-truncation=3D]
+                  "blkdebug:%s:%s", s->config_file ?: "",
+                               ^~
+block/blkdebug.c:692:9: note: =E2=80=98snprintf=E2=80=99 output 11 or mor=
+e bytes
+(assuming 4106) into a destination of size 4096
+         snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                  "blkdebug:%s:%s", s->config_file ?: "",
+                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                  bs->file->bs->exact_filename);
+                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cc1: all warnings being treated as errors
+make: *** [/home/dummy/qemu/rules.mak:69: block/blkdebug.o] Error 1
+  CC      block/blkverify.o
+block/blkverify.c: In function =E2=80=98blkverify_refresh_filename=E2=80=99=
+:
+block/blkverify.c:309:29: error: =E2=80=98%s=E2=80=99 directive output ma=
+y be truncated
+writing up to 4095 bytes into a region of size 4086
+[-Werror=3Dformat-truncation=3D]
+                  "blkverify:%s:%s",
+                             ^~
+block/blkverify.c:308:9: note: =E2=80=98snprintf=E2=80=99 output between =
+12 and 8202
+bytes into a destination of size 4096
+         snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                  "blkverify:%s:%s",
+                  ~~~~~~~~~~~~~~~~~~
+                  bs->file->bs->exact_filename,
+                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                  s->test_file->bs->exact_filename);
+                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cc1: all warnings being treated as errors
+make: *** [/home/dummy/qemu/rules.mak:69: block/blkverify.o] Error 1
+  CC      hw/usb/bus.o
+hw/usb/bus.c: In function =E2=80=98usb_port_location=E2=80=99:
+hw/usb/bus.c:410:66: error: =E2=80=98%d=E2=80=99 directive output may be =
+truncated
+writing between 1 and 11 bytes into a region of size between 0 and 15
+[-Werror=3Dformat-truncation=3D]
+         snprintf(downstream->path, sizeof(downstream->path), "%s.%d",
+                                                                  ^~
+hw/usb/bus.c:410:9: note: =E2=80=98snprintf=E2=80=99 output between 3 and=
+ 28 bytes into
+a destination of size 16
+         snprintf(downstream->path, sizeof(downstream->path), "%s.%d",
+         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                  upstream->path, portnr);
+                  ~~~~~~~~~~~~~~~~~~~~~~~
+cc1: all warnings being treated as errors
+make: *** [/home/dummy/qemu/rules.mak:69: hw/usb/bus.o] Error 1
+  CC      net/slirp.o
+net/slirp.c: In function =E2=80=98slirp_smb_cleanup=E2=80=99:
+net/slirp.c:565:44: error: =E2=80=98%s=E2=80=99 directive output may be t=
+runcated
+writing up to 127 bytes into a region of size 121
+[-Werror=3Dformat-truncation=3D]
+         snprintf(cmd, sizeof(cmd), "rm -rf %s", s->smb_dir);
+                                            ^~
+net/slirp.c:565:9: note: =E2=80=98snprintf=E2=80=99 output between 8 and =
+135 bytes into
+a destination of size 128
+         snprintf(cmd, sizeof(cmd), "rm -rf %s", s->smb_dir);
+         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+net/slirp.c: In function =E2=80=98slirp_smb=E2=80=99:
+net/slirp.c:609:46: error: =E2=80=98%s=E2=80=99 directive output may be t=
+runcated
+writing 8 bytes into a region of size between 0 and 127
+[-Werror=3Dformat-truncation=3D]
+     snprintf(smb_conf, sizeof(smb_conf), "%s/%s", s->smb_dir, "smb.conf"=
+);
+                                              ^~               ~~~~~~~~~~=
 
->> +++ b/include/qemu/thread.h >> @@ -55,7 +55,7 @@ void qemu_event_destr=
-oy(QemuEvent *ev); >> >>  void qemu_thread_create(QemuThread *thread, con=
-st char *name, >>                          void *(*start_routine)(void *)=
-, >> -                        void *arg, int mode); >> +                 =
-       void *arg, int mode, Error **errp); > > Hmm, we still haven't made=
- it official recommended practice, but it's a > good idea to use 'git con=
-fig diff.orderFile /path/to/file' in order to > hoist .h changes to the f=
-ront of a diff (it makes diffs easier to review > when you see the interf=
-ace change prior to the clients of the > interface).  I wish I had a bett=
-er URL to point to on the topic, but > didn't want to spend time finding =
-it in the mailing list archives at > this time.
+net/slirp.c:609:5: note: =E2=80=98snprintf=E2=80=99 output between 10 and=
+ 137 bytes into
+a destination of size 128
+     snprintf(smb_conf, sizeof(smb_conf), "%s/%s", s->smb_dir, "smb.conf"=
+);
+     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
+~
+net/slirp.c:654:55: error: =E2=80=98%s=E2=80=99 directive output may be t=
+runcated
+writing up to 127 bytes into a region of size 110
+[-Werror=3Dformat-truncation=3D]
+     snprintf(smb_cmdline, sizeof(smb_cmdline), "%s -l %s -s %s",
+                                                       ^~
+net/slirp.c:654:5: note: =E2=80=98snprintf=E2=80=99 output 23 or more byt=
+es (assuming
+150) into a destination of size 128
+     snprintf(smb_cmdline, sizeof(smb_cmdline), "%s -l %s -s %s",
+     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+              CONFIG_SMBD_COMMAND, s->smb_dir, smb_conf);
+              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cc1: all warnings being treated as errors
+make: *** [/home/dummy/qemu/rules.mak:69: net/slirp.o] Error 1
+make: Target 'all' not remade because of errors.
 
-Noted for future submissions.
 
->> +++ b/migration/ram.c >> @@ -357,6 +357,7 @@ void migrate_compress_thr=
-eads_join(void) >>  void migrate_compress_threads_create(void) >>  { >>  =
-    int i, thread_count; >> +    Error *err =3D NULL, *local_err =3D NULL=
-; >> >>      if (!migrate_use_compression()) { >>          return; >> @@ =
--378,7 +379,16 @@ void migrate_compress_threads_create(void) >>          =
-qemu_cond_init(&comp_param[i].cond); >>          qemu_thread_create(compr=
-ess_threads + i, "compress", >>                             do_data_compr=
-ess, comp_param + i, >> -                           QEMU_THREAD_JOINABLE)=
-; >> +                           QEMU_THREAD_JOINABLE, &local_err); >> + =
->> +        if (local_err) { >> +            error_propagate(&err, local_=
-err); >> +            local_err =3D NULL; >> +        } >> +    } >> + >>=
- +    if (err) { >> +        error_report_err(err); >>      } > > Another=
- place that looks weird with two error variables.
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-I was on the fence about this one. I wrote it this way thinking that
-we would want to know the 'first' time the call to qemu_thread_create
-failed, but proceed to try and create subsequent threads, which might
-also fail. Seeing it now, it might be more reasonable to catch the
-first error, report it then return?
 
->> +++ b/tests/iothread.c >> @@ -69,11 +69,18 @@ void iothread_join(IOThr=
-ead *iothread) >>  IOThread *iothread_new(void) >>  { >>      IOThread *i=
-othread =3D g_new0(IOThread, 1); >> +    Error *local_err =3D NULL; >> >>=
-      qemu_mutex_init(&iothread->init_done_lock); >>      qemu_cond_init(=
-&iothread->init_done_cond); >>      qemu_thread_create(&iothread->thread,=
- NULL, iothread_run, >> -                       iothread, QEMU_THREAD_JOI=
-NABLE); >> +                       iothread, QEMU_THREAD_JOINABLE, &local=
-_err); > > In a test, you can just assert success, by using: > > qemu_thr=
-ead_create(..., &error_abort); > >> + >> +    if (local_err) { >> +      =
-  error_report_err(local_err); >> +        /*what makes sense here as a r=
-eturn value?*/ >> +        return NULL; > > Doing that will get rid of th=
-is fishy comment. > >> +++ b/tests/rcutorture.c >> @@ -64,6 +64,7 @@ >>  =
-#include "qemu/atomic.h" >>  #include "qemu/rcu.h" >>  #include "qemu/thr=
-ead.h" >> +#include "qapi/error.h" >> >>  long long n_reads =3D 0LL; >>=20
-long n_updates =3D 0L; >> @@ -85,12 +86,20 @@ static int n_threads; >> >>=
-  static void create_thread(void *(*func)(void *)) >>  { >> +    Error *l=
-ocal_err =3D NULL; >> + >>      if (n_threads >=3D NR_THREADS) { >>      =
-    fprintf(stderr, "Thread limit of %d exceeded!\n", NR_THREADS); >>    =
-      exit(-1); >>      } >>      qemu_thread_create(&threads[n_threads],=
- "test", func, &data[n_threads], >> -                       QEMU_THREAD_J=
-OINABLE); >> +                       QEMU_THREAD_JOINABLE, &local_err); >=
-> + >> +    if (local_err) { >> +        error_report_err(local_err); >> =
-+        exit(1); > > Again, in a test, if you're just going to exit anyw=
-ay, then it's easier > to pass &error_abort to the original call, than it=
- is to post-process > and report the error. >
+--k26KOG4IPg934CHVt3JXKi8JGUskHhrgl
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-OK, I will change the code in the tests.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-Achilles
+iQEcBAEBCAAGBQJY0stYAAoJEKeha0olJ0NqKpkH/jSurObrIv3MMEAKPbppdH1m
+D6xkHNQKj9HIqUImKhRqF4WrS37Jfxul96ixSv3aPrbRg0SwZKqAZSJAJ84U5qf8
+aq+xybzA4oVIN13HPW4ZYwUKrTpa5cIg2Lgv4N3Fts4A4WmrsovuhiFTtBJ7silx
+W6FDeeml0gFnOWKwtw/t/+0TsK/yLdsGHUsXjdZlpCKIw/kQUeTDAOHaI0e3Wl5r
+JHC1ZYJt6M3xaYFWxuGgQRoDuOdTTRSaWzjdc9e/npo6NIx8++MwlBA1uGfgJGkX
+vNyz+n0tXCpy5vBHGZNtP/fbCHdLRbjUO3kuI1fbn+HdR15UZ4xjSk0X+VVcZLk=
+=1oYK
+-----END PGP SIGNATURE-----
+
+--k26KOG4IPg934CHVt3JXKi8JGUskHhrgl--
