@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32947)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nsoffer@redhat.com>) id 1cqlwi-0001lC-QD
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 15:29:26 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cqm6h-0004mY-32
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 15:39:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nsoffer@redhat.com>) id 1cqlwd-0001MX-Sv
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 15:29:24 -0400
-Received: from mail-vk0-f50.google.com ([209.85.213.50]:35643)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cqm6d-0004sX-4v
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 15:39:43 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:36110)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <nsoffer@redhat.com>) id 1cqlwd-0001MI-NO
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 15:29:19 -0400
-Received: by mail-vk0-f50.google.com with SMTP id r69so23847270vke.2
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 12:29:18 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1cqm6c-0004sK-Vr
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 15:39:39 -0400
+Received: by mail-qt0-x243.google.com with SMTP id n37so26663394qtb.3
+	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 12:39:38 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <CAFEAcA9pqDoCWrPAJ+KVxLC_eRy-xRg36oYuARYg2YP8VpGpBg@mail.gmail.com>
+	<c46ff864-fc8b-aeba-30f4-4c773f879786@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <85b94581-70ec-3e7e-1f2f-dd70204fb68c@amsat.org>
+Date: Wed, 22 Mar 2017 16:39:34 -0300
 MIME-Version: 1.0
-References: <20170322111608.31230-1-stefanha@redhat.com>
-In-Reply-To: <20170322111608.31230-1-stefanha@redhat.com>
-From: Nir Soffer <nsoffer@redhat.com>
-Date: Wed, 22 Mar 2017 19:29:07 +0000
-Message-ID: <CAMRbyysE0+GPze8mFZyaWqTywGMW67t+JKV1xX_CvX_dcu5q7A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v3 0/8] qemu-img: add measure sub-command
+In-Reply-To: <c46ff864-fc8b-aeba-30f4-4c773f879786@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] rawhide gcc failures [was: Proposal for
+ deprecating unsupported host OSes & architecutures]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,111 +35,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>
+To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>
 
-On Wed, Mar 22, 2017 at 2:28 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
+so lovely...
 
-> v3:
->  * Drop RFC, this is ready to go for QEMU 2.10
->  * Use "required size" instead of "required bytes" in qemu-img output for
->    consistency [Nir]
->  * Clarify BlockMeasureInfo semantics [Max]
->  * Clarify bdrv_measure() opts argument and error handling [Nir]
->  * Handle -o backing_file= for qcow2 [Max]
->  * Handle snapshot options in qemu-img measure
->  * Probe input image for allocated data clusters for qcow2.  Didn't
-> centralize
->    this because there are format-specific aspects such as the
-> cluster_size.  It
->    may make sense to centralize it later (with a bit more complexity) if
->    support is added to more formats.
->  * Add qemu-img(1) man page section for 'measure' sub-command [Max]
->  * Extend test case to cover additional scenarios [Nir]
->
-> RFCv2:
->  * Publishing RFC again to discuss the new user-visible interfaces.  Code
-> has
->    changed quite a bit, I have not kept any Reviewed-by tags.
->  * Rename qemu-img sub-command "measure" and API bdrv_measure() [Nir]
->  * Report both "required bytes" and "fully allocated bytes" to handle the
-> empty
->    image file and prealloc use cases [Nir and Dan]
->  * Use bdrv_getlength() instead of bdrv_nb_sectors() [Berto]
->  * Rename "err" label "out" in qemu-img-cmds.c [Nir]
->  * Add basic qcow2 support, doesn't support qemu-img convert from existing
-> files yet
->
-> RFCv1:
->  * Publishing patch series with just raw support, no qcow2 yet.  Please
-> review
->    the command-line interface and let me know if you are happy with this
->    approach.
->
-> Users and management tools sometimes need to know the size required for a
-> new
-> disk image so that an LVM volume, SAN LUN, etc can be allocated ahead of
-> time.
-> Image formats like qcow2 have non-trivial metadata that makes it hard to
-> estimate the exact size without knowledge of file format internals.
->
-> This patch series introduces a new qemu-img sub-command that calculates the
-> required size for both image creation and conversion scenarios.
->
-> The conversion scenario is:
->
->   $ qemu-img measure -f raw -O qcow2 input.img
->   required size: 1327680
->   fully allocated size: 1074069504
->
-> Here an existing image file is taken and the output includes the space
-> required
-> for data from the input image file.
->
-> The creation scenario is:
->
->   $ qemu-img measure -O qcow2 --size 5G
->   required size: 327680
->   fully allocated size: 1074069504
->
-> Stefan Hajnoczi (8):
->   block: add bdrv_measure() API
->   raw-format: add bdrv_measure() support
->   qcow2: extract preallocation calculation function
->   qcow2: extract image creation option parsing
->   qcow2: add bdrv_measure() support
->   qemu-img: add measure subcommand
->   qemu-iotests: support per-format golden output files
->   iotests: add test 178 for qemu-img measure
->
->  qapi/block-core.json             |  25 +++
->  include/block/block.h            |   4 +
->  include/block/block_int.h        |   2 +
->  block.c                          |  35 ++++
->  block/qcow2.c                    | 362
-> +++++++++++++++++++++++++++++----------
->  block/raw-format.c               |  22 +++
->  qemu-img.c                       | 227 ++++++++++++++++++++++++
->  qemu-img-cmds.hx                 |   6 +
->  qemu-img.texi                    |  25 +++
->  tests/qemu-iotests/178           | 144 ++++++++++++++++
->  tests/qemu-iotests/178.out.qcow2 | 242 ++++++++++++++++++++++++++
->  tests/qemu-iotests/178.out.raw   | 130 ++++++++++++++
->  tests/qemu-iotests/check         |   5 +
->  tests/qemu-iotests/group         |   1 +
->  14 files changed, 1136 insertions(+), 94 deletions(-)
->  create mode 100755 tests/qemu-iotests/178
->  create mode 100644 tests/qemu-iotests/178.out.qcow2
->  create mode 100644 tests/qemu-iotests/178.out.raw
->
-> --
-> 2.9.3
->
+as a start point for bleeding edge stuff this can go in CI as a 
+complement of debian images in tests/docker/... using the official 
+fedora:rawhide base image.
 
-Stefan, is this available in some public git repo?
-
-I would like to test it,  and downloading and applying 8 patches is lot of
-work.
-(I'm probably not using the right tools for this).
-
-Nir
+On 03/22/2017 04:07 PM, Eric Blake wrote:
+> On 03/16/2017 10:23 AM, Peter Maydell wrote:
+>> OK, here's a concrete proposal for deprecating/dropping out of
+>> date host OS and architecture support.
+>>
+>> We'll put this in the ChangeLog 'Future incompatible changes'
+>> section:
+>> -----
+>> * Removal of support for untested host OS and architectures:
+>
+> Tangentially-related: do we officially support bleeding-edge OS builds?
+> For example, current rawhide has a new-enough gcc that gives some
+> (possibly-useful) new warnings (-Werror=format-truncation) that fire
+> when formatting what can be easily proven to be larger than a
+> fixed-width buffer will hold.  If rawhide is not a current target, then
+> I don't need to spend any time on this (yet); but if rawhide builds ARE
+> supported, then we want this patched before 2.9:
+>
+>
+>   CC      block/blkdebug.o
+> block/blkdebug.c: In function ‘blkdebug_refresh_filename’:
+> block/blkdebug.c:693:31: error: ‘%s’ directive output may be truncated
+> writing up to 4095 bytes into a region of size 4086
+> [-Werror=format-truncation=]
+>                   "blkdebug:%s:%s", s->config_file ?: "",
+>                                ^~
+> block/blkdebug.c:692:9: note: ‘snprintf’ output 11 or more bytes
+> (assuming 4106) into a destination of size 4096
+>          snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>                   "blkdebug:%s:%s", s->config_file ?: "",
+>                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>                   bs->file->bs->exact_filename);
+>                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> cc1: all warnings being treated as errors
+> make: *** [/home/dummy/qemu/rules.mak:69: block/blkdebug.o] Error 1
+>   CC      block/blkverify.o
+> block/blkverify.c: In function ‘blkverify_refresh_filename’:
+> block/blkverify.c:309:29: error: ‘%s’ directive output may be truncated
+> writing up to 4095 bytes into a region of size 4086
+> [-Werror=format-truncation=]
+>                   "blkverify:%s:%s",
+>                              ^~
+> block/blkverify.c:308:9: note: ‘snprintf’ output between 12 and 8202
+> bytes into a destination of size 4096
+>          snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>                   "blkverify:%s:%s",
+>                   ~~~~~~~~~~~~~~~~~~
+>                   bs->file->bs->exact_filename,
+>                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>                   s->test_file->bs->exact_filename);
+>                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> cc1: all warnings being treated as errors
+> make: *** [/home/dummy/qemu/rules.mak:69: block/blkverify.o] Error 1
+>   CC      hw/usb/bus.o
+> hw/usb/bus.c: In function ‘usb_port_location’:
+> hw/usb/bus.c:410:66: error: ‘%d’ directive output may be truncated
+> writing between 1 and 11 bytes into a region of size between 0 and 15
+> [-Werror=format-truncation=]
+>          snprintf(downstream->path, sizeof(downstream->path), "%s.%d",
+>                                                                   ^~
+> hw/usb/bus.c:410:9: note: ‘snprintf’ output between 3 and 28 bytes into
+> a destination of size 16
+>          snprintf(downstream->path, sizeof(downstream->path), "%s.%d",
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>                   upstream->path, portnr);
+>                   ~~~~~~~~~~~~~~~~~~~~~~~
+> cc1: all warnings being treated as errors
+> make: *** [/home/dummy/qemu/rules.mak:69: hw/usb/bus.o] Error 1
+>   CC      net/slirp.o
+> net/slirp.c: In function ‘slirp_smb_cleanup’:
+> net/slirp.c:565:44: error: ‘%s’ directive output may be truncated
+> writing up to 127 bytes into a region of size 121
+> [-Werror=format-truncation=]
+>          snprintf(cmd, sizeof(cmd), "rm -rf %s", s->smb_dir);
+>                                             ^~
+> net/slirp.c:565:9: note: ‘snprintf’ output between 8 and 135 bytes into
+> a destination of size 128
+>          snprintf(cmd, sizeof(cmd), "rm -rf %s", s->smb_dir);
+>          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> net/slirp.c: In function ‘slirp_smb’:
+> net/slirp.c:609:46: error: ‘%s’ directive output may be truncated
+> writing 8 bytes into a region of size between 0 and 127
+> [-Werror=format-truncation=]
+>      snprintf(smb_conf, sizeof(smb_conf), "%s/%s", s->smb_dir, "smb.conf");
+>                                               ^~               ~~~~~~~~~~
+> net/slirp.c:609:5: note: ‘snprintf’ output between 10 and 137 bytes into
+> a destination of size 128
+>      snprintf(smb_conf, sizeof(smb_conf), "%s/%s", s->smb_dir, "smb.conf");
+>      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> net/slirp.c:654:55: error: ‘%s’ directive output may be truncated
+> writing up to 127 bytes into a region of size 110
+> [-Werror=format-truncation=]
+>      snprintf(smb_cmdline, sizeof(smb_cmdline), "%s -l %s -s %s",
+>                                                        ^~
+> net/slirp.c:654:5: note: ‘snprintf’ output 23 or more bytes (assuming
+> 150) into a destination of size 128
+>      snprintf(smb_cmdline, sizeof(smb_cmdline), "%s -l %s -s %s",
+>      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>               CONFIG_SMBD_COMMAND, s->smb_dir, smb_conf);
+>               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> cc1: all warnings being treated as errors
+> make: *** [/home/dummy/qemu/rules.mak:69: net/slirp.o] Error 1
+> make: Target 'all' not remade because of errors.
+>
+>
