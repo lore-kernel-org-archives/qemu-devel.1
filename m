@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cqgO9-0007D6-Up
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 09:33:23 -0400
+	(envelope-from <imammedo@redhat.com>) id 1cqgOH-0007L2-Dp
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 09:33:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cqgO8-0001o9-At
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 09:33:21 -0400
+	(envelope-from <imammedo@redhat.com>) id 1cqgOG-0001pU-Aj
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 09:33:29 -0400
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Wed, 22 Mar 2017 14:32:30 +0100
-Message-Id: <1490189568-167621-6-git-send-email-imammedo@redhat.com>
+Date: Wed, 22 Mar 2017 14:32:31 +0100
+Message-Id: <1490189568-167621-7-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1490189568-167621-1-git-send-email-imammedo@redhat.com>
 References: <1490189568-167621-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.10 05/23] numa: move source of default
- CPUs to NUMA node mapping into boards
+Subject: [Qemu-devel] [PATCH for-2.10 06/23] spapr: add node-id property to
+ sPAPR core
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,278 +23,124 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
 
-Originally CPU threads were by default assigned in
-round-robin fashion. However it was causing issues in
-guest since CPU threads from the same socket/core could
-be placed on different NUMA nodes.
-Commit fb43b73b (pc: fix default VCPU to NUMA node mapping)
-fixed it by grouping threads within a socket on the same node
-introducing cpu_index_to_socket_id() callback and commit
-20bb648d (spapr: Fix default NUMA node allocation for threads)
-reused callback to fix similar issues for SPAPR machine
-even though socket doesn't make much sense there.
-
-As result QEMU ended up having 3 default distribution rules
-used by 3 targets /virt-arm, spapr, pc/.
-
-In effort of moving NUMA mapping for CPUs into possible_cpus,
-generalize default mapping in numa.c by making boards decide
-on default mapping and let them explicitly tell generic
-numa code to which node a CPU thread belongs to by replacing
-cpu_index_to_socket_id() with @cpu_index_to_instance_props()
-which provides default node_id assigned by board to specified
-cpu_index.
+it will allow switching from cpu_index to core based numa
+mapping in follow up patches.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
-Patch only moves source of default mapping to possible_cpus[]
-and leaves the rest of NUMA handling to numa_info[node_id].node_cpu
-bitmaps. It's up to follow up patches to replace bitmaps
-with possible_cpus[] internally.
----
- include/hw/boards.h   |  8 ++++++--
- include/sysemu/numa.h |  2 +-
- hw/arm/virt.c         | 19 +++++++++++++++++--
- hw/i386/pc.c          | 22 ++++++++++++++++------
- hw/ppc/spapr.c        | 27 ++++++++++++++++++++-------
- numa.c                | 15 +++++++++------
- vl.c                  |  2 +-
- 7 files changed, 70 insertions(+), 25 deletions(-)
+ include/hw/ppc/spapr_cpu_core.h |  1 +
+ include/qom/cpu.h               |  2 ++
+ hw/ppc/spapr.c                  | 17 +++++++++++++++++
+ hw/ppc/spapr_cpu_core.c         | 11 ++++++++---
+ 4 files changed, 28 insertions(+), 3 deletions(-)
 
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 269d0ba..1dd0fde 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -74,7 +74,10 @@ typedef struct {
-  *    of HotplugHandler object, which handles hotplug operation
-  *    for a given @dev. It may return NULL if @dev doesn't require
-  *    any actions to be performed by hotplug handler.
-- * @cpu_index_to_socket_id:
-+ * @cpu_index_to_instance_props:
-+ *    used to provide @cpu_index to socket/core/thread number mapping, allowing
-+ *    legacy code to perform maping from cpu_index to topology properties
-+ *    Returns: tuple of socket/core/thread ids given cpu_index belongs to.
-  *    used to provide @cpu_index to socket number mapping, allowing
-  *    a machine to group CPU threads belonging to the same socket/package
-  *    Returns: socket number given cpu_index belongs to.
-@@ -138,7 +141,8 @@ struct MachineClass {
+diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
+index 3c35665..93051e9 100644
+--- a/include/hw/ppc/spapr_cpu_core.h
++++ b/include/hw/ppc/spapr_cpu_core.h
+@@ -27,6 +27,7 @@ typedef struct sPAPRCPUCore {
  
-     HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
-                                            DeviceState *dev);
--    unsigned (*cpu_index_to_socket_id)(unsigned cpu_index);
-+    CpuInstanceProperties (*cpu_index_to_instance_props)(MachineState *machine,
-+                                                         unsigned cpu_index);
-     const CPUArchIdList *(*possible_cpu_arch_ids)(MachineState *machine);
- };
+     /*< public >*/
+     void *threads;
++    int node_id;
+ } sPAPRCPUCore;
  
-diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-index 8f09dcf..46ea6c7 100644
---- a/include/sysemu/numa.h
-+++ b/include/sysemu/numa.h
-@@ -24,7 +24,7 @@ typedef struct node_info {
- } NodeInfo;
+ typedef struct sPAPRCPUCoreClass {
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index c3292ef..7f27d56 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -258,6 +258,8 @@ typedef void (*run_on_cpu_func)(CPUState *cpu, run_on_cpu_data data);
  
- extern NodeInfo numa_info[MAX_NODES];
--void parse_numa_opts(MachineClass *mc);
-+void parse_numa_opts(MachineState *ms);
- void numa_post_machine_init(void);
- void query_numa_node_mem(uint64_t node_mem[]);
- extern QemuOptsList qemu_numa_opts;
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 0cbcbc1..8748d25 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1554,6 +1554,16 @@ static void virt_set_gic_version(Object *obj, const char *value, Error **errp)
-     }
- }
+ struct qemu_work_item;
  
-+static CpuInstanceProperties
-+virt_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
-+{
-+    MachineClass *mc = MACHINE_GET_CLASS(ms);
-+    const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(ms);
++#define CPU_UNSET_NUMA_NODE_ID -1
 +
-+    assert(cpu_index < possible_cpus->len);
-+    return possible_cpus->cpus[cpu_index].props;;
-+}
-+
- static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
- {
-     int n;
-@@ -1573,8 +1583,12 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
-         ms->possible_cpus->cpus[n].props.has_thread_id = true;
-         ms->possible_cpus->cpus[n].props.thread_id = n;
- 
--        /* TODO: add 'has_node/node' here to describe
--           to which node core belongs */
-+        /* default distribution of CPUs over NUMA nodes */
-+        if (nb_numa_nodes) {
-+            /* preset values but do not enable them i.e. 'has_node_id = false',
-+             * board will enable them if manual mapping wasn't present on CLI */
-+            ms->possible_cpus->cpus[n].props.node_id = n % nb_numa_nodes;;
-+        }
-     }
-     return ms->possible_cpus;
- }
-@@ -1596,6 +1610,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-     /* We know we will never create a pre-ARMv7 CPU which needs 1K pages */
-     mc->minimum_page_bits = 12;
-     mc->possible_cpu_arch_ids = virt_possible_cpu_arch_ids;
-+    mc->cpu_index_to_instance_props = virt_cpu_index_to_props;
- }
- 
- static const TypeInfo virt_machine_info = {
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index d24388e..7031100 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -2245,12 +2245,14 @@ static void pc_machine_reset(void)
-     }
- }
- 
--static unsigned pc_cpu_index_to_socket_id(unsigned cpu_index)
-+static CpuInstanceProperties
-+pc_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
- {
--    X86CPUTopoInfo topo;
--    x86_topo_ids_from_idx(smp_cores, smp_threads, cpu_index,
--                          &topo);
--    return topo.pkg_id;
-+    MachineClass *mc = MACHINE_GET_CLASS(ms);
-+    const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(ms);
-+
-+    assert(cpu_index < possible_cpus->len);
-+    return possible_cpus->cpus[cpu_index].props;;
- }
- 
- static const CPUArchIdList *pc_possible_cpu_arch_ids(MachineState *ms)
-@@ -2282,6 +2284,14 @@ static const CPUArchIdList *pc_possible_cpu_arch_ids(MachineState *ms)
-         ms->possible_cpus->cpus[i].props.core_id = topo.core_id;
-         ms->possible_cpus->cpus[i].props.has_thread_id = true;
-         ms->possible_cpus->cpus[i].props.thread_id = topo.smt_id;
-+
-+        /* default distribution of CPUs over NUMA nodes */
-+        if (nb_numa_nodes) {
-+            /* preset values but do not enable them i.e. 'has_node_id = false',
-+             * board will enable them if manual mapping wasn't present on CLI */
-+            ms->possible_cpus->cpus[i].props.node_id =
-+                topo.pkg_id % nb_numa_nodes;
-+        }
-     }
-     return ms->possible_cpus;
- }
-@@ -2324,7 +2334,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-     pcmc->acpi_data_size = 0x20000 + 0x8000;
-     pcmc->save_tsc_khz = true;
-     mc->get_hotplug_handler = pc_get_hotpug_handler;
--    mc->cpu_index_to_socket_id = pc_cpu_index_to_socket_id;
-+    mc->cpu_index_to_instance_props = pc_cpu_index_to_props;
-     mc->possible_cpu_arch_ids = pc_possible_cpu_arch_ids;
-     mc->has_hotpluggable_cpus = true;
-     mc->default_boot_order = "cad";
+ /**
+  * CPUState:
+  * @cpu_index: CPU index (informative).
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 6ee566d..9dcbbcc 100644
+index 9dcbbcc..9c61721 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -2921,11 +2921,18 @@ static HotplugHandler *spapr_get_hotplug_handler(MachineState *machine,
-     return NULL;
- }
+@@ -2770,9 +2770,11 @@ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     MachineClass *mc = MACHINE_GET_CLASS(hotplug_dev);
+     Error *local_err = NULL;
+     CPUCore *cc = CPU_CORE(dev);
++    sPAPRCPUCore *sc = SPAPR_CPU_CORE(dev);
+     char *base_core_type = spapr_get_cpu_core_type(machine->cpu_model);
+     const char *type = object_get_typename(OBJECT(dev));
+     CPUArchId *core_slot;
++    int node_id;
+     int index;
  
--static unsigned spapr_cpu_index_to_socket_id(unsigned cpu_index)
-+static CpuInstanceProperties
-+spapr_cpu_index_to_props(MachineState *machine, unsigned cpu_index)
- {
--    /* Allocate to NUMA nodes on a "socket" basis (not that concept of
--     * socket means much for the paravirtualized PAPR platform) */
--    return cpu_index / smp_threads / smp_cores;
-+    CPUArchId *core_slot;
-+    MachineClass *mc = MACHINE_GET_CLASS(machine);
-+    int core_id = cpu_index / smp_threads * smp_threads;
-+
-+    /* make sure possible_cpu are intialized */
-+    mc->possible_cpu_arch_ids(machine);
-+    core_slot = spapr_find_cpu_slot(machine, core_id, NULL);
-+    assert(core_slot);
-+    return core_slot->props;
- }
- 
- static const CPUArchIdList *spapr_possible_cpu_arch_ids(MachineState *machine)
-@@ -2952,8 +2959,14 @@ static const CPUArchIdList *spapr_possible_cpu_arch_ids(MachineState *machine)
-         machine->possible_cpus->cpus[i].arch_id = core_id;
-         machine->possible_cpus->cpus[i].props.has_core_id = true;
-         machine->possible_cpus->cpus[i].props.core_id = core_id;
--        /* TODO: add 'has_node/node' here to describe
--           to which node core belongs */
-+
-+        /* default distribution of CPUs over NUMA nodes */
-+        if (nb_numa_nodes) {
-+            /* preset values but do not enable them i.e. 'has_node_id = false',
-+             * board will enable them if manual mapping wasn't present on CLI */
-+            machine->possible_cpus->cpus[i].props.node_id =
-+                core_id / smp_threads / smp_cores % nb_numa_nodes;
-+        }
+     if (dev->hotplugged && !mc->has_hotpluggable_cpus) {
+@@ -2801,6 +2803,21 @@ static void spapr_core_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+         goto out;
      }
-     return machine->possible_cpus;
- }
-@@ -3076,7 +3089,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-     hc->pre_plug = spapr_machine_device_pre_plug;
-     hc->plug = spapr_machine_device_plug;
-     hc->unplug = spapr_machine_device_unplug;
--    mc->cpu_index_to_socket_id = spapr_cpu_index_to_socket_id;
-+    mc->cpu_index_to_instance_props = spapr_cpu_index_to_props;
-     mc->possible_cpu_arch_ids = spapr_possible_cpu_arch_ids;
-     hc->unplug_request = spapr_machine_device_unplug_request;
  
-diff --git a/numa.c b/numa.c
-index e01cb54..b6e71bc 100644
---- a/numa.c
-+++ b/numa.c
-@@ -294,9 +294,10 @@ static void validate_numa_cpus(void)
-     g_free(seen_cpus);
- }
++    node_id = numa_get_node_for_cpu(cc->core_id);
++    if (node_id == nb_numa_nodes) {
++        /* by default CPUState::numa_node was 0 if it's not set via CLI
++         * keep it this way for now but in future we probably should
++         * refuse to start up with incomplete numa mapping */
++        node_id = 0;
++    }
++    if (sc->node_id == CPU_UNSET_NUMA_NODE_ID) {
++        sc->node_id = node_id;
++    } else if (sc->node_id != node_id) {
++        error_setg(&local_err, "node-id %d must match numa node specified"
++            "with -numa option for cpu-index %d", sc->node_id, cc->core_id);
++        goto out;
++    }
++
+ out:
+     g_free(base_core_type);
+     error_propagate(errp, local_err);
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index 6883f09..25988f8 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -163,7 +163,6 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+     const char *typename = object_class_get_name(scc->cpu_class);
+     size_t size = object_type_get_instance_size(typename);
+     Error *local_err = NULL;
+-    int core_node_id = numa_get_node_for_cpu(cc->core_id);;
+     void *obj;
+     int i, j;
  
--void parse_numa_opts(MachineClass *mc)
-+void parse_numa_opts(MachineState *ms)
- {
-     int i;
-+    MachineClass *mc = MACHINE_GET_CLASS(ms);
+@@ -181,10 +180,10 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
  
-     for (i = 0; i < MAX_NODES; i++) {
-         numa_info[i].node_cpu = bitmap_new(max_cpus);
-@@ -378,14 +379,16 @@ void parse_numa_opts(MachineClass *mc)
-          * rule grouping VCPUs by socket so that VCPUs from the same socket
-          * would be on the same node.
-          */
-+        if (!mc->cpu_index_to_instance_props) {
-+            error_report("default CPUs to NUMA node mapping isn't supported");
-+            exit(1);
-+        }
-         if (i == nb_numa_nodes) {
-             for (i = 0; i < max_cpus; i++) {
--                unsigned node_id = i % nb_numa_nodes;
--                if (mc->cpu_index_to_socket_id) {
--                    node_id = mc->cpu_index_to_socket_id(i) % nb_numa_nodes;
--                }
-+                CpuInstanceProperties props;
-+                props = mc->cpu_index_to_instance_props(ms, i);
- 
--                set_bit(i, numa_info[node_id].node_cpu);
-+                set_bit(i, numa_info[props.node_id].node_cpu);
-             }
+         /* Set NUMA node for the added CPUs  */
+         node_id = numa_get_node_for_cpu(cs->cpu_index);
+-        if (node_id != core_node_id) {
++        if (node_id != sc->node_id) {
+             error_setg(&local_err, "Invalid node-id=%d of thread[cpu-index: %d]"
+                 " on CPU[core-id: %d, node-id: %d], node-id must be the same",
+-                 node_id, cs->cpu_index, cc->core_id, core_node_id);
++                 node_id, cs->cpu_index, cc->core_id, sc->node_id);
+             goto err;
          }
+         if (node_id < nb_numa_nodes) {
+@@ -250,6 +249,11 @@ static const char *spapr_core_models[] = {
+     "POWER9_v1.0",
+ };
  
-diff --git a/vl.c b/vl.c
-index 0b4ed52..5ffb9c3 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4498,7 +4498,7 @@ int main(int argc, char **argv, char **envp)
-     default_drive(default_floppy, snapshot, IF_FLOPPY, 0, FD_OPTS);
-     default_drive(default_sdcard, snapshot, IF_SD, 0, SD_OPTS);
++static Property spapr_cpu_core_properties[] = {
++    DEFINE_PROP_INT32("node-id", sPAPRCPUCore, node_id, CPU_UNSET_NUMA_NODE_ID),
++    DEFINE_PROP_END_OF_LIST()
++};
++
+ void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(oc);
+@@ -257,6 +261,7 @@ void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
  
--    parse_numa_opts(machine_class);
-+    parse_numa_opts(current_machine);
- 
-     if (qemu_opts_foreach(qemu_find_opts("mon"),
-                           mon_init_func, NULL, NULL)) {
+     dc->realize = spapr_cpu_core_realize;
+     dc->unrealize = spapr_cpu_core_unrealizefn;
++    dc->props = spapr_cpu_core_properties;
+     scc->cpu_class = cpu_class_by_name(TYPE_POWERPC_CPU, data);
+     g_assert(scc->cpu_class);
+ }
 -- 
 2.7.4
