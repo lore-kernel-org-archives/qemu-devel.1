@@ -1,14 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45205)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cqWci-0001oD-JT
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 23:07:45 -0400
+	(envelope-from <jasowang@redhat.com>) id 1cqWii-0002m0-1a
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 23:13:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cqWce-0003uT-K1
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 23:07:44 -0400
+	(envelope-from <jasowang@redhat.com>) id 1cqWie-0005sr-T8
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 23:13:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37008)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cqWie-0005sn-KB
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 23:13:52 -0400
+References: <1489657928-14919-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<22303218-697c-7166-406b-050888efdfd5@redhat.com>
+	<cc051a40-9142-9364-8bc8-de8ec453ebe2@cn.fujitsu.com>
+	<8901e058-dcda-5c4a-e43a-38fca5814eb5@redhat.com>
+	<ff751bdb-95bf-4c76-b782-d2bc47746c02@cn.fujitsu.com>
+	<2875d736-61ae-b8f6-bb79-40aaddf3cb9b@redhat.com>
+	<af721967-8c73-1747-1428-adc390732cd1@cn.fujitsu.com>
+	<15aa7299-d364-cb03-f07f-778dfbb1f8a4@redhat.com>
+	<28bd303e-3b54-8465-2b23-9107d4ba18c6@cn.fujitsu.com>
 From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 22 Mar 2017 11:07:32 +0800
-Message-Id: <1490152052-9660-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PATCH] e1000: disable debug by default
+Message-ID: <ce6a10ba-c9ce-1587-b7db-80c4e8be14b6@redhat.com>
+Date: Wed, 22 Mar 2017 11:13:38 +0800
+MIME-Version: 1.0
+In-Reply-To: <28bd303e-3b54-8465-2b23-9107d4ba18c6@cn.fujitsu.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/3] Add COLO-proxy virtio-net support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,34 +34,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jasowang@redhat.com, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Leonid Bloch <leonid.bloch@ravellosystems.com>, Dmitry Fleytman <dmitry.fleytman@ravellosystems.com>, qemu-stable@nongnu.org
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>
+Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, "eddie . dong" <eddie.dong@intel.com>, bian naimeng <biannm@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-Disable debug output by default, the information were not needed for
-release.
 
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Leonid Bloch <leonid.bloch@ravellosystems.com>
-Cc: Dmitry Fleytman <dmitry.fleytman@ravellosystems.com>
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- hw/net/e1000.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/net/e1000.c b/hw/net/e1000.c
-index 9324949..f2e5072 100644
---- a/hw/net/e1000.c
-+++ b/hw/net/e1000.c
-@@ -40,7 +40,7 @@
- 
- static const uint8_t bcast[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
- 
--#define E1000_DEBUG
-+/* #define E1000_DEBUG */
- 
- #ifdef E1000_DEBUG
- enum {
--- 
-2.7.4
+On 2017=E5=B9=B403=E6=9C=8822=E6=97=A5 09:50, Zhang Chen wrote:
+>
+>
+> On 03/21/2017 05:15 PM, Jason Wang wrote:
+>>
+>>
+>> On 2017=E5=B9=B403=E6=9C=8821=E6=97=A5 15:08, Zhang Chen wrote:
+>>>
+>>>
+>>> On 03/21/2017 02:30 PM, Jason Wang wrote:
+>>>>
+>>>>
+>>>> On 2017=E5=B9=B403=E6=9C=8821=E6=97=A5 14:16, Zhang Chen wrote:
+>>>>>
+>>>>>
+>>>>> On 03/21/2017 02:10 PM, Jason Wang wrote:
+>>>>>>
+>>>>>>
+>>>>>> On 2017=E5=B9=B403=E6=9C=8821=E6=97=A5 13:47, Zhang Chen wrote:
+>>>>>>>
+>>>>>>>
+>>>>>>> On 03/21/2017 11:39 AM, Jason Wang wrote:
+>>>>>>>>
+>>>>>>>>
+>>>>>>>> On 2017=E5=B9=B403=E6=9C=8816=E6=97=A5 17:52, Zhang Chen wrote:
+>>>>>>>>> If user use -device virtio-net-pci, virtio-net driver will add=20
+>>>>>>>>> a header
+>>>>>>>>> to raw net packet that colo-proxy can't handle it. COLO-proxy=20
+>>>>>>>>> just
+>>>>>>>>> focus on the packet payload, so we skip the virtio-net header=20
+>>>>>>>>> to compare
+>>>>>>>>> the sent packet that primary guest's to secondary guest's.
+>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>> Zhang Chen (3):
+>>>>>>>>>    COLO-proxy: Add virtio-net packet parse function
+>>>>>>>>>    COLO-proxy: Add a tag to mark virtio-net packet
+>>>>>>>>>    COLO-compare: Add virtio-net packet compare support
+>>>>>>>>>
+>>>>>>>>>   net/colo-compare.c    | 42=20
+>>>>>>>>> +++++++++++++++++++++++++++++++++---------
+>>>>>>>>>   net/colo.c            | 14 ++++++++++----
+>>>>>>>>>   net/colo.h            |  7 ++++++-
+>>>>>>>>>   net/filter-rewriter.c | 15 ++++++++++-----
+>>>>>>>>>   4 files changed, 59 insertions(+), 19 deletions(-)
+>>>>>>>>>
+>>>>>>>>
+>>>>>>>> Hi:
+>>>>>>>>
+>>>>>>>> Git grep told us virtio-net is not the only user for vnet=20
+>>>>>>>> header. E1000e and vmxnet3 uses it too.
+>>>>>>>>
+>>>>>>>> So we need solve them all instead of being virtio-net specific.
+>>>>>>>>
+>>>>>>>
+>>>>>>> Yes, In this series I just try to parse vnet header, if failed I=20
+>>>>>>> will try to parse normal net packet.
+>>>>>>> So, I just focus on vnet header rather than virtio-net driver.
+>>>>>>> But the patch comments really make people confused , Should I=20
+>>>>>>> fix all the comments send the V2 ?
+>>>>>>
+>>>>>> Yes, please. Beside this, instead of using fixed vnet header len=20
+>>>>>> macro, you should query the backend for the length of vnet header.
+>>>>>
+>>>>> I want query the backend too, but colo-compare is not a netfilter=20
+>>>>> means it no need attach any netdev.
+>>>>> How can we query the backend for the length of vnet header?
+>>>>
+>>>> Filters can know this, then how about let filters add the vnet=20
+>>>> header length before the real packet and send it to colo-compare?
+>>>>
+>>>
+>>> I don't know whether I understand your comments...
+>>> Do you means filter send a vnet header length firstly(independent=20
+>>> length packet), then send the real packet?
+>>
+>> This requires too much changes and may break the compatibility of=20
+>> socket net backend.
+>>
+>>> If yes, I think it so expensive, in colo we use filter mirror or=20
+>>> redirect packet between primary and secondary
+>>> that no need to know the vnet header length.
+>>> Or do you means add a fake vnet header to real packet in same one=20
+>>> packet?
+>>
+>> Kind of, see below.
+>>
+>>> If yes, filter-mirror and filter-redirector must touch the packet do=20
+>>> some job like colo-compare.
+>>> We initial design split colo-proxy to 4 modules have make=20
+>>> filter-mirror and filter-redirector not to touch
+>>> the packet content, colo-compare and filter-rewriter do the packet=20
+>>> data related job.
+>>> Or you have other way to tell colo-compare the length?
+>>>
+>>> Thanks
+>>> Zhang Chen
+>>
+>> I mean e.g: We send a packet like struct {int size; const uint8_t=20
+>> buf[];} currently. We can try to add vnet header information like=20
+>> {int size; int vnet_hdr_len; const uint8_t buf[];}. Or even just pack=20
+>> the vnet_hdr_len information to the higher bits of size. Then we just=20
+>> need some encoding and decoding and the changes were limited.
+>>
+>> Does this make sense?
+>
+> Yes, encoding is OK in filter, but decoding we must touch the=20
+> "net_fill_rstate()", net/socket.c also use this
+> function to receive packet, other codes try to send packet like struct=20
+> {int size; const uint8_t buf[];} maybe conflict with it.
+> For the vnet header length do this job is acceptable?
+
+Yes, I think so.
+
+> and in what situation the vnet header length will be change?
+
+If guest support mrg_rxbuf or virtio 1.0, there will be 2 more bytes=20
+(__virtio16 num_buffers). And we plan to add more information in the=20
+header in the future.
+
+Thanks
+
+>
+> Thanks
+> Zhang Chen
