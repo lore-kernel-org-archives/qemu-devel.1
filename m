@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cqloY-0007rf-Pb
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 15:20:59 -0400
+	(envelope-from <nsoffer@redhat.com>) id 1cqlwi-0001lC-QD
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 15:29:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cqloT-0007Up-T3
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 15:20:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40828)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cqloT-0007Uf-Fm
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 15:20:53 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cqloP-0005A0-MT
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 19:20:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2E7EE2E819A
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 19:20:47 +0000 (UTC)
+	(envelope-from <nsoffer@redhat.com>) id 1cqlwd-0001MX-Sv
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 15:29:24 -0400
+Received: from mail-vk0-f50.google.com ([209.85.213.50]:35643)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <nsoffer@redhat.com>) id 1cqlwd-0001MI-NO
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 15:29:19 -0400
+Received: by mail-vk0-f50.google.com with SMTP id r69so23847270vke.2
+	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 12:29:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 22 Mar 2017 19:15:29 -0000
-From: luigiburdo <intermediadc@hotmail.com>
-Reply-To: Bug 1674925 <1674925@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170322092818.25605.49354.malonedeb@gac.canonical.com>
-Message-Id: <AM5P194MB01297823A835C4F56CE786AAC83C0@AM5P194MB0129.EURP194.PROD.OUTLOOK.COM>
-Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Qemu-ppc] [Bug 1674925] Re: Qemu PPC64 kvm no
- display if --device virtio-gpu-pci is selected
+References: <20170322111608.31230-1-stefanha@redhat.com>
+In-Reply-To: <20170322111608.31230-1-stefanha@redhat.com>
+From: Nir Soffer <nsoffer@redhat.com>
+Date: Wed, 22 Mar 2017 19:29:07 +0000
+Message-ID: <CAMRbyysE0+GPze8mFZyaWqTywGMW67t+JKV1xX_CvX_dcu5q7A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v3 0/8] qemu-img: add measure sub-command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,97 +27,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Maor Lipchuk <mlipchuk@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Alberto Garcia <berto@igalia.com>, John Snow <jsnow@redhat.com>
 
-Hello C=C3=A9dric,
+On Wed, Mar 22, 2017 at 2:28 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
 
-with your last message you made me think about and make more test.
+> v3:
+>  * Drop RFC, this is ready to go for QEMU 2.10
+>  * Use "required size" instead of "required bytes" in qemu-img output for
+>    consistency [Nir]
+>  * Clarify BlockMeasureInfo semantics [Max]
+>  * Clarify bdrv_measure() opts argument and error handling [Nir]
+>  * Handle -o backing_file= for qcow2 [Max]
+>  * Handle snapshot options in qemu-img measure
+>  * Probe input image for allocated data clusters for qcow2.  Didn't
+> centralize
+>    this because there are format-specific aspects such as the
+> cluster_size.  It
+>    may make sense to centralize it later (with a bit more complexity) if
+>    support is added to more formats.
+>  * Add qemu-img(1) man page section for 'measure' sub-command [Max]
+>  * Extend test case to cover additional scenarios [Nir]
+>
+> RFCv2:
+>  * Publishing RFC again to discuss the new user-visible interfaces.  Code
+> has
+>    changed quite a bit, I have not kept any Reviewed-by tags.
+>  * Rename qemu-img sub-command "measure" and API bdrv_measure() [Nir]
+>  * Report both "required bytes" and "fully allocated bytes" to handle the
+> empty
+>    image file and prealloc use cases [Nir and Dan]
+>  * Use bdrv_getlength() instead of bdrv_nb_sectors() [Berto]
+>  * Rename "err" label "out" in qemu-img-cmds.c [Nir]
+>  * Add basic qcow2 support, doesn't support qemu-img convert from existing
+> files yet
+>
+> RFCv1:
+>  * Publishing patch series with just raw support, no qcow2 yet.  Please
+> review
+>    the command-line interface and let me know if you are happy with this
+>    approach.
+>
+> Users and management tools sometimes need to know the size required for a
+> new
+> disk image so that an LVM volume, SAN LUN, etc can be allocated ahead of
+> time.
+> Image formats like qcow2 have non-trivial metadata that makes it hard to
+> estimate the exact size without knowledge of file format internals.
+>
+> This patch series introduces a new qemu-img sub-command that calculates the
+> required size for both image creation and conversion scenarios.
+>
+> The conversion scenario is:
+>
+>   $ qemu-img measure -f raw -O qcow2 input.img
+>   required size: 1327680
+>   fully allocated size: 1074069504
+>
+> Here an existing image file is taken and the output includes the space
+> required
+> for data from the input image file.
+>
+> The creation scenario is:
+>
+>   $ qemu-img measure -O qcow2 --size 5G
+>   required size: 327680
+>   fully allocated size: 1074069504
+>
+> Stefan Hajnoczi (8):
+>   block: add bdrv_measure() API
+>   raw-format: add bdrv_measure() support
+>   qcow2: extract preallocation calculation function
+>   qcow2: extract image creation option parsing
+>   qcow2: add bdrv_measure() support
+>   qemu-img: add measure subcommand
+>   qemu-iotests: support per-format golden output files
+>   iotests: add test 178 for qemu-img measure
+>
+>  qapi/block-core.json             |  25 +++
+>  include/block/block.h            |   4 +
+>  include/block/block_int.h        |   2 +
+>  block.c                          |  35 ++++
+>  block/qcow2.c                    | 362
+> +++++++++++++++++++++++++++++----------
+>  block/raw-format.c               |  22 +++
+>  qemu-img.c                       | 227 ++++++++++++++++++++++++
+>  qemu-img-cmds.hx                 |   6 +
+>  qemu-img.texi                    |  25 +++
+>  tests/qemu-iotests/178           | 144 ++++++++++++++++
+>  tests/qemu-iotests/178.out.qcow2 | 242 ++++++++++++++++++++++++++
+>  tests/qemu-iotests/178.out.raw   | 130 ++++++++++++++
+>  tests/qemu-iotests/check         |   5 +
+>  tests/qemu-iotests/group         |   1 +
+>  14 files changed, 1136 insertions(+), 94 deletions(-)
+>  create mode 100755 tests/qemu-iotests/178
+>  create mode 100644 tests/qemu-iotests/178.out.qcow2
+>  create mode 100644 tests/qemu-iotests/178.out.raw
+>
+> --
+> 2.9.3
+>
 
->The default machine for qemu-system-ppc64 is pseries.
-yes usually with 2.8 i  boot  the VM without issue on G5 Quad  with the opt=
-ion  -M  pseries from 2.1 to 2.5 with kvm-pr enabled.
-i did the tests and with all pseries now on 2.9 i have the same issue.
-example:
-qemu-system-ppc64 --enable-kvm -cpu 970fx_v2.0 -m 1024 -M pseries-2.1
-qemu-system-ppc64: KVM and IRQ_XICS capability must be present for in-kerne=
-l XICS
+Stefan, is this available in some public git repo?
 
-but no issue if i run with -M mac99 before 2.9 was not possible use it on q=
-emu-system-ppc64
-It means it will no possible anymore in future release of qemu use open fir=
-mware on powermacs any moore?
+I would like to test it,  and downloading and applying 8 patches is lot of
+work.
+(I'm probably not using the right tools for this).
 
-
->I admit the message is not very clear, but the host kernel is
->using a dev config.
-
-Im so sorry, i learn English by my self reading ml and on irc chatting
-is too difficult where no one speak English  around.
-
->> On Qoriq if i pass the -cpu e500 (normal thing) all is working right qem=
-u 2.9rc1
->> all boot and so and so.
->but you must be changing the machine right ?
-not on Qoriq because it is book3e and is not so flexible like the G5 Quad w=
-ho is book3s machine.
-i can run qemu kvm only with emb hardware on Qoriq
-
->>On G5 the -cpu variable dont fix the issue.
->with which machine ?
-On PowerMac G5 Quad 970MP it have similar hardware configuration of IBM int=
-ellistation power 285
-
-> >I can build a new kernel release , usually mine dont have xics enabled b=
-ecause G5
->> dont have that feature, if needed i can enable it for testing.**
->Yes that would be interesting.
-
-I will do ASAP just the time to build it .
-
-Thank you really much for your time and patience.
-Luigi
-________________________________
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1674925
-
-Title:
-  Qemu PPC64 kvm no display if  --device virtio-gpu-pci is selected
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hi,
-  i did many tests on qemu 2.8 on my BE machines and i found an issue that =
-i think was need to be reported
-
-  Test Machines BE 970MP
-
-  if i setup qemu with
-
-  qemu-system-ppc64 -M 1024 --display sdl(or gtk),gl=3Don --device virtio-
-  gpu-pci,virgl --enable-kvm and so and so
-
-  result is doubled window one is vga other is virtio-gpu-pci without
-  any start of the VM . pratically i dont have any output of openbios
-  and on the virtual serial output
-
-  the same issue i found is if i select:
-  qemu-system-ppc64 -M 1024 --display gtk(or sdl) --device virtio-gpu-pci -=
--enable-kvm and so and so
-
-  =
-
-  i had been try to change all the -M types of all kind of pseries without =
-any positive result.
-
-  Ciao =
-
-  Luigi
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1674925/+subscriptions
+Nir
