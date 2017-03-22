@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cqj82-0001XU-8e
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:28:55 -0400
+	(envelope-from <mst@redhat.com>) id 1cqj83-0001YF-Bf
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:28:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cqj7y-0005QJ-Ua
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:28:54 -0400
-Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:34831)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cqj7y-0005Px-O5
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:28:50 -0400
-Received: by mail-wr0-x22f.google.com with SMTP id g10so132489768wrg.2
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 09:28:50 -0700 (PDT)
-References: <20170315144825.3108-1-alex.bennee@linaro.org>
-	<CABoDooPQt2WJWJcf0FzwvJQU8Yb7OQjfAwbioY_+0ED_nVq-dw@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CABoDooPQt2WJWJcf0FzwvJQU8Yb7OQjfAwbioY_+0ED_nVq-dw@mail.gmail.com>
-Date: Wed, 22 Mar 2017 16:28:47 +0000
-Message-ID: <87h92lxolc.fsf@linaro.org>
+	(envelope-from <mst@redhat.com>) id 1cqj80-0005Qi-20
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:28:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32924)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cqj7z-0005QO-SP
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:28:51 -0400
+Date: Wed, 22 Mar 2017 18:28:49 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170322182815-mutt-send-email-mst@kernel.org>
+References: <1490198476-12244-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH] ui/console: ensure graphic updates
- don't race with TCG vCPUs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1490198476-12244-1-git-send-email-mst@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 0/4] virtio, pc: fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,71 +26,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Desnogues <laurent.desnogues@gmail.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
+On Wed, Mar 22, 2017 at 06:01:31PM +0200, Michael S. Tsirkin wrote:
+> The following changes since commit 55a19ad8b2d0797e3a8fe90ab99a9bb713824059:
+> 
+>   Update version for v2.9.0-rc1 release (2017-03-21 17:13:29 +0000)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+> 
+> for you to fetch changes up to 807211b76603b094c46a0cd95a3c785f47f3ab73:
+> 
+>   hw/acpi/vmgenid: prevent more than one vmgenid device (2017-03-22 17:56:00 +0200)
 
-Laurent Desnogues <laurent.desnogues@gmail.com> writes:
+I tweaked commit log on two patches at submitter's request.
+Pushed 160f57134960e6356257e54408f6bce382aac5f6 - same tree.
 
-> Hi Alex,
->
-> this patch breaks:
->
->   http://wiki.qemu.org/download/arm-test-0.2.tar.gz
->
-> qemu-system-arm -kernel zImage.integrator -initrd arm_root.img
-> -append "console=ttyAMA0" -machine integratorcp -serial stdio -icount
-> 0
-> Uncompressing Linux..........................................................................
-> done, booting the kernel.
-> qemu-system-arm: /work/qemu/qemu/memory.c:920:
-> memory_region_transaction_commit: Assertion
-> `qemu_mutex_iothread_locked()' failed.
-
-Doh - too many levels of BQL. So wi->exclusive tasks drop the iothread
-so they don't deadlock as any other threads try and wake up and get to
-cpu_exec_end. Of course the update was originally under BQL so the
-deferred work should be as well. We have to make a minor tweak to avoid
-triggering RCU clean-up outside the execution context though. Try this:
-
-ui/console: ensure do_safe_dpy_refresh holds BQL
-
-I missed the fact that when an exclusive work item runs it drops the
-BQL to ensure all no vCPUs are stuck waiting for it, hence causing a
-deadlock. However the actual helper needs to take the BQL especially
-as we'll be messing with device emulation bits during the update which
-all assume BQL is held.
-
-We make a minor cpu_reloading_memory_map which must try and unlock the
-RCU if we are actually outside the running context.
-
-Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-CC: Gerd Hoffmann <kraxel@redhat.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
-2 files changed, 3 insertions(+), 1 deletion(-)
-cpu-exec-common.c | 2 +-
-ui/console.c      | 2 ++
-
-modified   cpu-exec-common.c
-@@ -35,7 +35,7 @@ void cpu_loop_exit_noexc(CPUState *cpu)
- #if defined(CONFIG_SOFTMMU)
- void cpu_reloading_memory_map(void)
- {
--    if (qemu_in_vcpu_thread()) {
-+    if (qemu_in_vcpu_thread() && current_cpu->running) {
-         /* The guest can in theory prolong the RCU critical section as long
-          * as it feels like. The major problem with this is that because it
-          * can do multiple reconfigurations of the memory map within the
-modified   ui/console.c
-@@ -1586,7 +1586,9 @@ bool dpy_gfx_check_format(QemuConsole *con,
- static void do_safe_dpy_refresh(CPUState *cpu, run_on_cpu_data opaque)
- {
-     DisplayChangeListener *dcl = opaque.host_ptr;
-+    qemu_mutex_lock_iothread();
-     dcl->ops->dpy_refresh(dcl);
-+    qemu_mutex_unlock_iothread();
- }
-
- static void dpy_refresh(DisplayState *s)
+> ----------------------------------------------------------------
+> virtio, pc: fixes
+> 
+> virtio and misc fixes for 2.9.
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> ----------------------------------------------------------------
+> Fam Zheng (1):
+>       virtio: Fix error handling in virtio_bus_device_plugged
+> 
+> Laszlo Ersek (2):
+>       hw/acpi/vmgenid: prevent device realization on pre-2.5 machine types
+>       hw/acpi/vmgenid: prevent more than one vmgenid device
+> 
+> Paolo Bonzini (1):
+>       virtio: always use handle_aio_output if registered
+> 
+>  include/hw/acpi/vmgenid.h |  2 ++
+>  include/hw/compat.h       |  4 ++++
+>  hw/acpi/vmgenid.c         | 22 ++++++++++++++++++++++
+>  hw/virtio/virtio-bus.c    | 20 +++++++++++++++++---
+>  hw/virtio/virtio.c        | 13 ++++++++++++-
+>  5 files changed, 57 insertions(+), 4 deletions(-)
+> 
