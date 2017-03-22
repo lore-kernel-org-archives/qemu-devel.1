@@ -1,17 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cqhW2-00013r-Kp
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 10:45:36 -0400
+	(envelope-from <bobby.prani@gmail.com>) id 1cqhg4-0005pi-R5
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 10:55:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cqhW1-0000UQ-Cj
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 10:45:34 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Wed, 22 Mar 2017 09:45:25 -0500
-Message-Id: <20170322144525.18964-4-eblake@redhat.com>
-In-Reply-To: <20170322144525.18964-1-eblake@redhat.com>
-References: <20170322144525.18964-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 3/3] qapi: Fix QemuOpts visitor regression
- on unvisited input
+	(envelope-from <bobby.prani@gmail.com>) id 1cqhg3-0005LH-RM
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 10:55:56 -0400
+Received: from mail-yw0-x242.google.com ([2607:f8b0:4002:c05::242]:32921)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
+	id 1cqhg3-0005Ks-BT
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 10:55:55 -0400
+Received: by mail-yw0-x242.google.com with SMTP id p77so20523658ywg.0
+	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 07:55:55 -0700 (PDT)
+MIME-Version: 1.0
+Sender: bobby.prani@gmail.com
+In-Reply-To: <CAFEAcA8-GJxpmppZGF5ygSAL4Y81BdvYKqso-XhjR2pbjMLi+A@mail.gmail.com>
+References: <CAG48ez1tcz7GGsc5+L3EF140NsW=UyNir=0UpuZZYrBn4ZxrSA@mail.gmail.com>
+	<CAFEAcA8-GJxpmppZGF5ygSAL4Y81BdvYKqso-XhjR2pbjMLi+A@mail.gmail.com>
+From: Pranith Kumar <bobby.prani+qemu@gmail.com>
+Date: Wed, 22 Mar 2017 10:55:23 -0400
+Message-ID: <CAJhHMCA=rwLqLOPq3kMOz9SpV83yrzkK_K6RfPmuyXMU1pXT7g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [BUG] user-to-root privesc inside VM via bad
+ translation caching
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,111 +31,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, lvivier@redhat.com, qemu-stable@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Jann Horn <jannh@google.com>, Qemu Developers <qemu-devel@nongnu.org>
 
-An off-by-one in commit 15c2f669e meant that we were failing to
-check for unparsed input in all QemuOpts visitors.  Recent testsuite
-additions show that fixing the obvious bug with bogus fields will
-also fix the case of an incomplete list visit; update the tests to
-match the new behavior.
+On Mon, Mar 20, 2017 at 10:46 AM, Peter Maydell wrote:
+> On 20 March 2017 at 14:36, Jann Horn <jannh@google.com> wrote:
+>> This is an issue in QEMU's system emulation for X86 in TCG mode.
+>> The issue permits an attacker who can execute code in guest ring 3
+>> with normal user privileges to inject code into other processes that
+>> are running in guest ring 3, in particular root-owned processes.
+>
+>> I am sending this to qemu-devel because a QEMU security contact
+>> told me that QEMU does not consider privilege escalation inside a
+>> TCG VM to be a security concern.
+>
+> Correct; it's just a bug. Don't trust TCG QEMU as a security boundary.
+>
+> We should really fix the crossing-a-page-boundary code for x86.
+> I believe we do get it correct for ARM Thumb instructions.
 
-Simple testcase:
+How about doing the instruction size check as follows?
 
-./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic -qmp stdio -numa node,size=1g
-
-failed to diagnose that 'size' is not a valid argument to -numa, and
-now once again reports:
-
-qemu-system-x86_64: -numa node,size=1g: Invalid parameter 'size'
-
-See also https://bugzilla.redhat.com/show_bug.cgi?id=1434666
-
-CC: qemu-stable@nongnu.org
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-Tested-by: Laurent Vivier <lvivier@redhat.com>
-
----
-v3: drop spurious hunk, comment tweak, add BZ number
-v2: trivial rebase to comment tweak in patch 1
----
- qapi/opts-visitor.c       |  6 +++---
- tests/test-opts-visitor.c | 13 ++++++++-----
- 2 files changed, 11 insertions(+), 8 deletions(-)
-
-diff --git a/qapi/opts-visitor.c b/qapi/opts-visitor.c
-index 026d25b..324b197 100644
---- a/qapi/opts-visitor.c
-+++ b/qapi/opts-visitor.c
-@@ -164,7 +164,7 @@ opts_check_struct(Visitor *v, Error **errp)
-     GHashTableIter iter;
-     GQueue *any;
-
--    if (ov->depth > 0) {
-+    if (ov->depth > 1) {
-         return;
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index 72c1b03a2a..94cf3da719 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -8235,6 +8235,10 @@ static target_ulong disas_insn(CPUX86State
+*env, DisasContext *s,
+     default:
+         goto unknown_op;
      }
++    if (s->pc - pc_start > 15) {
++        s->pc = pc_start;
++        goto illegal_op;
++    }
+     return s->pc;
+  illegal_op:
+     gen_illegal_opcode(s);
 
-@@ -276,8 +276,8 @@ static void
- opts_check_list(Visitor *v, Error **errp)
- {
-     /*
--     * FIXME should set error when unvisited elements remain.  Mostly
--     * harmless, as the generated visits always visit all elements.
-+     * Unvisited list elements will be reported later when checking
-+     * whether unvisited struct members remain.
-      */
- }
-
-diff --git a/tests/test-opts-visitor.c b/tests/test-opts-visitor.c
-index 8e0dda5..23e8970 100644
---- a/tests/test-opts-visitor.c
-+++ b/tests/test-opts-visitor.c
-@@ -175,6 +175,7 @@ expect_u64_max(OptsVisitorFixture *f, gconstpointer test_data)
- static void
- test_opts_range_unvisited(void)
- {
-+    Error *err = NULL;
-     intList *list = NULL;
-     intList *tail;
-     QemuOpts *opts;
-@@ -199,10 +200,11 @@ test_opts_range_unvisited(void)
-     g_assert_cmpint(tail->value, ==, 1);
-     tail = (intList *)visit_next_list(v, (GenericList *)tail, sizeof(*list));
-     g_assert(tail);
--    visit_check_list(v, &error_abort); /* BUG: unvisited tail not reported */
-+    visit_check_list(v, &error_abort); /* unvisited tail ignored until... */
-     visit_end_list(v, (void **)&list);
-
--    visit_check_struct(v, &error_abort);
-+    visit_check_struct(v, &err); /* ...here */
-+    error_free_or_abort(&err);
-     visit_end_struct(v, NULL);
-
-     qapi_free_intList(list);
-@@ -250,6 +252,7 @@ test_opts_range_beyond(void)
- static void
- test_opts_dict_unvisited(void)
- {
-+    Error *err = NULL;
-     QemuOpts *opts;
-     Visitor *v;
-     UserDefOptions *userdef;
-@@ -258,11 +261,11 @@ test_opts_dict_unvisited(void)
-                            &error_abort);
-
-     v = opts_visitor_new(opts);
--    /* BUG: bogus should be diagnosed */
--    visit_type_UserDefOptions(v, NULL, &userdef, &error_abort);
-+    visit_type_UserDefOptions(v, NULL, &userdef, &err);
-+    error_free_or_abort(&err);
-     visit_free(v);
-     qemu_opts_del(opts);
--    qapi_free_UserDefOptions(userdef);
-+    g_assert(!userdef);
- }
-
- int
--- 
-2.9.3
+Thanks,
+--
+Pranith
