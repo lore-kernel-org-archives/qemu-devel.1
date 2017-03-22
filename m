@@ -1,32 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32947)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cqm6h-0004mY-32
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 15:39:44 -0400
+	(envelope-from <janne.huttunen@nokia.com>) id 1cqmIT-0007FS-9t
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 15:51:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cqm6d-0004sX-4v
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 15:39:43 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:36110)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cqm6c-0004sK-Vr
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 15:39:39 -0400
-Received: by mail-qt0-x243.google.com with SMTP id n37so26663394qtb.3
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 12:39:38 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <CAFEAcA9pqDoCWrPAJ+KVxLC_eRy-xRg36oYuARYg2YP8VpGpBg@mail.gmail.com>
-	<c46ff864-fc8b-aeba-30f4-4c773f879786@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <85b94581-70ec-3e7e-1f2f-dd70204fb68c@amsat.org>
-Date: Wed, 22 Mar 2017 16:39:34 -0300
+	(envelope-from <janne.huttunen@nokia.com>) id 1cqmIQ-0008HR-6t
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 15:51:53 -0400
+Received: from mail-db5eur01on0129.outbound.protection.outlook.com
+	([104.47.2.129]:45792
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <janne.huttunen@nokia.com>)
+	id 1cqmIP-0008H8-OR
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 15:51:50 -0400
+Message-ID: <1490195960.19055.105.camel@nokia.com>
+From: Janne Huttunen <janne.huttunen@nokia.com>
+Date: Wed, 22 Mar 2017 17:19:20 +0200
+In-Reply-To: <8616b7ec-8306-25b4-267c-449f94261502@redhat.com>
+References: <cover.1489494746.git.janne.huttunen@nokia.com>
+	<1489510640.8844.18.camel@redhat.com>
+	<1489561105.24841.25.camel@nokia.com>
+	<11a3eab4-77f8-87ea-9558-299fbfc77a07@redhat.com>
+	<1490164614.19055.31.camel@nokia.com>
+	<1558854179.6445757.1490172190685.JavaMail.zimbra@redhat.com>
+	<1490173225.19055.48.camel@nokia.com>
+	<c1a80bf6-1379-8402-06d4-01247825fcf0@redhat.com>
+	<1490191138.19055.92.camel@nokia.com>
+	<8616b7ec-8306-25b4-267c-449f94261502@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
-In-Reply-To: <c46ff864-fc8b-aeba-30f4-4c773f879786@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] rawhide gcc failures [was: Proposal for
- deprecating unsupported host OSes & architecutures]
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC][PATCH 0/6] "bootonceindex" property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,119 +38,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc: "kraxel@redhat.com" <kraxel@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-so lovely...
+On Wed, 2017-03-22 at 15:36 +0100, Laszlo Ersek wrote:
+>=C2=A0
+> To my knowledge, currently the bootindex properties cannot be changed
+> dynamically (for example with monitor commands) after they have been
+> specified on the QEMU command line.
 
-as a start point for bleeding edge stuff this can go in CI as a 
-complement of debian images in tests/docker/... using the official 
-fedora:rawhide base image.
+Yes they can, via QMP:
 
-On 03/22/2017 04:07 PM, Eric Blake wrote:
-> On 03/16/2017 10:23 AM, Peter Maydell wrote:
->> OK, here's a concrete proposal for deprecating/dropping out of
->> date host OS and architecture support.
->>
->> We'll put this in the ChangeLog 'Future incompatible changes'
->> section:
->> -----
->> * Removal of support for untested host OS and architectures:
->
-> Tangentially-related: do we officially support bleeding-edge OS builds?
-> For example, current rawhide has a new-enough gcc that gives some
-> (possibly-useful) new warnings (-Werror=format-truncation) that fire
-> when formatting what can be easily proven to be larger than a
-> fixed-width buffer will hold.  If rawhide is not a current target, then
-> I don't need to spend any time on this (yet); but if rawhide builds ARE
-> supported, then we want this patched before 2.9:
->
->
->   CC      block/blkdebug.o
-> block/blkdebug.c: In function ‘blkdebug_refresh_filename’:
-> block/blkdebug.c:693:31: error: ‘%s’ directive output may be truncated
-> writing up to 4095 bytes into a region of size 4086
-> [-Werror=format-truncation=]
->                   "blkdebug:%s:%s", s->config_file ?: "",
->                                ^~
-> block/blkdebug.c:692:9: note: ‘snprintf’ output 11 or more bytes
-> (assuming 4106) into a destination of size 4096
->          snprintf(bs->exact_filename, sizeof(bs->exact_filename),
->          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->                   "blkdebug:%s:%s", s->config_file ?: "",
->                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->                   bs->file->bs->exact_filename);
->                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> cc1: all warnings being treated as errors
-> make: *** [/home/dummy/qemu/rules.mak:69: block/blkdebug.o] Error 1
->   CC      block/blkverify.o
-> block/blkverify.c: In function ‘blkverify_refresh_filename’:
-> block/blkverify.c:309:29: error: ‘%s’ directive output may be truncated
-> writing up to 4095 bytes into a region of size 4086
-> [-Werror=format-truncation=]
->                   "blkverify:%s:%s",
->                              ^~
-> block/blkverify.c:308:9: note: ‘snprintf’ output between 12 and 8202
-> bytes into a destination of size 4096
->          snprintf(bs->exact_filename, sizeof(bs->exact_filename),
->          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->                   "blkverify:%s:%s",
->                   ~~~~~~~~~~~~~~~~~~
->                   bs->file->bs->exact_filename,
->                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->                   s->test_file->bs->exact_filename);
->                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> cc1: all warnings being treated as errors
-> make: *** [/home/dummy/qemu/rules.mak:69: block/blkverify.o] Error 1
->   CC      hw/usb/bus.o
-> hw/usb/bus.c: In function ‘usb_port_location’:
-> hw/usb/bus.c:410:66: error: ‘%d’ directive output may be truncated
-> writing between 1 and 11 bytes into a region of size between 0 and 15
-> [-Werror=format-truncation=]
->          snprintf(downstream->path, sizeof(downstream->path), "%s.%d",
->                                                                   ^~
-> hw/usb/bus.c:410:9: note: ‘snprintf’ output between 3 and 28 bytes into
-> a destination of size 16
->          snprintf(downstream->path, sizeof(downstream->path), "%s.%d",
->          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->                   upstream->path, portnr);
->                   ~~~~~~~~~~~~~~~~~~~~~~~
-> cc1: all warnings being treated as errors
-> make: *** [/home/dummy/qemu/rules.mak:69: hw/usb/bus.o] Error 1
->   CC      net/slirp.o
-> net/slirp.c: In function ‘slirp_smb_cleanup’:
-> net/slirp.c:565:44: error: ‘%s’ directive output may be truncated
-> writing up to 127 bytes into a region of size 121
-> [-Werror=format-truncation=]
->          snprintf(cmd, sizeof(cmd), "rm -rf %s", s->smb_dir);
->                                             ^~
-> net/slirp.c:565:9: note: ‘snprintf’ output between 8 and 135 bytes into
-> a destination of size 128
->          snprintf(cmd, sizeof(cmd), "rm -rf %s", s->smb_dir);
->          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> net/slirp.c: In function ‘slirp_smb’:
-> net/slirp.c:609:46: error: ‘%s’ directive output may be truncated
-> writing 8 bytes into a region of size between 0 and 127
-> [-Werror=format-truncation=]
->      snprintf(smb_conf, sizeof(smb_conf), "%s/%s", s->smb_dir, "smb.conf");
->                                               ^~               ~~~~~~~~~~
-> net/slirp.c:609:5: note: ‘snprintf’ output between 10 and 137 bytes into
-> a destination of size 128
->      snprintf(smb_conf, sizeof(smb_conf), "%s/%s", s->smb_dir, "smb.conf");
->      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> net/slirp.c:654:55: error: ‘%s’ directive output may be truncated
-> writing up to 127 bytes into a region of size 110
-> [-Werror=format-truncation=]
->      snprintf(smb_cmdline, sizeof(smb_cmdline), "%s -l %s -s %s",
->                                                        ^~
-> net/slirp.c:654:5: note: ‘snprintf’ output 23 or more bytes (assuming
-> 150) into a destination of size 128
->      snprintf(smb_cmdline, sizeof(smb_cmdline), "%s -l %s -s %s",
->      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->               CONFIG_SMBD_COMMAND, s->smb_dir, smb_conf);
->               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> cc1: all warnings being treated as errors
-> make: *** [/home/dummy/qemu/rules.mak:69: net/slirp.o] Error 1
-> make: Target 'all' not remade because of errors.
->
->
+{'execute': 'qom-get', 'arguments': { 'path': 'scsi0.0/child[0]',
+'property': 'bootindex' }}
+{"return": 10}
+
+{'execute': 'qom-set', 'arguments': { 'path': 'scsi0.0/child[0]',
+'property': 'bootindex', 'value': 11 }}
+{"return": {}}
+
+{'execute': 'qom-get', 'arguments': { 'path': 'scsi0.0/child[0]',
+'property': 'bootindex' }}
+{"return": 11}
+
+
+I have no idea if doing so breaks something, like e.g.
+migration, but it definitely can be done.
+
+> And, even if some settings can be changed, the question is what agent
+> changes them. If the management layer (libvirt etc) changes them
+> using
+> monitor commands, then libvirt itself can keep track of that state,
+> and
+> then start the QEMU process on the destination=C2=A0=C2=A0host with a sui=
+tably
+> modified command line.
+>=20
+> Whereas, if it is the guest that changes device state, memory state
+> etc,
+> then those things have to be part of the migration stream.
+
+True.
+
+> > If it
+> > is, migrating the "bootonceindex" values the same way should
+> > be sufficient, no?
+> To my knowledge, "bootindex" properties are not migrated now, and
+> they
+> also need not to, because they never change at runtime.
+
+Like demonstrated above, they can change, but of course
+there might be an assumption that they won't change
+"unexpectedly".
+
+> If the second system sets a temporary boot order for the first system
+> "every now and then", which I guess entails on-demand talking to the
+> first system's management processor, then how can you replace that
+> with
+> a static QEMU command line (with the proposed bootonceindex
+> property)?
+
+I'm not. I'm using QMP to change the index dynamically.
+
+> I'm not saying that the use case is without merit. My point is that
+> this
+> new property would introduce obscure interactions with other
+> components
+> in the virt stack around QEMU, and it could have a significant
+> maintenance footprint, while the feature does look niche (to me
+> anyway).
+
+Maybe, and it is definitely good to analyze it. Like I
+already admitted, I did not think about migration at all
+and there may very well have been other things I have
+overlooked too.
