@@ -1,31 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cqkuw-0003Yz-4K
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:23:31 -0400
+	(envelope-from <anthony.xu@intel.com>) id 1cqkxz-0004Zw-TI
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:26:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cqkur-0003Kz-Vd
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:23:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42364)
+	(envelope-from <anthony.xu@intel.com>) id 1cqkxv-0004gL-P5
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:26:39 -0400
+Received: from mga01.intel.com ([192.55.52.88]:10927)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cqkur-0003KK-N8
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:23:25 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 819177F7C5
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 18:23:25 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <1490199642-5521-1-git-send-email-armbru@redhat.com>
-	<01e78c6d-b182-f8f9-828c-737cb94c4f1b@redhat.com>
-Date: Wed, 22 Mar 2017 19:23:21 +0100
-In-Reply-To: <01e78c6d-b182-f8f9-828c-737cb94c4f1b@redhat.com> (Max Reitz's
-	message of "Wed, 22 Mar 2017 18:13:56 +0100")
-Message-ID: <87h92l9nmu.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <anthony.xu@intel.com>)
+	id 1cqkxv-0004fP-Cc
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:26:35 -0400
+From: "Xu, Anthony" <anthony.xu@intel.com>
+Date: Wed, 22 Mar 2017 18:26:32 +0000
+Message-ID: <4712D8F4B26E034E80552F30A67BE0B1A2E524@ORSMSX112.amr.corp.intel.com>
+References: <1489158897-9206-1-git-send-email-yang.zhong@intel.com>
+	<4712D8F4B26E034E80552F30A67BE0B1A0F91A@ORSMSX112.amr.corp.intel.com>
+	<920352018.1797331.1489251855464.JavaMail.zimbra@redhat.com>
+	<4712D8F4B26E034E80552F30A67BE0B1A13045@ORSMSX112.amr.corp.intel.com>
+	<991a0f3d-5e1f-d17c-a8f3-a42c02ac2f17@redhat.com>
+	<4712D8F4B26E034E80552F30A67BE0B1A1561C@ORSMSX112.amr.corp.intel.com>
+	<f05fe113-c286-19b0-f5bc-ee2c1ea05568@redhat.com>
+	<4712D8F4B26E034E80552F30A67BE0B1A16F14@ORSMSX112.amr.corp.intel.com>
+	<1466597512.4602267.1489609298091.JavaMail.zimbra@redhat.com>
+	<4712D8F4B26E034E80552F30A67BE0B1A19A11@ORSMSX112.amr.corp.intel.com>
+	<b23eb236-6f32-fb2b-1a61-a831053e277b@redhat.com>
+In-Reply-To: <b23eb236-6f32-fb2b-1a61-a831053e277b@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.9] block: Declare blockdev-add and
- blockdev-del supported
+Subject: Re: [Qemu-devel] [PATCH v1 2/2] reduce qemu's heap Rss size from
+ 12252kB to 2752KB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,173 +39,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Zhong, Yang" <yang.zhong@intel.com>, "Peng, Chao P" <chao.p.peng@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Max Reitz <mreitz@redhat.com> writes:
-
-> On 22.03.2017 17:20, Markus Armbruster wrote:
->> It's been a long journey, but here we are.
->> 
->> The supported blockdev-add is not compatible to its experimental
->> predecessors; bump all Since: tags to 2.9.
->> 
->> x-blockdev-remove-medium, x-blockdev-insert-medium and
->> x-blockdev-change need a bit more work, so leave them alone for now.
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->> v2:
->> * Another "command is considered experimental" comment dropped [Max]
->> * More Since: tags updated to 2.9, commit message improved, R-bys dropped
->
-> Do you want to do this recursively? There are things such as
-> BlkdebugSetStateOptions or ReplicationMode which are only used by the
-> corresponding BlockdevOptions*, so they too are basically only supported
-> as of 2.9.
-
-Fixup appended.
-
-> I don't have a strong opinion, but I think I personally wouldn't bother
-> with any of these structures and just update the tag for blockdev-add
-> itself...
-
-Kevin, what about you?
-
-Since: tags on types are kind of redundant, as types become part of the
-public interface only via commands and events.  The real Since: is the
-oldest command or event exposing it.  But explaining that is too
-complicated.  It's better to tell people to always add Since: tags.
-
-Now if the QAPI generators could tell them when to add and when not to
-add Since: tags...
-
-> You being fine with me would be enough to convince me, so:
->
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-Thanks!
-
-
-
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index bd39b3f..f938316 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2053,7 +2053,7 @@
- # @ignore:      Ignore the request
- # @unmap:       Forward as an unmap request
- #
--# Since: 1.7
-+# Since: 2.9
- ##
- { 'enum': 'BlockdevDiscardOptions',
-   'data': [ 'ignore', 'unmap' ] }
-@@ -2082,7 +2082,7 @@
- # @threads:     Use qemu's thread pool
- # @native:      Use native AIO backend (only Linux and Windows)
- #
--# Since: 1.7
-+# Since: 2.9
- ##
- { 'enum': 'BlockdevAioOptions',
-   'data': [ 'threads', 'native' ] }
-@@ -2097,7 +2097,7 @@
- # @no-flush:    ignore any flush requests for the device (default:
- #               false)
- #
--# Since: 1.7
-+# Since: 2.9
- ##
- { 'struct': 'BlockdevCacheOptions',
-   'data': { '*direct': 'bool',
-@@ -2229,7 +2229,7 @@
- #
- # @all:         Perform all available overlap checks
- #
--# Since: 2.2
-+# Since: 2.9
- ##
- { 'enum': 'Qcow2OverlapCheckMode',
-   'data': [ 'none', 'constant', 'cached', 'all' ] }
-@@ -2244,7 +2244,7 @@
- # @template: Specifies a template mode which can be adjusted using the other
- #            flags, defaults to 'cached'
- #
--# Since: 2.2
-+# Since: 2.9
- ##
- { 'struct': 'Qcow2OverlapCheckFlags',
-   'data': { '*template':       'Qcow2OverlapCheckMode',
-@@ -2268,7 +2268,7 @@
- #
- # @mode:    named mode which chooses a specific set of flags
- #
--# Since: 2.2
-+# Since: 2.9
- ##
- { 'alternate': 'Qcow2OverlapChecks',
-   'data': { 'flags': 'Qcow2OverlapCheckFlags',
-@@ -2349,7 +2349,7 @@
- #
- # Trigger events supported by blkdebug.
- #
--# Since: 2.0
-+# Since: 2.9
- ##
- { 'enum': 'BlkdebugEvent', 'prefix': 'BLKDBG',
-   'data': [ 'l1_update', 'l1_grow_alloc_table', 'l1_grow_write_table',
-@@ -2389,7 +2389,7 @@
- #
- # @immediately: fail immediately; defaults to false
- #
--# Since: 2.0
-+# Since: 2.9
- ##
- { 'struct': 'BlkdebugInjectErrorOptions',
-   'data': { 'event': 'BlkdebugEvent',
-@@ -2412,7 +2412,7 @@
- # @new_state:   the state identifier blkdebug is supposed to assume if
- #               this event is triggered
- #
--# Since: 2.0
-+# Since: 2.9
- ##
- { 'struct': 'BlkdebugSetStateOptions',
-   'data': { 'event': 'BlkdebugEvent',
-@@ -2468,7 +2468,7 @@
- #
- # @fifo: read only from the first child that has not failed
- #
--# Since: 2.2
-+# Since: 2.9
- ##
- { 'enum': 'QuorumReadPattern', 'data': [ 'quorum', 'fifo' ] }
- 
-@@ -2674,7 +2674,7 @@
- #
- # @secondary: Secondary mode, receive the vm's state from primary QEMU.
- #
--# Since: 2.8
-+# Since: 2.9
- ##
- { 'enum' : 'ReplicationMode', 'data' : [ 'primary', 'secondary' ] }
- 
-@@ -2703,7 +2703,7 @@
- #
- # @inet:        TCP transport
- #
--# Since: 2.8
-+# Since: 2.9
- ##
- { 'enum': 'NFSTransport',
-   'data': [ 'inet' ] }
-@@ -2717,7 +2717,7 @@
- #
- # @host:        host address for NFS server
- #
--# Since: 2.8
-+# Since: 2.9
- ##
- { 'struct': 'NFSServer',
-   'data': { 'type': 'NFSTransport',
+PiBTbyBwbGVhc2Ugc2VuZCBpdCB0byB0aGUgbGlzdCB3aXRoIFNpZ25lZC1vZmYtYnkgbGluZS4N
+ClRoYW5rcywgDQoNCj4gDQo+ICAgICAgICAgICAgIERQUklOVEYoImhhbmRsZV9tbWlvXG4iKTsN
+Cj4gICAgICAgICAgICAgLyogQ2FsbGVkIG91dHNpZGUgQlFMICovDQo+ICAgICAgICAgICAgIGFk
+ZHJlc3Nfc3BhY2VfcncoJmFkZHJlc3Nfc3BhY2VfbWVtb3J5LA0KPiAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIHJ1bi0+bW1pby5waHlzX2FkZHIsIGF0dHJzLA0KPiAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIHJ1bi0+bW1pby5kYXRhLA0KPiAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIHJ1bi0+bW1pby5sZW4sDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcnVu
+LT5tbWlvLmlzX3dyaXRlKTsNCj4gDQo+IGFuZCBhZGRpbmcgYSBzaW1wbGUgYXNzZXJ0KCkgd291
+bGQgaGF2ZSBxdWlja2x5IGRpc3Byb3ZlZCB5b3VyIHRoZW9yeS4NCllvdSBhcmUgcmlnaHQgaGVy
+ZS4NCklmIGl0IGlzIGEgUENJIGJhciB3cml0ZSwgYSBtZW1vcnkgcmVnaW9uIG9wZXJhdGlvbihk
+ZWwvYWRkKSBtYXkgDQpiZSBjYWxsZWQgaW5zaWRlIGFkZHJlc3Nfc3BhY2VfcncsIGFuZCANCm1l
+bW9yeV9yZWdpb25fdHJhbnNhY3Rpb25fY29tbWl0IHdpbGwgYmUgY2FsbGVkLg0KSWYgYWRkcmVz
+c19zcGFjZV9ydyBpcyBjYWxsZWQgIHdpdGhvdXQgdGhlIGdsb2JhbCBsb2NrLCANCm1lbW9yeV9y
+ZWdpb25fdHJhbnNhY3Rpb25fY29tbWl0IGlzIGNhbGxlZCB3aXRoIHRoZSBnbG9iYWwgbG9jay4N
+CiBJdCBjb25mbGljdHMgd2l0aCB3aGF0IHlvdSBzYWlkIGJlZm9yZS4NCg0KPk5vLCB5b3UgZG9u
+J3QgbmVlZCB0byBjaGVjayBpdC4gIE1vc3QgZnVuY3Rpb25zIChpbiB0aGlzIGNhc2UsDQo+bWVt
+b3J5X3JlZ2lvbl90cmFuc2FjdGlvbl9jb21taXQpIGNhbiBvbmx5IGJlIGNhbGxlZCB1bmRlciB0
+aGUgZ2xvYmFsIGxvY2suDQoNCkFuZCBpZiB0d28gdmNwdXMgcHJvZ3JhbSB0aGUgZGlmZmVyZW50
+IFBDSSBiYXJzIGF0IHRoZSBzYW1lIHRpbWUgDQooaXQgaXMgdW5saWtlbHksIGJ1dCBRRU1VIHNo
+b3VsZCBub3QgYXNzdW1lIGl0KSwgd2l0aG91dCB0aGUgZ2xvYmFsIGxvY2ssIA0KcmVnaW9uIG9w
+ZXJhdGlvbnMgbWF5IGJlIGNhbGxlZCBhdCB0aGUgc2FtZSB0aW1lLiANCkFyZSBtZW1vcnlfcmVn
+aW9uX2RlbF9zdWJyZWdpb24gYW5kIA0KbWVtb3J5X3JlZ2lvbl9hZGRfc3VicmVnaW9uX292ZXJs
+YXAgdGhyZWFkLXNhZmU/DQoNCj4gSXQncyBub3QgYSBmaXggaWYgdGhlIGNvZGUgaXMgbm90IHRo
+cmVhZC1zYWZlIGFueW1vcmUhICBCdXQgSSB0aGluayB5b3UNCj4gaGF2ZSB0aGUgYW5zd2VyIG5v
+dyBhcyB0byB3aHkgeW91IGNhbm5vdCB1c2Ugc3luY2hyb25pemVfcmN1Lg0KDQpDYW4geW91IGVs
+YWJvcmF0ZSB3aHkgdGhlIGNvZGUgaXMgbm90IHRocmVhZC1zYWZlPw0KDQpUaGFua3MNCkFudGhv
+bnkNCg==
