@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cqjVW-0008IQ-6L
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:53:11 -0400
+	(envelope-from <rkrcmar@redhat.com>) id 1cqjX7-0000Ol-As
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:54:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cqjVV-0007yK-6e
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:53:10 -0400
-References: <20170313214001.26339-1-mreitz@redhat.com>
-	<20170313214045.26857-5-mreitz@redhat.com>
-	<20170320110023.GH17887@stefanha-x1.localdomain>
-	<a51da640-ce10-1a8c-2e07-195e900e1147@redhat.com>
-	<20170322164413.GD16717@stefanha-x1.localdomain>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <7e892dd3-2eab-3a2e-c5ca-43aa4b36b988@redhat.com>
-Date: Wed, 22 Mar 2017 17:53:00 +0100
+	(envelope-from <rkrcmar@redhat.com>) id 1cqjX3-0008Gw-6m
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:54:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36812)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkrcmar@redhat.com>) id 1cqjX3-0008Gg-1L
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:54:45 -0400
+Date: Wed, 22 Mar 2017 17:54:39 +0100
+From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Message-ID: <20170322165438.GA1910@potion>
+References: <20170322155906.10679-1-rkrcmar@redhat.com>
+	<20170322180319-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20170322164413.GD16717@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="HAjQJwTIT8RNhndw1VB9Wgb92n49X3tcf"
-Subject: Re: [Qemu-devel] [PATCH for-2.10 07/16] block/file-posix:
- Generalize raw_regular_truncate
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170322180319-mutt-send-email-mst@kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] pc: q35: bump max_cpus to INT32_MAX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,78 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HAjQJwTIT8RNhndw1VB9Wgb92n49X3tcf
-From: Max Reitz <mreitz@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- qemu-devel@nongnu.org
-Message-ID: <7e892dd3-2eab-3a2e-c5ca-43aa4b36b988@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10 07/16] block/file-posix: Generalize
- raw_regular_truncate
-References: <20170313214001.26339-1-mreitz@redhat.com>
- <20170313214045.26857-5-mreitz@redhat.com>
- <20170320110023.GH17887@stefanha-x1.localdomain>
- <a51da640-ce10-1a8c-2e07-195e900e1147@redhat.com>
- <20170322164413.GD16717@stefanha-x1.localdomain>
-In-Reply-To: <20170322164413.GD16717@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-
-On 22.03.2017 17:44, Stefan Hajnoczi wrote:
-> On Mon, Mar 20, 2017 at 04:11:24PM +0100, Max Reitz wrote:
->> On 20.03.2017 12:00, Stefan Hajnoczi wrote:
->>> On Mon, Mar 13, 2017 at 10:40:36PM +0100, Max Reitz wrote:
->>>> +static int raw_regular_truncate(int fd, BlockDriverState *bs, int64=
-_t offset,
->>>
->>> The presence of both a file descriptor and a BlockDriverState (actual=
-ly
->>> it must be a BDRVRawState) arguments is unusual.  It seems bs is need=
-ed
->>> for bdrv_getlength().
->>>
->>> How about using fstat(fd, &st) and then dropping bs and create?
->>
->> Well, I could do that, but bdrv_getlength() is a bit simpler and I don=
-'t
->> see much of an issue with specifying both an fd and a bs.
+2017-03-22 18:06+0200, Michael S. Tsirkin:
+> On Wed, Mar 22, 2017 at 04:59:06PM +0100, Radim Kr=C4=8Dm=C3=A1=C5=99 w=
+rote:
+>> QEMU does not allocate based on machine's max_cpus, but only uses it t=
+o
+>> limit the maximum selected by user and the actual limit of VCPUs is
+>> enfoced by other components:
+>>  - machine without vIOMMU ends at 255 VCPUs
+>>  - TCG currently doesn't support x2APIC, so it also ends below 256
+>>  - KVM with vIOMMU cannot exceed the KVM limit (currently 288)
+>>=20
+>> Using a big value should bring no drawbacks and the benefit is that
+>> components (especially out-of-tree KVM) can bump their limits without
+>> touching machine's max_cpus.
+>>=20
+>> max_cpus is unsigned, but it is treated as signed at least in printf a=
+nd
+>> the other two billion VCPU won't be needed for a while, so we can igno=
+re
+>> possible bugs by using signed max.
+>>=20
+>> Signed-off-by: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
+>> ---
+>>   Should the 2.9 machine type still have 288?
 >=20
-> Arguments that provide overlapping information make the function harder=
+> It doesn't look like a bugfix to me.
+> So if we can defer past 2.9 that would be best IMO.
 
-> to understand and use correctly (there are combinations of these
-> arguments that are invalid or don't make sense).  Saving a few lines of=
+Sure, I'll wait until the 2.10 machine type pops up.
 
-> code in the function implementation is a poor trade-off IMO.
-
-My brain likes to agree but for some reason my heart really prefers
-block layer functions (where I know what can go wrong) over POSIX
-functions (where I always have the feeling of maybe not having though of
-everything).
-
-I guess I'll have to silence my heart for a bit, then.
-
-Max
-
-
---HAjQJwTIT8RNhndw1VB9Wgb92n49X3tcf
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljSq+wSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AXwYH/R0FRmrpqzgX6Uwoy7/FOsgZytzzFcuF
-fd1hl/v8o/QpSiuWFsEep3/oKjKC9dOhWhpWCzAfNIacnj43taFc+NNylMOD+CCZ
-kMLKEN4fQF3b84Z2Grw4A/hRoJ+cp4BfdMB6Xjp36qNmgvwCUd6PFYLhxz/PkbUw
-saQSob7fZluUC/9/GjO5riXzhDka9Xx4Id7wTwNI8ODNsOnWtgMj1sCy62WypJnh
-VbWFSO2SSmyBC80b2hdZfVK00reD+GRmw4SiAuhhnHhsxQGEHYr8oBkGpCf2d54p
-fXcQHeJAgE8yCyCVw5nMULJOl06qZ/fB5JHR20WSaOY3l50xSE6I2U4=
-=gRqc
------END PGP SIGNATURE-----
-
---HAjQJwTIT8RNhndw1VB9Wgb92n49X3tcf--
+Thanks.
