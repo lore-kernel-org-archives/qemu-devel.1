@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41340)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cql7T-0008GP-Pk
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:36:30 -0400
+	(envelope-from <armbru@redhat.com>) id 1cql7T-0008GO-Qs
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:36:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cql7Q-0000Xg-J1
+	(envelope-from <armbru@redhat.com>) id 1cql7Q-0000Xj-JM
 	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:36:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60978)
+Received: from mx1.redhat.com ([209.132.183.28]:58002)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cql7Q-0000WP-AN
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cql7Q-0000WM-9y
 	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:36:24 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 250AF67BA8
+	by mx1.redhat.com (Postfix) with ESMTPS id 255D661BAA
 	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 18:36:24 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-26.ams2.redhat.com
 	[10.36.116.26])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E557D80F6A
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id E40D27EFF4
 	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 18:36:23 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 22 Mar 2017 19:36:06 +0100
-Message-Id: <1490207781-18965-3-git-send-email-armbru@redhat.com>
-In-Reply-To: <1490207781-18965-1-git-send-email-armbru@redhat.com>
-References: <1490207781-18965-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v3 for-2.9 02/17] keyval: Improve some comments
+Date: Wed, 22 Mar 2017 19:36:04 +0100
+Message-Id: <1490207781-18965-1-git-send-email-armbru@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v3 for-2.9 00/17] QAPI patches for 2017-03-22
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,87 +36,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1490014548-15083-3-git-send-email-armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- util/keyval.c | 47 +++++++++++++++++++++++++++++++----------------
- 1 file changed, 31 insertions(+), 16 deletions(-)
+v3 (third time's a charm)
+* Actually squash it into 16/17, not 17/17
+v2:
+* Leak fix squashed into 16/17
 
-diff --git a/util/keyval.c b/util/keyval.c
-index f646b36..46cd540 100644
---- a/util/keyval.c
-+++ b/util/keyval.c
-@@ -21,22 +21,36 @@
-  *
-  * Semantics defined by reduction to JSON:
-  *
-- *   key-vals is a tree of objects and arrays rooted at object R
-- *   where for each key-val = key-fragment . ... = val in key-vals
-- *       R op key-fragment op ... = val'
-- *       where (left-associative) op is
-- *                 array subscript L[key-fragment] for numeric key-fragment
-- *                 member reference L.key-fragment otherwise
-- *             val' is val with ',,' replaced by ','
-- *   and only R may be empty.
-+ *   key-vals specifies a JSON object, i.e. a tree whose root is an
-+ *   object, inner nodes other than the root are objects or arrays,
-+ *   and leaves are strings.
-  *
-- *   Duplicate keys are permitted; all but the last one are ignored.
-+ *   Each key-val = key-fragment '.' ... '=' val specifies a path from
-+ *   root to a leaf (left of '='), and the leaf's value (right of
-+ *   '=').
-  *
-- *   The equations must have a solution.  Counter-example: a.b=1,a=2
-- *   doesn't have one, because R.a must be an object to satisfy a.b=1
-- *   and a string to satisfy a=2.
-+ *   A path from the root is defined recursively:
-+ *       L '.' key-fragment is a child of the node denoted by path L
-+ *       key-fragment is a child of the tree root
-+ *   If key-fragment is numeric, the parent is an array and the child
-+ *   is its key-fragment-th member, counting from zero.
-+ *   Else, the parent is an object, and the child is its member named
-+ *   key-fragment.
-  *
-- * Key-fragments must be valid QAPI names or consist only of digits.
-+ *   This constrains inner nodes to be either array or object.  The
-+ *   constraints must be satisfiable.  Counter-example: a.b=1,a=2 is
-+ *   not, because root.a must be an object to satisfy a.b=1 and a
-+ *   string to satisfy a=2.
-+ *
-+ *   Array subscripts can occur in any order, but the set of
-+ *   subscripts must not have gaps.  For instance, a.1=v is not okay,
-+ *   because root.a[0] is missing.
-+ *
-+ *   If multiple key-val denote the same leaf, the last one determines
-+ *   the value.
-+ *
-+ * Key-fragments must be valid QAPI names or consist only of decimal
-+ * digits.
-  *
-  * The length of any key-fragment must be between 1 and 127.
-  *
-@@ -64,8 +78,8 @@
- 
- /*
-  * Convert @key to a list index.
-- * Convert all leading digits to a (non-negative) number, capped at
-- * INT_MAX.
-+ * Convert all leading decimal digits to a (non-negative) number,
-+ * capped at INT_MAX.
-  * If @end is non-null, assign a pointer to the first character after
-  * the number to *@end.
-  * Else, fail if any characters follow.
-@@ -337,7 +351,8 @@ static QObject *keyval_listify(QDict *cur, GSList *key_of_cur, Error **errp)
-     }
- 
-     /*
--     * Make a list from @elt[], reporting any missing elements.
-+     * Make a list from @elt[], reporting the first missing element,
-+     * if any.
-      * If we dropped an index >= nelt in the previous loop, this loop
-      * will run into the sentinel and report index @nelt missing.
-      */
--- 
+The following changes since commit 940a8ce075e3408742a4edcabfd6c2a15e2539=
+eb:
+
+  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into s=
+taging (2017-03-20 16:34:26 +0000)
+
+are available in the git repository at:
+
+  git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2017-03-22-v3
+
+for you to fetch changes up to 21f88d021d0d2b4ecee8f6cd6ca63a943a3ce71d:
+
+  qapi: Fix QemuOpts visitor regression on unvisited input (2017-03-22 19=
+:24:34 +0100)
+
+----------------------------------------------------------------
+QAPI patches for 2017-03-22
+
+----------------------------------------------------------------
+Eric Blake (3):
+      tests: Expose regression in QemuOpts visitor
+      qom: Avoid unvisited 'id'/'qom-type' in user_creatable_add_opts
+      qapi: Fix QemuOpts visitor regression on unvisited input
+
+Markus Armbruster (14):
+      test-keyval: Tweaks to improve list coverage
+      keyval: Improve some comments
+      test-keyval: Cover alternate and 'any' type
+      keyval: Document issues with 'any' and alternate types
+      MAINTAINERS: Add myself for files I touched recently
+      qapi: Drop excessive Make dependencies on qapi2texi.py
+      qapi2texi: Fix to actually fail when 'doc-required' is false
+      qapi: Drop unused QAPIDoc member optional
+      tests/qapi-schema: Make test-qapi.py print docs again
+      tests/qapi-schema: Systematic positive doc comment tests
+      qapi2texi: Fix translation of *strong* and _emphasized_
+      qapi: Fix string input visitor regression for empty lists
+      Revert "hostmem: fix QEMU crash by 'info memdev'"
+      test-qobject-input-visitor: Cover visit_type_uint64()
+
+ MAINTAINERS                        |  11 ++
+ Makefile                           |   7 +-
+ backends/hostmem.c                 |  22 ++--
+ qapi/opts-visitor.c                |   6 +-
+ qapi/string-input-visitor.c        |   4 +
+ qom/object_interfaces.c            |   8 +-
+ scripts/qapi.py                    |   1 -
+ scripts/qapi2texi.py               |   5 +-
+ tests/Makefile.include             |  15 ++-
+ tests/qapi-schema/doc-good.err     |   0
+ tests/qapi-schema/doc-good.exit    |   1 +
+ tests/qapi-schema/doc-good.json    | 136 +++++++++++++++++++++
+ tests/qapi-schema/doc-good.out     | 148 ++++++++++++++++++++++
+ tests/qapi-schema/doc-good.texi    | 243 +++++++++++++++++++++++++++++++=
+++++++
+ tests/qapi-schema/test-qapi.py     |  11 ++
+ tests/test-keyval.c                |  59 ++++++++-
+ tests/test-opts-visitor.c          |  27 ++++-
+ tests/test-qobject-input-visitor.c |  30 +++++
+ tests/test-string-input-visitor.c  |  11 +-
+ util/keyval.c                      |  57 ++++++---
+ 20 files changed, 747 insertions(+), 55 deletions(-)
+ create mode 100644 tests/qapi-schema/doc-good.err
+ create mode 100644 tests/qapi-schema/doc-good.exit
+ create mode 100644 tests/qapi-schema/doc-good.json
+ create mode 100644 tests/qapi-schema/doc-good.out
+ create mode 100644 tests/qapi-schema/doc-good.texi
+
+--=20
 2.7.4
