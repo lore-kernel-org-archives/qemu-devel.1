@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cqj9f-0002wW-UN
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:30:36 -0400
+	(envelope-from <mst@redhat.com>) id 1cqj9l-000317-VS
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:30:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cqj9a-0005v3-4k
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:30:35 -0400
-Received: from mail-yw0-x232.google.com ([2607:f8b0:4002:c05::232]:34209)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1cqj9a-0005uw-0t
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:30:30 -0400
-Received: by mail-yw0-x232.google.com with SMTP id p77so130935028ywg.1
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 09:30:29 -0700 (PDT)
+	(envelope-from <mst@redhat.com>) id 1cqj9k-0005zS-Vm
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:30:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57762)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cqj9k-0005yM-PN
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:30:40 -0400
+Date: Wed, 22 Mar 2017 18:30:38 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170322183009-mutt-send-email-mst@kernel.org>
+References: <1490198476-12244-1-git-send-email-mst@redhat.com>
+	<20170322182815-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Sender: bobby.prani@gmail.com
-In-Reply-To: <CAFEAcA-x8CbqVpnaszmdZzLZt6+urxSntdWxLHeFXAOy327OqA@mail.gmail.com>
-References: <CAG48ez1tcz7GGsc5+L3EF140NsW=UyNir=0UpuZZYrBn4ZxrSA@mail.gmail.com>
-	<CAFEAcA8-GJxpmppZGF5ygSAL4Y81BdvYKqso-XhjR2pbjMLi+A@mail.gmail.com>
-	<CAJhHMCA=rwLqLOPq3kMOz9SpV83yrzkK_K6RfPmuyXMU1pXT7g@mail.gmail.com>
-	<CAFEAcA9ZtayLn-bOPL4=2=w0SS_H0-EYO0UpFzXJSvyueGOHMw@mail.gmail.com>
-	<CAJhHMCAjG1kfG8-3E8CcWu4V2cWMsR0La6iZ3hq0rbM91+brsA@mail.gmail.com>
-	<CAFEAcA-x8CbqVpnaszmdZzLZt6+urxSntdWxLHeFXAOy327OqA@mail.gmail.com>
-From: Pranith Kumar <bobby.prani+qemu@gmail.com>
-Date: Wed, 22 Mar 2017 12:29:58 -0400
-Message-ID: <CAJhHMCDfmT_zrnuEBcmoJ+CJV9j8CB79ybehWoMBeh3rd+hA3Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [BUG] user-to-root privesc inside VM via bad
- translation caching
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170322182815-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PULL 0/4] virtio, pc: fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,33 +27,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Jann Horn <jannh@google.com>, Qemu Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-On Wed, Mar 22, 2017 at 11:21 AM, Peter Maydell
-<peter.maydell@linaro.org> wrote:
-> On 22 March 2017 at 15:14, Pranith Kumar <bobby.prani+qemu@gmail.com> wrote:
->> On Wed, Mar 22, 2017 at 11:04 AM, Peter Maydell
->> <peter.maydell@linaro.org> wrote:
->>> This doesn't look right because it means we'll check
->>> only after we've emitted all the code to do the
->>> instruction operation, so the effect will be
->>> "execute instruction, then take illegal-opcode
->>> exception".
->
->> The pc is restored to original address (s->pc = pc_start), so the
->> exception will overwrite the generated illegal instruction and will be
->> executed first.
->
-> s->pc is the guest PC -- moving that backwards will
-> not do anything about the generated TCG IR that's
-> already been written. You'd need to rewind the
-> write pointer in the IR stream, which there is
-> no support for doing AFAIK.
+On Wed, Mar 22, 2017 at 06:28:49PM +0200, Michael S. Tsirkin wrote:
+> On Wed, Mar 22, 2017 at 06:01:31PM +0200, Michael S. Tsirkin wrote:
+> > The following changes since commit 55a19ad8b2d0797e3a8fe90ab99a9bb713824059:
+> > 
+> >   Update version for v2.9.0-rc1 release (2017-03-21 17:13:29 +0000)
+> > 
+> > are available in the git repository at:
+> > 
+> >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+> > 
+> > for you to fetch changes up to 807211b76603b094c46a0cd95a3c785f47f3ab73:
+> > 
+> >   hw/acpi/vmgenid: prevent more than one vmgenid device (2017-03-22 17:56:00 +0200)
+> 
+> I tweaked commit log on two patches at submitter's request.
+> Pushed 160f57134960e6356257e54408f6bce382aac5f6 - same tree.
 
-Ah, OK. Thanks for the explanation. May be we should check the size of
-the instruction while decoding the prefixes and error out once we
-exceed the limit. We would not generate any IR code.
+It's really f92063028a0ea9e15d8f962644bce76c0e8aa7d1
+sorry about the noise.
 
---
-Pranith
+> > ----------------------------------------------------------------
+> > virtio, pc: fixes
+> > 
+> > virtio and misc fixes for 2.9.
+> > 
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > 
+> > ----------------------------------------------------------------
+> > Fam Zheng (1):
+> >       virtio: Fix error handling in virtio_bus_device_plugged
+> > 
+> > Laszlo Ersek (2):
+> >       hw/acpi/vmgenid: prevent device realization on pre-2.5 machine types
+> >       hw/acpi/vmgenid: prevent more than one vmgenid device
+> > 
+> > Paolo Bonzini (1):
+> >       virtio: always use handle_aio_output if registered
+> > 
+> >  include/hw/acpi/vmgenid.h |  2 ++
+> >  include/hw/compat.h       |  4 ++++
+> >  hw/acpi/vmgenid.c         | 22 ++++++++++++++++++++++
+> >  hw/virtio/virtio-bus.c    | 20 +++++++++++++++++---
+> >  hw/virtio/virtio.c        | 13 ++++++++++++-
+> >  5 files changed, 57 insertions(+), 4 deletions(-)
+> > 
