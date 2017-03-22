@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38398)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cqeeW-0002GJ-9t
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 07:42:09 -0400
+	(envelope-from <sameeh@daynix.com>) id 1cqegV-0002tn-Vy
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 07:44:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cqeeQ-00060D-CQ
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 07:42:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47170)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cqeeQ-000609-7B
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 07:42:02 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1272E1556C
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 11:42:02 +0000 (UTC)
-Date: Wed, 22 Mar 2017 11:41:55 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170322114155.GD2406@work-vm>
-References: <1490168303-24588-1-git-send-email-kraxel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1490168303-24588-1-git-send-email-kraxel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] cirrus: fix PUTPIXEL macro
+	(envelope-from <sameeh@daynix.com>) id 1cqegR-0006Vg-As
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 07:44:12 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:35968)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1cqegR-0006VF-2B
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 07:44:07 -0400
+Received: by mail-wr0-x244.google.com with SMTP id l37so26288536wrc.3
+	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 04:44:06 -0700 (PDT)
+From: Sameeh Jubran <sameeh@daynix.com>
+Date: Wed, 22 Mar 2017 13:43:59 +0200
+Message-Id: <20170322114359.3455-1-sameeh@daynix.com>
+Subject: [Qemu-devel] [PATCH qemu-ga] qemu-ga: Make QGA VSS provider service
+ run only when needed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,41 +24,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Yan Vugenfirer <yan@daynix.com>
 
-* Gerd Hoffmann (kraxel@redhat.com) wrote:
-> Should be "c" not "col".  The macro is used with "col" as third parameter
-> everywhere, so this tyops doesn't break something.
-> 
-> Fixes: 026aeffcb4752054830ba203020ed6eb05bcaba8
-> Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Currently the service runs in background on boot even though it is not
+needed and once it is running it never stops. The service needs to be
+running only during freeze operation and it should be stopped after
+executing thaw.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Sameeh Jubran <sameeh@daynix.com>
+---
+ qga/vss-win32/install.cpp   | 28 ++++++++++++++++++++++++++--
+ qga/vss-win32/requester.cpp |  2 ++
+ 2 files changed, 28 insertions(+), 2 deletions(-)
 
-> ---
->  hw/display/cirrus_vga_rop2.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/display/cirrus_vga_rop2.h b/hw/display/cirrus_vga_rop2.h
-> index b86bcd6..b208b73 100644
-> --- a/hw/display/cirrus_vga_rop2.h
-> +++ b/hw/display/cirrus_vga_rop2.h
-> @@ -29,8 +29,8 @@
->  #elif DEPTH == 24
->  #define PUTPIXEL(s, a, c)    do {          \
->          ROP_OP(s, a,     c);               \
-> -        ROP_OP(s, a + 1, (col >> 8));      \
-> -        ROP_OP(s, a + 2, (col >> 16));     \
-> +        ROP_OP(s, a + 1, (c >> 8));        \
-> +        ROP_OP(s, a + 2, (c >> 16));       \
->      } while (0)
->  #elif DEPTH == 32
->  #define PUTPIXEL(s, a, c)    ROP_OP_32(s, a, c)
-> -- 
-> 1.8.3.1
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/qga/vss-win32/install.cpp b/qga/vss-win32/install.cpp
+index f4160a3..f41fcdf 100644
+--- a/qga/vss-win32/install.cpp
++++ b/qga/vss-win32/install.cpp
+@@ -14,7 +14,7 @@
+ 
+ #include "vss-common.h"
+ #include <inc/win2003/vscoordint.h>
+-#include <comadmin.h>
++#include "install.h"
+ #include <wbemidl.h>
+ #include <comdef.h>
+ #include <comutil.h>
+@@ -276,7 +276,7 @@ STDAPI COMRegister(void)
+ 
+     chk(pCatalog->CreateServiceForApplication(
+             _bstr_t(QGA_PROVIDER_LNAME), _bstr_t(QGA_PROVIDER_LNAME),
+-            _bstr_t(L"SERVICE_AUTO_START"), _bstr_t(L"SERVICE_ERROR_NORMAL"),
++            _bstr_t(L"SERVICE_DEMAND_START"), _bstr_t(L"SERVICE_ERROR_NORMAL"),
+             _bstr_t(L""), _bstr_t(L".\\localsystem"), _bstr_t(L""), FALSE));
+     chk(pCatalog->InstallComponent(_bstr_t(QGA_PROVIDER_LNAME),
+                                    _bstr_t(dllPath), _bstr_t(tlbPath),
+@@ -461,3 +461,27 @@ namespace _com_util
+         return bstr;
+     }
+ }
++
++/* Stop QGA VSS provider service from COM+ Application Admin Catalog */
++
++STDAPI StopService(void)
++{
++    HRESULT hr;
++    COMInitializer initializer;
++    COMPointer<IUnknown> pUnknown;
++    COMPointer<ICOMAdminCatalog2> pCatalog;
++
++    int count = 0;
++
++    chk(QGAProviderFind(QGAProviderCount, (void *)&count));
++    if (count) {
++        chk(CoCreateInstance(CLSID_COMAdminCatalog, NULL, CLSCTX_INPROC_SERVER,
++            IID_IUnknown, (void **)pUnknown.replace()));
++        chk(pUnknown->QueryInterface(IID_ICOMAdminCatalog2,
++            (void **)pCatalog.replace()));
++        chk(pCatalog->ShutdownApplication(_bstr_t(QGA_PROVIDER_LNAME)));
++    }
++
++out:
++    return hr;
++}
+diff --git a/qga/vss-win32/requester.cpp b/qga/vss-win32/requester.cpp
+index 272e71b..27308ad 100644
+--- a/qga/vss-win32/requester.cpp
++++ b/qga/vss-win32/requester.cpp
+@@ -13,6 +13,7 @@
+ #include "qemu/osdep.h"
+ #include "vss-common.h"
+ #include "requester.h"
++#include "install.h"
+ #include <inc/win2003/vswriter.h>
+ #include <inc/win2003/vsbackup.h>
+ 
+@@ -501,4 +502,5 @@ void requester_thaw(int *num_vols, ErrorSet *errset)
+     requester_cleanup();
+ 
+     CoUninitialize();
++    StopService();
+ }
+-- 
+2.9.3
