@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cqiX3-0005bT-5c
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 11:50:42 -0400
+	(envelope-from <stefanha@gmail.com>) id 1cqiaA-000715-Q6
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 11:53:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cqiX2-0002lr-51
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 11:50:41 -0400
-References: <20170314111157.14464-1-pbonzini@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <61f68525-8c4d-97a3-67f1-2c2bbdfa7751@redhat.com>
-Date: Wed, 22 Mar 2017 16:50:32 +0100
+	(envelope-from <stefanha@gmail.com>) id 1cqia5-0003Sp-0e
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 11:53:54 -0400
+Date: Wed, 22 Mar 2017 15:53:44 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170322155344.GA16717@stefanha-x1.localdomain>
+References: <20170228132132.20231-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170314111157.14464-1-pbonzini@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="KX2nueESN6HQf7fM4lW1RsUloAFN7NFrn"
-Subject: Re: [Qemu-devel] [PATCH] nbd-client: fix handling of hungup
- connections
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="IJpNTDwzlM2Ie8A6"
+Content-Disposition: inline
+In-Reply-To: <20170228132132.20231-1-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] virtio: always use handle_aio_output if
+ registered
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,65 +24,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, kraxel@redhat.com, mst@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---KX2nueESN6HQf7fM4lW1RsUloAFN7NFrn
-From: Max Reitz <mreitz@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org
-Message-ID: <61f68525-8c4d-97a3-67f1-2c2bbdfa7751@redhat.com>
-Subject: Re: [PATCH] nbd-client: fix handling of hungup connections
-References: <20170314111157.14464-1-pbonzini@redhat.com>
-In-Reply-To: <20170314111157.14464-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
+
+--IJpNTDwzlM2Ie8A6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 14.03.2017 12:11, Paolo Bonzini wrote:
-> After the switch to reading replies in a coroutine, nothing is
-> reentering pending receive coroutines if the connection hangs.
-> Move nbd_recv_coroutines_enter_all to the reply read coroutine,
-> which is the place where hangups are detected.  nbd_teardown_connection=
-
-> can simply wait for the reply read coroutine to detect the hangup
-> and clean up after itself.
+On Tue, Feb 28, 2017 at 02:21:32PM +0100, Paolo Bonzini wrote:
+> Commit ad07cd6 ("virtio-scsi: always use dataplane path if ioeventfd is
+> active", 2016-10-30) and 9ffe337 ("virtio-blk: always use dataplane
+> path if ioeventfd is active", 2016-10-30) broke the virtio 1.0
+> indirect access registers.
 >=20
-> This wouldn't be enough though because nbd_receive_reply returns 0
-> (rather than -EPIPE or similar) when reading from a hung connection.
-> Fix the return value check in nbd_read_reply_entry.
+> The indirect access registers bypass the ioeventfd, so that virtio-blk
+> and virtio-scsi now repeatedly try to initialize dataplane instead of
+> triggering the guest->host EventNotifier.  Detect the situation by
+> checking vq->handle_aio_output; if it is not NULL, trigger the
+> EventNotifier, which is how the device expects to get notifications
+> and in fact the only thread-safe manner to deliver them.
 >=20
-> This fixes qemu-iotests 083.
->=20
-> Reported-by: Max Reitz <mreitz@redhat.com>
+> Fixes: ad07cd6
+> Fixes: 9ffe337
+> Cc: qemu-stable@nongnu.org
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  block/nbd-client.c | 12 ++++++------
->  nbd/client.c       |  2 +-
->  2 files changed, 7 insertions(+), 7 deletions(-)
+>  hw/virtio/virtio.c | 13 ++++++++++++-
+>  1 file changed, 12 insertions(+), 1 deletion(-)
 
-Thanks, I've applied the patch to my block branch:
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-https://github.com/XanClic/qemu/commits/block
-
-Max
-
-
---KX2nueESN6HQf7fM4lW1RsUloAFN7NFrn
+--IJpNTDwzlM2Ie8A6
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAljSnUgSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ALvIIAKj1lfFIbgq9FxnmRKwBSaxGsVyox5uw
-Uypt5hcOMk6+XJ6fRBaD0GbaDkXJaD0lpBjkn3TYbKPUnDk2TV7jPu1/ucuttr2Z
-86XLZOxj0ZxdyxiSVBtADrJ+ezLaJYWHjb7XOPMRXrTQWrzZ7H45okxMCeiaBnWZ
-rv7CPFkvVVgWE1x3kcffRd5kekLmd7xblaIJI4N/Z1fGcitLH/PYfhI92nNpAYfw
-maW7beXPj5CkrkfntokskEnFWbedv7pjY5vIRsct7fY7Kl/8GfvzU2+CM7nyliSQ
-UCiskMtMXk6FJHm89rqhoPA/eOXbGMCTjALJqKXaKPvPYIuP6pbpWnc=
-=1i5L
+iQEcBAEBAgAGBQJY0p4IAAoJEJykq7OBq3PIolUIAK5AVQO7mBFWsyW3iaSJ2rfc
+QBXNu9egf39P6vcXy7PB1/cNWpogR+XlEsGiH6v5zUS1x2asIkjZqQPrzRKmP0FP
+TrjbWrpa+aVvc/n9rGBtRQBWJsNemtilmx7p5JoTfzbW+AqkDE41QjbV9NGEYBbo
+hrFZdpGb09ZfcIVG2z8RpDTeQ/1Xman3T1qtpHehzvo83UsN0NHaCYCOUHN6pZWC
+q0XpgI2e5r6gO7Vls2YGoR/FyF55wckbOMyo+4fINOGU3yIWyDFD+TGp2o+7cxte
+myreyGR908jy525/bMXqiPdU5Tf4Fqicv+w7GC/xL3N/5iNnSFOoz8LAn1DcZlw=
+=BXsT
 -----END PGP SIGNATURE-----
 
---KX2nueESN6HQf7fM4lW1RsUloAFN7NFrn--
+--IJpNTDwzlM2Ie8A6--
