@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40759)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cqWAZ-0004jf-8g
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 22:38:40 -0400
+	(envelope-from <jasowang@redhat.com>) id 1cqWci-0001oD-JT
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 23:07:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cqWAV-0003FI-GC
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 22:38:39 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Tue, 21 Mar 2017 21:38:20 -0500
-Message-Id: <20170322023820.10772-4-eblake@redhat.com>
-In-Reply-To: <20170322023820.10772-1-eblake@redhat.com>
-References: <20170322023820.10772-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/3] qapi: Fix QemuOpts visitor regression
- on unvisited input
+	(envelope-from <jasowang@redhat.com>) id 1cqWce-0003uT-K1
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 23:07:44 -0400
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 22 Mar 2017 11:07:32 +0800
+Message-Id: <1490152052-9660-1-git-send-email-jasowang@redhat.com>
+Subject: [Qemu-devel] [PATCH] e1000: disable debug by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,117 +17,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, lvivier@redhat.com, qemu-stable@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: jasowang@redhat.com, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Leonid Bloch <leonid.bloch@ravellosystems.com>, Dmitry Fleytman <dmitry.fleytman@ravellosystems.com>, qemu-stable@nongnu.org
 
-An off-by-one in commit 15c2f669e meant that we were failing to
-check for unparsed input in all QemuOpts visitors.  Recent testsuite
-additions show that fixing the obvious bug with bogus fields will
-also fix the case of an incomplete list visit; update the tests to
-match the new behavior.
+Disable debug output by default, the information were not needed for
+release.
 
-Simple testcase:
-
-./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic -qmp stdio -numa node,size=1g
-
-failed to diagnose that 'size' is not a valid argument to -numa, and
-now once again reports:
-
-qemu-system-x86_64: -numa node,size=1g: Invalid parameter 'size'
-
-CC: qemu-stable@nongnu.org
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-Tested-by: Laurent Vivier <lvivier@redhat.com>
-
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Leonid Bloch <leonid.bloch@ravellosystems.com>
+Cc: Dmitry Fleytman <dmitry.fleytman@ravellosystems.com>
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
-v2: trivial rebase to comment tweak in patch 1
----
- qapi/opts-visitor.c       |  6 +++---
- tests/test-opts-visitor.c | 15 +++++++++------
- 2 files changed, 12 insertions(+), 9 deletions(-)
+ hw/net/e1000.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/qapi/opts-visitor.c b/qapi/opts-visitor.c
-index 026d25b..b54da81 100644
---- a/qapi/opts-visitor.c
-+++ b/qapi/opts-visitor.c
-@@ -164,7 +164,7 @@ opts_check_struct(Visitor *v, Error **errp)
-     GHashTableIter iter;
-     GQueue *any;
-
--    if (ov->depth > 0) {
-+    if (ov->depth > 1) {
-         return;
-     }
-
-@@ -276,8 +276,8 @@ static void
- opts_check_list(Visitor *v, Error **errp)
- {
-     /*
--     * FIXME should set error when unvisited elements remain.  Mostly
--     * harmless, as the generated visits always visit all elements.
-+     * Unvisited list elements will be reported later when checking if
-+     * unvisited struct members remain.
-      */
- }
-
-diff --git a/tests/test-opts-visitor.c b/tests/test-opts-visitor.c
-index 8e0dda5..1766919 100644
---- a/tests/test-opts-visitor.c
-+++ b/tests/test-opts-visitor.c
-@@ -175,6 +175,7 @@ expect_u64_max(OptsVisitorFixture *f, gconstpointer test_data)
- static void
- test_opts_range_unvisited(void)
- {
-+    Error *err = NULL;
-     intList *list = NULL;
-     intList *tail;
-     QemuOpts *opts;
-@@ -199,10 +200,11 @@ test_opts_range_unvisited(void)
-     g_assert_cmpint(tail->value, ==, 1);
-     tail = (intList *)visit_next_list(v, (GenericList *)tail, sizeof(*list));
-     g_assert(tail);
--    visit_check_list(v, &error_abort); /* BUG: unvisited tail not reported */
-+    visit_check_list(v, &error_abort); /* unvisited tail ignored until... */
-     visit_end_list(v, (void **)&list);
-
--    visit_check_struct(v, &error_abort);
-+    visit_check_struct(v, &err); /* ...here */
-+    error_free_or_abort(&err);
-     visit_end_struct(v, NULL);
-
-     qapi_free_intList(list);
-@@ -239,7 +241,7 @@ test_opts_range_beyond(void)
-     error_free_or_abort(&err);
-     visit_end_list(v, (void **)&list);
-
--    visit_check_struct(v, &error_abort);
-+    visit_check_struct(v, &err);
-     visit_end_struct(v, NULL);
-
-     qapi_free_intList(list);
-@@ -250,6 +252,7 @@ test_opts_range_beyond(void)
- static void
- test_opts_dict_unvisited(void)
- {
-+    Error *err = NULL;
-     QemuOpts *opts;
-     Visitor *v;
-     UserDefOptions *userdef;
-@@ -258,11 +261,11 @@ test_opts_dict_unvisited(void)
-                            &error_abort);
-
-     v = opts_visitor_new(opts);
--    /* BUG: bogus should be diagnosed */
--    visit_type_UserDefOptions(v, NULL, &userdef, &error_abort);
-+    visit_type_UserDefOptions(v, NULL, &userdef, &err);
-+    error_free_or_abort(&err);
-     visit_free(v);
-     qemu_opts_del(opts);
--    qapi_free_UserDefOptions(userdef);
-+    g_assert(!userdef);
- }
-
- int
+diff --git a/hw/net/e1000.c b/hw/net/e1000.c
+index 9324949..f2e5072 100644
+--- a/hw/net/e1000.c
++++ b/hw/net/e1000.c
+@@ -40,7 +40,7 @@
+ 
+ static const uint8_t bcast[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+ 
+-#define E1000_DEBUG
++/* #define E1000_DEBUG */
+ 
+ #ifdef E1000_DEBUG
+ enum {
 -- 
-2.9.3
+2.7.4
