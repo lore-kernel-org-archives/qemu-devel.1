@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cqWAQ-0004eG-EX
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 22:38:31 -0400
+	(envelope-from <eblake@redhat.com>) id 1cqWAY-0004iw-Dy
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 22:38:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cqWAP-0003CA-Dz
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 22:38:30 -0400
+	(envelope-from <eblake@redhat.com>) id 1cqWAU-0003F5-Bj
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 22:38:38 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Tue, 21 Mar 2017 21:38:18 -0500
-Message-Id: <20170322023820.10772-2-eblake@redhat.com>
+Date: Tue, 21 Mar 2017 21:38:19 -0500
+Message-Id: <20170322023820.10772-3-eblake@redhat.com>
 In-Reply-To: <20170322023820.10772-1-eblake@redhat.com>
 References: <20170322023820.10772-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/3] tests: Expose regression in QemuOpts
- visitor
+Subject: [Qemu-devel] [PATCH v2 2/3] qom: Avoid unvisited 'id'/'qom-type' in
+ user_creatable_add_opts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,63 +21,67 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, lvivier@redhat.com, qemu-stable@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: armbru@redhat.com, lvivier@redhat.com, qemu-stable@nongnu.org, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>
 
-Commit 15c2f669e broke the ability of the QemuOpts visitor to
-flag extra input parameters, but the regression went unnoticed
-because of missing testsuite coverage.  Add a test to cover this;
-take the approach already used in 9cb8ef3 of adding a test that
-passes (to avoid breaking bisection) but marks with BUG the
-behavior that we don't like, so that the actual impact of the
-fix in a later patch is easier to see.
+A regression in commit 15c2f669e caused us to silently ignore
+excess input to the QemuOpts visitor.  Later, commit ea4641
+accidentally abused that situation, by removing "qom-type" and
+"id" from the corresponding QDict but leaving them defined in
+the QemuOpts, when using the pair of containers to create a
+user-defined object. Note that since we are already traversing
+two separate items (a QDict and a QemuOpts), we are already
+able to flag bogus arguments, as in:
+
+$ ./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic -qmp stdio -object memory-backend-ram,id=mem1,size=4k,bogus=huh
+qemu-system-x86_64: -object memory-backend-ram,id=mem1,size=4k,bogus=huh: Property '.bogus' not found
+
+So the only real concern is that when we re-enable strict checking
+in the QemuOpts visitor, we do not want to start flagging the two
+leftover keys as unvisited.  Rearrange the code to clean out the
+QemuOpts listing in advance, rather than removing items from the
+QDict.  Since "qom-type" is usually an automatic implicit default,
+we don't have to restore it; but "id" has to be put back (requiring
+us to cast away a const).
 
 CC: qemu-stable@nongnu.org
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 
 ---
-v2: s/FIXME/BUG/ in comment, enhance commit message
+v2: new patch
 ---
- tests/test-opts-visitor.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ qom/object_interfaces.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/tests/test-opts-visitor.c b/tests/test-opts-visitor.c
-index 2238f8e..8e0dda5 100644
---- a/tests/test-opts-visitor.c
-+++ b/tests/test-opts-visitor.c
-@@ -247,6 +247,24 @@ test_opts_range_beyond(void)
-     qemu_opts_del(opts);
- }
+diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
+index 03a95c3..cc9a694 100644
+--- a/qom/object_interfaces.c
++++ b/qom/object_interfaces.c
+@@ -114,7 +114,7 @@ Object *user_creatable_add_opts(QemuOpts *opts, Error **errp)
+     QDict *pdict;
+     Object *obj;
+     const char *id = qemu_opts_id(opts);
+-    const char *type = qemu_opt_get(opts, "qom-type");
++    char *type = qemu_opt_get_del(opts, "qom-type");
 
-+static void
-+test_opts_dict_unvisited(void)
-+{
-+    QemuOpts *opts;
-+    Visitor *v;
-+    UserDefOptions *userdef;
-+
-+    opts = qemu_opts_parse(qemu_find_opts("userdef"), "i64x=0,bogus=1", false,
-+                           &error_abort);
-+
-+    v = opts_visitor_new(opts);
-+    /* BUG: bogus should be diagnosed */
-+    visit_type_UserDefOptions(v, NULL, &userdef, &error_abort);
-+    visit_free(v);
-+    qemu_opts_del(opts);
-+    qapi_free_UserDefOptions(userdef);
-+}
-+
- int
- main(int argc, char **argv)
- {
-@@ -343,6 +361,8 @@ main(int argc, char **argv)
-     g_test_add_func("/visitor/opts/range/beyond",
-                     test_opts_range_beyond);
+     if (!type) {
+         error_setg(errp, QERR_MISSING_PARAMETER, "qom-type");
+@@ -125,14 +125,15 @@ Object *user_creatable_add_opts(QemuOpts *opts, Error **errp)
+         return NULL;
+     }
 
-+    g_test_add_func("/visitor/opts/dict/unvisited", test_opts_dict_unvisited);
-+
-     g_test_run();
-     return 0;
++    qemu_opts_set_id(opts, NULL);
+     pdict = qemu_opts_to_qdict(opts, NULL);
+-    qdict_del(pdict, "qom-type");
+-    qdict_del(pdict, "id");
+
+     v = opts_visitor_new(opts);
+     obj = user_creatable_add_type(type, id, pdict, v, errp);
+     visit_free(v);
+
++    qemu_opts_set_id(opts, (char *) id);
++    g_free(type);
+     QDECREF(pdict);
+     return obj;
  }
 -- 
 2.9.3
