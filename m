@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vfeenstr@redhat.com>) id 1cqiUC-0004BS-Ki
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 11:47:45 -0400
+	(envelope-from <armbru@redhat.com>) id 1cqiWd-0005NM-41
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 11:50:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vfeenstr@redhat.com>) id 1cqiUA-0001lF-36
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 11:47:44 -0400
-Received: from mail-wr0-f172.google.com ([209.85.128.172]:35581)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <vfeenstr@redhat.com>) id 1cqiU9-0001kP-Sr
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 11:47:42 -0400
-Received: by mail-wr0-f172.google.com with SMTP id g10so131883466wrg.2
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 08:47:41 -0700 (PDT)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-From: Vinzenz Feenstra <vfeenstr@redhat.com>
-In-Reply-To: <20170322154649.6947-1-vfeenstr@redhat.com>
-Date: Wed, 22 Mar 2017 16:47:39 +0100
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <50AD4E3B-F0A3-48AC-B2EB-770D80678981@redhat.com>
-References: <20170322154649.6947-1-vfeenstr@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qga: Add `guest-get-timezone` command
+	(envelope-from <armbru@redhat.com>) id 1cqiWc-0002dJ-3n
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 11:50:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60588)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cqiWb-0002d6-U6
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 11:50:14 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D5DF167BB0
+	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 15:50:13 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <1490115473-24839-1-git-send-email-armbru@redhat.com>
+	<dbbe78d8-2c09-2832-89f4-51b50ee6bb8f@redhat.com>
+Date: Wed, 22 Mar 2017 16:50:10 +0100
+In-Reply-To: <dbbe78d8-2c09-2832-89f4-51b50ee6bb8f@redhat.com> (Max Reitz's
+	message of "Wed, 22 Mar 2017 15:10:47 +0100")
+Message-ID: <874lylgvkd.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH for-2.9] block: Declare blockdev-add and
+ blockdev-del supported
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,91 +34,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, pkrempa@redhat.com
 
-Sorry I meant to add you Michael not Paolo -_-
+Max Reitz <mreitz@redhat.com> writes:
 
-> On Mar 22, 2017, at 4:46 PM, Vinzenz 'evilissimo' Feenstra =
-<vfeenstr@redhat.com> wrote:
->=20
-> From: Vinzenz Feenstra <vfeenstr@redhat.com>
->=20
-> Adds a new command `guest-get-timezone` reporting the currently
-> configured timezone on the system. The information on what timezone is
-> currently is configured is useful in case of Windows VMs where the
-> offset of the hardware clock is required to have the same offset. This
-> can be used for management systems like `oVirt` to detect the timezone
-> difference and warn administrators of the misconfiguration.
->=20
-> Signed-off-by: Vinzenz Feenstra <vfeenstr@redhat.com>
-> ---
-> qga/commands.c       | 19 +++++++++++++++++++
-> qga/qapi-schema.json | 25 +++++++++++++++++++++++++
-> 2 files changed, 44 insertions(+)
->=20
-> diff --git a/qga/commands.c b/qga/commands.c
-> index 4d92946..83d7f99 100644
-> --- a/qga/commands.c
-> +++ b/qga/commands.c
-> @@ -499,3 +499,22 @@ int ga_parse_whence(GuestFileWhence *whence, =
-Error **errp)
->     error_setg(errp, "invalid whence code %"PRId64, whence->u.value);
->     return -1;
-> }
-> +
-> +GuestTimezone *qmp_guest_get_timezone(Error **errp)
-> +{
-> +    GuestTimezone *info =3D g_new0(GuestTimezone, 1);
-> +    GTimeZone *tz =3D g_time_zone_new_local();
-> +    gint32 interval =3D g_time_zone_find_interval(tz, =
-G_TIME_TYPE_STANDARD, 0);
-> +    gchar const *name =3D g_time_zone_get_abbreviation(tz, interval);
-> +    if (name !=3D NULL) {
-> +        info->offset =3D g_time_zone_get_offset(tz, interval) / 60;
-> +        info->zone =3D g_strdup(name);
-> +    } else {
-> +        error_setg(errp, "Timezone lookup failed");
-> +        g_free(info);
-> +        info =3D NULL;
-> +    }
-> +    g_time_zone_unref(tz);
-> +    return info;
-> +}
-> +
-> diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-> index a02dbf2..6683aae 100644
-> --- a/qga/qapi-schema.json
-> +++ b/qga/qapi-schema.json
-> @@ -1042,3 +1042,28 @@
->   'data':    { 'path': 'str', '*arg': ['str'], '*env': ['str'],
->                '*input-data': 'str', '*capture-output': 'bool' },
->   'returns': 'GuestExec' }
-> +
-> +
-> +##
-> +# @GuestTimezone:
-> +#
-> +# @zone:    Timezone name
-> +# @offset:  Offset to UTC in minutes
-> +#
-> +# Since: 2.10
-> +##
-> +{ 'struct': 'GuestTimezone',
-> +  'data':   { 'zone': 'str', 'offset': 'int' } }
-> +
-> +
-> +##
-> +# @guest-get-timezone:
-> +#
-> +# Retrieves the timezone information from the guest.
-> +#
-> +# Returns: The guest timezone GuestTimezone information on success.
-> +#
-> +# Since: 2.10
-> +##
-> +{ 'command': 'guest-get-timezone',
-> +  'returns': 'GuestTimezone' }
-> --=20
-> 2.9.3
->=20
+> On 21.03.2017 17:57, Markus Armbruster wrote:
+>> It's been a long journey, but here we are.
+>> 
+>> x-blockdev-remove-medium, x-blockdev-insert-medium and
+>> x-blockdev-change need a bit more work, so leave them alone for now.
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  blockdev.c             |  4 ++--
+>>  qapi/block-core.json   | 14 +++++---------
+>>  tests/qemu-iotests/139 |  8 ++++----
+>>  tests/qemu-iotests/141 |  4 ++--
+>>  tests/qemu-iotests/147 |  2 +-
+>>  5 files changed, 14 insertions(+), 18 deletions(-)
+>
+> [...]
+>
+>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> index 0f132fc..5d913d4 100644
+>> --- a/qapi/block-core.json
+>> +++ b/qapi/block-core.json
+>> @@ -2907,11 +2907,7 @@
+>>  # BlockBackend will be created; otherwise, @node-name is mandatory at the top
+>>  # level and no BlockBackend will be created.
+>>  #
+>> -# Note: This command is still a work in progress.  It doesn't support all
+>> -# block drivers among other things.  Stay away from it unless you want
+>> -# to help with its development.
+>> -#
+>> -# Since: 1.7
+>> +# Since: 2.9
+>>  #
+>>  # Example:
+>>  #
+>> @@ -2957,7 +2953,7 @@
+>>  { 'command': 'blockdev-add', 'data': 'BlockdevOptions', 'boxed': true }
+>>  
+>>  ##
+>> -# @x-blockdev-del:
+>> +# @blockdev-del:
+>>  #
+>>  # Deletes a block device that has been added using blockdev-add.
+>>  # The command will fail if the node is attached to a device or is
+>> @@ -2969,7 +2965,7 @@
+>>  # experimental. Stay away from it unless you want to help with its
+>>  # development.
+>
+> This part of the comment very much looks like it should be removed.
+
+v2 coming up, thanks!
+
+> Max
+>
+>>  #
+>> -# Since: 2.5
+>> +# Since: 2.9
+>>  #
+>>  # Example:
+>>  #
+>
+> [...]
