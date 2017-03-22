@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cqZV2-00008V-A1
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 02:12:01 -0400
+	(envelope-from <armbru@redhat.com>) id 1cqZyb-00046O-HT
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 02:42:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cqZUx-0005hA-Bi
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 02:12:00 -0400
-Received: from mail.weilnetz.de ([37.120.169.71]:41332
-	helo=v2201612906741603.powersrv.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1cqZUx-0005h2-5N
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 02:11:55 -0400
-References: <20170321223151.12984-1-Andrew.Baumann@microsoft.com>
-	<158d19e3-feaf-84fb-6d7b-22f6204858fd@redhat.com>
-	<DM5PR03MB2827F4507244124CB15683209E3D0@DM5PR03MB2827.namprd03.prod.outlook.com>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <b0b934af-0957-ce61-60ff-5cdf45e869f1@weilnetz.de>
-Date: Wed, 22 Mar 2017 07:11:51 +0100
+	(envelope-from <armbru@redhat.com>) id 1cqZyX-00082G-Es
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 02:42:33 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170322023820.10772-1-eblake@redhat.com>
+	<20170322023820.10772-3-eblake@redhat.com>
+Date: Wed, 22 Mar 2017 07:42:24 +0100
+In-Reply-To: <20170322023820.10772-3-eblake@redhat.com> (Eric Blake's message
+	of "Tue, 21 Mar 2017 21:38:19 -0500")
+Message-ID: <87efxpersf.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <DM5PR03MB2827F4507244124CB15683209E3D0@DM5PR03MB2827.namprd03.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] virtio: fix vring_align() on 64-bit win32
- platforms
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] qom: Avoid unvisited
+ 'id'/'qom-type' in user_creatable_add_opts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +24,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Baumann <Andrew.Baumann@microsoft.com>, Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, Andreas =?utf-8?Q?F=C3=A4?= =?utf-8?Q?rber?= <afaerber@suse.de>, qemu-stable@nongnu.org, Eduardo Otubo <eduardo.otubo@profitbricks.com>, David Alan Gilbert <dgilbert@redhat.com>
 
-Am 22.03.2017 um 00:06 schrieb Andrew Baumann:
->> From: Eric Blake [mailto:eblake@redhat.com]
->> Sent: Tuesday, 21 March 2017 15:52
->>
->> On 03/21/2017 05:31 PM, Andrew Baumann wrote:
->>> "long" is 32-bits on win32, but we need to promote it to a 64-bit hwaddr
->>> before negating, or else the top half of the address is truncated
->>>
->>> Signed-off-by: Andrew Baumann <Andrew.Baumann@microsoft.com>
->>> ---
->>>  include/hw/virtio/virtio.h | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
->>> index 15efcf2..a0a8543 100644
->>> --- a/include/hw/virtio/virtio.h
->>> +++ b/include/hw/virtio/virtio.h
->>> @@ -34,7 +34,7 @@ struct VirtQueue;
->>>  static inline hwaddr vring_align(hwaddr addr,
->>>                                               unsigned long align)
->>>  {
->>> -    return (addr + align - 1) & ~(align - 1);
->>> +    return (addr + align - 1) & ~(hwaddr)(align - 1);
->>
->> Why not just use the QEMU_ALIGN_DOWN macro, instead of open-coding it?
+Eric Blake <eblake@redhat.com> writes:
+
+> A regression in commit 15c2f669e caused us to silently ignore
+> excess input to the QemuOpts visitor.  Later, commit ea4641
+> accidentally abused that situation, by removing "qom-type" and
+> "id" from the corresponding QDict but leaving them defined in
+> the QemuOpts, when using the pair of containers to create a
+> user-defined object. Note that since we are already traversing
+> two separate items (a QDict and a QemuOpts), we are already
+> able to flag bogus arguments, as in:
 >
-> Well, this code is aligning up, but yes the ALIGN_UP macro looks like it should also avoid the type promotion problem. This patch is just the minimally-invasive change after discovering the bug.
+> $ ./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic -qmp stdio -object memory-backend-ram,id=mem1,size=4k,bogus=huh
+> qemu-system-x86_64: -object memory-backend-ram,id=mem1,size=4k,bogus=huh: Property '.bogus' not found
 >
-> Let me know if you want me to spin another patch with the macro.
+> So the only real concern is that when we re-enable strict checking
+> in the QemuOpts visitor, we do not want to start flagging the two
+> leftover keys as unvisited.  Rearrange the code to clean out the
+> QemuOpts listing in advance, rather than removing items from the
+> QDict.  Since "qom-type" is usually an automatic implicit default,
+> we don't have to restore it; but "id" has to be put back (requiring
+> us to cast away a const).
+
+This is a yet another example of how actual configuration can easily
+diverge from the one in QemuOpts.  Discussed recently in:
+
+Subject: Re: [PATCH 0/2] add writeconfig command on monitor
+Message-ID: <87k28qlca9.fsf@dusky.pond.sub.org>
+https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg03476.html
+
+Not putting "qom-type" back here is okay.  Putting it back would also be
+okay.  I guess what you prefer depends on your level of OCD.
+
+> CC: qemu-stable@nongnu.org
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 >
-> Andrew
+> ---
+> v2: new patch
+> ---
+>  qom/object_interfaces.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+>
+> diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
+> index 03a95c3..cc9a694 100644
+> --- a/qom/object_interfaces.c
+> +++ b/qom/object_interfaces.c
+> @@ -114,7 +114,7 @@ Object *user_creatable_add_opts(QemuOpts *opts, Error **errp)
+>      QDict *pdict;
+>      Object *obj;
+>      const char *id = qemu_opts_id(opts);
+> -    const char *type = qemu_opt_get(opts, "qom-type");
+> +    char *type = qemu_opt_get_del(opts, "qom-type");
+>
+>      if (!type) {
+>          error_setg(errp, QERR_MISSING_PARAMETER, "qom-type");
+> @@ -125,14 +125,15 @@ Object *user_creatable_add_opts(QemuOpts *opts, Error **errp)
+>          return NULL;
+>      }
+>
+> +    qemu_opts_set_id(opts, NULL);
+>      pdict = qemu_opts_to_qdict(opts, NULL);
+> -    qdict_del(pdict, "qom-type");
+> -    qdict_del(pdict, "id");
+>
+>      v = opts_visitor_new(opts);
+>      obj = user_creatable_add_type(type, id, pdict, v, errp);
+>      visit_free(v);
+>
+> +    qemu_opts_set_id(opts, (char *) id);
+> +    g_free(type);
+>      QDECREF(pdict);
+>      return obj;
+>  }
 
-Yes, please use QEMU_ALIGN_UP in an updated patch.
-This is a bug fix needed for v2.9.0.
-
-Fixing all other code locations which round up or down
-with Coccinelle is a separate task, nothing which is
-needed for the next QEMU version.
-
-Thanks,
-Stefan
+Aside: I dislike how this converts QemuOpts to QDict so
+user_creatable_add_type() can use the QDict to guide the visit.
+Awkward, as so much code that uses QemuOpts in not entirely
+straightforward ways.
