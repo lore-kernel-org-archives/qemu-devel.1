@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49468)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cqnBw-0003sX-SV
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 16:49:13 -0400
+	id 1cqnC1-0003uY-3g
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 16:49:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1cqnBt-0000SL-Qq
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 16:49:12 -0400
+	id 1cqnC0-0000UG-6u
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 16:49:17 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 22 Mar 2017 17:48:41 -0300
-Message-Id: <20170322204844.446-1-f4bug@amsat.org>
+Date: Wed, 22 Mar 2017 17:48:42 -0300
+Message-Id: <20170322204844.446-2-f4bug@amsat.org>
+In-Reply-To: <20170322204844.446-1-f4bug@amsat.org>
+References: <20170322204844.446-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH RESEND 0/3] easy-to-fix clang warnings
+Subject: [Qemu-devel] [PATCH RESEND 1/3] usb-ccid: make
+ ccid_write_data_block() cope with null buffers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,20 +30,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Michael Roth <mdroth@linux.vnet.ibm.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>, Gerd Hoffmann <kraxel@redhat.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-This patchset fixes three easy-to-fix clang warnings.
+static code analyzer complain:
 
-Resent adding Marc-André Lureau's Reviewed-by and CC'ing qemu-trivial as
-suggested by Markus Armbruster.
+hw/usb/dev-smartcard-reader.c:816:5: warning: Null pointer passed as an argument to a 'nonnull' parameter
+    memcpy(p->abData, data, len);
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Philippe Mathieu-Daudé (3):
-  usb-ccid: make ccid_write_data_block() cope with null buffers
-  device_tree: fix compiler warnings (clang 5)
-  qga: fix compiler warnings (clang 5)
-
- device_tree.c                 | 1 +
+Reported-by: Clang Static Analyzer
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+---
  hw/usb/dev-smartcard-reader.c | 8 +++++++-
- qga/commands-posix.c          | 8 +++++---
- 3 files changed, 13 insertions(+), 4 deletions(-)
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
+diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-reader.c
+index 757b8b3f5a..c38a4e5886 100644
+--- a/hw/usb/dev-smartcard-reader.c
++++ b/hw/usb/dev-smartcard-reader.c
+@@ -799,8 +799,14 @@ static void ccid_write_parameters(USBCCIDState *s, CCID_Header *recv)
+ static void ccid_write_data_block(USBCCIDState *s, uint8_t slot, uint8_t seq,
+                                   const uint8_t *data, uint32_t len)
+ {
+-    CCID_DataBlock *p = ccid_reserve_recv_buf(s, sizeof(*p) + len);
++    CCID_DataBlock *p;
+ 
++    if (len == 0) {
++        return;
++    }
++    g_assert(data != NULL);
++
++    p = ccid_reserve_recv_buf(s, sizeof(*p) + len);
+     if (p == NULL) {
+         return;
+     }
 -- 
 2.11.0
