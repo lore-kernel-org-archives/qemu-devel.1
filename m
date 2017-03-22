@@ -1,27 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45058)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cqbwI-0001fn-OR
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 04:48:19 -0400
+	(envelope-from <jiahuanzhang90@gmail.com>) id 1cqbwn-00021U-H3
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 04:48:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cqbwD-0007iZ-Rb
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 04:48:18 -0400
-Received: from 17.mo6.mail-out.ovh.net ([46.105.36.150]:50075)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cqbwD-0007iI-LY
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 04:48:13 -0400
-Received: from player787.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 73D7ABA2E8
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 09:48:12 +0100 (CET)
-Date: Wed, 22 Mar 2017 09:48:05 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170322094805.6acc527e@bahia.lan>
-In-Reply-To: <1490130086-22057-1-git-send-email-sstabellini@kernel.org>
-References: <1490130086-22057-1-git-send-email-sstabellini@kernel.org>
+	(envelope-from <jiahuanzhang90@gmail.com>) id 1cqbwj-0007qB-E0
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 04:48:49 -0400
+Received: from mail-qt0-x233.google.com ([2607:f8b0:400d:c0d::233]:35121)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jiahuanzhang90@gmail.com>)
+	id 1cqbwj-0007q7-AA
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 04:48:45 -0400
+Received: by mail-qt0-x233.google.com with SMTP id x35so148563764qtc.2
+	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 01:48:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/B+W8Tz_y4BgWgXD21y5C8Jo";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH] add xen-9p-backend to MAINTAINERS under Xen
+In-Reply-To: <1322109813.6444955.1490172025040.JavaMail.zimbra@redhat.com>
+References: <CAJy91CY1SOwi7D-kyU0ooe5SyhM414WaBCedXuPfXXhJpbo1fg@mail.gmail.com>
+	<CAFEAcA_etsFstPtUzs0AZjWD35MhMLhwru0ibJzS_upgE-nsng@mail.gmail.com>
+	<CAJy91CZmqEUXLKjRJ0JdUEf83E3FwE_24qmej-4C8uAGQkTPWA@mail.gmail.com>
+	<CAFEAcA-mzO7vniDEaZeueVFQ7+MVBB7pnzHhahv2Yk_f3q0mJw@mail.gmail.com>
+	<CAJy91CZ4Ed-HGHLkzEc1dqQbo32d-eTE1S1ovO_ZwkDdTpkQXQ@mail.gmail.com>
+	<CAJy91CaCV40FgSP55qWZeZgkQ=2+E8Cr7xdbu9pn5HLEo+6JJQ@mail.gmail.com>
+	<CAJy91CYEwOVT7oEdYY=21__c2kcLTyxyjAaq7Zx4VnQdeLdQQQ@mail.gmail.com>
+	<CAFEAcA_t9iLude4Vu3Zc=_wcXMTtFb4Q4oJ8O+zLAJ9isAPqHQ@mail.gmail.com>
+	<1322109813.6444955.1490172025040.JavaMail.zimbra@redhat.com>
+From: Jiahuan Zhang <jiahuanzhang90@gmail.com>
+Date: Wed, 22 Mar 2017 09:48:44 +0100
+Message-ID: <CAJy91CaUxFHJeGLLW4DqK6sBwx2qDnE9s20ZbdT86JDn8yQoHg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Guest application reading from pl011 without
+ device driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +38,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Stefano Stabellini <stefano@aporeto.com>, anthony.perard@citrix.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
---Sig_/B+W8Tz_y4BgWgXD21y5C8Jo
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 22 March 2017 at 09:40, Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-On Tue, 21 Mar 2017 14:01:26 -0700
-Stefano Stabellini <sstabellini@kernel.org> wrote:
+>
+> > > I am using a windows named pipe to get the data from a window
+> > > host program, which uses ReadFile () in char_win.c
+> >
+> > OK, bugs in the windows-specific char backend would be
+> > unsurprising.
+> >
+> > I'm not entirely sure how the chardev layer works, but
+> > at the pl011 end if we return 0 from our can_receive
+> > function then the chardev layer should decide it has
+> > nothing to do until the pl011 later calls
+> > qemu_chr_fe_accept_input(), I think.
+> >
+> > I've cc'd Paolo and Marc-Andr=C3=A9 Lureau as the chardev
+> > maintainers.
+>
+> Windows named pipes do not support the equivalent of "select",
+> so it's possible that they cause a busy wait.  Try using a
+> TCP socket instead and see if the bug goes away.
+>
 
-> Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
-> Signed-off-by: Stefano Stabellini <stefano@aporeto.com>
-> CC: groug@kaod.org
-> CC: anthony.perard@citrix.com
-> ---
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
-> This patch is meant to be on top of
-> http://marc.info/?l=3Dxen-devel&m=3D149003409510264&w=3D2
-> ---
->  MAINTAINERS | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index be79f68..bd5218e 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -327,6 +327,7 @@ L: xen-devel@lists.xenproject.org
->  S: Supported
->  F: xen-*
->  F: */xen*
-> +F: hw/9pfs/xen-9p-backend.c
->  F: hw/char/xen_console.c
->  F: hw/display/xenfb.c
->  F: hw/net/xen_nic.c
+Hi, I am trying to use a Windows socket for serial redirection instead of
+Windows named pipe.
+What do you mean "the equivalent of 'select'"?
 
 
---Sig_/B+W8Tz_y4BgWgXD21y5C8Jo
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAljSOkUACgkQAvw66wEB28JgqQCgktSk+btKeg2ErqW+M+9drNuq
-FWUAn0m5NiSZDLuygTNN/V+X7EfhwpSL
-=HesJ
------END PGP SIGNATURE-----
-
---Sig_/B+W8Tz_y4BgWgXD21y5C8Jo--
+>
+> Paolo
+>
