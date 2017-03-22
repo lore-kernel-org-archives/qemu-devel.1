@@ -1,21 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37140)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cqilo-0006XG-7P
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:05:58 -0400
+	(envelope-from <armbru@redhat.com>) id 1cqilo-0006XX-R0
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:06:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cqill-0001kn-LU
+	(envelope-from <armbru@redhat.com>) id 1cqilm-0001lq-Sk
 	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:05:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35986)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cqill-0001jK-9h
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:05:53 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 22 Mar 2017 17:05:44 +0100
-Message-Id: <1490198748-4753-14-git-send-email-armbru@redhat.com>
+Date: Wed, 22 Mar 2017 17:05:47 +0100
+Message-Id: <1490198748-4753-17-git-send-email-armbru@redhat.com>
 In-Reply-To: <1490198748-4753-1-git-send-email-armbru@redhat.com>
 References: <1490198748-4753-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL for-2.9 13/17] Revert "hostmem: fix QEMU crash
- by 'info memdev'"
+Subject: [Qemu-devel] [PULL for-2.9 16/17] qom: Avoid unvisited
+ 'id'/'qom-type' in user_creatable_add_opts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,117 +21,78 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Xiao Guangrong <guangrong.xiao@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-stable@nongnu.org
 
-This reverts commit 1454d33f0507cb54d62ed80f494884157c9e7130.
+From: Eric Blake <eblake@redhat.com>
 
-The string input visitor regression fixed in the previous commit made
-visit_type_uint16List() fail on empty input.  query_memdev() calls it
-via object_property_get_uint16List().  Because it doesn't expect it to
-fail, it passes &error_abort, and duly crashes.
+A regression in commit 15c2f669e caused us to silently ignore
+excess input to the QemuOpts visitor.  Later, commit ea4641
+accidentally abused that situation, by removing "qom-type" and
+"id" from the corresponding QDict but leaving them defined in
+the QemuOpts, when using the pair of containers to create a
+user-defined object. Note that since we are already traversing
+two separate items (a QDict and a QemuOpts), we are already
+able to flag bogus arguments, as in:
 
-Commit 1454d33 "fixes" this crash by making
-host_memory_backend_get_host_nodes() return a list containing just
-MAX_NODES instead of the empty list.  Papers over the regression, and
-leads to bogus "info memdev" output, as shown below; revert.
+$ ./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic -qmp stdio -object memory-backend-ram,id=mem1,size=4k,bogus=huh
+qemu-system-x86_64: -object memory-backend-ram,id=mem1,size=4k,bogus=huh: Property '.bogus' not found
 
-I suspect that if we had bisected the crash back then, we would have
-found and fixed the actual bug instead of papering over it.
+So the only real concern is that when we re-enable strict checking
+in the QemuOpts visitor, we do not want to start flagging the two
+leftover keys as unvisited.  Rearrange the code to clean out the
+QemuOpts listing in advance, rather than removing items from the
+QDict.  Since "qom-type" is usually an automatic implicit default,
+we don't have to restore it (this does mean that once instantiated,
+QemuOpts is not necessarily an accurate representation of the
+original command line - but this is not the first place to do that);
+however "id" has to be put back (requiring us to cast away a const).
 
-To reproduce, run HMP command "info memdev" with
+[As a side note, hmp_object_add() turns a QDict into a QemuOpts,
+then calls user_creatable_add_opts() which converts QemuOpts into
+a new QDict. There are probably a lot of wasteful conversions like
+this, but cleaning them up is a much bigger task than the immediate
+regression fix.]
 
-    $ qemu-system-x86_64 --nodefaults -S -display none -monitor stdio -object memory-backend-ram,id=mem1,size=4k
-
-With this commit, "info memdev" prints
-
-    memory backend: mem1
-      size:  4096
-      merge: true
-      dump: true
-      prealloc: false
-      policy: default
-      host nodes:
-
-exactly like before commit 74f24cb.
-
-Between commit 1454d33 and this commit, it prints
-
-    memory backend: mem1
-      size:  4096
-      merge: true
-      dump: true
-      prealloc: false
-      policy: default
-      host nodes: 128
-
-The last line is bogus.
-
-Between commit 74f24cb and 1454d33, it crashes like this:
-
-    Unexpected error in parse_str() at /work/armbru/tmp/qemu/qapi/string-input-visitor.c:126:
-    Parameter 'null' expects an int64 value or range
-    Aborted (core dumped)
-
-Cc: Xiao Guangrong <guangrong.xiao@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+CC: qemu-stable@nongnu.org
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20170322144525.18964-3-eblake@redhat.com>
+Tested-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <1490026424-11330-3-git-send-email-armbru@redhat.com>
-Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- backends/hostmem.c | 22 ++++++++--------------
- 1 file changed, 8 insertions(+), 14 deletions(-)
+ qom/object_interfaces.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/backends/hostmem.c b/backends/hostmem.c
-index 162c218..89feb9e 100644
---- a/backends/hostmem.c
-+++ b/backends/hostmem.c
-@@ -64,14 +64,6 @@ out:
-     error_propagate(errp, local_err);
- }
+diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
+index 03a95c3..cc9a694 100644
+--- a/qom/object_interfaces.c
++++ b/qom/object_interfaces.c
+@@ -114,7 +114,7 @@ Object *user_creatable_add_opts(QemuOpts *opts, Error **errp)
+     QDict *pdict;
+     Object *obj;
+     const char *id = qemu_opts_id(opts);
+-    const char *type = qemu_opt_get(opts, "qom-type");
++    char *type = qemu_opt_get_del(opts, "qom-type");
  
--static uint16List **host_memory_append_node(uint16List **node,
--                                            unsigned long value)
--{
--     *node = g_malloc0(sizeof(**node));
--     (*node)->value = value;
--     return &(*node)->next;
--}
--
- static void
- host_memory_backend_get_host_nodes(Object *obj, Visitor *v, const char *name,
-                                    void *opaque, Error **errp)
-@@ -82,23 +74,25 @@ host_memory_backend_get_host_nodes(Object *obj, Visitor *v, const char *name,
-     unsigned long value;
- 
-     value = find_first_bit(backend->host_nodes, MAX_NODES);
--
--    node = host_memory_append_node(node, value);
--
-     if (value == MAX_NODES) {
--        goto out;
-+        return;
+     if (!type) {
+         error_setg(errp, QERR_MISSING_PARAMETER, "qom-type");
+@@ -125,14 +125,15 @@ Object *user_creatable_add_opts(QemuOpts *opts, Error **errp)
+         return NULL;
      }
  
-+    *node = g_malloc0(sizeof(**node));
-+    (*node)->value = value;
-+    node = &(*node)->next;
-+
-     do {
-         value = find_next_bit(backend->host_nodes, MAX_NODES, value + 1);
-         if (value == MAX_NODES) {
-             break;
-         }
++    qemu_opts_set_id(opts, NULL);
+     pdict = qemu_opts_to_qdict(opts, NULL);
+-    qdict_del(pdict, "qom-type");
+-    qdict_del(pdict, "id");
  
--        node = host_memory_append_node(node, value);
-+        *node = g_malloc0(sizeof(**node));
-+        (*node)->value = value;
-+        node = &(*node)->next;
-     } while (true);
+     v = opts_visitor_new(opts);
+     obj = user_creatable_add_type(type, id, pdict, v, errp);
+     visit_free(v);
  
--out:
-     visit_type_uint16List(v, name, &host_nodes, errp);
++    qemu_opts_set_id(opts, (char *) id);
++    g_free(type);
+     QDECREF(pdict);
+     return obj;
  }
- 
 -- 
 2.7.4
