@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cqa3r-0005BT-JV
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 02:48:00 -0400
+	(envelope-from <janne.huttunen@nokia.com>) id 1cqa9E-00067X-MP
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 02:53:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cqa3n-0000fN-NQ
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 02:47:59 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170322023820.10772-1-eblake@redhat.com>
-	<20170322023820.10772-4-eblake@redhat.com>
-Date: Wed, 22 Mar 2017 07:47:51 +0100
-In-Reply-To: <20170322023820.10772-4-eblake@redhat.com> (Eric Blake's message
-	of "Tue, 21 Mar 2017 21:38:20 -0500")
-Message-ID: <87a88derjc.fsf@dusky.pond.sub.org>
+	(envelope-from <janne.huttunen@nokia.com>) id 1cqa9A-000293-Qc
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 02:53:32 -0400
+Received: from mail-db5eur01on0133.outbound.protection.outlook.com
+	([104.47.2.133]:4313
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <janne.huttunen@nokia.com>)
+	id 1cqa9A-000289-6f
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 02:53:28 -0400
+Message-ID: <1490164614.19055.31.camel@nokia.com>
+From: Janne Huttunen <janne.huttunen@nokia.com>
+Date: Wed, 22 Mar 2017 08:36:54 +0200
+In-Reply-To: <11a3eab4-77f8-87ea-9558-299fbfc77a07@redhat.com>
+References: <cover.1489494746.git.janne.huttunen@nokia.com>
+	<1489510640.8844.18.camel@redhat.com>
+	<1489561105.24841.25.camel@nokia.com>
+	<11a3eab4-77f8-87ea-9558-299fbfc77a07@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] qapi: Fix QemuOpts visitor
- regression on unvisited input
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC][PATCH 0/6] "bootonceindex" property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,128 +32,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-stable@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Eric Blake <eblake@redhat.com> writes:
+On Tue, 2017-03-21 at 18:55 +0100, Paolo Bonzini wrote:
+>=20
+> > Since real HW has this capability, there exist certain
+> > auxiliary systems that are built on it. Having similar
+> > semantics available in QEMU allows me to build a virtual
+> > machine that works with these systems without modifying
+> > them in any way.
+>
+> How does real hardware do it?=C2=A0=C2=A0I suppose you'd do it with a fir=
+mware
+> setup menu or something like that; would it be enough to add a way to
+> modify bootindex during runtime?
 
-> An off-by-one in commit 15c2f669e meant that we were failing to
-> check for unparsed input in all QemuOpts visitors.  Recent testsuite
-> additions show that fixing the obvious bug with bogus fields will
-> also fix the case of an incomplete list visit; update the tests to
-> match the new behavior.
->
-> Simple testcase:
->
-> ./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic -qmp stdio -numa node,size=1g
->
-> failed to diagnose that 'size' is not a valid argument to -numa, and
-> now once again reports:
->
-> qemu-system-x86_64: -numa node,size=1g: Invalid parameter 'size'
->
-> CC: qemu-stable@nongnu.org
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> Tested-by: Laurent Vivier <lvivier@redhat.com>
->
-> ---
-> v2: trivial rebase to comment tweak in patch 1
-> ---
->  qapi/opts-visitor.c       |  6 +++---
->  tests/test-opts-visitor.c | 15 +++++++++------
->  2 files changed, 12 insertions(+), 9 deletions(-)
->
-> diff --git a/qapi/opts-visitor.c b/qapi/opts-visitor.c
-> index 026d25b..b54da81 100644
-> --- a/qapi/opts-visitor.c
-> +++ b/qapi/opts-visitor.c
-> @@ -164,7 +164,7 @@ opts_check_struct(Visitor *v, Error **errp)
->      GHashTableIter iter;
->      GQueue *any;
->
-> -    if (ov->depth > 0) {
-> +    if (ov->depth > 1) {
->          return;
->      }
->
-> @@ -276,8 +276,8 @@ static void
->  opts_check_list(Visitor *v, Error **errp)
->  {
->      /*
-> -     * FIXME should set error when unvisited elements remain.  Mostly
-> -     * harmless, as the generated visits always visit all elements.
-> +     * Unvisited list elements will be reported later when checking if
-> +     * unvisited struct members remain.
+On the real hardware the "boot once" really means *once*
+i.e. it only affects the next reboot regardless of how
+the next boot is triggered (reset button, power button,
+software, etc.). After the next boot the normal boot
+order is automatically restored.
 
-Non-native speaker question: if or whether?
-
->       */
->  }
->
-> diff --git a/tests/test-opts-visitor.c b/tests/test-opts-visitor.c
-> index 8e0dda5..1766919 100644
-> --- a/tests/test-opts-visitor.c
-> +++ b/tests/test-opts-visitor.c
-> @@ -175,6 +175,7 @@ expect_u64_max(OptsVisitorFixture *f, gconstpointer test_data)
->  static void
->  test_opts_range_unvisited(void)
->  {
-> +    Error *err = NULL;
->      intList *list = NULL;
->      intList *tail;
->      QemuOpts *opts;
-> @@ -199,10 +200,11 @@ test_opts_range_unvisited(void)
->      g_assert_cmpint(tail->value, ==, 1);
->      tail = (intList *)visit_next_list(v, (GenericList *)tail, sizeof(*list));
->      g_assert(tail);
-> -    visit_check_list(v, &error_abort); /* BUG: unvisited tail not reported */
-> +    visit_check_list(v, &error_abort); /* unvisited tail ignored until... */
->      visit_end_list(v, (void **)&list);
->
-> -    visit_check_struct(v, &error_abort);
-> +    visit_check_struct(v, &err); /* ...here */
-> +    error_free_or_abort(&err);
->      visit_end_struct(v, NULL);
->
->      qapi_free_intList(list);
-
-How come unvisited tails are diagnosed late?
-
-> @@ -239,7 +241,7 @@ test_opts_range_beyond(void)
->      error_free_or_abort(&err);
->      visit_end_list(v, (void **)&list);
->
-> -    visit_check_struct(v, &error_abort);
-> +    visit_check_struct(v, &err);
-
-This looks wrong.  Either you expect an error or not.  If you do,
-error_free_or_abort() seems missing.  If you don't, the hunk needs to be
-dropped.
-
->      visit_end_struct(v, NULL);
->
->      qapi_free_intList(list);
-> @@ -250,6 +252,7 @@ test_opts_range_beyond(void)
->  static void
->  test_opts_dict_unvisited(void)
->  {
-> +    Error *err = NULL;
->      QemuOpts *opts;
->      Visitor *v;
->      UserDefOptions *userdef;
-> @@ -258,11 +261,11 @@ test_opts_dict_unvisited(void)
->                             &error_abort);
->
->      v = opts_visitor_new(opts);
-> -    /* BUG: bogus should be diagnosed */
-> -    visit_type_UserDefOptions(v, NULL, &userdef, &error_abort);
-> +    visit_type_UserDefOptions(v, NULL, &userdef, &err);
-> +    error_free_or_abort(&err);
->      visit_free(v);
->      qemu_opts_del(opts);
-> -    qapi_free_UserDefOptions(userdef);
-> +    g_assert(!userdef);
->  }
->
->  int
+Theoretically it should be possible to get a close
+approximation of this by changing the main boot order,
+waiting for the boot to happen and then restoring the
+original order back. This would require having some
+process that constantly monitors what QEMU is doing so
+that it can notice when the boot happens and then
+restore the order. I'm trying to avoid having such
+a process if possible, which in this case means that
+QEMU would need to restore the order by itself.
