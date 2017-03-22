@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37092)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cqilo-0006Wi-4Z
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:05:57 -0400
+	(envelope-from <armbru@redhat.com>) id 1cqilo-0006XG-7P
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:05:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cqilk-0001iv-CR
+	(envelope-from <armbru@redhat.com>) id 1cqill-0001kn-LU
 	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:05:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35898)
+Received: from mx1.redhat.com ([209.132.183.28]:35986)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cqilj-0001hj-WE
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:05:52 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 30D2AC01B15E
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 16:05:51 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-26.ams2.redhat.com
-	[10.36.116.26])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id C392C7EFE6
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 16:05:50 +0000 (UTC)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cqill-0001jK-9h
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:05:53 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 22 Mar 2017 17:05:31 +0100
-Message-Id: <1490198748-4753-1-git-send-email-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL for-2.9 00/17] QAPI patches for 2017-03-22
+Date: Wed, 22 Mar 2017 17:05:44 +0100
+Message-Id: <1490198748-4753-14-git-send-email-armbru@redhat.com>
+In-Reply-To: <1490198748-4753-1-git-send-email-armbru@redhat.com>
+References: <1490198748-4753-1-git-send-email-armbru@redhat.com>
+Subject: [Qemu-devel] [PULL for-2.9 13/17] Revert "hostmem: fix QEMU crash
+ by 'info memdev'"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,74 +25,117 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Xiao Guangrong <guangrong.xiao@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-The following changes since commit 940a8ce075e3408742a4edcabfd6c2a15e2539=
-eb:
+This reverts commit 1454d33f0507cb54d62ed80f494884157c9e7130.
 
-  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into s=
-taging (2017-03-20 16:34:26 +0000)
+The string input visitor regression fixed in the previous commit made
+visit_type_uint16List() fail on empty input.  query_memdev() calls it
+via object_property_get_uint16List().  Because it doesn't expect it to
+fail, it passes &error_abort, and duly crashes.
 
-are available in the git repository at:
+Commit 1454d33 "fixes" this crash by making
+host_memory_backend_get_host_nodes() return a list containing just
+MAX_NODES instead of the empty list.  Papers over the regression, and
+leads to bogus "info memdev" output, as shown below; revert.
 
-  git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2017-03-22
+I suspect that if we had bisected the crash back then, we would have
+found and fixed the actual bug instead of papering over it.
 
-for you to fetch changes up to 612d910f8492775902892213e624ce277f98306a:
+To reproduce, run HMP command "info memdev" with
 
-  qapi: Fix QemuOpts visitor regression on unvisited input (2017-03-22 16=
-:57:09 +0100)
+    $ qemu-system-x86_64 --nodefaults -S -display none -monitor stdio -object memory-backend-ram,id=mem1,size=4k
 
-----------------------------------------------------------------
-QAPI patches for 2017-03-22
+With this commit, "info memdev" prints
 
-----------------------------------------------------------------
-Eric Blake (3):
-      tests: Expose regression in QemuOpts visitor
-      qom: Avoid unvisited 'id'/'qom-type' in user_creatable_add_opts
-      qapi: Fix QemuOpts visitor regression on unvisited input
+    memory backend: mem1
+      size:  4096
+      merge: true
+      dump: true
+      prealloc: false
+      policy: default
+      host nodes:
 
-Markus Armbruster (14):
-      test-keyval: Tweaks to improve list coverage
-      keyval: Improve some comments
-      test-keyval: Cover alternate and 'any' type
-      keyval: Document issues with 'any' and alternate types
-      MAINTAINERS: Add myself for files I touched recently
-      qapi: Drop excessive Make dependencies on qapi2texi.py
-      qapi2texi: Fix to actually fail when 'doc-required' is false
-      qapi: Drop unused QAPIDoc member optional
-      tests/qapi-schema: Make test-qapi.py print docs again
-      tests/qapi-schema: Systematic positive doc comment tests
-      qapi2texi: Fix translation of *strong* and _emphasized_
-      qapi: Fix string input visitor regression for empty lists
-      Revert "hostmem: fix QEMU crash by 'info memdev'"
-      test-qobject-input-visitor: Cover visit_type_uint64()
+exactly like before commit 74f24cb.
 
- MAINTAINERS                        |  11 ++
- Makefile                           |   7 +-
- backends/hostmem.c                 |  22 ++--
- qapi/opts-visitor.c                |   6 +-
- qapi/string-input-visitor.c        |   4 +
- qom/object_interfaces.c            |   7 +-
- scripts/qapi.py                    |   1 -
- scripts/qapi2texi.py               |   5 +-
- tests/Makefile.include             |  15 ++-
- tests/qapi-schema/doc-good.err     |   0
- tests/qapi-schema/doc-good.exit    |   1 +
- tests/qapi-schema/doc-good.json    | 136 +++++++++++++++++++++
- tests/qapi-schema/doc-good.out     | 148 ++++++++++++++++++++++
- tests/qapi-schema/doc-good.texi    | 243 +++++++++++++++++++++++++++++++=
-++++++
- tests/qapi-schema/test-qapi.py     |  11 ++
- tests/test-keyval.c                |  59 ++++++++-
- tests/test-opts-visitor.c          |  27 ++++-
- tests/test-qobject-input-visitor.c |  30 +++++
- tests/test-string-input-visitor.c  |  11 +-
- util/keyval.c                      |  57 ++++++---
- 20 files changed, 746 insertions(+), 55 deletions(-)
- create mode 100644 tests/qapi-schema/doc-good.err
- create mode 100644 tests/qapi-schema/doc-good.exit
- create mode 100644 tests/qapi-schema/doc-good.json
- create mode 100644 tests/qapi-schema/doc-good.out
- create mode 100644 tests/qapi-schema/doc-good.texi
+Between commit 1454d33 and this commit, it prints
 
---=20
+    memory backend: mem1
+      size:  4096
+      merge: true
+      dump: true
+      prealloc: false
+      policy: default
+      host nodes: 128
+
+The last line is bogus.
+
+Between commit 74f24cb and 1454d33, it crashes like this:
+
+    Unexpected error in parse_str() at /work/armbru/tmp/qemu/qapi/string-input-visitor.c:126:
+    Parameter 'null' expects an int64 value or range
+    Aborted (core dumped)
+
+Cc: Xiao Guangrong <guangrong.xiao@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <1490026424-11330-3-git-send-email-armbru@redhat.com>
+Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ backends/hostmem.c | 22 ++++++++--------------
+ 1 file changed, 8 insertions(+), 14 deletions(-)
+
+diff --git a/backends/hostmem.c b/backends/hostmem.c
+index 162c218..89feb9e 100644
+--- a/backends/hostmem.c
++++ b/backends/hostmem.c
+@@ -64,14 +64,6 @@ out:
+     error_propagate(errp, local_err);
+ }
+ 
+-static uint16List **host_memory_append_node(uint16List **node,
+-                                            unsigned long value)
+-{
+-     *node = g_malloc0(sizeof(**node));
+-     (*node)->value = value;
+-     return &(*node)->next;
+-}
+-
+ static void
+ host_memory_backend_get_host_nodes(Object *obj, Visitor *v, const char *name,
+                                    void *opaque, Error **errp)
+@@ -82,23 +74,25 @@ host_memory_backend_get_host_nodes(Object *obj, Visitor *v, const char *name,
+     unsigned long value;
+ 
+     value = find_first_bit(backend->host_nodes, MAX_NODES);
+-
+-    node = host_memory_append_node(node, value);
+-
+     if (value == MAX_NODES) {
+-        goto out;
++        return;
+     }
+ 
++    *node = g_malloc0(sizeof(**node));
++    (*node)->value = value;
++    node = &(*node)->next;
++
+     do {
+         value = find_next_bit(backend->host_nodes, MAX_NODES, value + 1);
+         if (value == MAX_NODES) {
+             break;
+         }
+ 
+-        node = host_memory_append_node(node, value);
++        *node = g_malloc0(sizeof(**node));
++        (*node)->value = value;
++        node = &(*node)->next;
+     } while (true);
+ 
+-out:
+     visit_type_uint16List(v, name, &host_nodes, errp);
+ }
+ 
+-- 
 2.7.4
