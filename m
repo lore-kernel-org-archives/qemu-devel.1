@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cqUmr-0007vD-A5
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 21:10:07 -0400
+	(envelope-from <wang.guang55@zte.com.cn>) id 1cqVIc-0004U4-7G
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 21:42:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cqUmo-00024w-28
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 21:10:05 -0400
-Received: from [45.249.212.189] (port=2864 helo=dggrg03-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cqUmi-00021L-9U
-	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 21:10:01 -0400
-References: <201703211610470826648@zte.com.cn> <58D0F498.3020105@huawei.com>
-	<20170321115624.GB3248@work-vm>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <58D1CEC4.4050803@huawei.com>
-Date: Wed, 22 Mar 2017 09:09:24 +0800
-MIME-Version: 1.0
-In-Reply-To: <20170321115624.GB3248@work-vm>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel]
- =?utf-8?b?562U5aSNOiBSZTogIOetlOWkjTogUmU6IFtCVUdd?=
- =?utf-8?q?COLO_failover_hang?=
+	(envelope-from <wang.guang55@zte.com.cn>) id 1cqVIY-0002m3-Iv
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 21:42:54 -0400
+Received: from mx7.zte.com.cn ([202.103.147.169]:50560)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <wang.guang55@zte.com.cn>) id 1cqVIX-0002lT-0G
+	for qemu-devel@nongnu.org; Tue, 21 Mar 2017 21:42:50 -0400
+Date: Wed, 22 Mar 2017 09:42:30 +0800 (CST)
+Message-ID: <201703220942303543948@zte.com.cn>
+References: 201703211610470826648@zte.com.cn, 58D0F498.3020105@huawei.com,
+	20170321115624.GB3248@work-vm, 58D1CEC4.4050803@huawei.com
+Mime-Version: 1.0
+From: <wang.guang55@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64 
+Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiBSZTogICDnrZTlpI06IFJlOiAg562U?=
+ =?utf-8?b?5aSNOiBSZTogW0JVR11DT0xPIGZhaWxvdmVyIGhhbmc=?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,359 +28,262 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, berrange@redhat.com
-Cc: xuquan8@huawei.com, wang.guang55@zte.com.cn, zhangchen.fnst@cn.fujitsu.com, qemu-devel@nongnu.org
+To: zhang.zhanghailiang@huawei.com
+Cc: dgilbert@redhat.com, berrange@redhat.com, xuquan8@huawei.com, qemu-devel@nongnu.org, zhangchen.fnst@cn.fujitsu.com
 
-On 2017/3/21 19:56, Dr. David Alan Gilbert wrote:
-> * Hailiang Zhang (zhang.zhanghailiang@huawei.com) wrote:
->> Hi,
->>
->> Thanks for reporting this, and i confirmed it in my test, and it is a bug.
->>
->> Though we tried to call qemu_file_shutdown() to shutdown the related fd, in
->> case COLO thread/incoming thread is stuck in read/write() while do failover,
->> but it didn't take effect, because all the fd used by COLO (also migration)
->> has been wrapped by qio channel, and it will not call the shutdown API if
->> we didn't qio_channel_set_feature(QIO_CHANNEL(sioc), QIO_CHANNEL_FEATURE_SHUTDOWN).
->>
->> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
->>
->> I doubted migration cancel has the same problem, it may be stuck in write()
->> if we tried to cancel migration.
->>
->> void fd_start_outgoing_migration(MigrationState *s, const char *fdname, Error **errp)
->> {
->>      qio_channel_set_name(QIO_CHANNEL(ioc), "migration-fd-outgoing");
->>      migration_channel_connect(s, ioc, NULL);
->>      ... ...
->> We didn't call qio_channel_set_feature(QIO_CHANNEL(sioc), QIO_CHANNEL_FEATURE_SHUTDOWN) above,
->> and the
->> migrate_fd_cancel()
->> {
->>   ... ...
->>      if (s->state == MIGRATION_STATUS_CANCELLING && f) {
->>          qemu_file_shutdown(f);  --> This will not take effect. No ?
->>      }
->> }
->
-> (cc'd in Daniel Berrange).
-> I see that we call qio_channel_set_feature(ioc, QIO_CHANNEL_FEATURE_SHUTDOWN); at the
-> top of qio_channel_socket_new;  so I think that's safe isn't it?
->
-
-Hmm, you are right, this problem is only exist for the migration incoming fd, thanks.
-
-> Dave
->
->> Thanks,
->> Hailiang
->>
->> On 2017/3/21 16:10, wang.guang55@zte.com.cn wrote:
->>> Thank you。
->>>
->>> I have test aready。
->>>
->>> When the Primary Node panic,the Secondary Node qemu hang at the same place。
->>>
->>> Incorrding http://wiki.qemu-project.org/Features/COLO ，kill Primary Node qemu will not produce the problem,but Primary Node panic can。
->>>
->>> I think due to the feature of channel does not support QIO_CHANNEL_FEATURE_SHUTDOWN.
->>>
->>>
->>> when failover,channel_shutdown could not shut down the channel.
->>>
->>>
->>> so the colo_process_incoming_thread will hang at recvmsg.
->>>
->>>
->>> I test a patch:
->>>
->>>
->>> diff --git a/migration/socket.c b/migration/socket.c
->>>
->>>
->>> index 13966f1..d65a0ea 100644
->>>
->>>
->>> --- a/migration/socket.c
->>>
->>>
->>> +++ b/migration/socket.c
->>>
->>>
->>> @@ -147,8 +147,9 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
->>>
->>>
->>>        }
->>>
->>>
->>>
->>>
->>>
->>>        trace_migration_socket_incoming_accepted()
->>>
->>>
->>>
->>>
->>>
->>>        qio_channel_set_name(QIO_CHANNEL(sioc), "migration-socket-incoming")
->>>
->>>
->>> +    qio_channel_set_feature(QIO_CHANNEL(sioc), QIO_CHANNEL_FEATURE_SHUTDOWN)
->>>
->>>
->>>        migration_channel_process_incoming(migrate_get_current(),
->>>
->>>
->>>                                           QIO_CHANNEL(sioc))
->>>
->>>
->>>        object_unref(OBJECT(sioc))
->>>
->>>
->>>
->>>
->>> My test will not hang any more.
->>>
->>>
->>>
->>>
->>>
->>>
->>>
->>>
->>>
->>>
->>>
->>>
->>>
->>>
->>>
->>>
->>>
->>> 原始邮件
->>>
->>>
->>>
->>> 发件人： ＜zhangchen.fnst@cn.fujitsu.com＞
->>> 收件人：王广10165992 ＜zhang.zhanghailiang@huawei.com＞
->>> 抄送人： ＜qemu-devel@nongnu.org＞ ＜zhangchen.fnst@cn.fujitsu.com＞
->>> 日 期 ：2017年03月21日 15:58
->>> 主 题 ：Re: [Qemu-devel]  答复: Re:  [BUG]COLO failover hang
->>>
->>>
->>>
->>>
->>>
->>> Hi,Wang.
->>>
->>> You can test this branch:
->>>
->>> https://github.com/coloft/qemu/tree/colo-v5.1-developing-COLO-frame-v21-with-shared-disk
->>>
->>> and please follow wiki ensure your own configuration correctly.
->>>
->>> http://wiki.qemu-project.org/Features/COLO
->>>
->>>
->>> Thanks
->>>
->>> Zhang Chen
->>>
->>>
->>> On 03/21/2017 03:27 PM, wang.guang55@zte.com.cn wrote:
->>> ＞
->>> ＞ hi.
->>> ＞
->>> ＞ I test the git qemu master have the same problem.
->>> ＞
->>> ＞ (gdb) bt
->>> ＞
->>> ＞ #0  qio_channel_socket_readv (ioc=0x7f65911b4e50, iov=0x7f64ef3fd880,
->>> ＞ niov=1, fds=0x0, nfds=0x0, errp=0x0) at io/channel-socket.c:461
->>> ＞
->>> ＞ #1  0x00007f658e4aa0c2 in qio_channel_read
->>> ＞ (ioc=ioc@entry=0x7f65911b4e50, buf=buf@entry=0x7f65907cb838 "",
->>> ＞ buflen=buflen@entry=32768, errp=errp@entry=0x0) at io/channel.c:114
->>> ＞
->>> ＞ #2  0x00007f658e3ea990 in channel_get_buffer (opaque=＜optimized out＞,
->>> ＞ buf=0x7f65907cb838 "", pos=＜optimized out＞, size=32768) at
->>> ＞ migration/qemu-file-channel.c:78
->>> ＞
->>> ＞ #3  0x00007f658e3e97fc in qemu_fill_buffer (f=0x7f65907cb800) at
->>> ＞ migration/qemu-file.c:295
->>> ＞
->>> ＞ #4  0x00007f658e3ea2e1 in qemu_peek_byte (f=f@entry=0x7f65907cb800,
->>> ＞ offset=offset@entry=0) at migration/qemu-file.c:555
->>> ＞
->>> ＞ #5  0x00007f658e3ea34b in qemu_get_byte (f=f@entry=0x7f65907cb800) at
->>> ＞ migration/qemu-file.c:568
->>> ＞
->>> ＞ #6  0x00007f658e3ea552 in qemu_get_be32 (f=f@entry=0x7f65907cb800) at
->>> ＞ migration/qemu-file.c:648
->>> ＞
->>> ＞ #7  0x00007f658e3e66e5 in colo_receive_message (f=0x7f65907cb800,
->>> ＞ errp=errp@entry=0x7f64ef3fd9b0) at migration/colo.c:244
->>> ＞
->>> ＞ #8  0x00007f658e3e681e in colo_receive_check_message (f=＜optimized
->>> ＞ out＞, expect_msg=expect_msg@entry=COLO_MESSAGE_VMSTATE_SEND,
->>> ＞ errp=errp@entry=0x7f64ef3fda08)
->>> ＞
->>> ＞     at migration/colo.c:264
->>> ＞
->>> ＞ #9  0x00007f658e3e740e in colo_process_incoming_thread
->>> ＞ (opaque=0x7f658eb30360 ＜mis_current.31286＞) at migration/colo.c:577
->>> ＞
->>> ＞ #10 0x00007f658be09df3 in start_thread () from /lib64/libpthread.so.0
->>> ＞
->>> ＞ #11 0x00007f65881983ed in clone () from /lib64/libc.so.6
->>> ＞
->>> ＞ (gdb) p ioc-＞name
->>> ＞
->>> ＞ $2 = 0x7f658ff7d5c0 "migration-socket-incoming"
->>> ＞
->>> ＞ (gdb) p ioc-＞features        Do not support QIO_CHANNEL_FEATURE_SHUTDOWN
->>> ＞
->>> ＞ $3 = 0
->>> ＞
->>> ＞
->>> ＞ (gdb) bt
->>> ＞
->>> ＞ #0  socket_accept_incoming_migration (ioc=0x7fdcceeafa90,
->>> ＞ condition=G_IO_IN, opaque=0x7fdcceeafa90) at migration/socket.c:137
->>> ＞
->>> ＞ #1  0x00007fdcc6966350 in g_main_dispatch (context=＜optimized out＞) at
->>> ＞ gmain.c:3054
->>> ＞
->>> ＞ #2  g_main_context_dispatch (context=＜optimized out＞,
->>> ＞ context@entry=0x7fdccce9f590) at gmain.c:3630
->>> ＞
->>> ＞ #3  0x00007fdccb8a6dcc in glib_pollfds_poll () at util/main-loop.c:213
->>> ＞
->>> ＞ #4  os_host_main_loop_wait (timeout=＜optimized out＞) at
->>> ＞ util/main-loop.c:258
->>> ＞
->>> ＞ #5  main_loop_wait (nonblocking=nonblocking@entry=0) at
->>> ＞ util/main-loop.c:506
->>> ＞
->>> ＞ #6  0x00007fdccb526187 in main_loop () at vl.c:1898
->>> ＞
->>> ＞ #7  main (argc=＜optimized out＞, argv=＜optimized out＞, envp=＜optimized
->>> ＞ out＞) at vl.c:4709
->>> ＞
->>> ＞ (gdb) p ioc-＞features
->>> ＞
->>> ＞ $1 = 6
->>> ＞
->>> ＞ (gdb) p ioc-＞name
->>> ＞
->>> ＞ $2 = 0x7fdcce1b1ab0 "migration-socket-listener"
->>> ＞
->>> ＞
->>> ＞ May be socket_accept_incoming_migration should
->>> ＞ call qio_channel_set_feature(ioc, QIO_CHANNEL_FEATURE_SHUTDOWN)??
->>> ＞
->>> ＞
->>> ＞ thank you.
->>> ＞
->>> ＞
->>> ＞
->>> ＞
->>> ＞
->>> ＞ 原始邮件
->>> ＞ *发件人：*＜zhangchen.fnst@cn.fujitsu.com＞
->>> ＞ *收件人：*王广10165992＜qemu-devel@nongnu.org＞
->>> ＞ *抄送人：*＜zhangchen.fnst@cn.fujitsu.com＞＜zhang.zhanghailiang@huawei.com＞
->>> ＞ *日 期 ：*2017年03月16日 14:46
->>> ＞ *主 题 ：**Re: [Qemu-devel] COLO failover hang*
->>> ＞
->>> ＞
->>> ＞
->>> ＞
->>> ＞ On 03/15/2017 05:06 PM, wangguang wrote:
->>> ＞ ＞   am testing QEMU COLO feature described here [QEMU
->>> ＞ ＞ Wiki](http://wiki.qemu-project.org/Features/COLO).
->>> ＞ ＞
->>> ＞ ＞ When the Primary Node panic,the Secondary Node qemu hang.
->>> ＞ ＞ hang at recvmsg in qio_channel_socket_readv.
->>> ＞ ＞ And  I run  { 'execute': 'nbd-server-stop' } and { "execute":
->>> ＞ ＞ "x-colo-lost-heartbeat" } in Secondary VM's
->>> ＞ ＞ monitor,the  Secondary Node qemu still hang at recvmsg .
->>> ＞ ＞
->>> ＞ ＞ I found that the colo in qemu is not complete yet.
->>> ＞ ＞ Do the colo have any plan for development?
->>> ＞
->>> ＞ Yes, We are developing. You can see some of patch we pushing.
->>> ＞
->>> ＞ ＞ Has anyone ever run it successfully? Any help is appreciated!
->>> ＞
->>> ＞ In our internal version can run it successfully,
->>> ＞ The failover detail you can ask Zhanghailiang for help.
->>> ＞ Next time if you have some question about COLO,
->>> ＞ please cc me and zhanghailiang ＜zhang.zhanghailiang@huawei.com＞.
->>> ＞
->>> ＞
->>> ＞ Thanks
->>> ＞ Zhang Chen
->>> ＞
->>> ＞
->>> ＞ ＞
->>> ＞ ＞
->>> ＞ ＞
->>> ＞ ＞ centos7.2+qemu2.7.50
->>> ＞ ＞ (gdb) bt
->>> ＞ ＞ #0  0x00007f3e00cc86ad in recvmsg () from /lib64/libpthread.so.0
->>> ＞ ＞ #1  0x00007f3e0332b738 in qio_channel_socket_readv (ioc=＜optimized out＞,
->>> ＞ ＞ iov=＜optimized out＞, niov=＜optimized out＞, fds=0x0, nfds=0x0, errp=0x0) at
->>> ＞ ＞ io/channel-socket.c:497
->>> ＞ ＞ #2  0x00007f3e03329472 in qio_channel_read (ioc=ioc@entry=0x7f3e05110e40,
->>> ＞ ＞ buf=buf@entry=0x7f3e05910f38 "", buflen=buflen@entry=32768,
->>> ＞ ＞ errp=errp@entry=0x0) at io/channel.c:97
->>> ＞ ＞ #3  0x00007f3e032750e0 in channel_get_buffer (opaque=＜optimized out＞,
->>> ＞ ＞ buf=0x7f3e05910f38 "", pos=＜optimized out＞, size=32768) at
->>> ＞ ＞ migration/qemu-file-channel.c:78
->>> ＞ ＞ #4  0x00007f3e0327412c in qemu_fill_buffer (f=0x7f3e05910f00) at
->>> ＞ ＞ migration/qemu-file.c:257
->>> ＞ ＞ #5  0x00007f3e03274a41 in qemu_peek_byte (f=f@entry=0x7f3e05910f00,
->>> ＞ ＞ offset=offset@entry=0) at migration/qemu-file.c:510
->>> ＞ ＞ #6  0x00007f3e03274aab in qemu_get_byte (f=f@entry=0x7f3e05910f00) at
->>> ＞ ＞ migration/qemu-file.c:523
->>> ＞ ＞ #7  0x00007f3e03274cb2 in qemu_get_be32 (f=f@entry=0x7f3e05910f00) at
->>> ＞ ＞ migration/qemu-file.c:603
->>> ＞ ＞ #8  0x00007f3e03271735 in colo_receive_message (f=0x7f3e05910f00,
->>> ＞ ＞ errp=errp@entry=0x7f3d62bfaa50) at migration/colo.c:215
->>> ＞ ＞ #9  0x00007f3e0327250d in colo_wait_handle_message (errp=0x7f3d62bfaa48,
->>> ＞ ＞ checkpoint_request=＜synthetic pointer＞, f=＜optimized out＞) at
->>> ＞ ＞ migration/colo.c:546
->>> ＞ ＞ #10 colo_process_incoming_thread (opaque=0x7f3e067245e0) at
->>> ＞ ＞ migration/colo.c:649
->>> ＞ ＞ #11 0x00007f3e00cc1df3 in start_thread () from /lib64/libpthread.so.0
->>> ＞ ＞ #12 0x00007f3dfc9c03ed in clone () from /lib64/libc.so.6
->>> ＞ ＞
->>> ＞ ＞
->>> ＞ ＞
->>> ＞ ＞
->>> ＞ ＞
->>> ＞ ＞ --
->>> ＞ ＞ View this message in context: http://qemu.11.n7.nabble.com/COLO-failover-hang-tp473250.html
->>> ＞ ＞ Sent from the Developer mailing list archive at Nabble.com.
->>> ＞ ＞
->>> ＞ ＞
->>> ＞ ＞
->>> ＞ ＞
->>> ＞
->>> ＞ --
->>> ＞ Thanks
->>> ＞ Zhang Chen
->>> ＞
->>> ＞
->>> ＞
->>> ＞
->>> ＞
->>>
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->
-> .
->
+ZGlmZiAtLWdpdCBhL21pZ3JhdGlvbi9zb2NrZXQuYyBiL21pZ3JhdGlvbi9zb2NrZXQuYw0KDQoN
+CmluZGV4IDEzOTY2ZjEuLmQ2NWEwZWEgMTAwNjQ0DQoNCg0KLS0tIGEvbWlncmF0aW9uL3NvY2tl
+dC5jDQoNCg0KKysrIGIvbWlncmF0aW9uL3NvY2tldC5jDQoNCg0KQEAgLTE0Nyw4ICsxNDcsOSBA
+QCBzdGF0aWMgZ2Jvb2xlYW4gc29ja2V0X2FjY2VwdF9pbmNvbWluZ19taWdyYXRpb24oUUlPQ2hh
+bm5lbCAqaW9jLA0KDQoNCiAgICAgfQ0KDQoNCiANCg0KDQogICAgIHRyYWNlX21pZ3JhdGlvbl9z
+b2NrZXRfaW5jb21pbmdfYWNjZXB0ZWQoKQ0KDQoNCiAgICANCg0KDQogICAgIHFpb19jaGFubmVs
+X3NldF9uYW1lKFFJT19DSEFOTkVMKHNpb2MpLCAibWlncmF0aW9uLXNvY2tldC1pbmNvbWluZyIp
+DQoNCg0KKyAgICBxaW9fY2hhbm5lbF9zZXRfZmVhdHVyZShRSU9fQ0hBTk5FTChzaW9jKSwgUUlP
+X0NIQU5ORUxfRkVBVFVSRV9TSFVURE9XTikNCg0KDQogICAgIG1pZ3JhdGlvbl9jaGFubmVsX3By
+b2Nlc3NfaW5jb21pbmcobWlncmF0ZV9nZXRfY3VycmVudCgpLA0KDQoNCiAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBRSU9fQ0hBTk5FTChzaW9jKSkNCg0KDQogICAgIG9i
+amVjdF91bnJlZihPQkpFQ1Qoc2lvYykpDQoNCg0KDQoNCklzIHRoaXMgcGF0Y2ggb2s/IA0KDQpJ
+IGhhdmUgdGVzdCBpdCAuIFRoZSB0ZXN0IGNvdWxkIG5vdCBoYW5nIGFueSBtb3JlLg0KDQoNCg0K
+DQoNCg0KDQoNCg0KDQoNCg0K5Y6f5aeL6YKu5Lu2DQoNCg0KDQrlj5Hku7bkurrvvJog77ycemhh
+bmcuemhhbmdoYWlsaWFuZ0BodWF3ZWkuY29t77yeDQrmlLbku7bkurrvvJog77ycZGdpbGJlcnRA
+cmVkaGF0LmNvbe+8niDvvJxiZXJyYW5nZUByZWRoYXQuY29t77yeDQrmioTpgIHkurrvvJog77yc
+eHVxdWFuOEBodWF3ZWkuY29t77yeIO+8nHFlbXUtZGV2ZWxAbm9uZ251Lm9yZ++8niDvvJx6aGFu
+Z2NoZW4uZm5zdEBjbi5mdWppdHN1LmNvbe+8nueOi+W5vzEwMTY1OTkyDQrml6Ug5pyfIO+8mjIw
+MTflubQwM+aciDIy5pelIDA5OjExDQrkuLsg6aKYIO+8mlJlOiBbUWVtdS1kZXZlbF0gIOetlOWk
+jTogUmU6ICDnrZTlpI06IFJlOiBbQlVHXUNPTE8gZmFpbG92ZXIgaGFuZw0KDQoNCg0KDQoNCk9u
+IDIwMTcvMy8yMSAxOTo1NiwgRHIuIERhdmlkIEFsYW4gR2lsYmVydCB3cm90ZToNCu+8niAqIEhh
+aWxpYW5nIFpoYW5nICh6aGFuZy56aGFuZ2hhaWxpYW5nQGh1YXdlaS5jb20pIHdyb3RlOg0K77ye
+77yeIEhpLA0K77ye77yeDQrvvJ7vvJ4gVGhhbmtzIGZvciByZXBvcnRpbmcgdGhpcywgYW5kIGkg
+Y29uZmlybWVkIGl0IGluIG15IHRlc3QsIGFuZCBpdCBpcyBhIGJ1Zy4NCu+8nu+8ng0K77ye77ye
+IFRob3VnaCB3ZSB0cmllZCB0byBjYWxsIHFlbXVfZmlsZV9zaHV0ZG93bigpIHRvIHNodXRkb3du
+IHRoZSByZWxhdGVkIGZkLCBpbg0K77ye77yeIGNhc2UgQ09MTyB0aHJlYWQvaW5jb21pbmcgdGhy
+ZWFkIGlzIHN0dWNrIGluIHJlYWQvd3JpdGUoKSB3aGlsZSBkbyBmYWlsb3ZlciwNCu+8nu+8niBi
+dXQgaXQgZGlkbid0IHRha2UgZWZmZWN0LCBiZWNhdXNlIGFsbCB0aGUgZmQgdXNlZCBieSBDT0xP
+IChhbHNvIG1pZ3JhdGlvbikNCu+8nu+8niBoYXMgYmVlbiB3cmFwcGVkIGJ5IHFpbyBjaGFubmVs
+LCBhbmQgaXQgd2lsbCBub3QgY2FsbCB0aGUgc2h1dGRvd24gQVBJIGlmDQrvvJ7vvJ4gd2UgZGlk
+bid0IHFpb19jaGFubmVsX3NldF9mZWF0dXJlKFFJT19DSEFOTkVMKHNpb2MpLCBRSU9fQ0hBTk5F
+TF9GRUFUVVJFX1NIVVRET1dOKS4NCu+8nu+8ng0K77ye77yeIENjOiBEci4gRGF2aWQgQWxhbiBH
+aWxiZXJ0IO+8nGRnaWxiZXJ0QHJlZGhhdC5jb23vvJ4NCu+8nu+8ng0K77ye77yeIEkgZG91YnRl
+ZCBtaWdyYXRpb24gY2FuY2VsIGhhcyB0aGUgc2FtZSBwcm9ibGVtLCBpdCBtYXkgYmUgc3R1Y2sg
+aW4gd3JpdGUoKQ0K77ye77yeIGlmIHdlIHRyaWVkIHRvIGNhbmNlbCBtaWdyYXRpb24uDQrvvJ7v
+vJ4NCu+8nu+8niB2b2lkIGZkX3N0YXJ0X291dGdvaW5nX21pZ3JhdGlvbihNaWdyYXRpb25TdGF0
+ZSAqcywgY29uc3QgY2hhciAqZmRuYW1lLCBFcnJvciAqKmVycnApDQrvvJ7vvJ4gew0K77ye77ye
+ICAgICAgcWlvX2NoYW5uZWxfc2V0X25hbWUoUUlPX0NIQU5ORUwoaW9jKSwgIm1pZ3JhdGlvbi1m
+ZC1vdXRnb2luZyIpDQrvvJ7vvJ4gICAgICBtaWdyYXRpb25fY2hhbm5lbF9jb25uZWN0KHMsIGlv
+YywgTlVMTCkNCu+8nu+8niAgICAgIC4uLiAuLi4NCu+8nu+8niBXZSBkaWRuJ3QgY2FsbCBxaW9f
+Y2hhbm5lbF9zZXRfZmVhdHVyZShRSU9fQ0hBTk5FTChzaW9jKSwgUUlPX0NIQU5ORUxfRkVBVFVS
+RV9TSFVURE9XTikgYWJvdmUsDQrvvJ7vvJ4gYW5kIHRoZQ0K77ye77yeIG1pZ3JhdGVfZmRfY2Fu
+Y2VsKCkNCu+8nu+8niB7DQrvvJ7vvJ4gICAuLi4gLi4uDQrvvJ7vvJ4gICAgICBpZiAocy3vvJ5z
+dGF0ZSA9PSBNSUdSQVRJT05fU1RBVFVTX0NBTkNFTExJTkcgJiYgZikgew0K77ye77yeICAgICAg
+ICAgIHFlbXVfZmlsZV9zaHV0ZG93bihmKSAgLS3vvJ4gVGhpcyB3aWxsIG5vdCB0YWtlIGVmZmVj
+dC4gTm8gPw0K77ye77yeICAgICAgfQ0K77ye77yeIH0NCu+8ng0K77yeIChjYydkIGluIERhbmll
+bCBCZXJyYW5nZSkuDQrvvJ4gSSBzZWUgdGhhdCB3ZSBjYWxsIHFpb19jaGFubmVsX3NldF9mZWF0
+dXJlKGlvYywgUUlPX0NIQU5ORUxfRkVBVFVSRV9TSFVURE9XTikgYXQgdGhlDQrvvJ4gdG9wIG9m
+IHFpb19jaGFubmVsX3NvY2tldF9uZXcgIHNvIEkgdGhpbmsgdGhhdCdzIHNhZmUgaXNuJ3QgaXQ/
+DQrvvJ4NCg0KSG1tLCB5b3UgYXJlIHJpZ2h0LCB0aGlzIHByb2JsZW0gaXMgb25seSBleGlzdCBm
+b3IgdGhlIG1pZ3JhdGlvbiBpbmNvbWluZyBmZCwgdGhhbmtzLg0KDQrvvJ4gRGF2ZQ0K77yeDQrv
+vJ7vvJ4gVGhhbmtzLA0K77ye77yeIEhhaWxpYW5nDQrvvJ7vvJ4NCu+8nu+8niBPbiAyMDE3LzMv
+MjEgMTY6MTAsIHdhbmcuZ3Vhbmc1NUB6dGUuY29tLmNuIHdyb3RlOg0K77ye77ye77yeIFRoYW5r
+IHlvdeOAgg0K77ye77ye77yeDQrvvJ7vvJ7vvJ4gSSBoYXZlIHRlc3QgYXJlYWR544CCDQrvvJ7v
+vJ7vvJ4NCu+8nu+8nu+8niBXaGVuIHRoZSBQcmltYXJ5IE5vZGUgcGFuaWMsdGhlIFNlY29uZGFy
+eSBOb2RlIHFlbXUgaGFuZyBhdCB0aGUgc2FtZSBwbGFjZeOAgg0K77ye77ye77yeDQrvvJ7vvJ7v
+vJ4gSW5jb3JyZGluZyBodHRwOi8vd2lraS5xZW11LXByb2plY3Qub3JnL0ZlYXR1cmVzL0NPTE8g
+77yMa2lsbCBQcmltYXJ5IE5vZGUgcWVtdSB3aWxsIG5vdCBwcm9kdWNlIHRoZSBwcm9ibGVtLGJ1
+dCBQcmltYXJ5IE5vZGUgcGFuaWMgY2Fu44CCDQrvvJ7vvJ7vvJ4NCu+8nu+8nu+8niBJIHRoaW5r
+IGR1ZSB0byB0aGUgZmVhdHVyZSBvZiBjaGFubmVsIGRvZXMgbm90IHN1cHBvcnQgUUlPX0NIQU5O
+RUxfRkVBVFVSRV9TSFVURE9XTi4NCu+8nu+8nu+8ng0K77ye77ye77yeDQrvvJ7vvJ7vvJ4gd2hl
+biBmYWlsb3ZlcixjaGFubmVsX3NodXRkb3duIGNvdWxkIG5vdCBzaHV0IGRvd24gdGhlIGNoYW5u
+ZWwuDQrvvJ7vvJ7vvJ4NCu+8nu+8nu+8ng0K77ye77ye77yeIHNvIHRoZSBjb2xvX3Byb2Nlc3Nf
+aW5jb21pbmdfdGhyZWFkIHdpbGwgaGFuZyBhdCByZWN2bXNnLg0K77ye77ye77yeDQrvvJ7vvJ7v
+vJ4NCu+8nu+8nu+8niBJIHRlc3QgYSBwYXRjaDoNCu+8nu+8nu+8ng0K77ye77ye77yeDQrvvJ7v
+vJ7vvJ4gZGlmZiAtLWdpdCBhL21pZ3JhdGlvbi9zb2NrZXQuYyBiL21pZ3JhdGlvbi9zb2NrZXQu
+Yw0K77ye77ye77yeDQrvvJ7vvJ7vvJ4NCu+8nu+8nu+8niBpbmRleCAxMzk2NmYxLi5kNjVhMGVh
+IDEwMDY0NA0K77ye77ye77yeDQrvvJ7vvJ7vvJ4NCu+8nu+8nu+8niAtLS0gYS9taWdyYXRpb24v
+c29ja2V0LmMNCu+8nu+8nu+8ng0K77ye77ye77yeDQrvvJ7vvJ7vvJ4gKysrIGIvbWlncmF0aW9u
+L3NvY2tldC5jDQrvvJ7vvJ7vvJ4NCu+8nu+8nu+8ng0K77ye77ye77yeIEBAIC0xNDcsOCArMTQ3
+LDkgQEAgc3RhdGljIGdib29sZWFuIHNvY2tldF9hY2NlcHRfaW5jb21pbmdfbWlncmF0aW9uKFFJ
+T0NoYW5uZWwgKmlvYywNCu+8nu+8nu+8ng0K77ye77ye77yeDQrvvJ7vvJ7vvJ4gICAgICAgIH0N
+Cu+8nu+8nu+8ng0K77ye77ye77yeDQrvvJ7vvJ7vvJ4NCu+8nu+8nu+8ng0K77ye77ye77yeDQrv
+vJ7vvJ7vvJ4gICAgICAgIHRyYWNlX21pZ3JhdGlvbl9zb2NrZXRfaW5jb21pbmdfYWNjZXB0ZWQo
+KQ0K77ye77ye77yeDQrvvJ7vvJ7vvJ4NCu+8nu+8nu+8ng0K77ye77ye77yeDQrvvJ7vvJ7vvJ4N
+Cu+8nu+8nu+8niAgICAgICAgcWlvX2NoYW5uZWxfc2V0X25hbWUoUUlPX0NIQU5ORUwoc2lvYyks
+ICJtaWdyYXRpb24tc29ja2V0LWluY29taW5nIikNCu+8nu+8nu+8ng0K77ye77ye77yeDQrvvJ7v
+vJ7vvJ4gKyAgICBxaW9fY2hhbm5lbF9zZXRfZmVhdHVyZShRSU9fQ0hBTk5FTChzaW9jKSwgUUlP
+X0NIQU5ORUxfRkVBVFVSRV9TSFVURE9XTikNCu+8nu+8nu+8ng0K77ye77ye77yeDQrvvJ7vvJ7v
+vJ4gICAgICAgIG1pZ3JhdGlvbl9jaGFubmVsX3Byb2Nlc3NfaW5jb21pbmcobWlncmF0ZV9nZXRf
+Y3VycmVudCgpLA0K77ye77ye77yeDQrvvJ7vvJ7vvJ4NCu+8nu+8nu+8niAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBRSU9fQ0hBTk5FTChzaW9jKSkNCu+8nu+8nu+8
+ng0K77ye77ye77yeDQrvvJ7vvJ7vvJ4gICAgICAgIG9iamVjdF91bnJlZihPQkpFQ1Qoc2lvYykp
+DQrvvJ7vvJ7vvJ4NCu+8nu+8nu+8ng0K77ye77ye77yeDQrvvJ7vvJ7vvJ4NCu+8nu+8nu+8niBN
+eSB0ZXN0IHdpbGwgbm90IGhhbmcgYW55IG1vcmUuDQrvvJ7vvJ7vvJ4NCu+8nu+8nu+8ng0K77ye
+77ye77yeDQrvvJ7vvJ7vvJ4NCu+8nu+8nu+8ng0K77ye77ye77yeDQrvvJ7vvJ7vvJ4NCu+8nu+8
+nu+8ng0K77ye77ye77yeDQrvvJ7vvJ7vvJ4NCu+8nu+8nu+8ng0K77ye77ye77yeDQrvvJ7vvJ7v
+vJ4NCu+8nu+8nu+8ng0K77ye77ye77yeDQrvvJ7vvJ7vvJ4NCu+8nu+8nu+8ng0K77ye77ye77ye
+IOWOn+Wni+mCruS7tg0K77ye77ye77yeDQrvvJ7vvJ7vvJ4NCu+8nu+8nu+8ng0K77ye77ye77ye
+IOWPkeS7tuS6uu+8miDvvJx6aGFuZ2NoZW4uZm5zdEBjbi5mdWppdHN1Li5jb23vvJ4NCu+8nu+8
+nu+8niDmlLbku7bkurrvvJrnjovlub8xMDE2NTk5MiDvvJx6aGFuZy56aGFuZ2hhaWxpYW5nQGh1
+YXdlaS5jb23vvJ4NCu+8nu+8nu+8niDmioTpgIHkurrvvJog77yccWVtdS1kZXZlbEBub25nbnUu
+b3Jn77yeIO+8nHpoYW5nY2hlbi5mbnN0QGNuLmZ1aml0c3UuY29t77yeDQrvvJ7vvJ7vvJ4g5pel
+IOacnyDvvJoyMDE35bm0MDPmnIgyMeaXpSAxNTo1OA0K77ye77ye77yeIOS4uyDpopgg77yaUmU6
+IFtRZW11LWRldmVsXSAg562U5aSNOiBSZTogIFtCVUddQ09MTyBmYWlsb3ZlciBoYW5nDQrvvJ7v
+vJ7vvJ4NCu+8nu+8nu+8ng0K77ye77ye77yeDQrvvJ7vvJ7vvJ4NCu+8nu+8nu+8ng0K77ye77ye
+77yeIEhpLFdhbmcuDQrvvJ7vvJ7vvJ4NCu+8nu+8nu+8niBZb3UgY2FuIHRlc3QgdGhpcyBicmFu
+Y2g6DQrvvJ7vvJ7vvJ4NCu+8nu+8nu+8niBodHRwczovL2dpdGh1Yi5jb20vY29sb2Z0L3FlbXUv
+dHJlZS9jb2xvLXY1LjEtZGV2ZWxvcGluZy1DT0xPLWZyYW1lLXYyMS13aXRoLXNoYXJlZC1kaXNr
+DQrvvJ7vvJ7vvJ4NCu+8nu+8nu+8niBhbmQgcGxlYXNlIGZvbGxvdyB3aWtpIGVuc3VyZSB5b3Vy
+IG93biBjb25maWd1cmF0aW9uIGNvcnJlY3RseS4NCu+8nu+8nu+8ng0K77ye77ye77yeIGh0dHA6
+Ly93aWtpLnFlbXUtcHJvamVjdC5vcmcvRmVhdHVyZXMvQ09MTw0K77ye77ye77yeDQrvvJ7vvJ7v
+vJ4NCu+8nu+8nu+8niBUaGFua3MNCu+8nu+8nu+8ng0K77ye77ye77yeIFpoYW5nIENoZW4NCu+8
+nu+8nu+8ng0K77ye77ye77yeDQrvvJ7vvJ7vvJ4gT24gMDMvMjEvMjAxNyAwMzoyNyBQTSwgd2Fu
+Zy5ndWFuZzU1QHp0ZS5jb20uY24gd3JvdGU6DQrvvJ7vvJ7vvJ4g77yeDQrvvJ7vvJ7vvJ4g77ye
+IGhpLg0K77ye77ye77yeIO+8ng0K77ye77ye77yeIO+8niBJIHRlc3QgdGhlIGdpdCBxZW11IG1h
+c3RlciBoYXZlIHRoZSBzYW1lIHByb2JsZW0uDQrvvJ7vvJ7vvJ4g77yeDQrvvJ7vvJ7vvJ4g77ye
+IChnZGIpIGJ0DQrvvJ7vvJ7vvJ4g77yeDQrvvJ7vvJ7vvJ4g77yeICMwICBxaW9fY2hhbm5lbF9z
+b2NrZXRfcmVhZHYgKGlvYz0weDdmNjU5MTFiNGU1MCwgaW92PTB4N2Y2NGVmM2ZkODgwLA0K77ye
+77ye77yeIO+8niBuaW92PTEsIGZkcz0weDAsIG5mZHM9MHgwLCBlcnJwPTB4MCkgYXQgaW8vY2hh
+bm5lbC1zb2NrZXQuYzo0NjENCu+8nu+8nu+8niDvvJ4NCu+8nu+8nu+8niDvvJ4gIzEgIDB4MDAw
+MDdmNjU4ZTRhYTBjMiBpbiBxaW9fY2hhbm5lbF9yZWFkDQrvvJ7vvJ7vvJ4g77yeIChpb2M9aW9j
+QGVudHJ5PTB4N2Y2NTkxMWI0ZTUwLCBidWY9YnVmQGVudHJ5PTB4N2Y2NTkwN2NiODM4ICIiLA0K
+77ye77ye77yeIO+8niBidWZsZW49YnVmbGVuQGVudHJ5PTMyNzY4LCBlcnJwPWVycnBAZW50cnk9
+MHgwKSBhdCBpby9jaGFubmVsLmM6MTE0DQrvvJ7vvJ7vvJ4g77yeDQrvvJ7vvJ7vvJ4g77yeICMy
+ICAweDAwMDA3ZjY1OGUzZWE5OTAgaW4gY2hhbm5lbF9nZXRfYnVmZmVyIChvcGFxdWU977ycb3B0
+aW1pemVkIG91dO+8niwNCu+8nu+8nu+8niDvvJ4gYnVmPTB4N2Y2NTkwN2NiODM4ICIiLCBwb3M9
+77ycb3B0aW1pemVkIG91dO+8niwgc2l6ZT0zMjc2OCkgYXQNCu+8nu+8nu+8niDvvJ4gbWlncmF0
+aW9uL3FlbXUtZmlsZS1jaGFubmVsLmM6NzgNCu+8nu+8nu+8niDvvJ4NCu+8nu+8nu+8niDvvJ4g
+IzMgIDB4MDAwMDdmNjU4ZTNlOTdmYyBpbiBxZW11X2ZpbGxfYnVmZmVyIChmPTB4N2Y2NTkwN2Ni
+ODAwKSBhdA0K77ye77ye77yeIO+8niBtaWdyYXRpb24vcWVtdS1maWxlLmM6Mjk1DQrvvJ7vvJ7v
+vJ4g77yeDQrvvJ7vvJ7vvJ4g77yeICM0ICAweDAwMDA3ZjY1OGUzZWEyZTEgaW4gcWVtdV9wZWVr
+X2J5dGUgKGY9ZkBlbnRyeT0weDdmNjU5MDdjYjgwMCwNCu+8nu+8nu+8niDvvJ4gb2Zmc2V0PW9m
+ZnNldEBlbnRyeT0wKSBhdCBtaWdyYXRpb24vcWVtdS1maWxlLmM6NTU1DQrvvJ7vvJ7vvJ4g77ye
+DQrvvJ7vvJ7vvJ4g77yeICM1ICAweDAwMDA3ZjY1OGUzZWEzNGIgaW4gcWVtdV9nZXRfYnl0ZSAo
+Zj1mQGVudHJ5PTB4N2Y2NTkwN2NiODAwKSBhdA0K77ye77ye77yeIO+8niBtaWdyYXRpb24vcWVt
+dS1maWxlLmM6NTY4DQrvvJ7vvJ7vvJ4g77yeDQrvvJ7vvJ7vvJ4g77yeICM2ICAweDAwMDA3ZjY1
+OGUzZWE1NTIgaW4gcWVtdV9nZXRfYmUzMiAoZj1mQGVudHJ5PTB4N2Y2NTkwN2NiODAwKSBhdA0K
+77ye77ye77yeIO+8niBtaWdyYXRpb24vcWVtdS1maWxlLmM6NjQ4DQrvvJ7vvJ7vvJ4g77yeDQrv
+vJ7vvJ7vvJ4g77yeICM3ICAweDAwMDA3ZjY1OGUzZTY2ZTUgaW4gY29sb19yZWNlaXZlX21lc3Nh
+Z2UgKGY9MHg3ZjY1OTA3Y2I4MDAsDQrvvJ7vvJ7vvJ4g77yeIGVycnA9ZXJycEBlbnRyeT0weDdm
+NjRlZjNmZDliMCkgYXQgbWlncmF0aW9uL2NvbG8uYzoyNDQNCu+8nu+8nu+8niDvvJ4NCu+8nu+8
+nu+8niDvvJ4gIzggIDB4MDAwMDdmNjU4ZTNlNjgxZSBpbiBjb2xvX3JlY2VpdmVfY2hlY2tfbWVz
+c2FnZSAoZj3vvJxvcHRpbWl6ZWQNCu+8nu+8nu+8niDvvJ4gb3V077yeLCBleHBlY3RfbXNnPWV4
+cGVjdF9tc2dAZW50cnk9Q09MT19NRVNTQUdFX1ZNU1RBVEVfU0VORCwNCu+8nu+8nu+8niDvvJ4g
+ZXJycD1lcnJwQGVudHJ5PTB4N2Y2NGVmM2ZkYTA4KQ0K77ye77ye77yeIO+8ng0K77ye77ye77ye
+IO+8niAgICAgYXQgbWlncmF0aW9uL2NvbG8uYzoyNjQNCu+8nu+8nu+8niDvvJ4NCu+8nu+8nu+8
+niDvvJ4gIzkgIDB4MDAwMDdmNjU4ZTNlNzQwZSBpbiBjb2xvX3Byb2Nlc3NfaW5jb21pbmdfdGhy
+ZWFkDQrvvJ7vvJ7vvJ4g77yeIChvcGFxdWU9MHg3ZjY1OGViMzAzNjAg77ycbWlzX2N1cnJlbnQu
+MzEyODbvvJ4pIGF0IG1pZ3JhdGlvbi9jb2xvLmM6NTc3DQrvvJ7vvJ7vvJ4g77yeDQrvvJ7vvJ7v
+vJ4g77yeICMxMCAweDAwMDA3ZjY1OGJlMDlkZjMgaW4gc3RhcnRfdGhyZWFkICgpIGZyb20gL2xp
+YjY0L2xpYnB0aHJlYWQuc28uMA0K77ye77ye77yeIO+8ng0K77ye77ye77yeIO+8niAjMTEgMHgw
+MDAwN2Y2NTg4MTk4M2VkIGluIGNsb25lICgpIGZyb20gL2xpYjY0L2xpYmMuc28uNg0K77ye77ye
+77yeIO+8ng0K77ye77ye77yeIO+8niAoZ2RiKSBwIGlvYy3vvJ5uYW1lDQrvvJ7vvJ7vvJ4g77ye
+DQrvvJ7vvJ7vvJ4g77yeICQyID0gMHg3ZjY1OGZmN2Q1YzAgIm1pZ3JhdGlvbi1zb2NrZXQtaW5j
+b21pbmciDQrvvJ7vvJ7vvJ4g77yeDQrvvJ7vvJ7vvJ4g77yeIChnZGIpIHAgaW9jLe+8nmZlYXR1
+cmVzICAgICAgICBEbyBub3Qgc3VwcG9ydCBRSU9fQ0hBTk5FTF9GRUFUVVJFX1NIVVRET1dODQrv
+vJ7vvJ7vvJ4g77yeDQrvvJ7vvJ7vvJ4g77yeICQzID0gMA0K77ye77ye77yeIO+8ng0K77ye77ye
+77yeIO+8ng0K77ye77ye77yeIO+8niAoZ2RiKSBidA0K77ye77ye77yeIO+8ng0K77ye77ye77ye
+IO+8niAjMCAgc29ja2V0X2FjY2VwdF9pbmNvbWluZ19taWdyYXRpb24gKGlvYz0weDdmZGNjZWVh
+ZmE5MCwNCu+8nu+8nu+8niDvvJ4gY29uZGl0aW9uPUdfSU9fSU4sIG9wYXF1ZT0weDdmZGNjZWVh
+ZmE5MCkgYXQgbWlncmF0aW9uL3NvY2tldC5jOjEzNw0K77ye77ye77yeIO+8ng0K77ye77ye77ye
+IO+8niAjMSAgMHgwMDAwN2ZkY2M2OTY2MzUwIGluIGdfbWFpbl9kaXNwYXRjaCAoY29udGV4dD3v
+vJxvcHRpbWl6ZWQgb3V077yeKSBhdA0K77ye77ye77yeIO+8niBnbWFpbi5jOjMwNTQNCu+8nu+8
+nu+8niDvvJ4NCu+8nu+8nu+8niDvvJ4gIzIgIGdfbWFpbl9jb250ZXh0X2Rpc3BhdGNoIChjb250
+ZXh0Pe+8nG9wdGltaXplZCBvdXTvvJ4sDQrvvJ7vvJ7vvJ4g77yeIGNvbnRleHRAZW50cnk9MHg3
+ZmRjY2NlOWY1OTApIGF0IGdtYWluLmM6MzYzMA0K77ye77ye77yeIO+8ng0K77ye77ye77yeIO+8
+niAjMyAgMHgwMDAwN2ZkY2NiOGE2ZGNjIGluIGdsaWJfcG9sbGZkc19wb2xsICgpIGF0IHV0aWwv
+bWFpbi1sb29wLmM6MjEzDQrvvJ7vvJ7vvJ4g77yeDQrvvJ7vvJ7vvJ4g77yeICM0ICBvc19ob3N0
+X21haW5fbG9vcF93YWl0ICh0aW1lb3V0Pe+8nG9wdGltaXplZCBvdXTvvJ4pIGF0DQrvvJ7vvJ7v
+vJ4g77yeIHV0aWwvbWFpbi1sb29wLmM6MjU4DQrvvJ7vvJ7vvJ4g77yeDQrvvJ7vvJ7vvJ4g77ye
+ICM1ICBtYWluX2xvb3Bfd2FpdCAobm9uYmxvY2tpbmc9bm9uYmxvY2tpbmdAZW50cnk9MCkgYXQN
+Cu+8nu+8nu+8niDvvJ4gdXRpbC9tYWluLWxvb3AuYzo1MDYNCu+8nu+8nu+8niDvvJ4NCu+8nu+8
+nu+8niDvvJ4gIzYgIDB4MDAwMDdmZGNjYjUyNjE4NyBpbiBtYWluX2xvb3AgKCkgYXQgdmwuYzox
+ODk4DQrvvJ7vvJ7vvJ4g77yeDQrvvJ7vvJ7vvJ4g77yeICM3ICBtYWluIChhcmdjPe+8nG9wdGlt
+aXplZCBvdXTvvJ4sIGFyZ3Y977ycb3B0aW1pemVkIG91dO+8niwgZW52cD3vvJxvcHRpbWl6ZWQN
+Cu+8nu+8nu+8niDvvJ4gb3V077yeKSBhdCB2bC5jOjQ3MDkNCu+8nu+8nu+8niDvvJ4NCu+8nu+8
+nu+8niDvvJ4gKGdkYikgcCBpb2Mt77yeZmVhdHVyZXMNCu+8nu+8nu+8niDvvJ4NCu+8nu+8nu+8
+niDvvJ4gJDEgPSA2DQrvvJ7vvJ7vvJ4g77yeDQrvvJ7vvJ7vvJ4g77yeIChnZGIpIHAgaW9jLe+8
+nm5hbWUNCu+8nu+8nu+8niDvvJ4NCu+8nu+8nu+8niDvvJ4gJDIgPSAweDdmZGNjZTFiMWFiMCAi
+bWlncmF0aW9uLXNvY2tldC1saXN0ZW5lciINCu+8nu+8nu+8niDvvJ4NCu+8nu+8nu+8niDvvJ4N
+Cu+8nu+8nu+8niDvvJ4gTWF5IGJlIHNvY2tldF9hY2NlcHRfaW5jb21pbmdfbWlncmF0aW9uIHNo
+b3VsZA0K77ye77ye77yeIO+8niBjYWxsIHFpb19jaGFubmVsX3NldF9mZWF0dXJlKGlvYywgUUlP
+X0NIQU5ORUxfRkVBVFVSRV9TSFVURE9XTik/Pw0K77ye77ye77yeIO+8ng0K77ye77ye77yeIO+8
+ng0K77ye77ye77yeIO+8niB0aGFuayB5b3UuDQrvvJ7vvJ7vvJ4g77yeDQrvvJ7vvJ7vvJ4g77ye
+DQrvvJ7vvJ7vvJ4g77yeDQrvvJ7vvJ7vvJ4g77yeDQrvvJ7vvJ7vvJ4g77yeDQrvvJ7vvJ7vvJ4g
+77yeIOWOn+Wni+mCruS7tg0K77ye77ye77yeIO+8niAq5Y+R5Lu25Lq677yaKu+8nHpoYW5nY2hl
+bi5mbnN0QGNuLmZ1aml0c3UuY29t77yeDQrvvJ7vvJ7vvJ4g77yeICrmlLbku7bkurrvvJoq546L
+5bm/MTAxNjU5OTLvvJxxZW11LWRldmVsQG5vbmdudS5vcmfvvJ4NCu+8nu+8nu+8niDvvJ4gKuaK
+hOmAgeS6uu+8mirvvJx6aGFuZ2NoZW4uZm5zdEBjbi5mdWppdHN1LmNvbe+8nu+8nHpoYW5nLnpo
+YW5naGFpbGlhbmdAaHVhd2VpLmNvbe+8ng0K77ye77ye77yeIO+8niAq5pelIOacnyDvvJoqMjAx
+N+W5tDAz5pyIMTbml6UgMTQ6NDYNCu+8nu+8nu+8niDvvJ4gKuS4uyDpopgg77yaKipSZTogW1Fl
+bXUtZGV2ZWxdIENPTE8gZmFpbG92ZXIgaGFuZyoNCu+8nu+8nu+8niDvvJ4NCu+8nu+8nu+8niDv
+vJ4NCu+8nu+8nu+8niDvvJ4NCu+8nu+8nu+8niDvvJ4NCu+8nu+8nu+8niDvvJ4gT24gMDMvMTUv
+MjAxNyAwNTowNiBQTSwgd2FuZ2d1YW5nIHdyb3RlOg0K77ye77ye77yeIO+8niDvvJ4gICBhbSB0
+ZXN0aW5nIFFFTVUgQ09MTyBmZWF0dXJlIGRlc2NyaWJlZCBoZXJlIFtRRU1VDQrvvJ7vvJ7vvJ4g
+77yeIO+8niBXaWtpXShodHRwOi8vd2lraS5xZW11LXByb2plY3Qub3JnL0ZlYXR1cmVzL0NPTE8p
+Lg0K77ye77ye77yeIO+8niDvvJ4NCu+8nu+8nu+8niDvvJ4g77yeIFdoZW4gdGhlIFByaW1hcnkg
+Tm9kZSBwYW5pYyx0aGUgU2Vjb25kYXJ5IE5vZGUgcWVtdSBoYW5nLg0K77ye77ye77yeIO+8niDv
+vJ4gaGFuZyBhdCByZWN2bXNnIGluIHFpb19jaGFubmVsX3NvY2tldF9yZWFkdi4NCu+8nu+8nu+8
+niDvvJ4g77yeIEFuZCAgSSBydW4gIHsgJ2V4ZWN1dGUnOiAnbmJkLXNlcnZlci1zdG9wJyB9IGFu
+ZCB7ICJleGVjdXRlIjoNCu+8nu+8nu+8niDvvJ4g77yeICJ4LWNvbG8tbG9zdC1oZWFydGJlYXQi
+IH0gaW4gU2Vjb25kYXJ5IFZNJ3MNCu+8nu+8nu+8niDvvJ4g77yeIG1vbml0b3IsdGhlICBTZWNv
+bmRhcnkgTm9kZSBxZW11IHN0aWxsIGhhbmcgYXQgcmVjdm1zZyAuDQrvvJ7vvJ7vvJ4g77yeIO+8
+ng0K77ye77ye77yeIO+8niDvvJ4gSSBmb3VuZCB0aGF0IHRoZSBjb2xvIGluIHFlbXUgaXMgbm90
+IGNvbXBsZXRlIHlldC4NCu+8nu+8nu+8niDvvJ4g77yeIERvIHRoZSBjb2xvIGhhdmUgYW55IHBs
+YW4gZm9yIGRldmVsb3BtZW50Pw0K77ye77ye77yeIO+8ng0K77ye77ye77yeIO+8niBZZXMsIFdl
+IGFyZSBkZXZlbG9waW5nLiBZb3UgY2FuIHNlZSBzb21lIG9mIHBhdGNoIHdlIHB1c2hpbmcuDQrv
+vJ7vvJ7vvJ4g77yeDQrvvJ7vvJ7vvJ4g77yeIO+8niBIYXMgYW55b25lIGV2ZXIgcnVuIGl0IHN1
+Y2Nlc3NmdWxseT8gQW55IGhlbHAgaXMgYXBwcmVjaWF0ZWQhDQrvvJ7vvJ7vvJ4g77yeDQrvvJ7v
+vJ7vvJ4g77yeIEluIG91ciBpbnRlcm5hbCB2ZXJzaW9uIGNhbiBydW4gaXQgc3VjY2Vzc2Z1bGx5
+LA0K77ye77ye77yeIO+8niBUaGUgZmFpbG92ZXIgZGV0YWlsIHlvdSBjYW4gYXNrIFpoYW5naGFp
+bGlhbmcgZm9yIGhlbHAuDQrvvJ7vvJ7vvJ4g77yeIE5leHQgdGltZSBpZiB5b3UgaGF2ZSBzb21l
+IHF1ZXN0aW9uIGFib3V0IENPTE8sDQrvvJ7vvJ7vvJ4g77yeIHBsZWFzZSBjYyBtZSBhbmQgemhh
+bmdoYWlsaWFuZyDvvJx6aGFuZy56aGFuZ2hhaWxpYW5nQGh1YXdlaS5jb23vvJ4uDQrvvJ7vvJ7v
+vJ4g77yeDQrvvJ7vvJ7vvJ4g77yeDQrvvJ7vvJ7vvJ4g77yeIFRoYW5rcw0K77ye77ye77yeIO+8
+niBaaGFuZyBDaGVuDQrvvJ7vvJ7vvJ4g77yeDQrvvJ7vvJ7vvJ4g77yeDQrvvJ7vvJ7vvJ4g77ye
+IO+8ng0K77ye77ye77yeIO+8niDvvJ4NCu+8nu+8nu+8niDvvJ4g77yeDQrvvJ7vvJ7vvJ4g77ye
+IO+8niBjZW50b3M3LjIrcWVtdTIuNy41MA0K77ye77ye77yeIO+8niDvvJ4gKGdkYikgYnQNCu+8
+nu+8nu+8niDvvJ4g77yeICMwICAweDAwMDA3ZjNlMDBjYzg2YWQgaW4gcmVjdm1zZyAoKSBmcm9t
+IC9saWI2NC9saWJwdGhyZWFkLnNvLjANCu+8nu+8nu+8niDvvJ4g77yeICMxICAweDAwMDA3ZjNl
+MDMzMmI3MzggaW4gcWlvX2NoYW5uZWxfc29ja2V0X3JlYWR2IChpb2M977ycb3B0aW1pemVkIG91
+dO+8niwNCu+8nu+8nu+8niDvvJ4g77yeIGlvdj3vvJxvcHRpbWl6ZWQgb3V077yeLCBuaW92Pe+8
+nG9wdGltaXplZCBvdXTvvJ4sIGZkcz0weDAsIG5mZHM9MHgwLCBlcnJwPTB4MCkgYXQNCu+8nu+8
+nu+8niDvvJ4g77yeIGlvL2NoYW5uZWwtc29ja2V0LmM6NDk3DQrvvJ7vvJ7vvJ4g77yeIO+8niAj
+MiAgMHgwMDAwN2YzZTAzMzI5NDcyIGluIHFpb19jaGFubmVsX3JlYWQgKGlvYz1pb2NAZW50cnk9
+MHg3ZjNlMDUxMTBlNDAsDQrvvJ7vvJ7vvJ4g77yeIO+8niBidWY9YnVmQGVudHJ5PTB4N2YzZTA1
+OTEwZjM4ICIiLCBidWZsZW49YnVmbGVuQGVudHJ5PTMyNzY4LA0K77ye77ye77yeIO+8niDvvJ4g
+ZXJycD1lcnJwQGVudHJ5PTB4MCkgYXQgaW8vY2hhbm5lbC5jOjk3DQrvvJ7vvJ7vvJ4g77yeIO+8
+niAjMyAgMHgwMDAwN2YzZTAzMjc1MGUwIGluIGNoYW5uZWxfZ2V0X2J1ZmZlciAob3BhcXVlPe+8
+nG9wdGltaXplZCBvdXTvvJ4sDQrvvJ7vvJ7vvJ4g77yeIO+8niBidWY9MHg3ZjNlMDU5MTBmMzgg
+IiIsIHBvcz3vvJxvcHRpbWl6ZWQgb3V077yeLCBzaXplPTMyNzY4KSBhdA0K77ye77ye77yeIO+8
+niDvvJ4gbWlncmF0aW9uL3FlbXUtZmlsZS1jaGFubmVsLmM6NzgNCu+8nu+8nu+8niDvvJ4g77ye
+ICM0ICAweDAwMDA3ZjNlMDMyNzQxMmMgaW4gcWVtdV9maWxsX2J1ZmZlciAoZj0weDdmM2UwNTkx
+MGYwMCkgYXQNCu+8nu+8nu+8niDvvJ4g77yeIG1pZ3JhdGlvbi9xZW11LWZpbGUuYzoyNTcNCu+8
+nu+8nu+8niDvvJ4g77yeICM1ICAweDAwMDA3ZjNlMDMyNzRhNDEgaW4gcWVtdV9wZWVrX2J5dGUg
+KGY9ZkBlbnRyeT0weDdmM2UwNTkxMGYwMCwNCu+8nu+8nu+8niDvvJ4g77yeIG9mZnNldD1vZmZz
+ZXRAZW50cnk9MCkgYXQgbWlncmF0aW9uL3FlbXUtZmlsZS5jOjUxMA0K77ye77ye77yeIO+8niDv
+vJ4gIzYgIDB4MDAwMDdmM2UwMzI3NGFhYiBpbiBxZW11X2dldF9ieXRlIChmPWZAZW50cnk9MHg3
+ZjNlMDU5MTBmMDApIGF0DQrvvJ7vvJ7vvJ4g77yeIO+8niBtaWdyYXRpb24vcWVtdS1maWxlLmM6
+NTIzDQrvvJ7vvJ7vvJ4g77yeIO+8niAjNyAgMHgwMDAwN2YzZTAzMjc0Y2IyIGluIHFlbXVfZ2V0
+X2JlMzIgKGY9ZkBlbnRyeT0weDdmM2UwNTkxMGYwMCkgYXQNCu+8nu+8nu+8niDvvJ4g77yeIG1p
+Z3JhdGlvbi9xZW11LWZpbGUuYzo2MDMNCu+8nu+8nu+8niDvvJ4g77yeICM4ICAweDAwMDA3ZjNl
+MDMyNzE3MzUgaW4gY29sb19yZWNlaXZlX21lc3NhZ2UgKGY9MHg3ZjNlMDU5MTBmMDAsDQrvvJ7v
+vJ7vvJ4g77yeIO+8niBlcnJwPWVycnBAZW50cnk9MHg3ZjNkNjJiZmFhNTApIGF0IG1pZ3JhdGlv
+bi9jb2xvLmM6MjE1DQrvvJ7vvJ7vvJ4g77yeIO+8niAjOSAgMHgwMDAwN2YzZTAzMjcyNTBkIGlu
+IGNvbG9fd2FpdF9oYW5kbGVfbWVzc2FnZSAoZXJycD0weDdmM2Q2MmJmYWE0OCwNCu+8nu+8nu+8
+niDvvJ4g77yeIGNoZWNrcG9pbnRfcmVxdWVzdD3vvJxzeW50aGV0aWMgcG9pbnRlcu+8niwgZj3v
+vJxvcHRpbWl6ZWQgb3V077yeKSBhdA0K77ye77ye77yeIO+8niDvvJ4gbWlncmF0aW9uL2NvbG8u
+Yzo1NDYNCu+8nu+8nu+8niDvvJ4g77yeICMxMCBjb2xvX3Byb2Nlc3NfaW5jb21pbmdfdGhyZWFk
+IChvcGFxdWU9MHg3ZjNlMDY3MjQ1ZTApIGF0DQrvvJ7vvJ7vvJ4g77yeIO+8niBtaWdyYXRpb24v
+Y29sby5jOjY0OQ0K77ye77ye77yeIO+8niDvvJ4gIzExIDB4MDAwMDdmM2UwMGNjMWRmMyBpbiBz
+dGFydF90aHJlYWQgKCkgZnJvbSAvbGliNjQvbGlicHRocmVhZC5zby4wDQrvvJ7vvJ7vvJ4g77ye
+IO+8niAjMTIgMHgwMDAwN2YzZGZjOWMwM2VkIGluIGNsb25lICgpIGZyb20gL2xpYjY0L2xpYmMu
+LnNvLjYNCu+8nu+8nu+8niDvvJ4g77yeDQrvvJ7vvJ7vvJ4g77yeIO+8ng0K77ye77ye77yeIO+8
+niDvvJ4NCu+8nu+8nu+8niDvvJ4g77yeDQrvvJ7vvJ7vvJ4g77yeIO+8ng0K77ye77ye77yeIO+8
+niDvvJ4gLS0NCu+8nu+8nu+8niDvvJ4g77yeIFZpZXcgdGhpcyBtZXNzYWdlIGluIGNvbnRleHQ6
+IGh0dHA6Ly9xZW11LjExLm43Lm5hYmJsZS5jb20vQ09MTy1mYWlsb3Zlci1oYW5nLXRwNDczMjUw
+Lmh0bWwNCu+8nu+8nu+8niDvvJ4g77yeIFNlbnQgZnJvbSB0aGUgRGV2ZWxvcGVyIG1haWxpbmcg
+bGlzdCBhcmNoaXZlIGF0IE5hYmJsZS5jb20uDQrvvJ7vvJ7vvJ4g77yeIO+8ng0K77ye77ye77ye
+IO+8niDvvJ4NCu+8nu+8nu+8niDvvJ4g77yeDQrvvJ7vvJ7vvJ4g77yeIO+8ng0K77ye77ye77ye
+IO+8ng0K77ye77ye77yeIO+8niAtLQ0K77ye77ye77yeIO+8niBUaGFua3MNCu+8nu+8nu+8niDv
+vJ4gWmhhbmcgQ2hlbg0K77ye77ye77yeIO+8ng0K77ye77ye77yeIO+8ng0K77ye77ye77yeIO+8
+ng0K77ye77ye77yeIO+8ng0K77ye77ye77yeIO+8ng0K77ye77ye77yeDQrvvJ7vvJ4NCu+8niAt
+LQ0K77yeIERyLiBEYXZpZCBBbGFuIEdpbGJlcnQgLyBkZ2lsYmVydEByZWRoYXQuY29tIC8gTWFu
+Y2hlc3RlciwgVUsNCu+8ng0K77yeIC4NCu+8ng==
