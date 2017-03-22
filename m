@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cql9N-000208-Lg
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:38:26 -0400
+	(envelope-from <abenetopoulos@gmail.com>) id 1cqlW8-0001V8-CN
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 15:01:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cql9K-0002kQ-CS
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:38:25 -0400
-Received: from mail.kernel.org ([198.145.29.136]:47236)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1cql9K-0002j8-1z
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:38:22 -0400
-Date: Wed, 22 Mar 2017 11:38:17 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <1490175555-17827-1-git-send-email-paul.durrant@citrix.com>
-Message-ID: <alpine.DEB.2.10.1703221137250.13499@sstabellini-ThinkPad-X260>
-References: <1490175555-17827-1-git-send-email-paul.durrant@citrix.com>
+	(envelope-from <abenetopoulos@gmail.com>) id 1cqlW5-0000Wv-4f
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 15:01:56 -0400
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:36028)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <abenetopoulos@gmail.com>)
+	id 1cqlW4-0000WS-Qx
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 15:01:53 -0400
+Received: by mail-wm0-x22f.google.com with SMTP id n11so44992066wma.1
+	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 12:01:52 -0700 (PDT)
+References: <74f647b8-a890-6635-278a-ce55fbbb5537@gmail.com>
+	<7cfc0f3b-2cd3-32b7-0274-90b2bcfc2efa@redhat.com>
+From: Achilles Benetopoulos <abenetopoulos@gmail.com>
+Message-ID: <dfda7306-0003-7e3c-f596-9f04586b6b8c@gmail.com>
+Date: Wed, 22 Mar 2017 21:01:48 +0200
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [PATCH v4] xen: use libxendevice model to restrict
- operations
+In-Reply-To: <7cfc0f3b-2cd3-32b7-0274-90b2bcfc2efa@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3] qemu/thread: Add support for error
+ reporting in qemu_thread_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,183 +31,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <paul.durrant@citrix.com>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, quintela@redhat.com, armbru@redhat.com, crosthwaite.peter@gmail.com
 
-On Wed, 22 Mar 2017, Paul Durrant wrote:
-> This patch adds a command-line option (-xen-domid-restrict) which will
-> use the new libxendevicemodel API to restrict devicemodel [1] operations
-> to the specified domid. (Such operations are not applicable to the xenpv
-> machine type).
-> 
-> This patch also adds a tracepoint to allow successful enabling of the
-> restriction to be monitored.
-> 
-> [1] I.e. operations issued by libxendevicemodel. Operation issued by other
->     xen libraries (e.g. libxenforeignmemory) are currently still unrestricted
->     but this will be rectified by subsequent patches.
-> 
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+Thank you for the detailed review. The indentation errors mentioned
+were pure carelesness on my part, sorry about that.
 
-Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+On 3/22/17 2:20 PM, Eric Blake wrote:
+>> @@ -342,13 +343,19 @@ static void pci_edu_realize(PCIDevice *pdev, Err=
+or **errp) >>  { >>      EduState *edu =3D DO_UPCAST(EduState, pdev, pdev=
+); >>      uint8_t *pci_conf =3D pdev->config; >> +    Error *local_err =3D=
+ NULL; >> >>      timer_init_ms(&edu->dma_timer, QEMU_CLOCK_VIRTUAL, edu_=
+dma_timer, edu); >> >>      qemu_mutex_init(&edu->thr_mutex); >>      qem=
+u_cond_init(&edu->thr_cond); >>      qemu_thread_create(&edu->thread, "ed=
+u", edu_fact_thread, >> -                       edu, QEMU_THREAD_JOINABLE=
+); >> +                       edu, QEMU_THREAD_JOINABLE, &local_err); >> =
++ >> +    if (local_err) { >> +        error_propagate(errp, local_err); =
+>> +        return; >> +    } > > Looking at code like this, I wonder if =
+it would be easier to make > qemu_thread_create() return a value, rather =
+than being void.  Then you > could write: > > if (qemu_thread_create(...,=
+ errp) < 0) { >     return; > } > > instead of having to futz around with=
+ local_err and error_propagate(). >
 
-Applied to my next branch
+I don't know about it being easier, but it does seem like it would
+make the code at the call site cleaner, when the function calling
+qemu_thread_create was passed an error variable itself. However, in
+all but four cases there is no preexisting error variable, so the code
+would stay pretty much the same.
 
-> ---
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> NOTE: This is already re-based on Juergen Gross's patch "xen: use 5 digit
->       xen versions" and so should not be applied until after that patch
->       has been applied.
-> 
-> v4:
->  - Added missing quote
-> 
-> v3:
->  - Updated usage comment
-> 
-> v2:
->  - Log errno in tracepoint
-> ---
->  hw/xen/trace-events         |  1 +
->  include/hw/xen/xen.h        |  1 +
->  include/hw/xen/xen_common.h | 20 ++++++++++++++++++++
->  qemu-options.hx             |  7 +++++++
->  vl.c                        |  8 ++++++++
->  xen-hvm.c                   |  8 ++++++++
->  6 files changed, 45 insertions(+)
-> 
-> diff --git a/hw/xen/trace-events b/hw/xen/trace-events
-> index c4fb6f1..5615dce 100644
-> --- a/hw/xen/trace-events
-> +++ b/hw/xen/trace-events
-> @@ -11,3 +11,4 @@ xen_map_portio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %
->  xen_unmap_portio_range(uint32_t id, uint64_t start_addr, uint64_t end_addr) "id: %u start: %#"PRIx64" end: %#"PRIx64
->  xen_map_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
->  xen_unmap_pcidev(uint32_t id, uint8_t bus, uint8_t dev, uint8_t func) "id: %u bdf: %02x.%02x.%02x"
-> +xen_domid_restrict(int err) "err: %u"
-> diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
-> index 2b1733b..7efcdaa 100644
-> --- a/include/hw/xen/xen.h
-> +++ b/include/hw/xen/xen.h
-> @@ -21,6 +21,7 @@ enum xen_mode {
->  
->  extern uint32_t xen_domid;
->  extern enum xen_mode xen_mode;
-> +extern bool xen_domid_restrict;
->  
->  extern bool xen_allowed;
->  
-> diff --git a/include/hw/xen/xen_common.h b/include/hw/xen/xen_common.h
-> index df098c7..4f3bd35 100644
-> --- a/include/hw/xen/xen_common.h
-> +++ b/include/hw/xen/xen_common.h
-> @@ -152,6 +152,13 @@ static inline int xendevicemodel_set_mem_type(
->      return xc_hvm_set_mem_type(dmod, domid, mem_type, first_pfn, nr);
->  }
->  
-> +static inline int xendevicemodel_restrict(
-> +    xendevicemodel_handle *dmod, domid_t domid)
-> +{
-> +    errno = ENOTTY;
-> +    return -1;
-> +}
-> +
->  #else /* CONFIG_XEN_CTRL_INTERFACE_VERSION >= 40900 */
->  
->  #include <xendevicemodel.h>
-> @@ -206,6 +213,19 @@ static inline int xen_modified_memory(domid_t domid, uint64_t first_pfn,
->      return xendevicemodel_modified_memory(xen_dmod, domid, first_pfn, nr);
->  }
->  
-> +static inline int xen_restrict(domid_t domid)
-> +{
-> +    int rc = xendevicemodel_restrict(xen_dmod, domid);
-> +
-> +    trace_xen_domid_restrict(errno);
-> +
-> +    if (errno == ENOTTY) {
-> +        return 0;
-> +    }
-> +
-> +    return rc;
-> +}
-> +
->  /* Xen 4.2 through 4.6 */
->  #if CONFIG_XEN_CTRL_INTERFACE_VERSION < 40701
->  
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 99af8ed..2043371 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -3354,6 +3354,11 @@ DEF("xen-attach", 0, QEMU_OPTION_xen_attach,
->      "-xen-attach     attach to existing xen domain\n"
->      "                xend will use this when starting QEMU\n",
->      QEMU_ARCH_ALL)
-> +DEF("xen-domid-restrict", 0, QEMU_OPTION_xen_domid_restrict,
-> +    "-xen-domid-restrict     restrict set of available xen operations\n"
-> +    "                        to specified domain id. (Does not affect\n"
-> +    "                        xenpv machine type).\n",
-> +    QEMU_ARCH_ALL)
->  STEXI
->  @item -xen-domid @var{id}
->  @findex -xen-domid
-> @@ -3366,6 +3371,8 @@ Warning: should not be used when xend is in use (XEN only).
->  @findex -xen-attach
->  Attach to existing xen domain.
->  xend will use this when starting QEMU (XEN only).
-> +@findex -xen-domid-restrict
-> +Restrict set of available xen operations to specified domain id (XEN only).
->  ETEXI
->  
->  DEF("no-reboot", 0, QEMU_OPTION_no_reboot, \
-> diff --git a/vl.c b/vl.c
-> index 0b4ed52..f46e070 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -205,6 +205,7 @@ static NotifierList machine_init_done_notifiers =
->  bool xen_allowed;
->  uint32_t xen_domid;
->  enum xen_mode xen_mode = XEN_EMULATE;
-> +bool xen_domid_restrict;
->  
->  static int has_defaults = 1;
->  static int default_serial = 1;
-> @@ -3933,6 +3934,13 @@ int main(int argc, char **argv, char **envp)
->                  }
->                  xen_mode = XEN_ATTACH;
->                  break;
-> +            case QEMU_OPTION_xen_domid_restrict:
-> +                if (!(xen_available())) {
-> +                    error_report("Option not supported for this target");
-> +                    exit(1);
-> +                }
-> +                xen_domid_restrict = true;
-> +                break;
->              case QEMU_OPTION_trace:
->                  g_free(trace_file);
->                  trace_file = trace_opt_parse(optarg);
-> diff --git a/xen-hvm.c b/xen-hvm.c
-> index 4b928cf..335e263 100644
-> --- a/xen-hvm.c
-> +++ b/xen-hvm.c
-> @@ -1226,6 +1226,14 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
->          goto err;
->      }
->  
-> +    if (xen_domid_restrict) {
-> +        rc = xen_restrict(xen_domid);
-> +        if (rc < 0) {
-> +            error_report("failed to restrict: error %d", errno);
-> +            goto err;
-> +        }
-> +    }
-> +
->      xen_create_ioreq_server(xen_domid, &state->ioservid);
->  
->      state->exit.notify = xen_exit_notifier;
-> -- 
-> 2.1.4
-> 
+>> +++ b/hw/usb/ccid-card-emulated.c >> @@ -34,6 +34,7 @@ >> >>  #include=
+ "qemu/thread.h" >>  #include "sysemu/char.h" >> +#include "qapi/error.h"=
+ >>  #include "ccid.h" >> >>  #define DPRINTF(card, lvl, fmt, ...) \ >> @=
+@ -485,6 +486,7 @@ static int emulated_initfn(CCIDCardState *base) >>    =
+  EmulatedState *card =3D EMULATED_CCID_CARD(base); >>      VCardEmulErro=
+r ret; >>      const EnumTable *ptable; >> +    Error *err =3D NULL, *loc=
+al_err =3D NULL; > > Huh? Why do you need two local error objects? One is=
+ generally sufficient. > >> >>      QSIMPLEQ_INIT(&card->event_list); >> =
+     QSIMPLEQ_INIT(&card->guest_apdu_list); >> @@ -541,9 +543,17 @@ stati=
+c int emulated_initfn(CCIDCardState *base) >>          return -1; >>     =
+ } >>      qemu_thread_create(&card->event_thread_id, "ccid/event", event=
+_thread, >> -                       card, QEMU_THREAD_JOINABLE); >> +    =
+                   card, QEMU_THREAD_JOINABLE, &err); >> + >>      qemu_t=
+hread_create(&card->apdu_thread_id, "ccid/apdu", handle_apdu_thread, >>
+-                       card, QEMU_THREAD_JOINABLE); >> +                =
+       card, QEMU_THREAD_JOINABLE, &local_err); >> +    error_propagate(&=
+err, local_err); >> + >> +    if (err) { >> +        error_report_err(err=
+); >> +        return -1; >> +    } > > > If you used the return value, y=
+ou could write: > > if (qemu_thread_create(..., &err) < 0 || >     qemu_t=
+hread_create(..., &err) < 0) { >     error_report_err(err); >     return =
+-1; > } > > without needing the second object.
+
+Well, I wrote it this way because of a recommendation in the error.h
+header, but yes, if we were to change the return type of
+qemu_thread_create, then this would make sense.
+
+>> +++ b/include/qemu/thread.h >> @@ -55,7 +55,7 @@ void qemu_event_destr=
+oy(QemuEvent *ev); >> >>  void qemu_thread_create(QemuThread *thread, con=
+st char *name, >>                          void *(*start_routine)(void *)=
+, >> -                        void *arg, int mode); >> +                 =
+       void *arg, int mode, Error **errp); > > Hmm, we still haven't made=
+ it official recommended practice, but it's a > good idea to use 'git con=
+fig diff.orderFile /path/to/file' in order to > hoist .h changes to the f=
+ront of a diff (it makes diffs easier to review > when you see the interf=
+ace change prior to the clients of the > interface).  I wish I had a bett=
+er URL to point to on the topic, but > didn't want to spend time finding =
+it in the mailing list archives at > this time.
+
+Noted for future submissions.
+
+>> +++ b/migration/ram.c >> @@ -357,6 +357,7 @@ void migrate_compress_thr=
+eads_join(void) >>  void migrate_compress_threads_create(void) >>  { >>  =
+    int i, thread_count; >> +    Error *err =3D NULL, *local_err =3D NULL=
+; >> >>      if (!migrate_use_compression()) { >>          return; >> @@ =
+-378,7 +379,16 @@ void migrate_compress_threads_create(void) >>          =
+qemu_cond_init(&comp_param[i].cond); >>          qemu_thread_create(compr=
+ess_threads + i, "compress", >>                             do_data_compr=
+ess, comp_param + i, >> -                           QEMU_THREAD_JOINABLE)=
+; >> +                           QEMU_THREAD_JOINABLE, &local_err); >> + =
+>> +        if (local_err) { >> +            error_propagate(&err, local_=
+err); >> +            local_err =3D NULL; >> +        } >> +    } >> + >>=
+ +    if (err) { >> +        error_report_err(err); >>      } > > Another=
+ place that looks weird with two error variables.
+
+I was on the fence about this one. I wrote it this way thinking that
+we would want to know the 'first' time the call to qemu_thread_create
+failed, but proceed to try and create subsequent threads, which might
+also fail. Seeing it now, it might be more reasonable to catch the
+first error, report it then return?
+
+>> +++ b/tests/iothread.c >> @@ -69,11 +69,18 @@ void iothread_join(IOThr=
+ead *iothread) >>  IOThread *iothread_new(void) >>  { >>      IOThread *i=
+othread =3D g_new0(IOThread, 1); >> +    Error *local_err =3D NULL; >> >>=
+      qemu_mutex_init(&iothread->init_done_lock); >>      qemu_cond_init(=
+&iothread->init_done_cond); >>      qemu_thread_create(&iothread->thread,=
+ NULL, iothread_run, >> -                       iothread, QEMU_THREAD_JOI=
+NABLE); >> +                       iothread, QEMU_THREAD_JOINABLE, &local=
+_err); > > In a test, you can just assert success, by using: > > qemu_thr=
+ead_create(..., &error_abort); > >> + >> +    if (local_err) { >> +      =
+  error_report_err(local_err); >> +        /*what makes sense here as a r=
+eturn value?*/ >> +        return NULL; > > Doing that will get rid of th=
+is fishy comment. > >> +++ b/tests/rcutorture.c >> @@ -64,6 +64,7 @@ >>  =
+#include "qemu/atomic.h" >>  #include "qemu/rcu.h" >>  #include "qemu/thr=
+ead.h" >> +#include "qapi/error.h" >> >>  long long n_reads =3D 0LL; >>=20
+long n_updates =3D 0L; >> @@ -85,12 +86,20 @@ static int n_threads; >> >>=
+  static void create_thread(void *(*func)(void *)) >>  { >> +    Error *l=
+ocal_err =3D NULL; >> + >>      if (n_threads >=3D NR_THREADS) { >>      =
+    fprintf(stderr, "Thread limit of %d exceeded!\n", NR_THREADS); >>    =
+      exit(-1); >>      } >>      qemu_thread_create(&threads[n_threads],=
+ "test", func, &data[n_threads], >> -                       QEMU_THREAD_J=
+OINABLE); >> +                       QEMU_THREAD_JOINABLE, &local_err); >=
+> + >> +    if (local_err) { >> +        error_report_err(local_err); >> =
++        exit(1); > > Again, in a test, if you're just going to exit anyw=
+ay, then it's easier > to pass &error_abort to the original call, than it=
+ is to post-process > and report the error. >
+
+OK, I will change the code in the tests.
+
+Achilles
