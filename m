@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41967)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cqiwO-0007Zj-0N
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:16:53 -0400
+	(envelope-from <lersek@redhat.com>) id 1cqiz5-0001Sg-GA
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:19:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cqiwM-00006C-EH
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:16:51 -0400
-Date: Wed, 22 Mar 2017 12:16:38 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170322161638.GK3411@localhost.localdomain>
-References: <148969972666.96.6167903765236289989@6c512846dbc7>
-	<18a5e8e8-36bf-62ed-7cdd-f576c6700dc3@redhat.com>
-	<20170322160143.GH3411@localhost.localdomain>
-	<9e312886-03e7-d15c-76cb-4ec333eba317@redhat.com>
+	(envelope-from <lersek@redhat.com>) id 1cqiz2-0001e4-4v
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:19:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56226)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cqiz1-0001dN-Sd
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:19:36 -0400
+References: <1490198476-12244-1-git-send-email-mst@redhat.com>
+	<1490198476-12244-4-git-send-email-mst@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <bf935b4a-a4f8-6bfd-b62e-3222f3c83ad0@redhat.com>
+Date: Wed, 22 Mar 2017 17:19:28 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9e312886-03e7-d15c-76cb-4ec333eba317@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] block: pause block jobs for
- bdrv_drain_begin/end
+In-Reply-To: <1490198476-12244-4-git-send-email-mst@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 3/4] hw/acpi/vmgenid: prevent device
+ realization on pre-2.5 machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,105 +28,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org, kwolf@redhat.com, pbonzini@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Ben Warren <ben@skyportsystems.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Wed, Mar 22, 2017 at 12:05:26PM -0400, John Snow wrote:
+On 03/22/17 17:01, Michael S. Tsirkin wrote:
+> From: Laszlo Ersek <lersek@redhat.com>
 > 
+> The WRITE_POINTER linker/loader command that underlies VMGENID depends on
+> commit baf2d5bfbac0 ("fw-cfg: support writeable blobs", 2017-01-12), which
+> in turn depends on fw_cfg DMA.
 > 
-> On 03/22/2017 12:01 PM, Jeff Cody wrote:
-> > On Wed, Mar 22, 2017 at 11:37:15AM -0400, John Snow wrote:
-> >> ping, is this the only issue? Any feedback? If this can hit 2.9 that
-> >> would be good.
-> >>
-> > 
-> > The series looks fine to me, and I can patch up the nit from patchew when
-> > applying.  But do you happen to have a qemu-iotest for this case, or is it
-> > not very feasible to create one?
-> > 
+> DMA for fw_cfg is enabled in 2.5+ machine types only (see commit
+> e6915b5f3a87, "fw_cfg: unbreak migration compatibility for 2.4 and earlier
+> machines", 2016-02-18).
 > 
-> I might need a hint from Paolo on how; my reproducer ATM is to literally
-> boot a Fedora VM and issue reboots/QMP commands and manually observe a
-> hang. (Which is pretty subjective ...)
-> 
-> An iotest version would probably involve using the qtest socket to issue
-> a PCI reset of some sort inbetween QMP commands as necessary, but
-> testing for a hang in iotests seems race-prone. I have no idea how long
-> this hang would last on other machines, for instance.
-> 
-> There might be a more fool-proof automated testing method, but at the
-> second I'm drawing a blank.
->
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Ben Warren <ben@skyportsystems.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
-OK, I figured as much.  We'll chalk that up as "not very feasible", at least
-for the moment :)
+Can you please add the feedback tags from Ben and Igor?
+
+http://mid.mail-archive.com/20170321131306.332253d2@nial.brq.redhat.com
+http://mid.mail-archive.com/71BEDF9C-3FA5-4F2B-8763-5169B729103B@skyportsystems.com
+
+Thanks,
+Laszlo
 
 
-> >>
-> >> On 03/16/2017 05:28 PM, no-reply@patchew.org wrote:
-> >>> Hi,
-> >>>
-> >>> This series seems to have some coding style problems. See output below for
-> >>> more information:
-> >>>
-> >>> Type: series
-> >>> Subject: [Qemu-devel] [PATCH v2 0/3] block: pause block jobs for bdrv_drain_begin/end
-> >>> Message-id: 20170316212351.13797-1-jsnow@redhat.com
-> >>>
-> >>> === TEST SCRIPT BEGIN ===
-> >>> #!/bin/bash
-> >>>
-> >>> BASE=base
-> >>> n=1
-> >>> total=$(git log --oneline $BASE.. | wc -l)
-> >>> failed=0
-> >>>
-> >>> # Useful git options
-> >>> git config --local diff.renamelimit 0
-> >>> git config --local diff.renames True
-> >>>
-> >>> commits="$(git log --format=%H --reverse $BASE..)"
-> >>> for c in $commits; do
-> >>>     echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
-> >>>     if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback -; then
-> >>>         failed=1
-> >>>         echo
-> >>>     fi
-> >>>     n=$((n+1))
-> >>> done
-> >>>
-> >>> exit $failed
-> >>> === TEST SCRIPT END ===
-> >>>
-> >>> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> >>> From https://github.com/patchew-project/qemu
-> >>>  * [new tag]         patchew/20170316212351.13797-1-jsnow@redhat.com -> patchew/20170316212351.13797-1-jsnow@redhat.com
-> >>> Switched to a new branch 'test'
-> >>> 1cca6f3 blockjob: add devops to blockjob backends
-> >>> 864d906 block-backend: add drained_begin / drained_end ops
-> >>> 5e4f22d blockjob: add block_job_start_shim
-> >>>
-> >>> === OUTPUT BEGIN ===
-> >>> Checking PATCH 1/3: blockjob: add block_job_start_shim...
-> >>> Checking PATCH 2/3: block-backend: add drained_begin / drained_end ops...
-> >>> ERROR: suspect code indent for conditional statements (8, 14)
-> >>> #70: FILE: block/block-backend.c:1903:
-> >>> +        if (blk->dev_ops && blk->dev_ops->drained_end) {
-> >>> +              blk->dev_ops->drained_end(blk->dev_opaque);
-> >>>
-> >>> total: 1 errors, 0 warnings, 67 lines checked
-> >>>
-> >>> Your patch has style problems, please review.  If any of these errors
-> >>> are false positives report them to the maintainer, see
-> >>> CHECKPATCH in MAINTAINERS.
-> >>>
-> >>> Checking PATCH 3/3: blockjob: add devops to blockjob backends...
-> >>> === OUTPUT END ===
-> >>>
-> >>> Test command exited with code: 1
-> >>>
-> >>>
-> >>> ---
-> >>> Email generated automatically by Patchew [http://patchew.org/].
-> >>> Please send your feedback to patchew-devel@freelists.org
-> >>>
+> ---
+>  include/hw/acpi/vmgenid.h |  1 +
+>  include/hw/compat.h       |  4 ++++
+>  hw/acpi/vmgenid.c         | 14 ++++++++++++++
+>  3 files changed, 19 insertions(+)
+> 
+> diff --git a/include/hw/acpi/vmgenid.h b/include/hw/acpi/vmgenid.h
+> index db7fa0e..8578476 100644
+> --- a/include/hw/acpi/vmgenid.h
+> +++ b/include/hw/acpi/vmgenid.h
+> @@ -21,6 +21,7 @@ typedef struct VmGenIdState {
+>      DeviceClass parent_obj;
+>      QemuUUID guid;                /* The 128-bit GUID seen by the guest */
+>      uint8_t vmgenid_addr_le[8];   /* Address of the GUID (little-endian) */
+> +    bool write_pointer_available;
+>  } VmGenIdState;
+>  
+>  static inline Object *find_vmgenid_dev(void)
+> diff --git a/include/hw/compat.h b/include/hw/compat.h
+> index fc8c3e0..5d5be91 100644
+> --- a/include/hw/compat.h
+> +++ b/include/hw/compat.h
+> @@ -131,6 +131,10 @@
+>          .driver   = "fw_cfg_io",\
+>          .property = "dma_enabled",\
+>          .value    = "off",\
+> +    },{\
+> +        .driver   = "vmgenid",\
+> +        .property = "x-write-pointer-available",\
+> +        .value    = "off",\
+>      },
+>  
+>  #define HW_COMPAT_2_3 \
+> diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+> index 7a3ad17..c3ddcc8 100644
+> --- a/hw/acpi/vmgenid.c
+> +++ b/hw/acpi/vmgenid.c
+> @@ -205,9 +205,22 @@ static void vmgenid_handle_reset(void *opaque)
+>      memset(vms->vmgenid_addr_le, 0, ARRAY_SIZE(vms->vmgenid_addr_le));
+>  }
+>  
+> +static Property vmgenid_properties[] = {
+> +    DEFINE_PROP_BOOL("x-write-pointer-available", VmGenIdState,
+> +                     write_pointer_available, true),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+>  static void vmgenid_realize(DeviceState *dev, Error **errp)
+>  {
+>      VmGenIdState *vms = VMGENID(dev);
+> +
+> +    if (!vms->write_pointer_available) {
+> +        error_setg(errp, "%s requires DMA write support in fw_cfg, "
+> +                   "which this machine type does not provide", VMGENID_DEVICE);
+> +        return;
+> +    }
+> +
+>      qemu_register_reset(vmgenid_handle_reset, vms);
+>  }
+>  
+> @@ -218,6 +231,7 @@ static void vmgenid_device_class_init(ObjectClass *klass, void *data)
+>      dc->vmsd = &vmstate_vmgenid;
+>      dc->realize = vmgenid_realize;
+>      dc->hotpluggable = false;
+> +    dc->props = vmgenid_properties;
+>  
+>      object_class_property_add_str(klass, VMGENID_GUID, NULL,
+>                                    vmgenid_set_guid, NULL);
+> 
