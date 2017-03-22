@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43361)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cqdV7-0002Oi-Oi
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 06:28:24 -0400
+	(envelope-from <drjones@redhat.com>) id 1cqdaw-0005O5-T9
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 06:34:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cqdV6-0007Lz-77
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 06:28:21 -0400
-Received: from [59.151.112.132] (port=24619 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cqdV5-0007Ju-Bq
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 06:28:20 -0400
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Date: Wed, 22 Mar 2017 18:36:52 +0800
-Message-ID: <1490179012-14990-4-git-send-email-caoj.fnst@cn.fujitsu.com>
-In-Reply-To: <1490179012-14990-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-References: <1490179012-14990-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+	(envelope-from <drjones@redhat.com>) id 1cqdau-0001FF-WC
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 06:34:22 -0400
+Date: Wed, 22 Mar 2017 11:34:05 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20170322103405.rcye74zye6gvrfis@hawk.localdomain>
+References: <1490175166-19785-1-git-send-email-he.chen@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 3/3] vfio-pci: process non fatal error of AER
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1490175166-19785-1-git-send-email-he.chen@linux.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v3] Allow setting NUMA distance for
+ different NUMA nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,338 +23,412 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: izumi.taku@jp.fujitsu.com, alex.williamson@redhat.com, mst@redhat.com, Dou Liyang <douly.fnst@cn.fujitsu.com>
+To: He Chen <he.chen@linux.intel.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Make use of the non fatal error eventfd that the kernel module provide
-to process the AER non fatal error. Fatal error still goes into the
-legacy way which results in VM stop.
 
-Register the handler, wait for notification. Construct aer message and
-pass it to root port on notification. Root port will trigger an interrupt
-to signal guest, then guest driver will do the recovery.
+You should have CC'ed me, considering this version is addressing my
+review comments, but whatever, I usually skim the list so I found it...
 
-Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
----
- hw/vfio/pci.c              | 247 +++++++++++++++++++++++++++++++++++++++++++++
- hw/vfio/pci.h              |   4 +
- linux-headers/linux/vfio.h |   2 +
- 3 files changed, 253 insertions(+)
+On Wed, Mar 22, 2017 at 05:32:46PM +0800, He Chen wrote:
+> Current, QEMU does not provide a clear command to set vNUMA distance for
+> guest although we already have `-numa` command to set vNUMA nodes.
+> 
+> vNUMA distance makes sense in certain scenario.
+> But now, if we create a guest that has 4 vNUMA nodes, when we check NUMA
+> info via `numactl -H`, we will see:
+> 
+> node distance:
+> node    0    1    2    3
+>   0:   10   20   20   20
+>   1:   20   10   20   20
+>   2:   20   20   10   20
+>   3:   20   20   20   10
+> 
+> Guest kernel regards all local node as distance 10, and all remote node
+> as distance 20 when there is no SLIT table since QEMU doesn't build it.
+> It looks like a little strange when you have seen the distance in an
+> actual physical machine that contains 4 NUMA nodes. My machine shows:
+> 
+> node distance:
+> node    0    1    2    3
+>   0:   10   21   31   41
+>   1:   21   10   21   31
+>   2:   31   21   10   21
+>   3:   41   31   21   10
+> 
+> To set vNUMA distance, guest should see a complete SLIT table.
+> I found QEMU has provide `-acpitable` command that allows users to add
+> a ACPI table into guest, but it requires users building ACPI table by
+> themselves first. Using `-acpitable` to add a SLIT table may be not so
+> straightforward or flexible, imagine that when the vNUMA configuration
+> is changes and we need to generate another SLIT table manually. It may
+> not be friendly to users or upper software like libvirt.
+> 
+> This patch is going to add SLIT table support in QEMU, and provides
+> additional option `dist` for command `-numa` to allow user set vNUMA
+> distance by QEMU command.
+> 
+> With this patch, when a user wants to create a guest that contains
+> several vNUMA nodes and also wants to set distance among those nodes,
+> the QEMU command would like:
+> 
+> ```
+> -object memory-backend-ram,size=1G,prealloc=yes,host-nodes=0,policy=bind,id=node0 \
+> -numa node,nodeid=0,cpus=0,memdev=node0 \
+> -object memory-backend-ram,size=1G,prealloc=yes,host-nodes=1,policy=bind,id=node1 \
+> -numa node,nodeid=1,cpus=1,memdev=node1 \
+> -object memory-backend-ram,size=1G,prealloc=yes,host-nodes=2,policy=bind,id=node2 \
+> -numa node,nodeid=2,cpus=2,memdev=node2 \
+> -object memory-backend-ram,size=1G,prealloc=yes,host-nodes=3,policy=bind,id=node3 \
+> -numa node,nodeid=3,cpus=3,memdev=node3 \
+> -numa dist,src=0,dst=1,val=21 \
+> -numa dist,src=0,dst=2,val=31 \
+> -numa dist,src=0,dst=3,val=41 \
+> -numa dist,src=1,dst=0,val=21 \
+> ...
+> ```
+> 
+> Signed-off-by: He Chen <he.chen@linux.intel.com>
+> 
+> fix
 
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 3d0d005..4912bc6 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -2422,6 +2422,34 @@ static void vfio_populate_device(VFIOPCIDevice *vdev, Error **errp)
-                      "Could not enable error recovery for the device",
-                      vbasedev->name);
-     }
-+
-+    irq_info.index = VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX;
-+    irq_info.count = 0; /* clear */
-+    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_GET_IRQ_INFO, &irq_info);
-+    if (ret) {
-+        /* This can fail for an old kernel or legacy PCI dev */
-+        trace_vfio_populate_device_get_irq_info_failure();
-+    } else if (irq_info.count == 1) {
-+        vdev->pci_aer_non_fatal = true;
-+    } else {
-+        error_report(WARN_PREFIX
-+                     "Couldn't enable non fatal error recovery for the device",
-+                     vbasedev->name);
-+    }
-+
-+    irq_info.index = VFIO_PCI_PASSIVE_RESET_IRQ_INDEX;
-+    irq_info.count = 0; /* clear */
-+    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_GET_IRQ_INFO, &irq_info);
-+    if (ret) {
-+        /* This can fail for an old kernel or legacy PCI dev */
-+        trace_vfio_populate_device_get_irq_info_failure();
-+    } else if (irq_info.count == 1) {
-+        vdev->passive_reset = true;
-+    } else {
-+        error_report(WARN_PREFIX
-+                     "Don't support passive reset notification",
-+                     vbasedev->name);
-+    }
- }
- 
- static void vfio_put_device(VFIOPCIDevice *vdev)
-@@ -2432,6 +2460,221 @@ static void vfio_put_device(VFIOPCIDevice *vdev)
-     vfio_put_base_device(&vdev->vbasedev);
- }
- 
-+static void vfio_non_fatal_err_notifier_handler(void *opaque)
-+{
-+    VFIOPCIDevice *vdev = opaque;
-+    PCIDevice *dev = &vdev->pdev;
-+    PCIEAERMsg msg = {
-+        .severity = PCI_ERR_ROOT_CMD_NONFATAL_EN,
-+        .source_id = (pci_bus_num(dev->bus) << 8) | dev->devfn,
-+    };
-+
-+    if (!event_notifier_test_and_clear(&vdev->non_fatal_err_notifier)) {
-+        return;
-+    }
-+
-+    /* Populate the aer msg and send it to root port */
-+    if (dev->exp.aer_cap) {
-+        uint8_t *aer_cap = dev->config + dev->exp.aer_cap;
-+        uint32_t uncor_status;
-+        bool isfatal;
-+
-+        uncor_status = vfio_pci_read_config(dev,
-+                            dev->exp.aer_cap + PCI_ERR_UNCOR_STATUS, 4);
-+        if (!uncor_status) {
-+            return;
-+        }
-+
-+        isfatal = uncor_status & pci_get_long(aer_cap + PCI_ERR_UNCOR_SEVER);
-+        if (isfatal) {
-+            goto stop;
-+        }
-+
-+        error_report("%s sending non fatal event to root port. uncor status = "
-+                     "0x%"PRIx32, vdev->vbasedev.name, uncor_status);
-+        pcie_aer_msg(dev, &msg);
-+        return;
-+    }
-+
-+stop:
-+    /* Terminate the guest in case of fatal error */
-+    error_report("%s(%s) fatal error detected. Please collect any data"
-+            " possible and then kill the guest", __func__, vdev->vbasedev.name);
-+    vm_stop(RUN_STATE_INTERNAL_ERROR);
-+}
-+
-+/*
-+ * Register non fatal error notifier for devices supporting error recovery.
-+ * If we encounter a failure in this function, we report an error
-+ * and continue after disabling error recovery support for the device.
-+ */
-+static void vfio_register_non_fatal_err_notifier(VFIOPCIDevice *vdev)
-+{
-+    int ret;
-+    int argsz;
-+    struct vfio_irq_set *irq_set;
-+    int32_t *pfd;
-+
-+    if (!vdev->pci_aer_non_fatal) {
-+        return;
-+    }
-+
-+    if (event_notifier_init(&vdev->non_fatal_err_notifier, 0)) {
-+        error_report("vfio: Unable to init event notifier for non-fatal error detection");
-+        vdev->pci_aer_non_fatal = false;
-+        return;
-+    }
-+
-+    argsz = sizeof(*irq_set) + sizeof(*pfd);
-+
-+    irq_set = g_malloc0(argsz);
-+    irq_set->argsz = argsz;
-+    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
-+                     VFIO_IRQ_SET_ACTION_TRIGGER;
-+    irq_set->index = VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX;
-+    irq_set->start = 0;
-+    irq_set->count = 1;
-+    pfd = (int32_t *)&irq_set->data;
-+
-+    *pfd = event_notifier_get_fd(&vdev->non_fatal_err_notifier);
-+    qemu_set_fd_handler(*pfd, vfio_non_fatal_err_notifier_handler, NULL, vdev);
-+
-+    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
-+    if (ret) {
-+        error_report("vfio: Failed to set up non-fatal error notification");
-+        qemu_set_fd_handler(*pfd, NULL, NULL, vdev);
-+        event_notifier_cleanup(&vdev->non_fatal_err_notifier);
-+        vdev->pci_aer_non_fatal = false;
-+    }
-+    g_free(irq_set);
-+}
-+
-+static void vfio_unregister_non_fatal_err_notifier(VFIOPCIDevice *vdev)
-+{
-+    int argsz;
-+    struct vfio_irq_set *irq_set;
-+    int32_t *pfd;
-+    int ret;
-+
-+    if (!vdev->pci_aer_non_fatal) {
-+        return;
-+    }
-+
-+    argsz = sizeof(*irq_set) + sizeof(*pfd);
-+
-+    irq_set = g_malloc0(argsz);
-+    irq_set->argsz = argsz;
-+    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
-+                     VFIO_IRQ_SET_ACTION_TRIGGER;
-+    irq_set->index = VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX;
-+    irq_set->start = 0;
-+    irq_set->count = 1;
-+    pfd = (int32_t *)&irq_set->data;
-+    *pfd = -1;
-+
-+    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
-+    if (ret) {
-+        error_report("vfio: Failed to de-assign error fd: %m");
-+    }
-+    g_free(irq_set);
-+    qemu_set_fd_handler(event_notifier_get_fd(&vdev->non_fatal_err_notifier),
-+                        NULL, NULL, vdev);
-+    event_notifier_cleanup(&vdev->non_fatal_err_notifier);
-+}
-+
-+static void vfio_passive_reset_notifier_handler(void *opaque)
-+{
-+    VFIOPCIDevice *vdev = opaque;
-+
-+    if (!event_notifier_test_and_clear(&vdev->passive_reset_notifier)) {
-+        return;
-+    }
-+
-+    error_report("device %s is forced to be reset. Please collect any data"
-+            " possible and then kill the guest", vdev->vbasedev.name);
-+    vm_stop(RUN_STATE_INTERNAL_ERROR);
-+}
-+
-+/*
-+ * Register passive reset notifier, in case of certain function of a
-+ * multifunction device is passthroughed,  while other functions are still
-+ * controlled by device driver.
-+ */
-+static void vfio_register_passive_reset_notifier(VFIOPCIDevice *vdev)
-+{
-+    int ret;
-+    int argsz;
-+    struct vfio_irq_set *irq_set;
-+    int32_t *pfd;
-+
-+    error_report("Registering event notifier for passive reset");
-+    if (!vdev->passive_reset) {
-+        return;
-+    }
-+
-+    if (event_notifier_init(&vdev->passive_reset_notifier, 0)) {
-+        error_report("vfio: Unable to init event notifier for passive reset");
-+        vdev->passive_reset = false;
-+        return;
-+    }
-+
-+    argsz = sizeof(*irq_set) + sizeof(*pfd);
-+
-+    irq_set = g_malloc0(argsz);
-+    irq_set->argsz = argsz;
-+    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
-+                     VFIO_IRQ_SET_ACTION_TRIGGER;
-+    irq_set->index = VFIO_PCI_PASSIVE_RESET_IRQ_INDEX;
-+    irq_set->start = 0;
-+    irq_set->count = 1;
-+    pfd = (int32_t *)&irq_set->data;
-+
-+    *pfd = event_notifier_get_fd(&vdev->passive_reset_notifier);
-+    qemu_set_fd_handler(*pfd, vfio_passive_reset_notifier_handler, NULL, vdev);
-+
-+    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
-+    if (ret) {
-+        error_report("vfio: Failed to set up passive reset notification");
-+        qemu_set_fd_handler(*pfd, NULL, NULL, vdev);
-+        event_notifier_cleanup(&vdev->passive_reset_notifier);
-+        vdev->passive_reset = false;
-+    }
-+    g_free(irq_set);
-+}
-+
-+static void vfio_unregister_passive_reset_notifier(VFIOPCIDevice *vdev)
-+{
-+    int argsz;
-+    struct vfio_irq_set *irq_set;
-+    int32_t *pfd;
-+    int ret;
-+
-+    if (!vdev->passive_reset) {
-+        return;
-+    }
-+
-+    argsz = sizeof(*irq_set) + sizeof(*pfd);
-+
-+    irq_set = g_malloc0(argsz);
-+    irq_set->argsz = argsz;
-+    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
-+                     VFIO_IRQ_SET_ACTION_TRIGGER;
-+    irq_set->index = VFIO_PCI_PASSIVE_RESET_IRQ_INDEX;
-+    irq_set->start = 0;
-+    irq_set->count = 1;
-+    pfd = (int32_t *)&irq_set->data;
-+    *pfd = -1;
-+
-+    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
-+    if (ret) {
-+        error_report("vfio: Failed to de-assign error fd: %m");
-+    }
-+    g_free(irq_set);
-+    qemu_set_fd_handler(event_notifier_get_fd(&vdev->passive_reset_notifier),
-+                        NULL, NULL, vdev);
-+    event_notifier_cleanup(&vdev->passive_reset_notifier);
-+}
-+
- static void vfio_err_notifier_handler(void *opaque)
- {
-     VFIOPCIDevice *vdev = opaque;
-@@ -2860,6 +3103,8 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
-         }
-     }
- 
-+    vfio_register_passive_reset_notifier(vdev);
-+    vfio_register_non_fatal_err_notifier(vdev);
-     vfio_register_err_notifier(vdev);
-     vfio_register_req_notifier(vdev);
-     vfio_setup_resetfn_quirk(vdev);
-@@ -2900,6 +3145,8 @@ static void vfio_exitfn(PCIDevice *pdev)
- 
-     vfio_unregister_req_notifier(vdev);
-     vfio_unregister_err_notifier(vdev);
-+    vfio_unregister_non_fatal_err_notifier(vdev);
-+    vfio_unregister_passive_reset_notifier(vdev);
-     pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
-     vfio_disable_interrupts(vdev);
-     if (vdev->intx.mmap_timer) {
-diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-index 34e8b04..dcb0e0a 100644
---- a/hw/vfio/pci.h
-+++ b/hw/vfio/pci.h
-@@ -119,6 +119,8 @@ typedef struct VFIOPCIDevice {
-     void *igd_opregion;
-     PCIHostDeviceAddress host;
-     EventNotifier err_notifier;
-+    EventNotifier non_fatal_err_notifier;
-+    EventNotifier passive_reset_notifier;
-     EventNotifier req_notifier;
-     int (*resetfn)(struct VFIOPCIDevice *);
-     uint32_t vendor_id;
-@@ -137,6 +139,8 @@ typedef struct VFIOPCIDevice {
-     uint32_t igd_gms;
-     uint8_t pm_cap;
-     bool pci_aer;
-+    bool pci_aer_non_fatal;
-+    bool passive_reset;
-     bool req_enabled;
-     bool has_flr;
-     bool has_pm_reset;
-diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-index 759b850..726ddbe 100644
---- a/linux-headers/linux/vfio.h
-+++ b/linux-headers/linux/vfio.h
-@@ -433,6 +433,8 @@ enum {
- 	VFIO_PCI_MSIX_IRQ_INDEX,
- 	VFIO_PCI_ERR_IRQ_INDEX,
- 	VFIO_PCI_REQ_IRQ_INDEX,
-+	VFIO_PCI_NON_FATAL_ERR_IRQ_INDEX,
-+	VFIO_PCI_PASSIVE_RESET_IRQ_INDEX,
- 	VFIO_PCI_NUM_IRQS
- };
- 
--- 
-1.8.3.1
+stray 'fix' above the ---
+
+> ---
+>  hw/acpi/aml-build.c         | 26 +++++++++++++++++++++++++
+>  hw/arm/virt-acpi-build.c    |  2 ++
+>  hw/i386/acpi-build.c        |  2 ++
+>  include/hw/acpi/aml-build.h |  1 +
+>  include/sysemu/numa.h       |  1 +
+>  include/sysemu/sysemu.h     |  4 ++++
+>  numa.c                      | 47 +++++++++++++++++++++++++++++++++++++++++++++
+>  qapi-schema.json            | 30 ++++++++++++++++++++++++++---
+>  qemu-options.hx             | 12 +++++++++++-
+>  9 files changed, 121 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+> index c6f2032..410b30e 100644
+> --- a/hw/acpi/aml-build.c
+> +++ b/hw/acpi/aml-build.c
+> @@ -24,6 +24,7 @@
+>  #include "hw/acpi/aml-build.h"
+>  #include "qemu/bswap.h"
+>  #include "qemu/bitops.h"
+> +#include "sysemu/numa.h"
+>  
+>  static GArray *build_alloc_array(void)
+>  {
+> @@ -1609,3 +1610,28 @@ void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
+>      numamem->base_addr = cpu_to_le64(base);
+>      numamem->range_length = cpu_to_le64(len);
+>  }
+> +
+> +/*
+> + * ACPI spec 5.2.17 System Locality Distance Information Table
+> + * (Revision 2.0 or later)
+> + */
+> +void build_slit(GArray *table_data, BIOSLinker *linker)
+> +{
+> +    int slit_start, i, j;
+> +    slit_start = table_data->len;
+> +
+> +    acpi_data_push(table_data, sizeof(AcpiTableHeader));
+> +
+> +    build_append_int_noprefix(table_data, nb_numa_nodes, 8);
+> +    for (i = 0; i < nb_numa_nodes; i++) {
+> +        for (j = 0; j < nb_numa_nodes; j++) {
+> +            build_append_int_noprefix(table_data, numa_info[i].distance[j], 1);
+> +        }
+> +    }
+> +
+> +    build_header(linker, table_data,
+> +                 (void *)(table_data->data + slit_start),
+> +                 "SLIT",
+> +                 table_data->len - slit_start, 1, NULL, NULL);
+> +}
+> +
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index 0835e59..d9e6828 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -781,6 +781,8 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+>      if (nb_numa_nodes > 0) {
+>          acpi_add_table(table_offsets, tables_blob);
+>          build_srat(tables_blob, tables->linker, vms);
+> +        acpi_add_table(table_offsets, tables_blob);
+> +        build_slit(tables_blob, tables->linker);
+
+I didn't expect you'd actually add the support to the ARM machine
+model, but only provide the API. Anyway, thanks for this, assuming
+you've tested it and it works.
+
+>      }
+>  
+>      if (its_class_name() && !vmc->no_its) {
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 2073108..12730ea 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -2678,6 +2678,8 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+>      if (pcms->numa_nodes) {
+>          acpi_add_table(table_offsets, tables_blob);
+>          build_srat(tables_blob, tables->linker, machine);
+> +        acpi_add_table(table_offsets, tables_blob);
+> +        build_slit(tables_blob, tables->linker);
+>      }
+>      if (acpi_get_mcfg(&mcfg)) {
+>          acpi_add_table(table_offsets, tables_blob);
+> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+> index 00c21f1..329a0d0 100644
+> --- a/include/hw/acpi/aml-build.h
+> +++ b/include/hw/acpi/aml-build.h
+> @@ -389,4 +389,5 @@ GCC_FMT_ATTR(2, 3);
+>  void build_srat_memory(AcpiSratMemoryAffinity *numamem, uint64_t base,
+>                         uint64_t len, int node, MemoryAffinityFlags flags);
+>  
+> +void build_slit(GArray *table_data, BIOSLinker *linker);
+>  #endif
+> diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+> index 8f09dcf..2f7a941 100644
+> --- a/include/sysemu/numa.h
+> +++ b/include/sysemu/numa.h
+> @@ -21,6 +21,7 @@ typedef struct node_info {
+>      struct HostMemoryBackend *node_memdev;
+>      bool present;
+>      QLIST_HEAD(, numa_addr_range) addr; /* List to store address ranges */
+> +    uint8_t distance[MAX_NODES];
+>  } NodeInfo;
+>  
+>  extern NodeInfo numa_info[MAX_NODES];
+> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> index 576c7ce..a4e328d 100644
+> --- a/include/sysemu/sysemu.h
+> +++ b/include/sysemu/sysemu.h
+> @@ -169,6 +169,10 @@ extern int mem_prealloc;
+>  
+>  #define MAX_NODES 128
+>  #define NUMA_NODE_UNASSIGNED MAX_NODES
+> +#define MIN_NUMA_DISTANCE 10
+> +#define DEF_NUMA_DISTANCE 20
+> +#define MAX_NUMA_DISTANCE 254
+
+You ignored my comment about starting with 'NUMA_DISTANCE' without
+even replying to that comment stating why you prefer it this way.
+That's a bit annoying.
+
+> +#define NUMA_DISTANCE_UNREACHABLE 255
+
+Here you do start with NUMA_DISTANCE, so these names have an
+inconsistent format.
+
+>  
+>  #define MAX_OPTION_ROMS 16
+>  typedef struct QEMUOptionRom {
+> diff --git a/numa.c b/numa.c
+> index e01cb54..425a320 100644
+> --- a/numa.c
+> +++ b/numa.c
+> @@ -212,6 +212,28 @@ static void numa_node_parse(NumaNodeOptions *node, QemuOpts *opts, Error **errp)
+>      max_numa_nodeid = MAX(max_numa_nodeid, nodenr + 1);
+>  }
+>  
+> +static void numa_distance_parse(NumaDistOptions *dist, QemuOpts *opts, Error **errp)
+> +{
+> +    uint64_t src = dist->src;
+> +    uint64_t dst = dist->dst;
+> +    uint8_t val = dist->val;
+> +
+> +    if (src >= MAX_NODES || dst >= MAX_NODES) {
+> +        error_setg(errp, "Max number of NUMA nodes reached: %"
+> +                   PRIu64 "", src > dst ? src : dst);
+> +        return;
+> +    }
+> +
+> +    if (val < MIN_NUMA_DISTANCE || val > MAX_NUMA_DISTANCE) {
+
+val > MAX_NUMA_DISTANCE is not invalid, as NUMA_DISTANCE_UNREACHABLE
+is 255. Isn't it possible that that could be what the user wants?
+
+> +        error_setg(errp,
+> +                "NUMA distance (%" PRIu8 ") out of range (%d) ~ (%d)",
+> +                dist->val, MIN_NUMA_DISTANCE, MAX_NUMA_DISTANCE);
+> +        return;
+> +    }
+> +
+> +    numa_info[src].distance[dst] = val;
+> +}
+> +
+>  static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
+>  {
+>      NumaOptions *object = NULL;
+> @@ -235,6 +257,12 @@ static int parse_numa(void *opaque, QemuOpts *opts, Error **errp)
+>          }
+>          nb_numa_nodes++;
+>          break;
+> +    case NUMA_OPTIONS_TYPE_DIST:
+> +        numa_distance_parse(&object->u.dist, opts, &err);
+> +        if (err) {
+> +            goto end;
+> +        }
+> +        break;
+>      default:
+>          abort();
+>      }
+> @@ -294,6 +322,24 @@ static void validate_numa_cpus(void)
+>      g_free(seen_cpus);
+>  }
+>  
+> +static void default_numa_distance(void)
+> +{
+> +    int src, dst;
+> +
+> +    for (src = 0; src < nb_numa_nodes; src++) {
+> +        for (dst = 0; dst < nb_numa_nodes; dst++) {
+> +            if (src == dst && numa_info[src].distance[dst] != MIN_NUMA_DISTANCE) {
+> +                numa_info[src].distance[dst] = MIN_NUMA_DISTANCE;
+> +            } else if (numa_info[src].distance[dst] <= MIN_NUMA_DISTANCE) {
+> +                if (numa_info[dst].distance[src] > MIN_NUMA_DISTANCE)
+> +                    numa_info[src].distance[dst] = numa_info[dst].distance[src];
+> +                else
+> +                    numa_info[src].distance[dst] = DEF_NUMA_DISTANCE;
+> +            }
+> +        }
+> +    }
+> +}
+> +
+>  void parse_numa_opts(MachineClass *mc)
+>  {
+>      int i;
+> @@ -390,6 +436,7 @@ void parse_numa_opts(MachineClass *mc)
+>          }
+>  
+>          validate_numa_cpus();
+> +        default_numa_distance();
+>      } else {
+>          numa_set_mem_node_id(0, ram_size, 0);
+>      }
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 32b4a4b..21ad94a 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -5644,15 +5644,19 @@
+>  ##
+>  # @NumaOptionsType:
+>  #
+> +# @node: NUMA nodes configuration
+> +#
+> +# @dist: NUMA distance configuration
+> +#
+>  # Since: 2.1
+>  ##
+>  { 'enum': 'NumaOptionsType',
+> -  'data': [ 'node' ] }
+> +  'data': [ 'node', 'dist' ] }
+>  
+>  ##
+>  # @NumaOptions:
+>  #
+> -# A discriminated record of NUMA options. (for OptsVisitor)
+> +# A discriminated record of NUMA options.
+>  #
+>  # Since: 2.1
+>  ##
+> @@ -5660,7 +5664,8 @@
+>    'base': { 'type': 'NumaOptionsType' },
+>    'discriminator': 'type',
+>    'data': {
+> -    'node': 'NumaNodeOptions' }}
+> +    'node': 'NumaNodeOptions',
+> +    'dist': 'NumaDistOptions' }}
+>  
+>  ##
+>  # @NumaNodeOptions:
+> @@ -5689,6 +5694,25 @@
+>     '*memdev': 'str' }}
+>  
+>  ##
+> +# @NumaDistOptions:
+> +#
+> +# Set distance between 2 NUMA nodes. (for OptsVisitor)
+
+Set the distance
+
+> +#
+> +# @src: source NUMA node.
+> +#
+> +# @dst: destination NUMA node.
+> +#
+> +# @val: NUMA distance from source node to destination node.
+> +#
+> +# Since: 2.10
+> +##
+> +{ 'struct': 'NumaDistOptions',
+> +  'data': {
+> +   'src': 'uint64',
+> +   'dst': 'uint64',
+> +   'val': 'uint8' }}
+> +
+> +##
+>  # @HostMemPolicy:
+>  #
+>  # Host memory policy types
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 8dd8ee3..43c3950 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -139,12 +139,15 @@ ETEXI
+>  
+>  DEF("numa", HAS_ARG, QEMU_OPTION_numa,
+>      "-numa node[,mem=size][,cpus=firstcpu[-lastcpu]][,nodeid=node]\n"
+> -    "-numa node[,memdev=id][,cpus=firstcpu[-lastcpu]][,nodeid=node]\n", QEMU_ARCH_ALL)
+> +    "-numa node[,memdev=id][,cpus=firstcpu[-lastcpu]][,nodeid=node]\n"
+> +    "-numa dist,src=source,dst=destination,val=distance\n", QEMU_ARCH_ALL)
+>  STEXI
+>  @item -numa node[,mem=@var{size}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}]
+>  @itemx -numa node[,memdev=@var{id}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}]
+> +@itemx -numa dist,src=@var{source},dst=@var{destination},val=@var{distance}
+>  @findex -numa
+>  Define a NUMA node and assign RAM and VCPUs to it.
+> +Set NUMA distance from source node to destination node.
+
+Set the NUMA distance from a source node to a destination node.
+
+>  
+>  @var{firstcpu} and @var{lastcpu} are CPU indexes. Each
+>  @samp{cpus} option represent a contiguous range of CPU indexes
+> @@ -167,6 +170,13 @@ split equally between them.
+>  @samp{mem} and @samp{memdev} are mutually exclusive. Furthermore,
+>  if one node uses @samp{memdev}, all of them have to use it.
+>  
+> +@var{source} and @var{destination} are NUMA node IDs.
+> +@var{distance} is the NUMA distance from @var{source} to @var{destination}.
+> +The distance from node A to node B may be different from the distance from
+> +node B to node A since the distance can to be asymmetry.
+
+/since/as/
+/asymmetry/asymmetrical/
+
+> +If the distance is not set, the default distance for a local NUMA node is 10,
+
+no need for ,
+
+> +and 20 for a remote node.
+
+and the default distance for a remote node is 20.
+
+Also need sentence like: When the distance for only one direction is
+given, then the opposite direction defaults to the same distance.
+
+And maybe should also point out how to set an unreachable node with 255.
+
+> +
+>  Note that the -@option{numa} option doesn't allocate any of the
+>  specified resources, it just assigns existing resources to NUMA
+>  nodes. This means that one still has to use the @option{-m},
+> -- 
+> 2.7.4
+> 
+> 
+
+drew
