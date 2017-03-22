@@ -1,17 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cql7V-0008HF-6C
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:36:30 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cql7T-0000au-IY
+	(envelope-from <armbru@redhat.com>) id 1cql7T-0008GK-Ov
 	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:36:29 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <armbru@redhat.com>) id 1cql7Q-0000XR-Gn
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:36:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34834)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cql7Q-0000WL-Ak
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 14:36:24 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2711A3D96B
+	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 18:36:24 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-26.ams2.redhat.com
+	[10.36.116.26])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id E7FFDAAAD0
+	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 18:36:23 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 22 Mar 2017 19:36:19 +0100
-Message-Id: <1490207781-18965-16-git-send-email-armbru@redhat.com>
+Date: Wed, 22 Mar 2017 19:36:05 +0100
+Message-Id: <1490207781-18965-2-git-send-email-armbru@redhat.com>
 In-Reply-To: <1490207781-18965-1-git-send-email-armbru@redhat.com>
 References: <1490207781-18965-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v3 for-2.9 15/17] tests: Expose regression in
- QemuOpts visitor
+Subject: [Qemu-devel] [PULL v3 for-2.9 01/17] test-keyval: Tweaks to improve
+ list coverage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,65 +35,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, qemu-stable@nongnu.org
 
-From: Eric Blake <eblake@redhat.com>
+We have a negative test case for a list index with leading zero.  Add
+positive ones.
 
-Commit 15c2f669e broke the ability of the QemuOpts visitor to
-flag extra input parameters, but the regression went unnoticed
-because of missing testsuite coverage.  Add a test to cover this;
-take the approach already used in 9cb8ef3 of adding a test that
-passes (to avoid breaking bisection) but marks with BUG the
-behavior that we don't like, so that the actual impact of the
-fix in a later patch is easier to see.
+Tweak the test case for list index greater or equal the number of
+elements: test "equal" instead of "greater" to guard against
+off-by-one mistakes.
 
-CC: qemu-stable@nongnu.org
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-Message-Id: <20170322144525.18964-2-eblake@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <1490014548-15083-2-git-send-email-armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/test-opts-visitor.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ tests/test-keyval.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/tests/test-opts-visitor.c b/tests/test-opts-visitor.c
-index 2238f8e..8e0dda5 100644
---- a/tests/test-opts-visitor.c
-+++ b/tests/test-opts-visitor.c
-@@ -247,6 +247,24 @@ test_opts_range_beyond(void)
-     qemu_opts_del(opts);
- }
+diff --git a/tests/test-keyval.c b/tests/test-keyval.c
+index 71288b0..e97f6d5 100644
+--- a/tests/test-keyval.c
++++ b/tests/test-keyval.c
+@@ -218,14 +218,14 @@ static void test_keyval_parse_list(void)
+     QDECREF(qdict);
  
-+static void
-+test_opts_dict_unvisited(void)
-+{
-+    QemuOpts *opts;
-+    Visitor *v;
-+    UserDefOptions *userdef;
-+
-+    opts = qemu_opts_parse(qemu_find_opts("userdef"), "i64x=0,bogus=1", false,
-+                           &error_abort);
-+
-+    v = opts_visitor_new(opts);
-+    /* BUG: bogus should be diagnosed */
-+    visit_type_UserDefOptions(v, NULL, &userdef, &error_abort);
-+    visit_free(v);
-+    qemu_opts_del(opts);
-+    qapi_free_UserDefOptions(userdef);
-+}
-+
- int
- main(int argc, char **argv)
- {
-@@ -343,6 +361,8 @@ main(int argc, char **argv)
-     g_test_add_func("/visitor/opts/range/beyond",
-                     test_opts_range_beyond);
+     /* Multiple indexes, last one wins */
+-    qdict = keyval_parse("list.1=goner,list.0=null,list.1=eins,list.2=zwei",
++    qdict = keyval_parse("list.1=goner,list.0=null,list.01=eins,list.2=zwei",
+                          NULL, &error_abort);
+     g_assert_cmpint(qdict_size(qdict), ==, 1);
+     check_list012(qdict_get_qlist(qdict, "list"));
+     QDECREF(qdict);
  
-+    g_test_add_func("/visitor/opts/dict/unvisited", test_opts_dict_unvisited);
-+
-     g_test_run();
-     return 0;
- }
+     /* List at deeper nesting */
+-    qdict = keyval_parse("a.list.1=eins,a.list.0=null,a.list.2=zwei",
++    qdict = keyval_parse("a.list.1=eins,a.list.00=null,a.list.2=zwei",
+                          NULL, &error_abort);
+     g_assert_cmpint(qdict_size(qdict), ==, 1);
+     sub_qdict = qdict_get_qdict(qdict, "a");
+@@ -242,7 +242,7 @@ static void test_keyval_parse_list(void)
+     g_assert(!qdict);
+ 
+     /* Missing list indexes */
+-    qdict = keyval_parse("list.2=lonely", NULL, &err);
++    qdict = keyval_parse("list.1=lonely", NULL, &err);
+     error_free_or_abort(&err);
+     g_assert(!qdict);
+     qdict = keyval_parse("list.0=null,list.2=eins,list.02=zwei", NULL, &err);
 -- 
 2.7.4
