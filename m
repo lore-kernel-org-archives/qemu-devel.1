@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cqfpy-0004Nv-0N
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 08:58:03 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1cqg16-00068J-8y
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 09:09:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cqfpw-0006Om-VU
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 08:58:02 -0400
-Date: Wed, 22 Mar 2017 08:57:51 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170322125751.GA15423@localhost.localdomain>
-References: <20170316212351.13797-1-jsnow@redhat.com>
-	<20170316212351.13797-2-jsnow@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cqg15-0001so-AH
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 09:09:32 -0400
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:38410)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cqg15-0001sh-1c
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 09:09:31 -0400
+Received: by mail-wm0-x231.google.com with SMTP id t189so37279381wmt.1
+	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 06:09:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170316212351.13797-2-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] blockjob: add block_job_start_shim
+In-Reply-To: <87k27hxyni.fsf@linaro.org>
+References: <CAFEAcA9pqDoCWrPAJ+KVxLC_eRy-xRg36oYuARYg2YP8VpGpBg@mail.gmail.com>
+	<CAFEAcA-2mcGih5bscnMsevTNTy71g9kE7OjTy3hYJKeGoGQw-g@mail.gmail.com>
+	<87k27hxyni.fsf@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 22 Mar 2017 13:09:09 +0000
+Message-ID: <CAFEAcA-oLDW2F=L3NCdSvrLp_eh3tu9mfKR0mTfZ=3O3dpdKbQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Proposal for deprecating unsupported host OSes &
+ architecutures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,90 +32,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Mar 16, 2017 at 05:23:49PM -0400, John Snow wrote:
-> The purpose of this shim is to allow us to pause pre-started jobs.
-> The purpose of *that* is to allow us to buffer a pause request that
-> will be able to take effect before the job ever does any work, allowing
-> us to create jobs during a quiescent state (under which they will be
-> automatically paused), then resuming the jobs after the critical section
-> in any order, either:
-> 
-> (1) -block_job_start
->     -block_job_resume (via e.g. drained_end)
-> 
-> (2) -block_job_resume (via e.g. drained_end)
->     -block_job_start
-> 
-> The problem that requires a startup wrapper is the idea that a job must
-> start in the busy=true state only its first time-- all subsequent entries
-> require busy to be false, and the toggling of this state is otherwise
-> handled during existing pause and yield points.
-> 
-> The wrapper simply allows us to mandate that a job can "start," set busy
-> to true, then immediately pause only if necessary. We could avoid
-> requiring a wrapper, but all jobs would need to do it, so it's been
-> factored out here.
+On 22 March 2017 at 12:51, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>> ...unfortunately the gcc compile farm mips board (1) is very slow
+>> and (2) has very little disk space free in /tmp, which means that
+>> it can't pass "make check" because for instance tests/test-replication
+>> assumes it can write comparatively large test files to /tmp/...
+>
+> That makes it sound like a mips cross build or mips linux-user powered
+> image would be useful then?
 
-I think this makes sense.  So when this happens:
+Cross build can't actually run 'make check' and I wouldn't
+trust linux-user to run our test suite. Also, if there's
+no hardware that we can sensibly do make/make check
+on then how much can people really care about QEMU on MIPS?
+(In fact since MIPS supports KVM these days, there really
+ought to be sufficiently capable hardware to work as
+a build system.)
 
-* block_job_create
-* block_job_pause
-* block_job_resume  <-- only effects pause_count, rest is noop
-* block_job_start
+The "test uses /tmp/" stuff is a test suite bug which
+we should fix, which might make the gcc cfarm box at
+least kind of usable.
 
-The block_job_resume is mostly a no-op, only affecting the pause_count but
-since there is no job coroutine created yet, the block_job_enter does
-nothing.
-
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  blockjob.c | 26 +++++++++++++++++++-------
->  1 file changed, 19 insertions(+), 7 deletions(-)
-> 
-> diff --git a/blockjob.c b/blockjob.c
-> index 69126af..69b4ec6 100644
-> --- a/blockjob.c
-> +++ b/blockjob.c
-> @@ -250,16 +250,28 @@ static bool block_job_started(BlockJob *job)
->      return job->co;
->  }
->  
-> +/**
-> + * All jobs must allow a pause point before entering their job proper. This
-> + * ensures that jobs can be paused prior to being started, then resumed later.
-> + */
-> +static void coroutine_fn block_job_co_entry(void *opaque)
-> +{
-> +    BlockJob *job = opaque;
-> +
-> +    assert(job && job->driver && job->driver->start);
-> +    block_job_pause_point(job);
-> +    job->driver->start(job);
-> +}
-> +
->  void block_job_start(BlockJob *job)
->  {
->      assert(job && !block_job_started(job) && job->paused &&
-> -           !job->busy && job->driver->start);
-> -    job->co = qemu_coroutine_create(job->driver->start, job);
-> -    if (--job->pause_count == 0) {
-> -        job->paused = false;
-> -        job->busy = true;
-> -        qemu_coroutine_enter(job->co);
-> -    }
-> +           job->driver && job->driver->start);
-> +    job->co = qemu_coroutine_create(block_job_co_entry, job);
-> +    job->pause_count--;
-> +    job->busy = true;
-> +    job->paused = false;
-> +    qemu_coroutine_enter(job->co);
->  }
->  
->  void block_job_ref(BlockJob *job)
-> -- 
-> 2.9.3
-> 
+thanks
+-- PMM
