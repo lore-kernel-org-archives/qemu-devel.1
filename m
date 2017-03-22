@@ -1,17 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37220)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cqilt-0006b0-Az
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:06:05 -0400
+	(envelope-from <armbru@redhat.com>) id 1cqils-0006aK-PU
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:06:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cqilm-0001le-Oj
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:06:01 -0400
+	(envelope-from <armbru@redhat.com>) id 1cqilk-0001je-Vx
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:06:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49484)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cqilk-0001iR-Gk
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:05:52 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8FAD39F733
+	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 16:05:52 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-26.ams2.redhat.com
+	[10.36.116.26])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 542BA7EFF1
+	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 16:05:52 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 22 Mar 2017 17:05:46 +0100
-Message-Id: <1490198748-4753-16-git-send-email-armbru@redhat.com>
+Date: Wed, 22 Mar 2017 17:05:39 +0100
+Message-Id: <1490198748-4753-9-git-send-email-armbru@redhat.com>
 In-Reply-To: <1490198748-4753-1-git-send-email-armbru@redhat.com>
 References: <1490198748-4753-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL for-2.9 15/17] tests: Expose regression in
- QemuOpts visitor
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL for-2.9 08/17] qapi: Drop unused QAPIDoc member
+ optional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,65 +38,27 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, qemu-stable@nongnu.org
 
-From: Eric Blake <eblake@redhat.com>
+Unused since commit aa964b7 "qapi2texi: Convert to QAPISchemaVisitor"
 
-Commit 15c2f669e broke the ability of the QemuOpts visitor to
-flag extra input parameters, but the regression went unnoticed
-because of missing testsuite coverage.  Add a test to cover this;
-take the approach already used in 9cb8ef3 of adding a test that
-passes (to avoid breaking bisection) but marks with BUG the
-behavior that we don't like, so that the actual impact of the
-fix in a later patch is easier to see.
-
-CC: qemu-stable@nongnu.org
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-Message-Id: <20170322144525.18964-2-eblake@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <1490015515-25851-4-git-send-email-armbru@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- tests/test-opts-visitor.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ scripts/qapi.py | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/tests/test-opts-visitor.c b/tests/test-opts-visitor.c
-index 2238f8e..8e0dda5 100644
---- a/tests/test-opts-visitor.c
-+++ b/tests/test-opts-visitor.c
-@@ -247,6 +247,24 @@ test_opts_range_beyond(void)
-     qemu_opts_del(opts);
- }
- 
-+static void
-+test_opts_dict_unvisited(void)
-+{
-+    QemuOpts *opts;
-+    Visitor *v;
-+    UserDefOptions *userdef;
-+
-+    opts = qemu_opts_parse(qemu_find_opts("userdef"), "i64x=0,bogus=1", false,
-+                           &error_abort);
-+
-+    v = opts_visitor_new(opts);
-+    /* BUG: bogus should be diagnosed */
-+    visit_type_UserDefOptions(v, NULL, &userdef, &error_abort);
-+    visit_free(v);
-+    qemu_opts_del(opts);
-+    qapi_free_UserDefOptions(userdef);
-+}
-+
- int
- main(int argc, char **argv)
- {
-@@ -343,6 +361,8 @@ main(int argc, char **argv)
-     g_test_add_func("/visitor/opts/range/beyond",
-                     test_opts_range_beyond);
- 
-+    g_test_add_func("/visitor/opts/dict/unvisited", test_opts_dict_unvisited);
-+
-     g_test_run();
-     return 0;
- }
--- 
+diff --git a/scripts/qapi.py b/scripts/qapi.py
+index e88c047..6c4d554 100644
+--- a/scripts/qapi.py
++++ b/scripts/qapi.py
+@@ -106,7 +106,6 @@ class QAPIDoc(object):
+             self.name =3D name
+             # the list of lines for this section
+             self.content =3D []
+-            self.optional =3D False
+=20
+         def append(self, line):
+             self.content.append(line)
+--=20
 2.7.4
