@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35120)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <SRS0=0SF/=27=redhat.com=mst@kernel.org>)
-	id 1cqihh-0002tF-T8
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:01:47 -0400
+	id 1cqihl-0002vW-Ms
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:01:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <SRS0=0SF/=27=redhat.com=mst@kernel.org>)
-	id 1cqihd-00077G-S7
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:01:41 -0400
-Received: from mail.kernel.org ([198.145.29.136]:38640)
+	id 1cqihk-0007Ca-My
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:01:45 -0400
+Received: from mail.kernel.org ([198.145.29.136]:38742)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <SRS0=0SF/=27=redhat.com=mst@kernel.org>)
-	id 1cqihd-00076L-MB
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:01:37 -0400
-Date: Wed, 22 Mar 2017 18:01:31 +0200
+	id 1cqihk-0007C8-H1
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 12:01:44 -0400
+Date: Wed, 22 Mar 2017 18:01:34 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1490198476-12244-1-git-send-email-mst@redhat.com>
+Message-ID: <1490198476-12244-2-git-send-email-mst@redhat.com>
+References: <1490198476-12244-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Subject: [Qemu-devel] [PULL 0/4] virtio, pc: fixes
+In-Reply-To: <1490198476-12244-1-git-send-email-mst@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 1/4] virtio: Fix error handling in
+ virtio_bus_device_plugged
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +32,76 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Andrew Jones <drjones@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-The following changes since commit 55a19ad8b2d0797e3a8fe90ab99a9bb713824059:
+From: Fam Zheng <famz@redhat.com>
 
-  Update version for v2.9.0-rc1 release (2017-03-21 17:13:29 +0000)
+For one thing we shouldn't continue if an error happened, for the other
+two steps failing can cause an abort() in error_setg because we reuse
+the same errp blindly.
 
-are available in the git repository at:
+Add error handling checks to fix both issues.
 
-  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
-
-for you to fetch changes up to 807211b76603b094c46a0cd95a3c785f47f3ab73:
-
-  hw/acpi/vmgenid: prevent more than one vmgenid device (2017-03-22 17:56:00 +0200)
-
-----------------------------------------------------------------
-virtio, pc: fixes
-
-virtio and misc fixes for 2.9.
-
+Signed-off-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+---
+ hw/virtio/virtio-bus.c | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
 
-----------------------------------------------------------------
-Fam Zheng (1):
-      virtio: Fix error handling in virtio_bus_device_plugged
-
-Laszlo Ersek (2):
-      hw/acpi/vmgenid: prevent device realization on pre-2.5 machine types
-      hw/acpi/vmgenid: prevent more than one vmgenid device
-
-Paolo Bonzini (1):
-      virtio: always use handle_aio_output if registered
-
- include/hw/acpi/vmgenid.h |  2 ++
- include/hw/compat.h       |  4 ++++
- hw/acpi/vmgenid.c         | 22 ++++++++++++++++++++++
- hw/virtio/virtio-bus.c    | 20 +++++++++++++++++---
- hw/virtio/virtio.c        | 13 ++++++++++++-
- 5 files changed, 57 insertions(+), 4 deletions(-)
+diff --git a/hw/virtio/virtio-bus.c b/hw/virtio/virtio-bus.c
+index a886011..3042232 100644
+--- a/hw/virtio/virtio-bus.c
++++ b/hw/virtio/virtio-bus.c
+@@ -25,6 +25,7 @@
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
+ #include "qemu/error-report.h"
++#include "qapi/error.h"
+ #include "hw/qdev.h"
+ #include "hw/virtio/virtio-bus.h"
+ #include "hw/virtio/virtio.h"
+@@ -48,20 +49,33 @@ void virtio_bus_device_plugged(VirtIODevice *vdev, Er=
+ror **errp)
+     VirtioBusClass *klass =3D VIRTIO_BUS_GET_CLASS(bus);
+     VirtioDeviceClass *vdc =3D VIRTIO_DEVICE_GET_CLASS(vdev);
+     bool has_iommu =3D virtio_host_has_feature(vdev, VIRTIO_F_IOMMU_PLAT=
+FORM);
++    Error *local_err =3D NULL;
+=20
+     DPRINTF("%s: plug device.\n", qbus->name);
+=20
+     if (klass->pre_plugged !=3D NULL) {
+-        klass->pre_plugged(qbus->parent, errp);
++        klass->pre_plugged(qbus->parent, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            return;
++        }
+     }
+=20
+     /* Get the features of the plugged device. */
+     assert(vdc->get_features !=3D NULL);
+     vdev->host_features =3D vdc->get_features(vdev, vdev->host_features,
+-                                            errp);
++                                            &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
+=20
+     if (klass->device_plugged !=3D NULL) {
+-        klass->device_plugged(qbus->parent, errp);
++        klass->device_plugged(qbus->parent, &local_err);
++    }
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
+     }
+=20
+     if (klass->get_dma_as !=3D NULL && has_iommu) {
+--=20
+MST
