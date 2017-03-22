@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cqkNB-0007uh-7M
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 13:48:38 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cqkN8-0001Nj-R8
+	(envelope-from <armbru@redhat.com>) id 1cqkNA-0007uW-Md
 	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 13:48:37 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <armbru@redhat.com>) id 1cqkN8-0001NU-Ob
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 13:48:36 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 22 Mar 2017 18:48:28 +0100
-Message-Id: <1490204908-26567-18-git-send-email-armbru@redhat.com>
+Date: Wed, 22 Mar 2017 18:48:27 +0100
+Message-Id: <1490204908-26567-17-git-send-email-armbru@redhat.com>
 In-Reply-To: <1490204908-26567-1-git-send-email-armbru@redhat.com>
 References: <1490204908-26567-1-git-send-email-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL v2 for-2.9 17/17] qapi: Fix QemuOpts visitor
- regression on unvisited input
+Subject: [Qemu-devel] [PULL v2 for-2.9 16/17] qom: Avoid unvisited
+ 'id'/'qom-type' in user_creatable_add_opts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,121 +25,74 @@ Cc: Eric Blake <eblake@redhat.com>, qemu-stable@nongnu.org
 
 From: Eric Blake <eblake@redhat.com>
 
-An off-by-one in commit 15c2f669e meant that we were failing to
-check for unparsed input in all QemuOpts visitors.  Recent testsuite
-additions show that fixing the obvious bug with bogus fields will
-also fix the case of an incomplete list visit; update the tests to
-match the new behavior.
+A regression in commit 15c2f669e caused us to silently ignore
+excess input to the QemuOpts visitor.  Later, commit ea4641
+accidentally abused that situation, by removing "qom-type" and
+"id" from the corresponding QDict but leaving them defined in
+the QemuOpts, when using the pair of containers to create a
+user-defined object. Note that since we are already traversing
+two separate items (a QDict and a QemuOpts), we are already
+able to flag bogus arguments, as in:
 
-Simple testcase:
+$ ./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic -qmp stdio -object memory-backend-ram,id=mem1,size=4k,bogus=huh
+qemu-system-x86_64: -object memory-backend-ram,id=mem1,size=4k,bogus=huh: Property '.bogus' not found
 
-./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic -qmp stdio -numa node,size=1g
+So the only real concern is that when we re-enable strict checking
+in the QemuOpts visitor, we do not want to start flagging the two
+leftover keys as unvisited.  Rearrange the code to clean out the
+QemuOpts listing in advance, rather than removing items from the
+QDict.  Since "qom-type" is usually an automatic implicit default,
+we don't have to restore it (this does mean that once instantiated,
+QemuOpts is not necessarily an accurate representation of the
+original command line - but this is not the first place to do that);
+however "id" has to be put back (requiring us to cast away a const).
 
-failed to diagnose that 'size' is not a valid argument to -numa, and
-now once again reports:
-
-qemu-system-x86_64: -numa node,size=1g: Invalid parameter 'size'
-
-See also https://bugzilla.redhat.com/show_bug.cgi?id=1434666
+[As a side note, hmp_object_add() turns a QDict into a QemuOpts,
+then calls user_creatable_add_opts() which converts QemuOpts into
+a new QDict. There are probably a lot of wasteful conversions like
+this, but cleaning them up is a much bigger task than the immediate
+regression fix.]
 
 CC: qemu-stable@nongnu.org
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Message-Id: <20170322144525.18964-3-eblake@redhat.com>
 Tested-by: Laurent Vivier <lvivier@redhat.com>
-Message-Id: <20170322144525.18964-4-eblake@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
-[Fixup squashed in]
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- qapi/opts-visitor.c       |  6 +++---
- qom/object_interfaces.c   |  1 +
- tests/test-opts-visitor.c | 13 ++++++++-----
- 3 files changed, 12 insertions(+), 8 deletions(-)
+ qom/object_interfaces.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/qapi/opts-visitor.c b/qapi/opts-visitor.c
-index 026d25b..324b197 100644
---- a/qapi/opts-visitor.c
-+++ b/qapi/opts-visitor.c
-@@ -164,7 +164,7 @@ opts_check_struct(Visitor *v, Error **errp)
-     GHashTableIter iter;
-     GQueue *any;
- 
--    if (ov->depth > 0) {
-+    if (ov->depth > 1) {
-         return;
-     }
- 
-@@ -276,8 +276,8 @@ static void
- opts_check_list(Visitor *v, Error **errp)
- {
-     /*
--     * FIXME should set error when unvisited elements remain.  Mostly
--     * harmless, as the generated visits always visit all elements.
-+     * Unvisited list elements will be reported later when checking
-+     * whether unvisited struct members remain.
-      */
- }
- 
 diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
-index cc9a694..9c271ad 100644
+index 03a95c3..cc9a694 100644
 --- a/qom/object_interfaces.c
 +++ b/qom/object_interfaces.c
-@@ -122,6 +122,7 @@ Object *user_creatable_add_opts(QemuOpts *opts, Error **errp)
-     }
-     if (!id) {
-         error_setg(errp, QERR_MISSING_PARAMETER, "id");
-+        g_free(type);
+@@ -114,7 +114,7 @@ Object *user_creatable_add_opts(QemuOpts *opts, Error **errp)
+     QDict *pdict;
+     Object *obj;
+     const char *id = qemu_opts_id(opts);
+-    const char *type = qemu_opt_get(opts, "qom-type");
++    char *type = qemu_opt_get_del(opts, "qom-type");
+ 
+     if (!type) {
+         error_setg(errp, QERR_MISSING_PARAMETER, "qom-type");
+@@ -125,14 +125,15 @@ Object *user_creatable_add_opts(QemuOpts *opts, Error **errp)
          return NULL;
      }
  
-diff --git a/tests/test-opts-visitor.c b/tests/test-opts-visitor.c
-index 8e0dda5..23e8970 100644
---- a/tests/test-opts-visitor.c
-+++ b/tests/test-opts-visitor.c
-@@ -175,6 +175,7 @@ expect_u64_max(OptsVisitorFixture *f, gconstpointer test_data)
- static void
- test_opts_range_unvisited(void)
- {
-+    Error *err = NULL;
-     intList *list = NULL;
-     intList *tail;
-     QemuOpts *opts;
-@@ -199,10 +200,11 @@ test_opts_range_unvisited(void)
-     g_assert_cmpint(tail->value, ==, 1);
-     tail = (intList *)visit_next_list(v, (GenericList *)tail, sizeof(*list));
-     g_assert(tail);
--    visit_check_list(v, &error_abort); /* BUG: unvisited tail not reported */
-+    visit_check_list(v, &error_abort); /* unvisited tail ignored until... */
-     visit_end_list(v, (void **)&list);
- 
--    visit_check_struct(v, &error_abort);
-+    visit_check_struct(v, &err); /* ...here */
-+    error_free_or_abort(&err);
-     visit_end_struct(v, NULL);
- 
-     qapi_free_intList(list);
-@@ -250,6 +252,7 @@ test_opts_range_beyond(void)
- static void
- test_opts_dict_unvisited(void)
- {
-+    Error *err = NULL;
-     QemuOpts *opts;
-     Visitor *v;
-     UserDefOptions *userdef;
-@@ -258,11 +261,11 @@ test_opts_dict_unvisited(void)
-                            &error_abort);
++    qemu_opts_set_id(opts, NULL);
+     pdict = qemu_opts_to_qdict(opts, NULL);
+-    qdict_del(pdict, "qom-type");
+-    qdict_del(pdict, "id");
  
      v = opts_visitor_new(opts);
--    /* BUG: bogus should be diagnosed */
--    visit_type_UserDefOptions(v, NULL, &userdef, &error_abort);
-+    visit_type_UserDefOptions(v, NULL, &userdef, &err);
-+    error_free_or_abort(&err);
+     obj = user_creatable_add_type(type, id, pdict, v, errp);
      visit_free(v);
-     qemu_opts_del(opts);
--    qapi_free_UserDefOptions(userdef);
-+    g_assert(!userdef);
- }
  
- int
++    qemu_opts_set_id(opts, (char *) id);
++    g_free(type);
+     QDECREF(pdict);
+     return obj;
+ }
 -- 
 2.7.4
