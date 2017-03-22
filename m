@@ -1,28 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cqhg4-0005pi-R5
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 10:55:57 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cqhgR-00063e-N1
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 10:56:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cqhg3-0005LH-RM
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 10:55:56 -0400
-Received: from mail-yw0-x242.google.com ([2607:f8b0:4002:c05::242]:32921)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1cqhg3-0005Ks-BT
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 10:55:55 -0400
-Received: by mail-yw0-x242.google.com with SMTP id p77so20523658ywg.0
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 07:55:55 -0700 (PDT)
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cqhgO-0005b4-Gq
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 10:56:19 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54861
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1cqhgO-0005an-A8
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 10:56:16 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id
+	v2MEsTVN133021
+	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 10:56:15 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 29b9vnj6sv-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 10:56:15 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Wed, 22 Mar 2017 14:56:13 -0000
+References: <20170322123655.32085-1-pasic@linux.vnet.ibm.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Wed, 22 Mar 2017 15:56:11 +0100
 MIME-Version: 1.0
-Sender: bobby.prani@gmail.com
-In-Reply-To: <CAFEAcA8-GJxpmppZGF5ygSAL4Y81BdvYKqso-XhjR2pbjMLi+A@mail.gmail.com>
-References: <CAG48ez1tcz7GGsc5+L3EF140NsW=UyNir=0UpuZZYrBn4ZxrSA@mail.gmail.com>
-	<CAFEAcA8-GJxpmppZGF5ygSAL4Y81BdvYKqso-XhjR2pbjMLi+A@mail.gmail.com>
-From: Pranith Kumar <bobby.prani+qemu@gmail.com>
-Date: Wed, 22 Mar 2017 10:55:23 -0400
-Message-ID: <CAJhHMCA=rwLqLOPq3kMOz9SpV83yrzkK_K6RfPmuyXMU1pXT7g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [BUG] user-to-root privesc inside VM via bad
- translation caching
+In-Reply-To: <20170322123655.32085-1-pasic@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Message-Id: <9f770dc9-f26c-796a-67a7-dc37997efc69@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] cryptodev: fix asserting single queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,44 +41,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Jann Horn <jannh@google.com>, Qemu Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Gonglei <arei.gonglei@huawei.com>
 
-On Mon, Mar 20, 2017 at 10:46 AM, Peter Maydell wrote:
-> On 20 March 2017 at 14:36, Jann Horn <jannh@google.com> wrote:
->> This is an issue in QEMU's system emulation for X86 in TCG mode.
->> The issue permits an attacker who can execute code in guest ring 3
->> with normal user privileges to inject code into other processes that
->> are running in guest ring 3, in particular root-owned processes.
->
->> I am sending this to qemu-devel because a QEMU security contact
->> told me that QEMU does not consider privilege escalation inside a
->> TCG VM to be a security concern.
->
-> Correct; it's just a bug. Don't trust TCG QEMU as a security boundary.
->
-> We should really fix the crossing-a-page-boundary code for x86.
-> I believe we do get it correct for ARM Thumb instructions.
 
-How about doing the instruction size check as follows?
 
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 72c1b03a2a..94cf3da719 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -8235,6 +8235,10 @@ static target_ulong disas_insn(CPUX86State
-*env, DisasContext *s,
-     default:
-         goto unknown_op;
-     }
-+    if (s->pc - pc_start > 15) {
-+        s->pc = pc_start;
-+        goto illegal_op;
-+    }
-     return s->pc;
-  illegal_op:
-     gen_illegal_opcode(s);
+On 03/22/2017 01:36 PM, Halil Pasic wrote:
+> We already check for queues == 1 in cryptodev_builtin_init and when that
+> is not true raise an error. But before that error is reported the
+> assertion in cryptodev_builtin_cleanup kicks in (because object is being
+> finalized and freed).
+> 
+> Let's remove assert(queues == 1) form cryptodev_builtin_cleanup as it
+> does only harm and no good.
+> 
+> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
 
-Thanks,
---
-Pranith
+Sorry guys, I forgot to give credit to the reporter.
+
+Reported-by: Boris Fiuczynski <fiuczy@linux.vnet.ibm.com>
+> ---
+>  backends/cryptodev-builtin.c | 2 --
+>  1 file changed, 2 deletions(-)
+> 
+> diff --git a/backends/cryptodev-builtin.c b/backends/cryptodev-builtin.c
+> index 82a068e..137c7a6 100644
+> --- a/backends/cryptodev-builtin.c
+> +++ b/backends/cryptodev-builtin.c
+> @@ -359,8 +359,6 @@ static void cryptodev_builtin_cleanup(
+>          }
+>      }
+> 
+> -    assert(queues == 1);
+> -
+>      for (i = 0; i < queues; i++) {
+>          cc = backend->conf.peers.ccs[i];
+>          if (cc) {
+> 
