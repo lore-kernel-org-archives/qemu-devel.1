@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38974)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1cqbQ2-0002OU-14
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 04:14:59 -0400
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cqbds-0004uG-Oz
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 04:29:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1cqbPy-0007LS-PB
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 04:14:58 -0400
-Received: from mail-vk0-x230.google.com ([2607:f8b0:400c:c05::230]:33537)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1cqbPy-0007LJ-Cc
-	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 04:14:54 -0400
-Received: by mail-vk0-x230.google.com with SMTP id d188so118082161vka.0
-	for <qemu-devel@nongnu.org>; Wed, 22 Mar 2017 01:14:54 -0700 (PDT)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cqbdp-0002K7-JC
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 04:29:16 -0400
+Received: from [45.249.212.187] (port=3006 helo=dggrg01-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cqbdl-0002IM-R7
+	for qemu-devel@nongnu.org; Wed, 22 Mar 2017 04:29:13 -0400
+References: <201703221609014140490@zte.com.cn>
+From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Message-ID: <58D23533.30902@huawei.com>
+Date: Wed, 22 Mar 2017 16:26:27 +0800
 MIME-Version: 1.0
-In-Reply-To: <149011257708.3910.6427658788264808225@loki>
-References: <20170321104952.6236-1-sameeh@daynix.com>
-	<149011257708.3910.6427658788264808225@loki>
-From: Sameeh Jubran <sameeh@daynix.com>
-Date: Wed, 22 Mar 2017 10:14:53 +0200
-Message-ID: <CAKPgXcFgZ4PA4d8SqFTe1quk16jFnXVWsx8Lody1Z60B0wRXqA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] Fix Event Viewer errors caused by qemu-ga
+In-Reply-To: <201703221609014140490@zte.com.cn>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel]
+ =?utf-8?b?562U5aSNOiBSZTogIOetlOWkjTogUmU6IOetlA==?=
+ =?utf-8?b?5aSNOiBSZTog562U5aSNOiBSZTogW0JVR11DT0xPIGZhaWxvdmVyIGhhbmc=?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,129 +28,513 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, Yan Vugenfirer <yan@daynix.com>
+To: wang.guang55@zte.com.cn
+Cc: xuquan8@huawei.com, dgilbert@redhat.com, zhangchen.fnst@cn.fujitsu.com, qemu-devel@nongnu.org
 
-On Tue, Mar 21, 2017 at 6:09 PM, Michael Roth <mdroth@linux.vnet.ibm.com>
-wrote:
-
-> Quoting Sameeh Jubran (2017-03-21 05:49:52)
-> > When the command "guest-fsfreeze-freeze" is executed it causes
-> > the VSS service to log the errors below in the Event Viewer.
-> >
-> > These errors are caused by two issues in the function "CommitSnapshots"
-> in
-> > provider.cpp:
-> >
-> > 1. When VSS_TIMEOUT_MSEC expires the funtion returns E_ABORT. This causes
-> > the error #12293.
-> >
-> > 2. The VSS_TIMEOUT_MSEC value is too big. According to msdn the
-> > "Flush & Hold" operation has 10 seconds timeout not configurable, The
-> > "CommitSnapshots" is a part of the "Flush & Hold" process and thus any
-> > timeout bigger than 10 seconds would cause the error #12298 and anything
-> > bigger than 40 seconds causes the error #12340. All this info can be
-> found here:
-> > https://msdn.microsoft.com/en-us/library/windows/desktop/
-> aa384589(v=vs.85).aspx
+On 2017/3/22 16:09, wang.guang55@zte.com.cn wrote:
+> hi:
 >
-> Not sure how best to deal with this. Technically our CommitSnapshots
-> interface is driven by the backup job being run by QGA/QEMU management
-> side. If that amount of time exceeds the VSS limits then I think it's
-> appropriate for VSS to log the error accordingly. VSS_TIMEOUT_MSEC here
-> doesn't actually have too much correlation with the VSS-set timeout,
-> IIRC it's specifically picked to exceed both the 10 and 40 second
-> timeouts and acts more as a fail-safe timeout.
-
-The timeout was added in #commit: b39297aedfabe9b2c426cd540413be991500da25
-There is no point in setting the TIMEOUT for this long as the actual freeze
-- Fush and Hold Writes -
-is limited to 10 seconds ( not configurable) according to msdn
-https://msdn.microsoft.com/en-us/library/windows/desktop/aa384589%28v=vs.85%29.aspx
-
+> yes.it is better.
 >
-> Are the event logs causing issues? FWIW, on the posix side we also opt
-> for gratuitous logging to syslog and such, the idea there being that
-> cooperative guests would prefer transparency on how the agent is being
-> used.
->
-Apparently, these error logs are annoying to some (
-https://bugzilla.redhat.com/show_bug.cgi?id=1387125),
-moreover I don't think that our implementation to the freeze operation -
-which is a workaround in a way -
-should log errors even though we know they are false alarm.
-
->
-> That said, I do think error 12293 is unecessary, since IIUC it would
-> always be paired with the actual VSS-reported error. So avoiding the
-> E_ABORT seems reasonable either way.
->
-> >
-> > |event id|                           error
->  |
-> > * 12293  : Volume Shadow Copy Service error: Error calling a routine on a
-> >            Shadow Copy Provider {00000000-0000-0000-0000-000000000000}.
-> >        Routine details CommitSnapshots [hr = 0x80004004, Operation
-> >        aborted.
-> >
-> > * 12340  : Volume Shadow Copy Error: VSS waited more than 40 seconds for
-> >            all volumes to be flushed.  This caused volume
-> >        \\?\Volume{62a171da-32ec-11e4-80b1-806e6f6e6963}\ to timeout
-> >        while waiting for the release-writes phase of shadow copy
-> >        creation. Trying again when disk activity is lower may solve
-> >        this problem.
-> >
-> > * 12298  : Volume Shadow Copy Service error: The I/O writes cannot be
-> held
-> >            during the shadow copy creation period on volume
-> >            \\?\Volume{62a171d9-32ec-11e4-80b1-806e6f6e6963}\. The volume
-> >        index in the shadow copy set is 0. Error details:
-> >        Open[0x00000000, The operation completed successfully. ],
-> >        Flush[0x00000000, The operation completed successfully.],
-> >        Release[0x00000000, The operation completed successfully.],
-> >        OnRun[0x80042314, The shadow copy provider timed out while
-> >        holding writes to the volume being shadow copied. This is
-> >        probably due to excessive activity on the volume by an
-> >        application or a system service. Try again later when activity
-> >        on the volume is reduced.
-> >
-> > Signed-off-by: Sameeh Jubran <sameeh@daynix.com>
-> > ---
-> >  qga/vss-win32/provider.cpp | 3 +--
-> >  1 file changed, 1 insertion(+), 2 deletions(-)
-> >
-> > diff --git a/qga/vss-win32/provider.cpp b/qga/vss-win32/provider.cpp
-> > index ef94669..d72f4d4 100644
-> > --- a/qga/vss-win32/provider.cpp
-> > +++ b/qga/vss-win32/provider.cpp
-> > @@ -15,7 +15,7 @@
-> >  #include <inc/win2003/vscoordint.h>
-> >  #include <inc/win2003/vsprov.h>
-> >
-> > -#define VSS_TIMEOUT_MSEC (60*1000)
-> > +#define VSS_TIMEOUT_MSEC (9 * 1000)
-> >
-> >  static long g_nComObjsInUse;
-> >  HINSTANCE g_hinstDll;
-> > @@ -377,7 +377,6 @@ STDMETHODIMP CQGAVssProvider::CommitSnapshots(VSS_ID
-> SnapshotSetId)
-> >      if (WaitForSingleObject(hEventThaw, VSS_TIMEOUT_MSEC) !=
-> WAIT_OBJECT_0) {
-> >          /* Send event to qemu-ga to notify the provider is timed out */
-> >          SetEvent(hEventTimeout);
-> > -        hr = E_ABORT;
-> >      }
-> >
-> >      CloseHandle(hEventThaw);
-> > --
-> > 2.9.3
-> >
->
+> And should we delete
 >
 
+Yes, you are right.
 
--- 
-Respectfully,
-*Sameeh Jubran*
-*Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>*
-*Software Engineer @ Daynix <http://www.daynix.com>.*
+>
+>
+>
+> #ifdef WIN32
+>
+>      QIO_CHANNEL(cioc)-＞event = CreateEvent(NULL, FALSE, FALSE, NULL)
+>
+> #endif
+>
+>
+>
+>
+> in qio_channel_socket_accept？
+>
+> qio_channel_socket_new already have it.
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+> 原始邮件
+>
+>
+>
+> 发件人： ＜zhang.zhanghailiang@huawei.com＞
+> 收件人：王广10165992
+> 抄送人： ＜xuquan8@huawei.com＞ ＜dgilbert@redhat.com＞ ＜zhangchen.fnst@cn.fujitsu.com＞ ＜qemu-devel@nongnu.org＞
+> 日 期 ：2017年03月22日 15:03
+> 主 题 ：Re: [Qemu-devel]  答复: Re:  答复: Re: 答复: Re: [BUG]COLO failover hang
+>
+>
+>
+>
+>
+> Hi,
+>
+> On 2017/3/22 9:42, wang.guang55@zte.com.cn wrote:
+> ＞ diff --git a/migration/socket.c b/migration/socket.c
+> ＞
+> ＞
+> ＞ index 13966f1..d65a0ea 100644
+> ＞
+> ＞
+> ＞ --- a/migration/socket.c
+> ＞
+> ＞
+> ＞ +++ b/migration/socket.c
+> ＞
+> ＞
+> ＞ @@ -147,8 +147,9 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
+> ＞
+> ＞
+> ＞       }
+> ＞
+> ＞
+> ＞
+> ＞
+> ＞
+> ＞       trace_migration_socket_incoming_accepted()
+> ＞
+> ＞
+> ＞
+> ＞
+> ＞
+> ＞       qio_channel_set_name(QIO_CHANNEL(sioc), "migration-socket-incoming")
+> ＞
+> ＞
+> ＞ +    qio_channel_set_feature(QIO_CHANNEL(sioc), QIO_CHANNEL_FEATURE_SHUTDOWN)
+> ＞
+> ＞
+> ＞       migration_channel_process_incoming(migrate_get_current(),
+> ＞
+> ＞
+> ＞                                          QIO_CHANNEL(sioc))
+> ＞
+> ＞
+> ＞       object_unref(OBJECT(sioc))
+> ＞
+> ＞
+> ＞
+> ＞
+> ＞ Is this patch ok?
+> ＞
+>
+> Yes, i think this works, but a better way maybe to call qio_channel_set_feature()
+> in qio_channel_socket_accept(), we didn't set the SHUTDOWN feature for the socket accept fd,
+> Or fix it by this:
+>
+> diff --git a/io/channel-socket.c b/io/channel-socket.c
+> index f546c68..ce6894c 100644
+> --- a/io/channel-socket.c
+> +++ b/io/channel-socket.c
+> @@ -330,9 +330,8 @@ qio_channel_socket_accept(QIOChannelSocket *ioc,
+>                              Error **errp)
+>    {
+>        QIOChannelSocket *cioc
+> -
+> -    cioc = QIO_CHANNEL_SOCKET(object_new(TYPE_QIO_CHANNEL_SOCKET))
+> -    cioc-＞fd = -1
+> +
+> +    cioc = qio_channel_socket_new()
+>        cioc-＞remoteAddrLen = sizeof(ioc-＞remoteAddr)
+>        cioc-＞localAddrLen = sizeof(ioc-＞localAddr)
+>
+>
+> Thanks,
+> Hailiang
+>
+> ＞ I have test it . The test could not hang any more.
+> ＞
+> ＞
+> ＞
+> ＞
+> ＞
+> ＞
+> ＞
+> ＞
+> ＞
+> ＞
+> ＞
+> ＞
+> ＞ 原始邮件
+> ＞
+> ＞
+> ＞
+> ＞ 发件人： ＜zhang.zhanghailiang@huawei.com＞
+> ＞ 收件人： ＜dgilbert@redhat.com＞ ＜berrange@redhat.com＞
+> ＞ 抄送人： ＜xuquan8@huawei.com＞ ＜qemu-devel@nongnu.org＞ ＜zhangchen.fnst@cn.fujitsu..com＞王广10165992
+> ＞ 日 期 ：2017年03月22日 09:11
+> ＞ 主 题 ：Re: [Qemu-devel]  答复: Re:  答复: Re: [BUG]COLO failover hang
+> ＞
+> ＞
+> ＞
+> ＞
+> ＞
+> ＞ On 2017/3/21 19:56, Dr. David Alan Gilbert wrote:
+> ＞ ＞ * Hailiang Zhang (zhang.zhanghailiang@huawei.com) wrote:
+> ＞ ＞＞ Hi,
+> ＞ ＞＞
+> ＞ ＞＞ Thanks for reporting this, and i confirmed it in my test, and it is a bug.
+> ＞ ＞＞
+> ＞ ＞＞ Though we tried to call qemu_file_shutdown() to shutdown the related fd, in
+> ＞ ＞＞ case COLO thread/incoming thread is stuck in read/write() while do failover,
+> ＞ ＞＞ but it didn't take effect, because all the fd used by COLO (also migration)
+> ＞ ＞＞ has been wrapped by qio channel, and it will not call the shutdown API if
+> ＞ ＞＞ we didn't qio_channel_set_feature(QIO_CHANNEL(sioc), QIO_CHANNEL_FEATURE_SHUTDOWN).
+> ＞ ＞＞
+> ＞ ＞＞ Cc: Dr. David Alan Gilbert ＜dgilbert@redhat.com＞
+> ＞ ＞＞
+> ＞ ＞＞ I doubted migration cancel has the same problem, it may be stuck in write()
+> ＞ ＞＞ if we tried to cancel migration.
+> ＞ ＞＞
+> ＞ ＞＞ void fd_start_outgoing_migration(MigrationState *s, const char *fdname, Error **errp)
+> ＞ ＞＞ {
+> ＞ ＞＞      qio_channel_set_name(QIO_CHANNEL(ioc), "migration-fd-outgoing")
+> ＞ ＞＞      migration_channel_connect(s, ioc, NULL)
+> ＞ ＞＞      ... ...
+> ＞ ＞＞ We didn't call qio_channel_set_feature(QIO_CHANNEL(sioc), QIO_CHANNEL_FEATURE_SHUTDOWN) above,
+> ＞ ＞＞ and the
+> ＞ ＞＞ migrate_fd_cancel()
+> ＞ ＞＞ {
+> ＞ ＞＞   ... ...
+> ＞ ＞＞      if (s-＞state == MIGRATION_STATUS_CANCELLING && f) {
+> ＞ ＞＞          qemu_file_shutdown(f)  --＞ This will not take effect. No ?
+> ＞ ＞＞      }
+> ＞ ＞＞ }
+> ＞ ＞
+> ＞ ＞ (cc'd in Daniel Berrange).
+> ＞ ＞ I see that we call qio_channel_set_feature(ioc, QIO_CHANNEL_FEATURE_SHUTDOWN) at the
+> ＞ ＞ top of qio_channel_socket_new  so I think that's safe isn't it?
+> ＞ ＞
+> ＞
+> ＞ Hmm, you are right, this problem is only exist for the migration incoming fd, thanks.
+> ＞
+> ＞ ＞ Dave
+> ＞ ＞
+> ＞ ＞＞ Thanks,
+> ＞ ＞＞ Hailiang
+> ＞ ＞＞
+> ＞ ＞＞ On 2017/3/21 16:10, wang.guang55@zte.com.cn wrote:
+> ＞ ＞＞＞ Thank you。
+> ＞ ＞＞＞
+> ＞ ＞＞＞ I have test aready。
+> ＞ ＞＞＞
+> ＞ ＞＞＞ When the Primary Node panic,the Secondary Node qemu hang at the same place。
+> ＞ ＞＞＞
+> ＞ ＞＞＞ Incorrding http://wiki.qemu-project.org/Features/COLO ，kill Primary Node qemu will not produce the problem,but Primary Node panic can。
+> ＞ ＞＞＞
+> ＞ ＞＞＞ I think due to the feature of channel does not support QIO_CHANNEL_FEATURE_SHUTDOWN.
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞ when failover,channel_shutdown could not shut down the channel.
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞ so the colo_process_incoming_thread will hang at recvmsg.
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞ I test a patch:
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞ diff --git a/migration/socket.c b/migration/socket.c
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞ index 13966f1..d65a0ea 100644
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞ --- a/migration/socket.c
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞ +++ b/migration/socket.c
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞ @@ -147,8 +147,9 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞        }
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞        trace_migration_socket_incoming_accepted()
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞        qio_channel_set_name(QIO_CHANNEL(sioc), "migration-socket-incoming")
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞ +    qio_channel_set_feature(QIO_CHANNEL(sioc), QIO_CHANNEL_FEATURE_SHUTDOWN)
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞        migration_channel_process_incoming(migrate_get_current(),
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞                                           QIO_CHANNEL(sioc))
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞        object_unref(OBJECT(sioc))
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞ My test will not hang any more.
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞ 原始邮件
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞ 发件人： ＜zhangchen.fnst@cn.fujitsu..com＞
+> ＞ ＞＞＞ 收件人：王广10165992 ＜zhang.zhanghailiang@huawei.com＞
+> ＞ ＞＞＞ 抄送人： ＜qemu-devel@nongnu.org＞ ＜zhangchen.fnst@cn.fujitsu.com＞
+> ＞ ＞＞＞ 日 期 ：2017年03月21日 15:58
+> ＞ ＞＞＞ 主 题 ：Re: [Qemu-devel]  答复: Re:  [BUG]COLO failover hang
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞ Hi,Wang.
+> ＞ ＞＞＞
+> ＞ ＞＞＞ You can test this branch:
+> ＞ ＞＞＞
+> ＞ ＞＞＞ https://github.com/coloft/qemu/tree/colo-v5.1-developing-COLO-frame-v21-with-shared-disk
+> ＞ ＞＞＞
+> ＞ ＞＞＞ and please follow wiki ensure your own configuration correctly.
+> ＞ ＞＞＞
+> ＞ ＞＞＞ http://wiki.qemu-project.org/Features/COLO
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞ Thanks
+> ＞ ＞＞＞
+> ＞ ＞＞＞ Zhang Chen
+> ＞ ＞＞＞
+> ＞ ＞＞＞
+> ＞ ＞＞＞ On 03/21/2017 03:27 PM, wang.guang55@zte.com.cn wrote:
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ hi.
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ I test the git qemu master have the same problem.
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ (gdb) bt
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ #0  qio_channel_socket_readv (ioc=0x7f65911b4e50, iov=0x7f64ef3fd880,
+> ＞ ＞＞＞ ＞ niov=1, fds=0x0, nfds=0x0, errp=0x0) at io/channel-socket.c:461
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ #1  0x00007f658e4aa0c2 in qio_channel_read
+> ＞ ＞＞＞ ＞ (ioc=ioc@entry=0x7f65911b4e50, buf=buf@entry=0x7f65907cb838 "",
+> ＞ ＞＞＞ ＞ buflen=buflen@entry=32768, errp=errp@entry=0x0) at io/channel.c:114
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ #2  0x00007f658e3ea990 in channel_get_buffer (opaque=＜optimized out＞,
+> ＞ ＞＞＞ ＞ buf=0x7f65907cb838 "", pos=＜optimized out＞, size=32768) at
+> ＞ ＞＞＞ ＞ migration/qemu-file-channel.c:78
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ #3  0x00007f658e3e97fc in qemu_fill_buffer (f=0x7f65907cb800) at
+> ＞ ＞＞＞ ＞ migration/qemu-file.c:295
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ #4  0x00007f658e3ea2e1 in qemu_peek_byte (f=f@entry=0x7f65907cb800,
+> ＞ ＞＞＞ ＞ offset=offset@entry=0) at migration/qemu-file.c:555
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ #5  0x00007f658e3ea34b in qemu_get_byte (f=f@entry=0x7f65907cb800) at
+> ＞ ＞＞＞ ＞ migration/qemu-file.c:568
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ #6  0x00007f658e3ea552 in qemu_get_be32 (f=f@entry=0x7f65907cb800) at
+> ＞ ＞＞＞ ＞ migration/qemu-file.c:648
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ #7  0x00007f658e3e66e5 in colo_receive_message (f=0x7f65907cb800,
+> ＞ ＞＞＞ ＞ errp=errp@entry=0x7f64ef3fd9b0) at migration/colo.c:244
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ #8  0x00007f658e3e681e in colo_receive_check_message (f=＜optimized
+> ＞ ＞＞＞ ＞ out＞, expect_msg=expect_msg@entry=COLO_MESSAGE_VMSTATE_SEND,
+> ＞ ＞＞＞ ＞ errp=errp@entry=0x7f64ef3fda08)
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞     at migration/colo.c:264
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ #9  0x00007f658e3e740e in colo_process_incoming_thread
+> ＞ ＞＞＞ ＞ (opaque=0x7f658eb30360 ＜mis_current.31286＞) at migration/colo.c:577
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ #10 0x00007f658be09df3 in start_thread () from /lib64/libpthread.so.0
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ #11 0x00007f65881983ed in clone () from /lib64/libc.so.6
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ (gdb) p ioc-＞name
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ $2 = 0x7f658ff7d5c0 "migration-socket-incoming"
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ (gdb) p ioc-＞features        Do not support QIO_CHANNEL_FEATURE_SHUTDOWN
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ $3 = 0
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ (gdb) bt
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ #0  socket_accept_incoming_migration (ioc=0x7fdcceeafa90,
+> ＞ ＞＞＞ ＞ condition=G_IO_IN, opaque=0x7fdcceeafa90) at migration/socket.c:137
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ #1  0x00007fdcc6966350 in g_main_dispatch (context=＜optimized out＞) at
+> ＞ ＞＞＞ ＞ gmain.c:3054
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ #2  g_main_context_dispatch (context=＜optimized out＞,
+> ＞ ＞＞＞ ＞ context@entry=0x7fdccce9f590) at gmain.c:3630
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ #3  0x00007fdccb8a6dcc in glib_pollfds_poll () at util/main-loop.c:213
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ #4  os_host_main_loop_wait (timeout=＜optimized out＞) at
+> ＞ ＞＞＞ ＞ util/main-loop.c:258
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ #5  main_loop_wait (nonblocking=nonblocking@entry=0) at
+> ＞ ＞＞＞ ＞ util/main-loop.c:506
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ #6  0x00007fdccb526187 in main_loop () at vl.c:1898
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ #7  main (argc=＜optimized out＞, argv=＜optimized out＞, envp=＜optimized
+> ＞ ＞＞＞ ＞ out＞) at vl.c:4709
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ (gdb) p ioc-＞features
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ $1 = 6
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ (gdb) p ioc-＞name
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ $2 = 0x7fdcce1b1ab0 "migration-socket-listener"
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ May be socket_accept_incoming_migration should
+> ＞ ＞＞＞ ＞ call qio_channel_set_feature(ioc, QIO_CHANNEL_FEATURE_SHUTDOWN)??
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ thank you.
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ 原始邮件
+> ＞ ＞＞＞ ＞ *发件人：*＜zhangchen.fnst@cn.fujitsu.com＞
+> ＞ ＞＞＞ ＞ *收件人：*王广10165992＜qemu-devel@nongnu.org＞
+> ＞ ＞＞＞ ＞ *抄送人：*＜zhangchen.fnst@cn.fujitsu.com＞＜zhang.zhanghailiang@huawei.com＞
+> ＞ ＞＞＞ ＞ *日 期 ：*2017年03月16日 14:46
+> ＞ ＞＞＞ ＞ *主 题 ：**Re: [Qemu-devel] COLO failover hang*
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ On 03/15/2017 05:06 PM, wangguang wrote:
+> ＞ ＞＞＞ ＞ ＞   am testing QEMU COLO feature described here [QEMU
+> ＞ ＞＞＞ ＞ ＞ Wiki](http://wiki.qemu-project.org/Features/COLO).
+> ＞ ＞＞＞ ＞ ＞
+> ＞ ＞＞＞ ＞ ＞ When the Primary Node panic,the Secondary Node qemu hang.
+> ＞ ＞＞＞ ＞ ＞ hang at recvmsg in qio_channel_socket_readv.
+> ＞ ＞＞＞ ＞ ＞ And  I run  { 'execute': 'nbd-server-stop' } and { "execute":
+> ＞ ＞＞＞ ＞ ＞ "x-colo-lost-heartbeat" } in Secondary VM's
+> ＞ ＞＞＞ ＞ ＞ monitor,the  Secondary Node qemu still hang at recvmsg .
+> ＞ ＞＞＞ ＞ ＞
+> ＞ ＞＞＞ ＞ ＞ I found that the colo in qemu is not complete yet.
+> ＞ ＞＞＞ ＞ ＞ Do the colo have any plan for development?
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ Yes, We are developing. You can see some of patch we pushing.
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ ＞ Has anyone ever run it successfully? Any help is appreciated!
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ In our internal version can run it successfully,
+> ＞ ＞＞＞ ＞ The failover detail you can ask Zhanghailiang for help.
+> ＞ ＞＞＞ ＞ Next time if you have some question about COLO,
+> ＞ ＞＞＞ ＞ please cc me and zhanghailiang ＜zhang.zhanghailiang@huawei.com＞.
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ Thanks
+> ＞ ＞＞＞ ＞ Zhang Chen
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ ＞
+> ＞ ＞＞＞ ＞ ＞
+> ＞ ＞＞＞ ＞ ＞
+> ＞ ＞＞＞ ＞ ＞ centos7.2+qemu2.7.50
+> ＞ ＞＞＞ ＞ ＞ (gdb) bt
+> ＞ ＞＞＞ ＞ ＞ #0  0x00007f3e00cc86ad in recvmsg () from /lib64/libpthread.so.0
+> ＞ ＞＞＞ ＞ ＞ #1  0x00007f3e0332b738 in qio_channel_socket_readv (ioc=＜optimized out＞,
+> ＞ ＞＞＞ ＞ ＞ iov=＜optimized out＞, niov=＜optimized out＞, fds=0x0, nfds=0x0, errp=0x0) at
+> ＞ ＞＞＞ ＞ ＞ io/channel-socket.c:497
+> ＞ ＞＞＞ ＞ ＞ #2  0x00007f3e03329472 in qio_channel_read (ioc=ioc@entry=0x7f3e05110e40,
+> ＞ ＞＞＞ ＞ ＞ buf=buf@entry=0x7f3e05910f38 "", buflen=buflen@entry=32768,
+> ＞ ＞＞＞ ＞ ＞ errp=errp@entry=0x0) at io/channel.c:97
+> ＞ ＞＞＞ ＞ ＞ #3  0x00007f3e032750e0 in channel_get_buffer (opaque=＜optimized out＞,
+> ＞ ＞＞＞ ＞ ＞ buf=0x7f3e05910f38 "", pos=＜optimized out＞, size=32768) at
+> ＞ ＞＞＞ ＞ ＞ migration/qemu-file-channel.c:78
+> ＞ ＞＞＞ ＞ ＞ #4  0x00007f3e0327412c in qemu_fill_buffer (f=0x7f3e05910f00) at
+> ＞ ＞＞＞ ＞ ＞ migration/qemu-file.c:257
+> ＞ ＞＞＞ ＞ ＞ #5  0x00007f3e03274a41 in qemu_peek_byte (f=f@entry=0x7f3e05910f00,
+> ＞ ＞＞＞ ＞ ＞ offset=offset@entry=0) at migration/qemu-file.c:510
+> ＞ ＞＞＞ ＞ ＞ #6  0x00007f3e03274aab in qemu_get_byte (f=f@entry=0x7f3e05910f00) at
+> ＞ ＞＞＞ ＞ ＞ migration/qemu-file.c:523
+> ＞ ＞＞＞ ＞ ＞ #7  0x00007f3e03274cb2 in qemu_get_be32 (f=f@entry=0x7f3e05910f00) at
+> ＞ ＞＞＞ ＞ ＞ migration/qemu-file.c:603
+> ＞ ＞＞＞ ＞ ＞ #8  0x00007f3e03271735 in colo_receive_message (f=0x7f3e05910f00,
+> ＞ ＞＞＞ ＞ ＞ errp=errp@entry=0x7f3d62bfaa50) at migration/colo.c:215
+> ＞ ＞＞＞ ＞ ＞ #9  0x00007f3e0327250d in colo_wait_handle_message (errp=0x7f3d62bfaa48,
+> ＞ ＞＞＞ ＞ ＞ checkpoint_request=＜synthetic pointer＞, f=＜optimized out＞) at
+> ＞ ＞＞＞ ＞ ＞ migration/colo.c:546
+> ＞ ＞＞＞ ＞ ＞ #10 colo_process_incoming_thread (opaque=0x7f3e067245e0) at
+> ＞ ＞＞＞ ＞ ＞ migration/colo.c:649
+> ＞ ＞＞＞ ＞ ＞ #11 0x00007f3e00cc1df3 in start_thread () from /lib64/libpthread.so.0
+> ＞ ＞＞＞ ＞ ＞ #12 0x00007f3dfc9c03ed in clone () from /lib64/libc..so.6
+> ＞ ＞＞＞ ＞ ＞
+> ＞ ＞＞＞ ＞ ＞
+> ＞ ＞＞＞ ＞ ＞
+> ＞ ＞＞＞ ＞ ＞
+> ＞ ＞＞＞ ＞ ＞
+> ＞ ＞＞＞ ＞ ＞ --
+> ＞ ＞＞＞ ＞ ＞ View this message in context: http://qemu.11.n7.nabble.com/COLO-failover-hang-tp473250.html
+> ＞ ＞＞＞ ＞ ＞ Sent from the Developer mailing list archive at Nabble.com.
+> ＞ ＞＞＞ ＞ ＞
+> ＞ ＞＞＞ ＞ ＞
+> ＞ ＞＞＞ ＞ ＞
+> ＞ ＞＞＞ ＞ ＞
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞ --
+> ＞ ＞＞＞ ＞ Thanks
+> ＞ ＞＞＞ ＞ Zhang Chen
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞ ＞
+> ＞ ＞＞＞
+> ＞ ＞＞
+> ＞ ＞ --
+> ＞ ＞ Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> ＞ ＞
+> ＞ ＞ .
+> ＞ ＞
+> ＞
+>
