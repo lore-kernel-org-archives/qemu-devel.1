@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cr2eb-0006w8-TH
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 09:19:53 -0400
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cr2g1-0007gV-Br
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 09:21:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cr2ea-0003Ey-Mr
-	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 09:19:49 -0400
-References: <1490189568-167621-1-git-send-email-imammedo@redhat.com>
-	<1490189568-167621-16-git-send-email-imammedo@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <59448b66-430d-48a1-cf98-541873c87cb7@redhat.com>
-Date: Thu, 23 Mar 2017 08:19:24 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cr2fy-0003pc-8k
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 09:21:17 -0400
+Received: from mail2-relais-roc.national.inria.fr ([192.134.164.83]:46602)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1cr2fx-0003oN-ST
+	for qemu-devel@nongnu.org; Thu, 23 Mar 2017 09:21:14 -0400
+Date: Thu, 23 Mar 2017 14:21:08 +0100
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20170323132108.7cht5gpwmyjxiumm@var.youpi.perso.aquilenet.fr>
+References: <20170323113156.9277-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1490189568-167621-16-git-send-email-imammedo@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="P1T8rw3QOnNhb7OK8Xe149ex66f6mQU1N"
-Subject: Re: [Qemu-devel] [PATCH for-2.10 15/23] QMP: include
- CpuInstanceProperties into query_cpus output output
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20170323113156.9277-1-marcandre.lureau@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] slirp: tftp, copy sockaddr_size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,83 +28,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, jan.kiszka@siemens.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---P1T8rw3QOnNhb7OK8Xe149ex66f6mQU1N
-From: Eric Blake <eblake@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Paolo Bonzini <pbonzini@redhat.com>, Shannon Zhao
- <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org
-Message-ID: <59448b66-430d-48a1-cf98-541873c87cb7@redhat.com>
-Subject: Re: [PATCH for-2.10 15/23] QMP: include CpuInstanceProperties into
- query_cpus output output
-References: <1490189568-167621-1-git-send-email-imammedo@redhat.com>
- <1490189568-167621-16-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1490189568-167621-16-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Marc-André Lureau, on jeu. 23 mars 2017 15:31:56 +0400, wrote:
+> ASAN detects an "unknown-crash" when running pxe-test:
+> 
+> /ppc64/pxe/spapr-vlan: =================================================================
+> ==7143==ERROR: AddressSanitizer: unknown-crash on address 0x7f6dcd298d30 at pc 0x55e22218830d bp 0x7f6dcd2989e0 sp 0x7f6dcd2989d0
+> READ of size 128 at 0x7f6dcd298d30 thread T2
+>     #0 0x55e22218830c in tftp_session_allocate /home/elmarco/src/qq/slirp/tftp.c:73
+>     #1 0x55e22218a1f8 in tftp_handle_rrq /home/elmarco/src/qq/slirp/tftp.c:289
+>     #2 0x55e22218b54c in tftp_input /home/elmarco/src/qq/slirp/tftp.c:446
+>     #3 0x55e2221833fe in udp6_input /home/elmarco/src/qq/slirp/udp6.c:82
+>     #4 0x55e222137b17 in ip6_input /home/elmarco/src/qq/slirp/ip6_input.c:67
+> 
+> Address 0x7f6dcd298d30 is located in stack of thread T2 at offset 96 in frame
+>     #0 0x55e222182420 in udp6_input /home/elmarco/src/qq/slirp/udp6.c:13
+> 
+>   This frame has 3 object(s):
+>     [32, 48) '<unknown>'
+>     [96, 124) 'lhost' <== Memory access at offset 96 partially overflows this variable
+>     [160, 200) 'save_ip' <== Memory access at offset 96 partially underflows this variable
+> 
+> The sockaddr_storage pointer is the sockaddr_in6 lhost on the
+> stack. Copy only the source addr size.
+> 
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-On 03/22/2017 08:32 AM, Igor Mammedov wrote:
-> if board supports CpuInstanceProperties, report them for
-> each CPU thread listed. Main motivation for this is to
-> provide these properties introspection via QMP interface
-> for using in test cases to verify numa node to cpu mapping,
-> which includes not only boards that support cpu hotplug
-> and have this info in query-hotpluggable-cpus (pc/spapr)
-> but also for boards that don't not support hotpluggable-cpus
-> but support numa mapping (virt-arm).
->=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+
 > ---
+>  slirp/tftp.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/slirp/tftp.c b/slirp/tftp.c
+> index 50e714807d..a9bc4bb1b6 100644
+> --- a/slirp/tftp.c
+> +++ b/slirp/tftp.c
+> @@ -70,7 +70,7 @@ static int tftp_session_allocate(Slirp *slirp, struct sockaddr_storage *srcsas,
+>  
+>   found:
+>    memset(spt, 0, sizeof(*spt));
+> -  spt->client_addr = *srcsas;
+> +  memcpy(&spt->client_addr, srcsas, sockaddr_size(srcsas));
+>    spt->fd = -1;
+>    spt->block_size = 512;
+>    spt->client_port = tp->udp.uh_sport;
+> -- 
+> 2.12.0.191.gc5d8de91d
+> 
 
-> @@ -1860,6 +1863,12 @@ CpuInfoList *qmp_query_cpus(Error **errp)
->  #else
->          info->value->arch =3D CPU_INFO_ARCH_OTHER;
->  #endif
-> +        if ((info->value->has_props =3D !!mc->cpu_index_to_instance_pr=
-ops)) {
-
-checkpatch.pl doesn't flag that? We generally try to avoid side-effects
-inside conditionals.
-
-> +            CpuInstanceProperties *props;
-> +            props =3D g_malloc0(sizeof(*props));
-> +            *props =3D mc->cpu_index_to_instance_props(ms, cpu->cpu_in=
-dex);
-> +            info->value->props =3D  props;
-
-Why two spaces after =3D?
-
-With those cleaned up,
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---P1T8rw3QOnNhb7OK8Xe149ex66f6mQU1N
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJY08tcAAoJEKeha0olJ0Nq+VkIAIsuKx1YXnvSqeuJvsKry60q
-FPqiyvM7dAxlxVfW+vZhQgyOedBrQ6d4k6kRKODGmm93R6bSItdEwTX1vfAeVOpt
-NwyE3VGWqCKQkgN4TVkJNIMmPFo5aanQpoN2ZqiqV6+0Uzh7Kv3jtGpb54XEBkZI
-0ykdx2O3PRWySWkD9DrcKhQAGRQwJbuIjg/E9vFjZl/w+TjbgjYMKI5kj7LJ2EEG
-xuwTga8YSUEwXNOPk5FYguDq/0OaLRFqI5DSklzhY6xRVawTrcX2zYNF1U6yFGsT
-o4vk0qvFIsBk86tuuKDySiK8vDAw+dokJ0xlWjRUJml4lc4YHRJK2BsyXSnuIBg=
-=p5hB
------END PGP SIGNATURE-----
-
---P1T8rw3QOnNhb7OK8Xe149ex66f6mQU1N--
+-- 
+Samuel
+gawk; talk; nice; date; wine; grep; touch; unzip; strip;  \
+touch; gasp; finger; gasp; lyx; gasp; latex; mount; fsck; \
+more; yes; gasp; umount; make clean; make mrproper; sleep
